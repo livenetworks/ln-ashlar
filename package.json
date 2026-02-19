@@ -1,0 +1,42 @@
+{
+	"name": "ln-frontend",
+	"version": "1.0.0",
+	"description": "LiveNetworks unified frontend library — CSS framework and vanilla JS components",
+	"type": "module",
+	"main": "dist/ln-frontend.js",
+	"style": "dist/ln-frontend.css",
+	"files": [
+		"dist/",
+		"scss/",
+		"js/"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/ln-frontend.js",
+			"style": "./dist/ln-frontend.css"
+		},
+		"./css": "./dist/ln-frontend.css",
+		"./js": "./dist/ln-frontend.js",
+		"./scss/*": "./scss/*",
+		"./js/*": "./js/*"
+	},
+	"scripts": {
+		"dev": "vite build --watch",
+		"build": "vite build"
+	},
+	"devDependencies": {
+		"sass-embedded": "^1.83.0",
+		"vite": "^6.0.0"
+	},
+	"peerDependencies": {
+		"tom-select": "^2.0.0"
+	},
+	"peerDependenciesMeta": {
+		"tom-select": {
+			"optional": true
+		}
+	},
+	"dependencies": {},
+	"license": "UNLICENSED",
+	"private": true
+}

@@ -1,0 +1,213 @@
+// ==========================================================================
+// Mixins — ln-frontend
+// ==========================================================================
+// Tailwind-like utility mixins. Наместо utility класи во HTML,
+// ги @include во SCSS компонентите.
+//
+// СИТЕ mixins ги референцираат CSS variables од _tokens.scss.
+// Ништо не е hardcoded — промени го token-от, промени го секаде.
+//
+// Пример:
+//   .card header {
+//       @include px(var(--spacing-lg));
+//       @include py(var(--spacing-md));
+//       @include font-semibold;
+//       @include text-sm;
+//       @include border-b;
+//   }
+// ==========================================================================
+
+// ---------------------------------------------------------------------------
+// Spacing — прима CSS variable или вредност
+// ---------------------------------------------------------------------------
+
+@mixin p($val)  { padding: $val; }
+@mixin px($val) { padding-left: $val; padding-right: $val; }
+@mixin py($val) { padding-top: $val; padding-bottom: $val; }
+@mixin pt($val) { padding-top: $val; }
+@mixin pb($val) { padding-bottom: $val; }
+@mixin pl($val) { padding-left: $val; }
+@mixin pr($val) { padding-right: $val; }
+
+@mixin m($val)  { margin: $val; }
+@mixin mx($val) { margin-left: $val; margin-right: $val; }
+@mixin my($val) { margin-top: $val; margin-bottom: $val; }
+@mixin mt($val) { margin-top: $val; }
+@mixin mb($val) { margin-bottom: $val; }
+@mixin ml($val) { margin-left: $val; }
+@mixin mr($val) { margin-right: $val; }
+
+@mixin gap($val) { gap: $val; }
+
+// ---------------------------------------------------------------------------
+// Display & Flex
+// ---------------------------------------------------------------------------
+
+@mixin flex          { display: flex; }
+@mixin inline-flex   { display: inline-flex; }
+@mixin block         { display: block; }
+@mixin inline-block  { display: inline-block; }
+@mixin hidden        { display: none; }
+
+@mixin flex-col      { display: flex; flex-direction: column; }
+@mixin flex-row      { display: flex; flex-direction: row; }
+@mixin flex-wrap     { flex-wrap: wrap; }
+@mixin flex-1        { flex: 1; }
+@mixin flex-shrink-0 { flex-shrink: 0; }
+
+@mixin items-center    { align-items: center; }
+@mixin items-start     { align-items: flex-start; }
+@mixin items-end       { align-items: flex-end; }
+@mixin justify-center  { justify-content: center; }
+@mixin justify-between { justify-content: space-between; }
+@mixin justify-end     { justify-content: flex-end; }
+
+@mixin flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+// ---------------------------------------------------------------------------
+// Width & Height
+// ---------------------------------------------------------------------------
+
+@mixin w-full    { width: 100%; }
+@mixin h-full    { height: 100%; }
+@mixin min-h-screen { min-height: 100vh; }
+@mixin w($val)   { width: $val; }
+@mixin h($val)   { height: $val; }
+@mixin size($val) { width: $val; height: $val; }
+
+// ---------------------------------------------------------------------------
+// Typography — референцира --text-* и --font-* токени
+// ---------------------------------------------------------------------------
+
+@mixin text-xs   { font-size: var(--text-xs);   line-height: 1rem; }
+@mixin text-sm   { font-size: var(--text-sm);   line-height: 1.25rem; }
+@mixin text-base { font-size: var(--text-base);  line-height: 1.5rem; }
+@mixin text-lg   { font-size: var(--text-lg);   line-height: 1.75rem; }
+@mixin text-xl   { font-size: var(--text-xl);   line-height: 1.75rem; }
+@mixin text-2xl  { font-size: var(--text-2xl);  line-height: 2rem; }
+
+@mixin font-normal    { font-weight: var(--font-normal); }
+@mixin font-medium    { font-weight: var(--font-medium); }
+@mixin font-semibold  { font-weight: var(--font-semibold); }
+@mixin font-bold      { font-weight: var(--font-bold); }
+
+@mixin text-left   { text-align: left; }
+@mixin text-center { text-align: center; }
+@mixin text-right  { text-align: right; }
+
+@mixin uppercase { text-transform: uppercase; }
+@mixin lowercase { text-transform: lowercase; }
+@mixin capitalize { text-transform: capitalize; }
+@mixin normal-case { text-transform: none; }
+
+@mixin tracking-wide   { letter-spacing: 0.025em; }
+@mixin tracking-wider  { letter-spacing: 0.05em; }
+
+@mixin truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@mixin whitespace-nowrap { white-space: nowrap; }
+@mixin font-mono { font-family: var(--font-mono); }
+@mixin font-sans { font-family: var(--font-sans); }
+
+// ---------------------------------------------------------------------------
+// Colors — референцира --color-* токени
+// ---------------------------------------------------------------------------
+
+@mixin text-primary   { color: var(--color-text-primary); }
+@mixin text-secondary { color: var(--color-text-secondary); }
+@mixin text-muted     { color: var(--color-text-muted); }
+@mixin text-white     { color: #ffffff; }
+@mixin text-error     { color: var(--color-error); }
+@mixin text-success   { color: var(--color-success); }
+@mixin text-warning   { color: var(--color-warning); }
+
+@mixin bg-primary   { background-color: var(--color-bg-primary); }
+@mixin bg-secondary { background-color: var(--color-bg-secondary); }
+@mixin bg-body      { background-color: var(--color-bg-body); }
+
+// ---------------------------------------------------------------------------
+// Borders — референцира --color-border и --radius-* токени
+// ---------------------------------------------------------------------------
+
+@mixin border    { border: 1px solid var(--color-border); }
+@mixin border-t  { border-top: 1px solid var(--color-border); }
+@mixin border-b  { border-bottom: 1px solid var(--color-border); }
+@mixin border-l  { border-left: 1px solid var(--color-border); }
+@mixin border-r  { border-right: 1px solid var(--color-border); }
+@mixin border-none { border: none; }
+
+@mixin rounded-sm   { border-radius: var(--radius-sm); }
+@mixin rounded-md   { border-radius: var(--radius-md); }
+@mixin rounded-lg   { border-radius: var(--radius-lg); }
+@mixin rounded-xl   { border-radius: var(--radius-xl); }
+@mixin rounded-full { border-radius: var(--radius-full); }
+
+// ---------------------------------------------------------------------------
+// Shadows — референцира --shadow-* токени
+// ---------------------------------------------------------------------------
+
+@mixin shadow-none { box-shadow: var(--shadow-none); }
+@mixin shadow-sm   { box-shadow: var(--shadow-sm); }
+@mixin shadow-md   { box-shadow: var(--shadow-md); }
+@mixin shadow-lg   { box-shadow: var(--shadow-lg); }
+@mixin shadow-xl   { box-shadow: var(--shadow-xl); }
+
+// ---------------------------------------------------------------------------
+// Transitions — референцира --transition-* токени
+// ---------------------------------------------------------------------------
+
+@mixin transition      { transition: all var(--transition-base); }
+@mixin transition-fast { transition: all var(--transition-fast); }
+@mixin transition-colors {
+	transition: color var(--transition-base),
+	            background-color var(--transition-base),
+	            border-color var(--transition-base);
+}
+
+// ---------------------------------------------------------------------------
+// Position
+// ---------------------------------------------------------------------------
+
+@mixin relative { position: relative; }
+@mixin absolute { position: absolute; }
+@mixin fixed    { position: fixed; }
+@mixin sticky   { position: sticky; }
+
+@mixin inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+
+// ---------------------------------------------------------------------------
+// Overflow
+// ---------------------------------------------------------------------------
+
+@mixin overflow-hidden { overflow: hidden; }
+@mixin overflow-auto   { overflow: auto; }
+@mixin overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+// ---------------------------------------------------------------------------
+// Cursor & Interaction
+// ---------------------------------------------------------------------------
+
+@mixin cursor-pointer     { cursor: pointer; }
+@mixin cursor-not-allowed { cursor: not-allowed; }
+@mixin select-none        { user-select: none; }
+@mixin opacity-50         { opacity: 0.5; }
+
+// ---------------------------------------------------------------------------
+// Z-Index — референцира --z-* токени
+// ---------------------------------------------------------------------------
+
+@mixin z-dropdown { z-index: var(--z-dropdown); }
+@mixin z-sticky   { z-index: var(--z-sticky); }
+@mixin z-overlay  { z-index: var(--z-overlay); }
+@mixin z-modal    { z-index: var(--z-modal); }
+@mixin z-toast    { z-index: var(--z-toast); }
+
+@mixin z($val) { z-index: $val; }

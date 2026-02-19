@@ -1,0 +1,231 @@
+@use '../config/mixins' as *;
+
+table {
+	@include w-full;
+	@include bg-primary;
+	@include rounded-lg;
+	@include overflow-hidden;
+	@include shadow-sm;
+	border-collapse: collapse;
+}
+
+table thead {
+	background: var(--color-table-header-bg, #1a1a2e);
+}
+
+table th {
+	@include text-left;
+	@include px(1rem);
+	@include py(0.75rem);
+	@include font-semibold;
+	font-size: 0.8125rem;
+	letter-spacing: 0.3px;
+	color: var(--color-table-header-text, #fff);
+}
+
+table tbody tr {
+	@include relative;
+	@include transition;
+
+	&::before {
+		content: '';
+		@include absolute;
+		left: 0;
+		top: 0;
+		@include w(4px);
+		@include h-full;
+		background: var(--color-primary);
+		transform: scaleY(0);
+		@include transition;
+		@include z(10);
+	}
+
+	&:hover {
+		background-color: var(--color-primary-lighter);
+		outline: 1px solid var(--color-primary);
+		outline-offset: -1px;
+
+		&::before {
+			transform: scaleY(1);
+		}
+	}
+}
+
+table td {
+	@include px(1rem);
+	@include py(0.625rem);
+	@include border-b;
+	font-size: 0.8125rem;
+	vertical-align: top;
+}
+
+table tr:last-child td {
+	@include border-none;
+}
+
+table td:first-child {
+	@include font-semibold;
+	@include text-primary;
+	@include bg-secondary;
+}
+
+table tr.section-header td {
+	background: var(--color-table-section-bg, #e8ecf1);
+	@include font-bold;
+	font-size: 0.8125rem;
+	color: var(--color-table-header-bg, #1a1a2e);
+	letter-spacing: 0.3px;
+}
+
+table tbody tr.section-header:hover {
+	background-color: var(--color-table-section-bg, #e8ecf1);
+	outline: none;
+}
+
+table tbody tr.section-header::before {
+	@include hidden;
+}
+
+.pass {
+	@include text-success;
+	@include font-semibold;
+}
+
+.fail {
+	@include text-error;
+	@include font-semibold;
+}
+
+.warn {
+	@include text-warning;
+	@include font-semibold;
+}
+
+.table-container {
+	@include overflow-x-auto;
+}
+
+table.striped tbody tr:nth-child(odd) {
+	@include bg-secondary;
+
+	&:hover {
+		background-color: var(--color-primary-lighter);
+	}
+}
+
+table td.numeric,
+table th.numeric {
+	@include text-right;
+	@include font-mono;
+}
+
+table td.center,
+table th.center {
+	@include text-center;
+}
+
+table td.nowrap,
+table th.nowrap {
+	@include whitespace-nowrap;
+}
+
+table td .actions {
+	@include flex;
+	@include gap(0.5rem);
+	@include items-center;
+}
+
+table td .action {
+	@include inline-flex;
+	@include items-center;
+	@include justify-center;
+	@include px(0.5rem);
+	@include py(0.25rem);
+	@include text-sm;
+	@include transition-colors;
+
+	&:hover {
+		@include bg-secondary;
+	}
+
+	&.danger {
+		@include text-error;
+		&:hover { background-color: #fef2f2; }
+	}
+
+	&.primary {
+		color: var(--color-primary);
+		&:hover { background-color: var(--color-primary-light); }
+	}
+
+	svg {
+		@include size(1.5rem);
+	}
+}
+
+.table-sort {
+	@include cursor-pointer;
+	@include select-none;
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.25rem);
+
+	&--asc::after  { content: '\2191'; }
+	&--desc::after { content: '\2193'; }
+}
+
+@media (max-width: 768px) {
+	table th {
+		@include hidden;
+	}
+
+	table tbody tr {
+		@include block;
+		@include mb(1rem);
+		@include border;
+		@include rounded-md;
+		@include overflow-hidden;
+	}
+
+	table td {
+		@include block;
+		@include text-right;
+		@include px(1rem);
+		@include py(0.75rem);
+		@include border-b;
+		@include relative;
+		padding-left: 50%;
+
+		&:last-child {
+			@include border-none;
+		}
+
+		&::before {
+			content: attr(data-label);
+			@include absolute;
+			left: 1rem;
+			@include text-left;
+			@include font-semibold;
+			@include text-secondary;
+			@include text-xs;
+			@include uppercase;
+		}
+
+		&:first-child {
+			background: transparent;
+		}
+	}
+
+	table tr.section-header td {
+		padding-left: 1rem;
+		@include text-left;
+
+		&::before {
+			@include hidden;
+		}
+	}
+
+	table tbody tr::before {
+		@include hidden;
+	}
+}

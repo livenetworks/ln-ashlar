@@ -1,0 +1,105 @@
+@use '../config/mixins' as *;
+
+.header {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(1.5rem);
+	@include py(0.75rem);
+	@include bg-primary;
+	@include border-b;
+	@include sticky;
+	top: 0;
+	@include z-sticky;
+	height: var(--header-height, 3.5rem);
+
+	.header-left {
+		@include flex;
+		@include items-center;
+		@include gap(0.75rem);
+
+		.menu-toggle {
+			@include hidden;
+			@include items-center;
+			@include justify-center;
+			@include size(2.5rem);
+			@include rounded-md;
+			@include cursor-pointer;
+			@include transition-colors;
+			background: none;
+			border: none;
+			@include text-secondary;
+
+			&:hover {
+				@include bg-secondary;
+			}
+
+			@media (max-width: 768px) {
+				@include flex;
+			}
+		}
+
+		h1 {
+			@include text-xl;
+			@include font-bold;
+			@include text-primary;
+			margin: 0;
+		}
+	}
+
+	.header-right {
+		@include flex;
+		@include items-center;
+		@include gap(1rem);
+	}
+
+	.header-search {
+		@include relative;
+
+		input {
+			@include pl(2.5rem);
+			@include pr(1rem);
+			@include py(0.5rem);
+			@include text-sm;
+			@include rounded-md;
+			@include border;
+			@include bg-secondary;
+			width: 16rem;
+			@include transition;
+
+			&:focus {
+				@include bg-primary;
+				border-color: var(--color-primary);
+				width: 20rem;
+			}
+		}
+
+		.search-icon {
+			@include absolute;
+			left: 0.75rem;
+			top: 50%;
+			transform: translateY(-50%);
+			@include text-muted;
+			@include size(1rem);
+		}
+	}
+
+	.header-actions {
+		@include flex;
+		@include items-center;
+		@include gap(0.5rem);
+	}
+
+	.header-avatar {
+		@include size(2rem);
+		@include rounded-full;
+		@include overflow-hidden;
+		@include cursor-pointer;
+
+		img {
+			@include w-full;
+			@include h-full;
+			object-fit: cover;
+		}
+	}
+}

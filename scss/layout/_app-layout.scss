@@ -1,0 +1,100 @@
+@use '../config/mixins' as *;
+
+.app-wrapper {
+	@include flex;
+	@include min-h-screen;
+	@include bg-body;
+}
+
+.sidebar {
+	@include flex-col;
+	@include bg-primary;
+	@include border-r;
+	@include fixed;
+	top: 0;
+	left: 0;
+	@include h-full;
+	@include z-sticky;
+	@include overflow-auto;
+	@include transition;
+	width: 16rem;
+	container-type: inline-size;
+	container-name: sidebar;
+
+	.sidebar-header {
+		@include flex;
+		@include items-center;
+		@include gap(0.75rem);
+		@include px(1.5rem);
+		@include py(1rem);
+		@include border-b;
+
+		.logo {
+			@include flex-shrink-0;
+			@include size(2rem);
+		}
+
+		.app-name {
+			@include text-lg;
+			@include font-bold;
+			@include text-primary;
+			@include truncate;
+		}
+	}
+
+	.sidebar-content {
+		@include flex-1;
+		@include overflow-auto;
+		@include py(0.5rem);
+	}
+
+	.sidebar-footer {
+		@include border-t;
+		@include p(1rem);
+	}
+}
+
+.main-panel {
+	@include flex-col;
+	@include flex-1;
+	margin-left: 16rem;
+	@include min-h-screen;
+	@include transition;
+}
+
+.content {
+	@include flex-1;
+	@include p(1.5rem);
+	@include overflow-auto;
+	max-width: 80rem;
+	@include mx(auto);
+	@include w-full;
+}
+
+.footer {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(1.5rem);
+	@include py(0.75rem);
+	@include border-t;
+	@include bg-primary;
+	@include text-sm;
+	@include text-secondary;
+	@include select-none;
+}
+
+@media (max-width: 768px) {
+	.sidebar {
+		transform: translateX(-100%);
+		@include z-overlay;
+
+		&.open {
+			transform: translateX(0);
+		}
+	}
+
+	.main-panel {
+		margin-left: 0;
+	}
+}

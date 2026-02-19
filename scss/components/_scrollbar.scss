@@ -1,0 +1,30 @@
+@use '../config/mixins' as *;
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--color-bg-secondary, #f9fafb);
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: var(--color-gray-300, #d1d5db);
+	border-radius: 4px;
+	border: 2px solid transparent;
+	background-clip: content-box;
+
+	&:hover {
+		background-color: var(--color-gray-400, #9ca3af);
+	}
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--color-gray-300, #d1d5db) var(--color-bg-secondary, #f9fafb);
+}

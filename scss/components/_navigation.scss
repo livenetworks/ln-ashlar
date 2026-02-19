@@ -1,0 +1,84 @@
+@use '../config/mixins' as *;
+
+.nav {
+	@include bg-primary;
+	@include select-none;
+	@include flex-col;
+	@include h-full;
+
+	ul {
+		list-style: none;
+		@include p(0);
+		margin: 0;
+	}
+
+	li {
+		margin: 0;
+	}
+
+	a {
+		@include flex;
+		@include items-center;
+		@include gap(0.75rem);
+		@include px(1rem);
+		@include py(0.625rem);
+		@include text-sm;
+		@include text-secondary;
+		text-decoration: none;
+		@include transition-colors;
+		@include rounded-md;
+		@include mx(0.5rem);
+
+		&:hover {
+			@include bg-secondary;
+			@include text-primary;
+		}
+
+		&.active {
+			background-color: var(--color-primary-light);
+			color: var(--color-primary);
+			@include font-semibold;
+		}
+	}
+
+	.nav-icon {
+		@include flex-shrink-0;
+		@include size(1.25rem);
+	}
+
+	.nav-label {
+		@include flex-1;
+		@include truncate;
+	}
+
+	.nav-section {
+		@include px(1rem);
+		@include py(0.5rem);
+		@include text-xs;
+		@include font-semibold;
+		@include text-muted;
+		@include uppercase;
+		@include tracking-wider;
+		@include mt(1rem);
+	}
+
+	.nav-divider {
+		@include border-t;
+		@include my(0.5rem);
+		@include mx(1rem);
+	}
+}
+
+@container sidebar (max-width: 80px) {
+	.nav {
+		a {
+			@include justify-center;
+			@include px(0.5rem);
+		}
+
+		.nav-label,
+		.nav-section {
+			@include hidden;
+		}
+	}
+}

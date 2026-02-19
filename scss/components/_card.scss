@@ -1,0 +1,99 @@
+@use '../config/mixins' as *;
+
+.card {
+	@include bg-primary;
+	@include border;
+	@include w-full;
+	@include flex-col;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	transition: all var(--transition-base);
+	@include relative;
+	@include overflow-hidden;
+
+	&::before {
+		content: '';
+		@include absolute;
+		top: 0;
+		left: 0;
+		@include w-full;
+		height: 4px;
+		background: var(--color-primary);
+		transform: scaleX(0);
+		transition: transform var(--transition-base);
+		z-index: 1;
+	}
+
+	&:hover {
+		transform: translateY(-10px);
+		box-shadow: var(--shadow-primary);
+		border-color: var(--color-primary);
+
+		&::before {
+			transform: scaleX(1);
+		}
+	}
+
+	a {
+		@include flex-col;
+		@include flex-1;
+		text-decoration: none;
+		@include text-primary;
+	}
+
+	header {
+		@include flex;
+		@include items-center;
+		@include gap(0.75rem);
+
+		h3 {
+			color: var(--color-primary);
+			margin: 0;
+		}
+	}
+
+	main {
+		@include px(1.5rem);
+		@include py(1.25rem);
+		@include flex-col;
+		@include gap(1rem);
+		@include flex-1;
+	}
+
+	.field {
+		@include flex;
+		@include justify-between;
+		align-items: baseline;
+		@include gap(0.75rem);
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid #f3f4f6;
+
+		&:last-child {
+			border-bottom: none;
+			padding-bottom: 0;
+		}
+
+		.label {
+			@include text-xs;
+			@include font-semibold;
+			@include text-secondary;
+			@include uppercase;
+			@include tracking-wider;
+			@include flex-shrink-0;
+		}
+
+		.value {
+			@include text-base;
+			@include text-primary;
+			@include font-semibold;
+			@include text-right;
+			margin: 0;
+
+			em {
+				@include text-muted;
+				@include font-normal;
+				font-style: normal;
+				@include text-sm;
+			}
+		}
+	}
+}
