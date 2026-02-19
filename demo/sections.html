@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sections &amp; Breadcrumbs — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Sections &amp; Breadcrumbs</li></nav>
+		<h1>Sections &amp; Breadcrumbs</h1>
+
+		<!-- Breadcrumbs -->
+		<section class="section-card">
+			<header><h3>.breadcrumbs</h3></header>
+			<main>
+				<nav class="breadcrumbs">
+					<li><a href="#">Home</a></li>
+					<li><a href="#">Корисници</a></li>
+					<li class="current">Марко Петровски</li>
+				</nav>
+			</main>
+		</section>
+
+		<!-- Section -->
+		<section class="section-card">
+			<header><h3>.section</h3></header>
+			<main>
+				<div class="section">
+					<header>
+						<h2>Листа на корисници</h2>
+						<div class="section-actions">
+							<button class="btn-secondary">Филтер</button>
+							<button>Додај</button>
+						</div>
+					</header>
+					<main>
+						<p class="text-secondary">Содржина на секцијата...</p>
+					</main>
+				</div>
+			</main>
+		</section>
+
+		<!-- Section Card -->
+		<section class="section-card">
+			<header><h3>.section-card</h3></header>
+			<main>
+				<div class="section-card">
+					<header><h3>Наслов на секција</h3></header>
+					<main><p>Содржина со padding и border.</p></main>
+					<footer>
+						<button class="btn-secondary">Откажи</button>
+						<button>Зачувај</button>
+					</footer>
+				</div>
+			</main>
+		</section>
+
+		<!-- Empty State -->
+		<section class="section-card">
+			<header><h3>.section-empty</h3></header>
+			<main>
+				<div class="section-empty">
+					<div class="empty-icon">&#128269;</div>
+					<h3>Нема резултати</h3>
+					<p>Обидете се со друг филтер или додајте нов запис.</p>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;!-- Breadcrumbs --&gt;
+&lt;nav class="breadcrumbs"&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Секција&lt;/a&gt;&lt;/li&gt;
+    &lt;li class="current"&gt;Тековна&lt;/li&gt;
+&lt;/nav&gt;
+
+&lt;!-- Section --&gt;
+&lt;section class="section"&gt;
+    &lt;header&gt;
+        &lt;h2&gt;Наслов&lt;/h2&gt;
+        &lt;div class="section-actions"&gt;&lt;button&gt;Акција&lt;/button&gt;&lt;/div&gt;
+    &lt;/header&gt;
+    &lt;main&gt;...&lt;/main&gt;
+&lt;/section&gt;
+
+&lt;!-- Section Card --&gt;
+&lt;div class="section-card"&gt;
+    &lt;header&gt;&lt;h3&gt;Наслов&lt;/h3&gt;&lt;/header&gt;
+    &lt;main&gt;...&lt;/main&gt;
+    &lt;footer&gt;&lt;button&gt;Зачувај&lt;/button&gt;&lt;/footer&gt;
+&lt;/div&gt;
+
+&lt;!-- Empty State --&gt;
+&lt;div class="section-empty"&gt;
+    &lt;h3&gt;Нема резултати&lt;/h3&gt;
+    &lt;p&gt;Опис...&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

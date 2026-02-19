@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Tables — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Tables</li></nav>
+		<h1>Tables</h1>
+		<p>Темен header, hover accent со лева линија, section rows, статус класи. Responsive на мобилен.</p>
+
+		<!-- Basic table -->
+		<section class="section-card">
+			<header><h3>Основна табела</h3></header>
+			<main>
+				<table>
+					<thead>
+						<tr><th>Име</th><th>Email</th><th>Статус</th><th class="numeric">Бодови</th></tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td data-label="Име">Марко Петровски</td>
+							<td data-label="Email">marko@example.com</td>
+							<td data-label="Статус"><span class="pass">Активен</span></td>
+							<td data-label="Бодови" class="numeric">95</td>
+						</tr>
+						<tr>
+							<td data-label="Име">Ана Стојанова</td>
+							<td data-label="Email">ana@example.com</td>
+							<td data-label="Статус"><span class="pass">Активен</span></td>
+							<td data-label="Бодови" class="numeric">88</td>
+						</tr>
+						<tr>
+							<td data-label="Име">Иван Димитров</td>
+							<td data-label="Email">ivan@example.com</td>
+							<td data-label="Статус"><span class="fail">Неактивен</span></td>
+							<td data-label="Бодови" class="numeric">42</td>
+						</tr>
+						<tr>
+							<td data-label="Име">Елена Трајкова</td>
+							<td data-label="Email">elena@example.com</td>
+							<td data-label="Статус"><span class="warn">Чекање</span></td>
+							<td data-label="Бодови" class="numeric">71</td>
+						</tr>
+					</tbody>
+				</table>
+			</main>
+		</section>
+
+		<!-- Section headers -->
+		<section class="section-card">
+			<header><h3>Section rows</h3></header>
+			<main>
+				<table>
+					<thead>
+						<tr><th>Параметар</th><th>Вредност</th><th>Статус</th></tr>
+					</thead>
+					<tbody>
+						<tr class="section-header"><td colspan="3">Мрежа</td></tr>
+						<tr><td>IP Адреса</td><td>192.168.1.1</td><td><span class="pass">OK</span></td></tr>
+						<tr><td>DNS</td><td>8.8.8.8</td><td><span class="pass">OK</span></td></tr>
+						<tr class="section-header"><td colspan="3">Систем</td></tr>
+						<tr><td>CPU</td><td>78%</td><td><span class="warn">Внимание</span></td></tr>
+						<tr><td>RAM</td><td>92%</td><td><span class="fail">Критично</span></td></tr>
+						<tr><td>Диск</td><td>45%</td><td><span class="pass">OK</span></td></tr>
+					</tbody>
+				</table>
+			</main>
+		</section>
+
+		<!-- Striped + actions -->
+		<section class="section-card">
+			<header><h3>Striped + Actions</h3></header>
+			<main>
+				<table class="striped">
+					<thead><tr><th>Документ</th><th>Датум</th><th class="center">Акции</th></tr></thead>
+					<tbody>
+						<tr>
+							<td data-label="Документ">Договор.pdf</td>
+							<td data-label="Датум">15.02.2026</td>
+							<td data-label="Акции" class="center">
+								<div class="actions">
+									<a href="#" class="action primary"><span class="ln-icon-view"></span></a>
+									<a href="#" class="action danger"><span class="ln-icon-delete--red"></span></a>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td data-label="Документ">Фактура.pdf</td>
+							<td data-label="Датум">10.02.2026</td>
+							<td data-label="Акции" class="center">
+								<div class="actions">
+									<a href="#" class="action primary"><span class="ln-icon-view"></span></a>
+									<a href="#" class="action danger"><span class="ln-icon-delete--red"></span></a>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;table&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;&lt;th&gt;Колона&lt;/th&gt;&lt;th class="numeric"&gt;Број&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr class="section-header"&gt;&lt;td colspan="2"&gt;Секција&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td data-label="Колона"&gt;Вредност&lt;/td&gt;
+            &lt;td data-label="Број" class="numeric"&gt;42&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- Статус класи --&gt;
+&lt;span class="pass"&gt;OK&lt;/span&gt;
+&lt;span class="fail"&gt;Грешка&lt;/span&gt;
+&lt;span class="warn"&gt;Внимание&lt;/span&gt;
+
+&lt;!-- Responsive: data-label за мобилен --&gt;
+&lt;td data-label="Име"&gt;Марко&lt;/td&gt;
+
+&lt;!-- Striped: додај класа на table --&gt;
+&lt;table class="striped"&gt;...&lt;/table&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

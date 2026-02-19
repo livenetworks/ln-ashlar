@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Forms &amp; Buttons — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Forms &amp; Buttons</li></nav>
+		<h1>Forms &amp; Buttons</h1>
+		<p>Input, textarea, select, label, button — сите стилизирани преку base стилови.</p>
+
+		<!-- Inputs -->
+		<section class="section-card">
+			<header><h3>Input елементи</h3></header>
+			<main>
+				<div class="form-group">
+					<label for="name">Име</label>
+					<input type="text" id="name" placeholder="Внесете име...">
+				</div>
+				<div class="form-group">
+					<label for="email">Email</label>
+					<input type="email" id="email" placeholder="email@example.com">
+				</div>
+				<div class="form-row">
+					<div class="form-group">
+						<label for="city">Град</label>
+						<input type="text" id="city" placeholder="Скопје">
+					</div>
+					<div class="form-group">
+						<label for="zip">Поштенски број</label>
+						<input type="text" id="zip" placeholder="1000">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="disabled">Disabled</label>
+					<input type="text" id="disabled" disabled value="Не може да се менува">
+				</div>
+			</main>
+		</section>
+
+		<!-- Select & Textarea -->
+		<section class="section-card">
+			<header><h3>Select &amp; Textarea</h3></header>
+			<main>
+				<div class="form-group">
+					<label for="category">Категорија</label>
+					<select id="category">
+						<option>Избери...</option>
+						<option>Финансии</option>
+						<option>Техничка поддршка</option>
+						<option>Продажба</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="message">Порака</label>
+					<textarea id="message" placeholder="Напишете порака..."></textarea>
+				</div>
+			</main>
+		</section>
+
+		<!-- Buttons -->
+		<section class="section-card">
+			<header><h3>Buttons</h3></header>
+			<main>
+				<div class="flex gap-3" style="flex-wrap: wrap;">
+					<button type="button">Primary</button>
+					<button type="button" class="btn-secondary">Secondary</button>
+					<button type="button" class="btn-danger">Danger</button>
+					<button type="button" disabled>Disabled</button>
+				</div>
+			</main>
+		</section>
+
+		<!-- Form with ln-input -->
+		<section class="section-card">
+			<header><h3>Floating label (ln-input)</h3></header>
+			<main>
+				<form>
+					<fieldset>
+						<div ln-inputcontrol>
+							<div ln-input>
+								<input type="text" name="fname" id="fname" placeholder=" " required>
+								<label for="fname">Име:</label>
+							</div>
+						</div>
+						<div ln-inputcontrol>
+							<div ln-input>
+								<input type="text" name="lname" id="lname" placeholder=" ">
+								<label for="lname">Презиме:</label>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</main>
+		</section>
+
+		<!-- Form actions -->
+		<section class="section-card">
+			<header><h3>Form Actions</h3></header>
+			<main>
+				<p class="text-sm text-secondary">Типична форма со копчиња подредени десно.</p>
+				<div class="form-actions">
+					<button type="button" class="btn-secondary">Откажи</button>
+					<button type="submit">Зачувај</button>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;div class="form-group"&gt;
+    &lt;label for="name"&gt;Име&lt;/label&gt;
+    &lt;input type="text" id="name" placeholder="..."&gt;
+&lt;/div&gt;
+
+&lt;div class="form-row"&gt;
+    &lt;div class="form-group"&gt;...&lt;/div&gt;
+    &lt;div class="form-group"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="form-actions"&gt;
+    &lt;button class="btn-secondary"&gt;Откажи&lt;/button&gt;
+    &lt;button type="submit"&gt;Зачувај&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- Button варијанти --&gt;
+&lt;button&gt;Primary&lt;/button&gt;
+&lt;button class="btn-secondary"&gt;Secondary&lt;/button&gt;
+&lt;button class="btn-danger"&gt;Danger&lt;/button&gt;
+&lt;button disabled&gt;Disabled&lt;/button&gt;
+
+&lt;!-- Floating label --&gt;
+&lt;div ln-inputcontrol&gt;
+    &lt;div ln-input&gt;
+        &lt;input type="text" name="x" id="x" placeholder=" " required&gt;
+        &lt;label for="x"&gt;Label:&lt;/label&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

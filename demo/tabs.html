@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Tabs — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+	<script src="../dist/ln-frontend.iife.js" defer></script>
+	<style>
+		[data-ln-tabs] [data-ln-tab] {
+			padding: 0.5rem 1rem; border: 1px solid var(--color-border); border-bottom: none;
+			background: var(--color-bg-secondary); cursor: pointer; border-radius: var(--radius-md) var(--radius-md) 0 0;
+		}
+		[data-ln-tabs] [data-ln-tab][data-active] {
+			background: var(--color-bg-primary); border-color: var(--color-primary); color: var(--color-primary); font-weight: var(--font-semibold);
+		}
+		[data-ln-panel] { padding: 1.5rem; border: 1px solid var(--color-border); border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md); }
+		[data-ln-panel].hidden { display: none; }
+	</style>
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Tabs</li></nav>
+		<h1>Tabs</h1>
+		<p>Hash-aware табови. Синхронизирани со URL hash (<code>#tab-key</code>).</p>
+
+		<!-- Basic tabs -->
+		<section class="section-card">
+			<header><h3>Пример</h3></header>
+			<main>
+				<div data-ln-tabs data-ln-tabs-default="info">
+					<div class="flex gap-1 mb-0">
+						<button data-ln-tab="info">Информации</button>
+						<button data-ln-tab="settings">Поставки</button>
+						<button data-ln-tab="history">Историја</button>
+					</div>
+
+					<div data-ln-panel="info">
+						<h4>Информации</h4>
+						<p>Ова е содржината на првиот таб.</p>
+						<p class="text-sm text-secondary">Промени го URL hash на <code>#settings</code> за да видиш синхронизација.</p>
+					</div>
+
+					<div data-ln-panel="settings" class="hidden">
+						<h4>Поставки</h4>
+						<div class="form-group">
+							<label for="t-lang">Јазик</label>
+							<select id="t-lang"><option>Македонски</option><option>English</option></select>
+						</div>
+						<div class="form-group">
+							<label for="t-tz">Timezone</label>
+							<input type="text" id="t-tz" value="Europe/Skopje">
+						</div>
+					</div>
+
+					<div data-ln-panel="history" class="hidden">
+						<h4>Историја</h4>
+						<table>
+							<thead><tr><th>Датум</th><th>Акција</th><th>Корисник</th></tr></thead>
+							<tbody>
+								<tr><td>19.02.2026</td><td>Креирано</td><td>Марко</td></tr>
+								<tr><td>18.02.2026</td><td>Ажурирано</td><td>Ана</td></tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;div data-ln-tabs data-ln-tabs-default="first"&gt;
+
+    &lt;!-- Tab копчиња --&gt;
+    &lt;div class="flex gap-1"&gt;
+        &lt;button data-ln-tab="first"&gt;Прв таб&lt;/button&gt;
+        &lt;button data-ln-tab="second"&gt;Втор таб&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Панели --&gt;
+    &lt;div data-ln-panel="first"&gt;
+        Содржина на прв таб
+    &lt;/div&gt;
+
+    &lt;div data-ln-panel="second" class="hidden"&gt;
+        Содржина на втор таб
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;!-- Атрибути --&gt;
+data-ln-tabs              - контејнер
+data-ln-tabs-default="x"  - почетен таб
+data-ln-tabs-focus         - фокусирај прв input при промена
+data-ln-tab="key"          - таб копче
+data-ln-panel="key"        - панел содржина
+
+&lt;!-- Hash sync: #second → активирај second таб --&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

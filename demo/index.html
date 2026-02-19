@@ -1,483 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mk">
 <head>
 	<meta charset="UTF-8">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="default">
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="HandheldFriendly" content="True">
-	<meta name="MobileOptimized" content="320">
-	<meta name="format-detection" content="telephone=no">
-	<meta name="title" content="LN GUI">
-
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-
-	<title>Live Networks - GUI</title>
-
-	<link rel="stylesheet" type="text/css" href="../src/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="../src/base/base.css">
-	<link rel="stylesheet" type="text/css" href="../src/css/cs.css">
-
-	<link rel="stylesheet" type="text/css" href="../src/box/box.css">
-	<link rel="stylesheet" type="text/css" href="../src/resizer/resizer.css">
-	<link rel="stylesheet" type="text/css" href="../src/progress/progress.css">
-	<link rel="stylesheet" type="text/css" href="../src/breadcrumbs/breadcrumbs.css">
-
-	<link rel="stylesheet" type="text/css" href="../src/header/header.css">
-	<link rel="stylesheet" type="text/css" href="../src/main/main.css">
-	<link rel="stylesheet" type="text/css" href="../src/form/form.css">
-	<link rel="stylesheet" type="text/css" href="../src/table/table.css">
-	<link rel="stylesheet" type="text/css" href="../src/balloon/balloon.css">
-	<link rel="stylesheet" type="text/css" href="../src/loader/loader.css">
-
-	<link rel="stylesheet" type="text/css" href="../src/base/footer.css">
-	<link rel="stylesheet" type="text/css" href="../src/aside/aside.css">
-	<link rel="stylesheet" type="text/css" href="../src/css/nav.css">
-	<link rel="stylesheet" type="text/css" href="../src/css/app.css">
-	<link rel="stylesheet" type="text/css" href="../src/base/icons/icons.css">
-
-
-	<link rel="stylesheet" type="text/css" href="../src/base/ln.css">
-
-
-	<link rel="stylesheet" type="text/css" href="style.css">
-
-	<script src="../src/resizer/resizer.js" type="text/javascript" defer></script>
-	<script src="../src/progress/progress.js" type="text/javascript" defer></script>
-	<script src="../src/box/box.js" type="text/javascript" defer></script>
-	
-<!-- 
-	<link rel="preload" href="/static/quickref.6d12f82e9b23fa665c6c.chunk.js" as="script"  />
-	<link rel="preload" href="/static/4.a0700f24d468995b2fe3.css" as="style"  />
-
-	<script src="/static/vendors-bundle.d7344bc686df8d11ede6.chunk.js" defer></script>
-	<script src="/static/bundle.5dc0dbeb6f32952d7ccc.js" defer></script> -->
-
-	<!-- 
-	<link rel="shortcut icon" href="/static/assets/favicon.ico" type="image/x-icon">
-	<link rel="apple-touch-icon" sizes="57x57" href="/static/assets/apple-icon-57x57.png">
-	<link rel="apple-touch-icon" sizes="60x60" href="/static/assets/apple-icon-60x60.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="/static/assets/apple-icon-72x72.png">
-	<link rel="apple-touch-icon" sizes="76x76" href="/static/assets/apple-icon-76x76.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="/static/assets/apple-icon-114x114.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="/static/assets/apple-icon-120x120.png">
-	<link rel="apple-touch-icon" sizes="144x144" href="/static/assets/apple-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="/static/assets/apple-icon-152x152.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="/static/assets/apple-icon-180x180.png">
-	<link rel="icon" type="image/png" href="/static/assets/favicon-16x16.png" sizes="16x16">
-	<link rel="icon" type="image/png" href="/static/assets/favicon-32x32.png" sizes="32x32">
-	<link rel="icon" type="image/png" href="/static/assets/favicon-96x96.png" sizes="96x96">
-	<link rel="icon" type="image/png" href="/static/assets/android-icon-192x192.png" sizes="192x192">
-
-	<link rel="manifest" href="/static/assets/manifest.webmanifest"> -->
-
-	<link href="https://livenetworks.mk" rel="home" />
-	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<meta name="author" content="Live Networks">
-
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ln-frontend — Demo</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+	<script src="../dist/ln-frontend.iife.js" defer></script>
 </head>
-<body ln-layout="window" class="light disableSelect">
-	<header ln-header>
-		sdfasf
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<h1>ln-frontend — Компоненти</h1>
+		<p>Документација и живи примери за секоја CSS и JS компонента.</p>
 
-		<nav class="ln-nav">
-			<ul>
-				<li>
-					<a href="#">Link 1</a>
-				</li>
-				<li>
-					<a href="#">Link 1</a>
-				</li>
-				<li>
-					<a href="#">Link 1</a>
-				</li>
-			</ul>
-		</nav>
-	</header>
+		<section class="section">
+			<header><h2>CSS компоненти</h2></header>
+			<main>
+				<div class="grid-2">
+					<a href="typography.html" class="card">
+						<main><h3>Typography</h3><p class="text-sm text-secondary">Наслови, параграфи, код, цитати, листи</p></main>
+					</a>
+					<a href="cards.html" class="card">
+						<main><h3>Cards</h3><p class="text-sm text-secondary">.card со header/main/footer, hover ефект, поља</p></main>
+					</a>
+					<a href="tables.html" class="card">
+						<main><h3>Tables</h3><p class="text-sm text-secondary">Dark header, hover accent, section rows, responsive</p></main>
+					</a>
+					<a href="forms.html" class="card">
+						<main><h3>Forms &amp; Buttons</h3><p class="text-sm text-secondary">Input, select, textarea, button варијанти</p></main>
+					</a>
+					<a href="layout.html" class="card">
+						<main><h3>Layout &amp; Grid</h3><p class="text-sm text-secondary">Sidebar, header, grid, stack, container</p></main>
+					</a>
+					<a href="sections.html" class="card">
+						<main><h3>Sections &amp; Breadcrumbs</h3><p class="text-sm text-secondary">.section, .section-card, .breadcrumbs</p></main>
+					</a>
+					<a href="icons.html" class="card">
+						<main><h3>Icons</h3><p class="text-sm text-secondary">SVG data-URI иконки преку CSS pseudo-elements</p></main>
+					</a>
+					<a href="utilities.html" class="card">
+						<main><h3>Utilities</h3><p class="text-sm text-secondary">Utility класи за flex, spacing, text, colors</p></main>
+					</a>
+				</div>
+			</main>
+		</section>
 
+		<section class="section">
+			<header><h2>JS компоненти</h2></header>
+			<main>
+				<div class="grid-2">
+					<a href="modal.html" class="card">
+						<main><h3>Modal</h3><p class="text-sm text-secondary">data-ln-modal — отвори/затвори, ESC, backdrop</p></main>
+					</a>
+					<a href="toast.html" class="card">
+						<main><h3>Toast</h3><p class="text-sm text-secondary">data-ln-toast — нотификации со иконки</p></main>
+					</a>
+					<a href="tabs.html" class="card">
+						<main><h3>Tabs</h3><p class="text-sm text-secondary">data-ln-tabs — hash-aware табови</p></main>
+					</a>
+					<a href="box.html" class="card">
+						<main><h3>Box &amp; Progress</h3><p class="text-sm text-secondary">data-ln-box collapse + data-ln-progress bar</p></main>
+					</a>
+					<a href="upload.html" class="card">
+						<main><h3>Upload</h3><p class="text-sm text-secondary">data-ln-upload — drag-drop, progress, валидација</p></main>
+					</a>
+				</div>
+			</main>
+		</section>
 
-	<div ln-app>
-		<main ln-main>
-			<nav>
-				<ol ln-breadcrumbs>
-					<li>
-						<a href="#">Link 1</a>
-					</li>
-					<li>
-						<a href="#">Link 1</a>
-					</li>
-					<li>
-						<a href="#">Link 1</a>
-					</li>
-				</ol>
-			</nav>
-			
-			<h1>Page Title</h1>
+		<section class="section">
+			<header><h2>Брза интеграција</h2></header>
+			<main>
+				<pre><code>&lt;!-- CSS --&gt;
+&lt;link rel="stylesheet" href="dist/ln-frontend.css"&gt;
 
-			<section>
-
-				<form action="#" method="POST"  ln-box>
-
-					<div ln-progress>
-						<div ln-progress="trackable" data-progress-min="100" data-progress-max="200" data-progress-value="130" class="green"></div>
-						<div ln-progress data-progress-min="10" data-progress-max="20" data-progress-value="11" class="red"></div>
-						<div ln-progress data-progress-min="10" data-progress-max="20" data-progress-value="12" class="green"></div>
-						<div ln-progress data-progress-min="10" data-progress-max="20" data-progress-value="11" class="red"></div>
-					</div>
-
-
-					<fieldset ln-box-body>
-						<legend>Personal Details</legend>
-						
-						<div ln-inputControl>
-							<div ln-input>
-								<input type="text" name="name" id="name" placeholder=" " required />
-								<label for="name">First Name:</label>
-							</div>
-							<ul ln-input-errors>
-								<li aria-label="First Name should be more than 5 characters" data-balloon-pos="down">
-									Minimum length 5
-								</li>
-							</ul>
-						</div>
-
-						<div ln-inputControl>
-							<div ln-input>
-								<input type="text" name="middleName" id="middleName" placeholder=" " />
-								<label for="middleName">Middle Name:</label>
-							</div>
-							<ul ln-input-errors>
-								<li aria-label="Field 1 should be more than 5 characters" data-balloon-pos="down">
-									Minimum length 5
-								</li>
-							</ul>
-						</div>
-
-						<div ln-inputControl>
-							<div ln-input>
-								<input type="text" name="surname" id="surname" placeholder=" " required />
-								<label for="surname">Last Name:</label>
-							</div>
-							<ul ln-input-errors>
-								<li aria-label="Last Name should be more than 5 characters" data-balloon-pos="down">
-									Minimum length 5
-								</li>
-							</ul>
-						</div>
-
-						<div ln-inputControl>
-							<div ln-input>
-								<input type="text" name="field1" id="field1" placeholder=" " />
-								<label for="field1">Field 1:</label>
-							</div>
-							<ul ln-input-errors>
-								<li aria-label="Field 1 should be more than 5 characters" data-balloon-pos="down">
-									Minimum length 5
-								</li>
-							</ul>
-						</div>
-
-					</fieldset>
-					<footer>
-						<button disabled="disabled">Disabled</button>
-						<button>Save</button>
-					</footer>
-
-				</form>
-
-			</section>
-
-		</main>
-
-		<aside ln-aside>
-			<div ln-box>
-				<header>
-					Box Title  1
-
-					<ul class="lnActions">
-						<li><button type="button" ln-box-action="collapse" aria-label="Collapse" data-balloon-pos="up">expand_less</button></li>
-						<li><button type="button" ln-box-action="expand" aria-label="Expand" data-balloon-pos="up">expand_more</button></li>
-						<li><button type="button" ln-close="formElementsBox" aria-label="Remove Widget" data-balloon-pos="up">close</button></li>
-					</ul>
-				</header>
-				<main ln-box-body class="enableSelect">
-					<table class="fixedHeader">
-						<thead>
-							<tr>
-								<th>The table header</th>
-								<th>The table header</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-						</tbody>
-					</table>
-				</main>
-			</div>
-
-			<div ln-box id="box2">
-				<header>
-					Box Title  1
-				</header>
-				<main ln-box-body>
-					<table>
-						<thead>
-							<tr>
-								<th>The table header</th>
-								<th>The table header</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-						</tbody>
-					</table>
-				</main>
-			</div>
-
-			<div ln-box>
-				<header>
-					Box Title  1
-				</header>
-				<main ln-box-body>
-					<table>
-						<thead>
-							<tr>
-								<th>The table header</th>
-								<th>The table header</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-							<tr>
-								<td>The table body</td>
-								<td>with two columns</td>
-							</tr>
-						</tbody>
-					</table>
-				</main>
-			</div>
-
-		</aside>
+&lt;!-- JS (IIFE — сите компоненти) --&gt;
+&lt;script src="dist/ln-frontend.iife.js" defer&gt;&lt;/script&gt;</code></pre>
+			</main>
+		</section>
 	</div>
-
-	<footer ln-footer>
-		<p ln-status>Lorem Ipsum</p>
-		<p class="ln">Developed by <a href="#">Live Networks</a></p>
-	</footer>
-
-
-	<!-- <div ln-loader></div> -->
 </body>
 </html>

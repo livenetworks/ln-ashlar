@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Layout &amp; Grid — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+	<style>
+		.demo-box { background: var(--color-primary-light); border: 1px dashed var(--color-primary); padding: 1rem; text-align: center; border-radius: var(--radius-md); font-size: var(--text-sm); }
+	</style>
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Layout &amp; Grid</li></nav>
+		<h1>Layout &amp; Grid</h1>
+		<p>App layout со sidebar, grid систем, stack, row и container.</p>
+
+		<!-- Grid -->
+		<section class="section-card">
+			<header><h3>.grid (3 колони)</h3></header>
+			<main>
+				<div class="grid">
+					<div class="demo-box">1</div>
+					<div class="demo-box">2</div>
+					<div class="demo-box">3</div>
+					<div class="demo-box">4</div>
+					<div class="demo-box">5</div>
+					<div class="demo-box">6</div>
+				</div>
+			</main>
+		</section>
+
+		<section class="section-card">
+			<header><h3>.grid-2 (2 колони)</h3></header>
+			<main>
+				<div class="grid-2">
+					<div class="demo-box">Лево</div>
+					<div class="demo-box">Десно</div>
+				</div>
+			</main>
+		</section>
+
+		<section class="section-card">
+			<header><h3>.grid-4 (4 колони)</h3></header>
+			<main>
+				<div class="grid-4">
+					<div class="demo-box">1</div>
+					<div class="demo-box">2</div>
+					<div class="demo-box">3</div>
+					<div class="demo-box">4</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Stack & Row -->
+		<section class="section-card">
+			<header><h3>.stack, .row</h3></header>
+			<main>
+				<div class="grid-2">
+					<div>
+						<h5>stack (вертикално)</h5>
+						<div class="stack">
+							<div class="demo-box">Item 1</div>
+							<div class="demo-box">Item 2</div>
+							<div class="demo-box">Item 3</div>
+						</div>
+					</div>
+					<div>
+						<h5>row (хоризонтално)</h5>
+						<div class="row">
+							<div class="demo-box">A</div>
+							<div class="demo-box">B</div>
+							<div class="demo-box">C</div>
+						</div>
+						<br>
+						<h5>row-between</h5>
+						<div class="row-between">
+							<div class="demo-box">Лево</div>
+							<div class="demo-box">Десно</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- App Layout -->
+		<section class="section-card">
+			<header><h3>App Layout структура</h3></header>
+			<main>
+				<pre><code>&lt;!-- Целосен app layout --&gt;
+&lt;div class="app-wrapper"&gt;
+
+    &lt;aside class="sidebar"&gt;
+        &lt;div class="sidebar-header"&gt;
+            &lt;img class="logo" src="logo.svg"&gt;
+            &lt;span class="app-name"&gt;App Name&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="sidebar-content"&gt;
+            &lt;nav class="nav"&gt;...&lt;/nav&gt;
+        &lt;/div&gt;
+        &lt;div class="sidebar-footer"&gt;...&lt;/div&gt;
+    &lt;/aside&gt;
+
+    &lt;div class="main-panel"&gt;
+        &lt;header class="header"&gt;
+            &lt;div class="header-left"&gt;
+                &lt;h1&gt;Page Title&lt;/h1&gt;
+            &lt;/div&gt;
+            &lt;div class="header-right"&gt;...&lt;/div&gt;
+        &lt;/header&gt;
+
+        &lt;div class="content"&gt;
+            &lt;!-- page content --&gt;
+        &lt;/div&gt;
+
+        &lt;footer class="footer"&gt;
+            &lt;span&gt;Footer text&lt;/span&gt;
+        &lt;/footer&gt;
+    &lt;/div&gt;
+
+&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+
+		<!-- Grid HTML -->
+		<section class="section-card">
+			<header><h3>Grid HTML</h3></header>
+			<main>
+				<pre><code>&lt;!-- 3-column grid (responsive: 1→2→3) --&gt;
+&lt;div class="grid"&gt;
+    &lt;div&gt;...&lt;/div&gt;
+    &lt;div&gt;...&lt;/div&gt;
+    &lt;div&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 2-column --&gt;
+&lt;div class="grid-2"&gt;...&lt;/div&gt;
+
+&lt;!-- 4-column --&gt;
+&lt;div class="grid-4"&gt;...&lt;/div&gt;
+
+&lt;!-- Stack (vertical) --&gt;
+&lt;div class="stack"&gt;...&lt;/div&gt;
+&lt;div class="stack-sm"&gt;...&lt;/div&gt;  &lt;!-- помал gap --&gt;
+
+&lt;!-- Row (horizontal) --&gt;
+&lt;div class="row"&gt;...&lt;/div&gt;
+&lt;div class="row-between"&gt;...&lt;/div&gt;
+&lt;div class="row-center"&gt;...&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

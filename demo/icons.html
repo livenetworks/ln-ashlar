@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Icons — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+	<style>
+		.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
+		.icon-cell { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--text-xs); color: var(--color-text-secondary); text-align: center; }
+		.icon-cell:hover { background: var(--color-bg-secondary); }
+	</style>
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Icons</li></nav>
+		<h1>Icons</h1>
+		<p>SVG иконки преку CSS pseudo-elements (<code>::before</code>). Додај класа <code>ln-icon-{name}</code> на елемент.</p>
+
+		<!-- Navigation icons -->
+		<section class="section-card">
+			<header><h3>Навигација</h3></header>
+			<main>
+				<div class="icon-grid">
+					<div class="icon-cell"><span class="ln-icon-home ln-icon--lg"></span>ln-icon-home</div>
+					<div class="icon-cell"><span class="ln-icon-users ln-icon--lg"></span>ln-icon-users</div>
+					<div class="icon-cell"><span class="ln-icon-books ln-icon--lg"></span>ln-icon-books</div>
+					<div class="icon-cell"><span class="ln-icon-lodges ln-icon--lg"></span>ln-icon-lodges</div>
+					<div class="icon-cell"><span class="ln-icon-settings ln-icon--lg"></span>ln-icon-settings</div>
+					<div class="icon-cell"><span class="ln-icon-logout ln-icon--lg"></span>ln-icon-logout</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Action icons -->
+		<section class="section-card">
+			<header><h3>Акции</h3></header>
+			<main>
+				<div class="icon-grid">
+					<div class="icon-cell"><span class="ln-icon-close ln-icon--lg"></span>ln-icon-close</div>
+					<div class="icon-cell"><span class="ln-icon-menu ln-icon--lg"></span>ln-icon-menu</div>
+					<div class="icon-cell"><span class="ln-icon-view ln-icon--lg"></span>ln-icon-view</div>
+					<div class="icon-cell"><span class="ln-icon-delete ln-icon--lg"></span>ln-icon-delete</div>
+					<div class="icon-cell"><span class="ln-icon-delete--red ln-icon--lg"></span>ln-icon-delete--red</div>
+					<div class="icon-cell"><span class="ln-icon-check ln-icon--lg"></span>ln-icon-check</div>
+					<div class="icon-cell"><span class="ln-icon-plus ln-icon--lg"></span>ln-icon-plus</div>
+					<div class="icon-cell"><span class="ln-icon-arrow-up ln-icon--lg"></span>ln-icon-arrow-up</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Status icons -->
+		<section class="section-card">
+			<header><h3>Статус</h3></header>
+			<main>
+				<div class="icon-grid">
+					<div class="icon-cell"><span class="ln-icon-check-circle ln-icon--lg"></span>ln-icon-check-circle</div>
+					<div class="icon-cell"><span class="ln-icon-check-circle--green ln-icon--lg"></span>check-circle--green</div>
+					<div class="icon-cell"><span class="ln-icon-error-circle ln-icon--lg"></span>ln-icon-error-circle</div>
+					<div class="icon-cell"><span class="ln-icon-error-circle--red ln-icon--lg"></span>error-circle--red</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Utility icons -->
+		<section class="section-card">
+			<header><h3>Utility</h3></header>
+			<main>
+				<div class="icon-grid">
+					<div class="icon-cell"><span class="ln-icon-chart ln-icon--lg"></span>ln-icon-chart</div>
+					<div class="icon-cell"><span class="ln-icon-clock ln-icon--lg"></span>ln-icon-clock</div>
+					<div class="icon-cell"><span class="ln-icon-envelope ln-icon--lg"></span>ln-icon-envelope</div>
+					<div class="icon-cell"><span class="ln-icon-book ln-icon--lg"></span>ln-icon-book</div>
+					<div class="icon-cell"><span class="icon-user ln-icon--lg"></span>icon-user</div>
+					<div class="icon-cell"><span class="icon-mail ln-icon--lg"></span>icon-mail</div>
+					<div class="icon-cell"><span class="icon-phone ln-icon--lg"></span>icon-phone</div>
+					<div class="icon-cell"><span class="icon-badge ln-icon--lg"></span>icon-badge</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Sizes -->
+		<section class="section-card">
+			<header><h3>Големини</h3></header>
+			<main>
+				<div class="flex items-center gap-6">
+					<div class="text-center">
+						<span class="ln-icon-home ln-icon--sm"></span>
+						<div class="text-xs text-secondary">--sm (1rem)</div>
+					</div>
+					<div class="text-center">
+						<span class="ln-icon-home"></span>
+						<div class="text-xs text-secondary">default (1.25rem)</div>
+					</div>
+					<div class="text-center">
+						<span class="ln-icon-home ln-icon--lg"></span>
+						<div class="text-xs text-secondary">--lg (1.5rem)</div>
+					</div>
+					<div class="text-center">
+						<span class="ln-icon-home ln-icon--xl"></span>
+						<div class="text-xs text-secondary">--xl (4rem)</div>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;!-- Основна иконка --&gt;
+&lt;span class="ln-icon-home"&gt;&lt;/span&gt;
+
+&lt;!-- Со големина --&gt;
+&lt;span class="ln-icon-home ln-icon--lg"&gt;&lt;/span&gt;
+&lt;span class="ln-icon-home ln-icon--xl"&gt;&lt;/span&gt;
+&lt;span class="ln-icon-home ln-icon--sm"&gt;&lt;/span&gt;
+
+&lt;!-- Во button --&gt;
+&lt;button&gt;&lt;span class="ln-icon-plus--white"&gt;&lt;/span&gt; Додај&lt;/button&gt;
+
+&lt;!-- Во navigation --&gt;
+&lt;a href="#"&gt;&lt;span class="ln-icon-home nav-icon"&gt;&lt;/span&gt; Home&lt;/a&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>
