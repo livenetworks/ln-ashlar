@@ -1,0 +1,39 @@
+@use '../config/mixins' as *;
+
+.breadcrumbs {
+	@include flex;
+	@include items-center;
+	@include gap(0.5rem);
+	@include text-sm;
+	@include text-secondary;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
+	li {
+		@include flex;
+		@include items-center;
+		@include gap(0.5rem);
+		margin: 0;
+
+		+ li::before {
+			content: '\00BB';
+			@include text-muted;
+		}
+	}
+
+	a {
+		@include text-secondary;
+		text-decoration: none;
+		@include transition-colors;
+
+		&:hover {
+			color: var(--color-primary);
+		}
+	}
+
+	.current {
+		@include text-primary;
+		@include font-medium;
+	}
+}

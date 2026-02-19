@@ -1,0 +1,123 @@
+@use '../config/mixins' as *;
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	@include font-bold;
+	@include text-primary;
+	line-height: 1.25;
+}
+
+h1 {
+	font-size: 2.25rem;
+	line-height: 2.5rem;
+	@include mb(1.5rem);
+}
+
+h2 {
+	@include text-2xl;
+	@include mb(1rem);
+}
+
+h3 {
+	@include text-xl;
+	@include mb(0.75rem);
+}
+
+h4 {
+	@include text-lg;
+	@include mb(0.5rem);
+}
+
+h5 {
+	@include text-base;
+	@include font-semibold;
+	@include mb(0.5rem);
+}
+
+h6 {
+	@include text-sm;
+	@include font-semibold;
+	@include mb(0.25rem);
+}
+
+p {
+	@include text-base;
+	@include text-primary;
+	line-height: 1.75;
+	@include mb(1rem);
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+strong,
+b {
+	@include font-semibold;
+}
+
+em,
+i {
+	font-style: italic;
+}
+
+small {
+	@include text-sm;
+	@include text-secondary;
+}
+
+code {
+	@include font-mono;
+	@include text-sm;
+	background-color: var(--color-gray-100, #f3f4f6);
+	@include px(0.25rem);
+	@include py(0.125rem);
+	@include rounded-sm;
+}
+
+pre {
+	@include font-mono;
+	@include text-sm;
+	background-color: var(--color-gray-100, #f3f4f6);
+	@include p(1rem);
+	@include rounded-md;
+	@include overflow-x-auto;
+	@include mb(1rem);
+
+	code {
+		background: none;
+		padding: 0;
+	}
+}
+
+blockquote {
+	border-left: 4px solid var(--color-primary);
+	@include pl(1rem);
+	@include py(0.5rem);
+	@include mb(1rem);
+	@include text-secondary;
+	font-style: italic;
+}
+
+ul,
+ol {
+	@include pl(1.5rem);
+	@include mb(1rem);
+}
+
+ul {
+	list-style-type: disc;
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+li {
+	@include mb(0.25rem);
+	line-height: 1.75;
+}

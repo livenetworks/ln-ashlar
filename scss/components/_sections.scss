@@ -1,0 +1,92 @@
+@use '../config/mixins' as *;
+
+.section {
+	@include mb(2rem);
+
+	header {
+		@include flex;
+		@include items-center;
+		@include justify-between;
+		@include mb(1rem);
+		@include pb(0.75rem);
+		@include border-b;
+
+		h2 {
+			@include text-xl;
+			@include font-bold;
+			@include text-primary;
+			margin: 0;
+		}
+
+		.section-actions {
+			@include flex;
+			@include gap(0.5rem);
+		}
+	}
+
+	main {
+		@include p(0);
+	}
+}
+
+.section-card {
+	@include bg-primary;
+	@include border;
+	@include rounded-lg;
+	@include shadow-sm;
+	@include overflow-hidden;
+	@include mb(1.5rem);
+
+	header {
+		@include px(1.5rem);
+		@include py(1rem);
+		@include border-b;
+		@include bg-secondary;
+
+		h3 {
+			@include text-lg;
+			@include font-semibold;
+			@include text-primary;
+			margin: 0;
+		}
+	}
+
+	main {
+		@include p(1.5rem);
+	}
+
+	footer {
+		@include px(1.5rem);
+		@include py(1rem);
+		@include border-t;
+		@include bg-secondary;
+		@include flex;
+		@include justify-end;
+		@include gap(0.75rem);
+	}
+}
+
+.section-empty {
+	@include text-center;
+	@include py(3rem);
+	@include text-secondary;
+
+	.empty-icon {
+		font-size: 3rem;
+		@include mb(1rem);
+		@include text-muted;
+	}
+
+	h3 {
+		@include text-lg;
+		@include font-semibold;
+		@include text-primary;
+		@include mb(0.5rem);
+	}
+
+	p {
+		@include text-sm;
+		@include text-secondary;
+		margin: 0;
+	}
+}

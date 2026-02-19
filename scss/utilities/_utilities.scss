@@ -1,0 +1,127 @@
+@use '../config/mixins' as *;
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.disable-select {
+	@include select-none;
+}
+
+.enable-select {
+	user-select: text;
+}
+
+.text-center { @include text-center; }
+.text-left   { @include text-left; }
+.text-right  { @include text-right; }
+
+.text-primary   { @include text-primary; }
+.text-secondary { @include text-secondary; }
+.text-muted     { @include text-muted; }
+.text-white     { @include text-white; }
+.text-error     { @include text-error; }
+.text-success   { @include text-success; }
+.text-warning   { @include text-warning; }
+
+.font-normal   { @include font-normal; }
+.font-medium   { @include font-medium; }
+.font-semibold { @include font-semibold; }
+.font-bold     { @include font-bold; }
+
+.text-xs   { @include text-xs; }
+.text-sm   { @include text-sm; }
+.text-base { @include text-base; }
+.text-lg   { @include text-lg; }
+.text-xl   { @include text-xl; }
+.text-2xl  { @include text-2xl; }
+
+.flex         { @include flex; }
+.inline-flex  { @include inline-flex; }
+.flex-col     { @include flex-col; }
+.flex-1       { @include flex-1; }
+.flex-shrink-0 { @include flex-shrink-0; }
+.flex-wrap    { @include flex-wrap; }
+
+.items-center    { @include items-center; }
+.items-start     { @include items-start; }
+.items-end       { @include items-end; }
+.justify-center  { @include justify-center; }
+.justify-between { @include justify-between; }
+.justify-end     { @include justify-end; }
+
+.block  { @include block; }
+.hidden { @include hidden; }
+
+.w-full { @include w-full; }
+.h-full { @include h-full; }
+
+.overflow-hidden { @include overflow-hidden; }
+.overflow-auto   { @include overflow-auto; }
+.overflow-x-auto { @include overflow-x-auto; }
+
+.relative { @include relative; }
+.absolute { @include absolute; }
+.fixed    { @include fixed; }
+.sticky   { @include sticky; }
+
+.truncate { @include truncate; }
+
+.cursor-pointer { @include cursor-pointer; }
+.select-none    { @include select-none; }
+.opacity-50     { @include opacity-50; }
+
+.rounded-sm   { @include rounded-sm; }
+.rounded-md   { @include rounded-md; }
+.rounded-lg   { @include rounded-lg; }
+.rounded-full { @include rounded-full; }
+
+.shadow-none { @include shadow-none; }
+.shadow-sm   { @include shadow-sm; }
+.shadow-md   { @include shadow-md; }
+.shadow-lg   { @include shadow-lg; }
+
+.border   { @include border; }
+.border-t { @include border-t; }
+.border-b { @include border-b; }
+
+.bg-primary   { @include bg-primary; }
+.bg-secondary { @include bg-secondary; }
+
+.gap-1 { @include gap(0.25rem); }
+.gap-2 { @include gap(0.5rem); }
+.gap-3 { @include gap(0.75rem); }
+.gap-4 { @include gap(1rem); }
+.gap-6 { @include gap(1.5rem); }
+
+.p-1 { @include p(0.25rem); }
+.p-2 { @include p(0.5rem); }
+.p-4 { @include p(1rem); }
+.p-6 { @include p(1.5rem); }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { @include mb(0.25rem); }
+.mb-2 { @include mb(0.5rem); }
+.mb-4 { @include mb(1rem); }
+.mb-6 { @include mb(1.5rem); }
+.mb-8 { @include mb(2rem); }
+
+.mt-auto { margin-top: auto; }
+.mx-auto { @include mx(auto); }
+
+.transition { @include transition; }
+.transition-colors { @include transition-colors; }
+
+.uppercase { @include uppercase; }
+.font-mono { @include font-mono; }
+
+.max-w-full { max-width: 100%; }
+.min-w-0    { min-width: 0; }

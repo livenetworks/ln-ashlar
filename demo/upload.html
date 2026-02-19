@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Upload — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+	<script src="../dist/ln-frontend.iife.js" defer></script>
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Upload</li></nav>
+		<h1>Upload</h1>
+		<p>File upload со drag-drop, progress bar, валидација на тип. Потребен е сервер за вистински upload.</p>
+
+		<!-- Upload zone -->
+		<section class="section-card">
+			<header><h3>Upload Zone (демо — без сервер)</h3></header>
+			<main>
+				<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
+					<div class="ln-upload__zone">
+						<p>Довлечи фајлови тука или кликни за избор</p>
+						<small class="text-muted">Дозволени: pdf, doc, docx, jpg, png</small>
+					</div>
+					<ul class="ln-upload__list"></ul>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;!-- Upload container --&gt;
+&lt;div data-ln-upload="/api/upload-endpoint"
+     data-ln-upload-accept="pdf,doc,jpg,png"&gt;
+
+    &lt;!-- Drop zone --&gt;
+    &lt;div class="ln-upload__zone"&gt;
+        &lt;p&gt;Довлечи фајлови тука&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;!-- File list (автоматски се полни) --&gt;
+    &lt;ul class="ln-upload__list"&gt;&lt;/ul&gt;
+
+&lt;/div&gt;
+
+&lt;!-- Атрибути --&gt;
+data-ln-upload="URL"           - upload endpoint
+data-ln-upload-accept="ext,ext" - дозволени екстензии
+
+&lt;!-- JS API (достапно на container елементот) --&gt;
+&lt;script&gt;
+const container = document.querySelector('[data-ln-upload]');
+container.lnUploadAPI.getFileIds();   // [1, 2, 3]
+container.lnUploadAPI.getFiles();     // file objects
+container.lnUploadAPI.clear();        // исчисти сè
+&lt;/script&gt;
+
+&lt;!-- Custom Events --&gt;
+ln-upload:uploaded   - {id, name, size}
+ln-upload:removed    - {id}
+ln-upload:error      - {message}
+ln-upload:invalid    - {file, reason}
+
+&lt;!-- Hidden inputs за форма --&gt;
+&lt;!-- Автоматски се креираат: --&gt;
+&lt;input type="hidden" name="file_ids[]" value="123"&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Toast — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+	<script src="../dist/ln-frontend.iife.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Toast</li></nav>
+		<h1>Toast</h1>
+		<p>Нотификации со страничен accent и иконка. Автоматски исчезнуваат после 6 секунди.</p>
+
+		<!-- Triggers -->
+		<section class="section-card">
+			<header><h3>Примери</h3></header>
+			<main>
+				<div class="flex gap-3" style="flex-wrap: wrap;">
+					<button onclick="window.lnToast.enqueue({type:'success', title:'Успешно', message:'Записот е зачуван.'})">Success</button>
+					<button onclick="window.lnToast.enqueue({type:'error', title:'Грешка', message:'Нешто не е во ред.'})" class="btn-danger">Error</button>
+					<button onclick="window.lnToast.enqueue({type:'warn', title:'Внимание', message:'Проверете ги податоците.'})" class="btn-secondary">Warning</button>
+					<button onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Нова верзија е достапна.'})" class="btn-secondary">Info</button>
+				</div>
+			</main>
+		</section>
+
+		<!-- Error with list -->
+		<section class="section-card">
+			<header><h3>Error со листа на грешки</h3></header>
+			<main>
+				<button onclick="window.lnToast.enqueue({type:'error', title:'Валидација', message:['Името е задолжително','Email форматот е погрешен','Лозинката е прекратка']})" class="btn-danger">Покажи validation errors</button>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML &amp; JS API</h3></header>
+			<main>
+				<pre><code>&lt;!-- Toast container (еднаш на страница) --&gt;
+&lt;div data-ln-toast&gt;&lt;/div&gt;
+
+&lt;!-- JS API --&gt;
+&lt;script&gt;
+// Основен toast
+window.lnToast.enqueue({
+    type: 'success',     // success | error | warn | info
+    title: 'Наслов',
+    message: 'Опис...'
+});
+
+// Error со листа
+window.lnToast.enqueue({
+    type: 'error',
+    title: 'Валидација',
+    message: ['Грешка 1', 'Грешка 2', 'Грешка 3']
+});
+
+// Исчисти сите
+window.lnToast.clear();
+&lt;/script&gt;
+
+&lt;!-- Статичен toast (хидриран при init) --&gt;
+&lt;div data-ln-toast&gt;
+    &lt;div data-ln-toast-item data-type="success" data-title="OK"&gt;
+        Зачувано!
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

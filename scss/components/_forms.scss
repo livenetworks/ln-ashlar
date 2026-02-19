@@ -1,0 +1,182 @@
+@use '../config/mixins' as *;
+
+form {
+	fieldset {
+		@include flex-wrap;
+		@include flex;
+		border: none;
+	}
+
+	[ln-inputcontrol] {
+		color: #333;
+		margin: 10px;
+		padding-top: 15px;
+		flex: 1 1 auto;
+
+		[ln-input] {
+			@include bg-primary;
+			@include rounded-sm;
+			@include ml(1.25rem);
+			@include relative;
+		}
+	}
+}
+
+[ln-input] {
+	input {
+		@include w-full;
+		background: transparent;
+		@include p(0.625rem);
+		margin: 0;
+		outline: 0;
+		border: none;
+		@include text-base;
+		color: inherit;
+		box-sizing: border-box;
+	}
+
+	label {
+		@include absolute;
+		left: 5px;
+		top: 0;
+		line-height: 32px;
+		@include transition;
+	}
+
+	input[required] ~ label {
+		@include font-bold;
+	}
+
+	input:focus ~ label,
+	input:not(:placeholder-shown) ~ label {
+		transform: translate(-20px, -27px);
+	}
+}
+
+[ln-input-errors] {
+	@include ml(1.25rem);
+	font-size: 0.825rem;
+	color: var(--color-error);
+}
+
+input,
+textarea,
+select {
+	@include w-full;
+	@include px(0.75rem);
+	@include py(0.5rem);
+	@include text-base;
+	@include text-primary;
+	@include bg-primary;
+	@include border;
+	@include rounded-md;
+	@include transition;
+	outline: none;
+
+	&:focus {
+		border-color: var(--color-primary);
+		box-shadow: 0 0 0 3px var(--color-primary-light);
+	}
+
+	&::placeholder {
+		@include text-muted;
+	}
+
+	&:disabled {
+		@include opacity-50;
+		@include cursor-not-allowed;
+		@include bg-secondary;
+	}
+}
+
+textarea {
+	min-height: 6rem;
+	resize: vertical;
+}
+
+select {
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.75rem center;
+	padding-right: 2.5rem;
+}
+
+label {
+	@include block;
+	@include text-sm;
+	@include font-medium;
+	@include text-primary;
+	@include mb(0.25rem);
+}
+
+button {
+	@include flex;
+	@include items-center;
+	@include justify-center;
+	@include px(1rem);
+	@include py(0.5rem);
+	@include text-sm;
+	@include font-medium;
+	@include rounded-md;
+	@include cursor-pointer;
+	@include transition;
+	border: none;
+	outline: none;
+	background-color: var(--color-primary);
+	@include text-white;
+	white-space: nowrap;
+
+	&:hover {
+		background-color: var(--color-primary-hover);
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 3px var(--color-primary-light);
+	}
+
+	&:disabled {
+		@include opacity-50;
+		@include cursor-not-allowed;
+	}
+}
+
+.btn-secondary {
+	@include bg-secondary;
+	@include text-primary;
+	@include border;
+
+	&:hover {
+		background-color: var(--color-gray-100, #f3f4f6);
+	}
+}
+
+.btn-danger {
+	background-color: var(--color-error);
+
+	&:hover {
+		background-color: #b91c1c;
+	}
+}
+
+.form-group {
+	@include mb(1rem);
+}
+
+.form-row {
+	@include flex;
+	@include gap(1rem);
+
+	> * {
+		@include flex-1;
+	}
+}
+
+.form-actions {
+	@include flex;
+	@include justify-end;
+	@include gap(0.75rem);
+	@include mt(1.5rem);
+	@include pt(1rem);
+	@include border-t;
+}

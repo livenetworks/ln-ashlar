@@ -1,0 +1,42 @@
+@use '../config/mixins' as *;
+
+html,
+body {
+	@include w-full;
+	@include h-full;
+	@include bg-body;
+	@include font-sans;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+	line-height: 1.5;
+}
+
+body {
+	@include text-base;
+	@include text-primary;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+a {
+	color: var(--color-primary);
+	text-decoration: none;
+	@include transition-colors;
+	@include relative;
+
+	&:hover {
+		color: var(--color-primary-hover);
+	}
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+::selection {
+	background-color: var(--color-primary-light);
+	color: var(--color-text-primary);
+}

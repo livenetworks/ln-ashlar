@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cards — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Cards</li></nav>
+		<h1>Cards</h1>
+		<p>Картичка со hover ефект — primary accent линија одозгора, shadow и border промена.</p>
+
+		<!-- Basic card -->
+		<section class="section-card">
+			<header><h3>Основна картичка</h3></header>
+			<main>
+				<div class="grid-2">
+					<div class="card">
+						<main>
+							<h3>Наслов на картичка</h3>
+							<p class="text-sm text-secondary">Опис на содржината. Hover-ирај за ефект.</p>
+						</main>
+					</div>
+					<div class="card">
+						<main>
+							<h3>Друга картичка</h3>
+							<p class="text-sm text-secondary">Секоја .card има ::before pseudo за горната линија.</p>
+						</main>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Card with fields -->
+		<section class="section-card">
+			<header><h3>Картичка со поља (.field)</h3></header>
+			<main>
+				<div class="grid">
+					<div class="card">
+						<header><h3>Корисник</h3></header>
+						<main>
+							<div class="field"><span class="label">Име</span><span class="value">Марко</span></div>
+							<div class="field"><span class="label">Email</span><span class="value">marko@example.com</span></div>
+							<div class="field"><span class="label">Статус</span><span class="value pass">Активен</span></div>
+						</main>
+					</div>
+					<div class="card">
+						<header><h3>Статистика</h3></header>
+						<main>
+							<div class="field"><span class="label">Вкупно</span><span class="value">1,234</span></div>
+							<div class="field"><span class="label">Активни</span><span class="value pass">892</span></div>
+							<div class="field"><span class="label">Грешки</span><span class="value fail">12</span></div>
+						</main>
+					</div>
+					<div class="card">
+						<a href="#">
+							<main>
+								<h3>Card како линк</h3>
+								<div class="field"><span class="label">Тип</span><span class="value">Линк</span></div>
+								<div class="field"><span class="label">Кликни</span><span class="value">→</span></div>
+							</main>
+						</a>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;div class="card"&gt;
+    &lt;header&gt;&lt;h3&gt;Наслов&lt;/h3&gt;&lt;/header&gt;
+    &lt;main&gt;
+        &lt;div class="field"&gt;
+            &lt;span class="label"&gt;Label&lt;/span&gt;
+            &lt;span class="value"&gt;Value&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/main&gt;
+&lt;/div&gt;
+
+&lt;!-- Card како линк --&gt;
+&lt;div class="card"&gt;
+    &lt;a href="/page"&gt;
+        &lt;main&gt;&lt;h3&gt;Наслов&lt;/h3&gt;&lt;/main&gt;
+    &lt;/a&gt;
+&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

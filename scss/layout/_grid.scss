@@ -1,0 +1,94 @@
+@use '../config/mixins' as *;
+
+.grid {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+.grid-2 {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.grid-4 {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+.stack {
+	@include flex-col;
+	@include gap(1rem);
+}
+
+.stack-sm {
+	@include flex-col;
+	@include gap(0.5rem);
+}
+
+.stack-lg {
+	@include flex-col;
+	@include gap(1.5rem);
+}
+
+.row {
+	@include flex;
+	@include items-center;
+	@include gap(1rem);
+}
+
+.row-between {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+}
+
+.row-center {
+	@include flex;
+	@include items-center;
+	@include justify-center;
+}
+
+.container {
+	@include w-full;
+	max-width: 80rem;
+	@include mx(auto);
+	@include px(1rem);
+
+	@media (min-width: 640px) {
+		@include px(1.5rem);
+	}
+
+	@media (min-width: 1024px) {
+		@include px(2rem);
+	}
+}
+
+.container-sm {
+	@include w-full;
+	max-width: 56rem;
+	@include mx(auto);
+	@include px(1rem);
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Modal — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+	<script src="../dist/ln-frontend.iife.js" defer></script>
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Modal</li></nav>
+		<h1>Modal</h1>
+		<p>JS компонента за модални прозорци. Отвора/затвора преку <code>data-ln-modal</code>. ESC затвора.</p>
+
+		<!-- Triggers -->
+		<section class="section-card">
+			<header><h3>Примери</h3></header>
+			<main>
+				<div class="flex gap-3" style="flex-wrap: wrap;">
+					<button data-ln-modal="demo-basic">Basic Modal</button>
+					<button data-ln-modal="demo-form" class="btn-secondary">Form Modal</button>
+					<button data-ln-modal="demo-large" class="btn-secondary">Large Modal</button>
+				</div>
+			</main>
+		</section>
+
+		<!-- Basic Modal -->
+		<div class="ln-modal" id="demo-basic">
+			<div class="ln-modal__content">
+				<header>
+					<h3>Basic Modal</h3>
+					<button data-ln-modal-close>&times;</button>
+				</header>
+				<main>
+					<p>Ова е основен модал со наслов и содржина.</p>
+					<p>Притисни ESC или кликни затвори.</p>
+				</main>
+				<footer>
+					<button data-ln-modal-close class="btn-secondary">Затвори</button>
+				</footer>
+			</div>
+		</div>
+
+		<!-- Form Modal -->
+		<div class="ln-modal" id="demo-form">
+			<div class="ln-modal__content">
+				<header>
+					<h3>Додај корисник</h3>
+					<button data-ln-modal-close>&times;</button>
+				</header>
+				<main>
+					<form>
+						<div class="form-group">
+							<label for="m-name">Име</label>
+							<input type="text" id="m-name" placeholder="Внесете име...">
+						</div>
+						<div class="form-group">
+							<label for="m-email">Email</label>
+							<input type="email" id="m-email" placeholder="email@example.com">
+						</div>
+						<div class="form-group">
+							<label for="m-role">Улога</label>
+							<select id="m-role">
+								<option>Корисник</option>
+								<option>Администратор</option>
+								<option>Модератор</option>
+							</select>
+						</div>
+					</form>
+				</main>
+				<footer>
+					<button data-ln-modal-close class="btn-secondary">Откажи</button>
+					<button type="submit">Зачувај</button>
+				</footer>
+			</div>
+		</div>
+
+		<!-- Large Modal -->
+		<div class="ln-modal" id="demo-large">
+			<div class="ln-modal__content ln-modal__content--lg">
+				<header>
+					<h3>Голем модал</h3>
+					<button data-ln-modal-close>&times;</button>
+				</header>
+				<main>
+					<p>Поголем модал за повеќе содржина. Класата <code>.ln-modal__content--lg</code> го зголемува.</p>
+					<table>
+						<thead><tr><th>Име</th><th>Статус</th><th>Бодови</th></tr></thead>
+						<tbody>
+							<tr><td>Марко</td><td><span class="pass">OK</span></td><td class="numeric">95</td></tr>
+							<tr><td>Ана</td><td><span class="pass">OK</span></td><td class="numeric">88</td></tr>
+							<tr><td>Иван</td><td><span class="fail">Грешка</span></td><td class="numeric">42</td></tr>
+						</tbody>
+					</table>
+				</main>
+				<footer>
+					<button data-ln-modal-close class="btn-secondary">Затвори</button>
+				</footer>
+			</div>
+		</div>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;!-- Trigger копче --&gt;
+&lt;button data-ln-modal="my-modal"&gt;Отвори&lt;/button&gt;
+
+&lt;!-- Modal --&gt;
+&lt;div class="ln-modal" id="my-modal"&gt;
+    &lt;div class="ln-modal__content"&gt;
+        &lt;header&gt;
+            &lt;h3&gt;Наслов&lt;/h3&gt;
+            &lt;button data-ln-modal-close&gt;&amp;times;&lt;/button&gt;
+        &lt;/header&gt;
+        &lt;main&gt;
+            &lt;p&gt;Содржина...&lt;/p&gt;
+        &lt;/main&gt;
+        &lt;footer&gt;
+            &lt;button data-ln-modal-close class="btn-secondary"&gt;Откажи&lt;/button&gt;
+            &lt;button type="submit"&gt;Зачувај&lt;/button&gt;
+        &lt;/footer&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Големини: default, --sm, --md, --lg, --xl --&gt;
+&lt;div class="ln-modal__content ln-modal__content--lg"&gt;
+
+&lt;!-- JS API --&gt;
+&lt;script&gt;
+    window.lnModal.open('my-modal');
+    window.lnModal.close('my-modal');
+    window.lnModal.toggle('my-modal');
+&lt;/script&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

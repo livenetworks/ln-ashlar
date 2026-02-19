@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Typography — ln-frontend</title>
+	<link rel="stylesheet" href="../dist/ln-frontend.css">
+</head>
+<body>
+	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
+		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Typography</li></nav>
+		<h1>Typography</h1>
+		<p>Базни типографски стилови. Сите fonts, weights и sizes доаѓаат од <code>_tokens.scss</code>.</p>
+
+		<!-- Headings -->
+		<section class="section-card">
+			<header><h3>Наслови</h3></header>
+			<main>
+				<h1>h1 — Главен наслов (2.25rem)</h1>
+				<h2>h2 — Секундарен (1.5rem)</h2>
+				<h3>h3 — Под-наслов (1.25rem)</h3>
+				<h4>h4 — Помал наслов (1.125rem)</h4>
+				<h5>h5 — Мал наслов (1rem, semibold)</h5>
+				<h6>h6 — Најмал (0.875rem, semibold)</h6>
+			</main>
+		</section>
+
+		<!-- Text -->
+		<section class="section-card">
+			<header><h3>Текст</h3></header>
+			<main>
+				<p>Обичен параграф со <strong>bold текст</strong>, <em>italic текст</em> и <small>мал текст</small>.</p>
+				<p>Линк: <a href="#">Пример линк</a> со hover ефект.</p>
+				<blockquote>Blockquote — цитат со лева линија во primary боја.</blockquote>
+			</main>
+		</section>
+
+		<!-- Code -->
+		<section class="section-card">
+			<header><h3>Код</h3></header>
+			<main>
+				<p>Inline код: <code>var(--color-primary)</code></p>
+				<pre><code>.card header {
+    @include px(var(--spacing-lg));
+    @include py(var(--spacing-md));
+    @include font-semibold;
+}</code></pre>
+			</main>
+		</section>
+
+		<!-- Lists -->
+		<section class="section-card">
+			<header><h3>Листи</h3></header>
+			<main>
+				<div class="grid-2">
+					<div>
+						<h5>Unordered</h5>
+						<ul>
+							<li>Прва ставка</li>
+							<li>Втора ставка</li>
+							<li>Трета ставка</li>
+						</ul>
+					</div>
+					<div>
+						<h5>Ordered</h5>
+						<ol>
+							<li>Прв чекор</li>
+							<li>Втор чекор</li>
+							<li>Трет чекор</li>
+						</ol>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Font sizes -->
+		<section class="section-card">
+			<header><h3>Font Size токени</h3></header>
+			<main>
+				<table>
+					<thead><tr><th>Токен</th><th>Вредност</th><th>Пример</th></tr></thead>
+					<tbody>
+						<tr><td>--text-xs</td><td>0.75rem</td><td><span class="text-xs">Мал текст xs</span></td></tr>
+						<tr><td>--text-sm</td><td>0.875rem</td><td><span class="text-sm">Мал текст sm</span></td></tr>
+						<tr><td>--text-base</td><td>1rem</td><td><span class="text-base">Основен base</span></td></tr>
+						<tr><td>--text-lg</td><td>1.125rem</td><td><span class="text-lg">Поголем lg</span></td></tr>
+						<tr><td>--text-xl</td><td>1.25rem</td><td><span class="text-xl">Голем xl</span></td></tr>
+						<tr><td>--text-2xl</td><td>1.5rem</td><td><span class="text-2xl">Најголем 2xl</span></td></tr>
+					</tbody>
+				</table>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;h1&gt;Наслов&lt;/h1&gt;
+&lt;p&gt;Параграф со &lt;strong&gt;bold&lt;/strong&gt; и &lt;code&gt;inline code&lt;/code&gt;.&lt;/p&gt;
+&lt;blockquote&gt;Цитат&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;Code block&lt;/code&gt;&lt;/pre&gt;</code></pre>
+			</main>
+		</section>
+	</div>
+</body>
+</html>

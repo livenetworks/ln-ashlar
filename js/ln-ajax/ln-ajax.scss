@@ -1,0 +1,35 @@
+/* ln-ajax Loading States */
+
+/* Links with loading state */
+a.ln-ajax--loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Disabled buttons (during form submission) */
+button:disabled,
+input[type="submit"]:disabled,
+input[type="image"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Optional: Add a simple indicator for loading state */
+a.ln-ajax--loading::after {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 6px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: ln-ajax-spin 0.6s linear infinite;
+}
+
+@keyframes ln-ajax-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
