@@ -1,8 +1,8 @@
-# CLAUDE.md — AI Agent Instructions for ln-frontend
+# CLAUDE.md — AI Agent Instructions for ln-acme
 
 ## Што е ова репозитори?
 
-`ln-frontend` е унифициран frontend library за LiveNetworks проекти.
+`ln-acme` е унифициран frontend library за LiveNetworks проекти.
 Содржи **SCSS CSS framework** + **vanilla JS компоненти**, без зависности.
 Се користи во Laravel проекти и други веб апликации.
 
@@ -203,9 +203,9 @@ npm run dev          # Watch mode
 ```
 
 Output:
-- `dist/ln-frontend.css` — сè вклучено
-- `dist/ln-frontend.js` — ES module
-- `dist/ln-frontend.iife.js` — за `<script>` tag
+- `dist/ln-acme.css` — сè вклучено
+- `dist/ln-acme.js` — ES module
+- `dist/ln-acme.iife.js` — за `<script>` tag
 
 ---
 
@@ -213,19 +213,19 @@ Output:
 
 ### npm
 ```js
-import 'ln-frontend';                           // JS
-import 'ln-frontend/dist/ln-frontend.css';       // CSS
+import 'ln-acme';                           // JS
+import 'ln-acme/dist/ln-acme.css';       // CSS
 ```
 
 ### Git submodule
 ```bash
-git submodule add .../ln-frontend.git resources/ln-frontend
+git submodule add .../ln-acme.git resources/ln-acme
 ```
 
 ### Plain HTML
 ```html
-<link rel="stylesheet" href="dist/ln-frontend.css">
-<script src="dist/ln-frontend.iife.js"></script>
+<link rel="stylesheet" href="dist/ln-acme.css">
+<script src="dist/ln-acme.iife.js"></script>
 ```
 
 ---
@@ -237,7 +237,7 @@ git submodule add .../ln-frontend.git resources/ln-frontend
 3. Користи семантички селектори (`.component element {}`)
 4. Користи `@include` mixins за properties
 5. Користи `var(--token)` за вредности
-6. Додај го `@use 'components/new-component'` во `scss/ln-frontend.scss`
+6. Додај го `@use 'components/new-component'` во `scss/ln-acme.scss`
 
 ## Кога додаваш нов JS компонент
 

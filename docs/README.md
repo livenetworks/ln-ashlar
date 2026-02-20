@@ -43,19 +43,19 @@ js/ln-*/                    → Vanilla JS components (IIFE pattern)
 ## Build
 
 ```bash
-npm run build   # dist/ln-frontend.css + .js + .iife.js
+npm run build   # dist/ln-acme.css + .js + .iife.js
 npm run dev     # Watch mode
 ```
 
 ## Integration
 
 ```html
-<link rel="stylesheet" href="dist/ln-frontend.css">
-<script src="dist/ln-frontend.iife.js" defer></script>
+<link rel="stylesheet" href="dist/ln-acme.css">
+<script src="dist/ln-acme.iife.js" defer></script>
 ```
 
 ```js
 // npm module
 import 'acme-gui';
-import 'acme-gui/dist/ln-frontend.css';
+import 'acme-gui/dist/ln-acme.css';
 ```

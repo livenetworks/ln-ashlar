@@ -1,5 +1,5 @@
 // SCSS Framework — master entry (tokens, base, components, layouts, utilities)
-import '../scss/ln-frontend.scss';
+import '../scss/ln-acme.scss';
 
 // JS Components (JS + co-located SCSS)
 import './ln-ajax/ln-ajax.js';

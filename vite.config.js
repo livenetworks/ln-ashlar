@@ -7,15 +7,15 @@ export default defineConfig({
 		emptyOutDir: true,
 		lib: {
 			entry: resolve(__dirname, 'js/index.js'),
-			name: 'LnFrontend',
+			name: 'LnAcme',
 			formats: ['es', 'iife'],
-			fileName: (format) => format === 'es' ? 'ln-frontend.js' : 'ln-frontend.iife.js'
+			fileName: (format) => format === 'es' ? 'ln-acme.js' : 'ln-acme.iife.js'
 		},
 		rollupOptions: {
 			output: {
 				assetFileNames: (assetInfo) => {
 					if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-						return 'ln-frontend.css';
+						return 'ln-acme.css';
 					}
 					return 'assets/[name][extname]';
 				}

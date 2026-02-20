@@ -1,10 +1,10 @@
 {
-	"name": "ln-frontend",
+	"name": "ln-acme",
 	"version": "1.0.0",
 	"description": "LiveNetworks unified frontend library — CSS framework and vanilla JS components",
 	"type": "module",
-	"main": "dist/ln-frontend.js",
-	"style": "dist/ln-frontend.css",
+	"main": "dist/ln-acme.js",
+	"style": "dist/ln-acme.css",
 	"files": [
 		"dist/",
 		"scss/",
@@ -12,11 +12,11 @@
 	],
 	"exports": {
 		".": {
-			"import": "./dist/ln-frontend.js",
-			"style": "./dist/ln-frontend.css"
+			"import": "./dist/ln-acme.js",
+			"style": "./dist/ln-acme.css"
 		},
-		"./css": "./dist/ln-frontend.css",
-		"./js": "./dist/ln-frontend.js",
+		"./css": "./dist/ln-acme.css",
+		"./js": "./dist/ln-acme.js",
 		"./scss/*": "./scss/*",
 		"./js/*": "./js/*"
 	},
