@@ -7,10 +7,14 @@
  * <select data-ln-select='{"create": true, "maxItems": 3}'>...</select>
  */
 
-import TomSelect from 'tom-select';
-
 (function () {
 	'use strict';
+
+	const TomSelect = window.TomSelect;
+	if (!TomSelect) {
+		window.lnSelect = { initialize: function(){}, destroy: function(){}, getInstance: function(){ return null; } };
+		return;
+	}
 
 	const instances = new WeakMap();
 

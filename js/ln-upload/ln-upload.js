@@ -90,8 +90,22 @@
 
 		const zone = container.querySelector('.ln-upload__zone');
 		const list = container.querySelector('.ln-upload__list');
-		const input = container.querySelector('input[type="file"]');
 		const acceptString = container.getAttribute(ACCEPT_ATTR) || '';
+
+		let input = container.querySelector('input[type="file"]');
+		if (!input) {
+			input = document.createElement('input');
+			input.type = 'file';
+			input.multiple = true;
+			input.style.display = 'none';
+			if (acceptString) {
+				input.accept = acceptString.split(',').map(function(ext) {
+					ext = ext.trim();
+					return ext.startsWith('.') ? ext : '.' + ext;
+				}).join(',');
+			}
+			container.appendChild(input);
+		}
 		const uploadUrl = container.getAttribute(DOM_SELECTOR) || '/files/upload';
 		const uploadContext = container.getAttribute(CONTEXT_ATTR) || '';
 

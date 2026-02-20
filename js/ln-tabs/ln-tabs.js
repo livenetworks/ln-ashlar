@@ -37,12 +37,15 @@
 			|| Object.keys(this.mapTabs)[0] || "";
 		this.autoFocus  = (this.dom.getAttribute("data-ln-tabs-focus") || "true").toLowerCase() !== "false";
 
-		// Anchor-friendly: ако кликнеш ист hash повторно, сепак активирај (за фокус/рефреш)
 		this.tabs.forEach((t) => {
 			t.addEventListener("click", () => {
 				const key = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
 				if (!key) return;
-				if (location.hash === "#" + key) this.activate(key);
+				if (location.hash === "#" + key) {
+					this.activate(key);
+				} else {
+					location.hash = key;
+				}
 			});
 		});
 

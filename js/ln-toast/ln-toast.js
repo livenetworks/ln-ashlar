@@ -153,10 +153,20 @@
 			const body = document.createElement("div");
 			body.className = "ln-toast__body";
 			if (opts.message) {
-				const p = document.createElement("p");
-				p.textContent = opts.message;
-				p.style.margin = "0";
-				body.appendChild(p);
+				if (Array.isArray(opts.message)) {
+					const ul = document.createElement("ul");
+					opts.message.forEach(function(msg) {
+						const lie = document.createElement("li");
+						lie.textContent = msg;
+						ul.appendChild(lie);
+					});
+					body.appendChild(ul);
+				} else {
+					const p = document.createElement("p");
+					p.textContent = opts.message;
+					p.style.margin = "0";
+					body.appendChild(p);
+				}
 			}
 			if (opts.data && opts.data.errors) {
 				const ul = document.createElement("ul");

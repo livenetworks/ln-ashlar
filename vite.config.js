@@ -12,11 +12,7 @@ export default defineConfig({
 			fileName: (format) => format === 'es' ? 'ln-frontend.js' : 'ln-frontend.iife.js'
 		},
 		rollupOptions: {
-			external: ['tom-select'],
 			output: {
-				globals: {
-					'tom-select': 'TomSelect'
-				},
 				assetFileNames: (assetInfo) => {
 					if (assetInfo.name && assetInfo.name.endsWith('.css')) {
 						return 'ln-frontend.css';
