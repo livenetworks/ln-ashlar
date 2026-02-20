@@ -1,44 +1,36 @@
-:root {
-	--progressHeight: 5px;
-	--progressBoxBg: 255,255,255,.8;
-}
+@use '../../scss/config/mixins' as *;
 
-[ln-progress] {
-	height: var(--progressHeight);
-	max-width: 100%;
-	width: 100%;
-	border-radius: calc(var(--progressHeight) / 2);
-	background-color: rgba(var(--progressBoxBg));
-	transition: width .5s  ease-in, background-color .5s  ease-in;
+/* Progress Track */
+[data-ln-progress] {
+	height: var(--spacing-xs);
+	@include w-full;
+	@include rounded-full;
+	background-color: var(--color-bg-body);
 	overflow: hidden;
-	display: flex;
+	@include flex;
 }
 
-
-[ln-progress] [ln-progress] {
+/* Progress Bar (inner) */
+[data-ln-progress] > [data-ln-progress] {
+	width: 0;
+	@include transition;
 	border-radius: 0;
+
+	&:last-child {
+		border-top-right-radius: var(--radius-full);
+		border-bottom-right-radius: var(--radius-full);
+	}
 }
 
-[ln-progress] [ln-progress]:last-child {
-	border-top-right-radius: calc(var(--progressHeight) / 2);
-	border-bottom-right-radius: calc(var(--progressHeight) / 2);
+/* Color variants */
+[data-ln-progress].green {
+	background-color: var(--color-success);
 }
 
-[ln-progress="trackable"]::after {
-	float: right;
-	width: 50%;
-	background-color: blue;
-	content: "";
+[data-ln-progress].red {
+	background-color: var(--color-error);
 }
 
-[ln-progress].green {
-	background-color: green;
-}
-
-[ln-progress].yellow {
-	background-color: yellow;
-}
-
-[ln-progress].red {
-	background-color: red;
+[data-ln-progress].yellow {
+	background-color: var(--color-warning);
 }

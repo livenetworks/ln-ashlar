@@ -1,107 +1,49 @@
-[ln-box] {
-	background-color: rgba(var(--boxColor), .4);
+@use '../../scss/config/mixins' as *;
 
-	margin-top: 10px;
-	min-height: 39px;
+/* Box Container */
+[data-ln-box] {
+	@include bg-primary;
+	@include border;
+	@include rounded-md;
+	@include overflow-hidden;
 }
 
-[ln-box] header, [ln-box] footer {
-	padding: 10px;
-	flex: 0 0 auto;
-}
-
-
-[ln-box] header {
-	color: rgba(var(--boxText), 1);
-}
-
-[ln-box] header h1
-, [ln-box] header h2
-, [ln-box] header h3
-, [ln-box] header h4
-, [ln-box] header h5
-, [ln-box] header h6 {
-	float: left;
-	font-size: 14px;
+/* Header */
+[data-ln-box] > header {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(var(--spacing-sm));
+	@include py(var(--spacing-xs));
+	@include bg-secondary;
+	@include border-b;
+	@include text-sm;
+	@include font-semibold;
 	margin: 0;
-	padding: 0;
-	font-weight: normal;
 }
 
-[ln-box] .lnActions {
-	float: right;
-	display: flex;
-}
-
-[ln-box] .lnActions button {
-	margin: 0 2px;
-	padding: 0 5px;
-	line-height: inherit;
-}
-
-.lnActions button {
-	font-family: "Material Icons";
-}
-
-
-[ln-box-body] {
-	background-color: var(--mainColor);
-	max-height: 100%;
-}
-
-[ln-box-body], [ln-box] footer {
-	transition: max-height 300ms ease-in;
-}
-
-[ln-box="collapsed"] [ln-box-body], [ln-box="collapsed"] footer {
-	max-height: 0 !important;
-	padding: 0;
-	overflow: hidden;
-}
-
-
-
-
-
-
-
-
-
-
-[ln-layout="window"] [ln-box] {
-	display: flex;
-	flex: 0 1 auto;
-	flex-direction: column;
-}
-
-
-[ln-layout="window"] [ln-box-body] {
+/* Body */
+[data-ln-box-body] {
+	@include p(var(--spacing-sm));
 	max-height: 100vh;
-	height: 100%;
-	flex: 1 1 auto;
+	@include transition;
 	overflow: auto;
 }
 
-
-
-[ln-layout="auto"] [ln-box] {
-	display: flex;
-	flex: 0 1 auto;
-	flex-direction: column;
+/* Collapsed state */
+[data-ln-box="collapsed"] [data-ln-box-body],
+[data-ln-box="collapsed"] footer {
+	max-height: 0 !important;
+	@include py(0);
+	overflow: hidden;
 }
 
-
-[ln-layout="auto"] [ln-box-body] {
-	max-height: 100%;
-	display: flex;
-}
-
-
-
-
-[ln-box="collapsed"] [ln-box-action="collapse"] {
+/* Toggle button visibility */
+[data-ln-box="collapsed"] [data-ln-box-action="collapse"] {
 	display: none;
 }
-[ln-box=""] [ln-box-action="expand"] {
+
+[data-ln-box=""] [data-ln-box-action="expand"],
+[data-ln-box]:not([data-ln-box="collapsed"]) [data-ln-box-action="expand"] {
 	display: none;
 }

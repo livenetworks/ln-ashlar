@@ -1,24 +1,18 @@
-/* Modal Component Styles */
+@use '../../scss/config/mixins' as *;
 
-/* ==========================================================================
-   Modal Container
-   ========================================================================== */
-
+/* Modal Overlay */
 .ln-modal {
 	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+	@include fixed;
+	@include inset-0;
 	background-color: rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(4px);
 	-webkit-backdrop-filter: blur(4px);
-	z-index: 1000;
-	align-items: center;
-	justify-content: center;
+	@include z-modal;
+	@include items-center;
+	@include justify-center;
 	opacity: 0;
-	transition: opacity 0.3s ease;
+	@include transition;
 }
 
 .ln-modal--open {
@@ -26,168 +20,81 @@
 	opacity: 1;
 }
 
-.ln-modal--hidden {
-	display: none;
-}
-
-.ln-modal--visible {
-	display: flex;
-}
-
-/* ==========================================================================
-   Modal Content
-   ========================================================================== */
-
+/* Modal Content */
 .ln-modal__content {
-	background: white;
-	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+	@include bg-primary;
+	@include rounded-md;
+	@include shadow-lg;
 	max-width: 600px;
 	width: 90%;
 	max-height: 90vh;
 	overflow-y: auto;
-	animation: slideIn 0.3s ease;
+	animation: ln-modal-slideIn 0.3s ease;
 	display: grid;
 	grid-template-rows: auto 1fr auto;
 }
 
-/* Modal Sizes */
-.ln-modal__content--sm {
-	max-width: 28rem;
-}
+.ln-modal__content--sm { max-width: 28rem; }
+.ln-modal__content--md { max-width: 32rem; }
+.ln-modal__content--lg { max-width: 42rem; }
+.ln-modal__content--xl { max-width: 48rem; }
 
-.ln-modal__content--md {
-	max-width: 32rem;
-}
-
-.ln-modal__content--lg {
-	max-width: 42rem;
-}
-
-.ln-modal__content--xl {
-	max-width: 48rem;
-}
-
-/* ==========================================================================
-   Modal Header - Uses semantic selector, inherits global header styles
-   ========================================================================== */
-
+/* Header */
 .ln-modal header {
-	padding: 0 !important;
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(var(--spacing-sm));
+	@include py(var(--spacing-xs));
+	@include bg-secondary;
+	@include border-b;
+
+	h3 {
+		@include text-sm;
+		@include font-semibold;
+		@include uppercase;
+		@include tracking-wider;
+		margin: 0;
+	}
 }
 
-.ln-modal header > * {
-	@apply px-3 py-2;
-}
-
-.ln-modal header > h1,
-.ln-modal header > h2,
-.ln-modal header > h3,
-.ln-modal header > h4,
-.ln-modal header > h5,
-.ln-modal header > h6 {
-	@apply text-sm;
-}
-
-/* Modal-specific close button styling */
 .ln-modal header button[data-ln-modal-close] {
-	background-color: transparent;
-	border: none;
-	font-size: 20px;
+	background: transparent;
+	@include border-none;
+	@include text-lg;
 	color: var(--color-text-secondary);
-	cursor: pointer;
-	padding: 6px;
-	width: 32px;
-	height: 32px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all 0.2s ease;
+	@include cursor-pointer;
+	@include size(2rem);
+	@include flex-center;
+	@include transition;
+
+	&:hover {
+		color: var(--color-text-primary);
+		@include bg-secondary;
+	}
 }
 
-.ln-modal header button[data-ln-modal-close]:hover {
-	color: var(--color-text-primary);
-	background-color: var(--color-gray-100);
-}
-
-.ln-modal header button[data-ln-modal-close]:focus {
-	outline: none;
-	box-shadow: 0 0 0 2px var(--color-indigo-500);
-}
-
-/* ==========================================================================
-   Modal Body - Uses semantic selector
-   ========================================================================== */
-
+/* Body */
 .ln-modal main {
-	padding: 24px;
+	@include p(var(--spacing-lg));
 	overflow-y: auto;
 	overflow-x: hidden;
 }
 
-/* ==========================================================================
-   Modal Footer - Uses semantic selector
-   ========================================================================== */
-
+/* Footer */
 .ln-modal footer {
-	padding: 12px;
-	border-top: 1px solid var(--color-border);
-	background-color: var(--color-bg-light);
-	display: flex;
-	justify-content: flex-end;
-	gap: 8px;
+	@include p(var(--spacing-sm));
+	@include border-t;
+	@include bg-secondary;
+	@include flex;
+	@include justify-end;
+	@include gap(var(--spacing-sm));
 	position: sticky;
 	bottom: 0;
 }
 
-/* Modal footer button styles */
-.ln-modal footer button {
-	font-weight: 500;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	font-size: 14px;
-	padding: 6px 12px;
-}
-
-.ln-modal footer button[type=button] {
-	background-color: var(--color-gray-100);
-	color: var(--color-gray-700);
-}
-
-.ln-modal footer button[type=button]:hover {
-	background-color: var(--color-gray-200);
-}
-
-.ln-modal footer button[type=submit] {
-	border: none;
-	background-color: var(--color-indigo-600);
-	color: white;
-	display: inline-flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-
-.ln-modal footer button[type=submit]::before {
-	background-image: var(--icon-check-white);
-}
-
-.ln-modal footer button[type=submit]:hover {
-	background-color: var(--color-indigo-700);
-}
-
-.ln-modal footer button[type=submit]:disabled {
-	opacity: 0.6;
-	cursor: not-allowed;
-}
-
-.ln-modal footer button[type=submit]:active {
-	background-color: var(--color-indigo-800);
-}
-
-/* ==========================================================================
-   Animations
-   ========================================================================== */
-
-@keyframes slideIn {
+/* Animation */
+@keyframes ln-modal-slideIn {
 	from {
 		transform: translateY(-50px);
 		opacity: 0;
@@ -197,30 +104,6 @@
 		opacity: 1;
 	}
 }
-
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-
-@keyframes slideUp {
-	from {
-		opacity: 0;
-		transform: translateY(20px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-/* ==========================================================================
-   Utilities
-   ========================================================================== */
 
 /* Prevent body scroll when modal is open */
 body.ln-modal-open {

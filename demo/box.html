@@ -46,25 +46,25 @@
 					<div>
 						<small class="text-secondary">65% (130/200)</small>
 						<div data-ln-progress>
-							<div data-ln-progress data-progress-min="100" data-progress-max="200" data-progress-value="130" class="green"></div>
+							<div data-ln-progress="130" data-ln-progress-max="200" class="green"></div>
 						</div>
 					</div>
 					<div>
 						<small class="text-secondary">55% (11/20) — red</small>
 						<div data-ln-progress>
-							<div data-ln-progress data-progress-min="10" data-progress-max="20" data-progress-value="11" class="red"></div>
+							<div data-ln-progress="11" data-ln-progress-max="20" class="red"></div>
 						</div>
 					</div>
 					<div>
 						<small class="text-secondary">60% (12/20) — green</small>
 						<div data-ln-progress>
-							<div data-ln-progress data-progress-min="10" data-progress-max="20" data-progress-value="12" class="green"></div>
+							<div data-ln-progress="12" data-ln-progress-max="20" class="green"></div>
 						</div>
 					</div>
 					<div>
 						<small class="text-secondary">75% (15/20) — yellow</small>
 						<div data-ln-progress>
-							<div data-ln-progress data-progress-min="10" data-progress-max="20" data-progress-value="15" class="yellow"></div>
+							<div data-ln-progress="15" data-ln-progress-max="20" class="yellow"></div>
 						</div>
 					</div>
 				</div>
@@ -96,19 +96,18 @@
 			<header><h3>Progress HTML</h3></header>
 			<main>
 				<pre><code>&lt;div data-ln-progress&gt;
-    &lt;div data-ln-progress
-         data-progress-min="0"
-         data-progress-max="100"
-         data-progress-value="65"
+    &lt;div data-ln-progress="65"
+         data-ln-progress-max="100"
          class="green"&gt;
     &lt;/div&gt;
 &lt;/div&gt;
 
 &lt;!-- Бои: class="green" | "red" | "yellow" --&gt;
+&lt;!-- max default = 100 (може да се испушти) --&gt;
 
 &lt;!-- Динамичка промена --&gt;
 &lt;script&gt;
-    el.setAttribute('data-progress-value', '80');
+    el.setAttribute('data-ln-progress', '80');
     // MutationObserver автоматски ќе ја ажурира ширината
 &lt;/script&gt;</code></pre>
 			</main>
