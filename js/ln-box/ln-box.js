@@ -1,11 +1,9 @@
-// Usage:
 (function () {
 	const DOM_SELECTOR = '[data-ln-box]';
 	const DOM_ATTRIBUTE = 'lnBox';
-	const ALLOWED_NOTE_TYPES = new Set([1, 2, 9, 10, 11]);
 
 	// if the component is already defined, return
-	if (window[DOM_ATTRIBUTE] != undefined || window[DOM_ATTRIBUTE] != null) {
+	if (window[DOM_ATTRIBUTE] !== undefined) {
 		return;
 	}
 
@@ -37,9 +35,9 @@
 	function _domObserver() {
 		let observer = new MutationObserver(function (mutations) {
 			mutations.forEach(function (mutation) {
-				if (mutation.type == "childList") {
+				if (mutation.type === "childList") {
 					mutation.addedNodes.forEach(function (item) {
-						if (ALLOWED_NOTE_TYPES.has(item.nodeType)) {
+						if (item.nodeType === 1) {
 							_findElements(item);
 						}
 					});
@@ -47,16 +45,13 @@
 			});
 		});
 
-
 		observer.observe(document.body, {
-			childList: true
+			childList: true,
+			subtree: true
 		});
 	}
 
 	_domObserver();
-
-
-	// Edit Below
 
 	function _init() {
 		this.buttons = {};
@@ -67,7 +62,6 @@
 	}
 
 	function _setEventListeners() {
-
 		// Collapse
 		this.buttons.collapse.forEach((btn) => {
 			btn.addEventListener('click', (e) => {
@@ -80,9 +74,7 @@
 				expand.call(this);
 			}, false)
 		})
-
 	}
-
 
 	function collapse() {
 		this.dom.setAttribute('data-ln-box', "collapsed");
@@ -91,12 +83,16 @@
 		this.dom.setAttribute('data-ln-box', "");
 	}
 
-	// make lnResizer globaly avaliable
+	// make lnBox globally available
 	window[DOM_ATTRIBUTE] = constructor;
 	_constructor.prototype.collapse = collapse;
 	_constructor.prototype.expand = expand;
-})();
 
-document.addEventListener('DOMContentLoaded', function () {
-	window.lnBox(document.body);
-});
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', function () {
+			window.lnBox(document.body);
+		});
+	} else {
+		window.lnBox(document.body);
+	}
+})();

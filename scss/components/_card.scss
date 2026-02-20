@@ -5,7 +5,7 @@
 	@include border;
 	@include w-full;
 	@include flex-col;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	@include shadow-sm;
 	transition: all var(--transition-base);
 	@include relative;
 	@include overflow-hidden;
@@ -44,9 +44,13 @@
 		@include flex;
 		@include items-center;
 		@include gap(0.75rem);
+		@include px(1.5rem);
+		@include pt(1.25rem);
 
 		h3 {
 			color: var(--color-primary);
+			@include text-base;
+			@include font-semibold;
 			margin: 0;
 		}
 	}
@@ -64,8 +68,8 @@
 		@include justify-between;
 		align-items: baseline;
 		@include gap(0.75rem);
-		padding-bottom: 0.75rem;
-		border-bottom: 1px solid #f3f4f6;
+		@include pb(0.75rem);
+		@include border-b;
 
 		&:last-child {
 			border-bottom: none;
@@ -97,3 +101,11 @@
 		}
 	}
 }
+
+// Семантичка употреба со @extend:
+// #korisnik { @extend .card; }
+//
+// HTML: <div id="korisnik">
+//           <header><h3>Корисник</h3></header>
+//           <main>...</main>
+//       </div>

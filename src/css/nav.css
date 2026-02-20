@@ -1,8 +1,0 @@
-[ln-nav] {
-	background-color: var(--navColor);
-
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}

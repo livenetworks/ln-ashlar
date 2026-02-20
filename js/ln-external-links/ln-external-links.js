@@ -20,7 +20,7 @@
 	const DOM_ATTRIBUTE = 'lnExternalLinks';
 
 	// Prevent duplicate initialization
-	if (window[DOM_ATTRIBUTE] != undefined || window[DOM_ATTRIBUTE] != null) {
+	if (window[DOM_ATTRIBUTE] !== undefined) {
 		return;
 	}
 

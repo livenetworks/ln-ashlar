@@ -7,13 +7,13 @@ form {
 		border: none;
 	}
 
-	[ln-inputcontrol] {
-		color: #333;
-		margin: 10px;
-		padding-top: 15px;
+	[data-ln-inputcontrol] {
+		@include text-primary;
+		@include m(var(--spacing-sm));
+		@include pt(var(--spacing-md));
 		flex: 1 1 auto;
 
-		[ln-input] {
+		[data-ln-input] {
 			@include bg-primary;
 			@include rounded-sm;
 			@include ml(1.25rem);
@@ -22,7 +22,7 @@ form {
 	}
 }
 
-[ln-input] {
+[data-ln-input] {
 	input {
 		@include w-full;
 		background: transparent;
@@ -37,9 +37,9 @@ form {
 
 	label {
 		@include absolute;
-		left: 5px;
+		left: var(--spacing-xs);
 		top: 0;
-		line-height: 32px;
+		line-height: 2rem;
 		@include transition;
 	}
 
@@ -49,13 +49,13 @@ form {
 
 	input:focus ~ label,
 	input:not(:placeholder-shown) ~ label {
-		transform: translate(-20px, -27px);
+		transform: translate(-1.25rem, -1.75rem);
 	}
 }
 
-[ln-input-errors] {
+[data-ln-input-errors] {
 	@include ml(1.25rem);
-	font-size: 0.825rem;
+	@include text-sm;
 	color: var(--color-error);
 }
 
@@ -147,7 +147,7 @@ button {
 	@include border;
 
 	&:hover {
-		background-color: var(--color-gray-100, #f3f4f6);
+		background-color: var(--color-bg-secondary);
 	}
 }
 
@@ -155,7 +155,7 @@ button {
 	background-color: var(--color-error);
 
 	&:hover {
-		background-color: #b91c1c;
+		background-color: var(--color-error-hover);
 	}
 }
 

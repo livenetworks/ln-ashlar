@@ -3,7 +3,7 @@
 	const DOM_ATTRIBUTE = 'lnNav';
 
 	// Early exit if already defined
-	if (window[DOM_ATTRIBUTE] != undefined || window[DOM_ATTRIBUTE] != null) {
+	if (window[DOM_ATTRIBUTE] !== undefined) {
 		return;
 	}
 

@@ -3,7 +3,7 @@
 	const DOM_ATTRIBUTE = 'lnModal';
 
 	// If component already defined, return
-	if (window[DOM_ATTRIBUTE] != undefined || window[DOM_ATTRIBUTE] != null) {
+	if (window[DOM_ATTRIBUTE] !== undefined) {
 		return;
 	}
 
@@ -157,8 +157,8 @@
 		open: function(modalId) {
 			const modal = document.getElementById(modalId);
 			if (modal) {
-				modal.classList.add('modal--open');
-				document.body.classList.add('modal-open');
+				modal.classList.add('ln-modal--open');
+				document.body.classList.add('ln-modal-open');
 			}
 		}
 	};

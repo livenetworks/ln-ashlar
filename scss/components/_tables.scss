@@ -18,36 +18,16 @@ table th {
 	@include px(1rem);
 	@include py(0.75rem);
 	@include font-semibold;
-	font-size: 0.8125rem;
+	@include text-sm;
 	letter-spacing: 0.3px;
 	color: var(--color-table-header-text, #fff);
 }
 
 table tbody tr {
-	@include relative;
 	@include transition;
 
-	&::before {
-		content: '';
-		@include absolute;
-		left: 0;
-		top: 0;
-		@include w(4px);
-		@include h-full;
-		background: var(--color-primary);
-		transform: scaleY(0);
-		@include transition;
-		@include z(10);
-	}
-
 	&:hover {
-		background-color: var(--color-primary-lighter);
-		outline: 1px solid var(--color-primary);
-		outline-offset: -1px;
-
-		&::before {
-			transform: scaleY(1);
-		}
+		@include bg-secondary;
 	}
 }
 
@@ -55,7 +35,7 @@ table td {
 	@include px(1rem);
 	@include py(0.625rem);
 	@include border-b;
-	font-size: 0.8125rem;
+	@include text-sm;
 	vertical-align: top;
 }
 
@@ -72,18 +52,13 @@ table td:first-child {
 table tr.section-header td {
 	background: var(--color-table-section-bg, #e8ecf1);
 	@include font-bold;
-	font-size: 0.8125rem;
+	@include text-sm;
 	color: var(--color-table-header-bg, #1a1a2e);
 	letter-spacing: 0.3px;
 }
 
 table tbody tr.section-header:hover {
 	background-color: var(--color-table-section-bg, #e8ecf1);
-	outline: none;
-}
-
-table tbody tr.section-header::before {
-	@include hidden;
 }
 
 .pass {
@@ -109,7 +84,7 @@ table.striped tbody tr:nth-child(odd) {
 	@include bg-secondary;
 
 	&:hover {
-		background-color: var(--color-primary-lighter);
+		background-color: var(--color-bg-secondary);
 	}
 }
 
@@ -150,7 +125,7 @@ table td .action {
 
 	&.danger {
 		@include text-error;
-		&:hover { background-color: #fef2f2; }
+		&:hover { background-color: var(--color-bg-error); }
 	}
 
 	&.primary {
@@ -223,9 +198,5 @@ table td .action {
 		&::before {
 			@include hidden;
 		}
-	}
-
-	table tbody tr::before {
-		@include hidden;
 	}
 }
