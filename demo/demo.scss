@@ -34,3 +34,43 @@
 		margin: 0;
 	}
 }
+
+/* Tab buttons */
+.demo-tabs {
+	@include flex;
+	@include gap(var(--spacing-xs));
+	@include bg-secondary;
+	@include p(0.25rem);
+	@include rounded-md;
+
+	button {
+		@include px(var(--spacing-sm));
+		@include py(var(--spacing-xs));
+		background: none;
+		@include border-none;
+		@include cursor-pointer;
+		@include text-sm;
+		@include text-secondary;
+		@include rounded-sm;
+		@include transition;
+		box-shadow: none;
+
+		&:hover {
+			@include text-primary;
+		}
+
+		&:focus {
+			box-shadow: none;
+		}
+
+		&[data-active] {
+			background-color: var(--color-primary);
+			@include text-white;
+		}
+	}
+}
+
+/* Tab panel */
+.demo-panel {
+	@include pt(var(--spacing-md));
+}

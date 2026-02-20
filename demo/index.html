@@ -3,55 +3,362 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ln-frontend — Demo</title>
+	<title>acme-gui — Demo</title>
 	<link rel="stylesheet" href="../dist/ln-frontend.css">
 	<link rel="stylesheet" href="demo.css">
 	<script src="../dist/ln-frontend.iife.js" defer></script>
 </head>
 <body>
-	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
-		<h1>ln-frontend — Компоненти</h1>
-		<p>Документација и живи примери за секоја CSS и JS компонента.</p>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
 
-		<section class="section">
-			<header><h2>CSS компоненти</h2></header>
+	<div class="app-wrapper">
+		<!-- Sidebar -->
+		<aside class="sidebar" id="demo-sidebar">
+			<div class="sidebar-header">
+				<svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
+					<text x="16" y="22" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="system-ui">A</text>
+				</svg>
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<div class="nav-section">CSS компоненти</div>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<div class="nav-section">JS компоненти</div>
+					<ul>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="box.html"><span class="nav-label">Box &amp; Progress</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small class="text-muted">acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+			<!-- Header -->
+			<div class="header">
+				<div class="header-left">
+					<button class="menu-toggle" onclick="document.getElementById('demo-sidebar').classList.toggle('open')">
+						<span class="ln-icon-menu"></span>
+					</button>
+					<h1>Dashboard</h1>
+				</div>
+				<div class="header-right">
+					<div class="header-actions">
+						<button class="btn-secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Ова е демо нотификација.'})">
+							Test Toast
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Content -->
+			<div class="content">
+				<div class="stack-lg">
+					<!-- Stats cards -->
+					<div class="grid-4">
+						<div class="card">
+							<main>
+								<small class="text-secondary">Компоненти</small>
+								<h2 style="margin:0;">18</h2>
+								<div data-ln-progress style="margin-top: 0.5rem;">
+									<div data-ln-progress="18" data-ln-progress-max="20" class="green"></div>
+								</div>
+							</main>
+						</div>
+						<div class="card">
+							<main>
+								<small class="text-secondary">JS модули</small>
+								<h2 style="margin:0;">10</h2>
+								<div data-ln-progress style="margin-top: 0.5rem;">
+									<div data-ln-progress="10" data-ln-progress-max="12" class="green"></div>
+								</div>
+							</main>
+						</div>
+						<div class="card">
+							<main>
+								<small class="text-secondary">SCSS фајлови</small>
+								<h2 style="margin:0;">22</h2>
+								<div data-ln-progress style="margin-top: 0.5rem;">
+									<div data-ln-progress="22" data-ln-progress-max="25" class="yellow"></div>
+								</div>
+							</main>
+						</div>
+						<div class="card">
+							<main>
+								<small class="text-secondary">Демо страници</small>
+								<h2 style="margin:0;">14</h2>
+								<div data-ln-progress style="margin-top: 0.5rem;">
+									<div data-ln-progress="14" data-ln-progress-max="14" class="green"></div>
+								</div>
+							</main>
+						</div>
+					</div>
+
+					<!-- Modal Demo -->
+					<section class="section-card">
+						<header><h3>Modal</h3></header>
+						<main>
+							<div class="row" style="flex-wrap:wrap;">
+								<button data-ln-modal="demo-basic">Basic Modal</button>
+								<button data-ln-modal="demo-form" class="btn-secondary">Form Modal</button>
+							</div>
+						</main>
+					</section>
+
+					<!-- Tabs Demo -->
+					<section class="section-card">
+						<header><h3>Tabs</h3></header>
+						<main>
+							<div data-ln-tabs data-ln-tabs-default="pregled">
+								<div class="demo-tabs">
+									<button data-ln-tab="pregled">Преглед</button>
+									<button data-ln-tab="korisnici">Корисници</button>
+									<button data-ln-tab="podesuvanja">Подесувања</button>
+								</div>
+
+								<div data-ln-panel="pregled" class="demo-panel">
+									<p>Содржина на табот <strong>Преглед</strong>. Табовите се синхронизирани со URL hash.</p>
+									<p class="text-sm text-secondary">Промени го URL hash на <code>#korisnici</code> за да видиш.</p>
+								</div>
+
+								<div data-ln-panel="korisnici" class="demo-panel hidden">
+									<table>
+										<thead><tr><th>Име</th><th>Email</th><th>Улога</th></tr></thead>
+										<tbody>
+											<tr><td>Марко Петров</td><td>marko@example.com</td><td>Админ</td></tr>
+											<tr><td>Ана Стојанова</td><td>ana@example.com</td><td>Корисник</td></tr>
+											<tr><td>Иван Николов</td><td>ivan@example.com</td><td>Модератор</td></tr>
+										</tbody>
+									</table>
+								</div>
+
+								<div data-ln-panel="podesuvanja" class="demo-panel hidden">
+									<form>
+										<div class="form-group">
+											<label for="d-lang">Јазик</label>
+											<select id="d-lang"><option>Македонски</option><option>English</option></select>
+										</div>
+										<div class="form-group">
+											<label for="d-tz">Timezone</label>
+											<input type="text" id="d-tz" value="Europe/Skopje">
+										</div>
+									</form>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- Box & Progress -->
+					<div class="grid-2">
+						<section class="section-card">
+							<header><h3>Box — Collapsible</h3></header>
+							<main>
+								<div data-ln-box>
+									<header>
+										Серверски статус
+										<ul style="list-style:none;display:flex;gap:0.5rem;margin:0;padding:0;">
+											<li><button type="button" data-ln-box-action="collapse" class="btn-secondary" style="padding:0.25rem 0.5rem;">Collapse</button></li>
+											<li><button type="button" data-ln-box-action="expand" class="btn-secondary" style="padding:0.25rem 0.5rem;">Expand</button></li>
+										</ul>
+									</header>
+									<main data-ln-box-body>
+										<table>
+											<thead><tr><th>Сервер</th><th>Статус</th><th>Uptime</th></tr></thead>
+											<tbody>
+												<tr><td>web-01</td><td><span class="pass">OK</span></td><td class="numeric">99.9%</td></tr>
+												<tr><td>web-02</td><td><span class="pass">OK</span></td><td class="numeric">99.7%</td></tr>
+												<tr><td>db-01</td><td><span class="fail">Down</span></td><td class="numeric">95.2%</td></tr>
+											</tbody>
+										</table>
+									</main>
+								</div>
+							</main>
+						</section>
+
+						<section class="section-card">
+							<header><h3>Progress</h3></header>
+							<main>
+								<div class="stack">
+									<div>
+										<small class="text-secondary">CPU — 72%</small>
+										<div data-ln-progress>
+											<div data-ln-progress="72" class="yellow"></div>
+										</div>
+									</div>
+									<div>
+										<small class="text-secondary">RAM — 45%</small>
+										<div data-ln-progress>
+											<div data-ln-progress="45" class="green"></div>
+										</div>
+									</div>
+									<div>
+										<small class="text-secondary">Disk — 89%</small>
+										<div data-ln-progress>
+											<div data-ln-progress="89" class="red"></div>
+										</div>
+									</div>
+								</div>
+							</main>
+						</section>
+					</div>
+
+					<!-- Toast Demo -->
+					<section class="section-card">
+						<header><h3>Toast нотификации</h3></header>
+						<main>
+							<div class="row" style="flex-wrap:wrap;">
+								<button onclick="window.lnToast.enqueue({type:'success', title:'Успешно', message:'Записот е зачуван.'})">Success</button>
+								<button onclick="window.lnToast.enqueue({type:'error', title:'Грешка', message:'Нешто не е во ред.'})" class="btn-danger">Error</button>
+								<button onclick="window.lnToast.enqueue({type:'warn', title:'Внимание', message:'Проверете ги податоците.'})" class="btn-secondary">Warning</button>
+								<button onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Нова верзија е достапна.'})" class="btn-secondary">Info</button>
+								<button onclick="window.lnToast.enqueue({type:'error', title:'Валидација', message:['Името е задолжително','Email форматот е погрешен','Лозинката е прекратка']})" class="btn-danger">Validation Errors</button>
+							</div>
+						</main>
+					</section>
+
+					<!-- Upload Demo -->
+					<section class="section-card">
+						<header><h3>Upload</h3></header>
+						<main>
+							<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
+								<div class="ln-upload__zone">
+									<p>Довлечи фајлови тука или кликни за избор</p>
+									<small class="text-muted">Дозволени: pdf, doc, docx, jpg, png</small>
+								</div>
+								<ul class="ln-upload__list"></ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- AJAX -->
+					<section class="section-card">
+						<header><h3>ln-ajax — AJAX Navigation</h3></header>
+						<main>
+							<p class="text-secondary">Компонента за AJAX навигација и форм submission. Линкови и форми внатре во <code>data-ln-ajax</code> контејнер автоматски се обработуваат преку fetch.</p>
+							<div class="stack-sm">
+								<div class="card">
+									<main>
+										<pre><code>&lt;div data-ln-ajax&gt;
+    &lt;a href="/users"&gt;Корисници&lt;/a&gt;
+    &lt;form method="POST" action="/users"&gt;...&lt;/form&gt;
+&lt;/div&gt;
+
+&lt;!-- JSON одговор --&gt;
+{
+    "title": "Наслов",
+    "content": { "main": "&lt;p&gt;HTML&lt;/p&gt;" },
+    "message": { "type": "success", "title": "OK", "body": "Зачувано!" }
+}</code></pre>
+									</main>
+								</div>
+								<table>
+									<thead><tr><th>Атрибут</th><th>Опис</th></tr></thead>
+									<tbody>
+										<tr><td><code>data-ln-ajax</code></td><td>Контејнер — сите <code>&lt;a&gt;</code> и <code>&lt;form&gt;</code> внатре се AJAX</td></tr>
+										<tr><td><code>data-ln-ajax="false"</code></td><td>Исклучи конкретен елемент од AJAX обработка</td></tr>
+									</tbody>
+								</table>
+								<p class="text-sm text-secondary">CSRF token автоматски од <code>&lt;meta name="csrf-token"&gt;</code>. History pushState за линкови и GET форми.</p>
+							</div>
+						</main>
+					</section>
+
+					<!-- Quick Integration -->
+					<section class="section-card">
+						<header><h3>Брза интеграција</h3></header>
+						<main>
+							<pre><code>&lt;link rel="stylesheet" href="dist/ln-frontend.css"&gt;
+&lt;script src="dist/ln-frontend.iife.js" defer&gt;&lt;/script&gt;
+
+&lt;!-- Или како npm модул --&gt;
+import 'ln-frontend';
+import 'ln-frontend/dist/ln-frontend.css';</code></pre>
+						</main>
+					</section>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span class="text-muted">ln-frontend v1.0.0</span>
+			</footer>
+		</div>
+	</div>
+
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" id="demo-basic">
+		<div class="ln-modal__content">
+			<header>
+				<h3>Basic Modal</h3>
+				<button data-ln-modal-close>&times;</button>
+			</header>
 			<main>
-				<ul class="demo-links">
-					<li><a href="typography.html"><h3>Typography</h3><p class="text-sm text-secondary">Наслови, параграфи, код, цитати, листи</p></a></li>
-					<li><a href="cards.html"><h3>Cards</h3><p class="text-sm text-secondary">.card со header/main/footer, hover ефект, поља</p></a></li>
-					<li><a href="tables.html"><h3>Tables</h3><p class="text-sm text-secondary">Dark header, hover accent, section rows, responsive</p></a></li>
-					<li><a href="forms.html"><h3>Forms &amp; Buttons</h3><p class="text-sm text-secondary">Input, select, textarea, button варијанти</p></a></li>
-					<li><a href="layout.html"><h3>Layout &amp; Grid</h3><p class="text-sm text-secondary">Sidebar, header, grid, stack, container</p></a></li>
-					<li><a href="sections.html"><h3>Sections &amp; Breadcrumbs</h3><p class="text-sm text-secondary">.section, .section-card, .breadcrumbs</p></a></li>
-					<li><a href="icons.html"><h3>Icons</h3><p class="text-sm text-secondary">SVG data-URI иконки преку CSS pseudo-elements</p></a></li>
-					<li><a href="utilities.html"><h3>Utilities</h3><p class="text-sm text-secondary">Utility класи за flex, spacing, text, colors</p></a></li>
-				</ul>
+				<p>Ова е основен модал со наслов и содржина.</p>
+				<p>Притисни ESC или кликни затвори.</p>
 			</main>
-		</section>
+			<footer>
+				<button data-ln-modal-close class="btn-secondary">Затвори</button>
+			</footer>
+		</div>
+	</div>
 
-		<section class="section">
-			<header><h2>JS компоненти</h2></header>
+	<div class="ln-modal" id="demo-form">
+		<div class="ln-modal__content">
+			<header>
+				<h3>Додај корисник</h3>
+				<button data-ln-modal-close>&times;</button>
+			</header>
 			<main>
-				<ul class="demo-links">
-					<li><a href="modal.html"><h3>Modal</h3><p class="text-sm text-secondary">data-ln-modal — отвори/затвори, ESC, backdrop</p></a></li>
-					<li><a href="toast.html"><h3>Toast</h3><p class="text-sm text-secondary">data-ln-toast — нотификации со иконки</p></a></li>
-					<li><a href="tabs.html"><h3>Tabs</h3><p class="text-sm text-secondary">data-ln-tabs — hash-aware табови</p></a></li>
-					<li><a href="box.html"><h3>Box &amp; Progress</h3><p class="text-sm text-secondary">data-ln-box collapse + data-ln-progress bar</p></a></li>
-					<li><a href="upload.html"><h3>Upload</h3><p class="text-sm text-secondary">data-ln-upload — drag-drop, progress, валидација</p></a></li>
-				</ul>
+				<form>
+					<div class="form-group">
+						<label for="m-name">Име</label>
+						<input type="text" id="m-name" placeholder="Внесете име...">
+					</div>
+					<div class="form-group">
+						<label for="m-email">Email</label>
+						<input type="email" id="m-email" placeholder="email@example.com">
+					</div>
+					<div class="form-group">
+						<label for="m-role">Улога</label>
+						<select id="m-role">
+							<option>Корисник</option>
+							<option>Администратор</option>
+							<option>Модератор</option>
+						</select>
+					</div>
+				</form>
 			</main>
-		</section>
-
-		<section class="section">
-			<header><h2>Брза интеграција</h2></header>
-			<main>
-				<pre><code>&lt;!-- CSS --&gt;
-&lt;link rel="stylesheet" href="dist/ln-frontend.css"&gt;
-
-&lt;!-- JS (IIFE — сите компоненти) --&gt;
-&lt;script src="dist/ln-frontend.iife.js" defer&gt;&lt;/script&gt;</code></pre>
-			</main>
-		</section>
+			<footer>
+				<button data-ln-modal-close class="btn-secondary">Откажи</button>
+				<button type="submit">Зачувај</button>
+			</footer>
+		</div>
 	</div>
 </body>
 </html>

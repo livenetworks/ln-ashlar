@@ -62,9 +62,13 @@
 		if (!key || !(key in this.mapPanels)) key = this.defaultKey;
 		for (const k in this.mapTabs) {
 			const btn = this.mapTabs[k];
-			const active = (k === key);
-			btn.setAttribute("data-active", active ? "true" : "false");
-			btn.setAttribute("aria-selected", active ? "true" : "false");
+			if (k === key) {
+				btn.setAttribute("data-active", "");
+				btn.setAttribute("aria-selected", "true");
+			} else {
+				btn.removeAttribute("data-active");
+				btn.setAttribute("aria-selected", "false");
+			}
 		}
 		for (const k in this.mapPanels) {
 			const panel = this.mapPanels[k];
