@@ -38,13 +38,13 @@
 	@include mb(1.5rem);
 
 	header {
-		@include px(1.5rem);
-		@include py(1rem);
+		@include px(1rem);
+		@include py(0.625rem);
 		@include border-b;
 		@include bg-secondary;
 
 		h3 {
-			@include text-lg;
+			@include text-base;
 			@include font-semibold;
 			@include text-primary;
 			margin: 0;
@@ -52,12 +52,12 @@
 	}
 
 	main {
-		@include p(1.5rem);
+		@include p(1rem);
 	}
 
 	footer {
-		@include px(1.5rem);
-		@include py(1rem);
+		@include px(1rem);
+		@include py(0.625rem);
 		@include border-t;
 		@include bg-secondary;
 		@include flex;

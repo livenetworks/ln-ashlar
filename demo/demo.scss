@@ -1,0 +1,36 @@
+@use '../scss/config/mixins' as *;
+
+.demo-links {
+	@include grid-2;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	a {
+		@include block;
+		@include px(1.5rem);
+		@include py(1.25rem);
+		text-decoration: none;
+		color: inherit;
+		@include bg-primary;
+		@include border;
+		@include rounded-md;
+		@include transition;
+
+		&:hover {
+			@include bg-secondary;
+			border-color: var(--color-primary);
+		}
+	}
+
+	h3 {
+		color: var(--color-primary);
+		@include text-base;
+		@include font-semibold;
+		@include mb(0.25rem);
+	}
+
+	p {
+		margin: 0;
+	}
+}

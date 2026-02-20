@@ -1,36 +1,11 @@
 @use '../config/mixins' as *;
 
 .card {
-	@include bg-primary;
-	@include border;
-	@include w-full;
-	@include flex-col;
-	@include shadow-sm;
-	transition: all var(--transition-base);
-	@include relative;
-	@include overflow-hidden;
-
-	&::before {
-		content: '';
-		@include absolute;
-		top: 0;
-		left: 0;
-		@include w-full;
-		height: 4px;
-		background: var(--color-primary);
-		transform: scaleX(0);
-		transition: transform var(--transition-base);
-		z-index: 1;
-	}
+	@include card;
 
 	&:hover {
-		transform: translateY(-10px);
-		box-shadow: var(--shadow-primary);
 		border-color: var(--color-primary);
-
-		&::before {
-			transform: scaleX(1);
-		}
+		@include shadow-md;
 	}
 
 	a {
@@ -43,32 +18,43 @@
 	header {
 		@include flex;
 		@include items-center;
-		@include gap(0.75rem);
-		@include px(1.5rem);
-		@include pt(1.25rem);
+		@include gap(0.5rem);
+		@include px(0.75rem);
+		@include py(0.5rem);
+		@include bg-secondary;
+		@include border-b;
 
 		h3 {
 			color: var(--color-primary);
-			@include text-base;
+			@include text-sm;
 			@include font-semibold;
+			@include uppercase;
+			@include tracking-wider;
 			margin: 0;
 		}
 	}
 
 	main {
-		@include px(1.5rem);
-		@include py(1.25rem);
+		@include px(0.75rem);
+		@include py(0.5rem);
 		@include flex-col;
-		@include gap(1rem);
+		@include gap(0.5rem);
 		@include flex-1;
+
+		h3 {
+			@include text-sm;
+			@include font-semibold;
+			@include text-primary;
+			margin: 0;
+		}
 	}
 
 	.field {
 		@include flex;
 		@include justify-between;
 		align-items: baseline;
-		@include gap(0.75rem);
-		@include pb(0.75rem);
+		@include gap(0.5rem);
+		@include pb(0.375rem);
 		@include border-b;
 
 		&:last-child {
@@ -86,7 +72,7 @@
 		}
 
 		.value {
-			@include text-base;
+			@include text-sm;
 			@include text-primary;
 			@include font-semibold;
 			@include text-right;
@@ -96,16 +82,12 @@
 				@include text-muted;
 				@include font-normal;
 				font-style: normal;
-				@include text-sm;
+				@include text-xs;
 			}
 		}
 	}
 }
 
-// Семантичка употреба со @extend:
-// #korisnik { @extend .card; }
-//
-// HTML: <div id="korisnik">
-//           <header><h3>Корисник</h3></header>
-//           <main>...</main>
-//       </div>
+// Семантичка употреба:
+//   со @include: #korisnik { @include card; }
+//   со @extend:  #korisnik { @extend .card; }

@@ -1,57 +1,12 @@
 @use '../config/mixins' as *;
 
-.grid {
-	display: grid;
-	@include gap(1.5rem);
-	grid-template-columns: repeat(1, minmax(0, 1fr));
+.grid   { @include grid; }
+.grid-2 { @include grid-2; }
+.grid-4 { @include grid-4; }
 
-	@media (min-width: 768px) {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	@media (min-width: 1024px) {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-	}
-}
-
-.grid-2 {
-	display: grid;
-	@include gap(1.5rem);
-	grid-template-columns: repeat(1, minmax(0, 1fr));
-
-	@media (min-width: 768px) {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-}
-
-.grid-4 {
-	display: grid;
-	@include gap(1.5rem);
-	grid-template-columns: repeat(1, minmax(0, 1fr));
-
-	@media (min-width: 768px) {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	@media (min-width: 1024px) {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-	}
-}
-
-.stack {
-	@include flex-col;
-	@include gap(1rem);
-}
-
-.stack-sm {
-	@include flex-col;
-	@include gap(0.5rem);
-}
-
-.stack-lg {
-	@include flex-col;
-	@include gap(1.5rem);
-}
+.stack    { @include stack; }
+.stack-sm { @include stack(0.5rem); }
+.stack-lg { @include stack(1.5rem); }
 
 .row {
 	@include flex;

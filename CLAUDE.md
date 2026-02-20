@@ -122,7 +122,7 @@ box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     const DOM_ATTRIBUTE = 'lnComponent';
 
     // Заштита од двојно вчитување
-    if (window[DOM_ATTRIBUTE] != undefined) return;
+    if (window[DOM_ATTRIBUTE] !== undefined) return;
 
     function _helperFunction() { /* ... */ }
     function _initComponent(container) { /* ... */ }
@@ -252,3 +252,157 @@ git submodule add .../ln-frontend.git resources/ln-frontend
 1. Промени ги во `scss/config/_tokens.scss`
 2. Провери дали mixins кои ги референцираат се ажурирани
 3. Провери дека build-от поминува: `npm run build`
+
+---
+
+## Дизајн принципи — ЗАПАМТИ
+
+### Токени = логички/семантички имиња
+
+Имињата на CSS custom properties СЕКОГАШ се семантички (по функција), НИКОГАШ по боја.
+
+```scss
+// ТОЧНО — семантички
+--color-primary: #2737a1;
+--color-error-hover: #b91c1c;
+--color-bg-error: #fef2f2;
+--color-text-muted: #9ca3af;
+
+// ПОГРЕШНО — именувано по боја
+--color-white: #ffffff;
+--color-red: #dc2626;
+--color-blue: #2737a1;
+```
+
+Вредностите може да бидат RGB/HSL за composability:
+```scss
+--color-primary: 39 55 161;  // потоа: hsl(var(--color-primary) / .5)
+```
+
+Utility mixins (како `text-white`) може да користат директни вредности — тие се utility, не токени.
+
+### Двоен пристап: класи + mixins
+
+Framework-от нуди **и класи и mixins** за истите компоненти:
+- **Класи** (`.card`, `.grid-2`) → за брзо прототипирање директно во HTML
+- **Mixins** (`@include card`, `@include grid-2`) → за семантичка употреба во проект SCSS
+
+```scss
+// Во _mixins.scss — component mixins
+@mixin card { ... }
+@mixin grid-2 { ... }
+
+// Во _card.scss — класата го користи миксинот
+.card { @include card; }
+
+// Во проект-специфичен SCSS — семантичка употреба
+#korisnik { @include card; }
+.demo-links { @include grid-2; }
+```
+
+`@extend .card` исто работи (ако е во иста compilation unit).
+
+### Table hover = минимален
+
+Само суптилна промена на позадина. Без outline, без ::before ленти.
+```scss
+table tbody tr {
+    @include transition;
+    &:hover { @include bg-secondary; }
+}
+```
+
+### Картички и секции = компактни data containers
+
+Картичките се **податочни контејнери**, не флеши UI елементи. Стилот е инспириран од табелите.
+
+**`.card` header** — најкомпактен, uppercase:
+```scss
+.card header {
+    @include px(0.75rem);
+    @include py(0.5rem);
+    @include bg-secondary;
+    @include border-b;
+
+    h3 {
+        @include text-sm;       // мал текст
+        @include font-semibold;
+        @include uppercase;     // КОРИСНИК
+        @include tracking-wider;
+    }
+}
+```
+
+**`.section-card` header** — едно ниво поголем (wrapper/родител на картички):
+```scss
+.section-card header {
+    @include px(1rem);
+    @include py(0.625rem);
+    @include bg-secondary;
+    @include border-b;
+
+    h3 {
+        @include text-base;     // поголем од card
+        @include font-semibold;
+        // БЕЗ uppercase — нормален текст
+    }
+}
+```
+
+**Hover** — суптилен, без анимации/translateY/::before ленти:
+```scss
+.card:hover {
+    border-color: var(--color-primary);
+    @include shadow-md;
+}
+```
+
+**Padding** — тесен, збиен како table ќелии:
+- `.card`: `px(0.75rem)` / `py(0.5rem)`
+- `.section-card`: `px(1rem)` / `py(0.625rem)` — малку поширок како wrapper
+
+### HTML = семантички, CSS = одвоен
+
+Никогаш не користи CSS компоненти (`.card`, `.grid-2`) како замена за семантички HTML.
+
+```html
+<!-- ПОГРЕШНО — презентациски HTML -->
+<div class="grid-2">
+    <a href="page.html" class="card">
+        <main><h3>Наслов</h3></main>
+    </a>
+</div>
+
+<!-- ТОЧНО — семантички HTML -->
+<ul class="demo-links">
+    <li><a href="page.html"><h3>Наслов</h3><p>Опис</p></a></li>
+</ul>
+```
+
+Стилот се дефинира на семантичкиот селектор користејќи framework mixins:
+```scss
+// Во проект SCSS — НЕ хардкодирај, користи @include
+.demo-links {
+    @include grid-2;
+    list-style: none;
+
+    a {
+        @include block;
+        @include px(1.5rem);
+        @include py(1.25rem);
+        @include bg-primary;
+        @include border;
+        @include rounded-md;
+        @include transition;
+    }
+}
+```
+
+---
+
+## Познати заостанати работи
+
+- **ln-modal** — нема CustomEvent dispatching (ln-modal:open/close), event listeners не се отстрануваат
+- **ln-ajax** — нема CustomEvent dispatching за AJAX lifecycle
+- **ln-select** — зависи од TomSelect (peer dependency)
+- **Form атрибути** — ренамирани во `data-ln-*` конвенција, Laravel проекти треба да ги ажурираат HTML templates

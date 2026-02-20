@@ -211,3 +211,66 @@
 @mixin z-toast    { z-index: var(--z-toast); }
 
 @mixin z($val) { z-index: $val; }
+
+// ---------------------------------------------------------------------------
+// Component Mixins — композитни mixins за семантичка употреба
+// ---------------------------------------------------------------------------
+// Класите (.grid-2, .card итн.) ги користат овие mixins.
+// Проектите можат @include директно на семантички селектори:
+//   #korisnik { @include card; }
+//   #demo-links { @include grid-2; }
+// ---------------------------------------------------------------------------
+
+@mixin grid {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@mixin grid-2 {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@mixin grid-4 {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+@mixin stack($gap: 1rem) {
+	@include flex-col;
+	@include gap($gap);
+}
+
+@mixin card {
+	@include bg-primary;
+	@include border;
+	@include w-full;
+	@include flex-col;
+	@include shadow-sm;
+	@include rounded-md;
+	@include overflow-hidden;
+	@include transition;
+}
