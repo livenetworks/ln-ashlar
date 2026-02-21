@@ -6,16 +6,19 @@ Sidebar navigation component. File: `scss/components/_navigation.scss`.
 
 ```html
 <nav class="nav" data-ln-nav="active">
-    <div class="nav-section">Section Title</div>
+    <h6 class="nav-section">Section Title</h6>
     <ul>
         <li><a href="/users">
             <span class="nav-icon ln-icon-users"></span>
             <span class="nav-label">Users</span>
         </a></li>
     </ul>
-    <div class="nav-divider"></div>
+    <hr class="nav-divider">
 </nav>
 ```
+
+> **Семантика:** `.nav-section` е наслов на група → користи `<h6>`, не `<div>`.
+> `.nav-divider` е разделувач → користи `<hr>`, не `<div>`.
 
 ## Elements
 

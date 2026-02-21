@@ -45,15 +45,15 @@ window.lnTabs(document.body);
     </nav>
 
     <!-- Панели -->
-    <div data-ln-panel="general">
+    <section data-ln-panel="general">
         <p>Општа содржина...</p>
-    </div>
-    <div data-ln-panel="settings">
+    </section>
+    <section data-ln-panel="settings">
         <p>Поставки содржина...</p>
-    </div>
-    <div data-ln-panel="logs">
+    </section>
+    <section data-ln-panel="logs">
         <p>Логови содржина...</p>
-    </div>
+    </section>
 </div>
 ```
 

@@ -37,9 +37,12 @@ Card-like section with background, border, shadow.
 Empty state placeholder.
 
 ```html
-<div class="section-empty">
-    <div class="empty-icon">icon</div>
+<article class="section-empty">
+    <figure class="empty-icon">icon</figure>
     <h3>No data</h3>
     <p>Add items to see them here.</p>
-</div>
+</article>
 ```
+
+> **Семантика:** Празно state е содржина → `<article>`, не `<div>`.
+> Иконата е илустрација → `<figure>`, не `<div>`.

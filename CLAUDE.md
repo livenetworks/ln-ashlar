@@ -92,22 +92,185 @@ border-radius: 0.75rem;
 box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 ```
 
-### 4. Иконки = CSS pseudo-elements
+### 4. Иконки = `.ln-icon-*` класи (CSS pseudo-elements)
 
+Сите иконки се дефинирани во `_icons.scss` како CSS custom properties + класи.
+
+**НИКОГАШ** не користи HTML ентитети (`&times;`, `&#9660;`, `&#10005;`) или Unicode карактери за иконки.
+**СЕКОГАШ** користи `.ln-icon-*` класа.
+
+```html
+<!-- ТОЧНО -->
+<button class="ln-icon-close" data-ln-modal-close></button>
+<button class="ln-icon-menu" data-ln-toggle-for="sidebar"></button>
+<span class="ln-icon-home"></span>
+
+<!-- ПОГРЕШНО -->
+<button data-ln-modal-close>&times;</button>
+<button>✕</button>
+<span>🏠</span>
+```
+
+Достапни иконки: `ln-icon-close`, `ln-icon-menu`, `ln-icon-home`, `ln-icon-users`,
+`ln-icon-delete`, `ln-icon-view`, `ln-icon-check`, `ln-icon-plus`, `ln-icon-settings`,
+`ln-icon-books`, `ln-icon-lodges`, `ln-icon-logout`, `ln-icon-chart`, `ln-icon-clock`,
+`ln-icon-envelope`, `ln-icon-arrow-up`, `ln-icon-book`.
+
+Големински варијанти: `.ln-icon--sm` (1rem), `.ln-icon--lg` (1.5rem), `.ln-icon--xl` (4rem).
+
+**`@mixin close-button`** — стандарден стил за close копчиња (sidebar, modal, toast):
 ```scss
-.ln-icon-home::before {
-    background-image: var(--icon-home);
+// Дефиниран во _mixins.scss — СЕКОГАШ користи го, не пишувај свој close стил
+@mixin close-button {
+    background: transparent;
+    @include border-none;
+    @include size(2rem);
+    @include flex-center;
+    @include transition-fast;
+    &:hover { @include text-error; }
 }
+
+// Употреба — комбинирај со ln-icon-close класа на HTML:
+.ln-modal header button[data-ln-modal-close] { @include close-button; }
+.sidebar-header [data-ln-toggle-action="close"] { @include close-button; }
+```
+
+Имплементацијата на иконките:
+```scss
+// Во _icons.scss — auto-applied на сите ln-icon-* класи
+[class*="ln-icon-"]::before {
+    content: '';
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.ln-icon-close::before { background-image: var(--icon-close); }
+.ln-icon-home::before  { background-image: var(--icon-home); }
+// итн.
 ```
 
 ### 5. Data attributes за JS, класи за CSS
 
 ```html
-<!-- JS однесување -->
-<div data-ln-modal="my-modal">
+<!-- JS однесување — data attributes -->
+<section data-ln-modal="my-modal">
+<button data-ln-toggle-for="sidebar">
 
-<!-- CSS стилизирање -->
-<div class="card card--flat">
+<!-- CSS стилизирање — компонентна класа (опишува ШТО е) -->
+<section class="section-card">
+<button class="btn btn--secondary">
+
+<!-- CSS стилизирање — семантички селектор + @include (во проект SCSS) -->
+<section id="korisnici">  <!-- #korisnici { @include card; } -->
+```
+
+### 6. Забрането користење на `<div>` без причина
+
+`<div>` е последна опција — користи го САМО кога нема семантички подобар елемент (`<section>`, `<article>`, `<nav>`, `<aside>`, `<header>`, `<footer>`, `<main>`, `<figure>`, `<ul>/<li>` итн.).
+
+Во секој случај, `<div>` МОРА да има барем една класа која го опишува неговото постоење.
+
+```html
+<!-- ТОЧНО — семантички елемент -->
+<section class="section-card">
+<nav class="sidebar-content">
+<header>...</header>
+
+<!-- ТОЧНО — div со класа кога нема подобар елемент -->
+<div class="collapsible-content">...</div>
+
+<!-- ПОГРЕШНО — гол div без класа и без семантика -->
+<div>
+    <p>Содржина</p>
+</div>
+```
+
+### 7. Класификација на CSS класи во HTML
+
+Не сите класи се еднакви. Класите паѓаат во 3 категории:
+
+**Компонентни класи (ОСТАНУВААТ во HTML)** — опишуваат ШТО е елементот:
+- `.btn`, `.btn--secondary`, `.btn--danger` — типови на копчиња
+- `.section-card` — тип на секција (компонент)
+- `.collapsible`, `.collapsible-body` — однесување (collapse/expand)
+- `.form-group`, `.form-row`, `.form-actions` — form структура
+- `.pass`, `.fail`, `.warn` — статусни индикатори
+- `.ln-icon-*` — иконки
+- `.ln-modal`, `.ln-upload__*` — JS компонентни класи
+- `.nav`, `.nav-section`, `.nav-label`, `.nav-icon` — навигациски компоненти
+- `.hidden` — JS state класа
+
+**Презентациски класи (ЗАБРАНЕТИ во HTML)** — опишуваат КАКО изгледа:
+- `.grid-2`, `.grid-4`, `.stack`, `.stack-lg` — layout (користи `@include grid-2` во SCSS)
+- `.card` на голи `<div>` — визуелен стил (користи `@include card` на `<li>`, `<article>`)
+- `.row`, `.row-between`, `.row-center` — flex layout
+- `.text-secondary`, `.text-muted`, `.text-sm` — типографија
+- `.flex`, `.gap-3`, `.items-center` — utility
+- `.bg-secondary`, `.shadow-md`, `.rounded-lg` — визуелни
+
+**Inline styles (`style="..."`) — ЗАБРАНЕТИ** без исклучок. Секогаш во SCSS.
+
+```html
+<!-- ПОГРЕШНО — презентациски класи + inline стил -->
+<div class="grid-4">
+    <div class="card">
+        <small class="text-secondary">Вработени</small>
+        <h2 style="margin:0;">42</h2>
+    </div>
+</div>
+
+<!-- ТОЧНО — семантички HTML + стилирање во SCSS -->
+<section id="stats">
+    <ul>
+        <li>
+            <h3>Вработени</h3>
+            <strong>42</strong>
+        </li>
+    </ul>
+</section>
+```
+
+```scss
+// Во проект SCSS — @include на семантички селектори
+#stats {
+    ul { @include grid-4; list-style: none; padding: 0; margin: 0; }
+    li { @include card; @include p(1rem); }
+    h3 { @include text-sm; @include text-secondary; margin: 0; }
+    strong { @include text-2xl; @include font-bold; @include block; }
+}
+```
+
+### 8. Избор на HTML елемент — водич
+
+| Содржина | Користи | НЕ користи |
+|----------|---------|------------|
+| Листа на ставки | `<ul>/<li>` или `<ol>/<li>` | `<div>` за секоја ставка |
+| Картичка/ставка | `<article>` или `<li>` | `<div class="card">` |
+| Група содржина | `<section>` | `<div class="stack">` |
+| Навигациски копчиња | `<nav>` | `<div class="row">` |
+| Код пример | `<figure><pre><code>` | `<div class="card"><main><pre>` |
+| Празно state | `<article class="section-empty">` | `<div class="section-empty">` |
+| Наслов/label | `<h1>`-`<h6>`, `<strong>`, `<label>` | `<small class="text-secondary">` |
+| Вредност/број | `<strong>`, `<output>`, `<data>` | `<h2>` (бројот НЕ е наслов) |
+| Затвори/dismiss | `<button class="ln-icon-close">` | `<button>&times;</button>` |
+| Nav section header | `<h6 class="nav-section">` | `<div class="nav-section">` |
+| Разделувач | `<hr>` | `<div class="nav-divider">` |
+| Breadcrumbs | `<nav><ol class="breadcrumbs">` | `<nav class="breadcrumbs"><li>` (без `<ol>`) |
+
+**Правило за наслови (h1-h6):**
+Насловот е она што **ИМЕНУВА** содржината, не она што е визуелно најголемо.
+
+```html
+<!-- ПОГРЕШНО — бројката е h2 затоа што е голема визуелно -->
+<small class="text-secondary">Вработени</small>
+<h2>42</h2>
+
+<!-- ТОЧНО — „Вработени" е насловот, 42 е вредноста -->
+<h3>Вработени</h3>
+<strong>42</strong>
 ```
 
 ---
@@ -349,6 +512,43 @@ table tbody tr {
     @include shadow-md;
 }
 ```
+
+### Collapsible = grid-template-rows (НЕ max-height)
+
+За expand/collapse анимации, СЕКОГАШ користи го `collapsible` pattern-от. НИКОГАШ `max-height` hack.
+
+**Single point of truth:** `@mixin collapsible` + `@mixin collapsible-content` во `_mixins.scss`.
+
+```html
+<!-- HTML pattern — accordion = ul/li, header = trigger -->
+<ul data-ln-accordion>
+    <li>
+        <header data-ln-toggle-for="panel1">Наслов</header>
+        <main id="panel1" data-ln-toggle class="collapsible">
+            <section class="collapsible-body">
+                <p>Содржина со padding, margins итн.</p>
+            </section>
+        </main>
+    </li>
+</ul>
+```
+
+```scss
+// Класа (за HTML) — веќе дефинирана во _toggle.scss
+.collapsible { @include collapsible; }
+.collapsible > * { @include collapsible-content; }
+
+// Mixin (за проект SCSS) — семантичка употреба
+.my-panel          { @include collapsible; }
+.my-panel > .inner { @include collapsible-content; }
+```
+
+**Правила:**
+- `.collapsible` (парент) = padding:0, се затвора до 0
+- `.collapsible-body` (child) = padding/margins одат тука
+- Child елементот е семантички (`<section>`, `<article>`) со класа, НЕ гол `<div>`
+- Accordion = `<ul>/<li>`, header = целосен trigger (`data-ln-toggle-for` на `<header>`)
+- `data-ln-toggle` = JS (додава `.open`), `class="collapsible"` = CSS (grid анимација)
 
 ### HTML = семантички, CSS = одвоен
 

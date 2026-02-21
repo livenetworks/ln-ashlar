@@ -50,7 +50,7 @@ window.lnModal.toggle('my-modal');
     <div class="ln-modal__content">
         <header>
             <h3>Наслов</h3>
-            <button data-ln-modal-close>&times;</button>
+            <button class="ln-icon-close" data-ln-modal-close></button>
         </header>
         <main>
             <p>Содржина на модалот...</p>
@@ -62,6 +62,9 @@ window.lnModal.toggle('my-modal');
     </div>
 </div>
 ```
+
+> **Иконки:** Close копчето користи `.ln-icon-close` класа — НИКОГАШ `&times;` карактер.
+> `@include close-button` е веќе аплициран на `button[data-ln-modal-close]` во `ln-modal.scss`.
 
 ## Големини
 

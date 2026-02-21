@@ -1,0 +1,43 @@
+@use '../config/mixins' as *;
+
+// ==========================================================================
+// Toggle — collapse/expand CSS
+// ==========================================================================
+// data-ln-toggle = JS (додава .open класа)
+// .collapsible   = CSS (grid collapse анимација)
+//
+// Парентот (.collapsible) НИКОГАШ нема padding — се затвора до 0.
+// Padding/margins одат на child елементот (.collapsible-body).
+//
+// HTML структура:
+//   <main data-ln-toggle class="collapsible">
+//       <section class="collapsible-body">
+//           <p>...</p>     ← содржина со padding, margins итн.
+//       </section>
+//   </main>
+//
+// Или преку @include во проект SCSS:
+//   .my-panel          { @include collapsible; }
+//   .my-panel > .inner { @include collapsible-content; }
+// ==========================================================================
+
+[data-ln-accordion] {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.collapsible {
+	@include collapsible;
+
+	// Структурен override — parent МОРА да е grid без padding
+	// за анимацијата да работи. !important бидејќи компоненти
+	// како .card main наметнуваат свои display/padding/flex.
+	display: grid !important;
+	padding: 0 !important;
+	flex: initial !important;
+
+	> * {
+		@include collapsible-content;
+	}
+}

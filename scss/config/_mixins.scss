@@ -213,6 +213,32 @@
 @mixin z($val) { z-index: $val; }
 
 // ---------------------------------------------------------------------------
+// Collapsible — grid-template-rows анимација за expand/collapse
+// ---------------------------------------------------------------------------
+// Single point of truth за toggle/accordion collapse однесување.
+// Парент: display:grid со 0fr/1fr транзиција.
+// Child: overflow:hidden за клипирање на содржината (вклучувајќи padding).
+//
+// Употреба:
+//   .my-panel          { @include collapsible; }
+//   .my-panel > .inner { @include collapsible-content; }
+// ---------------------------------------------------------------------------
+
+@mixin collapsible {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows var(--transition-base);
+
+	&.open {
+		grid-template-rows: 1fr;
+	}
+}
+
+@mixin collapsible-content {
+	overflow: hidden;
+}
+
+// ---------------------------------------------------------------------------
 // Component Mixins — композитни mixins за семантичка употреба
 // ---------------------------------------------------------------------------
 // Класите (.grid-2, .card итн.) ги користат овие mixins.

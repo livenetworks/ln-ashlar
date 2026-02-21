@@ -45,12 +45,15 @@ document.addEventListener('ln-toggle:open', function (e) {
 
 ```html
 <aside id="sidebar-left" class="sidebar open" data-ln-toggle="open">
-    <button data-ln-toggle-for="sidebar-left" data-ln-toggle-action="close">&times;</button>
+    <button class="ln-icon-close" data-ln-toggle-for="sidebar-left" data-ln-toggle-action="close"></button>
     <nav>...</nav>
 </aside>
 
-<button data-ln-toggle-for="sidebar-left">☰</button>
+<button class="ln-icon-menu" data-ln-toggle-for="sidebar-left"></button>
 ```
+
+> **Иконки:** СЕКОГАШ користи `.ln-icon-close` / `.ln-icon-menu` класи.
+> НИКОГАШ `&times;`, `☰`, или други Unicode карактери.
 
 CSS за sidebar (во `_app-layout.scss`):
 ```scss
@@ -64,20 +67,26 @@ CSS за sidebar (во `_app-layout.scss`):
 ### Collapsible секција
 
 ```html
-<button data-ln-toggle-for="section1">▼</button>
-<main id="section1" data-ln-toggle="open">
-    Content here
-</main>
+<header data-ln-toggle-for="section1">Наслов</header>
+<section id="section1" data-ln-toggle="open" class="collapsible">
+    <article class="collapsible-body">
+        Content here
+    </article>
+</section>
 ```
 
-CSS за collapse (во проект SCSS):
+- `.collapsible` = парент, padding:0, се затвора до 0
+- `.collapsible-body` = child, тука оди padding/margins
+- `data-ln-toggle-for` на `<header>` — целиот header е кликабилен trigger
+
+> **Семантика:** Collapsible контејнерот НЕ смее да биде `<main>` — HTML spec дозволува
+> само еден `<main>` per page. Користи `<section>` или `<div class="collapsible">`.
+
+CSS за collapse — framework ја обезбедува `.collapsible` класата (grid-template-rows анимација).
+За семантичка употреба во проект SCSS:
 ```scss
-#section1 {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    &.open { max-height: 100vh; }
-}
+#section1              { @include collapsible; }
+#section1 > .my-body   { @include collapsible-content; }
 ```
 
 ### Програмски

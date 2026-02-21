@@ -108,38 +108,41 @@
 					<section class="section-card">
 						<header><h3>Пример — Основен Accordion</h3></header>
 						<main>
-							<div data-ln-accordion>
-								<div>
-									<header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-border);">
+							<ul data-ln-accordion>
+								<li>
+									<header data-ln-toggle-for="panel1">
 										<strong>Што е ln-acme?</strong>
-										<button type="button" data-ln-toggle-for="panel1" class="btn btn--secondary" style="padding:0.25rem 0.5rem; font-size: 0.75rem;">▼</button>
 									</header>
-									<main id="panel1" data-ln-toggle="open">
-										<p>ln-acme е унифициран frontend library за LiveNetworks проекти. Содржи SCSS CSS framework + vanilla JS компоненти, без зависности.</p>
+									<main id="panel1" data-ln-toggle="open" class="collapsible">
+										<section class="collapsible-body">
+											<p>ln-acme е унифициран frontend library за LiveNetworks проекти. Содржи SCSS CSS framework + vanilla JS компоненти, без зависности.</p>
+										</section>
 									</main>
-								</div>
-								<div>
-									<header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-border);">
+								</li>
+								<li>
+									<header data-ln-toggle-for="panel2">
 										<strong>Како да се користи?</strong>
-										<button type="button" data-ln-toggle-for="panel2" class="btn btn--secondary" style="padding:0.25rem 0.5rem; font-size: 0.75rem;">▼</button>
 									</header>
-									<main id="panel2" data-ln-toggle>
-										<p>Можеш да ја користиш како npm пакет, преку git submodule, или директно со <code>&lt;link&gt;</code> и <code>&lt;script&gt;</code> тагови.</p>
-										<pre><code>import 'ln-acme';
+									<main id="panel2" data-ln-toggle class="collapsible">
+										<section class="collapsible-body">
+											<p>Можеш да ја користиш како npm пакет, преку git submodule, или директно со <code>&lt;link&gt;</code> и <code>&lt;script&gt;</code> тагови.</p>
+											<pre><code>import 'ln-acme';
 import 'ln-acme/dist/ln-acme.css';</code></pre>
+										</section>
 									</main>
-								</div>
-								<div>
-									<header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-border);">
+								</li>
+								<li>
+									<header data-ln-toggle-for="panel3">
 										<strong>Има ли зависности?</strong>
-										<button type="button" data-ln-toggle-for="panel3" class="btn btn--secondary" style="padding:0.25rem 0.5rem; font-size: 0.75rem;">▼</button>
 									</header>
-									<main id="panel3" data-ln-toggle>
-										<p>ln-acme е полностојно независен. Сите JS компоненти се напишани во vanilla JavaScript користејќи IIFE pattern.</p>
-										<p><strong>Исклучок:</strong> ln-select зависи од TomSelect (peer dependency).</p>
+									<main id="panel3" data-ln-toggle class="collapsible">
+										<section class="collapsible-body">
+											<p>ln-acme е полностојно независен. Сите JS компоненти се напишани во vanilla JavaScript користејќи IIFE pattern.</p>
+											<p><strong>Исклучок:</strong> ln-select зависи од TomSelect (peer dependency).</p>
+										</section>
 									</main>
-								</div>
-							</div>
+								</li>
+							</ul>
 						</main>
 					</section>
 
@@ -147,52 +150,55 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 					<section class="section-card">
 						<header><h3>Пример — Сложен Accordion</h3></header>
 						<main>
-							<div data-ln-accordion>
-								<div class="card">
-									<header style="padding: 1rem; background: var(--color-bg-secondary); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
-										<h4 style="margin: 0; font-size: 0.95rem;">Корисничка документација</h4>
-										<button type="button" data-ln-toggle-for="sec1" class="btn btn--secondary" style="padding:0.25rem 0.5rem; font-size: 0.75rem;">▼</button>
+							<ul data-ln-accordion>
+								<li class="card">
+									<header data-ln-toggle-for="sec1">
+										<h4>Корисничка документација</h4>
 									</header>
-									<main id="sec1" data-ln-toggle="open" style="padding: 1rem;">
-										<ul>
-											<li><a href="#">Почеток</a></li>
-											<li><a href="#">Инсталација</a></li>
-											<li><a href="#">Брза интеграција</a></li>
-											<li><a href="#">Best Practices</a></li>
-										</ul>
+									<main id="sec1" data-ln-toggle="open" class="collapsible">
+										<section class="collapsible-body" style="padding: 1rem;">
+											<ul>
+												<li><a href="#">Почеток</a></li>
+												<li><a href="#">Инсталација</a></li>
+												<li><a href="#">Брза интеграција</a></li>
+												<li><a href="#">Best Practices</a></li>
+											</ul>
+										</section>
 									</main>
-								</div>
-								<div class="card">
-									<header style="padding: 1rem; background: var(--color-bg-secondary); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
-										<h4 style="margin: 0; font-size: 0.95rem;">CSS Компоненти</h4>
-										<button type="button" data-ln-toggle-for="sec2" class="btn btn--secondary" style="padding:0.25rem 0.5rem; font-size: 0.75rem;">▼</button>
+								</li>
+								<li class="card">
+									<header data-ln-toggle-for="sec2">
+										<h4>CSS Компоненти</h4>
 									</header>
-									<main id="sec2" data-ln-toggle style="padding: 1rem;">
-										<ul>
-											<li><a href="#">Картички</a></li>
-											<li><a href="#">Форми</a></li>
-											<li><a href="#">Табели</a></li>
-											<li><a href="#">Навигација</a></li>
-											<li><a href="#">Layout</a></li>
-										</ul>
+									<main id="sec2" data-ln-toggle class="collapsible">
+										<section class="collapsible-body" style="padding: 1rem;">
+											<ul>
+												<li><a href="#">Картички</a></li>
+												<li><a href="#">Форми</a></li>
+												<li><a href="#">Табели</a></li>
+												<li><a href="#">Навигација</a></li>
+												<li><a href="#">Layout</a></li>
+											</ul>
+										</section>
 									</main>
-								</div>
-								<div class="card">
-									<header style="padding: 1rem; background: var(--color-bg-secondary); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
-										<h4 style="margin: 0; font-size: 0.95rem;">JS Компоненти</h4>
-										<button type="button" data-ln-toggle-for="sec3" class="btn btn--secondary" style="padding:0.25rem 0.5rem; font-size: 0.75rem;">▼</button>
+								</li>
+								<li class="card">
+									<header data-ln-toggle-for="sec3">
+										<h4>JS Компоненти</h4>
 									</header>
-									<main id="sec3" data-ln-toggle style="padding: 1rem;">
-										<ul>
-											<li><a href="#">Modal</a></li>
-											<li><a href="#">Toast</a></li>
-											<li><a href="#">Tabs</a></li>
-											<li><a href="#">Upload</a></li>
-											<li><a href="#">AJAX</a></li>
-										</ul>
+									<main id="sec3" data-ln-toggle class="collapsible">
+										<section class="collapsible-body" style="padding: 1rem;">
+											<ul>
+												<li><a href="#">Modal</a></li>
+												<li><a href="#">Toast</a></li>
+												<li><a href="#">Tabs</a></li>
+												<li><a href="#">Upload</a></li>
+												<li><a href="#">AJAX</a></li>
+											</ul>
+										</section>
 									</main>
-								</div>
-							</div>
+								</li>
+							</ul>
 						</main>
 					</section>
 
@@ -225,27 +231,29 @@ window.lnAccordion(document.body);</code></pre>
 					<section class="section-card">
 						<header><h3>HTML структура</h3></header>
 						<main>
-							<pre><code>&lt;div data-ln-accordion&gt;
-    &lt;div&gt;
-        &lt;header&gt;
+							<pre><code>&lt;ul data-ln-accordion&gt;
+    &lt;li&gt;
+        &lt;header data-ln-toggle-for="panel1"&gt;
             &lt;strong&gt;Наслов 1&lt;/strong&gt;
-            &lt;button data-ln-toggle-for="panel1"&gt;▼&lt;/button&gt;
         &lt;/header&gt;
-        &lt;main id="panel1" data-ln-toggle="open"&gt;
-            &lt;p&gt;Содржина 1 — почнува отворена&lt;/p&gt;
+        &lt;main id="panel1" data-ln-toggle="open" class="collapsible"&gt;
+            &lt;section class="collapsible-body"&gt;
+                &lt;p&gt;Содржина 1 — почнува отворена&lt;/p&gt;
+            &lt;/section&gt;
         &lt;/main&gt;
-    &lt;/div&gt;
+    &lt;/li&gt;
 
-    &lt;div&gt;
-        &lt;header&gt;
+    &lt;li&gt;
+        &lt;header data-ln-toggle-for="panel2"&gt;
             &lt;strong&gt;Наслов 2&lt;/strong&gt;
-            &lt;button data-ln-toggle-for="panel2"&gt;▼&lt;/button&gt;
         &lt;/header&gt;
-        &lt;main id="panel2" data-ln-toggle&gt;
-            &lt;p&gt;Содржина 2 — почнува затворена&lt;/p&gt;
+        &lt;main id="panel2" data-ln-toggle class="collapsible"&gt;
+            &lt;section class="collapsible-body"&gt;
+                &lt;p&gt;Содржина 2 — почнува затворена&lt;/p&gt;
+            &lt;/section&gt;
         &lt;/main&gt;
-    &lt;/div&gt;
-&lt;/div&gt;</code></pre>
+    &lt;/li&gt;
+&lt;/ul&gt;</code></pre>
 						</main>
 					</section>
 

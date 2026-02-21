@@ -31,22 +31,25 @@ Progress bar компонента — визуелен индикатор за �
 
 ```html
 <!-- Единечен progress bar -->
-<div data-ln-progress>
+<div data-ln-progress role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
     <div data-ln-progress="75" class="green"></div>
 </div>
 
 <!-- Со максимална вредност -->
-<div data-ln-progress>
+<div data-ln-progress role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="50">
     <div data-ln-progress="30" data-ln-progress-max="50" class="green"></div>
 </div>
 
 <!-- Stacked (повеќе сегменти) -->
-<div data-ln-progress>
+<div data-ln-progress role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
     <div data-ln-progress="40" class="green"></div>
     <div data-ln-progress="20" class="yellow"></div>
     <div data-ln-progress="10" class="red"></div>
 </div>
 ```
+
+> **Accessibility:** Додади `role="progressbar"` и ARIA атрибути (`aria-valuenow`,
+> `aria-valuemin`, `aria-valuemax`) на track елементот за screen readers.
 
 ## API
 

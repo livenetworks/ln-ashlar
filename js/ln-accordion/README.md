@@ -12,23 +12,36 @@ Wrapper компонента — слуша `ln-toggle:open` events од дец�
 ## Пример
 
 ```html
-<div data-ln-accordion>
-    <div>
-        <header><button data-ln-toggle-for="panel1">Section 1</button></header>
-        <main id="panel1" data-ln-toggle="open">Content 1</main>
-    </div>
-    <div>
-        <header><button data-ln-toggle-for="panel2">Section 2</button></header>
-        <main id="panel2" data-ln-toggle>Content 2</main>
-    </div>
-    <div>
-        <header><button data-ln-toggle-for="panel3">Section 3</button></header>
-        <main id="panel3" data-ln-toggle>Content 3</main>
-    </div>
-</div>
+<ul data-ln-accordion>
+    <li>
+        <header data-ln-toggle-for="panel1">Section 1</header>
+        <section id="panel1" data-ln-toggle="open" class="collapsible">
+            <article class="collapsible-body">Content 1</article>
+        </section>
+    </li>
+    <li>
+        <header data-ln-toggle-for="panel2">Section 2</header>
+        <section id="panel2" data-ln-toggle class="collapsible">
+            <article class="collapsible-body">Content 2</article>
+        </section>
+    </li>
+    <li>
+        <header data-ln-toggle-for="panel3">Section 3</header>
+        <section id="panel3" data-ln-toggle class="collapsible">
+            <article class="collapsible-body">Content 3</article>
+        </section>
+    </li>
+</ul>
 ```
 
-Кога се отвора `panel2`, автоматски се затвора `panel1` (и обратно).
+> **Семантика:** Collapsible контејнерот е `<section>`, НЕ `<main>` (HTML spec: само 1 `<main>` per page).
+> Child-от е `<article>` со `.collapsible-body` класа, НЕ гол `<div>`.
+
+- `ul/li` — accordion е листа на ставки
+- `header` е целосно кликабилен trigger (`data-ln-toggle-for`)
+- `.collapsible` на парент → grid collapse (padding:0, се затвора до 0)
+- `.collapsible-body` на child → overflow:hidden, padding/margins одат тука
+- Кога се отвора `panel2`, автоматски се затвора `panel1` (и обратно).
 
 ## Зависности
 

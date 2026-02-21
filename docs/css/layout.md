@@ -50,18 +50,40 @@ Sticky, z-sticky, border-bottom. Menu toggle hidden on desktop, visible on mobil
 
 ## Grid
 
-| Class | Description |
-|-------|-------------|
-| `.grid` | 1->2->3 columns responsive |
-| `.grid-2` | 1->2 columns responsive |
-| `.grid-4` | 1->2->4 columns responsive |
-| `.stack` | Vertical flex, gap 1rem |
-| `.stack-sm` | Vertical flex, gap 0.5rem |
-| `.stack-lg` | Vertical flex, gap 1.5rem |
-| `.row` | Horizontal flex + center + gap |
-| `.row-between` | Horizontal flex + space-between |
-| `.container` | Max 80rem, centered, responsive padding |
-| `.container-sm` | Max 56rem, centered |
+| Class | Mixin | Description |
+|-------|-------|-------------|
+| `.grid` | `@include grid` | 1->2->3 columns responsive |
+| `.grid-2` | `@include grid-2` | 1->2 columns responsive |
+| `.grid-4` | `@include grid-4` | 1->2->4 columns responsive |
+| `.stack` | `@include stack` | Vertical flex, gap 1rem |
+| `.stack-sm` | `@include stack(0.5rem)` | Vertical flex, gap 0.5rem |
+| `.stack-lg` | `@include stack(1.5rem)` | Vertical flex, gap 1.5rem |
+| `.row` | — | Horizontal flex + center + gap |
+| `.row-between` | — | Horizontal flex + space-between |
+| `.container` | — | Max 80rem, centered, responsive padding |
+| `.container-sm` | — | Max 56rem, centered |
+
+> **Важно:** Овие класи постојат за **брзо прототипирање** во HTML.
+> Во проектен код, **СЕКОГАШ** користи `@include` на семантички елемент:
+>
+> ```html
+> <!-- ПОГРЕШНО — презентациска класа во HTML -->
+> <div class="grid-4">
+>     <div class="card">...</div>
+> </div>
+>
+> <!-- ТОЧНО — семантички HTML + @include во SCSS -->
+> <section id="stats">
+>     <ul>
+>         <li>...</li>
+>     </ul>
+> </section>
+> ```
+>
+> ```scss
+> #stats ul { @include grid-4; list-style: none; padding: 0; margin: 0; }
+> #stats li { @include card; @include p(1rem); }
+> ```
 
 ## Mobile
 
