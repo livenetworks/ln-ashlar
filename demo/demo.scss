@@ -28,98 +28,65 @@
 	@include text-muted;
 }
 
-// Button groups (replaces <div class="row" style="flex-wrap:wrap"> and <div class="flex gap-3" ...>)
+// ==========================================================================
+// Demo Split Layout — 2 columns: left = live demo, right = auto-extracted code
+// ==========================================================================
+
+.demo-split {
+	@include grid-2;
+	align-items: start;
+	@include gap(1rem);
+
+	> article {
+		@include border;
+		@include rounded-md;
+		@include p(1rem);
+	}
+
+	> figure {
+		margin: 0;
+		@include bg-secondary;
+		@include border;
+		@include rounded-md;
+		overflow: auto;
+
+		pre {
+			margin: 0;
+			@include p(1rem);
+		}
+	}
+}
+
+// Description section below the split
+.demo-why {
+	@include mt(1rem);
+	@include pt(1rem);
+	@include border-t;
+
+	h4 {
+		@include text-sm;
+		@include font-semibold;
+		margin: 0 0 0.5rem;
+	}
+
+	p, ul {
+		@include text-sm;
+		@include text-secondary;
+		margin: 0;
+	}
+
+	ul {
+		@include mt(0.5rem);
+		padding-left: 1.25rem;
+	}
+}
+
+// Button groups
 .demo-actions {
 	@include flex;
 	@include items-center;
-	@include gap(1rem);
+	@include gap(0.75rem);
 	@include flex-wrap;
-}
-
-.demo-links {
-	@include grid-2;
-	list-style: none;
-	padding: 0;
-	margin: 0;
-
-	a {
-		@include block;
-		@include px(1.5rem);
-		@include py(1.25rem);
-		text-decoration: none;
-		color: inherit;
-		@include bg-primary;
-		@include border;
-		@include rounded-md;
-		@include transition;
-
-		&:hover {
-			@include bg-secondary;
-			border-color: var(--color-primary);
-		}
-	}
-
-	h3 {
-		color: var(--color-primary);
-		@include text-base;
-		@include font-semibold;
-		@include mb(0.25rem);
-	}
-
-	p {
-		margin: 0;
-	}
-}
-
-/* Tab buttons */
-.demo-tabs {
-	@include flex;
-	@include gap(var(--spacing-xs));
-	@include bg-secondary;
-	@include p(0.25rem);
-	@include rounded-md;
-
-	button {
-		@include px(var(--spacing-sm));
-		@include py(var(--spacing-xs));
-		background: none;
-		@include border-none;
-		@include cursor-pointer;
-		@include text-sm;
-		@include text-secondary;
-		@include rounded-sm;
-		@include transition;
-		box-shadow: none;
-
-		&:hover {
-			@include text-primary;
-		}
-
-		&:focus {
-			box-shadow: none;
-		}
-
-		&[data-active] {
-			background-color: var(--color-primary);
-			@include text-white;
-		}
-	}
-}
-
-/* Tab panel */
-.demo-panel {
-	@include pt(var(--spacing-md));
-}
-
-// ==========================================================================
-// Demo note box (warning/info callout)
-// ==========================================================================
-
-.demo-note {
-	@include p(1rem);
-	background: var(--color-bg-warning);
-	@include border;
-	@include rounded-md;
 }
 
 // ==========================================================================
@@ -157,61 +124,6 @@
 	}
 }
 
-#demo-tabs .demo-panel > p:last-child {
-	@include text-sm;
-	@include text-secondary;
-}
-
-#demo-panels {
-	@include grid-2;
-}
-
-#demo-toggle article > header {
-	@include flex;
-	@include justify-between;
-	@include items-center;
-	@include pb(0.75rem);
-	@include mb(0.75rem);
-	@include border-b;
-
-	button {
-		@include px(0.5rem);
-		@include py(0.25rem);
-		@include text-xs;
-	}
-}
-
-#demo-progress {
-	ul {
-		@include stack;
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-
-	h4 {
-		@include text-sm;
-		@include text-secondary;
-		@include font-normal;
-		margin: 0;
-	}
-}
-
-#demo-ajax-info {
-	@include stack(0.5rem);
-
-	figure {
-		@include card;
-		@include p(1rem);
-		margin: 0;
-	}
-
-	> p {
-		@include text-sm;
-		@include text-secondary;
-	}
-}
-
 // ==========================================================================
 // Page: Cards (cards.html)
 // ==========================================================================
@@ -223,30 +135,7 @@
 		@include card;
 		@include p(1rem);
 
-		p {
-			@include text-sm;
-			@include text-secondary;
-			margin: 0;
-		}
-	}
-}
-
-// ==========================================================================
-// Page: External Links (external-links.html)
-// ==========================================================================
-
-.demo-link-group {
-	@include p(1rem);
-	@include bg-secondary;
-	@include rounded-md;
-
-	h5 {
-		margin-top: 0;
-		@include mb(0.5rem);
-	}
-
-	ul {
-		margin: 0;
+		p { margin: 0; }
 	}
 }
 
@@ -254,74 +143,32 @@
 // Page: Forms (forms.html)
 // ==========================================================================
 
-#forms-actions > p {
-	@include text-sm;
-	@include text-secondary;
+#demo-complex-form {
+	@include form-grid;
+
+	.form-group:nth-child(1),
+	.form-group:nth-child(2) { grid-column: span 3; }
+
+	.form-group:nth-child(3),
+	.form-group:nth-child(4),
+	.form-group:nth-child(5) { grid-column: span 2; }
+
+	.form-group:nth-child(6),
+	.form-actions { grid-column: span 6; }
 }
 
 // ==========================================================================
-// Page: Nav (nav.html)
+// Page: Layout (layout.html)
 // ==========================================================================
 
-.demo-nav-example {
-	@include border;
-	@include p(1rem);
-	@include rounded-md;
-
-	h5 {
-		margin-top: 0;
-		@include mb(0.5rem);
-	}
-
-	nav {
-		@include flex;
-		@include gap(1rem);
-		@include py(0.5rem);
-	}
-}
-
-// ==========================================================================
-// Page: Progress (progress.html)
-// ==========================================================================
-
-.demo-progress-item {
-	h4 {
-		@include text-sm;
-		@include text-secondary;
-		@include font-normal;
-		margin: 0;
-		@include mb(0.5rem);
-	}
-}
-
-#progress-reactive nav {
-	@include flex;
-	@include gap(0.5rem);
-	@include mt(0.5rem);
-}
-
-// ==========================================================================
-// Page: Select (select.html)
-// ==========================================================================
-
-.section-card form {
-	@include stack;
-}
-
-#select-graceful > p:last-child {
-	@include p(1rem);
+.demo-box {
 	@include bg-secondary;
-	@include rounded-md;
-	@include text-muted;
-}
-
-// ==========================================================================
-// Page: Tabs (tabs.html)
-// ==========================================================================
-
-#tabs-example [data-ln-panel] > p:last-child {
+	@include border;
+	@include rounded-sm;
+	@include p(0.75rem);
 	@include text-sm;
 	@include text-secondary;
+	text-align: center;
 }
 
 // ==========================================================================
@@ -408,13 +255,10 @@
 		@include shadow-md;
 		list-style: none;
 		padding: 0;
-		margin-top: 0.25rem;
 		min-width: 10rem;
 		z-index: 10;
 
-		&.open {
-			display: block;
-		}
+		&.open { display: block; }
 
 		a {
 			@include block;
@@ -424,9 +268,123 @@
 			color: inherit;
 			@include transition;
 
-			&:hover {
-				@include bg-secondary;
-			}
+			&:hover { @include bg-secondary; }
 		}
 	}
+}
+
+// ==========================================================================
+// Page: Icons (icons.html)
+// ==========================================================================
+
+.icon-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	@include gap(1rem);
+}
+
+.icon-cell {
+	@include flex;
+	flex-direction: column;
+	@include items-center;
+	@include gap(0.5rem);
+	@include p(1rem);
+	@include border;
+	@include rounded-md;
+	@include text-xs;
+	@include text-secondary;
+	text-align: center;
+
+	&:hover { @include bg-secondary; }
+}
+
+// ==========================================================================
+// Page: External Links (external-links.html)
+// ==========================================================================
+
+.demo-link-group {
+	@include p(1rem);
+	@include bg-secondary;
+	@include rounded-md;
+
+	h5 { margin-top: 0; @include mb(0.5rem); }
+	ul { margin: 0; }
+}
+
+// ==========================================================================
+// Page: Nav (nav.html)
+// ==========================================================================
+
+.demo-nav-example {
+	@include border;
+	@include p(1rem);
+	@include rounded-md;
+
+	h5 { margin-top: 0; @include mb(0.5rem); }
+
+	nav {
+		@include flex;
+		@include gap(1rem);
+		@include py(0.5rem);
+	}
+}
+
+// ==========================================================================
+// Page: Progress (progress.html)
+// ==========================================================================
+
+.demo-progress-list {
+	@include stack(1rem);
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	h4 {
+		@include text-sm;
+		@include text-secondary;
+		@include font-normal;
+		margin: 0;
+		@include mb(0.5rem);
+	}
+}
+
+#progress-reactive nav {
+	@include flex;
+	@include gap(0.5rem);
+	@include mt(0.5rem);
+}
+
+// ==========================================================================
+// Page: Select (select.html)
+// ==========================================================================
+
+.section-card form {
+	@include stack;
+}
+
+#select-graceful > p:last-child {
+	@include p(1rem);
+	@include bg-secondary;
+	@include rounded-md;
+	@include text-muted;
+}
+
+// ==========================================================================
+// Page: Tabs (tabs.html)
+// ==========================================================================
+
+#tabs-example [data-ln-panel] > p:last-child {
+	@include text-sm;
+	@include text-secondary;
+}
+
+// ==========================================================================
+// Page: Ajax (ajax.html)
+// ==========================================================================
+
+.demo-note {
+	@include p(1rem);
+	background: var(--color-bg-warning);
+	@include border;
+	@include rounded-md;
 }

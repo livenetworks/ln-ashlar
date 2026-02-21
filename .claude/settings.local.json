@@ -10,7 +10,10 @@
       "Bash(node --version:*)",
       "Bash(node -e:*)",
       "Bash(grep:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(ls:*)",
+      "Bash(npm run build:demo:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }
