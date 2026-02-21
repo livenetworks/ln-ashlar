@@ -5,12 +5,87 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Tables — ln-acme</title>
 	<link rel="stylesheet" href="../dist/ln-acme.css">
+	<link rel="stylesheet" href="demo.css">
+	<script src="../dist/ln-acme.iife.js" defer></script>
 </head>
 <body>
-	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
-		<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Tables</li></nav>
-		<h1>Tables</h1>
-		<p>Темен header, hover accent со лева линија, section rows, статус класи. Responsive на мобилен.</p>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<div class="header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Tables</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'CSS табели компонента.'})">Test Toast</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme" style="width: 2rem; height: 2rem; border-radius: var(--radius-sm);">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<div class="nav-section">CSS компоненти</div>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<div class="nav-section">JS компоненти</div>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small class="text-muted">acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+				<div class="stack-lg">
+					<h1>Tables</h1>
+					<p>Темен header, hover accent со лева линија, section rows, статус класи. Responsive на мобилен.</p>
 
 		<!-- Basic table -->
 		<section class="section-card">
@@ -132,6 +207,16 @@
 &lt;table class="striped"&gt;...&lt;/table&gt;</code></pre>
 			</main>
 		</section>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span class="text-muted">ln-acme demo</span>
+			</footer>
+
+		</div>
+	</div>
 	</div>
 </body>
 </html>

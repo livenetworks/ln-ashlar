@@ -102,7 +102,7 @@
 
 	function _normalizeUrl(url) {
 		try {
-			const urlObj = new URL(url, window.location.origin);
+			const urlObj = new URL(url, window.location.href);
 			return urlObj.pathname.replace(/\/$/, '') || '/'; // Remove trailing slash
 		} catch (e) {
 			return url.replace(/\/$/, '') || '/';

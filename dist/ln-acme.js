@@ -246,7 +246,7 @@
   }
   function v(n) {
     try {
-      return new URL(n, window.location.origin).pathname.replace(/\/$/, "") || "/";
+      return new URL(n, window.location.href).pathname.replace(/\/$/, "") || "/";
     } catch {
       return n.replace(/\/$/, "") || "/";
     }
