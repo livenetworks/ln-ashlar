@@ -316,37 +316,30 @@ table tbody tr {
 
 Картичките се **податочни контејнери**, не флеши UI елементи. Стилот е инспириран од табелите.
 
-**`.card` header** — најкомпактен, uppercase:
+**`@mixin panel-header`** — унифициран header за сите панели (card, section-card, modal):
 ```scss
-.card header {
-    @include px(0.75rem);
-    @include py(0.5rem);
-    @include bg-secondary;
-    @include border-b;
-
-    h3 {
-        @include text-sm;       // мал текст
-        @include font-semibold;
-        @include uppercase;     // КОРИСНИК
-        @include tracking-wider;
-    }
-}
-```
-
-**`.section-card` header** — едно ниво поголем (wrapper/родител на картички):
-```scss
-.section-card header {
+// Дефиниран во _mixins.scss
+@mixin panel-header {
+    @include flex;
+    @include items-center;
+    @include justify-between;
     @include px(1rem);
     @include py(0.625rem);
     @include bg-secondary;
     @include border-b;
 
     h3 {
-        @include text-base;     // поголем од card
+        @include text-base;
         @include font-semibold;
-        // БЕЗ uppercase — нормален текст
+        @include text-primary;
+        margin: 0;
     }
 }
+
+// Употреба — сите компоненти го користат истиот mixin:
+.card header          { @include panel-header; }
+.section-card header  { @include panel-header; }
+.ln-modal header      { @include panel-header; }
 ```
 
 **Hover** — суптилен, без анимации/translateY/::before ленти:
@@ -356,10 +349,6 @@ table tbody tr {
     @include shadow-md;
 }
 ```
-
-**Padding** — тесен, збиен како table ќелии:
-- `.card`: `px(0.75rem)` / `py(0.5rem)`
-- `.section-card`: `px(1rem)` / `py(0.625rem)` — малку поширок како wrapper
 
 ### HTML = семантички, CSS = одвоен
 

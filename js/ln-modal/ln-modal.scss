@@ -41,37 +41,11 @@
 
 /* Header */
 .ln-modal header {
-	@include flex;
-	@include items-center;
-	@include justify-between;
-	@include px(var(--spacing-sm));
-	@include py(var(--spacing-xs));
-	@include bg-secondary;
-	@include border-b;
-
-	h3 {
-		@include text-sm;
-		@include font-semibold;
-		@include uppercase;
-		@include tracking-wider;
-		margin: 0;
-	}
+	@include panel-header;
 }
 
 .ln-modal header button[data-ln-modal-close] {
-	background: transparent;
-	@include border-none;
-	@include text-lg;
-	color: var(--color-text-secondary);
-	@include cursor-pointer;
-	@include size(2rem);
-	@include flex-center;
-	@include transition;
-
-	&:hover {
-		color: var(--color-text-primary);
-		@include bg-secondary;
-	}
+	@include close-button;
 }
 
 /* Body */

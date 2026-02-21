@@ -1,3 +1,5 @@
+@use '../../scss/config/mixins' as *;
+
 /* ========== Live Networks Toast (Side-Accent Light Theme) ========== */
 
 :root {
@@ -17,8 +19,6 @@
 	--ln-toast-warn: #f59e0b;
 	--ln-toast-info: #0ea5e9;
 
-	--ln-toast-close: #9ca3af;
-	--ln-toast-close-hover: #111827;
 }
 
 /* Container */
@@ -123,21 +123,10 @@
 }
 
 .ln-toast__close {
+	@include close-button;
 	position: absolute;
 	top: 0.5rem;
 	right: 0.5rem;
-	border: 0;
-	background: transparent;
-	cursor: pointer;
-	font-size: 1.25rem;
-	color: var(--ln-toast-close);
-	line-height: 1;
-	padding: 4px;
-	transition: color 0.2s;
-}
-
-.ln-toast__close:hover {
-	color: var(--ln-toast-close-hover);
 }
 
 /* Body */

@@ -274,3 +274,68 @@
 	@include overflow-hidden;
 	@include transition;
 }
+
+@mixin panel-header {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(1rem);
+	@include py(0.625rem);
+	@include bg-secondary;
+	@include border-b;
+
+	h3 {
+		@include text-base;
+		@include font-semibold;
+		@include text-primary;
+		margin: 0;
+	}
+}
+
+@mixin btn {
+	@include flex;
+	@include items-center;
+	@include justify-center;
+	@include px(1rem);
+	@include py(0.5rem);
+	@include text-sm;
+	@include font-medium;
+	@include rounded-md;
+	@include cursor-pointer;
+	@include transition;
+	border: none;
+	outline: none;
+	background-color: var(--color-primary);
+	@include text-white;
+	white-space: nowrap;
+
+	&:hover { background-color: var(--color-primary-hover); }
+	&:focus { box-shadow: 0 0 0 3px var(--color-primary-light); }
+	&:disabled { @include opacity-50; @include cursor-not-allowed; }
+}
+
+@mixin close-button {
+	background: transparent;
+	@include border-none;
+	@include text-lg;
+	color: var(--color-text-muted);
+	@include cursor-pointer;
+	@include size(2rem);
+	@include flex-center;
+	@include rounded-sm;
+	@include transition-fast;
+
+	&:hover {
+		@include text-error;
+	}
+
+	&:active {
+		color: var(--color-error-hover);
+		@include bg-body;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--color-primary);
+		outline-offset: -2px;
+	}
+}

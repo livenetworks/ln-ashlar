@@ -8,10 +8,24 @@
 	@include py(0.75rem);
 	@include bg-primary;
 	@include border-b;
-	@include sticky;
+	@include fixed;
 	top: 0;
+	@include w-full;
 	@include z-sticky;
 	height: var(--header-height, 3.5rem);
+
+	// Reset global button styles inside header
+	button {
+		@include p(0);
+		background: none;
+		border: none;
+		box-shadow: none;
+		@include cursor-pointer;
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
 
 	.header-left {
 		@include flex;
@@ -19,23 +33,14 @@
 		@include gap(0.75rem);
 
 		.menu-toggle {
-			@include hidden;
-			@include items-center;
-			@include justify-center;
-			@include size(2.5rem);
-			@include rounded-md;
-			@include cursor-pointer;
-			@include transition-colors;
-			background: none;
-			border: none;
+			@include flex-center;
+			@include size(2rem);
+			@include rounded-sm;
 			@include text-secondary;
+			@include transition-colors;
 
 			&:hover {
 				@include bg-secondary;
-			}
-
-			@media (max-width: 768px) {
-				@include flex;
 			}
 		}
 
@@ -88,6 +93,21 @@
 		@include flex;
 		@include items-center;
 		@include gap(0.5rem);
+
+		button {
+			@include px(0.75rem);
+			@include py(0.25rem);
+			@include text-xs;
+			@include font-medium;
+			@include rounded-sm;
+			@include text-secondary;
+			@include border;
+			@include transition-colors;
+
+			&:hover {
+				@include bg-secondary;
+			}
+		}
 	}
 
 	.header-avatar {

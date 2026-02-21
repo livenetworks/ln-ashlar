@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Nav — ln-acme</title>
+	<link rel="stylesheet" href="../dist/ln-acme.css">
+	<link rel="stylesheet" href="demo.css">
+	<script src="../dist/ln-acme.iife.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<div class="header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Nav</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Nav — активен линк маркер.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
+				<svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
+					<text x="16" y="22" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="system-ui">A</text>
+				</svg>
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<div class="nav-section">CSS компоненти</div>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<div class="nav-section">JS компоненти</div>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small class="text-muted">acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+				<div class="stack-lg">
+					<h1>Nav</h1>
+					<p>Active link highlighter — автоматски го означува активниот линк во навигација врз основа на тековниот URL. Работи со pushState (AJAX) и popstate (browser back/forward).</p>
+
+					<!-- Основи -->
+					<section class="section-card">
+						<header><h3>Основи</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Атрибут</th><th>На елемент</th><th>Вредност</th><th>Опис</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-nav</code></td><td>&lt;nav&gt;</td><td>CSS класа</td><td>Активира nav highlighter</td></tr>
+								</tbody>
+							</table>
+							<p><strong>Пример:</strong> <code>data-ln-nav="active"</code> — линкот добива класа <code>.active</code> кога е активен.</p>
+						</main>
+					</section>
+
+					<!-- Однесување -->
+					<section class="section-card">
+						<header><h3>Однесување и Match правила</h3></header>
+						<main>
+							<div class="stack">
+								<div>
+									<h4>Како функционира?</h4>
+									<ol>
+										<li>При init, ги скенира сите <code>&lt;a&gt;</code> внатре во <code>&lt;nav&gt;</code></li>
+										<li>Го споредува <code>href</code> на секој линк со <code>window.location.pathname</code></li>
+										<li>Додава CSS класа на совпаѓачки линкови</li>
+									</ol>
+								</div>
+								<div>
+									<h4>Match правила</h4>
+									<table>
+										<thead><tr><th>Правило</th><th>Пример</th><th>Резултат</th></tr></thead>
+										<tbody>
+											<tr><td><strong>Exact match</strong></td><td><code>/users</code> на <code>/users</code></td><td>✓ Match</td></tr>
+											<tr><td><strong>Parent match</strong></td><td><code>/users</code> на <code>/users/123</code></td><td>✓ Match</td></tr>
+											<tr><td><strong>Root специјален</strong></td><td><code>/</code> само на <code>/</code></td><td>✓ Exact only</td></tr>
+											<tr><td><strong>Trailing slash</strong></td><td><code>/users/</code> == <code>/users</code></td><td>✓ Нормализирано</td></tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- HTML пример -->
+					<section class="section-card">
+						<header><h3>HTML пример</h3></header>
+						<main>
+							<pre><code>&lt;nav data-ln-nav="active"&gt;
+    &lt;a href="/"&gt;Home&lt;/a&gt;
+    &lt;a href="/users"&gt;Users&lt;/a&gt;
+    &lt;a href="/users/new"&gt;New User&lt;/a&gt;
+    &lt;a href="/settings"&gt;Settings&lt;/a&gt;
+&lt;/nav&gt;
+
+&lt;!-- Ако URL е /users/42 --&gt;
+&lt;!-- Линкот /users добива класа .active (parent match) --&gt;
+&lt;!-- Линкот /users/new НЕ добива класа --&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- CSS стилизирање -->
+					<section class="section-card">
+						<header><h3>CSS стилизирање</h3></header>
+						<main>
+							<pre><code>nav a {
+    @include text-secondary;
+    @include transition;
+    
+    &.active {
+        @include text-primary;
+        @include font-bold;
+        @include bg-secondary;
+        @include px(0.75rem);
+        @include rounded-md;
+    }
+}</code></pre>
+						</main>
+					</section>
+
+					<!-- Реактивност -->
+					<section class="section-card">
+						<header><h3>Реактивност со AJAX и Browser History</h3></header>
+						<main>
+							<div class="stack">
+								<div>
+									<h4>pushState (AJAX навигација)</h4>
+									<p>Кога ln-ajax го менува URL-от преку <code>pushState</code>, ln-nav автоматски ги ажурира активните класи.</p>
+								</div>
+								<div>
+									<h4>popstate (browser back/forward)</h4>
+									<p>При browser back/forward, ln-nav слуша <code>popstate</code> event и ги ажурира активните класи.</p>
+								</div>
+								<div>
+									<h4>Динамички додадени линкови</h4>
+									<p>Новите линкови додадени преку JavaScript (MutationObserver) автоматски се обработуваат.</p>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Рачна иницијализација
+window.lnNav.init(navElement);
+
+// Рачно ажурирај активни линкови
+// (обично не требава — работи автоматски)
+window.lnNav.updateActive();</code></pre>
+						</main>
+					</section>
+
+					<!-- Пример со неколку навигации -->
+					<section class="section-card">
+						<header><h3>Пример — Повеќе навигации на исто време</h3></header>
+						<main>
+							<div class="stack-sm">
+								<div style="border: 1px solid var(--color-border); padding: 1rem; border-radius: var(--radius-md);">
+									<h5 style="margin-top: 0;">Top Navigation</h5>
+									<nav data-ln-nav="active" style="display: flex; gap: 1rem; padding: 0.5rem 0;">
+										<a href="/">Home</a>
+										<a href="/users">Users</a>
+										<a href="/reports">Reports</a>
+									</nav>
+								</div>
+								<div style="border: 1px solid var(--color-border); padding: 1rem; border-radius: var(--radius-md);">
+									<h5 style="margin-top: 0;">Side Navigation</h5>
+									<nav data-ln-nav="active" style="display: flex; flex-direction: column; gap: 0.5rem;">
+										<a href="/settings">Settings</a>
+										<a href="/settings/profile">Profile</a>
+										<a href="/settings/security">Security</a>
+									</nav>
+								</div>
+							</div>
+						</main>
+					</section>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span class="text-muted">ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>

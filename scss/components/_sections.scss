@@ -38,17 +38,7 @@
 	@include mb(1.5rem);
 
 	header {
-		@include px(1rem);
-		@include py(0.625rem);
-		@include border-b;
-		@include bg-secondary;
-
-		h3 {
-			@include text-base;
-			@include font-semibold;
-			@include text-primary;
-			margin: 0;
-		}
+		@include panel-header;
 	}
 
 	main {

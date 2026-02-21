@@ -21,10 +21,10 @@
 			<header><h3>Примери</h3></header>
 			<main>
 				<div class="flex gap-3" style="flex-wrap: wrap;">
-					<button onclick="window.lnToast.enqueue({type:'success', title:'Успешно', message:'Записот е зачуван.'})">Success</button>
-					<button onclick="window.lnToast.enqueue({type:'error', title:'Грешка', message:'Нешто не е во ред.'})" class="btn-danger">Error</button>
-					<button onclick="window.lnToast.enqueue({type:'warn', title:'Внимание', message:'Проверете ги податоците.'})" class="btn-secondary">Warning</button>
-					<button onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Нова верзија е достапна.'})" class="btn-secondary">Info</button>
+					<button onclick="window.lnToast.enqueue({type:'success', title:'Успешно', message:'Записот е зачуван.'})" class="btn">Success</button>
+					<button onclick="window.lnToast.enqueue({type:'error', title:'Грешка', message:'Нешто не е во ред.'})" class="btn btn--danger">Error</button>
+					<button onclick="window.lnToast.enqueue({type:'warn', title:'Внимание', message:'Проверете ги податоците.'})" class="btn btn--secondary">Warning</button>
+					<button onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Нова верзија е достапна.'})" class="btn btn--secondary">Info</button>
 				</div>
 			</main>
 		</section>
@@ -33,7 +33,7 @@
 		<section class="section-card">
 			<header><h3>Error со листа на грешки</h3></header>
 			<main>
-				<button onclick="window.lnToast.enqueue({type:'error', title:'Валидација', message:['Името е задолжително','Email форматот е погрешен','Лозинката е прекратка']})" class="btn-danger">Покажи validation errors</button>
+				<button onclick="window.lnToast.enqueue({type:'error', title:'Валидација', message:['Името е задолжително','Email форматот е погрешен','Лозинката е прекратка']})" class="btn btn--danger">Покажи validation errors</button>
 			</main>
 		</section>
 

@@ -32,7 +32,6 @@ js/ln-*/                    → Vanilla JS components (IIFE pattern)
 | Modal | `data-ln-modal` | [modal.md](js/modal.md) |
 | Toast | `data-ln-toast` | [toast.md](js/toast.md) |
 | Tabs | `data-ln-tabs` | [tabs.md](js/tabs.md) |
-| Box | `data-ln-box` | [box.md](js/box.md) |
 | Progress | `data-ln-progress` | [progress.md](js/progress.md) |
 | Upload | `data-ln-upload` | [upload.md](js/upload.md) |
 | AJAX | `data-ln-ajax` | [ajax.md](js/ajax.md) |

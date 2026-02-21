@@ -110,38 +110,11 @@ label {
 	@include mb(0.25rem);
 }
 
-button {
-	@include flex;
-	@include items-center;
-	@include justify-center;
-	@include px(1rem);
-	@include py(0.5rem);
-	@include text-sm;
-	@include font-medium;
-	@include rounded-md;
-	@include cursor-pointer;
-	@include transition;
-	border: none;
-	outline: none;
-	background-color: var(--color-primary);
-	@include text-white;
-	white-space: nowrap;
-
-	&:hover {
-		background-color: var(--color-primary-hover);
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 3px var(--color-primary-light);
-	}
-
-	&:disabled {
-		@include opacity-50;
-		@include cursor-not-allowed;
-	}
+.btn {
+	@include btn;
 }
 
-.btn-secondary {
+.btn--secondary {
 	@include bg-secondary;
 	@include text-primary;
 	@include border;
@@ -151,7 +124,7 @@ button {
 	}
 }
 
-.btn-danger {
+.btn--danger {
 	background-color: var(--color-error);
 
 	&:hover {

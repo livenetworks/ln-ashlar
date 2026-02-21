@@ -13,9 +13,29 @@
 	<div data-ln-toast></div>
 
 	<div class="app-wrapper">
+		<!-- Header -->
+		<div class="header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Dashboard</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Ова е демо нотификација.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- App Body -->
+		<div class="app-body">
 		<!-- Sidebar -->
-		<aside class="sidebar" id="demo-sidebar">
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
 				<svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
 					<text x="16" y="22" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="system-ui">A</text>
@@ -43,10 +63,16 @@
 
 					<div class="nav-section">JS компоненти</div>
 					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
 						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
-						<li><a href="box.html"><span class="nav-label">Box &amp; Progress</span></a></li>
 						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
 					</ul>
 				</nav>
@@ -59,22 +85,6 @@
 
 		<!-- Main Panel -->
 		<div class="main-panel">
-			<!-- Header -->
-			<div class="header">
-				<div class="header-left">
-					<button class="menu-toggle" onclick="document.getElementById('demo-sidebar').classList.toggle('open')">
-						<span class="ln-icon-menu"></span>
-					</button>
-					<h1>Dashboard</h1>
-				</div>
-				<div class="header-right">
-					<div class="header-actions">
-						<button class="btn-secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Ова е демо нотификација.'})">
-							Test Toast
-						</button>
-					</div>
-				</div>
-			</div>
 
 			<!-- Content -->
 			<div class="content">
@@ -124,8 +134,8 @@
 						<header><h3>Modal</h3></header>
 						<main>
 							<div class="row" style="flex-wrap:wrap;">
-								<button data-ln-modal="demo-basic">Basic Modal</button>
-								<button data-ln-modal="demo-form" class="btn-secondary">Form Modal</button>
+								<button data-ln-modal="demo-basic" class="btn">Basic Modal</button>
+								<button data-ln-modal="demo-form" class="btn btn--secondary">Form Modal</button>
 							</div>
 						</main>
 					</section>
@@ -176,17 +186,14 @@
 					<!-- Box & Progress -->
 					<div class="grid-2">
 						<section class="section-card">
-							<header><h3>Box — Collapsible</h3></header>
+							<header><h3>Toggle — Collapsible</h3></header>
 							<main>
-								<div data-ln-box>
-									<header>
-										Серверски статус
-										<ul style="list-style:none;display:flex;gap:0.5rem;margin:0;padding:0;">
-											<li><button type="button" data-ln-box-action="collapse" class="btn-secondary" style="padding:0.25rem 0.5rem;">Collapse</button></li>
-											<li><button type="button" data-ln-box-action="expand" class="btn-secondary" style="padding:0.25rem 0.5rem;">Expand</button></li>
-										</ul>
+								<div>
+									<header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-border);">
+										<strong>Серверски статус</strong>
+										<button type="button" data-ln-toggle-for="server-status" class="btn btn--secondary" style="padding:0.25rem 0.5rem; font-size: 0.75rem;">▼</button>
 									</header>
-									<main data-ln-box-body>
+									<main id="server-status" data-ln-toggle="open">
 										<table>
 											<thead><tr><th>Сервер</th><th>Статус</th><th>Uptime</th></tr></thead>
 											<tbody>
@@ -232,11 +239,11 @@
 						<header><h3>Toast нотификации</h3></header>
 						<main>
 							<div class="row" style="flex-wrap:wrap;">
-								<button onclick="window.lnToast.enqueue({type:'success', title:'Успешно', message:'Записот е зачуван.'})">Success</button>
-								<button onclick="window.lnToast.enqueue({type:'error', title:'Грешка', message:'Нешто не е во ред.'})" class="btn-danger">Error</button>
-								<button onclick="window.lnToast.enqueue({type:'warn', title:'Внимание', message:'Проверете ги податоците.'})" class="btn-secondary">Warning</button>
-								<button onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Нова верзија е достапна.'})" class="btn-secondary">Info</button>
-								<button onclick="window.lnToast.enqueue({type:'error', title:'Валидација', message:['Името е задолжително','Email форматот е погрешен','Лозинката е прекратка']})" class="btn-danger">Validation Errors</button>
+								<button onclick="window.lnToast.enqueue({type:'success', title:'Успешно', message:'Записот е зачуван.'})" class="btn">Success</button>
+								<button onclick="window.lnToast.enqueue({type:'error', title:'Грешка', message:'Нешто не е во ред.'})" class="btn btn--danger">Error</button>
+								<button onclick="window.lnToast.enqueue({type:'warn', title:'Внимание', message:'Проверете ги податоците.'})" class="btn btn--secondary">Warning</button>
+								<button onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Нова верзија е достапна.'})" class="btn btn--secondary">Info</button>
+								<button onclick="window.lnToast.enqueue({type:'error', title:'Валидација', message:['Името е задолжително','Email форматот е погрешен','Лозинката е прекратка']})" class="btn btn--danger">Validation Errors</button>
 							</div>
 						</main>
 					</section>
@@ -309,7 +316,8 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 				<span class="text-muted">ln-acme v1.0.0</span>
 			</footer>
 		</div>
-	</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
 
 	<!-- Modals (outside app-wrapper) -->
 	<div class="ln-modal" id="demo-basic">
@@ -323,7 +331,7 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 				<p>Притисни ESC или кликни затвори.</p>
 			</main>
 			<footer>
-				<button data-ln-modal-close class="btn-secondary">Затвори</button>
+				<button data-ln-modal-close class="btn btn--secondary">Затвори</button>
 			</footer>
 		</div>
 	</div>
@@ -355,8 +363,8 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 				</form>
 			</main>
 			<footer>
-				<button data-ln-modal-close class="btn-secondary">Откажи</button>
-				<button type="submit">Зачувај</button>
+				<button data-ln-modal-close class="btn btn--secondary">Откажи</button>
+				<button type="submit" class="btn">Зачувај</button>
 			</footer>
 		</div>
 	</div>

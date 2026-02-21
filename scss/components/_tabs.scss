@@ -1,0 +1,53 @@
+@use '../config/mixins' as *;
+
+// ==========================================================================
+// Tabs — underline стил
+// ==========================================================================
+
+// Tab navigation — bottom border со underline на активен таб
+[data-ln-tabs] nav {
+	@include flex;
+	@include border-b;
+}
+
+// Tab копчиња — целосен reset (button, a, или било кој елемент)
+[data-ln-tabs] [data-ln-tab] {
+	all: unset;
+	box-sizing: border-box;
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-sm));
+	@include text-sm;
+	@include font-medium;
+	@include text-secondary;
+	@include cursor-pointer;
+	@include transition;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -1px;
+
+	&:hover {
+		color: var(--color-primary);
+		background: none;
+	}
+
+	&:focus,
+	&:active,
+	&:visited {
+		background: none;
+	}
+}
+
+// Активен таб
+[data-ln-tabs] [data-ln-tab][data-active] {
+	color: var(--color-primary);
+	border-bottom-color: var(--color-primary);
+	background: none;
+}
+
+// Панели
+[data-ln-tabs] [data-ln-panel] {
+	@include p(var(--spacing-lg));
+}
+
+[data-ln-tabs] [data-ln-panel].hidden {
+	@include hidden;
+}

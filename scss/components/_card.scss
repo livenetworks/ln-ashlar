@@ -16,22 +16,7 @@
 	}
 
 	header {
-		@include flex;
-		@include items-center;
-		@include gap(0.5rem);
-		@include px(0.75rem);
-		@include py(0.5rem);
-		@include bg-secondary;
-		@include border-b;
-
-		h3 {
-			color: var(--color-primary);
-			@include text-sm;
-			@include font-semibold;
-			@include uppercase;
-			@include tracking-wider;
-			margin: 0;
-		}
+		@include panel-header;
 	}
 
 	main {

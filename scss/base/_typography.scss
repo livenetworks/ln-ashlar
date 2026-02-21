@@ -73,7 +73,7 @@ small {
 code {
 	@include font-mono;
 	@include text-sm;
-	background-color: var(--color-gray-100, #f3f4f6);
+	background-color: var(--color-bg-body);
 	@include px(0.25rem);
 	@include py(0.125rem);
 	@include rounded-sm;
@@ -82,7 +82,7 @@ code {
 pre {
 	@include font-mono;
 	@include text-sm;
-	background-color: var(--color-gray-100, #f3f4f6);
+	background-color: var(--color-bg-body);
 	@include p(1rem);
 	@include rounded-md;
 	@include overflow-x-auto;

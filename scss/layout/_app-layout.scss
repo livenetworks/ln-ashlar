@@ -1,9 +1,15 @@
 @use '../config/mixins' as *;
 
 .app-wrapper {
-	@include flex;
+	@include flex-col;
 	@include min-h-screen;
 	@include bg-body;
+}
+
+.app-body {
+	@include flex;
+	@include flex-1;
+	margin-top: var(--header-height, 3.5rem);
 }
 
 .sidebar {
@@ -11,15 +17,20 @@
 	@include bg-primary;
 	@include border-r;
 	@include fixed;
-	top: 0;
+	top: var(--header-height, 3.5rem);
 	left: 0;
-	@include h-full;
+	height: calc(100vh - var(--header-height, 3.5rem));
 	@include z-sticky;
 	@include overflow-auto;
 	@include transition;
 	width: 16rem;
 	container-type: inline-size;
 	container-name: sidebar;
+	transform: translateX(-100%);
+
+	&.open {
+		transform: translateX(0);
+	}
 
 	.sidebar-header {
 		@include flex;
@@ -57,9 +68,12 @@
 .main-panel {
 	@include flex-col;
 	@include flex-1;
-	margin-left: 16rem;
-	@include min-h-screen;
+	margin-left: 0;
 	@include transition;
+}
+
+.sidebar.open ~ .main-panel {
+	margin-left: 16rem;
 }
 
 .content {
@@ -86,15 +100,10 @@
 
 @media (max-width: 768px) {
 	.sidebar {
-		transform: translateX(-100%);
 		@include z-overlay;
-
-		&.open {
-			transform: translateX(0);
-		}
 	}
 
-	.main-panel {
+	.sidebar.open ~ .main-panel {
 		margin-left: 0;
 	}
 }

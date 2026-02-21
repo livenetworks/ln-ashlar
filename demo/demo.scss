@@ -74,3 +74,17 @@
 .demo-panel {
 	@include pt(var(--spacing-md));
 }
+
+/* Toggle collapsible demo */
+#server-status {
+	max-height: 0;
+	@include py(0);
+	@include overflow-hidden;
+	@include transition;
+
+	&.open {
+		max-height: 100vh;
+		@include py(var(--spacing-sm));
+		overflow: auto;
+	}
+}

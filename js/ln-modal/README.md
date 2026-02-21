@@ -1,0 +1,81 @@
+# ln-modal
+
+Modal dialog компонента — overlay со содржина (header/main/footer).
+Отвара/затвара модал по ID. ESC затвара сите отворени модали. Body scroll се блокира кога модал е отворен.
+
+## Атрибути
+
+| Атрибут | На | Опис |
+|---------|-----|------|
+| `data-ln-modal="modalId"` | trigger копче/линк | Кликот го toggle-ува модалот со тој ID |
+| `data-ln-modal-close` | копче внатре во модал | Затвара го родителскиот модал |
+
+## CSS класи
+
+| Класа | Опис |
+|-------|------|
+| `.ln-modal` | Overlay контејнер (мора да има `id`) |
+| `.ln-modal--open` | Отворен модал (додава ја JS) |
+| `.ln-modal__content` | Внатрешен контејнер за содржина |
+| `.ln-modal__content--sm` | Мал модал (max-width: 28rem) |
+| `.ln-modal__content--md` | Среден модал (max-width: 32rem) |
+| `.ln-modal__content--lg` | Голем модал (max-width: 42rem) |
+| `.ln-modal__content--xl` | Екстра голем модал (max-width: 48rem) |
+
+## API
+
+```javascript
+// Functional API (на window)
+window.lnModal.open('my-modal');
+window.lnModal.close('my-modal');
+window.lnModal.toggle('my-modal');
+```
+
+## Однесување
+
+- ESC тастер затвара сите отворени модали
+- `body.ln-modal-open` се додава кога модал е отворен (спречува scroll)
+- Backdrop: полу-транспарентен темен overlay со blur
+- Анимација: slideIn од горе (0.3s ease)
+- Ctrl/Cmd+Click и middle-click на trigger не го отвараат модалот (дозволува open in new tab)
+
+## HTML структура
+
+```html
+<!-- Trigger копче -->
+<button data-ln-modal="my-modal">Отвори</button>
+
+<!-- Модал -->
+<div id="my-modal" class="ln-modal">
+    <div class="ln-modal__content">
+        <header>
+            <h3>Наслов</h3>
+            <button data-ln-modal-close>&times;</button>
+        </header>
+        <main>
+            <p>Содржина на модалот...</p>
+        </main>
+        <footer>
+            <button data-ln-modal-close>Откажи</button>
+            <button class="btn-primary">Зачувај</button>
+        </footer>
+    </div>
+</div>
+```
+
+## Големини
+
+```html
+<div class="ln-modal__content ln-modal__content--sm">...</div>
+<div class="ln-modal__content ln-modal__content--lg">...</div>
+```
+
+## Програмски
+
+```javascript
+// Отвори модал
+window.lnModal.open('confirm-dialog');
+
+// Затвори модал
+window.lnModal.close('confirm-dialog');
+```

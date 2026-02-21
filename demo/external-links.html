@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>External Links — ln-acme</title>
+	<link rel="stylesheet" href="../dist/ln-acme.css">
+	<link rel="stylesheet" href="demo.css">
+	<script src="../dist/ln-acme.iife.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<div class="header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>External Links</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'External links обработувач.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
+				<svg class="logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
+					<text x="16" y="22" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="system-ui">A</text>
+				</svg>
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<div class="nav-section">CSS компоненти</div>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<div class="nav-section">JS компоненти</div>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small class="text-muted">acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+				<div class="stack-lg">
+					<h1>External Links</h1>
+					<p>Utility компонента која автоматски ги обработува надворешните линкови за безбедност и tracking. <strong>Нема потреба од data attribute — работи автоматски.</strong></p>
+
+					<!-- Основи -->
+					<section class="section-card">
+						<header><h3>Основи</h3></header>
+						<main>
+							<div class="stack">
+								<div>
+									<h4>Што оди?</h4>
+									<p>За секој линк чиј <code>hostname</code> се разликува од <code>window.location.hostname</code>:</p>
+									<ol>
+										<li>Добива <code>target="_blank"</code> (отвора во нов tab)</li>
+										<li>Добива <code>rel="noopener noreferrer"</code> (безбедност)</li>
+										<li>Се означува со <code>data-ln-external-link="processed"</code></li>
+									</ol>
+								</div>
+								<div>
+									<h4>Пример</h4>
+									<pre><code>// Пред
+&lt;a href="https://example.com"&gt;External link&lt;/a&gt;
+
+// По обработка (автоматски)
+&lt;a href="https://example.com" 
+   target="_blank" 
+   rel="noopener noreferrer"
+   data-ln-external-link="processed"&gt;
+    External link
+&lt;/a&gt;
+
+// Внатрешни линкови остануваат исти
+&lt;a href="/dashboard"&gt;Dashboard&lt;/a&gt;</code></pre>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- Примери -->
+					<section class="section-card">
+						<header><h3>Демо примери</h3></header>
+						<main>
+							<div class="stack-sm">
+								<div style="padding: 1rem; background: var(--color-bg-secondary); border-radius: var(--radius-md);">
+									<h5 style="margin-top: 0;">Надворешни линкови (ќе се обработат)</h5>
+									<ul style="margin: 0;">
+										<li><a href="https://github.com">GitHub</a></li>
+										<li><a href="https://www.mozilla.org">Mozilla</a></li>
+										<li><a href="https://example.com/page">Example.com</a></li>
+									</ul>
+								</div>
+								<div style="padding: 1rem; background: var(--color-bg-secondary); border-radius: var(--radius-md);">
+									<h5 style="margin-top: 0;">Внатрешни линкови (нема промена)</h5>
+									<ul style="margin: 0;">
+										<li><a href="/">Homepage</a></li>
+										<li><a href="/index.html">Dashboard</a></li>
+										<li><a href="/users/123">User profile</a></li>
+									</ul>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<div class="stack">
+								<div>
+									<h4>Рачна обработка на нов DOM</h4>
+									<pre><code>// По динамичко додавање на HTML
+var newContent = document.getElementById('new-content');
+window.lnExternalLinks.process(newContent);
+
+// Обработи цела страница
+window.lnExternalLinks.process();</code></pre>
+								</div>
+								<div>
+									<h4>Пример за динамичка содржина</h4>
+									<pre><code>// Додај нов HTML динамички
+var html = '&lt;a href="https://new-site.com"&gt;Link&lt;/a&gt;';
+document.getElementById('content').innerHTML += html;
+
+// Рачно обработи го новиот HTML
+window.lnExternalLinks.process(
+    document.getElementById('content')
+);</code></pre>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>Bubbles</th><th>Detail</th><th>Кога</th></tr></thead>
+								<tbody>
+									<tr>
+										<td><code>ln-external-links:processed</code></td>
+										<td>да</td>
+										<td><code>{ link, href }</code></td>
+										<td>Кога линкот е обработен</td>
+									</tr>
+									<tr>
+										<td><code>ln-external-links:clicked</code></td>
+										<td>да</td>
+										<td><code>{ link, href, text }</code></td>
+										<td>Кога корисникот клика на надворешен линк</td>
+									</tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Tracking пример -->
+					<section class="section-card">
+						<header><h3>Tracking пример</h3></header>
+						<main>
+							<pre><code>// Слушај кога корисникот клика надворешен линк
+document.addEventListener('ln-external-links:clicked', function(e) {
+    var href = e.detail.href;
+    var text = e.detail.text;
+    
+    // Испрати tracking
+    console.log('External link clicked:', href, text);
+    
+    // Пример: Google Analytics
+    // gtag('event', 'external_link', {
+    //     'event_label': text,
+    //     'value': href
+    // });
+});
+
+// Слушај кога линкот е обработен
+document.addEventListener('ln-external-links:processed', function(e) {
+    console.log('Link processed:', e.detail.href);
+});</code></pre>
+						</main>
+					</section>
+
+					<!-- HTML пример -->
+					<section class="section-card">
+						<header><h3>HTML пример</h3></header>
+						<main>
+							<pre><code>&lt;!-- Ова е сè што треба! Компонентата се активира автоматски. --&gt;
+&lt;nav&gt;
+    &lt;!-- Внатрешен линк (нема промена) --&gt;
+    &lt;a href="/dashboard"&gt;Dashboard&lt;/a&gt;
+    
+    &lt;!-- Надворешен линк (ќе биде обработен) --&gt;
+    &lt;a href="https://example.com"&gt;External Site&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- Безбедност -->
+					<section class="section-card">
+						<header><h3>Безбедност</h3></header>
+						<main>
+							<p><strong>Зошто <code>rel="noopener noreferrer"</code>?</strong></p>
+							<ul>
+								<li><code>noopener</code> — го спречува новиот tab да пристапи до <code>window.opener</code> (защита од XSS)</li>
+								<li><code>noreferrer</code> — не го испраќа Referer header (приватност)</li>
+							</ul>
+							<p>Компонентата автоматски ги додава оваа атрибути за безбедност.</p>
+						</main>
+					</section>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span class="text-muted">ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>

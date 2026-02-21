@@ -6,17 +6,6 @@
 	<title>Tabs — ln-acme</title>
 	<link rel="stylesheet" href="../dist/ln-acme.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
-	<style>
-		[data-ln-tabs] [data-ln-tab] {
-			padding: 0.5rem 1rem; border: 1px solid var(--color-border); border-bottom: none;
-			background: var(--color-bg-secondary); cursor: pointer; border-radius: var(--radius-md) var(--radius-md) 0 0;
-		}
-		[data-ln-tabs] [data-ln-tab][data-active] {
-			background: var(--color-bg-primary); border-color: var(--color-primary); color: var(--color-primary); font-weight: var(--font-semibold);
-		}
-		[data-ln-panel] { padding: 1.5rem; border: 1px solid var(--color-border); border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md); }
-		[data-ln-panel].hidden { display: none; }
-	</style>
 </head>
 <body>
 	<div style="max-width: 56rem; margin: 0 auto; padding: 2rem 1rem;">
@@ -29,11 +18,11 @@
 			<header><h3>Пример</h3></header>
 			<main>
 				<div data-ln-tabs data-ln-tabs-default="info">
-					<div class="flex gap-1 mb-0">
+					<nav>
 						<button data-ln-tab="info">Информации</button>
 						<button data-ln-tab="settings">Поставки</button>
 						<button data-ln-tab="history">Историја</button>
-					</div>
+					</nav>
 
 					<div data-ln-panel="info">
 						<h4>Информации</h4>
@@ -74,10 +63,10 @@
 				<pre><code>&lt;div data-ln-tabs data-ln-tabs-default="first"&gt;
 
     &lt;!-- Tab копчиња --&gt;
-    &lt;div class="flex gap-1"&gt;
+    &lt;nav&gt;
         &lt;button data-ln-tab="first"&gt;Прв таб&lt;/button&gt;
         &lt;button data-ln-tab="second"&gt;Втор таб&lt;/button&gt;
-    &lt;/div&gt;
+    &lt;/nav&gt;
 
     &lt;!-- Панели --&gt;
     &lt;div data-ln-panel="first"&gt;
