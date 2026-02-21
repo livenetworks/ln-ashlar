@@ -35,8 +35,8 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
-			<img class="logo" src="ln-acme-logo.png" alt="ln-acme" style="width: 2rem; height: 2rem; border-radius: var(--radius-sm);">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
 
@@ -46,7 +46,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<div class="nav-section">CSS компоненти</div>
+					<h6 class="nav-section">CSS компоненти</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -58,7 +58,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<div class="nav-section">JS компоненти</div>
+					<h6 class="nav-section">JS компоненти</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -76,7 +76,7 @@
 			</div>
 
 			<div class="sidebar-footer">
-				<small class="text-muted">acme-gui v1.0.0</small>
+				<small>acme-gui v1.0.0</small>
 			</div>
 		</aside>
 
@@ -85,7 +85,6 @@
 
 			<!-- Content -->
 			<div class="content">
-				<div class="stack-lg">
 					<h1>Accordion</h1>
 					<p>Wrapper компонента која ги координира toggle елементи. Само еден панел може да биде отворен во исто време.</p>
 
@@ -113,34 +112,34 @@
 									<header data-ln-toggle-for="panel1">
 										<strong>Што е ln-acme?</strong>
 									</header>
-									<main id="panel1" data-ln-toggle="open" class="collapsible">
+									<section id="panel1" data-ln-toggle="open" class="collapsible">
 										<section class="collapsible-body">
 											<p>ln-acme е унифициран frontend library за LiveNetworks проекти. Содржи SCSS CSS framework + vanilla JS компоненти, без зависности.</p>
 										</section>
-									</main>
+									</section>
 								</li>
 								<li>
 									<header data-ln-toggle-for="panel2">
 										<strong>Како да се користи?</strong>
 									</header>
-									<main id="panel2" data-ln-toggle class="collapsible">
+									<section id="panel2" data-ln-toggle class="collapsible">
 										<section class="collapsible-body">
 											<p>Можеш да ја користиш како npm пакет, преку git submodule, или директно со <code>&lt;link&gt;</code> и <code>&lt;script&gt;</code> тагови.</p>
 											<pre><code>import 'ln-acme';
 import 'ln-acme/dist/ln-acme.css';</code></pre>
 										</section>
-									</main>
+									</section>
 								</li>
 								<li>
 									<header data-ln-toggle-for="panel3">
 										<strong>Има ли зависности?</strong>
 									</header>
-									<main id="panel3" data-ln-toggle class="collapsible">
+									<section id="panel3" data-ln-toggle class="collapsible">
 										<section class="collapsible-body">
 											<p>ln-acme е полностојно независен. Сите JS компоненти се напишани во vanilla JavaScript користејќи IIFE pattern.</p>
 											<p><strong>Исклучок:</strong> ln-select зависи од TomSelect (peer dependency).</p>
 										</section>
-									</main>
+									</section>
 								</li>
 							</ul>
 						</main>
@@ -151,12 +150,12 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 						<header><h3>Пример — Сложен Accordion</h3></header>
 						<main>
 							<ul data-ln-accordion>
-								<li class="card">
+								<li>
 									<header data-ln-toggle-for="sec1">
 										<h4>Корисничка документација</h4>
 									</header>
-									<main id="sec1" data-ln-toggle="open" class="collapsible">
-										<section class="collapsible-body" style="padding: 1rem;">
+									<section id="sec1" data-ln-toggle="open" class="collapsible">
+										<section class="collapsible-body">
 											<ul>
 												<li><a href="#">Почеток</a></li>
 												<li><a href="#">Инсталација</a></li>
@@ -164,14 +163,14 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 												<li><a href="#">Best Practices</a></li>
 											</ul>
 										</section>
-									</main>
+									</section>
 								</li>
-								<li class="card">
+								<li>
 									<header data-ln-toggle-for="sec2">
 										<h4>CSS Компоненти</h4>
 									</header>
-									<main id="sec2" data-ln-toggle class="collapsible">
-										<section class="collapsible-body" style="padding: 1rem;">
+									<section id="sec2" data-ln-toggle class="collapsible">
+										<section class="collapsible-body">
 											<ul>
 												<li><a href="#">Картички</a></li>
 												<li><a href="#">Форми</a></li>
@@ -180,14 +179,14 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 												<li><a href="#">Layout</a></li>
 											</ul>
 										</section>
-									</main>
+									</section>
 								</li>
-								<li class="card">
+								<li>
 									<header data-ln-toggle-for="sec3">
 										<h4>JS Компоненти</h4>
 									</header>
-									<main id="sec3" data-ln-toggle class="collapsible">
-										<section class="collapsible-body" style="padding: 1rem;">
+									<section id="sec3" data-ln-toggle class="collapsible">
+										<section class="collapsible-body">
 											<ul>
 												<li><a href="#">Modal</a></li>
 												<li><a href="#">Toast</a></li>
@@ -196,7 +195,7 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 												<li><a href="#">AJAX</a></li>
 											</ul>
 										</section>
-									</main>
+									</section>
 								</li>
 							</ul>
 						</main>
@@ -206,24 +205,22 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 					<section class="section-card">
 						<header><h3>API &amp; Events</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<h4>Constructor</h4>
-									<pre><code>// Рачна иницијализација
+							<article>
+								<h4>Constructor</h4>
+								<pre><code>// Рачна иницијализација
 window.lnAccordion(document.body);</code></pre>
-								</div>
-								<div>
-									<h4>Events</h4>
-									<p>Accordion слуша на <code>ln-toggle:open</code> events од decendent toggle елементи и затвора ги останатите панели.</p>
-									<table>
-										<thead><tr><th>Event</th><th>Кога</th></tr></thead>
-										<tbody>
-											<tr><td><code>ln-toggle:open</code></td><td>Кога еден панел се отвора</td></tr>
-											<tr><td><code>ln-toggle:close</code></td><td>Кога еден панел се затвора</td></tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
+							</article>
+							<article>
+								<h4>Events</h4>
+								<p>Accordion слуша на <code>ln-toggle:open</code> events од decendent toggle елементи и затвора ги останатите панели.</p>
+								<table>
+									<thead><tr><th>Event</th><th>Кога</th></tr></thead>
+									<tbody>
+										<tr><td><code>ln-toggle:open</code></td><td>Кога еден панел се отвора</td></tr>
+										<tr><td><code>ln-toggle:close</code></td><td>Кога еден панел се затвора</td></tr>
+									</tbody>
+								</table>
+							</article>
 						</main>
 					</section>
 
@@ -236,22 +233,22 @@ window.lnAccordion(document.body);</code></pre>
         &lt;header data-ln-toggle-for="panel1"&gt;
             &lt;strong&gt;Наслов 1&lt;/strong&gt;
         &lt;/header&gt;
-        &lt;main id="panel1" data-ln-toggle="open" class="collapsible"&gt;
+        &lt;section id="panel1" data-ln-toggle="open" class="collapsible"&gt;
             &lt;section class="collapsible-body"&gt;
                 &lt;p&gt;Содржина 1 — почнува отворена&lt;/p&gt;
             &lt;/section&gt;
-        &lt;/main&gt;
+        &lt;/section&gt;
     &lt;/li&gt;
 
     &lt;li&gt;
         &lt;header data-ln-toggle-for="panel2"&gt;
             &lt;strong&gt;Наслов 2&lt;/strong&gt;
         &lt;/header&gt;
-        &lt;main id="panel2" data-ln-toggle class="collapsible"&gt;
+        &lt;section id="panel2" data-ln-toggle class="collapsible"&gt;
             &lt;section class="collapsible-body"&gt;
                 &lt;p&gt;Содржина 2 — почнува затворена&lt;/p&gt;
             &lt;/section&gt;
-        &lt;/main&gt;
+        &lt;/section&gt;
     &lt;/li&gt;
 &lt;/ul&gt;</code></pre>
 						</main>
@@ -265,13 +262,12 @@ window.lnAccordion(document.body);</code></pre>
 							<pre><code>&lt;script src="dist/ln-acme.iife.js"&gt;&lt;/script&gt;</code></pre>
 						</main>
 					</section>
-				</div>
 			</div>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
-				<span class="text-muted">ln-acme v1.0.0</span>
+				<span>ln-acme v1.0.0</span>
 			</footer>
 		</div>
 		</div><!-- /.app-body -->

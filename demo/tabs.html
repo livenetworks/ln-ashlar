@@ -4,119 +4,138 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Tabs — ln-acme</title>
-	<link rel="stylesheet" href="demo.css">
 	<link rel="stylesheet" href="../dist/ln-acme.css">
+	<link rel="stylesheet" href="demo.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 </head>
 <body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="app-header">
-			<button onclick="window.lnToggle.toggle('demo-sidebar')" style="width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&#9776;</button>
-			<h1>Tabs</h1>
-			<button onclick="window.lnToast.enqueue({type:'success', title:'Пример', message:'Ова е пример на успешен toast нотификација'})" class="btn btn--sm">Test Toast</button>
-		</div>
-
-		<!-- Body -->
-		<div class="app-body">
-			<!-- Sidebar -->
-			<div id="demo-sidebar" class="sidebar" role="navigation" data-ln-toggle="demo-sidebar" data-ln-toggle-target="#demo-sidebar">
-				<div class="sidebar-header">
-					<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
-					<img class="logo" src="ln-acme-logo.png" alt="ln-acme" style="width: 2rem; height: 2rem; border-radius: var(--radius-sm);">
-					<span class="app-name">acme-gui</span>
-				</div>
-
-				<nav>
-					<h5>CSS</h5>
-					<ul class="nav-group">
-						<li><a href="cards.html">Cards</a></li>
-						<li><a href="forms.html">Forms</a></li>
-						<li><a href="icons.html">Icons</a></li>
-						<li><a href="layout.html">Layout</a></li>
-						<li><a href="sections.html">Sections</a></li>
-						<li><a href="tables.html">Tables</a></li>
-						<li><a href="typography.html">Typography</a></li>
-						<li><a href="utilities.html">Utilities</a></li>
-					</ul>
-
-					<h5>JS</h5>
-					<ul class="nav-group">
-						<li><a href="accordion.html">Accordion</a></li>
-						<li><a href="ajax.html">AJAX</a></li>
-						<li><a href="external-links.html">External Links</a></li>
-						<li><a href="nav.html">Nav</a></li>
-						<li><a href="progress.html">Progress</a></li>
-						<li><a href="select.html">Select</a></li>
-						<li><a href="toggle.html">Toggle</a></li>
-						<li><a href="modal.html">Modal</a></li>
-						<li><a href="tabs.html" class="current">Tabs</a></li>
-						<li><a href="toast.html">Toast</a></li>
-						<li><a href="upload.html">Upload</a></li>
-					</ul>
-				</nav>
-
-				<div class="sidebar-footer">
-					<small class="text-muted">v1.0.0</small>
+		<div class="header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Tabs</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Tabs компонента со hash sync.'})">
+						Test Toast
+					</button>
 				</div>
 			</div>
+		</div>
 
-			<!-- Main panel -->
-			<div class="main-panel">
-				<!-- Content -->
-				<div class="content">
-					<nav class="breadcrumbs"><li><a href="index.html">Demo</a></li><li class="current">Tabs</li></nav>
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS компоненти</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS компоненти</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
 					<h1>Tabs</h1>
-		<p>Hash-aware табови. Синхронизирани со URL hash (<code>#tab-key</code>).</p>
+					<p>Hash-aware табови. Синхронизирани со URL hash (<code>#tab-key</code>).</p>
 
-		<!-- Basic tabs -->
-		<section class="section-card">
-			<header><h3>Пример</h3></header>
-			<main>
-				<div data-ln-tabs data-ln-tabs-default="info">
-					<nav>
-						<button data-ln-tab="info">Информации</button>
-						<button data-ln-tab="settings">Поставки</button>
-						<button data-ln-tab="history">Историја</button>
-					</nav>
+					<!-- Basic tabs -->
+					<section class="section-card" id="tabs-example">
+						<header><h3>Пример</h3></header>
+						<main>
+							<section data-ln-tabs data-ln-tabs-default="info">
+								<nav>
+									<button data-ln-tab="info">Информации</button>
+									<button data-ln-tab="settings">Поставки</button>
+									<button data-ln-tab="history">Историја</button>
+								</nav>
 
-					<div data-ln-panel="info">
-						<h4>Информации</h4>
-						<p>Ова е содржината на првиот таб.</p>
-						<p class="text-sm text-secondary">Промени го URL hash на <code>#settings</code> за да видиш синхронизација.</p>
-					</div>
+								<section data-ln-panel="info">
+									<h4>Информации</h4>
+									<p>Ова е содржината на првиот таб.</p>
+									<p>Промени го URL hash на <code>#settings</code> за да видиш синхронизација.</p>
+								</section>
 
-					<div data-ln-panel="settings" class="hidden">
-						<h4>Поставки</h4>
-						<div class="form-group">
-							<label for="t-lang">Јазик</label>
-							<select id="t-lang"><option>Македонски</option><option>English</option></select>
-						</div>
-						<div class="form-group">
-							<label for="t-tz">Timezone</label>
-							<input type="text" id="t-tz" value="Europe/Skopje">
-						</div>
-					</div>
+								<section data-ln-panel="settings" class="hidden">
+									<h4>Поставки</h4>
+									<div class="form-group">
+										<label for="t-lang">Јазик</label>
+										<select id="t-lang"><option>Македонски</option><option>English</option></select>
+									</div>
+									<div class="form-group">
+										<label for="t-tz">Timezone</label>
+										<input type="text" id="t-tz" value="Europe/Skopje">
+									</div>
+								</section>
 
-					<div data-ln-panel="history" class="hidden">
-						<h4>Историја</h4>
-						<table>
-							<thead><tr><th>Датум</th><th>Акција</th><th>Корисник</th></tr></thead>
-							<tbody>
-								<tr><td>19.02.2026</td><td>Креирано</td><td>Марко</td></tr>
-								<tr><td>18.02.2026</td><td>Ажурирано</td><td>Ана</td></tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</main>
-		</section>
+								<section data-ln-panel="history" class="hidden">
+									<h4>Историја</h4>
+									<table>
+										<thead><tr><th>Датум</th><th>Акција</th><th>Корисник</th></tr></thead>
+										<tbody>
+											<tr><td>19.02.2026</td><td>Креирано</td><td>Марко</td></tr>
+											<tr><td>18.02.2026</td><td>Ажурирано</td><td>Ана</td></tr>
+										</tbody>
+									</table>
+								</section>
+							</section>
+						</main>
+					</section>
 
-		<!-- HTML -->
-		<section class="section-card">
-			<header><h3>HTML</h3></header>
-			<main>
-				<pre><code>&lt;div data-ln-tabs data-ln-tabs-default="first"&gt;
+					<!-- HTML -->
+					<section class="section-card">
+						<header><h3>HTML</h3></header>
+						<main>
+							<pre><code>&lt;section data-ln-tabs data-ln-tabs-default="first"&gt;
 
     &lt;!-- Tab копчиња --&gt;
     &lt;nav&gt;
@@ -125,15 +144,15 @@
     &lt;/nav&gt;
 
     &lt;!-- Панели --&gt;
-    &lt;div data-ln-panel="first"&gt;
+    &lt;section data-ln-panel="first"&gt;
         Содржина на прв таб
-    &lt;/div&gt;
+    &lt;/section&gt;
 
-    &lt;div data-ln-panel="second" class="hidden"&gt;
+    &lt;section data-ln-panel="second" class="hidden"&gt;
         Содржина на втор таб
-    &lt;/div&gt;
+    &lt;/section&gt;
 
-&lt;/div&gt;
+&lt;/section&gt;
 
 &lt;!-- Атрибути --&gt;
 data-ln-tabs              - контејнер
@@ -143,15 +162,17 @@ data-ln-tab="key"          - таб копче
 data-ln-panel="key"        - панел содржина
 
 &lt;!-- Hash sync: #second → активирај second таб --&gt;</code></pre>
-			</main>
-		</section>
-				</div>
+						</main>
+					</section>
 			</div>
-		</div>
-	</div>
 
-	<footer class="app-footer">
-		<small>&copy; 2024 ln-acme Demo</small>
-	</footer>
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
 </body>
 </html>

@@ -1,5 +1,41 @@
 @use '../scss/config/mixins' as *;
 
+// ==========================================================================
+// Demo Shell — shared across all pages
+// ==========================================================================
+
+.sidebar-header [data-ln-toggle-action="close"] {
+	@include close-button;
+	@include absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+}
+
+.sidebar-header .logo {
+	@include size(2rem);
+	@include rounded-sm;
+}
+
+.sidebar-footer small {
+	@include text-muted;
+}
+
+.content {
+	@include stack(1.5rem);
+}
+
+.footer span:last-child {
+	@include text-muted;
+}
+
+// Button groups (replaces <div class="row" style="flex-wrap:wrap"> and <div class="flex gap-3" ...>)
+.demo-actions {
+	@include flex;
+	@include items-center;
+	@include gap(1rem);
+	@include flex-wrap;
+}
+
 .demo-links {
 	@include grid-2;
 	list-style: none;
@@ -75,16 +111,322 @@
 	@include pt(var(--spacing-md));
 }
 
-/* Toggle collapsible demo */
-#server-status {
-	max-height: 0;
-	@include py(0);
-	@include overflow-hidden;
-	@include transition;
+// ==========================================================================
+// Demo note box (warning/info callout)
+// ==========================================================================
 
-	&.open {
-		max-height: 100vh;
-		@include py(var(--spacing-sm));
-		overflow: auto;
+.demo-note {
+	@include p(1rem);
+	background: var(--color-bg-warning);
+	@include border;
+	@include rounded-md;
+}
+
+// ==========================================================================
+// Page: Dashboard (index.html)
+// ==========================================================================
+
+#stats {
+	ul {
+		@include grid-4;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	li {
+		@include card;
+		@include p(1rem);
+	}
+
+	h3 {
+		@include text-sm;
+		@include text-secondary;
+		@include font-normal;
+		margin: 0;
+	}
+
+	strong {
+		@include text-2xl;
+		@include font-bold;
+		@include block;
+	}
+
+	[data-ln-progress] {
+		@include mt(0.5rem);
+	}
+}
+
+#demo-tabs .demo-panel > p:last-child {
+	@include text-sm;
+	@include text-secondary;
+}
+
+#demo-panels {
+	@include grid-2;
+}
+
+#demo-toggle article > header {
+	@include flex;
+	@include justify-between;
+	@include items-center;
+	@include pb(0.75rem);
+	@include mb(0.75rem);
+	@include border-b;
+
+	button {
+		@include px(0.5rem);
+		@include py(0.25rem);
+		@include text-xs;
+	}
+}
+
+#demo-progress {
+	ul {
+		@include stack;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	h4 {
+		@include text-sm;
+		@include text-secondary;
+		@include font-normal;
+		margin: 0;
+	}
+}
+
+#demo-ajax-info {
+	@include stack(0.5rem);
+
+	figure {
+		@include card;
+		@include p(1rem);
+		margin: 0;
+	}
+
+	> p {
+		@include text-sm;
+		@include text-secondary;
+	}
+}
+
+// ==========================================================================
+// Page: Cards (cards.html)
+// ==========================================================================
+
+#demo-basic-cards {
+	@include grid-2;
+
+	article {
+		@include card;
+		@include p(1rem);
+
+		p {
+			@include text-sm;
+			@include text-secondary;
+			margin: 0;
+		}
+	}
+}
+
+// ==========================================================================
+// Page: External Links (external-links.html)
+// ==========================================================================
+
+.demo-link-group {
+	@include p(1rem);
+	@include bg-secondary;
+	@include rounded-md;
+
+	h5 {
+		margin-top: 0;
+		@include mb(0.5rem);
+	}
+
+	ul {
+		margin: 0;
+	}
+}
+
+// ==========================================================================
+// Page: Forms (forms.html)
+// ==========================================================================
+
+#forms-actions > p {
+	@include text-sm;
+	@include text-secondary;
+}
+
+// ==========================================================================
+// Page: Nav (nav.html)
+// ==========================================================================
+
+.demo-nav-example {
+	@include border;
+	@include p(1rem);
+	@include rounded-md;
+
+	h5 {
+		margin-top: 0;
+		@include mb(0.5rem);
+	}
+
+	nav {
+		@include flex;
+		@include gap(1rem);
+		@include py(0.5rem);
+	}
+}
+
+// ==========================================================================
+// Page: Progress (progress.html)
+// ==========================================================================
+
+.demo-progress-item {
+	h4 {
+		@include text-sm;
+		@include text-secondary;
+		@include font-normal;
+		margin: 0;
+		@include mb(0.5rem);
+	}
+}
+
+#progress-reactive nav {
+	@include flex;
+	@include gap(0.5rem);
+	@include mt(0.5rem);
+}
+
+// ==========================================================================
+// Page: Select (select.html)
+// ==========================================================================
+
+.section-card form {
+	@include stack;
+}
+
+#select-graceful > p:last-child {
+	@include p(1rem);
+	@include bg-secondary;
+	@include rounded-md;
+	@include text-muted;
+}
+
+// ==========================================================================
+// Page: Tabs (tabs.html)
+// ==========================================================================
+
+#tabs-example [data-ln-panel] > p:last-child {
+	@include text-sm;
+	@include text-secondary;
+}
+
+// ==========================================================================
+// Page: Toggle (toggle.html)
+// ==========================================================================
+
+.demo-toggle-sidebar {
+	@include flex;
+	@include gap(1rem);
+	min-height: 12rem;
+	@include border;
+	@include rounded-md;
+	overflow: hidden;
+
+	aside {
+		@include relative;
+		@include p(1rem);
+		@include bg-secondary;
+		width: 12rem;
+		@include border-r;
+		@include transition;
+
+		&:not(.open) {
+			margin-left: -12rem;
+		}
+
+		h4 {
+			margin: 0;
+			@include mb(0.5rem);
+		}
+
+		ul {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		button[data-ln-toggle-action="close"] {
+			@include close-button;
+			@include absolute;
+			top: 0.25rem;
+			right: 0.25rem;
+		}
+	}
+
+	> article {
+		@include p(1rem);
+		@include flex;
+		flex-direction: column;
+		@include gap(0.5rem);
+	}
+}
+
+.demo-toggle-collapsible {
+	@include border;
+	@include rounded-md;
+
+	> header {
+		@include flex;
+		@include justify-between;
+		@include items-center;
+		@include p(1rem);
+		@include border-b;
+	}
+
+	.collapsible-body {
+		@include p(1rem);
+		@include stack(0.5rem);
+	}
+}
+
+.demo-toggle-dropdown {
+	@include relative;
+
+	ul {
+		display: none;
+		@include absolute;
+		top: 100%;
+		left: 0;
+		@include mt(0.25rem);
+		@include bg-primary;
+		@include border;
+		@include rounded-md;
+		@include shadow-md;
+		list-style: none;
+		padding: 0;
+		margin-top: 0.25rem;
+		min-width: 10rem;
+		z-index: 10;
+
+		&.open {
+			display: block;
+		}
+
+		a {
+			@include block;
+			@include px(1rem);
+			@include py(0.5rem);
+			text-decoration: none;
+			color: inherit;
+			@include transition;
+
+			&:hover {
+				@include bg-secondary;
+			}
+		}
 	}
 }

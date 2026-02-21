@@ -4,7 +4,13 @@
       "Bash(npm run build:*)",
       "Bash(for f in demo/index.html demo/box.html demo/modal.html demo/toast.html demo/tabs.html demo/upload.html demo/cards.html demo/forms.html demo/icons.html demo/layout.html demo/sections.html demo/tables.html demo/typography.html demo/utilities.html)",
       "Bash(do sed -i 's/ln-frontend/ln-acme/g' \"$f\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(python3:*)",
+      "Bash(\"/c/Users/Dalibor Sojic/AppData/Local/Microsoft/WindowsApps/python3\" --version)",
+      "Bash(node --version:*)",
+      "Bash(node -e:*)",
+      "Bash(grep:*)",
+      "Bash(node:*)"
     ]
   }
 }

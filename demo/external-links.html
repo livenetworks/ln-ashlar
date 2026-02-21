@@ -35,8 +35,8 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
-			<img class="logo" src="ln-acme-logo.png" alt="ln-acme" style="width: 2rem; height: 2rem; border-radius: var(--radius-sm);">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
 
@@ -46,7 +46,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<div class="nav-section">CSS компоненти</div>
+					<h6 class="nav-section">CSS компоненти</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -58,7 +58,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<div class="nav-section">JS компоненти</div>
+					<h6 class="nav-section">JS компоненти</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -76,7 +76,7 @@
 			</div>
 
 			<div class="sidebar-footer">
-				<small class="text-muted">acme-gui v1.0.0</small>
+				<small>acme-gui v1.0.0</small>
 			</div>
 		</aside>
 
@@ -85,7 +85,6 @@
 
 			<!-- Content -->
 			<div class="content">
-				<div class="stack-lg">
 					<h1>External Links</h1>
 					<p>Utility компонента која автоматски ги обработува надворешните линкови за безбедност и tracking. <strong>Нема потреба од data attribute — работи автоматски.</strong></p>
 
@@ -93,24 +92,23 @@
 					<section class="section-card">
 						<header><h3>Основи</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<h4>Што оди?</h4>
-									<p>За секој линк чиј <code>hostname</code> се разликува од <code>window.location.hostname</code>:</p>
-									<ol>
-										<li>Добива <code>target="_blank"</code> (отвора во нов tab)</li>
-										<li>Добива <code>rel="noopener noreferrer"</code> (безбедност)</li>
-										<li>Се означува со <code>data-ln-external-link="processed"</code></li>
-									</ol>
-								</div>
-								<div>
-									<h4>Пример</h4>
-									<pre><code>// Пред
+							<article>
+								<h4>Што оди?</h4>
+								<p>За секој линк чиј <code>hostname</code> се разликува од <code>window.location.hostname</code>:</p>
+								<ol>
+									<li>Добива <code>target="_blank"</code> (отвора во нов tab)</li>
+									<li>Добива <code>rel="noopener noreferrer"</code> (безбедност)</li>
+									<li>Се означува со <code>data-ln-external-link="processed"</code></li>
+								</ol>
+							</article>
+							<article>
+								<h4>Пример</h4>
+								<pre><code>// Пред
 &lt;a href="https://example.com"&gt;External link&lt;/a&gt;
 
 // По обработка (автоматски)
-&lt;a href="https://example.com" 
-   target="_blank" 
+&lt;a href="https://example.com"
+   target="_blank"
    rel="noopener noreferrer"
    data-ln-external-link="processed"&gt;
     External link
@@ -118,8 +116,7 @@
 
 // Внатрешни линкови остануваат исти
 &lt;a href="/dashboard"&gt;Dashboard&lt;/a&gt;</code></pre>
-								</div>
-							</div>
+							</article>
 						</main>
 					</section>
 
@@ -127,24 +124,22 @@
 					<section class="section-card">
 						<header><h3>Демо примери</h3></header>
 						<main>
-							<div class="stack-sm">
-								<div style="padding: 1rem; background: var(--color-bg-secondary); border-radius: var(--radius-md);">
-									<h5 style="margin-top: 0;">Надворешни линкови (ќе се обработат)</h5>
-									<ul style="margin: 0;">
-										<li><a href="https://github.com">GitHub</a></li>
-										<li><a href="https://www.mozilla.org">Mozilla</a></li>
-										<li><a href="https://example.com/page">Example.com</a></li>
-									</ul>
-								</div>
-								<div style="padding: 1rem; background: var(--color-bg-secondary); border-radius: var(--radius-md);">
-									<h5 style="margin-top: 0;">Внатрешни линкови (нема промена)</h5>
-									<ul style="margin: 0;">
-										<li><a href="/">Homepage</a></li>
-										<li><a href="/index.html">Dashboard</a></li>
-										<li><a href="/users/123">User profile</a></li>
-									</ul>
-								</div>
-							</div>
+							<article class="demo-link-group">
+								<h5>Надворешни линкови (ќе се обработат)</h5>
+								<ul>
+									<li><a href="https://github.com">GitHub</a></li>
+									<li><a href="https://www.mozilla.org">Mozilla</a></li>
+									<li><a href="https://example.com/page">Example.com</a></li>
+								</ul>
+							</article>
+							<article class="demo-link-group">
+								<h5>Внатрешни линкови (нема промена)</h5>
+								<ul>
+									<li><a href="/">Homepage</a></li>
+									<li><a href="/index.html">Dashboard</a></li>
+									<li><a href="/users/123">User profile</a></li>
+								</ul>
+							</article>
 						</main>
 					</section>
 
@@ -152,19 +147,18 @@
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<h4>Рачна обработка на нов DOM</h4>
-									<pre><code>// По динамичко додавање на HTML
+							<article>
+								<h4>Рачна обработка на нов DOM</h4>
+								<pre><code>// По динамичко додавање на HTML
 var newContent = document.getElementById('new-content');
 window.lnExternalLinks.process(newContent);
 
 // Обработи цела страница
 window.lnExternalLinks.process();</code></pre>
-								</div>
-								<div>
-									<h4>Пример за динамичка содржина</h4>
-									<pre><code>// Додај нов HTML динамички
+							</article>
+							<article>
+								<h4>Пример за динамичка содржина</h4>
+								<pre><code>// Додај нов HTML динамички
 var html = '&lt;a href="https://new-site.com"&gt;Link&lt;/a&gt;';
 document.getElementById('content').innerHTML += html;
 
@@ -172,8 +166,7 @@ document.getElementById('content').innerHTML += html;
 window.lnExternalLinks.process(
     document.getElementById('content')
 );</code></pre>
-								</div>
-							</div>
+							</article>
 						</main>
 					</section>
 
@@ -254,13 +247,12 @@ document.addEventListener('ln-external-links:processed', function(e) {
 							<p>Компонентата автоматски ги додава оваа атрибути за безбедност.</p>
 						</main>
 					</section>
-				</div>
 			</div>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
-				<span class="text-muted">ln-acme v1.0.0</span>
+				<span>ln-acme v1.0.0</span>
 			</footer>
 		</div>
 		</div><!-- /.app-body -->

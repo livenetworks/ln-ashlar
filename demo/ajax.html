@@ -35,8 +35,8 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
-			<img class="logo" src="ln-acme-logo.png" alt="ln-acme" style="width: 2rem; height: 2rem; border-radius: var(--radius-sm);">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
 
@@ -46,7 +46,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<div class="nav-section">CSS компоненти</div>
+					<h6 class="nav-section">CSS компоненти</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -58,7 +58,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<div class="nav-section">JS компоненти</div>
+					<h6 class="nav-section">JS компоненти</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -76,7 +76,7 @@
 			</div>
 
 			<div class="sidebar-footer">
-				<small class="text-muted">acme-gui v1.0.0</small>
+				<small>acme-gui v1.0.0</small>
 			</div>
 		</aside>
 
@@ -85,7 +85,6 @@
 
 			<!-- Content -->
 			<div class="content">
-				<div class="stack-lg">
 					<h1>AJAX</h1>
 					<p>Навигациска компонента — линкови и форми внатре во <strong>data-ln-ajax</strong> контејнер се праќаат асинхроно, без полн reload на страница.</p>
 
@@ -107,19 +106,18 @@
 					<section class="section-card">
 						<header><h3>AJAX Линкови</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<h4>Однесување</h4>
-									<ul>
-										<li>Клик на линк → GET AJAX request на <code>href</code></li>
-										<li>Ctrl/Cmd+Click → Отвора во нов tab (нормално)</li>
-										<li>Middle click → Отвора во нов tab (нормално)</li>
-										<li>Линкови со <code>#</code> → прескокнато</li>
-										<li>По успешен одговор → URL се додава во browser history (pushState)</li>
-									</ul>
-								</div>
-								<div>
-									<h4>HTML пример</h4>
+							<article>
+								<h4>Однесување</h4>
+								<ul>
+									<li>Клик на линк → GET AJAX request на <code>href</code></li>
+									<li>Ctrl/Cmd+Click → Отвора во нов tab (нормално)</li>
+									<li>Middle click → Отвора во нов tab (нормално)</li>
+									<li>Линкови со <code>#</code> → прескокнато</li>
+									<li>По успешен одговор → URL се додава во browser history (pushState)</li>
+								</ul>
+							</article>
+							<article>
+								<h4>HTML пример</h4>
 									<pre><code>&lt;div data-ln-ajax&gt;
     &lt;a href="/users"&gt;Корисници&lt;/a&gt;
     &lt;a href="/settings"&gt;Поставки&lt;/a&gt;
@@ -127,8 +125,7 @@
     &lt;!-- Исклучи конкретен линк --&gt;
     &lt;a href="/login" data-ln-ajax="false"&gt;Логирај се&lt;/a&gt;
 &lt;/div&gt;</code></pre>
-								</div>
-							</div>
+							</article>
 						</main>
 					</section>
 
@@ -136,26 +133,24 @@
 					<section class="section-card">
 						<header><h3>AJAX Форми</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<h4>Однесување</h4>
-									<ul>
-										<li>Submit → AJAX request (method и action од формата)</li>
+							<article>
+								<h4>Однесување</h4>
+								<ul>
+									<li>Submit → AJAX request (method и action од формата)</li>
 										<li>FormData → автоматски се креира</li>
 										<li>Копчињата на формата → disable за време на request</li>
 										<li>GET форми → параметри во URL + pushState</li>
 										<li>POST/PUT/DELETE → body е FormData</li>
 									</ul>
-								</div>
-								<div>
-									<h4>HTML пример</h4>
-									<pre><code>&lt;form data-ln-ajax method="POST" action="/api/users"&gt;
+							</article>
+							<article>
+								<h4>HTML пример</h4>
+								<pre><code>&lt;form data-ln-ajax method="POST" action="/api/users"&gt;
     &lt;input type="text" name="name" placeholder="Име"&gt;
     &lt;input type="email" name="email" placeholder="Email"&gt;
     &lt;button type="submit"&gt;Зачувај&lt;/button&gt;
 &lt;/form&gt;</code></pre>
-								</div>
-							</div>
+							</article>
 						</main>
 					</section>
 
@@ -192,14 +187,13 @@
 					<section class="section-card">
 						<header><h3>CSS класи за loading state</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<h4>За време на request</h4>
-									<p>Елементот добива класа <code>.ln-ajax--loading</code>. Користи ја за визуелна повратна информација.</p>
-								</div>
-								<div>
-									<h4>SCSS пример</h4>
-									<pre><code>a.ln-ajax--loading {
+							<article>
+								<h4>За време на request</h4>
+								<p>Елементот добива класа <code>.ln-ajax--loading</code>. Користи ја за визуелна повратна информација.</p>
+							</article>
+							<article>
+								<h4>SCSS пример</h4>
+								<pre><code>a.ln-ajax--loading {
     opacity: 0.6;
     pointer-events: none;
 }
@@ -207,8 +201,7 @@
 button.ln-ajax--loading {
     cursor: wait;
 }</code></pre>
-								</div>
-							</div>
+							</article>
 						</main>
 					</section>
 
@@ -240,19 +233,18 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 					<section class="section-card">
 						<header><h3>Белешки</h3></header>
 						<main>
-							<div style="padding: 1rem; background: var(--color-bg-warning); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+							<article class="demo-note">
 								<p><strong>Позната ограничување:</strong> ln-ajax тренутно нема CustomEvent dispatching за AJAX lifecycle (започнало, завршено, грешка).</p>
 								<p>За интеграција во веќе-постоечки AJAX sistem, препорачуваме рачна имплементација на Fetch + DOM манипулација.</p>
-							</div>
+							</article>
 						</main>
 					</section>
-				</div>
 			</div>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
-				<span class="text-muted">ln-acme v1.0.0</span>
+				<span>ln-acme v1.0.0</span>
 			</footer>
 		</div>
 		</div><!-- /.app-body -->

@@ -35,8 +35,8 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
-			<img class="logo" src="ln-acme-logo.png" alt="ln-acme" style="width: 2rem; height: 2rem; border-radius: var(--radius-sm);">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
 
@@ -46,7 +46,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<div class="nav-section">CSS компоненти</div>
+					<h6 class="nav-section">CSS компоненти</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -58,7 +58,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<div class="nav-section">JS компоненти</div>
+					<h6 class="nav-section">JS компоненти</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -76,7 +76,7 @@
 			</div>
 
 			<div class="sidebar-footer">
-				<small class="text-muted">acme-gui v1.0.0</small>
+				<small>acme-gui v1.0.0</small>
 			</div>
 		</aside>
 
@@ -85,7 +85,6 @@
 
 			<!-- Content -->
 			<div class="content">
-				<div class="stack-lg">
 					<h1>Progress</h1>
 					<p>Progress bar компонента — визуелен индикатор за напредок. Реактивен: автоматски се ажурира кога атрибутите се менуваат.</p>
 
@@ -124,32 +123,32 @@
 					<section class="section-card">
 						<header><h3>Пример — Единечни progress bar</h3></header>
 						<main>
-							<div class="stack-sm">
-								<div>
-									<p style="margin-bottom: 0.5rem;">Успех (80%)</p>
+							<ul class="demo-progress-item">
+								<li>
+									<h4>Успех (80%)</h4>
 									<div data-ln-progress>
 										<div data-ln-progress="80" class="green"></div>
 									</div>
-								</div>
-								<div>
-									<p style="margin-bottom: 0.5rem;">Внимание (50%)</p>
+								</li>
+								<li>
+									<h4>Внимание (50%)</h4>
 									<div data-ln-progress>
 										<div data-ln-progress="50" class="yellow"></div>
 									</div>
-								</div>
-								<div>
-									<p style="margin-bottom: 0.5rem;">Грешка (25%)</p>
+								</li>
+								<li>
+									<h4>Грешка (25%)</h4>
 									<div data-ln-progress>
 										<div data-ln-progress="25" class="red"></div>
 									</div>
-								</div>
-								<div>
-									<p style="margin-bottom: 0.5rem;">Default (60%)</p>
+								</li>
+								<li>
+									<h4>Default (60%)</h4>
 									<div data-ln-progress>
 										<div data-ln-progress="60"></div>
 									</div>
-								</div>
-							</div>
+								</li>
+							</ul>
 						</main>
 					</section>
 
@@ -157,20 +156,20 @@
 					<section class="section-card">
 						<header><h3>Пример — Со максимална вредност</h3></header>
 						<main>
-							<div class="stack-sm">
-								<div>
-									<p style="margin-bottom: 0.5rem;">Storage: 7.5 GB од 10 GB</p>
+							<ul class="demo-progress-item">
+								<li>
+									<h4>Storage: 7.5 GB од 10 GB</h4>
 									<div data-ln-progress>
 										<div data-ln-progress="7.5" data-ln-progress-max="10" class="yellow"></div>
 									</div>
-								</div>
-								<div>
-									<p style="margin-bottom: 0.5rem;">Backup: 45 од 50 items</p>
+								</li>
+								<li>
+									<h4>Backup: 45 од 50 items</h4>
 									<div data-ln-progress>
 										<div data-ln-progress="45" data-ln-progress-max="50" class="green"></div>
 									</div>
-								</div>
-							</div>
+								</li>
+							</ul>
 						</main>
 					</section>
 
@@ -178,24 +177,24 @@
 					<section class="section-card">
 						<header><h3>Пример — Stacked progress (повеќе сегменти)</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<p style="margin-bottom: 0.5rem;">Ресурси (%) — CPU, RAM, Disk</p>
+							<ul class="demo-progress-item">
+								<li>
+									<h4>Ресурси (%) — CPU, RAM, Disk</h4>
 									<div data-ln-progress>
 										<div data-ln-progress="40" class="green"></div>
 										<div data-ln-progress="30" class="yellow"></div>
 										<div data-ln-progress="30" class="red"></div>
 									</div>
-								</div>
-								<div>
-									<p style="margin-bottom: 0.5rem;">Задачи — 4 завршени, 2 во тек, 1 чека</p>
+								</li>
+								<li>
+									<h4>Задачи — 4 завршени, 2 во тек, 1 чека</h4>
 									<div data-ln-progress>
 										<div data-ln-progress="4" class="green"></div>
 										<div data-ln-progress="2" class="yellow"></div>
 										<div data-ln-progress="1" class="red"></div>
 									</div>
-								</div>
-							</div>
+								</li>
+							</ul>
 						</main>
 					</section>
 
@@ -203,18 +202,18 @@
 					<section class="section-card">
 						<header><h3>Реактивност — напредок се ажурира</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<p style="margin-bottom: 0.5rem;">Клик за промена на вредност:</p>
+							<ul class="demo-progress-item">
+								<li>
+									<h4>Клик за промена на вредност:</h4>
 									<div id="react-progress" data-ln-progress>
 										<div id="react-bar" data-ln-progress="0" class="green"></div>
 									</div>
-									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '25')" class="btn" style="margin-top: 0.5rem; font-size: 0.85rem;">25%</button>
-									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '50')" class="btn" style="margin-top: 0.5rem; font-size: 0.85rem;">50%</button>
-									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '75')" class="btn" style="margin-top: 0.5rem; font-size: 0.85rem;">75%</button>
-									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '100')" class="btn" style="margin-top: 0.5rem; font-size: 0.85rem;">100%</button>
-								</div>
-							</div>
+									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '25')" class="btn btn--sm">25%</button>
+									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '50')" class="btn btn--sm">50%</button>
+									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '75')" class="btn btn--sm">75%</button>
+									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '100')" class="btn btn--sm">100%</button>
+								</li>
+							</ul>
 						</main>
 					</section>
 
@@ -261,16 +260,14 @@
 					<section class="section-card">
 						<header><h3>CSS детали</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<h4>Заоблени агли</h4>
-									<p>Последниот bar во stacked progress добива заоблен десен агол.</p>
-								</div>
-								<div>
-									<h4>Реактивност</h4>
-									<p>Компонентата користи MutationObserver за следење на <code>data-ln-progress</code> и <code>data-ln-progress-max</code> атрибутите.</p>
-								</div>
-							</div>
+							<article>
+								<h4>Заоблени агли</h4>
+								<p>Последниот bar во stacked progress добива заоблен десен агол.</p>
+							</article>
+							<article>
+								<h4>Реактивност</h4>
+								<p>Компонентата користи MutationObserver за следење на <code>data-ln-progress</code> и <code>data-ln-progress-max</code> атрибутите.</p>
+							</article>
 						</main>
 					</section>
 
@@ -287,13 +284,12 @@ bar.setAttribute('data-ln-progress', '50');
 bar.setAttribute('data-ln-progress-max', '100');</code></pre>
 						</main>
 					</section>
-				</div>
 			</div>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
-				<span class="text-muted">ln-acme v1.0.0</span>
+				<span>ln-acme v1.0.0</span>
 			</footer>
 		</div>
 		</div><!-- /.app-body -->

@@ -38,8 +38,8 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" style="position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: var(--color-text);">&times;</button>
-			<img class="logo" src="ln-acme-logo.png" alt="ln-acme" style="width: 2rem; height: 2rem; border-radius: var(--radius-sm);">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
 
@@ -49,7 +49,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<div class="nav-section">CSS компоненти</div>
+					<h6 class="nav-section">CSS компоненти</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -61,7 +61,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<div class="nav-section">JS компоненти</div>
+					<h6 class="nav-section">JS компоненти</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -79,7 +79,7 @@
 			</div>
 
 			<div class="sidebar-footer">
-				<small class="text-muted">acme-gui v1.0.0</small>
+				<small>acme-gui v1.0.0</small>
 			</div>
 		</aside>
 
@@ -88,7 +88,6 @@
 
 			<!-- Content -->
 			<div class="content">
-				<div class="stack-lg">
 					<h1>Select</h1>
 					<p>TomSelect wrapper — го подобрува стандардниот <code>&lt;select&gt;</code> со search, tagging и create функционалност.</p>
 
@@ -141,18 +140,14 @@
 					<section class="section-card">
 						<header><h3>Пример — Select со create опција</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<p style="margin-bottom: 0.75rem;"><strong>Можеш да напишеш нова вредност:</strong></p>
-									<select data-ln-select='{"create":true}' placeholder="Напиши или избери...">
-										<option value="">Избери...</option>
-										<option value="php">PHP</option>
-										<option value="python">Python</option>
-										<option value="javascript">JavaScript</option>
-										<option value="java">Java</option>
-									</select>
-								</div>
-							</div>
+							<p><strong>Можеш да напишеш нова вредност:</strong></p>
+							<select data-ln-select='{"create":true}' placeholder="Напиши или избери...">
+								<option value="">Избери...</option>
+								<option value="php">PHP</option>
+								<option value="python">Python</option>
+								<option value="javascript">JavaScript</option>
+								<option value="java">Java</option>
+							</select>
 						</main>
 					</section>
 
@@ -160,7 +155,7 @@
 					<section class="section-card">
 						<header><h3>Пример — Повеќе селекти на форма</h3></header>
 						<main>
-							<form class="stack">
+							<form>
 								<div>
 									<label for="s-dept">Одделение</label>
 									<select id="s-dept" data-ln-select>
@@ -207,11 +202,11 @@ ts.getItems();</code></pre>
 					</section>
 
 					<!-- Graceful degradation -->
-					<section class="section-card">
+					<section id="select-graceful" class="section-card">
 						<header><h3>Graceful Degradation</h3></header>
 						<main>
 							<p>Ако <code>window.TomSelect</code> не постои, компонентата тивко не прави ништо. <code>&lt;select&gt;</code>-от остануваат функционален како обичен браузерски select.</p>
-							<p style="padding: 1rem; background: var(--color-bg-secondary); border-radius: var(--radius-md); color: var(--color-text-muted);">
+							<p>
 								<strong>Добра практика:</strong> Секогаш вклучи TomSelect пред ln-acme ако го користиш.
 							</p>
 						</main>
@@ -221,20 +216,18 @@ ts.getItems();</code></pre>
 					<section class="section-card">
 						<header><h3>Жизнен циклус</h3></header>
 						<main>
-							<div class="stack">
-								<div>
-									<h4>При DOM remove</h4>
-									<p>Инстанцата автоматски се уништува (cleanup).</p>
-								</div>
-								<div>
-									<h4>При form reset</h4>
-									<p>Selection се чисти автоматски.</p>
-								</div>
-								<div>
-									<h4>Динамички додадени select елементи</h4>
-									<p>Нови select елементи со <code>data-ln-select</code> се обработуваат автоматски.</p>
-								</div>
-							</div>
+							<article>
+								<h4>При DOM remove</h4>
+								<p>Инстанцата автоматски се уништува (cleanup).</p>
+							</article>
+							<article>
+								<h4>При form reset</h4>
+								<p>Selection се чисти автоматски.</p>
+							</article>
+							<article>
+								<h4>Динамички додадени select елементи</h4>
+								<p>Нови select елементи со <code>data-ln-select</code> се обработуваат автоматски.</p>
+							</article>
 						</main>
 					</section>
 
@@ -283,13 +276,12 @@ ts.getItems();</code></pre>
 &lt;script src="dist/ln-acme.iife.js"&gt;&lt;/script&gt;</code></pre>
 						</main>
 					</section>
-				</div>
 			</div>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
-				<span class="text-muted">ln-acme v1.0.0</span>
+				<span>ln-acme v1.0.0</span>
 			</footer>
 		</div>
 		</div><!-- /.app-body -->
