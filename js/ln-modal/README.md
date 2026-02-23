@@ -25,16 +25,41 @@ Modal dialog компонента — overlay со содржина (header/main
 ## API
 
 ```javascript
-// Functional API (на window)
 window.lnModal.open('my-modal');
 window.lnModal.close('my-modal');
 window.lnModal.toggle('my-modal');
 ```
 
+## Events
+
+Сите настани се dispatch-уваат на самиот модал елемент и bubble-аат нагоре.
+
+| Настан | Кога | `detail` |
+|--------|------|----------|
+| `ln-modal:open` | Модалот се отвори | `{ modalId }` |
+| `ln-modal:close` | Модалот се затвори | `{ modalId }` |
+
+```javascript
+document.addEventListener('ln-modal:open', function(e) {
+    console.log('Отворен модал:', e.detail.modalId);
+});
+
+document.addEventListener('ln-modal:close', function(e) {
+    if (e.detail.modalId === 'confirm-dialog') {
+        // reset форма, исчисти state итн.
+    }
+});
+
+// Или директно на модалот
+document.getElementById('my-modal').addEventListener('ln-modal:open', function(e) {
+    // load данови при секое отварање
+});
+```
+
 ## Однесување
 
 - ESC тастер затвара сите отворени модали
-- `body.ln-modal-open` се додава кога модал е отворен (спречува scroll)
+- `body.ln-modal-open` се додава кога барем еден модал е отворен (спречува scroll)
 - Backdrop: полу-транспарентен темен overlay со blur
 - Анимација: slideIn од горе (0.3s ease)
 - Ctrl/Cmd+Click и middle-click на trigger не го отвараат модалот (дозволува open in new tab)
@@ -71,14 +96,4 @@ window.lnModal.toggle('my-modal');
 ```html
 <div class="ln-modal__content ln-modal__content--sm">...</div>
 <div class="ln-modal__content ln-modal__content--lg">...</div>
-```
-
-## Програмски
-
-```javascript
-// Отвори модал
-window.lnModal.open('confirm-dialog');
-
-// Затвори модал
-window.lnModal.close('confirm-dialog');
 ```

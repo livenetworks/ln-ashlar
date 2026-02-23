@@ -50,7 +50,60 @@ AJAX навигација компонента — линкови и форми 
 |------|------|
 | `title` | Ажурирај `document.title` |
 | `content` | Објект: клуч = ID на елемент, вредност = нов innerHTML |
-| `message` | Toast порака (се прикажува преку `lnToast.enqueue`) |
+| `message` | Порака — достапна во `ln-ajax:success` event, проектот одлучува како да ја прикаже |
+
+## Events
+
+Сите настани се dispatch-уваат на елементот кој го иницирал request-от (link или form) и bubble-аат нагоре.
+
+| Настан | Кога | `detail` |
+|--------|------|----------|
+| `ln-ajax:start` | Пред fetch | `{ method, url }` |
+| `ln-ajax:success` | По успешен одговор | `{ method, url, data }` |
+| `ln-ajax:error` | По fetch грешка | `{ method, url, error }` |
+| `ln-ajax:complete` | По завршување (success или error) | `{ method, url }` |
+
+### Интеграција со ln-toast
+
+`ln-ajax` не знае за `ln-toast`. За приказ на пораки, слушај го `ln-ajax:success` во твојот проект:
+
+```javascript
+document.addEventListener('ln-ajax:success', function(e) {
+    const message = e.detail.data.message;
+    if (message && window.lnToast) {
+        window.lnToast.enqueue({
+            type: message.type,
+            title: message.title,
+            message: message.body,
+            data: message.data
+        });
+    }
+});
+```
+
+### Останати примери
+
+```javascript
+// Покажи custom loading индикатор
+document.addEventListener('ln-ajax:start', function(e) {
+    console.log('Request started:', e.detail.method, e.detail.url);
+});
+
+// Обнови компонента по успешен одговор
+document.addEventListener('ln-ajax:success', function(e) {
+    window.lnSelect && window.lnSelect.reinit();
+});
+
+// Глобален error handler
+document.addEventListener('ln-ajax:error', function(e) {
+    console.error('AJAX failed:', e.detail.url, e.detail.error);
+});
+
+// Завршување (секогаш)
+document.addEventListener('ln-ajax:complete', function(e) {
+    console.log('Request complete:', e.detail.url);
+});
+```
 
 ## Headers
 
@@ -86,14 +139,4 @@ AJAX навигација компонента — линкови и форми 
 ```javascript
 // Рачна иницијализација на нов AJAX контејнер
 window.lnAjax(document.getElementById('new-content'));
-```
-
-## Програмски
-
-```javascript
-// CSS loading индикатор
-.ln-ajax--loading {
-    opacity: 0.5;
-    pointer-events: none;
-}
 ```

@@ -181,7 +181,7 @@
 								<tbody>
 									<tr><td><code>title</code></td><td><code>&lt;title&gt;</code> атрибут на страница</td></tr>
 									<tr><td><code>content</code></td><td>Објект: селектор → HTML за замена</td></tr>
-									<tr><td><code>message</code></td><td>Toast нотификација (опционално)</td></tr>
+									<tr><td><code>message</code></td><td>Порака — достапна во <code>ln-ajax:success</code> event</td></tr>
 								</tbody>
 							</table>
 						</main>
@@ -233,13 +233,56 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 						</main>
 					</section>
 
-					<!-- Events (Known Issues) -->
+					<!-- Events -->
 					<section class="section-card">
-						<header><h3>Белешки</h3></header>
+						<header><h3>Events</h3></header>
 						<main>
-							<article class="demo-note">
-								<p><strong>Позната ограничување:</strong> ln-ajax тренутно нема CustomEvent dispatching за AJAX lifecycle (започнало, завршено, грешка).</p>
-								<p>За интеграција во веќе-постоечки AJAX sistem, препорачуваме рачна имплементација на Fetch + DOM манипулација.</p>
+							<article>
+								<h4>Lifecycle настани</h4>
+								<table>
+									<thead><tr><th>Настан</th><th>Кога</th><th><code>detail</code></th></tr></thead>
+									<tbody>
+										<tr><td><code>ln-ajax:start</code></td><td>Пред fetch</td><td><code>{ method, url }</code></td></tr>
+										<tr><td><code>ln-ajax:success</code></td><td>По успешен одговор</td><td><code>{ method, url, data }</code></td></tr>
+										<tr><td><code>ln-ajax:error</code></td><td>По fetch грешка</td><td><code>{ method, url, error }</code></td></tr>
+										<tr><td><code>ln-ajax:complete</code></td><td>По завршување (секогаш)</td><td><code>{ method, url }</code></td></tr>
+									</tbody>
+								</table>
+								<p>Настаните се dispatch-уваат на елементот кој го иницирал request-от (<code>&lt;a&gt;</code> или <code>&lt;form&gt;</code>) и bubble-аат нагоре.</p>
+							</article>
+							<article>
+								<h4>Интеграција со ln-toast</h4>
+								<p><code>ln-ajax</code> не знае за <code>ln-toast</code>. Пораките од JSON response се достапни во <code>ln-ajax:success</code> — проектот одлучува:</p>
+								<pre><code>document.addEventListener('ln-ajax:success', function(e) {
+    var message = e.detail.data.message;
+    if (message &amp;&amp; window.lnToast) {
+        window.lnToast.enqueue({
+            type: message.type,
+            title: message.title,
+            message: message.body
+        });
+    }
+});</code></pre>
+							</article>
+							<article>
+								<h4>Останати примери</h4>
+								<pre><code>// Глобален loading индикатор
+document.addEventListener('ln-ajax:start', function(e) {
+    document.body.classList.add('loading');
+});
+document.addEventListener('ln-ajax:complete', function(e) {
+    document.body.classList.remove('loading');
+});
+
+// Обнови компоненти по DOM промена
+document.addEventListener('ln-ajax:success', function(e) {
+    window.lnSelect &amp;&amp; window.lnSelect.reinit();
+});
+
+// Error handler
+document.addEventListener('ln-ajax:error', function(e) {
+    console.error('AJAX failed:', e.detail.url, e.detail.error);
+});</code></pre>
 							</article>
 						</main>
 					</section>

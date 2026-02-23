@@ -86,140 +86,260 @@
 
 			<!-- Content -->
 			<div class="content">
-					<h1>Forms &amp; Buttons</h1>
-					<p>Input, textarea, select, label, button — сите стилизирани преку base стилови.</p>
+				<h1>Forms &amp; Buttons</h1>
+				<p>CSS Grid + wrapping <code>&lt;label&gt;</code> pattern. Нема <code>&lt;div class="form-group"&gt;</code> или <code>&lt;div class="form-row"&gt;</code>. Grid-от го контролира layout-от преку SCSS — не преку HTML.</p>
 
-		<!-- Inputs -->
-		<section class="section-card">
-			<header><h3>Input елементи</h3></header>
-			<main>
-				<div class="form-group">
-					<label for="name">Име</label>
-					<input type="text" id="name" placeholder="Внесете име...">
-				</div>
-				<div class="form-group">
-					<label for="email">Email</label>
-					<input type="email" id="email" placeholder="email@example.com">
-				</div>
-				<div class="form-row">
-					<div class="form-group">
-						<label for="city">Град</label>
-						<input type="text" id="city" placeholder="Скопје">
-					</div>
-					<div class="form-group">
-						<label for="zip">Поштенски број</label>
-						<input type="text" id="zip" placeholder="1000">
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="disabled">Disabled</label>
-					<input type="text" id="disabled" disabled value="Не може да се менува">
-				</div>
-			</main>
-		</section>
+				<!-- ==========================================
+				     ПРИНЦИП — за девелопери и агенти
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Принцип</h3></header>
+					<main>
+						<p>Секое поле е <code>&lt;label&gt;</code> кој ги обвиткува текстот и input-от (implicit association — без <code>for</code>/<code>id</code>). Root елементот (<code>&lt;form&gt;</code> или <code>&lt;section&gt;</code>) добива <code>@include form-grid</code> во SCSS — 6-колонска решетка, колапсира на 1 колона на мобилен. Column spans се поставуваат на <code>&gt; label:nth-child(N)</code> во app-specific SCSS — никогаш inline <code>style=""</code>.</p>
 
-		<!-- Select & Textarea -->
-		<section class="section-card">
-			<header><h3>Select &amp; Textarea</h3></header>
-			<main>
-				<div class="form-group">
-					<label for="category">Категорија</label>
-					<select id="category">
-						<option>Избери...</option>
-						<option>Финансии</option>
-						<option>Техничка поддршка</option>
-						<option>Продажба</option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label for="message">Порака</label>
-					<textarea id="message" placeholder="Напишете порака..."></textarea>
-				</div>
-			</main>
-		</section>
-
-		<!-- Buttons -->
-		<section class="section-card">
-			<header><h3>Buttons</h3></header>
-			<main>
-				<nav class="demo-actions">
-					<button type="button" class="btn">Primary</button>
-					<button type="button" class="btn btn--secondary">Secondary</button>
-					<button type="button" class="btn btn--danger">Danger</button>
-					<button type="button" class="btn" disabled>Disabled</button>
-				</nav>
-			</main>
-		</section>
-
-		<!-- Form with ln-input -->
-		<section class="section-card">
-			<header><h3>Floating label (ln-input)</h3></header>
-			<main>
-				<form>
-					<fieldset>
-						<div ln-inputcontrol>
-							<div ln-input>
-								<input type="text" name="fname" id="fname" placeholder=" " required>
-								<label for="fname">Име:</label>
-							</div>
-						</div>
-						<div ln-inputcontrol>
-							<div ln-input>
-								<input type="text" name="lname" id="lname" placeholder=" ">
-								<label for="lname">Презиме:</label>
-							</div>
-						</div>
-					</fieldset>
-				</form>
-			</main>
-		</section>
-
-		<!-- Form actions -->
-		<section class="section-card">
-			<header><h3>Form Actions</h3></header>
-			<main>
-				<p>Типична форма со копчиња подредени десно.</p>
-				<div class="form-actions">
-					<button type="button" class="btn btn--secondary">Откажи</button>
-					<button type="submit" class="btn">Зачувај</button>
-				</div>
-			</main>
-		</section>
-
-		<!-- HTML -->
-		<section class="section-card">
-			<header><h3>HTML</h3></header>
-			<main>
-				<pre><code>&lt;div class="form-group"&gt;
-    &lt;label for="name"&gt;Име&lt;/label&gt;
-    &lt;input type="text" id="name" placeholder="..."&gt;
+						<!-- Wrong vs Right -->
+						<div class="demo-split">
+							<article>
+								<h4>Погрешно — стар pattern</h4>
+								<pre><code>&lt;!-- div wrapper-и, explicit for/id --&gt;
+&lt;div class="form-group"&gt;
+  &lt;label for="name"&gt;Ime&lt;/label&gt;
+  &lt;input type="text" id="name"&gt;
 &lt;/div&gt;
 
 &lt;div class="form-row"&gt;
-    &lt;div class="form-group"&gt;...&lt;/div&gt;
-    &lt;div class="form-group"&gt;...&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div class="form-actions"&gt;
-    &lt;button class="btn-secondary"&gt;Откажи&lt;/button&gt;
-    &lt;button type="submit"&gt;Зачувај&lt;/button&gt;
-&lt;/div&gt;
-
-&lt;!-- Button варијанти --&gt;
-&lt;button&gt;Primary&lt;/button&gt;
-&lt;button class="btn-secondary"&gt;Secondary&lt;/button&gt;
-&lt;button class="btn-danger"&gt;Danger&lt;/button&gt;
-&lt;button disabled&gt;Disabled&lt;/button&gt;
-
-&lt;!-- Floating label --&gt;
-&lt;div ln-inputcontrol&gt;
-    &lt;div ln-input&gt;
-        &lt;input type="text" name="x" id="x" placeholder=" " required&gt;
-        &lt;label for="x"&gt;Label:&lt;/label&gt;
-    &lt;/div&gt;
+  &lt;div class="form-group"&gt;
+    &lt;label for="city"&gt;Grad&lt;/label&gt;
+    &lt;input type="text" id="city"&gt;
+  &lt;/div&gt;
+  &lt;div class="form-group"&gt;
+    &lt;label for="zip"&gt;Zip&lt;/label&gt;
+    &lt;input type="text" id="zip"&gt;
+  &lt;/div&gt;
 &lt;/div&gt;</code></pre>
-			</main>
-		</section>
+							</article>
+							<article>
+								<h4>Точно — нов pattern</h4>
+								<pre><code>&lt;!-- label wrap, grid во SCSS --&gt;
+&lt;form id="my-form"&gt;
+
+  &lt;label&gt;
+    Ime
+    &lt;input type="text" name="name"&gt;
+  &lt;/label&gt;
+
+  &lt;label&gt;
+    Grad
+    &lt;input type="text" name="city"&gt;
+  &lt;/label&gt;
+
+  &lt;label&gt;
+    Zip
+    &lt;input type="text" name="zip"&gt;
+  &lt;/label&gt;
+
+&lt;/form&gt;</code></pre>
+							</article>
+						</div>
+
+						<!-- Rules table -->
+						<table>
+							<thead>
+								<tr>
+									<th>Елемент</th>
+									<th>Правило</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Root</td>
+									<td><code>&lt;form id="..."&gt;</code> — styled со <code>@include form-grid</code> во SCSS (6 cols → 1 col на мобилен)</td>
+								</tr>
+								<tr>
+									<td>Деца</td>
+									<td>Директно <code>&lt;label&gt;</code> — без <code>&lt;div class="form-group"&gt;</code> или <code>&lt;div class="form-row"&gt;</code></td>
+								</tr>
+								<tr>
+									<td>Label</td>
+									<td>Го обвиткува текстот + input (implicit association — не треба <code>for</code>/<code>id</code>). Checkbox/radio: текстот оди <em>после</em> input-от</td>
+								</tr>
+								<tr>
+									<td>Column spans</td>
+									<td>Во SCSS преку <code>&gt; label:nth-child(N) { grid-column: span N; }</code> — НИКОГАШ inline <code>style=""</code>. span 3 = ½, span 2 = ⅓, span 6 = full</td>
+								</tr>
+								<tr>
+									<td>Грешки</td>
+									<td><code>&lt;small class="text-error"&gt;</code> внатре во <code>&lt;label&gt;</code> + <code>small { display: block }</code> во SCSS</td>
+								</tr>
+								<tr>
+									<td>Checkbox / Radio</td>
+									<td><code>input[type="checkbox"] { width: auto }</code> — ln-acme сетира <code>input { width: 100% }</code> глобално</td>
+								</tr>
+								<tr>
+									<td><code>&lt;fieldset&gt;</code></td>
+									<td>САМО за семантички поврзани полиња (пр. адреса: улица + град + поштенски). НЕ за визуелни редици</td>
+								</tr>
+								<tr>
+									<td><code>.form-actions</code></td>
+									<td>Компонентна класа — останува во HTML. Добива <code>grid-column: span 6</code> (full-width) во SCSS</td>
+								</tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     LIVE DEMO
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Live demo — CSS Grid форма</h3></header>
+					<main>
+						<!--
+							#demo-form-grid се стилизира во demo.scss:
+							- default: > label { grid-column: span 3 } (половина)
+							- 3(Email)→span4, 4(Telefon)→span2
+							- 5,6,7(Grad/Zip/Država)→span2 (три во ред)
+							- 8(Poraka), 10(Checkbox), .form-actions → span6 (full-width)
+						-->
+						<form id="demo-form-grid">
+							<label>
+								Ime <span class="text-error">*</span>
+								<input type="text" name="fname" required placeholder="Иван">
+								<small class="text-error">Задолжително поле</small>
+							</label>
+							<label>
+								Prezime
+								<input type="text" name="lname" placeholder="Петров">
+							</label>
+							<label>
+								Email <span class="text-error">*</span>
+								<input type="email" name="email" required placeholder="email@primer.com">
+							</label>
+							<label>
+								Telefon
+								<input type="tel" name="phone" placeholder="+389 2 ...">
+							</label>
+							<label>
+								Grad
+								<input type="text" name="city" placeholder="Скопје">
+							</label>
+							<label>
+								Poštanski broj
+								<input type="text" name="zip" placeholder="1000">
+							</label>
+							<label>
+								Država
+								<select name="country">
+									<option>Македонија</option>
+									<option>Србија</option>
+									<option>Хрватска</option>
+								</select>
+							</label>
+							<label>
+								Poraka
+								<textarea name="message" placeholder="Напишете порака..."></textarea>
+							</label>
+							<label>
+								Disabled поле
+								<input type="text" name="disabled_field" disabled value="Не може да се менува">
+							</label>
+							<label>
+								<input type="checkbox" name="confirmed" value="1">
+								Ги потврдувам внесените податоци
+							</label>
+							<div class="form-actions">
+								<button type="button" class="btn btn--secondary">Откажи</button>
+								<button type="submit" class="btn">Зачувај</button>
+							</div>
+						</form>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     BUTTONS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Buttons</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button type="button" class="btn">Primary</button>
+							<button type="button" class="btn btn--secondary">Secondary</button>
+							<button type="button" class="btn btn--danger">Danger</button>
+							<button type="button" class="btn" disabled>Disabled</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     ИМПЛЕМЕНТАЦИЈА — HTML + SCSS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Имплементација</h3></header>
+					<main>
+						<h4>HTML</h4>
+						<pre><code>&lt;form id="my-form"&gt;
+
+  &lt;!-- Стандардно поле — span 3 (половина) преку SCSS --&gt;
+  &lt;label&gt;
+    Ime &lt;span class="text-error"&gt;*&lt;/span&gt;
+    &lt;input type="text" name="fname" required placeholder="..."&gt;
+    &lt;small class="text-error"&gt;Задолжително поле&lt;/small&gt;
+  &lt;/label&gt;
+
+  &lt;!-- Select — ист pattern --&gt;
+  &lt;label&gt;
+    Kategorija
+    &lt;select name="category"&gt;
+      &lt;option value="a"&gt;Опција А&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/label&gt;
+
+  &lt;!-- Checkbox — текстот ПОСЛЕ input-от --&gt;
+  &lt;label&gt;
+    &lt;input type="checkbox" name="confirmed" value="1"&gt;
+    Ги потврдувам податоците
+  &lt;/label&gt;
+
+  &lt;!-- form-actions е компонентна класа, останува во HTML --&gt;
+  &lt;div class="form-actions"&gt;
+    &lt;button type="button" class="btn btn--secondary"&gt;Откажи&lt;/button&gt;
+    &lt;button type="submit" class="btn"&gt;Зачувај&lt;/button&gt;
+  &lt;/div&gt;
+
+&lt;/form&gt;</code></pre>
+
+						<h4>SCSS</h4>
+						<pre><code>#my-form {
+  @include form-grid;       // 6 cols, gap, responsive (&lt;768px → 1 col)
+
+  &gt; label {
+    grid-column: span 3;    // default: половина ширина
+  }
+
+  // Специфични spans
+  &gt; label:nth-child(3) { grid-column: span 4; }   // 2/3 ширина
+  &gt; label:nth-child(4) { grid-column: span 2; }   // 1/3 ширина
+
+  // Три во ред (span 2 × 3 = 6 cols)
+  &gt; label:nth-child(5),
+  &gt; label:nth-child(6),
+  &gt; label:nth-child(7) { grid-column: span 2; }
+
+  // Full-width
+  &gt; label:nth-child(8),
+  &gt; label:nth-child(10),
+  &gt; .form-actions { grid-column: span 6; }
+
+  // Checkbox/radio fix
+  input[type="checkbox"],
+  input[type="radio"] { width: auto; }
+
+  // Error display
+  small { display: block; }
+}</code></pre>
+					</main>
+				</section>
+
 			</div>
 
 			<!-- Footer -->

@@ -177,6 +177,63 @@
 			</div>
 		</div>
 
+		<!-- Events -->
+		<section class="section-card">
+			<header><h3>Events</h3></header>
+			<main>
+				<article>
+					<h4>Lifecycle настани</h4>
+					<table>
+						<thead><tr><th>Настан</th><th>Кога</th><th><code>detail</code></th></tr></thead>
+						<tbody>
+							<tr><td><code>ln-modal:open</code></td><td>Модалот се отвори</td><td><code>{ modalId }</code></td></tr>
+							<tr><td><code>ln-modal:close</code></td><td>Модалот се затвори</td><td><code>{ modalId }</code></td></tr>
+						</tbody>
+					</table>
+				</article>
+				<article>
+					<h4>Живо демо</h4>
+					<nav class="demo-actions">
+						<button data-ln-modal="demo-events" class="btn btn--secondary">Отвори модал (следи events)</button>
+					</nav>
+					<output id="modal-event-log">Уште нема настани.</output>
+				</article>
+				<article>
+					<h4>Код</h4>
+					<pre><code>document.addEventListener('ln-modal:open', function(e) {
+    console.log('Отворен:', e.detail.modalId);
+});
+
+document.addEventListener('ln-modal:close', function(e) {
+    if (e.detail.modalId === 'confirm-dialog') {
+        // reset форма, исчисти state итн.
+    }
+});
+
+// Или директно на модалот
+document.getElementById('my-modal').addEventListener('ln-modal:open', function() {
+    fetchData(); // load при секое отварање
+});</code></pre>
+				</article>
+			</main>
+		</section>
+
+		<!-- Events demo modal -->
+		<div class="ln-modal" id="demo-events">
+			<div class="ln-modal__content ln-modal__content--sm">
+				<header>
+					<h3>Events демо</h3>
+					<button class="ln-icon-close" data-ln-modal-close></button>
+				</header>
+				<main>
+					<p>Отварањето и затварањето на овој модал испраќа <code>ln-modal:open</code> и <code>ln-modal:close</code> настани.</p>
+				</main>
+				<footer>
+					<button data-ln-modal-close class="btn btn--secondary">Затвори</button>
+				</footer>
+			</div>
+		</div>
+
 		<!-- HTML -->
 		<section class="section-card">
 			<header><h3>HTML</h3></header>
@@ -222,5 +279,21 @@
 
 		</div>
 	</div>
-	</div></body>
+	</div>
+
+	<script>
+		(function() {
+			var log = document.getElementById('modal-event-log');
+			if (!log) return;
+
+			function _update(eventName, detail) {
+				var time = new Date().toLocaleTimeString('mk');
+				log.textContent = eventName + ' — ' + detail.modalId + ' (' + time + ')';
+			}
+
+			document.addEventListener('ln-modal:open', function(e) { _update('ln-modal:open', e.detail); });
+			document.addEventListener('ln-modal:close', function(e) { _update('ln-modal:close', e.detail); });
+		})();
+	</script>
+</body>
 </html>

@@ -7,10 +7,38 @@
 		return;
 	}
 
-	/**
-	 * Toggle modal visibility by ID
-	 * @param {string} modalId - ID of the modal element
-	 */
+	function _dispatch(modal, eventName) {
+		modal.dispatchEvent(new CustomEvent(eventName, {
+			bubbles: true,
+			detail: { modalId: modal.id }
+		}));
+	}
+
+	function _openModal(modalId) {
+		const modal = document.getElementById(modalId);
+		if (!modal) {
+			console.warn('Modal with ID "' + modalId + '" not found');
+			return;
+		}
+
+		modal.classList.add('ln-modal--open');
+		document.body.classList.add('ln-modal-open');
+		_dispatch(modal, 'ln-modal:open');
+	}
+
+	function _closeModal(modalId) {
+		const modal = document.getElementById(modalId);
+		if (!modal) return;
+
+		modal.classList.remove('ln-modal--open');
+		_dispatch(modal, 'ln-modal:close');
+
+		// Only remove body class when no modals remain open
+		if (!document.querySelector('.ln-modal.ln-modal--open')) {
+			document.body.classList.remove('ln-modal-open');
+		}
+	}
+
 	function _toggleModal(modalId) {
 		const modal = document.getElementById(modalId);
 		if (!modal) {
@@ -18,38 +46,21 @@
 			return;
 		}
 
-		const isOpen = modal.classList.contains('ln-modal--open');
-
-		if (isOpen) {
-			modal.classList.remove('ln-modal--open');
-			document.body.classList.remove('ln-modal-open');
+		if (modal.classList.contains('ln-modal--open')) {
+			_closeModal(modalId);
 		} else {
-			modal.classList.add('ln-modal--open');
-			document.body.classList.add('ln-modal-open');
+			_openModal(modalId);
 		}
 	}
 
-	/**
-	 * Close modal by ID
-	 * @param {string} modalId - ID of the modal element
-	 */
-	function _closeModal(modalId) {
-		const modal = document.getElementById(modalId);
-		if (!modal) return;
-
-		modal.classList.remove('ln-modal--open');
-		document.body.classList.remove('ln-modal-open');
-	}
-
-	/**
-	 * Attach listeners to close buttons within a modal
-	 * @param {HTMLElement} modal - The modal element
-	 */
 	function _attachCloseButtons(modal) {
 		const closeButtons = modal.querySelectorAll('[data-ln-modal-close]');
 		const modalId = modal.id;
 
 		closeButtons.forEach(function(btn) {
+			if (btn._lnModalCloseAttached) return;
+			btn._lnModalCloseAttached = true;
+
 			btn.addEventListener('click', function(e) {
 				e.preventDefault();
 				_closeModal(modalId);
@@ -57,12 +68,11 @@
 		});
 	}
 
-	/**
-	 * Attach click listeners to trigger buttons/links with data-ln-modal
-	 * @param {NodeList} triggers - Trigger elements with data-ln-modal attribute
-	 */
 	function _attachTriggerListeners(triggers) {
 		triggers.forEach(function(trigger) {
+			if (trigger._lnModalAttached) return;
+			trigger._lnModalAttached = true;
+
 			trigger.addEventListener('click', function(e) {
 				// Allow ctrl/cmd + click and middle-click (open in new tab)
 				if (e.ctrlKey || e.metaKey || e.button === 1) {
@@ -78,26 +88,17 @@
 		});
 	}
 
-	/**
-	 * Initialize all modals and trigger buttons
-	 */
 	function _initializeAll() {
-		// Find all trigger buttons/links with data-ln-modal
 		const triggers = document.querySelectorAll('[' + DOM_SELECTOR + ']');
 		_attachTriggerListeners(triggers);
 
-		// Find all modals and attach their close buttons
-		const modals = document.querySelectorAll('[id]');
+		const modals = document.querySelectorAll('.ln-modal');
 		modals.forEach(function(modal) {
-			if (modal.classList.contains('ln-modal')) {
-				_attachCloseButtons(modal);
-			}
+			_attachCloseButtons(modal);
 		});
 
-		// Attach ESC key listener to close modals
 		document.addEventListener('keydown', function(e) {
-			if (e.key === 'Escape' || e.keyCode === 27) {
-				// Close all open modals
+			if (e.key === 'Escape') {
 				const openModals = document.querySelectorAll('.ln-modal.ln-modal--open');
 				openModals.forEach(function(modal) {
 					_closeModal(modal.id);
@@ -106,32 +107,25 @@
 		});
 	}
 
-	/**
-	 * Watch for dynamically added modals and trigger buttons
-	 */
 	function _domObserver() {
 		const observer = new MutationObserver(function(mutations) {
 			mutations.forEach(function(mutation) {
 				if (mutation.type === 'childList') {
 					mutation.addedNodes.forEach(function(node) {
 						if (node.nodeType === 1) {
-							// Check if node is a trigger button
 							if (node.hasAttribute(DOM_SELECTOR)) {
 								_attachTriggerListeners([node]);
 							}
 
-							// Check if node contains trigger buttons
 							const childTriggers = node.querySelectorAll('[' + DOM_SELECTOR + ']');
 							if (childTriggers.length > 0) {
 								_attachTriggerListeners(childTriggers);
 							}
 
-							// Check if node is a modal
 							if (node.id && node.classList.contains('ln-modal')) {
 								_attachCloseButtons(node);
 							}
 
-							// Check if node contains modals
 							const childModals = node.querySelectorAll('.ln-modal');
 							if (childModals.length > 0) {
 								childModals.forEach(function(modal) {
@@ -150,23 +144,14 @@
 		});
 	}
 
-	// Expose global API
 	window[DOM_ATTRIBUTE] = {
-		toggle: _toggleModal,
+		open: _openModal,
 		close: _closeModal,
-		open: function(modalId) {
-			const modal = document.getElementById(modalId);
-			if (modal) {
-				modal.classList.add('ln-modal--open');
-				document.body.classList.add('ln-modal-open');
-			}
-		}
+		toggle: _toggleModal
 	};
 
-	// Start watching for dynamic elements
 	_domObserver();
 
-	// Initialize on DOM ready
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', _initializeAll);
 	} else {
