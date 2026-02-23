@@ -155,10 +155,9 @@
 
 	window[DOM_ATTRIBUTE] = { init: constructor };
 
-	_createStatusBar();
-	_domObserver();
-
 	function _initializeAll() {
+		_createStatusBar();
+		_domObserver();
 		constructor(document.body);
 	}
 

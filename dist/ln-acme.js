@@ -989,9 +989,9 @@
   function r(s) {
     i(s);
   }
-  window[d] = { init: r }, b(), l();
+  window[d] = { init: r };
   function o() {
-    r(document.body);
+    b(), l(), r(document.body);
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", o) : o();
 })();

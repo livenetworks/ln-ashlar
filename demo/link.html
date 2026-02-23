@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Link — ln-acme</title>
+	<link rel="stylesheet" href="../dist/ln-acme.css">
+	<link rel="stylesheet" href="demo.css">
+	<script src="../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../js/ln-link/ln-link.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<div class="header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Link</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Кликабилни редици компонента.'})">Test Toast</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS компоненти</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS компоненти</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Link</h1>
+					<p>Кликабилни контејнери — целата редица/елемент реагира на клик, наоѓајќи го првиот <code>&lt;a&gt;</code> внатре. Компатибилно со ln-ajax.</p>
+
+					<!-- Табела -->
+					<section class="section-card">
+						<header><h3>Табела со кликабилни редици</h3></header>
+						<main>
+							<table data-ln-link>
+								<thead>
+									<tr><th>Име</th><th>Email</th><th>Статус</th></tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><a href="tables.html">Марко Петровски</a></td>
+										<td>marko@example.com</td>
+										<td><span class="pass">Активен</span></td>
+									</tr>
+									<tr>
+										<td><a href="forms.html">Ана Стојанова</a></td>
+										<td>ana@example.com</td>
+										<td><span class="pass">Активен</span></td>
+									</tr>
+									<tr>
+										<td><a href="cards.html">Иван Димитров</a></td>
+										<td>ivan@example.com</td>
+										<td><span class="fail">Неактивен</span></td>
+									</tr>
+									<tr>
+										<td><a href="icons.html">Елена Трајкова</a></td>
+										<td>elena@example.com</td>
+										<td><span class="warn">Чекање</span></td>
+									</tr>
+								</tbody>
+							</table>
+							<p><small>Кликни било каде на редицата — навигира до линкот. Ctrl+click отвора во нов таб. Hover го прикажува URL во status bar.</small></p>
+						</main>
+					</section>
+
+					<!-- Табела со копчиња -->
+					<section class="section-card">
+						<header><h3>Редици со интерактивни елементи</h3></header>
+						<main>
+							<table data-ln-link>
+								<thead>
+									<tr><th>Документ</th><th>Датум</th><th class="center">Акции</th></tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><a href="typography.html">Договор.pdf</a></td>
+										<td>15.02.2026</td>
+										<td class="center">
+											<button class="btn btn--secondary" onclick="alert('Delete clicked!')">Избриши</button>
+										</td>
+									</tr>
+									<tr>
+										<td><a href="layout.html">Фактура.pdf</a></td>
+										<td>10.02.2026</td>
+										<td class="center">
+											<button class="btn btn--secondary" onclick="alert('Delete clicked!')">Избриши</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<p><small>Клик на „Избриши" копчето го тригерира само копчето, НЕ линкот. Клик на останатите ќелии навигира.</small></p>
+						</main>
+					</section>
+
+					<!-- Генерички контејнер -->
+					<section class="section-card">
+						<header><h3>Генерички контејнер</h3></header>
+						<main>
+							<article data-ln-link style="padding: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+								<h4><a href="index.html">Dashboard</a></h4>
+								<p>Целиот контејнер е кликабилен — не само текстот на линкот.</p>
+							</article>
+						</main>
+					</section>
+
+					<!-- HTML -->
+					<section class="section-card">
+						<header><h3>HTML</h3></header>
+						<main>
+							<pre><code>&lt;!-- Табела: сите редици кликабилни --&gt;
+&lt;table data-ln-link&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;a href="/users/1"&gt;Марко&lt;/a&gt;&lt;/td&gt;
+            &lt;td&gt;marko@example.com&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- Генерички контејнер --&gt;
+&lt;article data-ln-link&gt;
+    &lt;h3&gt;&lt;a href="/post/1"&gt;Наслов&lt;/a&gt;&lt;/h3&gt;
+    &lt;p&gt;Опис&lt;/p&gt;
+&lt;/article&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- Однесување -->
+					<section class="section-card">
+						<header><h3>Однесување</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Акција</th><th>Резултат</th></tr></thead>
+								<tbody>
+									<tr><td>Клик на редица</td><td>Навигира до првиот <code>&lt;a&gt;</code></td></tr>
+									<tr><td>Клик на <code>&lt;a&gt;</code> директно</td><td>Нормален клик (не се пресретнува)</td></tr>
+									<tr><td>Клик на <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code></td><td>Нормален клик (не се пресретнува)</td></tr>
+									<tr><td>Ctrl/Cmd + клик</td><td>Отвора во нов таб</td></tr>
+									<tr><td>Hover на редица</td><td>URL во status bar (долу-лево)</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Рачна иницијализација на нов DOM елемент
+window.lnLink.init(document.getElementById('new-container'));</code></pre>
+						</main>
+					</section>
+
+					<!-- ln-ajax -->
+					<section class="section-card">
+						<header><h3>Компатибилност со ln-ajax</h3></header>
+						<main>
+							<p>ln-link и ln-ajax се <strong>потполно декуплирани</strong> — комуницираат преку нативни DOM click настани:</p>
+							<ol>
+								<li>ln-link тригерира <code>.click()</code> на <code>&lt;a&gt;</code></li>
+								<li>ln-ajax го пресретнува click настанот (ако е присутен)</li>
+								<li>Ако ln-ajax не е присутен → нормална навигација</li>
+							</ol>
+							<pre><code>&lt;!-- Двете компоненти заедно --&gt;
+&lt;section data-ln-ajax&gt;
+    &lt;table data-ln-link&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+                &lt;td&gt;&lt;a href="/users/1"&gt;Марко&lt;/a&gt;&lt;/td&gt;
+                &lt;td&gt;marko@example.com&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/section&gt;</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>
