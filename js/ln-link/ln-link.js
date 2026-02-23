@@ -44,13 +44,9 @@
 			return;
 		}
 
-		// Normal click → dispatch click event on the link
-		// This lets ln-ajax intercept it if present, otherwise native navigation
-		link.dispatchEvent(new MouseEvent('click', {
-			bubbles: true,
-			cancelable: true,
-			view: window
-		}));
+		// Normal click → trigger click on the link
+		// .click() triggers both event listeners (ln-ajax) and native navigation
+		link.click();
 	}
 
 	// ─── Hover Handlers ────────────────────────────────────────

@@ -96,6 +96,9 @@
 		console.log('Making AJAX request:', method, url);
 
 		element.classList.add('ln-ajax--loading');
+		let spinner = document.createElement('span');
+		spinner.className = 'ln-ajax-spinner';
+		element.appendChild(spinner);
 
 		// Store final URL for history (will be modified for GET with data)
 		let finalUrl = url;
@@ -175,6 +178,8 @@
 
 				// Remove loading state after response
 				element.classList.remove('ln-ajax--loading');
+				let s1 = element.querySelector('.ln-ajax-spinner');
+				if (s1) s1.remove();
 
 				// Execute callback if provided
 				if (callback) {
@@ -184,6 +189,8 @@
 			.catch(error => {
 				console.error('AJAX error:', error);
 				element.classList.remove('ln-ajax--loading');
+				let s2 = element.querySelector('.ln-ajax-spinner');
+				if (s2) s2.remove();
 
 				// Execute callback on error too
 				if (callback) {
