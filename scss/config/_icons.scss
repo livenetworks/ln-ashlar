@@ -141,11 +141,11 @@
 .ln-icon-check::before        { background-image: var(--icon-check-gray); }
 .ln-icon-check--white::before { background-image: var(--icon-check-white); }
 
-/* Submit button icon */
-form button[type=submit]::before { background-image: var(--icon-check-white); }
+/* Submit button icon — :where() keeps specificity at (0,0,1) so explicit ln-icon-* classes can override */
+:where(form) :where(button[type=submit])::before { background-image: var(--icon-check-white); }
 
-/* Plus Icons */
-button[data-ln-modal].form__button--primary::before { background-image: var(--icon-plus-white); }
+/* Plus Icons — :where() keeps specificity low for same reason */
+:where(button[data-ln-modal].form__button--primary)::before { background-image: var(--icon-plus-white); }
 .ln-icon-plus::before        { background-image: var(--icon-plus-gray); }
 .ln-icon-plus--white::before { background-image: var(--icon-plus-white); }
 
