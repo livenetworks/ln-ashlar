@@ -1,25 +1,25 @@
 (function() {
-  const m = "data-ln-ajax", c = "lnAjax";
+  const p = "data-ln-ajax", c = "lnAjax";
   if (window[c] !== void 0)
     return;
-  function h(e) {
-    if (console.log(e), !e.hasAttribute(m) || e[c])
+  function v(e) {
+    if (console.log(e), !e.hasAttribute(p) || e[c])
       return;
     e[c] = !0, console.log("constructor called with:", e);
-    let t = d(e);
-    console.log("Items found:", t), b(t.links), E(t.forms);
+    let t = m(e);
+    console.log("Items found:", t), g(t.links), E(t.forms);
   }
-  function b(e) {
+  function g(e) {
     e.forEach(function(t) {
       if (t._lnAjaxAttached)
         return;
       const i = t.getAttribute("href");
-      i && i.includes("#") || (t._lnAjaxAttached = !0, t.addEventListener("click", function(a) {
-        if (a.ctrlKey || a.metaKey || a.button === 1)
+      i && i.includes("#") || (t._lnAjaxAttached = !0, t.addEventListener("click", function(d) {
+        if (d.ctrlKey || d.metaKey || d.button === 1)
           return;
-        a.preventDefault();
+        d.preventDefault();
         const r = t.getAttribute("href");
-        r && v("GET", r, null, t);
+        r && b("GET", r, null, t);
       }));
     });
   }
@@ -27,74 +27,74 @@
     e.forEach(function(t) {
       t._lnAjaxAttached || (t._lnAjaxAttached = !0, t.addEventListener("submit", function(i) {
         i.preventDefault();
-        const a = t.method.toUpperCase(), r = t.action, o = new FormData(t);
-        console.log("Form submitted:", a, r), t.querySelectorAll('button, input[type="submit"]').forEach(function(u) {
-          u.disabled = !0;
-        }), v(a, r, o, t, function() {
-          t.querySelectorAll('button, input[type="submit"]').forEach(function(u) {
-            u.disabled = !1;
+        const d = t.method.toUpperCase(), r = t.action, o = new FormData(t);
+        console.log("Form submitted:", d, r), t.querySelectorAll('button, input[type="submit"]').forEach(function(s) {
+          s.disabled = !0;
+        }), b(d, r, o, t, function() {
+          t.querySelectorAll('button, input[type="submit"]').forEach(function(s) {
+            s.disabled = !1;
           });
         });
       }));
     });
   }
-  function v(e, t, i, a, r) {
-    console.log("Making AJAX request:", e, t), a.classList.add("ln-ajax--loading");
+  function b(e, t, i, d, r) {
+    console.log("Making AJAX request:", e, t), d.classList.add("ln-ajax--loading");
     let o = t;
-    const u = document.querySelector('meta[name="csrf-token"]'), p = u ? u.getAttribute("content") : null;
-    i instanceof FormData && p && i.append("_token", p);
-    const g = {
+    const s = document.querySelector('meta[name="csrf-token"]'), l = s ? s.getAttribute("content") : null;
+    i instanceof FormData && l && i.append("_token", l);
+    const h = {
       method: e,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         Accept: "application/json"
       }
     };
-    if (p && (g.headers["X-CSRF-TOKEN"] = p), e === "GET" && i) {
-      const f = new URLSearchParams(i);
-      o = t + (t.includes("?") ? "&" : "?") + f.toString();
-    } else e !== "GET" && i && (g.body = i);
-    fetch(o, g).then((f) => f.json()).then((f) => {
-      if (f.title && (document.title = f.title), f.content)
-        for (let y in f.content) {
+    if (l && (h.headers["X-CSRF-TOKEN"] = l), e === "GET" && i) {
+      const u = new URLSearchParams(i);
+      o = t + (t.includes("?") ? "&" : "?") + u.toString();
+    } else e !== "GET" && i && (h.body = i);
+    fetch(o, h).then((u) => u.json()).then((u) => {
+      if (u.title && (document.title = u.title), u.content)
+        for (let y in u.content) {
           const L = document.getElementById(y);
-          L && (L.innerHTML = f.content[y]);
+          L && (L.innerHTML = u.content[y]);
         }
-      if (a.tagName === "A") {
-        let y = a.getAttribute("href");
+      if (d.tagName === "A") {
+        let y = d.getAttribute("href");
         y && window.history.pushState({ ajax: !0 }, "", y);
-      } else a.tagName === "FORM" && a.method.toUpperCase() === "GET" && window.history.pushState({ ajax: !0 }, "", o);
-      f.message && window.lnToast && window.lnToast.enqueue({
-        type: f.message.type,
-        title: f.message.title,
-        message: f.message.body,
-        data: f.message.data
-      }), a.classList.remove("ln-ajax--loading"), r && r();
-    }).catch((f) => {
-      console.error("AJAX error:", f), a.classList.remove("ln-ajax--loading"), r && r();
+      } else d.tagName === "FORM" && d.method.toUpperCase() === "GET" && window.history.pushState({ ajax: !0 }, "", o);
+      u.message && window.lnToast && window.lnToast.enqueue({
+        type: u.message.type,
+        title: u.message.title,
+        message: u.message.body,
+        data: u.message.data
+      }), d.classList.remove("ln-ajax--loading"), r && r();
+    }).catch((u) => {
+      console.error("AJAX error:", u), d.classList.remove("ln-ajax--loading"), r && r();
     });
   }
-  function d(e) {
+  function m(e) {
     let t = {
       links: [],
       forms: []
     };
-    if (e.tagName === "A" && e.getAttribute(m) !== "false")
+    if (e.tagName === "A" && e.getAttribute(p) !== "false")
       t.links.push(e);
-    else if (e.tagName === "FORM" && e.getAttribute(m) !== "false")
+    else if (e.tagName === "FORM" && e.getAttribute(p) !== "false")
       t.forms.push(e);
     else {
-      let i = e.querySelectorAll('a:not([data-ln-ajax="false"])') || [], a = e.querySelectorAll('form:not([data-ln-ajax="false"])') || [];
-      t.links = Array.from(i), t.forms = Array.from(a);
+      let i = e.querySelectorAll('a:not([data-ln-ajax="false"])') || [], d = e.querySelectorAll('form:not([data-ln-ajax="false"])') || [];
+      t.links = Array.from(i), t.forms = Array.from(d);
     }
     return t;
   }
-  function s() {
+  function a() {
     new MutationObserver(function(t) {
       t.forEach(function(i) {
-        i.type == "childList" && i.addedNodes.forEach(function(a) {
-          a.nodeType === 1 && (h(a), a.hasAttribute && !a.hasAttribute(m) && a.querySelectorAll("[" + m + "]").forEach(function(o) {
-            h(o);
+        i.type == "childList" && i.addedNodes.forEach(function(d) {
+          d.nodeType === 1 && (v(d), d.hasAttribute && !d.hasAttribute(p) && d.querySelectorAll("[" + p + "]").forEach(function(o) {
+            v(o);
           }));
         });
       });
@@ -103,19 +103,19 @@
       subtree: !0
     });
   }
-  s(), window[c] = h;
+  a(), window[c] = v;
   function n() {
-    document.querySelectorAll("[" + m + "]").forEach(function(t) {
-      h(t);
+    document.querySelectorAll("[" + p + "]").forEach(function(t) {
+      v(t);
     });
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", n) : n();
 })();
 (function() {
-  const m = "data-ln-modal", c = "lnModal";
+  const p = "data-ln-modal", c = "lnModal";
   if (window[c] !== void 0)
     return;
-  function h(n) {
+  function v(n) {
     const e = document.getElementById(n);
     if (!e) {
       console.warn('Modal with ID "' + n + '" not found');
@@ -123,47 +123,47 @@
     }
     e.classList.contains("ln-modal--open") ? (e.classList.remove("ln-modal--open"), document.body.classList.remove("ln-modal-open")) : (e.classList.add("ln-modal--open"), document.body.classList.add("ln-modal-open"));
   }
-  function b(n) {
+  function g(n) {
     const e = document.getElementById(n);
     e && (e.classList.remove("ln-modal--open"), document.body.classList.remove("ln-modal-open"));
   }
   function E(n) {
     const e = n.querySelectorAll("[data-ln-modal-close]"), t = n.id;
     e.forEach(function(i) {
-      i.addEventListener("click", function(a) {
-        a.preventDefault(), b(t);
+      i.addEventListener("click", function(d) {
+        d.preventDefault(), g(t);
       });
     });
   }
-  function v(n) {
+  function b(n) {
     n.forEach(function(e) {
       e.addEventListener("click", function(t) {
         if (t.ctrlKey || t.metaKey || t.button === 1)
           return;
         t.preventDefault();
-        const i = e.getAttribute(m);
-        i && h(i);
+        const i = e.getAttribute(p);
+        i && v(i);
       });
     });
   }
-  function d() {
-    const n = document.querySelectorAll("[" + m + "]");
-    v(n), document.querySelectorAll("[id]").forEach(function(t) {
+  function m() {
+    const n = document.querySelectorAll("[" + p + "]");
+    b(n), document.querySelectorAll("[id]").forEach(function(t) {
       t.classList.contains("ln-modal") && E(t);
     }), document.addEventListener("keydown", function(t) {
-      (t.key === "Escape" || t.keyCode === 27) && document.querySelectorAll(".ln-modal.ln-modal--open").forEach(function(a) {
-        b(a.id);
+      (t.key === "Escape" || t.keyCode === 27) && document.querySelectorAll(".ln-modal.ln-modal--open").forEach(function(d) {
+        g(d.id);
       });
     });
   }
-  function s() {
+  function a() {
     new MutationObserver(function(e) {
       e.forEach(function(t) {
         t.type === "childList" && t.addedNodes.forEach(function(i) {
           if (i.nodeType === 1) {
-            i.hasAttribute(m) && v([i]);
-            const a = i.querySelectorAll("[" + m + "]");
-            a.length > 0 && v(a), i.id && i.classList.contains("ln-modal") && E(i);
+            i.hasAttribute(p) && b([i]);
+            const d = i.querySelectorAll("[" + p + "]");
+            d.length > 0 && b(d), i.id && i.classList.contains("ln-modal") && E(i);
             const r = i.querySelectorAll(".ln-modal");
             r.length > 0 && r.forEach(function(o) {
               E(o);
@@ -177,58 +177,58 @@
     });
   }
   window[c] = {
-    toggle: h,
-    close: b,
+    toggle: v,
+    close: g,
     open: function(n) {
       const e = document.getElementById(n);
       e && (e.classList.add("ln-modal--open"), document.body.classList.add("ln-modal-open"));
     }
-  }, s(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", d) : d();
+  }, a(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", m) : m();
 })();
 (function() {
-  const m = "data-ln-nav", c = "lnNav";
+  const p = "data-ln-nav", c = "lnNav";
   if (window[c] !== void 0)
     return;
-  const h = /* @__PURE__ */ new WeakMap();
-  function b(n) {
-    if (!n.hasAttribute(m) || h.has(n)) return;
-    const e = n.getAttribute(m);
+  const v = /* @__PURE__ */ new WeakMap();
+  function g(n) {
+    if (!n.hasAttribute(p) || v.has(n)) return;
+    const e = n.getAttribute(p);
     if (!e) return;
     const t = E(n, e);
-    h.set(n, t);
+    v.set(n, t);
   }
   function E(n, e) {
     let t = Array.from(n.querySelectorAll("a"));
-    d(t, e, window.location.pathname);
+    m(t, e, window.location.pathname);
     const i = function() {
-      t = Array.from(n.querySelectorAll("a")), d(t, e, window.location.pathname);
+      t = Array.from(n.querySelectorAll("a")), m(t, e, window.location.pathname);
     };
     window.addEventListener("popstate", i);
-    const a = history.pushState;
+    const d = history.pushState;
     history.pushState = function() {
-      a.apply(history, arguments), t = Array.from(n.querySelectorAll("a")), d(t, e, window.location.pathname);
+      d.apply(history, arguments), t = Array.from(n.querySelectorAll("a")), m(t, e, window.location.pathname);
     };
     const r = new MutationObserver(function(o) {
-      o.forEach(function(u) {
-        u.type === "childList" && (u.addedNodes.forEach(function(p) {
-          if (p.nodeType === 1) {
-            if (p.tagName === "A")
-              t.push(p), d([p], e, window.location.pathname);
-            else if (p.querySelectorAll) {
-              const g = Array.from(p.querySelectorAll("a"));
-              t = t.concat(g), d(g, e, window.location.pathname);
+      o.forEach(function(s) {
+        s.type === "childList" && (s.addedNodes.forEach(function(l) {
+          if (l.nodeType === 1) {
+            if (l.tagName === "A")
+              t.push(l), m([l], e, window.location.pathname);
+            else if (l.querySelectorAll) {
+              const h = Array.from(l.querySelectorAll("a"));
+              t = t.concat(h), m(h, e, window.location.pathname);
             }
           }
-        }), u.removedNodes.forEach(function(p) {
-          if (p.nodeType === 1) {
-            if (p.tagName === "A")
-              t = t.filter(function(g) {
-                return g !== p;
+        }), s.removedNodes.forEach(function(l) {
+          if (l.nodeType === 1) {
+            if (l.tagName === "A")
+              t = t.filter(function(h) {
+                return h !== l;
               });
-            else if (p.querySelectorAll) {
-              const g = Array.from(p.querySelectorAll("a"));
-              t = t.filter(function(f) {
-                return !g.includes(f);
+            else if (l.querySelectorAll) {
+              const h = Array.from(l.querySelectorAll("a"));
+              t = t.filter(function(u) {
+                return !h.includes(u);
               });
             }
           }
@@ -244,35 +244,35 @@
       observer: r
     };
   }
-  function v(n) {
+  function b(n) {
     try {
       return new URL(n, window.location.href).pathname.replace(/\/$/, "") || "/";
     } catch {
       return n.replace(/\/$/, "") || "/";
     }
   }
-  function d(n, e, t) {
-    const i = v(t);
-    n.forEach(function(a) {
-      const r = a.getAttribute("href");
+  function m(n, e, t) {
+    const i = b(t);
+    n.forEach(function(d) {
+      const r = d.getAttribute("href");
       if (!r) return;
-      const o = v(r);
-      a.classList.remove(e);
-      const u = o === i, p = o !== "/" && i.startsWith(o + "/");
-      (u || p) && a.classList.add(e);
+      const o = b(r);
+      d.classList.remove(e);
+      const s = o === i, l = o !== "/" && i.startsWith(o + "/");
+      (s || l) && d.classList.add(e);
     });
   }
-  window[c] = b;
-  function s() {
-    document.querySelectorAll("[" + m + "]").forEach(function(e) {
-      b(e);
+  window[c] = g;
+  function a() {
+    document.querySelectorAll("[" + p + "]").forEach(function(e) {
+      g(e);
     });
   }
-  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", s) : s();
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", a) : a();
 })();
 (function() {
-  const m = window.TomSelect;
-  if (!m) {
+  const p = window.TomSelect;
+  if (!p) {
     window.lnSelect = { initialize: function() {
     }, destroy: function() {
     }, getInstance: function() {
@@ -281,14 +281,14 @@
     return;
   }
   const c = /* @__PURE__ */ new WeakMap();
-  function h(d) {
-    if (c.has(d))
+  function v(m) {
+    if (c.has(m))
       return;
-    const s = d.getAttribute("data-ln-select");
+    const a = m.getAttribute("data-ln-select");
     let n = {};
-    if (s && s.trim() !== "")
+    if (a && a.trim() !== "")
       try {
-        n = JSON.parse(s);
+        n = JSON.parse(a);
       } catch (i) {
         console.warn("Invalid JSON in data-ln-select attribute:", i);
       }
@@ -304,15 +304,15 @@
       // Close dropdown after selection (for single select)
       closeAfterSelect: !0,
       // Placeholder handling
-      placeholder: d.getAttribute("placeholder") || "Select...",
+      placeholder: m.getAttribute("placeholder") || "Select...",
       // Load throttle for search
       loadThrottle: 300
     }, ...n };
     try {
-      const i = new m(d, t);
-      c.set(d, i);
-      const a = d.closest("form");
-      a && a.addEventListener("reset", () => {
+      const i = new p(m, t);
+      c.set(m, i);
+      const d = m.closest("form");
+      d && d.addEventListener("reset", () => {
         setTimeout(() => {
           i.clear(), i.clearOptions(), i.sync();
         }, 0);
@@ -321,20 +321,20 @@
       console.error("Failed to initialize Tom Select:", i);
     }
   }
-  function b(d) {
-    const s = c.get(d);
-    s && (s.destroy(), c.delete(d));
+  function g(m) {
+    const a = c.get(m);
+    a && (a.destroy(), c.delete(m));
   }
   function E() {
-    document.querySelectorAll("select[data-ln-select]").forEach(h);
+    document.querySelectorAll("select[data-ln-select]").forEach(v);
   }
-  function v() {
-    new MutationObserver((s) => {
-      s.forEach((n) => {
+  function b() {
+    new MutationObserver((a) => {
+      a.forEach((n) => {
         n.addedNodes.forEach((e) => {
-          e.nodeType === 1 && (e.matches && e.matches("select[data-ln-select]") && h(e), e.querySelectorAll && e.querySelectorAll("select[data-ln-select]").forEach(h));
+          e.nodeType === 1 && (e.matches && e.matches("select[data-ln-select]") && v(e), e.querySelectorAll && e.querySelectorAll("select[data-ln-select]").forEach(v));
         }), n.removedNodes.forEach((e) => {
-          e.nodeType === 1 && (e.matches && e.matches("select[data-ln-select]") && b(e), e.querySelectorAll && e.querySelectorAll("select[data-ln-select]").forEach(b));
+          e.nodeType === 1 && (e.matches && e.matches("select[data-ln-select]") && g(e), e.querySelectorAll && e.querySelectorAll("select[data-ln-select]").forEach(g));
         });
       });
     }).observe(document.body, {
@@ -343,86 +343,86 @@
     });
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => {
-    E(), v();
-  }) : (E(), v()), window.lnSelect = {
-    initialize: h,
-    destroy: b,
-    getInstance: (d) => c.get(d)
+    E(), b();
+  }) : (E(), b()), window.lnSelect = {
+    initialize: v,
+    destroy: g,
+    getInstance: (m) => c.get(m)
   };
 })();
 (function() {
-  const m = "data-ln-tabs", c = "lnTabs";
+  const p = "data-ln-tabs", c = "lnTabs";
   if (window[c] !== void 0 && window[c] !== null) return;
-  function h(s = document.body) {
-    b(s);
+  function v(a = document.body) {
+    g(a);
   }
-  function b(s) {
-    if (s.nodeType !== 1) return;
-    let n = Array.from(s.querySelectorAll("[" + m + "]"));
-    s.hasAttribute && s.hasAttribute(m) && n.push(s), n.forEach(function(e) {
+  function g(a) {
+    if (a.nodeType !== 1) return;
+    let n = Array.from(a.querySelectorAll("[" + p + "]"));
+    a.hasAttribute && a.hasAttribute(p) && n.push(a), n.forEach(function(e) {
       e[c] || (e[c] = new E(e));
     });
   }
-  function E(s) {
-    return this.dom = s, v.call(this), this;
+  function E(a) {
+    return this.dom = a, b.call(this), this;
   }
-  function v() {
+  function b() {
     this.tabs = Array.from(this.dom.querySelectorAll("[data-ln-tab]")), this.panels = Array.from(this.dom.querySelectorAll("[data-ln-panel]")), this.mapTabs = {}, this.mapPanels = {};
-    for (const s of this.tabs) {
-      const n = (s.getAttribute("data-ln-tab") || "").toLowerCase().trim();
-      n && (this.mapTabs[n] = s);
+    for (const a of this.tabs) {
+      const n = (a.getAttribute("data-ln-tab") || "").toLowerCase().trim();
+      n && (this.mapTabs[n] = a);
     }
-    for (const s of this.panels) {
-      const n = (s.getAttribute("data-ln-panel") || "").toLowerCase().trim();
-      n && (this.mapPanels[n] = s);
+    for (const a of this.panels) {
+      const n = (a.getAttribute("data-ln-panel") || "").toLowerCase().trim();
+      n && (this.mapPanels[n] = a);
     }
-    this.defaultKey = (this.dom.getAttribute("data-ln-tabs-default") || "").toLowerCase().trim() || Object.keys(this.mapTabs)[0] || "", this.autoFocus = (this.dom.getAttribute("data-ln-tabs-focus") || "true").toLowerCase() !== "false", this.tabs.forEach((s) => {
-      s.addEventListener("click", () => {
-        const n = (s.getAttribute("data-ln-tab") || "").toLowerCase().trim();
+    this.defaultKey = (this.dom.getAttribute("data-ln-tabs-default") || "").toLowerCase().trim() || Object.keys(this.mapTabs)[0] || "", this.autoFocus = (this.dom.getAttribute("data-ln-tabs-focus") || "true").toLowerCase() !== "false", this.tabs.forEach((a) => {
+      a.addEventListener("click", () => {
+        const n = (a.getAttribute("data-ln-tab") || "").toLowerCase().trim();
         n && (location.hash === "#" + n ? this.activate(n) : location.hash = n);
       });
     }), this._hashHandler = () => {
-      const s = (location.hash || "").replace("#", "").toLowerCase();
-      this.activate(s || this.defaultKey);
+      const a = (location.hash || "").replace("#", "").toLowerCase();
+      this.activate(a || this.defaultKey);
     }, window.addEventListener("hashchange", this._hashHandler), this._hashHandler();
   }
-  E.prototype.activate = function(s) {
+  E.prototype.activate = function(a) {
     var n;
-    (!s || !(s in this.mapPanels)) && (s = this.defaultKey);
+    (!a || !(a in this.mapPanels)) && (a = this.defaultKey);
     for (const e in this.mapTabs) {
       const t = this.mapTabs[e];
-      e === s ? (t.setAttribute("data-active", ""), t.setAttribute("aria-selected", "true")) : (t.removeAttribute("data-active"), t.setAttribute("aria-selected", "false"));
+      e === a ? (t.setAttribute("data-active", ""), t.setAttribute("aria-selected", "true")) : (t.removeAttribute("data-active"), t.setAttribute("aria-selected", "false"));
     }
     for (const e in this.mapPanels) {
-      const t = this.mapPanels[e], i = e === s;
+      const t = this.mapPanels[e], i = e === a;
       t.classList.toggle("hidden", !i), t.setAttribute("aria-hidden", i ? "false" : "true");
     }
     if (this.autoFocus) {
-      const e = (n = this.mapPanels[s]) == null ? void 0 : n.querySelector('input,button,select,textarea,[tabindex]:not([tabindex="-1"])');
+      const e = (n = this.mapPanels[a]) == null ? void 0 : n.querySelector('input,button,select,textarea,[tabindex]:not([tabindex="-1"])');
       e && setTimeout(() => e.focus({ preventScroll: !0 }), 0);
     }
   };
-  function d() {
+  function m() {
     new MutationObserver(function(n) {
       n.forEach(function(e) {
         e.addedNodes.forEach(function(t) {
-          b(t);
+          g(t);
         });
       });
     }).observe(document.body, { childList: !0, subtree: !0 });
   }
-  d(), window[c] = h, h(document.body);
+  m(), window[c] = v, v(document.body);
 })();
 (function() {
-  const m = "data-ln-toggle", c = "lnToggle";
+  const p = "data-ln-toggle", c = "lnToggle";
   if (window[c] !== void 0) return;
-  function h(n) {
-    b(n), E(n);
+  function v(n) {
+    g(n), E(n);
   }
-  function b(n) {
-    var e = n.querySelectorAll("[" + m + "]") || [];
-    n.hasAttribute && n.hasAttribute(m) && (e = Array.from(e), e.push(n)), e.forEach(function(t) {
-      t[c] || (t[c] = new v(t));
+  function g(n) {
+    var e = n.querySelectorAll("[" + p + "]") || [];
+    n.hasAttribute && n.hasAttribute(p) && (e = Array.from(e), e.push(n)), e.forEach(function(t) {
+      t[c] || (t[c] = new b(t));
     });
   }
   function E(n) {
@@ -430,7 +430,7 @@
     n.hasAttribute && n.hasAttribute("data-ln-toggle-for") && (e = Array.from(e), e.push(n)), e.forEach(function(t) {
       t.addEventListener("click", function(i) {
         i.preventDefault();
-        var a = t.getAttribute("data-ln-toggle-for"), r = document.getElementById(a);
+        var d = t.getAttribute("data-ln-toggle-for"), r = document.getElementById(d);
         if (!(!r || !r[c])) {
           var o = t.getAttribute("data-ln-toggle-action") || "toggle";
           r[c][o]();
@@ -438,27 +438,27 @@
       });
     });
   }
-  function v(n) {
-    return this.dom = n, this.isOpen = n.getAttribute(m) === "open", this.isOpen && n.classList.add("open"), this;
+  function b(n) {
+    return this.dom = n, this.isOpen = n.getAttribute(p) === "open", this.isOpen && n.classList.add("open"), this;
   }
-  v.prototype.open = function() {
-    this.isOpen || (this.isOpen = !0, this.dom.classList.add("open"), d(this.dom, "ln-toggle:open", { target: this.dom }));
-  }, v.prototype.close = function() {
-    this.isOpen && (this.isOpen = !1, this.dom.classList.remove("open"), d(this.dom, "ln-toggle:close", { target: this.dom }));
-  }, v.prototype.toggle = function() {
+  b.prototype.open = function() {
+    this.isOpen || (this.isOpen = !0, this.dom.classList.add("open"), m(this.dom, "ln-toggle:open", { target: this.dom }));
+  }, b.prototype.close = function() {
+    this.isOpen && (this.isOpen = !1, this.dom.classList.remove("open"), m(this.dom, "ln-toggle:close", { target: this.dom }));
+  }, b.prototype.toggle = function() {
     this.isOpen ? this.close() : this.open();
   };
-  function d(n, e, t) {
+  function m(n, e, t) {
     n.dispatchEvent(new CustomEvent(e, {
       bubbles: !0,
       detail: t || {}
     }));
   }
-  function s() {
+  function a() {
     var n = new MutationObserver(function(e) {
       e.forEach(function(t) {
         t.type === "childList" && t.addedNodes.forEach(function(i) {
-          i.nodeType === 1 && (b(i), E(i));
+          i.nodeType === 1 && (g(i), E(i));
         });
       });
     });
@@ -467,93 +467,93 @@
       subtree: !0
     });
   }
-  window[c] = h, s(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
-    h(document.body);
-  }) : h(document.body);
+  window[c] = v, a(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
+    v(document.body);
+  }) : v(document.body);
 })();
 (function() {
-  const m = "data-ln-accordion", c = "lnAccordion";
+  const p = "data-ln-accordion", c = "lnAccordion";
   if (window[c] !== void 0) return;
-  function h(d) {
-    b(d);
+  function v(m) {
+    g(m);
   }
-  function b(d) {
-    var s = d.querySelectorAll("[" + m + "]") || [];
-    d.hasAttribute && d.hasAttribute(m) && (s = Array.from(s), s.push(d)), s.forEach(function(n) {
+  function g(m) {
+    var a = m.querySelectorAll("[" + p + "]") || [];
+    m.hasAttribute && m.hasAttribute(p) && (a = Array.from(a), a.push(m)), a.forEach(function(n) {
       n[c] || (n[c] = new E(n));
     });
   }
-  function E(d) {
-    return this.dom = d, d.addEventListener("ln-toggle:open", function(s) {
-      var n = d.querySelectorAll("[data-ln-toggle]");
+  function E(m) {
+    return this.dom = m, m.addEventListener("ln-toggle:open", function(a) {
+      var n = m.querySelectorAll("[data-ln-toggle]");
       n.forEach(function(e) {
-        e !== s.detail.target && e.lnToggle && e.lnToggle.isOpen && e.lnToggle.close();
+        e !== a.detail.target && e.lnToggle && e.lnToggle.isOpen && e.lnToggle.close();
       });
     }), this;
   }
-  function v() {
-    var d = new MutationObserver(function(s) {
-      s.forEach(function(n) {
+  function b() {
+    var m = new MutationObserver(function(a) {
+      a.forEach(function(n) {
         n.type === "childList" && n.addedNodes.forEach(function(e) {
-          e.nodeType === 1 && b(e);
+          e.nodeType === 1 && g(e);
         });
       });
     });
-    d.observe(document.body, {
+    m.observe(document.body, {
       childList: !0,
       subtree: !0
     });
   }
-  window[c] = h, v(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
-    h(document.body);
-  }) : h(document.body);
+  window[c] = v, b(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
+    v(document.body);
+  }) : v(document.body);
 })();
 (function() {
-  const m = "data-ln-toast", c = "lnToast", h = {
+  const p = "data-ln-toast", c = "lnToast", v = {
     success: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>',
     error: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
     warn: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 1.67 10.42 18.04H1.58L12 1.67z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
     info: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
   };
   if (window[c] !== void 0 && window[c] !== null) return;
-  function b(r = document.body) {
+  function g(r = document.body) {
     return E(r), i;
   }
   function E(r) {
     if (!r || r.nodeType !== 1) return;
-    let o = Array.from(r.querySelectorAll("[" + m + "]"));
-    r.hasAttribute && r.hasAttribute(m) && o.push(r), o.forEach((u) => {
-      u[c] || new v(u);
+    let o = Array.from(r.querySelectorAll("[" + p + "]"));
+    r.hasAttribute && r.hasAttribute(p) && o.push(r), o.forEach((s) => {
+      s[c] || new b(s);
     });
   }
-  function v(r) {
+  function b(r) {
     return this.dom = r, r[c] = this, this.timeoutDefault = parseInt(r.getAttribute("data-ln-toast-timeout") || "6000", 10), this.max = parseInt(r.getAttribute("data-ln-toast-max") || "5", 10), Array.from(r.querySelectorAll("[data-ln-toast-item]")).forEach((o) => {
-      d(o);
+      m(o);
     }), this;
   }
-  function d(r) {
-    const o = ((r.getAttribute("data-type") || "info") + "").toLowerCase(), u = r.getAttribute("data-title"), p = (r.innerText || r.textContent || "").trim();
+  function m(r) {
+    const o = ((r.getAttribute("data-type") || "info") + "").toLowerCase(), s = r.getAttribute("data-title"), l = (r.innerText || r.textContent || "").trim();
     r.className = "ln-toast__item", r.removeAttribute("data-ln-toast-item");
-    const g = document.createElement("div");
-    g.className = "ln-toast__card ln-toast__card--" + o, g.setAttribute("role", o === "error" ? "alert" : "status"), g.setAttribute("aria-live", o === "error" ? "assertive" : "polite");
-    const f = document.createElement("div");
-    f.className = "ln-toast__side", f.innerHTML = h[o] || h.info;
+    const h = document.createElement("div");
+    h.className = "ln-toast__card ln-toast__card--" + o, h.setAttribute("role", o === "error" ? "alert" : "status"), h.setAttribute("aria-live", o === "error" ? "assertive" : "polite");
+    const u = document.createElement("div");
+    u.className = "ln-toast__side", u.innerHTML = v[o] || v.info;
     const y = document.createElement("div");
     y.className = "ln-toast__content";
     const L = document.createElement("div");
     L.className = "ln-toast__head";
-    const w = document.createElement("strong");
-    w.className = "ln-toast__title", w.textContent = u || (o === "success" ? "Success" : o === "error" ? "Error" : o === "warn" ? "Warning" : "Information");
+    const _ = document.createElement("strong");
+    _.className = "ln-toast__title", _.textContent = s || (o === "success" ? "Success" : o === "error" ? "Error" : o === "warn" ? "Warning" : "Information");
     const T = document.createElement("button");
-    if (T.type = "button", T.className = "ln-toast__close", T.setAttribute("aria-label", "Close"), T.innerHTML = "&times;", T.addEventListener("click", () => n(r)), L.appendChild(w), y.appendChild(L), y.appendChild(T), p) {
+    if (T.type = "button", T.className = "ln-toast__close", T.setAttribute("aria-label", "Close"), T.innerHTML = "&times;", T.addEventListener("click", () => n(r)), L.appendChild(_), y.appendChild(L), y.appendChild(T), l) {
       const S = document.createElement("div");
       S.className = "ln-toast__body";
       const O = document.createElement("p");
-      O.textContent = p, S.appendChild(O), y.appendChild(S);
+      O.textContent = l, S.appendChild(O), y.appendChild(S);
     }
-    g.appendChild(f), g.appendChild(y), r.innerHTML = "", r.appendChild(g), requestAnimationFrame(() => r.classList.add("ln-toast__item--in"));
+    h.appendChild(u), h.appendChild(y), r.innerHTML = "", r.appendChild(h), requestAnimationFrame(() => r.classList.add("ln-toast__item--in"));
   }
-  function s(r, o) {
+  function a(r, o) {
     for (; r.dom.children.length >= r.max; ) r.dom.removeChild(r.dom.firstElementChild);
     r.dom.appendChild(o), requestAnimationFrame(() => o.classList.add("ln-toast__item--in"));
   }
@@ -564,28 +564,28 @@
   }
   function e(r = {}) {
     let o = r.container;
-    if (typeof o == "string" && (o = document.querySelector(o)), o instanceof HTMLElement || (o = document.querySelector("[" + m + "]") || document.getElementById("ln-toast-container")), !o) return null;
-    const u = o[c] || new v(o), p = Number.isFinite(r.timeout) ? r.timeout : u.timeoutDefault, g = (r.type || "info").toLowerCase(), f = document.createElement("li");
-    f.className = "ln-toast__item";
+    if (typeof o == "string" && (o = document.querySelector(o)), o instanceof HTMLElement || (o = document.querySelector("[" + p + "]") || document.getElementById("ln-toast-container")), !o) return null;
+    const s = o[c] || new b(o), l = Number.isFinite(r.timeout) ? r.timeout : s.timeoutDefault, h = (r.type || "info").toLowerCase(), u = document.createElement("li");
+    u.className = "ln-toast__item";
     const y = document.createElement("div");
-    y.className = "ln-toast__card ln-toast__card--" + g, y.setAttribute("role", g === "error" ? "alert" : "status"), y.setAttribute("aria-live", g === "error" ? "assertive" : "polite");
+    y.className = "ln-toast__card ln-toast__card--" + h, y.setAttribute("role", h === "error" ? "alert" : "status"), y.setAttribute("aria-live", h === "error" ? "assertive" : "polite");
     const L = document.createElement("div");
-    L.className = "ln-toast__side", L.innerHTML = h[g] || h.info;
-    const w = document.createElement("div");
-    w.className = "ln-toast__content";
+    L.className = "ln-toast__side", L.innerHTML = v[h] || v.info;
+    const _ = document.createElement("div");
+    _.className = "ln-toast__content";
     const T = document.createElement("div");
     T.className = "ln-toast__head";
     const S = document.createElement("strong");
-    S.className = "ln-toast__title", S.textContent = r.title || (g === "success" ? "Success" : g === "error" ? "Error" : g === "warn" ? "Warning" : "Information");
+    S.className = "ln-toast__title", S.textContent = r.title || (h === "success" ? "Success" : h === "error" ? "Error" : h === "warn" ? "Warning" : "Information");
     const O = document.createElement("button");
-    if (O.type = "button", O.className = "ln-toast__close", O.setAttribute("aria-label", "Close"), O.innerHTML = "&times;", O.addEventListener("click", () => n(f)), T.appendChild(S), w.appendChild(T), w.appendChild(O), r.message || r.data && r.data.errors) {
+    if (O.type = "button", O.className = "ln-toast__close", O.setAttribute("aria-label", "Close"), O.innerHTML = "&times;", O.addEventListener("click", () => n(u)), T.appendChild(S), _.appendChild(T), _.appendChild(O), r.message || r.data && r.data.errors) {
       const x = document.createElement("div");
       if (x.className = "ln-toast__body", r.message)
         if (Array.isArray(r.message)) {
           const M = document.createElement("ul");
           r.message.forEach(function(D) {
-            const l = document.createElement("li");
-            l.textContent = D, M.appendChild(l);
+            const f = document.createElement("li");
+            f.textContent = D, M.appendChild(f);
           }), x.appendChild(M);
         } else {
           const M = document.createElement("p");
@@ -594,185 +594,185 @@
       if (r.data && r.data.errors) {
         const M = document.createElement("ul");
         Object.values(r.data.errors).flat().forEach((D) => {
-          const l = document.createElement("li");
-          l.textContent = D, M.appendChild(l);
+          const f = document.createElement("li");
+          f.textContent = D, M.appendChild(f);
         }), x.appendChild(M);
       }
-      w.appendChild(x);
+      _.appendChild(x);
     }
-    return y.appendChild(L), y.appendChild(w), f.appendChild(y), s(u, f), p > 0 && (f._timer = setTimeout(() => n(f), p)), f;
+    return y.appendChild(L), y.appendChild(_), u.appendChild(y), a(s, u), l > 0 && (u._timer = setTimeout(() => n(u), l)), u;
   }
   function t(r) {
     let o = r;
-    typeof o == "string" && (o = document.querySelector(o)), o instanceof HTMLElement || (o = document.querySelector("[" + m + "]") || document.getElementById("ln-toast-container")), o && Array.from(o.children).forEach(n);
+    typeof o == "string" && (o = document.querySelector(o)), o instanceof HTMLElement || (o = document.querySelector("[" + p + "]") || document.getElementById("ln-toast-container")), o && Array.from(o.children).forEach(n);
   }
   const i = function(r) {
-    return b(r);
+    return g(r);
   };
   i.enqueue = e, i.clear = t, new MutationObserver((r) => {
-    r.forEach((o) => o.addedNodes.forEach((u) => E(u)));
+    r.forEach((o) => o.addedNodes.forEach((s) => E(s)));
   }).observe(document.body, { childList: !0, subtree: !0 }), window[c] = i, window.addEventListener("ln-toast:enqueue", function(r) {
     r.detail && i.enqueue(r.detail);
-  }), b(document.body);
+  }), g(document.body);
 })();
 (function() {
-  const m = "data-ln-upload", c = "lnUpload", h = "data-ln-upload-dict", b = "data-ln-upload-accept", E = "data-ln-upload-context";
+  const p = "data-ln-upload", c = "lnUpload", v = "data-ln-upload-dict", g = "data-ln-upload-accept", E = "data-ln-upload-context";
   if (window[c] !== void 0)
     return;
-  function v(o, u) {
-    const p = o.querySelector("[" + h + '="' + u + '"]');
-    return p ? p.textContent : u;
+  function b(o, s) {
+    const l = o.querySelector("[" + v + '="' + s + '"]');
+    return l ? l.textContent : s;
   }
-  function d(o) {
+  function m(o) {
     if (o === 0) return "0 B";
-    const u = 1024, p = ["B", "KB", "MB", "GB"], g = Math.floor(Math.log(o) / Math.log(u));
-    return parseFloat((o / Math.pow(u, g)).toFixed(1)) + " " + p[g];
+    const s = 1024, l = ["B", "KB", "MB", "GB"], h = Math.floor(Math.log(o) / Math.log(s));
+    return parseFloat((o / Math.pow(s, h)).toFixed(1)) + " " + l[h];
   }
-  function s(o) {
+  function a(o) {
     return o.split(".").pop().toLowerCase();
   }
   function n(o) {
     return o === "docx" && (o = "doc"), ["pdf", "doc", "epub"].includes(o) ? "ln-icon-file-" + o : "ln-icon-file";
   }
-  function e(o, u) {
-    if (!u) return !0;
-    const p = "." + s(o.name);
-    return u.split(",").map(function(f) {
-      return f.trim().toLowerCase();
-    }).includes(p.toLowerCase());
+  function e(o, s) {
+    if (!s) return !0;
+    const l = "." + a(o.name);
+    return s.split(",").map(function(u) {
+      return u.trim().toLowerCase();
+    }).includes(l.toLowerCase());
   }
-  function t(o, u, p) {
-    o.dispatchEvent(new CustomEvent(u, {
+  function t(o, s, l) {
+    o.dispatchEvent(new CustomEvent(s, {
       bubbles: !0,
-      detail: p
+      detail: l
     }));
   }
   function i(o) {
     if (o.hasAttribute("data-ln-upload-initialized")) return;
     o.setAttribute("data-ln-upload-initialized", "true");
-    const u = o.querySelector(".ln-upload__zone"), p = o.querySelector(".ln-upload__list"), g = o.getAttribute(b) || "";
-    let f = o.querySelector('input[type="file"]');
-    f || (f = document.createElement("input"), f.type = "file", f.multiple = !0, f.style.display = "none", g && (f.accept = g.split(",").map(function(l) {
-      return l = l.trim(), l.startsWith(".") ? l : "." + l;
-    }).join(",")), o.appendChild(f));
-    const y = o.getAttribute(m) || "/files/upload", L = o.getAttribute(E) || "", w = /* @__PURE__ */ new Map();
+    const s = o.querySelector(".ln-upload__zone"), l = o.querySelector(".ln-upload__list"), h = o.getAttribute(g) || "";
+    let u = o.querySelector('input[type="file"]');
+    u || (u = document.createElement("input"), u.type = "file", u.multiple = !0, u.style.display = "none", h && (u.accept = h.split(",").map(function(f) {
+      return f = f.trim(), f.startsWith(".") ? f : "." + f;
+    }).join(",")), o.appendChild(u));
+    const y = o.getAttribute(p) || "/files/upload", L = o.getAttribute(E) || "", _ = /* @__PURE__ */ new Map();
     let T = 0;
     function S() {
-      const l = document.querySelector('meta[name="csrf-token"]');
-      return l ? l.getAttribute("content") : "";
+      const f = document.querySelector('meta[name="csrf-token"]');
+      return f ? f.getAttribute("content") : "";
     }
-    function O(l) {
-      if (!e(l, g)) {
-        const _ = v(o, "invalid-type");
+    function O(f) {
+      if (!e(f, h)) {
+        const A = b(o, "invalid-type");
         t(o, "ln-upload:invalid", {
-          file: l,
-          message: _
+          file: f,
+          message: A
         }), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
           detail: {
             type: "error",
             title: "Invalid File",
-            message: _ || "This file type is not allowed"
+            message: A || "This file type is not allowed"
           }
         }));
         return;
       }
-      const A = "file-" + ++T, C = s(l.name), F = n(C), N = document.createElement("li");
-      N.className = "ln-upload__item ln-upload__item--uploading " + F, N.setAttribute("data-file-id", A);
-      const B = document.createElement("span");
-      B.className = "ln-upload__name", B.textContent = l.name;
+      const w = "file-" + ++T, C = a(f.name), j = n(C), k = document.createElement("li");
+      k.className = "ln-upload__item ln-upload__item--uploading " + j, k.setAttribute("data-file-id", w);
+      const F = document.createElement("span");
+      F.className = "ln-upload__name", F.textContent = f.name;
       const I = document.createElement("span");
       I.className = "ln-upload__size", I.textContent = "0%";
-      const k = document.createElement("button");
-      k.type = "button", k.className = "ln-upload__remove", k.title = v(o, "remove"), k.textContent = "×", k.disabled = !0;
+      const N = document.createElement("button");
+      N.type = "button", N.className = "ln-upload__remove", N.title = b(o, "remove"), N.textContent = "×", N.disabled = !0;
       const U = document.createElement("div");
       U.className = "ln-upload__progress";
       const z = document.createElement("div");
-      z.className = "ln-upload__progress-bar", U.appendChild(z), N.appendChild(B), N.appendChild(I), N.appendChild(k), N.appendChild(U), p.appendChild(N);
-      const H = new FormData();
-      H.append("file", l), H.append("context", L);
+      z.className = "ln-upload__progress-bar", U.appendChild(z), k.appendChild(F), k.appendChild(I), k.appendChild(N), k.appendChild(U), l.appendChild(k);
+      const R = new FormData();
+      R.append("file", f), R.append("context", L);
       const q = new XMLHttpRequest();
-      q.upload.addEventListener("progress", function(_) {
-        if (_.lengthComputable) {
-          const j = Math.round(_.loaded / _.total * 100);
-          z.style.width = j + "%", I.textContent = j + "%";
+      q.upload.addEventListener("progress", function(A) {
+        if (A.lengthComputable) {
+          const B = Math.round(A.loaded / A.total * 100);
+          z.style.width = B + "%", I.textContent = B + "%";
         }
       }), q.addEventListener("load", function() {
         if (q.status >= 200 && q.status < 300) {
-          var _;
+          var A;
           try {
-            _ = JSON.parse(q.responseText);
+            A = JSON.parse(q.responseText);
           } catch {
-            P("Invalid response");
+            H("Invalid response");
             return;
           }
-          N.classList.remove("ln-upload__item--uploading"), I.textContent = d(_.size || l.size), k.disabled = !1, w.set(A, {
-            serverId: _.id,
-            name: _.name,
-            size: _.size
+          k.classList.remove("ln-upload__item--uploading"), I.textContent = m(A.size || f.size), N.disabled = !1, _.set(w, {
+            serverId: A.id,
+            name: A.name,
+            size: A.size
           }), x(), t(o, "ln-upload:uploaded", {
-            localId: A,
-            serverId: _.id,
-            name: _.name
+            localId: w,
+            serverId: A.id,
+            name: A.name
           });
         } else {
-          var j = "Upload failed";
+          var B = "Upload failed";
           try {
-            var R = JSON.parse(q.responseText);
-            j = R.message || j;
+            var P = JSON.parse(q.responseText);
+            B = P.message || B;
           } catch {
           }
-          P(j);
+          H(B);
         }
       }), q.addEventListener("error", function() {
-        P("Network error");
+        H("Network error");
       });
-      function P(_) {
-        N.classList.remove("ln-upload__item--uploading"), N.classList.add("ln-upload__item--error"), z.style.width = "100%", I.textContent = v(o, "error"), k.disabled = !1, t(o, "ln-upload:error", {
-          file: l,
-          message: _
+      function H(A) {
+        k.classList.remove("ln-upload__item--uploading"), k.classList.add("ln-upload__item--error"), z.style.width = "100%", I.textContent = b(o, "error"), N.disabled = !1, t(o, "ln-upload:error", {
+          file: f,
+          message: A
         }), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
           detail: {
             type: "error",
             title: "Upload Error",
-            message: _ || v(o, "upload-failed") || "Failed to upload file"
+            message: A || b(o, "upload-failed") || "Failed to upload file"
           }
         }));
       }
-      q.open("POST", y), q.setRequestHeader("X-CSRF-TOKEN", S()), q.setRequestHeader("Accept", "application/json"), q.send(H);
+      q.open("POST", y), q.setRequestHeader("X-CSRF-TOKEN", S()), q.setRequestHeader("Accept", "application/json"), q.send(R);
     }
     function x() {
-      o.querySelectorAll('input[name="file_ids[]"]').forEach(function(l) {
-        l.remove();
-      }), w.forEach(function(l) {
-        const A = document.createElement("input");
-        A.type = "hidden", A.name = "file_ids[]", A.value = l.serverId, o.appendChild(A);
+      o.querySelectorAll('input[name="file_ids[]"]').forEach(function(f) {
+        f.remove();
+      }), _.forEach(function(f) {
+        const w = document.createElement("input");
+        w.type = "hidden", w.name = "file_ids[]", w.value = f.serverId, o.appendChild(w);
       });
     }
-    function M(l) {
-      const A = w.get(l), C = p.querySelector('[data-file-id="' + l + '"]');
-      if (!A || !A.serverId) {
-        C && C.remove(), w.delete(l), x();
+    function M(f) {
+      const w = _.get(f), C = l.querySelector('[data-file-id="' + f + '"]');
+      if (!w || !w.serverId) {
+        C && C.remove(), _.delete(f), x();
         return;
       }
-      C && C.classList.add("ln-upload__item--deleting"), fetch("/files/" + A.serverId, {
+      C && C.classList.add("ln-upload__item--deleting"), fetch("/files/" + w.serverId, {
         method: "DELETE",
         headers: {
           "X-CSRF-TOKEN": S(),
           Accept: "application/json"
         }
-      }).then((F) => {
-        F.status === 200 ? (C && C.remove(), w.delete(l), x(), t(o, "ln-upload:removed", {
-          localId: l,
-          serverId: A.serverId
+      }).then((j) => {
+        j.status === 200 ? (C && C.remove(), _.delete(f), x(), t(o, "ln-upload:removed", {
+          localId: f,
+          serverId: w.serverId
         })) : (C && C.classList.remove("ln-upload__item--deleting"), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
           detail: {
             type: "error",
             title: "Error",
-            message: v(o, "delete-error") || "Failed to delete file"
+            message: b(o, "delete-error") || "Failed to delete file"
           }
         })));
-      }).catch((F) => {
-        console.error("Delete error:", F), C && C.classList.remove("ln-upload__item--deleting"), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
+      }).catch((j) => {
+        console.error("Delete error:", j), C && C.classList.remove("ln-upload__item--deleting"), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
           detail: {
             type: "error",
             title: "Network Error",
@@ -781,58 +781,58 @@
         }));
       });
     }
-    function D(l) {
-      Array.from(l).forEach(function(A) {
-        O(A);
-      }), f.value = "";
+    function D(f) {
+      Array.from(f).forEach(function(w) {
+        O(w);
+      }), u.value = "";
     }
-    u.addEventListener("click", function() {
-      f.click();
-    }), f.addEventListener("change", function() {
+    s.addEventListener("click", function() {
+      u.click();
+    }), u.addEventListener("change", function() {
       D(this.files);
-    }), u.addEventListener("dragenter", function(l) {
-      l.preventDefault(), l.stopPropagation(), u.classList.add("ln-upload__zone--dragover");
-    }), u.addEventListener("dragover", function(l) {
-      l.preventDefault(), l.stopPropagation(), u.classList.add("ln-upload__zone--dragover");
-    }), u.addEventListener("dragleave", function(l) {
-      l.preventDefault(), l.stopPropagation(), u.classList.remove("ln-upload__zone--dragover");
-    }), u.addEventListener("drop", function(l) {
-      l.preventDefault(), l.stopPropagation(), u.classList.remove("ln-upload__zone--dragover"), D(l.dataTransfer.files);
-    }), p.addEventListener("click", function(l) {
-      if (l.target.classList.contains("ln-upload__remove")) {
-        const A = l.target.closest(".ln-upload__item");
-        A && M(A.getAttribute("data-file-id"));
+    }), s.addEventListener("dragenter", function(f) {
+      f.preventDefault(), f.stopPropagation(), s.classList.add("ln-upload__zone--dragover");
+    }), s.addEventListener("dragover", function(f) {
+      f.preventDefault(), f.stopPropagation(), s.classList.add("ln-upload__zone--dragover");
+    }), s.addEventListener("dragleave", function(f) {
+      f.preventDefault(), f.stopPropagation(), s.classList.remove("ln-upload__zone--dragover");
+    }), s.addEventListener("drop", function(f) {
+      f.preventDefault(), f.stopPropagation(), s.classList.remove("ln-upload__zone--dragover"), D(f.dataTransfer.files);
+    }), l.addEventListener("click", function(f) {
+      if (f.target.classList.contains("ln-upload__remove")) {
+        const w = f.target.closest(".ln-upload__item");
+        w && M(w.getAttribute("data-file-id"));
       }
     }), o.lnUploadAPI = {
       getFileIds: function() {
-        return Array.from(w.values()).map(function(l) {
-          return l.serverId;
+        return Array.from(_.values()).map(function(f) {
+          return f.serverId;
         });
       },
       getFiles: function() {
-        return Array.from(w.values());
+        return Array.from(_.values());
       },
       clear: function() {
-        w.forEach(function(l) {
-          l.serverId && fetch("/files/" + l.serverId, {
+        _.forEach(function(f) {
+          f.serverId && fetch("/files/" + f.serverId, {
             method: "DELETE",
             headers: {
               "X-CSRF-TOKEN": S(),
               Accept: "application/json"
             }
           });
-        }), w.clear(), p.innerHTML = "", x(), t(o, "ln-upload:cleared", {});
+        }), _.clear(), l.innerHTML = "", x(), t(o, "ln-upload:cleared", {});
       }
     };
   }
-  function a() {
-    document.querySelectorAll("[" + m + "]").forEach(i);
+  function d() {
+    document.querySelectorAll("[" + p + "]").forEach(i);
   }
   function r() {
-    new MutationObserver(function(u) {
-      u.forEach(function(p) {
-        p.type === "childList" && p.addedNodes.forEach(function(g) {
-          g.nodeType === 1 && (g.hasAttribute(m) && i(g), g.querySelectorAll("[" + m + "]").forEach(i));
+    new MutationObserver(function(s) {
+      s.forEach(function(l) {
+        l.type === "childList" && l.addedNodes.forEach(function(h) {
+          h.nodeType === 1 && (h.hasAttribute(p) && i(h), h.querySelectorAll("[" + p + "]").forEach(i));
         });
       });
     }).observe(document.body, {
@@ -842,12 +842,12 @@
   }
   window[c] = {
     init: i,
-    initAll: a
-  }, r(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", a) : a();
+    initAll: d
+  }, r(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", d) : d();
 })();
 (function() {
-  const m = "lnExternalLinks";
-  if (window[m] !== void 0)
+  const p = "lnExternalLinks";
+  if (window[p] !== void 0)
     return;
   function c(n, e, t) {
     n.dispatchEvent(new CustomEvent(e, {
@@ -855,21 +855,21 @@
       detail: t
     }));
   }
-  function h(n) {
+  function v(n) {
     return n.hostname && n.hostname !== window.location.hostname;
   }
-  function b(n) {
-    n.getAttribute("data-ln-external-link") !== "processed" && h(n) && (n.target = "_blank", n.rel = "noopener noreferrer", n.setAttribute("data-ln-external-link", "processed"), c(n, "ln-external-links:processed", {
+  function g(n) {
+    n.getAttribute("data-ln-external-link") !== "processed" && v(n) && (n.target = "_blank", n.rel = "noopener noreferrer", n.setAttribute("data-ln-external-link", "processed"), c(n, "ln-external-links:processed", {
       link: n,
       href: n.href
     }));
   }
   function E(n) {
     n = n || document.body, n.querySelectorAll("a, area").forEach(function(t) {
-      b(t);
+      g(t);
     });
   }
-  function v() {
+  function b() {
     document.body.addEventListener("click", function(n) {
       const e = n.target.closest("a, area");
       e && e.getAttribute("data-ln-external-link") === "processed" && c(e, "ln-external-links:clicked", {
@@ -879,14 +879,14 @@
       });
     });
   }
-  function d() {
+  function m() {
     new MutationObserver(function(e) {
       e.forEach(function(t) {
         t.type === "childList" && t.addedNodes.forEach(function(i) {
           if (i.nodeType === 1) {
-            i.matches && (i.matches("a") || i.matches("area")) && b(i);
-            const a = i.querySelectorAll && i.querySelectorAll("a, area");
-            a && a.forEach(b);
+            i.matches && (i.matches("a") || i.matches("area")) && g(i);
+            const d = i.querySelectorAll && i.querySelectorAll("a, area");
+            d && d.forEach(g);
           }
         });
       });
@@ -895,40 +895,129 @@
       subtree: !0
     });
   }
-  function s() {
-    v(), d(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
+  function a() {
+    b(), m(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
       E();
     }) : E();
   }
-  window[m] = {
+  window[p] = {
     process: E
-  }, s();
+  }, a();
 })();
 (function() {
-  const m = "[data-ln-progress]", c = "lnProgress";
+  const p = "data-ln-link", c = "lnLink";
+  if (window[c] !== void 0) return;
+  var v = null;
+  function g() {
+    v = document.createElement("div"), v.className = "ln-link-status", document.body.appendChild(v);
+  }
+  function E(s) {
+    v && (v.textContent = s, v.classList.add("ln-link-status--visible"));
+  }
+  function b() {
+    v && v.classList.remove("ln-link-status--visible");
+  }
+  function m(s, l) {
+    if (!l.target.closest("a, button, input, select, textarea")) {
+      var h = s.querySelector("a");
+      if (h) {
+        var u = h.getAttribute("href");
+        if (u) {
+          if (l.ctrlKey || l.metaKey) {
+            window.open(u, "_blank");
+            return;
+          }
+          h.dispatchEvent(new MouseEvent("click", {
+            bubbles: !0,
+            cancelable: !0,
+            view: window
+          }));
+        }
+      }
+    }
+  }
+  function a(s) {
+    var l = s.querySelector("a");
+    if (l) {
+      var h = l.getAttribute("href");
+      h && E(h);
+    }
+  }
+  function n() {
+    b();
+  }
+  function e(s) {
+    s._lnLinkInit || (s._lnLinkInit = !0, s.querySelector("a") && (s.addEventListener("click", function(l) {
+      m(s, l);
+    }), s.addEventListener("mouseenter", function() {
+      a(s);
+    }), s.addEventListener("mouseleave", n)));
+  }
+  function t(s) {
+    if (!s._lnLinkInit) {
+      s._lnLinkInit = !0;
+      var l = s.tagName;
+      if (l === "TABLE" || l === "TBODY") {
+        var h = l === "TABLE" && s.querySelector("tbody") || s, u = h.querySelectorAll("tr");
+        u.forEach(e);
+      } else e(s);
+    }
+  }
+  function i(s) {
+    s.hasAttribute && s.hasAttribute(p) && t(s);
+    var l = s.querySelectorAll ? s.querySelectorAll("[" + p + "]") : [];
+    l.forEach(t);
+  }
+  function d() {
+    var s = new MutationObserver(function(l) {
+      l.forEach(function(h) {
+        h.type === "childList" && h.addedNodes.forEach(function(u) {
+          if (u.nodeType === 1 && (i(u), u.tagName === "TR")) {
+            var y = u.closest("[" + p + "]");
+            y && e(u);
+          }
+        });
+      });
+    });
+    s.observe(document.body, {
+      childList: !0,
+      subtree: !0
+    });
+  }
+  function r(s) {
+    i(s);
+  }
+  window[c] = { init: r }, g(), d();
+  function o() {
+    r(document.body);
+  }
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", o) : o();
+})();
+(function() {
+  const p = "[data-ln-progress]", c = "lnProgress";
   if (window[c] !== void 0)
     return;
-  function h(e) {
+  function v(e) {
     var t = e.getAttribute("data-ln-progress");
     return t !== null && t !== "";
   }
-  function b(e) {
+  function g(e) {
     E(e);
   }
   function E(e) {
-    var t = e.querySelectorAll(m) || [];
+    var t = e.querySelectorAll(p) || [];
     t.forEach(function(i) {
-      h(i) && !i[c] && (i[c] = new v(i));
-    }), e.hasAttribute && e.hasAttribute("data-ln-progress") && h(e) && !e[c] && (e[c] = new v(e));
+      v(i) && !i[c] && (i[c] = new b(i));
+    }), e.hasAttribute && e.hasAttribute("data-ln-progress") && v(e) && !e[c] && (e[c] = new b(e));
   }
-  function v(e) {
-    return this.dom = e, n.call(this), s.call(this), this;
+  function b(e) {
+    return this.dom = e, n.call(this), a.call(this), this;
   }
-  function d() {
+  function m() {
     var e = new MutationObserver(function(t) {
       t.forEach(function(i) {
-        i.type === "childList" && i.addedNodes.forEach(function(a) {
-          a.nodeType === 1 && E(a);
+        i.type === "childList" && i.addedNodes.forEach(function(d) {
+          d.nodeType === 1 && E(d);
         });
       });
     });
@@ -937,11 +1026,11 @@
       subtree: !0
     });
   }
-  d();
-  function s() {
+  m();
+  function a() {
     var e = this, t = new MutationObserver(function(i) {
-      i.forEach(function(a) {
-        (a.attributeName === "data-ln-progress" || a.attributeName === "data-ln-progress-max") && n.call(e);
+      i.forEach(function(d) {
+        (d.attributeName === "data-ln-progress" || d.attributeName === "data-ln-progress-max") && n.call(e);
       });
     });
     t.observe(this.dom, {
@@ -953,7 +1042,7 @@
     var e = parseFloat(this.dom.getAttribute("data-ln-progress")) || 0, t = parseFloat(this.dom.getAttribute("data-ln-progress-max")) || 100, i = t > 0 ? e / t * 100 : 0;
     i < 0 && (i = 0), i > 100 && (i = 100), this.dom.style.width = i + "%";
   }
-  window[c] = b, document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
+  window[c] = g, document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
     window.lnProgress(document.body);
   }) : window.lnProgress(document.body);
 })();

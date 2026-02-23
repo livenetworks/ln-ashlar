@@ -16,5 +16,7 @@ import './ln-toast/ln-toast.scss';
 import './ln-upload/ln-upload.js';
 import './ln-upload/ln-upload.scss';
 import './ln-external-links/ln-external-links.js';
+import './ln-link/ln-link.js';
+import './ln-link/ln-link.scss';
 import './ln-progress/ln-progress.js';
 import './ln-progress/ln-progress.scss';

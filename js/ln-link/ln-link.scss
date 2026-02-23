@@ -1,0 +1,40 @@
+@use '../../scss/config/mixins' as *;
+
+// ─── Clickable rows ────────────────────────────────────────
+// Rows inside data-ln-link containers get pointer cursor
+
+[data-ln-link] tr,
+tr[data-ln-link],
+[data-ln-link]:not(table):not(tbody):not(tr) {
+	@include cursor-pointer;
+	@include select-none;
+}
+
+// ─── Status bar (URL preview) ──────────────────────────────
+// Mimics browser's native status bar at bottom-left
+
+.ln-link-status {
+	@include fixed;
+	bottom: 0;
+	left: 0;
+	@include px(0.75rem);
+	@include py(0.25rem);
+	@include bg-primary;
+	@include border-t;
+	@include border-r;
+	@include text-xs;
+	@include text-secondary;
+	@include rounded-sm;
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+	max-width: 50vw;
+	@include truncate;
+	@include z-toast;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity var(--transition-fast);
+
+	&--visible {
+		opacity: 1;
+	}
+}
