@@ -114,7 +114,11 @@ box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 Достапни иконки: `ln-icon-close`, `ln-icon-menu`, `ln-icon-home`, `ln-icon-users`,
 `ln-icon-delete`, `ln-icon-view`, `ln-icon-check`, `ln-icon-plus`, `ln-icon-settings`,
 `ln-icon-books`, `ln-icon-lodges`, `ln-icon-logout`, `ln-icon-chart`, `ln-icon-clock`,
-`ln-icon-envelope`, `ln-icon-arrow-up`, `ln-icon-book`.
+`ln-icon-envelope`, `ln-icon-arrow-up`, `ln-icon-arrow-down`, `ln-icon-book`,
+`ln-icon-edit`, `ln-icon-save`, `ln-icon-download`, `ln-icon-upload`,
+`ln-icon-copy`, `ln-icon-link`, `ln-icon-calendar`, `ln-icon-filter`,
+`ln-icon-refresh`, `ln-icon-print`, `ln-icon-lock`, `ln-icon-star`,
+`ln-icon-info-circle`, `ln-icon-warning`.
 
 Големински варијанти: `.ln-icon--sm` (1rem), `.ln-icon--lg` (1.5rem), `.ln-icon--xl` (4rem).
 

@@ -7,27 +7,20 @@
    ========================================================================== */
 
 /* Generic file icon */
-.ln-icon-file::before {
-	margin-right: 0.5rem;
-	background-image: var(--icon-file);
-}
+.ln-icon-file::before { background-image: var(--icon-file); }
 
 /* PDF file icon */
-.ln-icon-file-pdf::before {
-	margin-right: 0.5rem;
-	background-image: var(--icon-file-pdf);
-}
+.ln-icon-file-pdf::before { background-image: var(--icon-file-pdf); }
 
 /* DOC/DOCX file icon */
-.ln-icon-file-doc::before {
-	margin-right: 0.5rem;
-	background-image: var(--icon-file-doc);
-}
+.ln-icon-file-doc::before { background-image: var(--icon-file-doc); }
 
 /* EPUB file icon */
-.ln-icon-file-epub::before {
+.ln-icon-file-epub::before { background-image: var(--icon-file-epub); }
+
+/* Spacing only in upload context */
+.ln-upload__item [class*="ln-icon-file"]::before {
 	margin-right: 0.5rem;
-	background-image: var(--icon-file-epub);
 }
 
 /* ==========================================================================
