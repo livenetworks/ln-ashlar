@@ -198,6 +198,14 @@
 								node.querySelectorAll('[' + DOM_SELECTOR + ']').forEach(function (el) {
 									_constructor(el);
 								});
+
+								// Node injected inside an already-initialized root — attach handlers to its links/forms
+								var ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
+								if (ajaxRoot && ajaxRoot.getAttribute(DOM_SELECTOR) !== 'false') {
+									var items = _findElements(node);
+									_attachLinksAjax(items.links);
+									_attachFormsAjax(items.forms);
+								}
 							}
 						}
 					});
