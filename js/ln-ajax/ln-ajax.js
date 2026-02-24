@@ -203,6 +203,7 @@
 								var ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
 								if (ajaxRoot && ajaxRoot.getAttribute(DOM_SELECTOR) !== 'false') {
 									var items = _findElements(node);
+									console.log('[ln-ajax] re-attach on injected node:', node, 'links:', items.links.length, 'forms:', items.forms.length);
 									_attachLinksAjax(items.links);
 									_attachFormsAjax(items.forms);
 								}
