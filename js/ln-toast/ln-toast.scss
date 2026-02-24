@@ -135,6 +135,8 @@
 	font-size: 0.9375rem;
 	color: var(--ln-toast-fg-muted);
 	line-height: 1.5;
+
+	p { margin: 0; }
 }
 
 .ln-toast__body ul {

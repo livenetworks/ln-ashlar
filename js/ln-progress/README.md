@@ -51,6 +51,25 @@ Progress bar компонента — визуелен индикатор за �
 > **Accessibility:** Додади `role="progressbar"` и ARIA атрибути (`aria-valuenow`,
 > `aria-valuemin`, `aria-valuemax`) на track елементот за screen readers.
 
+## Events
+
+Настанот се dispatch-ува на bar елементот (`[data-ln-progress="N"]`) и bubble-ира нагоре.
+
+| Настан | Кога | `detail` |
+|--------|------|----------|
+| `ln-progress:change` | При секоја промена на вредноста | `{ target, value, max, percentage }` |
+
+```javascript
+document.addEventListener('ln-progress:change', function(e) {
+    console.log('Прогрес:', e.detail.percentage.toFixed(1) + '%');
+    console.log('Вредност:', e.detail.value, '/', e.detail.max);
+
+    if (e.detail.percentage >= 100) {
+        console.log('Завршено!');
+    }
+});
+```
+
 ## API
 
 ```javascript

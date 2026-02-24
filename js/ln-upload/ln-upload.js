@@ -163,7 +163,7 @@
 
 			const removeBtn = document.createElement('button');
 			removeBtn.type = 'button';
-			removeBtn.className = 'ln-upload__remove';
+			removeBtn.className = 'ln-upload__remove ln-icon-close';
 			removeBtn.title = _getDict(container, 'remove');
 			removeBtn.textContent = '\u00D7';
 			removeBtn.disabled = true;

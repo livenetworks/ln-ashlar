@@ -16,6 +16,17 @@
 		});
 	}
 
+	function _parseHash() {
+		const h = (location.hash || "").replace("#", "");
+		const map = {};
+		if (!h) return map;
+		h.split("&").forEach(function (part) {
+			const sep = part.indexOf(":");
+			if (sep > 0) map[part.slice(0, sep)] = part.slice(sep + 1);
+		});
+		return map;
+	}
+
 	function _component(dom) { this.dom = dom; _init.call(this); return this; }
 
 	function _init() {
@@ -33,29 +44,40 @@
 			if (key) this.mapPanels[key] = p;
 		}
 
-		this.defaultKey = (this.dom.getAttribute("data-ln-tabs-default") || "").toLowerCase().trim()
+		this.defaultKey   = (this.dom.getAttribute("data-ln-tabs-default") || "").toLowerCase().trim()
 			|| Object.keys(this.mapTabs)[0] || "";
-		this.autoFocus  = (this.dom.getAttribute("data-ln-tabs-focus") || "true").toLowerCase() !== "false";
+		this.autoFocus    = (this.dom.getAttribute("data-ln-tabs-focus") || "true").toLowerCase() !== "false";
+		this.nsKey        = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
+		this.hashEnabled  = !!this.nsKey;
 
 		this.tabs.forEach((t) => {
 			t.addEventListener("click", () => {
 				const key = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
 				if (!key) return;
-				if (location.hash === "#" + key) {
-					this.activate(key);
+				if (this.hashEnabled) {
+					const map = _parseHash();
+					map[this.nsKey] = key;
+					const newHash = Object.keys(map).map(function (k) { return k + ":" + map[k]; }).join("&");
+					if (location.hash === "#" + newHash) this.activate(key);
+					else location.hash = newHash;
 				} else {
-					location.hash = key;
+					this.activate(key);
 				}
 			});
 		});
 
 		this._hashHandler = () => {
-			const h = (location.hash || "").replace("#", "").toLowerCase();
-			this.activate(h || this.defaultKey);
+			if (!this.hashEnabled) return;
+			const map = _parseHash();
+			this.activate(this.nsKey in map ? map[this.nsKey] : this.defaultKey);
 		};
-		window.addEventListener("hashchange", this._hashHandler);
 
-		this._hashHandler(); // initial
+		if (this.hashEnabled) {
+			window.addEventListener("hashchange", this._hashHandler);
+			this._hashHandler(); // initial
+		} else {
+			this.activate(this.defaultKey);
+		}
 	}
 
 	_component.prototype.activate = function (key) {
@@ -80,7 +102,15 @@
 			const first = this.mapPanels[key]?.querySelector('input,button,select,textarea,[tabindex]:not([tabindex="-1"])');
 			if (first) setTimeout(() => first.focus({ preventScroll: true }), 0);
 		}
+		_dispatch(this.dom, 'ln-tabs:change', { key: key, tab: this.mapTabs[key], panel: this.mapPanels[key] });
 	};
+
+	function _dispatch(element, eventName, detail) {
+		element.dispatchEvent(new CustomEvent(eventName, {
+			bubbles: true,
+			detail: detail || {}
+		}));
+	}
 
 	function _domObserver() {
 		const observer = new MutationObserver(function (mutations) {

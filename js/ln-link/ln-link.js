@@ -5,6 +5,25 @@
 	// Prevent duplicate initialization
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Helpers ───────────────────────────────────────────────
+
+	function _dispatch(element, eventName, detail) {
+		element.dispatchEvent(new CustomEvent(eventName, {
+			bubbles: true,
+			detail: detail || {}
+		}));
+	}
+
+	function _dispatchCancelable(element, eventName, detail) {
+		var event = new CustomEvent(eventName, {
+			bubbles: true,
+			cancelable: true,
+			detail: detail || {}
+		});
+		element.dispatchEvent(event);
+		return event;
+	}
+
 	// ─── Status Bar ────────────────────────────────────────────
 
 	var _statusEl = null;
@@ -38,14 +57,16 @@
 		var href = link.getAttribute('href');
 		if (!href) return;
 
-		// Ctrl/Meta + click → open in new tab (native behavior)
-		if (e.ctrlKey || e.metaKey) {
+		// Ctrl/Meta/middle-click → open in new tab (native behavior)
+		if (e.ctrlKey || e.metaKey || e.button === 1) {
 			window.open(href, '_blank');
 			return;
 		}
 
 		// Normal click → trigger click on the link
 		// .click() triggers both event listeners (ln-ajax) and native navigation
+		var before = _dispatchCancelable(row, 'ln-link:navigate', { target: row, href: href, link: link });
+		if (before.defaultPrevented) return;
 		link.click();
 	}
 

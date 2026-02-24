@@ -31,9 +31,8 @@ function constructor(domRoot) {
 }
 
 function _findElements(root) {
-    var items = root.querySelectorAll('[' + DOM_SELECTOR + ']') || [];
+    var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
     if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-        items = Array.from(items);
         items.push(root);
     }
     items.forEach(function (el) {
@@ -56,12 +55,13 @@ _component.prototype.close = function () { ... };
 
 **Употреба:**
 ```javascript
-// Constructor за scan на DOM (auto-init или рачно)
-window.lnToggle(document.body);
-
 // Instance API на елементот
 document.getElementById('sidebar').lnToggle.open();
 document.getElementById('sidebar').lnToggle.close();
+
+// Constructor — само за нестандардни случаи (Shadow DOM, iframe)
+// Динамички AJAX HTML НЕ бара рачна иницијализација — MutationObserver го прави тоа автоматски
+window.lnToggle(container);
 ```
 
 ---
@@ -111,6 +111,100 @@ _dispatch(this.dom, 'ln-toggle:open', { target: this.dom });
 // Слушај (во друга компонента или интеграциски код)
 document.addEventListener('ln-toggle:open', function (e) {
     console.log('Отворен:', e.detail.target);
+});
+```
+
+---
+
+## Lifecycle Events (животен циклус)
+
+Секоја компонента со акции мора да емитува **пар events**: `before-{action}` (cancelable) + `{action}` (post).
+
+```javascript
+function _dispatchCancelable(element, eventName, detail) {
+    var event = new CustomEvent(eventName, {
+        bubbles: true,
+        cancelable: true,
+        detail: detail || {}
+    });
+    element.dispatchEvent(event);
+    return event;
+}
+
+_component.prototype.open = function () {
+    if (this.isOpen) return;
+    var before = _dispatchCancelable(this.dom, 'ln-component:before-open', { target: this.dom });
+    if (before.defaultPrevented) return;   // надворешен код може да го откаже
+    this.isOpen = true;
+    this.dom.classList.add('open');
+    _dispatch(this.dom, 'ln-component:open', { target: this.dom });
+};
+```
+
+**Правила:**
+- `before-{action}` — `cancelable: true`, се fire-ува **пред** промена на состојба
+- `{action}` — `cancelable: false`, се fire-ува **по** промена на состојба (fact, не prediction)
+- Именување: `ln-{component}:before-{action}` и `ln-{component}:{action}`
+- `detail` секогаш содржи `{ target: HTMLElement }` — елементот на кој се случи акцијата
+
+**Употреба:**
+```javascript
+// Откажи условно
+element.addEventListener('ln-toggle:before-open', function (e) {
+    if (!userHasPermission()) e.preventDefault();
+});
+
+// Реагирај по факт
+document.addEventListener('ln-toggle:open', function (e) {
+    analytics.track('panel-opened', e.detail.target.id);
+});
+```
+
+---
+
+## Trigger re-init guard
+
+Кога компонентата слуша click events на trigger елементи, мора да постави guard за да спречи дупли listeners при повторно скенирање на DOM (MutationObserver):
+
+```javascript
+function _attachTriggers(root) {
+    var triggers = Array.from(root.querySelectorAll('[data-ln-{name}-for]'));
+    triggers.forEach(function (btn) {
+        if (btn[DOM_ATTRIBUTE + 'Trigger']) return;  // веќе иницијализиран
+        btn[DOM_ATTRIBUTE + 'Trigger'] = true;
+        btn.addEventListener('click', function (e) {
+            if (e.ctrlKey || e.metaKey || e.button === 1) return;  // дозволи browser shortcuts
+            e.preventDefault();
+            // ...
+        });
+    });
+}
+```
+
+**Правила:**
+- Guard: `btn[DOM_ATTRIBUTE + 'Trigger'] = true` (property на DOM елементот)
+- Секогаш дозволи ctrl/meta/middle-click пред `e.preventDefault()`
+
+---
+
+## Компонентни зависности
+
+Кога компонента зависи од друга (пр. ln-accordion → ln-toggle):
+
+1. **Слушај само post-action events** (`ln-toggle:open`) — не before-events, освен ако треба да откажеш
+2. **Користи само јавен API** (`el.lnToggle.close()`, `.isOpen`) — никогаш директен DOM/state
+3. **Емитувај свои events** за своите акции (`ln-accordion:change`)
+4. **Никогаш не import-ирај** друга компонента — само CustomEvent комуникација
+
+```javascript
+// Точно — слуша post-action, користи public API, емитува свој event
+dom.addEventListener('ln-toggle:open', function (e) {
+    dom.querySelectorAll('[data-ln-toggle]').forEach(function (el) {
+        if (el !== e.detail.target && el.lnToggle && el.lnToggle.isOpen) {
+            el.lnToggle.close();  // public API
+        }
+    });
+    _dispatch(dom, 'ln-accordion:change', { target: e.detail.target });  // свој event
 });
 ```
 

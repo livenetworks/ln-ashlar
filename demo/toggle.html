@@ -261,19 +261,17 @@ document.addEventListener('ln-toggle:close', function (e) {
 
 					<!-- Constructor -->
 					<section class="section-card">
-						<header><h3>Constructor</h3></header>
+						<header><h3>Динамички DOM</h3></header>
 						<main>
-							<pre><code>// Рачна иницијализација на нов DOM
-window.lnToggle(document.body);
+							<p>Компонентата користи <strong>MutationObserver</strong> — автоматски ги иницијализира сите нови елементи додадени во DOM, вклучувајќи динамички HTML од AJAX или JS.</p>
+							<pre><code>// Нема потреба од рачна иницијализација.
+// MutationObserver автоматски ги открива новите data-ln-toggle елементи.
 
-// Пример: По AJAX полнење на нов HTML
 fetch('/partial').then(r => r.text()).then(html => {
-    var container = document.getElementById('content');
-    container.innerHTML = html;
-    
-    // Иницијализирај ново додаден HTML
-    window.lnToggle(container);
+    document.getElementById('content').innerHTML = html;
+    // lnToggle автоматски ги иницијализира новите елементи
 });</code></pre>
+							<p><code>window.lnToggle</code> е достапен само за нестандардни случаи (Shadow DOM, iframe) каде MutationObserver не набљудува.</p>
 						</main>
 					</section>
 

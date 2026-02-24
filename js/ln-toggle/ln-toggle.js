@@ -12,9 +12,8 @@
 	}
 
 	function _findElements(root) {
-		var items = root.querySelectorAll('[' + DOM_SELECTOR + ']') || [];
+		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-			items = Array.from(items);
 			items.push(root);
 		}
 		items.forEach(function (el) {
@@ -25,13 +24,15 @@
 	}
 
 	function _attachTriggers(root) {
-		var triggers = root.querySelectorAll('[data-ln-toggle-for]') || [];
+		var triggers = Array.from(root.querySelectorAll('[data-ln-toggle-for]'));
 		if (root.hasAttribute && root.hasAttribute('data-ln-toggle-for')) {
-			triggers = Array.from(triggers);
 			triggers.push(root);
 		}
 		triggers.forEach(function (btn) {
+			if (btn[DOM_ATTRIBUTE + 'Trigger']) return;
+			btn[DOM_ATTRIBUTE + 'Trigger'] = true;
 			btn.addEventListener('click', function (e) {
+				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				e.preventDefault();
 				var targetId = btn.getAttribute('data-ln-toggle-for');
 				var target = document.getElementById(targetId);
@@ -58,6 +59,8 @@
 
 	_component.prototype.open = function () {
 		if (this.isOpen) return;
+		var before = _dispatchCancelable(this.dom, 'ln-toggle:before-open', { target: this.dom });
+		if (before.defaultPrevented) return;
 		this.isOpen = true;
 		this.dom.classList.add('open');
 		_dispatch(this.dom, 'ln-toggle:open', { target: this.dom });
@@ -65,6 +68,8 @@
 
 	_component.prototype.close = function () {
 		if (!this.isOpen) return;
+		var before = _dispatchCancelable(this.dom, 'ln-toggle:before-close', { target: this.dom });
+		if (before.defaultPrevented) return;
 		this.isOpen = false;
 		this.dom.classList.remove('open');
 		_dispatch(this.dom, 'ln-toggle:close', { target: this.dom });
@@ -81,6 +86,16 @@
 			bubbles: true,
 			detail: detail || {}
 		}));
+	}
+
+	function _dispatchCancelable(element, eventName, detail) {
+		var event = new CustomEvent(eventName, {
+			bubbles: true,
+			cancelable: true,
+			detail: detail || {}
+		});
+		element.dispatchEvent(event);
+		return event;
 	}
 
 	// ─── DOM Observer ──────────────────────────────────────────

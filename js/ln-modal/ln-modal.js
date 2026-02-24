@@ -7,11 +7,21 @@
 		return;
 	}
 
-	function _dispatch(modal, eventName) {
+	function _dispatch(modal, eventName, detail) {
 		modal.dispatchEvent(new CustomEvent(eventName, {
 			bubbles: true,
-			detail: { modalId: modal.id }
+			detail: Object.assign({ modalId: modal.id, target: modal }, detail || {})
 		}));
+	}
+
+	function _dispatchCancelable(modal, eventName) {
+		var event = new CustomEvent(eventName, {
+			bubbles: true,
+			cancelable: true,
+			detail: { modalId: modal.id, target: modal }
+		});
+		modal.dispatchEvent(event);
+		return event;
 	}
 
 	function _openModal(modalId) {
@@ -21,6 +31,9 @@
 			return;
 		}
 
+		var before = _dispatchCancelable(modal, 'ln-modal:before-open');
+		if (before.defaultPrevented) return;
+
 		modal.classList.add('ln-modal--open');
 		document.body.classList.add('ln-modal-open');
 		_dispatch(modal, 'ln-modal:open');
@@ -29,6 +42,9 @@
 	function _closeModal(modalId) {
 		const modal = document.getElementById(modalId);
 		if (!modal) return;
+
+		var before = _dispatchCancelable(modal, 'ln-modal:before-close');
+		if (before.defaultPrevented) return;
 
 		modal.classList.remove('ln-modal--open');
 		_dispatch(modal, 'ln-modal:close');

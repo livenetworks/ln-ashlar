@@ -92,11 +92,11 @@
 					<h1>Tabs</h1>
 					<p>Hash-aware табови. Синхронизирани со URL hash (<code>#tab-key</code>).</p>
 
-					<!-- Basic tabs -->
-					<section class="section-card" id="tabs-example">
-						<header><h3>Пример</h3></header>
+					<!-- Basic tabs — Секција 1 -->
+					<section class="section-card">
+						<header><h3>Пример 1 — Корисник</h3></header>
 						<main>
-							<section data-ln-tabs data-ln-tabs-default="info">
+							<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
 								<nav>
 									<button data-ln-tab="info">Информации</button>
 									<button data-ln-tab="settings">Поставки</button>
@@ -106,19 +106,19 @@
 								<section data-ln-panel="info">
 									<h4>Информации</h4>
 									<p>Ова е содржината на првиот таб.</p>
-									<p>Промени го URL hash на <code>#settings</code> за да видиш синхронизација.</p>
+									<p>Hash формат: <code>#user-tabs:info</code></p>
 								</section>
 
 								<section data-ln-panel="settings" class="hidden">
 									<h4>Поставки</h4>
-									<div class="form-group">
-										<label for="t-lang">Јазик</label>
-										<select id="t-lang"><option>Македонски</option><option>English</option></select>
-									</div>
-									<div class="form-group">
-										<label for="t-tz">Timezone</label>
-										<input type="text" id="t-tz" value="Europe/Skopje">
-									</div>
+									<label>
+										Јазик
+										<select><option>Македонски</option><option>English</option></select>
+									</label>
+									<label>
+										Timezone
+										<input type="text" value="Europe/Skopje">
+									</label>
 								</section>
 
 								<section data-ln-panel="history" class="hidden">
@@ -135,11 +135,80 @@
 						</main>
 					</section>
 
+				<!-- Basic tabs — Секција 2 (независна) -->
+					<section class="section-card">
+						<header><h3>Пример 2 — Проект</h3></header>
+						<main>
+							<section id="project-tabs" data-ln-tabs data-ln-tabs-default="overview">
+								<nav>
+									<button data-ln-tab="overview">Преглед</button>
+									<button data-ln-tab="members">Членови</button>
+									<button data-ln-tab="info">Инфо</button>
+								</nav>
+
+								<section data-ln-panel="overview">
+									<h4>Преглед на проект</h4>
+									<p>Оваа секција е целосно независна од горната.</p>
+									<p>Hash формат: <code>#project-tabs:overview</code></p>
+									<p>И двете секции имаат таб <code>info</code> — нема collision.</p>
+								</section>
+
+								<section data-ln-panel="members" class="hidden">
+									<h4>Членови</h4>
+									<table>
+										<thead><tr><th>Корисник</th><th>Улога</th></tr></thead>
+										<tbody>
+											<tr><td>Марко</td><td>Admin</td></tr>
+											<tr><td>Ана</td><td>Editor</td></tr>
+										</tbody>
+									</table>
+								</section>
+
+								<section data-ln-panel="info" class="hidden">
+									<h4>Информации за проект</h4>
+									<p>Истиот клуч <code>info</code> постои и во секција 1 — работи независно.</p>
+								</section>
+							</section>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<article>
+								<h4>Lifecycle настани</h4>
+								<table>
+									<thead><tr><th>Настан</th><th>Кога</th><th><code>detail</code></th></tr></thead>
+									<tbody>
+										<tr><td><code>ln-tabs:change</code></td><td>По активирање на нов таб</td><td><code>{ key, tab, panel }</code></td></tr>
+									</tbody>
+								</table>
+							</article>
+							<article>
+								<h4>Живо демо</h4>
+								<output id="tabs-event-log">Уште нема настани — кликни таб.</output>
+							</article>
+							<article>
+								<h4>Код</h4>
+								<pre><code>document.getElementById(&#39;user-tabs&#39;).addEventListener(&#39;ln-tabs:change&#39;, function(e) {
+    console.log(&#39;Активен таб:&#39;, e.detail.key);
+});
+
+// Глобално — за сите tab секции
+document.addEventListener(&#39;ln-tabs:change&#39;, function(e) {
+    analytics.track(&#39;tab_change&#39;, { tab: e.detail.key });
+});</code></pre>
+							</article>
+						</main>
+					</section>
+
 					<!-- HTML -->
 					<section class="section-card">
 						<header><h3>HTML</h3></header>
 						<main>
-							<pre><code>&lt;section data-ln-tabs data-ln-tabs-default="first"&gt;
+							<pre><code>&lt;!-- Namespace = id атрибут (или data-ln-tabs-key) --&gt;
+&lt;section id="my-tabs" data-ln-tabs data-ln-tabs-default="first"&gt;
 
     &lt;!-- Tab копчиња --&gt;
     &lt;nav&gt;
@@ -159,13 +228,17 @@
 &lt;/section&gt;
 
 &lt;!-- Атрибути --&gt;
-data-ln-tabs              - контејнер
-data-ln-tabs-default="x"  - почетен таб
+id="key"                   - namespace за hash (задолжително за повеќе секции)
+data-ln-tabs-key="key"     - алтернативно, ако id не е погоден
+data-ln-tabs               - контејнер
+data-ln-tabs-default="x"   - почетен таб
 data-ln-tabs-focus         - фокусирај прв input при промена
 data-ln-tab="key"          - таб копче
 data-ln-panel="key"        - панел содржина
 
-&lt;!-- Hash sync: #second → активирај second таб --&gt;</code></pre>
+&lt;!-- Hash формат: #my-tabs:second → активирај second таб --&gt;
+&lt;!-- Повеќе секции: #my-tabs:second&other-tabs:info --&gt;
+&lt;!-- Без id/data-ln-tabs-key → нема hash sync, само defaultKey --&gt;</code></pre>
 						</main>
 					</section>
 			</div>
@@ -178,5 +251,16 @@ data-ln-panel="key"        - панел содржина
 		</div>
 		</div><!-- /.app-body -->
 	</div><!-- /.app-wrapper -->
+	<script>
+		(function() {
+			var log = document.getElementById('tabs-event-log');
+			if (!log) return;
+
+			document.addEventListener('ln-tabs:change', function(e) {
+				var time = new Date().toLocaleTimeString('mk');
+				log.textContent = 'ln-tabs:change — ' + e.detail.key + ' (' + time + ')';
+			});
+		})();
+	</script>
 </body>
 </html>

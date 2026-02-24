@@ -22,20 +22,29 @@ el.lnToggle.close();
 el.lnToggle.toggle();
 el.lnToggle.isOpen;  // boolean
 
-// Constructor (рачна иницијализација на нов DOM)
-window.lnToggle(document.body);
+// Constructor — само за нестандардни случаи (Shadow DOM, iframe)
+// За AJAX/динамички DOM: MutationObserver автоматски иницијализира
+window.lnToggle(container);
 ```
 
 ## Events
 
-| Event | Bubbles | Detail |
-|-------|---------|--------|
-| `ln-toggle:open` | да | `{ target: HTMLElement }` |
-| `ln-toggle:close` | да | `{ target: HTMLElement }` |
+| Event | Bubbles | Cancelable | Detail |
+|-------|---------|------------|--------|
+| `ln-toggle:before-open` | да | **да** | `{ target: HTMLElement }` |
+| `ln-toggle:open` | да | не | `{ target: HTMLElement }` |
+| `ln-toggle:before-close` | да | **да** | `{ target: HTMLElement }` |
+| `ln-toggle:close` | да | не | `{ target: HTMLElement }` |
 
 ```javascript
+// Слушај по отворање
 document.addEventListener('ln-toggle:open', function (e) {
     console.log('Отворен:', e.detail.target.id);
+});
+
+// Откажи го отворањето условно
+document.addEventListener('ln-toggle:before-open', function (e) {
+    if (!userHasPermission()) e.preventDefault();
 });
 ```
 

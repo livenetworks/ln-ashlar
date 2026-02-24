@@ -34,12 +34,29 @@ window.lnModal.toggle('my-modal');
 
 Сите настани се dispatch-уваат на самиот модал елемент и bubble-аат нагоре.
 
-| Настан | Кога | `detail` |
-|--------|------|----------|
-| `ln-modal:open` | Модалот се отвори | `{ modalId }` |
-| `ln-modal:close` | Модалот се затвори | `{ modalId }` |
+| Настан | Cancelable | Кога | `detail` |
+|--------|-----------|------|----------|
+| `ln-modal:before-open` | ✅ | Пред отварање (може да се откаже) | `{ modalId, target }` |
+| `ln-modal:open` | ❌ | Модалот се отвори | `{ modalId, target }` |
+| `ln-modal:before-close` | ✅ | Пред затварање (може да се откаже) | `{ modalId, target }` |
+| `ln-modal:close` | ❌ | Модалот се затвори | `{ modalId, target }` |
 
 ```javascript
+// Откажи отварање условно
+document.addEventListener('ln-modal:before-open', function(e) {
+    if (e.detail.modalId === 'confirm-dialog' && !formIsValid()) {
+        e.preventDefault(); // модалот нема да се отвори
+    }
+});
+
+// Спречи затварање (unsaved changes)
+document.getElementById('edit-modal').addEventListener('ln-modal:before-close', function(e) {
+    if (hasUnsavedChanges()) {
+        e.preventDefault();
+        showConfirmation();
+    }
+});
+
 document.addEventListener('ln-modal:open', function(e) {
     console.log('Отворен модал:', e.detail.modalId);
 });
@@ -48,11 +65,6 @@ document.addEventListener('ln-modal:close', function(e) {
     if (e.detail.modalId === 'confirm-dialog') {
         // reset форма, исчисти state итн.
     }
-});
-
-// Или директно на модалот
-document.getElementById('my-modal').addEventListener('ln-modal:open', function(e) {
-    // load данови при секое отварање
 });
 ```
 

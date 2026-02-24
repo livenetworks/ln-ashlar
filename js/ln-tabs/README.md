@@ -1,24 +1,73 @@
 # ln-tabs
 
 Hash-aware tab навигација — tabs со панели, синхронизирани со URL hash.
-Клик на tab го менува `location.hash`, а `hashchange` го активира соодветниот панел.
+Поддржува повеќе независни tab секции на иста страна преку namespace (`id`).
 
 ## Атрибути
 
 | Атрибут | На | Опис |
 |---------|-----|------|
-| `data-ln-tabs` | wrapper елемент | Креира tab инстанца |
+| `id="key"` | wrapper | Namespace за hash (задолжително за hash sync) |
+| `data-ln-tabs-key="key"` | wrapper | Алтернативен namespace (ако `id` не е погоден) |
+| `data-ln-tabs` | wrapper | Креира tab инстанца |
 | `data-ln-tabs-default="key"` | wrapper | Default активен tab (default: првиот) |
 | `data-ln-tabs-focus="false"` | wrapper | Исклучи auto-focus на прв input во панел (default: true) |
 | `data-ln-tab="key"` | tab копче | Го означува табот со клуч |
 | `data-ln-panel="key"` | панел елемент | Го поврзува панелот со tab по клуч |
 
+## Hash формат
+
+```
+#namespace:tabkey
+```
+
+Повеќе секции на иста страна — секоја ги чува своите стејтови:
+
+```
+#user-tabs:settings&project-tabs:members
+```
+
+- Без `id` / `data-ln-tabs-key` → нема hash sync, активира само `defaultKey`
+- Клик во една секција ги зачувува стејтовите на сите останати секции
+- Рефреш → сите секции ги враќаат своите табови
+
+## HTML структура
+
+```html
+<!-- Секција 1 — namespace преку id -->
+<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
+    <nav>
+        <button data-ln-tab="info">Информации</button>
+        <button data-ln-tab="settings">Поставки</button>
+    </nav>
+
+    <section data-ln-panel="info">...</section>
+    <section data-ln-panel="settings" class="hidden">...</section>
+</section>
+
+<!-- Секција 2 — независна, иста страна -->
+<section id="project-tabs" data-ln-tabs data-ln-tabs-default="overview">
+    <nav>
+        <button data-ln-tab="overview">Преглед</button>
+        <button data-ln-tab="members">Членови</button>
+    </nav>
+
+    <section data-ln-panel="overview">...</section>
+    <section data-ln-panel="members" class="hidden">...</section>
+</section>
+```
+
 ## API
 
 ```javascript
 // Instance API (на DOM елементот)
-var tabs = document.getElementById('my-tabs');
-tabs.lnTabs.activate('settings');
+document.getElementById('user-tabs').lnTabs.activate('settings');
+
+// Преку hash
+location.hash = 'user-tabs:settings';
+
+// Повеќе секции преку hash
+location.hash = 'user-tabs:settings&project-tabs:members';
 
 // Constructor (рачна иницијализација)
 window.lnTabs(document.body);
@@ -26,40 +75,36 @@ window.lnTabs(document.body);
 
 ## Однесување
 
-- URL hash синхронизација: клик на tab → `location.hash = key` → `hashchange` → панелот се прикажува
-- Ако hash-от не одговара на ниеден tab, се активира default
-- Auto-focus: по активирање на панел, првиот focusable елемент (input, button, select, textarea) добива focus
+- URL hash синхронизација: `#namespace:tabkey` → активирај соодветен таб
+- Повеќе секции: `#ns1:tab&ns2:tab` — секоја секција чита само свој namespace
+- Ако клучот не одговара на ниеден таб, се активира default
+- Auto-focus: по активирање на панел, првиот focusable елемент добива focus
 - ARIA: `aria-selected` на tabs, `aria-hidden` на панели
 - Активен tab добива `data-active` атрибут (за CSS стилизирање)
 - Неактивни панели добиваат `.hidden` класа
 
-## HTML структура
+## Events
 
-```html
-<div data-ln-tabs data-ln-tabs-default="general">
-    <!-- Tab навигација -->
-    <nav>
-        <a data-ln-tab="general" href="#general">Општо</a>
-        <a data-ln-tab="settings" href="#settings">Поставки</a>
-        <a data-ln-tab="logs" href="#logs">Логови</a>
-    </nav>
+Настанот се dispatch-ува на wrapper елементот (`[data-ln-tabs]`) и bubble-ира нагоре.
 
-    <!-- Панели -->
-    <section data-ln-panel="general">
-        <p>Општа содржина...</p>
-    </section>
-    <section data-ln-panel="settings">
-        <p>Поставки содржина...</p>
-    </section>
-    <section data-ln-panel="logs">
-        <p>Логови содржина...</p>
-    </section>
-</div>
+| Настан | Кога | `detail` |
+|--------|------|----------|
+| `ln-tabs:change` | По активирање на нов таб | `{ key, tab, panel }` |
+
+```javascript
+document.getElementById('user-tabs').addEventListener('ln-tabs:change', function(e) {
+    console.log('Активен таб:', e.detail.key);
+    console.log('Tab копче:', e.detail.tab);    // DOM елемент
+    console.log('Панел:', e.detail.panel);      // DOM елемент
+});
+
+// Или глобално (за сите tab секции)
+document.addEventListener('ln-tabs:change', function(e) {
+    analytics.track('tab_change', { tab: e.detail.key });
+});
 ```
 
 ## CSS стилизирање
-
-Активниот tab има `data-active` атрибут:
 
 ```scss
 [data-ln-tab] {
@@ -70,14 +115,4 @@ window.lnTabs(document.body);
         border-bottom: 2px solid var(--color-primary);
     }
 }
-```
-
-## Програмски
-
-```javascript
-// Активирај tab програмски
-document.getElementById('my-tabs').lnTabs.activate('settings');
-
-// Или преку hash
-location.hash = 'settings';
 ```

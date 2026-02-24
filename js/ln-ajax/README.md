@@ -56,12 +56,25 @@ AJAX навигација компонента — линкови и форми 
 
 Сите настани се dispatch-уваат на елементот кој го иницирал request-от (link или form) и bubble-аат нагоре.
 
-| Настан | Кога | `detail` |
-|--------|------|----------|
-| `ln-ajax:start` | Пред fetch | `{ method, url }` |
-| `ln-ajax:success` | По успешен одговор | `{ method, url, data }` |
-| `ln-ajax:error` | По fetch грешка | `{ method, url, error }` |
-| `ln-ajax:complete` | По завршување (success или error) | `{ method, url }` |
+| Настан | Cancelable | Кога | `detail` |
+|--------|-----------|------|----------|
+| `ln-ajax:before-start` | ✅ | Пред сè (може да откаже request) | `{ method, url }` |
+| `ln-ajax:start` | ❌ | По додавање на spinner, пред fetch | `{ method, url }` |
+| `ln-ajax:success` | ❌ | По успешен одговор | `{ method, url, data }` |
+| `ln-ajax:error` | ❌ | По fetch грешка | `{ method, url, error }` |
+| `ln-ajax:complete` | ❌ | По завршување (success или error) | `{ method, url }` |
+
+### Откажување на request
+
+```javascript
+// Спречи AJAX за одреден елемент условно
+document.addEventListener('ln-ajax:before-start', function(e) {
+    if (!userIsAuthenticated()) {
+        e.preventDefault(); // request се откажува, нема spinner
+        redirectToLogin();
+    }
+});
+```
 
 ### Интеграција со ln-toast
 

@@ -184,10 +184,12 @@
 				<article>
 					<h4>Lifecycle настани</h4>
 					<table>
-						<thead><tr><th>Настан</th><th>Кога</th><th><code>detail</code></th></tr></thead>
+						<thead><tr><th>Настан</th><th>Cancelable</th><th>Кога</th><th><code>detail</code></th></tr></thead>
 						<tbody>
-							<tr><td><code>ln-modal:open</code></td><td>Модалот се отвори</td><td><code>{ modalId }</code></td></tr>
-							<tr><td><code>ln-modal:close</code></td><td>Модалот се затвори</td><td><code>{ modalId }</code></td></tr>
+							<tr><td><code>ln-modal:before-open</code></td><td>✅</td><td>Пред отварање</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:open</code></td><td>❌</td><td>Модалот се отвори</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:before-close</code></td><td>✅</td><td>Пред затварање</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:close</code></td><td>❌</td><td>Модалот се затвори</td><td><code>{ modalId, target }</code></td></tr>
 						</tbody>
 					</table>
 				</article>
@@ -200,7 +202,21 @@
 				</article>
 				<article>
 					<h4>Код</h4>
-					<pre><code>document.addEventListener('ln-modal:open', function(e) {
+					<pre><code>// Откажи отварање условно (cancelable)
+document.addEventListener('ln-modal:before-open', function(e) {
+    if (e.detail.modalId === 'confirm-dialog' &amp;&amp; !formIsValid()) {
+        e.preventDefault(); // модалот нема да се отвори
+    }
+});
+
+// Спречи затварање (unsaved changes)
+document.getElementById('edit-modal').addEventListener('ln-modal:before-close', function(e) {
+    if (hasUnsavedChanges()) {
+        e.preventDefault();
+    }
+});
+
+document.addEventListener('ln-modal:open', function(e) {
     console.log('Отворен:', e.detail.modalId);
 });
 
@@ -208,11 +224,6 @@ document.addEventListener('ln-modal:close', function(e) {
     if (e.detail.modalId === 'confirm-dialog') {
         // reset форма, исчисти state итн.
     }
-});
-
-// Или директно на модалот
-document.getElementById('my-modal').addEventListener('ln-modal:open', function() {
-    fetchData(); // load при секое отварање
 });</code></pre>
 				</article>
 			</main>
@@ -291,7 +302,9 @@ document.getElementById('my-modal').addEventListener('ln-modal:open', function()
 				log.textContent = eventName + ' — ' + detail.modalId + ' (' + time + ')';
 			}
 
+			document.addEventListener('ln-modal:before-open', function(e) { _update('ln-modal:before-open', e.detail); });
 			document.addEventListener('ln-modal:open', function(e) { _update('ln-modal:open', e.detail); });
+			document.addEventListener('ln-modal:before-close', function(e) { _update('ln-modal:before-close', e.detail); });
 			document.addEventListener('ln-modal:close', function(e) { _update('ln-modal:close', e.detail); });
 		})();
 	</script>

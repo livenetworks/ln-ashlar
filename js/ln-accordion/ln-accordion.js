@@ -11,9 +11,8 @@
 	}
 
 	function _findElements(root) {
-		var items = root.querySelectorAll('[' + DOM_SELECTOR + ']') || [];
+		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-			items = Array.from(items);
 			items.push(root);
 		}
 		items.forEach(function (el) {
@@ -35,9 +34,19 @@
 					el.lnToggle.close();
 				}
 			});
+			_dispatch(dom, 'ln-accordion:change', { target: e.detail.target });
 		});
 
 		return this;
+	}
+
+	// ─── Helpers ───────────────────────────────────────────────
+
+	function _dispatch(element, eventName, detail) {
+		element.dispatchEvent(new CustomEvent(eventName, {
+			bubbles: true,
+			detail: detail || {}
+		}));
 	}
 
 	// ─── DOM Observer ──────────────────────────────────────────

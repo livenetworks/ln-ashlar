@@ -14,6 +14,16 @@
 		}));
 	}
 
+	function _dispatchCancelable(element, eventName, detail) {
+		var event = new CustomEvent(eventName, {
+			bubbles: true,
+			cancelable: true,
+			detail: detail || {}
+		});
+		element.dispatchEvent(event);
+		return event;
+	}
+
 	function _constructor(domRoot) {
 		if (!domRoot.hasAttribute(DOM_SELECTOR)) {
 			return;
@@ -80,6 +90,9 @@
 	}
 
 	function _makeAjaxRequest(method, url, data, element, callback) {
+		var before = _dispatchCancelable(element, 'ln-ajax:before-start', { method: method, url: url });
+		if (before.defaultPrevented) return;
+
 		_dispatch(element, 'ln-ajax:start', { method, url });
 
 		element.classList.add('ln-ajax--loading');

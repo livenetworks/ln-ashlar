@@ -16,8 +16,15 @@
 		_findElements(domRoot);
 	}
 
+	function _dispatch(element, eventName, detail) {
+		element.dispatchEvent(new CustomEvent(eventName, {
+			bubbles: true,
+			detail: detail || {}
+		}));
+	}
+
 	function _findElements(domRoot) {
-		var items = domRoot.querySelectorAll(DOM_SELECTOR) || [];
+		var items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
 
 		items.forEach(function (item) {
 			if (_isBar(item) && !item[DOM_ATTRIBUTE]) {
@@ -83,6 +90,7 @@
 		if (percentage > 100) percentage = 100;
 
 		this.dom.style.width = percentage + '%';
+		_dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
 	}
 
 	// make lnProgress globally available

@@ -65,9 +65,8 @@
 
 		const x = document.createElement("button");
 		x.type = "button";
-		x.className = "ln-toast__close";
+		x.className = "ln-toast__close ln-icon-close";
 		x.setAttribute("aria-label", "Close");
-		x.innerHTML = "&times;";
 		x.addEventListener("click", () => _dismiss(li));
 
 		head.appendChild(tt);
@@ -140,9 +139,8 @@
 
 		const x = document.createElement("button");
 		x.type = "button";
-		x.className = "ln-toast__close";
+		x.className = "ln-toast__close ln-icon-close";
 		x.setAttribute("aria-label", "Close");
-		x.innerHTML = "&times;";
 		x.addEventListener("click", () => _dismiss(li));
 
 		head.appendChild(tt);
@@ -164,7 +162,6 @@
 				} else {
 					const p = document.createElement("p");
 					p.textContent = opts.message;
-					p.style.margin = "0";
 					body.appendChild(p);
 				}
 			}

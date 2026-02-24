@@ -43,6 +43,20 @@ Wrapper компонента — слуша `ln-toggle:open` events од дец�
 - `.collapsible-body` на child → overflow:hidden, padding/margins одат тука
 - Кога се отвора `panel2`, автоматски се затвора `panel1` (и обратно).
 
+## Events
+
+| Event | Bubbles | Cancelable | Detail |
+|-------|---------|------------|--------|
+| `ln-accordion:change` | да | не | `{ target: HTMLElement }` |
+
+```javascript
+document.addEventListener('ln-accordion:change', function (e) {
+    console.log('Активен панел:', e.detail.target.id);
+});
+```
+
+`ln-accordion:change` се fire-ува на accordion контејнерот кога ќе се отвори панел (по затворањето на браќата).
+
 ## Зависности
 
 Зависи од `ln-toggle` — accordion слуша `ln-toggle:open` events кои ги емитира `ln-toggle`.
