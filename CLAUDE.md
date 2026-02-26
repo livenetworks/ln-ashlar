@@ -347,6 +347,8 @@ document.addEventListener('ln-upload:uploaded', function(e) {
 
 Детална документација со примери и workflow: [js/COMPONENTS.md](js/COMPONENTS.md) → „Архитектура на ln-acme проект".
 
+Каноничен пример за Mediator pattern: ln-accordion : ln-toggle = проектен координатор : компоненти. Компонентите НЕ знаат за siblings и НЕ повикуваат storage/DB. Видете COMPONENTS.md → „Координатор/Медијатор Pattern".
+
 ---
 
 ## Структура на фајлови

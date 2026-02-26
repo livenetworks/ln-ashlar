@@ -273,6 +273,53 @@ dom.addEventListener('ln-toggle:open', function (e) {
 
 ---
 
+## Координатор/Медијатор Pattern — каноничен пример
+
+Архитектурата следи **Mediator pattern** (GoF): компонентите не комуницираат меѓусебно. Координатор ги посредува сите cross-component интеракции.
+
+### Каноничен пример: ln-accordion / ln-toggle
+
+ln-acme библиотеката веќе го имплементира ова:
+
+- **ln-toggle** е компонента (state layer): менаџира свој state (`isOpen`), емитува `ln-toggle:open` / `ln-toggle:close`, слуша `ln-toggle:request-close` / `ln-toggle:request-open`
+- **ln-accordion** е координатор (mediator): слуша `ln-toggle:open` од деца, dispatcha `ln-toggle:request-close` на siblings. **Никогаш** не повикува `el.lnToggle.close()`. Емитува свој `ln-accordion:change`
+
+```
+[Toggle A се отвора]
+        ↓
+    ln-toggle:open (bubbles нагоре)
+        ↓
+[Accordion] го фаќа, dispatcha ln-toggle:request-close на B и C
+        ↓
+[Toggle B] сам одлучува: ако е отворен → се затвора
+[Toggle C] сам одлучува: ако е затворен → игнорира
+```
+
+Toggle **не знае** дека постојат други toggle-и. Accordion **не знае** за внатрешниот state на toggle. Комуникација = само events.
+
+### Скалирање на ниво на проект
+
+Истиот pattern се скалира од библиотека до апликација:
+
+| ln-acme (библиотека) | Проект (апликација) | Улога |
+|---|---|---|
+| ln-toggle | ln-profile, ln-playlist, ln-deck | Компонента (state + events) |
+| ln-accordion | ln-mixer (координатор) | Медијатор (event wiring) |
+| `ln-toggle:open` | `ln-profile:switched` | Notification event (факт) |
+| `ln-toggle:request-close` | `ln-deck:request-load` | Request event (команда) |
+| `ln-accordion:change` | toast / modal close | Координатор реакција |
+
+### Правила за изолација
+
+1. **Компонента → sibling компонента: ЗАБРАНЕТО.** Компонента НИКОГАШ не query-ира друга компонента (`lnSettings.getApiUrl()`, `nav.lnProfile.getProfile()`). Само координаторот знае за сите.
+2. **Компонента → storage/DB: ЗАБРАНЕТО.** Компонента НЕ повикува `lnDb.put()` или друг storage backend. Координаторот одлучува кој storage backend го повикува.
+3. **Координатор → компонента query: ДОЗВОЛЕНО.** Координаторот чита state директно (`el.lnProfile.currentId`).
+4. **Координатор → компонента command: САМО request events.** Координаторот dispatcha `request-*` events, компонентата самостојно одлучува.
+
+**Зошто?** Компонентите стануваат storage-agnostic и sibling-agnostic. Менување на backend (IndexedDB → API → localStorage) бара промена САМО во координаторот. Додавање нова компонента бара промена САМО во координаторот.
+
+---
+
 ## Auto-init на DOMContentLoaded
 
 ```javascript
