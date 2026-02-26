@@ -547,4 +547,6 @@ _component.prototype._buildTrackItem = function (track, idx) {
 | ln-ajax | Functional | `data-ln-ajax` | AJAX navigation |
 | ln-progress | Functional | `data-ln-progress` | Progress bar |
 | ln-select | Wrapper | `data-ln-select` | TomSelect wrapper |
+| ln-search | Instance | `data-ln-search` | Генерички search (textContent филтер) |
+| ln-filter | Instance | `data-ln-filter` | Генерички filter (data атрибут филтер) |
 | ln-external-links | Utility | — | External links handler |

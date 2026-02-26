@@ -20,3 +20,5 @@ import './ln-link/ln-link.js';
 import './ln-link/ln-link.scss';
 import './ln-progress/ln-progress.js';
 import './ln-progress/ln-progress.scss';
+import './ln-search/ln-search.js';
+import './ln-filter/ln-filter.js';
