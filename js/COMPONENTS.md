@@ -192,16 +192,16 @@ function _attachTriggers(root) {
 Кога компонента зависи од друга (пр. ln-accordion → ln-toggle):
 
 1. **Слушај само post-action events** (`ln-toggle:open`) — не before-events, освен ако треба да откажеш
-2. **Користи само јавен API** (`el.lnToggle.close()`, `.isOpen`) — никогаш директен DOM/state
+2. **Комуницирај само преку events** — dispatcha `request-*` events на целниот елемент, НИКОГАШ не викај друга компонента директно (`el.lnToggle.close()`)
 3. **Емитувај свои events** за своите акции (`ln-accordion:change`)
 4. **Никогаш не import-ирај** друга компонента — само CustomEvent комуникација
 
 ```javascript
-// Точно — слуша post-action, користи public API, емитува свој event
+// Точно — слуша post-action, dispatcha request event, емитува свој event
 dom.addEventListener('ln-toggle:open', function (e) {
     dom.querySelectorAll('[data-ln-toggle]').forEach(function (el) {
-        if (el !== e.detail.target && el.lnToggle && el.lnToggle.isOpen) {
-            el.lnToggle.close();  // public API
+        if (el !== e.detail.target) {
+            el.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
         }
     });
     _dispatch(dom, 'ln-accordion:change', { target: e.detail.target });  // свој event

@@ -59,7 +59,11 @@ document.addEventListener('ln-accordion:change', function (e) {
 
 ## Зависности
 
-Зависи од `ln-toggle` — accordion слуша `ln-toggle:open` events кои ги емитира `ln-toggle`.
+Accordion е координатор за `ln-toggle` деца. Комуникацијата е само преку events:
+- **Слуша**: `ln-toggle:open` (bubbles нагоре од toggle дете)
+- **Dispatcha**: `ln-toggle:request-close` на секој sibling toggle (toggle сам одлучува дали да се затвори)
+
+Accordion **НЕ** вика директно toggle API (`el.lnToggle.close()`). Секој toggle самостојно реагира на `request-close`.
 
 ## API
 

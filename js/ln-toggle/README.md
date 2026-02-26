@@ -35,6 +35,7 @@ window.lnToggle(container);
 | `ln-toggle:open` | да | не | `{ target: HTMLElement }` |
 | `ln-toggle:before-close` | да | **да** | `{ target: HTMLElement }` |
 | `ln-toggle:close` | да | не | `{ target: HTMLElement }` |
+| `ln-toggle:request-close` | не | не | — |
 
 ```javascript
 // Слушај по отворање
@@ -46,7 +47,12 @@ document.addEventListener('ln-toggle:open', function (e) {
 document.addEventListener('ln-toggle:before-open', function (e) {
     if (!userHasPermission()) e.preventDefault();
 });
+
+// Побарај toggle да се затвори (пр. од accordion координатор)
+element.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
 ```
+
+`ln-toggle:request-close` е **incoming** event — надворешен код го dispatcha на toggle елементот. Toggle слуша на себе и се затвора ако е отворен. Затворањето минува низ нормалниот lifecycle (`before-close` → `close`).
 
 ## Примери
 

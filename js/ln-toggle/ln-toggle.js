@@ -54,6 +54,13 @@
 			dom.classList.add('open');
 		}
 
+		var self = this;
+		dom.addEventListener('ln-toggle:request-close', function () {
+			if (self.isOpen) {
+				self.close();
+			}
+		});
+
 		return this;
 	}
 

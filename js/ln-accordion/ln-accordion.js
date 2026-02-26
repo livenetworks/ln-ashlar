@@ -30,8 +30,8 @@
 		dom.addEventListener('ln-toggle:open', function (e) {
 			var toggles = dom.querySelectorAll('[data-ln-toggle]');
 			toggles.forEach(function (el) {
-				if (el !== e.detail.target && el.lnToggle && el.lnToggle.isOpen) {
-					el.lnToggle.close();
+				if (el !== e.detail.target) {
+					el.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
 				}
 			});
 			_dispatch(dom, 'ln-accordion:change', { target: e.detail.target });
