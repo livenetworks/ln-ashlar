@@ -1,5 +1,68 @@
 # JS Components — Конвенции и Pattern-и
 
+## Архитектура на ln-acme проект (задолжително)
+
+Секој проект кој користи ln-acme JS компоненти **МОРА** да следи три слоја:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Координатор (project-specific)                     │
+│  Фаќа UI акции → dispatcha request events →         │
+│  реагира на notification events со UI feedback       │
+├─────────────────────────────────────────────────────┤
+│  Компоненти (reusable)                              │
+│  State + CRUD + request listeners + notifications    │
+├─────────────────────────────────────────────────────┤
+│  ln-acme (library)                                  │
+│  ln-toggle, ln-accordion, ln-modal, ln-toast...      │
+└─────────────────────────────────────────────────────┘
+```
+
+### Три правила
+
+1. **Компонента = data layer.** Менаџира state, CRUD, свој DOM. НЕ отвора модали, НЕ покажува toast, НЕ чита надворешни форми.
+2. **Координатор = UI wiring.** Фаќа копчиња/форми, dispatcha request events на компоненти, реагира на notification events со UI feedback (toast, модал, highlight).
+3. **Commands → request events. Queries → direct API.** Координаторот НИКОГАШ не повикува prototype методи за state mutations (`el.lnProfile.create()`). СЕКОГАШ dispatcha request event (`ln-profile:request-create`). Читање на state е дозволено директно (`el.lnProfile.currentId`).
+
+### Event flow
+
+```
+[Корисник клика копче]
+        ↓
+[Координатор] фаќа click на [data-ln-action="new-profile"]
+        ↓
+[Координатор] чита input, dispatcha request event:
+    nav.dispatchEvent('ln-profile:request-create', { detail: { name } })
+        ↓
+[Компонента ln-profile] слуша request-create, повикува self.create(name)
+        ↓
+[Компонента] менува state, рендерира DOM, dispatcha notification:
+    _dispatch(dom, 'ln-profile:created', { profileId, profile })
+        ↓
+[Координатор] слуша ln-profile:created → покажува toast, затвора модал
+```
+
+### Workflow за нова функционалност
+
+1. **Компонента**: додај prototype метод (чист — прими параметри, менувај state, dispatcha notification event)
+2. **Компонента**: додај request listener во `_bindEvents` (повикува го истиот prototype метод)
+3. **Координатор**: додај UI trigger (click / form submit → dispatcha request event на компонента)
+4. **Координатор**: додај UI reaction (слушај notification event → toast / modal / highlight)
+
+### Тест: „Дали е компонента или координатор?"
+
+| Прашање | Ако ДА → | Ако НЕ → |
+|---------|----------|----------|
+| Менува свој state (CRUD)? | компонента | координатор |
+| Рендерира свој DOM (листа, копчиња)? | компонента | координатор |
+| Отвора модал / покажува toast? | координатор | компонента |
+| Чита input од форма? | координатор | компонента |
+| Слуша `[data-ln-action="..."]` клик? | координатор | компонента |
+| Слуша клик на **свој child** елемент? | компонента | координатор |
+| Bridges две компоненти (A:event → B:attribute)? | координатор | — |
+
+---
+
 ## IIFE Pattern (задолжителен)
 
 Секоја компонента е IIFE (Immediately Invoked Function Expression) — нема exports, нема imports, нема зависности.
@@ -264,88 +327,121 @@ import './ln-{name}/ln-{name}.scss';
 
 ---
 
-## Request Events (request-* pattern)
+## Request Events — детали
 
-Кога надворешен код (координатор, друга компонента) треба да **побара акција** од компонента, dispatcha `request-*` CustomEvent на DOM елементот. Компонентата слуша и реагира.
+> Архитектурата е дефинирана во [Архитектура на ln-acme проект](#архитектура-на-ln-acme-проект-задолжително). Тука се само техничките детали.
 
-### Правила
-
-1. **Именување:** `ln-{component}:request-{action}` (пр. `ln-toggle:request-close`, `ln-profile:request-create`)
-2. **Target:** Секогаш на DOM елементот на компонентата
-3. **Detail:** Параметри за акцијата (`{ name }`, `{ id }`, итн.)
-4. **Bubbles:** `false` (default) — request events се за конкретен елемент
-5. **Компонентата слуша** во constructor или `_bindEvents`
-6. **Prototype методи остануваат** — request events ги повикуваат истите методи
+### Имплементација во компонента
 
 ```javascript
-// Компонента — слуша request events
-dom.addEventListener('ln-profile:request-create', function (e) {
-    self.create(e.detail.name);
+// Во _bindEvents — слуша request events на себе
+this.dom.addEventListener('ln-profile:request-create', function (e) {
+    self.create(e.detail.name);  // повикува ист prototype метод
 });
+this.dom.addEventListener('ln-profile:request-remove', function (e) {
+    self.remove(e.detail.id);
+});
+```
 
+### Dispatching од координатор
+
+```javascript
 // Координатор — dispatcha request event (НЕ директен API повик)
 nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
     detail: { name: 'My Profile' }
 }));
 ```
 
-### Queries vs Commands
+### Именување
 
-- **Commands** (менуваат state) → СЕКОГАШ преку request events
-- **Queries** (читаат state) → дозволени директно: `nav.lnProfile.currentId`, `sidebar.lnPlaylist.getTrack(idx)`
+| Тип | Формат | Пример | Bubbles |
+|-----|--------|--------|---------|
+| Request (incoming) | `ln-{name}:request-{action}` | `ln-profile:request-create` | `false` |
+| Notification (outgoing) | `ln-{name}:{past-tense}` | `ln-profile:created` | `true` |
+| Lifecycle before | `ln-{name}:before-{action}` | `ln-toggle:before-open` | `true`, cancelable |
+| Lifecycle after | `ln-{name}:{action}` | `ln-toggle:open` | `true` |
+
+### Commands vs Queries
+
+| Тип | Механизам | Пример |
+|-----|-----------|--------|
+| **Command** (менува state) | request event | `nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', { detail: { id } }))` |
+| **Query** (чита state) | директен пристап | `nav.lnProfile.currentId`, `sidebar.lnPlaylist.getTrack(idx)` |
 
 ---
 
-## Компонента = Data Layer, Координатор = UI Wiring
+## Координатор — целосен пример
 
-Компонентите се **чисти data layers** — менаџираат state, CRUD операции и dispatching на CustomEvent. **НЕ знаат** за конкретни UI елементи надвор од својот DOM root.
-
-### Компонентата НЕ смее да:
-- Слуша клик на конкретно копче (пр. `[data-ln-action="delete-profile"]`)
-- Отвора/затвора модали (`lnModal.open(...)`)
-- Покажува toast нотификации
-- Чита input полиња од форми надвор од својот DOM
-- Знае за `ln-form:submit` на надворешни форми
-
-### Компонентата СМЕЕ да:
-- Менаџира свој state (CRUD)
-- Рендерира свој DOM (пр. profile buttons во `<nav data-ln-profile>`)
-- Слуша клик на **свои** child елементи (пр. profile button → `switchTo()`)
-- Слуша `request-*` events на себе и извршува команди
-- Dispatcha notification events (`ln-profile:created`, `ln-profile:switched`)
-- Expose-ува public API преку prototype (за конзола/тестирање)
-
-### Координатор (app-level wiring)
-Проектот има **координатор** (пр. `ln-mixer.js`) — тенок IIFE кој:
-
-1. **Фаќа UI акции** — клик на `[data-ln-action="new-profile"]`, `ln-form:submit` за `new-profile`
-2. **Dispatcha request events** — `nav.dispatchEvent(new CustomEvent('ln-profile:request-create', { detail: { name } }))`
-3. **Хендла UI реакции** — toast на `ln-profile:created`, затвори модал на `ln-profile:deleted`
-4. **Bridges компоненти** — `ln-profile:switched` → сетирај `data-ln-playlist-profile` на sidebar
+> Координаторот е тенок IIFE, project-specific. Нема свој state, нема свој DOM. Само wiring.
 
 ```javascript
-// Координатор — dispatcha request event
-document.addEventListener('click', function (e) {
-    if (e.target.closest('[data-ln-action="delete-profile"]')) {
-        var nav = document.querySelector('[data-ln-profile]');
-        if (nav && nav.lnProfile) {
-            nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', {
-                detail: { id: nav.lnProfile.currentId }
-            }));
-        }
-    }
-});
+(function () {
+    'use strict';
+    if (window.myCoordinator !== undefined) return;
+    window.myCoordinator = true;
 
-// Координатор — реагира на notification event со UI feedback
-document.addEventListener('ln-profile:deleted', function () {
-    lnModal.close('modal-settings');
-    window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-        detail: { type: 'info', message: 'Profile deleted' }
-    }));
-});
+    function _getNav() { return document.querySelector('[data-ln-profile]'); }
+    function _getSidebar() { return document.querySelector('[data-ln-playlist]'); }
+
+    function _init() {
+        // 1. UI trigger → request event
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('[data-ln-action="delete-profile"]')) {
+                var nav = _getNav();
+                if (nav && nav.lnProfile) {
+                    nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', {
+                        detail: { id: nav.lnProfile.currentId }  // query е OK
+                    }));
+                }
+            }
+        });
+
+        // 2. Form submit → request event
+        document.addEventListener('ln-form:submit', function (e) {
+            if (e.target.getAttribute('data-ln-form') !== 'new-profile') return;
+            var input = document.querySelector('[data-ln-field="new-profile-name"]');
+            var name = input ? input.value.trim() : '';
+            if (!name) return;
+
+            var nav = _getNav();
+            if (nav) {
+                nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
+                    detail: { name: name }
+                }));
+            }
+            input.value = '';
+            lnModal.close('modal-new-profile');
+        });
+
+        // 3. Notification → UI feedback
+        document.addEventListener('ln-profile:created', function () {
+            window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+                detail: { type: 'success', message: 'Profile created' }
+            }));
+        });
+
+        // 4. Bridge: component A event → component B attribute
+        document.addEventListener('ln-profile:switched', function (e) {
+            var sidebar = _getSidebar();
+            if (sidebar) {
+                sidebar.setAttribute('data-ln-playlist-profile', e.detail.profileId);
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _init);
+    } else {
+        _init();
+    }
+})();
 ```
 
-**Зошто?** Компонентата е reusable. Координаторот е project-specific. Ако утре имаш друго копче или друг модал — менуваш само координаторот, не компонентата.
+**Четирите работи на координаторот:**
+1. **UI trigger → request event** — клик/submit → dispatcha request на компонента
+2. **Form processing** — чита input, валидира, чисти, затвора модал
+3. **Notification → UI feedback** — toast, modal close, highlight
+4. **Bridge** — event од компонента A → attribute/request на компонента B
 
 ---
 
