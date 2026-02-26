@@ -445,6 +445,94 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
 
 ---
 
+## Template System — DOM структура во HTML, не во JS
+
+**НИКОГАШ** не гради DOM структура со `createElement` chains во JS. Користи нативен HTML `<template>` елемент.
+
+### Принцип
+
+DOM структурата е **HTML одлука**, не JS одлука. Компонентата само ги полни податоците.
+
+```
+HTML:  <template> ги дефинира структурите (inert, не се рендерираат)
+JS:    clone → querySelector → textContent/setAttribute
+```
+
+### HTML — дефинирај templates на крајот од `<body>`, пред `<script>` тагови
+
+```html
+<!-- Templates -->
+<template data-ln-template="track-item">
+    <li data-ln-track>
+        <span class="track-number" data-ln-drag-handle></span>
+        <article class="track-info">
+            <p class="track-name"></p>
+            <p class="track-artist"></p>
+        </article>
+        <nav class="track-actions">
+            <button type="button" data-ln-load-to="a">A</button>
+            <button type="button" data-ln-load-to="b">B</button>
+        </nav>
+    </li>
+</template>
+
+<template data-ln-template="profile-btn">
+    <button type="button" class="profile-btn" data-ln-profile-id></button>
+</template>
+
+<script src="..."></script>
+```
+
+### JS — `_cloneTemplate` helper (IIFE-scoped, lazy-cached)
+
+Секоја IIFE компонента добива свој `_cloneTemplate`:
+
+```javascript
+var _tmplCache = {};
+function _cloneTemplate(name) {
+    if (!_tmplCache[name]) {
+        _tmplCache[name] = document.querySelector('[data-ln-template="' + name + '"]');
+    }
+    return _tmplCache[name].content.cloneNode(true);
+}
+```
+
+### Употреба — clone + fill
+
+```javascript
+_component.prototype._buildTrackItem = function (track, idx) {
+    var frag = _cloneTemplate('track-item');
+    var li = frag.querySelector('[data-ln-track]');
+
+    li.setAttribute('data-ln-track', idx);
+    li.querySelector('.track-number').textContent = idx + 1;
+    li.querySelector('.track-name').textContent = track.title;
+    li.querySelector('.track-artist').textContent = track.artist;
+
+    return li;
+};
+```
+
+### Правила
+
+1. **`<template data-ln-template="name">`** — конвенција за именување
+2. **Место:** на крајот од `<body>`, пред `<script>` тагови, во коментар блок `TEMPLATES`
+3. **`content.cloneNode(true)`** враќа DocumentFragment — query-ирај го root елементот со `querySelector`
+4. **JS само полни:** `textContent`, `setAttribute`, `classList` — НЕ создава структура
+5. **Услови:** мали условни елементи (1-2 spans за индикатори) се OK како `createElement`
+6. **Еден template, една функција:** ако иста структура се создава на 2+ места, мора да биде `<template>` + заедничка функција
+
+### Зошто
+
+| createElement chains | `<template>` |
+|---------------------|--------------|
+| 60+ линии JS за еден `<li>` | 10 линии HTML + 8 линии JS |
+| Структура скриена во JS | Структура видлива во HTML |
+| Дупликација помеѓу методи | Една дефиниција, една функција |
+| Тешко за дизајнер | HTML — лесно за промена |
+
+---
+
 ## Компоненти (референца)
 
 | Компонента | Pattern | Data Attr | Опис |

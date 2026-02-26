@@ -423,6 +423,7 @@ git submodule add .../ln-acme.git resources/ln-acme
 3. Додај `data-ln-{name}` data attribute
 4. Ако треба CSS, креирај `js/ln-{name}/ln-{name}.scss`
 5. Додај `import './ln-{name}/ln-{name}.js'` во `js/index.js`
+6. **DOM структура → `<template>` елементи во HTML** (НИКОГАШ createElement chains). Детали: [js/COMPONENTS.md](js/COMPONENTS.md) → „Template System"
 
 ## Кога менуваш дизајн токени
 
