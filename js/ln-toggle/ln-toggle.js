@@ -61,6 +61,12 @@
 			}
 		});
 
+		dom.addEventListener('ln-toggle:request-open', function () {
+			if (!self.isOpen) {
+				self.open();
+			}
+		});
+
 		return this;
 	}
 

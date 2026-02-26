@@ -264,6 +264,38 @@ import './ln-{name}/ln-{name}.scss';
 
 ---
 
+## Request Events (request-* pattern)
+
+Кога надворешен код (координатор, друга компонента) треба да **побара акција** од компонента, dispatcha `request-*` CustomEvent на DOM елементот. Компонентата слуша и реагира.
+
+### Правила
+
+1. **Именување:** `ln-{component}:request-{action}` (пр. `ln-toggle:request-close`, `ln-profile:request-create`)
+2. **Target:** Секогаш на DOM елементот на компонентата
+3. **Detail:** Параметри за акцијата (`{ name }`, `{ id }`, итн.)
+4. **Bubbles:** `false` (default) — request events се за конкретен елемент
+5. **Компонентата слуша** во constructor или `_bindEvents`
+6. **Prototype методи остануваат** — request events ги повикуваат истите методи
+
+```javascript
+// Компонента — слуша request events
+dom.addEventListener('ln-profile:request-create', function (e) {
+    self.create(e.detail.name);
+});
+
+// Координатор — dispatcha request event (НЕ директен API повик)
+nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
+    detail: { name: 'My Profile' }
+}));
+```
+
+### Queries vs Commands
+
+- **Commands** (менуваат state) → СЕКОГАШ преку request events
+- **Queries** (читаат state) → дозволени директно: `nav.lnProfile.currentId`, `sidebar.lnPlaylist.getTrack(idx)`
+
+---
+
 ## Компонента = Data Layer, Координатор = UI Wiring
 
 Компонентите се **чисти data layers** — менаџираат state, CRUD операции и dispatching на CustomEvent. **НЕ знаат** за конкретни UI елементи надвор од својот DOM root.
@@ -279,27 +311,32 @@ import './ln-{name}/ln-{name}.scss';
 - Менаџира свој state (CRUD)
 - Рендерира свој DOM (пр. profile buttons во `<nav data-ln-profile>`)
 - Слуша клик на **свои** child елементи (пр. profile button → `switchTo()`)
-- Dispatcha CustomEvents (`ln-profile:created`, `ln-profile:switched`)
-- Expose-ува public API преку prototype (`create()`, `remove()`, `switchTo()`)
+- Слуша `request-*` events на себе и извршува команди
+- Dispatcha notification events (`ln-profile:created`, `ln-profile:switched`)
+- Expose-ува public API преку prototype (за конзола/тестирање)
 
 ### Координатор (app-level wiring)
 Проектот има **координатор** (пр. `ln-mixer.js`) — тенок IIFE кој:
 
 1. **Фаќа UI акции** — клик на `[data-ln-action="new-profile"]`, `ln-form:submit` за `new-profile`
-2. **Преведува во API повици** — `nav.lnProfile.create(name)`, `nav.lnProfile.remove(id)`
+2. **Dispatcha request events** — `nav.dispatchEvent(new CustomEvent('ln-profile:request-create', { detail: { name } }))`
 3. **Хендла UI реакции** — toast на `ln-profile:created`, затвори модал на `ln-profile:deleted`
 4. **Bridges компоненти** — `ln-profile:switched` → сетирај `data-ln-playlist-profile` на sidebar
 
 ```javascript
-// Координатор — слуша конкретни копчиња, вика component API
+// Координатор — dispatcha request event
 document.addEventListener('click', function (e) {
     if (e.target.closest('[data-ln-action="delete-profile"]')) {
-        var profile = nav.lnProfile;
-        if (profile) profile.remove(profile.currentId);
+        var nav = document.querySelector('[data-ln-profile]');
+        if (nav && nav.lnProfile) {
+            nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', {
+                detail: { id: nav.lnProfile.currentId }
+            }));
+        }
     }
 });
 
-// Координатор — реагира на component events со UI feedback
+// Координатор — реагира на notification event со UI feedback
 document.addEventListener('ln-profile:deleted', function () {
     lnModal.close('modal-settings');
     window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {

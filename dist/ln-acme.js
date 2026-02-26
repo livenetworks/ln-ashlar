@@ -510,6 +510,8 @@
     var i = this;
     return o.addEventListener("ln-toggle:request-close", function() {
       i.isOpen && i.close();
+    }), o.addEventListener("ln-toggle:request-open", function() {
+      i.isOpen || i.open();
     }), this;
   }
   b.prototype.open = function() {
