@@ -337,6 +337,12 @@ document.addEventListener('ln-upload:uploaded', function(e) {
 });
 ```
 
+### Компонента = Data Layer, Координатор = UI Wiring
+
+Компонентите се **чисти data layers** — CRUD + state + events. **НЕ слушаат** конкретни копчиња, **НЕ отвораат** модали, **НЕ покажуваат** toast. Проектот има **координатор** (пр. `ln-mixer.js`) кој ги фаќа UI акциите и ги преведува во component API повици, и реагира на component events со UI feedback (toast, modal close).
+
+Детална документација: [js/COMPONENTS.md](js/COMPONENTS.md) → секција „Компонента = Data Layer".
+
 ---
 
 ## Структура на фајлови

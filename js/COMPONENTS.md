@@ -264,6 +264,54 @@ import './ln-{name}/ln-{name}.scss';
 
 ---
 
+## Компонента = Data Layer, Координатор = UI Wiring
+
+Компонентите се **чисти data layers** — менаџираат state, CRUD операции и dispatching на CustomEvent. **НЕ знаат** за конкретни UI елементи надвор од својот DOM root.
+
+### Компонентата НЕ смее да:
+- Слуша клик на конкретно копче (пр. `[data-ln-action="delete-profile"]`)
+- Отвора/затвора модали (`lnModal.open(...)`)
+- Покажува toast нотификации
+- Чита input полиња од форми надвор од својот DOM
+- Знае за `ln-form:submit` на надворешни форми
+
+### Компонентата СМЕЕ да:
+- Менаџира свој state (CRUD)
+- Рендерира свој DOM (пр. profile buttons во `<nav data-ln-profile>`)
+- Слуша клик на **свои** child елементи (пр. profile button → `switchTo()`)
+- Dispatcha CustomEvents (`ln-profile:created`, `ln-profile:switched`)
+- Expose-ува public API преку prototype (`create()`, `remove()`, `switchTo()`)
+
+### Координатор (app-level wiring)
+Проектот има **координатор** (пр. `ln-mixer.js`) — тенок IIFE кој:
+
+1. **Фаќа UI акции** — клик на `[data-ln-action="new-profile"]`, `ln-form:submit` за `new-profile`
+2. **Преведува во API повици** — `nav.lnProfile.create(name)`, `nav.lnProfile.remove(id)`
+3. **Хендла UI реакции** — toast на `ln-profile:created`, затвори модал на `ln-profile:deleted`
+4. **Bridges компоненти** — `ln-profile:switched` → сетирај `data-ln-playlist-profile` на sidebar
+
+```javascript
+// Координатор — слуша конкретни копчиња, вика component API
+document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-ln-action="delete-profile"]')) {
+        var profile = nav.lnProfile;
+        if (profile) profile.remove(profile.currentId);
+    }
+});
+
+// Координатор — реагира на component events со UI feedback
+document.addEventListener('ln-profile:deleted', function () {
+    lnModal.close('modal-settings');
+    window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+        detail: { type: 'info', message: 'Profile deleted' }
+    }));
+});
+```
+
+**Зошто?** Компонентата е reusable. Координаторот е project-specific. Ако утре имаш друго копче или друг модал — менуваш само координаторот, не компонентата.
+
+---
+
 ## Компоненти (референца)
 
 | Компонента | Pattern | Data Attr | Опис |
