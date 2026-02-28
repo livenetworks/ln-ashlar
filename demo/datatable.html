@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Data Table — ln-acme</title>
+	<link rel="stylesheet" href="../dist/ln-acme.css">
+	<link rel="stylesheet" href="demo.css">
+	<style>
+		/* ── ln-table component ──────────────────────────────────────── */
+		/* Привремени стилови — ќе се преселат во js/ln-table/ln-table.scss */
+
+		/*
+		 * Scroll container = viewport (body), НЕ .content.
+		 * (.content има overflow:auto, но flex родителите растат неограничено
+		 *  со min-h-screen, па content никогаш не scrolls — страната scroll-а.)
+		 *
+		 * .header = position:fixed, top:0, z-index:20, height: var(--header-height, 3.5rem)
+		 *
+		 * Sticky stacking (сите под z:20 за да одат ЗАД .header):
+		 *   1. .ln-table__toolbar — sticky top: --header-height, z-index:12
+		 *   2. thead th           — sticky top: --header-height + toolbar-h, z-index:11
+		 */
+
+		/*
+		 * .content има overflow:auto (_app-layout.scss:82) што го прави
+		 * scroll container за sticky. Но .content никогаш не скрола
+		 * (flex+min-h-screen го пуштаат да расте). Sticky е заробен во
+		 * контејнер без scroll → никогаш не се активира.
+		 * Fix: overflow:visible го ослободува sticky да го користи viewport-от.
+		 */
+		.content:has([data-ln-table]) {
+			overflow: visible;
+		}
+
+		/* ── Component wrapper ─── */
+		[data-ln-table] {
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			background: var(--color-bg-primary);
+		}
+
+		/* ── Toolbar (sticky #1 — below .header) ─── */
+		.ln-table__toolbar {
+			position: sticky;
+			top: var(--header-height, 3.5rem);
+			z-index: 12;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0.625rem 1rem;
+			background: var(--color-bg-secondary);
+			border-bottom: 1px solid var(--color-border);
+			border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+		}
+
+		.ln-table__toolbar h3 {
+			font-size: var(--text-base);
+			font-weight: var(--font-semibold);
+			color: var(--color-text-primary);
+			margin: 0;
+		}
+
+		.ln-table__toolbar aside {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.ln-table__count {
+			font-size: var(--text-sm);
+			color: var(--color-text-secondary);
+		}
+
+		/* ── Table overrides (undo global overflow:hidden + border-collapse) ─── */
+		[data-ln-table] table {
+			overflow: visible;
+			border-collapse: separate;
+			border-spacing: 0;
+			border-radius: 0;
+			box-shadow: none;
+		}
+
+		/* ── Thead (sticky #2, below toolbar) ─── */
+		[data-ln-table] thead th {
+			position: sticky;
+			top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 2.75rem));
+			z-index: 11;
+			background: var(--color-table-header-bg, #1a1a2e);
+		}
+
+		/* First/last td overrides — remove bg-secondary on first-child inside data-ln-table */
+		[data-ln-table] table td:first-child {
+			background: transparent;
+			font-weight: normal;
+			color: var(--color-text-secondary);
+		}
+
+		/* ── Footer ─── */
+		.ln-table__footer {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0.5rem 1rem;
+			border-top: 1px solid var(--color-border);
+			background: var(--color-bg-secondary);
+			border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+			font-size: var(--text-sm);
+			color: var(--color-text-secondary);
+		}
+
+		.ln-table__footer strong {
+			color: var(--color-text-primary);
+			font-weight: var(--font-semibold);
+		}
+
+		/* ── Timing badge ─── */
+		.ln-table__timing {
+			font-size: var(--text-xs);
+			color: var(--color-text-muted);
+			font-family: var(--font-mono);
+		}
+	</style>
+	<script src="../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../js/ln-nav/ln-nav.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+
+		<!-- Header -->
+		<div class="header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Data Table</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'ln-table', message:'Фаза 1 — sticky header demo.'})">Test Toast</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="app-body">
+
+			<!-- Sidebar -->
+			<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+				<div class="sidebar-header">
+					<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+					<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+					<span class="app-name">acme-gui</span>
+				</div>
+
+				<div class="sidebar-content">
+					<nav class="nav" data-ln-nav="active">
+						<ul>
+							<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+						</ul>
+
+						<h6 class="nav-section">CSS компоненти</h6>
+						<ul>
+							<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+							<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+							<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+							<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+							<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+							<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+							<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+							<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						</ul>
+
+						<h6 class="nav-section">JS компоненти</h6>
+						<ul>
+							<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+							<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+							<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+							<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+							<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+							<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+							<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+							<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+							<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+							<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+							<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+							<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+							<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						</ul>
+					</nav>
+				</div>
+
+				<div class="sidebar-footer">
+					<small>acme-gui v1.0.0</small>
+				</div>
+			</aside>
+
+			<!-- Main Panel -->
+			<div class="main-panel">
+				<div class="content">
+
+					<!-- ── Data Table component ─────────────────────── -->
+					<div data-ln-table id="demo-table">
+
+						<!-- Toolbar — sticky #1, закачена на top:0 (.content scroll area) -->
+						<header class="ln-table__toolbar">
+							<h3>Вработени</h3>
+							<aside>
+								<span class="ln-table__count" id="demo-count">10.000 записи</span>
+								<span class="ln-table__timing" id="demo-timing"></span>
+							</aside>
+						</header>
+
+						<table>
+							<thead>
+								<tr>
+									<th data-ln-sort="number">#</th>
+									<th data-ln-sort="string">Вработен</th>
+									<th data-ln-sort="string">Оддел</th>
+									<th data-ln-sort="string">Позиција</th>
+									<th data-ln-sort="date">Вработен од</th>
+									<th data-ln-sort="number" class="numeric">Плата (МКД)</th>
+									<th>Статус</th>
+									<th class="center">Акции</th>
+								</tr>
+							</thead>
+							<tbody id="demo-tbody">
+								<!-- 10.000 реда — генерирани со JS -->
+							</tbody>
+						</table>
+
+						<footer class="ln-table__footer">
+							<span>Вкупно: <strong id="demo-total">10.000</strong> записи</span>
+						</footer>
+					</div>
+
+				</div>
+
+				<footer class="footer">
+					<span>acme-gui &copy; 2026 LiveNetworks</span>
+					<span>ln-acme v1.0.0</span>
+				</footer>
+
+			</div>
+		</div>
+	</div>
+	<script>
+	(function() {
+		var TOTAL = 10000;
+		var tableEl = document.getElementById('demo-table');
+		var tbody = document.getElementById('demo-tbody');
+		if (!tableEl || !tbody) return;
+
+		// ── Measure toolbar height → CSS variable for thead sticky offset ──
+		var toolbar = tableEl.querySelector('.ln-table__toolbar');
+		if (toolbar) {
+			var h = toolbar.offsetHeight;
+			tableEl.style.setProperty('--ln-table-toolbar-h', h + 'px');
+		}
+
+		// ── Data pools ──
+		var firstNames = [
+			'Марко','Ана','Иван','Елена','Борис','Сара','Никола','Тамара',
+			'Димитар','Ленче','Стефан','Мила','Горан','Ивана','Дејан',
+			'Наташа','Филип','Весна','Александар','Катерина'
+		];
+		var lastNames = [
+			'Петровски','Стојанова','Димитров','Трајкова','Николовски',
+			'Петреска','Јовановски','Алексовска','Стефановски','Маркоска',
+			'Ристовски','Илиевска','Георгиев','Ангелова','Павловски',
+			'Јанковска','Тодоров','Велковска','Миленков','Костадинова'
+		];
+		var departments = ['ИТ', 'Финансии', 'Правно', 'Маркетинг', 'HR', 'Продажба'];
+		var positions = [
+			'Senior Developer','Junior Developer','Financial Analyst','Marketing Manager',
+			'Legal Advisor','DevOps Engineer','Accountant','Content Writer',
+			'Project Manager','Legal Secretary','HR Specialist','Sales Rep',
+			'Team Lead','Designer','QA Engineer','Data Analyst'
+		];
+		var statuses = [
+			{ cls: 'pass', text: 'Активен' },
+			{ cls: 'pass', text: 'Активен' },
+			{ cls: 'pass', text: 'Активен' },
+			{ cls: 'warn', text: 'Отсутен' },
+			{ cls: 'warn', text: 'Суспендиран' },
+			{ cls: 'fail', text: 'Неактивен' }
+		];
+
+		var dateMin = 1420070400; // 2015-01-01
+		var dateMax = 1767139200; // 2025-12-01
+		var dateRange = dateMax - dateMin;
+
+		function pad(n) { return n < 10 ? '0' + n : n; }
+
+		function formatDate(ts) {
+			var d = new Date(ts * 1000);
+			return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear();
+		}
+
+		function formatSalary(n) {
+			return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		}
+
+		// ── Generate rows ──
+		var t0 = performance.now();
+
+		var html = [];
+		for (var i = 0; i < TOTAL; i++) {
+			var name = firstNames[i % firstNames.length] + ' ' + lastNames[i % lastNames.length];
+			var dept = departments[i % departments.length];
+			var pos  = positions[i % positions.length];
+			var ts   = dateMin + Math.floor(Math.random() * dateRange);
+			var salary = 30000 + Math.floor(Math.random() * 80000);
+			var status = statuses[i % statuses.length];
+
+			html.push(
+				'<tr>' +
+				'<td>' + (i + 1) + '</td>' +
+				'<td>' + name + '</td>' +
+				'<td>' + dept + '</td>' +
+				'<td>' + pos + '</td>' +
+				'<td data-ln-value="' + ts + '">' + formatDate(ts) + '</td>' +
+				'<td data-ln-value="' + salary + '" class="numeric">' + formatSalary(salary) + '</td>' +
+				'<td><span class="' + status.cls + '">' + status.text + '</span></td>' +
+				'<td class="center">' +
+					'<div class="actions">' +
+						'<a href="#" class="action primary"><span class="ln-icon-view"></span></a>' +
+						'<a href="#" class="action"><span class="ln-icon-edit"></span></a>' +
+						'<a href="#" class="action danger"><span class="ln-icon-delete"></span></a>' +
+					'</div>' +
+				'</td>' +
+				'</tr>'
+			);
+		}
+
+		tbody.innerHTML = html.join('');
+
+		var elapsed = (performance.now() - t0).toFixed(0);
+		console.log('ln-table: ' + TOTAL + ' rows rendered in ' + elapsed + 'ms');
+
+		// ── Update UI with timing ──
+		var timingEl = document.getElementById('demo-timing');
+		if (timingEl) timingEl.textContent = elapsed + 'ms';
+	})();
+	</script>
+</body>
+</html>
