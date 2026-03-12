@@ -1,9 +1,9 @@
 (function () {
 	'use strict';
 
-	var DOM_SELECTOR = 'data-ln-sortable';
-	var DOM_ATTRIBUTE = 'lnSortable';
-	var HANDLE_ATTR = 'data-ln-sortable-handle';
+	const DOM_SELECTOR = 'data-ln-sortable';
+	const DOM_ATTRIBUTE = 'lnSortable';
+	const HANDLE_ATTR = 'data-ln-sortable-handle';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -14,15 +14,15 @@
 	}
 
 	function _findElements(root) {
-		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
+		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			items.push(root);
 		}
-		items.forEach(function (el) {
+		for (const el of items) {
 			if (!el[DOM_ATTRIBUTE]) {
 				el[DOM_ATTRIBUTE] = new _component(el);
 			}
-		});
+		}
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -32,21 +32,18 @@
 		this.isEnabled = true;
 		this._dragging = null;
 
-		var self = this;
+		const self = this;
 
-		// Delegated pointerdown on container
-		dom.addEventListener('pointerdown', function (e) {
+		this._onPointerDown = function (e) {
 			if (!self.isEnabled) return;
-			self._onPointerDown(e);
-		});
+			self._handlePointerDown(e);
+		};
+		dom.addEventListener('pointerdown', this._onPointerDown);
 
-		// Request events
-		dom.addEventListener('ln-sortable:request-enable', function () {
-			self.enable();
-		});
-		dom.addEventListener('ln-sortable:request-disable', function () {
-			self.disable();
-		});
+		this._onRequestEnable = function () { self.enable(); };
+		this._onRequestDisable = function () { self.disable(); };
+		dom.addEventListener('ln-sortable:request-enable', this._onRequestEnable);
+		dom.addEventListener('ln-sortable:request-disable', this._onRequestDisable);
 
 		return this;
 	}
@@ -61,24 +58,30 @@
 		this.isEnabled = false;
 	};
 
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this.dom.removeEventListener('pointerdown', this._onPointerDown);
+		this.dom.removeEventListener('ln-sortable:request-enable', this._onRequestEnable);
+		this.dom.removeEventListener('ln-sortable:request-disable', this._onRequestDisable);
+		_dispatch(this.dom, 'ln-sortable:destroyed', { target: this.dom });
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
 	// ─── Pointer Handlers ──────────────────────────────────────
 
-	_component.prototype._onPointerDown = function (e) {
-		var handle = e.target.closest('[' + HANDLE_ATTR + ']');
-		var item;
+	_component.prototype._handlePointerDown = function (e) {
+		let handle = e.target.closest('[' + HANDLE_ATTR + ']');
+		let item;
 
 		if (handle) {
-			// Handle found — walk up to find the direct child of this container
 			item = handle;
 			while (item && item.parentElement !== this.dom) {
 				item = item.parentElement;
 			}
 			if (!item || item.parentElement !== this.dom) return;
 		} else {
-			// No handle clicked — check if handles exist at all
 			if (this.dom.querySelector('[' + HANDLE_ATTR + ']')) return;
 
-			// No handles anywhere — whole child is draggable
 			item = e.target;
 			while (item && item.parentElement !== this.dom) {
 				item = item.parentElement;
@@ -87,17 +90,15 @@
 			handle = item;
 		}
 
-		// Cancelable before-drag event
-		var children = Array.from(this.dom.children);
-		var index = children.indexOf(item);
+		const children = Array.from(this.dom.children);
+		const index = children.indexOf(item);
 
-		var before = _dispatchCancelable(this.dom, 'ln-sortable:before-drag', {
+		const before = _dispatchCancelable(this.dom, 'ln-sortable:before-drag', {
 			item: item,
 			index: index
 		});
 		if (before.defaultPrevented) return;
 
-		// Start drag
 		e.preventDefault();
 		handle.setPointerCapture(e.pointerId);
 
@@ -111,11 +112,10 @@
 			index: index
 		});
 
-		// Bind move + end on handle (pointer capture keeps events flowing)
-		var self = this;
-		var onMove = function (ev) { self._onPointerMove(ev); };
-		var onEnd = function (ev) {
-			self._onPointerEnd(ev);
+		const self = this;
+		const onMove = function (ev) { self._handlePointerMove(ev); };
+		const onEnd = function (ev) {
+			self._handlePointerEnd(ev);
 			handle.removeEventListener('pointermove', onMove);
 			handle.removeEventListener('pointerup', onEnd);
 			handle.removeEventListener('pointercancel', onEnd);
@@ -126,66 +126,61 @@
 		handle.addEventListener('pointercancel', onEnd);
 	};
 
-	_component.prototype._onPointerMove = function (e) {
+	_component.prototype._handlePointerMove = function (e) {
 		if (!this._dragging) return;
 
-		var children = Array.from(this.dom.children);
-		var dragging = this._dragging;
+		const children = Array.from(this.dom.children);
+		const dragging = this._dragging;
 
-		// Clear existing drop indicators
-		children.forEach(function (child) {
+		for (const child of children) {
 			child.classList.remove('ln-sortable--drop-before', 'ln-sortable--drop-after');
-		});
+		}
 
-		// Find drop target
-		for (var i = 0; i < children.length; i++) {
-			if (children[i] === dragging) continue;
+		for (const child of children) {
+			if (child === dragging) continue;
 
-			var rect = children[i].getBoundingClientRect();
-			var mid = rect.top + rect.height / 2;
+			const rect = child.getBoundingClientRect();
+			const mid = rect.top + rect.height / 2;
 
 			if (e.clientY >= rect.top && e.clientY < mid) {
-				children[i].classList.add('ln-sortable--drop-before');
+				child.classList.add('ln-sortable--drop-before');
 				break;
 			} else if (e.clientY >= mid && e.clientY <= rect.bottom) {
-				children[i].classList.add('ln-sortable--drop-after');
+				child.classList.add('ln-sortable--drop-after');
 				break;
 			}
 		}
 	};
 
-	_component.prototype._onPointerEnd = function (e) {
+	_component.prototype._handlePointerEnd = function (e) {
 		if (!this._dragging) return;
 
-		var item = this._dragging;
-		var children = Array.from(this.dom.children);
-		var oldIndex = children.indexOf(item);
+		const item = this._dragging;
+		const children = Array.from(this.dom.children);
+		const oldIndex = children.indexOf(item);
 
-		// Find drop target
-		var dropTarget = null;
-		var dropPosition = null;
+		let dropTarget = null;
+		let dropPosition = null;
 
-		for (var i = 0; i < children.length; i++) {
-			if (children[i].classList.contains('ln-sortable--drop-before')) {
-				dropTarget = children[i];
+		for (const child of children) {
+			if (child.classList.contains('ln-sortable--drop-before')) {
+				dropTarget = child;
 				dropPosition = 'before';
 				break;
 			}
-			if (children[i].classList.contains('ln-sortable--drop-after')) {
-				dropTarget = children[i];
+			if (child.classList.contains('ln-sortable--drop-after')) {
+				dropTarget = child;
 				dropPosition = 'after';
 				break;
 			}
 		}
 
-		// Clean up all classes
-		children.forEach(function (child) {
+		for (const child of children) {
 			child.classList.remove('ln-sortable--drop-before', 'ln-sortable--drop-after');
-		});
+		}
 		item.classList.remove('ln-sortable--dragging');
 		this.dom.classList.remove('ln-sortable--active');
 
-		// Perform DOM reorder
 		if (dropTarget && dropTarget !== item) {
 			if (dropPosition === 'before') {
 				this.dom.insertBefore(item, dropTarget);
@@ -193,8 +188,8 @@
 				this.dom.insertBefore(item, dropTarget.nextElementSibling);
 			}
 
-			var newChildren = Array.from(this.dom.children);
-			var newIndex = newChildren.indexOf(item);
+			const newChildren = Array.from(this.dom.children);
+			const newIndex = newChildren.indexOf(item);
 
 			_dispatch(this.dom, 'ln-sortable:reordered', {
 				item: item,
@@ -216,7 +211,7 @@
 	}
 
 	function _dispatchCancelable(element, eventName, detail) {
-		var event = new CustomEvent(eventName, {
+		const event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: detail || {}
@@ -228,16 +223,16 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {

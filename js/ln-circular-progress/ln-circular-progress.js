@@ -2,14 +2,12 @@
 	const DOM_SELECTOR = '[data-ln-circular-progress]';
 	const DOM_ATTRIBUTE = 'lnCircularProgress';
 
-	if (window[DOM_ATTRIBUTE] !== undefined) {
-		return;
-	}
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	var SVG_NS = 'http://www.w3.org/2000/svg';
-	var VIEW_SIZE = 36;
-	var RADIUS = 16;
-	var CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+	const SVG_NS = 'http://www.w3.org/2000/svg';
+	const VIEW_SIZE = 36;
+	const RADIUS = 16;
+	const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 	function constructor(domRoot) {
 		_findElements(domRoot);
@@ -23,13 +21,13 @@
 	}
 
 	function _findElements(domRoot) {
-		var items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
+		const items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
 
-		items.forEach(function (item) {
+		for (const item of items) {
 			if (!item[DOM_ATTRIBUTE]) {
 				item[DOM_ATTRIBUTE] = new _constructor(item);
 			}
-		});
+		}
 
 		if (domRoot.hasAttribute && domRoot.hasAttribute('data-ln-circular-progress') && !domRoot[DOM_ATTRIBUTE]) {
 			domRoot[DOM_ATTRIBUTE] = new _constructor(domRoot);
@@ -42,6 +40,7 @@
 		this.trackCircle = null;
 		this.progressCircle = null;
 		this.labelEl = null;
+		this._attrObserver = null;
 		_buildSvg.call(this);
 		_render.call(this);
 		_listenValues.call(this);
@@ -49,9 +48,24 @@
 		return this;
 	}
 
+	_constructor.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this._attrObserver) {
+			this._attrObserver.disconnect();
+		}
+		if (this.svg) {
+			this.svg.remove();
+		}
+		if (this.labelEl) {
+			this.labelEl.remove();
+		}
+		this.dom.removeAttribute('data-ln-circular-progress-initialized');
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
 	function _createSvgElement(tag, attrs) {
-		var el = document.createElementNS(SVG_NS, tag);
-		for (var key in attrs) {
+		const el = document.createElementNS(SVG_NS, tag);
+		for (const key in attrs) {
 			el.setAttribute(key, attrs[key]);
 		}
 		return el;
@@ -96,16 +110,16 @@
 	}
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (item) {
+					for (const item of mutation.addedNodes) {
 						if (item.nodeType === 1) {
 							_findElements(item);
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {
@@ -117,34 +131,36 @@
 	_domObserver();
 
 	function _listenValues() {
-		var self = this;
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const self = this;
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.attributeName === 'data-ln-circular-progress' ||
 					mutation.attributeName === 'data-ln-circular-progress-max') {
 					_render.call(self);
 				}
-			});
+			}
 		});
 
 		observer.observe(this.dom, {
 			attributes: true,
 			attributeFilter: ['data-ln-circular-progress', 'data-ln-circular-progress-max']
 		});
+
+		this._attrObserver = observer;
 	}
 
 	function _render() {
-		var value = parseFloat(this.dom.getAttribute('data-ln-circular-progress')) || 0;
-		var max = parseFloat(this.dom.getAttribute('data-ln-circular-progress-max')) || 100;
-		var percentage = (max > 0) ? (value / max) * 100 : 0;
+		const value = parseFloat(this.dom.getAttribute('data-ln-circular-progress')) || 0;
+		const max = parseFloat(this.dom.getAttribute('data-ln-circular-progress-max')) || 100;
+		let percentage = (max > 0) ? (value / max) * 100 : 0;
 
 		if (percentage < 0) percentage = 0;
 		if (percentage > 100) percentage = 100;
 
-		var offset = CIRCUMFERENCE - (percentage / 100) * CIRCUMFERENCE;
+		const offset = CIRCUMFERENCE - (percentage / 100) * CIRCUMFERENCE;
 		this.progressCircle.setAttribute('stroke-dashoffset', offset);
 
-		var label = this.dom.getAttribute('data-ln-circular-progress-label');
+		const label = this.dom.getAttribute('data-ln-circular-progress-label');
 		this.labelEl.textContent = label !== null ? label : Math.round(percentage) + '%';
 
 		_dispatch(this.dom, 'ln-circular-progress:change', {
@@ -159,9 +175,9 @@
 
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', function () {
-			window.lnCircularProgress(document.body);
+			constructor(document.body);
 		});
 	} else {
-		window.lnCircularProgress(document.body);
+		constructor(document.body);
 	}
 })();

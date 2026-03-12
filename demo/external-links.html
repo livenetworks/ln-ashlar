@@ -9,6 +9,7 @@
 	<script src="../js/ln-toast/ln-toast.js" defer></script>
 	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
 	<script src="../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../js/ln-modal/ln-modal.js" defer></script>
 	<script src="../js/ln-external-links/ln-external-links.js" defer></script>
 	<script src="demo.js" defer></script>
 </head>
@@ -69,6 +70,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -125,10 +127,10 @@
 					</section>
 
 					<!-- Примери -->
-					<section class="section-card">
+					<section class="section-card" id="external-links-demo">
 						<header><h3>Демо примери</h3></header>
 						<main>
-							<article class="demo-link-group">
+							<article>
 								<h5>Надворешни линкови (ќе се обработат)</h5>
 								<ul>
 									<li><a href="https://github.com">GitHub</a></li>
@@ -136,7 +138,7 @@
 									<li><a href="https://example.com/page">Example.com</a></li>
 								</ul>
 							</article>
-							<article class="demo-link-group">
+							<article>
 								<h5>Внатрешни линкови (нема промена)</h5>
 								<ul>
 									<li><a href="/">Homepage</a></li>
@@ -261,5 +263,50 @@ document.addEventListener('ln-external-links:processed', function(e) {
 		</div>
 		</div><!-- /.app-body -->
 	</div><!-- /.app-wrapper -->
+
+	<!-- External link confirmation modal -->
+	<aside class="ln-modal" id="external-link-modal">
+		<section class="ln-modal__content ln-modal__content--sm">
+			<header>
+				<h3>Надворешен линк</h3>
+				<button class="ln-icon-close" data-ln-modal-close></button>
+			</header>
+			<main>
+				<p>Ја напуштате оваа страница и одите на:</p>
+				<p id="external-link-url"></p>
+				<p>Дали сакате да продолжите?</p>
+			</main>
+			<footer>
+				<button class="btn btn--secondary" data-ln-modal-close>Откажи</button>
+				<button class="btn" id="external-link-confirm">Продолжи</button>
+			</footer>
+		</section>
+	</aside>
+
+	<script>
+	(function() {
+		var demo = document.getElementById('external-links-demo');
+		var pendingHref = null;
+
+		demo.addEventListener('click', function(e) {
+			var link = e.target.closest('a[data-ln-external-link="processed"]');
+			if (!link) return;
+			if (e.ctrlKey || e.metaKey || e.button === 1) return;
+
+			e.preventDefault();
+			pendingHref = link.href;
+			document.getElementById('external-link-url').textContent = pendingHref;
+			window.lnModal.open('external-link-modal');
+		});
+
+		document.getElementById('external-link-confirm').addEventListener('click', function() {
+			window.lnModal.close('external-link-modal');
+			if (pendingHref) {
+				window.open(pendingHref, '_blank', 'noopener,noreferrer');
+				pendingHref = null;
+			}
+		});
+	})();
+	</script>
 </body>
 </html>

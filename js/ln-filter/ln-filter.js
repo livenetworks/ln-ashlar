@@ -11,15 +11,15 @@
 	}
 
 	function _findElements(root) {
-		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
+		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			items.push(root);
 		}
-		items.forEach(function (el) {
+		for (const el of items) {
 			if (!el[DOM_ATTRIBUTE]) {
 				el[DOM_ATTRIBUTE] = new _component(el);
 			}
-		});
+		}
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -35,8 +35,7 @@
 
 		this._bindEvents();
 
-		// Set initial active (first button with empty value)
-		var initialActive = dom.querySelector('[data-ln-filter-key][data-ln-filter-value=""]');
+		const initialActive = dom.querySelector('[data-ln-filter-key][data-ln-filter-value=""]');
 		if (initialActive) {
 			initialActive.setAttribute('data-active', '');
 		}
@@ -45,36 +44,33 @@
 	}
 
 	_component.prototype._bindEvents = function () {
-		var self = this;
+		const self = this;
 
-		// Event delegation on own DOM
-		this.dom.addEventListener('click', function (e) {
-			var btn = e.target.closest('[data-ln-filter-key]');
+		this._clickHandler = function (e) {
+			const btn = e.target.closest('[data-ln-filter-key]');
 			if (!btn || !self.dom.contains(btn)) return;
 
-			var key = btn.getAttribute('data-ln-filter-key');
-			var value = btn.getAttribute('data-ln-filter-value');
+			const key = btn.getAttribute('data-ln-filter-key');
+			const value = btn.getAttribute('data-ln-filter-value');
 			self.filter(key, value);
-		});
+		};
+		this.dom.addEventListener('click', this._clickHandler);
 	};
 
 	// ─── Public API ────────────────────────────────────────────
 
 	_component.prototype.filter = function (key, value) {
-		// Update data-active on buttons
-		var buttons = Array.from(this.dom.querySelectorAll('[data-ln-filter-key]'));
-		buttons.forEach(function (btn) {
+		const buttons = Array.from(this.dom.querySelectorAll('[data-ln-filter-key]'));
+		for (const btn of buttons) {
 			btn.removeAttribute('data-active');
-		});
+		}
 
-		// Find and activate matching button
-		var matchBtn = this.dom.querySelector(
+		const matchBtn = this.dom.querySelector(
 			'[data-ln-filter-key="' + key + '"][data-ln-filter-value="' + (value || '') + '"]'
 		);
 		if (matchBtn) matchBtn.setAttribute('data-active', '');
 
 		if (!value) {
-			// Empty value = reset (show all)
 			this._activeKey = null;
 			this._activeValue = null;
 			this._apply();
@@ -94,9 +90,8 @@
 	};
 
 	_component.prototype.reset = function () {
-		// Find the reset button (empty value) key, or use current key
-		var resetBtn = this.dom.querySelector('[data-ln-filter-key][data-ln-filter-value=""]');
-		var key = resetBtn ? resetBtn.getAttribute('data-ln-filter-key') : '';
+		const resetBtn = this.dom.querySelector('[data-ln-filter-key][data-ln-filter-value=""]');
+		const key = resetBtn ? resetBtn.getAttribute('data-ln-filter-key') : '';
 		this.filter(key, '');
 	};
 
@@ -105,46 +100,54 @@
 		return { key: this._activeKey, value: this._activeValue };
 	};
 
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this.dom.removeEventListener('click', this._clickHandler);
+		if (this._targetObserver) {
+			this._targetObserver.disconnect();
+		}
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
 	// ─── Private ───────────────────────────────────────────────
 
 	_component.prototype._resolveTarget = function () {
 		if (!this._target) {
-			var targetId = this.dom.getAttribute(DOM_SELECTOR);
+			const targetId = this.dom.getAttribute(DOM_SELECTOR);
 			this._target = targetId ? document.getElementById(targetId) : null;
 		}
 		return this._target;
 	};
 
 	_component.prototype._getItems = function () {
-		var target = this._resolveTarget();
+		const target = this._resolveTarget();
 		if (!target) return [];
 		return Array.from(target.children);
 	};
 
 	_component.prototype._apply = function () {
-		var key = this._activeKey;
-		var value = this._activeValue;
+		const key = this._activeKey;
+		const value = this._activeValue;
 
-		this._getItems().forEach(function (el) {
+		for (const el of this._getItems()) {
 			if (!key || !value) {
-				// No active filter — show all
 				el.removeAttribute('data-ln-filter-hide');
 			} else {
-				var elValue = el.getAttribute('data-' + key);
+				const elValue = el.getAttribute('data-' + key);
 				if (elValue !== null && elValue.toLowerCase().indexOf(value.toLowerCase()) !== -1) {
 					el.removeAttribute('data-ln-filter-hide');
 				} else {
 					el.setAttribute('data-ln-filter-hide', '');
 				}
 			}
-		});
+		}
 	};
 
 	_component.prototype._ensureTargetObserver = function () {
-		var target = this._resolveTarget();
+		const target = this._resolveTarget();
 		if (!target || this._targetObserver) return;
 
-		var self = this;
+		const self = this;
 		this._targetObserver = new MutationObserver(function () {
 			if (self._activeKey) self._apply();
 		});
@@ -163,16 +166,16 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {

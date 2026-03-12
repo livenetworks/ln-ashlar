@@ -2,24 +2,18 @@
 	const DOM_SELECTOR = 'data-ln-nav';
 	const DOM_ATTRIBUTE = 'lnNav';
 
-	if (window[DOM_ATTRIBUTE] !== undefined) {
-		return;
-	}
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// WeakMap to store nav instances
 	const navInstances = new WeakMap();
 
 	// ─── pushState singleton patch ──────────────────────────────
-	// Patched once globally — prevents multiply-nested overrides when
-	// multiple [data-ln-nav] elements exist on the same page.
-
-	var _pushStateCallbacks = [];
+	const _pushStateCallbacks = [];
 
 	if (!history._lnNavPatched) {
-		var _origPushState = history.pushState;
+		const _origPushState = history.pushState;
 		history.pushState = function () {
 			_origPushState.apply(history, arguments);
-			_pushStateCallbacks.forEach(function (cb) { cb(); });
+			for (const cb of _pushStateCallbacks) { cb(); }
 		};
 		history._lnNavPatched = true;
 	}
@@ -35,6 +29,7 @@
 
 		const instance = _initializeNav(navElement, activeClass);
 		navInstances.set(navElement, instance);
+		navElement[DOM_ATTRIBUTE] = instance;
 	}
 
 	function _initializeNav(navElement, activeClass) {
@@ -42,8 +37,7 @@
 
 		_updateActiveState(links, activeClass, window.location.pathname);
 
-		// Shared handler for both popstate and pushState
-		var updateHandler = function () {
+		const updateHandler = function () {
 			links = Array.from(navElement.querySelectorAll('a'));
 			_updateActiveState(links, activeClass, window.location.pathname);
 		};
@@ -51,11 +45,10 @@
 		window.addEventListener('popstate', updateHandler);
 		_pushStateCallbacks.push(updateHandler);
 
-		// Watch for DOM changes within this nav (new/removed links)
 		const observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							if (node.tagName === 'A') {
 								links.push(node);
@@ -66,9 +59,9 @@
 								_updateActiveState(newLinks, activeClass, window.location.pathname);
 							}
 						}
-					});
+					}
 
-					mutation.removedNodes.forEach(function (node) {
+					for (const node of mutation.removedNodes) {
 						if (node.nodeType === 1) {
 							if (node.tagName === 'A') {
 								links = links.filter(function (link) { return link !== node; });
@@ -79,14 +72,27 @@
 								});
 							}
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(navElement, { childList: true, subtree: true });
 
-		return { navElement: navElement, activeClass: activeClass, observer: observer };
+		return {
+			navElement: navElement,
+			activeClass: activeClass,
+			observer: observer,
+			updateHandler: updateHandler,
+			destroy: function () {
+				observer.disconnect();
+				window.removeEventListener('popstate', updateHandler);
+				const idx = _pushStateCallbacks.indexOf(updateHandler);
+				if (idx !== -1) _pushStateCallbacks.splice(idx, 1);
+				navInstances.delete(navElement);
+				delete navElement[DOM_ATTRIBUTE];
+			}
+		};
 	}
 
 	function _normalizeUrl(url) {
@@ -101,9 +107,9 @@
 	function _updateActiveState(links, activeClass, currentPath) {
 		const normalizedCurrent = _normalizeUrl(currentPath);
 
-		links.forEach(function (link) {
+		for (const link of links) {
 			const href = link.getAttribute('href');
-			if (!href) return;
+			if (!href) continue;
 
 			const normalizedHref = _normalizeUrl(href);
 
@@ -115,26 +121,29 @@
 			if (isExact || isParent) {
 				link.classList.add(activeClass);
 			}
-		});
+		}
 	}
 
 	// ─── Global DOM Observer ───────────────────────────────────
-	// Auto-initialize new [data-ln-nav] elements added dynamically.
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							if (node.hasAttribute && node.hasAttribute(DOM_SELECTOR)) {
 								constructor(node);
 							}
-							node.querySelectorAll && node.querySelectorAll('[' + DOM_SELECTOR + ']').forEach(constructor);
+							if (node.querySelectorAll) {
+								for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
+									constructor(el);
+								}
+							}
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, { childList: true, subtree: true });
@@ -145,7 +154,9 @@
 	window[DOM_ATTRIBUTE] = constructor;
 
 	function _initializeAll() {
-		document.querySelectorAll('[' + DOM_SELECTOR + ']').forEach(constructor);
+		for (const el of document.querySelectorAll('[' + DOM_SELECTOR + ']')) {
+			constructor(el);
+		}
 	}
 
 	_domObserver();

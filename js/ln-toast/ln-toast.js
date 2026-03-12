@@ -3,7 +3,6 @@
 	const DOM_SELECTOR = "data-ln-toast";
 	const DOM_ATTRIBUTE = "lnToast";
 
-	// SVGs for different types
 	const ICONS = {
 		success: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>`,
 		error: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`,
@@ -20,9 +19,11 @@
 
 	function _findContainers(root) {
 		if (!root || root.nodeType !== 1) return;
-		let items = Array.from(root.querySelectorAll("[" + DOM_SELECTOR + "]"));
+		const items = Array.from(root.querySelectorAll("[" + DOM_SELECTOR + "]"));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) items.push(root);
-		items.forEach((el) => { if (!el[DOM_ATTRIBUTE]) new _Component(el); });
+		for (const el of items) {
+			if (!el[DOM_ATTRIBUTE]) new _Component(el);
+		}
 	}
 
 	function _Component(dom) {
@@ -31,11 +32,19 @@
 		this.timeoutDefault = parseInt(dom.getAttribute("data-ln-toast-timeout") || "6000", 10);
 		this.max = parseInt(dom.getAttribute("data-ln-toast-max") || "5", 10);
 
-		Array.from(dom.querySelectorAll("[data-ln-toast-item]")).forEach((li) => {
+		for (const li of Array.from(dom.querySelectorAll("[data-ln-toast-item]"))) {
 			_hydrateLI(li);
-		});
+		}
 		return this;
 	}
+
+	_Component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		for (const li of Array.from(this.dom.children)) {
+			_dismiss(li);
+		}
+		delete this.dom[DOM_ATTRIBUTE];
+	};
 
 	function _hydrateLI(li) {
 		const type = ((li.getAttribute("data-type") || "info") + "").toLowerCase();
@@ -110,7 +119,10 @@
 		if (!(container instanceof HTMLElement)) {
 			container = document.querySelector("[" + DOM_SELECTOR + "]") || document.getElementById("ln-toast-container");
 		}
-		if (!container) return null;
+		if (!container) {
+			console.warn('[ln-toast] No toast container found');
+			return null;
+		}
 
 		const cmp = container[DOM_ATTRIBUTE] || new _Component(container);
 		const timeout = Number.isFinite(opts.timeout) ? opts.timeout : cmp.timeoutDefault;
@@ -153,11 +165,11 @@
 			if (opts.message) {
 				if (Array.isArray(opts.message)) {
 					const ul = document.createElement("ul");
-					opts.message.forEach(function(msg) {
+					for (const msg of opts.message) {
 						const lie = document.createElement("li");
 						lie.textContent = msg;
 						ul.appendChild(lie);
-					});
+					}
 					body.appendChild(ul);
 				} else {
 					const p = document.createElement("p");
@@ -167,11 +179,11 @@
 			}
 			if (opts.data && opts.data.errors) {
 				const ul = document.createElement("ul");
-				Object.values(opts.data.errors).flat().forEach(err => {
+				for (const err of Object.values(opts.data.errors).flat()) {
 					const lie = document.createElement("li");
 					lie.textContent = err;
 					ul.appendChild(lie);
-				});
+				}
 				body.appendChild(ul);
 			}
 			content.appendChild(body);
@@ -192,21 +204,26 @@
 			el = document.querySelector("[" + DOM_SELECTOR + "]") || document.getElementById("ln-toast-container");
 		}
 		if (!el) return;
-		Array.from(el.children).forEach(_dismiss);
+		for (const child of Array.from(el.children)) {
+			_dismiss(child);
+		}
 	}
 
 	const api = function (domRoot) { return constructor(domRoot); };
 	api.enqueue = enqueue;
 	api.clear = clear;
 
-	const observer = new MutationObserver((muts) => {
-		muts.forEach((m) => m.addedNodes.forEach((n) => _findContainers(n)));
+	const observer = new MutationObserver(function (muts) {
+		for (const m of muts) {
+			for (const n of m.addedNodes) {
+				_findContainers(n);
+			}
+		}
 	});
 	observer.observe(document.body, { childList: true, subtree: true });
 
 	window[DOM_ATTRIBUTE] = api;
 
-	// Global event listener for decoupled components
 	window.addEventListener('ln-toast:enqueue', function (e) {
 		if (e.detail) {
 			api.enqueue(e.detail);
