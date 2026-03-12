@@ -17,9 +17,9 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Utilities</h1>
@@ -29,14 +29,14 @@
 					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'CSS утилити компонента.'})">Test Toast</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -107,7 +107,7 @@
 						<tr><td>.font-semibold</td><td><span class="font-semibold">Semibold текст</span></td></tr>
 						<tr><td>.uppercase</td><td><span class="uppercase">uppercase текст</span></td></tr>
 						<tr><td>.font-mono</td><td><span class="font-mono">Monospace текст</span></td></tr>
-						<tr><td>.truncate</td><td><div class="truncate" style="max-width:200px">Многу долг текст кој ќе се скрати со три точки</div></td></tr>
+						<tr><td>.truncate</td><td><div class="truncate" id="demo-truncate">Многу долг текст кој ќе се скрати со три точки</div></td></tr>
 					</tbody>
 				</table>
 			</main>

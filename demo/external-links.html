@@ -19,9 +19,9 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>External Links</h1>
@@ -33,14 +33,14 @@
 					</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -269,7 +269,7 @@ document.addEventListener('ln-external-links:processed', function(e) {
 		<section class="ln-modal__content ln-modal__content--sm">
 			<header>
 				<h3>Надворешен линк</h3>
-				<button class="ln-icon-close" data-ln-modal-close></button>
+				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 			</header>
 			<main>
 				<p>Ја напуштате оваа страница и одите на:</p>

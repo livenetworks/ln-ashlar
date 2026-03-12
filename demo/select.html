@@ -20,9 +20,9 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Select</h1>
@@ -34,14 +34,14 @@
 					</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -160,25 +160,25 @@
 						<header><h3>Пример — Повеќе селекти на форма</h3></header>
 						<main>
 							<form>
-								<div>
-									<label for="s-dept">Одделение</label>
-									<select id="s-dept" data-ln-select>
+								<label>
+									Одделение
+									<select data-ln-select>
 										<option value="">Избери...</option>
 										<option value="sales">Продажба</option>
 										<option value="marketing">Маркетинг</option>
 										<option value="dev">Развој</option>
 										<option value="hr">HR</option>
 									</select>
-								</div>
-								<div>
-									<label for="s-team">Тим</label>
-									<select id="s-team" data-ln-select>
+								</label>
+								<label>
+									Тим
+									<select data-ln-select>
 										<option value="">Избери...</option>
 										<option value="frontend">Frontend</option>
 										<option value="backend">Backend</option>
 										<option value="devops">DevOps</option>
 									</select>
-								</div>
+								</label>
 								<button type="submit" class="btn">Зачувај</button>
 							</form>
 						</main>

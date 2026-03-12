@@ -17,9 +17,9 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Icons</h1>
@@ -29,14 +29,14 @@
 					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'CSS иконки компонента.'})">Test Toast</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -173,23 +173,23 @@
 		<section class="section-card">
 			<header><h3>Големини</h3></header>
 			<main>
-				<div class="flex items-center gap-6">
-					<div class="text-center">
+				<div class="icon-grid">
+					<figure class="icon-cell">
 						<span class="ln-icon-home ln-icon--sm"></span>
-						<div class="text-xs text-secondary">--sm (1rem)</div>
-					</div>
-					<div class="text-center">
+						<figcaption>--sm (1rem)</figcaption>
+					</figure>
+					<figure class="icon-cell">
 						<span class="ln-icon-home"></span>
-						<div class="text-xs text-secondary">default (1.25rem)</div>
-					</div>
-					<div class="text-center">
+						<figcaption>default (1.25rem)</figcaption>
+					</figure>
+					<figure class="icon-cell">
 						<span class="ln-icon-home ln-icon--lg"></span>
-						<div class="text-xs text-secondary">--lg (1.5rem)</div>
-					</div>
-					<div class="text-center">
+						<figcaption>--lg (1.5rem)</figcaption>
+					</figure>
+					<figure class="icon-cell">
 						<span class="ln-icon-home ln-icon--xl"></span>
-						<div class="text-xs text-secondary">--xl (4rem)</div>
-					</div>
+						<figcaption>--xl (4rem)</figcaption>
+					</figure>
 				</div>
 			</main>
 		</section>
