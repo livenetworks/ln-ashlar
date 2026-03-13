@@ -24,3 +24,4 @@ import './ln-circular-progress/ln-circular-progress.js';
 import './ln-circular-progress/ln-circular-progress.scss';
 import './ln-search/ln-search.js';
 import './ln-filter/ln-filter.js';
+import './ln-confirm/ln-confirm.js';
