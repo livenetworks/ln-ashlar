@@ -1,28 +1,28 @@
 # ln-search
 
-Генеричка search компонента — филтрира деца на целен елемент по `textContent`.
-Елементите што не одговараат добиваат `data-ln-search-hide` атрибут.
+Generic search component — filters children of a target element by `textContent`.
+Elements that don't match receive a `data-ln-search-hide` attribute.
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
+| Attribute | On | Description |
 |---------|-----|------|
-| `data-ln-search="targetId"` | component root | Целен елемент по ID чии деца се филтрираат |
-| `data-ln-search-input` | `<input>` внатре | Search input (слуша `input` event) |
-| `data-ln-search-debounce="300"` | component root | Optional debounce во ms (default: 0) |
-| `data-ln-search-hide` | деца на target | Поставен од JS кога елементот не одговара |
+| `data-ln-search="targetId"` | component root | Target element by ID whose children are filtered |
+| `data-ln-search-input` | `<input>` inside | Search input (listens to `input` event) |
+| `data-ln-search-debounce="300"` | component root | Optional debounce in ms (default: 0) |
+| `data-ln-search-hide` | children of target | Set by JS when the element doesn't match |
 
 ## API
 
 ```javascript
-// Instance API (на DOM елементот)
+// Instance API (on the DOM element)
 var el = document.querySelector('[data-ln-search]');
-el.lnSearch.search('query');   // програмски пребарување
-el.lnSearch.clear();           // исчисти search, покажи сe
-el.lnSearch.getQuery();        // тековен query string
+el.lnSearch.search('query');   // programmatic search
+el.lnSearch.clear();           // clear search, show all
+el.lnSearch.getQuery();        // current query string
 
-// Constructor — само за нестандардни случаи (Shadow DOM, iframe)
-// За AJAX/динамички DOM: MutationObserver автоматски иницијализира
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM: MutationObserver auto-initializes
 window.lnSearch(container);
 ```
 
@@ -30,50 +30,50 @@ window.lnSearch(container);
 
 | Event | Bubbles | Detail |
 |-------|---------|--------|
-| `ln-search:input` | да | `{ query: string, count: number, total: number }` |
-| `ln-search:clear` | да | `{ count: number, total: number }` |
+| `ln-search:input` | yes | `{ query: string, count: number, total: number }` |
+| `ln-search:clear` | yes | `{ count: number, total: number }` |
 
 ```javascript
-// Слушај пребарување
+// Listen for search
 document.addEventListener('ln-search:input', function (e) {
-    console.log('Пребарување:', e.detail.query, '— Резултати:', e.detail.count + '/' + e.detail.total);
+    console.log('Search:', e.detail.query, '— Results:', e.detail.count + '/' + e.detail.total);
 });
 
-// Слушај кога се чисти
+// Listen for clear
 document.addEventListener('ln-search:clear', function (e) {
-    console.log('Search исчистен, вкупно:', e.detail.total);
+    console.log('Search cleared, total:', e.detail.total);
 });
 ```
 
-## Пример
+## Example
 
 ```html
-<!-- Search компонента -->
+<!-- Search component -->
 <fieldset data-ln-search="my-list">
-    <legend class="sr-only">Пребарај</legend>
+    <legend class="sr-only">Search</legend>
     <span class="ln-icon-search ln-icon--sm"></span>
-    <input type="search" placeholder="Пребарај..." data-ln-search-input />
+    <input type="search" placeholder="Search..." data-ln-search-input />
 </fieldset>
 
-<!-- Целна листа (ID = вредноста од data-ln-search) -->
+<!-- Target list (ID = value from data-ln-search) -->
 <ul id="my-list">
-    <li>Прв елемент</li>
-    <li>Втор елемент</li>
-    <li>Трет елемент</li>
+    <li>First element</li>
+    <li>Second element</li>
+    <li>Third element</li>
 </ul>
 ```
 
-### Со debounce
+### With debounce
 
 ```html
 <fieldset data-ln-search="results" data-ln-search-debounce="300">
-    <input type="search" data-ln-search-input placeholder="Барај..." />
+    <input type="search" data-ln-search-input placeholder="Search..." />
 </fieldset>
 ```
 
 ## CSS
 
-Потрошувачот мора да обезбеди CSS правило за криење:
+The consumer must provide a CSS rule for hiding:
 
 ```css
 [data-ln-search-hide] {
@@ -81,9 +81,9 @@ document.addEventListener('ln-search:clear', function (e) {
 }
 ```
 
-## Комбинација со ln-filter
+## Combination with ln-filter
 
-`ln-search` и `ln-filter` работат **независно** на ист target — секој со свој hide атрибут. Елемент е видлив само кога **ниеден** hide атрибут не е присутен:
+`ln-search` and `ln-filter` work **independently** on the same target — each with its own hide attribute. An element is visible only when **no** hide attribute is present:
 
 ```css
 [data-ln-search-hide],
@@ -92,6 +92,6 @@ document.addEventListener('ln-search:clear', function (e) {
 }
 ```
 
-## Динамички елементи
+## Dynamic elements
 
-Кога деца се додаваат во целната листа (AJAX, populate), `ln-search` автоматски ги ре-филтрира ако има активен query. MutationObserver на целниот елемент го обезбедува ова.
+When children are added to the target list (AJAX, populate), `ln-search` automatically re-filters them if there is an active query. A MutationObserver on the target element ensures this.

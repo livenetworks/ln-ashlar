@@ -1,30 +1,30 @@
 # ln-filter
 
-Генеричка filter компонента — филтрира деца на целен елемент по `data-*` атрибут.
-Копчиња со `data-ln-filter-key` + `data-ln-filter-value` ги контролираат филтрите.
-Елементите што не одговараат добиваат `data-ln-filter-hide` атрибут.
+Generic filter component — filters children of a target element by `data-*` attribute.
+Buttons with `data-ln-filter-key` + `data-ln-filter-value` control the filters.
+Elements that don't match receive a `data-ln-filter-hide` attribute.
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
+| Attribute | On | Description |
 |---------|-----|------|
-| `data-ln-filter="targetId"` | component root | Целен елемент по ID чии деца се филтрираат |
-| `data-ln-filter-key="field"` | `<button>` внатре | Име на data атрибут за споредба на целните деца |
-| `data-ln-filter-value="val"` | `<button>` внатре | Вредност за споредба (празно = покажи сe) |
-| `data-ln-filter-hide` | деца на target | Поставен од JS кога елементот не одговара |
-| `data-active` | активно копче | Поставен од JS на тековно селектираното копче |
+| `data-ln-filter="targetId"` | component root | Target element by ID whose children are filtered |
+| `data-ln-filter-key="field"` | `<button>` inside | Name of data attribute for comparison on target children |
+| `data-ln-filter-value="val"` | `<button>` inside | Value for comparison (empty = show all) |
+| `data-ln-filter-hide` | target children | Set by JS when element doesn't match |
+| `data-active` | active button | Set by JS on the currently selected button |
 
 ## API
 
 ```javascript
-// Instance API (на DOM елементот)
+// Instance API (on the DOM element)
 var el = document.querySelector('[data-ln-filter]');
-el.lnFilter.filter('genre', 'rock');  // програмски филтрирај
-el.lnFilter.reset();                   // исчисти филтер, покажи сe
-el.lnFilter.getActive();               // { key: 'genre', value: 'rock' } или null
+el.lnFilter.filter('genre', 'rock');  // programmatically filter
+el.lnFilter.reset();                   // clear filter, show all
+el.lnFilter.getActive();               // { key: 'genre', value: 'rock' } or null
 
-// Constructor — само за нестандардни случаи (Shadow DOM, iframe)
-// За AJAX/динамички DOM: MutationObserver автоматски иницијализира
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM: MutationObserver automatically initializes
 window.lnFilter(container);
 ```
 
@@ -32,74 +32,74 @@ window.lnFilter(container);
 
 | Event | Bubbles | Detail |
 |-------|---------|--------|
-| `ln-filter:changed` | да | `{ key: string, value: string }` |
-| `ln-filter:reset` | да | `{}` |
+| `ln-filter:changed` | yes | `{ key: string, value: string }` |
+| `ln-filter:reset` | yes | `{}` |
 
 ```javascript
-// Слушај промена на филтер
+// Listen for filter change
 document.addEventListener('ln-filter:changed', function (e) {
-    console.log('Филтер:', e.detail.key, '=', e.detail.value);
+    console.log('Filter:', e.detail.key, '=', e.detail.value);
 });
 
-// Слушај ресет
+// Listen for reset
 document.addEventListener('ln-filter:reset', function (e) {
-    console.log('Филтер ресетиран');
+    console.log('Filter reset');
 });
 ```
 
-## Пример
+## Example
 
-### Основна употреба
+### Basic usage
 
 ```html
-<!-- Filter копчиња -->
+<!-- Filter buttons -->
 <nav data-ln-filter="my-list">
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="">Сите</button>
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="a">Категорија A</button>
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="b">Категорија B</button>
+    <button type="button" data-ln-filter-key="category" data-ln-filter-value="">All</button>
+    <button type="button" data-ln-filter-key="category" data-ln-filter-value="a">Category A</button>
+    <button type="button" data-ln-filter-key="category" data-ln-filter-value="b">Category B</button>
 </nav>
 
-<!-- Целна листа (деца имаат data-category атрибут) -->
+<!-- Target list (children have data-category attribute) -->
 <ul id="my-list">
-    <li data-category="a">Елемент од категорија A</li>
-    <li data-category="b">Елемент од категорија B</li>
-    <li data-category="a">Друг елемент A</li>
+    <li data-category="a">Element from category A</li>
+    <li data-category="b">Element from category B</li>
+    <li data-category="a">Another element A</li>
 </ul>
 ```
 
-### Повеќе филтер групи
+### Multiple filter groups
 
 ```html
-<!-- Филтер по фаза -->
+<!-- Filter by phase -->
 <nav data-ln-filter="documents">
-    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="">Сите</button>
-    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="0">Фаза 0</button>
-    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="1">Фаза 1</button>
-    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="2">Фаза 2</button>
+    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="">All</button>
+    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="0">Phase 0</button>
+    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="1">Phase 1</button>
+    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="2">Phase 2</button>
 </nav>
 ```
 
-> **Копче со `data-ln-filter-value=""`** = „Покажи сe" (reset). При иницијализација автоматски добива `data-active`.
+> **Button with `data-ln-filter-value=""`** = "Show all" (reset). On initialization it automatically receives `data-active`.
 
 ## CSS
 
-Потрошувачот мора да обезбеди CSS правила за криење и за активно копче:
+The consumer must provide CSS rules for hiding and for the active button:
 
 ```css
 [data-ln-filter-hide] {
     display: none;
 }
 
-/* Стил за активно filter копче */
+/* Style for active filter button */
 [data-ln-filter-key][data-active] {
     background: var(--accent);
     color: var(--bg);
 }
 ```
 
-## Комбинација со ln-search
+## Combination with ln-search
 
-`ln-filter` и `ln-search` работат **независно** на ист target — секој со свој hide атрибут. Елемент е видлив само кога **ниеден** hide атрибут не е присутен:
+`ln-filter` and `ln-search` work **independently** on the same target — each with its own hide attribute. An element is visible only when **no** hide attribute is present:
 
 ```css
 [data-ln-search-hide],
@@ -108,22 +108,22 @@ document.addEventListener('ln-filter:reset', function (e) {
 }
 ```
 
-## Динамички елементи
+## Dynamic elements
 
-Кога деца се додаваат во целната листа (AJAX, populate), `ln-filter` автоматски ги ре-филтрира ако има активен филтер. MutationObserver на целниот елемент го обезбедува ова.
+When children are added to the target list (AJAX, populate), `ln-filter` automatically re-filters them if there is an active filter. A MutationObserver on the target element ensures this.
 
-## Програмски
+## Programmatic
 
 ```javascript
-// Филтрирај по жанр
+// Filter by genre
 document.querySelector('[data-ln-filter]').lnFilter.filter('genre', 'rock');
 
-// Ресетирај
+// Reset
 document.querySelector('[data-ln-filter]').lnFilter.reset();
 
-// Провери тековен филтер
+// Check current filter
 var active = document.querySelector('[data-ln-filter]').lnFilter.getActive();
 if (active) {
-    console.log('Активен филтер:', active.key, '=', active.value);
+    console.log('Active filter:', active.key, '=', active.value);
 }
 ```

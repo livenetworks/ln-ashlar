@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +27,7 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Circular progress компонента.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Circular progress component.'})">
 						Test Toast
 					</button>
 				</div>
@@ -50,7 +50,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -62,7 +62,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -91,44 +91,44 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Circular Progress</h1>
-					<p>Кружен индикатор за напредок базиран на SVG. Реактивен: автоматски се ажурира кога атрибутите се менуваат.</p>
+					<p>SVG-based circular progress indicator. Reactive: automatically updates when attributes change.</p>
 
-					<!-- Основи -->
+					<!-- Basics -->
 					<section class="section-card">
-						<header><h3>Основи</h3></header>
+						<header><h3>Basics</h3></header>
 						<main>
 							<table>
-								<thead><tr><th>Атрибут</th><th>Опис</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-circular-progress="75"</code></td><td>Тековна вредност</td></tr>
-									<tr><td><code>data-ln-circular-progress-max="100"</code></td><td>Максимална вредност (default: 100)</td></tr>
-									<tr><td><code>data-ln-circular-progress-label="текст"</code></td><td>Custom текст во центар (default: проценти)</td></tr>
+									<tr><td><code>data-ln-circular-progress="75"</code></td><td>Current value</td></tr>
+									<tr><td><code>data-ln-circular-progress-max="100"</code></td><td>Maximum value (default: 100)</td></tr>
+									<tr><td><code>data-ln-circular-progress-label="text"</code></td><td>Custom text in center (default: percentage)</td></tr>
 								</tbody>
 							</table>
 						</main>
 					</section>
 
-					<!-- CSS класи -->
+					<!-- CSS classes -->
 					<section class="section-card">
-						<header><h3>CSS класи</h3></header>
+						<header><h3>CSS Classes</h3></header>
 						<main>
 							<table>
-								<thead><tr><th>Класа</th><th>Опис</th></tr></thead>
+								<thead><tr><th>Class</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>.green</code></td><td>Success боја (зелена)</td></tr>
-									<tr><td><code>.yellow</code></td><td>Warning боја (жолта)</td></tr>
-									<tr><td><code>.red</code></td><td>Error боја (црвена)</td></tr>
-									<tr><td><code>.sm</code></td><td>Мала големина (2.5rem)</td></tr>
-									<tr><td><code>.lg</code></td><td>Голема големина (6rem)</td></tr>
-									<tr><td><code>.xl</code></td><td>Екстра голема (8rem)</td></tr>
+									<tr><td><code>.green</code></td><td>Success color (green)</td></tr>
+									<tr><td><code>.yellow</code></td><td>Warning color (yellow)</td></tr>
+									<tr><td><code>.red</code></td><td>Error color (red)</td></tr>
+									<tr><td><code>.sm</code></td><td>Small size (2.5rem)</td></tr>
+									<tr><td><code>.lg</code></td><td>Large size (6rem)</td></tr>
+									<tr><td><code>.xl</code></td><td>Extra large (8rem)</td></tr>
 								</tbody>
 							</table>
 						</main>
 					</section>
 
-					<!-- Бои -->
+					<!-- Colors -->
 					<section class="section-card">
-						<header><h3>Бои</h3></header>
+						<header><h3>Colors</h3></header>
 						<main>
 							<ul class="demo-circular-progress-row">
 								<li>
@@ -151,9 +151,9 @@
 						</main>
 					</section>
 
-					<!-- Големини -->
+					<!-- Sizes -->
 					<section class="section-card">
-						<header><h3>Големини</h3></header>
+						<header><h3>Sizes</h3></header>
 						<main>
 							<ul class="demo-circular-progress-row">
 								<li>
@@ -183,23 +183,23 @@
 							<ul class="demo-circular-progress-row">
 								<li>
 									<figure data-ln-circular-progress="7" data-ln-circular-progress-max="10" data-ln-circular-progress-label="7/10" class="lg"></figure>
-									<span>7 од 10</span>
+									<span>7 out of 10</span>
 								</li>
 								<li>
 									<figure data-ln-circular-progress="85" data-ln-circular-progress-label="A+" class="lg green"></figure>
-									<span>Оценка</span>
+									<span>Grade</span>
 								</li>
 								<li>
 									<figure data-ln-circular-progress="42" data-ln-circular-progress-label="42" class="lg yellow"></figure>
-									<span>Број</span>
+									<span>Number</span>
 								</li>
 							</ul>
 						</main>
 					</section>
 
-					<!-- Реактивност -->
+					<!-- Reactivity -->
 					<section class="section-card">
-						<header><h3>Реактивност — клик за промена</h3></header>
+						<header><h3>Reactivity — click to change</h3></header>
 						<main>
 							<ul class="demo-circular-progress-row">
 								<li>
@@ -216,21 +216,21 @@
 						</main>
 					</section>
 
-					<!-- HTML структура -->
+					<!-- HTML structure -->
 					<section class="section-card">
-						<header><h3>HTML структура</h3></header>
+						<header><h3>HTML Structure</h3></header>
 						<main>
-							<pre><code>&lt;!-- Основна употреба --&gt;
+							<pre><code>&lt;!-- Basic usage --&gt;
 &lt;figure data-ln-circular-progress="75"&gt;&lt;/figure&gt;
 
-&lt;!-- Со боја и големина --&gt;
+&lt;!-- With color and size --&gt;
 &lt;figure data-ln-circular-progress="90" class="green lg"&gt;&lt;/figure&gt;
 
-&lt;!-- Со max вредност --&gt;
+&lt;!-- With max value --&gt;
 &lt;figure data-ln-circular-progress="7"
         data-ln-circular-progress-max="10"&gt;&lt;/figure&gt;
 
-&lt;!-- Со custom label --&gt;
+&lt;!-- With custom label --&gt;
 &lt;figure data-ln-circular-progress="85"
         data-ln-circular-progress-label="A+"&gt;&lt;/figure&gt;</code></pre>
 						</main>
@@ -240,10 +240,10 @@
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<pre><code>// Рачна иницијализација
+							<pre><code>// Manual initialization
 window.lnCircularProgress(document.body);
 
-// Промена на вредност динамички (реактивно):
+// Change value dynamically (reactive):
 var el = document.getElementById('my-circle');
 el.setAttribute('data-ln-circular-progress', '80');
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +26,7 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Toggle компонента за отвор/затворање.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Toggle component for opening/closing.'})">
 						Test Toast
 					</button>
 				</div>
@@ -49,7 +49,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -61,7 +61,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -90,19 +90,19 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Toggle</h1>
-					<p>Генеричка toggle компонента — додава/тргни <code>.open</code> класа на елемент. Работи за sidebar, collapsible, dropdown — било што.</p>
+					<p>Generic toggle component — adds/removes the <code>.open</code> class on an element. Works for sidebar, collapsible, dropdown — anything.</p>
 
-					<!-- Основи -->
+					<!-- Basics -->
 					<section class="section-card">
-						<header><h3>Основи</h3></header>
+						<header><h3>Basics</h3></header>
 						<main>
 							<table>
-								<thead><tr><th>Атрибут</th><th>На елемент</th><th>Опис</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-toggle</code></td><td>целен елемент</td><td>Креира инстанца, почнува затворен</td></tr>
-									<tr><td><code>data-ln-toggle="open"</code></td><td>целен елемент</td><td>Почнува отворен (добива класа <code>.open</code>)</td></tr>
-									<tr><td><code>data-ln-toggle-for="id"</code></td><td>копче</td><td>Реферира на целниот елемент по ID</td></tr>
-									<tr><td><code>data-ln-toggle-action="open|close"</code></td><td>копче</td><td>Експлицитна акција (default: toggle)</td></tr>
+									<tr><td><code>data-ln-toggle</code></td><td>target element</td><td>Creates an instance, starts closed</td></tr>
+									<tr><td><code>data-ln-toggle="open"</code></td><td>target element</td><td>Starts open (receives the <code>.open</code> class)</td></tr>
+									<tr><td><code>data-ln-toggle-for="id"</code></td><td>button</td><td>References the target element by ID</td></tr>
+									<tr><td><code>data-ln-toggle-action="open|close"</code></td><td>button</td><td>Explicit action (default: toggle)</td></tr>
 								</tbody>
 							</table>
 						</main>
@@ -114,8 +114,8 @@
 						<main>
 							<pre><code>var el = document.getElementById('my-element');
 
-el.lnToggle.open();      // Отвори
-el.lnToggle.close();     // Затвори
+el.lnToggle.open();      // Open
+el.lnToggle.close();     // Close
 el.lnToggle.toggle();    // Toggle
 el.lnToggle.isOpen;      // boolean (read-only)</code></pre>
 						</main>
@@ -128,59 +128,59 @@ el.lnToggle.isOpen;      // boolean (read-only)</code></pre>
 							<table>
 								<thead><tr><th>Event</th><th>Bubbles</th><th>Detail</th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-toggle:open</code></td><td>да</td><td><code>{ target: HTMLElement }</code></td></tr>
-									<tr><td><code>ln-toggle:close</code></td><td>да</td><td><code>{ target: HTMLElement }</code></td></tr>
+									<tr><td><code>ln-toggle:open</code></td><td>yes</td><td><code>{ target: HTMLElement }</code></td></tr>
+									<tr><td><code>ln-toggle:close</code></td><td>yes</td><td><code>{ target: HTMLElement }</code></td></tr>
 								</tbody>
 							</table>
 							<pre><code>document.addEventListener('ln-toggle:open', function (e) {
-    console.log('Отворен:', e.detail.target.id);
+    console.log('Opened:', e.detail.target.id);
 });
 
 document.addEventListener('ln-toggle:close', function (e) {
-    console.log('Затворен:', e.detail.target.id);
+    console.log('Closed:', e.detail.target.id);
 });</code></pre>
 						</main>
 					</section>
 
-					<!-- Пример: Sidebar -->
+					<!-- Example: Sidebar -->
 					<section class="section-card">
-						<header><h3>Пример — Sidebar</h3></header>
+						<header><h3>Example — Sidebar</h3></header>
 						<main>
-							<p><strong>Клик на копче за отворање/затворање на sidebar</strong></p>
+							<p><strong>Click the button to open/close the sidebar</strong></p>
 							<section class="demo-toggle-sidebar">
 								<aside id="demo-sidebar-example" class="sidebar open" data-ln-toggle="open">
 									<h4>Sidebar</h4>
 									<ul>
-										<li><a href="#">Линк 1</a></li>
-										<li><a href="#">Линк 2</a></li>
-										<li><a href="#">Линк 3</a></li>
+										<li><a href="#">Link 1</a></li>
+										<li><a href="#">Link 2</a></li>
+										<li><a href="#">Link 3</a></li>
 									</ul>
 									<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar-example" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 								</aside>
 								<article>
-									<button data-ln-toggle-for="demo-sidebar-example" class="btn">Тоглирај Sidebar</button>
-									<p>Sidebar добива класа <code>.open</code> кога е отворен.</p>
+									<button data-ln-toggle-for="demo-sidebar-example" class="btn">Toggle Sidebar</button>
+									<p>Sidebar receives the <code>.open</code> class when open.</p>
 								</article>
 							</section>
 						</main>
 					</section>
 
-					<!-- Пример: Collapsible -->
+					<!-- Example: Collapsible -->
 					<section class="section-card">
-						<header><h3>Пример — Collapsible сегмент</h3></header>
+						<header><h3>Example — Collapsible section</h3></header>
 						<main>
 							<article class="demo-toggle-collapsible">
 								<header>
-									<strong>Напредни опции</strong>
+									<strong>Advanced options</strong>
 									<button type="button" data-ln-toggle-for="collapse-example" class="btn btn--secondary btn--sm" aria-label="Toggle"><span class="ln-icon-arrow-down"></span></button>
 								</header>
 								<section id="collapse-example" data-ln-toggle class="collapsible">
 									<section class="collapsible-body">
-										<p>Ова е зададена содржина кога је затворена.</p>
-										<p>Клик на копчето за отворање/затворање.</p>
+										<p>This is hidden content when collapsed.</p>
+										<p>Click the button to open/close.</p>
 										<form>
-											<label><input type="checkbox"> Опција 1</label>
-											<label><input type="checkbox"> Опција 2</label>
+											<label><input type="checkbox"> Option 1</label>
+											<label><input type="checkbox"> Option 2</label>
 										</form>
 									</section>
 								</section>
@@ -188,65 +188,65 @@ document.addEventListener('ln-toggle:close', function (e) {
 						</main>
 					</section>
 
-					<!-- Пример: Dropdown -->
+					<!-- Example: Dropdown -->
 					<section class="section-card">
-						<header><h3>Пример — Dropdown мени</h3></header>
+						<header><h3>Example — Dropdown menu</h3></header>
 						<main>
 							<nav class="demo-toggle-dropdown">
-								<button data-ln-toggle-for="dropdown-example" class="btn">Мени</button>
+								<button data-ln-toggle-for="dropdown-example" class="btn">Menu</button>
 								<ul id="dropdown-example" data-ln-toggle>
 									<li><a href="#">Edit</a></li>
 									<li><a href="#">Delete</a></li>
-									<li><a href="#">Архивирај</a></li>
+									<li><a href="#">Archive</a></li>
 								</ul>
 							</nav>
 						</main>
 					</section>
 
-					<!-- HTML структура -->
+					<!-- HTML structure -->
 					<section class="section-card">
-						<header><h3>HTML структура</h3></header>
+						<header><h3>HTML structure</h3></header>
 						<main>
-							<pre><code>&lt;!-- Елемент кој ќе се мени --&gt;
+							<pre><code>&lt;!-- Element that will be toggled --&gt;
 &lt;aside id="my-sidebar" data-ln-toggle&gt;
-    Содржина
+    Content
 &lt;/aside&gt;
 
-&lt;!-- Копче кое го контролива --&gt;
+&lt;!-- Button that controls it --&gt;
 &lt;button data-ln-toggle-for="my-sidebar"&gt;
-    Тоглирај
+    Toggle
 &lt;/button&gt;
 
-&lt;!-- Почнува отворен --&gt;
+&lt;!-- Starts open --&gt;
 &lt;section id="panel" data-ln-toggle="open"&gt;
-    Отворена содржина
+    Open content
 &lt;/section&gt;
 
-&lt;!-- Експлицитна акција --&gt;
-&lt;button data-ln-toggle-for="panel" 
+&lt;!-- Explicit action --&gt;
+&lt;button data-ln-toggle-for="panel"
         data-ln-toggle-action="close"&gt;
-    Затвори
+    Close
 &lt;/button&gt;</code></pre>
 						</main>
 					</section>
 
-					<!-- CSS за анимации -->
+					<!-- CSS for animations -->
 					<section class="section-card">
-						<header><h3>CSS за анимации</h3></header>
+						<header><h3>CSS for animations</h3></header>
 						<main>
-							<p>ln-toggle додава/отстранува класа <code>.open</code>. За CSS анимации користи го collapsible pattern-от:</p>
-							<pre><code>// Sidebar — transform анимација
+							<p>ln-toggle adds/removes the <code>.open</code> class. For CSS animations use the collapsible pattern:</p>
+							<pre><code>// Sidebar — transform animation
 .sidebar {
     transform: translateX(-100%);
     @include transition;
     &.open { transform: translateX(0); }
 }
 
-// Collapsible — grid-template-rows (ПРЕПОРАЧАНО)
-// Користи .collapsible класа или @include collapsible
+// Collapsible — grid-template-rows (RECOMMENDED)
+// Use .collapsible class or @include collapsible
 &lt;section id="panel" data-ln-toggle class="collapsible"&gt;
     &lt;article class="collapsible-body"&gt;
-        Содржина...
+        Content...
     &lt;/article&gt;
 &lt;/section&gt;
 
@@ -254,7 +254,7 @@ document.addEventListener('ln-toggle:close', function (e) {
 .collapsible      { @include collapsible; }
 .collapsible > *  { @include collapsible-content; }
 
-// Или семантички во проект SCSS:
+// Or semantically in project SCSS:
 #panel         { @include collapsible; }
 #panel > .body { @include collapsible-content; }</code></pre>
 						</main>
@@ -262,31 +262,31 @@ document.addEventListener('ln-toggle:close', function (e) {
 
 					<!-- Constructor -->
 					<section class="section-card">
-						<header><h3>Динамички DOM</h3></header>
+						<header><h3>Dynamic DOM</h3></header>
 						<main>
-							<p>Компонентата користи <strong>MutationObserver</strong> — автоматски ги иницијализира сите нови елементи додадени во DOM, вклучувајќи динамички HTML од AJAX или JS.</p>
-							<pre><code>// Нема потреба од рачна иницијализација.
-// MutationObserver автоматски ги открива новите data-ln-toggle елементи.
+							<p>The component uses <strong>MutationObserver</strong> — it automatically initializes all new elements added to the DOM, including dynamic HTML from AJAX or JS.</p>
+							<pre><code>// No manual initialization needed.
+// MutationObserver automatically detects new data-ln-toggle elements.
 
 fetch('/partial').then(r => r.text()).then(html => {
     document.getElementById('content').innerHTML = html;
-    // lnToggle автоматски ги иницијализира новите елементи
+    // lnToggle automatically initializes the new elements
 });</code></pre>
-							<p><code>window.lnToggle</code> е достапен само за нестандардни случаи (Shadow DOM, iframe) каде MutationObserver не набљудува.</p>
+							<p><code>window.lnToggle</code> is available only for non-standard cases (Shadow DOM, iframe) where MutationObserver does not observe.</p>
 						</main>
 					</section>
 
-					<!-- Практични примери -->
+					<!-- Practical examples -->
 					<section class="section-card">
-						<header><h3>Практични користења</h3></header>
+						<header><h3>Practical uses</h3></header>
 						<main>
 							<ul>
-								<li><strong>Sidebar навигација</strong> — отворање/затворање на мобил</li>
-								<li><strong>Collapsible FAQ/документација</strong> — Q&A панели</li>
-								<li><strong>Dropdown менија</strong> — user menu, actions menu</li>
-								<li><strong>Modal backdrop</strong> — преку ln-modal компонента</li>
-								<li><strong>Tabs панели</strong> — преку ln-tabs компонента</li>
-								<li><strong>Accordion</strong> — преку ln-accordion компонента</li>
+								<li><strong>Sidebar navigation</strong> — opening/closing on mobile</li>
+								<li><strong>Collapsible FAQ/documentation</strong> — Q&A panels</li>
+								<li><strong>Dropdown menus</strong> — user menu, actions menu</li>
+								<li><strong>Modal backdrop</strong> — via ln-modal component</li>
+								<li><strong>Tabs panels</strong> — via ln-tabs component</li>
+								<li><strong>Accordion</strong> — via ln-accordion component</li>
 							</ul>
 						</main>
 					</section>

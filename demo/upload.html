@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +27,7 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Upload компонента со drag-drop.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Upload component with drag-drop.'})">
 						Test Toast
 					</button>
 				</div>
@@ -50,7 +50,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -62,7 +62,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -91,16 +91,16 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Upload</h1>
-					<p>File upload со drag-drop, progress bar, валидација на тип. Потребен е сервер за вистински upload.</p>
+					<p>File upload with drag-drop, progress bar, file type validation. A server is required for actual upload.</p>
 
 					<!-- Upload zone -->
 					<section class="section-card">
-						<header><h3>Upload Zone (демо — без сервер)</h3></header>
+						<header><h3>Upload Zone (demo — no server)</h3></header>
 						<main>
 							<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
 								<div class="ln-upload__zone">
-									<p>Довлечи фајлови тука или кликни за избор</p>
-									<small>Дозволени: pdf, doc, docx, jpg, png</small>
+									<p>Drag files here or click to browse</p>
+									<small>Allowed: pdf, doc, docx, jpg, png</small>
 								</div>
 								<ul class="ln-upload__list"></ul>
 							</div>
@@ -117,24 +117,24 @@
 
     &lt;!-- Drop zone --&gt;
     &lt;div class="ln-upload__zone"&gt;
-        &lt;p&gt;Довлечи фајлови тука&lt;/p&gt;
+        &lt;p&gt;Drag files here&lt;/p&gt;
     &lt;/div&gt;
 
-    &lt;!-- File list (автоматски се полни) --&gt;
+    &lt;!-- File list (populated automatically) --&gt;
     &lt;ul class="ln-upload__list"&gt;&lt;/ul&gt;
 
 &lt;/div&gt;
 
-&lt;!-- Атрибути --&gt;
+&lt;!-- Attributes --&gt;
 data-ln-upload="URL"           - upload endpoint
-data-ln-upload-accept="ext,ext" - дозволени екстензии
+data-ln-upload-accept="ext,ext" - allowed extensions
 
-&lt;!-- JS API (достапно на container елементот) --&gt;
+&lt;!-- JS API (available on the container element) --&gt;
 &lt;script&gt;
 const container = document.querySelector('[data-ln-upload]');
 container.lnUploadAPI.getFileIds();   // [1, 2, 3]
 container.lnUploadAPI.getFiles();     // file objects
-container.lnUploadAPI.clear();        // исчисти сè
+container.lnUploadAPI.clear();        // clear everything
 &lt;/script&gt;
 
 &lt;!-- Custom Events --&gt;
@@ -143,8 +143,8 @@ ln-upload:removed    - {id}
 ln-upload:error      - {message}
 ln-upload:invalid    - {file, reason}
 
-&lt;!-- Hidden inputs за форма --&gt;
-&lt;!-- Автоматски се креираат: --&gt;
+&lt;!-- Hidden inputs for form --&gt;
+&lt;!-- Created automatically: --&gt;
 &lt;input type="hidden" name="file_ids[]" value="123"&gt;</code></pre>
 						</main>
 					</section>

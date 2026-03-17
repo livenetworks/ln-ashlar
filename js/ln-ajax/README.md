@@ -1,84 +1,84 @@
 # ln-ajax
 
-AJAX навигација компонента — линкови и форми се праќаат асинхроно, одговорот го ажурира DOM-от без full page reload.
-Поддржува browser history (pushState), CSRF token, и JSON response protocol.
+AJAX navigation component — links and forms are sent asynchronously, the response updates the DOM without a full page reload.
+Supports browser history (pushState), CSRF token, and JSON response protocol.
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
-|---------|-----|------|
-| `data-ln-ajax` | контејнер, `<a>`, или `<form>` | Активира AJAX на елементот и сите деца |
-| `data-ln-ajax="false"` | `<a>` или `<form>` | Исклучи AJAX за конкретен елемент внатре во AJAX контејнер |
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-ajax` | container, `<a>`, or `<form>` | Activates AJAX on the element and all its children |
+| `data-ln-ajax="false"` | `<a>` or `<form>` | Disables AJAX for a specific element inside an AJAX container |
 
-## Однесување
+## Behavior
 
-### Линкови (`<a>`)
-- Клик прави GET AJAX request на `href`
-- Ctrl/Cmd+Click и middle-click работат нормално (open in new tab)
-- Линкови со `#` во href се прескокнуваат
-- По успешен одговор, URL се додава во browser history (pushState)
+### Links (`<a>`)
+- Click makes a GET AJAX request to `href`
+- Ctrl/Cmd+Click and middle-click work normally (open in new tab)
+- Links with `#` in href are skipped
+- After a successful response, the URL is added to browser history (pushState)
 
-### Форми (`<form>`)
-- Submit прави AJAX request (method и action од формата)
-- FormData автоматски се креира од формата
-- Копчињата се disable-ираат за време на request
-- GET форми: параметрите одат во URL query string + pushState
-- POST/PUT/DELETE: body е FormData
+### Forms (`<form>`)
+- Submit makes an AJAX request (method and action from the form)
+- FormData is automatically created from the form
+- Buttons are disabled during the request
+- GET forms: parameters go in URL query string + pushState
+- POST/PUT/DELETE: body is FormData
 
-### CSS класа за loading
-- `.ln-ajax--loading` се додава на елементот за време на request
+### CSS class for loading
+- `.ln-ajax--loading` is added to the element during the request
 
-## Серверски JSON Response Protocol
+## Server JSON Response Protocol
 
 ```json
 {
-    "title": "Нова страница",
+    "title": "New page",
     "content": {
-        "main-content": "<h1>Содржина</h1><p>Нов HTML</p>",
-        "sidebar-nav": "<ul><li>Нова навигација</li></ul>"
+        "main-content": "<h1>Content</h1><p>New HTML</p>",
+        "sidebar-nav": "<ul><li>New navigation</li></ul>"
     },
     "message": {
         "type": "success",
-        "title": "Зачувано",
-        "body": "Промените се зачувани.",
+        "title": "Saved",
+        "body": "Changes have been saved.",
         "data": {}
     }
 }
 ```
 
-| Поле | Опис |
-|------|------|
-| `title` | Ажурирај `document.title` |
-| `content` | Објект: клуч = ID на елемент, вредност = нов innerHTML |
-| `message` | Порака — достапна во `ln-ajax:success` event, проектот одлучува како да ја прикаже |
+| Field | Description |
+|-------|-------------|
+| `title` | Update `document.title` |
+| `content` | Object: key = element ID, value = new innerHTML |
+| `message` | Message — available in `ln-ajax:success` event, the project decides how to display it |
 
 ## Events
 
-Сите настани се dispatch-уваат на елементот кој го иницирал request-от (link или form) и bubble-аат нагоре.
+All events are dispatched on the element that initiated the request (link or form) and bubble up.
 
-| Настан | Cancelable | Кога | `detail` |
-|--------|-----------|------|----------|
-| `ln-ajax:before-start` | ✅ | Пред сè (може да откаже request) | `{ method, url }` |
-| `ln-ajax:start` | ❌ | По додавање на spinner, пред fetch | `{ method, url }` |
-| `ln-ajax:success` | ❌ | По успешен одговор | `{ method, url, data }` |
-| `ln-ajax:error` | ❌ | По fetch грешка | `{ method, url, error }` |
-| `ln-ajax:complete` | ❌ | По завршување (success или error) | `{ method, url }` |
+| Event | Cancelable | When | `detail` |
+|-------|-----------|------|----------|
+| `ln-ajax:before-start` | yes | Before everything (can cancel request) | `{ method, url }` |
+| `ln-ajax:start` | no | After adding spinner, before fetch | `{ method, url }` |
+| `ln-ajax:success` | no | After successful response | `{ method, url, data }` |
+| `ln-ajax:error` | no | After fetch error | `{ method, url, error }` |
+| `ln-ajax:complete` | no | After completion (success or error) | `{ method, url }` |
 
-### Откажување на request
+### Cancelling a request
 
 ```javascript
-// Спречи AJAX за одреден елемент условно
+// Prevent AJAX for a specific element conditionally
 document.addEventListener('ln-ajax:before-start', function(e) {
     if (!userIsAuthenticated()) {
-        e.preventDefault(); // request се откажува, нема spinner
+        e.preventDefault(); // request is cancelled, no spinner
         redirectToLogin();
     }
 });
 ```
 
-### Интеграција со ln-toast
+### Integration with ln-toast
 
-`ln-ajax` не знае за `ln-toast`. За приказ на пораки, слушај го `ln-ajax:success` во твојот проект:
+`ln-ajax` doesn't know about `ln-toast`. To display messages, listen to `ln-ajax:success` in your project:
 
 ```javascript
 document.addEventListener('ln-ajax:success', function(e) {
@@ -94,25 +94,25 @@ document.addEventListener('ln-ajax:success', function(e) {
 });
 ```
 
-### Останати примери
+### Other examples
 
 ```javascript
-// Покажи custom loading индикатор
+// Show custom loading indicator
 document.addEventListener('ln-ajax:start', function(e) {
     console.log('Request started:', e.detail.method, e.detail.url);
 });
 
-// Обнови компонента по успешен одговор
+// Refresh component after successful response
 document.addEventListener('ln-ajax:success', function(e) {
     window.lnSelect && window.lnSelect.reinit();
 });
 
-// Глобален error handler
+// Global error handler
 document.addEventListener('ln-ajax:error', function(e) {
     console.error('AJAX failed:', e.detail.url, e.detail.error);
 });
 
-// Завршување (секогаш)
+// Completion (always)
 document.addEventListener('ln-ajax:complete', function(e) {
     console.log('Request complete:', e.detail.url);
 });
@@ -120,29 +120,29 @@ document.addEventListener('ln-ajax:complete', function(e) {
 
 ## Headers
 
-Секој AJAX request ги испраќа:
+Every AJAX request sends:
 - `X-Requested-With: XMLHttpRequest`
 - `Accept: application/json`
-- `X-CSRF-TOKEN: {token}` (од `<meta name="csrf-token">`)
+- `X-CSRF-TOKEN: {token}` (from `<meta name="csrf-token">`)
 
-## HTML структура
+## HTML Structure
 
 ```html
-<!-- AJAX контејнер — сите линкови и форми внатре се AJAX -->
+<!-- AJAX container — all links and forms inside are AJAX -->
 <div data-ln-ajax>
     <nav>
-        <a href="/users">Корисници</a>
-        <a href="/settings">Поставки</a>
-        <a href="/external" data-ln-ajax="false">Надворешен (без AJAX)</a>
+        <a href="/users">Users</a>
+        <a href="/settings">Settings</a>
+        <a href="/external" data-ln-ajax="false">External (no AJAX)</a>
     </nav>
 
     <form method="POST" action="/users/create">
         <input name="name" type="text">
-        <button type="submit">Зачувај</button>
+        <button type="submit">Save</button>
     </form>
 </div>
 
-<!-- Или директно на елемент -->
+<!-- Or directly on an element -->
 <a href="/dashboard" data-ln-ajax>Dashboard</a>
 <form data-ln-ajax method="POST" action="/api/save">...</form>
 ```
@@ -150,6 +150,6 @@ document.addEventListener('ln-ajax:complete', function(e) {
 ## API
 
 ```javascript
-// Рачна иницијализација на нов AJAX контејнер
+// Manual initialization of a new AJAX container
 window.lnAjax(document.getElementById('new-content'));
 ```

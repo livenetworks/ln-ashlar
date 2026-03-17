@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +27,7 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'AJAX навигација компонента.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'AJAX navigation component.'})">
 						Test Toast
 					</button>
 				</div>
@@ -50,7 +50,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -62,7 +62,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -91,69 +91,69 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>AJAX</h1>
-					<p>Навигациска компонента — линкови и форми внатре во <strong>data-ln-ajax</strong> контејнер се праќаат асинхроно, без полн reload на страница.</p>
+					<p>Navigation component — links and forms inside a <strong>data-ln-ajax</strong> container are sent asynchronously, without a full page reload.</p>
 
-					<!-- Основи -->
+					<!-- Basics -->
 					<section class="section-card">
-						<header><h3>Основи</h3></header>
+						<header><h3>Basics</h3></header>
 						<main>
 							<table>
-								<thead><tr><th>Атрибут</th><th>На елемент</th><th>Опис</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-ajax</code></td><td>контејнер, &lt;a&gt;, &lt;form&gt;</td><td>Активира AJAX обработка</td></tr>
-									<tr><td><code>data-ln-ajax="false"</code></td><td>&lt;a&gt;, &lt;form&gt;</td><td>Исклучи конкретен елемент од AJAX</td></tr>
+									<tr><td><code>data-ln-ajax</code></td><td>container, &lt;a&gt;, &lt;form&gt;</td><td>Activates AJAX handling</td></tr>
+									<tr><td><code>data-ln-ajax="false"</code></td><td>&lt;a&gt;, &lt;form&gt;</td><td>Exclude a specific element from AJAX</td></tr>
 								</tbody>
 							</table>
 						</main>
 					</section>
 
-					<!-- Линкови -->
+					<!-- Links -->
 					<section class="section-card">
-						<header><h3>AJAX Линкови</h3></header>
+						<header><h3>AJAX Links</h3></header>
 						<main>
 							<article>
-								<h4>Однесување</h4>
+								<h4>Behavior</h4>
 								<ul>
-									<li>Клик на линк → GET AJAX request на <code>href</code></li>
-									<li>Ctrl/Cmd+Click → Отвора во нов tab (нормално)</li>
-									<li>Middle click → Отвора во нов tab (нормално)</li>
-									<li>Линкови со <code>#</code> → прескокнато</li>
-									<li>По успешен одговор → URL се додава во browser history (pushState)</li>
+									<li>Click on a link → GET AJAX request to <code>href</code></li>
+									<li>Ctrl/Cmd+Click → Opens in a new tab (normal)</li>
+									<li>Middle click → Opens in a new tab (normal)</li>
+									<li>Links with <code>#</code> → skipped</li>
+									<li>After a successful response → URL is added to browser history (pushState)</li>
 								</ul>
 							</article>
 							<article>
-								<h4>HTML пример</h4>
+								<h4>HTML example</h4>
 									<pre><code>&lt;div data-ln-ajax&gt;
-    &lt;a href="/users"&gt;Корисници&lt;/a&gt;
-    &lt;a href="/settings"&gt;Поставки&lt;/a&gt;
-    
-    &lt;!-- Исклучи конкретен линк --&gt;
-    &lt;a href="/login" data-ln-ajax="false"&gt;Логирај се&lt;/a&gt;
+    &lt;a href="/users"&gt;Users&lt;/a&gt;
+    &lt;a href="/settings"&gt;Settings&lt;/a&gt;
+
+    &lt;!-- Exclude a specific link --&gt;
+    &lt;a href="/login" data-ln-ajax="false"&gt;Log in&lt;/a&gt;
 &lt;/div&gt;</code></pre>
 							</article>
 						</main>
 					</section>
 
-					<!-- Форми -->
+					<!-- Forms -->
 					<section class="section-card">
-						<header><h3>AJAX Форми</h3></header>
+						<header><h3>AJAX Forms</h3></header>
 						<main>
 							<article>
-								<h4>Однесување</h4>
+								<h4>Behavior</h4>
 								<ul>
-									<li>Submit → AJAX request (method и action од формата)</li>
-										<li>FormData → автоматски се креира</li>
-										<li>Копчињата на формата → disable за време на request</li>
-										<li>GET форми → параметри во URL + pushState</li>
-										<li>POST/PUT/DELETE → body е FormData</li>
+									<li>Submit → AJAX request (method and action from the form)</li>
+										<li>FormData → automatically created</li>
+										<li>Form buttons → disabled during the request</li>
+										<li>GET forms → parameters in URL + pushState</li>
+										<li>POST/PUT/DELETE → body is FormData</li>
 									</ul>
 							</article>
 							<article>
-								<h4>HTML пример</h4>
+								<h4>HTML example</h4>
 								<pre><code>&lt;form data-ln-ajax method="POST" action="/api/users"&gt;
-    &lt;input type="text" name="name" placeholder="Име"&gt;
+    &lt;input type="text" name="name" placeholder="Name"&gt;
     &lt;input type="email" name="email" placeholder="Email"&gt;
-    &lt;button type="submit"&gt;Зачувај&lt;/button&gt;
+    &lt;button type="submit"&gt;Save&lt;/button&gt;
 &lt;/form&gt;</code></pre>
 							</article>
 						</main>
@@ -163,41 +163,41 @@
 					<section class="section-card">
 						<header><h3>JSON Response Protocol</h3></header>
 						<main>
-							<p>Серверот враќа JSON со следнава структура:</p>
+							<p>The server returns JSON with the following structure:</p>
 							<pre><code>{
-    "title": "Нова странична наслов",
+    "title": "New page title",
     "content": {
-        "main-content": "&lt;h1&gt;Содржина&lt;/h1&gt;",
+        "main-content": "&lt;h1&gt;Content&lt;/h1&gt;",
         "sidebar-nav": "&lt;ul&gt;&lt;li&gt;...&lt;/li&gt;&lt;/ul&gt;"
     },
     "message": {
         "type": "success|error|warn|info",
-        "title": "Наслов",
-        "body": "Порака",
+        "title": "Title",
+        "body": "Message",
         "data": {}
     }
 }</code></pre>
 							<table>
-								<thead><tr><th>Поле</th><th>Опис</th></tr></thead>
+								<thead><tr><th>Field</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>title</code></td><td><code>&lt;title&gt;</code> атрибут на страница</td></tr>
-									<tr><td><code>content</code></td><td>Објект: селектор → HTML за замена</td></tr>
-									<tr><td><code>message</code></td><td>Порака — достапна во <code>ln-ajax:success</code> event</td></tr>
+									<tr><td><code>title</code></td><td><code>&lt;title&gt;</code> attribute of the page</td></tr>
+									<tr><td><code>content</code></td><td>Object: selector → HTML for replacement</td></tr>
+									<tr><td><code>message</code></td><td>Message — available in the <code>ln-ajax:success</code> event</td></tr>
 								</tbody>
 							</table>
 						</main>
 					</section>
 
-					<!-- CSS класи -->
+					<!-- CSS classes -->
 					<section class="section-card">
-						<header><h3>CSS класи за loading state</h3></header>
+						<header><h3>CSS classes for loading state</h3></header>
 						<main>
 							<article>
-								<h4>За време на request</h4>
-								<p>Елементот добива класа <code>.ln-ajax--loading</code>. Користи ја за визуелна повратна информација.</p>
+								<h4>During request</h4>
+								<p>The element receives the class <code>.ln-ajax--loading</code>. Use it for visual feedback.</p>
 							</article>
 							<article>
-								<h4>SCSS пример</h4>
+								<h4>SCSS example</h4>
 								<pre><code>a.ln-ajax--loading {
     opacity: 0.6;
     pointer-events: none;
@@ -214,12 +214,12 @@ button.ln-ajax--loading {
 					<section class="section-card">
 						<header><h3>CSRF Token</h3></header>
 						<main>
-							<p>Компонентата автоматски читa CSRF token од <code>&lt;meta name="csrf-token"&gt;</code> и го испраќа во header:</p>
+							<p>The component automatically reads the CSRF token from <code>&lt;meta name="csrf-token"&gt;</code> and sends it in the header:</p>
 							<pre><code>&lt;head&gt;
     &lt;meta name="csrf-token" content="..."&gt;
 &lt;/head&gt;
 
-// ln-ajax го читa и го испраќа како:
+// ln-ajax reads it and sends it as:
 // X-CSRF-Token: ...</code></pre>
 						</main>
 					</section>
@@ -228,8 +228,8 @@ button.ln-ajax--loading {
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<p>ln-ajax нема јавна API — се активира автоматски преку data attributes.</p>
-							<pre><code>// Рачна иницијализација на нов DOM елемент
+							<p>ln-ajax has no public API — it is activated automatically via data attributes.</p>
+							<pre><code>// Manual initialization of a new DOM element
 window.lnAjax(document.getElementById('new-container'));</code></pre>
 						</main>
 					</section>
@@ -239,21 +239,21 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 						<header><h3>Events</h3></header>
 						<main>
 							<article>
-								<h4>Lifecycle настани</h4>
+								<h4>Lifecycle events</h4>
 								<table>
-									<thead><tr><th>Настан</th><th>Кога</th><th><code>detail</code></th></tr></thead>
+									<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
 									<tbody>
-										<tr><td><code>ln-ajax:start</code></td><td>Пред fetch</td><td><code>{ method, url }</code></td></tr>
-										<tr><td><code>ln-ajax:success</code></td><td>По успешен одговор</td><td><code>{ method, url, data }</code></td></tr>
-										<tr><td><code>ln-ajax:error</code></td><td>По fetch грешка</td><td><code>{ method, url, error }</code></td></tr>
-										<tr><td><code>ln-ajax:complete</code></td><td>По завршување (секогаш)</td><td><code>{ method, url }</code></td></tr>
+										<tr><td><code>ln-ajax:start</code></td><td>Before fetch</td><td><code>{ method, url }</code></td></tr>
+										<tr><td><code>ln-ajax:success</code></td><td>After successful response</td><td><code>{ method, url, data }</code></td></tr>
+										<tr><td><code>ln-ajax:error</code></td><td>After fetch error</td><td><code>{ method, url, error }</code></td></tr>
+										<tr><td><code>ln-ajax:complete</code></td><td>After completion (always)</td><td><code>{ method, url }</code></td></tr>
 									</tbody>
 								</table>
-								<p>Настаните се dispatch-уваат на елементот кој го иницирал request-от (<code>&lt;a&gt;</code> или <code>&lt;form&gt;</code>) и bubble-аат нагоре.</p>
+								<p>Events are dispatched on the element that initiated the request (<code>&lt;a&gt;</code> or <code>&lt;form&gt;</code>) and bubble up.</p>
 							</article>
 							<article>
-								<h4>Интеграција со ln-toast</h4>
-								<p><code>ln-ajax</code> не знае за <code>ln-toast</code>. Пораките од JSON response се достапни во <code>ln-ajax:success</code> — проектот одлучува:</p>
+								<h4>Integration with ln-toast</h4>
+								<p><code>ln-ajax</code> does not know about <code>ln-toast</code>. Messages from the JSON response are available in <code>ln-ajax:success</code> — the project decides:</p>
 								<pre><code>document.addEventListener('ln-ajax:success', function(e) {
     var message = e.detail.data.message;
     if (message &amp;&amp; window.lnToast) {
@@ -266,8 +266,8 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 });</code></pre>
 							</article>
 							<article>
-								<h4>Останати примери</h4>
-								<pre><code>// Глобален loading индикатор
+								<h4>Other examples</h4>
+								<pre><code>// Global loading indicator
 document.addEventListener('ln-ajax:start', function(e) {
     document.body.classList.add('loading');
 });
@@ -275,7 +275,7 @@ document.addEventListener('ln-ajax:complete', function(e) {
     document.body.classList.remove('loading');
 });
 
-// Обнови компоненти по DOM промена
+// Refresh components after DOM change
 document.addEventListener('ln-ajax:success', function(e) {
     window.lnSelect &amp;&amp; window.lnSelect.reinit();
 });

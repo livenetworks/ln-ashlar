@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +29,7 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Select — TomSelect wrapper.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Select — TomSelect wrapper.'})">
 						Test Toast
 					</button>
 				</div>
@@ -52,7 +52,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -64,7 +64,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -93,25 +93,25 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Select</h1>
-					<p>TomSelect wrapper — го подобрува стандардниот <code>&lt;select&gt;</code> со search, tagging и create функционалност.</p>
+					<p>TomSelect wrapper — enhances the standard <code>&lt;select&gt;</code> with search, tagging and create functionality.</p>
 
-					<!-- Основи -->
+					<!-- Basics -->
 					<section class="section-card">
-						<header><h3>Основи</h3></header>
+						<header><h3>Basics</h3></header>
 						<main>
 							<table>
-								<thead><tr><th>Атрибут</th><th>На елемент</th><th>Опис</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-select</code></td><td>&lt;select&gt;</td><td>Активира TomSelect со default конфигурација</td></tr>
-									<tr><td><code>data-ln-select='{"create":true}'</code></td><td>&lt;select&gt;</td><td>JSON конфигурација (мерџира се со defaults)</td></tr>
+									<tr><td><code>data-ln-select</code></td><td>&lt;select&gt;</td><td>Activates TomSelect with default configuration</td></tr>
+									<tr><td><code>data-ln-select='{"create":true}'</code></td><td>&lt;select&gt;</td><td>JSON configuration (merged with defaults)</td></tr>
 								</tbody>
 							</table>
 						</main>
 					</section>
 
-					<!-- Default конфигурација -->
+					<!-- Default configuration -->
 					<section class="section-card">
-						<header><h3>Default конфигурација</h3></header>
+						<header><h3>Default configuration</h3></header>
 						<main>
 							<pre><code>{
     "allowEmptyOption": true,
@@ -122,31 +122,31 @@
     "placeholder": "Select...",
     "loadThrottle": 300
 }</code></pre>
-							<p><strong>Напомена:</strong> <code>placeholder</code> атрибутот на <code>&lt;select&gt;</code> се користи ако е поставен.</p>
+							<p><strong>Note:</strong> The <code>placeholder</code> attribute on <code>&lt;select&gt;</code> is used if set.</p>
 						</main>
 					</section>
 
-					<!-- Примери -->
+					<!-- Examples -->
 					<section class="section-card">
-						<header><h3>Пример — Обичен select</h3></header>
+						<header><h3>Example — Basic select</h3></header>
 						<main>
 							<select data-ln-select>
-								<option value="">Избери улога...</option>
-								<option value="user">Обичен корисник</option>
-								<option value="admin">Администратор</option>
-								<option value="moderator">Модератор</option>
-								<option value="editor">Уредувач</option>
+								<option value="">Choose a role...</option>
+								<option value="user">Regular user</option>
+								<option value="admin">Administrator</option>
+								<option value="moderator">Moderator</option>
+								<option value="editor">Editor</option>
 							</select>
 						</main>
 					</section>
 
-					<!-- Select со create опција -->
+					<!-- Select with create option -->
 					<section class="section-card">
-						<header><h3>Пример — Select со create опција</h3></header>
+						<header><h3>Example — Select with create option</h3></header>
 						<main>
-							<p><strong>Можеш да напишеш нова вредност:</strong></p>
-							<select data-ln-select='{"create":true}' placeholder="Напиши или избери...">
-								<option value="">Избери...</option>
+							<p><strong>You can type a new value:</strong></p>
+							<select data-ln-select='{"create":true}' placeholder="Type or select...">
+								<option value="">Select...</option>
 								<option value="php">PHP</option>
 								<option value="python">Python</option>
 								<option value="javascript">JavaScript</option>
@@ -155,31 +155,31 @@
 						</main>
 					</section>
 
-					<!-- Повеќе selects -->
+					<!-- Multiple selects -->
 					<section class="section-card">
-						<header><h3>Пример — Повеќе селекти на форма</h3></header>
+						<header><h3>Example — Multiple selects in a form</h3></header>
 						<main>
 							<form>
 								<label>
-									Одделение
+									Department
 									<select data-ln-select>
-										<option value="">Избери...</option>
-										<option value="sales">Продажба</option>
-										<option value="marketing">Маркетинг</option>
-										<option value="dev">Развој</option>
+										<option value="">Select...</option>
+										<option value="sales">Sales</option>
+										<option value="marketing">Marketing</option>
+										<option value="dev">Development</option>
 										<option value="hr">HR</option>
 									</select>
 								</label>
 								<label>
-									Тим
+									Team
 									<select data-ln-select>
-										<option value="">Избери...</option>
+										<option value="">Select...</option>
 										<option value="frontend">Frontend</option>
 										<option value="backend">Backend</option>
 										<option value="devops">DevOps</option>
 									</select>
 								</label>
-								<button type="submit" class="btn">Зачувај</button>
+								<button type="submit" class="btn">Save</button>
 							</form>
 						</main>
 					</section>
@@ -188,17 +188,17 @@
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<pre><code>// Рачна иницијализација
+							<pre><code>// Manual initialization
 window.lnSelect.initialize(selectElement);
 
-// Уништи инстанца (cleanup)
+// Destroy instance (cleanup)
 window.lnSelect.destroy(selectElement);
 
-// Земи TomSelect инстанца за директен приступ
+// Get TomSelect instance for direct access
 var ts = window.lnSelect.getInstance(selectElement);
 
 // TomSelect API
-ts.addOption({ value: 'new', text: 'Нова опција' });
+ts.addOption({ value: 'new', text: 'New option' });
 ts.setValue('new');
 ts.clear();
 ts.getItems();</code></pre>
@@ -209,53 +209,53 @@ ts.getItems();</code></pre>
 					<section id="select-graceful" class="section-card">
 						<header><h3>Graceful Degradation</h3></header>
 						<main>
-							<p>Ако <code>window.TomSelect</code> не постои, компонентата тивко не прави ништо. <code>&lt;select&gt;</code>-от остануваат функционален како обичен браузерски select.</p>
+							<p>If <code>window.TomSelect</code> does not exist, the component silently does nothing. The <code>&lt;select&gt;</code> remains functional as a regular browser select.</p>
 							<p>
-								<strong>Добра практика:</strong> Секогаш вклучи TomSelect пред ln-acme ако го користиш.
+								<strong>Best practice:</strong> Always include TomSelect before ln-acme if you are using it.
 							</p>
 						</main>
 					</section>
 
-					<!-- жизнен циклус -->
+					<!-- Lifecycle -->
 					<section class="section-card">
-						<header><h3>Жизнен циклус</h3></header>
+						<header><h3>Lifecycle</h3></header>
 						<main>
 							<article>
-								<h4>При DOM remove</h4>
-								<p>Инстанцата автоматски се уништува (cleanup).</p>
+								<h4>On DOM remove</h4>
+								<p>The instance is automatically destroyed (cleanup).</p>
 							</article>
 							<article>
-								<h4>При form reset</h4>
-								<p>Selection се чисти автоматски.</p>
+								<h4>On form reset</h4>
+								<p>The selection is cleared automatically.</p>
 							</article>
 							<article>
-								<h4>Динамички додадени select елементи</h4>
-								<p>Нови select елементи со <code>data-ln-select</code> се обработуваат автоматски.</p>
+								<h4>Dynamically added select elements</h4>
+								<p>New select elements with <code>data-ln-select</code> are processed automatically.</p>
 							</article>
 						</main>
 					</section>
 
-					<!-- HTML пример -->
+					<!-- HTML example -->
 					<section class="section-card">
-						<header><h3>HTML структура</h3></header>
+						<header><h3>HTML structure</h3></header>
 						<main>
-							<pre><code>&lt;!-- Обичен TomSelect --&gt;
+							<pre><code>&lt;!-- Basic TomSelect --&gt;
 &lt;select data-ln-select&gt;
-    &lt;option value=""&gt;Избери...&lt;/option&gt;
-    &lt;option value="option1"&gt;Опција 1&lt;/option&gt;
-    &lt;option value="option2"&gt;Опција 2&lt;/option&gt;
+    &lt;option value=""&gt;Select...&lt;/option&gt;
+    &lt;option value="option1"&gt;Option 1&lt;/option&gt;
+    &lt;option value="option2"&gt;Option 2&lt;/option&gt;
 &lt;/select&gt;
 
-&lt;!-- TomSelect со create опција --&gt;
-&lt;select data-ln-select='{"create":true}' 
-        placeholder="Напиши или избери..."&gt;
-    &lt;option value="opt1"&gt;Опција 1&lt;/option&gt;
-    &lt;option value="opt2"&gt;Опција 2&lt;/option&gt;
+&lt;!-- TomSelect with create option --&gt;
+&lt;select data-ln-select='{"create":true}'
+        placeholder="Type or select..."&gt;
+    &lt;option value="opt1"&gt;Option 1&lt;/option&gt;
+    &lt;option value="opt2"&gt;Option 2&lt;/option&gt;
 &lt;/select&gt;
 
-&lt;!-- TomSelect во форма --&gt;
+&lt;!-- TomSelect in a form --&gt;
 &lt;form&gt;
-    &lt;label for="my-select"&gt;Избор&lt;/label&gt;
+    &lt;label for="my-select"&gt;Selection&lt;/label&gt;
     &lt;select id="my-select" data-ln-select name="role"&gt;
         &lt;option value="user"&gt;User&lt;/option&gt;
         &lt;option value="admin"&gt;Admin&lt;/option&gt;
@@ -264,18 +264,18 @@ ts.getItems();</code></pre>
 						</main>
 					</section>
 
-					<!-- Зависности -->
+					<!-- Dependencies -->
 					<section class="section-card">
-						<header><h3>Зависности</h3></header>
+						<header><h3>Dependencies</h3></header>
 						<main>
-							<p><strong>Peer dependency:</strong> TomSelect мора да е вчитана пред ln-acme.</p>
+							<p><strong>Peer dependency:</strong> TomSelect must be loaded before ln-acme.</p>
 							<pre><code>&lt;!-- TomSelect CSS --&gt;
 &lt;link href="..." rel="stylesheet"&gt;
 
-&lt;!-- TomSelect JS (пред ln-acme!) --&gt;
+&lt;!-- TomSelect JS (before ln-acme!) --&gt;
 &lt;script src="..."&gt;&lt;/script&gt;
 
-&lt;!-- ln-acme (со вградена поддршка за TomSelect) --&gt;
+&lt;!-- ln-acme (with built-in TomSelect support) --&gt;
 &lt;link rel="stylesheet" href="dist/ln-acme.css"&gt;
 &lt;script src="dist/ln-acme.iife.js"&gt;&lt;/script&gt;</code></pre>
 						</main>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +26,7 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Nav — активен линк маркер.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Nav — active link marker.'})">
 						Test Toast
 					</button>
 				</div>
@@ -49,7 +49,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -61,7 +61,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -90,52 +90,52 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Nav</h1>
-					<p>Active link highlighter — автоматски го означува активниот линк во навигација врз основа на тековниот URL. Работи со pushState (AJAX) и popstate (browser back/forward).</p>
+					<p>Active link highlighter — automatically marks the active link in navigation based on the current URL. Works with pushState (AJAX) and popstate (browser back/forward).</p>
 
-					<!-- Основи -->
+					<!-- Basics -->
 					<section class="section-card">
-						<header><h3>Основи</h3></header>
+						<header><h3>Basics</h3></header>
 						<main>
 							<table>
-								<thead><tr><th>Атрибут</th><th>На елемент</th><th>Вредност</th><th>Опис</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Value</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-nav</code></td><td>&lt;nav&gt;</td><td>CSS класа</td><td>Активира nav highlighter</td></tr>
+									<tr><td><code>data-ln-nav</code></td><td>&lt;nav&gt;</td><td>CSS class</td><td>Activates nav highlighter</td></tr>
 								</tbody>
 							</table>
-							<p><strong>Пример:</strong> <code>data-ln-nav="active"</code> — линкот добива класа <code>.active</code> кога е активен.</p>
+							<p><strong>Example:</strong> <code>data-ln-nav="active"</code> — the link receives class <code>.active</code> when it is active.</p>
 						</main>
 					</section>
 
-					<!-- Однесување -->
+					<!-- Behavior -->
 					<section class="section-card">
-						<header><h3>Однесување и Match правила</h3></header>
+						<header><h3>Behavior and Match Rules</h3></header>
 						<main>
 							<article>
-								<h4>Како функционира?</h4>
+								<h4>How does it work?</h4>
 								<ol>
-									<li>При init, ги скенира сите <code>&lt;a&gt;</code> внатре во <code>&lt;nav&gt;</code></li>
-									<li>Го споредува <code>href</code> на секој линк со <code>window.location.pathname</code></li>
-									<li>Додава CSS класа на совпаѓачки линкови</li>
+									<li>On init, it scans all <code>&lt;a&gt;</code> elements inside <code>&lt;nav&gt;</code></li>
+									<li>It compares the <code>href</code> of each link with <code>window.location.pathname</code></li>
+									<li>Adds a CSS class to matching links</li>
 								</ol>
 							</article>
 							<article>
-								<h4>Match правила</h4>
+								<h4>Match Rules</h4>
 								<table>
-									<thead><tr><th>Правило</th><th>Пример</th><th>Резултат</th></tr></thead>
+									<thead><tr><th>Rule</th><th>Example</th><th>Result</th></tr></thead>
 									<tbody>
-										<tr><td><strong>Exact match</strong></td><td><code>/users</code> на <code>/users</code></td><td>✓ Match</td></tr>
-										<tr><td><strong>Parent match</strong></td><td><code>/users</code> на <code>/users/123</code></td><td>✓ Match</td></tr>
-										<tr><td><strong>Root специјален</strong></td><td><code>/</code> само на <code>/</code></td><td>✓ Exact only</td></tr>
-										<tr><td><strong>Trailing slash</strong></td><td><code>/users/</code> == <code>/users</code></td><td>✓ Нормализирано</td></tr>
+										<tr><td><strong>Exact match</strong></td><td><code>/users</code> on <code>/users</code></td><td>✓ Match</td></tr>
+										<tr><td><strong>Parent match</strong></td><td><code>/users</code> on <code>/users/123</code></td><td>✓ Match</td></tr>
+										<tr><td><strong>Root special</strong></td><td><code>/</code> only on <code>/</code></td><td>✓ Exact only</td></tr>
+										<tr><td><strong>Trailing slash</strong></td><td><code>/users/</code> == <code>/users</code></td><td>✓ Normalized</td></tr>
 									</tbody>
 								</table>
 							</article>
 						</main>
 					</section>
 
-					<!-- HTML пример -->
+					<!-- HTML example -->
 					<section class="section-card">
-						<header><h3>HTML пример</h3></header>
+						<header><h3>HTML Example</h3></header>
 						<main>
 							<pre><code>&lt;nav data-ln-nav="active"&gt;
     &lt;a href="/"&gt;Home&lt;/a&gt;
@@ -144,20 +144,20 @@
     &lt;a href="/settings"&gt;Settings&lt;/a&gt;
 &lt;/nav&gt;
 
-&lt;!-- Ако URL е /users/42 --&gt;
-&lt;!-- Линкот /users добива класа .active (parent match) --&gt;
-&lt;!-- Линкот /users/new НЕ добива класа --&gt;</code></pre>
+&lt;!-- If the URL is /users/42 --&gt;
+&lt;!-- The /users link receives class .active (parent match) --&gt;
+&lt;!-- The /users/new link does NOT receive the class --&gt;</code></pre>
 						</main>
 					</section>
 
-					<!-- CSS стилизирање -->
+					<!-- CSS styling -->
 					<section class="section-card">
-						<header><h3>CSS стилизирање</h3></header>
+						<header><h3>CSS Styling</h3></header>
 						<main>
 							<pre><code>nav a {
     @include text-secondary;
     @include transition;
-    
+
     &.active {
         @include text-primary;
         @include font-bold;
@@ -169,21 +169,21 @@
 						</main>
 					</section>
 
-					<!-- Реактивност -->
+					<!-- Reactivity -->
 					<section class="section-card">
-						<header><h3>Реактивност со AJAX и Browser History</h3></header>
+						<header><h3>Reactivity with AJAX and Browser History</h3></header>
 						<main>
 							<article>
-								<h4>pushState (AJAX навигација)</h4>
-								<p>Кога ln-ajax го менува URL-от преку <code>pushState</code>, ln-nav автоматски ги ажурира активните класи.</p>
+								<h4>pushState (AJAX navigation)</h4>
+								<p>When ln-ajax changes the URL via <code>pushState</code>, ln-nav automatically updates the active classes.</p>
 							</article>
 							<article>
 								<h4>popstate (browser back/forward)</h4>
-								<p>При browser back/forward, ln-nav слуша <code>popstate</code> event и ги ажурира активните класи.</p>
+								<p>On browser back/forward, ln-nav listens to the <code>popstate</code> event and updates the active classes.</p>
 							</article>
 							<article>
-								<h4>Динамички додадени линкови</h4>
-								<p>Новите линкови додадени преку JavaScript (MutationObserver) автоматски се обработуваат.</p>
+								<h4>Dynamically added links</h4>
+								<p>New links added via JavaScript (MutationObserver) are automatically processed.</p>
 							</article>
 						</main>
 					</section>
@@ -192,18 +192,18 @@
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<pre><code>// Рачна иницијализација
+							<pre><code>// Manual initialization
 window.lnNav.init(navElement);
 
-// Рачно ажурирај активни линкови
-// (обично не требава — работи автоматски)
+// Manually update active links
+// (usually not needed — works automatically)
 window.lnNav.updateActive();</code></pre>
 						</main>
 					</section>
 
-					<!-- Пример со неколку навигации -->
+					<!-- Example with multiple navigations -->
 					<section class="section-card">
-						<header><h3>Пример — Повеќе навигации на исто време</h3></header>
+						<header><h3>Example — Multiple Navigations at the Same Time</h3></header>
 						<main>
 							<article class="demo-nav-example">
 								<h5>Top Navigation</h5>

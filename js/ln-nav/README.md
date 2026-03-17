@@ -1,40 +1,40 @@
 # ln-nav
 
-Active link highlighter — автоматски го означува активниот линк во навигација врз основа на тековниот URL.
-Работи со `pushState` (ln-ajax) и `popstate` (browser back/forward).
+Active link highlighter — automatically marks the active link in navigation based on the current URL.
+Works with `pushState` (ln-ajax) and `popstate` (browser back/forward).
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
-|---------|-----|------|
-| `data-ln-nav="active"` | `<nav>` елемент | Активира nav highlighter, вредноста е CSS класата за активен линк |
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-nav="active"` | `<nav>` element | Activates the nav highlighter; the value is the CSS class for the active link |
 
-## Однесување
+## Behavior
 
-- При init, ги скенира сите `<a>` внатре во навигацијата
-- Го споредува `href` на секој линк со `window.location.pathname`
-- Додава CSS класа (дефинирана во `data-ln-nav`) на совпаѓачки линкови
-- **Exact match**: `/users` совпаѓа со `/users`
-- **Parent match**: `/users` совпаѓа и со `/users/123` (prefix match)
-- **Root (`/`)**: не се третира како parent — точно совпаѓање само
-- Trailing slash се нормализира (`/users/` == `/users`)
-- При `pushState` (ln-ajax навигација) автоматски ги ажурира активните линкови
-- При `popstate` (browser back/forward) исто ги ажурира
-- Динамички додадени линкови (MutationObserver) автоматски се обработуваат
+- On init, scans all `<a>` elements inside the navigation
+- Compares the `href` of each link with `window.location.pathname`
+- Adds the CSS class (defined in `data-ln-nav`) to matching links
+- **Exact match**: `/users` matches `/users`
+- **Parent match**: `/users` also matches `/users/123` (prefix match)
+- **Root (`/`)**: not treated as a parent — exact match only
+- Trailing slash is normalized (`/users/` == `/users`)
+- On `pushState` (ln-ajax navigation) automatically updates active links
+- On `popstate` (browser back/forward) also updates
+- Dynamically added links (MutationObserver) are automatically processed
 
-## HTML структура
+## HTML Structure
 
 ```html
 <nav data-ln-nav="active">
     <a href="/dashboard">Dashboard</a>
-    <a href="/users">Корисници</a>
-    <a href="/settings">Поставки</a>
+    <a href="/users">Users</a>
+    <a href="/settings">Settings</a>
 </nav>
 ```
 
-Ако URL е `/users/42`, линкот `/users` ќе добие класа `active`.
+If the URL is `/users/42`, the `/users` link will get the `active` class.
 
-## CSS стилизирање
+## CSS Styling
 
 ```scss
 nav a {
@@ -50,10 +50,10 @@ nav a {
 ## API
 
 ```javascript
-// Рачна иницијализација
+// Manual initialization
 window.lnNav(document.getElementById('sidebar-nav'));
 ```
 
-## Интеграција со ln-ajax
+## Integration with ln-ajax
 
-`ln-nav` се закачува на `history.pushState` за да детектира URL промени од ln-ajax. Override-от е **singleton** — се поставува само еднаш, без разлика колку `[data-ln-nav]` елементи постојат на страната. Не е потребна додатна конфигурација — активниот линк се ажурира по секој AJAX навигација.
+`ln-nav` hooks into `history.pushState` to detect URL changes from ln-ajax. The override is a **singleton** — set only once, regardless of how many `[data-ln-nav]` elements exist on the page. No additional configuration is needed — the active link updates after every AJAX navigation.

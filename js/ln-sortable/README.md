@@ -1,26 +1,26 @@
 # ln-sortable
 
-Drag & drop reorder компонента — преместува елементи во листа со Pointer Events API.
-Работи со touch + mouse. Компонентата само го реорганизира DOM-от — data model sync е одговорност на consumer-от (преку events).
+Drag & drop reorder component — moves elements in a list using the Pointer Events API.
+Works with touch + mouse. The component only reorganizes the DOM — data model sync is the consumer's responsibility (via events).
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
+| Attribute | On | Description |
 |---------|-----|------|
-| `data-ln-sortable` | контејнер (`<ol>`, `<ul>`, итн.) | Креира инстанца. Sortable items = директни деца. |
-| `data-ln-sortable-handle` | елемент внатре во дете | Drag handle. Ако нема — целото дете е draggable. |
+| `data-ln-sortable` | container (`<ol>`, `<ul>`, etc.) | Creates an instance. Sortable items = direct children. |
+| `data-ln-sortable-handle` | element inside a child | Drag handle. If absent — the entire child is draggable. |
 
 ## API
 
 ```javascript
-// Instance API (на DOM елементот)
+// Instance API (on the DOM element)
 var list = document.querySelector('[data-ln-sortable]');
 list.lnSortable.enable();
 list.lnSortable.disable();
 list.lnSortable.isEnabled;  // boolean
 
-// Constructor — само за нестандардни случаи (Shadow DOM, iframe)
-// За AJAX/динамички DOM: MutationObserver автоматски иницијализира
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM: MutationObserver auto-initializes
 window.lnSortable(container);
 ```
 
@@ -28,41 +28,41 @@ window.lnSortable(container);
 
 | Event | Bubbles | Cancelable | Detail |
 |-------|---------|------------|--------|
-| `ln-sortable:before-drag` | да | **да** | `{ item: HTMLElement, index: number }` |
-| `ln-sortable:drag-start` | да | не | `{ item: HTMLElement, index: number }` |
-| `ln-sortable:reordered` | да | не | `{ item: HTMLElement, oldIndex: number, newIndex: number }` |
-| `ln-sortable:request-enable` | не | не | — |
-| `ln-sortable:request-disable` | не | не | — |
+| `ln-sortable:before-drag` | yes | **yes** | `{ item: HTMLElement, index: number }` |
+| `ln-sortable:drag-start` | yes | no | `{ item: HTMLElement, index: number }` |
+| `ln-sortable:reordered` | yes | no | `{ item: HTMLElement, oldIndex: number, newIndex: number }` |
+| `ln-sortable:request-enable` | no | no | — |
+| `ln-sortable:request-disable` | no | no | — |
 
 ```javascript
-// Слушај реорганизирање
+// Listen for reordering
 document.addEventListener('ln-sortable:reordered', function (e) {
-    console.log('Преместено од', e.detail.oldIndex, 'на', e.detail.newIndex);
+    console.log('Moved from', e.detail.oldIndex, 'to', e.detail.newIndex);
 });
 
-// Откажи drag условно
+// Cancel drag conditionally
 document.addEventListener('ln-sortable:before-drag', function (e) {
     if (listIsLocked) e.preventDefault();
 });
 
-// Побарај disable (пр. додека се зачувува)
+// Request disable (e.g. while saving)
 list.dispatchEvent(new CustomEvent('ln-sortable:request-disable'));
 ```
 
-`ln-sortable:request-enable` и `ln-sortable:request-disable` се **incoming** events — надворешен код ги dispatcha на sortable елементот.
+`ln-sortable:request-enable` and `ln-sortable:request-disable` are **incoming** events — external code dispatches them on the sortable element.
 
-## CSS класи
+## CSS Classes
 
-Компонентата ги додава/тргни овие класи. **Не испорачува CSS** — consumer-от ги стилизира.
+The component adds/removes these classes. **Does not ship CSS** — the consumer styles them.
 
-| Класа | На | Кога |
+| Class | On | When |
 |-------|----|------|
-| `ln-sortable--active` | контејнер | Додека трае drag |
-| `ln-sortable--dragging` | влечен елемент | Додека се влече |
-| `ln-sortable--drop-before` | целен елемент | Покажувач во горна половина |
-| `ln-sortable--drop-after` | целен елемент | Покажувач во долна половина |
+| `ln-sortable--active` | container | While drag is in progress |
+| `ln-sortable--dragging` | dragged element | While being dragged |
+| `ln-sortable--drop-before` | target element | Pointer in top half |
+| `ln-sortable--drop-after` | target element | Pointer in bottom half |
 
-Пример CSS:
+Example CSS:
 ```css
 .my-list > li.ln-sortable--dragging {
     opacity: 0.4;
@@ -75,43 +75,43 @@ list.dispatchEvent(new CustomEvent('ln-sortable:request-disable'));
 }
 ```
 
-> **Важно:** Handle елементот треба `touch-action: none` и `cursor: grab` во CSS за правилно однесување на touch уреди.
+> **Important:** The handle element needs `touch-action: none` and `cursor: grab` in CSS for correct behavior on touch devices.
 
-## Примери
+## Examples
 
-### Листа со drag handle
+### List with drag handle
 
 ```html
 <ol data-ln-sortable>
     <li>
         <span data-ln-sortable-handle>⋮⋮</span>
-        Прва ставка
+        First item
     </li>
     <li>
         <span data-ln-sortable-handle>⋮⋮</span>
-        Втора ставка
+        Second item
     </li>
 </ol>
 ```
 
-### Листа без handle (целото дете е draggable)
+### List without handle (entire child is draggable)
 
 ```html
 <ul data-ln-sortable>
-    <li>Влечи ме</li>
-    <li>И мене</li>
+    <li>Drag me</li>
+    <li>Me too</li>
 </ul>
 ```
 
-### Програмски
+### Programmatic
 
 ```javascript
-// Disable додека се процесира
+// Disable while processing
 list.lnSortable.disable();
 saveOrder().then(function () {
     list.lnSortable.enable();
 });
 
-// Или преку events
+// Or via events
 list.dispatchEvent(new CustomEvent('ln-sortable:request-disable'));
 ```

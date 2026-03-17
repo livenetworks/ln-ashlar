@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +26,7 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'CSS layout компонента.'})">Test Toast</button>
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'CSS layout component.'})">Test Toast</button>
 				</div>
 			</div>
 		</header>
@@ -47,7 +47,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -59,7 +59,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -88,11 +88,11 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Layout &amp; Grid</h1>
-					<p>App layout со sidebar, grid систем, stack, row и container.</p>
+					<p>App layout with sidebar, grid system, stack, row and container.</p>
 
 		<!-- Grid -->
 		<section class="section-card">
-			<header><h3>.grid (3 колони)</h3></header>
+			<header><h3>.grid (3 columns)</h3></header>
 			<main>
 				<div class="grid">
 					<div class="demo-box">1</div>
@@ -106,17 +106,17 @@
 		</section>
 
 		<section class="section-card">
-			<header><h3>.grid-2 (2 колони)</h3></header>
+			<header><h3>.grid-2 (2 columns)</h3></header>
 			<main>
 				<div class="grid-2">
-					<div class="demo-box">Лево</div>
-					<div class="demo-box">Десно</div>
+					<div class="demo-box">Left</div>
+					<div class="demo-box">Right</div>
 				</div>
 			</main>
 		</section>
 
 		<section class="section-card">
-			<header><h3>.grid-4 (4 колони)</h3></header>
+			<header><h3>.grid-4 (4 columns)</h3></header>
 			<main>
 				<div class="grid-4">
 					<div class="demo-box">1</div>
@@ -133,7 +133,7 @@
 			<main>
 				<div class="grid-2">
 					<div>
-						<h5>stack (вертикално)</h5>
+						<h5>stack (vertical)</h5>
 						<div class="stack">
 							<div class="demo-box">Item 1</div>
 							<div class="demo-box">Item 2</div>
@@ -141,7 +141,7 @@
 						</div>
 					</div>
 					<div>
-						<h5>row (хоризонтално)</h5>
+						<h5>row (horizontal)</h5>
 						<div class="row">
 							<div class="demo-box">A</div>
 							<div class="demo-box">B</div>
@@ -150,8 +150,8 @@
 						<br>
 						<h5>row-between</h5>
 						<div class="row-between">
-							<div class="demo-box">Лево</div>
-							<div class="demo-box">Десно</div>
+							<div class="demo-box">Left</div>
+							<div class="demo-box">Right</div>
 						</div>
 					</div>
 				</div>
@@ -160,9 +160,9 @@
 
 		<!-- App Layout -->
 		<section class="section-card">
-			<header><h3>App Layout структура</h3></header>
+			<header><h3>App Layout structure</h3></header>
 			<main>
-				<pre><code>&lt;!-- Целосен app layout --&gt;
+				<pre><code>&lt;!-- Full app layout --&gt;
 &lt;div class="app-wrapper"&gt;
 
     &lt;aside class="sidebar"&gt;
@@ -216,7 +216,7 @@
 
 &lt;!-- Stack (vertical) --&gt;
 &lt;div class="stack"&gt;...&lt;/div&gt;
-&lt;div class="stack-sm"&gt;...&lt;/div&gt;  &lt;!-- помал gap --&gt;
+&lt;div class="stack-sm"&gt;...&lt;/div&gt;  &lt;!-- smaller gap --&gt;
 
 &lt;!-- Row (horizontal) --&gt;
 &lt;div class="row"&gt;...&lt;/div&gt;

@@ -37,8 +37,10 @@
 	function _constructor(dom) {
 		this.dom = dom;
 		this._attrObserver = null;
+		this._parentObserver = null;
 		_render.call(this);
 		_listenValues.call(this);
+		_listenParent.call(this);
 		return this;
 	}
 
@@ -46,6 +48,9 @@
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		if (this._attrObserver) {
 			this._attrObserver.disconnect();
+		}
+		if (this._parentObserver) {
+			this._parentObserver.disconnect();
 		}
 		delete this.dom[DOM_ATTRIBUTE];
 	};
@@ -89,9 +94,34 @@
 		this._attrObserver = observer;
 	}
 
+	function _listenParent() {
+		const self = this;
+		const parent = this.dom.parentElement;
+		if (!parent || !parent.hasAttribute('data-ln-progress-max')) return;
+
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
+				if (mutation.attributeName === 'data-ln-progress-max') {
+					_render.call(self);
+				}
+			}
+		});
+
+		observer.observe(parent, {
+			attributes: true,
+			attributeFilter: ['data-ln-progress-max']
+		});
+
+		this._parentObserver = observer;
+	}
+
 	function _render() {
 		const value = parseFloat(this.dom.getAttribute('data-ln-progress')) || 0;
-		const max = parseFloat(this.dom.getAttribute('data-ln-progress-max')) || 100;
+		const parent = this.dom.parentElement;
+		const parentMax = parent && parent.hasAttribute('data-ln-progress-max')
+			? parseFloat(parent.getAttribute('data-ln-progress-max'))
+			: null;
+		const max = parentMax || parseFloat(this.dom.getAttribute('data-ln-progress-max')) || 100;
 		let percentage = (max > 0) ? (value / max) * 100 : 0;
 
 		if (percentage < 0) percentage = 0;

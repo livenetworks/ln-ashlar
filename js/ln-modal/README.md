@@ -1,26 +1,26 @@
 # ln-modal
 
-Modal dialog компонента — overlay со содржина (header/main/footer).
-Отвара/затвара модал по ID. ESC затвара сите отворени модали. Body scroll се блокира кога модал е отворен.
+Modal dialog component — overlay with content (header/main/footer).
+Opens/closes a modal by ID. ESC closes all open modals. Body scroll is blocked when a modal is open.
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
-|---------|-----|------|
-| `data-ln-modal="modalId"` | trigger копче/линк | Кликот го toggle-ува модалот со тој ID |
-| `data-ln-modal-close` | копче внатре во модал | Затвара го родителскиот модал |
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-modal="modalId"` | trigger button/link | Click toggles the modal with that ID |
+| `data-ln-modal-close` | button inside modal | Closes the parent modal |
 
-## CSS класи
+## CSS Classes
 
-| Класа | Опис |
-|-------|------|
-| `.ln-modal` | Overlay контејнер (мора да има `id`) |
-| `.ln-modal--open` | Отворен модал (додава ја JS) |
-| `.ln-modal__content` | Внатрешен контејнер за содржина |
-| `.ln-modal__content--sm` | Мал модал (max-width: 28rem) |
-| `.ln-modal__content--md` | Среден модал (max-width: 32rem) |
-| `.ln-modal__content--lg` | Голем модал (max-width: 42rem) |
-| `.ln-modal__content--xl` | Екстра голем модал (max-width: 48rem) |
+| Class | Description |
+|-------|-------------|
+| `.ln-modal` | Overlay container (must have `id`) |
+| `.ln-modal--open` | Open modal (added by JS) |
+| `.ln-modal__content` | Inner content container |
+| `.ln-modal__content--sm` | Small modal (max-width: 28rem) |
+| `.ln-modal__content--md` | Medium modal (max-width: 32rem) |
+| `.ln-modal__content--lg` | Large modal (max-width: 42rem) |
+| `.ln-modal__content--xl` | Extra large modal (max-width: 48rem) |
 
 ## API
 
@@ -32,24 +32,24 @@ window.lnModal.toggle('my-modal');
 
 ## Events
 
-Сите настани се dispatch-уваат на самиот модал елемент и bubble-аат нагоре.
+All events are dispatched on the modal element itself and bubble up.
 
-| Настан | Cancelable | Кога | `detail` |
-|--------|-----------|------|----------|
-| `ln-modal:before-open` | ✅ | Пред отварање (може да се откаже) | `{ modalId, target }` |
-| `ln-modal:open` | ❌ | Модалот се отвори | `{ modalId, target }` |
-| `ln-modal:before-close` | ✅ | Пред затварање (може да се откаже) | `{ modalId, target }` |
-| `ln-modal:close` | ❌ | Модалот се затвори | `{ modalId, target }` |
+| Event | Cancelable | When | `detail` |
+|-------|-----------|------|----------|
+| `ln-modal:before-open` | yes | Before opening (can be cancelled) | `{ modalId, target }` |
+| `ln-modal:open` | no | Modal opened | `{ modalId, target }` |
+| `ln-modal:before-close` | yes | Before closing (can be cancelled) | `{ modalId, target }` |
+| `ln-modal:close` | no | Modal closed | `{ modalId, target }` |
 
 ```javascript
-// Откажи отварање условно
+// Cancel opening conditionally
 document.addEventListener('ln-modal:before-open', function(e) {
     if (e.detail.modalId === 'confirm-dialog' && !formIsValid()) {
-        e.preventDefault(); // модалот нема да се отвори
+        e.preventDefault(); // modal won't open
     }
 });
 
-// Спречи затварање (unsaved changes)
+// Prevent closing (unsaved changes)
 document.getElementById('edit-modal').addEventListener('ln-modal:before-close', function(e) {
     if (hasUnsavedChanges()) {
         e.preventDefault();
@@ -58,52 +58,52 @@ document.getElementById('edit-modal').addEventListener('ln-modal:before-close', 
 });
 
 document.addEventListener('ln-modal:open', function(e) {
-    console.log('Отворен модал:', e.detail.modalId);
+    console.log('Modal opened:', e.detail.modalId);
 });
 
 document.addEventListener('ln-modal:close', function(e) {
     if (e.detail.modalId === 'confirm-dialog') {
-        // reset форма, исчисти state итн.
+        // reset form, clear state, etc.
     }
 });
 ```
 
-## Однесување
+## Behavior
 
-- ESC тастер затвара сите отворени модали
-- `body.ln-modal-open` се додава кога барем еден модал е отворен (спречува scroll)
-- Backdrop: полу-транспарентен темен overlay со blur
-- Анимација: slideIn од горе (0.3s ease)
-- Ctrl/Cmd+Click и middle-click на trigger не го отвараат модалот (дозволува open in new tab)
+- ESC key closes all open modals
+- `body.ln-modal-open` is added when at least one modal is open (prevents scroll)
+- Backdrop: semi-transparent dark overlay with blur
+- Animation: slideIn from top (0.3s ease)
+- Ctrl/Cmd+Click and middle-click on trigger don't open the modal (allows open in new tab)
 
-## HTML структура
+## HTML Structure
 
 ```html
-<!-- Trigger копче -->
-<button data-ln-modal="my-modal">Отвори</button>
+<!-- Trigger button -->
+<button data-ln-modal="my-modal">Open</button>
 
-<!-- Модал -->
+<!-- Modal -->
 <div id="my-modal" class="ln-modal">
     <div class="ln-modal__content">
         <header>
-            <h3>Наслов</h3>
+            <h3>Title</h3>
             <button class="ln-icon-close" data-ln-modal-close></button>
         </header>
         <main>
-            <p>Содржина на модалот...</p>
+            <p>Modal content...</p>
         </main>
         <footer>
-            <button data-ln-modal-close>Откажи</button>
-            <button class="btn-primary">Зачувај</button>
+            <button data-ln-modal-close>Cancel</button>
+            <button class="btn-primary">Save</button>
         </footer>
     </div>
 </div>
 ```
 
-> **Иконки:** Close копчето користи `.ln-icon-close` класа — НИКОГАШ `&times;` карактер.
-> `@include close-button` е веќе аплициран на `button[data-ln-modal-close]` во `ln-modal.scss`.
+> **Icons:** The close button uses the `.ln-icon-close` class — NEVER use `&times;` character.
+> `@include close-button` is already applied on `button[data-ln-modal-close]` in `ln-modal.scss`.
 
-## Големини
+## Sizes
 
 ```html
 <div class="ln-modal__content ln-modal__content--sm">...</div>
