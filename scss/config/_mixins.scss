@@ -317,6 +317,7 @@
 	@include justify-between;
 	@include px(1rem);
 	@include py(0.625rem);
+	min-height: 3.5rem;
 	@include bg-secondary;
 	@include border-b;
 
