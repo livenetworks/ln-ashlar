@@ -23,7 +23,7 @@
   }
   function b(t) {
     for (const r of t) {
-      if (r[l + "Trigger"]) continue;
+      if (r[l + "Trigger"] || r.hostname && r.hostname !== window.location.hostname) continue;
       const o = r.getAttribute("href");
       o && o.includes("#") || (r[l + "Trigger"] = !0, r.addEventListener("click", function(n) {
         if (n.ctrlKey || n.metaKey || n.button === 1) return;
