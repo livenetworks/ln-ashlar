@@ -2,7 +2,6 @@
 	const DOM_SELECTOR = 'data-ln-link';
 	const DOM_ATTRIBUTE = 'lnLink';
 
-	// Prevent duplicate initialization
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	// ─── Helpers ───────────────────────────────────────────────
@@ -15,7 +14,7 @@
 	}
 
 	function _dispatchCancelable(element, eventName, detail) {
-		var event = new CustomEvent(eventName, {
+		const event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: detail || {}
@@ -26,7 +25,7 @@
 
 	// ─── Status Bar ────────────────────────────────────────────
 
-	var _statusEl = null;
+	let _statusEl = null;
 
 	function _createStatusBar() {
 		_statusEl = document.createElement('div');
@@ -48,24 +47,20 @@
 	// ─── Click Handler ─────────────────────────────────────────
 
 	function _handleClick(row, e) {
-		// Don't intercept clicks on interactive elements
 		if (e.target.closest('a, button, input, select, textarea')) return;
 
-		var link = row.querySelector('a');
+		const link = row.querySelector('a');
 		if (!link) return;
 
-		var href = link.getAttribute('href');
+		const href = link.getAttribute('href');
 		if (!href) return;
 
-		// Ctrl/Meta/middle-click → open in new tab (native behavior)
 		if (e.ctrlKey || e.metaKey || e.button === 1) {
 			window.open(href, '_blank');
 			return;
 		}
 
-		// Normal click → trigger click on the link
-		// .click() triggers both event listeners (ln-ajax) and native navigation
-		var before = _dispatchCancelable(row, 'ln-link:navigate', { target: row, href: href, link: link });
+		const before = _dispatchCancelable(row, 'ln-link:navigate', { target: row, href: href, link: link });
 		if (before.defaultPrevented) return;
 		link.click();
 	}
@@ -73,10 +68,10 @@
 	// ─── Hover Handlers ────────────────────────────────────────
 
 	function _handleMouseEnter(row) {
-		var link = row.querySelector('a');
+		const link = row.querySelector('a');
 		if (!link) return;
 
-		var href = link.getAttribute('href');
+		const href = link.getAttribute('href');
 		if (href) _showStatus(href);
 	}
 
@@ -87,10 +82,9 @@
 	// ─── Row Initialization ────────────────────────────────────
 
 	function _initRow(row) {
-		if (row._lnLinkInit) return;
-		row._lnLinkInit = true;
+		if (row[DOM_ATTRIBUTE + 'Row']) return;
+		row[DOM_ATTRIBUTE + 'Row'] = true;
 
-		// Only init rows that actually contain a link
 		if (!row.querySelector('a')) return;
 
 		row.addEventListener('click', function (e) {
@@ -107,20 +101,19 @@
 	// ─── Container Initialization ──────────────────────────────
 
 	function _initContainer(container) {
-		if (container._lnLinkInit) return;
-		container._lnLinkInit = true;
+		if (container[DOM_ATTRIBUTE + 'Init']) return;
+		container[DOM_ATTRIBUTE + 'Init'] = true;
 
-		var tag = container.tagName;
+		const tag = container.tagName;
 
 		if (tag === 'TABLE' || tag === 'TBODY') {
-			// Table mode: each <tr> in <tbody> becomes clickable
-			var tbody = (tag === 'TABLE') ? container.querySelector('tbody') || container : container;
-			var rows = tbody.querySelectorAll('tr');
-			rows.forEach(_initRow);
+			const tbody = (tag === 'TABLE') ? container.querySelector('tbody') || container : container;
+			for (const row of tbody.querySelectorAll('tr')) {
+				_initRow(row);
+			}
 		} else if (tag === 'TR') {
 			_initRow(container);
 		} else {
-			// Generic container: the element itself is clickable
 			_initRow(container);
 		}
 	}
@@ -128,36 +121,34 @@
 	// ─── Find & Init ───────────────────────────────────────────
 
 	function _findElements(root) {
-		// Check if root itself has the attribute
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			_initContainer(root);
 		}
 
-		// Check descendants
-		var containers = root.querySelectorAll ? root.querySelectorAll('[' + DOM_SELECTOR + ']') : [];
-		containers.forEach(_initContainer);
+		const containers = root.querySelectorAll ? root.querySelectorAll('[' + DOM_SELECTOR + ']') : [];
+		for (const c of containers) {
+			_initContainer(c);
+		}
 	}
 
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							_findElements(node);
 
-							// If a new <tr> is added inside an already-initialized container,
-							// init the row directly
 							if (node.tagName === 'TR') {
-								var parent = node.closest('[' + DOM_SELECTOR + ']');
+								const parent = node.closest('[' + DOM_SELECTOR + ']');
 								if (parent) _initRow(node);
 							}
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {

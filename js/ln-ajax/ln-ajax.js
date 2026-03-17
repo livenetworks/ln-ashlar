@@ -2,10 +2,7 @@
 	const DOM_SELECTOR = 'data-ln-ajax';
 	const DOM_ATTRIBUTE = 'lnAjax';
 
-	// If component already defined, return
-	if (window[DOM_ATTRIBUTE] !== undefined) {
-		return;
-	}
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	function _dispatch(element, eventName, detail) {
 		element.dispatchEvent(new CustomEvent(eventName, {
@@ -15,7 +12,7 @@
 	}
 
 	function _dispatchCancelable(element, eventName, detail) {
-		var event = new CustomEvent(eventName, {
+		const event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: detail || {}
@@ -25,14 +22,8 @@
 	}
 
 	function _constructor(domRoot) {
-		if (!domRoot.hasAttribute(DOM_SELECTOR)) {
-			return;
-		}
-
-		// Prevent double initialization
-		if (domRoot[DOM_ATTRIBUTE]) {
-			return;
-		}
+		if (!domRoot.hasAttribute(DOM_SELECTOR)) return;
+		if (domRoot[DOM_ATTRIBUTE]) return;
 		domRoot[DOM_ATTRIBUTE] = true;
 
 		const items = _findElements(domRoot);
@@ -41,20 +32,19 @@
 	}
 
 	function _attachLinksAjax(links) {
-		links.forEach(function (link) {
-			if (link._lnAjaxAttached) return;
+		for (const link of links) {
+			if (link[DOM_ATTRIBUTE + 'Trigger']) continue;
 
-			// Exclude links with #anchor structure
+			// Skip external links — CORS blocks them and they should open normally
+			if (link.hostname && link.hostname !== window.location.hostname) continue;
+
 			const href = link.getAttribute('href');
-			if (href && href.includes('#')) return;
+			if (href && href.includes('#')) continue;
 
-			link._lnAjaxAttached = true;
+			link[DOM_ATTRIBUTE + 'Trigger'] = true;
 
 			link.addEventListener('click', function (e) {
-				// Allow ctrl/cmd + click and middle-click (open in new tab)
-				if (e.ctrlKey || e.metaKey || e.button === 1) {
-					return;
-				}
+				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 
 				e.preventDefault();
 				const url = link.getAttribute('href');
@@ -62,13 +52,13 @@
 					_makeAjaxRequest('GET', url, null, link);
 				}
 			});
-		});
+		}
 	}
 
 	function _attachFormsAjax(forms) {
-		forms.forEach(function (form) {
-			if (form._lnAjaxAttached) return;
-			form._lnAjaxAttached = true;
+		for (const form of forms) {
+			if (form[DOM_ATTRIBUTE + 'Trigger']) continue;
+			form[DOM_ATTRIBUTE + 'Trigger'] = true;
 
 			form.addEventListener('submit', function (e) {
 				e.preventDefault();
@@ -76,24 +66,24 @@
 				const action = form.action;
 				const formData = new FormData(form);
 
-				form.querySelectorAll('button, input[type="submit"]').forEach(function (btn) {
+				for (const btn of form.querySelectorAll('button, input[type="submit"]')) {
 					btn.disabled = true;
-				});
+				}
 
 				_makeAjaxRequest(method, action, formData, form, function () {
-					form.querySelectorAll('button, input[type="submit"]').forEach(function (btn) {
+					for (const btn of form.querySelectorAll('button, input[type="submit"]')) {
 						btn.disabled = false;
-					});
+					}
 				});
 			});
-		});
+		}
 	}
 
 	function _makeAjaxRequest(method, url, data, element, callback) {
-		var before = _dispatchCancelable(element, 'ln-ajax:before-start', { method: method, url: url });
+		const before = _dispatchCancelable(element, 'ln-ajax:before-start', { method: method, url: url });
 		if (before.defaultPrevented) return;
 
-		_dispatch(element, 'ln-ajax:start', { method, url });
+		_dispatch(element, 'ln-ajax:start', { method: method, url: url });
 
 		element.classList.add('ln-ajax--loading');
 		const spinner = document.createElement('span');
@@ -136,14 +126,14 @@
 		}
 
 		fetch(finalUrl, options)
-			.then(response => response.json())
-			.then(data => {
+			.then(function (response) { return response.json(); })
+			.then(function (data) {
 				if (data.title) {
 					document.title = data.title;
 				}
 
 				if (data.content) {
-					for (let targetId in data.content) {
+					for (const targetId in data.content) {
 						const targetElement = document.getElementById(targetId);
 						if (targetElement) {
 							targetElement.innerHTML = data.content[targetId];
@@ -160,13 +150,13 @@
 					window.history.pushState({ ajax: true }, '', finalUrl);
 				}
 
-				_dispatch(element, 'ln-ajax:success', { method, url: finalUrl, data });
-				_dispatch(element, 'ln-ajax:complete', { method, url: finalUrl });
+				_dispatch(element, 'ln-ajax:success', { method: method, url: finalUrl, data: data });
+				_dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
 			})
-			.catch(error => {
-				_dispatch(element, 'ln-ajax:error', { method, url: finalUrl, error });
-				_dispatch(element, 'ln-ajax:complete', { method, url: finalUrl });
+			.catch(function (error) {
+				_dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, error: error });
+				_dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
 			});
 	}
@@ -188,30 +178,28 @@
 
 	function _domObserver() {
 		const observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							_constructor(node);
 
 							if (!node.hasAttribute(DOM_SELECTOR)) {
-								node.querySelectorAll('[' + DOM_SELECTOR + ']').forEach(function (el) {
+								for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
 									_constructor(el);
-								});
+								}
 
-								// Node injected inside an already-initialized root — attach handlers to its links/forms
-								var ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
+								const ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
 								if (ajaxRoot && ajaxRoot.getAttribute(DOM_SELECTOR) !== 'false') {
-									var items = _findElements(node);
-									console.log('[ln-ajax] re-attach on injected node:', node, 'links:', items.links.length, 'forms:', items.forms.length);
+									const items = _findElements(node);
 									_attachLinksAjax(items.links);
 									_attachFormsAjax(items.forms);
 								}
 							}
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {
@@ -221,9 +209,9 @@
 	}
 
 	function _initializeAll() {
-		document.querySelectorAll('[' + DOM_SELECTOR + ']').forEach(function (element) {
+		for (const element of document.querySelectorAll('[' + DOM_SELECTOR + ']')) {
 			_constructor(element);
-		});
+		}
 	}
 
 	window[DOM_ATTRIBUTE] = _constructor;

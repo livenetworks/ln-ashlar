@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,26 +18,26 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Modal</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'JS модал компонента.'})">Test Toast</button>
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'JS modal component.'})">Test Toast</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -48,7 +48,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -60,7 +60,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -68,6 +68,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -89,11 +90,11 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Modal</h1>
-					<p>JS компонента за модални прозорци. Отвора/затвора преку <code>data-ln-modal</code>. ESC затвора.</p>
+					<p>JS component for modal windows. Opens/closes via <code>data-ln-modal</code>. ESC closes.</p>
 
 		<!-- Triggers -->
 		<section class="section-card">
-			<header><h3>Примери</h3></header>
+			<header><h3>Examples</h3></header>
 			<main>
 				<nav class="demo-actions">
 					<button data-ln-modal="demo-basic" class="btn">Basic Modal</button>
@@ -108,14 +109,14 @@
 			<div class="ln-modal__content">
 				<header>
 					<h3>Basic Modal</h3>
-					<button class="ln-icon-close" data-ln-modal-close></button>
+					<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 				</header>
 				<main>
-					<p>Ова е основен модал со наслов и содржина.</p>
-					<p>Притисни ESC или кликни затвори.</p>
+					<p>This is a basic modal with a title and content.</p>
+					<p>Press ESC or click close.</p>
 				</main>
 				<footer>
-					<button data-ln-modal-close class="btn btn--secondary">Затвори</button>
+					<button data-ln-modal-close class="btn btn--secondary">Close</button>
 				</footer>
 			</div>
 		</div>
@@ -124,32 +125,32 @@
 		<div class="ln-modal" id="demo-form">
 			<div class="ln-modal__content">
 				<header>
-					<h3>Додај корисник</h3>
-					<button class="ln-icon-close" data-ln-modal-close></button>
+					<h3>Add User</h3>
+					<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 				</header>
 				<main>
 					<form>
-						<div class="form-group">
-							<label for="m-name">Име</label>
-							<input type="text" id="m-name" placeholder="Внесете име...">
-						</div>
-						<div class="form-group">
-							<label for="m-email">Email</label>
-							<input type="email" id="m-email" placeholder="email@example.com">
-						</div>
-						<div class="form-group">
-							<label for="m-role">Улога</label>
-							<select id="m-role">
-								<option>Корисник</option>
-								<option>Администратор</option>
-								<option>Модератор</option>
+						<label>
+							Name
+							<input type="text" placeholder="Enter name...">
+						</label>
+						<label>
+							Email
+							<input type="email" placeholder="email@example.com">
+						</label>
+						<label>
+							Role
+							<select>
+								<option>User</option>
+								<option>Administrator</option>
+								<option>Moderator</option>
 							</select>
-						</div>
+						</label>
 					</form>
 				</main>
 				<footer>
-					<button data-ln-modal-close class="btn btn--secondary">Откажи</button>
-					<button type="submit" class="btn">Зачувај</button>
+					<button data-ln-modal-close class="btn btn--secondary">Cancel</button>
+					<button type="submit" class="btn">Save</button>
 				</footer>
 			</div>
 		</div>
@@ -158,22 +159,22 @@
 		<div class="ln-modal" id="demo-large">
 			<div class="ln-modal__content ln-modal__content--lg">
 				<header>
-					<h3>Голем модал</h3>
-					<button class="ln-icon-close" data-ln-modal-close></button>
+					<h3>Large Modal</h3>
+					<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 				</header>
 				<main>
-					<p>Поголем модал за повеќе содржина. Класата <code>.ln-modal__content--lg</code> го зголемува.</p>
+					<p>A larger modal for more content. The <code>.ln-modal__content--lg</code> class enlarges it.</p>
 					<table>
-						<thead><tr><th>Име</th><th>Статус</th><th>Бодови</th></tr></thead>
+						<thead><tr><th>Name</th><th>Status</th><th>Points</th></tr></thead>
 						<tbody>
-							<tr><td>Марко</td><td><span class="pass">OK</span></td><td class="numeric">95</td></tr>
-							<tr><td>Ана</td><td><span class="pass">OK</span></td><td class="numeric">88</td></tr>
-							<tr><td>Иван</td><td><span class="fail">Грешка</span></td><td class="numeric">42</td></tr>
+							<tr><td>Marko</td><td><span class="pass">OK</span></td><td class="numeric">95</td></tr>
+							<tr><td>Ana</td><td><span class="pass">OK</span></td><td class="numeric">88</td></tr>
+							<tr><td>Ivan</td><td><span class="fail">Error</span></td><td class="numeric">42</td></tr>
 						</tbody>
 					</table>
 				</main>
 				<footer>
-					<button data-ln-modal-close class="btn btn--secondary">Затвори</button>
+					<button data-ln-modal-close class="btn btn--secondary">Close</button>
 				</footer>
 			</div>
 		</div>
@@ -183,34 +184,34 @@
 			<header><h3>Events</h3></header>
 			<main>
 				<article>
-					<h4>Lifecycle настани</h4>
+					<h4>Lifecycle Events</h4>
 					<table>
-						<thead><tr><th>Настан</th><th>Cancelable</th><th>Кога</th><th><code>detail</code></th></tr></thead>
+						<thead><tr><th>Event</th><th>Cancelable</th><th>When</th><th><code>detail</code></th></tr></thead>
 						<tbody>
-							<tr><td><code>ln-modal:before-open</code></td><td>✅</td><td>Пред отварање</td><td><code>{ modalId, target }</code></td></tr>
-							<tr><td><code>ln-modal:open</code></td><td>❌</td><td>Модалот се отвори</td><td><code>{ modalId, target }</code></td></tr>
-							<tr><td><code>ln-modal:before-close</code></td><td>✅</td><td>Пред затварање</td><td><code>{ modalId, target }</code></td></tr>
-							<tr><td><code>ln-modal:close</code></td><td>❌</td><td>Модалот се затвори</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:before-open</code></td><td>✅</td><td>Before opening</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:open</code></td><td>❌</td><td>Modal opened</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:before-close</code></td><td>✅</td><td>Before closing</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:close</code></td><td>❌</td><td>Modal closed</td><td><code>{ modalId, target }</code></td></tr>
 						</tbody>
 					</table>
 				</article>
 				<article>
-					<h4>Живо демо</h4>
+					<h4>Live Demo</h4>
 					<nav class="demo-actions">
-						<button data-ln-modal="demo-events" class="btn btn--secondary">Отвори модал (следи events)</button>
+						<button data-ln-modal="demo-events" class="btn btn--secondary">Open modal (track events)</button>
 					</nav>
-					<output id="modal-event-log">Уште нема настани.</output>
+					<output id="modal-event-log">No events yet.</output>
 				</article>
 				<article>
-					<h4>Код</h4>
-					<pre><code>// Откажи отварање условно (cancelable)
+					<h4>Code</h4>
+					<pre><code>// Cancel opening conditionally (cancelable)
 document.addEventListener('ln-modal:before-open', function(e) {
     if (e.detail.modalId === 'confirm-dialog' &amp;&amp; !formIsValid()) {
-        e.preventDefault(); // модалот нема да се отвори
+        e.preventDefault(); // the modal will not open
     }
 });
 
-// Спречи затварање (unsaved changes)
+// Prevent closing (unsaved changes)
 document.getElementById('edit-modal').addEventListener('ln-modal:before-close', function(e) {
     if (hasUnsavedChanges()) {
         e.preventDefault();
@@ -218,12 +219,12 @@ document.getElementById('edit-modal').addEventListener('ln-modal:before-close', 
 });
 
 document.addEventListener('ln-modal:open', function(e) {
-    console.log('Отворен:', e.detail.modalId);
+    console.log('Opened:', e.detail.modalId);
 });
 
 document.addEventListener('ln-modal:close', function(e) {
     if (e.detail.modalId === 'confirm-dialog') {
-        // reset форма, исчисти state итн.
+        // reset form, clear state etc.
     }
 });</code></pre>
 				</article>
@@ -234,14 +235,14 @@ document.addEventListener('ln-modal:close', function(e) {
 		<div class="ln-modal" id="demo-events">
 			<div class="ln-modal__content ln-modal__content--sm">
 				<header>
-					<h3>Events демо</h3>
-					<button class="ln-icon-close" data-ln-modal-close></button>
+					<h3>Events Demo</h3>
+					<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 				</header>
 				<main>
-					<p>Отварањето и затварањето на овој модал испраќа <code>ln-modal:open</code> и <code>ln-modal:close</code> настани.</p>
+					<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and <code>ln-modal:close</code> events.</p>
 				</main>
 				<footer>
-					<button data-ln-modal-close class="btn btn--secondary">Затвори</button>
+					<button data-ln-modal-close class="btn btn--secondary">Close</button>
 				</footer>
 			</div>
 		</div>
@@ -250,27 +251,27 @@ document.addEventListener('ln-modal:close', function(e) {
 		<section class="section-card">
 			<header><h3>HTML</h3></header>
 			<main>
-				<pre><code>&lt;!-- Trigger копче --&gt;
-&lt;button data-ln-modal="my-modal"&gt;Отвори&lt;/button&gt;
+				<pre><code>&lt;!-- Trigger button --&gt;
+&lt;button data-ln-modal="my-modal"&gt;Open&lt;/button&gt;
 
 &lt;!-- Modal --&gt;
 &lt;div class="ln-modal" id="my-modal"&gt;
     &lt;div class="ln-modal__content"&gt;
         &lt;header&gt;
-            &lt;h3&gt;Наслов&lt;/h3&gt;
+            &lt;h3&gt;Title&lt;/h3&gt;
             &lt;button class="ln-icon-close" data-ln-modal-close&gt;&lt;/button&gt;
         &lt;/header&gt;
         &lt;main&gt;
-            &lt;p&gt;Содржина...&lt;/p&gt;
+            &lt;p&gt;Content...&lt;/p&gt;
         &lt;/main&gt;
         &lt;footer&gt;
-            &lt;button data-ln-modal-close class="btn btn--secondary"&gt;Откажи&lt;/button&gt;
-            &lt;button type="submit" class="btn"&gt;Зачувај&lt;/button&gt;
+            &lt;button data-ln-modal-close class="btn btn--secondary"&gt;Cancel&lt;/button&gt;
+            &lt;button type="submit" class="btn"&gt;Save&lt;/button&gt;
         &lt;/footer&gt;
     &lt;/div&gt;
 &lt;/div&gt;
 
-&lt;!-- Големини: default, --sm, --md, --lg, --xl --&gt;
+&lt;!-- Sizes: default, --sm, --md, --lg, --xl --&gt;
 &lt;div class="ln-modal__content ln-modal__content--lg"&gt;
 
 &lt;!-- JS API --&gt;
@@ -299,7 +300,7 @@ document.addEventListener('ln-modal:close', function(e) {
 			if (!log) return;
 
 			function _update(eventName, detail) {
-				var time = new Date().toLocaleTimeString('mk');
+				var time = new Date().toLocaleTimeString('en');
 				log.textContent = eventName + ' — ' + detail.modalId + ' (' + time + ')';
 			}
 

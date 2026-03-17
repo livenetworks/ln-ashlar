@@ -9,21 +9,21 @@
 
 	function _findElements(root) {
 		if (root.nodeType !== 1) return;
-		let items = Array.from(root.querySelectorAll("[" + DOM_SELECTOR + "]"));
+		const items = Array.from(root.querySelectorAll("[" + DOM_SELECTOR + "]"));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) items.push(root);
-		items.forEach(function (el) {
+		for (const el of items) {
 			if (!el[DOM_ATTRIBUTE]) el[DOM_ATTRIBUTE] = new _component(el);
-		});
+		}
 	}
 
 	function _parseHash() {
 		const h = (location.hash || "").replace("#", "");
 		const map = {};
 		if (!h) return map;
-		h.split("&").forEach(function (part) {
+		for (const part of h.split("&")) {
 			const sep = part.indexOf(":");
 			if (sep > 0) map[part.slice(0, sep)] = part.slice(sep + 1);
-		});
+		}
 		return map;
 	}
 
@@ -50,31 +50,38 @@
 		this.nsKey        = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
 		this.hashEnabled  = !!this.nsKey;
 
-		this.tabs.forEach((t) => {
-			t.addEventListener("click", () => {
+		const self = this;
+		this._clickHandlers = [];
+		for (const t of this.tabs) {
+			if (t[DOM_ATTRIBUTE + 'Trigger']) continue;
+			t[DOM_ATTRIBUTE + 'Trigger'] = true;
+			const handler = function (e) {
+				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				const key = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
 				if (!key) return;
-				if (this.hashEnabled) {
+				if (self.hashEnabled) {
 					const map = _parseHash();
-					map[this.nsKey] = key;
+					map[self.nsKey] = key;
 					const newHash = Object.keys(map).map(function (k) { return k + ":" + map[k]; }).join("&");
-					if (location.hash === "#" + newHash) this.activate(key);
+					if (location.hash === "#" + newHash) self.activate(key);
 					else location.hash = newHash;
 				} else {
-					this.activate(key);
+					self.activate(key);
 				}
-			});
-		});
+			};
+			t.addEventListener("click", handler);
+			self._clickHandlers.push({ el: t, handler: handler });
+		}
 
-		this._hashHandler = () => {
-			if (!this.hashEnabled) return;
+		this._hashHandler = function () {
+			if (!self.hashEnabled) return;
 			const map = _parseHash();
-			this.activate(this.nsKey in map ? map[this.nsKey] : this.defaultKey);
+			self.activate(self.nsKey in map ? map[self.nsKey] : self.defaultKey);
 		};
 
 		if (this.hashEnabled) {
 			window.addEventListener("hashchange", this._hashHandler);
-			this._hashHandler(); // initial
+			this._hashHandler();
 		} else {
 			this.activate(this.defaultKey);
 		}
@@ -105,6 +112,18 @@
 		_dispatch(this.dom, 'ln-tabs:change', { key: key, tab: this.mapTabs[key], panel: this.mapPanels[key] });
 	};
 
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		for (const { el, handler } of this._clickHandlers) {
+			el.removeEventListener("click", handler);
+		}
+		if (this.hashEnabled) {
+			window.removeEventListener("hashchange", this._hashHandler);
+		}
+		_dispatch(this.dom, 'ln-tabs:destroyed', { target: this.dom });
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
 	function _dispatch(element, eventName, detail) {
 		element.dispatchEvent(new CustomEvent(eventName, {
 			bubbles: true,
@@ -114,9 +133,9 @@
 
 	function _domObserver() {
 		const observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
-				mutation.addedNodes.forEach(function (node) { _findElements(node); });
-			});
+			for (const mutation of mutations) {
+				for (const node of mutation.addedNodes) { _findElements(node); }
+			}
 		});
 		observer.observe(document.body, { childList: true, subtree: true });
 	}

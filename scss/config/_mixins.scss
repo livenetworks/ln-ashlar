@@ -316,12 +316,13 @@
 	@include items-center;
 	@include justify-between;
 	@include px(1rem);
-	@include py(0.625rem);
+	@include py(0.5rem);
+	min-height: 3.25rem;
 	@include bg-secondary;
 	@include border-b;
 
 	h3 {
-		@include text-base;
+		@include text-lg;
 		@include font-semibold;
 		@include text-primary;
 		margin: 0;

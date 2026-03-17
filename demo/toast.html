@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,28 +17,28 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Toast</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Toast нотификација компонента.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Toast notification component.'})">
 						Test Toast
 					</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -49,7 +49,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -61,7 +61,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -69,6 +69,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -90,26 +91,26 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Toast</h1>
-					<p>Нотификации со страничен accent и иконка. Автоматски исчезнуваат после 6 секунди.</p>
+					<p>Notifications with a side accent and icon. They automatically disappear after 6 seconds.</p>
 
 					<!-- Triggers -->
 					<section class="section-card">
-						<header><h3>Примери</h3></header>
+						<header><h3>Examples</h3></header>
 						<main>
 							<nav class="demo-actions">
-								<button onclick="window.lnToast.enqueue({type:'success', title:'Успешно', message:'Записот е зачуван.'})" class="btn">Success</button>
-								<button onclick="window.lnToast.enqueue({type:'error', title:'Грешка', message:'Нешто не е во ред.'})" class="btn btn--danger">Error</button>
-								<button onclick="window.lnToast.enqueue({type:'warn', title:'Внимание', message:'Проверете ги податоците.'})" class="btn btn--secondary">Warning</button>
-								<button onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Нова верзија е достапна.'})" class="btn btn--secondary">Info</button>
+								<button onclick="window.lnToast.enqueue({type:'success', title:'Success', message:'The record has been saved.'})" class="btn">Success</button>
+								<button onclick="window.lnToast.enqueue({type:'error', title:'Error', message:'Something went wrong.'})" class="btn btn--danger">Error</button>
+								<button onclick="window.lnToast.enqueue({type:'warn', title:'Warning', message:'Please check the data.'})" class="btn btn--secondary">Warning</button>
+								<button onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'A new version is available.'})" class="btn btn--secondary">Info</button>
 							</nav>
 						</main>
 					</section>
 
 					<!-- Error with list -->
 					<section class="section-card">
-						<header><h3>Error со листа на грешки</h3></header>
+						<header><h3>Error with a list of errors</h3></header>
 						<main>
-							<button onclick="window.lnToast.enqueue({type:'error', title:'Валидација', message:['Името е задолжително','Email форматот е погрешен','Лозинката е прекратка']})" class="btn btn--danger">Покажи validation errors</button>
+							<button onclick="window.lnToast.enqueue({type:'error', title:'Validation', message:['Name is required','Email format is incorrect','Password is too short']})" class="btn btn--danger">Show validation errors</button>
 						</main>
 					</section>
 
@@ -117,33 +118,33 @@
 					<section class="section-card">
 						<header><h3>HTML &amp; JS API</h3></header>
 						<main>
-							<pre><code>&lt;!-- Toast container (еднаш на страница) --&gt;
+							<pre><code>&lt;!-- Toast container (once per page) --&gt;
 &lt;div data-ln-toast&gt;&lt;/div&gt;
 
 &lt;!-- JS API --&gt;
 &lt;script&gt;
-// Основен toast
+// Basic toast
 window.lnToast.enqueue({
     type: 'success',     // success | error | warn | info
-    title: 'Наслов',
-    message: 'Опис...'
+    title: 'Title',
+    message: 'Description...'
 });
 
-// Error со листа
+// Error with list
 window.lnToast.enqueue({
     type: 'error',
-    title: 'Валидација',
-    message: ['Грешка 1', 'Грешка 2', 'Грешка 3']
+    title: 'Validation',
+    message: ['Error 1', 'Error 2', 'Error 3']
 });
 
-// Исчисти сите
+// Clear all
 window.lnToast.clear();
 &lt;/script&gt;
 
-&lt;!-- Статичен toast (хидриран при init) --&gt;
+&lt;!-- Static toast (hydrated on init) --&gt;
 &lt;div data-ln-toast&gt;
     &lt;div data-ln-toast-item data-type="success" data-title="OK"&gt;
-        Зачувано!
+        Saved!
     &lt;/div&gt;
 &lt;/div&gt;</code></pre>
 						</main>

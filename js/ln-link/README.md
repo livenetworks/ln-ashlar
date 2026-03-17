@@ -1,83 +1,83 @@
 # ln-link
 
-Clickable rows компонента — прави цели редови (или други елементи) клик-навигабилни врз основа на `<a>` линк внатре.
-Поддржува табели, листи и генерички контејнери. Покажува URL preview (status bar) при hover.
+Clickable rows component — makes entire rows (or other elements) click-navigable based on an `<a>` link inside.
+Supports tables, lists, and generic containers. Shows URL preview (status bar) on hover.
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
+| Attribute | On | Description |
 |---------|-----|------|
-| `data-ln-link` | `<table>`, `<tbody>`, `<tr>`, или друг елемент | Активира clickable row однесување |
+| `data-ln-link` | `<table>`, `<tbody>`, `<tr>`, or other element | Activates clickable row behavior |
 
-## Однесување
+## Behavior
 
-- Клик на ред (надвор од `<a>`, `<button>`, `<input>`, `<select>`, `<textarea>`) → навигира до `href` на prviot `<a>` во редот
-- Ctrl/Cmd+Click и middle-click → отвора во нов таб (`window.open`)
-- Hover → покажува URL во status bar (долу-лево, browser-стил)
-- `<table>` / `<tbody>` режим: секој `<tr>` со `<a>` внатре станува клик-навигабилен
-- `<tr>` режим: директно на конкретен ред
-- Генерички режим: самиот елемент е клик-навигабилен
+- Click on a row (outside of `<a>`, `<button>`, `<input>`, `<select>`, `<textarea>`) → navigates to the `href` of the first `<a>` in the row
+- Ctrl/Cmd+Click and middle-click → opens in a new tab (`window.open`)
+- Hover → shows URL in the status bar (bottom-left, browser-style)
+- `<table>` / `<tbody>` mode: each `<tr>` with an `<a>` inside becomes click-navigable
+- `<tr>` mode: directly on a specific row
+- Generic mode: the element itself is click-navigable
 
-## HTML структура
+## HTML Structure
 
 ```html
-<!-- Табела — сите редови стануваат clickable -->
+<!-- Table — all rows become clickable -->
 <table data-ln-link>
     <thead>
-        <tr><th>Корисник</th><th>Улога</th><th>Акции</th></tr>
+        <tr><th>User</th><th>Role</th><th>Actions</th></tr>
     </thead>
     <tbody>
         <tr>
-            <td><a href="/users/1">Марко</a></td>
+            <td><a href="/users/1">Marko</a></td>
             <td>Admin</td>
             <td>
-                <!-- Копчиња внатре во ред НЕ го активираат row click -->
-                <button class="btn btn--sm">Уреди</button>
+                <!-- Buttons inside a row do NOT trigger the row click -->
+                <button class="btn btn--sm">Edit</button>
             </td>
         </tr>
     </tbody>
 </table>
 
-<!-- Листа на картички -->
+<!-- List of cards -->
 <ul data-ln-link>
     <li>
-        <a href="/projects/1"><h3>Проект 1</h3></a>
-        <p>Опис на проектот</p>
+        <a href="/projects/1"><h3>Project 1</h3></a>
+        <p>Project description</p>
     </li>
     <li>
-        <a href="/projects/2"><h3>Проект 2</h3></a>
-        <p>Опис на проектот</p>
+        <a href="/projects/2"><h3>Project 2</h3></a>
+        <p>Project description</p>
     </li>
 </ul>
 ```
 
 ## Events
 
-Настанот се dispatch-ува на редот (row/element) и bubble-ира нагоре.
+The event is dispatched on the row (row/element) and bubbles up.
 
-| Настан | Cancelable | Кога | `detail` |
+| Event | Cancelable | When | `detail` |
 |--------|-----------|------|----------|
-| `ln-link:navigate` | ✅ | Пред навигација (може да се откаже) | `{ target, href, link }` |
+| `ln-link:navigate` | ✅ | Before navigation (can be canceled) | `{ target, href, link }` |
 
 ```javascript
-// Откажи навигација условно
+// Cancel navigation conditionally
 document.addEventListener('ln-link:navigate', function(e) {
-    if (!confirm('Сигурно сакате да одите на: ' + e.detail.href + '?')) {
+    if (!confirm('Are you sure you want to go to: ' + e.detail.href + '?')) {
         e.preventDefault();
     }
 });
 
-// Логирај навигација
+// Log navigation
 document.querySelector('table[data-ln-link]').addEventListener('ln-link:navigate', function(e) {
     analytics.track('row_click', { href: e.detail.href });
-    // не викај e.preventDefault() — навигацијата продолжува нормално
+    // don't call e.preventDefault() — navigation continues normally
 });
 ```
 
-## CSS стилизирање
+## CSS Styling
 
 ```scss
-// Clickable ред — cursor pointer + hover
+// Clickable row — cursor pointer + hover
 table[data-ln-link] tbody tr {
     cursor: pointer;
     @include transition;
@@ -91,6 +91,6 @@ table[data-ln-link] tbody tr {
 ## API
 
 ```javascript
-// Рачна иницијализација
+// Manual initialization
 window.lnLink.init(document.getElementById('my-table'));
 ```

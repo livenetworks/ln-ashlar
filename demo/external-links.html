@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,7 @@
 	<script src="../js/ln-toast/ln-toast.js" defer></script>
 	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
 	<script src="../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../js/ln-modal/ln-modal.js" defer></script>
 	<script src="../js/ln-external-links/ln-external-links.js" defer></script>
 	<script src="demo.js" defer></script>
 </head>
@@ -18,28 +19,28 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>External Links</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'External links обработувач.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'External links handler.'})">
 						Test Toast
 					</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -50,7 +51,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -62,7 +63,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -70,6 +71,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -91,27 +93,27 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>External Links</h1>
-					<p>Utility компонента која автоматски ги обработува надворешните линкови за безбедност и tracking. <strong>Нема потреба од data attribute — работи автоматски.</strong></p>
+					<p>Utility component that automatically handles external links for security and tracking. <strong>No data attribute needed — it works automatically.</strong></p>
 
-					<!-- Основи -->
+					<!-- Basics -->
 					<section class="section-card">
-						<header><h3>Основи</h3></header>
+						<header><h3>Basics</h3></header>
 						<main>
 							<article>
-								<h4>Што оди?</h4>
-								<p>За секој линк чиј <code>hostname</code> се разликува од <code>window.location.hostname</code>:</p>
+								<h4>What happens?</h4>
+								<p>For every link whose <code>hostname</code> differs from <code>window.location.hostname</code>:</p>
 								<ol>
-									<li>Добива <code>target="_blank"</code> (отвора во нов tab)</li>
-									<li>Добива <code>rel="noopener noreferrer"</code> (безбедност)</li>
-									<li>Се означува со <code>data-ln-external-link="processed"</code></li>
+									<li>Gets <code>target="_blank"</code> (opens in a new tab)</li>
+									<li>Gets <code>rel="noopener noreferrer"</code> (security)</li>
+									<li>Gets marked with <code>data-ln-external-link="processed"</code></li>
 								</ol>
 							</article>
 							<article>
-								<h4>Пример</h4>
-								<pre><code>// Пред
+								<h4>Example</h4>
+								<pre><code>// Before
 &lt;a href="https://example.com"&gt;External link&lt;/a&gt;
 
-// По обработка (автоматски)
+// After processing (automatic)
 &lt;a href="https://example.com"
    target="_blank"
    rel="noopener noreferrer"
@@ -119,26 +121,26 @@
     External link
 &lt;/a&gt;
 
-// Внатрешни линкови остануваат исти
+// Internal links remain the same
 &lt;a href="/dashboard"&gt;Dashboard&lt;/a&gt;</code></pre>
 							</article>
 						</main>
 					</section>
 
-					<!-- Примери -->
-					<section class="section-card">
-						<header><h3>Демо примери</h3></header>
+					<!-- Examples -->
+					<section class="section-card" id="external-links-demo">
+						<header><h3>Demo examples</h3></header>
 						<main>
-							<article class="demo-link-group">
-								<h5>Надворешни линкови (ќе се обработат)</h5>
+							<article>
+								<h5>External links (will be processed)</h5>
 								<ul>
 									<li><a href="https://github.com">GitHub</a></li>
 									<li><a href="https://www.mozilla.org">Mozilla</a></li>
 									<li><a href="https://example.com/page">Example.com</a></li>
 								</ul>
 							</article>
-							<article class="demo-link-group">
-								<h5>Внатрешни линкови (нема промена)</h5>
+							<article>
+								<h5>Internal links (no change)</h5>
 								<ul>
 									<li><a href="/">Homepage</a></li>
 									<li><a href="/index.html">Dashboard</a></li>
@@ -153,21 +155,21 @@
 						<header><h3>API</h3></header>
 						<main>
 							<article>
-								<h4>Рачна обработка на нов DOM</h4>
-								<pre><code>// По динамичко додавање на HTML
+								<h4>Manual processing of new DOM</h4>
+								<pre><code>// After dynamically adding HTML
 var newContent = document.getElementById('new-content');
 window.lnExternalLinks.process(newContent);
 
-// Обработи цела страница
+// Process the entire page
 window.lnExternalLinks.process();</code></pre>
 							</article>
 							<article>
-								<h4>Пример за динамичка содржина</h4>
-								<pre><code>// Додај нов HTML динамички
+								<h4>Dynamic content example</h4>
+								<pre><code>// Add new HTML dynamically
 var html = '&lt;a href="https://new-site.com"&gt;Link&lt;/a&gt;';
 document.getElementById('content').innerHTML += html;
 
-// Рачно обработи го новиот HTML
+// Manually process the new HTML
 window.lnExternalLinks.process(
     document.getElementById('content')
 );</code></pre>
@@ -180,76 +182,76 @@ window.lnExternalLinks.process(
 						<header><h3>Events</h3></header>
 						<main>
 							<table>
-								<thead><tr><th>Event</th><th>Bubbles</th><th>Detail</th><th>Кога</th></tr></thead>
+								<thead><tr><th>Event</th><th>Bubbles</th><th>Detail</th><th>When</th></tr></thead>
 								<tbody>
 									<tr>
 										<td><code>ln-external-links:processed</code></td>
-										<td>да</td>
+										<td>yes</td>
 										<td><code>{ link, href }</code></td>
-										<td>Кога линкот е обработен</td>
+										<td>When the link is processed</td>
 									</tr>
 									<tr>
 										<td><code>ln-external-links:clicked</code></td>
-										<td>да</td>
+										<td>yes</td>
 										<td><code>{ link, href, text }</code></td>
-										<td>Кога корисникот клика на надворешен линк</td>
+										<td>When the user clicks an external link</td>
 									</tr>
 								</tbody>
 							</table>
 						</main>
 					</section>
 
-					<!-- Tracking пример -->
+					<!-- Tracking example -->
 					<section class="section-card">
-						<header><h3>Tracking пример</h3></header>
+						<header><h3>Tracking example</h3></header>
 						<main>
-							<pre><code>// Слушај кога корисникот клика надворешен линк
+							<pre><code>// Listen when the user clicks an external link
 document.addEventListener('ln-external-links:clicked', function(e) {
     var href = e.detail.href;
     var text = e.detail.text;
-    
-    // Испрати tracking
+
+    // Send tracking
     console.log('External link clicked:', href, text);
-    
-    // Пример: Google Analytics
+
+    // Example: Google Analytics
     // gtag('event', 'external_link', {
     //     'event_label': text,
     //     'value': href
     // });
 });
 
-// Слушај кога линкот е обработен
+// Listen when a link is processed
 document.addEventListener('ln-external-links:processed', function(e) {
     console.log('Link processed:', e.detail.href);
 });</code></pre>
 						</main>
 					</section>
 
-					<!-- HTML пример -->
+					<!-- HTML example -->
 					<section class="section-card">
-						<header><h3>HTML пример</h3></header>
+						<header><h3>HTML example</h3></header>
 						<main>
-							<pre><code>&lt;!-- Ова е сè што треба! Компонентата се активира автоматски. --&gt;
+							<pre><code>&lt;!-- This is all you need! The component activates automatically. --&gt;
 &lt;nav&gt;
-    &lt;!-- Внатрешен линк (нема промена) --&gt;
+    &lt;!-- Internal link (no change) --&gt;
     &lt;a href="/dashboard"&gt;Dashboard&lt;/a&gt;
-    
-    &lt;!-- Надворешен линк (ќе биде обработен) --&gt;
+
+    &lt;!-- External link (will be processed) --&gt;
     &lt;a href="https://example.com"&gt;External Site&lt;/a&gt;
 &lt;/nav&gt;</code></pre>
 						</main>
 					</section>
 
-					<!-- Безбедност -->
+					<!-- Security -->
 					<section class="section-card">
-						<header><h3>Безбедност</h3></header>
+						<header><h3>Security</h3></header>
 						<main>
-							<p><strong>Зошто <code>rel="noopener noreferrer"</code>?</strong></p>
+							<p><strong>Why <code>rel="noopener noreferrer"</code>?</strong></p>
 							<ul>
-								<li><code>noopener</code> — го спречува новиот tab да пристапи до <code>window.opener</code> (защита од XSS)</li>
-								<li><code>noreferrer</code> — не го испраќа Referer header (приватност)</li>
+								<li><code>noopener</code> — prevents the new tab from accessing <code>window.opener</code> (XSS protection)</li>
+								<li><code>noreferrer</code> — does not send the Referer header (privacy)</li>
 							</ul>
-							<p>Компонентата автоматски ги додава оваа атрибути за безбедност.</p>
+							<p>The component automatically adds these security attributes.</p>
 						</main>
 					</section>
 			</div>
@@ -262,5 +264,50 @@ document.addEventListener('ln-external-links:processed', function(e) {
 		</div>
 		</div><!-- /.app-body -->
 	</div><!-- /.app-wrapper -->
+
+	<!-- External link confirmation modal -->
+	<aside class="ln-modal" id="external-link-modal">
+		<section class="ln-modal__content ln-modal__content--sm">
+			<header>
+				<h3>External link</h3>
+				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+			</header>
+			<main>
+				<p>You are leaving this page and going to:</p>
+				<p id="external-link-url"></p>
+				<p>Do you want to continue?</p>
+			</main>
+			<footer>
+				<button class="btn btn--secondary" data-ln-modal-close>Cancel</button>
+				<button class="btn" id="external-link-confirm">Continue</button>
+			</footer>
+		</section>
+	</aside>
+
+	<script>
+	(function() {
+		var demo = document.getElementById('external-links-demo');
+		var pendingHref = null;
+
+		demo.addEventListener('click', function(e) {
+			var link = e.target.closest('a[data-ln-external-link="processed"]');
+			if (!link) return;
+			if (e.ctrlKey || e.metaKey || e.button === 1) return;
+
+			e.preventDefault();
+			pendingHref = link.href;
+			document.getElementById('external-link-url').textContent = pendingHref;
+			window.lnModal.open('external-link-modal');
+		});
+
+		document.getElementById('external-link-confirm').addEventListener('click', function() {
+			window.lnModal.close('external-link-modal');
+			if (pendingHref) {
+				window.open(pendingHref, '_blank', 'noopener,noreferrer');
+				pendingHref = null;
+			}
+		});
+	})();
+	</script>
 </body>
 </html>

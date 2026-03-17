@@ -19,6 +19,13 @@ Animated progress bar. File: `js/ln-progress/ln-progress.js`.
     <div data-ln-progress="30" class="green"></div>
     <div data-ln-progress="20" class="red"></div>
 </div>
+
+<!-- Stacked with shared max — fills 100% proportionally -->
+<div data-ln-progress data-ln-progress-max="15">
+    <div data-ln-progress="7" class="green"></div>
+    <div data-ln-progress="3" class="yellow"></div>
+    <div data-ln-progress="5" class="red"></div>
+</div>
 ```
 
 ## Attributes
@@ -28,6 +35,7 @@ Animated progress bar. File: `js/ln-progress/ln-progress.js`.
 | `data-ln-progress` (empty) | outer | Track container |
 | `data-ln-progress="value"` | inner | Current value |
 | `data-ln-progress-max="100"` | inner | Maximum value (default: 100) |
+| `data-ln-progress-max="N"` | outer | Shared max for stacked bars — children use this as denominator |
 
 ## Color Classes
 
@@ -50,3 +58,4 @@ bar.setAttribute('data-ln-progress', '80');
 - Width calculated as `value / max * 100%`
 - Starts at `width: 0`, animates to target via CSS transition
 - MutationObserver watches `data-ln-progress` and `data-ln-progress-max`
+- `data-ln-progress-max` on track → children fill proportionally (parent max > bar max > 100)

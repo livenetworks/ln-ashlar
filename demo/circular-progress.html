@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Circular Progress — ln-acme</title>
+	<link rel="stylesheet" href="../dist/ln-acme.css">
+	<link rel="stylesheet" href="demo.css">
+	<script src="../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../js/ln-circular-progress/ln-circular-progress.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Circular Progress</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Circular progress component.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Circular Progress</h1>
+					<p>SVG-based circular progress indicator. Reactive: automatically updates when attributes change.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-circular-progress="75"</code></td><td>Current value</td></tr>
+									<tr><td><code>data-ln-circular-progress-max="100"</code></td><td>Maximum value (default: 100)</td></tr>
+									<tr><td><code>data-ln-circular-progress-label="text"</code></td><td>Custom text in center (default: percentage)</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- CSS classes -->
+					<section class="section-card">
+						<header><h3>CSS Classes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Class</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>.green</code></td><td>Success color (green)</td></tr>
+									<tr><td><code>.yellow</code></td><td>Warning color (yellow)</td></tr>
+									<tr><td><code>.red</code></td><td>Error color (red)</td></tr>
+									<tr><td><code>.sm</code></td><td>Small size (2.5rem)</td></tr>
+									<tr><td><code>.lg</code></td><td>Large size (6rem)</td></tr>
+									<tr><td><code>.xl</code></td><td>Extra large (8rem)</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Colors -->
+					<section class="section-card">
+						<header><h3>Colors</h3></header>
+						<main>
+							<ul class="demo-circular-progress-row">
+								<li>
+									<figure data-ln-circular-progress="75"></figure>
+									<span>Default (75%)</span>
+								</li>
+								<li>
+									<figure data-ln-circular-progress="90" class="green"></figure>
+									<span>Green (90%)</span>
+								</li>
+								<li>
+									<figure data-ln-circular-progress="55" class="yellow"></figure>
+									<span>Yellow (55%)</span>
+								</li>
+								<li>
+									<figure data-ln-circular-progress="25" class="red"></figure>
+									<span>Red (25%)</span>
+								</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Sizes -->
+					<section class="section-card">
+						<header><h3>Sizes</h3></header>
+						<main>
+							<ul class="demo-circular-progress-row">
+								<li>
+									<figure data-ln-circular-progress="65" class="sm green"></figure>
+									<span>.sm (2.5rem)</span>
+								</li>
+								<li>
+									<figure data-ln-circular-progress="65" class="green"></figure>
+									<span>default (4rem)</span>
+								</li>
+								<li>
+									<figure data-ln-circular-progress="65" class="lg green"></figure>
+									<span>.lg (6rem)</span>
+								</li>
+								<li>
+									<figure data-ln-circular-progress="65" class="xl green"></figure>
+									<span>.xl (8rem)</span>
+								</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Custom label -->
+					<section class="section-card">
+						<header><h3>Custom label</h3></header>
+						<main>
+							<ul class="demo-circular-progress-row">
+								<li>
+									<figure data-ln-circular-progress="7" data-ln-circular-progress-max="10" data-ln-circular-progress-label="7/10" class="lg"></figure>
+									<span>7 out of 10</span>
+								</li>
+								<li>
+									<figure data-ln-circular-progress="85" data-ln-circular-progress-label="A+" class="lg green"></figure>
+									<span>Grade</span>
+								</li>
+								<li>
+									<figure data-ln-circular-progress="42" data-ln-circular-progress-label="42" class="lg yellow"></figure>
+									<span>Number</span>
+								</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Reactivity -->
+					<section class="section-card">
+						<header><h3>Reactivity — click to change</h3></header>
+						<main>
+							<ul class="demo-circular-progress-row">
+								<li>
+									<figure id="react-circle" data-ln-circular-progress="0" class="xl"></figure>
+								</li>
+							</ul>
+							<nav class="demo-circular-progress-buttons">
+								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '0')" class="btn btn--sm">0%</button>
+								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '25')" class="btn btn--sm">25%</button>
+								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '50')" class="btn btn--sm">50%</button>
+								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '75')" class="btn btn--sm">75%</button>
+								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '100')" class="btn btn--sm btn--primary">100%</button>
+							</nav>
+						</main>
+					</section>
+
+					<!-- HTML structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;!-- Basic usage --&gt;
+&lt;figure data-ln-circular-progress="75"&gt;&lt;/figure&gt;
+
+&lt;!-- With color and size --&gt;
+&lt;figure data-ln-circular-progress="90" class="green lg"&gt;&lt;/figure&gt;
+
+&lt;!-- With max value --&gt;
+&lt;figure data-ln-circular-progress="7"
+        data-ln-circular-progress-max="10"&gt;&lt;/figure&gt;
+
+&lt;!-- With custom label --&gt;
+&lt;figure data-ln-circular-progress="85"
+        data-ln-circular-progress-label="A+"&gt;&lt;/figure&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Manual initialization
+window.lnCircularProgress(document.body);
+
+// Change value dynamically (reactive):
+var el = document.getElementById('my-circle');
+el.setAttribute('data-ln-circular-progress', '80');
+
+// Custom label:
+el.setAttribute('data-ln-circular-progress-label', '8/10');
+
+// Event:
+el.addEventListener('ln-circular-progress:change', function(e) {
+    console.log(e.detail.percentage); // 80
+});</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>

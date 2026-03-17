@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,28 +18,28 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Tabs</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Tabs компонента со hash sync.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Tabs component with hash sync.'})">
 						Test Toast
 					</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -50,7 +50,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -62,7 +62,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -70,6 +70,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -91,30 +92,30 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Tabs</h1>
-					<p>Hash-aware табови. Синхронизирани со URL hash (<code>#tab-key</code>).</p>
+					<p>Hash-aware tabs. Synchronized with URL hash (<code>#tab-key</code>).</p>
 
-					<!-- Basic tabs — Секција 1 -->
+					<!-- Basic tabs — Section 1 -->
 					<section class="section-card">
-						<header><h3>Пример 1 — Корисник</h3></header>
+						<header><h3>Example 1 — User</h3></header>
 						<main>
 							<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
 								<nav>
-									<button data-ln-tab="info">Информации</button>
-									<button data-ln-tab="settings">Поставки</button>
-									<button data-ln-tab="history">Историја</button>
+									<button data-ln-tab="info">Information</button>
+									<button data-ln-tab="settings">Settings</button>
+									<button data-ln-tab="history">History</button>
 								</nav>
 
 								<section data-ln-panel="info">
-									<h4>Информации</h4>
-									<p>Ова е содржината на првиот таб.</p>
-									<p>Hash формат: <code>#user-tabs:info</code></p>
+									<h4>Information</h4>
+									<p>This is the content of the first tab.</p>
+									<p>Hash format: <code>#user-tabs:info</code></p>
 								</section>
 
 								<section data-ln-panel="settings" class="hidden">
-									<h4>Поставки</h4>
+									<h4>Settings</h4>
 									<label>
-										Јазик
-										<select><option>Македонски</option><option>English</option></select>
+										Language
+										<select><option>Macedonian</option><option>English</option></select>
 									</label>
 									<label>
 										Timezone
@@ -123,12 +124,12 @@
 								</section>
 
 								<section data-ln-panel="history" class="hidden">
-									<h4>Историја</h4>
+									<h4>History</h4>
 									<table>
-										<thead><tr><th>Датум</th><th>Акција</th><th>Корисник</th></tr></thead>
+										<thead><tr><th>Date</th><th>Action</th><th>User</th></tr></thead>
 										<tbody>
-											<tr><td>19.02.2026</td><td>Креирано</td><td>Марко</td></tr>
-											<tr><td>18.02.2026</td><td>Ажурирано</td><td>Ана</td></tr>
+											<tr><td>19.02.2026</td><td>Created</td><td>Marko</td></tr>
+											<tr><td>18.02.2026</td><td>Updated</td><td>Ana</td></tr>
 										</tbody>
 									</table>
 								</section>
@@ -136,38 +137,38 @@
 						</main>
 					</section>
 
-				<!-- Basic tabs — Секција 2 (независна) -->
+				<!-- Basic tabs — Section 2 (independent) -->
 					<section class="section-card">
-						<header><h3>Пример 2 — Проект</h3></header>
+						<header><h3>Example 2 — Project</h3></header>
 						<main>
 							<section id="project-tabs" data-ln-tabs data-ln-tabs-default="overview">
 								<nav>
-									<button data-ln-tab="overview">Преглед</button>
-									<button data-ln-tab="members">Членови</button>
-									<button data-ln-tab="info">Инфо</button>
+									<button data-ln-tab="overview">Overview</button>
+									<button data-ln-tab="members">Members</button>
+									<button data-ln-tab="info">Info</button>
 								</nav>
 
 								<section data-ln-panel="overview">
-									<h4>Преглед на проект</h4>
-									<p>Оваа секција е целосно независна од горната.</p>
-									<p>Hash формат: <code>#project-tabs:overview</code></p>
-									<p>И двете секции имаат таб <code>info</code> — нема collision.</p>
+									<h4>Project Overview</h4>
+									<p>This section is completely independent from the one above.</p>
+									<p>Hash format: <code>#project-tabs:overview</code></p>
+									<p>Both sections have a tab <code>info</code> — no collision.</p>
 								</section>
 
 								<section data-ln-panel="members" class="hidden">
-									<h4>Членови</h4>
+									<h4>Members</h4>
 									<table>
-										<thead><tr><th>Корисник</th><th>Улога</th></tr></thead>
+										<thead><tr><th>User</th><th>Role</th></tr></thead>
 										<tbody>
-											<tr><td>Марко</td><td>Admin</td></tr>
-											<tr><td>Ана</td><td>Editor</td></tr>
+											<tr><td>Marko</td><td>Admin</td></tr>
+											<tr><td>Ana</td><td>Editor</td></tr>
 										</tbody>
 									</table>
 								</section>
 
 								<section data-ln-panel="info" class="hidden">
-									<h4>Информации за проект</h4>
-									<p>Истиот клуч <code>info</code> постои и во секција 1 — работи независно.</p>
+									<h4>Project Information</h4>
+									<p>The same key <code>info</code> exists in section 1 as well — works independently.</p>
 								</section>
 							</section>
 						</main>
@@ -178,25 +179,25 @@
 						<header><h3>Events</h3></header>
 						<main>
 							<article>
-								<h4>Lifecycle настани</h4>
+								<h4>Lifecycle Events</h4>
 								<table>
-									<thead><tr><th>Настан</th><th>Кога</th><th><code>detail</code></th></tr></thead>
+									<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
 									<tbody>
-										<tr><td><code>ln-tabs:change</code></td><td>По активирање на нов таб</td><td><code>{ key, tab, panel }</code></td></tr>
+										<tr><td><code>ln-tabs:change</code></td><td>After activating a new tab</td><td><code>{ key, tab, panel }</code></td></tr>
 									</tbody>
 								</table>
 							</article>
 							<article>
-								<h4>Живо демо</h4>
-								<output id="tabs-event-log">Уште нема настани — кликни таб.</output>
+								<h4>Live Demo</h4>
+								<output id="tabs-event-log">No events yet — click a tab.</output>
 							</article>
 							<article>
-								<h4>Код</h4>
+								<h4>Code</h4>
 								<pre><code>document.getElementById(&#39;user-tabs&#39;).addEventListener(&#39;ln-tabs:change&#39;, function(e) {
-    console.log(&#39;Активен таб:&#39;, e.detail.key);
+    console.log(&#39;Active tab:&#39;, e.detail.key);
 });
 
-// Глобално — за сите tab секции
+// Global — for all tab sections
 document.addEventListener(&#39;ln-tabs:change&#39;, function(e) {
     analytics.track(&#39;tab_change&#39;, { tab: e.detail.key });
 });</code></pre>
@@ -208,38 +209,38 @@ document.addEventListener(&#39;ln-tabs:change&#39;, function(e) {
 					<section class="section-card">
 						<header><h3>HTML</h3></header>
 						<main>
-							<pre><code>&lt;!-- Namespace = id атрибут (или data-ln-tabs-key) --&gt;
+							<pre><code>&lt;!-- Namespace = id attribute (or data-ln-tabs-key) --&gt;
 &lt;section id="my-tabs" data-ln-tabs data-ln-tabs-default="first"&gt;
 
-    &lt;!-- Tab копчиња --&gt;
+    &lt;!-- Tab buttons --&gt;
     &lt;nav&gt;
-        &lt;button data-ln-tab="first"&gt;Прв таб&lt;/button&gt;
-        &lt;button data-ln-tab="second"&gt;Втор таб&lt;/button&gt;
+        &lt;button data-ln-tab="first"&gt;First tab&lt;/button&gt;
+        &lt;button data-ln-tab="second"&gt;Second tab&lt;/button&gt;
     &lt;/nav&gt;
 
-    &lt;!-- Панели --&gt;
+    &lt;!-- Panels --&gt;
     &lt;section data-ln-panel="first"&gt;
-        Содржина на прв таб
+        Content of the first tab
     &lt;/section&gt;
 
     &lt;section data-ln-panel="second" class="hidden"&gt;
-        Содржина на втор таб
+        Content of the second tab
     &lt;/section&gt;
 
 &lt;/section&gt;
 
-&lt;!-- Атрибути --&gt;
-id="key"                   - namespace за hash (задолжително за повеќе секции)
-data-ln-tabs-key="key"     - алтернативно, ако id не е погоден
-data-ln-tabs               - контејнер
-data-ln-tabs-default="x"   - почетен таб
-data-ln-tabs-focus         - фокусирај прв input при промена
-data-ln-tab="key"          - таб копче
-data-ln-panel="key"        - панел содржина
+&lt;!-- Attributes --&gt;
+id="key"                   - namespace for hash (required for multiple sections)
+data-ln-tabs-key="key"     - alternative, if id is not suitable
+data-ln-tabs               - container
+data-ln-tabs-default="x"   - default tab
+data-ln-tabs-focus         - focus first input on change
+data-ln-tab="key"          - tab button
+data-ln-panel="key"        - panel content
 
-&lt;!-- Hash формат: #my-tabs:second → активирај second таб --&gt;
-&lt;!-- Повеќе секции: #my-tabs:second&other-tabs:info --&gt;
-&lt;!-- Без id/data-ln-tabs-key → нема hash sync, само defaultKey --&gt;</code></pre>
+&lt;!-- Hash format: #my-tabs:second → activate second tab --&gt;
+&lt;!-- Multiple sections: #my-tabs:second&other-tabs:info --&gt;
+&lt;!-- Without id/data-ln-tabs-key → no hash sync, only defaultKey --&gt;</code></pre>
 						</main>
 					</section>
 			</div>
@@ -258,7 +259,7 @@ data-ln-panel="key"        - панел содржина
 			if (!log) return;
 
 			document.addEventListener('ln-tabs:change', function(e) {
-				var time = new Date().toLocaleTimeString('mk');
+				var time = new Date().toLocaleTimeString('en');
 				log.textContent = 'ln-tabs:change — ' + e.detail.key + ' (' + time + ')';
 			});
 		})();

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,28 +17,28 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Cards</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'CSS картички компонента.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'CSS cards component.'})">
 						Test Toast
 					</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -49,7 +49,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -61,7 +61,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -69,6 +69,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -90,20 +91,20 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Cards</h1>
-					<p>Картичка со hover ефект — primary accent линија одозгора, shadow и border промена.</p>
+					<p>Card with hover effect — primary accent line on top, shadow and border change.</p>
 
 					<!-- Basic card -->
 					<section class="section-card">
-						<header><h3>Основна картичка</h3></header>
+						<header><h3>Basic Card</h3></header>
 						<main>
 							<section id="demo-basic-cards">
 								<article>
-									<h3>Наслов на картичка</h3>
-									<p>Опис на содржината. Hover-ирај за ефект.</p>
+									<h3>Card Title</h3>
+									<p>Description of the content. Hover for effect.</p>
 								</article>
 								<article>
-									<h3>Друга картичка</h3>
-									<p>Секоја .card има ::before pseudo за горната линија.</p>
+									<h3>Another Card</h3>
+									<p>Each .card has a ::before pseudo for the top line.</p>
 								</article>
 							</section>
 						</main>
@@ -111,31 +112,31 @@
 
 					<!-- Card with fields -->
 					<section class="section-card">
-						<header><h3>Картичка со поља (.field)</h3></header>
+						<header><h3>Card with Fields (.field)</h3></header>
 						<main>
 							<div class="grid">
 								<div class="card">
-									<header><h3>Корисник</h3></header>
+									<header><h3>User</h3></header>
 									<main>
-										<div class="field"><span class="label">Име</span><span class="value">Марко</span></div>
+										<div class="field"><span class="label">Name</span><span class="value">Marko</span></div>
 										<div class="field"><span class="label">Email</span><span class="value">marko@example.com</span></div>
-										<div class="field"><span class="label">Статус</span><span class="value pass">Активен</span></div>
+										<div class="field"><span class="label">Status</span><span class="value pass">Active</span></div>
 									</main>
 								</div>
 								<div class="card">
-									<header><h3>Статистика</h3></header>
+									<header><h3>Statistics</h3></header>
 									<main>
-										<div class="field"><span class="label">Вкупно</span><span class="value">1,234</span></div>
-										<div class="field"><span class="label">Активни</span><span class="value pass">892</span></div>
-										<div class="field"><span class="label">Грешки</span><span class="value fail">12</span></div>
+										<div class="field"><span class="label">Total</span><span class="value">1,234</span></div>
+										<div class="field"><span class="label">Active</span><span class="value pass">892</span></div>
+										<div class="field"><span class="label">Errors</span><span class="value fail">12</span></div>
 									</main>
 								</div>
 								<div class="card">
 									<a href="#">
 										<main>
-											<h3>Card како линк</h3>
-											<div class="field"><span class="label">Тип</span><span class="value">Линк</span></div>
-											<div class="field"><span class="label">Кликни</span><span class="value">→</span></div>
+											<h3>Card as Link</h3>
+											<div class="field"><span class="label">Type</span><span class="value">Link</span></div>
+											<div class="field"><span class="label">Click</span><span class="value">→</span></div>
 										</main>
 									</a>
 								</div>
@@ -148,7 +149,7 @@
 						<header><h3>HTML</h3></header>
 						<main>
 							<pre><code>&lt;div class="card"&gt;
-    &lt;header&gt;&lt;h3&gt;Наслов&lt;/h3&gt;&lt;/header&gt;
+    &lt;header&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;/header&gt;
     &lt;main&gt;
         &lt;div class="field"&gt;
             &lt;span class="label"&gt;Label&lt;/span&gt;
@@ -157,10 +158,10 @@
     &lt;/main&gt;
 &lt;/div&gt;
 
-&lt;!-- Card како линк --&gt;
+&lt;!-- Card as Link --&gt;
 &lt;div class="card"&gt;
     &lt;a href="/page"&gt;
-        &lt;main&gt;&lt;h3&gt;Наслов&lt;/h3&gt;&lt;/main&gt;
+        &lt;main&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;/main&gt;
     &lt;/a&gt;
 &lt;/div&gt;</code></pre>
 						</main>

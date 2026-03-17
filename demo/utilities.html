@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,26 +17,26 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Utilities</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'CSS утилити компонента.'})">Test Toast</button>
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'CSS utilities component.'})">Test Toast</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -47,7 +47,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -59,7 +59,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -67,6 +67,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -88,26 +89,26 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Utilities</h1>
-					<p>Помошни CSS класи — директно од <code>@include</code> mixins, за употреба во HTML.</p>
+					<p>Helper CSS classes — directly from <code>@include</code> mixins, for use in HTML.</p>
 
 		<!-- Text -->
 		<section class="section-card">
 			<header><h3>Text &amp; Colors</h3></header>
 			<main>
 				<table>
-					<thead><tr><th>Класа</th><th>Резултат</th></tr></thead>
+					<thead><tr><th>Class</th><th>Result</th></tr></thead>
 					<tbody>
-						<tr><td>.text-primary</td><td><span class="text-primary">Primary текст</span></td></tr>
-						<tr><td>.text-secondary</td><td><span class="text-secondary">Secondary текст</span></td></tr>
-						<tr><td>.text-muted</td><td><span class="text-muted">Muted текст</span></td></tr>
-						<tr><td>.text-success</td><td><span class="text-success">Success текст</span></td></tr>
-						<tr><td>.text-error</td><td><span class="text-error">Error текст</span></td></tr>
-						<tr><td>.text-warning</td><td><span class="text-warning">Warning текст</span></td></tr>
-						<tr><td>.font-bold</td><td><span class="font-bold">Bold текст</span></td></tr>
-						<tr><td>.font-semibold</td><td><span class="font-semibold">Semibold текст</span></td></tr>
-						<tr><td>.uppercase</td><td><span class="uppercase">uppercase текст</span></td></tr>
-						<tr><td>.font-mono</td><td><span class="font-mono">Monospace текст</span></td></tr>
-						<tr><td>.truncate</td><td><div class="truncate" style="max-width:200px">Многу долг текст кој ќе се скрати со три точки</div></td></tr>
+						<tr><td>.text-primary</td><td><span class="text-primary">Primary text</span></td></tr>
+						<tr><td>.text-secondary</td><td><span class="text-secondary">Secondary text</span></td></tr>
+						<tr><td>.text-muted</td><td><span class="text-muted">Muted text</span></td></tr>
+						<tr><td>.text-success</td><td><span class="text-success">Success text</span></td></tr>
+						<tr><td>.text-error</td><td><span class="text-error">Error text</span></td></tr>
+						<tr><td>.text-warning</td><td><span class="text-warning">Warning text</span></td></tr>
+						<tr><td>.font-bold</td><td><span class="font-bold">Bold text</span></td></tr>
+						<tr><td>.font-semibold</td><td><span class="font-semibold">Semibold text</span></td></tr>
+						<tr><td>.uppercase</td><td><span class="uppercase">uppercase text</span></td></tr>
+						<tr><td>.font-mono</td><td><span class="font-mono">Monospace text</span></td></tr>
+						<tr><td>.truncate</td><td><div class="truncate" id="demo-truncate">A very long text that will be truncated with an ellipsis</div></td></tr>
 					</tbody>
 				</table>
 			</main>
@@ -126,15 +127,15 @@
 
 				<h5>flex items-center justify-between</h5>
 				<div class="flex items-center justify-between mb-4">
-					<div class="demo-box">Лево</div>
-					<div class="demo-box">Десно</div>
+					<div class="demo-box">Left</div>
+					<div class="demo-box">Right</div>
 				</div>
 
 				<h5>flex-col gap-2</h5>
 				<div class="flex-col gap-2 mb-4">
-					<div class="demo-box">Ред 1</div>
-					<div class="demo-box">Ред 2</div>
-					<div class="demo-box">Ред 3</div>
+					<div class="demo-box">Row 1</div>
+					<div class="demo-box">Row 2</div>
+					<div class="demo-box">Row 3</div>
 				</div>
 			</main>
 		</section>
@@ -144,7 +145,7 @@
 			<header><h3>Spacing</h3></header>
 			<main>
 				<table>
-					<thead><tr><th>Класа</th><th>Вредност</th></tr></thead>
+					<thead><tr><th>Class</th><th>Value</th></tr></thead>
 					<tbody>
 						<tr><td>.p-1 / .p-2 / .p-4 / .p-6</td><td>0.25rem / 0.5rem / 1rem / 1.5rem</td></tr>
 						<tr><td>.mb-0 / .mb-1 / .mb-2 / .mb-4 / .mb-6 / .mb-8</td><td>0 / 0.25 / 0.5 / 1 / 1.5 / 2rem</td></tr>
@@ -161,7 +162,7 @@
 			<header><h3>Display, Size, Position</h3></header>
 			<main>
 				<table>
-					<thead><tr><th>Класа</th><th>CSS</th></tr></thead>
+					<thead><tr><th>Class</th><th>CSS</th></tr></thead>
 					<tbody>
 						<tr><td>.block / .hidden</td><td>display: block / none</td></tr>
 						<tr><td>.w-full / .h-full</td><td>width/height: 100%</td></tr>

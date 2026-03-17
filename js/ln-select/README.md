@@ -1,16 +1,16 @@
 # ln-select
 
-TomSelect wrapper — го подобрува стандардниот `<select>` со search, tagging и create функционалност.
-Зависи од [TomSelect](https://tom-select.js.org/) (peer dependency, мора да е вчитан пред ln-acme).
+TomSelect wrapper — enhances the standard `<select>` with search, tagging and create functionality.
+Depends on [TomSelect](https://tom-select.js.org/) (peer dependency, must be loaded before ln-acme).
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
-|---------|-----|------|
-| `data-ln-select` | `<select>` | Активира TomSelect со default конфигурација |
-| `data-ln-select='{"create":true}'` | `<select>` | JSON конфигурација (се мерџира со defaults) |
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-select` | `<select>` | Activates TomSelect with default configuration |
+| `data-ln-select='{"create":true}'` | `<select>` | JSON configuration (merged with defaults) |
 
-## Default конфигурација
+## Default configuration
 
 ```json
 {
@@ -24,56 +24,56 @@ TomSelect wrapper — го подобрува стандардниот `<select>
 }
 ```
 
-Атрибутот `placeholder` на `<select>` се користи ако е поставен.
+The `placeholder` attribute on `<select>` is used if set.
 
 ## API
 
 ```javascript
-// Рачна иницијализација
+// Manual initialization
 window.lnSelect.initialize(selectElement);
 
-// Уништи инстанца
+// Destroy instance
 window.lnSelect.destroy(selectElement);
 
-// Земи TomSelect инстанца (за директен пристап до TomSelect API)
-var ts = window.lnSelect.getInstance(selectElement);
-ts.addOption({ value: 'new', text: 'Нова опција' });
+// Get TomSelect instance (for direct access to TomSelect API)
+const ts = window.lnSelect.getInstance(selectElement);
+ts.addOption({ value: 'new', text: 'New option' });
 ts.setValue('new');
 ```
 
-## Однесување
+## Behavior
 
-- Ако `window.TomSelect` не постои, компонентата тивко не прави ништо (graceful degradation)
-- При DOM remove, инстанцата автоматски се уништува (cleanup)
-- При form reset, selection се чисти автоматски
+- If `window.TomSelect` doesn't exist, the component silently does nothing (graceful degradation)
+- On DOM remove, the instance is automatically destroyed (cleanup)
+- On form reset, the selection is cleared automatically
 
-## HTML примери
+## HTML Examples
 
 ```html
-<!-- Основен -->
+<!-- Basic -->
 <select data-ln-select name="country">
-    <option value="">Избери земја...</option>
-    <option value="mk">Македонија</option>
-    <option value="rs">Србија</option>
+    <option value="">Select country...</option>
+    <option value="mk">Macedonia</option>
+    <option value="rs">Serbia</option>
 </select>
 
-<!-- Со create (tagging) -->
+<!-- With create (tagging) -->
 <select data-ln-select='{"create": true}' name="tags" multiple>
     <option value="php">PHP</option>
     <option value="js">JavaScript</option>
 </select>
 
-<!-- Повеќе избори со лимит -->
+<!-- Multiple choices with limit -->
 <select data-ln-select='{"maxItems": 3}' name="colors[]" multiple>
-    <option value="red">Црвена</option>
-    <option value="blue">Сина</option>
-    <option value="green">Зелена</option>
+    <option value="red">Red</option>
+    <option value="blue">Blue</option>
+    <option value="green">Green</option>
 </select>
 ```
 
 ## Peer dependency
 
-TomSelect мора да се вчита пред ln-acme:
+TomSelect must be loaded before ln-acme:
 
 ```html
 <link rel="stylesheet" href="tom-select/dist/css/tom-select.css">

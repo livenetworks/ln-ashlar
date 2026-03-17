@@ -11,15 +11,15 @@
 	}
 
 	function _findElements(root) {
-		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
+		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			items.push(root);
 		}
-		items.forEach(function (el) {
+		for (const el of items) {
 			if (!el[DOM_ATTRIBUTE]) {
 				el[DOM_ATTRIBUTE] = new _component(el);
 			}
-		});
+		}
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -27,18 +27,26 @@
 	function _component(dom) {
 		this.dom = dom;
 
-		dom.addEventListener('ln-toggle:open', function (e) {
-			var toggles = dom.querySelectorAll('[data-ln-toggle]');
-			toggles.forEach(function (el) {
-				if (el !== e.detail.target && el.lnToggle && el.lnToggle.isOpen) {
-					el.lnToggle.close();
+		this._onToggleOpen = function (e) {
+			const toggles = dom.querySelectorAll('[data-ln-toggle]');
+			for (const el of toggles) {
+				if (el !== e.detail.target) {
+					el.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
 				}
-			});
+			}
 			_dispatch(dom, 'ln-accordion:change', { target: e.detail.target });
-		});
+		};
+		dom.addEventListener('ln-toggle:open', this._onToggleOpen);
 
 		return this;
 	}
+
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this.dom.removeEventListener('ln-toggle:open', this._onToggleOpen);
+		_dispatch(this.dom, 'ln-accordion:destroyed', { target: this.dom });
+		delete this.dom[DOM_ATTRIBUTE];
+	};
 
 	// ─── Helpers ───────────────────────────────────────────────
 
@@ -52,16 +60,16 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {

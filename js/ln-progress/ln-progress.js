@@ -2,13 +2,10 @@
 	const DOM_SELECTOR = '[data-ln-progress]';
 	const DOM_ATTRIBUTE = 'lnProgress';
 
-	// if the component is already defined, return
-	if (window[DOM_ATTRIBUTE] !== undefined) {
-		return;
-	}
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	function _isBar(el) {
-		var val = el.getAttribute('data-ln-progress');
+		const val = el.getAttribute('data-ln-progress');
 		return val !== null && val !== '';
 	}
 
@@ -24,13 +21,13 @@
 	}
 
 	function _findElements(domRoot) {
-		var items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
+		const items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
 
-		items.forEach(function (item) {
+		for (const item of items) {
 			if (_isBar(item) && !item[DOM_ATTRIBUTE]) {
 				item[DOM_ATTRIBUTE] = new _constructor(item);
 			}
-		});
+		}
 
 		if (domRoot.hasAttribute && domRoot.hasAttribute('data-ln-progress') && _isBar(domRoot) && !domRoot[DOM_ATTRIBUTE]) {
 			domRoot[DOM_ATTRIBUTE] = new _constructor(domRoot);
@@ -39,22 +36,36 @@
 
 	function _constructor(dom) {
 		this.dom = dom;
+		this._attrObserver = null;
+		this._parentObserver = null;
 		_render.call(this);
 		_listenValues.call(this);
+		_listenParent.call(this);
 		return this;
 	}
 
+	_constructor.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this._attrObserver) {
+			this._attrObserver.disconnect();
+		}
+		if (this._parentObserver) {
+			this._parentObserver.disconnect();
+		}
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.type === "childList") {
-					mutation.addedNodes.forEach(function (item) {
+					for (const item of mutation.addedNodes) {
 						if (item.nodeType === 1) {
 							_findElements(item);
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {
@@ -66,25 +77,52 @@
 	_domObserver();
 
 	function _listenValues() {
-		var self = this;
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const self = this;
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.attributeName === 'data-ln-progress' || mutation.attributeName === 'data-ln-progress-max') {
 					_render.call(self);
 				}
-			});
+			}
 		});
 
 		observer.observe(this.dom, {
 			attributes: true,
 			attributeFilter: ['data-ln-progress', 'data-ln-progress-max']
 		});
+
+		this._attrObserver = observer;
+	}
+
+	function _listenParent() {
+		const self = this;
+		const parent = this.dom.parentElement;
+		if (!parent || !parent.hasAttribute('data-ln-progress-max')) return;
+
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
+				if (mutation.attributeName === 'data-ln-progress-max') {
+					_render.call(self);
+				}
+			}
+		});
+
+		observer.observe(parent, {
+			attributes: true,
+			attributeFilter: ['data-ln-progress-max']
+		});
+
+		this._parentObserver = observer;
 	}
 
 	function _render() {
-		var value = parseFloat(this.dom.getAttribute('data-ln-progress')) || 0;
-		var max = parseFloat(this.dom.getAttribute('data-ln-progress-max')) || 100;
-		var percentage = (max > 0) ? (value / max) * 100 : 0;
+		const value = parseFloat(this.dom.getAttribute('data-ln-progress')) || 0;
+		const parent = this.dom.parentElement;
+		const parentMax = parent && parent.hasAttribute('data-ln-progress-max')
+			? parseFloat(parent.getAttribute('data-ln-progress-max'))
+			: null;
+		const max = parentMax || parseFloat(this.dom.getAttribute('data-ln-progress-max')) || 100;
+		let percentage = (max > 0) ? (value / max) * 100 : 0;
 
 		if (percentage < 0) percentage = 0;
 		if (percentage > 100) percentage = 100;
@@ -93,14 +131,13 @@
 		_dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
 	}
 
-	// make lnProgress globally available
 	window[DOM_ATTRIBUTE] = constructor;
 
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', function () {
-			window.lnProgress(document.body);
+			constructor(document.body);
 		});
 	} else {
-		window.lnProgress(document.body);
+		constructor(document.body);
 	}
 })();

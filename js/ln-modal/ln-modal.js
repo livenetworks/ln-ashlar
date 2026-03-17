@@ -2,10 +2,7 @@
 	const DOM_SELECTOR = 'data-ln-modal';
 	const DOM_ATTRIBUTE = 'lnModal';
 
-	// If component already defined, return
-	if (window[DOM_ATTRIBUTE] !== undefined) {
-		return;
-	}
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	function _dispatch(modal, eventName, detail) {
 		modal.dispatchEvent(new CustomEvent(eventName, {
@@ -15,7 +12,7 @@
 	}
 
 	function _dispatchCancelable(modal, eventName) {
-		var event = new CustomEvent(eventName, {
+		const event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: { modalId: modal.id, target: modal }
@@ -27,11 +24,11 @@
 	function _openModal(modalId) {
 		const modal = document.getElementById(modalId);
 		if (!modal) {
-			console.warn('Modal with ID "' + modalId + '" not found');
+			console.warn('[ln-modal] Modal with ID "' + modalId + '" not found');
 			return;
 		}
 
-		var before = _dispatchCancelable(modal, 'ln-modal:before-open');
+		const before = _dispatchCancelable(modal, 'ln-modal:before-open');
 		if (before.defaultPrevented) return;
 
 		modal.classList.add('ln-modal--open');
@@ -43,13 +40,12 @@
 		const modal = document.getElementById(modalId);
 		if (!modal) return;
 
-		var before = _dispatchCancelable(modal, 'ln-modal:before-close');
+		const before = _dispatchCancelable(modal, 'ln-modal:before-close');
 		if (before.defaultPrevented) return;
 
 		modal.classList.remove('ln-modal--open');
 		_dispatch(modal, 'ln-modal:close');
 
-		// Only remove body class when no modals remain open
 		if (!document.querySelector('.ln-modal.ln-modal--open')) {
 			document.body.classList.remove('ln-modal-open');
 		}
@@ -58,7 +54,7 @@
 	function _toggleModal(modalId) {
 		const modal = document.getElementById(modalId);
 		if (!modal) {
-			console.warn('Modal with ID "' + modalId + '" not found');
+			console.warn('[ln-modal] Modal with ID "' + modalId + '" not found');
 			return;
 		}
 
@@ -71,29 +67,25 @@
 
 	function _attachCloseButtons(modal) {
 		const closeButtons = modal.querySelectorAll('[data-ln-modal-close]');
-		const modalId = modal.id;
 
-		closeButtons.forEach(function(btn) {
-			if (btn._lnModalCloseAttached) return;
-			btn._lnModalCloseAttached = true;
+		for (const btn of closeButtons) {
+			if (btn[DOM_ATTRIBUTE + 'Close']) continue;
+			btn[DOM_ATTRIBUTE + 'Close'] = true;
 
 			btn.addEventListener('click', function(e) {
 				e.preventDefault();
-				_closeModal(modalId);
+				_closeModal(modal.id);
 			});
-		});
+		}
 	}
 
 	function _attachTriggerListeners(triggers) {
-		triggers.forEach(function(trigger) {
-			if (trigger._lnModalAttached) return;
-			trigger._lnModalAttached = true;
+		for (const trigger of triggers) {
+			if (trigger[DOM_ATTRIBUTE + 'Trigger']) continue;
+			trigger[DOM_ATTRIBUTE + 'Trigger'] = true;
 
 			trigger.addEventListener('click', function(e) {
-				// Allow ctrl/cmd + click and middle-click (open in new tab)
-				if (e.ctrlKey || e.metaKey || e.button === 1) {
-					return;
-				}
+				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 
 				e.preventDefault();
 				const modalId = trigger.getAttribute(DOM_SELECTOR);
@@ -101,7 +93,7 @@
 					_toggleModal(modalId);
 				}
 			});
-		});
+		}
 	}
 
 	function _initializeAll() {
@@ -109,25 +101,25 @@
 		_attachTriggerListeners(triggers);
 
 		const modals = document.querySelectorAll('.ln-modal');
-		modals.forEach(function(modal) {
+		for (const modal of modals) {
 			_attachCloseButtons(modal);
-		});
+		}
 
 		document.addEventListener('keydown', function(e) {
 			if (e.key === 'Escape') {
 				const openModals = document.querySelectorAll('.ln-modal.ln-modal--open');
-				openModals.forEach(function(modal) {
+				for (const modal of openModals) {
 					_closeModal(modal.id);
-				});
+				}
 			}
 		});
 	}
 
 	function _domObserver() {
 		const observer = new MutationObserver(function(mutations) {
-			mutations.forEach(function(mutation) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function(node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							if (node.hasAttribute(DOM_SELECTOR)) {
 								_attachTriggerListeners([node]);
@@ -143,15 +135,13 @@
 							}
 
 							const childModals = node.querySelectorAll('.ln-modal');
-							if (childModals.length > 0) {
-								childModals.forEach(function(modal) {
-									_attachCloseButtons(modal);
-								});
+							for (const modal of childModals) {
+								_attachCloseButtons(modal);
 							}
 						}
-					});
+					}
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {

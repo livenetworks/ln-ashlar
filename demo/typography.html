@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,26 +17,26 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Typography</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'CSS типографски компонента.'})">Test Toast</button>
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'CSS typography component.'})">Test Toast</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -47,7 +47,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -59,7 +59,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -67,6 +67,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -88,36 +89,36 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Typography</h1>
-					<p>Базни типографски стилови. Сите fonts, weights и sizes доаѓаат од <code>_tokens.scss</code>.</p>
+					<p>Base typography styles. All fonts, weights and sizes come from <code>_tokens.scss</code>.</p>
 
 		<!-- Headings -->
 		<section class="section-card">
-			<header><h3>Наслови</h3></header>
+			<header><h3>Headings</h3></header>
 			<main>
-				<h1>h1 — Главен наслов (2.25rem)</h1>
-				<h2>h2 — Секундарен (1.5rem)</h2>
-				<h3>h3 — Под-наслов (1.25rem)</h3>
-				<h4>h4 — Помал наслов (1.125rem)</h4>
-				<h5>h5 — Мал наслов (1rem, semibold)</h5>
-				<h6>h6 — Најмал (0.875rem, semibold)</h6>
+				<h1>h1 — Main heading (2.25rem)</h1>
+				<h2>h2 — Secondary (1.5rem)</h2>
+				<h3>h3 — Sub-heading (1.25rem)</h3>
+				<h4>h4 — Smaller heading (1.125rem)</h4>
+				<h5>h5 — Small heading (1rem, semibold)</h5>
+				<h6>h6 — Smallest (0.875rem, semibold)</h6>
 			</main>
 		</section>
 
 		<!-- Text -->
 		<section class="section-card">
-			<header><h3>Текст</h3></header>
+			<header><h3>Text</h3></header>
 			<main>
-				<p>Обичен параграф со <strong>bold текст</strong>, <em>italic текст</em> и <small>мал текст</small>.</p>
-				<p>Линк: <a href="#">Пример линк</a> со hover ефект.</p>
-				<blockquote>Blockquote — цитат со лева линија во primary боја.</blockquote>
+				<p>Regular paragraph with <strong>bold text</strong>, <em>italic text</em> and <small>small text</small>.</p>
+				<p>Link: <a href="#">Example link</a> with hover effect.</p>
+				<blockquote>Blockquote — a quote with a left border in primary color.</blockquote>
 			</main>
 		</section>
 
 		<!-- Code -->
 		<section class="section-card">
-			<header><h3>Код</h3></header>
+			<header><h3>Code</h3></header>
 			<main>
-				<p>Inline код: <code>var(--color-primary)</code></p>
+				<p>Inline code: <code>var(--color-primary)</code></p>
 				<pre><code>.card header {
     @include px(var(--spacing-lg));
     @include py(var(--spacing-md));
@@ -128,42 +129,42 @@
 
 		<!-- Lists -->
 		<section class="section-card">
-			<header><h3>Листи</h3></header>
+			<header><h3>Lists</h3></header>
 			<main>
-				<div class="grid-2">
-					<div>
+				<div class="demo-split">
+					<section>
 						<h5>Unordered</h5>
 						<ul>
-							<li>Прва ставка</li>
-							<li>Втора ставка</li>
-							<li>Трета ставка</li>
+							<li>First item</li>
+							<li>Second item</li>
+							<li>Third item</li>
 						</ul>
-					</div>
-					<div>
+					</section>
+					<section>
 						<h5>Ordered</h5>
 						<ol>
-							<li>Прв чекор</li>
-							<li>Втор чекор</li>
-							<li>Трет чекор</li>
+							<li>First step</li>
+							<li>Second step</li>
+							<li>Third step</li>
 						</ol>
-					</div>
+					</section>
 				</div>
 			</main>
 		</section>
 
 		<!-- Font sizes -->
 		<section class="section-card">
-			<header><h3>Font Size токени</h3></header>
+			<header><h3>Font Size Tokens</h3></header>
 			<main>
 				<table>
-					<thead><tr><th>Токен</th><th>Вредност</th><th>Пример</th></tr></thead>
+					<thead><tr><th>Token</th><th>Value</th><th>Example</th></tr></thead>
 					<tbody>
-						<tr><td>--text-xs</td><td>0.75rem</td><td><span class="text-xs">Мал текст xs</span></td></tr>
-						<tr><td>--text-sm</td><td>0.875rem</td><td><span class="text-sm">Мал текст sm</span></td></tr>
-						<tr><td>--text-base</td><td>1rem</td><td><span class="text-base">Основен base</span></td></tr>
-						<tr><td>--text-lg</td><td>1.125rem</td><td><span class="text-lg">Поголем lg</span></td></tr>
-						<tr><td>--text-xl</td><td>1.25rem</td><td><span class="text-xl">Голем xl</span></td></tr>
-						<tr><td>--text-2xl</td><td>1.5rem</td><td><span class="text-2xl">Најголем 2xl</span></td></tr>
+						<tr><td>--text-xs</td><td>0.75rem</td><td><span class="text-xs">Small text xs</span></td></tr>
+						<tr><td>--text-sm</td><td>0.875rem</td><td><span class="text-sm">Small text sm</span></td></tr>
+						<tr><td>--text-base</td><td>1rem</td><td><span class="text-base">Base text base</span></td></tr>
+						<tr><td>--text-lg</td><td>1.125rem</td><td><span class="text-lg">Larger lg</span></td></tr>
+						<tr><td>--text-xl</td><td>1.25rem</td><td><span class="text-xl">Large xl</span></td></tr>
+						<tr><td>--text-2xl</td><td>1.5rem</td><td><span class="text-2xl">Largest 2xl</span></td></tr>
 					</tbody>
 				</table>
 			</main>
@@ -173,9 +174,9 @@
 		<section class="section-card">
 			<header><h3>HTML</h3></header>
 			<main>
-				<pre><code>&lt;h1&gt;Наслов&lt;/h1&gt;
-&lt;p&gt;Параграф со &lt;strong&gt;bold&lt;/strong&gt; и &lt;code&gt;inline code&lt;/code&gt;.&lt;/p&gt;
-&lt;blockquote&gt;Цитат&lt;/blockquote&gt;
+				<pre><code>&lt;h1&gt;Heading&lt;/h1&gt;
+&lt;p&gt;Paragraph with &lt;strong&gt;bold&lt;/strong&gt; and &lt;code&gt;inline code&lt;/code&gt;.&lt;/p&gt;
+&lt;blockquote&gt;Quote&lt;/blockquote&gt;
 &lt;pre&gt;&lt;code&gt;Code block&lt;/code&gt;&lt;/pre&gt;</code></pre>
 			</main>
 		</section>

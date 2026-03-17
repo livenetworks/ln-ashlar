@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,28 +22,28 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Dashboard</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Ова е демо нотификација.'})">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
 						Test Toast
 					</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -54,7 +54,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -66,7 +66,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -74,6 +74,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -99,28 +100,28 @@
 				<section id="stats">
 					<ul>
 						<li>
-							<h3>Компоненти</h3>
+							<h3>Components</h3>
 							<strong>18</strong>
 							<div data-ln-progress>
 								<div data-ln-progress="18" data-ln-progress-max="20" class="green"></div>
 							</div>
 						</li>
 						<li>
-							<h3>JS модули</h3>
+							<h3>JS Modules</h3>
 							<strong>10</strong>
 							<div data-ln-progress>
 								<div data-ln-progress="10" data-ln-progress-max="12" class="green"></div>
 							</div>
 						</li>
 						<li>
-							<h3>SCSS фајлови</h3>
+							<h3>SCSS Files</h3>
 							<strong>22</strong>
 							<div data-ln-progress>
 								<div data-ln-progress="22" data-ln-progress-max="25" class="yellow"></div>
 							</div>
 						</li>
 						<li>
-							<h3>Демо страници</h3>
+							<h3>Demo Pages</h3>
 							<strong>14</strong>
 							<div data-ln-progress>
 								<div data-ln-progress="14" data-ln-progress-max="14" class="green"></div>
@@ -146,37 +147,37 @@
 					<main>
 						<div data-ln-tabs data-ln-tabs-default="pregled">
 							<div class="demo-tabs">
-								<button data-ln-tab="pregled">Преглед</button>
-								<button data-ln-tab="korisnici">Корисници</button>
-								<button data-ln-tab="podesuvanja">Подесувања</button>
+								<button data-ln-tab="pregled">Overview</button>
+								<button data-ln-tab="korisnici">Users</button>
+								<button data-ln-tab="podesuvanja">Settings</button>
 							</div>
 
 							<div data-ln-panel="pregled" class="demo-panel">
-								<p>Содржина на табот <strong>Преглед</strong>. Табовите се синхронизирани со URL hash.</p>
-								<p>Промени го URL hash на <code>#korisnici</code> за да видиш.</p>
+								<p>Content of the <strong>Overview</strong> tab. Tabs are synchronized with the URL hash.</p>
+								<p>Change the URL hash to <code>#korisnici</code> to see.</p>
 							</div>
 
 							<div data-ln-panel="korisnici" class="demo-panel hidden">
 								<table>
-									<thead><tr><th>Име</th><th>Email</th><th>Улога</th></tr></thead>
+									<thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
 									<tbody>
-										<tr><td>Марко Петров</td><td>marko@example.com</td><td>Админ</td></tr>
-										<tr><td>Ана Стојанова</td><td>ana@example.com</td><td>Корисник</td></tr>
-										<tr><td>Иван Николов</td><td>ivan@example.com</td><td>Модератор</td></tr>
+										<tr><td>Marko Petrov</td><td>marko@example.com</td><td>Admin</td></tr>
+										<tr><td>Ana Stojanova</td><td>ana@example.com</td><td>User</td></tr>
+										<tr><td>Ivan Nikolov</td><td>ivan@example.com</td><td>Moderator</td></tr>
 									</tbody>
 								</table>
 							</div>
 
 							<div data-ln-panel="podesuvanja" class="demo-panel hidden">
 								<form>
-									<div class="form-group">
-										<label for="d-lang">Јазик</label>
-										<select id="d-lang"><option>Македонски</option><option>English</option></select>
-									</div>
-									<div class="form-group">
-										<label for="d-tz">Timezone</label>
+									<label for="d-lang">
+										Language
+										<select id="d-lang"><option>Macedonian</option><option>English</option></select>
+									</label>
+									<label for="d-tz">
+										Timezone
 										<input type="text" id="d-tz" value="Europe/Skopje">
-									</div>
+									</label>
 								</form>
 							</div>
 						</div>
@@ -190,13 +191,13 @@
 						<main>
 							<article>
 								<header>
-									<strong>Серверски статус</strong>
-									<button type="button" data-ln-toggle-for="server-status" class="btn btn--secondary">▼</button>
+									<strong>Server Status</strong>
+									<button type="button" data-ln-toggle-for="server-status" class="btn btn--secondary" aria-label="Toggle server status"><span class="ln-icon-arrow-down"></span></button>
 								</header>
 								<section id="server-status" data-ln-toggle="open" class="collapsible">
 								<section class="collapsible-body">
 									<table>
-										<thead><tr><th>Сервер</th><th>Статус</th><th>Uptime</th></tr></thead>
+										<thead><tr><th>Server</th><th>Status</th><th>Uptime</th></tr></thead>
 										<tbody>
 											<tr><td>web-01</td><td><span class="pass">OK</span></td><td class="numeric">99.9%</td></tr>
 											<tr><td>web-02</td><td><span class="pass">OK</span></td><td class="numeric">99.7%</td></tr>
@@ -238,14 +239,14 @@
 
 				<!-- Toast Demo -->
 				<section class="section-card">
-					<header><h3>Toast нотификации</h3></header>
+					<header><h3>Toast Notifications</h3></header>
 					<main>
 						<nav class="demo-actions">
-							<button onclick="window.lnToast.enqueue({type:'success', title:'Успешно', message:'Записот е зачуван.'})" class="btn">Success</button>
-							<button onclick="window.lnToast.enqueue({type:'error', title:'Грешка', message:'Нешто не е во ред.'})" class="btn btn--danger">Error</button>
-							<button onclick="window.lnToast.enqueue({type:'warn', title:'Внимание', message:'Проверете ги податоците.'})" class="btn btn--secondary">Warning</button>
-							<button onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'Нова верзија е достапна.'})" class="btn btn--secondary">Info</button>
-							<button onclick="window.lnToast.enqueue({type:'error', title:'Валидација', message:['Името е задолжително','Email форматот е погрешен','Лозинката е прекратка']})" class="btn btn--danger">Validation Errors</button>
+							<button onclick="window.lnToast.enqueue({type:'success', title:'Success', message:'The record has been saved.'})" class="btn">Success</button>
+							<button onclick="window.lnToast.enqueue({type:'error', title:'Error', message:'Something went wrong.'})" class="btn btn--danger">Error</button>
+							<button onclick="window.lnToast.enqueue({type:'warn', title:'Warning', message:'Please check the data.'})" class="btn btn--secondary">Warning</button>
+							<button onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'A new version is available.'})" class="btn btn--secondary">Info</button>
+							<button onclick="window.lnToast.enqueue({type:'error', title:'Validation', message:['Name is required','Email format is invalid','Password is too short']})" class="btn btn--danger">Validation Errors</button>
 						</nav>
 					</main>
 				</section>
@@ -256,8 +257,8 @@
 					<main>
 						<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
 							<div class="ln-upload__zone">
-								<p>Довлечи фајлови тука или кликни за избор</p>
-								<small>Дозволени: pdf, doc, docx, jpg, png</small>
+								<p>Drag files here or click to select</p>
+								<small>Allowed: pdf, doc, docx, jpg, png</small>
 							</div>
 							<ul class="ln-upload__list"></ul>
 						</div>
@@ -268,41 +269,41 @@
 				<section class="section-card">
 					<header><h3>ln-ajax — AJAX Navigation</h3></header>
 					<main>
-						<p>Компонента за AJAX навигација и форм submission. Линкови и форми внатре во <code>data-ln-ajax</code> контејнер автоматски се обработуваат преку fetch.</p>
+						<p>Component for AJAX navigation and form submission. Links and forms inside a <code>data-ln-ajax</code> container are automatically processed via fetch.</p>
 						<section id="demo-ajax-info">
 							<figure>
 								<pre><code>&lt;div data-ln-ajax&gt;
-    &lt;a href="/users"&gt;Корисници&lt;/a&gt;
+    &lt;a href="/users"&gt;Users&lt;/a&gt;
     &lt;form method="POST" action="/users"&gt;...&lt;/form&gt;
 &lt;/div&gt;
 
-&lt;!-- JSON одговор --&gt;
+&lt;!-- JSON response --&gt;
 {
-    "title": "Наслов",
+    "title": "Title",
     "content": { "main": "&lt;p&gt;HTML&lt;/p&gt;" },
-    "message": { "type": "success", "title": "OK", "body": "Зачувано!" }
+    "message": { "type": "success", "title": "OK", "body": "Saved!" }
 }</code></pre>
 							</figure>
 							<table>
-								<thead><tr><th>Атрибут</th><th>Опис</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-ajax</code></td><td>Контејнер — сите <code>&lt;a&gt;</code> и <code>&lt;form&gt;</code> внатре се AJAX</td></tr>
-									<tr><td><code>data-ln-ajax="false"</code></td><td>Исклучи конкретен елемент од AJAX обработка</td></tr>
+									<tr><td><code>data-ln-ajax</code></td><td>Container — all <code>&lt;a&gt;</code> and <code>&lt;form&gt;</code> inside are AJAX</td></tr>
+									<tr><td><code>data-ln-ajax="false"</code></td><td>Exclude a specific element from AJAX processing</td></tr>
 								</tbody>
 							</table>
-							<p>CSRF token автоматски од <code>&lt;meta name="csrf-token"&gt;</code>. History pushState за линкови и GET форми.</p>
+							<p>CSRF token automatically from <code>&lt;meta name="csrf-token"&gt;</code>. History pushState for links and GET forms.</p>
 						</section>
 					</main>
 				</section>
 
 				<!-- Quick Integration -->
 				<section class="section-card">
-					<header><h3>Брза интеграција</h3></header>
+					<header><h3>Quick Integration</h3></header>
 					<main>
 						<pre><code>&lt;link rel="stylesheet" href="dist/ln-acme.css"&gt;
 &lt;script src="dist/ln-acme.iife.js" defer&gt;&lt;/script&gt;
 
-&lt;!-- Или како npm модул --&gt;
+&lt;!-- Or as npm module --&gt;
 import 'ln-acme';
 import 'ln-acme/dist/ln-acme.css';</code></pre>
 					</main>
@@ -324,14 +325,14 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 		<div class="ln-modal__content">
 			<header>
 				<h3>Basic Modal</h3>
-				<button class="ln-icon-close" data-ln-modal-close></button>
+				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 			</header>
 			<main>
-				<p>Ова е основен модал со наслов и содржина.</p>
-				<p>Притисни ESC или кликни затвори.</p>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
 			</main>
 			<footer>
-				<button data-ln-modal-close class="btn btn--secondary">Затвори</button>
+				<button data-ln-modal-close class="btn btn--secondary">Close</button>
 			</footer>
 		</div>
 	</div>
@@ -339,32 +340,32 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 	<div class="ln-modal" id="demo-form">
 		<div class="ln-modal__content">
 			<header>
-				<h3>Додај корисник</h3>
-				<button class="ln-icon-close" data-ln-modal-close></button>
+				<h3>Add User</h3>
+				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 			</header>
 			<main>
 				<form>
-					<div class="form-group">
-						<label for="m-name">Име</label>
-						<input type="text" id="m-name" placeholder="Внесете име...">
-					</div>
-					<div class="form-group">
-						<label for="m-email">Email</label>
-						<input type="email" id="m-email" placeholder="email@example.com">
-					</div>
-					<div class="form-group">
-						<label for="m-role">Улога</label>
-						<select id="m-role">
-							<option>Корисник</option>
-							<option>Администратор</option>
-							<option>Модератор</option>
+					<label>
+						Name
+						<input type="text" placeholder="Enter name...">
+					</label>
+					<label>
+						Email
+						<input type="email" placeholder="email@example.com">
+					</label>
+					<label>
+						Role
+						<select>
+							<option>User</option>
+							<option>Administrator</option>
+							<option>Moderator</option>
 						</select>
-					</div>
+					</label>
 				</form>
 			</main>
 			<footer>
-				<button data-ln-modal-close class="btn btn--secondary">Откажи</button>
-				<button type="submit" class="btn">Зачувај</button>
+				<button data-ln-modal-close class="btn btn--secondary">Cancel</button>
+				<button type="submit" class="btn">Save</button>
 			</footer>
 		</div>
 	</div>

@@ -1,71 +1,80 @@
 # ln-progress
 
-Progress bar компонента — визуелен индикатор за напредок.
-Реактивен: автоматски се ажурира кога `data-ln-progress` атрибутот се менува (MutationObserver на атрибути).
+A visual progress indicator. Reactive: automatically updates when `data-ln-progress` attributes change (MutationObserver on attributes).
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
-|---------|-----|------|
-| `data-ln-progress` | track (надворешен) | Го означува progress track контејнерот (празна вредност) |
-| `data-ln-progress="50"` | bar (внатрешен) | Тековна вредност на progress bar |
-| `data-ln-progress-max="100"` | bar | Максимална вредност (default: 100) |
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-progress` | track (outer) | Marks the progress track container (empty value) |
+| `data-ln-progress="50"` | bar (inner) | Current progress value |
+| `data-ln-progress-max="100"` | bar | Maximum value for a single bar (default: 100) |
+| `data-ln-progress-max="N"` | track | Shared max for stacked bars — all children use this as denominator |
 
-## CSS класи (боја)
+## Color Classes
 
-| Класа | Боја |
-|-------|------|
-| `.green` | Success (зелена) |
-| `.red` | Error (црвена) |
-| `.yellow` | Warning (жолта) |
-| (без класа) | Default background |
+| Class | Color |
+|-------|-------|
+| `.green` | Success (green) |
+| `.red` | Error (red) |
+| `.yellow` | Warning (yellow) |
+| (no class) | Default background |
 
-## Однесување
+## Behavior
 
-- `width` на bar елементот се пресметува како `(value / max) * 100%`
-- При промена на `data-ln-progress` или `data-ln-progress-max` атрибутот, bar-от реактивно се ажурира
-- Поддржува повеќе bar-ови во еден track (stacked progress)
-- Последниот bar има заоблен десен агол
+- Bar width is calculated as `(value / max) * 100%`
+- When `data-ln-progress` or `data-ln-progress-max` attributes change, the bar reactively updates
+- Supports multiple bars in one track (stacked progress)
+- `data-ln-progress-max` on track — all children use that max (bars fill the entire space proportionally)
+- Max priority: parent track max > bar's own max > default 100
+- The last bar gets a rounded right edge
 
-## HTML структура
+## HTML Structure
 
 ```html
-<!-- Единечен progress bar -->
+<!-- Single progress bar -->
 <div data-ln-progress role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
     <div data-ln-progress="75" class="green"></div>
 </div>
 
-<!-- Со максимална вредност -->
+<!-- Custom maximum value -->
 <div data-ln-progress role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="50">
     <div data-ln-progress="30" data-ln-progress-max="50" class="green"></div>
 </div>
 
-<!-- Stacked (повеќе сегменти) -->
+<!-- Stacked (multiple segments) — each bar is a % of 100 -->
 <div data-ln-progress role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
     <div data-ln-progress="40" class="green"></div>
     <div data-ln-progress="20" class="yellow"></div>
     <div data-ln-progress="10" class="red"></div>
 </div>
+
+<!-- Stacked with shared max — fills 100% proportionally -->
+<div data-ln-progress data-ln-progress-max="15">
+    <div data-ln-progress="7" class="green"></div>
+    <div data-ln-progress="3" class="yellow"></div>
+    <div data-ln-progress="5" class="red"></div>
+</div>
 ```
 
-> **Accessibility:** Додади `role="progressbar"` и ARIA атрибути (`aria-valuenow`,
-> `aria-valuemin`, `aria-valuemax`) на track елементот за screen readers.
+> **Accessibility:** Add `role="progressbar"` and ARIA attributes (`aria-valuenow`,
+> `aria-valuemin`, `aria-valuemax`) to the track element for screen readers.
 
 ## Events
 
-Настанот се dispatch-ува на bar елементот (`[data-ln-progress="N"]`) и bubble-ира нагоре.
+Events are dispatched on the bar element (`[data-ln-progress="N"]`) and bubble up.
 
-| Настан | Кога | `detail` |
-|--------|------|----------|
-| `ln-progress:change` | При секоја промена на вредноста | `{ target, value, max, percentage }` |
+| Event | When | `detail` |
+|-------|------|----------|
+| `ln-progress:change` | On every value change | `{ target, value, max, percentage }` |
 
 ```javascript
 document.addEventListener('ln-progress:change', function(e) {
-    console.log('Прогрес:', e.detail.percentage.toFixed(1) + '%');
-    console.log('Вредност:', e.detail.value, '/', e.detail.max);
+    console.log('Progress:', e.detail.percentage.toFixed(1) + '%');
+    console.log('Value:', e.detail.value, '/', e.detail.max);
 
     if (e.detail.percentage >= 100) {
-        console.log('Завршено!');
+        console.log('Complete!');
     }
 });
 ```
@@ -73,27 +82,26 @@ document.addEventListener('ln-progress:change', function(e) {
 ## API
 
 ```javascript
-// Рачна иницијализација
+// Manual initialization
 window.lnProgress(document.body);
 ```
 
-## Реактивно ажурирање
+## Reactive Updates
 
 ```javascript
-// Промени ја вредноста — bar автоматски се ажурира
-var bar = document.querySelector('[data-ln-progress="75"]');
+// Change the value — bar auto-updates
+const bar = document.querySelector('[data-ln-progress="75"]');
 bar.setAttribute('data-ln-progress', '90');
 ```
 
-## Програмски пример
+## Example: Upload Progress
 
 ```javascript
-// Progress bar за upload
-var bar = document.getElementById('upload-bar');
+const bar = document.getElementById('upload-bar');
 
 xhr.upload.addEventListener('progress', function(e) {
     if (e.lengthComputable) {
-        var percent = Math.round((e.loaded / e.total) * 100);
+        const percent = Math.round((e.loaded / e.total) * 100);
         bar.setAttribute('data-ln-progress', percent);
     }
 });

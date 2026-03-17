@@ -32,6 +32,33 @@ Card-like section with background, border, shadow.
 - `main` -- padding 1rem
 - `footer` -- bg-secondary, border-top, right-aligned buttons
 
+### Auto-flush for tables
+
+When `main` contains a direct `<table>` or `.table-container`, padding is automatically removed and the table's own border-radius/shadow are stripped. The card's `overflow: hidden` handles the rounded corners.
+
+```html
+<!-- No extra classes needed — :has() detects the table -->
+<section class="section-card">
+    <header><h3>Items</h3></header>
+    <main>
+        <table>...</table>
+    </main>
+</section>
+```
+
+Works with `.table-container` too:
+
+```html
+<section class="section-card">
+    <header><h3>Items</h3></header>
+    <main>
+        <div class="table-container">
+            <table>...</table>
+        </div>
+    </main>
+</section>
+```
+
 ## .section-empty
 
 Empty state placeholder.

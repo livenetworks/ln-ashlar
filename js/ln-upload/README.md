@@ -1,77 +1,77 @@
 # ln-upload
 
-File upload компонента — drag & drop зона со progress bar, валидација, и серверска комуникација.
-Автоматски upload на фајл по избор/drop, со progress tracking преку XHR. Бришење на фајл од сервер.
+File upload component — drag & drop zone with progress bar, validation, and server communication.
+Automatic upload on file select/drop, with progress tracking via XHR. File deletion from server.
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
-|---------|-----|------|
-| `data-ln-upload="/files/upload"` | контејнер | Upload URL (default: `/files/upload`) |
-| `data-ln-upload-accept=".pdf,.doc,.docx"` | контејнер | Дозволени екстензии (comma-separated) |
-| `data-ln-upload-context="documents"` | контејнер | Context string испратен со upload (FormData `context` поле) |
-| `data-ln-upload-dict="key"` | скриен елемент | I18n речник за пораки (видете подолу) |
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-upload="/files/upload"` | container | Upload URL (default: `/files/upload`) |
+| `data-ln-upload-accept=".pdf,.doc,.docx"` | container | Allowed extensions (comma-separated) |
+| `data-ln-upload-context="documents"` | container | Context string sent with upload (FormData `context` field) |
+| `data-ln-upload-dict="key"` | hidden element | I18n dictionary for messages (see below) |
 
-## Речник (i18n)
+## Dictionary (i18n)
 
 ```html
-<span data-ln-upload-dict="remove" hidden>Отстрани</span>
-<span data-ln-upload-dict="error" hidden>Грешка</span>
-<span data-ln-upload-dict="invalid-type" hidden>Овој тип фајл не е дозволен</span>
-<span data-ln-upload-dict="upload-failed" hidden>Неуспешен upload</span>
-<span data-ln-upload-dict="delete-error" hidden>Неуспешно бришење</span>
+<span data-ln-upload-dict="remove" hidden>Remove</span>
+<span data-ln-upload-dict="error" hidden>Error</span>
+<span data-ln-upload-dict="invalid-type" hidden>This file type is not allowed</span>
+<span data-ln-upload-dict="upload-failed" hidden>Upload failed</span>
+<span data-ln-upload-dict="delete-error" hidden>Delete failed</span>
 ```
 
-## CSS класи
+## CSS Classes
 
-| Класа | Опис |
-|-------|------|
-| `.ln-upload__zone` | Drag & drop зона (кликабилна) |
-| `.ln-upload__zone--dragover` | Кога фајл е повлечен над зоната |
-| `.ln-upload__list` | Листа на upload-ирани фајли |
-| `.ln-upload__item` | Поединечен фајл |
-| `.ln-upload__item--uploading` | Фајл во тек на upload |
-| `.ln-upload__item--error` | Неуспешен upload |
-| `.ln-upload__item--deleting` | Фајл се брише од сервер |
-| `.ln-upload__name` | Име на фајл |
-| `.ln-upload__size` | Големина / процент |
-| `.ln-upload__remove` | Копче за бришење |
-| `.ln-upload__progress` | Progress bar контејнер |
+| Class | Description |
+|-------|-------------|
+| `.ln-upload__zone` | Drag & drop zone (clickable) |
+| `.ln-upload__zone--dragover` | When a file is dragged over the zone |
+| `.ln-upload__list` | List of uploaded files |
+| `.ln-upload__item` | Individual file |
+| `.ln-upload__item--uploading` | File currently uploading |
+| `.ln-upload__item--error` | Failed upload |
+| `.ln-upload__item--deleting` | File being deleted from server |
+| `.ln-upload__name` | File name |
+| `.ln-upload__size` | Size / percentage |
+| `.ln-upload__remove` | Delete button |
+| `.ln-upload__progress` | Progress bar container |
 | `.ln-upload__progress-bar` | Progress bar (width %) |
 
 ## API
 
 ```javascript
-// Instance API (на контејнер елементот)
-var uploader = document.getElementById('my-upload');
+// Instance API (on container element)
+const uploader = document.getElementById('my-upload');
 
 uploader.lnUploadAPI.getFileIds();   // [1, 2, 3] — server IDs
 uploader.lnUploadAPI.getFiles();     // [{serverId, name, size}, ...]
-uploader.lnUploadAPI.clear();        // Брише сè (и од сервер)
+uploader.lnUploadAPI.clear();        // Deletes everything (from server too)
 
 // Global API
-window.lnUpload.init(containerElement);  // Рачна иницијализација
-window.lnUpload.initAll();               // Иницијализирај сите
+window.lnUpload.init(containerElement);  // Manual initialization
+window.lnUpload.initAll();               // Initialize all
 ```
 
 ## Events
 
 | Event | Bubbles | Detail |
 |-------|---------|--------|
-| `ln-upload:uploaded` | да | `{ localId, serverId, name }` |
-| `ln-upload:error` | да | `{ file, message }` |
-| `ln-upload:invalid` | да | `{ file, message }` |
-| `ln-upload:removed` | да | `{ localId, serverId }` |
-| `ln-upload:cleared` | да | `{}` |
+| `ln-upload:uploaded` | yes | `{ localId, serverId, name }` |
+| `ln-upload:error` | yes | `{ file, message }` |
+| `ln-upload:invalid` | yes | `{ file, message }` |
+| `ln-upload:removed` | yes | `{ localId, serverId }` |
+| `ln-upload:cleared` | yes | `{}` |
 
-## Серверски API
+## Server API
 
 ### Upload (POST)
 
-Request: `multipart/form-data` со `file` и `context` полиња.
+Request: `multipart/form-data` with `file` and `context` fields.
 Headers: `X-CSRF-TOKEN`, `Accept: application/json`
 
-Очекуван response:
+Expected response:
 ```json
 { "id": 123, "name": "document.pdf", "size": 45678 }
 ```
@@ -79,44 +79,44 @@ Headers: `X-CSRF-TOKEN`, `Accept: application/json`
 ### Delete (DELETE `/files/{id}`)
 
 Headers: `X-CSRF-TOKEN`, `Accept: application/json`
-Очекуван status: `200`
+Expected status: `200`
 
-## HTML структура
+## HTML Structure
 
 ```html
 <div data-ln-upload="/files/upload" data-ln-upload-accept=".pdf,.doc,.docx" data-ln-upload-context="documents">
     <div class="ln-upload__zone">
-        <p>Повлечи фајл овде или кликни за избор</p>
+        <p>Drag files here or click to browse</p>
     </div>
     <ul class="ln-upload__list"></ul>
 
-    <!-- Речник (optional, за i18n) -->
-    <span data-ln-upload-dict="remove" hidden>Отстрани</span>
-    <span data-ln-upload-dict="error" hidden>Грешка</span>
-    <span data-ln-upload-dict="invalid-type" hidden>Овој тип фајл не е дозволен</span>
+    <!-- Dictionary (optional, for i18n) -->
+    <span data-ln-upload-dict="remove" hidden>Remove</span>
+    <span data-ln-upload-dict="error" hidden>Error</span>
+    <span data-ln-upload-dict="invalid-type" hidden>This file type is not allowed</span>
 </div>
 ```
 
-## Програмски
+## Programmatic
 
 ```javascript
-// Слушај за успешен upload
+// Listen for successful upload
 document.addEventListener('ln-upload:uploaded', function(e) {
     console.log('Uploaded:', e.detail.name, 'Server ID:', e.detail.serverId);
 });
 
-// Земи ги сите upload-ирани IDs пред submit на форма
-var ids = document.getElementById('my-upload').lnUploadAPI.getFileIds();
+// Get all uploaded IDs before form submit
+const ids = document.getElementById('my-upload').lnUploadAPI.getFileIds();
 ```
 
-## Фајл икони
+## File Icons
 
-Компонентата автоматски додава CSS класа за иконата на фајлот:
+The component automatically adds a CSS class for the file icon:
 - `.ln-icon-file-pdf` — PDF
 - `.ln-icon-file-doc` — DOC/DOCX
 - `.ln-icon-file-epub` — EPUB
-- `.ln-icon-file` — останато
+- `.ln-icon-file` — other
 
-## Hidden inputs
+## Hidden Inputs
 
-По секој успешен upload, компонентата автоматски креира `<input type="hidden" name="file_ids[]" value="serverId">` за секој фајл. При submit на формата, серверот ги добива IDs директно.
+After each successful upload, the component automatically creates `<input type="hidden" name="file_ids[]" value="serverId">` for each file. On form submit, the server receives the IDs directly.

@@ -1,29 +1,29 @@
 # ln-toggle
 
-Генеричка toggle компонента — додава/тргни `open` класа на елемент.
-CSS на елементот ја дефинира анимацијата. Работи за sidebar, collapsible секции, dropdown — било што.
+Generic toggle component — adds/removes `open` class on an element.
+CSS on the element defines the animation. Works for sidebar, collapsible sections, dropdown — anything.
 
-## Атрибути
+## Attributes
 
-| Атрибут | На | Опис |
-|---------|-----|------|
-| `data-ln-toggle` | целен елемент | Креира инстанца, почнува затворен |
-| `data-ln-toggle="open"` | целен елемент | Почнува отворен (добива `.open` класа) |
-| `data-ln-toggle-for="id"` | копче | Реферира на целниот елемент по ID |
-| `data-ln-toggle-action="open\|close"` | копче | Експлицитна акција (default: toggle) |
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-toggle` | target element | Creates an instance, starts closed |
+| `data-ln-toggle="open"` | target element | Starts open (gets `.open` class) |
+| `data-ln-toggle-for="id"` | button | References the target element by ID |
+| `data-ln-toggle-action="open\|close"` | button | Explicit action (default: toggle) |
 
 ## API
 
 ```javascript
-// Instance API (на DOM елементот)
-var el = document.getElementById('my-element');
+// Instance API (on DOM element)
+const el = document.getElementById('my-element');
 el.lnToggle.open();
 el.lnToggle.close();
 el.lnToggle.toggle();
 el.lnToggle.isOpen;  // boolean
 
-// Constructor — само за нестандардни случаи (Shadow DOM, iframe)
-// За AJAX/динамички DOM: MutationObserver автоматски иницијализира
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM: MutationObserver auto-initializes
 window.lnToggle(container);
 ```
 
@@ -31,24 +31,34 @@ window.lnToggle(container);
 
 | Event | Bubbles | Cancelable | Detail |
 |-------|---------|------------|--------|
-| `ln-toggle:before-open` | да | **да** | `{ target: HTMLElement }` |
-| `ln-toggle:open` | да | не | `{ target: HTMLElement }` |
-| `ln-toggle:before-close` | да | **да** | `{ target: HTMLElement }` |
-| `ln-toggle:close` | да | не | `{ target: HTMLElement }` |
+| `ln-toggle:before-open` | yes | **yes** | `{ target: HTMLElement }` |
+| `ln-toggle:open` | yes | no | `{ target: HTMLElement }` |
+| `ln-toggle:before-close` | yes | **yes** | `{ target: HTMLElement }` |
+| `ln-toggle:close` | yes | no | `{ target: HTMLElement }` |
+| `ln-toggle:request-close` | no | no | — |
+| `ln-toggle:request-open` | no | no | — |
 
 ```javascript
-// Слушај по отворање
+// Listen for open
 document.addEventListener('ln-toggle:open', function (e) {
-    console.log('Отворен:', e.detail.target.id);
+    console.log('Opened:', e.detail.target.id);
 });
 
-// Откажи го отворањето условно
+// Cancel opening conditionally
 document.addEventListener('ln-toggle:before-open', function (e) {
     if (!userHasPermission()) e.preventDefault();
 });
+
+// Request toggle to close (e.g. from accordion coordinator)
+element.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
+
+// Request toggle to open
+element.dispatchEvent(new CustomEvent('ln-toggle:request-open'));
 ```
 
-## Примери
+`ln-toggle:request-close` and `ln-toggle:request-open` are **incoming** events — external code dispatches them on the toggle element. Toggle listens on itself and reacts if the state is appropriate. Opening/closing goes through the normal lifecycle (`before-open/close` → `open/close`).
+
+## Examples
 
 ### Sidebar
 
@@ -61,10 +71,10 @@ document.addEventListener('ln-toggle:before-open', function (e) {
 <button class="ln-icon-menu" data-ln-toggle-for="sidebar-left"></button>
 ```
 
-> **Иконки:** СЕКОГАШ користи `.ln-icon-close` / `.ln-icon-menu` класи.
-> НИКОГАШ `&times;`, `☰`, или други Unicode карактери.
+> **Icons:** ALWAYS use `.ln-icon-close` / `.ln-icon-menu` classes.
+> NEVER use `&times;`, `☰`, or other Unicode characters.
 
-CSS за sidebar (во `_app-layout.scss`):
+CSS for sidebar (in `_app-layout.scss`):
 ```scss
 .sidebar {
     transform: translateX(-100%);
@@ -73,10 +83,10 @@ CSS за sidebar (во `_app-layout.scss`):
 }
 ```
 
-### Collapsible секција
+### Collapsible section
 
 ```html
-<header data-ln-toggle-for="section1">Наслов</header>
+<header data-ln-toggle-for="section1">Title</header>
 <section id="section1" data-ln-toggle="open" class="collapsible">
     <article class="collapsible-body">
         Content here
@@ -84,21 +94,21 @@ CSS за sidebar (во `_app-layout.scss`):
 </section>
 ```
 
-- `.collapsible` = парент, padding:0, се затвора до 0
-- `.collapsible-body` = child, тука оди padding/margins
-- `data-ln-toggle-for` на `<header>` — целиот header е кликабилен trigger
+- `.collapsible` = parent, padding:0, collapses to 0
+- `.collapsible-body` = child, padding/margins go here
+- `data-ln-toggle-for` on `<header>` — entire header is a clickable trigger
 
-> **Семантика:** Collapsible контејнерот НЕ смее да биде `<main>` — HTML spec дозволува
-> само еден `<main>` per page. Користи `<section>` или `<div class="collapsible">`.
+> **Semantics:** The collapsible container must NOT be `<main>` — HTML spec allows
+> only one `<main>` per page. Use `<section>` or `<div class="collapsible">`.
 
-CSS за collapse — framework ја обезбедува `.collapsible` класата (grid-template-rows анимација).
-За семантичка употреба во проект SCSS:
+CSS for collapse — the framework provides the `.collapsible` class (grid-template-rows animation).
+For semantic usage in project SCSS:
 ```scss
 #section1              { @include collapsible; }
 #section1 > .my-body   { @include collapsible-content; }
 ```
 
-### Програмски
+### Programmatic
 
 ```javascript
 document.getElementById('sidebar-left').lnToggle.open();
@@ -106,7 +116,7 @@ document.getElementById('sidebar-left').lnToggle.close();
 
 document.addEventListener('ln-toggle:close', function (e) {
     if (e.detail.target.id === 'sidebar-left') {
-        console.log('Sidebar затворен');
+        console.log('Sidebar closed');
     }
 });
 ```

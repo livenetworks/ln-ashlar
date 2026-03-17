@@ -329,13 +329,58 @@
 // Page: External Links (external-links.html)
 // ==========================================================================
 
-.demo-link-group {
-	@include p(1rem);
-	@include bg-secondary;
-	@include rounded-md;
+#external-links-demo main {
+	@include grid-2;
 
-	h5 { margin-top: 0; @include mb(0.5rem); }
-	ul { margin: 0; }
+	article {
+		@include p(1rem);
+		@include rounded-md;
+		@include transition;
+
+		h5 { margin-top: 0; @include mb(0.5rem); }
+		ul { margin: 0; }
+	}
+
+	// External links group — teal accent
+	article:first-child {
+		background-color: #e0f7fa;
+		border-left: 3px solid #0891b2;
+
+		h5 { color: #0e7490; }
+
+		a {
+			color: #0891b2;
+			@include font-medium;
+			@include transition-colors;
+			&:hover { color: #0e7490; }
+		}
+	}
+
+	// Internal links group — amber accent
+	article:last-child {
+		background-color: #fef3c7;
+		border-left: 3px solid #d97706;
+
+		h5 { color: #92400e; }
+
+		a {
+			color: #b45309;
+			@include font-medium;
+			@include transition-colors;
+			&:hover { color: #92400e; }
+		}
+	}
+}
+
+// External links confirmation modal — URL display
+#external-link-modal main p {
+	word-break: break-all;
+	@include font-mono;
+	@include text-sm;
+	@include p(0.75rem);
+	@include rounded-md;
+	background-color: #e0f7fa;
+	color: #0e7490;
 }
 
 // ==========================================================================

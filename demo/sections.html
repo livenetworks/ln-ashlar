@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,26 +17,26 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Sections</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Инфо', message:'CSS секции компонента.'})">Test Toast</button>
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'CSS sections component.'})">Test Toast</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<!-- App Body -->
 		<div class="app-body">
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -47,7 +47,7 @@
 						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">CSS компоненти</h6>
+					<h6 class="nav-section">CSS Components</h6>
 					<ul>
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -59,7 +59,7 @@
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 					</ul>
 
-					<h6 class="nav-section">JS компоненти</h6>
+					<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -67,6 +67,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -95,8 +96,8 @@
 			<main>
 				<nav class="breadcrumbs">
 					<li><a href="#">Home</a></li>
-					<li><a href="#">Корисници</a></li>
-					<li class="current">Марко Петровски</li>
+					<li><a href="#">Users</a></li>
+					<li class="current">Marko Petrovski</li>
 				</nav>
 			</main>
 		</section>
@@ -105,18 +106,18 @@
 		<section class="section-card">
 			<header><h3>.section</h3></header>
 			<main>
-				<div class="section">
+				<section class="section">
 					<header>
-						<h2>Листа на корисници</h2>
+						<h2>User List</h2>
 						<div class="section-actions">
-							<button class="btn btn--secondary">Филтер</button>
-							<button class="btn">Додај</button>
+							<button class="btn btn--secondary">Filter</button>
+							<button class="btn">Add</button>
 						</div>
 					</header>
 					<main>
-						<p class="text-secondary">Содржина на секцијата...</p>
+						<p>Section content...</p>
 					</main>
-				</div>
+				</section>
 			</main>
 		</section>
 
@@ -125,11 +126,11 @@
 			<header><h3>.section-card</h3></header>
 			<main>
 				<div class="section-card">
-					<header><h3>Наслов на секција</h3></header>
-					<main><p>Содржина со padding и border.</p></main>
+					<header><h3>Section Title</h3></header>
+					<main><p>Content with padding and border.</p></main>
 					<footer>
-						<button class="btn btn--secondary">Откажи</button>
-						<button class="btn">Зачувај</button>
+						<button class="btn btn--secondary">Cancel</button>
+						<button class="btn">Save</button>
 					</footer>
 				</div>
 			</main>
@@ -139,11 +140,10 @@
 		<section class="section-card">
 			<header><h3>.section-empty</h3></header>
 			<main>
-				<div class="section-empty">
-					<div class="empty-icon">&#128269;</div>
-					<h3>Нема резултати</h3>
-					<p>Обидете се со друг филтер или додајте нов запис.</p>
-				</div>
+				<article class="section-empty">
+					<h3>No Results</h3>
+					<p>Try a different filter or add a new record.</p>
+				</article>
 			</main>
 		</section>
 
@@ -154,30 +154,30 @@
 				<pre><code>&lt;!-- Breadcrumbs --&gt;
 &lt;nav class="breadcrumbs"&gt;
     &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href="#"&gt;Секција&lt;/a&gt;&lt;/li&gt;
-    &lt;li class="current"&gt;Тековна&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Section&lt;/a&gt;&lt;/li&gt;
+    &lt;li class="current"&gt;Current&lt;/li&gt;
 &lt;/nav&gt;
 
 &lt;!-- Section --&gt;
 &lt;section class="section"&gt;
     &lt;header&gt;
-        &lt;h2&gt;Наслов&lt;/h2&gt;
-        &lt;div class="section-actions"&gt;&lt;button&gt;Акција&lt;/button&gt;&lt;/div&gt;
+        &lt;h2&gt;Title&lt;/h2&gt;
+        &lt;div class="section-actions"&gt;&lt;button&gt;Action&lt;/button&gt;&lt;/div&gt;
     &lt;/header&gt;
     &lt;main&gt;...&lt;/main&gt;
 &lt;/section&gt;
 
 &lt;!-- Section Card --&gt;
 &lt;div class="section-card"&gt;
-    &lt;header&gt;&lt;h3&gt;Наслов&lt;/h3&gt;&lt;/header&gt;
+    &lt;header&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;/header&gt;
     &lt;main&gt;...&lt;/main&gt;
-    &lt;footer&gt;&lt;button&gt;Зачувај&lt;/button&gt;&lt;/footer&gt;
+    &lt;footer&gt;&lt;button&gt;Save&lt;/button&gt;&lt;/footer&gt;
 &lt;/div&gt;
 
 &lt;!-- Empty State --&gt;
 &lt;div class="section-empty"&gt;
-    &lt;h3&gt;Нема резултати&lt;/h3&gt;
-    &lt;p&gt;Опис...&lt;/p&gt;
+    &lt;h3&gt;No Results&lt;/h3&gt;
+    &lt;p&gt;Description...&lt;/p&gt;
 &lt;/div&gt;</code></pre>
 			</main>
 		</section>
