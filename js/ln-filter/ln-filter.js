@@ -1,6 +1,10 @@
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
 	const DOM_ATTRIBUTE = 'lnFilter';
+	const INIT_ATTR = 'data-ln-filter-initialized';
+	const KEY_ATTR = 'data-ln-filter-key';
+	const VALUE_ATTR = 'data-ln-filter-value';
+	const HIDE_ATTR = 'data-ln-filter-hide';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -11,147 +15,84 @@
 	}
 
 	function _findElements(root) {
-		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
+		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			items.push(root);
 		}
-		for (const el of items) {
+		items.forEach(function (el) {
 			if (!el[DOM_ATTRIBUTE]) {
 				el[DOM_ATTRIBUTE] = new _component(el);
 			}
-		}
+		});
 	}
 
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
+		if (dom.hasAttribute(INIT_ATTR)) return this;
+
 		this.dom = dom;
-		dom[DOM_ATTRIBUTE] = this;
+		this.targetId = dom.getAttribute(DOM_SELECTOR);
+		this.buttons = Array.from(dom.querySelectorAll('button'));
 
-		this._activeKey = null;
-		this._activeValue = null;
-		this._target = null;
-		this._targetObserver = null;
+		this._attachHandlers();
 
-		this._bindEvents();
-
-		const initialActive = dom.querySelector('[data-ln-filter-key][data-ln-filter-value=""]');
-		if (initialActive) {
-			initialActive.setAttribute('data-active', '');
-		}
-
+		dom.setAttribute(INIT_ATTR, '');
 		return this;
 	}
 
-	_component.prototype._bindEvents = function () {
-		const self = this;
+	// ─── Handlers ──────────────────────────────────────────────
 
-		this._clickHandler = function (e) {
-			const btn = e.target.closest('[data-ln-filter-key]');
-			if (!btn || !self.dom.contains(btn)) return;
+	_component.prototype._attachHandlers = function () {
+		var self = this;
 
-			const key = btn.getAttribute('data-ln-filter-key');
-			const value = btn.getAttribute('data-ln-filter-value');
-			self.filter(key, value);
-		};
-		this.dom.addEventListener('click', this._clickHandler);
-	};
+		this.buttons.forEach(function (btn) {
+			if (btn[DOM_ATTRIBUTE + 'Bound']) return;
+			btn[DOM_ATTRIBUTE + 'Bound'] = true;
 
-	// ─── Public API ────────────────────────────────────────────
+			btn.addEventListener('click', function (e) {
+				// Update active state
+				self.buttons.forEach(function (b) {
+					b.classList.remove('active');
+				});
+				btn.classList.add('active');
 
-	_component.prototype.filter = function (key, value) {
-		const buttons = Array.from(this.dom.querySelectorAll('[data-ln-filter-key]'));
-		for (const btn of buttons) {
-			btn.removeAttribute('data-active');
-		}
-
-		const matchBtn = this.dom.querySelector(
-			'[data-ln-filter-key="' + key + '"][data-ln-filter-value="' + (value || '') + '"]'
-		);
-		if (matchBtn) matchBtn.setAttribute('data-active', '');
-
-		if (!value) {
-			this._activeKey = null;
-			this._activeValue = null;
-			this._apply();
-			_dispatch(this.dom, 'ln-filter:reset', {});
-			return;
-		}
-
-		this._activeKey = key;
-		this._activeValue = value;
-		this._apply();
-		this._ensureTargetObserver();
-
-		_dispatch(this.dom, 'ln-filter:changed', {
-			key: key,
-			value: value
+				// Apply filter
+				self._filter(btn);
+			});
 		});
 	};
 
-	_component.prototype.reset = function () {
-		const resetBtn = this.dom.querySelector('[data-ln-filter-key][data-ln-filter-value=""]');
-		const key = resetBtn ? resetBtn.getAttribute('data-ln-filter-key') : '';
-		this.filter(key, '');
-	};
+	_component.prototype._filter = function (btn) {
+		var target = document.getElementById(this.targetId);
+		if (!target) return;
 
-	_component.prototype.getActive = function () {
-		if (!this._activeKey) return null;
-		return { key: this._activeKey, value: this._activeValue };
-	};
+		var key = btn.getAttribute(KEY_ATTR);
+		var value = btn.getAttribute(VALUE_ATTR);
+		if (!key) return;
 
-	_component.prototype.destroy = function () {
-		if (!this.dom[DOM_ATTRIBUTE]) return;
-		this.dom.removeEventListener('click', this._clickHandler);
-		if (this._targetObserver) {
-			this._targetObserver.disconnect();
-		}
-		delete this.dom[DOM_ATTRIBUTE];
-	};
+		var elements = target.querySelectorAll('[data-' + key + ']');
+		var matched = 0;
+		var total = elements.length;
 
-	// ─── Private ───────────────────────────────────────────────
+		for (var i = 0; i < elements.length; i++) {
+			var el = elements[i];
+			el.removeAttribute(HIDE_ATTR);
 
-	_component.prototype._resolveTarget = function () {
-		if (!this._target) {
-			const targetId = this.dom.getAttribute(DOM_SELECTOR);
-			this._target = targetId ? document.getElementById(targetId) : null;
-		}
-		return this._target;
-	};
-
-	_component.prototype._getItems = function () {
-		const target = this._resolveTarget();
-		if (!target) return [];
-		return Array.from(target.children);
-	};
-
-	_component.prototype._apply = function () {
-		const key = this._activeKey;
-		const value = this._activeValue;
-
-		for (const el of this._getItems()) {
-			if (!key || !value) {
-				el.removeAttribute('data-ln-filter-hide');
+			if (value !== '' && !el.getAttribute('data-' + key).toLowerCase().includes(value.toLowerCase())) {
+				el.setAttribute(HIDE_ATTR, 'true');
 			} else {
-				const elValue = el.getAttribute('data-' + key);
-				if (elValue !== null && elValue.toLowerCase().indexOf(value.toLowerCase()) !== -1) {
-					el.removeAttribute('data-ln-filter-hide');
-				} else {
-					el.setAttribute('data-ln-filter-hide', '');
-				}
+				matched++;
 			}
 		}
-	};
 
-	_component.prototype._ensureTargetObserver = function () {
-		const target = this._resolveTarget();
-		if (!target || this._targetObserver) return;
-
-		const self = this;
-		this._targetObserver = new MutationObserver(function () {
-			if (self._activeKey) self._apply();
+		_dispatch(this.dom, 'ln-filter:change', {
+			targetId: this.targetId,
+			key: key,
+			value: value,
+			matched: matched,
+			total: total
 		});
-		this._targetObserver.observe(target, { childList: true });
 	};
 
 	// ─── Helpers ───────────────────────────────────────────────
@@ -166,16 +107,16 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
+		var observer = new MutationObserver(function (mutations) {
+			mutations.forEach(function (mutation) {
 				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
+					mutation.addedNodes.forEach(function (node) {
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}
-					}
+					});
 				}
-			}
+			});
 		});
 
 		observer.observe(document.body, {
