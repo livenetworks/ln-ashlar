@@ -3,11 +3,15 @@
 	const DOM_ATTRIBUTE = 'lnTable';
 	const SORT_ATTR = 'data-ln-sort';        // read-only: column type metadata (number/date/string) used when parsing rows
 	const EMPTY_TEMPLATE = 'data-ln-table-empty';
-	const INIT_ATTR = 'data-ln-table-initialized';
 	const VIRTUAL_THRESHOLD = 200;
 	const BUFFER_ROWS = 15;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// Singleton — same lang for all table instances on the page
+	var _collator = typeof Intl !== 'undefined'
+		? new Intl.Collator(document.documentElement.lang || undefined, { sensitivity: 'base' })
+		: null;
 
 	// ─── Constructor ───────────────────────────────────────────
 
@@ -26,8 +30,6 @@
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
-		if (dom.hasAttribute(INIT_ATTR)) return this;
-
 		this.dom = dom;
 		this.table = dom.querySelector('table');
 		this.tbody = dom.querySelector('tbody');
@@ -40,7 +42,6 @@
 		this._sortCol = -1;
 		this._sortDir = null;
 		this._sortType = null;
-		this._totalCount = 0;
 
 		// Virtual scroll state
 		this._virtual = false;
@@ -51,10 +52,6 @@
 		this._scrollHandler = null;
 		this._colgroup = null;
 
-		this._collator = typeof Intl !== 'undefined'
-			? new Intl.Collator(document.documentElement.lang || undefined, { sensitivity: 'base' })
-			: null;
-
 		var toolbar = dom.querySelector('.ln-table__toolbar');
 		if (toolbar) dom.style.setProperty('--ln-table-toolbar-h', toolbar.offsetHeight + 'px');
 
@@ -63,13 +60,13 @@
 		if (this.tbody && this.tbody.rows.length > 0) {
 			this._parseRows();
 		} else if (this.tbody) {
-			this._tbodyObserver = new MutationObserver(function () {
+			var observer = new MutationObserver(function () {
 				if (self.tbody.rows.length > 0) {
-					self._tbodyObserver.disconnect();
+					observer.disconnect();
 					self._parseRows();
 				}
 			});
-			this._tbodyObserver.observe(this.tbody, { childList: true });
+			observer.observe(this.tbody, { childList: true });
 		}
 
 		// ─── Coordinate with ln-table-search ───────────────────
@@ -83,7 +80,7 @@
 			_dispatch(dom, 'ln-table:filter', {
 				term: self._searchTerm,
 				matched: self._filteredData.length,
-				total: self._totalCount
+				total: self._data.length
 			});
 		});
 
@@ -101,11 +98,10 @@
 				column: e.detail.column,
 				direction: e.detail.direction,
 				matched: self._filteredData.length,
-				total: self._totalCount
+				total: self._data.length
 			});
 		});
 
-		dom.setAttribute(INIT_ATTR, '');
 		return this;
 	}
 
@@ -147,19 +143,17 @@
 			}
 
 			this._data.push({
-				index: i,
 				sortKeys: sortKeys,
 				html: tr.outerHTML,
 				searchText: searchParts.join(' ')
 			});
 		}
 
-		this._totalCount = this._data.length;
 		this._filteredData = this._data.slice();
 		this._render();
 
 		_dispatch(this.dom, 'ln-table:ready', {
-			total: this._totalCount
+			total: this._data.length
 		});
 	};
 
@@ -180,9 +174,8 @@
 		var colIndex = this._sortCol;
 		var multiplier = this._sortDir === 'desc' ? -1 : 1;
 		var isNumeric = (this._sortType === 'number' || this._sortType === 'date');
-		var collator = this._collator;
-		var compare = collator
-			? collator.compare
+		var compare = _collator
+			? _collator.compare
 			: function (a, b) { return a < b ? -1 : a > b ? 1 : 0; };
 
 		this._filteredData.sort(function (a, b) {
@@ -328,7 +321,7 @@
 
 		_dispatch(this.dom, 'ln-table:empty', {
 			term: this._searchTerm,
-			total: this._totalCount
+			total: this._data.length
 		});
 	};
 
