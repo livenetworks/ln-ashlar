@@ -69,9 +69,11 @@
 			observer.observe(this.tbody, { childList: true });
 		}
 
-		// ─── Coordinate with ln-table-search ───────────────────
+		// ─── Search — ln-search dispatches ln-search:change on the target ─────
+		// preventDefault() tells ln-search to skip its own DOM show/hide logic.
 
-		dom.addEventListener('ln-table:search', function (e) {
+		dom.addEventListener('ln-search:change', function (e) {
+			e.preventDefault();
 			self._searchTerm = e.detail.term;
 			self._applyFilterAndSort();
 			self._vStart = -1;

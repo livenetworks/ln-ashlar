@@ -1,84 +1,83 @@
 # ln-search
 
 Generic search component — filters children of a target element by `textContent`.
-Elements that don't match receive a `data-ln-search-hide` attribute.
+Works on lists and on `[data-ln-table]` components.
 
 ## Attributes
 
 | Attribute | On | Description |
 |---------|-----|------|
-| `data-ln-search="targetId"` | component root | Target element by ID whose children are filtered |
-| `data-ln-search-input` | `<input>` inside | Search input (listens to `input` event) |
-| `data-ln-search-debounce="300"` | component root | Optional debounce in ms (default: 0) |
+| `data-ln-search="targetId"` | wrapper element **or** directly on `<input>` | Target element by ID |
 | `data-ln-search-hide` | children of target | Set by JS when the element doesn't match |
 
-## API
-
-```javascript
-// Instance API (on the DOM element)
-var el = document.querySelector('[data-ln-search]');
-el.lnSearch.search('query');   // programmatic search
-el.lnSearch.clear();           // clear search, show all
-el.lnSearch.getQuery();        // current query string
-
-// Constructor — only for non-standard cases (Shadow DOM, iframe)
-// For AJAX/dynamic DOM: MutationObserver auto-initializes
-window.lnSearch(container);
-```
+When placed on a wrapper, the component finds the first `input[type="search"]`, `input[type="text"]`, or `[name="search"]` inside it.
+When placed directly on an `<input>`, that input is used.
 
 ## Events
 
-| Event | Bubbles | Detail |
-|-------|---------|--------|
-| `ln-search:input` | yes | `{ query: string, count: number, total: number }` |
-| `ln-search:clear` | yes | `{ count: number, total: number }` |
+| Event | On | Cancelable | `detail` |
+|-------|-----|-----------|--------|
+| `ln-search:change` | target element | **yes** | `{ term, targetId }` |
+
+The event fires on the **target** element (not the input) before any DOM manipulation.
+If `preventDefault()` is called, `ln-search` skips its default show/hide behavior — the consumer handles filtering itself (e.g. `ln-table`).
 
 ```javascript
-// Listen for search
-document.addEventListener('ln-search:input', function (e) {
-    console.log('Search:', e.detail.query, '— Results:', e.detail.count + '/' + e.detail.total);
-});
-
-// Listen for clear
-document.addEventListener('ln-search:clear', function (e) {
-    console.log('Search cleared, total:', e.detail.total);
+document.getElementById('my-list').addEventListener('ln-search:change', function (e) {
+    console.log('Search term:', e.detail.term);
 });
 ```
 
-## Example
+## Default behaviour (lists)
 
-```html
-<!-- Search component -->
-<fieldset data-ln-search="my-list">
-    <legend class="sr-only">Search</legend>
-    <span class="ln-icon-search ln-icon--sm"></span>
-    <input type="search" placeholder="Search..." data-ln-search-input />
-</fieldset>
-
-<!-- Target list (ID = value from data-ln-search) -->
-<ul id="my-list">
-    <li>First element</li>
-    <li>Second element</li>
-    <li>Third element</li>
-</ul>
-```
-
-### With debounce
-
-```html
-<fieldset data-ln-search="results" data-ln-search-debounce="300">
-    <input type="search" data-ln-search-input placeholder="Search..." />
-</fieldset>
-```
-
-## CSS
-
-The consumer must provide a CSS rule for hiding:
+When the target is a plain list, `ln-search` adds `data-ln-search-hide="true"` to children that don't match, and removes it from those that do.
 
 ```css
+/* Required CSS */
 [data-ln-search-hide] {
     display: none;
 }
+```
+
+## Table integration
+
+When `data-ln-search` points to a `[data-ln-table]` element, `ln-table` intercepts the `ln-search:change` event and calls `preventDefault()`. This tells `ln-search` to skip DOM manipulation. `ln-table` then handles filtering in-memory (with sort and virtual scroll preserved).
+
+```html
+<input type="search" placeholder="Search..." data-ln-search="my-table">
+
+<div id="my-table" data-ln-table>
+    <table>...</table>
+</div>
+```
+
+No extra configuration needed — the integration is automatic.
+
+## Examples
+
+### On a wrapper element
+
+```html
+<label data-ln-search="my-list">
+    <span class="ln-icon-filter ln-icon--sm"></span>
+    <input type="search" placeholder="Search...">
+</label>
+
+<ul id="my-list">
+    <li>First element</li>
+    <li>Second element</li>
+</ul>
+```
+
+### Directly on an input
+
+```html
+<input type="search" placeholder="Search..." data-ln-search="my-list">
+
+<ul id="my-list">
+    <li>First element</li>
+    <li>Second element</li>
+</ul>
 ```
 
 ## Combination with ln-filter
@@ -91,7 +90,3 @@ The consumer must provide a CSS rule for hiding:
     display: none;
 }
 ```
-
-## Dynamic elements
-
-When children are added to the target list (AJAX, populate), `ln-search` automatically re-filters them if there is an active query. A MutationObserver on the target element ensures this.

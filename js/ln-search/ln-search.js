@@ -32,9 +32,14 @@
 
 		this.dom = dom;
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
-		this.input = dom.querySelector('[name="search"]') ||
-		             dom.querySelector('input[type="search"]') ||
-		             dom.querySelector('input[type="text"]');
+
+		// Support data-ln-search directly on <input> or on a wrapper element
+		var tag = dom.tagName;
+		this.input = (tag === 'INPUT' || tag === 'TEXTAREA') ? dom
+			: dom.querySelector('[name="search"]')
+			|| dom.querySelector('input[type="search"]')
+			|| dom.querySelector('input[type="text"]');
+
 		this._debounceTimer = null;
 
 		this._attachHandler();
@@ -61,6 +66,18 @@
 		var target = document.getElementById(this.targetId);
 		if (!target) return;
 
+		// Dispatch cancelable event on target.
+		// Consumers (e.g. ln-table) can call preventDefault() to handle filtering
+		// themselves and skip the default DOM show/hide behaviour.
+		var evt = new CustomEvent('ln-search:change', {
+			bubbles: true,
+			cancelable: true,
+			detail: { term: term, targetId: this.targetId }
+		});
+
+		if (!target.dispatchEvent(evt)) return; // preventDefault() called — bail out
+
+		// Default behaviour: show/hide direct children of target
 		var children = target.children;
 		var matched = 0;
 		var total = children.length;
@@ -75,23 +92,7 @@
 				matched++;
 			}
 		}
-
-		_dispatch(this.dom, 'ln-search:change', {
-			targetId: this.targetId,
-			term: term,
-			matched: matched,
-			total: total
-		});
 	};
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
 
 	// ─── DOM Observer ──────────────────────────────────────────
 

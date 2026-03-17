@@ -1,13 +1,14 @@
 # ln-table
 
 Data table компонента — in-memory filter, sort, virtual scroll.
-Три независни компоненти кои комуницираат преку CustomEvents.
+Две независни компоненти кои комуницираат преку CustomEvents.
 
 | Компонента | `window.*` | Одговорност |
 |-----------|-----------|-------------|
-| `ln-table-search` | `lnTableSearch` | Input debounce → dispatch `ln-table:search` |
 | `ln-table-sort` | `lnTableSort` | Click на `th` → cycling asc/desc/null → dispatch `ln-table:sort` |
 | `ln-table` | `lnTable` | Parse rows, слуша events, filter + sort во меморија, render |
+
+Search се обезбедува од **`ln-search`** (генеричка компонента) — `data-ln-search="tableId"` на input-от.
 
 ---
 
@@ -20,7 +21,7 @@ Data table компонента — in-memory filter, sort, virtual scroll.
         <aside>
             <label class="ln-table__search">
                 <span class="ln-icon-filter ln-icon--sm"></span>
-                <input type="search" placeholder="Пребарај..." data-ln-table-search="employees">
+                <input type="search" placeholder="Пребарај..." data-ln-search="employees">
             </label>
             <span class="ln-table__count"></span>
             <span class="ln-table__timing"></span>
@@ -62,15 +63,17 @@ Data table компонента — in-memory filter, sort, virtual scroll.
 
 На wrapper елементот. Мора да има `id` ако се поврзува со search input.
 
-### `[data-ln-table-search="tableId"]`
+### `[data-ln-search="tableId"]`
 
-На `<input>` надвор (или внатре) во wrapper-от. Вредноста е `id` на `[data-ln-table]`.
-Може да биде во toolbar-от или на друго место на страницата.
+На `<input>` (или на wrapper) — стандарден `ln-search` атрибут.
+`ln-table` го пресретнува `ln-search:change` евентот и вика `preventDefault()`,
+со што `ln-search` го прескокнува своето DOM show/hide и `ln-table` го врши
+филтрирањето во меморија.
 
 ### `[data-ln-table-clear]`
 
 На копче — ја чисти вредноста на поврзаниот search input.
-Се резолвира преку: `btn → closest [data-ln-table] → id → [data-ln-table-search="id"]`.
+Се резолвира преку: `btn → closest [data-ln-table] → id → [data-ln-search="id"]`.
 
 ### `th[data-ln-sort]`
 
@@ -126,7 +129,6 @@ Data table компонента — in-memory filter, sort, virtual scroll.
 ```javascript
 document.getElementById('employees').addEventListener('ln-table:empty', function (e) {
     console.log('No results for:', e.detail.term);
-    // прикажи своја порака
 });
 ```
 
@@ -154,7 +156,6 @@ document.getElementById('employees').addEventListener('ln-table:empty', function
 | Event | Dispatch-ува | `detail` |
 |-------|-------------|----------|
 | `ln-table:ready` | `ln-table` — по парсирање на rows | `{ total }` |
-| `ln-table:search` | `ln-table-search` — по debounce | `{ term }` |
 | `ln-table:filter` | `ln-table` — по filter render | `{ term, matched, total }` |
 | `ln-table:sort` | `ln-table-sort` — по click на `th` | `{ column, sortType, direction }` |
 | `ln-table:sorted` | `ln-table` — по sort render | `{ column, direction, matched, total }` |
@@ -162,8 +163,6 @@ document.getElementById('employees').addEventListener('ln-table:empty', function
 
 ```javascript
 var table = document.getElementById('employees');
-var countEl = document.getElementById('count');
-var timingEl = document.getElementById('timing');
 
 // Почетен count по парсирање
 table.addEventListener('ln-table:ready', function (e) {

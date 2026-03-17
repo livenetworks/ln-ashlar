@@ -89,6 +89,15 @@
 	background: var(--color-table-header-bg, #1a1a2e);
 }
 
+// ── Thead corner radius — overflow:clip clips at content-box, not border-radius curve,
+//    so the dark thead bleeds into the wrapper's rounded corners. Fix at source. ──
+[data-ln-table] thead tr:first-child th:first-child {
+	border-top-left-radius: var(--radius-lg);
+}
+[data-ln-table] thead tr:first-child th:last-child {
+	border-top-right-radius: var(--radius-lg);
+}
+
 // ── Virtual scroll spacer rows ──
 .ln-table__spacer td {
 	padding: 0 !important;

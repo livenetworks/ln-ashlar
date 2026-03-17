@@ -9,6 +9,8 @@
 	<script src="../js/ln-toast/ln-toast.js" defer></script>
 	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
 	<script src="../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../js/ln-search/ln-search.js" defer></script>
+	<script src="../js/ln-table/ln-table-sort.js" defer></script>
 	<script src="../js/ln-table/ln-table.js" defer></script>
 	<script src="demo.js" defer></script>
 </head>
@@ -17,27 +19,25 @@
 
 	<div class="app-wrapper">
 
-		<!-- Header -->
-		<div class="header">
+		<header>
 			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<span class="ln-icon-menu"></span>
 				</button>
 				<h1>Data Table</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'ln-table', message:'Фаза 1 — sticky header demo.'})">Test Toast</button>
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'ln-table', message:'In-memory filter, sort, virtual scroll.'})">Test Toast</button>
 				</div>
 			</div>
-		</div>
+		</header>
 
 		<div class="app-body">
 
-			<!-- Sidebar -->
 			<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 				<div class="sidebar-header">
-					<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close"></button>
+					<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
 					<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 					<span class="app-name">acme-gui</span>
 				</div>
@@ -48,7 +48,7 @@
 							<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
 						</ul>
 
-						<h6 class="nav-section">CSS компоненти</h6>
+						<h6 class="nav-section">CSS Components</h6>
 						<ul>
 							<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 							<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
@@ -60,23 +60,23 @@
 							<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
 						</ul>
 
-						<h6 class="nav-section">JS компоненти</h6>
+						<h6 class="nav-section">JS Components</h6>
 						<ul>
 							<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 							<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
 							<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
 							<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 							<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
-						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+							<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 							<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+							<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 							<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 							<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
-						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+							<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 							<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
 							<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
 							<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
 							<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
-							<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						</ul>
 					</nav>
 				</div>
@@ -86,48 +86,199 @@
 				</div>
 			</aside>
 
-			<!-- Main Panel -->
 			<div class="main-panel">
 				<div class="content">
 
-					<!-- ── Data Table component ─────────────────────── -->
-					<div data-ln-table id="demo-table">
+					<h1>Data Table</h1>
+					<p>In-memory filter, sort, virtual scroll. Search is provided by <code>ln-search</code>; sort by <code>ln-table-sort</code>; rendering by <code>ln-table</code>.</p>
 
-						<!-- Toolbar — sticky #1, закачена на top:0 (.content scroll area) -->
-						<header class="ln-table__toolbar">
-							<h3>Вработени</h3>
-							<aside>
-								<label class="ln-table__search">
-									<span class="ln-icon-filter ln-icon--sm"></span>
-									<input type="search" placeholder="Пребарај..." data-ln-table-search="demo-table">
-								</label>
-								<span class="ln-table__count" id="demo-count">10.000 записи</span>
-								<span class="ln-table__timing" id="demo-timing"></span>
-							</aside>
-						</header>
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-table</code></td><td>wrapper (needs <code>id</code>)</td><td>Marks the component root. Parses rows, listens for search/sort events.</td></tr>
+									<tr><td><code>data-ln-search="tableId"</code></td><td><code>&lt;input&gt;</code> or wrapper</td><td>Standard <code>ln-search</code> — <code>ln-table</code> intercepts the event and handles filtering in-memory.</td></tr>
+									<tr><td><code>data-ln-table-clear</code></td><td><code>&lt;button&gt;</code></td><td>Clears the search input. Resolves via <code>closest [data-ln-table]</code> → id → <code>[data-ln-search="id"]</code>.</td></tr>
+									<tr><td><code>th[data-ln-sort="string"]</code></td><td><code>&lt;th&gt;</code></td><td>Makes a column sortable. Values: <code>string</code>, <code>number</code>, <code>date</code>.</td></tr>
+									<tr><td><code>td[data-ln-value]</code></td><td><code>&lt;td&gt;</code></td><td>Raw sort/filter value when display text differs (formatted numbers, dates).</td></tr>
+									<tr><td><code>data-ln-table-empty</code></td><td><code>&lt;template&gt;</code></td><td>Content shown when search returns 0 results.</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
 
-						<table>
-							<thead>
-								<tr>
-									<th data-ln-sort="number">#</th>
-									<th data-ln-sort="string">Вработен</th>
-									<th data-ln-sort="string">Оддел</th>
-									<th data-ln-sort="string">Позиција</th>
-									<th data-ln-sort="date">Вработен од</th>
-									<th data-ln-sort="number" class="numeric">Плата (МКД)</th>
-									<th>Статус</th>
-									<th class="center">Акции</th>
-								</tr>
-							</thead>
-							<tbody id="demo-tbody">
-								<!-- 10.000 реда — генерирани со JS -->
-							</tbody>
-						</table>
+					<!-- Live demo — 10.000 rows -->
+					<section class="section-card">
+						<header><h3>Live Demo — 10.000 rows</h3></header>
+						<main>
+							<div data-ln-table id="demo-table">
+								<header class="ln-table__toolbar">
+									<h3>Вработени</h3>
+									<aside>
+										<label class="ln-table__search">
+											<span class="ln-icon-filter ln-icon--sm"></span>
+											<input type="search" placeholder="Пребарај..." data-ln-search="demo-table">
+										</label>
+										<span class="ln-table__count" id="demo-count"></span>
+										<span class="ln-table__timing" id="demo-timing"></span>
+									</aside>
+								</header>
 
-						<footer class="ln-table__footer">
-							<span>Вкупно: <strong id="demo-total">10.000</strong> записи</span>
-						</footer>
-					</div>
+								<template data-ln-table-empty>
+									<article class="ln-table__empty-state">
+										<span class="ln-icon-filter ln-icon--xl"></span>
+										<h3>Нема резултати</h3>
+										<p>Обидете се со поинаков термин.</p>
+										<button class="btn btn--secondary" data-ln-table-clear>Исчисти</button>
+									</article>
+								</template>
+
+								<table>
+									<thead>
+										<tr>
+											<th data-ln-sort="number">#</th>
+											<th data-ln-sort="string">Вработен</th>
+											<th data-ln-sort="string">Оддел</th>
+											<th data-ln-sort="string">Позиција</th>
+											<th data-ln-sort="date">Вработен од</th>
+											<th data-ln-sort="number" class="numeric">Плата (МКД)</th>
+											<th>Статус</th>
+											<th class="center">Акции</th>
+										</tr>
+									</thead>
+									<tbody id="demo-tbody"></tbody>
+								</table>
+
+								<footer class="ln-table__footer">
+									<span>Вкупно: <strong id="demo-total"></strong> записи</span>
+								</footer>
+							</div>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>Dispatched by</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-table:ready</code></td><td><code>ln-table</code> — after row parse</td><td><code>{ total }</code></td></tr>
+									<tr><td><code>ln-table:filter</code></td><td><code>ln-table</code> — after filter render</td><td><code>{ term, matched, total }</code></td></tr>
+									<tr><td><code>ln-table:sort</code></td><td><code>ln-table-sort</code> — on <code>th</code> click</td><td><code>{ column, sortType, direction }</code></td></tr>
+									<tr><td><code>ln-table:sorted</code></td><td><code>ln-table</code> — after sort render</td><td><code>{ column, direction, matched, total }</code></td></tr>
+									<tr><td><code>ln-table:empty</code></td><td><code>ln-table</code> — filter returns 0</td><td><code>{ term, total }</code></td></tr>
+								</tbody>
+							</table>
+							<pre><code>var table = document.getElementById('demo-table');
+
+table.addEventListener('ln-table:ready', function (e) {
+    countEl.textContent = e.detail.total.toLocaleString() + ' записи';
+});
+
+table.addEventListener('ln-table:filter', function (e) {
+    countEl.textContent = e.detail.matched < e.detail.total
+        ? e.detail.matched.toLocaleString() + ' / ' + e.detail.total.toLocaleString()
+        : e.detail.total.toLocaleString() + ' записи';
+});</code></pre>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;div id="employees" data-ln-table&gt;
+
+    &lt;!-- Optional toolbar (sticky) --&gt;
+    &lt;header class="ln-table__toolbar"&gt;
+        &lt;h3&gt;Employees&lt;/h3&gt;
+        &lt;aside&gt;
+            &lt;label class="ln-table__search"&gt;
+                &lt;span class="ln-icon-filter ln-icon--sm"&gt;&lt;/span&gt;
+                &lt;input type="search" placeholder="Search..." data-ln-search="employees"&gt;
+            &lt;/label&gt;
+            &lt;span class="ln-table__count"&gt;&lt;/span&gt;
+            &lt;span class="ln-table__timing"&gt;&lt;/span&gt;
+        &lt;/aside&gt;
+    &lt;/header&gt;
+
+    &lt;!-- Optional empty state --&gt;
+    &lt;template data-ln-table-empty&gt;
+        &lt;article class="ln-table__empty-state"&gt;
+            &lt;span class="ln-icon-filter ln-icon--xl"&gt;&lt;/span&gt;
+            &lt;h3&gt;No results&lt;/h3&gt;
+            &lt;button class="btn btn--secondary" data-ln-table-clear&gt;Clear&lt;/button&gt;
+        &lt;/article&gt;
+    &lt;/template&gt;
+
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th data-ln-sort="number"&gt;#&lt;/th&gt;
+                &lt;th data-ln-sort="string"&gt;Name&lt;/th&gt;
+                &lt;th data-ln-sort="date"&gt;Date&lt;/th&gt;
+                &lt;th data-ln-sort="number"&gt;Salary&lt;/th&gt;
+                &lt;th&gt;Actions&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+                &lt;td&gt;1&lt;/td&gt;
+                &lt;td&gt;Marko Petrovski&lt;/td&gt;
+                &lt;td data-ln-value="1700000000"&gt;15.11.2023&lt;/td&gt;
+                &lt;td data-ln-value="55000"&gt;55.000&lt;/td&gt;
+                &lt;td&gt;&lt;button&gt;...&lt;/button&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;!-- Optional footer --&gt;
+    &lt;footer class="ln-table__footer"&gt;
+        &lt;span&gt;Total: &lt;strong&gt;&lt;/strong&gt;&lt;/span&gt;
+    &lt;/footer&gt;
+&lt;/div&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- data-ln-value -->
+					<section class="section-card">
+						<header><h3>data-ln-value — sort/filter raw value</h3></header>
+						<main>
+							<p>When display text differs from the sort/filter key, add <code>data-ln-value</code> on the <code>&lt;td&gt;</code>:</p>
+							<table>
+								<thead><tr><th>Case</th><th>Without data-ln-value</th><th>With data-ln-value</th></tr></thead>
+								<tbody>
+									<tr><td>Formatted number</td><td>Sorts by <code>"55.000"</code> (string)</td><td>Sorts by <code>55000</code> (number)</td></tr>
+									<tr><td>Formatted date</td><td>Sorts by <code>"15.11.2023"</code> (string)</td><td>Sorts by Unix timestamp (number)</td></tr>
+								</tbody>
+							</table>
+							<pre><code>&lt;td data-ln-value="55000"&gt;55.000&lt;/td&gt;
+&lt;td data-ln-value="1700000000"&gt;15.11.2023&lt;/td&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- Virtual scroll -->
+					<section class="section-card">
+						<header><h3>Virtual Scroll</h3></header>
+						<main>
+							<p>Automatically activates when filtered rows exceed <strong>200</strong>. Only visible rows + 15 buffer rows are rendered. Deactivates automatically when rows drop below the threshold.</p>
+							<p>Column widths are locked on first parse to prevent layout shifts during virtual rendering.</p>
+						</main>
+					</section>
+
+					<!-- Dynamic rows -->
+					<section class="section-card">
+						<header><h3>Dynamic Rows (AJAX)</h3></header>
+						<main>
+							<p>If <code>&lt;tbody&gt;</code> is empty at init, <code>ln-table</code> waits — a MutationObserver detects when rows are added and parses them automatically.</p>
+							<pre><code>// After AJAX — set innerHTML directly, ln-table will detect it
+document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pre>
+						</main>
+					</section>
 
 				</div>
 
@@ -135,16 +286,40 @@
 					<span>acme-gui &copy; 2026 LiveNetworks</span>
 					<span>ln-acme v1.0.0</span>
 				</footer>
-
 			</div>
 		</div>
 	</div>
+
 	<script>
-	(function() {
+	(function () {
 		var TOTAL = 10000;
 		var tableEl = document.getElementById('demo-table');
-		var tbody = document.getElementById('demo-tbody');
+		var tbody   = document.getElementById('demo-tbody');
+		var countEl = document.getElementById('demo-count');
+		var totalEl = document.getElementById('demo-total');
 		if (!tableEl || !tbody) return;
+
+		// ── Wire up events ──
+		tableEl.addEventListener('ln-table:ready', function (e) {
+			var n = e.detail.total.toLocaleString('mk');
+			if (countEl) countEl.textContent = n + ' записи';
+			if (totalEl) totalEl.textContent = n;
+		});
+
+		tableEl.addEventListener('ln-table:filter', function (e) {
+			var matched = e.detail.matched;
+			var total   = e.detail.total;
+			if (countEl) {
+				countEl.textContent = matched < total
+					? matched.toLocaleString('mk') + ' / ' + total.toLocaleString('mk')
+					: total.toLocaleString('mk') + ' записи';
+			}
+			if (totalEl) totalEl.textContent = matched.toLocaleString('mk');
+		});
+
+		tableEl.addEventListener('ln-table:sorted', function (e) {
+			if (totalEl) totalEl.textContent = e.detail.matched.toLocaleString('mk');
+		});
 
 		// ── Data pools ──
 		var firstNames = [
@@ -174,30 +349,28 @@
 			{ cls: 'fail', text: 'Неактивен' }
 		];
 
-		var dateMin = 1420070400; // 2015-01-01
-		var dateMax = 1767139200; // 2025-12-01
+		var dateMin   = 1420070400; // 2015-01-01
+		var dateMax   = 1767139200; // 2025-12-01
 		var dateRange = dateMax - dateMin;
 
 		function pad(n) { return n < 10 ? '0' + n : n; }
-
 		function formatDate(ts) {
 			var d = new Date(ts * 1000);
 			return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear();
 		}
-
 		function formatSalary(n) {
 			return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 		}
 
 		// ── Generate rows ──
-		var t0 = performance.now();
-
+		var t0   = performance.now();
 		var html = [];
+
 		for (var i = 0; i < TOTAL; i++) {
-			var name = firstNames[i % firstNames.length] + ' ' + lastNames[i % lastNames.length];
-			var dept = departments[i % departments.length];
-			var pos  = positions[i % positions.length];
-			var ts   = dateMin + Math.floor(Math.random() * dateRange);
+			var name   = firstNames[i % firstNames.length] + ' ' + lastNames[i % lastNames.length];
+			var dept   = departments[i % departments.length];
+			var pos    = positions[i % positions.length];
+			var ts     = dateMin + Math.floor(Math.random() * dateRange);
 			var salary = 30000 + Math.floor(Math.random() * 80000);
 			var status = statuses[i % statuses.length];
 
@@ -224,9 +397,6 @@
 		tbody.innerHTML = html.join('');
 
 		var elapsed = (performance.now() - t0).toFixed(0);
-		console.log('ln-table: ' + TOTAL + ' rows rendered in ' + elapsed + 'ms');
-
-		// ── Update UI with timing ──
 		var timingEl = document.getElementById('demo-timing');
 		if (timingEl) timingEl.textContent = elapsed + 'ms';
 	})();
