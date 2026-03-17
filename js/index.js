@@ -24,5 +24,7 @@ import './ln-filter/ln-filter.js';
 import './ln-filter/ln-filter.scss';
 import './ln-search/ln-search.js';
 import './ln-search/ln-search.scss';
+import './ln-table/ln-table-search.js';
+import './ln-table/ln-table-sort.js';
 import './ln-table/ln-table.js';
 import './ln-table/ln-table.scss';
