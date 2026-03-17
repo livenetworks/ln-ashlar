@@ -13,7 +13,8 @@
       "Bash(node:*)",
       "Bash(ls:*)",
       "Bash(npm run build:demo:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git ls-tree:*)"
     ]
   }
 }

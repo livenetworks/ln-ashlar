@@ -1,0 +1,189 @@
+@use '../../scss/config/mixins' as *;
+
+// ==========================================================================
+// ln-table — Data table component (sort, filter, sticky headers)
+// ==========================================================================
+
+// ── Fix: .content overflow blocks sticky ──
+.content:has([data-ln-table]) {
+	overflow: visible;
+}
+
+// ── Component wrapper ──
+[data-ln-table] {
+	@include border;
+	@include rounded-lg;
+	@include bg-primary;
+	overflow: clip;
+}
+
+// ── Toolbar (sticky #1 — below .header) ──
+.ln-table__toolbar {
+	@include panel-header;
+	position: sticky;
+	top: var(--header-height, 3.5rem);
+	z-index: 12;
+	border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+// ── Toolbar search ──
+.ln-table__search {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.375rem);
+	@include px(0.625rem);
+	@include py(0.25rem);
+	@include rounded-md;
+	@include border;
+	@include bg-primary;
+	@include transition-fast;
+
+	input[type="search"] {
+		@include border-none;
+		@include text-sm;
+		background: transparent;
+		outline: none;
+		@include w(10rem);
+
+		&::placeholder {
+			@include text-muted;
+		}
+
+		// Hide native clear button — we rely on type="search" x
+		&::-webkit-search-cancel-button {
+			-webkit-appearance: none;
+		}
+	}
+
+	&:focus-within {
+		border-color: var(--color-primary);
+		@include shadow-sm;
+	}
+}
+
+// ── Count badge ──
+.ln-table__count {
+	@include text-sm;
+	@include text-secondary;
+
+	strong {
+		@include text-primary;
+		@include font-semibold;
+	}
+}
+
+// ── Table overrides inside component ──
+[data-ln-table] table {
+	overflow: visible;
+	border-collapse: separate;
+	border-spacing: 0;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+// ── Thead (sticky #2, below toolbar) ──
+[data-ln-table] thead th {
+	position: sticky;
+	top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 2.75rem));
+	z-index: 11;
+	background: var(--color-table-header-bg, #1a1a2e);
+}
+
+// ── Virtual scroll spacer rows ──
+.ln-table__spacer td {
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
+}
+
+// ── First td override — remove global bold/bg ──
+[data-ln-table] table td:first-child {
+	background: transparent;
+	font-weight: normal;
+	@include text-secondary;
+}
+
+// ── Sort indicators on th ──
+[data-ln-table] th[data-ln-sort] {
+	@include cursor-pointer;
+	@include select-none;
+
+	&::after {
+		content: '';
+		@include inline-block;
+		@include size(0.875rem);
+		@include ml(0.25rem);
+		vertical-align: middle;
+		background-image: var(--icon-sort-both);
+		background-size: contain;
+		background-repeat: no-repeat;
+		opacity: 0.4;
+		@include transition-fast;
+	}
+
+	&:hover::after {
+		opacity: 0.7;
+	}
+
+	&[data-ln-sort-active="asc"]::after {
+		background-image: var(--icon-arrow-up-white);
+		opacity: 1;
+	}
+
+	&[data-ln-sort-active="desc"]::after {
+		background-image: var(--icon-arrow-down-white);
+		opacity: 1;
+	}
+}
+
+// ── Footer ──
+.ln-table__footer {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(1rem);
+	@include py(0.5rem);
+	@include border-t;
+	@include bg-secondary;
+	border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+	@include text-sm;
+	@include text-secondary;
+
+	strong {
+		@include text-primary;
+		@include font-semibold;
+	}
+}
+
+// ── Timing badge ──
+.ln-table__timing {
+	@include text-xs;
+	@include text-muted;
+	font-family: var(--font-mono);
+}
+
+// ── Empty state (filter returned 0 results) ──
+.ln-table__empty-state {
+	@include py(3rem);
+	@include text-center;
+
+	[class*="ln-icon-"] {
+		@include block;
+		@include mx(auto);
+		@include mb(1rem);
+		opacity: 0.3;
+	}
+
+	h3 {
+		@include text-lg;
+		@include font-semibold;
+		@include text-primary;
+		margin: 0 0 0.5rem;
+	}
+
+	p {
+		@include text-sm;
+		@include text-secondary;
+		margin: 0 0 1.5rem;
+	}
+}

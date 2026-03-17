@@ -6,124 +6,10 @@
 	<title>Data Table — ln-acme</title>
 	<link rel="stylesheet" href="../dist/ln-acme.css">
 	<link rel="stylesheet" href="demo.css">
-	<style>
-		/* ── ln-table component ──────────────────────────────────────── */
-		/* Привремени стилови — ќе се преселат во js/ln-table/ln-table.scss */
-
-		/*
-		 * Scroll container = viewport (body), НЕ .content.
-		 * (.content има overflow:auto, но flex родителите растат неограничено
-		 *  со min-h-screen, па content никогаш не scrolls — страната scroll-а.)
-		 *
-		 * .header = position:fixed, top:0, z-index:20, height: var(--header-height, 3.5rem)
-		 *
-		 * Sticky stacking (сите под z:20 за да одат ЗАД .header):
-		 *   1. .ln-table__toolbar — sticky top: --header-height, z-index:12
-		 *   2. thead th           — sticky top: --header-height + toolbar-h, z-index:11
-		 */
-
-		/*
-		 * .content има overflow:auto (_app-layout.scss:82) што го прави
-		 * scroll container за sticky. Но .content никогаш не скрола
-		 * (flex+min-h-screen го пуштаат да расте). Sticky е заробен во
-		 * контејнер без scroll → никогаш не се активира.
-		 * Fix: overflow:visible го ослободува sticky да го користи viewport-от.
-		 */
-		.content:has([data-ln-table]) {
-			overflow: visible;
-		}
-
-		/* ── Component wrapper ─── */
-		[data-ln-table] {
-			border: 1px solid var(--color-border);
-			border-radius: var(--radius-lg);
-			background: var(--color-bg-primary);
-		}
-
-		/* ── Toolbar (sticky #1 — below .header) ─── */
-		.ln-table__toolbar {
-			position: sticky;
-			top: var(--header-height, 3.5rem);
-			z-index: 12;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0.625rem 1rem;
-			background: var(--color-bg-secondary);
-			border-bottom: 1px solid var(--color-border);
-			border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-		}
-
-		.ln-table__toolbar h3 {
-			font-size: var(--text-base);
-			font-weight: var(--font-semibold);
-			color: var(--color-text-primary);
-			margin: 0;
-		}
-
-		.ln-table__toolbar aside {
-			display: flex;
-			align-items: center;
-			gap: 0.75rem;
-		}
-
-		.ln-table__count {
-			font-size: var(--text-sm);
-			color: var(--color-text-secondary);
-		}
-
-		/* ── Table overrides (undo global overflow:hidden + border-collapse) ─── */
-		[data-ln-table] table {
-			overflow: visible;
-			border-collapse: separate;
-			border-spacing: 0;
-			border-radius: 0;
-			box-shadow: none;
-		}
-
-		/* ── Thead (sticky #2, below toolbar) ─── */
-		[data-ln-table] thead th {
-			position: sticky;
-			top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 2.75rem));
-			z-index: 11;
-			background: var(--color-table-header-bg, #1a1a2e);
-		}
-
-		/* First/last td overrides — remove bg-secondary on first-child inside data-ln-table */
-		[data-ln-table] table td:first-child {
-			background: transparent;
-			font-weight: normal;
-			color: var(--color-text-secondary);
-		}
-
-		/* ── Footer ─── */
-		.ln-table__footer {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0.5rem 1rem;
-			border-top: 1px solid var(--color-border);
-			background: var(--color-bg-secondary);
-			border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-			font-size: var(--text-sm);
-			color: var(--color-text-secondary);
-		}
-
-		.ln-table__footer strong {
-			color: var(--color-text-primary);
-			font-weight: var(--font-semibold);
-		}
-
-		/* ── Timing badge ─── */
-		.ln-table__timing {
-			font-size: var(--text-xs);
-			color: var(--color-text-muted);
-			font-family: var(--font-mono);
-		}
-	</style>
 	<script src="../js/ln-toast/ln-toast.js" defer></script>
 	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
 	<script src="../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../js/ln-table/ln-table.js" defer></script>
 	<script src="demo.js" defer></script>
 </head>
 <body>
@@ -209,6 +95,10 @@
 						<header class="ln-table__toolbar">
 							<h3>Вработени</h3>
 							<aside>
+								<label class="ln-table__search">
+									<span class="ln-icon-filter ln-icon--sm"></span>
+									<input type="search" placeholder="Пребарај..." data-ln-table-search="demo-table">
+								</label>
 								<span class="ln-table__count" id="demo-count">10.000 записи</span>
 								<span class="ln-table__timing" id="demo-timing"></span>
 							</aside>
@@ -253,13 +143,6 @@
 		var tableEl = document.getElementById('demo-table');
 		var tbody = document.getElementById('demo-tbody');
 		if (!tableEl || !tbody) return;
-
-		// ── Measure toolbar height → CSS variable for thead sticky offset ──
-		var toolbar = tableEl.querySelector('.ln-table__toolbar');
-		if (toolbar) {
-			var h = toolbar.offsetHeight;
-			tableEl.style.setProperty('--ln-table-toolbar-h', h + 'px');
-		}
 
 		// ── Data pools ──
 		var firstNames = [
