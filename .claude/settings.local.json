@@ -14,12 +14,7 @@
       "Bash(ls:*)",
       "Bash(npm run build:demo:*)",
       "Bash(git checkout:*)",
-      "Bash(for file:*)",
-      "Bash(do sed:*)",
-      "Bash(echo \"Updated: $file\")",
-      "Bash(echo \"Removed bad line: $file\")",
-      "Bash(do)",
-      "Bash(sed -i 's|\\\\\\(\t\t\t\t\t\t<li><a href=\"\"progress.html\"\"><span class=\"\"nav-label\"\">Progress</span></a></li>\\\\\\)|\\\\1\\\\n\t\t\t\t\t\t<li><a href=\"\"circular-progress.html\"\"><span class=\"\"nav-label\"\">Circular Progress</span></a></li>|' \"$file\")"
+      "Bash(git ls-tree:*)"
     ]
   }
 }
