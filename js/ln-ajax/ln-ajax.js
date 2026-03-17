@@ -35,6 +35,9 @@
 		for (const link of links) {
 			if (link[DOM_ATTRIBUTE + 'Trigger']) continue;
 
+			// Skip external links — CORS blocks them and they should open normally
+			if (link.hostname && link.hostname !== window.location.hostname) continue;
+
 			const href = link.getAttribute('href');
 			if (href && href.includes('#')) continue;
 
