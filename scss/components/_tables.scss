@@ -138,17 +138,6 @@ table td .action {
 	}
 }
 
-.table-sort {
-	@include cursor-pointer;
-	@include select-none;
-	@include inline-flex;
-	@include items-center;
-	@include gap(0.25rem);
-
-	&--asc::after  { content: '\2191'; }
-	&--desc::after { content: '\2193'; }
-}
-
 @media (max-width: 768px) {
 	table th {
 		@include hidden;
