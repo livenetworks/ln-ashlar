@@ -213,6 +213,31 @@
 @mixin z($val) { z-index: $val; }
 
 // ---------------------------------------------------------------------------
+// Container Queries — декларирај контекст на парент, дете прашува @container
+// ---------------------------------------------------------------------------
+// Парент: @include container(name) — поставува container-type: inline-size
+// Дете:   @container name (min-width: 580px) { ... }  — нативна CSS синтакса
+//
+// Именување: noun, singular, lowercase, без хифени (CSS custom ident).
+//   RIGHT: foldersgrid, sidebar, cardgrid, searchresults
+//   WRONG: left-panel (позиција), card-grid (хифен не е дозволен)
+//
+// ВАЖНО: НЕ комбинирај container-type со overflow:hidden на ист елемент —
+//        ова го кршат containment. Ако треба клипирање, врапирај со нов елемент.
+//
+// Стандардни breakpoints:
+//   480px  → 1→2 колони во тесни контејнери
+//   580px  → 1→2 колони (стандардно)
+//   880px  → 2→3 колони
+//   1120px → 3→4 колони
+// ---------------------------------------------------------------------------
+
+@mixin container($name: null) {
+	container-type: inline-size;
+	@if $name { container-name: $name; }
+}
+
+// ---------------------------------------------------------------------------
 // Collapsible — grid-template-rows анимација за expand/collapse
 // ---------------------------------------------------------------------------
 // Single point of truth за toggle/accordion collapse однесување.
