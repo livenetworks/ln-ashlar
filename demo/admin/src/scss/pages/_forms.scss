@@ -33,10 +33,6 @@
 		@include mt(0.25rem);
 	}
 
-	// Checkbox/radio fix (ln-acme sets input { width: 100% } globally)
-	input[type="checkbox"],
-	input[type="radio"] { width: auto; margin-top: 0; }
-
 	// Error display
 	small { display: block; }
 }

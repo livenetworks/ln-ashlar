@@ -102,6 +102,79 @@ select {
 	padding-right: 2.5rem;
 }
 
+// ─── Custom checkbox & radio ──────────────────────────────────
+
+input[type="checkbox"],
+input[type="radio"] {
+	appearance: none;
+	@include size(1.25rem);
+	padding: 0;
+	@include flex-shrink-0;
+	border: 2px solid hsl(var(--color-border));
+	@include bg-primary;
+	@include cursor-pointer;
+	@include transition;
+	vertical-align: middle;
+
+	&:checked {
+		background-color: hsl(var(--color-primary));
+		border-color: hsl(var(--color-primary));
+		background-image: var(--icon-check-white);
+		background-size: 0.75rem;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 3px hsl(var(--color-primary-light));
+	}
+
+	&:disabled {
+		@include opacity-50;
+		@include cursor-not-allowed;
+	}
+}
+
+input[type="checkbox"] {
+	@include rounded-sm;
+}
+
+input[type="radio"] {
+	border-radius: 50%;
+
+	&:checked {
+		background-image: none;
+		@include bg-primary;
+		border-width: 5px;
+		border-color: hsl(var(--color-primary));
+	}
+}
+
+// ─── Pill label for checkbox/radio ────────────────────────────
+
+label:has(> input[type="checkbox"]),
+label:has(> input[type="radio"]) {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.5rem);
+	@include px(1rem);
+	@include py(0.5rem);
+	@include border;
+	@include rounded-md;
+	@include cursor-pointer;
+	@include transition;
+	@include mb(0);
+
+	&:has(> input:checked) {
+		border-color: hsl(var(--color-primary));
+		background-color: hsl(var(--color-primary) / 0.04);
+	}
+
+	&:hover {
+		border-color: hsl(var(--color-primary) / 0.5);
+	}
+}
+
 label {
 	@include block;
 	@include text-sm;
