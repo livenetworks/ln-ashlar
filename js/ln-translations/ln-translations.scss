@@ -1,0 +1,140 @@
+@use '../../scss/config/mixins' as *;
+
+// ─── Translation input: flag icon in background ───────────────────────────────
+
+[data-ln-translatable-lang] {
+	padding-left: 2.5rem;
+	background-repeat: no-repeat;
+	background-position: 0.5rem center;
+	background-size: 1.25rem auto;
+}
+
+// ─── Flag icons per language ──────────────────────────────────────────────────
+
+[data-ln-translatable-lang="en"] {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3CclipPath id='s'%3E%3Cpath d='M0 0v30h60V0z'/%3E%3C/clipPath%3E%3CclipPath id='t'%3E%3Cpath d='M30 15h30v15zv15H0zH0V0zV0h30z'/%3E%3C/clipPath%3E%3Cg clip-path='url(%23s)'%3E%3Cpath d='M0 0v30h60V0z' fill='%23012169'/%3E%3Cpath d='M0 0l60 30m0-30L0 30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0 0l60 30m0-30L0 30' clip-path='url(%23t)' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M30 0v30M0 15h60' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M30 0v30M0 15h60' stroke='%23C8102E' stroke-width='6'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+[data-ln-translatable-lang="sq"] {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 980 700'%3E%3Cpath d='M0 0h980v700H0z' fill='%23e41e20'/%3E%3Cpath d='M475.8 174.3c-7.4-1.1-14.2 3.8-15.4 11.2l-6.8 44.5c-1 6.4 2.7 12.6 8.8 14.8l-27 38.2c-1.4-5.4-5.4-10-11-11.8l-43.4-14.1c-7.1-2.3-14.8 1.5-17.1 8.7l-.3.8c-2.3 7.1 1.5 14.8 8.7 17.1l43.4 14.1c5 1.6 10.3.6 14.2-2.3l-5.4 48.8-44.2-21.5c-6.5-3.2-14.5-.4-17.6 6.1l-.4.8c-3.2 6.5-.4 14.4 6.1 17.6l44.2 21.5c4.7 2.3 10.1 1.8 14.2-.8l-28.7 68.2-38.1-30c-5.6-4.4-13.8-3.4-18.2 2.2l-.5.7c-4.4 5.6-3.4 13.8 2.2 18.2l38.1 30c3.6 2.8 8.2 3.5 12.3 2.2l-27.2 43.2-35-27.6c-5.6-4.4-13.8-3.5-18.2 2.2l-.5.6c-4.4 5.6-3.5 13.8 2.2 18.2l44.2 34.8c2.6 2.1 5.8 3.1 9 3.1 1.2 0 2.5-.2 3.7-.5l5.5-1.7L355 571.2c-2.7 6.3.2 13.7 6.5 16.4l.8.3c6.3 2.7 13.7-.2 16.4-6.5l22.3-52.4 6.8 22.3c2.1 6.8 9.2 10.6 16 8.6l.8-.3c6.8-2.1 10.6-9.2 8.6-16l-8.5-27.8 37.1 24.2c-2 6-.7 12.8 4 17.4l33.3 33.3c2.7 2.7 6.2 4 9.7 4s7-1.3 9.7-4c5.4-5.4 5.4-14 0-19.4l-33.3-33.3c-3.4-3.4-8-4.9-12.4-4.5l-47.1-30.8 27.8-8.5c6.8-2.1 10.6-9.2 8.6-16l-.3-.8c-2.1-6.8-9.2-10.6-16-8.6l-22.3 6.8 22.3-52.4c2.7-6.3-.2-13.7-6.5-16.4l-.8-.3c-6.3-2.7-13.7.2-16.4 6.5l-21 49.3-1.7 5.5c-1.5 5 .2 10.4 4.2 13.6l-9.2 14.7-35-27.6c-5.6-4.4-13.8-3.5-18.2 2.2l-.5.6c-1.4 1.8-2.2 3.8-2.6 5.9l-22.8 36.2 30.5-72.4 38.1 30c5.6 4.4 13.8 3.5 18.2-2.2l.5-.7c4.4-5.6 3.5-13.8-2.2-18.2l-38.1-30c-3-2.3-6.6-3.3-10.1-3l32.5-77.1 44.2 21.5c6.5 3.2 14.4.4 17.6-6.1l.4-.8c3.2-6.5.4-14.4-6.1-17.6l-44.2-21.5c-4.2-2-8.8-1.8-12.7.2l6.3-57.1 43.4 14.1c7.1 2.3 14.8-1.5 17.1-8.7l.3-.8c2.3-7.1-1.5-14.8-8.7-17.1l-43.4-14.1c-5.6-1.8-11.4.1-14.8 4.4l28.5-40.3c5.2-2.8 8.2-8.6 7.2-14.8l-6.8-44.5c-1.2-7.4-8-12.3-15.4-11.2-.4.1-.8.2-1.1.3-6.6 1.6-11 7.9-10 14.8l6.8 44.5.3 1.5-40.7 57.4-40.7-57.4.3-1.5 6.8-44.5c1-6.9-3.4-13.2-10-14.8-.4-.1-.8-.2-1.1-.3z' fill='%23000'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+[data-ln-translatable-lang="sr"] {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1350 900'%3E%3Cpath d='M0 0h1350v300H0z' fill='%23C6363C'/%3E%3Cpath d='M0 300h1350v300H0z' fill='%230C4076'/%3E%3Cpath d='M0 600h1350v300H0z' fill='%23fff'/%3E%3C/svg%3E");
+}
+
+// ─── Header actions ───────────────────────────────────────────────────────────
+
+.ln-translations__actions {
+	@include inline-flex;
+	@include items-center;
+	@include gap(var(--spacing-xs));
+	margin-left: auto;
+}
+
+.ln-translations__badge {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.25rem);
+	@include text-xs;
+	@include font-semibold;
+	@include uppercase;
+	@include rounded-sm;
+	@include px(var(--spacing-xs));
+	@include py(0.125rem);
+	background: hsl(var(--color-primary-hsl) / 0.08);
+	color: hsl(var(--color-primary-hsl));
+	@include select-none;
+}
+
+.ln-translations__badge-remove {
+	background: none;
+	border: none;
+	@include cursor-pointer;
+	@include text-sm;
+	@include font-bold;
+	color: inherit;
+	padding: 0;
+	line-height: 1;
+	@include transition-fast;
+
+	&:hover {
+		@include text-error;
+	}
+}
+
+.ln-translations__dropdown {
+	@include relative;
+}
+
+.ln-translations__add-btn {
+	@include inline-flex;
+	@include items-center;
+	@include justify-center;
+	@include size(1.5rem);
+	@include rounded-sm;
+	@include text-sm;
+	@include font-bold;
+	@include cursor-pointer;
+	@include transition-fast;
+	background: hsl(var(--color-primary-hsl) / 0.08);
+	color: hsl(var(--color-primary-hsl));
+	border: none;
+
+	&:hover {
+		background: hsl(var(--color-primary-hsl) / 0.15);
+	}
+}
+
+.ln-translations__menu {
+	display: none;
+	@include absolute;
+	right: 0;
+	top: 100%;
+	@include mt(var(--spacing-xs));
+	@include bg-primary;
+	@include border;
+	@include rounded-md;
+	@include shadow-lg;
+	@include z-dropdown;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	min-width: 10rem;
+
+	&[data-open] {
+		display: block;
+	}
+
+	li {
+		margin: 0;
+		padding: 0;
+	}
+
+	button {
+		@include w-full;
+		@include text-left;
+		@include px(var(--spacing-sm));
+		@include py(var(--spacing-xs));
+		@include text-sm;
+		@include cursor-pointer;
+		@include transition-fast;
+		background: none;
+		border: none;
+		color: var(--color-text-primary);
+
+		&:hover {
+			@include bg-secondary;
+		}
+	}
+}
+
+// ─── Reduced motion ───────────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+	.ln-translations__add-btn,
+	.ln-translations__badge-remove,
+	.ln-translations__menu button {
+		transition: none;
+	}
+}

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Translations — ln-acme</title>
+	<link rel="stylesheet" href="../dist/ln-acme.css">
+	<link rel="stylesheet" href="demo.css">
+	<script src="../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../js/ln-translations/ln-translations.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Translations</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Inline translation system for forms.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Translations</h1>
+					<p>Inline translation system for forms. Adds translation inputs below translatable fields.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-translations</code></td><td>container</td><td>Initializes instance</td></tr>
+									<tr><td><code>data-ln-translations-locales</code></td><td>container</td><td>JSON: available languages</td></tr>
+									<tr><td><code>data-ln-translations-active</code></td><td>container</td><td>JSON: existing translations</td></tr>
+									<tr><td><code>data-ln-translatable="field"</code></td><td>wrapper</td><td>Marks a translatable field</td></tr>
+									<tr><td><code>data-ln-translations-prefix</code></td><td>wrapper</td><td>Nested prefix for name attr</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Example 1: Basic -->
+					<section class="section-card">
+						<header><h3>Example — Basic</h3></header>
+						<main>
+							<form>
+								<section data-ln-translations
+								         data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski"}'>
+									<header><h3>Company Info</h3></header>
+									<main>
+										<p>
+											<label>Name <input type="text" name="name" value="Acme Corp"></label>
+										</p>
+										<p data-ln-translatable="scope">
+											<label>Scope <textarea name="scope">Производство на храна и пијалоци</textarea></label>
+										</p>
+										<p>
+											<label>EA Code <input type="text" name="ea_code" value="28"></label>
+										</p>
+										<p data-ln-translatable="address">
+											<label>Address <input type="text" name="address" value="ул. Македонија 12, Скопје"></label>
+										</p>
+									</main>
+								</section>
+							</form>
+						</main>
+					</section>
+
+					<!-- Example 2: Pre-loaded -->
+					<section class="section-card">
+						<header><h3>Example — With Existing Translations</h3></header>
+						<main>
+							<form>
+								<section data-ln-translations
+								         data-ln-translations-locales='{"en":"English","sq":"Shqip"}'
+								         data-ln-translations-active='{"en":{"title":"Information Security","description":"Requirements for establishing, implementing, maintaining and continually improving an information security management system."}}'>
+									<header><h3>Standard Details</h3></header>
+									<main>
+										<p data-ln-translatable="title">
+											<label>Title <input type="text" name="title" value="Информациска безбедност"></label>
+										</p>
+										<p data-ln-translatable="description">
+											<label>Description <textarea name="description">Барања за воспоставување, имплементирање, одржување и континуирано подобрување на систем за управување со информациска безбедност.</textarea></label>
+										</p>
+									</main>
+								</section>
+							</form>
+						</main>
+					</section>
+
+					<!-- Example 3: Nested (prefix) -->
+					<section class="section-card">
+						<header><h3>Example — Nested Items (Prefix)</h3></header>
+						<main>
+							<form>
+								<section data-ln-translations
+								         data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski"}'>
+									<header><h3>Checklist Items</h3></header>
+									<main>
+										<article data-ln-translatable="title" data-ln-translations-prefix="items[1]">
+											<label>Item 1 <input type="text" name="items[1][title]" value="Лидерство"></label>
+										</article>
+										<article data-ln-translatable="title" data-ln-translations-prefix="items[2]">
+											<label>Item 2 <input type="text" name="items[2][title]" value="Планирање"></label>
+										</article>
+										<article data-ln-translatable="title" data-ln-translations-prefix="items[3]">
+											<label>Item 3 <input type="text" name="items[3][title]" value="Поддршка"></label>
+										</article>
+									</main>
+								</section>
+							</form>
+						</main>
+					</section>
+
+					<!-- API & Events -->
+					<section class="section-card">
+						<header><h3>API &amp; Events</h3></header>
+						<main>
+							<article>
+								<h4>Instance API</h4>
+								<pre><code>const el = document.querySelector('[data-ln-translations]');
+el.lnTranslations.addLanguage('en');
+el.lnTranslations.addLanguage('sq', { scope: 'Prodhimi...' });
+el.lnTranslations.removeLanguage('en');
+el.lnTranslations.hasLanguage('en');          // boolean
+el.lnTranslations.getActiveLanguages();       // Set</code></pre>
+							</article>
+							<article>
+								<h4>Events</h4>
+								<table>
+									<thead><tr><th>Event</th><th>Bubbles</th><th>Cancelable</th><th>Detail</th></tr></thead>
+									<tbody>
+										<tr><td><code>ln-translations:before-add</code></td><td>yes</td><td>yes</td><td><code>{ target, lang, langName }</code></td></tr>
+										<tr><td><code>ln-translations:added</code></td><td>yes</td><td>no</td><td><code>{ target, lang, langName }</code></td></tr>
+										<tr><td><code>ln-translations:before-remove</code></td><td>yes</td><td>yes</td><td><code>{ target, lang }</code></td></tr>
+										<tr><td><code>ln-translations:removed</code></td><td>yes</td><td>no</td><td><code>{ target, lang }</code></td></tr>
+										<tr><td><code>ln-translations:request-add</code></td><td>no</td><td>no</td><td><code>{ lang }</code></td></tr>
+										<tr><td><code>ln-translations:request-remove</code></td><td>no</td><td>no</td><td><code>{ lang }</code></td></tr>
+									</tbody>
+								</table>
+							</article>
+							<article>
+								<h4>Name Generation</h4>
+								<pre><code>// Without prefix:
+name="trans[en][scope]"
+
+// With prefix (data-ln-translations-prefix="items[5]"):
+name="items[5][trans][en][title]"</code></pre>
+							</article>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;section data-ln-translations
+         data-ln-translations-locales='{"en":"English","sq":"Shqip"}'
+         data-ln-translations-active='{"en":{"scope":"Production..."}}'&gt;
+    &lt;header&gt;&lt;h3&gt;Section Title&lt;/h3&gt;&lt;/header&gt;
+    &lt;main&gt;
+        &lt;p data-ln-translatable="scope"&gt;
+            &lt;label&gt;Scope &lt;textarea name="scope"&gt;...&lt;/textarea&gt;&lt;/label&gt;
+        &lt;/p&gt;
+    &lt;/main&gt;
+&lt;/section&gt;</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>
