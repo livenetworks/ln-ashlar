@@ -96,7 +96,7 @@ $lang-flag-overrides: (
 	[data-ln-translatable-lang="#{$lang}"],
 	[data-ln-translations-active] [data-ln-translations-lang="#{$lang}"],
 	[data-ln-toggle] button[data-ln-translations-lang="#{$lang}"]::before {
-		background-image: url('../../assets/flags/#{$country}.svg');
+		background-image: url('/assets/flags/#{$country}.svg');
 	}
 }
 
@@ -110,7 +110,7 @@ $lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, 
 	[data-ln-translatable-lang="#{$lang}"],
 	[data-ln-translations-active] [data-ln-translations-lang="#{$lang}"],
 	[data-ln-toggle] button[data-ln-translations-lang="#{$lang}"]::before {
-		background-image: url('../../assets/flags/#{$lang}.svg');
+		background-image: url('/assets/flags/#{$lang}.svg');
 	}
 }
 

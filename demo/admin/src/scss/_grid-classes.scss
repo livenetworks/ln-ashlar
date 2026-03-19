@@ -1,4 +1,4 @@
-@use '../../../scss/config/mixins' as *;
+@use '../../../../scss/config/mixins' as *;
 
 .grid   { @include grid; }
 .grid-2 { @include grid-2; }

@@ -1,4 +1,4 @@
-@use '../../../../scss/config/mixins' as *;
+@use '../../../../../scss/config/mixins' as *;
 
 #tabs-example [data-ln-panel] > p:last-child {
 	@include text-sm;
