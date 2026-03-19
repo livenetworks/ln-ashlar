@@ -1,0 +1,22 @@
+@use '../../../../scss/config/mixins' as *;
+
+.icon-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	@include gap(1rem);
+}
+
+.icon-cell {
+	@include flex;
+	flex-direction: column;
+	@include items-center;
+	@include gap(0.5rem);
+	@include p(1rem);
+	@include border;
+	@include rounded-md;
+	@include text-xs;
+	@include text-secondary;
+	text-align: center;
+
+	&:hover { @include bg-secondary; }
+}

@@ -1,0 +1,12 @@
+@use '../../../../scss/config/mixins' as *;
+
+#demo-basic-cards {
+	@include grid-2;
+
+	article {
+		@include card;
+		@include p(1rem);
+
+		p { margin: 0; }
+	}
+}

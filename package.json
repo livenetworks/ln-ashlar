@@ -22,10 +22,13 @@
 	},
 	"scripts": {
 		"dev": "vite build --watch",
-		"build": "vite build && npm run build:demo",
-		"build:demo": "sass demo/demo.scss demo/demo.css --no-source-map --style=compressed"
+		"build": "vite build && npm run build:demos",
+		"build:demos": "npm run build:demo-index && npm run build:demo-admin",
+		"build:demo-index": "sass demo/index.scss demo/index.css --no-source-map --style=compressed",
+		"build:demo-admin": "sass demo/admin/admin.scss demo/admin/admin.css --no-source-map --style=compressed"
 	},
 	"devDependencies": {
+		"flag-icons": "^7.5.0",
 		"sass-embedded": "^1.83.0",
 		"vite": "^6.0.0"
 	},
@@ -37,7 +40,6 @@
 			"optional": true
 		}
 	},
-	"dependencies": {},
 	"license": "UNLICENSED",
 	"private": true
 }

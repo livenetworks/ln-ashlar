@@ -1,0 +1,12 @@
+@use '../../../../scss/config/mixins' as *;
+
+.section-card form {
+	@include stack;
+}
+
+#select-graceful > p:last-child {
+	@include p(1rem);
+	@include bg-secondary;
+	@include rounded-md;
+	@include text-muted;
+}

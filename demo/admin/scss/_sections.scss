@@ -1,0 +1,46 @@
+@use '../../../scss/config/mixins' as *;
+
+.section {
+	@include section;
+}
+
+.section-card {
+	@include section-card;
+}
+
+// Auto-flush — when main contains a table, remove padding and table chrome
+.section-card main:has(> table),
+.section-card main:has(> .table-container) {
+	@include p(0);
+}
+
+.section-card main > table,
+.section-card main > .table-container table {
+	border-radius: 0;
+	box-shadow: none;
+}
+
+.section-empty {
+	@include text-center;
+	@include py(3rem);
+	@include text-secondary;
+
+	.empty-icon {
+		font-size: 3rem;
+		@include mb(1rem);
+		@include text-muted;
+	}
+
+	h3 {
+		@include text-lg;
+		@include font-semibold;
+		@include text-primary;
+		@include mb(0.5rem);
+	}
+
+	p {
+		@include text-sm;
+		@include text-secondary;
+		margin: 0;
+	}
+}

@@ -1,0 +1,8 @@
+@use '../../../../scss/config/mixins' as *;
+
+.demo-note {
+	@include p(1rem);
+	background: var(--color-bg-warning);
+	@include border;
+	@include rounded-md;
+}

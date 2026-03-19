@@ -1,0 +1,60 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-dropdown] {
+	@include relative;
+}
+
+[data-ln-dropdown-menu] {
+	display: none;
+	@include absolute;
+	right: 0;
+	top: 100%;
+	@include mt(var(--spacing-xs));
+	@include bg-primary;
+	@include border;
+	@include rounded-md;
+	@include shadow-lg;
+	@include z-dropdown;
+	list-style: none;
+	@include py(var(--spacing-xs));
+	padding-left: 0;
+	padding-right: 0;
+	margin: 0;
+	min-width: 10rem;
+
+	&.open {
+		display: block;
+	}
+
+	// ─── Menu items ────────────────────────────────────────
+	li {
+		margin: 0;
+		padding: 0;
+	}
+
+	a, button {
+		@include w-full;
+		display: block;
+		@include text-left;
+		@include px(var(--spacing-sm));
+		@include py(var(--spacing-xs));
+		@include text-sm;
+		@include cursor-pointer;
+		@include transition-fast;
+		background: none;
+		border: none;
+		color: var(--color-text-primary);
+		text-decoration: none;
+
+		&:hover {
+			@include bg-secondary;
+		}
+	}
+
+	// ─── Separator ─────────────────────────────────────────
+	hr {
+		border: none;
+		border-top: 1px solid var(--color-border);
+		@include my(var(--spacing-xs));
+	}
+}

@@ -4,6 +4,24 @@
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Hardcoded locales ─────────────────────────────────────
+
+	var LOCALES = {
+		en: 'English',
+		sq: 'Shqip',
+		sr: 'Srpski'
+	};
+
+	// ─── Template cache ────────────────────────────────────────
+
+	var _tmplCache = {};
+	function _cloneTemplate(name) {
+		if (!_tmplCache[name]) {
+			_tmplCache[name] = document.querySelector('[data-ln-template="' + name + '"]');
+		}
+		return _tmplCache[name].content.cloneNode(true);
+	}
+
 	// ─── Constructor ───────────────────────────────────────────
 
 	function constructor(domRoot) {
@@ -27,19 +45,15 @@
 	function _component(dom) {
 		this.dom = dom;
 		this.activeLanguages = new Set();
-		this.locales = {};
-		this.actionsEl = null;
-		this.badgesEl = null;
-		this.dropdownEl = null;
+		this.defaultLang = dom.getAttribute(DOM_SELECTOR + '-default') || '';
+		this.badgesEl = dom.querySelector('[' + DOM_SELECTOR + '-active]');
+		this.menuEl = dom.querySelector('[data-ln-dropdown] > [data-ln-toggle]');
 
-		// Parse locales
-		const localesAttr = dom.getAttribute(DOM_SELECTOR + '-locales');
-		if (localesAttr) {
-			try { this.locales = JSON.parse(localesAttr); } catch (e) { /* invalid JSON */ }
-		}
+		// Set default language flag on original inputs
+		this._applyDefaultLang();
 
-		// Build header actions
-		this._buildHeaderActions();
+		// Populate dropdown menu
+		this._updateDropdown();
 
 		// Bind request events
 		const self = this;
@@ -52,115 +66,81 @@
 		dom.addEventListener('ln-translations:request-add', this._onRequestAdd);
 		dom.addEventListener('ln-translations:request-remove', this._onRequestRemove);
 
-		// Close dropdown on outside click
-		this._onDocumentClick = function (e) {
-			if (self.dropdownEl && !self.dropdownEl.contains(e.target)) {
-				const menu = self.dropdownEl.querySelector('.ln-translations__menu');
-				if (menu) menu.removeAttribute('data-open');
-			}
-		};
-		document.addEventListener('click', this._onDocumentClick);
-
-		// Load active translations
-		const activeAttr = dom.getAttribute(DOM_SELECTOR + '-active');
-		if (activeAttr) {
-			try {
-				const active = JSON.parse(activeAttr);
-				for (const lang in active) {
-					if (active.hasOwnProperty(lang)) {
-						this.addLanguage(lang, active[lang]);
-					}
-				}
-			} catch (e) { /* invalid JSON */ }
-		}
+		// Detect existing translations in DOM (server-rendered)
+		this._detectExisting();
 
 		return this;
 	}
 
-	// ─── Header Actions ────────────────────────────────────────
+	// ─── Default language flag ─────────────────────────────────
 
-	_component.prototype._buildHeaderActions = function () {
-		const header = this.dom.querySelector(':scope > header');
-		if (!header) return;
+	_component.prototype._applyDefaultLang = function () {
+		if (!this.defaultLang) return;
 
-		// Actions container
-		this.actionsEl = document.createElement('span');
-		this.actionsEl.className = 'ln-translations__actions';
-
-		// Badges container
-		this.badgesEl = document.createElement('span');
-		this.actionsEl.appendChild(this.badgesEl);
-
-		// Dropdown
-		this.dropdownEl = document.createElement('span');
-		this.dropdownEl.className = 'ln-translations__dropdown';
-
-		const addBtn = document.createElement('button');
-		addBtn.type = 'button';
-		addBtn.className = 'ln-translations__add-btn';
-		addBtn.textContent = '+';
-		addBtn[DOM_ATTRIBUTE + 'Trigger'] = true;
-
-		const self = this;
-		addBtn.addEventListener('click', function (e) {
-			if (e.ctrlKey || e.metaKey || e.button === 1) return;
-			e.preventDefault();
-			e.stopPropagation();
-			const menu = self.dropdownEl.querySelector('.ln-translations__menu');
-			if (menu) {
-				menu.hasAttribute('data-open') ? menu.removeAttribute('data-open') : menu.setAttribute('data-open', '');
+		const translatables = this.dom.querySelectorAll('[data-ln-translatable]');
+		for (const wrapper of translatables) {
+			const originals = wrapper.querySelectorAll('input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])');
+			for (const el of originals) {
+				el.setAttribute('data-ln-translatable-lang', this.defaultLang);
 			}
-		});
-
-		this.dropdownEl.appendChild(addBtn);
-
-		// Menu
-		const menu = document.createElement('ul');
-		menu.className = 'ln-translations__menu';
-		this.dropdownEl.appendChild(menu);
-
-		this.actionsEl.appendChild(this.dropdownEl);
-		header.appendChild(this.actionsEl);
-
-		this._updateDropdown();
+		}
 	};
 
+	// ─── Detect existing translations ──────────────────────────
+
+	_component.prototype._detectExisting = function () {
+		const existing = this.dom.querySelectorAll('[data-ln-translatable-lang]');
+		for (const el of existing) {
+			const lang = el.getAttribute('data-ln-translatable-lang');
+			if (lang && lang !== this.defaultLang) {
+				this.activeLanguages.add(lang);
+			}
+		}
+
+		if (this.activeLanguages.size > 0) {
+			this._updateBadges();
+			this._updateDropdown();
+		}
+	};
+
+	// ─── Dropdown update ───────────────────────────────────────
+
 	_component.prototype._updateDropdown = function () {
-		if (!this.dropdownEl) return;
+		if (!this.menuEl) return;
 
-		const menu = this.dropdownEl.querySelector('.ln-translations__menu');
-		if (!menu) return;
-
-		menu.textContent = '';
+		this.menuEl.textContent = '';
 		const self = this;
 		let availableCount = 0;
 
-		for (const lang in this.locales) {
-			if (!this.locales.hasOwnProperty(lang)) continue;
+		for (const lang in LOCALES) {
+			if (!LOCALES.hasOwnProperty(lang)) continue;
 			if (this.activeLanguages.has(lang)) continue;
 			availableCount++;
 
-			const li = document.createElement('li');
-			const btn = document.createElement('button');
-			btn.type = 'button';
-			btn.textContent = this.locales[lang];
-			btn.setAttribute('data-lang', lang);
+			const frag = _cloneTemplate('ln-translations-menu-item');
+			const btn = frag.querySelector('[data-ln-translations-lang]');
+			btn.setAttribute('data-ln-translations-lang', lang);
+			btn.textContent = LOCALES[lang];
 
 			btn.addEventListener('click', function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				e.preventDefault();
 				e.stopPropagation();
-				menu.removeAttribute('data-open');
+				self.menuEl.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
 				self.addLanguage(lang);
 			});
 
-			li.appendChild(btn);
-			menu.appendChild(li);
+			this.menuEl.appendChild(frag);
 		}
 
-		// Hide dropdown if no languages available
-		this.dropdownEl.style.display = availableCount === 0 ? 'none' : '';
+		// Hide trigger if no languages available
+		var triggerBtn = this.dom.querySelector('[' + DOM_SELECTOR + '-add]');
+		if (triggerBtn) {
+			triggerBtn.style.display = availableCount === 0 ? 'none' : '';
+		}
 	};
+
+	// ─── Badges update ─────────────────────────────────────────
 
 	_component.prototype._updateBadges = function () {
 		if (!this.badgesEl) return;
@@ -169,18 +149,15 @@
 		const self = this;
 
 		this.activeLanguages.forEach(function (lang) {
-			const badge = document.createElement('span');
-			badge.className = 'ln-translations__badge';
-			badge.setAttribute('data-lang', lang);
+			const frag = _cloneTemplate('ln-translations-badge');
+			const p = frag.querySelector('[data-ln-translations-lang]');
+			p.setAttribute('data-ln-translations-lang', lang);
 
-			const label = document.createTextNode(lang.toUpperCase() + ' ');
-			badge.appendChild(label);
+			const label = p.querySelector('span');
+			label.textContent = LOCALES[lang] || lang.toUpperCase();
 
-			const closeBtn = document.createElement('button');
-			closeBtn.type = 'button';
-			closeBtn.className = 'ln-translations__badge-remove';
-			closeBtn.textContent = '\u00D7';
-			closeBtn.setAttribute('aria-label', 'Remove ' + lang.toUpperCase());
+			const closeBtn = p.querySelector('button');
+			closeBtn.setAttribute('aria-label', 'Remove ' + (LOCALES[lang] || lang.toUpperCase()));
 
 			closeBtn.addEventListener('click', function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
@@ -189,8 +166,7 @@
 				self.removeLanguage(lang);
 			});
 
-			badge.appendChild(closeBtn);
-			self.badgesEl.appendChild(badge);
+			self.badgesEl.appendChild(frag);
 		});
 	};
 
@@ -199,7 +175,7 @@
 	_component.prototype.addLanguage = function (lang, values) {
 		if (this.activeLanguages.has(lang)) return;
 
-		const langName = this.locales[lang] || lang;
+		const langName = LOCALES[lang] || lang;
 		const before = _dispatchCancelable(this.dom, 'ln-translations:before-add', {
 			target: this.dom, lang: lang, langName: langName
 		});
@@ -214,8 +190,12 @@
 			const field = wrapper.getAttribute('data-ln-translatable');
 			const prefix = wrapper.getAttribute('data-ln-translations-prefix') || '';
 
-			// Find the original input/textarea (first one without data-ln-translatable-lang)
-			const original = wrapper.querySelector('input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])');
+			// Find the original input/textarea (first one without data-ln-translatable-lang, or with default lang)
+			const original = wrapper.querySelector(
+				this.defaultLang
+					? '[data-ln-translatable-lang="' + this.defaultLang + '"]'
+					: 'input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])'
+			);
 			if (!original) continue;
 
 			const clone = original.cloneNode(false);
@@ -240,7 +220,7 @@
 			clone.setAttribute('data-ln-translatable-lang', lang);
 
 			// Insert after original or after last clone for this field
-			const existing = wrapper.querySelectorAll('[data-ln-translatable-lang]');
+			const existing = wrapper.querySelectorAll('[data-ln-translatable-lang]:not([data-ln-translatable-lang="' + this.defaultLang + '"])');
 			const insertAfter = existing.length > 0 ? existing[existing.length - 1] : original;
 			insertAfter.parentNode.insertBefore(clone, insertAfter.nextSibling);
 		}
@@ -287,21 +267,18 @@
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
-		// Remove all clones
+		// Remove all translation clones (not default lang)
+		const defaultLang = this.defaultLang;
 		const clones = this.dom.querySelectorAll('[data-ln-translatable-lang]');
 		for (const clone of clones) {
-			clone.parentNode.removeChild(clone);
-		}
-
-		// Remove header actions
-		if (this.actionsEl && this.actionsEl.parentNode) {
-			this.actionsEl.parentNode.removeChild(this.actionsEl);
+			if (clone.getAttribute('data-ln-translatable-lang') !== defaultLang) {
+				clone.parentNode.removeChild(clone);
+			}
 		}
 
 		// Remove event listeners
 		this.dom.removeEventListener('ln-translations:request-add', this._onRequestAdd);
 		this.dom.removeEventListener('ln-translations:request-remove', this._onRequestRemove);
-		document.removeEventListener('click', this._onDocumentClick);
 
 		delete this.dom[DOM_ATTRIBUTE];
 	};

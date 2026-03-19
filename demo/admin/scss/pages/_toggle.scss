@@ -1,0 +1,99 @@
+@use '../../../../scss/config/mixins' as *;
+
+.demo-toggle-sidebar {
+	@include flex;
+	@include gap(1rem);
+	min-height: 12rem;
+	@include border;
+	@include rounded-md;
+	overflow: hidden;
+
+	aside {
+		@include relative;
+		@include p(1rem);
+		@include bg-secondary;
+		width: 12rem;
+		@include border-r;
+		@include transition;
+
+		&:not(.open) {
+			margin-left: -12rem;
+		}
+
+		h4 {
+			margin: 0;
+			@include mb(0.5rem);
+		}
+
+		ul {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		button[data-ln-toggle-action="close"] {
+			@include close-button;
+			@include absolute;
+			top: 0.25rem;
+			right: 0.25rem;
+		}
+	}
+
+	> article {
+		@include p(1rem);
+		@include flex;
+		flex-direction: column;
+		@include gap(0.5rem);
+	}
+}
+
+.demo-toggle-collapsible {
+	@include border;
+	@include rounded-md;
+
+	> header {
+		@include flex;
+		@include justify-between;
+		@include items-center;
+		@include p(1rem);
+		@include border-b;
+	}
+
+	.collapsible-body {
+		@include p(1rem);
+		@include stack(0.5rem);
+	}
+}
+
+.demo-toggle-dropdown {
+	@include relative;
+
+	ul {
+		display: none;
+		@include absolute;
+		top: 100%;
+		left: 0;
+		@include mt(0.25rem);
+		@include bg-primary;
+		@include border;
+		@include rounded-md;
+		@include shadow-md;
+		list-style: none;
+		padding: 0;
+		min-width: 10rem;
+		z-index: 10;
+
+		&.open { display: block; }
+
+		a {
+			@include block;
+			@include px(1rem);
+			@include py(0.5rem);
+			text-decoration: none;
+			color: inherit;
+			@include transition;
+
+			&:hover { @include bg-secondary; }
+		}
+	}
+}

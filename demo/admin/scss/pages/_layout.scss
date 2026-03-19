@@ -1,0 +1,11 @@
+@use '../../../../scss/config/mixins' as *;
+
+.demo-box {
+	@include bg-secondary;
+	@include border;
+	@include rounded-sm;
+	@include p(0.75rem);
+	@include text-sm;
+	@include text-secondary;
+	text-align: center;
+}

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Toggle — ln-acme</title>
+	<link rel="stylesheet" href="../../dist/ln-acme.css">
+	<link rel="stylesheet" href="admin.css">
+	<script src="../../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../../js/ln-dropdown/ln-dropdown.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Toggle</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Toggle component for opening/closing.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Toggle</h1>
+					<p>Generic toggle component — adds/removes the <code>.open</code> class on an element. Works for sidebar, collapsible, dropdown — anything.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-toggle</code></td><td>target element</td><td>Creates an instance, starts closed</td></tr>
+									<tr><td><code>data-ln-toggle="open"</code></td><td>target element</td><td>Starts open (receives the <code>.open</code> class)</td></tr>
+									<tr><td><code>data-ln-toggle-for="id"</code></td><td>button</td><td>References the target element by ID</td></tr>
+									<tr><td><code>data-ln-toggle-action="open|close"</code></td><td>button</td><td>Explicit action (default: toggle)</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Instance API -->
+					<section class="section-card">
+						<header><h3>Instance API</h3></header>
+						<main>
+							<pre><code>var el = document.getElementById('my-element');
+
+el.lnToggle.open();      // Open
+el.lnToggle.close();     // Close
+el.lnToggle.toggle();    // Toggle
+el.lnToggle.isOpen;      // boolean (read-only)</code></pre>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>Bubbles</th><th>Detail</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-toggle:open</code></td><td>yes</td><td><code>{ target: HTMLElement }</code></td></tr>
+									<tr><td><code>ln-toggle:close</code></td><td>yes</td><td><code>{ target: HTMLElement }</code></td></tr>
+								</tbody>
+							</table>
+							<pre><code>document.addEventListener('ln-toggle:open', function (e) {
+    console.log('Opened:', e.detail.target.id);
+});
+
+document.addEventListener('ln-toggle:close', function (e) {
+    console.log('Closed:', e.detail.target.id);
+});</code></pre>
+						</main>
+					</section>
+
+					<!-- Example: Sidebar -->
+					<section class="section-card">
+						<header><h3>Example — Sidebar</h3></header>
+						<main>
+							<p><strong>Click the button to open/close the sidebar</strong></p>
+							<section class="demo-toggle-sidebar">
+								<aside id="demo-sidebar-example" class="sidebar open" data-ln-toggle="open">
+									<h4>Sidebar</h4>
+									<ul>
+										<li><a href="#">Link 1</a></li>
+										<li><a href="#">Link 2</a></li>
+										<li><a href="#">Link 3</a></li>
+									</ul>
+									<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar-example" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+								</aside>
+								<article>
+									<button data-ln-toggle-for="demo-sidebar-example" class="btn">Toggle Sidebar</button>
+									<p>Sidebar receives the <code>.open</code> class when open.</p>
+								</article>
+							</section>
+						</main>
+					</section>
+
+					<!-- Example: Collapsible -->
+					<section class="section-card">
+						<header><h3>Example — Collapsible section</h3></header>
+						<main>
+							<article class="demo-toggle-collapsible">
+								<header>
+									<strong>Advanced options</strong>
+									<button type="button" data-ln-toggle-for="collapse-example" class="btn btn--secondary btn--sm" aria-label="Toggle"><span class="ln-icon-arrow-down"></span></button>
+								</header>
+								<section id="collapse-example" data-ln-toggle class="collapsible">
+									<section class="collapsible-body">
+										<p>This is hidden content when collapsed.</p>
+										<p>Click the button to open/close.</p>
+										<form>
+											<label><input type="checkbox"> Option 1</label>
+											<label><input type="checkbox"> Option 2</label>
+										</form>
+									</section>
+								</section>
+							</article>
+						</main>
+					</section>
+
+					<!-- Example: Dropdown -->
+					<section class="section-card">
+						<header><h3>Example — Dropdown menu</h3></header>
+						<main>
+							<div data-ln-dropdown>
+								<button data-ln-toggle-for="dropdown-example" class="btn">Menu</button>
+								<ul id="dropdown-example" data-ln-toggle data-ln-dropdown-menu>
+									<li><a href="#">Edit</a></li>
+									<li><a href="#">Delete</a></li>
+									<li><a href="#">Archive</a></li>
+								</ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- HTML structure -->
+					<section class="section-card">
+						<header><h3>HTML structure</h3></header>
+						<main>
+							<pre><code>&lt;!-- Element that will be toggled --&gt;
+&lt;aside id="my-sidebar" data-ln-toggle&gt;
+    Content
+&lt;/aside&gt;
+
+&lt;!-- Button that controls it --&gt;
+&lt;button data-ln-toggle-for="my-sidebar"&gt;
+    Toggle
+&lt;/button&gt;
+
+&lt;!-- Starts open --&gt;
+&lt;section id="panel" data-ln-toggle="open"&gt;
+    Open content
+&lt;/section&gt;
+
+&lt;!-- Explicit action --&gt;
+&lt;button data-ln-toggle-for="panel"
+        data-ln-toggle-action="close"&gt;
+    Close
+&lt;/button&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- CSS for animations -->
+					<section class="section-card">
+						<header><h3>CSS for animations</h3></header>
+						<main>
+							<p>ln-toggle adds/removes the <code>.open</code> class. For CSS animations use the collapsible pattern:</p>
+							<pre><code>// Sidebar — transform animation
+.sidebar {
+    transform: translateX(-100%);
+    @include transition;
+    &.open { transform: translateX(0); }
+}
+
+// Collapsible — grid-template-rows (RECOMMENDED)
+// Use .collapsible class or @include collapsible
+&lt;section id="panel" data-ln-toggle class="collapsible"&gt;
+    &lt;article class="collapsible-body"&gt;
+        Content...
+    &lt;/article&gt;
+&lt;/section&gt;
+
+// SCSS:
+.collapsible      { @include collapsible; }
+.collapsible > *  { @include collapsible-content; }
+
+// Or semantically in project SCSS:
+#panel         { @include collapsible; }
+#panel > .body { @include collapsible-content; }</code></pre>
+						</main>
+					</section>
+
+					<!-- Constructor -->
+					<section class="section-card">
+						<header><h3>Dynamic DOM</h3></header>
+						<main>
+							<p>The component uses <strong>MutationObserver</strong> — it automatically initializes all new elements added to the DOM, including dynamic HTML from AJAX or JS.</p>
+							<pre><code>// No manual initialization needed.
+// MutationObserver automatically detects new data-ln-toggle elements.
+
+fetch('/partial').then(r => r.text()).then(html => {
+    document.getElementById('content').innerHTML = html;
+    // lnToggle automatically initializes the new elements
+});</code></pre>
+							<p><code>window.lnToggle</code> is available only for non-standard cases (Shadow DOM, iframe) where MutationObserver does not observe.</p>
+						</main>
+					</section>
+
+					<!-- Practical examples -->
+					<section class="section-card">
+						<header><h3>Practical uses</h3></header>
+						<main>
+							<ul>
+								<li><strong>Sidebar navigation</strong> — opening/closing on mobile</li>
+								<li><strong>Collapsible FAQ/documentation</strong> — Q&A panels</li>
+								<li><strong>Dropdown menus</strong> — user menu, actions menu</li>
+								<li><strong>Modal backdrop</strong> — via ln-modal component</li>
+								<li><strong>Tabs panels</strong> — via ln-tabs component</li>
+								<li><strong>Accordion</strong> — via ln-accordion component</li>
+							</ul>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>

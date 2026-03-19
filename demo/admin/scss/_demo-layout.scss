@@ -1,0 +1,62 @@
+@use '../../../scss/config/mixins' as *;
+
+// ==========================================================================
+// Demo Split Layout — 2 columns: left = live demo, right = auto-extracted code
+// ==========================================================================
+
+.demo-split {
+	@include grid-2;
+	align-items: start;
+	@include gap(1rem);
+
+	> article {
+		@include border;
+		@include rounded-md;
+		@include p(1rem);
+	}
+
+	> figure {
+		margin: 0;
+		@include bg-secondary;
+		@include border;
+		@include rounded-md;
+		overflow: auto;
+
+		pre {
+			margin: 0;
+			@include p(1rem);
+		}
+	}
+}
+
+// Description section below the split
+.demo-why {
+	@include mt(1rem);
+	@include pt(1rem);
+	@include border-t;
+
+	h4 {
+		@include text-sm;
+		@include font-semibold;
+		margin: 0 0 0.5rem;
+	}
+
+	p, ul {
+		@include text-sm;
+		@include text-secondary;
+		margin: 0;
+	}
+
+	ul {
+		@include mt(0.5rem);
+		padding-left: 1.25rem;
+	}
+}
+
+// Button groups
+.demo-actions {
+	@include flex;
+	@include items-center;
+	@include gap(0.75rem);
+	@include flex-wrap;
+}

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Filter — ln-acme</title>
+	<link rel="stylesheet" href="../../dist/ln-acme.css">
+	<link rel="stylesheet" href="admin.css">
+	<script src="../../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../../js/ln-filter/ln-filter.js" defer></script>
+	<script src="../../js/ln-search/ln-search.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Filter</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'ln-filter — attribute-based filter component.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+				<h1>Filter</h1>
+				<p>Generic filter component — filters children of a target element by <code>data-*</code> attribute. Works independently alongside <code>ln-search</code>.</p>
+
+				<!-- Attributes -->
+				<section class="section-card">
+					<header><h3>Attributes</h3></header>
+					<main>
+						<table>
+							<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+							<tbody>
+								<tr><td><code>data-ln-filter="targetId"</code></td><td>component root</td><td>Target element by ID whose children are filtered</td></tr>
+								<tr><td><code>data-ln-filter-key="field"</code></td><td><code>&lt;button&gt;</code></td><td>Name of data attribute for comparison on target children</td></tr>
+								<tr><td><code>data-ln-filter-value="val"</code></td><td><code>&lt;button&gt;</code></td><td>Value for comparison (empty = show all)</td></tr>
+								<tr><td><code>data-ln-filter-hide</code></td><td>target children</td><td>Set by JS when element doesn't match</td></tr>
+								<tr><td><code>data-active</code></td><td>active button</td><td>Set by JS on the currently selected button</td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- Basic filter -->
+				<section class="section-card">
+					<header><h3>Basic Filter</h3></header>
+					<main>
+						<nav data-ln-filter="filter-basic-list" id="filter-basic-nav">
+							<button type="button" data-ln-filter-key="category" data-ln-filter-value="">All</button>
+							<button type="button" data-ln-filter-key="category" data-ln-filter-value="design">Design</button>
+							<button type="button" data-ln-filter-key="category" data-ln-filter-value="dev">Development</button>
+							<button type="button" data-ln-filter-key="category" data-ln-filter-value="qa">QA</button>
+						</nav>
+
+						<ul id="filter-basic-list">
+							<li data-category="design">Ana Petrova — UI Designer</li>
+							<li data-category="dev">Marko Nikolov — Frontend Developer</li>
+							<li data-category="dev">Ivan Stojanovski — Backend Developer</li>
+							<li data-category="qa">Sara Dimitrova — QA Engineer</li>
+							<li data-category="design">Elena Ristova — UX Designer</li>
+							<li data-category="qa">Toni Angelov — QA Lead</li>
+							<li data-category="dev">Boris Ilievski — Full Stack Developer</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Filter with cards -->
+				<section class="section-card">
+					<header><h3>Filter with Cards</h3></header>
+					<main>
+						<nav data-ln-filter="filter-cards-list" id="filter-cards-nav">
+							<button type="button" data-ln-filter-key="status" data-ln-filter-value="">All</button>
+							<button type="button" data-ln-filter-key="status" data-ln-filter-value="active">Active</button>
+							<button type="button" data-ln-filter-key="status" data-ln-filter-value="pending">Pending</button>
+							<button type="button" data-ln-filter-key="status" data-ln-filter-value="inactive">Inactive</button>
+						</nav>
+
+						<ul id="filter-cards-list">
+							<li data-status="active">
+								<strong>Project Alpha</strong>
+								<small>Status: Active</small>
+							</li>
+							<li data-status="pending">
+								<strong>Project Beta</strong>
+								<small>Status: Pending</small>
+							</li>
+							<li data-status="inactive">
+								<strong>Project Gamma</strong>
+								<small>Status: Inactive</small>
+							</li>
+							<li data-status="active">
+								<strong>Project Delta</strong>
+								<small>Status: Active</small>
+							</li>
+							<li data-status="pending">
+								<strong>Project Epsilon</strong>
+								<small>Status: Pending</small>
+							</li>
+							<li data-status="active">
+								<strong>Project Zeta</strong>
+								<small>Status: Active</small>
+							</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Filter + Search combo -->
+				<section class="section-card">
+					<header><h3>Filter + Search Combination</h3></header>
+					<main>
+						<p>Both components work <strong>independently</strong> on the same list — an item is visible only when neither hides it.</p>
+
+						<div id="combo-toolbar">
+							<nav data-ln-filter="combo-list">
+								<button type="button" data-ln-filter-key="dept" data-ln-filter-value="">All departments</button>
+								<button type="button" data-ln-filter-key="dept" data-ln-filter-value="hr">HR</button>
+								<button type="button" data-ln-filter-key="dept" data-ln-filter-value="it">IT</button>
+								<button type="button" data-ln-filter-key="dept" data-ln-filter-value="finance">Finance</button>
+							</nav>
+							<label>
+								<span class="ln-icon-filter ln-icon--sm"></span>
+								<input type="search" placeholder="Search name..." data-ln-search="combo-list">
+							</label>
+						</div>
+
+						<ul id="combo-list">
+							<li data-dept="hr">Maja Kostadinova — HR Manager</li>
+							<li data-dept="it">Petar Blazevski — System Administrator</li>
+							<li data-dept="finance">Kristina Gjorgjevska — Accountant</li>
+							<li data-dept="it">Aleksandar Naumov — DevOps Engineer</li>
+							<li data-dept="hr">Vesna Todorova — HR Specialist</li>
+							<li data-dept="finance">Darko Mitevski — Financial Analyst</li>
+							<li data-dept="it">Lidija Petrovska — Security Engineer</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Programmatic API -->
+				<section class="section-card">
+					<header><h3>Programmatic API</h3></header>
+					<main>
+						<nav class="demo-actions" id="api-demo-actions">
+							<button class="btn btn--sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'high')">Filter: High</button>
+							<button class="btn btn--sm btn--secondary" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'medium')">Filter: Medium</button>
+							<button class="btn btn--sm btn--secondary" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'low')">Filter: Low</button>
+							<button class="btn btn--sm" onclick="document.querySelector('#api-filter-nav').lnFilter.reset()">Reset</button>
+							<code id="api-filter-status">Active filter: none</code>
+						</nav>
+
+						<nav data-ln-filter="api-filter-list" id="api-filter-nav" style="display:none"></nav>
+
+						<ul id="api-filter-list">
+							<li data-priority="high">Task A — High priority</li>
+							<li data-priority="medium">Task B — Medium priority</li>
+							<li data-priority="low">Task C — Low priority</li>
+							<li data-priority="high">Task D — High priority</li>
+							<li data-priority="medium">Task E — Medium priority</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Events -->
+				<section class="section-card">
+					<header><h3>Events</h3></header>
+					<main>
+						<table>
+							<thead><tr><th>Event</th><th>Bubbles</th><th>detail</th></tr></thead>
+							<tbody>
+								<tr><td><code>ln-filter:changed</code></td><td>yes</td><td><code>{ key, value }</code></td></tr>
+								<tr><td><code>ln-filter:reset</code></td><td>yes</td><td><code>{}</code></td></tr>
+							</tbody>
+						</table>
+						<pre><code>document.addEventListener('ln-filter:changed', function (e) {
+    console.log('Filter:', e.detail.key, '=', e.detail.value);
+});
+
+document.addEventListener('ln-filter:reset', function (e) {
+    console.log('Filter reset');
+});</code></pre>
+					</main>
+				</section>
+
+				<!-- HTML Structure -->
+				<section class="section-card">
+					<header><h3>HTML Structure</h3></header>
+					<main>
+						<pre><code>&lt;!-- Filter buttons --&gt;
+&lt;nav data-ln-filter="my-list"&gt;
+    &lt;button type="button" data-ln-filter-key="category" data-ln-filter-value=""&gt;All&lt;/button&gt;
+    &lt;button type="button" data-ln-filter-key="category" data-ln-filter-value="a"&gt;Category A&lt;/button&gt;
+    &lt;button type="button" data-ln-filter-key="category" data-ln-filter-value="b"&gt;Category B&lt;/button&gt;
+&lt;/nav&gt;
+
+&lt;!-- Target list (children have data-category attribute) --&gt;
+&lt;ul id="my-list"&gt;
+    &lt;li data-category="a"&gt;Element from category A&lt;/li&gt;
+    &lt;li data-category="b"&gt;Element from category B&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Required CSS --&gt;
+&lt;style&gt;
+[data-ln-filter-hide] { display: none; }
+[data-ln-filter-key][data-active] { background: var(--accent); }
+&lt;/style&gt;</code></pre>
+					</main>
+				</section>
+
+				<!-- CSS -->
+				<section class="section-card">
+					<header><h3>Required CSS</h3></header>
+					<main>
+						<p>The component adds attributes — the consumer provides the visual rules:</p>
+						<pre><code>/* Hide filtered-out items */
+[data-ln-filter-hide] {
+    display: none;
+}
+
+/* Active filter button */
+[data-ln-filter-key][data-active] {
+    background: var(--color-primary);
+    color: var(--color-text-on-primary);
+}
+
+/* Combined with ln-search */
+[data-ln-search-hide],
+[data-ln-filter-hide] {
+    display: none;
+}</code></pre>
+					</main>
+				</section>
+
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+	<script>
+		// Programmatic API demo — update status label
+		document.addEventListener('ln-filter:changed', function (e) {
+			var el = document.getElementById('api-filter-status');
+			if (el && e.target.id === 'api-filter-nav') {
+				el.textContent = 'Active filter: ' + e.detail.key + ' = ' + e.detail.value;
+			}
+		});
+		document.addEventListener('ln-filter:reset', function (e) {
+			var el = document.getElementById('api-filter-status');
+			if (el && e.target.id === 'api-filter-nav') {
+				el.textContent = 'Active filter: none';
+			}
+		});
+	</script>
+</body>
+</html>
