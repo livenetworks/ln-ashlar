@@ -143,8 +143,8 @@ $lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, 
 	@include rounded-sm;
 	@include px(var(--spacing-xs));
 	@include py(0.125rem);
-	background-color: hsl(var(--color-primary-hsl) / 0.08);
-	color: hsl(var(--color-primary-hsl));
+	background-color: hsl(var(--color-primary) / 0.08);
+	color: hsl(var(--color-primary));
 	@include select-none;
 	margin: 0;
 	background-repeat: no-repeat;
@@ -182,12 +182,12 @@ $lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, 
 	@include rounded-sm;
 	@include cursor-pointer;
 	@include transition-fast;
-	background: hsl(var(--color-primary-hsl) / 0.08);
-	color: hsl(var(--color-primary-hsl));
+	background: hsl(var(--color-primary) / 0.08);
+	color: hsl(var(--color-primary));
 	border: none;
 
 	&:hover {
-		background: hsl(var(--color-primary-hsl) / 0.15);
+		background: hsl(var(--color-primary) / 0.15);
 	}
 }
 

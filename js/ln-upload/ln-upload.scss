@@ -41,35 +41,35 @@
    ========================================================================== */
 
 .ln-upload__zone {
-	border: 2px dashed var(--color-border);
+	border: 2px dashed hsl(var(--color-border));
 	border-radius: 0.5rem;
 	padding: var(--spacing-lg);
 	text-align: center;
 	cursor: pointer;
 	transition: all var(--transition-base);
-	background-color: var(--color-bg-secondary);
+	background-color: hsl(var(--color-bg-secondary));
 }
 
 .ln-upload__zone:hover {
-	border-color: var(--color-primary);
-	background-color: var(--color-primary-lighter);
+	border-color: hsl(var(--color-primary));
+	background-color: hsl(var(--color-primary-lighter));
 }
 
 .ln-upload__zone--dragover {
-	border-color: var(--color-primary);
-	background-color: var(--color-primary-light);
+	border-color: hsl(var(--color-primary));
+	background-color: hsl(var(--color-primary-light));
 	border-style: solid;
 }
 
 .ln-upload__zone span {
 	display: block;
-	color: var(--color-text-secondary);
+	color: hsl(var(--color-text-secondary));
 	font-size: 0.875rem;
 }
 
 .ln-upload__zone small {
 	display: block;
-	color: var(--color-text-muted);
+	color: hsl(var(--color-text-muted));
 	font-size: 0.75rem;
 	margin-top: var(--spacing-xs);
 }
@@ -95,8 +95,8 @@
 	align-items: center;
 	flex-wrap: wrap;
 	padding: var(--spacing-sm) var(--spacing-md);
-	background-color: var(--color-bg-secondary);
-	border: 1px solid var(--color-border);
+	background-color: hsl(var(--color-bg-secondary));
+	border: 1px solid hsl(var(--color-border));
 	border-radius: 0.375rem;
 	margin-bottom: var(--spacing-sm);
 	font-size: 0.875rem;
@@ -112,11 +112,11 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	color: var(--color-text-primary);
+	color: hsl(var(--color-text-primary));
 }
 
 .ln-upload__size {
-	color: var(--color-text-muted);
+	color: hsl(var(--color-text-muted));
 	font-size: 0.75rem;
 	margin-left: var(--spacing-md);
 	flex-shrink: 0;
@@ -137,13 +137,13 @@
 	left: 0;
 	right: 0;
 	height: 3px;
-	background-color: var(--color-border);
+	background-color: hsl(var(--color-border));
 }
 
 .ln-upload__progress-bar {
 	height: 100%;
 	width: 0;
-	background-color: var(--color-primary);
+	background-color: hsl(var(--color-primary));
 	transition: width 0.15s ease-out;
 }
 
@@ -156,12 +156,12 @@
 }
 
 .ln-upload__item--error {
-	border-color: var(--color-error);
-	background-color: var(--color-bg-error);
+	border-color: hsl(var(--color-error));
+	background-color: hsl(var(--color-bg-error));
 }
 
 .ln-upload__item--error .ln-upload__progress-bar {
-	background-color: var(--color-error);
+	background-color: hsl(var(--color-error));
 }
 
 /* ==========================================================================
@@ -180,9 +180,9 @@
 	width: 1.25rem;
 	height: 1.25rem;
 	margin-right: 0.5rem;
-	border: 2px solid var(--color-border);
+	border: 2px solid hsl(var(--color-border));
 	border-radius: 50%;
-	border-top-color: var(--color-primary);
+	border-top-color: hsl(var(--color-primary));
 	background-image: none !important;
 	animation: ln-upload-spin 0.6s linear infinite;
 	flex-shrink: 0;

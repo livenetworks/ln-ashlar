@@ -25,7 +25,7 @@
 	margin-bottom: -1px;
 
 	&:hover {
-		color: var(--color-primary);
+		color: hsl(var(--color-primary));
 		background: none;
 	}
 
@@ -38,8 +38,8 @@
 
 // Активен таб
 [data-ln-tabs] [data-ln-tab][data-active] {
-	color: var(--color-primary);
-	border-bottom-color: var(--color-primary);
+	color: hsl(var(--color-primary));
+	border-bottom-color: hsl(var(--color-primary));
 	background: none;
 }
 

@@ -1,0 +1,324 @@
+@use '../../../scss/config/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════
+// Dashboard — DocuFlow
+// ═══════════════════════════════════════════════════════════════
+
+// ───────────────────────────────────────────────────────────
+// Side Panel Sections
+// ───────────────────────────────────────────────────────────
+
+// Details — metadata rows (icon on li::before)
+.details-section {
+	ul {
+		list-style: none;
+		@include p(0);
+		@include m(0);
+		@include flex-col;
+		@include gap(var(--spacing-sm));
+	}
+
+	li {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-sm));
+		@include text-sm;
+		color: hsl(var(--color-text-secondary));
+		line-height: 1.5;
+	}
+}
+
+// Activity — avatar + text + timestamp
+.activity-section {
+	ul {
+		list-style: none;
+		@include p(0);
+		@include m(0);
+		@include flex-col;
+		@include gap(var(--spacing-md));
+	}
+
+	li {
+		@include flex;
+		@include items-start;
+		@include gap(var(--spacing-sm));
+	}
+
+	img {
+		@include rounded-full;
+		@include size(1.75rem);
+		@include flex-shrink-0;
+		@include mt(var(--spacing-xs));
+	}
+
+	p {
+		@include text-sm;
+		color: hsl(var(--color-text-secondary));
+		@include m(0);
+		@include mb(var(--spacing-xs));
+		line-height: 1.5;
+
+		a {
+			color: hsl(var(--color-primary));
+			text-decoration: none;
+			&:hover { color: hsl(var(--color-primary-hover)); }
+		}
+	}
+
+	time {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-xs));
+		@include text-xs;
+		color: hsl(var(--color-text-muted));
+	}
+}
+
+// Actions — clickable rows (icon on a::before)
+.actions-section {
+	ul {
+		list-style: none;
+		@include p(0);
+		@include m(0);
+		@include flex-col;
+		gap: 1px;
+	}
+
+	li {
+		&.divider {
+			@include mt(var(--spacing-sm));
+			@include pt(var(--spacing-sm));
+			border-top: 1px solid hsl(var(--color-border));
+		}
+	}
+
+	a {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-sm));
+		@include px(var(--spacing-md));
+		@include py(var(--spacing-sm));
+		@include text-sm;
+		@include rounded-md;
+		@include transition-fast;
+		color: hsl(var(--color-text-secondary));
+		text-decoration: none;
+		@include font-medium;
+
+		&:hover {
+			background-color: hsl(var(--color-bg-secondary));
+			color: hsl(var(--color-text-primary));
+		}
+
+		&.active {
+			background-color: hsl(var(--color-bg-secondary));
+			color: hsl(var(--color-text-primary));
+		}
+
+		&.primary-action {
+			color: hsl(var(--color-primary));
+			&:hover {
+				background-color: hsl(var(--color-primary) / 0.08);
+				color: hsl(var(--color-primary-hover));
+			}
+		}
+
+		&.danger {
+			&:hover {
+				background-color: hsl(var(--color-error) / 0.08);
+				color: hsl(var(--color-error));
+			}
+		}
+	}
+}
+
+#dashboard {
+
+	// ───────────────────────────────────────────────────────────
+	// Page Header & Controls
+	// ───────────────────────────────────────────────────────────
+
+	.dashboard-header {
+		@include flex;
+		@include items-center;
+		@include justify-between;
+		@include mb(var(--spacing-lg));
+
+		h1 {
+			@include text-2xl;
+			@include font-semibold;
+			letter-spacing: -0.025em;
+			margin: 0;
+			color: hsl(var(--color-text-primary));
+		}
+	}
+
+	// ───────────────────────────────────────────────────────────
+	// Folder Items Grid
+	// ───────────────────────────────────────────────────────────
+
+	#folders {
+		@include container(foldersgrid);
+
+		> ul {
+			display: grid;
+			grid-template-columns: 1fr;
+			@include gap(var(--spacing-xl));
+			list-style: none;
+			@include p(0);
+			@include m(0);
+
+			// Medium containers: 2 columns
+			@container foldersgrid (min-width: 580px) {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			// Large containers: 3 columns (never more than 3)
+			@container foldersgrid (min-width: 880px) {
+				grid-template-columns: repeat(3, 1fr);
+			}
+		}
+
+		li {
+			@include card;
+			@include shadow-none;
+			border-radius: 0;
+			@include overflow-hidden;
+
+			> a {
+				@include flex-col;
+				text-decoration: none;
+				color: inherit;
+				@include h-full;
+				@include transition;
+				opacity: 0.8;
+
+				&:hover {
+					opacity: 1;
+				}
+			}
+		}
+
+		article {
+			@include flex-col;
+			@include h-full;
+		}
+
+		img.folder-image {
+			@include w-full;
+			height: auto;
+			object-fit: contain;
+			@include block;
+			background-color: hsl(var(--color-bg-secondary));
+		}
+
+		.folder-info {
+			@include flex-1;
+			@include flex-col;
+			@include p(var(--spacing-lg));
+			@include gap(var(--spacing-xs));
+
+			h3 {
+				@include text-base;
+				@include font-semibold;
+				color: hsl(var(--color-text-primary));
+				@include m(0);
+				line-height: 1.35;
+				letter-spacing: -0.015em;
+			}
+
+			p {
+				@include text-sm;
+				color: hsl(var(--color-text-secondary));
+				@include m(0);
+				line-height: 1.6;
+			}
+		}
+	}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Responsive
+// ═══════════════════════════════════════════════════════════════
+
+@media (max-width: 768px) {
+	#dashboard {
+
+		#stats {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		#shelves > ul {
+			grid-template-columns: 1fr;
+		}
+
+		> header {
+			@include flex-col;
+			@include items-start;
+			@include gap(var(--spacing-md));
+
+			nav { @include w-full; }
+			nav a { @include w-full; @include text-center; }
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	#dashboard #stats {
+		grid-template-columns: 1fr;
+	}
+}
+
+// ───────────────────────────────────────────────────────────
+// Metadata Tags — badges for clause, type, etc.
+// ───────────────────────────────────────────────────────────
+
+.metadata-tags {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	@include flex;
+	@include flex-wrap;
+	@include gap(var(--spacing-sm));
+	@include mb(var(--spacing-lg));
+}
+
+.ln-tag {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0);
+	@include text-xs;
+	@include rounded-sm;
+	@include overflow-hidden;
+	border: 1px solid hsl(var(--color-border));
+	background-color: hsl(var(--color-bg-secondary));
+	color: hsl(var(--color-text-secondary));
+
+	// Icon
+	&::before {
+		@include ml(var(--spacing-xs));
+		@include mr(2px);
+		width: 0.875rem;
+		height: 0.875rem;
+		opacity: 0.6;
+	}
+
+	// The 'clause', 'type', etc. label
+	small {
+		background-color: hsl(var(--color-bg-secondary));
+		@include px(var(--spacing-xs));
+		@include py(2px);
+		@include font-medium;
+		color: hsl(var(--color-text-muted));
+		border-right: 1px solid hsl(var(--color-border));
+		font-size: inherit;
+	}
+
+	// The value
+	strong {
+		@include px(var(--spacing-xs));
+		@include py(2px);
+		@include font-medium;
+		color: hsl(var(--color-text-secondary));
+	}
+}

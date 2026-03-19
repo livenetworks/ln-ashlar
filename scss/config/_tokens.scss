@@ -5,8 +5,12 @@
 // Сите компоненти ги референцираат овие CSS variables.
 // За темирање: override на :root или scope на елемент.
 //
-// Пример:
-//   .dark-theme { --color-bg-primary: #1a1a2e; }
+// Боите се зачувани како bare HSL triplets за да овозможат alpha transparency:
+//   hsl(var(--color-primary))          → solid color
+//   hsl(var(--color-primary) / 0.5)    → 50% transparent
+//
+// Пример за темирање:
+//   .dark-theme { --color-bg-primary: 240 14% 15%; }
 // ==========================================================================
 
 :root {
@@ -14,54 +18,54 @@
 	// -----------------------------------------------------------------------
 	// Colors — Primary
 	// -----------------------------------------------------------------------
-	--color-primary: #2737a1;
-	--color-primary-hover: #1e2b82;
-	--color-primary-focus: #3246c8;
-	--color-primary-light: #e6eafa;
-	--color-primary-lighter: #f5f6fc;
+	--color-primary: 233 60% 42%;
+	--color-primary-hover: 233 61% 31%;
+	--color-primary-focus: 233 58% 49%;
+	--color-primary-light: 228 73% 94%;
+	--color-primary-lighter: 230 60% 97%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Secondary
 	// -----------------------------------------------------------------------
-	--color-secondary: #10b981;
-	--color-secondary-hover: #059669;
+	--color-secondary: 160 76% 40%;
+	--color-secondary-hover: 162 93% 31%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Status
 	// -----------------------------------------------------------------------
-	--color-success: #16a34a;
-	--color-error: #dc2626;
-	--color-error-hover: #b91c1c;
-	--color-warning: #d97706;
-	--color-info: #3b82f6;
+	--color-success: 142 76% 36%;
+	--color-error: 0 84% 50%;
+	--color-error-hover: 0 74% 42%;
+	--color-warning: 32 95% 44%;
+	--color-info: 217 91% 60%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Text
 	// -----------------------------------------------------------------------
-	--color-text-primary: #111827;
-	--color-text-secondary: #6b7280;
-	--color-text-muted: #9ca3af;
+	--color-text-primary: 221 39% 11%;
+	--color-text-secondary: 220 9% 46%;
+	--color-text-muted: 218 11% 65%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Backgrounds
 	// -----------------------------------------------------------------------
-	--color-bg-primary: #ffffff;
-	--color-bg-secondary: #f3f4f6;
-	--color-bg-body: #f4f4f5;
-	--color-bg-error: #fef2f2;
+	--color-bg-primary: 0 0% 100%;
+	--color-bg-secondary: 220 14% 96%;
+	--color-bg-body: 240 5% 96%;
+	--color-bg-error: 0 86% 97%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Borders
 	// -----------------------------------------------------------------------
-	--color-border: #e5e7eb;
-	--color-border-light: #e5e7eb;
+	--color-border: 220 13% 91%;
+	--color-border-light: 220 13% 91%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Table-specific
 	// -----------------------------------------------------------------------
-	--color-table-header-bg: #1a1a2e;
-	--color-table-header-text: #ffffff;
-	--color-table-section-bg: #e8ecf1;
+	--color-table-header-bg: 240 28% 14%;
+	--color-table-header-text: 0 0% 100%;
+	--color-table-section-bg: 216 22% 93%;
 
 	// -----------------------------------------------------------------------
 	// Spacing
@@ -90,7 +94,7 @@
 	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-	--shadow-primary: 0 0 20px rgba(39, 55, 161, 0.2);
+	--shadow-primary: 0 0 20px hsl(var(--color-primary) / 0.2);
 
 	// -----------------------------------------------------------------------
 	// Transitions

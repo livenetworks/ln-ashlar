@@ -15,3 +15,17 @@
 @use 'components/scrollbar';
 
 @use 'utilities/utilities';
+
+// JS component co-located styles
+@use '../js/ln-ajax/ln-ajax';
+@use '../js/ln-modal/ln-modal';
+@use '../js/ln-dropdown/ln-dropdown';
+@use '../js/ln-toast/ln-toast';
+@use '../js/ln-upload/ln-upload';
+@use '../js/ln-link/ln-link';
+@use '../js/ln-progress/ln-progress';
+@use '../js/ln-filter/ln-filter';
+@use '../js/ln-search/ln-search';
+@use '../js/ln-table/ln-table';
+@use '../js/ln-circular-progress/ln-circular-progress';
+@use '../js/ln-translations/ln-translations';

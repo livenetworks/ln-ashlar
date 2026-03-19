@@ -1,0 +1,269 @@
+@use '../../../scss/config/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════
+// Admin Panel Styles
+// ═══════════════════════════════════════════════════════════════
+
+// ───────────────────────────────────────────────────────────
+// Admin Sidebar Navigation
+// ───────────────────────────────────────────────────────────
+
+#admin-nav {
+	nav ul {
+		list-style: none;
+		@include p(0);
+		@include m(0);
+		@include flex-col;
+		@include gap(var(--spacing-xs));
+	}
+
+	nav li a {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-sm));
+		@include px(var(--spacing-md));
+		@include py(var(--spacing-sm));
+		@include rounded-md;
+		@include text-sm;
+		@include font-medium;
+		color: hsl(var(--color-text-secondary));
+		text-decoration: none;
+		@include transition;
+
+		&:hover {
+			@include bg-secondary;
+			color: hsl(var(--color-text-primary));
+		}
+
+		&.active {
+			background-color: hsl(var(--color-primary) / 0.1);
+			color: hsl(var(--color-primary));
+			@include font-semibold;
+		}
+	}
+}
+
+// ───────────────────────────────────────────────────────────
+// Admin Content Sections
+// ───────────────────────────────────────────────────────────
+
+#admin-packages,
+#admin-tenants {
+	> header {
+		@include flex;
+		@include items-center;
+		@include justify-between;
+		@include mb(var(--spacing-xl));
+
+		h1 {
+			@include m(0);
+		}
+	}
+
+	// Table styles
+	table {
+		@include w-full;
+		border-collapse: collapse;
+		@include text-sm;
+
+		thead {
+			th {
+				text-align: left;
+				@include px(var(--spacing-md));
+				@include py(var(--spacing-sm));
+				@include font-semibold;
+				@include text-xs;
+				@include uppercase;
+				color: hsl(var(--color-text-muted));
+				@include border-b;
+				border-color: hsl(var(--color-border));
+				letter-spacing: 0.05em;
+			}
+		}
+
+		tbody {
+			tr {
+				@include transition;
+				@include border-b;
+				border-color: hsl(var(--color-border) / 0.5);
+
+				&:hover {
+					@include bg-secondary;
+				}
+			}
+
+			td {
+				@include px(var(--spacing-md));
+				@include py(var(--spacing-md));
+				vertical-align: middle;
+			}
+		}
+	}
+
+	// Badge styles
+	.badge {
+		@include inline-flex;
+		@include items-center;
+		@include px(var(--spacing-sm));
+		@include py(2px);
+		@include rounded-full;
+		@include text-xs;
+		@include font-semibold;
+
+		&--success {
+			background-color: hsl(var(--color-success) / 0.1);
+			color: hsl(var(--color-success));
+		}
+
+		&--muted {
+			background-color: hsl(var(--color-text-muted) / 0.1);
+			color: hsl(var(--color-text-muted));
+		}
+	}
+
+	// Action cell
+	td:last-child {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-sm));
+
+		a, button {
+			color: hsl(var(--color-text-muted));
+			background: none;
+			@include border-none;
+			@include cursor-pointer;
+			@include p(var(--spacing-xs));
+			@include rounded-md;
+			@include transition;
+
+			&:hover {
+				color: hsl(var(--color-primary));
+				@include bg-secondary;
+			}
+		}
+
+		button.ln-icon-delete:hover {
+			color: hsl(var(--color-error));
+		}
+	}
+
+	.inline-form {
+		display: inline;
+	}
+
+	// Empty state
+	.section-empty {
+		@include flex-col;
+		@include items-center;
+		@include py(var(--spacing-2xl));
+		@include gap(var(--spacing-lg));
+		color: hsl(var(--color-text-muted));
+		@include text-center;
+	}
+
+	// Form styles
+	form {
+		@include form-grid;
+
+		> .form-element {
+			grid-column: span 3;
+		}
+
+		> fieldset {
+			grid-column: span 6;
+			@include border;
+			border-color: hsl(var(--color-border) / 0.5);
+			@include rounded-md;
+			@include p(var(--spacing-lg));
+			@include flex;
+			@include gap(var(--spacing-xl));
+
+			legend {
+				@include font-semibold;
+				@include text-sm;
+				@include px(var(--spacing-sm));
+			}
+
+			.form-element {
+				@include flex-1;
+			}
+		}
+
+		> .form-actions {
+			grid-column: span 6;
+		}
+
+		.form-element {
+			@include m(0);
+
+			label {
+				@include block;
+				@include text-sm;
+				@include font-medium;
+				color: hsl(var(--color-text-secondary));
+				@include mb(var(--spacing-xs));
+			}
+
+			input[type="text"],
+			input[type="number"],
+			input[type="email"],
+			select {
+				@include w-full;
+				@include px(var(--spacing-md));
+				@include py(var(--spacing-sm));
+				@include border;
+				border-color: hsl(var(--color-border));
+				@include rounded-md;
+				@include text-sm;
+				@include transition;
+				background-color: hsl(0 0% 100%);
+
+				&:focus {
+					border-color: hsl(var(--color-primary));
+					outline: none;
+					box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.1);
+				}
+			}
+
+			input[type="color"] {
+				@include h(2.5rem);
+				@include w-full;
+				@include p(var(--spacing-xs));
+				@include border;
+				border-color: hsl(var(--color-border));
+				@include rounded-md;
+				@include cursor-pointer;
+			}
+
+			input[type="checkbox"] {
+				width: auto;
+				@include mr(var(--spacing-xs));
+			}
+
+			small {
+				@include block;
+				@include text-xs;
+				color: hsl(var(--color-text-muted));
+				@include mt(var(--spacing-xs));
+			}
+		}
+
+		.validation-errors {
+			list-style: none;
+			@include p(0);
+			@include mt(var(--spacing-xs));
+			@include text-sm;
+			@include text-error;
+		}
+
+		.form-actions {
+			@include flex;
+			@include gap(var(--spacing-md));
+			@include justify-end;
+			@include mt(var(--spacing-lg));
+			@include pt(var(--spacing-lg));
+			@include border-t;
+			border-color: hsl(var(--color-border) / 0.5);
+		}
+	}
+}

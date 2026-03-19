@@ -1,0 +1,152 @@
+@use '../../../scss/config/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════
+// Document View — Navigation Components
+// ═══════════════════════════════════════════════════════════════
+
+// ───────────────────────────────────────────────────────────
+// Page Navigation — Table of Contents (outline of headings)
+// ───────────────────────────────────────────────────────────
+
+.toc-nav {
+	// Each ul level gets its own vertical track via border-left.
+	// padding-left creates space; dots are absolute-positioned on the border.
+	ul {
+		list-style: none;
+		@include p(0);
+		@include m(0);
+		@include flex-col;
+		gap: 2px;
+		padding-left: 1.25rem;
+		border-left: 2px solid var(--color-border);
+	}
+
+	ul ul {
+		padding-left: 1rem;
+		@include mt(2px);
+	}
+
+	a {
+		@include flex;
+		@include items-center;
+		@include relative;
+		@include py(var(--spacing-xs));
+		@include pr(var(--spacing-sm));
+		@include text-sm;
+		text-decoration: none;
+		color: var(--color-text-secondary);
+		line-height: 1.45;
+		@include transition-fast;
+
+		// Dot — centered on the ul's left border (the track)
+		&::before {
+			content: '';
+			@include absolute;
+			left: calc(-1.25rem - 1px);
+			top: 50%;
+			transform: translate(-50%, -50%);
+			width: 7px;
+			height: 7px;
+			border-radius: 50%;
+			border: 1.5px solid var(--color-border);
+			background-color: hsl(var(--color-body-bg));
+			z-index: 1;
+			@include transition-fast;
+		}
+
+		&:hover {
+			color: var(--color-primary);
+			&::before {
+				border-color: var(--color-primary);
+				background-color: var(--color-primary);
+			}
+		}
+
+		&.active {
+			color: var(--color-primary);
+			@include font-medium;
+			&::before {
+				border-color: var(--color-primary);
+				background-color: var(--color-primary);
+				width: 9px;
+				height: 9px;
+			}
+		}
+	}
+
+	// Nested dots — adjusted position to sit on nested track
+	ul ul a::before {
+		left: calc(-1rem - 1px);
+	}
+}
+
+// ───────────────────────────────────────────────────────────
+// Book Navigation — ordered list of documents in a book
+// CSS counter provides chapter numbers; left accent on active
+// --color-primary scoped to jade (book entity color)
+// ───────────────────────────────────────────────────────────
+
+#book-nav {
+	--color-primary: var(--palette-jade);
+
+	nav {
+		ul {
+			list-style: none;
+			@include p(0);
+			@include m(0);
+			@include flex-col;
+			gap: 1px;
+			counter-reset: book-nav;
+		}
+
+		li {
+			counter-increment: book-nav;
+		}
+
+		a {
+			@include flex;
+			@include items-start;
+			@include gap(var(--spacing-sm));
+			@include py(var(--spacing-sm));
+			@include pr(var(--spacing-sm));
+			@include pl(var(--spacing-xs));
+			@include text-sm;
+			text-decoration: none;
+			color: var(--color-text-secondary);
+			border-left: 4px solid transparent;
+			line-height: 1.45;
+			@include transition-fast;
+
+			// Chapter number
+			&::before {
+				content: counter(book-nav);
+				@include flex-shrink-0;
+				min-width: 1.25rem;
+				@include text-xs;
+				@include font-medium;
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+				color: var(--color-text-muted);
+				padding-top: 1px;
+				@include transition-fast;
+			}
+
+			&:hover {
+				background-color: hsl(var(--palette-jade) / 0.07);
+				color: var(--color-text-primary);
+				border-left-color: hsl(var(--palette-jade));
+			}
+
+			&.active {
+				background-color: hsl(var(--palette-jade) / 0.12);
+				color: hsl(var(--palette-jade));
+				border-left-color: hsl(var(--palette-jade));
+				@include font-medium;
+
+				&::before {
+					color: hsl(var(--palette-jade));
+				}
+			}
+		}
+	}
+}

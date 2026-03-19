@@ -1,7 +1,7 @@
 @use '../config/mixins' as *;
 
 .loader {
-	color: var(--color-primary);
+	color: hsl(var(--color-primary));
 	font-size: 90px;
 	text-indent: -9999em;
 	@include overflow-hidden;

@@ -104,7 +104,8 @@ git submodule add .../ln-acme.git resources/ln-acme
 `ln-icon-edit`, `ln-icon-save`, `ln-icon-download`, `ln-icon-upload`,
 `ln-icon-copy`, `ln-icon-link`, `ln-icon-calendar`, `ln-icon-filter`,
 `ln-icon-refresh`, `ln-icon-print`, `ln-icon-lock`, `ln-icon-star`,
-`ln-icon-info-circle`, `ln-icon-warning`, `ln-icon-globe`.
+`ln-icon-info-circle`, `ln-icon-warning`, `ln-icon-globe`,
+`ln-icon-search`, `ln-icon-list`, `ln-icon-box`, `ln-icon-building`.
 
 ---
 

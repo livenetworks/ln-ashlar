@@ -28,7 +28,7 @@
 		@include transition-colors;
 
 		&:hover {
-			color: var(--color-primary);
+			color: hsl(var(--color-primary));
 		}
 	}
 

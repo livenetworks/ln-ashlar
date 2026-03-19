@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>New Tenant — DocuFlow</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/docuflow.css">
+</head>
+<body>
+	<div class="app-wrapper">
+
+		<header class="app-header">
+			<div class="header-brand">
+				<span class="brand-logo ln-icon-book" aria-hidden="true"></span>
+				<span class="brand-name">DocuFlow</span>
+			</div>
+
+			<div class="header-center">
+				<div class="header-search">
+					<span class="ln-icon-search search-icon" aria-hidden="true"></span>
+					<input type="search" placeholder="Search..." aria-label="Search">
+				</div>
+			</div>
+
+			<nav class="header-nav" aria-label="User navigation">
+				<div class="header-avatar">
+					<img src="https://ui-avatars.com/api/?name=D+S&background=2737a1&color=fff&size=32&bold=true" alt="Dalibor Sojic">
+				</div>
+				<a href="packages.html" class="ln-icon-settings" aria-label="Admin" title="Admin"></a>
+				<a href="#" class="ln-icon-logout" aria-label="Log out" title="Log out"></a>
+			</nav>
+		</header>
+
+		<div class="app-body">
+
+			<div class="page-columns">
+
+				<aside class="panel-left">
+					<section id="admin-nav">
+						<h3>Administration</h3>
+						<nav aria-label="Admin navigation">
+							<ul>
+								<li>
+									<a href="packages.html">
+										<span class="ln-icon-box" aria-hidden="true"></span>
+										Packages
+									</a>
+								</li>
+								<li>
+									<a href="tenants.html" class="active">
+										<span class="ln-icon-building" aria-hidden="true"></span>
+										Tenants
+									</a>
+								</li>
+							</ul>
+						</nav>
+					</section>
+				</aside>
+
+				<div class="main-column">
+					<nav class="page-breadcrumbs" aria-label="Breadcrumbs">
+						<ol>
+							<li><a href="index.html">Home</a></li>
+							<li><a href="packages.html">Admin</a></li>
+							<li><a href="tenants.html">Tenants</a></li>
+							<li>New Tenant</li>
+						</ol>
+					</nav>
+
+					<main class="content">
+						<section id="admin-tenants">
+							<header>
+								<h1>New Tenant</h1>
+							</header>
+
+							<form id="tenant-form">
+								<p class="form-element">
+									<label for="name">Name</label>
+									<input type="text" id="name" name="name" required maxlength="255">
+								</p>
+
+								<p class="form-element">
+									<label for="slug">Slug (subdomain)</label>
+									<input type="text" id="slug" name="slug" required maxlength="100"
+									       pattern="[a-z0-9\-]+"
+									       title="Lowercase letters, numbers and hyphens only">
+								</p>
+
+								<p class="form-element">
+									<label for="domain">Custom Domain</label>
+									<input type="text" id="domain" name="domain" maxlength="255"
+									       placeholder="e.g. docs.company.com">
+								</p>
+
+								<p class="form-element">
+									<label for="package_id">Package</label>
+									<select id="package_id" name="package_id" required>
+										<option value="">— Select Package —</option>
+										<option value="1">Enterprise</option>
+										<option value="2">Professional</option>
+										<option value="3">Starter</option>
+										<option value="4">Trial</option>
+									</select>
+								</p>
+
+								<p class="form-element">
+									<label for="auth_method">Auth Method</label>
+									<select id="auth_method" name="auth_method" required>
+										<option value="local" selected>Local</option>
+										<option value="ldap">LDAP</option>
+									</select>
+								</p>
+
+								<p class="form-element">
+									<label for="doc_number_scheme">Document Numbering</label>
+									<input type="text" id="doc_number_scheme" name="doc_number_scheme" required maxlength="255"
+									       value="{TYPE}-{SEQ:4}">
+								</p>
+
+								<p class="form-element">
+									<label for="default_review_interval">Review Interval (days)</label>
+									<input type="number" id="default_review_interval" name="default_review_interval" required min="1" max="9999"
+									       value="365">
+								</p>
+
+								<fieldset>
+									<legend>Branding</legend>
+
+									<p class="form-element">
+										<label for="color_primary">Primary Color</label>
+										<input type="color" id="color_primary" name="color_primary" value="#2737a1">
+									</p>
+
+									<p class="form-element">
+										<label for="color_secondary">Secondary Color</label>
+										<input type="color" id="color_secondary" name="color_secondary" value="#206ea7">
+									</p>
+								</fieldset>
+
+								<p class="form-element">
+									<label>
+										<input type="checkbox" name="is_read_confirm_required" value="1" checked>
+										Require Read Confirmation
+									</label>
+								</p>
+
+								<p class="form-element">
+									<label>
+										<input type="checkbox" name="is_active" value="1" checked>
+										Active
+									</label>
+								</p>
+
+								<div class="form-actions">
+									<a href="tenants.html" class="btn btn--secondary">Cancel</a>
+									<button type="submit" class="btn">Create</button>
+								</div>
+							</form>
+						</section>
+					</main>
+				</div>
+
+				<aside class="panel-right">
+				</aside>
+
+			</div>
+
+			<footer class="app-footer">
+				<p>&copy; 2026 DocuFlow. Developed By <strong>Live Networks</strong></p>
+			</footer>
+
+		</div>
+
+	</div>
+
+	<ul class="ln-toast ln-toast--top-right" data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
+	<script src="../../dist/ln-acme.iife.js"></script>
+</body>
+</html>

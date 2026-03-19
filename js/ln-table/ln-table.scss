@@ -56,7 +56,7 @@
 	}
 
 	&:focus-within {
-		border-color: var(--color-primary);
+		border-color: hsl(var(--color-primary));
 		@include shadow-sm;
 	}
 }
@@ -86,7 +86,7 @@
 	position: sticky;
 	top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 2.75rem));
 	z-index: 11;
-	background: var(--color-table-header-bg, #1a1a2e);
+	background: hsl(var(--color-table-header-bg));
 }
 
 // ── Thead corner radius — overflow:clip clips at content-box, not border-radius curve,

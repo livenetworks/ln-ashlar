@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dashboard — DocuFlow</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/docuflow.css">
+</head>
+<body>
+	<div class="app-wrapper">
+
+		<header class="app-header">
+			<div class="header-brand">
+				<span class="brand-logo ln-icon-book" aria-hidden="true"></span>
+				<span class="brand-name">DocuFlow</span>
+			</div>
+
+			<div class="header-center">
+				<div class="header-search">
+					<span class="ln-icon-search search-icon" aria-hidden="true"></span>
+					<input type="search" placeholder="Search documents, standards..." aria-label="Search">
+				</div>
+			</div>
+
+			<nav class="header-nav" aria-label="User navigation">
+				<div class="header-avatar">
+					<img src="https://ui-avatars.com/api/?name=D+S&background=2737a1&color=fff&size=32&bold=true" alt="Dalibor Sojic">
+				</div>
+				<a href="packages.html" class="ln-icon-settings" aria-label="Admin" title="Admin"></a>
+				<a href="#" class="ln-icon-logout" aria-label="Log out" title="Log out"></a>
+			</nav>
+		</header>
+
+		<div class="app-body">
+
+			<div class="page-columns">
+
+				<aside class="panel-left">
+					<section id="book-nav">
+						<h3>Book Navigation</h3>
+						<nav aria-label="Book Navigation">
+							<ul>
+								<li><a href="#">Политики (ISMS)</a></li>
+								<li><a href="#" class="active">Опфат на ISMS</a></li>
+								<li><a href="#">Политика за информациска безбедност</a></li>
+								<li><a href="#">Политика за управување со ризици</a></li>
+								<li><a href="#">Политика за контрола на пристап</a></li>
+								<li><a href="#">Политика за класификација на информации</a></li>
+								<li><a href="#">Политика за криптографија</a></li>
+								<li><a href="#">Политика за физичка безбедност</a></li>
+							</ul>
+						</nav>
+					</section>
+				</aside>
+
+				<div class="main-column">
+					<nav class="page-breadcrumbs" aria-label="Breadcrumbs">
+						<ol>
+							<li><a href="#">Shelves</a></li>
+							<li>ISO 20000 — SMS (ИТ сервис менаџмент)</li>
+						</ol>
+					</nav>
+
+					<main class="content">
+						<section id="dashboard">
+
+							<header class="dashboard-header">
+								<h1>ISO 20000 — SMS (ИТ сервис менаџмент)</h1>
+							</header>
+
+							<section id="folders">
+								<ul>
+									<li>
+										<a href="#">
+											<article>
+												<img class="folder-image" src="https://placehold.co/400x200/e8f0fe/1a73e8?text=ISO+27001" alt="ISO 27001 cover">
+												<div class="folder-info">
+													<h3>ISO 27001 — Систем за управување со информациска безбедност</h3>
+													<p>Рамка за воспоставување, имплементација и одржување на ISMS</p>
+												</div>
+											</article>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<article>
+												<img class="folder-image" src="https://placehold.co/400x200/e8f4e8/2d7a3a?text=ISO+9001" alt="ISO 9001 cover">
+												<div class="folder-info">
+													<h3>ISO 9001 — Систем за управување со квалитет</h3>
+													<p>Меѓународен стандард за управување со квалитет и континуирано подобрување</p>
+												</div>
+											</article>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<article>
+												<img class="folder-image" src="https://placehold.co/400x200/fff3e0/e65100?text=ISO+22301" alt="ISO 22301 cover">
+												<div class="folder-info">
+													<h3>ISO 22301 — Управување со континуитет на бизнис</h3>
+													<p>Барања за планирање, воспоставување и одржување на BCM систем</p>
+												</div>
+											</article>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<article>
+												<img class="folder-image" src="https://placehold.co/400x200/f3e5f5/7b1fa2?text=ISO+20000" alt="ISO 20000 cover">
+												<div class="folder-info">
+													<h3>ISO 20000 — ИТ сервис менаџмент</h3>
+													<p>Стандард за управување со ИТ услуги и сервисен менаџмент</p>
+												</div>
+											</article>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<article>
+												<img class="folder-image" src="https://placehold.co/400x200/e0f2f1/00695c?text=ISO+14001" alt="ISO 14001 cover">
+												<div class="folder-info">
+													<h3>ISO 14001 — Систем за управување со животна средина</h3>
+													<p>Рамка за заштита на животната средина и одржлив развој</p>
+												</div>
+											</article>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<article>
+												<img class="folder-image" src="https://placehold.co/400x200/fce4ec/c62828?text=ISO+45001" alt="ISO 45001 cover">
+												<div class="folder-info">
+													<h3>ISO 45001 — Безбедност и здравје при работа</h3>
+													<p>Систем за управување со безбедност и здравје на работното место</p>
+												</div>
+											</article>
+										</a>
+									</li>
+								</ul>
+							</section>
+						</section>
+					</main>
+				</div>
+
+				<aside class="panel-right">
+					<ul class="metadata-tags">
+						<li class="ln-tag icon-badge"><small>clause</small><strong>4.3</strong></li>
+						<li class="ln-tag icon-badge"><small>type</small><strong>policy</strong></li>
+						<li class="ln-tag icon-badge"><small>standard</small><strong>27001</strong></li>
+					</ul>
+
+					<section id="page-nav">
+						<h3><abbr title="Table Of Contents">TOC</abbr></h3>
+						<nav class="toc-nav" aria-label="Table of Contents">
+							<ul>
+								<li><a href="#section-1">1. Цел</a></li>
+								<li><a href="#section-2">2. Контекст на организацијата</a></li>
+								<li>
+									<a href="#section-3">3. Опфат на ISMS</a>
+									<ul>
+										<li><a href="#section-3-1" class="active">3.1 Сервиси во опфат</a></li>
+										<li><a href="#section-3-2">3.2 Локации</a></li>
+										<li><a href="#section-3-3">3.3 Инфраструктура</a></li>
+										<li><a href="#section-3-4">3.4 Лица во опфат</a></li>
+										<li><a href="#section-3-5">3.5 Процеси во опфат</a></li>
+									</ul>
+								</li>
+								<li><a href="#section-4">4. Исклучени контроли</a></li>
+								<li><a href="#section-5">5. Интерфејси и зависности</a></li>
+								<li><a href="#section-6">6. Референци</a></li>
+							</ul>
+						</nav>
+					</section>
+
+					<section class="actions-section">
+						<h3>Actions</h3>
+						<ul>
+							<li><a href="#" class="ln-icon-plus primary-action">New Book</a></li>
+							<li><a href="#" class="ln-icon-list">List View</a></li>
+							<li><a href="#" class="ln-icon-edit">Edit</a></li>
+							<li><a href="#" class="ln-icon-lock">Permissions</a></li>
+							<li><a href="#" class="ln-icon-delete">Delete</a></li>
+							<li class="divider"><a href="#" class="ln-icon-star">Favourite</a></li>
+						</ul>
+					</section>
+				</aside>
+
+			</div>
+
+			<footer class="app-footer">
+				<p>&copy; 2026 DocuFlow. Developed By <strong>Live Networks</strong></p>
+			</footer>
+
+		</div>
+
+	</div>
+
+	<ul class="ln-toast ln-toast--top-right" data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
+	<script src="../../dist/ln-acme.iife.js"></script>
+</body>
+</html>

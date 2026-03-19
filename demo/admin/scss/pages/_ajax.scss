@@ -2,7 +2,7 @@
 
 .demo-note {
 	@include p(1rem);
-	background: var(--color-bg-warning);
+	background: hsl(var(--color-bg-warning, 48 96% 89%));
 	@include border;
 	@include rounded-md;
 }

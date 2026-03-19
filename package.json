@@ -23,9 +23,10 @@
 	"scripts": {
 		"dev": "vite build --watch",
 		"build": "vite build && npm run build:demos",
-		"build:demos": "npm run build:demo-index && npm run build:demo-admin",
+		"build:demos": "npm run build:demo-index && npm run build:demo-admin && npm run build:demo-docuflow",
 		"build:demo-index": "sass demo/index.scss demo/index.css --no-source-map --style=compressed",
-		"build:demo-admin": "sass demo/admin/admin.scss demo/admin/admin.css --no-source-map --style=compressed"
+		"build:demo-admin": "sass demo/admin/admin.scss demo/admin/dist/admin.css --no-source-map --style=compressed",
+		"build:demo-docuflow": "sass demo/docuflow/docuflow.scss demo/docuflow/dist/docuflow.css --no-source-map --style=compressed"
 	},
 	"devDependencies": {
 		"flag-icons": "^7.5.0",

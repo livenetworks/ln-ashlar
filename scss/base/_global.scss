@@ -20,13 +20,13 @@ body {
 }
 
 a {
-	color: var(--color-primary);
+	color: hsl(var(--color-primary));
 	text-decoration: none;
 	@include transition-colors;
 	@include relative;
 
 	&:hover {
-		color: var(--color-primary-hover);
+		color: hsl(var(--color-primary-hover));
 	}
 }
 
@@ -37,6 +37,6 @@ img {
 }
 
 ::selection {
-	background-color: var(--color-primary-light);
-	color: var(--color-text-primary);
+	background-color: hsl(var(--color-primary-light));
+	color: hsl(var(--color-text-primary));
 }

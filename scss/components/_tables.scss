@@ -10,7 +10,7 @@ table {
 }
 
 table thead {
-	background: var(--color-table-header-bg, #1a1a2e);
+	background: hsl(var(--color-table-header-bg));
 }
 
 table th {
@@ -20,7 +20,7 @@ table th {
 	@include font-semibold;
 	@include text-sm;
 	letter-spacing: 0.3px;
-	color: var(--color-table-header-text, #fff);
+	color: hsl(var(--color-table-header-text));
 }
 
 table tbody tr {
@@ -50,15 +50,15 @@ table td:first-child {
 }
 
 table tr.section-header td {
-	background: var(--color-table-section-bg, #e8ecf1);
+	background: hsl(var(--color-table-section-bg));
 	@include font-bold;
 	@include text-sm;
-	color: var(--color-table-header-bg, #1a1a2e);
+	color: hsl(var(--color-table-header-bg));
 	letter-spacing: 0.3px;
 }
 
 table tbody tr.section-header:hover {
-	background-color: var(--color-table-section-bg, #e8ecf1);
+	background-color: hsl(var(--color-table-section-bg));
 }
 
 .pass {
@@ -84,7 +84,7 @@ table.striped tbody tr:nth-child(odd) {
 	@include bg-secondary;
 
 	&:hover {
-		background-color: var(--color-bg-secondary);
+		background-color: hsl(var(--color-bg-secondary));
 	}
 }
 
@@ -125,12 +125,12 @@ table td .action {
 
 	&.danger {
 		@include text-error;
-		&:hover { background-color: var(--color-bg-error); }
+		&:hover { background-color: hsl(var(--color-bg-error)); }
 	}
 
 	&.primary {
-		color: var(--color-primary);
-		&:hover { background-color: var(--color-primary-light); }
+		color: hsl(var(--color-primary));
+		&:hover { background-color: hsl(var(--color-primary-light)); }
 	}
 
 	svg {

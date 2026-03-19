@@ -73,7 +73,7 @@ small {
 code {
 	@include font-mono;
 	@include text-sm;
-	background-color: var(--color-bg-body);
+	background-color: hsl(var(--color-bg-body));
 	@include px(0.25rem);
 	@include py(0.125rem);
 	@include rounded-sm;
@@ -82,7 +82,7 @@ code {
 pre {
 	@include font-mono;
 	@include text-sm;
-	background-color: var(--color-bg-body);
+	background-color: hsl(var(--color-bg-body));
 	@include p(1rem);
 	@include rounded-md;
 	@include overflow-x-auto;
@@ -95,7 +95,7 @@ pre {
 }
 
 blockquote {
-	border-left: 4px solid var(--color-primary);
+	border-left: 4px solid hsl(var(--color-primary));
 	@include pl(1rem);
 	@include py(0.5rem);
 	@include mb(1rem);

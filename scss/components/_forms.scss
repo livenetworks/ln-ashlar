@@ -56,7 +56,7 @@ form {
 [data-ln-input-errors] {
 	@include ml(1.25rem);
 	@include text-sm;
-	color: var(--color-error);
+	color: hsl(var(--color-error));
 }
 
 input,
@@ -74,8 +74,8 @@ select {
 	outline: none;
 
 	&:focus {
-		border-color: var(--color-primary);
-		box-shadow: 0 0 0 3px var(--color-primary-light);
+		border-color: hsl(var(--color-primary));
+		box-shadow: 0 0 0 3px hsl(var(--color-primary-light));
 	}
 
 	&::placeholder {
@@ -120,15 +120,15 @@ label {
 	@include border;
 
 	&:hover {
-		background-color: var(--color-bg-secondary);
+		background-color: hsl(var(--color-bg-secondary));
 	}
 }
 
 .btn--danger {
-	background-color: var(--color-error);
+	background-color: hsl(var(--color-error));
 
 	&:hover {
-		background-color: var(--color-error-hover);
+		background-color: hsl(var(--color-error-hover));
 	}
 }
 

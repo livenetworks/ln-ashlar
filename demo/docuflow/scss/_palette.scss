@@ -1,0 +1,77 @@
+// ═══════════════════════════════════════════════════════════════
+// DocuFlow — Named Color Palette
+// ═══════════════════════════════════════════════════════════════
+//
+// All values are bare HSL triplets (H S% L%) so they compose
+// with the slash-alpha syntax:
+//
+//   hsl(var(--palette-coral))          → solid color
+//   hsl(var(--palette-coral) / 0.1)   → 10% tint (icon bg, badge bg)
+//   hsl(var(--palette-coral) / 0.15)  → 15% tint (hover bg)
+//
+// Entity type variables map a logical name to a palette color.
+// Components use --entity-color so the color can be overridden
+// per-context without touching the component styles.
+//
+// ═══════════════════════════════════════════════════════════════
+
+:root {
+
+	// ───────────────────────────────────────────────────────────
+	// Named Palette
+	// ───────────────────────────────────────────────────────────
+
+	//  Name       H    S     L       Character
+	--palette-coral:    7  72%  52%;  // warm red      — Shelves
+	--palette-jade:   155  50%  38%;  // forest green  — Books
+	--palette-azure:  211  62%  50%;  // mid blue      — Documents
+	--palette-violet: 262  55%  54%;  // purple        — Standards
+	--palette-amber:   38  88%  48%;  // orange-gold   — IMS / warnings
+	--palette-teal:   187  56%  38%;  // blue-green    — alternative
+	--palette-rose:   338  66%  52%;  // pink-red      — alternative
+	--palette-indigo: 231  56%  50%;  // deep blue     — alternative
+	--palette-pine:   160  44%  33%;  // dark green    — alternative
+	--palette-slate:  220  14%  44%;  // neutral grey  — unclassified / muted
+
+	// ───────────────────────────────────────────────────────────
+	// Entity Type Mapping
+	// Assign a palette color to each logical entity in the system
+	// ───────────────────────────────────────────────────────────
+
+	--entity-shelf:    var(--palette-coral);
+	--entity-book:     var(--palette-jade);
+	--entity-document: var(--palette-azure);
+	--entity-standard: var(--palette-violet);
+	--entity-ims:      var(--palette-amber);
+}
+
+// ───────────────────────────────────────────────────────────
+// Entity Color Context Classes
+// Apply one of these on a wrapping element to set --entity-color
+// for all descendant components that consume it.
+// ───────────────────────────────────────────────────────────
+
+.entity-shelf    { --entity-color: var(--palette-coral);  }
+.entity-book     { --entity-color: var(--palette-jade);   }
+.entity-document { --entity-color: var(--palette-azure);  }
+.entity-standard { --entity-color: var(--palette-violet); }
+.entity-ims      { --entity-color: var(--palette-amber);  }
+
+// ───────────────────────────────────────────────────────────
+// Reusable Entity Icon
+// A colored icon + light tint background.
+// Requires --entity-color to be set on an ancestor.
+// ───────────────────────────────────────────────────────────
+
+.entity-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.75rem;
+	height: 1.75rem;
+	border-radius: 50%;
+	flex-shrink: 0;
+	background-color: hsl(var(--entity-color) / 0.12);
+	color: hsl(var(--entity-color));
+	font-size: 0.875rem;
+}

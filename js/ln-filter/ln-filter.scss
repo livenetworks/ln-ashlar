@@ -5,3 +5,8 @@
 [data-ln-filter-hide="true"] {
 	display: none;
 }
+
+[data-ln-filter-key][data-active] {
+	background: var(--color-primary);
+	color: var(--color-text-on-primary);
+}

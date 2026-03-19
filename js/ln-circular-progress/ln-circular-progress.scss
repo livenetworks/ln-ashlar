@@ -14,12 +14,12 @@
 
 /* Track */
 .ln-circular-progress__track {
-	stroke: var(--color-border);
+	stroke: hsl(var(--color-border));
 }
 
 /* Fill arc */
 .ln-circular-progress__fill {
-	stroke: var(--color-primary);
+	stroke: hsl(var(--color-primary));
 	transition: stroke-dashoffset var(--transition-base);
 }
 
@@ -59,13 +59,13 @@
 
 /* Color variants */
 [data-ln-circular-progress].green .ln-circular-progress__fill {
-	stroke: var(--color-success);
+	stroke: hsl(var(--color-success));
 }
 
 [data-ln-circular-progress].red .ln-circular-progress__fill {
-	stroke: var(--color-error);
+	stroke: hsl(var(--color-error));
 }
 
 [data-ln-circular-progress].yellow .ln-circular-progress__fill {
-	stroke: var(--color-warning);
+	stroke: hsl(var(--color-warning));
 }

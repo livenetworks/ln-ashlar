@@ -43,7 +43,7 @@
 		@include transition-fast;
 		background: none;
 		border: none;
-		color: var(--color-text-primary);
+		color: hsl(var(--color-text-primary));
 		text-decoration: none;
 
 		&:hover {
@@ -54,7 +54,7 @@
 	// ─── Separator ─────────────────────────────────────────
 	hr {
 		border: none;
-		border-top: 1px solid var(--color-border);
+		border-top: 1px solid hsl(var(--color-border));
 		@include my(var(--spacing-xs));
 	}
 }

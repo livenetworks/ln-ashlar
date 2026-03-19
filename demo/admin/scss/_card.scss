@@ -4,7 +4,7 @@
 	@include card;
 
 	&:hover {
-		border-color: var(--color-primary);
+		border-color: hsl(var(--color-primary));
 		@include shadow-md;
 	}
 

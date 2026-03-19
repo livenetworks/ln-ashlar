@@ -5,6 +5,7 @@
 	const KEY_ATTR = 'data-ln-filter-key';
 	const VALUE_ATTR = 'data-ln-filter-value';
 	const HIDE_ATTR = 'data-ln-filter-hide';
+	const ACTIVE_ATTR = 'data-active';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -50,49 +51,88 @@
 			if (btn[DOM_ATTRIBUTE + 'Bound']) return;
 			btn[DOM_ATTRIBUTE + 'Bound'] = true;
 
-			btn.addEventListener('click', function (e) {
-				// Update active state
-				self.buttons.forEach(function (b) {
-					b.classList.remove('active');
-				});
-				btn.classList.add('active');
+			btn.addEventListener('click', function () {
+				var key = btn.getAttribute(KEY_ATTR);
+				var value = btn.getAttribute(VALUE_ATTR);
 
-				// Apply filter
-				self._filter(btn);
+				if (value === '') {
+					self.reset();
+				} else {
+					self._setActive(btn);
+					self._applyFilter(key, value);
+					_dispatch(self.dom, 'ln-filter:changed', { key: key, value: value });
+				}
 			});
 		});
 	};
 
-	_component.prototype._filter = function (btn) {
+	// ─── Filter logic ──────────────────────────────────────────
+
+	_component.prototype._applyFilter = function (key, value) {
 		var target = document.getElementById(this.targetId);
 		if (!target) return;
 
-		var key = btn.getAttribute(KEY_ATTR);
-		var value = btn.getAttribute(VALUE_ATTR);
-		if (!key) return;
+		var children = Array.from(target.children);
 
-		var elements = target.querySelectorAll('[data-' + key + ']');
-		var matched = 0;
-		var total = elements.length;
+		for (var i = 0; i < children.length; i++) {
+			var el = children[i];
+			var attr = el.getAttribute('data-' + key);
 
-		for (var i = 0; i < elements.length; i++) {
-			var el = elements[i];
 			el.removeAttribute(HIDE_ATTR);
 
-			if (value !== '' && !el.getAttribute('data-' + key).toLowerCase().includes(value.toLowerCase())) {
+			if (attr === null) continue;
+
+			if (value && attr.toLowerCase() !== value.toLowerCase()) {
 				el.setAttribute(HIDE_ATTR, 'true');
-			} else {
-				matched++;
+			}
+		}
+	};
+
+	_component.prototype._setActive = function (btn) {
+		this.buttons.forEach(function (b) {
+			b.removeAttribute(ACTIVE_ATTR);
+		});
+		if (btn) btn.setAttribute(ACTIVE_ATTR, '');
+	};
+
+	// ─── Public API ────────────────────────────────────────────
+
+	_component.prototype.filter = function (key, value) {
+		this._setActive(null);
+
+		// Highlight matching button if one exists
+		for (var i = 0; i < this.buttons.length; i++) {
+			var btn = this.buttons[i];
+			if (btn.getAttribute(KEY_ATTR) === key && btn.getAttribute(VALUE_ATTR) === value) {
+				this._setActive(btn);
+				break;
 			}
 		}
 
-		_dispatch(this.dom, 'ln-filter:change', {
-			targetId: this.targetId,
-			key: key,
-			value: value,
-			matched: matched,
-			total: total
-		});
+		this._applyFilter(key, value);
+		_dispatch(this.dom, 'ln-filter:changed', { key: key, value: value });
+	};
+
+	_component.prototype.reset = function () {
+		var target = document.getElementById(this.targetId);
+		if (target) {
+			var children = Array.from(target.children);
+			for (var i = 0; i < children.length; i++) {
+				children[i].removeAttribute(HIDE_ATTR);
+			}
+		}
+
+		// Activate the "all" button (empty value)
+		var allBtn = null;
+		for (var i = 0; i < this.buttons.length; i++) {
+			if (this.buttons[i].getAttribute(VALUE_ATTR) === '') {
+				allBtn = this.buttons[i];
+				break;
+			}
+		}
+		this._setActive(allBtn);
+
+		_dispatch(this.dom, 'ln-filter:reset', {});
 	};
 
 	// ─── Helpers ───────────────────────────────────────────────

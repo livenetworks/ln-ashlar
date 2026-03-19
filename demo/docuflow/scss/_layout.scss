@@ -1,0 +1,347 @@
+@use '../../../scss/config/mixins' as *;
+
+// ═══════════════════════════════════════════════════════════════
+// Layout Core
+// ═══════════════════════════════════════════════════════════════
+
+:root {
+	// Custom layout colors based on requirements
+	// Header: ~ #206ea7 -> HSL: 205 68% 39%
+	--color-header-bg: 205 68% 39%;
+
+	// Body: #f2f2f2 -> HSL: 0 0% 95%
+	--color-body-bg: 0 0% 95%;
+
+	--layout-header-height: 4rem;
+	--layout-panel-width: 16rem;
+
+	// Typography override — Inter replaces system-ui stack
+	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+	// Slightly tighter base text for dense UI
+	--text-xs:   0.6875rem;  // 11px
+	--text-sm:   0.8125rem;  // 13px
+	--text-base: 0.9375rem;  // 15px
+	--text-lg:   1.0625rem;  // 17px
+	--text-xl:   1.25rem;    // 20px
+	--text-2xl:  1.5rem;     // 24px
+}
+
+body {
+	background-color: hsl(var(--color-body-bg));
+	margin: 0;
+	@include p(0);
+	font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+	font-optical-sizing: auto;
+}
+
+.app-wrapper {
+	@include flex-col;
+	@include min-h-screen;
+}
+
+// ───────────────────────────────────────────────────────────
+// App Header
+// ───────────────────────────────────────────────────────────
+
+.app-header {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(var(--spacing-lg));
+	height: var(--layout-header-height);
+	background-color: hsl(var(--color-header-bg));
+	@include text-white;
+	@include sticky;
+	top: 0;
+	@include z-sticky;
+
+	.header-brand {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-md));
+
+		.menu-toggle {
+			background: transparent;
+			@include border-none;
+			@include text-white;
+			@include text-xl;
+			@include cursor-pointer;
+			@include p(var(--spacing-xs));
+
+			&:hover {
+				background-color: hsl(0 0% 100% / 0.1);
+				@include rounded-md;
+			}
+		}
+
+		.brand-logo {
+			@include text-2xl;
+		}
+
+		.brand-name {
+			@include text-lg;
+			@include font-semibold;
+			letter-spacing: -0.01em;
+		}
+	}
+
+	.header-center {
+		@include flex-1;
+		@include flex-center;
+		@include px(var(--spacing-xl));
+
+		.header-search {
+			@include relative;
+			max-width: 32rem;
+			@include w-full;
+
+			.search-icon {
+				@include absolute;
+				left: var(--spacing-sm);
+				top: 50%;
+				transform: translateY(-50%);
+				color: hsl(0 0% 100% / 0.7);
+			}
+
+			input {
+				@include w-full;
+				@include py(var(--spacing-sm));
+				@include pl(2.5rem);
+				@include pr(var(--spacing-md));
+				background-color: hsl(0 0% 100% / 0.2);
+				border: 1px solid hsl(0 0% 100% / 0.1);
+				@include text-white;
+				@include rounded-md;
+				@include transition;
+
+				&::placeholder {
+					color: hsl(0 0% 100% / 0.7);
+				}
+
+				&:focus {
+					background-color: hsl(0 0% 100% / 0.3);
+					border-color: hsl(0 0% 100% / 0.3);
+					outline: none;
+				}
+			}
+		}
+	}
+
+	.header-nav {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-md));
+
+		.header-avatar img {
+			@include rounded-full;
+			@include size(2rem);
+			border: 2px solid hsl(0 0% 100% / 0.2);
+		}
+
+		a {
+			color: white;
+			text-decoration: none;
+			@include font-medium;
+			@include text-sm;
+			opacity: 0.9;
+			@include transition;
+
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+// ───────────────────────────────────────────────────────────
+// App Body (Page Columns + Footer)
+// ───────────────────────────────────────────────────────────
+
+.app-body {
+	@include flex;
+	@include flex-col;
+	@include flex-1;
+	height: calc(100vh - var(--layout-header-height));
+	overflow: hidden; // Columns scroll independently — not the whole body
+	@include p(0);
+	max-width: 90%;
+	margin: 0 auto !important; // Override framework injected margin-top
+	@include w-full;
+}
+
+// 3-Column Layout
+.page-columns {
+	@include flex;
+	@include gap(var(--spacing-xl));
+	@include w-full;
+	flex: 1;
+	min-height: 0; // Allow flex children to shrink and scroll
+	overflow: hidden;
+
+	@media (max-width: 1024px) {
+		@include flex-col;
+		overflow: visible;
+		flex: none;
+	}
+}
+
+// Asides (Transparent)
+.panel-left,
+.panel-right {
+	width: var(--layout-panel-width);
+	@include flex-shrink-0;
+	@include flex-col;
+	@include gap(var(--spacing-lg));
+	padding-top: 6rem;
+	@include px(var(--spacing-md));
+	overflow-y: auto; // Independent scroll
+
+	@media (max-width: 1024px) {
+		@include w-full;
+		overflow-y: visible;
+		order: 2;
+	}
+
+	section {
+		@include flex-col;
+		@include gap(var(--spacing-sm));
+
+		h3 {
+			@include font-sans;
+			@include text-lg;
+			@include font-semibold;
+			letter-spacing: -0.02em;
+			color: hsl(var(--color-text-primary));
+			@include m(0);
+			@include pb(var(--spacing-xs));
+			@include border-b;
+			border-color: hsl(var(--color-border) / 0.5);
+		}
+	}
+}
+
+// Main Content Wrapper (Breadcrumbs + Content)
+.main-column {
+	@include flex-1;
+	@include flex-col;
+	min-width: 0; // Prevent flex blowout
+	overflow-y: auto; // Independent scroll
+
+	@media (max-width: 1024px) {
+		order: 1;
+		@include w-full;
+		overflow-y: visible;
+	}
+}
+
+// Breadcrumbs
+.page-breadcrumbs {
+	@include mt(1rem);
+	@include mb(1rem);
+	@include w-full;
+
+	ol {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-sm));
+		list-style: none;
+		@include p(0);
+		@include m(0);
+	}
+
+	li {
+		@include flex;
+		@include items-center;
+		@include text-sm;
+		color: hsl(var(--color-text-secondary));
+		@include font-medium;
+
+		&::after {
+			content: '\203A'; // Single Right-Pointing Angle Quotation Mark
+			font-size: 1.25rem;
+			@include font-bold;
+			@include ml(var(--spacing-md));
+			color: hsl(var(--color-text-muted) / 0.8);
+			transform: translateY(-1px);
+		}
+
+		&:last-child {
+			color: hsl(var(--color-primary));
+			@include font-medium;
+			@include px(var(--spacing-md));
+			@include py(var(--spacing-xs));
+			&::after { content: none; }
+		}
+	}
+
+	a {
+		color: hsl(var(--color-text-secondary));
+		text-decoration: none;
+		@include transition;
+
+		@include px(var(--spacing-lg));
+		@include py(var(--spacing-sm));
+		border: 1px solid transparent;
+		@include rounded-md;
+
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-xs));
+
+		&:hover {
+			color: hsl(var(--color-primary));
+			border-color: hsl(var(--color-border) / 0.8);
+			background-color: hsl(0 0% 100% / 0.5);
+		}
+	}
+}
+
+// Main Content (White Sheet with Shadow)
+.content {
+	@include flex-1;
+	background-color: hsl(0 0% 100%);
+	@include rounded-lg;
+	@include shadow-lg;
+	@include p(var(--spacing-2xl));
+	min-height: 60vh;
+	line-height: 1.65;
+
+	@media (max-width: 1024px) {
+		@include p(var(--spacing-xl));
+	}
+
+	h1, h2, h3, h4, h5 {
+		letter-spacing: -0.02em;
+		line-height: 1.25;
+		@include text-primary;
+	}
+
+	h1 { @include text-2xl; @include font-semibold; }
+	h2 { @include text-xl;  @include font-semibold; }
+	h3 { @include text-lg;  @include font-medium; }
+
+	p { line-height: 1.7; }
+}
+
+// ───────────────────────────────────────────────────────────
+// App Footer
+// ───────────────────────────────────────────────────────────
+.app-footer {
+	@include mt(var(--spacing-2xl));
+	@include mb(var(--spacing-xl));
+	@include flex-center;
+	@include w-full;
+	color: hsl(var(--color-text-muted));
+	@include text-xs;
+	opacity: 0.7;
+
+	p {
+		margin: 0;
+	}
+
+	strong {
+		color: hsl(var(--color-text-secondary));
+		@include font-semibold;
+	}
+}

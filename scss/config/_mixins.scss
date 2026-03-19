@@ -121,27 +121,27 @@
 // Colors — референцира --color-* токени
 // ---------------------------------------------------------------------------
 
-@mixin text-primary   { color: var(--color-text-primary); }
-@mixin text-secondary { color: var(--color-text-secondary); }
-@mixin text-muted     { color: var(--color-text-muted); }
+@mixin text-primary   { color: hsl(var(--color-text-primary)); }
+@mixin text-secondary { color: hsl(var(--color-text-secondary)); }
+@mixin text-muted     { color: hsl(var(--color-text-muted)); }
 @mixin text-white     { color: #ffffff; }
-@mixin text-error     { color: var(--color-error); }
-@mixin text-success   { color: var(--color-success); }
-@mixin text-warning   { color: var(--color-warning); }
+@mixin text-error     { color: hsl(var(--color-error)); }
+@mixin text-success   { color: hsl(var(--color-success)); }
+@mixin text-warning   { color: hsl(var(--color-warning)); }
 
-@mixin bg-primary   { background-color: var(--color-bg-primary); }
-@mixin bg-secondary { background-color: var(--color-bg-secondary); }
-@mixin bg-body      { background-color: var(--color-bg-body); }
+@mixin bg-primary   { background-color: hsl(var(--color-bg-primary)); }
+@mixin bg-secondary { background-color: hsl(var(--color-bg-secondary)); }
+@mixin bg-body      { background-color: hsl(var(--color-bg-body)); }
 
 // ---------------------------------------------------------------------------
 // Borders — референцира --color-border и --radius-* токени
 // ---------------------------------------------------------------------------
 
-@mixin border    { border: 1px solid var(--color-border); }
-@mixin border-t  { border-top: 1px solid var(--color-border); }
-@mixin border-b  { border-bottom: 1px solid var(--color-border); }
-@mixin border-l  { border-left: 1px solid var(--color-border); }
-@mixin border-r  { border-right: 1px solid var(--color-border); }
+@mixin border    { border: 1px solid hsl(var(--color-border)); }
+@mixin border-t  { border-top: 1px solid hsl(var(--color-border)); }
+@mixin border-b  { border-bottom: 1px solid hsl(var(--color-border)); }
+@mixin border-l  { border-left: 1px solid hsl(var(--color-border)); }
+@mixin border-r  { border-right: 1px solid hsl(var(--color-border)); }
 @mixin border-none { border: none; }
 
 @mixin rounded-sm   { border-radius: var(--radius-sm); }
@@ -367,12 +367,12 @@
 	@include transition;
 	border: none;
 	outline: none;
-	background-color: var(--color-primary);
+	background-color: hsl(var(--color-primary));
 	@include text-white;
 	white-space: nowrap;
 
-	&:hover { background-color: var(--color-primary-hover); }
-	&:focus { box-shadow: 0 0 0 3px var(--color-primary-light); }
+	&:hover { background-color: hsl(var(--color-primary-hover)); }
+	&:focus { box-shadow: 0 0 0 3px hsl(var(--color-primary-light)); }
 	&:disabled { @include opacity-50; @include cursor-not-allowed; }
 }
 
@@ -380,7 +380,7 @@
 	background: transparent;
 	@include border-none;
 	@include text-lg;
-	color: var(--color-text-muted);
+	color: hsl(var(--color-text-muted));
 	@include cursor-pointer;
 	@include size(2rem);
 	@include flex-center;
@@ -392,12 +392,12 @@
 	}
 
 	&:active {
-		color: var(--color-error-hover);
+		color: hsl(var(--color-error-hover));
 		@include bg-body;
 	}
 
 	&:focus-visible {
-		outline: 2px solid var(--color-primary);
+		outline: 2px solid hsl(var(--color-primary));
 		outline-offset: -2px;
 	}
 }
@@ -437,8 +437,8 @@
 		}
 
 		&.active {
-			background-color: var(--color-primary-light);
-			color: var(--color-primary);
+			background-color: hsl(var(--color-primary-light));
+			color: hsl(var(--color-primary));
 			@include font-semibold;
 		}
 	}

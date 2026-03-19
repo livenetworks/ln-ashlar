@@ -206,7 +206,7 @@
 
 			&:focus {
 				@include bg-primary;
-				border-color: var(--color-primary);
+				border-color: hsl(var(--color-primary));
 				width: 20rem;
 			}
 		}
