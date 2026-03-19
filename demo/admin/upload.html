@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Upload — ln-acme</title>
+	<link rel="stylesheet" href="../../dist/ln-acme.css">
+	<link rel="stylesheet" href="admin.css">
+	<script src="../../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../../js/ln-upload/ln-upload.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Upload</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Upload component with drag-drop.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Upload</h1>
+					<p>File upload with drag-drop, progress bar, file type validation. A server is required for actual upload.</p>
+
+					<!-- Upload zone -->
+					<section class="section-card">
+						<header><h3>Upload Zone (demo — no server)</h3></header>
+						<main>
+							<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
+								<div class="ln-upload__zone">
+									<p>Drag files here or click to browse</p>
+									<small>Allowed: pdf, doc, docx, jpg, png</small>
+								</div>
+								<ul class="ln-upload__list"></ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- HTML -->
+					<section class="section-card">
+						<header><h3>HTML</h3></header>
+						<main>
+							<pre><code>&lt;!-- Upload container --&gt;
+&lt;div data-ln-upload="/api/upload-endpoint"
+     data-ln-upload-accept="pdf,doc,jpg,png"&gt;
+
+    &lt;!-- Drop zone --&gt;
+    &lt;div class="ln-upload__zone"&gt;
+        &lt;p&gt;Drag files here&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;!-- File list (populated automatically) --&gt;
+    &lt;ul class="ln-upload__list"&gt;&lt;/ul&gt;
+
+&lt;/div&gt;
+
+&lt;!-- Attributes --&gt;
+data-ln-upload="URL"           - upload endpoint
+data-ln-upload-accept="ext,ext" - allowed extensions
+
+&lt;!-- JS API (available on the container element) --&gt;
+&lt;script&gt;
+const container = document.querySelector('[data-ln-upload]');
+container.lnUploadAPI.getFileIds();   // [1, 2, 3]
+container.lnUploadAPI.getFiles();     // file objects
+container.lnUploadAPI.clear();        // clear everything
+&lt;/script&gt;
+
+&lt;!-- Custom Events --&gt;
+ln-upload:uploaded   - {id, name, size}
+ln-upload:removed    - {id}
+ln-upload:error      - {message}
+ln-upload:invalid    - {file, reason}
+
+&lt;!-- Hidden inputs for form --&gt;
+&lt;!-- Created automatically: --&gt;
+&lt;input type="hidden" name="file_ids[]" value="123"&gt;</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>

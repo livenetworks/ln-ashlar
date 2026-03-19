@@ -6,15 +6,8 @@
 @use 'base/global';
 @use 'base/typography';
 
-@use 'layout/app-layout';
-@use 'layout/header';
-@use 'layout/grid';
-
-@use 'components/card';
 @use 'components/forms';
 @use 'components/tables';
-@use 'components/navigation';
-@use 'components/sections';
 @use 'components/tabs';
 @use 'components/toggle';
 @use 'components/breadcrumbs';

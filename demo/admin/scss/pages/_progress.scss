@@ -1,0 +1,22 @@
+@use '../../../../scss/config/mixins' as *;
+
+.demo-progress-item {
+	@include stack(1rem);
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	h4 {
+		@include text-sm;
+		@include text-secondary;
+		@include font-normal;
+		margin: 0;
+		@include mb(0.5rem);
+	}
+}
+
+#progress-reactive nav {
+	@include flex;
+	@include gap(0.5rem);
+	@include mt(0.5rem);
+}

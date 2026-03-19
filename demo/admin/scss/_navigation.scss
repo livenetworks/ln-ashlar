@@ -1,0 +1,19 @@
+@use '../../../scss/config/mixins' as *;
+
+.nav {
+	@include nav;
+}
+
+@container sidebar (max-width: 80px) {
+	.nav {
+		a {
+			@include justify-center;
+			@include px(0.5rem);
+		}
+
+		.nav-label,
+		.nav-section {
+			@include hidden;
+		}
+	}
+}

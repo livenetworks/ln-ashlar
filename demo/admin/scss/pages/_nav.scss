@@ -1,0 +1,15 @@
+@use '../../../../scss/config/mixins' as *;
+
+.demo-nav-example {
+	@include border;
+	@include p(1rem);
+	@include rounded-md;
+
+	h5 { margin-top: 0; @include mb(0.5rem); }
+
+	nav {
+		@include flex;
+		@include gap(1rem);
+		@include py(0.5rem);
+	}
+}

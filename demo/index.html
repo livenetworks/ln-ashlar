@@ -1,375 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>acme-gui — Demo</title>
-	<link rel="stylesheet" href="../dist/ln-acme.css">
-	<link rel="stylesheet" href="demo.css">
-	<script src="../js/ln-toast/ln-toast.js" defer></script>
-	<script src="../js/ln-toggle/ln-toggle.js" defer></script>
-	<script src="../js/ln-nav/ln-nav.js" defer></script>
-	<script src="../js/ln-progress/ln-progress.js" defer></script>
-	<script src="../js/ln-tabs/ln-tabs.js" defer></script>
-	<script src="../js/ln-modal/ln-modal.js" defer></script>
-	<script src="../js/ln-upload/ln-upload.js" defer></script>
-	<script src="../js/ln-ajax/ln-ajax.js" defer></script>
-	<script src="demo.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ln-acme — Demos</title>
+    <link rel="stylesheet" href="../dist/ln-acme.css">
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-	<!-- Toast container -->
-	<div data-ln-toast></div>
+    <div class="container">
+        <header>
+            <h1>ln-acme Demos</h1>
+            <p>Select a design style to explore the components and layouts.</p>
+        </header>
 
-	<div class="app-wrapper">
-		<!-- Header -->
-		<header>
-			<div class="header-left">
-				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
-				</button>
-				<h1>Dashboard</h1>
-			</div>
-			<div class="header-right">
-				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
-					</button>
-				</div>
-			</div>
-		</header>
+        <main class="demo-grid">
+            <a href="admin/index.html" class="demo-card">
+                <div class="icon">
+                    <span class="ln-icon-chart"></span>
+                </div>
+                <h3>Admin Dashboard</h3>
+                <p>Advanced data management and administration interface.</p>
+                <span class="badge">Current Style</span>
+            </a>
 
-		<!-- App Body -->
-		<div class="app-body">
-		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
-			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
-				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
-				<span class="app-name">acme-gui</span>
-			</div>
+            <div class="demo-card" style="opacity: 0.6; cursor: not-allowed;">
+                <div class="icon">
+                    <span class="ln-icon-globe"></span>
+                </div>
+                <h3>Web Frontend</h3>
+                <p>Clean and modern design for public websites.</p>
+                <span class="badge">Coming Soon</span>
+            </div>
+        </main>
 
-			<div class="sidebar-content">
-				<nav class="nav" data-ln-nav="active">
-					<ul>
-						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
-					</ul>
-
-					<h6 class="nav-section">CSS Components</h6>
-					<ul>
-						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
-						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
-						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
-						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
-						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
-						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
-						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
-						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
-					</ul>
-
-					<h6 class="nav-section">JS Components</h6>
-					<ul>
-						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
-						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
-						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
-						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
-						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
-						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
-						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
-						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
-						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
-						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
-						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
-						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
-						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
-						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
-						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
-					</ul>
-				</nav>
-			</div>
-
-			<div class="sidebar-footer">
-				<small>acme-gui v1.0.0</small>
-			</div>
-		</aside>
-
-		<!-- Main Panel -->
-		<div class="main-panel">
-
-			<!-- Content -->
-			<div class="content">
-
-				<!-- Stats -->
-				<section id="stats">
-					<ul>
-						<li>
-							<h3>Components</h3>
-							<strong>18</strong>
-							<div data-ln-progress>
-								<div data-ln-progress="18" data-ln-progress-max="20" class="green"></div>
-							</div>
-						</li>
-						<li>
-							<h3>JS Modules</h3>
-							<strong>10</strong>
-							<div data-ln-progress>
-								<div data-ln-progress="10" data-ln-progress-max="12" class="green"></div>
-							</div>
-						</li>
-						<li>
-							<h3>SCSS Files</h3>
-							<strong>22</strong>
-							<div data-ln-progress>
-								<div data-ln-progress="22" data-ln-progress-max="25" class="yellow"></div>
-							</div>
-						</li>
-						<li>
-							<h3>Demo Pages</h3>
-							<strong>14</strong>
-							<div data-ln-progress>
-								<div data-ln-progress="14" data-ln-progress-max="14" class="green"></div>
-							</div>
-						</li>
-					</ul>
-				</section>
-
-				<!-- Modal Demo -->
-				<section class="section-card">
-					<header><h3>Modal</h3></header>
-					<main>
-						<nav class="demo-actions">
-							<button data-ln-modal="demo-basic" class="btn">Basic Modal</button>
-							<button data-ln-modal="demo-form" class="btn btn--secondary">Form Modal</button>
-						</nav>
-					</main>
-				</section>
-
-				<!-- Tabs Demo -->
-				<section id="demo-tabs" class="section-card">
-					<header><h3>Tabs</h3></header>
-					<main>
-						<div data-ln-tabs data-ln-tabs-default="pregled">
-							<div class="demo-tabs">
-								<button data-ln-tab="pregled">Overview</button>
-								<button data-ln-tab="korisnici">Users</button>
-								<button data-ln-tab="podesuvanja">Settings</button>
-							</div>
-
-							<div data-ln-panel="pregled" class="demo-panel">
-								<p>Content of the <strong>Overview</strong> tab. Tabs are synchronized with the URL hash.</p>
-								<p>Change the URL hash to <code>#korisnici</code> to see.</p>
-							</div>
-
-							<div data-ln-panel="korisnici" class="demo-panel hidden">
-								<table>
-									<thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
-									<tbody>
-										<tr><td>Marko Petrov</td><td>marko@example.com</td><td>Admin</td></tr>
-										<tr><td>Ana Stojanova</td><td>ana@example.com</td><td>User</td></tr>
-										<tr><td>Ivan Nikolov</td><td>ivan@example.com</td><td>Moderator</td></tr>
-									</tbody>
-								</table>
-							</div>
-
-							<div data-ln-panel="podesuvanja" class="demo-panel hidden">
-								<form>
-									<label for="d-lang">
-										Language
-										<select id="d-lang"><option>Macedonian</option><option>English</option></select>
-									</label>
-									<label for="d-tz">
-										Timezone
-										<input type="text" id="d-tz" value="Europe/Skopje">
-									</label>
-								</form>
-							</div>
-						</div>
-					</main>
-				</section>
-
-				<!-- Toggle & Progress -->
-				<section id="demo-panels">
-					<section id="demo-toggle" class="section-card">
-						<header><h3>Toggle — Collapsible</h3></header>
-						<main>
-							<article>
-								<header>
-									<strong>Server Status</strong>
-									<button type="button" data-ln-toggle-for="server-status" class="btn btn--secondary" aria-label="Toggle server status"><span class="ln-icon-arrow-down"></span></button>
-								</header>
-								<section id="server-status" data-ln-toggle="open" class="collapsible">
-								<section class="collapsible-body">
-									<table>
-										<thead><tr><th>Server</th><th>Status</th><th>Uptime</th></tr></thead>
-										<tbody>
-											<tr><td>web-01</td><td><span class="pass">OK</span></td><td class="numeric">99.9%</td></tr>
-											<tr><td>web-02</td><td><span class="pass">OK</span></td><td class="numeric">99.7%</td></tr>
-											<tr><td>db-01</td><td><span class="fail">Down</span></td><td class="numeric">95.2%</td></tr>
-										</tbody>
-									</table>
-								</section>
-							</section>
-							</article>
-						</main>
-					</section>
-
-					<section id="demo-progress" class="section-card">
-						<header><h3>Progress</h3></header>
-						<main>
-							<ul>
-								<li>
-									<h4>CPU — 72%</h4>
-									<div data-ln-progress>
-										<div data-ln-progress="72" class="yellow"></div>
-									</div>
-								</li>
-								<li>
-									<h4>RAM — 45%</h4>
-									<div data-ln-progress>
-										<div data-ln-progress="45" class="green"></div>
-									</div>
-								</li>
-								<li>
-									<h4>Disk — 89%</h4>
-									<div data-ln-progress>
-										<div data-ln-progress="89" class="red"></div>
-									</div>
-								</li>
-							</ul>
-						</main>
-					</section>
-				</section>
-
-				<!-- Toast Demo -->
-				<section class="section-card">
-					<header><h3>Toast Notifications</h3></header>
-					<main>
-						<nav class="demo-actions">
-							<button onclick="window.lnToast.enqueue({type:'success', title:'Success', message:'The record has been saved.'})" class="btn">Success</button>
-							<button onclick="window.lnToast.enqueue({type:'error', title:'Error', message:'Something went wrong.'})" class="btn btn--danger">Error</button>
-							<button onclick="window.lnToast.enqueue({type:'warn', title:'Warning', message:'Please check the data.'})" class="btn btn--secondary">Warning</button>
-							<button onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'A new version is available.'})" class="btn btn--secondary">Info</button>
-							<button onclick="window.lnToast.enqueue({type:'error', title:'Validation', message:['Name is required','Email format is invalid','Password is too short']})" class="btn btn--danger">Validation Errors</button>
-						</nav>
-					</main>
-				</section>
-
-				<!-- Upload Demo -->
-				<section class="section-card">
-					<header><h3>Upload</h3></header>
-					<main>
-						<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
-							<div class="ln-upload__zone">
-								<p>Drag files here or click to select</p>
-								<small>Allowed: pdf, doc, docx, jpg, png</small>
-							</div>
-							<ul class="ln-upload__list"></ul>
-						</div>
-					</main>
-				</section>
-
-				<!-- AJAX -->
-				<section class="section-card">
-					<header><h3>ln-ajax — AJAX Navigation</h3></header>
-					<main>
-						<p>Component for AJAX navigation and form submission. Links and forms inside a <code>data-ln-ajax</code> container are automatically processed via fetch.</p>
-						<section id="demo-ajax-info">
-							<figure>
-								<pre><code>&lt;div data-ln-ajax&gt;
-    &lt;a href="/users"&gt;Users&lt;/a&gt;
-    &lt;form method="POST" action="/users"&gt;...&lt;/form&gt;
-&lt;/div&gt;
-
-&lt;!-- JSON response --&gt;
-{
-    "title": "Title",
-    "content": { "main": "&lt;p&gt;HTML&lt;/p&gt;" },
-    "message": { "type": "success", "title": "OK", "body": "Saved!" }
-}</code></pre>
-							</figure>
-							<table>
-								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td><code>data-ln-ajax</code></td><td>Container — all <code>&lt;a&gt;</code> and <code>&lt;form&gt;</code> inside are AJAX</td></tr>
-									<tr><td><code>data-ln-ajax="false"</code></td><td>Exclude a specific element from AJAX processing</td></tr>
-								</tbody>
-							</table>
-							<p>CSRF token automatically from <code>&lt;meta name="csrf-token"&gt;</code>. History pushState for links and GET forms.</p>
-						</section>
-					</main>
-				</section>
-
-				<!-- Quick Integration -->
-				<section class="section-card">
-					<header><h3>Quick Integration</h3></header>
-					<main>
-						<pre><code>&lt;link rel="stylesheet" href="dist/ln-acme.css"&gt;
-&lt;script src="dist/ln-acme.iife.js" defer&gt;&lt;/script&gt;
-
-&lt;!-- Or as npm module --&gt;
-import 'ln-acme';
-import 'ln-acme/dist/ln-acme.css';</code></pre>
-					</main>
-				</section>
-
-			</div>
-
-			<!-- Footer -->
-			<footer class="footer">
-				<span>acme-gui &copy; 2026 LiveNetworks</span>
-				<span>ln-acme v1.0.0</span>
-			</footer>
-		</div>
-		</div><!-- /.app-body -->
-	</div><!-- /.app-wrapper -->
-
-	<!-- Modals (outside app-wrapper) -->
-	<div class="ln-modal" id="demo-basic">
-		<div class="ln-modal__content">
-			<header>
-				<h3>Basic Modal</h3>
-				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
-			</header>
-			<main>
-				<p>This is a basic modal with a title and content.</p>
-				<p>Press ESC or click close.</p>
-			</main>
-			<footer>
-				<button data-ln-modal-close class="btn btn--secondary">Close</button>
-			</footer>
-		</div>
-	</div>
-
-	<div class="ln-modal" id="demo-form">
-		<div class="ln-modal__content">
-			<header>
-				<h3>Add User</h3>
-				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
-			</header>
-			<main>
-				<form>
-					<label>
-						Name
-						<input type="text" placeholder="Enter name...">
-					</label>
-					<label>
-						Email
-						<input type="email" placeholder="email@example.com">
-					</label>
-					<label>
-						Role
-						<select>
-							<option>User</option>
-							<option>Administrator</option>
-							<option>Moderator</option>
-						</select>
-					</label>
-				</form>
-			</main>
-			<footer>
-				<button data-ln-modal-close class="btn btn--secondary">Cancel</button>
-				<button type="submit" class="btn">Save</button>
-			</footer>
-		</div>
-	</div>
+        <footer class="footer">
+            ln-acme &bull; LiveNetworks &copy; 2026
+        </footer>
+    </div>
 </body>
 </html>

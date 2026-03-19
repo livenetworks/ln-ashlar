@@ -6,12 +6,32 @@ Inline translation system for forms. Adds translation inputs below translatable 
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
-| `data-ln-translations` | container (`<section>`, `<fieldset>`, `<div>`) | Initializes instance |
-| `data-ln-translations-locales` | container | JSON: available languages `{"en":"English","sq":"Shqip","sr":"Srpski"}` |
-| `data-ln-translations-active` | container | JSON: existing translations `{"en":{"scope":"Production..."}}` |
+| `data-ln-translations` | `<form>` | Initializes instance |
+| `data-ln-translations-default` | `<form>` | Default language code — sets flag on original inputs |
+| `data-ln-translations-add` | `<button>` | Trigger button (inside `data-ln-dropdown` wrapper) |
+| `data-ln-translations-active` | `<ul>` | Container for active language badges |
 | `data-ln-translatable="field"` | form element wrapper (`<p>`, `<label>`, `<div>`, `<article>`) | Marks a translatable field + field name |
 | `data-ln-translations-prefix` | `[data-ln-translatable]` | Nested prefix for name attr: `"items[5]"` |
-| `data-ln-translatable-lang` | cloned input/textarea | Language code (set by JS) |
+| `data-ln-translatable-lang` | input/textarea | Language code (set by JS or pre-rendered by server) |
+
+## Templates
+
+Required `<template>` elements (before `</body>`):
+
+```html
+<template data-ln-template="ln-translations-badge">
+    <li>
+        <p data-ln-translations-lang>
+            <span></span>
+            <button type="button" aria-label="Remove">&times;</button>
+        </p>
+    </li>
+</template>
+
+<template data-ln-template="ln-translations-menu-item">
+    <li><button type="button" data-ln-translations-lang></button></li>
+</template>
+```
 
 ## API
 
@@ -60,6 +80,43 @@ element.dispatchEvent(new CustomEvent('ln-translations:request-remove', {
 }));
 ```
 
+## Flags
+
+Flag icons are country SVGs from the `flag-icons` npm package, stored in `assets/flags/` (ISO 3166-1 alpha-2 filenames: `mk.svg`, `gb.svg`, etc.). CSS maps language codes to the correct flag via two Sass collections in `ln-translations.scss`:
+
+**`$lang-flag-overrides`** — languages where the lang code differs from the country code:
+
+| Lang | Flag | Language |
+|------|------|----------|
+| `en` | `gb` | English |
+| `sq` | `al` | Albanian |
+| `sr` | `rs` | Serbian |
+| `ja` | `jp` | Japanese |
+| `ko` | `kr` | Korean |
+| `zh` | `cn` | Chinese |
+| `cs` | `cz` | Czech |
+| `da` | `dk` | Danish |
+| `el` | `gr` | Greek |
+| `sv` | `se` | Swedish |
+| `uk` | `ua` | Ukrainian |
+| `sl` | `si` | Slovenian |
+| `et` | `ee` | Estonian |
+| `ka` | `ge` | Georgian |
+| `bs` | `ba` | Bosnian |
+| ... | ... | (35 total, see SCSS) |
+
+**`$lang-auto`** — languages where lang code = country code (no override needed):
+
+`mk`, `de`, `fr`, `it`, `bg`, `pt`, `ro`, `nl`, `pl`, `fi`, `hu`, `lt`, `lv`, `tr`, `az`, `is`, `mt`, `lb`, `no`, `ru`, `th`, `id`
+
+### Adding a new language flag
+
+1. Check if the SVG already exists in `assets/flags/` (271 flags available)
+2. If lang code = country code (e.g. `se` for Swedish? No — `sv`→`se`, so add to overrides):
+   - **Same**: add to `$lang-auto` list in `ln-translations.scss`
+   - **Different**: add to `$lang-flag-overrides` map: `lang: 'country-code'`
+3. Rebuild: `npm run build`
+
 ## Name Generation
 
 ```
@@ -76,9 +133,19 @@ name="items[5][trans][en][title]"
 ### Basic
 
 ```html
-<section data-ln-translations
-         data-ln-translations-locales='{"en":"English","sq":"Shqip","sr":"Srpski"}'>
-    <header><h3>Basic Example</h3></header>
+<form data-ln-translations
+      data-ln-translations-default="mk">
+    <header>
+        <h3>Company Info</h3>
+        <div class="ln-translations__actions">
+            <ul data-ln-translations-active></ul>
+            <div data-ln-dropdown>
+                <button type="button" data-ln-translations-add
+                        data-ln-toggle-for="trans-menu" class="ln-icon-globe"></button>
+                <ul id="trans-menu" data-ln-toggle></ul>
+            </div>
+        </div>
+    </header>
     <main>
         <p data-ln-translatable="scope">
             <label>Scope <textarea name="scope">Производство на храна</textarea></label>
@@ -87,30 +154,50 @@ name="items[5][trans][en][title]"
             <label>Code <input type="text" name="code" value="28"></label>
         </p>
     </main>
-</section>
+</form>
 ```
 
-### With Existing Translations
+### With Existing Translations (server-rendered)
 
 ```html
-<section data-ln-translations
-         data-ln-translations-locales='{"en":"English","sq":"Shqip"}'
-         data-ln-translations-active='{"en":{"title":"Information Security"}}'>
-    <header><h3>Pre-loaded</h3></header>
+<form data-ln-translations
+      data-ln-translations-default="mk">
+    <header>
+        <h3>Standard Details</h3>
+        <div class="ln-translations__actions">
+            <ul data-ln-translations-active></ul>
+            <div data-ln-dropdown>
+                <button type="button" data-ln-translations-add
+                        data-ln-toggle-for="trans-menu" class="ln-icon-globe"></button>
+                <ul id="trans-menu" data-ln-toggle></ul>
+            </div>
+        </div>
+    </header>
     <main>
         <p data-ln-translatable="title">
             <label>Title <input type="text" name="title" value="Информациска безбедност"></label>
+            <input data-ln-translatable-lang="en" name="trans[en][title]" value="Information Security" placeholder="English translation">
         </p>
     </main>
-</section>
+</form>
 ```
 
 ### Nested (Prefix)
 
 ```html
-<section data-ln-translations
-         data-ln-translations-locales='{"en":"English"}'>
-    <header><h3>Nested Items</h3></header>
+<form data-ln-translations
+      data-ln-translations-default="mk">
+    <header>
+        <h3>Nested Items</h3>
+        <div class="ln-translations__actions">
+            <ul data-ln-translations-active></ul>
+            <div data-ln-dropdown>
+                <button type="button" data-ln-translations-add
+                        data-ln-toggle-for="trans-menu" class="ln-icon-globe"></button>
+                <ul id="trans-menu" data-ln-toggle></ul>
+            </div>
+        </div>
+    </header>
     <main>
         <article data-ln-translatable="title" data-ln-translations-prefix="items[1]">
             <label>Item 1 <input type="text" name="items[1][title]" value="Лидерство"></label>
@@ -119,7 +206,7 @@ name="items[5][trans][en][title]"
             <label>Item 2 <input type="text" name="items[2][title]" value="Планирање"></label>
         </article>
     </main>
-</section>
+</form>
 ```
 
 ### Programmatic

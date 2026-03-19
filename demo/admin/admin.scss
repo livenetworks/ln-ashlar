@@ -1,0 +1,33 @@
+// ==========================================================================
+// Admin Demo — Project-specific styles
+// ==========================================================================
+// Ова е project layer: ги користи ln-acme mixins/tokens за да изгради
+// admin dashboard дизајн. Framework-от (dist/ln-acme.css) дава основата;
+// овој фајл го надградува со layout, navigation, и page-specific стилови.
+// ==========================================================================
+
+// Admin shell (layout)
+@use 'scss/shell';
+@use 'scss/navigation';
+@use 'scss/sections';
+@use 'scss/card';
+@use 'scss/grid-classes';
+
+// Demo infrastructure
+@use 'scss/demo-layout';
+
+// Page-specific styles
+@use 'scss/pages/dashboard';
+@use 'scss/pages/cards';
+@use 'scss/pages/forms';
+@use 'scss/pages/layout';
+@use 'scss/pages/toggle';
+@use 'scss/pages/icons';
+@use 'scss/pages/external-links';
+@use 'scss/pages/nav';
+@use 'scss/pages/progress';
+@use 'scss/pages/select';
+@use 'scss/pages/tabs';
+@use 'scss/pages/ajax';
+@use 'scss/pages/filter';
+@use 'scss/pages/sortable';

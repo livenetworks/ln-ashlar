@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>AJAX — ln-acme</title>
+	<link rel="stylesheet" href="../../dist/ln-acme.css">
+	<link rel="stylesheet" href="admin.css">
+	<script src="../../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../../js/ln-nav/ln-nav.js" defer></script>
+	<script src="../../js/ln-ajax/ln-ajax.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>AJAX</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'AJAX navigation component.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>AJAX</h1>
+					<p>Navigation component — links and forms inside a <strong>data-ln-ajax</strong> container are sent asynchronously, without a full page reload.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-ajax</code></td><td>container, &lt;a&gt;, &lt;form&gt;</td><td>Activates AJAX handling</td></tr>
+									<tr><td><code>data-ln-ajax="false"</code></td><td>&lt;a&gt;, &lt;form&gt;</td><td>Exclude a specific element from AJAX</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Links -->
+					<section class="section-card">
+						<header><h3>AJAX Links</h3></header>
+						<main>
+							<article>
+								<h4>Behavior</h4>
+								<ul>
+									<li>Click on a link → GET AJAX request to <code>href</code></li>
+									<li>Ctrl/Cmd+Click → Opens in a new tab (normal)</li>
+									<li>Middle click → Opens in a new tab (normal)</li>
+									<li>Links with <code>#</code> → skipped</li>
+									<li>After a successful response → URL is added to browser history (pushState)</li>
+								</ul>
+							</article>
+							<article>
+								<h4>HTML example</h4>
+									<pre><code>&lt;div data-ln-ajax&gt;
+    &lt;a href="/users"&gt;Users&lt;/a&gt;
+    &lt;a href="/settings"&gt;Settings&lt;/a&gt;
+
+    &lt;!-- Exclude a specific link --&gt;
+    &lt;a href="/login" data-ln-ajax="false"&gt;Log in&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+							</article>
+						</main>
+					</section>
+
+					<!-- Forms -->
+					<section class="section-card">
+						<header><h3>AJAX Forms</h3></header>
+						<main>
+							<article>
+								<h4>Behavior</h4>
+								<ul>
+									<li>Submit → AJAX request (method and action from the form)</li>
+										<li>FormData → automatically created</li>
+										<li>Form buttons → disabled during the request</li>
+										<li>GET forms → parameters in URL + pushState</li>
+										<li>POST/PUT/DELETE → body is FormData</li>
+									</ul>
+							</article>
+							<article>
+								<h4>HTML example</h4>
+								<pre><code>&lt;form data-ln-ajax method="POST" action="/api/users"&gt;
+    &lt;input type="text" name="name" placeholder="Name"&gt;
+    &lt;input type="email" name="email" placeholder="Email"&gt;
+    &lt;button type="submit"&gt;Save&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+							</article>
+						</main>
+					</section>
+
+					<!-- JSON Response Protocol -->
+					<section class="section-card">
+						<header><h3>JSON Response Protocol</h3></header>
+						<main>
+							<p>The server returns JSON with the following structure:</p>
+							<pre><code>{
+    "title": "New page title",
+    "content": {
+        "main-content": "&lt;h1&gt;Content&lt;/h1&gt;",
+        "sidebar-nav": "&lt;ul&gt;&lt;li&gt;...&lt;/li&gt;&lt;/ul&gt;"
+    },
+    "message": {
+        "type": "success|error|warn|info",
+        "title": "Title",
+        "body": "Message",
+        "data": {}
+    }
+}</code></pre>
+							<table>
+								<thead><tr><th>Field</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>title</code></td><td><code>&lt;title&gt;</code> attribute of the page</td></tr>
+									<tr><td><code>content</code></td><td>Object: selector → HTML for replacement</td></tr>
+									<tr><td><code>message</code></td><td>Message — available in the <code>ln-ajax:success</code> event</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- CSS classes -->
+					<section class="section-card">
+						<header><h3>CSS classes for loading state</h3></header>
+						<main>
+							<article>
+								<h4>During request</h4>
+								<p>The element receives the class <code>.ln-ajax--loading</code>. Use it for visual feedback.</p>
+							</article>
+							<article>
+								<h4>SCSS example</h4>
+								<pre><code>a.ln-ajax--loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+button.ln-ajax--loading {
+    cursor: wait;
+}</code></pre>
+							</article>
+						</main>
+					</section>
+
+					<!-- CSRF Token -->
+					<section class="section-card">
+						<header><h3>CSRF Token</h3></header>
+						<main>
+							<p>The component automatically reads the CSRF token from <code>&lt;meta name="csrf-token"&gt;</code> and sends it in the header:</p>
+							<pre><code>&lt;head&gt;
+    &lt;meta name="csrf-token" content="..."&gt;
+&lt;/head&gt;
+
+// ln-ajax reads it and sends it as:
+// X-CSRF-Token: ...</code></pre>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<p>ln-ajax has no public API — it is activated automatically via data attributes.</p>
+							<pre><code>// Manual initialization of a new DOM element
+window.lnAjax(document.getElementById('new-container'));</code></pre>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<article>
+								<h4>Lifecycle events</h4>
+								<table>
+									<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+									<tbody>
+										<tr><td><code>ln-ajax:start</code></td><td>Before fetch</td><td><code>{ method, url }</code></td></tr>
+										<tr><td><code>ln-ajax:success</code></td><td>After successful response</td><td><code>{ method, url, data }</code></td></tr>
+										<tr><td><code>ln-ajax:error</code></td><td>After fetch error</td><td><code>{ method, url, error }</code></td></tr>
+										<tr><td><code>ln-ajax:complete</code></td><td>After completion (always)</td><td><code>{ method, url }</code></td></tr>
+									</tbody>
+								</table>
+								<p>Events are dispatched on the element that initiated the request (<code>&lt;a&gt;</code> or <code>&lt;form&gt;</code>) and bubble up.</p>
+							</article>
+							<article>
+								<h4>Integration with ln-toast</h4>
+								<p><code>ln-ajax</code> does not know about <code>ln-toast</code>. Messages from the JSON response are available in <code>ln-ajax:success</code> — the project decides:</p>
+								<pre><code>document.addEventListener('ln-ajax:success', function(e) {
+    var message = e.detail.data.message;
+    if (message &amp;&amp; window.lnToast) {
+        window.lnToast.enqueue({
+            type: message.type,
+            title: message.title,
+            message: message.body
+        });
+    }
+});</code></pre>
+							</article>
+							<article>
+								<h4>Other examples</h4>
+								<pre><code>// Global loading indicator
+document.addEventListener('ln-ajax:start', function(e) {
+    document.body.classList.add('loading');
+});
+document.addEventListener('ln-ajax:complete', function(e) {
+    document.body.classList.remove('loading');
+});
+
+// Refresh components after DOM change
+document.addEventListener('ln-ajax:success', function(e) {
+    window.lnSelect &amp;&amp; window.lnSelect.reinit();
+});
+
+// Error handler
+document.addEventListener('ln-ajax:error', function(e) {
+    console.error('AJAX failed:', e.detail.url, e.detail.error);
+});</code></pre>
+							</article>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>

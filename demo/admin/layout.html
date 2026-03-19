@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Layout &amp; Grid — ln-acme</title>
+	<link rel="stylesheet" href="../../dist/ln-acme.css">
+	<link rel="stylesheet" href="admin.css">
+	<script src="../../js/ln-toast/ln-toast.js" defer></script>
+	<script src="../../js/ln-toggle/ln-toggle.js" defer></script>
+	<script src="../../js/ln-nav/ln-nav.js" defer></script>
+	<script src="demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Layout &amp; Grid</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'CSS layout component.'})">Test Toast</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Layout &amp; Grid</h1>
+					<p>App layout with sidebar, grid system, stack, row and container.</p>
+
+		<!-- Grid -->
+		<section class="section-card">
+			<header><h3>.grid (3 columns)</h3></header>
+			<main>
+				<div class="grid">
+					<div class="demo-box">1</div>
+					<div class="demo-box">2</div>
+					<div class="demo-box">3</div>
+					<div class="demo-box">4</div>
+					<div class="demo-box">5</div>
+					<div class="demo-box">6</div>
+				</div>
+			</main>
+		</section>
+
+		<section class="section-card">
+			<header><h3>.grid-2 (2 columns)</h3></header>
+			<main>
+				<div class="grid-2">
+					<div class="demo-box">Left</div>
+					<div class="demo-box">Right</div>
+				</div>
+			</main>
+		</section>
+
+		<section class="section-card">
+			<header><h3>.grid-4 (4 columns)</h3></header>
+			<main>
+				<div class="grid-4">
+					<div class="demo-box">1</div>
+					<div class="demo-box">2</div>
+					<div class="demo-box">3</div>
+					<div class="demo-box">4</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Stack & Row -->
+		<section class="section-card">
+			<header><h3>.stack, .row</h3></header>
+			<main>
+				<div class="grid-2">
+					<div>
+						<h5>stack (vertical)</h5>
+						<div class="stack">
+							<div class="demo-box">Item 1</div>
+							<div class="demo-box">Item 2</div>
+							<div class="demo-box">Item 3</div>
+						</div>
+					</div>
+					<div>
+						<h5>row (horizontal)</h5>
+						<div class="row">
+							<div class="demo-box">A</div>
+							<div class="demo-box">B</div>
+							<div class="demo-box">C</div>
+						</div>
+						<br>
+						<h5>row-between</h5>
+						<div class="row-between">
+							<div class="demo-box">Left</div>
+							<div class="demo-box">Right</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- App Layout -->
+		<section class="section-card">
+			<header><h3>App Layout structure</h3></header>
+			<main>
+				<pre><code>&lt;!-- Full app layout --&gt;
+&lt;div class="app-wrapper"&gt;
+
+    &lt;aside class="sidebar"&gt;
+        &lt;div class="sidebar-header"&gt;
+            &lt;img class="logo" src="logo.svg"&gt;
+            &lt;span class="app-name"&gt;App Name&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="sidebar-content"&gt;
+            &lt;nav class="nav"&gt;...&lt;/nav&gt;
+        &lt;/div&gt;
+        &lt;div class="sidebar-footer"&gt;...&lt;/div&gt;
+    &lt;/aside&gt;
+
+    &lt;div class="main-panel"&gt;
+        &lt;header class="header"&gt;
+            &lt;div class="header-left"&gt;
+                &lt;h1&gt;Page Title&lt;/h1&gt;
+            &lt;/div&gt;
+            &lt;div class="header-right"&gt;...&lt;/div&gt;
+        &lt;/header&gt;
+
+        &lt;div class="content"&gt;
+            &lt;!-- page content --&gt;
+        &lt;/div&gt;
+
+        &lt;footer class="footer"&gt;
+            &lt;span&gt;Footer text&lt;/span&gt;
+        &lt;/footer&gt;
+    &lt;/div&gt;
+
+&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+
+		<!-- Grid HTML -->
+		<section class="section-card">
+			<header><h3>Grid HTML</h3></header>
+			<main>
+				<pre><code>&lt;!-- 3-column grid (responsive: 1→2→3) --&gt;
+&lt;div class="grid"&gt;
+    &lt;div&gt;...&lt;/div&gt;
+    &lt;div&gt;...&lt;/div&gt;
+    &lt;div&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 2-column --&gt;
+&lt;div class="grid-2"&gt;...&lt;/div&gt;
+
+&lt;!-- 4-column --&gt;
+&lt;div class="grid-4"&gt;...&lt;/div&gt;
+
+&lt;!-- Stack (vertical) --&gt;
+&lt;div class="stack"&gt;...&lt;/div&gt;
+&lt;div class="stack-sm"&gt;...&lt;/div&gt;  &lt;!-- smaller gap --&gt;
+
+&lt;!-- Row (horizontal) --&gt;
+&lt;div class="row"&gt;...&lt;/div&gt;
+&lt;div class="row-between"&gt;...&lt;/div&gt;
+&lt;div class="row-center"&gt;...&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+
+		</div>
+	</div>
+	</div>
+</body>
+</html>
