@@ -1,0 +1,25 @@
+// Pill-outline — bordered pill with visible checkbox/radio input
+// Apply on parent container to switch all pill labels inside
+//
+// Usage:
+//   #my-form .radio-group { @include pill-outline; }
+
+@mixin pill-outline {
+	label:has(> input[type="checkbox"]),
+	label:has(> input[type="radio"]) {
+		background-color: transparent;
+		border-color: hsl(var(--color-border));
+
+		> input { display: initial; }
+
+		&:has(> input:checked) {
+			background-color: hsl(var(--color-primary) / 0.04);
+			border-color: hsl(var(--color-primary));
+			color: inherit;
+		}
+
+		&:hover:not(:has(> input:checked)) {
+			border-color: hsl(var(--color-primary) / 0.5);
+		}
+	}
+}

@@ -211,6 +211,7 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Modal size: medium (32rem) | `@include modal-md` |
 | Modal size: large (42rem) | `@include modal-lg` |
 | Modal size: extra large (48rem) | `@include modal-xl` |
+| Pill labels: bordered + visible input | `@include pill-outline` (on parent) |
 
 ---
 
@@ -764,6 +765,25 @@ z-index: 40;
 ```scss
 // Sizes via mixins (not classes)
 #edit-user > form { @include modal-lg; }
+```
+
+### Pill Labels (Checkbox / Radio)
+
+Checkbox and radio inputs inside `<label>` become pill buttons automatically. Two styles:
+
+| Style | Description |
+|-------|-------------|
+| **Filled** (default) | Input hidden, gray bg, colored bg + white text on checked |
+| **Outline** (`@include pill-outline` on parent) | Visible input indicator, bordered, light bg on checked |
+
+```html
+<!-- HTML — same for both styles -->
+<label><input type="radio" name="role" value="admin"> Admin</label>
+<label><input type="checkbox" name="api" value="1"> API</label>
+```
+```scss
+// Switch to outline style on parent
+#my-form .auth-group { @include pill-outline; }
 ```
 
 ### Collapsible Accordion

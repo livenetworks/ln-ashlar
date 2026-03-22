@@ -259,6 +259,61 @@
 				</section>
 
 				<!-- ==========================================
+				     PILL LABELS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Pill labels — checkbox &amp; radio</h3></header>
+					<main>
+						<article>
+							<h4>Filled (default)</h4>
+							<p>Radio and checkbox inputs inside <code>&lt;label&gt;</code> become pills automatically. Input is hidden.</p>
+							<nav id="demo-pills-filled">
+								<fieldset>
+									<legend>Role</legend>
+									<label><input type="radio" name="role" value="admin"> Admin</label>
+									<label><input type="radio" name="role" value="employee"> Employee</label>
+									<label><input type="radio" name="role" value="external" checked> External</label>
+								</fieldset>
+								<fieldset>
+									<legend>Features</legend>
+									<label><input type="checkbox" name="feat[]" value="api" checked> API</label>
+									<label><input type="checkbox" name="feat[]" value="export"> Export</label>
+									<label><input type="checkbox" name="feat[]" value="audit" checked> Audit</label>
+								</fieldset>
+							</nav>
+						</article>
+						<article>
+							<h4>Outline (<code>@include pill-outline</code>)</h4>
+							<p>Apply on parent to show the input indicator and use bordered style.</p>
+							<nav id="demo-pills-outline">
+								<fieldset>
+									<legend>Auth Method</legend>
+									<label><input type="radio" name="auth" value="local" checked> Local</label>
+									<label><input type="radio" name="auth" value="ldap"> LDAP</label>
+								</fieldset>
+								<fieldset>
+									<legend>Options</legend>
+									<label><input type="checkbox" name="opt[]" value="notify" checked> Notifications</label>
+									<label><input type="checkbox" name="opt[]" value="2fa"> Two-factor</label>
+								</fieldset>
+							</nav>
+						</article>
+						<article>
+							<h4>Code</h4>
+							<pre><code>&lt;!-- HTML — same for both styles --&gt;
+&lt;label&gt;&lt;input type="radio" name="role" value="admin"&gt; Admin&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" name="api" value="1"&gt; API&lt;/label&gt;
+
+// SCSS — outline style on parent
+#my-form .radio-group { @include pill-outline; }
+
+// Color override per context
+#role-field { --color-primary: var(--color-secondary); }</code></pre>
+						</article>
+					</main>
+				</section>
+
+				<!-- ==========================================
 				     BUTTONS
 				     ========================================== -->
 				<section class="section-card">

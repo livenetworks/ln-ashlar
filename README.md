@@ -368,6 +368,13 @@ Applied via semantic selectors:
 #edit-user > form { @include modal-lg; }
 ```
 
+### Pill Labels
+
+| Mixin | Description |
+|-------|-------------|
+| *(default)* | Filled — gray bg, colored on checked, input hidden |
+| `@include pill-outline` | Outlined — bordered, visible input, apply on parent |
+
 ### Buttons
 
 Every `<button>` gets hover/active/focus/disabled effects **automatically** from ln-acme. All states read from `--color-primary`.
@@ -518,6 +525,33 @@ Each form has its own SCSS file with `#form-id` selector:
 | Column spans | In SCSS via `> label:nth-child(N)` — NEVER inline `style` |
 | Checkbox/radio | `input[type="checkbox"] { width: auto; }` |
 | `.form-actions` | Component class — stays in HTML, `grid-column: span 6` |
+
+---
+
+## Pill Labels (Checkbox / Radio)
+
+Checkbox and radio inputs inside `<label>` become pill buttons automatically. Input is hidden.
+
+```html
+<label><input type="radio" name="role" value="admin"> Admin</label>
+<label><input type="radio" name="role" value="editor" checked> Editor</label>
+<label><input type="checkbox" name="api" value="1"> API</label>
+```
+
+### Two Styles
+
+| Style | How | Description |
+|-------|-----|-------------|
+| **Filled** (default) | Automatic | Gray bg, colored bg on checked, input hidden |
+| **Outline** | `@include pill-outline` on parent | Bordered, visible input indicator |
+
+```scss
+// Outline style — apply on parent container
+#my-form .auth-options { @include pill-outline; }
+
+// Color override per context
+#role-field { --color-primary: var(--color-secondary); }
+```
 
 ---
 
