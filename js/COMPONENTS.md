@@ -596,4 +596,5 @@ _component.prototype._buildTrackItem = function (track, idx) {
 | ln-select | Wrapper | `data-ln-select` | TomSelect wrapper |
 | ln-search | Instance | `data-ln-search` | Генерички search (textContent филтер) |
 | ln-filter | Instance | `data-ln-filter` | Генерички filter (data атрибут филтер) |
+| ln-autosave | Instance | `data-ln-autosave` | Auto-save форма во localStorage на blur/change |
 | ln-external-links | Utility | — | External links handler |
