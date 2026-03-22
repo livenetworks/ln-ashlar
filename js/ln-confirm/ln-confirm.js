@@ -50,8 +50,20 @@
 
 	_component.prototype._enterConfirm = function () {
 		this.confirming = true;
-		this.dom.setAttribute('data-confirming', '');
-		this.dom.textContent = this.confirmText;
+		this.dom.setAttribute('data-confirming', 'true');
+
+		if (this.dom.className.match(/ln-icon-/) && this.originalText === '') {
+			this.isIconButton = true;
+			// Extract existing icon class
+			this.originalIconClass = Array.from(this.dom.classList).find(c => c.startsWith('ln-icon-'));
+			if (this.originalIconClass) {
+				this.dom.classList.remove(this.originalIconClass);
+			}
+			this.dom.classList.add('ln-icon-check', 'text-success', 'ln-confirm-tooltip');
+			this.dom.setAttribute('data-tooltip-text', this.confirmText);
+		} else {
+			this.dom.textContent = this.confirmText;
+		}
 
 		var self = this;
 		this.revertTimer = setTimeout(function () {
@@ -64,7 +76,17 @@
 	_component.prototype._reset = function () {
 		this.confirming = false;
 		this.dom.removeAttribute('data-confirming');
-		this.dom.textContent = this.originalText;
+		
+		if (this.isIconButton) {
+			this.dom.classList.remove('ln-icon-check', 'text-success', 'ln-confirm-tooltip');
+			if (this.originalIconClass) {
+				this.dom.classList.add(this.originalIconClass);
+			}
+			this.dom.removeAttribute('data-tooltip-text');
+			this.isIconButton = false;
+		} else {
+			this.dom.textContent = this.originalText;
+		}
 
 		if (this.revertTimer) {
 			clearTimeout(this.revertTimer);
