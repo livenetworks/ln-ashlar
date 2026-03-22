@@ -29,8 +29,6 @@
 
 body {
 	background-color: hsl(var(--color-body-bg));
-	margin: 0;
-	@include p(0);
 	font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 	font-optical-sizing: auto;
 }
@@ -345,3 +343,6 @@ body {
 		@include font-semibold;
 	}
 }
+
+// Button color variants — project-level
+.btn--secondary { --color-primary: var(--color-secondary); }

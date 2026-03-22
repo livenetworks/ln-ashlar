@@ -1,0 +1,35 @@
+// Typography — референцира --text-* и --font-* токени
+
+@mixin text-xs   { font-size: var(--text-xs);   line-height: 1rem; }
+@mixin text-sm   { font-size: var(--text-sm);   line-height: 1.25rem; }
+@mixin text-base { font-size: var(--text-base);  line-height: 1.5rem; }
+@mixin text-lg   { font-size: var(--text-lg);   line-height: 1.75rem; }
+@mixin text-xl   { font-size: var(--text-xl);   line-height: 1.75rem; }
+@mixin text-2xl  { font-size: var(--text-2xl);  line-height: 2rem; }
+
+@mixin font-normal    { font-weight: var(--font-normal); }
+@mixin font-medium    { font-weight: var(--font-medium); }
+@mixin font-semibold  { font-weight: var(--font-semibold); }
+@mixin font-bold      { font-weight: var(--font-bold); }
+
+@mixin text-left   { text-align: left; }
+@mixin text-center { text-align: center; }
+@mixin text-right  { text-align: right; }
+
+@mixin uppercase { text-transform: uppercase; }
+@mixin lowercase { text-transform: lowercase; }
+@mixin capitalize { text-transform: capitalize; }
+@mixin normal-case { text-transform: none; }
+
+@mixin tracking-wide   { letter-spacing: 0.025em; }
+@mixin tracking-wider  { letter-spacing: 0.05em; }
+
+@mixin truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@mixin whitespace-nowrap { white-space: nowrap; }
+@mixin font-mono { font-family: var(--font-mono); }
+@mixin font-sans { font-family: var(--font-sans); }

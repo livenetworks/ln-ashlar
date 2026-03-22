@@ -1,0 +1,96 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+@use 'transitions' as *;
+@use 'position' as *;
+
+// Card & Section — композитни mixins
+
+@mixin card {
+	@include bg-primary;
+	@include border;
+	@include w-full;
+	@include flex-col;
+	@include shadow-sm;
+	@include rounded-md;
+	@include overflow-hidden;
+	@include transition;
+}
+
+@mixin panel-header {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(1rem);
+	@include py(0.5rem);
+	min-height: 3.25rem;
+	@include bg-secondary;
+	@include border-b;
+
+	h3 {
+		@include text-lg;
+		@include font-semibold;
+		@include text-primary;
+		margin: 0;
+	}
+}
+
+@mixin section {
+	@include mb(2rem);
+
+	header {
+		@include flex;
+		@include items-center;
+		@include justify-between;
+		@include mb(1rem);
+		@include pb(0.75rem);
+		@include border-b;
+
+		h2 {
+			@include text-xl;
+			@include font-bold;
+			@include text-primary;
+			margin: 0;
+		}
+
+		.section-actions {
+			@include flex;
+			@include gap(0.5rem);
+		}
+	}
+
+	main {
+		@include p(0);
+	}
+}
+
+@mixin section-card {
+	@include bg-primary;
+	@include border;
+	@include rounded-lg;
+	@include shadow-sm;
+	@include overflow-hidden;
+	@include mb(1.5rem);
+
+	header {
+		@include panel-header;
+	}
+
+	main {
+		@include p(1rem);
+	}
+
+	footer {
+		@include px(1rem);
+		@include py(0.625rem);
+		@include border-t;
+		@include bg-secondary;
+		@include flex;
+		@include justify-end;
+		@include gap(0.75rem);
+	}
+}

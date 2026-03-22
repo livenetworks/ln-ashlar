@@ -68,13 +68,29 @@ git submodule add .../ln-acme.git resources/ln-acme
 
 ---
 
+## Button Architecture
+
+Every `<button>` gets hover/active/focus/disabled effects **out of the box** from `scss/base/_global.scss` via `@include btn-colors`.
+All states read from `--color-primary`. No classes needed.
+
+- **`@include btn-colors`** — color states (default 0.15, hover 0.7, active 1.0). Applied globally to all `<button>` elements
+- **`@include btn`** — structure only (inline-flex, padding, font). Use when you need a styled button
+- **Color change** — override `--color-primary` on the element or parent:
+  ```scss
+  #delete-user { --color-primary: var(--color-error); }
+  .admin-panel { --color-primary: var(--color-secondary); }
+  ```
+- **ZERO hardcoded colors** in mixins — every color reads from `var(--token)`
+- **No `btn--*` variant classes** in ln-acme — projects define their own via `--color-primary` override
+- Full docs: `demo/admin/mixins.html`
+
 ## Adding a New SCSS Component
 
 1. Create `scss/components/_new-component.scss`
 2. Start with `@use '../config/mixins' as *;`
 3. Use semantic selectors (`.component element {}`)
 4. Use `@include` mixins for properties
-5. Use `var(--token)` for values
+5. Use `var(--token)` for values — **NEVER** hardcoded colors
 6. Add `@use 'components/new-component'` to `scss/ln-acme.scss`
 
 ## Adding a New JS Component
@@ -87,6 +103,14 @@ git submodule add .../ln-acme.git resources/ln-acme
 6. DOM structure → `<template>` elements in HTML
 7. Detailed architecture: [js/COMPONENTS.md](js/COMPONENTS.md)
 
+## Override Architecture
+
+ln-acme defines default mixins → projects use them on semantic selectors → projects override `--color-primary` (for colors) or redefine the mixin (for structure).
+
+1. **Color change** → override CSS variable on parent: `.my-section { --color-primary: var(--color-error); }`
+2. **Structure change** → redefine the mixin in project `_overrides.scss`
+3. **Project selectors never change** — they describe WHAT, not HOW
+
 ## Changing Design Tokens
 
 1. Edit `scss/config/_tokens.scss`
@@ -95,17 +119,28 @@ git submodule add .../ln-acme.git resources/ln-acme
 
 ---
 
-## Available Icons
+## Icons
 
-`ln-icon-close`, `ln-icon-menu`, `ln-icon-home`, `ln-icon-users`,
+Icons use `mask-image` + `currentColor` — they automatically inherit the text color from their parent.
+No color variant classes (`--white`, `--red`, etc.) — change color via CSS `color` property.
+
+```html
+<span class="ln-icon-plus"></span>           <!-- inherits parent color -->
+<button><span class="ln-icon-plus"></span> Add</button>  <!-- follows button text color -->
+```
+
+Available: `ln-icon-close`, `ln-icon-menu`, `ln-icon-home`, `ln-icon-users`,
 `ln-icon-delete`, `ln-icon-view`, `ln-icon-check`, `ln-icon-plus`, `ln-icon-settings`,
 `ln-icon-books`, `ln-icon-lodges`, `ln-icon-logout`, `ln-icon-chart`, `ln-icon-clock`,
 `ln-icon-envelope`, `ln-icon-arrow-up`, `ln-icon-arrow-down`, `ln-icon-book`,
 `ln-icon-edit`, `ln-icon-save`, `ln-icon-download`, `ln-icon-upload`,
 `ln-icon-copy`, `ln-icon-link`, `ln-icon-calendar`, `ln-icon-filter`,
 `ln-icon-refresh`, `ln-icon-print`, `ln-icon-lock`, `ln-icon-star`,
-`ln-icon-info-circle`, `ln-icon-warning`, `ln-icon-globe`,
-`ln-icon-search`, `ln-icon-list`, `ln-icon-box`, `ln-icon-building`.
+`ln-icon-info-circle`, `ln-icon-error-circle`, `ln-icon-check-circle`,
+`ln-icon-warning`, `ln-icon-globe`, `ln-icon-search`, `ln-icon-list`,
+`ln-icon-box`, `ln-icon-building`, `ln-icon-badge`.
+
+Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon--xl` (4rem).
 
 ---
 

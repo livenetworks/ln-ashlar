@@ -1,0 +1,8 @@
+// Width & Height
+
+@mixin w-full    { width: 100%; }
+@mixin h-full    { height: 100%; }
+@mixin min-h-screen { min-height: 100vh; }
+@mixin w($val)   { width: $val; }
+@mixin h($val)   { height: $val; }
+@mixin size($val) { width: $val; height: $val; }

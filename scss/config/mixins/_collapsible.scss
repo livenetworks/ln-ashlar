@@ -1,0 +1,19 @@
+// Collapsible — grid-template-rows анимација за expand/collapse
+//
+// Употреба:
+//   .my-panel          { @include collapsible; }
+//   .my-panel > .inner { @include collapsible-content; }
+
+@mixin collapsible {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows var(--transition-base);
+
+	&.open {
+		grid-template-rows: 1fr;
+	}
+}
+
+@mixin collapsible-content {
+	overflow: hidden;
+}

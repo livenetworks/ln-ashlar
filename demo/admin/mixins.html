@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mixins Reference — ln-acme</title>
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Mixins Reference</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'SCSS Mixins reference.'})">Test Toast</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+				<h1>Mixins Reference</h1>
+				<p>Complete list of <code>@include</code> mixins from <code>scss/config/_mixins.scss</code>. Import with <code>@use 'config/mixins' as *;</code> and use in semantic selectors.</p>
+
+				<!-- ==========================================
+				     OVERRIDE ARCHITECTURE
+				     ========================================== -->
+				<section class="section-card" id="override-architecture">
+					<header><h3>Override Architecture</h3></header>
+					<main>
+						<p><strong>ln-acme</strong> provides predefined mixins. Projects use those mixins in their SCSS selectors. When a project needs different behavior, it creates a <strong>project-level mixin with the same name</strong> that overrides the ln-acme version. The project SCSS selectors stay unchanged.</p>
+
+						<h4>The golden rule: ZERO hardcoded colors</h4>
+						<p>Mixins <strong>NEVER</strong> contain concrete color values (<code>#fff</code>, <code>rgb()</code>, <code>hsl(0 0% 100%)</code>). Every color reads from a CSS custom property token: <code>var(--color-*)</code>. This is what makes the entire system work &mdash; colors are inherited through the CSS cascade, not baked into mixin definitions.</p>
+
+						<div class="demo-split">
+							<article>
+								<h4>WRONG</h4>
+								<pre><code>// Hardcoded — breaks inheritance
+.ln-modal header {
+  background-color: hsl(var(--color-primary));
+  border-bottom: none;
+  color: #fff;
+}</code></pre>
+							</article>
+							<article>
+								<h4>CORRECT</h4>
+								<pre><code>// Mixin reads tokens, project just uses it
+.ln-modal header {
+  @include panel-header;
+}
+
+// Want a different color? Override the token
+.ln-modal {
+  --color-primary: 280 60% 50%;
+  // header automatically inherits
+}</code></pre>
+							</article>
+						</div>
+
+						<h4>Three layers</h4>
+						<table>
+							<thead>
+								<tr><th>Layer</th><th>Role</th><th>Example</th></tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td><strong>ln-acme</strong> (library)</td>
+									<td>Defines the default mixin &mdash; reads from <code>var(--token)</code>, never hardcodes</td>
+									<td><code>@mixin panel-header { background-color: hsl(var(--color-primary)); color: hsl(var(--color-white)); }</code></td>
+								</tr>
+								<tr>
+									<td><strong>Project</strong> (consumer)</td>
+									<td>Uses the mixin on semantic selectors. For different colors, overrides the <strong>CSS variable on a parent</strong>, not the mixin</td>
+									<td><code>.ln-modal header { @include panel-header; }</code><br><code>.ln-modal { --color-primary: 280 60% 50%; }</code></td>
+								</tr>
+								<tr>
+									<td><strong>Project override</strong> (rare)</td>
+									<td>Redefines the mixin only when <strong>structure</strong> needs to change (layout, padding, border-radius) &mdash; still reads from tokens</td>
+									<td>Project's own <code>@mixin panel-header { ... }</code></td>
+								</tr>
+							</tbody>
+						</table>
+
+						<h4>When to use which approach</h4>
+						<table>
+							<thead>
+								<tr><th>Need</th><th>Approach</th><th>Example</th></tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Different <strong>color</strong></td>
+									<td>Override CSS variable on parent element</td>
+									<td><code>.ln-modal { --color-primary: 280 60% 50%; }</code></td>
+								</tr>
+								<tr>
+									<td>Different <strong>structure</strong> (padding, layout, shape)</td>
+									<td>Override the mixin in project <code>_overrides.scss</code></td>
+									<td><code>@mixin panel-header { @include px(2rem); ... }</code></td>
+								</tr>
+								<tr>
+									<td>Both</td>
+									<td>Override mixin for structure + CSS variable for color</td>
+									<td>Mixin override + <code>.parent { --color-primary: ...; }</code></td>
+								</tr>
+							</tbody>
+						</table>
+
+						<h4>Example: overriding btn in a project</h4>
+						<div class="demo-split">
+							<article>
+								<h4>ln-acme default</h4>
+								<pre><code>// scss/config/_mixins.scss (ln-acme)
+@mixin btn {
+  @include flex;
+  @include items-center;
+  @include px(1rem);
+  @include py(0.5rem);
+  @include text-sm;
+  @include rounded-md;
+  @include cursor-pointer;
+  @include transition;
+  border: none;
+  outline: none;
+  white-space: nowrap;
+}</code></pre>
+							</article>
+							<article>
+								<h4>Project override</h4>
+								<pre><code>// project/scss/_overrides.scss
+@mixin btn {
+  @include inline-flex;
+  @include items-center;
+  @include px(1.5rem);
+  @include py(0.75rem);
+  @include text-base;      // larger text
+  @include font-medium;
+  white-space: nowrap;
+}
+
+// Project selectors — UNCHANGED
+#save-user   { @include btn; }
+#delete-user { @include btn; }
+.form-actions button { @include btn; }</code></pre>
+							</article>
+						</div>
+
+						<h4>How to set up the override</h4>
+						<pre><code>// project/scss/main.scss
+// 1. Import ln-acme (loads default mixins)
+@use 'ln-acme/scss/ln-acme';
+
+// 2. Import project overrides AFTER ln-acme
+//    This file redefines mixins with the same name
+@use 'overrides';
+
+// 3. Import project pages (use the mixins — they get the overridden version)
+@use 'pages/users';
+@use 'pages/dashboard';</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     SPACING
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Spacing</h3></header>
+					<main>
+						<p>Accept any CSS value or <code>var(--spacing-*)</code> token.</p>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include p($val)</code></td><td><code>padding: $val</code></td></tr>
+								<tr><td><code>@include px($val)</code></td><td><code>padding-left + padding-right</code></td></tr>
+								<tr><td><code>@include py($val)</code></td><td><code>padding-top + padding-bottom</code></td></tr>
+								<tr><td><code>@include pt($val)</code>, <code>pb</code>, <code>pl</code>, <code>pr</code></td><td>Individual padding sides</td></tr>
+								<tr><td><code>@include m($val)</code></td><td><code>margin: $val</code></td></tr>
+								<tr><td><code>@include mx($val)</code></td><td><code>margin-left + margin-right</code></td></tr>
+								<tr><td><code>@include my($val)</code></td><td><code>margin-top + margin-bottom</code></td></tr>
+								<tr><td><code>@include mt($val)</code>, <code>mb</code>, <code>ml</code>, <code>mr</code></td><td>Individual margin sides</td></tr>
+								<tr><td><code>@include gap($val)</code></td><td><code>gap: $val</code></td></tr>
+							</tbody>
+						</table>
+						<pre><code>article {
+  @include px(var(--spacing-lg));
+  @include py(var(--spacing-md));
+  @include mb(1rem);
+}</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     DISPLAY & FLEX
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Display &amp; Flex</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include flex</code></td><td><code>display: flex</code></td></tr>
+								<tr><td><code>@include inline-flex</code></td><td><code>display: inline-flex</code></td></tr>
+								<tr><td><code>@include block</code></td><td><code>display: block</code></td></tr>
+								<tr><td><code>@include inline-block</code></td><td><code>display: inline-block</code></td></tr>
+								<tr><td><code>@include hidden</code></td><td><code>display: none</code></td></tr>
+								<tr><td><code>@include flex-col</code></td><td><code>display: flex; flex-direction: column</code></td></tr>
+								<tr><td><code>@include flex-row</code></td><td><code>display: flex; flex-direction: row</code></td></tr>
+								<tr><td><code>@include flex-wrap</code></td><td><code>flex-wrap: wrap</code></td></tr>
+								<tr><td><code>@include flex-1</code></td><td><code>flex: 1</code></td></tr>
+								<tr><td><code>@include flex-shrink-0</code></td><td><code>flex-shrink: 0</code></td></tr>
+								<tr><td><code>@include items-center</code></td><td><code>align-items: center</code></td></tr>
+								<tr><td><code>@include items-start</code></td><td><code>align-items: flex-start</code></td></tr>
+								<tr><td><code>@include items-end</code></td><td><code>align-items: flex-end</code></td></tr>
+								<tr><td><code>@include justify-center</code></td><td><code>justify-content: center</code></td></tr>
+								<tr><td><code>@include justify-between</code></td><td><code>justify-content: space-between</code></td></tr>
+								<tr><td><code>@include justify-end</code></td><td><code>justify-content: flex-end</code></td></tr>
+								<tr><td><code>@include flex-center</code></td><td><code>display: flex; align-items: center; justify-content: center</code></td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     WIDTH & HEIGHT
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Width &amp; Height</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include w-full</code></td><td><code>width: 100%</code></td></tr>
+								<tr><td><code>@include h-full</code></td><td><code>height: 100%</code></td></tr>
+								<tr><td><code>@include min-h-screen</code></td><td><code>min-height: 100vh</code></td></tr>
+								<tr><td><code>@include w($val)</code></td><td><code>width: $val</code></td></tr>
+								<tr><td><code>@include h($val)</code></td><td><code>height: $val</code></td></tr>
+								<tr><td><code>@include size($val)</code></td><td><code>width: $val; height: $val</code></td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     TYPOGRAPHY
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Typography</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include text-xs</code></td><td><code>font-size: var(--text-xs); line-height: 1rem</code></td></tr>
+								<tr><td><code>@include text-sm</code></td><td><code>font-size: var(--text-sm); line-height: 1.25rem</code></td></tr>
+								<tr><td><code>@include text-base</code></td><td><code>font-size: var(--text-base); line-height: 1.5rem</code></td></tr>
+								<tr><td><code>@include text-lg</code></td><td><code>font-size: var(--text-lg); line-height: 1.75rem</code></td></tr>
+								<tr><td><code>@include text-xl</code></td><td><code>font-size: var(--text-xl); line-height: 1.75rem</code></td></tr>
+								<tr><td><code>@include text-2xl</code></td><td><code>font-size: var(--text-2xl); line-height: 2rem</code></td></tr>
+								<tr><td><code>@include font-normal</code></td><td><code>font-weight: var(--font-normal)</code></td></tr>
+								<tr><td><code>@include font-medium</code></td><td><code>font-weight: var(--font-medium)</code></td></tr>
+								<tr><td><code>@include font-semibold</code></td><td><code>font-weight: var(--font-semibold)</code></td></tr>
+								<tr><td><code>@include font-bold</code></td><td><code>font-weight: var(--font-bold)</code></td></tr>
+								<tr><td><code>@include text-left</code>, <code>text-center</code>, <code>text-right</code></td><td>Text alignment</td></tr>
+								<tr><td><code>@include uppercase</code>, <code>lowercase</code>, <code>capitalize</code>, <code>normal-case</code></td><td>Text transform</td></tr>
+								<tr><td><code>@include tracking-wide</code></td><td><code>letter-spacing: 0.025em</code></td></tr>
+								<tr><td><code>@include tracking-wider</code></td><td><code>letter-spacing: 0.05em</code></td></tr>
+								<tr><td><code>@include truncate</code></td><td><code>overflow: hidden; text-overflow: ellipsis; white-space: nowrap</code></td></tr>
+								<tr><td><code>@include whitespace-nowrap</code></td><td><code>white-space: nowrap</code></td></tr>
+								<tr><td><code>@include font-mono</code></td><td><code>font-family: var(--font-mono)</code></td></tr>
+								<tr><td><code>@include font-sans</code></td><td><code>font-family: var(--font-sans)</code></td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     COLORS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Colors</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include text-primary</code></td><td><code>color: hsl(var(--color-text-primary))</code></td></tr>
+								<tr><td><code>@include text-secondary</code></td><td><code>color: hsl(var(--color-text-secondary))</code></td></tr>
+								<tr><td><code>@include text-muted</code></td><td><code>color: hsl(var(--color-text-muted))</code></td></tr>
+								<tr><td><code>@include text-white</code></td><td><code>color: hsl(var(--color-white))</code></td></tr>
+								<tr><td><code>@include text-error</code></td><td><code>color: hsl(var(--color-error))</code></td></tr>
+								<tr><td><code>@include text-success</code></td><td><code>color: hsl(var(--color-success))</code></td></tr>
+								<tr><td><code>@include text-warning</code></td><td><code>color: hsl(var(--color-warning))</code></td></tr>
+								<tr><td><code>@include bg-primary</code></td><td><code>background-color: hsl(var(--color-bg-primary))</code></td></tr>
+								<tr><td><code>@include bg-secondary</code></td><td><code>background-color: hsl(var(--color-bg-secondary))</code></td></tr>
+								<tr><td><code>@include bg-body</code></td><td><code>background-color: hsl(var(--color-bg-body))</code></td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     BORDERS & RADIUS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Borders &amp; Radius</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include border</code></td><td><code>border: 1px solid hsl(var(--color-border))</code></td></tr>
+								<tr><td><code>@include border-t</code>, <code>border-b</code>, <code>border-l</code>, <code>border-r</code></td><td>Individual border sides</td></tr>
+								<tr><td><code>@include border-none</code></td><td><code>border: none</code></td></tr>
+								<tr><td><code>@include rounded-sm</code></td><td><code>border-radius: var(--radius-sm)</code> — 4px</td></tr>
+								<tr><td><code>@include rounded-md</code></td><td><code>border-radius: var(--radius-md)</code> — 8px</td></tr>
+								<tr><td><code>@include rounded-lg</code></td><td><code>border-radius: var(--radius-lg)</code> — 12px</td></tr>
+								<tr><td><code>@include rounded-xl</code></td><td><code>border-radius: var(--radius-xl)</code> — 16px</td></tr>
+								<tr><td><code>@include rounded-full</code></td><td><code>border-radius: 9999px</code></td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     SHADOWS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Shadows</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include shadow-none</code></td><td>No shadow</td></tr>
+								<tr><td><code>@include shadow-sm</code></td><td>Subtle shadow</td></tr>
+								<tr><td><code>@include shadow-md</code></td><td>Medium shadow</td></tr>
+								<tr><td><code>@include shadow-lg</code></td><td>Large shadow</td></tr>
+								<tr><td><code>@include shadow-xl</code></td><td>Extra large shadow</td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     TRANSITIONS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Transitions</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include transition</code></td><td><code>transition: all var(--transition-base)</code></td></tr>
+								<tr><td><code>@include transition-fast</code></td><td><code>transition: all var(--transition-fast)</code></td></tr>
+								<tr><td><code>@include transition-colors</code></td><td>Transitions only <code>color</code>, <code>background-color</code>, <code>border-color</code></td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     POSITION
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Position &amp; Overflow</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include relative</code>, <code>absolute</code>, <code>fixed</code>, <code>sticky</code></td><td>Position values</td></tr>
+								<tr><td><code>@include inset-0</code></td><td><code>top: 0; right: 0; bottom: 0; left: 0</code></td></tr>
+								<tr><td><code>@include overflow-hidden</code></td><td><code>overflow: hidden</code></td></tr>
+								<tr><td><code>@include overflow-auto</code></td><td><code>overflow: auto</code></td></tr>
+								<tr><td><code>@include overflow-x-auto</code></td><td><code>overflow-x: auto</code> with touch scrolling</td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     CURSOR & INTERACTION
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Cursor &amp; Interaction</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include cursor-pointer</code></td><td><code>cursor: pointer</code></td></tr>
+								<tr><td><code>@include cursor-not-allowed</code></td><td><code>cursor: not-allowed</code></td></tr>
+								<tr><td><code>@include select-none</code></td><td><code>user-select: none</code></td></tr>
+								<tr><td><code>@include opacity-50</code></td><td><code>opacity: 0.5</code></td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     Z-INDEX
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Z-Index</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include z-dropdown</code></td><td><code>z-index: var(--z-dropdown)</code></td></tr>
+								<tr><td><code>@include z-sticky</code></td><td><code>z-index: var(--z-sticky)</code></td></tr>
+								<tr><td><code>@include z-overlay</code></td><td><code>z-index: var(--z-overlay)</code></td></tr>
+								<tr><td><code>@include z-modal</code></td><td><code>z-index: var(--z-modal)</code></td></tr>
+								<tr><td><code>@include z-toast</code></td><td><code>z-index: var(--z-toast)</code></td></tr>
+								<tr><td><code>@include z($val)</code></td><td><code>z-index: $val</code></td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     CONTAINER QUERIES
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Container Queries</h3></header>
+					<main>
+						<p>Parent declares the container context, child queries it with native <code>@container</code>. Never combine <code>container-type</code> with <code>overflow: hidden</code> on the same element.</p>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Output</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include container</code></td><td><code>container-type: inline-size</code></td></tr>
+								<tr><td><code>@include container(name)</code></td><td><code>container-type: inline-size; container-name: name</code></td></tr>
+							</tbody>
+						</table>
+						<pre><code>// Parent — declares the context
+#sidebar { @include container(sidebar); }
+
+// Child — queries the container
+#sidebar nav {
+  @container sidebar (min-width: 580px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}</code></pre>
+						<h4>Standard breakpoints</h4>
+						<table>
+							<thead>
+								<tr><th>Width</th><th>Use</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>480px</td><td>1 &rarr; 2 columns (narrow containers)</td></tr>
+								<tr><td>580px</td><td>1 &rarr; 2 columns (standard)</td></tr>
+								<tr><td>880px</td><td>2 &rarr; 3 columns</td></tr>
+								<tr><td>1120px</td><td>3 &rarr; 4 columns</td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     COLLAPSIBLE
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Collapsible</h3></header>
+					<main>
+						<p>Grid-based expand/collapse animation. Uses <code>grid-template-rows: 0fr/1fr</code> transition.</p>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Role</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include collapsible</code></td><td>Parent — <code>display: grid</code> with 0fr &rarr; 1fr transition. Toggled by <code>.open</code> class</td></tr>
+								<tr><td><code>@include collapsible-content</code></td><td>Child — <code>overflow: hidden</code> to clip content</td></tr>
+							</tbody>
+						</table>
+						<pre><code>.my-panel          { @include collapsible; }
+.my-panel > section { @include collapsible-content; }</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     GRID LAYOUTS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Grid Layouts</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Columns</th><th>Responsive</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include grid</code></td><td>1 &rarr; 2 &rarr; 3</td><td>768px &rarr; 2col, 1024px &rarr; 3col</td></tr>
+								<tr><td><code>@include grid-2</code></td><td>1 &rarr; 2</td><td>768px &rarr; 2col</td></tr>
+								<tr><td><code>@include grid-4</code></td><td>1 &rarr; 2 &rarr; 4</td><td>768px &rarr; 2col, 1024px &rarr; 4col</td></tr>
+								<tr><td><code>@include form-grid</code></td><td>6-column grid</td><td>&lt;768px &rarr; 1col. Children use <code>grid-column: span N</code></td></tr>
+								<tr><td><code>@include stack($gap)</code></td><td>Flex column</td><td>Vertical stack with configurable gap (default: 1rem)</td></tr>
+							</tbody>
+						</table>
+						<pre><code>// Responsive grid
+#products { @include grid; }
+
+// Form layout — 6 columns
+#my-form {
+  @include form-grid;
+  > label { grid-column: span 3; }            // half
+  > label:nth-child(3) { grid-column: span 6; } // full
+  > .form-actions { grid-column: span 6; }
+}</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     CARD & SECTION
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Card &amp; Section</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include card</code></td><td>White background, border, shadow, rounded, overflow hidden</td></tr>
+								<tr><td><code>@include panel-header</code></td><td>Flex header bar with secondary bg and bottom border. Styles nested <code>h3</code></td></tr>
+								<tr><td><code>@include section</code></td><td>Margin-bottom + <code>header</code> with border-bottom, styles <code>h2</code> and <code>.section-actions</code></td></tr>
+								<tr><td><code>@include section-card</code></td><td>Complete card with <code>header</code> (panel-header), <code>main</code> (padding), <code>footer</code> (border-top, bg, flex-end)</td></tr>
+							</tbody>
+						</table>
+						<pre><code>// Semantic usage — no .card class in HTML
+#user-profile {
+  @include section-card;
+}
+
+// In HTML:
+// &lt;section id="user-profile"&gt;
+//   &lt;header&gt;&lt;h3&gt;Profile&lt;/h3&gt;&lt;/header&gt;
+//   &lt;main&gt;...&lt;/main&gt;
+//   &lt;footer&gt;...&lt;/footer&gt;
+// &lt;/section&gt;</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     BUTTONS
+				     ========================================== -->
+				<section class="section-card" id="btn-colors">
+					<header><h3>Buttons</h3></header>
+					<main>
+						<p>Every <code>&lt;button&gt;</code> gets hover/active/focus/disabled effects <strong>out of the box</strong> from ln-acme. All states read from <code>--color-primary</code>. No classes needed.</p>
+
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include btn</code></td><td>Button structure: inline-flex, padding, font-size, font-weight. Colors come from global styles</td></tr>
+								<tr><td><code>@include btn-colors</code></td><td>Only the color states (reads <code>--color-primary</code>). Already applied globally to all <code>&lt;button&gt;</code></td></tr>
+								<tr><td><code>@include close-button</code></td><td>Transparent close button with hover-red effect</td></tr>
+							</tbody>
+						</table>
+
+						<h4>Color states (automatic on every button)</h4>
+						<table>
+							<thead>
+								<tr><th>State</th><th>Background</th><th>Text</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>Default</td><td><code>hsl(var(--color-primary) / 0.15)</code></td><td><code>hsl(var(--color-primary))</code></td></tr>
+								<tr><td>Hover</td><td><code>hsl(var(--color-primary) / 0.7)</code></td><td><code>hsl(var(--color-white))</code></td></tr>
+								<tr><td>Active</td><td><code>hsl(var(--color-primary) / 1)</code></td><td><code>hsl(var(--color-white))</code></td></tr>
+								<tr><td>Focus</td><td><code>box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.2)</code></td><td>unchanged</td></tr>
+								<tr><td>Disabled</td><td>50% opacity</td><td>cursor: not-allowed</td></tr>
+							</tbody>
+						</table>
+
+						<h4>Live demo</h4>
+						<nav id="demo-btn-variants">
+							<button type="button" class="btn">Primary</button>
+							<button type="button" class="btn btn--secondary">Secondary</button>
+							<button type="button" class="btn btn--danger">Danger</button>
+							<button type="button" class="btn btn--warning">Warning</button>
+							<button type="button" class="btn btn--success">Success</button>
+							<button type="button" class="btn btn--info">Info</button>
+							<button type="button" class="btn" disabled>Disabled</button>
+						</nav>
+
+						<h4>Changing color — override <code>--color-primary</code></h4>
+						<p>Override <code>--color-primary</code> on the element or any parent. The button inherits the new color automatically.</p>
+						<pre><code>/* Project variant — overrides --color-primary on the button */
+.btn--danger  { --color-primary: var(--color-error); }
+
+/* Parent context — all buttons inside change color */
+.admin-panel  { --color-primary: var(--color-secondary); }
+
+/* Semantic selector */
+#delete-user  { --color-primary: var(--color-error); }</code></pre>
+
+						<h4>Custom color in a project</h4>
+						<pre><code>/* Define a project-specific color token */
+:root { --color-brand: 280 60% 50%; }
+
+/* Override --color-primary on the context */
+.brand-section { --color-primary: var(--color-brand); }
+/* All buttons inside .brand-section now use brand color */</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     NAV
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Navigation</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include nav</code></td><td>Full sidebar navigation: styles <code>ul</code>, <code>li</code>, <code>a</code> (with hover/active states), <code>.nav-icon</code>, <code>.nav-label</code>, <code>.nav-section</code>, <code>.nav-divider</code></td></tr>
+							</tbody>
+						</table>
+						<pre><code>aside nav { @include nav; }
+
+// In HTML:
+// &lt;nav data-ln-nav="active"&gt;
+//   &lt;ul&gt;
+//     &lt;li&gt;&lt;a href="/"&gt;
+//       &lt;span class="nav-icon ln-icon-home"&gt;&lt;/span&gt;
+//       &lt;span class="nav-label"&gt;Dashboard&lt;/span&gt;
+//     &lt;/a&gt;&lt;/li&gt;
+//   &lt;/ul&gt;
+// &lt;/nav&gt;</code></pre>
+					</main>
+				</section>
+
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+
+		</div>
+	</div>
+	</div>
+</body>
+</html>

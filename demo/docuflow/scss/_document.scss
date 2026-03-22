@@ -16,9 +16,9 @@
 		@include p(0);
 		@include m(0);
 		@include flex-col;
-		gap: 2px;
+		@include gap(2px);
 		padding-left: 1.25rem;
-		border-left: 2px solid var(--color-border);
+		border-left: 2px solid hsl(var(--color-border));
 	}
 
 	ul ul {
@@ -34,7 +34,7 @@
 		@include pr(var(--spacing-sm));
 		@include text-sm;
 		text-decoration: none;
-		color: var(--color-text-secondary);
+		color: hsl(var(--color-text-secondary));
 		line-height: 1.45;
 		@include transition-fast;
 
@@ -48,26 +48,26 @@
 			width: 7px;
 			height: 7px;
 			border-radius: 50%;
-			border: 1.5px solid var(--color-border);
+			border: 1.5px solid hsl(var(--color-border));
 			background-color: hsl(var(--color-body-bg));
 			z-index: 1;
 			@include transition-fast;
 		}
 
 		&:hover {
-			color: var(--color-primary);
+			color: hsl(var(--color-primary));
 			&::before {
-				border-color: var(--color-primary);
-				background-color: var(--color-primary);
+				border-color: hsl(var(--color-primary));
+				background-color: hsl(var(--color-primary));
 			}
 		}
 
 		&.active {
-			color: var(--color-primary);
+			color: hsl(var(--color-primary));
 			@include font-medium;
 			&::before {
-				border-color: var(--color-primary);
-				background-color: var(--color-primary);
+				border-color: hsl(var(--color-primary));
+				background-color: hsl(var(--color-primary));
 				width: 9px;
 				height: 9px;
 			}
@@ -95,7 +95,7 @@
 			@include p(0);
 			@include m(0);
 			@include flex-col;
-			gap: 1px;
+			@include gap(1px);
 			counter-reset: book-nav;
 		}
 
@@ -112,7 +112,7 @@
 			@include pl(var(--spacing-xs));
 			@include text-sm;
 			text-decoration: none;
-			color: var(--color-text-secondary);
+			color: hsl(var(--color-text-secondary));
 			border-left: 4px solid transparent;
 			line-height: 1.45;
 			@include transition-fast;
@@ -126,14 +126,14 @@
 				@include font-medium;
 				font-variant-numeric: tabular-nums;
 				text-align: right;
-				color: var(--color-text-muted);
+				color: hsl(var(--color-text-muted));
 				padding-top: 1px;
 				@include transition-fast;
 			}
 
 			&:hover {
 				background-color: hsl(var(--palette-jade) / 0.07);
-				color: var(--color-text-primary);
+				color: hsl(var(--color-text-primary));
 				border-left-color: hsl(var(--palette-jade));
 			}
 

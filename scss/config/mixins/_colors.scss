@@ -1,0 +1,13 @@
+// Colors — референцира --color-* токени
+
+@mixin text-primary   { color: hsl(var(--color-text-primary)); }
+@mixin text-secondary { color: hsl(var(--color-text-secondary)); }
+@mixin text-muted     { color: hsl(var(--color-text-muted)); }
+@mixin text-white     { color: hsl(var(--color-white)); }
+@mixin text-error     { color: hsl(var(--color-error)); }
+@mixin text-success   { color: hsl(var(--color-success)); }
+@mixin text-warning   { color: hsl(var(--color-warning)); }
+
+@mixin bg-primary   { background-color: hsl(var(--color-bg-primary)); }
+@mixin bg-secondary { background-color: hsl(var(--color-bg-secondary)); }
+@mixin bg-body      { background-color: hsl(var(--color-bg-body)); }

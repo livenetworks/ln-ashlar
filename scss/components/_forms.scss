@@ -187,37 +187,6 @@ label {
 	@include btn;
 }
 
-.btn--secondary {
-	@include bg-secondary;
-	@include text-primary;
-	@include border;
-
-	&:hover {
-		background-color: hsl(var(--color-bg-secondary));
-	}
-}
-
-.btn--danger {
-	background-color: hsl(var(--color-error));
-
-	&:hover {
-		background-color: hsl(var(--color-error-hover));
-	}
-}
-
-.form-group {
-	@include mb(1rem);
-}
-
-.form-row {
-	@include flex;
-	@include gap(1rem);
-
-	> * {
-		@include flex-1;
-	}
-}
-
 .form-actions {
 	@include flex;
 	@include justify-end;
