@@ -40,10 +40,10 @@ File: `scss/components/_tables.scss`.
 
 ```html
 <td>
-    <div class="btn-group">
-        <a class="action primary" href="#">View</a>
-        <button class="action danger">Delete</button>
-    </div>
+    <ul class="btn-group">
+        <li><a class="action primary" href="#">View</a></li>
+        <li><button class="action danger">Delete</button></li>
+    </ul>
 </td>
 ```
 
