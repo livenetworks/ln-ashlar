@@ -34,7 +34,9 @@
 
 	a, button {
 		@include w-full;
-		display: block;
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-sm));
 		@include text-left;
 		@include px(var(--spacing-sm));
 		@include py(var(--spacing-xs));
