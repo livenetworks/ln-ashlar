@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Autosave — ln-acme</title>
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Autosave</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Auto-save form data to localStorage.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+					</ul>
+
+										<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Autosave</h1>
+					<p>Auto-saves form data to <code>localStorage</code> on field blur/change. Restores on next visit. Clears on submit.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-autosave</code></td><td><code>&lt;form&gt;</code></td><td>Enables autosave. Uses <code>form.id</code> as storage key.</td></tr>
+									<tr><td><code>data-ln-autosave="key"</code></td><td><code>&lt;form&gt;</code></td><td>Explicit storage key (overrides <code>form.id</code>).</td></tr>
+								</tbody>
+							</table>
+							<p>Storage key format: <code>ln-autosave:{pathname}:{identifier}</code> — unique per URL + form.</p>
+						</main>
+					</section>
+
+					<!-- Live Demo -->
+					<section class="section-card">
+						<header><h3>Live demo — fill fields, close tab, reopen</h3></header>
+						<main>
+							<p>Fill in some fields below, then close (or refresh) this tab. When you reopen, the data is restored. Submitting the form clears the saved draft.</p>
+
+							<form id="demo-autosave" data-ln-autosave>
+								<p class="form-element">
+									<label for="as-name">Name</label>
+									<input type="text" id="as-name" name="name" placeholder="Ivan Petrov">
+								</p>
+								<p class="form-element">
+									<label for="as-email">Email</label>
+									<input type="email" id="as-email" name="email" placeholder="ivan@example.com">
+								</p>
+								<p class="form-element">
+									<label for="as-phone">Phone</label>
+									<input type="tel" id="as-phone" name="phone" placeholder="+389 2 ...">
+								</p>
+								<p class="form-element">
+									<label for="as-country">Country</label>
+									<select id="as-country" name="country">
+										<option value="">— Select —</option>
+										<option value="mk">Macedonia</option>
+										<option value="rs">Serbia</option>
+										<option value="hr">Croatia</option>
+										<option value="bg">Bulgaria</option>
+									</select>
+								</p>
+								<p class="form-element">
+									<label for="as-message">Message</label>
+									<textarea id="as-message" name="message" placeholder="Write something..."></textarea>
+								</p>
+								<fieldset>
+									<legend>Role</legend>
+									<ul>
+										<li><label><input type="radio" name="role" value="admin"> Admin</label></li>
+										<li><label><input type="radio" name="role" value="editor"> Editor</label></li>
+										<li><label><input type="radio" name="role" value="viewer"> Viewer</label></li>
+									</ul>
+								</fieldset>
+								<fieldset>
+									<legend>Features</legend>
+									<ul>
+										<li><label><input type="checkbox" name="features[]" value="api"> API</label></li>
+										<li><label><input type="checkbox" name="features[]" value="export"> Export</label></li>
+										<li><label><input type="checkbox" name="features[]" value="audit"> Audit</label></li>
+									</ul>
+								</fieldset>
+								<div class="form-actions">
+									<button type="button" onclick="document.getElementById('demo-autosave').lnAutosave.clear(); window.lnToast.enqueue({type:'info', title:'Cleared', message:'Saved draft removed from localStorage.'})">Clear Draft</button>
+									<button type="submit">Submit</button>
+								</div>
+							</form>
+						</main>
+					</section>
+
+					<!-- Events Demo -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>Cancelable</th><th>Detail</th><th>When</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-autosave:before-restore</code></td><td><strong>yes</strong></td><td><code>{ target, data }</code></td><td>Before restoring saved data</td></tr>
+									<tr><td><code>ln-autosave:restored</code></td><td>no</td><td><code>{ target, data }</code></td><td>Data restored to form</td></tr>
+									<tr><td><code>ln-autosave:saved</code></td><td>no</td><td><code>{ target, data }</code></td><td>Data saved to localStorage</td></tr>
+									<tr><td><code>ln-autosave:cleared</code></td><td>no</td><td><code>{ target }</code></td><td>localStorage entry removed</td></tr>
+								</tbody>
+							</table>
+
+							<article>
+								<h4>Event log</h4>
+								<p>Interact with the form above to see events here:</p>
+								<pre id="autosave-log" style="max-height: 12rem; overflow-y: auto; font-size: 0.8rem;"></pre>
+							</article>
+
+							<script>
+								document.addEventListener('DOMContentLoaded', function () {
+									var log = document.getElementById('autosave-log');
+									var events = ['ln-autosave:saved', 'ln-autosave:restored', 'ln-autosave:cleared'];
+									events.forEach(function (name) {
+										document.addEventListener(name, function (e) {
+											var time = new Date().toLocaleTimeString();
+											var line = '[' + time + '] ' + name;
+											if (e.detail.data) line += ' — ' + JSON.stringify(e.detail.data).substring(0, 80) + '…';
+											log.textContent = line + '\n' + log.textContent;
+										});
+									});
+								});
+							</script>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Instance API (on DOM element)
+var form = document.getElementById('my-form');
+form.lnAutosave.save();     // manually save
+form.lnAutosave.restore();  // manually restore
+form.lnAutosave.clear();    // remove saved data
+form.lnAutosave.destroy();  // cleanup listeners
+
+// Constructor (for dynamic content)
+window.lnAutosave(container);</code></pre>
+						</main>
+					</section>
+
+					<!-- Cancel Restore -->
+					<section class="section-card">
+						<header><h3>Cancel restore (server data takes priority)</h3></header>
+						<main>
+							<pre><code>// Prevent restore when form already has server data
+document.addEventListener('ln-autosave:before-restore', function (e) {
+    var form = e.detail.target;
+    if (form.dataset.hasServerData === 'true') {
+        e.preventDefault();       // don't overwrite server values
+        form.lnAutosave.clear();  // discard stale draft
+    }
+});</code></pre>
+						</main>
+					</section>
+
+					<!-- Submit handler for demo -->
+					<script>
+						document.addEventListener('DOMContentLoaded', function () {
+							document.getElementById('demo-autosave').addEventListener('submit', function (e) {
+								e.preventDefault();
+								window.lnToast.enqueue({ type: 'success', title: 'Submitted', message: 'Form data sent. Draft cleared from localStorage.' });
+							});
+						});
+					</script>
+
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+</body>
+</html>
