@@ -110,17 +110,20 @@ All states read from `--color-primary`. No classes needed.
 
 ## Pill Labels (Checkbox / Radio)
 
-Checkbox/radio inside `<label>` → pill button automatically. Input hidden.
+Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on first/last.
 
 - **Filled** (default) — gray bg, colored bg on checked, input hidden
 - **Outline** — `@include pill-outline` on parent → bordered, visible input indicator
 - **Color** — override `--color-primary` on parent for different colors
 
 ```html
-<label><input type="radio" name="role" value="admin"> Admin</label>
+<ul>
+  <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
+  <li><label><input type="radio" name="role" value="editor"> Editor</label></li>
+</ul>
 ```
 ```scss
-#my-form .auth-group { @include pill-outline; }
+#my-form fieldset { @include pill-outline; }
 ```
 
 ## Adding a New SCSS Component

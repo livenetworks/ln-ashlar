@@ -101,7 +101,7 @@ Non-submit buttons need `type="button"`.
             <button type="button" class="ln-icon-close" data-ln-modal-close></button>
         </header>
         <main>
-            <label>Name <input type="text"></label>
+            <label>Name <input type="text" name="name"></label>
         </main>
         <footer>
             <button type="button" data-ln-modal-close>Cancel</button>

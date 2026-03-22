@@ -7,45 +7,53 @@ File: `scss/components/_forms.scss`.
 All `input`, `textarea`, `select` are styled globally with border, rounded-md, focus ring. Full width by default.
 
 ```html
-<form id="my-form">
-  <label>
-    Name <span class="text-error">*</span>
-    <input type="text" name="name" required>
-  </label>
-  <label>
-    Category
-    <select name="category">
-      <option>Option A</option>
-    </select>
-  </label>
-</form>
+<p class="form-element">
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name">
+</p>
 ```
 
 ## Form Layout
 
-Forms use CSS Grid + wrapping `<label>`. No `<div class="form-group">` or `<div class="form-row">`.
+Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<input id>`.
+
+```html
+<form id="my-form">
+  <p class="form-element">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" required>
+  </p>
+  <p class="form-element form-element--wide">
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes"></textarea>
+  </p>
+  <div class="form-actions">
+    <button type="button">Cancel</button>
+    <button type="submit">Save</button>
+  </div>
+</form>
+```
 
 ```scss
 #my-form {
-  @include form-grid;            // 6 cols, gap, responsive
+  @include form-grid;
 
-  > label { grid-column: span 3; }  // half width
-  > label:nth-child(3) { grid-column: span 6; }  // full width
-  > .form-actions { grid-column: span 6; }
-
-  input[type="checkbox"],
-  input[type="radio"] { width: auto; }
+  .form-element { grid-column: span 3; }
+  .form-element--wide { grid-column: span 6; }
+  .form-actions { grid-column: span 6; }
 }
 ```
 
 ## Pill Labels (Checkbox / Radio)
 
-Checkbox and radio inputs inside `<label>` become pill buttons automatically.
+Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on first/last.
 
 ```html
-<label><input type="radio" name="role" value="admin"> Admin</label>
-<label><input type="radio" name="role" value="editor" checked> Editor</label>
-<label><input type="checkbox" name="api" value="1"> API</label>
+<ul>
+  <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
+  <li><label><input type="radio" name="role" value="editor" checked> Editor</label></li>
+  <li><label><input type="radio" name="role" value="external"> External</label></li>
+</ul>
 ```
 
 ### Two Styles
@@ -57,7 +65,7 @@ Checkbox and radio inputs inside `<label>` become pill buttons automatically.
 
 ```scss
 // Switch to outline on a parent container
-#my-form .auth-group { @include pill-outline; }
+#my-form fieldset { @include pill-outline; }
 
 // Color per context
 #role-field { --color-primary: var(--color-secondary); }

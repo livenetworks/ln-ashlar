@@ -769,7 +769,7 @@ z-index: 40;
 
 ### Pill Labels (Checkbox / Radio)
 
-Checkbox and radio inputs inside `<label>` become pill buttons automatically. Two styles:
+Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on first/last.
 
 | Style | Description |
 |-------|-------------|
@@ -777,13 +777,14 @@ Checkbox and radio inputs inside `<label>` become pill buttons automatically. Tw
 | **Outline** (`@include pill-outline` on parent) | Visible input indicator, bordered, light bg on checked |
 
 ```html
-<!-- HTML — same for both styles -->
-<label><input type="radio" name="role" value="admin"> Admin</label>
-<label><input type="checkbox" name="api" value="1"> API</label>
+<ul>
+    <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
+    <li><label><input type="radio" name="role" value="editor"> Editor</label></li>
+</ul>
 ```
 ```scss
 // Switch to outline style on parent
-#my-form .auth-group { @include pill-outline; }
+#my-form fieldset { @include pill-outline; }
 ```
 
 ### Collapsible Accordion

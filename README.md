@@ -456,29 +456,29 @@ Icons use `mask-image` + `currentColor` — they automatically inherit the text 
 
 ## Form Layout
 
-Forms use CSS Grid + wrapping `<label>`. No `<div class="form-group">` or `<div class="form-row">`.
+Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<input id>`.
 
 ### HTML
 
 ```html
 <form id="my-form">
-  <label>
-    Name <span class="text-error">*</span>
-    <input type="text" name="fname" required>
+  <p class="form-element">
+    <label for="name">Name <span class="text-error">*</span></label>
+    <input type="text" id="name" name="name" required>
     <small class="text-error">Required field</small>
-  </label>
+  </p>
 
-  <label>
-    Category
-    <select name="category">
+  <p class="form-element">
+    <label for="category">Category</label>
+    <select id="category" name="category">
       <option>Option A</option>
     </select>
-  </label>
+  </p>
 
-  <label>
-    <input type="checkbox" name="confirmed" value="1">
-    I confirm the data
-  </label>
+  <p class="form-element form-element--wide">
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes"></textarea>
+  </p>
 
   <div class="form-actions">
     <button type="button">Cancel</button>
@@ -489,28 +489,14 @@ Forms use CSS Grid + wrapping `<label>`. No `<div class="form-group">` or `<div 
 
 ### SCSS
 
-Each form has its own SCSS file with `#form-id` selector:
-
 ```scss
 #my-form {
-  @include form-grid;          // 6 cols, gap, responsive
+  @include form-grid;
 
-  > label {
-    grid-column: span 3;       // default: half width
-  }
+  .form-element { grid-column: span 3; }        // half
+  .form-element--wide { grid-column: span 6; }  // full
+  .form-actions { grid-column: span 6; }
 
-  > label:nth-child(3) { grid-column: span 4; }   // 2/3
-  > label:nth-child(4) { grid-column: span 2; }   // 1/3
-
-  // Full-width
-  > label:nth-child(8),
-  > .form-actions { grid-column: span 6; }
-
-  // Checkbox/radio fix
-  input[type="checkbox"],
-  input[type="radio"] { width: auto; }
-
-  // Error display
   small { display: block; }
 }
 ```
@@ -520,22 +506,23 @@ Each form has its own SCSS file with `#form-id` selector:
 | Element | Rule |
 |---------|------|
 | Root | `<form id="...">` — styled with `@include form-grid` |
-| Children | Direct `<label>` — no wrappers |
-| Label | Wraps text + input (implicit association, no `for`/`id`) |
-| Column spans | In SCSS via `> label:nth-child(N)` — NEVER inline `style` |
-| Checkbox/radio | `input[type="checkbox"] { width: auto; }` |
+| Children | `<p class="form-element">` — wraps `<label>` + `<input>` |
+| Label | Explicit `for`/`id`: `<label for="name">` + `<input id="name">` |
+| Wide fields | `.form-element--wide` — full-width (span 6) |
 | `.form-actions` | Component class — stays in HTML, `grid-column: span 6` |
 
 ---
 
 ## Pill Labels (Checkbox / Radio)
 
-Checkbox and radio inputs inside `<label>` become pill buttons automatically. Input is hidden.
+Checkbox and radio inputs in `<ul> > <li> > <label>` become grouped pill buttons. Border-radius on first/last only.
 
 ```html
-<label><input type="radio" name="role" value="admin"> Admin</label>
-<label><input type="radio" name="role" value="editor" checked> Editor</label>
-<label><input type="checkbox" name="api" value="1"> API</label>
+<ul>
+  <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
+  <li><label><input type="radio" name="role" value="editor" checked> Editor</label></li>
+  <li><label><input type="radio" name="role" value="external"> External</label></li>
+</ul>
 ```
 
 ### Two Styles
@@ -547,7 +534,7 @@ Checkbox and radio inputs inside `<label>` become pill buttons automatically. In
 
 ```scss
 // Outline style — apply on parent container
-#my-form .auth-options { @include pill-outline; }
+#my-form fieldset { @include pill-outline; }
 
 // Color override per context
 #role-field { --color-primary: var(--color-secondary); }

@@ -8,37 +8,10 @@
 #demo-form-grid {
 	@include form-grid;
 
-	> label {
-		grid-column: span 3; // default: половина
-	}
+	.form-element { grid-column: span 3; }
+	.form-element--wide { grid-column: span 6; }
+	.form-actions { grid-column: span 6; }
 
-	// Email span 4, Telefon span 2
-	> label:nth-child(3) { grid-column: span 4; }
-	> label:nth-child(4) { grid-column: span 2; }
-
-	// Grad, Poštanski, Država: third-width
-	> label:nth-child(5),
-	> label:nth-child(6),
-	> label:nth-child(7) { grid-column: span 2; }
-
-	// Poraka: full-width
-	> label:nth-child(8) { grid-column: span 6; }
-
-	// Checkbox: full-width
-	> label:nth-child(10) { grid-column: span 6; }
-
-	// form-actions: full-width
-	> .form-actions { grid-column: span 6; }
-
-	// Spacing between label text and input inside wrapping label
-	> label input,
-	> label select,
-	> label textarea {
-		display: block;
-		@include mt(0.25rem);
-	}
-
-	// Error display
 	small { display: block; }
 }
 

@@ -2,11 +2,13 @@
 // Apply on parent container to switch all pill labels inside
 //
 // Usage:
-//   #my-form .radio-group { @include pill-outline; }
+//   #my-form .auth-group { @include pill-outline; }
 
 @mixin pill-outline {
 	label:has(> input[type="checkbox"]),
-	label:has(> input[type="radio"]) {
+	label:has(> input[type="radio"]),
+	li label:has(> input[type="checkbox"]),
+	li label:has(> input[type="radio"]) {
 		background-color: transparent;
 		border-color: hsl(var(--color-border));
 

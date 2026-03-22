@@ -98,48 +98,37 @@
 				<section class="section-card">
 					<header><h3>Principle</h3></header>
 					<main>
-						<p>Each field is a <code>&lt;label&gt;</code> that wraps the text and the input (implicit association — no <code>for</code>/<code>id</code>). The root element (<code>&lt;form&gt;</code> or <code>&lt;section&gt;</code>) gets <code>@include form-grid</code> in SCSS — a 6-column grid, collapsing to 1 column on mobile. Column spans are set on <code>&gt; label:nth-child(N)</code> in app-specific SCSS — never inline <code>style=""</code>.</p>
+						<p>Each field is a <code>&lt;p class="form-element"&gt;</code> containing a <code>&lt;label for="..."&gt;</code> and <code>&lt;input id="..."&gt;</code> (explicit association). The root <code>&lt;form&gt;</code> gets <code>@include form-grid</code> in SCSS — a 6-column grid, collapsing to 1 column on mobile. Use <code>.form-element--wide</code> for full-width fields.</p>
 
 						<!-- Wrong vs Right -->
 						<div class="demo-split">
 							<article>
-								<h4>Wrong — old pattern</h4>
-								<pre><code>&lt;!-- div wrappers, explicit for/id --&gt;
-&lt;div class="form-group"&gt;
-  &lt;label for="name"&gt;Name&lt;/label&gt;
-  &lt;input type="text" id="name"&gt;
-&lt;/div&gt;
+								<h4>Wrong — wrapping label</h4>
+								<pre><code>&lt;!-- implicit label, no for/id --&gt;
+&lt;label&gt;
+  Name
+  &lt;input type="text" name="name"&gt;
+&lt;/label&gt;
 
-&lt;div class="form-row"&gt;
-  &lt;div class="form-group"&gt;
-    &lt;label for="city"&gt;City&lt;/label&gt;
-    &lt;input type="text" id="city"&gt;
-  &lt;/div&gt;
-  &lt;div class="form-group"&gt;
-    &lt;label for="zip"&gt;Zip&lt;/label&gt;
-    &lt;input type="text" id="zip"&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</code></pre>
+&lt;label&gt;
+  City
+  &lt;input type="text" name="city"&gt;
+&lt;/label&gt;</code></pre>
 							</article>
 							<article>
-								<h4>Correct — new pattern</h4>
-								<pre><code>&lt;!-- label wrap, grid in SCSS --&gt;
+								<h4>Correct — form-element</h4>
+								<pre><code>&lt;!-- explicit for/id, p wrapper --&gt;
 &lt;form id="my-form"&gt;
 
-  &lt;label&gt;
-    Name
-    &lt;input type="text" name="name"&gt;
-  &lt;/label&gt;
+  &lt;p class="form-element"&gt;
+    &lt;label for="name"&gt;Name&lt;/label&gt;
+    &lt;input type="text" id="name" name="name"&gt;
+  &lt;/p&gt;
 
-  &lt;label&gt;
-    City
-    &lt;input type="text" name="city"&gt;
-  &lt;/label&gt;
-
-  &lt;label&gt;
-    Zip
-    &lt;input type="text" name="zip"&gt;
-  &lt;/label&gt;
+  &lt;p class="form-element"&gt;
+    &lt;label for="city"&gt;City&lt;/label&gt;
+    &lt;input type="text" id="city" name="city"&gt;
+  &lt;/p&gt;
 
 &lt;/form&gt;</code></pre>
 							</article>
@@ -160,27 +149,23 @@
 								</tr>
 								<tr>
 									<td>Children</td>
-									<td>Direct <code>&lt;label&gt;</code> — no <code>&lt;div class="form-group"&gt;</code> or <code>&lt;div class="form-row"&gt;</code></td>
+									<td><code>&lt;p class="form-element"&gt;</code> — wraps <code>&lt;label&gt;</code> + <code>&lt;input&gt;</code></td>
 								</tr>
 								<tr>
 									<td>Label</td>
-									<td>Wraps the text + input (implicit association — no need for <code>for</code>/<code>id</code>). Checkbox/radio: text goes <em>after</em> the input</td>
+									<td>Explicit <code>for</code>/<code>id</code> association: <code>&lt;label for="name"&gt;</code> + <code>&lt;input id="name"&gt;</code></td>
 								</tr>
 								<tr>
-									<td>Column spans</td>
-									<td>In SCSS via <code>&gt; label:nth-child(N) { grid-column: span N; }</code> — NEVER inline <code>style=""</code>. span 3 = ½, span 2 = ⅓, span 6 = full</td>
+									<td>Wide fields</td>
+									<td><code>.form-element--wide</code> for full-width fields (grid-column: span 6)</td>
 								</tr>
 								<tr>
 									<td>Errors</td>
-									<td><code>&lt;small class="text-error"&gt;</code> inside <code>&lt;label&gt;</code> + <code>small { display: block }</code> in SCSS</td>
+									<td><code>&lt;small class="text-error"&gt;</code> inside <code>.form-element</code></td>
 								</tr>
 								<tr>
-									<td>Checkbox / Radio</td>
-									<td><code>input[type="checkbox"] { width: auto }</code> — ln-acme sets <code>input { width: 100% }</code> globally</td>
-								</tr>
-								<tr>
-									<td><code>&lt;fieldset&gt;</code></td>
-									<td>ONLY for semantically related fields (e.g. address: street + city + postal code). NOT for visual rows</td>
+									<td>Pill radio/checkbox</td>
+									<td><code>&lt;ul&gt; &gt; &lt;li&gt; &gt; &lt;label&gt; &gt; &lt;input&gt;</code> — grouped pills (see Pill Labels section)</td>
 								</tr>
 								<tr>
 									<td><code>.form-actions</code></td>
@@ -205,54 +190,53 @@
 							- 8(Message), 10(Checkbox), .form-actions → span6 (full-width)
 						-->
 						<form id="demo-form-grid">
-							<label>
-								First Name <span class="text-error">*</span>
-								<input type="text" name="fname" required placeholder="Ivan">
+							<p class="form-element">
+								<label for="demo-fname">First Name <span class="text-error">*</span></label>
+								<input type="text" id="demo-fname" name="fname" required placeholder="Ivan">
 								<small class="text-error">Required field</small>
-							</label>
-							<label>
-								Last Name
-								<input type="text" name="lname" placeholder="Petrov">
-							</label>
-							<label>
-								Email <span class="text-error">*</span>
-								<input type="email" name="email" required placeholder="email@example.com">
-							</label>
-							<label>
-								Phone
-								<input type="tel" name="phone" placeholder="+389 2 ...">
-							</label>
-							<label>
-								City
-								<input type="text" name="city" placeholder="Skopje">
-							</label>
-							<label>
-								Postal Code
-								<input type="text" name="zip" placeholder="1000">
-							</label>
-							<label>
-								Country
-								<select name="country">
+							</p>
+							<p class="form-element">
+								<label for="demo-lname">Last Name</label>
+								<input type="text" id="demo-lname" name="lname" placeholder="Petrov">
+							</p>
+							<p class="form-element">
+								<label for="demo-email">Email <span class="text-error">*</span></label>
+								<input type="email" id="demo-email" name="email" required placeholder="email@example.com">
+							</p>
+							<p class="form-element">
+								<label for="demo-phone">Phone</label>
+								<input type="tel" id="demo-phone" name="phone" placeholder="+389 2 ...">
+							</p>
+							<p class="form-element">
+								<label for="demo-city">City</label>
+								<input type="text" id="demo-city" name="city" placeholder="Skopje">
+							</p>
+							<p class="form-element">
+								<label for="demo-zip">Postal Code</label>
+								<input type="text" id="demo-zip" name="zip" placeholder="1000">
+							</p>
+							<p class="form-element">
+								<label for="demo-country">Country</label>
+								<select id="demo-country" name="country">
 									<option>Macedonia</option>
 									<option>Serbia</option>
 									<option>Croatia</option>
 								</select>
-							</label>
-							<label>
-								Message
-								<textarea name="message" placeholder="Write a message..."></textarea>
-							</label>
-							<label>
-								Disabled field
-								<input type="text" name="disabled_field" disabled value="Cannot be changed">
-							</label>
-							<label>
-								<input type="checkbox" name="confirmed" value="1">
-								I confirm the entered data
-							</label>
+							</p>
+							<p class="form-element form-element--wide">
+								<label for="demo-message">Message</label>
+								<textarea id="demo-message" name="message" placeholder="Write a message..."></textarea>
+							</p>
+							<p class="form-element">
+								<label for="demo-disabled">Disabled field</label>
+								<input type="text" id="demo-disabled" name="disabled_field" disabled value="Cannot be changed">
+							</p>
+							<p class="form-element form-element--wide">
+								<label><input type="checkbox" name="confirmed" value="1"> I confirm the entered data</label>
+							</p>
 							<div class="form-actions">
-								<button type="button" class="btn btn--secondary">Cancel</button>
-								<button type="submit" class="btn">Save</button>
+								<button type="button">Cancel</button>
+								<button type="submit">Save</button>
 							</div>
 						</form>
 					</main>
@@ -266,19 +250,23 @@
 					<main>
 						<article>
 							<h4>Filled (default)</h4>
-							<p>Radio and checkbox inputs inside <code>&lt;label&gt;</code> become pills automatically. Input is hidden.</p>
+							<p>Radio and checkbox in <code>&lt;ul&gt; &gt; &lt;li&gt; &gt; &lt;label&gt;</code> — grouped, border-radius on first/last.</p>
 							<nav id="demo-pills-filled">
 								<fieldset>
 									<legend>Role</legend>
-									<label><input type="radio" name="role" value="admin"> Admin</label>
-									<label><input type="radio" name="role" value="employee"> Employee</label>
-									<label><input type="radio" name="role" value="external" checked> External</label>
+									<ul>
+										<li><label><input type="radio" name="role" value="admin" checked> Admin</label></li>
+										<li><label><input type="radio" name="role" value="employee"> Employee</label></li>
+										<li><label><input type="radio" name="role" value="external"> External</label></li>
+									</ul>
 								</fieldset>
 								<fieldset>
 									<legend>Features</legend>
-									<label><input type="checkbox" name="feat[]" value="api" checked> API</label>
-									<label><input type="checkbox" name="feat[]" value="export"> Export</label>
-									<label><input type="checkbox" name="feat[]" value="audit" checked> Audit</label>
+									<ul>
+										<li><label><input type="checkbox" name="feat[]" value="api" checked> API</label></li>
+										<li><label><input type="checkbox" name="feat[]" value="export"> Export</label></li>
+										<li><label><input type="checkbox" name="feat[]" value="audit" checked> Audit</label></li>
+									</ul>
 								</fieldset>
 							</nav>
 						</article>
@@ -288,24 +276,30 @@
 							<nav id="demo-pills-outline">
 								<fieldset>
 									<legend>Auth Method</legend>
-									<label><input type="radio" name="auth" value="local" checked> Local</label>
-									<label><input type="radio" name="auth" value="ldap"> LDAP</label>
+									<ul>
+										<li><label><input type="radio" name="auth" value="local" checked> Local</label></li>
+										<li><label><input type="radio" name="auth" value="ldap"> LDAP</label></li>
+									</ul>
 								</fieldset>
 								<fieldset>
 									<legend>Options</legend>
-									<label><input type="checkbox" name="opt[]" value="notify" checked> Notifications</label>
-									<label><input type="checkbox" name="opt[]" value="2fa"> Two-factor</label>
+									<ul>
+										<li><label><input type="checkbox" name="opt[]" value="notify" checked> Notifications</label></li>
+										<li><label><input type="checkbox" name="opt[]" value="2fa"> Two-factor</label></li>
+									</ul>
 								</fieldset>
 							</nav>
 						</article>
 						<article>
 							<h4>Code</h4>
-							<pre><code>&lt;!-- HTML — same for both styles --&gt;
-&lt;label&gt;&lt;input type="radio" name="role" value="admin"&gt; Admin&lt;/label&gt;
-&lt;label&gt;&lt;input type="checkbox" name="api" value="1"&gt; API&lt;/label&gt;
+							<pre><code>&lt;!-- HTML — ul/li structure, grouped pills --&gt;
+&lt;ul&gt;
+    &lt;li&gt;&lt;label&gt;&lt;input type="radio" name="role" value="admin"&gt; Admin&lt;/label&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;label&gt;&lt;input type="radio" name="role" value="editor"&gt; Editor&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 // SCSS — outline style on parent
-#my-form .radio-group { @include pill-outline; }
+#my-form fieldset { @include pill-outline; }
 
 // Color override per context
 #role-field { --color-primary: var(--color-secondary); }</code></pre>
@@ -341,62 +335,39 @@
 						<h4>HTML</h4>
 						<pre><code>&lt;form id="my-form"&gt;
 
-  &lt;!-- Standard field — span 3 (half) via SCSS --&gt;
-  &lt;label&gt;
-    Name &lt;span class="text-error"&gt;*&lt;/span&gt;
-    &lt;input type="text" name="fname" required placeholder="..."&gt;
+  &lt;p class="form-element"&gt;
+    &lt;label for="name"&gt;Name &lt;span class="text-error"&gt;*&lt;/span&gt;&lt;/label&gt;
+    &lt;input type="text" id="name" name="name" required&gt;
     &lt;small class="text-error"&gt;Required field&lt;/small&gt;
-  &lt;/label&gt;
+  &lt;/p&gt;
 
-  &lt;!-- Select — same pattern --&gt;
-  &lt;label&gt;
-    Category
-    &lt;select name="category"&gt;
+  &lt;p class="form-element"&gt;
+    &lt;label for="category"&gt;Category&lt;/label&gt;
+    &lt;select id="category" name="category"&gt;
       &lt;option value="a"&gt;Option A&lt;/option&gt;
     &lt;/select&gt;
-  &lt;/label&gt;
+  &lt;/p&gt;
 
-  &lt;!-- Checkbox — text AFTER the input --&gt;
-  &lt;label&gt;
-    &lt;input type="checkbox" name="confirmed" value="1"&gt;
-    I confirm the data
-  &lt;/label&gt;
+  &lt;p class="form-element form-element--wide"&gt;
+    &lt;label for="notes"&gt;Notes&lt;/label&gt;
+    &lt;textarea id="notes" name="notes"&gt;&lt;/textarea&gt;
+  &lt;/p&gt;
 
-  &lt;!-- form-actions is a component class, stays in HTML --&gt;
   &lt;div class="form-actions"&gt;
-    &lt;button type="button" class="btn btn--secondary"&gt;Cancel&lt;/button&gt;
-    &lt;button type="submit" class="btn"&gt;Save&lt;/button&gt;
+    &lt;button type="button"&gt;Cancel&lt;/button&gt;
+    &lt;button type="submit"&gt;Save&lt;/button&gt;
   &lt;/div&gt;
 
 &lt;/form&gt;</code></pre>
 
 						<h4>SCSS</h4>
 						<pre><code>#my-form {
-  @include form-grid;       // 6 cols, gap, responsive (&lt;768px → 1 col)
+  @include form-grid;
 
-  &gt; label {
-    grid-column: span 3;    // default: half width
-  }
+  .form-element { grid-column: span 3; }        // default: half
+  .form-element--wide { grid-column: span 6; }  // full-width
+  .form-actions { grid-column: span 6; }
 
-  // Specific spans
-  &gt; label:nth-child(3) { grid-column: span 4; }   // 2/3 width
-  &gt; label:nth-child(4) { grid-column: span 2; }   // 1/3 width
-
-  // Three in a row (span 2 × 3 = 6 cols)
-  &gt; label:nth-child(5),
-  &gt; label:nth-child(6),
-  &gt; label:nth-child(7) { grid-column: span 2; }
-
-  // Full-width
-  &gt; label:nth-child(8),
-  &gt; label:nth-child(10),
-  &gt; .form-actions { grid-column: span 6; }
-
-  // Checkbox/radio fix
-  input[type="checkbox"],
-  input[type="radio"] { width: auto; }
-
-  // Error display
   small { display: block; }
 }</code></pre>
 					</main>
