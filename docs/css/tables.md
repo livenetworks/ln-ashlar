@@ -40,7 +40,7 @@ File: `scss/components/_tables.scss`.
 
 ```html
 <td>
-    <div class="actions">
+    <div class="btn-group">
         <a class="action primary" href="#">View</a>
         <button class="action danger">Delete</button>
     </div>

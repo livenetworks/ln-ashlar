@@ -39,6 +39,12 @@
 	white-space: nowrap;
 }
 
+@mixin btn-group {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.5rem);
+}
+
 @mixin close-button {
 	background: transparent;
 	@include border-none;

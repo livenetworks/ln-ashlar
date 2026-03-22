@@ -1,0 +1,5 @@
+@use '../config/mixins' as *;
+
+.btn-group {
+	@include btn-group;
+}

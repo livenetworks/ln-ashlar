@@ -6,7 +6,7 @@
 Contains **SCSS CSS framework** + **vanilla JS components**, zero dependencies.
 Used in Laravel projects and other web applications.
 
-> **Coding standards** → see global SKILL files (senior-css-developer, senior-js-developer). This file covers project-specific details only.
+> **Coding standards** → see global SKILL files (css, html, js). This file covers project-specific details only.
 
 ---
 
@@ -110,14 +110,14 @@ All states read from `--color-primary`. No classes needed.
 
 ## Pill Labels (Checkbox / Radio)
 
-Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on first/last.
+Checkbox/radio pills use `<ul class="btn-group"> > <li> > <label>` — grouped, border-radius on first/last.
 
 - **Filled** (default) — gray bg, colored bg on checked, input hidden
 - **Outline** — `@include pill-outline` on parent → bordered, visible input indicator
 - **Color** — override `--color-primary` on parent for different colors
 
 ```html
-<ul>
+<ul class="btn-group">
   <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
   <li><label><input type="radio" name="role" value="editor"> Editor</label></li>
 </ul>
