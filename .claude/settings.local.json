@@ -20,7 +20,11 @@
       "Bash(cp .claude/skills/html/SKILL.md docs/SKILL-HTML.md)",
       "Bash(cp .claude/skills/css/SKILL.md SKILL-CSS.md)",
       "Bash(cp .claude/skills/css/SKILL.md docs/SKILL-CSS.md)",
-      "Bash(find /c/laragon/www/ln-acme -name *feedback* -o -name *override* -o -name *semantic*)"
+      "Bash(find /c/laragon/www/ln-acme -name *feedback* -o -name *override* -o -name *semantic*)",
+      "Bash(while read:*)",
+      "Bash(do grep:*)",
+      "Bash(echo \"$f\")",
+      "Bash(git add:*)"
     ]
   }
 }
