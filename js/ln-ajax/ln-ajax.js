@@ -126,31 +126,53 @@
 		}
 
 		fetch(finalUrl, options)
-			.then(function (response) { return response.json(); })
-			.then(function (data) {
-				if (data.title) {
-					document.title = data.title;
-				}
+			.then(function (response) {
+				var ok = response.ok;
+				return response.json().then(function (data) {
+					return { ok: ok, status: response.status, data: data };
+				});
+			})
+			.then(function (result) {
+				var data = result.data;
 
-				if (data.content) {
-					for (const targetId in data.content) {
-						const targetElement = document.getElementById(targetId);
-						if (targetElement) {
-							targetElement.innerHTML = data.content[targetId];
+				if (result.ok) {
+					if (data.title) {
+						document.title = data.title;
+					}
+
+					if (data.content) {
+						for (const targetId in data.content) {
+							const targetElement = document.getElementById(targetId);
+							if (targetElement) {
+								targetElement.innerHTML = data.content[targetId];
+							}
 						}
 					}
-				}
 
-				if (element.tagName === 'A') {
-					const historyUrl = element.getAttribute('href');
-					if (historyUrl) {
-						window.history.pushState({ ajax: true }, '', historyUrl);
+					if (element.tagName === 'A') {
+						const historyUrl = element.getAttribute('href');
+						if (historyUrl) {
+							window.history.pushState({ ajax: true }, '', historyUrl);
+						}
+					} else if (element.tagName === 'FORM' && element.method.toUpperCase() === 'GET') {
+						window.history.pushState({ ajax: true }, '', finalUrl);
 					}
-				} else if (element.tagName === 'FORM' && element.method.toUpperCase() === 'GET') {
-					window.history.pushState({ ajax: true }, '', finalUrl);
+
+					_dispatch(element, 'ln-ajax:success', { method: method, url: finalUrl, data: data });
+				} else {
+					_dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, status: result.status, data: data });
 				}
 
-				_dispatch(element, 'ln-ajax:success', { method: method, url: finalUrl, data: data });
+				// Auto-show response message as toast
+				if (data.message && window.lnToast) {
+					var msg = data.message;
+					window.lnToast.enqueue({
+						type: msg.type || (result.ok ? 'success' : 'error'),
+						title: msg.title || '',
+						message: msg.body || ''
+					});
+				}
+
 				_dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
 			})
