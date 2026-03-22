@@ -98,7 +98,7 @@
 				<section class="section-card">
 					<header><h3>Principle</h3></header>
 					<main>
-						<p>Each field is a <code>&lt;p class="form-element"&gt;</code> containing a <code>&lt;label for="..."&gt;</code> and <code>&lt;input id="..."&gt;</code> (explicit association). The root <code>&lt;form&gt;</code> gets <code>@include form-grid</code> in SCSS — a 6-column grid, collapsing to 1 column on mobile. Use <code>.form-element--wide</code> for full-width fields.</p>
+						<p>Each field is a <code>&lt;p class="form-element"&gt;</code> containing a <code>&lt;label for="..."&gt;</code> and <code>&lt;input id="..."&gt;</code> (explicit association). The root <code>&lt;form&gt;</code> gets <code>@include form-grid</code> in SCSS — a 6-column grid, collapsing to 1 column on mobile. Column widths are set via <code>nth-child</code> in form-specific SCSS.</p>
 
 						<!-- Wrong vs Right -->
 						<div class="demo-split">
@@ -156,8 +156,8 @@
 									<td>Explicit <code>for</code>/<code>id</code> association: <code>&lt;label for="name"&gt;</code> + <code>&lt;input id="name"&gt;</code></td>
 								</tr>
 								<tr>
-									<td>Wide fields</td>
-									<td><code>.form-element--wide</code> for full-width fields (grid-column: span 6)</td>
+									<td>Column spans</td>
+									<td>In form-specific SCSS via <code>.form-element:nth-child(N)</code> — NEVER width classes on the element</td>
 								</tr>
 								<tr>
 									<td>Errors</td>
@@ -223,7 +223,7 @@
 									<option>Croatia</option>
 								</select>
 							</p>
-							<p class="form-element form-element--wide">
+							<p class="form-element">
 								<label for="demo-message">Message</label>
 								<textarea id="demo-message" name="message" placeholder="Write a message..."></textarea>
 							</p>
@@ -231,7 +231,7 @@
 								<label for="demo-disabled">Disabled field</label>
 								<input type="text" id="demo-disabled" name="disabled_field" disabled value="Cannot be changed">
 							</p>
-							<p class="form-element form-element--wide">
+							<p class="form-element">
 								<label><input type="checkbox" name="confirmed" value="1"> I confirm the entered data</label>
 							</p>
 							<div class="form-actions">
@@ -348,7 +348,7 @@
     &lt;/select&gt;
   &lt;/p&gt;
 
-  &lt;p class="form-element form-element--wide"&gt;
+  &lt;p class="form-element"&gt;
     &lt;label for="notes"&gt;Notes&lt;/label&gt;
     &lt;textarea id="notes" name="notes"&gt;&lt;/textarea&gt;
   &lt;/p&gt;
@@ -364,11 +364,10 @@
 						<pre><code>#my-form {
   @include form-grid;
 
-  .form-element { grid-column: span 3; }        // default: half
-  .form-element--wide { grid-column: span 6; }  // full-width
+  .form-element { grid-column: span 3; }                   // default: half
+  .form-element:nth-child(5) { grid-column: span 6; }     // notes: full
+  > fieldset { grid-column: span 6; }
   .form-actions { grid-column: span 6; }
-
-  small { display: block; }
 }</code></pre>
 					</main>
 				</section>

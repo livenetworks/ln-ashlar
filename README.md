@@ -475,7 +475,7 @@ Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<
     </select>
   </p>
 
-  <p class="form-element form-element--wide">
+  <p class="form-element" id="field-notes">
     <label for="notes">Notes</label>
     <textarea id="notes" name="notes"></textarea>
   </p>
@@ -493,8 +493,8 @@ Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<
 #my-form {
   @include form-grid;
 
-  .form-element { grid-column: span 3; }        // half
-  .form-element--wide { grid-column: span 6; }  // full
+  .form-element { grid-column: span 3; }       // default: half
+  #field-notes { grid-column: span 6; }        // by id: full
   .form-actions { grid-column: span 6; }
 
   small { display: block; }
@@ -508,7 +508,7 @@ Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<
 | Root | `<form id="...">` — styled with `@include form-grid` |
 | Children | `<p class="form-element">` — wraps `<label>` + `<input>` |
 | Label | Explicit `for`/`id`: `<label for="name">` + `<input id="name">` |
-| Wide fields | `.form-element--wide` — full-width (span 6) |
+| Column spans | Via `#id` or `nth-child` in form-specific SCSS — NEVER width classes |
 | `.form-actions` | Component class — stays in HTML, `grid-column: span 6` |
 
 ---

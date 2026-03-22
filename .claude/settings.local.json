@@ -15,7 +15,12 @@
       "Bash(npm run build:demo:*)",
       "Bash(git checkout:*)",
       "Bash(git ls-tree:*)",
-      "Bash(echo \"Updated $f\")"
+      "Bash(echo \"Updated $f\")",
+      "Bash(cp .claude/skills/html/SKILL.md SKILL-HTML.md)",
+      "Bash(cp .claude/skills/html/SKILL.md docs/SKILL-HTML.md)",
+      "Bash(cp .claude/skills/css/SKILL.md SKILL-CSS.md)",
+      "Bash(cp .claude/skills/css/SKILL.md docs/SKILL-CSS.md)",
+      "Bash(find /c/laragon/www/ln-acme -name *feedback* -o -name *override* -o -name *semantic*)"
     ]
   }
 }

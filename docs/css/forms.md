@@ -23,7 +23,7 @@ Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<
     <label for="name">Name</label>
     <input type="text" id="name" name="name" required>
   </p>
-  <p class="form-element form-element--wide">
+  <p class="form-element" id="field-notes">
     <label for="notes">Notes</label>
     <textarea id="notes" name="notes"></textarea>
   </p>
@@ -39,7 +39,7 @@ Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<
   @include form-grid;
 
   .form-element { grid-column: span 3; }
-  .form-element--wide { grid-column: span 6; }
+  #field-notes { grid-column: span 6; }
   .form-actions { grid-column: span 6; }
 }
 ```
