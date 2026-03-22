@@ -34,11 +34,6 @@
 	grid-template-rows: auto 1fr auto;
 }
 
-.ln-modal__content--sm { max-width: 28rem; }
-.ln-modal__content--md { max-width: 32rem; }
-.ln-modal__content--lg { max-width: 42rem; }
-.ln-modal__content--xl { max-width: 48rem; }
-
 /* Header */
 .ln-modal header {
 	@include panel-header;

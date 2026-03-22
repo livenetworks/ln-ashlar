@@ -8,29 +8,47 @@ Modal dialog component. File: `js/ln-modal/ln-modal.js`.
 <!-- Trigger -->
 <button data-ln-modal="my-modal">Open</button>
 
-<!-- Modal -->
+<!-- Basic Modal -->
 <div class="ln-modal" id="my-modal">
     <div class="ln-modal__content">
         <header>
             <h3>Title</h3>
-            <button data-ln-modal-close>&times;</button>
+            <button class="ln-icon-close" data-ln-modal-close></button>
         </header>
         <main>Content</main>
         <footer>
-            <button data-ln-modal-close class="btn-secondary">Cancel</button>
-            <button>Save</button>
+            <button data-ln-modal-close>Close</button>
         </footer>
     </div>
+</div>
+
+<!-- Form Modal — <form> is the content root -->
+<div class="ln-modal" id="my-form-modal">
+    <form class="ln-modal__content">
+        <header>
+            <h3>Title</h3>
+            <button type="button" class="ln-icon-close" data-ln-modal-close></button>
+        </header>
+        <main>
+            <label>Name <input type="text"></label>
+        </main>
+        <footer>
+            <button type="button" data-ln-modal-close>Cancel</button>
+            <button type="submit">Save</button>
+        </footer>
+    </form>
 </div>
 ```
 
 ## Sizes
 
-```html
-<div class="ln-modal__content ln-modal__content--sm">  <!-- 28rem -->
-<div class="ln-modal__content ln-modal__content--md">  <!-- 32rem -->
-<div class="ln-modal__content ln-modal__content--lg">  <!-- 42rem -->
-<div class="ln-modal__content ln-modal__content--xl">  <!-- 48rem -->
+Sizes via SCSS mixins (not CSS classes):
+
+```scss
+#my-modal .ln-modal__content { @include modal-sm; }  // 28rem
+#my-modal .ln-modal__content { @include modal-md; }  // 32rem
+#my-modal .ln-modal__content { @include modal-lg; }  // 42rem
+#my-modal .ln-modal__content { @include modal-xl; }  // 48rem
 ```
 
 ## Attributes
