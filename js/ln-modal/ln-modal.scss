@@ -60,6 +60,9 @@
 	@include gap(var(--spacing-sm));
 	position: sticky;
 	bottom: 0;
+
+	button { @include btn; }
+	button[type="button"] { --color-primary: var(--color-text-secondary); }
 }
 
 /* Animation */

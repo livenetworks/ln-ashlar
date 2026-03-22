@@ -742,7 +742,7 @@ z-index: 40;
 
 ### Modal
 
-`<form>` is always the content root — footer buttons are part of the form. Non-submit buttons need `type="button"`.
+`<form>` is always the content root. Footer buttons get `@include btn` automatically — no `.btn` class needed. Non-submit buttons need `type="button"`.
 
 ```html
 <div class="ln-modal" id="edit-user">
