@@ -151,6 +151,8 @@ input[type="radio"] {
 }
 
 // ─── Pill label for checkbox/radio ────────────────────────────
+// Default: filled style (input hidden, gray bg, colored on checked)
+// Alternative: @include pill-outline on parent for bordered + visible input
 
 label:has(> input[type="checkbox"]),
 label:has(> input[type="radio"]) {
@@ -159,19 +161,24 @@ label:has(> input[type="radio"]) {
 	@include gap(0.5rem);
 	@include px(1rem);
 	@include py(0.5rem);
-	@include border;
 	@include rounded-md;
 	@include cursor-pointer;
 	@include transition;
+	@include text-sm;
+	@include font-medium;
 	@include mb(0);
+	background-color: hsl(var(--color-bg-secondary));
+	border: 1px solid transparent;
+
+	> input { display: none; }
 
 	&:has(> input:checked) {
-		border-color: hsl(var(--color-primary));
-		background-color: hsl(var(--color-primary) / 0.04);
+		background-color: hsl(var(--color-primary));
+		color: hsl(var(--color-white));
 	}
 
-	&:hover {
-		border-color: hsl(var(--color-primary) / 0.5);
+	&:hover:not(:has(> input:checked)) {
+		border-color: hsl(var(--color-border));
 	}
 }
 

@@ -41,3 +41,33 @@
 	// Error display
 	small { display: block; }
 }
+
+// ─── Pill labels demo ────────────────────────────────────────
+
+#demo-pills-filled,
+#demo-pills-outline {
+	@include flex;
+	@include gap(var(--spacing-xl));
+
+	fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+		@include flex;
+		@include flex-wrap;
+		@include gap(0.5rem);
+
+		legend {
+			@include text-sm;
+			@include text-secondary;
+			@include font-medium;
+			@include mb(0.5rem);
+			float: left;
+			width: 100%;
+		}
+	}
+}
+
+#demo-pills-outline {
+	@include pill-outline;
+}

@@ -108,6 +108,21 @@ All states read from `--color-primary`. No classes needed.
 - **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes
 - Available: `modal-sm` (28rem), `modal-md` (32rem), `modal-lg` (42rem), `modal-xl` (48rem)
 
+## Pill Labels (Checkbox / Radio)
+
+Checkbox/radio inside `<label>` → pill button automatically. Input hidden.
+
+- **Filled** (default) — gray bg, colored bg on checked, input hidden
+- **Outline** — `@include pill-outline` on parent → bordered, visible input indicator
+- **Color** — override `--color-primary` on parent for different colors
+
+```html
+<label><input type="radio" name="role" value="admin"> Admin</label>
+```
+```scss
+#my-form .auth-group { @include pill-outline; }
+```
+
 ## Adding a New SCSS Component
 
 1. Create `scss/components/_new-component.scss`
