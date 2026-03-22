@@ -102,6 +102,7 @@ All states read from `--color-primary`. No classes needed.
 ```
 
 - **`<form>` is the root** — footer buttons (Cancel, Submit) are inside the form
+- **Footer buttons** get `@include btn` automatically — no `.btn` class needed
 - **Non-submit buttons** need `type="button"` (close, cancel) to prevent form submission
 - **No `.ln-modal__content` class** — select semantically: `.ln-modal > form`
 - **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes

@@ -4,7 +4,7 @@ Modal dialog component. File: `js/ln-modal/ln-modal.js`.
 
 ## HTML
 
-`<form>` is always the content root. Non-submit buttons need `type="button"`.
+`<form>` is always the content root. Footer buttons get `@include btn` automatically. Non-submit buttons need `type="button"`.
 
 ```html
 <!-- Trigger -->

@@ -86,6 +86,7 @@ document.addEventListener('ln-modal:close', function(e) {
 ## HTML Structure
 
 `<form>` is always the content root — footer buttons are part of the form.
+Footer buttons get `@include btn` automatically — no `.btn` class needed.
 Non-submit buttons need `type="button"`.
 
 ```html
