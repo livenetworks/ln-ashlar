@@ -207,6 +207,10 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Close/dismiss button | `@include close-button` |
 | Expand/collapse parent | `@include collapsible` |
 | Expand/collapse child | `@include collapsible-content` |
+| Modal size: small (28rem) | `@include modal-sm` |
+| Modal size: medium (32rem) | `@include modal-md` |
+| Modal size: large (42rem) | `@include modal-lg` |
+| Modal size: extra large (48rem) | `@include modal-xl` |
 
 ---
 
@@ -738,33 +742,43 @@ z-index: 40;
 
 ### Modal
 
+Two patterns: basic (no form) and form modal (`<form>` is the content root so footer buttons are inside the form).
+
 ```html
-<section data-ln-modal="edit-user" class="ln-modal">
-    <article>
+<!-- Basic Modal -->
+<div class="ln-modal" id="info-modal">
+    <div class="ln-modal__content">
         <header>
-            <h3>Edit User</h3>
+            <h3>Title</h3>
             <button class="ln-icon-close" data-ln-modal-close></button>
         </header>
         <main>...</main>
         <footer>
-            <button class="btn btn--secondary" data-ln-modal-close>Cancel</button>
-            <button class="btn">Save</button>
+            <button data-ln-modal-close>Close</button>
         </footer>
-    </article>
-</section>
+    </div>
+</div>
+
+<!-- Form Modal — <form> IS the content root -->
+<div class="ln-modal" id="edit-user">
+    <form class="ln-modal__content">
+        <header>
+            <h3>Edit User</h3>
+            <button type="button" class="ln-icon-close" data-ln-modal-close></button>
+        </header>
+        <main>
+            <label>Name <input type="text"></label>
+        </main>
+        <footer>
+            <button type="button" data-ln-modal-close>Cancel</button>
+            <button type="submit">Save</button>
+        </footer>
+    </form>
+</div>
 ```
 ```scss
-.ln-modal header { @include panel-header; }
-.ln-modal header button[data-ln-modal-close] { @include close-button; }
-.ln-modal main { @include p(var(--spacing-lg)); }
-.ln-modal footer {
-    @include border-t;
-    @include bg-secondary;
-    @include flex;
-    @include justify-end;
-    @include gap(0.5rem);
-    @include p(var(--spacing-md));
-}
+// Sizes via mixins (not classes)
+#edit-user .ln-modal__content { @include modal-lg; }
 ```
 
 ### Collapsible Accordion

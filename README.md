@@ -88,7 +88,8 @@ scss/
 │   │   ├── _collapsible.scss ← collapsible, collapsible-content
 │   │   ├── _card.scss        ← card, panel-header, section, section-card
 │   │   ├── _nav.scss         ← nav
-│   │   └── _btn.scss         ← btn, btn-colors, close-button
+│   │   ├── _btn.scss         ← btn, btn-colors, close-button
+│   │   └── _modal.scss       ← modal-sm, modal-md, modal-lg, modal-xl
 │   ├── _theme.scss           ← Color palette extensions
 │   └── _icons.scss           ← SVG mask-image icon system
 ├── base/                     ← Reset, global defaults (button, a), typography
@@ -352,6 +353,20 @@ Import in any SCSS file:
 | Mixin | Description |
 |-------|-------------|
 | `@include nav` | Full sidebar navigation with `ul`, `li`, `a` (hover/active), `.nav-icon`, `.nav-label`, `.nav-section`, `.nav-divider` |
+
+### Modal
+
+| Mixin | Max-width |
+|-------|-----------|
+| `@include modal-sm` | 28rem |
+| `@include modal-md` | 32rem |
+| `@include modal-lg` | 42rem |
+| `@include modal-xl` | 48rem |
+
+Applied via semantic selectors:
+```scss
+#edit-user .ln-modal__content { @include modal-lg; }
+```
 
 ### Buttons
 

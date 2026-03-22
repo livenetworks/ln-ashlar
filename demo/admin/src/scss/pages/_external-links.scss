@@ -43,7 +43,9 @@
 	}
 }
 
-// External links confirmation modal — URL display
+// External links confirmation modal
+#external-link-modal .ln-modal__content { @include modal-sm; }
+
 #external-link-modal main p {
 	word-break: break-all;
 	@include font-mono;

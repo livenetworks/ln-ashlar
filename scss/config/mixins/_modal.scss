@@ -1,0 +1,7 @@
+// Modal size mixins
+// Usage: #my-form-modal .ln-modal__content { @include modal-lg; }
+
+@mixin modal-sm { max-width: 28rem; }
+@mixin modal-md { max-width: 32rem; }
+@mixin modal-lg { max-width: 42rem; }
+@mixin modal-xl { max-width: 48rem; }
