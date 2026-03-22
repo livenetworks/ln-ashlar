@@ -96,7 +96,7 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Autosave</h1>
-					<p>Auto-saves form data to <code>localStorage</code> on field blur/change. Restores on next visit. Clears on submit.</p>
+					<p>Auto-saves form data to <code>localStorage</code> on field blur/change. Restores on next visit. Clears on submit, reset, or cancel.</p>
 
 					<!-- Basics -->
 					<section class="section-card">
@@ -107,6 +107,7 @@
 								<tbody>
 									<tr><td><code>data-ln-autosave</code></td><td><code>&lt;form&gt;</code></td><td>Enables autosave. Uses <code>form.id</code> as storage key.</td></tr>
 									<tr><td><code>data-ln-autosave="key"</code></td><td><code>&lt;form&gt;</code></td><td>Explicit storage key (overrides <code>form.id</code>).</td></tr>
+									<tr><td><code>data-ln-autosave-clear</code></td><td>button inside form</td><td>Click clears saved draft (cancel/discard buttons).</td></tr>
 								</tbody>
 							</table>
 							<p>Storage key format: <code>ln-autosave:{pathname}:{identifier}</code> — unique per URL + form.</p>
@@ -163,7 +164,8 @@
 									</ul>
 								</fieldset>
 								<div class="form-actions">
-									<button type="button" onclick="document.getElementById('demo-autosave').lnAutosave.clear(); window.lnToast.enqueue({type:'info', title:'Cleared', message:'Saved draft removed from localStorage.'})">Clear Draft</button>
+									<button type="button" data-ln-autosave-clear>Cancel</button>
+									<button type="reset">Reset</button>
 									<button type="submit">Submit</button>
 								</div>
 							</form>

@@ -9,6 +9,7 @@ Restores data on next visit if the form wasn't submitted. Clears storage on subm
 |-----------|-----|-------------|
 | `data-ln-autosave` | `<form>` | Enables autosave, uses `form.id` as storage key |
 | `data-ln-autosave="key"` | `<form>` | Explicit storage key (overrides `form.id`) |
+| `data-ln-autosave-clear` | button inside form | Click clears saved draft (for cancel/discard buttons) |
 
 Storage key format: `ln-autosave:{pathname}:{identifier}` — unique per URL + form.
 
@@ -58,6 +59,8 @@ document.addEventListener('ln-autosave:restored', function (e) {
 - **Blur** (`focusout`) on any input/textarea/select → saves entire form
 - **Change** on checkbox/radio/select → saves entire form (blur doesn't always fire on these)
 - **Submit** → clears localStorage entry (form completed successfully)
+- **Reset** (`type="reset"`) → clears localStorage entry (form reset to defaults)
+- **Clear button** (`data-ln-autosave-clear`) → clears localStorage entry (cancel/discard)
 - **Page load** → restores saved data if present, dispatches `input` + `change` events on each field
 - File inputs are skipped (can't be stored in localStorage)
 - Fields without `name` are skipped
@@ -114,7 +117,7 @@ No JS needed — MutationObserver auto-initializes.
             </p>
         </main>
         <footer>
-            <button type="button" data-ln-modal-close>Cancel</button>
+            <button type="button" data-ln-modal-close data-ln-autosave-clear>Cancel</button>
             <button type="submit">Create</button>
         </footer>
     </form>

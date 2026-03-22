@@ -1,6 +1,7 @@
 (function () {
 	const DOM_SELECTOR = 'data-ln-autosave';
 	const DOM_ATTRIBUTE = 'lnAutosave';
+	const CLEAR_SELECTOR = 'data-ln-autosave-clear';
 	const STORAGE_PREFIX = 'ln-autosave:';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
@@ -55,9 +56,20 @@
 			self.clear();
 		};
 
+		this._onReset = function () {
+			self.clear();
+		};
+
+		this._onClearClick = function (e) {
+			var btn = e.target.closest('[' + CLEAR_SELECTOR + ']');
+			if (btn) self.clear();
+		};
+
 		form.addEventListener('focusout', this._onFocusout);
 		form.addEventListener('change', this._onChange);
 		form.addEventListener('submit', this._onSubmit);
+		form.addEventListener('reset', this._onReset);
+		form.addEventListener('click', this._onClearClick);
 
 		this.restore();
 
@@ -111,6 +123,8 @@
 		this.dom.removeEventListener('focusout', this._onFocusout);
 		this.dom.removeEventListener('change', this._onChange);
 		this.dom.removeEventListener('submit', this._onSubmit);
+		this.dom.removeEventListener('reset', this._onReset);
+		this.dom.removeEventListener('click', this._onClearClick);
 		_dispatch(this.dom, 'ln-autosave:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
