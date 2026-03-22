@@ -265,11 +265,11 @@ document.addEventListener('ln-external-links:processed', function(e) {
 	</div><!-- /.app-wrapper -->
 
 	<!-- External link confirmation modal -->
-	<aside class="ln-modal" id="external-link-modal">
-		<section class="ln-modal__content">
+	<div class="ln-modal" id="external-link-modal">
+		<form>
 			<header>
 				<h3>External link</h3>
-				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+				<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 			</header>
 			<main>
 				<p>You are leaving this page and going to:</p>
@@ -277,11 +277,11 @@ document.addEventListener('ln-external-links:processed', function(e) {
 				<p>Do you want to continue?</p>
 			</main>
 			<footer>
-				<button class="btn btn--secondary" data-ln-modal-close>Cancel</button>
-				<button class="btn" id="external-link-confirm">Continue</button>
+				<button type="button" class="btn btn--secondary" data-ln-modal-close>Cancel</button>
+				<button type="button" class="btn" id="external-link-confirm">Continue</button>
 			</footer>
-		</section>
-	</aside>
+		</form>
+	</div>
 
 	<script>
 	(function() {

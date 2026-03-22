@@ -106,24 +106,24 @@
 
 		<!-- Basic Modal -->
 		<div class="ln-modal" id="demo-basic">
-			<div class="ln-modal__content">
+			<form>
 				<header>
 					<h3>Basic Modal</h3>
-					<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 				</header>
 				<main>
 					<p>This is a basic modal with a title and content.</p>
 					<p>Press ESC or click close.</p>
 				</main>
 				<footer>
-					<button data-ln-modal-close class="btn btn--secondary">Close</button>
+					<button type="button" data-ln-modal-close class="btn btn--secondary">Close</button>
 				</footer>
-			</div>
+			</form>
 		</div>
 
 		<!-- Form Modal -->
 		<div class="ln-modal" id="demo-form">
-			<form class="ln-modal__content">
+			<form>
 				<header>
 					<h3>Add User</h3>
 					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
@@ -155,10 +155,10 @@
 
 		<!-- Large Modal -->
 		<div class="ln-modal" id="demo-large">
-			<div class="ln-modal__content">
+			<form>
 				<header>
 					<h3>Large Modal</h3>
-					<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 				</header>
 				<main>
 					<p>A larger modal for more content. Size set via <code>@include modal-lg</code> in SCSS.</p>
@@ -172,9 +172,9 @@
 					</table>
 				</main>
 				<footer>
-					<button data-ln-modal-close class="btn btn--secondary">Close</button>
+					<button type="button" data-ln-modal-close class="btn btn--secondary">Close</button>
 				</footer>
-			</div>
+			</form>
 		</div>
 
 		<!-- Events -->
@@ -231,18 +231,18 @@ document.addEventListener('ln-modal:close', function(e) {
 
 		<!-- Events demo modal -->
 		<div class="ln-modal" id="demo-events">
-			<div class="ln-modal__content">
+			<form>
 				<header>
 					<h3>Events Demo</h3>
-					<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 				</header>
 				<main>
 					<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and <code>ln-modal:close</code> events.</p>
 				</main>
 				<footer>
-					<button data-ln-modal-close class="btn btn--secondary">Close</button>
+					<button type="button" data-ln-modal-close class="btn btn--secondary">Close</button>
 				</footer>
-			</div>
+			</form>
 		</div>
 
 		<!-- HTML -->
@@ -252,23 +252,9 @@ document.addEventListener('ln-modal:close', function(e) {
 				<pre><code>&lt;!-- Trigger button --&gt;
 &lt;button data-ln-modal="my-modal"&gt;Open&lt;/button&gt;
 
-&lt;!-- Basic Modal (no form) --&gt;
+&lt;!-- Modal — form is always the content root --&gt;
 &lt;div class="ln-modal" id="my-modal"&gt;
-    &lt;div class="ln-modal__content"&gt;
-        &lt;header&gt;
-            &lt;h3&gt;Title&lt;/h3&gt;
-            &lt;button class="ln-icon-close" data-ln-modal-close&gt;&lt;/button&gt;
-        &lt;/header&gt;
-        &lt;main&gt;Content&lt;/main&gt;
-        &lt;footer&gt;
-            &lt;button data-ln-modal-close class="btn btn--secondary"&gt;Close&lt;/button&gt;
-        &lt;/footer&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Form Modal — form IS the content root --&gt;
-&lt;div class="ln-modal" id="my-form-modal"&gt;
-    &lt;form class="ln-modal__content"&gt;
+    &lt;form&gt;
         &lt;header&gt;
             &lt;h3&gt;Title&lt;/h3&gt;
             &lt;button type="button" class="ln-icon-close" data-ln-modal-close&gt;&lt;/button&gt;
@@ -277,14 +263,14 @@ document.addEventListener('ln-modal:close', function(e) {
             &lt;label&gt;Name &lt;input type="text"&gt;&lt;/label&gt;
         &lt;/main&gt;
         &lt;footer&gt;
-            &lt;button type="button" data-ln-modal-close class="btn btn--secondary"&gt;Cancel&lt;/button&gt;
-            &lt;button type="submit" class="btn"&gt;Save&lt;/button&gt;
+            &lt;button type="button" data-ln-modal-close&gt;Cancel&lt;/button&gt;
+            &lt;button type="submit"&gt;Save&lt;/button&gt;
         &lt;/footer&gt;
     &lt;/form&gt;
 &lt;/div&gt;
 
 &lt;!-- Sizes via mixins in SCSS (not classes) --&gt;
-&lt;!-- #my-large-modal .ln-modal__content { @include modal-lg; } --&gt;
+&lt;!-- #my-modal &gt; form { @include modal-lg; } --&gt;
 
 &lt;!-- JS API --&gt;
 &lt;script&gt;

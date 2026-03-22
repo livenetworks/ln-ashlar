@@ -321,52 +321,50 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 
 	<!-- Modals (outside app-wrapper) -->
 	<div class="ln-modal" id="demo-basic">
-		<div class="ln-modal__content">
+		<form>
 			<header>
 				<h3>Basic Modal</h3>
-				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+				<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 			</header>
 			<main>
 				<p>This is a basic modal with a title and content.</p>
 				<p>Press ESC or click close.</p>
 			</main>
 			<footer>
-				<button data-ln-modal-close class="btn btn--secondary">Close</button>
+				<button type="button" data-ln-modal-close class="btn btn--secondary">Close</button>
 			</footer>
-		</div>
+		</form>
 	</div>
 
 	<div class="ln-modal" id="demo-form">
-		<div class="ln-modal__content">
+		<form>
 			<header>
 				<h3>Add User</h3>
-				<button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+				<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 			</header>
 			<main>
-				<form>
-					<label>
-						Name
-						<input type="text" placeholder="Enter name...">
-					</label>
-					<label>
-						Email
-						<input type="email" placeholder="email@example.com">
-					</label>
-					<label>
-						Role
-						<select>
-							<option>User</option>
-							<option>Administrator</option>
-							<option>Moderator</option>
-						</select>
-					</label>
-				</form>
+				<label>
+					Name
+					<input type="text" placeholder="Enter name...">
+				</label>
+				<label>
+					Email
+					<input type="email" placeholder="email@example.com">
+				</label>
+				<label>
+					Role
+					<select>
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</label>
 			</main>
 			<footer>
-				<button data-ln-modal-close class="btn btn--secondary">Cancel</button>
+				<button type="button" data-ln-modal-close class="btn btn--secondary">Cancel</button>
 				<button type="submit" class="btn">Save</button>
 			</footer>
-		</div>
+		</form>
 	</div>
 </body>
 </html>

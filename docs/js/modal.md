@@ -4,27 +4,15 @@ Modal dialog component. File: `js/ln-modal/ln-modal.js`.
 
 ## HTML
 
+`<form>` is always the content root. Non-submit buttons need `type="button"`.
+
 ```html
 <!-- Trigger -->
 <button data-ln-modal="my-modal">Open</button>
 
-<!-- Basic Modal -->
+<!-- Modal -->
 <div class="ln-modal" id="my-modal">
-    <div class="ln-modal__content">
-        <header>
-            <h3>Title</h3>
-            <button class="ln-icon-close" data-ln-modal-close></button>
-        </header>
-        <main>Content</main>
-        <footer>
-            <button data-ln-modal-close>Close</button>
-        </footer>
-    </div>
-</div>
-
-<!-- Form Modal — <form> is the content root -->
-<div class="ln-modal" id="my-form-modal">
-    <form class="ln-modal__content">
+    <form>
         <header>
             <h3>Title</h3>
             <button type="button" class="ln-icon-close" data-ln-modal-close></button>
@@ -45,10 +33,10 @@ Modal dialog component. File: `js/ln-modal/ln-modal.js`.
 Sizes via SCSS mixins (not CSS classes):
 
 ```scss
-#my-modal .ln-modal__content { @include modal-sm; }  // 28rem
-#my-modal .ln-modal__content { @include modal-md; }  // 32rem
-#my-modal .ln-modal__content { @include modal-lg; }  // 42rem
-#my-modal .ln-modal__content { @include modal-xl; }  // 48rem
+#my-modal > form { @include modal-sm; }  // 28rem
+#my-modal > form { @include modal-md; }  // 32rem
+#my-modal > form { @include modal-lg; }  // 42rem
+#my-modal > form { @include modal-xl; }  // 48rem
 ```
 
 ## Attributes

@@ -248,13 +248,15 @@ Use HTML5 landmarks — they have implicit ARIA roles. Add explicit `role` only 
 <main id="panel1" data-ln-toggle class="collapsible">...</main>
 
 <!-- Modal — label and role -->
-<section data-ln-modal="confirm-delete" role="dialog" aria-labelledby="modal-title">
-    <header>
-        <h3 id="modal-title">Confirm Delete</h3>
-        <button class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
-    </header>
-    <main>...</main>
-</section>
+<div class="ln-modal" id="confirm-delete" role="dialog" aria-labelledby="modal-title">
+    <form>
+        <header>
+            <h3 id="modal-title">Confirm Delete</h3>
+            <button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+        </header>
+        <main>...</main>
+    </form>
+</div>
 
 <!-- Loading state -->
 <button type="submit" class="btn" aria-busy="true" disabled>Saving...</button>

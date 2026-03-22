@@ -742,26 +742,11 @@ z-index: 40;
 
 ### Modal
 
-Two patterns: basic (no form) and form modal (`<form>` is the content root so footer buttons are inside the form).
+`<form>` is always the content root — footer buttons are part of the form. Non-submit buttons need `type="button"`.
 
 ```html
-<!-- Basic Modal -->
-<div class="ln-modal" id="info-modal">
-    <div class="ln-modal__content">
-        <header>
-            <h3>Title</h3>
-            <button class="ln-icon-close" data-ln-modal-close></button>
-        </header>
-        <main>...</main>
-        <footer>
-            <button data-ln-modal-close>Close</button>
-        </footer>
-    </div>
-</div>
-
-<!-- Form Modal — <form> IS the content root -->
 <div class="ln-modal" id="edit-user">
-    <form class="ln-modal__content">
+    <form>
         <header>
             <h3>Edit User</h3>
             <button type="button" class="ln-icon-close" data-ln-modal-close></button>
@@ -778,7 +763,7 @@ Two patterns: basic (no form) and form modal (`<form>` is the content root so fo
 ```
 ```scss
 // Sizes via mixins (not classes)
-#edit-user .ln-modal__content { @include modal-lg; }
+#edit-user > form { @include modal-lg; }
 ```
 
 ### Collapsible Accordion

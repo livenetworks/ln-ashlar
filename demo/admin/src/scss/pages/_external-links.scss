@@ -44,7 +44,7 @@
 }
 
 // External links confirmation modal
-#external-link-modal .ln-modal__content { @include modal-sm; }
+#external-link-modal > form { @include modal-sm; }
 
 #external-link-modal main p {
 	word-break: break-all;

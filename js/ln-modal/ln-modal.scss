@@ -21,7 +21,7 @@
 }
 
 /* Modal Content */
-.ln-modal__content {
+.ln-modal > form {
 	@include bg-primary;
 	@include rounded-md;
 	@include shadow-lg;

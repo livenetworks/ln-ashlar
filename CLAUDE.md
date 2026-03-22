@@ -84,6 +84,29 @@ All states read from `--color-primary`. No classes needed.
 - **No `btn--*` variant classes** in ln-acme — projects define their own via `--color-primary` override
 - Full docs: `demo/admin/mixins.html`
 
+## Modal Architecture
+
+`<form>` is always the content root — no wrapper `<div>`, no BEM classes. Styled via `.ln-modal > form`.
+
+```html
+<div class="ln-modal" id="my-modal">
+    <form>
+        <header><h3>Title</h3><button type="button" class="ln-icon-close" data-ln-modal-close></button></header>
+        <main>...</main>
+        <footer>
+            <button type="button" data-ln-modal-close>Cancel</button>
+            <button type="submit">Save</button>
+        </footer>
+    </form>
+</div>
+```
+
+- **`<form>` is the root** — footer buttons (Cancel, Submit) are inside the form
+- **Non-submit buttons** need `type="button"` (close, cancel) to prevent form submission
+- **No `.ln-modal__content` class** — select semantically: `.ln-modal > form`
+- **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes
+- Available: `modal-sm` (28rem), `modal-md` (32rem), `modal-lg` (42rem), `modal-xl` (48rem)
+
 ## Adding a New SCSS Component
 
 1. Create `scss/components/_new-component.scss`

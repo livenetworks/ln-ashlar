@@ -16,17 +16,17 @@ Opens/closes a modal by ID. ESC closes all open modals. Body scroll is blocked w
 |-------|-------------|
 | `.ln-modal` | Overlay container (must have `id`) |
 | `.ln-modal--open` | Open modal (added by JS) |
-| `.ln-modal__content` | Inner content container (`<div>` or `<form>`) |
+| `.ln-modal > form` | Content container (always `<form>`) |
 
 ## Size Mixins
 
 Sizes are applied via SCSS mixins on semantic selectors, not CSS classes:
 
 ```scss
-#user-form-modal .ln-modal__content { @include modal-sm; }  // 28rem
-#settings-modal .ln-modal__content  { @include modal-md; }  // 32rem
-#report-modal .ln-modal__content    { @include modal-lg; }  // 42rem
-#preview-modal .ln-modal__content   { @include modal-xl; }  // 48rem
+#user-form-modal > form { @include modal-sm; }  // 28rem
+#settings-modal > form  { @include modal-md; }  // 32rem
+#report-modal > form    { @include modal-lg; }  // 42rem
+#preview-modal > form   { @include modal-xl; }  // 48rem
 ```
 
 ## API
@@ -85,29 +85,16 @@ document.addEventListener('ln-modal:close', function(e) {
 
 ## HTML Structure
 
+`<form>` is always the content root — footer buttons are part of the form.
+Non-submit buttons need `type="button"`.
+
 ```html
 <!-- Trigger button -->
 <button data-ln-modal="my-modal">Open</button>
 
-<!-- Basic Modal (no form) -->
+<!-- Modal -->
 <div id="my-modal" class="ln-modal">
-    <div class="ln-modal__content">
-        <header>
-            <h3>Title</h3>
-            <button class="ln-icon-close" data-ln-modal-close></button>
-        </header>
-        <main>
-            <p>Modal content...</p>
-        </main>
-        <footer>
-            <button data-ln-modal-close>Close</button>
-        </footer>
-    </div>
-</div>
-
-<!-- Form Modal — <form> IS the content root -->
-<div id="my-form-modal" class="ln-modal">
-    <form class="ln-modal__content">
+    <form>
         <header>
             <h3>Title</h3>
             <button type="button" class="ln-icon-close" data-ln-modal-close></button>
@@ -126,4 +113,4 @@ document.addEventListener('ln-modal:close', function(e) {
 > **Icons:** The close button uses the `.ln-icon-close` class — NEVER use `&times;` character.
 > `@include close-button` is already applied on `button[data-ln-modal-close]` in `ln-modal.scss`.
 >
-> **Form modals:** Buttons inside `<form>` that should NOT submit need `type="button"` (close, cancel).
+> **Non-submit buttons** inside `<form>` need `type="button"` (close, cancel) to prevent form submission.

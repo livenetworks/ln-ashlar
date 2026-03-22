@@ -1,5 +1,5 @@
 @use '../../../../../scss/config/mixins' as *;
 
 // Modal sizes — applied by ID, not by class
-#demo-large .ln-modal__content { @include modal-lg; }
-#demo-events .ln-modal__content { @include modal-sm; }
+#demo-large > form { @include modal-lg; }
+#demo-events > form { @include modal-sm; }

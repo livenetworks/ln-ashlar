@@ -365,7 +365,7 @@ Import in any SCSS file:
 
 Applied via semantic selectors:
 ```scss
-#edit-user .ln-modal__content { @include modal-lg; }
+#edit-user > form { @include modal-lg; }
 ```
 
 ### Buttons
