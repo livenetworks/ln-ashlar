@@ -54,6 +54,7 @@
 						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
 						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">JS Components</h6>
@@ -117,7 +118,6 @@
 					<div class="icon-cell"><span class="ln-icon-edit ln-icon--lg"></span>ln-icon-edit</div>
 					<div class="icon-cell"><span class="ln-icon-save ln-icon--lg"></span>ln-icon-save</div>
 					<div class="icon-cell"><span class="ln-icon-delete ln-icon--lg"></span>ln-icon-delete</div>
-					<div class="icon-cell"><span class="ln-icon-delete--red ln-icon--lg"></span>ln-icon-delete--red</div>
 					<div class="icon-cell"><span class="ln-icon-check ln-icon--lg"></span>ln-icon-check</div>
 					<div class="icon-cell"><span class="ln-icon-plus ln-icon--lg"></span>ln-icon-plus</div>
 					<div class="icon-cell"><span class="ln-icon-copy ln-icon--lg"></span>ln-icon-copy</div>
@@ -134,13 +134,9 @@
 			<main>
 				<div class="icon-grid">
 					<div class="icon-cell"><span class="ln-icon-check-circle ln-icon--lg"></span>ln-icon-check-circle</div>
-					<div class="icon-cell"><span class="ln-icon-check-circle--green ln-icon--lg"></span>check-circle--green</div>
 					<div class="icon-cell"><span class="ln-icon-error-circle ln-icon--lg"></span>ln-icon-error-circle</div>
-					<div class="icon-cell"><span class="ln-icon-error-circle--red ln-icon--lg"></span>error-circle--red</div>
 					<div class="icon-cell"><span class="ln-icon-info-circle ln-icon--lg"></span>ln-icon-info-circle</div>
-					<div class="icon-cell"><span class="ln-icon-info-circle--blue ln-icon--lg"></span>info-circle--blue</div>
 					<div class="icon-cell"><span class="ln-icon-warning ln-icon--lg"></span>ln-icon-warning</div>
-					<div class="icon-cell"><span class="ln-icon-warning--yellow ln-icon--lg"></span>warning--yellow</div>
 				</div>
 			</main>
 		</section>
@@ -195,23 +191,26 @@
 			</main>
 		</section>
 
-		<!-- HTML -->
+		<!-- How it works -->
 		<section class="section-card">
-			<header><h3>HTML</h3></header>
+			<header><h3>How it works</h3></header>
 			<main>
-				<pre><code>&lt;!-- Basic icon --&gt;
+				<p>Icons use <code>mask-image</code> + <code>background-color: currentColor</code>. The icon automatically inherits the text color from its parent element. No color variant classes needed.</p>
+
+				<pre><code>&lt;!-- Basic icon — inherits parent color --&gt;
 &lt;span class="ln-icon-home"&gt;&lt;/span&gt;
 
 &lt;!-- With size --&gt;
 &lt;span class="ln-icon-home ln-icon--lg"&gt;&lt;/span&gt;
-&lt;span class="ln-icon-home ln-icon--xl"&gt;&lt;/span&gt;
 &lt;span class="ln-icon-home ln-icon--sm"&gt;&lt;/span&gt;
 
-&lt;!-- In button --&gt;
-&lt;button&gt;&lt;span class="ln-icon-plus--white"&gt;&lt;/span&gt; Add&lt;/button&gt;
+&lt;!-- In button — icon follows button text color --&gt;
+&lt;button&gt;&lt;span class="ln-icon-plus"&gt;&lt;/span&gt; Add&lt;/button&gt;
+&lt;!-- On hover, button text turns white → icon turns white too --&gt;
 
-&lt;!-- In navigation --&gt;
-&lt;a href="#"&gt;&lt;span class="ln-icon-home nav-icon"&gt;&lt;/span&gt; Home&lt;/a&gt;</code></pre>
+&lt;!-- Color via CSS, not classes --&gt;
+&lt;span class="ln-icon-delete" style="color: red"&gt;&lt;/span&gt;
+&lt;!-- Or better, via SCSS: .action.danger { color: hsl(var(--color-error)); } --&gt;</code></pre>
 			</main>
 		</section>
 			</div>

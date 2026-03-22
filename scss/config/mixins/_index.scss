@@ -1,0 +1,21 @@
+// Mixins index — @forward сите во правилен редослед
+// Примитиви прво, композити после (зависат од примитивите)
+
+// Primitives
+@forward 'spacing';
+@forward 'display';
+@forward 'sizing';
+@forward 'typography';
+@forward 'colors';
+@forward 'borders';
+@forward 'shadows';
+@forward 'transitions';
+@forward 'position';
+@forward 'interaction';
+
+// Composites (depend on primitives)
+@forward 'layout';
+@forward 'collapsible';
+@forward 'card';
+@forward 'nav';
+@forward 'btn';

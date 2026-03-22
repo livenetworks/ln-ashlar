@@ -1,0 +1,66 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+
+// Buttons — btn-colors (states), btn (structure), close-button
+
+@mixin btn-colors {
+	background-color: hsl(var(--color-primary) / 0.15);
+	color: hsl(var(--color-primary));
+
+	&:hover:not(:disabled) {
+		background-color: hsl(var(--color-primary) / 0.7);
+		color: hsl(var(--color-white));
+	}
+
+	&:active:not(:disabled) {
+		background-color: hsl(var(--color-primary));
+		color: hsl(var(--color-white));
+	}
+
+	&:focus { box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.2); }
+	&:disabled { @include opacity-50; @include cursor-not-allowed; }
+}
+
+@mixin btn {
+	@include inline-flex;
+	@include items-center;
+	@include justify-center;
+	@include gap(0.5rem);
+	@include px(1rem);
+	@include py(0.5rem);
+	@include text-sm;
+	@include font-medium;
+	white-space: nowrap;
+}
+
+@mixin close-button {
+	background: transparent;
+	@include border-none;
+	@include text-lg;
+	color: hsl(var(--color-text-muted));
+	@include cursor-pointer;
+	@include size(2rem);
+	@include flex-center;
+	@include rounded-sm;
+	@include transition-fast;
+
+	&:hover {
+		@include text-error;
+	}
+
+	&:active {
+		color: hsl(var(--color-error-hover));
+		@include bg-body;
+	}
+
+	&:focus-visible {
+		outline: 2px solid hsl(var(--color-primary));
+		outline-offset: -2px;
+	}
+}

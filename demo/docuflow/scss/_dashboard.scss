@@ -81,7 +81,7 @@
 		@include p(0);
 		@include m(0);
 		@include flex-col;
-		gap: 1px;
+		@include gap(1px);
 	}
 
 	li {
@@ -275,8 +275,8 @@
 
 .metadata-tags {
 	list-style: none;
-	padding: 0;
-	margin: 0;
+	@include p(0);
+	@include m(0);
 	@include flex;
 	@include flex-wrap;
 	@include gap(var(--spacing-sm));

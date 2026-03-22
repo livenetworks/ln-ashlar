@@ -1,0 +1,12 @@
+// Position & Overflow
+
+@mixin relative { position: relative; }
+@mixin absolute { position: absolute; }
+@mixin fixed    { position: fixed; }
+@mixin sticky   { position: sticky; }
+
+@mixin inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+
+@mixin overflow-hidden { overflow: hidden; }
+@mixin overflow-auto   { overflow: auto; }
+@mixin overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }

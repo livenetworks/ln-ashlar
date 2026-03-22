@@ -1,0 +1,69 @@
+@use 'spacing' as *;
+@use 'display' as *;
+
+// Layout — grid, form-grid, stack, container
+
+@mixin grid {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@mixin grid-2 {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@mixin grid-4 {
+	display: grid;
+	@include gap(1.5rem);
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@media (min-width: 1024px) {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+@mixin form-grid {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	@include gap(var(--spacing-md));
+
+	@media (max-width: 767px) {
+		grid-template-columns: repeat(1, minmax(0, 1fr));
+	}
+}
+
+@mixin stack($gap: 1rem) {
+	@include flex-col;
+	@include gap($gap);
+}
+
+// Container Queries
+// Парент: @include container(name)
+// Дете:   @container name (min-width: 580px) { ... }
+//
+// ВАЖНО: НЕ комбинирај container-type со overflow:hidden на ист елемент
+//
+// Breakpoints: 480px, 580px, 880px, 1120px
+@mixin container($name: null) {
+	container-type: inline-size;
+	@if $name { container-name: $name; }
+}

@@ -30,6 +30,18 @@ a {
 	}
 }
 
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+	@include rounded-md;
+	@include cursor-pointer;
+	@include transition;
+	border: none;
+	outline: none;
+	@include btn-colors;
+}
+
 img {
 	max-width: 100%;
 	height: auto;

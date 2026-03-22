@@ -1,0 +1,7 @@
+// Shadows — референцира --shadow-* токени
+
+@mixin shadow-none { box-shadow: var(--shadow-none); }
+@mixin shadow-sm   { box-shadow: var(--shadow-sm); }
+@mixin shadow-md   { box-shadow: var(--shadow-md); }
+@mixin shadow-lg   { box-shadow: var(--shadow-lg); }
+@mixin shadow-xl   { box-shadow: var(--shadow-xl); }

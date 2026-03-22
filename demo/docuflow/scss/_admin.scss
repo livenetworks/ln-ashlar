@@ -165,7 +165,7 @@
 	form {
 		@include form-grid;
 
-		> .form-element {
+		> label {
 			grid-column: span 3;
 		}
 
@@ -184,68 +184,27 @@
 				@include px(var(--spacing-sm));
 			}
 
-			.form-element {
+			label {
 				@include flex-1;
 			}
 		}
 
 		> .form-actions {
 			grid-column: span 6;
+			border-color: hsl(var(--color-border) / 0.5);
 		}
 
-		.form-element {
-			@include m(0);
+		input[type="color"] {
+			@include h(2.5rem);
+			@include p(var(--spacing-xs));
+			@include cursor-pointer;
+		}
 
-			label {
-				@include block;
-				@include text-sm;
-				@include font-medium;
-				color: hsl(var(--color-text-secondary));
-				@include mb(var(--spacing-xs));
-			}
-
-			input[type="text"],
-			input[type="number"],
-			input[type="email"],
-			select {
-				@include w-full;
-				@include px(var(--spacing-md));
-				@include py(var(--spacing-sm));
-				@include border;
-				border-color: hsl(var(--color-border));
-				@include rounded-md;
-				@include text-sm;
-				@include transition;
-				background-color: hsl(0 0% 100%);
-
-				&:focus {
-					border-color: hsl(var(--color-primary));
-					outline: none;
-					box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.1);
-				}
-			}
-
-			input[type="color"] {
-				@include h(2.5rem);
-				@include w-full;
-				@include p(var(--spacing-xs));
-				@include border;
-				border-color: hsl(var(--color-border));
-				@include rounded-md;
-				@include cursor-pointer;
-			}
-
-			input[type="checkbox"] {
-				width: auto;
-				@include mr(var(--spacing-xs));
-			}
-
-			small {
-				@include block;
-				@include text-xs;
-				color: hsl(var(--color-text-muted));
-				@include mt(var(--spacing-xs));
-			}
+		small {
+			@include block;
+			@include text-xs;
+			color: hsl(var(--color-text-muted));
+			@include mt(var(--spacing-xs));
 		}
 
 		.validation-errors {
@@ -254,16 +213,6 @@
 			@include mt(var(--spacing-xs));
 			@include text-sm;
 			@include text-error;
-		}
-
-		.form-actions {
-			@include flex;
-			@include gap(var(--spacing-md));
-			@include justify-end;
-			@include mt(var(--spacing-lg));
-			@include pt(var(--spacing-lg));
-			@include border-t;
-			border-color: hsl(var(--color-border) / 0.5);
 		}
 	}
 }
