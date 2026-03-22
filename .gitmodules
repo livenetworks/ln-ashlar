@@ -1,0 +1,4 @@
+[submodule ".claude/skills"]
+	path = .claude/skills
+	url = https://github.com/livenetworks/claude-skills.git
+	branch = main
