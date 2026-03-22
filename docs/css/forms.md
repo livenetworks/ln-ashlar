@@ -49,7 +49,7 @@ Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<
 Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on first/last.
 
 ```html
-<ul>
+<ul class="btn-group">
   <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
   <li><label><input type="radio" name="role" value="editor" checked> Editor</label></li>
   <li><label><input type="radio" name="role" value="external"> External</label></li>

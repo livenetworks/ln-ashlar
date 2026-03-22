@@ -104,12 +104,6 @@ table th.nowrap {
 	@include whitespace-nowrap;
 }
 
-table td .actions {
-	@include flex;
-	@include gap(0.5rem);
-	@include items-center;
-}
-
 table td .action {
 	@include inline-flex;
 	@include items-center;
