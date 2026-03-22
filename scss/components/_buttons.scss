@@ -2,4 +2,7 @@
 
 .btn-group {
 	@include btn-group;
+	list-style: none;
+	@include p(0);
+	@include m(0);
 }
