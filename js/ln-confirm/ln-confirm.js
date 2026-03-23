@@ -122,13 +122,17 @@
 							_findElements(node);
 						}
 					}
+				} else if (mutations[i].type === 'attributes') {
+					_findElements(mutations[i].target);
 				}
 			}
 		});
 
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true
+			subtree: true,
+			attributes: true,
+			attributeFilter: [DOM_SELECTOR]
 		});
 	}
 

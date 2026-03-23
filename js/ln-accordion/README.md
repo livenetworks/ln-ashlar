@@ -70,7 +70,8 @@ This is the canonical example of the **Coordinator/Mediator Pattern** described 
 ## API
 
 ```javascript
-// Constructor (manual initialization)
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnAccordion(document.body);
 ```
 

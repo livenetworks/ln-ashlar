@@ -42,7 +42,8 @@ lnToast.enqueue({
 lnToast.clear();
 lnToast.clear('#my-toasts');
 
-// Manual initialization
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 lnToast(document.body);
 ```
 

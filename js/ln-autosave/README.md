@@ -24,7 +24,7 @@ form.lnAutosave.clear();    // remove saved data
 form.lnAutosave.destroy();  // cleanup listeners
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
-// For AJAX/dynamic DOM: MutationObserver auto-initializes
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnAutosave(container);
 ```
 

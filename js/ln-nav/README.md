@@ -20,7 +20,7 @@ Works with `pushState` (ln-ajax) and `popstate` (browser back/forward).
 - Trailing slash is normalized (`/users/` == `/users`)
 - On `pushState` (ln-ajax navigation) automatically updates active links
 - On `popstate` (browser back/forward) also updates
-- Dynamically added links (MutationObserver) are automatically processed
+- Dynamically added links or attribute changes (MutationObserver) are automatically processed
 
 ## HTML Structure
 

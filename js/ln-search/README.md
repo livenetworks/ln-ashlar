@@ -80,6 +80,10 @@ No extra configuration needed — the integration is automatic.
 </ul>
 ```
 
+## Auto-initialization
+
+MutationObserver auto-initializes both new DOM elements and existing elements that receive `data-ln-search` via `setAttribute`. No manual JS initialization needed.
+
 ## Combination with ln-filter
 
 `ln-search` and `ln-filter` work **independently** on the same target — each with its own hide attribute. An element is visible only when **no** hide attribute is present:

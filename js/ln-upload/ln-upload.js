@@ -386,13 +386,19 @@
 							}
 						}
 					}
+				} else if (mutation.type === 'attributes') {
+					if (mutation.target.hasAttribute(DOM_SELECTOR)) {
+						_initUpload(mutation.target);
+					}
 				}
 			}
 		});
 
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true
+			subtree: true,
+			attributes: true,
+			attributeFilter: [DOM_SELECTOR]
 		});
 	}
 

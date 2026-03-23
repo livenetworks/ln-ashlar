@@ -24,7 +24,7 @@ el.lnFilter.reset();                   // clear filter, show all
 el.lnFilter.getActive();               // { key: 'genre', value: 'rock' } or null
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
-// For AJAX/dynamic DOM: MutationObserver automatically initializes
+// For AJAX/dynamic DOM or setAttribute: MutationObserver automatically initializes
 window.lnFilter(container);
 ```
 

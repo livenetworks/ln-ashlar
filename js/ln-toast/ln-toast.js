@@ -215,12 +215,13 @@
 
 	const observer = new MutationObserver(function (muts) {
 		for (const m of muts) {
+			if (m.type === 'attributes') { _findContainers(m.target); continue; }
 			for (const n of m.addedNodes) {
 				_findContainers(n);
 			}
 		}
 	});
-	observer.observe(document.body, { childList: true, subtree: true });
+	observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
 
 	window[DOM_ATTRIBUTE] = api;
 

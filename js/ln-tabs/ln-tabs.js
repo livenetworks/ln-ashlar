@@ -134,10 +134,11 @@
 	function _domObserver() {
 		const observer = new MutationObserver(function (mutations) {
 			for (const mutation of mutations) {
+				if (mutation.type === 'attributes') { _findElements(mutation.target); continue; }
 				for (const node of mutation.addedNodes) { _findElements(node); }
 			}
 		});
-		observer.observe(document.body, { childList: true, subtree: true });
+		observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
 	}
 
 	_domObserver();

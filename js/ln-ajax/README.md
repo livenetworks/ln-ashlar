@@ -150,6 +150,7 @@ Every AJAX request sends:
 ## API
 
 ```javascript
-// Manual initialization of a new AJAX container
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnAjax(document.getElementById('new-content'));
 ```

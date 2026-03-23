@@ -53,5 +53,5 @@ document.addEventListener('ln-external-links:clicked', function(e) {
 ## Notes
 
 - Works automatically — no data attribute or manual initialization needed
-- MutationObserver watches dynamically added links
+- MutationObserver watches dynamically added links (childList only — no attribute watching needed)
 - Click tracking uses event delegation on `document.body` (one listener)

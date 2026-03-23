@@ -55,7 +55,8 @@ Style the confirming state using the `data-confirming` attribute:
 ## API
 
 ```javascript
-// Manual initialization
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnConfirm(document.body);
 
 // Access instance

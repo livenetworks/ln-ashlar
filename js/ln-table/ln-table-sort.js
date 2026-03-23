@@ -92,10 +92,12 @@
 					mutation.addedNodes.forEach(function (node) {
 						if (node.nodeType === 1) _findElements(node);
 					});
+				} else if (mutation.type === 'attributes') {
+					_findElements(mutation.target);
 				}
 			});
 		});
-		observer.observe(document.body, { childList: true, subtree: true });
+		observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [SORT_ATTR] });
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

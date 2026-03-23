@@ -142,11 +142,15 @@
 							}
 						}
 					}
+				} else if (mutation.type === 'attributes') {
+					if (mutation.target.hasAttribute && mutation.target.hasAttribute(DOM_SELECTOR)) {
+						constructor(mutation.target);
+					}
 				}
 			}
 		});
 
-		observer.observe(document.body, { childList: true, subtree: true });
+		observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

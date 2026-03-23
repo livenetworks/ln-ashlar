@@ -80,6 +80,13 @@
 	function observeDOM() {
 		const observer = new MutationObserver(function (mutations) {
 			for (const mutation of mutations) {
+				if (mutation.type === 'attributes') {
+					if (mutation.target.matches && mutation.target.matches('select[data-ln-select]')) {
+						initializeSelect(mutation.target);
+					}
+					continue;
+				}
+
 				for (const node of mutation.addedNodes) {
 					if (node.nodeType === 1) {
 						if (node.matches && node.matches('select[data-ln-select]')) {
@@ -111,6 +118,8 @@
 		observer.observe(document.body, {
 			childList: true,
 			subtree: true,
+			attributes: true,
+			attributeFilter: ['data-ln-select']
 		});
 	}
 

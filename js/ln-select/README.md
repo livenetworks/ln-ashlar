@@ -29,7 +29,8 @@ The `placeholder` attribute on `<select>` is used if set.
 ## API
 
 ```javascript
-// Manual initialization
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnSelect.initialize(selectElement);
 
 // Destroy instance

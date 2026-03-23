@@ -31,6 +31,8 @@ Sizes are applied via SCSS mixins on semantic selectors, not CSS classes:
 
 ## API
 
+Triggers with `data-ln-modal` are auto-initialized by MutationObserver (both new DOM and `setAttribute`).
+
 ```javascript
 window.lnModal.open('my-modal');
 window.lnModal.close('my-modal');

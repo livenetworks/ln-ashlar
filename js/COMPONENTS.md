@@ -131,28 +131,40 @@ window.lnToggle(container);
 
 ## MutationObserver (задолжителен)
 
-Секоја компонента мора да следи динамички додадени елементи:
+Секоја компонента мора да следи **два типа** промени:
+
+1. **`childList`** — нов елемент додаден во DOM (AJAX, `innerHTML`, `appendChild`)
+2. **`attributes`** — `data-ln-*` атрибут додаден на постоечки елемент (Inspector, `setAttribute`)
 
 ```javascript
 function _domObserver() {
     var observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
+        for (var mutation of mutations) {
             if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach(function (node) {
+                for (var node of mutation.addedNodes) {
                     if (node.nodeType === 1) {
                         _findElements(node);
                     }
-                });
+                }
+            } else if (mutation.type === 'attributes') {
+                _findElements(mutation.target);
             }
-        });
+        }
     });
 
     observer.observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
+        attributes: true,
+        attributeFilter: [DOM_SELECTOR]
     });
 }
 ```
+
+**Правила:**
+- `attributeFilter` секогаш содржи `DOM_SELECTOR` (и евентуално trigger атрибути како `'data-ln-toggle-for'`)
+- `attributeFilter` е задолжителен — без него observer-от ќе fire-ува на СЕКОЈА промена на атрибут (performance проблем)
+- При `attributes` мутација, `mutation.target` е елементот чиј атрибут е променет — повикај `_findElements` директно на него
 
 ---
 

@@ -128,13 +128,18 @@
 							_attachTriggers(node);
 						}
 					}
+				} else if (mutation.type === 'attributes') {
+					_findElements(mutation.target);
+					_attachTriggers(mutation.target);
 				}
 			}
 		});
 
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true
+			subtree: true,
+			attributes: true,
+			attributeFilter: [DOM_SELECTOR, 'data-ln-toggle-for']
 		});
 	}
 

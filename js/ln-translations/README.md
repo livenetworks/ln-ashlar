@@ -45,7 +45,7 @@ el.lnTranslations.getActiveLanguages();       // Set of active language codes
 el.lnTranslations.hasLanguage('en');          // boolean
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
-// Dynamic DOM: MutationObserver auto-initializes
+// Dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnTranslations(container);
 ```
 

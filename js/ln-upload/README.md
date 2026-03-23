@@ -49,7 +49,8 @@ uploader.lnUploadAPI.getFileIds();   // [1, 2, 3] — server IDs
 uploader.lnUploadAPI.getFiles();     // [{serverId, name, size}, ...]
 uploader.lnUploadAPI.clear();        // Deletes everything (from server too)
 
-// Global API
+// Global API — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnUpload.init(containerElement);  // Manual initialization
 window.lnUpload.initAll();               // Initialize all
 ```

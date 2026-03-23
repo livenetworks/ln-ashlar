@@ -69,7 +69,8 @@ location.hash = 'user-tabs:settings';
 // Multiple sections via hash
 location.hash = 'user-tabs:settings&project-tabs:members';
 
-// Constructor (manual initialization)
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnTabs(document.body);
 ```
 

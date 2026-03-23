@@ -220,13 +220,17 @@
 							}
 						}
 					}
+				} else if (mutation.type === 'attributes') {
+					_constructor(mutation.target);
 				}
 			}
 		});
 
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true
+			subtree: true,
+			attributes: true,
+			attributeFilter: [DOM_SELECTOR]
 		});
 	}
 

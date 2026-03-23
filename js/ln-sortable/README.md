@@ -20,7 +20,7 @@ list.lnSortable.disable();
 list.lnSortable.isEnabled;  // boolean
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
-// For AJAX/dynamic DOM: MutationObserver auto-initializes
+// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnSortable(container);
 ```
 
