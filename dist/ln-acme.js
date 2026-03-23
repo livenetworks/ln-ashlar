@@ -15,7 +15,7 @@
     });
     return e.dispatchEvent(t), t;
   }
-  function g(e) {
+  function b(e) {
     if (!e.hasAttribute(h) || e[c]) return;
     e[c] = !0;
     const n = d(e);
@@ -56,7 +56,7 @@
       const L = t.querySelector(".ln-ajax-spinner");
       L && L.remove(), s && s();
     }
-    let b = n;
+    let g = n;
     const E = document.querySelector('meta[name="csrf-token"]'), w = E ? E.getAttribute("content") : null;
     o instanceof FormData && w && o.append("_token", w);
     const A = {
@@ -68,9 +68,9 @@
     };
     if (w && (A.headers["X-CSRF-TOKEN"] = w), e === "GET" && o) {
       const L = new URLSearchParams(o);
-      b = n + (n.includes("?") ? "&" : "?") + L.toString();
+      g = n + (n.includes("?") ? "&" : "?") + L.toString();
     } else e !== "GET" && o && (A.body = o);
-    fetch(b, A).then(function(L) {
+    fetch(g, A).then(function(L) {
       var C = L.ok;
       return L.json().then(function(T) {
         return { ok: C, status: L.status, data: T };
@@ -86,10 +86,10 @@
         if (t.tagName === "A") {
           const O = t.getAttribute("href");
           O && window.history.pushState({ ajax: !0 }, "", O);
-        } else t.tagName === "FORM" && t.method.toUpperCase() === "GET" && window.history.pushState({ ajax: !0 }, "", b);
-        _(t, "ln-ajax:success", { method: e, url: b, data: C });
+        } else t.tagName === "FORM" && t.method.toUpperCase() === "GET" && window.history.pushState({ ajax: !0 }, "", g);
+        _(t, "ln-ajax:success", { method: e, url: g, data: C });
       } else
-        _(t, "ln-ajax:error", { method: e, url: b, status: L.status, data: C });
+        _(t, "ln-ajax:error", { method: e, url: g, status: L.status, data: C });
       if (C.message && window.lnToast) {
         var T = C.message;
         window.lnToast.enqueue({
@@ -98,9 +98,9 @@
           message: T.body || ""
         });
       }
-      _(t, "ln-ajax:complete", { method: e, url: b }), u();
+      _(t, "ln-ajax:complete", { method: e, url: g }), u();
     }).catch(function(L) {
-      _(t, "ln-ajax:error", { method: e, url: b, error: L }), _(t, "ln-ajax:complete", { method: e, url: b }), u();
+      _(t, "ln-ajax:error", { method: e, url: g, error: L }), _(t, "ln-ajax:complete", { method: e, url: g }), u();
     });
   }
   function d(e) {
@@ -112,16 +112,16 @@
       for (const o of n)
         if (o.type === "childList") {
           for (const t of o.addedNodes)
-            if (t.nodeType === 1 && (g(t), !t.hasAttribute(h))) {
+            if (t.nodeType === 1 && (b(t), !t.hasAttribute(h))) {
               for (const a of t.querySelectorAll("[" + h + "]"))
-                g(a);
+                b(a);
               const s = t.closest && t.closest("[" + h + "]");
               if (s && s.getAttribute(h) !== "false") {
                 const a = d(t);
                 m(a.links), v(a.forms);
               }
             }
-        } else o.type === "attributes" && g(o.target);
+        } else o.type === "attributes" && b(o.target);
     }).observe(document.body, {
       childList: !0,
       subtree: !0,
@@ -131,9 +131,9 @@
   }
   function i() {
     for (const e of document.querySelectorAll("[" + h + "]"))
-      g(e);
+      b(e);
   }
-  window[c] = g, r(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", i) : i();
+  window[c] = b, r(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", i) : i();
 })();
 (function() {
   const h = "data-ln-modal", c = "lnModal";
@@ -152,7 +152,7 @@
     });
     return e.dispatchEvent(o), o;
   }
-  function g(e) {
+  function b(e) {
     const n = document.getElementById(e);
     if (!n) {
       console.warn('[ln-modal] Modal with ID "' + e + '" not found');
@@ -170,7 +170,7 @@
       console.warn('[ln-modal] Modal with ID "' + e + '" not found');
       return;
     }
-    n.classList.contains("ln-modal--open") ? m(e) : g(e);
+    n.classList.contains("ln-modal--open") ? m(e) : b(e);
   }
   function f(e) {
     const n = e.querySelectorAll("[data-ln-modal-close]");
@@ -224,7 +224,7 @@
     });
   }
   window[c] = {
-    open: g,
+    open: b,
     close: m,
     toggle: v
   }, i(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", r) : r();
@@ -241,7 +241,7 @@
         e();
     }, history._lnNavPatched = !0;
   }
-  function g(i) {
+  function b(i) {
     if (!i.hasAttribute(h) || _.has(i)) return;
     const e = i.getAttribute(h);
     if (!e) return;
@@ -275,8 +275,8 @@
                 });
               else if (l.querySelectorAll) {
                 const u = Array.from(l.querySelectorAll("a"));
-                n = n.filter(function(b) {
-                  return !u.includes(b);
+                n = n.filter(function(g) {
+                  return !u.includes(g);
                 });
               }
             }
@@ -317,16 +317,16 @@
       for (const n of e)
         if (n.type === "childList") {
           for (const o of n.addedNodes)
-            if (o.nodeType === 1 && (o.hasAttribute && o.hasAttribute(h) && g(o), o.querySelectorAll))
+            if (o.nodeType === 1 && (o.hasAttribute && o.hasAttribute(h) && b(o), o.querySelectorAll))
               for (const t of o.querySelectorAll("[" + h + "]"))
-                g(t);
-        } else n.type === "attributes" && n.target.hasAttribute && n.target.hasAttribute(h) && g(n.target);
+                b(t);
+        } else n.type === "attributes" && n.target.hasAttribute && n.target.hasAttribute(h) && b(n.target);
     }).observe(document.body, { childList: !0, subtree: !0, attributes: !0, attributeFilter: [h] });
   }
-  window[c] = g;
+  window[c] = b;
   function r() {
     for (const i of document.querySelectorAll("[" + h + "]"))
-      g(i);
+      b(i);
   }
   d(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", r) : r();
 })();
@@ -377,7 +377,7 @@
     const f = c.get(v);
     f && (f.destroy(), c.delete(v));
   }
-  function g() {
+  function b() {
     for (const v of document.querySelectorAll("select[data-ln-select]"))
       _(v);
   }
@@ -405,8 +405,8 @@
     });
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
-    g(), m();
-  }) : (g(), m()), window.lnSelect = {
+    b(), m();
+  }) : (b(), m()), window.lnSelect = {
     initialize: _,
     destroy: p,
     getInstance: function(v) {
@@ -427,7 +427,7 @@
     for (const e of i)
       e[c] || (e[c] = new m(e));
   }
-  function g() {
+  function b() {
     const r = (location.hash || "").replace("#", ""), i = {};
     if (!r) return i;
     for (const e of r.split("&")) {
@@ -460,7 +460,7 @@
         const o = (i.getAttribute("data-ln-tab") || "").toLowerCase().trim();
         if (o)
           if (r.hashEnabled) {
-            const t = g();
+            const t = b();
             t[r.nsKey] = o;
             const s = Object.keys(t).map(function(a) {
               return a + ":" + t[a];
@@ -473,7 +473,7 @@
     }
     this._hashHandler = function() {
       if (!r.hashEnabled) return;
-      const i = g();
+      const i = b();
       r.activate(r.nsKey in i ? i[r.nsKey] : r.defaultKey);
     }, this.hashEnabled ? (window.addEventListener("hashchange", this._hashHandler), this._hashHandler()) : this.activate(this.defaultKey);
   }
@@ -524,7 +524,7 @@
   const h = "data-ln-toggle", c = "lnToggle";
   if (window[c] !== void 0) return;
   function _(r) {
-    p(r), g(r);
+    p(r), b(r);
   }
   function p(r) {
     const i = Array.from(r.querySelectorAll("[" + h + "]"));
@@ -532,7 +532,7 @@
     for (const e of i)
       e[c] || (e[c] = new m(e));
   }
-  function g(r) {
+  function b(r) {
     const i = Array.from(r.querySelectorAll("[data-ln-toggle-for]"));
     r.hasAttribute && r.hasAttribute("data-ln-toggle-for") && i.push(r);
     for (const e of i) {
@@ -584,8 +584,8 @@
       for (const e of i)
         if (e.type === "childList")
           for (const n of e.addedNodes)
-            n.nodeType === 1 && (p(n), g(n));
-        else e.type === "attributes" && (p(e.target), g(e.target));
+            n.nodeType === 1 && (p(n), b(n));
+        else e.type === "attributes" && (p(e.target), b(e.target));
     }).observe(document.body, {
       childList: !0,
       subtree: !0,
@@ -607,9 +607,9 @@
     const d = Array.from(f.querySelectorAll("[" + h + "]"));
     f.hasAttribute && f.hasAttribute(h) && d.push(f);
     for (const r of d)
-      r[c] || (r[c] = new g(r));
+      r[c] || (r[c] = new b(r));
   }
-  function g(f) {
+  function b(f) {
     return this.dom = f, this._onToggleOpen = function(d) {
       const r = f.querySelectorAll("[data-ln-toggle]");
       for (const i of r)
@@ -617,7 +617,7 @@
       m(f, "ln-accordion:change", { target: d.detail.target });
     }, f.addEventListener("ln-toggle:open", this._onToggleOpen), this;
   }
-  g.prototype.destroy = function() {
+  b.prototype.destroy = function() {
     this.dom[c] && (this.dom.removeEventListener("ln-toggle:open", this._onToggleOpen), m(this.dom, "ln-accordion:destroyed", { target: this.dom }), delete this.dom[c]);
   };
   function m(f, d, r) {
@@ -654,33 +654,34 @@
     const d = Array.from(f.querySelectorAll("[" + h + "]"));
     f.hasAttribute && f.hasAttribute(h) && d.push(f);
     for (const r of d)
-      r[c] || (r[c] = new g(r));
+      r[c] || (r[c] = new b(r));
   }
-  function g(f) {
-    this.dom = f, this.toggleEl = f.querySelector("[data-ln-toggle]"), this._boundDocClick = null, this._boundScrollClose = null, this._menuParent = null, this._placeholder = null, this.toggleEl && this.toggleEl.setAttribute("data-ln-dropdown-menu", "");
+  function b(f) {
+    this.dom = f, this.toggleEl = f.querySelector("[data-ln-toggle]"), this._boundDocClick = null, this._boundScrollReposition = null, this._boundResizeClose = null, this._menuParent = null, this._placeholder = null, this.toggleEl && this.toggleEl.setAttribute("data-ln-dropdown-menu", "");
     const d = this;
     return this._onToggleOpen = function(r) {
-      r.detail.target === d.toggleEl && (d._teleportToBody(), d._addOutsideClickListener(), d._addScrollCloseListener(), m(f, "ln-dropdown:open", { target: r.detail.target }));
+      r.detail.target === d.toggleEl && (d._teleportToBody(), d._addOutsideClickListener(), d._addScrollRepositionListener(), d._addResizeCloseListener(), m(f, "ln-dropdown:open", { target: r.detail.target }));
     }, this._onToggleClose = function(r) {
-      r.detail.target === d.toggleEl && (d._removeOutsideClickListener(), d._removeScrollCloseListener(), d._teleportBack(), m(f, "ln-dropdown:close", { target: r.detail.target }));
+      r.detail.target === d.toggleEl && (d._removeOutsideClickListener(), d._removeScrollRepositionListener(), d._removeResizeCloseListener(), d._teleportBack(), m(f, "ln-dropdown:close", { target: r.detail.target }));
     }, this.toggleEl.addEventListener("ln-toggle:open", this._onToggleOpen), this.toggleEl.addEventListener("ln-toggle:close", this._onToggleClose), this;
   }
-  g.prototype._teleportToBody = function() {
-    if (!this.toggleEl || this.toggleEl.parentNode === document.body) return;
+  b.prototype._positionMenu = function() {
     const f = this.dom.querySelector("[data-ln-toggle-for]");
-    if (!f) return;
-    const d = f.getBoundingClientRect();
-    this._menuParent = this.toggleEl.parentNode, this._placeholder = document.createComment("ln-dropdown"), this._menuParent.insertBefore(this._placeholder, this.toggleEl), document.body.appendChild(this.toggleEl), this.toggleEl.style.position = "fixed", this.toggleEl.style.visibility = "hidden", this.toggleEl.style.display = "block";
-    const r = this.toggleEl.offsetWidth, i = this.toggleEl.offsetHeight;
-    this.toggleEl.style.visibility = "", this.toggleEl.style.display = "";
-    const e = window.innerWidth, n = window.innerHeight, o = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--spacing-xs")) * 16 || 4;
-    var t;
-    d.bottom + o + i <= n ? t = d.bottom + o : d.top - o - i >= 0 ? t = d.top - o - i : t = Math.max(0, n - i);
+    if (!f || !this.toggleEl) return;
+    const d = f.getBoundingClientRect(), r = this.toggleEl.style.display === "none" || this.toggleEl.style.display === "";
+    r && (this.toggleEl.style.visibility = "hidden", this.toggleEl.style.display = "block");
+    const i = this.toggleEl.offsetWidth, e = this.toggleEl.offsetHeight;
+    r && (this.toggleEl.style.visibility = "", this.toggleEl.style.display = "");
+    const n = window.innerWidth, o = window.innerHeight, t = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--spacing-xs")) * 16 || 4;
     var s;
-    d.right - r >= 0 ? s = d.right - r : d.left + r <= e ? s = d.left : s = Math.max(0, e - r), this.toggleEl.style.top = t + "px", this.toggleEl.style.left = s + "px", this.toggleEl.style.right = "auto", this.toggleEl.style.transform = "none", this.toggleEl.style.margin = "0";
-  }, g.prototype._teleportBack = function() {
+    d.bottom + t + e <= o ? s = d.bottom + t : d.top - t - e >= 0 ? s = d.top - t - e : s = Math.max(0, o - e);
+    var a;
+    d.right - i >= 0 ? a = d.right - i : d.left + i <= n ? a = d.left : a = Math.max(0, n - i), this.toggleEl.style.top = s + "px", this.toggleEl.style.left = a + "px", this.toggleEl.style.right = "auto", this.toggleEl.style.transform = "none", this.toggleEl.style.margin = "0";
+  }, b.prototype._teleportToBody = function() {
+    !this.toggleEl || this.toggleEl.parentNode === document.body || (this._menuParent = this.toggleEl.parentNode, this._placeholder = document.createComment("ln-dropdown"), this._menuParent.insertBefore(this._placeholder, this.toggleEl), document.body.appendChild(this.toggleEl), this.toggleEl.style.position = "fixed", this._positionMenu());
+  }, b.prototype._teleportBack = function() {
     !this._placeholder || !this._menuParent || (this.toggleEl.style.position = "", this.toggleEl.style.top = "", this.toggleEl.style.left = "", this.toggleEl.style.right = "", this.toggleEl.style.transform = "", this.toggleEl.style.margin = "", this._menuParent.insertBefore(this.toggleEl, this._placeholder), this._menuParent.removeChild(this._placeholder), this._menuParent = null, this._placeholder = null);
-  }, g.prototype._addOutsideClickListener = function() {
+  }, b.prototype._addOutsideClickListener = function() {
     if (this._boundDocClick) return;
     const f = this;
     this._boundDocClick = function(d) {
@@ -688,17 +689,24 @@
     }, setTimeout(function() {
       document.addEventListener("click", f._boundDocClick);
     }, 0);
-  }, g.prototype._removeOutsideClickListener = function() {
+  }, b.prototype._removeOutsideClickListener = function() {
     this._boundDocClick && (document.removeEventListener("click", this._boundDocClick), this._boundDocClick = null);
-  }, g.prototype._addScrollCloseListener = function() {
+  }, b.prototype._addScrollRepositionListener = function() {
     const f = this;
-    this._boundScrollClose = function() {
+    this._boundScrollReposition = function() {
+      f._positionMenu();
+    }, window.addEventListener("scroll", this._boundScrollReposition, { passive: !0, capture: !0 });
+  }, b.prototype._removeScrollRepositionListener = function() {
+    this._boundScrollReposition && (window.removeEventListener("scroll", this._boundScrollReposition, { capture: !0 }), this._boundScrollReposition = null);
+  }, b.prototype._addResizeCloseListener = function() {
+    const f = this;
+    this._boundResizeClose = function() {
       f.toggleEl && f.toggleEl.dispatchEvent(new CustomEvent("ln-toggle:request-close"));
-    }, window.addEventListener("scroll", this._boundScrollClose, { passive: !0, capture: !0 }), window.addEventListener("resize", this._boundScrollClose);
-  }, g.prototype._removeScrollCloseListener = function() {
-    this._boundScrollClose && (window.removeEventListener("scroll", this._boundScrollClose, { capture: !0 }), window.removeEventListener("resize", this._boundScrollClose), this._boundScrollClose = null);
-  }, g.prototype.destroy = function() {
-    this.dom[c] && (this._removeOutsideClickListener(), this._removeScrollCloseListener(), this._teleportBack(), this.toggleEl.removeEventListener("ln-toggle:open", this._onToggleOpen), this.toggleEl.removeEventListener("ln-toggle:close", this._onToggleClose), m(this.dom, "ln-dropdown:destroyed", { target: this.dom }), delete this.dom[c]);
+    }, window.addEventListener("resize", this._boundResizeClose);
+  }, b.prototype._removeResizeCloseListener = function() {
+    this._boundResizeClose && (window.removeEventListener("resize", this._boundResizeClose), this._boundResizeClose = null);
+  }, b.prototype.destroy = function() {
+    this.dom[c] && (this._removeOutsideClickListener(), this._removeScrollRepositionListener(), this._removeResizeCloseListener(), this._teleportBack(), this.toggleEl.removeEventListener("ln-toggle:open", this._onToggleOpen), this.toggleEl.removeEventListener("ln-toggle:close", this._onToggleClose), m(this.dom, "ln-dropdown:destroyed", { target: this.dom }), delete this.dom[c]);
   };
   function m(f, d, r) {
     f.dispatchEvent(new CustomEvent(d, {
@@ -733,9 +741,9 @@
   };
   if (window[c] !== void 0 && window[c] !== null) return;
   function p(o = document.body) {
-    return g(o), e;
+    return b(o), e;
   }
-  function g(o) {
+  function b(o) {
     if (!o || o.nodeType !== 1) return;
     const t = Array.from(o.querySelectorAll("[" + h + "]"));
     o.hasAttribute && o.hasAttribute(h) && t.push(o);
@@ -762,20 +770,20 @@
     l.className = "ln-toast__card ln-toast__card--" + t, l.setAttribute("role", t === "error" ? "alert" : "status"), l.setAttribute("aria-live", t === "error" ? "assertive" : "polite");
     const u = document.createElement("div");
     u.className = "ln-toast__side", u.innerHTML = _[t] || _.info;
-    const b = document.createElement("div");
-    b.className = "ln-toast__content";
+    const g = document.createElement("div");
+    g.className = "ln-toast__content";
     const E = document.createElement("div");
     E.className = "ln-toast__head";
     const w = document.createElement("strong");
     w.className = "ln-toast__title", w.textContent = s || (t === "success" ? "Success" : t === "error" ? "Error" : t === "warn" ? "Warning" : "Information");
     const A = document.createElement("button");
-    if (A.type = "button", A.className = "ln-toast__close ln-icon-close", A.setAttribute("aria-label", "Close"), A.addEventListener("click", () => d(o)), E.appendChild(w), b.appendChild(E), b.appendChild(A), a) {
+    if (A.type = "button", A.className = "ln-toast__close ln-icon-close", A.setAttribute("aria-label", "Close"), A.addEventListener("click", () => d(o)), E.appendChild(w), g.appendChild(E), g.appendChild(A), a) {
       const L = document.createElement("div");
       L.className = "ln-toast__body";
       const C = document.createElement("p");
-      C.textContent = a, L.appendChild(C), b.appendChild(L);
+      C.textContent = a, L.appendChild(C), g.appendChild(L);
     }
-    l.appendChild(u), l.appendChild(b), o.innerHTML = "", o.appendChild(l), requestAnimationFrame(() => o.classList.add("ln-toast__item--in"));
+    l.appendChild(u), l.appendChild(g), o.innerHTML = "", o.appendChild(l), requestAnimationFrame(() => o.classList.add("ln-toast__item--in"));
   }
   function f(o, t) {
     for (; o.dom.children.length >= o.max; ) o.dom.removeChild(o.dom.firstElementChild);
@@ -792,8 +800,8 @@
       return console.warn("[ln-toast] No toast container found"), null;
     const s = t[c] || new m(t), a = Number.isFinite(o.timeout) ? o.timeout : s.timeoutDefault, l = (o.type || "info").toLowerCase(), u = document.createElement("li");
     u.className = "ln-toast__item";
-    const b = document.createElement("div");
-    b.className = "ln-toast__card ln-toast__card--" + l, b.setAttribute("role", l === "error" ? "alert" : "status"), b.setAttribute("aria-live", l === "error" ? "assertive" : "polite");
+    const g = document.createElement("div");
+    g.className = "ln-toast__card ln-toast__card--" + l, g.setAttribute("role", l === "error" ? "alert" : "status"), g.setAttribute("aria-live", l === "error" ? "assertive" : "polite");
     const E = document.createElement("div");
     E.className = "ln-toast__side", E.innerHTML = _[l] || _.info;
     const w = document.createElement("div");
@@ -827,7 +835,7 @@
       }
       w.appendChild(T);
     }
-    return b.appendChild(E), b.appendChild(w), u.appendChild(b), f(s, u), a > 0 && (u._timer = setTimeout(() => d(u), a)), u;
+    return g.appendChild(E), g.appendChild(w), u.appendChild(g), f(s, u), a > 0 && (u._timer = setTimeout(() => d(u), a)), u;
   }
   function i(o) {
     let t = o;
@@ -841,18 +849,18 @@
   e.enqueue = r, e.clear = i, new MutationObserver(function(o) {
     for (const t of o) {
       if (t.type === "attributes") {
-        g(t.target);
+        b(t.target);
         continue;
       }
       for (const s of t.addedNodes)
-        g(s);
+        b(s);
     }
   }).observe(document.body, { childList: !0, subtree: !0, attributes: !0, attributeFilter: [h] }), window[c] = e, window.addEventListener("ln-toast:enqueue", function(o) {
     o.detail && e.enqueue(o.detail);
   }), p(document.body);
 })();
 (function() {
-  const h = "data-ln-upload", c = "lnUpload", _ = "data-ln-upload-dict", p = "data-ln-upload-accept", g = "data-ln-upload-context";
+  const h = "data-ln-upload", c = "lnUpload", _ = "data-ln-upload-dict", p = "data-ln-upload-accept", b = "data-ln-upload-context";
   if (window[c] !== void 0) return;
   function m(t, s) {
     const a = t.querySelector("[" + _ + '="' + s + '"]');
@@ -894,7 +902,7 @@
     u || (u = document.createElement("input"), u.type = "file", u.multiple = !0, u.style.display = "none", l && (u.accept = l.split(",").map(function(y) {
       return y = y.trim(), y.startsWith(".") ? y : "." + y;
     }).join(",")), t.appendChild(u));
-    const b = t.getAttribute(h) || "/files/upload", E = t.getAttribute(g) || "", w = /* @__PURE__ */ new Map();
+    const g = t.getAttribute(h) || "/files/upload", E = t.getAttribute(b) || "", w = /* @__PURE__ */ new Map();
     let A = 0;
     function L() {
       const y = document.querySelector('meta[name="csrf-token"]');
@@ -915,25 +923,25 @@
         }));
         return;
       }
-      const q = "file-" + ++A, x = f(y.name), R = d(x), k = document.createElement("li");
-      k.className = "ln-upload__item ln-upload__item--uploading " + R, k.setAttribute("data-file-id", q);
-      const P = document.createElement("span");
-      P.className = "ln-upload__name", P.textContent = y.name;
-      const N = document.createElement("span");
-      N.className = "ln-upload__size", N.textContent = "0%";
-      const I = document.createElement("button");
-      I.type = "button", I.className = "ln-upload__remove ln-icon-close", I.title = m(t, "remove"), I.textContent = "×", I.disabled = !0;
-      const H = document.createElement("div");
-      H.className = "ln-upload__progress";
+      const q = "file-" + ++A, x = f(y.name), N = d(x), k = document.createElement("li");
+      k.className = "ln-upload__item ln-upload__item--uploading " + N, k.setAttribute("data-file-id", q);
+      const H = document.createElement("span");
+      H.className = "ln-upload__name", H.textContent = y.name;
+      const I = document.createElement("span");
+      I.className = "ln-upload__size", I.textContent = "0%";
+      const R = document.createElement("button");
+      R.type = "button", R.className = "ln-upload__remove ln-icon-close", R.title = m(t, "remove"), R.textContent = "×", R.disabled = !0;
+      const P = document.createElement("div");
+      P.className = "ln-upload__progress";
       const F = document.createElement("div");
-      F.className = "ln-upload__progress-bar", H.appendChild(F), k.appendChild(P), k.appendChild(N), k.appendChild(I), k.appendChild(H), a.appendChild(k);
-      const U = new FormData();
-      U.append("file", y), U.append("context", E);
+      F.className = "ln-upload__progress-bar", P.appendChild(F), k.appendChild(H), k.appendChild(I), k.appendChild(R), k.appendChild(P), a.appendChild(k);
+      const z = new FormData();
+      z.append("file", y), z.append("context", E);
       const M = new XMLHttpRequest();
       M.upload.addEventListener("progress", function(S) {
         if (S.lengthComputable) {
           const B = Math.round(S.loaded / S.total * 100);
-          F.style.width = B + "%", N.textContent = B + "%";
+          F.style.width = B + "%", I.textContent = B + "%";
         }
       }), M.addEventListener("load", function() {
         if (M.status >= 200 && M.status < 300) {
@@ -941,10 +949,10 @@
           try {
             S = JSON.parse(M.responseText);
           } catch {
-            z("Invalid response");
+            U("Invalid response");
             return;
           }
-          k.classList.remove("ln-upload__item--uploading"), N.textContent = v(S.size || y.size), I.disabled = !1, w.set(q, {
+          k.classList.remove("ln-upload__item--uploading"), I.textContent = v(S.size || y.size), R.disabled = !1, w.set(q, {
             serverId: S.id,
             name: S.name,
             size: S.size
@@ -959,13 +967,13 @@
             S = JSON.parse(M.responseText).message || S;
           } catch {
           }
-          z(S);
+          U(S);
         }
       }), M.addEventListener("error", function() {
-        z("Network error");
+        U("Network error");
       });
-      function z(S) {
-        k.classList.remove("ln-upload__item--uploading"), k.classList.add("ln-upload__item--error"), F.style.width = "100%", N.textContent = m(t, "error"), I.disabled = !1, i(t, "ln-upload:error", {
+      function U(S) {
+        k.classList.remove("ln-upload__item--uploading"), k.classList.add("ln-upload__item--error"), F.style.width = "100%", I.textContent = m(t, "error"), R.disabled = !1, i(t, "ln-upload:error", {
           file: y,
           message: S
         }), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
@@ -976,7 +984,7 @@
           }
         }));
       }
-      M.open("POST", b), M.setRequestHeader("X-CSRF-TOKEN", L()), M.setRequestHeader("Accept", "application/json"), M.send(U);
+      M.open("POST", g), M.setRequestHeader("X-CSRF-TOKEN", L()), M.setRequestHeader("Accept", "application/json"), M.send(z);
     }
     function T() {
       for (const y of t.querySelectorAll('input[name="file_ids[]"]'))
@@ -998,8 +1006,8 @@
           "X-CSRF-TOKEN": L(),
           Accept: "application/json"
         }
-      }).then(function(R) {
-        R.status === 200 ? (x && x.remove(), w.delete(y), T(), i(t, "ln-upload:removed", {
+      }).then(function(N) {
+        N.status === 200 ? (x && x.remove(), w.delete(y), T(), i(t, "ln-upload:removed", {
           localId: y,
           serverId: q.serverId
         })) : (x && x.classList.remove("ln-upload__item--deleting"), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
@@ -1009,8 +1017,8 @@
             message: m(t, "delete-error") || "Failed to delete file"
           }
         })));
-      }).catch(function(R) {
-        console.warn("[ln-upload] Delete error:", R), x && x.classList.remove("ln-upload__item--deleting"), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
+      }).catch(function(N) {
+        console.warn("[ln-upload] Delete error:", N), x && x.classList.remove("ln-upload__item--deleting"), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
           detail: {
             type: "error",
             title: "Network Error",
@@ -1108,7 +1116,7 @@
       href: d.href
     }));
   }
-  function g(d) {
+  function b(d) {
     d = d || document.body;
     for (const r of d.querySelectorAll("a, area"))
       p(r);
@@ -1139,26 +1147,26 @@
   }
   function f() {
     m(), v(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
-      g();
-    }) : g();
+      b();
+    }) : b();
   }
   window[h] = {
-    process: g
+    process: b
   }, f();
 })();
 (function() {
   const h = "data-ln-link", c = "lnLink";
   if (window[c] !== void 0) return;
   function _(a, l, u) {
-    const b = new CustomEvent(l, {
+    const g = new CustomEvent(l, {
       bubbles: !0,
       cancelable: !0,
       detail: u || {}
     });
-    return a.dispatchEvent(b), b;
+    return a.dispatchEvent(g), g;
   }
   let p = null;
-  function g() {
+  function b() {
     p = document.createElement("div"), p.className = "ln-link-status", document.body.appendChild(p);
   }
   function m(a) {
@@ -1171,13 +1179,13 @@
     if (l.target.closest("a, button, input, select, textarea")) return;
     const u = a.querySelector("a");
     if (!u) return;
-    const b = u.getAttribute("href");
-    if (!b) return;
+    const g = u.getAttribute("href");
+    if (!g) return;
     if (l.ctrlKey || l.metaKey || l.button === 1) {
-      window.open(b, "_blank");
+      window.open(g, "_blank");
       return;
     }
-    _(a, "ln-link:navigate", { target: a, href: b, link: u }).defaultPrevented || u.click();
+    _(a, "ln-link:navigate", { target: a, href: g, link: u }).defaultPrevented || u.click();
   }
   function d(a) {
     const l = a.querySelector("a");
@@ -1201,8 +1209,8 @@
     const l = a.tagName;
     if (l === "TABLE" || l === "TBODY") {
       const u = l === "TABLE" && a.querySelector("tbody") || a;
-      for (const b of u.querySelectorAll("tr"))
-        i(b);
+      for (const g of u.querySelectorAll("tr"))
+        i(g);
     } else i(a);
   }
   function n(a) {
@@ -1215,8 +1223,8 @@
     new MutationObserver(function(l) {
       for (const u of l)
         if (u.type === "childList")
-          for (const b of u.addedNodes)
-            b.nodeType === 1 && (n(b), b.tagName === "TR" && b.closest("[" + h + "]") && i(b));
+          for (const g of u.addedNodes)
+            g.nodeType === 1 && (n(g), g.tagName === "TR" && g.closest("[" + h + "]") && i(g));
         else u.type === "attributes" && n(u.target);
     }).observe(document.body, {
       childList: !0,
@@ -1230,7 +1238,7 @@
   }
   window[c] = { init: t };
   function s() {
-    g(), o(), t(document.body);
+    b(), o(), t(document.body);
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", s) : s();
 })();
@@ -1244,7 +1252,7 @@
   function p(e) {
     m(e);
   }
-  function g(e, n, o) {
+  function b(e, n, o) {
     e.dispatchEvent(new CustomEvent(n, {
       bubbles: !0,
       detail: o || {}
@@ -1302,14 +1310,14 @@
   function i() {
     const e = parseFloat(this.dom.getAttribute("data-ln-progress")) || 0, n = this.dom.parentElement, t = (n && n.hasAttribute("data-ln-progress-max") ? parseFloat(n.getAttribute("data-ln-progress-max")) : null) || parseFloat(this.dom.getAttribute("data-ln-progress-max")) || 100;
     let s = t > 0 ? e / t * 100 : 0;
-    s < 0 && (s = 0), s > 100 && (s = 100), this.dom.style.width = s + "%", g(this.dom, "ln-progress:change", { target: this.dom, value: e, max: t, percentage: s });
+    s < 0 && (s = 0), s > 100 && (s = 100), this.dom.style.width = s + "%", b(this.dom, "ln-progress:change", { target: this.dom, value: e, max: t, percentage: s });
   }
   window[c] = p, document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
     p(document.body);
   }) : p(document.body);
 })();
 (function() {
-  const h = "data-ln-filter", c = "lnFilter", _ = "data-ln-filter-initialized", p = "data-ln-filter-key", g = "data-ln-filter-value", m = "data-ln-filter-hide", v = "data-active";
+  const h = "data-ln-filter", c = "lnFilter", _ = "data-ln-filter-initialized", p = "data-ln-filter-key", b = "data-ln-filter-value", m = "data-ln-filter-hide", v = "data-active";
   if (window[c] !== void 0) return;
   function f(n) {
     d(n);
@@ -1327,7 +1335,7 @@
     var n = this;
     this.buttons.forEach(function(o) {
       o[c + "Bound"] || (o[c + "Bound"] = !0, o.addEventListener("click", function() {
-        var t = o.getAttribute(p), s = o.getAttribute(g);
+        var t = o.getAttribute(p), s = o.getAttribute(b);
         s === "" ? n.reset() : (n._setActive(o), n._applyFilter(t, s), i(n.dom, "ln-filter:changed", { key: t, value: s }));
       }));
     });
@@ -1346,7 +1354,7 @@
     this._setActive(null);
     for (var t = 0; t < this.buttons.length; t++) {
       var s = this.buttons[t];
-      if (s.getAttribute(p) === n && s.getAttribute(g) === o) {
+      if (s.getAttribute(p) === n && s.getAttribute(b) === o) {
         this._setActive(s);
         break;
       }
@@ -1358,7 +1366,7 @@
       for (var o = Array.from(n.children), t = 0; t < o.length; t++)
         o[t].removeAttribute(m);
     for (var s = null, t = 0; t < this.buttons.length; t++)
-      if (this.buttons[t].getAttribute(g) === "") {
+      if (this.buttons[t].getAttribute(b) === "") {
         s = this.buttons[t];
         break;
       }
@@ -1457,9 +1465,9 @@
   const h = "lnTableSort", c = "data-ln-sort", _ = "data-ln-sort-active";
   if (window[h] !== void 0) return;
   function p(d) {
-    g(d);
+    b(d);
   }
-  function g(d) {
+  function b(d) {
     var r = Array.from(d.querySelectorAll("table"));
     d.tagName === "TABLE" && r.push(d), r.forEach(function(i) {
       if (!i[h]) {
@@ -1497,8 +1505,8 @@
     var d = new MutationObserver(function(r) {
       r.forEach(function(i) {
         i.type === "childList" ? i.addedNodes.forEach(function(e) {
-          e.nodeType === 1 && g(e);
-        }) : i.type === "attributes" && g(i.target);
+          e.nodeType === 1 && b(e);
+        }) : i.type === "attributes" && b(i.target);
       });
     });
     d.observe(document.body, { childList: !0, subtree: !0, attributes: !0, attributeFilter: [c] });
@@ -1555,14 +1563,14 @@
       t[s] = o[s].getAttribute(_);
     n.length > 0 && (this._rowHeight = n[0].offsetHeight || 40), this._lockColumnWidths();
     for (var a = 0; a < n.length; a++) {
-      for (var l = n[a], u = [], b = [], E = 0; E < l.cells.length; E++) {
+      for (var l = n[a], u = [], g = [], E = 0; E < l.cells.length; E++) {
         var w = l.cells[E], A = w.textContent.trim(), L = w.hasAttribute("data-ln-value") ? w.getAttribute("data-ln-value") : A, C = t[E];
-        C === "number" || C === "date" ? u[E] = parseFloat(L) || 0 : C === "string" ? u[E] = String(L) : u[E] = null, E < l.cells.length - 1 && b.push(A.toLowerCase());
+        C === "number" || C === "date" ? u[E] = parseFloat(L) || 0 : C === "string" ? u[E] = String(L) : u[E] = null, E < l.cells.length - 1 && g.push(A.toLowerCase());
       }
       this._data.push({
         sortKeys: u,
         html: l.outerHTML,
-        searchText: b.join(" ")
+        searchText: g.join(" ")
       });
     }
     this._filteredData = this._data.slice(), this._render(), i(this.dom, "ln-table:ready", {
@@ -1582,8 +1590,8 @@
         return l < u ? -1 : l > u ? 1 : 0;
       };
       this._filteredData.sort(function(l, u) {
-        var b = l.sortKeys[o], E = u.sortKeys[o];
-        return s ? (b - E) * t : a(b, E) * t;
+        var g = l.sortKeys[o], E = u.sortKeys[o];
+        return s ? (g - E) * t : a(g, E) * t;
       });
     }
   }, r.prototype._lockColumnWidths = function() {
@@ -1617,7 +1625,7 @@
   }, r.prototype._renderVirtual = function() {
     var n = this._filteredData, o = n.length, t = this._rowHeight;
     if (!(!t || !o)) {
-      var s = this.table.getBoundingClientRect(), a = s.top + window.scrollY, l = this.thead ? this.thead.offsetHeight : 0, u = a + l, b = window.scrollY - u, E = Math.max(0, Math.floor(b / t) - 15), w = Math.min(E + Math.ceil(window.innerHeight / t) + 30, o);
+      var s = this.table.getBoundingClientRect(), a = s.top + window.scrollY, l = this.thead ? this.thead.offsetHeight : 0, u = a + l, g = window.scrollY - u, E = Math.max(0, Math.floor(g / t) - 15), w = Math.min(E + Math.ceil(window.innerHeight / t) + 30, o);
       if (!(E === this._vStart && w === this._vEnd)) {
         this._vStart = E, this._vEnd = w;
         var A = this.ths.length || 1, L = E * t, C = (o - w) * t, T = "";
@@ -1655,7 +1663,7 @@
 (function() {
   const h = "[data-ln-circular-progress]", c = "lnCircularProgress";
   if (window[c] !== void 0) return;
-  const _ = "http://www.w3.org/2000/svg", p = 36, g = 16, m = 2 * Math.PI * g;
+  const _ = "http://www.w3.org/2000/svg", p = 36, b = 16, m = 2 * Math.PI * b;
   function v(s) {
     d(s);
   }
@@ -1690,13 +1698,13 @@
     }), this.trackCircle = i("circle", {
       cx: p / 2,
       cy: p / 2,
-      r: g,
+      r: b,
       fill: "none",
       "stroke-width": "3"
     }), this.trackCircle.classList.add("ln-circular-progress__track"), this.progressCircle = i("circle", {
       cx: p / 2,
       cy: p / 2,
-      r: g,
+      r: b,
       fill: "none",
       "stroke-width": "3",
       "stroke-linecap": "round",
@@ -1736,8 +1744,8 @@
     l < 0 && (l = 0), l > 100 && (l = 100);
     const u = m - l / 100 * m;
     this.progressCircle.setAttribute("stroke-dashoffset", u);
-    const b = this.dom.getAttribute("data-ln-circular-progress-label");
-    this.labelEl.textContent = b !== null ? b : Math.round(l) + "%", f(this.dom, "ln-circular-progress:change", {
+    const g = this.dom.getAttribute("data-ln-circular-progress-label");
+    this.labelEl.textContent = g !== null ? g : Math.round(l) + "%", f(this.dom, "ln-circular-progress:change", {
       target: this.dom,
       value: s,
       max: a,
@@ -1752,9 +1760,9 @@
   const h = "data-ln-sortable", c = "lnSortable", _ = "data-ln-sortable-handle";
   if (window[c] !== void 0) return;
   function p(r) {
-    g(r);
+    b(r);
   }
-  function g(r) {
+  function b(r) {
     const i = Array.from(r.querySelectorAll("[" + h + "]"));
     r.hasAttribute && r.hasAttribute(h) && i.push(r);
     for (const e of i)
@@ -1867,8 +1875,8 @@
       for (const e of i)
         if (e.type === "childList")
           for (const n of e.addedNodes)
-            n.nodeType === 1 && g(n);
-        else e.type === "attributes" && g(e.target);
+            n.nodeType === 1 && b(n);
+        else e.type === "attributes" && b(e.target);
     }).observe(document.body, {
       childList: !0,
       subtree: !0,
@@ -1884,9 +1892,9 @@
   const h = "data-ln-confirm", c = "lnConfirm";
   if (window[c] !== void 0) return;
   function p(d) {
-    g(d);
+    b(d);
   }
-  function g(d) {
+  function b(d) {
     const r = Array.from(d.querySelectorAll("[" + h + "]"));
     d.hasAttribute && d.hasAttribute(h) && r.push(d);
     for (const i of r)
@@ -1922,9 +1930,9 @@
         if (r[i].type === "childList")
           for (var e = 0; e < r[i].addedNodes.length; e++) {
             var n = r[i].addedNodes[e];
-            n.nodeType === 1 && g(n);
+            n.nodeType === 1 && b(n);
           }
-        else r[i].type === "attributes" && g(r[i].target);
+        else r[i].type === "attributes" && b(r[i].target);
     });
     d.observe(document.body, {
       childList: !0,
@@ -1945,7 +1953,7 @@
     sq: "Shqip",
     sr: "Srpski"
   }, p = {};
-  function g(e) {
+  function b(e) {
     return p[e] || (p[e] = document.querySelector('[data-ln-template="' + e + '"]')), p[e].content.cloneNode(!0);
   }
   function m(e) {
@@ -1989,7 +1997,7 @@
     for (const t in _) {
       if (!_.hasOwnProperty(t) || this.activeLanguages.has(t)) continue;
       n++;
-      const s = g("ln-translations-menu-item"), a = s.querySelector("[data-ln-translations-lang]");
+      const s = b("ln-translations-menu-item"), a = s.querySelector("[data-ln-translations-lang]");
       a.setAttribute("data-ln-translations-lang", t), a.textContent = _[t], a.addEventListener("click", function(l) {
         l.ctrlKey || l.metaKey || l.button === 1 || (l.preventDefault(), l.stopPropagation(), e.menuEl.dispatchEvent(new CustomEvent("ln-toggle:request-close")), e.addLanguage(t));
       }), this.menuEl.appendChild(s);
@@ -2001,7 +2009,7 @@
     this.badgesEl.textContent = "";
     const e = this;
     this.activeLanguages.forEach(function(n) {
-      const o = g("ln-translations-badge"), t = o.querySelector("[data-ln-translations-lang]");
+      const o = b("ln-translations-badge"), t = o.querySelector("[data-ln-translations-lang]");
       t.setAttribute("data-ln-translations-lang", n);
       const s = t.querySelector("span");
       s.textContent = _[n] || n.toUpperCase();
@@ -2021,13 +2029,13 @@
     this.activeLanguages.add(e), n = n || {};
     const s = this.dom.querySelectorAll("[data-ln-translatable]");
     for (const a of s) {
-      const l = a.getAttribute("data-ln-translatable"), u = a.getAttribute("data-ln-translations-prefix") || "", b = a.querySelector(
+      const l = a.getAttribute("data-ln-translatable"), u = a.getAttribute("data-ln-translations-prefix") || "", g = a.querySelector(
         this.defaultLang ? '[data-ln-translatable-lang="' + this.defaultLang + '"]' : "input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])"
       );
-      if (!b) continue;
-      const E = b.cloneNode(!1);
+      if (!g) continue;
+      const E = g.cloneNode(!1);
       u ? E.name = u + "[trans][" + e + "][" + l + "]" : E.name = "trans[" + e + "][" + l + "]", E.value = n[l] !== void 0 ? n[l] : "", E.removeAttribute("id"), E.placeholder = o + " translation", E.setAttribute("data-ln-translatable-lang", e);
-      const w = a.querySelectorAll('[data-ln-translatable-lang]:not([data-ln-translatable-lang="' + this.defaultLang + '"])'), A = w.length > 0 ? w[w.length - 1] : b;
+      const w = a.querySelectorAll('[data-ln-translatable-lang]:not([data-ln-translatable-lang="' + this.defaultLang + '"])'), A = w.length > 0 ? w[w.length - 1] : g;
       A.parentNode.insertBefore(E, A.nextSibling);
     }
     this._updateDropdown(), this._updateBadges(), d(this.dom, "ln-translations:added", {
@@ -2093,7 +2101,7 @@
 (function() {
   const h = "data-ln-autosave", c = "lnAutosave", _ = "data-ln-autosave-clear", p = "ln-autosave:";
   if (window[c] !== void 0) return;
-  function g(t) {
+  function b(t) {
     m(t);
   }
   function m(t) {
@@ -2178,8 +2186,8 @@
           u.checked && (s[u.name] = u.value);
         else if (u.type === "select-multiple") {
           s[u.name] = [];
-          for (var b = 0; b < u.options.length; b++)
-            u.options[b].selected && s[u.name].push(u.options[b].value);
+          for (var g = 0; g < u.options.length; g++)
+            u.options[g].selected && s[u.name].push(u.options[g].value);
         } else
           s[u.name] = u.value;
     }
@@ -2187,20 +2195,20 @@
   }
   function i(t, s) {
     for (var a = t.elements, l = [], u = 0; u < a.length; u++) {
-      var b = a[u];
-      if (!(!b.name || !(b.name in s) || b.type === "file" || b.type === "submit" || b.type === "button")) {
-        var E = s[b.name];
-        if (b.type === "checkbox")
-          b.checked = Array.isArray(E) && E.indexOf(b.value) !== -1, l.push(b);
-        else if (b.type === "radio")
-          b.checked = b.value === E, l.push(b);
-        else if (b.type === "select-multiple") {
+      var g = a[u];
+      if (!(!g.name || !(g.name in s) || g.type === "file" || g.type === "submit" || g.type === "button")) {
+        var E = s[g.name];
+        if (g.type === "checkbox")
+          g.checked = Array.isArray(E) && E.indexOf(g.value) !== -1, l.push(g);
+        else if (g.type === "radio")
+          g.checked = g.value === E, l.push(g);
+        else if (g.type === "select-multiple") {
           if (Array.isArray(E))
-            for (var w = 0; w < b.options.length; w++)
-              b.options[w].selected = E.indexOf(b.options[w].value) !== -1;
-          l.push(b);
+            for (var w = 0; w < g.options.length; w++)
+              g.options[w].selected = E.indexOf(g.options[w].value) !== -1;
+          l.push(g);
         } else
-          b.value = E, l.push(b);
+          g.value = E, l.push(g);
       }
     }
     for (var A = 0; A < l.length; A++)
@@ -2235,7 +2243,7 @@
       attributeFilter: [h]
     });
   }
-  window[c] = g, o(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
-    g(document.body);
-  }) : g(document.body);
+  window[c] = b, o(), document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", function() {
+    b(document.body);
+  }) : b(document.body);
 })();
