@@ -28,7 +28,8 @@
 		this.dom = dom;
 		this.toggleEl = dom.querySelector('[data-ln-toggle]');
 		this._boundDocClick = null;
-		this._boundScrollClose = null;
+		this._boundScrollReposition = null;
+		this._boundResizeClose = null;
 		this._menuParent = null;
 		this._placeholder = null;
 
@@ -42,14 +43,16 @@
 			if (e.detail.target !== self.toggleEl) return;
 			self._teleportToBody();
 			self._addOutsideClickListener();
-			self._addScrollCloseListener();
+			self._addScrollRepositionListener();
+			self._addResizeCloseListener();
 			_dispatch(dom, 'ln-dropdown:open', { target: e.detail.target });
 		};
 
 		this._onToggleClose = function (e) {
 			if (e.detail.target !== self.toggleEl) return;
 			self._removeOutsideClickListener();
-			self._removeScrollCloseListener();
+			self._removeScrollRepositionListener();
+			self._removeResizeCloseListener();
 			self._teleportBack();
 			_dispatch(dom, 'ln-dropdown:close', { target: e.detail.target });
 		};
@@ -60,30 +63,26 @@
 		return this;
 	}
 
-	// ─── Teleport ──────────────────────────────────────────────
+	// ─── Positioning ───────────────────────────────────────────
 
-	_component.prototype._teleportToBody = function () {
-		if (!this.toggleEl || this.toggleEl.parentNode === document.body) return;
-
+	_component.prototype._positionMenu = function () {
 		const trigger = this.dom.querySelector('[data-ln-toggle-for]');
-		if (!trigger) return;
+		if (!trigger || !this.toggleEl) return;
 
 		const rect = trigger.getBoundingClientRect();
 
-		this._menuParent = this.toggleEl.parentNode;
-		this._placeholder = document.createComment('ln-dropdown');
-		this._menuParent.insertBefore(this._placeholder, this.toggleEl);
-
-		document.body.appendChild(this.toggleEl);
-
 		// Measure menu dimensions (briefly show off-screen to get size)
-		this.toggleEl.style.position = 'fixed';
-		this.toggleEl.style.visibility = 'hidden';
-		this.toggleEl.style.display = 'block';
+		const wasHidden = this.toggleEl.style.display === 'none' || this.toggleEl.style.display === '';
+		if (wasHidden) {
+			this.toggleEl.style.visibility = 'hidden';
+			this.toggleEl.style.display = 'block';
+		}
 		const menuW = this.toggleEl.offsetWidth;
 		const menuH = this.toggleEl.offsetHeight;
-		this.toggleEl.style.visibility = '';
-		this.toggleEl.style.display = '';
+		if (wasHidden) {
+			this.toggleEl.style.visibility = '';
+			this.toggleEl.style.display = '';
+		}
 
 		// Viewport bounds
 		const vw = window.innerWidth;
@@ -103,10 +102,8 @@
 		// Horizontal: prefer right-aligned to trigger, flip left-aligned if no room
 		var left;
 		if (rect.right - menuW >= 0) {
-			// Right-aligned: menu's right edge = trigger's right edge
 			left = rect.right - menuW;
 		} else if (rect.left + menuW <= vw) {
-			// Left-aligned: menu's left edge = trigger's left edge
 			left = rect.left;
 		} else {
 			left = Math.max(0, vw - menuW);
@@ -117,6 +114,21 @@
 		this.toggleEl.style.right = 'auto';
 		this.toggleEl.style.transform = 'none';
 		this.toggleEl.style.margin = '0';
+	};
+
+	// ─── Teleport ──────────────────────────────────────────────
+
+	_component.prototype._teleportToBody = function () {
+		if (!this.toggleEl || this.toggleEl.parentNode === document.body) return;
+
+		this._menuParent = this.toggleEl.parentNode;
+		this._placeholder = document.createComment('ln-dropdown');
+		this._menuParent.insertBefore(this._placeholder, this.toggleEl);
+
+		document.body.appendChild(this.toggleEl);
+
+		this.toggleEl.style.position = 'fixed';
+		this._positionMenu();
 	};
 
 	_component.prototype._teleportBack = function () {
@@ -159,24 +171,39 @@
 		}
 	};
 
-	// ─── Scroll / resize close ─────────────────────────────────
+	// ─── Scroll → reposition ──────────────────────────────────
 
-	_component.prototype._addScrollCloseListener = function () {
+	_component.prototype._addScrollRepositionListener = function () {
 		const self = this;
-		this._boundScrollClose = function () {
+		this._boundScrollReposition = function () {
+			self._positionMenu();
+		};
+		window.addEventListener('scroll', this._boundScrollReposition, { passive: true, capture: true });
+	};
+
+	_component.prototype._removeScrollRepositionListener = function () {
+		if (this._boundScrollReposition) {
+			window.removeEventListener('scroll', this._boundScrollReposition, { capture: true });
+			this._boundScrollReposition = null;
+		}
+	};
+
+	// ─── Resize → close ───────────────────────────────────────
+
+	_component.prototype._addResizeCloseListener = function () {
+		const self = this;
+		this._boundResizeClose = function () {
 			if (self.toggleEl) {
 				self.toggleEl.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
 			}
 		};
-		window.addEventListener('scroll', this._boundScrollClose, { passive: true, capture: true });
-		window.addEventListener('resize', this._boundScrollClose);
+		window.addEventListener('resize', this._boundResizeClose);
 	};
 
-	_component.prototype._removeScrollCloseListener = function () {
-		if (this._boundScrollClose) {
-			window.removeEventListener('scroll', this._boundScrollClose, { capture: true });
-			window.removeEventListener('resize', this._boundScrollClose);
-			this._boundScrollClose = null;
+	_component.prototype._removeResizeCloseListener = function () {
+		if (this._boundResizeClose) {
+			window.removeEventListener('resize', this._boundResizeClose);
+			this._boundResizeClose = null;
 		}
 	};
 
@@ -185,7 +212,8 @@
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._removeOutsideClickListener();
-		this._removeScrollCloseListener();
+		this._removeScrollRepositionListener();
+		this._removeResizeCloseListener();
 		this._teleportBack();
 		this.toggleEl.removeEventListener('ln-toggle:open', this._onToggleOpen);
 		this.toggleEl.removeEventListener('ln-toggle:close', this._onToggleClose);
