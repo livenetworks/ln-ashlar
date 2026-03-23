@@ -1,0 +1,23 @@
+@use '../config/mixins' as *;
+
+// ─── Keyframes ────────────────────────────────────────────
+
+@keyframes ln-slide-in {
+	from { opacity: 0; transform: translateY(-10px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ln-slide-out {
+	from { opacity: 1; transform: translateX(0); }
+	to   { opacity: 0; transform: translateX(20px); }
+}
+
+// ─── Utility classes ──────────────────────────────────────
+
+.is-new {
+	animation: ln-slide-in var(--transition-base) backwards;
+}
+
+.is-removing {
+	animation: ln-slide-out var(--transition-base) forwards;
+}
