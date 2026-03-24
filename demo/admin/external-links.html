@@ -300,11 +300,11 @@ document.addEventListener('ln-external-links:processed', function(e) {
 			e.preventDefault();
 			pendingHref = link.href;
 			document.getElementById('external-link-url').textContent = pendingHref;
-			window.lnModal.open('external-link-modal');
+			document.getElementById('external-link-modal').lnModal.open();
 		});
 
 		document.getElementById('external-link-confirm').addEventListener('click', function() {
-			window.lnModal.close('external-link-modal');
+			document.getElementById('external-link-modal').lnModal.close();
 			if (pendingHref) {
 				window.open(pendingHref, '_blank', 'noopener,noreferrer');
 				pendingHref = null;

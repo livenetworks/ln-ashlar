@@ -122,6 +122,8 @@ All states read from `--color-primary`. No classes needed.
 - **No `.ln-modal__content` class** — select semantically: `.ln-modal > form`
 - **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes
 - Available: `modal-sm` (28rem), `modal-md` (32rem), `modal-lg` (42rem), `modal-xl` (48rem)
+- **Instance-based API** — `modal.lnModal.open()`, `.close()`, `.toggle()`, `.destroy()`
+- **ESC listener** active only while modal is open (zero listeners when all closed)
 
 ## Pill Labels (Checkbox / Radio)
 
@@ -236,7 +238,6 @@ Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon
 
 ## Known Backlog
 
-- **ln-modal** — event listeners not removed on cleanup
 - **ln-ajax** — missing CustomEvent dispatching for AJAX lifecycle
 - **ln-select** — depends on TomSelect (peer dependency)
 - **Form attributes** — renamed to `data-ln-*` convention, Laravel projects need HTML template updates

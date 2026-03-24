@@ -469,7 +469,7 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
                 }));
             }
             input.value = '';
-            lnModal.close('modal-new-profile');
+            document.getElementById('modal-new-profile').lnModal.close();
         });
 
         // 3. Notification → UI feedback
@@ -600,7 +600,7 @@ _component.prototype._buildTrackItem = function (track, idx) {
 | ln-accordion | Instance | `data-ln-accordion` | Wrapper — само еден toggle отворен |
 | ln-tabs | Instance | `data-ln-tabs` | Hash-aware tab навигација |
 | ln-nav | Instance | `data-ln-nav` | Active link highlighter |
-| ln-modal | Functional | `data-ln-modal` | Modal dialog |
+| ln-modal | Instance | `data-ln-modal` | Modal dialog |
 | ln-toast | Functional | `data-ln-toast` | Toast notifications |
 | ln-upload | Functional | `data-ln-upload` | File upload |
 | ln-ajax | Functional | `data-ln-ajax` | AJAX navigation |

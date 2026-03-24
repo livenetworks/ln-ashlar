@@ -1,7 +1,7 @@
 # ln-modal
 
 Modal dialog component — overlay with content (header/main/footer).
-Opens/closes a modal by ID. ESC closes all open modals. Body scroll is blocked when a modal is open.
+Instance-based: each `.ln-modal` gets its own instance. ESC closes the focused modal. Body scroll is blocked when a modal is open.
 
 ## Attributes
 
@@ -31,12 +31,14 @@ Sizes are applied via SCSS mixins on semantic selectors, not CSS classes:
 
 ## API
 
-Triggers with `data-ln-modal` are auto-initialized by MutationObserver (both new DOM and `setAttribute`).
+Modals are auto-initialized by MutationObserver. Each `.ln-modal` element gets an instance at `element.lnModal`.
 
 ```javascript
-window.lnModal.open('my-modal');
-window.lnModal.close('my-modal');
-window.lnModal.toggle('my-modal');
+const modal = document.getElementById('my-modal');
+modal.lnModal.open();
+modal.lnModal.close();
+modal.lnModal.toggle();
+modal.lnModal.destroy();  // removes all listeners, cleans up instance
 ```
 
 ## Events
@@ -49,6 +51,7 @@ All events are dispatched on the modal element itself and bubble up.
 | `ln-modal:open` | no | Modal opened | `{ modalId, target }` |
 | `ln-modal:before-close` | yes | Before closing (can be cancelled) | `{ modalId, target }` |
 | `ln-modal:close` | no | Modal closed | `{ modalId, target }` |
+| `ln-modal:destroyed` | no | Instance destroyed | `{ modalId, target }` |
 
 ```javascript
 // Cancel opening conditionally
@@ -79,7 +82,7 @@ document.addEventListener('ln-modal:close', function(e) {
 
 ## Behavior
 
-- ESC key closes all open modals
+- ESC key closes the open modal (listener active only while modal is open)
 - `body.ln-modal-open` is added when at least one modal is open (prevents scroll)
 - Backdrop: semi-transparent dark overlay with blur
 - Animation: slideIn from top (0.3s ease)

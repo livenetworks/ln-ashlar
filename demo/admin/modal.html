@@ -278,9 +278,11 @@ document.addEventListener('ln-modal:close', function(e) {
 
 &lt;!-- JS API --&gt;
 &lt;script&gt;
-    window.lnModal.open('my-modal');
-    window.lnModal.close('my-modal');
-    window.lnModal.toggle('my-modal');
+    const modal = document.getElementById('my-modal');
+    modal.lnModal.open();
+    modal.lnModal.close();
+    modal.lnModal.toggle();
+    modal.lnModal.destroy();
 &lt;/script&gt;</code></pre>
 			</main>
 		</section>
