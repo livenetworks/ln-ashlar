@@ -175,7 +175,7 @@ background-color: hsl(var(--color-primary) / 0.5);
 #### Z-Index Scale
 | Token | Value |
 |-------|-------|
-| `--z-dropdown` | 10 |
+| `--z-dropdown` | 100 |
 | `--z-sticky` | 20 |
 | `--z-overlay` | 30 |
 | `--z-modal` | 40 |
@@ -372,7 +372,8 @@ Applied via semantic selectors:
 
 | Mixin | Description |
 |-------|-------------|
-| *(default)* | Filled — gray bg, colored on checked, input hidden |
+| `@include pill` | Filled — gray bg, colored on checked, input hidden |
+| `@include pill-group` | Container for pill labels (flex, shared border-radius) |
 | `@include pill-outline` | Outlined — bordered, visible input, apply on parent |
 
 ### Buttons
@@ -383,6 +384,7 @@ Every `<button>` gets hover/active/focus/disabled effects **automatically** from
 |-------|-------------|
 | `@include btn-colors` | Color states only. Already applied globally to all `<button>` |
 | `@include btn` | Structure: inline-flex, padding, font-size, font-weight |
+| `@include btn-group` | Container for grouped buttons (flex, gap, shared border-radius) |
 | `@include close-button` | Transparent close button with red hover |
 
 #### States (automatic on every button)
@@ -411,6 +413,78 @@ Override `--color-primary` on the element or any parent:
 ```
 
 **ln-acme does NOT ship `btn--*` variant classes.** Each project defines its own.
+
+### Form
+
+| Mixin | Description |
+|-------|-------------|
+| `@include form-label` | Label styling (font-weight, spacing) |
+| `@include form-grid` | 6-column CSS grid with responsive fallback |
+| `@include form-actions` | Flex end-justified with border-top |
+| `@include form-input` | Text input styling (border, padding, focus ring) |
+| `@include form-textarea` | Textarea with min-height |
+| `@include form-select` | Select with custom dropdown icon |
+| `@include form-checkbox` | Checkbox styling |
+| `@include form-radio` | Radio styling |
+
+### Table
+
+| Mixin | Description |
+|-------|-------------|
+| `@include table-base` | Base table styling (borders, padding, alignment) |
+| `@include table-responsive` | Stacked mobile layout with `data-label` |
+| `@include table-striped` | Alternating row background colors |
+| `@include table-section-header` | Section header row styling |
+| `@include table-action` | Action button styling in table cells |
+
+### Other
+
+| Mixin | Description |
+|-------|-------------|
+| `@include loader` | Animated spinner |
+| `@include breadcrumbs` | Flex breadcrumb navigation with separators |
+
+---
+
+## Auto-Applied Styles
+
+ln-acme automatically styles bare HTML elements via its component layer. You get these styles for free — no classes or mixins needed. Use the corresponding mixin when you need to re-apply or override on a custom selector.
+
+### Global (`base/_global.scss`)
+
+| Element | Styles applied |
+|---------|---------------|
+| `html`, `body` | Full width/height, `bg-body`, `font-sans` |
+| `body` | `text-base`, `text-primary` |
+| `a` | Color from tokens, no underline, hover color transition |
+| `button`, `input[type="submit"]`, `input[type="reset"]`, `input[type="button"]` | `rounded-md`, `cursor-pointer`, `transition`, `btn-colors` (hover/active/focus/disabled) |
+| `img` | `max-width: 100%`, `height: auto`, `display: block` |
+
+### Forms (`components/_forms.scss`)
+
+| Element | Mixin applied |
+|---------|--------------|
+| `input`, `textarea`, `select` | `form-input` |
+| `textarea` | `form-textarea` |
+| `select` | `form-select` |
+| `input[type="checkbox"]` | `form-checkbox` |
+| `input[type="radio"]` | `form-radio` |
+| `label` | `form-label` |
+| `label:has(> input[type="checkbox/radio"])` | `pill` |
+| `ul:has(> li > label > input[type="checkbox/radio"])` | `pill-group` |
+| `.form-actions` | `form-actions` |
+
+### Other components
+
+| Selector | Mixin applied | Source |
+|----------|--------------|--------|
+| `.btn` | `btn` | `components/_buttons.scss` |
+| `.btn-group` | `btn-group` | `components/_buttons.scss` |
+| `table` | `table-base` + responsive | `components/_tables.scss` |
+| `.collapsible` | `collapsible` | `components/_toggle.scss` |
+| `#breadcrumbs` | `breadcrumbs` | `components/_breadcrumbs.scss` |
+
+To override any auto-applied style, re-apply the mixin on your own selector or use a more specific selector in your project SCSS.
 
 ---
 
