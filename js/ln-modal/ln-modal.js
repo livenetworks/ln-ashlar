@@ -54,6 +54,19 @@
 			if (e.key === 'Escape') self.close();
 		};
 
+		this._onFocusTrap = function (e) {
+			if (e.key !== 'Tab') return;
+			var focusable = self.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+			if (focusable.length === 0) return;
+			var first = focusable[0];
+			var last = focusable[focusable.length - 1];
+			if (e.shiftKey) {
+				if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+			} else {
+				if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+			}
+		};
+
 		this._onClose = function (e) {
 			e.preventDefault();
 			self.close();
@@ -71,8 +84,16 @@
 
 		this.isOpen = true;
 		this.dom.classList.add('ln-modal--open');
+		this.dom.setAttribute('aria-modal', 'true');
+		this.dom.setAttribute('role', 'dialog');
 		document.body.classList.add('ln-modal-open');
 		document.addEventListener('keydown', this._onEscape);
+		document.addEventListener('keydown', this._onFocusTrap);
+
+		// Focus first focusable element inside modal
+		var firstFocusable = this.dom.querySelector('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])');
+		if (firstFocusable) firstFocusable.focus();
+
 		_dispatch(this.dom, 'ln-modal:open');
 	};
 
@@ -83,7 +104,9 @@
 
 		this.isOpen = false;
 		this.dom.classList.remove('ln-modal--open');
+		this.dom.removeAttribute('aria-modal');
 		document.removeEventListener('keydown', this._onEscape);
+		document.removeEventListener('keydown', this._onFocusTrap);
 		_dispatch(this.dom, 'ln-modal:close');
 
 		if (!document.querySelector('.ln-modal.ln-modal--open')) {
@@ -100,7 +123,9 @@
 
 		if (this.isOpen) {
 			this.dom.classList.remove('ln-modal--open');
+			this.dom.removeAttribute('aria-modal');
 			document.removeEventListener('keydown', this._onEscape);
+			document.removeEventListener('keydown', this._onFocusTrap);
 			if (!document.querySelector('.ln-modal.ln-modal--open')) {
 				document.body.classList.remove('ln-modal-open');
 			}

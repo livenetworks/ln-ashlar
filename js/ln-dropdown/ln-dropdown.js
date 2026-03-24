@@ -35,12 +35,28 @@
 
 		if (this.toggleEl) {
 			this.toggleEl.setAttribute('data-ln-dropdown-menu', '');
+			this.toggleEl.setAttribute('role', 'menu');
+		}
+
+		// ARIA on trigger button
+		this.triggerBtn = dom.querySelector('[data-ln-toggle-for]');
+		if (this.triggerBtn) {
+			this.triggerBtn.setAttribute('aria-haspopup', 'menu');
+			this.triggerBtn.setAttribute('aria-expanded', 'false');
+		}
+
+		// role="menuitem" on direct children of menu
+		if (this.toggleEl) {
+			for (const item of this.toggleEl.children) {
+				item.setAttribute('role', 'menuitem');
+			}
 		}
 
 		const self = this;
 
 		this._onToggleOpen = function (e) {
 			if (e.detail.target !== self.toggleEl) return;
+			if (self.triggerBtn) self.triggerBtn.setAttribute('aria-expanded', 'true');
 			self._teleportToBody();
 			self._addOutsideClickListener();
 			self._addScrollRepositionListener();
@@ -50,6 +66,7 @@
 
 		this._onToggleClose = function (e) {
 			if (e.detail.target !== self.toggleEl) return;
+			if (self.triggerBtn) self.triggerBtn.setAttribute('aria-expanded', 'false');
 			self._removeOutsideClickListener();
 			self._removeScrollRepositionListener();
 			self._removeResizeCloseListener();
