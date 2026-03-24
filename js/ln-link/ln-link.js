@@ -87,15 +87,42 @@
 
 		if (!row.querySelector('a')) return;
 
-		row.addEventListener('click', function (e) {
+		row._lnLinkClick = function (e) {
 			_handleClick(row, e);
-		});
-
-		row.addEventListener('mouseenter', function () {
+		};
+		row._lnLinkEnter = function () {
 			_handleMouseEnter(row);
-		});
+		};
 
+		row.addEventListener('click', row._lnLinkClick);
+		row.addEventListener('mouseenter', row._lnLinkEnter);
 		row.addEventListener('mouseleave', _handleMouseLeave);
+	}
+
+	function _destroyRow(row) {
+		if (!row[DOM_ATTRIBUTE + 'Row']) return;
+		if (row._lnLinkClick) row.removeEventListener('click', row._lnLinkClick);
+		if (row._lnLinkEnter) row.removeEventListener('mouseenter', row._lnLinkEnter);
+		row.removeEventListener('mouseleave', _handleMouseLeave);
+		delete row._lnLinkClick;
+		delete row._lnLinkEnter;
+		delete row[DOM_ATTRIBUTE + 'Row'];
+	}
+
+	function _destroyContainer(container) {
+		if (!container[DOM_ATTRIBUTE + 'Init']) return;
+		const tag = container.tagName;
+
+		if (tag === 'TABLE' || tag === 'TBODY') {
+			const tbody = (tag === 'TABLE') ? container.querySelector('tbody') || container : container;
+			for (const row of tbody.querySelectorAll('tr')) {
+				_destroyRow(row);
+			}
+		} else {
+			_destroyRow(container);
+		}
+
+		delete container[DOM_ATTRIBUTE + 'Init'];
 	}
 
 	// ─── Container Initialization ──────────────────────────────
@@ -169,7 +196,7 @@
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = { init: constructor };
+	window[DOM_ATTRIBUTE] = { init: constructor, destroy: _destroyContainer };
 
 	function _initializeAll() {
 		_createStatusBar();

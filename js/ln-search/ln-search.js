@@ -54,12 +54,14 @@
 		if (!this.input) return;
 		var self = this;
 
-		this.input.addEventListener('input', function () {
+		this._onInput = function () {
 			clearTimeout(self._debounceTimer);
 			self._debounceTimer = setTimeout(function () {
 				self._search(self.input.value.trim().toLowerCase());
 			}, DEBOUNCE_MS);
-		});
+		};
+
+		this.input.addEventListener('input', this._onInput);
 	};
 
 	_component.prototype._search = function (term) {
@@ -92,6 +94,16 @@
 				matched++;
 			}
 		}
+	};
+
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		clearTimeout(this._debounceTimer);
+		if (this.input && this._onInput) {
+			this.input.removeEventListener('input', this._onInput);
+		}
+		this.dom.removeAttribute(INIT_ATTR);
+		delete this.dom[DOM_ATTRIBUTE];
 	};
 
 	// ─── DOM Observer ──────────────────────────────────────────

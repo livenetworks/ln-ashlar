@@ -4,9 +4,9 @@
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// ─── Hardcoded locales ─────────────────────────────────────
+	// ─── Default locales (override via data-ln-translations-locales JSON) ──
 
-	var LOCALES = {
+	var DEFAULT_LOCALES = {
 		en: 'English',
 		sq: 'Shqip',
 		sr: 'Srpski'
@@ -48,6 +48,14 @@
 		this.defaultLang = dom.getAttribute(DOM_SELECTOR + '-default') || '';
 		this.badgesEl = dom.querySelector('[' + DOM_SELECTOR + '-active]');
 		this.menuEl = dom.querySelector('[data-ln-dropdown] > [data-ln-toggle]');
+
+		// Parse locales from attribute or use defaults
+		var localesAttr = dom.getAttribute(DOM_SELECTOR + '-locales');
+		this.locales = DEFAULT_LOCALES;
+		if (localesAttr) {
+			try { this.locales = JSON.parse(localesAttr); }
+			catch (e) { console.warn('[ln-translations] Invalid JSON in data-ln-translations-locales'); }
+		}
 
 		// Set default language flag on original inputs
 		this._applyDefaultLang();
@@ -112,15 +120,15 @@
 		const self = this;
 		let availableCount = 0;
 
-		for (const lang in LOCALES) {
-			if (!LOCALES.hasOwnProperty(lang)) continue;
+		for (const lang in this.locales) {
+			if (!this.locales.hasOwnProperty(lang)) continue;
 			if (this.activeLanguages.has(lang)) continue;
 			availableCount++;
 
 			const frag = _cloneTemplate('ln-translations-menu-item');
 			const btn = frag.querySelector('[data-ln-translations-lang]');
 			btn.setAttribute('data-ln-translations-lang', lang);
-			btn.textContent = LOCALES[lang];
+			btn.textContent = this.locales[lang];
 
 			btn.addEventListener('click', function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
@@ -154,10 +162,10 @@
 			p.setAttribute('data-ln-translations-lang', lang);
 
 			const label = p.querySelector('span');
-			label.textContent = LOCALES[lang] || lang.toUpperCase();
+			label.textContent = self.locales[lang] || lang.toUpperCase();
 
 			const closeBtn = p.querySelector('button');
-			closeBtn.setAttribute('aria-label', 'Remove ' + (LOCALES[lang] || lang.toUpperCase()));
+			closeBtn.setAttribute('aria-label', 'Remove ' + (self.locales[lang] || lang.toUpperCase()));
 
 			closeBtn.addEventListener('click', function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
@@ -175,7 +183,7 @@
 	_component.prototype.addLanguage = function (lang, values) {
 		if (this.activeLanguages.has(lang)) return;
 
-		const langName = LOCALES[lang] || lang;
+		const langName = this.locales[lang] || lang;
 		const before = _dispatchCancelable(this.dom, 'ln-translations:before-add', {
 			target: this.dom, lang: lang, langName: langName
 		});
