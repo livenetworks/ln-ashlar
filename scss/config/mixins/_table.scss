@@ -1,0 +1,138 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+@use 'transitions' as *;
+@use 'position' as *;
+
+// ─── Base table ─────────────────────────────────────────────────
+
+@mixin table-base {
+	@include w-full;
+	@include bg-primary;
+	@include rounded-lg;
+	@include overflow-hidden;
+	@include shadow-sm;
+	border-collapse: collapse;
+
+	thead {
+		background: hsl(var(--color-table-header-bg));
+	}
+
+	th {
+		@include text-left;
+		@include px(1rem);
+		@include py(0.75rem);
+		@include font-semibold;
+		@include text-sm;
+		letter-spacing: 0.3px;
+		color: hsl(var(--color-table-header-text));
+	}
+
+	tbody tr {
+		@include transition;
+
+		&:hover {
+			@include bg-secondary;
+		}
+	}
+
+	td {
+		@include px(1rem);
+		@include py(0.625rem);
+		@include border-b;
+		@include text-sm;
+		vertical-align: top;
+	}
+
+	tr:last-child td {
+		@include border-none;
+	}
+}
+
+// ─── Responsive (mobile stacked layout) ─────────────────────────
+// Requires data-label attribute on <td> for column headers.
+
+@mixin table-responsive {
+	th {
+		@include hidden;
+	}
+
+	tbody tr {
+		@include block;
+		@include mb(1rem);
+		@include border;
+		@include rounded-md;
+		@include overflow-hidden;
+	}
+
+	td {
+		@include block;
+		@include text-right;
+		@include px(1rem);
+		@include py(0.75rem);
+		@include border-b;
+		@include relative;
+		padding-left: 50%;
+
+		&:last-child {
+			@include border-none;
+		}
+
+		&::before {
+			content: attr(data-label);
+			@include absolute;
+			left: 1rem;
+			@include text-left;
+			@include font-semibold;
+			@include text-secondary;
+			@include text-xs;
+			@include uppercase;
+		}
+	}
+}
+
+// ─── Variants ───────────────────────────────────────────────────
+
+@mixin table-striped {
+	tbody tr:nth-child(odd) {
+		@include bg-secondary;
+
+		&:hover {
+			background-color: hsl(var(--color-bg-secondary));
+		}
+	}
+}
+
+@mixin table-section-header {
+	background: hsl(var(--color-table-section-bg));
+	@include font-bold;
+	@include text-sm;
+	color: hsl(var(--color-table-header-bg));
+	letter-spacing: 0.3px;
+
+	&:hover {
+		background-color: hsl(var(--color-table-section-bg));
+	}
+}
+
+@mixin table-action {
+	@include inline-flex;
+	@include items-center;
+	@include justify-center;
+	@include px(0.5rem);
+	@include py(0.25rem);
+	@include text-sm;
+	@include transition-colors;
+
+	&:hover {
+		@include bg-secondary;
+	}
+
+	svg {
+		@include size(1.5rem);
+	}
+}

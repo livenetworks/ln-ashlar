@@ -1,7 +1,7 @@
 @use 'spacing' as *;
 @use 'display' as *;
 
-// Layout — grid, form-grid, stack, container
+// Layout — grid, stack, container
 
 @mixin grid {
 	display: grid;
@@ -38,16 +38,6 @@
 
 	@media (min-width: 1024px) {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
-	}
-}
-
-@mixin form-grid {
-	display: grid;
-	grid-template-columns: repeat(6, minmax(0, 1fr));
-	@include gap(var(--spacing-md));
-
-	@media (max-width: 767px) {
-		grid-template-columns: repeat(1, minmax(0, 1fr));
 	}
 }
 
