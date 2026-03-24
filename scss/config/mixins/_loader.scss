@@ -1,0 +1,20 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'sizing' as *;
+@use 'position' as *;
+@use 'colors' as *;
+
+@mixin loader {
+	color: hsl(var(--color-primary));
+	font-size: 90px;
+	text-indent: -9999em;
+	@include overflow-hidden;
+	width: 1em;
+	height: 1em;
+	border-radius: 50%;
+	@include mx(auto);
+	@include my(4.5rem);
+	@include relative;
+	transform: translateZ(0);
+	animation: loader-spin 1.7s infinite ease, loader-round 1.7s infinite ease;
+}

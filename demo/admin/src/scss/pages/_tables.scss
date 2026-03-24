@@ -1,0 +1,44 @@
+@use '../../../../../scss/config/mixins' as *;
+
+// ─── Demo table styles (project-level) ──────────────────────────
+// These classes were removed from ln-acme library and moved here
+// as project-level styles. Real projects should use semantic selectors
+// instead of these classes.
+
+// Status indicators
+.pass { @include text-success; @include font-semibold; }
+.fail { @include text-error; @include font-semibold; }
+.warn { @include text-warning; @include font-semibold; }
+
+// Cell modifiers
+.numeric { @include text-right; @include font-mono; }
+.center { @include text-center; }
+.nowrap { @include whitespace-nowrap; }
+
+// Table container
+.table-container { @include overflow-x-auto; }
+
+// Section header rows
+tr.section-header td {
+	@include table-section-header;
+}
+
+// Action buttons in table cells
+td .action {
+	@include table-action;
+
+	&.danger {
+		@include text-error;
+		&:hover { background-color: hsl(var(--color-bg-error)); }
+	}
+
+	&.primary {
+		color: hsl(var(--color-primary));
+		&:hover { background-color: hsl(var(--color-primary-light)); }
+	}
+}
+
+// Loader
+.loader {
+	@include loader;
+}

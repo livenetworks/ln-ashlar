@@ -97,14 +97,87 @@
 				<p>Complete list of <code>@include</code> mixins from <code>scss/config/_mixins.scss</code>. Import with <code>@use 'config/mixins' as *;</code> and use in semantic selectors.</p>
 
 				<!-- ==========================================
-				     OVERRIDE ARCHITECTURE
+				     TWO-LAYER ARCHITECTURE
+				     ========================================== -->
+				<section class="section-card" id="two-layer-architecture">
+					<header><h3>Two-Layer Architecture: Mixins + Components</h3></header>
+					<main>
+						<p>Every visual style has <strong>two layers</strong>: a <strong>mixin</strong> (recipe) and a <strong>component</strong> (default application).</p>
+
+						<div class="demo-split">
+							<article>
+								<h4>Mixin (recipe)</h4>
+								<pre><code>// scss/config/mixins/_table.scss
+@mixin table-base {
+  @include w-full;
+  @include bg-primary;
+  @include rounded-lg;
+  // ... styles
+}</code></pre>
+							</article>
+							<article>
+								<h4>Component (default)</h4>
+								<pre><code>// scss/components/_tables.scss
+table {
+  @include table-base;
+}
+
+@media (max-width: 768px) {
+  table { @include table-responsive; }
+}</code></pre>
+							</article>
+						</div>
+
+						<h4>When to use which selector</h4>
+						<table>
+							<thead>
+								<tr><th>Situation</th><th>Mixin</th><th>Component selector</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>Universal element (<code>label</code>, <code>table</code>, <code>input</code>)</td><td>yes</td><td><code>table { @include table-base; }</code></td></tr>
+								<tr><td>Singleton (<code>#breadcrumbs</code>)</td><td>yes</td><td><code>#breadcrumbs { @include breadcrumbs; }</code></td></tr>
+								<tr><td>Component class (<code>.btn</code>, <code>.collapsible</code>)</td><td>yes</td><td><code>.btn { @include btn; }</code></td></tr>
+								<tr><td>Data-attr JS (<code>[data-ln-tabs]</code>)</td><td>not needed</td><td><code>[data-ln-tabs] nav { ... }</code></td></tr>
+							</tbody>
+						</table>
+
+						<h4>Project overrides — 4 levels</h4>
+						<table>
+							<thead>
+								<tr><th>Need</th><th>Approach</th><th>Example</th></tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Use default</td>
+									<td>Do nothing &mdash; library CSS works</td>
+									<td><code>&lt;table&gt;...&lt;/table&gt;</code></td>
+								</tr>
+								<tr>
+									<td>Different <strong>color</strong></td>
+									<td>Override CSS variable on parent</td>
+									<td><code>#danger-zone { --color-primary: var(--color-error); }</code></td>
+								</tr>
+								<tr>
+									<td>Different <strong>structure</strong></td>
+									<td>Re-apply mixin with modifications</td>
+									<td><code>#audit-log { @include table-base; @include table-striped; }</code></td>
+								</tr>
+								<tr>
+									<td>Full replace</td>
+									<td>Use only the mixin on custom selector</td>
+									<td>Exclude component, write from scratch</td>
+								</tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     OVERRIDE ARCHITECTURE (ZERO HARDCODED)
 				     ========================================== -->
 				<section class="section-card" id="override-architecture">
-					<header><h3>Override Architecture</h3></header>
+					<header><h3>Override Architecture — Zero Hardcoded Colors</h3></header>
 					<main>
-						<p><strong>ln-acme</strong> provides predefined mixins. Projects use those mixins in their SCSS selectors. When a project needs different behavior, it creates a <strong>project-level mixin with the same name</strong> that overrides the ln-acme version. The project SCSS selectors stay unchanged.</p>
-
-						<h4>The golden rule: ZERO hardcoded colors</h4>
 						<p>Mixins <strong>NEVER</strong> contain concrete color values (<code>#fff</code>, <code>rgb()</code>, <code>hsl(0 0% 100%)</code>). Every color reads from a CSS custom property token: <code>var(--color-*)</code>. This is what makes the entire system work &mdash; colors are inherited through the CSS cascade, not baked into mixin definitions.</p>
 
 						<div class="demo-split">
@@ -131,30 +204,6 @@
 }</code></pre>
 							</article>
 						</div>
-
-						<h4>Three layers</h4>
-						<table>
-							<thead>
-								<tr><th>Layer</th><th>Role</th><th>Example</th></tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td><strong>ln-acme</strong> (library)</td>
-									<td>Defines the default mixin &mdash; reads from <code>var(--token)</code>, never hardcodes</td>
-									<td><code>@mixin panel-header { background-color: hsl(var(--color-primary)); color: hsl(var(--color-white)); }</code></td>
-								</tr>
-								<tr>
-									<td><strong>Project</strong> (consumer)</td>
-									<td>Uses the mixin on semantic selectors. For different colors, overrides the <strong>CSS variable on a parent</strong>, not the mixin</td>
-									<td><code>.ln-modal header { @include panel-header; }</code><br><code>.ln-modal { --color-primary: 280 60% 50%; }</code></td>
-								</tr>
-								<tr>
-									<td><strong>Project override</strong> (rare)</td>
-									<td>Redefines the mixin only when <strong>structure</strong> needs to change (layout, padding, border-radius) &mdash; still reads from tokens</td>
-									<td>Project's own <code>@mixin panel-header { ... }</code></td>
-								</tr>
-							</tbody>
-						</table>
 
 						<h4>When to use which approach</h4>
 						<table>
@@ -693,6 +742,108 @@
 /* Override --color-primary on the context */
 .brand-section { --color-primary: var(--color-brand); }
 /* All buttons inside .brand-section now use brand color */</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     FORM
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Form</h3></header>
+					<main>
+						<p>All form mixins live in <code>scss/config/mixins/_form.scss</code>. The component file <code>scss/components/_forms.scss</code> applies them to default element selectors.</p>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include form-label</code></td><td>Block label: text-sm, font-medium, text-primary, margin-bottom</td></tr>
+								<tr><td><code>@include form-grid</code></td><td>6-column grid &rarr; 1-column on mobile. Children use <code>grid-column: span N</code></td></tr>
+								<tr><td><code>@include form-actions</code></td><td>Flex row with justify-end, gap, border-top, margin-top</td></tr>
+								<tr><td><code>@include form-input</code></td><td>Base input styling: border, focus ring, placeholder, disabled state</td></tr>
+								<tr><td><code>@include form-textarea</code></td><td>Min-height 6rem, vertical resize</td></tr>
+								<tr><td><code>@include form-select</code></td><td>Custom appearance with SVG arrow indicator</td></tr>
+								<tr><td><code>@include form-check</code></td><td>Base checkbox/radio: appearance none, custom border, checked state</td></tr>
+								<tr><td><code>@include form-checkbox</code></td><td>Checkbox: form-check + rounded-sm corners</td></tr>
+								<tr><td><code>@include form-radio</code></td><td>Radio: form-check + circle + dot indicator</td></tr>
+								<tr><td><code>@include pill</code></td><td>Filled pill label: gray bg, colored on checked, input hidden</td></tr>
+								<tr><td><code>@include pill-group</code></td><td>Grouped pills: border-radius on first/last child</td></tr>
+								<tr><td><code>@include pill-outline</code></td><td>Switch pills to outline style: bordered, visible input indicator</td></tr>
+							</tbody>
+						</table>
+						<pre><code>// Library default — already applied
+input, textarea, select { @include form-input; }
+input[type="checkbox"]  { @include form-checkbox; }
+label                   { @include form-label; }
+
+// Project override — custom form
+#audit-form {
+  @include form-grid;
+  label { grid-column: span 3; }
+  .form-actions { grid-column: span 6; }
+}
+
+// Pill outline variant
+#role-selector { @include pill-outline; }</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     TABLE
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Table</h3></header>
+					<main>
+						<p>All table mixins live in <code>scss/config/mixins/_table.scss</code>. The component file applies <code>table-base</code> and <code>table-responsive</code> to the <code>table</code> element.</p>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include table-base</code></td><td>Full table styling: bg, shadow, rounded, thead, th, td, row hover, last-row border</td></tr>
+								<tr><td><code>@include table-responsive</code></td><td>Mobile stacked layout: td becomes block, uses <code>data-label</code> for column headers</td></tr>
+								<tr><td><code>@include table-striped</code></td><td>Odd-row zebra striping</td></tr>
+								<tr><td><code>@include table-section-header</code></td><td>Section header row: bold, colored background</td></tr>
+								<tr><td><code>@include table-action</code></td><td>Inline action button/link in table cells</td></tr>
+							</tbody>
+						</table>
+						<pre><code>// Library default — already applied
+table { @include table-base; }
+@media (max-width: 768px) { table { @include table-responsive; } }
+
+// Project — striped table with section headers
+#server-status {
+  @include table-base;
+  @include table-striped;
+  tr[data-section] td { @include table-section-header; }
+  td a { @include table-action; }
+}</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     BREADCRUMBS & LOADER
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Breadcrumbs &amp; Loader</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th><th>Default selector</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include breadcrumbs</code></td><td>Flex list with <code>&raquo;</code> separator, link hover, <code>[aria-current="page"]</code> for active item</td><td><code>#breadcrumbs</code></td></tr>
+								<tr><td><code>@include loader</code></td><td>CSS-only spinner animation (box-shadow based)</td><td>none &mdash; project defines selector</td></tr>
+							</tbody>
+						</table>
+						<pre><code>// Breadcrumbs — library applies to #breadcrumbs
+// HTML: &lt;nav id="breadcrumbs" aria-label="Breadcrumbs"&gt;
+//         &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+//         &lt;li aria-current="page"&gt;Users&lt;/li&gt;
+//       &lt;/nav&gt;
+
+// Loader — project applies to its own selector
+#loading { @include loader; }</code></pre>
 					</main>
 				</section>
 

@@ -15,20 +15,35 @@ Used in Laravel projects and other web applications.
 ```
 scss/
 ├── config/
-│   ├── _tokens.scss     ← :root CSS variables (DO NOT change without reason)
-│   ├── _mixins.scss     ← @include helpers (add new ones as needed)
-│   ├── _theme.scss      ← Color palette extensions
-│   └── _icons.scss      ← SVG data-URI icon variables
-├── base/                ← Reset, global defaults, typography
-├── layout/              ← App layout, grid, header
-├── components/          ← Card, forms, tables, navigation, etc.
-└── utilities/           ← Helper classes (.hidden, etc.)
+│   ├── _tokens.scss         ← :root CSS variables (DO NOT change without reason)
+│   ├── _mixins.scss         ← @forward index of all mixins
+│   ├── mixins/
+│   │   ├── _index.scss      ← @forward all mixin files
+│   │   ├── _spacing.scss    ← p, px, py, m, mx, my, gap (primitives)
+│   │   ├── _display.scss    ← flex, block, hidden, items-*, justify-*
+│   │   ├── _typography.scss ← text-*, font-*, truncate
+│   │   ├── _colors.scss     ← text-primary, bg-primary
+│   │   ├── _borders.scss    ← border, rounded-*
+│   │   ├── _form.scss       ← form-input, form-select, form-checkbox, pill, ...
+│   │   ├── _btn.scss        ← btn, btn-colors, close-button
+│   │   ├── _table.scss      ← table-base, table-responsive, table-striped, ...
+│   │   ├── _card.scss       ← card, panel-header, section, section-card
+│   │   ├── _modal.scss      ← modal-sm, modal-md, modal-lg, modal-xl
+│   │   ├── _breadcrumbs.scss← breadcrumbs
+│   │   ├── _loader.scss     ← loader
+│   │   └── ...              ← other primitive/composite mixins
+│   ├── _theme.scss          ← Color palette extensions
+│   └── _icons.scss          ← SVG data-URI icon variables
+├── base/                    ← Reset, global defaults, typography
+├── layout/                  ← App layout, grid, header
+├── components/              ← Default application of mixins to selectors
+└── utilities/               ← Helper classes (.hidden, etc.)
 
 js/
-├── index.js             ← Barrel import (all components)
+├── index.js                 ← Barrel import (all components)
 └── ln-{name}/
-    ├── ln-{name}.js     ← IIFE component
-    └── ln-{name}.scss   ← Co-located CSS (if needed)
+    ├── ln-{name}.js         ← IIFE component
+    └── ln-{name}.scss       ← Co-located CSS (if needed)
 ```
 
 ---
@@ -126,14 +141,44 @@ Checkbox/radio pills use `<ul class="btn-group"> > <li> > <label>` — grouped, 
 #my-form fieldset { @include pill-outline; }
 ```
 
-## Adding a New SCSS Component
+## SCSS Architecture — Two Layers
 
-1. Create `scss/components/_new-component.scss`
-2. Start with `@use '../config/mixins' as *;`
-3. Use semantic selectors (`.component element {}`)
-4. Use `@include` mixins for properties
-5. Use `var(--token)` for values — **NEVER** hardcoded colors
-6. Add `@use 'components/new-component'` to `scss/ln-acme.scss`
+Every visual style has **two layers**: a mixin (recipe) and a component (application).
+
+```
+scss/config/mixins/_table.scss      →  @mixin table-base { ... }         ← recipe
+scss/components/_tables.scss        →  table { @include table-base; }    ← applied
+```
+
+**Mixins** (`scss/config/mixins/`) — define HOW something looks. Never generate CSS by themselves.
+**Components** (`scss/components/`) — apply mixins to default selectors. Generate CSS.
+
+| Situation | Mixin | Component |
+|---|---|---|
+| Universal element (`label`, `table`, `input`) | yes | yes — applied to element selector |
+| Singleton (`#breadcrumbs`) | yes | yes — applied to `#id` selector |
+| Component-identifying class (`.btn`, `.btn-group`, `.collapsible`) | yes | yes — applied to class |
+| Data-attr JS component (`[data-ln-tabs]`) | not needed | yes — selector is the attribute |
+
+**Projects override** by using the same mixin on their own selector:
+```scss
+// project — different table styling for a specific table
+#audit-log { @include table-base; @include table-striped; }
+#audit-log thead { display: none; } // no header for this one
+```
+
+## Adding a New SCSS Mixin + Component
+
+1. Create `scss/config/mixins/_new-component.scss` with `@mixin new-component { ... }`
+2. Register in `scss/config/mixins/_index.scss` with `@forward 'new-component'`
+3. Update `scss/config/_mixins.scss` header comment
+4. Create `scss/components/_new-component.scss` that applies the mixin:
+   ```scss
+   @use '../config/mixins' as *;
+   #new-component { @include new-component; }
+   ```
+5. Add `@use 'components/new-component'` to `scss/ln-acme.scss`
+6. Use `@include` mixins for properties, `var(--token)` for values — **NEVER** hardcoded colors
 
 ## Adding a New JS Component
 
@@ -147,11 +192,14 @@ Checkbox/radio pills use `<ul class="btn-group"> > <li> > <label>` — grouped, 
 
 ## Override Architecture
 
-ln-acme defines default mixins → projects use them on semantic selectors → projects override `--color-primary` (for colors) or redefine the mixin (for structure).
+ln-acme ships two layers: **mixins** (recipes) + **components** (defaults applied to selectors).
+Projects can override at any level:
 
-1. **Color change** → override CSS variable on parent: `.my-section { --color-primary: var(--color-error); }`
-2. **Structure change** → redefine the mixin in project `_overrides.scss`
-3. **Project selectors never change** — they describe WHAT, not HOW
+1. **Use the default** → do nothing, library CSS works out of the box
+2. **Color change** → override CSS variable: `.my-section { --color-primary: var(--color-error); }`
+3. **Structure tweak** → re-apply mixin with modifications on a project selector
+4. **Full replace** → exclude the component, use only the mixin on a custom selector
+5. **Project selectors never change** — they describe WHAT, not HOW
 
 ## Changing Design Tokens
 

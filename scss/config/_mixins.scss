@@ -18,13 +18,20 @@
 //   mixins/_transitions.scss  — transition, transition-fast
 //   mixins/_position.scss     — relative, absolute, overflow-*
 //   mixins/_interaction.scss  — cursor-*, z-*
-//   mixins/_layout.scss       — grid, form-grid, stack, container
+//   mixins/_layout.scss       — grid, stack, container
 //   mixins/_collapsible.scss  — collapsible, collapsible-content
 //   mixins/_card.scss         — card, panel-header, section, section-card
 //   mixins/_nav.scss          — nav
+//   mixins/_form.scss         — form-label, form-grid, form-actions, form-input,
+//                               form-textarea, form-select, form-check,
+//                               form-checkbox, form-radio, pill, pill-group
 //   mixins/_btn.scss          — btn, btn-colors, close-button
 //   mixins/_modal.scss        — modal-sm, modal-md, modal-lg, modal-xl
 //   mixins/_pill.scss         — pill-outline
+//   mixins/_breadcrumbs.scss  — breadcrumbs
+//   mixins/_loader.scss       — loader
+//   mixins/_table.scss        — table-base, table-responsive, table-striped,
+//                               table-section-header, table-action
 // ==========================================================================
 
 @forward 'mixins/index';
