@@ -1,4 +1,4 @@
-// Spacing — прима CSS variable или вредност
+// Spacing — accepts CSS variable or value
 
 @mixin p($val)  { padding: $val; }
 @mixin px($val) { padding-left: $val; padding-right: $val; }

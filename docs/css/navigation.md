@@ -17,8 +17,8 @@ Sidebar navigation component. File: `scss/components/_nav.scss`.
 </nav>
 ```
 
-> **Семантика:** `.nav-section` е наслов на група → користи `<h6>`, не `<div>`.
-> `.nav-divider` е разделувач → користи `<hr>`, не `<div>`.
+> **Semantics:** `.nav-section` is a group heading → use `<h6>`, not `<div>`.
+> `.nav-divider` is a separator → use `<hr>`, not `<div>`.
 
 ## Elements
 

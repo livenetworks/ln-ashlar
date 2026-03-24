@@ -16,5 +16,5 @@ Navigation trail. File: `scss/components/_breadcrumbs.scss`.
 
 Separator `>>` is auto-generated via `::before` pseudo-element.
 
-> **Семантика:** Breadcrumbs се подредена листа → `<ol>`, не голи `<li>` во `<nav>`.
-> `aria-label="breadcrumb"` и `aria-current="page"` за accessibility.
+> **Semantics:** Breadcrumbs are an ordered list → `<ol>`, not bare `<li>` inside `<nav>`.
+> `aria-label="breadcrumb"` and `aria-current="page"` for accessibility.
