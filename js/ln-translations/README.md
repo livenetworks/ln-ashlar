@@ -134,7 +134,7 @@ name="items[5][trans][en][title]"
 
 ```html
 <form data-ln-translations
-      data-ln-translations-default="mk">
+      data-ln-translations-default="en">
     <header>
         <h3>Company Info</h3>
         <div class="ln-translations__actions">
@@ -148,7 +148,7 @@ name="items[5][trans][en][title]"
     </header>
     <main>
         <p data-ln-translatable="scope">
-            <label>Scope <textarea name="scope">Производство на храна</textarea></label>
+            <label>Scope <textarea name="scope">Food and beverage production</textarea></label>
         </p>
         <p>
             <label>Code <input type="text" name="code" value="28"></label>
@@ -161,7 +161,7 @@ name="items[5][trans][en][title]"
 
 ```html
 <form data-ln-translations
-      data-ln-translations-default="mk">
+      data-ln-translations-default="en">
     <header>
         <h3>Standard Details</h3>
         <div class="ln-translations__actions">
@@ -175,7 +175,7 @@ name="items[5][trans][en][title]"
     </header>
     <main>
         <p data-ln-translatable="title">
-            <label>Title <input type="text" name="title" value="Информациска безбедност"></label>
+            <label>Title <input type="text" name="title" value="Information Security"></label>
             <input data-ln-translatable-lang="en" name="trans[en][title]" value="Information Security" placeholder="English translation">
         </p>
     </main>
@@ -186,7 +186,7 @@ name="items[5][trans][en][title]"
 
 ```html
 <form data-ln-translations
-      data-ln-translations-default="mk">
+      data-ln-translations-default="en">
     <header>
         <h3>Nested Items</h3>
         <div class="ln-translations__actions">
@@ -200,10 +200,10 @@ name="items[5][trans][en][title]"
     </header>
     <main>
         <article data-ln-translatable="title" data-ln-translations-prefix="items[1]">
-            <label>Item 1 <input type="text" name="items[1][title]" value="Лидерство"></label>
+            <label>Item 1 <input type="text" name="items[1][title]" value="Leadership"></label>
         </article>
         <article data-ln-translatable="title" data-ln-translations-prefix="items[2]">
-            <label>Item 2 <input type="text" name="items[2][title]" value="Планирање"></label>
+            <label>Item 2 <input type="text" name="items[2][title]" value="Planning"></label>
         </article>
     </main>
 </form>

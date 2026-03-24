@@ -8,7 +8,7 @@
 @use 'transitions' as *;
 @use 'position' as *;
 
-// Card & Section — композитни mixins
+// Card & Section — composite mixins
 
 @mixin card {
 	@include bg-primary;

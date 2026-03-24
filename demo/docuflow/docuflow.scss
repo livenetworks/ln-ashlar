@@ -1,9 +1,9 @@
 // ==========================================================================
 // DocuFlow Demo — Bundled build
 // ==========================================================================
-// Ова е project layer: ги користи ln-acme mixins/tokens за да изгради
-// DocuFlow 3-column layout дизајн. ln-acme CSS е вклучен во build-от преку
-// @use; output-от е еден CSS фајл во dist/docuflow.css.
+// This is the project layer: uses ln-acme mixins/tokens to build the
+// DocuFlow 3-column layout design. ln-acme CSS is included in the build
+// via @use; the output is a single CSS file in dist/docuflow.css.
 // ==========================================================================
 
 // Framework (includes full ln-acme CSS)

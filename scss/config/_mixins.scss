@@ -1,13 +1,13 @@
 // ==========================================================================
 // Mixins — ln-acme
 // ==========================================================================
-// Tailwind-like utility mixins. Наместо utility класи во HTML,
-// ги @include во SCSS компонентите.
+// Tailwind-like utility mixins. Instead of utility classes in HTML,
+// @include them in SCSS components.
 //
-// СИТЕ mixins ги референцираат CSS variables од _tokens.scss.
-// Ништо не е hardcoded — промени го token-от, промени го секаде.
+// ALL mixins reference CSS variables from _tokens.scss.
+// Nothing is hardcoded — change the token, change it everywhere.
 //
-// Организација:
+// Organization:
 //   mixins/_spacing.scss      — p, px, py, m, mx, my, gap
 //   mixins/_display.scss      — flex, block, hidden, items-*, justify-*
 //   mixins/_sizing.scss       — w, h, size

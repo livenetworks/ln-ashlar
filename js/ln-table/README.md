@@ -1,27 +1,27 @@
 # ln-table
 
-Data table компонента — in-memory filter, sort, virtual scroll.
-Две независни компоненти кои комуницираат преку CustomEvents.
+Data table component — in-memory filter, sort, virtual scroll.
+Two independent components that communicate via CustomEvents.
 
-| Компонента | `window.*` | Одговорност |
+| Component | `window.*` | Responsibility |
 |-----------|-----------|-------------|
-| `ln-table-sort` | `lnTableSort` | Click на `th` → cycling asc/desc/null → dispatch `ln-table:sort` |
-| `ln-table` | `lnTable` | Parse rows, слуша events, filter + sort во меморија, render |
+| `ln-table-sort` | `lnTableSort` | Click on `th` → cycling asc/desc/null → dispatch `ln-table:sort` |
+| `ln-table` | `lnTable` | Parse rows, listen to events, filter + sort in memory, render |
 
-Search се обезбедува од **`ln-search`** (генеричка компонента) — `data-ln-search="tableId"` на input-от.
+Search is provided by **`ln-search`** (generic component) — `data-ln-search="tableId"` on the input.
 
 ---
 
-## Основна употреба
+## Basic Usage
 
 ```html
 <div id="employees" data-ln-table>
     <header class="ln-table__toolbar">
-        <h3>Вработени</h3>
+        <h3>Employees</h3>
         <aside>
             <label class="ln-table__search">
                 <span class="ln-icon-filter ln-icon--sm"></span>
-                <input type="search" placeholder="Пребарај..." data-ln-search="employees">
+                <input type="search" placeholder="Search..." data-ln-search="employees">
             </label>
             <span class="ln-table__count"></span>
             <span class="ln-table__timing"></span>
@@ -32,73 +32,73 @@ Search се обезбедува од **`ln-search`** (генеричка ком
         <thead>
             <tr>
                 <th data-ln-sort="number">#</th>
-                <th data-ln-sort="string">Ime</th>
-                <th data-ln-sort="date">Datum</th>
-                <th data-ln-sort="number">Plata</th>
-                <th>Akcii</th>
+                <th data-ln-sort="string">Name</th>
+                <th data-ln-sort="date">Date</th>
+                <th data-ln-sort="number">Salary</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>1</td>
-                <td>Marko Petrovski</td>
+                <td>John Smith</td>
                 <td data-ln-value="1700000000">15.11.2023</td>
-                <td data-ln-value="55000">55.000</td>
+                <td data-ln-value="55000">55,000</td>
                 <td><button>...</button></td>
             </tr>
         </tbody>
     </table>
 
     <footer class="ln-table__footer">
-        <span>Вкупно: <strong></strong></span>
+        <span>Total: <strong></strong></span>
     </footer>
 </div>
 ```
 
 ---
 
-## Атрибути
+## Attributes
 
 ### `[data-ln-table]`
 
-На wrapper елементот. Мора да има `id` ако се поврзува со search input.
+On the wrapper element. Must have an `id` if connected to a search input.
 
 ### `[data-ln-search="tableId"]`
 
-На `<input>` (или на wrapper) — стандарден `ln-search` атрибут.
-`ln-table` го пресретнува `ln-search:change` евентот и вика `preventDefault()`,
-со што `ln-search` го прескокнува своето DOM show/hide и `ln-table` го врши
-филтрирањето во меморија.
+On `<input>` (or wrapper) — standard `ln-search` attribute.
+`ln-table` intercepts the `ln-search:change` event and calls `preventDefault()`,
+so `ln-search` skips its own DOM show/hide and `ln-table` handles
+filtering in memory.
 
 ### `[data-ln-table-clear]`
 
-На копче — ја чисти вредноста на поврзаниот search input.
-Се резолвира преку: `btn → closest [data-ln-table] → id → [data-ln-search="id"]`.
+On a button — clears the connected search input value.
+Resolved via: `btn → closest [data-ln-table] → id → [data-ln-search="id"]`.
 
 ### `th[data-ln-sort]`
 
-На `<th>` елементи — ги прави колоните sortable.
-Вредноста го одредува типот на споредување:
+On `<th>` elements — makes columns sortable.
+The value determines the comparison type:
 
-| Вредност | Споредување |
+| Value | Comparison |
 |----------|-------------|
-| `string` | Lexicographic (Intl.Collator — Cyrillic-aware, се чита од `<html lang>`) |
-| `number` | Нумеричко |
-| `date` | Нумеричко (timestamp во `data-ln-value`) |
-| _(без вредност)_ | Колоната не е sortable |
+| `string` | Lexicographic (Intl.Collator — locale-aware, reads from `<html lang>`) |
+| `number` | Numeric |
+| `date` | Numeric (timestamp in `data-ln-value`) |
+| _(no value)_ | Column is not sortable |
 
 ### `td[data-ln-value]`
 
-На `<td>` — raw вредност за sort/filter кога display текстот се разликува (форматирани броеви, датуми).
+On `<td>` — raw value for sort/filter when display text differs (formatted numbers, dates).
 
 ```html
-<!-- Без data-ln-value: sort по "55.000" (string) -->
-<td>55.000</td>
+<!-- Without data-ln-value: sorts by "55,000" (string) -->
+<td>55,000</td>
 
-<!-- Со data-ln-value: sort по 55000 (number), display "55.000" -->
-<td data-ln-value="55000">55.000</td>
+<!-- With data-ln-value: sorts by 55000 (number), displays "55,000" -->
+<td data-ln-value="55000">55,000</td>
 
-<!-- Датум: sort по Unix timestamp, display по форматиран датум -->
+<!-- Date: sorts by Unix timestamp, displays formatted date -->
 <td data-ln-value="1700000000">15.11.2023</td>
 ```
 
@@ -106,8 +106,8 @@ Search се обезбедува од **`ln-search`** (генеричка ком
 
 ## Empty state
 
-`ln-table` не содржи hardcoded markup или текст.
-Кога пребарувањето враќа 0 резултати, се прикажува содржината на `<template data-ln-table-empty>` (ако постои) и секогаш се dispatch-ува `ln-table:empty` event.
+`ln-table` contains no hardcoded markup or text.
+When search returns 0 results, the content of `<template data-ln-table-empty>` is shown (if present) and `ln-table:empty` event is always dispatched.
 
 ```html
 <div id="employees" data-ln-table>
@@ -124,7 +124,7 @@ Search се обезбедува од **`ln-search`** (генеричка ком
 </div>
 ```
 
-Без `<template>` — слушај го евентот и прикажи свое UI:
+Without `<template>` — listen to the event and show your own UI:
 
 ```javascript
 document.getElementById('employees').addEventListener('ln-table:empty', function (e) {
@@ -134,49 +134,49 @@ document.getElementById('employees').addEventListener('ln-table:empty', function
 
 ---
 
-## CSS класи
+## CSS Classes
 
-| Класа | Опис |
+| Class | Description |
 |-------|------|
-| `.ln-table__toolbar` | Sticky header (закачен под `.header`) |
-| `.ln-table__search` | Wrapper за search input со икона |
-| `.ln-table__count` | Badge со број на записи (пополнува JS) |
-| `.ln-table__timing` | Monospace badge со ms (пополнува JS) |
-| `.ln-table__footer` | Footer со вкупен count |
-| `.ln-table__empty-state` | Стил за empty state article |
+| `.ln-table__toolbar` | Sticky header (pinned below `.header`) |
+| `.ln-table__search` | Wrapper for search input with icon |
+| `.ln-table__count` | Badge with record count (populated by JS) |
+| `.ln-table__timing` | Monospace badge with ms (populated by JS) |
+| `.ln-table__footer` | Footer with total count |
+| `.ln-table__empty-state` | Style for empty state article |
 
 ---
 
 ## Events
 
-Сите events се dispatch-уваат на `[data-ln-table]` елементот и bubble-аат нагоре.
+All events are dispatched on the `[data-ln-table]` element and bubble up.
 
-Компонентата dispatch-ува само сурови броеви — форматирањето е одговорност на страницата.
+The component dispatches only raw numbers — formatting is the page's responsibility.
 
-| Event | Dispatch-ува | `detail` |
+| Event | Dispatched by | `detail` |
 |-------|-------------|----------|
-| `ln-table:ready` | `ln-table` — по парсирање на rows | `{ total }` |
-| `ln-table:filter` | `ln-table` — по filter render | `{ term, matched, total }` |
-| `ln-table:sort` | `ln-table-sort` — по click на `th` | `{ column, sortType, direction }` |
-| `ln-table:sorted` | `ln-table` — по sort render | `{ column, direction, matched, total }` |
-| `ln-table:empty` | `ln-table` — кога filter врати 0 резултати | `{ term, total }` |
+| `ln-table:ready` | `ln-table` — after row parsing | `{ total }` |
+| `ln-table:filter` | `ln-table` — after filter render | `{ term, matched, total }` |
+| `ln-table:sort` | `ln-table-sort` — after `th` click | `{ column, sortType, direction }` |
+| `ln-table:sorted` | `ln-table` — after sort render | `{ column, direction, matched, total }` |
+| `ln-table:empty` | `ln-table` — when filter returns 0 results | `{ term, total }` |
 
 ```javascript
 var table = document.getElementById('employees');
 
-// Почетен count по парсирање
+// Initial count after parsing
 table.addEventListener('ln-table:ready', function (e) {
     countEl.textContent = e.detail.total.toLocaleString();
 });
 
-// По пребарување — ажурирај count
+// After search — update count
 table.addEventListener('ln-table:filter', function (e) {
     countEl.textContent = e.detail.matched < e.detail.total
         ? e.detail.matched.toLocaleString() + ' / ' + e.detail.total.toLocaleString()
         : e.detail.total.toLocaleString();
 });
 
-// Нема резултати
+// No results
 table.addEventListener('ln-table:empty', function (e) {
     console.log('No match for:', e.detail.term);
 });
@@ -186,38 +186,38 @@ table.addEventListener('ln-table:empty', function (e) {
 
 ## Virtual scroll
 
-Автоматски се активира кога бројот на (филтрирани) редови надминува 200.
-Рендерира само видливите редови + 15 buffer редови над/под viewport.
-Деактивира се автоматски кога редовите паднат под прагот.
+Automatically activates when the number of (filtered) rows exceeds 200.
+Renders only visible rows + 15 buffer rows above/below the viewport.
+Deactivates automatically when rows drop below the threshold.
 
-Колонските ширини се заклучуваат при прв parse за да спречат width jumps.
+Column widths are locked on first parse to prevent width jumps.
 
 ---
 
-## Динамички редови
+## Dynamic rows
 
-Ако `<tbody>` е празен при init (редовите доаѓаат via AJAX), компонентата чека — MutationObserver детектира кога редовите се додадат и тогаш ги парсира.
+If `<tbody>` is empty at init (rows arrive via AJAX), the component waits — MutationObserver detects when rows are added and parses them automatically.
 
 ```javascript
-// По AJAX — директно постави innerHTML, ln-table ќе го забележи
+// After AJAX — set innerHTML directly, ln-table will detect it
 document.querySelector('#employees tbody').innerHTML = generatedHtml;
 ```
 
 ---
 
-## Colspan — последна колона
+## Colspan — last column
 
-Последната колона (actions/buttons) е исклучена од search index — JS ги зема само `cells[0..n-2]` за `searchText`.
+The last column (actions/buttons) is excluded from the search index — JS takes only `cells[0..n-2]` for `searchText`.
 
 ---
 
-## Употреба на Intl.Collator
+## Intl.Collator usage
 
-Collator-от за string sort се создава еднаш при init:
+The collator for string sort is created once at init:
 
 ```javascript
 new Intl.Collator(document.documentElement.lang || undefined, { sensitivity: 'base' })
 ```
 
-Ако `<html lang="mk">` — Cyrillic-aware sort.
-Ако `lang` е празен — browser default locale.
+If `<html lang="en">` — locale-aware sort.
+If `lang` is empty — browser default locale.

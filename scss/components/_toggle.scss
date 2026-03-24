@@ -3,20 +3,20 @@
 // ==========================================================================
 // Toggle — collapse/expand CSS
 // ==========================================================================
-// data-ln-toggle = JS (додава .open класа)
-// .collapsible   = CSS (grid collapse анимација)
+// data-ln-toggle = JS (adds .open class)
+// .collapsible   = CSS (grid collapse animation)
 //
-// Парентот (.collapsible) НИКОГАШ нема padding — се затвора до 0.
-// Padding/margins одат на child елементот (.collapsible-body).
+// The parent (.collapsible) NEVER has padding — it collapses to 0.
+// Padding/margins go on the child element (.collapsible-body).
 //
-// HTML структура:
+// HTML structure:
 //   <main data-ln-toggle class="collapsible">
 //       <section class="collapsible-body">
-//           <p>...</p>     ← содржина со padding, margins итн.
+//           <p>...</p>     ← content with padding, margins etc.
 //       </section>
 //   </main>
 //
-// Или преку @include во проект SCSS:
+// Or via @include in project SCSS:
 //   .my-panel          { @include collapsible; }
 //   .my-panel > .inner { @include collapsible-content; }
 // ==========================================================================
@@ -30,9 +30,9 @@
 .collapsible {
 	@include collapsible;
 
-	// Структурен override — parent МОРА да е grid без padding
-	// за анимацијата да работи. !important бидејќи компоненти
-	// како .card main наметнуваат свои display/padding/flex.
+	// Structural override — parent MUST be grid without padding
+	// for the animation to work. !important because components
+	// like .card main impose their own display/padding/flex.
 	display: grid !important;
 	padding: 0 !important;
 	flex: initial !important;

@@ -1,5 +1,5 @@
-// Mixins index — @forward сите во правилен редослед
-// Примитиви прво, композити после (зависат од примитивите)
+// Mixins index — @forward all in correct order
+// Primitives first, composites after (they depend on primitives)
 
 // Primitives
 @forward 'spacing';

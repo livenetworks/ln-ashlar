@@ -1,15 +1,15 @@
 // ==========================================================================
 // Design Tokens — ln-acme
 // ==========================================================================
-// Единствен извор на вистина за сите дизајн вредности.
-// Сите компоненти ги референцираат овие CSS variables.
-// За темирање: override на :root или scope на елемент.
+// Single source of truth for all design values.
+// All components reference these CSS variables.
+// For theming: override at :root or scope to an element.
 //
-// Боите се зачувани како bare HSL triplets за да овозможат alpha transparency:
+// Colors are stored as bare HSL triplets to enable alpha transparency:
 //   hsl(var(--color-primary))          → solid color
 //   hsl(var(--color-primary) / 0.5)    → 50% transparent
 //
-// Пример за темирање:
+// Theming example:
 //   .dark-theme { --color-bg-primary: 240 14% 15%; }
 // ==========================================================================
 

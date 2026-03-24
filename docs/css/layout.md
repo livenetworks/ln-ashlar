@@ -63,16 +63,16 @@ Sticky, z-sticky, border-bottom. Menu toggle hidden on desktop, visible on mobil
 | `.container` | — | Max 80rem, centered, responsive padding |
 | `.container-sm` | — | Max 56rem, centered |
 
-> **Важно:** Овие класи постојат за **брзо прототипирање** во HTML.
-> Во проектен код, **СЕКОГАШ** користи `@include` на семантички елемент:
+> **Important:** These classes exist for **rapid prototyping** in HTML.
+> In project code, **ALWAYS** use `@include` on a semantic element:
 >
 > ```html
-> <!-- ПОГРЕШНО — презентациска класа во HTML -->
+> <!-- WRONG — presentational class in HTML -->
 > <div class="grid-4">
 >     <div class="card">...</div>
 > </div>
 >
-> <!-- ТОЧНО — семантички HTML + @include во SCSS -->
+> <!-- RIGHT — semantic HTML + @include in SCSS -->
 > <section id="stats">
 >     <ul>
 >         <li>...</li>
@@ -87,7 +87,7 @@ Sticky, z-sticky, border-bottom. Menu toggle hidden on desktop, visible on mobil
 
 ## Container Queries
 
-Components не знаат каде ќе бидат поставени. `@include container` на парентот, `@container` на детето — тоа е единственото правило.
+Components don't know where they'll be placed. `@include container` on the parent, `@container` on the child — that's the only rule.
 
 ```scss
 // Parent declares context
@@ -111,26 +111,26 @@ Components не знаат каде ќе бидат поставени. `@includ
 }
 ```
 
-### Кога `@container`, кога `@media`
+### When `@container`, when `@media`
 
 | `@container` | `@media` |
 |---|---|
 | Reusable components | App shell (sidebar, header) |
 | Cards, grids, lists | Global layout structure |
-| Се поставува на повеќе места | Еден фиксен контекст |
+| Placed in multiple contexts | Single fixed context |
 
-### Стандардни breakpoints
+### Standard breakpoints
 
 | Value | Use |
 |-------|-----|
-| `480px` | 1→2 колони во тесни контејнери |
-| `580px` | 1→2 колони (стандардно) |
-| `880px` | 2→3 колони |
-| `1120px` | 3→4 колони |
+| `480px` | 1→2 columns in tight containers |
+| `580px` | 1→2 columns (standard) |
+| `880px` | 2→3 columns |
+| `1120px` | 3→4 columns |
 
-### Naming конвенција
+### Naming convention
 
-**noun, singular, lowercase, без хифени** — CSS custom ident правила.
+**noun, singular, lowercase, no hyphens** — CSS custom ident rules.
 
 ```scss
 // RIGHT
@@ -140,15 +140,15 @@ container-name: cardgrid;
 container-name: searchresults;
 
 // WRONG
-container-name: left-panel;   // позиција
-container-name: card-grid;    // хифени не се дозволени
+container-name: left-panel;   // position-based
+container-name: card-grid;    // hyphens not allowed
 ```
 
-### Правила
+### Rules
 
-- `container-type` секогаш на **парентот**, `@container` секогаш на **детето** — никогаш на ист елемент
-- **НЕ** комбинирај `container-type: inline-size` со `overflow: hidden` на ист елемент — ги кршат containment. Ако треба клипирање, врапирај со дополнителен елемент
-- Anonymous container (`@include container` без име) работи со `@container (min-width: ...)` — само кога има еден container ancestor во scope
+- `container-type` always on the **parent**, `@container` always on the **child** — never on the same element
+- Do **NOT** combine `container-type: inline-size` with `overflow: hidden` on the same element — they break containment. If you need clipping, wrap with an additional element
+- Anonymous container (`@include container` without name) works with `@container (min-width: ...)` — only when there's a single container ancestor in scope
 
 ## Mobile
 

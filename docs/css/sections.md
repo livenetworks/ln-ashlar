@@ -71,5 +71,5 @@ Empty state placeholder.
 </article>
 ```
 
-> **Семантика:** Празно state е содржина → `<article>`, не `<div>`.
-> Иконата е илустрација → `<figure>`, не `<div>`.
+> **Semantics:** Empty state is content → `<article>`, not `<div>`.
+> The icon is an illustration → `<figure>`, not `<div>`.

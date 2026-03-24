@@ -1,9 +1,9 @@
 // ==========================================================================
 // Admin Demo — Bundled build
 // ==========================================================================
-// Ова е project layer: ги користи ln-acme mixins/tokens за да изгради
-// admin dashboard дизајн. ln-acme CSS е вклучен во build-от преку @use;
-// output-от е еден CSS фајл во dist/admin.css.
+// This is the project layer: uses ln-acme mixins/tokens to build the
+// admin dashboard design. ln-acme CSS is included in the build via @use;
+// the output is a single CSS file in dist/admin.css.
 // ==========================================================================
 
 // Framework (includes full ln-acme CSS)

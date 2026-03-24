@@ -1,4 +1,4 @@
-// Borders — референцира --color-border и --radius-* токени
+// Borders — references --color-border and --radius-* tokens
 
 @mixin border    { border: var(--border-width) solid hsl(var(--color-border)); }
 @mixin border-t  { border-top: var(--border-width) solid hsl(var(--color-border)); }

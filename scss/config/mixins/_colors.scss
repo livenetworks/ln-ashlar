@@ -1,4 +1,4 @@
-// Colors — референцира --color-* токени
+// Colors — references --color-* tokens
 
 @mixin text-primary   { color: hsl(var(--color-text-primary)); }
 @mixin text-secondary { color: hsl(var(--color-text-secondary)); }

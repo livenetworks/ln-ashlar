@@ -1,4 +1,4 @@
-// Transitions — референцира --transition-* токени
+// Transitions — references --transition-* tokens
 
 @mixin transition      { transition: all var(--transition-base); }
 @mixin transition-fast { transition: all var(--transition-fast); }

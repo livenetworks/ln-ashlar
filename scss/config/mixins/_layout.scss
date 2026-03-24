@@ -47,10 +47,10 @@
 }
 
 // Container Queries
-// Парент: @include container(name)
-// Дете:   @container name (min-width: 580px) { ... }
+// Parent: @include container(name)
+// Child:  @container name (min-width: 580px) { ... }
 //
-// ВАЖНО: НЕ комбинирај container-type со overflow:hidden на ист елемент
+// IMPORTANT: Do NOT combine container-type with overflow:hidden on the same element
 //
 // Breakpoints: 480px, 580px, 880px, 1120px
 @mixin container($name: null) {
