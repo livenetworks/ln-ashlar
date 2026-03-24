@@ -100,18 +100,20 @@
 			<header><h3>#breadcrumbs</h3></header>
 			<main>
 				<nav id="breadcrumbs" aria-label="Breadcrumbs">
-					<li><a href="#">Home</a></li>
-					<li><a href="#">Users</a></li>
-					<li aria-current="page">Marko Petrovski</li>
+					<ol>
+						<li><a href="#">Home</a></li>
+						<li><a href="#">Users</a></li>
+						<li aria-current="page">John Smith</li>
+					</ol>
 				</nav>
 			</main>
 		</section>
 
 		<!-- Section -->
 		<section class="section-card">
-			<header><h3>.section</h3></header>
+			<header><h3>&lt;section&gt;</h3></header>
 			<main>
-				<section class="section">
+				<section>
 					<header>
 						<h2>User List</h2>
 						<div class="section-actions">
@@ -130,14 +132,14 @@
 		<section class="section-card">
 			<header><h3>.section-card</h3></header>
 			<main>
-				<div class="section-card">
+				<section class="section-card">
 					<header><h3>Section Title</h3></header>
 					<main><p>Content with padding and border.</p></main>
 					<footer>
 						<button class="btn btn--secondary">Cancel</button>
 						<button class="btn">Save</button>
 					</footer>
-				</div>
+				</section>
 			</main>
 		</section>
 
@@ -158,13 +160,15 @@
 			<main>
 				<pre><code>&lt;!-- Breadcrumbs --&gt;
 &lt;nav id="breadcrumbs" aria-label="Breadcrumbs"&gt;
-    &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href="#"&gt;Section&lt;/a&gt;&lt;/li&gt;
-    &lt;li aria-current="page"&gt;Current&lt;/li&gt;
+    &lt;ol&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Section&lt;/a&gt;&lt;/li&gt;
+        &lt;li aria-current="page"&gt;Current&lt;/li&gt;
+    &lt;/ol&gt;
 &lt;/nav&gt;
 
 &lt;!-- Section --&gt;
-&lt;section class="section"&gt;
+&lt;section&gt;
     &lt;header&gt;
         &lt;h2&gt;Title&lt;/h2&gt;
         &lt;div class="section-actions"&gt;&lt;button&gt;Action&lt;/button&gt;&lt;/div&gt;
@@ -173,17 +177,17 @@
 &lt;/section&gt;
 
 &lt;!-- Section Card --&gt;
-&lt;div class="section-card"&gt;
+&lt;section class="section-card"&gt;
     &lt;header&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;/header&gt;
     &lt;main&gt;...&lt;/main&gt;
     &lt;footer&gt;&lt;button&gt;Save&lt;/button&gt;&lt;/footer&gt;
-&lt;/div&gt;
+&lt;/section&gt;
 
 &lt;!-- Empty State --&gt;
-&lt;div class="section-empty"&gt;
+&lt;article class="section-empty"&gt;
     &lt;h3&gt;No Results&lt;/h3&gt;
     &lt;p&gt;Description...&lt;/p&gt;
-&lt;/div&gt;</code></pre>
+&lt;/article&gt;</code></pre>
 			</main>
 		</section>
 			</div>

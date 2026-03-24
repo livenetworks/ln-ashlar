@@ -76,70 +76,77 @@
 								<h1>New Tenant</h1>
 							</header>
 
-							<form id="tenant-form">
-								<label>Name
-									<input type="text" name="name" required maxlength="255">
-								</label>
+														<form id="tenant-form">
+								<p class="form-element">
+									<label for="t-name">Name</label>
+									<input type="text" id="t-name" name="name" required maxlength="255">
+								</p>
 
-								<label>Slug (subdomain)
-									<input type="text" name="slug" required maxlength="100"
+								<p class="form-element">
+									<label for="t-slug">Slug (subdomain)</label>
+									<input type="text" id="t-slug" name="slug" required maxlength="100"
 									       pattern="[a-z0-9\-]+"
 									       title="Lowercase letters, numbers and hyphens only">
-								</label>
+								</p>
 
-								<label>Custom Domain
-									<input type="text" name="domain" maxlength="255"
+								<p class="form-element">
+									<label for="t-domain">Custom Domain</label>
+									<input type="text" id="t-domain" name="domain" maxlength="255"
 									       placeholder="e.g. docs.company.com">
-								</label>
+								</p>
 
-								<label>Package
-									<select name="package_id" required>
-										<option value="">â€” Select Package â€”</option>
+								<p class="form-element">
+									<label for="t-package">Package</label>
+									<select id="t-package" name="package_id" required>
+										<option value="">— Select Package —</option>
 										<option value="1">Enterprise</option>
 										<option value="2">Professional</option>
 										<option value="3">Starter</option>
 										<option value="4">Trial</option>
 									</select>
-								</label>
+								</p>
 
-								<label>Auth Method
-									<select name="auth_method" required>
+								<p class="form-element">
+									<label for="t-auth">Auth Method</label>
+									<select id="t-auth" name="auth_method" required>
 										<option value="local" selected>Local</option>
 										<option value="ldap">LDAP</option>
 									</select>
-								</label>
+								</p>
 
-								<label>Document Numbering
-									<input type="text" name="doc_number_scheme" required maxlength="255"
+								<p class="form-element">
+									<label for="t-numbering">Document Numbering</label>
+									<input type="text" id="t-numbering" name="doc_number_scheme" required maxlength="255"
 									       value="{TYPE}-{SEQ:4}">
-								</label>
+								</p>
 
-								<label>Review Interval (days)
-									<input type="number" name="default_review_interval" required min="1" max="9999"
+								<p class="form-element">
+									<label for="t-review">Review Interval (days)</label>
+									<input type="number" id="t-review" name="default_review_interval" required min="1" max="9999"
 									       value="365">
-								</label>
+								</p>
 
 								<fieldset>
 									<legend>Branding</legend>
 
-									<label>Primary Color
-										<input type="color" name="color_primary" value="#2737a1">
-									</label>
+									<p class="form-element">
+										<label for="t-color-primary">Primary Color</label>
+										<input type="color" id="t-color-primary" name="color_primary" value="#2737a1">
+									</p>
 
-									<label>Secondary Color
-										<input type="color" name="color_secondary" value="#206ea7">
-									</label>
+									<p class="form-element">
+										<label for="t-color-secondary">Secondary Color</label>
+										<input type="color" id="t-color-secondary" name="color_secondary" value="#206ea7">
+									</p>
 								</fieldset>
 
-								<label>
-									<input type="checkbox" name="is_read_confirm_required" value="1" checked>
-									Require Read Confirmation
-								</label>
+								<p class="form-element">
+									<label><input type="checkbox" name="is_read_confirm_required" value="1" checked> Require Read Confirmation</label>
+								</p>
 
-								<label>
-									<input type="checkbox" name="is_active" value="1" checked>
-									Active
-								</label>
+								<p class="form-element">
+									<label><input type="checkbox" name="is_active" value="1" checked> Active</label>
+								</p>
 
 								<div class="form-actions">
 									<a href="tenants.html" class="btn btn--secondary">Cancel</a>
