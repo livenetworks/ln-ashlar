@@ -238,6 +238,5 @@ Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon
 
 ## Known Backlog
 
-- **ln-ajax** — missing CustomEvent dispatching for AJAX lifecycle
 - **ln-select** — depends on TomSelect (peer dependency)
 - **Form attributes** — renamed to `data-ln-*` convention, Laravel projects need HTML template updates

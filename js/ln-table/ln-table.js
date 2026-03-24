@@ -72,7 +72,7 @@
 		// ─── Search — ln-search dispatches ln-search:change on the target ─────
 		// preventDefault() tells ln-search to skip its own DOM show/hide logic.
 
-		dom.addEventListener('ln-search:change', function (e) {
+		this._onSearch = function (e) {
 			e.preventDefault();
 			self._searchTerm = e.detail.term;
 			self._applyFilterAndSort();
@@ -84,11 +84,12 @@
 				matched: self._filteredData.length,
 				total: self._data.length
 			});
-		});
+		};
+		dom.addEventListener('ln-search:change', this._onSearch);
 
 		// ─── Coordinate with ln-table-sort ─────────────────────
 
-		dom.addEventListener('ln-table:sort', function (e) {
+		this._onSort = function (e) {
 			self._sortCol = e.detail.direction === null ? -1 : e.detail.column;
 			self._sortDir = e.detail.direction;
 			self._sortType = e.detail.sortType;
@@ -102,7 +103,8 @@
 				matched: self._filteredData.length,
 				total: self._data.length
 			});
-		});
+		};
+		dom.addEventListener('ln-table:sort', this._onSort);
 
 		return this;
 	}
@@ -325,6 +327,23 @@
 			term: this._searchTerm,
 			total: this._data.length
 		});
+	};
+
+	// ─── Destroy ───────────────────────────────────────────────
+
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this._disableVirtualScroll();
+		this.dom.removeEventListener('ln-search:change', this._onSearch);
+		this.dom.removeEventListener('ln-table:sort', this._onSort);
+		if (this._colgroup) {
+			this._colgroup.remove();
+			this._colgroup = null;
+		}
+		if (this.table) this.table.style.tableLayout = '';
+		this._data = [];
+		this._filteredData = [];
+		delete this.dom[DOM_ATTRIBUTE];
 	};
 
 	// ─── Helpers ───────────────────────────────────────────────

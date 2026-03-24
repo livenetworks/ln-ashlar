@@ -296,47 +296,26 @@
 			input.value = '';
 		}
 
-		zone.addEventListener('click', function () {
-			input.click();
-		});
-
-		input.addEventListener('change', function () {
-			handleFiles(this.files);
-		});
-
-		zone.addEventListener('dragenter', function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-			zone.classList.add('ln-upload__zone--dragover');
-		});
-
-		zone.addEventListener('dragover', function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-			zone.classList.add('ln-upload__zone--dragover');
-		});
-
-		zone.addEventListener('dragleave', function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-			zone.classList.remove('ln-upload__zone--dragover');
-		});
-
-		zone.addEventListener('drop', function (e) {
-			e.preventDefault();
-			e.stopPropagation();
-			zone.classList.remove('ln-upload__zone--dragover');
-			handleFiles(e.dataTransfer.files);
-		});
-
-		list.addEventListener('click', function (e) {
+		const _onZoneClick = function () { input.click(); };
+		const _onInputChange = function () { handleFiles(this.files); };
+		const _onDragEnter = function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.add('ln-upload__zone--dragover'); };
+		const _onDragOver = function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.add('ln-upload__zone--dragover'); };
+		const _onDragLeave = function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.remove('ln-upload__zone--dragover'); };
+		const _onDrop = function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.remove('ln-upload__zone--dragover'); handleFiles(e.dataTransfer.files); };
+		const _onListClick = function (e) {
 			if (e.target.classList.contains('ln-upload__remove')) {
 				const item = e.target.closest('.ln-upload__item');
-				if (item) {
-					removeFile(item.getAttribute('data-file-id'));
-				}
+				if (item) removeFile(item.getAttribute('data-file-id'));
 			}
-		});
+		};
+
+		zone.addEventListener('click', _onZoneClick);
+		input.addEventListener('change', _onInputChange);
+		zone.addEventListener('dragenter', _onDragEnter);
+		zone.addEventListener('dragover', _onDragOver);
+		zone.addEventListener('dragleave', _onDragLeave);
+		zone.addEventListener('drop', _onDrop);
+		list.addEventListener('click', _onListClick);
 
 		container.lnUploadAPI = {
 			getFileIds: function () {
@@ -361,6 +340,20 @@
 				list.innerHTML = '';
 				updateHiddenInput();
 				_dispatch(container, 'ln-upload:cleared', {});
+			},
+			destroy: function () {
+				zone.removeEventListener('click', _onZoneClick);
+				input.removeEventListener('change', _onInputChange);
+				zone.removeEventListener('dragenter', _onDragEnter);
+				zone.removeEventListener('dragover', _onDragOver);
+				zone.removeEventListener('dragleave', _onDragLeave);
+				zone.removeEventListener('drop', _onDrop);
+				list.removeEventListener('click', _onListClick);
+				uploadedFiles.clear();
+				list.innerHTML = '';
+				updateHiddenInput();
+				container.removeAttribute('data-ln-upload-initialized');
+				delete container.lnUploadAPI;
 			}
 		};
 	}
