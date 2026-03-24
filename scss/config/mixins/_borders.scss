@@ -1,10 +1,10 @@
 // Borders — референцира --color-border и --radius-* токени
 
-@mixin border    { border: 1px solid hsl(var(--color-border)); }
-@mixin border-t  { border-top: 1px solid hsl(var(--color-border)); }
-@mixin border-b  { border-bottom: 1px solid hsl(var(--color-border)); }
-@mixin border-l  { border-left: 1px solid hsl(var(--color-border)); }
-@mixin border-r  { border-right: 1px solid hsl(var(--color-border)); }
+@mixin border    { border: var(--border-width) solid hsl(var(--color-border)); }
+@mixin border-t  { border-top: var(--border-width) solid hsl(var(--color-border)); }
+@mixin border-b  { border-bottom: var(--border-width) solid hsl(var(--color-border)); }
+@mixin border-l  { border-left: var(--border-width) solid hsl(var(--color-border)); }
+@mixin border-r  { border-right: var(--border-width) solid hsl(var(--color-border)); }
 @mixin border-none { border: none; }
 
 @mixin rounded-sm   { border-radius: var(--radius-sm); }

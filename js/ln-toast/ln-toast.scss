@@ -60,7 +60,7 @@
 .ln-toast__card {
 	display: flex;
 	background: var(--ln-toast-bg);
-	border: 1px solid var(--ln-toast-border);
+	border: var(--border-width) solid var(--ln-toast-border);
 	border-radius: var(--ln-toast-radius);
 	box-shadow: var(--ln-toast-shadow);
 	min-width: 320px;

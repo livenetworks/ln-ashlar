@@ -1,5 +1,7 @@
 @use '../config/mixins' as *;
 
+// ─── Floating label (legacy data-ln-input pattern) ──────────────
+
 form {
 	fieldset {
 		@include flex-wrap;
@@ -59,172 +61,50 @@ form {
 	color: hsl(var(--color-error));
 }
 
+// ─── Inputs ─────────────────────────────────────────────────────
+
 input,
 textarea,
 select {
-	@include w-full;
-	@include px(0.75rem);
-	@include py(0.5rem);
-	@include text-base;
-	@include text-primary;
-	@include bg-primary;
-	@include border;
-	@include rounded-md;
-	@include transition;
-	outline: none;
-
-	&:focus {
-		border-color: hsl(var(--color-primary));
-		box-shadow: 0 0 0 3px hsl(var(--color-primary-light));
-	}
-
-	&::placeholder {
-		@include text-muted;
-	}
-
-	&:disabled {
-		@include opacity-50;
-		@include cursor-not-allowed;
-		@include bg-secondary;
-	}
+	@include form-input;
 }
 
 textarea {
-	min-height: 6rem;
-	resize: vertical;
+	@include form-textarea;
 }
 
 select {
-	appearance: none;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-	background-repeat: no-repeat;
-	background-position: right 0.75rem center;
-	padding-right: 2.5rem;
+	@include form-select;
 }
 
-// ─── Custom checkbox & radio ──────────────────────────────────
-
-input[type="checkbox"],
-input[type="radio"] {
-	appearance: none;
-	@include size(1.25rem);
-	padding: 0;
-	@include flex-shrink-0;
-	border: 2px solid hsl(var(--color-border));
-	@include bg-primary;
-	@include cursor-pointer;
-	@include transition;
-	vertical-align: middle;
-
-	&:checked {
-		background-color: hsl(var(--color-primary));
-		border-color: hsl(var(--color-primary));
-		background-image: var(--icon-check-white);
-		background-size: 0.75rem;
-		background-position: center;
-		background-repeat: no-repeat;
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 3px hsl(var(--color-primary-light));
-	}
-
-	&:disabled {
-		@include opacity-50;
-		@include cursor-not-allowed;
-	}
-}
+// ─── Checkbox & Radio ───────────────────────────────────────────
 
 input[type="checkbox"] {
-	@include rounded-sm;
+	@include form-checkbox;
 }
 
 input[type="radio"] {
-	border-radius: 50%;
-
-	&:checked {
-		background-image: none;
-		@include bg-primary;
-		border-width: 5px;
-		border-color: hsl(var(--color-primary));
-	}
+	@include form-radio;
 }
 
-// ─── Pill label for checkbox/radio ────────────────────────────
-// Structure: ul > li > label > input
-// Default: filled style (input hidden, gray bg, colored on checked)
-// Alternative: @include pill-outline on parent for bordered + visible input
+// ─── Pill labels ────────────────────────────────────────────────
 
 label:has(> input[type="checkbox"]),
 label:has(> input[type="radio"]) {
-	@include inline-flex;
-	@include items-center;
-	@include gap(0.5rem);
-	@include px(1rem);
-	@include py(0.5rem);
-	@include cursor-pointer;
-	@include transition;
-	@include text-sm;
-	@include font-medium;
-	@include mb(0);
-	background-color: hsl(var(--color-bg-secondary));
-	border: 1px solid transparent;
-
-	> input { display: none; }
-
-	&:has(> input:checked) {
-		background-color: hsl(var(--color-primary));
-		color: hsl(var(--color-white));
-	}
-
-	&:hover:not(:has(> input:checked)) {
-		border-color: hsl(var(--color-border));
-	}
+	@include pill;
 }
-
-// ─── Pill group: ul > li > label ─────────────────────────────
 
 ul:has(> li > label > input[type="checkbox"]),
 ul:has(> li > label > input[type="radio"]) {
-	@include inline-flex;
-	list-style: none;
-	padding: 0;
-	margin: 0;
-
-	li label {
-		border-radius: 0;
-	}
-
-	li:first-child label {
-		border-radius: var(--radius-md) 0 0 var(--radius-md);
-	}
-
-	li:last-child label {
-		border-radius: 0 var(--radius-md) var(--radius-md) 0;
-	}
-
-	li:only-child label {
-		@include rounded-md;
-	}
+	@include pill-group;
 }
+
+// ─── Label & Actions ────────────────────────────────────────────
 
 label {
-	@include block;
-	@include text-sm;
-	@include font-medium;
-	@include text-primary;
-	@include mb(0.25rem);
-}
-
-.btn {
-	@include btn;
+	@include form-label;
 }
 
 .form-actions {
-	@include flex;
-	@include justify-end;
-	@include gap(0.75rem);
-	@include mt(1.5rem);
-	@include pt(1rem);
-	@include border-t;
+	@include form-actions;
 }
