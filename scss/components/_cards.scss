@@ -1,0 +1,9 @@
+@use '../config/mixins' as *;
+
+.card {
+	@include card;
+}
+
+.section-card {
+	@include section-card;
+}

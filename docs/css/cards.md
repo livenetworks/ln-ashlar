@@ -1,6 +1,6 @@
 # Cards
 
-Data containers with compact, table-like styling. File: `scss/components/_card.scss`.
+Data containers with compact, table-like styling. File: `scss/components/_cards.scss`.
 
 ## Usage (HTML класа — за прототипирање)
 

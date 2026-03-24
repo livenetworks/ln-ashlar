@@ -2,12 +2,12 @@
 
 Page section wrappers. File: `scss/components/_sections.scss`.
 
-## .section
+## `<section>`
 
-Simple section with bordered header.
+Simple section with bordered header. Applied automatically to `<section>` elements.
 
 ```html
-<section class="section">
+<section>
     <header>
         <h2>Title</h2>
         <div class="section-actions"><button>Action</button></div>
