@@ -165,7 +165,7 @@
 	form {
 		@include form-grid;
 
-		> label {
+		.form-element {
 			grid-column: span 3;
 		}
 
@@ -184,7 +184,7 @@
 				@include px(var(--spacing-sm));
 			}
 
-			label {
+			.form-element {
 				@include flex-1;
 			}
 		}

@@ -77,39 +77,44 @@
 							</header>
 
 							<form id="package-form">
-								<label>Name
-									<input type="text" name="name" required maxlength="100">
-								</label>
+								<p class="form-element">
+									<label for="pkg-name">Name</label>
+									<input type="text" id="pkg-name" name="name" required maxlength="100">
+								</p>
 
-								<label>Max Users
-									<input type="number" name="max_users" required min="0" value="0">
+								<p class="form-element">
+									<label for="pkg-max-users">Max Users</label>
+									<input type="number" id="pkg-max-users" name="max_users" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</label>
+								</p>
 
-								<label>Max Guests
-									<input type="number" name="max_guests" required min="0" value="0">
+								<p class="form-element">
+									<label for="pkg-max-guests">Max Guests</label>
+									<input type="number" id="pkg-max-guests" name="max_guests" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</label>
+								</p>
 
-								<label>Max Standards
-									<input type="number" name="max_collections" required min="0" value="0">
+								<p class="form-element">
+									<label for="pkg-max-standards">Max Standards</label>
+									<input type="number" id="pkg-max-standards" name="max_collections" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</label>
+								</p>
 
-								<label>Max Documents
-									<input type="number" name="max_documents" required min="0" value="0">
+								<p class="form-element">
+									<label for="pkg-max-docs">Max Documents</label>
+									<input type="number" id="pkg-max-docs" name="max_documents" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</label>
+								</p>
 
-								<label>Max Storage (MB)
-									<input type="number" name="max_storage_mb" required min="0" value="0">
+								<p class="form-element">
+									<label for="pkg-max-storage">Max Storage (MB)</label>
+									<input type="number" id="pkg-max-storage" name="max_storage_mb" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</label>
+								</p>
 
-								<label>
-									<input type="checkbox" name="is_active" value="1" checked>
-									Active
-								</label>
+								<p class="form-element">
+									<label><input type="checkbox" name="is_active" value="1" checked> Active</label>
+								</p>
 
 								<div class="form-actions">
 									<a href="packages.html" class="btn btn--secondary">Cancel</a>
