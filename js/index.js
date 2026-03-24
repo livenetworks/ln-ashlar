@@ -24,3 +24,4 @@ import './ln-sortable/ln-sortable.js';
 import './ln-confirm/ln-confirm.js';
 import './ln-translations/ln-translations.js';
 import './ln-autosave/ln-autosave.js';
+import './ln-autoresize/ln-autoresize.js';
