@@ -24,7 +24,9 @@
       "Bash(while read:*)",
       "Bash(do grep:*)",
       "Bash(echo \"$f\")",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git stash:*)",
+      "Bash(git pull:*)"
     ]
   }
 }

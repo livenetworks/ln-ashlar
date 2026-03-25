@@ -37,6 +37,7 @@
 /* Header */
 .ln-modal header {
 	@include panel-header;
+	@include mb(0);
 }
 
 .ln-modal header button[data-ln-modal-close] {
@@ -45,7 +46,7 @@
 
 /* Body */
 .ln-modal main {
-	@include p(var(--spacing-lg));
+	@include p(var(--spacing-md));
 	overflow-y: auto;
 	overflow-x: hidden;
 }
