@@ -7,13 +7,12 @@
 @use 'transitions' as *;
 @use 'interaction' as *;
 
-// Navigation — sidebar nav mixin
+// ─── Nav ────────────────────────────────────────────────────────
+// Navigation reset: clean list, styled links, transitions.
+// Layout (flex-col, h-full) and background come from the parent.
 
 @mixin nav {
-	@include bg-primary;
 	@include select-none;
-	@include flex-col;
-	@include h-full;
 
 	ul {
 		list-style: none;
@@ -36,7 +35,6 @@
 		text-decoration: none;
 		@include transition-colors;
 		@include rounded-md;
-		@include mx(0.5rem);
 
 		&:hover {
 			@include bg-secondary;

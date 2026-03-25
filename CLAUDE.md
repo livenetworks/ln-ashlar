@@ -29,6 +29,7 @@ scss/
 │   │   ├── _table.scss      ← table-base, table-responsive, table-striped, ...
 │   │   ├── _card.scss       ← card, panel-header, section, section-card
 │   │   ├── _modal.scss      ← modal-sm, modal-md, modal-lg, modal-xl
+│   │   ├── _nav.scss        ← nav (general navigation reset)
 │   │   ├── _breadcrumbs.scss← breadcrumbs
 │   │   ├── _loader.scss     ← loader
 │   │   └── ...              ← other primitive/composite mixins
