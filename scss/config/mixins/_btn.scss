@@ -41,6 +41,8 @@
 
 @mixin btn-group {
 	@include inline-flex;
+	@include items-center;
+	@include gap(0.25rem);
 	list-style: none;
 	@include p(0);
 	@include m(0);
