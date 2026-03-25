@@ -858,10 +858,15 @@ table { @include table-base; }
 								<tr><th>Mixin</th><th>Description</th></tr>
 							</thead>
 							<tbody>
-								<tr><td><code>@include nav</code></td><td>Full sidebar navigation: styles <code>ul</code>, <code>li</code>, <code>a</code> (with hover/active states), <code>.nav-icon</code>, <code>.nav-label</code>, <code>.nav-section</code>, <code>.nav-divider</code></td></tr>
+								<tr><td><code>@include nav</code></td><td>General navigation reset: clean list, styled links (hover/active), <code>.nav-icon</code>, <code>.nav-label</code>, <code>.nav-section</code>, <code>.nav-divider</code>. Layout and background come from the parent.</td></tr>
 							</tbody>
 						</table>
-						<pre><code>aside nav { @include nav; }
+						<pre><code>// Sidebar — parent handles layout &amp; bg
+aside { @include flex-col; @include h-full; @include bg-primary; }
+aside nav { @include nav; }
+
+// Header nav — same mixin, different context
+#header nav { @include nav; }
 
 // In HTML:
 // &lt;nav data-ln-nav="active"&gt;
