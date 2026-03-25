@@ -126,23 +126,30 @@ All states read from `--color-primary`. No classes needed.
 - **Instance-based API** — `modal.lnModal.open()`, `.close()`, `.toggle()`, `.destroy()`
 - **ESC listener** active only while modal is open (zero listeners when all closed)
 
-## Pill Labels (Checkbox / Radio)
+## Button Groups vs Pill Groups
 
-Checkbox/radio pills use `<ul class="btn-group"> > <li> > <label>` — grouped, border-radius on first/last.
+Two distinct grouping patterns:
 
-- **Filled** (default) — gray bg, colored bg on checked, input hidden
-- **Outline** — `@include pill-outline` on parent → bordered, visible input indicator
-- **Color** — override `--color-primary` on parent for different colors
+- **`@include btn-group`** — action buttons with small gap (toolbars, table actions)
+- **`@include pill-group`** — joined pills without gap, border-radius on first/last only (radio/checkbox)
 
 ```html
+<!-- Action buttons (btn-group) -->
 <ul class="btn-group">
+  <li><button class="ln-icon-edit" title="Edit"></button></li>
+  <li><button class="ln-icon-delete" title="Delete"></button></li>
+</ul>
+
+<!-- Pill radio (pill-group — auto-detected via :has) -->
+<ul>
   <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
   <li><label><input type="radio" name="role" value="editor"> Editor</label></li>
 </ul>
 ```
-```scss
-#my-form fieldset { @include pill-outline; }
-```
+
+- **Filled** (default) — gray bg, colored bg on checked, input hidden
+- **Outline** — `@include pill-outline` on parent → bordered, visible input indicator
+- **Color** — override `--color-primary` on parent for different colors
 
 ## SCSS Architecture — Two Layers
 
