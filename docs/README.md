@@ -17,12 +17,17 @@ js/ln-*/                    → Vanilla JS components (IIFE pattern)
 |-----------|------|------|
 | Design Tokens | `scss/config/_tokens.scss` | [tokens.md](css/tokens.md) |
 | Mixins | `scss/config/_mixins.scss` | [mixins.md](css/mixins.md) |
-| Cards | `scss/components/_card.scss` | [cards.md](css/cards.md) |
-| Tables | `scss/components/_tables.scss` | [tables.md](css/tables.md) |
-| Forms & Buttons | `scss/components/_forms.scss` | [forms.md](css/forms.md) |
-| Navigation | `scss/components/_navigation.scss` | [navigation.md](css/navigation.md) |
+| Cards | `scss/components/_cards.scss` | [cards.md](css/cards.md) |
 | Sections | `scss/components/_sections.scss` | [sections.md](css/sections.md) |
+| Navigation | `scss/components/_nav.scss` | [navigation.md](css/navigation.md) |
+| Tables | `scss/components/_tables.scss` | [tables.md](css/tables.md) |
+| Forms | `scss/components/_forms.scss` | [forms.md](css/forms.md) |
+| Buttons | `scss/components/_buttons.scss` | — |
+| Tabs | `scss/components/_tabs.scss` | — |
+| Toggle | `scss/components/_toggle.scss` | — |
 | Breadcrumbs | `scss/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
+| Loader | `scss/components/_loader.scss` | — |
+| Scrollbar | `scss/components/_scrollbar.scss` | — |
 | Layout | `scss/layout/` | [layout.md](css/layout.md) |
 
 ## JS Components

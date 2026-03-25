@@ -1,11 +1,11 @@
 # Navigation
 
-Sidebar navigation component. File: `scss/components/_navigation.scss`.
+Sidebar navigation component. File: `scss/components/_nav.scss`.
 
 ## Usage
 
 ```html
-<nav class="nav" data-ln-nav="active">
+<nav data-ln-nav="active">
     <h6 class="nav-section">Section Title</h6>
     <ul>
         <li><a href="/users">
@@ -17,14 +17,14 @@ Sidebar navigation component. File: `scss/components/_navigation.scss`.
 </nav>
 ```
 
-> **Семантика:** `.nav-section` е наслов на група → користи `<h6>`, не `<div>`.
-> `.nav-divider` е разделувач → користи `<hr>`, не `<div>`.
+> **Semantics:** `.nav-section` is a group heading → use `<h6>`, not `<div>`.
+> `.nav-divider` is a separator → use `<hr>`, not `<div>`.
 
 ## Elements
 
 | Element | Description |
 |---------|-------------|
-| `.nav` | Container -- full height, flex column |
+| `<nav>` | Container -- full height, flex column |
 | `.nav-section` | Section header -- xs uppercase muted text |
 | `.nav-icon` | Icon slot -- 1.25rem flex-shrink-0 |
 | `.nav-label` | Link text -- flex-1 with truncate |

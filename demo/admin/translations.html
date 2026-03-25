@@ -122,7 +122,7 @@
 						<header><h3>Example — Basic</h3></header>
 						<main>
 							<form data-ln-translations
-							      data-ln-translations-default="mk">
+							      data-ln-translations-default="en">
 								<header>
 									<h3>Company Info</h3>
 									<div class="ln-translations__actions">
@@ -138,13 +138,13 @@
 										<label>Name <input type="text" name="name" value="Acme Corp"></label>
 									</p>
 									<p data-ln-translatable="scope">
-										<label>Scope <textarea name="scope">Производство на храна и пијалоци</textarea></label>
+										<label>Scope <textarea name="scope">Food and beverage production</textarea></label>
 									</p>
 									<p>
 										<label>EA Code <input type="text" name="ea_code" value="28"></label>
 									</p>
 									<p data-ln-translatable="address">
-										<label>Address <input type="text" name="address" value="ул. Македонија 12, Скопје"></label>
+										<label>Address <input type="text" name="address" value="123 Main Street, New York"></label>
 									</p>
 								</main>
 							</form>
@@ -156,7 +156,7 @@
 						<header><h3>Example — With Existing Translations</h3></header>
 						<main>
 							<form data-ln-translations
-							      data-ln-translations-default="mk">
+							      data-ln-translations-default="en">
 								<header>
 									<h3>Standard Details</h3>
 									<div class="ln-translations__actions">
@@ -169,11 +169,11 @@
 								</header>
 								<main>
 									<p data-ln-translatable="title">
-										<label>Title <input type="text" name="title" value="Информациска безбедност"></label>
+										<label>Title <input type="text" name="title" value="Information Security"></label>
 										<input data-ln-translatable-lang="en" name="trans[en][title]" value="Information Security" placeholder="English translation">
 									</p>
 									<p data-ln-translatable="description">
-										<label>Description <textarea name="description">Барања за воспоставување, имплементирање, одржување и континуирано подобрување на систем за управување со информациска безбедност.</textarea></label>
+										<label>Description <textarea name="description">Requirements for establishing, implementing, maintaining and continually improving an information security management system.</textarea></label>
 										<textarea data-ln-translatable-lang="en" name="trans[en][description]" placeholder="English translation">Requirements for establishing, implementing, maintaining and continually improving an information security management system.</textarea>
 									</p>
 								</main>
@@ -186,7 +186,7 @@
 						<header><h3>Example — Nested Items (Prefix)</h3></header>
 						<main>
 							<form data-ln-translations
-							      data-ln-translations-default="mk">
+							      data-ln-translations-default="en">
 								<header>
 									<h3>Checklist Items</h3>
 									<div class="ln-translations__actions">
@@ -199,13 +199,13 @@
 								</header>
 								<main>
 									<article data-ln-translatable="title" data-ln-translations-prefix="items[1]">
-										<label>Item 1 <input type="text" name="items[1][title]" value="Лидерство"></label>
+										<label>Item 1 <input type="text" name="items[1][title]" value="Leadership"></label>
 									</article>
 									<article data-ln-translatable="title" data-ln-translations-prefix="items[2]">
-										<label>Item 2 <input type="text" name="items[2][title]" value="Планирање"></label>
+										<label>Item 2 <input type="text" name="items[2][title]" value="Planning"></label>
 									</article>
 									<article data-ln-translatable="title" data-ln-translations-prefix="items[3]">
-										<label>Item 3 <input type="text" name="items[3][title]" value="Поддршка"></label>
+										<label>Item 3 <input type="text" name="items[3][title]" value="Support"></label>
 									</article>
 								</main>
 							</form>
@@ -255,7 +255,7 @@ name="items[5][trans][en][title]"</code></pre>
 						<header><h3>HTML Structure</h3></header>
 						<main>
 							<pre><code>&lt;form data-ln-translations
-      data-ln-translations-default="mk"&gt;
+      data-ln-translations-default="en"&gt;
     &lt;header&gt;
         &lt;h3&gt;Section Title&lt;/h3&gt;
         &lt;div class="ln-translations__actions"&gt;

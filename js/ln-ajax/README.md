@@ -78,21 +78,9 @@ document.addEventListener('ln-ajax:before-start', function(e) {
 
 ### Integration with ln-toast
 
-`ln-ajax` doesn't know about `ln-toast`. To display messages, listen to `ln-ajax:success` in your project:
+If `window.lnToast` exists and the response contains a `message` object, `ln-ajax` automatically shows a toast notification. No project-level wiring needed.
 
-```javascript
-document.addEventListener('ln-ajax:success', function(e) {
-    const message = e.detail.data.message;
-    if (message && window.lnToast) {
-        window.lnToast.enqueue({
-            type: message.type,
-            title: message.title,
-            message: message.body,
-            data: message.data
-        });
-    }
-});
-```
+To override the default toast behavior, cancel the `ln-ajax:success` event isn't possible (non-cancelable), but you can handle it in your own listener and call `lnToast` yourself with different options.
 
 ### Other examples
 

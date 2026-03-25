@@ -32,6 +32,8 @@
 		this.isEnabled = true;
 		this._dragging = null;
 
+		dom.setAttribute('aria-roledescription', 'sortable list');
+
 		const self = this;
 
 		this._onPointerDown = function (e) {
@@ -105,6 +107,7 @@
 		this._dragging = item;
 
 		item.classList.add('ln-sortable--dragging');
+		item.setAttribute('aria-grabbed', 'true');
 		this.dom.classList.add('ln-sortable--active');
 
 		_dispatch(this.dom, 'ln-sortable:drag-start', {
@@ -179,6 +182,7 @@
 			child.classList.remove('ln-sortable--drop-before', 'ln-sortable--drop-after');
 		}
 		item.classList.remove('ln-sortable--dragging');
+		item.removeAttribute('aria-grabbed');
 		this.dom.classList.remove('ln-sortable--active');
 
 		if (dropTarget && dropTarget !== item) {

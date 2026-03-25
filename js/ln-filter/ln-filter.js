@@ -38,6 +38,11 @@
 
 		this._attachHandlers();
 
+		// Initialize aria-pressed on all filter buttons
+		this.buttons.forEach(function (btn) {
+			btn.setAttribute('aria-pressed', btn.hasAttribute(ACTIVE_ATTR) ? 'true' : 'false');
+		});
+
 		dom.setAttribute(INIT_ATTR, '');
 		return this;
 	}
@@ -91,8 +96,12 @@
 	_component.prototype._setActive = function (btn) {
 		this.buttons.forEach(function (b) {
 			b.removeAttribute(ACTIVE_ATTR);
+			b.setAttribute('aria-pressed', 'false');
 		});
-		if (btn) btn.setAttribute(ACTIVE_ATTR, '');
+		if (btn) {
+			btn.setAttribute(ACTIVE_ATTR, '');
+			btn.setAttribute('aria-pressed', 'true');
+		}
 	};
 
 	// ─── Public API ────────────────────────────────────────────

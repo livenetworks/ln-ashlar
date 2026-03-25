@@ -145,39 +145,39 @@
 				<section id="demo-tabs" class="section-card">
 					<header><h3>Tabs</h3></header>
 					<main>
-						<div data-ln-tabs data-ln-tabs-default="pregled">
+						<div data-ln-tabs data-ln-tabs-default="overview">
 							<nav class="demo-tabs">
-								<button data-ln-tab="pregled">Overview</button>
-								<button data-ln-tab="korisnici">Users</button>
-								<button data-ln-tab="podesuvanja">Settings</button>
+								<button data-ln-tab="overview">Overview</button>
+								<button data-ln-tab="users">Users</button>
+								<button data-ln-tab="settings">Settings</button>
 							</nav>
 
-							<div data-ln-panel="pregled" class="demo-panel">
+							<div data-ln-panel="overview" class="demo-panel">
 								<p>Content of the <strong>Overview</strong> tab. Tabs are synchronized with the URL hash.</p>
-								<p>Change the URL hash to <code>#korisnici</code> to see.</p>
+								<p>Change the URL hash to <code>#users</code> to see.</p>
 							</div>
 
-							<div data-ln-panel="korisnici" class="demo-panel hidden">
+							<div data-ln-panel="users" class="demo-panel hidden">
 								<table>
 									<thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
 									<tbody>
-										<tr><td>Marko Petrov</td><td>marko@example.com</td><td>Admin</td></tr>
-										<tr><td>Ana Stojanova</td><td>ana@example.com</td><td>User</td></tr>
-										<tr><td>Ivan Nikolov</td><td>ivan@example.com</td><td>Moderator</td></tr>
+										<tr><td>John Smith</td><td>marko@example.com</td><td>Admin</td></tr>
+										<tr><td>Jane Doe</td><td>ana@example.com</td><td>User</td></tr>
+										<tr><td>Alex Johnson</td><td>ivan@example.com</td><td>Moderator</td></tr>
 									</tbody>
 								</table>
 							</div>
 
-							<div data-ln-panel="podesuvanja" class="demo-panel hidden">
+							<div data-ln-panel="settings" class="demo-panel hidden">
 								<form>
-									<label for="d-lang">
-										Language
-										<select id="d-lang"><option>Macedonian</option><option>English</option></select>
-									</label>
-									<label for="d-tz">
-										Timezone
-										<input type="text" id="d-tz" value="Europe/Skopje">
-									</label>
+									<p class="form-element">
+										<label for="d-lang">Language</label>
+										<select id="d-lang"><option>English</option><option>Spanish</option></select>
+									</p>
+									<p class="form-element">
+										<label for="d-tz">Timezone</label>
+										<input type="text" id="d-tz" value="America/New_York">
+									</p>
 								</form>
 							</div>
 						</div>

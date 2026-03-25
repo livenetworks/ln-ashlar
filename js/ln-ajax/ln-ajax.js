@@ -41,9 +41,7 @@
 			const href = link.getAttribute('href');
 			if (href && href.includes('#')) continue;
 
-			link[DOM_ATTRIBUTE + 'Trigger'] = true;
-
-			link.addEventListener('click', function (e) {
+			const handler = function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 
 				e.preventDefault();
@@ -51,16 +49,18 @@
 				if (url) {
 					_makeAjaxRequest('GET', url, null, link);
 				}
-			});
+			};
+
+			link.addEventListener('click', handler);
+			link[DOM_ATTRIBUTE + 'Trigger'] = handler;
 		}
 	}
 
 	function _attachFormsAjax(forms) {
 		for (const form of forms) {
 			if (form[DOM_ATTRIBUTE + 'Trigger']) continue;
-			form[DOM_ATTRIBUTE + 'Trigger'] = true;
 
-			form.addEventListener('submit', function (e) {
+			const handler = function (e) {
 				e.preventDefault();
 				const method = form.method.toUpperCase();
 				const action = form.action;
@@ -75,8 +75,31 @@
 						btn.disabled = false;
 					}
 				});
-			});
+			};
+
+			form.addEventListener('submit', handler);
+			form[DOM_ATTRIBUTE + 'Trigger'] = handler;
 		}
+	}
+
+	function _destroy(domRoot) {
+		if (!domRoot[DOM_ATTRIBUTE]) return;
+
+		const items = _findElements(domRoot);
+		for (const link of items.links) {
+			if (link[DOM_ATTRIBUTE + 'Trigger']) {
+				link.removeEventListener('click', link[DOM_ATTRIBUTE + 'Trigger']);
+				delete link[DOM_ATTRIBUTE + 'Trigger'];
+			}
+		}
+		for (const form of items.forms) {
+			if (form[DOM_ATTRIBUTE + 'Trigger']) {
+				form.removeEventListener('submit', form[DOM_ATTRIBUTE + 'Trigger']);
+				delete form[DOM_ATTRIBUTE + 'Trigger'];
+			}
+		}
+
+		delete domRoot[DOM_ATTRIBUTE];
 	}
 
 	function _makeAjaxRequest(method, url, data, element, callback) {
@@ -241,6 +264,7 @@
 	}
 
 	window[DOM_ATTRIBUTE] = _constructor;
+	window[DOM_ATTRIBUTE].destroy = _destroy;
 
 	_domObserver();
 

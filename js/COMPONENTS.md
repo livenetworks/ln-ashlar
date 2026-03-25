@@ -1,81 +1,81 @@
-# JS Components — Конвенции и Pattern-и
+# JS Components — Conventions and Patterns
 
-## Архитектура на ln-acme проект (задолжително)
+## ln-acme Project Architecture (mandatory)
 
-Секој проект кој користи ln-acme JS компоненти **МОРА** да следи три слоја:
+Every project using ln-acme JS components **MUST** follow three layers:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Координатор (project-specific)                     │
-│  Фаќа UI акции → dispatcha request events →         │
-│  реагира на notification events со UI feedback       │
+│  Coordinator (project-specific)                      │
+│  Catches UI actions → dispatches request events →    │
+│  reacts to notification events with UI feedback      │
 ├─────────────────────────────────────────────────────┤
-│  Компоненти (reusable)                              │
+│  Components (reusable)                               │
 │  State + CRUD + request listeners + notifications    │
 ├─────────────────────────────────────────────────────┤
-│  ln-acme (library)                                  │
+│  ln-acme (library)                                   │
 │  ln-toggle, ln-accordion, ln-modal, ln-toast...      │
 └─────────────────────────────────────────────────────┘
 ```
 
-### Три правила
+### Three Rules
 
-1. **Компонента = data layer.** Менаџира state, CRUD, свој DOM. НЕ отвора модали, НЕ покажува toast, НЕ чита надворешни форми.
-2. **Координатор = UI wiring.** Фаќа копчиња/форми, dispatcha request events на компоненти, реагира на notification events со UI feedback (toast, модал, highlight).
-3. **Commands → request events. Queries → direct API.** Координаторот НИКОГАШ не повикува prototype методи за state mutations (`el.lnProfile.create()`). СЕКОГАШ dispatcha request event (`ln-profile:request-create`). Читање на state е дозволено директно (`el.lnProfile.currentId`).
+1. **Component = data layer.** Manages state, CRUD, its own DOM. Does NOT open modals, does NOT show toast, does NOT read external forms.
+2. **Coordinator = UI wiring.** Catches buttons/forms, dispatches request events to components, reacts to notification events with UI feedback (toast, modal, highlight).
+3. **Commands → request events. Queries → direct API.** The coordinator NEVER calls prototype methods for state mutations (`el.lnProfile.create()`). ALWAYS dispatches a request event (`ln-profile:request-create`). Reading state directly is allowed (`el.lnProfile.currentId`).
 
 ### Event flow
 
 ```
-[Корисник клика копче]
+[User clicks button]
         ↓
-[Координатор] фаќа click на [data-ln-action="new-profile"]
+[Coordinator] catches click on [data-ln-action="new-profile"]
         ↓
-[Координатор] чита input, dispatcha request event:
+[Coordinator] reads input, dispatches request event:
     nav.dispatchEvent('ln-profile:request-create', { detail: { name } })
         ↓
-[Компонента ln-profile] слуша request-create, повикува self.create(name)
+[Component ln-profile] listens for request-create, calls self.create(name)
         ↓
-[Компонента] менува state, рендерира DOM, dispatcha notification:
+[Component] changes state, renders DOM, dispatches notification:
     _dispatch(dom, 'ln-profile:created', { profileId, profile })
         ↓
-[Координатор] слуша ln-profile:created → покажува toast, затвора модал
+[Coordinator] listens for ln-profile:created → shows toast, closes modal
 ```
 
-### Workflow за нова функционалност
+### Workflow for new functionality
 
-1. **Компонента**: додај prototype метод (чист — прими параметри, менувај state, dispatcha notification event)
-2. **Компонента**: додај request listener во `_bindEvents` (повикува го истиот prototype метод)
-3. **Координатор**: додај UI trigger (click / form submit → dispatcha request event на компонента)
-4. **Координатор**: додај UI reaction (слушај notification event → toast / modal / highlight)
+1. **Component**: add prototype method (clean — accept params, change state, dispatch notification event)
+2. **Component**: add request listener in `_bindEvents` (calls the same prototype method)
+3. **Coordinator**: add UI trigger (click / form submit → dispatch request event to component)
+4. **Coordinator**: add UI reaction (listen to notification event → toast / modal / highlight)
 
-### Тест: „Дали е компонента или координатор?"
+### Test: "Is it a component or coordinator?"
 
-| Прашање | Ако ДА → | Ако НЕ → |
+| Question | If YES → | If NO → |
 |---------|----------|----------|
-| Менува свој state (CRUD)? | компонента | координатор |
-| Рендерира свој DOM (листа, копчиња)? | компонента | координатор |
-| Отвора модал / покажува toast? | координатор | компонента |
-| Чита input од форма? | координатор | компонента |
-| Слуша `[data-ln-action="..."]` клик? | координатор | компонента |
-| Слуша клик на **свој child** елемент? | компонента | координатор |
-| Bridges две компоненти (A:event → B:attribute)? | координатор | — |
+| Changes its own state (CRUD)? | component | coordinator |
+| Renders its own DOM (list, buttons)? | component | coordinator |
+| Opens modal / shows toast? | coordinator | component |
+| Reads input from form? | coordinator | component |
+| Listens to `[data-ln-action="..."]` click? | coordinator | component |
+| Listens to click on **its own child** element? | component | coordinator |
+| Bridges two components (A:event → B:attribute)? | coordinator | — |
 
 ---
 
-## IIFE Pattern (задолжителен)
+## IIFE Pattern (mandatory)
 
-Секоја компонента е IIFE (Immediately Invoked Function Expression) — нема exports, нема imports, нема зависности.
+Every component is an IIFE (Immediately Invoked Function Expression) — no exports, no imports, no dependencies.
 
 ```javascript
 (function () {
     const DOM_SELECTOR = 'data-ln-{name}';
     const DOM_ATTRIBUTE = 'ln{Name}';
 
-    // Заштита од двојно вчитување
+    // Guard against double loading
     if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-    // ... компонента ...
+    // ... component ...
 
     window[DOM_ATTRIBUTE] = constructor;
 })();
@@ -83,12 +83,12 @@
 
 ---
 
-## Instance-based Pattern (препорачан)
+## Instance-based Pattern (recommended)
 
-Компонентата се **закачува на DOM елемент**. API-то живее на елементот, НЕ на `window`.
+The component is **attached to a DOM element**. The API lives on the element, NOT on `window`.
 
 ```javascript
-// window[DOM_ATTRIBUTE] е само constructor функција
+// window[DOM_ATTRIBUTE] is just the constructor function
 function constructor(domRoot) {
     _findElements(domRoot);
 }
@@ -111,30 +111,30 @@ function _component(dom) {
     return this;
 }
 
-// Prototype методи = public API
+// Prototype methods = public API
 _component.prototype.open = function () { ... };
 _component.prototype.close = function () { ... };
 ```
 
-**Употреба:**
+**Usage:**
 ```javascript
-// Instance API на елементот
+// Instance API on the element
 document.getElementById('sidebar').lnToggle.open();
 document.getElementById('sidebar').lnToggle.close();
 
-// Constructor — само за нестандардни случаи (Shadow DOM, iframe)
-// Динамички AJAX HTML НЕ бара рачна иницијализација — MutationObserver го прави тоа автоматски
+// Constructor — only for non-standard cases (Shadow DOM, iframe)
+// Dynamic AJAX HTML does NOT require manual init — MutationObserver handles it automatically
 window.lnToggle(container);
 ```
 
 ---
 
-## MutationObserver (задолжителен)
+## MutationObserver (mandatory)
 
-Секоја компонента мора да следи **два типа** промени:
+Every component must watch for **two types** of changes:
 
-1. **`childList`** — нов елемент додаден во DOM (AJAX, `innerHTML`, `appendChild`)
-2. **`attributes`** — `data-ln-*` атрибут додаден на постоечки елемент (Inspector, `setAttribute`)
+1. **`childList`** — new element added to DOM (AJAX, `innerHTML`, `appendChild`)
+2. **`attributes`** — `data-ln-*` attribute added to existing element (Inspector, `setAttribute`)
 
 ```javascript
 function _domObserver() {
@@ -161,16 +161,16 @@ function _domObserver() {
 }
 ```
 
-**Правила:**
-- `attributeFilter` секогаш содржи `DOM_SELECTOR` (и евентуално trigger атрибути како `'data-ln-toggle-for'`)
-- `attributeFilter` е задолжителен — без него observer-от ќе fire-ува на СЕКОЈА промена на атрибут (performance проблем)
-- При `attributes` мутација, `mutation.target` е елементот чиј атрибут е променет — повикај `_findElements` директно на него
+**Rules:**
+- `attributeFilter` always includes `DOM_SELECTOR` (and optionally trigger attributes like `'data-ln-toggle-for'`)
+- `attributeFilter` is mandatory — without it the observer fires on EVERY attribute change (performance issue)
+- On `attributes` mutation, `mutation.target` is the element whose attribute changed — call `_findElements` directly on it
 
 ---
 
-## CustomEvent комуникација
+## CustomEvent Communication
 
-Компонентите НЕ знаат едни за други. Комуникација САМО преку CustomEvent.
+Components do NOT know about each other. Communication ONLY via CustomEvent.
 
 ```javascript
 function _dispatch(element, eventName, detail) {
@@ -180,20 +180,20 @@ function _dispatch(element, eventName, detail) {
     }));
 }
 
-// Испрати
+// Dispatch
 _dispatch(this.dom, 'ln-toggle:open', { target: this.dom });
 
-// Слушај (во друга компонента или интеграциски код)
+// Listen (in another component or integration code)
 document.addEventListener('ln-toggle:open', function (e) {
-    console.log('Отворен:', e.detail.target);
+    console.log('Opened:', e.detail.target);
 });
 ```
 
 ---
 
-## Lifecycle Events (животен циклус)
+## Lifecycle Events
 
-Секоја компонента со акции мора да емитува **пар events**: `before-{action}` (cancelable) + `{action}` (post).
+Every component with actions must emit **paired events**: `before-{action}` (cancelable) + `{action}` (post).
 
 ```javascript
 function _dispatchCancelable(element, eventName, detail) {
@@ -209,27 +209,27 @@ function _dispatchCancelable(element, eventName, detail) {
 _component.prototype.open = function () {
     if (this.isOpen) return;
     var before = _dispatchCancelable(this.dom, 'ln-component:before-open', { target: this.dom });
-    if (before.defaultPrevented) return;   // надворешен код може да го откаже
+    if (before.defaultPrevented) return;   // external code can cancel
     this.isOpen = true;
     this.dom.classList.add('open');
     _dispatch(this.dom, 'ln-component:open', { target: this.dom });
 };
 ```
 
-**Правила:**
-- `before-{action}` — `cancelable: true`, се fire-ува **пред** промена на состојба
-- `{action}` — `cancelable: false`, се fire-ува **по** промена на состојба (fact, не prediction)
-- Именување: `ln-{component}:before-{action}` и `ln-{component}:{action}`
-- `detail` секогаш содржи `{ target: HTMLElement }` — елементот на кој се случи акцијата
+**Rules:**
+- `before-{action}` — `cancelable: true`, fires **before** state change
+- `{action}` — `cancelable: false`, fires **after** state change (fact, not prediction)
+- Naming: `ln-{component}:before-{action}` and `ln-{component}:{action}`
+- `detail` always contains `{ target: HTMLElement }` — the element where the action occurred
 
-**Употреба:**
+**Usage:**
 ```javascript
-// Откажи условно
+// Cancel conditionally
 element.addEventListener('ln-toggle:before-open', function (e) {
     if (!userHasPermission()) e.preventDefault();
 });
 
-// Реагирај по факт
+// React after the fact
 document.addEventListener('ln-toggle:open', function (e) {
     analytics.track('panel-opened', e.detail.target.id);
 });
@@ -237,18 +237,18 @@ document.addEventListener('ln-toggle:open', function (e) {
 
 ---
 
-## Trigger re-init guard
+## Trigger Re-init Guard
 
-Кога компонентата слуша click events на trigger елементи, мора да постави guard за да спречи дупли listeners при повторно скенирање на DOM (MutationObserver):
+When a component listens for click events on trigger elements, it must set a guard to prevent duplicate listeners on repeated DOM scans (MutationObserver):
 
 ```javascript
 function _attachTriggers(root) {
     var triggers = Array.from(root.querySelectorAll('[data-ln-{name}-for]'));
     triggers.forEach(function (btn) {
-        if (btn[DOM_ATTRIBUTE + 'Trigger']) return;  // веќе иницијализиран
+        if (btn[DOM_ATTRIBUTE + 'Trigger']) return;  // already initialized
         btn[DOM_ATTRIBUTE + 'Trigger'] = true;
         btn.addEventListener('click', function (e) {
-            if (e.ctrlKey || e.metaKey || e.button === 1) return;  // дозволи browser shortcuts
+            if (e.ctrlKey || e.metaKey || e.button === 1) return;  // allow browser shortcuts
             e.preventDefault();
             // ...
         });
@@ -256,83 +256,83 @@ function _attachTriggers(root) {
 }
 ```
 
-**Правила:**
-- Guard: `btn[DOM_ATTRIBUTE + 'Trigger'] = true` (property на DOM елементот)
-- Секогаш дозволи ctrl/meta/middle-click пред `e.preventDefault()`
+**Rules:**
+- Guard: `btn[DOM_ATTRIBUTE + 'Trigger'] = true` (property on DOM element)
+- Always allow ctrl/meta/middle-click before `e.preventDefault()`
 
 ---
 
-## Компонентни зависности
+## Component Dependencies
 
-Кога компонента зависи од друга (пр. ln-accordion → ln-toggle):
+When a component depends on another (e.g. ln-accordion → ln-toggle):
 
-1. **Слушај само post-action events** (`ln-toggle:open`) — не before-events, освен ако треба да откажеш
-2. **Комуницирај само преку events** — dispatcha `request-*` events на целниот елемент, НИКОГАШ не викај друга компонента директно (`el.lnToggle.close()`)
-3. **Емитувај свои events** за своите акции (`ln-accordion:change`)
-4. **Никогаш не import-ирај** друга компонента — само CustomEvent комуникација
+1. **Listen only to post-action events** (`ln-toggle:open`) — not before-events, unless you need to cancel
+2. **Communicate only via events** — dispatch `request-*` events to the target element, NEVER call another component directly (`el.lnToggle.close()`)
+3. **Emit your own events** for your own actions (`ln-accordion:change`)
+4. **Never import** another component — CustomEvent communication only
 
 ```javascript
-// Точно — слуша post-action, dispatcha request event, емитува свој event
+// Correct — listens to post-action, dispatches request event, emits own event
 dom.addEventListener('ln-toggle:open', function (e) {
     dom.querySelectorAll('[data-ln-toggle]').forEach(function (el) {
         if (el !== e.detail.target) {
             el.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
         }
     });
-    _dispatch(dom, 'ln-accordion:change', { target: e.detail.target });  // свој event
+    _dispatch(dom, 'ln-accordion:change', { target: e.detail.target });  // own event
 });
 ```
 
 ---
 
-## Координатор/Медијатор Pattern — каноничен пример
+## Coordinator/Mediator Pattern — Canonical Example
 
-Архитектурата следи **Mediator pattern** (GoF): компонентите не комуницираат меѓусебно. Координатор ги посредува сите cross-component интеракции.
+The architecture follows the **Mediator pattern** (GoF): components do not communicate with each other. The coordinator mediates all cross-component interactions.
 
-### Каноничен пример: ln-accordion / ln-toggle
+### Canonical Example: ln-accordion / ln-toggle
 
-ln-acme библиотеката веќе го имплементира ова:
+The ln-acme library already implements this:
 
-- **ln-toggle** е компонента (state layer): менаџира свој state (`isOpen`), емитува `ln-toggle:open` / `ln-toggle:close`, слуша `ln-toggle:request-close` / `ln-toggle:request-open`
-- **ln-accordion** е координатор (mediator): слуша `ln-toggle:open` од деца, dispatcha `ln-toggle:request-close` на siblings. **Никогаш** не повикува `el.lnToggle.close()`. Емитува свој `ln-accordion:change`
+- **ln-toggle** is a component (state layer): manages its own state (`isOpen`), emits `ln-toggle:open` / `ln-toggle:close`, listens to `ln-toggle:request-close` / `ln-toggle:request-open`
+- **ln-accordion** is a coordinator (mediator): listens to `ln-toggle:open` from children, dispatches `ln-toggle:request-close` to siblings. **Never** calls `el.lnToggle.close()`. Emits its own `ln-accordion:change`
 
 ```
-[Toggle A се отвора]
+[Toggle A opens]
         ↓
-    ln-toggle:open (bubbles нагоре)
+    ln-toggle:open (bubbles up)
         ↓
-[Accordion] го фаќа, dispatcha ln-toggle:request-close на B и C
+[Accordion] catches it, dispatches ln-toggle:request-close to B and C
         ↓
-[Toggle B] сам одлучува: ако е отворен → се затвора
-[Toggle C] сам одлучува: ако е затворен → игнорира
+[Toggle B] decides on its own: if open → closes
+[Toggle C] decides on its own: if closed → ignores
 ```
 
-Toggle **не знае** дека постојат други toggle-и. Accordion **не знае** за внатрешниот state на toggle. Комуникација = само events.
+Toggle **doesn't know** that other toggles exist. Accordion **doesn't know** about toggle's internal state. Communication = events only.
 
-### Скалирање на ниво на проект
+### Scaling to Project Level
 
-Истиот pattern се скалира од библиотека до апликација:
+The same pattern scales from library to application:
 
-| ln-acme (библиотека) | Проект (апликација) | Улога |
+| ln-acme (library) | Project (application) | Role |
 |---|---|---|
-| ln-toggle | ln-profile, ln-playlist, ln-deck | Компонента (state + events) |
-| ln-accordion | ln-mixer (координатор) | Медијатор (event wiring) |
-| `ln-toggle:open` | `ln-profile:switched` | Notification event (факт) |
-| `ln-toggle:request-close` | `ln-deck:request-load` | Request event (команда) |
-| `ln-accordion:change` | toast / modal close | Координатор реакција |
+| ln-toggle | ln-profile, ln-playlist, ln-deck | Component (state + events) |
+| ln-accordion | ln-mixer (coordinator) | Mediator (event wiring) |
+| `ln-toggle:open` | `ln-profile:switched` | Notification event (fact) |
+| `ln-toggle:request-close` | `ln-deck:request-load` | Request event (command) |
+| `ln-accordion:change` | toast / modal close | Coordinator reaction |
 
-### Правила за изолација
+### Isolation Rules
 
-1. **Компонента → sibling компонента: ЗАБРАНЕТО.** Компонента НИКОГАШ не query-ира друга компонента (`lnSettings.getApiUrl()`, `nav.lnProfile.getProfile()`). Само координаторот знае за сите.
-2. **Компонента → storage/DB: ЗАБРАНЕТО.** Компонента НЕ повикува `lnDb.put()` или друг storage backend. Координаторот одлучува кој storage backend го повикува.
-3. **Координатор → компонента query: ДОЗВОЛЕНО.** Координаторот чита state директно (`el.lnProfile.currentId`).
-4. **Координатор → компонента command: САМО request events.** Координаторот dispatcha `request-*` events, компонентата самостојно одлучува.
+1. **Component → sibling component: FORBIDDEN.** A component NEVER queries another component (`lnSettings.getApiUrl()`, `nav.lnProfile.getProfile()`). Only the coordinator knows about all of them.
+2. **Component → storage/DB: FORBIDDEN.** A component does NOT call `lnDb.put()` or any storage backend. The coordinator decides which storage backend to call.
+3. **Coordinator → component query: ALLOWED.** The coordinator reads state directly (`el.lnProfile.currentId`).
+4. **Coordinator → component command: ONLY request events.** The coordinator dispatches `request-*` events, the component decides independently.
 
-**Зошто?** Компонентите стануваат storage-agnostic и sibling-agnostic. Менување на backend (IndexedDB → API → localStorage) бара промена САМО во координаторот. Додавање нова компонента бара промена САМО во координаторот.
+**Why?** Components become storage-agnostic and sibling-agnostic. Changing the backend (IndexedDB → API → localStorage) requires changes ONLY in the coordinator. Adding a new component requires changes ONLY in the coordinator.
 
 ---
 
-## Auto-init на DOMContentLoaded
+## Auto-init on DOMContentLoaded
 
 ```javascript
 window[DOM_ATTRIBUTE] = constructor;
@@ -349,28 +349,28 @@ if (document.readyState === 'loading') {
 
 ---
 
-## Именување
+## Naming
 
-| Елемент | Конвенција | Пример |
+| Element | Convention | Example |
 |---------|-----------|--------|
 | Data attribute | `data-ln-{name}` | `data-ln-toggle` |
 | Window constructor | `window.ln{Name}` | `window.lnToggle` |
 | DOM instance | `element.ln{Name}` | `el.lnToggle` |
 | Custom event | `ln-{name}:{action}` | `ln-toggle:open` |
-| CSS класа | `.ln-{name}__{element}` | `.ln-toggle__backdrop` |
+| CSS class | `.ln-{name}__{element}` | `.ln-toggle__backdrop` |
 | Initialized flag | `data-ln-{name}-initialized` | `data-ln-toggle-for-initialized` |
-| Приватна функција | `_functionName` | `_findElements` |
+| Private function | `_functionName` | `_findElements` |
 
 ---
 
 ## Co-located SCSS
 
-Ако компонентата потребува CSS, креирај `js/ln-{name}/ln-{name}.scss`:
+If a component needs CSS, create `js/ln-{name}/ln-{name}.scss`:
 
 ```scss
 @use '../../scss/config/mixins' as *;
 
-// Користи @include mixins и var(--token) вредности
+// Use @include mixins and var(--token) values
 .ln-{name}__element {
     @include fixed;
     @include transition;
@@ -378,7 +378,7 @@ if (document.readyState === 'loading') {
 }
 ```
 
-Додај го во `js/index.js`:
+Add it to `js/index.js`:
 ```javascript
 import './ln-{name}/ln-{name}.js';
 import './ln-{name}/ln-{name}.scss';
@@ -386,34 +386,34 @@ import './ln-{name}/ln-{name}.scss';
 
 ---
 
-## Request Events — детали
+## Request Events — Details
 
-> Архитектурата е дефинирана во [Архитектура на ln-acme проект](#архитектура-на-ln-acme-проект-задолжително). Тука се само техничките детали.
+> Architecture is defined in [ln-acme Project Architecture](#ln-acme-project-architecture-mandatory). This section covers technical details only.
 
-### Имплементација во компонента
+### Implementation in Component
 
 ```javascript
-// Во _bindEvents — слуша request events на себе
+// In _bindEvents — listen for request events on self
 this.dom.addEventListener('ln-profile:request-create', function (e) {
-    self.create(e.detail.name);  // повикува ист prototype метод
+    self.create(e.detail.name);  // calls the same prototype method
 });
 this.dom.addEventListener('ln-profile:request-remove', function (e) {
     self.remove(e.detail.id);
 });
 ```
 
-### Dispatching од координатор
+### Dispatching from Coordinator
 
 ```javascript
-// Координатор — dispatcha request event (НЕ директен API повик)
+// Coordinator — dispatches request event (NOT direct API call)
 nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
     detail: { name: 'My Profile' }
 }));
 ```
 
-### Именување
+### Naming
 
-| Тип | Формат | Пример | Bubbles |
+| Type | Format | Example | Bubbles |
 |-----|--------|--------|---------|
 | Request (incoming) | `ln-{name}:request-{action}` | `ln-profile:request-create` | `false` |
 | Notification (outgoing) | `ln-{name}:{past-tense}` | `ln-profile:created` | `true` |
@@ -422,16 +422,16 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
 
 ### Commands vs Queries
 
-| Тип | Механизам | Пример |
+| Type | Mechanism | Example |
 |-----|-----------|--------|
-| **Command** (менува state) | request event | `nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', { detail: { id } }))` |
-| **Query** (чита state) | директен пристап | `nav.lnProfile.currentId`, `sidebar.lnPlaylist.getTrack(idx)` |
+| **Command** (changes state) | request event | `nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', { detail: { id } }))` |
+| **Query** (reads state) | direct access | `nav.lnProfile.currentId`, `sidebar.lnPlaylist.getTrack(idx)` |
 
 ---
 
-## Координатор — целосен пример
+## Coordinator — Full Example
 
-> Координаторот е тенок IIFE, project-specific. Нема свој state, нема свој DOM. Само wiring.
+> The coordinator is a thin IIFE, project-specific. No own state, no own DOM. Just wiring.
 
 ```javascript
 (function () {
@@ -449,7 +449,7 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
                 var nav = _getNav();
                 if (nav && nav.lnProfile) {
                     nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', {
-                        detail: { id: nav.lnProfile.currentId }  // query е OK
+                        detail: { id: nav.lnProfile.currentId }  // query is OK
                     }));
                 }
             }
@@ -469,7 +469,7 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
                 }));
             }
             input.value = '';
-            lnModal.close('modal-new-profile');
+            document.getElementById('modal-new-profile').lnModal.close();
         });
 
         // 3. Notification → UI feedback
@@ -496,28 +496,28 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
 })();
 ```
 
-**Четирите работи на координаторот:**
-1. **UI trigger → request event** — клик/submit → dispatcha request на компонента
-2. **Form processing** — чита input, валидира, чисти, затвора модал
+**The four jobs of a coordinator:**
+1. **UI trigger → request event** — click/submit → dispatch request to component
+2. **Form processing** — read input, validate, clear, close modal
 3. **Notification → UI feedback** — toast, modal close, highlight
-4. **Bridge** — event од компонента A → attribute/request на компонента B
+4. **Bridge** — event from component A → attribute/request on component B
 
 ---
 
-## Template System — DOM структура во HTML, не во JS
+## Template System — DOM Structure in HTML, Not in JS
 
-**НИКОГАШ** не гради DOM структура со `createElement` chains во JS. Користи нативен HTML `<template>` елемент.
+**NEVER** build DOM structure with `createElement` chains in JS. Use the native HTML `<template>` element.
 
-### Принцип
+### Principle
 
-DOM структурата е **HTML одлука**, не JS одлука. Компонентата само ги полни податоците.
+DOM structure is an **HTML decision**, not a JS decision. The component only fills in the data.
 
 ```
-HTML:  <template> ги дефинира структурите (inert, не се рендерираат)
+HTML:  <template> defines structures (inert, not rendered)
 JS:    clone → querySelector → textContent/setAttribute
 ```
 
-### HTML — дефинирај templates на крајот од `<body>`, пред `<script>` тагови
+### HTML — define templates at the end of `<body>`, before `<script>` tags
 
 ```html
 <!-- Templates -->
@@ -544,7 +544,7 @@ JS:    clone → querySelector → textContent/setAttribute
 
 ### JS — `_cloneTemplate` helper (IIFE-scoped, lazy-cached)
 
-Секоја IIFE компонента добива свој `_cloneTemplate`:
+Each IIFE component gets its own `_cloneTemplate`:
 
 ```javascript
 var _tmplCache = {};
@@ -556,7 +556,7 @@ function _cloneTemplate(name) {
 }
 ```
 
-### Употреба — clone + fill
+### Usage — clone + fill
 
 ```javascript
 _component.prototype._buildTrackItem = function (track, idx) {
@@ -572,41 +572,41 @@ _component.prototype._buildTrackItem = function (track, idx) {
 };
 ```
 
-### Правила
+### Rules
 
-1. **`<template data-ln-template="name">`** — конвенција за именување
-2. **Место:** на крајот од `<body>`, пред `<script>` тагови, во коментар блок `TEMPLATES`
-3. **`content.cloneNode(true)`** враќа DocumentFragment — query-ирај го root елементот со `querySelector`
-4. **JS само полни:** `textContent`, `setAttribute`, `classList` — НЕ создава структура
-5. **Услови:** мали условни елементи (1-2 spans за индикатори) се OK како `createElement`
-6. **Еден template, една функција:** ако иста структура се создава на 2+ места, мора да биде `<template>` + заедничка функција
+1. **`<template data-ln-template="name">`** — naming convention
+2. **Placement:** at the end of `<body>`, before `<script>` tags, in a `TEMPLATES` comment block
+3. **`content.cloneNode(true)`** returns a DocumentFragment — query the root element with `querySelector`
+4. **JS only fills:** `textContent`, `setAttribute`, `classList` — does NOT create structure
+5. **Conditions:** small conditional elements (1-2 spans for indicators) are OK as `createElement`
+6. **One template, one function:** if the same structure is created in 2+ places, it must be a `<template>` + shared function
 
-### Зошто
+### Why
 
 | createElement chains | `<template>` |
 |---------------------|--------------|
-| 60+ линии JS за еден `<li>` | 10 линии HTML + 8 линии JS |
-| Структура скриена во JS | Структура видлива во HTML |
-| Дупликација помеѓу методи | Една дефиниција, една функција |
-| Тешко за дизајнер | HTML — лесно за промена |
+| 60+ lines of JS for one `<li>` | 10 lines HTML + 8 lines JS |
+| Structure hidden in JS | Structure visible in HTML |
+| Duplication between methods | One definition, one function |
+| Hard for designers | HTML — easy to change |
 
 ---
 
-## Компоненти (референца)
+## Components (reference)
 
-| Компонента | Pattern | Data Attr | Опис |
+| Component | Pattern | Data Attr | Description |
 |-----------|---------|-----------|------|
-| ln-toggle | Instance | `data-ln-toggle` | Генерички toggle (sidebar, collapse) |
-| ln-accordion | Instance | `data-ln-accordion` | Wrapper — само еден toggle отворен |
-| ln-tabs | Instance | `data-ln-tabs` | Hash-aware tab навигација |
+| ln-toggle | Instance | `data-ln-toggle` | Generic toggle (sidebar, collapse) |
+| ln-accordion | Instance | `data-ln-accordion` | Wrapper — only one toggle open at a time |
+| ln-tabs | Instance | `data-ln-tabs` | Hash-aware tab navigation |
 | ln-nav | Instance | `data-ln-nav` | Active link highlighter |
-| ln-modal | Functional | `data-ln-modal` | Modal dialog |
+| ln-modal | Instance | `data-ln-modal` | Modal dialog |
 | ln-toast | Functional | `data-ln-toast` | Toast notifications |
 | ln-upload | Functional | `data-ln-upload` | File upload |
 | ln-ajax | Functional | `data-ln-ajax` | AJAX navigation |
 | ln-progress | Functional | `data-ln-progress` | Progress bar |
 | ln-select | Wrapper | `data-ln-select` | TomSelect wrapper |
-| ln-search | Instance | `data-ln-search` | Генерички search (textContent филтер) |
-| ln-filter | Instance | `data-ln-filter` | Генерички filter (data атрибут филтер) |
-| ln-autosave | Instance | `data-ln-autosave` | Auto-save форма во localStorage на blur/change |
+| ln-search | Instance | `data-ln-search` | Generic search (textContent filter) |
+| ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
+| ln-autosave | Instance | `data-ln-autosave` | Auto-save form to localStorage on blur/change |
 | ln-external-links | Utility | — | External links handler |

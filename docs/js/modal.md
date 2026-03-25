@@ -48,15 +48,19 @@ Sizes via SCSS mixins (not CSS classes):
 
 ## JS API
 
+Instance-based — each `.ln-modal` gets an instance at `element.lnModal`.
+
 ```js
-window.lnModal.open('my-modal');
-window.lnModal.close('my-modal');
-window.lnModal.toggle('my-modal');
+const modal = document.getElementById('my-modal');
+modal.lnModal.open();
+modal.lnModal.close();
+modal.lnModal.toggle();
+modal.lnModal.destroy();  // removes all listeners, cleans up
 ```
 
 ## Behavior
 
-- ESC closes all open modals
+- ESC closes the open modal (listener active only while open)
 - Body scroll locked when modal open (`body.ln-modal-open`)
 - Backdrop blur + 50% opacity
 - Slide-in animation

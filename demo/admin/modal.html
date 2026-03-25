@@ -133,22 +133,22 @@
 					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
 				</header>
 				<main>
-					<label>
-						Name
-						<input type="text" placeholder="Enter name...">
-					</label>
-					<label>
-						Email
-						<input type="email" placeholder="email@example.com">
-					</label>
-					<label>
-						Role
-						<select>
+					<p class="form-element">
+						<label for="modal-name">Name</label>
+						<input type="text" id="modal-name" placeholder="Enter name...">
+					</p>
+					<p class="form-element">
+						<label for="modal-email">Email</label>
+						<input type="email" id="modal-email" placeholder="email@example.com">
+					</p>
+					<p class="form-element">
+						<label for="modal-role">Role</label>
+						<select id="modal-role">
 							<option>User</option>
 							<option>Administrator</option>
 							<option>Moderator</option>
 						</select>
-					</label>
+					</p>
 				</main>
 				<footer>
 					<button type="button" data-ln-modal-close>Cancel</button>
@@ -264,7 +264,10 @@ document.addEventListener('ln-modal:close', function(e) {
             &lt;button type="button" class="ln-icon-close" data-ln-modal-close&gt;&lt;/button&gt;
         &lt;/header&gt;
         &lt;main&gt;
-            &lt;label&gt;Name &lt;input type="text"&gt;&lt;/label&gt;
+            &lt;p class="form-element"&gt;
+                &lt;label for="name"&gt;Name&lt;/label&gt;
+                &lt;input type="text" id="name"&gt;
+            &lt;/p&gt;
         &lt;/main&gt;
         &lt;footer&gt;
             &lt;button type="button" data-ln-modal-close&gt;Cancel&lt;/button&gt;
@@ -278,9 +281,11 @@ document.addEventListener('ln-modal:close', function(e) {
 
 &lt;!-- JS API --&gt;
 &lt;script&gt;
-    window.lnModal.open('my-modal');
-    window.lnModal.close('my-modal');
-    window.lnModal.toggle('my-modal');
+    const modal = document.getElementById('my-modal');
+    modal.lnModal.open();
+    modal.lnModal.close();
+    modal.lnModal.toggle();
+    modal.lnModal.destroy();
 &lt;/script&gt;</code></pre>
 			</main>
 		</section>

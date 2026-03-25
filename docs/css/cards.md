@@ -1,8 +1,8 @@
 # Cards
 
-Data containers with compact, table-like styling. File: `scss/components/_card.scss`.
+Data containers with compact, table-like styling. File: `scss/components/_cards.scss`.
 
-## Usage (HTML класа — за прототипирање)
+## Usage (HTML class — for prototyping)
 
 ```html
 <article class="card">
@@ -16,19 +16,19 @@ Data containers with compact, table-like styling. File: `scss/components/_card.s
 </article>
 ```
 
-## Семантичка употреба (проектен SCSS — препорачано)
+## Semantic usage (project SCSS — recommended)
 
-Во проектен код, НЕ користи `class="card"` на `<div>`. Користи семантички елемент + `@include card`:
+In project code, do NOT use `class="card"` on `<div>`. Use a semantic element + `@include card`:
 
 ```html
-<!-- HTML — семантички -->
-<section id="korisnici">
+<!-- HTML — semantic -->
+<section id="users">
     <ul>
         <li>
-            <h3>Марко Петров</h3>
+            <h3>John Smith</h3>
             <dl>
-                <dt>Email</dt><dd>marko@example.com</dd>
-                <dt>Улога</dt><dd>Админ</dd>
+                <dt>Email</dt><dd>john@example.com</dd>
+                <dt>Role</dt><dd>Admin</dd>
             </dl>
         </li>
     </ul>
@@ -36,8 +36,8 @@ Data containers with compact, table-like styling. File: `scss/components/_card.s
 ```
 
 ```scss
-// SCSS — стилирање на семантички селектори
-#korisnici {
+// SCSS — style semantic selectors
+#users {
     ul { @include grid-2; list-style: none; padding: 0; margin: 0; }
     li { @include card; }
 }
@@ -58,5 +58,5 @@ Subtle -- border color changes to primary, shadow upgrades to md.
 ## Semantic Usage (mixin)
 
 ```scss
-#korisnik { @include card; }
+#user-profile { @include card; }
 ```

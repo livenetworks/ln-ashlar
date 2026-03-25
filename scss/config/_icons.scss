@@ -1,17 +1,17 @@
 // ==========================================================================
 // Icons — SVG mask-image system with currentColor inheritance
 // ==========================================================================
-// Иконите користат mask-image + background-color: currentColor.
-// Бојата автоматски се наследува од parent елементот (color property).
-// Нема потреба за -white, -gray, -red варијанти — бојата доаѓа од CSS.
+// Icons use mask-image + background-color: currentColor.
+// Color is automatically inherited from the parent element (color property).
+// No need for -white, -gray, -red variants — color comes from CSS.
 //
-// Употреба:
+// Usage:
 //   <span class="ln-icon-home"></span>
 //   <button class="ln-icon-close"></button>
 //
-// Бојата се менува преку CSS:
+// Change color via CSS:
 //   .sidebar a:hover { color: hsl(var(--color-primary)); }
-//   /* иконата автоматски станува primary боја */
+//   /* icon automatically becomes primary color */
 // ==========================================================================
 
 /* Icon URL variables — single version per icon, black stroke/fill for masking */

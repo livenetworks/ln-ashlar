@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="mk">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -116,11 +116,11 @@
 						<main>
 							<div data-ln-table id="demo-table">
 								<header class="ln-table__toolbar">
-									<h3>Вработени</h3>
+									<h3>Employees</h3>
 									<aside>
 										<label class="ln-table__search">
 											<span class="ln-icon-filter ln-icon--sm"></span>
-											<input type="search" placeholder="Пребарај..." data-ln-search="demo-table">
+											<input type="search" placeholder="Search..." data-ln-search="demo-table">
 										</label>
 										<span class="ln-table__count" id="demo-count"></span>
 										<span class="ln-table__timing" id="demo-timing"></span>
@@ -130,9 +130,9 @@
 								<template data-ln-table-empty>
 									<article class="ln-table__empty-state">
 										<span class="ln-icon-filter ln-icon--xl"></span>
-										<h3>Нема резултати</h3>
-										<p>Обидете се со поинаков термин.</p>
-										<button class="btn btn--secondary" data-ln-table-clear>Исчисти</button>
+										<h3>No results</h3>
+										<p>Try a different search term.</p>
+										<button class="btn btn--secondary" data-ln-table-clear>Clear</button>
 									</article>
 								</template>
 
@@ -140,20 +140,20 @@
 									<thead>
 										<tr>
 											<th data-ln-sort="number">#</th>
-											<th data-ln-sort="string">Вработен</th>
-											<th data-ln-sort="string">Оддел</th>
-											<th data-ln-sort="string">Позиција</th>
-											<th data-ln-sort="date">Вработен од</th>
-											<th data-ln-sort="number" class="numeric">Плата (МКД)</th>
-											<th>Статус</th>
-											<th class="center">Акции</th>
+											<th data-ln-sort="string">Employee</th>
+											<th data-ln-sort="string">Department</th>
+											<th data-ln-sort="string">Position</th>
+											<th data-ln-sort="date">Hire Date</th>
+											<th data-ln-sort="number" class="numeric">Salary (USD)</th>
+											<th>Status</th>
+											<th class="center">Actions</th>
 										</tr>
 									</thead>
 									<tbody id="demo-tbody"></tbody>
 								</table>
 
 								<footer class="ln-table__footer">
-									<span>Вкупно: <strong id="demo-total"></strong> записи</span>
+									<span>Total: <strong id="demo-total"></strong> records</span>
 								</footer>
 							</div>
 						</main>
@@ -176,13 +176,13 @@
 							<pre><code>var table = document.getElementById('demo-table');
 
 table.addEventListener('ln-table:ready', function (e) {
-    countEl.textContent = e.detail.total.toLocaleString() + ' записи';
+    countEl.textContent = e.detail.total.toLocaleString() + ' records';
 });
 
 table.addEventListener('ln-table:filter', function (e) {
     countEl.textContent = e.detail.matched < e.detail.total
         ? e.detail.matched.toLocaleString() + ' / ' + e.detail.total.toLocaleString()
-        : e.detail.total.toLocaleString() + ' записи';
+        : e.detail.total.toLocaleString() + ' records';
 });</code></pre>
 						</main>
 					</section>
@@ -301,8 +301,8 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 
 		// ── Wire up events ──
 		tableEl.addEventListener('ln-table:ready', function (e) {
-			var n = e.detail.total.toLocaleString('mk');
-			if (countEl) countEl.textContent = n + ' записи';
+			var n = e.detail.total.toLocaleString();
+			if (countEl) countEl.textContent = n + ' records';
 			if (totalEl) totalEl.textContent = n;
 		});
 
@@ -311,29 +311,29 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 			var total   = e.detail.total;
 			if (countEl) {
 				countEl.textContent = matched < total
-					? matched.toLocaleString('mk') + ' / ' + total.toLocaleString('mk')
-					: total.toLocaleString('mk') + ' записи';
+					? matched.toLocaleString() + ' / ' + total.toLocaleString()
+					: total.toLocaleString() + ' records';
 			}
-			if (totalEl) totalEl.textContent = matched.toLocaleString('mk');
+			if (totalEl) totalEl.textContent = matched.toLocaleString();
 		});
 
 		tableEl.addEventListener('ln-table:sorted', function (e) {
-			if (totalEl) totalEl.textContent = e.detail.matched.toLocaleString('mk');
+			if (totalEl) totalEl.textContent = e.detail.matched.toLocaleString();
 		});
 
 		// ── Data pools ──
 		var firstNames = [
-			'Марко','Ана','Иван','Елена','Борис','Сара','Никола','Тамара',
-			'Димитар','Ленче','Стефан','Мила','Горан','Ивана','Дејан',
-			'Наташа','Филип','Весна','Александар','Катерина'
+			'James','Emma','Oliver','Sophia','William','Ava','Benjamin','Isabella',
+			'Lucas','Mia','Henry','Charlotte','Alexander','Amelia','Daniel',
+			'Harper','Matthew','Evelyn','Sebastian','Abigail'
 		];
 		var lastNames = [
-			'Петровски','Стојанова','Димитров','Трајкова','Николовски',
-			'Петреска','Јовановски','Алексовска','Стефановски','Маркоска',
-			'Ристовски','Илиевска','Георгиев','Ангелова','Павловски',
-			'Јанковска','Тодоров','Велковска','Миленков','Костадинова'
+			'Anderson','Johnson','Williams','Brown','Davis',
+			'Miller','Wilson','Moore','Taylor','Thomas',
+			'Jackson','White','Harris','Martin','Thompson',
+			'Garcia','Martinez','Robinson','Clark','Rodriguez'
 		];
-		var departments = ['ИТ', 'Финансии', 'Правно', 'Маркетинг', 'HR', 'Продажба'];
+		var departments = ['IT', 'Finance', 'Legal', 'Marketing', 'HR', 'Sales'];
 		var positions = [
 			'Senior Developer','Junior Developer','Financial Analyst','Marketing Manager',
 			'Legal Advisor','DevOps Engineer','Accountant','Content Writer',
@@ -341,12 +341,12 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 			'Team Lead','Designer','QA Engineer','Data Analyst'
 		];
 		var statuses = [
-			{ cls: 'pass', text: 'Активен' },
-			{ cls: 'pass', text: 'Активен' },
-			{ cls: 'pass', text: 'Активен' },
-			{ cls: 'warn', text: 'Отсутен' },
-			{ cls: 'warn', text: 'Суспендиран' },
-			{ cls: 'fail', text: 'Неактивен' }
+			{ cls: 'pass', text: 'Active' },
+			{ cls: 'pass', text: 'Active' },
+			{ cls: 'pass', text: 'Active' },
+			{ cls: 'warn', text: 'On Leave' },
+			{ cls: 'warn', text: 'Suspended' },
+			{ cls: 'fail', text: 'Inactive' }
 		];
 
 		var dateMin   = 1420070400; // 2015-01-01
