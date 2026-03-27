@@ -116,13 +116,13 @@ For the full SCSS mixin reference, see [mixins.md](mixins.md).
 ## Z-Index
 
 ```
-toast (50) > modal (40) > overlay (30) > sticky (20) > dropdown (10)
+toast (50) > modal (40) > overlay (30) > dropdown (20) > sticky (10)
 ```
 
 | Token | Value |
 |-------|-------|
-| `--z-dropdown` | 10 |
-| `--z-sticky` | 20 |
+| `--z-sticky` | 10 |
+| `--z-dropdown` | 20 |
 | `--z-overlay` | 30 |
 | `--z-modal` | 40 |
 | `--z-toast` | 50 |

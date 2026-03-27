@@ -30,13 +30,14 @@ scss/
 │   │   ├── _card.scss       ← card, panel-header, section, section-card
 │   │   ├── _modal.scss      ← modal-sm, modal-md, modal-lg, modal-xl
 │   │   ├── _nav.scss        ← nav (general navigation reset)
+│   │   ├── _tabs.scss       ← tabs-nav, tabs-tab, tabs-tab-active, tabs-panel
 │   │   ├── _breadcrumbs.scss← breadcrumbs
+│   │   ├── _focus.scss      ← focus-ring (consistent focus indicator)
 │   │   ├── _loader.scss     ← loader
 │   │   └── ...              ← other primitive/composite mixins
 │   ├── _theme.scss          ← Color palette extensions
 │   └── _icons.scss          ← SVG data-URI icon variables
 ├── base/                    ← Reset, global defaults, typography
-├── layout/                  ← App layout, grid, header
 ├── components/              ← Default application of mixins to selectors
 └── utilities/               ← Helper classes (.hidden, etc.)
 
@@ -247,4 +248,3 @@ Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon
 ## Known Backlog
 
 - **ln-select** — depends on TomSelect (peer dependency)
-- **Form attributes** — renamed to `data-ln-*` convention, Laravel projects need HTML template updates

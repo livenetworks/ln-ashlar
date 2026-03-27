@@ -1,0 +1,5 @@
+// Focus ring — consistent focus indicator across all interactive elements
+
+@mixin focus-ring($color: var(--color-primary-light), $width: 3px) {
+	box-shadow: 0 0 0 $width hsl($color);
+}

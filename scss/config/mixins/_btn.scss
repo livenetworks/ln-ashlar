@@ -6,6 +6,7 @@
 @use 'borders' as *;
 @use 'transitions' as *;
 @use 'interaction' as *;
+@use 'focus' as *;
 
 // Buttons — btn-colors (states), btn (structure), close-button
 
@@ -23,7 +24,7 @@
 		color: hsl(var(--color-white));
 	}
 
-	&:focus { box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.2); }
+	&:focus { @include focus-ring; }
 	&:disabled { @include opacity-50; @include cursor-not-allowed; }
 }
 
@@ -69,7 +70,6 @@
 	}
 
 	&:focus-visible {
-		outline: 2px solid hsl(var(--color-primary));
-		outline-offset: -2px;
+		@include focus-ring;
 	}
 }

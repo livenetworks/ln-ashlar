@@ -22,7 +22,7 @@
 	@include panel-header;
 	position: sticky;
 	top: var(--header-height, 3.5rem);
-	z-index: 12;
+	@include z-sticky;
 	border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
@@ -85,7 +85,7 @@
 [data-ln-table] thead th {
 	position: sticky;
 	top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 2.75rem));
-	z-index: 11;
+	z-index: calc(var(--z-sticky) - 1);
 	background: hsl(var(--color-table-header-bg));
 }
 

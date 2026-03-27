@@ -1,4 +1,4 @@
-# acme-gui Documentation
+# ln-acme Documentation
 
 Unified frontend library — SCSS CSS framework + vanilla JS components.
 
@@ -28,7 +28,6 @@ js/ln-*/                    → Vanilla JS components (IIFE pattern)
 | Breadcrumbs | `scss/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
 | Loader | `scss/components/_loader.scss` | — |
 | Scrollbar | `scss/components/_scrollbar.scss` | — |
-| Layout | `scss/layout/` | [layout.md](css/layout.md) |
 
 ## JS Components
 
@@ -37,11 +36,21 @@ js/ln-*/                    → Vanilla JS components (IIFE pattern)
 | Modal | `data-ln-modal` | [modal.md](js/modal.md) |
 | Toast | `data-ln-toast` | [toast.md](js/toast.md) |
 | Tabs | `data-ln-tabs` | [tabs.md](js/tabs.md) |
+| Accordion | `data-ln-accordion` | [accordion.md](js/accordion.md) |
+| Toggle | `data-ln-toggle` | [toggle.md](js/toggle.md) |
 | Progress | `data-ln-progress` | [progress.md](js/progress.md) |
+| Circular Progress | `data-ln-circular-progress` | [circular-progress.md](js/circular-progress.md) |
 | Upload | `data-ln-upload` | [upload.md](js/upload.md) |
 | AJAX | `data-ln-ajax` | [ajax.md](js/ajax.md) |
 | Select | `data-ln-select` | [select.md](js/select.md) |
 | Nav | `data-ln-nav` | [nav.md](js/nav.md) |
+| Dropdown | `data-ln-dropdown` | — |
+| Filter | `data-ln-filter` | [filter.md](js/filter.md) |
+| Search | `data-ln-search` | [search.md](js/search.md) |
+| Table | `data-ln-table` | — |
+| Link | `data-ln-link` | [link.md](js/link.md) |
+| Confirm | `data-ln-confirm` | [confirm.md](js/confirm.md) |
+| Sortable | `data-ln-sortable` | [sortable.md](js/sortable.md) |
 | External Links | (automatic) | [external-links.md](js/external-links.md) |
 
 ## Build
@@ -60,6 +69,6 @@ npm run dev     # Watch mode
 
 ```js
 // npm module
-import 'acme-gui';
-import 'acme-gui/dist/ln-acme.css';
+import 'ln-acme';
+import 'ln-acme/dist/ln-acme.css';
 ```

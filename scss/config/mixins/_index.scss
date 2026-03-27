@@ -12,6 +12,7 @@
 @forward 'transitions';
 @forward 'position';
 @forward 'interaction';
+@forward 'focus';
 
 // Composites (depend on primitives)
 @forward 'layout';
@@ -24,4 +25,5 @@
 @forward 'pill';
 @forward 'breadcrumbs';
 @forward 'loader';
+@forward 'tabs';
 @forward 'table';

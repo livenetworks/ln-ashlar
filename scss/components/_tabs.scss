@@ -4,48 +4,20 @@
 // Tabs — underline style
 // ==========================================================================
 
-// Tab navigation — bottom border with underline on active tab
 [data-ln-tabs] nav {
-	@include flex;
-	@include border-b;
+	@include tabs-nav;
 }
 
-// Tab buttons — full reset (button, a, or any element)
 [data-ln-tabs] [data-ln-tab] {
-	all: unset;
-	box-sizing: border-box;
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-sm));
-	@include text-sm;
-	@include font-medium;
-	@include text-secondary;
-	@include cursor-pointer;
-	@include transition;
-	border-bottom: 2px solid transparent;
-	margin-bottom: -1px;
-
-	&:hover {
-		color: hsl(var(--color-primary));
-		background: none;
-	}
-
-	&:focus,
-	&:active,
-	&:visited {
-		background: none;
-	}
+	@include tabs-tab;
 }
 
-// Active tab
 [data-ln-tabs] [data-ln-tab][data-active] {
-	color: hsl(var(--color-primary));
-	border-bottom-color: hsl(var(--color-primary));
-	background: none;
+	@include tabs-tab-active;
 }
 
-// Panels
 [data-ln-tabs] [data-ln-panel] {
-	@include p(var(--spacing-lg));
+	@include tabs-panel;
 }
 
 [data-ln-tabs] [data-ln-panel].hidden {

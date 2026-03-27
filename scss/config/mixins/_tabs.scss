@@ -1,0 +1,49 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+
+// Tabs — underline style
+
+@mixin tabs-nav {
+	@include flex;
+	@include border-b;
+}
+
+@mixin tabs-tab {
+	all: unset;
+	box-sizing: border-box;
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-sm));
+	@include text-sm;
+	@include font-medium;
+	@include text-secondary;
+	@include cursor-pointer;
+	@include transition;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -1px;
+
+	&:hover {
+		color: hsl(var(--color-primary));
+		background: none;
+	}
+
+	&:focus,
+	&:active,
+	&:visited {
+		background: none;
+	}
+}
+
+@mixin tabs-tab-active {
+	color: hsl(var(--color-primary));
+	border-bottom-color: hsl(var(--color-primary));
+	background: none;
+}
+
+@mixin tabs-panel {
+	@include p(var(--spacing-lg));
+}

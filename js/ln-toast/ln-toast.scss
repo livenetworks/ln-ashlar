@@ -2,50 +2,31 @@
 
 /* ========== Live Networks Toast (Side-Accent Light Theme) ========== */
 
-:root {
-	--ln-toast-bg: #ffffff;
-	--ln-toast-fg: #1f2937;
-	/* Slate 800 */
-	--ln-toast-fg-muted: #4b5563;
-	/* Slate 600 */
-	--ln-toast-border: #e5e7eb;
-	/* Gray 200 */
-	--ln-toast-radius: 4px;
-	--ln-toast-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-
-	/* Types - Solid vibrant colors for the side bar */
-	--ln-toast-success: #22c55e;
-	--ln-toast-error: #ef4444;
-	--ln-toast-warn: #f59e0b;
-	--ln-toast-info: #0ea5e9;
-
-}
-
 /* Container */
 [data-ln-toast] {
-	position: fixed;
-	z-index: 9999;
+	@include fixed;
+	@include z-toast;
 	pointer-events: none;
-	right: 1.5rem;
-	top: 1.5rem;
+	right: var(--spacing-lg);
+	top: var(--spacing-lg);
 	list-style: none;
-	margin: 0;
-	padding: 0;
+	@include m(0);
+	@include p(0);
 }
 
 /* Transitions */
-[data-ln-toast]>.ln-toast__item {
+[data-ln-toast] > .ln-toast__item {
 	opacity: 0;
 	transform: translateX(30px);
-	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: all var(--transition-base) cubic-bezier(0.4, 0, 0.2, 1);
 	pointer-events: auto;
 }
 
-[data-ln-toast]>.ln-toast__item+.ln-toast__item {
-	margin-top: 1rem;
+[data-ln-toast] > .ln-toast__item + .ln-toast__item {
+	@include mt(var(--spacing-md));
 }
 
-[data-ln-toast]>.ln-toast__item--in {
+[data-ln-toast] > .ln-toast__item--in {
 	opacity: 1;
 	transform: translateX(0);
 }
@@ -53,98 +34,97 @@
 .ln-toast__item--out {
 	opacity: 0 !important;
 	transform: scale(0.95) !important;
-	transition: all 0.2s ease !important;
+	transition: all var(--transition-fast) !important;
 }
 
 /* Card */
 .ln-toast__card {
-	display: flex;
-	background: var(--ln-toast-bg);
-	border: var(--border-width) solid var(--ln-toast-border);
-	border-radius: var(--ln-toast-radius);
-	box-shadow: var(--ln-toast-shadow);
+	@include flex;
+	@include bg-primary;
+	@include border;
+	@include rounded-sm;
+	@include shadow-md;
 	min-width: 320px;
 	max-width: 450px;
-	overflow: hidden;
+	@include overflow-hidden;
 }
 
 /* Icon Sidebar */
 .ln-toast__side {
 	flex: 0 0 60px;
-	display: flex;
+	@include flex;
 	align-items: flex-start;
-	justify-content: center;
-	padding-top: 1rem;
-	background: var(--ln-toast-accent, var(--ln-toast-info));
+	@include justify-center;
+	@include pt(var(--spacing-md));
+	background: var(--ln-toast-accent, hsl(var(--color-info)));
 }
 
 .ln-toast__side svg {
-	width: 32px;
-	height: 32px;
-	color: #fff;
+	@include size(2rem);
+	color: hsl(var(--color-white));
 }
 
 /* Content Area */
 .ln-toast__content {
-	flex: 1;
-	padding: 1rem 1rem 1rem 0.75rem;
-	position: relative;
+	@include flex-1;
+	padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+	@include relative;
 }
 
 .ln-toast__card--success {
-	--ln-toast-accent: var(--ln-toast-success);
+	--ln-toast-accent: hsl(var(--color-success));
 }
 
 .ln-toast__card--error {
-	--ln-toast-accent: var(--ln-toast-error);
+	--ln-toast-accent: hsl(var(--color-error));
 }
 
 .ln-toast__card--warn {
-	--ln-toast-accent: var(--ln-toast-warn);
+	--ln-toast-accent: hsl(var(--color-warning));
 }
 
 .ln-toast__card--info {
-	--ln-toast-accent: var(--ln-toast-info);
+	--ln-toast-accent: hsl(var(--color-info));
 }
 
 /* Header & Close */
 .ln-toast__head {
-	display: flex;
+	@include flex;
 	align-items: flex-start;
-	justify-content: space-between;
-	gap: 1rem;
+	@include justify-between;
+	@include gap(var(--spacing-md));
 }
 
 .ln-toast__title {
-	font-weight: 700;
-	font-size: 1rem;
-	color: var(--ln-toast-fg);
+	@include font-bold;
+	@include text-base;
+	@include text-primary;
 	line-height: 1.25;
 }
 
 .ln-toast__close {
 	@include close-button;
-	position: absolute;
-	top: 0.5rem;
-	right: 0.5rem;
+	@include absolute;
+	top: var(--spacing-sm);
+	right: var(--spacing-sm);
 }
 
 /* Body */
 .ln-toast__body {
-	margin-top: 0.5rem;
+	@include mt(var(--spacing-sm));
 	font-size: 0.9375rem;
-	color: var(--ln-toast-fg-muted);
+	@include text-secondary;
 	line-height: 1.5;
 
-	p { margin: 0; }
+	p { @include m(0); }
 }
 
 .ln-toast__body ul {
-	margin: 0.5rem 0 0 0;
+	margin: var(--spacing-sm) 0 0 0;
 	padding-left: 1.25rem;
-	font-size: 0.875rem;
+	@include text-sm;
 }
 
-.ln-toast__body li+li {
-	margin-top: 0.25rem;
+.ln-toast__body li + li {
+	@include mt(var(--spacing-xs));
 }

@@ -185,8 +185,8 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 
 | Instead of writing... | Use |
 |---|---|
-| `z-index: 10` (dropdowns) | `@include z-dropdown` |
-| `z-index: 20` (sticky elements) | `@include z-sticky` |
+| `z-index: 10` (sticky elements) | `@include z-sticky` |
+| `z-index: 20` (dropdowns) | `@include z-dropdown` |
 | `z-index: 30` (overlays) | `@include z-overlay` |
 | `z-index: 40` (modals) | `@include z-modal` |
 | `z-index: 50` (toasts) | `@include z-toast` |
@@ -212,6 +212,12 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Modal size: large (42rem) | `@include modal-lg` |
 | Modal size: extra large (48rem) | `@include modal-xl` |
 | Pill labels: bordered + visible input | `@include pill-outline` (on parent) |
+| Focus ring (consistent focus indicator) | `@include focus-ring` or `@include focus-ring($color, $width)` |
+| Tab navigation container | `@include tabs-nav` |
+| Tab button styling | `@include tabs-tab` |
+| Active tab styling | `@include tabs-tab-active` |
+| Tab content panel | `@include tabs-panel` |
+| Container query setup | `@include container` or `@include container(name)` |
 
 ---
 
@@ -245,9 +251,9 @@ Responsive grid layouts with `gap: 1.5rem`.
 #my-form {
     @include form-grid;
 
-    .form-group:nth-child(1),
-    .form-group:nth-child(2) { grid-column: span 3; } // Half width each
-    .form-group:nth-child(3) { grid-column: span 6; } // Full width
+    > label:nth-child(1),
+    > label:nth-child(2) { grid-column: span 3; } // Half width each
+    > label:nth-child(3) { grid-column: span 6; } // Full width
     .form-actions { grid-column: span 6; }
 }
 ```
@@ -320,34 +326,21 @@ h3 {
 
 ### `@include btn`
 
-Primary button with hover, focus, and disabled states.
+Button **structure only** — padding, flex alignment, font sizing. Does NOT include colors.
 
 **Expands to:**
 ```css
-display: flex;
+display: inline-flex;
 align-items: center;
 justify-content: center;
+gap: 0.5rem;
 padding: 0.5rem 1rem;
 font-size: var(--text-sm);                    /* 0.875rem */
 font-weight: var(--font-medium);              /* 500 */
-border-radius: var(--radius-md);              /* 0.5rem */
-cursor: pointer;
-transition: all var(--transition-base);
-border: none;
-outline: none;
-background-color: var(--color-primary);       /* #2737a1 */
-color: #ffffff;
 white-space: nowrap;
 ```
 
-**States:**
-- `:hover` → `background-color: var(--color-primary-hover)` (#1e2b82)
-- `:focus` → `box-shadow: 0 0 0 3px var(--color-primary-light)` (#e6eafa)
-- `:disabled` → `opacity: 0.5; cursor: not-allowed`
-
-**Variants** (defined in `_forms.scss`):
-- `.btn--secondary` — light background, primary text
-- `.btn--danger` — red background
+> **Colors come from `@include btn-colors`**, which is applied globally to all `<button>` elements via `scss/base/_global.scss`. You get hover/active/focus/disabled states for free. Change color by overriding `--color-primary` on the element or parent.
 
 ### `@include close-button`
 
@@ -372,7 +365,7 @@ transition: all var(--transition-fast);       /* 0.15s ease */
 **States:**
 - `:hover` → `color: var(--color-error)` (#dc2626)
 - `:active` → `color: var(--color-error-hover)` (#b91c1c), `background: var(--color-bg-body)`
-- `:focus-visible` → `outline: 2px solid var(--color-primary)`
+- `:focus-visible` → `@include focus-ring` (consistent with all interactive elements)
 
 ```html
 <button class="ln-icon-close" data-ln-modal-close></button>
@@ -592,13 +585,13 @@ Table:       --color-table-header-bg: #1a1a2e
 ### Z-Index Scale
 
 ```
-toast (50) > modal (40) > overlay (30) > sticky (20) > dropdown (10)
+toast (50) > modal (40) > overlay (30) > dropdown (20) > sticky (10)
 ```
 
 | Token | Value |
 |-------|-------|
-| `--z-dropdown` | 10 |
-| `--z-sticky` | 20 |
+| `--z-sticky` | 10 |
+| `--z-dropdown` | 20 |
 | `--z-overlay` | 30 |
 | `--z-modal` | 40 |
 | `--z-toast` | 50 |
@@ -810,22 +803,25 @@ Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on f
 
 ### Form Layout
 
+Forms use CSS Grid + wrapping `<label>`. No `<div>` wrappers, no `.form-group`.
+
 ```html
 <form id="user-form">
-    <div class="form-group"><label>First Name</label><input></div>
-    <div class="form-group"><label>Last Name</label><input></div>
-    <div class="form-group"><label>Email</label><input type="email"></div>
+    <label>First Name <input type="text" name="first_name"></label>
+    <label>Last Name <input type="text" name="last_name"></label>
+    <label>Email <input type="email" name="email"></label>
     <div class="form-actions">
-        <button class="btn" type="submit">Save</button>
+        <button type="button">Cancel</button>
+        <button type="submit">Save</button>
     </div>
 </form>
 ```
 ```scss
 #user-form {
     @include form-grid;
-    .form-group:nth-child(1),
-    .form-group:nth-child(2) { grid-column: span 3; }
-    .form-group:nth-child(3) { grid-column: span 6; }
+    > label:nth-child(1),
+    > label:nth-child(2) { grid-column: span 3; }
+    > label:nth-child(3) { grid-column: span 6; }
     .form-actions { grid-column: span 6; }
 }
 ```
@@ -837,9 +833,8 @@ Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on f
 | File | Contents |
 |------|----------|
 | `scss/config/_tokens.scss` | All CSS custom properties (`:root`) |
-| `scss/config/_mixins.scss` | All `@include` mixins (91 total) |
+| `scss/config/_mixins.scss` | All `@include` mixins (120+) |
 | `scss/config/_icons.scss` | SVG icon system |
 | `scss/config/_theme.scss` | Color palette extensions |
-| `scss/components/` | Component SCSS (card, forms, tables, etc.) |
+| `scss/components/` | Component SCSS (card, forms, tables, tabs, etc.) |
 | `scss/base/` | Reset, global defaults, typography |
-| `scss/layout/` | App layout, grid, header |

@@ -175,8 +175,8 @@ background-color: hsl(var(--color-primary) / 0.5);
 #### Z-Index Scale
 | Token | Value |
 |-------|-------|
-| `--z-dropdown` | 100 |
-| `--z-sticky` | 20 |
+| `--z-sticky` | 10 |
+| `--z-dropdown` | 20 |
 | `--z-overlay` | 30 |
 | `--z-modal` | 40 |
 | `--z-toast` | 50 |
@@ -394,7 +394,7 @@ Every `<button>` gets hover/active/focus/disabled effects **automatically** from
 | Default | `hsl(--color-primary / 0.15)` | `hsl(--color-primary)` |
 | Hover | `hsl(--color-primary / 0.7)` | `hsl(--color-white)` |
 | Active | `hsl(--color-primary / 1)` | `hsl(--color-white)` |
-| Focus | `box-shadow: 0 0 0 3px hsl(--color-primary / 0.2)` | unchanged |
+| Focus | `@include focus-ring` (consistent with all interactive elements) | unchanged |
 | Disabled | 50% opacity | cursor: not-allowed |
 
 #### Changing button color
@@ -436,6 +436,24 @@ Override `--color-primary` on the element or any parent:
 | `@include table-striped` | Alternating row background colors |
 | `@include table-section-header` | Section header row styling |
 | `@include table-action` | Action button styling in table cells |
+
+### Tabs
+
+| Mixin | Description |
+|-------|-------------|
+| `@include tabs-nav` | Tab navigation container (flex, border-bottom) |
+| `@include tabs-tab` | Tab button (full reset, padding, text, underline on hover) |
+| `@include tabs-tab-active` | Active tab state (primary color, bottom border) |
+| `@include tabs-panel` | Tab content panel (padding) |
+
+### Focus
+
+| Mixin | Description |
+|-------|-------------|
+| `@include focus-ring` | Consistent focus indicator (box-shadow, primary-light, 3px) |
+| `@include focus-ring($color, $width)` | Custom color and width |
+
+Used internally by `btn-colors`, `form-input`, `form-check`, `close-button`. Use directly when building custom interactive elements.
 
 ### Other
 
@@ -530,29 +548,29 @@ Icons use `mask-image` + `currentColor` — they automatically inherit the text 
 
 ## Form Layout
 
-Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<input id>`.
+Forms use CSS Grid + wrapping `<label>` (implicit association, no `for`/`id` needed). No `<div>` wrappers.
 
 ### HTML
 
 ```html
 <form id="my-form">
-  <p class="form-element">
-    <label for="name">Name <span class="text-error">*</span></label>
-    <input type="text" id="name" name="name" required>
+  <label>
+    Name <span class="text-error">*</span>
+    <input type="text" name="name" required>
     <small class="text-error">Required field</small>
-  </p>
+  </label>
 
-  <p class="form-element">
-    <label for="category">Category</label>
-    <select id="category" name="category">
+  <label>
+    Category
+    <select name="category">
       <option>Option A</option>
     </select>
-  </p>
+  </label>
 
-  <p class="form-element" id="field-notes">
-    <label for="notes">Notes</label>
-    <textarea id="notes" name="notes"></textarea>
-  </p>
+  <label>
+    Notes
+    <textarea name="notes"></textarea>
+  </label>
 
   <div class="form-actions">
     <button type="button">Cancel</button>
@@ -567,8 +585,9 @@ Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<
 #my-form {
   @include form-grid;
 
-  .form-element { grid-column: span 3; }       // default: half
-  #field-notes { grid-column: span 6; }        // by id: full
+  > label:nth-child(1),
+  > label:nth-child(2) { grid-column: span 3; } // half width
+  > label:nth-child(3) { grid-column: span 6; } // full width
   .form-actions { grid-column: span 6; }
 
   small { display: block; }
@@ -579,10 +598,11 @@ Forms use CSS Grid + `<p class="form-element">` with explicit `<label for>` / `<
 
 | Element | Rule |
 |---------|------|
-| Root | `<form id="...">` — styled with `@include form-grid` |
-| Children | `<p class="form-element">` — wraps `<label>` + `<input>` |
-| Label | Explicit `for`/`id`: `<label for="name">` + `<input id="name">` |
-| Column spans | Via `#id` or `nth-child` in form-specific SCSS — NEVER width classes |
+| Root | `<form id="...">` — styled with `@include form-grid` (6 cols, 1 col on mobile) |
+| Children | Direct `<label>` elements wrapping both text and input |
+| Column spans | Via `> label:nth-child(N)` in SCSS — NEVER inline style or width classes |
+| Errors | `<small class="text-error">` inside `<label>` + `small { display: block; }` in SCSS |
+| Checkbox/radio | Needs `input[type="checkbox"] { width: auto; }` |
 | `.form-actions` | Component class — stays in HTML, `grid-column: span 6` |
 
 ---
