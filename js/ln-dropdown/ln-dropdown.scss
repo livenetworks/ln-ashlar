@@ -32,7 +32,11 @@
 		padding: 0;
 	}
 
-	a, button {
+	a,
+	button,
+	input[type="submit"],
+	input[type="reset"],
+	input[type="button"] {
 		@include w-full;
 		@include flex;
 		@include items-center;
@@ -45,11 +49,22 @@
 		@include transition-fast;
 		background: none;
 		border: none;
+		border-radius: 0;
 		color: hsl(var(--color-text-primary));
 		text-decoration: none;
 
-		&:hover {
+		&:hover:not(:disabled) {
 			@include bg-secondary;
+			color: hsl(var(--color-text-primary));
+		}
+
+		&:active:not(:disabled) {
+			@include bg-secondary;
+			color: hsl(var(--color-text-primary));
+		}
+
+		&:focus {
+			box-shadow: none;
 		}
 	}
 
