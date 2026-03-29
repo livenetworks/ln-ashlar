@@ -148,8 +148,12 @@
 			document.addEventListener('keydown', instance._onEscape);
 			document.addEventListener('keydown', instance._onFocusTrap);
 
-			var firstFocusable = el.querySelector('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])');
-			if (firstFocusable) firstFocusable.focus();
+			var firstInput = el.querySelector('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
+			if (firstInput) firstInput.focus();
+			else {
+				var firstFocusable = el.querySelector('a[href], button:not([disabled])');
+				if (firstFocusable) firstFocusable.focus();
+			}
 
 			_dispatch(el, 'ln-modal:open');
 		} else {
