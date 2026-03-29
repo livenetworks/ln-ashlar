@@ -106,6 +106,7 @@
 								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
 									<tr><td><code>data-ln-confirm="Confirm?"</code></td><td>button</td><td>Enables confirm behavior. Value is the confirmation text.</td></tr>
+									<tr><td><code>data-ln-confirm-timeout="3"</code></td><td>button</td><td>Timeout in seconds before auto-revert (default: 3). Observable.</td></tr>
 									<tr><td><code>data-confirming</code></td><td>button</td><td>Added automatically while awaiting confirmation.</td></tr>
 								</tbody>
 							</table>
@@ -119,6 +120,19 @@
 							<div class="demo-actions">
 								<button class="btn btn--danger" data-ln-confirm="Are you sure?">Delete Record</button>
 								<button class="btn btn--secondary" data-ln-confirm="Reset settings?">Reset Defaults</button>
+							</div>
+						</main>
+					</section>
+
+					<!-- Custom Timeout -->
+					<section class="section-card">
+						<header><h3>Example — Custom Timeout</h3></header>
+						<main>
+							<p>Use <code>data-ln-confirm-timeout</code> to override the default 3-second revert. The attribute is observed — changing it dynamically restarts the timer.</p>
+							<div class="demo-actions">
+								<button class="btn btn--danger" data-ln-confirm="Confirm?" data-ln-confirm-timeout="1.5">1.5s timeout</button>
+								<button class="btn btn--danger" data-ln-confirm="Confirm?">3s default</button>
+								<button class="btn btn--danger" data-ln-confirm="Confirm?" data-ln-confirm-timeout="6">6s timeout</button>
 							</div>
 						</main>
 					</section>

@@ -1,25 +1,43 @@
 # ln-confirm
 
-A confirmation prompt for destructive actions. First click changes the button text to a confirmation message; second click allows the action through. Automatically reverts after 3 seconds if not confirmed.
+A confirmation prompt for destructive actions. First click changes the button text to a confirmation message; second click allows the action through. Automatically reverts after a configurable timeout (default 3 seconds).
 
 ## Attributes
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
 | `data-ln-confirm="Confirm?"` | button | Enables confirm behavior; value is the confirmation text (default: "Confirm?") |
+| `data-ln-confirm-timeout="5"` | button | Timeout in seconds before auto-revert (default: 3). Observable — changing it while confirming restarts the timer. |
 | `data-confirming` | button (auto) | Added automatically while awaiting confirmation — use for CSS styling |
 
 ## Behavior
 
 1. **First click** — `preventDefault` + `stopImmediatePropagation`, button text changes to the confirm message, `data-confirming` attribute is set
 2. **Second click** — action proceeds normally (form submit, etc.), button resets
-3. **Auto-revert** — if no second click within 3 seconds, the button reverts to its original text
+3. **Auto-revert** — if no second click within the timeout, the button reverts to its original text
+
+## Timeout
+
+Default timeout is 3 seconds. Override per-button via attribute:
+
+```html
+<!-- Reverts after 5 seconds -->
+<button data-ln-confirm="Are you sure?" data-ln-confirm-timeout="5">Delete</button>
+
+<!-- Reverts after 1.5 seconds -->
+<button data-ln-confirm="Confirm?" data-ln-confirm-timeout="1.5">Remove</button>
+```
+
+The `data-ln-confirm-timeout` attribute is observed — changing it dynamically while the button is in confirming state restarts the timer with the new value.
 
 ## HTML Structure
 
 ```html
 <!-- Simple confirm button -->
 <button data-ln-confirm="Are you sure?">Delete</button>
+
+<!-- Custom timeout -->
+<button data-ln-confirm="Confirm delete?" data-ln-confirm-timeout="5">Delete</button>
 
 <!-- Inside a form -->
 <form method="POST" action="/delete">

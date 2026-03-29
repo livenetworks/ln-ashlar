@@ -162,8 +162,8 @@
 					<header><h3>Enable / Disable</h3></header>
 					<main>
 						<nav class="demo-actions">
-							<button class="btn btn--sm" onclick="document.getElementById('sortable-toggle').lnSortable.enable(); updateToggleStatus()">Enable</button>
-							<button class="btn btn--sm btn--secondary" onclick="document.getElementById('sortable-toggle').lnSortable.disable(); updateToggleStatus()">Disable</button>
+							<button class="btn btn--sm" onclick="document.getElementById('sortable-toggle').setAttribute('data-ln-sortable', ''); updateToggleStatus()">Enable</button>
+							<button class="btn btn--sm btn--secondary" onclick="document.getElementById('sortable-toggle').setAttribute('data-ln-sortable', 'disabled'); updateToggleStatus()">Disable</button>
 							<code id="toggle-status">Status: enabled</code>
 						</nav>
 						<ol id="sortable-toggle" data-ln-sortable>
@@ -236,8 +236,6 @@
 								<tr><td><code>ln-sortable:before-drag</code></td><td>yes</td><td><strong>yes</strong></td><td><code>{ item, index }</code></td></tr>
 								<tr><td><code>ln-sortable:drag-start</code></td><td>yes</td><td>no</td><td><code>{ item, index }</code></td></tr>
 								<tr><td><code>ln-sortable:reordered</code></td><td>yes</td><td>no</td><td><code>{ item, oldIndex, newIndex }</code></td></tr>
-								<tr><td><code>ln-sortable:request-enable</code></td><td>no</td><td>no</td><td>incoming — dispatch on container</td></tr>
-								<tr><td><code>ln-sortable:request-disable</code></td><td>no</td><td>no</td><td>incoming — dispatch on container</td></tr>
 							</tbody>
 						</table>
 						<pre><code>document.addEventListener('ln-sortable:reordered', function (e) {
@@ -249,8 +247,8 @@ document.addEventListener('ln-sortable:before-drag', function (e) {
     if (listIsLocked) e.preventDefault();
 });
 
-// Request disable via event
-list.dispatchEvent(new CustomEvent('ln-sortable:request-disable'));</code></pre>
+// Disable via attribute (single source of truth)
+list.setAttribute('data-ln-sortable', 'disabled');</code></pre>
 					</main>
 				</section>
 
@@ -295,9 +293,14 @@ list.dispatchEvent(new CustomEvent('ln-sortable:request-disable'));</code></pre>
 					<main>
 						<pre><code>var list = document.querySelector('[data-ln-sortable]');
 
-list.lnSortable.enable();
-list.lnSortable.disable();
-list.lnSortable.isEnabled;  // boolean
+// Via API (sets the attribute, observer syncs state)
+list.lnSortable.enable();     // sets data-ln-sortable=""
+list.lnSortable.disable();    // sets data-ln-sortable="disabled"
+list.lnSortable.isEnabled;    // boolean
+
+// Via attribute (identical result)
+list.setAttribute('data-ln-sortable', 'disabled');
+list.setAttribute('data-ln-sortable', '');
 
 // Constructor — only for non-standard cases
 window.lnSortable(container);</code></pre>
@@ -320,7 +323,7 @@ window.lnSortable(container);</code></pre>
 			var list = document.getElementById('sortable-toggle');
 			var el = document.getElementById('toggle-status');
 			if (list && el) {
-				el.textContent = 'Status: ' + (list.lnSortable.isEnabled ? 'enabled' : 'disabled');
+				el.textContent = 'Status: ' + (list.getAttribute('data-ln-sortable') === 'disabled' ? 'disabled' : 'enabled');
 			}
 		}
 

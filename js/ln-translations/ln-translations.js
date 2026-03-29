@@ -134,7 +134,9 @@
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				e.preventDefault();
 				e.stopPropagation();
-				self.menuEl.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
+				if (self.menuEl.getAttribute('data-ln-toggle') === 'open') {
+					self.menuEl.setAttribute('data-ln-toggle', 'close');
+				}
 				self.addLanguage(lang);
 			});
 

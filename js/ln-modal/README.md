@@ -1,21 +1,31 @@
 # ln-modal
 
 Modal dialog component — overlay with content (header/main/footer).
-Instance-based: each `.ln-modal` gets its own instance. ESC closes the focused modal. Body scroll is blocked when a modal is open.
+Instance-based: each `[data-ln-modal]` gets its own instance. ESC closes the focused modal. Body scroll is blocked when a modal is open.
+
+## Single Source of Truth
+
+The `data-ln-modal` attribute is the single source of truth for open/closed state:
+- `data-ln-modal="open"` — modal is open
+- `data-ln-modal` or `data-ln-modal="close"` — modal is closed
+
+All state changes flow through the attribute. The JS API methods (`open()`, `close()`, `toggle()`) simply set the attribute — the MutationObserver detects the change and applies the actual state (visibility, aria, ESC listener, events). External code can set the attribute directly with the same result.
 
 ## Attributes
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
-| `data-ln-modal="modalId"` | trigger button/link | Click toggles the modal with that ID |
+| `data-ln-modal` | modal element | Creates instance, starts closed |
+| `data-ln-modal="open"` | modal element | Starts open |
+| `data-ln-modal-for="modalId"` | trigger button/link | Click toggles the modal with that ID |
 | `data-ln-modal-close` | button inside modal | Closes the parent modal |
 
 ## CSS Classes
 
 | Class | Description |
 |-------|-------------|
-| `.ln-modal` | Overlay container (must have `id`) |
-| `.ln-modal--open` | Open modal (added by JS) |
+| `.ln-modal` | Overlay container (styling) |
+| `[data-ln-modal="open"]` | Open modal (set by JS) |
 | `.ln-modal > form` | Content container (always `<form>`) |
 
 ## Size Mixins
@@ -31,14 +41,18 @@ Sizes are applied via SCSS mixins on semantic selectors, not CSS classes:
 
 ## API
 
-Modals are auto-initialized by MutationObserver. Each `.ln-modal` element gets an instance at `element.lnModal`.
+Modals are auto-initialized by MutationObserver. Each `[data-ln-modal]` element gets an instance at `element.lnModal`.
 
 ```javascript
 const modal = document.getElementById('my-modal');
-modal.lnModal.open();
-modal.lnModal.close();
-modal.lnModal.toggle();
-modal.lnModal.destroy();  // removes all listeners, cleans up instance
+modal.lnModal.open();       // sets data-ln-modal="open" → observer applies state
+modal.lnModal.close();      // sets data-ln-modal="close" → observer applies state
+modal.lnModal.toggle();     // toggles based on current state
+modal.lnModal.destroy();    // removes all listeners, cleans up instance
+
+// Direct attribute change — identical result
+modal.setAttribute('data-ln-modal', 'open');
+modal.setAttribute('data-ln-modal', 'close');
 ```
 
 ## Events
@@ -53,11 +67,13 @@ All events are dispatched on the modal element itself and bubble up.
 | `ln-modal:close` | no | Modal closed | `{ modalId, target }` |
 | `ln-modal:destroyed` | no | Instance destroyed | `{ modalId, target }` |
 
+If `before-open`/`before-close` is canceled (`preventDefault()`), the observer reverts the attribute.
+
 ```javascript
 // Cancel opening conditionally
 document.addEventListener('ln-modal:before-open', function(e) {
     if (e.detail.modalId === 'confirm-dialog' && !formIsValid()) {
-        e.preventDefault(); // modal won't open
+        e.preventDefault(); // observer reverts attribute back to "close"
     }
 });
 
@@ -65,7 +81,6 @@ document.addEventListener('ln-modal:before-open', function(e) {
 document.getElementById('edit-modal').addEventListener('ln-modal:before-close', function(e) {
     if (hasUnsavedChanges()) {
         e.preventDefault();
-        showConfirmation();
     }
 });
 
@@ -96,10 +111,10 @@ Non-submit buttons need `type="button"`.
 
 ```html
 <!-- Trigger button -->
-<button data-ln-modal="my-modal">Open</button>
+<button data-ln-modal-for="my-modal">Open</button>
 
 <!-- Modal -->
-<div id="my-modal" class="ln-modal">
+<div class="ln-modal" data-ln-modal id="my-modal">
     <form>
         <header>
             <h3>Title</h3>

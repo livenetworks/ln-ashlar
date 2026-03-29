@@ -103,7 +103,7 @@ No JS needed — MutationObserver auto-initializes.
 ### Modal form
 
 ```html
-<div id="new-invoice" class="ln-modal">
+<div id="new-invoice" class="ln-modal" data-ln-modal>
     <form id="invoice-form" data-ln-autosave>
         <header><h3>New Invoice</h3><button type="button" class="ln-icon-close" data-ln-modal-close></button></header>
         <main>

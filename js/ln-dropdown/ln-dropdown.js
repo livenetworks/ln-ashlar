@@ -172,8 +172,8 @@
 		this._boundDocClick = function (e) {
 			if (self.dom.contains(e.target)) return;
 			if (self.toggleEl && self.toggleEl.contains(e.target)) return;
-			if (self.toggleEl) {
-				self.toggleEl.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
+			if (self.toggleEl && self.toggleEl.getAttribute('data-ln-toggle') === 'open') {
+				self.toggleEl.setAttribute('data-ln-toggle', 'close');
 			}
 		};
 		setTimeout(function () {
@@ -210,8 +210,8 @@
 	_component.prototype._addResizeCloseListener = function () {
 		const self = this;
 		this._boundResizeClose = function () {
-			if (self.toggleEl) {
-				self.toggleEl.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
+			if (self.toggleEl && self.toggleEl.getAttribute('data-ln-toggle') === 'open') {
+				self.toggleEl.setAttribute('data-ln-toggle', 'close');
 			}
 		};
 		window.addEventListener('resize', this._boundResizeClose);

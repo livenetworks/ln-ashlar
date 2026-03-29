@@ -15,7 +15,7 @@
 	@include transition;
 }
 
-.ln-modal--open {
+[data-ln-modal="open"] {
 	display: flex;
 	opacity: 1;
 }
