@@ -94,22 +94,22 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Modal</h1>
-					<p>JS component for modal windows. Opens/closes via <code>data-ln-modal</code>. ESC closes.</p>
+					<p>JS component for modal windows. The <code>data-ln-modal</code> attribute is the single source of truth for open/closed state. ESC closes.</p>
 
 		<!-- Triggers -->
 		<section class="section-card">
 			<header><h3>Examples</h3></header>
 			<main>
 				<nav class="demo-actions">
-					<button data-ln-modal="demo-basic" class="btn">Basic Modal</button>
-					<button data-ln-modal="demo-form" class="btn btn--secondary">Form Modal</button>
-					<button data-ln-modal="demo-large" class="btn btn--secondary">Large Modal</button>
+					<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
+					<button data-ln-modal-for="demo-form" class="btn btn--secondary">Form Modal</button>
+					<button data-ln-modal-for="demo-large" class="btn btn--secondary">Large Modal</button>
 				</nav>
 			</main>
 		</section>
 
 		<!-- Basic Modal -->
-		<div class="ln-modal" id="demo-basic">
+		<div class="ln-modal" data-ln-modal id="demo-basic">
 			<form>
 				<header>
 					<h3>Basic Modal</h3>
@@ -126,7 +126,7 @@
 		</div>
 
 		<!-- Form Modal -->
-		<div class="ln-modal" id="demo-form">
+		<div class="ln-modal" data-ln-modal id="demo-form">
 			<form>
 				<header>
 					<h3>Add User</h3>
@@ -158,7 +158,7 @@
 		</div>
 
 		<!-- Large Modal -->
-		<div class="ln-modal" id="demo-large">
+		<div class="ln-modal" data-ln-modal id="demo-large">
 			<form>
 				<header>
 					<h3>Large Modal</h3>
@@ -200,7 +200,7 @@
 				<article>
 					<h4>Live Demo</h4>
 					<nav class="demo-actions">
-						<button data-ln-modal="demo-events" class="btn btn--secondary">Open modal (track events)</button>
+						<button data-ln-modal-for="demo-events" class="btn btn--secondary">Open modal (track events)</button>
 					</nav>
 					<output id="modal-event-log">No events yet.</output>
 				</article>
@@ -234,7 +234,7 @@ document.addEventListener('ln-modal:close', function(e) {
 		</section>
 
 		<!-- Events demo modal -->
-		<div class="ln-modal" id="demo-events">
+		<div class="ln-modal" data-ln-modal id="demo-events">
 			<form>
 				<header>
 					<h3>Events Demo</h3>
@@ -254,10 +254,10 @@ document.addEventListener('ln-modal:close', function(e) {
 			<header><h3>HTML</h3></header>
 			<main>
 				<pre><code>&lt;!-- Trigger button --&gt;
-&lt;button data-ln-modal="my-modal"&gt;Open&lt;/button&gt;
+&lt;button data-ln-modal-for="my-modal"&gt;Open&lt;/button&gt;
 
 &lt;!-- Modal — form is always the content root --&gt;
-&lt;div class="ln-modal" id="my-modal"&gt;
+&lt;div class="ln-modal" data-ln-modal id="my-modal"&gt;
     &lt;form&gt;
         &lt;header&gt;
             &lt;h3&gt;Title&lt;/h3&gt;
@@ -276,16 +276,15 @@ document.addEventListener('ln-modal:close', function(e) {
     &lt;/form&gt;
 &lt;/div&gt;
 
-&lt;!-- Sizes via mixins in SCSS (not classes) --&gt;
-&lt;!-- #my-modal &gt; form { @include modal-lg; } --&gt;
-
-&lt;!-- JS API --&gt;
+&lt;!-- JS API (sets the attribute, observer does the rest) --&gt;
 &lt;script&gt;
     const modal = document.getElementById('my-modal');
-    modal.lnModal.open();
-    modal.lnModal.close();
-    modal.lnModal.toggle();
-    modal.lnModal.destroy();
+    modal.lnModal.open();       // sets data-ln-modal="open"
+    modal.lnModal.close();      // sets data-ln-modal="close"
+
+    // Direct attribute change — identical result
+    modal.setAttribute('data-ln-modal', 'open');
+    modal.setAttribute('data-ln-modal', 'close');
 &lt;/script&gt;</code></pre>
 			</main>
 		</section>

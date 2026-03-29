@@ -135,8 +135,8 @@
 					<header><h3>Modal</h3></header>
 					<main>
 						<nav class="demo-actions">
-							<button data-ln-modal="demo-basic" class="btn">Basic Modal</button>
-							<button data-ln-modal="demo-form" class="btn btn--secondary">Form Modal</button>
+							<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
+							<button data-ln-modal-for="demo-form" class="btn btn--secondary">Form Modal</button>
 						</nav>
 					</main>
 				</section>
@@ -321,7 +321,7 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 	</div><!-- /.app-wrapper -->
 
 	<!-- Modals (outside app-wrapper) -->
-	<div class="ln-modal" id="demo-basic">
+	<div class="ln-modal" data-ln-modal id="demo-basic">
 		<form>
 			<header>
 				<h3>Basic Modal</h3>
@@ -337,7 +337,7 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 		</form>
 	</div>
 
-	<div class="ln-modal" id="demo-form">
+	<div class="ln-modal" data-ln-modal id="demo-form">
 		<form>
 			<header>
 				<h3>Add User</h3>

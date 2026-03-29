@@ -12,8 +12,8 @@
 	}
 
 	function _findModals(root) {
-		const items = Array.from(root.querySelectorAll('.ln-modal'));
-		if (root.classList && root.classList.contains('ln-modal')) {
+		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
+		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			items.push(root);
 		}
 		for (const el of items) {
@@ -24,8 +24,8 @@
 	}
 
 	function _attachTriggers(root) {
-		const triggers = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
+		const triggers = Array.from(root.querySelectorAll('[data-ln-modal-for]'));
+		if (root.hasAttribute && root.hasAttribute('data-ln-modal-for')) {
 			triggers.push(root);
 		}
 		for (const btn of triggers) {
@@ -34,7 +34,7 @@
 			btn.addEventListener('click', function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				e.preventDefault();
-				const modalId = btn.getAttribute(DOM_SELECTOR);
+				const modalId = btn.getAttribute('data-ln-modal-for');
 				const target = document.getElementById(modalId);
 				if (!target || !target[DOM_ATTRIBUTE]) return;
 				target[DOM_ATTRIBUTE].toggle();
@@ -46,7 +46,7 @@
 
 	function _component(dom) {
 		this.dom = dom;
-		this.isOpen = dom.classList.contains('ln-modal--open');
+		this.isOpen = dom.getAttribute(DOM_SELECTOR) === 'open';
 
 		const self = this;
 
@@ -74,44 +74,26 @@
 
 		_attachCloseButtons(this);
 
+		// Apply initial state if open
+		if (this.isOpen) {
+			this.dom.setAttribute('aria-modal', 'true');
+			this.dom.setAttribute('role', 'dialog');
+			document.body.classList.add('ln-modal-open');
+			document.addEventListener('keydown', this._onEscape);
+			document.addEventListener('keydown', this._onFocusTrap);
+		}
+
 		return this;
 	}
 
 	_component.prototype.open = function () {
 		if (this.isOpen) return;
-		const before = _dispatchCancelable(this.dom, 'ln-modal:before-open');
-		if (before.defaultPrevented) return;
-
-		this.isOpen = true;
-		this.dom.classList.add('ln-modal--open');
-		this.dom.setAttribute('aria-modal', 'true');
-		this.dom.setAttribute('role', 'dialog');
-		document.body.classList.add('ln-modal-open');
-		document.addEventListener('keydown', this._onEscape);
-		document.addEventListener('keydown', this._onFocusTrap);
-
-		// Focus first focusable element inside modal
-		var firstFocusable = this.dom.querySelector('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])');
-		if (firstFocusable) firstFocusable.focus();
-
-		_dispatch(this.dom, 'ln-modal:open');
+		this.dom.setAttribute(DOM_SELECTOR, 'open');
 	};
 
 	_component.prototype.close = function () {
 		if (!this.isOpen) return;
-		const before = _dispatchCancelable(this.dom, 'ln-modal:before-close');
-		if (before.defaultPrevented) return;
-
-		this.isOpen = false;
-		this.dom.classList.remove('ln-modal--open');
-		this.dom.removeAttribute('aria-modal');
-		document.removeEventListener('keydown', this._onEscape);
-		document.removeEventListener('keydown', this._onFocusTrap);
-		_dispatch(this.dom, 'ln-modal:close');
-
-		if (!document.querySelector('.ln-modal.ln-modal--open')) {
-			document.body.classList.remove('ln-modal-open');
-		}
+		this.dom.setAttribute(DOM_SELECTOR, 'close');
 	};
 
 	_component.prototype.toggle = function () {
@@ -122,11 +104,10 @@
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
 		if (this.isOpen) {
-			this.dom.classList.remove('ln-modal--open');
 			this.dom.removeAttribute('aria-modal');
 			document.removeEventListener('keydown', this._onEscape);
 			document.removeEventListener('keydown', this._onFocusTrap);
-			if (!document.querySelector('.ln-modal.ln-modal--open')) {
+			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
 				document.body.classList.remove('ln-modal-open');
 			}
 		}
@@ -143,6 +124,52 @@
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	// ─── Attribute Sync ────────────────────────────────────────
+
+	function _syncAttribute(el) {
+		var instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+
+		var value = el.getAttribute(DOM_SELECTOR);
+		var shouldBeOpen = value === 'open';
+
+		if (shouldBeOpen === instance.isOpen) return;
+
+		if (shouldBeOpen) {
+			var before = _dispatchCancelable(el, 'ln-modal:before-open');
+			if (before.defaultPrevented) {
+				el.setAttribute(DOM_SELECTOR, 'close');
+				return;
+			}
+			instance.isOpen = true;
+			el.setAttribute('aria-modal', 'true');
+			el.setAttribute('role', 'dialog');
+			document.body.classList.add('ln-modal-open');
+			document.addEventListener('keydown', instance._onEscape);
+			document.addEventListener('keydown', instance._onFocusTrap);
+
+			var firstFocusable = el.querySelector('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])');
+			if (firstFocusable) firstFocusable.focus();
+
+			_dispatch(el, 'ln-modal:open');
+		} else {
+			var before = _dispatchCancelable(el, 'ln-modal:before-close');
+			if (before.defaultPrevented) {
+				el.setAttribute(DOM_SELECTOR, 'open');
+				return;
+			}
+			instance.isOpen = false;
+			el.removeAttribute('aria-modal');
+			document.removeEventListener('keydown', instance._onEscape);
+			document.removeEventListener('keydown', instance._onFocusTrap);
+			_dispatch(el, 'ln-modal:close');
+
+			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
+				document.body.classList.remove('ln-modal-open');
+			}
+		}
+	}
+
 	// ─── Helpers ───────────────────────────────────────────────
 
 	function _dispatch(element, eventName, detail) {
@@ -153,7 +180,7 @@
 	}
 
 	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
+		var event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: Object.assign({ modalId: element.id, target: element }, detail || {})
@@ -174,18 +201,24 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
+		var observer = new MutationObserver(function (mutations) {
+			for (var i = 0; i < mutations.length; i++) {
+				var mutation = mutations[i];
 				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
+					for (var j = 0; j < mutation.addedNodes.length; j++) {
+						var node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							_findModals(node);
 							_attachTriggers(node);
 						}
 					}
 				} else if (mutation.type === 'attributes') {
-					_findModals(mutation.target);
-					_attachTriggers(mutation.target);
+					if (mutation.attributeName === DOM_SELECTOR && mutation.target[DOM_ATTRIBUTE]) {
+						_syncAttribute(mutation.target);
+					} else {
+						_findModals(mutation.target);
+						_attachTriggers(mutation.target);
+					}
 				}
 			}
 		});
@@ -194,7 +227,7 @@
 			childList: true,
 			subtree: true,
 			attributes: true,
-			attributeFilter: [DOM_SELECTOR]
+			attributeFilter: [DOM_SELECTOR, 'data-ln-modal-for']
 		});
 	}
 

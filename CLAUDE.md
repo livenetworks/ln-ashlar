@@ -104,9 +104,12 @@ All states read from `--color-primary`. No classes needed.
 ## Modal Architecture
 
 `<form>` is always the content root — no wrapper `<div>`, no BEM classes. Styled via `.ln-modal > form`.
+`data-ln-modal` attribute is the single source of truth for open/closed state.
 
 ```html
-<div class="ln-modal" id="my-modal">
+<button data-ln-modal-for="my-modal">Open</button>
+
+<div class="ln-modal" data-ln-modal id="my-modal">
     <form>
         <header><h3>Title</h3><button type="button" class="ln-icon-close" data-ln-modal-close></button></header>
         <main>...</main>
@@ -118,13 +121,16 @@ All states read from `--color-primary`. No classes needed.
 </div>
 ```
 
+- **`data-ln-modal`** on modal element = creates instance, value = state ("open"/"close")
+- **`data-ln-modal-for="id"`** on trigger button = references modal by ID
 - **`<form>` is the root** — footer buttons (Cancel, Submit) are inside the form
 - **Footer buttons** get `@include btn` automatically — no `.btn` class needed
 - **Non-submit buttons** need `type="button"` (close, cancel) to prevent form submission
 - **No `.ln-modal__content` class** — select semantically: `.ln-modal > form`
 - **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes
 - Available: `modal-sm` (28rem), `modal-md` (32rem), `modal-lg` (42rem), `modal-xl` (48rem)
-- **Instance-based API** — `modal.lnModal.open()`, `.close()`, `.toggle()`, `.destroy()`
+- **API** — `modal.lnModal.open()` / `.close()` just set the attribute, observer applies state
+- **Direct attribute** — `modal.setAttribute('data-ln-modal', 'open')` — identical result
 - **ESC listener** active only while modal is open (zero listeners when all closed)
 
 ## Button Groups vs Pill Groups

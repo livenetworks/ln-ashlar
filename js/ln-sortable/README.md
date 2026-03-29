@@ -3,11 +3,20 @@
 Drag & drop reorder component — moves elements in a list using the Pointer Events API.
 Works with touch + mouse. The component only reorganizes the DOM — data model sync is the consumer's responsibility (via events).
 
+## Single Source of Truth
+
+The `data-ln-sortable` attribute is the single source of truth for enabled/disabled state:
+- `data-ln-sortable` — enabled (default)
+- `data-ln-sortable="disabled"` — disabled
+
+All state changes flow through the attribute. The JS API methods (`enable()`, `disable()`) simply set the attribute — the MutationObserver detects the change and syncs the internal state. External code can set the attribute directly with the same result.
+
 ## Attributes
 
 | Attribute | On | Description |
 |---------|-----|------|
-| `data-ln-sortable` | container (`<ol>`, `<ul>`, etc.) | Creates an instance. Sortable items = direct children. |
+| `data-ln-sortable` | container (`<ol>`, `<ul>`, etc.) | Creates an instance, enabled by default |
+| `data-ln-sortable="disabled"` | container | Creates an instance, starts disabled |
 | `data-ln-sortable-handle` | element inside a child | Drag handle. If absent — the entire child is draggable. |
 
 ## API
@@ -15,9 +24,13 @@ Works with touch + mouse. The component only reorganizes the DOM — data model 
 ```javascript
 // Instance API (on the DOM element)
 var list = document.querySelector('[data-ln-sortable]');
-list.lnSortable.enable();
-list.lnSortable.disable();
-list.lnSortable.isEnabled;  // boolean
+list.lnSortable.enable();     // sets data-ln-sortable="" → observer syncs state
+list.lnSortable.disable();    // sets data-ln-sortable="disabled" → observer syncs state
+list.lnSortable.isEnabled;    // boolean
+
+// Direct attribute change — identical result
+list.setAttribute('data-ln-sortable', '');           // same as enable()
+list.setAttribute('data-ln-sortable', 'disabled');   // same as disable()
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
 // For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
@@ -31,8 +44,6 @@ window.lnSortable(container);
 | `ln-sortable:before-drag` | yes | **yes** | `{ item: HTMLElement, index: number }` |
 | `ln-sortable:drag-start` | yes | no | `{ item: HTMLElement, index: number }` |
 | `ln-sortable:reordered` | yes | no | `{ item: HTMLElement, oldIndex: number, newIndex: number }` |
-| `ln-sortable:request-enable` | no | no | — |
-| `ln-sortable:request-disable` | no | no | — |
 
 ```javascript
 // Listen for reordering
@@ -45,11 +56,12 @@ document.addEventListener('ln-sortable:before-drag', function (e) {
     if (listIsLocked) e.preventDefault();
 });
 
-// Request disable (e.g. while saving)
-list.dispatchEvent(new CustomEvent('ln-sortable:request-disable'));
+// Disable while saving (via attribute or API — identical result)
+list.setAttribute('data-ln-sortable', 'disabled');
+saveOrder().then(function () {
+    list.setAttribute('data-ln-sortable', '');
+});
 ```
-
-`ln-sortable:request-enable` and `ln-sortable:request-disable` are **incoming** events — external code dispatches them on the sortable element.
 
 ## CSS Classes
 
@@ -106,12 +118,12 @@ Example CSS:
 ### Programmatic
 
 ```javascript
-// Disable while processing
+// Via API (sets the attribute, observer does the rest)
 list.lnSortable.disable();
 saveOrder().then(function () {
     list.lnSortable.enable();
 });
 
-// Or via events
-list.dispatchEvent(new CustomEvent('ln-sortable:request-disable'));
+// Via attribute (identical result)
+list.setAttribute('data-ln-sortable', 'disabled');
 ```

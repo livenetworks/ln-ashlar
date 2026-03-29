@@ -29,7 +29,7 @@
 
 	function _component(dom) {
 		this.dom = dom;
-		this.isEnabled = true;
+		this.isEnabled = dom.getAttribute(DOM_SELECTOR) !== 'disabled';
 		this._dragging = null;
 
 		dom.setAttribute('aria-roledescription', 'sortable list');
@@ -42,32 +42,39 @@
 		};
 		dom.addEventListener('pointerdown', this._onPointerDown);
 
-		this._onRequestEnable = function () { self.enable(); };
-		this._onRequestDisable = function () { self.disable(); };
-		dom.addEventListener('ln-sortable:request-enable', this._onRequestEnable);
-		dom.addEventListener('ln-sortable:request-disable', this._onRequestDisable);
-
 		return this;
 	}
 
 	// ─── Public API ────────────────────────────────────────────
 
 	_component.prototype.enable = function () {
-		this.isEnabled = true;
+		if (this.isEnabled) return;
+		this.dom.setAttribute(DOM_SELECTOR, '');
 	};
 
 	_component.prototype.disable = function () {
-		this.isEnabled = false;
+		if (!this.isEnabled) return;
+		this.dom.setAttribute(DOM_SELECTOR, 'disabled');
 	};
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('pointerdown', this._onPointerDown);
-		this.dom.removeEventListener('ln-sortable:request-enable', this._onRequestEnable);
-		this.dom.removeEventListener('ln-sortable:request-disable', this._onRequestDisable);
 		_dispatch(this.dom, 'ln-sortable:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
+
+	// ─── Attribute Sync ────────────────────────────────────────
+
+	function _syncAttribute(el) {
+		var instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+
+		var shouldBeEnabled = el.getAttribute(DOM_SELECTOR) !== 'disabled';
+		if (shouldBeEnabled === instance.isEnabled) return;
+
+		instance.isEnabled = shouldBeEnabled;
+	}
 
 	// ─── Pointer Handlers ──────────────────────────────────────
 
@@ -227,16 +234,22 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
+		var observer = new MutationObserver(function (mutations) {
+			for (var i = 0; i < mutations.length; i++) {
+				var mutation = mutations[i];
 				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
+					for (var j = 0; j < mutation.addedNodes.length; j++) {
+						var node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}
 					}
 				} else if (mutation.type === 'attributes') {
-					_findElements(mutation.target);
+					if (mutation.attributeName === DOM_SELECTOR && mutation.target[DOM_ATTRIBUTE]) {
+						_syncAttribute(mutation.target);
+					} else {
+						_findElements(mutation.target);
+					}
 				}
 			}
 		});

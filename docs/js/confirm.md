@@ -7,6 +7,9 @@ Confirmation prompt for destructive actions. File: `js/ln-confirm/ln-confirm.js`
 ```html
 <button data-ln-confirm="Are you sure?">Delete</button>
 
+<!-- Custom timeout (seconds) -->
+<button data-ln-confirm="Confirm?" data-ln-confirm-timeout="5">Delete</button>
+
 <!-- Inside a form -->
 <form method="POST" action="/delete">
     <button type="submit" data-ln-confirm="Confirm delete?">Delete</button>
@@ -18,13 +21,15 @@ Confirmation prompt for destructive actions. File: `js/ln-confirm/ln-confirm.js`
 | Attribute | On | Description |
 |-----------|-----|-------------|
 | `data-ln-confirm="text"` | button | Confirmation text shown on first click (default: "Confirm?") |
+| `data-ln-confirm-timeout="3"` | button | Timeout in seconds before auto-revert (default: 3). Observable. |
 | `data-confirming` | button (auto) | Set automatically while awaiting confirmation |
 
 ## Behavior
 
 - First click: prevents action, shows confirmation text, sets `data-confirming`
 - Second click: allows action through, resets button
-- Auto-reverts after 3 seconds if not confirmed
+- Auto-reverts after timeout (default 3 seconds, configurable via `data-ln-confirm-timeout`)
+- Changing `data-ln-confirm-timeout` while confirming restarts the timer
 - MutationObserver auto-initializes dynamically added elements
 
 ## Events
@@ -33,7 +38,7 @@ Confirmation prompt for destructive actions. File: `js/ln-confirm/ln-confirm.js`
 |-------|------|----------|
 | `ln-confirm:waiting` | Entering confirmation state | `{ target }` |
 
-## Dynamic Update
+## API
 
 ```js
 // Manual initialization

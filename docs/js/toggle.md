@@ -2,6 +2,10 @@
 
 Generic toggle component — adds/removes `open` class on an element. CSS defines the animation. Works for sidebar, collapsible sections, dropdowns — anything. File: `js/ln-toggle/ln-toggle.js`.
 
+## Single Source of Truth
+
+The `data-ln-toggle` attribute is the single source of truth. All state changes flow through it — the JS API, trigger buttons, and external code all set the attribute, and the MutationObserver reacts by applying the `.open` class and dispatching events.
+
 ## HTML
 
 ```html
@@ -36,20 +40,22 @@ Generic toggle component — adds/removes `open` class on an element. CSS define
 | `ln-toggle:open` | yes | no | `{ target }` |
 | `ln-toggle:before-close` | yes | **yes** | `{ target }` |
 | `ln-toggle:close` | yes | no | `{ target }` |
-| `ln-toggle:request-close` | no | no | — |
-| `ln-toggle:request-open` | no | no | — |
 
-`request-close` and `request-open` are **incoming** events — external code dispatches them on the toggle element.
+If `before-open`/`before-close` is canceled (`preventDefault()`), the observer reverts the attribute.
 
 ## API
 
 ```js
 const el = document.getElementById('sidebar');
-el.lnToggle.open();
-el.lnToggle.close();
-el.lnToggle.toggle();
-el.lnToggle.isOpen;  // boolean
+el.lnToggle.open();       // sets attribute → observer applies state
+el.lnToggle.close();      // sets attribute → observer applies state
+el.lnToggle.toggle();     // toggles based on current state
+el.lnToggle.isOpen;       // boolean
 
-// Manual initialization
+// Direct attribute change — identical result
+el.setAttribute('data-ln-toggle', 'open');
+el.setAttribute('data-ln-toggle', 'close');
+
+// Manual initialization (Shadow DOM, iframe only)
 window.lnToggle(container);
 ```

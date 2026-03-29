@@ -37,11 +37,11 @@ Fired on the accordion container when a panel opens (after siblings are closed).
 
 ## Dependencies
 
-Accordion is a coordinator for `ln-toggle` children. Communication is event-only:
+Accordion is a coordinator for `ln-toggle` children. Communication is via the attribute (single source of truth):
 - **Listens to**: `ln-toggle:open` (bubbles up from toggle child)
-- **Dispatches**: `ln-toggle:request-close` on each sibling toggle
+- **Closes siblings**: sets `data-ln-toggle="close"` on each sibling — the toggle's MutationObserver handles the rest
 
-Accordion never calls toggle API directly (`el.lnToggle.close()`). This is the canonical Coordinator/Mediator Pattern from [COMPONENTS.md](../../js/COMPONENTS.md).
+Accordion never calls toggle API directly (`el.lnToggle.close()`). It sets the attribute, and toggle's observer applies the state. This is the canonical Coordinator/Mediator Pattern from [COMPONENTS.md](../../js/COMPONENTS.md).
 
 ## API
 

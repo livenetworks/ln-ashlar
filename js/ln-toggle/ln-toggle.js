@@ -54,35 +54,17 @@
 			dom.classList.add('open');
 		}
 
-		const self = this;
-		this._onRequestClose = function () {
-			if (self.isOpen) self.close();
-		};
-		this._onRequestOpen = function () {
-			if (!self.isOpen) self.open();
-		};
-		dom.addEventListener('ln-toggle:request-close', this._onRequestClose);
-		dom.addEventListener('ln-toggle:request-open', this._onRequestOpen);
-
 		return this;
 	}
 
 	_component.prototype.open = function () {
 		if (this.isOpen) return;
-		const before = _dispatchCancelable(this.dom, 'ln-toggle:before-open', { target: this.dom });
-		if (before.defaultPrevented) return;
-		this.isOpen = true;
-		this.dom.classList.add('open');
-		_dispatch(this.dom, 'ln-toggle:open', { target: this.dom });
+		this.dom.setAttribute(DOM_SELECTOR, 'open');
 	};
 
 	_component.prototype.close = function () {
 		if (!this.isOpen) return;
-		const before = _dispatchCancelable(this.dom, 'ln-toggle:before-close', { target: this.dom });
-		if (before.defaultPrevented) return;
-		this.isOpen = false;
-		this.dom.classList.remove('open');
-		_dispatch(this.dom, 'ln-toggle:close', { target: this.dom });
+		this.dom.setAttribute(DOM_SELECTOR, 'close');
 	};
 
 	_component.prototype.toggle = function () {
@@ -91,11 +73,41 @@
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		this.dom.removeEventListener('ln-toggle:request-close', this._onRequestClose);
-		this.dom.removeEventListener('ln-toggle:request-open', this._onRequestOpen);
 		_dispatch(this.dom, 'ln-toggle:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
+
+	// ─── Attribute Sync ────────────────────────────────────────
+
+	function _syncAttribute(el) {
+		var instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+
+		var value = el.getAttribute(DOM_SELECTOR);
+		var shouldBeOpen = value === 'open';
+
+		if (shouldBeOpen === instance.isOpen) return;
+
+		if (shouldBeOpen) {
+			var before = _dispatchCancelable(el, 'ln-toggle:before-open', { target: el });
+			if (before.defaultPrevented) {
+				el.setAttribute(DOM_SELECTOR, 'close');
+				return;
+			}
+			instance.isOpen = true;
+			el.classList.add('open');
+			_dispatch(el, 'ln-toggle:open', { target: el });
+		} else {
+			var before = _dispatchCancelable(el, 'ln-toggle:before-close', { target: el });
+			if (before.defaultPrevented) {
+				el.setAttribute(DOM_SELECTOR, 'open');
+				return;
+			}
+			instance.isOpen = false;
+			el.classList.remove('open');
+			_dispatch(el, 'ln-toggle:close', { target: el });
+		}
+	}
 
 	// ─── Helpers ───────────────────────────────────────────────
 
@@ -107,7 +119,7 @@
 	}
 
 	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
+		var event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: detail || {}
@@ -119,18 +131,24 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
+		var observer = new MutationObserver(function (mutations) {
+			for (var i = 0; i < mutations.length; i++) {
+				var mutation = mutations[i];
 				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
+					for (var j = 0; j < mutation.addedNodes.length; j++) {
+						var node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							_findElements(node);
 							_attachTriggers(node);
 						}
 					}
 				} else if (mutation.type === 'attributes') {
-					_findElements(mutation.target);
-					_attachTriggers(mutation.target);
+					if (mutation.attributeName === DOM_SELECTOR && mutation.target[DOM_ATTRIBUTE]) {
+						_syncAttribute(mutation.target);
+					} else {
+						_findElements(mutation.target);
+						_attachTriggers(mutation.target);
+					}
 				}
 			}
 		});

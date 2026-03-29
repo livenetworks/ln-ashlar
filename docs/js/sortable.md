@@ -2,6 +2,10 @@
 
 Drag & drop reorder component using Pointer Events API. Works with touch + mouse. File: `js/ln-sortable/ln-sortable.js`.
 
+## Single Source of Truth
+
+The `data-ln-sortable` attribute is the single source of truth. `data-ln-sortable="disabled"` disables sorting. API methods just set the attribute, and the MutationObserver syncs state.
+
 ## HTML
 
 ```html
@@ -28,7 +32,8 @@ Drag & drop reorder component using Pointer Events API. Works with touch + mouse
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
-| `data-ln-sortable` | container (`<ol>`, `<ul>`, etc.) | Creates instance. Sortable items = direct children. |
+| `data-ln-sortable` | container (`<ol>`, `<ul>`, etc.) | Creates instance, enabled by default |
+| `data-ln-sortable="disabled"` | container | Creates instance, starts disabled |
 | `data-ln-sortable-handle` | element inside child | Drag handle. If absent, entire child is draggable. |
 
 ## Events
@@ -38,10 +43,6 @@ Drag & drop reorder component using Pointer Events API. Works with touch + mouse
 | `ln-sortable:before-drag` | yes | **yes** | `{ item, index }` |
 | `ln-sortable:drag-start` | yes | no | `{ item, index }` |
 | `ln-sortable:reordered` | yes | no | `{ item, oldIndex, newIndex }` |
-| `ln-sortable:request-enable` | no | no | — |
-| `ln-sortable:request-disable` | no | no | — |
-
-`request-enable` and `request-disable` are **incoming** events — external code dispatches them on the sortable element.
 
 ## CSS Classes (set by JS, styled by consumer)
 
@@ -56,9 +57,12 @@ Drag & drop reorder component using Pointer Events API. Works with touch + mouse
 
 ```js
 const list = document.querySelector('[data-ln-sortable]');
-list.lnSortable.enable();
-list.lnSortable.disable();
-list.lnSortable.isEnabled;  // boolean
+list.lnSortable.enable();     // sets attribute → observer syncs state
+list.lnSortable.disable();    // sets attribute → observer syncs state
+list.lnSortable.isEnabled;    // boolean
+
+// Direct attribute change — identical result
+list.setAttribute('data-ln-sortable', 'disabled');
 ```
 
 ## Behavior

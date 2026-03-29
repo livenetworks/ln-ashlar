@@ -739,7 +739,7 @@ z-index: 40;
 `<form>` is always the content root. Footer buttons get `@include btn` automatically — no `.btn` class needed. Non-submit buttons need `type="button"`.
 
 ```html
-<div class="ln-modal" id="edit-user">
+<div class="ln-modal" data-ln-modal id="edit-user">
     <form>
         <header>
             <h3>Edit User</h3>

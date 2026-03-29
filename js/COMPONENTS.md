@@ -272,11 +272,11 @@ When a component depends on another (e.g. ln-accordion → ln-toggle):
 4. **Never import** another component — CustomEvent communication only
 
 ```javascript
-// Correct — listens to post-action, dispatches request event, emits own event
+// Correct — listens to post-action, sets attribute on siblings, emits own event
 dom.addEventListener('ln-toggle:open', function (e) {
     dom.querySelectorAll('[data-ln-toggle]').forEach(function (el) {
-        if (el !== e.detail.target) {
-            el.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
+        if (el !== e.detail.target && el.getAttribute('data-ln-toggle') === 'open') {
+            el.setAttribute('data-ln-toggle', 'close');
         }
     });
     _dispatch(dom, 'ln-accordion:change', { target: e.detail.target });  // own event
@@ -293,21 +293,21 @@ The architecture follows the **Mediator pattern** (GoF): components do not commu
 
 The ln-acme library already implements this:
 
-- **ln-toggle** is a component (state layer): manages its own state (`isOpen`), emits `ln-toggle:open` / `ln-toggle:close`, listens to `ln-toggle:request-close` / `ln-toggle:request-open`
-- **ln-accordion** is a coordinator (mediator): listens to `ln-toggle:open` from children, dispatches `ln-toggle:request-close` to siblings. **Never** calls `el.lnToggle.close()`. Emits its own `ln-accordion:change`
+- **ln-toggle** is a component (state layer): `data-ln-toggle` attribute is the single source of truth. MutationObserver detects attribute changes → applies `.open` class, emits `ln-toggle:open` / `ln-toggle:close`. API methods (`open()`, `close()`) just set the attribute.
+- **ln-accordion** is a coordinator (mediator): listens to `ln-toggle:open` from children, sets `data-ln-toggle="close"` on siblings. **Never** calls `el.lnToggle.close()`. Emits its own `ln-accordion:change`
 
 ```
-[Toggle A opens]
+[Toggle A opens — attribute set to "open"]
         ↓
-    ln-toggle:open (bubbles up)
+    MutationObserver → .open class + ln-toggle:open event (bubbles up)
         ↓
-[Accordion] catches it, dispatches ln-toggle:request-close to B and C
+[Accordion] catches it, sets data-ln-toggle="close" on B and C
         ↓
-[Toggle B] decides on its own: if open → closes
-[Toggle C] decides on its own: if closed → ignores
+[Toggle B] observer detects attribute change → if was open → closes
+[Toggle C] observer detects attribute change → already closed → no-op
 ```
 
-Toggle **doesn't know** that other toggles exist. Accordion **doesn't know** about toggle's internal state. Communication = events only.
+Toggle **doesn't know** that other toggles exist. Accordion **doesn't know** about toggle's internal state. Communication = attribute changes + events only.
 
 ### Scaling to Project Level
 
@@ -318,7 +318,7 @@ The same pattern scales from library to application:
 | ln-toggle | ln-profile, ln-playlist, ln-deck | Component (state + events) |
 | ln-accordion | ln-mixer (coordinator) | Mediator (event wiring) |
 | `ln-toggle:open` | `ln-profile:switched` | Notification event (fact) |
-| `ln-toggle:request-close` | `ln-deck:request-load` | Request event (command) |
+| `setAttribute('data-ln-toggle', 'close')` | `ln-deck:request-load` | Attribute change / Request event (command) |
 | `ln-accordion:change` | toast / modal close | Coordinator reaction |
 
 ### Isolation Rules

@@ -59,11 +59,11 @@ document.addEventListener('ln-accordion:change', function (e) {
 
 ## Dependencies
 
-Accordion is a coordinator for `ln-toggle` children. Communication is only via events:
+Accordion is a coordinator for `ln-toggle` children. Communication is via the attribute (single source of truth):
 - **Listens**: `ln-toggle:open` (bubbles up from toggle child)
-- **Dispatches**: `ln-toggle:request-close` on each sibling toggle (toggle itself decides whether to close)
+- **Closes siblings**: sets `data-ln-toggle="close"` on each sibling toggle — the toggle's MutationObserver handles the rest (events, `.open` class)
 
-Accordion does **NOT** call the toggle API directly (`el.lnToggle.close()`). Each toggle independently reacts to `request-close`.
+Accordion does **NOT** call the toggle API directly (`el.lnToggle.close()`). It sets the attribute, and each toggle's observer independently applies the state change.
 
 This is the canonical example of the **Coordinator/Mediator Pattern** described in [COMPONENTS.md](../COMPONENTS.md) → "Coordinator/Mediator Pattern — canonical example".
 

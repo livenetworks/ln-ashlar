@@ -30,8 +30,8 @@
 		this._onToggleOpen = function (e) {
 			const toggles = dom.querySelectorAll('[data-ln-toggle]');
 			for (const el of toggles) {
-				if (el !== e.detail.target) {
-					el.dispatchEvent(new CustomEvent('ln-toggle:request-close'));
+				if (el !== e.detail.target && el.getAttribute('data-ln-toggle') === 'open') {
+					el.setAttribute('data-ln-toggle', 'close');
 				}
 			}
 			_dispatch(dom, 'ln-accordion:change', { target: e.detail.target });

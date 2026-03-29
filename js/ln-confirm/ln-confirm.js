@@ -1,7 +1,8 @@
 (function () {
 	const DOM_SELECTOR = 'data-ln-confirm';
 	const DOM_ATTRIBUTE = 'lnConfirm';
-	const REVERT_TIMEOUT = 3000;
+	const TIMEOUT_ATTR = 'data-ln-confirm-timeout';
+	const DEFAULT_TIMEOUT = 3;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -32,7 +33,7 @@
 		this.confirmText = dom.getAttribute(DOM_SELECTOR) || 'Confirm?';
 		this.revertTimer = null;
 
-		const self = this;
+		var self = this;
 		this._onClick = function (e) {
 			if (!self.confirming) {
 				e.preventDefault();
@@ -48,14 +49,18 @@
 		return this;
 	}
 
+	_component.prototype._getTimeout = function () {
+		var val = parseFloat(this.dom.getAttribute(TIMEOUT_ATTR));
+		return (isNaN(val) || val <= 0) ? DEFAULT_TIMEOUT : val;
+	};
+
 	_component.prototype._enterConfirm = function () {
 		this.confirming = true;
 		this.dom.setAttribute('data-confirming', 'true');
 
 		if (this.dom.className.match(/ln-icon-/) && this.originalText === '') {
 			this.isIconButton = true;
-			// Extract existing icon class
-			this.originalIconClass = Array.from(this.dom.classList).find(c => c.startsWith('ln-icon-'));
+			this.originalIconClass = Array.from(this.dom.classList).find(function (c) { return c.startsWith('ln-icon-'); });
 			if (this.originalIconClass) {
 				this.dom.classList.remove(this.originalIconClass);
 			}
@@ -65,18 +70,26 @@
 			this.dom.textContent = this.confirmText;
 		}
 
-		var self = this;
-		this.revertTimer = setTimeout(function () {
-			self._reset();
-		}, REVERT_TIMEOUT);
+		this._startTimer();
 
 		_dispatch(this.dom, 'ln-confirm:waiting', { target: this.dom });
+	};
+
+	_component.prototype._startTimer = function () {
+		if (this.revertTimer) {
+			clearTimeout(this.revertTimer);
+		}
+		var self = this;
+		var ms = this._getTimeout() * 1000;
+		this.revertTimer = setTimeout(function () {
+			self._reset();
+		}, ms);
 	};
 
 	_component.prototype._reset = function () {
 		this.confirming = false;
 		this.dom.removeAttribute('data-confirming');
-		
+
 		if (this.isIconButton) {
 			this.dom.classList.remove('ln-icon-check', 'text-success', 'ln-confirm-tooltip');
 			if (this.originalIconClass) {
@@ -101,6 +114,15 @@
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	// ─── Attribute Sync ────────────────────────────────────────
+
+	function _syncTimeout(el) {
+		var instance = el[DOM_ATTRIBUTE];
+		if (!instance || !instance.confirming) return;
+		// Restart timer with new timeout value
+		instance._startTimer();
+	}
+
 	// ─── Helpers ───────────────────────────────────────────────
 
 	function _dispatch(element, eventName, detail) {
@@ -115,15 +137,20 @@
 	function _domObserver() {
 		var observer = new MutationObserver(function (mutations) {
 			for (var i = 0; i < mutations.length; i++) {
-				if (mutations[i].type === 'childList') {
-					for (var j = 0; j < mutations[i].addedNodes.length; j++) {
-						var node = mutations[i].addedNodes[j];
+				var mutation = mutations[i];
+				if (mutation.type === 'childList') {
+					for (var j = 0; j < mutation.addedNodes.length; j++) {
+						var node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}
 					}
-				} else if (mutations[i].type === 'attributes') {
-					_findElements(mutations[i].target);
+				} else if (mutation.type === 'attributes') {
+					if (mutation.attributeName === TIMEOUT_ATTR && mutation.target[DOM_ATTRIBUTE]) {
+						_syncTimeout(mutation.target);
+					} else {
+						_findElements(mutation.target);
+					}
 				}
 			}
 		});
@@ -132,7 +159,7 @@
 			childList: true,
 			subtree: true,
 			attributes: true,
-			attributeFilter: [DOM_SELECTOR]
+			attributeFilter: [DOM_SELECTOR, TIMEOUT_ATTR]
 		});
 	}
 
