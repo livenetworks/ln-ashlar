@@ -849,6 +849,40 @@ table { @include table-base; }
 				</section>
 
 				<!-- ==========================================
+				     AVATAR
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Avatar</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th><th>Default selector</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include avatar</code></td><td>Profile button/link with square-ish image (rounded-md) + name/role text. Hover bg, focus ring. Works on <code>&lt;button&gt;</code> and <code>&lt;a&gt;</code>.</td><td><code>.avatar</code></td></tr>
+							</tbody>
+						</table>
+						<pre><code>// Avatar — profile button with image + name/role
+&lt;button class="avatar"&gt;
+    &lt;img src="avatar.jpg" alt=""&gt;
+    &lt;span&gt;Sojic&lt;small&gt;Administrator&lt;/small&gt;&lt;/span&gt;
+&lt;/button&gt;
+
+// As dropdown trigger
+&lt;div data-ln-dropdown&gt;
+    &lt;button class="avatar" data-ln-toggle-for="user-menu"&gt;
+        &lt;img src="avatar.jpg" alt=""&gt;
+        &lt;span&gt;Sojic&lt;small&gt;Administrator&lt;/small&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;ul id="user-menu" data-ln-toggle&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Edit Profile&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Logout&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
 				     NAV
 				     ========================================== -->
 				<section class="section-card">

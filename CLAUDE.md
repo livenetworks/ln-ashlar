@@ -34,6 +34,7 @@ scss/
 │   │   ├── _breadcrumbs.scss← breadcrumbs
 │   │   ├── _focus.scss      ← focus-ring (consistent focus indicator)
 │   │   ├── _loader.scss     ← loader
+│   │   ├── _avatar.scss     ← avatar (profile button with image + name/role)
 │   │   └── ...              ← other primitive/composite mixins
 │   ├── _theme.scss          ← Color palette extensions
 │   └── _icons.scss          ← SVG data-URI icon variables

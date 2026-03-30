@@ -1,0 +1,56 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+@use 'focus' as *;
+
+// Avatar — profile button/link with image + name/role text
+
+@mixin avatar {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.625rem);
+	@include p(0.375rem);
+	@include rounded-md;
+	@include cursor-pointer;
+	@include transition-fast;
+	@include select-none;
+	@include border-none;
+	background: transparent;
+	text-decoration: none;
+	color: inherit;
+	font: inherit;
+
+	&:hover {
+		@include bg-secondary;
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	img {
+		@include size(2.5rem);
+		@include rounded-md;
+		@include flex-shrink-0;
+		object-fit: cover;
+	}
+
+	span {
+		@include flex-col;
+		@include text-sm;
+		@include font-medium;
+		@include text-primary;
+		@include text-left;
+
+		small {
+			@include text-xs;
+			@include font-normal;
+			@include text-muted;
+		}
+	}
+}

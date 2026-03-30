@@ -89,6 +89,7 @@ scss/
 │   │   ├── _card.scss        ← card, panel-header, section, section-card
 │   │   ├── _nav.scss         ← nav
 │   │   ├── _btn.scss         ← btn, btn-colors, close-button
+│   │   ├── _avatar.scss      ← avatar
 │   │   └── _modal.scss       ← modal-sm, modal-md, modal-lg, modal-xl
 │   ├── _theme.scss           ← Color palette extensions
 │   └── _icons.scss           ← SVG mask-image icon system
@@ -455,6 +456,21 @@ Override `--color-primary` on the element or any parent:
 
 Used internally by `btn-colors`, `form-input`, `form-check`, `close-button`. Use directly when building custom interactive elements.
 
+### Avatar
+
+| Mixin | Description |
+|-------|-------------|
+| `@include avatar` | Profile button/link with square-ish image (rounded-md) + name/role text. Hover bg, focus ring. |
+
+```scss
+// Default selector: .avatar
+// HTML:
+// <button class="avatar">
+//   <img src="avatar.jpg" alt="">
+//   <span>Sojic<small>Administrator</small></span>
+// </button>
+```
+
 ### Other
 
 | Mixin | Description |
@@ -498,6 +514,7 @@ ln-acme automatically styles bare HTML elements via its component layer. You get
 |----------|--------------|--------|
 | `.btn` | `btn` | `components/_buttons.scss` |
 | `.btn-group` | `btn-group` | `components/_buttons.scss` |
+| `.avatar` | `avatar` | `components/_avatar.scss` |
 | `table` | `table-base` + responsive | `components/_tables.scss` |
 | `.collapsible` | `collapsible` | `components/_toggle.scss` |
 | `#breadcrumbs` | `breadcrumbs` | `components/_breadcrumbs.scss` |
