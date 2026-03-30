@@ -610,3 +610,4 @@ _component.prototype._buildTrackItem = function (track, idx) {
 | ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
 | ln-autosave | Instance | `data-ln-autosave` | Auto-save form to localStorage on blur/change |
 | ln-external-links | Utility | — | External links handler |
+| ln-http | Global service | — | Event-driven JSON fetch with abort support |

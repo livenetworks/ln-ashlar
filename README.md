@@ -673,6 +673,7 @@ All components use `data-ln-*` attributes. No initialization needed — auto-dis
 | Component | Attribute | Description |
 |-----------|-----------|-------------|
 | Accordion | `data-ln-accordion` | Collapsible panels, only one open at a time |
+| HTTP | — (global service) | Event-driven JSON fetch with abort support |
 | AJAX | `data-ln-ajax` | AJAX navigation and form submission |
 | Circular Progress | `data-ln-circular-progress` | SVG circular progress indicator |
 | Confirm | `data-ln-confirm` | Destructive action confirmation dialog |
