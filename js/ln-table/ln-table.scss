@@ -99,6 +99,60 @@
 	border-top-right-radius: var(--radius-lg);
 }
 
+// ── Column filter dropdowns in th ──
+[data-ln-table] th [data-ln-dropdown] {
+	@include inline-flex;
+	@include items-center;
+}
+
+[data-ln-table] th [data-ln-dropdown] > button {
+	@include flex;
+	@include items-center;
+	@include gap(0.25rem);
+	background: none;
+	border: none;
+	color: inherit;
+	font: inherit;
+	@include cursor-pointer;
+	@include p(0);
+
+	.ln-icon-filter {
+		opacity: 0.4;
+		@include transition-fast;
+	}
+
+	&:hover .ln-icon-filter {
+		opacity: 1;
+	}
+}
+
+[data-ln-table] th [data-ln-dropdown-menu] button[data-ln-filter-key] {
+	@include w-full;
+	@include flex;
+	@include items-center;
+	@include text-left;
+	@include px(var(--spacing-sm));
+	@include py(var(--spacing-xs));
+	@include text-sm;
+	@include font-normal;
+	background: none;
+	border: none;
+	border-radius: 0;
+	color: hsl(var(--color-text-primary));
+	@include cursor-pointer;
+	@include transition-fast;
+
+	&:hover {
+		@include bg-secondary;
+	}
+
+	&[data-active] {
+		background-color: hsl(var(--color-primary) / 0.1);
+		color: hsl(var(--color-primary));
+		@include font-medium;
+	}
+}
+
 // ── Virtual scroll spacer rows ──
 .ln-table__spacer td {
 	padding: 0 !important;

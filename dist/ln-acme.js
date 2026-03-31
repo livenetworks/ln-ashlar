@@ -70,9 +70,9 @@
       if (n[a + "Trigger"] || n.hostname && n.hostname !== window.location.hostname) continue;
       const t = n.getAttribute("href");
       if (t && t.includes("#")) continue;
-      const i = function(d) {
-        if (d.ctrlKey || d.metaKey || d.button === 1) return;
-        d.preventDefault();
+      const i = function(l) {
+        if (l.ctrlKey || l.metaKey || l.button === 1) return;
+        l.preventDefault();
         const c = n.getAttribute("href");
         c && u("GET", c, null, n);
       };
@@ -84,10 +84,10 @@
       if (n[a + "Trigger"]) continue;
       const t = function(i) {
         i.preventDefault();
-        const d = n.method.toUpperCase(), c = n.action, l = new FormData(n);
+        const l = n.method.toUpperCase(), c = n.action, d = new FormData(n);
         for (const b of n.querySelectorAll('button, input[type="submit"]'))
           b.disabled = !0;
-        u(d, c, l, n, function() {
+        u(l, c, d, n, function() {
           for (const b of n.querySelectorAll('button, input[type="submit"]'))
             b.disabled = !1;
         });
@@ -104,19 +104,19 @@
       t[a + "Trigger"] && (t.removeEventListener("submit", t[a + "Trigger"]), delete t[a + "Trigger"]);
     delete e[a];
   }
-  function u(e, n, t, i, d) {
+  function u(e, n, t, i, l) {
     if (p(i, "ln-ajax:before-start", { method: e, url: n }).defaultPrevented) return;
     _(i, "ln-ajax:start", { method: e, url: n }), i.classList.add("ln-ajax--loading");
-    const l = document.createElement("span");
-    l.className = "ln-ajax-spinner", i.appendChild(l);
+    const d = document.createElement("span");
+    d.className = "ln-ajax-spinner", i.appendChild(d);
     function b() {
       i.classList.remove("ln-ajax--loading");
-      const L = i.querySelector(".ln-ajax-spinner");
-      L && L.remove(), d && d();
+      const w = i.querySelector(".ln-ajax-spinner");
+      w && w.remove(), l && l();
     }
     let y = n;
-    const E = document.querySelector('meta[name="csrf-token"]'), w = E ? E.getAttribute("content") : null;
-    t instanceof FormData && w && t.append("_token", w);
+    const E = document.querySelector('meta[name="csrf-token"]'), L = E ? E.getAttribute("content") : null;
+    t instanceof FormData && L && t.append("_token", L);
     const C = {
       method: e,
       headers: {
@@ -124,18 +124,18 @@
         Accept: "application/json"
       }
     };
-    if (w && (C.headers["X-CSRF-TOKEN"] = w), e === "GET" && t) {
-      const L = new URLSearchParams(t);
-      y = n + (n.includes("?") ? "&" : "?") + L.toString();
+    if (L && (C.headers["X-CSRF-TOKEN"] = L), e === "GET" && t) {
+      const w = new URLSearchParams(t);
+      y = n + (n.includes("?") ? "&" : "?") + w.toString();
     } else e !== "GET" && t && (C.body = t);
-    fetch(y, C).then(function(L) {
-      var T = L.ok;
-      return L.json().then(function(O) {
-        return { ok: T, status: L.status, data: O };
+    fetch(y, C).then(function(w) {
+      var T = w.ok;
+      return w.json().then(function(S) {
+        return { ok: T, status: w.status, data: S };
       });
-    }).then(function(L) {
-      var T = L.data;
-      if (L.ok) {
+    }).then(function(w) {
+      var T = w.data;
+      if (w.ok) {
         if (T.title && (document.title = T.title), T.content)
           for (const x in T.content) {
             const M = document.getElementById(x);
@@ -147,18 +147,18 @@
         } else i.tagName === "FORM" && i.method.toUpperCase() === "GET" && window.history.pushState({ ajax: !0 }, "", y);
         _(i, "ln-ajax:success", { method: e, url: y, data: T });
       } else
-        _(i, "ln-ajax:error", { method: e, url: y, status: L.status, data: T });
+        _(i, "ln-ajax:error", { method: e, url: y, status: w.status, data: T });
       if (T.message && window.lnToast) {
-        var O = T.message;
+        var S = T.message;
         window.lnToast.enqueue({
-          type: O.type || (L.ok ? "success" : "error"),
-          title: O.title || "",
-          message: O.body || ""
+          type: S.type || (w.ok ? "success" : "error"),
+          title: S.title || "",
+          message: S.body || ""
         });
       }
       _(i, "ln-ajax:complete", { method: e, url: y }), b();
-    }).catch(function(L) {
-      _(i, "ln-ajax:error", { method: e, url: y, error: L }), _(i, "ln-ajax:complete", { method: e, url: y }), b();
+    }).catch(function(w) {
+      _(i, "ln-ajax:error", { method: e, url: y, error: w }), _(i, "ln-ajax:complete", { method: e, url: y }), b();
     });
   }
   function s(e) {
@@ -173,8 +173,8 @@
             if (i.nodeType === 1 && (g(i), !i.hasAttribute(f))) {
               for (const c of i.querySelectorAll("[" + f + "]"))
                 g(c);
-              const d = i.closest && i.closest("[" + f + "]");
-              if (d && d.getAttribute(f) !== "false") {
+              const l = i.closest && i.closest("[" + f + "]");
+              if (l && l.getAttribute(f) !== "false") {
                 const c = s(i);
                 v(c.links), m(c.forms);
               }
@@ -212,8 +212,8 @@
       n[a + "Trigger"] || (n[a + "Trigger"] = !0, n.addEventListener("click", function(t) {
         if (t.ctrlKey || t.metaKey || t.button === 1) return;
         t.preventDefault();
-        const i = n.getAttribute("data-ln-modal-for"), d = document.getElementById(i);
-        !d || !d[a] || d[a].toggle();
+        const i = n.getAttribute("data-ln-modal-for"), l = document.getElementById(i);
+        !l || !l[a] || l[a].toggle();
       }));
   }
   function v(r) {
@@ -225,8 +225,8 @@
       if (n.key === "Tab") {
         var t = e.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
         if (t.length !== 0) {
-          var i = t[0], d = t[t.length - 1];
-          n.shiftKey ? document.activeElement === i && (n.preventDefault(), d.focus()) : document.activeElement === d && (n.preventDefault(), i.focus());
+          var i = t[0], l = t[t.length - 1];
+          n.shiftKey ? document.activeElement === i && (n.preventDefault(), l.focus()) : document.activeElement === l && (n.preventDefault(), i.focus());
         }
       }
     }, this._onClose = function(n) {
@@ -259,8 +259,8 @@
             return;
           }
           e.isOpen = !0, r.setAttribute("aria-modal", "true"), r.setAttribute("role", "dialog"), document.body.classList.add("ln-modal-open"), document.addEventListener("keydown", e._onEscape), document.addEventListener("keydown", e._onFocusTrap);
-          var d = r.querySelector('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
-          if (d) d.focus();
+          var l = r.querySelector('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
+          if (l) l.focus();
           else {
             var c = r.querySelector("a[href], button:not([disabled])");
             c && c.focus();
@@ -301,8 +301,8 @@
         var t = e[n];
         if (t.type === "childList")
           for (var i = 0; i < t.addedNodes.length; i++) {
-            var d = t.addedNodes[i];
-            d.nodeType === 1 && (p(d), g(d));
+            var l = t.addedNodes[i];
+            l.nodeType === 1 && (p(l), g(l));
           }
         else t.type === "attributes" && (t.attributeName === f && t.target[a] ? m(t.target) : (p(t.target), g(t.target)));
       }
@@ -345,27 +345,27 @@
     };
     window.addEventListener("popstate", n), p.push(n);
     const t = new MutationObserver(function(i) {
-      for (const d of i)
-        if (d.type === "childList") {
-          for (const c of d.addedNodes)
+      for (const l of i)
+        if (l.type === "childList") {
+          for (const c of l.addedNodes)
             if (c.nodeType === 1) {
               if (c.tagName === "A")
                 e.push(c), h([c], r, window.location.pathname);
               else if (c.querySelectorAll) {
-                const l = Array.from(c.querySelectorAll("a"));
-                e = e.concat(l), h(l, r, window.location.pathname);
+                const d = Array.from(c.querySelectorAll("a"));
+                e = e.concat(d), h(d, r, window.location.pathname);
               }
             }
-          for (const c of d.removedNodes)
+          for (const c of l.removedNodes)
             if (c.nodeType === 1) {
               if (c.tagName === "A")
-                e = e.filter(function(l) {
-                  return l !== c;
+                e = e.filter(function(d) {
+                  return d !== c;
                 });
               else if (c.querySelectorAll) {
-                const l = Array.from(c.querySelectorAll("a"));
+                const d = Array.from(c.querySelectorAll("a"));
                 e = e.filter(function(b) {
-                  return !l.includes(b);
+                  return !d.includes(b);
                 });
               }
             }
@@ -395,10 +395,10 @@
     for (const t of o) {
       const i = t.getAttribute("href");
       if (!i) continue;
-      const d = m(i);
+      const l = m(i);
       t.classList.remove(r);
-      const c = d === n, l = d !== "/" && n.startsWith(d + "/");
-      (c || l) && t.classList.add(r);
+      const c = l === n, d = l !== "/" && n.startsWith(l + "/");
+      (c || d) && t.classList.add(r);
     }
   }
   function u() {
@@ -551,8 +551,8 @@
           if (s.hashEnabled) {
             const t = g();
             t[s.nsKey] = n;
-            const i = Object.keys(t).map(function(d) {
-              return d + ":" + t[d];
+            const i = Object.keys(t).map(function(l) {
+              return l + ":" + t[l];
             }).join("&");
             location.hash === "#" + i ? s.activate(n) : location.hash = i;
           } else
@@ -631,8 +631,8 @@
         n.preventDefault();
         const t = e.getAttribute("data-ln-toggle-for"), i = document.getElementById(t);
         if (!i || !i[a]) return;
-        const d = e.getAttribute("data-ln-toggle-action") || "toggle";
-        i[a][d]();
+        const l = e.getAttribute("data-ln-toggle-action") || "toggle";
+        i[a][l]();
       });
     }
   }
@@ -787,8 +787,8 @@
     const e = window.innerWidth, n = window.innerHeight, t = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--spacing-xs")) * 16 || 4;
     var i;
     u.bottom + t + r <= n ? i = u.bottom + t : u.top - t - r >= 0 ? i = u.top - t - r : i = Math.max(0, n - r);
-    var d;
-    u.right - o >= 0 ? d = u.right - o : u.left + o <= e ? d = u.left : d = Math.max(0, e - o), this.toggleEl.style.top = i + "px", this.toggleEl.style.left = d + "px", this.toggleEl.style.right = "auto", this.toggleEl.style.transform = "none", this.toggleEl.style.margin = "0";
+    var l;
+    u.right - o >= 0 ? l = u.right - o : u.left + o <= e ? l = u.left : l = Math.max(0, e - o), this.toggleEl.style.top = i + "px", this.toggleEl.style.left = l + "px", this.toggleEl.style.right = "auto", this.toggleEl.style.transform = "none", this.toggleEl.style.margin = "0";
   }, g.prototype._teleportToBody = function() {
     !this.toggleEl || this.toggleEl.parentNode === document.body || (this._menuParent = this.toggleEl.parentNode, this._placeholder = document.createComment("ln-dropdown"), this._menuParent.insertBefore(this._placeholder, this.toggleEl), document.body.appendChild(this.toggleEl), this.toggleEl.style.position = "fixed", this._positionMenu());
   }, g.prototype._teleportBack = function() {
@@ -876,26 +876,26 @@
     }
   };
   function m(n) {
-    const t = ((n.getAttribute("data-type") || "info") + "").toLowerCase(), i = n.getAttribute("data-title"), d = (n.innerText || n.textContent || "").trim();
+    const t = ((n.getAttribute("data-type") || "info") + "").toLowerCase(), i = n.getAttribute("data-title"), l = (n.innerText || n.textContent || "").trim();
     n.className = "ln-toast__item", n.removeAttribute("data-ln-toast-item");
     const c = document.createElement("div");
     c.className = "ln-toast__card ln-toast__card--" + t, c.setAttribute("role", t === "error" ? "alert" : "status"), c.setAttribute("aria-live", t === "error" ? "assertive" : "polite");
-    const l = document.createElement("div");
-    l.className = "ln-toast__side", l.innerHTML = _[t] || _.info;
+    const d = document.createElement("div");
+    d.className = "ln-toast__side", d.innerHTML = _[t] || _.info;
     const b = document.createElement("div");
     b.className = "ln-toast__content";
     const y = document.createElement("div");
     y.className = "ln-toast__head";
     const E = document.createElement("strong");
     E.className = "ln-toast__title", E.textContent = i || (t === "success" ? "Success" : t === "error" ? "Error" : t === "warn" ? "Warning" : "Information");
-    const w = document.createElement("button");
-    if (w.type = "button", w.className = "ln-toast__close ln-icon-close", w.setAttribute("aria-label", "Close"), w.addEventListener("click", () => u(n)), y.appendChild(E), b.appendChild(y), b.appendChild(w), d) {
+    const L = document.createElement("button");
+    if (L.type = "button", L.className = "ln-toast__close ln-icon-close", L.setAttribute("aria-label", "Close"), L.addEventListener("click", () => u(n)), y.appendChild(E), b.appendChild(y), b.appendChild(L), l) {
       const C = document.createElement("div");
       C.className = "ln-toast__body";
-      const L = document.createElement("p");
-      L.textContent = d, C.appendChild(L), b.appendChild(C);
+      const w = document.createElement("p");
+      w.textContent = l, C.appendChild(w), b.appendChild(C);
     }
-    c.appendChild(l), c.appendChild(b), n.innerHTML = "", n.appendChild(c), requestAnimationFrame(() => n.classList.add("ln-toast__item--in"));
+    c.appendChild(d), c.appendChild(b), n.innerHTML = "", n.appendChild(c), requestAnimationFrame(() => n.classList.add("ln-toast__item--in"));
   }
   function h(n, t) {
     for (; n.dom.children.length >= n.max; ) n.dom.removeChild(n.dom.firstElementChild);
@@ -910,44 +910,44 @@
     let t = n.container;
     if (typeof t == "string" && (t = document.querySelector(t)), t instanceof HTMLElement || (t = document.querySelector("[" + f + "]") || document.getElementById("ln-toast-container")), !t)
       return console.warn("[ln-toast] No toast container found"), null;
-    const i = t[a] || new v(t), d = Number.isFinite(n.timeout) ? n.timeout : i.timeoutDefault, c = (n.type || "info").toLowerCase(), l = document.createElement("li");
-    l.className = "ln-toast__item";
+    const i = t[a] || new v(t), l = Number.isFinite(n.timeout) ? n.timeout : i.timeoutDefault, c = (n.type || "info").toLowerCase(), d = document.createElement("li");
+    d.className = "ln-toast__item";
     const b = document.createElement("div");
     b.className = "ln-toast__card ln-toast__card--" + c, b.setAttribute("role", c === "error" ? "alert" : "status"), b.setAttribute("aria-live", c === "error" ? "assertive" : "polite");
     const y = document.createElement("div");
     y.className = "ln-toast__side", y.innerHTML = _[c] || _.info;
     const E = document.createElement("div");
     E.className = "ln-toast__content";
-    const w = document.createElement("div");
-    w.className = "ln-toast__head";
+    const L = document.createElement("div");
+    L.className = "ln-toast__head";
     const C = document.createElement("strong");
     C.className = "ln-toast__title", C.textContent = n.title || (c === "success" ? "Success" : c === "error" ? "Error" : c === "warn" ? "Warning" : "Information");
-    const L = document.createElement("button");
-    if (L.type = "button", L.className = "ln-toast__close ln-icon-close", L.setAttribute("aria-label", "Close"), L.addEventListener("click", () => u(l)), w.appendChild(C), E.appendChild(w), E.appendChild(L), n.message || n.data && n.data.errors) {
+    const w = document.createElement("button");
+    if (w.type = "button", w.className = "ln-toast__close ln-icon-close", w.setAttribute("aria-label", "Close"), w.addEventListener("click", () => u(d)), L.appendChild(C), E.appendChild(L), E.appendChild(w), n.message || n.data && n.data.errors) {
       const T = document.createElement("div");
       if (T.className = "ln-toast__body", n.message)
         if (Array.isArray(n.message)) {
-          const O = document.createElement("ul");
+          const S = document.createElement("ul");
           for (const x of n.message) {
             const M = document.createElement("li");
-            M.textContent = x, O.appendChild(M);
+            M.textContent = x, S.appendChild(M);
           }
-          T.appendChild(O);
+          T.appendChild(S);
         } else {
-          const O = document.createElement("p");
-          O.textContent = n.message, T.appendChild(O);
+          const S = document.createElement("p");
+          S.textContent = n.message, T.appendChild(S);
         }
       if (n.data && n.data.errors) {
-        const O = document.createElement("ul");
+        const S = document.createElement("ul");
         for (const x of Object.values(n.data.errors).flat()) {
           const M = document.createElement("li");
-          M.textContent = x, O.appendChild(M);
+          M.textContent = x, S.appendChild(M);
         }
-        T.appendChild(O);
+        T.appendChild(S);
       }
       E.appendChild(T);
     }
-    return b.appendChild(y), b.appendChild(E), l.appendChild(b), h(i, l), d > 0 && (l._timer = setTimeout(() => u(l), d)), l;
+    return b.appendChild(y), b.appendChild(E), d.appendChild(b), h(i, d), l > 0 && (d._timer = setTimeout(() => u(d), l)), d;
   }
   function o(n) {
     let t = n;
@@ -975,13 +975,13 @@
   const f = "data-ln-upload", a = "lnUpload", _ = "data-ln-upload-dict", p = "data-ln-upload-accept", g = "data-ln-upload-context";
   if (window[a] !== void 0) return;
   function v(t, i) {
-    const d = t.querySelector("[" + _ + '="' + i + '"]');
-    return d ? d.textContent : i;
+    const l = t.querySelector("[" + _ + '="' + i + '"]');
+    return l ? l.textContent : i;
   }
   function m(t) {
     if (t === 0) return "0 B";
-    const i = 1024, d = ["B", "KB", "MB", "GB"], c = Math.floor(Math.log(t) / Math.log(i));
-    return parseFloat((t / Math.pow(i, c)).toFixed(1)) + " " + d[c];
+    const i = 1024, l = ["B", "KB", "MB", "GB"], c = Math.floor(Math.log(t) / Math.log(i));
+    return parseFloat((t / Math.pow(i, c)).toFixed(1)) + " " + l[c];
   }
   function h(t) {
     return t.split(".").pop().toLowerCase();
@@ -991,51 +991,51 @@
   }
   function s(t, i) {
     if (!i) return !0;
-    const d = "." + h(t.name);
-    return i.split(",").map(function(l) {
-      return l.trim().toLowerCase();
-    }).includes(d.toLowerCase());
+    const l = "." + h(t.name);
+    return i.split(",").map(function(d) {
+      return d.trim().toLowerCase();
+    }).includes(l.toLowerCase());
   }
-  function o(t, i, d) {
+  function o(t, i, l) {
     t.dispatchEvent(new CustomEvent(i, {
       bubbles: !0,
-      detail: d
+      detail: l
     }));
   }
   function r(t) {
     if (t.hasAttribute("data-ln-upload-initialized")) return;
     t.setAttribute("data-ln-upload-initialized", "true");
-    const i = t.querySelector(".ln-upload__zone"), d = t.querySelector(".ln-upload__list"), c = t.getAttribute(p) || "";
-    if (!i || !d) {
+    const i = t.querySelector(".ln-upload__zone"), l = t.querySelector(".ln-upload__list"), c = t.getAttribute(p) || "";
+    if (!i || !l) {
       console.warn("[ln-upload] Missing .ln-upload__zone or .ln-upload__list in container:", t);
       return;
     }
-    let l = t.querySelector('input[type="file"]');
-    l || (l = document.createElement("input"), l.type = "file", l.multiple = !0, l.style.display = "none", c && (l.accept = c.split(",").map(function(A) {
+    let d = t.querySelector('input[type="file"]');
+    d || (d = document.createElement("input"), d.type = "file", d.multiple = !0, d.style.display = "none", c && (d.accept = c.split(",").map(function(A) {
       return A = A.trim(), A.startsWith(".") ? A : "." + A;
-    }).join(",")), t.appendChild(l));
+    }).join(",")), t.appendChild(d));
     const b = t.getAttribute(f) || "/files/upload", y = t.getAttribute(g) || "", E = /* @__PURE__ */ new Map();
-    let w = 0;
+    let L = 0;
     function C() {
       const A = document.querySelector('meta[name="csrf-token"]');
       return A ? A.getAttribute("content") : "";
     }
-    function L(A) {
+    function w(A) {
       if (!s(A, c)) {
-        const S = v(t, "invalid-type");
+        const O = v(t, "invalid-type");
         o(t, "ln-upload:invalid", {
           file: A,
-          message: S
+          message: O
         }), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
           detail: {
             type: "error",
             title: "Invalid File",
-            message: S || "This file type is not allowed"
+            message: O || "This file type is not allowed"
           }
         }));
         return;
       }
-      const k = "file-" + ++w, D = h(A.name), B = u(D), I = document.createElement("li");
+      const k = "file-" + ++L, D = h(A.name), B = u(D), I = document.createElement("li");
       I.className = "ln-upload__item ln-upload__item--uploading " + B, I.setAttribute("data-file-id", k);
       const P = document.createElement("span");
       P.className = "ln-upload__name", P.textContent = A.name;
@@ -1046,53 +1046,53 @@
       const z = document.createElement("div");
       z.className = "ln-upload__progress";
       const H = document.createElement("div");
-      H.className = "ln-upload__progress-bar", z.appendChild(H), I.appendChild(P), I.appendChild(R), I.appendChild(N), I.appendChild(z), d.appendChild(I);
+      H.className = "ln-upload__progress-bar", z.appendChild(H), I.appendChild(P), I.appendChild(R), I.appendChild(N), I.appendChild(z), l.appendChild(I);
       const U = new FormData();
       U.append("file", A), U.append("context", y);
       const q = new XMLHttpRequest();
-      q.upload.addEventListener("progress", function(S) {
-        if (S.lengthComputable) {
-          const F = Math.round(S.loaded / S.total * 100);
+      q.upload.addEventListener("progress", function(O) {
+        if (O.lengthComputable) {
+          const F = Math.round(O.loaded / O.total * 100);
           H.style.width = F + "%", R.textContent = F + "%";
         }
       }), q.addEventListener("load", function() {
         if (q.status >= 200 && q.status < 300) {
-          let S;
+          let O;
           try {
-            S = JSON.parse(q.responseText);
+            O = JSON.parse(q.responseText);
           } catch {
             K("Invalid response");
             return;
           }
-          I.classList.remove("ln-upload__item--uploading"), R.textContent = m(S.size || A.size), N.disabled = !1, E.set(k, {
-            serverId: S.id,
-            name: S.name,
-            size: S.size
+          I.classList.remove("ln-upload__item--uploading"), R.textContent = m(O.size || A.size), N.disabled = !1, E.set(k, {
+            serverId: O.id,
+            name: O.name,
+            size: O.size
           }), T(), o(t, "ln-upload:uploaded", {
             localId: k,
-            serverId: S.id,
-            name: S.name
+            serverId: O.id,
+            name: O.name
           });
         } else {
-          let S = "Upload failed";
+          let O = "Upload failed";
           try {
-            S = JSON.parse(q.responseText).message || S;
+            O = JSON.parse(q.responseText).message || O;
           } catch {
           }
-          K(S);
+          K(O);
         }
       }), q.addEventListener("error", function() {
         K("Network error");
       });
-      function K(S) {
+      function K(O) {
         I.classList.remove("ln-upload__item--uploading"), I.classList.add("ln-upload__item--error"), H.style.width = "100%", R.textContent = v(t, "error"), N.disabled = !1, o(t, "ln-upload:error", {
           file: A,
-          message: S
+          message: O
         }), window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
           detail: {
             type: "error",
             title: "Upload Error",
-            message: S || v(t, "upload-failed") || "Failed to upload file"
+            message: O || v(t, "upload-failed") || "Failed to upload file"
           }
         }));
       }
@@ -1106,8 +1106,8 @@
         k.type = "hidden", k.name = "file_ids[]", k.value = A.serverId, t.appendChild(k);
       }
     }
-    function O(A) {
-      const k = E.get(A), D = d.querySelector('[data-file-id="' + A + '"]');
+    function S(A) {
+      const k = E.get(A), D = l.querySelector('[data-file-id="' + A + '"]');
       if (!k || !k.serverId) {
         D && D.remove(), E.delete(A), T();
         return;
@@ -1141,14 +1141,14 @@
     }
     function x(A) {
       for (const k of A)
-        L(k);
-      l.value = "";
+        w(k);
+      d.value = "";
     }
     const M = function() {
-      l.click();
-    }, V = function() {
+      d.click();
+    }, j = function() {
       x(this.files);
-    }, j = function(A) {
+    }, V = function(A) {
       A.preventDefault(), A.stopPropagation(), i.classList.add("ln-upload__zone--dragover");
     }, W = function(A) {
       A.preventDefault(), A.stopPropagation(), i.classList.add("ln-upload__zone--dragover");
@@ -1159,10 +1159,10 @@
     }, G = function(A) {
       if (A.target.classList.contains("ln-upload__remove")) {
         const k = A.target.closest(".ln-upload__item");
-        k && O(k.getAttribute("data-file-id"));
+        k && S(k.getAttribute("data-file-id"));
       }
     };
-    i.addEventListener("click", M), l.addEventListener("change", V), i.addEventListener("dragenter", j), i.addEventListener("dragover", W), i.addEventListener("dragleave", X), i.addEventListener("drop", Y), d.addEventListener("click", G), t.lnUploadAPI = {
+    i.addEventListener("click", M), d.addEventListener("change", j), i.addEventListener("dragenter", V), i.addEventListener("dragover", W), i.addEventListener("dragleave", X), i.addEventListener("drop", Y), l.addEventListener("click", G), t.lnUploadAPI = {
       getFileIds: function() {
         return Array.from(E.values()).map(function(A) {
           return A.serverId;
@@ -1180,10 +1180,10 @@
               Accept: "application/json"
             }
           });
-        E.clear(), d.innerHTML = "", T(), o(t, "ln-upload:cleared", {});
+        E.clear(), l.innerHTML = "", T(), o(t, "ln-upload:cleared", {});
       },
       destroy: function() {
-        i.removeEventListener("click", M), l.removeEventListener("change", V), i.removeEventListener("dragenter", j), i.removeEventListener("dragover", W), i.removeEventListener("dragleave", X), i.removeEventListener("drop", Y), d.removeEventListener("click", G), E.clear(), d.innerHTML = "", T(), t.removeAttribute("data-ln-upload-initialized"), delete t.lnUploadAPI;
+        i.removeEventListener("click", M), d.removeEventListener("change", j), i.removeEventListener("dragenter", V), i.removeEventListener("dragover", W), i.removeEventListener("dragleave", X), i.removeEventListener("drop", Y), l.removeEventListener("click", G), E.clear(), l.innerHTML = "", T(), t.removeAttribute("data-ln-upload-initialized"), delete t.lnUploadAPI;
       }
     };
   }
@@ -1193,15 +1193,15 @@
   }
   function n() {
     new MutationObserver(function(i) {
-      for (const d of i)
-        if (d.type === "childList") {
-          for (const c of d.addedNodes)
+      for (const l of i)
+        if (l.type === "childList") {
+          for (const c of l.addedNodes)
             if (c.nodeType === 1) {
               c.hasAttribute(f) && r(c);
-              for (const l of c.querySelectorAll("[" + f + "]"))
-                r(l);
+              for (const d of c.querySelectorAll("[" + f + "]"))
+                r(d);
             }
-        } else d.type === "attributes" && d.target.hasAttribute(f) && r(d.target);
+        } else l.type === "attributes" && l.target.hasAttribute(f) && r(l.target);
     }).observe(document.body, {
       childList: !0,
       subtree: !0,
@@ -1273,27 +1273,27 @@
 (function() {
   const f = "data-ln-link", a = "lnLink";
   if (window[a] !== void 0) return;
-  function _(l, b, y) {
+  function _(d, b, y) {
     const E = new CustomEvent(b, {
       bubbles: !0,
       cancelable: !0,
       detail: y || {}
     });
-    return l.dispatchEvent(E), E;
+    return d.dispatchEvent(E), E;
   }
   let p = null;
   function g() {
     p = document.createElement("div"), p.className = "ln-link-status", document.body.appendChild(p);
   }
-  function v(l) {
-    p && (p.textContent = l, p.classList.add("ln-link-status--visible"));
+  function v(d) {
+    p && (p.textContent = d, p.classList.add("ln-link-status--visible"));
   }
   function m() {
     p && p.classList.remove("ln-link-status--visible");
   }
-  function h(l, b) {
+  function h(d, b) {
     if (b.target.closest("a, button, input, select, textarea")) return;
-    const y = l.querySelector("a");
+    const y = d.querySelector("a");
     if (!y) return;
     const E = y.getAttribute("href");
     if (!E) return;
@@ -1301,10 +1301,10 @@
       window.open(E, "_blank");
       return;
     }
-    _(l, "ln-link:navigate", { target: l, href: E, link: y }).defaultPrevented || y.click();
+    _(d, "ln-link:navigate", { target: d, href: E, link: y }).defaultPrevented || y.click();
   }
-  function u(l) {
-    const b = l.querySelector("a");
+  function u(d) {
+    const b = d.querySelector("a");
     if (!b) return;
     const y = b.getAttribute("href");
     y && v(y);
@@ -1312,40 +1312,40 @@
   function s() {
     m();
   }
-  function o(l) {
-    l[a + "Row"] || (l[a + "Row"] = !0, l.querySelector("a") && (l._lnLinkClick = function(b) {
-      h(l, b);
-    }, l._lnLinkEnter = function() {
-      u(l);
-    }, l.addEventListener("click", l._lnLinkClick), l.addEventListener("mouseenter", l._lnLinkEnter), l.addEventListener("mouseleave", s)));
+  function o(d) {
+    d[a + "Row"] || (d[a + "Row"] = !0, d.querySelector("a") && (d._lnLinkClick = function(b) {
+      h(d, b);
+    }, d._lnLinkEnter = function() {
+      u(d);
+    }, d.addEventListener("click", d._lnLinkClick), d.addEventListener("mouseenter", d._lnLinkEnter), d.addEventListener("mouseleave", s)));
   }
-  function r(l) {
-    l[a + "Row"] && (l._lnLinkClick && l.removeEventListener("click", l._lnLinkClick), l._lnLinkEnter && l.removeEventListener("mouseenter", l._lnLinkEnter), l.removeEventListener("mouseleave", s), delete l._lnLinkClick, delete l._lnLinkEnter, delete l[a + "Row"]);
+  function r(d) {
+    d[a + "Row"] && (d._lnLinkClick && d.removeEventListener("click", d._lnLinkClick), d._lnLinkEnter && d.removeEventListener("mouseenter", d._lnLinkEnter), d.removeEventListener("mouseleave", s), delete d._lnLinkClick, delete d._lnLinkEnter, delete d[a + "Row"]);
   }
-  function e(l) {
-    if (!l[a + "Init"]) return;
-    const b = l.tagName;
+  function e(d) {
+    if (!d[a + "Init"]) return;
+    const b = d.tagName;
     if (b === "TABLE" || b === "TBODY") {
-      const y = b === "TABLE" && l.querySelector("tbody") || l;
+      const y = b === "TABLE" && d.querySelector("tbody") || d;
       for (const E of y.querySelectorAll("tr"))
         r(E);
     } else
-      r(l);
-    delete l[a + "Init"];
+      r(d);
+    delete d[a + "Init"];
   }
-  function n(l) {
-    if (l[a + "Init"]) return;
-    l[a + "Init"] = !0;
-    const b = l.tagName;
+  function n(d) {
+    if (d[a + "Init"]) return;
+    d[a + "Init"] = !0;
+    const b = d.tagName;
     if (b === "TABLE" || b === "TBODY") {
-      const y = b === "TABLE" && l.querySelector("tbody") || l;
+      const y = b === "TABLE" && d.querySelector("tbody") || d;
       for (const E of y.querySelectorAll("tr"))
         o(E);
-    } else o(l);
+    } else o(d);
   }
-  function t(l) {
-    l.hasAttribute && l.hasAttribute(f) && n(l);
-    const b = l.querySelectorAll ? l.querySelectorAll("[" + f + "]") : [];
+  function t(d) {
+    d.hasAttribute && d.hasAttribute(f) && n(d);
+    const b = d.querySelectorAll ? d.querySelectorAll("[" + f + "]") : [];
     for (const y of b)
       n(y);
   }
@@ -1363,12 +1363,12 @@
       attributeFilter: [f]
     });
   }
-  function d(l) {
-    t(l);
+  function l(d) {
+    t(d);
   }
-  window[a] = { init: d, destroy: e };
+  window[a] = { init: l, destroy: e };
   function c() {
-    g(), i(), d(document.body);
+    g(), i(), l(document.body);
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", c) : c();
 })();
@@ -1468,15 +1468,27 @@
     this.buttons.forEach(function(n) {
       n[a + "Bound"] || (n[a + "Bound"] = !0, n.addEventListener("click", function() {
         var t = n.getAttribute(p), i = n.getAttribute(g);
-        i === "" ? e.reset() : (e._setActive(n), e._applyFilter(t, i), o(e.dom, "ln-filter:changed", { key: t, value: i }));
+        if (i === "") {
+          e.reset();
+          var l = { key: t, value: "" };
+          o(e.dom, "ln-filter:changed", l);
+          var c = document.getElementById(e.targetId);
+          c && c !== e.dom && o(c, "ln-filter:changed", l);
+        } else {
+          e._setActive(n), e._applyFilter(t, i);
+          var l = { key: t, value: i };
+          o(e.dom, "ln-filter:changed", l);
+          var c = document.getElementById(e.targetId);
+          c && c !== e.dom && o(c, "ln-filter:changed", l);
+        }
       }));
     });
   }, s.prototype._applyFilter = function(e, n) {
     var t = document.getElementById(this.targetId);
     if (t)
-      for (var i = Array.from(t.children), d = 0; d < i.length; d++) {
-        var c = i[d], l = c.getAttribute("data-" + e);
-        c.removeAttribute(v), l !== null && n && l.toLowerCase() !== n.toLowerCase() && c.setAttribute(v, "true");
+      for (var i = Array.from(t.children), l = 0; l < i.length; l++) {
+        var c = i[l], d = c.getAttribute("data-" + e);
+        c.removeAttribute(v), d !== null && n && d.toLowerCase() !== n.toLowerCase() && c.setAttribute(v, "true");
       }
   }, s.prototype._setActive = function(e) {
     this.buttons.forEach(function(n) {
@@ -1663,7 +1675,7 @@
     });
   }
   function s(e) {
-    this.dom = e, this.table = e.querySelector("table"), this.tbody = e.querySelector("tbody"), this.thead = e.querySelector("thead"), this.ths = this.thead ? Array.from(this.thead.querySelectorAll("th")) : [], this._data = [], this._filteredData = [], this._searchTerm = "", this._sortCol = -1, this._sortDir = null, this._sortType = null, this._virtual = !1, this._rowHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._colgroup = null;
+    this.dom = e, this.table = e.querySelector("table"), this.tbody = e.querySelector("tbody"), this.thead = e.querySelector("thead"), this.ths = this.thead ? Array.from(this.thead.querySelectorAll("th")) : [], this._data = [], this._filteredData = [], this._searchTerm = "", this._sortCol = -1, this._sortDir = null, this._sortType = null, this._columnFilters = {}, this._virtual = !1, this._rowHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._colgroup = null;
     var n = e.querySelector(".ln-table__toolbar");
     n && e.style.setProperty("--ln-table-toolbar-h", n.offsetHeight + "px");
     var t = this;
@@ -1675,20 +1687,27 @@
       });
       i.observe(this.tbody, { childList: !0 });
     }
-    return this._onSearch = function(d) {
-      d.preventDefault(), t._searchTerm = d.detail.term, t._applyFilterAndSort(), t._vStart = -1, t._vEnd = -1, t._render(), o(e, "ln-table:filter", {
+    return this._onSearch = function(l) {
+      l.preventDefault(), t._searchTerm = l.detail.term, t._applyFilterAndSort(), t._vStart = -1, t._vEnd = -1, t._render(), o(e, "ln-table:filter", {
         term: t._searchTerm,
         matched: t._filteredData.length,
         total: t._data.length
       });
-    }, e.addEventListener("ln-search:change", this._onSearch), this._onSort = function(d) {
-      t._sortCol = d.detail.direction === null ? -1 : d.detail.column, t._sortDir = d.detail.direction, t._sortType = d.detail.sortType, t._applyFilterAndSort(), t._vStart = -1, t._vEnd = -1, t._render(), o(e, "ln-table:sorted", {
-        column: d.detail.column,
-        direction: d.detail.direction,
+    }, e.addEventListener("ln-search:change", this._onSearch), this._onSort = function(l) {
+      t._sortCol = l.detail.direction === null ? -1 : l.detail.column, t._sortDir = l.detail.direction, t._sortType = l.detail.sortType, t._applyFilterAndSort(), t._vStart = -1, t._vEnd = -1, t._render(), o(e, "ln-table:sorted", {
+        column: l.detail.column,
+        direction: l.detail.direction,
         matched: t._filteredData.length,
         total: t._data.length
       });
-    }, e.addEventListener("ln-table:sort", this._onSort), this;
+    }, e.addEventListener("ln-table:sort", this._onSort), this._onColumnFilter = function(l) {
+      var c = l.detail.key, d = l.detail.value;
+      d ? t._columnFilters[c] = d.toLowerCase() : delete t._columnFilters[c], t._applyFilterAndSort(), t._vStart = -1, t._vEnd = -1, t._render(), o(e, "ln-table:filter", {
+        term: t._searchTerm,
+        matched: t._filteredData.length,
+        total: t._data.length
+      });
+    }, e.addEventListener("ln-filter:changed", this._onColumnFilter), this;
   }
   s.prototype._parseRows = function() {
     var e = this.tbody.rows, n = this.ths;
@@ -1696,36 +1715,43 @@
     for (var t = [], i = 0; i < n.length; i++)
       t[i] = n[i].getAttribute(_);
     e.length > 0 && (this._rowHeight = e[0].offsetHeight || 40), this._lockColumnWidths();
-    for (var d = 0; d < e.length; d++) {
-      for (var c = e[d], l = [], b = [], y = 0; y < c.cells.length; y++) {
-        var E = c.cells[y], w = E.textContent.trim(), C = E.hasAttribute("data-ln-value") ? E.getAttribute("data-ln-value") : w, L = t[y];
-        L === "number" || L === "date" ? l[y] = parseFloat(C) || 0 : L === "string" ? l[y] = String(C) : l[y] = null, y < c.cells.length - 1 && b.push(w.toLowerCase());
+    for (var l = 0; l < e.length; l++) {
+      for (var c = e[l], d = [], b = [], y = [], E = 0; E < c.cells.length; E++) {
+        var L = c.cells[E], C = L.textContent.trim(), w = L.hasAttribute("data-ln-value") ? L.getAttribute("data-ln-value") : C, T = t[E];
+        b[E] = C.toLowerCase(), T === "number" || T === "date" ? d[E] = parseFloat(w) || 0 : T === "string" ? d[E] = String(w) : d[E] = null, E < c.cells.length - 1 && y.push(C.toLowerCase());
       }
       this._data.push({
-        sortKeys: l,
+        sortKeys: d,
+        rawTexts: b,
         html: c.outerHTML,
-        searchText: b.join(" ")
+        searchText: y.join(" ")
       });
     }
     this._filteredData = this._data.slice(), this._render(), o(this.dom, "ln-table:ready", {
       total: this._data.length
     });
   }, s.prototype._applyFilterAndSort = function() {
-    if (!this._searchTerm)
-      this._filteredData = this._data.slice();
-    else {
-      var e = this._searchTerm;
-      this._filteredData = this._data.filter(function(c) {
-        return c.searchText.indexOf(e) !== -1;
-      });
-    }
-    if (!(this._sortCol < 0 || !this._sortDir)) {
-      var n = this._sortCol, t = this._sortDir === "desc" ? -1 : 1, i = this._sortType === "number" || this._sortType === "date", d = m ? m.compare : function(c, l) {
-        return c < l ? -1 : c > l ? 1 : 0;
+    var e = this._searchTerm, n = this._columnFilters, t = Object.keys(n).length > 0, i = this.ths, l = {};
+    if (t)
+      for (var c = 0; c < i.length; c++) {
+        var d = i[c].getAttribute("data-ln-filter-col");
+        d && (l[d] = c);
+      }
+    if (!e && !t ? this._filteredData = this._data.slice() : this._filteredData = this._data.filter(function(C) {
+      if (e && C.searchText.indexOf(e) === -1) return !1;
+      if (t)
+        for (var w in n) {
+          var T = l[w];
+          if (T !== void 0 && C.rawTexts[T] !== n[w]) return !1;
+        }
+      return !0;
+    }), !(this._sortCol < 0 || !this._sortDir)) {
+      var b = this._sortCol, y = this._sortDir === "desc" ? -1 : 1, E = this._sortType === "number" || this._sortType === "date", L = m ? m.compare : function(C, w) {
+        return C < w ? -1 : C > w ? 1 : 0;
       };
-      this._filteredData.sort(function(c, l) {
-        var b = c.sortKeys[n], y = l.sortKeys[n];
-        return i ? (b - y) * t : d(b, y) * t;
+      this._filteredData.sort(function(C, w) {
+        var T = C.sortKeys[b], S = w.sortKeys[b];
+        return E ? (T - S) * y : L(T, S) * y;
       });
     }
   }, s.prototype._lockColumnWidths = function() {
@@ -1739,7 +1765,7 @@
   }, s.prototype._render = function() {
     if (this.tbody) {
       var e = this._filteredData.length;
-      e === 0 && this._searchTerm ? (this._disableVirtualScroll(), this._showEmptyState()) : e > 200 ? (this._enableVirtualScroll(), this._renderVirtual()) : (this._disableVirtualScroll(), this._renderAll());
+      e === 0 && (this._searchTerm || Object.keys(this._columnFilters).length > 0) ? (this._disableVirtualScroll(), this._showEmptyState()) : e > 200 ? (this._enableVirtualScroll(), this._renderVirtual()) : (this._disableVirtualScroll(), this._renderAll());
     }
   }, s.prototype._renderAll = function() {
     for (var e = [], n = this._filteredData, t = 0; t < n.length; t++) e.push(n[t].html);
@@ -1759,13 +1785,13 @@
   }, s.prototype._renderVirtual = function() {
     var e = this._filteredData, n = e.length, t = this._rowHeight;
     if (!(!t || !n)) {
-      var i = this.table.getBoundingClientRect(), d = i.top + window.scrollY, c = this.thead ? this.thead.offsetHeight : 0, l = d + c, b = window.scrollY - l, y = Math.max(0, Math.floor(b / t) - 15), E = Math.min(y + Math.ceil(window.innerHeight / t) + 30, n);
+      var i = this.table.getBoundingClientRect(), l = i.top + window.scrollY, c = this.thead ? this.thead.offsetHeight : 0, d = l + c, b = window.scrollY - d, y = Math.max(0, Math.floor(b / t) - 15), E = Math.min(y + Math.ceil(window.innerHeight / t) + 30, n);
       if (!(y === this._vStart && E === this._vEnd)) {
         this._vStart = y, this._vEnd = E;
-        var w = this.ths.length || 1, C = y * t, L = (n - E) * t, T = "";
-        C > 0 && (T += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' + w + '" style="height:' + C + 'px;padding:0;border:none"></td></tr>');
-        for (var O = y; O < E; O++) T += e[O].html;
-        L > 0 && (T += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' + w + '" style="height:' + L + 'px;padding:0;border:none"></td></tr>'), this.tbody.innerHTML = T;
+        var L = this.ths.length || 1, C = y * t, w = (n - E) * t, T = "";
+        C > 0 && (T += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' + L + '" style="height:' + C + 'px;padding:0;border:none"></td></tr>');
+        for (var S = y; S < E; S++) T += e[S].html;
+        w > 0 && (T += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' + L + '" style="height:' + w + 'px;padding:0;border:none"></td></tr>'), this.tbody.innerHTML = T;
       }
     }
   }, s.prototype._showEmptyState = function() {
@@ -1777,7 +1803,7 @@
       total: this._data.length
     });
   }, s.prototype.destroy = function() {
-    this.dom[a] && (this._disableVirtualScroll(), this.dom.removeEventListener("ln-search:change", this._onSearch), this.dom.removeEventListener("ln-table:sort", this._onSort), this._colgroup && (this._colgroup.remove(), this._colgroup = null), this.table && (this.table.style.tableLayout = ""), this._data = [], this._filteredData = [], delete this.dom[a]);
+    this.dom[a] && (this._disableVirtualScroll(), this.dom.removeEventListener("ln-search:change", this._onSearch), this.dom.removeEventListener("ln-table:sort", this._onSort), this.dom.removeEventListener("ln-filter:changed", this._onColumnFilter), this._colgroup && (this._colgroup.remove(), this._colgroup = null), this.table && (this.table.style.tableLayout = ""), this._data = [], this._filteredData = [], delete this.dom[a]);
   };
   function o(e, n, t) {
     e.dispatchEvent(new CustomEvent(n, { bubbles: !0, detail: t || {} }));
@@ -1803,15 +1829,15 @@
   function m(i) {
     u(i);
   }
-  function h(i, d, c) {
-    i.dispatchEvent(new CustomEvent(d, {
+  function h(i, l, c) {
+    i.dispatchEvent(new CustomEvent(l, {
       bubbles: !0,
       detail: c || {}
     }));
   }
   function u(i) {
-    const d = Array.from(i.querySelectorAll(f));
-    for (const c of d)
+    const l = Array.from(i.querySelectorAll(f));
+    for (const c of l)
       c[a] || (c[a] = new s(c));
     i.hasAttribute && i.hasAttribute("data-ln-circular-progress") && !i[a] && (i[a] = new s(i));
   }
@@ -1821,10 +1847,10 @@
   s.prototype.destroy = function() {
     this.dom[a] && (this._attrObserver && this._attrObserver.disconnect(), this.svg && this.svg.remove(), this.labelEl && this.labelEl.remove(), this.dom.removeAttribute("data-ln-circular-progress-initialized"), delete this.dom[a]);
   };
-  function o(i, d) {
+  function o(i, l) {
     const c = document.createElementNS(_, i);
-    for (const l in d)
-      c.setAttribute(l, d[l]);
+    for (const d in l)
+      c.setAttribute(d, l[d]);
     return c;
   }
   function r() {
@@ -1850,11 +1876,11 @@
     }), this.progressCircle.classList.add("ln-circular-progress__fill"), this.svg.appendChild(this.trackCircle), this.svg.appendChild(this.progressCircle), this.labelEl = document.createElement("strong"), this.labelEl.classList.add("ln-circular-progress__label"), this.dom.appendChild(this.svg), this.dom.appendChild(this.labelEl);
   }
   function e() {
-    new MutationObserver(function(d) {
-      for (const c of d)
+    new MutationObserver(function(l) {
+      for (const c of l)
         if (c.type === "childList")
-          for (const l of c.addedNodes)
-            l.nodeType === 1 && u(l);
+          for (const d of c.addedNodes)
+            d.nodeType === 1 && u(d);
         else c.type === "attributes" && u(c.target);
     }).observe(document.body, {
       childList: !0,
@@ -1865,26 +1891,26 @@
   }
   e();
   function n() {
-    const i = this, d = new MutationObserver(function(c) {
-      for (const l of c)
-        (l.attributeName === "data-ln-circular-progress" || l.attributeName === "data-ln-circular-progress-max") && t.call(i);
+    const i = this, l = new MutationObserver(function(c) {
+      for (const d of c)
+        (d.attributeName === "data-ln-circular-progress" || d.attributeName === "data-ln-circular-progress-max") && t.call(i);
     });
-    d.observe(this.dom, {
+    l.observe(this.dom, {
       attributes: !0,
       attributeFilter: ["data-ln-circular-progress", "data-ln-circular-progress-max"]
-    }), this._attrObserver = d;
+    }), this._attrObserver = l;
   }
   function t() {
-    const i = parseFloat(this.dom.getAttribute("data-ln-circular-progress")) || 0, d = parseFloat(this.dom.getAttribute("data-ln-circular-progress-max")) || 100;
-    let c = d > 0 ? i / d * 100 : 0;
+    const i = parseFloat(this.dom.getAttribute("data-ln-circular-progress")) || 0, l = parseFloat(this.dom.getAttribute("data-ln-circular-progress-max")) || 100;
+    let c = l > 0 ? i / l * 100 : 0;
     c < 0 && (c = 0), c > 100 && (c = 100);
-    const l = v - c / 100 * v;
-    this.progressCircle.setAttribute("stroke-dashoffset", l);
+    const d = v - c / 100 * v;
+    this.progressCircle.setAttribute("stroke-dashoffset", d);
     const b = this.dom.getAttribute("data-ln-circular-progress-label");
     this.labelEl.textContent = b !== null ? b : Math.round(c) + "%", h(this.dom, "ln-circular-progress:change", {
       target: this.dom,
       value: i,
-      max: d,
+      max: l,
       percentage: c
     });
   }
@@ -1947,12 +1973,12 @@
       item: e,
       index: t
     });
-    const d = this, c = function(b) {
-      d._handlePointerMove(b);
-    }, l = function(b) {
-      d._handlePointerEnd(b), r.removeEventListener("pointermove", c), r.removeEventListener("pointerup", l), r.removeEventListener("pointercancel", l);
+    const l = this, c = function(b) {
+      l._handlePointerMove(b);
+    }, d = function(b) {
+      l._handlePointerEnd(b), r.removeEventListener("pointermove", c), r.removeEventListener("pointerup", d), r.removeEventListener("pointercancel", d);
     };
-    r.addEventListener("pointermove", c), r.addEventListener("pointerup", l), r.addEventListener("pointercancel", l);
+    r.addEventListener("pointermove", c), r.addEventListener("pointerup", d), r.addEventListener("pointercancel", d);
   }, v.prototype._handlePointerMove = function(o) {
     if (!this._dragging) return;
     const r = Array.from(this.dom.children), e = this._dragging;
@@ -1973,18 +1999,18 @@
     if (!this._dragging) return;
     const r = this._dragging, e = Array.from(this.dom.children), n = e.indexOf(r);
     let t = null, i = null;
-    for (const d of e) {
-      if (d.classList.contains("ln-sortable--drop-before")) {
-        t = d, i = "before";
+    for (const l of e) {
+      if (l.classList.contains("ln-sortable--drop-before")) {
+        t = l, i = "before";
         break;
       }
-      if (d.classList.contains("ln-sortable--drop-after")) {
-        t = d, i = "after";
+      if (l.classList.contains("ln-sortable--drop-after")) {
+        t = l, i = "after";
         break;
       }
     }
-    for (const d of e)
-      d.classList.remove("ln-sortable--drop-before", "ln-sortable--drop-after");
+    for (const l of e)
+      l.classList.remove("ln-sortable--drop-before", "ln-sortable--drop-after");
     if (r.classList.remove("ln-sortable--dragging"), r.removeAttribute("aria-grabbed"), this.dom.classList.remove("ln-sortable--active"), t && t !== r) {
       i === "before" ? this.dom.insertBefore(r, t) : this.dom.insertBefore(r, t.nextElementSibling);
       const c = Array.from(this.dom.children).indexOf(r);
@@ -2163,8 +2189,8 @@
     for (const t in this.locales) {
       if (!this.locales.hasOwnProperty(t) || this.activeLanguages.has(t)) continue;
       e++;
-      const i = g("ln-translations-menu-item"), d = i.querySelector("[data-ln-translations-lang]");
-      d.setAttribute("data-ln-translations-lang", t), d.textContent = this.locales[t], d.addEventListener("click", function(c) {
+      const i = g("ln-translations-menu-item"), l = i.querySelector("[data-ln-translations-lang]");
+      l.setAttribute("data-ln-translations-lang", t), l.textContent = this.locales[t], l.addEventListener("click", function(c) {
         c.ctrlKey || c.metaKey || c.button === 1 || (c.preventDefault(), c.stopPropagation(), r.menuEl.getAttribute("data-ln-toggle") === "open" && r.menuEl.setAttribute("data-ln-toggle", "close"), r.addLanguage(t));
       }), this.menuEl.appendChild(i);
     }
@@ -2179,8 +2205,8 @@
       t.setAttribute("data-ln-translations-lang", e);
       const i = t.querySelector("span");
       i.textContent = r.locales[e] || e.toUpperCase();
-      const d = t.querySelector("button");
-      d.setAttribute("aria-label", "Remove " + (r.locales[e] || e.toUpperCase())), d.addEventListener("click", function(c) {
+      const l = t.querySelector("button");
+      l.setAttribute("aria-label", "Remove " + (r.locales[e] || e.toUpperCase())), l.addEventListener("click", function(c) {
         c.ctrlKey || c.metaKey || c.button === 1 || (c.preventDefault(), c.stopPropagation(), r.removeLanguage(e));
       }), r.badgesEl.appendChild(n);
     });
@@ -2194,15 +2220,15 @@
     }).defaultPrevented) return;
     this.activeLanguages.add(r), e = e || {};
     const i = this.dom.querySelectorAll("[data-ln-translatable]");
-    for (const d of i) {
-      const c = d.getAttribute("data-ln-translatable"), l = d.getAttribute("data-ln-translations-prefix") || "", b = d.querySelector(
+    for (const l of i) {
+      const c = l.getAttribute("data-ln-translatable"), d = l.getAttribute("data-ln-translations-prefix") || "", b = l.querySelector(
         this.defaultLang ? '[data-ln-translatable-lang="' + this.defaultLang + '"]' : "input:not([data-ln-translatable-lang]), textarea:not([data-ln-translatable-lang]), select:not([data-ln-translatable-lang])"
       );
       if (!b) continue;
       const y = b.cloneNode(!1);
-      l ? y.name = l + "[trans][" + r + "][" + c + "]" : y.name = "trans[" + r + "][" + c + "]", y.value = e[c] !== void 0 ? e[c] : "", y.removeAttribute("id"), y.placeholder = n + " translation", y.setAttribute("data-ln-translatable-lang", r);
-      const E = d.querySelectorAll('[data-ln-translatable-lang]:not([data-ln-translatable-lang="' + this.defaultLang + '"])'), w = E.length > 0 ? E[E.length - 1] : b;
-      w.parentNode.insertBefore(y, w.nextSibling);
+      d ? y.name = d + "[trans][" + r + "][" + c + "]" : y.name = "trans[" + r + "][" + c + "]", y.value = e[c] !== void 0 ? e[c] : "", y.removeAttribute("id"), y.placeholder = n + " translation", y.setAttribute("data-ln-translatable-lang", r);
+      const E = l.querySelectorAll('[data-ln-translatable-lang]:not([data-ln-translatable-lang="' + this.defaultLang + '"])'), L = E.length > 0 ? E[E.length - 1] : b;
+      L.parentNode.insertBefore(y, L.nextSibling);
     }
     this._updateDropdown(), this._updateBadges(), u(this.dom, "ln-translations:added", {
       target: this.dom,
@@ -2273,8 +2299,8 @@
   function v(t) {
     const i = Array.from(t.querySelectorAll("[" + f + "]"));
     t.hasAttribute && t.hasAttribute(f) && i.push(t);
-    for (const d of i)
-      d[a] || (d[a] = new m(d));
+    for (const l of i)
+      l[a] || (l[a] = new m(l));
   }
   function m(t) {
     var i = h(t);
@@ -2283,20 +2309,20 @@
       return;
     }
     this.dom = t, this.key = i;
-    var d = this;
+    var l = this;
     return this._onFocusout = function(c) {
-      var l = c.target;
-      u(l) && l.name && d.save();
+      var d = c.target;
+      u(d) && d.name && l.save();
     }, this._onChange = function(c) {
-      var l = c.target;
-      u(l) && l.name && d.save();
+      var d = c.target;
+      u(d) && d.name && l.save();
     }, this._onSubmit = function() {
-      d.clear();
+      l.clear();
     }, this._onReset = function() {
-      d.clear();
+      l.clear();
     }, this._onClearClick = function(c) {
-      var l = c.target.closest("[" + _ + "]");
-      l && d.clear();
+      var d = c.target.closest("[" + _ + "]");
+      d && l.clear();
     }, t.addEventListener("focusout", this._onFocusout), t.addEventListener("change", this._onChange), t.addEventListener("submit", this._onSubmit), t.addEventListener("reset", this._onReset), t.addEventListener("click", this._onClearClick), this.restore(), this;
   }
   m.prototype.save = function() {
@@ -2321,8 +2347,8 @@
       } catch {
         return;
       }
-      var d = e(this.dom, "ln-autosave:before-restore", { target: this.dom, data: i });
-      d.defaultPrevented || (o(this.dom, i), r(this.dom, "ln-autosave:restored", { target: this.dom, data: i }));
+      var l = e(this.dom, "ln-autosave:before-restore", { target: this.dom, data: i });
+      l.defaultPrevented || (o(this.dom, i), r(this.dom, "ln-autosave:restored", { target: this.dom, data: i }));
     }
   }, m.prototype.clear = function() {
     try {
@@ -2335,33 +2361,33 @@
     this.dom[a] && (this.dom.removeEventListener("focusout", this._onFocusout), this.dom.removeEventListener("change", this._onChange), this.dom.removeEventListener("submit", this._onSubmit), this.dom.removeEventListener("reset", this._onReset), this.dom.removeEventListener("click", this._onClearClick), r(this.dom, "ln-autosave:destroyed", { target: this.dom }), delete this.dom[a]);
   };
   function h(t) {
-    var i = t.getAttribute(f), d = i || t.id;
-    return d ? p + window.location.pathname + ":" + d : null;
+    var i = t.getAttribute(f), l = i || t.id;
+    return l ? p + window.location.pathname + ":" + l : null;
   }
   function u(t) {
     var i = t.tagName;
     return i === "INPUT" || i === "TEXTAREA" || i === "SELECT";
   }
   function s(t) {
-    for (var i = {}, d = t.elements, c = 0; c < d.length; c++) {
-      var l = d[c];
-      if (!(!l.name || l.disabled || l.type === "file" || l.type === "submit" || l.type === "button"))
-        if (l.type === "checkbox")
-          i[l.name] || (i[l.name] = []), l.checked && i[l.name].push(l.value);
-        else if (l.type === "radio")
-          l.checked && (i[l.name] = l.value);
-        else if (l.type === "select-multiple") {
-          i[l.name] = [];
-          for (var b = 0; b < l.options.length; b++)
-            l.options[b].selected && i[l.name].push(l.options[b].value);
+    for (var i = {}, l = t.elements, c = 0; c < l.length; c++) {
+      var d = l[c];
+      if (!(!d.name || d.disabled || d.type === "file" || d.type === "submit" || d.type === "button"))
+        if (d.type === "checkbox")
+          i[d.name] || (i[d.name] = []), d.checked && i[d.name].push(d.value);
+        else if (d.type === "radio")
+          d.checked && (i[d.name] = d.value);
+        else if (d.type === "select-multiple") {
+          i[d.name] = [];
+          for (var b = 0; b < d.options.length; b++)
+            d.options[b].selected && i[d.name].push(d.options[b].value);
         } else
-          i[l.name] = l.value;
+          i[d.name] = d.value;
     }
     return i;
   }
   function o(t, i) {
-    for (var d = t.elements, c = [], l = 0; l < d.length; l++) {
-      var b = d[l];
+    for (var l = t.elements, c = [], d = 0; d < l.length; d++) {
+      var b = l[d];
       if (!(!b.name || !(b.name in i) || b.type === "file" || b.type === "submit" || b.type === "button")) {
         var y = i[b.name];
         if (b.type === "checkbox")
@@ -2377,30 +2403,30 @@
           b.value = y, c.push(b);
       }
     }
-    for (var w = 0; w < c.length; w++)
-      c[w].dispatchEvent(new Event("input", { bubbles: !0 })), c[w].dispatchEvent(new Event("change", { bubbles: !0 })), c[w].lnSelect && c[w].lnSelect.setValue && c[w].lnSelect.setValue(i[c[w].name]);
+    for (var L = 0; L < c.length; L++)
+      c[L].dispatchEvent(new Event("input", { bubbles: !0 })), c[L].dispatchEvent(new Event("change", { bubbles: !0 })), c[L].lnSelect && c[L].lnSelect.setValue && c[L].lnSelect.setValue(i[c[L].name]);
   }
-  function r(t, i, d) {
+  function r(t, i, l) {
     t.dispatchEvent(new CustomEvent(i, {
       bubbles: !0,
-      detail: d || {}
+      detail: l || {}
     }));
   }
-  function e(t, i, d) {
+  function e(t, i, l) {
     var c = new CustomEvent(i, {
       bubbles: !0,
       cancelable: !0,
-      detail: d || {}
+      detail: l || {}
     });
     return t.dispatchEvent(c), c;
   }
   function n() {
     var t = new MutationObserver(function(i) {
-      for (var d = 0; d < i.length; d++)
-        if (i[d].type === "childList")
-          for (var c = i[d].addedNodes, l = 0; l < c.length; l++)
-            c[l].nodeType === 1 && v(c[l]);
-        else i[d].type === "attributes" && v(i[d].target);
+      for (var l = 0; l < i.length; l++)
+        if (i[l].type === "childList")
+          for (var c = i[l].addedNodes, d = 0; d < c.length; d++)
+            c[d].nodeType === 1 && v(c[d]);
+        else i[l].type === "attributes" && v(i[l].target);
     });
     t.observe(document.body, {
       childList: !0,
