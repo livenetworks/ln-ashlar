@@ -195,7 +195,7 @@
 						-->
 						<form id="demo-form-grid">
 							<p class="form-element">
-								<label for="demo-fname">First Name <span class="text-error">*</span></label>
+								<label for="demo-fname">First Name</label>
 								<input type="text" id="demo-fname" name="fname" required placeholder="John">
 								<small class="text-error">Required field</small>
 							</p>
@@ -204,7 +204,7 @@
 								<input type="text" id="demo-lname" name="lname" placeholder="Smith">
 							</p>
 							<p class="form-element">
-								<label for="demo-email">Email <span class="text-error">*</span></label>
+								<label for="demo-email">Email</label>
 								<input type="email" id="demo-email" name="email" required placeholder="email@example.com">
 							</p>
 							<p class="form-element">
@@ -258,7 +258,7 @@
 							<nav id="demo-pills-filled">
 								<fieldset>
 									<legend>Role</legend>
-									<ul class="btn-group">
+									<ul>
 										<li><label><input type="radio" name="role" value="admin" checked> Admin</label></li>
 										<li><label><input type="radio" name="role" value="employee"> Employee</label></li>
 										<li><label><input type="radio" name="role" value="external"> External</label></li>
@@ -266,7 +266,7 @@
 								</fieldset>
 								<fieldset>
 									<legend>Features</legend>
-									<ul class="btn-group">
+									<ul>
 										<li><label><input type="checkbox" name="feat[]" value="api" checked> API</label></li>
 										<li><label><input type="checkbox" name="feat[]" value="export"> Export</label></li>
 										<li><label><input type="checkbox" name="feat[]" value="audit" checked> Audit</label></li>
@@ -280,14 +280,14 @@
 							<nav id="demo-pills-outline">
 								<fieldset>
 									<legend>Auth Method</legend>
-									<ul class="btn-group">
+									<ul>
 										<li><label><input type="radio" name="auth" value="local" checked> Local</label></li>
 										<li><label><input type="radio" name="auth" value="ldap"> LDAP</label></li>
 									</ul>
 								</fieldset>
 								<fieldset>
 									<legend>Options</legend>
-									<ul class="btn-group">
+									<ul>
 										<li><label><input type="checkbox" name="opt[]" value="notify" checked> Notifications</label></li>
 										<li><label><input type="checkbox" name="opt[]" value="2fa"> Two-factor</label></li>
 									</ul>
@@ -312,12 +312,108 @@
 				</section>
 
 				<!-- ==========================================
+				     INPUT STATES
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Input States</h3></header>
+					<main>
+						<section id="demo-input-states">
+							<p class="form-element">
+								<label for="state-default">Default</label>
+								<input type="text" id="state-default" placeholder="Click to see focus ring">
+							</p>
+							<p class="form-element">
+								<label for="state-filled">Filled</label>
+								<input type="text" id="state-filled" value="John Smith">
+							</p>
+							<p class="form-element">
+								<label for="state-disabled">Disabled</label>
+								<input type="text" id="state-disabled" disabled value="Cannot edit">
+							</p>
+							<p class="form-element">
+								<label for="state-readonly">Readonly</label>
+								<input type="text" id="state-readonly" readonly value="Read only value">
+							</p>
+							<p class="form-element">
+								<label for="state-error">With error</label>
+								<input type="text" id="state-error" class="input-error" value="bad@">
+								<small class="text-error">Invalid email address</small>
+							</p>
+							<p class="form-element">
+								<label for="state-success">With success</label>
+								<input type="text" id="state-success" class="input-success" value="john@example.com">
+								<small class="text-success">Email verified</small>
+							</p>
+						</section>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     SELECT & TEXTAREA
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Select &amp; Textarea</h3></header>
+					<main>
+						<section id="demo-select-textarea">
+							<p class="form-element">
+								<label for="demo-sel1">Select</label>
+								<select id="demo-sel1">
+									<option value="">Choose an option...</option>
+									<option>Option A</option>
+									<option>Option B</option>
+									<option>Option C</option>
+								</select>
+							</p>
+							<p class="form-element">
+								<label for="demo-sel-dis">Disabled select</label>
+								<select id="demo-sel-dis" disabled>
+									<option>Locked option</option>
+								</select>
+							</p>
+							<p class="form-element">
+								<label for="demo-ta1">Textarea</label>
+								<textarea id="demo-ta1" placeholder="Write something..."></textarea>
+							</p>
+							<p class="form-element">
+								<label for="demo-ta-dis">Disabled textarea</label>
+								<textarea id="demo-ta-dis" disabled>Cannot edit this text</textarea>
+							</p>
+						</section>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     CHECKBOXES & RADIOS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Checkboxes &amp; Radios</h3></header>
+					<main>
+						<section id="demo-checks">
+							<fieldset>
+								<legend>Checkboxes</legend>
+								<p class="form-element"><label><input type="checkbox" checked> Receive notifications</label></p>
+								<p class="form-element"><label><input type="checkbox"> Subscribe to newsletter</label></p>
+								<p class="form-element"><label><input type="checkbox" disabled> Disabled option</label></p>
+								<p class="form-element"><label><input type="checkbox" checked disabled> Checked disabled</label></p>
+							</fieldset>
+							<fieldset>
+								<legend>Radios</legend>
+								<p class="form-element"><label><input type="radio" name="demo-radio" value="1" checked> Option one</label></p>
+								<p class="form-element"><label><input type="radio" name="demo-radio" value="2"> Option two</label></p>
+								<p class="form-element"><label><input type="radio" name="demo-radio" value="3"> Option three</label></p>
+								<p class="form-element"><label><input type="radio" name="demo-radio" value="4" disabled> Disabled</label></p>
+							</fieldset>
+						</section>
+					</main>
+				</section>
+
+				<!-- ==========================================
 				     BUTTONS
 				     ========================================== -->
 				<section class="section-card">
-					<header><h3>Buttons</h3></header>
+					<header><h3>Buttons — Colors</h3></header>
 					<main>
-						<p>Every <code>&lt;button&gt;</code> gets hover/active/focus effects out of the box from ln-acme via <code>--color-primary</code>. Override <code>--color-primary</code> on the element or parent to change color.</p>
+						<p>Every <code>&lt;button&gt;</code> gets hover/active/focus via <code>--color-primary</code>. Override per element to change color.</p>
 						<nav class="demo-actions">
 							<button type="button" class="btn">Primary</button>
 							<button type="button" class="btn btn--secondary">Secondary</button>
@@ -331,6 +427,60 @@
 				</section>
 
 				<!-- ==========================================
+				     BUTTON SIZES
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Button Sizes</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button type="button" class="btn btn-sm">Small</button>
+							<button type="button" class="btn">Default</button>
+							<button type="button" class="btn btn-lg">Large</button>
+						</nav>
+						<nav class="demo-actions" style="margin-top: 1rem;">
+							<button type="button" class="btn btn-sm btn--danger">Small Danger</button>
+							<button type="button" class="btn btn--success">Default Success</button>
+							<button type="button" class="btn btn-lg btn--info">Large Info</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     ICON BUTTONS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Icon Buttons</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button type="button" class="btn"><span class="ln-icon-plus"></span> Add</button>
+							<button type="button" class="btn btn--success"><span class="ln-icon-save"></span> Save</button>
+							<button type="button" class="btn btn--danger"><span class="ln-icon-delete"></span> Delete</button>
+							<button type="button" class="btn btn--info"><span class="ln-icon-download"></span> Export</button>
+						</nav>
+						<nav class="demo-actions" style="margin-top: 1rem;">
+							<button type="button" title="Edit"><span class="ln-icon-edit"></span></button>
+							<button type="button" title="Copy"><span class="ln-icon-copy"></span></button>
+							<button type="button" title="Print"><span class="ln-icon-print"></span></button>
+							<button type="button" title="Refresh"><span class="ln-icon-refresh"></span></button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     BUTTON GROUPS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Button Groups</h3></header>
+					<main>
+						<ul class="btn-group">
+							<li><button type="button" class="btn" title="Edit"><span class="ln-icon-edit"></span></button></li>
+							<li><button type="button" class="btn" title="Copy"><span class="ln-icon-copy"></span></button></li>
+							<li><button type="button" class="btn btn--danger" title="Delete"><span class="ln-icon-delete"></span></button></li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- ==========================================
 				     IMPLEMENTATION — HTML + SCSS
 				     ========================================== -->
 				<section class="section-card">
@@ -340,7 +490,7 @@
 						<pre><code>&lt;form id="my-form"&gt;
 
   &lt;p class="form-element"&gt;
-    &lt;label for="name"&gt;Name &lt;span class="text-error"&gt;*&lt;/span&gt;&lt;/label&gt;
+    &lt;label for="name"&gt;Name&lt;/label&gt;
     &lt;input type="text" id="name" name="name" required&gt;
     &lt;small class="text-error"&gt;Required field&lt;/small&gt;
   &lt;/p&gt;

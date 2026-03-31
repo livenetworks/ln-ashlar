@@ -44,3 +44,73 @@
 #demo-pills-outline {
 	@include pill-outline;
 }
+
+// ─── Input states demo ──────────────────────────────────
+#demo-input-states {
+	@include form-grid;
+
+	.form-element { grid-column: span 3; }
+
+	.input-error {
+		border-color: hsl(var(--color-error));
+
+		&:focus {
+			border-color: hsl(var(--color-error));
+			box-shadow: 0 0 0 3px hsl(var(--color-error) / 0.15);
+		}
+	}
+
+	.input-success {
+		border-color: hsl(var(--color-success));
+
+		&:focus {
+			border-color: hsl(var(--color-success));
+			box-shadow: 0 0 0 3px hsl(var(--color-success) / 0.15);
+		}
+	}
+}
+
+// ─── Select & Textarea demo ────────────────────────────
+#demo-select-textarea {
+	@include form-grid;
+
+	.form-element { grid-column: span 3; }
+}
+
+// ─── Checkbox & Radio demo ─────────────────────────────
+#demo-checks {
+	@include flex;
+	@include gap(var(--spacing-xl));
+
+	fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+
+		legend {
+			@include text-sm;
+			@include font-semibold;
+			@include text-primary;
+			@include mb(0.75rem);
+		}
+
+		.form-element {
+			@include mb(0.5rem);
+
+			label {
+				@include flex;
+				@include items-center;
+				@include gap(0.5rem);
+				@include cursor-pointer;
+			}
+		}
+	}
+}
+
+// ─── Button demos ──────────────────────────────────────
+.demo-actions {
+	@include flex;
+	@include flex-wrap;
+	@include items-center;
+	@include gap(0.5rem);
+}

@@ -43,6 +43,7 @@
 		@include text-sm;
 		background: transparent;
 		outline: none;
+		box-shadow: none;
 		@include w(10rem);
 
 		&::placeholder {
@@ -57,7 +58,7 @@
 
 	&:focus-within {
 		border-color: hsl(var(--color-primary));
-		@include shadow-sm;
+		box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.1);
 	}
 }
 
@@ -169,6 +170,122 @@
 	@include text-xs;
 	@include text-muted;
 	font-family: var(--font-mono);
+}
+
+// ── Quick filter bar ──
+.ln-table__filters {
+	@include flex;
+	@include flex-wrap;
+	@include items-center;
+	@include gap(var(--spacing-lg));
+	@include px(1rem);
+	@include py(0.5rem);
+	@include border-b-light;
+
+	fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+		@include flex;
+		@include items-center;
+		@include gap(0.375rem);
+
+		legend {
+			@include text-xs;
+			@include font-medium;
+			@include text-muted;
+			float: left;
+			@include mr(0.5rem);
+			line-height: 1.75rem;
+		}
+
+		ul {
+			@include inline-flex;
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		li button {
+			@include px(0.5rem);
+			@include py(0.125rem);
+			@include text-xs;
+			@include font-medium;
+			@include rounded-full;
+			@include transition-fast;
+			background: transparent;
+			color: hsl(var(--color-text-secondary));
+			border: none;
+
+			&:hover {
+				background-color: hsl(var(--color-bg-secondary));
+				color: hsl(var(--color-text-primary));
+			}
+
+			&[data-active] {
+				background-color: hsl(var(--color-primary) / 0.1);
+				color: hsl(var(--color-primary));
+			}
+		}
+	}
+}
+
+// ── Active filter chips ──
+.ln-table__chips {
+	@include flex;
+	@include items-center;
+	@include flex-wrap;
+	@include gap(0.375rem);
+	@include px(1rem);
+	@include py(0.375rem);
+	@include border-b-light;
+	background-color: hsl(var(--color-primary) / 0.03);
+}
+
+.ln-table__chip {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.25rem);
+	@include px(0.5rem);
+	@include py(0.125rem);
+	@include rounded-full;
+	@include text-xs;
+	background-color: hsl(var(--color-primary) / 0.1);
+	color: hsl(var(--color-primary));
+
+	strong {
+		@include font-semibold;
+	}
+
+	button {
+		background: none;
+		border: none;
+		color: hsl(var(--color-primary));
+		@include cursor-pointer;
+		@include text-sm;
+		@include font-bold;
+		line-height: 1;
+		padding: 0;
+		@include ml(0.125rem);
+
+		&:hover {
+			color: hsl(var(--color-error));
+		}
+	}
+}
+
+.ln-table__clear-all {
+	@include text-xs;
+	@include font-medium;
+	color: hsl(var(--color-text-muted));
+	background: none;
+	border: none;
+	@include cursor-pointer;
+	@include ml(0.25rem);
+
+	&:hover {
+		color: hsl(var(--color-error));
+	}
 }
 
 // ── Empty state (filter returned 0 results) ──

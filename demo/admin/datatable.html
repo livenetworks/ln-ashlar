@@ -112,27 +112,63 @@
 
 					<!-- Live demo — 10.000 rows -->
 					<section class="section-card">
-						<header><h3>Live Demo — 10.000 rows</h3></header>
+						<header><h3>Live Demo — 10,000 rows with filters</h3></header>
 						<main>
 							<div data-ln-table id="demo-table">
 								<header class="ln-table__toolbar">
-									<h3>Employees</h3>
+									<div>
+										<h3>Employees</h3>
+										<small>Manage employee records. Click column headers to sort.</small>
+									</div>
 									<aside>
 										<label class="ln-table__search">
-											<span class="ln-icon-filter ln-icon--sm"></span>
-											<input type="search" placeholder="Search..." data-ln-search="demo-table">
+											<span class="ln-icon-search ln-icon--sm"></span>
+											<input type="search" placeholder="Search employees..." data-ln-search="demo-table">
 										</label>
 										<span class="ln-table__count" id="demo-count"></span>
 										<span class="ln-table__timing" id="demo-timing"></span>
 									</aside>
 								</header>
 
+								<!-- Quick filters -->
+								<nav class="ln-table__filters" id="demo-filters">
+									<fieldset id="filter-status">
+										<legend>Status</legend>
+										<ul>
+											<li><button data-filter-col="status" data-filter-val="" data-active>All</button></li>
+											<li><button data-filter-col="status" data-filter-val="Active">Active</button></li>
+											<li><button data-filter-col="status" data-filter-val="Inactive">Inactive</button></li>
+											<li><button data-filter-col="status" data-filter-val="On Leave">On Leave</button></li>
+											<li><button data-filter-col="status" data-filter-val="Suspended">Suspended</button></li>
+										</ul>
+									</fieldset>
+									<fieldset id="filter-dept">
+										<legend>Department</legend>
+										<ul>
+											<li><button data-filter-col="dept" data-filter-val="" data-active>All</button></li>
+											<li><button data-filter-col="dept" data-filter-val="IT">IT</button></li>
+											<li><button data-filter-col="dept" data-filter-val="Finance">Finance</button></li>
+											<li><button data-filter-col="dept" data-filter-val="Legal">Legal</button></li>
+											<li><button data-filter-col="dept" data-filter-val="Marketing">Marketing</button></li>
+											<li><button data-filter-col="dept" data-filter-val="HR">HR</button></li>
+											<li><button data-filter-col="dept" data-filter-val="Sales">Sales</button></li>
+										</ul>
+									</fieldset>
+								</nav>
+
+								<!-- Active filter chips -->
+								<div class="ln-table__chips" id="demo-chips" hidden>
+									<span id="demo-chip-list"></span>
+									<button type="button" class="ln-table__clear-all" id="demo-clear-all">Clear all</button>
+								</div>
+
 								<template data-ln-table-empty>
 									<article class="ln-table__empty-state">
-										<span class="ln-icon-filter ln-icon--xl"></span>
+										<span class="ln-icon-search ln-icon--xl"></span>
 										<h3>No results</h3>
-										<p>Try a different search term.</p>
-										<button class="btn btn--secondary" data-ln-table-clear>Clear</button>
+										<p>Try different search terms or clear filters.</p>
+										<button class="btn" data-ln-table-clear>Clear search</button>
+										<button class="btn btn--secondary" id="demo-clear-filters-empty">Clear filters</button>
 									</article>
 								</template>
 
@@ -153,7 +189,8 @@
 								</table>
 
 								<footer class="ln-table__footer">
-									<span>Total: <strong id="demo-total"></strong> records</span>
+									<span>Showing <strong id="demo-total"></strong> records</span>
+									<span class="ln-table__timing" id="demo-timing-footer"></span>
 								</footer>
 							</div>
 						</main>
@@ -375,7 +412,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 			var status = statuses[i % statuses.length];
 
 			html.push(
-				'<tr>' +
+				'<tr data-status="' + status.text + '" data-dept="' + dept + '">' +
 				'<td>' + (i + 1) + '</td>' +
 				'<td>' + name + '</td>' +
 				'<td>' + dept + '</td>' +
@@ -399,6 +436,118 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 		var elapsed = (performance.now() - t0).toFixed(0);
 		var timingEl = document.getElementById('demo-timing');
 		if (timingEl) timingEl.textContent = elapsed + 'ms';
+
+		// ── Quick filters (demo-level, works with ln-table virtual scroll) ──
+		var activeFilters = {};
+		var filtersNav = document.getElementById('demo-filters');
+		var chipsEl = document.getElementById('demo-chips');
+		var chipListEl = document.getElementById('demo-chip-list');
+		var clearAllBtn = document.getElementById('demo-clear-all');
+		var clearFiltersEmptyBtn = document.getElementById('demo-clear-filters-empty');
+
+		function applyFilters() {
+			var rows = tbody.querySelectorAll('tr');
+			var shown = 0;
+
+			for (var i = 0; i < rows.length; i++) {
+				var row = rows[i];
+				var visible = true;
+
+				for (var col in activeFilters) {
+					if (activeFilters[col] && row.getAttribute('data-' + col) !== activeFilters[col]) {
+						visible = false;
+						break;
+					}
+				}
+
+				row.style.display = visible ? '' : 'none';
+				if (visible) shown++;
+			}
+
+			if (totalEl) totalEl.textContent = shown.toLocaleString();
+			renderChips();
+		}
+
+		function renderChips() {
+			var chips = [];
+			var hasActive = false;
+
+			for (var col in activeFilters) {
+				if (activeFilters[col]) {
+					hasActive = true;
+					chips.push(
+						'<span class="ln-table__chip">' +
+							col + ': <strong>' + activeFilters[col] + '</strong>' +
+							' <button type="button" data-chip-col="' + col + '" title="Remove">×</button>' +
+						'</span>'
+					);
+				}
+			}
+
+			if (chipListEl) chipListEl.innerHTML = chips.join('');
+			if (chipsEl) chipsEl.hidden = !hasActive;
+		}
+
+		function clearAllFilters() {
+			activeFilters = {};
+
+			var btns = filtersNav.querySelectorAll('button');
+			for (var i = 0; i < btns.length; i++) {
+				btns[i].removeAttribute('data-active');
+				if (btns[i].getAttribute('data-filter-val') === '') {
+					btns[i].setAttribute('data-active', '');
+				}
+			}
+
+			applyFilters();
+		}
+
+		// Filter button clicks
+		if (filtersNav) {
+			filtersNav.addEventListener('click', function (e) {
+				var btn = e.target.closest('button[data-filter-col]');
+				if (!btn) return;
+
+				var col = btn.getAttribute('data-filter-col');
+				var val = btn.getAttribute('data-filter-val');
+
+				// Update active state within same fieldset
+				var siblings = btn.closest('ul').querySelectorAll('button');
+				for (var i = 0; i < siblings.length; i++) {
+					siblings[i].removeAttribute('data-active');
+				}
+				btn.setAttribute('data-active', '');
+
+				activeFilters[col] = val;
+				applyFilters();
+			});
+		}
+
+		// Chip remove clicks
+		if (chipsEl) {
+			chipsEl.addEventListener('click', function (e) {
+				var chipBtn = e.target.closest('button[data-chip-col]');
+				if (!chipBtn) return;
+
+				var col = chipBtn.getAttribute('data-chip-col');
+				activeFilters[col] = '';
+
+				// Reset the corresponding filter button to "All"
+				var fieldsetBtns = filtersNav.querySelectorAll('button[data-filter-col="' + col + '"]');
+				for (var i = 0; i < fieldsetBtns.length; i++) {
+					fieldsetBtns[i].removeAttribute('data-active');
+					if (fieldsetBtns[i].getAttribute('data-filter-val') === '') {
+						fieldsetBtns[i].setAttribute('data-active', '');
+					}
+				}
+
+				applyFilters();
+			});
+		}
+
+		// Clear all button
+		if (clearAllBtn) clearAllBtn.addEventListener('click', clearAllFilters);
+		if (clearFiltersEmptyBtn) clearFiltersEmptyBtn.addEventListener('click', clearAllFilters);
 	})();
 	</script>
 </body>

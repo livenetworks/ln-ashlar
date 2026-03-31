@@ -11,7 +11,7 @@
 	top: 100%;
 	@include mt(var(--spacing-xs));
 	@include bg-primary;
-	@include border;
+	@include border-light;
 	@include rounded-md;
 	@include shadow-lg;
 	@include z-dropdown;
@@ -24,6 +24,7 @@
 
 	&.open {
 		display: block;
+		animation: ln-dropdown-in var(--transition-fast);
 	}
 
 	// ─── Menu items ────────────────────────────────────────
@@ -71,7 +72,18 @@
 	// ─── Separator ─────────────────────────────────────────
 	hr {
 		border: none;
-		border-top: var(--border-width) solid hsl(var(--color-border));
+		border-top: var(--border-width) solid hsl(var(--color-border-light));
 		@include my(var(--spacing-xs));
+	}
+}
+
+@keyframes ln-dropdown-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
 	}
 }

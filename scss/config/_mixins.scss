@@ -13,23 +13,27 @@
 //   mixins/_sizing.scss       — w, h, size
 //   mixins/_typography.scss   — text-*, font-*, truncate
 //   mixins/_colors.scss       — text-primary, bg-primary
-//   mixins/_borders.scss      — border, rounded-*
-//   mixins/_shadows.scss      — shadow-*
-//   mixins/_transitions.scss  — transition, transition-fast
+//   mixins/_borders.scss      — border, border-light, border-t-light, border-b-light, rounded-*
+//   mixins/_shadows.scss      — shadow-xs, shadow-sm, shadow-md, shadow-lg, shadow-xl
+//   mixins/_transitions.scss  — transition, transition-fast, transition-slow
 //   mixins/_position.scss     — relative, absolute, overflow-*
 //   mixins/_interaction.scss  — cursor-*, z-*
 //   mixins/_layout.scss       — grid, stack, container
 //   mixins/_collapsible.scss  — collapsible, collapsible-content
-//   mixins/_card.scss         — card, panel-header, section, section-card
+//   mixins/_card.scss         — card, card-accent-top, card-accent-bottom,
+//                               card-accent-left, card-bg, card-stacked,
+//                               panel-header, section, section-card
 //   mixins/_nav.scss          — nav
 //   mixins/_form.scss         — form-label, form-grid, form-actions, form-input,
 //                               form-textarea, form-select, form-check,
 //                               form-checkbox, form-radio, pill, pill-group
-//   mixins/_btn.scss          — btn, btn-colors, close-button
+//   mixins/_btn.scss          — btn, btn-sm, btn-lg, btn-colors, close-button
 //   mixins/_modal.scss        — modal-sm, modal-md, modal-lg, modal-xl
 //   mixins/_pill.scss         — pill-outline
 //   mixins/_breadcrumbs.scss  — breadcrumbs
 //   mixins/_loader.scss       — loader
+//   mixins/_tabs.scss         — tabs-nav, tabs-tab, tabs-tab-active,
+//                               tabs-tab-disabled, tabs-panel
 //   mixins/_table.scss        — table-base, table-responsive, table-striped,
 //                               table-section-header, table-action
 //   mixins/_avatar.scss       — avatar

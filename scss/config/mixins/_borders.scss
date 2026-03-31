@@ -5,6 +5,9 @@
 @mixin border-b  { border-bottom: var(--border-width) solid hsl(var(--color-border)); }
 @mixin border-l  { border-left: var(--border-width) solid hsl(var(--color-border)); }
 @mixin border-r  { border-right: var(--border-width) solid hsl(var(--color-border)); }
+@mixin border-light   { border: var(--border-width) solid hsl(var(--color-border-light)); }
+@mixin border-t-light { border-top: var(--border-width) solid hsl(var(--color-border-light)); }
+@mixin border-b-light { border-bottom: var(--border-width) solid hsl(var(--color-border-light)); }
 @mixin border-none { border: none; }
 
 @mixin rounded-sm   { border-radius: var(--radius-sm); }

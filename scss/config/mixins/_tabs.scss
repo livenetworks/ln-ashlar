@@ -28,7 +28,8 @@
 
 	&:hover {
 		color: hsl(var(--color-primary));
-		background: none;
+		background-color: hsl(var(--color-primary) / 0.05);
+		border-bottom-color: hsl(var(--color-primary) / 0.3);
 	}
 
 	&:focus,
@@ -42,6 +43,18 @@
 	color: hsl(var(--color-primary));
 	border-bottom-color: hsl(var(--color-primary));
 	background: none;
+}
+
+@mixin tabs-tab-disabled {
+	@include text-muted;
+	@include cursor-not-allowed;
+	@include opacity-50;
+
+	&:hover {
+		color: hsl(var(--color-text-muted));
+		background: none;
+		border-bottom-color: transparent;
+	}
 }
 
 @mixin tabs-panel {

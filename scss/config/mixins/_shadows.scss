@@ -1,6 +1,7 @@
 // Shadows — references --shadow-* tokens
 
 @mixin shadow-none { box-shadow: var(--shadow-none); }
+@mixin shadow-xs   { box-shadow: var(--shadow-xs); }
 @mixin shadow-sm   { box-shadow: var(--shadow-sm); }
 @mixin shadow-md   { box-shadow: var(--shadow-md); }
 @mixin shadow-lg   { box-shadow: var(--shadow-lg); }

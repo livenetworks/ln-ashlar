@@ -42,8 +42,8 @@
 	@include flex;
 	@include bg-primary;
 	@include border;
-	@include rounded-sm;
-	@include shadow-md;
+	@include rounded-md;
+	@include shadow-lg;
 	min-width: 320px;
 	max-width: 450px;
 	@include overflow-hidden;
@@ -51,7 +51,7 @@
 
 /* Icon Sidebar */
 .ln-toast__side {
-	flex: 0 0 60px;
+	flex: 0 0 44px;
 	@include flex;
 	align-items: flex-start;
 	@include justify-center;

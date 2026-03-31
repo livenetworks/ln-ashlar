@@ -6,7 +6,6 @@ h3,
 h4,
 h5,
 h6 {
-	@include font-bold;
 	@include text-primary;
 	line-height: 1.25;
 }
@@ -14,21 +13,27 @@ h6 {
 h1 {
 	font-size: 2.25rem;
 	line-height: 2.5rem;
+	@include font-bold;
+	letter-spacing: -0.025em;
 	@include mb(1.5rem);
 }
 
 h2 {
 	@include text-2xl;
+	@include font-bold;
+	letter-spacing: -0.025em;
 	@include mb(1rem);
 }
 
 h3 {
 	@include text-xl;
+	@include font-semibold;
 	@include mb(0.75rem);
 }
 
 h4 {
 	@include text-lg;
+	@include font-semibold;
 	@include mb(0.5rem);
 }
 
@@ -85,6 +90,7 @@ pre {
 	background-color: hsl(var(--color-bg-body));
 	@include p(1rem);
 	@include rounded-md;
+	@include border;
 	@include overflow-x-auto;
 	@include mb(1rem);
 
@@ -95,9 +101,10 @@ pre {
 }
 
 blockquote {
-	border-left: 4px solid hsl(var(--color-primary));
-	@include pl(1rem);
-	@include py(0.5rem);
+	border-left: 3px solid hsl(var(--color-primary));
+	background-color: hsl(var(--color-bg-secondary));
+	@include p(1rem);
+	@include rounded-sm;
 	@include mb(1rem);
 	@include text-secondary;
 	font-style: italic;

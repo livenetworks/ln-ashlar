@@ -5,10 +5,34 @@
 // as project-level styles. Real projects should use semantic selectors
 // instead of these classes.
 
-// Status indicators
-.pass { @include text-success; @include font-semibold; }
-.fail { @include text-error; @include font-semibold; }
-.warn { @include text-warning; @include font-semibold; }
+// Status badges — pill style (Tabler-inspired)
+.pass,
+.fail,
+.warn {
+	@include inline-flex;
+	@include items-center;
+	@include px(0.5rem);
+	@include py(0.125rem);
+	@include rounded-full;
+	@include text-xs;
+	@include font-medium;
+	white-space: nowrap;
+}
+
+.pass {
+	background-color: hsl(var(--color-success) / 0.1);
+	color: hsl(var(--color-success));
+}
+
+.fail {
+	background-color: hsl(var(--color-error) / 0.1);
+	color: hsl(var(--color-error));
+}
+
+.warn {
+	background-color: hsl(var(--color-warning) / 0.1);
+	color: hsl(var(--color-warning));
+}
 
 // Cell modifiers
 .numeric { @include text-right; @include font-mono; }
@@ -29,13 +53,20 @@ td .action {
 
 	&.danger {
 		@include text-error;
-		&:hover { background-color: hsl(var(--color-bg-error)); }
+		&:hover { background-color: hsl(var(--color-error) / 0.1); }
 	}
 
 	&.primary {
 		color: hsl(var(--color-primary));
-		&:hover { background-color: hsl(var(--color-primary-light)); }
+		&:hover { background-color: hsl(var(--color-primary) / 0.1); }
 	}
+}
+
+// Inline row actions group
+td .actions {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.125rem);
 }
 
 // Loader

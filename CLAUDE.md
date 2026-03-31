@@ -27,7 +27,7 @@ scss/
 │   │   ├── _form.scss       ← form-input, form-select, form-checkbox, pill, ...
 │   │   ├── _btn.scss        ← btn, btn-colors, close-button
 │   │   ├── _table.scss      ← table-base, table-responsive, table-striped, ...
-│   │   ├── _card.scss       ← card, panel-header, section, section-card
+│   │   ├── _card.scss       ← card, card-accent-*, card-bg, card-stacked, panel-header, section-card
 │   │   ├── _modal.scss      ← modal-sm, modal-md, modal-lg, modal-xl
 │   │   ├── _nav.scss        ← nav (general navigation reset)
 │   │   ├── _tabs.scss       ← tabs-nav, tabs-tab, tabs-tab-active, tabs-panel
@@ -91,7 +91,7 @@ git submodule add .../ln-acme.git resources/ln-acme
 Every `<button>` gets hover/active/focus/disabled effects **out of the box** from `scss/base/_global.scss` via `@include btn-colors`.
 All states read from `--color-primary`. No classes needed.
 
-- **`@include btn-colors`** — color states (default 0.15, hover 0.7, active 1.0). Applied globally to all `<button>` elements
+- **`@include btn-colors`** — color states (default 0.1, hover solid+shadow+lift, active darker). Applied globally to all `<button>` elements. Focus ring on `focus-visible` only (keyboard)
 - **`@include btn`** — structure only (inline-flex, padding, font). Use when you need a styled button
 - **Color change** — override `--color-primary` on the element or parent:
   ```scss

@@ -1,8 +1,8 @@
 @use '../config/mixins' as *;
 
-.btn {
-	@include btn;
-}
+.btn    { @include btn; }
+.btn-sm { @include btn-sm; }
+.btn-lg { @include btn-lg; }
 
 .btn-group {
 	@include btn-group;

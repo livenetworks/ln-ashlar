@@ -6,6 +6,7 @@
 @use 'borders' as *;
 @use 'transitions' as *;
 @use 'interaction' as *;
+@use 'position' as *;
 
 // ─── Nav ────────────────────────────────────────────────────────
 // Navigation reset: clean list, styled links, transitions.
@@ -42,9 +43,21 @@
 		}
 
 		&.active {
-			background-color: hsl(var(--color-primary-light));
+			background-color: hsl(var(--color-primary-lighter));
 			color: hsl(var(--color-primary));
 			@include font-semibold;
+			@include relative;
+
+			&::before {
+				content: '';
+				@include absolute;
+				left: 0;
+				top: 0.25rem;
+				bottom: 0.25rem;
+				width: 3px;
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+				background-color: hsl(var(--color-primary));
+			}
 		}
 	}
 
@@ -62,10 +75,10 @@
 		@include px(1rem);
 		@include py(0.5rem);
 		@include text-xs;
-		@include font-semibold;
+		@include font-medium;
 		@include text-muted;
-		@include uppercase;
-		@include tracking-wider;
+		@include normal-case;
+		letter-spacing: normal;
 		@include mt(1rem);
 	}
 

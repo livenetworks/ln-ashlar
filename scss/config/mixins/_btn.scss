@@ -11,20 +11,24 @@
 // Buttons — btn-colors (states), btn (structure), close-button
 
 @mixin btn-colors {
-	background-color: hsl(var(--color-primary) / 0.15);
+	background-color: hsl(var(--color-primary) / 0.1);
 	color: hsl(var(--color-primary));
 
 	&:hover:not(:disabled) {
-		background-color: hsl(var(--color-primary) / 0.7);
+		background-color: hsl(var(--color-primary));
 		color: hsl(var(--color-white));
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px hsl(var(--color-primary) / 0.3);
 	}
 
 	&:active:not(:disabled) {
-		background-color: hsl(var(--color-primary));
+		background-color: hsl(var(--color-primary-hover));
 		color: hsl(var(--color-white));
+		transform: translateY(0);
+		box-shadow: none;
 	}
 
-	&:focus { @include focus-ring; }
+	&:focus-visible { @include focus-ring; }
 	&:disabled { @include opacity-50; @include cursor-not-allowed; }
 }
 
@@ -38,6 +42,20 @@
 	@include text-sm;
 	@include font-medium;
 	white-space: nowrap;
+}
+
+@mixin btn-sm {
+	@include px(0.75rem);
+	@include py(0.25rem);
+	@include text-xs;
+	@include gap(0.25rem);
+}
+
+@mixin btn-lg {
+	@include px(1.5rem);
+	@include py(0.75rem);
+	@include text-base;
+	@include gap(0.75rem);
 }
 
 @mixin btn-group {

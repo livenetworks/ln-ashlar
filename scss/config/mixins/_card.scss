@@ -12,13 +12,17 @@
 
 @mixin card {
 	@include bg-primary;
-	@include border;
+	@include border-light;
 	@include w-full;
 	@include flex-col;
 	@include shadow-sm;
 	@include rounded-md;
 	@include overflow-hidden;
 	@include transition;
+
+	&:hover {
+		box-shadow: var(--shadow-md);
+	}
 }
 
 @mixin panel-header {
@@ -26,13 +30,11 @@
 	@include items-center;
 	@include justify-between;
 	@include px(1rem);
-	@include py(0.5rem);
-	min-height: 3.25rem;
-	@include bg-secondary;
-	@include border-b;
+	@include py(0.75rem);
+	@include border-b-light;
 
 	h3 {
-		@include text-lg;
+		@include text-base;
 		@include font-semibold;
 		@include text-primary;
 		margin: 0;
@@ -68,9 +70,55 @@
 	}
 }
 
+// ─── Card accents (Tabler-inspired colored lines) ──────
+// Color reads from --color-primary, override per element
+// Usage: #my-card { @include card; @include card-accent-top; }
+
+@mixin card-accent-top {
+	border-top: 3px solid hsl(var(--color-primary));
+}
+
+@mixin card-accent-bottom {
+	border-bottom: 3px solid hsl(var(--color-primary));
+}
+
+@mixin card-accent-left {
+	border-left: 3px solid hsl(var(--color-primary));
+}
+
+// ─── Card tinted background ────────────────────────────
+// Soft colored bg — for hero cards, alerts, highlights
+// Usage: #welcome { @include card; @include card-bg; }
+
+@mixin card-bg {
+	background-color: hsl(var(--color-primary) / 0.06);
+	border-color: hsl(var(--color-primary) / 0.15);
+}
+
+// ─── Card stacked (visual depth illusion) ──────────────
+// Adds pseudo-element "cards behind" the main card
+
+@mixin card-stacked {
+	@include relative;
+
+	&::after {
+		content: '';
+		@include absolute;
+		bottom: -5px;
+		left: 6px;
+		right: 6px;
+		height: 10px;
+		@include bg-primary;
+		@include rounded-md;
+		@include shadow-xs;
+		border: var(--border-width) solid hsl(var(--color-border-light));
+		z-index: -1;
+	}
+}
+
 @mixin section-card {
 	@include bg-primary;
-	@include border;
+	@include border-light;
 	@include rounded-lg;
 	@include shadow-sm;
 	@include overflow-hidden;
@@ -86,9 +134,8 @@
 
 	footer {
 		@include px(1rem);
-		@include py(0.625rem);
-		@include border-t;
-		@include bg-secondary;
+		@include py(0.75rem);
+		@include border-t-light;
 		@include flex;
 		@include justify-end;
 		@include gap(0.75rem);

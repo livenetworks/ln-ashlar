@@ -441,12 +441,14 @@ table {
 							</thead>
 							<tbody>
 								<tr><td><code>@include border</code></td><td><code>border: 1px solid hsl(var(--color-border))</code></td></tr>
+								<tr><td><code>@include border-light</code></td><td><code>border: 1px solid hsl(var(--color-border-light))</code> — softer</td></tr>
 								<tr><td><code>@include border-t</code>, <code>border-b</code>, <code>border-l</code>, <code>border-r</code></td><td>Individual border sides</td></tr>
+								<tr><td><code>@include border-t-light</code>, <code>border-b-light</code></td><td>Light individual sides</td></tr>
 								<tr><td><code>@include border-none</code></td><td><code>border: none</code></td></tr>
-								<tr><td><code>@include rounded-sm</code></td><td><code>border-radius: var(--radius-sm)</code> — 4px</td></tr>
-								<tr><td><code>@include rounded-md</code></td><td><code>border-radius: var(--radius-md)</code> — 8px</td></tr>
-								<tr><td><code>@include rounded-lg</code></td><td><code>border-radius: var(--radius-lg)</code> — 12px</td></tr>
-								<tr><td><code>@include rounded-xl</code></td><td><code>border-radius: var(--radius-xl)</code> — 16px</td></tr>
+								<tr><td><code>@include rounded-sm</code></td><td><code>border-radius: var(--radius-sm)</code> — 2px</td></tr>
+								<tr><td><code>@include rounded-md</code></td><td><code>border-radius: var(--radius-md)</code> — 6px</td></tr>
+								<tr><td><code>@include rounded-lg</code></td><td><code>border-radius: var(--radius-lg)</code> — 8px</td></tr>
+								<tr><td><code>@include rounded-xl</code></td><td><code>border-radius: var(--radius-xl)</code> — 12px</td></tr>
 								<tr><td><code>@include rounded-full</code></td><td><code>border-radius: 9999px</code></td></tr>
 							</tbody>
 						</table>
@@ -465,7 +467,8 @@ table {
 							</thead>
 							<tbody>
 								<tr><td><code>@include shadow-none</code></td><td>No shadow</td></tr>
-								<tr><td><code>@include shadow-sm</code></td><td>Subtle shadow</td></tr>
+								<tr><td><code>@include shadow-xs</code></td><td>Very subtle depth (<code>0 1px 2px</code>)</td></tr>
+								<tr><td><code>@include shadow-sm</code></td><td>Subtle multi-layer shadow</td></tr>
 								<tr><td><code>@include shadow-md</code></td><td>Medium shadow</td></tr>
 								<tr><td><code>@include shadow-lg</code></td><td>Large shadow</td></tr>
 								<tr><td><code>@include shadow-xl</code></td><td>Extra large shadow</td></tr>
@@ -487,6 +490,7 @@ table {
 							<tbody>
 								<tr><td><code>@include transition</code></td><td><code>transition: all var(--transition-base)</code></td></tr>
 								<tr><td><code>@include transition-fast</code></td><td><code>transition: all var(--transition-fast)</code></td></tr>
+								<tr><td><code>@include transition-slow</code></td><td><code>transition: all var(--transition-slow)</code> (0.3s)</td></tr>
 								<tr><td><code>@include transition-colors</code></td><td>Transitions only <code>color</code>, <code>background-color</code>, <code>border-color</code></td></tr>
 							</tbody>
 						</table>
@@ -660,23 +664,25 @@ table {
 								<tr><th>Mixin</th><th>Description</th></tr>
 							</thead>
 							<tbody>
-								<tr><td><code>@include card</code></td><td>White background, border, shadow, rounded, overflow hidden</td></tr>
-								<tr><td><code>@include panel-header</code></td><td>Flex header bar with secondary bg and bottom border. Styles nested <code>h3</code></td></tr>
+								<tr><td><code>@include card</code></td><td>White bg, light border, shadow-sm, rounded, hover shadow-md</td></tr>
+								<tr><td><code>@include card-accent-top</code></td><td>3px colored <code>border-top</code> (reads <code>--color-primary</code>)</td></tr>
+								<tr><td><code>@include card-accent-bottom</code></td><td>3px colored <code>border-bottom</code></td></tr>
+								<tr><td><code>@include card-accent-left</code></td><td>3px colored <code>border-left</code> (side status)</td></tr>
+								<tr><td><code>@include card-bg</code></td><td>Soft tinted background from <code>--color-primary</code></td></tr>
+								<tr><td><code>@include card-stacked</code></td><td>Pseudo-element "stacked cards" depth illusion</td></tr>
+								<tr><td><code>@include panel-header</code></td><td>Flex header bar with border-bottom. Styles nested <code>h3</code></td></tr>
 								<tr><td><code>@include section</code></td><td>Margin-bottom + <code>header</code> with border-bottom, styles <code>h2</code> and <code>.section-actions</code></td></tr>
-								<tr><td><code>@include section-card</code></td><td>Complete card with <code>header</code> (panel-header), <code>main</code> (padding), <code>footer</code> (border-top, bg, flex-end)</td></tr>
+								<tr><td><code>@include section-card</code></td><td>Complete card with <code>header</code> (panel-header), <code>main</code> (padding), <code>footer</code> (border-top)</td></tr>
 							</tbody>
 						</table>
-						<pre><code>// Semantic usage — no .card class in HTML
-#user-profile {
-  @include section-card;
-}
+						<pre><code>// Semantic usage
+#user-profile { @include section-card; }
 
-// In HTML:
-// &lt;section id="user-profile"&gt;
-//   &lt;header&gt;&lt;h3&gt;Profile&lt;/h3&gt;&lt;/header&gt;
-//   &lt;main&gt;...&lt;/main&gt;
-//   &lt;footer&gt;...&lt;/footer&gt;
-// &lt;/section&gt;</code></pre>
+// Card variants — color via --color-primary override
+#alerts  { @include card; @include card-accent-top; --color-primary: var(--color-error); }
+#status  { @include card; @include card-accent-left; --color-primary: var(--color-success); }
+#welcome { @include card; @include card-bg; }
+#archive { @include card; @include card-stacked; }</code></pre>
 					</main>
 				</section>
 
@@ -693,9 +699,11 @@ table {
 								<tr><th>Mixin</th><th>Description</th></tr>
 							</thead>
 							<tbody>
-								<tr><td><code>@include btn</code></td><td>Button structure: inline-flex, padding, font-size, font-weight. Colors come from global styles</td></tr>
-								<tr><td><code>@include btn-colors</code></td><td>Only the color states (reads <code>--color-primary</code>). Already applied globally to all <code>&lt;button&gt;</code></td></tr>
-								<tr><td><code>@include btn-group</code></td><td>Action button group: inline-flex, centered, small gap. For toolbars and table actions</td></tr>
+								<tr><td><code>@include btn</code></td><td>Button structure: inline-flex, padding, font-size, font-weight</td></tr>
+								<tr><td><code>@include btn-sm</code></td><td>Small button: less padding, <code>text-xs</code></td></tr>
+								<tr><td><code>@include btn-lg</code></td><td>Large button: more padding, <code>text-base</code></td></tr>
+								<tr><td><code>@include btn-colors</code></td><td>Color states (reads <code>--color-primary</code>). Applied globally to all <code>&lt;button&gt;</code></td></tr>
+								<tr><td><code>@include btn-group</code></td><td>Action button group: inline-flex, centered, small gap</td></tr>
 								<tr><td><code>@include close-button</code></td><td>Transparent close button with hover-red effect</td></tr>
 							</tbody>
 						</table>
@@ -706,10 +714,10 @@ table {
 								<tr><th>State</th><th>Background</th><th>Text</th></tr>
 							</thead>
 							<tbody>
-								<tr><td>Default</td><td><code>hsl(var(--color-primary) / 0.15)</code></td><td><code>hsl(var(--color-primary))</code></td></tr>
-								<tr><td>Hover</td><td><code>hsl(var(--color-primary) / 0.7)</code></td><td><code>hsl(var(--color-white))</code></td></tr>
-								<tr><td>Active</td><td><code>hsl(var(--color-primary) / 1)</code></td><td><code>hsl(var(--color-white))</code></td></tr>
-								<tr><td>Focus</td><td><code>box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.2)</code></td><td>unchanged</td></tr>
+								<tr><td>Default</td><td><code>hsl(var(--color-primary) / 0.1)</code></td><td><code>hsl(var(--color-primary))</code></td></tr>
+								<tr><td>Hover</td><td><code>hsl(var(--color-primary))</code> + shadow + lift</td><td><code>hsl(var(--color-white))</code></td></tr>
+								<tr><td>Active</td><td><code>hsl(var(--color-primary-hover))</code></td><td><code>hsl(var(--color-white))</code></td></tr>
+								<tr><td>Focus-visible</td><td><code>focus-ring</code> (keyboard only)</td><td>unchanged</td></tr>
 								<tr><td>Disabled</td><td>50% opacity</td><td>cursor: not-allowed</td></tr>
 							</tbody>
 						</table>

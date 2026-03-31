@@ -96,7 +96,7 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Cards</h1>
-					<p>Card with hover effect — primary accent line on top, shadow and border change.</p>
+					<p>Card variants with colored accents, tinted backgrounds, stat layouts, and stacked effects.</p>
 
 					<!-- Basic card -->
 					<section class="section-card">
@@ -105,19 +105,193 @@
 							<section id="demo-basic-cards">
 								<article>
 									<h3>Card Title</h3>
-									<p>Description of the content. Hover for effect.</p>
+									<p>Default card with hover shadow effect.</p>
 								</article>
 								<article>
 									<h3>Another Card</h3>
-									<p>Each .card has a ::before pseudo for the top line.</p>
+									<p>Uses <code>@include card</code> mixin.</p>
 								</article>
 							</section>
 						</main>
 					</section>
 
-					<!-- Card with fields -->
+					<!-- Accent Top -->
 					<section class="section-card">
-						<header><h3>Card with Fields (.field)</h3></header>
+						<header><h3>Accent Top — <code>card-accent-top</code></h3></header>
+						<main>
+							<section id="demo-accent-top">
+								<article>
+									<h4>Primary</h4>
+									<p>Default primary color</p>
+								</article>
+								<article class="accent-success">
+									<h4>Success</h4>
+									<p>--color-primary: success</p>
+								</article>
+								<article class="accent-error">
+									<h4>Error</h4>
+									<p>--color-primary: error</p>
+								</article>
+								<article class="accent-warning">
+									<h4>Warning</h4>
+									<p>--color-primary: warning</p>
+								</article>
+							</section>
+						</main>
+					</section>
+
+					<!-- Accent Left -->
+					<section class="section-card">
+						<header><h3>Accent Left — <code>card-accent-left</code></h3></header>
+						<main>
+							<section id="demo-accent-left">
+								<article>
+									<h4>Primary</h4>
+									<p>Side status indicator</p>
+								</article>
+								<article class="accent-success">
+									<h4>Active</h4>
+									<p>User is online</p>
+								</article>
+								<article class="accent-error">
+									<h4>Critical</h4>
+									<p>3 errors found</p>
+								</article>
+								<article class="accent-info">
+									<h4>Info</h4>
+									<p>New update available</p>
+								</article>
+							</section>
+						</main>
+					</section>
+
+					<!-- Accent Bottom -->
+					<section class="section-card">
+						<header><h3>Accent Bottom — <code>card-accent-bottom</code></h3></header>
+						<main>
+							<section id="demo-accent-bottom">
+								<article>
+									<h4>Primary</h4>
+									<p>Bottom accent line</p>
+								</article>
+								<article class="accent-success">
+									<h4>Success</h4>
+									<p>Completed task</p>
+								</article>
+								<article class="accent-warning">
+									<h4>Warning</h4>
+									<p>Pending review</p>
+								</article>
+								<article class="accent-error">
+									<h4>Error</h4>
+									<p>Action required</p>
+								</article>
+							</section>
+						</main>
+					</section>
+
+					<!-- Tinted Background -->
+					<section class="section-card">
+						<header><h3>Tinted Background — <code>card-bg</code></h3></header>
+						<main>
+							<section id="demo-tinted">
+								<article>
+									<h4>Primary</h4>
+									<p>Soft primary tint</p>
+								</article>
+								<article class="tint-success">
+									<h4>Success</h4>
+									<p>All systems operational</p>
+								</article>
+								<article class="tint-error">
+									<h4>Error</h4>
+									<p>Service disruption</p>
+								</article>
+								<article class="tint-warning">
+									<h4>Warning</h4>
+									<p>High memory usage</p>
+								</article>
+							</section>
+						</main>
+					</section>
+
+					<!-- Stat Cards -->
+					<section class="section-card">
+						<header><h3>Stat Cards</h3></header>
+						<main>
+							<section id="demo-stat-cards">
+								<article>
+									<span class="stat-value">1,234</span>
+									<span class="stat-label">Total Users</span>
+									<span class="stat-change text-success">+12%</span>
+								</article>
+								<article class="stat-success">
+									<span class="stat-value">892</span>
+									<span class="stat-label">Active</span>
+									<span class="stat-change text-success">+5%</span>
+								</article>
+								<article class="stat-warning">
+									<span class="stat-value">48</span>
+									<span class="stat-label">Pending</span>
+									<span class="stat-change text-warning">+2</span>
+								</article>
+								<article class="stat-error">
+									<span class="stat-value">3</span>
+									<span class="stat-label">Errors</span>
+									<span class="stat-change text-error">-1</span>
+								</article>
+							</section>
+						</main>
+					</section>
+
+					<!-- Stacked -->
+					<section class="section-card">
+						<header><h3>Stacked Card — <code>card-stacked</code></h3></header>
+						<main>
+							<section id="demo-stacked">
+								<article>
+									<h4>Stacked Card</h4>
+									<p>Visual depth illusion with pseudo-element behind the card.</p>
+								</article>
+								<article>
+									<h4>Another Stack</h4>
+									<p>Great for "group of items" indication.</p>
+								</article>
+							</section>
+						</main>
+					</section>
+
+					<!-- Full Card (header + body + footer) -->
+					<section class="section-card">
+						<header><h3>Full Card — Header + Body + Footer</h3></header>
+						<main>
+							<section id="demo-full-cards">
+								<article>
+									<header><h3>User Profile</h3></header>
+									<main>
+										<p>Card with header, body content, and action footer.</p>
+									</main>
+									<footer>
+										<button type="button">Cancel</button>
+										<button class="btn">Save</button>
+									</footer>
+								</article>
+								<article>
+									<header><h3>Settings</h3></header>
+									<main>
+										<p>Panel-header style with border-bottom, white background.</p>
+									</main>
+									<footer>
+										<button class="btn">Apply</button>
+									</footer>
+								</article>
+							</section>
+						</main>
+					</section>
+
+					<!-- Card with Fields -->
+					<section class="section-card">
+						<header><h3>Card with Fields</h3></header>
 						<main>
 							<div class="grid">
 								<div class="card">
@@ -149,26 +323,36 @@
 						</main>
 					</section>
 
-					<!-- HTML -->
+					<!-- SCSS Reference -->
 					<section class="section-card">
-						<header><h3>HTML</h3></header>
+						<header><h3>SCSS Usage</h3></header>
 						<main>
-							<pre><code>&lt;div class="card"&gt;
-    &lt;header&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;/header&gt;
-    &lt;main&gt;
-        &lt;div class="field"&gt;
-            &lt;span class="label"&gt;Label&lt;/span&gt;
-            &lt;span class="value"&gt;Value&lt;/span&gt;
-        &lt;/div&gt;
-    &lt;/main&gt;
-&lt;/div&gt;
+							<pre><code>// Base card
+#my-card { @include card; @include p(1rem); }
 
-&lt;!-- Card as Link --&gt;
-&lt;div class="card"&gt;
-    &lt;a href="/page"&gt;
-        &lt;main&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;/main&gt;
-    &lt;/a&gt;
-&lt;/div&gt;</code></pre>
+// Colored accent lines (reads --color-primary)
+#alerts  { @include card; @include card-accent-top; }
+#status  { @include card; @include card-accent-left; }
+#tasks   { @include card; @include card-accent-bottom; }
+
+// Override color per element
+#errors  { @include card; @include card-accent-top; --color-primary: var(--color-error); }
+#success { @include card; @include card-accent-left; --color-primary: var(--color-success); }
+
+// Tinted background
+#welcome { @include card; @include card-bg; }
+#warning { @include card; @include card-bg; --color-primary: var(--color-warning); }
+
+// Stacked effect
+#archive { @include card; @include card-stacked; }
+
+// Full card with header/body/footer
+article {
+    @include card;
+    header { @include panel-header; }
+    main   { @include p(1rem); }
+    footer { @include px(1rem); @include py(0.75rem); @include border-t-light; }
+}</code></pre>
 						</main>
 					</section>
 			</div>

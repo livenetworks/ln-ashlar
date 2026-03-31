@@ -1,5 +1,6 @@
 @use '../config/mixins' as *;
 
-.avatar {
-	@include avatar;
-}
+.avatar    { @include avatar; }
+.avatar-sm { @include avatar-sm; }
+.avatar-lg { @include avatar-lg; }
+.avatar-xl { @include avatar-xl; }

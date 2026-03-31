@@ -1,5 +1,6 @@
 @use '../../../../../scss/config/mixins' as *;
 
+// ─── Basic cards grid ──────────────────────────────────
 #demo-basic-cards {
 	@include grid-2;
 
@@ -8,5 +9,162 @@
 		@include p(1rem);
 
 		p { margin: 0; }
+	}
+}
+
+// ─── Accent top variants ───────────────────────────────
+#demo-accent-top {
+	@include grid-4;
+
+	article {
+		@include card;
+		@include card-accent-top;
+		@include p(1rem);
+
+		h4 { margin: 0; }
+		p { margin: 0; @include text-sm; @include text-secondary; }
+	}
+
+	.accent-success { --color-primary: var(--color-success); }
+	.accent-error   { --color-primary: var(--color-error); }
+	.accent-warning { --color-primary: var(--color-warning); }
+	.accent-info    { --color-primary: var(--color-info); }
+}
+
+// ─── Accent left / side status ─────────────────────────
+#demo-accent-left {
+	@include grid-4;
+
+	article {
+		@include card;
+		@include card-accent-left;
+		@include p(1rem);
+
+		h4 { margin: 0; }
+		p { margin: 0; @include text-sm; @include text-secondary; }
+	}
+
+	.accent-success { --color-primary: var(--color-success); }
+	.accent-error   { --color-primary: var(--color-error); }
+	.accent-warning { --color-primary: var(--color-warning); }
+	.accent-info    { --color-primary: var(--color-info); }
+}
+
+// ─── Accent bottom ─────────────────────────────────────
+#demo-accent-bottom {
+	@include grid-4;
+
+	article {
+		@include card;
+		@include card-accent-bottom;
+		@include p(1rem);
+
+		h4 { margin: 0; }
+		p { margin: 0; @include text-sm; @include text-secondary; }
+	}
+
+	.accent-success { --color-primary: var(--color-success); }
+	.accent-error   { --color-primary: var(--color-error); }
+	.accent-warning { --color-primary: var(--color-warning); }
+	.accent-info    { --color-primary: var(--color-info); }
+}
+
+// ─── Tinted background cards ───────────────────────────
+#demo-tinted {
+	@include grid-4;
+
+	article {
+		@include card;
+		@include card-bg;
+		@include p(1rem);
+
+		h4 { margin: 0; color: hsl(var(--color-primary)); }
+		p { margin: 0; @include text-sm; @include text-secondary; }
+	}
+
+	.tint-success { --color-primary: var(--color-success); }
+	.tint-error   { --color-primary: var(--color-error); }
+	.tint-warning { --color-primary: var(--color-warning); }
+	.tint-info    { --color-primary: var(--color-info); }
+}
+
+// ─── Stacked card ──────────────────────────────────────
+#demo-stacked {
+	@include grid-2;
+
+	article {
+		@include card;
+		@include card-stacked;
+		@include p(1rem);
+		@include mb(1rem);
+
+		h4 { margin: 0; }
+		p { margin: 0; @include text-sm; @include text-secondary; }
+	}
+}
+
+// ─── Stat cards (number + label) ───────────────────────
+#demo-stat-cards {
+	@include grid-4;
+
+	article {
+		@include card;
+		@include card-accent-top;
+		@include p(1rem);
+		text-align: center;
+
+		.stat-value {
+			@include text-2xl;
+			@include font-bold;
+			@include text-primary;
+			line-height: 1.2;
+		}
+
+		.stat-label {
+			@include text-xs;
+			@include font-medium;
+			@include text-muted;
+			@include uppercase;
+			@include tracking-wider;
+			@include mt(0.25rem);
+		}
+
+		.stat-change {
+			@include text-sm;
+			@include mt(0.5rem);
+		}
+	}
+
+	.stat-success { --color-primary: var(--color-success); }
+	.stat-error   { --color-primary: var(--color-error); }
+	.stat-warning { --color-primary: var(--color-warning); }
+	.stat-info    { --color-primary: var(--color-info); }
+}
+
+// ─── Card with header + body + footer ──────────────────
+#demo-full-cards {
+	@include grid-2;
+
+	article {
+		@include card;
+
+		header {
+			@include panel-header;
+		}
+
+		main {
+			@include p(1rem);
+
+			p { margin: 0; @include text-sm; @include text-secondary; }
+		}
+
+		footer {
+			@include px(1rem);
+			@include py(0.75rem);
+			@include border-t-light;
+			@include flex;
+			@include justify-end;
+			@include gap(0.5rem);
+		}
 	}
 }

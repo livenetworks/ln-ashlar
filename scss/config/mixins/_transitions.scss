@@ -2,6 +2,7 @@
 
 @mixin transition      { transition: all var(--transition-base); }
 @mixin transition-fast { transition: all var(--transition-fast); }
+@mixin transition-slow { transition: all var(--transition-slow); }
 @mixin transition-colors {
 	transition: color var(--transition-base),
 	            background-color var(--transition-base),

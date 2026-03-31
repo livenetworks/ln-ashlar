@@ -4,12 +4,34 @@
 @use 'typography' as *;
 @use 'colors' as *;
 @use 'borders' as *;
+@use 'shadows' as *;
 @use 'transitions' as *;
 @use 'interaction' as *;
 @use 'focus' as *;
 
-// Avatar — profile button/link with image + name/role text
+// Avatar — profile image or initials, with optional name/role text
+//
+// Standalone:  <span class="avatar"><img src="..." alt=""></span>
+// Initials:    <abbr class="avatar">SO</abbr>
+// With text:   <button class="avatar"><img ...><span>Name<small>Role</small></span></button>
+// Sizes:       avatar-sm (2rem), avatar (2.5rem), avatar-lg (3rem), avatar-xl (5rem)
+// Ring:        double box-shadow (bg + border) — Tabler-inspired
 
+// ─── Shared ring ───────────────────────────────────────
+@mixin _avatar-ring {
+	box-shadow: 0 0 0 2px hsl(var(--color-bg-primary)),
+	            0 0 0 3px hsl(var(--color-border));
+}
+
+// ─── Shared image / initials base ──────────────────────
+@mixin _avatar-media {
+	@include size(2.5rem);
+	@include rounded-md;
+	@include flex-shrink-0;
+	@include _avatar-ring;
+}
+
+// ─── Base ──────────────────────────────────────────────
 @mixin avatar {
 	@include inline-flex;
 	@include items-center;
@@ -33,19 +55,31 @@
 		@include focus-ring;
 	}
 
+	// Photo
 	img {
-		@include size(2.5rem);
-		@include rounded-md;
-		@include flex-shrink-0;
+		@include _avatar-media;
 		object-fit: cover;
 	}
 
+	// Initials fallback — <abbr class="avatar">SO</abbr>
+	&:not(:has(img)):not(:has(span)) {
+		@include _avatar-media;
+		@include flex-center;
+		@include text-sm;
+		@include font-semibold;
+		background-color: hsl(var(--color-primary) / 0.15);
+		color: hsl(var(--color-primary));
+		padding: 0;
+	}
+
+	// Name + role
 	span {
 		@include flex-col;
 		@include text-sm;
 		@include font-medium;
 		@include text-primary;
 		@include text-left;
+		line-height: 1.3;
 
 		small {
 			@include text-xs;
@@ -53,4 +87,20 @@
 			@include text-muted;
 		}
 	}
+}
+
+// ─── Sizes ─────────────────────────────────────────────
+@mixin avatar-sm {
+	img { @include size(2rem); }
+	&:not(:has(img)):not(:has(span)) { @include size(2rem); @include text-xs; }
+}
+
+@mixin avatar-lg {
+	img { @include size(3rem); }
+	&:not(:has(img)):not(:has(span)) { @include size(3rem); @include text-base; }
+}
+
+@mixin avatar-xl {
+	img { @include size(5rem); }
+	&:not(:has(img)):not(:has(span)) { @include size(5rem); @include text-xl; }
 }

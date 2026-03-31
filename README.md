@@ -86,7 +86,7 @@ scss/
 │   │   ├── _interaction.scss ← cursor-*, z-*
 │   │   ├── _layout.scss      ← grid, form-grid, stack, container
 │   │   ├── _collapsible.scss ← collapsible, collapsible-content
-│   │   ├── _card.scss        ← card, panel-header, section, section-card
+│   │   ├── _card.scss        ← card, card-accent-*, card-bg, card-stacked, panel-header, section, section-card
 │   │   ├── _nav.scss         ← nav
 │   │   ├── _btn.scss         ← btn, btn-colors, close-button
 │   │   ├── _avatar.scss      ← avatar
@@ -156,10 +156,10 @@ background-color: hsl(var(--color-primary) / 0.5);
 #### Border Radius
 | Token | Value |
 |-------|-------|
-| `--radius-sm` | `0.25rem` (4px) |
-| `--radius-md` | `0.5rem` (8px) |
-| `--radius-lg` | `0.75rem` (12px) |
-| `--radius-xl` | `1rem` (16px) |
+| `--radius-sm` | `0.125rem` (2px) |
+| `--radius-md` | `0.375rem` (6px) |
+| `--radius-lg` | `0.5rem` (8px) |
+| `--radius-xl` | `0.75rem` (12px) |
 | `--radius-full` | `9999px` |
 
 #### Typography
@@ -269,7 +269,9 @@ Import in any SCSS file:
 | Mixin | Output |
 |-------|--------|
 | `@include border` | `border: 1px solid hsl(var(--color-border))` |
+| `@include border-light` | `border: 1px solid hsl(var(--color-border-light))` — softer variant |
 | `@include border-t`, `border-b`, `border-l`, `border-r` | Individual sides |
+| `@include border-t-light`, `border-b-light` | Light individual sides |
 | `@include border-none` | `border: none` |
 | `@include rounded-sm` .. `rounded-full` | Border radius from tokens |
 
@@ -277,14 +279,16 @@ Import in any SCSS file:
 
 | Mixin | Output |
 |-------|--------|
-| `@include shadow-none` .. `shadow-xl` | Box shadow from tokens |
+| `@include shadow-xs` | Very subtle depth (`0 1px 2px`) |
+| `@include shadow-sm` .. `shadow-xl` | Multi-layer box shadows from tokens |
 
 ### Transitions
 
 | Mixin | Output |
 |-------|--------|
-| `@include transition` | `transition: all var(--transition-base)` |
-| `@include transition-fast` | `transition: all var(--transition-fast)` |
+| `@include transition` | `transition: all var(--transition-base)` (0.2s) |
+| `@include transition-fast` | `transition: all var(--transition-fast)` (0.15s) |
+| `@include transition-slow` | `transition: all var(--transition-slow)` (0.3s) |
 | `@include transition-colors` | Transitions only color, background-color, border-color |
 
 ### Position & Overflow
@@ -333,20 +337,21 @@ Import in any SCSS file:
 
 | Mixin | Description |
 |-------|-------------|
-| `@include card` | White bg, border, shadow, rounded, overflow hidden |
-| `@include panel-header` | Flex header bar with secondary bg, styles `h3` |
+| `@include card` | White bg, light border, shadow-sm, rounded, hover shadow-md |
+| `@include card-accent-top` | 3px colored `border-top` (reads `--color-primary`) |
+| `@include card-accent-bottom` | 3px colored `border-bottom` |
+| `@include card-accent-left` | 3px colored `border-left` (side status) |
+| `@include card-bg` | Soft tinted background from `--color-primary` |
+| `@include card-stacked` | Pseudo-element "stacked cards" depth illusion |
+| `@include panel-header` | Flex header bar with border-bottom, styles `h3` |
 | `@include section` | Margin-bottom + header with border-bottom, styles `h2` |
 | `@include section-card` | Complete card: `header` (panel-header), `main` (padding), `footer` (border-top) |
 
 ```scss
 #user-profile { @include section-card; }
-
-// HTML:
-// <section id="user-profile">
-//   <header><h3>Profile</h3></header>
-//   <main>...</main>
-//   <footer>...</footer>
-// </section>
+#alerts  { @include card; @include card-accent-top; --color-primary: var(--color-error); }
+#status  { @include card; @include card-accent-left; --color-primary: var(--color-success); }
+#welcome { @include card; @include card-bg; }
 ```
 
 ### Navigation
@@ -385,6 +390,8 @@ Every `<button>` gets hover/active/focus/disabled effects **automatically** from
 |-------|-------------|
 | `@include btn-colors` | Color states only. Already applied globally to all `<button>` |
 | `@include btn` | Structure: inline-flex, padding, font-size, font-weight |
+| `@include btn-sm` | Small button: less padding, `text-xs` |
+| `@include btn-lg` | Large button: more padding, `text-base` |
 | `@include btn-group` | Container for grouped buttons (flex, gap, shared border-radius) |
 | `@include close-button` | Transparent close button with red hover |
 
@@ -392,10 +399,10 @@ Every `<button>` gets hover/active/focus/disabled effects **automatically** from
 
 | State | Background | Text |
 |-------|-----------|------|
-| Default | `hsl(--color-primary / 0.15)` | `hsl(--color-primary)` |
-| Hover | `hsl(--color-primary / 0.7)` | `hsl(--color-white)` |
-| Active | `hsl(--color-primary / 1)` | `hsl(--color-white)` |
-| Focus | `@include focus-ring` (consistent with all interactive elements) | unchanged |
+| Default | `hsl(--color-primary / 0.1)` | `hsl(--color-primary)` |
+| Hover | `hsl(--color-primary)` + shadow + translateY(-1px) | `hsl(--color-white)` |
+| Active | `hsl(--color-primary-hover)` | `hsl(--color-white)` |
+| Focus-visible | `@include focus-ring` (keyboard only) | unchanged |
 | Disabled | 50% opacity | cursor: not-allowed |
 
 #### Changing button color
@@ -419,7 +426,7 @@ Override `--color-primary` on the element or any parent:
 
 | Mixin | Description |
 |-------|-------------|
-| `@include form-label` | Label styling (font-weight, spacing) |
+| `@include form-label` | Label styling (font-weight, spacing). Auto `*` on required via `:has([required])` |
 | `@include form-grid` | 6-column CSS grid with responsive fallback |
 | `@include form-actions` | Flex end-justified with border-top |
 | `@include form-input` | Text input styling (border, padding, focus ring) |
@@ -443,8 +450,9 @@ Override `--color-primary` on the element or any parent:
 | Mixin | Description |
 |-------|-------------|
 | `@include tabs-nav` | Tab navigation container (flex, border-bottom) |
-| `@include tabs-tab` | Tab button (full reset, padding, text, underline on hover) |
+| `@include tabs-tab` | Tab button (full reset, padding, text, hover tint + underline) |
 | `@include tabs-tab-active` | Active tab state (primary color, bottom border) |
+| `@include tabs-tab-disabled` | Disabled tab (muted, opacity-50, cursor-not-allowed) |
 | `@include tabs-panel` | Tab content panel (padding) |
 
 ### Focus

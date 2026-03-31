@@ -40,6 +40,10 @@ input[type="button"] {
 	border: none;
 	outline: none;
 	@include btn-colors;
+
+	&:focus-visible {
+		@include focus-ring;
+	}
 }
 
 img {
@@ -49,6 +53,6 @@ img {
 }
 
 ::selection {
-	background-color: hsl(var(--color-primary-light));
+	background-color: hsl(var(--color-primary) / 0.2);
 	color: hsl(var(--color-text-primary));
 }
