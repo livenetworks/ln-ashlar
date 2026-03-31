@@ -62,10 +62,19 @@
 
 				if (value === '') {
 					self.reset();
+					// Also dispatch changed with empty value so consumers clear this specific key
+					var detail = { key: key, value: '' };
+					_dispatch(self.dom, 'ln-filter:changed', detail);
+					var t = document.getElementById(self.targetId);
+					if (t && t !== self.dom) _dispatch(t, 'ln-filter:changed', detail);
 				} else {
 					self._setActive(btn);
 					self._applyFilter(key, value);
-					_dispatch(self.dom, 'ln-filter:changed', { key: key, value: value });
+					var detail = { key: key, value: value };
+					_dispatch(self.dom, 'ln-filter:changed', detail);
+					// Also dispatch on target — dropdown teleport moves dom out of target tree
+					var t = document.getElementById(self.targetId);
+					if (t && t !== self.dom) _dispatch(t, 'ln-filter:changed', detail);
 				}
 			});
 		});

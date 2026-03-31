@@ -130,45 +130,12 @@
 									</aside>
 								</header>
 
-								<!-- Quick filters -->
-								<nav class="ln-table__filters" id="demo-filters">
-									<fieldset id="filter-status">
-										<legend>Status</legend>
-										<ul>
-											<li><button data-filter-col="status" data-filter-val="" data-active>All</button></li>
-											<li><button data-filter-col="status" data-filter-val="Active">Active</button></li>
-											<li><button data-filter-col="status" data-filter-val="Inactive">Inactive</button></li>
-											<li><button data-filter-col="status" data-filter-val="On Leave">On Leave</button></li>
-											<li><button data-filter-col="status" data-filter-val="Suspended">Suspended</button></li>
-										</ul>
-									</fieldset>
-									<fieldset id="filter-dept">
-										<legend>Department</legend>
-										<ul>
-											<li><button data-filter-col="dept" data-filter-val="" data-active>All</button></li>
-											<li><button data-filter-col="dept" data-filter-val="IT">IT</button></li>
-											<li><button data-filter-col="dept" data-filter-val="Finance">Finance</button></li>
-											<li><button data-filter-col="dept" data-filter-val="Legal">Legal</button></li>
-											<li><button data-filter-col="dept" data-filter-val="Marketing">Marketing</button></li>
-											<li><button data-filter-col="dept" data-filter-val="HR">HR</button></li>
-											<li><button data-filter-col="dept" data-filter-val="Sales">Sales</button></li>
-										</ul>
-									</fieldset>
-								</nav>
-
-								<!-- Active filter chips -->
-								<div class="ln-table__chips" id="demo-chips" hidden>
-									<span id="demo-chip-list"></span>
-									<button type="button" class="ln-table__clear-all" id="demo-clear-all">Clear all</button>
-								</div>
-
 								<template data-ln-table-empty>
 									<article class="ln-table__empty-state">
 										<span class="ln-icon-search ln-icon--xl"></span>
 										<h3>No results</h3>
 										<p>Try different search terms or clear filters.</p>
 										<button class="btn" data-ln-table-clear>Clear search</button>
-										<button class="btn btn--secondary" id="demo-clear-filters-empty">Clear filters</button>
 									</article>
 								</template>
 
@@ -177,11 +144,35 @@
 										<tr>
 											<th data-ln-sort="number">#</th>
 											<th data-ln-sort="string">Employee</th>
-											<th data-ln-sort="string">Department</th>
+											<th data-ln-sort="string" data-ln-filter-col="dept">
+												<div data-ln-dropdown>
+													<button data-ln-toggle-for="filter-dept-dd">Department <span class="ln-icon-filter ln-icon--sm"></span></button>
+													<ul id="filter-dept-dd" data-ln-toggle data-ln-dropdown-menu data-ln-filter="demo-table">
+														<li><button data-ln-filter-key="dept" data-ln-filter-value="" data-active>All</button></li>
+														<li><button data-ln-filter-key="dept" data-ln-filter-value="IT">IT</button></li>
+														<li><button data-ln-filter-key="dept" data-ln-filter-value="Finance">Finance</button></li>
+														<li><button data-ln-filter-key="dept" data-ln-filter-value="Legal">Legal</button></li>
+														<li><button data-ln-filter-key="dept" data-ln-filter-value="Marketing">Marketing</button></li>
+														<li><button data-ln-filter-key="dept" data-ln-filter-value="HR">HR</button></li>
+														<li><button data-ln-filter-key="dept" data-ln-filter-value="Sales">Sales</button></li>
+													</ul>
+												</div>
+											</th>
 											<th data-ln-sort="string">Position</th>
 											<th data-ln-sort="date">Hire Date</th>
 											<th data-ln-sort="number" class="numeric">Salary (USD)</th>
-											<th>Status</th>
+											<th data-ln-filter-col="status">
+												<div data-ln-dropdown>
+													<button data-ln-toggle-for="filter-status-dd">Status <span class="ln-icon-filter ln-icon--sm"></span></button>
+													<ul id="filter-status-dd" data-ln-toggle data-ln-dropdown-menu data-ln-filter="demo-table">
+														<li><button data-ln-filter-key="status" data-ln-filter-value="" data-active>All</button></li>
+														<li><button data-ln-filter-key="status" data-ln-filter-value="Active">Active</button></li>
+														<li><button data-ln-filter-key="status" data-ln-filter-value="Inactive">Inactive</button></li>
+														<li><button data-ln-filter-key="status" data-ln-filter-value="On Leave">On Leave</button></li>
+														<li><button data-ln-filter-key="status" data-ln-filter-value="Suspended">Suspended</button></li>
+													</ul>
+												</div>
+											</th>
 											<th class="center">Actions</th>
 										</tr>
 									</thead>
@@ -412,7 +403,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 			var status = statuses[i % statuses.length];
 
 			html.push(
-				'<tr data-status="' + status.text + '" data-dept="' + dept + '">' +
+				'<tr>' +
 				'<td>' + (i + 1) + '</td>' +
 				'<td>' + name + '</td>' +
 				'<td>' + dept + '</td>' +
@@ -437,117 +428,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 		var timingEl = document.getElementById('demo-timing');
 		if (timingEl) timingEl.textContent = elapsed + 'ms';
 
-		// ── Quick filters (demo-level, works with ln-table virtual scroll) ──
-		var activeFilters = {};
-		var filtersNav = document.getElementById('demo-filters');
-		var chipsEl = document.getElementById('demo-chips');
-		var chipListEl = document.getElementById('demo-chip-list');
-		var clearAllBtn = document.getElementById('demo-clear-all');
-		var clearFiltersEmptyBtn = document.getElementById('demo-clear-filters-empty');
-
-		function applyFilters() {
-			var rows = tbody.querySelectorAll('tr');
-			var shown = 0;
-
-			for (var i = 0; i < rows.length; i++) {
-				var row = rows[i];
-				var visible = true;
-
-				for (var col in activeFilters) {
-					if (activeFilters[col] && row.getAttribute('data-' + col) !== activeFilters[col]) {
-						visible = false;
-						break;
-					}
-				}
-
-				row.style.display = visible ? '' : 'none';
-				if (visible) shown++;
-			}
-
-			if (totalEl) totalEl.textContent = shown.toLocaleString();
-			renderChips();
-		}
-
-		function renderChips() {
-			var chips = [];
-			var hasActive = false;
-
-			for (var col in activeFilters) {
-				if (activeFilters[col]) {
-					hasActive = true;
-					chips.push(
-						'<span class="ln-table__chip">' +
-							col + ': <strong>' + activeFilters[col] + '</strong>' +
-							' <button type="button" data-chip-col="' + col + '" title="Remove">×</button>' +
-						'</span>'
-					);
-				}
-			}
-
-			if (chipListEl) chipListEl.innerHTML = chips.join('');
-			if (chipsEl) chipsEl.hidden = !hasActive;
-		}
-
-		function clearAllFilters() {
-			activeFilters = {};
-
-			var btns = filtersNav.querySelectorAll('button');
-			for (var i = 0; i < btns.length; i++) {
-				btns[i].removeAttribute('data-active');
-				if (btns[i].getAttribute('data-filter-val') === '') {
-					btns[i].setAttribute('data-active', '');
-				}
-			}
-
-			applyFilters();
-		}
-
-		// Filter button clicks
-		if (filtersNav) {
-			filtersNav.addEventListener('click', function (e) {
-				var btn = e.target.closest('button[data-filter-col]');
-				if (!btn) return;
-
-				var col = btn.getAttribute('data-filter-col');
-				var val = btn.getAttribute('data-filter-val');
-
-				// Update active state within same fieldset
-				var siblings = btn.closest('ul').querySelectorAll('button');
-				for (var i = 0; i < siblings.length; i++) {
-					siblings[i].removeAttribute('data-active');
-				}
-				btn.setAttribute('data-active', '');
-
-				activeFilters[col] = val;
-				applyFilters();
-			});
-		}
-
-		// Chip remove clicks
-		if (chipsEl) {
-			chipsEl.addEventListener('click', function (e) {
-				var chipBtn = e.target.closest('button[data-chip-col]');
-				if (!chipBtn) return;
-
-				var col = chipBtn.getAttribute('data-chip-col');
-				activeFilters[col] = '';
-
-				// Reset the corresponding filter button to "All"
-				var fieldsetBtns = filtersNav.querySelectorAll('button[data-filter-col="' + col + '"]');
-				for (var i = 0; i < fieldsetBtns.length; i++) {
-					fieldsetBtns[i].removeAttribute('data-active');
-					if (fieldsetBtns[i].getAttribute('data-filter-val') === '') {
-						fieldsetBtns[i].setAttribute('data-active', '');
-					}
-				}
-
-				applyFilters();
-			});
-		}
-
-		// Clear all button
-		if (clearAllBtn) clearAllBtn.addEventListener('click', clearAllFilters);
-		if (clearFiltersEmptyBtn) clearFiltersEmptyBtn.addEventListener('click', clearAllFilters);
+		// Column filters handled by ln-filter + ln-table integration (no custom JS needed)
 	})();
 	</script>
 </body>
