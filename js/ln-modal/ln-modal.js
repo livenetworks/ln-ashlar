@@ -56,10 +56,10 @@
 
 		this._onFocusTrap = function (e) {
 			if (e.key !== 'Tab') return;
-			var focusable = self.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+			const focusable = self.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
 			if (focusable.length === 0) return;
-			var first = focusable[0];
-			var last = focusable[focusable.length - 1];
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
 			if (e.shiftKey) {
 				if (document.activeElement === first) { e.preventDefault(); last.focus(); }
 			} else {
@@ -127,16 +127,16 @@
 	// ─── Attribute Sync ────────────────────────────────────────
 
 	function _syncAttribute(el) {
-		var instance = el[DOM_ATTRIBUTE];
+		const instance = el[DOM_ATTRIBUTE];
 		if (!instance) return;
 
-		var value = el.getAttribute(DOM_SELECTOR);
-		var shouldBeOpen = value === 'open';
+		const value = el.getAttribute(DOM_SELECTOR);
+		const shouldBeOpen = value === 'open';
 
 		if (shouldBeOpen === instance.isOpen) return;
 
 		if (shouldBeOpen) {
-			var before = _dispatchCancelable(el, 'ln-modal:before-open');
+			const before = _dispatchCancelable(el, 'ln-modal:before-open');
 			if (before.defaultPrevented) {
 				el.setAttribute(DOM_SELECTOR, 'close');
 				return;
@@ -148,16 +148,16 @@
 			document.addEventListener('keydown', instance._onEscape);
 			document.addEventListener('keydown', instance._onFocusTrap);
 
-			var firstInput = el.querySelector('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
+			const firstInput = el.querySelector('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
 			if (firstInput) firstInput.focus();
 			else {
-				var firstFocusable = el.querySelector('a[href], button:not([disabled])');
+				const firstFocusable = el.querySelector('a[href], button:not([disabled])');
 				if (firstFocusable) firstFocusable.focus();
 			}
 
 			_dispatch(el, 'ln-modal:open');
 		} else {
-			var before = _dispatchCancelable(el, 'ln-modal:before-close');
+			const before = _dispatchCancelable(el, 'ln-modal:before-close');
 			if (before.defaultPrevented) {
 				el.setAttribute(DOM_SELECTOR, 'open');
 				return;
@@ -184,7 +184,7 @@
 	}
 
 	function _dispatchCancelable(element, eventName, detail) {
-		var event = new CustomEvent(eventName, {
+		const event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: Object.assign({ modalId: element.id, target: element }, detail || {})
@@ -205,12 +205,12 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			for (var i = 0; i < mutations.length; i++) {
-				var mutation = mutations[i];
+		const observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
+				const mutation = mutations[i];
 				if (mutation.type === 'childList') {
-					for (var j = 0; j < mutation.addedNodes.length; j++) {
-						var node = mutation.addedNodes[j];
+					for (let j = 0; j < mutation.addedNodes.length; j++) {
+						const node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							_findModals(node);
 							_attachTriggers(node);

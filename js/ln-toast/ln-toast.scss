@@ -57,11 +57,12 @@
 	@include justify-center;
 	@include pt(var(--spacing-md));
 	background: var(--ln-toast-accent, hsl(var(--color-info)));
+	color: hsl(var(--color-white));
 }
 
-.ln-toast__side svg {
-	@include size(2rem);
-	color: hsl(var(--color-white));
+.ln-toast__side::before {
+	width: 2rem;
+	height: 2rem;
 }
 
 /* Content Area */

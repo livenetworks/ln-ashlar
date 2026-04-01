@@ -62,7 +62,7 @@
 			input = document.createElement('input');
 			input.type = 'file';
 			input.multiple = true;
-			input.style.display = 'none';
+			input.classList.add('hidden');
 			if (acceptString) {
 				input.accept = acceptString.split(',').map(function(ext) {
 					ext = ext.trim();
@@ -90,13 +90,11 @@
 					message: message
 				});
 
-				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-					detail: {
-						type: 'error',
-						title: 'Invalid File',
-						message: message || 'This file type is not allowed'
-					}
-				}));
+				_dispatch(window, 'ln-toast:enqueue', {
+					type: 'error',
+					title: 'Invalid File',
+					message: message || 'This file type is not allowed'
+				});
 				return;
 			}
 
@@ -202,13 +200,11 @@
 					message: message
 				});
 
-				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-					detail: {
-						type: 'error',
-						title: 'Upload Error',
-						message: message || _getDict(container, 'upload-failed') || 'Failed to upload file'
-					}
-				}));
+				_dispatch(window, 'ln-toast:enqueue', {
+					type: 'error',
+					title: 'Upload Error',
+					message: message || _getDict(container, 'upload-failed') || 'Failed to upload file'
+				});
 			}
 
 			xhr.open('POST', uploadUrl);
@@ -266,26 +262,22 @@
 					} else {
 						if (item) item.classList.remove('ln-upload__item--deleting');
 
-						window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-							detail: {
-								type: 'error',
-								title: 'Error',
-								message: _getDict(container, 'delete-error') || 'Failed to delete file'
-							}
-						}));
+						_dispatch(window, 'ln-toast:enqueue', {
+							type: 'error',
+							title: 'Error',
+							message: _getDict(container, 'delete-error') || 'Failed to delete file'
+						});
 					}
 				})
 				.catch(function (error) {
 					console.warn('[ln-upload] Delete error:', error);
 					if (item) item.classList.remove('ln-upload__item--deleting');
 
-					window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-						detail: {
-							type: 'error',
-							title: 'Network Error',
-							message: 'Could not connect to server'
-						}
-					}));
+					_dispatch(window, 'ln-toast:enqueue', {
+						type: 'error',
+						title: 'Network Error',
+						message: 'Could not connect to server'
+					});
 				});
 		}
 

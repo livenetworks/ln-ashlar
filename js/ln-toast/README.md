@@ -3,6 +3,8 @@
 Toast notification component — displays temporary messages (success, error, warn, info).
 Each toast has an icon, title, message and close button. Automatically disappears after timeout.
 
+Uses `deepReactive` + `createBatcher` for state management and `cloneTemplate` + `fill` for DOM creation (ln-core).
+
 ## Attributes
 
 | Attribute | On | Description |
@@ -17,8 +19,8 @@ Each toast has an icon, title, message and close button. Automatically disappear
 ## API
 
 ```javascript
-// Add toast programmatically
-lnToast.enqueue({
+// Add toast programmatically — returns numeric toast id
+var id = lnToast.enqueue({
     type: 'success',           // success | error | warn | info
     title: 'Saved',            // optional, default by type
     message: 'Changes have been saved.',
@@ -62,16 +64,32 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 
 ## Types
 
-| Type | Default title | Icon |
-|------|--------------|------|
-| `success` | Success | Checkmark |
-| `error` | Error | X circle |
-| `warn` | Warning | Triangle |
-| `info` | Information | Info circle |
+| Type | Default title | Icon class |
+|------|--------------|------------|
+| `success` | Success | `ln-icon-check-circle` |
+| `error` | Error | `ln-icon-error-circle` |
+| `warn` | Warning | `ln-icon-warning` |
+| `info` | Information | `ln-icon-info-circle` |
 
 ## HTML Structure
 
 ```html
+<!-- Template (once per layout — fallback injected if missing) -->
+<template data-ln-template="ln-toast-item">
+    <li class="ln-toast__item">
+        <div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+            <div class="ln-toast__side"></div>
+            <div class="ln-toast__content">
+                <div class="ln-toast__head">
+                    <strong class="ln-toast__title" data-ln-field="title"></strong>
+                </div>
+                <button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+                <div class="ln-toast__body" data-ln-show="hasBody"></div>
+            </div>
+        </div>
+    </li>
+</template>
+
 <!-- Container (usually in the layout, top right) -->
 <ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
 

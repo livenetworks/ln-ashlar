@@ -150,13 +150,13 @@
 
 		fetch(finalUrl, options)
 			.then(function (response) {
-				var ok = response.ok;
+				const ok = response.ok;
 				return response.json().then(function (data) {
 					return { ok: ok, status: response.status, data: data };
 				});
 			})
 			.then(function (result) {
-				var data = result.data;
+				const data = result.data;
 
 				if (result.ok) {
 					if (data.title) {
@@ -188,7 +188,7 @@
 
 				// Auto-show response message as toast
 				if (data.message && window.lnToast) {
-					var msg = data.message;
+					const msg = data.message;
 					window.lnToast.enqueue({
 						type: msg.type || (result.ok ? 'success' : 'error'),
 						title: msg.title || '',

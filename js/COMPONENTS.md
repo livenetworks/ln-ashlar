@@ -65,9 +65,12 @@ Every project using ln-acme JS components **MUST** follow three layers:
 
 ## IIFE Pattern (mandatory)
 
-Every component is an IIFE (Immediately Invoked Function Expression) — no exports, no imports, no dependencies.
+Every component is an IIFE (Immediately Invoked Function Expression). Shared helpers are imported from `ln-core`; the IIFE body has no exports.
 
 ```javascript
+import { dispatch } from '../ln-core';
+import { deepReactive, createBatcher } from '../ln-core';
+
 (function () {
     const DOM_SELECTOR = 'data-ln-{name}';
     const DOM_ATTRIBUTE = 'ln{Name}';
@@ -80,6 +83,21 @@ Every component is an IIFE (Immediately Invoked Function Expression) — no expo
     window[DOM_ATTRIBUTE] = constructor;
 })();
 ```
+
+### ln-core shared helpers
+
+| Import | Purpose |
+|--------|---------|
+| `dispatch(el, name, detail)` | Fire non-cancelable CustomEvent |
+| `dispatchCancelable(el, name, detail)` | Fire cancelable CustomEvent, returns event |
+| `cloneTemplate(name, tag)` | Clone `<template data-ln-template="name">`, cached |
+| `fill(root, data)` | Declarative DOM binding via `data-ln-field`, `data-ln-attr`, `data-ln-show`, `data-ln-class` |
+| `renderList(container, items, tpl, keyFn, fillFn, tag)` | Keyed list rendering with DOM reuse |
+| `reactiveState(initial, onChange)` | Shallow Proxy — onChange(prop, value, old) per set |
+| `deepReactive(obj, onChange)` | Deep Proxy — onChange() on any nested change |
+| `createBatcher(renderFn, afterRender)` | Coalesce multiple sync state changes into one render |
+
+Import only what the component needs. Vite tree-shakes unused exports.
 
 ---
 
@@ -173,15 +191,10 @@ function _domObserver() {
 Components do NOT know about each other. Communication ONLY via CustomEvent.
 
 ```javascript
-function _dispatch(element, eventName, detail) {
-    element.dispatchEvent(new CustomEvent(eventName, {
-        bubbles: true,
-        detail: detail || {}
-    }));
-}
+import { dispatch } from '../ln-core';
 
 // Dispatch
-_dispatch(this.dom, 'ln-toggle:open', { target: this.dom });
+dispatch(this.dom, 'ln-toggle:open', { target: this.dom });
 
 // Listen (in another component or integration code)
 document.addEventListener('ln-toggle:open', function (e) {
@@ -196,23 +209,15 @@ document.addEventListener('ln-toggle:open', function (e) {
 Every component with actions must emit **paired events**: `before-{action}` (cancelable) + `{action}` (post).
 
 ```javascript
-function _dispatchCancelable(element, eventName, detail) {
-    var event = new CustomEvent(eventName, {
-        bubbles: true,
-        cancelable: true,
-        detail: detail || {}
-    });
-    element.dispatchEvent(event);
-    return event;
-}
+import { dispatch, dispatchCancelable } from '../ln-core';
 
 _component.prototype.open = function () {
     if (this.isOpen) return;
-    var before = _dispatchCancelable(this.dom, 'ln-component:before-open', { target: this.dom });
+    var before = dispatchCancelable(this.dom, 'ln-component:before-open', { target: this.dom });
     if (before.defaultPrevented) return;   // external code can cancel
     this.isOpen = true;
     this.dom.classList.add('open');
-    _dispatch(this.dom, 'ln-component:open', { target: this.dom });
+    dispatch(this.dom, 'ln-component:open', { target: this.dom });
 };
 ```
 
@@ -542,32 +547,35 @@ JS:    clone → querySelector → textContent/setAttribute
 <script src="..."></script>
 ```
 
-### JS — `_cloneTemplate` helper (IIFE-scoped, lazy-cached)
-
-Each IIFE component gets its own `_cloneTemplate`:
+### JS — `cloneTemplate` + `fill` from ln-core
 
 ```javascript
-var _tmplCache = {};
-function _cloneTemplate(name) {
-    if (!_tmplCache[name]) {
-        _tmplCache[name] = document.querySelector('[data-ln-template="' + name + '"]');
-    }
-    return _tmplCache[name].content.cloneNode(true);
-}
+import { cloneTemplate, fill } from '../ln-core';
 ```
 
-### Usage — clone + fill
+`cloneTemplate(name, componentTag)` caches the lookup and returns `tmpl.content.cloneNode(true)`.
+
+### Usage — clone + fill (declarative)
+
+Use `data-ln-field` for text, `data-ln-attr` for attributes:
+
+```html
+<template data-ln-template="track-item">
+    <li data-ln-track>
+        <span class="track-number" data-ln-field="number"></span>
+        <article class="track-info">
+            <p data-ln-field="title"></p>
+            <p data-ln-field="artist"></p>
+        </article>
+    </li>
+</template>
+```
 
 ```javascript
 _component.prototype._buildTrackItem = function (track, idx) {
-    var frag = _cloneTemplate('track-item');
+    var frag = cloneTemplate('track-item', 'ln-playlist');
     var li = frag.querySelector('[data-ln-track]');
-
-    li.setAttribute('data-ln-track', idx);
-    li.querySelector('.track-number').textContent = idx + 1;
-    li.querySelector('.track-name').textContent = track.title;
-    li.querySelector('.track-artist').textContent = track.artist;
-
+    fill(li, { number: idx + 1, title: track.title, artist: track.artist });
     return li;
 };
 ```
@@ -596,6 +604,7 @@ _component.prototype._buildTrackItem = function (track, idx) {
 
 | Component | Pattern | Data Attr | Description |
 |-----------|---------|-----------|------|
+| ln-core | Shared module | — | dispatch, fill, renderList, reactiveState, deepReactive, createBatcher |
 | ln-toggle | Instance | `data-ln-toggle` | Generic toggle (sidebar, collapse) |
 | ln-accordion | Instance | `data-ln-accordion` | Wrapper — only one toggle open at a time |
 | ln-tabs | Instance | `data-ln-tabs` | Hash-aware tab navigation |

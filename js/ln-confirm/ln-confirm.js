@@ -33,7 +33,7 @@
 		this.confirmText = dom.getAttribute(DOM_SELECTOR) || 'Confirm?';
 		this.revertTimer = null;
 
-		var self = this;
+		const self = this;
 		this._onClick = function (e) {
 			if (!self.confirming) {
 				e.preventDefault();
@@ -50,7 +50,7 @@
 	}
 
 	_component.prototype._getTimeout = function () {
-		var val = parseFloat(this.dom.getAttribute(TIMEOUT_ATTR));
+		const val = parseFloat(this.dom.getAttribute(TIMEOUT_ATTR));
 		return (isNaN(val) || val <= 0) ? DEFAULT_TIMEOUT : val;
 	};
 
@@ -79,8 +79,8 @@
 		if (this.revertTimer) {
 			clearTimeout(this.revertTimer);
 		}
-		var self = this;
-		var ms = this._getTimeout() * 1000;
+		const self = this;
+		const ms = this._getTimeout() * 1000;
 		this.revertTimer = setTimeout(function () {
 			self._reset();
 		}, ms);
@@ -117,7 +117,7 @@
 	// ─── Attribute Sync ────────────────────────────────────────
 
 	function _syncTimeout(el) {
-		var instance = el[DOM_ATTRIBUTE];
+		const instance = el[DOM_ATTRIBUTE];
 		if (!instance || !instance.confirming) return;
 		// Restart timer with new timeout value
 		instance._startTimer();
@@ -135,12 +135,12 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			for (var i = 0; i < mutations.length; i++) {
-				var mutation = mutations[i];
+		const observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
+				const mutation = mutations[i];
 				if (mutation.type === 'childList') {
-					for (var j = 0; j < mutation.addedNodes.length; j++) {
-						var node = mutation.addedNodes[j];
+					for (let j = 0; j < mutation.addedNodes.length; j++) {
+						const node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}

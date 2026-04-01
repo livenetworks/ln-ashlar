@@ -20,6 +20,8 @@
 //   abort  — string key: aborts previous in-flight request with same key
 //   tag    — passed back in response events for consumer filtering
 
+import { dispatch } from '../ln-core';
+
 (function () {
 	const DOM_ATTRIBUTE = 'lnHttp';
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
@@ -78,15 +80,12 @@
 			.then(function (result) {
 				result.tag = tag;
 				const eventName = result.ok ? 'ln-http:success' : 'ln-http:error';
-				target.dispatchEvent(new CustomEvent(eventName, { bubbles: true, detail: result }));
+				dispatch(target, eventName, result);
 			})
 			.catch(function (err) {
 				if (abortKey && err.name !== 'AbortError') delete _pending[abortKey];
 				if (err.name === 'AbortError') return; // Silently ignore aborted requests
-				target.dispatchEvent(new CustomEvent('ln-http:error', {
-					bubbles: true,
-					detail: { tag: tag, ok: false, status: 0, data: { error: true, message: 'Network error' } }
-				}));
+				dispatch(target, 'ln-http:error', { tag: tag, ok: false, status: 0, data: { error: true, message: 'Network error' } });
 			});
 	});
 

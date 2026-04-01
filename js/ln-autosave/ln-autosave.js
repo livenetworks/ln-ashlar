@@ -27,7 +27,7 @@
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(form) {
-		var key = _getStorageKey(form);
+		const key = _getStorageKey(form);
 		if (!key) {
 			console.warn('ln-autosave: form needs an id or data-ln-autosave value', form);
 			return;
@@ -36,17 +36,17 @@
 		this.dom = form;
 		this.key = key;
 
-		var self = this;
+		const self = this;
 
 		this._onFocusout = function (e) {
-			var el = e.target;
+			const el = e.target;
 			if (_isFormField(el) && el.name) {
 				self.save();
 			}
 		};
 
 		this._onChange = function (e) {
-			var el = e.target;
+			const el = e.target;
 			if (_isFormField(el) && el.name) {
 				self.save();
 			}
@@ -61,7 +61,7 @@
 		};
 
 		this._onClearClick = function (e) {
-			var btn = e.target.closest('[' + CLEAR_SELECTOR + ']');
+			const btn = e.target.closest('[' + CLEAR_SELECTOR + ']');
 			if (btn) self.clear();
 		};
 
@@ -77,7 +77,7 @@
 	}
 
 	_component.prototype.save = function () {
-		var data = _serialize(this.dom);
+		const data = _serialize(this.dom);
 		try {
 			localStorage.setItem(this.key, JSON.stringify(data));
 		} catch (e) {
@@ -87,7 +87,7 @@
 	};
 
 	_component.prototype.restore = function () {
-		var raw;
+		let raw;
 		try {
 			raw = localStorage.getItem(this.key);
 		} catch (e) {
@@ -95,14 +95,14 @@
 		}
 		if (!raw) return;
 
-		var data;
+		let data;
 		try {
 			data = JSON.parse(raw);
 		} catch (e) {
 			return;
 		}
 
-		var before = _dispatchCancelable(this.dom, 'ln-autosave:before-restore', { target: this.dom, data: data });
+		const before = _dispatchCancelable(this.dom, 'ln-autosave:before-restore', { target: this.dom, data: data });
 		if (before.defaultPrevented) return;
 
 		_populateForm(this.dom, data);
@@ -132,23 +132,23 @@
 	// ─── Helpers ───────────────────────────────────────────────
 
 	function _getStorageKey(form) {
-		var value = form.getAttribute(DOM_SELECTOR);
-		var identifier = value || form.id;
+		const value = form.getAttribute(DOM_SELECTOR);
+		const identifier = value || form.id;
 		if (!identifier) return null;
 		return STORAGE_PREFIX + window.location.pathname + ':' + identifier;
 	}
 
 	function _isFormField(el) {
-		var tag = el.tagName;
+		const tag = el.tagName;
 		return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 	}
 
 	function _serialize(form) {
-		var data = {};
-		var elements = form.elements;
+		const data = {};
+		const elements = form.elements;
 
-		for (var i = 0; i < elements.length; i++) {
-			var el = elements[i];
+		for (let i = 0; i < elements.length; i++) {
+			const el = elements[i];
 			if (!el.name || el.disabled || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
 
 			if (el.type === 'checkbox') {
@@ -158,7 +158,7 @@
 				if (el.checked) data[el.name] = el.value;
 			} else if (el.type === 'select-multiple') {
 				data[el.name] = [];
-				for (var j = 0; j < el.options.length; j++) {
+				for (let j = 0; j < el.options.length; j++) {
 					if (el.options[j].selected) data[el.name].push(el.options[j].value);
 				}
 			} else {
@@ -170,14 +170,14 @@
 	}
 
 	function _populateForm(form, data) {
-		var elements = form.elements;
-		var restored = [];
+		const elements = form.elements;
+		const restored = [];
 
-		for (var i = 0; i < elements.length; i++) {
-			var el = elements[i];
+		for (let i = 0; i < elements.length; i++) {
+			const el = elements[i];
 			if (!el.name || !(el.name in data) || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
 
-			var value = data[el.name];
+			const value = data[el.name];
 
 			if (el.type === 'checkbox') {
 				el.checked = Array.isArray(value) && value.indexOf(el.value) !== -1;
@@ -187,7 +187,7 @@
 				restored.push(el);
 			} else if (el.type === 'select-multiple') {
 				if (Array.isArray(value)) {
-					for (var j = 0; j < el.options.length; j++) {
+					for (let j = 0; j < el.options.length; j++) {
 						el.options[j].selected = value.indexOf(el.options[j].value) !== -1;
 					}
 				}
@@ -198,7 +198,7 @@
 			}
 		}
 
-		for (var k = 0; k < restored.length; k++) {
+		for (let k = 0; k < restored.length; k++) {
 			restored[k].dispatchEvent(new Event('input', { bubbles: true }));
 			restored[k].dispatchEvent(new Event('change', { bubbles: true }));
 
@@ -216,7 +216,7 @@
 	}
 
 	function _dispatchCancelable(element, eventName, detail) {
-		var event = new CustomEvent(eventName, {
+		const event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: detail || {}
@@ -228,11 +228,11 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			for (var i = 0; i < mutations.length; i++) {
+		const observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
 				if (mutations[i].type === 'childList') {
-					var nodes = mutations[i].addedNodes;
-					for (var j = 0; j < nodes.length; j++) {
+					const nodes = mutations[i].addedNodes;
+					for (let j = 0; j < nodes.length; j++) {
 						if (nodes[j].nodeType === 1) {
 							_findElements(nodes[j]);
 						}

@@ -107,7 +107,7 @@
 		const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--spacing-xs')) * 16 || 4;
 
 		// Vertical: prefer below, flip above if no room
-		var top;
+		let top;
 		if (rect.bottom + gap + menuH <= vh) {
 			top = rect.bottom + gap;
 		} else if (rect.top - gap - menuH >= 0) {
@@ -117,7 +117,7 @@
 		}
 
 		// Horizontal: prefer right-aligned to trigger, flip left-aligned if no room
-		var left;
+		let left;
 		if (rect.right - menuW >= 0) {
 			left = rect.right - menuW;
 		} else if (rect.left + menuW <= vw) {
