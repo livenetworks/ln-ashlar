@@ -6,7 +6,7 @@
 
 	// ─── Default locales (override via data-ln-translations-locales JSON) ──
 
-	var DEFAULT_LOCALES = {
+	const DEFAULT_LOCALES = {
 		en: 'English',
 		sq: 'Shqip',
 		sr: 'Srpski'
@@ -14,7 +14,7 @@
 
 	// ─── Template cache ────────────────────────────────────────
 
-	var _tmplCache = {};
+	const _tmplCache = {};
 	function _cloneTemplate(name) {
 		if (!_tmplCache[name]) {
 			_tmplCache[name] = document.querySelector('[data-ln-template="' + name + '"]');
@@ -50,7 +50,7 @@
 		this.menuEl = dom.querySelector('[data-ln-dropdown] > [data-ln-toggle]');
 
 		// Parse locales from attribute or use defaults
-		var localesAttr = dom.getAttribute(DOM_SELECTOR + '-locales');
+		const localesAttr = dom.getAttribute(DOM_SELECTOR + '-locales');
 		this.locales = DEFAULT_LOCALES;
 		if (localesAttr) {
 			try { this.locales = JSON.parse(localesAttr); }
@@ -144,7 +144,7 @@
 		}
 
 		// Hide trigger if no languages available
-		var triggerBtn = this.dom.querySelector('[' + DOM_SELECTOR + '-add]');
+		const triggerBtn = this.dom.querySelector('[' + DOM_SELECTOR + '-add]');
 		if (triggerBtn) {
 			triggerBtn.style.display = availableCount === 0 ? 'none' : '';
 		}

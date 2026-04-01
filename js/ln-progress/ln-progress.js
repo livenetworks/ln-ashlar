@@ -1,3 +1,5 @@
+import { dispatch } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = '[data-ln-progress]';
 	const DOM_ATTRIBUTE = 'lnProgress';
@@ -11,13 +13,6 @@
 
 	function constructor(domRoot) {
 		_findElements(domRoot);
-	}
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
 	}
 
 	function _findElements(domRoot) {
@@ -132,7 +127,7 @@
 		if (percentage > 100) percentage = 100;
 
 		this.dom.style.width = percentage + '%';
-		_dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
+		dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
 	}
 
 	window[DOM_ATTRIBUTE] = constructor;

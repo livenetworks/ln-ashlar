@@ -1,4 +1,6 @@
 /* Live Networks - lnTabs (hash-aware tabs via <a href="#key">) */
+import { dispatch } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = "data-ln-tabs";
 	const DOM_ATTRIBUTE = "lnTabs";
@@ -109,7 +111,7 @@
 			const first = this.mapPanels[key]?.querySelector('input,button,select,textarea,[tabindex]:not([tabindex="-1"])');
 			if (first) setTimeout(() => first.focus({ preventScroll: true }), 0);
 		}
-		_dispatch(this.dom, 'ln-tabs:change', { key: key, tab: this.mapTabs[key], panel: this.mapPanels[key] });
+		dispatch(this.dom, 'ln-tabs:change', { key: key, tab: this.mapTabs[key], panel: this.mapPanels[key] });
 	};
 
 	_component.prototype.destroy = function () {
@@ -120,16 +122,9 @@
 		if (this.hashEnabled) {
 			window.removeEventListener("hashchange", this._hashHandler);
 		}
-		_dispatch(this.dom, 'ln-tabs:destroyed', { target: this.dom });
+		dispatch(this.dom, 'ln-tabs:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
 
 	function _domObserver() {
 		const observer = new MutationObserver(function (mutations) {
