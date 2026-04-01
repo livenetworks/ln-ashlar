@@ -1,3 +1,5 @@
+import { guardBody } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-translations';
 	const DOM_ATTRIBUTE = 'lnTranslations';
@@ -315,26 +317,28 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
-						if (node.nodeType === 1) {
-							_findElements(node);
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === 'childList') {
+						for (const node of mutation.addedNodes) {
+							if (node.nodeType === 1) {
+								_findElements(node);
+							}
 						}
+					} else if (mutation.type === 'attributes') {
+						_findElements(mutation.target);
 					}
-				} else if (mutation.type === 'attributes') {
-					_findElements(mutation.target);
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: [DOM_SELECTOR]
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: [DOM_SELECTOR]
+			});
+		}, 'ln-translations');
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

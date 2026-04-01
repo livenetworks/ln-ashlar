@@ -1,3 +1,5 @@
+import { guardBody } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-search';
 	const DOM_ATTRIBUTE = 'lnSearch';
@@ -109,26 +111,28 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
-				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
-						if (node.nodeType === 1) {
-							_findElements(node);
-						}
-					});
-				} else if (mutation.type === 'attributes') {
-					_findElements(mutation.target);
-				}
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				mutations.forEach(function (mutation) {
+					if (mutation.type === 'childList') {
+						mutation.addedNodes.forEach(function (node) {
+							if (node.nodeType === 1) {
+								_findElements(node);
+							}
+						});
+					} else if (mutation.type === 'attributes') {
+						_findElements(mutation.target);
+					}
+				});
 			});
-		});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: [DOM_SELECTOR]
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: [DOM_SELECTOR]
+			});
+		}, 'ln-search');
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

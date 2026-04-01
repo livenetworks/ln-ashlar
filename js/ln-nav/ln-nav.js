@@ -1,3 +1,5 @@
+import { guardBody } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-nav';
 	const DOM_ATTRIBUTE = 'lnNav';
@@ -127,30 +129,32 @@
 	// ─── Global DOM Observer ───────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
-						if (node.nodeType === 1) {
-							if (node.hasAttribute && node.hasAttribute(DOM_SELECTOR)) {
-								constructor(node);
-							}
-							if (node.querySelectorAll) {
-								for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
-									constructor(el);
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === 'childList') {
+						for (const node of mutation.addedNodes) {
+							if (node.nodeType === 1) {
+								if (node.hasAttribute && node.hasAttribute(DOM_SELECTOR)) {
+									constructor(node);
+								}
+								if (node.querySelectorAll) {
+									for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
+										constructor(el);
+									}
 								}
 							}
 						}
-					}
-				} else if (mutation.type === 'attributes') {
-					if (mutation.target.hasAttribute && mutation.target.hasAttribute(DOM_SELECTOR)) {
-						constructor(mutation.target);
+					} else if (mutation.type === 'attributes') {
+						if (mutation.target.hasAttribute && mutation.target.hasAttribute(DOM_SELECTOR)) {
+							constructor(mutation.target);
+						}
 					}
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
+			observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
+		}, 'ln-nav');
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

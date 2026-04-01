@@ -1,4 +1,6 @@
 /* Live Networks — lnToast (side-accent with icons) */
+import { guardBody } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = "data-ln-toast";
 	const DOM_ATTRIBUTE = "lnToast";
@@ -213,15 +215,17 @@
 	api.enqueue = enqueue;
 	api.clear = clear;
 
-	const observer = new MutationObserver(function (muts) {
-		for (const m of muts) {
-			if (m.type === 'attributes') { _findContainers(m.target); continue; }
-			for (const n of m.addedNodes) {
-				_findContainers(n);
+	guardBody(function () {
+		const observer = new MutationObserver(function (muts) {
+			for (const m of muts) {
+				if (m.type === 'attributes') { _findContainers(m.target); continue; }
+				for (const n of m.addedNodes) {
+					_findContainers(n);
+				}
 			}
-		}
-	});
-	observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
+		});
+		observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
+	}, 'ln-toast');
 
 	window[DOM_ATTRIBUTE] = api;
 

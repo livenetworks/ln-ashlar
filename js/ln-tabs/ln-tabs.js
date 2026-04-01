@@ -1,5 +1,5 @@
 /* Live Networks - lnTabs (hash-aware tabs via <a href="#key">) */
-import { dispatch } from '../ln-core';
+import { dispatch, guardBody } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-tabs";
@@ -127,13 +127,15 @@ import { dispatch } from '../ln-core';
 	};
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'attributes') { _findElements(mutation.target); continue; }
-				for (const node of mutation.addedNodes) { _findElements(node); }
-			}
-		});
-		observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === 'attributes') { _findElements(mutation.target); continue; }
+					for (const node of mutation.addedNodes) { _findElements(node); }
+				}
+			});
+			observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
+		}, 'ln-tabs');
 	}
 
 	_domObserver();

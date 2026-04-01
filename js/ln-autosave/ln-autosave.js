@@ -1,3 +1,5 @@
+import { guardBody } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-autosave';
 	const DOM_ATTRIBUTE = 'lnAutosave';
@@ -228,27 +230,29 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (let i = 0; i < mutations.length; i++) {
-				if (mutations[i].type === 'childList') {
-					const nodes = mutations[i].addedNodes;
-					for (let j = 0; j < nodes.length; j++) {
-						if (nodes[j].nodeType === 1) {
-							_findElements(nodes[j]);
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (let i = 0; i < mutations.length; i++) {
+					if (mutations[i].type === 'childList') {
+						const nodes = mutations[i].addedNodes;
+						for (let j = 0; j < nodes.length; j++) {
+							if (nodes[j].nodeType === 1) {
+								_findElements(nodes[j]);
+							}
 						}
+					} else if (mutations[i].type === 'attributes') {
+						_findElements(mutations[i].target);
 					}
-				} else if (mutations[i].type === 'attributes') {
-					_findElements(mutations[i].target);
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: [DOM_SELECTOR]
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: [DOM_SELECTOR]
+			});
+		}, 'ln-autosave');
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

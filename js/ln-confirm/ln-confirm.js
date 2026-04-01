@@ -1,3 +1,5 @@
+import { guardBody } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-confirm';
 	const DOM_ATTRIBUTE = 'lnConfirm';
@@ -135,32 +137,34 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (let i = 0; i < mutations.length; i++) {
-				const mutation = mutations[i];
-				if (mutation.type === 'childList') {
-					for (let j = 0; j < mutation.addedNodes.length; j++) {
-						const node = mutation.addedNodes[j];
-						if (node.nodeType === 1) {
-							_findElements(node);
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (let i = 0; i < mutations.length; i++) {
+					const mutation = mutations[i];
+					if (mutation.type === 'childList') {
+						for (let j = 0; j < mutation.addedNodes.length; j++) {
+							const node = mutation.addedNodes[j];
+							if (node.nodeType === 1) {
+								_findElements(node);
+							}
+						}
+					} else if (mutation.type === 'attributes') {
+						if (mutation.attributeName === TIMEOUT_ATTR && mutation.target[DOM_ATTRIBUTE]) {
+							_syncTimeout(mutation.target);
+						} else {
+							_findElements(mutation.target);
 						}
 					}
-				} else if (mutation.type === 'attributes') {
-					if (mutation.attributeName === TIMEOUT_ATTR && mutation.target[DOM_ATTRIBUTE]) {
-						_syncTimeout(mutation.target);
-					} else {
-						_findElements(mutation.target);
-					}
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: [DOM_SELECTOR, TIMEOUT_ATTR]
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: [DOM_SELECTOR, TIMEOUT_ATTR]
+			});
+		}, 'ln-confirm');
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

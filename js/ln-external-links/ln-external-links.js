@@ -1,4 +1,4 @@
-import { dispatch } from '../ln-core';
+import { dispatch, guardBody } from '../ln-core';
 
 (function() {
 	const DOM_ATTRIBUTE = 'lnExternalLinks';
@@ -48,30 +48,32 @@ import { dispatch } from '../ln-core';
 	}
 
 	function _domObserver() {
-		const observer = new MutationObserver(function(mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
-						if (node.nodeType === 1) {
-							if (node.matches && (node.matches('a') || node.matches('area'))) {
-								_processLink(node);
-							}
+		guardBody(function() {
+			const observer = new MutationObserver(function(mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === 'childList') {
+						for (const node of mutation.addedNodes) {
+							if (node.nodeType === 1) {
+								if (node.matches && (node.matches('a') || node.matches('area'))) {
+									_processLink(node);
+								}
 
-							if (node.querySelectorAll) {
-								for (const link of node.querySelectorAll('a, area')) {
-									_processLink(link);
+								if (node.querySelectorAll) {
+									for (const link of node.querySelectorAll('a, area')) {
+										_processLink(link);
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true
+			});
+		}, 'ln-external-links');
 	}
 
 	function _initialize() {

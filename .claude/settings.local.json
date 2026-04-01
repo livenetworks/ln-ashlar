@@ -35,7 +35,9 @@
       "WebFetch(domain:preview.tabler.io)",
       "WebFetch(domain:docs.tabler.io)",
       "WebFetch(domain:tabler.bootmb.com)",
-      "Bash(find /c/laragon/www/ln-acme -name SKILL.md -o -name vite.config.*)"
+      "Bash(find /c/laragon/www/ln-acme -name SKILL.md -o -name vite.config.*)",
+      "Bash(git status:*)",
+      "Bash(git merge:*)"
     ]
   }
 }

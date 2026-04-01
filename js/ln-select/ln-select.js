@@ -7,6 +7,8 @@
  * <select data-ln-select='{"create": true, "maxItems": 3}'>...</select>
  */
 
+import { guardBody } from '../ln-core';
+
 (function () {
 	'use strict';
 
@@ -78,49 +80,51 @@
 	}
 
 	function observeDOM() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'attributes') {
-					if (mutation.target.matches && mutation.target.matches('select[data-ln-select]')) {
-						initializeSelect(mutation.target);
-					}
-					continue;
-				}
-
-				for (const node of mutation.addedNodes) {
-					if (node.nodeType === 1) {
-						if (node.matches && node.matches('select[data-ln-select]')) {
-							initializeSelect(node);
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === 'attributes') {
+						if (mutation.target.matches && mutation.target.matches('select[data-ln-select]')) {
+							initializeSelect(mutation.target);
 						}
-						if (node.querySelectorAll) {
-							for (const el of node.querySelectorAll('select[data-ln-select]')) {
-								initializeSelect(el);
+						continue;
+					}
+
+					for (const node of mutation.addedNodes) {
+						if (node.nodeType === 1) {
+							if (node.matches && node.matches('select[data-ln-select]')) {
+								initializeSelect(node);
+							}
+							if (node.querySelectorAll) {
+								for (const el of node.querySelectorAll('select[data-ln-select]')) {
+									initializeSelect(el);
+								}
+							}
+						}
+					}
+
+					for (const node of mutation.removedNodes) {
+						if (node.nodeType === 1) {
+							if (node.matches && node.matches('select[data-ln-select]')) {
+								destroySelect(node);
+							}
+							if (node.querySelectorAll) {
+								for (const el of node.querySelectorAll('select[data-ln-select]')) {
+									destroySelect(el);
+								}
 							}
 						}
 					}
 				}
+			});
 
-				for (const node of mutation.removedNodes) {
-					if (node.nodeType === 1) {
-						if (node.matches && node.matches('select[data-ln-select]')) {
-							destroySelect(node);
-						}
-						if (node.querySelectorAll) {
-							for (const el of node.querySelectorAll('select[data-ln-select]')) {
-								destroySelect(el);
-							}
-						}
-					}
-				}
-			}
-		});
-
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ['data-ln-select']
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['data-ln-select']
+			});
+		}, 'ln-select');
 	}
 
 	if (document.readyState === 'loading') {

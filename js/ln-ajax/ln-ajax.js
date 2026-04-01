@@ -1,3 +1,5 @@
+import { guardBody } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-ajax';
 	const DOM_ATTRIBUTE = 'lnAjax';
@@ -222,39 +224,41 @@
 	}
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
-						if (node.nodeType === 1) {
-							_constructor(node);
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === 'childList') {
+						for (const node of mutation.addedNodes) {
+							if (node.nodeType === 1) {
+								_constructor(node);
 
-							if (!node.hasAttribute(DOM_SELECTOR)) {
-								for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
-									_constructor(el);
-								}
+								if (!node.hasAttribute(DOM_SELECTOR)) {
+									for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
+										_constructor(el);
+									}
 
-								const ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
-								if (ajaxRoot && ajaxRoot.getAttribute(DOM_SELECTOR) !== 'false') {
-									const items = _findElements(node);
-									_attachLinksAjax(items.links);
-									_attachFormsAjax(items.forms);
+									const ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
+									if (ajaxRoot && ajaxRoot.getAttribute(DOM_SELECTOR) !== 'false') {
+										const items = _findElements(node);
+										_attachLinksAjax(items.links);
+										_attachFormsAjax(items.forms);
+									}
 								}
 							}
 						}
+					} else if (mutation.type === 'attributes') {
+						_constructor(mutation.target);
 					}
-				} else if (mutation.type === 'attributes') {
-					_constructor(mutation.target);
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: [DOM_SELECTOR]
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: [DOM_SELECTOR]
+			});
+		}, 'ln-ajax');
 	}
 
 	function _initializeAll() {

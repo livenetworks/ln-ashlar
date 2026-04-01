@@ -132,3 +132,16 @@ export function renderList(container, items, templateName, keyFn, fillFn, compon
 	container.textContent = '';
 	container.appendChild(frag);
 }
+
+// ─── Guard Body ────────────────────────────────────────
+
+export function guardBody(setupFn, componentTag) {
+	if (!document.body) {
+		document.addEventListener('DOMContentLoaded', function () {
+			guardBody(setupFn, componentTag);
+		});
+		console.warn('[' + componentTag + '] Script loaded before <body> — add "defer" to your <script> tag');
+		return;
+	}
+	setupFn();
+}

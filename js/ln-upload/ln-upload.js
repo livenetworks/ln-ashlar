@@ -1,3 +1,5 @@
+import { guardBody } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-upload';
 	const DOM_ATTRIBUTE = 'lnUpload';
@@ -357,34 +359,36 @@
 	}
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
-						if (node.nodeType === 1) {
-							if (node.hasAttribute(DOM_SELECTOR)) {
-								_initUpload(node);
-							}
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === 'childList') {
+						for (const node of mutation.addedNodes) {
+							if (node.nodeType === 1) {
+								if (node.hasAttribute(DOM_SELECTOR)) {
+									_initUpload(node);
+								}
 
-							for (const child of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
-								_initUpload(child);
+								for (const child of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
+									_initUpload(child);
+								}
 							}
 						}
-					}
-				} else if (mutation.type === 'attributes') {
-					if (mutation.target.hasAttribute(DOM_SELECTOR)) {
-						_initUpload(mutation.target);
+					} else if (mutation.type === 'attributes') {
+						if (mutation.target.hasAttribute(DOM_SELECTOR)) {
+							_initUpload(mutation.target);
+						}
 					}
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: [DOM_SELECTOR]
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: [DOM_SELECTOR]
+			});
+		}, 'ln-upload');
 	}
 
 	window[DOM_ATTRIBUTE] = {
