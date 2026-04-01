@@ -10,7 +10,33 @@
 </head>
 <body>
 	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+</template>
 	<div data-ln-toast></div>
+
+	<template data-ln-template="ln-upload-item">
+	<li class="ln-upload__item"
+		data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
+		<span class="ln-upload__name" data-ln-field="name"></span>
+		<span class="ln-upload__size" data-ln-field="sizeText"></span>
+		<button type="button" class="ln-upload__remove ln-icon-close" aria-label="Remove"></button>
+		<div class="ln-upload__progress">
+			<div class="ln-upload__progress-bar"></div>
+		</div>
+	</li>
+</template>
 
 	<div class="app-wrapper">
 		<!-- Header -->

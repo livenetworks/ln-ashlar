@@ -45,6 +45,8 @@ Animated progress bar. File: `js/ln-progress/ln-progress.js`.
 | `.red` | `--color-error` |
 | `.yellow` | `--color-warning` |
 
+> **Note**: These presentational classes are an intentional exception to the `--color-primary` override convention. Progress bars represent categorical status (success/error/warning) rather than themed UI, so named classes map directly to semantic tokens. To use a custom color, skip the class and set `background-color` on the bar element directly.
+
 ## Dynamic Update
 
 ```js

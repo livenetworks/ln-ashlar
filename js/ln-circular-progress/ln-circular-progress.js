@@ -1,3 +1,5 @@
+import { dispatch } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = '[data-ln-circular-progress]';
 	const DOM_ATTRIBUTE = 'lnCircularProgress';
@@ -11,13 +13,6 @@
 
 	function constructor(domRoot) {
 		_findElements(domRoot);
-	}
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
 	}
 
 	function _findElements(domRoot) {
@@ -167,7 +162,7 @@
 		const label = this.dom.getAttribute('data-ln-circular-progress-label');
 		this.labelEl.textContent = label !== null ? label : Math.round(percentage) + '%';
 
-		_dispatch(this.dom, 'ln-circular-progress:change', {
+		dispatch(this.dom, 'ln-circular-progress:change', {
 			target: this.dom,
 			value: value,
 			max: max,

@@ -144,6 +144,20 @@
 
 	</div>
 
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+</template>
 	<ul class="ln-toast ln-toast--top-right" data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
 	<script src="../../dist/ln-acme.iife.js"></script>
 </body>

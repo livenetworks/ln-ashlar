@@ -14,7 +14,7 @@
 	}
 
 	function _findElements(root) {
-		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
+		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			items.push(root);
 		}
@@ -34,7 +34,7 @@
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
 
 		// Support data-ln-search directly on <input> or on a wrapper element
-		var tag = dom.tagName;
+		const tag = dom.tagName;
 		this.input = (tag === 'INPUT' || tag === 'TEXTAREA') ? dom
 			: dom.querySelector('[name="search"]')
 			|| dom.querySelector('input[type="search"]')
@@ -52,7 +52,7 @@
 
 	_component.prototype._attachHandler = function () {
 		if (!this.input) return;
-		var self = this;
+		const self = this;
 
 		this._onInput = function () {
 			clearTimeout(self._debounceTimer);
@@ -65,13 +65,13 @@
 	};
 
 	_component.prototype._search = function (term) {
-		var target = document.getElementById(this.targetId);
+		const target = document.getElementById(this.targetId);
 		if (!target) return;
 
 		// Dispatch cancelable event on target.
 		// Consumers (e.g. ln-table) can call preventDefault() to handle filtering
 		// themselves and skip the default DOM show/hide behaviour.
-		var evt = new CustomEvent('ln-search:change', {
+		const evt = new CustomEvent('ln-search:change', {
 			bubbles: true,
 			cancelable: true,
 			detail: { term: term, targetId: this.targetId }
@@ -80,12 +80,12 @@
 		if (!target.dispatchEvent(evt)) return; // preventDefault() called — bail out
 
 		// Default behaviour: show/hide direct children of target
-		var children = target.children;
-		var matched = 0;
-		var total = children.length;
+		const children = target.children;
+		let matched = 0;
+		const total = children.length;
 
-		for (var i = 0; i < children.length; i++) {
-			var el = children[i];
+		for (let i = 0; i < children.length; i++) {
+			const el = children[i];
 			el.removeAttribute(HIDE_ATTR);
 
 			if (term && !el.textContent.replace(/\s+/g, ' ').toLowerCase().includes(term)) {
@@ -109,7 +109,7 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
+		const observer = new MutationObserver(function (mutations) {
 			mutations.forEach(function (mutation) {
 				if (mutation.type === 'childList') {
 					mutation.addedNodes.forEach(function (node) {

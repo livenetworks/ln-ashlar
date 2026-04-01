@@ -9,7 +9,7 @@
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	// Singleton — same lang for all table instances on the page
-	var _collator = typeof Intl !== 'undefined'
+	const _collator = typeof Intl !== 'undefined'
 		? new Intl.Collator(document.documentElement.lang || undefined, { sensitivity: 'base' })
 		: null;
 
@@ -20,7 +20,7 @@
 	}
 
 	function _findElements(root) {
-		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
+		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) items.push(root);
 		items.forEach(function (el) {
 			if (!el[DOM_ATTRIBUTE]) el[DOM_ATTRIBUTE] = new _component(el);
@@ -42,6 +42,7 @@
 		this._sortCol = -1;
 		this._sortDir = null;
 		this._sortType = null;
+		this._columnFilters = {};
 
 		// Virtual scroll state
 		this._virtual = false;
@@ -52,15 +53,15 @@
 		this._scrollHandler = null;
 		this._colgroup = null;
 
-		var toolbar = dom.querySelector('.ln-table__toolbar');
+		const toolbar = dom.querySelector('.ln-table__toolbar');
 		if (toolbar) dom.style.setProperty('--ln-table-toolbar-h', toolbar.offsetHeight + 'px');
 
-		var self = this;
+		const self = this;
 
 		if (this.tbody && this.tbody.rows.length > 0) {
 			this._parseRows();
 		} else if (this.tbody) {
-			var observer = new MutationObserver(function () {
+			const observer = new MutationObserver(function () {
 				if (self.tbody.rows.length > 0) {
 					observer.disconnect();
 					self._parseRows();
@@ -106,34 +107,59 @@
 		};
 		dom.addEventListener('ln-table:sort', this._onSort);
 
+		// ─── Column filters — ln-filter dispatches on target via bubbling ──
+
+		this._onColumnFilter = function (e) {
+			const key = e.detail.key;
+			const value = e.detail.value;
+			if (!value) {
+				delete self._columnFilters[key];
+			} else {
+				self._columnFilters[key] = value.toLowerCase();
+			}
+			self._applyFilterAndSort();
+			self._vStart = -1;
+			self._vEnd = -1;
+			self._render();
+			_dispatch(dom, 'ln-table:filter', {
+				term: self._searchTerm,
+				matched: self._filteredData.length,
+				total: self._data.length
+			});
+		};
+		dom.addEventListener('ln-filter:changed', this._onColumnFilter);
+
 		return this;
 	}
 
 	// ─── Parse rows into in-memory array ───────────────────────
 
 	_component.prototype._parseRows = function () {
-		var rows = this.tbody.rows;
-		var ths = this.ths;
+		const rows = this.tbody.rows;
+		const ths = this.ths;
 		this._data = [];
 
-		var sortTypes = [];
-		for (var c = 0; c < ths.length; c++) {
+		const sortTypes = [];
+		for (let c = 0; c < ths.length; c++) {
 			sortTypes[c] = ths[c].getAttribute(SORT_ATTR);
 		}
 
 		if (rows.length > 0) this._rowHeight = rows[0].offsetHeight || 40;
 		this._lockColumnWidths();
 
-		for (var i = 0; i < rows.length; i++) {
-			var tr = rows[i];
-			var sortKeys = [];
-			var searchParts = [];
+		for (let i = 0; i < rows.length; i++) {
+			const tr = rows[i];
+			const sortKeys = [];
+			const rawTexts = [];
+			const searchParts = [];
 
-			for (var j = 0; j < tr.cells.length; j++) {
-				var td = tr.cells[j];
-				var text = td.textContent.trim();
-				var raw = td.hasAttribute('data-ln-value') ? td.getAttribute('data-ln-value') : text;
-				var type = sortTypes[j];
+			for (let j = 0; j < tr.cells.length; j++) {
+				const td = tr.cells[j];
+				const text = td.textContent.trim();
+				const raw = td.hasAttribute('data-ln-value') ? td.getAttribute('data-ln-value') : text;
+				const type = sortTypes[j];
+
+				rawTexts[j] = text.toLowerCase();
 
 				if (type === 'number' || type === 'date') {
 					sortKeys[j] = parseFloat(raw) || 0;
@@ -148,6 +174,7 @@
 
 			this._data.push({
 				sortKeys: sortKeys,
+				rawTexts: rawTexts,
 				html: tr.outerHTML,
 				searchText: searchParts.join(' ')
 			});
@@ -164,27 +191,47 @@
 	// ─── Filter + Sort ─────────────────────────────────────────
 
 	_component.prototype._applyFilterAndSort = function () {
-		if (!this._searchTerm) {
+		const term = this._searchTerm;
+		const colFilters = this._columnFilters;
+		const hasColFilters = Object.keys(colFilters).length > 0;
+		const ths = this.ths;
+
+		// Build column index lookup: { "status": 6, "dept": 2 }
+		const colIndexByKey = {};
+		if (hasColFilters) {
+			for (let i = 0; i < ths.length; i++) {
+				const filterKey = ths[i].getAttribute('data-ln-filter-col');
+				if (filterKey) colIndexByKey[filterKey] = i;
+			}
+		}
+
+		if (!term && !hasColFilters) {
 			this._filteredData = this._data.slice();
 		} else {
-			var term = this._searchTerm;
 			this._filteredData = this._data.filter(function (row) {
-				return row.searchText.indexOf(term) !== -1;
+				if (term && row.searchText.indexOf(term) === -1) return false;
+				if (hasColFilters) {
+					for (const key in colFilters) {
+						const idx = colIndexByKey[key];
+						if (idx !== undefined && row.rawTexts[idx] !== colFilters[key]) return false;
+					}
+				}
+				return true;
 			});
 		}
 
 		if (this._sortCol < 0 || !this._sortDir) return;
 
-		var colIndex = this._sortCol;
-		var multiplier = this._sortDir === 'desc' ? -1 : 1;
-		var isNumeric = (this._sortType === 'number' || this._sortType === 'date');
-		var compare = _collator
+		const colIndex = this._sortCol;
+		const multiplier = this._sortDir === 'desc' ? -1 : 1;
+		const isNumeric = (this._sortType === 'number' || this._sortType === 'date');
+		const compare = _collator
 			? _collator.compare
 			: function (a, b) { return a < b ? -1 : a > b ? 1 : 0; };
 
 		this._filteredData.sort(function (a, b) {
-			var aKey = a.sortKeys[colIndex];
-			var bKey = b.sortKeys[colIndex];
+			const aKey = a.sortKeys[colIndex];
+			const bKey = b.sortKeys[colIndex];
 			if (isNumeric) return (aKey - bKey) * multiplier;
 			return compare(aKey, bKey) * multiplier;
 		});
@@ -195,9 +242,9 @@
 	_component.prototype._lockColumnWidths = function () {
 		if (!this.table || !this.thead || this._colgroup) return;
 
-		var colgroup = document.createElement('colgroup');
+		const colgroup = document.createElement('colgroup');
 		this.ths.forEach(function (th) {
-			var col = document.createElement('col');
+			const col = document.createElement('col');
 			col.style.width = th.offsetWidth + 'px';
 			colgroup.appendChild(col);
 		});
@@ -211,9 +258,9 @@
 
 	_component.prototype._render = function () {
 		if (!this.tbody) return;
-		var count = this._filteredData.length;
+		const count = this._filteredData.length;
 
-		if (count === 0 && this._searchTerm) {
+		if (count === 0 && (this._searchTerm || Object.keys(this._columnFilters).length > 0)) {
 			this._disableVirtualScroll();
 			this._showEmptyState();
 		} else if (count > VIRTUAL_THRESHOLD) {
@@ -226,9 +273,9 @@
 	};
 
 	_component.prototype._renderAll = function () {
-		var html = [];
-		var data = this._filteredData;
-		for (var i = 0; i < data.length; i++) html.push(data[i].html);
+		const html = [];
+		const data = this._filteredData;
+		for (let i = 0; i < data.length; i++) html.push(data[i].html);
 		this.tbody.innerHTML = html.join('');
 	};
 
@@ -237,7 +284,7 @@
 	_component.prototype._enableVirtualScroll = function () {
 		if (this._virtual) return;
 		this._virtual = true;
-		var self = this;
+		const self = this;
 
 		this._scrollHandler = function () {
 			if (self._rafId) return;
@@ -269,34 +316,34 @@
 	};
 
 	_component.prototype._renderVirtual = function () {
-		var data = this._filteredData;
-		var total = data.length;
-		var rowH = this._rowHeight;
+		const data = this._filteredData;
+		const total = data.length;
+		const rowH = this._rowHeight;
 		if (!rowH || !total) return;
 
-		var tableRect = this.table.getBoundingClientRect();
-		var tableTopInPage = tableRect.top + window.scrollY;
-		var theadH = this.thead ? this.thead.offsetHeight : 0;
-		var dataStartInPage = tableTopInPage + theadH;
+		const tableRect = this.table.getBoundingClientRect();
+		const tableTopInPage = tableRect.top + window.scrollY;
+		const theadH = this.thead ? this.thead.offsetHeight : 0;
+		const dataStartInPage = tableTopInPage + theadH;
 
-		var scrollIntoData = window.scrollY - dataStartInPage;
-		var startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
-		var endRow = Math.min(startRow + Math.ceil(window.innerHeight / rowH) + (BUFFER_ROWS * 2), total);
+		const scrollIntoData = window.scrollY - dataStartInPage;
+		const startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
+		const endRow = Math.min(startRow + Math.ceil(window.innerHeight / rowH) + (BUFFER_ROWS * 2), total);
 
 		if (startRow === this._vStart && endRow === this._vEnd) return;
 		this._vStart = startRow;
 		this._vEnd = endRow;
 
-		var colSpan = this.ths.length || 1;
-		var topH = startRow * rowH;
-		var bottomH = (total - endRow) * rowH;
-		var html = '';
+		const colSpan = this.ths.length || 1;
+		const topH = startRow * rowH;
+		const bottomH = (total - endRow) * rowH;
+		const html = '';
 
 		if (topH > 0) {
 			html += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' +
 				colSpan + '" style="height:' + topH + 'px;padding:0;border:none"></td></tr>';
 		}
-		for (var i = startRow; i < endRow; i++) html += data[i].html;
+		for (let i = startRow; i < endRow; i++) html += data[i].html;
 		if (bottomH > 0) {
 			html += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' +
 				colSpan + '" style="height:' + bottomH + 'px;padding:0;border:none"></td></tr>';
@@ -309,14 +356,14 @@
 	// Clones <template data-ln-table-empty> if present, then dispatches ln-table:empty.
 
 	_component.prototype._showEmptyState = function () {
-		var colSpan = this.ths.length || 1;
-		var tpl = this.dom.querySelector('template[' + EMPTY_TEMPLATE + ']');
+		const colSpan = this.ths.length || 1;
+		const tpl = this.dom.querySelector('template[' + EMPTY_TEMPLATE + ']');
 
-		var td = document.createElement('td');
+		const td = document.createElement('td');
 		td.setAttribute('colspan', String(colSpan));
 		if (tpl) td.appendChild(document.importNode(tpl.content, true));
 
-		var tr = document.createElement('tr');
+		const tr = document.createElement('tr');
 		tr.className = 'ln-table__empty';
 		tr.appendChild(td);
 
@@ -336,6 +383,7 @@
 		this._disableVirtualScroll();
 		this.dom.removeEventListener('ln-search:change', this._onSearch);
 		this.dom.removeEventListener('ln-table:sort', this._onSort);
+		this.dom.removeEventListener('ln-filter:changed', this._onColumnFilter);
 		if (this._colgroup) {
 			this._colgroup.remove();
 			this._colgroup = null;
@@ -355,7 +403,7 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
+		const observer = new MutationObserver(function (mutations) {
 			mutations.forEach(function (mutation) {
 				if (mutation.type === 'childList') {
 					mutation.addedNodes.forEach(function (node) {

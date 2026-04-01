@@ -44,6 +44,10 @@ scss/
 
 js/
 ├── index.js                 ← Barrel import (all components)
+├── ln-core/
+│   ├── index.js             ← Barrel re-export
+│   ├── helpers.js           ← cloneTemplate, dispatch, dispatchCancelable, fill, renderList
+│   └── reactive.js          ← reactiveState, deepReactive, createBatcher
 └── ln-{name}/
     ├── ln-{name}.js         ← IIFE component
     └── ln-{name}.scss       ← Co-located CSS (if needed)
@@ -201,7 +205,10 @@ scss/components/_tables.scss        →  table { @include table-base; }    ← a
 ## Adding a New JS Component
 
 1. Create `js/ln-{name}/ln-{name}.js`
-2. Follow the IIFE pattern (see senior-js-developer skill)
+2. Follow the IIFE pattern — import helpers from `ln-core`:
+   ```js
+   import { dispatch, dispatchCancelable } from '../ln-core';
+   ```
 3. Add `data-ln-{name}` data attribute
 4. If CSS needed, create `js/ln-{name}/ln-{name}.scss`
 5. Add `import './ln-{name}/ln-{name}.js'` to `js/index.js`
@@ -249,6 +256,12 @@ Available: `ln-icon-close`, `ln-icon-menu`, `ln-icon-home`, `ln-icon-users`,
 `ln-icon-box`, `ln-icon-building`, `ln-icon-badge`.
 
 Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon--xl` (4rem).
+
+---
+
+## Reactive Architecture
+
+See [docs/v2-reactive.md](docs/v2-reactive.md) for the reactive rendering layer: ln-core shared helpers, Proxy-based state, fill/renderList, attribute bridge pattern.
 
 ---
 

@@ -80,16 +80,16 @@
 	// ─── Attribute Sync ────────────────────────────────────────
 
 	function _syncAttribute(el) {
-		var instance = el[DOM_ATTRIBUTE];
+		const instance = el[DOM_ATTRIBUTE];
 		if (!instance) return;
 
-		var value = el.getAttribute(DOM_SELECTOR);
-		var shouldBeOpen = value === 'open';
+		const value = el.getAttribute(DOM_SELECTOR);
+		const shouldBeOpen = value === 'open';
 
 		if (shouldBeOpen === instance.isOpen) return;
 
 		if (shouldBeOpen) {
-			var before = _dispatchCancelable(el, 'ln-toggle:before-open', { target: el });
+			const before = _dispatchCancelable(el, 'ln-toggle:before-open', { target: el });
 			if (before.defaultPrevented) {
 				el.setAttribute(DOM_SELECTOR, 'close');
 				return;
@@ -98,7 +98,7 @@
 			el.classList.add('open');
 			_dispatch(el, 'ln-toggle:open', { target: el });
 		} else {
-			var before = _dispatchCancelable(el, 'ln-toggle:before-close', { target: el });
+			const before = _dispatchCancelable(el, 'ln-toggle:before-close', { target: el });
 			if (before.defaultPrevented) {
 				el.setAttribute(DOM_SELECTOR, 'open');
 				return;
@@ -119,7 +119,7 @@
 	}
 
 	function _dispatchCancelable(element, eventName, detail) {
-		var event = new CustomEvent(eventName, {
+		const event = new CustomEvent(eventName, {
 			bubbles: true,
 			cancelable: true,
 			detail: detail || {}
@@ -131,12 +131,12 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			for (var i = 0; i < mutations.length; i++) {
-				var mutation = mutations[i];
+		const observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
+				const mutation = mutations[i];
 				if (mutation.type === 'childList') {
-					for (var j = 0; j < mutation.addedNodes.length; j++) {
-						var node = mutation.addedNodes[j];
+					for (let j = 0; j < mutation.addedNodes.length; j++) {
+						const node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							_findElements(node);
 							_attachTriggers(node);
