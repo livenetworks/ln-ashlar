@@ -1,14 +1,9 @@
+import { dispatch } from '../ln-core';
+
 (function() {
 	const DOM_ATTRIBUTE = 'lnExternalLinks';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail
-		}));
-	}
 
 	function _isExternalLink(link) {
 		return link.hostname && link.hostname !== window.location.hostname;
@@ -23,7 +18,7 @@
 
 		link.setAttribute('data-ln-external-link', 'processed');
 
-		_dispatch(link, 'ln-external-links:processed', {
+		dispatch(link, 'ln-external-links:processed', {
 			link: link,
 			href: link.href
 		});
@@ -43,7 +38,7 @@
 			if (!link) return;
 
 			if (link.getAttribute('data-ln-external-link') === 'processed') {
-				_dispatch(link, 'ln-external-links:clicked', {
+				dispatch(link, 'ln-external-links:clicked', {
 					link: link,
 					href: link.href,
 					text: link.textContent || link.title || ''

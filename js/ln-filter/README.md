@@ -108,6 +108,10 @@ The consumer must provide CSS rules for hiding and for the active button:
 }
 ```
 
+## Internals
+
+Uses `reactiveState` + `createBatcher` from `ln-core`. State is `{ key, value }` — all DOM updates (button active state, target hide attributes) derive from state in a batched `_render()` cycle. Events dispatch after render via `_afterRender()`.
+
 ## Dynamic elements
 
 When children are added to the target list (AJAX, populate), `ln-filter` automatically re-filters them if there is an active filter. A MutationObserver on the target element ensures this.

@@ -59,3 +59,79 @@ el.setAttribute('data-ln-toggle', 'close');
 // Manual initialization (Shadow DOM, iframe only)
 window.lnToggle(container);
 ```
+
+---
+
+## Internal Architecture
+
+This section explains how the component works internally. A developer or AI reading this should fully understand the data flow, state model, and event pipeline without reading the source.
+
+### State
+
+Each `[data-ln-toggle]` element gets a `_component` instance stored at `element.lnToggle`. Instance state is minimal:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `dom` | Element | Reference to the host element |
+| `isOpen` | boolean | Current open/closed state |
+
+There is no reactive proxy — state is a single boolean, and the attribute is the source of truth.
+
+### Attribute-Driven Flow
+
+This is the canonical pattern that other ln-acme components (ln-modal, ln-accordion) are built on:
+
+```
+API call or trigger click
+    |
+    v
+open() / close() / toggle()
+    |
+    v
+setAttribute('data-ln-toggle', 'open' | 'close')
+    |
+    v
+MutationObserver fires
+    |
+    v
+_syncAttribute(el):
+    1. Read attribute value, compare to instance.isOpen
+    2. If no change → return (no-op)
+    3. Dispatch cancelable before-event (ln-toggle:before-open or ln-toggle:before-close)
+    4. If preventDefault() called → revert attribute to previous value, return
+    5. Update instance.isOpen
+    6. Add or remove .open class
+    7. Dispatch post-event (ln-toggle:open or ln-toggle:close)
+```
+
+**Key insight**: API methods (`open`, `close`, `toggle`) never apply state directly. They only set the attribute. The MutationObserver is the single codepath that applies `.open` class and dispatches events. This means `el.setAttribute('data-ln-toggle', 'open')` from external code produces identical behavior to `el.lnToggle.open()`.
+
+### Cancelable Before-Events
+
+Before-events use `dispatchCancelable()` from ln-core. If a listener calls `preventDefault()`, the observer **reverts the attribute** to its previous value (`open` → `close` or vice versa). This revert does not re-trigger the observer because `_syncAttribute` compares the new value against `instance.isOpen` — since state was never updated, the comparison shows no change and returns immediately.
+
+### Trigger Buttons
+
+Buttons with `data-ln-toggle-for="id"` are wired up by `_attachTriggers()`:
+
+1. Click handler reads `data-ln-toggle-for` to find the target element by ID
+2. Reads optional `data-ln-toggle-action` (`open`, `close`, or default `toggle`)
+3. Calls the corresponding API method on the target's instance
+4. Guard: `btn[lnToggleTrigger] = true` prevents duplicate listeners when MutationObserver re-fires on existing triggers
+5. Modifier keys (ctrl/meta) and middle-click are allowed through without `preventDefault()` — this preserves native browser behavior (open in new tab, etc.)
+
+### MutationObserver
+
+A single global observer watches `document.body` for:
+
+- **`childList`** (subtree): new elements added to DOM → `_findElements` + `_attachTriggers` auto-initializes them
+- **`attributes`** (`data-ln-toggle`, `data-ln-toggle-for`): attribute changes on existing elements → either `_syncAttribute` (state change) or `_findElements` + `_attachTriggers` (new component/trigger)
+
+### Why This Matters
+
+This attribute-driven reactive pattern is the foundation of ln-acme's component model:
+
+- **ln-accordion** coordinates multiple ln-toggle instances — it listens for toggle events and closes siblings
+- **External code** can drive state purely through `setAttribute` without importing anything
+- **Server-rendered state** works automatically — `data-ln-toggle="open"` in HTML applies `.open` class on init
+- **ln-acme v2** generalizes this pattern with Proxy-based reactivity, but the attribute-as-source-of-truth principle remains

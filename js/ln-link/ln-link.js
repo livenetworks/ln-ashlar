@@ -1,27 +1,10 @@
+import { dispatchCancelable } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-link';
 	const DOM_ATTRIBUTE = 'lnLink';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
-
-	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
-			bubbles: true,
-			cancelable: true,
-			detail: detail || {}
-		});
-		element.dispatchEvent(event);
-		return event;
-	}
 
 	// ─── Status Bar ────────────────────────────────────────────
 
@@ -60,7 +43,7 @@
 			return;
 		}
 
-		const before = _dispatchCancelable(row, 'ln-link:navigate', { target: row, href: href, link: link });
+		const before = dispatchCancelable(row, 'ln-link:navigate', { target: row, href: href, link: link });
 		if (before.defaultPrevented) return;
 		link.click();
 	}

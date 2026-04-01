@@ -26,7 +26,16 @@
       "Bash(echo \"$f\")",
       "Bash(git add:*)",
       "Bash(git stash:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(find /c/laragon/www/ln-acme/demo -type f -name *chat* -o -name *ai*)",
+      "Bash(find /c/laragon/www/ln-acme/js/ln-* -maxdepth 1 -type f)",
+      "Bash(find /c/laragon/www/ln-acme -type d -name *http* -o -name *request* -o -name *api*)",
+      "WebSearch",
+      "WebFetch(domain:tabler.io)",
+      "WebFetch(domain:preview.tabler.io)",
+      "WebFetch(domain:docs.tabler.io)",
+      "WebFetch(domain:tabler.bootmb.com)",
+      "Bash(find /c/laragon/www/ln-acme -name SKILL.md -o -name vite.config.*)"
     ]
   }
 }

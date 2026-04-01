@@ -13,12 +13,12 @@
 	}
 
 	function _findElements(root) {
-		var tables = Array.from(root.querySelectorAll('table'));
+		const tables = Array.from(root.querySelectorAll('table'));
 		if (root.tagName === 'TABLE') tables.push(root);
 
 		tables.forEach(function (table) {
 			if (table[DOM_ATTRIBUTE]) return;
-			var ths = Array.from(table.querySelectorAll('th[' + SORT_ATTR + ']'));
+			const ths = Array.from(table.querySelectorAll('th[' + SORT_ATTR + ']'));
 			if (ths.length) table[DOM_ATTRIBUTE] = new _component(table, ths);
 		});
 	}
@@ -30,7 +30,7 @@
 		this.ths = ths;
 		this._col = -1;
 		this._dir = null;
-		var self = this;
+		const self = this;
 
 		ths.forEach(function (th, index) {
 			if (th[DOM_ATTRIBUTE + 'Bound']) return;
@@ -44,7 +44,7 @@
 	}
 
 	_component.prototype._handleClick = function (colIndex, th) {
-		var newDir;
+		let newDir;
 
 		if (this._col !== colIndex) {
 			newDir = 'asc';
@@ -86,7 +86,7 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
+		const observer = new MutationObserver(function (mutations) {
 			mutations.forEach(function (mutation) {
 				if (mutation.type === 'childList') {
 					mutation.addedNodes.forEach(function (node) {

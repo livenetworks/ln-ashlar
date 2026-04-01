@@ -67,10 +67,10 @@
 	// ─── Attribute Sync ────────────────────────────────────────
 
 	function _syncAttribute(el) {
-		var instance = el[DOM_ATTRIBUTE];
+		const instance = el[DOM_ATTRIBUTE];
 		if (!instance) return;
 
-		var shouldBeEnabled = el.getAttribute(DOM_SELECTOR) !== 'disabled';
+		const shouldBeEnabled = el.getAttribute(DOM_SELECTOR) !== 'disabled';
 		if (shouldBeEnabled === instance.isEnabled) return;
 
 		instance.isEnabled = shouldBeEnabled;
@@ -234,12 +234,12 @@
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			for (var i = 0; i < mutations.length; i++) {
-				var mutation = mutations[i];
+		const observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
+				const mutation = mutations[i];
 				if (mutation.type === 'childList') {
-					for (var j = 0; j < mutation.addedNodes.length; j++) {
-						var node = mutation.addedNodes[j];
+					for (let j = 0; j < mutation.addedNodes.length; j++) {
+						const node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}

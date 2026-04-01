@@ -1,3 +1,6 @@
+import { dispatch } from '../ln-core';
+import { reactiveState, createBatcher } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
 	const DOM_ATTRIBUTE = 'lnFilter';
@@ -16,15 +19,15 @@
 	}
 
 	function _findElements(root) {
-		var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-			items.push(root);
-		}
-		items.forEach(function (el) {
+		const items = root.querySelectorAll('[' + DOM_SELECTOR + ']');
+		for (const el of items) {
 			if (!el[DOM_ATTRIBUTE]) {
 				el[DOM_ATTRIBUTE] = new _component(el);
 			}
-		});
+		}
+		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR) && !root[DOM_ATTRIBUTE]) {
+			root[DOM_ATTRIBUTE] = new _component(root);
+		}
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -35,8 +38,32 @@
 		this.dom = dom;
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
 		this.buttons = Array.from(dom.querySelectorAll('button'));
+		this._pendingEvents = [];
+
+		const self = this;
+
+		const queueRender = createBatcher(
+			function () { self._render(); },
+			function () { self._afterRender(); }
+		);
+
+		this.state = reactiveState({
+			key: null,
+			value: null
+		}, queueRender);
 
 		this._attachHandlers();
+
+		// Initialize from existing DOM — find pre-active button
+		for (let i = 0; i < this.buttons.length; i++) {
+			const btn = this.buttons[i];
+			if (btn.hasAttribute(ACTIVE_ATTR) && btn.getAttribute(VALUE_ATTR) !== '') {
+				// Set state directly on the proxy target to avoid triggering render
+				this.state.key = btn.getAttribute(KEY_ATTR);
+				this.state.value = btn.getAttribute(VALUE_ATTR);
+				break;
+			}
+		}
 
 		// Initialize aria-pressed on all filter buttons
 		this.buttons.forEach(function (btn) {
@@ -50,133 +77,133 @@
 	// ─── Handlers ──────────────────────────────────────────────
 
 	_component.prototype._attachHandlers = function () {
-		var self = this;
+		const self = this;
 
 		this.buttons.forEach(function (btn) {
 			if (btn[DOM_ATTRIBUTE + 'Bound']) return;
 			btn[DOM_ATTRIBUTE + 'Bound'] = true;
 
 			btn.addEventListener('click', function () {
-				var key = btn.getAttribute(KEY_ATTR);
-				var value = btn.getAttribute(VALUE_ATTR);
+				const key = btn.getAttribute(KEY_ATTR);
+				const value = btn.getAttribute(VALUE_ATTR);
 
 				if (value === '') {
+					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: '' } });
 					self.reset();
-					// Also dispatch changed with empty value so consumers clear this specific key
-					var detail = { key: key, value: '' };
-					_dispatch(self.dom, 'ln-filter:changed', detail);
-					var t = document.getElementById(self.targetId);
-					if (t && t !== self.dom) _dispatch(t, 'ln-filter:changed', detail);
 				} else {
-					self._setActive(btn);
-					self._applyFilter(key, value);
-					var detail = { key: key, value: value };
-					_dispatch(self.dom, 'ln-filter:changed', detail);
-					// Also dispatch on target — dropdown teleport moves dom out of target tree
-					var t = document.getElementById(self.targetId);
-					if (t && t !== self.dom) _dispatch(t, 'ln-filter:changed', detail);
+					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: value } });
+					self.state.key = key;
+					self.state.value = value;
 				}
 			});
 		});
 	};
 
-	// ─── Filter logic ──────────────────────────────────────────
+	// ─── Render ────────────────────────────────────────────────
 
-	_component.prototype._applyFilter = function (key, value) {
-		var target = document.getElementById(this.targetId);
+	_component.prototype._render = function () {
+		const self = this;
+		const activeKey = this.state.key;
+		const activeValue = this.state.value;
+
+		// Update button states
+		this.buttons.forEach(function (btn) {
+			const btnKey = btn.getAttribute(KEY_ATTR);
+			const btnValue = btn.getAttribute(VALUE_ATTR);
+			let isActive = false;
+
+			if (activeKey === null && activeValue === null) {
+				// Reset state — "all" button is active
+				isActive = btnValue === '';
+			} else {
+				isActive = btnKey === activeKey && btnValue === activeValue;
+			}
+
+			if (isActive) {
+				btn.setAttribute(ACTIVE_ATTR, '');
+				btn.setAttribute('aria-pressed', 'true');
+			} else {
+				btn.removeAttribute(ACTIVE_ATTR);
+				btn.setAttribute('aria-pressed', 'false');
+			}
+		});
+
+		// Apply filter to target children
+		const target = document.getElementById(self.targetId);
 		if (!target) return;
 
-		var children = Array.from(target.children);
+		const children = target.children;
+		for (let i = 0; i < children.length; i++) {
+			const el = children[i];
 
-		for (var i = 0; i < children.length; i++) {
-			var el = children[i];
-			var attr = el.getAttribute('data-' + key);
+			if (activeKey === null && activeValue === null) {
+				// Reset — show all
+				el.removeAttribute(HIDE_ATTR);
+				continue;
+			}
 
+			const attr = el.getAttribute('data-' + activeKey);
 			el.removeAttribute(HIDE_ATTR);
 
 			if (attr === null) continue;
 
-			if (value && attr.toLowerCase() !== value.toLowerCase()) {
+			if (activeValue && attr.toLowerCase() !== activeValue.toLowerCase()) {
 				el.setAttribute(HIDE_ATTR, 'true');
 			}
 		}
 	};
 
-	_component.prototype._setActive = function (btn) {
-		this.buttons.forEach(function (b) {
-			b.removeAttribute(ACTIVE_ATTR);
-			b.setAttribute('aria-pressed', 'false');
-		});
-		if (btn) {
-			btn.setAttribute(ACTIVE_ATTR, '');
-			btn.setAttribute('aria-pressed', 'true');
+	_component.prototype._afterRender = function () {
+		const events = this._pendingEvents;
+		this._pendingEvents = [];
+
+		for (let i = 0; i < events.length; i++) {
+			this._dispatchOnBoth(events[i].name, events[i].detail);
+		}
+	};
+
+	_component.prototype._dispatchOnBoth = function (eventName, detail) {
+		dispatch(this.dom, eventName, detail);
+		const target = document.getElementById(this.targetId);
+		if (target && target !== this.dom) {
+			dispatch(target, eventName, detail);
 		}
 	};
 
 	// ─── Public API ────────────────────────────────────────────
 
 	_component.prototype.filter = function (key, value) {
-		this._setActive(null);
-
-		// Highlight matching button if one exists
-		for (var i = 0; i < this.buttons.length; i++) {
-			var btn = this.buttons[i];
-			if (btn.getAttribute(KEY_ATTR) === key && btn.getAttribute(VALUE_ATTR) === value) {
-				this._setActive(btn);
-				break;
-			}
-		}
-
-		this._applyFilter(key, value);
-		_dispatch(this.dom, 'ln-filter:changed', { key: key, value: value });
+		this._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: value } });
+		this.state.key = key;
+		this.state.value = value;
 	};
 
 	_component.prototype.reset = function () {
-		var target = document.getElementById(this.targetId);
-		if (target) {
-			var children = Array.from(target.children);
-			for (var i = 0; i < children.length; i++) {
-				children[i].removeAttribute(HIDE_ATTR);
-			}
-		}
-
-		// Activate the "all" button (empty value)
-		var allBtn = null;
-		for (var i = 0; i < this.buttons.length; i++) {
-			if (this.buttons[i].getAttribute(VALUE_ATTR) === '') {
-				allBtn = this.buttons[i];
-				break;
-			}
-		}
-		this._setActive(allBtn);
-
-		_dispatch(this.dom, 'ln-filter:reset', {});
+		this._pendingEvents.push({ name: 'ln-filter:reset', detail: {} });
+		this.state.key = null;
+		this.state.value = null;
 	};
 
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
+	_component.prototype.getActive = function () {
+		if (this.state.key === null && this.state.value === null) return null;
+		return { key: this.state.key, value: this.state.value };
+	};
 
 	// ─── DOM Observer ──────────────────────────────────────────
 
 	function _domObserver() {
-		var observer = new MutationObserver(function (mutations) {
-			mutations.forEach(function (mutation) {
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
 				if (mutation.type === 'childList') {
-					mutation.addedNodes.forEach(function (node) {
+					for (const node of mutation.addedNodes) {
 						if (node.nodeType === 1) {
 							_findElements(node);
 						}
-					});
+					}
 				} else if (mutation.type === 'attributes') {
 					_findElements(mutation.target);
 				}
-			});
+			}
 		});
 
 		observer.observe(document.body, {

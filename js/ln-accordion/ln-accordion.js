@@ -1,3 +1,5 @@
+import { dispatch } from '../ln-core';
+
 (function () {
 	const DOM_SELECTOR = 'data-ln-accordion';
 	const DOM_ATTRIBUTE = 'lnAccordion';
@@ -34,7 +36,7 @@
 					el.setAttribute('data-ln-toggle', 'close');
 				}
 			}
-			_dispatch(dom, 'ln-accordion:change', { target: e.detail.target });
+			dispatch(dom, 'ln-accordion:change', { target: e.detail.target });
 		};
 		dom.addEventListener('ln-toggle:open', this._onToggleOpen);
 
@@ -44,18 +46,9 @@
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('ln-toggle:open', this._onToggleOpen);
-		_dispatch(this.dom, 'ln-accordion:destroyed', { target: this.dom });
+		dispatch(this.dom, 'ln-accordion:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
 
 	// ─── DOM Observer ──────────────────────────────────────────
 
