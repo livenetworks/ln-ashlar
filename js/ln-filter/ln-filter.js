@@ -1,4 +1,4 @@
-import { dispatch, guardBody } from '../ln-core';
+import { dispatch, guardBody, findElements } from '../ln-core';
 import { reactiveState, createBatcher } from '../ln-core';
 
 (function () {
@@ -15,19 +15,7 @@ import { reactiveState, createBatcher } from '../ln-core';
 	// ─── Constructor ───────────────────────────────────────────
 
 	function constructor(domRoot) {
-		_findElements(domRoot);
-	}
-
-	function _findElements(root) {
-		const items = root.querySelectorAll('[' + DOM_SELECTOR + ']');
-		for (const el of items) {
-			if (!el[DOM_ATTRIBUTE]) {
-				el[DOM_ATTRIBUTE] = new _component(el);
-			}
-		}
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR) && !root[DOM_ATTRIBUTE]) {
-			root[DOM_ATTRIBUTE] = new _component(root);
-		}
+		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -198,11 +186,11 @@ import { reactiveState, createBatcher } from '../ln-core';
 					if (mutation.type === 'childList') {
 						for (const node of mutation.addedNodes) {
 							if (node.nodeType === 1) {
-								_findElements(node);
+								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 							}
 						}
 					} else if (mutation.type === 'attributes') {
-						_findElements(mutation.target);
+						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 					}
 				}
 			});

@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-core';
 
 (function () {
 	'use strict';
@@ -12,19 +12,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 	// ─── Constructor ───────────────────────────────────────────
 
 	function constructor(domRoot) {
-		_findElements(domRoot);
-	}
-
-	function _findElements(root) {
-		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-			items.push(root);
-		}
-		for (const el of items) {
-			if (!el[DOM_ATTRIBUTE]) {
-				el[DOM_ATTRIBUTE] = new _component(el);
-			}
-		}
+		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -225,14 +213,14 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 						for (let j = 0; j < mutation.addedNodes.length; j++) {
 							const node = mutation.addedNodes[j];
 							if (node.nodeType === 1) {
-								_findElements(node);
+								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 							}
 						}
 					} else if (mutation.type === 'attributes') {
 						if (mutation.attributeName === DOM_SELECTOR && mutation.target[DOM_ATTRIBUTE]) {
 							_syncAttribute(mutation.target);
 						} else {
-							_findElements(mutation.target);
+							findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 						}
 					}
 				}

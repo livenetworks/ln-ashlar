@@ -1,5 +1,5 @@
 /* Live Networks - lnTabs (hash-aware tabs via <a href="#key">) */
-import { dispatch, guardBody } from '../ln-core';
+import { dispatch, guardBody, findElements } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-tabs";
@@ -7,16 +7,7 @@ import { dispatch, guardBody } from '../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined && window[DOM_ATTRIBUTE] !== null) return;
 
-	function constructor(domRoot = document.body) { _findElements(domRoot); }
-
-	function _findElements(root) {
-		if (root.nodeType !== 1) return;
-		const items = Array.from(root.querySelectorAll("[" + DOM_SELECTOR + "]"));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) items.push(root);
-		for (const el of items) {
-			if (!el[DOM_ATTRIBUTE]) el[DOM_ATTRIBUTE] = new _component(el);
-		}
-	}
+	function constructor(domRoot = document.body) { findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component); }
 
 	function _parseHash() {
 		const h = (location.hash || "").replace("#", "");
@@ -130,8 +121,8 @@ import { dispatch, guardBody } from '../ln-core';
 		guardBody(function () {
 			const observer = new MutationObserver(function (mutations) {
 				for (const mutation of mutations) {
-					if (mutation.type === 'attributes') { _findElements(mutation.target); continue; }
-					for (const node of mutation.addedNodes) { _findElements(node); }
+					if (mutation.type === 'attributes') { findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component); continue; }
+					for (const node of mutation.addedNodes) { findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component); }
 				}
 			});
 			observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });

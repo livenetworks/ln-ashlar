@@ -1,4 +1,4 @@
-import { guardBody, dispatch } from '../ln-core';
+import { guardBody, dispatch, findElements } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-dropdown';
@@ -9,19 +9,7 @@ import { guardBody, dispatch } from '../ln-core';
 	// ─── Constructor ───────────────────────────────────────────
 
 	function constructor(domRoot) {
-		_findElements(domRoot);
-	}
-
-	function _findElements(root) {
-		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-			items.push(root);
-		}
-		for (const el of items) {
-			if (!el[DOM_ATTRIBUTE]) {
-				el[DOM_ATTRIBUTE] = new _component(el);
-			}
-		}
+		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -249,11 +237,11 @@ import { guardBody, dispatch } from '../ln-core';
 					if (mutation.type === 'childList') {
 						for (const node of mutation.addedNodes) {
 							if (node.nodeType === 1) {
-								_findElements(node);
+								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 							}
 						}
 					} else if (mutation.type === 'attributes') {
-						_findElements(mutation.target);
+						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 					}
 				}
 			});

@@ -1,7 +1,7 @@
-import { dispatch } from '../ln-core';
+import { dispatch, findElements } from '../ln-core';
 
 (function () {
-	const DOM_SELECTOR = '[data-ln-circular-progress]';
+	const DOM_SELECTOR = 'data-ln-circular-progress';
 	const DOM_ATTRIBUTE = 'lnCircularProgress';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
@@ -12,21 +12,7 @@ import { dispatch } from '../ln-core';
 	const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 	function constructor(domRoot) {
-		_findElements(domRoot);
-	}
-
-	function _findElements(domRoot) {
-		const items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
-
-		for (const item of items) {
-			if (!item[DOM_ATTRIBUTE]) {
-				item[DOM_ATTRIBUTE] = new _constructor(item);
-			}
-		}
-
-		if (domRoot.hasAttribute && domRoot.hasAttribute('data-ln-circular-progress') && !domRoot[DOM_ATTRIBUTE]) {
-			domRoot[DOM_ATTRIBUTE] = new _constructor(domRoot);
-		}
+		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
 	}
 
 	function _constructor(dom) {
@@ -110,11 +96,11 @@ import { dispatch } from '../ln-core';
 				if (mutation.type === 'childList') {
 					for (const item of mutation.addedNodes) {
 						if (item.nodeType === 1) {
-							_findElements(item);
+							findElements(item, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
 						}
 					}
 				} else if (mutation.type === 'attributes') {
-					_findElements(mutation.target);
+					findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
 				}
 			}
 		});

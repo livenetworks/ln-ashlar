@@ -145,3 +145,18 @@ export function guardBody(setupFn, componentTag) {
 	}
 	setupFn();
 }
+
+// ─── Find Elements ─────────────────────────────────────────
+
+export function findElements(root, selector, attribute, ComponentClass) {
+	if (root.nodeType !== 1) return;
+	const items = Array.from(root.querySelectorAll('[' + selector + ']'));
+	if (root.hasAttribute && root.hasAttribute(selector)) {
+		items.push(root);
+	}
+	for (const el of items) {
+		if (!el[attribute]) {
+			el[attribute] = new ComponentClass(el);
+		}
+	}
+}

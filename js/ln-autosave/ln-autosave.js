@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-autosave';
@@ -11,19 +11,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 	// ─── Constructor ───────────────────────────────────────────
 
 	function constructor(domRoot) {
-		_findElements(domRoot);
-	}
-
-	function _findElements(root) {
-		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-			items.push(root);
-		}
-		for (const el of items) {
-			if (!el[DOM_ATTRIBUTE]) {
-				el[DOM_ATTRIBUTE] = new _component(el);
-			}
-		}
+		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -220,11 +208,11 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 						const nodes = mutations[i].addedNodes;
 						for (let j = 0; j < nodes.length; j++) {
 							if (nodes[j].nodeType === 1) {
-								_findElements(nodes[j]);
+								findElements(nodes[j], DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 							}
 						}
 					} else if (mutations[i].type === 'attributes') {
-						_findElements(mutations[i].target);
+						findElements(mutations[i].target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 					}
 				}
 			});
