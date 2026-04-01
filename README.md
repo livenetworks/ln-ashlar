@@ -99,6 +99,10 @@ scss/
 
 js/
 ├── index.js                  ← Barrel import
+├── ln-core/
+│   ├── index.js              ← Barrel re-export
+│   ├── helpers.js            ← cloneTemplate, dispatch, fill, renderList
+│   └── reactive.js           ← reactiveState, deepReactive, createBatcher
 └── ln-{name}/
     ├── ln-{name}.js          ← IIFE component
     └── ln-{name}.scss        ← Co-located CSS (if needed)
@@ -698,6 +702,7 @@ All components use `data-ln-*` attributes. No initialization needed — auto-dis
 | Component | Attribute | Description |
 |-----------|-----------|-------------|
 | Accordion | `data-ln-accordion` | Collapsible panels, only one open at a time |
+| Autoresize | `data-ln-autoresize` | Auto-resize textarea to fit content |
 | HTTP | — (global service) | Event-driven JSON fetch with abort support |
 | AJAX | `data-ln-ajax` | AJAX navigation and form submission |
 | Circular Progress | `data-ln-circular-progress` | SVG circular progress indicator |
@@ -736,7 +741,10 @@ See [js/COMPONENTS.md](js/COMPONENTS.md) for detailed JS architecture and patter
 ### New JS Component
 
 1. Create `js/ln-{name}/ln-{name}.js`
-2. Follow the IIFE pattern
+2. Follow the IIFE pattern — import helpers from `ln-core`:
+   ```js
+   import { dispatch, dispatchCancelable } from '../ln-core';
+   ```
 3. Use `data-ln-{name}` attribute for auto-discovery
 4. If CSS needed, create `js/ln-{name}/ln-{name}.scss`
 5. Add `import './ln-{name}/ln-{name}.js'` to `js/index.js`
