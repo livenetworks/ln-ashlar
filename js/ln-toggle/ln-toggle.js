@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-toggle';
@@ -75,7 +75,7 @@ import { guardBody } from '../ln-core';
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		_dispatch(this.dom, 'ln-toggle:destroyed', { target: this.dom });
+		dispatch(this.dom, 'ln-toggle:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -91,43 +91,24 @@ import { guardBody } from '../ln-core';
 		if (shouldBeOpen === instance.isOpen) return;
 
 		if (shouldBeOpen) {
-			const before = _dispatchCancelable(el, 'ln-toggle:before-open', { target: el });
+			const before = dispatchCancelable(el, 'ln-toggle:before-open', { target: el });
 			if (before.defaultPrevented) {
 				el.setAttribute(DOM_SELECTOR, 'close');
 				return;
 			}
 			instance.isOpen = true;
 			el.classList.add('open');
-			_dispatch(el, 'ln-toggle:open', { target: el });
+			dispatch(el, 'ln-toggle:open', { target: el });
 		} else {
-			const before = _dispatchCancelable(el, 'ln-toggle:before-close', { target: el });
+			const before = dispatchCancelable(el, 'ln-toggle:before-close', { target: el });
 			if (before.defaultPrevented) {
 				el.setAttribute(DOM_SELECTOR, 'open');
 				return;
 			}
 			instance.isOpen = false;
 			el.classList.remove('open');
-			_dispatch(el, 'ln-toggle:close', { target: el });
+			dispatch(el, 'ln-toggle:close', { target: el });
 		}
-	}
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
-
-	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
-			bubbles: true,
-			cancelable: true,
-			detail: detail || {}
-		});
-		element.dispatchEvent(event);
-		return event;
 	}
 
 	// ─── DOM Observer ──────────────────────────────────────────

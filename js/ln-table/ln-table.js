@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
@@ -82,7 +82,7 @@ import { guardBody } from '../ln-core';
 			self._vStart = -1;
 			self._vEnd = -1;
 			self._render();
-			_dispatch(dom, 'ln-table:filter', {
+			dispatch(dom, 'ln-table:filter', {
 				term: self._searchTerm,
 				matched: self._filteredData.length,
 				total: self._data.length
@@ -100,7 +100,7 @@ import { guardBody } from '../ln-core';
 			self._vStart = -1;
 			self._vEnd = -1;
 			self._render();
-			_dispatch(dom, 'ln-table:sorted', {
+			dispatch(dom, 'ln-table:sorted', {
 				column: e.detail.column,
 				direction: e.detail.direction,
 				matched: self._filteredData.length,
@@ -123,7 +123,7 @@ import { guardBody } from '../ln-core';
 			self._vStart = -1;
 			self._vEnd = -1;
 			self._render();
-			_dispatch(dom, 'ln-table:filter', {
+			dispatch(dom, 'ln-table:filter', {
 				term: self._searchTerm,
 				matched: self._filteredData.length,
 				total: self._data.length
@@ -185,7 +185,7 @@ import { guardBody } from '../ln-core';
 		this._filteredData = this._data.slice();
 		this._render();
 
-		_dispatch(this.dom, 'ln-table:ready', {
+		dispatch(this.dom, 'ln-table:ready', {
 			total: this._data.length
 		});
 	};
@@ -372,7 +372,7 @@ import { guardBody } from '../ln-core';
 		this.tbody.innerHTML = '';
 		this.tbody.appendChild(tr);
 
-		_dispatch(this.dom, 'ln-table:empty', {
+		dispatch(this.dom, 'ln-table:empty', {
 			term: this._searchTerm,
 			total: this._data.length
 		});
@@ -395,12 +395,6 @@ import { guardBody } from '../ln-core';
 		this._filteredData = [];
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, { bubbles: true, detail: detail || {} }));
-	}
 
 	// ─── DOM Observer ──────────────────────────────────────────
 

@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-autosave';
@@ -85,7 +85,7 @@ import { guardBody } from '../ln-core';
 		} catch (e) {
 			return;
 		}
-		_dispatch(this.dom, 'ln-autosave:saved', { target: this.dom, data: data });
+		dispatch(this.dom, 'ln-autosave:saved', { target: this.dom, data: data });
 	};
 
 	_component.prototype.restore = function () {
@@ -104,11 +104,11 @@ import { guardBody } from '../ln-core';
 			return;
 		}
 
-		const before = _dispatchCancelable(this.dom, 'ln-autosave:before-restore', { target: this.dom, data: data });
+		const before = dispatchCancelable(this.dom, 'ln-autosave:before-restore', { target: this.dom, data: data });
 		if (before.defaultPrevented) return;
 
 		_populateForm(this.dom, data);
-		_dispatch(this.dom, 'ln-autosave:restored', { target: this.dom, data: data });
+		dispatch(this.dom, 'ln-autosave:restored', { target: this.dom, data: data });
 	};
 
 	_component.prototype.clear = function () {
@@ -117,7 +117,7 @@ import { guardBody } from '../ln-core';
 		} catch (e) {
 			return;
 		}
-		_dispatch(this.dom, 'ln-autosave:cleared', { target: this.dom });
+		dispatch(this.dom, 'ln-autosave:cleared', { target: this.dom });
 	};
 
 	_component.prototype.destroy = function () {
@@ -127,7 +127,7 @@ import { guardBody } from '../ln-core';
 		this.dom.removeEventListener('submit', this._onSubmit);
 		this.dom.removeEventListener('reset', this._onReset);
 		this.dom.removeEventListener('click', this._onClearClick);
-		_dispatch(this.dom, 'ln-autosave:destroyed', { target: this.dom });
+		dispatch(this.dom, 'ln-autosave:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -208,23 +208,6 @@ import { guardBody } from '../ln-core';
 				restored[k].lnSelect.setValue(data[restored[k].name]);
 			}
 		}
-	}
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
-
-	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
-			bubbles: true,
-			cancelable: true,
-			detail: detail || {}
-		});
-		element.dispatchEvent(event);
-		return event;
 	}
 
 	// ─── DOM Observer ──────────────────────────────────────────

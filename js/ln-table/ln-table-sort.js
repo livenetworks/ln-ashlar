@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch } from '../ln-core';
 
 (function () {
 	const DOM_ATTRIBUTE = 'lnTableSort';
@@ -69,21 +69,12 @@ import { guardBody } from '../ln-core';
 			th.setAttribute(SORT_ACTIVE_ATTR, newDir);
 		}
 
-		_dispatch(this.table, 'ln-table:sort', {
+		dispatch(this.table, 'ln-table:sort', {
 			column: colIndex,
 			sortType: th.getAttribute(SORT_ATTR),
 			direction: newDir
 		});
 	};
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
 
 	// ─── DOM Observer ──────────────────────────────────────────
 

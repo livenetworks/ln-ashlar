@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-upload';
@@ -37,13 +37,6 @@ import { guardBody } from '../ln-core';
 		const ext = '.' + _getExtension(file.name);
 		const allowed = acceptString.split(',').map(function (s) { return s.trim().toLowerCase(); });
 		return allowed.includes(ext.toLowerCase());
-	}
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail
-		}));
 	}
 
 	function _initUpload(container) {
@@ -87,12 +80,12 @@ import { guardBody } from '../ln-core';
 		function addFile(file) {
 			if (!_isValidFile(file, acceptString)) {
 				const message = _getDict(container, 'invalid-type');
-				_dispatch(container, 'ln-upload:invalid', {
+				dispatch(container, 'ln-upload:invalid', {
 					file: file,
 					message: message
 				});
 
-				_dispatch(window, 'ln-toast:enqueue', {
+				dispatch(window, 'ln-toast:enqueue', {
 					type: 'error',
 					title: 'Invalid File',
 					message: message || 'This file type is not allowed'
@@ -171,7 +164,7 @@ import { guardBody } from '../ln-core';
 
 					updateHiddenInput();
 
-					_dispatch(container, 'ln-upload:uploaded', {
+					dispatch(container, 'ln-upload:uploaded', {
 						localId: localId,
 						serverId: data.id,
 						name: data.name
@@ -197,12 +190,12 @@ import { guardBody } from '../ln-core';
 				sizeSpan.textContent = _getDict(container, 'error');
 				removeBtn.disabled = false;
 
-				_dispatch(container, 'ln-upload:error', {
+				dispatch(container, 'ln-upload:error', {
 					file: file,
 					message: message
 				});
 
-				_dispatch(window, 'ln-toast:enqueue', {
+				dispatch(window, 'ln-toast:enqueue', {
 					type: 'error',
 					title: 'Upload Error',
 					message: message || _getDict(container, 'upload-failed') || 'Failed to upload file'
@@ -257,14 +250,14 @@ import { guardBody } from '../ln-core';
 						uploadedFiles.delete(localId);
 						updateHiddenInput();
 
-						_dispatch(container, 'ln-upload:removed', {
+						dispatch(container, 'ln-upload:removed', {
 							localId: localId,
 							serverId: fileData.serverId
 						});
 					} else {
 						if (item) item.classList.remove('ln-upload__item--deleting');
 
-						_dispatch(window, 'ln-toast:enqueue', {
+						dispatch(window, 'ln-toast:enqueue', {
 							type: 'error',
 							title: 'Error',
 							message: _getDict(container, 'delete-error') || 'Failed to delete file'
@@ -275,7 +268,7 @@ import { guardBody } from '../ln-core';
 					console.warn('[ln-upload] Delete error:', error);
 					if (item) item.classList.remove('ln-upload__item--deleting');
 
-					_dispatch(window, 'ln-toast:enqueue', {
+					dispatch(window, 'ln-toast:enqueue', {
 						type: 'error',
 						title: 'Network Error',
 						message: 'Could not connect to server'
@@ -333,7 +326,7 @@ import { guardBody } from '../ln-core';
 				uploadedFiles.clear();
 				list.innerHTML = '';
 				updateHiddenInput();
-				_dispatch(container, 'ln-upload:cleared', {});
+				dispatch(container, 'ln-upload:cleared', {});
 			},
 			destroy: function () {
 				zone.removeEventListener('click', _onZoneClick);

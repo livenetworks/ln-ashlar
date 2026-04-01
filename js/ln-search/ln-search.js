@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatchCancelable } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-search';
@@ -73,13 +73,8 @@ import { guardBody } from '../ln-core';
 		// Dispatch cancelable event on target.
 		// Consumers (e.g. ln-table) can call preventDefault() to handle filtering
 		// themselves and skip the default DOM show/hide behaviour.
-		const evt = new CustomEvent('ln-search:change', {
-			bubbles: true,
-			cancelable: true,
-			detail: { term: term, targetId: this.targetId }
-		});
-
-		if (!target.dispatchEvent(evt)) return; // preventDefault() called — bail out
+		const evt = dispatchCancelable(target, 'ln-search:change', { term: term, targetId: this.targetId });
+		if (evt.defaultPrevented) return;
 
 		// Default behaviour: show/hide direct children of target
 		const children = target.children;

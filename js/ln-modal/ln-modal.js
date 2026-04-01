@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-modal';
@@ -122,7 +122,7 @@ import { guardBody } from '../ln-core';
 			}
 		}
 
-		_dispatch(this.dom, 'ln-modal:destroyed');
+		dispatch(this.dom, 'ln-modal:destroyed', { modalId: this.dom.id, target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -138,7 +138,7 @@ import { guardBody } from '../ln-core';
 		if (shouldBeOpen === instance.isOpen) return;
 
 		if (shouldBeOpen) {
-			const before = _dispatchCancelable(el, 'ln-modal:before-open');
+			const before = dispatchCancelable(el, 'ln-modal:before-open', { modalId: el.id, target: el });
 			if (before.defaultPrevented) {
 				el.setAttribute(DOM_SELECTOR, 'close');
 				return;
@@ -157,9 +157,9 @@ import { guardBody } from '../ln-core';
 				if (firstFocusable) firstFocusable.focus();
 			}
 
-			_dispatch(el, 'ln-modal:open');
+			dispatch(el, 'ln-modal:open', { modalId: el.id, target: el });
 		} else {
-			const before = _dispatchCancelable(el, 'ln-modal:before-close');
+			const before = dispatchCancelable(el, 'ln-modal:before-close', { modalId: el.id, target: el });
 			if (before.defaultPrevented) {
 				el.setAttribute(DOM_SELECTOR, 'open');
 				return;
@@ -168,7 +168,7 @@ import { guardBody } from '../ln-core';
 			el.removeAttribute('aria-modal');
 			document.removeEventListener('keydown', instance._onEscape);
 			document.removeEventListener('keydown', instance._onFocusTrap);
-			_dispatch(el, 'ln-modal:close');
+			dispatch(el, 'ln-modal:close', { modalId: el.id, target: el });
 
 			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
 				document.body.classList.remove('ln-modal-open');
@@ -177,23 +177,6 @@ import { guardBody } from '../ln-core';
 	}
 
 	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: Object.assign({ modalId: element.id, target: element }, detail || {})
-		}));
-	}
-
-	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
-			bubbles: true,
-			cancelable: true,
-			detail: Object.assign({ modalId: element.id, target: element }, detail || {})
-		});
-		element.dispatchEvent(event);
-		return event;
-	}
 
 	function _attachCloseButtons(instance) {
 		const closeButtons = instance.dom.querySelectorAll('[data-ln-modal-close]');

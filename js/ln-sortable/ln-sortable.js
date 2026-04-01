@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 
 (function () {
 	'use strict';
@@ -62,7 +62,7 @@ import { guardBody } from '../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('pointerdown', this._onPointerDown);
-		_dispatch(this.dom, 'ln-sortable:destroyed', { target: this.dom });
+		dispatch(this.dom, 'ln-sortable:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -104,7 +104,7 @@ import { guardBody } from '../ln-core';
 		const children = Array.from(this.dom.children);
 		const index = children.indexOf(item);
 
-		const before = _dispatchCancelable(this.dom, 'ln-sortable:before-drag', {
+		const before = dispatchCancelable(this.dom, 'ln-sortable:before-drag', {
 			item: item,
 			index: index
 		});
@@ -119,7 +119,7 @@ import { guardBody } from '../ln-core';
 		item.setAttribute('aria-grabbed', 'true');
 		this.dom.classList.add('ln-sortable--active');
 
-		_dispatch(this.dom, 'ln-sortable:drag-start', {
+		dispatch(this.dom, 'ln-sortable:drag-start', {
 			item: item,
 			index: index
 		});
@@ -204,7 +204,7 @@ import { guardBody } from '../ln-core';
 			const newChildren = Array.from(this.dom.children);
 			const newIndex = newChildren.indexOf(item);
 
-			_dispatch(this.dom, 'ln-sortable:reordered', {
+			dispatch(this.dom, 'ln-sortable:reordered', {
 				item: item,
 				oldIndex: oldIndex,
 				newIndex: newIndex
@@ -213,25 +213,6 @@ import { guardBody } from '../ln-core';
 
 		this._dragging = null;
 	};
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
-
-	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
-			bubbles: true,
-			cancelable: true,
-			detail: detail || {}
-		});
-		element.dispatchEvent(event);
-		return event;
-	}
 
 	// ─── DOM Observer ──────────────────────────────────────────
 

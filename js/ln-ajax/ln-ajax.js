@@ -1,27 +1,10 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-ajax';
 	const DOM_ATTRIBUTE = 'lnAjax';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
-
-	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
-			bubbles: true,
-			cancelable: true,
-			detail: detail || {}
-		});
-		element.dispatchEvent(event);
-		return event;
-	}
 
 	function _constructor(domRoot) {
 		if (!domRoot.hasAttribute(DOM_SELECTOR)) return;
@@ -105,10 +88,10 @@ import { guardBody } from '../ln-core';
 	}
 
 	function _makeAjaxRequest(method, url, data, element, callback) {
-		const before = _dispatchCancelable(element, 'ln-ajax:before-start', { method: method, url: url });
+		const before = dispatchCancelable(element, 'ln-ajax:before-start', { method: method, url: url });
 		if (before.defaultPrevented) return;
 
-		_dispatch(element, 'ln-ajax:start', { method: method, url: url });
+		dispatch(element, 'ln-ajax:start', { method: method, url: url });
 
 		element.classList.add('ln-ajax--loading');
 		const spinner = document.createElement('span');
@@ -183,9 +166,9 @@ import { guardBody } from '../ln-core';
 						window.history.pushState({ ajax: true }, '', finalUrl);
 					}
 
-					_dispatch(element, 'ln-ajax:success', { method: method, url: finalUrl, data: data });
+					dispatch(element, 'ln-ajax:success', { method: method, url: finalUrl, data: data });
 				} else {
-					_dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, status: result.status, data: data });
+					dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, status: result.status, data: data });
 				}
 
 				// Auto-show response message as toast
@@ -198,12 +181,12 @@ import { guardBody } from '../ln-core';
 					});
 				}
 
-				_dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
+				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
 			})
 			.catch(function (error) {
-				_dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, error: error });
-				_dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
+				dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, error: error });
+				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
 			});
 	}

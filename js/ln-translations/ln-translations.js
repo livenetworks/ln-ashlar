@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, cloneTemplate, dispatch, dispatchCancelable } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-translations';
@@ -13,16 +13,6 @@ import { guardBody } from '../ln-core';
 		sq: 'Shqip',
 		sr: 'Srpski'
 	};
-
-	// ─── Template cache ────────────────────────────────────────
-
-	const _tmplCache = {};
-	function _cloneTemplate(name) {
-		if (!_tmplCache[name]) {
-			_tmplCache[name] = document.querySelector('[data-ln-template="' + name + '"]');
-		}
-		return _tmplCache[name].content.cloneNode(true);
-	}
 
 	// ─── Constructor ───────────────────────────────────────────
 
@@ -127,7 +117,8 @@ import { guardBody } from '../ln-core';
 			if (this.activeLanguages.has(lang)) continue;
 			availableCount++;
 
-			const frag = _cloneTemplate('ln-translations-menu-item');
+			const frag = cloneTemplate('ln-translations-menu-item', 'ln-translations');
+			if (!frag) return;
 			const btn = frag.querySelector('[data-ln-translations-lang]');
 			btn.setAttribute('data-ln-translations-lang', lang);
 			btn.textContent = this.locales[lang];
@@ -161,7 +152,8 @@ import { guardBody } from '../ln-core';
 		const self = this;
 
 		this.activeLanguages.forEach(function (lang) {
-			const frag = _cloneTemplate('ln-translations-badge');
+			const frag = cloneTemplate('ln-translations-badge', 'ln-translations');
+			if (!frag) return;
 			const p = frag.querySelector('[data-ln-translations-lang]');
 			p.setAttribute('data-ln-translations-lang', lang);
 
@@ -188,7 +180,7 @@ import { guardBody } from '../ln-core';
 		if (this.activeLanguages.has(lang)) return;
 
 		const langName = this.locales[lang] || lang;
-		const before = _dispatchCancelable(this.dom, 'ln-translations:before-add', {
+		const before = dispatchCancelable(this.dom, 'ln-translations:before-add', {
 			target: this.dom, lang: lang, langName: langName
 		});
 		if (before.defaultPrevented) return;
@@ -240,7 +232,7 @@ import { guardBody } from '../ln-core';
 		this._updateDropdown();
 		this._updateBadges();
 
-		_dispatch(this.dom, 'ln-translations:added', {
+		dispatch(this.dom, 'ln-translations:added', {
 			target: this.dom, lang: lang, langName: langName
 		});
 	};
@@ -248,7 +240,7 @@ import { guardBody } from '../ln-core';
 	_component.prototype.removeLanguage = function (lang) {
 		if (!this.activeLanguages.has(lang)) return;
 
-		const before = _dispatchCancelable(this.dom, 'ln-translations:before-remove', {
+		const before = dispatchCancelable(this.dom, 'ln-translations:before-remove', {
 			target: this.dom, lang: lang
 		});
 		if (before.defaultPrevented) return;
@@ -263,7 +255,7 @@ import { guardBody } from '../ln-core';
 		this._updateDropdown();
 		this._updateBadges();
 
-		_dispatch(this.dom, 'ln-translations:removed', {
+		dispatch(this.dom, 'ln-translations:removed', {
 			target: this.dom, lang: lang
 		});
 	};
@@ -294,25 +286,6 @@ import { guardBody } from '../ln-core';
 
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
-
-	function _dispatchCancelable(element, eventName, detail) {
-		const event = new CustomEvent(eventName, {
-			bubbles: true,
-			cancelable: true,
-			detail: detail || {}
-		});
-		element.dispatchEvent(event);
-		return event;
-	}
 
 	// ─── DOM Observer ──────────────────────────────────────────
 

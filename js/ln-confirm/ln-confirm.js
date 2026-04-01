@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-confirm';
@@ -74,7 +74,7 @@ import { guardBody } from '../ln-core';
 
 		this._startTimer();
 
-		_dispatch(this.dom, 'ln-confirm:waiting', { target: this.dom });
+		dispatch(this.dom, 'ln-confirm:waiting', { target: this.dom });
 	};
 
 	_component.prototype._startTimer = function () {
@@ -123,15 +123,6 @@ import { guardBody } from '../ln-core';
 		if (!instance || !instance.confirming) return;
 		// Restart timer with new timeout value
 		instance._startTimer();
-	}
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
 	}
 
 	// ─── DOM Observer ──────────────────────────────────────────

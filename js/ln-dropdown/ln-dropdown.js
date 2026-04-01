@@ -1,4 +1,4 @@
-import { guardBody } from '../ln-core';
+import { guardBody, dispatch } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-dropdown';
@@ -63,7 +63,7 @@ import { guardBody } from '../ln-core';
 			self._addOutsideClickListener();
 			self._addScrollRepositionListener();
 			self._addResizeCloseListener();
-			_dispatch(dom, 'ln-dropdown:open', { target: e.detail.target });
+			dispatch(dom, 'ln-dropdown:open', { target: e.detail.target });
 		};
 
 		this._onToggleClose = function (e) {
@@ -73,7 +73,7 @@ import { guardBody } from '../ln-core';
 			self._removeScrollRepositionListener();
 			self._removeResizeCloseListener();
 			self._teleportBack();
-			_dispatch(dom, 'ln-dropdown:close', { target: e.detail.target });
+			dispatch(dom, 'ln-dropdown:close', { target: e.detail.target });
 		};
 
 		this.toggleEl.addEventListener('ln-toggle:open', this._onToggleOpen);
@@ -236,18 +236,9 @@ import { guardBody } from '../ln-core';
 		this._teleportBack();
 		this.toggleEl.removeEventListener('ln-toggle:open', this._onToggleOpen);
 		this.toggleEl.removeEventListener('ln-toggle:close', this._onToggleClose);
-		_dispatch(this.dom, 'ln-dropdown:destroyed', { target: this.dom });
+		dispatch(this.dom, 'ln-dropdown:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
-
-	// ─── Helpers ───────────────────────────────────────────────
-
-	function _dispatch(element, eventName, detail) {
-		element.dispatchEvent(new CustomEvent(eventName, {
-			bubbles: true,
-			detail: detail || {}
-		}));
-	}
 
 	// ─── DOM Observer ──────────────────────────────────────────
 
