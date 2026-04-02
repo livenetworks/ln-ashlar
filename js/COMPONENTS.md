@@ -614,9 +614,18 @@ _component.prototype._buildTrackItem = function (track, idx) {
 | ln-upload | Functional | `data-ln-upload` | File upload |
 | ln-ajax | Functional | `data-ln-ajax` | AJAX navigation |
 | ln-progress | Functional | `data-ln-progress` | Progress bar |
+| ln-circular-progress | Instance | `data-ln-circular-progress` | Circular (ring) progress indicator |
 | ln-select | Wrapper | `data-ln-select` | TomSelect wrapper |
 | ln-search | Instance | `data-ln-search` | Generic search (textContent filter) |
 | ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
+| ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll) |
+| ln-table-sort | Instance | `data-ln-sort` | Sort header handler (companion to ln-table) |
+| ln-sortable | Instance | `data-ln-sortable` | Drag & drop reorder |
+| ln-dropdown | Instance | `data-ln-dropdown` | Positioned dropdown menu (wraps ln-toggle) |
+| ln-link | Instance | `data-ln-link` | Clickable rows/containers |
+| ln-confirm | Instance | `data-ln-confirm` | Two-click confirmation for destructive actions |
 | ln-autosave | Instance | `data-ln-autosave` | Auto-save form to localStorage on blur/change |
+| ln-autoresize | Instance | `data-ln-autoresize` | Auto-resize textarea height |
+| ln-translations | Instance | `data-ln-translations` | Multi-language form field management |
 | ln-external-links | Utility | — | External links handler |
 | ln-http | Global service | — | Event-driven JSON fetch with abort support |
