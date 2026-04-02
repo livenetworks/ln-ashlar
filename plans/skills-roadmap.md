@@ -53,6 +53,6 @@ Discussion happens in main chat, execution in separate chats.
 - [ ] TODO (future): ln-http integration — ln-store uses raw fetch. If global HTTP layer needed (shared headers, auth refresh, interceptors), extract shared fetch wrapper. Not needed now but if mysterious HTTP failures appear, this is why.
 
 ## 6. Discussions Pending (separate chats)
-- [ ] Rendering boundary — Blade SSR vs JS dynamic, exact rules
+- [x] Rendering boundary — DEFINED: SSR default (ln-table, up to ~1000 rows), IndexedDB mode (ln-data-table + ln-store, 1000+), SPA mode (ln-mixer pattern). Documented in memory.
 - [x] Coordinator pattern — DONE (architecture/coordinator-pattern.md) — two types: library (ln-accordion, ln-form) + project (ln-mixer pattern)
 - [x] State ownership hierarchy — DONE (architecture/state-ownership.md) — external vs internal vs persistent
