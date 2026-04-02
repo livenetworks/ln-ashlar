@@ -43,6 +43,8 @@ The `data-ln-sortable` attribute is the single source of truth. `data-ln-sortabl
 | `ln-sortable:before-drag` | yes | **yes** | `{ item, index }` |
 | `ln-sortable:drag-start` | yes | no | `{ item, index }` |
 | `ln-sortable:reordered` | yes | no | `{ item, oldIndex, newIndex }` |
+| `ln-sortable:enabled` | yes | no | `{ target }` |
+| `ln-sortable:disabled` | yes | no | `{ target }` |
 
 ## CSS Classes (set by JS, styled by consumer)
 
@@ -94,7 +96,7 @@ The `data-ln-sortable` attribute controls enabled/disabled state:
 - `data-ln-sortable` or `data-ln-sortable=""` → enabled
 - `data-ln-sortable="disabled"` → disabled
 
-API methods (`enable()`, `disable()`) set the attribute. The MutationObserver calls `_syncAttribute()` which updates `instance.isEnabled`. Unlike ln-toggle/ln-modal, there are no before-events for enable/disable — the state change is immediate.
+API methods (`enable()`, `disable()`) set the attribute. The MutationObserver detects the change and updates `instance.isEnabled` inline, then dispatches `ln-sortable:enabled` or `ln-sortable:disabled`. Unlike ln-toggle/ln-modal, there are no cancelable before-events for enable/disable — the state change is immediate.
 
 ### Pointer Events Lifecycle
 
@@ -190,4 +192,4 @@ list.addEventListener('ln-sortable:before-drag', function (e) {
 A single global observer watches `document.body` for:
 
 - **`childList`** (subtree): new elements → `_findElements` auto-initializes sortable containers
-- **`attributes`** (`data-ln-sortable`): attribute changes → `_syncAttribute` updates `isEnabled`
+- **`attributes`** (`data-ln-sortable`): attribute changes → updates `isEnabled` + dispatches `ln-sortable:enabled` or `ln-sortable:disabled`

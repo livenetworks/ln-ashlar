@@ -54,18 +54,6 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── Attribute Sync ────────────────────────────────────────
-
-	function _syncAttribute(el) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
-
-		const shouldBeEnabled = el.getAttribute(DOM_SELECTOR) !== 'disabled';
-		if (shouldBeEnabled === instance.isEnabled) return;
-
-		instance.isEnabled = shouldBeEnabled;
-	}
-
 	// ─── Pointer Handlers ──────────────────────────────────────
 
 	_component.prototype._handlePointerDown = function (e) {
@@ -217,10 +205,16 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 							}
 						}
 					} else if (mutation.type === 'attributes') {
-						if (mutation.attributeName === DOM_SELECTOR && mutation.target[DOM_ATTRIBUTE]) {
-							_syncAttribute(mutation.target);
+						const el = mutation.target;
+						const instance = el[DOM_ATTRIBUTE];
+						if (instance) {
+							const shouldBeEnabled = el.getAttribute(DOM_SELECTOR) !== 'disabled';
+							if (shouldBeEnabled !== instance.isEnabled) {
+								instance.isEnabled = shouldBeEnabled;
+								dispatch(el, shouldBeEnabled ? 'ln-sortable:enabled' : 'ln-sortable:disabled', { target: el });
+							}
 						} else {
-							findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
+							findElements(el, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 						}
 					}
 				}

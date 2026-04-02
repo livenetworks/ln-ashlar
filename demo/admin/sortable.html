@@ -176,8 +176,8 @@
 					<header><h3>Enable / Disable</h3></header>
 					<main>
 						<nav class="demo-actions">
-							<button class="btn btn--sm" onclick="document.getElementById('sortable-toggle').setAttribute('data-ln-sortable', ''); updateToggleStatus()">Enable</button>
-							<button class="btn btn--sm btn--secondary" onclick="document.getElementById('sortable-toggle').setAttribute('data-ln-sortable', 'disabled'); updateToggleStatus()">Disable</button>
+							<button class="btn btn--sm" onclick="document.getElementById('sortable-toggle').setAttribute('data-ln-sortable', '')">Enable</button>
+							<button class="btn btn--sm btn--secondary" onclick="document.getElementById('sortable-toggle').setAttribute('data-ln-sortable', 'disabled')">Disable</button>
 							<code id="toggle-status">Status: enabled</code>
 						</nav>
 						<ol id="sortable-toggle" data-ln-sortable>
@@ -250,6 +250,8 @@
 								<tr><td><code>ln-sortable:before-drag</code></td><td>yes</td><td><strong>yes</strong></td><td><code>{ item, index }</code></td></tr>
 								<tr><td><code>ln-sortable:drag-start</code></td><td>yes</td><td>no</td><td><code>{ item, index }</code></td></tr>
 								<tr><td><code>ln-sortable:reordered</code></td><td>yes</td><td>no</td><td><code>{ item, oldIndex, newIndex }</code></td></tr>
+									<tr><td><code>ln-sortable:enabled</code></td><td>yes</td><td>no</td><td><code>{ target }</code></td></tr>
+									<tr><td><code>ln-sortable:disabled</code></td><td>yes</td><td>no</td><td><code>{ target }</code></td></tr>
 							</tbody>
 						</table>
 						<pre><code>document.addEventListener('ln-sortable:reordered', function (e) {
@@ -333,13 +335,16 @@ window.lnSortable(container);</code></pre>
 	</div><!-- /.app-wrapper -->
 
 	<script>
-		function updateToggleStatus() {
-			var list = document.getElementById('sortable-toggle');
-			var el = document.getElementById('toggle-status');
-			if (list && el) {
-				el.textContent = 'Status: ' + (list.getAttribute('data-ln-sortable') === 'disabled' ? 'disabled' : 'enabled');
+		document.addEventListener('ln-sortable:enabled', function (e) {
+			if (e.target.id === 'sortable-toggle') {
+				document.getElementById('toggle-status').textContent = 'Status: enabled';
 			}
-		}
+		});
+		document.addEventListener('ln-sortable:disabled', function (e) {
+			if (e.target.id === 'sortable-toggle') {
+				document.getElementById('toggle-status').textContent = 'Status: disabled';
+			}
+		});
 
 		document.addEventListener('ln-sortable:reordered', function (e) {
 			var log = document.getElementById('sortable-log');
