@@ -517,6 +517,24 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
 
 DOM structure is an **HTML decision**, not a JS decision. The component only fills in the data.
 
+### Zero Display Text in JS (mandatory)
+
+JS components **NEVER** contain hardcoded strings intended for user display — no labels, messages, button text, status text, relative time words, or any translatable content. All display text lives in HTML templates where the server (Blade, backend) can translate it.
+
+```
+WRONG:  el.textContent = 'No results found';
+WRONG:  el.textContent = '3 minutes ago';
+WRONG:  const label = count === 1 ? 'item' : 'items';
+
+RIGHT:  text comes from <template> → cloneTemplate → fill
+RIGHT:  text comes from data-ln-* attribute set by server
+RIGHT:  text comes from Intl API (dates, numbers — browser-native i18n)
+```
+
+**Intl APIs are the exception** — `Intl.DateTimeFormat`, `Intl.NumberFormat`, `Intl.RelativeTimeFormat` produce locale-aware output from the browser's own translations. These are acceptable because the browser handles i18n, not the component.
+
+If a component needs display text that Intl can't provide, the text must come from HTML (template or data attribute) so the server can translate it.
+
 ```
 HTML:  <template> defines structures (inert, not rendered)
 JS:    clone → querySelector → textContent/setAttribute

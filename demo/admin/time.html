@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Time — ln-acme</title>
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+</template>
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Time</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Time formatting component.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+					</ul>
+
+									<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Time</h1>
+					<p>Timezone-aware timestamp formatting using <code>Intl.DateTimeFormat</code> and <code>Intl.RelativeTimeFormat</code>. Enhances <code>&lt;time&gt;</code> elements — Blade renders fallback text, JS replaces with localized output.</p>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-time="mode"</code></td><td><code>&lt;time&gt;</code></td><td>Format mode: <code>relative</code>, <code>short</code>, <code>full</code>, <code>date</code>, <code>time</code></td></tr>
+									<tr><td><code>datetime="1736952600"</code></td><td><code>&lt;time&gt;</code></td><td>Unix timestamp in seconds</td></tr>
+									<tr><td><code>data-ln-time-locale="mk"</code></td><td><code>&lt;time&gt;</code></td><td>Override locale (default: <code>&lt;html lang&gt;</code> or browser)</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Format Modes -->
+					<section class="section-card">
+						<header><h3>Format Modes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Mode</th><th>Example Output</th><th>Intl Options</th></tr></thead>
+								<tbody>
+									<tr><td><code>relative</code></td><td>3 hr. ago, just now, in 2 hr.</td><td><code>Intl.RelativeTimeFormat</code></td></tr>
+									<tr><td><code>short</code></td><td>Jan 15 / Jan 15, 2024</td><td><code>{ month: 'short', day: 'numeric' }</code> + conditional year</td></tr>
+									<tr><td><code>full</code></td><td>January 15, 2025 at 2:30 PM</td><td><code>{ dateStyle: 'long', timeStyle: 'short' }</code></td></tr>
+									<tr><td><code>date</code></td><td>Jan 15, 2025</td><td><code>{ dateStyle: 'medium' }</code></td></tr>
+									<tr><td><code>time</code></td><td>2:30 PM</td><td><code>{ timeStyle: 'short' }</code></td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Live: All Modes (same timestamp) -->
+					<section class="section-card">
+						<header><h3>All Modes — Same Timestamp</h3></header>
+						<main>
+							<p>All elements below use the same <code>datetime</code> value. Hover for full date tooltip.</p>
+							<table id="demo-modes-table">
+								<thead><tr><th>Mode</th><th>Output</th><th>HTML</th></tr></thead>
+								<tbody></tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Relative Time -->
+					<section class="section-card">
+						<header><h3>Relative Time — Thresholds</h3></header>
+						<main>
+							<p>Relative mode picks the best unit and uses <code>Intl.RelativeTimeFormat</code> for localized output. Auto-updates every 60 seconds.</p>
+							<table id="demo-relative-table">
+								<thead><tr><th>Offset</th><th>Output</th></tr></thead>
+								<tbody></tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Future Timestamps -->
+					<section class="section-card">
+						<header><h3>Future Timestamps</h3></header>
+						<main>
+							<p>Relative mode handles future dates — <code>Intl.RelativeTimeFormat</code> produces "in X" automatically.</p>
+							<table id="demo-future-table">
+								<thead><tr><th>Offset</th><th>Output</th></tr></thead>
+								<tbody></tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Locale Override -->
+					<section class="section-card">
+						<header><h3>Locale Override</h3></header>
+						<main>
+							<p>Default locale comes from <code>&lt;html lang="en"&gt;</code>. Override per-element with <code>data-ln-time-locale</code>.</p>
+							<table id="demo-locale-table">
+								<thead><tr><th>Locale</th><th>Full</th><th>Relative</th></tr></thead>
+								<tbody></tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Dynamic Insertion -->
+					<section class="section-card">
+						<header><h3>Dynamic Insertion (MutationObserver)</h3></header>
+						<main>
+							<p>Inserting <code>&lt;time&gt;</code> elements via JS auto-initializes them. Try it:</p>
+							<div id="demo-dynamic-target"></div>
+							<button id="demo-dynamic-btn">Insert &lt;time&gt; element</button>
+						</main>
+					</section>
+
+					<!-- Reactive Attribute Change -->
+					<section class="section-card">
+						<header><h3>Reactive Attribute Changes</h3></header>
+						<main>
+							<p>Changing <code>datetime</code> or <code>data-ln-time</code> re-renders automatically.</p>
+							<p><time id="demo-reactive" data-ln-time="full" datetime="1736952600">loading...</time></p>
+							<button id="demo-reactive-ts">Change timestamp</button>
+							<button id="demo-reactive-mode">Cycle mode</button>
+						</main>
+					</section>
+
+					<!-- Edge Cases -->
+					<section class="section-card">
+						<header><h3>Edge Cases</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Case</th><th>Element</th><th>Result</th></tr></thead>
+								<tbody>
+									<tr>
+										<td>Empty datetime</td>
+										<td><time data-ln-time="short" datetime="">fallback text</time></td>
+										<td>Skipped — fallback text preserved</td>
+									</tr>
+									<tr>
+										<td>Missing datetime</td>
+										<td><time data-ln-time="short">no datetime attr</time></td>
+										<td>Skipped — text preserved</td>
+									</tr>
+									<tr>
+										<td>Non-numeric datetime</td>
+										<td><time data-ln-time="short" datetime="2025-01-15T14:30:00Z">ISO string</time></td>
+										<td>Skipped — not a Unix timestamp</td>
+									</tr>
+									<tr>
+										<td>Epoch zero</td>
+										<td><time data-ln-time="full" datetime="0">epoch</time></td>
+										<td>Rendered normally (Jan 1, 1970)</td>
+									</tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;!-- Blade renders fallback, JS enhances --&gt;
+&lt;time data-ln-time="relative" datetime="1736952600"&gt;Jan 15&lt;/time&gt;
+&lt;time data-ln-time="short" datetime="1736952600"&gt;Jan 15&lt;/time&gt;
+&lt;time data-ln-time="full" datetime="1736952600"&gt;January 15, 2025&lt;/time&gt;
+&lt;time data-ln-time="date" datetime="1736952600"&gt;Jan 15, 2025&lt;/time&gt;
+&lt;time data-ln-time="time" datetime="1736952600"&gt;14:30&lt;/time&gt;
+
+&lt;!-- Locale override --&gt;
+&lt;time data-ln-time="full" datetime="1736952600" data-ln-time-locale="mk"&gt;fallback&lt;/time&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Manual init (not needed for normal use — MutationObserver handles it)
+window.lnTime(document.body);
+
+// Instance API
+const el = document.querySelector('time[data-ln-time]');
+el.lnTime.render();    // Force re-render
+el.lnTime.destroy();   // Cleanup (remove from auto-update pool)
+
+// Reactive update — just change the attribute
+el.setAttribute('datetime', '1700000000');
+el.setAttribute('data-ln-time', 'date');  // switch mode</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var now = Math.floor(Date.now() / 1000);
+
+		// ─── All Modes — same timestamp (3 hours ago) ─────────
+		var ts = now - 10800;
+		var modes = ['relative', 'short', 'full', 'date', 'time'];
+		var modesBody = document.querySelector('#demo-modes-table tbody');
+		modes.forEach(function (mode) {
+			var tr = document.createElement('tr');
+			var escaped = '&lt;time data-ln-time="' + mode + '" datetime="' + ts + '"&gt;fallback&lt;/time&gt;';
+			tr.innerHTML = '<td><code>' + mode + '</code></td>'
+				+ '<td><time data-ln-time="' + mode + '" datetime="' + ts + '">loading...</time></td>'
+				+ '<td><code>' + escaped + '</code></td>';
+			modesBody.appendChild(tr);
+		});
+
+		// ─── Relative Thresholds ──────────────────────────────
+		var offsets = [
+			{ label: '5 seconds ago', delta: -5 },
+			{ label: '45 seconds ago', delta: -45 },
+			{ label: '5 minutes ago', delta: -300 },
+			{ label: '45 minutes ago', delta: -2700 },
+			{ label: '3 hours ago', delta: -10800 },
+			{ label: '18 hours ago', delta: -64800 },
+			{ label: '2 days ago', delta: -172800 },
+			{ label: '10 days ago', delta: -864000 },
+			{ label: '25 days ago', delta: -2160000 },
+			{ label: '60 days ago (falls back to short)', delta: -5184000 }
+		];
+		var relBody = document.querySelector('#demo-relative-table tbody');
+		offsets.forEach(function (o) {
+			var tr = document.createElement('tr');
+			tr.innerHTML = '<td>' + o.label + '</td>'
+				+ '<td><time data-ln-time="relative" datetime="' + (now + o.delta) + '">loading...</time></td>';
+			relBody.appendChild(tr);
+		});
+
+		// ─── Future Timestamps ────────────────────────────────
+		var futures = [
+			{ label: 'in 30 seconds', delta: 30 },
+			{ label: 'in 15 minutes', delta: 900 },
+			{ label: 'in 6 hours', delta: 21600 },
+			{ label: 'in 3 days', delta: 259200 },
+			{ label: 'in 2 weeks', delta: 1209600 }
+		];
+		var futBody = document.querySelector('#demo-future-table tbody');
+		futures.forEach(function (o) {
+			var tr = document.createElement('tr');
+			tr.innerHTML = '<td>' + o.label + '</td>'
+				+ '<td><time data-ln-time="relative" datetime="' + (now + o.delta) + '">loading...</time></td>';
+			futBody.appendChild(tr);
+		});
+
+		// ─── Locale Override ──────────────────────────────────
+		var localeTs = now - 10800;
+		var locales = [
+			{ code: 'en', name: 'English (default)' },
+			{ code: 'mk', name: 'Macedonian' },
+			{ code: 'de', name: 'German' },
+			{ code: 'fr', name: 'French' },
+			{ code: 'ja', name: 'Japanese' },
+			{ code: 'ar', name: 'Arabic' }
+		];
+		var locBody = document.querySelector('#demo-locale-table tbody');
+		locales.forEach(function (l) {
+			var tr = document.createElement('tr');
+			tr.innerHTML = '<td><code>' + l.code + '</code> — ' + l.name + '</td>'
+				+ '<td><time data-ln-time="full" datetime="' + localeTs + '" data-ln-time-locale="' + l.code + '">loading...</time></td>'
+				+ '<td><time data-ln-time="relative" datetime="' + localeTs + '" data-ln-time-locale="' + l.code + '">loading...</time></td>';
+			locBody.appendChild(tr);
+		});
+
+		// ─── Dynamic Insertion ────────────────────────────────
+		var dynCount = 0;
+		document.getElementById('demo-dynamic-btn').addEventListener('click', function () {
+			dynCount++;
+			var el = document.createElement('time');
+			el.setAttribute('data-ln-time', 'relative');
+			el.setAttribute('datetime', String(now - dynCount * 3600));
+			el.textContent = 'loading...';
+			var p = document.createElement('p');
+			p.appendChild(document.createTextNode('Inserted #' + dynCount + ': '));
+			p.appendChild(el);
+			document.getElementById('demo-dynamic-target').appendChild(p);
+		});
+
+		// ─── Reactive Attribute Change ────────────────────────
+		var reactModes = ['full', 'short', 'date', 'time', 'relative'];
+		var reactIdx = 0;
+		var reactEl = document.getElementById('demo-reactive');
+
+		document.getElementById('demo-reactive-ts').addEventListener('click', function () {
+			var randomTs = now - Math.floor(Math.random() * 31536000);
+			reactEl.setAttribute('datetime', String(randomTs));
+		});
+
+		document.getElementById('demo-reactive-mode').addEventListener('click', function () {
+			reactIdx = (reactIdx + 1) % reactModes.length;
+			reactEl.setAttribute('data-ln-time', reactModes[reactIdx]);
+		});
+	});
+	</script>
+</body>
+</html>

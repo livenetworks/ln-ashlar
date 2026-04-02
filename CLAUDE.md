@@ -1,5 +1,27 @@
 # CLAUDE.md — ln-acme Project
 
+## Working Mode
+
+When I share plans, specs, or ask architectural questions — DON'T immediately
+execute. Instead:
+
+1. **Think first** — analyze what I'm proposing. Look for gaps, contradictions,
+   missing edge cases, better alternatives.
+2. **Push back** — if something is wrong or suboptimal, say so directly.
+   Don't agree just because I said it. Challenge mainstream patterns if
+   they don't fit our architecture.
+3. **Reference existing decisions** — check the skills and specs before
+   answering. If we already decided "no pagination, virtual scroll" in
+   data-table.md, don't suggest pagination.
+4. **Ask before building** — if the request is ambiguous or has multiple
+   valid approaches, discuss first. Don't pick one silently.
+5. **Proactive feedback** — if you notice something I didn't ask about
+   but should have (missing state, edge case, contradiction with another
+   spec), bring it up.
+
+This applies to architecture discussions, spec reviews, and planning.
+For implementation tasks ("create this file", "fix this bug"), execute directly.
+
 ## What is this?
 
 `ln-acme` is a unified frontend library for LiveNetworks projects.
@@ -213,7 +235,18 @@ scss/components/_tables.scss        →  table { @include table-base; }    ← a
 4. If CSS needed, create `js/ln-{name}/ln-{name}.scss`
 5. Add `import './ln-{name}/ln-{name}.js'` to `js/index.js`
 6. DOM structure → `<template>` elements in HTML
-7. Detailed architecture: [js/COMPONENTS.md](js/COMPONENTS.md)
+7. Create `js/ln-{name}/README.md` — usage guide (attributes, events, API, HTML examples)
+8. Create `docs/js/{name}.md` — architecture reference (internal state, render flow, event lifecycle)
+9. Create `demo/admin/{name}.html` — interactive demo page
+10. Detailed architecture: [js/COMPONENTS.md](js/COMPONENTS.md)
+
+## Updating an Existing JS Component
+
+When modifying component behavior (attributes, events, API, HTML structure):
+
+1. Update `js/ln-{name}/README.md` — reflect new/changed usage
+2. Update `docs/js/{name}.md` — reflect architectural changes
+3. Update `demo/admin/{name}.html` — add/update interactive examples
 
 ## Override Architecture
 

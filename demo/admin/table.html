@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Table — ln-acme</title>
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+</template>
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Table</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Server-rendered table with in-memory sort, filter, virtual scroll.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+					</ul>
+
+									<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Table</h1>
+					<p>Server-rendered data table — in-memory search, per-column filtering, sorting, virtual scroll. Rows arrive as HTML in <code>&lt;tbody&gt;</code>. Two independent components: <code>ln-table</code> (parse + render) and <code>ln-table-sort</code> (sort header clicks). Search provided by <code>ln-search</code>.</p>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-table</code></td><td>wrapper (needs <code>id</code>)</td><td>Component root. Parses rows, listens for events.</td></tr>
+									<tr><td><code>data-ln-search="tableId"</code></td><td><code>&lt;input&gt;</code> or wrapper</td><td>Standard <code>ln-search</code>. <code>ln-table</code> intercepts the event for in-memory filtering.</td></tr>
+									<tr><td><code>data-ln-table-clear</code></td><td><code>&lt;button&gt;</code></td><td>Clears search input.</td></tr>
+									<tr><td><code>th[data-ln-sort="type"]</code></td><td><code>&lt;th&gt;</code></td><td>Sortable column. Values: <code>string</code>, <code>number</code>, <code>date</code>.</td></tr>
+									<tr><td><code>td[data-ln-value]</code></td><td><code>&lt;td&gt;</code></td><td>Raw sort value when display text differs.</td></tr>
+									<tr><td><code>data-ln-filter-col="key"</code></td><td><code>&lt;th&gt;</code></td><td>Maps column to a filter key (used by <code>ln-filter</code>).</td></tr>
+									<tr><td><code>data-ln-table-empty</code></td><td><code>&lt;template&gt;</code></td><td>Content shown when filter returns 0 results.</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Live Demo — 500 rows -->
+					<section class="section-card">
+						<header><h3>Live Demo — 500 rows with search and sort</h3></header>
+						<main>
+							<div data-ln-table id="demo-table">
+								<header class="ln-table__toolbar">
+									<div>
+										<h3>Products</h3>
+									</div>
+									<aside>
+										<label class="ln-table__search">
+											<span class="ln-icon-search ln-icon--sm"></span>
+											<input type="search" placeholder="Search products..." data-ln-search="demo-table">
+										</label>
+										<span class="ln-table__count" id="demo-count"></span>
+									</aside>
+								</header>
+
+								<template data-ln-table-empty>
+									<article class="ln-table__empty-state">
+										<span class="ln-icon-search ln-icon--xl"></span>
+										<h3>No results</h3>
+										<p>Try different search terms.</p>
+										<button data-ln-table-clear>Clear search</button>
+									</article>
+								</template>
+
+								<table>
+									<thead>
+										<tr>
+											<th data-ln-sort="number">#</th>
+											<th data-ln-sort="string">Product</th>
+											<th data-ln-sort="string">Category</th>
+											<th data-ln-sort="number" class="numeric">Price</th>
+											<th data-ln-sort="number" class="numeric">Stock</th>
+										</tr>
+									</thead>
+									<tbody id="demo-tbody"></tbody>
+								</table>
+
+								<footer class="ln-table__footer">
+									<span>Total: <strong id="demo-total"></strong></span>
+								</footer>
+							</div>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>Dispatched by</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-table:ready</code></td><td><code>ln-table</code> — after row parse</td><td><code>{ total }</code></td></tr>
+									<tr><td><code>ln-table:filter</code></td><td><code>ln-table</code> — after filter render</td><td><code>{ term, matched, total }</code></td></tr>
+									<tr><td><code>ln-table:sort</code></td><td><code>ln-table-sort</code> — on th click</td><td><code>{ column, sortType, direction }</code></td></tr>
+									<tr><td><code>ln-table:sorted</code></td><td><code>ln-table</code> — after sort render</td><td><code>{ column, direction, matched, total }</code></td></tr>
+									<tr><td><code>ln-table:empty</code></td><td><code>ln-table</code> — filter returns 0</td><td><code>{ term, total }</code></td></tr>
+								</tbody>
+							</table>
+							<pre><code>var table = document.getElementById('demo-table');
+
+table.addEventListener('ln-table:ready', function (e) {
+    countEl.textContent = e.detail.total.toLocaleString() + ' products';
+});
+
+table.addEventListener('ln-table:filter', function (e) {
+    countEl.textContent = e.detail.matched < e.detail.total
+        ? e.detail.matched.toLocaleString() + ' / ' + e.detail.total.toLocaleString()
+        : e.detail.total.toLocaleString() + ' products';
+});</code></pre>
+						</main>
+					</section>
+
+					<!-- data-ln-value -->
+					<section class="section-card">
+						<header><h3>data-ln-value — sort raw value</h3></header>
+						<main>
+							<p>When display text differs from the sort key:</p>
+							<pre><code>&lt;!-- Without: sorts by "1.250" (string) --&gt;
+&lt;td&gt;1.250&lt;/td&gt;
+
+&lt;!-- With: sorts by 1250 (number) --&gt;
+&lt;td data-ln-value="1250"&gt;1.250&lt;/td&gt;
+
+&lt;!-- Date: sorts by Unix timestamp --&gt;
+&lt;td data-ln-value="1700000000"&gt;15.11.2023&lt;/td&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- Virtual Scroll -->
+					<section class="section-card">
+						<header><h3>Virtual Scroll</h3></header>
+						<main>
+							<p>Activates when filtered rows exceed <strong>200</strong>. Renders only visible rows + 15 buffer rows above/below. Deactivates automatically when rows drop below threshold. Column widths are locked on first parse to prevent layout shifts.</p>
+						</main>
+					</section>
+
+					<!-- Dynamic Rows -->
+					<section class="section-card">
+						<header><h3>Dynamic Rows (AJAX)</h3></header>
+						<main>
+							<p>If <code>&lt;tbody&gt;</code> is empty at init, a MutationObserver waits for rows to appear and parses them automatically.</p>
+							<pre><code>// Set innerHTML directly — ln-table detects it
+document.querySelector('#products tbody').innerHTML = generatedHtml;</code></pre>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;div id="products" data-ln-table&gt;
+    &lt;header class="ln-table__toolbar"&gt;
+        &lt;h3&gt;Products&lt;/h3&gt;
+        &lt;aside&gt;
+            &lt;label class="ln-table__search"&gt;
+                &lt;span class="ln-icon-search ln-icon--sm"&gt;&lt;/span&gt;
+                &lt;input type="search" placeholder="Search..." data-ln-search="products"&gt;
+            &lt;/label&gt;
+        &lt;/aside&gt;
+    &lt;/header&gt;
+
+    &lt;template data-ln-table-empty&gt;
+        &lt;article class="ln-table__empty-state"&gt;
+            &lt;h3&gt;No results&lt;/h3&gt;
+            &lt;button data-ln-table-clear&gt;Clear&lt;/button&gt;
+        &lt;/article&gt;
+    &lt;/template&gt;
+
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th data-ln-sort="number"&gt;#&lt;/th&gt;
+                &lt;th data-ln-sort="string"&gt;Name&lt;/th&gt;
+                &lt;th data-ln-sort="date"&gt;Date&lt;/th&gt;
+                &lt;th data-ln-sort="number"&gt;Price&lt;/th&gt;
+                &lt;th&gt;Actions&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+                &lt;td&gt;1&lt;/td&gt;
+                &lt;td&gt;Widget A&lt;/td&gt;
+                &lt;td data-ln-value="1700000000"&gt;15.11.2023&lt;/td&gt;
+                &lt;td data-ln-value="1250"&gt;1.250&lt;/td&gt;
+                &lt;td&gt;&lt;button&gt;Edit&lt;/button&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;footer class="ln-table__footer"&gt;
+        &lt;span&gt;Total: &lt;strong&gt;&lt;/strong&gt;&lt;/span&gt;
+    &lt;/footer&gt;
+&lt;/div&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Manual init
+window.lnTable(document.body);
+
+// Instance
+var el = document.querySelector('[data-ln-table]');
+el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+	<script>
+	(function () {
+		var TOTAL = 500;
+		var tableEl = document.getElementById('demo-table');
+		var tbody = document.getElementById('demo-tbody');
+		var countEl = document.getElementById('demo-count');
+		var totalEl = document.getElementById('demo-total');
+		if (!tableEl || !tbody) return;
+
+		// Wire up events
+		tableEl.addEventListener('ln-table:ready', function (e) {
+			var n = e.detail.total.toLocaleString();
+			if (countEl) countEl.textContent = n + ' products';
+			if (totalEl) totalEl.textContent = n;
+		});
+
+		tableEl.addEventListener('ln-table:filter', function (e) {
+			var matched = e.detail.matched;
+			var total = e.detail.total;
+			if (countEl) {
+				countEl.textContent = matched < total
+					? matched.toLocaleString() + ' / ' + total.toLocaleString()
+					: total.toLocaleString() + ' products';
+			}
+			if (totalEl) totalEl.textContent = matched.toLocaleString();
+		});
+
+		tableEl.addEventListener('ln-table:sorted', function (e) {
+			if (totalEl) totalEl.textContent = e.detail.matched.toLocaleString();
+		});
+
+		// Data
+		var products = [
+			'Laptop Pro', 'Wireless Mouse', 'USB-C Hub', 'Mechanical Keyboard',
+			'Monitor 27"', 'Webcam HD', 'Headset Pro', 'Docking Station',
+			'SSD 1TB', 'RAM 32GB', 'GPU Card', 'Network Switch',
+			'Power Supply', 'Cable Kit', 'Mouse Pad', 'Screen Protector'
+		];
+		var categories = ['Electronics', 'Peripherals', 'Storage', 'Networking', 'Accessories', 'Components'];
+
+		function formatPrice(n) {
+			return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		}
+
+		// Generate rows
+		var html = [];
+		for (var i = 0; i < TOTAL; i++) {
+			var name = products[i % products.length];
+			var cat = categories[i % categories.length];
+			var price = 50 + Math.floor(Math.random() * 2000);
+			var stock = Math.floor(Math.random() * 500);
+
+			html.push(
+				'<tr>' +
+				'<td>' + (i + 1) + '</td>' +
+				'<td>' + name + '</td>' +
+				'<td>' + cat + '</td>' +
+				'<td data-ln-value="' + price + '" class="numeric">' + formatPrice(price) + '</td>' +
+				'<td data-ln-value="' + stock + '" class="numeric">' + stock + '</td>' +
+				'</tr>'
+			);
+		}
+
+		tbody.innerHTML = html.join('');
+	})();
+	</script>
+</body>
+</html>

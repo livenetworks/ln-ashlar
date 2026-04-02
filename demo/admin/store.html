@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Store — ln-acme</title>
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+</template>
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Store</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'IndexedDB data layer component.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+					</ul>
+
+									<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Store</h1>
+					<p>Generic IndexedDB data layer — caches server data locally, syncs via delta protocol, handles optimistic mutations. Renders nothing — UI components consume data through its API and CustomEvents.</p>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>Required</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-store</code></td><td>yes</td><td>Store name (IndexedDB object store name, event namespace)</td></tr>
+									<tr><td><code>data-ln-store-endpoint</code></td><td>yes</td><td>Server API base URL for this resource</td></tr>
+									<tr><td><code>data-ln-store-stale</code></td><td>no</td><td>Staleness threshold in seconds (default: 300 = 5 min)</td></tr>
+									<tr><td><code>data-ln-store-indexes</code></td><td>no</td><td>Comma-separated fields to index</td></tr>
+									<tr><td><code>data-ln-store-search-fields</code></td><td>no</td><td>Comma-separated fields for text search</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Live Demo — Mock Store -->
+					<section class="section-card">
+						<header><h3>Live Demo — Mock Store</h3></header>
+						<main>
+							<p>This demo simulates <code>ln-store</code> behavior using an in-memory mock (no real IndexedDB or server). The event log shows the lifecycle.</p>
+
+							<div id="demo-store-controls">
+								<button id="demo-create">Create record</button>
+								<button id="demo-update">Update first record</button>
+								<button id="demo-delete">Delete first record</button>
+								<button id="demo-clear-log">Clear log</button>
+							</div>
+
+							<h4>Store State</h4>
+							<table>
+								<thead><tr><th>Property</th><th>Value</th></tr></thead>
+								<tbody>
+									<tr><td><code>isLoaded</code></td><td id="demo-is-loaded">false</td></tr>
+									<tr><td><code>totalCount</code></td><td id="demo-total-count">0</td></tr>
+									<tr><td><code>isSyncing</code></td><td id="demo-is-syncing">false</td></tr>
+								</tbody>
+							</table>
+
+							<h4>Records</h4>
+							<ul id="demo-records"></ul>
+
+							<h4>Event Log</h4>
+							<pre id="demo-event-log" style="max-height:20rem;overflow:auto;font-size:0.85rem"></pre>
+						</main>
+					</section>
+
+					<!-- Events — Commands -->
+					<section class="section-card">
+						<header><h3>Events — Commands (dispatched TO the store)</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th><code>detail</code></th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-store:request-create</code></td><td><code>{ data }</code></td><td>Create record (optimistic with temp ID)</td></tr>
+									<tr><td><code>ln-store:request-update</code></td><td><code>{ id, data, expected_version }</code></td><td>Update record (optimistic, conflict detection)</td></tr>
+									<tr><td><code>ln-store:request-delete</code></td><td><code>{ id }</code></td><td>Delete record (optimistic)</td></tr>
+									<tr><td><code>ln-store:request-bulk-delete</code></td><td><code>{ ids }</code></td><td>Delete multiple records (optimistic)</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Events — Notifications -->
+					<section class="section-card">
+						<header><h3>Events — Notifications (emitted BY the store)</h3></header>
+						<main>
+							<h4>Data Events</h4>
+							<table>
+								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-store:ready</code></td><td>Data available</td><td><code>{ store, count, source }</code></td></tr>
+									<tr><td><code>ln-store:loaded</code></td><td>Initial full load</td><td><code>{ store, count }</code></td></tr>
+									<tr><td><code>ln-store:synced</code></td><td>Delta sync changes</td><td><code>{ store, added, updated, deleted }</code></td></tr>
+									<tr><td><code>ln-store:unchanged</code></td><td>Delta sync no changes</td><td><code>{ store }</code></td></tr>
+								</tbody>
+							</table>
+
+							<h4>Mutation Events</h4>
+							<table>
+								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-store:created</code></td><td>Optimistic create</td><td><code>{ store, record, tempId }</code></td></tr>
+									<tr><td><code>ln-store:updated</code></td><td>Optimistic update</td><td><code>{ store, record, previous }</code></td></tr>
+									<tr><td><code>ln-store:deleted</code></td><td>Optimistic delete</td><td><code>{ store, id }</code> or <code>{ store, ids }</code></td></tr>
+									<tr><td><code>ln-store:confirmed</code></td><td>Server confirmed</td><td><code>{ store, record, action }</code></td></tr>
+									<tr><td><code>ln-store:reverted</code></td><td>Mutation failed</td><td><code>{ store, record, action, error }</code></td></tr>
+									<tr><td><code>ln-store:conflict</code></td><td>Update conflict (409)</td><td><code>{ store, local, remote, field_diffs }</code></td></tr>
+								</tbody>
+							</table>
+
+							<h4>Error Events</h4>
+							<table>
+								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-store:error</code></td><td>Initial load failed</td><td><code>{ store, action, error, status }</code></td></tr>
+									<tr><td><code>ln-store:offline</code></td><td>Server unreachable</td><td><code>{ store }</code></td></tr>
+									<tr><td><code>ln-store:destroyed</code></td><td>Instance destroyed</td><td><code>{ store }</code></td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Sync Lifecycle -->
+					<section class="section-card">
+						<header><h3>Sync Lifecycle</h3></header>
+						<main>
+							<pre><code>Init:
+  1. Open IndexedDB → read _meta
+  2. Schema mismatch? → clear, full load
+  3. Has cache? → emit ready (source: 'cache'), delta sync if stale
+  4. No cache? → full load → emit loaded, ready (source: 'server')
+
+Visibility change (tab returns):
+  → delta sync all stores
+
+Delta sync:
+  1. GET {endpoint}?since={last_synced_at}
+  2. Upsert data[], delete deleted[]
+  3. Emit synced or unchanged</code></pre>
+						</main>
+					</section>
+
+					<!-- Optimistic Mutations -->
+					<section class="section-card">
+						<header><h3>Optimistic Mutation Flow</h3></header>
+						<main>
+							<pre><code>Create:  insert temp → POST → confirmed | reverted
+Update:  save prev, update → PUT → confirmed | conflict | reverted
+Delete:  save, remove → DELETE → confirmed | reverted
+Bulk:    save all, remove → DELETE /bulk-delete → confirmed | reverted</code></pre>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>const storeEl = document.querySelector('[data-ln-store="documents"]');
+
+// Queries (all return Promise)
+storeEl.lnStore.getAll(options)        // → { data, total, filtered }
+storeEl.lnStore.getById(id)            // → Object|null
+storeEl.lnStore.count(filters)         // → Number
+storeEl.lnStore.aggregate(field, fn)   // → Number (sum, avg, count)
+
+// State
+storeEl.lnStore.isLoaded               // Boolean
+storeEl.lnStore.isSyncing              // Boolean
+storeEl.lnStore.lastSyncedAt           // Number|null
+storeEl.lnStore.totalCount             // Number
+
+// Manual triggers
+storeEl.lnStore.forceSync()            // delta sync
+storeEl.lnStore.fullReload()           // clear + full reload
+storeEl.lnStore.destroy()              // cleanup
+
+// Global
+window.lnStore.clearAll()              // wipe all stores (logout)
+window.lnStore.init(el)                // manual init</code></pre>
+						</main>
+					</section>
+
+					<!-- Query Options -->
+					<section class="section-card">
+						<header><h3>Query Options</h3></header>
+						<main>
+							<pre><code>storeEl.lnStore.getAll({
+    sort: { field: 'title', direction: 'asc' },
+    filters: { status: ['approved', 'draft'] },
+    search: 'ISO 27001',
+    offset: 0,
+    limit: 100
+})
+// → { data: [...], total: 1247, filtered: 45 }</code></pre>
+						</main>
+					</section>
+
+					<!-- Server Response -->
+					<section class="section-card">
+						<header><h3>Server Response Format</h3></header>
+						<main>
+							<pre><code>// Full load / Delta sync
+{
+    "data": [{ "id": 42, "title": "...", "updated_at": 1736952600 }],
+    "deleted": [17, 23],          // delta only
+    "synced_at": 1736953500       // next ?since= value
+}</code></pre>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;!-- One per resource, anywhere in the page --&gt;
+&lt;div data-ln-store="documents"
+     data-ln-store-endpoint="/api/documents"
+     data-ln-store-stale="300"
+     data-ln-store-indexes="status,category,updated_at"
+     data-ln-store-search-fields="title,description,author_name"&gt;
+&lt;/div&gt;</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+	<script>
+	// ─── Mock store demo ────────────────────────────────────────
+	(function () {
+		var records = [
+			{ id: 1, title: 'ISO 27001 Policy', status: 'Approved' },
+			{ id: 2, title: 'Risk Assessment', status: 'Draft' },
+			{ id: 3, title: 'Access Control', status: 'Pending' }
+		];
+		var nextId = 4;
+		var logEl = document.getElementById('demo-event-log');
+
+		function log(event, detail) {
+			var line = new Date().toLocaleTimeString() + '  ' + event;
+			if (detail) line += '  ' + JSON.stringify(detail);
+			logEl.textContent += line + '\n';
+			logEl.scrollTop = logEl.scrollHeight;
+		}
+
+		function renderState() {
+			document.getElementById('demo-is-loaded').textContent = 'true';
+			document.getElementById('demo-total-count').textContent = records.length;
+			document.getElementById('demo-is-syncing').textContent = 'false';
+
+			var ul = document.getElementById('demo-records');
+			ul.innerHTML = '';
+			records.forEach(function (r) {
+				var li = document.createElement('li');
+				li.textContent = '#' + r.id + ' — ' + r.title + ' (' + r.status + ')';
+				ul.appendChild(li);
+			});
+		}
+
+		// Initial state
+		log('ln-store:ready', { store: 'demo', count: records.length, source: 'cache' });
+		renderState();
+
+		// Create
+		document.getElementById('demo-create').addEventListener('click', function () {
+			var tempId = '_temp_' + Math.random().toString(36).substr(2, 8);
+			var record = { id: tempId, title: 'New Document #' + nextId, status: 'Draft' };
+			records.push(record);
+			log('ln-store:created', { store: 'demo', record: record, tempId: tempId });
+			renderState();
+
+			// Simulate server confirmation
+			setTimeout(function () {
+				var idx = records.findIndex(function (r) { return r.id === tempId; });
+				if (idx !== -1) {
+					records[idx].id = nextId++;
+					log('ln-store:confirmed', { store: 'demo', record: records[idx], action: 'create' });
+					renderState();
+				}
+			}, 800);
+		});
+
+		// Update
+		document.getElementById('demo-update').addEventListener('click', function () {
+			if (records.length === 0) return;
+			var record = records[0];
+			var previous = Object.assign({}, record);
+			record.status = record.status === 'Approved' ? 'Draft' : 'Approved';
+			log('ln-store:updated', { store: 'demo', record: record, previous: previous });
+			renderState();
+
+			setTimeout(function () {
+				log('ln-store:confirmed', { store: 'demo', record: record, action: 'update' });
+			}, 500);
+		});
+
+		// Delete
+		document.getElementById('demo-delete').addEventListener('click', function () {
+			if (records.length === 0) return;
+			var removed = records.shift();
+			log('ln-store:deleted', { store: 'demo', id: removed.id });
+			renderState();
+
+			setTimeout(function () {
+				log('ln-store:confirmed', { store: 'demo', record: removed, action: 'delete' });
+			}, 500);
+		});
+
+		// Clear log
+		document.getElementById('demo-clear-log').addEventListener('click', function () {
+			logEl.textContent = '';
+		});
+	})();
+	</script>
+</body>
+</html>

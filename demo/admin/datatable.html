@@ -85,6 +85,7 @@
 						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -322,6 +323,174 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 						</main>
 					</section>
 
+					<!-- ═══════════════════════════════════════════════════ -->
+					<!-- ln-data-table — event-driven component            -->
+					<!-- ═══════════════════════════════════════════════════ -->
+
+					<h1 style="margin-top:3rem">ln-data-table</h1>
+					<p>Event-driven data table. Receives data via <code>ln-data-table:set-data</code>, renders rows from <code>&lt;template&gt;</code>. Sort, filter, search, selection, virtual scroll, keyboard navigation.</p>
+
+					<!-- ln-data-table Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-data-table</code></td><td>wrapper</td><td>Table name (unique per page). Marks the component root.</td></tr>
+									<tr><td><code>data-ln-data-table-selectable</code></td><td>wrapper</td><td>Enable row checkboxes + select-all.</td></tr>
+									<tr><td><code>data-ln-data-table-search</code></td><td><code>&lt;input&gt;</code></td><td>Search input. Emits on every keystroke.</td></tr>
+									<tr><td><code>data-ln-col="field"</code></td><td><code>&lt;th&gt;</code></td><td>Maps column to a data field name.</td></tr>
+									<tr><td><code>data-ln-col-sort</code></td><td><code>&lt;button&gt;</code></td><td>Sort toggle button (3-state cycle).</td></tr>
+									<tr><td><code>data-ln-col-filter</code></td><td><code>&lt;button&gt;</code></td><td>Filter dropdown trigger.</td></tr>
+									<tr><td><code>data-ln-col-select</code></td><td><code>&lt;th&gt;</code></td><td>Select-all checkbox column.</td></tr>
+									<tr><td><code>data-ln-cell="field"</code></td><td><code>&lt;td&gt;</code> in template</td><td>JS fills cell with field value.</td></tr>
+									<tr><td><code>data-ln-row</code></td><td><code>&lt;tr&gt;</code> in template</td><td>Click target for row navigation.</td></tr>
+									<tr><td><code>data-ln-row-select</code></td><td><code>&lt;input&gt;</code> in template</td><td>Row selection checkbox.</td></tr>
+									<tr><td><code>data-ln-row-action="name"</code></td><td><code>&lt;button&gt;</code> in template</td><td>Row action button (edit, delete).</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- ln-data-table Live Demo -->
+					<section class="section-card">
+						<header><h3>Live Demo — 1,000 rows (ln-data-table)</h3></header>
+						<main>
+							<section data-ln-data-table="demo-docs"
+							         data-ln-data-table-selectable
+							         id="demo-data-table">
+
+								<!-- Toolbar -->
+								<header class="ln-table__toolbar">
+									<div>
+										<h3>Documents</h3>
+									</div>
+									<aside>
+										<label class="ln-table__search">
+											<span class="ln-icon-search ln-icon--sm"></span>
+											<input type="search" placeholder="Search documents..." data-ln-data-table-search>
+										</label>
+									</aside>
+								</header>
+
+								<table>
+									<thead>
+										<tr>
+											<th data-ln-col-select></th>
+											<th data-ln-col="title" data-ln-col-sortable>
+												Title
+												<button data-ln-col-sort class="ln-icon-sort"></button>
+											</th>
+											<th data-ln-col="department" data-ln-col-sortable data-ln-col-filterable>
+												Department
+												<button data-ln-col-sort class="ln-icon-sort"></button>
+												<button data-ln-col-filter class="ln-icon-filter"></button>
+											</th>
+											<th data-ln-col="status" data-ln-col-filterable>
+												Status
+												<button data-ln-col-filter class="ln-icon-filter"></button>
+											</th>
+											<th data-ln-col="date" data-ln-col-sortable>
+												Date
+												<button data-ln-col-sort class="ln-icon-sort"></button>
+											</th>
+											<th data-ln-col-actions>Actions</th>
+										</tr>
+									</thead>
+									<tbody data-ln-data-table-body></tbody>
+									<tfoot>
+										<tr>
+											<td colspan="99" data-ln-data-table-footer>
+												<span data-ln-data-table-total></span> items
+												<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+
+								<!-- Row template -->
+								<template data-ln-template="demo-docs-row">
+									<tr data-ln-row>
+										<td><input type="checkbox" data-ln-row-select></td>
+										<td data-ln-cell="title"></td>
+										<td data-ln-cell="department"></td>
+										<td data-ln-cell="status"></td>
+										<td data-ln-cell="date"></td>
+										<td>
+											<button data-ln-row-action="edit" class="ln-icon-edit" aria-label="Edit"></button>
+											<button data-ln-row-action="delete" class="ln-icon-delete" aria-label="Delete"></button>
+										</td>
+									</tr>
+								</template>
+
+								<!-- Empty state -->
+								<template data-ln-template="demo-docs-empty">
+									<tr>
+										<td colspan="99">
+											<article class="ln-table__empty-state">
+												<h3>No documents yet</h3>
+												<p>Create your first document to get started.</p>
+											</article>
+										</td>
+									</tr>
+								</template>
+
+								<!-- Empty filtered state -->
+								<template data-ln-template="demo-docs-empty-filtered">
+									<tr>
+										<td colspan="99">
+											<article class="ln-table__empty-state">
+												<span class="ln-icon-search ln-icon--xl"></span>
+												<h3>No results</h3>
+												<p>Try adjusting your search or filters.</p>
+												<button data-ln-data-table-clear-all class="btn">Clear all filters</button>
+											</article>
+										</td>
+									</tr>
+								</template>
+
+								<!-- Column filter template -->
+								<template data-ln-template="column-filter">
+									<div class="column-filter-dropdown">
+										<input type="search" data-ln-filter-search placeholder="Search...">
+										<ul data-ln-filter-options></ul>
+										<button data-ln-filter-clear>Clear filter</button>
+									</div>
+								</template>
+							</section>
+						</main>
+					</section>
+
+					<!-- ln-data-table Events -->
+					<section class="section-card">
+						<header><h3>Events — ln-data-table</h3></header>
+						<main>
+							<h4>Emitted by table</h4>
+							<table>
+								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-data-table:sort</code></td><td>User clicks sort</td><td><code>{ table, field, direction }</code></td></tr>
+									<tr><td><code>ln-data-table:filter</code></td><td>User changes filter</td><td><code>{ table, field, values }</code></td></tr>
+									<tr><td><code>ln-data-table:search</code></td><td>User types in search</td><td><code>{ table, query }</code></td></tr>
+									<tr><td><code>ln-data-table:row-click</code></td><td>User clicks a row</td><td><code>{ table, id, record }</code></td></tr>
+									<tr><td><code>ln-data-table:row-action</code></td><td>User clicks action button</td><td><code>{ table, id, action, record }</code></td></tr>
+									<tr><td><code>ln-data-table:select</code></td><td>Selection changes</td><td><code>{ table, selectedIds, count }</code></td></tr>
+									<tr><td><code>ln-data-table:request-data</code></td><td>Table needs data</td><td><code>{ table, sort, filters, search }</code></td></tr>
+								</tbody>
+							</table>
+
+							<h4>Received by table</h4>
+							<table>
+								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-data-table:set-data</code></td><td>Data ready to render</td><td><code>{ data: [], total, filtered }</code></td></tr>
+									<tr><td><code>ln-data-table:set-loading</code></td><td>Show/hide loading</td><td><code>{ loading: Boolean }</code></td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
 				</div>
 
 				<footer class="footer">
@@ -443,6 +612,123 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 		if (timingEl) timingEl.textContent = elapsed + 'ms';
 
 		// Column filters handled by ln-filter + ln-table integration (no custom JS needed)
+	})();
+
+	// ─── ln-data-table demo — mock coordinator ────────────────
+	(function () {
+		var TOTAL = 1000;
+		var tableEl = document.getElementById('demo-data-table');
+		if (!tableEl) return;
+
+		var titles = [
+			'ISO 27001 Policy', 'Risk Assessment', 'Access Control', 'Data Protection',
+			'Business Continuity', 'Incident Response', 'Security Audit', 'Compliance Report',
+			'Network Policy', 'User Guide', 'Training Manual', 'Vendor Agreement',
+			'Privacy Policy', 'SLA Document', 'Change Request', 'Release Notes'
+		];
+		var departments = ['IT', 'Finance', 'Legal', 'Marketing', 'HR', 'Sales', 'Operations'];
+		var statusList = ['Approved', 'Draft', 'Pending', 'Rejected', 'Archived'];
+
+		function pad(n) { return n < 10 ? '0' + n : n; }
+
+		// Generate mock data
+		var allData = [];
+		for (var i = 0; i < TOTAL; i++) {
+			var d = new Date(2023, 0, 1);
+			d.setDate(d.getDate() + Math.floor(Math.random() * 730));
+			allData.push({
+				id: i + 1,
+				title: titles[i % titles.length] + ' #' + (i + 1),
+				department: departments[i % departments.length],
+				status: statusList[i % statusList.length],
+				date: pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear(),
+				_dateTs: d.getTime()
+			});
+		}
+
+		// Coordinator: listen for request-data → sort/filter/search → feed back
+		document.addEventListener('ln-data-table:request-data', function (e) {
+			if (e.detail.table !== 'demo-docs') return;
+			var sort = e.detail.sort;
+			var filters = e.detail.filters;
+			var search = e.detail.search;
+
+			var result = allData.slice();
+
+			// Search
+			if (search) {
+				var q = search.toLowerCase();
+				result = result.filter(function (r) {
+					return r.title.toLowerCase().indexOf(q) !== -1
+						|| r.department.toLowerCase().indexOf(q) !== -1
+						|| r.status.toLowerCase().indexOf(q) !== -1;
+				});
+			}
+
+			// Filters
+			if (filters) {
+				for (var field in filters) {
+					var vals = filters[field];
+					if (vals && vals.length) {
+						result = result.filter(function (r) {
+							return vals.indexOf(String(r[field])) !== -1;
+						});
+					}
+				}
+			}
+
+			// Sort
+			if (sort && sort.field) {
+				var dir = sort.direction === 'desc' ? -1 : 1;
+				var f = sort.field;
+				result.sort(function (a, b) {
+					var av = f === 'date' ? a._dateTs : a[f];
+					var bv = f === 'date' ? b._dateTs : b[f];
+					if (av < bv) return -1 * dir;
+					if (av > bv) return 1 * dir;
+					return 0;
+				});
+			}
+
+			tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+				bubbles: true,
+				detail: {
+					data: result,
+					total: allData.length,
+					filtered: result.length
+				}
+			}));
+		});
+
+		// Log events to console for demo
+		['ln-data-table:sort', 'ln-data-table:filter', 'ln-data-table:search',
+		 'ln-data-table:row-click', 'ln-data-table:row-action', 'ln-data-table:select',
+		 'ln-data-table:rendered'].forEach(function (name) {
+			document.addEventListener(name, function (e) {
+				if (e.detail.table !== 'demo-docs') return;
+				console.log(name, e.detail);
+			});
+		});
+
+		// Row click → toast
+		document.addEventListener('ln-data-table:row-click', function (e) {
+			if (e.detail.table !== 'demo-docs') return;
+			window.lnToast.enqueue({
+				type: 'info',
+				title: 'Row clicked',
+				message: 'ID: ' + e.detail.id + ' — ' + (e.detail.record.title || '')
+			});
+		});
+
+		// Row action → toast
+		document.addEventListener('ln-data-table:row-action', function (e) {
+			if (e.detail.table !== 'demo-docs') return;
+			window.lnToast.enqueue({
+				type: e.detail.action === 'delete' ? 'error' : 'info',
+				title: e.detail.action.charAt(0).toUpperCase() + e.detail.action.slice(1),
+				message: e.detail.record.title || 'ID: ' + e.detail.id
+			});
+		});
 	})();
 	</script>
 </body>

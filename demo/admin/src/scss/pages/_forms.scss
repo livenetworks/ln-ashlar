@@ -15,6 +15,13 @@
 	.form-actions { grid-column: span 6; }
 }
 
+// ─── Auto-submit demo ──────────────────────────────────────
+#demo-auto-submit {
+	@include form-grid;
+
+	.form-element { grid-column: span 3; }
+}
+
 // ─── Pill labels demo ────────────────────────────────────────
 
 #demo-pills-filled,
@@ -51,7 +58,7 @@
 
 	.form-element { grid-column: span 3; }
 
-	.input-error {
+	.ln-validate-invalid {
 		border-color: hsl(var(--color-error));
 
 		&:focus {
@@ -60,7 +67,7 @@
 		}
 	}
 
-	.input-success {
+	.ln-validate-valid {
 		border-color: hsl(var(--color-success));
 
 		&:focus {
@@ -68,6 +75,16 @@
 			box-shadow: 0 0 0 3px hsl(var(--color-success) / 0.15);
 		}
 	}
+}
+
+// ─── Validation error messages ────────────────────────────
+[data-ln-validate-errors] {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	@include text-sm;
+	color: hsl(var(--color-error));
+	min-height: 1.25rem;
 }
 
 // ─── Select & Textarea demo ────────────────────────────
@@ -113,4 +130,16 @@
 	@include flex-wrap;
 	@include items-center;
 	@include gap(0.5rem);
+}
+
+// ─── Event log ──────────────────────────────────────────
+#form-log,
+#auto-submit-log {
+	@include text-sm;
+	max-height: 10rem;
+	overflow-y: auto;
+	background: hsl(var(--color-surface-alt));
+	@include p(0.75rem);
+	@include rounded-md;
+	min-height: 3rem;
 }

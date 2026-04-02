@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Search — ln-acme</title>
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+</template>
+	<div data-ln-toast></div>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<span class="ln-icon-menu"></span>
+				</button>
+				<h1>Search</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Generic search/filter component.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+					</ul>
+
+									<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Search</h1>
+					<p>Generic search component — filters children of a target element by <code>textContent</code>. Works on lists, card grids, or any container. Also integrates with <code>ln-table</code> for in-memory table filtering.</p>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-search="targetId"</code></td><td>wrapper or <code>&lt;input&gt;</code></td><td>Target element by ID</td></tr>
+									<tr><td><code>data-ln-search-hide</code></td><td>children of target</td><td>Set by JS when element doesn't match</td></tr>
+								</tbody>
+							</table>
+							<p>On a wrapper: finds <code>input[type="search"]</code>, <code>input[type="text"]</code>, or <code>[name="search"]</code> inside.<br>Directly on <code>&lt;input&gt;</code>: that input is used.</p>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>On</th><th>Cancelable</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-search:change</code></td><td>target element</td><td>yes</td><td><code>{ term, targetId }</code></td></tr>
+								</tbody>
+							</table>
+							<p>Fires on the <strong>target</strong> element (not the input). If <code>preventDefault()</code> is called, ln-search skips its default show/hide — the consumer handles filtering (e.g. <code>ln-table</code>).</p>
+						</main>
+					</section>
+
+					<!-- Demo 1: Simple List -->
+					<section class="section-card">
+						<header><h3>Demo — Filter a list</h3></header>
+						<main>
+							<p>Type to filter the list below. Default behavior: ln-search adds <code>data-ln-search-hide</code> to non-matching children.</p>
+
+							<label data-ln-search="demo-list">
+								<span class="ln-icon-search ln-icon--sm"></span>
+								<input type="search" placeholder="Search countries...">
+							</label>
+
+							<ul id="demo-list">
+								<li>Argentina</li>
+								<li>Australia</li>
+								<li>Brazil</li>
+								<li>Canada</li>
+								<li>Denmark</li>
+								<li>Egypt</li>
+								<li>France</li>
+								<li>Germany</li>
+								<li>India</li>
+								<li>Japan</li>
+								<li>Kenya</li>
+								<li>Mexico</li>
+								<li>Netherlands</li>
+								<li>Norway</li>
+								<li>Poland</li>
+								<li>Singapore</li>
+								<li>Spain</li>
+								<li>Sweden</li>
+								<li>United Kingdom</li>
+								<li>United States</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Demo 2: Directly on input -->
+					<section class="section-card">
+						<header><h3>Demo — Input directly</h3></header>
+						<main>
+							<p><code>data-ln-search</code> directly on the <code>&lt;input&gt;</code> element — no wrapper needed.</p>
+
+							<input type="search" placeholder="Search teams..." data-ln-search="demo-teams">
+
+							<ul id="demo-teams">
+								<li>Engineering — builds the product</li>
+								<li>Design — creates user interfaces</li>
+								<li>Marketing — promotes the product</li>
+								<li>Sales — closes deals</li>
+								<li>Support — helps customers</li>
+								<li>Finance — manages budgets</li>
+								<li>Legal — handles compliance</li>
+								<li>HR — manages people</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Demo 3: Custom event handling -->
+					<section class="section-card">
+						<header><h3>Demo — Custom event handler</h3></header>
+						<main>
+							<p>Use <code>preventDefault()</code> to handle filtering yourself. This example shows a match counter instead of hiding elements.</p>
+
+							<input type="search" placeholder="Search (custom handler)..." data-ln-search="demo-custom">
+
+							<p id="demo-custom-result">Type to search...</p>
+							<ul id="demo-custom">
+								<li>Alpha framework</li>
+								<li>Beta library</li>
+								<li>Gamma toolkit</li>
+								<li>Delta engine</li>
+								<li>Epsilon runtime</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Table Integration -->
+					<section class="section-card">
+						<header><h3>Table Integration</h3></header>
+						<main>
+							<p>When <code>data-ln-search</code> points to a <code>[data-ln-table]</code> element, <code>ln-table</code> intercepts <code>ln-search:change</code> and calls <code>preventDefault()</code>. No extra configuration — the integration is automatic.</p>
+							<pre><code>&lt;input type="search" data-ln-search="my-table"&gt;
+
+&lt;div id="my-table" data-ln-table&gt;
+    &lt;table&gt;...&lt;/table&gt;
+&lt;/div&gt;</code></pre>
+							<p>See the <a href="datatable.html">Data Table</a> and <a href="table.html">Table</a> demos for live examples.</p>
+						</main>
+					</section>
+
+					<!-- Combination with ln-filter -->
+					<section class="section-card">
+						<header><h3>Combination with ln-filter</h3></header>
+						<main>
+							<p><code>ln-search</code> and <code>ln-filter</code> work independently on the same target. Each uses its own hide attribute. An element is visible only when no hide attribute is present:</p>
+							<pre><code>[data-ln-search-hide],
+[data-ln-filter-hide] {
+    display: none;
+}</code></pre>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;!-- On a wrapper --&gt;
+&lt;label data-ln-search="my-list"&gt;
+    &lt;span class="ln-icon-search ln-icon--sm"&gt;&lt;/span&gt;
+    &lt;input type="search" placeholder="Search..."&gt;
+&lt;/label&gt;
+
+&lt;ul id="my-list"&gt;
+    &lt;li&gt;First element&lt;/li&gt;
+    &lt;li&gt;Second element&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Directly on input --&gt;
+&lt;input type="search" data-ln-search="my-list"&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- CSS -->
+					<section class="section-card">
+						<header><h3>Required CSS</h3></header>
+						<main>
+							<pre><code>/* Hide non-matching elements */
+[data-ln-search-hide] {
+    display: none;
+}</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		// Demo 3: Custom event handler
+		var customTarget = document.getElementById('demo-custom');
+		var resultEl = document.getElementById('demo-custom-result');
+
+		customTarget.addEventListener('ln-search:change', function (e) {
+			e.preventDefault(); // skip default show/hide
+
+			var term = e.detail.term;
+			if (!term) {
+				resultEl.textContent = 'Type to search...';
+				// Show all
+				for (var i = 0; i < customTarget.children.length; i++) {
+					customTarget.children[i].style.opacity = '1';
+				}
+				return;
+			}
+
+			var matched = 0;
+			for (var i = 0; i < customTarget.children.length; i++) {
+				var el = customTarget.children[i];
+				var isMatch = el.textContent.toLowerCase().indexOf(term) !== -1;
+				el.style.opacity = isMatch ? '1' : '0.3';
+				if (isMatch) matched++;
+			}
+
+			resultEl.textContent = matched + ' of ' + customTarget.children.length + ' match "' + e.detail.term + '"';
+		});
+	});
+	</script>
+</body>
+</html>

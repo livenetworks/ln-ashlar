@@ -71,7 +71,7 @@
 						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
 					</ul>
 
-										<h6 class="nav-section">JS Components</h6>
+									<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -87,6 +87,7 @@
 						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -108,10 +109,10 @@
 			<!-- Content -->
 			<div class="content">
 				<h1>Forms &amp; Buttons</h1>
-				<p>CSS Grid + wrapping <code>&lt;label&gt;</code> pattern. No <code>&lt;div class="form-group"&gt;</code> or <code>&lt;div class="form-row"&gt;</code>. The grid controls the layout via SCSS — not via HTML.</p>
+				<p>CSS Grid + <code>&lt;p class="form-element"&gt;</code> pattern. No <code>&lt;div class="form-group"&gt;</code> or <code>&lt;div class="form-row"&gt;</code>. The grid controls the layout via SCSS — not via HTML.</p>
 
 				<!-- ==========================================
-				     PRINCIPLE — for developers and agents
+				     PRINCIPLE
 				     ========================================== -->
 				<section class="section-card">
 					<header><h3>Principle</h3></header>
@@ -136,16 +137,17 @@
 							<article>
 								<h4>Correct — form-element</h4>
 								<pre><code>&lt;!-- explicit for/id, p wrapper --&gt;
-&lt;form id="my-form"&gt;
+&lt;form id="my-form" data-ln-form&gt;
 
   &lt;p class="form-element"&gt;
     &lt;label for="name"&gt;Name&lt;/label&gt;
-    &lt;input type="text" id="name" name="name"&gt;
-  &lt;/p&gt;
-
-  &lt;p class="form-element"&gt;
-    &lt;label for="city"&gt;City&lt;/label&gt;
-    &lt;input type="text" id="city" name="city"&gt;
+    &lt;input type="text" id="name" name="name"
+           required data-ln-validate&gt;
+    &lt;ul data-ln-validate-errors&gt;
+      &lt;li hidden data-ln-validate-error="required"&gt;
+        Required field
+      &lt;/li&gt;
+    &lt;/ul&gt;
   &lt;/p&gt;
 
 &lt;/form&gt;</code></pre>
@@ -163,23 +165,23 @@
 							<tbody>
 								<tr>
 									<td>Root</td>
-									<td><code>&lt;form id="..."&gt;</code> — styled with <code>@include form-grid</code> in SCSS (6 cols → 1 col on mobile)</td>
+									<td><code>&lt;form id="..." data-ln-form&gt;</code> — styled with <code>@include form-grid</code> in SCSS (6 cols → 1 col on mobile)</td>
 								</tr>
 								<tr>
 									<td>Children</td>
-									<td><code>&lt;p class="form-element"&gt;</code> — wraps <code>&lt;label&gt;</code> + <code>&lt;input&gt;</code></td>
+									<td><code>&lt;p class="form-element"&gt;</code> — wraps <code>&lt;label&gt;</code> + <code>&lt;input&gt;</code> + error list</td>
 								</tr>
 								<tr>
 									<td>Label</td>
 									<td>Explicit <code>for</code>/<code>id</code> association: <code>&lt;label for="name"&gt;</code> + <code>&lt;input id="name"&gt;</code></td>
 								</tr>
 								<tr>
-									<td>Column spans</td>
-									<td>In form-specific SCSS via <code>.form-element:nth-child(N)</code> — NEVER width classes on the element</td>
+									<td>Validation</td>
+									<td><code>data-ln-validate</code> on input + <code>&lt;ul data-ln-validate-errors&gt;</code> with <code>&lt;li data-ln-validate-error="..."&gt;</code></td>
 								</tr>
 								<tr>
-									<td>Errors</td>
-									<td><code>&lt;small class="text-error"&gt;</code> inside <code>.form-element</code></td>
+									<td>Column spans</td>
+									<td>In form-specific SCSS via <code>.form-element:nth-child(N)</code> — NEVER width classes on the element</td>
 								</tr>
 								<tr>
 									<td>Pill radio/checkbox</td>
@@ -187,7 +189,7 @@
 								</tr>
 								<tr>
 									<td><code>.form-actions</code></td>
-									<td>Component class — stays in HTML. Gets <code>grid-column: span 6</code> (full-width) in SCSS</td>
+									<td><code>&lt;ul class="form-actions"&gt;</code> with <code>&lt;li&gt;</code> per button — spans full-width in SCSS</td>
 								</tr>
 							</tbody>
 						</table>
@@ -195,23 +197,18 @@
 				</section>
 
 				<!-- ==========================================
-				     LIVE DEMO
+				     LIVE DEMO — ln-validate + ln-form
 				     ========================================== -->
 				<section class="section-card">
-					<header><h3>Live demo — CSS Grid form</h3></header>
+					<header><h3>Live demo — ln-validate + ln-form</h3></header>
 					<main>
-						<!--
-							#demo-form-grid is styled in demo.scss:
-							- default: > label { grid-column: span 3 } (half)
-							- 3(Email)→span4, 4(Phone)→span2
-							- 5,6,7(City/Zip/Country)→span2 (three in a row)
-							- 8(Message), 10(Checkbox), .form-actions → span6 (full-width)
-						-->
-						<form id="demo-form-grid">
+						<form id="demo-form-grid" data-ln-form>
 							<p class="form-element">
 								<label for="demo-fname">First Name</label>
-								<input type="text" id="demo-fname" name="fname" required placeholder="John">
-								<small class="text-error">Required field</small>
+								<input type="text" id="demo-fname" name="fname" required placeholder="John" data-ln-validate>
+								<ul data-ln-validate-errors>
+									<li hidden data-ln-validate-error="required">First name is required</li>
+								</ul>
 							</p>
 							<p class="form-element">
 								<label for="demo-lname">Last Name</label>
@@ -219,11 +216,19 @@
 							</p>
 							<p class="form-element">
 								<label for="demo-email">Email</label>
-								<input type="email" id="demo-email" name="email" required placeholder="email@example.com">
+								<input type="email" id="demo-email" name="email" required minlength="5" placeholder="email@example.com" data-ln-validate>
+								<ul data-ln-validate-errors>
+									<li hidden data-ln-validate-error="required">Email is required</li>
+									<li hidden data-ln-validate-error="typeMismatch">Invalid email format</li>
+									<li hidden data-ln-validate-error="tooShort">Must be at least 5 characters</li>
+								</ul>
 							</p>
 							<p class="form-element">
 								<label for="demo-phone">Phone</label>
-								<input type="tel" id="demo-phone" name="phone" placeholder="+1 555 ...">
+								<input type="tel" id="demo-phone" name="phone" placeholder="+1 555 ..." pattern="^\+?[\d\s\-]{7,}$" data-ln-validate>
+								<ul data-ln-validate-errors>
+									<li hidden data-ln-validate-error="patternMismatch">Invalid phone format</li>
+								</ul>
 							</p>
 							<p class="form-element">
 								<label for="demo-city">City</label>
@@ -252,11 +257,82 @@
 							<p class="form-element">
 								<label><input type="checkbox" name="confirmed" value="1"> I confirm the entered data</label>
 							</p>
-							<div class="form-actions">
-								<button type="button">Cancel</button>
-								<button type="submit">Save</button>
-							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
 						</form>
+
+						<h4>Event log</h4>
+						<pre id="form-log"></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     AUTO-SUBMIT DEMO
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Auto-submit — search/filter forms</h3></header>
+					<main>
+						<p><code>data-ln-form-auto</code> submits on any input change. <code>data-ln-form-debounce="300"</code> waits 300ms after last change.</p>
+
+						<form id="demo-auto-submit" data-ln-form data-ln-form-auto data-ln-form-debounce="300">
+							<p class="form-element">
+								<label for="demo-search-q">Search</label>
+								<input type="search" id="demo-search-q" name="q" placeholder="Type to search...">
+							</p>
+							<p class="form-element">
+								<label for="demo-search-role">Role</label>
+								<select id="demo-search-role" name="role">
+									<option value="">All roles</option>
+									<option value="admin">Admin</option>
+									<option value="editor">Editor</option>
+									<option value="viewer">Viewer</option>
+								</select>
+							</p>
+						</form>
+
+						<h4>Event log</h4>
+						<pre id="auto-submit-log"></pre>
+
+						<h4>Code</h4>
+						<pre><code>&lt;form data-ln-form data-ln-form-auto data-ln-form-debounce="300"&gt;
+    &lt;input name="q" type="search" placeholder="Search..."&gt;
+    &lt;select name="role"&gt;
+        &lt;option value=""&gt;All roles&lt;/option&gt;
+        &lt;option value="admin"&gt;Admin&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/form&gt;
+
+// Coordinator listens for auto-submit
+document.addEventListener('ln-form:submit', function (e) {
+    console.log('Search:', e.detail.data);
+});</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     FILL DEMO
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Fill — edit mode</h3></header>
+					<main>
+						<p>Populate form fields programmatically via <code>fill()</code> or <code>ln-form:fill</code> event.</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn" id="demo-fill-btn"><span class="ln-icon-edit"></span> Fill form</button>
+							<button type="button" class="btn btn--secondary" id="demo-reset-btn"><span class="ln-icon-refresh"></span> Reset form</button>
+						</nav>
+						<h4>Code</h4>
+						<pre><code>// Fill via API
+form.lnForm.fill({ fname: 'Dalibor', email: 'd@test.com' });
+
+// Fill via event (e.g. from data-table row click)
+form.dispatchEvent(new CustomEvent('ln-form:fill', {
+    detail: { fname: 'Dalibor', email: 'd@test.com' }
+}));
+
+// Reset
+form.lnForm.reset();</code></pre>
 					</main>
 				</section>
 
@@ -349,14 +425,15 @@
 								<input type="text" id="state-readonly" readonly value="Read only value">
 							</p>
 							<p class="form-element">
-								<label for="state-error">With error</label>
-								<input type="text" id="state-error" class="input-error" value="bad@">
-								<small class="text-error">Invalid email address</small>
+								<label for="state-invalid">Invalid (ln-validate)</label>
+								<input type="email" id="state-invalid" class="ln-validate-invalid" value="bad@">
+								<ul data-ln-validate-errors>
+									<li data-ln-validate-error="typeMismatch">Invalid email address</li>
+								</ul>
 							</p>
 							<p class="form-element">
-								<label for="state-success">With success</label>
-								<input type="text" id="state-success" class="input-success" value="john@example.com">
-								<small class="text-success">Email verified</small>
+								<label for="state-valid">Valid (ln-validate)</label>
+								<input type="email" id="state-valid" class="ln-validate-valid" value="john@example.com">
 							</p>
 						</section>
 					</main>
@@ -387,6 +464,10 @@
 							<p class="form-element">
 								<label for="demo-ta1">Textarea</label>
 								<textarea id="demo-ta1" placeholder="Write something..."></textarea>
+							</p>
+							<p class="form-element">
+								<label for="demo-ta-auto">Textarea with autoresize</label>
+								<textarea id="demo-ta-auto" data-ln-autoresize placeholder="Type here — height grows automatically..."></textarea>
 							</p>
 							<p class="form-element">
 								<label for="demo-ta-dis">Disabled textarea</label>
@@ -495,18 +576,29 @@
 				</section>
 
 				<!-- ==========================================
-				     IMPLEMENTATION — HTML + SCSS
+				     IMPLEMENTATION
 				     ========================================== -->
 				<section class="section-card">
 					<header><h3>Implementation</h3></header>
 					<main>
 						<h4>HTML</h4>
-						<pre><code>&lt;form id="my-form"&gt;
+						<pre><code>&lt;form id="my-form" data-ln-form&gt;
 
   &lt;p class="form-element"&gt;
     &lt;label for="name"&gt;Name&lt;/label&gt;
-    &lt;input type="text" id="name" name="name" required&gt;
-    &lt;small class="text-error"&gt;Required field&lt;/small&gt;
+    &lt;input type="text" id="name" name="name" required data-ln-validate&gt;
+    &lt;ul data-ln-validate-errors&gt;
+      &lt;li hidden data-ln-validate-error="required"&gt;Required field&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/p&gt;
+
+  &lt;p class="form-element"&gt;
+    &lt;label for="email"&gt;Email&lt;/label&gt;
+    &lt;input type="email" id="email" name="email" required data-ln-validate&gt;
+    &lt;ul data-ln-validate-errors&gt;
+      &lt;li hidden data-ln-validate-error="required"&gt;Required&lt;/li&gt;
+      &lt;li hidden data-ln-validate-error="typeMismatch"&gt;Invalid email&lt;/li&gt;
+    &lt;/ul&gt;
   &lt;/p&gt;
 
   &lt;p class="form-element"&gt;
@@ -516,15 +608,10 @@
     &lt;/select&gt;
   &lt;/p&gt;
 
-  &lt;p class="form-element"&gt;
-    &lt;label for="notes"&gt;Notes&lt;/label&gt;
-    &lt;textarea id="notes" name="notes"&gt;&lt;/textarea&gt;
-  &lt;/p&gt;
-
-  &lt;div class="form-actions"&gt;
-    &lt;button type="button"&gt;Cancel&lt;/button&gt;
-    &lt;button type="submit"&gt;Save&lt;/button&gt;
-  &lt;/div&gt;
+  &lt;ul class="form-actions"&gt;
+    &lt;li&gt;&lt;button type="button"&gt;Cancel&lt;/button&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;button type="submit"&gt;Save&lt;/button&gt;&lt;/li&gt;
+  &lt;/ul&gt;
 
 &lt;/form&gt;</code></pre>
 
@@ -533,10 +620,25 @@
   @include form-grid;
 
   .form-element { grid-column: span 3; }                   // default: half
-  .form-element:nth-child(5) { grid-column: span 6; }     // notes: full
+  .form-element:nth-child(3) { grid-column: span 6; }     // category: full
   > fieldset { grid-column: span 6; }
   .form-actions { grid-column: span 6; }
 }</code></pre>
+
+						<h4>Coordinator</h4>
+						<pre><code>document.addEventListener('ln-form:submit', function (e) {
+    if (e.target.id !== 'my-form') return;
+
+    fetch('/api/resource', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(e.detail.data)
+    })
+    .then(function (res) { return res.json(); })
+    .then(function () {
+        window.lnToast.enqueue({ type: 'success', title: 'Saved' });
+    });
+});</code></pre>
 					</main>
 				</section>
 
@@ -551,5 +653,56 @@
 		</div>
 	</div>
 	</div>
+
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var formLog = document.getElementById('form-log');
+		var autoLog = document.getElementById('auto-submit-log');
+
+		// ─── Main form event log ───────────────────────────
+		var formEvents = [
+			'ln-validate:valid', 'ln-validate:invalid',
+			'ln-form:submit'
+		];
+
+		formEvents.forEach(function (name) {
+			document.getElementById('demo-form-grid').addEventListener(name, function (e) {
+				var time = new Date().toLocaleTimeString();
+				var line = '[' + time + '] ' + name;
+				if (e.detail.field) line += ' — field: ' + e.detail.field;
+				if (e.detail.data) line += ' — ' + JSON.stringify(e.detail.data).substring(0, 100);
+				formLog.textContent = line + '\n' + formLog.textContent;
+			});
+		});
+
+		// ─── Auto-submit event log ─────────────────────────
+		document.getElementById('demo-auto-submit').addEventListener('ln-form:submit', function (e) {
+			var time = new Date().toLocaleTimeString();
+			var line = '[' + time + '] ln-form:submit — ' + JSON.stringify(e.detail.data);
+			autoLog.textContent = line + '\n' + autoLog.textContent;
+		});
+
+		// ─── Fill / Reset buttons ──────────────────────────
+		var demoForm = document.getElementById('demo-form-grid');
+
+		document.getElementById('demo-fill-btn').addEventListener('click', function () {
+			demoForm.lnForm.fill({
+				fname: 'Dalibor',
+				lname: 'Sojic',
+				email: 'dalibor@example.com',
+				phone: '+389 70 123456',
+				city: 'Skopje',
+				zip: '1000',
+				message: 'Hello from fill()!'
+			});
+			window.lnToast.enqueue({ type: 'info', title: 'Filled', message: 'Form populated via lnForm.fill()' });
+		});
+
+		document.getElementById('demo-reset-btn').addEventListener('click', function () {
+			demoForm.lnForm.reset();
+			window.lnToast.enqueue({ type: 'info', title: 'Reset', message: 'Form cleared via lnForm.reset()' });
+		});
+	});
+	</script>
 </body>
 </html>
