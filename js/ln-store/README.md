@@ -9,7 +9,7 @@ It renders NOTHING. UI components consume data through its API and CustomEvents.
 |-----------|----------|-------------|
 | `data-ln-store` | yes | Store name (IndexedDB object store name, event namespace) |
 | `data-ln-store-endpoint` | yes | Server API base URL for this resource |
-| `data-ln-store-stale` | no | Staleness threshold in seconds (default: 300). `"0"` = sync every mount. `"-1"` or `"never"` = sync only on visibility change |
+| `data-ln-store-stale` | no | Staleness threshold in seconds (default: 300). `"0"` = always stale (syncs on every mount). `"-1"` or `"never"` = never auto-sync (only `forceSync()`) |
 | `data-ln-store-indexes` | no | Comma-separated fields to index: `"status,category,updated_at"` |
 | `data-ln-store-search-fields` | no | Comma-separated fields for text search: `"title,description,author_name"` |
 
@@ -32,8 +32,7 @@ Mutations go through request events. The coordinator dispatches these on the sto
 |-------|------|----------|
 | `ln-store:ready` | Data available (cache or server) | `{ store, count, source: 'cache'\|'server' }` |
 | `ln-store:loaded` | Initial full load complete | `{ store, count }` |
-| `ln-store:synced` | Delta sync found changes | `{ store, added, deleted }` |
-| `ln-store:unchanged` | Delta sync found no changes | `{ store }` |
+| `ln-store:synced` | Delta sync complete | `{ store, added, deleted, changed: bool }` |
 
 ### Mutation Events
 
@@ -134,6 +133,6 @@ window.lnStore.init(el)     // Manual init (MutationObserver handles dynamic DOM
 ## Sync Lifecycle
 
 1. **Init** — has cache? emit `ready` (source: 'cache'), delta sync if stale. No cache? full load.
-2. **Visibility change** — tab becomes visible → delta sync if stale (or always for `"never"` threshold stores).
-3. **Delta sync** — `GET {endpoint}?since={last_synced_at}` → upsert/delete → emit `synced` or `unchanged`.
+2. **Visibility change** — tab becomes visible → delta sync if stale.
+3. **Delta sync** — `GET {endpoint}?since={last_synced_at}` → upsert/delete → emit `synced`.
 4. **Mutation** — optimistic update → server request → `confirmed` or `reverted`/`conflict`.

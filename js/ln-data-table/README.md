@@ -43,6 +43,8 @@ Unlike `ln-table` (which parses existing `<tbody>` rows), `ln-data-table` is fed
 | `data-ln-data-table-total` | `<span>` | Displays total record count (formatted via `Intl.NumberFormat`). |
 | `data-ln-data-table-filtered` | `<span>` | Displays filtered count (hidden when no filter active). |
 | `data-ln-data-table-filtered-wrap` | parent | Wrapper hidden when no filter is active. |
+| `data-ln-data-table-selected` | `<span>` | Displays selected row count (hidden when 0). |
+| `data-ln-data-table-selected-wrap` | parent | Wrapper hidden when no rows selected. |
 
 ## Events — Emitted by table
 
@@ -176,6 +178,9 @@ Activates automatically when data exceeds **200 rows**. Renders only visible row
                     <span data-ln-data-table-total></span> items
                     <span data-ln-data-table-filtered-wrap>
                         · <span data-ln-data-table-filtered></span> filtered
+                    </span>
+                    <span data-ln-data-table-selected-wrap>
+                        · <span data-ln-data-table-selected></span> selected
                     </span>
                 </td>
             </tr>

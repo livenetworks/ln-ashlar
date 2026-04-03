@@ -81,22 +81,22 @@ Targets: `button[type="submit"]` and `input[type="submit"]` within the form.
 
 ```html
 <form id="user-form" data-ln-form>
-    <p class="form-element">
+    <div class="form-element">
         <label for="name">Name</label>
         <input id="name" name="name" required data-ln-validate>
         <ul data-ln-validate-errors>
             <li hidden data-ln-validate-error="required">Name is required</li>
         </ul>
-    </p>
+    </div>
 
-    <p class="form-element">
+    <div class="form-element">
         <label for="email">Email</label>
         <input id="email" name="email" type="email" required data-ln-validate>
         <ul data-ln-validate-errors>
             <li hidden data-ln-validate-error="required">Email is required</li>
             <li hidden data-ln-validate-error="typeMismatch">Invalid email format</li>
         </ul>
-    </p>
+    </div>
 
     <ul class="form-actions">
         <li><button type="button" data-ln-modal-close>Cancel</button></li>

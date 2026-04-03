@@ -118,7 +118,9 @@ Non-submit buttons need `type="button"`.
     <form>
         <header>
             <h3>Title</h3>
-            <button type="button" class="ln-icon-close" data-ln-modal-close></button>
+            <button type="button" data-ln-modal-close aria-label="Close">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+            </button>
         </header>
         <main>
             <label>Name <input type="text" name="name"></label>
@@ -131,7 +133,7 @@ Non-submit buttons need `type="button"`.
 </div>
 ```
 
-> **Icons:** The close button uses the `.ln-icon-close` class — NEVER use `&times;` character.
+> **Icons:** The close button uses `<svg class="ln-icon"><use href="#ln-close">` — NEVER use `&times;` character.
 > `@include close-button` is already applied on `button[data-ln-modal-close]` in `ln-modal.scss`.
 >
 > **Non-submit buttons** inside `<form>` need `type="button"` (close, cancel) to prevent form submission.

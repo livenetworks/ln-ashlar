@@ -17,12 +17,12 @@ Multi-language form field management. Clones input fields for each added languag
     </nav>
 
     <!-- Translatable field -->
-    <p class="form-element" data-ln-translatable="title">
+    <div class="form-element" data-ln-translatable="title">
         <label for="title">Title</label>
         <input id="title" name="title" type="text">
     </p>
 
-    <p class="form-element" data-ln-translatable="description" data-ln-translations-prefix="meta">
+    <div class="form-element" data-ln-translatable="description" data-ln-translations-prefix="meta">
         <label for="description">Description</label>
         <textarea id="description" name="meta[description]"></textarea>
     </p>

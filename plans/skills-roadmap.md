@@ -5,54 +5,86 @@ Discussion happens in main chat, execution in separate chats.
 
 ---
 
-## 1. Architecture Skill Restructure
-- [x] Move Laravel-specific content to laravel/ skill — PROMPT SENT
-- [ ] Review result, iterate if needed
+## 1. Architecture Skill Restructure (DONE)
+- [x] Move Laravel-specific content to laravel/ skill
+- [x] Add coordinator-pattern.md
+- [x] Add state-ownership.md
+- [x] Rendering boundary defined (SSR / IndexedDB / SPA)
+- [x] Add rendering modes section to architecture/SKILL.md (§3b)
+- [x] Fix broken reference: docs/js/ln-store.md → store.md in SKILL.md
+- [x] Fix state-ownership.md "prop watcher" terminology
 
-## 2. UI Skill — Component Specs
-- [x] Review existing: ui/SKILL.md — synced §4 layout, §6 component table, §10 checklists, §11 anti-patterns with new specs
-- [x] Review existing: ui/components/data-table.md (470 lines)
-- [x] Create: ui/components/form.md — DONE (ln-validate + ln-form, validation, fill, submit)
-- [x] Create: ui/components/modal.md — DONE (sizes, modal vs page, behavior, confirmation pattern)
-- [x] Create: ui/components/tabs.md — DONE (URL hash sync, multiple groups, badge counts, tabs vs sections)
-- [x] Create: ui/components/search.md — DONE (ln-search client-side, server-side → form auto-submit)
-- [x] Create: ui/components/status-badge.md — DONE (5 categories, actionable variant via ln-confirm/ln-dropdown)
-- [x] Create: ui/components/empty-state.md — DONE (two types: no data vs filter zero)
-- [x] Create: ui/components/loading-state.md — DONE (button spinner + shimmer)
+## 2. UI Skill — Component Specs (DONE)
+- [x] ui/SKILL.md synced with all component specs
+- [x] data-table.md, form.md, modal.md, tabs.md, search.md
+- [x] status-badge.md, empty-state.md, loading-state.md, kpi-card.md
+- [x] Fix: form.md custom validation — concrete approach (ln-validate:set-custom / clear-custom)
+- [x] Fix: modal.md — mobile responsive section added
+- [x] Fix: tabs.md — lazy load exception clarified
 
-## 2c. Status Badge — Actionable Variant
-- [ ] Design: inline status change via badge button (2 statuses → ln-confirm toggle, 3+ → ln-dropdown)
-- [ ] Implementation: badge CSS on `<button>` + ln-confirm / ln-dropdown integration
+## 3. UX Skill — Review & Improve (DONE)
+- [x] Synced with UI component specs, no duplication
 
-## 2b. Form Implementation (from form.md spec)
-- [ ] Check: does ln-validate exist? If not, create
-- [ ] Check: does ln-form exist? If not, create
-- [ ] Check: existing form SCSS — does it support reserved error space?
-- [ ] Check: existing ln-autosave — confirm independence from ln-form
-- [ ] TODO (future): custom validation mechanism (password match, async checks)
+## 4. ln-acme Documentation Refactor (DONE)
+- [x] COMPONENTS.md — findElements in ln-core table + instance pattern updated
+- [x] component-guide.md — trigger re-init guard + destroy() cleanup in checklist
+- [x] v2-reactive.md — translate + rewrite as reference doc (pattern now in COMPONENTS.md)
 
-## 3. UX Skill — Review & Improve
-- [x] Review existing: ux/SKILL.md — synced form anti-patterns (submit disabled, not validate-on-submit)
-- [x] Review existing: interaction-patterns.md — fixed search (instant keyup, / shortcut), shimmer not skeleton, inline editing marked Future
-- [x] Sync with UI component specs — form §6 and modal §7 reference specs, no duplication
+## 5. ln-acme Component Refactor (DONE except new features)
+- [x] Phase A — _findElements → findElements in 4 files (ln-ajax, ln-link, ln-progress, ln-table-sort)
+- [x] Phase B1 — ln-store: threshold parsing, visibility staleness, synced event, listener cleanup
+- [x] Phase B2 — ln-data-table: inline styles fix, template scoping (cloneTemplateScoped), ln-core export
 
-## 4. Data Table — Full Implementation
-- [x] Review ln-data-table.js — quality check + spec alignment
-- [x] Fix prompt sent: inline styles, var/let, BEM classes, Ctrl+K→/, search spec, template scoping
-- [ ] Feature: column resize (drag border, double-click auto-fit, persist widths)
-- [ ] Feature: footer selection count + bulk actions
-- [ ] Feature: sticky first column(s)
-- [ ] Create docs/js/ln-data-table.md (architecture reference)
-- [ ] Create/update demo/admin/datatable.html
+## 6. Phase C — New Functionality (NEXT)
+- [x] ln-data-table: footer selection count
+- [ ] ln-data-table: sticky column — може да биде која било колона, не нужно прва (defer)
+- [ ] ln-data-table: column resize (defer)
+- [ ] Form: reserved error space in SCSS
+- [x] Custom validation: ln-validate:set-custom / clear-custom events in ln-validate.js
+- [x] Status badge actionable variant (mixin + component + demo)
 
-## 5. ln-store — Full Implementation
-- [x] Review ln-store.js (948 lines) — quality check done
-- [ ] Fix: var → const/let, guardBody, synced event, visibility staleness check, event cleanup in destroy(), Infinity staleness option
-- [ ] Create docs/js/ln-store.md (architecture reference)
-- [ ] Sync architecture/data-layer.md with actual ln-store implementation
-- [ ] TODO (future): ln-http integration — ln-store uses raw fetch. If global HTTP layer needed (shared headers, auth refresh, interceptors), extract shared fetch wrapper. Not needed now but if mysterious HTTP failures appear, this is why.
+## 7. JS Component Audit (DONE)
+- [x] Review all js/ln-* components — 8 bugs fixed, 4 забелешки discussed and closed
+- [x] ln-tabs attribute bridge refactor (prompt sent, new chat)
+- [x] Reactive rendering pattern documented in COMPONENTS.md
+- [x] Attribute Bridge principle documented in COMPONENTS.md
 
-## 6. Discussions Pending (separate chats)
-- [x] Rendering boundary — DEFINED: SSR default (ln-table, up to ~1000 rows), IndexedDB mode (ln-data-table + ln-store, 1000+), SPA mode (ln-mixer pattern). Documented in memory.
-- [x] Coordinator pattern — DONE (architecture/coordinator-pattern.md) — two types: library (ln-accordion, ln-form) + project (ln-mixer pattern)
-- [x] State ownership hierarchy — DONE (architecture/state-ownership.md) — external vs internal vs persistent
+## 8. Discussions Complete
+- [x] Rendering boundary — SSR / IndexedDB / SPA
+- [x] Coordinator pattern — library + project coordinators
+- [x] State ownership — external vs internal vs persistent
+
+---
+
+## 9. Visual Design Pass (IN PROGRESS)
+- [x] Card accent hover — bg tint + restore border color per accent mixin
+- [x] Accordion — `@mixin accordion` (contained card, chevron rotation via `:has()`)
+- [x] Accordion collapse bug — padding on `> *` not `.collapsible-body` (overflow:hidden fix)
+- [x] panel-header — bg-secondary + reduced padding (px 1rem, py 0.75rem)
+- [x] section-card — spacing reduction (mb, main padding, footer padding) + shadow-xs base
+- [x] .content shell — p(1.5rem)→p(1rem), stack gap 1.5rem→1rem
+- [x] Design tokens — bg-body + bg-secondary (lighter, more blue-saturated)
+- [x] card/section-card — rounded-lg→rounded-md + shadow-xs always-on
+- [x] Modal footer — remove btn-sm, reduce py to 0.75rem
+- [x] Modal cancel button — border at rest + bg-body on hover (fix invisible hover)
+- [x] Inter font — token + antialiasing + all demo HTML files
+- [x] Status badge — `&:is(button)` hover/active states in mixin
+
+## 10. Documentation & Architecture Overview (NEXT)
+
+### Фаза 1: Visual close-out
+- [ ] Review current visual state — confirm all §9 fixes look correct
+- [ ] Identify any remaining visual issues before moving to docs
+
+### Фаза 2: Architect Overview Doc
+One document for humans giving instructions — "read this first."
+- [ ] Component inventory — all CSS mixins (what they are, when to use)
+- [ ] Component inventory — all JS components (what they are, when to use)
+- [ ] Design decisions rationale — no utility classes, mixins not classes, semantic selectors
+- [ ] Override architecture — color → token, structure → mixin, full replace
+- [ ] New project integration guide — what SCSS files to create, how to structure project SCSS
+
+### Фаза 3: Existing Docs Gap Fill
+- [ ] Audit `docs/css/` — accurate? complete?
+- [ ] Audit `docs/js/` — accurate? complete?
+- [ ] Audit `.claude/skills/` — fill gaps found in Фаза 2

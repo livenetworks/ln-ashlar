@@ -8,16 +8,23 @@ All `input`, `textarea`, `select` are styled globally with border, rounded-md, f
 
 ## Form Layout
 
-Forms use CSS Grid + wrapping `<label>` (implicit association, no `for`/`id` needed).
+Forms use CSS Grid + `<div class="form-element">` with explicit `for`/`id` association.
 
 ```html
 <form id="my-form">
-  <label>Name <input type="text" name="name" required></label>
-  <label>Notes <textarea name="notes"></textarea></label>
-  <div class="form-actions">
-    <button type="button">Cancel</button>
-    <button type="submit">Save</button>
+  <div class="form-element">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" required>
+    <ul data-ln-validate-errors></ul>
   </div>
+  <div class="form-element">
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes"></textarea>
+  </div>
+  <ul class="form-actions">
+    <li><button type="button">Cancel</button></li>
+    <li><button type="submit">Save</button></li>
+  </ul>
 </form>
 ```
 
@@ -25,8 +32,8 @@ Forms use CSS Grid + wrapping `<label>` (implicit association, no `for`/`id` nee
 #my-form {
   @include form-grid;
 
-  > label:nth-child(1) { grid-column: span 3; }
-  > label:nth-child(2) { grid-column: span 6; }
+  .form-element:nth-child(1) { grid-column: span 3; }
+  .form-element:nth-child(2) { grid-column: span 6; }
   .form-actions { grid-column: span 6; }
 }
 ```
@@ -34,11 +41,12 @@ Forms use CSS Grid + wrapping `<label>` (implicit association, no `for`/`id` nee
 ### Rules
 
 - Root: `<form id="...">` styled with `@include form-grid` (6 cols, 1 col on mobile)
-- Children: direct `<label>` elements wrapping both text and input
-- Grid spans: `> label:nth-child(N) { grid-column: span N; }` in SCSS
-- Errors: `<small class="text-error">` inside `<label>`
-- Checkbox/radio: needs `input[type="checkbox"] { width: auto; }` (ln-acme sets `input { width: 100% }` globally)
-- `.form-actions` stays in HTML, gets `grid-column: span 6` in SCSS
+- Children: `<div class="form-element">` wrapping `<label for="...">` + `<input id="...">`
+- Explicit association: `for`/`id` on label/input (NOT wrapping label)
+- **Use `<div>`, NOT `<p>`** — `<ul data-ln-validate-errors>` inside `<p>` is invalid HTML; browser ejects the `<ul>` as a stray grid item, breaking the layout
+- Grid spans: `.form-element { grid-column: span 3; }` in SCSS
+- Errors: `<ul data-ln-validate-errors>` inside `.form-element` (valid only with `<div>`)
+- `.form-actions` is a `<ul>` component class — stays in HTML, gets `grid-column: span 6` in SCSS; `@include form-actions` resets `list-style: none; padding: 0`
 
 ## Pill Labels (Checkbox / Radio)
 
@@ -69,15 +77,33 @@ Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on f
 
 ## Buttons
 
-Every `<button>` gets hover/active/focus/disabled effects automatically via `@include btn-colors` (applied globally in `scss/base/_global.scss`). No class needed.
+Three tiers — all structure is inherited globally, no class needed for tiers 1 and 2.
+
+| Tier | Element | How | When |
+|------|---------|-----|------|
+| **1 — Neutral** | `<button type="button">` | Global `_global.scss` | Cancel, close, toggle, icon |
+| **2 — Primary** | `<button type="submit">` | Global `_global.scss` | Save, confirm |
+| **3 — Action** | any button | `@include btn` on semantic selector | Non-submit action buttons |
 
 ```html
-<button>Default</button>
-<button disabled>Disabled</button>
+<!-- Tier 1 — neutral, no class needed -->
+<button type="button">Cancel</button>
+
+<!-- Tier 2 — primary, no class needed -->
+<button type="submit">Save</button>
+
+<!-- Tier 3 — non-submit action via project SCSS -->
+<button id="add-user">Add</button>
 ```
 
-- **Color change**: override `--color-primary` on element or parent
-- **Structure**: `@include btn` adds padding, font, inline-flex alignment (structure only, no colors)
-- **Colors**: `@include btn-colors` provides background opacity states (0.15 default, 0.7 hover, 1.0 active)
-- **Focus ring**: consistent `@include focus-ring` across all interactive elements
+```scss
+// Project SCSS — Tier 3
+#add-user   { @include btn; }
+#delete-user { @include btn; --color-primary: var(--color-error); }
+```
+
+- **Color change**: override `--color-primary` on element or parent; ALL states (hover, active, focus) adapt automatically
+- **No `btn--*` variant classes** — projects define their own via `--color-primary` override
+- **No `translateY` or `box-shadow` on hover** — color change only
+- **Size modifiers**: `@include btn-sm` / `@include btn-lg` alongside `@include btn`
 - `.form-actions` — right-aligned button container, `grid-column: span 6` in form grid

@@ -85,6 +85,12 @@ ln-acme      — library primitives (toggle, modal, toast, tabs, etc.)
 | Autoresize | `data-ln-autoresize` | — | [autoresize.md](js/autoresize.md) |
 | Translations | `data-ln-translations` | `before-add`, `added`, `before-remove`, `removed` | [translations.md](js/translations.md) |
 | External Links | (automatic) | `processed`, `clicked` | [external-links.md](js/external-links.md) |
+| Store | `data-ln-store` | `ln-store:change` | [store.md](js/store.md) |
+| Form | `data-ln-form` | `ln-form:submit`, `ln-form:error` | [form.md](js/form.md) |
+| Validate | `data-ln-validate` | `ln-validate:valid`, `ln-validate:invalid` | [validate.md](js/validate.md) |
+| Time | `data-ln-time` | — | [time.md](js/time.md) |
+| Data Table | `data-ln-data-table` | `ln-data-table:load`, `ln-data-table:sort`, `ln-data-table:page` | [data-table.md](js/data-table.md) |
+| Icons | (auto-init) | — | [icons.md](js/icons.md) |
 
 ## CSS Architecture Quick Reference
 
@@ -100,8 +106,8 @@ scss/components/_*.scss      → Applied to default selectors (button, table, .l
 
 - **Button colors**: every `<button>` gets states via `@include btn-colors` globally. Change color: `--color-primary` override.
 - **Modal**: `<form>` is content root. Select via `.ln-modal > form`. Sizes: `@include modal-sm/md/lg/xl`.
-- **Forms**: CSS Grid + `<p class="form-element">` + explicit `<label for>` / `<input id>`.
-- **Icons**: `ln-icon-*` classes use `mask-image` + `currentColor`. Sizes: `ln-icon--sm/lg/xl`.
+- **Forms**: CSS Grid (`@include form-grid`) + `<div class="form-element">` + explicit `<label for="x">` / `<input id="x">`. Use `<div>` not `<p>` — `<ul data-ln-validate-errors>` inside `<p>` is invalid HTML.
+- **Icons**: SVG sprite injected at init. Use `<svg class="ln-icon" aria-hidden="true"><use href="#ln-{name}"></use></svg>`. Sizes: `ln-icon--sm/lg/xl`. IDs: `#ln-home`, `#ln-close`, etc. See `js/ln-icons/README.md`.
 - **Container queries**: `@include container(name)` on parent, `@container name (min-width: ...)` on child. Never on same element. Never combine with `overflow: hidden`.
 
 ### Override strategy
@@ -129,10 +135,12 @@ js/
 └── ln-{name}/                ← Component IIFE + optional co-located SCSS
 
 docs/
-├── README.md                 ← Documentation index
-├── SKILL.md                  ← This file
-├── css/*.md                  ← CSS component docs
-└── js/*.md                   ← JS component docs
+├── README.md                 ← Documentation index (human)
+├── SKILL.md                  ← This file (AI cheatsheet)
+├── css/*.md                  ← CSS architecture docs
+└── js/*.md                   ← JS architecture docs (internal, render flow)
+
+js/ln-{name}/README.md        ← Per-component usage guide (human — attributes, API, HTML)
 ```
 
 ## Build
