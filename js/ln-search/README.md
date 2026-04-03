@@ -8,6 +8,7 @@ Works on lists and on `[data-ln-table]` components.
 | Attribute | On | Description |
 |---------|-----|------|
 | `data-ln-search="targetId"` | wrapper element **or** directly on `<input>` | Target element by ID |
+| `data-ln-search-items="selector"` | same element as `data-ln-search` | CSS selector passed to `querySelectorAll` on the target — enables filtering nested elements instead of direct children |
 | `data-ln-search-hide` | children of target | Set by JS when the element doesn't match |
 
 When placed on a wrapper, the component finds the first `input[type="search"]`, `input[type="text"]`, or `[name="search"]` inside it.
@@ -79,6 +80,27 @@ No extra configuration needed — the integration is automatic.
     <li>Second element</li>
 </ul>
 ```
+
+### Deep targeting with `data-ln-search-items`
+
+When items are nested (not direct children of the target), use `data-ln-search-items` to target them by CSS selector:
+
+```html
+<input type="search" placeholder="Search..." data-ln-search="icon-grid" data-ln-search-items=".icon-cell">
+
+<div id="icon-grid">
+    <section data-category="navigation">
+        <div class="icon-cell">#ln-home</div>
+        <div class="icon-cell">#ln-users</div>
+    </section>
+    <section data-category="actions">
+        <div class="icon-cell">#ln-plus</div>
+        <div class="icon-cell">#ln-edit</div>
+    </section>
+</div>
+```
+
+Searching `"home"` matches `.icon-cell` elements whose `textContent` contains `"home"`, regardless of nesting depth.
 
 ## Auto-initialization
 

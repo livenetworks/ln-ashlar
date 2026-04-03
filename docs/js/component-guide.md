@@ -55,10 +55,9 @@ import { findElements } from '../ln-core'
 1. Finds all `[data-ln-{name}]` elements under `root`
 2. Skips already-initialized (checks `element[DOM_ATTRIBUTE]`)
 3. Creates instance: `element[DOM_ATTRIBUTE] = new Constructor(element)`
-4. Sets up MutationObserver for dynamic elements (childList + subtree)
-5. Handles the initialization guard (no double-init)
+4. Handles the initialization guard (no double-init)
 
-You provide the constructor. `findElements` handles discovery, guarding, and observation.
+You provide the constructor. `findElements` handles discovery and guarding. MutationObserver is set up separately in `_domObserver` — it calls `findElements` on newly added nodes and attribute-changed targets.
 
 ---
 
@@ -438,6 +437,8 @@ try {
 - [ ] Shared interval checks `document.body.contains()` on tick (orphan cleanup)
 - [ ] Formatter/template caches at module level
 - [ ] `destroy()` method: removes from pools, disconnects observers, deletes DOM reference
+- [ ] `destroy()` removes ALL `addEventListener` listeners added during init — not just observers and pool references
+- [ ] Trigger re-init guard: `btn[DOM_ATTRIBUTE + 'Trigger'] = true` before `addEventListener` (prevents duplicate listeners when MutationObserver re-fires on existing triggers)
 - [ ] All warnings prefixed with `[ln-{component}]`
 - [ ] Dict pattern with try/catch and fallback defaults
 - [ ] `title` attribute on abbreviated content (hover for full value)

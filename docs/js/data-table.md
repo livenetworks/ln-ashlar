@@ -41,7 +41,7 @@ Unlike `ln-table` (parses existing `<tbody>` rows), `ln-data-table` is fed data 
 | `data-ln-data-table-selectable` | wrapper | Enables row checkboxes + select-all |
 | `data-ln-data-table-body` | `<tbody>` | Explicit render target (falls back to first `<tbody>`) |
 | `data-ln-data-table-search` | `<input>` | Search input — emits on every keystroke |
-| `data-ln-data-table-clear-all` | `<button>` | Clears all active column filters |
+| `data-ln-data-table-clear-all` | `<button>` | Clears all active column filters — hidden when no filters active |
 
 ### Column Headers
 
@@ -69,6 +69,8 @@ Unlike `ln-table` (parses existing `<tbody>` rows), `ln-data-table` is fed data 
 | `data-ln-data-table-total` | `<span>` | Total record count |
 | `data-ln-data-table-filtered` | `<span>` | Filtered count (hidden when no filter) |
 | `data-ln-data-table-filtered-wrap` | parent | Wrapper hidden when no filter active |
+| `data-ln-data-table-selected` | `<span>` | Selected row count (hidden when 0) |
+| `data-ln-data-table-selected-wrap` | parent | Wrapper hidden when no rows selected |
 
 ## Events — Emitted
 
@@ -159,7 +161,7 @@ Activates when data exceeds **200 rows**. Renders only visible rows + 15 buffer 
 | `Enter` | Trigger row-click |
 | `Space` | Toggle selection (if selectable) |
 | `Escape` | Close filter dropdown |
-| `Ctrl+K` | Focus search input |
+| `/` | Focus search input |
 
 ## CSS Classes (applied by JS)
 

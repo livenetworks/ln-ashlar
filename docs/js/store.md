@@ -21,7 +21,7 @@ One element per resource, anywhere in the page (typically in layout). Multiple U
 |-----------|----------|-------------|
 | `data-ln-store` | yes | Store name (IndexedDB object store name, event namespace) |
 | `data-ln-store-endpoint` | yes | Server API base URL for this resource |
-| `data-ln-store-stale` | no | Staleness threshold in seconds (default: 300 = 5 min) |
+| `data-ln-store-stale` | no | Staleness threshold in seconds (default: 300 = 5 min). `"0"` = always stale (syncs on every mount). `"-1"` or `"never"` = never auto-sync (only `forceSync()`) |
 | `data-ln-store-indexes` | no | Comma-separated fields to index: `"status,category,updated_at"` |
 | `data-ln-store-search-fields` | no | Comma-separated fields for text search: `"title,description,author_name"` |
 
@@ -44,8 +44,7 @@ Mutations go through request events. The coordinator dispatches these on the sto
 |-------|------|----------|
 | `ln-store:ready` | Data available (cache or server) | `{ store, count, source: 'cache'\|'server' }` |
 | `ln-store:loaded` | Initial full load complete | `{ store, count }` |
-| `ln-store:synced` | Delta sync found changes | `{ store, added, updated, deleted }` |
-| `ln-store:unchanged` | Delta sync found no changes | `{ store }` |
+| `ln-store:synced` | Delta sync complete | `{ store, added, deleted, changed: bool }` |
 
 ### Mutation Events
 
@@ -76,12 +75,12 @@ Init:
   4. No cache? → full load → emit loaded, ready (source: 'server')
 
 Visibility change (tab returns):
-  → delta sync all stores (always, regardless of staleness)
+  → delta sync all stores if stale
 
 Delta sync:
   1. GET {endpoint}?since={last_synced_at}
   2. Upsert data[], delete deleted[]
-  3. Emit synced (if changes) or unchanged
+  3. Emit synced
 ```
 
 ## Optimistic Mutation Flow

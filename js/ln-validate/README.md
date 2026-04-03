@@ -31,7 +31,7 @@ const input = document.getElementById('email');
 
 input.lnValidate.validate();  // Force validate — returns boolean
 input.lnValidate.reset();     // Clear touched state, remove classes, hide errors
-input.lnValidate.isValid;     // Boolean (getter — reads native checkValidity())
+input.lnValidate.isValid;     // Boolean (getter — native checkValidity() AND no active custom errors)
 input.lnValidate.destroy();   // Remove listeners, cleanup
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
@@ -46,6 +46,13 @@ window.lnValidate(container);
 | `ln-validate:valid` | yes | no | `{ target: HTMLElement, field: String }` |
 | `ln-validate:invalid` | yes | no | `{ target: HTMLElement, field: String }` |
 | `ln-validate:destroyed` | yes | no | `{ target: HTMLElement }` |
+
+### Events — Received
+
+| Event | Detail | Description |
+|-------|--------|-------------|
+| `ln-validate:set-custom` | `{ error: String }` | Show a custom error by name. Marks field as invalid. |
+| `ln-validate:clear-custom` | `{ error: String }` or `{}` | Hide a custom error. Omit `error` to clear all custom errors. |
 
 ```javascript
 // Listen for validation state changes
@@ -82,7 +89,7 @@ Fields start clean — no errors, no CSS classes. Validation begins only after t
 ### Basic Input with Errors
 
 ```html
-<p class="form-element">
+<div class="form-element">
     <label for="email">Email</label>
     <input id="email" name="email" type="email" required minlength="5" data-ln-validate>
     <ul data-ln-validate-errors>
@@ -90,13 +97,13 @@ Fields start clean — no errors, no CSS classes. Validation begins only after t
         <li hidden data-ln-validate-error="typeMismatch">Invalid email format</li>
         <li hidden data-ln-validate-error="tooShort">Must be at least 5 characters</li>
     </ul>
-</p>
+</div>
 ```
 
 ### Select Field
 
 ```html
-<p class="form-element">
+<div class="form-element">
     <label for="role">Role</label>
     <select id="role" name="role" required data-ln-validate>
         <option value="">Select...</option>
@@ -106,7 +113,7 @@ Fields start clean — no errors, no CSS classes. Validation begins only after t
     <ul data-ln-validate-errors>
         <li hidden data-ln-validate-error="required">Please select a role</li>
     </ul>
-</p>
+</div>
 ```
 
 ### Programmatic Validation
@@ -117,4 +124,40 @@ const isValid = document.getElementById('email').lnValidate.validate();
 
 // Reset after form clear
 document.getElementById('email').lnValidate.reset();
+```
+
+### Custom Validation (Coordinator-driven)
+
+For errors that native HTML can't express — password mismatch, async uniqueness, server 422:
+
+```html
+<div class="form-element">
+    <label for="password-confirm">Confirm Password</label>
+    <input id="password-confirm" name="password_confirmation" type="password" required data-ln-validate>
+    <ul data-ln-validate-errors>
+        <li hidden data-ln-validate-error="required">This field is required</li>
+        <li hidden data-ln-validate-error="passwordMismatch">Passwords do not match</li>
+    </ul>
+</div>
+```
+
+```javascript
+// Coordinator — set custom error
+const input = document.getElementById('password-confirm');
+input.dispatchEvent(new CustomEvent('ln-validate:set-custom', {
+    bubbles: true,
+    detail: { error: 'passwordMismatch' }
+}));
+
+// Coordinator — clear when resolved
+input.dispatchEvent(new CustomEvent('ln-validate:clear-custom', {
+    bubbles: true,
+    detail: { error: 'passwordMismatch' }
+}));
+
+// Clear all custom errors at once
+input.dispatchEvent(new CustomEvent('ln-validate:clear-custom', {
+    bubbles: true,
+    detail: {}
+}));
 ```
