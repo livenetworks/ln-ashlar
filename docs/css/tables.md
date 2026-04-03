@@ -68,7 +68,7 @@ These describe the **role** of a cell or row — acceptable in HTML:
 
 | Class | Description |
 |-------|-------------|
-| `.numeric` | Right-aligned, monospace — for numbers |
+| `.numeric` | Right-aligned, `tabular-nums` — for numbers |
 | `.center` | Center-aligned |
 | `.nowrap` | Prevent text wrapping |
 | `.section-header` | Section divider row |
@@ -119,21 +119,32 @@ Action buttons use `@include btn-group` on a `<ul>`. Color change via `--color-p
 
 ## Responsive
 
-Wrap in `.table-container` for horizontal scroll on mobile:
+Wrap in `.table-container` — provides horizontal scroll and stacks rows below 640px container width:
 
 ```html
 <div class="table-container">
-    <table>...</table>
+    <table>
+        <tbody>
+            <tr>
+                <td data-label="Name">Marko</td>
+                <td data-label="Status">Active</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 ```
 
-Or use `@include table-responsive` + `data-label` on each `<td>` for stacked mobile layout:
+`data-label` on each `<td>` is required for the stacked layout — it renders as the row label via `::before`.
 
-```html
-<tr>
-    <td data-label="Name">Marko</td>
-    <td data-label="Status">Active</td>
-</tr>
+For project-level control of the stacked breakpoint:
+
+```scss
+// Project SCSS — custom breakpoint
+#users-table { @include table-responsive; }  // always stacked, or:
+
+@container table (max-width: 480px) {
+    #users-table { @include table-responsive; }
+}
 ```
 
 ---

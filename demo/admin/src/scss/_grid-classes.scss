@@ -8,20 +8,6 @@
 .stack-sm { @include stack(0.5rem); }
 .stack-lg { @include stack(1.5rem); }
 
-.row {
-	@include flex;
-	@include items-center;
-	@include gap(1rem);
-}
-
-.row-between {
-	@include flex;
-	@include items-center;
-	@include justify-between;
-}
-
-.row-center {
-	@include flex;
-	@include items-center;
-	@include justify-center;
-}
+.row        { @include row; }
+.row-between { @include row-between; }
+.row-center  { @include row-center; }

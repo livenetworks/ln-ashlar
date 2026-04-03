@@ -1,0 +1,78 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'borders' as *;
+@use 'btn' as *;
+
+// Full-width system status banner — top of page, in document flow.
+// Reuses ln-modal JS for open/close state. Applied to an .ln-modal element.
+//
+// Usage (project SCSS — apply to semantic selector):
+//   #trial-banner { @include banner; }                                ← info (default)
+//   #trial-banner { --color-primary: var(--color-warning); }
+//   #error-banner { --color-primary: var(--color-error); }
+//
+// HTML:
+//   <div class="ln-modal ln-banner" data-ln-modal id="trial-banner" role="status" aria-live="polite">
+//       <form>
+//           <svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+//           <p>Message text.</p>
+//           <button type="button" aria-label="Dismiss" data-ln-modal-close>
+//               <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+//           </button>
+//       </form>
+//   </div>
+
+@mixin banner {
+	// Reset .ln-modal overlay — banner is in document flow, no dark backdrop
+	position: static;
+	inset: auto;
+	background-color: transparent;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	z-index: auto;
+	opacity: 1;
+	align-items: stretch;
+	justify-content: stretch;
+
+	&[data-ln-modal="open"] {
+		display: block;
+	}
+
+	> form {
+		// Reset .ln-modal > form dialog styles
+		background-color: hsl(var(--color-primary) / 0.06);
+		border-radius: 0;
+		box-shadow: none;
+		max-width: none;
+		width: 100%;
+		max-height: none;
+		animation: none;
+		display: flex;
+		grid-template-rows: unset;
+
+		// Banner layout
+		@include items-center;
+		@include gap(var(--spacing-md));
+		@include py(var(--spacing-sm));
+		@include px(var(--spacing-lg));
+		border-bottom: var(--border-width) solid hsl(var(--color-primary) / 0.2);
+
+		.ln-icon {
+			color: hsl(var(--color-primary));
+			@include flex-shrink-0;
+		}
+
+		p {
+			@include flex-1;
+			@include m(0);
+			@include text-sm;
+		}
+
+		button[data-ln-modal-close] {
+			@include close-button;
+			@include flex-shrink-0;
+			margin-left: auto;
+		}
+	}
+}

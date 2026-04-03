@@ -12,6 +12,9 @@ Grid and container query utilities. File: `scss/config/mixins/_layout.scss`.
 | `.stack` | `@include stack` | Vertical flex, gap 1rem |
 | `.stack-sm` | `@include stack(0.5rem)` | Vertical flex, gap 0.5rem |
 | `.stack-lg` | `@include stack(1.5rem)` | Vertical flex, gap 1.5rem |
+| `.row` | `@include row` | Horizontal flex, items-center, gap 0.5rem |
+| `.row-between` | `@include row-between` | Horizontal flex, items-center, justify-between |
+| `.row-center` | `@include row-center` | Horizontal flex, items-center, justify-center |
 | `.container` | — | Max 80rem, centered, responsive padding |
 | `.container-sm` | — | Max 56rem, centered |
 

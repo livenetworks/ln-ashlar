@@ -198,6 +198,9 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Responsive 1→2→4 column grid | `@include grid-4` |
 | 6-column form layout | `@include form-grid` |
 | Vertical flex with gap | `@include stack` or `@include stack(0.5rem)` |
+| Horizontal flex row, items-center | `@include row` or `@include row(1rem)` |
+| Horizontal flex row, justify-between | `@include row-between` |
+| Horizontal flex row, justify-center | `@include row-center` |
 | Card container (bg + border + shadow + rounded) | `@include card` |
 | Full structured card (header + main + footer) | `@include section-card` |
 | Panel header bar (flex + bg-secondary + border-b) | `@include panel-header` |
@@ -207,6 +210,7 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Action button group (toolbar, table actions) | `@include btn-group` |
 | Close/dismiss button | `@include close-button` |
 | Inline alert (contextual feedback) | `@include alert` |
+| Full-width page banner (system status) | `@include banner` |
 | Expand/collapse parent | `@include collapsible` |
 | Expand/collapse child | `@include collapsible-content` |
 | Accordion list (styled + chevron) | `@include accordion` |
