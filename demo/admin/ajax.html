@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>AJAX — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -18,26 +21,26 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
 </template>
-	<div data-ln-toast></div>
+	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
 				<h1>AJAX</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'AJAX navigation component.'})">
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'AJAX navigation component.'})">
 						Test Toast
 					</button>
 				</div>
@@ -49,7 +52,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -57,7 +60,7 @@
 			<div class="sidebar-content">
 				<nav class="nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -263,7 +266,8 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 								<table>
 									<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
 									<tbody>
-										<tr><td><code>ln-ajax:start</code></td><td>Before fetch</td><td><code>{ method, url }</code></td></tr>
+										<tr><td><code>ln-ajax:before-start</code></td><td>Before everything (cancelable — can cancel request)</td><td><code>{ method, url }</code></td></tr>
+										<tr><td><code>ln-ajax:start</code></td><td>After adding spinner, before fetch</td><td><code>{ method, url }</code></td></tr>
 										<tr><td><code>ln-ajax:success</code></td><td>After successful response</td><td><code>{ method, url, data }</code></td></tr>
 										<tr><td><code>ln-ajax:error</code></td><td>After fetch error</td><td><code>{ method, url, error }</code></td></tr>
 										<tr><td><code>ln-ajax:complete</code></td><td>After completion (always)</td><td><code>{ method, url }</code></td></tr>
@@ -273,15 +277,11 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 							</article>
 							<article>
 								<h4>Integration with ln-toast</h4>
-								<p><code>ln-ajax</code> does not know about <code>ln-toast</code>. Messages from the JSON response are available in <code>ln-ajax:success</code> — the project decides:</p>
-								<pre><code>document.addEventListener('ln-ajax:success', function(e) {
-    var message = e.detail.data.message;
-    if (message &amp;&amp; window.lnToast) {
-        window.lnToast.enqueue({
-            type: message.type,
-            title: message.title,
-            message: message.body
-        });
+								<p>If <code>window.lnToast</code> exists and the response contains a <code>message</code> object, <code>ln-ajax</code> automatically shows a toast. No project-level wiring needed.</p>
+								<pre><code>// Cancel a request conditionally (ln-ajax:before-start is cancelable)
+document.addEventListener('ln-ajax:before-start', function(e) {
+    if (!userIsAuthenticated()) {
+        e.preventDefault(); // request is cancelled, no spinner
     }
 });</code></pre>
 							</article>

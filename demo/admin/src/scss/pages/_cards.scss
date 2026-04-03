@@ -162,9 +162,12 @@
 			@include px(1rem);
 			@include py(0.75rem);
 			@include border-t-light;
+			@include bg-secondary;
 			@include flex;
 			@include justify-end;
 			@include gap(0.5rem);
+
+			button { @include btn-sm; }
 		}
 	}
 }

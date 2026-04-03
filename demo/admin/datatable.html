@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Data Table — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -17,26 +20,26 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
 </template>
-	<div data-ln-toast></div>
+	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
 				<h1>Data Table</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'ln-table', message:'In-memory filter, sort, virtual scroll.'})">Test Toast</button>
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'ln-table', message:'In-memory filter, sort, virtual scroll.'})">Test Toast</button>
 				</div>
 			</div>
 		</header>
@@ -45,7 +48,7 @@
 
 			<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 				<div class="sidebar-header">
-					<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+					<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 					<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 					<span class="app-name">acme-gui</span>
 				</div>
@@ -53,7 +56,7 @@
 				<div class="sidebar-content">
 					<nav class="nav" data-ln-nav="active">
 						<ul>
-							<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+							<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 						</ul>
 
 						<h6 class="nav-section">CSS Components</h6>
@@ -137,7 +140,7 @@
 									</div>
 									<aside>
 										<label class="ln-table__search">
-											<span class="ln-icon-search ln-icon--sm"></span>
+											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 											<input type="search" placeholder="Search employees..." data-ln-search="demo-table">
 										</label>
 										<span class="ln-table__count" id="demo-count"></span>
@@ -147,7 +150,7 @@
 
 								<template data-ln-table-empty>
 									<article class="ln-table__empty-state">
-										<span class="ln-icon-search ln-icon--xl"></span>
+										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
 										<h3>No results</h3>
 										<p>Try different search terms or clear filters.</p>
 										<button class="btn" data-ln-table-clear>Clear search</button>
@@ -161,7 +164,7 @@
 											<th data-ln-sort="string">Employee</th>
 											<th data-ln-sort="string" data-ln-filter-col="dept">
 												<div data-ln-dropdown>
-													<button data-ln-toggle-for="filter-dept-dd">Department <span class="ln-icon-filter ln-icon--sm"></span></button>
+													<button data-ln-toggle-for="filter-dept-dd">Department <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 													<ul id="filter-dept-dd" data-ln-toggle data-ln-dropdown-menu data-ln-filter="demo-table">
 														<li><button data-ln-filter-key="dept" data-ln-filter-value="" data-active>All</button></li>
 														<li><button data-ln-filter-key="dept" data-ln-filter-value="IT">IT</button></li>
@@ -178,7 +181,7 @@
 											<th data-ln-sort="number" class="numeric">Salary (USD)</th>
 											<th data-ln-filter-col="status">
 												<div data-ln-dropdown>
-													<button data-ln-toggle-for="filter-status-dd">Status <span class="ln-icon-filter ln-icon--sm"></span></button>
+													<button data-ln-toggle-for="filter-status-dd">Status <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 													<ul id="filter-status-dd" data-ln-toggle data-ln-dropdown-menu data-ln-filter="demo-table">
 														<li><button data-ln-filter-key="status" data-ln-filter-value="" data-active>All</button></li>
 														<li><button data-ln-filter-key="status" data-ln-filter-value="Active">Active</button></li>
@@ -327,7 +330,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 					<!-- ln-data-table — event-driven component            -->
 					<!-- ═══════════════════════════════════════════════════ -->
 
-					<h1 style="margin-top:3rem">ln-data-table</h1>
+					<h1>ln-data-table</h1>
 					<p>Event-driven data table. Receives data via <code>ln-data-table:set-data</code>, renders rows from <code>&lt;template&gt;</code>. Sort, filter, search, selection, virtual scroll, keyboard navigation.</p>
 
 					<!-- ln-data-table Attributes -->
@@ -368,7 +371,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 									</div>
 									<aside>
 										<label class="ln-table__search">
-											<span class="ln-icon-search ln-icon--sm"></span>
+											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 											<input type="search" placeholder="Search documents..." data-ln-data-table-search>
 										</label>
 									</aside>
@@ -378,24 +381,24 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 									<thead>
 										<tr>
 											<th data-ln-col-select></th>
-											<th data-ln-col="title" data-ln-col-sortable>
+											<th data-ln-col="title">
 												Title
-												<button data-ln-col-sort class="ln-icon-sort"></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-sort-both"></use></svg></button>
 											</th>
-											<th data-ln-col="department" data-ln-col-sortable data-ln-col-filterable>
+											<th data-ln-col="department">
 												Department
-												<button data-ln-col-sort class="ln-icon-sort"></button>
-												<button data-ln-col-filter class="ln-icon-filter"></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-sort-both"></use></svg></button>
+												<button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 											</th>
-											<th data-ln-col="status" data-ln-col-filterable>
+											<th data-ln-col="status">
 												Status
-												<button data-ln-col-filter class="ln-icon-filter"></button>
+												<button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 											</th>
-											<th data-ln-col="date" data-ln-col-sortable>
+											<th data-ln-col="date">
 												Date
-												<button data-ln-col-sort class="ln-icon-sort"></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-sort-both"></use></svg></button>
 											</th>
-											<th data-ln-col-actions>Actions</th>
+											<th>Actions</th>
 										</tr>
 									</thead>
 									<tbody data-ln-data-table-body></tbody>
@@ -404,6 +407,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 											<td colspan="99" data-ln-data-table-footer>
 												<span data-ln-data-table-total></span> items
 												<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
+												<span data-ln-data-table-selected-wrap class="hidden"> · <span data-ln-data-table-selected></span> selected</span>
 											</td>
 										</tr>
 									</tfoot>
@@ -418,8 +422,8 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 										<td data-ln-cell="status"></td>
 										<td data-ln-cell="date"></td>
 										<td>
-											<button data-ln-row-action="edit" class="ln-icon-edit" aria-label="Edit"></button>
-											<button data-ln-row-action="delete" class="ln-icon-delete" aria-label="Delete"></button>
+											<button data-ln-row-action="edit"  aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
+											<button data-ln-row-action="delete"  aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg></button>
 										</td>
 									</tr>
 								</template>
@@ -441,7 +445,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 									<tr>
 										<td colspan="99">
 											<article class="ln-table__empty-state">
-												<span class="ln-icon-search ln-icon--xl"></span>
+												<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
 												<h3>No results</h3>
 												<p>Try adjusting your search or filters.</p>
 												<button data-ln-data-table-clear-all class="btn">Clear all filters</button>
@@ -476,6 +480,9 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 									<tr><td><code>ln-data-table:row-click</code></td><td>User clicks a row</td><td><code>{ table, id, record }</code></td></tr>
 									<tr><td><code>ln-data-table:row-action</code></td><td>User clicks action button</td><td><code>{ table, id, action, record }</code></td></tr>
 									<tr><td><code>ln-data-table:select</code></td><td>Selection changes</td><td><code>{ table, selectedIds, count }</code></td></tr>
+									<tr><td><code>ln-data-table:rendered</code></td><td>Rows rendered</td><td><code>{ table, total, visible }</code></td></tr>
+									<tr><td><code>ln-data-table:clear-filters</code></td><td>User clears all filters</td><td><code>{ table }</code></td></tr>
+									<tr><td><code>ln-data-table:select-all</code></td><td>Select-all toggled</td><td><code>{ table, selected }</code></td></tr>
 									<tr><td><code>ln-data-table:request-data</code></td><td>Table needs data</td><td><code>{ table, sort, filters, search }</code></td></tr>
 								</tbody>
 							</table>
@@ -596,9 +603,9 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 				'<td><span class="' + status.cls + '">' + status.text + '</span></td>' +
 				'<td class="center">' +
 					'<div class="actions">' +
-						'<a href="#" class="action primary"><span class="ln-icon-view"></span></a>' +
-						'<a href="#" class="action"><span class="ln-icon-edit"></span></a>' +
-						'<a href="#" class="action danger"><span class="ln-icon-delete"></span></a>' +
+						'<a href="#" class="action primary"><svg class="ln-icon" aria-hidden="true"><use href="#ln-view"></use></svg></a>' +
+						'<a href="#" class="action"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></a>' +
+						'<a href="#" class="action danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg></a>' +
 					'</div>' +
 				'</td>' +
 				'</tr>'

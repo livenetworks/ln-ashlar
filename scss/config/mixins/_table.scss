@@ -20,15 +20,17 @@
 
 	thead {
 		background: hsl(var(--color-table-header-bg));
+		border-bottom: 2px solid hsl(var(--color-border));
 	}
 
 	th {
 		@include text-left;
 		@include px(1rem);
-		@include py(0.75rem);
+		@include py(0.875rem);
 		@include font-semibold;
 		@include text-sm;
-		letter-spacing: 0.3px;
+		letter-spacing: 0.4px;
+		@include uppercase;
 		color: hsl(var(--color-table-header-text));
 	}
 

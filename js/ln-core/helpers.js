@@ -146,6 +146,14 @@ export function guardBody(setupFn, componentTag) {
 	setupFn();
 }
 
+export function cloneTemplateScoped(root, name, componentTag) {
+	if (root) {
+		const local = root.querySelector('[data-ln-template="' + name + '"]');
+		if (local) return local.content.cloneNode(true);
+	}
+	return cloneTemplate(name, componentTag);
+}
+
 // ─── Find Elements ─────────────────────────────────────────
 
 export function findElements(root, selector, attribute, ComponentClass) {

@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Mixins Reference — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -18,26 +21,26 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
 </template>
-	<div data-ln-toast></div>
+	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
 				<h1>Mixins Reference</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'SCSS Mixins reference.'})">Test Toast</button>
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'SCSS Mixins reference.'})">Test Toast</button>
 				</div>
 			</div>
 		</header>
@@ -47,7 +50,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -55,7 +58,7 @@
 			<div class="sidebar-content">
 				<nav class="nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -704,68 +707,60 @@ table {
 				<!-- ==========================================
 				     BUTTONS
 				     ========================================== -->
-				<section class="section-card" id="btn-colors">
+				<section class="section-card" id="btn">
 					<header><h3>Buttons</h3></header>
 					<main>
-						<p>Every <code>&lt;button&gt;</code> gets hover/active/focus/disabled effects <strong>out of the box</strong> from ln-acme. All states read from <code>--color-primary</code>. No classes needed.</p>
+						<p>Two-tier system: <strong>structure is global</strong>, <strong>color is semantic</strong>.</p>
 
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Description</th></tr>
 							</thead>
 							<tbody>
-								<tr><td><code>@include btn</code></td><td>Button structure: inline-flex, padding, font-size, font-weight</td></tr>
-								<tr><td><code>@include btn-sm</code></td><td>Small button: less padding, <code>text-xs</code></td></tr>
-								<tr><td><code>@include btn-lg</code></td><td>Large button: more padding, <code>text-base</code></td></tr>
-								<tr><td><code>@include btn-colors</code></td><td>Color states (reads <code>--color-primary</code>). Applied globally to all <code>&lt;button&gt;</code></td></tr>
-								<tr><td><code>@include btn-group</code></td><td>Action button group: inline-flex, centered, small gap</td></tr>
-								<tr><td><code>@include close-button</code></td><td>Transparent close button with hover-red effect</td></tr>
+								<tr><td><code>@include btn</code></td><td>Complete action button: structure (inline-flex, padding, font) + filled primary color. For non-submit action buttons via project SCSS.</td></tr>
+								<tr><td><code>@include btn-sm</code></td><td>Size modifier: less padding, <code>text-xs</code>. Apply after <code>@include btn</code>.</td></tr>
+								<tr><td><code>@include btn-lg</code></td><td>Size modifier: more padding, <code>text-base</code>. Apply after <code>@include btn</code>.</td></tr>
+								<tr><td><code>@include btn-group</code></td><td>Row action button group: inline-flex, small gap, no list style.</td></tr>
+								<tr><td><code>@include close-button</code></td><td>Icon close button: resets to <code>padding: 0</code>, fixed 2rem size, hover-red color.</td></tr>
 							</tbody>
 						</table>
 
-						<h4>Color states (automatic on every button)</h4>
+						<h4>Global button tiers</h4>
 						<table>
 							<thead>
-								<tr><th>State</th><th>Background</th><th>Text</th></tr>
+								<tr><th>Tier</th><th>How</th><th>Result</th></tr>
 							</thead>
 							<tbody>
-								<tr><td>Default</td><td><code>hsl(var(--color-primary) / 0.1)</code></td><td><code>hsl(var(--color-primary))</code></td></tr>
-								<tr><td>Hover</td><td><code>hsl(var(--color-primary))</code> + shadow + lift</td><td><code>hsl(var(--color-white))</code></td></tr>
-								<tr><td>Active</td><td><code>hsl(var(--color-primary-hover))</code></td><td><code>hsl(var(--color-white))</code></td></tr>
-								<tr><td>Focus-visible</td><td><code>focus-ring</code> (keyboard only)</td><td>unchanged</td></tr>
-								<tr><td>Disabled</td><td>50% opacity</td><td>cursor: not-allowed</td></tr>
+								<tr><td>1. Neutral</td><td><code>&lt;button type="button"&gt;</code> — no class</td><td>Transparent bg, muted text, gray hover. Cancel/Close/Toggle.</td></tr>
+								<tr><td>2. Primary</td><td><code>&lt;button type="submit"&gt;</code> — no class</td><td>Primary fill color + white text. Color-only override on top of tier 1 structure.</td></tr>
+								<tr><td>3. Action</td><td><code>@include btn</code> on a semantic selector (or <code>class="btn"</code> for prototyping)</td><td>Filled primary color. Same as tier 2 but for non-submit action buttons.</td></tr>
 							</tbody>
 						</table>
 
 						<h4>Live demo</h4>
-						<nav id="demo-btn-variants">
-							<button type="button" class="btn">Primary</button>
-							<button type="button" class="btn btn--secondary">Secondary</button>
-							<button type="button" class="btn btn--danger">Danger</button>
-							<button type="button" class="btn btn--warning">Warning</button>
-							<button type="button" class="btn btn--success">Success</button>
-							<button type="button" class="btn btn--info">Info</button>
+						<nav id="demo-btn-variants" class="demo-actions">
+							<button type="button">Neutral</button>
+							<button type="submit">Submit</button>
+							<button type="button" class="btn">Action (.btn)</button>
+							<button type="button" class="btn btn-danger">Danger</button>
+							<button type="button" class="btn btn-success">Success</button>
+							<button type="button" class="btn btn-warning">Warning</button>
+							<button type="button" class="btn btn-info">Info</button>
 							<button type="button" class="btn" disabled>Disabled</button>
 						</nav>
 
-						<h4>Changing color — override <code>--color-primary</code></h4>
-						<p>Override <code>--color-primary</code> on the element or any parent. The button inherits the new color automatically.</p>
-						<pre><code>/* Project variant — overrides --color-primary on the button */
-.btn--danger  { --color-primary: var(--color-error); }
+						<h4>Color change — override <code>--color-primary</code></h4>
+						<p>Set <code>--color-primary</code> on the element or any parent. All states (hover, active, focus-ring) adapt automatically.</p>
+						<pre><code>/* Project semantic selectors — correct approach */
+#delete-user  { @include btn; --color-primary: var(--color-error); }
+#approve-user { @include btn; --color-primary: var(--color-success); }
 
-/* Parent context — all buttons inside change color */
-.admin-panel  { --color-primary: var(--color-secondary); }
+/* Context override — all submit + action buttons inside change */
+.danger-zone  { --color-primary: var(--color-error); }
 
-/* Semantic selector */
-#delete-user  { --color-primary: var(--color-error); }</code></pre>
-
-						<h4>Custom color in a project</h4>
-						<pre><code>/* Define a project-specific color token */
+/* Custom brand color */
 :root { --color-brand: 280 60% 50%; }
-
-/* Override --color-primary on the context */
-.brand-section { --color-primary: var(--color-brand); }
-/* All buttons inside .brand-section now use brand color */</code></pre>
+.brand-section { --color-primary: var(--color-brand); }</code></pre>
 					</main>
 				</section>
 

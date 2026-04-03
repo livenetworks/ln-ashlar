@@ -23,8 +23,8 @@
 /* Modal Content */
 .ln-modal > form {
 	@include bg-primary;
-	@include rounded-md;
-	@include shadow-lg;
+	@include rounded-xl;
+	@include shadow-xl;
 	max-width: 600px;
 	width: 90%;
 	max-height: 90vh;
@@ -53,7 +53,8 @@
 
 /* Footer */
 .ln-modal footer {
-	@include p(var(--spacing-sm));
+	@include px(1rem);
+	@include py(0.75rem);
 	@include border-t;
 	@include bg-secondary;
 	@include flex;
@@ -62,8 +63,13 @@
 	position: sticky;
 	bottom: 0;
 
-	button { @include btn; }
-	button[type="button"] { --color-primary: var(--color-text-secondary); }
+	button[type="button"] {
+		border: var(--border-width) solid hsl(var(--color-border));
+
+		&:hover {
+			background-color: hsl(var(--color-bg-body));
+		}
+	}
 }
 
 /* Animation */

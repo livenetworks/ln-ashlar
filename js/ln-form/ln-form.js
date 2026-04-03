@@ -160,10 +160,13 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 			}
 		}
 
-		// Trigger events so ln-validate picks up the changes
+		// Trigger events so ln-validate picks up the changes.
+		// Mirror the same isChangeBased logic as ln-validate:
+		// SELECT/checkbox/radio → 'change', everything else → 'input'
 		for (let k = 0; k < filled.length; k++) {
-			filled[k].dispatchEvent(new Event('input', { bubbles: true }));
-			filled[k].dispatchEvent(new Event('change', { bubbles: true }));
+			const el = filled[k];
+			const isChangeBased = el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio';
+			el.dispatchEvent(new Event(isChangeBased ? 'change' : 'input', { bubbles: true }));
 		}
 	};
 

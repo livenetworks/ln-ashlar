@@ -121,8 +121,6 @@ import { dispatchCancelable, guardBody } from '../ln-core';
 			for (const row of tbody.querySelectorAll('tr')) {
 				_initRow(row);
 			}
-		} else if (tag === 'TR') {
-			_initRow(container);
 		} else {
 			_initRow(container);
 		}
@@ -130,7 +128,7 @@ import { dispatchCancelable, guardBody } from '../ln-core';
 
 	// ─── Find & Init ───────────────────────────────────────────
 
-	function _findElements(root) {
+	function findElements(root) {
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			_initContainer(root);
 		}
@@ -150,7 +148,7 @@ import { dispatchCancelable, guardBody } from '../ln-core';
 					if (mutation.type === 'childList') {
 						for (const node of mutation.addedNodes) {
 							if (node.nodeType === 1) {
-								_findElements(node);
+								findElements(node);
 
 								if (node.tagName === 'TR') {
 									const parent = node.closest('[' + DOM_SELECTOR + ']');
@@ -159,7 +157,7 @@ import { dispatchCancelable, guardBody } from '../ln-core';
 							}
 						}
 					} else if (mutation.type === 'attributes') {
-						_findElements(mutation.target);
+						findElements(mutation.target);
 					}
 				}
 			});
@@ -176,7 +174,7 @@ import { dispatchCancelable, guardBody } from '../ln-core';
 	// ─── Constructor (public API) ──────────────────────────────
 
 	function constructor(domRoot) {
-		_findElements(domRoot);
+		findElements(domRoot);
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

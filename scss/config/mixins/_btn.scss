@@ -8,52 +8,59 @@
 @use 'interaction' as *;
 @use 'focus' as *;
 
-// Buttons — btn-colors (states), btn (structure), close-button
-
-@mixin btn-colors {
-	background-color: hsl(var(--color-primary) / 0.1);
-	color: hsl(var(--color-primary));
-
-	&:hover:not(:disabled) {
-		background-color: hsl(var(--color-primary));
-		color: hsl(var(--color-white));
-		transform: translateY(-1px);
-		box-shadow: 0 4px 12px hsl(var(--color-primary) / 0.3);
-	}
-
-	&:active:not(:disabled) {
-		background-color: hsl(var(--color-primary-hover));
-		color: hsl(var(--color-white));
-		transform: translateY(0);
-		box-shadow: none;
-	}
-
-	&:focus-visible { @include focus-ring; }
-	&:disabled { @include opacity-50; @include cursor-not-allowed; }
-}
+// Buttons
+// btn        — complete action button (structure + filled solid colors)
+// btn-sm     — smaller size modifier
+// btn-lg     — larger size modifier
+// btn-group  — inline list of peer action buttons
+// close-button — icon-only dismiss/close button
 
 @mixin btn {
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
 	@include gap(0.5rem);
-	@include px(1rem);
-	@include py(0.5rem);
+	@include px(1.25rem);
+	@include py(0.625rem);
 	@include text-sm;
 	@include font-medium;
+	@include rounded-md;
 	white-space: nowrap;
+
+	background-color: hsl(var(--color-primary));
+	color: hsl(var(--color-white));
+	border: none;
+
+	&:hover:not(:disabled) {
+		background-color: hsl(var(--color-primary-hover));
+		color: hsl(var(--color-white));
+	}
+
+	&:active:not(:disabled) {
+		background-color: hsl(var(--color-primary-hover));
+		color: hsl(var(--color-white));
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	&:disabled {
+		@include opacity-50;
+		@include cursor-not-allowed;
+	}
 }
 
 @mixin btn-sm {
-	@include px(0.75rem);
-	@include py(0.25rem);
+	@include px(0.875rem);
+	@include py(0.375rem);
 	@include text-xs;
 	@include gap(0.25rem);
 }
 
 @mixin btn-lg {
-	@include px(1.5rem);
-	@include py(0.75rem);
+	@include px(1.75rem);
+	@include py(0.875rem);
 	@include text-base;
 	@include gap(0.75rem);
 }
@@ -68,21 +75,19 @@
 }
 
 @mixin close-button {
-	background: transparent;
-	@include border-none;
-	@include text-lg;
-	color: hsl(var(--color-text-muted));
-	@include cursor-pointer;
+	padding: 0;
 	@include size(2rem);
 	@include flex-center;
 	@include rounded-sm;
 	@include transition-fast;
+	color: hsl(var(--color-text-muted));
 
-	&:hover {
-		@include text-error;
+	&:hover:not(:disabled) {
+		color: hsl(var(--color-error));
+		background: hsl(var(--color-bg-secondary));
 	}
 
-	&:active {
+	&:active:not(:disabled) {
 		color: hsl(var(--color-error-hover));
 		@include bg-body;
 	}

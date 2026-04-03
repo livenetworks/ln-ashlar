@@ -56,10 +56,10 @@ import { dispatch, guardBody, findElements } from '../ln-core';
 					const map = _parseHash();
 					map[self.nsKey] = key;
 					const newHash = Object.keys(map).map(function (k) { return k + ":" + map[k]; }).join("&");
-					if (location.hash === "#" + newHash) self.activate(key);
+					if (location.hash === "#" + newHash) self.dom.setAttribute('data-ln-tabs-active', key);
 					else location.hash = newHash;
 				} else {
-					self.activate(key);
+					self.dom.setAttribute('data-ln-tabs-active', key);
 				}
 			};
 			t.addEventListener("click", handler);
@@ -81,6 +81,11 @@ import { dispatch, guardBody, findElements } from '../ln-core';
 	}
 
 	_component.prototype.activate = function (key) {
+		if (!key || !(key in this.mapPanels)) key = this.defaultKey;
+		this.dom.setAttribute('data-ln-tabs-active', key);
+	};
+
+	_component.prototype._applyActive = function (key) {
 		if (!key || !(key in this.mapPanels)) key = this.defaultKey;
 		for (const k in this.mapTabs) {
 			const btn = this.mapTabs[k];
@@ -121,11 +126,19 @@ import { dispatch, guardBody, findElements } from '../ln-core';
 		guardBody(function () {
 			const observer = new MutationObserver(function (mutations) {
 				for (const mutation of mutations) {
-					if (mutation.type === 'attributes') { findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component); continue; }
+					if (mutation.type === 'attributes') {
+						if (mutation.attributeName === 'data-ln-tabs-active' && mutation.target[DOM_ATTRIBUTE]) {
+							const key = mutation.target.getAttribute('data-ln-tabs-active');
+							mutation.target[DOM_ATTRIBUTE]._applyActive(key);
+							continue;
+						}
+						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
+						continue;
+					}
 					for (const node of mutation.addedNodes) { findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component); }
 				}
 			});
-			observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
+			observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR, 'data-ln-tabs-active'] });
 		}, 'ln-tabs');
 	}
 

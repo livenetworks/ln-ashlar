@@ -48,13 +48,12 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this.confirming = true;
 		this.dom.setAttribute('data-confirming', 'true');
 
-		if (this.dom.className.match(/ln-icon-/) && this.originalText === '') {
+		var iconUse = this.dom.querySelector('svg.ln-icon use');
+		if (iconUse && this.originalText === '') {
 			this.isIconButton = true;
-			this.originalIconClass = Array.from(this.dom.classList).find(function (c) { return c.startsWith('ln-icon-'); });
-			if (this.originalIconClass) {
-				this.dom.classList.remove(this.originalIconClass);
-			}
-			this.dom.classList.add('ln-icon-check', 'text-success', 'ln-confirm-tooltip');
+			this.originalIconHref = iconUse.getAttribute('href');
+			iconUse.setAttribute('href', '#ln-check');
+			this.dom.classList.add('text-success', 'ln-confirm-tooltip');
 			this.dom.setAttribute('data-tooltip-text', this.confirmText);
 		} else {
 			this.dom.textContent = this.confirmText;
@@ -81,12 +80,14 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this.dom.removeAttribute('data-confirming');
 
 		if (this.isIconButton) {
-			this.dom.classList.remove('ln-icon-check', 'text-success', 'ln-confirm-tooltip');
-			if (this.originalIconClass) {
-				this.dom.classList.add(this.originalIconClass);
+			var iconUse = this.dom.querySelector('svg.ln-icon use');
+			if (iconUse && this.originalIconHref) {
+				iconUse.setAttribute('href', this.originalIconHref);
 			}
+			this.dom.classList.remove('text-success', 'ln-confirm-tooltip');
 			this.dom.removeAttribute('data-tooltip-text');
 			this.isIconButton = false;
+			this.originalIconHref = null;
 		} else {
 			this.dom.textContent = this.originalText;
 		}

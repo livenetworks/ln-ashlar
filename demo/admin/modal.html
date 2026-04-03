@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Modal — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -18,26 +21,26 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
 </template>
-	<div data-ln-toast></div>
+	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
 				<h1>Modal</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'JS modal component.'})">Test Toast</button>
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'JS modal component.'})">Test Toast</button>
 				</div>
 			</div>
 		</header>
@@ -47,7 +50,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -55,7 +58,7 @@
 			<div class="sidebar-content">
 				<nav class="nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -117,8 +120,8 @@
 			<main>
 				<nav class="demo-actions">
 					<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
-					<button data-ln-modal-for="demo-form" class="btn btn--secondary">Form Modal</button>
-					<button data-ln-modal-for="demo-large" class="btn btn--secondary">Large Modal</button>
+					<button data-ln-modal-for="demo-form" class="btn">Form Modal</button>
+					<button data-ln-modal-for="demo-large" class="btn">Large Modal</button>
 				</nav>
 			</main>
 		</section>
@@ -128,7 +131,7 @@
 			<form>
 				<header>
 					<h3>Basic Modal</h3>
-					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				</header>
 				<main>
 					<p>This is a basic modal with a title and content.</p>
@@ -145,25 +148,25 @@
 			<form>
 				<header>
 					<h3>Add User</h3>
-					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				</header>
 				<main>
-					<p class="form-element">
+					<div class="form-element">
 						<label for="modal-name">Name</label>
 						<input type="text" id="modal-name" placeholder="Enter name...">
-					</p>
-					<p class="form-element">
+					</div>
+					<div class="form-element">
 						<label for="modal-email">Email</label>
 						<input type="email" id="modal-email" placeholder="email@example.com">
-					</p>
-					<p class="form-element">
+					</div>
+					<div class="form-element">
 						<label for="modal-role">Role</label>
 						<select id="modal-role">
 							<option>User</option>
 							<option>Administrator</option>
 							<option>Moderator</option>
 						</select>
-					</p>
+					</div>
 				</main>
 				<footer>
 					<button type="button" data-ln-modal-close>Cancel</button>
@@ -177,7 +180,7 @@
 			<form>
 				<header>
 					<h3>Large Modal</h3>
-					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				</header>
 				<main>
 					<p>A larger modal for more content. Size set via <code>@include modal-lg</code> in SCSS.</p>
@@ -209,13 +212,14 @@
 							<tr><td><code>ln-modal:open</code></td><td>❌</td><td>Modal opened</td><td><code>{ modalId, target }</code></td></tr>
 							<tr><td><code>ln-modal:before-close</code></td><td>✅</td><td>Before closing</td><td><code>{ modalId, target }</code></td></tr>
 							<tr><td><code>ln-modal:close</code></td><td>❌</td><td>Modal closed</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:destroyed</code></td><td>❌</td><td>Instance destroyed</td><td><code>{ modalId, target }</code></td></tr>
 						</tbody>
 					</table>
 				</article>
 				<article>
 					<h4>Live Demo</h4>
 					<nav class="demo-actions">
-						<button data-ln-modal-for="demo-events" class="btn btn--secondary">Open modal (track events)</button>
+						<button data-ln-modal-for="demo-events" class="btn">Open modal (track events)</button>
 					</nav>
 					<output id="modal-event-log">No events yet.</output>
 				</article>
@@ -253,7 +257,7 @@ document.addEventListener('ln-modal:close', function(e) {
 			<form>
 				<header>
 					<h3>Events Demo</h3>
-					<button type="button" class="ln-icon-close" data-ln-modal-close aria-label="Close"></button>
+					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				</header>
 				<main>
 					<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and <code>ln-modal:close</code> events.</p>
@@ -276,13 +280,13 @@ document.addEventListener('ln-modal:close', function(e) {
     &lt;form&gt;
         &lt;header&gt;
             &lt;h3&gt;Title&lt;/h3&gt;
-            &lt;button type="button" class="ln-icon-close" data-ln-modal-close&gt;&lt;/button&gt;
+            &lt;button type="button" data-ln-modal-close aria-label="Close"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-close"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;
         &lt;/header&gt;
         &lt;main&gt;
-            &lt;p class="form-element"&gt;
+            &lt;div class="form-element"&gt;
                 &lt;label for="name"&gt;Name&lt;/label&gt;
                 &lt;input type="text" id="name"&gt;
-            &lt;/p&gt;
+            &lt;/div&gt;
         &lt;/main&gt;
         &lt;footer&gt;
             &lt;button type="button" data-ln-modal-close&gt;Cancel&lt;/button&gt;
