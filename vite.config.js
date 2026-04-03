@@ -1,7 +1,24 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { readdirSync, copyFileSync, mkdirSync } from 'fs';
+
+// Copies js/ln-icons/icons/*.svg → dist/icons/ for self-hosting custom icons
+function copyCustomIconsPlugin() {
+    return {
+        name: 'copy-custom-icons',
+        closeBundle() {
+            var src  = resolve(__dirname, 'js/ln-icons/icons');
+            var dest = resolve(__dirname, 'dist/icons');
+            mkdirSync(dest, { recursive: true });
+            readdirSync(src).forEach(function (file) {
+                copyFileSync(resolve(src, file), resolve(dest, file));
+            });
+        }
+    };
+}
 
 export default defineConfig({
+	plugins: [copyCustomIconsPlugin()],
 	build: {
 		outDir: 'dist',
 		emptyOutDir: true,
