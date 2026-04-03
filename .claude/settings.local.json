@@ -37,7 +37,15 @@
       "WebFetch(domain:tabler.bootmb.com)",
       "Bash(find /c/laragon/www/ln-acme -name SKILL.md -o -name vite.config.*)",
       "Bash(git status:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(sed -i 's|href=\"#ln-close\"|href=\"#ln-x\"|g' js/ln-modal/README.md)",
+      "Bash(sed -i 's|use `<svg class=\"ln-icon\"><use href=\"#ln-close\">`|use `<svg class=\"ln-icon\"><use href=\"#ln-x\">`|g' js/ln-modal/README.md)",
+      "Bash(sed -i -e 's/`arrow-up` `arrow-down` `sort-both`/`arrow-up` `arrow-down` `arrows-sort`/' -e 's/`check-circle` `error-circle` `info-circle` `warning`/`circle-check` `circle-x` `info-circle` `alert-triangle`/' docs/css/mixins.md)",
+      "Bash(sed -i 's/class=\"ln-icon-close\" data-ln-modal-close/aria-label=\"Close\" data-ln-modal-close><svg class=\"ln-icon\" aria-hidden=\"true\"><use href=\"#ln-x\"><\\\\/use><\\\\/svg/g' docs/js/modal.md)",
+      "Bash(sed -i -e 's/class=\"ln-icon-close\" data-ln-toggle-for/aria-label=\"Close\" data-ln-toggle-for/g' -e 's/class=\"ln-icon-menu\" data-ln-toggle-for/aria-label=\"Open menu\" data-ln-toggle-for/g' docs/js/toggle.md)",
+      "Bash(sed -i 's|<li><a href=\"mixins.html\"><span class=\"nav-label\">Mixins Reference</span></a></li>|<li><a href=\"mixins.html\"><span class=\"nav-label\">Mixins Reference</span></a></li>\\\\n\\\\t\\\\t\\\\t\\\\t\\\\t\\\\t<li><a href=\"status-badge.html\"><span class=\"nav-label\">Status Badge</span></a></li>|g' *.html)",
+      "Bash(echo \"Done: $\\(grep -l 'status-badge.html' *.html)",
+      "Bash(git diff:*)"
     ]
   }
 }
