@@ -14,7 +14,7 @@ Notification system with side accent and icons. File: `js/ln-toast/ln-toast.js`.
                 <div class="ln-toast__head">
                     <strong class="ln-toast__title" data-ln-field="title"></strong>
                 </div>
-                <button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+                <button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg aria-label="Close"></button>
                 <div class="ln-toast__body" data-ln-show="hasBody"></div>
             </div>
         </div>
@@ -93,8 +93,8 @@ Icons use the ln-acme icon system (`ln-icon-*` classes with `mask-image` + `curr
 
 | Type | Icon class |
 |------|-----------|
-| `success` | `ln-icon-check-circle` |
-| `error` | `ln-icon-error-circle` |
+| `success` | `#ln-circle-check` |
+| `error` | `#ln-circle-x` |
 | `warn` | `ln-icon-warning` |
 | `info` | `ln-icon-info-circle` |
 

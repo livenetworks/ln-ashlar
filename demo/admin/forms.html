@@ -21,7 +21,7 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
@@ -50,7 +50,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -532,9 +532,9 @@ form.lnForm.reset();</code></pre>
 						<p>Non-submit action buttons (Add, Delete, Export). In production, apply via <code>@include btn</code> on a semantic selector in project SCSS. <code>class="btn"</code> is for prototyping only.</p>
 						<nav class="demo-actions">
 							<button type="button" class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg> Add</button>
-							<button type="button" class="btn btn-danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg> Delete</button>
-							<button type="button" class="btn btn-success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-save"></use></svg> Approve</button>
-							<button type="button" class="btn btn-warning"><svg class="ln-icon" aria-hidden="true"><use href="#ln-warning"></use></svg> Archive</button>
+							<button type="button" class="btn btn-danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg> Delete</button>
+							<button type="button" class="btn btn-success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg> Approve</button>
+							<button type="button" class="btn btn-warning"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg> Archive</button>
 							<button type="button" class="btn btn-info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-download"></use></svg> Export</button>
 							<button type="button" class="btn" disabled>Disabled</button>
 						</nav>
@@ -580,9 +580,9 @@ form.lnForm.reset();</code></pre>
 						<nav class="demo-actions">
 							<button type="button" title="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
 							<button type="button" title="Copy"><svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg></button>
-							<button type="button" title="Print"><svg class="ln-icon" aria-hidden="true"><use href="#ln-print"></use></svg></button>
+							<button type="button" title="Print"><svg class="ln-icon" aria-hidden="true"><use href="#ln-printer"></use></svg></button>
 							<button type="button" title="Refresh"><svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg></button>
-							<button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg></button>
+							<button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
 						</nav>
 					</main>
 				</section>
@@ -596,9 +596,9 @@ form.lnForm.reset();</code></pre>
 						<p>Row action buttons grouped with small gap. In projects: <code>#users-table .row-actions { @include btn-group; }</code></p>
 						<ul class="btn-group">
 							<li><button type="button" title="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-							<li><button type="button" title="View"><svg class="ln-icon" aria-hidden="true"><use href="#ln-view"></use></svg></button></li>
+							<li><button type="button" title="View"><svg class="ln-icon" aria-hidden="true"><use href="#ln-eye"></use></svg></button></li>
 							<li><button type="button" title="Copy"><svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg></button></li>
-							<li><button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg></button></li>
+							<li><button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 						</ul>
 					</main>
 				</section>

@@ -35,7 +35,7 @@ To switch the focus style for a form or section, override `:focus-visible` in pr
 | `focus-accent-line` | Bottom border only | Inside cards / panels with their own border |
 | `focus-inset-shadow` | Inner shadow | Tactile UI with consistent depth language |
 
-> See `docs/css/mixins.md` for full per-preset examples and `visual-language.md §10` for design guidance.
+> See `docs/css/mixins.md` for full per-preset examples .
 
 ## Form Layout
 

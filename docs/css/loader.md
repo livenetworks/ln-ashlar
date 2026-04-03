@@ -36,7 +36,7 @@ The mixin centers the spinner horizontally with `margin: auto` and adds vertical
 <div id="page-loader" role="status" aria-label="Loading"></div>
 ```
 
-For inline or button-level loading states, see the pseudo-element guidance in `visual-language.md §7` — spinners injected via JS avoid pseudo-element conflicts with icon buttons.
+For inline or button-level loading states, see the pseudo-element guidance in CLAUDE.md — spinners injected via JS avoid pseudo-element conflicts with icon buttons.
 
 ## Color
 

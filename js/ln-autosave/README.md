@@ -105,7 +105,7 @@ No JS needed — MutationObserver auto-initializes.
 ```html
 <div id="new-invoice" class="ln-modal" data-ln-modal>
     <form id="invoice-form" data-ln-autosave>
-        <header><h3>New Invoice</h3><button type="button" class="ln-icon-close" data-ln-modal-close></button></header>
+        <header><h3>New Invoice</h3><button type="button" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg> data-ln-modal-close></button></header>
         <main>
             <div class="form-element">
                 <label for="client">Client</label>

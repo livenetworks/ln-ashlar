@@ -11,10 +11,10 @@ The `data-ln-toggle` attribute is the single source of truth. All state changes 
 ```html
 <!-- Sidebar -->
 <aside id="sidebar" class="sidebar open" data-ln-toggle="open">
-    <button class="ln-icon-close" data-ln-toggle-for="sidebar" data-ln-toggle-action="close"></button>
+    <button aria-label="Close" data-ln-toggle-for="sidebar" data-ln-toggle-action="close"></button>
     <nav>...</nav>
 </aside>
-<button class="ln-icon-menu" data-ln-toggle-for="sidebar"></button>
+<button aria-label="Open menu" data-ln-toggle-for="sidebar"></button>
 
 <!-- Collapsible section -->
 <header data-ln-toggle-for="section1">Title</header>

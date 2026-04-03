@@ -113,7 +113,7 @@ Components expose a JS API on the element (`el.lnModal.open()`) and fire namespa
 | Document | Contents |
 |----------|----------|
 | [js/ln-icons/README.md](js/ln-icons/README.md) | SVG sprite system — HTML patterns, available icons, adding new icons |
-| [docs/js/icons.md](docs/js/icons.md) | Architecture — build-time processing, sprite construction, CSS components that inject icons |
+| [docs/js/icons.md](docs/js/icons.md) | Architecture — on-demand CDN loading, runtime sprite injection, #ln- vs #lnc- routing |
 
 ---
 

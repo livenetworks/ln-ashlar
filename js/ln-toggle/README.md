@@ -72,14 +72,18 @@ If `before-open` or `before-close` is canceled via `preventDefault()`, the obser
 
 ```html
 <aside id="sidebar-left" class="sidebar open" data-ln-toggle="open">
-    <button class="ln-icon-close" data-ln-toggle-for="sidebar-left" data-ln-toggle-action="close"></button>
+    <button aria-label="Close sidebar" data-ln-toggle-for="sidebar-left" data-ln-toggle-action="close">
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+    </button>
     <nav>...</nav>
 </aside>
 
-<button class="ln-icon-menu" data-ln-toggle-for="sidebar-left"></button>
+<button aria-label="Open menu" data-ln-toggle-for="sidebar-left">
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+</button>
 ```
 
-> **Icons:** ALWAYS use `.ln-icon-close` / `.ln-icon-menu` classes.
+> **Icons:** Use SVG sprite icons — `#ln-x` for close, `#ln-menu` for hamburger.
 > NEVER use `&times;`, `☰`, or other Unicode characters.
 
 CSS for sidebar (in `_app-layout.scss`):

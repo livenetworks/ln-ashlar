@@ -66,7 +66,7 @@ Sidebar navigation component. File: `scss/config/mixins/_nav.scss`.
 
 ### Preset: `nav-links-rounded` (default)
 
-Links float as pills inside the sidebar. `mx(0.5rem)` is required so the rounded corners do not touch the container wall (see visual-language.md §1).
+Links float as pills inside the sidebar. `mx(0.5rem)` is required so the rounded corners do not touch the container wall.
 
 - Hover: very faint primary tint (7% opacity bg)
 - Active: `primary-lighter` bg + primary text + semibold

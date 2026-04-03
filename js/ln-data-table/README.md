@@ -196,7 +196,7 @@ Activates automatically when data exceeds **200 rows**. Renders only visible row
             <td data-ln-cell="status"></td>
             <td>
                 <button data-ln-row-action="edit" class="ln-icon-edit" aria-label="Edit"></button>
-                <button data-ln-row-action="delete" class="ln-icon-delete" aria-label="Delete"></button>
+                <button data-ln-row-action="delete" aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg> aria-label="Delete"></button>
             </td>
         </tr>
     </template>

@@ -231,7 +231,7 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 
 Six presets for `:focus-visible` styling. All accept an optional `$color` parameter (default: `var(--color-primary)`). Apply one consistently across the entire interface — mixing types within the same project fragments the visual grammar.
 
-For design guidance on which type to use in which context, see `visual-language.md §10`.
+For design guidance on which type to use in which context, see `docs/css/tokens.md`.
 
 ### `@include focus-ring` — outer glow (default)
 
@@ -479,7 +479,7 @@ color: hsl(var(--color-text-muted));
 ```html
 <!-- In HTML — SVG icon inside the button -->
 <button type="button" aria-label="Close" data-ln-modal-close>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 </button>
 ```
 
@@ -557,7 +557,7 @@ SVG sprite injected into `<body>` at init by `ln-icons.js`. No init call require
 
 <!-- Icon-only button — aria-label required -->
 <button type="button" aria-label="Close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 </button>
 
 <!-- Accordion chevron — rotates on open/close via CSS -->
@@ -585,8 +585,8 @@ Icons inherit `currentColor` from the parent element's `color` property. No colo
 |----------|-----|
 | Navigation | `home` `users` `books` `settings` `logout` |
 | Actions | `close` `menu` `plus` `edit` `delete` `view` `save` `search` `check` `copy` `link` `upload` `download` `refresh` `print` `lock` `star` `filter` `calendar` |
-| Arrows | `arrow-up` `arrow-down` `sort-both` |
-| Status | `check-circle` `error-circle` `info-circle` `warning` |
+| Arrows | `arrow-up` `arrow-down` `arrows-sort` |
+| Status | `circle-check` `circle-x` `info-circle` `alert-triangle` |
 | Data/Content | `chart` `clock` `envelope` `book` `globe` `list` `box` `building` |
 | People/Contact | `user` `mail` `phone` `square-compass` |
 | File Types | `file` `file-pdf` `file-doc` `file-epub` |
@@ -726,7 +726,7 @@ z-index: 40;
         <header>
             <h3>Edit User</h3>
             <button type="button" aria-label="Close" data-ln-modal-close>
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
             </button>
         </header>
         <main>

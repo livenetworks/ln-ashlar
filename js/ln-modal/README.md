@@ -123,7 +123,7 @@ Use case: destructive confirm dialogs — place `autofocus` on the Cancel button
         <header>
             <h3>Title</h3>
             <button type="button" data-ln-modal-close aria-label="Close">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
             </button>
         </header>
         <main>
@@ -142,7 +142,7 @@ Use case: destructive confirm dialogs — place `autofocus` on the Cancel button
         <header>
             <h3>Delete record</h3>
             <button type="button" data-ln-modal-close aria-label="Close">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
             </button>
         </header>
         <main>
@@ -156,7 +156,7 @@ Use case: destructive confirm dialogs — place `autofocus` on the Cancel button
 </div>
 ```
 
-> **Icons:** The close button uses `<svg class="ln-icon"><use href="#ln-close">` — NEVER use `&times;` character.
+> **Icons:** The close button uses `<svg class="ln-icon"><use href="#ln-x">` — NEVER use `&times;` character.
 > `@include close-button` is already applied on `button[data-ln-modal-close]` in `ln-modal.scss`.
 >
 > **Non-submit buttons** inside `<form>` need `type="button"` (close, cancel) to prevent form submission.

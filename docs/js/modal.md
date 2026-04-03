@@ -19,7 +19,7 @@ The `data-ln-modal` attribute is the single source of truth. All state changes f
     <form>
         <header>
             <h3>Title</h3>
-            <button type="button" class="ln-icon-close" data-ln-modal-close></button>
+            <button type="button" aria-label="Close" data-ln-modal-close><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
         </header>
         <main>
             <label>Name <input type="text"></label>

@@ -107,7 +107,7 @@ scss/components/_*.scss      → Applied to default selectors (button, table, .l
 - **Button colors**: every `<button>` gets states via `@include btn-colors` globally. Change color: `--color-primary` override.
 - **Modal**: `<form>` is content root. Select via `.ln-modal > form`. Sizes: `@include modal-sm/md/lg/xl`.
 - **Forms**: CSS Grid (`@include form-grid`) + `<div class="form-element">` + explicit `<label for="x">` / `<input id="x">`. Use `<div>` not `<p>` — `<ul data-ln-validate-errors>` inside `<p>` is invalid HTML.
-- **Icons**: SVG sprite injected at init. Use `<svg class="ln-icon" aria-hidden="true"><use href="#ln-{name}"></use></svg>`. Sizes: `ln-icon--sm/lg/xl`. IDs: `#ln-home`, `#ln-close`, etc. See `js/ln-icons/README.md`.
+- **Icons**: SVG sprite injected at init. Use `<svg class="ln-icon" aria-hidden="true"><use href="#ln-{name}"></use></svg>`. Sizes: `ln-icon--sm/lg/xl`. IDs: `#ln-home`, `#ln-x`, `#ln-trash`, etc. (Tabler names — full list: `scss/tabler-icons.txt`) See `js/ln-icons/README.md`.
 - **Container queries**: `@include container(name)` on parent, `@container name (min-width: ...)` on child. Never on same element. Never combine with `overflow: hidden`.
 
 ### Override strategy

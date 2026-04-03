@@ -20,7 +20,7 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
@@ -48,7 +48,7 @@
 
 			<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 				<div class="sidebar-header">
-					<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+					<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 					<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 					<span class="app-name">acme-gui</span>
 				</div>
@@ -383,11 +383,11 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 											<th data-ln-col-select></th>
 											<th data-ln-col="title">
 												Title
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-sort-both"></use></svg></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button>
 											</th>
 											<th data-ln-col="department">
 												Department
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-sort-both"></use></svg></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button>
 												<button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 											</th>
 											<th data-ln-col="status">
@@ -396,7 +396,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 											</th>
 											<th data-ln-col="date">
 												Date
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-sort-both"></use></svg></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button>
 											</th>
 											<th>Actions</th>
 										</tr>
@@ -423,7 +423,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 										<td data-ln-cell="date"></td>
 										<td>
 											<button data-ln-row-action="edit"  aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
-											<button data-ln-row-action="delete"  aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg></button>
+											<button data-ln-row-action="delete"  aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
 										</td>
 									</tr>
 								</template>
@@ -603,9 +603,9 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 				'<td><span class="' + status.cls + '">' + status.text + '</span></td>' +
 				'<td class="center">' +
 					'<div class="actions">' +
-						'<a href="#" class="action primary"><svg class="ln-icon" aria-hidden="true"><use href="#ln-view"></use></svg></a>' +
+						'<a href="#" class="action primary"><svg class="ln-icon" aria-hidden="true"><use href="#ln-eye"></use></svg></a>' +
 						'<a href="#" class="action"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></a>' +
-						'<a href="#" class="action danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg></a>' +
+						'<a href="#" class="action danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></a>' +
 					'</div>' +
 				'</td>' +
 				'</tr>'

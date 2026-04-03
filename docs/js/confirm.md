@@ -67,7 +67,7 @@ Each `[data-ln-confirm]` button gets a `_component` instance stored at `element.
 | `confirmText` | string | Text from `data-ln-confirm` attribute (default: "Confirm?") |
 | `revertTimer` | number or null | `setTimeout` handle for auto-revert |
 | `isIconButton` | boolean | Set during confirm if button is icon-only (no text) |
-| `originalIconClass` | string | Original `ln-icon-*` class (stored for icon buttons) |
+| `originalIconHref` | string | Original `<use href>` value on the SVG icon (stored for icon buttons) |
 | `_onClick` | Function | Bound click handler |
 
 ### Two-Click Flow
@@ -93,12 +93,12 @@ Second click (confirming = true):
 
 ### Icon Button Detection
 
-On first click, `_enterConfirm()` checks if the button has an `ln-icon-*` class and empty `textContent`. If so, it's treated as an icon button:
+On first click, `_enterConfirm()` checks if the button contains an `svg.ln-icon use` element. If so, it's treated as an icon button:
 
-1. Store the original icon class (e.g., `ln-icon-delete`)
-2. Remove it, add `ln-icon-check` + `text-success` + `ln-confirm-tooltip`
+1. Store the original `href` from `svg.ln-icon use` (e.g., `#ln-trash`)
+2. Swap `href` to `#ln-check`, add `text-success` + `ln-confirm-tooltip`
 3. Set `data-tooltip-text` to the confirm text (shown as tooltip since there's no text content)
-4. On reset: reverse — remove check/success classes, restore original icon class, remove tooltip
+4. On reset: restore original `href`, remove `text-success` + `ln-confirm-tooltip`
 
 For text buttons, the swap is simpler: `dom.textContent = confirmText` on enter, `dom.textContent = originalText` on reset.
 

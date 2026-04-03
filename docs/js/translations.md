@@ -36,7 +36,7 @@ Multi-language form field management. Clones input fields for each added languag
 <template data-ln-template="ln-translations-badge">
     <p data-ln-translations-lang>
         <span></span>
-        <button type="button" class="ln-icon-close ln-icon--sm"></button>
+        <button type="button" aria-label="Remove"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
     </p>
 </template>
 ```

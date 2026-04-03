@@ -59,7 +59,7 @@ The component needs a `<template data-ln-template="ln-upload-item">` in your pag
     data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
     <span class="ln-upload__name" data-ln-field="name"></span>
     <span class="ln-upload__size" data-ln-field="sizeText"></span>
-    <button type="button" class="ln-upload__remove ln-icon-close" aria-label="Remove"></button>
+    <button type="button" class="ln-upload__remove" aria-label="Remove"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg aria-label="Remove"></button>
     <div class="ln-upload__progress">
         <div class="ln-upload__progress-bar"></div>
     </div>

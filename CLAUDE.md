@@ -198,7 +198,7 @@ For non-submit action buttons that need primary styling. Includes full structure
 
 <div class="ln-modal" data-ln-modal id="my-modal">
     <form>
-        <header><h3>Title</h3><button type="button" class="ln-icon-close" data-ln-modal-close></button></header>
+        <header><h3>Title</h3><button type="button" aria-label="Close" data-ln-modal-close><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button></header>
         <main>...</main>
         <footer>
             <button type="button" data-ln-modal-close>Cancel</button>
@@ -231,8 +231,8 @@ Two distinct grouping patterns:
 ```html
 <!-- Action buttons -->
 <ul>
-  <li><button class="ln-icon-edit" title="Edit"></button></li>
-  <li><button class="ln-icon-delete" title="Delete"></button></li>
+  <li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+  <li><button aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 </ul>
 
 <!-- Pill radio -->
@@ -351,7 +351,7 @@ and inserts it into `<body>` at init. Icons render via `<use href="#ln-{name}">`
 
 <!-- Icon-only button — aria-label required -->
 <button aria-label="Close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 </button>
 
 <!-- Accordion chevron (CSS rotates it on open) -->
@@ -361,26 +361,32 @@ and inserts it into `<body>` at init. Icons render via `<use href="#ln-{name}">`
 </header>
 ```
 
-Available IDs (`#ln-{name}`): `home` `close` `menu` `users` `settings` `logout` `books` `lodges`
-`plus` `edit` `delete` `view` `save` `search` `check` `copy` `link` `filter` `calendar`
-`upload` `download` `refresh` `print` `lock` `star` `arrow-up` `arrow-down` `sort-both`
-`chart` `clock` `envelope` `book` `globe` `list` `box` `building` `badge` `warning`
-`info-circle` `error-circle` `check-circle` `user` `mail` `phone` `square-compass`
-`file` `file-pdf` `file-doc` `file-epub`
+Any icon from [Tabler Icons](https://tabler.io/icons) works — use the Tabler name after `ln-`:
+`home` `x` `menu` `users` `settings` `logout` `books`
+`plus` `edit` `trash` `eye` `device-floppy` `search` `check` `copy` `link` `filter` `calendar`
+`upload` `download` `refresh` `printer` `lock` `star` `arrow-up` `arrow-down` `arrows-sort`
+`chart-bar` `clock` `mail` `book` `world` `list` `box` `building` `alert-triangle`
+`info-circle` `circle-x` `circle-check` `user` `phone` `square-compass`
+`file`
+
+Full name list: `scss/tabler-icons.txt`
+
+Custom icons (not in Tabler) use `#lnc-` prefix and are served from `window.LN_ICONS_CUSTOM_CDN`:
+`lnc-file-pdf` `lnc-file-doc` `lnc-file-epub`
 
 Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon--xl` (4rem).
 
-Color: icons follow the parent's `color` property automatically. Exception: `file-pdf`, `file-doc`,
-`file-epub` have embedded semantic stroke colors (red, blue, purple).
+Color: icons follow the parent's `color` property automatically. Exception: `lnc-file-pdf`, `lnc-file-doc`,
+`lnc-file-epub` have embedded semantic stroke colors.
 
-To add a new icon: create `js/ln-icons/icons/{name}.svg` with `stroke="currentColor"` or
-`fill="currentColor"`, then `npm run build`.
+To add a custom icon: add SVG to `js/ln-icons/icons/{name}.svg`, run `npm run build`,
+upload `dist/icons/{name}.svg` to custom CDN, use as `#lnc-{name}`.
 
 ---
 
 ## Reactive Architecture
 
-See [docs/v2-reactive.md](docs/v2-reactive.md) for the reactive rendering layer: ln-core shared helpers, Proxy-based state, fill/renderList, attribute bridge pattern.
+See [docs/js/core.md](docs/js/core.md) for the reactive rendering layer: ln-core shared helpers, Proxy-based state, fill/renderList, attribute bridge pattern.
 
 ---
 

@@ -66,8 +66,8 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 
 | Type | Default title | Icon class |
 |------|--------------|------------|
-| `success` | Success | `ln-icon-check-circle` |
-| `error` | Error | `ln-icon-error-circle` |
+| `success` | Success | `#ln-circle-check` |
+| `error` | Error | `#ln-circle-x` |
 | `warn` | Warning | `ln-icon-warning` |
 | `info` | Information | `ln-icon-info-circle` |
 
@@ -83,7 +83,7 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
                 <div class="ln-toast__head">
                     <strong class="ln-toast__title" data-ln-field="title"></strong>
                 </div>
-                <button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+                <button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg aria-label="Close"></button>
                 <div class="ln-toast__body" data-ln-show="hasBody"></div>
             </div>
         </div>
