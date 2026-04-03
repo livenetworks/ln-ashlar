@@ -23,12 +23,11 @@
 /* Modal Content */
 .ln-modal > form {
 	@include bg-primary;
-	@include rounded-xl;
+	@include rounded-md;
 	@include shadow-xl;
 	max-width: 600px;
 	width: 90%;
 	max-height: 90vh;
-	overflow-y: auto;
 	animation: ln-modal-slideIn 0.3s ease;
 	display: grid;
 	grid-template-rows: auto 1fr auto;
@@ -47,6 +46,7 @@
 /* Body */
 .ln-modal main {
 	@include p(var(--spacing-md));
+	min-height: 0;
 	overflow-y: auto;
 	overflow-x: hidden;
 }

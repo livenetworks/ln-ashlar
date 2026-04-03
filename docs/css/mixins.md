@@ -212,13 +212,114 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Modal size: large (42rem) | `@include modal-lg` |
 | Modal size: extra large (48rem) | `@include modal-xl` |
 | Pill labels: bordered + visible input | `@include pill-outline` (on parent) |
-| Focus ring | `@include focus-ring` |
+| Focus — outer glow ring (default) | `@include focus-ring` |
+| Focus — border thickens to 2px | `@include focus-border-thicken` |
+| Focus — border color + ring | `@include focus-combination` |
+| Focus — very light primary bg tint | `@include focus-background-shift` |
+| Focus — bottom border only changes | `@include focus-accent-line` |
+| Focus — inner shadow, field sinks | `@include focus-inset-shadow` |
 | Tab navigation container | `@include tabs-nav` |
 | Tab button | `@include tabs-tab` |
 | Active tab | `@include tabs-tab-active` |
 | Tab content panel | `@include tabs-panel` |
 | Container query setup | `@include container` or `@include container(name)` |
 | Status badge (dot + text + tinted pill) | `@include badge` |
+
+---
+
+## Focus Indicator Presets
+
+Six presets for `:focus-visible` styling. All accept an optional `$color` parameter (default: `var(--color-primary)`). Apply one consistently across the entire interface — mixing types within the same project fragments the visual grammar.
+
+For design guidance on which type to use in which context, see `visual-language.md §10`.
+
+### `@include focus-ring` — outer glow (default)
+
+A soft `box-shadow` ring outside the element. Border and layout are unchanged. No layout shift.
+
+```scss
+// Applied automatically in _global.scss — no action needed for standard inputs.
+
+// Override color for error state:
+input.error:focus-visible { @include focus-ring(var(--color-error)); }
+
+// Wider ring:
+input:focus-visible { @include focus-ring($width: 4px); }
+```
+
+**When:** Default choice. Universally readable. Tailwind / Vercel / shadcn convention.
+
+---
+
+### `@include focus-border-thicken` — structural border
+
+Uses `outline` (not `border`) to grow to 2px in primary color. No layout shift. No glow.
+
+```scss
+// Project SCSS — switch entire form to structural focus style:
+#settings-form input:focus-visible,
+#settings-form select:focus-visible,
+#settings-form textarea:focus-visible {
+    @include focus-border-thicken;
+}
+
+// Error variant:
+input.error:focus-visible { @include focus-border-thicken(var(--color-error)); }
+```
+
+**When:** Enterprise / business UI. Dense forms where softness (glow) would add visual noise. Material Design style.
+
+---
+
+### `@include focus-combination` — border + ring
+
+Border color shifts to primary AND outer ring appears simultaneously. The strongest possible focus signal.
+
+```scss
+// Accessibility-first form:
+#public-form input:focus-visible { @include focus-combination; }
+```
+
+**When:** Accessibility-first interfaces. Forms used by keyboard-only users or where WCAG AAA focus visibility is required.
+
+---
+
+### `@include focus-background-shift` — inner tint
+
+The field receives a very light primary tint. No border change whatsoever. Focus is felt, not announced.
+
+```scss
+// Minimalist / consumer-facing form inside a bordered card:
+.search-panel input:focus-visible { @include focus-background-shift; }
+```
+
+**When:** Minimalist or consumer UI. The surrounding container already has a visible border — adding a border-based focus signal would be visually crowded. Works inside cards with strong borders.
+
+---
+
+### `@include focus-accent-line` — bottom border only
+
+Only the bottom border changes to primary. The three other sides stay at their default color.
+
+```scss
+// Inside a section-card with visible border — full-border focus would double up:
+.filter-panel input:focus-visible { @include focus-accent-line; }
+```
+
+**When:** Inside bordered containers (cards, panels) where a full border change would compete with the container's own border. Subtle, directional.
+
+---
+
+### `@include focus-inset-shadow` — inner shadow
+
+An inner `box-shadow` makes the field appear to sink slightly. Tactile, three-dimensional.
+
+```scss
+// Custom UI with tactile character throughout:
+#kiosk-form input:focus-visible { @include focus-inset-shadow; }
+```
+
+**When:** Rarely appropriate. Use only if the overall UI has a consistent tactile / depth language — inset shadows on buttons, card depths, etc. Never mix with flat elements in the same interface.
 
 ---
 

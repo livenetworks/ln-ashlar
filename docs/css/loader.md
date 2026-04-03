@@ -1,0 +1,51 @@
+# Loader
+
+CSS-only spinner. Mixin only — no default class selector. Files: `scss/config/mixins/_loader.scss`, `scss/components/_loader.scss` (keyframes only).
+
+## Usage
+
+Apply `@include loader` to a semantic selector in project SCSS:
+
+```scss
+#page-loader     { @include loader; }
+#section-spinner { @include loader; }
+```
+
+```html
+<div id="page-loader" aria-label="Loading" role="status"></div>
+```
+
+## Size
+
+Size is controlled by `font-size` on the element. The spinner dimensions are relative (`em` units), so changing `font-size` scales the entire spinner proportionally.
+
+Default is `font-size: 90px` — a prominent page-level spinner. Override for smaller contexts:
+
+```scss
+#inline-spinner {
+    @include loader;
+    font-size: 32px;  // smaller spinner
+}
+```
+
+## Positioning
+
+The mixin centers the spinner horizontally with `margin: auto` and adds vertical spacing (`margin-top/bottom: 4.5rem`). For full-page loading, wrap in a centered container:
+
+```html
+<div id="page-loader" role="status" aria-label="Loading"></div>
+```
+
+For inline or button-level loading states, see the pseudo-element guidance in `visual-language.md §7` — spinners injected via JS avoid pseudo-element conflicts with icon buttons.
+
+## Color
+
+The spinner uses `color: hsl(var(--color-primary))`. Override on the element:
+
+```scss
+#page-loader { @include loader; --color-primary: var(--color-text-muted); }
+```
+
+## Note
+
+This is a CSS `box-shadow` spinner — no images, no SVG, no extra elements. It requires the element to have no meaningful text content. Always include `role="status"` and `aria-label="Loading"` for screen readers.

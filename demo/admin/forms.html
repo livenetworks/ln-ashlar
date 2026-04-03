@@ -670,6 +670,206 @@ form.lnForm.reset();</code></pre>
 					</main>
 				</section>
 
+				<!-- ─── Focus indicator presets ─────────────────────── -->
+
+				<section class="section-card">
+					<header><h3>focus-ring — outer glow (default)</h3></header>
+					<main>
+						<p class="demo-note">Safe, universally readable. No layout shift. Tailwind / Vercel convention.</p>
+						<form id="demo-focus-ring">
+							<div class="form-element">
+								<label for="fr-name">Name</label>
+								<input type="text" id="fr-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fr-email">Email</label>
+								<input type="email" id="fr-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fr-role">Role</label>
+								<select id="fr-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-border-thicken — structural outline</h3></header>
+					<main>
+						<p class="demo-note">Sharp, structural. No glow. Enterprise / business UI. Material Design style.</p>
+						<form id="demo-focus-border-thicken">
+							<div class="form-element">
+								<label for="fbt-name">Name</label>
+								<input type="text" id="fbt-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fbt-email">Email</label>
+								<input type="email" id="fbt-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fbt-role">Role</label>
+								<select id="fbt-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-combination — border + ring</h3></header>
+					<main>
+						<p class="demo-note">Border color + outer ring. Maximum signal strength. Accessibility-first.</p>
+						<form id="demo-focus-combination">
+							<div class="form-element">
+								<label for="fc-name">Name</label>
+								<input type="text" id="fc-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fc-email">Email</label>
+								<input type="email" id="fc-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fc-role">Role</label>
+								<select id="fc-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-background-shift — minimal tint</h3></header>
+					<main>
+						<p class="demo-note">Very light primary tint. No border change. Focus is felt, not announced.</p>
+						<form id="demo-focus-background-shift">
+							<div class="form-element">
+								<label for="fbs-name">Name</label>
+								<input type="text" id="fbs-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fbs-email">Email</label>
+								<input type="email" id="fbs-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fbs-role">Role</label>
+								<select id="fbs-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-accent-line — bottom border only</h3></header>
+					<main>
+						<p class="demo-note">Bottom border only changes. Subtle. Good inside bordered containers.</p>
+						<form id="demo-focus-accent-line">
+							<div class="form-element">
+								<label for="fal-name">Name</label>
+								<input type="text" id="fal-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fal-email">Email</label>
+								<input type="email" id="fal-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fal-role">Role</label>
+								<select id="fal-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-inset-shadow — tactile sink</h3></header>
+					<main>
+						<p class="demo-note">Inner shadow — field visually sinks. Tactile, three-dimensional feel.</p>
+						<form id="demo-focus-inset-shadow">
+							<div class="form-element">
+								<label for="fis-name">Name</label>
+								<input type="text" id="fis-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fis-email">Email</label>
+								<input type="email" id="fis-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fis-role">Role</label>
+								<select id="fis-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
 			</div>
 
 			<!-- Footer -->

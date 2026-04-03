@@ -6,6 +6,37 @@ File: `scss/components/_forms.scss`.
 
 All `input`, `textarea`, `select` are styled globally with border, rounded-md, focus ring. Full width by default.
 
+## Focus Indicators
+
+The default focus style is `@include focus-ring` — a soft outer glow applied automatically in `_global.scss`. No action needed for standard forms.
+
+To switch the focus style for a form or section, override `:focus-visible` in project SCSS:
+
+```scss
+// Switch to structural border for a settings panel:
+#settings-form input:focus-visible,
+#settings-form select:focus-visible,
+#settings-form textarea:focus-visible {
+    @include focus-border-thicken;
+}
+
+// Error state always uses error color, regardless of active preset:
+#settings-form input.error:focus-visible {
+    @include focus-border-thicken(var(--color-error));
+}
+```
+
+| Preset | Signal | Use when |
+|--------|--------|----------|
+| `focus-ring` | Outer glow (default) | General purpose, agnostic |
+| `focus-border-thicken` | 2px outline, no glow | Dense / enterprise UI |
+| `focus-combination` | Border + ring | Accessibility-first |
+| `focus-background-shift` | Light primary tint | Minimalist, inside bordered containers |
+| `focus-accent-line` | Bottom border only | Inside cards / panels with their own border |
+| `focus-inset-shadow` | Inner shadow | Tactile UI with consistent depth language |
+
+> See `docs/css/mixins.md` for full per-preset examples and `visual-language.md §10` for design guidance.
+
 ## Form Layout
 
 Forms use CSS Grid + `<div class="form-element">` with explicit `for`/`id` association.
