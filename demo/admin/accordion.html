@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Accordion — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -18,26 +21,26 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
-</template>
-	<div data-ln-toast></div>
+	</template>
+	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
 				<h1>Accordion</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo for the accordion component.'})">
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo for the accordion component.'})">
 						Test Toast
 					</button>
 				</div>
@@ -49,7 +52,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -57,7 +60,7 @@
 			<div class="sidebar-content">
 				<nav class="nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -73,7 +76,7 @@
 						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
 					</ul>
 
-										<h6 class="nav-section">JS Components</h6>
+									<h6 class="nav-section">JS Components</h6>
 					<ul>
 						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
 						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
@@ -89,6 +92,7 @@
 						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -112,7 +116,7 @@
 					<h1>Accordion</h1>
 					<p>A wrapper component that coordinates toggle elements. Only one panel can be open at a time.</p>
 
-					<!-- Basis Info -->
+					<!-- Basics -->
 					<section class="section-card">
 						<header><h3>Basics</h3></header>
 						<main>
@@ -135,34 +139,37 @@
 								<li>
 									<header data-ln-toggle-for="panel1">
 										<strong>What is ln-acme?</strong>
-									</header>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+					</header>
 									<section id="panel1" data-ln-toggle="open" class="collapsible">
-										<section class="collapsible-body">
+										<article class="collapsible-body">
 											<p>ln-acme is a unified frontend library for LiveNetworks projects. It contains an SCSS CSS framework + vanilla JS components, with zero dependencies.</p>
-										</section>
+										</article>
 									</section>
 								</li>
 								<li>
 									<header data-ln-toggle-for="panel2">
 										<strong>How to use it?</strong>
-									</header>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+					</header>
 									<section id="panel2" data-ln-toggle class="collapsible">
-										<section class="collapsible-body">
+										<article class="collapsible-body">
 											<p>You can use it as an npm package, via git submodule, or directly with <code>&lt;link&gt;</code> and <code>&lt;script&gt;</code> tags.</p>
 											<pre><code>import 'ln-acme';
 import 'ln-acme/dist/ln-acme.css';</code></pre>
-										</section>
+										</article>
 									</section>
 								</li>
 								<li>
 									<header data-ln-toggle-for="panel3">
 										<strong>Does it have dependencies?</strong>
-									</header>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+					</header>
 									<section id="panel3" data-ln-toggle class="collapsible">
-										<section class="collapsible-body">
+										<article class="collapsible-body">
 											<p>ln-acme is fully independent. All JS components are written in vanilla JavaScript using the IIFE pattern.</p>
 											<p><strong>Exception:</strong> ln-select depends on TomSelect (peer dependency).</p>
-										</section>
+										</article>
 									</section>
 								</li>
 							</ul>
@@ -177,24 +184,26 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 								<li>
 									<header data-ln-toggle-for="sec1">
 										<h4>User Documentation</h4>
-									</header>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+					</header>
 									<section id="sec1" data-ln-toggle="open" class="collapsible">
-										<section class="collapsible-body">
+										<article class="collapsible-body">
 											<ul>
 												<li><a href="#">Getting Started</a></li>
 												<li><a href="#">Installation</a></li>
 												<li><a href="#">Quick Integration</a></li>
 												<li><a href="#">Best Practices</a></li>
 											</ul>
-										</section>
+										</article>
 									</section>
 								</li>
 								<li>
 									<header data-ln-toggle-for="sec2">
 										<h4>CSS Components</h4>
-									</header>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+					</header>
 									<section id="sec2" data-ln-toggle class="collapsible">
-										<section class="collapsible-body">
+										<article class="collapsible-body">
 											<ul>
 												<li><a href="#">Cards</a></li>
 												<li><a href="#">Forms</a></li>
@@ -202,15 +211,16 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 												<li><a href="#">Navigation</a></li>
 												<li><a href="#">Layout</a></li>
 											</ul>
-										</section>
+										</article>
 									</section>
 								</li>
 								<li>
 									<header data-ln-toggle-for="sec3">
 										<h4>JS Components</h4>
-									</header>
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+					</header>
 									<section id="sec3" data-ln-toggle class="collapsible">
-										<section class="collapsible-body">
+										<article class="collapsible-body">
 											<ul>
 												<li><a href="#">Modal</a></li>
 												<li><a href="#">Toast</a></li>
@@ -218,7 +228,7 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 												<li><a href="#">Upload</a></li>
 												<li><a href="#">AJAX</a></li>
 											</ul>
-										</section>
+										</article>
 									</section>
 								</li>
 							</ul>
@@ -236,14 +246,16 @@ window.lnAccordion(document.body);</code></pre>
 							</article>
 							<article>
 								<h4>Events</h4>
-								<p>Accordion listens to <code>ln-toggle:open</code> events from descendant toggle elements and closes the other panels.</p>
+								<p>Fires on the accordion container when a panel opens (after siblings are closed).</p>
 								<table>
-									<thead><tr><th>Event</th><th>When</th></tr></thead>
+									<thead><tr><th>Event</th><th>Bubbles</th><th>Detail</th></tr></thead>
 									<tbody>
-										<tr><td><code>ln-toggle:open</code></td><td>When a panel opens</td></tr>
-										<tr><td><code>ln-toggle:close</code></td><td>When a panel closes</td></tr>
+										<tr><td><code>ln-accordion:change</code></td><td>yes</td><td><code>{ target: HTMLElement }</code></td></tr>
 									</tbody>
 								</table>
+								<pre><code>document.addEventListener('ln-accordion:change', function (e) {
+    console.log('Active panel:', e.detail.target.id);
+});</code></pre>
 							</article>
 						</main>
 					</section>
@@ -258,9 +270,9 @@ window.lnAccordion(document.body);</code></pre>
             &lt;strong&gt;Title 1&lt;/strong&gt;
         &lt;/header&gt;
         &lt;section id="panel1" data-ln-toggle="open" class="collapsible"&gt;
-            &lt;section class="collapsible-body"&gt;
+            &lt;article class="collapsible-body"&gt;
                 &lt;p&gt;Content 1 — starts open&lt;/p&gt;
-            &lt;/section&gt;
+            &lt;/article&gt;
         &lt;/section&gt;
     &lt;/li&gt;
 
@@ -269,9 +281,9 @@ window.lnAccordion(document.body);</code></pre>
             &lt;strong&gt;Title 2&lt;/strong&gt;
         &lt;/header&gt;
         &lt;section id="panel2" data-ln-toggle class="collapsible"&gt;
-            &lt;section class="collapsible-body"&gt;
+            &lt;article class="collapsible-body"&gt;
                 &lt;p&gt;Content 2 — starts closed&lt;/p&gt;
-            &lt;/section&gt;
+            &lt;/article&gt;
         &lt;/section&gt;
     &lt;/li&gt;
 &lt;/ul&gt;</code></pre>

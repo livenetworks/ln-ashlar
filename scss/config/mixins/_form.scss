@@ -42,6 +42,8 @@
 }
 
 @mixin form-actions {
+	list-style: none;
+	@include p(0);
 	@include flex;
 	@include justify-end;
 	@include gap(0.75rem);
@@ -54,7 +56,7 @@
 
 @mixin form-input {
 	@include w-full;
-	@include px(0.75rem);
+	@include px(0.875rem);
 	@include py(0.5rem);
 	@include text-base;
 	@include text-primary;
@@ -112,7 +114,9 @@
 	&:checked {
 		background-color: hsl(var(--color-primary));
 		border-color: hsl(var(--color-primary));
-		background-image: var(--icon-check-white);
+		// Inline SVG: native <input type="checkbox"> cannot contain child elements,
+		// so a data URI is the only way to embed a checkmark here.
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
 		background-size: 0.75rem;
 		background-position: center;
 		background-repeat: no-repeat;

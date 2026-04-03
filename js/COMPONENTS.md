@@ -88,6 +88,7 @@ import { deepReactive, createBatcher } from '../ln-core';
 
 | Import | Purpose |
 |--------|---------|
+| `findElements(root, selector, attr, Constructor)` | Find all `[selector]` under root, skip initialized, instantiate |
 | `dispatch(el, name, detail)` | Fire non-cancelable CustomEvent |
 | `dispatchCancelable(el, name, detail)` | Fire cancelable CustomEvent, returns event |
 | `cloneTemplate(name, tag)` | Clone `<template data-ln-template="name">`, cached |
@@ -106,27 +107,16 @@ Import only what the component needs. Vite tree-shakes unused exports.
 The component is **attached to a DOM element**. The API lives on the element, NOT on `window`.
 
 ```javascript
+import { findElements } from '../ln-core';
+
 // window[DOM_ATTRIBUTE] is just the constructor function
 function constructor(domRoot) {
-    _findElements(domRoot);
-}
-
-function _findElements(root) {
-    var items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
-    if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-        items.push(root);
-    }
-    items.forEach(function (el) {
-        if (!el[DOM_ATTRIBUTE]) {
-            el[DOM_ATTRIBUTE] = new _component(el);
-        }
-    });
+    findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 }
 
 function _component(dom) {
     this.dom = dom;
     // ... init ...
-    return this;
 }
 
 // Prototype methods = public API
@@ -147,6 +137,33 @@ window.lnToggle(container);
 
 ---
 
+## Attribute Bridge (mandatory)
+
+Instance methods that change component state **must only call `setAttribute`**. The MutationObserver observes the attribute change and applies the actual state. Direct DOM manipulation inside instance methods is forbidden.
+
+```javascript
+// CORRECT — method is a thin setAttribute wrapper
+_component.prototype.open = function () {
+    if (this.isOpen) return;
+    this.dom.setAttribute(DOM_SELECTOR, 'open');
+    // MutationObserver fires → _syncAttribute() applies state
+};
+
+// WRONG — method bypasses the attribute and manipulates state directly
+_component.prototype.open = function () {
+    this.isOpen = true;
+    this.dom.classList.add('open');
+    document.addEventListener('keydown', this._onEscape);
+    dispatch(this.dom, 'ln-component:open', { target: this.dom });
+};
+```
+
+**Why:** The attribute is the single source of truth. Any external code can trigger the same state change with `el.setAttribute(...)` and get identical behaviour. The component never has two code paths to the same state.
+
+**Rule:** If a prototype method changes state, its entire body is `this.dom.setAttribute(...)`. All state logic lives in `_syncAttribute()` (or equivalent), called only by the MutationObserver.
+
+---
+
 ## MutationObserver (mandatory)
 
 Every component must watch for **two types** of changes:
@@ -156,16 +173,16 @@ Every component must watch for **two types** of changes:
 
 ```javascript
 function _domObserver() {
-    var observer = new MutationObserver(function (mutations) {
-        for (var mutation of mutations) {
+    const observer = new MutationObserver(function (mutations) {
+        for (const mutation of mutations) {
             if (mutation.type === 'childList') {
-                for (var node of mutation.addedNodes) {
+                for (const node of mutation.addedNodes) {
                     if (node.nodeType === 1) {
-                        _findElements(node);
+                        findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
                     }
                 }
             } else if (mutation.type === 'attributes') {
-                _findElements(mutation.target);
+                findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
             }
         }
     });
@@ -182,7 +199,81 @@ function _domObserver() {
 **Rules:**
 - `attributeFilter` always includes `DOM_SELECTOR` (and optionally trigger attributes like `'data-ln-toggle-for'`)
 - `attributeFilter` is mandatory — without it the observer fires on EVERY attribute change (performance issue)
-- On `attributes` mutation, `mutation.target` is the element whose attribute changed — call `_findElements` directly on it
+- On `attributes` mutation, `mutation.target` is the element whose attribute changed — call `findElements` directly on it
+
+---
+
+## Reactive Rendering Pattern
+
+When a component has **multiple internal state properties** that together drive DOM updates, use `reactiveState` + `createBatcher` + `fill()` from ln-core. This eliminates manual querySelector chains and coalesces multiple synchronous state changes into a single DOM update.
+
+### The three primitives
+
+| Helper | Role |
+|--------|------|
+| `reactiveState(initial, onChange)` | Proxy — calls `onChange(prop, value, old)` on every top-level property set |
+| `createBatcher(renderFn, afterRender)` | Coalesces sync state changes into one `renderFn` call via `queueMicrotask` |
+| `fill(root, data)` | Writes state to DOM via `data-ln-field`, `data-ln-attr`, `data-ln-show`, `data-ln-class` |
+
+### Pattern
+
+```javascript
+import { reactiveState, createBatcher, fill, dispatch } from '../ln-core';
+
+function _component(dom) {
+    this.dom = dom;
+    const self = this;
+
+    const queueRender = createBatcher(
+        function () { self._render(); },      // runs after current sync block
+        function () { self._afterRender(); }  // runs after render — dispatch events here
+    );
+
+    this.state = reactiveState({ key: null, value: null }, queueRender);
+}
+
+_component.prototype._render = function () {
+    fill(this.dom, this.state);
+    // additional DOM logic derived from state
+};
+
+_component.prototype._afterRender = function () {
+    dispatch(this.dom, 'ln-component:changed', { key: this.state.key });
+};
+```
+
+When multiple properties change in the same sync block:
+
+```javascript
+this.state.key = 'status';   // queues render
+this.state.value = 'active'; // queues again — same microtask, no duplicate
+// → microtask fires → _render() once → _afterRender() once
+```
+
+### `reactiveState` vs `deepReactive`
+
+| | `reactiveState` | `deepReactive` |
+|---|---|---|
+| **Depth** | Shallow — top-level sets only | Deep — nested object/array mutations |
+| **onChange args** | `(prop, value, old)` | `()` — no args |
+| **Use when** | Flat state with primitive values | State contains nested objects or arrays |
+
+### `fill()` — limitations
+
+`fill()` sets `textContent` for `data-ln-field` — it does **not** set `.value` on `<input>`, `<textarea>`, or `<select>`. For form elements, set `.value` manually after `fill()`.
+
+### When to use
+
+Use reactive rendering when a component has **2+ state properties** that together drive DOM, and multiple changes happen in the same sync block.
+
+**Don't use it for:**
+- Single boolean state — `this.isOpen = true; dom.classList.toggle(...)` is simpler
+- Event-driven rendering — components that receive data via `set-data` events (ln-data-table)
+- One-shot renders — clone template + fill once, no ongoing state
+
+### Used in
+
+- **ln-filter** — `{ key, value }` state drives button active states and target element visibility
 
 ---
 
@@ -213,7 +304,7 @@ import { dispatch, dispatchCancelable } from '../ln-core';
 
 _component.prototype.open = function () {
     if (this.isOpen) return;
-    var before = dispatchCancelable(this.dom, 'ln-component:before-open', { target: this.dom });
+    const before = dispatchCancelable(this.dom, 'ln-component:before-open', { target: this.dom });
     if (before.defaultPrevented) return;   // external code can cancel
     this.isOpen = true;
     this.dom.classList.add('open');
@@ -248,7 +339,7 @@ When a component listens for click events on trigger elements, it must set a gua
 
 ```javascript
 function _attachTriggers(root) {
-    var triggers = Array.from(root.querySelectorAll('[data-ln-{name}-for]'));
+    const triggers = Array.from(root.querySelectorAll('[data-ln-{name}-for]'));
     triggers.forEach(function (btn) {
         if (btn[DOM_ATTRIBUTE + 'Trigger']) return;  // already initialized
         btn[DOM_ATTRIBUTE + 'Trigger'] = true;
@@ -364,7 +455,7 @@ if (document.readyState === 'loading') {
 | Custom event | `ln-{name}:{action}` | `ln-toggle:open` |
 | CSS class | `.ln-{name}__{element}` | `.ln-toggle__backdrop` |
 | Initialized flag | `data-ln-{name}-initialized` | `data-ln-toggle-for-initialized` |
-| Private function | `_functionName` | `_findElements` |
+| Private function | `_functionName` | `_render`, `_attachTriggers` |
 
 ---
 
@@ -451,7 +542,7 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
         // 1. UI trigger → request event
         document.addEventListener('click', function (e) {
             if (e.target.closest('[data-ln-action="delete-profile"]')) {
-                var nav = _getNav();
+                const nav = _getNav();
                 if (nav && nav.lnProfile) {
                     nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', {
                         detail: { id: nav.lnProfile.currentId }  // query is OK
@@ -463,11 +554,11 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
         // 2. Form submit → request event
         document.addEventListener('ln-form:submit', function (e) {
             if (e.target.getAttribute('data-ln-form') !== 'new-profile') return;
-            var input = document.querySelector('[data-ln-field="new-profile-name"]');
-            var name = input ? input.value.trim() : '';
+            const input = document.querySelector('[data-ln-field="new-profile-name"]');
+            const name = input ? input.value.trim() : '';
             if (!name) return;
 
-            var nav = _getNav();
+            const nav = _getNav();
             if (nav) {
                 nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
                     detail: { name: name }
@@ -486,7 +577,7 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
 
         // 4. Bridge: component A event → component B attribute
         document.addEventListener('ln-profile:switched', function (e) {
-            var sidebar = _getSidebar();
+            const sidebar = _getSidebar();
             if (sidebar) {
                 sidebar.setAttribute('data-ln-playlist-profile', e.detail.profileId);
             }
@@ -516,6 +607,24 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
 ### Principle
 
 DOM structure is an **HTML decision**, not a JS decision. The component only fills in the data.
+
+### Zero Display Text in JS (mandatory)
+
+JS components **NEVER** contain hardcoded strings intended for user display — no labels, messages, button text, status text, relative time words, or any translatable content. All display text lives in HTML templates where the server (Blade, backend) can translate it.
+
+```
+WRONG:  el.textContent = 'No results found';
+WRONG:  el.textContent = '3 minutes ago';
+WRONG:  const label = count === 1 ? 'item' : 'items';
+
+RIGHT:  text comes from <template> → cloneTemplate → fill
+RIGHT:  text comes from data-ln-* attribute set by server
+RIGHT:  text comes from Intl API (dates, numbers — browser-native i18n)
+```
+
+**Intl APIs are the exception** — `Intl.DateTimeFormat`, `Intl.NumberFormat`, `Intl.RelativeTimeFormat` produce locale-aware output from the browser's own translations. These are acceptable because the browser handles i18n, not the component.
+
+If a component needs display text that Intl can't provide, the text must come from HTML (template or data attribute) so the server can translate it.
 
 ```
 HTML:  <template> defines structures (inert, not rendered)
@@ -573,8 +682,8 @@ Use `data-ln-field` for text, `data-ln-attr` for attributes:
 
 ```javascript
 _component.prototype._buildTrackItem = function (track, idx) {
-    var frag = cloneTemplate('track-item', 'ln-playlist');
-    var li = frag.querySelector('[data-ln-track]');
+    const frag = cloneTemplate('track-item', 'ln-playlist');
+    const li = frag.querySelector('[data-ln-track]');
     fill(li, { number: idx + 1, title: track.title, artist: track.artist });
     return li;
 };
@@ -629,3 +738,8 @@ _component.prototype._buildTrackItem = function (track, idx) {
 | ln-translations | Instance | `data-ln-translations` | Multi-language form field management |
 | ln-external-links | Utility | — | External links handler |
 | ln-http | Global service | — | Event-driven JSON fetch with abort support |
+
+---
+
+> For the latest component skeleton and checklist →
+> see [docs/js/component-guide.md](../docs/js/component-guide.md)

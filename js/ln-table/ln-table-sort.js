@@ -11,10 +11,10 @@ import { guardBody, dispatch } from '../ln-core';
 	// Auto-initializes any <table> that contains th[data-ln-sort] headers.
 
 	function constructor(domRoot) {
-		_findElements(domRoot);
+		findElements(domRoot);
 	}
 
-	function _findElements(root) {
+	function findElements(root) {
 		const tables = Array.from(root.querySelectorAll('table'));
 		if (root.tagName === 'TABLE') tables.push(root);
 
@@ -27,6 +27,23 @@ import { guardBody, dispatch } from '../ln-core';
 
 	// ─── Component ─────────────────────────────────────────────
 
+	function _makeSortIcon() {
+		var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		svg.setAttribute('class', 'ln-icon ln-sort-icon');
+		svg.setAttribute('aria-hidden', 'true');
+		var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+		use.setAttribute('href', '#ln-sort-both');
+		svg.appendChild(use);
+		return svg;
+	}
+
+	function _setSortIcon(th, dir) {
+		var use = th.querySelector('svg.ln-sort-icon use');
+		if (!use) return;
+		var href = dir === 'asc' ? '#ln-arrow-up' : dir === 'desc' ? '#ln-arrow-down' : '#ln-sort-both';
+		use.setAttribute('href', href);
+	}
+
 	function _component(table, ths) {
 		this.table = table;
 		this.ths = ths;
@@ -37,9 +54,16 @@ import { guardBody, dispatch } from '../ln-core';
 		ths.forEach(function (th, index) {
 			if (th[DOM_ATTRIBUTE + 'Bound']) return;
 			th[DOM_ATTRIBUTE + 'Bound'] = true;
-			th.addEventListener('click', function () {
+
+			// Inject sort icon if not already present
+			if (!th.querySelector('svg.ln-sort-icon')) {
+				th.appendChild(_makeSortIcon());
+			}
+
+			th._lnSortClick = function () {
 				self._handleClick(index, th);
-			});
+			};
+			th.addEventListener('click', th._lnSortClick);
 		});
 
 		return this;
@@ -58,7 +82,10 @@ import { guardBody, dispatch } from '../ln-core';
 			newDir = 'asc';
 		}
 
-		this.ths.forEach(function (t) { t.removeAttribute(SORT_ACTIVE_ATTR); });
+		this.ths.forEach(function (t) {
+			t.removeAttribute(SORT_ACTIVE_ATTR);
+			_setSortIcon(t, null);
+		});
 
 		if (newDir === null) {
 			this._col = -1;
@@ -67,6 +94,7 @@ import { guardBody, dispatch } from '../ln-core';
 			this._col = colIndex;
 			this._dir = newDir;
 			th.setAttribute(SORT_ACTIVE_ATTR, newDir);
+			_setSortIcon(th, newDir);
 		}
 
 		dispatch(this.table, 'ln-table:sort', {
@@ -74,6 +102,18 @@ import { guardBody, dispatch } from '../ln-core';
 			sortType: th.getAttribute(SORT_ATTR),
 			direction: newDir
 		});
+	};
+
+	_component.prototype.destroy = function () {
+		if (!this.table[DOM_ATTRIBUTE]) return;
+		this.ths.forEach(function (th) {
+			if (th._lnSortClick) {
+				th.removeEventListener('click', th._lnSortClick);
+				delete th._lnSortClick;
+			}
+			delete th[DOM_ATTRIBUTE + 'Bound'];
+		});
+		delete this.table[DOM_ATTRIBUTE];
 	};
 
 	// ─── DOM Observer ──────────────────────────────────────────
@@ -84,10 +124,10 @@ import { guardBody, dispatch } from '../ln-core';
 				mutations.forEach(function (mutation) {
 					if (mutation.type === 'childList') {
 						mutation.addedNodes.forEach(function (node) {
-							if (node.nodeType === 1) _findElements(node);
+							if (node.nodeType === 1) findElements(node);
 						});
 					} else if (mutation.type === 'attributes') {
-						_findElements(mutation.target);
+						findElements(mutation.target);
 					}
 				});
 			});

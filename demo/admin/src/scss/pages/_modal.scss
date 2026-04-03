@@ -3,3 +3,26 @@
 // Modal sizes — applied by ID, not by class
 #demo-large > form { @include modal-lg; }
 #demo-events > form { @include modal-sm; }
+
+// Destructive confirm — error color on submit
+#demo-destructive footer button[type="submit"] {
+	--color-primary: var(--color-error);
+}
+
+// Table row action buttons
+td ul { @include btn-group; }
+
+// Banner demos
+#demo-banner-info,
+#demo-banner-warning,
+#demo-banner-error {
+	@include banner;
+}
+
+#demo-banner-warning {
+	--color-primary: var(--color-warning);
+}
+
+#demo-banner-error {
+	--color-primary: var(--color-error);
+}

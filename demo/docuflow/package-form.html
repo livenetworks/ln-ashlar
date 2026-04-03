@@ -14,13 +14,13 @@
 
 		<header class="app-header">
 			<div class="header-brand">
-				<span class="brand-logo ln-icon-book" aria-hidden="true"></span>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-book"></use></svg>
 				<span class="brand-name">DocuFlow</span>
 			</div>
 
 			<div class="header-center">
 				<div class="header-search">
-					<span class="ln-icon-search search-icon" aria-hidden="true"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
 					<input type="search" placeholder="Search..." aria-label="Search">
 				</div>
 			</div>
@@ -45,13 +45,13 @@
 							<ul>
 								<li>
 									<a href="packages.html" class="active">
-										<span class="ln-icon-box" aria-hidden="true"></span>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-box"></use></svg>
 										Packages
 									</a>
 								</li>
 								<li>
 									<a href="tenants.html">
-										<span class="ln-icon-building" aria-hidden="true"></span>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-building"></use></svg>
 										Tenants
 									</a>
 								</li>
@@ -77,44 +77,44 @@
 							</header>
 
 							<form id="package-form">
-								<p class="form-element">
+								<div class="form-element">
 									<label for="pkg-name">Name</label>
 									<input type="text" id="pkg-name" name="name" required maxlength="100">
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="pkg-max-users">Max Users</label>
 									<input type="number" id="pkg-max-users" name="max_users" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="pkg-max-guests">Max Guests</label>
 									<input type="number" id="pkg-max-guests" name="max_guests" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="pkg-max-standards">Max Standards</label>
 									<input type="number" id="pkg-max-standards" name="max_collections" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="pkg-max-docs">Max Documents</label>
 									<input type="number" id="pkg-max-docs" name="max_documents" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="pkg-max-storage">Max Storage (MB)</label>
 									<input type="number" id="pkg-max-storage" name="max_storage_mb" required min="0" value="0">
 									<small>0 = unlimited</small>
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label><input type="checkbox" name="is_active" value="1" checked> Active</label>
-								</p>
+								</div>
 
 								<div class="form-actions">
 									<a href="packages.html" class="btn btn--secondary">Cancel</a>
@@ -146,7 +146,7 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>

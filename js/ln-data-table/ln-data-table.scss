@@ -1,0 +1,205 @@
+@use '../../scss/config/mixins' as *;
+
+// ─── Data Table — co-located styles ───────────────────────
+
+[data-ln-data-table] {
+	position: relative;
+
+	// Toolbar
+	> header {
+		@include panel-header;
+	}
+
+	// Search label in toolbar
+	> header aside label {
+		@include inline-flex;
+		@include items-center;
+		@include gap(0.375rem);
+		@include px(0.625rem);
+		@include py(0.25rem);
+		@include rounded-md;
+		@include border;
+		@include bg-primary;
+		@include transition-fast;
+
+		input[type="search"] {
+			@include border-none;
+			@include text-sm;
+			background: transparent;
+			outline: none;
+			box-shadow: none;
+			@include w(10rem);
+
+			&::placeholder {
+				@include text-muted;
+			}
+
+			&::-webkit-search-cancel-button {
+				-webkit-appearance: none;
+			}
+		}
+
+		&:focus-within {
+			border-color: hsl(var(--color-primary));
+			box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.1);
+		}
+	}
+
+	// Sticky header — also relative for filter dropdown positioning
+	thead th {
+		position: sticky;
+		top: 0;
+		z-index: var(--z-sticky);
+		background: hsl(var(--color-bg-primary));
+	}
+
+	// Sticky footer
+	tfoot td {
+		position: sticky;
+		bottom: 0;
+		z-index: var(--z-sticky);
+		background: hsl(var(--color-bg-primary));
+		border-top: 1px solid hsl(var(--color-border));
+	}
+}
+
+// ─── Sort indicators ──────────────────────────────────────
+
+[data-ln-col-sort] {
+	opacity: 0.4;
+	transition: opacity 0.15s;
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0.125rem;
+	margin-inline-start: 0.25rem;
+	vertical-align: middle;
+}
+
+th:hover [data-ln-col-sort] {
+	opacity: 0.7;
+}
+
+.ln-sort-asc [data-ln-col-sort],
+.ln-sort-desc [data-ln-col-sort] {
+	opacity: 1;
+	color: hsl(var(--color-primary));
+}
+
+// ─── Filter button ────────────────────────────────────────
+
+[data-ln-col-filter] {
+	opacity: 0.4;
+	transition: opacity 0.15s;
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0.125rem;
+	margin-inline-start: 0.125rem;
+	vertical-align: middle;
+	position: relative;
+}
+
+th:hover [data-ln-col-filter] {
+	opacity: 0.7;
+}
+
+// Active filter dot indicator
+.ln-filter-active {
+	opacity: 1;
+	color: hsl(var(--color-primary));
+
+	&::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 0.375rem;
+		height: 0.375rem;
+		border-radius: var(--radius-full);
+		background: hsl(var(--color-primary));
+	}
+}
+
+// ─── Filter dropdown ──────────────────────────────────────
+
+.column-filter-dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: var(--z-dropdown);
+	background: hsl(var(--color-bg-primary));
+	border: 1px solid hsl(var(--color-border));
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md);
+	padding: var(--space-2);
+	min-width: 12rem;
+	max-height: 20rem;
+	overflow-y: auto;
+
+	[data-ln-filter-search] {
+		@include form-input;
+		width: 100%;
+		margin-bottom: var(--space-2);
+	}
+
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	li {
+		padding: var(--space-1) 0;
+	}
+
+	label {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		cursor: pointer;
+		font-size: var(--text-sm);
+	}
+
+	[data-ln-filter-clear] {
+		@include btn;
+		width: 100%;
+		margin-top: var(--space-2);
+		font-size: var(--text-sm);
+	}
+}
+
+// ─── Row states ───────────────────────────────────────────
+
+.ln-row-selected {
+	background: hsl(var(--color-primary-lighter));
+}
+
+.ln-row-focused {
+	outline: 2px solid hsl(var(--color-primary-focus));
+	outline-offset: -2px;
+}
+
+[data-ln-row] {
+	cursor: pointer;
+
+	&:hover {
+		background: hsl(var(--color-bg-secondary));
+	}
+}
+
+// ─── Loading state ────────────────────────────────────────
+
+.ln-data-table--loading {
+	tbody {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+}
+
+// ─── Spacer rows (virtual scroll) ─────────────────────────
+
+.ln-data-table__spacer td {
+	padding: 0 !important;
+	border: none !important;
+}

@@ -84,14 +84,14 @@ document.addEventListener('ln-autosave:restored', function (e) {
 
 ```html
 <form id="edit-user" data-ln-autosave>
-    <p class="form-element">
+    <div class="form-element">
         <label for="name">Name</label>
         <input id="name" name="name" type="text">
-    </p>
-    <p class="form-element">
+    </div>
+    <div class="form-element">
         <label for="email">Email</label>
         <input id="email" name="email" type="email">
-    </p>
+    </div>
     <footer class="form-actions">
         <button type="submit">Save</button>
     </footer>
@@ -107,14 +107,14 @@ No JS needed — MutationObserver auto-initializes.
     <form id="invoice-form" data-ln-autosave>
         <header><h3>New Invoice</h3><button type="button" class="ln-icon-close" data-ln-modal-close></button></header>
         <main>
-            <p class="form-element">
+            <div class="form-element">
                 <label for="client">Client</label>
                 <input id="client" name="client" type="text">
-            </p>
-            <p class="form-element">
+            </div>
+            <div class="form-element">
                 <label for="amount">Amount</label>
                 <input id="amount" name="amount" type="number">
-            </p>
+            </div>
         </main>
         <footer>
             <button type="button" data-ln-modal-close data-ln-autosave-clear>Cancel</button>

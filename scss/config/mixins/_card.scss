@@ -12,16 +12,17 @@
 
 @mixin card {
 	@include bg-primary;
-	@include border-light;
+	@include border;
 	@include w-full;
 	@include flex-col;
-	@include shadow-sm;
 	@include rounded-md;
 	@include overflow-hidden;
 	@include transition;
+	box-shadow: var(--shadow-xs);
 
 	&:hover {
-		box-shadow: var(--shadow-md);
+		border-color: hsl(var(--color-primary) / 0.25);
+		box-shadow: var(--shadow-sm);
 	}
 }
 
@@ -31,7 +32,8 @@
 	@include justify-between;
 	@include px(1rem);
 	@include py(0.75rem);
-	@include border-b-light;
+	@include border-b;
+	@include bg-secondary;
 
 	h3 {
 		@include text-base;
@@ -76,14 +78,26 @@
 
 @mixin card-accent-top {
 	border-top: 3px solid hsl(var(--color-primary));
+	&:hover {
+		border-top-color: hsl(var(--color-primary));
+		background-color: hsl(var(--color-primary) / 0.04);
+	}
 }
 
 @mixin card-accent-bottom {
 	border-bottom: 3px solid hsl(var(--color-primary));
+	&:hover {
+		border-bottom-color: hsl(var(--color-primary));
+		background-color: hsl(var(--color-primary) / 0.04);
+	}
 }
 
 @mixin card-accent-left {
 	border-left: 3px solid hsl(var(--color-primary));
+	&:hover {
+		border-left-color: hsl(var(--color-primary));
+		background-color: hsl(var(--color-primary) / 0.04);
+	}
 }
 
 // ─── Card tinted background ────────────────────────────
@@ -118,11 +132,11 @@
 
 @mixin section-card {
 	@include bg-primary;
-	@include border-light;
-	@include rounded-lg;
-	@include shadow-sm;
+	@include border;
+	@include rounded-md;
 	@include overflow-hidden;
-	@include mb(1.5rem);
+	box-shadow: var(--shadow-xs);
+	@include mb(1rem);
 
 	header {
 		@include panel-header;
@@ -135,7 +149,7 @@
 	footer {
 		@include px(1rem);
 		@include py(0.75rem);
-		@include border-t-light;
+		@include border-t;
 		@include flex;
 		@include justify-end;
 		@include gap(0.75rem);

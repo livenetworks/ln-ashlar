@@ -1,67 +1,86 @@
 # Design Tokens
 
-CSS custom properties defined in `scss/config/_tokens.scss`. All design values are semantic.
+CSS custom properties defined in `scss/config/_tokens.scss`. Single source of truth for all design values.
 
-For the full SCSS mixin reference, see [mixins.md](mixins.md).
+## How to use
+
+Colors are stored as **bare HSL triplets** — this enables alpha transparency:
+
+```css
+/* Solid color */
+background-color: hsl(var(--color-primary));
+
+/* With transparency */
+background-color: hsl(var(--color-primary) / 0.5);
+
+/* Theming — override at any scope */
+.dark-section { --color-bg-primary: 240 14% 15%; }
+#alert-panel   { --color-primary: var(--color-error); }
+```
+
+---
 
 ## Colors
 
 ### Primary
 ```css
---color-primary: #2737a1;
---color-primary-hover: #1e2b82;
---color-primary-focus: #3246c8;
---color-primary-light: #e6eafa;
---color-primary-lighter: #f5f6fc;
+--color-primary:        232 75% 52%;   /* Brand blue */
+--color-primary-hover:  232 75% 42%;
+--color-primary-focus:  232 75% 60%;
+--color-primary-light:  232 75% 93%;   /* Active nav, focus rings */
+--color-primary-lighter: 232 75% 97%;
 ```
 
 ### Secondary
 ```css
---color-secondary: #10b981;
---color-secondary-hover: #059669;
+--color-secondary:       160 76% 40%;  /* Green */
+--color-secondary-hover: 162 93% 31%;
 ```
 
 ### Status
 ```css
---color-success: #16a34a;
---color-error: #dc2626;
---color-error-hover: #b91c1c;
---color-warning: #d97706;
---color-info: #3b82f6;
+--color-success:      142 76% 36%;
+--color-error:        0 84% 50%;
+--color-error-hover:  0 74% 42%;
+--color-warning:      32 95% 44%;
+--color-info:         217 91% 60%;
 ```
 
 ### Text
 ```css
---color-text-primary: #111827;     /* Main text */
---color-text-secondary: #6b7280;   /* Secondary text */
---color-text-muted: #9ca3af;       /* Muted/disabled text */
+--color-text-primary:   221 39% 11%;   /* Main text */
+--color-text-secondary: 220 9%  46%;   /* Secondary text */
+--color-text-muted:     218 11% 65%;   /* Muted / disabled */
 ```
 
 ### Backgrounds
 ```css
---color-bg-primary: #ffffff;       /* Cards, panels */
---color-bg-secondary: #f3f4f6;    /* Headers, footers, alternating */
---color-bg-body: #f4f4f5;         /* Page background */
---color-bg-error: #fef2f2;        /* Error state background */
+--color-white:        0 0% 100%;
+--color-bg-primary:   0 0% 100%;       /* Cards, panels */
+--color-bg-secondary: 220 20% 97%;     /* Headers, footers, alternating rows */
+--color-bg-body:      220 27% 96%;     /* Page background */
+--color-bg-error:     0 86% 97%;       /* Error state background */
 ```
 
 ### Borders
 ```css
---color-border: #e5e7eb;
---color-border-light: #e5e7eb;
+--color-border:       220 13% 91%;
+--color-border-light: 220 14% 95%;     /* Softer variant */
 ```
 
-### Table
+### Table-specific
 ```css
---color-table-header-bg: #1a1a2e;
---color-table-header-text: #ffffff;
---color-table-section-bg: #e8ecf1;
+--color-table-header-bg:   220 14% 91%;
+--color-table-header-text: 221 39% 11%;
+--color-table-section-bg:  216 22% 88%;
 ```
+
+---
 
 ## Spacing
 
-| Token | Value | Pixels |
-|-------|-------|--------|
+| Token | Value | px |
+|-------|-------|----|
 | `--spacing-xs` | 0.25rem | 4px |
 | `--spacing-sm` | 0.5rem | 8px |
 | `--spacing-md` | 1rem | 16px |
@@ -69,10 +88,57 @@ For the full SCSS mixin reference, see [mixins.md](mixins.md).
 | `--spacing-xl` | 2rem | 32px |
 | `--spacing-2xl` | 3rem | 48px |
 
+---
+
+## Border
+
+```css
+--border-width: 1px;
+```
+
+| Token | Value | px |
+|-------|-------|----|
+| `--radius-sm` | 0.25rem | 4px |
+| `--radius-md` | 0.5rem | 8px |
+| `--radius-lg` | 0.75rem | 12px |
+| `--radius-xl` | 1rem | 16px |
+| `--radius-full` | 9999px | circle |
+
+---
+
+## Shadows
+
+| Token | Value |
+|-------|-------|
+| `--shadow-none` | none |
+| `--shadow-xs` | `0 1px 2px 0 rgba(0,0,0,0.05)` |
+| `--shadow-sm` | `0 1px 3px 0 …, 0 1px 2px -1px …` |
+| `--shadow-md` | `0 4px 6px -1px …, 0 2px 4px -2px …` |
+| `--shadow-lg` | `0 10px 15px -3px …, 0 4px 6px -4px …` |
+| `--shadow-xl` | `0 20px 25px -5px …, 0 8px 10px -6px …` |
+| `--shadow-primary` | `0 0 20px hsl(var(--color-primary) / 0.2)` |
+
+---
+
+## Transitions
+
+| Token | Value |
+|-------|-------|
+| `--transition-fast` | `0.15s cubic-bezier(0.4, 0, 0.2, 1)` |
+| `--transition-base` | `0.2s cubic-bezier(0.4, 0, 0.2, 1)` |
+| `--transition-slow` | `0.3s cubic-bezier(0.4, 0, 0.2, 1)` |
+
+---
+
 ## Typography
 
-| Token | Value | Pixels |
-|-------|-------|--------|
+```css
+--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+--font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+```
+
+| Token | Value | px |
+|-------|-------|----|
 | `--text-xs` | 0.75rem | 12px |
 | `--text-sm` | 0.875rem | 14px |
 | `--text-base` | 1rem | 16px |
@@ -87,31 +153,7 @@ For the full SCSS mixin reference, see [mixins.md](mixins.md).
 | `--font-semibold` | 600 |
 | `--font-bold` | 700 |
 
-```css
---font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
---font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
-```
-
-## Border Radius
-
-| Token | Value | Pixels |
-|-------|-------|--------|
-| `--radius-sm` | 0.25rem | 4px |
-| `--radius-md` | 0.5rem | 8px |
-| `--radius-lg` | 0.75rem | 12px |
-| `--radius-xl` | 1rem | 16px |
-| `--radius-full` | 9999px | circle |
-
-## Shadows
-
-| Token | Value |
-|-------|-------|
-| `--shadow-none` | none |
-| `--shadow-sm` | 0 1px 2px 0 rgba(0,0,0,0.05) |
-| `--shadow-md` | 0 4px 6px -1px rgba(0,0,0,0.1) |
-| `--shadow-lg` | 0 10px 15px -3px rgba(0,0,0,0.1) |
-| `--shadow-xl` | 0 20px 25px -5px rgba(0,0,0,0.1) |
-| `--shadow-primary` | 0 0 20px rgba(39,55,161,0.2) |
+---
 
 ## Z-Index
 
@@ -127,22 +169,18 @@ toast (50) > modal (40) > overlay (30) > dropdown (20) > sticky (10)
 | `--z-modal` | 40 |
 | `--z-toast` | 50 |
 
-## Transitions
+---
 
-| Token | Value |
-|-------|-------|
-| `--transition-base` | 0.3s ease |
-| `--transition-fast` | 0.15s ease |
-
-## Naming Convention
+## Naming convention
 
 Token names are always **semantic** (by function), never by color:
+
 ```css
 /* Correct */
---color-primary: #2737a1;
---color-error: #dc2626;
+--color-primary: 232 75% 52%;
+--color-error:   0 84% 50%;
 
 /* Wrong */
---color-blue: #2737a1;
---color-red: #dc2626;
+--color-blue: 232 75% 52%;
+--color-red:  0 84% 50%;
 ```

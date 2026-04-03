@@ -109,6 +109,10 @@ document.addEventListener('ln-modal:close', function(e) {
 Footer buttons get `@include btn` automatically — no `.btn` class needed.
 Non-submit buttons need `type="button"`.
 
+Any element with `autofocus` inside the modal will receive focus when the modal opens. If no `autofocus` is present, the first non-disabled input/textarea/select is focused, then the first focusable button or link.
+
+Use case: destructive confirm dialogs — place `autofocus` on the Cancel button so pressing Enter dismisses rather than confirms.
+
 ```html
 <!-- Trigger button -->
 <button data-ln-modal-for="my-modal">Open</button>
@@ -118,7 +122,9 @@ Non-submit buttons need `type="button"`.
     <form>
         <header>
             <h3>Title</h3>
-            <button type="button" class="ln-icon-close" data-ln-modal-close></button>
+            <button type="button" data-ln-modal-close aria-label="Close">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+            </button>
         </header>
         <main>
             <label>Name <input type="text" name="name"></label>
@@ -129,9 +135,28 @@ Non-submit buttons need `type="button"`.
         </footer>
     </form>
 </div>
+
+<!-- Destructive confirm — Cancel pre-focused via autofocus -->
+<div class="ln-modal" data-ln-modal id="confirm-delete">
+    <form>
+        <header>
+            <h3>Delete record</h3>
+            <button type="button" data-ln-modal-close aria-label="Close">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+            </button>
+        </header>
+        <main>
+            <p>This action cannot be undone.</p>
+        </main>
+        <footer>
+            <button type="button" data-ln-modal-close autofocus>Cancel</button>
+            <button type="submit">Delete</button>
+        </footer>
+    </form>
+</div>
 ```
 
-> **Icons:** The close button uses the `.ln-icon-close` class — NEVER use `&times;` character.
+> **Icons:** The close button uses `<svg class="ln-icon"><use href="#ln-close">` — NEVER use `&times;` character.
 > `@include close-button` is already applied on `button[data-ln-modal-close]` in `ln-modal.scss`.
 >
 > **Non-submit buttons** inside `<form>` need `type="button"` (close, cancel) to prevent form submission.

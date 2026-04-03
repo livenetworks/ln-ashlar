@@ -1,4 +1,4 @@
-import { dispatch } from '../ln-core';
+import { dispatch, guardBody } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = '[data-ln-progress]';
@@ -12,10 +12,10 @@ import { dispatch } from '../ln-core';
 	}
 
 	function constructor(domRoot) {
-		_findElements(domRoot);
+		findElements(domRoot);
 	}
 
-	function _findElements(domRoot) {
+	function findElements(domRoot) {
 		const items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
 
 		for (const item of items) {
@@ -51,26 +51,28 @@ import { dispatch } from '../ln-core';
 	};
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === "childList") {
-					for (const item of mutation.addedNodes) {
-						if (item.nodeType === 1) {
-							_findElements(item);
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === "childList") {
+						for (const item of mutation.addedNodes) {
+							if (item.nodeType === 1) {
+								findElements(item);
+							}
 						}
+					} else if (mutation.type === 'attributes') {
+						findElements(mutation.target);
 					}
-				} else if (mutation.type === 'attributes') {
-					_findElements(mutation.target);
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ['data-ln-progress']
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['data-ln-progress']
+			});
+		}, 'ln-progress');
 	}
 
 	_domObserver();

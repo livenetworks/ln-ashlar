@@ -28,6 +28,7 @@ Generic search component — filters children of a target element by `textConten
 | Attribute | On | Description |
 |-----------|-----|-------------|
 | `data-ln-search="targetId"` | component root or `<input>` | Target element by ID whose children are filtered. Can be placed directly on an `<input>` or on a wrapper element. |
+| `data-ln-search-items="selector"` | same element as `data-ln-search` | CSS selector for `querySelectorAll` on the target — enables filtering nested elements instead of direct children. When omitted, `target.children` is used. |
 | `data-ln-search-hide` | target children | Set by JS when element doesn't match |
 
 ## Events
@@ -53,6 +54,8 @@ el.lnSearch.destroy();    // remove listeners, clean up
 
 ## Behavior
 
-- Filters by `textContent` of target children (case-insensitive)
+- Filters by `textContent` of items (case-insensitive)
+- Default: iterates `target.children` (direct children)
+- With `data-ln-search-items`: iterates `target.querySelectorAll(selector)` — supports nested structures
 - Works independently alongside `ln-filter` on the same target
 - MutationObserver auto-re-filters dynamically added children
