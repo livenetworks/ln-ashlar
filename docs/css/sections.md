@@ -58,18 +58,3 @@ Works with `.table-container` too:
     </main>
 </section>
 ```
-
-## .section-empty
-
-Empty state placeholder.
-
-```html
-<article class="section-empty">
-    <figure class="empty-icon">icon</figure>
-    <h3>No data</h3>
-    <p>Add items to see them here.</p>
-</article>
-```
-
-> **Semantics:** Empty state is content → `<article>`, not `<div>`.
-> The icon is an illustration → `<figure>`, not `<div>`.

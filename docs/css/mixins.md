@@ -202,8 +202,11 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Full structured card (header + main + footer) | `@include section-card` |
 | Panel header bar (flex + bg-secondary + border-b) | `@include panel-header` |
 | Primary action button | `@include btn` |
-| Small button (table actions, toolbars) | `@include btn-sm` alongside `@include btn` |
+| Small button | `@include btn-sm` alongside `@include btn` |
+| Large button | `@include btn-lg` alongside `@include btn` |
+| Action button group (toolbar, table actions) | `@include btn-group` |
 | Close/dismiss button | `@include close-button` |
+| Inline alert (contextual feedback) | `@include alert` |
 | Expand/collapse parent | `@include collapsible` |
 | Expand/collapse child | `@include collapsible-content` |
 | Accordion list (styled + chevron) | `@include accordion` |
@@ -221,9 +224,11 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Tab navigation container | `@include tabs-nav` |
 | Tab button | `@include tabs-tab` |
 | Active tab | `@include tabs-tab-active` |
+| Disabled tab | `@include tabs-tab-disabled` |
 | Tab content panel | `@include tabs-panel` |
 | Container query setup | `@include container` or `@include container(name)` |
 | Status badge (dot + text + tinted pill) | `@include badge` |
+| Live / pulsing badge | `@include badge-live` |
 
 ---
 
@@ -327,7 +332,7 @@ An inner `box-shadow` makes the field appear to sink slightly. Tactile, three-di
 
 ### `@include grid` / `@include grid-2` / `@include grid-4`
 
-Responsive grid layouts with `gap: 1rem`.
+Responsive grid layouts with `gap: 1.5rem`.
 
 | Mixin | Mobile (<768px) | Tablet (768px+) | Desktop (1024px+) |
 |-------|-----------------|-----------------|-------------------|
@@ -584,14 +589,16 @@ Icons inherit `currentColor` from the parent element's `color` property. No colo
 | Category | IDs |
 |----------|-----|
 | Navigation | `home` `users` `books` `settings` `logout` |
-| Actions | `close` `menu` `plus` `edit` `delete` `view` `save` `search` `check` `copy` `link` `upload` `download` `refresh` `print` `lock` `star` `filter` `calendar` |
+| Actions | `x` `menu` `plus` `edit` `trash` `eye` `device-floppy` `search` `check` `copy` `link` `upload` `download` `refresh` `printer` `lock` `star` `filter` `calendar` |
 | Arrows | `arrow-up` `arrow-down` `arrows-sort` |
 | Status | `circle-check` `circle-x` `info-circle` `alert-triangle` |
-| Data/Content | `chart` `clock` `envelope` `book` `globe` `list` `box` `building` |
-| People/Contact | `user` `mail` `phone` `square-compass` |
-| File Types | `file` `file-pdf` `file-doc` `file-epub` |
+| Data/Content | `chart-bar` `clock` `mail` `book` `world` `list` `box` `building` |
+| People/Contact | `user` `phone` `square-compass` |
+| File Types | `file` |
+| File Types (custom CDN) | `file-pdf` `file-doc` `file-epub` — use `#lnc-{id}`, requires `window.LN_ICONS_CUSTOM_CDN` |
 
-Use as `#ln-{id}` — e.g. `<use href="#ln-home">`.
+Tabler icons: `#ln-{id}` — e.g. `<use href="#ln-home">`.
+Custom CDN icons: `#lnc-{id}` — e.g. `<use href="#lnc-file-pdf">`.
 
 ### Adding a New Icon
 
