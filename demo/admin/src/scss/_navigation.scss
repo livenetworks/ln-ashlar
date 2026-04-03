@@ -2,6 +2,7 @@
 
 .nav {
 	@include nav;
+	@include nav-links-border-grow;
 }
 
 @container sidebar (max-width: 80px) {

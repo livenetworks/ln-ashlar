@@ -2,7 +2,9 @@
 
 Complete reference for all `@include` mixins, design tokens, and the icon system.
 
-**Source files:** `scss/config/_mixins.scss`, `scss/config/_tokens.scss`, `scss/config/_icons.scss`
+**Source files:** `scss/config/_mixins.scss`, `scss/config/_tokens.scss`
+
+> For full token values and theming, see [tokens.md](tokens.md).
 
 ## How to Use
 
@@ -14,8 +16,8 @@ Every SCSS file starts with:
 Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but project SCSS should use `@include` on semantic selectors:
 ```scss
 // Project SCSS — semantic selectors + @include
-#korisnik { @include card; }
-.demo-links { @include grid-2; }
+#user-profile { @include card; }
+#stats ul     { @include grid-4; list-style: none; padding: 0; margin: 0; }
 ```
 
 ---
@@ -81,25 +83,19 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 
 | Instead of writing... | Use |
 |---|---|
-| `font-size: 0.75rem; line-height: 1rem` | `@include text-xs` |
-| `font-size: 0.875rem; line-height: 1.25rem` | `@include text-sm` |
-| `font-size: 1rem; line-height: 1.5rem` | `@include text-base` |
-| `font-size: 1.125rem; line-height: 1.75rem` | `@include text-lg` |
-| `font-size: 1.25rem; line-height: 1.75rem` | `@include text-xl` |
-| `font-size: 1.5rem; line-height: 2rem` | `@include text-2xl` |
+| `font-size: 0.75rem` | `@include text-xs` |
+| `font-size: 0.875rem` | `@include text-sm` |
+| `font-size: 1rem` | `@include text-base` |
+| `font-size: 1.125rem` | `@include text-lg` |
+| `font-size: 1.25rem` | `@include text-xl` |
+| `font-size: 1.5rem` | `@include text-2xl` |
 | `font-weight: 400` | `@include font-normal` |
 | `font-weight: 500` | `@include font-medium` |
 | `font-weight: 600` | `@include font-semibold` |
 | `font-weight: 700` | `@include font-bold` |
-| `text-align: left` | `@include text-left` |
-| `text-align: center` | `@include text-center` |
-| `text-align: right` | `@include text-right` |
+| `text-align: left/center/right` | `@include text-left/center/right` |
 | `text-transform: uppercase` | `@include uppercase` |
-| `text-transform: lowercase` | `@include lowercase` |
-| `text-transform: capitalize` | `@include capitalize` |
-| `text-transform: none` | `@include normal-case` |
 | `letter-spacing: 0.025em` | `@include tracking-wide` |
-| `letter-spacing: 0.05em` | `@include tracking-wider` |
 | `overflow: hidden; text-overflow: ellipsis; white-space: nowrap` | `@include truncate` |
 | `white-space: nowrap` | `@include whitespace-nowrap` |
 | `font-family: monospace` | `@include font-mono` |
@@ -109,22 +105,22 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 
 | Instead of writing... | Use |
 |---|---|
-| `color: var(--color-text-primary)` / `color: #111827` | `@include text-primary` |
-| `color: var(--color-text-secondary)` / `color: #6b7280` | `@include text-secondary` |
-| `color: var(--color-text-muted)` / `color: #9ca3af` | `@include text-muted` |
-| `color: #ffffff` / `color: white` | `@include text-white` |
-| `color: var(--color-error)` / `color: #dc2626` | `@include text-error` |
-| `color: var(--color-success)` / `color: #16a34a` | `@include text-success` |
-| `color: var(--color-warning)` / `color: #d97706` | `@include text-warning` |
-| `background-color: var(--color-bg-primary)` / `background: #ffffff` | `@include bg-primary` |
-| `background-color: var(--color-bg-secondary)` / `background: #f3f4f6` | `@include bg-secondary` |
-| `background-color: var(--color-bg-body)` / `background: #f4f4f5` | `@include bg-body` |
+| `color: var(--color-text-primary)` | `@include text-primary` |
+| `color: var(--color-text-secondary)` | `@include text-secondary` |
+| `color: var(--color-text-muted)` | `@include text-muted` |
+| `color: white` | `@include text-white` |
+| `color: var(--color-error)` | `@include text-error` |
+| `color: var(--color-success)` | `@include text-success` |
+| `color: var(--color-warning)` | `@include text-warning` |
+| `background-color: var(--color-bg-primary)` | `@include bg-primary` |
+| `background-color: var(--color-bg-secondary)` | `@include bg-secondary` |
+| `background-color: var(--color-bg-body)` | `@include bg-body` |
 
 ### Borders & Radius
 
 | Instead of writing... | Use |
 |---|---|
-| `border: 1px solid var(--color-border)` / `border: 1px solid #e5e7eb` | `@include border` |
+| `border: 1px solid var(--color-border)` | `@include border` |
 | `border-top: 1px solid var(--color-border)` | `@include border-t` |
 | `border-bottom: 1px solid var(--color-border)` | `@include border-b` |
 | `border-left: 1px solid var(--color-border)` | `@include border-l` |
@@ -141,18 +137,19 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Instead of writing... | Use |
 |---|---|
 | `box-shadow: none` | `@include shadow-none` |
-| `box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05)` | `@include shadow-sm` |
-| `box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1)` | `@include shadow-md` |
-| `box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1)` | `@include shadow-lg` |
-| `box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1)` | `@include shadow-xl` |
+| `box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05)` | `@include shadow-xs` |
+| `box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1)…` | `@include shadow-sm` |
+| `box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1)…` | `@include shadow-md` |
+| `box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1)…` | `@include shadow-lg` |
+| `box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1)…` | `@include shadow-xl` |
 
 ### Transitions
 
 | Instead of writing... | Use |
 |---|---|
-| `transition: all 0.3s ease` | `@include transition` |
+| `transition: all 0.2s ease` | `@include transition` |
 | `transition: all 0.15s ease` | `@include transition-fast` |
-| `transition: color, background-color, border-color 0.3s` | `@include transition-colors` |
+| `transition: color, background-color, border-color 0.2s` | `@include transition-colors` |
 
 ### Position
 
@@ -170,7 +167,7 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 |---|---|
 | `overflow: hidden` | `@include overflow-hidden` |
 | `overflow: auto` | `@include overflow-auto` |
-| `overflow-x: auto; -webkit-overflow-scrolling: touch` | `@include overflow-x-auto` |
+| `overflow-x: auto` | `@include overflow-x-auto` |
 
 ### Cursor & Interaction
 
@@ -202,22 +199,127 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | 6-column form layout | `@include form-grid` |
 | Vertical flex with gap | `@include stack` or `@include stack(0.5rem)` |
 | Card container (bg + border + shadow + rounded) | `@include card` |
+| Full structured card (header + main + footer) | `@include section-card` |
 | Panel header bar (flex + bg-secondary + border-b) | `@include panel-header` |
-| Primary button with states | `@include btn` |
+| Primary action button | `@include btn` |
+| Small button (table actions, toolbars) | `@include btn-sm` alongside `@include btn` |
 | Close/dismiss button | `@include close-button` |
 | Expand/collapse parent | `@include collapsible` |
 | Expand/collapse child | `@include collapsible-content` |
+| Accordion list (styled + chevron) | `@include accordion` |
 | Modal size: small (28rem) | `@include modal-sm` |
 | Modal size: medium (32rem) | `@include modal-md` |
 | Modal size: large (42rem) | `@include modal-lg` |
 | Modal size: extra large (48rem) | `@include modal-xl` |
 | Pill labels: bordered + visible input | `@include pill-outline` (on parent) |
-| Focus ring (consistent focus indicator) | `@include focus-ring` or `@include focus-ring($color, $width)` |
+| Focus — outer glow ring (default) | `@include focus-ring` |
+| Focus — border thickens to 2px | `@include focus-border-thicken` |
+| Focus — border color + ring | `@include focus-combination` |
+| Focus — very light primary bg tint | `@include focus-background-shift` |
+| Focus — bottom border only changes | `@include focus-accent-line` |
+| Focus — inner shadow, field sinks | `@include focus-inset-shadow` |
 | Tab navigation container | `@include tabs-nav` |
-| Tab button styling | `@include tabs-tab` |
-| Active tab styling | `@include tabs-tab-active` |
+| Tab button | `@include tabs-tab` |
+| Active tab | `@include tabs-tab-active` |
 | Tab content panel | `@include tabs-panel` |
 | Container query setup | `@include container` or `@include container(name)` |
+| Status badge (dot + text + tinted pill) | `@include badge` |
+
+---
+
+## Focus Indicator Presets
+
+Six presets for `:focus-visible` styling. All accept an optional `$color` parameter (default: `var(--color-primary)`). Apply one consistently across the entire interface — mixing types within the same project fragments the visual grammar.
+
+For design guidance on which type to use in which context, see `visual-language.md §10`.
+
+### `@include focus-ring` — outer glow (default)
+
+A soft `box-shadow` ring outside the element. Border and layout are unchanged. No layout shift.
+
+```scss
+// Applied automatically in _global.scss — no action needed for standard inputs.
+
+// Override color for error state:
+input.error:focus-visible { @include focus-ring(var(--color-error)); }
+
+// Wider ring:
+input:focus-visible { @include focus-ring($width: 4px); }
+```
+
+**When:** Default choice. Universally readable. Tailwind / Vercel / shadcn convention.
+
+---
+
+### `@include focus-border-thicken` — structural border
+
+Uses `outline` (not `border`) to grow to 2px in primary color. No layout shift. No glow.
+
+```scss
+// Project SCSS — switch entire form to structural focus style:
+#settings-form input:focus-visible,
+#settings-form select:focus-visible,
+#settings-form textarea:focus-visible {
+    @include focus-border-thicken;
+}
+
+// Error variant:
+input.error:focus-visible { @include focus-border-thicken(var(--color-error)); }
+```
+
+**When:** Enterprise / business UI. Dense forms where softness (glow) would add visual noise. Material Design style.
+
+---
+
+### `@include focus-combination` — border + ring
+
+Border color shifts to primary AND outer ring appears simultaneously. The strongest possible focus signal.
+
+```scss
+// Accessibility-first form:
+#public-form input:focus-visible { @include focus-combination; }
+```
+
+**When:** Accessibility-first interfaces. Forms used by keyboard-only users or where WCAG AAA focus visibility is required.
+
+---
+
+### `@include focus-background-shift` — inner tint
+
+The field receives a very light primary tint. No border change whatsoever. Focus is felt, not announced.
+
+```scss
+// Minimalist / consumer-facing form inside a bordered card:
+.search-panel input:focus-visible { @include focus-background-shift; }
+```
+
+**When:** Minimalist or consumer UI. The surrounding container already has a visible border — adding a border-based focus signal would be visually crowded. Works inside cards with strong borders.
+
+---
+
+### `@include focus-accent-line` — bottom border only
+
+Only the bottom border changes to primary. The three other sides stay at their default color.
+
+```scss
+// Inside a section-card with visible border — full-border focus would double up:
+.filter-panel input:focus-visible { @include focus-accent-line; }
+```
+
+**When:** Inside bordered containers (cards, panels) where a full border change would compete with the container's own border. Subtle, directional.
+
+---
+
+### `@include focus-inset-shadow` — inner shadow
+
+An inner `box-shadow` makes the field appear to sink slightly. Tactile, three-dimensional.
+
+```scss
+// Custom UI with tactile character throughout:
+#kiosk-form input:focus-visible { @include focus-inset-shadow; }
+```
+
+**When:** Rarely appropriate. Use only if the overall UI has a consistent tactile / depth language — inset shadows on buttons, card depths, etc. Never mix with flat elements in the same interface.
 
 ---
 
@@ -225,7 +327,7 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 
 ### `@include grid` / `@include grid-2` / `@include grid-4`
 
-Responsive grid layouts with `gap: 1.5rem`.
+Responsive grid layouts with `gap: 1rem`.
 
 | Mixin | Mobile (<768px) | Tablet (768px+) | Desktop (1024px+) |
 |-------|-----------------|-----------------|-------------------|
@@ -234,7 +336,6 @@ Responsive grid layouts with `gap: 1.5rem`.
 | `grid-4` | 1 column | 2 columns | 4 columns |
 
 ```scss
-// Usage on semantic selector
 #stats ul {
     @include grid-4;
     list-style: none;
@@ -243,90 +344,85 @@ Responsive grid layouts with `gap: 1.5rem`.
 }
 ```
 
-### `@include form-grid`
-
-6-column grid for forms. Collapses to 1 column on mobile (<768px). Use `grid-column: span N` on children.
-
-```scss
-#my-form {
-    @include form-grid;
-
-    > label:nth-child(1),
-    > label:nth-child(2) { grid-column: span 3; } // Half width each
-    > label:nth-child(3) { grid-column: span 6; } // Full width
-    .form-actions { grid-column: span 6; }
-}
-```
-
 ### `@include stack($gap: 1rem)`
 
 Vertical flex layout with configurable gap (default 1rem).
 
 ```scss
-.my-section main { @include stack(1.5rem); }   // 1.5rem gap
-.my-sidebar       { @include stack(0.5rem); }   // tight gap
-.my-content       { @include stack; }            // default 1rem gap
+.my-section main { @include stack(1.5rem); }
+.my-sidebar       { @include stack(0.5rem); }
+.my-content       { @include stack; }           // default 1rem
 ```
 
 **Expands to:** `display: flex; flex-direction: column; gap: $gap;`
 
-### `@include card`
+### `@include form-grid`
 
-Data container component — the standard "card" appearance.
+6-column grid for forms. Collapses to 1 column on mobile (<768px). Children are `.form-element` divs with explicit `for`/`id` association.
 
-**Expands to:**
-```css
-background-color: var(--color-bg-primary);     /* white */
-border: 1px solid var(--color-border);
-width: 100%;
-display: flex;
-flex-direction: column;
-box-shadow: var(--shadow-sm);
-border-radius: var(--radius-md);               /* 0.5rem */
-overflow: hidden;
-transition: all var(--transition-base);        /* 0.3s ease */
-```
-
-**Typical hover pattern:**
 ```scss
-article {
-    @include card;
-    &:hover { border-color: var(--color-primary); @include shadow-md; }
+#user-form {
+    @include form-grid;
+
+    .form-element:nth-child(1),
+    .form-element:nth-child(2) { grid-column: span 3; }
+    .form-element:nth-child(3) { grid-column: span 6; }
+    .form-actions               { grid-column: span 6; }
 }
 ```
 
+### `@include card`
+
+Base card container — bg, border, shadow, rounded corners. No built-in header/footer.
+
+**Expands to:**
+```css
+background-color: hsl(var(--color-bg-primary));
+border: 1px solid hsl(var(--color-border));
+width: 100%;
+display: flex;
+flex-direction: column;
+border-radius: var(--radius-md);        /* 8px */
+overflow: hidden;
+box-shadow: var(--shadow-xs);
+transition: all var(--transition-base);
+
+&:hover {
+    border-color: hsl(var(--color-primary) / 0.25);
+    box-shadow: var(--shadow-sm);
+}
+```
+
+See [cards.md](cards.md) for accent variants (`card-accent-top/left/bottom`), `card-bg`, `card-stacked`.
+
+### `@include section-card`
+
+Composed card with structured header + main + footer regions. See [cards.md](cards.md).
+
 ### `@include panel-header`
 
-Unified header bar used by `.card header`, `.section-card header`, and `.ln-modal header`.
+Header bar used by `section-card`, `ln-modal`, and any custom panel.
 
 **Expands to:**
 ```css
 display: flex;
 align-items: center;
 justify-content: space-between;
-padding-left: 1rem;
-padding-right: 1rem;
-padding-top: 0.625rem;
-padding-bottom: 0.625rem;
-background-color: var(--color-bg-secondary);   /* #f3f4f6 */
-border-bottom: 1px solid var(--color-border);
+padding: 0.75rem 1rem;
+background-color: hsl(var(--color-bg-secondary));
+border-bottom: 1px solid hsl(var(--color-border));
 
-/* Nested h3 styling included: */
 h3 {
-    font-size: var(--text-base);               /* 1rem */
-    font-weight: var(--font-semibold);         /* 600 */
-    color: var(--color-text-primary);
+    font-size: var(--text-base);        /* 1rem */
+    font-weight: var(--font-semibold);  /* 600 */
+    color: hsl(var(--color-text-primary));
     margin: 0;
 }
 ```
 
-```scss
-.my-section header { @include panel-header; }
-```
-
 ### `@include btn`
 
-Button **structure only** — padding, flex alignment, font sizing. Does NOT include colors.
+Complete primary action button — structure + filled primary colors. Use for non-submit action buttons.
 
 **Expands to:**
 ```css
@@ -334,43 +430,61 @@ display: inline-flex;
 align-items: center;
 justify-content: center;
 gap: 0.5rem;
-padding: 0.5rem 1rem;
-font-size: var(--text-sm);                    /* 0.875rem */
-font-weight: var(--font-medium);              /* 500 */
+padding: 0.5rem 1.25rem;        /* py(0.5rem) after global button reduction */
+font-size: var(--text-sm);
+font-weight: var(--font-medium);
+border-radius: var(--radius-md);
 white-space: nowrap;
+background-color: hsl(var(--color-primary));
+color: white;
+
+&:hover { background-color: hsl(var(--color-primary-hover)); }
 ```
 
-> **Colors come from `@include btn-colors`**, which is applied globally to all `<button>` elements via `scss/base/_global.scss`. You get hover/active/focus/disabled states for free. Change color by overriding `--color-primary` on the element or parent.
+> `<button type="submit">` gets primary colors automatically from `_global.scss` — no `@include btn` needed.
+> `<button type="button">` gets neutral (transparent + gray hover) automatically.
+> Use `@include btn` only for non-submit buttons that need primary styling.
+
+**Color change** — override `--color-primary` on element or parent:
+```scss
+#delete-btn { @include btn; --color-primary: var(--color-error); }
+```
+
+**Size modifiers:**
+```scss
+#compact-btn { @include btn; @include btn-sm; }   // toolbar, table actions
+#hero-cta    { @include btn; @include btn-lg; }
+```
 
 ### `@include close-button`
 
-Standard dismiss button. Always pair with `class="ln-icon-close"` in HTML.
+Icon-only dismiss button. Resets padding to zero, fixed 2rem size.
 
 **Expands to:**
 ```css
-background: transparent;
-border: none;
-font-size: var(--text-lg);
-color: var(--color-text-muted);               /* #9ca3af */
-cursor: pointer;
+padding: 0;
 width: 2rem;
 height: 2rem;
 display: flex;
 align-items: center;
 justify-content: center;
-border-radius: var(--radius-sm);              /* 0.25rem */
-transition: all var(--transition-fast);       /* 0.15s ease */
-```
+border-radius: var(--radius-sm);
+transition: all var(--transition-fast);
+color: hsl(var(--color-text-muted));
 
-**States:**
-- `:hover` → `color: var(--color-error)` (#dc2626)
-- `:active` → `color: var(--color-error-hover)` (#b91c1c), `background: var(--color-bg-body)`
-- `:focus-visible` → `@include focus-ring` (consistent with all interactive elements)
+&:hover  { color: hsl(var(--color-error)); background: hsl(var(--color-bg-secondary)); }
+&:active { color: hsl(var(--color-error-hover)); background: hsl(var(--color-bg-body)); }
+```
 
 ```html
-<button class="ln-icon-close" data-ln-modal-close></button>
+<!-- In HTML — SVG icon inside the button -->
+<button type="button" aria-label="Close" data-ln-modal-close>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+</button>
 ```
+
 ```scss
+/* In SCSS */
 .ln-modal header button[data-ln-modal-close] { @include close-button; }
 ```
 
@@ -378,223 +492,116 @@ transition: all var(--transition-fast);       /* 0.15s ease */
 
 Grid-based expand/collapse animation. **NEVER use `max-height` hack.**
 
-- `collapsible` → parent container (grid with 0fr→1fr transition)
-- `collapsible-content` → direct child (overflow: hidden)
+- `collapsible` → wrapper (grid-template-rows: 0fr → 1fr)
+- `collapsible-content` → direct child with `overflow: hidden`
 
-**Expands to:**
-```css
-/* @include collapsible */
-display: grid;
-grid-template-rows: 0fr;
-transition: grid-template-rows var(--transition-base);  /* 0.3s ease */
-
-/* When .open class is added: */
-&.open { grid-template-rows: 1fr; }
-
-/* @include collapsible-content */
-overflow: hidden;
+**Pattern:**
+```html
+<main id="panel1" data-ln-toggle class="collapsible">
+    <div class="collapsible-body">
+        <p>Content — padding goes here, not on .collapsible-body</p>
+    </div>
+</main>
 ```
 
-**Full pattern:**
+**Rules:**
+- `.collapsible` wrapper = no padding (it collapses to 0)
+- Put all padding on children of `.collapsible-body`, not on `.collapsible-body` itself — `overflow: hidden` on the wrapper means padding contributes to minimum height even at `grid-template-rows: 0fr`
+- `data-ln-toggle` = JS behavior, `class="collapsible"` = CSS animation
+
+### `@include accordion`
+
+Styled accordion list — contained card with chevron rotation. Applied automatically to `[data-ln-accordion]`.
+
 ```html
 <ul data-ln-accordion>
     <li>
-        <header data-ln-toggle-for="panel1">Title</header>
+        <header data-ln-toggle-for="panel1">Section Title</header>
         <main id="panel1" data-ln-toggle class="collapsible">
-            <section class="collapsible-body">
-                <p>Content with padding goes here.</p>
-            </section>
+            <div class="collapsible-body">
+                <p>Content goes here.</p>
+            </div>
+        </main>
+    </li>
+    <li>
+        <header data-ln-toggle-for="panel2">Another Section</header>
+        <main id="panel2" data-ln-toggle class="collapsible">
+            <div class="collapsible-body">
+                <p>More content.</p>
+            </div>
         </main>
     </li>
 </ul>
 ```
 
-**Rules:**
-- `.collapsible` parent = no padding (it collapses to 0)
-- `.collapsible-body` child = put all padding/margins here
-- Child must be semantic element (`<section>`, `<article>`) with a class, NOT bare `<div>`
-- `data-ln-toggle` = JS behavior, `class="collapsible"` = CSS animation
+> Chevron is CSS `::after` — no SVG element needed in HTML.
+> For custom accordion selectors: `#my-list { @include accordion; }`
 
 ---
 
 ## Icon System
 
-All icons use CSS pseudo-elements (`::before`) with inline SVG data-URIs. Defined in `scss/config/_icons.scss`.
+SVG sprite injected into `<body>` at init by `ln-icons.js`. No init call required.
 
 ### Usage
 
 ```html
-<span class="ln-icon-home"></span>
-<button class="ln-icon-close" data-ln-modal-close></button>
-<span class="ln-icon-check-circle--green ln-icon--lg"></span>
-```
+<!-- Standalone icon -->
+<svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg>
 
-**NEVER** use HTML entities (`&times;`, `&#9660;`), Unicode, or emoji for icons. **ALWAYS** use `ln-icon-*` classes.
+<!-- Icon in button with text -->
+<button>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+    Add User
+</button>
+
+<!-- Icon-only button — aria-label required -->
+<button type="button" aria-label="Close">
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+</button>
+
+<!-- Accordion chevron — rotates on open/close via CSS -->
+<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+```
 
 ### Size Variants
 
 | Class | Size |
 |-------|------|
-| *(default)* | 1.25rem (20px) |
 | `ln-icon--sm` | 1rem (16px) |
+| *(default)* | 1.25rem (20px) |
 | `ln-icon--lg` | 1.5rem (24px) |
 | `ln-icon--xl` | 4rem (64px) |
 
+### Color
+
+Icons inherit `currentColor` from the parent element's `color` property. No color variant classes.
+
+**Exception:** `file-pdf`, `file-doc`, `file-epub` have embedded semantic stroke colors and do not follow `currentColor`.
+
 ### Available Icons
 
-**Navigation:**
-`ln-icon-home`, `ln-icon-users`, `ln-icon-books`, `ln-icon-lodges`, `ln-icon-logout`, `ln-icon-settings`
+| Category | IDs |
+|----------|-----|
+| Navigation | `home` `users` `books` `settings` `logout` |
+| Actions | `close` `menu` `plus` `edit` `delete` `view` `save` `search` `check` `copy` `link` `upload` `download` `refresh` `print` `lock` `star` `filter` `calendar` |
+| Arrows | `arrow-up` `arrow-down` `sort-both` |
+| Status | `check-circle` `error-circle` `info-circle` `warning` |
+| Data/Content | `chart` `clock` `envelope` `book` `globe` `list` `box` `building` |
+| People/Contact | `user` `mail` `phone` `square-compass` |
+| File Types | `file` `file-pdf` `file-doc` `file-epub` |
 
-**Actions:**
-`ln-icon-close`, `ln-icon-menu`, `ln-icon-delete`, `ln-icon-view`, `ln-icon-edit`, `ln-icon-save`
+Use as `#ln-{id}` — e.g. `<use href="#ln-home">`.
 
-**Transfer:**
-`ln-icon-download`, `ln-icon-upload`, `ln-icon-copy`, `ln-icon-link`
+### Adding a New Icon
 
-**Indicators:**
-`ln-icon-check`, `ln-icon-plus`, `ln-icon-arrow-up`, `ln-icon-arrow-down`
+All ~4000 Tabler icons are available in `js/ln-icons/tabler/` (source library, not bundled).
 
-**Date & Filter:**
-`ln-icon-calendar`, `ln-icon-filter`
-
-**Utility:**
-`ln-icon-chart`, `ln-icon-clock`, `ln-icon-envelope`, `ln-icon-book`, `ln-icon-refresh`, `ln-icon-print`, `ln-icon-lock`, `ln-icon-star`
-
-**Status:**
-`ln-icon-check-circle`, `ln-icon-error-circle`, `ln-icon-info-circle`, `ln-icon-warning`
-
-### Color Variants
-
-| Default (gray) | White variant | Colored variant |
-|---|---|---|
-| `ln-icon-check` | `ln-icon-check--white` | — |
-| `ln-icon-plus` | `ln-icon-plus--white` | — |
-| `ln-icon-arrow-up` | `ln-icon-arrow-up--white` | — |
-| `ln-icon-arrow-down` | `ln-icon-arrow-down--white` | — |
-| `ln-icon-book` | `ln-icon-book--white` | — |
-| `ln-icon-delete` | — | `ln-icon-delete--red` |
-| `ln-icon-check-circle` | — | `ln-icon-check-circle--green` |
-| `ln-icon-error-circle` | — | `ln-icon-error-circle--red` |
-| `ln-icon-info-circle` | — | `ln-icon-info-circle--blue` |
-| `ln-icon-warning` | — | `ln-icon-warning--yellow` |
-
-### Legacy Icons (without `ln-` prefix)
-
-`icon-user`, `icon-mail`, `icon-phone`, `icon-badge`
-
----
-
-## Design Tokens
-
-All values from `scss/config/_tokens.scss`. Mixins reference these — never hardcode values.
-
-### Colors
-
+```bash
+# Copy from source library to bundled set, then rebuild
+cp js/ln-icons/tabler/{name}.svg js/ln-icons/icons/{name}.svg
+npm run build
 ```
-Primary:     --color-primary: #2737a1
-             --color-primary-hover: #1e2b82
-             --color-primary-focus: #3246c8
-             --color-primary-light: #e6eafa
-             --color-primary-lighter: #f5f6fc
-
-Secondary:   --color-secondary: #10b981
-             --color-secondary-hover: #059669
-
-Status:      --color-success: #16a34a
-             --color-error: #dc2626
-             --color-error-hover: #b91c1c
-             --color-warning: #d97706
-             --color-info: #3b82f6
-
-Text:        --color-text-primary: #111827
-             --color-text-secondary: #6b7280
-             --color-text-muted: #9ca3af
-
-Backgrounds: --color-bg-primary: #ffffff      (cards, panels)
-             --color-bg-secondary: #f3f4f6    (headers, footers)
-             --color-bg-body: #f4f4f5         (page background)
-             --color-bg-error: #fef2f2
-
-Borders:     --color-border: #e5e7eb
-             --color-border-light: #e5e7eb
-
-Table:       --color-table-header-bg: #1a1a2e
-             --color-table-header-text: #ffffff
-             --color-table-section-bg: #e8ecf1
-```
-
-### Spacing
-
-| Token | Value | Pixels |
-|-------|-------|--------|
-| `--spacing-xs` | 0.25rem | 4px |
-| `--spacing-sm` | 0.5rem | 8px |
-| `--spacing-md` | 1rem | 16px |
-| `--spacing-lg` | 1.5rem | 24px |
-| `--spacing-xl` | 2rem | 32px |
-| `--spacing-2xl` | 3rem | 48px |
-
-### Typography
-
-| Token | Value | Pixels |
-|-------|-------|--------|
-| `--text-xs` | 0.75rem | 12px |
-| `--text-sm` | 0.875rem | 14px |
-| `--text-base` | 1rem | 16px |
-| `--text-lg` | 1.125rem | 18px |
-| `--text-xl` | 1.25rem | 20px |
-| `--text-2xl` | 1.5rem | 24px |
-
-| Token | Value |
-|-------|-------|
-| `--font-normal` | 400 |
-| `--font-medium` | 500 |
-| `--font-semibold` | 600 |
-| `--font-bold` | 700 |
-| `--font-sans` | -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif |
-| `--font-mono` | ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace |
-
-### Border Radius
-
-| Token | Value | Pixels |
-|-------|-------|--------|
-| `--radius-sm` | 0.25rem | 4px |
-| `--radius-md` | 0.5rem | 8px |
-| `--radius-lg` | 0.75rem | 12px |
-| `--radius-xl` | 1rem | 16px |
-| `--radius-full` | 9999px | circle |
-
-### Shadows
-
-| Token | Value |
-|-------|-------|
-| `--shadow-none` | none |
-| `--shadow-sm` | 0 1px 2px 0 rgba(0,0,0,0.05) |
-| `--shadow-md` | 0 4px 6px -1px rgba(0,0,0,0.1) |
-| `--shadow-lg` | 0 10px 15px -3px rgba(0,0,0,0.1) |
-| `--shadow-xl` | 0 20px 25px -5px rgba(0,0,0,0.1) |
-| `--shadow-primary` | 0 0 20px rgba(39,55,161,0.2) |
-
-### Transitions
-
-| Token | Value |
-|-------|-------|
-| `--transition-base` | 0.3s ease |
-| `--transition-fast` | 0.15s ease |
-
-### Z-Index Scale
-
-```
-toast (50) > modal (40) > overlay (30) > dropdown (20) > sticky (10)
-```
-
-| Token | Value |
-|-------|-------|
-| `--z-sticky` | 10 |
-| `--z-dropdown` | 20 |
-| `--z-overlay` | 30 |
-| `--z-modal` | 40 |
-| `--z-toast` | 50 |
 
 ---
 
@@ -604,7 +611,7 @@ toast (50) > modal (40) > overlay (30) > dropdown (20) > sticky (10)
 
 ```scss
 // WRONG
-color: #2737a1;
+color: #111827;
 padding: 1rem 1.5rem;
 font-weight: 600;
 border: 1px solid #e5e7eb;
@@ -613,25 +620,13 @@ box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 z-index: 40;
 
 // CORRECT
-@include text-primary;          // or color: var(--color-primary)
+@include text-primary;
 @include px(1.5rem); @include py(1rem);
 @include font-semibold;
 @include border;
 @include rounded-md;
-@include shadow-sm;
+@include shadow-xs;
 @include z-modal;
-```
-
-### HTML entity icons → Use `.ln-icon-*`
-
-```html
-<!-- WRONG -->
-<button>&times;</button>
-<span>&#9660;</span>
-
-<!-- CORRECT -->
-<button class="ln-icon-close"></button>
-<span class="ln-icon-arrow-down"></span>
 ```
 
 ### `max-height` collapse → Use `@include collapsible`
@@ -646,37 +641,27 @@ z-index: 40;
 .panel > .inner { @include collapsible-content; }
 ```
 
+### Padding on collapsible wrapper → Put padding on children
+
+```scss
+// WRONG — padding leaks through overflow:hidden at 0fr
+.collapsible-body { @include p(1rem); }
+
+// CORRECT — padding on children, not the overflow:hidden wrapper
+.collapsible-body > * { @include px(1rem); @include py(0.75rem); margin: 0; }
+```
+
 ### Manual panel header → Use `@include panel-header`
 
 ```scss
-// WRONG — writing your own header layout
+// WRONG
 .my-card header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.625rem 1rem;
-    background: #f3f4f6;
-    border-bottom: 1px solid #e5e7eb;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1rem; background: #f3f4f6; border-bottom: 1px solid #e5e7eb;
 }
 
 // CORRECT
 .my-card header { @include panel-header; }
-```
-
-### Manual close button → Use `@include close-button`
-
-```scss
-// WRONG
-.dismiss-btn {
-    background: transparent;
-    border: none;
-    width: 2rem;
-    height: 2rem;
-    cursor: pointer;
-}
-
-// CORRECT
-.dismiss-btn { @include close-button; }
 ```
 
 ### Presentational classes in HTML → Use `@include` in SCSS
@@ -693,10 +678,7 @@ z-index: 40;
 <!-- CORRECT -->
 <section id="stats">
     <ul>
-        <li>
-            <h3>Label</h3>
-            <strong>42</strong>
-        </li>
+        <li><h3>Label</h3><strong>42</strong></li>
     </ul>
 </section>
 ```
@@ -736,17 +718,22 @@ z-index: 40;
 
 ### Modal
 
-`<form>` is always the content root. Footer buttons get `@include btn` automatically — no `.btn` class needed. Non-submit buttons need `type="button"`.
+`<form>` is always the content root. Cancel (`type="button"`) → neutral. Save (`type="submit"`) → primary. Both styled automatically from `_global.scss`.
 
 ```html
 <div class="ln-modal" data-ln-modal id="edit-user">
     <form>
         <header>
             <h3>Edit User</h3>
-            <button type="button" class="ln-icon-close" data-ln-modal-close></button>
+            <button type="button" aria-label="Close" data-ln-modal-close>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+            </button>
         </header>
         <main>
-            <label>Name <input type="text"></label>
+            <div class="form-element">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name">
+            </div>
         </main>
         <footer>
             <button type="button" data-ln-modal-close>Cancel</button>
@@ -756,74 +743,64 @@ z-index: 40;
 </div>
 ```
 ```scss
-// Sizes via mixins (not classes)
 #edit-user > form { @include modal-lg; }
-```
-
-### Pill Labels (Checkbox / Radio)
-
-Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on first/last.
-
-| Style | Description |
-|-------|-------------|
-| **Filled** (default) | Input hidden, gray bg, colored bg + white text on checked |
-| **Outline** (`@include pill-outline` on parent) | Visible input indicator, bordered, light bg on checked |
-
-```html
-<ul>
-    <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
-    <li><label><input type="radio" name="role" value="editor"> Editor</label></li>
-</ul>
-```
-```scss
-// Switch to outline style on parent
-#my-form fieldset { @include pill-outline; }
-```
-
-### Collapsible Accordion
-
-```html
-<ul data-ln-accordion>
-    <li>
-        <header data-ln-toggle-for="faq1">What is ln-acme?</header>
-        <main id="faq1" data-ln-toggle class="collapsible">
-            <section class="collapsible-body">
-                <p>A unified frontend library for LiveNetworks projects.</p>
-            </section>
-        </main>
-    </li>
-</ul>
-```
-```scss
-// Collapsible classes are already defined in _toggle.scss
-// For custom semantic selectors:
-.my-accordion > li > main { @include collapsible; }
-.my-accordion > li > main > section { @include collapsible-content; }
+#edit-user header button[data-ln-modal-close] { @include close-button; }
+#edit-user main { @include form-grid; }
 ```
 
 ### Form Layout
 
-Forms use CSS Grid + wrapping `<label>`. No `<div>` wrappers, no `.form-group`.
+Forms use CSS Grid + `<div class="form-element">` with explicit `for`/`id`. **Use `<div>`, not `<p>`** — `<ul data-ln-validate-errors>` inside `<p>` is invalid HTML.
 
 ```html
 <form id="user-form">
-    <label>First Name <input type="text" name="first_name"></label>
-    <label>Last Name <input type="text" name="last_name"></label>
-    <label>Email <input type="email" name="email"></label>
-    <div class="form-actions">
-        <button type="button">Cancel</button>
-        <button type="submit">Save</button>
+    <div class="form-element">
+        <label for="first-name">First Name</label>
+        <input type="text" id="first-name" name="first_name" required>
+        <ul data-ln-validate-errors></ul>
     </div>
+    <div class="form-element">
+        <label for="last-name">Last Name</label>
+        <input type="text" id="last-name" name="last_name" required>
+    </div>
+    <div class="form-element">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email">
+    </div>
+    <ul class="form-actions">
+        <li><button type="button">Cancel</button></li>
+        <li><button type="submit">Save</button></li>
+    </ul>
 </form>
 ```
 ```scss
 #user-form {
     @include form-grid;
-    > label:nth-child(1),
-    > label:nth-child(2) { grid-column: span 3; }
-    > label:nth-child(3) { grid-column: span 6; }
-    .form-actions { grid-column: span 6; }
+    .form-element:nth-child(1),
+    .form-element:nth-child(2) { grid-column: span 3; }
+    .form-element:nth-child(3) { grid-column: span 6; }
+    .form-actions               { grid-column: span 6; }
 }
+```
+
+### Pill Labels (Checkbox / Radio)
+
+```html
+<ul>
+    <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
+    <li><label><input type="radio" name="role" value="editor" checked> Editor</label></li>
+    <li><label><input type="radio" name="role" value="external"> External</label></li>
+</ul>
+```
+```scss
+// Default: filled (input hidden, colored bg on checked)
+#role-filter ul { @include pill-group; }
+
+// Outline variant: visible input indicator
+#role-filter ul { @include pill-group; @include pill-outline; }
+
+// Color override
+#status-filter { --color-primary: var(--color-success); }
 ```
 
 ---
@@ -833,8 +810,11 @@ Forms use CSS Grid + wrapping `<label>`. No `<div>` wrappers, no `.form-group`.
 | File | Contents |
 |------|----------|
 | `scss/config/_tokens.scss` | All CSS custom properties (`:root`) |
-| `scss/config/_mixins.scss` | All `@include` mixins (120+) |
-| `scss/config/_icons.scss` | SVG icon system |
-| `scss/config/_theme.scss` | Color palette extensions |
-| `scss/components/` | Component SCSS (card, forms, tables, tabs, etc.) |
-| `scss/base/` | Reset, global defaults, typography |
+| `scss/config/_mixins.scss` | `@forward` index for all mixin files |
+| `scss/config/mixins/` | Individual mixin files (spacing, display, typography, card, btn, form, …) |
+| `scss/base/_reset.scss` | `* { margin: 0; padding: 0; box-sizing: border-box }` |
+| `scss/base/_global.scss` | Global element styles — all buttons, links, images, `::selection` |
+| `scss/base/_typography.scss` | h1–h6, p, code, pre, blockquote, lists |
+| `scss/components/` | Apply mixins to default selectors (CSS output) |
+| `js/ln-icons/icons/` | Bundled SVG icons (~47, Tabler-based) |
+| `js/ln-icons/tabler/` | Full Tabler icon source library (~4000, not bundled) |

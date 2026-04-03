@@ -48,14 +48,14 @@ import { guardBody } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	function _hydrateLI(li) {
-		const type = ((li.getAttribute("data-type") || "info") + "").toLowerCase();
-		const titleA = li.getAttribute("data-title");
-		const msgText = (li.innerText || li.textContent || "").trim();
+	function _defaultTitle(type) {
+		return type === "success" ? "Success"
+			: type === "error" ? "Error"
+			: type === "warn" ? "Warning"
+			: "Information";
+	}
 
-		li.className = "ln-toast__item";
-		li.removeAttribute("data-ln-toast-item");
-
+	function _buildCard(type, title, li) {
 		const card = document.createElement("div");
 		card.className = "ln-toast__card ln-toast__card--" + type;
 		card.setAttribute("role", type === "error" ? "alert" : "status");
@@ -70,19 +70,36 @@ import { guardBody } from '../ln-core';
 
 		const head = document.createElement("div");
 		head.className = "ln-toast__head";
+
 		const tt = document.createElement("strong");
 		tt.className = "ln-toast__title";
-		tt.textContent = titleA || (type === "success" ? "Success" : type === "error" ? "Error" : type === "warn" ? "Warning" : "Information");
+		tt.textContent = title || _defaultTitle(type);
 
 		const x = document.createElement("button");
 		x.type = "button";
-		x.className = "ln-toast__close ln-icon-close";
+		x.className = "ln-toast__close";
 		x.setAttribute("aria-label", "Close");
-		x.addEventListener("click", () => _dismiss(li));
+		x.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>';
+		x.addEventListener("click", function () { _dismiss(li); });
 
 		head.appendChild(tt);
 		content.appendChild(head);
 		content.appendChild(x);
+		card.appendChild(side);
+		card.appendChild(content);
+
+		return { card: card, content: content };
+	}
+
+	function _hydrateLI(li) {
+		const type = ((li.getAttribute("data-type") || "info") + "").toLowerCase();
+		const titleA = li.getAttribute("data-title");
+		const msgText = (li.innerText || li.textContent || "").trim();
+
+		li.className = "ln-toast__item";
+		li.removeAttribute("data-ln-toast-item");
+
+		const built = _buildCard(type, titleA, li);
 
 		if (msgText) {
 			const body = document.createElement("div");
@@ -90,13 +107,11 @@ import { guardBody } from '../ln-core';
 			const p = document.createElement("p");
 			p.textContent = msgText;
 			body.appendChild(p);
-			content.appendChild(body);
+			built.content.appendChild(body);
 		}
 
-		card.appendChild(side);
-		card.appendChild(content);
 		li.innerHTML = "";
-		li.appendChild(card);
+		li.appendChild(built.card);
 
 		requestAnimationFrame(() => li.classList.add("ln-toast__item--in"));
 	}
@@ -133,33 +148,7 @@ import { guardBody } from '../ln-core';
 		const li = document.createElement("li");
 		li.className = "ln-toast__item";
 
-		const card = document.createElement("div");
-		card.className = "ln-toast__card ln-toast__card--" + type;
-		card.setAttribute("role", type === "error" ? "alert" : "status");
-		card.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
-
-		const side = document.createElement("div");
-		side.className = "ln-toast__side";
-		side.innerHTML = ICONS[type] || ICONS.info;
-
-		const content = document.createElement("div");
-		content.className = "ln-toast__content";
-
-		const head = document.createElement("div");
-		head.className = "ln-toast__head";
-		const tt = document.createElement("strong");
-		tt.className = "ln-toast__title";
-		tt.textContent = opts.title || (type === "success" ? "Success" : type === "error" ? "Error" : type === "warn" ? "Warning" : "Information");
-
-		const x = document.createElement("button");
-		x.type = "button";
-		x.className = "ln-toast__close ln-icon-close";
-		x.setAttribute("aria-label", "Close");
-		x.addEventListener("click", () => _dismiss(li));
-
-		head.appendChild(tt);
-		content.appendChild(head);
-		content.appendChild(x);
+		const built = _buildCard(type, opts.title, li);
 
 		if (opts.message || (opts.data && opts.data.errors)) {
 			const body = document.createElement("div");
@@ -188,12 +177,10 @@ import { guardBody } from '../ln-core';
 				}
 				body.appendChild(ul);
 			}
-			content.appendChild(body);
+			built.content.appendChild(body);
 		}
 
-		card.appendChild(side);
-		card.appendChild(content);
-		li.appendChild(card);
+		li.appendChild(built.card);
 		_append(cmp, li);
 		if (timeout > 0) li._timer = setTimeout(() => _dismiss(li), timeout);
 		return li;

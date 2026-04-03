@@ -1,3 +1,7 @@
+@use 'typography' as *;
+@use 'display' as *;
+@use 'btn' as *;
+
 // Modal size mixins
 // Usage: #my-modal > form { @include modal-lg; }
 
@@ -5,3 +9,44 @@
 @mixin modal-md { max-width: 32rem; }
 @mixin modal-lg { max-width: 42rem; }
 @mixin modal-xl { max-width: 48rem; }
+
+// Banner — full-width strip at top of viewport.
+// Uses ln-modal JS for open/close/dismiss. Applied to the container element:
+//   #my-banner { @include banner; }
+//
+// Color: override --color-primary on the element for different types:
+//   #my-banner { @include banner; --color-primary: var(--color-warning); }
+
+@mixin banner {
+    align-items: flex-start;
+
+    > form {
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+        max-height: none;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-sm) var(--spacing-lg);
+        border-bottom: var(--border-width) solid hsl(var(--color-primary) / 0.2);
+        background-color: hsl(var(--color-primary) / 0.06);
+
+        p {
+            flex: 1;
+            margin: 0;
+            @include text-sm;
+        }
+
+        .ln-icon {
+            color: hsl(var(--color-primary));
+            @include flex-shrink-0;
+        }
+
+        button[data-ln-modal-close] {
+            @include close-button;
+            @include flex-shrink-0;
+            margin-left: auto;
+        }
+    }
+}

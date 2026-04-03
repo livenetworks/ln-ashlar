@@ -3,7 +3,7 @@
 Toast notification component — displays temporary messages (success, error, warn, info).
 Each toast has an icon, title, message and close button. Automatically disappears after timeout.
 
-Uses `deepReactive` + `createBatcher` for state management and `cloneTemplate` + `fill` for DOM creation (ln-core).
+Builds toast DOM imperatively via `createElement`. Supports both server-side rendered toasts (hydrated on init via `data-ln-toast-item`) and programmatic enqueueing via JS API or `ln-toast:enqueue` event.
 
 ## Attributes
 

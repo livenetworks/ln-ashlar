@@ -11,7 +11,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 		if (domRoot[DOM_ATTRIBUTE]) return;
 		domRoot[DOM_ATTRIBUTE] = true;
 
-		const items = _findElements(domRoot);
+		const items = findElements(domRoot);
 		_attachLinksAjax(items.links);
 		_attachFormsAjax(items.forms);
 	}
@@ -70,7 +70,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 	function _destroy(domRoot) {
 		if (!domRoot[DOM_ATTRIBUTE]) return;
 
-		const items = _findElements(domRoot);
+		const items = findElements(domRoot);
 		for (const link of items.links) {
 			if (link[DOM_ATTRIBUTE + 'Trigger']) {
 				link.removeEventListener('click', link[DOM_ATTRIBUTE + 'Trigger']);
@@ -191,7 +191,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 			});
 	}
 
-	function _findElements(domRoot) {
+	function findElements(domRoot) {
 		const items = { links: [], forms: [] };
 
 		if (domRoot.tagName === 'A' && domRoot.getAttribute(DOM_SELECTOR) !== 'false') {
@@ -222,7 +222,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 
 									const ajaxRoot = node.closest && node.closest('[' + DOM_SELECTOR + ']');
 									if (ajaxRoot && ajaxRoot.getAttribute(DOM_SELECTOR) !== 'false') {
-										const items = _findElements(node);
+										const items = findElements(node);
 										_attachLinksAjax(items.links);
 										_attachFormsAjax(items.forms);
 									}

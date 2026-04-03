@@ -1,0 +1,9 @@
+@use '../config/mixins' as *;
+
+.alert {
+	@include alert;
+}
+
+.alert.success { --color-primary: var(--color-success); }
+.alert.warning { --color-primary: var(--color-warning); }
+.alert.error   { --color-primary: var(--color-error); }

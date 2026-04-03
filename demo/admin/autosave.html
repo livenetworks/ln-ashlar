@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Autosave — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -18,26 +21,26 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
 </template>
-	<div data-ln-toast></div>
+	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
 				<h1>Autosave</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Auto-save form data to localStorage.'})">
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Auto-save form data to localStorage.'})">
 						Test Toast
 					</button>
 				</div>
@@ -49,7 +52,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -57,7 +60,7 @@
 			<div class="sidebar-content">
 				<nav class="nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -89,6 +92,7 @@
 						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -135,19 +139,19 @@
 							<p>Fill in some fields below, then close (or refresh) this tab. When you reopen, the data is restored. Submitting the form clears the saved draft.</p>
 
 							<form id="demo-autosave" data-ln-autosave>
-								<p class="form-element">
+								<div class="form-element">
 									<label for="as-name">Name</label>
 									<input type="text" id="as-name" name="name" placeholder="John Smith">
-								</p>
-								<p class="form-element">
+								</div>
+								<div class="form-element">
 									<label for="as-email">Email</label>
 									<input type="email" id="as-email" name="email" placeholder="ivan@example.com">
-								</p>
-								<p class="form-element">
+								</div>
+								<div class="form-element">
 									<label for="as-phone">Phone</label>
 									<input type="tel" id="as-phone" name="phone" placeholder="+1 555 ...">
-								</p>
-								<p class="form-element">
+								</div>
+								<div class="form-element">
 									<label for="as-country">Country</label>
 									<select id="as-country" name="country">
 										<option value="">— Select —</option>
@@ -156,11 +160,11 @@
 										<option value="de">Germany</option>
 										<option value="fr">France</option>
 									</select>
-								</p>
-								<p class="form-element">
+								</div>
+								<div class="form-element">
 									<label for="as-message">Message</label>
 									<textarea id="as-message" name="message" placeholder="Write something..."></textarea>
-								</p>
+								</div>
 								<fieldset>
 									<legend>Role</legend>
 									<ul>
@@ -177,11 +181,11 @@
 										<li><label><input type="checkbox" name="features[]" value="audit"> Audit</label></li>
 									</ul>
 								</fieldset>
-								<div class="form-actions">
-									<button type="button" data-ln-autosave-clear>Cancel</button>
-									<button type="reset">Reset</button>
-									<button type="submit">Submit</button>
-								</div>
+								<ul class="form-actions">
+									<li><button type="button" data-ln-autosave-clear>Cancel</button></li>
+									<li><button type="reset">Reset</button></li>
+									<li><button type="submit">Submit</button></li>
+								</ul>
 							</form>
 						</main>
 					</section>
@@ -197,6 +201,7 @@
 									<tr><td><code>ln-autosave:restored</code></td><td>no</td><td><code>{ target, data }</code></td><td>Data restored to form</td></tr>
 									<tr><td><code>ln-autosave:saved</code></td><td>no</td><td><code>{ target, data }</code></td><td>Data saved to localStorage</td></tr>
 									<tr><td><code>ln-autosave:cleared</code></td><td>no</td><td><code>{ target }</code></td><td>localStorage entry removed</td></tr>
+									<tr><td><code>ln-autosave:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>Instance destroyed</td></tr>
 								</tbody>
 							</table>
 

@@ -1,5 +1,27 @@
 # CLAUDE.md — ln-acme Project
 
+## Working Mode
+
+When I share plans, specs, or ask architectural questions — DON'T immediately
+execute. Instead:
+
+1. **Think first** — analyze what I'm proposing. Look for gaps, contradictions,
+   missing edge cases, better alternatives.
+2. **Push back** — if something is wrong or suboptimal, say so directly.
+   Don't agree just because I said it. Challenge mainstream patterns if
+   they don't fit our architecture.
+3. **Reference existing decisions** — check the skills and specs before
+   answering. If we already decided "no pagination, virtual scroll" in
+   data-table.md, don't suggest pagination.
+4. **Ask before building** — if the request is ambiguous or has multiple
+   valid approaches, discuss first. Don't pick one silently.
+5. **Proactive feedback** — if you notice something I didn't ask about
+   but should have (missing state, edge case, contradiction with another
+   spec), bring it up.
+
+This applies to architecture discussions, spec reviews, and planning.
+For implementation tasks ("create this file", "fix this bug"), execute directly.
+
 ## What is this?
 
 `ln-acme` is a unified frontend library for LiveNetworks projects.
@@ -92,19 +114,79 @@ git submodule add .../ln-acme.git resources/ln-acme
 
 ## Button Architecture
 
-Every `<button>` gets hover/active/focus/disabled effects **out of the box** from `scss/base/_global.scss` via `@include btn-colors`.
-All states read from `--color-primary`. No classes needed.
+### Core Principle
 
-- **`@include btn-colors`** — color states (default 0.1, hover solid+shadow+lift, active darker). Applied globally to all `<button>` elements. Focus ring on `focus-visible` only (keyboard)
-- **`@include btn`** — structure only (inline-flex, padding, font). Use when you need a styled button
-- **Color change** — override `--color-primary` on the element or parent:
-  ```scss
-  #delete-user { --color-primary: var(--color-error); }
-  .admin-panel { --color-primary: var(--color-secondary); }
-  ```
-- **ZERO hardcoded colors** in mixins — every color reads from `var(--token)`
-- **No `btn--*` variant classes** in ln-acme — projects define their own via `--color-primary` override
-- Full docs: `demo/admin/mixins.html`
+Structure is **global**. Color is **semantic** (`type="submit"`) or **explicit** (`@include btn`).
+
+```
+scss/config/mixins/_btn.scss    →  @mixin btn { ... }           ← recipe
+scss/components/_buttons.scss   →  .btn { @include btn; }       ← default applied
+```
+
+The `.btn` class is available for prototyping and inspector experimentation.
+In production, projects use semantic selectors instead.
+
+### Global `<button>` — Structure + Neutral (Out of the Box)
+
+Every `<button>` gets **full structure + neutral colors** from `scss/base/_global.scss`:
+
+- Structure: inline-flex, centered, `px(1.25rem) py(0.625rem)`, text-sm, font-medium, rounded-md
+- Default: transparent background, muted text color
+- Hover: light gray background (`bg-secondary`), primary text
+- Active: border-color background
+- Focus-visible: focus ring
+- Disabled: 50% opacity
+
+Cancel, close, toggle, icon buttons all look usable **without any class or mixin**.
+
+### `<button type="submit">` — Color Only (Structure Inherited)
+
+Submit buttons automatically get primary color on top of the global structure:
+
+- Background: solid `hsl(var(--color-primary))`, white text
+- Hover: `hsl(var(--color-primary-hover))` — color change only, no transform
+- Active: same primary-hover color
+
+```html
+<!-- Cancel: neutral from global (no class needed) -->
+<button type="button">Cancel</button>
+
+<!-- Save: primary from type="submit" (no class needed) -->
+<button type="submit">Save</button>
+```
+
+### `@mixin btn` — Explicit Action Button
+
+For non-submit action buttons that need primary styling. Includes full structure + colors:
+
+```scss
+// Project SCSS — non-submit action buttons
+#add-user            { @include btn; }
+#export-data         { @include btn; }
+
+// Color variant — override token on element or parent
+#delete-user         { @include btn; --color-primary: var(--color-error); }
+#confirm-delete      { --color-primary: var(--color-error); }  // affects submit too
+```
+
+### Size Variants
+
+```scss
+#compact-action { @include btn; @include btn-sm; }
+#hero-cta       { @include btn; @include btn-lg; }
+```
+
+### Icon / Close Buttons
+
+`@include close-button` resets padding to 0 and sets a fixed 2rem size — overrides the global structure padding. Use for any icon-only button.
+
+### Rules
+
+- **No `btn--*` variant classes** in ln-acme — use `--color-primary` override
+- **No `translateY` or `box-shadow` on hover** — color change only
+- **ZERO hardcoded colors** — every color reads `var(--token)`
+- Production HTML uses semantic selectors, not `.btn` class
+- `.btn` class exists for prototyping/inspector use only
 
 ## Modal Architecture
 
@@ -129,7 +211,8 @@ All states read from `--color-primary`. No classes needed.
 - **`data-ln-modal`** on modal element = creates instance, value = state ("open"/"close")
 - **`data-ln-modal-for="id"`** on trigger button = references modal by ID
 - **`<form>` is the root** — footer buttons (Cancel, Submit) are inside the form
-- **Footer buttons** get `@include btn` automatically — no `.btn` class needed
+- **Cancel** (`type="button"`) gets neutral style from global — no class needed
+- **Save** (`type="submit"`) gets primary filled style from global — no class needed
 - **Non-submit buttons** need `type="button"` (close, cancel) to prevent form submission
 - **No `.ln-modal__content` class** — select semantically: `.ln-modal > form`
 - **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes
@@ -146,17 +229,23 @@ Two distinct grouping patterns:
 - **`@include pill-group`** — joined pills without gap, border-radius on first/last only (radio/checkbox)
 
 ```html
-<!-- Action buttons (btn-group) -->
-<ul class="btn-group">
+<!-- Action buttons -->
+<ul>
   <li><button class="ln-icon-edit" title="Edit"></button></li>
   <li><button class="ln-icon-delete" title="Delete"></button></li>
 </ul>
 
-<!-- Pill radio (pill-group — auto-detected via :has) -->
+<!-- Pill radio -->
 <ul>
   <li><label><input type="radio" name="role" value="admin"> Admin</label></li>
   <li><label><input type="radio" name="role" value="editor"> Editor</label></li>
 </ul>
+```
+
+```scss
+// Project SCSS — apply grouping via semantic selector
+#users td:last-child ul { @include btn-group; }
+#role-filter ul          { @include pill-group; }
 ```
 
 - **Filled** (default) — gray bg, colored bg on checked, input hidden
@@ -179,7 +268,7 @@ scss/components/_tables.scss        →  table { @include table-base; }    ← a
 |---|---|---|
 | Universal element (`label`, `table`, `input`) | yes | yes — applied to element selector |
 | Singleton (`#breadcrumbs`) | yes | yes — applied to `#id` selector |
-| Component-identifying class (`.btn`, `.btn-group`, `.collapsible`) | yes | yes — applied to class |
+| Structural class (`.form-element`, `.form-actions`, `.collapsible`) | yes | yes — applied to class |
 | Data-attr JS component (`[data-ln-tabs]`) | not needed | yes — selector is the attribute |
 
 **Projects override** by using the same mixin on their own selector:
@@ -213,7 +302,18 @@ scss/components/_tables.scss        →  table { @include table-base; }    ← a
 4. If CSS needed, create `js/ln-{name}/ln-{name}.scss`
 5. Add `import './ln-{name}/ln-{name}.js'` to `js/index.js`
 6. DOM structure → `<template>` elements in HTML
-7. Detailed architecture: [js/COMPONENTS.md](js/COMPONENTS.md)
+7. Create `js/ln-{name}/README.md` — usage guide (attributes, events, API, HTML examples)
+8. Create `docs/js/{name}.md` — architecture reference (internal state, render flow, event lifecycle)
+9. Create `demo/admin/{name}.html` — interactive demo page
+10. Detailed architecture: [js/COMPONENTS.md](js/COMPONENTS.md)
+
+## Updating an Existing JS Component
+
+When modifying component behavior (attributes, events, API, HTML structure):
+
+1. Update `js/ln-{name}/README.md` — reflect new/changed usage
+2. Update `docs/js/{name}.md` — reflect architectural changes
+3. Update `demo/admin/{name}.html` — add/update interactive examples
 
 ## Override Architecture
 
@@ -236,26 +336,45 @@ Projects can override at any level:
 
 ## Icons
 
-Icons use `mask-image` + `currentColor` — they automatically inherit the text color from their parent.
-No color variant classes (`--white`, `--red`, etc.) — change color via CSS `color` property.
+Icons use SVG sprite injection — `ln-icons.js` builds a hidden `<svg>` sprite from `js/ln-icons/icons/*.svg`
+and inserts it into `<body>` at init. Icons render via `<use href="#ln-{name}">` and inherit `currentColor`.
 
 ```html
-<span class="ln-icon-plus"></span>           <!-- inherits parent color -->
-<button><span class="ln-icon-plus"></span> Add</button>  <!-- follows button text color -->
+<!-- Standalone icon -->
+<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+
+<!-- Icon in button with text -->
+<button>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+    Add
+</button>
+
+<!-- Icon-only button — aria-label required -->
+<button aria-label="Close">
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+</button>
+
+<!-- Accordion chevron (CSS rotates it on open) -->
+<header data-ln-toggle-for="panel1">
+    Title
+    <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+</header>
 ```
 
-Available: `ln-icon-close`, `ln-icon-menu`, `ln-icon-home`, `ln-icon-users`,
-`ln-icon-delete`, `ln-icon-view`, `ln-icon-check`, `ln-icon-plus`, `ln-icon-settings`,
-`ln-icon-books`, `ln-icon-lodges`, `ln-icon-logout`, `ln-icon-chart`, `ln-icon-clock`,
-`ln-icon-envelope`, `ln-icon-arrow-up`, `ln-icon-arrow-down`, `ln-icon-book`,
-`ln-icon-edit`, `ln-icon-save`, `ln-icon-download`, `ln-icon-upload`,
-`ln-icon-copy`, `ln-icon-link`, `ln-icon-calendar`, `ln-icon-filter`,
-`ln-icon-refresh`, `ln-icon-print`, `ln-icon-lock`, `ln-icon-star`,
-`ln-icon-info-circle`, `ln-icon-error-circle`, `ln-icon-check-circle`,
-`ln-icon-warning`, `ln-icon-globe`, `ln-icon-search`, `ln-icon-list`,
-`ln-icon-box`, `ln-icon-building`, `ln-icon-badge`.
+Available IDs (`#ln-{name}`): `home` `close` `menu` `users` `settings` `logout` `books` `lodges`
+`plus` `edit` `delete` `view` `save` `search` `check` `copy` `link` `filter` `calendar`
+`upload` `download` `refresh` `print` `lock` `star` `arrow-up` `arrow-down` `sort-both`
+`chart` `clock` `envelope` `book` `globe` `list` `box` `building` `badge` `warning`
+`info-circle` `error-circle` `check-circle` `user` `mail` `phone` `square-compass`
+`file` `file-pdf` `file-doc` `file-epub`
 
 Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon--xl` (4rem).
+
+Color: icons follow the parent's `color` property automatically. Exception: `file-pdf`, `file-doc`,
+`file-epub` have embedded semantic stroke colors (red, blue, purple).
+
+To add a new icon: create `js/ln-icons/icons/{name}.svg` with `stroke="currentColor"` or
+`fill="currentColor"`, then `npm run build`.
 
 ---
 

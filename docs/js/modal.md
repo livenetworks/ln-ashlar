@@ -139,8 +139,25 @@ When opening (after before-event passes):
 1. Set `aria-modal="true"` and `role="dialog"` on the modal element
 2. Add `ln-modal-open` class to `document.body` (locks scroll)
 3. Attach `_onEscape` and `_onFocusTrap` keydown listeners to `document`
-4. Auto-focus: find first non-disabled, non-hidden `input`/`textarea`/`select` → focus it. If none found, focus first `a[href]` or `button`
+4. Focus management (see below)
 5. Dispatch `ln-modal:open`
+
+### Focus Management
+
+On open, focus is applied in this priority order:
+
+1. **`[autofocus]` element** — if any element inside the modal has the `autofocus` attribute, it receives focus first
+2. **First input** — first non-disabled, non-hidden `input`, `textarea`, or `select`
+3. **First focusable** — first `a[href]` or `button:not([disabled])`
+
+The `autofocus` attribute allows the caller to override the default input-first behavior. Primary use case: destructive confirm dialogs, where Cancel should be pre-focused so that pressing Enter dismisses the dialog rather than confirming the destructive action.
+
+```html
+<footer>
+    <button type="button" data-ln-modal-close autofocus>Cancel</button>
+    <button type="submit">Delete</button>
+</footer>
+```
 
 ### Close State Application
 

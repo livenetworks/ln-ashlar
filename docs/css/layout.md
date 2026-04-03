@@ -34,7 +34,9 @@ App layout system. Files: `scss/layout/_app-layout.scss`, `_header.scss`, `_grid
 ```html
 <div class="header">
     <div class="header-left">
-        <button class="menu-toggle"><span class="ln-icon-menu"></span></button>
+        <button class="menu-toggle" aria-label="Open menu">
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+        </button>
         <h1>Page Title</h1>
     </div>
     <div class="header-right">

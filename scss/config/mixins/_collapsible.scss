@@ -4,6 +4,14 @@
 //   .my-panel          { @include collapsible; }
 //   .my-panel > .inner { @include collapsible-content; }
 
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+
 @mixin collapsible {
 	display: grid;
 	grid-template-rows: 0fr;
@@ -16,4 +24,53 @@
 
 @mixin collapsible-content {
 	overflow: hidden;
+}
+
+@mixin accordion {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	@include border;
+	@include rounded-lg;
+	overflow: hidden;
+
+	> li {
+		border-bottom: var(--border-width) solid hsl(var(--color-border));
+
+		&:last-child { border-bottom: none; }
+
+		// Trigger
+		> [data-ln-toggle-for] {
+			@include flex;
+			@include justify-between;
+			@include items-center;
+			@include px(1rem);
+			@include py(0.875rem);
+			@include cursor-pointer;
+			@include font-medium;
+			@include text-primary;
+			@include transition;
+
+			&:hover { @include bg-secondary; }
+
+			// Chevron — place <svg class="ln-icon ln-chevron"> inside the trigger
+			svg.ln-chevron {
+				@include flex-shrink-0;
+				color: hsl(var(--color-text-muted));
+				@include transition;
+			}
+		}
+
+		// Rotate chevron when panel is open
+		&:has(> .collapsible.open) > [data-ln-toggle-for] svg.ln-chevron {
+			transform: rotate(180deg);
+		}
+
+		// Content body padding — on children, not the overflow:hidden wrapper
+		.collapsible-body > * {
+			@include px(1rem);
+			@include py(0.75rem);
+			margin: 0;
+		}
+	}
 }

@@ -8,7 +8,9 @@
 	@include z-toast;
 	pointer-events: none;
 	right: var(--spacing-lg);
-	top: var(--spacing-lg);
+	bottom: var(--spacing-lg);
+	display: flex;
+	flex-direction: column-reverse;
 	list-style: none;
 	@include m(0);
 	@include p(0);
@@ -23,7 +25,7 @@
 }
 
 [data-ln-toast] > .ln-toast__item + .ln-toast__item {
-	@include mt(var(--spacing-md));
+	@include mb(var(--spacing-md));
 }
 
 [data-ln-toast] > .ln-toast__item--in {

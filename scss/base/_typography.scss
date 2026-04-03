@@ -15,7 +15,7 @@ h1 {
 	line-height: 2.5rem;
 	@include font-bold;
 	letter-spacing: -0.025em;
-	@include mb(1.5rem);
+	@include mb(1rem);
 }
 
 h2 {
@@ -28,24 +28,28 @@ h2 {
 h3 {
 	@include text-xl;
 	@include font-semibold;
+	line-height: 1.1;
 	@include mb(0.75rem);
 }
 
 h4 {
 	@include text-lg;
 	@include font-semibold;
+	line-height: 1.1;
 	@include mb(0.5rem);
 }
 
 h5 {
 	@include text-base;
 	@include font-semibold;
+	line-height: 1.1;
 	@include mb(0.5rem);
 }
 
 h6 {
 	@include text-sm;
 	@include font-semibold;
+	line-height: 1.1;
 	@include mb(0.25rem);
 }
 

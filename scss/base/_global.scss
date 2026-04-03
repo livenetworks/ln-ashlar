@@ -30,19 +30,65 @@ a {
 	}
 }
 
+// ─── All buttons — structure + neutral colors ───────────────────────────────
+// Every <button> gets padding, font, and a neutral hover out of the box.
+// Icon/close buttons override padding via their own mixin (@include close-button).
+
 button,
 input[type="submit"],
 input[type="reset"],
 input[type="button"] {
+	@include inline-flex;
+	@include items-center;
+	@include justify-center;
+	@include gap(0.5rem);
+	@include px(1.25rem);
+	@include py(0.5rem);
+	@include text-sm;
+	@include font-medium;
 	@include rounded-md;
-	@include cursor-pointer;
-	@include transition;
+	white-space: nowrap;
 	border: none;
 	outline: none;
-	@include btn-colors;
+	background: transparent;
+	color: hsl(var(--color-text-secondary));
+	@include transition-colors;
+
+	&:hover:not(:disabled) {
+		background: hsl(var(--color-bg-secondary));
+		color: hsl(var(--color-text-primary));
+	}
+
+	&:active:not(:disabled) {
+		background: hsl(var(--color-border));
+	}
 
 	&:focus-visible {
 		@include focus-ring;
+	}
+
+	&:disabled {
+		@include opacity-50;
+		@include cursor-not-allowed;
+	}
+}
+
+// ─── Submit — color only, structure inherited from above ────────────────────
+// Change color: override --color-primary on the element or parent.
+
+button[type="submit"],
+input[type="submit"] {
+	background: hsl(var(--color-primary));
+	color: hsl(var(--color-white));
+
+	&:hover:not(:disabled) {
+		background: hsl(var(--color-primary-hover));
+		color: hsl(var(--color-white));
+	}
+
+	&:active:not(:disabled) {
+		background: hsl(var(--color-primary-hover));
+		color: hsl(var(--color-white));
 	}
 }
 

@@ -22,9 +22,7 @@
 // ==========================================================================
 
 [data-ln-accordion] {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+	@include accordion;
 }
 
 .collapsible {

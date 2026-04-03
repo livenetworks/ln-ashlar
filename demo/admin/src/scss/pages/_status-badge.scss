@@ -1,0 +1,7 @@
+@use '../../../../../scss/config/mixins' as *;
+
+// Production pattern demo — simulates project-owned selectors
+.status          { @include badge; }
+.status.active   { --color-primary: var(--color-success); }
+.status.pending  { --color-primary: var(--color-warning); }
+.status.inactive { --color-primary: var(--color-text-muted); }

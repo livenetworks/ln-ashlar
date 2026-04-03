@@ -64,8 +64,10 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 			dispatch(dom, 'ln-dropdown:close', { target: e.detail.target });
 		};
 
-		this.toggleEl.addEventListener('ln-toggle:open', this._onToggleOpen);
-		this.toggleEl.addEventListener('ln-toggle:close', this._onToggleClose);
+		if (this.toggleEl) {
+			this.toggleEl.addEventListener('ln-toggle:open', this._onToggleOpen);
+			this.toggleEl.addEventListener('ln-toggle:close', this._onToggleClose);
+		}
 
 		return this;
 	}
@@ -222,8 +224,10 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this._removeScrollRepositionListener();
 		this._removeResizeCloseListener();
 		this._teleportBack();
-		this.toggleEl.removeEventListener('ln-toggle:open', this._onToggleOpen);
-		this.toggleEl.removeEventListener('ln-toggle:close', this._onToggleClose);
+		if (this.toggleEl) {
+			this.toggleEl.removeEventListener('ln-toggle:open', this._onToggleOpen);
+			this.toggleEl.removeEventListener('ln-toggle:close', this._onToggleClose);
+		}
 		dispatch(this.dom, 'ln-dropdown:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
