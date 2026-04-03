@@ -4,8 +4,11 @@ table {
 	@include table-base;
 }
 
-@media (max-width: 768px) {
-	table {
-		@include table-responsive;
+.table-container {
+	@include container(table);
+	overflow-x: auto;
+
+	@container table (max-width: 640px) {
+		table { @include table-responsive; }
 	}
 }

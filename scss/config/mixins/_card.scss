@@ -144,6 +144,20 @@
 
 	main {
 		@include p(1rem);
+
+		// Auto-flush: table or .table-container as direct child —
+		// remove padding, strip table's own radius/shadow (card's
+		// overflow:hidden handles the rounded corners).
+		&:has(> table),
+		&:has(> .table-container) {
+			@include p(0);
+
+			> table,
+			> .table-container > table {
+				border-radius: 0;
+				box-shadow: none;
+			}
+		}
 	}
 
 	footer {

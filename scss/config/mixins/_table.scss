@@ -53,6 +53,22 @@
 	tr:last-child td {
 		@include border-none;
 	}
+
+	td.numeric,
+	th.numeric {
+		@include text-right;
+		font-variant-numeric: tabular-nums;
+	}
+
+	td.center,
+	th.center {
+		@include text-center;
+	}
+
+	td.nowrap,
+	th.nowrap {
+		@include whitespace-nowrap;
+	}
 }
 
 // ─── Responsive (mobile stacked layout) ─────────────────────────

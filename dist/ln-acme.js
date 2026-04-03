@@ -649,17 +649,15 @@ function pt(u, a) {
   function b(s) {
     const l = Array.from(s.querySelectorAll("[data-ln-toggle-for]"));
     s.hasAttribute && s.hasAttribute("data-ln-toggle-for") && l.push(s);
-    for (const o of l) {
-      if (o[a + "Trigger"]) return;
-      o[a + "Trigger"] = !0, o.addEventListener("click", function(t) {
+    for (const o of l)
+      o[a + "Trigger"] || (o[a + "Trigger"] = !0, o.addEventListener("click", function(t) {
         if (t.ctrlKey || t.metaKey || t.button === 1) return;
         t.preventDefault();
         const e = o.getAttribute("data-ln-toggle-for"), n = document.getElementById(e);
         if (!n || !n[a]) return;
         const r = o.getAttribute("data-ln-toggle-action") || "toggle";
         n[a][r]();
-      });
-    }
+      }));
   }
   function _(s) {
     return this.dom = s, this.isOpen = s.getAttribute(u) === "open", this.isOpen && s.classList.add("open"), this;
@@ -879,7 +877,7 @@ function pt(u, a) {
     const L = document.createElement("strong");
     L.className = "ln-toast__title", L.textContent = d || f(i);
     const w = document.createElement("button");
-    return w.type = "button", w.className = "ln-toast__close", w.setAttribute("aria-label", "Close"), w.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>', w.addEventListener("click", function() {
+    return w.type = "button", w.className = "ln-toast__close", w.setAttribute("aria-label", "Close"), w.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>', w.addEventListener("click", function() {
       t(p);
     }), C.appendChild(L), S.appendChild(C), S.appendChild(w), h.appendChild(g), h.appendChild(S), { card: h, content: S };
   }
@@ -977,7 +975,7 @@ function pt(u, a) {
     return i.split(".").pop().toLowerCase();
   }
   function l(i) {
-    return i === "docx" && (i = "doc"), ["pdf", "doc", "epub"].includes(i) ? "ln-file-" + i : "ln-file";
+    return i === "docx" && (i = "doc"), ["pdf", "doc", "epub"].includes(i) ? "lnc-file-" + i : "ln-file";
   }
   function o(i) {
     var d = document.createElement("span");
@@ -1028,7 +1026,7 @@ function pt(u, a) {
       const Y = document.createElement("span");
       Y.className = "ln-upload__size", Y.textContent = "0%";
       const c = document.createElement("button");
-      c.type = "button", c.className = "ln-upload__remove", c.setAttribute("aria-label", m(i, "remove")), c.title = m(i, "remove"), c.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>', c.disabled = !0;
+      c.type = "button", c.className = "ln-upload__remove", c.setAttribute("aria-label", m(i, "remove")), c.title = m(i, "remove"), c.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>', c.disabled = !0;
       const E = document.createElement("div");
       E.className = "ln-upload__progress";
       const y = document.createElement("div");
