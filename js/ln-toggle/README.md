@@ -29,6 +29,7 @@ el.lnToggle.open();       // sets data-ln-toggle="open" → observer applies sta
 el.lnToggle.close();      // sets data-ln-toggle="close" → observer applies state
 el.lnToggle.toggle();     // toggles based on current state
 el.lnToggle.isOpen;       // boolean (read-only)
+el.lnToggle.destroy();    // removes instance, dispatches ln-toggle:destroyed
 
 // Direct attribute change — equivalent to calling the API
 el.setAttribute('data-ln-toggle', 'open');   // same as el.lnToggle.open()
@@ -47,6 +48,7 @@ window.lnToggle(container);
 | `ln-toggle:open` | yes | no | `{ target: HTMLElement }` |
 | `ln-toggle:before-close` | yes | **yes** | `{ target: HTMLElement }` |
 | `ln-toggle:close` | yes | no | `{ target: HTMLElement }` |
+| `ln-toggle:destroyed` | yes | no | `{ target: HTMLElement }` |
 
 ```javascript
 // Listen for open

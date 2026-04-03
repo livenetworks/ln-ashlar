@@ -12,9 +12,13 @@ A confirmation prompt for destructive actions. First click changes the button te
 
 ## Behavior
 
-1. **First click** — `preventDefault` + `stopImmediatePropagation`, button text changes to the confirm message, `data-confirming` attribute is set
+1. **First click** — `preventDefault` + `stopImmediatePropagation`, button changes to confirm state, `data-confirming` attribute is set
 2. **Second click** — action proceeds normally (form submit, etc.), button resets
-3. **Auto-revert** — if no second click within the timeout, the button reverts to its original text
+3. **Auto-revert** — if no second click within the timeout, the button reverts to its original state
+
+**Text buttons** — text content is swapped to the confirm message.
+
+**Icon-only buttons** — if the button contains only `<svg class="ln-icon">` with no text, the icon `href` swaps to `#ln-check` and a tooltip shows the confirm text via `data-tooltip-text` (requires `.ln-confirm-tooltip` CSS).
 
 ## Timeout
 
@@ -49,9 +53,9 @@ The `data-ln-confirm-timeout` attribute is observed — changing it dynamically 
 
 Events are dispatched on the button element and bubble up.
 
-| Event | When | `detail` |
-|-------|------|----------|
-| `ln-confirm:waiting` | When entering confirmation state (first click) | `{ target }` |
+| Event | Bubbles | Cancelable | When | `detail` |
+|-------|---------|------------|------|----------|
+| `ln-confirm:waiting` | yes | no | Entering confirmation state (first click) | `{ target }` |
 
 ```javascript
 document.addEventListener('ln-confirm:waiting', function(e) {

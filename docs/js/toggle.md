@@ -40,6 +40,7 @@ The `data-ln-toggle` attribute is the single source of truth. All state changes 
 | `ln-toggle:open` | yes | no | `{ target }` |
 | `ln-toggle:before-close` | yes | **yes** | `{ target }` |
 | `ln-toggle:close` | yes | no | `{ target }` |
+| `ln-toggle:destroyed` | yes | no | `{ target }` |
 
 If `before-open`/`before-close` is canceled (`preventDefault()`), the observer reverts the attribute.
 
@@ -51,6 +52,7 @@ el.lnToggle.open();       // sets attribute → observer applies state
 el.lnToggle.close();      // sets attribute → observer applies state
 el.lnToggle.toggle();     // toggles based on current state
 el.lnToggle.isOpen;       // boolean
+el.lnToggle.destroy();    // removes instance, dispatches ln-toggle:destroyed
 
 // Direct attribute change — identical result
 el.setAttribute('data-ln-toggle', 'open');
@@ -124,8 +126,8 @@ Buttons with `data-ln-toggle-for="id"` are wired up by `_attachTriggers()`:
 
 A single global observer watches `document.body` for:
 
-- **`childList`** (subtree): new elements added to DOM → `_findElements` + `_attachTriggers` auto-initializes them
-- **`attributes`** (`data-ln-toggle`, `data-ln-toggle-for`): attribute changes on existing elements → either `_syncAttribute` (state change) or `_findElements` + `_attachTriggers` (new component/trigger)
+- **`childList`** (subtree): new elements added to DOM → `findElements` + `_attachTriggers` auto-initializes them
+- **`attributes`** (`data-ln-toggle`, `data-ln-toggle-for`): attribute changes on existing elements → either `_syncAttribute` (state change) or `findElements` + `_attachTriggers` (new component/trigger)
 
 ### Why This Matters
 

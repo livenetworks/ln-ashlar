@@ -48,6 +48,7 @@ Only one `ln-toggle` element can be open at a time.
 | Event | Bubbles | Cancelable | Detail |
 |-------|---------|------------|--------|
 | `ln-accordion:change` | yes | no | `{ target: HTMLElement }` |
+| `ln-accordion:destroyed` | yes | no | `{ target: HTMLElement }` |
 
 ```javascript
 document.addEventListener('ln-accordion:change', function (e) {
@@ -73,6 +74,8 @@ This is the canonical example of the **Coordinator/Mediator Pattern** described 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
 // For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnAccordion(document.body);
-```
 
-Accordion has no instance methods — its job is only to coordinate `ln-toggle` children.
+// Instance API
+const acc = document.querySelector('[data-ln-accordion]');
+acc.lnAccordion.destroy();   // removes coordinator, dispatches ln-accordion:destroyed
+```

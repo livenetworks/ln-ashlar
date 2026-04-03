@@ -29,7 +29,7 @@ import { guardBody, dispatch } from '../ln-core';
 	function _getIconId(extension) {
 		if (extension === 'docx') extension = 'doc';
 		const supported = ['pdf', 'doc', 'epub'];
-		return supported.includes(extension) ? 'ln-file-' + extension : 'ln-file';
+		return supported.includes(extension) ? 'lnc-file-' + extension : 'ln-file';
 	}
 
 	function _makeIcon(iconId) {
@@ -122,7 +122,7 @@ import { guardBody, dispatch } from '../ln-core';
 			removeBtn.className = 'ln-upload__remove';
 			removeBtn.setAttribute('aria-label', _getDict(container, 'remove'));
 			removeBtn.title = _getDict(container, 'remove');
-			removeBtn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>';
+			removeBtn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>';
 			removeBtn.disabled = true;
 
 			const progress = document.createElement('div');

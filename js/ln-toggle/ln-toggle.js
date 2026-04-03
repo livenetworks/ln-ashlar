@@ -19,7 +19,7 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 			triggers.push(root);
 		}
 		for (const btn of triggers) {
-			if (btn[DOM_ATTRIBUTE + 'Trigger']) return;
+			if (btn[DOM_ATTRIBUTE + 'Trigger']) continue;
 			btn[DOM_ATTRIBUTE + 'Trigger'] = true;
 			btn.addEventListener('click', function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;

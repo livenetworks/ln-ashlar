@@ -23,7 +23,7 @@ Required `<template>` elements (before `</body>`):
     <li>
         <p data-ln-translations-lang>
             <span></span>
-            <button type="button" aria-label="Remove">&times;</button>
+            <button type="button" aria-label="Remove"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
         </p>
     </li>
 </template>
@@ -140,8 +140,9 @@ name="items[5][trans][en][title]"
         <div class="ln-translations__actions">
             <ul data-ln-translations-active></ul>
             <div data-ln-dropdown>
-                <button type="button" data-ln-translations-add
-                        data-ln-toggle-for="trans-menu" class="ln-icon-globe"></button>
+                <button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu">
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
+                </button>
                 <ul id="trans-menu" data-ln-toggle></ul>
             </div>
         </div>
@@ -167,8 +168,9 @@ name="items[5][trans][en][title]"
         <div class="ln-translations__actions">
             <ul data-ln-translations-active></ul>
             <div data-ln-dropdown>
-                <button type="button" data-ln-translations-add
-                        data-ln-toggle-for="trans-menu" class="ln-icon-globe"></button>
+                <button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu">
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
+                </button>
                 <ul id="trans-menu" data-ln-toggle></ul>
             </div>
         </div>
@@ -192,8 +194,9 @@ name="items[5][trans][en][title]"
         <div class="ln-translations__actions">
             <ul data-ln-translations-active></ul>
             <div data-ln-dropdown>
-                <button type="button" data-ln-translations-add
-                        data-ln-toggle-for="trans-menu" class="ln-icon-globe"></button>
+                <button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu">
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
+                </button>
                 <ul id="trans-menu" data-ln-toggle></ul>
             </div>
         </div>

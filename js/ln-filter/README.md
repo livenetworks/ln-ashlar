@@ -22,6 +22,7 @@ var el = document.querySelector('[data-ln-filter]');
 el.lnFilter.filter('genre', 'rock');  // programmatically filter
 el.lnFilter.reset();                   // clear filter, show all
 el.lnFilter.getActive();               // { key: 'genre', value: 'rock' } or null
+el.lnFilter.destroy();                 // remove listeners, clean up
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
 // For AJAX/dynamic DOM or setAttribute: MutationObserver automatically initializes
@@ -30,10 +31,10 @@ window.lnFilter(container);
 
 ## Events
 
-| Event | Bubbles | Detail |
-|-------|---------|--------|
-| `ln-filter:changed` | yes | `{ key: string, value: string }` |
-| `ln-filter:reset` | yes | `{}` |
+| Event | Bubbles | Cancelable | Detail |
+|-------|---------|------------|--------|
+| `ln-filter:changed` | yes | no | `{ key: string, value: string }` |
+| `ln-filter:reset` | yes | no | `{}` |
 
 ```javascript
 // Listen for filter change
@@ -114,7 +115,7 @@ Uses `reactiveState` + `createBatcher` from `ln-core`. State is `{ key, value }`
 
 ## Dynamic elements
 
-When children are added to the target list (AJAX, populate), `ln-filter` automatically re-filters them if there is an active filter. A MutationObserver on the target element ensures this.
+MutationObserver auto-initializes new `[data-ln-filter]` elements added to the DOM. It does NOT automatically re-filter when new children are added to the target — call `el.lnFilter.filter(key, value)` manually after populating the target with new items.
 
 ## Programmatic
 

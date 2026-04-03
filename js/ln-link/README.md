@@ -94,4 +94,5 @@ table[data-ln-link] tbody tr {
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
 // For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
 window.lnLink.init(document.getElementById('my-table'));
+window.lnLink.destroy(document.getElementById('my-table'));  // removes all row listeners
 ```

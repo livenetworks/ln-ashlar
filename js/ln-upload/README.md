@@ -112,11 +112,13 @@ const ids = document.getElementById('my-upload').lnUploadAPI.getFileIds();
 
 ## File Icons
 
-The component automatically adds a CSS class for the file icon:
-- `.ln-icon-file-pdf` — PDF
-- `.ln-icon-file-doc` — DOC/DOCX
-- `.ln-icon-file-epub` — EPUB
-- `.ln-icon-file` — other
+The component automatically adds an SVG icon per file type using the icon loader:
+- `#lnc-file-pdf` — PDF (custom CDN)
+- `#lnc-file-doc` — DOC/DOCX (custom CDN)
+- `#lnc-file-epub` — EPUB (custom CDN)
+- `#ln-file` — all other types (Tabler CDN)
+
+Custom icons require `window.LN_ICONS_CUSTOM_CDN` to be set. See `js/ln-icons/README.md`.
 
 ## Hidden Inputs
 

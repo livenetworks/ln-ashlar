@@ -79,7 +79,7 @@ import { guardBody } from '../ln-core';
 		x.type = "button";
 		x.className = "ln-toast__close";
 		x.setAttribute("aria-label", "Close");
-		x.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>';
+		x.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>';
 		x.addEventListener("click", function () { _dismiss(li); });
 
 		head.appendChild(tt);

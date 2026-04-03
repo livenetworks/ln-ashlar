@@ -40,11 +40,11 @@ Keys not in this map are treated as **custom errors** — managed exclusively vi
 
 ## Events — Emitted
 
-| Event | Bubbles | `detail` |
-|-------|---------|----------|
-| `ln-validate:valid` | yes | `{ target, field }` |
-| `ln-validate:invalid` | yes | `{ target, field }` |
-| `ln-validate:destroyed` | yes | `{ target }` |
+| Event | Bubbles | Cancelable | `detail` |
+|-------|---------|------------|----------|
+| `ln-validate:valid` | yes | no | `{ target, field }` |
+| `ln-validate:invalid` | yes | no | `{ target, field }` |
+| `ln-validate:destroyed` | yes | no | `{ target }` |
 
 ## Events — Received
 

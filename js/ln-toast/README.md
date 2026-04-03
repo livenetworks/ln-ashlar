@@ -19,8 +19,8 @@ Builds toast DOM imperatively via `createElement`. Supports both server-side ren
 ## API
 
 ```javascript
-// Add toast programmatically — returns numeric toast id
-var id = lnToast.enqueue({
+// Add toast programmatically — returns the <li> element
+var li = lnToast.enqueue({
     type: 'success',           // success | error | warn | info
     title: 'Saved',            // optional, default by type
     message: 'Changes have been saved.',
@@ -64,33 +64,17 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 
 ## Types
 
-| Type | Default title | Icon class |
-|------|--------------|------------|
-| `success` | Success | `#ln-circle-check` |
-| `error` | Error | `#ln-circle-x` |
-| `warn` | Warning | `ln-icon-warning` |
-| `info` | Information | `ln-icon-info-circle` |
+| Type | Default title | Icon |
+|------|--------------|------|
+| `success` | Success | Checkmark (inline SVG) |
+| `error` | Error | Circle-X (inline SVG) |
+| `warn` | Warning | Triangle warning (inline SVG) |
+| `info` | Information | Circle info (inline SVG) |
 
 ## HTML Structure
 
 ```html
-<!-- Template (once per layout — fallback injected if missing) -->
-<template data-ln-template="ln-toast-item">
-    <li class="ln-toast__item">
-        <div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
-            <div class="ln-toast__side"></div>
-            <div class="ln-toast__content">
-                <div class="ln-toast__head">
-                    <strong class="ln-toast__title" data-ln-field="title"></strong>
-                </div>
-                <button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg aria-label="Close"></button>
-                <div class="ln-toast__body" data-ln-show="hasBody"></div>
-            </div>
-        </div>
-    </li>
-</template>
-
-<!-- Container (usually in the layout, top right) -->
+<!-- Container (once per layout) -->
 <ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
 
 <!-- Server-side rendered toasts (Laravel flash) -->
@@ -103,6 +87,9 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
     </li>
 </ul>
 ```
+
+Toasts are built imperatively via `createElement` — no `<template>` element needed.
+SSR toasts (`data-ln-toast-item`) are hydrated into full toast cards on init.
 
 ## Programmatic
 

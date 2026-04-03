@@ -62,6 +62,7 @@ Multiple sections on the same page — each stores its own state:
 ```javascript
 // Instance API (on DOM element)
 document.getElementById('user-tabs').lnTabs.activate('settings');
+document.getElementById('user-tabs').lnTabs.destroy();   // removes listeners, dispatches ln-tabs:destroyed
 
 // Via hash
 location.hash = 'user-tabs:settings';
@@ -88,9 +89,10 @@ window.lnTabs(document.body);
 
 Events are dispatched on the wrapper element (`[data-ln-tabs]`) and bubble up.
 
-| Event | When | `detail` |
-|-------|------|----------|
-| `ln-tabs:change` | After activating a new tab | `{ key, tab, panel }` |
+| Event | Bubbles | Cancelable | When | `detail` |
+|-------|---------|------------|------|----------|
+| `ln-tabs:change` | yes | no | After activating a new tab | `{ key, tab, panel }` |
+| `ln-tabs:destroyed` | yes | no | Instance destroyed | `{ target }` |
 
 ```javascript
 document.getElementById('user-tabs').addEventListener('ln-tabs:change', function(e) {

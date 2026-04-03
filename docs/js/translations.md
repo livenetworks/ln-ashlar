@@ -20,12 +20,12 @@ Multi-language form field management. Clones input fields for each added languag
     <div class="form-element" data-ln-translatable="title">
         <label for="title">Title</label>
         <input id="title" name="title" type="text">
-    </p>
+    </div>
 
     <div class="form-element" data-ln-translatable="description" data-ln-translations-prefix="meta">
         <label for="description">Description</label>
         <textarea id="description" name="meta[description]"></textarea>
-    </p>
+    </div>
 </form>
 
 <!-- Templates (end of body) -->
@@ -50,8 +50,8 @@ Multi-language form field management. Clones input fields for each added languag
 | `data-ln-translations-locales='{"en":"English",...}'` | `<form>` | Available locales as JSON (default: en, sq, sr) |
 | `data-ln-translations-active` | container | Where language badges are rendered |
 | `data-ln-translations-add` | trigger button | Hidden when all languages are active |
-| `data-ln-translatable="field"` | wrapper `<p>` | Marks a field group as translatable |
-| `data-ln-translations-prefix="prefix"` | wrapper `<p>` | Name prefix for cloned inputs |
+| `data-ln-translatable="field"` | wrapper element (`<div>`, `<p>`, `<article>`, etc.) | Marks a field group as translatable |
+| `data-ln-translations-prefix="prefix"` | wrapper element | Name prefix for cloned inputs |
 | `data-ln-translatable-lang="lang"` | input/textarea | Language code for that field |
 
 ## Generated Input Names

@@ -45,6 +45,7 @@ The `data-ln-sortable` attribute is the single source of truth. `data-ln-sortabl
 | `ln-sortable:reordered` | yes | no | `{ item, oldIndex, newIndex }` |
 | `ln-sortable:enabled` | yes | no | `{ target }` |
 | `ln-sortable:disabled` | yes | no | `{ target }` |
+| `ln-sortable:destroyed` | yes | no | `{ target }` |
 
 ## CSS Classes (set by JS, styled by consumer)
 
@@ -62,6 +63,7 @@ const list = document.querySelector('[data-ln-sortable]');
 list.lnSortable.enable();     // sets attribute → observer syncs state
 list.lnSortable.disable();    // sets attribute → observer syncs state
 list.lnSortable.isEnabled;    // boolean
+list.lnSortable.destroy();    // removes all listeners, dispatches ln-sortable:destroyed
 
 // Direct attribute change — identical result
 list.setAttribute('data-ln-sortable', 'disabled');

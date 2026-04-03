@@ -20,7 +20,7 @@ Search is provided by **`ln-search`** (generic component) — `data-ln-search="t
         <h3>Employees</h3>
         <aside>
             <label class="ln-table__search">
-                <span class="ln-icon-filter ln-icon--sm"></span>
+                <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
                 <input type="search" placeholder="Search..." data-ln-search="employees">
             </label>
             <span class="ln-table__count"></span>
@@ -113,10 +113,10 @@ When search returns 0 results, the content of `<template data-ln-table-empty>` i
 <div id="employees" data-ln-table>
     <template data-ln-table-empty>
         <article class="ln-table__empty-state">
-            <span class="ln-icon-filter ln-icon--xl"></span>
+            <svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-filter"></use></svg>
             <h3>No results found</h3>
             <p>Try a different search term.</p>
-            <button class="btn btn--secondary" data-ln-table-clear>Clear</button>
+            <button type="button" data-ln-table-clear>Clear</button>
         </article>
     </template>
 

@@ -56,3 +56,4 @@ SPA-like navigation for links and forms. File: `js/ln-ajax/ln-ajax.js`.
 - Ctrl/Cmd+click and middle-click open normally (not intercepted)
 - `.ln-ajax--loading` class added during request
 - Buttons disabled during form submission
+- If `window.lnToast` exists and the response contains a `message` object, a toast is shown automatically — no project-level wiring needed

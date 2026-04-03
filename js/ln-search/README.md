@@ -11,7 +11,7 @@ Works on lists and on `[data-ln-table]` components.
 | `data-ln-search-items="selector"` | same element as `data-ln-search` | CSS selector passed to `querySelectorAll` on the target — enables filtering nested elements instead of direct children |
 | `data-ln-search-hide` | children of target | Set by JS when the element doesn't match |
 
-When placed on a wrapper, the component finds the first `input[type="search"]`, `input[type="text"]`, or `[name="search"]` inside it.
+When placed on a wrapper, the component finds the input inside it in this priority order: `[name="search"]`, `input[type="search"]`, `input[type="text"]`.
 When placed directly on an `<input>`, that input is used.
 
 ## Events

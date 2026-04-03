@@ -96,9 +96,9 @@ Second click (confirming = true):
 On first click, `_enterConfirm()` checks if the button contains an `svg.ln-icon use` element. If so, it's treated as an icon button:
 
 1. Store the original `href` from `svg.ln-icon use` (e.g., `#ln-trash`)
-2. Swap `href` to `#ln-check`, add `text-success` + `ln-confirm-tooltip`
+2. Swap `href` to `#ln-check`, add `ln-confirm-tooltip` class
 3. Set `data-tooltip-text` to the confirm text (shown as tooltip since there's no text content)
-4. On reset: restore original `href`, remove `text-success` + `ln-confirm-tooltip`
+4. On reset: restore original `href`, remove `ln-confirm-tooltip` class, remove `data-tooltip-text`
 
 For text buttons, the swap is simpler: `dom.textContent = confirmText` on enter, `dom.textContent = originalText` on reset.
 
@@ -134,5 +134,5 @@ Only one event is dispatched: `ln-confirm:waiting` when entering confirmation st
 
 A single global observer watches `document.body` for:
 
-- **`childList`** (subtree): new elements → `_findElements` auto-initializes confirm buttons
+- **`childList`** (subtree): new elements → `findElements` auto-initializes confirm buttons
 - **`attributes`** (`data-ln-confirm`, `data-ln-confirm-timeout`): `data-ln-confirm` → re-init check; `data-ln-confirm-timeout` → `_syncTimeout` restarts timer if confirming

@@ -8,7 +8,7 @@ Generic search component — filters children of a target element by `textConten
 <!-- Search on wrapper (input auto-detected inside) -->
 <fieldset data-ln-search="my-list">
     <legend class="sr-only">Search</legend>
-    <span class="ln-icon-search ln-icon--sm"></span>
+    <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
     <input type="search" placeholder="Search..." />
 </fieldset>
 
@@ -58,4 +58,4 @@ el.lnSearch.destroy();    // remove listeners, clean up
 - Default: iterates `target.children` (direct children)
 - With `data-ln-search-items`: iterates `target.querySelectorAll(selector)` — supports nested structures
 - Works independently alongside `ln-filter` on the same target
-- MutationObserver auto-re-filters dynamically added children
+- MutationObserver auto-initializes new `[data-ln-search]` elements — it does NOT re-filter when new children are added to the target

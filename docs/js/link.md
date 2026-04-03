@@ -52,4 +52,5 @@ Clickable rows component — makes entire rows (or other elements) click-navigab
 
 ```js
 window.lnLink.init(document.getElementById('my-table'));
+window.lnLink.destroy(document.getElementById('my-table'));  // removes all row listeners
 ```

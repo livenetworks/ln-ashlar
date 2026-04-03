@@ -30,10 +30,10 @@ Form coordinator — intercepts native submit, manages fill/reset, tracks valida
 
 ## Events — Emitted
 
-| Event | Bubbles | `detail` |
-|-------|---------|----------|
-| `ln-form:submit` | yes | `{ data: Object }` |
-| `ln-form:destroyed` | yes | `{ target }` |
+| Event | Bubbles | Cancelable | `detail` |
+|-------|---------|------------|----------|
+| `ln-form:submit` | yes | no | `{ data: Object }` |
+| `ln-form:destroyed` | yes | no | `{ target }` |
 
 ## Events — Received
 

@@ -60,6 +60,7 @@ Sizes via SCSS mixins (not CSS classes):
 | `ln-modal:open` | yes | no | `{ modalId, target }` |
 | `ln-modal:before-close` | yes | **yes** | `{ modalId, target }` |
 | `ln-modal:close` | yes | no | `{ modalId, target }` |
+| `ln-modal:destroyed` | yes | no | `{ modalId, target }` |
 
 If `before-open`/`before-close` is canceled (`preventDefault()`), the observer reverts the attribute.
 

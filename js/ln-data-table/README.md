@@ -145,7 +145,7 @@ Activates automatically when data exceeds **200 rows**. Renders only visible row
         <h3>Documents</h3>
         <aside>
             <label>
-                <span class="ln-icon-search ln-icon--sm"></span>
+                <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
                 <input type="search" placeholder="Search..." data-ln-data-table-search>
             </label>
         </aside>
@@ -157,16 +157,16 @@ Activates automatically when data exceeds **200 rows**. Renders only visible row
                 <th data-ln-col-select></th>
                 <th data-ln-col="title">
                     Title
-                    <button data-ln-col-sort class="ln-icon-sort"></button>
+                    <button data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button>
                 </th>
                 <th data-ln-col="department">
                     Department
-                    <button data-ln-col-sort class="ln-icon-sort"></button>
-                    <button data-ln-col-filter class="ln-icon-filter"></button>
+                    <button data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button>
+                    <button data-ln-col-filter aria-label="Filter"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
                 </th>
                 <th data-ln-col="status">
                     Status
-                    <button data-ln-col-filter class="ln-icon-filter"></button>
+                    <button data-ln-col-filter aria-label="Filter"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
                 </th>
                 <th>Actions</th>
             </tr>
@@ -195,8 +195,8 @@ Activates automatically when data exceeds **200 rows**. Renders only visible row
             <td data-ln-cell="department"></td>
             <td data-ln-cell="status"></td>
             <td>
-                <button data-ln-row-action="edit" class="ln-icon-edit" aria-label="Edit"></button>
-                <button data-ln-row-action="delete" aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg> aria-label="Delete"></button>
+                <button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
+                <button data-ln-row-action="delete" aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
             </td>
         </tr>
     </template>

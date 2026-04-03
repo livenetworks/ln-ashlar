@@ -55,11 +55,11 @@ Clicking outside both the trigger wrapper and the teleported menu closes the dro
 
 ## Events
 
-| Event | Bubbles | Detail |
-|-------|---------|--------|
-| `ln-dropdown:open` | yes | `{ target: menuElement }` |
-| `ln-dropdown:close` | yes | `{ target: menuElement }` |
-| `ln-dropdown:destroyed` | yes | `{ target: wrapperElement }` |
+| Event | Bubbles | Cancelable | Detail |
+|-------|---------|------------|--------|
+| `ln-dropdown:open` | yes | no | `{ target: menuElement }` |
+| `ln-dropdown:close` | yes | no | `{ target: menuElement }` |
+| `ln-dropdown:destroyed` | yes | no | `{ target: wrapperElement }` |
 
 ```javascript
 document.addEventListener('ln-dropdown:open', function (e) {

@@ -32,10 +32,10 @@ Generic filter component — filters children of a target element by `data-*` at
 
 ## Events
 
-| Event | Bubbles | `detail` |
-|-------|---------|----------|
-| `ln-filter:changed` | yes | `{ key: string, value: string }` |
-| `ln-filter:reset` | yes | `{}` |
+| Event | Bubbles | Cancelable | `detail` |
+|-------|---------|------------|----------|
+| `ln-filter:changed` | yes | no | `{ key: string, value: string }` |
+| `ln-filter:reset` | yes | no | `{}` |
 
 Both events dispatch on the filter nav element AND the target element (dual dispatch).
 
@@ -46,6 +46,7 @@ const el = document.querySelector('[data-ln-filter]');
 el.lnFilter.filter('genre', 'rock');  // filter programmatically
 el.lnFilter.reset();                   // clear filter, show all
 el.lnFilter.getActive();               // { key, value } or null
+el.lnFilter.destroy();                 // remove listeners, clean up
 ```
 
 ## CSS (consumer provides)
@@ -184,4 +185,4 @@ State is flat — two scalar values (`key`, `value`). No nested objects or array
 1. **Init**: MutationObserver or DOMContentLoaded → `_findElements` → `new _component(dom)`
 2. **Guard**: `data-ln-filter-initialized` attribute prevents double-init on the same element
 3. **Steady state**: click or API call → set state → batcher → render → dispatch events
-4. **No destroy method**: ln-filter does not currently expose a `destroy()`. The guard attribute and bound-flag on buttons prevent re-initialization issues.
+4. **Destroy**: `destroy()` removes all click listeners, the init guard attribute, and the instance reference.

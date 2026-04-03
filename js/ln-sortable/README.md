@@ -27,6 +27,7 @@ var list = document.querySelector('[data-ln-sortable]');
 list.lnSortable.enable();     // sets data-ln-sortable="" → observer syncs state
 list.lnSortable.disable();    // sets data-ln-sortable="disabled" → observer syncs state
 list.lnSortable.isEnabled;    // boolean
+list.lnSortable.destroy();    // removes all listeners, dispatches ln-sortable:destroyed
 
 // Direct attribute change — identical result
 list.setAttribute('data-ln-sortable', '');           // same as enable()
@@ -44,6 +45,9 @@ window.lnSortable(container);
 | `ln-sortable:before-drag` | yes | **yes** | `{ item: HTMLElement, index: number }` |
 | `ln-sortable:drag-start` | yes | no | `{ item: HTMLElement, index: number }` |
 | `ln-sortable:reordered` | yes | no | `{ item: HTMLElement, oldIndex: number, newIndex: number }` |
+| `ln-sortable:enabled` | yes | no | `{ target: HTMLElement }` |
+| `ln-sortable:disabled` | yes | no | `{ target: HTMLElement }` |
+| `ln-sortable:destroyed` | yes | no | `{ target: HTMLElement }` |
 
 ```javascript
 // Listen for reordering

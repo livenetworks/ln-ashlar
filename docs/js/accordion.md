@@ -32,6 +32,7 @@ Coordinator wrapper — listens to `ln-toggle:open` events from children and clo
 | Event | Bubbles | Cancelable | `detail` |
 |-------|---------|------------|----------|
 | `ln-accordion:change` | yes | no | `{ target: HTMLElement }` |
+| `ln-accordion:destroyed` | yes | no | `{ target: HTMLElement }` |
 
 Fired on the accordion container when a panel opens (after siblings are closed).
 
@@ -48,6 +49,8 @@ Accordion never calls toggle API directly (`el.lnToggle.close()`). It sets the a
 ```js
 // Manual initialization
 window.lnAccordion(document.body);
-```
 
-No instance methods — accordion only coordinates `ln-toggle` children.
+// Instance API
+const acc = document.querySelector('[data-ln-accordion]');
+acc.lnAccordion.destroy();   // removes coordinator, dispatches ln-accordion:destroyed
+```
