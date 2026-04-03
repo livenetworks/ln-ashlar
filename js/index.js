@@ -32,3 +32,4 @@ import './ln-time/ln-time.js';
 import './ln-store/ln-store.js';
 import './ln-data-table/ln-data-table.js';
 import './ln-data-table/ln-data-table.scss';
+import './ln-icons/ln-icons.js';

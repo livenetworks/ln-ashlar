@@ -168,34 +168,25 @@
 }
 
 // ── Sort indicators on th ──
+// ln-table-sort.js injects <svg class="ln-icon ln-sort-icon"> into each th[data-ln-sort]
+// and updates the <use href> when sort state changes.
 [data-ln-table] th[data-ln-sort] {
 	@include cursor-pointer;
 	@include select-none;
 
-	&::after {
-		content: '';
-		@include inline-block;
+	svg.ln-sort-icon {
 		@include size(0.875rem);
 		@include ml(0.25rem);
 		vertical-align: middle;
-		background-image: var(--icon-sort-both);
-		background-size: contain;
-		background-repeat: no-repeat;
 		opacity: 0.4;
 		@include transition-fast;
 	}
 
-	&:hover::after {
+	&:hover svg.ln-sort-icon {
 		opacity: 0.7;
 	}
 
-	&[data-ln-sort-active="asc"]::after {
-		background-image: var(--icon-arrow-up-white);
-		opacity: 1;
-	}
-
-	&[data-ln-sort-active="desc"]::after {
-		background-image: var(--icon-arrow-down-white);
+	&[data-ln-sort-active] svg.ln-sort-icon {
 		opacity: 1;
 	}
 }
@@ -347,7 +338,7 @@
 	@include py(3rem);
 	@include text-center;
 
-	[class*="ln-icon-"] {
+	svg.ln-icon {
 		@include block;
 		@include mx(auto);
 		@include mb(1rem);

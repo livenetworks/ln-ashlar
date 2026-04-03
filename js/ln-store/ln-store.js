@@ -222,7 +222,8 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this._name = dom.getAttribute(DOM_SELECTOR);
 		this._endpoint = dom.getAttribute('data-ln-store-endpoint') || '';
 		const staleAttr = dom.getAttribute('data-ln-store-stale');
-		this._staleThreshold = (staleAttr === 'never' || staleAttr === '-1') ? -1 : (parseInt(staleAttr, 10) || 300);
+		const _parsed = parseInt(staleAttr, 10);
+		this._staleThreshold = (staleAttr === 'never' || staleAttr === '-1') ? -1 : (isNaN(_parsed) ? 300 : _parsed);
 		this._searchFields = (dom.getAttribute('data-ln-store-search-fields') || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
 		this._abortController = null;
 		this._handlers = null;
@@ -629,17 +630,12 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 					self.lastSyncedAt = syncedAt;
 					self._abortController = null;
 
-					if (hasChanges) {
-						dispatch(self.dom, 'ln-store:synced', {
-							store: self._name,
-							added: upserted.length,
-							deleted: deleted.length
-						});
-					} else {
-						dispatch(self.dom, 'ln-store:unchanged', {
-							store: self._name
-						});
-					}
+					dispatch(self.dom, 'ln-store:synced', {
+						store: self._name,
+						added: upserted.length,
+						deleted: deleted.length,
+						changed: hasChanges
+					});
 				});
 			})
 			.catch(function (err) {
@@ -686,16 +682,18 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 	// ─── Visibility Change ─────────────────────────────────
 
-	document.addEventListener('visibilitychange', function () {
+	let _visibilityHandler = null;
+	_visibilityHandler = function () {
 		if (document.visibilityState !== 'visible') return;
 		const names = Object.keys(_stores);
 		for (let i = 0; i < names.length; i++) {
 			const inst = _stores[names[i]];
-			if (inst.isLoaded && !inst.isSyncing && (inst._staleThreshold === -1 || _isStale(inst))) {
+			if (inst.isLoaded && !inst.isSyncing && _isStale(inst)) {
 				_deltaSync(inst);
 			}
 		}
-	});
+	};
+	document.addEventListener('visibilitychange', _visibilityHandler);
 
 	// ─── Query Engine ──────────────────────────────────────
 
@@ -878,6 +876,12 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		}
 
 		delete _stores[this._name];
+
+		if (Object.keys(_stores).length === 0 && _visibilityHandler) {
+			document.removeEventListener('visibilitychange', _visibilityHandler);
+			_visibilityHandler = null;
+		}
+
 		delete this.dom[DOM_ATTRIBUTE];
 
 		dispatch(this.dom, 'ln-store:destroyed', { store: this._name });

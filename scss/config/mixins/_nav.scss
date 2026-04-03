@@ -8,9 +8,17 @@
 @use 'interaction' as *;
 @use 'position' as *;
 
-// ─── Nav ────────────────────────────────────────────────────────
-// Navigation reset: clean list, styled links, transitions.
-// Layout (flex-col, h-full) and background come from the parent.
+// ─── Nav ────────────────────────────────────────────────────────────────────
+// Navigation structure reset. Layout (flex-col, h-full) and background come
+// from the parent container.
+//
+// Link appearance is controlled by a style preset mixin. The default is
+// nav-links-rounded. Override by applying a different preset after:
+//
+//   nav { @include nav; }                           ← rounded (default)
+//   nav { @include nav; @include nav-links-border-grow; }
+//   nav { @include nav; @include nav-links-border-left; }
+//   nav { @include nav; @include nav-links-border-top; }  ← horizontal navs
 
 @mixin nav {
 	@include select-none;
@@ -29,36 +37,10 @@
 		@include flex;
 		@include items-center;
 		@include gap(0.75rem);
-		@include px(1rem);
 		@include py(0.625rem);
 		@include text-sm;
 		@include text-secondary;
 		text-decoration: none;
-		@include transition-colors;
-		@include rounded-md;
-
-		&:hover {
-			@include bg-secondary;
-			@include text-primary;
-		}
-
-		&.active {
-			background-color: hsl(var(--color-primary-lighter));
-			color: hsl(var(--color-primary));
-			@include font-semibold;
-			@include relative;
-
-			&::before {
-				content: '';
-				@include absolute;
-				left: 0;
-				top: 0.25rem;
-				bottom: 0.25rem;
-				width: 3px;
-				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-				background-color: hsl(var(--color-primary));
-			}
-		}
 	}
 
 	.nav-icon {
@@ -86,5 +68,184 @@
 		@include border-t;
 		@include my(0.5rem);
 		@include mx(1rem);
+	}
+
+	// Default link style — override by applying a nav-links-* mixin after @include nav
+	@include nav-links-rounded;
+}
+
+
+// ─── Nav Link Style Presets ──────────────────────────────────────────────────
+// Each preset fully controls: padding/margin, radius, hover state, active
+// state, and any indicator element.
+//
+// Hover is always softer (lower opacity indicator + lighter bg) than active.
+// No translateY, no scale, no shadow appear — color + indicator only.
+
+
+// ── 1. Rounded floating (default) ────────────────────────────────────────────
+// Links float as pills inside the sidebar. mx() is required so the rounded
+// corners don't touch the container wall (see visual-language.md rule 1).
+// Active: primary-tinted bg + primary text. No bar indicator.
+@mixin nav-links-rounded {
+	li {
+		&::before { display: none; }
+	}
+
+	a {
+		@include mx(0.5rem);
+		@include px(0.75rem);
+		@include rounded-md;
+		transition: background-color 150ms ease, color 150ms ease;
+
+		&:hover {
+			background-color: hsl(var(--color-primary) / 0.07);
+			@include text-primary;
+		}
+
+		&.active {
+			background-color: hsl(var(--color-primary-lighter));
+			color: hsl(var(--color-primary));
+			@include font-semibold;
+		}
+	}
+}
+
+
+// ── 2. Left border — instant (inset shadow) ───────────────────────────────────
+// Full-width flush links. box-shadow: inset renders a left border without
+// affecting layout and without pseudo-elements.
+// Hover: thin faint bar (2px, 30% opacity). Active: solid 3px bar.
+@mixin nav-links-border-left {
+	li {
+		&::before { display: none; }
+	}
+
+	a {
+		@include mx(0);
+		@include px(1rem);
+		border-radius: 0;
+		transition: box-shadow 150ms ease, background-color 150ms ease, color 150ms ease;
+
+		&:hover {
+			box-shadow: inset 2px 0 0 hsl(var(--color-primary) / 0.3);
+			background-color: hsl(var(--color-primary) / 0.04);
+			@include text-primary;
+		}
+
+		&.active {
+			box-shadow: inset 3px 0 0 hsl(var(--color-primary));
+			background-color: hsl(var(--color-primary) / 0.07);
+			color: hsl(var(--color-primary));
+			@include font-semibold;
+		}
+	}
+}
+
+
+// ── 3. Growing left bar — animated (spring easing) ──────────────────────────
+// li::before bar scales from center. Hover: partial (45%) + faint.
+// Active: full height, full opacity. Spring cubic-bezier for organic feel.
+@mixin nav-links-border-grow {
+	li {
+		@include relative;
+
+		&::before {
+			content: '';
+			@include absolute;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 3px;
+			background-color: hsl(var(--color-primary));
+			border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+			transform: scaleY(0);
+			transform-origin: center;
+			opacity: 0;
+			transition:
+				transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+				opacity   180ms ease;
+		}
+
+		&:has(a:hover)::before {
+			transform: scaleY(0.45);
+			opacity: 0.4;
+		}
+
+		&:has(a.active)::before {
+			transform: scaleY(1);
+			opacity: 1;
+		}
+	}
+
+	a {
+		@include mx(0);
+		@include px(1rem);
+		border-radius: 0;
+		transition: background-color 150ms ease, color 150ms ease;
+
+		&:hover {
+			background-color: hsl(var(--color-primary) / 0.04);
+			@include text-primary;
+		}
+
+		&.active {
+			background-color: hsl(var(--color-primary) / 0.07);
+			color: hsl(var(--color-primary));
+			@include font-semibold;
+		}
+	}
+}
+
+
+// ── 4. Top bar — grow from center (horizontal navs) ──────────────────────────
+// For top navigation, tab bars, breadcrumb rows.
+// Top border grows from 50%/50% → full width via left/right transition.
+// Hover: partial (25–75%) + faint. Active: full width, full opacity.
+@mixin nav-links-border-top {
+	li {
+		@include relative;
+
+		&::before {
+			content: '';
+			@include absolute;
+			top: 0;
+			left: 50%;
+			right: 50%;
+			height: 2px;
+			background-color: hsl(var(--color-primary));
+			border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+			opacity: 0;
+			transition:
+				left    200ms ease,
+				right   200ms ease,
+				opacity 150ms ease;
+		}
+
+		&:has(a:hover)::before {
+			left: 20%;
+			right: 20%;
+			opacity: 0.45;
+		}
+
+		&:has(a.active)::before {
+			left: 0;
+			right: 0;
+			opacity: 1;
+		}
+	}
+
+	a {
+		@include mx(0);
+		@include px(0.75rem);
+		border-radius: 0;
+		transition: color 150ms ease;
+
+		&:hover { @include text-primary; }
+
+		&.active {
+			color: hsl(var(--color-primary));
+			@include font-semibold;
+		}
 	}
 }

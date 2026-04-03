@@ -26,10 +26,16 @@ import { guardBody, dispatch } from '../ln-core';
 		return filename.split('.').pop().toLowerCase();
 	}
 
-	function _getIconClass(extension) {
+	function _getIconId(extension) {
 		if (extension === 'docx') extension = 'doc';
 		const supported = ['pdf', 'doc', 'epub'];
-		return supported.includes(extension) ? 'ln-icon-file-' + extension : 'ln-icon-file';
+		return supported.includes(extension) ? 'ln-file-' + extension : 'ln-file';
+	}
+
+	function _makeIcon(iconId) {
+		var el = document.createElement('span');
+		el.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#' + iconId + '"></use></svg>';
+		return el.firstElementChild;
 	}
 
 	function _isValidFile(file, acceptString) {
@@ -95,11 +101,13 @@ import { guardBody, dispatch } from '../ln-core';
 
 			const localId = 'file-' + (++fileIdCounter);
 			const ext = _getExtension(file.name);
-			const iconClass = _getIconClass(ext);
+			const iconId = _getIconId(ext);
 
 			const li = document.createElement('li');
-			li.className = 'ln-upload__item ln-upload__item--uploading ' + iconClass;
+			li.className = 'ln-upload__item ln-upload__item--uploading';
 			li.setAttribute('data-file-id', localId);
+
+			const fileIcon = _makeIcon(iconId);
 
 			const nameSpan = document.createElement('span');
 			nameSpan.className = 'ln-upload__name';
@@ -111,9 +119,10 @@ import { guardBody, dispatch } from '../ln-core';
 
 			const removeBtn = document.createElement('button');
 			removeBtn.type = 'button';
-			removeBtn.className = 'ln-upload__remove ln-icon-close';
+			removeBtn.className = 'ln-upload__remove';
+			removeBtn.setAttribute('aria-label', _getDict(container, 'remove'));
 			removeBtn.title = _getDict(container, 'remove');
-			removeBtn.textContent = '\u00D7';
+			removeBtn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>';
 			removeBtn.disabled = true;
 
 			const progress = document.createElement('div');
@@ -122,6 +131,7 @@ import { guardBody, dispatch } from '../ln-core';
 			progressBar.className = 'ln-upload__progress-bar';
 			progress.appendChild(progressBar);
 
+			li.appendChild(fileIcon);
 			li.appendChild(nameSpan);
 			li.appendChild(sizeSpan);
 			li.appendChild(removeBtn);

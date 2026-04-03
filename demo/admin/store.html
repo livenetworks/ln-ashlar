@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Store — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -18,26 +21,26 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
 </template>
-	<div data-ln-toast></div>
+	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
 				<h1>Store</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'IndexedDB data layer component.'})">
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'IndexedDB data layer component.'})">
 						Test Toast
 					</button>
 				</div>
@@ -49,7 +52,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -57,7 +60,7 @@
 			<div class="sidebar-content">
 				<nav class="nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -123,7 +126,7 @@
 								<tbody>
 									<tr><td><code>data-ln-store</code></td><td>yes</td><td>Store name (IndexedDB object store name, event namespace)</td></tr>
 									<tr><td><code>data-ln-store-endpoint</code></td><td>yes</td><td>Server API base URL for this resource</td></tr>
-									<tr><td><code>data-ln-store-stale</code></td><td>no</td><td>Staleness threshold in seconds (default: 300 = 5 min)</td></tr>
+									<tr><td><code>data-ln-store-stale</code></td><td>no</td><td>Staleness threshold in seconds (default: 300). <code>"0"</code> = always stale (syncs on every mount). <code>"-1"</code> or <code>"never"</code> = never auto-sync (only <code>forceSync()</code>)</td></tr>
 									<tr><td><code>data-ln-store-indexes</code></td><td>no</td><td>Comma-separated fields to index</td></tr>
 									<tr><td><code>data-ln-store-search-fields</code></td><td>no</td><td>Comma-separated fields for text search</td></tr>
 								</tbody>
@@ -188,8 +191,7 @@
 								<tbody>
 									<tr><td><code>ln-store:ready</code></td><td>Data available</td><td><code>{ store, count, source }</code></td></tr>
 									<tr><td><code>ln-store:loaded</code></td><td>Initial full load</td><td><code>{ store, count }</code></td></tr>
-									<tr><td><code>ln-store:synced</code></td><td>Delta sync changes</td><td><code>{ store, added, updated, deleted }</code></td></tr>
-									<tr><td><code>ln-store:unchanged</code></td><td>Delta sync no changes</td><td><code>{ store }</code></td></tr>
+									<tr><td><code>ln-store:synced</code></td><td>Delta sync complete</td><td><code>{ store, added, deleted, changed: bool }</code></td></tr>
 								</tbody>
 							</table>
 
@@ -229,12 +231,12 @@
   4. No cache? → full load → emit loaded, ready (source: 'server')
 
 Visibility change (tab returns):
-  → delta sync all stores
+  → delta sync all stores if stale
 
 Delta sync:
   1. GET {endpoint}?since={last_synced_at}
   2. Upsert data[], delete deleted[]
-  3. Emit synced or unchanged</code></pre>
+  3. Emit synced</code></pre>
 						</main>
 					</section>
 

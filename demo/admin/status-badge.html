@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Status Badge — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+</template>
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Status Badge</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Status badge — pure CSS, no JS.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+					</ul>
+
+										<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+				<h1>Status Badge</h1>
+				<p>A compact inline label with a colored dot — pure CSS, no JS. Semantic color variants via <code>--color-primary</code> override. Pulse animation for live/active states.</p>
+
+				<!-- Variants -->
+				<section class="section-card">
+					<header><h3>Semantic Variants</h3></header>
+					<main>
+						<p>
+							<span class="badge success">Active</span>
+							<span class="badge warning">Pending</span>
+							<span class="badge error">Blocked</span>
+							<span class="badge info">In Review</span>
+							<span class="badge neutral">Inactive</span>
+							<span class="badge">Default</span>
+						</p>
+					</main>
+				</section>
+
+				<!-- Live / pulse -->
+				<section class="section-card">
+					<header><h3>Live State (Pulse Animation)</h3></header>
+					<main>
+						<p>
+							<span class="badge success live">Live</span>
+							<span class="badge info live">Syncing</span>
+							<span class="badge warning live">Processing</span>
+						</p>
+					</main>
+				</section>
+
+				<!-- Actionable button -->
+				<section class="section-card">
+					<header><h3>Actionable Badge (button)</h3></header>
+					<main>
+						<p>When applied to a <code>&lt;button&gt;</code>, hover and active states activate automatically.</p>
+						<p>
+							<button class="badge success">Active</button>
+							<button class="badge warning">Pending</button>
+							<button class="badge error">Blocked</button>
+							<button class="badge neutral">Inactive</button>
+						</p>
+					</main>
+				</section>
+
+				<!-- In context -->
+				<section class="section-card">
+					<header><h3>In Context — Table</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr>
+									<th>User</th>
+									<th>Role</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Alice Johnson</td>
+									<td>Admin</td>
+									<td><span class="badge success live">Active</span></td>
+								</tr>
+								<tr>
+									<td>Bob Smith</td>
+									<td>Editor</td>
+									<td><span class="badge warning">Pending</span></td>
+								</tr>
+								<tr>
+									<td>Carol White</td>
+									<td>Viewer</td>
+									<td><span class="badge neutral">Inactive</span></td>
+								</tr>
+								<tr>
+									<td>Dave Brown</td>
+									<td>Editor</td>
+									<td><span class="badge error">Blocked</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- Production usage -->
+				<section class="section-card">
+					<header><h3>Production Usage Pattern</h3></header>
+					<main>
+						<p>In production, avoid class utilities like <code>.success</code> on project-owned elements. Use <code>@include badge</code> on a semantic selector and override <code>--color-primary</code>:</p>
+						<pre><code>&lt;!-- Library classes (prototyping / design system demos) --&gt;
+&lt;span class="badge success"&gt;Active&lt;/span&gt;
+&lt;span class="badge warning"&gt;Pending&lt;/span&gt;
+&lt;span class="badge neutral"&gt;Inactive&lt;/span&gt;
+
+&lt;!-- Production pattern — project-owned selectors --&gt;
+&lt;span class="status active"&gt;Active&lt;/span&gt;
+&lt;span class="status pending"&gt;Pending&lt;/span&gt;
+&lt;span class="status inactive"&gt;Inactive&lt;/span&gt;</code></pre>
+
+						<pre><code>// Project SCSS
+.status          { @include badge; }
+.status.active   { --color-primary: var(--color-success); }
+.status.pending  { --color-primary: var(--color-warning); }
+.status.inactive { --color-primary: var(--color-text-muted); }
+
+// Add pulse for real-time states
+.status.live     { @include badge-live; }</code></pre>
+
+						<p>
+							<span class="status active">Active</span>
+							<span class="status pending">Pending</span>
+							<span class="status inactive">Inactive</span>
+						</p>
+					</main>
+				</section>
+
+				<!-- Mixin reference -->
+				<section class="section-card">
+					<header><h3>Mixin Reference</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include badge</code></td><td>Base badge: dot + label, pill shape, primary color tint. On <code>&lt;button&gt;</code>: hover/active states automatic.</td></tr>
+								<tr><td><code>@include badge-live</code></td><td>Adds pulsing ring animation to the <code>::before</code> dot (2s loop).</td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+
+				<!-- Token reference -->
+				<section class="section-card">
+					<header><h3>Token Reference</h3></header>
+					<main>
+						<table>
+							<thead>
+								<tr><th>Token</th><th>Used for</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>--color-primary</code></td><td>Dot color, text color, background tint</td></tr>
+								<tr><td><code>--color-success</code></td><td><code>.badge.success</code> override</td></tr>
+								<tr><td><code>--color-warning</code></td><td><code>.badge.warning</code> override</td></tr>
+								<tr><td><code>--color-error</code></td><td><code>.badge.error</code> override</td></tr>
+								<tr><td><code>--color-info</code></td><td><code>.badge.info</code> override</td></tr>
+								<tr><td><code>--color-text-muted</code></td><td><code>.badge.neutral</code> override</td></tr>
+								<tr><td><code>--radius-full</code></td><td>Pill border-radius</td></tr>
+								<tr><td><code>--text-xs</code></td><td>Font size</td></tr>
+								<tr><td><code>--font-medium</code></td><td>Font weight</td></tr>
+								<tr><td><code>--transition-fast</code></td><td>Button hover transition</td></tr>
+							</tbody>
+						</table>
+					</main>
+				</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+</body>
+</html>

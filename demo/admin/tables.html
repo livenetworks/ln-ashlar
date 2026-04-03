@@ -4,6 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Tables — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -18,26 +21,26 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
 </template>
-	<div data-ln-toast></div>
+	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
 		<header>
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<span class="ln-icon-menu"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
 				<h1>Tables</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button class="btn btn--secondary" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'CSS tables component.'})">Test Toast</button>
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'CSS tables component.'})">Test Toast</button>
 				</div>
 			</div>
 		</header>
@@ -47,7 +50,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button class="ln-icon-close" data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -55,7 +58,7 @@
 			<div class="sidebar-content">
 				<nav class="nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><span class="nav-icon ln-icon-home"></span><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -123,25 +126,25 @@
 						<tr>
 							<td data-label="Name">Marko Petrovski</td>
 							<td data-label="Email">marko@example.com</td>
-							<td data-label="Status"><span class="pass">Active</span></td>
+							<td data-label="Status"><span class="badge success">Active</span></td>
 							<td data-label="Points" class="numeric">95</td>
 						</tr>
 						<tr>
 							<td data-label="Name">Ana Stojanova</td>
 							<td data-label="Email">ana@example.com</td>
-							<td data-label="Status"><span class="pass">Active</span></td>
+							<td data-label="Status"><span class="badge success">Active</span></td>
 							<td data-label="Points" class="numeric">88</td>
 						</tr>
 						<tr>
 							<td data-label="Name">Ivan Dimitrov</td>
 							<td data-label="Email">ivan@example.com</td>
-							<td data-label="Status"><span class="fail">Inactive</span></td>
+							<td data-label="Status"><span class="badge error">Inactive</span></td>
 							<td data-label="Points" class="numeric">42</td>
 						</tr>
 						<tr>
 							<td data-label="Name">Elena Trajkova</td>
 							<td data-label="Email">elena@example.com</td>
-							<td data-label="Status"><span class="warn">Pending</span></td>
+							<td data-label="Status"><span class="badge warning">Pending</span></td>
 							<td data-label="Points" class="numeric">71</td>
 						</tr>
 					</tbody>
@@ -159,12 +162,12 @@
 					</thead>
 					<tbody>
 						<tr class="section-header"><td colspan="3">Network</td></tr>
-						<tr><td>IP Address</td><td>192.168.1.1</td><td><span class="pass">OK</span></td></tr>
-						<tr><td>DNS</td><td>8.8.8.8</td><td><span class="pass">OK</span></td></tr>
+						<tr><td>IP Address</td><td>192.168.1.1</td><td><span class="badge success">OK</span></td></tr>
+						<tr><td>DNS</td><td>8.8.8.8</td><td><span class="badge success">OK</span></td></tr>
 						<tr class="section-header"><td colspan="3">System</td></tr>
-						<tr><td>CPU</td><td>78%</td><td><span class="warn">Warning</span></td></tr>
-						<tr><td>RAM</td><td>92%</td><td><span class="fail">Critical</span></td></tr>
-						<tr><td>Disk</td><td>45%</td><td><span class="pass">OK</span></td></tr>
+						<tr><td>CPU</td><td>78%</td><td><span class="badge warning">Warning</span></td></tr>
+						<tr><td>RAM</td><td>92%</td><td><span class="badge error">Critical</span></td></tr>
+						<tr><td>Disk</td><td>45%</td><td><span class="badge success">OK</span></td></tr>
 					</tbody>
 				</table>
 			</main>
@@ -174,16 +177,16 @@
 		<section class="section-card">
 			<header><h3>Striped + Actions</h3></header>
 			<main>
-				<table class="striped">
+				<table>
 					<thead><tr><th>Document</th><th>Date</th><th class="center">Actions</th></tr></thead>
 					<tbody>
 						<tr>
 							<td data-label="Document">Contract.pdf</td>
 							<td data-label="Date">15.02.2026</td>
 							<td data-label="Actions" class="center">
-								<ul class="btn-group">
-									<li><a href="#" class="action primary"><span class="ln-icon-view"></span></a></li>
-									<li><a href="#" class="action danger"><span class="ln-icon-delete"></span></a></li>
+								<ul class="actions">
+									<li><button type="button" class="action primary"><svg class="ln-icon" aria-hidden="true"><use href="#ln-view"></use></svg></button></li>
+									<li><button type="button" class="action danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg></button></li>
 								</ul>
 							</td>
 						</tr>
@@ -191,9 +194,9 @@
 							<td data-label="Document">Invoice.pdf</td>
 							<td data-label="Date">10.02.2026</td>
 							<td data-label="Actions" class="center">
-								<ul class="btn-group">
-									<li><a href="#" class="action primary"><span class="ln-icon-view"></span></a></li>
-									<li><a href="#" class="action danger"><span class="ln-icon-delete"></span></a></li>
+								<ul class="actions">
+									<li><button type="button" class="action primary"><svg class="ln-icon" aria-hidden="true"><use href="#ln-view"></use></svg></button></li>
+									<li><button type="button" class="action danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-delete"></use></svg></button></li>
 								</ul>
 							</td>
 						</tr>
@@ -219,16 +222,25 @@
     &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;!-- Status classes --&gt;
-&lt;span class="pass"&gt;OK&lt;/span&gt;
-&lt;span class="fail"&gt;Error&lt;/span&gt;
-&lt;span class="warn"&gt;Warning&lt;/span&gt;
+&lt;!-- Status badges --&gt;
+&lt;span class="badge success"&gt;Active&lt;/span&gt;
+&lt;span class="badge error"&gt;Inactive&lt;/span&gt;
+&lt;span class="badge warning"&gt;Pending&lt;/span&gt;
+&lt;span class="badge info"&gt;In Review&lt;/span&gt;
 
 &lt;!-- Responsive: data-label for mobile --&gt;
 &lt;td data-label="Name"&gt;Marko&lt;/td&gt;
 
-&lt;!-- Striped: add class to table --&gt;
-&lt;table class="striped"&gt;...&lt;/table&gt;</code></pre>
+&lt;!-- Striped: apply via SCSS on a semantic selector --&gt;
+&lt;!-- #audit-log { @include table-striped; } --&gt;
+
+&lt;!-- Actions column: buttons with ul.actions (project SCSS) --&gt;
+&lt;td&gt;
+    &lt;ul class="actions"&gt;
+        &lt;li&gt;&lt;button type="button" class="action primary"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-view"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;button type="button" class="action danger"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-delete"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/td&gt;</code></pre>
 			</main>
 		</section>
 			</div>

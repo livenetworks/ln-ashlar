@@ -14,13 +14,13 @@
 
 		<header class="app-header">
 			<div class="header-brand">
-				<span class="brand-logo ln-icon-book" aria-hidden="true"></span>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-book"></use></svg>
 				<span class="brand-name">DocuFlow</span>
 			</div>
 
 			<div class="header-center">
 				<div class="header-search">
-					<span class="ln-icon-search search-icon" aria-hidden="true"></span>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
 					<input type="search" placeholder="Search..." aria-label="Search">
 				</div>
 			</div>
@@ -45,13 +45,13 @@
 							<ul>
 								<li>
 									<a href="packages.html">
-										<span class="ln-icon-box" aria-hidden="true"></span>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-box"></use></svg>
 										Packages
 									</a>
 								</li>
 								<li>
 									<a href="tenants.html" class="active">
-										<span class="ln-icon-building" aria-hidden="true"></span>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-building"></use></svg>
 										Tenants
 									</a>
 								</li>
@@ -77,76 +77,76 @@
 							</header>
 
 														<form id="tenant-form">
-								<p class="form-element">
+								<div class="form-element">
 									<label for="t-name">Name</label>
 									<input type="text" id="t-name" name="name" required maxlength="255">
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="t-slug">Slug (subdomain)</label>
 									<input type="text" id="t-slug" name="slug" required maxlength="100"
 									       pattern="[a-z0-9\-]+"
 									       title="Lowercase letters, numbers and hyphens only">
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="t-domain">Custom Domain</label>
 									<input type="text" id="t-domain" name="domain" maxlength="255"
 									       placeholder="e.g. docs.company.com">
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="t-package">Package</label>
 									<select id="t-package" name="package_id" required>
-										<option value="">— Select Package —</option>
+										<option value="">ï¿½ Select Package ï¿½</option>
 										<option value="1">Enterprise</option>
 										<option value="2">Professional</option>
 										<option value="3">Starter</option>
 										<option value="4">Trial</option>
 									</select>
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="t-auth">Auth Method</label>
 									<select id="t-auth" name="auth_method" required>
 										<option value="local" selected>Local</option>
 										<option value="ldap">LDAP</option>
 									</select>
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="t-numbering">Document Numbering</label>
 									<input type="text" id="t-numbering" name="doc_number_scheme" required maxlength="255"
 									       value="{TYPE}-{SEQ:4}">
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label for="t-review">Review Interval (days)</label>
 									<input type="number" id="t-review" name="default_review_interval" required min="1" max="9999"
 									       value="365">
-								</p>
+								</div>
 
 								<fieldset>
 									<legend>Branding</legend>
 
-									<p class="form-element">
+									<div class="form-element">
 										<label for="t-color-primary">Primary Color</label>
 										<input type="color" id="t-color-primary" name="color_primary" value="#2737a1">
-									</p>
+									</div>
 
-									<p class="form-element">
+									<div class="form-element">
 										<label for="t-color-secondary">Secondary Color</label>
 										<input type="color" id="t-color-secondary" name="color_secondary" value="#206ea7">
-									</p>
+									</div>
 								</fieldset>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label><input type="checkbox" name="is_read_confirm_required" value="1" checked> Require Read Confirmation</label>
-								</p>
+								</div>
 
-								<p class="form-element">
+								<div class="form-element">
 									<label><input type="checkbox" name="is_active" value="1" checked> Active</label>
-								</p>
+								</div>
 
 								<div class="form-actions">
 									<a href="tenants.html" class="btn btn--secondary">Cancel</a>
@@ -178,7 +178,7 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close ln-icon-close" aria-label="Close"></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>

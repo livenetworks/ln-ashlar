@@ -30,6 +30,7 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 			|| dom.querySelector('input[type="search"]')
 			|| dom.querySelector('input[type="text"]');
 
+		this.itemsSelector = dom.getAttribute('data-ln-search-items') || null;
 		this._debounceTimer = null;
 
 		this._attachHandler();
@@ -64,10 +65,11 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 		const evt = dispatchCancelable(target, 'ln-search:change', { term: term, targetId: this.targetId });
 		if (evt.defaultPrevented) return;
 
-		// Default behaviour: show/hide direct children of target
-		const children = target.children;
-		let matched = 0;
-		const total = children.length;
+		// Default behaviour: show/hide items in target
+		// data-ln-search-items="selector" enables deep targeting via querySelectorAll
+		const children = this.itemsSelector
+			? target.querySelectorAll(this.itemsSelector)
+			: target.children;
 
 		for (let i = 0; i < children.length; i++) {
 			const el = children[i];
@@ -75,8 +77,6 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 
 			if (term && !el.textContent.replace(/\s+/g, ' ').toLowerCase().includes(term)) {
 				el.setAttribute(HIDE_ATTR, 'true');
-			} else {
-				matched++;
 			}
 		}
 	};

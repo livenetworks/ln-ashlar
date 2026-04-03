@@ -1,4 +1,4 @@
-import { dispatch, findElements } from '../ln-core';
+import { dispatch, findElements, guardBody } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-circular-progress';
@@ -91,26 +91,28 @@ import { dispatch, findElements } from '../ln-core';
 	}
 
 	function _domObserver() {
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'childList') {
-					for (const item of mutation.addedNodes) {
-						if (item.nodeType === 1) {
-							findElements(item, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === 'childList') {
+						for (const item of mutation.addedNodes) {
+							if (item.nodeType === 1) {
+								findElements(item, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
+							}
 						}
+					} else if (mutation.type === 'attributes') {
+						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
 					}
-				} else if (mutation.type === 'attributes') {
-					findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
 				}
-			}
-		});
+			});
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ['data-ln-circular-progress']
-		});
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['data-ln-circular-progress']
+			});
+		}, 'ln-circular-progress');
 	}
 
 	_domObserver();

@@ -71,7 +71,7 @@ import { reactiveState, createBatcher } from '../ln-core';
 			if (btn[DOM_ATTRIBUTE + 'Bound']) return;
 			btn[DOM_ATTRIBUTE + 'Bound'] = true;
 
-			btn.addEventListener('click', function () {
+			btn._lnFilterClick = function () {
 				const key = btn.getAttribute(KEY_ATTR);
 				const value = btn.getAttribute(VALUE_ATTR);
 
@@ -83,7 +83,8 @@ import { reactiveState, createBatcher } from '../ln-core';
 					self.state.key = key;
 					self.state.value = value;
 				}
-			});
+			};
+			btn.addEventListener('click', btn._lnFilterClick);
 		});
 	};
 
@@ -175,6 +176,20 @@ import { reactiveState, createBatcher } from '../ln-core';
 	_component.prototype.getActive = function () {
 		if (this.state.key === null && this.state.value === null) return null;
 		return { key: this.state.key, value: this.state.value };
+	};
+
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		const self = this;
+		this.buttons.forEach(function (btn) {
+			if (btn._lnFilterClick) {
+				btn.removeEventListener('click', btn._lnFilterClick);
+				delete btn._lnFilterClick;
+			}
+			delete btn[DOM_ATTRIBUTE + 'Bound'];
+		});
+		this.dom.removeAttribute(INIT_ATTR);
+		delete this.dom[DOM_ATTRIBUTE];
 	};
 
 	// ─── DOM Observer ──────────────────────────────────────────

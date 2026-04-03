@@ -1,4 +1,4 @@
-import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
+import { cloneTemplateScoped, dispatch, findElements, guardBody } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-table';
@@ -59,13 +59,21 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 		// Footer elements
 		this._totalSpan = dom.querySelector('[data-ln-data-table-total]');
 		this._filteredSpan = dom.querySelector('[data-ln-data-table-filtered]');
-		this._countEl = dom.querySelector('[data-ln-data-table-count]');
 
 		// Filtered separator — the parent that wraps "· X filtered" text
 		// Hide it when there's no active filtering
 		if (this._filteredSpan) {
 			this._filteredWrap = this._filteredSpan.parentElement !== dom
 				? this._filteredSpan.closest('[data-ln-data-table-filtered-wrap]') || this._filteredSpan.parentNode
+				: null;
+		}
+
+		// Selected count — the parent that wraps "· X selected" text
+		// Hidden when nothing is selected
+		this._selectedSpan = dom.querySelector('[data-ln-data-table-selected]');
+		if (this._selectedSpan) {
+			this._selectedWrap = this._selectedSpan.parentElement !== dom
+				? this._selectedSpan.closest('[data-ln-data-table-selected-wrap]') || this._selectedSpan.parentNode
 				: null;
 		}
 
@@ -178,6 +186,7 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 
 				self.selectedCount = self.selectedIds.size;
 				self._updateSelectAll();
+				self._updateFooter();
 
 				dispatch(dom, 'ln-data-table:select', {
 					table: self.name,
@@ -229,6 +238,7 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 						selectedIds: self.selectedIds,
 						count: self.selectedCount
 					});
+					self._updateFooter();
 				};
 				this._selectAllCheckbox.addEventListener('change', this._onSelectAll);
 			}
@@ -467,8 +477,8 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 		this._closeFilterDropdown();
 
 		// Try table-scoped template first, fall back to generic
-		const clone = cloneTemplate(this.name + '-column-filter', 'ln-data-table')
-			|| cloneTemplate('column-filter', 'ln-data-table');
+		const clone = cloneTemplateScoped(this.dom, this.name + '-column-filter', 'ln-data-table')
+			|| cloneTemplateScoped(this.dom, 'column-filter', 'ln-data-table');
 		if (!clone) return;
 
 		const dropdown = clone.firstElementChild;
@@ -664,7 +674,7 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 	};
 
 	_component.prototype._buildRow = function (record) {
-		const clone = cloneTemplate(this.name + '-row', 'ln-data-table');
+		const clone = cloneTemplateScoped(this.dom, this.name + '-row', 'ln-data-table');
 		if (!clone) return null;
 
 		const tr = clone.querySelector('[data-ln-row]') || clone.firstElementChild;
@@ -767,7 +777,7 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 			topSpacer.setAttribute('aria-hidden', 'true');
 			const topTd = document.createElement('td');
 			topTd.setAttribute('colspan', colSpan);
-			topTd.style.cssText = 'height:' + topH + 'px;padding:0;border:none';
+			topTd.style.height = topH + 'px';
 			topSpacer.appendChild(topTd);
 			frag.appendChild(topSpacer);
 		}
@@ -785,7 +795,7 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 			bottomSpacer.setAttribute('aria-hidden', 'true');
 			const bottomTd = document.createElement('td');
 			bottomTd.setAttribute('colspan', colSpan);
-			bottomTd.style.cssText = 'height:' + bottomH + 'px;padding:0;border:none';
+			bottomTd.style.height = bottomH + 'px';
 			bottomSpacer.appendChild(bottomTd);
 			frag.appendChild(bottomSpacer);
 		}
@@ -829,7 +839,7 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 	// ─── Empty state ───────────────────────────────────────────
 
 	_component.prototype._showEmptyState = function (templateName) {
-		const clone = cloneTemplate(templateName, 'ln-data-table');
+		const clone = cloneTemplateScoped(this.dom, templateName, 'ln-data-table');
 		this.tbody.textContent = '';
 		if (clone) {
 			this.tbody.appendChild(clone);
@@ -854,6 +864,14 @@ import { cloneTemplate, dispatch, findElements, guardBody } from '../ln-core';
 		// Hide filtered wrapper when not filtering
 		if (this._filteredWrap) {
 			this._filteredWrap.classList.toggle('hidden', !isFiltered);
+		}
+
+		if (this._selectedSpan) {
+			const count = this.selectedIds.size;
+			this._selectedSpan.textContent = count > 0 ? _formatNum(count) : '';
+			if (this._selectedWrap) {
+				this._selectedWrap.classList.toggle('hidden', count === 0);
+			}
 		}
 	};
 
