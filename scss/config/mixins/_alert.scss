@@ -1,0 +1,52 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'borders' as *;
+@use 'btn' as *;
+
+// Inline alert — contextual feedback element inside content.
+//
+// Usage (project SCSS — apply to semantic selector):
+//   .alert          { @include alert; }                                  ← info (default)
+//   .alert.success  { --color-primary: var(--color-success); }
+//   .alert.warning  { --color-primary: var(--color-warning); }
+//   .alert.error    { --color-primary: var(--color-error); }
+//
+// HTML:
+//   <div class="alert" role="alert">
+//       <svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+//       <p>Message text.</p>
+//       <button type="button" aria-label="Dismiss">
+//           <svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+//       </button>
+//   </div>
+
+@mixin alert {
+	@include flex;
+	@include items-center;
+	@include gap(var(--spacing-sm));
+	@include py(var(--spacing-sm));
+	@include px(var(--spacing-md));
+	@include rounded-md;
+	@include text-sm;
+	border-left: 3px solid hsl(var(--color-primary));
+	background-color: hsl(var(--color-primary) / 0.08);
+	color: hsl(var(--color-text-primary));
+
+	.ln-icon {
+		color: hsl(var(--color-primary));
+		@include flex-shrink-0;
+	}
+
+	p {
+		@include flex-1;
+		@include m(0);
+		line-height: 1.5;
+	}
+
+	button {
+		@include close-button;
+		@include flex-shrink-0;
+		margin-left: auto;
+	}
+}

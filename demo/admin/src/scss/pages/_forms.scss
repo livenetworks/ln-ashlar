@@ -132,6 +132,48 @@
 	@include gap(0.5rem);
 }
 
+// ─── Focus indicator preset demos ─────────────────────────
+
+// All 6 demo forms share the same grid layout
+#demo-focus-ring,
+#demo-focus-border-thicken,
+#demo-focus-combination,
+#demo-focus-background-shift,
+#demo-focus-accent-line,
+#demo-focus-inset-shadow {
+	@include form-grid;
+
+	.form-element { grid-column: span 3; }
+	.form-actions  { grid-column: span 6; }
+}
+
+// focus-ring is the global default — no override needed for #demo-focus-ring
+
+#demo-focus-border-thicken input:focus-visible,
+#demo-focus-border-thicken select:focus-visible {
+	@include focus-border-thicken;
+}
+
+#demo-focus-combination input:focus-visible,
+#demo-focus-combination select:focus-visible {
+	@include focus-combination;
+}
+
+#demo-focus-background-shift input:focus-visible,
+#demo-focus-background-shift select:focus-visible {
+	@include focus-background-shift;
+}
+
+#demo-focus-accent-line input:focus-visible,
+#demo-focus-accent-line select:focus-visible {
+	@include focus-accent-line;
+}
+
+#demo-focus-inset-shadow input:focus-visible,
+#demo-focus-inset-shadow select:focus-visible {
+	@include focus-inset-shadow;
+}
+
 // ─── Event log ──────────────────────────────────────────
 #form-log,
 #auto-submit-log {

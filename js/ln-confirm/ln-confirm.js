@@ -53,7 +53,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 			this.isIconButton = true;
 			this.originalIconHref = iconUse.getAttribute('href');
 			iconUse.setAttribute('href', '#ln-check');
-			this.dom.classList.add('text-success', 'ln-confirm-tooltip');
+			this.dom.classList.add('ln-confirm-tooltip');
 			this.dom.setAttribute('data-tooltip-text', this.confirmText);
 		} else {
 			this.dom.textContent = this.confirmText;
@@ -84,7 +84,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 			if (iconUse && this.originalIconHref) {
 				iconUse.setAttribute('href', this.originalIconHref);
 			}
-			this.dom.classList.remove('text-success', 'ln-confirm-tooltip');
+			this.dom.classList.remove('ln-confirm-tooltip');
 			this.dom.removeAttribute('data-tooltip-text');
 			this.isIconButton = false;
 			this.originalIconHref = null;

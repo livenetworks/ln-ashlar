@@ -144,7 +144,7 @@
 
 
 // ── 3. Growing left bar — animated (spring easing) ──────────────────────────
-// li::before bar scales from center. Hover: partial (45%) + faint.
+// li::before bar scales from center. Hover: full height, low opacity (0.4) — no size change.
 // Active: full height, full opacity. Spring cubic-bezier for organic feel.
 @mixin nav-links-border-grow {
 	li {
@@ -168,7 +168,6 @@
 		}
 
 		&:has(a:hover)::before {
-			transform: scaleY(0.45);
 			opacity: 0.4;
 		}
 

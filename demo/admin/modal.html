@@ -21,7 +21,7 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
@@ -50,7 +50,7 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
@@ -122,16 +122,59 @@
 					<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
 					<button data-ln-modal-for="demo-form" class="btn">Form Modal</button>
 					<button data-ln-modal-for="demo-large" class="btn">Large Modal</button>
+					<button data-ln-modal-for="demo-tall" class="btn">Tall Content (scroll test)</button>
 				</nav>
 			</main>
 		</section>
+
+		<!-- Banner triggers -->
+		<section class="section-card">
+			<header><h3>Banner</h3></header>
+			<main>
+				<nav class="demo-actions">
+					<button data-ln-modal-for="demo-banner-info" class="btn">Info Banner</button>
+					<button data-ln-modal-for="demo-banner-warning" class="btn">Warning Banner</button>
+					<button data-ln-modal-for="demo-banner-error" class="btn">Error Banner</button>
+				</nav>
+			</main>
+		</section>
+
+		<!-- Info banner -->
+		<div class="ln-modal" data-ln-modal id="demo-banner-info">
+			<form>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+				<p>Your trial ends in 3 days. <a href="#">Upgrade now</a> to keep access.</p>
+				<button type="button" data-ln-modal-close aria-label="Dismiss">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+				</button>
+			</form>
+		</div>
+
+		<!-- Warning banner -->
+		<div class="ln-modal" data-ln-modal id="demo-banner-warning">
+			<form>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-warning"></use></svg>
+				<p>Scheduled maintenance tonight 22:00–02:00. Save your work before then.</p>
+				<button type="button" data-ln-modal-close aria-label="Dismiss">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg>
+				</button>
+			</form>
+		</div>
+
+		<!-- Error / blocking banner — no dismiss -->
+		<div class="ln-modal" data-ln-modal id="demo-banner-error">
+			<form>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-error-circle"></use></svg>
+				<p>You are offline. Changes will sync when connection is restored.</p>
+			</form>
+		</div>
 
 		<!-- Basic Modal -->
 		<div class="ln-modal" data-ln-modal id="demo-basic">
 			<form>
 				<header>
 					<h3>Basic Modal</h3>
-					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				</header>
 				<main>
 					<p>This is a basic modal with a title and content.</p>
@@ -148,7 +191,7 @@
 			<form>
 				<header>
 					<h3>Add User</h3>
-					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				</header>
 				<main>
 					<div class="form-element">
@@ -180,7 +223,7 @@
 			<form>
 				<header>
 					<h3>Large Modal</h3>
-					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				</header>
 				<main>
 					<p>A larger modal for more content. Size set via <code>@include modal-lg</code> in SCSS.</p>
@@ -198,6 +241,155 @@
 				</footer>
 			</form>
 		</div>
+
+		<!-- Tall Content (scroll test) -->
+		<div class="ln-modal" data-ln-modal id="demo-tall">
+			<form>
+				<header>
+					<h3>Tall Content — Scroll Test</h3>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</header>
+				<main>
+					<p>This modal has more content than fits in the viewport. Only <code>main</code> should scroll — the header and footer stay sticky.</p>
+					<div class="form-element">
+						<label for="tall-name">Full name</label>
+						<input type="text" id="tall-name" placeholder="Enter name...">
+					</div>
+					<div class="form-element">
+						<label for="tall-email">Email address</label>
+						<input type="email" id="tall-email" placeholder="email@example.com">
+					</div>
+					<div class="form-element">
+						<label for="tall-phone">Phone</label>
+						<input type="tel" id="tall-phone" placeholder="+389 ...">
+					</div>
+					<div class="form-element">
+						<label for="tall-role">Role</label>
+						<select id="tall-role">
+							<option>Member</option>
+							<option>Editor</option>
+							<option>Administrator</option>
+						</select>
+					</div>
+					<div class="form-element">
+						<label for="tall-address">Address</label>
+						<input type="text" id="tall-address" placeholder="Street and number">
+					</div>
+					<div class="form-element">
+						<label for="tall-city">City</label>
+						<input type="text" id="tall-city" placeholder="City">
+					</div>
+					<div class="form-element">
+						<label for="tall-country">Country</label>
+						<input type="text" id="tall-country" placeholder="Country">
+					</div>
+					<div class="form-element">
+						<label for="tall-bio">Bio</label>
+						<textarea id="tall-bio" rows="4" placeholder="Short description..."></textarea>
+					</div>
+					<div class="form-element">
+						<label for="tall-notes">Internal notes</label>
+						<textarea id="tall-notes" rows="4" placeholder="Visible to admins only..."></textarea>
+					</div>
+					<div class="form-element">
+						<label for="tall-joined">Joined</label>
+						<input type="date" id="tall-joined">
+					</div>
+					<div class="form-element">
+						<label for="tall-expires">Membership expires</label>
+						<input type="date" id="tall-expires">
+					</div>
+					<div class="form-element">
+						<label for="tall-status">Status</label>
+						<select id="tall-status">
+							<option>Active</option>
+							<option>Suspended</option>
+							<option>Expired</option>
+						</select>
+					</div>
+				</main>
+				<footer>
+					<button type="button" data-ln-modal-close>Cancel</button>
+					<button type="submit">Save</button>
+				</footer>
+			</form>
+		</div>
+
+		<!-- Destructive Confirm -->
+		<section class="section-card">
+			<header><h3>Destructive Confirm</h3></header>
+			<main>
+				<nav class="demo-actions">
+					<button data-ln-modal-for="demo-destructive" class="btn">Delete Membership</button>
+				</nav>
+			</main>
+		</section>
+
+		<div class="ln-modal" data-ln-modal id="demo-destructive">
+			<form>
+				<header>
+					<h3>Delete membership record</h3>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</header>
+				<main>
+					<p>The membership record and all associated data will be permanently removed. This action cannot be undone.</p>
+				</main>
+				<footer>
+					<button type="button" data-ln-modal-close autofocus>Cancel</button>
+					<button type="submit">Delete</button>
+				</footer>
+			</form>
+		</div>
+
+		<!-- Inline Confirm (ln-confirm) -->
+		<section class="section-card">
+			<header><h3>Inline Confirm (ln-confirm)</h3></header>
+			<main>
+				<article>
+					<h4>Text button — reverts after 3s</h4>
+					<nav class="demo-actions">
+						<button data-ln-confirm="Confirm delete?">Delete record</button>
+						<button data-ln-confirm="Confirm?" data-ln-confirm-timeout="5">Remove (5s)</button>
+					</nav>
+				</article>
+				<article>
+					<h4>Icon-only button — swaps to checkmark</h4>
+					<nav class="demo-actions">
+						<button aria-label="Delete" data-ln-confirm="Delete?">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+						</button>
+					</nav>
+				</article>
+				<article>
+					<h4>In a table row context</h4>
+					<table>
+						<thead><tr><th>Name</th><th>Role</th><th></th></tr></thead>
+						<tbody>
+							<tr>
+								<td>Marko Ivanov</td>
+								<td>Editor</td>
+								<td>
+									<ul>
+										<li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+										<li><button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+									</ul>
+								</td>
+							</tr>
+							<tr>
+								<td>Ana Petrović</td>
+								<td>Admin</td>
+								<td>
+									<ul>
+										<li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+										<li><button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+									</ul>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</article>
+			</main>
+		</section>
 
 		<!-- Events -->
 		<section class="section-card">
@@ -257,7 +449,7 @@ document.addEventListener('ln-modal:close', function(e) {
 			<form>
 				<header>
 					<h3>Events Demo</h3>
-					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-close"></use></svg></button>
+					<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				</header>
 				<main>
 					<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and <code>ln-modal:close</code> events.</p>
@@ -280,7 +472,7 @@ document.addEventListener('ln-modal:close', function(e) {
     &lt;form&gt;
         &lt;header&gt;
             &lt;h3&gt;Title&lt;/h3&gt;
-            &lt;button type="button" data-ln-modal-close aria-label="Close"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-close"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;
+            &lt;button type="button" data-ln-modal-close aria-label="Close"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;
         &lt;/header&gt;
         &lt;main&gt;
             &lt;div class="form-element"&gt;

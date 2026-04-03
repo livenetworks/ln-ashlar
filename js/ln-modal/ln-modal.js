@@ -150,11 +150,16 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 			document.addEventListener('keydown', instance._onEscape);
 			document.addEventListener('keydown', instance._onFocusTrap);
 
-			const firstInput = el.querySelector('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
-			if (firstInput) firstInput.focus();
-			else {
-				const firstFocusable = el.querySelector('a[href], button:not([disabled])');
-				if (firstFocusable) firstFocusable.focus();
+			const autoFocusEl = el.querySelector('[autofocus]');
+			if (autoFocusEl) {
+				autoFocusEl.focus();
+			} else {
+				const firstInput = el.querySelector('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
+				if (firstInput) firstInput.focus();
+				else {
+					const firstFocusable = el.querySelector('a[href], button:not([disabled])');
+					if (firstFocusable) firstFocusable.focus();
+				}
 			}
 
 			dispatch(el, 'ln-modal:open', { modalId: el.id, target: el });
