@@ -1,11 +1,4 @@
 @use '../config/mixins' as *;
 
-.badge         { @include badge; }
-
-.badge.success { --color-primary: var(--color-success); }
-.badge.warning { --color-primary: var(--color-warning); }
-.badge.error   { --color-primary: var(--color-error); }
-.badge.info    { --color-primary: var(--color-info); }
-.badge.neutral { --color-primary: var(--color-text-muted); }
-
-.badge.live    { @include badge-live; }
+.badge      { @include badge; }
+.badge.live { @include badge-live; }
