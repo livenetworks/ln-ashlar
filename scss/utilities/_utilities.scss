@@ -147,3 +147,10 @@
 	@include mx(auto);
 	@include px(1rem);
 }
+
+// Semantic color overrides — set --color-primary on any component
+.success { --color-primary: var(--color-success); }
+.warning { --color-primary: var(--color-warning); }
+.error   { --color-primary: var(--color-error); }
+.info    { --color-primary: var(--color-info); }
+.neutral { --color-primary: var(--color-text-muted); }
