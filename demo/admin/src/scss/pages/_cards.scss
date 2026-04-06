@@ -141,6 +141,9 @@
 	.stat-info    { --color-primary: var(--color-info); }
 }
 
+// ─── Card with fields ──────────────────────────────────
+#demo-card-fields > main > div { @include grid; }
+
 // ─── Card with header + body + footer ──────────────────
 #demo-full-cards {
 	@include grid-2;

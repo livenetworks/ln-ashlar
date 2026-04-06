@@ -321,19 +321,22 @@ document.addEventListener('ln-form:submit', function (e) {
 				<section class="section-card">
 					<header><h3>Fill — edit mode</h3></header>
 					<main>
-						<p>Populate form fields programmatically via <code>fill()</code> or <code>ln-form:fill</code> event.</p>
+						<p>Populate form fields programmatically. Two patterns:</p>
 						<nav class="demo-actions">
-							<button type="button" class="btn" id="demo-fill-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg> Fill form</button>
-							<button type="button" type="button" id="demo-reset-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg> Reset form</button>
+							<button type="button" class="btn" id="demo-fill-api-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg> Fill (API)</button>
+							<button type="button" id="demo-fill-coordinator-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg> Fill (Coordinator)</button>
+							<button type="button" id="demo-reset-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg> Reset</button>
 						</nav>
 						<h4>Code</h4>
-						<pre><code>// Fill via API
+						<pre><code>// Pattern 1: Direct API — caller has a reference to the form
 form.lnForm.fill({ fname: 'Dalibor', email: 'd@test.com' });
 
-// Fill via event (e.g. from data-table row click)
-form.dispatchEvent(new CustomEvent('ln-form:fill', {
-    detail: { fname: 'Dalibor', email: 'd@test.com' }
-}));
+// Pattern 2: Coordinator — routes external events to the form
+// Table doesn't know about the form. Form doesn't know about the table.
+// The coordinator is the glue.
+table.addEventListener('ln-data-table:row-click', function (e) {
+    form.lnForm.fill(e.detail.record);
+});
 
 // Reset
 form.lnForm.reset();</code></pre>
@@ -533,10 +536,10 @@ form.lnForm.reset();</code></pre>
 						<p>Non-submit action buttons (Add, Delete, Export). In production, apply via <code>@include btn</code> on a semantic selector in project SCSS. <code>class="btn"</code> is for prototyping only.</p>
 						<nav class="demo-actions">
 							<button type="button" class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg> Add</button>
-							<button type="button" class="btn btn-danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg> Delete</button>
-							<button type="button" class="btn btn-success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg> Approve</button>
-							<button type="button" class="btn btn-warning"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg> Archive</button>
-							<button type="button" class="btn btn-info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-download"></use></svg> Export</button>
+							<button type="button" class="btn" style="--color-primary: var(--color-error)"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg> Delete</button>
+							<button type="button" class="btn" style="--color-primary: var(--color-success)"><svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg> Approve</button>
+							<button type="button" class="btn" style="--color-primary: var(--color-warning)"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg> Archive</button>
+							<button type="button" class="btn" style="--color-primary: var(--color-info)"><svg class="ln-icon" aria-hidden="true"><use href="#ln-download"></use></svg> Export</button>
 							<button type="button" class="btn" disabled>Disabled</button>
 						</nav>
 
@@ -564,9 +567,9 @@ form.lnForm.reset();</code></pre>
 							<button type="button" class="btn btn-lg">Large</button>
 						</nav>
 						<nav class="demo-actions" style="margin-top: 1rem;">
-							<button type="button" class="btn btn-sm btn-danger">Small Danger</button>
-							<button type="button" class="btn btn-success">Default Success</button>
-							<button type="button" class="btn btn-lg btn-info">Large Info</button>
+							<button type="button" class="btn btn-sm" style="--color-primary: var(--color-error)">Small Danger</button>
+							<button type="button" class="btn" style="--color-primary: var(--color-success)">Default Success</button>
+							<button type="button" class="btn btn-lg" style="--color-primary: var(--color-info)">Large Info</button>
 						</nav>
 					</main>
 				</section>
@@ -914,7 +917,8 @@ form.lnForm.reset();</code></pre>
 		// ─── Fill / Reset buttons ──────────────────────────
 		var demoForm = document.getElementById('demo-form-grid');
 
-		document.getElementById('demo-fill-btn').addEventListener('click', function () {
+		// Pattern 1: Direct API — caller holds a reference
+		document.getElementById('demo-fill-api-btn').addEventListener('click', function () {
 			demoForm.lnForm.fill({
 				fname: 'Dalibor',
 				lname: 'Sojic',
@@ -924,7 +928,22 @@ form.lnForm.reset();</code></pre>
 				zip: '1000',
 				message: 'Hello from fill()!'
 			});
-			window.lnToast.enqueue({ type: 'info', title: 'Filled', message: 'Form populated via lnForm.fill()' });
+			window.lnToast.enqueue({ type: 'info', title: 'Filled', message: 'Form populated via direct API' });
+		});
+
+		// Pattern 2: Coordinator — routes external event to form
+		// In a real app this would be: table.addEventListener('ln-data-table:row-click', ...)
+		document.getElementById('demo-fill-coordinator-btn').addEventListener('click', function () {
+			demoForm.lnForm.fill({
+				fname: 'Jane',
+				lname: 'Doe',
+				email: 'jane@example.com',
+				phone: '+1 555 1234',
+				city: 'New York',
+				zip: '10001',
+				message: 'Hello from coordinator!'
+			});
+			window.lnToast.enqueue({ type: 'info', title: 'Filled', message: 'Form populated via coordinator pattern' });
 		});
 
 		document.getElementById('demo-reset-btn').addEventListener('click', function () {

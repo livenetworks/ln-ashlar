@@ -1,16 +1,8 @@
 @use '../scss/config/mixins' as *;
 
-:root {
-	--bg-color: #f8fafc;
-	--card-bg: #ffffff;
-	--primary-color: #2563eb;
-	--text-main: #1e293b;
-	--text-muted: #64748b;
-}
-
 body {
-	background-color: var(--bg-color);
-	color: var(--text-main);
+	background-color: hsl(var(--color-bg-body));
+	color: hsl(var(--color-text-primary));
 	font-family: 'Inter', -apple-system, sans-serif;
 	margin: 0;
 	@include flex-center;
@@ -31,13 +23,11 @@ header {
 h1 {
 	font-size: 2.5rem;
 	@include mb(1rem);
-	background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
+	color: hsl(var(--color-text-primary));
 }
 
 p {
-	color: var(--text-muted);
+	color: hsl(var(--color-text-muted));
 	font-size: 1.1rem;
 }
 
@@ -49,29 +39,28 @@ p {
 }
 
 .demo-card {
-	background: var(--card-bg);
-	border-radius: 1rem;
+	background: hsl(var(--color-bg-primary));
+	@include rounded-lg;
 	@include p(2rem);
 	text-decoration: none;
 	color: inherit;
-	box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+	box-shadow: var(--shadow-md);
 	@include transition;
-	border: 1px solid rgba(0,0,0,0.05);
+	border: 1px solid hsl(var(--color-border-light));
 	@include flex-col;
 	@include items-center;
 	@include gap(1rem);
 
 	&:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+		border-color: hsl(var(--color-primary));
 	}
 }
 
 .icon {
 	@include size(48px);
-	background: #eff6ff;
-	color: var(--primary-color);
-	border-radius: 12px;
+	background: hsl(var(--color-primary) / 0.08);
+	color: hsl(var(--color-primary));
+	@include rounded-md;
 	@include flex-center;
 	font-size: 1.5rem;
 }
@@ -91,13 +80,13 @@ p {
 	@include font-semibold;
 	@include px(0.75rem);
 	@include py(0.25rem);
-	background: #f1f5f9;
+	background: hsl(var(--color-bg-secondary));
 	@include rounded-full;
-	color: var(--text-muted);
+	color: hsl(var(--color-text-muted));
 }
 
 .footer {
 	@include mt(4rem);
 	font-size: 0.875rem;
-	color: var(--text-muted);
+	color: hsl(var(--color-text-muted));
 }

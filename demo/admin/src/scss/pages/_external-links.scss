@@ -12,33 +12,33 @@
 		ul { margin: 0; }
 	}
 
-	// External links group — teal accent
+	// External links group — info accent
 	article:first-child {
-		background-color: #e0f7fa;
-		border-left: 3px solid #0891b2;
+		background-color: hsl(var(--color-info) / 0.08);
+		border-left: 3px solid hsl(var(--color-info));
 
-		h5 { color: #0e7490; }
+		h5 { color: hsl(var(--color-info)); }
 
 		a {
-			color: #0891b2;
+			color: hsl(var(--color-info));
 			@include font-medium;
 			@include transition-colors;
-			&:hover { color: #0e7490; }
+			&:hover { color: hsl(var(--color-info-hover, var(--color-info))); }
 		}
 	}
 
-	// Internal links group — amber accent
+	// Internal links group — warning accent
 	article:last-child {
-		background-color: #fef3c7;
-		border-left: 3px solid #d97706;
+		background-color: hsl(var(--color-warning) / 0.08);
+		border-left: 3px solid hsl(var(--color-warning));
 
-		h5 { color: #92400e; }
+		h5 { color: hsl(var(--color-warning)); }
 
 		a {
-			color: #b45309;
+			color: hsl(var(--color-warning));
 			@include font-medium;
 			@include transition-colors;
-			&:hover { color: #92400e; }
+			&:hover { color: hsl(var(--color-warning-hover, var(--color-warning))); }
 		}
 	}
 }
@@ -52,6 +52,6 @@
 	@include text-sm;
 	@include p(0.75rem);
 	@include rounded-md;
-	background-color: #e0f7fa;
-	color: #0e7490;
+	background-color: hsl(var(--color-info) / 0.08);
+	color: hsl(var(--color-info));
 }

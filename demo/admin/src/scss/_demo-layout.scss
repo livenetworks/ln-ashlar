@@ -61,13 +61,3 @@
 	@include flex-wrap;
 }
 
-// ==========================================================================
-// Button color variants — project-level overrides via --color-primary
-// ln-acme reads --color-primary for all button states.
-// Override --color-primary on the element or parent to change color.
-// ==========================================================================
-.btn--secondary { --color-primary: var(--color-secondary); }
-.btn--danger    { --color-primary: var(--color-error); }
-.btn--warning   { --color-primary: var(--color-warning); }
-.btn--success   { --color-primary: var(--color-success); }
-.btn--info      { --color-primary: var(--color-info); }

@@ -9,3 +9,14 @@
 	@include text-secondary;
 	text-align: center;
 }
+
+// ─── Grid demos ──────────────────────────────────────
+#demo-grid-3 > main > div { @include grid; }
+#demo-grid-2 > main > div { @include grid-2; }
+#demo-grid-4 > main > div { @include grid-4; }
+
+// ─── Stack & Row demo ────────────────────────────────
+#demo-stack-row > main > div      { @include grid-2; }
+#demo-stack-row .demo-stack       { @include stack; }
+#demo-stack-row .demo-row         { @include row; }
+#demo-stack-row .demo-row-between { @include row-between; }

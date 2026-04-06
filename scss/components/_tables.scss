@@ -2,6 +2,10 @@
 
 table {
 	@include table-base;
+
+	tr.section-header td {
+		@include table-section-header;
+	}
 }
 
 .table-container {

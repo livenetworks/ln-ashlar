@@ -127,9 +127,9 @@
 
 @mixin table-section-header {
 	background: hsl(var(--color-table-section-bg));
-	@include font-bold;
+	@include font-semibold;
 	@include text-sm;
-	color: hsl(var(--color-table-header-bg));
+	color: hsl(var(--color-text-secondary));
 	letter-spacing: 0.3px;
 
 	&:hover {

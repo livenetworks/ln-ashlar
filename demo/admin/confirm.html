@@ -137,7 +137,7 @@
 						<header><h3>Example — Simple Buttons</h3></header>
 						<main>
 							<div class="demo-actions">
-								<button class="btn btn-danger" data-ln-confirm="Are you sure?">Delete Record</button>
+								<button class="btn" style="--color-primary: var(--color-error)" data-ln-confirm="Are you sure?">Delete Record</button>
 								<button type="button" data-ln-confirm="Reset settings?">Reset Defaults</button>
 							</div>
 						</main>
@@ -149,9 +149,9 @@
 						<main>
 							<p>Use <code>data-ln-confirm-timeout</code> to override the default 3-second revert. The attribute is observed — changing it dynamically restarts the timer.</p>
 							<div class="demo-actions">
-								<button class="btn btn-danger" data-ln-confirm="Confirm?" data-ln-confirm-timeout="1.5">1.5s timeout</button>
-								<button class="btn btn-danger" data-ln-confirm="Confirm?">3s default</button>
-								<button class="btn btn-danger" data-ln-confirm="Confirm?" data-ln-confirm-timeout="6">6s timeout</button>
+								<button class="btn" style="--color-primary: var(--color-error)" data-ln-confirm="Confirm?" data-ln-confirm-timeout="1.5">1.5s timeout</button>
+								<button class="btn" style="--color-primary: var(--color-error)" data-ln-confirm="Confirm?">3s default</button>
+								<button class="btn" style="--color-primary: var(--color-error)" data-ln-confirm="Confirm?" data-ln-confirm-timeout="6">6s timeout</button>
 							</div>
 						</main>
 					</section>
@@ -162,7 +162,7 @@
 						<main>
 							<form onsubmit="event.preventDefault(); window.lnToast.enqueue({type:'success', title:'Success', message:'Form submitted!'})">
 								<p>Confirmation prevents the form from submitting on the first click.</p>
-								<button type="submit" class="btn btn-danger" data-ln-confirm="Submit and Delete?">Confirm Action</button>
+								<button type="submit" class="btn" style="--color-primary: var(--color-error)" data-ln-confirm="Submit and Delete?">Confirm Action</button>
 							</form>
 						</main>
 					</section>

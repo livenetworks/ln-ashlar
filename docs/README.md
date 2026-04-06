@@ -6,19 +6,28 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 
 | Location | What | For whom |
 |----------|------|----------|
-| `README.md` (root) | Philosophy, quick start, doc links | Humans — entry point |
-| `docs/css/*.md` | CSS architecture per topic | Humans + AI |
-| `docs/js/*.md` | JS component architecture (internal state, render flow) | Primarily AI |
+| `CLAUDE.md` (root) | Project rules, coding standards, architectural decisions | AI — loaded every session |
+| `.claude-skills/` | AI-optimized implementation reference (mixins, boilerplate, component wiring) | AI — preloaded into agents |
+| `docs/README.md` | This file — documentation index | Humans |
+| `docs/css/*.md` | CSS architecture per topic (tokens, mixins, cards, forms, etc.) | Humans + AI on-demand |
+| `docs/js/*.md` | JS component architecture (internal state, render flow, design decisions) | Humans + AI on-demand |
 | `js/ln-*/README.md` | Per-component usage guide (attributes, API, HTML, events) | Humans |
-| `docs/SKILL.md` | ln-acme quick reference cheatsheet | AI |
-| `CLAUDE.md` (root) | Project rules, coding standards, architectural decisions | AI |
+
+### AI Documentation Layers
+
+```
+Layer 1: .claude-skills/SKILL.md        ← Always preloaded. Quick reference.
+Layer 2: .claude-skills/css/ + js/      ← Preloaded by domain architects. Implementation patterns.
+Layer 3: docs/css/*.md + docs/js/*.md   ← Read on-demand. Deep architecture detail.
+Layer 4: js/ln-*/README.md              ← Read on-demand. Usage examples and API reference.
+```
 
 ---
 
 ## CSS
 
-| Topic | File | Docs |
-|-------|------|------|
+| Topic | Source | Docs |
+|-------|--------|------|
 | Design Tokens | `scss/config/_tokens.scss` | [tokens.md](css/tokens.md) |
 | Mixins Reference | `scss/config/mixins/` | [mixins.md](css/mixins.md) |
 | Cards | `scss/components/_cards.scss` | [cards.md](css/cards.md) |
@@ -28,7 +37,13 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Forms | `scss/components/_forms.scss` | [forms.md](css/forms.md) |
 | Layout | `scss/config/mixins/_layout.scss` | [layout.md](css/layout.md) |
 | Breadcrumbs | `scss/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
+| Alert | `scss/components/_alert.scss` | [alert.md](css/alert.md) |
+| Avatar | `scss/components/_avatar.scss` | [avatar.md](css/avatar.md) |
+| Banner | `scss/components/_banner.scss` | [banner.md](css/banner.md) |
+| Loader | `scss/components/_loader.scss` | [loader.md](css/loader.md) |
+| Status Badge | `scss/components/_badge.scss` | [status-badge.md](css/status-badge.md) |
 | Icons (CSS) | `scss/config/_icons.scss` | [../js/ln-icons/README.md](../js/ln-icons/README.md) |
+| Container Queries | — | [ln-acme-container-queries.md](ln-acme-container-queries.md) |
 
 ---
 
@@ -71,4 +86,13 @@ Two files per component:
 | Autoresize | `data-ln-autoresize` | [js/ln-autoresize/README.md](../js/ln-autoresize/README.md) | [autoresize.md](js/autoresize.md) |
 | Translations | `data-ln-translations` | [js/ln-translations/README.md](../js/ln-translations/README.md) | [translations.md](js/translations.md) |
 | External Links | (automatic) | [js/ln-external-links/README.md](../js/ln-external-links/README.md) | [external-links.md](js/external-links.md) |
-| JS Patterns | — | — | [component-guide.md](js/component-guide.md) |
+
+---
+
+## Architecture References
+
+| Topic | File |
+|-------|------|
+| JS Component Patterns | [js/component-guide.md](js/component-guide.md) |
+| Reactive Architecture (v2) | [v2-reactive.md](v2-reactive.md) |
+| Container Queries | [ln-acme-container-queries.md](ln-acme-container-queries.md) |

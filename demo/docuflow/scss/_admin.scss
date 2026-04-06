@@ -100,25 +100,9 @@
 		}
 	}
 
-	// Badge styles
+	// Badge — uses ln-acme badge mixin, color via --color-primary override
 	.badge {
-		@include inline-flex;
-		@include items-center;
-		@include px(var(--spacing-sm));
-		@include py(2px);
-		@include rounded-full;
-		@include text-xs;
-		@include font-semibold;
-
-		&--success {
-			background-color: hsl(var(--color-success) / 0.1);
-			color: hsl(var(--color-success));
-		}
-
-		&--muted {
-			background-color: hsl(var(--color-text-muted) / 0.1);
-			color: hsl(var(--color-text-muted));
-		}
+		@include badge;
 	}
 
 	// Action cell

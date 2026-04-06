@@ -46,16 +46,9 @@ document.addEventListener('ln-form:submit', function (e) {
     console.log('Form data:', e.detail.data);
     // { name: 'Dalibor', email: 'd@test.com', role: 'admin' }
 });
-
-// Fill form programmatically via event
-const form = document.getElementById('user-form');
-form.dispatchEvent(new CustomEvent('ln-form:fill', {
-    detail: { name: 'Dalibor', email: 'd@test.com' }
-}));
-
-// Reset form via event
-form.dispatchEvent(new CustomEvent('ln-form:reset'));
 ```
+
+> **Note:** Prefer the direct API (`form.lnForm.fill()`, `form.lnForm.reset()`) over dispatching events on the form element. The received events exist for edge cases — the standard approach is the coordinator pattern (see below).
 
 ## Submit Button State
 
@@ -141,29 +134,28 @@ document.addEventListener('ln-form:submit', function (e) {
 ### Programmatic Fill (Edit Mode)
 
 ```javascript
-// From a data-table row click
-document.addEventListener('ln-data-table:row-click', function (e) {
-    var form = document.getElementById('user-form');
-    form.lnForm.fill(e.detail.record);
-});
-
-// Or via event dispatch
-document.getElementById('user-form').dispatchEvent(
-    new CustomEvent('ln-form:fill', {
-        detail: { name: 'Dalibor', email: 'd@test.com', role: 'admin' }
-    })
-);
+// Direct API — caller has a reference to the form
+var form = document.getElementById('user-form');
+form.lnForm.fill({ name: 'Dalibor', email: 'd@test.com', role: 'admin' });
 ```
 
 ### Coordinator Pattern
 
-```javascript
-// Listen for form submissions
-document.addEventListener('ln-form:submit', function (e) {
-    var form = e.target;
-    if (form.id !== 'user-form') return;
+Components don't know about each other. The coordinator is the glue:
 
-    // Send to server
+```javascript
+var table = document.getElementById('users-table');
+var form  = document.getElementById('user-form');
+var modal = document.getElementById('user-modal');
+
+// Fill form from table row click
+table.addEventListener('ln-data-table:row-click', function (e) {
+    form.lnForm.fill(e.detail.record);
+    modal.setAttribute('data-ln-modal', 'open');
+});
+
+// Submit form to server
+form.addEventListener('ln-form:submit', function (e) {
     fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -171,10 +163,8 @@ document.addEventListener('ln-form:submit', function (e) {
     })
     .then(function (res) { return res.json(); })
     .then(function (result) {
-        // Success: close modal, show toast
-    })
-    .catch(function (err) {
-        // Error: show toast
+        modal.setAttribute('data-ln-modal', 'close');
+        // Refresh table, show toast...
     });
 });
 ```

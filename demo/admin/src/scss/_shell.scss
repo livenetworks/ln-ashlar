@@ -128,13 +128,6 @@
 	}
 }
 
-// ─── Demo button color variants ────────────────────────────────────────────
-// Shows how projects define color variants via --color-primary override.
-// Project usage: #delete-user { @include btn; --color-primary: var(--color-error); }
-.btn-danger  { --color-primary: var(--color-error); --color-primary-hover: var(--color-error-hover); }
-.btn-success { --color-primary: var(--color-success); --color-primary-hover: 142 71% 28%; }
-.btn-warning { --color-primary: var(--color-warning); --color-primary-hover: 32 90% 36%; }
-.btn-info    { --color-primary: var(--color-info); --color-primary-hover: 217 91% 48%; }
 
 // ==========================================================================
 // Header

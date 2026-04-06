@@ -42,11 +42,6 @@
 // Table container
 .table-container { @include overflow-x-auto; }
 
-// Section header rows
-tr.section-header td {
-	@include table-section-header;
-}
-
 // Action buttons in table cells
 td .action {
 	@include table-action;

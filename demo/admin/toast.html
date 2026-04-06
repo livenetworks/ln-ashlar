@@ -123,9 +123,9 @@
 						<main>
 							<nav class="demo-actions">
 								<button onclick="window.lnToast.enqueue({type:'success', title:'Success', message:'The record has been saved.'})" class="btn">Success</button>
-								<button onclick="window.lnToast.enqueue({type:'error', title:'Error', message:'Something went wrong.'})" class="btn btn-danger">Error</button>
-								<button onclick="window.lnToast.enqueue({type:'warn', title:'Warning', message:'Please check the data.'})" class="btn btn-warning">Warning</button>
-								<button onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'A new version is available.'})" class="btn btn-info">Info</button>
+								<button onclick="window.lnToast.enqueue({type:'error', title:'Error', message:'Something went wrong.'})" class="btn" style="--color-primary: var(--color-error)">Error</button>
+								<button onclick="window.lnToast.enqueue({type:'warn', title:'Warning', message:'Please check the data.'})" class="btn" style="--color-primary: var(--color-warning)">Warning</button>
+								<button onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'A new version is available.'})" class="btn" style="--color-primary: var(--color-info)">Info</button>
 							</nav>
 						</main>
 					</section>
@@ -134,7 +134,7 @@
 					<section class="section-card">
 						<header><h3>Error with a list of errors</h3></header>
 						<main>
-							<button onclick="window.lnToast.enqueue({type:'error', title:'Validation', message:['Name is required','Email format is incorrect','Password is too short']})" class="btn btn-danger">Show validation errors</button>
+							<button onclick="window.lnToast.enqueue({type:'error', title:'Validation', message:['Name is required','Email format is incorrect','Password is too short']})" class="btn" style="--color-primary: var(--color-error)">Show validation errors</button>
 						</main>
 					</section>
 
