@@ -85,7 +85,7 @@
 // ── Thead (sticky #2, below toolbar) ──
 [data-ln-table] thead th {
 	position: sticky;
-	top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 2.75rem));
+	top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 0px));
 	z-index: calc(var(--z-sticky) - 1);
 	background: hsl(var(--color-table-header-bg));
 }

@@ -12,7 +12,7 @@ table {
 	@include container(table);
 	overflow-x: auto;
 
-	@container table (max-width: 640px) {
+	@container table (max-width: 480px) {
 		table { @include table-responsive; }
 	}
 }
