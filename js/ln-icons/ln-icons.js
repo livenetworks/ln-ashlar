@@ -1,12 +1,16 @@
 // SVG icon loader — fetches icons on demand, builds a hidden sprite.
+// Fetched SVGs are cached in localStorage (prefix "lni:") so subsequent
+// page loads resolve instantly without network requests.
 //
 // Two prefixes:
-//   #ln-{name}   → Tabler CDN  (https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons)
+//   #ln-{name}   → Tabler CDN  (https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline)
 //   #lnc-{name}  → Custom CDN  (window.LN_ICONS_CUSTOM_CDN)
 //
 // Config — set on window BEFORE this script loads:
 //   window.LN_ICONS_CDN        = 'https://...'   (override Tabler CDN base)
 //   window.LN_ICONS_CUSTOM_CDN = 'https://...'   (required for lnc- icons)
+//
+// Cache: bump CACHE_VERSION to invalidate all cached icons.
 //
 // Usage:
 //   <svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg>
@@ -21,8 +25,26 @@
     var pending = new Set();
     var spriteEl = null;
 
-    var BASE_CDN   = (window.LN_ICONS_CDN        || 'https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons').replace(/\/$/, '');
+    var BASE_CDN   = (window.LN_ICONS_CDN        || 'https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline').replace(/\/$/, '');
     var CUSTOM_CDN = (window.LN_ICONS_CUSTOM_CDN || '').replace(/\/$/, '');
+
+    var CACHE_PREFIX  = 'lni:';
+    var CACHE_VER_KEY = 'lni:v';
+    var CACHE_VERSION = '1';
+
+    function _checkCacheVersion() {
+        try {
+            if (localStorage.getItem(CACHE_VER_KEY) !== CACHE_VERSION) {
+                for (var i = localStorage.length - 1; i >= 0; i--) {
+                    var key = localStorage.key(i);
+                    if (key && key.indexOf(CACHE_PREFIX) === 0) localStorage.removeItem(key);
+                }
+                localStorage.setItem(CACHE_VER_KEY, CACHE_VERSION);
+            }
+        } catch (e) { /* localStorage unavailable or full — proceed without cache */ }
+    }
+
+    _checkCacheVersion();
 
     function _getSprite() {
         if (!spriteEl) {
@@ -68,6 +90,19 @@
     function _load(href) {
         if (loaded.has(href) || pending.has(href)) return;
         if (href.indexOf(PREFIX_LNC) === 0 && !CUSTOM_CDN) return;
+
+        var id = href.slice(1);
+
+        // Check localStorage first
+        try {
+            var cached = localStorage.getItem(CACHE_PREFIX + id);
+            if (cached) {
+                _addSymbol(id, cached);
+                loaded.add(href);
+                return;
+            }
+        } catch (e) { /* proceed to fetch */ }
+
         pending.add(href);
 
         fetch(_url(href))
@@ -76,9 +111,10 @@
                 return r.text();
             })
             .then(function (raw) {
-                _addSymbol(href.slice(1), raw);
+                _addSymbol(id, raw);
                 loaded.add(href);
                 pending.delete(href);
+                try { localStorage.setItem(CACHE_PREFIX + id, raw); } catch (e) { /* storage full */ }
             })
             .catch(function () {
                 pending.delete(href);

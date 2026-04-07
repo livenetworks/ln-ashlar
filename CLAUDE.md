@@ -336,8 +336,10 @@ Projects can override at any level:
 
 ## Icons
 
-Icons use SVG sprite injection — `ln-icons.js` builds a hidden `<svg>` sprite from `js/ln-icons/icons/*.svg`
-and inserts it into `<body>` at init. Icons render via `<use href="#ln-{name}">` and inherit `currentColor`.
+Icons use SVG sprite injection — `ln-icons.js` fetches icons on demand from Tabler CDN (pinned to `@3.31.0`),
+builds a hidden `<svg>` sprite, and inserts it into `<body>` at init. Fetched SVGs are cached in `localStorage`
+(prefix `lni:`) — subsequent page loads resolve from cache with zero network requests. Icons render via
+`<use href="#ln-{name}">` and inherit `currentColor`.
 
 ```html
 <!-- Standalone icon -->

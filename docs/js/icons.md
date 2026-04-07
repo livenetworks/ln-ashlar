@@ -1,6 +1,6 @@
 # Icons
 
-On-demand SVG icon loader. Scans the DOM for `<use href="#ln-*">` and `<use href="#lnc-*">` elements, fetches each referenced icon individually from CDN, and injects them as `<symbol>` elements into a hidden sprite. File: `js/ln-icons/ln-icons.js`.
+On-demand SVG icon loader. Scans the DOM for `<use href="#ln-*">` and `<use href="#lnc-*">` elements, fetches each referenced icon individually from CDN, and injects them as `<symbol>` elements into a hidden sprite. Fetched SVGs are cached in `localStorage` — subsequent page loads resolve from cache with zero network requests. File: `js/ln-icons/ln-icons.js`.
 
 ## Two Prefixes
 
@@ -37,7 +37,7 @@ Symbol IDs in the sprite mirror the full `href` value minus `#`:
 Read from `window` at init (before DOMContentLoaded):
 
 ```javascript
-var BASE_CDN   = window.LN_ICONS_CDN        || 'https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons';
+var BASE_CDN   = window.LN_ICONS_CDN        || 'https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline';
 var CUSTOM_CDN = window.LN_ICONS_CUSTOM_CDN || '';
 ```
 
@@ -57,9 +57,9 @@ For each matched <use>:
 
 Root element itself is also checked with `matches()` — covers single-node mutations.
 
-## Deduplication
+## Deduplication & Caching
 
-Two `Set` instances keyed by full `href` value (e.g. `'#lnc-file-pdf'`):
+Two `Set` instances keyed by full `href` value (e.g. `'#lnc-file-pdf'`) prevent duplicate requests within a single page load:
 
 ```javascript
 var loaded  = new Set();  // successfully added to sprite
@@ -68,25 +68,40 @@ var pending = new Set();  // fetch in flight
 
 `_load(href)` bails immediately if `loaded.has(href) || pending.has(href)`.
 
+### localStorage Cache (cross-navigation)
+
+Fetched SVG content is persisted in `localStorage` with prefix `lni:` (e.g. `lni:ln-home`). On each `_load(href)` call, localStorage is checked before `fetch()`. Cache hits inject the symbol synchronously — no network request.
+
+```javascript
+var CACHE_PREFIX  = 'lni:';
+var CACHE_VER_KEY = 'lni:v';
+var CACHE_VERSION = '1';
+```
+
+Cache invalidation: bumping `CACHE_VERSION` clears all `lni:*` keys on next page load, forcing a re-fetch. All `localStorage` access is wrapped in `try/catch` to handle private browsing and storage-full scenarios gracefully.
+
 ## Fetch + Symbol Injection — `_load(href)` → `_addSymbol(id, raw)`
 
 ```
 1. Bail if loaded or pending
 2. Bail if lnc- prefix and CUSTOM_CDN is empty
-3. pending.add(href)
-4. Resolve URL:
+3. Check localStorage for cached SVG:
+   a. If found → _addSymbol(id, cached), loaded.add(href), return
+4. pending.add(href)
+5. Resolve URL:
      lnc- → CUSTOM_CDN + '/' + name + '.svg'
      ln-  → BASE_CDN   + '/' + name + '.svg'
-5. fetch(url)
-6. On success: parse raw SVG string
+6. fetch(url)
+7. On success: parse raw SVG string
    a. Extract viewBox (fallback: '0 0 24 24')
    b. Extract inner content between <svg> tags
    c. Extract root SVG presentation attrs: fill, stroke, stroke-width, stroke-linecap, stroke-linejoin
    d. Create <symbol id="{href minus #}" viewBox="..." {attrs}>
    e. symbol.innerHTML = inner
    f. Append to <defs> in sprite
-7. loaded.add(href), pending.delete(href)
-8. On error: pending.delete(href) — silent fail, icon stays blank
+   g. Store raw SVG in localStorage
+8. loaded.add(href), pending.delete(href)
+9. On error: pending.delete(href) — silent fail, icon stays blank
 ```
 
 ## Sprite Element

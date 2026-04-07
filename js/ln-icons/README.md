@@ -1,6 +1,6 @@
 # ln-icons
 
-On-demand SVG icon loader — scans the DOM for `<use href="#ln-*">` and `<use href="#lnc-*">`, fetches each icon individually from CDN, and builds a hidden `<svg>` sprite at runtime. No bundled SVG content.
+On-demand SVG icon loader — scans the DOM for `<use href="#ln-*">` and `<use href="#lnc-*">`, fetches each icon individually from CDN, and builds a hidden `<svg>` sprite at runtime. Fetched SVGs are cached in `localStorage` so subsequent page loads resolve instantly without network requests.
 
 ## Two Prefixes
 
@@ -72,7 +72,7 @@ Set on `window` before the script loads:
 
 | Property | Default | Description |
 |---|---|---|
-| `window.LN_ICONS_CDN` | `https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons` | Tabler CDN base URL |
+| `window.LN_ICONS_CDN` | `https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline` | Tabler CDN base URL |
 | `window.LN_ICONS_CUSTOM_CDN` | — | CDN base URL for `lnc-` icons |
 
 ```html
@@ -90,6 +90,12 @@ Set on `window` before the script loads:
 4. Use as `<use href="#lnc-{name}">`
 
 No config update needed — the `lnc-` prefix routes automatically.
+
+## Caching
+
+Fetched SVG content is stored in `localStorage` with the prefix `lni:` (e.g. `lni:ln-home`). On subsequent page loads, icons are injected from cache without any network requests.
+
+Cache is versioned via `CACHE_VERSION` inside `ln-icons.js`. Bumping the version clears all cached icons and re-fetches them.
 
 ## No Init Required
 
