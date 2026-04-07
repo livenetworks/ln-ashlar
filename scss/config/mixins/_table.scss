@@ -103,12 +103,20 @@
 		&::before {
 			content: attr(data-label);
 			@include absolute;
+			top: 0;
+			bottom: 0;
 			left: 1rem;
+			width: calc(50% - 1.5rem);
+			@include flex;
+			@include items-center;
 			@include text-left;
 			@include font-semibold;
 			@include text-secondary;
 			@include text-xs;
 			@include uppercase;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 	}
 }
