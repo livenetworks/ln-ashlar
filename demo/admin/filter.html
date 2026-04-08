@@ -125,10 +125,9 @@
 							<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 							<tbody>
 								<tr><td><code>data-ln-filter="targetId"</code></td><td>component root</td><td>Target element by ID whose children are filtered</td></tr>
-								<tr><td><code>data-ln-filter-key="field"</code></td><td><code>&lt;button&gt;</code></td><td>Name of data attribute for comparison on target children</td></tr>
-								<tr><td><code>data-ln-filter-value="val"</code></td><td><code>&lt;button&gt;</code></td><td>Value for comparison (empty = show all)</td></tr>
+								<tr><td><code>data-ln-filter-key="field"</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Name of data attribute for comparison on target children</td></tr>
+								<tr><td><code>data-ln-filter-value="val"</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Value for comparison (empty = show all)</td></tr>
 								<tr><td><code>data-ln-filter-hide</code></td><td>target children</td><td>Set by JS when element doesn't match</td></tr>
-								<tr><td><code>data-active</code></td><td>active button</td><td>Set by JS on the currently selected button</td></tr>
 							</tbody>
 						</table>
 					</main>
@@ -139,10 +138,12 @@
 					<header><h3>Basic Filter</h3></header>
 					<main>
 						<nav data-ln-filter="filter-basic-list" id="filter-basic-nav">
-							<button type="button" data-ln-filter-key="category" data-ln-filter-value="">All</button>
-							<button type="button" data-ln-filter-key="category" data-ln-filter-value="design">Design</button>
-							<button type="button" data-ln-filter-key="category" data-ln-filter-value="dev">Development</button>
-							<button type="button" data-ln-filter-key="category" data-ln-filter-value="qa">QA</button>
+							<ul>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="" checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="design"> Design</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="dev"> Development</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="qa"> QA</label></li>
+							</ul>
 						</nav>
 
 						<ul id="filter-basic-list">
@@ -162,10 +163,12 @@
 					<header><h3>Filter with Cards</h3></header>
 					<main>
 						<nav data-ln-filter="filter-cards-list" id="filter-cards-nav">
-							<button type="button" data-ln-filter-key="status" data-ln-filter-value="">All</button>
-							<button type="button" data-ln-filter-key="status" data-ln-filter-value="active">Active</button>
-							<button type="button" data-ln-filter-key="status" data-ln-filter-value="pending">Pending</button>
-							<button type="button" data-ln-filter-key="status" data-ln-filter-value="inactive">Inactive</button>
+							<ul>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="" checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="active"> Active</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="pending"> Pending</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="inactive"> Inactive</label></li>
+							</ul>
 						</nav>
 
 						<ul id="filter-cards-list">
@@ -205,10 +208,12 @@
 
 						<div id="combo-toolbar">
 							<nav data-ln-filter="combo-list">
-								<button type="button" data-ln-filter-key="dept" data-ln-filter-value="">All departments</button>
-								<button type="button" data-ln-filter-key="dept" data-ln-filter-value="hr">HR</button>
-								<button type="button" data-ln-filter-key="dept" data-ln-filter-value="it">IT</button>
-								<button type="button" data-ln-filter-key="dept" data-ln-filter-value="finance">Finance</button>
+								<ul>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="" checked> All departments</label></li>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="hr"> HR</label></li>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="it"> IT</label></li>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="finance"> Finance</label></li>
+								</ul>
 							</nav>
 							<label>
 								<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
@@ -240,7 +245,7 @@
 							<code id="api-filter-status">Active filter: none</code>
 						</nav>
 
-						<nav data-ln-filter="api-filter-list" id="api-filter-nav" style="display:none"></nav>
+						<nav data-ln-filter="api-filter-list" id="api-filter-nav" hidden></nav>
 
 						<ul id="api-filter-list">
 							<li data-priority="high">Task A — High priority</li>
@@ -277,24 +282,20 @@ document.addEventListener('ln-filter:reset', function (e) {
 				<section class="section-card">
 					<header><h3>HTML Structure</h3></header>
 					<main>
-						<pre><code>&lt;!-- Filter buttons --&gt;
+						<pre><code>&lt;!-- Filter checkboxes --&gt;
 &lt;nav data-ln-filter="my-list"&gt;
-    &lt;button type="button" data-ln-filter-key="category" data-ln-filter-value=""&gt;All&lt;/button&gt;
-    &lt;button type="button" data-ln-filter-key="category" data-ln-filter-value="a"&gt;Category A&lt;/button&gt;
-    &lt;button type="button" data-ln-filter-key="category" data-ln-filter-value="b"&gt;Category B&lt;/button&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="" checked&gt; All&lt;/label&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"&gt; Category A&lt;/label&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"&gt; Category B&lt;/label&gt;&lt;/li&gt;
+    &lt;/ul&gt;
 &lt;/nav&gt;
 
 &lt;!-- Target list (children have data-category attribute) --&gt;
 &lt;ul id="my-list"&gt;
     &lt;li data-category="a"&gt;Element from category A&lt;/li&gt;
     &lt;li data-category="b"&gt;Element from category B&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;!-- Required CSS --&gt;
-&lt;style&gt;
-[data-ln-filter-hide] { display: none; }
-[data-ln-filter-key][data-active] { background: var(--accent); }
-&lt;/style&gt;</code></pre>
+&lt;/ul&gt;</code></pre>
 					</main>
 				</section>
 
@@ -302,19 +303,8 @@ document.addEventListener('ln-filter:reset', function (e) {
 				<section class="section-card">
 					<header><h3>Required CSS</h3></header>
 					<main>
-						<p>The component adds attributes — the consumer provides the visual rules:</p>
-						<pre><code>/* Hide filtered-out items */
-[data-ln-filter-hide] {
-    display: none;
-}
-
-/* Active filter button */
-[data-ln-filter-key][data-active] {
-    background: var(--color-primary);
-    color: var(--color-text-on-primary);
-}
-
-/* Combined with ln-search */
+						<p>The hide rule is bundled in ln-acme. Pill styling (active state highlight) is automatic via <code>label:has(&gt; input:checked)</code> in the library defaults — no additional CSS needed for active state.</p>
+						<pre><code>/* Combined with ln-search */
 [data-ln-search-hide],
 [data-ln-filter-hide] {
     display: none;

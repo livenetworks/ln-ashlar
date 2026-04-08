@@ -8,7 +8,6 @@ import { reactiveState, createBatcher } from '../ln-core';
 	const KEY_ATTR = 'data-ln-filter-key';
 	const VALUE_ATTR = 'data-ln-filter-value';
 	const HIDE_ATTR = 'data-ln-filter-hide';
-	const ACTIVE_ATTR = 'data-active';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -25,7 +24,7 @@ import { reactiveState, createBatcher } from '../ln-core';
 
 		this.dom = dom;
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
-		this.buttons = Array.from(dom.querySelectorAll('button'));
+		this.inputs = Array.from(dom.querySelectorAll('[' + KEY_ATTR + ']'));
 		this._pendingEvents = [];
 
 		const self = this;
@@ -42,21 +41,16 @@ import { reactiveState, createBatcher } from '../ln-core';
 
 		this._attachHandlers();
 
-		// Initialize from existing DOM — find pre-active button
-		for (let i = 0; i < this.buttons.length; i++) {
-			const btn = this.buttons[i];
-			if (btn.hasAttribute(ACTIVE_ATTR) && btn.getAttribute(VALUE_ATTR) !== '') {
+		// Initialize from existing DOM — find pre-checked input
+		for (let i = 0; i < this.inputs.length; i++) {
+			const input = this.inputs[i];
+			if (input.checked && input.getAttribute(VALUE_ATTR) !== '') {
 				// Set state directly on the proxy target to avoid triggering render
-				this.state.key = btn.getAttribute(KEY_ATTR);
-				this.state.value = btn.getAttribute(VALUE_ATTR);
+				this.state.key = input.getAttribute(KEY_ATTR);
+				this.state.value = input.getAttribute(VALUE_ATTR);
 				break;
 			}
 		}
-
-		// Initialize aria-pressed on all filter buttons
-		this.buttons.forEach(function (btn) {
-			btn.setAttribute('aria-pressed', btn.hasAttribute(ACTIVE_ATTR) ? 'true' : 'false');
-		});
 
 		dom.setAttribute(INIT_ATTR, '');
 		return this;
@@ -67,24 +61,30 @@ import { reactiveState, createBatcher } from '../ln-core';
 	_component.prototype._attachHandlers = function () {
 		const self = this;
 
-		this.buttons.forEach(function (btn) {
-			if (btn[DOM_ATTRIBUTE + 'Bound']) return;
-			btn[DOM_ATTRIBUTE + 'Bound'] = true;
+		this.inputs.forEach(function (input) {
+			if (input[DOM_ATTRIBUTE + 'Bound']) return;
+			input[DOM_ATTRIBUTE + 'Bound'] = true;
 
-			btn._lnFilterClick = function () {
-				const key = btn.getAttribute(KEY_ATTR);
-				const value = btn.getAttribute(VALUE_ATTR);
+			input._lnFilterChange = function () {
+				const key = input.getAttribute(KEY_ATTR);
+				const value = input.getAttribute(VALUE_ATTR);
 
 				if (value === '') {
+					// "All" checkbox — reset
+					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: '' } });
+					self.reset();
+				} else if (self.state.key === key && self.state.value === value) {
+					// Same filter clicked again — toggle OFF (reset)
 					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: '' } });
 					self.reset();
 				} else {
+					// New filter selected
 					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: value } });
 					self.state.key = key;
 					self.state.value = value;
 				}
 			};
-			btn.addEventListener('click', btn._lnFilterClick);
+			input.addEventListener('change', input._lnFilterChange);
 		});
 	};
 
@@ -95,29 +95,23 @@ import { reactiveState, createBatcher } from '../ln-core';
 		const activeKey = this.state.key;
 		const activeValue = this.state.value;
 
-		// Update button states
-		this.buttons.forEach(function (btn) {
-			const btnKey = btn.getAttribute(KEY_ATTR);
-			const btnValue = btn.getAttribute(VALUE_ATTR);
+		// Update input states
+		this.inputs.forEach(function (input) {
+			const inputKey = input.getAttribute(KEY_ATTR);
+			const inputValue = input.getAttribute(VALUE_ATTR);
 			let isActive = false;
 
 			if (activeKey === null && activeValue === null) {
-				// Reset state — "all" button is active
-				isActive = btnValue === '';
+				// Reset state — "All" input is active
+				isActive = inputValue === '';
 			} else {
-				isActive = btnKey === activeKey && btnValue === activeValue;
+				isActive = inputKey === activeKey && inputValue === activeValue;
 			}
 
-			if (isActive) {
-				btn.setAttribute(ACTIVE_ATTR, '');
-				btn.setAttribute('aria-pressed', 'true');
-			} else {
-				btn.removeAttribute(ACTIVE_ATTR);
-				btn.setAttribute('aria-pressed', 'false');
-			}
+			input.checked = isActive;
 		});
 
-		// Apply filter to target children
+		// Apply filter to target children (unchanged logic)
 		const target = document.getElementById(self.targetId);
 		if (!target) return;
 
@@ -126,7 +120,6 @@ import { reactiveState, createBatcher } from '../ln-core';
 			const el = children[i];
 
 			if (activeKey === null && activeValue === null) {
-				// Reset — show all
 				el.removeAttribute(HIDE_ATTR);
 				continue;
 			}
@@ -180,13 +173,12 @@ import { reactiveState, createBatcher } from '../ln-core';
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		const self = this;
-		this.buttons.forEach(function (btn) {
-			if (btn._lnFilterClick) {
-				btn.removeEventListener('click', btn._lnFilterClick);
-				delete btn._lnFilterClick;
+		this.inputs.forEach(function (input) {
+			if (input._lnFilterChange) {
+				input.removeEventListener('change', input._lnFilterChange);
+				delete input._lnFilterChange;
 			}
-			delete btn[DOM_ATTRIBUTE + 'Bound'];
+			delete input[DOM_ATTRIBUTE + 'Bound'];
 		});
 		this.dom.removeAttribute(INIT_ATTR);
 		delete this.dom[DOM_ATTRIBUTE];

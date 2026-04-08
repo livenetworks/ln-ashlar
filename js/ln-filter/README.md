@@ -1,7 +1,7 @@
 # ln-filter
 
 Generic filter component — filters children of a target element by `data-*` attribute.
-Buttons with `data-ln-filter-key` + `data-ln-filter-value` control the filters.
+Checkbox controls with `data-ln-filter-key` + `data-ln-filter-value` control the filters.
 Elements that don't match receive a `data-ln-filter-hide` attribute.
 
 ## Attributes
@@ -9,10 +9,9 @@ Elements that don't match receive a `data-ln-filter-hide` attribute.
 | Attribute | On | Description |
 |---------|-----|------|
 | `data-ln-filter="targetId"` | component root | Target element by ID whose children are filtered |
-| `data-ln-filter-key="field"` | `<button>` inside | Name of data attribute for comparison on target children |
-| `data-ln-filter-value="val"` | `<button>` inside | Value for comparison (empty = show all) |
+| `data-ln-filter-key="field"` | `<input type="checkbox">` inside | Name of data attribute for comparison on target children |
+| `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value for comparison (empty = show all) |
 | `data-ln-filter-hide` | target children | Set by JS when element doesn't match |
-| `data-active` | active button | Set by JS on the currently selected button |
 
 ## API
 
@@ -53,11 +52,13 @@ document.addEventListener('ln-filter:reset', function (e) {
 ### Basic usage
 
 ```html
-<!-- Filter buttons -->
+<!-- Filter checkboxes -->
 <nav data-ln-filter="my-list">
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="">All</button>
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="a">Category A</button>
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="b">Category B</button>
+    <ul>
+        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="" checked> All</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"> Category A</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"> Category B</label></li>
+    </ul>
 </nav>
 
 <!-- Target list (children have data-category attribute) -->
@@ -73,28 +74,27 @@ document.addEventListener('ln-filter:reset', function (e) {
 ```html
 <!-- Filter by phase -->
 <nav data-ln-filter="documents">
-    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="">All</button>
-    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="0">Phase 0</button>
-    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="1">Phase 1</button>
-    <button type="button" data-ln-filter-key="phase" data-ln-filter-value="2">Phase 2</button>
+    <ul>
+        <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-value="" checked> All</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-value="0"> Phase 0</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-value="1"> Phase 1</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-value="2"> Phase 2</label></li>
+    </ul>
 </nav>
 ```
 
-> **Button with `data-ln-filter-value=""`** = "Show all" (reset). On initialization it automatically receives `data-active`.
+> **Checkbox with `data-ln-filter-value=""`** = "Show all" (reset). On initialization the "All" checkbox is checked by default.
+
+> **Toggle behavior**: Clicking an active filter unchecks it and resets to "All".
 
 ## CSS
 
-The consumer must provide CSS rules for hiding and for the active button:
+The hide rule is bundled in ln-acme. Pill styling (active state highlight via primary color) is automatic for `label:has(> input[type="checkbox"])` via the library defaults. The consumer only needs the hide rule when combining with `ln-search`:
 
 ```css
+[data-ln-search-hide],
 [data-ln-filter-hide] {
     display: none;
-}
-
-/* Style for active filter button */
-[data-ln-filter-key][data-active] {
-    background: var(--accent);
-    color: var(--bg);
 }
 ```
 
@@ -111,7 +111,7 @@ The consumer must provide CSS rules for hiding and for the active button:
 
 ## Internals
 
-Uses `reactiveState` + `createBatcher` from `ln-core`. State is `{ key, value }` — all DOM updates (button active state, target hide attributes) derive from state in a batched `_render()` cycle. Events dispatch after render via `_afterRender()`.
+Uses `reactiveState` + `createBatcher` from `ln-core`. State is `{ key, value }` — all DOM updates (`input.checked` on filter controls, `data-ln-filter-hide` on target children) derive from state in a batched `_render()` cycle. Events dispatch after render via `_afterRender()`. Listens to `change` events on `<input type="checkbox">` elements.
 
 ## Dynamic elements
 

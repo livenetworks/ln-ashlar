@@ -5,8 +5,3 @@
 [data-ln-filter-hide="true"] {
 	display: none;
 }
-
-[data-ln-filter-key][data-active] {
-	background-color: hsl(var(--color-primary));
-	color: hsl(var(--color-white));
-}

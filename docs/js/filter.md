@@ -5,11 +5,13 @@ Generic filter component — filters children of a target element by `data-*` at
 ## HTML
 
 ```html
-<!-- Filter buttons -->
+<!-- Filter checkboxes -->
 <nav data-ln-filter="my-list">
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="">All</button>
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="a">Category A</button>
-    <button type="button" data-ln-filter-key="category" data-ln-filter-value="b">Category B</button>
+    <ul>
+        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="" checked> All</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"> Category A</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"> Category B</label></li>
+    </ul>
 </nav>
 
 <!-- Target list -->
@@ -24,10 +26,9 @@ Generic filter component — filters children of a target element by `data-*` at
 | Attribute | On | Description |
 |-----------|-----|-------------|
 | `data-ln-filter="targetId"` | component root | Target element by ID whose children are filtered |
-| `data-ln-filter-key="field"` | `<button>` inside | Data attribute name to compare on target children |
-| `data-ln-filter-value="val"` | `<button>` inside | Value to match (empty = show all) |
+| `data-ln-filter-key="field"` | `<input type="checkbox">` inside | Data attribute name to compare on target children |
+| `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value to match (empty = show all) |
 | `data-ln-filter-hide` | target children | Set by JS when element doesn't match |
-| `data-active` | active button | Set by JS on the currently selected button |
 | `data-ln-filter-initialized` | component root | Set by JS after init. Prevents double-init |
 
 ## Events
@@ -49,20 +50,21 @@ el.lnFilter.getActive();               // { key, value } or null
 el.lnFilter.destroy();                 // remove listeners, clean up
 ```
 
-## CSS (consumer provides)
+## CSS (consumer provides for ln-search combination)
 
 ```css
-[data-ln-filter-hide] { display: none; }
-
-[data-ln-filter-key][data-active] {
-    background: var(--accent);
-    color: var(--bg);
+[data-ln-search-hide],
+[data-ln-filter-hide] {
+    display: none;
 }
 ```
 
+The hide rule for `[data-ln-filter-hide]` is bundled in ln-acme. Pill active state is handled automatically via `label:has(> input:checked)` in the library defaults.
+
 ## Behavior
 
-- Button with `data-ln-filter-value=""` = "Show all" (reset). Gets `data-active` on init.
+- Checkbox with `data-ln-filter-value=""` = "Show all" (reset). The "All" checkbox is checked on init.
+- Clicking an active filter unchecks it and resets to "All".
 - Works independently alongside `ln-search` on the same target — each with its own hide attribute.
 - MutationObserver auto-re-filters dynamically added children.
 
@@ -83,8 +85,8 @@ this.state = reactiveState({
 }, queueRender);
 ```
 
-- `key = null, value = null` — reset state, all items visible, "All" button is active
-- `key = 'category', value = 'design'` — filter active, matching button highlighted
+- `key = null, value = null` — reset state, all items visible, "All" input is checked
+- `key = 'category', value = 'design'` — filter active, matching input is checked
 
 Any assignment to `state.key` or `state.value` triggers `queueRender`.
 
@@ -98,7 +100,7 @@ createBatcher schedules via queueMicrotask (deduplicates within same tick)
     |
     v
 renderFn:
-    1. _render()               — update button states + filter target children
+    1. _render()               — update input checked states + filter target children
     |
     v
 afterRender:
@@ -111,10 +113,10 @@ afterRender:
 
 `_render()` derives all DOM from two values (`state.key`, `state.value`). Two operations:
 
-**1. Button states**: iterate all buttons, compare each button's `data-ln-filter-key` / `data-ln-filter-value` against active state. Set or remove `data-active` and `aria-pressed`.
+**1. Input states**: iterate all inputs, compare each input's `data-ln-filter-key` / `data-ln-filter-value` against active state. Set `input.checked = true/false`.
 
-- Reset state (`key = null, value = null`): the button with `value=""` gets `data-active`
-- Active state: the button matching both key and value gets `data-active`
+- Reset state (`key = null, value = null`): the input with `value=""` gets `checked = true`
+- Active state: the input matching both key and value gets `checked = true`
 
 **2. Target children**: look up `document.getElementById(targetId)`, iterate children:
 
@@ -127,7 +129,7 @@ afterRender:
 Events dispatch **after** render via `_pendingEvents` + `_afterRender()`:
 
 ```
-button click:
+input change:
     1. push { name: 'ln-filter:changed', detail: { key, value } } to _pendingEvents
     2. set state.key and state.value          → triggers batcher
     ─── microtask boundary ───
@@ -148,17 +150,16 @@ This is how per-column table filters work: `ln-filter` inside a `<th>` dispatche
 
 ### Init from Existing DOM
 
-On construction, buttons are scanned for an existing `data-active` attribute. If found, `state.key` and `state.value` are set directly on the proxy target — this initializes state without triggering a render (the DOM is already correct from the server).
+On construction, inputs are scanned for an existing `checked` attribute. If found (and value is not empty), `state.key` and `state.value` are set directly on the proxy target — this initializes state without triggering a render (the DOM is already correct from the server).
 
-After init, `aria-pressed` is set on all buttons based on their `data-active` state.
+### Change Handlers
 
-### Click Handlers
+`_attachHandlers()` adds `change` listeners to all `[data-ln-filter-key]` inputs. Guard: `input[DOM_ATTRIBUTE + 'Bound'] = true` prevents duplicate listeners when MutationObserver re-fires.
 
-`_attachHandlers()` adds click listeners to all buttons. Guard: `btn[DOM_ATTRIBUTE + 'Bound'] = true` prevents duplicate listeners when MutationObserver re-fires.
-
-Click behavior:
-- Button with `value=""` (reset button): pushes `ln-filter:changed` event with empty value, then calls `this.reset()` which pushes `ln-filter:reset` and sets state to null/null
-- Button with a value: pushes `ln-filter:changed` event, then sets `state.key` and `state.value`
+Change behavior:
+- Input with `value=""` (reset/All input): pushes `ln-filter:changed` event with empty value, then calls `this.reset()` which pushes `ln-filter:reset` and sets state to null/null
+- Input with a value that matches current active state (toggle off): pushes `ln-filter:changed` event with empty value, then calls `this.reset()`
+- Input with a new value: pushes `ln-filter:changed` event, then sets `state.key` and `state.value`
 
 ### Public API Methods
 
@@ -176,7 +177,7 @@ State is flat — two scalar values (`key`, `value`). No nested objects or array
 
 ### Why NOT `fill()` / `renderList()`
 
-- Buttons are server-rendered, not from templates. `_render()` toggles attributes on existing buttons.
+- Inputs are server-rendered, not from templates. `_render()` toggles `input.checked` on existing inputs.
 - Target items are external DOM (a separate container by ID). ln-filter doesn't own or create them — it only sets/removes `data-ln-filter-hide`.
 - There is no template cloning or list building. All DOM elements exist at page load.
 
@@ -184,5 +185,5 @@ State is flat — two scalar values (`key`, `value`). No nested objects or array
 
 1. **Init**: MutationObserver or DOMContentLoaded → `_findElements` → `new _component(dom)`
 2. **Guard**: `data-ln-filter-initialized` attribute prevents double-init on the same element
-3. **Steady state**: click or API call → set state → batcher → render → dispatch events
-4. **Destroy**: `destroy()` removes all click listeners, the init guard attribute, and the instance reference.
+3. **Steady state**: change event or API call → set state → batcher → render → dispatch events
+4. **Destroy**: `destroy()` removes all change listeners, the init guard attribute, and the instance reference.
