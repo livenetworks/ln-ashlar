@@ -82,6 +82,19 @@
 	box-shadow: none;
 }
 
+// ── Card mode — neutralise _lockColumnWidths() column locking ──
+// colgroup <col> elements carry inline style.width from init; they constrain
+// column widths even when table-layout: auto is set. Hiding colgroup eliminates
+// all col constraints so the responsive display:block layout works cleanly.
+// table-layout: auto !important overrides the inline style set by JS.
+// Both rules fire in the same @container recalc — no hybrid frame possible.
+.table-container {
+	@container table (max-width: 640px) {
+		colgroup { display: none; }
+		table { table-layout: auto !important; }
+	}
+}
+
 // ── Thead (sticky #2, below toolbar) ──
 [data-ln-table] thead th {
 	position: sticky;
