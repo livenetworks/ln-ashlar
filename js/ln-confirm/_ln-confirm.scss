@@ -2,10 +2,17 @@
 	--color-primary: var(--color-error);
 }
 
+// ── Icon-only confirm button (tooltip mode) ──
+// Default mode (text buttons) overrides --color-primary above.
+// Icon-only buttons need explicit color because they don't inherit
+// through --color-primary (their colors are set directly by consumers).
 .ln-confirm-tooltip {
 	position: relative;
 	overflow: visible !important;
-	
+
+	// Confirm icon inherits this color
+	color: hsl(var(--color-error)) !important;
+
 	&::after {
 		content: attr(data-tooltip-text);
 		position: absolute;
@@ -25,4 +32,11 @@
 		z-index: var(--z-dropdown);
 		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 	}
+}
+
+// ── Overflow escape: tooltip inside clipped containers ──
+// [data-ln-table] uses overflow:clip which clips the ::after tooltip.
+// Temporarily allow overflow when a confirm is active inside.
+[data-ln-table]:has([data-confirming]) {
+	overflow: visible;
 }
