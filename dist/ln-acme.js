@@ -41,15 +41,31 @@ function R(u, a, v, b) {
   for (const p of _)
     p[v] || (p[v] = new b(p));
 }
-function mt(u, a) {
-  return new Proxy(Object.assign({}, u), {
-    set(v, b, _) {
-      const p = v[b];
-      return p === _ || (v[b] = _, a(b, _, p)), !0;
-    }
-  });
-}
+const ht = Symbol("deepReactive");
 function pt(u, a) {
+  function v(b) {
+    if (b === null || typeof b != "object" || b[ht]) return b;
+    const _ = Object.keys(b);
+    for (let p = 0; p < _.length; p++) {
+      const f = b[_[p]];
+      f !== null && typeof f == "object" && (b[_[p]] = v(f));
+    }
+    return new Proxy(b, {
+      get(p, f) {
+        return f === ht ? !0 : p[f];
+      },
+      set(p, f, s) {
+        const l = p[f];
+        return s !== null && typeof s == "object" && (s = v(s)), p[f] = s, l !== s && a(), !0;
+      },
+      deleteProperty(p, f) {
+        return f in p && (delete p[f], a()), !0;
+      }
+    });
+  }
+  return v(u);
+}
+function gt(u, a) {
   let v = !1;
   return function() {
     v || (v = !0, queueMicrotask(function() {
@@ -1008,14 +1024,14 @@ function pt(u, a) {
     }
     function D(M) {
       if (!t(M, h)) {
-        const x = p(r, "invalid-type");
+        const I = p(r, "invalid-type");
         S(r, "ln-upload:invalid", {
           file: M,
-          message: x
+          message: I
         }), S(window, "ln-toast:enqueue", {
           type: "error",
           title: "Invalid File",
-          message: x || "This file type is not allowed"
+          message: I || "This file type is not allowed"
         });
         return;
       }
@@ -1034,48 +1050,48 @@ function pt(u, a) {
       const T = new FormData();
       T.append("file", M), T.append("context", C);
       const k = new XMLHttpRequest();
-      k.upload.addEventListener("progress", function(x) {
-        if (x.lengthComputable) {
-          const q = Math.round(x.loaded / x.total * 100);
+      k.upload.addEventListener("progress", function(I) {
+        if (I.lengthComputable) {
+          const q = Math.round(I.loaded / I.total * 100);
           y.style.width = q + "%", Y.textContent = q + "%";
         }
       }), k.addEventListener("load", function() {
         if (k.status >= 200 && k.status < 300) {
-          let x;
+          let I;
           try {
-            x = JSON.parse(k.responseText);
+            I = JSON.parse(k.responseText);
           } catch {
-            I("Invalid response");
+            x("Invalid response");
             return;
           }
-          V.classList.remove("ln-upload__item--uploading"), Y.textContent = f(x.size || M.size), c.disabled = !1, L.set(P, {
-            serverId: x.id,
-            name: x.name,
-            size: x.size
+          V.classList.remove("ln-upload__item--uploading"), Y.textContent = f(I.size || M.size), c.disabled = !1, L.set(P, {
+            serverId: I.id,
+            name: I.name,
+            size: I.size
           }), F(), S(r, "ln-upload:uploaded", {
             localId: P,
-            serverId: x.id,
-            name: x.name
+            serverId: I.id,
+            name: I.name
           });
         } else {
-          let x = "Upload failed";
+          let I = "Upload failed";
           try {
-            x = JSON.parse(k.responseText).message || x;
+            I = JSON.parse(k.responseText).message || I;
           } catch {
           }
-          I(x);
+          x(I);
         }
       }), k.addEventListener("error", function() {
-        I("Network error");
+        x("Network error");
       });
-      function I(x) {
+      function x(I) {
         V.classList.remove("ln-upload__item--uploading"), V.classList.add("ln-upload__item--error"), y.style.width = "100%", Y.textContent = p(r, "error"), c.disabled = !1, S(r, "ln-upload:error", {
           file: M,
-          message: x
+          message: I
         }), S(window, "ln-toast:enqueue", {
           type: "error",
           title: "Upload Error",
-          message: x || p(r, "upload-failed") || "Failed to upload file"
+          message: I || p(r, "upload-failed") || "Failed to upload file"
         });
       }
       k.open("POST", w), k.setRequestHeader("X-CSRF-TOKEN", O()), k.setRequestHeader("Accept", "application/json"), k.send(T);
@@ -1425,7 +1441,7 @@ function pt(u, a) {
   function o(e) {
     if (e.hasAttribute(v)) return this;
     this.dom = e, this.targetId = e.getAttribute(u), this.inputs = Array.from(e.querySelectorAll("[" + b + "]")), this._pendingEvents = [];
-    const n = this, i = pt(
+    const n = this, i = gt(
       function() {
         n._render();
       },
@@ -1433,45 +1449,77 @@ function pt(u, a) {
         n._afterRender();
       }
     );
-    this.state = mt({
+    this.state = pt({
       key: null,
-      value: null
+      values: []
     }, i), this._attachHandlers();
-    for (let r = 0; r < this.inputs.length; r++) {
-      const d = this.inputs[r];
-      if (d.checked && !s(d)) {
-        this.state.key = d.getAttribute(b), this.state.value = d.getAttribute(_);
-        break;
+    let r = null;
+    const d = [];
+    for (let g = 0; g < this.inputs.length; g++) {
+      const h = this.inputs[g];
+      if (h.checked && !s(h)) {
+        r || (r = h.getAttribute(b));
+        const m = h.getAttribute(_);
+        m && d.push(m);
       }
     }
-    return e.setAttribute(v, ""), this;
+    return d.length > 0 && (this.state.key = r, this.state.values = d), e.setAttribute(v, ""), this;
   }
   o.prototype._attachHandlers = function() {
     const e = this;
     this.inputs.forEach(function(n) {
       n[a + "Bound"] || (n[a + "Bound"] = !0, n._lnFilterChange = function() {
         const i = n.getAttribute(b), r = n.getAttribute(_) || "";
-        s(n) ? (e._pendingEvents.push({ name: "ln-filter:changed", detail: { key: i, value: "" } }), e.reset()) : e.state.key === i && e.state.value === r ? (e._pendingEvents.push({ name: "ln-filter:changed", detail: { key: i, value: "" } }), e.reset()) : (e._pendingEvents.push({ name: "ln-filter:changed", detail: { key: i, value: r } }), e.state.key = i, e.state.value = r);
+        if (s(n)) {
+          e._pendingEvents.push({
+            name: "ln-filter:changed",
+            detail: { key: i, values: [] }
+          }), e.reset();
+          return;
+        }
+        if (n.checked)
+          e.state.values.indexOf(r) === -1 && (e.state.key = i, e.state.values.push(r));
+        else {
+          const d = e.state.values.indexOf(r);
+          if (d !== -1 && e.state.values.splice(d, 1), e.state.values.length === 0) {
+            e._pendingEvents.push({
+              name: "ln-filter:changed",
+              detail: { key: i, values: [] }
+            }), e.reset();
+            return;
+          }
+        }
+        e._pendingEvents.push({
+          name: "ln-filter:changed",
+          detail: { key: e.state.key, values: e.state.values.slice() }
+        });
       }, n.addEventListener("change", n._lnFilterChange));
     });
   }, o.prototype._render = function() {
-    const e = this, n = this.state.key, i = this.state.value;
-    this.inputs.forEach(function(g) {
-      const h = g.getAttribute(b), m = g.getAttribute(_) || "";
-      let w = !1;
-      n === null && i === null ? w = s(g) : w = h === n && m === i, g.checked = w;
+    const e = this, n = this.state.key, i = this.state.values, r = n === null || i.length === 0, d = [];
+    for (let m = 0; m < i.length; m++)
+      d.push(i[m].toLowerCase());
+    this.inputs.forEach(function(m) {
+      if (r)
+        m.checked = s(m);
+      else if (s(m))
+        m.checked = !1;
+      else {
+        const w = m.getAttribute(_) || "";
+        m.checked = i.indexOf(w) !== -1;
+      }
     });
-    const r = document.getElementById(e.targetId);
-    if (!r) return;
-    const d = r.children;
-    for (let g = 0; g < d.length; g++) {
-      const h = d[g];
-      if (n === null && i === null) {
-        h.removeAttribute(p);
+    const g = document.getElementById(e.targetId);
+    if (!g) return;
+    const h = g.children;
+    for (let m = 0; m < h.length; m++) {
+      const w = h[m];
+      if (r) {
+        w.removeAttribute(p);
         continue;
       }
-      const m = h.getAttribute("data-" + n);
-      h.removeAttribute(p), m !== null && i && m.toLowerCase() !== i.toLowerCase() && h.setAttribute(p, "true");
+      const C = w.getAttribute("data-" + n);
+      w.removeAttribute(p), C !== null && d.indexOf(C.toLowerCase()) === -1 && w.setAttribute(p, "true");
     }
   }, o.prototype._afterRender = function() {
     const e = this._pendingEvents;
@@ -1483,11 +1531,26 @@ function pt(u, a) {
     const i = document.getElementById(this.targetId);
     i && i !== this.dom && S(i, e, n);
   }, o.prototype.filter = function(e, n) {
-    this._pendingEvents.push({ name: "ln-filter:changed", detail: { key: e, value: n } }), this.state.key = e, this.state.value = n;
+    if (Array.isArray(n)) {
+      if (n.length === 0) {
+        this.reset();
+        return;
+      }
+      this.state.key = e, this.state.values = n.slice();
+    } else if (n)
+      this.state.key = e, this.state.values = [n];
+    else {
+      this.reset();
+      return;
+    }
+    this._pendingEvents.push({
+      name: "ln-filter:changed",
+      detail: { key: this.state.key, values: this.state.values.slice() }
+    });
   }, o.prototype.reset = function() {
-    this._pendingEvents.push({ name: "ln-filter:reset", detail: {} }), this.state.key = null, this.state.value = null;
+    this._pendingEvents.push({ name: "ln-filter:reset", detail: {} }), this.state.key = null, this.state.values = [];
   }, o.prototype.getActive = function() {
-    return this.state.key === null && this.state.value === null ? null : { key: this.state.key, value: this.state.value };
+    return this.state.key === null || this.state.values.length === 0 ? null : { key: this.state.key, values: this.state.values.slice() };
   }, o.prototype.destroy = function() {
     this.dom[a] && (this.inputs.forEach(function(e) {
       e._lnFilterChange && (e.removeEventListener("change", e._lnFilterChange), delete e._lnFilterChange), delete e[a + "Bound"];
@@ -1663,8 +1726,16 @@ function pt(u, a) {
         total: n._data.length
       });
     }, t.addEventListener("ln-table:sort", this._onSort), this._onColumnFilter = function(i) {
-      const r = i.detail.key, d = i.detail.value;
-      d ? n._columnFilters[r] = d.toLowerCase() : delete n._columnFilters[r], n._applyFilterAndSort(), n._vStart = -1, n._vEnd = -1, n._render(), S(t, "ln-table:filter", {
+      const r = i.detail.key, d = i.detail.values;
+      if (!d || d.length === 0)
+        delete n._columnFilters[r];
+      else {
+        const g = [];
+        for (let h = 0; h < d.length; h++)
+          g.push(d[h].toLowerCase());
+        n._columnFilters[r] = g;
+      }
+      n._applyFilterAndSort(), n._vStart = -1, n._vEnd = -1, n._render(), S(t, "ln-table:filter", {
         term: n._searchTerm,
         matched: n._filteredData.length,
         total: n._data.length
@@ -1706,7 +1777,8 @@ function pt(u, a) {
       if (n)
         for (const C in e) {
           const L = r[C];
-          if (L !== void 0 && w.rawTexts[L] !== e[C]) return !1;
+          if (L !== void 0 && e[C].indexOf(w.rawTexts[L]) === -1)
+            return !1;
         }
       return !0;
     }), this._sortCol < 0 || !this._sortDir) return;
@@ -2750,8 +2822,8 @@ function pt(u, a) {
       const y = l(), T = Object.keys(y), k = indexedDB.open(v);
       k.onerror = function() {
         console.warn("[ln-store] IndexedDB open failed — falling back to in-memory store"), c(null);
-      }, k.onsuccess = function(I) {
-        const x = I.target.result, q = Array.from(x.objectStoreNames);
+      }, k.onsuccess = function(x) {
+        const I = x.target.result, q = Array.from(I.objectStoreNames);
         let z = !1;
         q.indexOf(b) === -1 && (z = !0);
         for (let Z = 0; Z < T.length; Z++)
@@ -2760,11 +2832,11 @@ function pt(u, a) {
             break;
           }
         if (!z) {
-          t(x), p = x, c(x);
+          t(I), p = I, c(I);
           return;
         }
-        const ot = x.version;
-        x.close();
+        const ot = I.version;
+        I.close();
         const it = indexedDB.open(v, ot + 1);
         it.onblocked = function() {
           console.warn("[ln-store] Database upgrade blocked — waiting for other tabs to close connection");
@@ -2776,9 +2848,9 @@ function pt(u, a) {
           for (let lt = 0; lt < T.length; lt++) {
             const ct = T[lt];
             if (!J.objectStoreNames.contains(ct)) {
-              const ht = J.createObjectStore(ct, { keyPath: "id" }), dt = y[ct].indexes;
+              const mt = J.createObjectStore(ct, { keyPath: "id" }), dt = y[ct].indexes;
               for (let rt = 0; rt < dt.length; rt++)
-                ht.createIndex(dt[rt], dt[rt], { unique: !1 });
+                mt.createIndex(dt[rt], dt[rt], { unique: !1 });
             }
           }
         }, it.onsuccess = function(Z) {
@@ -2891,66 +2963,66 @@ function pt(u, a) {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(y)
       });
-    }).then(function(I) {
-      if (!I.ok) throw new Error("HTTP " + I.status);
-      return I.json();
-    }).then(function(I) {
+    }).then(function(x) {
+      if (!x.ok) throw new Error("HTTP " + x.status);
+      return x.json();
+    }).then(function(x) {
       return h(c._name, T).then(function() {
-        return g(c._name, I);
+        return g(c._name, x);
       }).then(function() {
         S(c.dom, "ln-store:confirmed", {
           store: c._name,
-          record: I,
+          record: x,
           tempId: T,
           action: "create"
         });
       });
-    }).catch(function(I) {
+    }).catch(function(x) {
       h(c._name, T).then(function() {
         c.totalCount--, S(c.dom, "ln-store:reverted", {
           store: c._name,
           record: k,
           action: "create",
-          error: I.message
+          error: x.message
         });
       });
     });
   }
   function F(c, E) {
     const y = E.id, T = E.data || {}, k = E.expected_version;
-    let I = null;
-    d(c._name, y).then(function(x) {
-      if (!x) throw new Error("Record not found: " + y);
-      I = Object.assign({}, x);
-      const q = Object.assign({}, x, T);
+    let x = null;
+    d(c._name, y).then(function(I) {
+      if (!I) throw new Error("Record not found: " + y);
+      x = Object.assign({}, I);
+      const q = Object.assign({}, I, T);
       return g(c._name, q).then(function() {
         return S(c.dom, "ln-store:updated", {
           store: c._name,
           record: q,
-          previous: I
+          previous: x
         }), q;
       });
-    }).then(function(x) {
+    }).then(function(I) {
       const q = Object.assign({}, T);
       return k && (q.expected_version = k), fetch(c._endpoint + "/" + y, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(q)
       });
-    }).then(function(x) {
-      if (x.status === 409)
-        return x.json().then(function(q) {
-          return g(c._name, I).then(function() {
+    }).then(function(I) {
+      if (I.status === 409)
+        return I.json().then(function(q) {
+          return g(c._name, x).then(function() {
             S(c.dom, "ln-store:conflict", {
               store: c._name,
-              local: I,
+              local: x,
               remote: q.current || q,
               field_diffs: q.field_diffs || null
             });
           });
         });
-      if (!x.ok) throw new Error("HTTP " + x.status);
-      return x.json().then(function(q) {
+      if (!I.ok) throw new Error("HTTP " + I.status);
+      return I.json().then(function(q) {
         return g(c._name, q).then(function() {
           S(c.dom, "ln-store:confirmed", {
             store: c._name,
@@ -2959,13 +3031,13 @@ function pt(u, a) {
           });
         });
       });
-    }).catch(function(x) {
-      I && g(c._name, I).then(function() {
+    }).catch(function(I) {
+      x && g(c._name, x).then(function() {
         S(c.dom, "ln-store:reverted", {
           store: c._name,
-          record: I,
+          record: x,
           action: "update",
-          error: x.message
+          error: I.message
         });
       });
     });
@@ -3006,11 +3078,11 @@ function pt(u, a) {
     const y = E.ids || [];
     if (y.length === 0) return;
     let T = [];
-    const k = y.map(function(I) {
-      return d(c._name, I);
+    const k = y.map(function(x) {
+      return d(c._name, x);
     });
-    Promise.all(k).then(function(I) {
-      return T = I.filter(Boolean), nt(c._name, y).then(function() {
+    Promise.all(k).then(function(x) {
+      return T = x.filter(Boolean), nt(c._name, y).then(function() {
         return c.totalCount -= y.length, S(c.dom, "ln-store:deleted", {
           store: c._name,
           ids: y
@@ -3020,22 +3092,22 @@ function pt(u, a) {
           body: JSON.stringify({ ids: y })
         });
       });
-    }).then(function(I) {
-      if (!I.ok) throw new Error("HTTP " + I.status);
+    }).then(function(x) {
+      if (!x.ok) throw new Error("HTTP " + x.status);
       S(c.dom, "ln-store:confirmed", {
         store: c._name,
         record: null,
         ids: y,
         action: "bulk-delete"
       });
-    }).catch(function(I) {
+    }).catch(function(x) {
       T.length > 0 && tt(c._name, T).then(function() {
         c.totalCount += T.length, S(c.dom, "ln-store:reverted", {
           store: c._name,
           record: null,
           ids: y,
           action: "bulk-delete",
-          error: I.message
+          error: x.message
         });
       });
     });
@@ -3101,7 +3173,7 @@ function pt(u, a) {
       if (!y.ok) throw new Error("HTTP " + y.status);
       return y.json();
     }).then(function(y) {
-      const T = y.data || [], k = y.deleted || [], I = y.synced_at || Math.floor(Date.now() / 1e3), x = T.length > 0 || k.length > 0;
+      const T = y.data || [], k = y.deleted || [], x = y.synced_at || Math.floor(Date.now() / 1e3), I = T.length > 0 || k.length > 0;
       let q = Promise.resolve();
       return T.length > 0 && (q = q.then(function() {
         return tt(c._name, T);
@@ -3112,15 +3184,15 @@ function pt(u, a) {
       }).then(function(z) {
         return c.totalCount = z, L(c._name, {
           schema_version: _,
-          last_synced_at: I,
+          last_synced_at: x,
           record_count: z
         });
       }).then(function() {
-        c.isSyncing = !1, c.lastSyncedAt = I, c._abortController = null, S(c.dom, "ln-store:synced", {
+        c.isSyncing = !1, c.lastSyncedAt = x, c._abortController = null, S(c.dom, "ln-store:synced", {
           store: c._name,
           added: T.length,
           deleted: k.length,
-          changed: x
+          changed: I
         });
       });
     }).catch(function(y) {
@@ -3131,13 +3203,13 @@ function pt(u, a) {
     return e().then(function(y) {
       if (y)
         return new Promise(function(T, k) {
-          const I = y.transaction(c, "readwrite"), x = I.objectStore(c);
+          const x = y.transaction(c, "readwrite"), I = x.objectStore(c);
           for (let q = 0; q < E.length; q++)
-            x.put(E[q]);
-          I.oncomplete = function() {
+            I.put(E[q]);
+          x.oncomplete = function() {
             T();
-          }, I.onerror = function() {
-            k(I.error);
+          }, x.onerror = function() {
+            k(x.error);
           };
         });
     });
@@ -3146,13 +3218,13 @@ function pt(u, a) {
     return e().then(function(y) {
       if (y)
         return new Promise(function(T, k) {
-          const I = y.transaction(c, "readwrite"), x = I.objectStore(c);
+          const x = y.transaction(c, "readwrite"), I = x.objectStore(c);
           for (let q = 0; q < E.length; q++)
-            x.delete(E[q]);
-          I.oncomplete = function() {
+            I.delete(E[q]);
+          x.oncomplete = function() {
             T();
-          }, I.onerror = function() {
-            k(I.error);
+          }, x.onerror = function() {
+            k(x.error);
           };
         });
     });
@@ -3170,13 +3242,13 @@ function pt(u, a) {
   function P(c, E) {
     if (!E || !E.field) return c;
     const y = E.field, T = E.direction === "desc";
-    return c.slice().sort(function(k, I) {
-      const x = k[y], q = I[y];
-      if (x == null && q == null) return 0;
-      if (x == null) return T ? 1 : -1;
+    return c.slice().sort(function(k, x) {
+      const I = k[y], q = x[y];
+      if (I == null && q == null) return 0;
+      if (I == null) return T ? 1 : -1;
       if (q == null) return T ? -1 : 1;
       let z;
-      return typeof x == "string" && typeof q == "string" ? z = M.compare(x, q) : z = x < q ? -1 : x > q ? 1 : 0, T ? -z : z;
+      return typeof I == "string" && typeof q == "string" ? z = M.compare(I, q) : z = I < q ? -1 : I > q ? 1 : 0, T ? -z : z;
     });
   }
   function j(c, E) {
@@ -3184,12 +3256,12 @@ function pt(u, a) {
     const y = Object.keys(E);
     return y.length === 0 ? c : c.filter(function(T) {
       for (let k = 0; k < y.length; k++) {
-        const I = y[k], x = E[I];
-        if (!Array.isArray(x) || x.length === 0) continue;
-        const q = T[I];
+        const x = y[k], I = E[x];
+        if (!Array.isArray(I) || I.length === 0) continue;
+        const q = T[x];
         let z = !1;
-        for (let ot = 0; ot < x.length; ot++)
-          if (String(q) === String(x[ot])) {
+        for (let ot = 0; ot < I.length; ot++)
+          if (String(q) === String(I[ot])) {
             z = !0;
             break;
           }
@@ -3202,9 +3274,9 @@ function pt(u, a) {
     if (!E || !y || y.length === 0) return c;
     const T = E.toLowerCase();
     return c.filter(function(k) {
-      for (let I = 0; I < y.length; I++) {
-        const x = k[y[I]];
-        if (x != null && String(x).toLowerCase().indexOf(T) !== -1)
+      for (let x = 0; x < y.length; x++) {
+        const I = k[y[x]];
+        if (I != null && String(I).toLowerCase().indexOf(T) !== -1)
           return !0;
       }
       return !1;
@@ -3214,9 +3286,9 @@ function pt(u, a) {
     if (c.length === 0) return 0;
     if (y === "count") return c.length;
     let T = 0, k = 0;
-    for (let I = 0; I < c.length; I++) {
-      const x = parseFloat(c[I][E]);
-      isNaN(x) || (T += x, k++);
+    for (let x = 0; x < c.length; x++) {
+      const I = parseFloat(c[x][E]);
+      isNaN(I) || (T += I, k++);
     }
     return y === "sum" ? T : y === "avg" && k > 0 ? T / k : 0;
   }
@@ -3227,8 +3299,8 @@ function pt(u, a) {
       c.filters && (y = j(y, c.filters)), c.search && (y = G(y, c.search, E._searchFields));
       const k = y.length;
       if (c.sort && (y = P(y, c.sort)), c.offset || c.limit) {
-        const I = c.offset || 0, x = c.limit || y.length;
-        y = y.slice(I, I + x);
+        const x = c.offset || 0, I = c.limit || y.length;
+        y = y.slice(x, x + I);
       }
       return {
         data: y,
@@ -3263,8 +3335,8 @@ function pt(u, a) {
       const E = Array.from(c.objectStoreNames);
       return new Promise(function(y, T) {
         const k = c.transaction(E, "readwrite");
-        for (let I = 0; I < E.length; I++)
-          k.objectStore(E[I]).clear();
+        for (let x = 0; x < E.length; x++)
+          k.objectStore(E[x]).clear();
         k.oncomplete = function() {
           y();
         }, k.onerror = function() {
@@ -3289,8 +3361,8 @@ function pt(u, a) {
           const T = E[y];
           if (T.type === "childList")
             for (let k = 0; k < T.addedNodes.length; k++) {
-              const I = T.addedNodes[k];
-              I.nodeType === 1 && R(I, u, a, A);
+              const x = T.addedNodes[k];
+              x.nodeType === 1 && R(x, u, a, A);
             }
           else T.type === "attributes" && R(T.target, u, a, A);
         }

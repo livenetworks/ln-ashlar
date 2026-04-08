@@ -1,5 +1,5 @@
 import { dispatch, guardBody, findElements } from '../ln-core';
-import { reactiveState, createBatcher } from '../ln-core';
+import { deepReactive, createBatcher } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
@@ -39,22 +39,27 @@ import { reactiveState, createBatcher } from '../ln-core';
 			function () { self._afterRender(); }
 		);
 
-		this.state = reactiveState({
+		this.state = deepReactive({
 			key: null,
-			value: null
+			values: []
 		}, queueRender);
 
 		this._attachHandlers();
 
-		// Initialize from existing DOM — find pre-checked input
+		// Initialize from existing DOM — collect all pre-checked inputs
+		let initKey = null;
+		const initValues = [];
 		for (let i = 0; i < this.inputs.length; i++) {
 			const input = this.inputs[i];
 			if (input.checked && !_isReset(input)) {
-				// Set state directly on the proxy target to avoid triggering render
-				this.state.key = input.getAttribute(KEY_ATTR);
-				this.state.value = input.getAttribute(VALUE_ATTR);
-				break;
+				if (!initKey) initKey = input.getAttribute(KEY_ATTR);
+				const val = input.getAttribute(VALUE_ATTR);
+				if (val) initValues.push(val);
 			}
+		}
+		if (initValues.length > 0) {
+			this.state.key = initKey;
+			this.state.values = initValues;
 		}
 
 		dom.setAttribute(INIT_ATTR, '');
@@ -75,19 +80,43 @@ import { reactiveState, createBatcher } from '../ln-core';
 				const value = input.getAttribute(VALUE_ATTR) || '';
 
 				if (_isReset(input)) {
-					// "All" checkbox — reset
-					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: '' } });
+					// "All" checkbox -- reset everything
+					self._pendingEvents.push({
+						name: 'ln-filter:changed',
+						detail: { key: key, values: [] }
+					});
 					self.reset();
-				} else if (self.state.key === key && self.state.value === value) {
-					// Same filter clicked again — toggle OFF (reset)
-					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: '' } });
-					self.reset();
-				} else {
-					// New filter selected
-					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: value } });
-					self.state.key = key;
-					self.state.value = value;
+					return;
 				}
+
+				// Non-reset checkbox toggled
+				if (input.checked) {
+					// Add value to active set
+					if (self.state.values.indexOf(value) === -1) {
+						self.state.key = key;
+						self.state.values.push(value);
+					}
+				} else {
+					// Remove value from active set
+					const idx = self.state.values.indexOf(value);
+					if (idx !== -1) {
+						self.state.values.splice(idx, 1);
+					}
+					// If no values left, auto-reset
+					if (self.state.values.length === 0) {
+						self._pendingEvents.push({
+							name: 'ln-filter:changed',
+							detail: { key: key, values: [] }
+						});
+						self.reset();
+						return;
+					}
+				}
+
+				self._pendingEvents.push({
+					name: 'ln-filter:changed',
+					detail: { key: self.state.key, values: self.state.values.slice() }
+				});
 			};
 			input.addEventListener('change', input._lnFilterChange);
 		});
@@ -98,25 +127,31 @@ import { reactiveState, createBatcher } from '../ln-core';
 	_component.prototype._render = function () {
 		const self = this;
 		const activeKey = this.state.key;
-		const activeValue = this.state.value;
+		const activeValues = this.state.values;
+		const isReset = activeKey === null || activeValues.length === 0;
 
-		// Update input states
+		// Build lowercase lookup for target filtering
+		const lowerValues = [];
+		for (let i = 0; i < activeValues.length; i++) {
+			lowerValues.push(activeValues[i].toLowerCase());
+		}
+
+		// Update input checked states
 		this.inputs.forEach(function (input) {
-			const inputKey = input.getAttribute(KEY_ATTR);
-			const inputValue = input.getAttribute(VALUE_ATTR) || '';
-			let isActive = false;
-
-			if (activeKey === null && activeValue === null) {
-				// Reset state — "All" input is active
-				isActive = _isReset(input);
+			if (isReset) {
+				// Reset state -- only "All" is checked
+				input.checked = _isReset(input);
+			} else if (_isReset(input)) {
+				// Active filters -- "All" is unchecked
+				input.checked = false;
 			} else {
-				isActive = inputKey === activeKey && inputValue === activeValue;
+				// Check if this input's value is in the active set
+				const inputValue = input.getAttribute(VALUE_ATTR) || '';
+				input.checked = activeValues.indexOf(inputValue) !== -1;
 			}
-
-			input.checked = isActive;
 		});
 
-		// Apply filter to target children (unchanged logic)
+		// Apply filter to target children
 		const target = document.getElementById(self.targetId);
 		if (!target) return;
 
@@ -124,7 +159,7 @@ import { reactiveState, createBatcher } from '../ln-core';
 		for (let i = 0; i < children.length; i++) {
 			const el = children[i];
 
-			if (activeKey === null && activeValue === null) {
+			if (isReset) {
 				el.removeAttribute(HIDE_ATTR);
 				continue;
 			}
@@ -134,7 +169,8 @@ import { reactiveState, createBatcher } from '../ln-core';
 
 			if (attr === null) continue;
 
-			if (activeValue && attr.toLowerCase() !== activeValue.toLowerCase()) {
+			// OR logic: visible if attr matches ANY active value
+			if (lowerValues.indexOf(attr.toLowerCase()) === -1) {
 				el.setAttribute(HIDE_ATTR, 'true');
 			}
 		}
@@ -160,20 +196,38 @@ import { reactiveState, createBatcher } from '../ln-core';
 	// ─── Public API ────────────────────────────────────────────
 
 	_component.prototype.filter = function (key, value) {
-		this._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: value } });
-		this.state.key = key;
-		this.state.value = value;
+		if (Array.isArray(value)) {
+			// Bulk set: replace all values
+			if (value.length === 0) {
+				this.reset();
+				return;
+			}
+			this.state.key = key;
+			this.state.values = value.slice();
+		} else if (!value) {
+			// Empty/falsy value: reset
+			this.reset();
+			return;
+		} else {
+			// Single value: set as sole active filter
+			this.state.key = key;
+			this.state.values = [value];
+		}
+		this._pendingEvents.push({
+			name: 'ln-filter:changed',
+			detail: { key: this.state.key, values: this.state.values.slice() }
+		});
 	};
 
 	_component.prototype.reset = function () {
 		this._pendingEvents.push({ name: 'ln-filter:reset', detail: {} });
 		this.state.key = null;
-		this.state.value = null;
+		this.state.values = [];
 	};
 
 	_component.prototype.getActive = function () {
-		if (this.state.key === null && this.state.value === null) return null;
-		return { key: this.state.key, value: this.state.value };
+		if (this.state.key === null || this.state.values.length === 0) return null;
+		return { key: this.state.key, values: this.state.values.slice() };
 	};
 
 	_component.prototype.destroy = function () {

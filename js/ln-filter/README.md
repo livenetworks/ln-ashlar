@@ -1,8 +1,8 @@
 # ln-filter
 
 Generic filter component — filters children of a target element by `data-*` attribute.
-Checkbox controls with `data-ln-filter-key` + `data-ln-filter-value` control the filters. The "All" (reset) checkbox uses `data-ln-filter-reset` instead of a value.
-Elements that don't match receive a `data-ln-filter-hide` attribute.
+Checkbox controls with `data-ln-filter-key` + `data-ln-filter-value` control the filters. Multiple checkboxes can be active simultaneously (OR logic). The "All" (reset) checkbox uses `data-ln-filter-reset` instead of a value.
+Elements that don't match any active value receive a `data-ln-filter-hide` attribute.
 
 ## Attributes
 
@@ -12,17 +12,18 @@ Elements that don't match receive a `data-ln-filter-hide` attribute.
 | `data-ln-filter-key="field"` | `<input type="checkbox">` inside | Name of data attribute for comparison on target children |
 | `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value for comparison |
 | `data-ln-filter-reset` | `<input type="checkbox">` inside | Marks the "All" (reset) checkbox — replaces `data-ln-filter-value=""` (which still works as fallback) |
-| `data-ln-filter-hide` | target children | Set by JS when element doesn't match |
+| `data-ln-filter-hide` | target children | Set by JS when element doesn't match any active value |
 
 ## API
 
 ```javascript
 // Instance API (on the DOM element)
 var el = document.querySelector('[data-ln-filter]');
-el.lnFilter.filter('genre', 'rock');  // programmatically filter
-el.lnFilter.reset();                   // clear filter, show all
-el.lnFilter.getActive();               // { key: 'genre', value: 'rock' } or null
-el.lnFilter.destroy();                 // remove listeners, clean up
+el.lnFilter.filter('genre', 'rock');           // set single filter
+el.lnFilter.filter('genre', ['rock', 'jazz']); // set multiple filters
+el.lnFilter.reset();                            // clear all, show all
+el.lnFilter.getActive();                        // { key: 'genre', values: ['rock', 'jazz'] } or null
+el.lnFilter.destroy();                          // remove listeners, clean up
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
 // For AJAX/dynamic DOM or setAttribute: MutationObserver automatically initializes
@@ -33,13 +34,13 @@ window.lnFilter(container);
 
 | Event | Bubbles | Cancelable | Detail |
 |-------|---------|------------|--------|
-| `ln-filter:changed` | yes | no | `{ key: string, value: string }` |
+| `ln-filter:changed` | yes | no | `{ key: string, values: string[] }` |
 | `ln-filter:reset` | yes | no | `{}` |
 
 ```javascript
 // Listen for filter change
 document.addEventListener('ln-filter:changed', function (e) {
-    console.log('Filter:', e.detail.key, '=', e.detail.value);
+    console.log('Filter:', e.detail.key, '=', e.detail.values.join(', '));
 });
 
 // Listen for reset
@@ -47,6 +48,15 @@ document.addEventListener('ln-filter:reset', function (e) {
     console.log('Filter reset');
 });
 ```
+
+## Behavior
+
+- Multiple checkboxes can be checked simultaneously
+- "All" (`data-ln-filter-reset`) unchecks all filter checkboxes and resets to show-all state
+- Any filter checkbox being checked unchecks "All"
+- When the last filter checkbox is unchecked, "All" auto-checks (auto-reset)
+- Filtering uses OR logic: items matching ANY active value are shown
+- Items without the filtered data attribute are left visible
 
 ## Example
 
@@ -86,7 +96,7 @@ document.addEventListener('ln-filter:reset', function (e) {
 
 > **Checkbox with `data-ln-filter-reset`** = "Show all" (reset). On initialization the "All" checkbox is checked by default. The legacy `data-ln-filter-value=""` still works as a fallback.
 
-> **Toggle behavior**: Clicking an active filter unchecks it and resets to "All".
+> **Multi-select**: Multiple filter checkboxes can be checked at the same time. Items matching any of the active values are shown (OR logic).
 
 ## CSS
 
@@ -112,7 +122,7 @@ The hide rule is bundled in ln-acme. Pill styling (active state highlight via pr
 
 ## Internals
 
-Uses `reactiveState` + `createBatcher` from `ln-core`. State is `{ key, value }` — all DOM updates (`input.checked` on filter controls, `data-ln-filter-hide` on target children) derive from state in a batched `_render()` cycle. Events dispatch after render via `_afterRender()`. Listens to `change` events on `<input type="checkbox">` elements. Reset inputs are detected via `_isReset()` helper which checks `data-ln-filter-reset` attribute with `data-ln-filter-value=""` fallback.
+Uses `deepReactive` + `createBatcher` from `ln-core`. State is `{ key, values: [] }` — all DOM updates (`input.checked` on filter controls, `data-ln-filter-hide` on target children) derive from state in a batched `_render()` cycle. Events dispatch after render via `_afterRender()`. Listens to `change` events on `<input type="checkbox">` elements. Reset inputs are detected via `_isReset()` helper which checks `data-ln-filter-reset` attribute with `data-ln-filter-value=""` fallback. Filtering uses OR logic: a target child is hidden only if its data attribute value does not appear in the active `values` array.
 
 ## Dynamic elements
 
@@ -121,8 +131,11 @@ MutationObserver auto-initializes new `[data-ln-filter]` elements added to the D
 ## Programmatic
 
 ```javascript
-// Filter by genre
+// Filter by single value
 document.querySelector('[data-ln-filter]').lnFilter.filter('genre', 'rock');
+
+// Filter by multiple values (OR logic)
+document.querySelector('[data-ln-filter]').lnFilter.filter('genre', ['rock', 'jazz']);
 
 // Reset
 document.querySelector('[data-ln-filter]').lnFilter.reset();
@@ -130,6 +143,6 @@ document.querySelector('[data-ln-filter]').lnFilter.reset();
 // Check current filter
 var active = document.querySelector('[data-ln-filter]').lnFilter.getActive();
 if (active) {
-    console.log('Active filter:', active.key, '=', active.value);
+    console.log('Active filter:', active.key, '=', active.values.join(', '));
 }
 ```

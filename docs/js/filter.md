@@ -1,6 +1,6 @@
 # Filter
 
-Generic filter component — filters children of a target element by `data-*` attribute. File: `js/ln-filter/ln-filter.js`.
+Generic filter component — filters children of a target element by `data-*` attribute. Multiple checkboxes can be active simultaneously (OR logic). File: `js/ln-filter/ln-filter.js`.
 
 ## HTML
 
@@ -29,14 +29,14 @@ Generic filter component — filters children of a target element by `data-*` at
 | `data-ln-filter-key="field"` | `<input type="checkbox">` inside | Data attribute name to compare on target children |
 | `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value to match |
 | `data-ln-filter-reset` | `<input type="checkbox">` inside | Marks the "All" (reset) checkbox — canonical replacement for `data-ln-filter-value=""` |
-| `data-ln-filter-hide` | target children | Set by JS when element doesn't match |
+| `data-ln-filter-hide` | target children | Set by JS when element doesn't match any active value |
 | `data-ln-filter-initialized` | component root | Set by JS after init. Prevents double-init |
 
 ## Events
 
 | Event | Bubbles | Cancelable | `detail` |
 |-------|---------|------------|----------|
-| `ln-filter:changed` | yes | no | `{ key: string, value: string }` |
+| `ln-filter:changed` | yes | no | `{ key: string, values: string[] }` |
 | `ln-filter:reset` | yes | no | `{}` |
 
 Both events dispatch on the filter nav element AND the target element (dual dispatch).
@@ -45,10 +45,11 @@ Both events dispatch on the filter nav element AND the target element (dual disp
 
 ```js
 const el = document.querySelector('[data-ln-filter]');
-el.lnFilter.filter('genre', 'rock');  // filter programmatically
-el.lnFilter.reset();                   // clear filter, show all
-el.lnFilter.getActive();               // { key, value } or null
-el.lnFilter.destroy();                 // remove listeners, clean up
+el.lnFilter.filter('genre', 'rock');           // set single active value
+el.lnFilter.filter('genre', ['rock', 'jazz']); // set multiple active values
+el.lnFilter.reset();                            // clear all, show all
+el.lnFilter.getActive();                        // { key, values: [] } or null
+el.lnFilter.destroy();                          // remove listeners, clean up
 ```
 
 ## CSS (consumer provides for ln-search combination)
@@ -64,8 +65,11 @@ The hide rule for `[data-ln-filter-hide]` is bundled in ln-acme. Pill active sta
 
 ## Behavior
 
-- Checkbox with `data-ln-filter-reset` = "Show all" (reset). The "All" checkbox is checked on init. Legacy `data-ln-filter-value=""` still works as fallback.
-- Clicking an active filter unchecks it and resets to "All".
+- Multiple checkboxes can be checked simultaneously (multi-select)
+- "All" (`data-ln-filter-reset`) unchecks all filter checkboxes and resets to show-all state
+- Any filter checkbox being checked unchecks "All"
+- When the last filter checkbox is unchecked, "All" auto-checks (auto-reset)
+- Filtering uses OR logic: items matching ANY active value are shown
 - Works independently alongside `ln-search` on the same target — each with its own hide attribute.
 - MutationObserver auto-re-filters dynamically added children.
 
@@ -77,24 +81,28 @@ This section explains how the component works internally. A developer or AI read
 
 ### Reactive State
 
-Filter state lives in a `reactiveState` proxy (shallow — no nested objects):
+Filter state lives in a `deepReactive` proxy to support array mutations (`push`, `splice`) on the `values` property:
 
 ```
-this.state = reactiveState({
-    key:   null,    // active filter key (e.g., 'category')
-    value: null     // active filter value (e.g., 'rock')
+this.state = deepReactive({
+    key:    null,    // active filter key (e.g., 'category')
+    values: []       // active filter values (e.g., ['design', 'qa'])
 }, queueRender);
 ```
 
-- `key = null, value = null` — reset state, all items visible, "All" input is checked
-- `key = 'category', value = 'design'` — filter active, matching input is checked
+- `key = null, values = []` — reset state, all items visible, "All" input is checked
+- `key = 'category', values = ['design', 'qa']` — multi-select active, matching inputs are checked
 
-Any assignment to `state.key` or `state.value` triggers `queueRender`.
+Any assignment to `state.key`, `state.values`, or mutation of `state.values` (via `push`/`splice`) triggers `queueRender`.
+
+### Why `deepReactive` (not `reactiveState`)
+
+`values` is an array. When the handler calls `state.values.push(value)` or `state.values.splice(idx, 1)`, these are mutations on a nested object — a shallow proxy (`reactiveState`) would not detect them. `deepReactive` wraps nested objects/arrays recursively so all mutations trigger `onChange`. Compare with the old single-select model which used flat scalars (`key`, `value`) where shallow proxy was sufficient.
 
 ### Render Pipeline
 
 ```
-state mutation (key or value)
+state mutation (key, values assignment, or values.push/splice)
     |
     v
 createBatcher schedules via queueMicrotask (deduplicates within same tick)
@@ -108,21 +116,21 @@ afterRender:
     2. _afterRender()          — dispatch pending CustomEvents
 ```
 
-**Batching matters for reset**: `reset()` sets both `state.key = null` and `state.value = null` synchronously. Each triggers `queueRender`, but `createBatcher` deduplicates — only one render fires after both are set.
+**Batching matters for reset**: `reset()` sets both `state.key = null` and `state.values = []` synchronously. Each triggers `queueRender`, but `createBatcher` deduplicates — only one render fires after both are set.
 
 ### Render Logic (`_render`)
 
-`_render()` derives all DOM from two values (`state.key`, `state.value`). Two operations:
+`_render()` derives all DOM from two values (`state.key`, `state.values`). Two operations:
 
-**1. Input states**: iterate all inputs, compare each input's `data-ln-filter-key` / `data-ln-filter-value` against active state. Set `input.checked = true/false`.
+**1. Input states**: iterate all inputs, derive checked state from active values array:
 
-- Reset state (`key = null, value = null`): the input with `data-ln-filter-reset` (or `value=""` fallback) gets `checked = true`
-- Active state: the input matching both key and value gets `checked = true`
+- Reset state (`key = null` or `values.length === 0`): the input with `data-ln-filter-reset` (or `value=""` fallback) gets `checked = true`, all others `false`
+- Active state: the "All" input gets `checked = false`; each non-reset input gets `checked = true` if its `data-ln-filter-value` appears in `state.values`
 
 **2. Target children**: look up `document.getElementById(targetId)`, iterate children:
 
 - Reset state: remove `data-ln-filter-hide` from all children
-- Active state: read each child's `data-{key}` attribute. If value doesn't match (case-insensitive), set `data-ln-filter-hide="true"`
+- Active state: read each child's `data-{key}` attribute. Build a lowercase array of active values. If the child's attribute value does not appear in the lowercase array, set `data-ln-filter-hide="true"` (OR logic — visible if it matches ANY active value)
 - Children without the data attribute are left visible (not filtered)
 
 ### Event Flow
@@ -130,12 +138,20 @@ afterRender:
 Events dispatch **after** render via `_pendingEvents` + `_afterRender()`:
 
 ```
-input change:
-    1. push { name: 'ln-filter:changed', detail: { key, value } } to _pendingEvents
-    2. set state.key and state.value          → triggers batcher
+input change (check):
+    1. push { name: 'ln-filter:changed', detail: { key, values: [...] } } to _pendingEvents
+    2. state.values.push(value)            → triggers batcher
     ─── microtask boundary ───
     3. batcher fires: _render() → _afterRender()
     4. _afterRender dispatches pending events
+
+input change (uncheck — last value):
+    1. state.values.splice(idx, 1)         → values now empty
+    2. push { name: 'ln-filter:changed', detail: { key, values: [] } } to _pendingEvents
+    3. reset() → push 'ln-filter:reset' + set state.key=null, state.values=[]
+    ─── microtask boundary ───
+    4. batcher fires: _render() → _afterRender()
+    5. _afterRender dispatches both pending events
 ```
 
 This guarantees event listeners see the DOM in its post-render state.
@@ -151,30 +167,27 @@ This is how per-column table filters work: `ln-filter` inside a `<th>` dispatche
 
 ### Init from Existing DOM
 
-On construction, inputs are scanned for an existing `checked` attribute. If found (and not a reset input per `_isReset()` — checks `data-ln-filter-reset` with `value=""` fallback), `state.key` and `state.value` are set directly on the proxy target — this initializes state without triggering a render (the DOM is already correct from the server).
+On construction, all inputs are scanned for existing `checked` attributes. All checked non-reset inputs (per `_isReset()`) have their values collected into `initValues[]`. If any are found, `state.key` and `state.values` are set directly — this initializes state without triggering a render (the DOM is already correct from the server). Single pre-checked input still works (array of one value).
 
 ### Change Handlers
 
 `_attachHandlers()` adds `change` listeners to all `[data-ln-filter-key]` inputs. Guard: `input[DOM_ATTRIBUTE + 'Bound'] = true` prevents duplicate listeners when MutationObserver re-fires.
 
 Change behavior:
-- Input with `data-ln-filter-reset` (or `value=""` fallback): pushes `ln-filter:changed` event with empty value, then calls `this.reset()` which pushes `ln-filter:reset` and sets state to null/null
-- Input with a value that matches current active state (toggle off): pushes `ln-filter:changed` event with empty value, then calls `this.reset()`
-- Input with a new value: pushes `ln-filter:changed` event, then sets `state.key` and `state.value`
+- Input with `data-ln-filter-reset`: pushes `ln-filter:changed` event with empty values array, then calls `this.reset()` which pushes `ln-filter:reset` and sets state to null/[]
+- Non-reset input checked: adds value to `state.values` via `push` (if not already present), pushes `ln-filter:changed` event with updated values array
+- Non-reset input unchecked: removes value from `state.values` via `splice`. If `values` is now empty, pushes `ln-filter:changed` event with empty values, then calls `this.reset()`
 
 ### Public API Methods
 
-| Method | Action |
-|--------|--------|
-| `filter(key, value)` | Push `ln-filter:changed` event, set `state.key` and `state.value` |
-| `reset()` | Push `ln-filter:reset` event, set state to `null`/`null` |
-| `getActive()` | Return `{ key, value }` or `null` if in reset state |
+| Method | Signature | Action |
+|--------|-----------|--------|
+| `filter(key, value)` | `value`: string or string[] | Push `ln-filter:changed`, set `state.key` and `state.values` (single string wrapped in array; empty array or falsy resets) |
+| `reset()` | — | Push `ln-filter:reset` event, set state to `null`/`[]` |
+| `getActive()` | — | Return `{ key, values: [...] }` or `null` if in reset state; returns defensive copy of values |
+| `destroy()` | — | Remove all change listeners, the init guard attribute, and the instance reference |
 
 All methods go through the same state → batcher → render → event pipeline.
-
-### Why `reactiveState` (not `deepReactive`)
-
-State is flat — two scalar values (`key`, `value`). No nested objects or arrays. `reactiveState` (shallow proxy) is sufficient and lighter than `deepReactive`. Compare with ln-table which uses `deepReactive` because `columnFilters` is a nested object with dynamic keys.
 
 ### Why NOT `fill()` / `renderList()`
 

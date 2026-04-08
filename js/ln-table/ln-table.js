@@ -105,11 +105,15 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 		this._onColumnFilter = function (e) {
 			const key = e.detail.key;
-			const value = e.detail.value;
-			if (!value) {
+			const values = e.detail.values;
+			if (!values || values.length === 0) {
 				delete self._columnFilters[key];
 			} else {
-				self._columnFilters[key] = value.toLowerCase();
+				const lower = [];
+				for (let i = 0; i < values.length; i++) {
+					lower.push(values[i].toLowerCase());
+				}
+				self._columnFilters[key] = lower;
 			}
 			self._applyFilterAndSort();
 			self._vStart = -1;
@@ -207,7 +211,9 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 				if (hasColFilters) {
 					for (const key in colFilters) {
 						const idx = colIndexByKey[key];
-						if (idx !== undefined && row.rawTexts[idx] !== colFilters[key]) return false;
+						if (idx !== undefined) {
+							if (colFilters[key].indexOf(row.rawTexts[idx]) === -1) return false;
+						}
 					}
 				}
 				return true;

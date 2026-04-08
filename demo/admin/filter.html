@@ -115,7 +115,7 @@
 			<!-- Content -->
 			<div class="content">
 				<h1>Filter</h1>
-				<p>Generic filter component — filters children of a target element by <code>data-*</code> attribute. Works independently alongside <code>ln-search</code>.</p>
+				<p>Generic filter component — filters children of a target element by <code>data-*</code> attribute. Supports multi-select: multiple checkboxes can be active simultaneously (OR logic). Works independently alongside <code>ln-search</code>.</p>
 
 				<!-- Attributes -->
 				<section class="section-card">
@@ -241,6 +241,7 @@
 						<nav class="demo-actions" id="api-demo-actions">
 							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'high')">Filter: High</button>
 							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'medium')">Filter: Medium</button>
+							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', ['high', 'medium'])">Filter: High + Medium</button>
 							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'low')">Filter: Low</button>
 							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.reset()">Reset</button>
 							<code id="api-filter-status">Active filter: none</code>
@@ -265,12 +266,12 @@
 						<table>
 							<thead><tr><th>Event</th><th>Bubbles</th><th>detail</th></tr></thead>
 							<tbody>
-								<tr><td><code>ln-filter:changed</code></td><td>yes</td><td><code>{ key, value }</code></td></tr>
+								<tr><td><code>ln-filter:changed</code></td><td>yes</td><td><code>{ key, values: [] }</code></td></tr>
 								<tr><td><code>ln-filter:reset</code></td><td>yes</td><td><code>{}</code></td></tr>
 							</tbody>
 						</table>
 						<pre><code>document.addEventListener('ln-filter:changed', function (e) {
-    console.log('Filter:', e.detail.key, '=', e.detail.value);
+    console.log('Filter:', e.detail.key, '=', e.detail.values.join(', '));
 });
 
 document.addEventListener('ln-filter:reset', function (e) {
@@ -329,7 +330,11 @@ document.addEventListener('ln-filter:reset', function (e) {
 		document.addEventListener('ln-filter:changed', function (e) {
 			var el = document.getElementById('api-filter-status');
 			if (el && e.target.id === 'api-filter-nav') {
-				el.textContent = 'Active filter: ' + e.detail.key + ' = ' + e.detail.value;
+				if (e.detail.values && e.detail.values.length > 0) {
+					el.textContent = 'Active filter: ' + e.detail.key + ' = ' + e.detail.values.join(', ');
+				} else {
+					el.textContent = 'Active filter: none';
+				}
 			}
 		});
 		document.addEventListener('ln-filter:reset', function (e) {
