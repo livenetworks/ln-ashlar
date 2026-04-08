@@ -1,7 +1,7 @@
 # ln-filter
 
 Generic filter component — filters children of a target element by `data-*` attribute.
-Checkbox controls with `data-ln-filter-key` + `data-ln-filter-value` control the filters.
+Checkbox controls with `data-ln-filter-key` + `data-ln-filter-value` control the filters. The "All" (reset) checkbox uses `data-ln-filter-reset` instead of a value.
 Elements that don't match receive a `data-ln-filter-hide` attribute.
 
 ## Attributes
@@ -10,7 +10,8 @@ Elements that don't match receive a `data-ln-filter-hide` attribute.
 |---------|-----|------|
 | `data-ln-filter="targetId"` | component root | Target element by ID whose children are filtered |
 | `data-ln-filter-key="field"` | `<input type="checkbox">` inside | Name of data attribute for comparison on target children |
-| `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value for comparison (empty = show all) |
+| `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value for comparison |
+| `data-ln-filter-reset` | `<input type="checkbox">` inside | Marks the "All" (reset) checkbox — replaces `data-ln-filter-value=""` (which still works as fallback) |
 | `data-ln-filter-hide` | target children | Set by JS when element doesn't match |
 
 ## API
@@ -55,7 +56,7 @@ document.addEventListener('ln-filter:reset', function (e) {
 <!-- Filter checkboxes -->
 <nav data-ln-filter="my-list">
     <ul>
-        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="" checked> All</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
         <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"> Category A</label></li>
         <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"> Category B</label></li>
     </ul>
@@ -75,7 +76,7 @@ document.addEventListener('ln-filter:reset', function (e) {
 <!-- Filter by phase -->
 <nav data-ln-filter="documents">
     <ul>
-        <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-value="" checked> All</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-reset checked> All</label></li>
         <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-value="0"> Phase 0</label></li>
         <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-value="1"> Phase 1</label></li>
         <li><label><input type="checkbox" data-ln-filter-key="phase" data-ln-filter-value="2"> Phase 2</label></li>
@@ -83,7 +84,7 @@ document.addEventListener('ln-filter:reset', function (e) {
 </nav>
 ```
 
-> **Checkbox with `data-ln-filter-value=""`** = "Show all" (reset). On initialization the "All" checkbox is checked by default.
+> **Checkbox with `data-ln-filter-reset`** = "Show all" (reset). On initialization the "All" checkbox is checked by default. The legacy `data-ln-filter-value=""` still works as a fallback.
 
 > **Toggle behavior**: Clicking an active filter unchecks it and resets to "All".
 
@@ -111,7 +112,7 @@ The hide rule is bundled in ln-acme. Pill styling (active state highlight via pr
 
 ## Internals
 
-Uses `reactiveState` + `createBatcher` from `ln-core`. State is `{ key, value }` — all DOM updates (`input.checked` on filter controls, `data-ln-filter-hide` on target children) derive from state in a batched `_render()` cycle. Events dispatch after render via `_afterRender()`. Listens to `change` events on `<input type="checkbox">` elements.
+Uses `reactiveState` + `createBatcher` from `ln-core`. State is `{ key, value }` — all DOM updates (`input.checked` on filter controls, `data-ln-filter-hide` on target children) derive from state in a batched `_render()` cycle. Events dispatch after render via `_afterRender()`. Listens to `change` events on `<input type="checkbox">` elements. Reset inputs are detected via `_isReset()` helper which checks `data-ln-filter-reset` attribute with `data-ln-filter-value=""` fallback.
 
 ## Dynamic elements
 

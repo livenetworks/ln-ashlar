@@ -8,8 +8,13 @@ import { reactiveState, createBatcher } from '../ln-core';
 	const KEY_ATTR = 'data-ln-filter-key';
 	const VALUE_ATTR = 'data-ln-filter-value';
 	const HIDE_ATTR = 'data-ln-filter-hide';
+	const RESET_ATTR = 'data-ln-filter-reset';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	function _isReset(input) {
+		return input.hasAttribute(RESET_ATTR) || input.getAttribute(VALUE_ATTR) === '';
+	}
 
 	// ─── Constructor ───────────────────────────────────────────
 
@@ -44,7 +49,7 @@ import { reactiveState, createBatcher } from '../ln-core';
 		// Initialize from existing DOM — find pre-checked input
 		for (let i = 0; i < this.inputs.length; i++) {
 			const input = this.inputs[i];
-			if (input.checked && input.getAttribute(VALUE_ATTR) !== '') {
+			if (input.checked && !_isReset(input)) {
 				// Set state directly on the proxy target to avoid triggering render
 				this.state.key = input.getAttribute(KEY_ATTR);
 				this.state.value = input.getAttribute(VALUE_ATTR);
@@ -67,9 +72,9 @@ import { reactiveState, createBatcher } from '../ln-core';
 
 			input._lnFilterChange = function () {
 				const key = input.getAttribute(KEY_ATTR);
-				const value = input.getAttribute(VALUE_ATTR);
+				const value = input.getAttribute(VALUE_ATTR) || '';
 
-				if (value === '') {
+				if (_isReset(input)) {
 					// "All" checkbox — reset
 					self._pendingEvents.push({ name: 'ln-filter:changed', detail: { key: key, value: '' } });
 					self.reset();
@@ -98,12 +103,12 @@ import { reactiveState, createBatcher } from '../ln-core';
 		// Update input states
 		this.inputs.forEach(function (input) {
 			const inputKey = input.getAttribute(KEY_ATTR);
-			const inputValue = input.getAttribute(VALUE_ATTR);
+			const inputValue = input.getAttribute(VALUE_ATTR) || '';
 			let isActive = false;
 
 			if (activeKey === null && activeValue === null) {
 				// Reset state — "All" input is active
-				isActive = inputValue === '';
+				isActive = _isReset(input);
 			} else {
 				isActive = inputKey === activeKey && inputValue === activeValue;
 			}
