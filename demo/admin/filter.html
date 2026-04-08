@@ -126,7 +126,8 @@
 							<tbody>
 								<tr><td><code>data-ln-filter="targetId"</code></td><td>component root</td><td>Target element by ID whose children are filtered</td></tr>
 								<tr><td><code>data-ln-filter-key="field"</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Name of data attribute for comparison on target children</td></tr>
-								<tr><td><code>data-ln-filter-value="val"</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Value for comparison (empty = show all)</td></tr>
+								<tr><td><code>data-ln-filter-value="val"</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Value for comparison</td></tr>
+								<tr><td><code>data-ln-filter-reset</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Marks the "All" (reset) checkbox. Replaces <code>data-ln-filter-value=""</code> which still works as fallback.</td></tr>
 								<tr><td><code>data-ln-filter-hide</code></td><td>target children</td><td>Set by JS when element doesn't match</td></tr>
 							</tbody>
 						</table>
@@ -139,7 +140,7 @@
 					<main>
 						<nav data-ln-filter="filter-basic-list" id="filter-basic-nav">
 							<ul>
-								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="" checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="design"> Design</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="dev"> Development</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="qa"> QA</label></li>
@@ -164,7 +165,7 @@
 					<main>
 						<nav data-ln-filter="filter-cards-list" id="filter-cards-nav">
 							<ul>
-								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="" checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="active"> Active</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="pending"> Pending</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="inactive"> Inactive</label></li>
@@ -209,7 +210,7 @@
 						<div id="combo-toolbar">
 							<nav data-ln-filter="combo-list">
 								<ul>
-									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="" checked> All departments</label></li>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All departments</label></li>
 									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="hr"> HR</label></li>
 									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="it"> IT</label></li>
 									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="finance"> Finance</label></li>
@@ -285,7 +286,7 @@ document.addEventListener('ln-filter:reset', function (e) {
 						<pre><code>&lt;!-- Filter checkboxes --&gt;
 &lt;nav data-ln-filter="my-list"&gt;
     &lt;ul&gt;
-        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="" checked&gt; All&lt;/label&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked&gt; All&lt;/label&gt;&lt;/li&gt;
         &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"&gt; Category A&lt;/label&gt;&lt;/li&gt;
         &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"&gt; Category B&lt;/label&gt;&lt;/li&gt;
     &lt;/ul&gt;

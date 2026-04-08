@@ -8,7 +8,7 @@ Generic filter component — filters children of a target element by `data-*` at
 <!-- Filter checkboxes -->
 <nav data-ln-filter="my-list">
     <ul>
-        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="" checked> All</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
         <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"> Category A</label></li>
         <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"> Category B</label></li>
     </ul>
@@ -27,7 +27,8 @@ Generic filter component — filters children of a target element by `data-*` at
 |-----------|-----|-------------|
 | `data-ln-filter="targetId"` | component root | Target element by ID whose children are filtered |
 | `data-ln-filter-key="field"` | `<input type="checkbox">` inside | Data attribute name to compare on target children |
-| `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value to match (empty = show all) |
+| `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value to match |
+| `data-ln-filter-reset` | `<input type="checkbox">` inside | Marks the "All" (reset) checkbox — canonical replacement for `data-ln-filter-value=""` |
 | `data-ln-filter-hide` | target children | Set by JS when element doesn't match |
 | `data-ln-filter-initialized` | component root | Set by JS after init. Prevents double-init |
 
@@ -63,7 +64,7 @@ The hide rule for `[data-ln-filter-hide]` is bundled in ln-acme. Pill active sta
 
 ## Behavior
 
-- Checkbox with `data-ln-filter-value=""` = "Show all" (reset). The "All" checkbox is checked on init.
+- Checkbox with `data-ln-filter-reset` = "Show all" (reset). The "All" checkbox is checked on init. Legacy `data-ln-filter-value=""` still works as fallback.
 - Clicking an active filter unchecks it and resets to "All".
 - Works independently alongside `ln-search` on the same target — each with its own hide attribute.
 - MutationObserver auto-re-filters dynamically added children.
@@ -115,7 +116,7 @@ afterRender:
 
 **1. Input states**: iterate all inputs, compare each input's `data-ln-filter-key` / `data-ln-filter-value` against active state. Set `input.checked = true/false`.
 
-- Reset state (`key = null, value = null`): the input with `value=""` gets `checked = true`
+- Reset state (`key = null, value = null`): the input with `data-ln-filter-reset` (or `value=""` fallback) gets `checked = true`
 - Active state: the input matching both key and value gets `checked = true`
 
 **2. Target children**: look up `document.getElementById(targetId)`, iterate children:
@@ -150,14 +151,14 @@ This is how per-column table filters work: `ln-filter` inside a `<th>` dispatche
 
 ### Init from Existing DOM
 
-On construction, inputs are scanned for an existing `checked` attribute. If found (and value is not empty), `state.key` and `state.value` are set directly on the proxy target — this initializes state without triggering a render (the DOM is already correct from the server).
+On construction, inputs are scanned for an existing `checked` attribute. If found (and not a reset input per `_isReset()` — checks `data-ln-filter-reset` with `value=""` fallback), `state.key` and `state.value` are set directly on the proxy target — this initializes state without triggering a render (the DOM is already correct from the server).
 
 ### Change Handlers
 
 `_attachHandlers()` adds `change` listeners to all `[data-ln-filter-key]` inputs. Guard: `input[DOM_ATTRIBUTE + 'Bound'] = true` prevents duplicate listeners when MutationObserver re-fires.
 
 Change behavior:
-- Input with `value=""` (reset/All input): pushes `ln-filter:changed` event with empty value, then calls `this.reset()` which pushes `ln-filter:reset` and sets state to null/null
+- Input with `data-ln-filter-reset` (or `value=""` fallback): pushes `ln-filter:changed` event with empty value, then calls `this.reset()` which pushes `ln-filter:reset` and sets state to null/null
 - Input with a value that matches current active state (toggle off): pushes `ln-filter:changed` event with empty value, then calls `this.reset()`
 - Input with a new value: pushes `ln-filter:changed` event, then sets `state.key` and `state.value`
 
