@@ -331,7 +331,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		const colSpan = this.ths.length || 1;
 		const topH = startRow * rowH;
 		const bottomH = (total - endRow) * rowH;
-		const html = '';
+		let html = '';
 
 		if (topH > 0) {
 			html += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' +
