@@ -62,7 +62,7 @@
 	@include gap(1rem);
 	@include mb(1rem);
 
-	label {
+	> label {
 		@include flex;
 		@include items-center;
 		@include gap(0.5rem);

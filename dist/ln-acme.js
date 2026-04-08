@@ -1726,14 +1726,22 @@ function gt(u, a) {
         total: n._data.length
       });
     }, t.addEventListener("ln-table:sort", this._onSort), this._onColumnFilter = function(i) {
-      const r = i.detail.key, d = i.detail.values;
-      if (!d || d.length === 0)
+      const r = i.detail.key;
+      let d = !1;
+      for (let h = 0; h < n.ths.length; h++)
+        if (n.ths[h].getAttribute("data-ln-filter-col") === r) {
+          d = !0;
+          break;
+        }
+      if (!d) return;
+      const g = i.detail.values;
+      if (!g || g.length === 0)
         delete n._columnFilters[r];
       else {
-        const g = [];
-        for (let h = 0; h < d.length; h++)
-          g.push(d[h].toLowerCase());
-        n._columnFilters[r] = g;
+        const h = [];
+        for (let m = 0; m < g.length; m++)
+          h.push(g[m].toLowerCase());
+        n._columnFilters[r] = h;
       }
       n._applyFilterAndSort(), n._vStart = -1, n._vEnd = -1, n._render(), S(t, "ln-table:filter", {
         term: n._searchTerm,
