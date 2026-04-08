@@ -103,40 +103,40 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 		// ─── Column filters — ln-filter dispatches on target via bubbling ──
 
-			this._onColumnFilter = function (e) {
-				const key = e.detail.key;
+		this._onColumnFilter = function (e) {
+			const key = e.detail.key;
 
-				// Only handle keys that map to a table column via data-ln-filter-col.
-				// If unmapped, let ln-filter handle row visibility via DOM attributes.
-				let hasMappedColumn = false;
-				for (let i = 0; i < self.ths.length; i++) {
-					if (self.ths[i].getAttribute('data-ln-filter-col') === key) {
-						hasMappedColumn = true;
-						break;
-					}
+			// Only handle keys that map to a table column via data-ln-filter-col.
+			// If unmapped, let ln-filter handle row visibility via DOM attributes.
+			let hasMappedColumn = false;
+			for (let i = 0; i < self.ths.length; i++) {
+				if (self.ths[i].getAttribute('data-ln-filter-col') === key) {
+					hasMappedColumn = true;
+					break;
 				}
-				if (!hasMappedColumn) return;
+			}
+			if (!hasMappedColumn) return;
 
-				const values = e.detail.values;
-				if (!values || values.length === 0) {
-					delete self._columnFilters[key];
-				} else {
-					const lower = [];
-					for (let i = 0; i < values.length; i++) {
-						lower.push(values[i].toLowerCase());
-					}
-					self._columnFilters[key] = lower;
+			const values = e.detail.values;
+			if (!values || values.length === 0) {
+				delete self._columnFilters[key];
+			} else {
+				const lower = [];
+				for (let i = 0; i < values.length; i++) {
+					lower.push(values[i].toLowerCase());
 				}
-				self._applyFilterAndSort();
-				self._vStart = -1;
-				self._vEnd = -1;
-				self._render();
-				dispatch(dom, 'ln-table:filter', {
-					term: self._searchTerm,
-					matched: self._filteredData.length,
-					total: self._data.length
-				});
-			};
+				self._columnFilters[key] = lower;
+			}
+			self._applyFilterAndSort();
+			self._vStart = -1;
+			self._vEnd = -1;
+			self._render();
+			dispatch(dom, 'ln-table:filter', {
+				term: self._searchTerm,
+				matched: self._filteredData.length,
+				total: self._data.length
+			});
+		};
 		dom.addEventListener('ln-filter:changed', this._onColumnFilter);
 
 		return this;

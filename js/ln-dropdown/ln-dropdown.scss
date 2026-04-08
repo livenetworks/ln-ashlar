@@ -46,6 +46,7 @@
 		@include w-full;
 		@include flex;
 		@include items-center;
+		justify-content: flex-start;
 		@include gap(var(--spacing-sm));
 		@include text-left;
 		@include px(var(--spacing-sm));
