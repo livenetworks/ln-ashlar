@@ -54,7 +54,8 @@ el.lnSearch.destroy();    // remove listeners, clean up
 
 ## Behavior
 
-- Filters by `textContent` of items (case-insensitive)
+- Input is debounced by 150ms — rapid keystrokes are coalesced into a single filter pass
+- Filters by `textContent` of items (case-insensitive, whitespace normalized)
 - Default: iterates `target.children` (direct children)
 - With `data-ln-search-items`: iterates `target.querySelectorAll(selector)` — supports nested structures
 - Works independently alongside `ln-filter` on the same target

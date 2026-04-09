@@ -71,7 +71,7 @@ The hide rule for `[data-ln-filter-hide]` is bundled in ln-acme. Pill active sta
 - When the last filter checkbox is unchecked, "All" auto-checks (auto-reset)
 - Filtering uses OR logic: items matching ANY active value are shown
 - Works independently alongside `ln-search` on the same target — each with its own hide attribute.
-- MutationObserver auto-re-filters dynamically added children.
+- MutationObserver auto-initializes new `[data-ln-filter]` components but does NOT auto-re-filter when children are added to the target — call `el.lnFilter.filter()` manually after adding items.
 
 ---
 

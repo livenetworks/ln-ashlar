@@ -96,9 +96,11 @@ Expected status: `200`
     <ul class="ln-upload__list"></ul>
 
     <!-- Dictionary (optional, for i18n) -->
-    <span data-ln-upload-dict="remove" hidden>Remove</span>
-    <span data-ln-upload-dict="error" hidden>Error</span>
-    <span data-ln-upload-dict="invalid-type" hidden>This file type is not allowed</span>
+    <ul hidden>
+        <li data-ln-upload-dict="remove">Remove</li>
+        <li data-ln-upload-dict="error">Error</li>
+        <li data-ln-upload-dict="invalid-type">This file type is not allowed</li>
+    </ul>
 </div>
 ```
 

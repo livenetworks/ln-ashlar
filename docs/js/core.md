@@ -8,8 +8,8 @@ No DOM attribute, no constructor, no MutationObserver. Pure utility functions re
 
 ```js
 import {
-    cloneTemplate, dispatch, dispatchCancelable,
-    fill, renderList, guardBody, findElements,
+    cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable,
+    fill, renderList, buildDict, guardBody, findElements,
     reactiveState, deepReactive, createBatcher
 } from '../ln-core';
 ```
@@ -117,13 +117,28 @@ findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 - Sets `el[attribute] = new ComponentClass(el)`
 - Used in constructors and MutationObserver callbacks
 
+### cloneTemplateScoped(root, name, componentTag)
+
+Clone a `<template>` with scoped lookup — searches inside `root` first, falls back to global `cloneTemplate`.
+
+```js
+const frag = cloneTemplateScoped(this.dom, 'column-filter', 'ln-data-table');
+```
+
+- First searches for `<template data-ln-template="name">` inside `root`
+- If not found inside `root`, falls back to global `cloneTemplate(name, componentTag)`
+- Returns `DocumentFragment` (same as `cloneTemplate`)
+- Use when a component supports locally-scoped templates that can be overridden per-instance
+
 ### buildDict(root, selector)
 
 Build a plain object from hidden dictionary elements. Reads all `[selector]` elements once at init, extracts `key → textContent`, removes them from DOM. Returns a plain object for O(1) lookups.
 
 ```html
-<span data-ln-upload-dict="remove" hidden>{{ __('Remove') }}</span>
-<span data-ln-upload-dict="error" hidden>{{ __('Error') }}</span>
+<ul hidden>
+    <li data-ln-upload-dict="remove">{{ __('Remove') }}</li>
+    <li data-ln-upload-dict="error">{{ __('Error') }}</li>
+</ul>
 ```
 
 ```js
@@ -133,8 +148,8 @@ dict['error']   // 'Error'
 ```
 
 - One-shot: reads once, removes elements, returns object
-- Returns the key itself if the element is missing (graceful fallback via `dict['key'] || 'key'`)
-- Convention: `data-{component}-dict="key"` on hidden `<span>` elements
+- Missing keys return `undefined` — caller provides fallback: `dict['key'] || 'default text'`
+- Convention: `data-{component}-dict="key"` on `<li>` elements inside a single `<ul hidden>`
 - Server (Blade, Twig, etc.) translates the text — JS never contains display strings
 
 ---

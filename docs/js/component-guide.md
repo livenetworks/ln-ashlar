@@ -241,8 +241,10 @@ For components that display text to users, use hidden elements with `buildDict` 
 
 ```html
 <div data-ln-toast>
-    <span data-ln-toast-dict="close" hidden>Close</span>
-    <span data-ln-toast-dict="dismiss" hidden>Dismiss all</span>
+    <ul hidden>
+        <li data-ln-toast-dict="close">Close</li>
+        <li data-ln-toast-dict="dismiss">Dismiss all</li>
+    </ul>
 </div>
 ```
 
@@ -258,7 +260,7 @@ dict['dismiss']  // 'Dismiss all'
 ```
 
 **Rules:**
-- Convention: `data-{component}-dict="key"` on hidden `<span>` elements
+- Convention: `data-{component}-dict="key"` on `<li>` elements inside a single `<ul hidden>`
 - `buildDict` reads once at init, removes elements, returns plain object
 - Access missing keys with fallback: `dict['key'] || 'default'`
 - Blade/server translates the text — JS never contains display strings
