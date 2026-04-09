@@ -159,9 +159,11 @@ export function cloneTemplateScoped(root, name, componentTag) {
 /**
  * Build a plain object from hidden dictionary elements.
  * Reads all [selector] elements once, extracts key→textContent,
- * removes them from DOM. Returns frozen dictionary object.
+ * removes them from DOM. Returns dictionary object.
  *
- * HTML: <span data-ln-upload-dict="remove" hidden>Remove</span>
+ * HTML: <ul hidden>
+ *         <li data-ln-upload-dict="remove">Remove</li>
+ *       </ul>
  * JS:   const dict = buildDict(container, 'data-ln-upload-dict');
  *        dict.remove → 'Remove'
  */

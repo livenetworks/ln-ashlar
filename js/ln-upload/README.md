@@ -14,14 +14,16 @@ Automatic upload on file select/drop, with progress tracking via XHR. File delet
 
 ## Dictionary (i18n)
 
-Translatable strings are provided via hidden elements with `data-ln-upload-dict` attributes. Read once at init via `buildDict()` from ln-core, then removed from DOM.
+Translatable strings are provided via a hidden list with `data-ln-upload-dict` attributes. Read once at init via `buildDict()` from ln-core, then removed from DOM.
 
 ```html
-<span data-ln-upload-dict="remove" hidden>Remove</span>
-<span data-ln-upload-dict="error" hidden>Error</span>
-<span data-ln-upload-dict="invalid-type" hidden>This file type is not allowed</span>
-<span data-ln-upload-dict="upload-failed" hidden>Upload failed</span>
-<span data-ln-upload-dict="delete-error" hidden>Delete failed</span>
+<ul hidden>
+    <li data-ln-upload-dict="remove">Remove</li>
+    <li data-ln-upload-dict="error">Error</li>
+    <li data-ln-upload-dict="invalid-type">This file type is not allowed</li>
+    <li data-ln-upload-dict="upload-failed">Upload failed</li>
+    <li data-ln-upload-dict="delete-error">Delete failed</li>
+</ul>
 ```
 
 ## CSS Classes

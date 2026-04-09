@@ -630,7 +630,7 @@ If a component needs display text that Intl can't provide, the text must come fr
 
 ```
 HTML:  <template> defines structures (inert, not rendered)
-HTML:  <span data-{component}-dict="key" hidden> defines translatable strings
+HTML:  <ul hidden> with <li data-{component}-dict="key"> defines translatable strings
 JS:    clone → fill (structures) / buildDict (strings)
 ```
 
@@ -640,9 +640,11 @@ For error messages, labels, and other translatable strings that aren't part of a
 
 ```html
 <!-- Hidden dict elements — server translates, JS reads once at init -->
-<span data-ln-upload-dict="remove" hidden>{{ __('Remove') }}</span>
-<span data-ln-upload-dict="error" hidden>{{ __('Error') }}</span>
-<span data-ln-upload-dict="invalid-type" hidden>{{ __('This file type is not allowed') }}</span>
+<ul hidden>
+    <li data-ln-upload-dict="remove">{{ __('Remove') }}</li>
+    <li data-ln-upload-dict="error">{{ __('Error') }}</li>
+    <li data-ln-upload-dict="invalid-type">{{ __('This file type is not allowed') }}</li>
+</ul>
 ```
 
 ```js
@@ -656,7 +658,7 @@ dict['remove']        // 'Remove'
 dict['invalid-type']  // 'This file type is not allowed'
 ```
 
-**Convention:** `data-{component}-dict="key"` on hidden `<span>` elements inside the component root. Attribute name matches the component's naming pattern.
+**Convention:** `data-{component}-dict="key"` on `<li>` elements inside a single `<ul hidden>` in the component root. The `hidden` attribute on the `<ul>` hides the entire group. `buildDict` removes the elements after reading. Attribute name matches the component's naming pattern.
 
 ### HTML — define templates at the end of `<body>`, before `<script>` tags
 
