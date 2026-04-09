@@ -742,7 +742,7 @@ _component.prototype._buildTrackItem = function (track, idx) {
 
 | Component | Pattern | Data Attr | Description |
 |-----------|---------|-----------|------|
-| ln-core | Shared module | — | dispatch, fill, renderList, reactiveState, deepReactive, createBatcher |
+| ln-core | Shared module | — | cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, fill, renderList, buildDict, guardBody, findElements, reactiveState, deepReactive, createBatcher |
 | ln-toggle | Instance | `data-ln-toggle` | Generic toggle (sidebar, collapse) |
 | ln-accordion | Instance | `data-ln-accordion` | Wrapper — only one toggle open at a time |
 | ln-tabs | Instance | `data-ln-tabs` | Hash-aware tab navigation |

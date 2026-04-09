@@ -20,7 +20,7 @@ When placed directly on an `<input>`, that input is used.
 |-------|-----|-----------|--------|
 | `ln-search:change` | target element | **yes** | `{ term, targetId }` |
 
-The event fires on the **target** element (not the input) before any DOM manipulation.
+The event fires on the **target** element (not the input) before any DOM manipulation. Input is debounced by 150ms — rapid keystrokes are coalesced into a single event.
 If `preventDefault()` is called, `ln-search` skips its default show/hide behavior — the consumer handles filtering itself (e.g. `ln-table`).
 
 ```javascript

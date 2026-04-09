@@ -13,9 +13,11 @@ File upload component — drag-and-drop zone with XHR progress, validation, and 
     <ul class="ln-upload__list"></ul>
 
     <!-- Optional dictionary for i18n -->
-    <span data-ln-upload-dict="remove" hidden>Remove</span>
-    <span data-ln-upload-dict="error" hidden>Error</span>
-    <span data-ln-upload-dict="invalid-type" hidden>File type not allowed</span>
+    <ul hidden>
+        <li data-ln-upload-dict="remove">Remove</li>
+        <li data-ln-upload-dict="error">Error</li>
+        <li data-ln-upload-dict="invalid-type">File type not allowed</li>
+    </ul>
 </div>
 ```
 

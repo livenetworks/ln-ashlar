@@ -104,44 +104,34 @@ After parsing, the original `<tbody>` rows are replaced by re-rendering from the
 
 **Why `outerHTML` strings?** The component supports virtual scroll (only visible rows in DOM). Storing pre-rendered HTML strings means rendering a window of rows is a single `innerHTML` assignment. No `createElement` chains, no template cloning, no `fill()` — the markup was already built by the server.
 
-### Reactive State
+### State Properties
 
-Filter/sort parameters live in a `deepReactive` proxy:
-
-```
-this.state = deepReactive({
-    searchTerm:    ''       // from ln-search:change
-    sortCol:       -1       // column index, -1 = no sort
-    sortDir:       null     // 'asc' | 'desc' | null
-    sortType:      null     // 'string' | 'number' | 'date' | null
-    columnFilters: {}       // { filterKey: 'value', ... }
-}, queueRender);
-```
-
-Any mutation to `state` (including nested changes like `state.columnFilters.dept = 'eng'` or `delete state.columnFilters.dept`) triggers `queueRender` — a batcher created by `createBatcher`.
-
-### Render Pipeline
+Filter/sort parameters are plain instance properties — no reactive proxy, no batching:
 
 ```
-state mutation (any property)
-    |
-    v
-createBatcher schedules via queueMicrotask (deduplicates within same tick)
-    |
-    v
-renderFn:
-    1. _applyFilterAndSort()    — recompute _filteredData from _data + state
-    2. reset _vStart/_vEnd      — force virtual scroll recalc
-    3. _render()                — choose render path based on count
-    |
-    v
-afterRender:
-    4. _afterRender()           — dispatch pending CustomEvents
+this._searchTerm    = ''       // from ln-search:change
+this._sortCol       = -1       // column index, -1 = no sort
+this._sortDir       = null     // 'asc' | 'desc' | null
+this._sortType      = null     // 'string' | 'number' | 'date' | null
+this._columnFilters = {}       // { filterKey: [values], ... }
 ```
 
-**Batching matters for sort**: the sort handler sets 3 state properties (`sortCol`, `sortDir`, `sortType`) synchronously. Each triggers `queueRender`, but `createBatcher` deduplicates — only one render fires after all three are set.
+Each event handler (search, sort, column filter) updates these properties directly, then calls `_applyFilterAndSort()` → `_render()` → `dispatch()` synchronously in the same handler.
 
-**Initial render** (`_parseRows`) bypasses the reactive pipeline. It sets `_filteredData = _data.slice()` and calls `_render()` directly, then dispatches `ln-table:ready`. No state change is involved.
+### Update Flow
+
+```
+event handler (e.g. _onSearch):
+    1. set this._searchTerm = term
+    2. _applyFilterAndSort()    — recompute _filteredData from _data
+    3. reset _vStart/_vEnd      — force virtual scroll recalc
+    4. _render()                — choose render path based on count
+    5. dispatch('ln-table:filter', { term, matched, total })
+```
+
+No microtask batching, no pending events queue. Each handler runs the full pipeline synchronously and dispatches its event immediately after rendering.
+
+**Initial render** (`_parseRows`) sets `_filteredData = _data.slice()` and calls `_render()` directly, then dispatches `ln-table:ready`.
 
 ### Render Paths
 
@@ -170,28 +160,29 @@ Virtual scroll listeners are passive (no `preventDefault`). Cleanup on destroy r
 
 ### Filter + Sort Pipeline
 
-`_applyFilterAndSort()` runs on every state-triggered render. It produces `_filteredData` from `_data`:
+`_applyFilterAndSort()` is called by each event handler. It produces `_filteredData` from `_data`:
 
-1. **Text search**: if `state.searchTerm` is set, rows where `searchText.indexOf(term) === -1` are excluded. Search covers all columns except the last (assumed to be an actions column).
-2. **Column filters**: if `state.columnFilters` has entries, each key is mapped to a column index via `th[data-ln-filter-col]`. Rows where `rawTexts[colIndex] !== filterValue` are excluded. Multiple column filters are AND-combined.
-3. **Sort**: if `state.sortCol >= 0` and `state.sortDir` is set, `_filteredData` is sorted in-place. Numeric/date columns compare `sortKeys` (pre-parsed floats). String columns use `Intl.Collator` (locale-aware, case-insensitive) with fallback to `<`/`>` comparison.
+1. **Text search**: if `_searchTerm` is set, rows where `searchText.indexOf(term) === -1` are excluded. Search covers all columns except the last (assumed to be an actions column).
+2. **Column filters**: if `_columnFilters` has entries, each key is mapped to a column index via `th[data-ln-filter-col]`. Only columns with a mapped `data-ln-filter-col` are processed — unmapped filter keys are ignored. Multiple column filters are AND-combined; values within a single filter are OR-combined (any match passes).
+3. **Sort**: if `_sortCol >= 0` and `_sortDir` is set, `_filteredData` is sorted in-place. Numeric/date columns compare `sortKeys` (pre-parsed floats). String columns use `Intl.Collator` (locale-aware, case-insensitive) with fallback to `<`/`>` comparison.
 
 Search and column filters stack — both must pass for a row to appear.
 
 ### Event Flow
 
-Events dispatch **after** render via `_pendingEvents` + `_afterRender()`:
+Events dispatch synchronously at the end of each handler, after render completes:
 
 ```
 _onSearch handler:
-    1. push { name: 'ln-table:filter' } to _pendingEvents
-    2. set state.searchTerm = term         → triggers batcher
-    ─── microtask boundary ───
-    3. batcher fires: filter+sort → render → _afterRender
-    4. _afterRender dispatches 'ln-table:filter' with { term, matched, total }
+    1. e.preventDefault()
+    2. set _searchTerm = term
+    3. _applyFilterAndSort()
+    4. reset virtual scroll range
+    5. _render()
+    6. dispatch('ln-table:filter', { term, matched, total })
 ```
 
-This guarantees event listeners receive correct `matched`/`total` counts that reflect the already-updated DOM.
+Because dispatch happens after `_render()`, event listeners receive correct `matched`/`total` counts that reflect the already-updated DOM.
 
 The `ln-search:change` handler calls `e.preventDefault()` — this tells ln-search to skip its own DOM show/hide logic (ln-table handles all rendering itself).
 
@@ -209,23 +200,24 @@ ln-table and ln-table-sort communicate only via events — no direct coupling.
 
 Per-column dropdown filters are implemented by placing `ln-filter` components inside `<th>` elements. When a filter button is clicked, `ln-filter` dispatches `ln-filter:changed` which bubbles up to `[data-ln-table]`. ln-table matches the filter `key` to a column via `th[data-ln-filter-col="key"]`.
 
-### Non-reactive Properties
-
-These properties are NOT in `deepReactive` — they are render mechanics, not state that drives re-renders:
+### Internal Properties
 
 | Property | Purpose |
 |----------|---------|
-| `_data` | Full parsed row array. Set once in `_parseRows`, never triggers render |
-| `_filteredData` | Derived from `_data` + state. Recomputed in `_applyFilterAndSort` |
+| `_data` | Full parsed row array. Set once in `_parseRows` |
+| `_filteredData` | Derived from `_data` by `_applyFilterAndSort` |
+| `_searchTerm` | Current search term (string) |
+| `_sortCol`, `_sortDir`, `_sortType` | Current sort state |
+| `_columnFilters` | Active column filters (`{ key: [values] }`) |
 | `_virtual` | Boolean — whether virtual scroll is currently active |
-| `_vStart`, `_vEnd` | Current visible row range. Reset to -1 on state change to force recalc |
+| `_vStart`, `_vEnd` | Current visible row range. Reset to -1 to force recalc |
 | `_rowHeight` | Measured once at parse time. Assumed uniform for virtual scroll math |
 | `_colgroup` | Reference to injected `<colgroup>` for width locking |
 | `_rafId`, `_scrollHandler` | Virtual scroll rAF and listener references for cleanup |
 
 ### Lifecycle
 
-1. **Init**: MutationObserver or DOMContentLoaded → `_findElements` → `new _component(dom)`
+1. **Init**: MutationObserver or DOMContentLoaded → `findElements` → `new _component(dom)`
 2. **Parse**: if `<tbody>` has rows, `_parseRows()` runs immediately. Otherwise, a MutationObserver waits for rows to appear (AJAX-loaded tables).
-3. **Steady state**: event handlers set `state` → batcher → filter+sort → render → dispatch
+3. **Steady state**: event handler → update properties → `_applyFilterAndSort()` → `_render()` → `dispatch()`
 4. **Destroy**: `destroy()` removes event listeners, virtual scroll, colgroup, clears data, deletes instance from DOM element
