@@ -93,6 +93,7 @@ import { deepReactive, createBatcher } from '../ln-core';
 | `dispatchCancelable(el, name, detail)` | Fire cancelable CustomEvent, returns event |
 | `cloneTemplate(name, tag)` | Clone `<template data-ln-template="name">`, cached |
 | `fill(root, data)` | Declarative DOM binding via `data-ln-field`, `data-ln-attr`, `data-ln-show`, `data-ln-class` |
+| `buildDict(root, selector)` | Read hidden i18n elements once at init, return plain object, remove from DOM |
 | `renderList(container, items, tpl, keyFn, fillFn, tag)` | Keyed list rendering with DOM reuse |
 | `reactiveState(initial, onChange)` | Shallow Proxy — onChange(prop, value, old) per set |
 | `deepReactive(obj, onChange)` | Deep Proxy — onChange() on any nested change |
@@ -618,6 +619,7 @@ WRONG:  el.textContent = '3 minutes ago';
 WRONG:  const label = count === 1 ? 'item' : 'items';
 
 RIGHT:  text comes from <template> → cloneTemplate → fill
+RIGHT:  text comes from hidden dict elements → buildDict (error messages, labels)
 RIGHT:  text comes from data-ln-* attribute set by server
 RIGHT:  text comes from Intl API (dates, numbers — browser-native i18n)
 ```
@@ -628,8 +630,33 @@ If a component needs display text that Intl can't provide, the text must come fr
 
 ```
 HTML:  <template> defines structures (inert, not rendered)
-JS:    clone → querySelector → textContent/setAttribute
+HTML:  <span data-{component}-dict="key" hidden> defines translatable strings
+JS:    clone → fill (structures) / buildDict (strings)
 ```
+
+### Dictionary pattern (i18n strings)
+
+For error messages, labels, and other translatable strings that aren't part of a template structure, use `buildDict` from ln-core:
+
+```html
+<!-- Hidden dict elements — server translates, JS reads once at init -->
+<span data-ln-upload-dict="remove" hidden>{{ __('Remove') }}</span>
+<span data-ln-upload-dict="error" hidden>{{ __('Error') }}</span>
+<span data-ln-upload-dict="invalid-type" hidden>{{ __('This file type is not allowed') }}</span>
+```
+
+```js
+import { buildDict } from '../ln-core';
+
+// Init — reads all elements, builds object, removes from DOM
+const dict = buildDict(container, 'data-ln-upload-dict');
+
+// Usage — O(1) property access
+dict['remove']        // 'Remove'
+dict['invalid-type']  // 'This file type is not allowed'
+```
+
+**Convention:** `data-{component}-dict="key"` on hidden `<span>` elements inside the component root. Attribute name matches the component's naming pattern.
 
 ### HTML — define templates at the end of `<body>`, before `<script>` tags
 

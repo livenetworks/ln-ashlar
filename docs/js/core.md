@@ -117,6 +117,26 @@ findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 - Sets `el[attribute] = new ComponentClass(el)`
 - Used in constructors and MutationObserver callbacks
 
+### buildDict(root, selector)
+
+Build a plain object from hidden dictionary elements. Reads all `[selector]` elements once at init, extracts `key → textContent`, removes them from DOM. Returns a plain object for O(1) lookups.
+
+```html
+<span data-ln-upload-dict="remove" hidden>{{ __('Remove') }}</span>
+<span data-ln-upload-dict="error" hidden>{{ __('Error') }}</span>
+```
+
+```js
+const dict = buildDict(container, 'data-ln-upload-dict');
+dict['remove']  // 'Remove'
+dict['error']   // 'Error'
+```
+
+- One-shot: reads once, removes elements, returns object
+- Returns the key itself if the element is missing (graceful fallback via `dict['key'] || 'key'`)
+- Convention: `data-{component}-dict="key"` on hidden `<span>` elements
+- Server (Blade, Twig, etc.) translates the text — JS never contains display strings
+
 ---
 
 ## reactive.js

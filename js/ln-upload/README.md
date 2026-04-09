@@ -14,6 +14,8 @@ Automatic upload on file select/drop, with progress tracking via XHR. File delet
 
 ## Dictionary (i18n)
 
+Translatable strings are provided via hidden elements with `data-ln-upload-dict` attributes. Read once at init via `buildDict()` from ln-core, then removed from DOM.
+
 ```html
 <span data-ln-upload-dict="remove" hidden>Remove</span>
 <span data-ln-upload-dict="error" hidden>Error</span>

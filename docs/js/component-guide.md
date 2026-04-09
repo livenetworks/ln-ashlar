@@ -90,9 +90,9 @@ button.textContent = 'Loading...'
 const fragment = _cloneTemplate('empty-state')   // template has translated text
 container.appendChild(fragment)
 
-// RIGHT — text from dictionary
-const dict = _getDict(dom)
-button.textContent = dict.loading || 'Loading...'  // fallback only for dev, Blade always provides dict
+// RIGHT — text from dictionary (buildDict from ln-core)
+const dict = buildDict(dom, 'data-ln-example-dict')
+button.textContent = dict['loading'] || 'Loading...'  // fallback only for dev, Blade always provides dict
 
 // RIGHT — text from Intl
 dom.textContent = new Intl.DateTimeFormat(locale).format(date)
@@ -237,38 +237,31 @@ function _cloneTemplate(name) {
 
 ## Dictionary Pattern (Localization)
 
-For components that display text to users, use the dictionary pattern:
+For components that display text to users, use hidden elements with `buildDict` from ln-core:
 
 ```html
-<div data-ln-toast
-     data-ln-toast-dict='{
-         "close": "Close",
-         "dismiss": "Dismiss all"
-     }'>
+<div data-ln-toast>
+    <span data-ln-toast-dict="close" hidden>Close</span>
+    <span data-ln-toast-dict="dismiss" hidden>Dismiss all</span>
 </div>
 ```
 
 ```javascript
-function _getDict(dom) {
-    const raw = dom.getAttribute('data-ln-' + COMPONENT_NAME + '-dict')
-    if (!raw) return {}
-    try {
-        return JSON.parse(raw)
-    } catch (e) {
-        console.warn('[ln-' + COMPONENT_NAME + '] Invalid dict JSON')
-        return {}
-    }
-}
+import { buildDict } from '../ln-core';
 
-// Usage — fallback to default if key missing:
-const label = dict.close || 'Close'
+// Init — reads all dict elements, builds object, removes from DOM
+const dict = buildDict(dom, 'data-ln-toast-dict');
+
+// Usage — O(1) property access
+dict['close']    // 'Close'
+dict['dismiss']  // 'Dismiss all'
 ```
 
 **Rules:**
-- Dict is a JSON object in a data attribute
-- Always parse with try/catch (malformed JSON = warn, not crash)
-- Always provide fallback defaults for every key
-- Blade sets the dict attribute from server-side translations
+- Convention: `data-{component}-dict="key"` on hidden `<span>` elements
+- `buildDict` reads once at init, removes elements, returns plain object
+- Access missing keys with fallback: `dict['key'] || 'default'`
+- Blade/server translates the text — JS never contains display strings
 
 ### Intl API as Alternative
 

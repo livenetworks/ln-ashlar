@@ -1,4 +1,4 @@
-import { guardBody, dispatch } from '../ln-core';
+import { guardBody, dispatch, buildDict } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-upload';
@@ -8,11 +8,6 @@ import { guardBody, dispatch } from '../ln-core';
 	const CONTEXT_ATTR = 'data-ln-upload-context';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	function _getDict(container, key) {
-		const el = container.querySelector('[' + DICT_SELECTOR + '="' + key + '"]');
-		return el ? el.textContent : key;
-	}
 
 	function _formatSize(bytes) {
 		if (bytes === 0) return '0 B';
@@ -49,6 +44,7 @@ import { guardBody, dispatch } from '../ln-core';
 		if (container.hasAttribute('data-ln-upload-initialized')) return;
 		container.setAttribute('data-ln-upload-initialized', 'true');
 
+		const dict = buildDict(container, DICT_SELECTOR);
 		const zone = container.querySelector('.ln-upload__zone');
 		const list = container.querySelector('.ln-upload__list');
 		const acceptString = container.getAttribute(ACCEPT_ATTR) || '';
@@ -85,7 +81,7 @@ import { guardBody, dispatch } from '../ln-core';
 
 		function addFile(file) {
 			if (!_isValidFile(file, acceptString)) {
-				const message = _getDict(container, 'invalid-type');
+				const message = dict['invalid-type'];
 				dispatch(container, 'ln-upload:invalid', {
 					file: file,
 					message: message
@@ -120,8 +116,8 @@ import { guardBody, dispatch } from '../ln-core';
 			const removeBtn = document.createElement('button');
 			removeBtn.type = 'button';
 			removeBtn.className = 'ln-upload__remove';
-			removeBtn.setAttribute('aria-label', _getDict(container, 'remove'));
-			removeBtn.title = _getDict(container, 'remove');
+			removeBtn.setAttribute('aria-label', dict['remove']);
+			removeBtn.title = dict['remove'];
 			removeBtn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>';
 			removeBtn.disabled = true;
 
@@ -197,7 +193,7 @@ import { guardBody, dispatch } from '../ln-core';
 				li.classList.remove('ln-upload__item--uploading');
 				li.classList.add('ln-upload__item--error');
 				progressBar.style.width = '100%';
-				sizeSpan.textContent = _getDict(container, 'error');
+				sizeSpan.textContent = dict['error'];
 				removeBtn.disabled = false;
 
 				dispatch(container, 'ln-upload:error', {
@@ -208,7 +204,7 @@ import { guardBody, dispatch } from '../ln-core';
 				dispatch(window, 'ln-toast:enqueue', {
 					type: 'error',
 					title: 'Upload Error',
-					message: message || _getDict(container, 'upload-failed') || 'Failed to upload file'
+					message: message || dict['upload-failed'] || 'Failed to upload file'
 				});
 			}
 
@@ -270,7 +266,7 @@ import { guardBody, dispatch } from '../ln-core';
 						dispatch(window, 'ln-toast:enqueue', {
 							type: 'error',
 							title: 'Error',
-							message: _getDict(container, 'delete-error') || 'Failed to delete file'
+							message: dict['delete-error'] || 'Failed to delete file'
 						});
 					}
 				})

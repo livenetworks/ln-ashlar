@@ -154,6 +154,27 @@ export function cloneTemplateScoped(root, name, componentTag) {
 	return cloneTemplate(name, componentTag);
 }
 
+// ─── Dictionary (i18n) ────────────────────────────────────
+
+/**
+ * Build a plain object from hidden dictionary elements.
+ * Reads all [selector] elements once, extracts key→textContent,
+ * removes them from DOM. Returns frozen dictionary object.
+ *
+ * HTML: <span data-ln-upload-dict="remove" hidden>Remove</span>
+ * JS:   const dict = buildDict(container, 'data-ln-upload-dict');
+ *        dict.remove → 'Remove'
+ */
+export function buildDict(root, selector) {
+	const dict = {};
+	const els = root.querySelectorAll('[' + selector + ']');
+	for (let i = 0; i < els.length; i++) {
+		dict[els[i].getAttribute(selector)] = els[i].textContent;
+		els[i].remove();
+	}
+	return dict;
+}
+
 // ─── Find Elements ─────────────────────────────────────────
 
 export function findElements(root, selector, attribute, ComponentClass) {
