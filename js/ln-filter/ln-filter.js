@@ -1,5 +1,6 @@
 import { dispatch, guardBody, findElements } from '../ln-core';
 import { deepReactive, createBatcher } from '../ln-core';
+import { persistGet, persistSet } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
@@ -46,20 +47,33 @@ import { deepReactive, createBatcher } from '../ln-core';
 
 		this._attachHandlers();
 
-		// Initialize from existing DOM — collect all pre-checked inputs
-		let initKey = null;
-		const initValues = [];
-		for (let i = 0; i < this.inputs.length; i++) {
-			const input = this.inputs[i];
-			if (input.checked && !_isReset(input)) {
-				if (!initKey) initKey = input.getAttribute(KEY_ATTR);
-				const val = input.getAttribute(VALUE_ATTR);
-				if (val) initValues.push(val);
+		// ─── Restore persisted filter ─────────────────────────────
+		let _persistRestored = false;
+		if (dom.hasAttribute('data-ln-persist')) {
+			const saved = persistGet('filter', dom);
+			if (saved && saved.key && Array.isArray(saved.values) && saved.values.length > 0) {
+				this.state.key = saved.key;
+				this.state.values = saved.values;
+				_persistRestored = true;
 			}
 		}
-		if (initValues.length > 0) {
-			this.state.key = initKey;
-			this.state.values = initValues;
+
+		if (!_persistRestored) {
+			// Initialize from existing DOM — collect all pre-checked inputs
+			let initKey = null;
+			const initValues = [];
+			for (let i = 0; i < this.inputs.length; i++) {
+				const input = this.inputs[i];
+				if (input.checked && !_isReset(input)) {
+					if (!initKey) initKey = input.getAttribute(KEY_ATTR);
+					const val = input.getAttribute(VALUE_ATTR);
+					if (val) initValues.push(val);
+				}
+			}
+			if (initValues.length > 0) {
+				this.state.key = initKey;
+				this.state.values = initValues;
+			}
 		}
 
 		dom.setAttribute(INIT_ATTR, '');
@@ -182,6 +196,15 @@ import { deepReactive, createBatcher } from '../ln-core';
 
 		for (let i = 0; i < events.length; i++) {
 			this._dispatchOnBoth(events[i].name, events[i].detail);
+		}
+
+		// Persist current filter state
+		if (this.dom.hasAttribute('data-ln-persist')) {
+			if (this.state.key && this.state.values.length > 0) {
+				persistSet('filter', this.dom, { key: this.state.key, values: this.state.values.slice() });
+			} else {
+				persistSet('filter', this.dom, null);
+			}
 		}
 	};
 

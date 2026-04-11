@@ -1,4 +1,5 @@
 import { guardBody, dispatch } from '../ln-core';
+import { persistGet, persistSet } from '../ln-core';
 
 (function () {
 	const DOM_ATTRIBUTE = 'lnTableSort';
@@ -66,6 +67,19 @@ import { guardBody, dispatch } from '../ln-core';
 			th.addEventListener('click', th._lnSortClick);
 		});
 
+		// ─── Restore persisted sort ───────────────────────────────
+		const persistRoot = table.closest('[data-ln-table][data-ln-persist]');
+		if (persistRoot) {
+			const saved = persistGet('table-sort', persistRoot);
+			if (saved && saved.dir && saved.col >= 0 && saved.col < ths.length) {
+				// Programmatically trigger the saved sort
+				this._handleClick(saved.col, ths[saved.col]);
+				if (saved.dir === 'desc') {
+					this._handleClick(saved.col, ths[saved.col]);
+				}
+			}
+		}
+
 		return this;
 	}
 
@@ -102,6 +116,14 @@ import { guardBody, dispatch } from '../ln-core';
 			sortType: th.getAttribute(SORT_ATTR),
 			direction: newDir
 		});
+		const persistRoot = this.table.closest('[data-ln-table][data-ln-persist]');
+		if (persistRoot) {
+			if (newDir === null) {
+				persistSet('table-sort', persistRoot, null);
+			} else {
+				persistSet('table-sort', persistRoot, { col: colIndex, dir: newDir });
+			}
+		}
 	};
 
 	_component.prototype.destroy = function () {

@@ -124,6 +124,30 @@ The hide rule is bundled in ln-acme. Pill styling (active state highlight via pr
 
 Uses `deepReactive` + `createBatcher` from `ln-core`. State is `{ key, values: [] }` — all DOM updates (`input.checked` on filter controls, `data-ln-filter-hide` on target children) derive from state in a batched `_render()` cycle. Events dispatch after render via `_afterRender()`. Listens to `change` events on `<input type="checkbox">` elements. Reset inputs are detected via `_isReset()` helper which checks `data-ln-filter-reset` attribute with `data-ln-filter-value=""` fallback. Filtering uses OR logic: a target child is hidden only if its data attribute value does not appear in the active `values` array.
 
+## Persistence
+
+Add `data-ln-persist` to the `[data-ln-filter]` element to remember selected filter values across page loads.
+
+**Requirements:**
+- Element must have an `id` attribute, OR a non-empty `data-ln-persist="key"` value
+- If neither is present, a `console.warn` is emitted and persistence is silently skipped — the filter still works normally
+
+**What is persisted:** Active filter key + selected values array. Reset state is stored as `null`.
+
+**Persisted state overrides DOM:** If localStorage has a saved filter, any `checked` attributes on inputs in the HTML are ignored.
+
+```html
+<nav id="status-filter" data-ln-filter="my-list" data-ln-persist>
+    <ul>
+        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="active"> Active</label></li>
+        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="pending"> Pending</label></li>
+    </ul>
+</nav>
+```
+
+Select "Active", refresh — "Active" is still checked and the list is filtered. Reset ("All"), refresh — no filter active.
+
 ## Dynamic elements
 
 MutationObserver auto-initializes new `[data-ln-filter]` elements added to the DOM. It does NOT automatically re-filter when new children are added to the target — call `el.lnFilter.filter(key, value)` manually after populating the target with new items.

@@ -204,6 +204,102 @@ const batchRender = createBatcher(
 
 ---
 
+## persist.js
+
+### persistGet(component, el)
+
+Read persisted value for an element. Returns the parsed JSON value or `null` (not found, or storage unavailable).
+
+- `component` — component name string (e.g. `'toggle'`, `'tabs'`, `'filter'`)
+- `el` — DOM element with `data-ln-persist` attribute
+
+Storage key resolved from `el`: uses `data-ln-persist` value if non-empty, otherwise element's `id`. If neither exists, emits `console.warn` and returns `null`.
+
+```js
+import { persistGet } from '../ln-core';
+const saved = persistGet('toggle', el); // null | 'open' | 'close'
+```
+
+### persistSet(component, el, value)
+
+Write a value to localStorage. Value is JSON-serialized. Silently no-ops if localStorage is unavailable or full.
+
+```js
+import { persistSet } from '../ln-core';
+persistSet('toggle', el, 'open');
+persistSet('table-sort', el, { col: 2, dir: 'desc' });
+persistSet('filter', el, null);  // explicitly clears
+```
+
+### persistRemove(component, el)
+
+Remove a single persisted value for a specific element.
+
+```js
+import { persistRemove } from '../ln-core';
+persistRemove('tabs', el);
+```
+
+### persistClear(component)
+
+Remove ALL persisted values for a given component type. Scans all localStorage keys matching `ln:{component}:*`.
+
+```js
+import { persistClear } from '../ln-core';
+persistClear('toggle');     // removes all ln:toggle:* keys
+persistClear('table-sort'); // removes all ln:table-sort:* keys
+```
+
+Useful for "reset to defaults" functionality.
+
+### Storage key format
+
+```
+ln:{component}:{pagePath}:{id}
+```
+
+- `pagePath` — `location.pathname`, lowercase, trailing slash stripped, or `/` for root
+- `id` — element's `id` attribute, or the explicit `data-ln-persist="custom-key"` value
+
+Examples:
+```
+ln:toggle:/admin/users:sidebar
+ln:tabs:/settings:settings-tabs
+ln:table-sort:/admin/orders:orders-table
+ln:filter:/admin/users:status-filter
+```
+
+### Opt-in HTML attribute
+
+```html
+<!-- Uses element id as storage key -->
+<section id="sidebar" data-ln-toggle="close" data-ln-persist>
+
+<!-- Explicit key (no id needed) -->
+<section data-ln-toggle="close" data-ln-persist="sidebar-section">
+```
+
+Persistence is always opt-in. Elements without `data-ln-persist` are never touched.
+
+### Supported components
+
+| Component | `data-ln-persist` on | What's persisted | Stored value |
+|-----------|---------------------|-----------------|--------------|
+| ln-toggle | `[data-ln-toggle]` element | open/close state | `"open"` or `"close"` |
+| ln-accordion | each `[data-ln-toggle]` inside | per-panel open/close | `"open"` or `"close"` |
+| ln-tabs | `[data-ln-tabs]` wrapper (non-hash only) | active tab key | `"tab-key"` string |
+| ln-table-sort | `[data-ln-table]` wrapper | sort column + direction | `{ col: number, dir: string }` |
+| ln-filter | `[data-ln-filter]` element | selected filter values | `{ key: string, values: string[] }` |
+
+### Graceful degradation
+
+- localStorage disabled (private browsing) → silent no-op, components work normally without persistence
+- localStorage full → silent no-op on write, existing data preserved
+- Stale data (panel removed from DOM, column index out of range) → orphan key ignored gracefully
+- Missing `id` + no explicit key → `console.warn` once, persistence skipped for that element
+
+---
+
 ## Typical Usage Pattern
 
 ```js

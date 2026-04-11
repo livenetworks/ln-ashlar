@@ -44,6 +44,14 @@ Accordion is a coordinator for `ln-toggle` children. Communication is via the at
 
 Accordion never calls toggle API directly (`el.lnToggle.close()`). It sets the attribute, and toggle's observer applies the state. This is the canonical Coordinator/Mediator Pattern from [COMPONENTS.md](../../js/COMPONENTS.md).
 
+## Persistence
+
+Accordion has no persistence code of its own. Panels persist via individual toggle persistence — each `[data-ln-toggle]` inside the accordion may carry `data-ln-persist`, which `ln-toggle` handles independently.
+
+On page reload, each toggle restores its saved state during `_component` construction. If one was persisted as `open`, `ln-toggle:open` bubbles up to the accordion, which then closes all other open siblings via its `_onToggleOpen` handler. Single-open behavior is preserved automatically.
+
+See [ln-toggle persistence docs](../../js/ln-toggle/README.md#persistence) for attribute usage and key format.
+
 ## API
 
 ```js

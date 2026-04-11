@@ -62,6 +62,29 @@ el.setAttribute('data-ln-toggle', 'close');
 window.lnToggle(container);
 ```
 
+## Persistence
+
+Toggle supports opt-in `localStorage` persistence via the `data-ln-persist` attribute.
+
+| Attribute | Description |
+|-----------|-------------|
+| `data-ln-persist` | Boolean — uses element `id` as storage key |
+| `data-ln-persist="custom-key"` | Uses the given string as storage key |
+
+**Storage key format:** `ln:toggle:{pagePath}:{id}`
+
+- `pagePath` = `location.pathname` lowercased, trailing slash stripped, or `/` for root
+- `id` = explicit `data-ln-persist` value, or element's `id` attribute
+- Example: `ln:toggle:/admin/users:sidebar`
+
+**Restore timing:** In `_component` constructor, before `this.isOpen` is read. If a saved value exists, `dom.setAttribute(DOM_SELECTOR, saved)` is called first — the existing `this.isOpen` line then picks up the restored value naturally. No special branching required.
+
+**Save timing:** In `_syncAttribute`, after each successful state change — after `dispatch('ln-toggle:open')` or `dispatch('ln-toggle:close')`. Saves only if `el.hasAttribute('data-ln-persist')`.
+
+**Graceful degradation:** All `localStorage` calls are wrapped in `try/catch`. If storage is unavailable or full, the error is silently swallowed and the toggle continues working without persistence.
+
+**Missing key warning:** If `data-ln-persist` is present but no `id` or explicit value exists, `console.warn` is emitted and persistence is skipped — the toggle still functions normally.
+
 ---
 
 ## Internal Architecture

@@ -43,6 +43,29 @@ Only one `ln-toggle` element can be open at a time.
 - `.collapsible-body` on child → overflow:hidden, padding/margins go here
 - When `panel2` opens, `panel1` is automatically closed (and vice versa).
 
+### Persistence
+
+Accordion panels persist via individual toggle persistence. Add `data-ln-persist` to each `[data-ln-toggle]` inside the accordion. Each panel stores its state independently. On page reload, the saved panel is restored as open, and the accordion's `ln-toggle:open` listener closes any other open panels — single-open behavior is preserved.
+
+Each `[data-ln-toggle]` must have an `id` (or explicit `data-ln-persist="key"`) for the storage key to resolve. See [ln-toggle README](../ln-toggle/README.md#persistence) for full details.
+
+```html
+<ul data-ln-accordion>
+    <li>
+        <header data-ln-toggle-for="panel1">Section 1</header>
+        <section id="panel1" data-ln-toggle="close" data-ln-persist class="collapsible">
+            <article class="collapsible-body">Content 1</article>
+        </section>
+    </li>
+    <li>
+        <header data-ln-toggle-for="panel2">Section 2</header>
+        <section id="panel2" data-ln-toggle="close" data-ln-persist class="collapsible">
+            <article class="collapsible-body">Content 2</article>
+        </section>
+    </li>
+</ul>
+```
+
 ## Events
 
 | Event | Bubbles | Cancelable | Detail |

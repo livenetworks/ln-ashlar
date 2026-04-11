@@ -98,6 +98,25 @@ _handleClick(colIndex, th):
     5. dispatch 'ln-table:sort' on the table
 ```
 
+### Persistence
+
+Table sort supports opt-in `localStorage` persistence via `data-ln-persist` on the `[data-ln-table]` **wrapper** (not on the `<table>` element).
+
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-persist` | `[data-ln-table]` wrapper | Uses wrapper `id` as storage key |
+| `data-ln-persist="custom-key"` | `[data-ln-table]` wrapper | Uses the given string as storage key |
+
+**Storage key format:** `ln:table-sort:{pagePath}:{wrapperId}`
+
+**Stored value:** `{ col: number, dir: 'asc'|'desc' }` or `null` (unsorted)
+
+**Restore timing:** In `_component` constructor, after click handlers are bound. Uses `table.closest('[data-ln-table][data-ln-persist]')` to locate the wrapper. If a saved value exists and `saved.col < ths.length` (stale column index check), `_handleClick` is called to replay the sort: once for `'asc'`, twice for `'desc'` (matching the click cycle from no-sort state).
+
+**Save timing:** In `_handleClick`, after `dispatch('ln-table:sort')`. Saves `null` when sort is cleared (third click).
+
+**Stale column index:** If the saved column index is out of range (column removed from DOM), the guard `saved.col < ths.length` silently skips restore with no error.
+
 ### Guard
 
 Each `<th>` gets a `lnTableSortBound = true` property to prevent duplicate click listeners when MutationObserver re-fires.

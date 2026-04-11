@@ -1,5 +1,6 @@
 /* Live Networks - lnTabs (hash-aware tabs via <a href="#key">) */
 import { dispatch, guardBody, findElements } from '../ln-core';
+import { persistGet, persistSet } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-tabs";
@@ -76,7 +77,14 @@ import { dispatch, guardBody, findElements } from '../ln-core';
 			window.addEventListener("hashchange", this._hashHandler);
 			this._hashHandler();
 		} else {
-			this.activate(this.defaultKey);
+			let initialKey = this.defaultKey;
+			if (this.dom.hasAttribute('data-ln-persist') && !this.hashEnabled) {
+				const saved = persistGet('tabs', this.dom);
+				if (saved !== null && saved in this.mapPanels) {
+					initialKey = saved;
+				}
+			}
+			this.activate(initialKey);
 		}
 	}
 
@@ -108,6 +116,9 @@ import { dispatch, guardBody, findElements } from '../ln-core';
 			if (first) setTimeout(() => first.focus({ preventScroll: true }), 0);
 		}
 		dispatch(this.dom, 'ln-tabs:change', { key: key, tab: this.mapTabs[key], panel: this.mapPanels[key] });
+		if (this.dom.hasAttribute('data-ln-persist') && !this.hashEnabled) {
+			persistSet('tabs', this.dom, key);
+		}
 	};
 
 	_component.prototype.destroy = function () {

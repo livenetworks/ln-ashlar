@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Persist — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+	</template>
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Persist</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'localStorage persistence for toggle, tabs, table sort, and filter.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.0.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+				<h1>Persist</h1>
+				<p>localStorage persistence for UI component states. Opt-in via <code>data-ln-persist</code>. State is page-scoped — storage keys include the URL pathname so the same <code>id</code> on different pages never collides.</p>
+				<p><strong>How to test:</strong> Change any state below, then refresh the page — the state should be restored exactly as you left it.</p>
+
+				<!-- ─── Section 1: Toggle ─────────────────────────────── -->
+				<section class="section-card">
+					<header><h3>1 — Toggle persistence</h3></header>
+					<main>
+						<p>Open/close these sections, then refresh. The two persisted toggles restore; the control toggle always resets to closed.</p>
+
+						<article>
+							<header>
+								<strong>Persisted toggle A</strong>
+								<small><code>id="persist-toggle-a" data-ln-persist</code></small>
+								<button type="button" data-ln-toggle-for="persist-toggle-a" aria-label="Toggle A">
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								</button>
+							</header>
+							<section id="persist-toggle-a" data-ln-toggle="close" data-ln-persist class="collapsible">
+								<article class="collapsible-body">
+									<p>This section remembers whether it was open or closed. Open it and refresh the page — it will still be open.</p>
+									<p>Storage key: <code>ln:toggle:{path}:persist-toggle-a</code></p>
+								</article>
+							</section>
+						</article>
+
+						<article>
+							<header>
+								<strong>Persisted toggle B</strong>
+								<small><code>id="persist-toggle-b" data-ln-persist</code></small>
+								<button type="button" data-ln-toggle-for="persist-toggle-b" aria-label="Toggle B">
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								</button>
+							</header>
+							<section id="persist-toggle-b" data-ln-toggle="close" data-ln-persist class="collapsible">
+								<article class="collapsible-body">
+									<p>Independent from Toggle A. Both persist their own state separately.</p>
+									<p>Storage key: <code>ln:toggle:{path}:persist-toggle-b</code></p>
+								</article>
+							</section>
+						</article>
+
+						<article>
+							<header>
+								<strong>Control — no persistence</strong>
+								<small><code>id="no-persist-toggle"</code> — no <code>data-ln-persist</code></small>
+								<button type="button" data-ln-toggle-for="no-persist-toggle" aria-label="Toggle control">
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								</button>
+							</header>
+							<section id="no-persist-toggle" data-ln-toggle="close" class="collapsible">
+								<article class="collapsible-body">
+									<p>This toggle has no <code>data-ln-persist</code> — it always resets to closed on page refresh. Nothing is written to localStorage.</p>
+								</article>
+							</section>
+						</article>
+					</main>
+				</section>
+
+				<!-- ─── Section 2: Accordion ──────────────────────────── -->
+				<section class="section-card">
+					<header><h3>2 — Accordion persistence</h3></header>
+					<main>
+						<p>Open one panel and refresh. The same panel reopens — single-open constraint still works after restore.</p>
+
+						<ul data-ln-accordion>
+							<li>
+								<header data-ln-toggle-for="acc-panel-1">
+									Panel 1 — General settings
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								</header>
+								<section id="acc-panel-1" data-ln-toggle="close" data-ln-persist class="collapsible">
+									<article class="collapsible-body">
+										<p>Content of panel 1. Opening this closes panels 2 and 3.</p>
+										<p>Storage key: <code>ln:toggle:{path}:acc-panel-1</code></p>
+									</article>
+								</section>
+							</li>
+							<li>
+								<header data-ln-toggle-for="acc-panel-2">
+									Panel 2 — Security
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								</header>
+								<section id="acc-panel-2" data-ln-toggle="close" data-ln-persist class="collapsible">
+									<article class="collapsible-body">
+										<p>Content of panel 2. Opening this closes panels 1 and 3.</p>
+										<p>Storage key: <code>ln:toggle:{path}:acc-panel-2</code></p>
+									</article>
+								</section>
+							</li>
+							<li>
+								<header data-ln-toggle-for="acc-panel-3">
+									Panel 3 — Notifications
+									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								</header>
+								<section id="acc-panel-3" data-ln-toggle="close" data-ln-persist class="collapsible">
+									<article class="collapsible-body">
+										<p>Content of panel 3. Opening this closes panels 1 and 2.</p>
+										<p>Storage key: <code>ln:toggle:{path}:acc-panel-3</code></p>
+									</article>
+								</section>
+							</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- ─── Section 3: Tabs ───────────────────────────────── -->
+				<section class="section-card">
+					<header><h3>3 — Tabs persistence</h3></header>
+					<main>
+						<p>Switch tabs, refresh. The non-hash tab set restores via localStorage. The hash tab set uses the URL — note the difference.</p>
+
+						<article>
+							<h4>Non-hash tabs — persists via localStorage</h4>
+							<p><code>data-ln-persist="persist-settings-tabs"</code> — no <code>id</code>, no hash sync.</p>
+							<div data-ln-tabs data-ln-tabs-default="general" data-ln-persist="persist-settings-tabs">
+								<nav>
+									<button data-ln-tab="general">General</button>
+									<button data-ln-tab="security">Security</button>
+									<button data-ln-tab="notifications">Notifications</button>
+								</nav>
+								<section data-ln-panel="general">
+									<h4>General</h4>
+									<p>Switch to Security or Notifications, then refresh — that tab will be restored from localStorage.</p>
+									<p>Storage key: <code>ln:tabs:{path}:persist-settings-tabs</code></p>
+								</section>
+								<section data-ln-panel="security" class="hidden">
+									<h4>Security</h4>
+									<p>This tab is active. Refresh the page — Security will still be active.</p>
+								</section>
+								<section data-ln-panel="notifications" class="hidden">
+									<h4>Notifications</h4>
+									<p>This tab is active. Refresh the page — Notifications will still be active.</p>
+								</section>
+							</div>
+						</article>
+
+						<article>
+							<h4>Hash tabs — URL sync takes precedence</h4>
+							<p><code>id="hash-tabs-demo"</code> — hash sync is active. <code>data-ln-persist</code> would be ignored even if added.</p>
+							<section id="hash-tabs-demo" data-ln-tabs data-ln-tabs-default="alpha">
+								<nav>
+									<button data-ln-tab="alpha">Alpha</button>
+									<button data-ln-tab="beta">Beta</button>
+									<button data-ln-tab="gamma">Gamma</button>
+								</nav>
+								<section data-ln-panel="alpha">
+									<h4>Alpha</h4>
+									<p>This tab set uses URL hash for state: <code>#hash-tabs-demo:beta</code>. No localStorage is written.</p>
+								</section>
+								<section data-ln-panel="beta" class="hidden">
+									<h4>Beta</h4>
+									<p>Active tab is visible in the URL bar. Refresh — hash restores it, not localStorage.</p>
+								</section>
+								<section data-ln-panel="gamma" class="hidden">
+									<h4>Gamma</h4>
+									<p>Hash format: <code>#hash-tabs-demo:gamma</code></p>
+								</section>
+							</section>
+						</article>
+					</main>
+				</section>
+
+				<!-- ─── Section 4: Table sort ─────────────────────────── -->
+				<section class="section-card">
+					<header><h3>4 — Table sort persistence</h3></header>
+					<main>
+						<p>Click a column header to sort, then refresh. The sort column and direction are restored.</p>
+						<p><code>data-ln-persist</code> goes on the <code>[data-ln-table]</code> wrapper — one attribute covers both <code>ln-table</code> and <code>ln-table-sort</code>.</p>
+
+						<div id="persist-table" data-ln-table data-ln-persist>
+							<table>
+								<thead>
+									<tr>
+										<th data-ln-sort="string">Name</th>
+										<th data-ln-sort="string">Department</th>
+										<th data-ln-sort="string">Role</th>
+										<th data-ln-sort="number" class="numeric">Salary</th>
+										<th data-ln-sort="date">Start date</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Alice Johnson</td>
+										<td>Engineering</td>
+										<td>Lead</td>
+										<td data-ln-value="95000">95,000</td>
+										<td data-ln-value="1609459200">01.01.2021</td>
+									</tr>
+									<tr>
+										<td>Bob Martinez</td>
+										<td>Design</td>
+										<td>Senior</td>
+										<td data-ln-value="82000">82,000</td>
+										<td data-ln-value="1625097600">01.07.2021</td>
+									</tr>
+									<tr>
+										<td>Carol White</td>
+										<td>Engineering</td>
+										<td>Mid</td>
+										<td data-ln-value="74000">74,000</td>
+										<td data-ln-value="1640995200">01.01.2022</td>
+									</tr>
+									<tr>
+										<td>David Lee</td>
+										<td>Marketing</td>
+										<td>Senior</td>
+										<td data-ln-value="78000">78,000</td>
+										<td data-ln-value="1656633600">01.07.2022</td>
+									</tr>
+									<tr>
+										<td>Eva Novak</td>
+										<td>Design</td>
+										<td>Lead</td>
+										<td data-ln-value="90000">90,000</td>
+										<td data-ln-value="1672531200">01.01.2023</td>
+									</tr>
+									<tr>
+										<td>Frank Okafor</td>
+										<td>Engineering</td>
+										<td>Senior</td>
+										<td data-ln-value="88000">88,000</td>
+										<td data-ln-value="1688169600">01.07.2023</td>
+									</tr>
+									<tr>
+										<td>Grace Park</td>
+										<td>Marketing</td>
+										<td>Mid</td>
+										<td data-ln-value="69000">69,000</td>
+										<td data-ln-value="1704067200">01.01.2024</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<p><small>Storage key: <code>ln:table-sort:{path}:persist-table</code> — value: <code>{ col: N, dir: "asc"|"desc" }</code></small></p>
+					</main>
+				</section>
+
+				<!-- ─── Section 5: Filter ─────────────────────────────── -->
+				<section class="section-card">
+					<header><h3>5 — Filter persistence</h3></header>
+					<main>
+						<p>Check one or more filters, then refresh. The selected values are restored and the list is filtered.</p>
+
+						<nav id="persist-filter" data-ln-filter="persist-items" data-ln-persist>
+							<ul>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="active"> Active</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="pending"> Pending</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="archived"> Archived</label></li>
+							</ul>
+						</nav>
+
+						<ul id="persist-items">
+							<li data-status="active">Alice Johnson — <strong>Active</strong></li>
+							<li data-status="pending">Bob Martinez — <strong>Pending</strong></li>
+							<li data-status="active">Carol White — <strong>Active</strong></li>
+							<li data-status="archived">David Lee — <strong>Archived</strong></li>
+							<li data-status="pending">Eva Novak — <strong>Pending</strong></li>
+							<li data-status="active">Frank Okafor — <strong>Active</strong></li>
+							<li data-status="archived">Grace Park — <strong>Archived</strong></li>
+						</ul>
+						<p><small>Storage key: <code>ln:filter:{path}:persist-filter</code> — value: <code>{ key: "status", values: ["active"] }</code></small></p>
+					</main>
+				</section>
+
+				<!-- ─── Section 6: Debug tools ────────────────────────── -->
+				<section class="section-card">
+					<header><h3>6 — Debug tools</h3></header>
+					<main>
+						<p>Inspect and clear all <code>ln:*</code> localStorage keys written by persist integrations on this page.</p>
+
+						<p>
+							<button type="button" onclick="showPersistKeys()">Show localStorage</button>
+							<button type="button" onclick="clearAllPersistKeys()">Clear all persisted state</button>
+						</p>
+
+						<pre id="persist-debug-output">(click "Show localStorage" to inspect)</pre>
+
+						<article>
+							<h4>What each component stores</h4>
+							<table>
+								<thead>
+									<tr><th>Component</th><th>Key pattern</th><th>Example value</th></tr>
+								</thead>
+								<tbody>
+									<tr><td>ln-toggle</td><td><code>ln:toggle:{path}:{id}</code></td><td><code>"open"</code> or <code>"close"</code></td></tr>
+									<tr><td>ln-tabs</td><td><code>ln:tabs:{path}:{key}</code></td><td><code>"security"</code></td></tr>
+									<tr><td>ln-table-sort</td><td><code>ln:table-sort:{path}:{id}</code></td><td><code>{"col":3,"dir":"desc"}</code></td></tr>
+									<tr><td>ln-filter</td><td><code>ln:filter:{path}:{id}</code></td><td><code>{"key":"status","values":["active"]}</code></td></tr>
+								</tbody>
+							</table>
+						</article>
+					</main>
+				</section>
+
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.0.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+	<script>
+		function showPersistKeys() {
+			var out = [];
+			for (var i = 0; i < localStorage.length; i++) {
+				var k = localStorage.key(i);
+				if (k && k.indexOf('ln:') === 0) {
+					out.push(k + '\n  = ' + localStorage.getItem(k));
+				}
+			}
+			document.getElementById('persist-debug-output').textContent =
+				out.length ? out.join('\n\n') : '(no ln:* keys in localStorage)';
+		}
+
+		function clearAllPersistKeys() {
+			var keys = [];
+			for (var i = 0; i < localStorage.length; i++) {
+				var k = localStorage.key(i);
+				if (k && k.indexOf('ln:') === 0) keys.push(k);
+			}
+			for (var j = 0; j < keys.length; j++) {
+				localStorage.removeItem(keys[j]);
+			}
+			showPersistKeys();
+			window.lnToast && window.lnToast.enqueue({
+				type: 'success',
+				title: 'Cleared',
+				message: 'All ln:* localStorage keys removed. Refresh to see components reset to default state.'
+			});
+		}
+	</script>
+</body>
+</html>

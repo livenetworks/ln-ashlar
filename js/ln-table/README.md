@@ -184,6 +184,35 @@ table.addEventListener('ln-table:empty', function (e) {
 
 ---
 
+## Persistence
+
+Add `data-ln-persist` to the `[data-ln-table]` wrapper to remember the active sort column and direction across page loads.
+
+**Requirements:**
+- The `[data-ln-table]` wrapper must have an `id` attribute, OR a non-empty `data-ln-persist="key"` value
+- If neither is present, a `console.warn` is emitted and persistence is silently skipped — the table still works normally
+
+**What is persisted:** Sort column index + direction (`asc`/`desc`). Not the search term.
+
+```html
+<div id="employees" data-ln-table data-ln-persist>
+    ...
+    <table>
+        <thead>
+            <tr>
+                <th data-ln-sort="string">Name</th>
+                <th data-ln-sort="date">Date</th>
+            </tr>
+        </thead>
+        <tbody>...</tbody>
+    </table>
+</div>
+```
+
+Sort by the Name column descending, refresh — the Name column is still sorted descending.
+
+---
+
 ## Virtual scroll
 
 Automatically activates when the number of (filtered) rows exceeds 200.

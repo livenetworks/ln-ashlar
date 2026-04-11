@@ -1,4 +1,5 @@
 import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-core';
+import { persistGet, persistSet } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-toggle';
@@ -38,6 +39,15 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 
 	function _component(dom) {
 		this.dom = dom;
+
+		// ─── Restore persisted state ──────────────────────────────
+		if (dom.hasAttribute('data-ln-persist')) {
+			const saved = persistGet('toggle', dom);
+			if (saved !== null) {
+				dom.setAttribute(DOM_SELECTOR, saved);
+			}
+		}
+
 		this.isOpen = dom.getAttribute(DOM_SELECTOR) === 'open';
 
 		if (this.isOpen) {
@@ -87,6 +97,9 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 			instance.isOpen = true;
 			el.classList.add('open');
 			dispatch(el, 'ln-toggle:open', { target: el });
+			if (el.hasAttribute('data-ln-persist')) {
+				persistSet('toggle', el, 'open');
+			}
 		} else {
 			const before = dispatchCancelable(el, 'ln-toggle:before-close', { target: el });
 			if (before.defaultPrevented) {
@@ -96,6 +109,9 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 			instance.isOpen = false;
 			el.classList.remove('open');
 			dispatch(el, 'ln-toggle:close', { target: el });
+			if (el.hasAttribute('data-ln-persist')) {
+				persistSet('toggle', el, 'close');
+			}
 		}
 	}
 

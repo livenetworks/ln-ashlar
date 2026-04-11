@@ -107,6 +107,41 @@ document.addEventListener('ln-tabs:change', function(e) {
 });
 ```
 
+## Persistence
+
+Add `data-ln-persist` to a tab wrapper to remember the active tab across page loads using `localStorage`. Only works when hash sync is **not** enabled (i.e., `data-ln-tabs-key` is absent and no `id` is used as namespace).
+
+**Requirements:**
+- Element must have an `id` attribute, OR a non-empty `data-ln-persist="custom-key"` value
+- If neither is present, a `console.warn` is emitted and persistence is silently skipped — tabs still work normally
+
+**Hash takes precedence:** If both `data-ln-tabs-key` (or `id`) and `data-ln-persist` are present, hash sync is used and `data-ln-persist` is ignored entirely. The two mechanisms are mutually exclusive.
+
+**Graceful degradation:** If `localStorage` is unavailable (private browsing, storage full), tabs work normally without persistence.
+
+**Saved key validation:** On restore, the saved tab key is checked against `mapPanels`. If the key no longer exists in the DOM, the component falls back to `defaultKey` silently.
+
+```html
+<div data-ln-tabs id="settings-tabs" data-ln-persist>
+    <nav>
+        <button data-ln-tab="general">General</button>
+        <button data-ln-tab="security">Security</button>
+    </nav>
+    <div data-ln-panel="general">...</div>
+    <div data-ln-panel="security" class="hidden">...</div>
+</div>
+```
+
+Storage key: `ln:tabs:/admin/settings:settings-tabs`
+
+With an explicit custom key instead of `id`:
+
+```html
+<div data-ln-tabs data-ln-persist="settings-tabs">
+    ...
+</div>
+```
+
 ## CSS Styling
 
 ```scss

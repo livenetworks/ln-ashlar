@@ -165,6 +165,29 @@ Every event dispatches on **two** elements via `_dispatchOnBoth()`:
 
 This is how per-column table filters work: `ln-filter` inside a `<th>` dispatches `ln-filter:changed` on the `[data-ln-table]` wrapper, and ln-table's handler picks it up.
 
+### Persistence
+
+Filter supports opt-in `localStorage` persistence via `data-ln-persist` on the `[data-ln-filter]` element.
+
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-persist` | `[data-ln-filter]` | Boolean — uses element `id` as storage key |
+| `data-ln-persist="custom-key"` | `[data-ln-filter]` | Uses the given string as storage key |
+
+**Storage key format:** `ln:filter:{pagePath}:{filterId}`
+
+**Stored value:** `{ key: string, values: string[] }` or `null` (reset state)
+
+**Restore timing:** In `_component` constructor, after `_attachHandlers()` but before DOM init. If `data-ln-persist` is present, `persistGet` is called. If the saved object has a non-empty `key` and non-empty `values` array, they are applied to `state` directly (`_persistRestored = true`). This triggers `queueRender` via `deepReactive`, which schedules a render cycle to update checkboxes and filter targets.
+
+**DOM init precedence:** Persisted state overrides any `checked` attributes in the HTML. If `_persistRestored` is true, the DOM init scan is skipped entirely.
+
+**Save timing:** In `_afterRender()`, after all pending events dispatch. Saves `{ key, values: [...] }` when a filter is active, saves `null` when filter is in reset state.
+
+**Reset clears storage:** When `reset()` is called, `state.key = null` and `state.values = []`. The next `_afterRender` call saves `null`, explicitly clearing the stored filter.
+
+**Graceful degradation:** All `localStorage` calls are in `persist.js` with `try/catch`. Storage errors are silently swallowed.
+
 ### Init from Existing DOM
 
 On construction, all inputs are scanned for existing `checked` attributes. All checked non-reset inputs (per `_isReset()`) have their values collected into `initValues[]`. If any are found, `state.key` and `state.values` are set directly — this initializes state without triggering a render (the DOM is already correct from the server). Single pre-checked input still works (array of one value).

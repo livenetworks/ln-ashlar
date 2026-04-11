@@ -122,6 +122,59 @@ For semantic usage in project SCSS:
 #section1 > .my-body   { @include collapsible-content; }
 ```
 
+## Persistence
+
+Add `data-ln-persist` to any toggle element to remember its open/closed state across page loads. State is stored in `localStorage` and restored on the next visit.
+
+**Requirements:**
+- Element must have an `id` attribute, OR a non-empty `data-ln-persist="custom-key"` value
+- If neither is provided, a `console.warn` is emitted and persistence is silently skipped — the toggle still works normally
+
+**Storage key format:** `ln:toggle:{pagePath}:{id}` — keys are page-scoped so elements with the same `id` on different pages don't collide.
+
+**Graceful degradation:** If `localStorage` is unavailable (e.g. private browsing, storage full), the toggle works normally without persistence.
+
+### Using element `id` as key (default)
+
+```html
+<aside id="sidebar" data-ln-toggle="close" data-ln-persist>
+    ...
+</aside>
+```
+
+Storage key: `ln:toggle:/admin/users:sidebar`
+
+### Using an explicit custom key
+
+```html
+<aside id="sidebar" data-ln-toggle="close" data-ln-persist="sidebar">
+    ...
+</aside>
+```
+
+The value of `data-ln-persist` overrides the `id` as the storage key.
+
+### Works with ln-accordion automatically
+
+Add `data-ln-persist` to each `[data-ln-toggle]` inside an accordion. Each panel persists its state individually. On page reload, the persisted panel is restored as open, and the accordion's single-open logic closes any others.
+
+```html
+<ul data-ln-accordion>
+    <li>
+        <header data-ln-toggle-for="panel1">Section 1</header>
+        <section id="panel1" data-ln-toggle="close" data-ln-persist class="collapsible">
+            <article class="collapsible-body">Content 1</article>
+        </section>
+    </li>
+    <li>
+        <header data-ln-toggle-for="panel2">Section 2</header>
+        <section id="panel2" data-ln-toggle="close" data-ln-persist class="collapsible">
+            <article class="collapsible-body">Content 2</article>
+        </section>
+    </li>
+</ul>
+```
+
 ### Programmatic
 
 ```javascript
