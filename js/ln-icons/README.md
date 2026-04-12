@@ -100,3 +100,12 @@ Cache is versioned via `CACHE_VERSION` inside `ln-icons.js`. Bumping the version
 ## No Init Required
 
 Runs automatically on `DOMContentLoaded`. MutationObserver handles icons added dynamically after page load.
+
+## Dynamic `href` Swaps
+
+Runtime changes to the `href` attribute on a `<use>` element are detected automatically — the new icon is fetched and added to the sprite. This supports patterns like `ln-confirm` swapping an action icon to `#ln-check` on first click.
+
+```js
+// Works without manual intervention — the new icon is fetched on demand:
+useEl.setAttribute('href', '#ln-check');
+```

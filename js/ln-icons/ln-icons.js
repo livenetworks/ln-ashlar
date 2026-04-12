@@ -138,11 +138,25 @@
         _scan(document);
         new MutationObserver(function (mutations) {
             mutations.forEach(function (m) {
-                m.addedNodes.forEach(function (node) {
-                    if (node.nodeType === 1) _scan(node);
-                });
+                if (m.type === 'childList') {
+                    m.addedNodes.forEach(function (node) {
+                        if (node.nodeType === 1) _scan(node);
+                    });
+                } else if (m.type === 'attributes' && m.attributeName === 'href') {
+                    // A <use href="..."> was swapped at runtime (e.g. ln-confirm
+                    // replacing an icon). Trigger a load for the new target.
+                    var h = m.target.getAttribute('href');
+                    if (h && (h.indexOf(PREFIX_LN) === 0 || h.indexOf(PREFIX_LNC) === 0)) {
+                        _load(h);
+                    }
+                }
             });
-        }).observe(document.body, { childList: true, subtree: true });
+        }).observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['href']
+        });
     }
 
     if (document.readyState === 'loading') {
