@@ -1,4 +1,4 @@
-import { guardBody, dispatch, buildDict } from '../ln-core';
+import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-upload';
@@ -6,6 +6,28 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 	const DICT_SELECTOR = 'data-ln-upload-dict';
 	const ACCEPT_ATTR = 'data-ln-upload-accept';
 	const CONTEXT_ATTR = 'data-ln-upload-context';
+
+	const DEFAULT_ITEM_TEMPLATE_HTML =
+		'<template data-ln-template="ln-upload-item">' +
+			'<li class="ln-upload__item" data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">' +
+				'<svg class="ln-icon" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-file"></use></svg>' +
+				'<span class="ln-upload__name" data-ln-field="name"></span>' +
+				'<span class="ln-upload__size" data-ln-field="sizeText"></span>' +
+				'<button type="button" class="ln-upload__remove" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">' +
+					'<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>' +
+				'</button>' +
+				'<div class="ln-upload__progress"><div class="ln-upload__progress-bar"></div></div>' +
+			'</li>' +
+		'</template>';
+
+	function _ensureDefaultItemTemplate() {
+		if (document.querySelector('[data-ln-template="ln-upload-item"]')) return;
+		if (!document.body) return;
+		const holder = document.createElement('div');
+		holder.innerHTML = DEFAULT_ITEM_TEMPLATE_HTML;
+		const tmpl = holder.firstElementChild;
+		if (tmpl) document.body.appendChild(tmpl);
+	}
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -27,12 +49,6 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 		return supported.includes(extension) ? 'lnc-file-' + extension : 'ln-file';
 	}
 
-	function _makeIcon(iconId) {
-		var el = document.createElement('span');
-		el.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#' + iconId + '"></use></svg>';
-		return el.firstElementChild;
-	}
-
 	function _isValidFile(file, acceptString) {
 		if (!acceptString) return true;
 		const ext = '.' + _getExtension(file.name);
@@ -44,6 +60,7 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 		if (container.hasAttribute('data-ln-upload-initialized')) return;
 		container.setAttribute('data-ln-upload-initialized', 'true');
 
+		_ensureDefaultItemTemplate();
 		const dict = buildDict(container, DICT_SELECTOR);
 		const zone = container.querySelector('.ln-upload__zone');
 		const list = container.querySelector('.ln-upload__list');
@@ -89,8 +106,8 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 
 				dispatch(window, 'ln-toast:enqueue', {
 					type: 'error',
-					title: 'Invalid File',
-					message: message || 'This file type is not allowed'
+					title: dict['invalid-title'] || 'Invalid File',
+					message: message || dict['invalid-type'] || 'This file type is not allowed'
 				});
 				return;
 			}
@@ -99,39 +116,27 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 			const ext = _getExtension(file.name);
 			const iconId = _getIconId(ext);
 
-			const li = document.createElement('li');
-			li.className = 'ln-upload__item ln-upload__item--uploading';
+			const fragment = cloneTemplateScoped(container, 'ln-upload-item', 'ln-upload');
+			if (!fragment) return;
+			const li = fragment.firstElementChild;
+			if (!li) return;
+
 			li.setAttribute('data-file-id', localId);
 
-			const fileIcon = _makeIcon(iconId);
+			fill(li, {
+				name: file.name,
+				sizeText: '0%',
+				iconHref: '#' + iconId,
+				removeLabel: dict['remove'] || 'Remove',
+				uploading: true,
+				error: false,
+				deleting: false
+			});
 
-			const nameSpan = document.createElement('span');
-			nameSpan.className = 'ln-upload__name';
-			nameSpan.textContent = file.name;
+			const progressBar = li.querySelector('.ln-upload__progress-bar');
+			const removeBtn = li.querySelector('[data-ln-upload-action="remove"]');
+			if (removeBtn) removeBtn.disabled = true;
 
-			const sizeSpan = document.createElement('span');
-			sizeSpan.className = 'ln-upload__size';
-			sizeSpan.textContent = '0%';
-
-			const removeBtn = document.createElement('button');
-			removeBtn.type = 'button';
-			removeBtn.className = 'ln-upload__remove';
-			removeBtn.setAttribute('aria-label', dict['remove']);
-			removeBtn.title = dict['remove'];
-			removeBtn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>';
-			removeBtn.disabled = true;
-
-			const progress = document.createElement('div');
-			progress.className = 'ln-upload__progress';
-			const progressBar = document.createElement('div');
-			progressBar.className = 'ln-upload__progress-bar';
-			progress.appendChild(progressBar);
-
-			li.appendChild(fileIcon);
-			li.appendChild(nameSpan);
-			li.appendChild(sizeSpan);
-			li.appendChild(removeBtn);
-			li.appendChild(progress);
 			list.appendChild(li);
 
 			const formData = new FormData();
@@ -144,7 +149,7 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 				if (e.lengthComputable) {
 					const percent = Math.round((e.loaded / e.total) * 100);
 					progressBar.style.width = percent + '%';
-					sizeSpan.textContent = percent + '%';
+					fill(li, { sizeText: percent + '%' });
 				}
 			});
 
@@ -158,9 +163,8 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 						return;
 					}
 
-					li.classList.remove('ln-upload__item--uploading');
-					sizeSpan.textContent = _formatSize(data.size || file.size);
-					removeBtn.disabled = false;
+					fill(li, { sizeText: _formatSize(data.size || file.size), uploading: false });
+					if (removeBtn) removeBtn.disabled = false;
 
 					uploadedFiles.set(localId, {
 						serverId: data.id,
@@ -176,7 +180,7 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 						name: data.name
 					});
 				} else {
-					let message = 'Upload failed';
+					let message = dict['upload-failed'] || 'Upload failed';
 					try {
 						const errorData = JSON.parse(xhr.responseText);
 						message = errorData.message || message;
@@ -186,15 +190,13 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 			});
 
 			xhr.addEventListener('error', function () {
-				handleError('Network error');
+				handleError(dict['network-error'] || 'Network error');
 			});
 
 			function handleError(message) {
-				li.classList.remove('ln-upload__item--uploading');
-				li.classList.add('ln-upload__item--error');
-				progressBar.style.width = '100%';
-				sizeSpan.textContent = dict['error'];
-				removeBtn.disabled = false;
+				if (progressBar) progressBar.style.width = '100%';
+				fill(li, { sizeText: dict['error'] || 'Error', uploading: false, error: true });
+				if (removeBtn) removeBtn.disabled = false;
 
 				dispatch(container, 'ln-upload:error', {
 					file: file,
@@ -203,7 +205,7 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 
 				dispatch(window, 'ln-toast:enqueue', {
 					type: 'error',
-					title: 'Upload Error',
+					title: dict['error-title'] || 'Upload Error',
 					message: message || dict['upload-failed'] || 'Failed to upload file'
 				});
 			}
@@ -239,9 +241,7 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 				return;
 			}
 
-			if (item) {
-				item.classList.add('ln-upload__item--deleting');
-			}
+			if (item) fill(item, { deleting: true });
 
 			fetch('/files/' + fileData.serverId, {
 				method: 'DELETE',
@@ -261,23 +261,23 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 							serverId: fileData.serverId
 						});
 					} else {
-						if (item) item.classList.remove('ln-upload__item--deleting');
+						if (item) fill(item, { deleting: false });
 
 						dispatch(window, 'ln-toast:enqueue', {
 							type: 'error',
-							title: 'Error',
+							title: dict['delete-title'] || 'Error',
 							message: dict['delete-error'] || 'Failed to delete file'
 						});
 					}
 				})
 				.catch(function (error) {
 					console.warn('[ln-upload] Delete error:', error);
-					if (item) item.classList.remove('ln-upload__item--deleting');
+					if (item) fill(item, { deleting: false });
 
 					dispatch(window, 'ln-toast:enqueue', {
 						type: 'error',
-						title: 'Network Error',
-						message: 'Could not connect to server'
+						title: dict['network-error'] || 'Network error',
+						message: dict['connection-error'] || 'Could not connect to server'
 					});
 				});
 		}
@@ -296,10 +296,11 @@ import { guardBody, dispatch, buildDict } from '../ln-core';
 		const _onDragLeave = function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.remove('ln-upload__zone--dragover'); };
 		const _onDrop = function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.remove('ln-upload__zone--dragover'); handleFiles(e.dataTransfer.files); };
 		const _onListClick = function (e) {
-			if (e.target.classList.contains('ln-upload__remove')) {
-				const item = e.target.closest('.ln-upload__item');
-				if (item) removeFile(item.getAttribute('data-file-id'));
-			}
+			const btn = e.target.closest('[data-ln-upload-action="remove"]');
+			if (!btn || !list.contains(btn)) return;
+			if (btn.disabled) return;
+			const item = btn.closest('.ln-upload__item');
+			if (item) removeFile(item.getAttribute('data-file-id'));
 		};
 
 		zone.addEventListener('click', _onZoneClick);

@@ -21,8 +21,6 @@ File upload component — drag-and-drop zone with XHR progress, validation, and 
 </div>
 ```
 
-No `<template>` element needed — the component creates DOM imperatively via `createElement`.
-
 ## Attributes
 
 | Attribute | Description |
@@ -66,17 +64,35 @@ Each upload container has a closure-scoped `uploadedFiles` Map: `localId → { s
 
 1. **Init**: `_initUpload(container)` — called by MutationObserver or `DOMContentLoaded`
 2. **Guard**: `data-ln-upload-initialized` attribute prevents double-init
-3. **Input**: creates hidden `<input type="file" multiple>` if none found inside container
-4. **Steady state**: file selected/dropped → `addFile()` → XHR → DOM update
+3. **Default template**: `_ensureDefaultItemTemplate()` runs once per init — if no `[data-ln-template="ln-upload-item"]` exists anywhere in the document, a default `<template>` is injected into `<body>` from an inline constant
+4. **Input**: creates hidden `<input type="file" multiple>` if none found inside container
+5. **Steady state**: file selected/dropped → `addFile()` → `cloneTemplateScoped` + `fill()` → XHR → DOM update via further `fill()` calls
 
 ### `addFile(file)` Flow
 
-1. Validate extension against `data-ln-upload-accept` via `_isValidFile()`. If invalid: dispatch `ln-upload:invalid`, enqueue error toast, return.
-2. Create `<li>` with icon, name, size/progress text, remove button, progress bar — appended to `.ln-upload__list`
-3. Open XHR POST to upload URL with `FormData`
-4. On progress: update progress bar width + `sizeSpan.textContent` as percent
-5. On load success: remove `--uploading` class, show formatted file size, enable remove button, store in `uploadedFiles` Map, update hidden inputs, dispatch `ln-upload:uploaded`
-6. On error: add `--error` class, dispatch `ln-upload:error`, enqueue error toast
+1. Validate extension against `data-ln-upload-accept` via `_isValidFile()`. If invalid: dispatch `ln-upload:invalid`, enqueue error toast (title + body from dict with English fallback), return.
+2. `cloneTemplateScoped(container, 'ln-upload-item', 'ln-upload')` — looks for a scoped template inside the container first, then the global one, then the auto-injected default.
+3. `fill(li, { name, sizeText: '0%', iconHref: '#' + iconId, removeLabel: dict.remove, uploading: true, error: false, deleting: false })` — populates text, icon `<use href>`, aria-label and state classes in one pass. The `ln-icons` observer picks up the `<use href>` swap and fetches the sprite.
+4. Set `data-file-id` attribute (structural, not a `fill` slot). Disable the remove button (`btn.disabled = true`) until upload completes.
+5. Append `<li>` to `.ln-upload__list`.
+6. Open XHR POST to upload URL with `FormData`.
+7. On progress: `progressBar.style.width = percent + '%'` + `fill(li, { sizeText: percent + '%' })`.
+8. On 2xx: `fill(li, { sizeText: formatSize, uploading: false })`, enable remove button, store in `uploadedFiles` Map, update hidden inputs, dispatch `ln-upload:uploaded`.
+9. On non-2xx or XHR error: `handleError(msg)` — sets progress bar to 100%, `fill(li, { sizeText: dict.error, uploading: false, error: true })`, dispatches `ln-upload:error`, enqueues error toast.
+
+### Template slots
+
+The component reads these slot attributes in the cloned `<li>`:
+
+- `data-ln-field="name"` — file name text
+- `data-ln-field="sizeText"` — status/size text, reused across states
+- `data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting"` — state class toggles
+- `data-ln-attr="href:iconHref"` on a `<use>` element — file-type icon reference
+- `data-ln-attr="aria-label:removeLabel, title:removeLabel"` on the remove button
+- `data-ln-upload-action="remove"` — behavioral hook for delegated click
+- `.ln-upload__progress-bar` class — selected directly for `style.width` animation
+
+The remove button listener is delegated on `.ln-upload__list` and resolved via `e.target.closest('[data-ln-upload-action="remove"]')`, so clicks on nested `<svg>`/`<use>` elements work correctly.
 
 ### File Icons
 
@@ -93,7 +109,10 @@ After each upload, `updateHiddenInput()` rebuilds all `<input type="hidden" name
 `removeFile(localId)`:
 1. Look up `uploadedFiles.get(localId)` for `serverId`
 2. If no `serverId` (still uploading) — just remove from DOM + Map
-3. If `serverId` exists: add `--deleting` class, send `DELETE /files/{serverId}`, on success: remove from DOM + Map, dispatch `ln-upload:removed`
+3. If `serverId` exists: `fill(item, { deleting: true })`, send `DELETE /files/{serverId}`
+   - On success: remove from DOM + Map, dispatch `ln-upload:removed`
+   - On non-200: `fill(item, { deleting: false })`, enqueue error toast (title + body from dict)
+   - On network failure (catch): `fill(item, { deleting: false })`, enqueue error toast
 
 ### Auto-toast
 

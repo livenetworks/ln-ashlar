@@ -14,15 +14,30 @@ Automatic upload on file select/drop, with progress tracking via XHR. File delet
 
 ## Dictionary (i18n)
 
-Translatable strings are provided via a hidden list with `data-ln-upload-dict` attributes. Read once at init via `buildDict()` from ln-core, then removed from DOM.
+All keys are optional. If a key is missing, the component falls back to the English value shown below. Dict entries are read once at init via `buildDict()` and then removed from the DOM.
+
+| Key | Used for | Fallback |
+|-----|----------|----------|
+| `remove` | Remove button aria-label and tooltip | `Remove` |
+| `error` | Size slot text when upload fails | `Error` |
+| `invalid-type` | Toast body — wrong extension | `This file type is not allowed` |
+| `upload-failed` | Toast body — upload error | `Upload failed` |
+| `delete-error` | Toast body — delete error | `Failed to delete file` |
+| `network-error` | XHR network error + toast title for delete | `Network error` |
+| `invalid-title` | Toast title — invalid file | `Invalid File` |
+| `error-title` | Toast title — upload error | `Upload Error` |
+| `delete-title` | Toast title — delete error | `Error` |
+| `connection-error` | Toast body — delete fetch network failure | `Could not connect to server` |
+
+Example (full override):
 
 ```html
 <ul hidden>
-    <li data-ln-upload-dict="remove">Remove</li>
-    <li data-ln-upload-dict="error">Error</li>
-    <li data-ln-upload-dict="invalid-type">This file type is not allowed</li>
-    <li data-ln-upload-dict="upload-failed">Upload failed</li>
-    <li data-ln-upload-dict="delete-error">Delete failed</li>
+	<li data-ln-upload-dict="remove">Ukloni</li>
+	<li data-ln-upload-dict="error">Greška</li>
+	<li data-ln-upload-dict="invalid-type">Tip fajla nije dozvoljen</li>
+	<li data-ln-upload-dict="invalid-title">Neispravan fajl</li>
+	<!-- ... other keys as needed -->
 </ul>
 ```
 
@@ -42,6 +57,49 @@ Translatable strings are provided via a hidden list with `data-ln-upload-dict` a
 | `.ln-upload__remove` | Delete button |
 | `.ln-upload__progress` | Progress bar container |
 | `.ln-upload__progress-bar` | Progress bar (width %) |
+
+## Customization — item template
+
+The component clones a `<template data-ln-template="ln-upload-item">` for every file row. Lookup order:
+
+1. **Scoped** — a `<template>` inside the `[data-ln-upload]` container (per-instance override)
+2. **Global** — a `<template>` anywhere at document root
+3. **Auto-injected default** — the component inserts a default template into `<body>` on first init if none is present, so zero-config usage keeps working
+
+### Required slots
+
+Your template MUST include these elements for the component to function:
+
+| Element | Attribute | Purpose |
+|---------|-----------|---------|
+| `<li>` root | `data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting"` | State classes toggled via `fill()` |
+| File name target | `data-ln-field="name"` | File name text |
+| Size/status target | `data-ln-field="sizeText"` | `"0%"` → `"45%"` → `"12.3 KB"` → `"Error"` |
+| File icon `<use>` | `data-ln-attr="href:iconHref"` | Auto-swapped to `#ln-file` / `#lnc-file-pdf` / `#lnc-file-doc` / `#lnc-file-epub` based on extension |
+| Remove button | `data-ln-upload-action="remove"` and `data-ln-attr="aria-label:removeLabel, title:removeLabel"` | Click target (attribute-based, not class-based) |
+| Progress bar | `class="ln-upload__progress-bar"` | Width is animated imperatively via inline style |
+
+### Example — override with a two-line article layout
+
+```html
+<div data-ln-upload="/files/upload">
+	<template data-ln-template="ln-upload-item">
+		<li class="ln-upload__item" data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
+			<svg class="ln-icon ln-icon--lg" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-file"></use></svg>
+			<article>
+				<p class="ln-upload__name" data-ln-field="name"></p>
+				<small class="ln-upload__size" data-ln-field="sizeText"></small>
+			</article>
+			<button type="button" class="ln-upload__remove" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+			<div class="ln-upload__progress"><div class="ln-upload__progress-bar"></div></div>
+		</li>
+	</template>
+	<div class="ln-upload__zone"><p>Drop files</p></div>
+	<ul class="ln-upload__list"></ul>
+</div>
+```
 
 ## API
 
@@ -90,6 +148,9 @@ Expected status: `200`
 
 ```html
 <div data-ln-upload="/files/upload" data-ln-upload-accept=".pdf,.doc,.docx" data-ln-upload-context="documents">
+    <!-- Optional: scoped item template override (see "Customization" section) -->
+    <!-- <template data-ln-template="ln-upload-item"> ... </template> -->
+
     <div class="ln-upload__zone">
         <p>Drag files here or click to browse</p>
     </div>
