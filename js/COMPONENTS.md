@@ -718,6 +718,146 @@ _component.prototype._buildTrackItem = function (track, idx) {
 };
 ```
 
+### Advanced `fill()` — attributes and state classes
+
+Beyond text, `fill()` binds attributes (`data-ln-attr`) and toggles classes (`data-ln-class`). ln-upload exercises all three in a single call:
+
+```html
+<template data-ln-template="ln-upload-item">
+    <li class="ln-upload__item"
+        data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
+        <svg class="ln-icon" aria-hidden="true">
+            <use data-ln-attr="href:iconHref" href="#ln-file"></use>
+        </svg>
+        <span class="ln-upload__name" data-ln-field="name"></span>
+        <span class="ln-upload__size" data-ln-field="sizeText"></span>
+        <button type="button" class="ln-upload__remove"
+                data-ln-upload-action="remove"
+                data-ln-attr="aria-label:removeLabel, title:removeLabel">
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+        </button>
+        <div class="ln-upload__progress">
+            <div class="ln-upload__progress-bar"></div>
+        </div>
+    </li>
+</template>
+```
+
+```javascript
+const fragment = cloneTemplateScoped(container, 'ln-upload-item', 'ln-upload');
+const li = fragment.firstElementChild;
+li.setAttribute('data-file-id', localId);
+fill(li, {
+    name: file.name,
+    sizeText: '0%',
+    iconHref: '#' + iconId,    // → <use href="#lnc-file-pdf">
+    removeLabel: dict.remove,  // → aria-label + title on button
+    uploading: true,           // → adds ln-upload__item--uploading
+    error: false,
+    deleting: false
+});
+list.appendChild(li);
+
+// Later, on XHR progress — update only what changed:
+fill(li, { sizeText: percent + '%' });
+
+// On upload success — flip state classes:
+fill(li, { sizeText: formatSize(size), uploading: false });
+
+// On upload error:
+fill(li, { sizeText: dict.error, uploading: false, error: true });
+```
+
+One `fill()` call handles all three binding types at once:
+
+- **`data-ln-field="name"`** → `textContent` assignment
+- **`data-ln-attr="href:iconHref"`** → one or more attributes per element (`href` on `<use>`, `aria-label` + `title` on the button)
+- **`data-ln-class="ln-upload__item--uploading:uploading, ..."`** → conditional class toggles driven by booleans
+
+State transitions are just successive `fill()` calls with different values — no imperative `classList.add/remove`, no manual `setAttribute`. The icon swap via `data-ln-attr="href:iconHref"` on a `<use>` element works because `ln-icons` runs a MutationObserver on `<use href>` changes and auto-fetches the new sprite — the component never touches the icon loader directly.
+
+**Behavioral hooks live on attributes, not classes** — `data-ln-upload-action="remove"` is a JS query hook, not a fill slot. Delegated click handlers on `.ln-upload__list` use `e.target.closest('[data-ln-upload-action="remove"]')` to locate the button, which also matches when the click lands on a nested `<svg>` / `<use>`. Keeping behavioral hooks off CSS class names means a project can rename or restyle classes without breaking JS.
+
+**Imperative escape hatches** — two things `fill()` can't express cleanly:
+
+1. `removeBtn.disabled = !uploaded` — the `disabled` boolean attribute doesn't round-trip through `data-ln-attr` (setting vs. removing).
+2. `progressBar.style.width = percent + '%'` — a continuous animation value, not discrete state. Same precedent as `ln-data-table` virtual-scroll spacer heights.
+
+Both are one-line assignments right after the `fill()` call and are the only non-declarative touches in the render path.
+
+### Scoped templates — per-instance override
+
+`cloneTemplate(name)` looks up a single global `<template>` at document root. For customizable components, use `cloneTemplateScoped(root, name, componentTag)` instead — it checks inside `root` first, then falls back to the global lookup. This lets projects override the layout per instance without forking the component:
+
+```html
+<!-- Default instance — uses the global or auto-injected template -->
+<div data-ln-upload="/files/upload"></div>
+
+<!-- Customized instance — scoped <template> inside the container -->
+<div data-ln-upload="/files/upload">
+    <template data-ln-template="ln-upload-item">
+        <li class="ln-upload__item"
+            data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
+            <svg class="ln-icon ln-icon--lg" aria-hidden="true">
+                <use data-ln-attr="href:iconHref" href="#ln-file"></use>
+            </svg>
+            <article>
+                <p class="ln-upload__name" data-ln-field="name"></p>
+                <small class="ln-upload__size" data-ln-field="sizeText"></small>
+            </article>
+            <button type="button" class="ln-upload__remove"
+                    data-ln-upload-action="remove"
+                    data-ln-attr="aria-label:removeLabel, title:removeLabel">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+            </button>
+            <div class="ln-upload__progress"><div class="ln-upload__progress-bar"></div></div>
+        </li>
+    </template>
+    <div class="ln-upload__zone"><p>Drop files</p></div>
+    <ul class="ln-upload__list"></ul>
+</div>
+```
+
+Lookup order for `cloneTemplateScoped`:
+
+1. **Scoped** — `<template>` inside the container element (per-instance)
+2. **Global** — `<template>` anywhere at document root (shared default)
+3. **Auto-injected default** *(optional)* — if the component ships a built-in default, inject it into `<body>` on first init when neither scoped nor global is present. This keeps zero-config usage working without forcing every project to copy-paste markup.
+
+ln-upload implements all three tiers. The auto-inject runs once per init via a helper:
+
+```javascript
+const DEFAULT_ITEM_TEMPLATE_HTML =
+    '<template data-ln-template="ln-upload-item">' +
+        /* ...default <li> markup... */
+    '</template>';
+
+function _ensureDefaultItemTemplate() {
+    if (document.querySelector('[data-ln-template="ln-upload-item"]')) return;
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = DEFAULT_ITEM_TEMPLATE_HTML;
+    document.body.appendChild(wrapper.firstElementChild);
+}
+```
+
+The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`, before any `cloneTemplateScoped` call. `cloneTemplate`'s internal cache only stores truthy lookups, so inserting a template after a previous `null` lookup is safe — the next call picks it up.
+
+**When to use which:**
+
+| Component shape | Use |
+|---|---|
+| Single template reused across all instances, never customized | `cloneTemplate(name, tag)` |
+| Instance layout may vary per project or per page | `cloneTemplateScoped(container, name, tag)` |
+| Zero-config out of the box + optional per-instance override | scoped lookup + auto-injected default |
+
+### Components using templates
+
+| Component | Template(s) | Lookup | Notes |
+|---|---|---|---|
+| **ln-upload** | `ln-upload-item` | `cloneTemplateScoped` | Scoped → global → auto-injected default on first init |
+| **ln-data-table** | `{name}-row`, `{name}-empty`, `{name}-empty-filtered`, `column-filter` (also falls back to `{name}-column-filter`) | `cloneTemplateScoped` | Scoped-first per table instance |
+| **ln-translations** | `ln-translations-menu-item`, `ln-translations-badge` | `cloneTemplate` | Single global template, no per-instance override |
+
 ### Rules
 
 1. **`<template data-ln-template="name">`** — naming convention
