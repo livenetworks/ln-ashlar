@@ -1,3 +1,5 @@
+@use 'sass:list';
+
 // Typography — references --text-* and --font-* tokens
 
 @mixin text-xs   { font-size: var(--text-xs);   line-height: 1rem; }
@@ -21,7 +23,7 @@
 @mixin capitalize { text-transform: capitalize; }
 @mixin normal-case { text-transform: none; }
 
-@mixin tracking-wide   { letter-spacing: 0.025em; }
+@mixin tracking-wide   { letter-spacing: var(--tracking-wide); }
 @mixin tracking-wider  { letter-spacing: 0.05em; }
 
 @mixin truncate {
@@ -33,3 +35,23 @@
 @mixin whitespace-nowrap { white-space: nowrap; }
 @mixin font-mono { font-family: var(--font-mono); }
 @mixin font-sans { font-family: var(--font-sans); }
+
+// Semantic role mixin — v1.1.
+// Usage: @include typography(display-lg) / typography(body-md) / etc.
+@mixin typography($role) {
+	$valid-roles: (display-lg, display-md, display-sm,
+	               heading-lg, heading-md, heading-sm,
+	               title-md, title-sm,
+	               body-lg, body-md, body-sm,
+	               label-md, label-sm, caption);
+
+	@if not list.index($valid-roles, $role) {
+		@error "typography(): unknown role '#{$role}'. Valid roles: #{$valid-roles}";
+	}
+
+	font-size:   var(--text-#{$role});
+	line-height: var(--lh-#{$role});
+}
+
+@mixin tracking-tight  { letter-spacing: var(--tracking-tight); }
+@mixin tracking-normal { letter-spacing: var(--tracking-normal); }

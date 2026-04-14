@@ -289,3 +289,30 @@ See `docs/css/breakpoints.md`.
 ### Motion safety
 
 See `docs/css/motion.md` (added in v1.1 Phase 5).
+
+### Typography roles (v1.1)
+
+Semantic layer on top of the existing `text-*` primitives. Use when
+the intent is "this is a page title" or "this is a helper label",
+not "this is 14px text".
+
+| Role | Size | Line-height | Use |
+|---|---|---|---|
+| `display-lg` | 3.75rem | 1.1 | Hero page headline |
+| `display-md` | 3rem | 1.1 | Large page headline |
+| `display-sm` | 2.25rem | 1.15 | `h1` default |
+| `heading-lg` | 1.875rem | 1.2 | Section headline |
+| `heading-md` | 1.5rem | 1.25 | `h2` default |
+| `heading-sm` | 1.25rem | 1.3 | `h3` default |
+| `title-md` | 1.125rem | 1.4 | `h4` default, card title |
+| `title-sm` | 1rem | 1.4 | `h5` default, strong body lead |
+| `body-lg` | 1.125rem | 1.6 | Emphasis paragraph |
+| `body-md` | 1rem | 1.6 | Standard body (default `p`) |
+| `body-sm` | 0.875rem | 1.5 | Secondary body, helper text |
+| `label-md` | 0.875rem | 1.4 | `h6`, form label |
+| `label-sm` | 0.75rem | 1.4 | Small label, meta |
+| `caption` | 0.75rem | 1.4 | Captions, timestamps |
+
+**Mixin:** `@include typography(<role>)`
+
+See `typography.md` for full usage and role-selection guide.
