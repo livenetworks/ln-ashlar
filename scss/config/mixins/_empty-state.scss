@@ -1,0 +1,37 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+
+@mixin empty-state {
+	@include flex-col;
+	@include items-center;
+	@include justify-center;
+	@include gap(1rem);
+	@include p(2rem);
+	text-align: center;
+	max-width: 28rem;
+	margin-inline: auto;
+
+	svg.ln-icon,
+	svg.ln-icon--xl {
+		color: hsl(var(--color-neutral-400));
+	}
+
+	h3 {
+		@include typography(heading-sm);
+		color: hsl(var(--color-text-primary));
+		margin: 0;
+	}
+
+	p {
+		@include typography(body-md);
+		color: hsl(var(--color-text-secondary));
+		margin: 0;
+	}
+
+	button,
+	a {
+		margin-top: 0.5rem;
+	}
+}
