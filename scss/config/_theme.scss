@@ -1,12 +1,95 @@
 // ==========================================================================
 // Theme — ln-acme
 // ==========================================================================
-// All design tokens are in _tokens.scss.
-// This file is reserved for future theming (dark mode, branding).
+// Dark-mode overrides. Inverts the neutral scale in place, re-tunes
+// shadows and primary tint layers.
 //
-// Example:
-//   .dark-theme {
-//       --color-bg-primary: #1a1a2e;
-//       --color-text-primary: #e5e7eb;
-//   }
+// Activation (any of the three):
+//   <html data-theme="dark">               ← explicit force
+//   @media (prefers-color-scheme: dark)    ← system preference
+//   :root:not([data-theme="light"])        ← opt-out of auto
+//
+// See docs/css/theming.md for the full guide.
 // ==========================================================================
+
+// ---------------------------------------------------------------------------
+// Shared dark overrides — used by both activation paths.
+// ---------------------------------------------------------------------------
+@mixin ln-dark-tokens {
+	// Neutral scale — inverted
+	--color-neutral-50:  220 20%  8%;
+	--color-neutral-100: 220 16% 12%;
+	--color-neutral-150: 220 14% 18%;
+	--color-neutral-200: 220 13% 24%;
+	--color-neutral-300: 220 13% 36%;
+	--color-neutral-400: 218 11% 52%;
+	--color-neutral-500: 220  9% 60%;
+	--color-neutral-600: 220 11% 72%;
+	--color-neutral-700: 220 14% 82%;
+	--color-neutral-800: 220 20% 90%;
+	--color-neutral-900: 221 30% 97%;
+
+	// Surface elevation — explicit re-tune.
+	//
+	// Light mode routes `--color-bg-primary` through `--color-white`
+	// (a hardcoded literal that does not cascade) and uses
+	// neutral-50 for `bg-secondary` (lighter than body = elevated).
+	// After the neutral-scale inversion above, neutral-50 would be
+	// DARKER than neutral-100 — flipping elevation direction. Dark
+	// UI convention (Apple HIG, Material, GitHub) keeps elevated =
+	// lighter, so we restate the three surface tokens explicitly as
+	// a clean ladder: body < primary < secondary (each ~4% lighter).
+	--color-bg-body:      220 16%  9%;
+	--color-bg-primary:   220 16% 13%;
+	--color-bg-secondary: 220 16% 17%;
+
+	// `--color-border-light` cascades through neutral-100 (12% in
+	// dark) which collides with bg-primary 13% — invisible edge.
+	// Bump to a visible subtle edge above bg-primary.
+	--color-border-light: 220 14% 20%;
+
+	// Primary tint layers — re-tuned for dark surfaces
+	--color-primary-light:   232 60% 22%;
+	--color-primary-lighter: 232 50% 15%;
+
+	// Error-bg re-tuned
+	--color-bg-error: 0 40% 15%;
+
+	// Shadows — solid black, boosted alpha, no hue (cool-tint
+	// disappears on dark surfaces)
+	--shadow-xs:
+		0 1px 2px 0 hsl(0 0% 0% / 0.32);
+	--shadow-sm:
+		0 1px 3px 0 hsl(0 0% 0% / 0.40),
+		0 1px 2px -1px hsl(0 0% 0% / 0.30);
+	--shadow-md:
+		0 4px 12px -2px hsl(0 0% 0% / 0.48),
+		0 2px 4px -2px hsl(0 0% 0% / 0.32);
+	--shadow-lg:
+		0 12px 24px -6px hsl(0 0% 0% / 0.56),
+		0 8px 12px -4px hsl(0 0% 0% / 0.40);
+	--shadow-xl:
+		0 24px 48px -12px hsl(0 0% 0% / 0.64),
+		0 12px 24px -6px hsl(0 0% 0% / 0.48);
+	--shadow-2xl:
+		0 36px 72px -18px hsl(0 0% 0% / 0.72),
+		0 18px 36px -9px hsl(0 0% 0% / 0.56);
+	--shadow-inner:
+		inset 0 2px 4px 0 hsl(0 0% 0% / 0.32);
+}
+
+// ---------------------------------------------------------------------------
+// Explicit attribute activation
+// ---------------------------------------------------------------------------
+[data-theme="dark"] {
+	@include ln-dark-tokens;
+}
+
+// ---------------------------------------------------------------------------
+// System preference activation (opt-out via data-theme="light")
+// ---------------------------------------------------------------------------
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		@include ln-dark-tokens;
+	}
+}
