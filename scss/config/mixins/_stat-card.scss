@@ -1,0 +1,55 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+
+@mixin stat-card {
+	@include flex-col;
+	@include gap(0.25rem);
+	@include p(1.5rem);
+	background: hsl(var(--color-bg-primary));
+	@include rounded-lg;
+	@include shadow-sm;
+	border: 1px solid hsl(var(--color-border));
+
+	> [data-ln-stat-label] {
+		@include typography(label-md);
+		color: hsl(var(--color-text-secondary));
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		margin: 0;
+	}
+
+	> [data-ln-stat-value] {
+		@include typography(heading-lg);
+		font-weight: var(--font-bold);
+		font-variant-numeric: tabular-nums;
+		color: hsl(var(--color-text-primary));
+		margin: 0;
+	}
+
+	> [data-ln-stat-trend] {
+		@include flex-row;
+		@include items-center;
+		@include gap(0.25rem);
+		@include typography(body-sm);
+		margin: 0.25rem 0 0;
+
+		svg.ln-icon {
+			width: 1rem;
+			height: 1rem;
+		}
+
+		&[data-ln-stat-trend="up"] {
+			color: hsl(var(--color-success));
+		}
+		&[data-ln-stat-trend="down"] {
+			color: hsl(var(--color-error));
+		}
+		&[data-ln-stat-trend="neutral"] {
+			color: hsl(var(--color-text-muted));
+		}
+	}
+}
