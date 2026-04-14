@@ -72,13 +72,20 @@ document.documentElement.removeAttribute('data-theme');
 ## What dark mode overrides
 
 - **Neutral scale:** all 11 steps (`50` → `900`), inverted.
+- **Surface elevation:** `--color-bg-body`, `--color-bg-primary`,
+  `--color-bg-secondary`, `--color-border-light`. These are
+  re-stated explicitly (not cascaded) because light-mode
+  elevation uses `--color-white` as the top layer, and the
+  light-to-dark ladder direction cannot be expressed by a
+  single neutral-scale inversion. Dark mode encodes its own
+  elevation ladder: `bg-body` (9%) < `bg-primary` (13%) <
+  `bg-secondary` (17%).
 - **Primary tint layers:** `--color-primary-light`, `--color-primary-lighter`.
 - **Error background:** `--color-bg-error`.
 - **Shadows:** solid black, higher alpha.
 
-All semantic tokens (`--color-text-primary`, `--color-bg-body`,
-`--color-border`, etc.) reference the neutral scale and flip
-automatically.
+All other semantic tokens (`--color-text-primary`, `--color-border`,
+etc.) reference the neutral scale and flip automatically.
 
 ## What dark mode does NOT override
 

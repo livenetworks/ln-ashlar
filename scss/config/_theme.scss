@@ -29,6 +29,25 @@
 	--color-neutral-800: 220 20% 90%;
 	--color-neutral-900: 221 30% 97%;
 
+	// Surface elevation — explicit re-tune.
+	//
+	// Light mode routes `--color-bg-primary` through `--color-white`
+	// (a hardcoded literal that does not cascade) and uses
+	// neutral-50 for `bg-secondary` (lighter than body = elevated).
+	// After the neutral-scale inversion above, neutral-50 would be
+	// DARKER than neutral-100 — flipping elevation direction. Dark
+	// UI convention (Apple HIG, Material, GitHub) keeps elevated =
+	// lighter, so we restate the three surface tokens explicitly as
+	// a clean ladder: body < primary < secondary (each ~4% lighter).
+	--color-bg-body:      220 16%  9%;
+	--color-bg-primary:   220 16% 13%;
+	--color-bg-secondary: 220 16% 17%;
+
+	// `--color-border-light` cascades through neutral-100 (12% in
+	// dark) which collides with bg-primary 13% — invisible edge.
+	// Bump to a visible subtle edge above bg-primary.
+	--color-border-light: 220 14% 20%;
+
 	// Primary tint layers — re-tuned for dark surfaces
 	--color-primary-light:   232 60% 22%;
 	--color-primary-lighter: 232 50% 15%;
