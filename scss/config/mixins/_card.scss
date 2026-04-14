@@ -138,11 +138,14 @@
 	box-shadow: var(--shadow-xs);
 	@include mb(1rem);
 
-	header {
+	// Direct-child selectors only — nested <header>/<main>/<footer>
+	// elements inside the card's content are consumer-owned and
+	// must not inherit the card's own chrome styles.
+	> header {
 		@include panel-header;
 	}
 
-	main {
+	> main {
 		@include p(1rem);
 
 		// Auto-flush: table or .table-container as direct child —
@@ -160,7 +163,7 @@
 		}
 	}
 
-	footer {
+	> footer {
 		@include px(1rem);
 		@include py(0.75rem);
 		@include border-t;
