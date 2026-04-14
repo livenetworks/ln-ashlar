@@ -7,49 +7,42 @@ h4,
 h5,
 h6 {
 	@include text-primary;
-	line-height: 1.25;
+	@include font-bold;
 }
 
 h1 {
-	font-size: 2.25rem;
-	line-height: 2.5rem;
-	@include font-bold;
-	letter-spacing: -0.025em;
+	@include typography(display-sm);
+	@include tracking-tight;
 	@include mb(1rem);
 }
 
 h2 {
-	@include text-2xl;
-	@include font-bold;
-	letter-spacing: -0.025em;
+	@include typography(heading-md);
+	@include tracking-tight;
 	@include mb(1rem);
 }
 
 h3 {
-	@include text-xl;
+	@include typography(heading-sm);
 	@include font-semibold;
-	line-height: 1.1;
 	@include mb(0.75rem);
 }
 
 h4 {
-	@include text-lg;
+	@include typography(title-md);
 	@include font-semibold;
-	line-height: 1.1;
 	@include mb(0.5rem);
 }
 
 h5 {
-	@include text-base;
+	@include typography(title-sm);
 	@include font-semibold;
-	line-height: 1.1;
 	@include mb(0.5rem);
 }
 
 h6 {
-	@include text-sm;
+	@include typography(label-md);
 	@include font-semibold;
-	line-height: 1.1;
 	@include mb(0.25rem);
 }
 
