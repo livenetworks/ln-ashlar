@@ -1,15 +1,16 @@
 # Filter toolbar
 
-File: `scss/config/mixins/_filter-toolbar.scss`.
+File: `scss/components/_filter-toolbar.scss`.
 
 Layout pattern for list views: search + active filters + sort + bulk
-actions. Not a default-applied component — consumer applies via
-`@include filter-toolbar` on a semantic selector.
+actions. The default `[data-ln-filter-toolbar]` attribute applies the
+mixin automatically. Custom selectors via `@include filter-toolbar` are
+still supported.
 
 ## Structure
 
 ```html
-<div id="documents-filters">
+<div data-ln-filter-toolbar>
 	<div data-ln-filter-search>
 		<input type="search" placeholder="Search documents…">
 	</div>
@@ -52,10 +53,18 @@ container`) for the query to match.
 
 ## Usage
 
+Use the default attribute — no extra CSS needed:
+
+```html
+<div data-ln-filter-toolbar>…</div>
+```
+
+For a custom selector (e.g. a semantic ID), use the mixin directly:
+
 ```scss
-// Apply to a semantic selector
+// Custom selector via mixin
 #documents-filters { @include filter-toolbar; }
 
-// Or bind the container context on the parent
+// The parent needs container-type for the 880px container query
 #documents-page { @include container(docpage); }
 ```
