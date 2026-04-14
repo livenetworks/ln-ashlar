@@ -23,3 +23,31 @@ Decision: all API timestamps are Unix epoch (seconds), formatted client-side per
 - [x] Build `ln-store.js` — IndexedDB data layer (plan: `plans/ln-store.md`, spec: `docs/js/ln-store.md`)
 - [x] Build `ln-data-table.js` — virtual scroll table UI (plan: `plans/ln-data-table.md`, spec: `docs/js/ln-data-table.md`)
 - [x] Build `ln-time.js` — timestamp formatting component
+
+## Design System v1.1
+
+Source: `plans/design-system-v1.1-roadmap.md`. Each phase has its own
+executor-ready plan file under `plans/v1.1-phase-*`. Run in dependency
+order — see roadmap § Execution Order.
+
+### MVP (must-ship, unblocks DocuFlow polish)
+
+- [x] **Phase 1** — Foundation tokens (breakpoints, spacing, max-widths, easings, motion-safe mixin) — `plans/v1.1-phase-1-tokens.md`
+- [ ] **Phase 2** — Neutral color scale + semantic remap — `plans/v1.1-phase-2-neutral-scale.md`
+- [ ] **Phase 4** — Cool-tinted shadows + three-layer focus halo — `plans/v1.1-phase-4-shadows-focus.md`
+- [ ] **Phase 5** — Motion-safe retrofit (wraps every animation) — `plans/v1.1-phase-5-motion-safe.md`
+
+### Full v1.1
+
+- [ ] **Phase 3** — Typography re-hierarchy (role tokens, `typography($role)` mixin) — `plans/v1.1-phase-3-typography.md`
+- [ ] **Phase 6** — Full dark mode (`[data-theme]` + `prefers-color-scheme`) — `plans/v1.1-phase-6-dark-mode.md`
+- [ ] **Phase 7a** — Loading + empty-state components (skeleton, empty-state) — `plans/v1.1-phase-7a-loading-components.md`
+- [ ] **Phase 7b** — Navigation components (page-header, stepper, timeline) — `plans/v1.1-phase-7b-navigation-components.md`
+- [ ] **Phase 7c** — Content components (stat-card, prose, kbd) — `plans/v1.1-phase-7c-content-components.md`
+- [ ] **Phase 7d** — Interaction components (tooltip CSS, toggle-switch, chip, filter-toolbar) — `plans/v1.1-phase-7d-interaction-components.md`
+
+### v1.2 candidates (defer if time-boxed)
+
+- [ ] **Phase 8** — JS components (ln-tooltip, ln-popover, ln-copy, ln-shortcuts) — `plans/v1.1-phase-8-js-components.md`
+- [ ] **Phase 9** — Density system (`[data-density="compact"]`) — `plans/v1.1-phase-9-density.md`
+- [ ] **Phase 10** — Infrastructure (auto-token-docs, Playwright VR, CHANGELOG, migration guide) — `plans/v1.1-phase-10-infrastructure.md`

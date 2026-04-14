@@ -2,6 +2,10 @@
 
 Unified frontend library for LiveNetworks projects — SCSS CSS framework + vanilla JS components, zero dependencies.
 
+> **v1.1 in flight** — design system refresh in progress. Roadmap:
+> [plans/design-system-v1.1-roadmap.md](plans/design-system-v1.1-roadmap.md).
+> Phase checklist: [todo.md](todo.md) § "Design System v1.1".
+
 ---
 
 ## Philosophy
@@ -106,7 +110,7 @@ Components expose a JS API on the element (`el.lnModal.open()`) and fire namespa
 
 ### Full index
 
-[docs/README.md](docs/README.md) — complete table of all CSS and JS docs, with links to both usage guides (`js/ln-*/README.md`) and architecture references (`docs/js/*.md`).
+[docs/README.md](docs/README.md) — complete table of all CSS and JS docs, with links to both usage guides (`js/ln-*/README.md`) and architecture references (`docs/js/*.md`). Also hosts the v1.1 roadmap index.
 
 ### Icons
 
