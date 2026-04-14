@@ -60,7 +60,9 @@
 			svg.ln-chevron {
 				@include flex-shrink-0;
 				color: hsl(var(--color-text-muted));
-				@include transition;
+				@include motion-safe {
+					transition: transform var(--transition-base);
+				}
 			}
 		}
 
