@@ -92,7 +92,9 @@ CSS for sidebar (in `_app-layout.scss`):
 ```scss
 .sidebar {
     transform: translateX(-100%);
-    @include transition;
+    @include motion-safe {
+        transition: transform var(--transition-base);
+    }
     &.open { transform: translateX(0); }
 }
 ```
