@@ -11,6 +11,7 @@ import './ln-tabs/ln-tabs.js';
 import './ln-toggle/ln-toggle.js';
 import './ln-accordion/ln-accordion.js';
 import './ln-dropdown/ln-dropdown.js';
+import './ln-popover/ln-popover.js';
 import './ln-toast/ln-toast.js';
 import './ln-upload/ln-upload.js';
 import './ln-external-links/ln-external-links.js';

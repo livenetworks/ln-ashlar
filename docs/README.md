@@ -75,6 +75,7 @@ Two files per component:
 | Tabs | `data-ln-tabs` | [js/ln-tabs/README.md](../js/ln-tabs/README.md) | [tabs.md](js/tabs.md) |
 | Toast | `data-ln-toast` | [js/ln-toast/README.md](../js/ln-toast/README.md) | [toast.md](js/toast.md) |
 | Dropdown | `data-ln-dropdown` | [js/ln-dropdown/README.md](../js/ln-dropdown/README.md) | [dropdown.md](js/dropdown.md) |
+| Popover | `data-ln-popover` | [js/ln-popover/README.md](../js/ln-popover/README.md) | [popover.md](js/popover.md) |
 | Nav | `data-ln-nav` | [js/ln-nav/README.md](../js/ln-nav/README.md) | [nav.md](js/nav.md) |
 | Filter | `data-ln-filter` | [js/ln-filter/README.md](../js/ln-filter/README.md) | [filter.md](js/filter.md) |
 | Search | `data-ln-search` | [js/ln-search/README.md](../js/ln-search/README.md) | [search.md](js/search.md) |

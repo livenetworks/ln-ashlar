@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Popover — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+	</template>
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Popover</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="ln-tooltip.html"><span class="nav-label">Tooltip (JS)</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.2.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+			<!-- Content -->
+			<div class="content">
+				<h1>Popover</h1>
+				<p>JS component for click-triggered rich-content panels. The <code>data-ln-popover</code> attribute is the single source of truth for open/closed state. Click outside or press ESC to close.</p>
+
+				<!-- 1. Basic -->
+				<section class="section-card">
+					<header><h3>1. Basic — Account popover</h3></header>
+					<main>
+						<p>Click the avatar button to open the account popover. Focus moves into the popover on open. Click outside or press ESC to close.</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn" data-ln-popover-for="demo-account-popover" aria-label="Account">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-user"></use></svg>
+								Account
+							</button>
+						</nav>
+
+						<div data-ln-popover id="demo-account-popover">
+							<p><strong>user@example.com</strong></p>
+							<nav>
+								<a href="#">Settings</a><br>
+								<a href="#">Sign out</a>
+							</nav>
+						</div>
+					</main>
+				</section>
+
+				<!-- 2. Position attribute -->
+				<section class="section-card">
+					<header><h3>2. Position attribute</h3></header>
+					<main>
+						<p>Four buttons with explicit preferred placement. The popover flips to the opposite side if the preferred side doesn't fit.</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn" data-ln-popover-for="demo-pos-top">Position: top</button>
+							<button type="button" class="btn" data-ln-popover-for="demo-pos-bottom">Position: bottom</button>
+							<button type="button" class="btn" data-ln-popover-for="demo-pos-left">Position: left</button>
+							<button type="button" class="btn" data-ln-popover-for="demo-pos-right">Position: right</button>
+						</nav>
+
+						<div data-ln-popover data-ln-popover-position="top" id="demo-pos-top">
+							<p>Preferred: <strong>top</strong>. Check <code>data-ln-popover-placement</code> in DevTools.</p>
+						</div>
+						<div data-ln-popover data-ln-popover-position="bottom" id="demo-pos-bottom">
+							<p>Preferred: <strong>bottom</strong>.</p>
+						</div>
+						<div data-ln-popover data-ln-popover-position="left" id="demo-pos-left">
+							<p>Preferred: <strong>left</strong>.</p>
+						</div>
+						<div data-ln-popover data-ln-popover-position="right" id="demo-pos-right">
+							<p>Preferred: <strong>right</strong>.</p>
+						</div>
+					</main>
+				</section>
+
+				<!-- 3. Auto-flip -->
+				<section class="section-card">
+					<header><h3>3. Auto-flip near viewport edge</h3></header>
+					<main>
+						<p>The button below is pushed to the far right. Its popover prefers <code>right</code> but flips to <code>left</code> because there is no room on the right. Inspect <code>data-ln-popover-placement</code> after opening — it should read <code>left</code>.</p>
+						<div style="display:flex; justify-content:flex-end;">
+							<button type="button" class="btn" data-ln-popover-for="demo-autoflip">Flip me</button>
+						</div>
+						<div data-ln-popover data-ln-popover-position="right" id="demo-autoflip">
+							<p>I flipped to the left because there was no space on the right. <code>data-ln-popover-placement</code> = <em>left</em>.</p>
+						</div>
+					</main>
+				</section>
+
+				<!-- 4. Nested -->
+				<section class="section-card">
+					<header><h3>4. Nested popovers — A stays open when B opens</h3></header>
+					<main>
+						<p>Open popover A, then click the button inside A to open popover B. Both A and B should be open simultaneously. Press ESC once to close B, again to close A.</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn" data-ln-popover-for="demo-nested-a">Open A</button>
+						</nav>
+
+						<div data-ln-popover id="demo-nested-a">
+							<p><strong>Popover A</strong> — I will stay open when B opens.</p>
+							<button type="button" class="btn" data-ln-popover-for="demo-nested-b">Open B inside A</button>
+						</div>
+
+						<div data-ln-popover id="demo-nested-b">
+							<p><strong>Popover B</strong> — A is still open. Press ESC to close me first.</p>
+						</div>
+					</main>
+				</section>
+
+				<!-- 5. Form inside popover -->
+				<section class="section-card">
+					<header><h3>5. Form inside popover</h3></header>
+					<main>
+						<p>Interactive content inside a popover. Tab navigates the form fields; the popover stays open. Submit fires the form action.</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn" data-ln-popover-for="demo-form-popover">Invite user</button>
+						</nav>
+
+						<div data-ln-popover id="demo-form-popover">
+							<form onsubmit="event.preventDefault(); alert('Invited! (demo)')">
+								<label for="invite-email">Email address</label>
+								<input id="invite-email" type="email" placeholder="colleague@example.com" autocomplete="off">
+								<div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
+									<button type="submit" class="btn">Send invite</button>
+									<button type="button" class="btn btn--ghost" onclick="document.getElementById('demo-form-popover').lnPopover.close()">Cancel</button>
+								</div>
+							</form>
+						</div>
+					</main>
+				</section>
+
+				<!-- 6. aria-expanded indicator -->
+				<section class="section-card">
+					<header><h3>6. <code>aria-expanded</code> live indicator</h3></header>
+					<main>
+						<p>The trigger button below has its <code>aria-expanded</code> wired automatically. Watch the status line update as you open and close the popover.</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn" id="demo-aria-trigger" data-ln-popover-for="demo-aria-popover">Toggle popover</button>
+						</nav>
+						<p id="demo-aria-status" style="margin-top:0.5rem; font-size:0.875rem;">
+							aria-expanded on trigger = <code id="demo-aria-value">false</code>
+						</p>
+
+						<div data-ln-popover id="demo-aria-popover">
+							<p>Popover is open. Check the status line above.</p>
+						</div>
+					</main>
+				</section>
+			</div>
+		</div>
+		</div>
+	</div>
+
+	<script>
+		// Update the aria-expanded live display
+		(function () {
+			const trigger = document.getElementById('demo-aria-trigger');
+			const display = document.getElementById('demo-aria-value');
+			if (!trigger || !display) return;
+			const popover = document.getElementById('demo-aria-popover');
+			if (!popover) return;
+			popover.addEventListener('ln-popover:open', function () {
+				display.textContent = 'true';
+			});
+			popover.addEventListener('ln-popover:close', function () {
+				display.textContent = 'false';
+			});
+		})();
+	</script>
+</body>
+</html>
