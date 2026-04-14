@@ -33,9 +33,9 @@ order — see roadmap § Execution Order.
 ### MVP (must-ship, unblocks DocuFlow polish)
 
 - [x] **Phase 1** — Foundation tokens (breakpoints, spacing, max-widths, easings, motion-safe mixin) — `plans/v1.1-phase-1-tokens.md`
-- [ ] **Phase 2** — Neutral color scale + semantic remap — `plans/v1.1-phase-2-neutral-scale.md`
-- [ ] **Phase 4** — Cool-tinted shadows + three-layer focus halo — `plans/v1.1-phase-4-shadows-focus.md`
-- [ ] **Phase 5** — Motion-safe retrofit (wraps every animation) — `plans/v1.1-phase-5-motion-safe.md`
+- [x] **Phase 2** — Neutral color scale + semantic remap — `plans/v1.1-phase-2-neutral-scale.md`
+- [x] **Phase 4** — Cool-tinted shadows + three-layer focus halo — `plans/v1.1-phase-4-shadows-focus.md`
+- [x] **Phase 5** — Motion-safe retrofit (wraps every animation) — `plans/v1.1-phase-5-motion-safe.md`
 
 ### Full v1.1
 
