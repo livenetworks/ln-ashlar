@@ -3,6 +3,7 @@
 @use 'sizing' as *;
 @use 'position' as *;
 @use 'colors' as *;
+@use 'motion' as *;
 
 @mixin loader {
 	color: hsl(var(--color-primary));
@@ -16,5 +17,7 @@
 	@include my(4.5rem);
 	@include relative;
 	transform: translateZ(0);
-	animation: loader-spin 1.7s infinite ease, loader-round 1.7s infinite ease;
+	@include motion-safe {
+		animation: loader-spin 1.7s infinite ease, loader-round 1.7s infinite ease;
+	}
 }

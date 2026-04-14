@@ -1,3 +1,5 @@
+@use 'motion' as *;
+
 // Status Badge — inline semantic indicator with colored dot
 //
 // Usage:
@@ -64,6 +66,8 @@
 	}
 
 	&::before {
-		animation: badge-pulse 2s ease-out infinite;
+		@include motion-safe {
+			animation: badge-pulse 2s ease-out infinite;
+		}
 	}
 }

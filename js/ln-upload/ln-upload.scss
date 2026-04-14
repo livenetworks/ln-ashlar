@@ -31,7 +31,10 @@
 	padding: var(--spacing-lg);
 	text-align: center;
 	cursor: pointer;
-	transition: all var(--transition-base);
+	@include motion-safe {
+		transition: border-color var(--transition-base),
+		            background-color var(--transition-base);
+	}
 	background-color: hsl(var(--color-bg-secondary));
 }
 
@@ -129,7 +132,9 @@
 	height: 100%;
 	width: 0;
 	background-color: hsl(var(--color-primary));
-	transition: width 0.15s ease-out;
+	@include motion-safe {
+		transition: width 0.15s ease-out;
+	}
 }
 
 .ln-upload__item--uploading .ln-upload__progress {
@@ -169,7 +174,9 @@
 	border-radius: 50%;
 	border-top-color: hsl(var(--color-primary));
 	background-image: none !important;
-	animation: ln-upload-spin 0.6s linear infinite;
+	@include motion-safe {
+		animation: ln-upload-spin 0.6s linear infinite;
+	}
 	flex-shrink: 0;
 }
 

@@ -131,7 +131,9 @@
 
 	.ln-icon-filter {
 		opacity: 0.4;
-		@include transition-fast;
+		@include motion-safe {
+			transition: opacity var(--transition-fast);
+		}
 	}
 
 	&:hover .ln-icon-filter {
@@ -192,7 +194,9 @@
 		@include ml(0.25rem);
 		vertical-align: middle;
 		opacity: 0.4;
-		@include transition-fast;
+		@include motion-safe {
+			transition: opacity var(--transition-fast);
+		}
 	}
 
 	&:hover svg.ln-sort-icon {

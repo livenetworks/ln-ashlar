@@ -24,7 +24,9 @@
 
 	&.open {
 		display: block;
-		animation: ln-dropdown-in var(--transition-fast);
+		@include motion-safe {
+			animation: ln-dropdown-in var(--transition-fast);
+		}
 	}
 
 	// ─── Menu items ────────────────────────────────────────
