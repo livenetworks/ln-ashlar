@@ -9,13 +9,16 @@
 	margin: 0;
 	position: relative;
 
-	// Vertical rail
+	// Vertical rail — concentric with the bullet x-axis.
+	// Bullet center = 0.125rem + (0.75rem / 2) = 0.5rem.
+	// Rail center   = left + (2px / 2)         = left + 1px.
+	// So left = 0.5rem - 1px keeps rail and bullet on the same axis.
 	&::before {
 		content: '';
 		position: absolute;
 		top: 0.5rem;
 		bottom: 0.5rem;
-		left: 0.5rem;
+		left: calc(0.5rem - 1px);
 		width: 2px;
 		background: hsl(var(--color-neutral-200));
 	}
