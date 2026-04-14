@@ -129,7 +129,9 @@
 	height: 100%;
 	width: 0;
 	background-color: hsl(var(--color-primary));
-	transition: width 0.15s ease-out;
+	@include motion-safe {
+		transition: width 0.15s ease-out;
+	}
 }
 
 .ln-upload__item--uploading .ln-upload__progress {

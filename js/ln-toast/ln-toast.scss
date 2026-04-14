@@ -19,9 +19,11 @@
 /* Transitions */
 [data-ln-toast] > .ln-toast__item {
 	opacity: 0;
-	transform: translateX(30px);
-	transition: all var(--transition-base) cubic-bezier(0.4, 0, 0.2, 1);
 	pointer-events: auto;
+	@include motion-safe {
+		transform: translateX(30px);
+		transition: all var(--transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+	}
 }
 
 [data-ln-toast] > .ln-toast__item + .ln-toast__item {
@@ -30,13 +32,17 @@
 
 [data-ln-toast] > .ln-toast__item--in {
 	opacity: 1;
-	transform: translateX(0);
+	@include motion-safe {
+		transform: translateX(0);
+	}
 }
 
 .ln-toast__item--out {
 	opacity: 0 !important;
-	transform: scale(0.95) !important;
-	transition: all var(--transition-fast) !important;
+	@include motion-safe {
+		transform: scale(0.95) !important;
+		transition: all var(--transition-fast) !important;
+	}
 }
 
 /* Card */

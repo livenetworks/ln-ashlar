@@ -67,7 +67,9 @@
 
 [data-ln-col-sort] {
 	opacity: 0.4;
-	transition: opacity 0.15s;
+	@include motion-safe {
+		transition: opacity 0.15s;
+	}
 	cursor: pointer;
 	background: none;
 	border: none;
@@ -90,7 +92,9 @@ th:hover [data-ln-col-sort] {
 
 [data-ln-col-filter] {
 	opacity: 0.4;
-	transition: opacity 0.15s;
+	@include motion-safe {
+		transition: opacity 0.15s;
+	}
 	cursor: pointer;
 	background: none;
 	border: none;
