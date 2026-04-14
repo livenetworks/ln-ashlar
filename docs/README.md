@@ -7,43 +7,48 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Location | What | For whom |
 |----------|------|----------|
 | `CLAUDE.md` (root) | Project rules, coding standards, architectural decisions | AI — loaded every session |
-| `.claude-skills/` | AI-optimized implementation reference (mixins, boilerplate, component wiring) | AI — preloaded into agents |
 | `docs/README.md` | This file — documentation index | Humans |
 | `docs/css/*.md` | CSS architecture per topic (tokens, mixins, cards, forms, etc.) | Humans + AI on-demand |
 | `docs/js/*.md` | JS component architecture (internal state, render flow, design decisions) | Humans + AI on-demand |
 | `js/ln-*/README.md` | Per-component usage guide (attributes, API, HTML, events) | Humans |
 
-### AI Documentation Layers
-
-```
-Layer 1: .claude-skills/SKILL.md        ← Always preloaded. Quick reference.
-Layer 2: .claude-skills/css/ + js/      ← Preloaded by domain architects. Implementation patterns.
-Layer 3: docs/css/*.md + docs/js/*.md   ← Read on-demand. Deep architecture detail.
-Layer 4: js/ln-*/README.md              ← Read on-demand. Usage examples and API reference.
-```
-
 ---
 
 ## CSS
 
+**Foundation** (tokens, config, mixins — consumed by every component)
+
 | Topic | Source | Docs |
 |-------|--------|------|
 | Design Tokens | `scss/config/_tokens.scss` | [tokens.md](css/tokens.md) |
-| Mixins Reference | `scss/config/mixins/` | [mixins.md](css/mixins.md) |
-| Cards | `scss/components/_cards.scss` | [cards.md](css/cards.md) |
-| Sections | `scss/components/_sections.scss` | [sections.md](css/sections.md) |
-| Navigation | `scss/components/_nav.scss` | [navigation.md](css/navigation.md) |
-| Tables | `scss/components/_tables.scss` | [tables.md](css/tables.md) |
-| Forms | `scss/components/_forms.scss` | [forms.md](css/forms.md) |
+| Breakpoints | `scss/config/_breakpoints.scss` | [breakpoints.md](css/breakpoints.md) |
+| Typography | `scss/config/mixins/_typography.scss` | [typography.md](css/typography.md) |
+| Theming (Dark Mode) | `scss/config/_theme.scss` | [theming.md](css/theming.md) |
+| Motion | `scss/config/mixins/_motion.scss` | [motion.md](css/motion.md) |
 | Layout | `scss/config/mixins/_layout.scss` | [layout.md](css/layout.md) |
-| Breadcrumbs | `scss/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
+| Mixins Reference | `scss/config/mixins/` | [mixins.md](css/mixins.md) |
+| Icons (CSS) | `scss/config/_icons.scss` | [../js/ln-icons/README.md](../js/ln-icons/README.md) |
+| Container Queries | — | [ln-acme-container-queries.md](ln-acme-container-queries.md) |
+
+**Components** (alphabetical)
+
+| Topic | Source | Docs |
+|-------|--------|------|
 | Alert | `scss/components/_alert.scss` | [alert.md](css/alert.md) |
 | Avatar | `scss/components/_avatar.scss` | [avatar.md](css/avatar.md) |
 | Banner | `scss/components/_banner.scss` | [banner.md](css/banner.md) |
+| Breadcrumbs | `scss/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
+| Cards | `scss/components/_cards.scss` | [cards.md](css/cards.md) |
+| Empty State | `scss/components/_empty-state.scss` | [empty-state.md](css/empty-state.md) |
+| Forms | `scss/components/_forms.scss` | [forms.md](css/forms.md) |
 | Loader | `scss/components/_loader.scss` | [loader.md](css/loader.md) |
-| Status Badge | `scss/components/_badge.scss` | [status-badge.md](css/status-badge.md) |
-| Icons (CSS) | `scss/config/_icons.scss` | [../js/ln-icons/README.md](../js/ln-icons/README.md) |
-| Container Queries | — | [ln-acme-container-queries.md](ln-acme-container-queries.md) |
+| Navigation | `scss/components/_nav.scss` | [navigation.md](css/navigation.md) |
+| Page Header | `scss/components/_page-header.scss` | [page-header.md](css/page-header.md) |
+| Sections | `scss/components/_sections.scss` | [sections.md](css/sections.md) |
+| Status Badge | `scss/components/_status-badge.scss` | [status-badge.md](css/status-badge.md) |
+| Stepper | `scss/components/_stepper.scss` | [stepper.md](css/stepper.md) |
+| Tables | `scss/components/_tables.scss` | [tables.md](css/tables.md) |
+| Timeline | `scss/components/_timeline.scss` | [timeline.md](css/timeline.md) |
 
 ---
 

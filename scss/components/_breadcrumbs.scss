@@ -1,5 +1,6 @@
 @use '../config/mixins' as *;
 
-#breadcrumbs {
+#breadcrumbs,
+[data-ln-breadcrumbs] {
 	@include breadcrumbs;
 }

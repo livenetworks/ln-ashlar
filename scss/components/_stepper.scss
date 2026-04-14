@@ -1,0 +1,5 @@
+@use '../config/mixins' as *;
+
+[data-ln-stepper] {
+	@include stepper;
+}
