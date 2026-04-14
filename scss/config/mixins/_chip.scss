@@ -1,0 +1,64 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'focus' as *;
+
+@mixin chip {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.25rem);
+	@include px(0.625rem);
+	@include py(0.25rem);
+	@include typography(label-sm);
+	background: hsl(var(--color-neutral-100));
+	color: hsl(var(--color-text-primary));
+	@include rounded-full;
+	white-space: nowrap;
+	line-height: 1.4;
+
+	> button {
+		all: unset;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1rem;
+		height: 1rem;
+		border-radius: 50%;
+		color: hsl(var(--color-text-secondary));
+
+		&:hover {
+			background: hsl(var(--color-neutral-200));
+			color: hsl(var(--color-text-primary));
+		}
+
+		&:focus-visible {
+			@include focus-ring;
+		}
+
+		svg.ln-icon {
+			width: 0.75rem;
+			height: 0.75rem;
+		}
+	}
+
+	// Tone variants
+	&[data-ln-chip="success"] {
+		background: hsl(var(--color-success) / 0.12);
+		color: hsl(var(--color-success));
+	}
+	&[data-ln-chip="warning"] {
+		background: hsl(var(--color-warning) / 0.12);
+		color: hsl(var(--color-warning));
+	}
+	&[data-ln-chip="error"] {
+		background: hsl(var(--color-error) / 0.12);
+		color: hsl(var(--color-error));
+	}
+	&[data-ln-chip="info"] {
+		background: hsl(var(--color-info) / 0.12);
+		color: hsl(var(--color-info));
+	}
+}

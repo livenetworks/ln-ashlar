@@ -39,7 +39,9 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Banner | `scss/components/_banner.scss` | [banner.md](css/banner.md) |
 | Breadcrumbs | `scss/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
 | Cards | `scss/components/_cards.scss` | [cards.md](css/cards.md) |
+| Chip | `scss/components/_chip.scss` | [chip.md](css/chip.md) |
 | Empty State | `scss/components/_empty-state.scss` | [empty-state.md](css/empty-state.md) |
+| Filter Toolbar | `scss/components/_filter-toolbar.scss` | [filter-toolbar.md](css/filter-toolbar.md) |
 | Forms | `scss/components/_forms.scss` | [forms.md](css/forms.md) |
 | Kbd | `scss/config/mixins/_kbd.scss` | [kbd.md](css/kbd.md) |
 | Loader | `scss/components/_loader.scss` | [loader.md](css/loader.md) |
@@ -52,6 +54,8 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Stepper | `scss/components/_stepper.scss` | [stepper.md](css/stepper.md) |
 | Tables | `scss/components/_tables.scss` | [tables.md](css/tables.md) |
 | Timeline | `scss/components/_timeline.scss` | [timeline.md](css/timeline.md) |
+| Tooltip | `scss/components/_tooltip.scss` | [tooltip.md](css/tooltip.md) |
+| Toggle Switch | `scss/components/_toggle-switch.scss` | [toggle-switch.md](css/toggle-switch.md) |
 
 ---
 

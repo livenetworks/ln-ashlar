@@ -1,0 +1,5 @@
+@use '../config/mixins' as *;
+
+input[type="checkbox"][data-ln-toggle-switch] {
+	@include toggle-switch;
+}
