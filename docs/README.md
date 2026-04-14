@@ -44,6 +44,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Loader | `scss/components/_loader.scss` | [loader.md](css/loader.md) |
 | Navigation | `scss/components/_nav.scss` | [navigation.md](css/navigation.md) |
 | Page Header | `scss/components/_page-header.scss` | [page-header.md](css/page-header.md) |
+| Prose | `scss/components/_prose.scss` | [prose.md](css/prose.md) |
 | Sections | `scss/components/_sections.scss` | [sections.md](css/sections.md) |
 | Stat Card | `scss/components/_stat-card.scss` | [stat-card.md](css/stat-card.md) |
 | Status Badge | `scss/components/_status-badge.scss` | [status-badge.md](css/status-badge.md) |

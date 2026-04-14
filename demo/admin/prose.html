@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Prose — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+	</template>
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Prose</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.1.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+			<div class="content">
+				<h1>Prose</h1>
+				<p>Rich-text content styling for TipTap/editor output. Add <code>data-ln-prose</code> to any wrapper containing semantic HTML.</p>
+
+				<!-- Full element showcase -->
+				<section class="section-card">
+					<header><h3>All Elements — Full Showcase</h3></header>
+					<main>
+						<article data-ln-prose>
+							<h1>Document Title (h1)</h1>
+							<p>This is the opening paragraph of a rich-text document. It uses the <code>body-md</code> typography role with a reading-optimized max-width of 65 characters.</p>
+
+							<h2>Section Heading (h2)</h2>
+							<p>Paragraphs are spaced using the <code>> * + *</code> lobotomised owl selector so margin is only added between sibling elements.</p>
+							<p>A second paragraph follows. Links are <a href="#">styled with the primary colour</a> and an underline. Hover thickens the underline.</p>
+
+							<h3>Subsection (h3)</h3>
+							<p>Content continues under the subsection heading.</p>
+
+							<h4>Minor heading (h4)</h4>
+							<p>The heading hierarchy maps to <code>heading-lg</code>, <code>heading-md</code>, <code>heading-sm</code>, and <code>title-md</code> typography roles.</p>
+
+							<hr>
+
+							<h2>Text formatting</h2>
+							<p>Text can be <strong>bold (semibold weight)</strong>, <em>italic</em>, or contain <code>inline code</code> styled in monospace with a secondary background.</p>
+
+							<h2>Lists</h2>
+							<ul>
+								<li>Unordered list — disc style</li>
+								<li>Second item with a longer description that wraps onto multiple lines to show line-height behaviour</li>
+								<li>Third item</li>
+							</ul>
+
+							<ol>
+								<li>Ordered list — decimal</li>
+								<li>Second numbered step</li>
+								<li>Third step</li>
+							</ol>
+
+							<h2>Blockquote</h2>
+							<blockquote>
+								An organization's quality management system should be documented in a quality manual that includes the scope, exclusions, and references to procedures.
+							</blockquote>
+
+							<h2>Code block</h2>
+							<pre><code>// Example code block
+const document = await fetch('/api/documents/123');
+const data = await document.json();
+console.log(data.title);</code></pre>
+
+							<h2>Image</h2>
+							<figure>
+								<img src="ln-acme-logo.png" alt="ln-acme logo example">
+								<figcaption>Figure caption styled with the caption typography role</figcaption>
+							</figure>
+
+							<h2>Table</h2>
+							<table>
+								<thead>
+									<tr>
+										<th>Document</th>
+										<th>Standard</th>
+										<th>Status</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Quality Manual</td>
+										<td>ISO 9001</td>
+										<td>Approved</td>
+									</tr>
+									<tr>
+										<td>Risk Register</td>
+										<td>ISO 27001</td>
+										<td>In Review</td>
+									</tr>
+									<tr>
+										<td>Incident Procedure</td>
+										<td>ISO 45001</td>
+										<td>Draft</td>
+									</tr>
+								</tbody>
+							</table>
+
+							<hr>
+
+							<p>End of prose content. The max-width is <code>65ch</code> — enough for comfortable reading without excessive eye travel.</p>
+						</article>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Default attribute — zero SCSS needed
+// &lt;article data-ln-prose&gt;...&lt;/article&gt;
+
+// Consumer semantic selectors
+#document-viewer { @include prose; }
+#help-article    { @include prose; }</code></pre>
+					</main>
+				</section>
+
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.1.0</span>
+			</footer>
+		</div>
+		</div>
+	</div>
+
+	<script>
+		(function () {
+			const KEY = 'ln-demo-theme';
+			const root = document.documentElement;
+
+			const stored = localStorage.getItem(KEY);
+			if (stored === 'dark' || stored === 'light') {
+				root.setAttribute('data-theme', stored);
+			}
+
+			const toggle = document.querySelector('[data-demo-theme-toggle]');
+			if (toggle) {
+				toggle.addEventListener('click', () => {
+					const current =
+						root.getAttribute('data-theme') ||
+						(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+					const next = current === 'dark' ? 'light' : 'dark';
+					root.setAttribute('data-theme', next);
+					localStorage.setItem(KEY, next);
+				});
+			}
+		})();
+	</script>
+</body>
+</html>
