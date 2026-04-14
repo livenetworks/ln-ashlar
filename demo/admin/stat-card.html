@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Stat Card — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+	</template>
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Stat Card</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.1.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+			<div class="content">
+				<h1>Stat Card / KPI Card</h1>
+				<p>Dashboard KPI tile. Large numeric value, small uppercase label, and optional trend indicator.</p>
+
+				<!-- 4-across grid — all 3 trend variants -->
+				<section class="section-card">
+					<header><h3>KPI Grid — 4 cards, all trend variants</h3></header>
+					<main>
+						<div data-demo-kpi-grid>
+							<article data-ln-stat-card>
+								<p data-ln-stat-label>Total Documents</p>
+								<p data-ln-stat-value>1,247</p>
+								<p data-ln-stat-trend="up">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+									12% from last month
+								</p>
+							</article>
+
+							<article data-ln-stat-card>
+								<p data-ln-stat-label>Active Standards</p>
+								<p data-ln-stat-value>8</p>
+								<p data-ln-stat-trend="neutral">
+									No change
+								</p>
+							</article>
+
+							<article data-ln-stat-card>
+								<p data-ln-stat-label>Pending Reviews</p>
+								<p data-ln-stat-value>34</p>
+								<p data-ln-stat-trend="down">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									5% from last week
+								</p>
+							</article>
+
+							<article data-ln-stat-card>
+								<p data-ln-stat-label>Approved This Month</p>
+								<p data-ln-stat-value>91</p>
+								<p data-ln-stat-trend="up">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+									22% from last month
+								</p>
+							</article>
+						</div>
+					</main>
+				</section>
+
+				<!-- Single card — no trend -->
+				<section class="section-card">
+					<header><h3>Single Card — No Trend</h3></header>
+					<main>
+						<div class="demo-single-card">
+							<article data-ln-stat-card>
+								<p data-ln-stat-label>Total Users</p>
+								<p data-ln-stat-value>3,581</p>
+							</article>
+						</div>
+					</main>
+				</section>
+
+				<!-- Trend up -->
+				<section class="section-card">
+					<header><h3>Trend Up (success)</h3></header>
+					<main>
+						<div class="demo-single-card">
+							<article data-ln-stat-card>
+								<p data-ln-stat-label>Revenue</p>
+								<p data-ln-stat-value>€42,600</p>
+								<p data-ln-stat-trend="up">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+									18.4% from last quarter
+								</p>
+							</article>
+						</div>
+					</main>
+				</section>
+
+				<!-- Trend down -->
+				<section class="section-card">
+					<header><h3>Trend Down (error)</h3></header>
+					<main>
+						<div class="demo-single-card">
+							<article data-ln-stat-card>
+								<p data-ln-stat-label>Overdue Items</p>
+								<p data-ln-stat-value>7</p>
+								<p data-ln-stat-trend="down">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									3 more than last week
+								</p>
+							</article>
+						</div>
+					</main>
+				</section>
+
+				<!-- Trend neutral -->
+				<section class="section-card">
+					<header><h3>Trend Neutral (muted)</h3></header>
+					<main>
+						<div class="demo-single-card">
+							<article data-ln-stat-card>
+								<p data-ln-stat-label>Compliance Score</p>
+								<p data-ln-stat-value>97%</p>
+								<p data-ln-stat-trend="neutral">
+									No change from last audit
+								</p>
+							</article>
+						</div>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Default attribute — zero SCSS needed
+// &lt;article data-ln-stat-card&gt;
+//   &lt;p data-ln-stat-label&gt;Label&lt;/p&gt;
+//   &lt;p data-ln-stat-value&gt;1,247&lt;/p&gt;
+//   &lt;p data-ln-stat-trend="up"&gt;12% up&lt;/p&gt;
+// &lt;/article&gt;
+
+// Consumer semantic selector
+#dashboard .kpi { @include stat-card; }
+
+// Grid layout with container queries
+#dashboard-kpis {
+  @include container(kpigrid);
+  display: grid;
+  grid-template-columns: 1fr;
+  @include gap(1rem);
+  @container kpigrid (min-width: #{$cq-compact}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @container kpigrid (min-width: #{$cq-medium}) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}</code></pre>
+					</main>
+				</section>
+
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.1.0</span>
+			</footer>
+		</div>
+		</div>
+	</div>
+
+	<style>
+		[data-demo-kpi-grid] {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 1rem;
+		}
+		@media (max-width: 900px) {
+			[data-demo-kpi-grid] {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+		@media (max-width: 540px) {
+			[data-demo-kpi-grid] {
+				grid-template-columns: 1fr;
+			}
+		}
+		.demo-single-card {
+			max-width: 280px;
+		}
+	</style>
+
+	<script>
+		(function () {
+			const KEY = 'ln-demo-theme';
+			const root = document.documentElement;
+
+			const stored = localStorage.getItem(KEY);
+			if (stored === 'dark' || stored === 'light') {
+				root.setAttribute('data-theme', stored);
+			}
+
+			const toggle = document.querySelector('[data-demo-theme-toggle]');
+			if (toggle) {
+				toggle.addEventListener('click', () => {
+					const current =
+						root.getAttribute('data-theme') ||
+						(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+					const next = current === 'dark' ? 'light' : 'dark';
+					root.setAttribute('data-theme', next);
+					localStorage.setItem(KEY, next);
+				});
+			}
+		})();
+	</script>
+</body>
+</html>
