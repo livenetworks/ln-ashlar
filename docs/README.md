@@ -52,6 +52,8 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Stepper | `scss/components/_stepper.scss` | [stepper.md](css/stepper.md) |
 | Tables | `scss/components/_tables.scss` | [tables.md](css/tables.md) |
 | Timeline | `scss/components/_timeline.scss` | [timeline.md](css/timeline.md) |
+| Tooltip | `scss/components/_tooltip.scss` | [tooltip.md](css/tooltip.md) |
+| Toggle Switch | `scss/components/_toggle-switch.scss` | [toggle-switch.md](css/toggle-switch.md) |
 
 ---
 
