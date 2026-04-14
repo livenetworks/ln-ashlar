@@ -1,0 +1,46 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'borders' as *;
+@use 'colors' as *;
+
+@mixin filter-toolbar {
+	display: grid;
+	grid-template-areas:
+		'search'
+		'chips'
+		'controls';
+	@include gap(0.75rem);
+	@include p(1rem);
+	background: hsl(var(--color-bg-primary));
+	border: 1px solid hsl(var(--color-border));
+	@include rounded-lg;
+
+	@container (min-width: 880px) {
+		grid-template-areas: 'search chips controls';
+		grid-template-columns: minmax(12rem, 20rem) 1fr auto;
+		align-items: center;
+	}
+
+	> [data-ln-filter-search] {
+		grid-area: search;
+	}
+
+	> [data-ln-filter-group] {
+		grid-area: chips;
+		@include flex-row;
+		flex-wrap: wrap;
+		@include gap(0.375rem);
+		min-width: 0;
+	}
+
+	> [data-ln-filter-sort],
+	> [data-ln-filter-bulk] {
+		grid-area: controls;
+	}
+
+	> [data-ln-filter-sort] + [data-ln-filter-bulk] {
+		// If both present, share the controls area with a small gap
+		display: inline-flex;
+		@include gap(0.5rem);
+	}
+}

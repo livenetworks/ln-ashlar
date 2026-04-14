@@ -1,0 +1,61 @@
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+@use 'spacing' as *;
+@use 'motion' as *;
+
+@mixin tooltip {
+	position: relative;
+
+	&::after {
+		content: attr(data-ln-tooltip);
+		position: absolute;
+		@include px(0.5rem);
+		@include py(0.25rem);
+		background: hsl(var(--color-neutral-900));
+		color: hsl(var(--color-neutral-50));
+		@include typography(caption);
+		@include rounded-sm;
+		white-space: nowrap;
+		pointer-events: none;
+		opacity: 0;
+		z-index: var(--z-dropdown);
+		box-shadow: var(--shadow-md);
+
+		@include motion-safe {
+			transition: opacity var(--transition-fast);
+		}
+	}
+
+	&:hover::after,
+	&:focus-visible::after {
+		opacity: 1;
+	}
+
+	// Default position: top, centered
+	&::after,
+	&[data-ln-tooltip-position="top"]::after {
+		bottom: calc(100% + 0.375rem);
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	&[data-ln-tooltip-position="bottom"]::after {
+		top: calc(100% + 0.375rem);
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	&[data-ln-tooltip-position="left"]::after {
+		right: calc(100% + 0.375rem);
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	&[data-ln-tooltip-position="right"]::after {
+		left: calc(100% + 0.375rem);
+		top: 50%;
+		transform: translateY(-50%);
+	}
+}

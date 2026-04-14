@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Chip — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+	</template>
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Chip</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<div class="sidebar-header">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="toggle-switch.html"><span class="nav-label">Toggle Switch</span></a></li>
+						<li><a href="filter-toolbar.html"><span class="nav-label">Filter Toolbar</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="sidebar-footer">
+				<small>acme-gui v1.1.0</small>
+			</div>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+			<div class="content">
+				<h1>Chip</h1>
+				<p>Passive inline label for status, tags, and active filter display. Distinct from <code>pill</code> (input-backed interactive). Optional close button with accessible focus ring.</p>
+
+				<!-- Plain chips -->
+				<section class="section-card">
+					<header><h3>Plain Chips</h3></header>
+					<main>
+						<div data-demo-chip-row>
+							<span data-ln-chip>Draft</span>
+							<span data-ln-chip>In Review</span>
+							<span data-ln-chip>Approved</span>
+							<span data-ln-chip>Obsolete</span>
+						</div>
+					</main>
+				</section>
+
+				<!-- Tone variants -->
+				<section class="section-card">
+					<header><h3>Tone Variants</h3></header>
+					<main>
+						<div data-demo-chip-row>
+							<span data-ln-chip>Neutral</span>
+							<span data-ln-chip="success">Approved</span>
+							<span data-ln-chip="warning">Pending review</span>
+							<span data-ln-chip="error">Rejected</span>
+							<span data-ln-chip="info">In progress</span>
+						</div>
+					</main>
+				</section>
+
+				<!-- Chips with close buttons -->
+				<section class="section-card">
+					<header><h3>Chips with Close Button</h3></header>
+					<main>
+						<div data-demo-chip-row>
+							<span data-ln-chip>
+								Quality Manual
+								<button type="button" aria-label="Remove Quality Manual filter">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</span>
+							<span data-ln-chip>
+								ISO 9001
+								<button type="button" aria-label="Remove ISO 9001 filter">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</span>
+							<span data-ln-chip="info">
+								Draft
+								<button type="button" aria-label="Remove Draft filter">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</span>
+						</div>
+					</main>
+				</section>
+
+				<!-- As active filter tags -->
+				<section class="section-card">
+					<header><h3>Active Filter Tags Context</h3></header>
+					<main>
+						<div data-demo-filter-context>
+							<p>Active filters:</p>
+							<div data-demo-chip-row>
+								<span data-ln-chip>
+									Status: Draft
+									<button type="button" aria-label="Remove Status: Draft filter">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</span>
+								<span data-ln-chip>
+									Standard: ISO 9001
+									<button type="button" aria-label="Remove Standard: ISO 9001 filter">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</span>
+								<span data-ln-chip>
+									Type: Procedure
+									<button type="button" aria-label="Remove Type: Procedure filter">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</span>
+							</div>
+						</div>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Default — attribute selector, no config needed
+// &lt;span data-ln-chip&gt;Label&lt;/span&gt;
+
+// Tone variants
+// &lt;span data-ln-chip="success"&gt;Approved&lt;/span&gt;
+// &lt;span data-ln-chip="warning"&gt;Pending&lt;/span&gt;
+// &lt;span data-ln-chip="error"&gt;Rejected&lt;/span&gt;
+// &lt;span data-ln-chip="info"&gt;Draft&lt;/span&gt;
+
+// With close button (focus ring auto-applied on :focus-visible)
+// &lt;span data-ln-chip&gt;
+//     Label
+//     &lt;button type="button" aria-label="Remove"&gt;
+//         &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+//     &lt;/button&gt;
+// &lt;/span&gt;
+
+// Consumer semantic selector
+.my-chip { @include chip; }</code></pre>
+					</main>
+				</section>
+
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.1.0</span>
+			</footer>
+		</div>
+		</div>
+	</div>
+
+	<script>
+		(function () {
+			const KEY = 'ln-demo-theme';
+			const root = document.documentElement;
+
+			const stored = localStorage.getItem(KEY);
+			if (stored === 'dark' || stored === 'light') {
+				root.setAttribute('data-theme', stored);
+			}
+
+			const toggle = document.querySelector('[data-demo-theme-toggle]');
+			if (toggle) {
+				toggle.addEventListener('click', () => {
+					const current =
+						root.getAttribute('data-theme') ||
+						(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+					const next = current === 'dark' ? 'light' : 'dark';
+					root.setAttribute('data-theme', next);
+					localStorage.setItem(KEY, next);
+				});
+			}
+		})();
+	</script>
+</body>
+</html>
