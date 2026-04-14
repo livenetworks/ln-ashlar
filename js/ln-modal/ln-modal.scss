@@ -12,7 +12,9 @@
 	@include items-center;
 	@include justify-center;
 	opacity: 0;
-	@include transition;
+	@include motion-safe {
+		transition: opacity var(--transition-base);
+	}
 }
 
 [data-ln-modal="open"] {
