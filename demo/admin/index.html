@@ -40,6 +40,9 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
+					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					</button>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
 						Test Toast
 					</button>
@@ -386,5 +389,30 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 			</footer>
 		</form>
 	</div>
+
+	<script>
+		// Consumer-side theme toggle example (library does not ship this)
+		(function () {
+			const KEY = 'ln-demo-theme';
+			const root = document.documentElement;
+
+			const stored = localStorage.getItem(KEY);
+			if (stored === 'dark' || stored === 'light') {
+				root.setAttribute('data-theme', stored);
+			}
+
+			const toggle = document.querySelector('[data-demo-theme-toggle]');
+			if (toggle) {
+				toggle.addEventListener('click', () => {
+					const current =
+						root.getAttribute('data-theme') ||
+						(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+					const next = current === 'dark' ? 'light' : 'dark';
+					root.setAttribute('data-theme', next);
+					localStorage.setItem(KEY, next);
+				});
+			}
+		})();
+	</script>
 </body>
 </html>

@@ -1,5 +1,8 @@
 # Design Tokens
 
+> **Theming:** see `docs/css/theming.md` for dark mode and
+> consumer theme extensions.
+
 CSS custom properties defined in `scss/config/_tokens.scss`. Single source of truth for all design values.
 
 ## How to use
