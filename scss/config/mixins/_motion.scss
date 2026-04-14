@@ -1,0 +1,19 @@
+// Motion safety — gate animation-only declarations behind
+// prefers-reduced-motion: no-preference.
+//
+// Usage:
+//   .ln-modal__overlay {
+//       @include motion-safe {
+//           animation: fadeIn var(--transition-base);
+//       }
+//   }
+//
+// Color transitions on hover are fine unwrapped — they do not trigger
+// vestibular issues. Only wrap transform, opacity, translate, scale,
+// rotate, and keyframe animations.
+
+@mixin motion-safe {
+	@media (prefers-reduced-motion: no-preference) {
+		@content;
+	}
+}

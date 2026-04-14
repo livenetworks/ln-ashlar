@@ -1,0 +1,52 @@
+// ==========================================================================
+// Breakpoints — ln-acme
+// ==========================================================================
+// App-shell media breakpoints:
+//   @use 'config/breakpoints' as *;
+//   @media (min-width: $bp-md) { ... }
+//
+// Container-query breakpoints:
+//   @use 'config/breakpoints' as *;
+//   @container foldersgrid (min-width: $cq-medium) { ... }
+//
+// CSS custom properties are also exposed at :root so JS can read via
+// getComputedStyle(document.documentElement).getPropertyValue('--bp-md').
+//
+// See docs/css/breakpoints.md for full usage guide.
+// See docs/ln-acme-container-queries.md for container-query doctrine.
+// ==========================================================================
+
+// -----------------------------------------------------------------------
+// App-shell media breakpoints (for @media — layout columns only)
+// -----------------------------------------------------------------------
+$bp-sm:  480px;
+$bp-md:  768px;
+$bp-lg:  1024px;
+$bp-xl:  1280px;
+$bp-2xl: 1536px;
+$bp-3xl: 1920px;
+
+// -----------------------------------------------------------------------
+// Container-query breakpoints (for @container — components)
+// -----------------------------------------------------------------------
+$cq-narrow:  480px;
+$cq-compact: 580px;
+$cq-medium:  880px;
+$cq-wide:    1120px;
+
+// -----------------------------------------------------------------------
+// CSS custom properties — JS readable via getComputedStyle
+// -----------------------------------------------------------------------
+:root {
+	--bp-sm:  #{$bp-sm};
+	--bp-md:  #{$bp-md};
+	--bp-lg:  #{$bp-lg};
+	--bp-xl:  #{$bp-xl};
+	--bp-2xl: #{$bp-2xl};
+	--bp-3xl: #{$bp-3xl};
+
+	--cq-narrow:  #{$cq-narrow};
+	--cq-compact: #{$cq-compact};
+	--cq-medium:  #{$cq-medium};
+	--cq-wide:    #{$cq-wide};
+}
