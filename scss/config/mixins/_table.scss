@@ -17,6 +17,7 @@
 	@include overflow-hidden;
 	@include shadow-sm;
 	border-collapse: collapse;
+	font-variant-numeric: tabular-nums;
 
 	thead {
 		background: hsl(var(--color-table-header-bg));
