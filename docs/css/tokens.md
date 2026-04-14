@@ -71,31 +71,31 @@ in-place (Phase 6).
 
 ### Text
 ```css
---color-text-primary:   221 39% 11%;   /* Main text */
---color-text-secondary: 220 9%  46%;   /* Secondary text */
---color-text-muted:     218 11% 65%;   /* Muted / disabled */
+--color-text-primary:   var(--color-neutral-900);  /* Main text */
+--color-text-secondary: var(--color-neutral-500);  /* Secondary text */
+--color-text-muted:     var(--color-neutral-400);  /* Muted / disabled */
 ```
 
 ### Backgrounds
 ```css
 --color-white:        0 0% 100%;
---color-bg-primary:   0 0% 100%;       /* Cards, panels */
---color-bg-secondary: 220 20% 97%;     /* Headers, footers, alternating rows */
---color-bg-body:      220 27% 96%;     /* Page background */
---color-bg-error:     0 86% 97%;       /* Error state background */
+--color-bg-primary:   var(--color-white);          /* Cards, panels */
+--color-bg-secondary: var(--color-neutral-50);     /* Headers, footers, alternating rows */
+--color-bg-body:      var(--color-neutral-100);    /* Page background */
+--color-bg-error:     0 86% 97%;                   /* Error state background */
 ```
 
 ### Borders
 ```css
---color-border:       220 13% 91%;
---color-border-light: 220 14% 95%;     /* Softer variant */
+--color-border:       var(--color-neutral-200);
+--color-border-light: var(--color-neutral-100);    /* Softer variant */
 ```
 
 ### Table-specific
 ```css
---color-table-header-bg:   220 14% 91%;
---color-table-header-text: 221 39% 11%;
---color-table-section-bg:  216 22% 88%;
+--color-table-header-bg:   var(--color-neutral-200);
+--color-table-header-text: var(--color-neutral-900);
+--color-table-section-bg:  var(--color-neutral-150);
 ```
 
 ---
