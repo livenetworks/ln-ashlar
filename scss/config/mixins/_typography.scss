@@ -33,3 +33,13 @@
 @mixin whitespace-nowrap { white-space: nowrap; }
 @mixin font-mono { font-family: var(--font-mono); }
 @mixin font-sans { font-family: var(--font-sans); }
+
+// Semantic role mixin — v1.1.
+// Usage: @include typography(display-lg) / typography(body-md) / etc.
+@mixin typography($role) {
+	font-size:   var(--text-#{$role});
+	line-height: var(--lh-#{$role});
+}
+
+@mixin tracking-tight  { letter-spacing: var(--tracking-tight); }
+@mixin tracking-normal { letter-spacing: var(--tracking-normal); }
