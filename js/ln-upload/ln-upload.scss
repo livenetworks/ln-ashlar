@@ -169,7 +169,9 @@
 	border-radius: 50%;
 	border-top-color: hsl(var(--color-primary));
 	background-image: none !important;
-	animation: ln-upload-spin 0.6s linear infinite;
+	@include motion-safe {
+		animation: ln-upload-spin 0.6s linear infinite;
+	}
 	flex-shrink: 0;
 }
 

@@ -15,9 +15,13 @@
 // ─── Utility classes ──────────────────────────────────────
 
 .is-new {
-	animation: ln-slide-in var(--transition-base) backwards;
+	@include motion-safe {
+		animation: ln-slide-in var(--transition-base) backwards;
+	}
 }
 
 .is-removing {
-	animation: ln-slide-out var(--transition-base) forwards;
+	@include motion-safe {
+		animation: ln-slide-out var(--transition-base) forwards;
+	}
 }

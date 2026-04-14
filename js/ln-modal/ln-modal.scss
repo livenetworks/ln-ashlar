@@ -28,7 +28,9 @@
 	max-width: 600px;
 	width: 90%;
 	max-height: 90vh;
-	animation: ln-modal-slideIn 0.3s ease;
+	@include motion-safe {
+		animation: ln-modal-slideIn 0.3s ease;
+	}
 	display: grid;
 	grid-template-rows: auto 1fr auto;
 }
