@@ -141,6 +141,43 @@ in-place (Phase 6).
 | `--shadow-xl` | `0 20px 25px -5px …, 0 8px 10px -6px …` |
 | `--shadow-primary` | `0 0 20px hsl(var(--color-primary) / 0.2)` |
 
+### Shadow scale (v1.1)
+
+All shadows use `hsl(220 40% 15% / alpha)` as the base — gives a faint
+cool tint that reads as modern/expensive on daylight backgrounds.
+
+| Token | Layers | Use |
+|---|---|---|
+| `--shadow-none` | — | Reset |
+| `--shadow-xs` | 1 | Hairline lift (subtle cards) |
+| `--shadow-sm` | 2 | Cards, dropdowns |
+| `--shadow-md` | 2 | Floating panels, popovers |
+| `--shadow-lg` | 2 | Modals, toast |
+| `--shadow-xl` | 2 | Full-screen overlays |
+| `--shadow-2xl` | 2 | Hero elevation |
+| `--shadow-inner` | 1 | Depressed state (active, selected) |
+| `--shadow-primary` | 1 | Primary-tinted glow (CTA emphasis, focus halo) |
+| `--shadow-success` | 1 | Success-tinted glow |
+| `--shadow-error` | 1 | Error-tinted glow |
+
+**Do not use hover shadows on buttons.** Buttons change colour only
+(`CLAUDE.md` § Button Architecture).
+
+### Focus ring (v1.1)
+
+`@include focus-ring($color: var(--color-primary))` produces a
+three-layer halo:
+
+1. 2px inner ring in `--color-bg-primary` — visual separator
+2. 2px middle ring in `$color` at 60% alpha — main signal
+3. 2px outer glow in `$color` at 15% alpha — soft halo
+
+Error variant: `@include focus-ring(var(--color-error))`.
+
+The v1.0 `$width` argument has been removed — the three-layer halo is
+always 6px total. Projects that need a different thickness can use
+`focus-combination`, `focus-inset-shadow`, or write a custom mixin.
+
 ---
 
 ## Transitions
