@@ -11,6 +11,8 @@
 	cursor: pointer;
 	vertical-align: middle;
 	flex-shrink: 0;
+	border: none;
+	transition: none;
 
 	@include motion-safe {
 		transition: background-color var(--transition-fast);
