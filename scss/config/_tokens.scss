@@ -55,33 +55,33 @@
 	--color-neutral-900: 221 39% 11%;
 
 	// -----------------------------------------------------------------------
-	// Colors — Text
+	// Colors — Text (reference neutral scale)
 	// -----------------------------------------------------------------------
-	--color-text-primary: 221 39% 11%;
-	--color-text-secondary: 220 9% 46%;
-	--color-text-muted: 218 11% 65%;
+	--color-text-primary:   var(--color-neutral-900);
+	--color-text-secondary: var(--color-neutral-500);
+	--color-text-muted:     var(--color-neutral-400);
 
 	// -----------------------------------------------------------------------
 	// Colors — Backgrounds
 	// -----------------------------------------------------------------------
-	--color-white: 0 0% 100%;
-	--color-bg-primary: 0 0% 100%;
-	--color-bg-secondary: 220 20% 97%;
-	--color-bg-body: 220 27% 96%;
-	--color-bg-error: 0 86% 97%;
+	--color-white:        0 0% 100%;
+	--color-bg-primary:   var(--color-white);
+	--color-bg-secondary: var(--color-neutral-50);
+	--color-bg-body:      var(--color-neutral-100);
+	--color-bg-error:     0 86% 97%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Borders
 	// -----------------------------------------------------------------------
-	--color-border: 220 13% 91%;
-	--color-border-light: 220 14% 95%;
+	--color-border:       var(--color-neutral-200);
+	--color-border-light: var(--color-neutral-100);
 
 	// -----------------------------------------------------------------------
 	// Colors — Table-specific
 	// -----------------------------------------------------------------------
-	--color-table-header-bg: 220 14% 91%;
-	--color-table-header-text: 221 39% 11%;
-	--color-table-section-bg: 220 25% 93%;
+	--color-table-header-bg:   var(--color-neutral-200);
+	--color-table-header-text: var(--color-neutral-900);
+	--color-table-section-bg:  var(--color-neutral-150);
 
 	// -----------------------------------------------------------------------
 	// Spacing

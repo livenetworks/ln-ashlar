@@ -46,6 +46,29 @@ background-color: hsl(var(--color-primary) / 0.5);
 --color-info:         217 91% 60%;
 ```
 
+### Neutral scale (v1.1)
+
+The canonical grey layer. All semantic colors (text, background,
+border, table) reference this scale. Dark mode inverts the scale
+in-place (Phase 6).
+
+| Token | Value | Maps to |
+|---|---|---|
+| `--color-neutral-50` | `220 20% 98%` | `bg-secondary` (lightest surface) |
+| `--color-neutral-100` | `220 16% 96%` | `bg-body`, `border-light` |
+| `--color-neutral-150` | `220 14% 93%` | `table-section-bg` (intermediate) |
+| `--color-neutral-200` | `220 13% 91%` | `border`, `table-header-bg` |
+| `--color-neutral-300` | `220 13% 83%` | disabled field borders |
+| `--color-neutral-400` | `218 11% 65%` | `text-muted`, placeholder |
+| `--color-neutral-500` | `220  9% 46%` | `text-secondary`, helper text |
+| `--color-neutral-600` | `220 11% 34%` | strong secondary text |
+| `--color-neutral-700` | `220 14% 24%` | strong body text |
+| `--color-neutral-800` | `220 20% 15%` | heading text (dark-on-light) |
+| `--color-neutral-900` | `221 39% 11%` | `text-primary` (maximum contrast) |
+
+**Why stored as bare HSL triplets:** enables alpha transparency via
+`hsl(var(--color-neutral-900) / 0.5)`.
+
 ### Text
 ```css
 --color-text-primary:   221 39% 11%;   /* Main text */
