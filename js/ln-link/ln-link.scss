@@ -32,7 +32,9 @@ tr[data-ln-link],
 	@include z-toast;
 	opacity: 0;
 	pointer-events: none;
-	transition: opacity var(--transition-fast);
+	@include motion-safe {
+		transition: opacity var(--transition-fast);
+	}
 
 	&--visible {
 		opacity: 1;

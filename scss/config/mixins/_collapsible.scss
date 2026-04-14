@@ -10,12 +10,15 @@
 @use 'colors' as *;
 @use 'borders' as *;
 @use 'transitions' as *;
+@use 'motion' as *;
 @use 'interaction' as *;
 
 @mixin collapsible {
 	display: grid;
 	grid-template-rows: 0fr;
-	transition: grid-template-rows var(--transition-base);
+	@include motion-safe {
+		transition: grid-template-rows var(--transition-base);
+	}
 
 	&.open {
 		grid-template-rows: 1fr;
@@ -57,7 +60,9 @@
 			svg.ln-chevron {
 				@include flex-shrink-0;
 				color: hsl(var(--color-text-muted));
-				@include transition;
+				@include motion-safe {
+					transition: transform var(--transition-base);
+				}
 			}
 		}
 

@@ -20,7 +20,9 @@
 /* Fill arc */
 .ln-circular-progress__fill {
 	stroke: hsl(var(--color-primary));
-	transition: stroke-dashoffset var(--transition-base);
+	@include motion-safe {
+		transition: stroke-dashoffset var(--transition-base);
+	}
 }
 
 /* Center label */

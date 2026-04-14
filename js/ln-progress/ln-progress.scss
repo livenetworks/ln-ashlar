@@ -13,7 +13,9 @@
 /* Progress Bar (inner) */
 [data-ln-progress] > [data-ln-progress] {
 	width: 0;
-	@include transition;
+	@include motion-safe {
+		transition: width var(--transition-base);
+	}
 	border-radius: 0;
 
 	&:last-child {

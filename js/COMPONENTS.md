@@ -467,10 +467,11 @@ If a component needs CSS, create `js/ln-{name}/ln-{name}.scss`:
 ```scss
 @use '../../scss/config/mixins' as *;
 
-// Use @include mixins and var(--token) values
+// Use @include mixins and var(--token) values. Any transition
+// that animates transform/opacity/width/height MUST be wrapped
+// in @include motion-safe { ... }.
 .ln-{name}__element {
     @include fixed;
-    @include transition;
     z-index: var(--z-overlay);
 }
 ```
