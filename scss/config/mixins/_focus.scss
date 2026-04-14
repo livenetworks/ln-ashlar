@@ -11,8 +11,17 @@
 // Error state — override $color:
 //   input.error:focus-visible { @include focus-ring(var(--color-error)); }
 
-@mixin focus-ring($color: var(--color-primary), $width: 3px) {
-	box-shadow: 0 0 0 $width hsl($color / 0.12);
+// Three-layer halo:
+//   1. 2px ring at bg-primary colour — visual separator from the
+//      element's own background
+//   2. 2px ring at 60% of the colour — the main focus signal
+//   3. 2px outer glow at 15% — soft halo outside the main ring
+@mixin focus-ring($color: var(--color-primary)) {
+	box-shadow:
+		0 0 0 2px hsl(var(--color-bg-primary)),
+		0 0 0 4px hsl($color / 0.6),
+		0 0 0 6px hsl($color / 0.15);
+	outline: none;
 }
 
 // Thickens the outline without causing layout shift (outline, not border).
