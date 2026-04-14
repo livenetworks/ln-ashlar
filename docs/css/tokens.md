@@ -184,3 +184,48 @@ Token names are always **semantic** (by function), never by color:
 --color-blue: 232 75% 52%;
 --color-red:  0 84% 50%;
 ```
+
+---
+
+## v1.1 Additions
+
+### Spacing (extended)
+
+| Token | Value | Use |
+|---|---|---|
+| `--spacing-2xs` | 2px | Tight gaps inside compound components (icon-next-to-text) |
+| `--spacing-3xl` | 4rem | Section separators on large dashboards |
+| `--spacing-4xl` | 6rem | Hero layouts |
+| `--spacing-5xl` | 8rem | Page-level hero spacing |
+
+### Content widths
+
+| Token | Value | Use |
+|---|---|---|
+| `--max-w-prose` | 65ch | Rich-text article / TipTap output |
+| `--max-w-form` | 32rem | Auth forms, short settings panels |
+| `--max-w-content` | 48rem | Standard content column |
+| `--max-w-container` | 80rem | Outer page container |
+
+### Easings (curves only)
+
+| Token | Curve | Use |
+|---|---|---|
+| `--easing-standard` | `cubic-bezier(0.4, 0, 0.2, 1)` | Default UI motion |
+| `--easing-decelerate` | `cubic-bezier(0, 0, 0.2, 1)` | Enter animations (modal open) |
+| `--easing-accelerate` | `cubic-bezier(0.4, 0, 1, 1)` | Exit animations (modal close) |
+| `--easing-spring` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Springy emphasis (nav underline, success check) |
+
+### Border widths
+
+| Token | Value | Use |
+|---|---|---|
+| `--border-width-strong` | 2px | Emphasis borders (active pill, focus inner ring) |
+
+### Breakpoints
+
+See `docs/css/breakpoints.md`.
+
+### Motion safety
+
+See `docs/css/motion.md` (added in v1.1 Phase 5).
