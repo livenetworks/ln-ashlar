@@ -1,0 +1,116 @@
+@use 'spacing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+
+@mixin prose {
+	max-width: var(--max-w-prose);
+	color: hsl(var(--color-text-primary));
+
+	> * + * {
+		margin-top: 1em;
+	}
+
+	h1 { @include typography(heading-lg); margin-top: 2em; margin-bottom: 0.5em; }
+	h2 { @include typography(heading-md); margin-top: 1.5em; margin-bottom: 0.5em; }
+	h3 { @include typography(heading-sm); margin-top: 1.25em; margin-bottom: 0.5em; }
+	h4 { @include typography(title-md); margin-top: 1em; margin-bottom: 0.5em; }
+
+	p { @include typography(body-md); }
+
+	a {
+		color: hsl(var(--color-primary));
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 2px;
+
+		&:hover {
+			text-decoration-thickness: 2px;
+		}
+	}
+
+	strong { font-weight: var(--font-semibold); }
+	em { font-style: italic; }
+
+	ul, ol {
+		padding-left: 1.5em;
+
+		li {
+			margin-top: 0.5em;
+		}
+	}
+
+	ul { list-style: disc; }
+	ol { list-style: decimal; }
+
+	blockquote {
+		border-left: 3px solid hsl(var(--color-primary));
+		padding-left: 1rem;
+		color: hsl(var(--color-text-secondary));
+		font-style: italic;
+	}
+
+	code {
+		background: hsl(var(--color-bg-secondary));
+		@include px(0.375rem);
+		@include py(0.125rem);
+		@include rounded-sm;
+		font-family: var(--font-mono);
+		@include typography(body-sm);
+		color: hsl(var(--color-primary));
+	}
+
+	pre {
+		background: hsl(var(--color-bg-secondary));
+		@include p(1rem);
+		@include rounded-md;
+		overflow-x: auto;
+
+		code {
+			background: none;
+			padding: 0;
+			color: inherit;
+		}
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+		@include rounded-md;
+	}
+
+	figure {
+		margin: 1.5em 0;
+
+		figcaption {
+			@include typography(caption);
+			color: hsl(var(--color-text-muted));
+			text-align: center;
+			margin-top: 0.5em;
+		}
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 1.5em;
+
+		th, td {
+			padding: 0.5rem 0.75rem;
+			border-bottom: 1px solid hsl(var(--color-border));
+			text-align: left;
+		}
+
+		th {
+			@include typography(label-md);
+			color: hsl(var(--color-text-primary));
+			font-weight: var(--font-semibold);
+		}
+	}
+
+	hr {
+		border: none;
+		border-top: 1px solid hsl(var(--color-border));
+		margin: 2em 0;
+	}
+}
