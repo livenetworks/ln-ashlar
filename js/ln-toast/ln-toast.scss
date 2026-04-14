@@ -22,7 +22,7 @@
 	pointer-events: auto;
 	@include motion-safe {
 		transform: translateX(30px);
-		transition: all var(--transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+		transition: all var(--transition-base) var(--easing-standard);
 	}
 }
 
