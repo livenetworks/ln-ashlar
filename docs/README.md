@@ -41,6 +41,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Cards | `scss/components/_cards.scss` | [cards.md](css/cards.md) |
 | Chip | `scss/components/_chip.scss` | [chip.md](css/chip.md) |
 | Empty State | `scss/components/_empty-state.scss` | [empty-state.md](css/empty-state.md) |
+| Filter Toolbar | `scss/config/mixins/_filter-toolbar.scss` (mixin-only) | [filter-toolbar.md](css/filter-toolbar.md) |
 | Forms | `scss/components/_forms.scss` | [forms.md](css/forms.md) |
 | Kbd | `scss/config/mixins/_kbd.scss` | [kbd.md](css/kbd.md) |
 | Loader | `scss/components/_loader.scss` | [loader.md](css/loader.md) |
