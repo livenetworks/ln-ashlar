@@ -31,7 +31,10 @@
 	padding: var(--spacing-lg);
 	text-align: center;
 	cursor: pointer;
-	transition: all var(--transition-base);
+	@include motion-safe {
+		transition: border-color var(--transition-base),
+		            background-color var(--transition-base);
+	}
 	background-color: hsl(var(--color-bg-secondary));
 }
 
