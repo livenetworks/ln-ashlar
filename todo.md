@@ -44,7 +44,7 @@ order — see roadmap § Execution Order.
 - [x] **Phase 7a** — Empty-state component (skeleton deferred — SSR renders with data) — `plans/v1.1-phase-7a-loading-components.md`
 - [x] **Phase 7b** — Navigation components (page-header, stepper, timeline) — `plans/v1.1-phase-7b-navigation-components.md`
 - [x] **Phase 7c** — Content components (stat-card, prose, kbd) — `plans/v1.1-phase-7c-content-components.md`
-- [ ] **Phase 7d** — Interaction components (tooltip CSS, toggle-switch, chip, filter-toolbar) — `plans/v1.1-phase-7d-interaction-components.md`
+- [x] **Phase 7d** — Interaction components (tooltip CSS, toggle-switch, chip, filter-toolbar) — `plans/v1.1-phase-7d-interaction-components.md`
 
 ### v1.2 candidates (defer if time-boxed)
 
