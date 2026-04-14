@@ -1,0 +1,19 @@
+@use 'spacing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+
+@mixin kbd {
+	display: inline-block;
+	@include px(0.375rem);
+	@include py(0.125rem);
+	@include typography(caption);
+	font-family: var(--font-mono);
+	color: hsl(var(--color-text-primary));
+	background: hsl(var(--color-bg-secondary));
+	border: 1px solid hsl(var(--color-border));
+	border-bottom-width: 2px;
+	@include rounded-sm;
+	line-height: 1;
+	white-space: nowrap;
+}
