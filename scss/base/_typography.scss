@@ -97,6 +97,10 @@ pre {
 	}
 }
 
+kbd {
+	@include kbd;
+}
+
 blockquote {
 	border-left: 3px solid hsl(var(--color-primary));
 	background-color: hsl(var(--color-bg-secondary));
