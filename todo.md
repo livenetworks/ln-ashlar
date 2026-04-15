@@ -46,9 +46,14 @@ order — see roadmap § Execution Order.
 - [x] **Phase 7c** — Content components (stat-card, prose, kbd) — `plans/v1.1-phase-7c-content-components.md`
 - [x] **Phase 7d** — Interaction components (tooltip CSS, toggle-switch, chip, filter-toolbar) — `plans/v1.1-phase-7d-interaction-components.md`
 
-### v1.2 candidates (defer if time-boxed)
+### v1.2 (shipped)
+
+- [x] **Phase 8** — JS components (ln-popover, ln-tooltip JS enhance) — `plans/v1.1-phase-8-js-components.md`. ln-copy and ln-shortcuts deferred.
+- [x] **Phase 9** — Density system (`[data-density="compact"]`) — `plans/v1.1-phase-9-density.md`
+
+### Deferred
 
 - [ ] **Skeleton** — loader placeholder mixins + `[data-ln-skeleton]` component (deferred from Phase 7a — not needed for SSR consumers, revive when first SPA consumer lands) — spec in `plans/v1.1-phase-7a-loading-components.md` Steps 2-3
-- [ ] **Phase 8** — JS components (ln-tooltip, ln-popover, ln-copy, ln-shortcuts) — `plans/v1.1-phase-8-js-components.md`
-- [ ] **Phase 9** — Density system (`[data-density="compact"]`) — `plans/v1.1-phase-9-density.md`
+- [ ] **ln-copy** — clipboard helper (deferred from Phase 8, no concrete consumer yet)
+- [ ] **ln-shortcuts** — keyboard shortcut registry (deferred from Phase 8, no concrete consumer yet)
 - [ ] **Phase 10** — Infrastructure (auto-token-docs, Playwright VR, CHANGELOG, migration guide) — `plans/v1.1-phase-10-infrastructure.md`
