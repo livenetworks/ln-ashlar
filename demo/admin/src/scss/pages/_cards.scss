@@ -1,5 +1,15 @@
 @use '../../../../../scss/config/mixins' as *;
 
+// File-local helper — cascade all status sibling tokens. Name prefixed with `-`
+// to signal "private to this file"; not @forward-ed, not a library mixin.
+@mixin -status-cascade($name) {
+	--color-primary:         var(--color-#{$name});
+	--color-primary-hover:   var(--color-#{$name}-hover);
+	--color-primary-focus:   var(--color-#{$name}-focus);
+	--color-primary-light:   var(--color-#{$name}-light);
+	--color-primary-lighter: var(--color-#{$name}-lighter);
+}
+
 // ─── Basic cards grid ──────────────────────────────────
 #demo-basic-cards {
 	@include grid-2;
@@ -25,10 +35,10 @@
 		p { margin: 0; @include text-sm; @include text-secondary; }
 	}
 
-	.accent-success { --color-primary: var(--color-success); }
-	.accent-error   { --color-primary: var(--color-error); }
-	.accent-warning { --color-primary: var(--color-warning); }
-	.accent-info    { --color-primary: var(--color-info); }
+	.accent-success { @include -status-cascade(success); }
+	.accent-error   { @include -status-cascade(error); }
+	.accent-warning { @include -status-cascade(warning); }
+	.accent-info    { @include -status-cascade(info); }
 }
 
 // ─── Accent left / side status ─────────────────────────
@@ -44,10 +54,10 @@
 		p { margin: 0; @include text-sm; @include text-secondary; }
 	}
 
-	.accent-success { --color-primary: var(--color-success); }
-	.accent-error   { --color-primary: var(--color-error); }
-	.accent-warning { --color-primary: var(--color-warning); }
-	.accent-info    { --color-primary: var(--color-info); }
+	.accent-success { @include -status-cascade(success); }
+	.accent-error   { @include -status-cascade(error); }
+	.accent-warning { @include -status-cascade(warning); }
+	.accent-info    { @include -status-cascade(info); }
 }
 
 // ─── Accent bottom ─────────────────────────────────────
@@ -63,10 +73,10 @@
 		p { margin: 0; @include text-sm; @include text-secondary; }
 	}
 
-	.accent-success { --color-primary: var(--color-success); }
-	.accent-error   { --color-primary: var(--color-error); }
-	.accent-warning { --color-primary: var(--color-warning); }
-	.accent-info    { --color-primary: var(--color-info); }
+	.accent-success { @include -status-cascade(success); }
+	.accent-error   { @include -status-cascade(error); }
+	.accent-warning { @include -status-cascade(warning); }
+	.accent-info    { @include -status-cascade(info); }
 }
 
 // ─── Tinted background cards ───────────────────────────
@@ -82,10 +92,10 @@
 		p { margin: 0; @include text-sm; @include text-secondary; }
 	}
 
-	.tint-success { --color-primary: var(--color-success); }
-	.tint-error   { --color-primary: var(--color-error); }
-	.tint-warning { --color-primary: var(--color-warning); }
-	.tint-info    { --color-primary: var(--color-info); }
+	.tint-success { @include -status-cascade(success); }
+	.tint-error   { @include -status-cascade(error); }
+	.tint-warning { @include -status-cascade(warning); }
+	.tint-info    { @include -status-cascade(info); }
 }
 
 // ─── Stacked card ──────────────────────────────────────
@@ -135,10 +145,10 @@
 		}
 	}
 
-	.stat-success { --color-primary: var(--color-success); }
-	.stat-error   { --color-primary: var(--color-error); }
-	.stat-warning { --color-primary: var(--color-warning); }
-	.stat-info    { --color-primary: var(--color-info); }
+	.stat-success { @include -status-cascade(success); }
+	.stat-error   { @include -status-cascade(error); }
+	.stat-warning { @include -status-cascade(warning); }
+	.stat-info    { @include -status-cascade(info); }
 }
 
 // ─── Card with fields ──────────────────────────────────

@@ -52,6 +52,16 @@
 	--color-primary-light:   232 60% 22%;
 	--color-primary-lighter: 232 50% 15%;
 
+	// Status tint layers — re-tuned for dark surfaces (parallel to primary)
+	--color-success-light:   142 50% 18%;
+	--color-success-lighter: 142 40% 13%;
+	--color-warning-light:   32 55% 20%;
+	--color-warning-lighter: 32 45% 14%;
+	--color-info-light:      217 55% 22%;
+	--color-info-lighter:    217 45% 15%;
+	--color-error-light:     0 50% 20%;
+	--color-error-lighter:   0 40% 14%;
+
 	// Error-bg re-tuned
 	--color-bg-error: 0 40% 15%;
 

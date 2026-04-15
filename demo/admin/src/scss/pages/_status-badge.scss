@@ -2,6 +2,20 @@
 
 // Production pattern demo — simulates project-owned selectors
 .status          { @include badge; }
-.status.active   { --color-primary: var(--color-success); }
-.status.pending  { --color-primary: var(--color-warning); }
+.status.active {
+	--color-primary:         var(--color-success);
+	--color-primary-hover:   var(--color-success-hover);
+	--color-primary-focus:   var(--color-success-focus);
+	--color-primary-light:   var(--color-success-light);
+	--color-primary-lighter: var(--color-success-lighter);
+}
+
+.status.pending {
+	--color-primary:         var(--color-warning);
+	--color-primary-hover:   var(--color-warning-hover);
+	--color-primary-focus:   var(--color-warning-focus);
+	--color-primary-light:   var(--color-warning-light);
+	--color-primary-lighter: var(--color-warning-lighter);
+}
+
 .status.inactive { --color-primary: var(--color-text-muted); }

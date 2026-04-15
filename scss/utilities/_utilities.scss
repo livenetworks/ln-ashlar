@@ -148,9 +148,39 @@
 	@include px(1rem);
 }
 
-// Semantic color overrides — set --color-primary on any component
-.success { --color-primary: var(--color-success); }
-.warning { --color-primary: var(--color-warning); }
-.error   { --color-primary: var(--color-error); }
-.info    { --color-primary: var(--color-info); }
+// Semantic color overrides — set --color-primary and all sibling tokens on any component.
+// Cascading all four siblings (hover/focus/light/lighter) ensures hover and focus
+// states read from the status family, not the default primary blue.
+.success {
+	--color-primary:         var(--color-success);
+	--color-primary-hover:   var(--color-success-hover);
+	--color-primary-focus:   var(--color-success-focus);
+	--color-primary-light:   var(--color-success-light);
+	--color-primary-lighter: var(--color-success-lighter);
+}
+
+.warning {
+	--color-primary:         var(--color-warning);
+	--color-primary-hover:   var(--color-warning-hover);
+	--color-primary-focus:   var(--color-warning-focus);
+	--color-primary-light:   var(--color-warning-light);
+	--color-primary-lighter: var(--color-warning-lighter);
+}
+
+.error {
+	--color-primary:         var(--color-error);
+	--color-primary-hover:   var(--color-error-hover);
+	--color-primary-focus:   var(--color-error-focus);
+	--color-primary-light:   var(--color-error-light);
+	--color-primary-lighter: var(--color-error-lighter);
+}
+
+.info {
+	--color-primary:         var(--color-info);
+	--color-primary-hover:   var(--color-info-hover);
+	--color-primary-focus:   var(--color-info-focus);
+	--color-primary-light:   var(--color-info-light);
+	--color-primary-lighter: var(--color-info-lighter);
+}
+
 .neutral { --color-primary: var(--color-text-muted); }

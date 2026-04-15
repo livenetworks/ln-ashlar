@@ -42,12 +42,34 @@ background-color: hsl(var(--color-primary) / 0.5);
 
 ### Status
 ```css
---color-success:      142 76% 36%;
---color-error:        0 84% 50%;
---color-error-hover:  0 74% 42%;
---color-warning:      32 95% 44%;
---color-info:         217 91% 60%;
+--color-success:         142 76% 36%;
+--color-success-hover:   142 76% 26%;
+--color-success-focus:   142 76% 44%;
+--color-success-light:   142 76% 93%;
+--color-success-lighter: 142 76% 97%;
+
+--color-error:           0 84% 50%;
+--color-error-hover:     0 74% 42%;
+--color-error-focus:     0 84% 58%;
+--color-error-light:     0 84% 93%;
+--color-error-lighter:   0 84% 97%;
+
+--color-warning:         32 95% 44%;
+--color-warning-hover:   32 95% 34%;
+--color-warning-focus:   32 95% 52%;
+--color-warning-light:   32 95% 93%;
+--color-warning-lighter: 32 95% 97%;
+
+--color-info:            217 91% 60%;
+--color-info-hover:      217 91% 50%;
+--color-info-focus:      217 91% 68%;
+--color-info-light:      217 91% 93%;
+--color-info-lighter:    217 91% 97%;
 ```
+
+### Status color overrides
+
+To change a component's status color, prefer the library helper classes (`.success`, `.warning`, `.error`, `.info`) which cascade all sibling tokens (`-hover`, `-focus`, `-light`, `-lighter`). If you override `--color-primary` directly on a selector, remember to also override its siblings to keep hover/focus/tint states in the variant color family.
 
 ### Neutral scale (v1.1)
 

@@ -6,7 +6,11 @@
 
 // Destructive confirm — error color on submit
 #demo-destructive footer button[type="submit"] {
-	--color-primary: var(--color-error);
+	--color-primary:         var(--color-error);
+	--color-primary-hover:   var(--color-error-hover);
+	--color-primary-focus:   var(--color-error-focus);
+	--color-primary-light:   var(--color-error-light);
+	--color-primary-lighter: var(--color-error-lighter);
 }
 
 // Table row action buttons
@@ -20,9 +24,17 @@ td ul { @include btn-group; }
 }
 
 #demo-banner-warning {
-	--color-primary: var(--color-warning);
+	--color-primary:         var(--color-warning);
+	--color-primary-hover:   var(--color-warning-hover);
+	--color-primary-focus:   var(--color-warning-focus);
+	--color-primary-light:   var(--color-warning-light);
+	--color-primary-lighter: var(--color-warning-lighter);
 }
 
 #demo-banner-error {
-	--color-primary: var(--color-error);
+	--color-primary:         var(--color-error);
+	--color-primary-hover:   var(--color-error-hover);
+	--color-primary-focus:   var(--color-error-focus);
+	--color-primary-light:   var(--color-error-light);
+	--color-primary-lighter: var(--color-error-lighter);
 }
