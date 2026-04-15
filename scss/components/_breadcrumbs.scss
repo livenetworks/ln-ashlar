@@ -1,6 +1,8 @@
 @use '../config/mixins' as *;
 
-#breadcrumbs,
-[data-ln-breadcrumbs] {
+// Production singleton — one breadcrumb trail per page, on the semantic
+// <nav aria-label="Breadcrumb"> container. Projects that need a second
+// breadcrumb instance should @include breadcrumbs on their own selector.
+#breadcrumbs {
 	@include breadcrumbs;
 }

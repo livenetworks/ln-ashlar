@@ -1,5 +1,9 @@
 @use '../config/mixins' as *;
 
-nav {
+// Sidebar/top navigation — opt-in via `data-ln-nav` (the same attribute that
+// activates the ln-nav JS highlighter). Scoping to an explicit marker prevents
+// this rule from capturing every other `<nav>` on the page (breadcrumbs,
+// pagination, in-page TOCs, etc.) which have their own styling contracts.
+nav[data-ln-nav] {
 	@include nav;
 }

@@ -1,43 +1,87 @@
 @use 'display' as *;
 @use 'spacing' as *;
+@use 'sizing' as *;
 @use 'typography' as *;
 @use 'colors' as *;
+@use 'borders' as *;
 @use 'transitions' as *;
+@use 'focus' as *;
+@use 'interaction' as *;
+
+// ─── Breadcrumbs ────────────────────────────────────────────────────────────
+// CSS-only navigation trail. No JS involvement.
+//
+// Applied to the semantic `<nav>` container (WAI-ARIA breadcrumb pattern).
+// The mixin internally targets the inner `> ol` so the browser's default
+// ordered-list styling (decimal markers, padding-left, li margins from
+// base typography) gets reset at the right depth. Applying the mixin
+// directly to an `<ol>` would not reset the parent `<nav>` and would
+// also not compose with the semantic a11y root.
+//
+// Usage:
+//   #breadcrumbs { @include breadcrumbs; }
+//
+//   <nav id="breadcrumbs" aria-label="Breadcrumb">
+//       <ol>
+//           <li><a href="/">Home</a></li>
+//           <li><a href="/users">Users</a></li>
+//           <li aria-current="page">Edit</li>
+//       </ol>
+//   </nav>
 
 @mixin breadcrumbs {
-	@include flex;
-	@include items-center;
-	@include gap(0.5rem);
-	@include text-sm;
-	@include text-secondary;
-	list-style: none;
-	margin: 0;
-	padding: 0;
+	@include select-none;
 
-	li {
+	> ol {
 		@include flex;
 		@include items-center;
+		@include flex-wrap;
 		@include gap(0.5rem);
+		list-style: none;
 		margin: 0;
+		padding: 0;
 
-		+ li::before {
-			content: '\00BB';
-			@include text-muted;
+		> li {
+			@include flex;
+			@include items-center;
+			@include gap(0.5rem);
+			@include text-sm;
+			margin: 0;
+
+			+ li::before {
+				content: '\00BB';
+				color: hsl(var(--color-text-muted));
+				// Pseudo-element announces as text by some screen readers.
+				// Breadcrumb separators are decorative — the list order
+				// carries the meaning.
+				speak: never;
+			}
 		}
-	}
 
-	a {
-		@include text-secondary;
-		text-decoration: none;
-		@include transition-colors;
+		a {
+			@include inline-flex;
+			@include items-center;
+			@include px(0.25rem);
+			@include py(0.125rem);
+			@include rounded-sm;
+			color: hsl(var(--color-text-secondary));
+			text-decoration: none;
+			@include transition-colors;
 
-		&:hover {
-			color: hsl(var(--color-primary));
+			&:hover {
+				color: hsl(var(--color-primary));
+			}
+
+			&:focus-visible {
+				@include focus-ring;
+			}
 		}
-	}
 
-	[aria-current="page"] {
-		@include text-primary;
-		@include font-medium;
+		[aria-current="page"] {
+			@include px(0.25rem);
+			@include py(0.125rem);
+			color: hsl(var(--color-text-primary));
+			@include font-medium;
+		}
 	}
 }

@@ -1,0 +1,28 @@
+@use '../../../../../scss/config/mixins' as *;
+
+// ─────────────────────────────────────────────────────────────────
+// Page-header demo
+//
+// page-header.html shows 4 variants of the same mixin side by side.
+// The library component binds @mixin page-header to the #page-header
+// singleton — it cannot be used 4× on one page. Scope the mixin via
+// a demo-local wrapper class instead.
+//
+// The container-type is required because @mixin page-header uses a
+// @container (min-width: 880px) query to switch between stacked and
+// row layouts.
+// ─────────────────────────────────────────────────────────────────
+
+.ph-wrap {
+	container-type: inline-size;
+
+	> header {
+		@include page-header;
+	}
+}
+
+// Narrow variant — forces the sub-880px stacked layout by capping
+// the container inline size.
+.ph-wrap--narrow {
+	max-width: 600px;
+}

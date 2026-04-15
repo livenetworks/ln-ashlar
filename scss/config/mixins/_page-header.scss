@@ -3,6 +3,7 @@
 @use 'typography' as *;
 @use 'colors' as *;
 @use 'borders' as *;
+@use 'breadcrumbs' as *;
 
 @mixin page-header {
 	display: grid;
@@ -25,6 +26,7 @@
 
 	> nav {
 		grid-area: breadcrumbs;
+		@include breadcrumbs;
 	}
 
 	> div:has(> h1) {

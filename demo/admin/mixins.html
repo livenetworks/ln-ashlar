@@ -874,9 +874,12 @@ table { @include table-base; }
 							</tbody>
 						</table>
 						<pre><code>// Breadcrumbs — library applies to #breadcrumbs
-// HTML: &lt;nav id="breadcrumbs" aria-label="Breadcrumbs"&gt;
-//         &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
-//         &lt;li aria-current="page"&gt;Users&lt;/li&gt;
+// HTML: &lt;nav id="breadcrumbs" aria-label="Breadcrumb"&gt;
+//           &lt;ol&gt;
+//               &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+//               &lt;li&gt;&lt;a href="#"&gt;Users&lt;/a&gt;&lt;/li&gt;
+//               &lt;li aria-current="page"&gt;Edit&lt;/li&gt;
+//           &lt;/ol&gt;
 //       &lt;/nav&gt;
 
 // Loader — project applies to its own selector

@@ -10,16 +10,6 @@
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
-	<style>
-		/* Container context required for [data-ln-page-header] @container queries */
-		.ph-wrap {
-			container-type: inline-size;
-		}
-		/* Narrow container — forces stacked (< 880px) layout */
-		.ph-wrap--narrow {
-			max-width: 600px;
-		}
-	</style>
 </head>
 <body>
 	<!-- Toast container -->
@@ -147,9 +137,9 @@
 					<header><h3>Full — Breadcrumbs + Title + Actions (wide container)</h3></header>
 					<main>
 						<div class="ph-wrap">
-							<header data-ln-page-header>
+							<header>
 								<nav aria-label="Breadcrumb">
-									<ol data-ln-breadcrumbs>
+									<ol>
 										<li><a href="#">Home</a></li>
 										<li><a href="#">Documents</a></li>
 										<li aria-current="page">Quality Manual</li>
@@ -173,9 +163,9 @@
 					<header><h3>Full — Narrow Container (max-width 600px → stacked)</h3></header>
 					<main>
 						<div class="ph-wrap ph-wrap--narrow">
-							<header data-ln-page-header>
+							<header>
 								<nav aria-label="Breadcrumb">
-									<ol data-ln-breadcrumbs>
+									<ol>
 										<li><a href="#">Home</a></li>
 										<li><a href="#">Documents</a></li>
 										<li aria-current="page">Quality Manual</li>
@@ -199,7 +189,7 @@
 					<header><h3>Title Only — No Breadcrumbs, No Actions</h3></header>
 					<main>
 						<div class="ph-wrap">
-							<header data-ln-page-header>
+							<header>
 								<div>
 									<h1>Dashboard</h1>
 								</div>
@@ -213,9 +203,9 @@
 					<header><h3>Title + Subtitle — No Actions</h3></header>
 					<main>
 						<div class="ph-wrap">
-							<header data-ln-page-header>
+							<header>
 								<nav aria-label="Breadcrumb">
-									<ol data-ln-breadcrumbs>
+									<ol>
 										<li><a href="#">Settings</a></li>
 										<li aria-current="page">Notifications</li>
 									</ol>
@@ -233,16 +223,21 @@
 				<section class="section-card">
 					<header><h3>SCSS Usage</h3></header>
 					<main>
-						<pre><code>// Default attribute — zero SCSS needed (requires container-type on parent)
-// &lt;div style="container-type: inline-size;"&gt;
-//     &lt;header data-ln-page-header&gt;...&lt;/header&gt;
-// &lt;/div&gt;
+						<pre><code>// Library default — applies @include page-header to #page-header.
+// Requires a container-query context on an ancestor.
+//
+//   &lt;main class="main"&gt;                           ← container-type: inline-size
+//       &lt;header id="page-header"&gt;
+//           &lt;nav aria-label="Breadcrumb"&gt;...&lt;/nav&gt;
+//           &lt;div&gt;&lt;h1&gt;...&lt;/h1&gt;&lt;/div&gt;
+//           &lt;div&gt;&lt;button&gt;...&lt;/button&gt;&lt;/div&gt;
+//       &lt;/header&gt;
+//   &lt;/main&gt;
 
-// In a project layout that already has container-type:
-//   .main-content { @include container; }  ← sets container-type: inline-size
-//   ↑ the page-header inside fires at 880px automatically
+// Project layout establishes the container context
+.main { @include container; }  // container-type: inline-size
 
-// Consumer semantic selector
+// Custom project selector (second header, section header, etc.)
 #document-detail > header { @include page-header; }</code></pre>
 					</main>
 				</section>
