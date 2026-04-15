@@ -40,9 +40,6 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-density-toggle aria-label="Toggle compact density">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-list"></use></svg>
-					</button>
 					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
 					</button>
@@ -133,20 +130,40 @@
 		<div class="main-panel">
 			<div class="content">
 				<h1>Density</h1>
-				<p>Global spacing compression toggle. Click the density button in the top-right header to flip the entire page between comfortable and compact spacing. The toggle sets <code>data-density</code> on <code>&lt;html&gt;</code>.</p>
+				<p>Global spacing compression toggle. Add the <code>density-compact</code> class to any element — the subtree tightens. Tables show more rows, form inputs pack denser, cards shrink padding. Same components, same markup, same selectors — only the internal spacing tokens change.</p>
 
-				<section class="section-card">
-					<header><h3>Activation</h3></header>
+				<section class="density-demo-controls">
+					<header><h3>Try it</h3></header>
 					<main>
-						<p>Three activation paths — see <a href="https://github.com/livenetworks/ln-acme/blob/main/docs/css/density.md">density.md</a> for the full spec.</p>
-						<pre><code>&lt;!-- Global --&gt;
-&lt;html data-density="compact"&gt;
+						<p>Toggle the switches below to see density in action. <strong>Global</strong> affects the whole page. <strong>Scoped</strong> affects only the Form section below — notice how the surrounding table, stat card, and intro stay comfortable while the form shrinks.</p>
+						<ul>
+							<li><label><input type="checkbox" data-demo-density-global> Global compact</label></li>
+							<li><label><input type="checkbox" data-demo-density-scoped> Scoped compact (form section)</label></li>
+						</ul>
+					</main>
+				</section>
 
-&lt;!-- Scoped --&gt;
-&lt;main data-density="compact"&gt;
-
-&lt;!-- Default (no attribute) --&gt;
-&lt;html&gt;</code></pre>
+				<section class="section-card" id="density-scoped-target">
+					<header><h3>Form — input padding shrinks</h3></header>
+					<main>
+						<form>
+							<div class="form-element">
+								<label for="density-name">Document title</label>
+								<input type="text" id="density-name" name="density-name" placeholder="ISO 9001 Quality Manual">
+							</div>
+							<div class="form-element">
+								<label for="density-standard">Standard</label>
+								<select id="density-standard" name="density-standard">
+									<option>ISO 9001</option>
+									<option>ISO 14001</option>
+									<option>ISO 27001</option>
+								</select>
+							</div>
+							<div class="form-element">
+								<label for="density-notes">Notes</label>
+								<textarea id="density-notes" name="density-notes" rows="3"></textarea>
+							</div>
+						</form>
 					</main>
 				</section>
 
@@ -205,30 +222,6 @@
 				</section>
 
 				<section class="section-card">
-					<header><h3>Form — input padding shrinks</h3></header>
-					<main>
-						<form>
-							<div class="form-element">
-								<label for="density-name">Document title</label>
-								<input type="text" id="density-name" name="density-name" placeholder="ISO 9001 Quality Manual">
-							</div>
-							<div class="form-element">
-								<label for="density-standard">Standard</label>
-								<select id="density-standard" name="density-standard">
-									<option>ISO 9001</option>
-									<option>ISO 14001</option>
-									<option>ISO 27001</option>
-								</select>
-							</div>
-							<div class="form-element">
-								<label for="density-notes">Notes</label>
-								<textarea id="density-notes" name="density-notes" rows="3"></textarea>
-							</div>
-						</form>
-					</main>
-				</section>
-
-				<section class="section-card">
 					<header><h3>Stat card — outer padding shrinks</h3></header>
 					<main>
 						<article data-ln-stat-card>
@@ -239,6 +232,21 @@
 								12% from last month
 							</p>
 						</article>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>Activation</h3></header>
+					<main>
+						<p>Three activation paths — see <a href="https://github.com/livenetworks/ln-acme/blob/main/docs/css/density.md">density.md</a> for the full spec.</p>
+						<pre><code>&lt;!-- Global --&gt;
+&lt;html class="density-compact"&gt;
+
+&lt;!-- Scoped --&gt;
+&lt;main class="density-compact"&gt;
+
+&lt;!-- Default (no class) --&gt;
+&lt;html&gt;</code></pre>
 					</main>
 				</section>
 
@@ -267,7 +275,7 @@
 		(function () {
 			const root = document.documentElement;
 
-			// Theme toggle (carry-over from other demos)
+			// Theme toggle (carry-over from other demos, persisted)
 			const THEME_KEY = 'ln-demo-theme';
 			const storedTheme = localStorage.getItem(THEME_KEY);
 			if (storedTheme === 'dark' || storedTheme === 'light') {
@@ -285,23 +293,22 @@
 				});
 			}
 
-			// Density toggle — the focus of this demo
-			const DENSITY_KEY = 'ln-demo-density';
-			const storedDensity = localStorage.getItem(DENSITY_KEY);
-			if (storedDensity === 'compact') {
-				root.setAttribute('data-density', 'compact');
+			// Density — demo checkboxes (ephemeral, no localStorage)
+			const DENSITY_CLASS = 'density-compact';
+
+			const globalCheckbox = document.querySelector('[data-demo-density-global]');
+			const scopedCheckbox = document.querySelector('[data-demo-density-scoped]');
+			const scopedTarget = document.getElementById('density-scoped-target');
+
+			if (globalCheckbox) {
+				globalCheckbox.addEventListener('change', () => {
+					root.classList.toggle(DENSITY_CLASS, globalCheckbox.checked);
+				});
 			}
-			const densityToggle = document.querySelector('[data-demo-density-toggle]');
-			if (densityToggle) {
-				densityToggle.addEventListener('click', () => {
-					const isCompact = root.getAttribute('data-density') === 'compact';
-					if (isCompact) {
-						root.removeAttribute('data-density');
-						localStorage.removeItem(DENSITY_KEY);
-					} else {
-						root.setAttribute('data-density', 'compact');
-						localStorage.setItem(DENSITY_KEY, 'compact');
-					}
+
+			if (scopedCheckbox && scopedTarget) {
+				scopedCheckbox.addEventListener('change', () => {
+					scopedTarget.classList.toggle(DENSITY_CLASS, scopedCheckbox.checked);
 				});
 			}
 		})();

@@ -13,7 +13,8 @@
 
 @mixin form-label {
 	@include block;
-	@include text-sm;
+	font-size: var(--text-label-md);
+	line-height: var(--lh-label-md);
 	@include font-medium;
 	@include text-primary;
 	@include mb(0.25rem);
@@ -56,9 +57,10 @@
 
 @mixin form-input {
 	@include w-full;
-	@include px(var(--density-pad-md));
-	@include py(var(--density-pad-sm));
-	@include text-base;
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-sm));
+	font-size: var(--text-body-md);
+	line-height: var(--lh-body-md);
 	@include text-primary;
 	@include bg-primary;
 	@include border;

@@ -39,7 +39,8 @@
 		@include items-center;
 		@include gap(0.75rem);
 		@include py(0.625rem);
-		@include text-sm;
+		font-size: var(--text-body-sm);
+		line-height: var(--lh-body-sm);
 		@include text-secondary;
 		text-decoration: none;
 	}

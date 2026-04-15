@@ -26,10 +26,11 @@
 
 	th {
 		@include text-left;
-		@include px(var(--density-pad-md));
-		@include py(var(--density-pad-sm));
+		@include px(var(--spacing-md));
+		@include py(var(--spacing-sm));
 		@include font-semibold;
-		@include text-sm;
+		font-size: var(--text-label-sm);
+		line-height: var(--lh-label-sm);
 		letter-spacing: 0.4px;
 		@include uppercase;
 		color: hsl(var(--color-table-header-text));
@@ -45,11 +46,11 @@
 	}
 
 	td {
-		@include px(var(--density-pad-md));
-		@include py(var(--density-pad-sm));
+		@include px(var(--spacing-md));
+		@include py(var(--spacing-sm));
 		@include border-b;
-		font-size: var(--density-font-body);
-		line-height: var(--density-lh-body);
+		font-size: var(--text-body-md);
+		line-height: var(--lh-body-md);
 		vertical-align: top;
 	}
 

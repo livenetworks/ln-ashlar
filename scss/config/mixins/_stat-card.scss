@@ -4,15 +4,17 @@
 @use 'colors' as *;
 @use 'borders' as *;
 @use 'shadows' as *;
+@use 'transitions' as *;
 
 @mixin stat-card {
 	@include flex-col;
 	@include gap(0.25rem);
-	@include p(var(--density-pad-lg));
+	@include p(var(--spacing-lg));
 	background: hsl(var(--color-bg-primary));
 	@include rounded-lg;
 	@include shadow-sm;
 	border: 1px solid hsl(var(--color-border));
+	@include transition;
 
 	> [data-ln-stat-label] {
 		@include typography(label-md);

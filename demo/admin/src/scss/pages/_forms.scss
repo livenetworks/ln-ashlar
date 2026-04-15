@@ -1,10 +1,5 @@
 @use '../../../../../scss/config/mixins' as *;
 
-// Forms page sections need more breathing room for code examples
-.content > .section-card > main {
-	@include p(1.5rem);
-}
-
 #demo-form-grid {
 	@include form-grid;
 

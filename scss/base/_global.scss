@@ -13,7 +13,8 @@ body {
 }
 
 body {
-	@include text-base;
+	font-size: var(--text-body-md);
+	line-height: var(--lh-body-md);
 	@include text-primary;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

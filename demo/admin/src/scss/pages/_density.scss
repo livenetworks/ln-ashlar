@@ -1,0 +1,37 @@
+@use '../../../../../scss/config/mixins' as *;
+
+// ─── Density demo — controls section ─────────────────────────
+// The Try-it block is NOT a section-card on purpose: it must stay
+// visually stable while every other section around it shifts when
+// density toggles. Fixed rems, no density tokens inside.
+
+.density-demo-controls {
+	@include mb(var(--spacing-lg));
+	@include p(1.5rem);
+	@include border;
+	@include rounded-md;
+	background: hsl(var(--color-bg-secondary));
+
+	> header {
+		@include mb(1rem);
+
+		h3 {
+			@include mb(0);
+			@include text-lg;
+			@include font-semibold;
+		}
+	}
+
+	> main > p {
+		@include mb(1rem);
+	}
+
+	// Pill-group of two checkbox toggles
+	> main > ul {
+		@include pill-group;
+
+		li label {
+			@include pill;
+		}
+	}
+}

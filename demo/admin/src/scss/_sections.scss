@@ -1,24 +1,8 @@
 @use '../../../../scss/config/mixins' as *;
 
-.section {
-	@include section;
-}
-
-.section-card {
-	@include section-card;
-}
-
-// Auto-flush — when main contains a table, remove padding and table chrome
-.section-card main:has(> table),
-.section-card main:has(> .table-container) {
-	@include p(0);
-}
-
-.section-card main > table,
-.section-card main > .table-container table {
-	border-radius: 0;
-	box-shadow: none;
-}
+// `.section` and `.section-card` bindings + table auto-flush are applied
+// by the library in scss/components/_sections.scss and _cards.scss — do
+// NOT re-apply them here or every rule ships twice in the compiled bundle.
 
 .section-empty {
 	@include text-center;

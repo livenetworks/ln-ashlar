@@ -30,13 +30,15 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include px(var(--density-pad-md));
-	@include py(var(--density-pad-sm));
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-sm));
 	@include border-b;
 	@include bg-secondary;
+	@include transition;
 
 	h3 {
-		@include text-base;
+		font-size: var(--text-title-sm);
+		line-height: var(--lh-title-sm);
 		@include font-semibold;
 		@include text-primary;
 		margin: 0;
@@ -135,6 +137,7 @@
 	@include border;
 	@include rounded-md;
 	@include overflow-hidden;
+	@include transition;
 	box-shadow: var(--shadow-xs);
 	@include mb(1rem);
 
@@ -146,7 +149,7 @@
 	}
 
 	> main {
-		@include p(var(--density-pad-md));
+		@include p(var(--spacing-lg));
 
 		// Auto-flush: table or .table-container as direct child —
 		// remove padding, strip table's own radius/shadow (card's
@@ -164,11 +167,11 @@
 	}
 
 	> footer {
-		@include px(var(--density-pad-md));
-		@include py(var(--density-pad-sm));
+		@include px(var(--spacing-md));
+		@include py(var(--spacing-sm));
 		@include border-t;
 		@include flex;
 		@include justify-end;
-		@include gap(var(--density-gap-md));
+		@include gap(var(--spacing-sm));
 	}
 }

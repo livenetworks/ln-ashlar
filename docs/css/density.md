@@ -1,18 +1,21 @@
 # Density
 
-File: `scss/config/_density.scss`. Added in v1.2.
+File: `scss/config/_density.scss`. Added in v1.2, refactored in v1.3.
 
 ## Philosophy
 
-ln-acme v1.2 supports a global density toggle for data-dense UIs.
+ln-acme supports a global density toggle for data-dense UIs.
 Compliance dashboards, audit log tables, settings pages with many
-fields — these benefit from showing more rows on screen. Marketing
+fields — these benefit from showing more content on screen. Marketing
 pages, modals, and onboarding screens do not.
 
-Density is implemented as a **CSS variable override**, not a
-component override. A single attribute (`data-density="compact"`)
-re-tunes the `--density-*` token scale, and every component
-referencing those tokens shrinks automatically.
+Density is implemented as a **cascade-driven base-token override**,
+not a parallel token scale, not a component override. The
+`.density-compact` class re-tunes the base `--spacing-*`, `--text-*`,
+and `--lh-*` tokens on the element where the class is applied, and
+every descendant that reads those tokens shrinks automatically.
+Same mechanism as theme color overrides (`--color-primary`) — one
+class, the cascade does the rest.
 
 ## Activation
 
@@ -21,16 +24,17 @@ Three activation paths:
 ### 1. Global
 
 ```html
-<html data-density="compact">
+<html class="density-compact">
 ```
 
-The whole document switches to compact spacing. Persist user choice
-client-side (`localStorage`, cookie); the library does not persist.
+The whole document switches to compact spacing. Persist the user's
+choice client-side (`localStorage`, cookie); the library does not
+persist.
 
 ### 2. Scoped
 
 ```html
-<main data-density="compact">
+<main class="density-compact">
 	<!-- only this region is compact -->
 </main>
 ```
@@ -41,138 +45,143 @@ comfortable page" layouts.
 
 ### 3. Default (comfortable)
 
-No attribute = comfortable mode. There is no `data-density="comfortable"`
-form — comfortable IS the default `:root` state. (You may write the
-attribute explicitly to UN-set a parent `compact`, e.g. embedding a
-comfortable preview inside a compact page; the override re-defines
-the tokens back to their defaults.)
+No class = comfortable mode. There is no `.density-comfortable`
+form — comfortable IS the default `:root` state (values live in
+`_tokens.scss`).
 
-## Token reference
+## What tokens the compact class overrides
 
-All tokens defined in `scss/config/_density.scss`.
+| Token group | Overridden | Effect |
+|---|---|---|
+| `--spacing-xs/sm/md/lg` | yes | Form input padding, table cell padding, card body padding, panel header padding, alert/banner/tabs chrome, grid gaps |
+| `--text-body-md`, `--lh-body-md` | yes | Body paragraphs, table cells, form inputs, nav link text |
+| `--text-body-sm`, `--lh-body-sm` | yes | Small body text, breadcrumbs, nav links |
+| `--text-label-md`, `--lh-label-md` | yes | Form labels, h6 |
+| `--text-label-sm`, `--lh-label-sm` | yes | Table column headers (`th`) |
+| `--text-title-md/sm`, `--lh-title-md/sm` | yes | h4, h5, panel header h3 |
+| `--text-heading-sm/md/lg`, `--lh-heading-*` | yes | h3, h2, stat-card value |
+| `--text-display-sm`, `--lh-display-sm` | yes | h1, page-header title |
+| `--density-row-h`, `--density-row-h-sm` | yes | Table row min-height |
 
-### Padding scale
-
-| Token | Comfortable | Compact | Used by |
-|---|---|---|---|
-| `--density-pad-xs` | `0.25rem` | `0.125rem` | reserved — not currently consumed |
-| `--density-pad-sm` | `0.5rem` | `0.375rem` | input `py`, table cell `py`, panel header `py`, section-card footer `py` |
-| `--density-pad-md` | `1rem` | `0.625rem` | input `px`, table cell `px`, panel header `px`, card body `p`, section-card footer `px` |
-| `--density-pad-lg` | `1.5rem` | `1rem` | stat-card `p` |
-
-### Gap scale
-
-| Token | Comfortable | Compact | Used by |
-|---|---|---|---|
-| `--density-gap-sm` | `0.5rem` | `0.375rem` | reserved |
-| `--density-gap-md` | `0.75rem` | `0.5rem` | section-card footer button gap |
-| `--density-gap-lg` | `1rem` | `0.75rem` | reserved |
-
-### Row height
-
-| Token | Comfortable | Compact | Used by |
-|---|---|---|---|
-| `--density-row-h` | `2.75rem` | `2.25rem` | table `tbody tr` min-height (floor for sparse rows) |
-| `--density-row-h-sm` | `2.25rem` | `1.875rem` | reserved |
-
-### Body typography
-
-| Token | Comfortable | Compact | Used by |
-|---|---|---|---|
-| `--density-font-body` | `var(--text-body-md)` (1rem) | `var(--text-body-sm)` (0.875rem) | table `td` font-size |
-| `--density-lh-body` | `var(--lh-body-md)` (1.6) | `var(--lh-body-sm)` (1.5) | table `td` line-height |
+`--density-row-h` is the only token that stays density-named. It has
+no analogue in the base token scale (there is no `--row-height` in
+`_tokens.scss`) and is only consumed by table row `min-height`.
 
 ## What reacts to density
 
-| Component | Reacts? | What changes |
-|---|---|---|
-| Tables | YES | header cell padding, body cell padding, body cell font + line-height, row min-height |
-| Forms (inputs) | YES | input/textarea/select horizontal and vertical padding |
-| Cards (`section-card`) | YES | body padding, footer padding, footer button gap |
-| Panel header (cards, dialogs) | YES | header padding |
-| Stat card | YES | outer padding |
+Short answer: everything that reads a base spacing or typography token.
+Long answer — tested surfaces:
 
-## What does NOT react to density and why
+- Tables — header padding, body padding, body font + line-height, row min-height
+- Forms — input/textarea/select padding, input font, label font
+- Cards — body padding, footer padding, footer button gap, panel header padding + title font, card `section-card` outer
+- Stat card — outer padding, value font, label font, trend font (all via heading-lg / label-md / body-sm tokens)
+- Nav — link font
+- Breadcrumbs — link font
+- Alerts, banners, tabs — padding and gaps (via `--spacing-*`)
+- Body paragraphs — `<p>` text
+- All headings `h1`–`h6` — via `typography(...)` role mixin
 
-| Component | Why not |
+## What does NOT react and why
+
+Exempt surfaces — hardcoded rem or raw typography scale, intentionally.
+
+| Component | Reason |
 |---|---|
-| Buttons | Hit-target accessibility — WCAG 2.5.5 recommends ≥44px. Shrinking buttons by density violates this floor. |
-| Form labels | Structural — labels NAME fields and must stay legible at any density. |
-| Form actions row (`.form-actions`) | Contains buttons; cramping the gap doesn't save space if buttons themselves are full size. |
-| Form grid gap | Layout — adjacent fields' focus rings must not overlap. |
-| Pills, checkboxes, radios | Interactive controls; same a11y reasoning as buttons. |
-| Modals | A modal is a focused interruption with its own scale. Shrinking modal padding makes it feel cramped without showing more data on screen. |
-| Toast | Ephemeral, fixed visual size. Not a data display surface. |
-| Page header | Fixed visual hierarchy at the top of the page. Reducing it does not improve information density of the content area. |
-| Sidebar nav | Density semantics for nav are ambiguous (does compact nav mean smaller fonts, tighter rows, no labels?). Deferred until a consumer asks. |
-| Card accents (`card-accent-top` etc.) | Decorative pixel borders, not content padding. |
-| Section margin (`section { mb: 2rem }`) | Page rhythm primitive, not within-card density. |
-| Stat card label / value / trend typography | The big number IS the stat card's identity; shrinking it defeats the component's purpose. |
-| Table headers (`th` font) | Column labels are structural — must stay scannable. Header padding shrinks; header font does not. |
-| Mobile-stacked table (`table-responsive`) | Already adapted by container query for small viewports; layering density would create test-matrix explosion. |
+| Buttons (`<button>`, `@include btn`, btn-sm, btn-lg) | WCAG 2.5.5 hit-target floor (~44px). Shrinking buttons violates the floor. Padding and font stay raw-scale values. |
+| Pill radio/checkbox | Interactive controls, same WCAG reasoning as buttons. |
+| Close buttons (`close-button` mixin) | Fixed 2rem tap target. |
+| Modal outer (`modal-sm/md/lg/xl`) | Only `max-width` declared in mixin — modal content inherits density via the cascade for its own `main` padding. |
+| Toasts | Ephemeral notification overlay. Fixed visual scale. |
+| Page-header outer chrome (pb, mb, gap) | Structural rhythm. Inner h1 DOES react via the display-sm token override. |
+| Sidebar outer chrome (width, header padding, footer padding in `_shell.scss`) | Layout primitives. Inner nav link text DOES react. |
+| Card accents, card `mb`, section `mb` | Decorative / page rhythm primitives. |
+| Small, code, pre | Chrome typography — already at "compact" size (`text-sm` raw = 0.875rem). Shrinking further would hurt legibility. |
+| Avatar text sizes | Fixed avatar sizing; text tracks the avatar pixel size, not content density. |
+| Nav section dividers (`text-xs` raw) | Already tiny; shrinking breaks legibility. |
+
+Key shift from v1.2 docs: stat-card value (`heading-lg`) now DOES react,
+but gently. The decision was reversed because the user wants coherent
+compression across the whole UI. The compact value for `--text-heading-lg`
+is intentionally tuned to a modest 1.75rem (28px) — only 0.125rem below
+the comfortable 1.875rem — so the stat-card value stays unambiguously
+"the big number": 2x body text, 0.5rem clear of `heading-md`, and just
+below `display-sm` (the page h1). Hierarchy is preserved; only scale is
+reduced. If a consumer wants the stat value to stay at comfortable size
+even in compact mode, they can override `--text-heading-lg` back on the
+stat-card selector.
 
 ## Use cases
 
 - **Audit log table** — hundreds of rows; user wants to see as many
   as possible. Activate compact globally.
 - **Settings page with many fields** — flip compact for power users
-  who navigate by keyboard and prefer to see all fields without
-  scrolling.
+  who prefer to see all fields without scrolling.
 - **Embedded data table inside a comfortable dashboard** — scope
-  compact to the table only.
-- **User preference toggle** — surface a setting "Compact density"
+  compact to the table container only.
+- **User preference toggle** — surface a "Compact density" setting
   in the user's profile; persist with `localStorage`.
 
 ## Anti-patterns
 
-- **Auto-switching density by viewport.** Density is an explicit
-  user choice. Viewport breakpoints handle layout (sidebar shows/hides),
-  density handles information density inside that layout. Mixing the
-  two creates surprise: the user resizes a window and content
-  unexpectedly shrinks.
-- **Per-component density selectors.** Do NOT write
-  `[data-density="compact"] [data-ln-card] { padding: ... }`.
-  That explodes specificity and duplicates rules. Use the
-  `--density-*` tokens — components reference them, the override
-  flows through the cascade.
-- **Shrinking buttons or interactive controls.** WCAG hit target
-  size is non-negotiable. Density shrinks chrome and content, never
-  controls.
-- **Shrinking body content text in non-table components.** Tables are
-  the one exception (column scanability); everywhere else, content
-  text stays at its declared size.
-- **Defining new `--density-*` tokens per component.** The token
-  surface is intentionally small (4 padding steps + 3 gap steps + 2
-  row heights + body font/lh). New components opt in by referencing
-  existing tokens, not by adding new ones.
+- **Auto-switching density by viewport.** Density is an explicit user
+  choice. Viewport breakpoints handle layout (sidebar shows/hides),
+  density handles information density inside that layout. Mixing
+  the two creates surprise.
+- **Per-component compact selectors.** Do NOT write
+  `.density-compact table td { padding: ... }`. That explodes
+  specificity and duplicates rules. Use the token-override route
+  (this file's `.density-compact` block) or — if a new component
+  doesn't react — switch its hardcoded padding to `var(--spacing-*)`.
+- **Shrinking buttons or interactive controls.** WCAG hit target is
+  non-negotiable. Density shrinks chrome and content, never controls.
+- **Introducing new `--density-*` tokens.** The refactor DELETED the
+  parallel scale. New components react by consuming the existing
+  base tokens (`--spacing-*`, `--text-body-md`, role typography
+  tokens). If a component cannot be made to react with the base
+  tokens alone, that is a signal the component is chrome, not content.
 
 ## Dark mode interaction
 
-Density and dark mode are orthogonal axes. Density only touches
-`--density-*` tokens; dark mode (`scss/config/_theme.scss`) only
-touches `--color-*` tokens. They cannot collide, and they compose:
+Density and dark mode are orthogonal. Density only touches `--spacing-*`
+and typography tokens; dark mode (`_theme.scss`) only touches `--color-*`.
+They cannot collide:
 
 ```html
-<html data-theme="dark" data-density="compact">
+<html data-theme="dark" class="density-compact">
 ```
-
-A compact, dark-mode UI works exactly as expected — every component
-is both dark and dense.
 
 ## Container query interaction
 
-Density only changes a component's INTERNAL spacing. It does NOT
-change a component's outer dimensions. A filter-toolbar with a
-container query at 880px still flips at 880px in both comfortable
-and compact modes — the density change does not push the toolbar
-across its breakpoint.
+Density only changes internal spacing, never outer dimensions. A
+filter-toolbar with a container query at 880px still flips at 880px
+in both comfortable and compact modes.
 
 ## Adding a new component to density
 
-1. Identify spacing rules in the component's mixin file.
-2. Decide for each: structural (border, label, control hit target,
-   layout rhythm) or content (cell padding, card body, panel header)?
-3. Replace content rules with `var(--density-pad-*)` /
-   `var(--density-gap-*)`.
-4. Leave structural rules literal.
-5. Document the component in this file's "What reacts" table.
+1. Use `var(--spacing-*)` for padding and gap instead of hardcoded rem.
+2. Use `font-size: var(--text-body-md); line-height: var(--lh-body-md);`
+   (or the matching role token) instead of raw `@include text-base`
+   when the element is content text.
+3. Leave structural chrome hardcoded.
+
+That's it. No new tokens, no per-component density rules. The cascade
+does the work.
+
+## Migration from v1.2
+
+Earlier v1.2 builds had a parallel `--density-pad-*`, `--density-gap-*`,
+`--density-font-body` token scale. Those tokens are DELETED in v1.3.
+Consumer code that referenced them directly (rare — they were documented
+as private implementation detail) must switch:
+
+- `var(--density-pad-md)` → `var(--spacing-md)`
+- `var(--density-pad-sm)` → `var(--spacing-sm)`
+- `var(--density-pad-lg)` → `var(--spacing-lg)`
+- `var(--density-pad-xs)` → `var(--spacing-xs)`
+- `var(--density-gap-md)` → `var(--spacing-sm)` (nearest equivalent)
+- `var(--density-font-body)` → `var(--text-body-md)`
+- `var(--density-lh-body)` → `var(--lh-body-md)`
+- `var(--density-row-h)` → unchanged (still exists)
+
+The `.density-compact` class selector itself is unchanged.

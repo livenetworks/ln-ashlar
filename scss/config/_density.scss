@@ -1,90 +1,107 @@
 // ==========================================================================
 // Density — ln-acme v1.2
 // ==========================================================================
-// Global spacing compression toggle. Flip one attribute, the entire
-// UI tightens. Tables show more rows, forms pack denser, cards shrink
-// padding. Same components, same markup, same selectors — only the
-// internal spacing tokens change.
+// Global spacing compression toggle. Flip one class, the entire UI
+// tightens. Tables show more rows, forms pack denser, cards shrink
+// padding, headings scale down. Same components, same markup, same
+// selectors — the `.density-compact` class re-tunes base design tokens
+// (spacing, typography) and every consumer reacts via the cascade.
+//
+// This file contains NO parallel `--density-*` token scale. Density
+// is an override of base tokens at a region root, exactly like theme
+// colors. Read `docs/css/density.md` for the full spec and rationale.
 //
 // Activation:
-//   <html data-density="compact">         ← global
-//   <main data-density="compact">         ← scoped to a region
+//   <html class="density-compact">       ← global
+//   <main class="density-compact">       ← scoped to a region
 //
 // Density is an explicit user choice (consumer's settings toggle).
 // It is NEVER auto-switched by viewport — viewport breakpoints handle
 // layout, density handles information density inside that layout.
 //
-// What reacts: tables, forms, cards, stat-card.
-// What does NOT react: buttons (a11y hit target), modal, toast,
-// page header, sidebar nav.
+// What reacts: everything that reads `--spacing-*`, `--text-body-*`,
+// `--text-label-*`, `--text-title-*`, `--text-heading-*`,
+// `--text-display-sm`, or `--density-row-h`. That is the majority of
+// the library (tables, forms, cards, stat-card, nav, breadcrumbs,
+// alerts, banners, tabs, prose, headings, page content).
 //
-// See docs/css/density.md for the full spec.
+// What does NOT react: buttons and pill-controls — their padding and
+// font are hardcoded rem/raw-scale values in `_btn.scss`, `_form.scss`
+// (pill), `_global.scss` (native <button>), and `_btn.scss`
+// (close-button). This is deliberate — WCAG 2.5.5 hit-target size
+// floor (~44px) must not be shrunk by a visual density toggle.
 // ==========================================================================
 
 :root {
 
 	// -----------------------------------------------------------------------
-	// Density — Padding scale
-	// Mirrors --spacing-* but routed through density tokens so the
-	// compact override below can shrink each step independently.
-	// -----------------------------------------------------------------------
-	--density-pad-xs:  0.25rem;   //  4px — tight inline padding (badges)
-	--density-pad-sm:  0.5rem;    //  8px — table cells, form field py
-	--density-pad-md:  1rem;      // 16px — cards, panel headers, form field px
-	--density-pad-lg:  1.5rem;    // 24px — stat card, large panel padding
-
-	// -----------------------------------------------------------------------
-	// Density — Gap scale
-	// For grid/flex gaps inside dense components.
-	// -----------------------------------------------------------------------
-	--density-gap-sm:  0.5rem;
-	--density-gap-md:  0.75rem;
-	--density-gap-lg:  1rem;
-
-	// -----------------------------------------------------------------------
 	// Density — Row height
-	// Minimum row height for table rows and form inputs. Padding alone
-	// determines visual height in comfortable mode; compact uses this
-	// as a min-height floor so rows stay scannable when content is short.
+	// Minimum row height for table rows. Padding alone determines visual
+	// height in comfortable mode; compact uses this as a min-height floor
+	// so rows stay scannable when content is short. Kept density-named
+	// because it has no analogue in the base token scale.
 	// -----------------------------------------------------------------------
 	--density-row-h:    2.75rem;  // 44px — comfortable input/row min
 	--density-row-h-sm: 2.25rem;  // 36px — compact-equivalent min for sub-elements
-
-	// -----------------------------------------------------------------------
-	// Density — Body typography
-	// Controls only CONTENT text (table cell text, card body text,
-	// stat trend line). Headings, labels, table headers, and section
-	// titles do NOT shrink — they are structural and need to remain
-	// scannable at any density.
-	// -----------------------------------------------------------------------
-	--density-font-body: var(--text-body-md);
-	--density-lh-body:   var(--lh-body-md);
 }
 
 // ---------------------------------------------------------------------------
 // Compact override
-// Activated by [data-density="compact"]. Re-tunes every density token
-// to its tighter value. The cascade does the rest — every component
-// referencing these tokens shrinks automatically.
+// Activated by the `.density-compact` class. Re-tunes base spacing and
+// typography tokens to tighter values. The cascade does the rest — every
+// component referencing these tokens shrinks automatically.
 //
 // Anti-pattern this avoids: writing
-//   [data-density="compact"] [data-ln-card] { padding: ...; }
+//   .density-compact table td { padding: ...; }
 // for every component. That explodes specificity and duplicates
-// rules. The token route keeps the override surface to one place.
+// rules. The token-override route keeps the compact surface to one
+// place — this block.
 // ---------------------------------------------------------------------------
-[data-density="compact"] {
-	--density-pad-xs:  0.125rem;
-	--density-pad-sm:  0.375rem;
-	--density-pad-md:  0.625rem;
-	--density-pad-lg:  1rem;
+.density-compact {
 
-	--density-gap-sm:  0.375rem;
-	--density-gap-md:  0.5rem;
-	--density-gap-lg:  0.75rem;
+	// -- Spacing — structural compression ---------------------------------
+	--spacing-xs: 0.125rem;
+	--spacing-sm: 0.375rem;
+	--spacing-md: 0.625rem;
+	--spacing-lg: 1rem;
 
+	// -- Body text --------------------------------------------------------
+	--text-body-md: 0.875rem;
+	--lh-body-md:   1.5;
+
+	--text-body-sm: 0.8125rem;
+	--lh-body-sm:   1.45;
+
+	// -- Labels -----------------------------------------------------------
+	--text-label-md: 0.8125rem;
+	--lh-label-md:   1.4;
+
+	--text-label-sm: 0.6875rem;
+	--lh-label-sm:   1.4;
+
+	// -- Titles -----------------------------------------------------------
+	--text-title-md: 1rem;
+	--lh-title-md:   1.3;
+
+	--text-title-sm: 0.875rem;
+	--lh-title-sm:   1.3;
+
+	// -- Headings — user opted in; see docs/css/density.md §stat-card ----
+	// heading-lg is the stat-card value. Intentionally a GENTLE reduction
+	// (1.875rem → 1.75rem, only 0.125rem) so the "big number" stays
+	// visually dominant — 2x body text, 0.5rem above heading-md.
+	// See plan D1 for the hierarchy math and rejected alternatives.
+	--text-heading-sm: 1.125rem;  --lh-heading-sm: 1.25;
+	--text-heading-md: 1.25rem;   --lh-heading-md: 1.2;
+	--text-heading-lg: 1.75rem;   --lh-heading-lg: 1.15;
+
+	// -- Display ---------------------------------------------------------
+	// Only display-sm shrinks — that's what page h1 uses. lg/md kept
+	// at their comfortable values because they're marketing-page scale
+	// that shouldn't appear in dense data contexts anyway.
+	--text-display-sm: 1.875rem;  --lh-display-sm: 1.1;
+
+	// -- Row height — density-specific (no base-token analogue) ---------
 	--density-row-h:    2.25rem;
 	--density-row-h-sm: 1.875rem;
-
-	--density-font-body: var(--text-body-sm);
-	--density-lh-body:   var(--lh-body-sm);
 }

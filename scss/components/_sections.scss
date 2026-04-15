@@ -1,5 +1,12 @@
 @use '../config/mixins' as *;
 
-section {
+// Opt-in only — applying to bare `section` is too greedy.
+// `<section>` is a generic semantic container used all over the place
+// (nested groupings inside cards, split layouts, etc.). Binding to the
+// bare element made every `.section-card` also inherit page-section
+// chrome (header margin, bottom border), causing doubled borders and
+// unwanted gaps. Projects that want page-section styling apply the
+// mixin to their own selector.
+.section {
 	@include section;
 }

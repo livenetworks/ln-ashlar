@@ -45,7 +45,8 @@
 			@include flex;
 			@include items-center;
 			@include gap(0.5rem);
-			@include text-sm;
+			font-size: var(--text-body-sm);
+			line-height: var(--lh-body-sm);
 			margin: 0;
 
 			+ li::before {
