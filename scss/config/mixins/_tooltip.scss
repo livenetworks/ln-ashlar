@@ -28,6 +28,13 @@
 		}
 	}
 
+	// Fallback: when data-ln-tooltip has no value, pull text from `title`.
+	// Enables the semantic `<abbr data-ln-tooltip title="full form">short</abbr>`
+	// pattern. Same specificity as the base rule — wins by source order.
+	&[data-ln-tooltip=""]::after {
+		content: attr(title);
+	}
+
 	&:hover::after,
 	&:focus-visible::after {
 		opacity: 1;

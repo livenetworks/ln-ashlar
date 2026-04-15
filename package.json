@@ -1,6 +1,6 @@
 {
 	"name": "ln-acme",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "LiveNetworks unified frontend library — CSS framework and vanilla JS components",
 	"type": "module",
 	"main": "dist/ln-acme.js",
