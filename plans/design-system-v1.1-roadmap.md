@@ -165,7 +165,6 @@ claude-skills UI component specs):
 |---|---|---|
 | Tooltip (CSS baseline) | — | Any form with helper text, any icon-only button |
 | Popover | — | Filter dropdowns, info panels |
-| Skeleton loader | `loading-state.md` | Data tables, async lists |
 | Empty state pattern | `empty-state.md` | Every list view |
 | Page header pattern | — | Every detail page |
 | Timeline / activity feed | — | Audit log, version history (DocuFlow direct need) |
@@ -575,16 +574,14 @@ the two-layer architecture (`scss/config/mixins/_{name}.scss` mixin +
 1. `kbd` — trivial; `<kbd>` styling. 20 lines.
 2. `chip` — inline label + optional close button. Different from `pill`
    (pill is a radio/checkbox label).
-3. `skeleton` — animated gradient loader block.
-   Pulls `loading-state.md` from claude-skills.
-4. `empty-state` — icon + title + description + action slot, centered.
+3. `empty-state` — icon + title + description + action slot, centered.
    Pulls `empty-state.md` from claude-skills.
-5. `tooltip` (CSS baseline) — `::before` / `::after` pseudo-elements
+4. `tooltip` (CSS baseline) — `::before` / `::after` pseudo-elements
    positioned off `data-tooltip` attribute. No JS required for baseline.
-6. `stat-card` — value + label + trend slot. Pulls `kpi-card.md`.
-7. `page-header` — title + breadcrumbs slot + actions slot.
-8. `toggle-switch` — `input[type="checkbox"]` with switch visual.
-9. `prose` — `@include prose` for rich text: h1-h6, p, ul/ol, blockquote,
+5. `stat-card` — value + label + trend slot. Pulls `kpi-card.md`.
+6. `page-header` — title + breadcrumbs slot + actions slot.
+7. `toggle-switch` — `input[type="checkbox"]` with switch visual.
+8. `prose` — `@include prose` for rich text: h1-h6, p, ul/ol, blockquote,
    code (inline + block), pre, table, img, figure. Used for TipTap
    output in DocuFlow.
 10. `timeline` — vertical or horizontal sequence of events. Pure CSS

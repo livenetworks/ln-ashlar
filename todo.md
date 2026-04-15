@@ -41,7 +41,7 @@ order — see roadmap § Execution Order.
 
 - [x] **Phase 3** — Typography re-hierarchy (role tokens, `typography($role)` mixin) — `plans/v1.1-phase-3-typography.md`
 - [x] **Phase 6** — Full dark mode (`[data-theme]` + `prefers-color-scheme`) — `plans/v1.1-phase-6-dark-mode.md`
-- [x] **Phase 7a** — Empty-state component (skeleton deferred — SSR renders with data) — `plans/v1.1-phase-7a-loading-components.md`
+- [x] **Phase 7a** — Empty-state component — SSR always renders with data, no loading placeholder needed
 - [x] **Phase 7b** — Navigation components (page-header, stepper, timeline) — `plans/v1.1-phase-7b-navigation-components.md`
 - [x] **Phase 7c** — Content components (stat-card, prose, kbd) — `plans/v1.1-phase-7c-content-components.md`
 - [x] **Phase 7d** — Interaction components (tooltip CSS, toggle-switch, chip, filter-toolbar) — `plans/v1.1-phase-7d-interaction-components.md`
@@ -53,7 +53,6 @@ order — see roadmap § Execution Order.
 
 ### Deferred
 
-- [ ] **Skeleton** — loader placeholder mixins + `[data-ln-skeleton]` component (deferred from Phase 7a — not needed for SSR consumers, revive when first SPA consumer lands) — spec in `plans/v1.1-phase-7a-loading-components.md` Steps 2-3
 - [ ] **ln-copy** — clipboard helper (deferred from Phase 8, no concrete consumer yet)
 - [ ] **ln-shortcuts** — keyboard shortcut registry (deferred from Phase 8, no concrete consumer yet)
 - [ ] **Phase 10** — Infrastructure (auto-token-docs, Playwright VR, CHANGELOG, migration guide) — `plans/v1.1-phase-10-infrastructure.md`
