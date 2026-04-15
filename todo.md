@@ -14,7 +14,7 @@
 Decision: all API timestamps are Unix epoch (seconds), formatted client-side per user timezone.
 
 - [x] **ln-time component** — ln-acme JS component for `<time>` elements
-- [ ] **Laravel side** — API resources return Unix timestamps (`$model->updated_at->timestamp`)
+- [x] **Laravel side** — API resources return Unix timestamps (`$model->updated_at->timestamp`) — DocuFlow AI chat API flipped, frontend parser updated in matched pair
 - [x] **data-layer.md** — all ISO timestamps converted to Unix epoch across specs
 - [x] **COMPONENTS.md** — "Zero Display Text in JS" rule added
 
