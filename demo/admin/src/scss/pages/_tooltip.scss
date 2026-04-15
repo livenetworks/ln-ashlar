@@ -1,19 +1,30 @@
 @use '../../../../../scss/config/mixins' as *;
 
 // ─────────────────────────────────────────────────────────────────
-// Tooltip position demo
+// Tooltip demo
 //
 // The CSS baseline tooltip uses `::after` on the trigger, positioned
 // with absolute coordinates. It cannot escape an ancestor that has
 // `overflow: hidden` — which `.section-card` sets on purpose for
-// rounded-corner clipping of tables. For this demo only, override
-// the card so the four position tooltips render without clipping.
+// rounded-corner clipping of tables. For sections that rely on the
+// CSS baseline rendering outside the card, override the card so
+// the tooltip is visible without clipping.
 // ─────────────────────────────────────────────────────────────────
 
-.section-card:has(> main > [data-demo-tooltip-grid]) {
+.section-card:has(> main > [data-demo-tooltip-grid]),
+.section-card:has(> main > [data-demo-tooltip-toolbar]),
+.section-card:has(> main > [data-demo-tooltip-flip-row]) {
 	overflow: visible;
 }
 
+// Icon toolbar — a row of icon buttons with tooltips
+[data-demo-tooltip-toolbar] {
+	@include flex;
+	@include items-center;
+	@include gap(0.5rem);
+}
+
+// Four-position compass grid — CSS baseline positions showcase
 [data-demo-tooltip-grid] {
 	display: grid;
 	grid-template-columns: 10rem 10rem 10rem;
@@ -28,4 +39,15 @@
 	> button:nth-child(2) { grid-area: 3 / 2; } // Bottom
 	> button:nth-child(3) { grid-area: 2 / 1; } // Left
 	> button:nth-child(4) { grid-area: 2 / 3; } // Right
+}
+
+// Edge auto-flip row — last button pushed to the far right so its
+// right-side tooltip has no room and flips to the left.
+[data-demo-tooltip-flip-row] {
+	@include flex;
+	@include gap(0.5rem);
+
+	> button:last-child {
+		margin-left: auto;
+	}
 }

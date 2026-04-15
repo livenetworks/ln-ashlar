@@ -115,7 +115,6 @@
 						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
-						<li><a href="ln-tooltip.html"><span class="nav-label">Tooltip (JS)</span></a></li>
 						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
 						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
 					</ul>
@@ -131,30 +130,34 @@
 		<div class="main-panel">
 			<div class="content">
 				<h1>Tooltip</h1>
-				<p>CSS-only tooltip via <code>data-ln-tooltip</code> attribute. Zero JS. Shows on <code>:hover</code> and <code>:focus-visible</code>. Four positions supported.</p>
+				<p>Tooltip has two layers. <strong>CSS baseline</strong> via <code>data-ln-tooltip="…"</code> — zero JS, shows on <code>:hover</code> and <code>:focus-visible</code>. <strong>JS enhance</strong> via <code>data-ln-tooltip-enhance</code> — progressive enhancement over the same attribute, adds viewport-aware placement (auto-flip at edges), <code>aria-describedby</code> wiring, and portal-rendered nodes that escape <code>overflow: hidden</code> ancestors. Sections 1–3 below demo the baseline; sections 4–8 demo the enhance layer.</p>
 
-				<!-- Default (top) position -->
+				<!-- ─── CSS baseline ─────────────────────────────────────── -->
+
+				<!-- 1. Default position (top) -->
 				<section class="section-card">
-					<header><h3>Default Position — Top</h3></header>
+					<header><h3>1. CSS baseline — default position (top)</h3></header>
 					<main>
-						<div data-demo-toolbar>
+						<p>Icon buttons with <code>data-ln-tooltip="…"</code>. The default position is <code>top</code>. <code>aria-label</code> is still required for screen readers — the tooltip text is only visual.</p>
+						<div data-demo-tooltip-toolbar>
 							<button type="button" data-ln-tooltip="Save as draft" aria-label="Save as draft">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg>
 							</button>
-							<button type="button" data-ln-tooltip="Delete document" data-ln-tooltip-position="top" aria-label="Delete document">
+							<button type="button" data-ln-tooltip="Delete document" aria-label="Delete document">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
 							</button>
-							<button type="button" data-ln-tooltip="Edit title" data-ln-tooltip-position="top" aria-label="Edit title">
+							<button type="button" data-ln-tooltip="Edit title" aria-label="Edit title">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-pencil"></use></svg>
 							</button>
 						</div>
 					</main>
 				</section>
 
-				<!-- All four positions -->
+				<!-- 2. All four positions -->
 				<section class="section-card">
-					<header><h3>All Four Positions</h3></header>
+					<header><h3>2. CSS baseline — all four positions</h3></header>
 					<main>
+						<p>Override the default with <code>data-ln-tooltip-position="bottom|left|right"</code>. The compass layout below places one trigger per position.</p>
 						<div data-demo-tooltip-grid>
 							<button type="button" data-ln-tooltip="Top tooltip" data-ln-tooltip-position="top" aria-label="Top tooltip example">Top</button>
 							<button type="button" data-ln-tooltip="Bottom tooltip" data-ln-tooltip-position="bottom" aria-label="Bottom tooltip example">Bottom</button>
@@ -164,19 +167,82 @@
 					</main>
 				</section>
 
-				<!-- On text elements -->
+				<!-- 3. On inline text -->
 				<section class="section-card">
-					<header><h3>On Inline Text</h3></header>
+					<header><h3>3. CSS baseline — on inline text</h3></header>
 					<main>
 						<p>Hover over <span data-ln-tooltip="ISO 9001 Quality Management">ISO 9001</span> to see the full standard name. Or try the semantic abbreviation pattern: <abbr data-ln-tooltip title="International Organization for Standardization">ISO</abbr> — an empty <code>data-ln-tooltip</code> falls back to the element's <code>title</code>.</p>
 					</main>
 				</section>
 
-				<!-- SCSS Usage -->
+				<!-- ─── JS enhance ───────────────────────────────────────── -->
+
+				<!-- 4. Side-by-side comparison -->
 				<section class="section-card">
-					<header><h3>SCSS Usage</h3></header>
+					<header><h3>4. JS enhance — side by side</h3></header>
 					<main>
-						<pre><code>// Default — attribute selector, no config needed
+						<p>Hover both buttons. Both show a tooltip. Only the enhanced button gets <code>aria-describedby</code> when focused — inspect with DevTools.</p>
+						<nav class="demo-actions">
+							<button type="button" data-ln-tooltip="Edit (CSS only)">
+								CSS only
+							</button>
+							<button type="button" data-ln-tooltip="Edit (JS enhanced)" data-ln-tooltip-enhance>
+								JS enhanced
+							</button>
+						</nav>
+						<p><small>Tab to the JS-enhanced button. Open DevTools Elements tab. The button should have <code>aria-describedby="ln-tooltip-1"</code> pointing at a node inside <code>#ln-tooltip-portal</code>.</small></p>
+					</main>
+				</section>
+
+				<!-- 5. Edge auto-flip (right → left) -->
+				<section class="section-card">
+					<header><h3>5. JS enhance — edge auto-flip (right &rarr; left)</h3></header>
+					<main>
+						<p>The last button is pushed to the far right edge of the container. Its preferred side is <code>right</code>. Hover it — the tooltip should appear on the <strong>left</strong> because there is no room on the right. Inspect <code>data-ln-tooltip-placement</code> on the tooltip node.</p>
+						<div data-demo-tooltip-flip-row>
+							<button type="button" data-ln-tooltip="First button" data-ln-tooltip-enhance data-ln-tooltip-position="right">Right (fits)</button>
+							<button type="button" data-ln-tooltip="Second button" data-ln-tooltip-enhance data-ln-tooltip-position="right">Right (fits)</button>
+							<button type="button" data-ln-tooltip="I flipped to the left — no room on right!" data-ln-tooltip-enhance data-ln-tooltip-position="right">Far right — flip me</button>
+						</div>
+					</main>
+				</section>
+
+				<!-- 6. Long text wrapping -->
+				<section class="section-card">
+					<header><h3>6. JS enhance — long-text max-width wrap</h3></header>
+					<main>
+						<p>The tooltip below has text that exceeds 20 rem. Hover it to verify the <code>max-width: 20rem</code> wraps the text instead of overflowing the viewport.</p>
+						<button type="button" data-ln-tooltip="This is a very long tooltip text that should wrap at twenty rem maximum width. It demonstrates that the max-width constraint in ln-tooltip.scss is working correctly and the text does not overflow off the right edge of the screen." data-ln-tooltip-enhance>
+							Long tooltip text
+						</button>
+					</main>
+				</section>
+
+				<!-- 7. Keyboard focus check -->
+				<section class="section-card">
+					<header><h3>7. JS enhance — keyboard focus + <code>aria-describedby</code></h3></header>
+					<main>
+						<p><strong>Instructions:</strong> Tab to the button below. Open DevTools (F12) and switch to the Elements panel. Inspect the button — it should have <code>aria-describedby="ln-tooltip-N"</code>. Inspect <code>#ln-tooltip-portal</code> in the body — there should be a <code>&lt;div class="ln-tooltip"&gt;</code> with the matching id. Tab away — both attributes should disappear.</p>
+						<button type="button" data-ln-tooltip="Focus this button to see aria-describedby wired" data-ln-tooltip-enhance id="demo-keyboard-focus-btn">
+							Tab to me
+						</button>
+					</main>
+				</section>
+
+				<!-- 8. Title fallback (<abbr> pattern) -->
+				<section class="section-card">
+					<header><h3>8. JS enhance — title fallback (<code>&lt;abbr&gt;</code> pattern)</h3></header>
+					<main>
+						<p>When <code>data-ln-tooltip</code> has no value, the enhance layer reads the text from <code>title</code>. Semantic HTML stays semantic.</p>
+						<p>Hover (or tab to) <abbr data-ln-tooltip data-ln-tooltip-enhance title="International Organization for Standardization" tabindex="0">ISO</abbr>. Open DevTools and watch the <code>title</code> attribute — it is stripped while the styled tooltip is visible and restored on hide, so the browser's native tooltip never appears alongside ours.</p>
+					</main>
+				</section>
+
+				<!-- 9. SCSS usage -->
+				<section class="section-card">
+					<header><h3>9. SCSS usage</h3></header>
+					<main>
+						<pre><code>// CSS baseline — attribute selector, no config needed
 // &lt;button data-ln-tooltip="Save" aria-label="Save"&gt;...&lt;/button&gt;
 
 // Positions
@@ -185,7 +251,11 @@
 // data-ln-tooltip-position="left"
 // data-ln-tooltip-position="right"
 
-// Consumer semantic selector
+// JS enhance — add data-ln-tooltip-enhance for viewport-aware
+// placement + aria-describedby wiring
+// &lt;button data-ln-tooltip="Save" data-ln-tooltip-enhance&gt;...&lt;/button&gt;
+
+// Consumer semantic selector for the baseline mixin
 .my-trigger { @include tooltip; }</code></pre>
 					</main>
 				</section>
