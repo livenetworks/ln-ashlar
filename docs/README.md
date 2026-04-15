@@ -24,6 +24,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Breakpoints | `scss/config/_breakpoints.scss` | [breakpoints.md](css/breakpoints.md) |
 | Typography | `scss/config/mixins/_typography.scss` | [typography.md](css/typography.md) |
 | Theming (Dark Mode) | `scss/config/_theme.scss` | [theming.md](css/theming.md) |
+| Density | `scss/config/_density.scss` | [density.md](css/density.md) |
 | Motion | `scss/config/mixins/_motion.scss` | [motion.md](css/motion.md) |
 | Layout | `scss/config/mixins/_layout.scss` | [layout.md](css/layout.md) |
 | Mixins Reference | `scss/config/mixins/` | [mixins.md](css/mixins.md) |
@@ -75,6 +76,8 @@ Two files per component:
 | Tabs | `data-ln-tabs` | [js/ln-tabs/README.md](../js/ln-tabs/README.md) | [tabs.md](js/tabs.md) |
 | Toast | `data-ln-toast` | [js/ln-toast/README.md](../js/ln-toast/README.md) | [toast.md](js/toast.md) |
 | Dropdown | `data-ln-dropdown` | [js/ln-dropdown/README.md](../js/ln-dropdown/README.md) | [dropdown.md](js/dropdown.md) |
+| Popover | `data-ln-popover` | [js/ln-popover/README.md](../js/ln-popover/README.md) | [popover.md](js/popover.md) |
+| Tooltip (JS) | `data-ln-tooltip-enhance` | [js/ln-tooltip/README.md](../js/ln-tooltip/README.md) | [tooltip.md](js/tooltip.md) |
 | Nav | `data-ln-nav` | [js/ln-nav/README.md](../js/ln-nav/README.md) | [nav.md](js/nav.md) |
 | Filter | `data-ln-filter` | [js/ln-filter/README.md](../js/ln-filter/README.md) | [filter.md](js/filter.md) |
 | Search | `data-ln-search` | [js/ln-search/README.md](../js/ln-search/README.md) | [search.md](js/search.md) |
@@ -111,26 +114,26 @@ Two files per component:
 
 ---
 
-## Roadmap — v1.1 Design System (in flight)
+## Roadmap — Design System
 
 Master roadmap: [../plans/design-system-v1.1-roadmap.md](../plans/design-system-v1.1-roadmap.md).
 Each phase has its own executor-ready plan; pick by dependency, not file order.
 
 | # | Phase | Plan | Track |
 |---|-------|------|-------|
-| 1 | Foundation tokens | [v1.1-phase-1-tokens.md](../plans/v1.1-phase-1-tokens.md) | MVP |
-| 2 | Neutral color scale | [v1.1-phase-2-neutral-scale.md](../plans/v1.1-phase-2-neutral-scale.md) | MVP |
-| 3 | Typography re-hierarchy | [v1.1-phase-3-typography.md](../plans/v1.1-phase-3-typography.md) | Full v1.1 |
-| 4 | Shadows + focus halo | [v1.1-phase-4-shadows-focus.md](../plans/v1.1-phase-4-shadows-focus.md) | MVP |
-| 5 | Motion-safe retrofit | [v1.1-phase-5-motion-safe.md](../plans/v1.1-phase-5-motion-safe.md) | MVP |
-| 6 | Dark mode | [v1.1-phase-6-dark-mode.md](../plans/v1.1-phase-6-dark-mode.md) | Full v1.1 |
-| 7a | Loading + empty states | [v1.1-phase-7a-loading-components.md](../plans/v1.1-phase-7a-loading-components.md) | Full v1.1 |
-| 7b | Navigation components | [v1.1-phase-7b-navigation-components.md](../plans/v1.1-phase-7b-navigation-components.md) | Full v1.1 |
-| 7c | Content components | [v1.1-phase-7c-content-components.md](../plans/v1.1-phase-7c-content-components.md) | Full v1.1 |
-| 7d | Interaction components | [v1.1-phase-7d-interaction-components.md](../plans/v1.1-phase-7d-interaction-components.md) | Full v1.1 |
-| 8 | JS-enhanced components | [v1.1-phase-8-js-components.md](../plans/v1.1-phase-8-js-components.md) | v1.2 candidate |
-| 9 | Density system | [v1.1-phase-9-density.md](../plans/v1.1-phase-9-density.md) | v1.2 candidate |
-| 10 | Infrastructure | [v1.1-phase-10-infrastructure.md](../plans/v1.1-phase-10-infrastructure.md) | v1.2 candidate |
+| 1 | Foundation tokens | [v1.1-phase-1-tokens.md](../plans/v1.1-phase-1-tokens.md) | v1.1 MVP |
+| 2 | Neutral color scale | [v1.1-phase-2-neutral-scale.md](../plans/v1.1-phase-2-neutral-scale.md) | v1.1 MVP |
+| 3 | Typography re-hierarchy | [v1.1-phase-3-typography.md](../plans/v1.1-phase-3-typography.md) | v1.1 |
+| 4 | Shadows + focus halo | [v1.1-phase-4-shadows-focus.md](../plans/v1.1-phase-4-shadows-focus.md) | v1.1 MVP |
+| 5 | Motion-safe retrofit | [v1.1-phase-5-motion-safe.md](../plans/v1.1-phase-5-motion-safe.md) | v1.1 MVP |
+| 6 | Dark mode | [v1.1-phase-6-dark-mode.md](../plans/v1.1-phase-6-dark-mode.md) | v1.1 |
+| 7a | Loading + empty states | [v1.1-phase-7a-loading-components.md](../plans/v1.1-phase-7a-loading-components.md) | v1.1 |
+| 7b | Navigation components | [v1.1-phase-7b-navigation-components.md](../plans/v1.1-phase-7b-navigation-components.md) | v1.1 |
+| 7c | Content components | [v1.1-phase-7c-content-components.md](../plans/v1.1-phase-7c-content-components.md) | v1.1 |
+| 7d | Interaction components | [v1.1-phase-7d-interaction-components.md](../plans/v1.1-phase-7d-interaction-components.md) | v1.1 |
+| 8 | JS-enhanced components (ln-popover, ln-tooltip) | [v1.1-phase-8-js-components.md](../plans/v1.1-phase-8-js-components.md) | v1.2 |
+| 9 | Density system (`[data-density="compact"]`) | [v1.1-phase-9-density.md](../plans/v1.1-phase-9-density.md) | v1.2 |
+| 10 | Infrastructure (auto-token-docs, Playwright VR, CHANGELOG) | [v1.1-phase-10-infrastructure.md](../plans/v1.1-phase-10-infrastructure.md) | deferred |
 
 Execution order: 1 → (2, 4, 5 in any order) → 3 → 6 → 7a–d → 8/9 → 10.
 See [todo.md](../todo.md) § "Design System v1.1" for the live checklist.

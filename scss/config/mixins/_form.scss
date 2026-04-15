@@ -56,8 +56,8 @@
 
 @mixin form-input {
 	@include w-full;
-	@include px(0.875rem);
-	@include py(0.5rem);
+	@include px(var(--density-pad-md));
+	@include py(var(--density-pad-sm));
 	@include text-base;
 	@include text-primary;
 	@include bg-primary;

@@ -1,0 +1,31 @@
+@use '../../../../../scss/config/mixins' as *;
+
+// ─────────────────────────────────────────────────────────────────
+// Tooltip position demo
+//
+// The CSS baseline tooltip uses `::after` on the trigger, positioned
+// with absolute coordinates. It cannot escape an ancestor that has
+// `overflow: hidden` — which `.section-card` sets on purpose for
+// rounded-corner clipping of tables. For this demo only, override
+// the card so the four position tooltips render without clipping.
+// ─────────────────────────────────────────────────────────────────
+
+.section-card:has(> main > [data-demo-tooltip-grid]) {
+	overflow: visible;
+}
+
+[data-demo-tooltip-grid] {
+	display: grid;
+	grid-template-columns: 10rem 10rem 10rem;
+	grid-template-rows: 3.5rem 3.5rem 3.5rem;
+	place-items: center;
+	@include p(2rem);
+	@include mx(auto);
+	width: fit-content;
+
+	// Compass layout: Top / Bottom / Left / Right
+	> button:nth-child(1) { grid-area: 1 / 2; } // Top
+	> button:nth-child(2) { grid-area: 3 / 2; } // Bottom
+	> button:nth-child(3) { grid-area: 2 / 1; } // Left
+	> button:nth-child(4) { grid-area: 2 / 3; } // Right
+}

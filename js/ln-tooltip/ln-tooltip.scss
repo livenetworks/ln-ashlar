@@ -1,0 +1,37 @@
+@use '../../scss/config/mixins' as *;
+
+#ln-tooltip-portal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	z-index: var(--z-toast);
+}
+
+.ln-tooltip {
+	position: fixed;
+	@include px(0.5rem);
+	@include py(0.25rem);
+	background: hsl(var(--color-neutral-900));
+	color: hsl(var(--color-neutral-50));
+	@include typography(caption);
+	@include rounded-sm;
+	white-space: nowrap;
+	box-shadow: var(--shadow-md);
+	max-width: 20rem;
+	pointer-events: none;
+
+	@include motion-safe {
+		animation: ln-tooltip-fade var(--transition-fast);
+	}
+}
+
+@keyframes ln-tooltip-fade {
+	from { opacity: 0; transform: translateY(2px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+/* When JS enhance is active, suppress the CSS baseline pseudo-element */
+[data-ln-tooltip][data-ln-tooltip-enhance]::after {
+	content: none;
+}
