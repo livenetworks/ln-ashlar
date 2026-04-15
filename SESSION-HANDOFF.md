@@ -68,7 +68,7 @@ All files are in this conversation's outputs. Download them and place as follows
 - Conflict detection: `updated_at` comparison, 409 response on stale update
 - Cache versioning: schema_version in IndexedDB metadata, clear on mismatch
 - Sync triggers: on mount (if stale), on visibility change, after CRUD
-- Blade renders table SHELL only (toolbar, header, footer, skeleton rows). JS renders data rows.
+- Blade renders the full table (toolbar, header, rows, footer) from SSR data. JS takes over for sort/filter/search/virtual scroll after mount.
 
 ### 4. ln-acme Components — Two Separate IIFEs
 - **ln-store**: generic data layer (IndexedDB CRUD, sync, optimistic mutations). Not UI-aware.

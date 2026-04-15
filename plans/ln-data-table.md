@@ -21,12 +21,11 @@ What to build:
 - Import from ln-core: `cloneTemplate`, `fill`, `dispatch`, `findElements`
 - Listen for `ln-data-table:set-data` event → receive `{ data, total, filtered }`
 - Clone row template (`data-ln-template="{name}-row"`), fill with `data-ln-cell` fields
-- Replace skeleton rows with real rows
+- Replace initial `<tbody>` contents with rendered rows
 - Show empty state template when data is empty:
   - `{name}-empty` template when total === 0 (no data exists)
   - `{name}-empty-filtered` template when total > 0 but filtered === 0 (query returned zero)
 - Footer count: update `data-ln-data-table-count` with "X items" or "X of Y"
-- `ln-data-table:set-loading` event → show/hide skeleton state
 - MutationObserver for dynamic `data-ln-data-table` elements
 - Instance state: `.isLoaded`, `.totalCount`, `.visibleCount`
 
@@ -209,8 +208,8 @@ Update `todo.md` — mark `ln-data-table.js` as done in "ln-acme Implementation"
 
 ## Verification (End-to-End)
 
-1. Blade shell renders: toolbar + sticky header + skeleton rows + footer
-2. Store loads → coordinator feeds data → table renders rows from template
+1. Blade renders toolbar + sticky header + data rows + footer in full
+2. Store loads → coordinator feeds data → table re-renders rows from template on change
 3. Sort: click column → 3-state cycle → instant re-render
 4. Filter: click filter icon → dropdown with checkboxes → instant filter → dot indicator + pills
 5. Search: type in search → instant filter on every keyup → clear button works
