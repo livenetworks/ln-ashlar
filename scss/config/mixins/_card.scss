@@ -30,8 +30,8 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include px(1rem);
-	@include py(0.75rem);
+	@include px(var(--density-pad-md));
+	@include py(var(--density-pad-sm));
 	@include border-b;
 	@include bg-secondary;
 
@@ -146,7 +146,7 @@
 	}
 
 	> main {
-		@include p(1rem);
+		@include p(var(--density-pad-md));
 
 		// Auto-flush: table or .table-container as direct child —
 		// remove padding, strip table's own radius/shadow (card's
@@ -164,11 +164,11 @@
 	}
 
 	> footer {
-		@include px(1rem);
-		@include py(0.75rem);
+		@include px(var(--density-pad-md));
+		@include py(var(--density-pad-sm));
 		@include border-t;
 		@include flex;
 		@include justify-end;
-		@include gap(0.75rem);
+		@include gap(var(--density-gap-md));
 	}
 }
