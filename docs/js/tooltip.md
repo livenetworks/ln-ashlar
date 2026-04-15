@@ -30,9 +30,10 @@ The portal is never destroyed — it persists in `<body>` once created. Tooltip 
 
 1. If the same trigger is already active, return immediately.
 2. Call `_hide()` to clear any previous tooltip.
-3. Read `data-ln-tooltip` text from the trigger. If empty, abort.
+3. Read `data-ln-tooltip` text from the trigger. If empty, fall back to the `title` attribute. If both are empty, abort.
 4. Call `_ensurePortal()` — creates the portal `<div>` lazily if it doesn't exist.
-5. Create `<div class="ln-tooltip">`, set `textContent` to the tooltip text.
+5. If the trigger has a `title` attribute, stash it on a module-level variable and strip it from the element. This prevents the browser's native title tooltip from appearing alongside the styled one. Restored on hide.
+6. Create `<div class="ln-tooltip">`, set `textContent` to the tooltip text.
 6. Assign a stable id to the node (`ln-tooltip-N`). The id is stored on `el[DOM_ATTRIBUTE + 'Uid']` so re-shows reuse the same value.
 7. Append the node to the portal.
 8. Measure `offsetWidth` / `offsetHeight` (the node is in the DOM, so layout is accurate without `measureHidden`).
@@ -47,9 +48,25 @@ The portal is never destroyed — it persists in `<body>` once created. Tooltip 
 ### Hide (`_hide()`)
 
 1. Remove `aria-describedby` from the trigger.
-2. Remove the tooltip node from the portal.
-3. Clear `activeTooltipNode` and `activeTrigger`.
-4. Remove the ESC listener (`_removeEscListener`).
+2. If a `title` was stashed in `_show`, restore it on the trigger.
+3. Remove the tooltip node from the portal.
+4. Clear `activeTooltipNode`, `activeTrigger`, and `activeStashedTitle`.
+5. Remove the ESC listener (`_removeEscListener`).
+
+## Title fallback and native tooltip suppression
+
+When `data-ln-tooltip` has no value, the enhance layer reads the text
+from the element's `title` attribute instead. This mirrors the CSS
+baseline's fallback rule and enables the semantic
+`<abbr data-ln-tooltip title="…">` pattern.
+
+While the styled tooltip is visible, the `title` attribute is stripped
+from the trigger and stashed on the module-level `activeStashedTitle`
+variable. On hide, it is restored. This prevents the browser's native
+title tooltip from appearing alongside the styled one during long hover
+dwells — a problem the CSS baseline cannot solve without JS, and the
+reason the enhance layer is the better choice for `<abbr>` elements
+that sit near viewport edges or need `aria-describedby` wiring.
 
 ## Coexistence rule
 

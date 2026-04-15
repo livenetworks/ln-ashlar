@@ -15,7 +15,7 @@ Progressive enhancement over the CSS-only `[data-ln-tooltip]` baseline. Adds sma
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
-| `data-ln-tooltip="text"` | trigger element | Tooltip text (required for both CSS baseline and JS enhance) |
+| `data-ln-tooltip="text"` | trigger element | Tooltip text. If the value is empty (just `data-ln-tooltip`), falls back to the element's `title` attribute — enables the semantic `<abbr title="…">` pattern. |
 | `data-ln-tooltip-position` | trigger element | Preferred placement side: `top` (default), `bottom`, `left`, `right` |
 | `data-ln-tooltip-enhance` | trigger element | Opt-in flag — activates JS enhance for this element |
 
@@ -65,6 +65,18 @@ On focus, the button above gets `aria-describedby="ln-tooltip-1"` and a tooltip 
     Delete
 </button>
 ```
+
+### Title fallback (`<abbr>` pattern)
+
+```html
+<abbr data-ln-tooltip data-ln-tooltip-enhance title="International Organization for Standardization">ISO</abbr>
+```
+
+No tooltip value — the text comes from `title`. While the styled
+tooltip is visible, the enhance layer strips `title` from the element
+to suppress the browser's native title tooltip, and restores it on
+hide. Also works without `-enhance` via the CSS baseline (with the
+tradeoff that the native tooltip can appear after a long hover dwell).
 
 ## Coexistence with CSS baseline
 

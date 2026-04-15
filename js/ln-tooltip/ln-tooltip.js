@@ -13,6 +13,7 @@ import { guardBody, computePlacement, dispatch } from '../ln-core';
 	let portal = null;
 	let activeTooltipNode = null;
 	let activeTrigger = null;
+	let activeStashedTitle = null;
 	let escListener = null;
 
 	function _ensurePortal() {
@@ -44,10 +45,19 @@ import { guardBody, computePlacement, dispatch } from '../ln-core';
 		if (activeTrigger === trigger) return;
 		_hide();
 
-		const text = trigger.getAttribute(TEXT_ATTR);
+		// Fallback: if data-ln-tooltip has no value, pull text from `title`.
+		// Supports the semantic `<abbr data-ln-tooltip title="...">` pattern.
+		const text = trigger.getAttribute(TEXT_ATTR) || trigger.getAttribute('title');
 		if (!text) return;
 
 		_ensurePortal();
+
+		// Stash + strip `title` while our tooltip is visible so the browser's
+		// native title tooltip does not appear alongside it. Restored on hide.
+		if (trigger.hasAttribute('title')) {
+			activeStashedTitle = trigger.getAttribute('title');
+			trigger.removeAttribute('title');
+		}
 
 		const node = document.createElement('div');
 		node.className = 'ln-tooltip';
@@ -89,7 +99,11 @@ import { guardBody, computePlacement, dispatch } from '../ln-core';
 		}
 		if (activeTrigger) {
 			activeTrigger.removeAttribute('aria-describedby');
+			if (activeStashedTitle !== null) {
+				activeTrigger.setAttribute('title', activeStashedTitle);
+			}
 		}
+		activeStashedTitle = null;
 		if (activeTooltipNode.parentNode) {
 			activeTooltipNode.parentNode.removeChild(activeTooltipNode);
 		}
