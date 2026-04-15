@@ -23,6 +23,13 @@
 		z-index: var(--z-dropdown);
 		box-shadow: var(--shadow-md);
 
+		// Default placement: top, centered above the trigger.
+		// Position overrides below reset `bottom` / `left` to `auto` so
+		// the pseudo-element is not stretched between two coordinates.
+		bottom: calc(100% + 0.375rem);
+		left: 50%;
+		transform: translateX(-50%);
+
 		@include motion-safe {
 			transition: opacity var(--transition-fast);
 		}
@@ -40,27 +47,27 @@
 		opacity: 1;
 	}
 
-	// Default position: top, centered
-	&::after,
-	&[data-ln-tooltip-position="top"]::after {
-		bottom: calc(100% + 0.375rem);
-		left: 50%;
-		transform: translateX(-50%);
-	}
-
+	// Bottom — push below the trigger. Must reset `bottom` from the default
+	// top placement or the pseudo-element stretches vertically.
 	&[data-ln-tooltip-position="bottom"]::after {
+		bottom: auto;
 		top: calc(100% + 0.375rem);
-		left: 50%;
-		transform: translateX(-50%);
 	}
 
+	// Left — reset `bottom` + `left` from the default, position to the left
+	// of the trigger, vertical-center via top + translateY.
 	&[data-ln-tooltip-position="left"]::after {
+		bottom: auto;
+		left: auto;
 		right: calc(100% + 0.375rem);
 		top: 50%;
 		transform: translateY(-50%);
 	}
 
+	// Right — reset `bottom` from the default, override `left` to the right
+	// edge, vertical-center via top + translateY.
 	&[data-ln-tooltip-position="right"]::after {
+		bottom: auto;
 		left: calc(100% + 0.375rem);
 		top: 50%;
 		transform: translateY(-50%);
