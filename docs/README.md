@@ -24,6 +24,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Breakpoints | `scss/config/_breakpoints.scss` | [breakpoints.md](css/breakpoints.md) |
 | Typography | `scss/config/mixins/_typography.scss` | [typography.md](css/typography.md) |
 | Theming (Dark Mode) | `scss/config/_theme.scss` | [theming.md](css/theming.md) |
+| Density | `scss/config/_density.scss` | [density.md](css/density.md) |
 | Motion | `scss/config/mixins/_motion.scss` | [motion.md](css/motion.md) |
 | Layout | `scss/config/mixins/_layout.scss` | [layout.md](css/layout.md) |
 | Mixins Reference | `scss/config/mixins/` | [mixins.md](css/mixins.md) |

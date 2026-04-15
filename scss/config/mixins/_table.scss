@@ -26,8 +26,8 @@
 
 	th {
 		@include text-left;
-		@include px(1rem);
-		@include py(0.875rem);
+		@include px(var(--density-pad-md));
+		@include py(var(--density-pad-sm));
 		@include font-semibold;
 		@include text-sm;
 		letter-spacing: 0.4px;
@@ -37,6 +37,7 @@
 
 	tbody tr {
 		@include transition;
+		min-height: var(--density-row-h);
 
 		&:hover {
 			@include bg-secondary;
@@ -44,10 +45,11 @@
 	}
 
 	td {
-		@include px(1rem);
-		@include py(0.625rem);
+		@include px(var(--density-pad-md));
+		@include py(var(--density-pad-sm));
 		@include border-b;
-		@include text-sm;
+		font-size: var(--density-font-body);
+		line-height: var(--density-lh-body);
 		vertical-align: top;
 	}
 
