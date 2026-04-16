@@ -8,6 +8,8 @@ File: `scss/config/mixins/_table.scss`. Applied: `scss/components/_tables.scss`.
 
 `@include table-base` is applied globally to all `<table>` elements. No class or mixin needed for a standard table.
 
+`<table>` also inherits `margin-bottom: 1rem` from base typography, so adjacent content (paragraphs, `<pre>` blocks, headings) keeps a consistent vertical rhythm. The margin is reset to `0` when the table is the only child of `.section-card > main` (auto-flush mode — see below).
+
 ---
 
 ## HTML
@@ -151,4 +153,6 @@ For project-level control of the stacked breakpoint:
 
 ## section-card integration
 
-When a `<table>` is a direct child of `.section-card > main`, padding is removed automatically and rounded corners are handled by the card's `overflow: hidden`. No extra classes needed — `:has()` detects the table.
+When `main` contains a `<table>` (or `.table-container`) **as its only child**, `.section-card` auto-flushes padding to `0` and strips the table's own `border-radius`, `box-shadow`, and `margin-bottom`. The card's `overflow: hidden` handles the rounded corners. No extra classes needed.
+
+Mixed-content cards (intro `<p>` + table + more) keep their `main` padding and the table flows in the content area with its own chrome intact, separated from surrounding content by its default `margin-bottom: 1rem`. See [sections.md](sections.md#auto-flush-for-tables) for HTML examples.

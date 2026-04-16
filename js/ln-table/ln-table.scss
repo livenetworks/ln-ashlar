@@ -26,40 +26,14 @@
 	border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
-// ── Toolbar search ──
-.ln-table__search {
-	@include inline-flex;
-	@include items-center;
-	@include gap(0.375rem);
-	@include px(0.625rem);
-	@include py(0.25rem);
-	@include rounded-md;
-	@include border;
-	@include bg-primary;
-	@include transition-fast;
-
-	input[type="search"] {
-		@include border-none;
-		@include text-sm;
-		background: transparent;
-		outline: none;
-		box-shadow: none;
-		@include w(10rem);
-
-		&::placeholder {
-			@include text-muted;
-		}
-
-		// Hide native clear button — we rely on type="search" x
-		&::-webkit-search-cancel-button {
-			-webkit-appearance: none;
-		}
-	}
-
-	&:focus-within {
-		border-color: hsl(var(--color-primary));
-		box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.1);
-	}
+// ── Toolbar search — delta over the semantic form-input-icon-group.
+// The <label>…<svg.ln-icon>…<input type="search">…</label> pattern now
+// picks up structure, border, focus ring, and padding automatically from
+// the icon-group binding in scss/components/_forms.scss. The only
+// toolbar-specific constraint left is the narrow fixed width of the input
+// (10rem) so the toolbar stays compact on wide tables.
+.ln-table__toolbar label:has(> input[type="search"]) > input {
+	@include w(10rem);
 }
 
 // ── Count badge ──

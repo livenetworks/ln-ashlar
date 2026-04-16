@@ -19,7 +19,7 @@ Search is provided by **`ln-search`** (generic component) — `data-ln-search="t
     <header class="ln-table__toolbar">
         <h3>Employees</h3>
         <aside>
-            <label class="ln-table__search">
+            <label>
                 <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
                 <input type="search" placeholder="Search..." data-ln-search="employees">
             </label>
@@ -139,7 +139,6 @@ document.getElementById('employees').addEventListener('ln-table:empty', function
 | Class | Description |
 |-------|------|
 | `.ln-table__toolbar` | Sticky header (pinned below `.header`) |
-| `.ln-table__search` | Wrapper for search input with icon |
 | `.ln-table__count` | Badge with record count (populated by JS) |
 | `.ln-table__timing` | Monospace badge with ms (populated by JS) |
 | `.ln-table__footer` | Footer with total count |

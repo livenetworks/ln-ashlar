@@ -148,8 +148,17 @@ import { guardBody, computePlacement, dispatch } from '../ln-core';
 
 	function _findTriggers(root) {
 		if (!root || root.nodeType !== 1) return;
-		const items = Array.from(root.querySelectorAll('[' + TRIGGER_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(TRIGGER_SELECTOR)) {
+		// Match elements that are either explicitly opted in (`-enhance`) or
+		// have both `data-ln-tooltip` and `title` (auto-enhance — the CSS
+		// baseline cannot strip `title`, so JS must take over to prevent the
+		// browser's native tooltip leaking alongside the styled one).
+		const items = Array.from(root.querySelectorAll(
+			'[' + TRIGGER_SELECTOR + '], [' + TEXT_ATTR + '][title]'
+		));
+		if (root.hasAttribute && (
+			root.hasAttribute(TRIGGER_SELECTOR) ||
+			(root.hasAttribute(TEXT_ATTR) && root.hasAttribute('title'))
+		)) {
 			items.push(root);
 		}
 		for (const el of items) {

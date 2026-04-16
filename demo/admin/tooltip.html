@@ -171,7 +171,7 @@
 				<section class="section-card">
 					<header><h3>3. CSS baseline — on inline text</h3></header>
 					<main>
-						<p>Hover over <span data-ln-tooltip="ISO 9001 Quality Management">ISO 9001</span> to see the full standard name. Or try the semantic abbreviation pattern: <abbr data-ln-tooltip title="International Organization for Standardization">ISO</abbr> — an empty <code>data-ln-tooltip</code> falls back to the element's <code>title</code>.</p>
+						<p>Hover over <span data-ln-tooltip="ISO 9001 Quality Management">ISO 9001</span> to see the full standard name. This is the pure CSS baseline — no JS runs for elements without a <code>title</code> attribute.</p>
 					</main>
 				</section>
 
@@ -231,10 +231,10 @@
 
 				<!-- 8. Title fallback (<abbr> pattern) -->
 				<section class="section-card">
-					<header><h3>8. JS enhance — title fallback (<code>&lt;abbr&gt;</code> pattern)</h3></header>
+					<header><h3>8. JS enhance — auto-attach on <code>[data-ln-tooltip][title]</code></h3></header>
 					<main>
-						<p>When <code>data-ln-tooltip</code> has no value, the enhance layer reads the text from <code>title</code>. Semantic HTML stays semantic.</p>
-						<p>Hover (or tab to) <abbr data-ln-tooltip data-ln-tooltip-enhance title="International Organization for Standardization" tabindex="0">ISO</abbr>. Open DevTools and watch the <code>title</code> attribute — it is stripped while the styled tooltip is visible and restored on hide, so the browser's native tooltip never appears alongside ours.</p>
+						<p>Any element with both <code>data-ln-tooltip</code> and <code>title</code> auto-enhances — the JS layer attaches without requiring <code>data-ln-tooltip-enhance</code>. The CSS baseline cannot strip <code>title</code>, so the browser's native tooltip would leak alongside the styled one. Auto-enhance resolves this for the semantic <code>&lt;abbr&gt;</code> pattern.</p>
+						<p>Hover (or tab to) <abbr data-ln-tooltip title="International Organization for Standardization" tabindex="0">ISO</abbr>. Open DevTools and watch the <code>title</code> attribute — it is stripped while the styled tooltip is visible and restored on hide. No <code>data-ln-tooltip-enhance</code> flag is required.</p>
 					</main>
 				</section>
 

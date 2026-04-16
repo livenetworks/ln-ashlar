@@ -59,15 +59,25 @@
 }
 
 // ─── Live / pulse ──────────────────────────────────────
+// Ring radius in `em` so it scales with badge font-size.
+// 0.9em ≈ 2× the dot width — visibly extends beyond the dot.
+// `70%, 100%` holds the final (invisible) frame for a short
+// rest between beats, giving a heartbeat rhythm instead of
+// a constant fade.
 @mixin badge-live {
 	@keyframes badge-pulse {
-		0%   { box-shadow: 0 0 0 0   hsl(var(--color-primary) / 0.4); }
-		100% { box-shadow: 0 0 0 5px hsl(var(--color-primary) / 0); }
+		0% {
+			box-shadow: 0 0 0 0 hsl(var(--color-primary) / 0.7);
+		}
+		70%,
+		100% {
+			box-shadow: 0 0 0 0.6em hsl(var(--color-primary) / 0);
+		}
 	}
 
 	&::before {
 		@include motion-safe {
-			animation: badge-pulse 2s ease-out infinite;
+			animation: badge-pulse 1.8s ease-out infinite;
 		}
 	}
 }

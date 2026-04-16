@@ -10,6 +10,9 @@ Progressive enhancement over the CSS-only `[data-ln-tooltip]` baseline. Adds sma
   - Scrollable lists or panels where position context may shift.
   - Elements where screen-reader accessibility (`aria-describedby`) is required.
   - Any case where auto-flip on viewport overflow is needed.
+  - Elements with a native `title` attribute (auto-enhanced; the CSS
+    baseline cannot strip `title` and the browser's native tooltip would
+    appear alongside).
 
 ## Attributes
 
@@ -17,7 +20,7 @@ Progressive enhancement over the CSS-only `[data-ln-tooltip]` baseline. Adds sma
 |-----------|-----|-------------|
 | `data-ln-tooltip="text"` | trigger element | Tooltip text. If the value is empty (just `data-ln-tooltip`), falls back to the element's `title` attribute — enables the semantic `<abbr title="…">` pattern. |
 | `data-ln-tooltip-position` | trigger element | Preferred placement side: `top` (default), `bottom`, `left`, `right` |
-| `data-ln-tooltip-enhance` | trigger element | Opt-in flag — activates JS enhance for this element |
+| `data-ln-tooltip-enhance` | trigger element | Opt-in flag — activates JS enhance for this element. Not required when the element has a `title` attribute — auto-enhance kicks in. |
 
 ## Events
 
@@ -69,14 +72,16 @@ On focus, the button above gets `aria-describedby="ln-tooltip-1"` and a tooltip 
 ### Title fallback (`<abbr>` pattern)
 
 ```html
-<abbr data-ln-tooltip data-ln-tooltip-enhance title="International Organization for Standardization">ISO</abbr>
+<abbr data-ln-tooltip title="International Organization for Standardization">ISO</abbr>
 ```
 
-No tooltip value — the text comes from `title`. While the styled
-tooltip is visible, the enhance layer strips `title` from the element
-to suppress the browser's native title tooltip, and restores it on
-hide. Also works without `-enhance` via the CSS baseline (with the
-tradeoff that the native tooltip can appear after a long hover dwell).
+No tooltip value — the text comes from `title`. Any element with both
+`data-ln-tooltip` and `title` auto-enhances: the JS layer attaches
+without requiring `data-ln-tooltip-enhance` because the CSS baseline
+cannot strip the `title` attribute and would leak the browser's native
+tooltip alongside the styled one. While the tooltip is visible the
+`title` is stashed and removed; it is restored on hide. Explicit
+`-enhance` is still accepted and behaves identically.
 
 ## Coexistence with CSS baseline
 

@@ -9,15 +9,14 @@
 	margin: 0;
 	position: relative;
 
-	// Vertical rail — concentric with the bullet x-axis.
-	// Bullet center = 0.125rem + (0.75rem / 2) = 0.5rem.
-	// Rail center   = left + (2px / 2)         = left + 1px.
-	// So left = 0.5rem - 1px keeps rail and bullet on the same axis.
+	// Vertical rail — concentric with the bullet on both axes.
+	// X: bullet center = 0.125rem + 0.375rem = 0.5rem; rail = 0.5rem - 1px.
+	// Y: start/end at the first/last bullet center = 0.525rem from li edge.
 	&::before {
 		content: '';
 		position: absolute;
-		top: 0.5rem;
-		bottom: 0.5rem;
+		top: calc(var(--lh-caption) * var(--text-caption) / 2);
+		bottom: calc(var(--lh-caption) * var(--text-caption) / 2);
 		left: calc(0.5rem - 1px);
 		width: 2px;
 		background: hsl(var(--color-neutral-200));
@@ -32,11 +31,13 @@
 			padding-bottom: 0;
 		}
 
-		// Bullet
+		// Bullet — centered on the first line of <time> (caption role).
+		// Line-box height = var(--lh-caption) * var(--text-caption) = 1.05rem.
+		// Line center = 0.525rem; bullet is 0.75rem tall so top = 0.15rem.
 		&::before {
 			content: '';
 			position: absolute;
-			top: 0.375rem;
+			top: calc((var(--lh-caption) * var(--text-caption) - 0.75rem) / 2);
 			left: 0.125rem;
 			width: 0.75rem;
 			height: 0.75rem;
