@@ -8,12 +8,12 @@
 @use 'base/global';
 @use 'base/typography';
 
-@use 'components/buttons';
-@use 'components/forms';
-@use 'components/tables';
+@use 'components/button';
+@use 'components/form';
+@use 'components/table';
 @use 'components/tabs';
 @use 'components/toggle';
-@use 'components/cards';
+@use 'components/card';
 @use 'components/sections';
 @use 'components/nav';
 @use 'components/breadcrumbs';

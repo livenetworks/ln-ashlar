@@ -1,6 +1,6 @@
 # Cards
 
-File: `scss/config/mixins/_card.scss`. Applied: `scss/components/_cards.scss`.
+File: `scss/config/mixins/_card.scss`. Applied: `scss/components/_card.scss`.
 
 ---
 
