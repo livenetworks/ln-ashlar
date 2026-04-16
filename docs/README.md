@@ -39,10 +39,10 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Avatar | `scss/components/_avatar.scss` | [avatar.md](css/avatar.md) |
 | Banner | `scss/components/_banner.scss` | [banner.md](css/banner.md) |
 | Breadcrumbs | `scss/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
-| Cards | `scss/components/_cards.scss` | [cards.md](css/cards.md) |
+| Cards | `scss/components/_card.scss` | [cards.md](css/cards.md) |
 | Chip | `scss/components/_chip.scss` | [chip.md](css/chip.md) |
 | Empty State | `scss/components/_empty-state.scss` | [empty-state.md](css/empty-state.md) |
-| Forms | `scss/components/_forms.scss` | [forms.md](css/forms.md) |
+| Forms | `scss/components/_form.scss` | [forms.md](css/forms.md) |
 | Kbd | `scss/config/mixins/_kbd.scss` | [kbd.md](css/kbd.md) |
 | Loader | `scss/components/_loader.scss` | [loader.md](css/loader.md) |
 | Navigation | `scss/components/_nav.scss` | [navigation.md](css/navigation.md) |
@@ -52,7 +52,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Stat Card | `scss/components/_stat-card.scss` | [stat-card.md](css/stat-card.md) |
 | Status Badge | `scss/components/_status-badge.scss` | [status-badge.md](css/status-badge.md) |
 | Stepper | `scss/components/_stepper.scss` | [stepper.md](css/stepper.md) |
-| Tables | `scss/components/_tables.scss` | [tables.md](css/tables.md) |
+| Tables | `scss/components/_table.scss` | [tables.md](css/tables.md) |
 | Timeline | `scss/components/_timeline.scss` | [timeline.md](css/timeline.md) |
 | Tooltip | `scss/components/_tooltip.scss` | [tooltip.md](css/tooltip.md) |
 | Toggle Switch | `scss/components/_toggle-switch.scss` | [toggle-switch.md](css/toggle-switch.md) |

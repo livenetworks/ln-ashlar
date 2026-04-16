@@ -1,6 +1,6 @@
 # Tables
 
-File: `scss/config/mixins/_table.scss`. Applied: `scss/components/_tables.scss`.
+File: `scss/config/mixins/_table.scss`. Applied: `scss/components/_table.scss`.
 
 ---
 

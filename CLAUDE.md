@@ -120,7 +120,7 @@ Structure is **global**. Color is **semantic** (`type="submit"`) or **explicit**
 
 ```
 scss/config/mixins/_btn.scss    →  @mixin btn { ... }           ← recipe
-scss/components/_buttons.scss   →  .btn { @include btn; }       ← default applied
+scss/components/_button.scss    →  .btn { @include btn; }       ← default applied
 ```
 
 The `.btn` class is available for prototyping and inspector experimentation.
@@ -258,7 +258,7 @@ Every visual style has **two layers**: a mixin (recipe) and a component (applica
 
 ```
 scss/config/mixins/_table.scss      →  @mixin table-base { ... }         ← recipe
-scss/components/_tables.scss        →  table { @include table-base; }    ← applied
+scss/components/_table.scss         →  table { @include table-base; }    ← applied
 ```
 
 **Mixins** (`scss/config/mixins/`) — define HOW something looks. Never generate CSS by themselves.

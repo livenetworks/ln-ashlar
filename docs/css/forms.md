@@ -1,6 +1,6 @@
 # Forms & Buttons
 
-File: `scss/components/_forms.scss`.
+File: `scss/components/_form.scss`.
 
 ## Inputs
 

@@ -29,7 +29,7 @@
 // ── Toolbar search — delta over the semantic form-input-icon-group.
 // The <label>…<svg.ln-icon>…<input type="search">…</label> pattern now
 // picks up structure, border, focus ring, and padding automatically from
-// the icon-group binding in scss/components/_forms.scss. The only
+// the icon-group binding in scss/components/_form.scss. The only
 // toolbar-specific constraint left is the narrow fixed width of the input
 // (10rem) so the toolbar stays compact on wide tables.
 .ln-table__toolbar label:has(> input[type="search"]) > input {
