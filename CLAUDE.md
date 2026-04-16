@@ -251,6 +251,7 @@ Two distinct grouping patterns:
 - **Filled** (default) — gray bg, colored bg on checked, input hidden
 - **Outline** — `@include pill-outline` on parent → bordered, visible input indicator
 - **Color** — override `--color-primary` on parent for different colors
+- **Prototype class** — `.btn-group` is shipped as a CSS class for prototyping and inspector experimentation (parallels `.btn`). Production HTML uses semantic selectors with `@include btn-group`, not the class.
 
 ## SCSS Architecture — Two Layers
 
