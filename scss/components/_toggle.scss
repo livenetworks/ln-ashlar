@@ -25,15 +25,14 @@
 	@include accordion;
 }
 
+// .collapsible parent is always a zero-padding grid container — that
+// contract comes from @include collapsible. The child (.collapsible-body
+// or anything else @include collapsible-content lands on) owns padding
+// and margins. Do NOT re-bind `.collapsible` on a selector that forces a
+// different display or non-zero padding — it will break the
+// grid-template-rows animation.
 .collapsible {
 	@include collapsible;
-
-	// Structural override — parent MUST be grid without padding
-	// for the animation to work. !important because components
-	// like .card main impose their own display/padding/flex.
-	display: grid !important;
-	padding: 0 !important;
-	flex: initial !important;
 
 	> * {
 		@include collapsible-content;
