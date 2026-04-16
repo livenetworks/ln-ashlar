@@ -38,9 +38,29 @@ ul:has(> li > label > input[type="radio"]) {
 	@include pill-group;
 }
 
+// ─── Icon input group ───────────────────────────────────────────
+// Semantic trigger: any <label> that directly contains a <svg class="ln-icon">
+// AND a text-ish <input>. Excludes checkbox/radio/file/button types via the
+// :is() allowlist.
+
+label:has(> .ln-icon):has(> :is(
+	input[type="text"],
+	input[type="search"],
+	input[type="email"],
+	input[type="url"],
+	input[type="tel"],
+	input[type="password"],
+	input[type="number"]
+)) {
+	@include form-input-icon-group;
+}
+
 // ─── Label & Actions ────────────────────────────────────────────
 
-label {
+// Non-wrapping labels only — the label sits above/beside its input, not
+// around it. Wrapping-label patterns (pill, icon-group) own their full
+// styling below and must not inherit block + margin-bottom from here.
+label:not(:has(> input)) {
 	@include form-label;
 }
 

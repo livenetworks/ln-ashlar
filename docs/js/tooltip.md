@@ -12,9 +12,11 @@ Progressive enhancement layer over the CSS-only tooltip baseline. File: `js/ln-t
 
 ### JS enhance
 
-`js/ln-tooltip/ln-tooltip.js` — opt-in per element via `data-ln-tooltip-enhance`. Intercepts hover and focus events, creates a portal node, positions it via `computePlacement`, and wires `aria-describedby`.
+`js/ln-tooltip/ln-tooltip.js` — opt-in per element via `data-ln-tooltip-enhance`, **or** auto-attached when the element has both `data-ln-tooltip` and a `title` attribute. Intercepts hover and focus events, creates a portal node, positions it via `computePlacement`, and wires `aria-describedby`.
 
 **Use when:** triggers are near viewport edges, in scrollable containers, or when screen-reader `aria-describedby` wiring is required.
+
+**Auto-enhance:** Elements with both `data-ln-tooltip` and `title` are attached automatically because the CSS baseline cannot strip the `title` attribute — the browser's native tooltip would otherwise appear alongside the styled one. This resolves the `<abbr data-ln-tooltip title="…">` collision without requiring an explicit `-enhance` flag.
 
 ## Portal architecture
 
@@ -72,15 +74,22 @@ that sit near viewport edges or need `aria-describedby` wiring.
 
 The CSS baseline generates a pseudo-element via `::after { content: attr(data-ln-tooltip) }`. This fires on any `[data-ln-tooltip]` regardless of `-enhance`.
 
-A single additive CSS rule in `js/ln-tooltip/ln-tooltip.scss` suppresses it for enhanced elements:
+Two additive CSS rules in `js/ln-tooltip/ln-tooltip.scss` suppress the baseline whenever JS enhance takes over:
 
 ```scss
-[data-ln-tooltip][data-ln-tooltip-enhance]::after {
+[data-ln-tooltip][data-ln-tooltip-enhance]::after,
+[data-ln-tooltip][title]::after {
     content: none;
 }
 ```
 
-This is purely additive — no changes to `scss/components/_tooltip.scss` or `scss/config/mixins/_tooltip.scss`. Un-enhanced elements are completely unaffected.
+The first clause fires when a consumer opts in explicitly via `data-ln-tooltip-enhance`. The second clause fires automatically on any element that carries both `data-ln-tooltip` and a native `title` attribute — for these elements the JS layer auto-attaches (see "Auto-enhance" above) because CSS alone cannot strip `title` and the browser's native tooltip would leak alongside the styled one.
+
+Both suppressors are purely additive — no changes to `scss/components/_tooltip.scss` or `scss/config/mixins/_tooltip.scss`. Elements that match neither clause keep the CSS baseline completely unchanged.
+
+### JS-disabled degradation
+
+If the JS bundle is absent or has not yet executed, the auto-enhance suppressor `[data-ln-tooltip][title]::after { content: none }` still fires because it is static CSS. The affected element falls back to the browser's native `title` tooltip with no styled pseudo-element — the cleanest possible degradation, matching browser defaults. There is no flash of the CSS baseline before JS init, because the suppressor is already in effect at parse time.
 
 The `content: none` approach is preferred over `display: none` because it removes the generated box entirely, not just its visibility.
 

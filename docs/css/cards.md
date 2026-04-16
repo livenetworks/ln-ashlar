@@ -52,10 +52,15 @@ Composed card with structured regions. Internally calls `@include panel-header` 
 #user-settings { @include section-card; }
 ```
 
-**Regions:**
-- `header` — `bg-secondary`, `px(1rem) py(0.75rem)`, `border-b`, h3 is `text-base font-semibold margin:0`
-- `main` — `p(1rem)`
-- `footer` — `px(1rem) py(0.75rem)`, `border-t`, `flex justify-end gap(0.75rem)`
+**Regions** (all spacing reads from tokens so the density cascade applies automatically):
+
+- `header` — `bg-secondary`, `px(--spacing-md) py(--spacing-sm)`, `border-b`, `transition`, h3 is `text-title-sm font-semibold margin:0`
+- `main` — `p(--spacing-lg)`
+- `footer` — `px(--spacing-md) py(--spacing-sm)`, `border-t`, `flex justify-end`, `gap(--spacing-sm)`
+
+The section-card itself also gets `@include transition` on the root so border/shadow/background changes (density switches, hover states on parent cascades) animate smoothly.
+
+**Auto-flush for tables** — when `main` contains a `<table>` or `.table-container` as its **only child**, padding is dropped to `0` and the table's own radius, shadow, and margin are stripped. Mixed-content cards (intro + table + text) keep their padding and the table flows naturally with its own chrome intact. See [sections.md](sections.md#auto-flush-for-tables) for HTML examples and the `:only-child` rationale.
 
 ---
 

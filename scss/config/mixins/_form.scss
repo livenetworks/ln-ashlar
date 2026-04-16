@@ -82,6 +82,13 @@
 		@include cursor-not-allowed;
 		@include bg-secondary;
 	}
+
+	// Hide native UA clear button on <input type="search"> — we never use it;
+	// it's visually inconsistent across browsers and fights our icon-group layout.
+	&[type="search"]::-webkit-search-cancel-button {
+		-webkit-appearance: none;
+		appearance: none;
+	}
 }
 
 @mixin form-textarea {
@@ -98,6 +105,85 @@
 	background-repeat: no-repeat;
 	background-position: right 0.75rem center;
 	padding-right: 2.5rem;
+}
+
+// ─── Input group — label wrapping icon(s) + input ──────────────────
+//
+// Pattern:
+//   <label>
+//     <svg class="ln-icon"/>   ← leading icon (optional)
+//     <input type="…">
+//     <svg class="ln-icon"/>   ← trailing icon (optional)
+//   </label>
+//
+// The <label> becomes the visual container (border, padding, focus
+// ring). The nested <input> strips its form-input container chrome so
+// that horizontal rhythm is owned by the label's px + gap, and vertical
+// rhythm by the label's py. Without this, the input keeps its own
+// padding and fights the wrapper — see the asymmetric spacing that
+// motivated this mixin.
+//
+// Applied via semantic selector in components/_forms.scss — no class
+// needed on the <label>.
+
+@mixin form-input-icon-group {
+	@include inline-flex;
+	@include items-center;
+	@include gap(var(--spacing-sm));
+	// Symmetric padding — the icon provides a left visual anchor, so the
+	// usual wider horizontal / narrower vertical rhythm of form-input would
+	// leave the icon "trapped" in a tall cell. Using spacing-sm on all four
+	// sides keeps icon-group compact and visually balanced in narrow
+	// toolbar/header contexts. Regular text inputs keep their px-md/py-sm
+	// rhythm via @mixin form-input — that asymmetry is hidden by their width.
+	@include p(var(--spacing-sm));
+	@include bg-primary;
+	@include border;
+	@include rounded-md;
+	@include transition;
+	font-size: var(--text-body-md);
+	line-height: var(--lh-body-md);
+	// Wrapping-label reset: undo form-label defaults that would otherwise leak.
+	margin-bottom: 0;
+
+	&:focus-within {
+		border-color: hsl(var(--color-primary));
+		@include focus-ring;
+	}
+
+	> .ln-icon {
+		@include flex-shrink-0;
+		color: hsl(var(--color-text-muted));
+	}
+
+	> input {
+		// Strip container chrome inherited from form-input — label owns it now.
+		@include p(0);
+		@include border-none;
+		background: transparent;
+		outline: none;
+		box-shadow: none;
+
+		// Tighten leading for a single-line control. form-input inherits
+		// --lh-body-md (1.6) which is tuned for prose readability, not form
+		// controls — that leaves ~7px of wasted leading above and below the
+		// glyph inside the input's own line box, which compounds with the
+		// label's padding and makes icon-group feel airy. 1.25 keeps
+		// descenders (g/p/j/y) safe and brings the label down to ~36px total.
+		line-height: 1.25;
+
+		// Take the remaining flex space. width: auto cancels form-input's
+		// width: 100%; flex-1 + min-width: 0 lets the field shrink below
+		// its intrinsic min-content inside a narrow label.
+		width: auto;
+		@include flex-1;
+		min-width: 0;
+
+		&:focus-visible {
+			border-color: transparent;
+			box-shadow: none;
+		}
+	}
 }
 
 // ─── Checkbox & Radio ───────────────────────────────────────────

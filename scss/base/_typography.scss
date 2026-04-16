@@ -97,6 +97,10 @@ pre {
 	}
 }
 
+table {
+	@include mb(1rem);
+}
+
 kbd {
 	@include kbd;
 }

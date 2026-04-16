@@ -151,17 +151,24 @@
 	> main {
 		@include p(var(--spacing-lg));
 
-		// Auto-flush: table or .table-container as direct child —
-		// remove padding, strip table's own radius/shadow (card's
-		// overflow:hidden handles the rounded corners).
-		&:has(> table),
-		&:has(> .table-container) {
+		// Auto-flush: ONLY when the table (or .table-container) is the
+		// sole child of main — i.e. the card is a pure table card.
+		// Strip padding so the table spans edge-to-edge, and drop the
+		// table's own radius/shadow (card's overflow:hidden handles
+		// rounded corners).
+		//
+		// If main has mixed content (intro <p>, demo-split, <h4>,
+		// then <table>), :only-child doesn't match, padding stays,
+		// and the table keeps its own inset.
+		&:has(> table:only-child),
+		&:has(> .table-container:only-child) {
 			@include p(0);
 
 			> table,
 			> .table-container > table {
 				border-radius: 0;
 				box-shadow: none;
+				margin-bottom: 0;
 			}
 		}
 	}

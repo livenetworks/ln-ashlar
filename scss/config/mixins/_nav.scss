@@ -94,6 +94,14 @@
 		&::before { display: none; }
 	}
 
+	// Vertical breathing room between floating pills.
+	// Only this preset needs it — flush full-width presets (border-*) deliberately
+	// share edges. Using `li + li` avoids a top margin above the first item and
+	// sidesteps margin-collapse because only one side contributes.
+	li + li {
+		@include mt(0.125rem);
+	}
+
 	a {
 		@include mx(0.5rem);
 		@include px(0.75rem);
