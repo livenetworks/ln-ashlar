@@ -2,4 +2,5 @@
 
 .loader {
 	@include loader;
+	@include my(4.5rem);
 }
