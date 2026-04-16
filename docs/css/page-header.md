@@ -13,7 +13,7 @@ singleton id.
 ## Structure
 
 ```html
-<main class="main">                             <!-- container-type: inline-size -->
+<main class="main">
     <header id="page-header">
         <nav aria-label="Breadcrumb">
             <ol>
@@ -38,12 +38,12 @@ Breadcrumbs inside a page-header get styled automatically — you don't need `id
 
 ## Responsive
 
-The header uses a container query at `880px`:
+The header uses a viewport media query at `880px`:
 - Below 880px: stacks `breadcrumbs → title → actions` vertically
 - At 880px+: breadcrumbs on top full-width, title-left + actions-right
 
-The parent container must declare `container-type: inline-size` or
-use `@include container` for the query to match.
+Self-contained — the flip triggers from viewport width regardless of
+wrappers. No parent `container-type` required.
 
 ## Slots
 
@@ -62,6 +62,5 @@ The library applies the mixin to `#page-header` by default. For a secondary page
 #document-detail > header { @include page-header; }
 ```
 
-In a project layout that already establishes `container-type` on the
-main content area, the query fires automatically — no extra wrapper
-needed.
+Works in any layout — the responsive flip is viewport-driven and
+requires no parent container context.

@@ -16,7 +16,7 @@
 	@include mb(1.5rem);
 	border-bottom: 1px solid hsl(var(--color-border));
 
-	@container (min-width: 880px) {
+	@media (min-width: 880px) {
 		grid-template-areas:
 			'breadcrumbs breadcrumbs'
 			'title       actions';
@@ -50,7 +50,7 @@
 		@include flex-row;
 		@include gap(0.5rem);
 
-		@container (max-width: 879px) {
+		@media (max-width: 879px) {
 			justify-content: flex-start;
 		}
 	}
