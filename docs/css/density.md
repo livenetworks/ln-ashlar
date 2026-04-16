@@ -154,7 +154,7 @@ They cannot collide:
 ## Container query interaction
 
 Density only changes internal spacing, never outer dimensions. A
-filter-toolbar with a container query at 880px still flips at 880px
+page-header with a container query at 880px still flips at 880px
 in both comfortable and compact modes.
 
 ## Adding a new component to density
