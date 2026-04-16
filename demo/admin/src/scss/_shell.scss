@@ -64,6 +64,31 @@
 		}
 	}
 
+	.sidebar-search {
+		@include flex;
+		@include items-center;
+		@include gap(0.5rem);
+		@include px(1rem);
+		@include py(0.75rem);
+		@include border-b;
+
+		input {
+			@include flex-1;
+			@include text-sm;
+			@include border;
+			@include rounded-sm;
+			@include px(0.5rem);
+			@include py(0.25rem);
+			background: hsl(var(--color-bg-secondary));
+			min-width: 0;
+		}
+
+		.ln-icon {
+			@include text-muted;
+			@include flex-shrink-0;
+		}
+	}
+
 	.sidebar-content {
 		@include flex-1;
 		@include overflow-auto;
