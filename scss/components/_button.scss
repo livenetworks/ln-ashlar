@@ -1,5 +1,16 @@
 @use '../config/mixins' as *;
 
+// Prototype-tier classes.
+// These classes are provided for prototyping, inspector experimentation,
+// and demo HTML only. In production, apply the corresponding mixin to a
+// semantic selector:
+//
+//   #add-user        { @include btn; }
+//   #users-table ul  { @include btn-group; }
+//
+// See CLAUDE.md "Button Architecture" and "Button Groups vs Pill Groups"
+// for the production pattern.
+
 .btn    { @include btn; }
 .btn-sm { @include btn-sm; }
 .btn-lg { @include btn-lg; }
