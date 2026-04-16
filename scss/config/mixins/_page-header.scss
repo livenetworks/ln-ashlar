@@ -34,6 +34,9 @@
 
 		h1 {
 			@include typography(display-sm);
+			// Override the global h1 `mb(1rem)` from scss/base/_typography.scss —
+			// the page-header grid supplies vertical rhythm via `gap`, so a
+			// trailing margin on the title would stack on top of the gap.
 			margin: 0;
 		}
 

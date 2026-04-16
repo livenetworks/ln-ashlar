@@ -10,6 +10,11 @@ h6 {
 	@include font-bold;
 }
 
+// The global 1rem bottom margin is the default for h1 rendered inline
+// with surrounding content (articles, page body, demo index). Containers
+// that provide their own spacing via `gap` — notably `@include page-header`
+// — intentionally zero this margin on their internal h1 so the gap is the
+// sole source of vertical rhythm. See scss/config/mixins/_page-header.scss.
 h1 {
 	@include typography(display-sm);
 	@include tracking-tight;
