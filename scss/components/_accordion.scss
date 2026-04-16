@@ -1,0 +1,15 @@
+@use '../config/mixins' as *;
+
+// ==========================================================================
+// Accordion — styled list with chevron rotation
+// ==========================================================================
+// [data-ln-accordion] gets the full styled accordion: bordered card,
+// dividers, trigger hover, chevron rotate on open.
+//
+// To style a custom selector instead of (or in addition to) the data
+// attribute: #my-list { @include accordion; }
+// ==========================================================================
+
+[data-ln-accordion] {
+	@include accordion;
+}

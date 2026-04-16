@@ -21,10 +21,6 @@
 //   .my-panel > .inner { @include collapsible-content; }
 // ==========================================================================
 
-[data-ln-accordion] {
-	@include accordion;
-}
-
 // .collapsible parent is always a zero-padding grid container — that
 // contract comes from @include collapsible. The child (.collapsible-body
 // or anything else @include collapsible-content lands on) owns padding
