@@ -17,7 +17,6 @@
 @use 'components/sections';
 @use 'components/nav';
 @use 'components/breadcrumbs';
-@use 'components/loader';
 @use 'components/avatar';
 @use 'components/status-badge';
 @use 'components/alert';
@@ -32,6 +31,7 @@
 @use 'components/tooltip';
 @use 'components/toggle-switch';
 @use 'components/chip';
+@use 'components/loader';
 
 @use 'utilities/utilities';
 @use 'utilities/animations';
