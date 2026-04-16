@@ -1,5 +1,0 @@
-@use '../config/mixins' as *;
-
-[data-ln-filter-toolbar] {
-	@include filter-toolbar;
-}
