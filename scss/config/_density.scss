@@ -42,7 +42,6 @@
 	// because it has no analogue in the base token scale.
 	// -----------------------------------------------------------------------
 	--density-row-h:    2.75rem;  // 44px — comfortable input/row min
-	--density-row-h-sm: 2.25rem;  // 36px — compact-equivalent min for sub-elements
 }
 
 // ---------------------------------------------------------------------------
@@ -103,5 +102,4 @@
 
 	// -- Row height — density-specific (no base-token analogue) ---------
 	--density-row-h:    2.25rem;
-	--density-row-h-sm: 1.875rem;
 }

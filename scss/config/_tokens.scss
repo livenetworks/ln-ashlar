@@ -104,6 +104,7 @@
 	// -----------------------------------------------------------------------
 	// Spacing
 	// -----------------------------------------------------------------------
+	// Public API surface — full scale exposed; internal usage may skip levels.
 	--spacing-2xs: 0.125rem; // 2px
 	--spacing-xs:  0.25rem;  // 4px
 	--spacing-sm:  0.5rem;   // 8px
@@ -118,12 +119,14 @@
 	// -----------------------------------------------------------------------
 	// Border Width
 	// -----------------------------------------------------------------------
+	// Public API surface — full scale exposed; internal usage may skip levels.
 	--border-width: 1px;
 	--border-width-strong: 2px;
 
 	// -----------------------------------------------------------------------
 	// Content widths
 	// -----------------------------------------------------------------------
+	// Public API surface — full scale exposed; internal usage may skip levels.
 	--max-w-prose:     65ch;
 	--max-w-form:      32rem;
 	--max-w-content:   48rem;
@@ -141,6 +144,7 @@
 	// -----------------------------------------------------------------------
 	// Shadows — cool-tinted, dual-layer (v1.1)
 	// -----------------------------------------------------------------------
+	// Public API surface — full scale exposed; internal usage may skip levels.
 	--shadow-none: none;
 
 	--shadow-xs:
@@ -184,6 +188,7 @@
 	// -----------------------------------------------------------------------
 	// Easings — curves only (no duration)
 	// -----------------------------------------------------------------------
+	// Public API surface — full scale exposed; internal usage may skip levels.
 	--easing-standard:   cubic-bezier(0.4, 0, 0.2, 1);
 	--easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
 	--easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
@@ -205,6 +210,7 @@
 	// -----------------------------------------------------------------------
 	// Typography — semantic role tokens (v1.1)
 	// -----------------------------------------------------------------------
+	// Public API surface — full scale exposed; internal usage may skip levels.
 	--text-display-lg: 3.75rem;   --lh-display-lg: 1.1;
 	--text-display-md: 3rem;      --lh-display-md: 1.1;
 	--text-display-sm: 2.25rem;   --lh-display-sm: 1.15;

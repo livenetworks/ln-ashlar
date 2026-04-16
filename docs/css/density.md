@@ -61,7 +61,7 @@ form — comfortable IS the default `:root` state (values live in
 | `--text-title-md/sm`, `--lh-title-md/sm` | yes | h4, h5, panel header h3 |
 | `--text-heading-sm/md/lg`, `--lh-heading-*` | yes | h3, h2, stat-card value |
 | `--text-display-sm`, `--lh-display-sm` | yes | h1, page-header title |
-| `--density-row-h`, `--density-row-h-sm` | yes | Table row min-height |
+| `--density-row-h` | yes | Table row min-height |
 
 `--density-row-h` is the only token that stays density-named. It has
 no analogue in the base token scale (there is no `--row-height` in
