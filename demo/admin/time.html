@@ -40,7 +40,10 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'Time formatting component.'})">
+					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					</button>
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
 						Test Toast
 					</button>
 				</div>
@@ -52,13 +55,18 @@
 		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
-				<button  data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-			<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
 				<span class="app-name">acme-gui</span>
 			</div>
 
+			<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
+				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+				<input type="search" placeholder="Filter menu…">
+			</label>
+
 			<div class="sidebar-content">
-				<nav class="nav" data-ln-nav="active">
+				<nav class="nav" id="demo-nav" data-ln-nav="active">
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
