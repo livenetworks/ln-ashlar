@@ -70,6 +70,8 @@
 //
 // Breakpoints: 480px, 580px, 880px, 1120px
 @mixin container($name: null) {
+	// Nameless form is intentional — models native anonymous @container queries.
+	// See docs/css/layout.md ("Anonymous container") and demo/admin/mixins.html.
 	container-type: inline-size;
 	@if $name { container-name: $name; }
 }
