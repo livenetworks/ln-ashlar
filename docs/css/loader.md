@@ -30,7 +30,16 @@ Default is `font-size: 90px` — a prominent page-level spinner. Override for sm
 
 ## Positioning
 
-The mixin centers the spinner horizontally with `margin: auto` and adds vertical spacing (`margin-top/bottom: 4.5rem`). For full-page loading, wrap in a centered container:
+The mixin centers the spinner horizontally with `margin: auto`. It does NOT set vertical margin — layout rhythm is a consumer concern. The default `.loader` binding adds `margin-top/bottom: 4.5rem` for page-level empty-state usage; when applying the mixin to your own selector, add your own vertical spacing if you need it:
+
+```scss
+#inline-spinner {
+    @include loader;
+    @include my(2rem);
+}
+```
+
+For full-page loading, wrap in a centered container:
 
 ```html
 <div id="page-loader" role="status" aria-label="Loading"></div>
