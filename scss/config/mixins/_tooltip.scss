@@ -13,6 +13,7 @@
 		position: absolute;
 		@include px(0.5rem);
 		@include py(0.25rem);
+		// Direct neutral: always-dark tooltip -- intentionally opaque regardless of theme surface
 		background: hsl(var(--color-neutral-900));
 		color: hsl(var(--color-neutral-50));
 		@include typography(caption);

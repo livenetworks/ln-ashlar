@@ -6,6 +6,7 @@
 	position: relative;
 	width: 2.5rem;
 	height: 1.5rem;
+	// Direct neutral: off-state track -- no semantic "track-inactive" token exists
 	background: hsl(var(--color-neutral-300));
 	border-radius: 9999px;
 	cursor: pointer;

@@ -25,10 +25,14 @@
 	--color-primary-lighter: 232 75% 97%;
 
 	// -----------------------------------------------------------------------
-	// Colors — Secondary
+	// Colors — Secondary (brand accent — surface/element color, NOT text)
+	// For subdued text color, see --color-text-secondary in the Text section.
 	// -----------------------------------------------------------------------
 	--color-secondary: 160 76% 40%;
 	--color-secondary-hover: 162 93% 31%;
+	--color-secondary-focus:   160 76% 48%;
+	--color-secondary-light:   160 76% 93%;
+	--color-secondary-lighter: 160 76% 97%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Status
@@ -60,6 +64,11 @@
 	// -----------------------------------------------------------------------
 	// Colors — Neutral scale (canonical greys)
 	// -----------------------------------------------------------------------
+	// Mixins may reach into the neutral scale directly when no semantic
+	// token matches the intent. Every such reference must be verified
+	// during dark-mode audits -- semantic tokens inherit dark adjustments
+	// automatically, direct-neutral references do not.
+	//
 	--color-neutral-50:  220 20% 98%;
 	--color-neutral-100: 220 16% 96%;
 	--color-neutral-150: 220 14% 93%;
@@ -73,7 +82,8 @@
 	--color-neutral-900: 221 39% 11%;
 
 	// -----------------------------------------------------------------------
-	// Colors — Text (reference neutral scale)
+	// Colors — Text (reference neutral scale — NOT the same as --color-secondary)
+	// --color-text-secondary = muted text; --color-secondary = brand accent surface.
 	// -----------------------------------------------------------------------
 	--color-text-primary:   var(--color-neutral-900);
 	--color-text-secondary: var(--color-neutral-500);

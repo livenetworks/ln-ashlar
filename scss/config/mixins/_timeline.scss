@@ -19,6 +19,7 @@
 		bottom: calc(var(--lh-caption) * var(--text-caption) / 2);
 		left: calc(0.5rem - 1px);
 		width: 2px;
+		// Direct neutral: rail intentionally heavier than --color-border (neutral-200 vs alias)
 		background: hsl(var(--color-neutral-200));
 	}
 

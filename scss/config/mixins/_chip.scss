@@ -12,6 +12,7 @@
 	@include px(0.625rem);
 	@include py(0.25rem);
 	@include typography(label-sm);
+	// Direct neutral: --color-bg-secondary (neutral-50) is too light for chip fill
 	background: hsl(var(--color-neutral-100));
 	color: hsl(var(--color-text-primary));
 	@include rounded-full;
@@ -30,6 +31,7 @@
 		color: hsl(var(--color-text-secondary));
 
 		&:hover {
+			// Direct neutral: close-button hover needs one step darker than chip fill
 			background: hsl(var(--color-neutral-200));
 			color: hsl(var(--color-text-primary));
 		}
