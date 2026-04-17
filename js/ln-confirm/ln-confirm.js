@@ -22,6 +22,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this.originalText = dom.textContent.trim();
 		this.confirmText = dom.getAttribute(DOM_SELECTOR) || 'Confirm?';
 		this.revertTimer = null;
+		this._submitted = false;
 
 		const self = this;
 		this._onClick = function (e) {
@@ -30,6 +31,8 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 				e.stopImmediatePropagation();
 				self._enterConfirm();
 			} else {
+				if (self._submitted) return;
+				self._submitted = true;
 				// Second click — allow form submit
 				self._reset();
 			}
@@ -76,6 +79,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	};
 
 	_component.prototype._reset = function () {
+		this._submitted = false;
 		this.confirming = false;
 		this.dom.removeAttribute('data-confirming');
 

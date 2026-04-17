@@ -4,6 +4,7 @@ import { cloneTemplateScoped, dispatch, findElements, guardBody } from '../ln-co
 	const DOM_SELECTOR = 'data-ln-data-table';
 	const DOM_ATTRIBUTE = 'lnDataTable';
 
+	// Tuning constant — duplicated in ln-table for component independence
 	const VIRTUAL_THRESHOLD = 200;
 	const BUFFER_ROWS = 15;
 

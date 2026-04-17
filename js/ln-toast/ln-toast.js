@@ -63,6 +63,7 @@ import { guardBody } from '../ln-core';
 
 		const side = document.createElement("div");
 		side.className = "ln-toast__side";
+		// Trust boundary: ICONS[type] contains hardcoded SVG strings defined in this module
 		side.innerHTML = ICONS[type] || ICONS.info;
 
 		const content = document.createElement("div");
@@ -79,6 +80,7 @@ import { guardBody } from '../ln-core';
 		x.type = "button";
 		x.className = "ln-toast__close";
 		x.setAttribute("aria-label", "Close");
+		// Trust boundary: hardcoded close-icon SVG string literal
 		x.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>';
 		x.addEventListener("click", function () { _dismiss(li); });
 

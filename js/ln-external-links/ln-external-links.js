@@ -16,6 +16,11 @@ import { dispatch, guardBody } from '../ln-core';
 		link.target = '_blank';
 		link.rel = 'noopener noreferrer';
 
+		const hint = document.createElement('span');
+		hint.className = 'sr-only';
+		hint.textContent = '(opens in new tab)';
+		link.appendChild(hint);
+
 		link.setAttribute('data-ln-external-link', 'processed');
 
 		dispatch(link, 'ln-external-links:processed', {

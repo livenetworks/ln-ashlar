@@ -24,6 +24,7 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../ln
 		if (document.querySelector('[data-ln-template="ln-upload-item"]')) return;
 		if (!document.body) return;
 		const holder = document.createElement('div');
+		// Trust boundary: DEFAULT_ITEM_TEMPLATE_HTML is a hardcoded template string defined above
 		holder.innerHTML = DEFAULT_ITEM_TEMPLATE_HTML;
 		const tmpl = holder.firstElementChild;
 		if (tmpl) document.body.appendChild(tmpl);

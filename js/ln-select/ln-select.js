@@ -14,6 +14,7 @@ import { guardBody } from '../ln-core';
 
 	const TomSelect = window.TomSelect;
 	if (!TomSelect) {
+		console.warn('[ln-select] TomSelect not found. Load TomSelect before ln-acme.');
 		window.lnSelect = { initialize: function(){}, destroy: function(){}, getInstance: function(){ return null; } };
 		return;
 	}

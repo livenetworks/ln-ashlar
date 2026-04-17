@@ -14,6 +14,22 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	let _dbReady = null; // Promise that resolves when db is open
 	const _stores = {};  // name → { el, config }
 
+	function _uuid() {
+		try { return crypto.randomUUID(); }
+		catch (_) {
+			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+				const r = Math.random() * 16 | 0;
+				return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+			});
+		}
+	}
+
+	function _checkQuota(err) {
+		if (err && err.name === 'QuotaExceededError') {
+			dispatch(document, 'ln-store:quota-exceeded', { error: err });
+		}
+	}
+
 	// ─── Database ──────────────────────────────────────────
 
 	function _getRequiredStores() {
@@ -152,7 +168,10 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	function _idbRequest(request) {
 		return new Promise(function (resolve, reject) {
 			request.onsuccess = function () { resolve(request.result); };
-			request.onerror = function () { reject(request.error); };
+			request.onerror = function () {
+				_checkQuota(request.error);
+				reject(request.error);
+			};
 		});
 	}
 
@@ -260,7 +279,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 	function _handleCreate(self, detail) {
 		const data = detail.data || {};
-		const tempId = '_temp_' + crypto.randomUUID();
+		const tempId = '_temp_' + _uuid();
 		const record = Object.assign({}, data, { id: tempId });
 
 		_putRecord(self._name, record).then(function () {
@@ -660,7 +679,10 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 					store.put(records[i]);
 				}
 				tx.oncomplete = function () { resolve(); };
-				tx.onerror = function () { reject(tx.error); };
+				tx.onerror = function () {
+					_checkQuota(tx.error);
+					reject(tx.error);
+				};
 			});
 		});
 	}

@@ -8,6 +8,10 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	function _isVisible(el) {
+		return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+	}
+
 	// ─── Open-stack (Escape closes top of stack) ───────────────
 
 	const openStack = [];
@@ -85,6 +89,7 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 		this._teleportRestore = null;
 		this._previousFocus = null;
 		this._boundDocClick = null;
+		this._docClickTimeout = null;
 		this._boundReposition = null;
 
 		// Make the popover container itself programmatically focusable
@@ -152,8 +157,9 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 			this.trigger.setAttribute('aria-expanded', 'true');
 		}
 
-		// Focus management — first focusable, or popover itself.
-		const focusable = this.dom.querySelector('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+		// Focus management — first visible focusable, or popover itself.
+		const allFocusable = this.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+		const focusable = Array.prototype.find.call(allFocusable, _isVisible);
 		if (focusable) {
 			focusable.focus();
 		} else {
@@ -168,7 +174,8 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 			if (self.trigger && self.trigger.contains(e.target)) return;
 			self.close();
 		};
-		setTimeout(function () {
+		self._docClickTimeout = setTimeout(function () {
+			self._docClickTimeout = null;
 			document.addEventListener('click', self._boundDocClick);
 		}, 0);
 
@@ -199,6 +206,10 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 	_component.prototype._applyClose = function () {
 		this.isOpen = false;
 
+		if (this._docClickTimeout) {
+			clearTimeout(this._docClickTimeout);
+			this._docClickTimeout = null;
+		}
 		if (this._boundDocClick) {
 			document.removeEventListener('click', this._boundDocClick);
 			this._boundDocClick = null;

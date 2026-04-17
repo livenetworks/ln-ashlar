@@ -18,6 +18,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this.dom = dom;
 		this.toggleEl = dom.querySelector('[data-ln-toggle]');
 		this._boundDocClick = null;
+		this._docClickTimeout = null;
 		this._boundScrollReposition = null;
 		this._boundResizeClose = null;
 		this._menuParent = null;
@@ -168,12 +169,17 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 				self.toggleEl.setAttribute('data-ln-toggle', 'close');
 			}
 		};
-		setTimeout(function () {
+		self._docClickTimeout = setTimeout(function () {
+			self._docClickTimeout = null;
 			document.addEventListener('click', self._boundDocClick);
 		}, 0);
 	};
 
 	_component.prototype._removeOutsideClickListener = function () {
+		if (this._docClickTimeout) {
+			clearTimeout(this._docClickTimeout);
+			this._docClickTimeout = null;
+		}
 		if (this._boundDocClick) {
 			document.removeEventListener('click', this._boundDocClick);
 			this._boundDocClick = null;

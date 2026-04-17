@@ -332,6 +332,25 @@ document.addEventListener('ln-toggle:open', function (e) {
 });
 ```
 
+### CustomEvent detail null checks
+
+Components that dispatch their own events control the `detail` payload — accessing
+`e.detail.x` directly is correct because `detail` is always set by the dispatcher.
+
+When listening to events where `detail` might be absent (external events, request
+events where callers may omit detail), use the guard pattern:
+
+```javascript
+// Guarded access — when detail may be null/undefined
+const loading = e.detail && e.detail.x;
+
+// Direct access — when this component dispatched the event
+const target = e.detail.target;
+```
+
+The `e.detail && e.detail.x` pattern is the project convention. Do not use
+`(e.detail || {}).x` or optional chaining (`e.detail?.x`).
+
 ---
 
 ## Trigger Re-init Guard
@@ -443,6 +462,57 @@ if (document.readyState === 'loading') {
     constructor(document.body);
 }
 ```
+
+---
+
+## API Export Patterns
+
+Components expose their API in one of three patterns, chosen based on how the component is used.
+
+### 1. Global Constructor (default)
+
+Most components: the constructor is registered on `window`. Instances live on DOM elements.
+
+```javascript
+window[DOM_ATTRIBUTE] = constructor;    // window.lnToggle, window.lnModal, ...
+// Instance: el.lnToggle.open(), el.lnModal.close()
+```
+
+Use when: component has DOM instances, each element gets its own API.
+
+### 2. Element API (per-instance closure)
+
+ln-upload: a plain object with methods is attached to the container element. The closure captures instance-specific state (file map, DOM references).
+
+```javascript
+container.lnUploadAPI = { getFileIds, getFiles, clear, destroy };
+```
+
+Use when: instance state is complex (closures, Maps) and doesn't fit the prototype pattern. Multiple instances on the same page each get their own API object.
+
+### 3. Functional API (singleton)
+
+ln-toast: the window registration IS the API. No per-element instances — one global queue.
+
+```javascript
+const api = function (domRoot) { return constructor(domRoot); };
+api.enqueue = enqueue;
+api.clear = clear;
+window[DOM_ATTRIBUTE] = api;
+// Usage: window.lnToast.enqueue({ type: 'success', message: '...' })
+```
+
+Use when: the component is a global service with no per-element state (toast queue, HTTP layer).
+
+### Choosing a pattern
+
+| Situation | Pattern |
+|-----------|---------|
+| Multiple instances, each with own DOM + state | Global constructor |
+| Multiple instances, complex closure state | Element API |
+| Single global service, no per-element instances | Functional API |
+
+Do NOT standardize to one pattern — each exists for architectural reasons.
 
 ---
 

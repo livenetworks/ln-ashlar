@@ -152,6 +152,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 						for (const targetId in data.content) {
 							const targetElement = document.getElementById(targetId);
 							if (targetElement) {
+								// Trust boundary: server response assumed trusted (same-origin). Sanitize if extending to third-party APIs.
 								targetElement.innerHTML = data.content[targetId];
 							}
 						}

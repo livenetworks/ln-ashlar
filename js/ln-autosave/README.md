@@ -13,6 +13,11 @@ Restores data on next visit if the form wasn't submitted. Clears storage on subm
 
 Storage key format: `ln-autosave:{pathname}:{identifier}` — unique per URL + form.
 
+> **Storage isolation:** ln-autosave uses its own `ln-autosave:` prefix, separate from
+> ln-core's `persist.js` (`ln:` prefix). The two systems cannot collide. However, if
+> another persistence layer manages the same form (e.g., a custom project-level autosave),
+> ensure it uses a different key prefix to avoid overwriting data.
+
 ## API
 
 ```javascript

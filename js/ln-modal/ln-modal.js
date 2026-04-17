@@ -6,6 +6,10 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	function _isVisible(el) {
+		return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+	}
+
 	// ─── Constructor ───────────────────────────────────────────
 
 	function constructor(domRoot) {
@@ -58,7 +62,11 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 
 		this._onFocusTrap = function (e) {
 			if (e.key !== 'Tab') return;
-			const focusable = self.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+			// Focuses in DOM order — positive tabindex not supported (anti-pattern per WCAG)
+			const focusable = Array.prototype.filter.call(
+				self.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+				_isVisible
+			);
 			if (focusable.length === 0) return;
 			const first = focusable[0];
 			const last = focusable[focusable.length - 1];
@@ -151,13 +159,15 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 			document.addEventListener('keydown', instance._onFocusTrap);
 
 			const autoFocusEl = el.querySelector('[autofocus]');
-			if (autoFocusEl) {
+			if (autoFocusEl && _isVisible(autoFocusEl)) {
 				autoFocusEl.focus();
 			} else {
-				const firstInput = el.querySelector('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
+				const inputs = el.querySelectorAll('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
+				const firstInput = Array.prototype.find.call(inputs, _isVisible);
 				if (firstInput) firstInput.focus();
 				else {
-					const firstFocusable = el.querySelector('a[href], button:not([disabled])');
+					const buttons = el.querySelectorAll('a[href], button:not([disabled])');
+					const firstFocusable = Array.prototype.find.call(buttons, _isVisible);
 					if (firstFocusable) firstFocusable.focus();
 				}
 			}

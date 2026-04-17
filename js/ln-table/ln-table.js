@@ -5,6 +5,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	const DOM_ATTRIBUTE = 'lnTable';
 	const SORT_ATTR = 'data-ln-sort';        // read-only: column type metadata (number/date/string) used when parsing rows
 	const EMPTY_TEMPLATE = 'data-ln-table-empty';
+	// Tuning constant — duplicated in ln-data-table for component independence
 	const VIRTUAL_THRESHOLD = 200;
 	const BUFFER_ROWS = 15;
 

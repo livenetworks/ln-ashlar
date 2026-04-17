@@ -1,4 +1,14 @@
 // ─── Persist (localStorage) ───────────────────────────────
+//
+// Key format: ln:{component}:{pathname}:{elementId}
+// Example:    ln:filter:/admin/users:status-filter
+//
+// Each component passes its own name ("filter", "table-sort", "toggle", "tabs"),
+// so keys are namespaced per component — no cross-component collision risk.
+// Element ID comes from data-ln-persist="key" or el.id.
+//
+// Note: ln-autosave uses its own separate prefix ("ln-autosave:") and does NOT
+// go through this module. No collision between the two systems.
 
 const PREFIX = 'ln:';
 
