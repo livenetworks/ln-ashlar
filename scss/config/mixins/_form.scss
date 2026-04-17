@@ -148,7 +148,7 @@
 
 	&:focus-within {
 		border-color: hsl(var(--color-primary));
-		@include focus-ring;
+		@include focus-background-shift;
 	}
 
 	> .ln-icon {

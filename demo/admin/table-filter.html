@@ -343,7 +343,8 @@
 
 						<!-- Department popover -->
 						<div data-ln-popover id="filter-dept">
-							<nav data-ln-filter="employee-table">
+							<input type="search" placeholder="Search..." data-ln-search="filter-dept-list" data-ln-search-items="label">
+							<nav id="filter-dept-list" data-ln-filter="employee-table">
 								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
 								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label>
 								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>
@@ -356,7 +357,8 @@
 
 						<!-- Role popover -->
 						<div data-ln-popover id="filter-role">
-							<nav data-ln-filter="employee-table">
+							<input type="search" placeholder="Search..." data-ln-search="filter-role-list" data-ln-search-items="label">
+							<nav id="filter-role-list" data-ln-filter="employee-table">
 								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-reset checked> All</label>
 								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Accountant"> Accountant</label>
 								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Backend Developer"> Backend Developer</label>
