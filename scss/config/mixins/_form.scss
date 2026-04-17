@@ -288,3 +288,33 @@
 		@include rounded-md;
 	}
 }
+
+// ─── Validation states ─────────────────────────────────────────
+
+@mixin form-validate-invalid {
+	border-color: hsl(var(--color-error));
+
+	&:focus-visible {
+		border-color: hsl(var(--color-error));
+		box-shadow: 0 0 0 3px hsl(var(--color-error) / 0.15);
+	}
+}
+
+@mixin form-validate-valid {
+	border-color: hsl(var(--color-success));
+
+	&:focus-visible {
+		border-color: hsl(var(--color-success));
+		box-shadow: 0 0 0 3px hsl(var(--color-success) / 0.15);
+	}
+}
+
+@mixin form-validate-errors {
+	list-style: none;
+	@include p(0);
+	@include m(0);
+	@include mt(var(--spacing-xs));
+	font-size: var(--text-caption);
+	line-height: var(--lh-caption);
+	color: hsl(var(--color-error));
+}

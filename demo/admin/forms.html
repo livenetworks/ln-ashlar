@@ -174,7 +174,7 @@
     &lt;input type="text" id="name" name="name"
            required data-ln-validate&gt;
     &lt;ul data-ln-validate-errors&gt;
-      &lt;li hidden data-ln-validate-error="required"&gt;
+      &lt;li class="hidden" data-ln-validate-error="required"&gt;
         Required field
       &lt;/li&gt;
     &lt;/ul&gt;
@@ -237,7 +237,7 @@
 								<label for="demo-fname">First Name</label>
 								<input type="text" id="demo-fname" name="fname" required placeholder="John" data-ln-validate>
 								<ul data-ln-validate-errors>
-									<li hidden data-ln-validate-error="required">First name is required</li>
+									<li class="hidden" data-ln-validate-error="required">First name is required</li>
 								</ul>
 							</div>
 							<div class="form-element">
@@ -248,16 +248,16 @@
 								<label for="demo-email">Email</label>
 								<input type="email" id="demo-email" name="email" required minlength="5" placeholder="email@example.com" data-ln-validate>
 								<ul data-ln-validate-errors>
-									<li hidden data-ln-validate-error="required">Email is required</li>
-									<li hidden data-ln-validate-error="typeMismatch">Invalid email format</li>
-									<li hidden data-ln-validate-error="tooShort">Must be at least 5 characters</li>
+									<li class="hidden" data-ln-validate-error="required">Email is required</li>
+									<li class="hidden" data-ln-validate-error="typeMismatch">Invalid email format</li>
+									<li class="hidden" data-ln-validate-error="tooShort">Must be at least 5 characters</li>
 								</ul>
 							</div>
 							<div class="form-element">
 								<label for="demo-phone">Phone</label>
 								<input type="tel" id="demo-phone" name="phone" placeholder="+1 555 ..." pattern="^\+?[\d\s\-]{7,}$" data-ln-validate>
 								<ul data-ln-validate-errors>
-									<li hidden data-ln-validate-error="patternMismatch">Invalid phone format</li>
+									<li class="hidden" data-ln-validate-error="patternMismatch">Invalid phone format</li>
 								</ul>
 							</div>
 							<div class="form-element">
@@ -646,7 +646,7 @@ form.lnForm.reset();</code></pre>
     &lt;label for="name"&gt;Name&lt;/label&gt;
     &lt;input type="text" id="name" name="name" required data-ln-validate&gt;
     &lt;ul data-ln-validate-errors&gt;
-      &lt;li hidden data-ln-validate-error="required"&gt;Required field&lt;/li&gt;
+      &lt;li class="hidden" data-ln-validate-error="required"&gt;Required field&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/p&gt;
 
@@ -654,8 +654,8 @@ form.lnForm.reset();</code></pre>
     &lt;label for="email"&gt;Email&lt;/label&gt;
     &lt;input type="email" id="email" name="email" required data-ln-validate&gt;
     &lt;ul data-ln-validate-errors&gt;
-      &lt;li hidden data-ln-validate-error="required"&gt;Required&lt;/li&gt;
-      &lt;li hidden data-ln-validate-error="typeMismatch"&gt;Invalid email&lt;/li&gt;
+      &lt;li class="hidden" data-ln-validate-error="required"&gt;Required&lt;/li&gt;
+      &lt;li class="hidden" data-ln-validate-error="typeMismatch"&gt;Invalid email&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/p&gt;
 

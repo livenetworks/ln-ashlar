@@ -67,3 +67,17 @@ label:not(:has(> input)) {
 .form-actions {
 	@include form-actions;
 }
+
+// ─── Validation states ─────────────────────────────────────────
+
+.ln-validate-invalid {
+	@include form-validate-invalid;
+}
+
+.ln-validate-valid {
+	@include form-validate-valid;
+}
+
+[data-ln-validate-errors] {
+	@include form-validate-errors;
+}

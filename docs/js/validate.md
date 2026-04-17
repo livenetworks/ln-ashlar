@@ -9,9 +9,9 @@ Per-field validation using the native `ValidityState` API. Shows/hides error mes
     <label for="email">Email</label>
     <input id="email" name="email" type="email" required minlength="5" data-ln-validate>
     <ul data-ln-validate-errors>
-        <li hidden data-ln-validate-error="required">This field is required</li>
-        <li hidden data-ln-validate-error="typeMismatch">Invalid email format</li>
-        <li hidden data-ln-validate-error="tooShort">Must be at least 5 characters</li>
+        <li class="hidden" data-ln-validate-error="required">This field is required</li>
+        <li class="hidden" data-ln-validate-error="typeMismatch">Invalid email format</li>
+        <li class="hidden" data-ln-validate-error="tooShort">Must be at least 5 characters</li>
     </ul>
 </div>
 ```

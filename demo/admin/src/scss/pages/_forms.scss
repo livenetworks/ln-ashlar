@@ -52,34 +52,6 @@
 	@include form-grid;
 
 	.form-element { grid-column: span 3; }
-
-	.ln-validate-invalid {
-		border-color: hsl(var(--color-error));
-
-		&:focus {
-			border-color: hsl(var(--color-error));
-			box-shadow: 0 0 0 3px hsl(var(--color-error) / 0.15);
-		}
-	}
-
-	.ln-validate-valid {
-		border-color: hsl(var(--color-success));
-
-		&:focus {
-			border-color: hsl(var(--color-success));
-			box-shadow: 0 0 0 3px hsl(var(--color-success) / 0.15);
-		}
-	}
-}
-
-// ─── Validation error messages ────────────────────────────
-[data-ln-validate-errors] {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	@include text-sm;
-	color: hsl(var(--color-error));
-	min-height: 1.25rem;
 }
 
 // ─── Select & Textarea demo ────────────────────────────

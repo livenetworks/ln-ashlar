@@ -93,9 +93,9 @@ Fields start clean — no errors, no CSS classes. Validation begins only after t
     <label for="email">Email</label>
     <input id="email" name="email" type="email" required minlength="5" data-ln-validate>
     <ul data-ln-validate-errors>
-        <li hidden data-ln-validate-error="required">This field is required</li>
-        <li hidden data-ln-validate-error="typeMismatch">Invalid email format</li>
-        <li hidden data-ln-validate-error="tooShort">Must be at least 5 characters</li>
+        <li class="hidden" data-ln-validate-error="required">This field is required</li>
+        <li class="hidden" data-ln-validate-error="typeMismatch">Invalid email format</li>
+        <li class="hidden" data-ln-validate-error="tooShort">Must be at least 5 characters</li>
     </ul>
 </div>
 ```
@@ -111,7 +111,7 @@ Fields start clean — no errors, no CSS classes. Validation begins only after t
         <option value="editor">Editor</option>
     </select>
     <ul data-ln-validate-errors>
-        <li hidden data-ln-validate-error="required">Please select a role</li>
+        <li class="hidden" data-ln-validate-error="required">Please select a role</li>
     </ul>
 </div>
 ```
@@ -135,8 +135,8 @@ For errors that native HTML can't express — password mismatch, async uniquenes
     <label for="password-confirm">Confirm Password</label>
     <input id="password-confirm" name="password_confirmation" type="password" required data-ln-validate>
     <ul data-ln-validate-errors>
-        <li hidden data-ln-validate-error="required">This field is required</li>
-        <li hidden data-ln-validate-error="passwordMismatch">Passwords do not match</li>
+        <li class="hidden" data-ln-validate-error="required">This field is required</li>
+        <li class="hidden" data-ln-validate-error="passwordMismatch">Passwords do not match</li>
     </ul>
 </div>
 ```
