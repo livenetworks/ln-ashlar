@@ -8,9 +8,24 @@ Sort header handler for tables. Companion to `ln-table` — detects `th[data-ln-
 <table data-ln-table>
     <thead>
         <tr>
-            <th data-ln-sort="string">Name</th>
-            <th data-ln-sort="number">Age</th>
-            <th data-ln-sort="date">Created</th>
+            <th data-ln-sort="string">
+                Name
+                <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+            </th>
+            <th data-ln-sort="number">
+                Age
+                <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+            </th>
+            <th data-ln-sort="date">
+                Created
+                <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+            </th>
             <th>Actions</th> <!-- not sortable -->
         </tr>
     </thead>
@@ -26,6 +41,7 @@ No separate attribute needed — any `<table>` containing `th[data-ln-sort]` is 
 |-----------|-----|-------------|
 | `data-ln-sort="type"` | `<th>` | Enables sorting. Type: `string`, `number`, or `date` |
 | `data-ln-sort-active="asc\|desc"` | `<th>` | Set by JS — indicates the currently active sort column and direction |
+| `data-ln-sort-icon` | `<svg>` inside `<th>` | Sort direction indicator. No value = neutral, `"asc"` = ascending, `"desc"` = descending |
 
 ## Events
 
@@ -51,6 +67,7 @@ Clicking a different column resets the previous column and starts at `asc`.
 
 - Sets `data-ln-sort-active="asc"` or `"desc"` on the active `<th>` — use this for CSS arrows
 - Clears `data-ln-sort-active` from all other headers when a new column is clicked
+- Toggles `.hidden` class on `[data-ln-sort-icon]` elements to show/hide the correct direction icon
 - The event is consumed by `ln-table` (if present) which performs the actual sort on its in-memory data
 - Can also be used standalone — listen for `ln-table:sort` on the table and implement your own sorting
 
@@ -62,8 +79,8 @@ th[data-ln-sort] {
     user-select: none;
 }
 
-th[data-ln-sort-active="asc"]::after  { content: ' ↑'; }
-th[data-ln-sort-active="desc"]::after { content: ' ↓'; }
+// Icons are in markup — styled via [data-ln-sort-icon] selector.
+// .hidden class toggles visibility. Opacity transitions on hover/active.
 ```
 
 ---
@@ -93,10 +110,16 @@ _handleClick(colIndex, th):
        - Same column, was 'asc' → 'desc'
        - Same column, was 'desc' → null (clear)
     2. Clear data-ln-sort-active from all <th>
-    3. If newDir is not null → set data-ln-sort-active on clicked <th>
-    4. Update _col and _dir
-    5. dispatch 'ln-table:sort' on the table
+    3. Call _setSortIcon(th, null) on all <th> — resets icons to neutral state
+    4. If newDir is not null → set data-ln-sort-active on clicked <th>
+    5. Call _setSortIcon(th, newDir) — toggles .hidden on [data-ln-sort-icon] elements
+    6. Update _col and _dir
+    7. dispatch 'ln-table:sort' on the table
 ```
+
+`_setSortIcon(th, dir)` queries all `[data-ln-sort-icon]` inside `th` and toggles
+`.hidden` so only the matching direction icon is visible. If no icons are present
+in markup, the function is a no-op — sort still works without visual indicators.
 
 ### Persistence
 

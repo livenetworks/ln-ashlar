@@ -28,21 +28,18 @@ import { persistGet, persistSet } from '../ln-core';
 
 	// ─── Component ─────────────────────────────────────────────
 
-	function _makeSortIcon() {
-		var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		svg.setAttribute('class', 'ln-icon ln-sort-icon');
-		svg.setAttribute('aria-hidden', 'true');
-		var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-		use.setAttribute('href', '#ln-sort-both');
-		svg.appendChild(use);
-		return svg;
-	}
-
 	function _setSortIcon(th, dir) {
-		var use = th.querySelector('svg.ln-sort-icon use');
-		if (!use) return;
-		var href = dir === 'asc' ? '#ln-arrow-up' : dir === 'desc' ? '#ln-arrow-down' : '#ln-sort-both';
-		use.setAttribute('href', href);
+		const icons = th.querySelectorAll('[data-ln-sort-icon]');
+		icons.forEach(function (icon) {
+			const val = icon.getAttribute('data-ln-sort-icon');
+			if (dir === null || dir === undefined) {
+				// Neutral: show the no-value icon, hide asc/desc
+				icon.classList.toggle('hidden', val !== null && val !== '');
+			} else {
+				// Show matching direction, hide others
+				icon.classList.toggle('hidden', val !== dir);
+			}
+		});
 	}
 
 	function _component(table, ths) {
@@ -56,12 +53,10 @@ import { persistGet, persistSet } from '../ln-core';
 			if (th[DOM_ATTRIBUTE + 'Bound']) return;
 			th[DOM_ATTRIBUTE + 'Bound'] = true;
 
-			// Inject sort icon if not already present
-			if (!th.querySelector('svg.ln-sort-icon')) {
-				th.appendChild(_makeSortIcon());
-			}
-
-			th._lnSortClick = function () {
+			th._lnSortClick = function (e) {
+				// Don't sort when user clicks an interactive child (filter button, etc.)
+				const interactive = e.target.closest('button, a, input, select, textarea, [data-ln-dropdown]');
+				if (interactive && interactive !== th) return;
 				self._handleClick(index, th);
 			};
 			th.addEventListener('click', th._lnSortClick);
