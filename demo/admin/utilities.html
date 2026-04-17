@@ -139,90 +139,38 @@
 			<!-- Content -->
 			<div class="content">
 					<h1>Utilities</h1>
-					<p>Helper CSS classes — directly from <code>@include</code> mixins, for use in HTML.</p>
+					<p>Infrastructure CSS classes that stay in HTML. For visual styling, use <code>@include</code> mixins in SCSS on semantic selectors.</p>
 
-		<!-- Text -->
+		<!-- Infrastructure -->
 		<section class="section-card">
-			<header><h3>Text &amp; Colors</h3></header>
+			<header><h3>Infrastructure</h3></header>
 			<main>
 				<table>
-					<thead><tr><th>Class</th><th>Result</th></tr></thead>
+					<thead><tr><th>Class</th><th>Purpose</th></tr></thead>
 					<tbody>
-						<tr><td>.text-primary</td><td><span class="text-primary">Primary text</span></td></tr>
-						<tr><td>.text-secondary</td><td><span class="text-secondary">Secondary text</span></td></tr>
-						<tr><td>.text-muted</td><td><span class="text-muted">Muted text</span></td></tr>
-						<tr><td>.text-success</td><td><span class="text-success">Success text</span></td></tr>
-						<tr><td>.text-error</td><td><span class="text-error">Error text</span></td></tr>
-						<tr><td>.text-warning</td><td><span class="text-warning">Warning text</span></td></tr>
-						<tr><td>.font-bold</td><td><span class="font-bold">Bold text</span></td></tr>
-						<tr><td>.font-semibold</td><td><span class="font-semibold">Semibold text</span></td></tr>
-						<tr><td>.uppercase</td><td><span class="uppercase">uppercase text</span></td></tr>
-						<tr><td>.font-mono</td><td><span class="font-mono">Monospace text</span></td></tr>
-						<tr><td>.truncate</td><td><div class="truncate" id="demo-truncate">A very long text that will be truncated with an ellipsis</div></td></tr>
+						<tr><td><code>.hidden</code></td><td>display: none — JS toggle target (used by ln-data-table, ln-tabs, etc.)</td></tr>
+						<tr><td><code>.sr-only</code></td><td>Visually hidden, accessible to screen readers</td></tr>
+						<tr><td><code>.container</code></td><td>Centered max-width wrapper with responsive horizontal padding</td></tr>
+						<tr><td><code>.container-sm</code></td><td>Narrow variant (56rem max-width)</td></tr>
 					</tbody>
 				</table>
 			</main>
 		</section>
 
-		<!-- Flex -->
+		<!-- Semantic Color Overrides -->
 		<section class="section-card">
-			<header><h3>Flex</h3></header>
+			<header><h3>Semantic Color Overrides</h3></header>
 			<main>
-				<h5>flex gap-4</h5>
-				<div class="flex gap-4 mb-4">
-					<div class="demo-box">A</div>
-					<div class="demo-box">B</div>
-					<div class="demo-box">C</div>
-				</div>
-
-				<h5>flex items-center justify-between</h5>
-				<div class="flex items-center justify-between mb-4">
-					<div class="demo-box">Left</div>
-					<div class="demo-box">Right</div>
-				</div>
-
-				<h5>flex-col gap-2</h5>
-				<div class="flex-col gap-2 mb-4">
-					<div class="demo-box">Row 1</div>
-					<div class="demo-box">Row 2</div>
-					<div class="demo-box">Row 3</div>
-				</div>
-			</main>
-		</section>
-
-		<!-- Spacing -->
-		<section class="section-card">
-			<header><h3>Spacing</h3></header>
-			<main>
+				<p>Apply to any parent element to thread <code>--color-primary</code> through the status color family. All child components (buttons, badges, progress bars) automatically adapt.</p>
 				<table>
-					<thead><tr><th>Class</th><th>Value</th></tr></thead>
+					<thead><tr><th>Class</th><th>Threads</th><th>Example</th></tr></thead>
 					<tbody>
-						<tr><td>.p-1 / .p-2 / .p-4 / .p-6</td><td>0.25rem / 0.5rem / 1rem / 1.5rem</td></tr>
-						<tr><td>.mb-0 / .mb-1 / .mb-2 / .mb-4 / .mb-6 / .mb-8</td><td>0 / 0.25 / 0.5 / 1 / 1.5 / 2rem</td></tr>
-						<tr><td>.gap-1 / .gap-2 / .gap-3 / .gap-4 / .gap-6</td><td>0.25 / 0.5 / 0.75 / 1 / 1.5rem</td></tr>
-						<tr><td>.mx-auto</td><td>margin: 0 auto</td></tr>
-						<tr><td>.mt-auto</td><td>margin-top: auto</td></tr>
-					</tbody>
-				</table>
-			</main>
-		</section>
-
-		<!-- Display & Size -->
-		<section class="section-card">
-			<header><h3>Display, Size, Position</h3></header>
-			<main>
-				<table>
-					<thead><tr><th>Class</th><th>CSS</th></tr></thead>
-					<tbody>
-						<tr><td>.block / .hidden</td><td>display: block / none</td></tr>
-						<tr><td>.w-full / .h-full</td><td>width/height: 100%</td></tr>
-						<tr><td>.overflow-hidden / .overflow-auto</td><td>overflow: hidden / auto</td></tr>
-						<tr><td>.relative / .absolute / .fixed / .sticky</td><td>position: ...</td></tr>
-						<tr><td>.rounded-sm / .rounded-md / .rounded-lg / .rounded-full</td><td>border-radius: token</td></tr>
-						<tr><td>.shadow-sm / .shadow-md / .shadow-lg</td><td>box-shadow: token</td></tr>
-						<tr><td>.border / .border-t / .border-b</td><td>border: 1px solid</td></tr>
-						<tr><td>.bg-primary / .bg-secondary</td><td>background: white / #f9fafb</td></tr>
-						<tr><td>.cursor-pointer / .select-none / .opacity-50</td><td>interaction</td></tr>
+						<tr><td><code>.success</code></td><td>--color-success-*</td><td><button type="submit" class="success">Success</button></td></tr>
+						<tr><td><code>.warning</code></td><td>--color-warning-*</td><td><button type="submit" class="warning">Warning</button></td></tr>
+						<tr><td><code>.error</code></td><td>--color-error-*</td><td><button type="submit" class="error">Error</button></td></tr>
+						<tr><td><code>.info</code></td><td>--color-info-*</td><td><button type="submit" class="info">Info</button></td></tr>
+						<tr><td><code>.secondary</code></td><td>--color-secondary-*</td><td><button type="submit" class="secondary">Secondary</button></td></tr>
+						<tr><td><code>.neutral</code></td><td>--color-text-muted</td><td><button type="submit" class="neutral">Neutral</button></td></tr>
 					</tbody>
 				</table>
 			</main>

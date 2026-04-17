@@ -142,6 +142,7 @@
 		.stat-change {
 			@include text-sm;
 			@include mt(0.5rem);
+			color: hsl(var(--color-primary));
 		}
 	}
 
@@ -153,6 +154,51 @@
 
 // ─── Card with fields ──────────────────────────────────
 #demo-card-fields > main > div { @include grid; }
+
+// --- Secondary brand accent showcase -----------------------
+#demo-secondary {
+	@include grid-4;
+
+	article {
+		@include card;
+		@include p(1rem);
+
+		h4 { margin: 0; }
+		p { margin: 0; @include text-sm; @include text-secondary; }
+	}
+
+	// First card: accent-top with secondary color
+	article:nth-child(1) {
+		@include card-accent-top;
+	}
+
+	// Second card: tinted bg with secondary color
+	article:nth-child(2) {
+		@include card-bg;
+	}
+
+	// Third card: explicit -light background
+	article:nth-child(3) {
+		background-color: hsl(var(--color-secondary-light));
+		border-color: hsl(var(--color-secondary) / 0.2);
+	}
+
+	// Fourth card: explicit -lighter background
+	article:nth-child(4) {
+		background-color: hsl(var(--color-secondary-lighter));
+		border-color: hsl(var(--color-secondary) / 0.1);
+	}
+}
+
+#demo-secondary-buttons {
+	@include flex;
+	@include gap(0.75rem);
+	@include mt(1rem);
+
+	button {
+		@include btn;
+	}
+}
 
 // ─── Card with header + body + footer ──────────────────
 #demo-full-cards {
