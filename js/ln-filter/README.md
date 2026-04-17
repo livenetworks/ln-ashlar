@@ -16,7 +16,6 @@ Also supports direct `<table>` row filtering by column text content — no `data
 | `data-ln-filter-reset` | `<input type="checkbox">` inside | Marks the "All" (reset) checkbox — replaces `data-ln-filter-value=""` (which still works as fallback) |
 | `data-ln-filter-hide` | target children | Set by JS when element doesn't match any active value |
 | `data-ln-filter-col="N"` | component root | Column index (0-based) for table row filtering. When set, ln-filter reads `<td>` text at column N instead of `data-*` attributes on children. |
-| `data-ln-filter-search` | `<input>` in parent container | Search input that filters the checkbox list (hides non-matching labels). Does not affect table row filtering. |
 
 ## API
 
@@ -174,27 +173,6 @@ Each filter must use a unique `data-ln-filter-key`. Row visibility is determined
 | Multiple `<tbody>` elements | All `<tbody>` rows are filtered |
 | Rows added dynamically | MutationObserver does NOT auto-re-filter. Call `el.lnFilter.filter(key, value)` manually after adding rows. |
 | Target is ln-table | ln-filter skips row filtering entirely — ln-table handles its own. |
-
-## Search Within Filter
-
-Add `data-ln-filter-search` to an `<input>` inside the **parent container** of the filter (or inside the filter nav itself) to enable live search over the checkbox list:
-
-```html
-<div>
-    <input type="search" placeholder="Search..." data-ln-filter-search>
-    <nav data-ln-filter="my-table" data-ln-filter-col="2">
-        <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
-        <template>
-            <label><input type="checkbox"> {{ text }}</label>
-        </template>
-    </nav>
-</div>
-```
-
-- Typing in the search input hides non-matching `<label>` elements using the `.hidden` class
-- Reset/All labels are never hidden
-- Clearing the search restores all labels
-- This only filters the checkbox list UI — it does NOT affect table row filtering
 
 ## CSS
 

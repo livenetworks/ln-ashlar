@@ -51,6 +51,25 @@
 // Filter popover content layout
 #filter-dept,
 #filter-role {
+	> input[data-ln-search] {
+		@include w-full;
+		@include px(var(--spacing-sm));
+		@include py(var(--spacing-xs));
+		@include text-sm;
+		background: none;
+		border: none;
+		@include border-b;
+		border-radius: 0;
+		outline: none;
+		@include mb(var(--spacing-xs));
+		margin-top: calc(var(--spacing-sm) * -1);
+
+		&:focus-visible {
+			@include focus-background-shift;
+			border-color: hsl(var(--color-primary));
+		}
+	}
+
 	nav {
 		@include stack(0.25rem);
 		max-height: 16rem;

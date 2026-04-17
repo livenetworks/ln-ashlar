@@ -31,6 +31,7 @@
 @use 'components/scrollbar';
 @use 'components/tooltip';
 @use 'components/toggle-switch';
+@use 'components/popover';
 @use 'components/chip';
 @use 'components/loader';
 
@@ -41,7 +42,6 @@
 @use '../js/ln-ajax/ln-ajax';
 @use '../js/ln-modal/ln-modal';
 @use '../js/ln-dropdown/ln-dropdown';
-@use '../js/ln-popover/ln-popover';
 @use '../js/ln-tooltip/ln-tooltip';
 @use '../js/ln-toast/ln-toast';
 @use '../js/ln-upload/ln-upload';

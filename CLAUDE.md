@@ -281,6 +281,21 @@ Projects apply the mixin to their own semantic selector (`#my-breadcrumbs { @inc
 #audit-log thead { display: none; } // no header for this one
 ```
 
+### Co-located JS SCSS (`js/ln-*/`)
+
+Co-located SCSS in JS component folders is ONLY for JS-state-driven CSS that
+cannot exist without the JS component:
+- Hide/show attributes: `[data-ln-*-hide] { display: none !important; }`
+- State transitions that JS controls directly
+
+Visual styling (padding, border, colors, layout, typography, shadows, z-index)
+ALWAYS belongs in the two-layer architecture:
+- Mixin: `scss/config/mixins/_component.scss`
+- Component: `scss/components/_component.scss`
+
+If a JS component needs visual styling, extract it into a mixin + component.
+The co-located SCSS should be minimal or empty.
+
 ## Adding a New SCSS Mixin + Component
 
 1. Create `scss/config/mixins/_new-component.scss` with `@mixin new-component { ... }`
@@ -317,6 +332,25 @@ When modifying component behavior (attributes, events, API, HTML structure):
 1. Update `js/ln-{name}/README.md` — reflect new/changed usage
 2. Update `docs/js/{name}.md` — reflect architectural changes
 3. Update `demo/admin/{name}.html` — add/update interactive examples
+
+## Using Existing JS Components
+
+Before using any `data-ln-*` attribute in HTML:
+1. Read `js/ln-{name}/README.md` — check the Attributes table for correct element placement
+2. Check Examples section for correct HTML structure
+3. Before creating a new data attribute → verify no existing component provides the functionality
+
+## Explain Approach Before Implementing
+
+For new or substantial work (new mixin, new component, new pattern, architectural change),
+present the implementation approach **before writing any code**:
+
+- **SCSS**: "Create `@mixin X` in `scss/config/mixins/`, apply in `scss/components/` on `[selector]`, project uses `@include X` on `#element`"
+- **JS**: "Component uses `data-ln-X` on `<element>`, dispatches event Y, project wires via Z"
+- **HTML**: "Structure is `<parent> > <child>`, component X on `<element>`, styled via mixin Y"
+
+Cover all layers touched. Wait for confirmation before executing.
+This does NOT apply to trivial fixes or established patterns — only new/substantial work.
 
 ## Override Architecture
 

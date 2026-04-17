@@ -154,7 +154,6 @@
 								<tr><td><code>data-ln-filter-reset</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Marks the "All" (reset) checkbox. Replaces <code>data-ln-filter-value=""</code> which still works as fallback.</td></tr>
 								<tr><td><code>data-ln-filter-hide</code></td><td>target children</td><td>Set by JS when element doesn't match</td></tr>
 									<tr><td><code>data-ln-filter-col</code></td><td>Component root</td><td>Column index (0-based) for table row filtering. Reads <code>&lt;td&gt;</code> text at column N.</td></tr>
-									<tr><td><code>data-ln-filter-search</code></td><td><code>&lt;input&gt;</code> near component</td><td>Search input that filters the checkbox list (not the table rows).</td></tr>
 							</tbody>
 						</table>
 					</main>
@@ -366,8 +365,8 @@
 						<p>Filter values auto-populated from column 2 text. Search input filters the checkbox list.</p>
 
 						<div>
-							<input type="search" placeholder="Search departments..." data-ln-filter-search>
-							<nav data-ln-filter="demo-table-3" data-ln-filter-col="2">
+							<input type="search" placeholder="Search departments..." data-ln-search="filter-dept-list-3" data-ln-search-items="label">
+							<nav id="filter-dept-list-3" data-ln-filter="demo-table-3" data-ln-filter-col="2">
 								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
 								<template>
 									<label><input type="checkbox"> {{ text }}</label>

@@ -11,7 +11,6 @@ import { persistGet, persistSet } from '../ln-core';
 	const HIDE_ATTR = 'data-ln-filter-hide';
 	const RESET_ATTR = 'data-ln-filter-reset';
 	const COL_ATTR = 'data-ln-filter-col';
-	const SEARCH_ATTR = 'data-ln-filter-search';
 
 	// Shared column filter state per table (AND across columns, OR within column)
 	const _tableFilters = new WeakMap();
@@ -141,9 +140,6 @@ import { persistGet, persistSet } from '../ln-core';
 				this.state.values = initValues;
 			}
 		}
-
-		// Initialize search-within-filter
-		this._initSearch();
 
 		dom.setAttribute(INIT_ATTR, '');
 		return this;
@@ -360,44 +356,6 @@ import { persistGet, persistSet } from '../ln-core';
 		}
 	};
 
-	// ─── Search Within Filter ──────────────────────────────────
-
-	_component.prototype._initSearch = function () {
-		// Look for search input in parent container (popover/dropdown wrapper)
-		const parent = this.dom.parentElement;
-		if (!parent) return;
-
-		const searchInput = parent.querySelector('[' + SEARCH_ATTR + ']')
-			|| this.dom.querySelector('[' + SEARCH_ATTR + ']');
-		if (!searchInput) return;
-
-		const self = this;
-		this._searchInput = searchInput;
-
-		this._onSearchInput = function () {
-			const term = searchInput.value.trim().toLowerCase();
-			const labels = self.dom.querySelectorAll('label');
-			for (let i = 0; i < labels.length; i++) {
-				const label = labels[i];
-				// Skip reset/all labels
-				const input = label.querySelector('input');
-				if (input && (input.hasAttribute(RESET_ATTR) || input.getAttribute(VALUE_ATTR) === '')) {
-					label.classList.remove('hidden');
-					continue;
-				}
-				if (!term) {
-					label.classList.remove('hidden');
-				} else if (label.textContent.toLowerCase().indexOf(term) !== -1) {
-					label.classList.remove('hidden');
-				} else {
-					label.classList.add('hidden');
-				}
-			}
-		};
-
-		searchInput.addEventListener('input', this._onSearchInput);
-	};
-
 	// ─── Public API ────────────────────────────────────────────
 
 	_component.prototype.filter = function (key, value) {
@@ -450,13 +408,6 @@ import { persistGet, persistSet } from '../ln-core';
 					if (Object.keys(filters).length === 0) _tableFilters.delete(table);
 				}
 			}
-		}
-
-		// Clean up search listener
-		if (this._searchInput && this._onSearchInput) {
-			this._searchInput.removeEventListener('input', this._onSearchInput);
-			delete this._searchInput;
-			delete this._onSearchInput;
 		}
 
 		this.inputs.forEach(function (input) {

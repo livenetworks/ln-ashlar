@@ -32,7 +32,6 @@ Generic filter component — filters children of a target element by `data-*` at
 | `data-ln-filter-hide` | target children | Set by JS when element doesn't match any active value |
 | `data-ln-filter-initialized` | component root | Set by JS after init. Prevents double-init |
 | `data-ln-filter-col="N"` | component root | 0-based column index for table row filtering. When present, reads `<td>` text instead of `data-*` attributes. |
-| `data-ln-filter-search` | `<input>` in parent container | Search input that filters the checkbox list UI (not table rows) |
 
 ## Events
 
@@ -188,19 +187,6 @@ Flow:
 
 **Constructor ordering:** `_populateFromColumn` runs BEFORE `this.inputs` is collected. This is critical — the inputs array must include auto-populated checkboxes.
 
-### Search Within Filter (`_initSearch`)
-
-Called at the end of the constructor.
-
-1. Looks for `[data-ln-filter-search]` in `this.dom.parentElement` first, then inside `this.dom`
-2. If found, stores reference as `this._searchInput` and attaches `input` event listener
-3. On each `input` event: lowercases the search term, iterates all `<label>` elements inside the filter nav
-4. Reset/All labels (inputs with `data-ln-filter-reset` or empty `data-ln-filter-value`) are never hidden
-5. Matching labels (text includes the search term) have `.hidden` removed; non-matching labels have `.hidden` added
-6. Empty search restores all labels
-
-The search listener is purely cosmetic — it does not change state, does not trigger `_render()`, and does not affect table row visibility.
-
 ### Event Flow
 
 Events dispatch **after** render via `_pendingEvents` + `_afterRender()`:
@@ -276,17 +262,16 @@ Change behavior:
 | `filter(key, value)` | `value`: string or string[] | Push `ln-filter:changed`, set `state.key` and `state.values` (single string wrapped in array; empty array or falsy resets) |
 | `reset()` | — | Push `ln-filter:reset` event, set state to `null`/`[]` |
 | `getActive()` | — | Return `{ key, values: [...] }` or `null` if in reset state; returns defensive copy of values |
-| `destroy()` | — | Remove all change listeners, search listener, table filter registry entry, the init guard attribute, and the instance reference |
+| `destroy()` | — | Remove all change listeners, table filter registry entry, the init guard attribute, and the instance reference |
 
 All methods go through the same state → batcher → render → event pipeline.
 
 ### Destroy Cleanup
 
-`destroy()` performs three cleanup steps:
+`destroy()` performs two cleanup steps:
 
 1. **Table filter registry**: if `colIndex !== null`, removes this filter's key entry from `_tableFilters`. If the table's filter map becomes empty, removes the table entry from the WeakMap entirely.
-2. **Search listener**: removes the `input` event listener from `_searchInput` if present.
-3. **Checkbox listeners**: removes all `change` listeners and the `Bound` guard property from each input.
+2. **Checkbox listeners**: removes all `change` listeners and the `Bound` guard property from each input.
 
 ### Why NOT `fill()` / `renderList()`
 
@@ -299,6 +284,5 @@ All methods go through the same state → batcher → render → event pipeline.
 1. **Init**: MutationObserver or DOMContentLoaded → `_findElements` → `new _component(dom)`
 2. **Guard**: `data-ln-filter-initialized` attribute prevents double-init on the same element
 3. **Auto-populate**: if `data-ln-filter-col` + `<template>` present, populate checkboxes from column data before collecting inputs
-4. **Search init**: attach `input` listener to `[data-ln-filter-search]` in parent container
-5. **Steady state**: change event or API call → set state → batcher → render → dispatch events
-6. **Destroy**: `destroy()` removes all change listeners, search listener, table filter registry entry, init guard attribute, and instance reference.
+4. **Steady state**: change event or API call → set state → batcher → render → dispatch events
+5. **Destroy**: `destroy()` removes all change listeners, table filter registry entry, init guard attribute, and instance reference.
