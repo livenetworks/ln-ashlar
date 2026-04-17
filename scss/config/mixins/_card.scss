@@ -78,27 +78,33 @@
 // Color reads from --color-primary, override per element
 // Usage: #my-card { @include card; @include card-accent-top; }
 
+@mixin _card-accent-base {
+	&:hover {
+		background-color: hsl(var(--color-primary) / 0.04);
+	}
+}
+
 @mixin card-accent-top {
+	@include _card-accent-base;
 	border-top: 3px solid hsl(var(--color-primary));
 	&:hover {
 		border-top-color: hsl(var(--color-primary));
-		background-color: hsl(var(--color-primary) / 0.04);
 	}
 }
 
 @mixin card-accent-bottom {
+	@include _card-accent-base;
 	border-bottom: 3px solid hsl(var(--color-primary));
 	&:hover {
 		border-bottom-color: hsl(var(--color-primary));
-		background-color: hsl(var(--color-primary) / 0.04);
 	}
 }
 
 @mixin card-accent-left {
+	@include _card-accent-base;
 	border-left: 3px solid hsl(var(--color-primary));
 	&:hover {
 		border-left-color: hsl(var(--color-primary));
-		background-color: hsl(var(--color-primary) / 0.04);
 	}
 }
 

@@ -12,4 +12,19 @@
 
 [data-ln-accordion] {
 	@include accordion;
+
+	> li {
+		// Trigger — element-level colors, typography, hover
+		> [data-ln-toggle-for] {
+			@include font-medium;
+			@include text-primary;
+			@include transition;
+
+			&:hover { @include bg-secondary; }
+
+			svg.ln-chevron {
+				color: hsl(var(--color-text-muted));
+			}
+		}
+	}
 }

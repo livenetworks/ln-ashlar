@@ -183,7 +183,7 @@ Flow:
 2. Iterate all `tBodies` rows, collect cell text at `colIndex`
 3. De-duplicate, sort alphabetically
 4. Determine `filterKey`: use key from existing `[data-ln-filter-key]` input, or `data-ln-filter-key` attribute on the nav root, or fallback `'col{N}'`
-5. For each unique value: clone template, set `data-ln-filter-key` and `data-ln-filter-value` on the `<input>`, set text node label, append to the filter nav root
+5. For each unique value: clone template, set `data-ln-filter-key` and `data-ln-filter-value` on the `<input>`, call `fillTemplate(clone, { text: value })` to replace `{{ text }}` placeholder, append to the filter nav root
 6. Return — the constructor then re-collects `this.inputs` to include the new inputs
 
 **Constructor ordering:** `_populateFromColumn` runs BEFORE `this.inputs` is collected. This is critical — the inputs array must include auto-populated checkboxes.
@@ -292,7 +292,7 @@ All methods go through the same state → batcher → render → event pipeline.
 
 - Inputs are server-rendered, not from templates. `_render()` toggles `input.checked` on existing inputs.
 - Target items are external DOM (a separate container by ID). ln-filter doesn't own or create them — it only sets/removes `data-ln-filter-hide`.
-- Auto-populate uses direct template cloning (`template.content.cloneNode(true)`) rather than `fill()` because it's a one-time init operation, not a reactive render cycle.
+- Auto-populate uses direct template cloning (`template.content.cloneNode(true)`) + `fillTemplate()` for `{{ text }}` placeholder replacement. Uses `fillTemplate` (not `fill`) because the label text is inline within the `<label>` element, not in a separate `[data-ln-field]` element.
 
 ### Lifecycle
 

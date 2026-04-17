@@ -134,7 +134,7 @@ When a `<template>` is present inside the filter root and `data-ln-filter-col` i
 <nav data-ln-filter="my-table" data-ln-filter-col="2">
     <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
     <template>
-        <label><input type="checkbox"> </label>
+        <label><input type="checkbox"> {{ text }}</label>
     </template>
 </nav>
 
@@ -143,7 +143,7 @@ When a `<template>` is present inside the filter root and `data-ln-filter-col` i
 </table>
 ```
 
-Unique non-empty text values from the column are collected, sorted alphabetically, and cloned from the template. Each cloned input receives `data-ln-filter-key` and `data-ln-filter-value` attributes automatically.
+Unique non-empty text values from the column are collected, sorted alphabetically, and cloned from the template. Each cloned input receives `data-ln-filter-key` and `data-ln-filter-value` attributes automatically. The `{{ text }}` placeholder is replaced with the column value via `fillTemplate` from ln-core.
 
 ### Multi-column AND filtering
 
@@ -185,7 +185,7 @@ Add `data-ln-filter-search` to an `<input>` inside the **parent container** of t
     <nav data-ln-filter="my-table" data-ln-filter-col="2">
         <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
         <template>
-            <label><input type="checkbox"> </label>
+            <label><input type="checkbox"> {{ text }}</label>
         </template>
     </nav>
 </div>

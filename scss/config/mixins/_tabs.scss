@@ -51,7 +51,6 @@
 	@include opacity-50;
 
 	&:hover {
-		color: hsl(var(--color-text-muted));
 		background: none;
 		border-bottom-color: transparent;
 	}

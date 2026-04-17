@@ -9,7 +9,7 @@ No DOM attribute, no constructor, no MutationObserver. Pure utility functions re
 ```js
 import {
     cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable,
-    fill, renderList, buildDict, guardBody, findElements,
+    fill, fillTemplate, renderList, buildDict, guardBody, findElements,
     reactiveState, deepReactive, createBatcher
 } from '../ln-core';
 ```
@@ -71,6 +71,29 @@ fill(li, { number: 1, title: 'Track', artist: 'Artist', isPlaying: true });
 
 - Returns `root` for chaining
 - Skips `null`/`undefined` values (existing content preserved)
+
+### fillTemplate(clone, data)
+
+Replace `{{ key }}` text-node placeholders in a cloned template fragment with values from `data`. Flat keys only (no nested `{{ item.text }}`).
+
+```js
+const frag = cloneTemplate('filter-item', 'ln-filter');
+fillTemplate(frag, { text: 'Engineering' });
+```
+
+```html
+<template data-ln-template="filter-item">
+    <label><input type="checkbox"> {{ text }}</label>
+</template>
+```
+
+- Walks text nodes via `TreeWalker(clone, NodeFilter.SHOW_TEXT)`
+- Replaces `{{ key }}` with `data[key]` (whitespace inside braces is flexible)
+- Missing keys produce empty string
+- No-op when no `{{` found in any text node — zero cost for templates without placeholders
+- Returns `clone` for chaining
+- Coexists with `fill()` — `{{ key }}` for inline text, `data-ln-field` for element content. Both patterns are valid and can be mixed in the same template
+- Called automatically by `renderList` after cloning — templates can use `{{ key }}` text nodes alongside `data-ln-field` elements without extra code
 
 ### renderList(container, items, templateName, keyFn, fillFn, componentTag)
 

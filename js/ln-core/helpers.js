@@ -96,6 +96,23 @@ export function fill(root, data) {
 	return root;
 }
 
+// ─── Template Text-Node Placeholders ──────────────────────
+
+export function fillTemplate(clone, data) {
+	if (!clone || !data) return clone;
+	const walker = document.createTreeWalker(clone, NodeFilter.SHOW_TEXT);
+	while (walker.nextNode()) {
+		const node = walker.currentNode;
+		if (node.textContent.indexOf('{{') !== -1) {
+			node.textContent = node.textContent.replace(
+				/\{\{\s*(\w+)\s*\}\}/g,
+				function (_, key) { return data[key] !== undefined ? data[key] : ''; }
+			);
+		}
+	}
+	return clone;
+}
+
 // ─── Keyed List Rendering ──────────────────────────────────
 
 export function renderList(container, items, templateName, keyFn, fillFn, componentTag) {
@@ -120,6 +137,7 @@ export function renderList(container, items, templateName, keyFn, fillFn, compon
 		} else {
 			const clone = cloneTemplate(templateName, componentTag);
 			if (!clone) continue;
+			fillTemplate(clone, item);
 			el = clone.firstElementChild;
 			if (!el) continue;
 			el.setAttribute('data-ln-key', key);

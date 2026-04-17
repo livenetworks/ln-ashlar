@@ -1,4 +1,4 @@
-import { dispatch, guardBody, findElements } from '../ln-core';
+import { dispatch, fillTemplate, guardBody, findElements } from '../ln-core';
 import { deepReactive, createBatcher } from '../ln-core';
 import { persistGet, persistSet } from '../ln-core';
 
@@ -68,23 +68,7 @@ import { persistGet, persistSet } from '../ln-core';
 			if (!input) continue;
 			input.setAttribute(KEY_ATTR, filterKey);
 			input.setAttribute(VALUE_ATTR, values[i]);
-			// Set label text — find the text node or span after the input
-			const label = clone.querySelector('label');
-			if (label) {
-				// Set the text node (last child or after input)
-				const textNodes = [];
-				for (let c = 0; c < label.childNodes.length; c++) {
-					if (label.childNodes[c].nodeType === 3) {
-						textNodes.push(label.childNodes[c]);
-					}
-				}
-				// Use last text node (after input) or create one
-				if (textNodes.length > 0) {
-					textNodes[textNodes.length - 1].textContent = ' ' + values[i];
-				} else {
-					label.appendChild(document.createTextNode(' ' + values[i]));
-				}
-			}
+			fillTemplate(clone, { text: values[i] });
 			dom.appendChild(clone);
 		}
 	}

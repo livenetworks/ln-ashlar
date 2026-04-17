@@ -231,9 +231,6 @@
 
 	&:checked {
 		background-image: none;
-		background-color: hsl(var(--color-primary));
-		border-color: hsl(var(--color-primary));
-		border-width: 1.5px;
 		box-shadow: inset 0 0 0 3px hsl(var(--color-bg-primary));
 	}
 }
@@ -251,6 +248,7 @@
 	@include text-sm;
 	@include font-medium;
 	@include mb(0);
+	@include rounded-md;
 	background-color: hsl(var(--color-bg-secondary));
 	border: var(--border-width) solid transparent;
 
@@ -264,6 +262,17 @@
 	&:hover:not(:has(> input:checked)) {
 		border-color: hsl(var(--color-border));
 	}
+
+	&:hover:has(> input:checked) {
+		background-color: hsl(var(--color-primary-hover));
+	}
+}
+
+// ─── Pill outline — adds visible border + shows input ──────────
+
+@mixin pill-outline {
+	border-color: hsl(var(--color-border));
+	> input { display: initial; }
 }
 
 @mixin pill-group {
@@ -287,6 +296,20 @@
 	li:only-child label {
 		@include rounded-md;
 	}
+}
+
+// ─── Check list — vertical label list ──────────────────────────
+// <ul><li><label><input> — same structure as pill-group but vertical.
+// Labels already have pill styling via the global component binding.
+// Apply on the container element.
+//
+// Usage:
+//   #dept-filter { @include check-list; }
+
+@mixin check-list {
+	list-style: none;
+	@include p(0);
+	@include m(0);
 }
 
 // ─── Validation states ─────────────────────────────────────────

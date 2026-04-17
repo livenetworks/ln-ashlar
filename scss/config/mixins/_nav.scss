@@ -85,11 +85,30 @@
 // No translateY, no scale, no shadow appear — color + indicator only.
 
 
+// ── Private base — shared active/hover state across all nav-links-* presets ─
+// Every preset: hover → primary text; active → primary color + semibold.
+// Indicator-specific styles (bg, border, box-shadow) live in each preset.
+@mixin _nav-link-active {
+	a {
+		&:hover {
+			@include text-primary;
+		}
+
+		&.active {
+			color: hsl(var(--color-primary));
+			@include font-semibold;
+		}
+	}
+}
+
+
 // ── 1. Rounded floating (default) ────────────────────────────────────────────
 // Links float as pills inside the sidebar. mx() is required so the rounded
 // corners don't touch the container wall (see visual-language.md rule 1).
 // Active: primary-tinted bg + primary text. No bar indicator.
 @mixin nav-links-rounded {
+	@include _nav-link-active;
+
 	li {
 		&::before { display: none; }
 	}
@@ -110,13 +129,10 @@
 
 		&:hover {
 			background-color: hsl(var(--color-primary) / 0.07);
-			@include text-primary;
 		}
 
 		&.active {
 			background-color: hsl(var(--color-primary-lighter));
-			color: hsl(var(--color-primary));
-			@include font-semibold;
 		}
 	}
 }
@@ -127,6 +143,8 @@
 // affecting layout and without pseudo-elements.
 // Hover: thin faint bar (2px, 30% opacity). Active: solid 3px bar.
 @mixin nav-links-border-left {
+	@include _nav-link-active;
+
 	li {
 		&::before { display: none; }
 	}
@@ -140,14 +158,11 @@
 		&:hover {
 			box-shadow: inset 2px 0 0 hsl(var(--color-primary) / 0.3);
 			background-color: hsl(var(--color-primary) / 0.04);
-			@include text-primary;
 		}
 
 		&.active {
 			box-shadow: inset 3px 0 0 hsl(var(--color-primary));
 			background-color: hsl(var(--color-primary) / 0.07);
-			color: hsl(var(--color-primary));
-			@include font-semibold;
 		}
 	}
 }
@@ -157,6 +172,8 @@
 // li::before bar scales from center. Hover: full height, low opacity (0.4) — no size change.
 // Active: full height, full opacity. Spring cubic-bezier for organic feel.
 @mixin nav-links-border-grow {
+	@include _nav-link-active;
+
 	li {
 		@include relative;
 
@@ -197,13 +214,10 @@
 
 		&:hover {
 			background-color: hsl(var(--color-primary) / 0.04);
-			@include text-primary;
 		}
 
 		&.active {
 			background-color: hsl(var(--color-primary) / 0.07);
-			color: hsl(var(--color-primary));
-			@include font-semibold;
 		}
 	}
 }
@@ -214,6 +228,8 @@
 // Top border grows from 50%/50% → full width via left/right transition.
 // Hover: partial (25–75%) + faint. Active: full width, full opacity.
 @mixin nav-links-border-top {
+	@include _nav-link-active;
+
 	li {
 		@include relative;
 
@@ -253,12 +269,5 @@
 		@include px(0.75rem);
 		border-radius: 0;
 		transition: color 150ms ease;
-
-		&:hover { @include text-primary; }
-
-		&.active {
-			color: hsl(var(--color-primary));
-			@include font-semibold;
-		}
 	}
 }

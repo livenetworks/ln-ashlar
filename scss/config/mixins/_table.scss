@@ -130,10 +130,6 @@
 @mixin table-striped {
 	tbody tr:nth-child(odd) {
 		@include bg-secondary;
-
-		&:hover {
-			background-color: hsl(var(--color-bg-secondary));
-		}
 	}
 }
 
