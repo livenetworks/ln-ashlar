@@ -10,11 +10,83 @@ import { persistGet, persistSet } from '../ln-core';
 	const VALUE_ATTR = 'data-ln-filter-value';
 	const HIDE_ATTR = 'data-ln-filter-hide';
 	const RESET_ATTR = 'data-ln-filter-reset';
+	const COL_ATTR = 'data-ln-filter-col';
+	const SEARCH_ATTR = 'data-ln-filter-search';
+
+	// Shared column filter state per table (AND across columns, OR within column)
+	const _tableFilters = new WeakMap();
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	function _isReset(input) {
 		return input.hasAttribute(RESET_ATTR) || input.getAttribute(VALUE_ATTR) === '';
+	}
+
+	// ─── Auto-populate from table column ───────────────────────
+
+	function _populateFromColumn(instance) {
+		const dom = instance.dom;
+		const colIndex = instance.colIndex;
+		const tmpl = dom.querySelector('template');
+		if (!tmpl || colIndex === null) return;
+
+		const target = document.getElementById(instance.targetId);
+		if (!target) return;
+
+		const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
+		if (!table || target.hasAttribute('data-ln-table')) return;
+
+		// Collect unique values from column
+		const seen = {};
+		const values = [];
+		const bodies = table.tBodies;
+		for (let b = 0; b < bodies.length; b++) {
+			const rows = bodies[b].rows;
+			for (let r = 0; r < rows.length; r++) {
+				const cell = rows[r].cells[colIndex];
+				const text = cell ? cell.textContent.trim() : '';
+				if (text && !seen[text]) {
+					seen[text] = true;
+					values.push(text);
+				}
+			}
+		}
+		values.sort(function (a, b) {
+			return a.localeCompare(b);
+		});
+
+		// Determine the filter key from existing inputs or dom attribute
+		const existingInput = dom.querySelector('[' + KEY_ATTR + ']');
+		const filterKey = existingInput
+			? existingInput.getAttribute(KEY_ATTR)
+			: (dom.getAttribute('data-ln-filter-key') || 'col' + colIndex);
+
+		// Clone template for each value
+		for (let i = 0; i < values.length; i++) {
+			const clone = tmpl.content.cloneNode(true);
+			const input = clone.querySelector('input');
+			if (!input) continue;
+			input.setAttribute(KEY_ATTR, filterKey);
+			input.setAttribute(VALUE_ATTR, values[i]);
+			// Set label text — find the text node or span after the input
+			const label = clone.querySelector('label');
+			if (label) {
+				// Set the text node (last child or after input)
+				const textNodes = [];
+				for (let c = 0; c < label.childNodes.length; c++) {
+					if (label.childNodes[c].nodeType === 3) {
+						textNodes.push(label.childNodes[c]);
+					}
+				}
+				// Use last text node (after input) or create one
+				if (textNodes.length > 0) {
+					textNodes[textNodes.length - 1].textContent = ' ' + values[i];
+				} else {
+					label.appendChild(document.createTextNode(' ' + values[i]));
+				}
+			}
+			dom.appendChild(clone);
+		}
 	}
 
 	// ─── Constructor ───────────────────────────────────────────
@@ -30,8 +102,18 @@ import { persistGet, persistSet } from '../ln-core';
 
 		this.dom = dom;
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
-		this.inputs = Array.from(dom.querySelectorAll('[' + KEY_ATTR + ']'));
 		this._pendingEvents = [];
+
+		// Column index for table filtering (null = not a table column filter)
+		const colAttr = dom.getAttribute(COL_ATTR);
+		this.colIndex = colAttr !== null ? parseInt(colAttr, 10) : null;
+
+		// Auto-populate from table column if template present
+		_populateFromColumn(this);
+
+		// Collect inputs AFTER auto-populate (new inputs may have been added)
+		this.inputs = Array.from(dom.querySelectorAll('[' + KEY_ATTR + ']'));
+		this._filterKey = this.inputs.length > 0 ? this.inputs[0].getAttribute(KEY_ATTR) : null;
 
 		const self = this;
 
@@ -75,6 +157,9 @@ import { persistGet, persistSet } from '../ln-core';
 				this.state.values = initValues;
 			}
 		}
+
+		// Initialize search-within-filter
+		this._initSearch();
 
 		dom.setAttribute(INIT_ATTR, '');
 		return this;
@@ -165,27 +250,33 @@ import { persistGet, persistSet } from '../ln-core';
 			}
 		});
 
-		// Apply filter to target children
-		const target = document.getElementById(self.targetId);
-		if (!target) return;
+		// Apply filter
+		if (self.colIndex !== null) {
+			// Table column filtering — shared multi-column logic
+			self._filterTableRows();
+		} else {
+			// Standard target-children filtering by data attribute
+			const target = document.getElementById(self.targetId);
+			if (!target) return;
 
-		const children = target.children;
-		for (let i = 0; i < children.length; i++) {
-			const el = children[i];
+			const children = target.children;
+			for (let i = 0; i < children.length; i++) {
+				const el = children[i];
 
-			if (isReset) {
+				if (isReset) {
+					el.removeAttribute(HIDE_ATTR);
+					continue;
+				}
+
+				const attr = el.getAttribute('data-' + activeKey);
 				el.removeAttribute(HIDE_ATTR);
-				continue;
-			}
 
-			const attr = el.getAttribute('data-' + activeKey);
-			el.removeAttribute(HIDE_ATTR);
+				if (attr === null) continue;
 
-			if (attr === null) continue;
-
-			// OR logic: visible if attr matches ANY active value
-			if (lowerValues.indexOf(attr.toLowerCase()) === -1) {
-				el.setAttribute(HIDE_ATTR, 'true');
+				// OR logic: visible if attr matches ANY active value
+				if (lowerValues.indexOf(attr.toLowerCase()) === -1) {
+					el.setAttribute(HIDE_ATTR, 'true');
+				}
 			}
 		}
 	};
@@ -214,6 +305,113 @@ import { persistGet, persistSet } from '../ln-core';
 		if (target && target !== this.dom) {
 			dispatch(target, eventName, detail);
 		}
+	};
+
+	// ─── Table Row Filtering ───────────────────────────────────
+
+	_component.prototype._filterTableRows = function () {
+		const target = document.getElementById(this.targetId);
+		if (!target) return;
+
+		const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
+		if (!table) return;
+
+		// Guard: don't filter if this is an ln-table (it handles its own filtering)
+		if (target.hasAttribute('data-ln-table')) return;
+
+		const key = this.state.key || this._filterKey;
+		const values = this.state.values;
+
+		// Get or create shared filter map for this table
+		if (!_tableFilters.has(table)) {
+			_tableFilters.set(table, {});
+		}
+		const filters = _tableFilters.get(table);
+
+		// Update this filter's entry
+		if (key && values.length > 0) {
+			const lower = [];
+			for (let i = 0; i < values.length; i++) {
+				lower.push(values[i].toLowerCase());
+			}
+			filters[key] = { col: this.colIndex, values: lower };
+		} else if (key) {
+			delete filters[key];
+		}
+
+		// Check if any column filters are active
+		const filterKeys = Object.keys(filters);
+		const hasFilters = filterKeys.length > 0;
+
+		// Apply all active filters to all rows (AND across columns, OR within column)
+		const bodies = table.tBodies;
+		for (let b = 0; b < bodies.length; b++) {
+			const rows = bodies[b].rows;
+			for (let r = 0; r < rows.length; r++) {
+				const row = rows[r];
+
+				if (!hasFilters) {
+					row.removeAttribute(HIDE_ATTR);
+					continue;
+				}
+
+				let visible = true;
+				for (let f = 0; f < filterKeys.length; f++) {
+					const filter = filters[filterKeys[f]];
+					const cell = row.cells[filter.col];
+					const cellText = cell ? cell.textContent.trim().toLowerCase() : '';
+					// OR within column: visible if cell text matches ANY filter value
+					if (filter.values.indexOf(cellText) === -1) {
+						visible = false;
+						break; // AND across columns: fail fast
+					}
+				}
+
+				if (visible) {
+					row.removeAttribute(HIDE_ATTR);
+				} else {
+					row.setAttribute(HIDE_ATTR, 'true');
+				}
+			}
+		}
+	};
+
+	// ─── Search Within Filter ──────────────────────────────────
+
+	_component.prototype._initSearch = function () {
+		// Look for search input in parent container (popover/dropdown wrapper)
+		const parent = this.dom.parentElement;
+		if (!parent) return;
+
+		const searchInput = parent.querySelector('[' + SEARCH_ATTR + ']')
+			|| this.dom.querySelector('[' + SEARCH_ATTR + ']');
+		if (!searchInput) return;
+
+		const self = this;
+		this._searchInput = searchInput;
+
+		this._onSearchInput = function () {
+			const term = searchInput.value.trim().toLowerCase();
+			const labels = self.dom.querySelectorAll('label');
+			for (let i = 0; i < labels.length; i++) {
+				const label = labels[i];
+				// Skip reset/all labels
+				const input = label.querySelector('input');
+				if (input && (input.hasAttribute(RESET_ATTR) || input.getAttribute(VALUE_ATTR) === '')) {
+					label.classList.remove('hidden');
+					continue;
+				}
+				if (!term) {
+					label.classList.remove('hidden');
+				} else if (label.textContent.toLowerCase().indexOf(term) !== -1) {
+					label.classList.remove('hidden');
+				} else {
+					label.classList.add('hidden');
+				}
+			}
+		};
+
+		searchInput.addEventListener('input', this._onSearchInput);
 	};
 
 	// ─── Public API ────────────────────────────────────────────
@@ -255,6 +453,28 @@ import { persistGet, persistSet } from '../ln-core';
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+
+		// Clean up table filter registry
+		if (this.colIndex !== null) {
+			const target = document.getElementById(this.targetId);
+			if (target) {
+				const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
+				if (table && _tableFilters.has(table)) {
+					const filters = _tableFilters.get(table);
+					const key = this.state.key || this._filterKey;
+					if (key && filters[key]) delete filters[key];
+					if (Object.keys(filters).length === 0) _tableFilters.delete(table);
+				}
+			}
+		}
+
+		// Clean up search listener
+		if (this._searchInput && this._onSearchInput) {
+			this._searchInput.removeEventListener('input', this._onSearchInput);
+			delete this._searchInput;
+			delete this._onSearchInput;
+		}
+
 		this.inputs.forEach(function (input) {
 			if (input._lnFilterChange) {
 				input.removeEventListener('change', input._lnFilterChange);
