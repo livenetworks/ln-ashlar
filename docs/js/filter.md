@@ -1,6 +1,6 @@
 # Filter
 
-Generic filter component — filters children of a target element by `data-*` attribute. Multiple checkboxes can be active simultaneously (OR logic). File: `js/ln-filter/ln-filter.js`.
+Generic filter component — filters children of a target element by `data-*` attribute. Multiple checkboxes can be active simultaneously (OR logic). Also supports direct `<table>` row filtering by column text content. File: `js/ln-filter/ln-filter.js`.
 
 ## HTML
 
@@ -31,6 +31,8 @@ Generic filter component — filters children of a target element by `data-*` at
 | `data-ln-filter-reset` | `<input type="checkbox">` inside | Marks the "All" (reset) checkbox — canonical replacement for `data-ln-filter-value=""` |
 | `data-ln-filter-hide` | target children | Set by JS when element doesn't match any active value |
 | `data-ln-filter-initialized` | component root | Set by JS after init. Prevents double-init |
+| `data-ln-filter-col="N"` | component root | 0-based column index for table row filtering. When present, reads `<td>` text instead of `data-*` attributes. |
+| `data-ln-filter-search` | `<input>` in parent container | Search input that filters the checkbox list UI (not table rows) |
 
 ## Events
 
@@ -109,7 +111,7 @@ createBatcher schedules via queueMicrotask (deduplicates within same tick)
     |
     v
 renderFn:
-    1. _render()               — update input checked states + filter target children
+    1. _render()               — update input checked states + filter target children or table rows
     |
     v
 afterRender:
@@ -127,11 +129,77 @@ afterRender:
 - Reset state (`key = null` or `values.length === 0`): the input with `data-ln-filter-reset` (or `value=""` fallback) gets `checked = true`, all others `false`
 - Active state: the "All" input gets `checked = false`; each non-reset input gets `checked = true` if its `data-ln-filter-value` appears in `state.values`
 
-**2. Target children**: look up `document.getElementById(targetId)`, iterate children:
+**2. Target filtering — two paths based on `colIndex`:**
+
+**Standard path** (`colIndex === null`): look up `document.getElementById(targetId)`, iterate children:
 
 - Reset state: remove `data-ln-filter-hide` from all children
 - Active state: read each child's `data-{key}` attribute. Build a lowercase array of active values. If the child's attribute value does not appear in the lowercase array, set `data-ln-filter-hide="true"` (OR logic — visible if it matches ANY active value)
 - Children without the data attribute are left visible (not filtered)
+
+**Table column path** (`colIndex !== null`): delegate to `_filterTableRows()`. See below.
+
+### Table Column Filtering (`_filterTableRows`)
+
+When `data-ln-filter-col` is set, `_render()` calls `_filterTableRows()` instead of the standard path.
+
+**Guard conditions:**
+- Target element must exist
+- Target or its child must be a `<table>` element
+- Target must NOT have `data-ln-table` (ln-table handles its own filtering)
+
+**Shared state via `_tableFilters` WeakMap:**
+
+A module-level `WeakMap<tableElement, Object>` tracks all active column filters for a given table:
+
+```
+_tableFilters: WeakMap {
+    tableElement → {
+        'dept':   { col: 2, values: ['engineering', 'design'] },
+        'status': { col: 3, values: ['active'] }
+    }
+}
+```
+
+Using WeakMap ensures no memory leak when tables are removed from the DOM — the garbage collector reclaims the entry automatically.
+
+Each `_filterTableRows()` call:
+1. Gets or creates the filter map for the table
+2. Updates (or deletes) this filter's entry using `this.state.key` as the map key
+3. Iterates all `tBodies` and all rows within them
+4. For each row: checks ALL active filters (AND across columns). For each filter, checks if the cell text appears in the filter's values array (OR within column, case-insensitive)
+5. Sets or removes `data-ln-filter-hide="true"` on each `<tr>`
+
+**AND/OR logic summary:**
+- Multiple values within one column filter → OR (row matches if cell matches ANY value)
+- Multiple filters on different columns → AND (row must satisfy ALL column filters)
+
+### Auto-Populate from Column (`_populateFromColumn`)
+
+Called at the end of the constructor when `colIndex !== null` and a `<template>` element exists inside the filter root.
+
+Flow:
+1. Find the target table (guard: must exist, must not be ln-table)
+2. Iterate all `tBodies` rows, collect cell text at `colIndex`
+3. De-duplicate, sort alphabetically
+4. Determine `filterKey`: use key from existing `[data-ln-filter-key]` input, or `data-ln-filter-key` attribute on the nav root, or fallback `'col{N}'`
+5. For each unique value: clone template, set `data-ln-filter-key` and `data-ln-filter-value` on the `<input>`, set text node label, append to the filter nav root
+6. Return — the constructor then re-collects `this.inputs` to include the new inputs
+
+**Constructor ordering:** `_populateFromColumn` runs BEFORE `this.inputs` is collected. This is critical — the inputs array must include auto-populated checkboxes.
+
+### Search Within Filter (`_initSearch`)
+
+Called at the end of the constructor.
+
+1. Looks for `[data-ln-filter-search]` in `this.dom.parentElement` first, then inside `this.dom`
+2. If found, stores reference as `this._searchInput` and attaches `input` event listener
+3. On each `input` event: lowercases the search term, iterates all `<label>` elements inside the filter nav
+4. Reset/All labels (inputs with `data-ln-filter-reset` or empty `data-ln-filter-value`) are never hidden
+5. Matching labels (text includes the search term) have `.hidden` removed; non-matching labels have `.hidden` added
+6. Empty search restores all labels
+
+The search listener is purely cosmetic — it does not change state, does not trigger `_render()`, and does not affect table row visibility.
 
 ### Event Flow
 
@@ -208,19 +276,29 @@ Change behavior:
 | `filter(key, value)` | `value`: string or string[] | Push `ln-filter:changed`, set `state.key` and `state.values` (single string wrapped in array; empty array or falsy resets) |
 | `reset()` | — | Push `ln-filter:reset` event, set state to `null`/`[]` |
 | `getActive()` | — | Return `{ key, values: [...] }` or `null` if in reset state; returns defensive copy of values |
-| `destroy()` | — | Remove all change listeners, the init guard attribute, and the instance reference |
+| `destroy()` | — | Remove all change listeners, search listener, table filter registry entry, the init guard attribute, and the instance reference |
 
 All methods go through the same state → batcher → render → event pipeline.
+
+### Destroy Cleanup
+
+`destroy()` performs three cleanup steps:
+
+1. **Table filter registry**: if `colIndex !== null`, removes this filter's key entry from `_tableFilters`. If the table's filter map becomes empty, removes the table entry from the WeakMap entirely.
+2. **Search listener**: removes the `input` event listener from `_searchInput` if present.
+3. **Checkbox listeners**: removes all `change` listeners and the `Bound` guard property from each input.
 
 ### Why NOT `fill()` / `renderList()`
 
 - Inputs are server-rendered, not from templates. `_render()` toggles `input.checked` on existing inputs.
 - Target items are external DOM (a separate container by ID). ln-filter doesn't own or create them — it only sets/removes `data-ln-filter-hide`.
-- There is no template cloning or list building. All DOM elements exist at page load.
+- Auto-populate uses direct template cloning (`template.content.cloneNode(true)`) rather than `fill()` because it's a one-time init operation, not a reactive render cycle.
 
 ### Lifecycle
 
 1. **Init**: MutationObserver or DOMContentLoaded → `_findElements` → `new _component(dom)`
 2. **Guard**: `data-ln-filter-initialized` attribute prevents double-init on the same element
-3. **Steady state**: change event or API call → set state → batcher → render → dispatch events
-4. **Destroy**: `destroy()` removes all change listeners, the init guard attribute, and the instance reference.
+3. **Auto-populate**: if `data-ln-filter-col` + `<template>` present, populate checkboxes from column data before collecting inputs
+4. **Search init**: attach `input` listener to `[data-ln-filter-search]` in parent container
+5. **Steady state**: change event or API call → set state → batcher → render → dispatch events
+6. **Destroy**: `destroy()` removes all change listeners, search listener, table filter registry entry, init guard attribute, and instance reference.
