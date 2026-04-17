@@ -1,0 +1,94 @@
+@use '../../../../../scss/config/mixins' as *;
+
+// ─── Table filter demo ─────────────────────────────────────────
+
+// Toolbar above table
+#employee-toolbar {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include mb(1rem);
+
+	> label {
+		@include flex;
+		@include items-center;
+		@include gap(0.5rem);
+		@include border;
+		@include rounded-md;
+		@include px(0.75rem);
+		@include py(0.375rem);
+		@include bg-primary;
+
+		input {
+			border: none;
+			background: none;
+			outline: none;
+			width: 16rem;
+		}
+	}
+}
+
+// Filter button inside <th> — push to far right
+#employee-table th button[data-ln-popover-for],
+#employee-table th [data-ln-dropdown] {
+	float: right;
+}
+
+#employee-table th button[data-ln-popover-for],
+#employee-table th [data-ln-dropdown] > button {
+	@include inline-flex;
+	@include items-center;
+	padding: 0.125rem;
+	@include rounded-sm;
+	opacity: 0.5;
+
+	&:hover {
+		opacity: 1;
+		@include bg-secondary;
+	}
+}
+
+// Filter popover content layout
+#filter-dept,
+#filter-role {
+	nav {
+		@include stack(0.25rem);
+		max-height: 16rem;
+		@include overflow-auto;
+	}
+
+	nav label {
+		@include flex;
+		@include items-center;
+		@include gap(0.5rem);
+		@include px(0.25rem);
+		@include py(0.125rem);
+		@include rounded-sm;
+		cursor: pointer;
+
+		&:hover {
+			@include bg-secondary;
+		}
+	}
+}
+
+// Dropdown filter content (Status)
+#filter-status nav {
+	@include stack(0.25rem);
+	@include p(0.5rem);
+	min-width: 10rem;
+
+	label {
+		@include flex;
+		@include items-center;
+		@include gap(0.5rem);
+		@include px(0.25rem);
+		@include py(0.125rem);
+		@include rounded-sm;
+		cursor: pointer;
+
+		&:hover {
+			@include bg-secondary;
+		}
+	}
+}

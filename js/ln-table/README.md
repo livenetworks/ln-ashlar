@@ -31,10 +31,30 @@ Search is provided by **`ln-search`** (generic component) — `data-ln-search="t
     <table>
         <thead>
             <tr>
-                <th data-ln-sort="number">#</th>
-                <th data-ln-sort="string">Name</th>
-                <th data-ln-sort="date">Date</th>
-                <th data-ln-sort="number">Salary</th>
+                <th data-ln-sort="number">
+                    #
+                    <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                    <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                    <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                </th>
+                <th data-ln-sort="string">
+                    Name
+                    <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                    <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                    <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                </th>
+                <th data-ln-sort="date">
+                    Date
+                    <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                    <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                    <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                </th>
+                <th data-ln-sort="number">
+                    Salary
+                    <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                    <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                    <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                </th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -101,6 +121,33 @@ On `<td>` — raw value for sort/filter when display text differs (formatted num
 <!-- Date: sorts by Unix timestamp, displays formatted date -->
 <td data-ln-value="1700000000">15.11.2023</td>
 ```
+
+---
+
+## Sort Icons
+
+Sort indicators are provided in HTML markup. JS toggles `.hidden` class
+based on sort direction — no icons are auto-created.
+
+Each sortable `<th>` should contain three SVG icons:
+
+```html
+<th data-ln-sort="string">
+    Name
+    <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+    <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+    <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+</th>
+```
+
+| Attribute | Visible when | Default |
+|-----------|-------------|---------|
+| `data-ln-sort-icon` (no value) | Unsorted (neutral) | visible |
+| `data-ln-sort-icon="asc"` | Sorted ascending | hidden |
+| `data-ln-sort-icon="desc"` | Sorted descending | hidden |
+
+If no icons are present in markup, sorting still works — there is just no
+visual indicator. This makes the component icon-system agnostic.
 
 ---
 
