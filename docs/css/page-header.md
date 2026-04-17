@@ -7,14 +7,14 @@ the left, action buttons on the right. Stacks vertically on narrow
 containers.
 
 **CSS-only.** No JS component backs this layout. The `data-ln-*` attribute
-prefix is reserved for JS components — page headers use the `#page-header`
-singleton id.
+prefix is reserved for JS components — page headers use the `.page-header`
+prototype-tier class.
 
 ## Structure
 
 ```html
 <main class="main">
-    <header id="page-header">
+    <header class="page-header">
         <nav aria-label="Breadcrumb">
             <ol>
                 <li><a href="/">Home</a></li>
@@ -34,7 +34,7 @@ singleton id.
 </main>
 ```
 
-Breadcrumbs inside a page-header get styled automatically — you don't need `id="breadcrumbs"` on the inner `<nav>`. See [breadcrumbs.md](./breadcrumbs.md).
+Breadcrumbs inside a page-header get styled automatically — you don't need `class="breadcrumbs"` on the inner `<nav>`. See [breadcrumbs.md](./breadcrumbs.md).
 
 ## Responsive
 
@@ -56,7 +56,7 @@ all modern browsers (Chrome 105+, Safari 15.4+, Firefox 121+).
 
 ## Project override
 
-The library applies the mixin to `#page-header` by default. For a secondary page header, or to apply the layout to a different semantic selector:
+The library applies the mixin to `.page-header` by default. For a secondary page header, or to apply the layout to a different semantic selector:
 
 ```scss
 #document-detail > header { @include page-header; }

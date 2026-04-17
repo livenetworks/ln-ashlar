@@ -1,8 +1,10 @@
 @use '../config/mixins' as *;
 
-// Production singleton — one breadcrumb trail per page, on the semantic
-// <nav aria-label="Breadcrumb"> container. Projects that need a second
-// breadcrumb instance should @include breadcrumbs on their own selector.
-#breadcrumbs {
+// Prototype-tier class — available out of the box for prototyping and
+// inspector experimentation. Production projects apply the mixin on
+// their own semantic selector:
+//
+//   #my-breadcrumbs { @include breadcrumbs; }
+.breadcrumbs {
 	@include breadcrumbs;
 }

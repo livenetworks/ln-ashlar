@@ -180,7 +180,7 @@ table {
 							</thead>
 							<tbody>
 								<tr><td>Universal element (<code>label</code>, <code>table</code>, <code>input</code>)</td><td>yes</td><td><code>table { @include table-base; }</code></td></tr>
-								<tr><td>Singleton (<code>#breadcrumbs</code>)</td><td>yes</td><td><code>#breadcrumbs { @include breadcrumbs; }</code></td></tr>
+								<tr><td>Page-level singleton</td><td>yes</td><td><code>.breadcrumbs { @include breadcrumbs; }</code></td></tr>
 								<tr><td>Component class (<code>.btn</code>, <code>.collapsible</code>)</td><td>yes</td><td><code>.btn { @include btn; }</code></td></tr>
 								<tr><td>Data-attr JS (<code>[data-ln-tabs]</code>)</td><td>not needed</td><td><code>[data-ln-tabs] nav { ... }</code></td></tr>
 							</tbody>
@@ -878,12 +878,12 @@ table { @include table-base; }
 								<tr><th>Mixin</th><th>Description</th><th>Default selector</th></tr>
 							</thead>
 							<tbody>
-								<tr><td><code>@include breadcrumbs</code></td><td>Flex list with <code>&raquo;</code> separator, link hover, <code>[aria-current="page"]</code> for active item</td><td><code>#breadcrumbs</code></td></tr>
+								<tr><td><code>@include breadcrumbs</code></td><td>Flex list with <code>&raquo;</code> separator, link hover, <code>[aria-current="page"]</code> for active item</td><td><code>.breadcrumbs</code></td></tr>
 								<tr><td><code>@include loader</code></td><td>CSS-only spinner animation (box-shadow based)</td><td>none &mdash; project defines selector</td></tr>
 							</tbody>
 						</table>
-						<pre><code>// Breadcrumbs — library applies to #breadcrumbs
-// HTML: &lt;nav id="breadcrumbs" aria-label="Breadcrumb"&gt;
+						<pre><code>// Breadcrumbs — library applies to .breadcrumbs
+// HTML: &lt;nav class="breadcrumbs" aria-label="Breadcrumb"&gt;
 //           &lt;ol&gt;
 //               &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
 //               &lt;li&gt;&lt;a href="#"&gt;Users&lt;/a&gt;&lt;/li&gt;

@@ -9,7 +9,7 @@ CSS-only navigation trail. No JS involvement.
 ## Usage
 
 ```html
-<nav id="breadcrumbs" aria-label="Breadcrumb">
+<nav class="breadcrumbs" aria-label="Breadcrumb">
     <ol>
         <li><a href="/">Home</a></li>
         <li><a href="/users">Users</a></li>
@@ -18,7 +18,7 @@ CSS-only navigation trail. No JS involvement.
 </nav>
 ```
 
-The library applies `@include breadcrumbs` to `#breadcrumbs`. No other selector is bound — breadcrumbs are a page-level singleton.
+The library applies `@include breadcrumbs` to `.breadcrumbs`. No other selector is bound — breadcrumbs are a page-level singleton.
 
 - **`<nav>` is the container**, not the `<ol>`. The mixin internally targets `> ol` and its descendants so the browser's default `<ol>` padding/decimal-marker reset happens at the right depth.
 - **`aria-label="Breadcrumb"`** is required for screen-reader landmark identification (WAI-ARIA).
@@ -27,10 +27,10 @@ The library applies `@include breadcrumbs` to `#breadcrumbs`. No other selector 
 
 ## Automatic inclusion inside `page-header`
 
-Any `<nav>` inside `#page-header` (or any element with `@include page-header`) gets breadcrumb styling automatically. You do **not** need `id="breadcrumbs"` when the breadcrumbs live inside a page header:
+Any `<nav>` inside `.page-header` (or any element with `@include page-header`) gets breadcrumb styling automatically. You do **not** need `class="breadcrumbs"` when the breadcrumbs live inside a page header:
 
 ```html
-<header id="page-header">
+<header class="page-header">
     <nav aria-label="Breadcrumb">
         <ol>
             <li><a href="#">Home</a></li>

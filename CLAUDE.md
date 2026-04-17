@@ -268,9 +268,11 @@ scss/components/_table.scss         →  table { @include table-base; }    ← a
 | Situation | Mixin | Component |
 |---|---|---|
 | Universal element (`label`, `table`, `input`) | yes | yes — applied to element selector |
-| Singleton (`#breadcrumbs`) | yes | yes — applied to `#id` selector |
+| Page-level singleton | yes | yes — applied to `.class` (prototype-tier) |
 | Structural class (`.form-element`, `.form-actions`, `.collapsible`) | yes | yes — applied to class |
 | Data-attr JS component (`[data-ln-tabs]`) | not needed | yes — selector is the attribute |
+
+Projects apply the mixin to their own semantic selector (`#my-breadcrumbs { @include breadcrumbs; }`).
 
 **Projects override** by using the same mixin on their own selector:
 ```scss

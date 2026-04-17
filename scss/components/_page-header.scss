@@ -1,12 +1,10 @@
 @use '../config/mixins' as *;
 
-// Production singleton — one page header per page, on the semantic
-// <header> element that introduces the main content area. Projects
-// that need to apply the same layout elsewhere should @include
-// page-header on their own selector (e.g. `#document-detail > header`).
+// Prototype-tier class — available out of the box for prototyping and
+// inspector experimentation. Production projects apply the mixin on
+// their own semantic selector:
 //
-// CSS-only — no JS component exists for page-header. The `data-ln-*`
-// attribute prefix is reserved for JS components.
-#page-header {
+//   #my-header { @include page-header; }
+.page-header {
 	@include page-header;
 }

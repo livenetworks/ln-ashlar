@@ -4,7 +4,7 @@
 // Page-header demo
 //
 // page-header.html shows 4 variants of the same mixin side by side.
-// The library component binds @mixin page-header to the #page-header
+// The library component binds @mixin page-header to the .page-header
 // singleton — it cannot be used 4× on one page. Scope the mixin via
 // a demo-local wrapper class instead.
 //
