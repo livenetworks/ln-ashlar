@@ -15,6 +15,7 @@
 
 	svg.ln-icon,
 	svg.ln-icon--xl {
+		// Direct neutral: subdued icon -- --color-text-muted (neutral-400) is semantically "text", not "icon"
 		color: hsl(var(--color-neutral-400));
 	}
 
