@@ -2,4 +2,19 @@
 
 [data-ln-empty-state] {
 	@include empty-state;
+
+	svg.ln-icon,
+	svg.ln-icon--xl {
+		color: hsl(var(--color-neutral-400));
+	}
+
+	h3 {
+		@include typography(heading-sm);
+		color: hsl(var(--color-text-primary));
+	}
+
+	p {
+		@include typography(body-md);
+		color: hsl(var(--color-text-secondary));
+	}
 }

@@ -16,10 +16,7 @@
 
 @use 'spacing' as *;
 @use 'display' as *;
-@use 'typography' as *;
-@use 'colors' as *;
 @use 'borders' as *;
-@use 'transitions' as *;
 @use 'motion' as *;
 @use 'interaction' as *;
 
@@ -44,16 +41,10 @@
 			@include px(1rem);
 			@include py(0.875rem);
 			@include cursor-pointer;
-			@include font-medium;
-			@include text-primary;
-			@include transition;
-
-			&:hover { @include bg-secondary; }
 
 			// Chevron — place <svg class="ln-icon ln-chevron"> inside the trigger
 			svg.ln-chevron {
 				@include flex-shrink-0;
-				color: hsl(var(--color-text-muted));
 				@include motion-safe {
 					transition: transform var(--transition-base);
 				}

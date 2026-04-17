@@ -90,17 +90,15 @@
 }
 
 // ─── Sizes ─────────────────────────────────────────────
-@mixin avatar-sm {
-	img { @include size(2rem); }
-	&:not(:has(img)):not(:has(span)) { @include size(2rem); @include text-xs; }
+@mixin _avatar-size($size, $font-size, $line-height) {
+	img { @include size($size); }
+	&:not(:has(img)):not(:has(span)) {
+		@include size($size);
+		font-size: $font-size;
+		line-height: $line-height;
+	}
 }
 
-@mixin avatar-lg {
-	img { @include size(3rem); }
-	&:not(:has(img)):not(:has(span)) { @include size(3rem); @include text-base; }
-}
-
-@mixin avatar-xl {
-	img { @include size(5rem); }
-	&:not(:has(img)):not(:has(span)) { @include size(5rem); @include text-xl; }
-}
+@mixin avatar-sm { @include _avatar-size(2rem, var(--text-xs), 1rem); }
+@mixin avatar-lg { @include _avatar-size(3rem, var(--text-base), 1.5rem); }
+@mixin avatar-xl { @include _avatar-size(5rem, var(--text-xl), 1.75rem); }

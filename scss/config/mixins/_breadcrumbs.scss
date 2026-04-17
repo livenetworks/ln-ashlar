@@ -1,10 +1,6 @@
 @use 'display' as *;
 @use 'spacing' as *;
-@use 'sizing' as *;
-@use 'typography' as *;
-@use 'colors' as *;
 @use 'borders' as *;
-@use 'transitions' as *;
 @use 'focus' as *;
 @use 'interaction' as *;
 
@@ -51,7 +47,6 @@
 
 			+ li::before {
 				content: '\00BB';
-				color: hsl(var(--color-text-muted));
 				// Pseudo-element announces as text by some screen readers.
 				// Breadcrumb separators are decorative — the list order
 				// carries the meaning.
@@ -65,13 +60,6 @@
 			@include px(0.25rem);
 			@include py(0.125rem);
 			@include rounded-sm;
-			color: hsl(var(--color-text-secondary));
-			text-decoration: none;
-			@include transition-colors;
-
-			&:hover {
-				color: hsl(var(--color-primary));
-			}
 
 			&:focus-visible {
 				@include focus-ring;
@@ -81,8 +69,6 @@
 		[aria-current="page"] {
 			@include px(0.25rem);
 			@include py(0.125rem);
-			color: hsl(var(--color-text-primary));
-			@include font-medium;
 		}
 	}
 }

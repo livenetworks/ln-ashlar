@@ -7,4 +7,25 @@
 //   #my-breadcrumbs { @include breadcrumbs; }
 .breadcrumbs {
 	@include breadcrumbs;
+
+	> ol {
+		> li + li::before {
+			color: hsl(var(--color-text-muted));
+		}
+
+		a {
+			color: hsl(var(--color-text-secondary));
+			text-decoration: none;
+			@include transition-colors;
+
+			&:hover {
+				color: hsl(var(--color-primary));
+			}
+		}
+
+		[aria-current="page"] {
+			color: hsl(var(--color-text-primary));
+			@include font-medium;
+		}
+	}
 }
