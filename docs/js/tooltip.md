@@ -18,6 +18,15 @@ Progressive enhancement layer over the CSS-only tooltip baseline. File: `js/ln-t
 
 **Auto-enhance:** Elements with both `data-ln-tooltip` and `title` are attached automatically because the CSS baseline cannot strip the `title` attribute — the browser's native tooltip would otherwise appear alongside the styled one. This resolves the `<abbr data-ln-tooltip title="…">` collision without requiring an explicit `-enhance` flag.
 
+## Attributes
+
+| Attribute | On | Description |
+|-----------|-----|-------------|
+| `data-ln-tooltip="text"` | trigger element | Tooltip text (falls back to `title` if empty) |
+| `data-ln-tooltip-position` | trigger element | Preferred placement: `top` (default), `bottom`, `left`, `right` |
+| `data-ln-tooltip-enhance` | trigger element | Opt-in flag — activates JS enhance. Auto-applied when element has `title` |
+| `data-ln-tooltip-placement` | tooltip portal node | **Set by JS.** Actual placement after viewport-aware computation: `top`, `bottom`, `left`, or `right`. Use for CSS arrow direction styling |
+
 ## Portal architecture
 
 A single `<div id="ln-tooltip-portal">` is created lazily in `<body>` on the first `_show` call. It is positioned `fixed` at `(0, 0)` with `pointer-events: none` and a high `z-index` (shared with toast layer). All tooltip nodes are appended to this container.

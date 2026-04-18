@@ -125,6 +125,11 @@ th[data-ln-filter-active] .filter {
 filter has non-reset values selected. Removed automatically when the filter
 is reset (all values cleared or "All" checkbox selected).
 
+### `th[data-ln-sort-active]`
+
+**Set by JS** — do not add manually. Present on the currently sorted `<th>`, with value `asc` or `desc`.
+Set by `ln-table-sort` on click; removed when the column returns to unsorted state.
+
 ### `th[data-ln-sort]`
 
 On `<th>` elements — makes columns sortable.

@@ -42,7 +42,9 @@ Companion: `js/ln-table/ln-table-sort.js` (sort header clicks).
 | Attribute | On | Description |
 |-----------|-----|-------------|
 | `data-ln-table` | component root | Initializes the table component |
+| `data-ln-persist` | component root | Persist active sort column + direction across page loads (uses `id` or attribute value as storage key) |
 | `data-ln-sort="type"` | `<th>` | Sort type: `string`, `number`, or `date`. Enables sorting on this column |
+| `data-ln-sort-active="asc\|desc"` | `<th>` | **Set by JS** (`ln-table-sort`). Present on the currently sorted column with value `asc` or `desc`. Removed when column returns to unsorted state |
 | `data-ln-filter-col="key"` | `<th>` | Maps this column to a filter key (used by `ln-filter` per-column filtering) |
 | `data-ln-filter-active` | `<th>` | **Set by JS.** Present when a column filter has active (non-reset) values |
 | `data-ln-value="raw"` | `<td>` | Override cell value for sorting (e.g., timestamp for dates) |

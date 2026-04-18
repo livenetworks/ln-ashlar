@@ -21,6 +21,7 @@ Progressive enhancement over the CSS-only `[data-ln-tooltip]` baseline. Adds sma
 | `data-ln-tooltip="text"` | trigger element | Tooltip text. If the value is empty (just `data-ln-tooltip`), falls back to the element's `title` attribute — enables the semantic `<abbr title="…">` pattern. |
 | `data-ln-tooltip-position` | trigger element | Preferred placement side: `top` (default), `bottom`, `left`, `right` |
 | `data-ln-tooltip-enhance` | trigger element | Opt-in flag — activates JS enhance for this element. Not required when the element has a `title` attribute — auto-enhance kicks in. |
+| `data-ln-tooltip-placement` | tooltip portal node | **Set by JS** — actual placement after viewport-aware computation: `top`, `bottom`, `left`, or `right`. Useful for CSS arrow direction. |
 
 ## Events
 
