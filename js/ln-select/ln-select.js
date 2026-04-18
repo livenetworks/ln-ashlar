@@ -53,13 +53,16 @@ import { guardBody } from '../ln-core';
 
 			const form = element.closest('form');
 			if (form) {
-				form.addEventListener('reset', () => {
+				const resetHandler = () => {
 					setTimeout(() => {
 						tomSelect.clear();
 						tomSelect.clearOptions();
 						tomSelect.sync();
 					}, 0);
-				});
+				};
+				form.addEventListener('reset', resetHandler);
+				tomSelect._lnResetHandler = resetHandler;
+				tomSelect._lnResetForm = form;
 			}
 		} catch (e) {
 			console.warn('[ln-select] Failed to initialize Tom Select:', e);
@@ -69,6 +72,9 @@ import { guardBody } from '../ln-core';
 	function destroySelect(element) {
 		const instance = instances.get(element);
 		if (instance) {
+			if (instance._lnResetForm && instance._lnResetHandler) {
+				instance._lnResetForm.removeEventListener('reset', instance._lnResetHandler);
+			}
 			instance.destroy();
 			instances.delete(element);
 		}

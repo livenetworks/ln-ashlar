@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable, findElements, serializeForm, populateForm } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-autosave';
@@ -67,7 +67,7 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 	}
 
 	_component.prototype.save = function () {
-		const data = _serialize(this.dom);
+		const data = serializeForm(this.dom);
 		try {
 			localStorage.setItem(this.key, JSON.stringify(data));
 		} catch (e) {
@@ -95,7 +95,15 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 		const before = dispatchCancelable(this.dom, 'ln-autosave:before-restore', { target: this.dom, data: data });
 		if (before.defaultPrevented) return;
 
-		_populateForm(this.dom, data);
+		const restored = populateForm(this.dom, data);
+		for (let k = 0; k < restored.length; k++) {
+			restored[k].dispatchEvent(new Event('input', { bubbles: true }));
+			restored[k].dispatchEvent(new Event('change', { bubbles: true }));
+
+			if (restored[k].lnSelect && restored[k].lnSelect.setValue) {
+				restored[k].lnSelect.setValue(data[restored[k].name]);
+			}
+		}
 		dispatch(this.dom, 'ln-autosave:restored', { target: this.dom, data: data });
 	};
 
@@ -131,71 +139,6 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 	function _isFormField(el) {
 		const tag = el.tagName;
 		return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
-	}
-
-	function _serialize(form) {
-		const data = {};
-		const elements = form.elements;
-
-		for (let i = 0; i < elements.length; i++) {
-			const el = elements[i];
-			if (!el.name || el.disabled || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
-
-			if (el.type === 'checkbox') {
-				if (!data[el.name]) data[el.name] = [];
-				if (el.checked) data[el.name].push(el.value);
-			} else if (el.type === 'radio') {
-				if (el.checked) data[el.name] = el.value;
-			} else if (el.type === 'select-multiple') {
-				data[el.name] = [];
-				for (let j = 0; j < el.options.length; j++) {
-					if (el.options[j].selected) data[el.name].push(el.options[j].value);
-				}
-			} else {
-				data[el.name] = el.value;
-			}
-		}
-
-		return data;
-	}
-
-	function _populateForm(form, data) {
-		const elements = form.elements;
-		const restored = [];
-
-		for (let i = 0; i < elements.length; i++) {
-			const el = elements[i];
-			if (!el.name || !(el.name in data) || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
-
-			const value = data[el.name];
-
-			if (el.type === 'checkbox') {
-				el.checked = Array.isArray(value) && value.indexOf(el.value) !== -1;
-				restored.push(el);
-			} else if (el.type === 'radio') {
-				el.checked = el.value === value;
-				restored.push(el);
-			} else if (el.type === 'select-multiple') {
-				if (Array.isArray(value)) {
-					for (let j = 0; j < el.options.length; j++) {
-						el.options[j].selected = value.indexOf(el.options[j].value) !== -1;
-					}
-				}
-				restored.push(el);
-			} else {
-				el.value = value;
-				restored.push(el);
-			}
-		}
-
-		for (let k = 0; k < restored.length; k++) {
-			restored[k].dispatchEvent(new Event('input', { bubbles: true }));
-			restored[k].dispatchEvent(new Event('change', { bubbles: true }));
-
-			if (restored[k].lnSelect && restored[k].lnSelect.setValue) {
-				restored[k].lnSelect.setValue(data[restored[k].name]);
-			}
-		}
 	}
 
 	// ─── DOM Observer ──────────────────────────────────────────

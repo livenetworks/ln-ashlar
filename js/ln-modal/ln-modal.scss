@@ -5,7 +5,7 @@
 	display: none;
 	@include fixed;
 	@include inset-0;
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: hsl(var(--color-neutral-900) / 0.5);
 	backdrop-filter: blur(4px);
 	-webkit-backdrop-filter: blur(4px);
 	@include z-modal;

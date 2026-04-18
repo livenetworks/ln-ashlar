@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBody, measureHidden } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBody, measureHidden, isVisible } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-popover';
@@ -7,10 +7,6 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 	const POSITION_SELECTOR = 'data-ln-popover-position';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	function _isVisible(el) {
-		return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
-	}
 
 	// ─── Open-stack (Escape closes top of stack) ───────────────
 
@@ -63,20 +59,21 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 		}
 		for (const btn of triggers) {
 			if (btn[DOM_ATTRIBUTE + 'Trigger']) continue;
-			btn[DOM_ATTRIBUTE + 'Trigger'] = true;
 
 			const popoverId = btn.getAttribute(TRIGGER_SELECTOR);
 			btn.setAttribute('aria-haspopup', 'dialog');
 			btn.setAttribute('aria-expanded', 'false');
 			btn.setAttribute('aria-controls', popoverId);
 
-			btn.addEventListener('click', function (e) {
+			const handler = function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				e.preventDefault();
 				const target = document.getElementById(popoverId);
 				if (!target || !target[DOM_ATTRIBUTE]) return;
 				target[DOM_ATTRIBUTE].toggle(btn);
-			});
+			};
+			btn.addEventListener('click', handler);
+			btn[DOM_ATTRIBUTE + 'Trigger'] = handler;
 		}
 	}
 
@@ -159,7 +156,7 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 
 		// Focus management — first visible focusable, or popover itself.
 		const allFocusable = this.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
-		const focusable = Array.prototype.find.call(allFocusable, _isVisible);
+		const focusable = Array.prototype.find.call(allFocusable, isVisible);
 		if (focusable) {
 			focusable.focus();
 		} else {
@@ -261,6 +258,13 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		if (this.isOpen) this._applyClose();
+		const triggers = document.querySelectorAll('[' + TRIGGER_SELECTOR + '="' + this.dom.id + '"]');
+		for (const btn of triggers) {
+			if (btn[DOM_ATTRIBUTE + 'Trigger']) {
+				btn.removeEventListener('click', btn[DOM_ATTRIBUTE + 'Trigger']);
+				delete btn[DOM_ATTRIBUTE + 'Trigger'];
+			}
+		}
 		dispatch(this.dom, 'ln-popover:destroyed', {
 			popoverId: this.dom.id,
 			target: this.dom

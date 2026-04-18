@@ -1,3 +1,5 @@
+@use '../../scss/config/mixins' as *;
+
 [data-confirming]:not(.ln-confirm-tooltip) {
 	--color-primary: var(--color-error);
 }
@@ -22,15 +24,16 @@
 		margin-bottom: 8px;
 		background: hsl(var(--color-text-primary));
 		color: hsl(var(--color-white));
-		padding: 4px 8px;
+		@include px(var(--spacing-sm));
+		@include py(var(--spacing-xs));
 		border-radius: var(--radius-sm);
 		font-size: var(--text-xs);
-		font-weight: 500;
+		@include font-medium;
 		white-space: nowrap;
 		line-height: 1.2;
 		pointer-events: none;
 		z-index: var(--z-dropdown);
-		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+		box-shadow: var(--shadow-md);
 	}
 }
 

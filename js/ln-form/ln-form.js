@@ -1,4 +1,4 @@
-import { guardBody, dispatch, findElements } from '../ln-core';
+import { guardBody, dispatch, findElements, serializeForm, populateForm } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-form';
@@ -105,64 +105,12 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		}
 	};
 
-	_component.prototype._serialize = function () {
-		const data = {};
-		const elements = this.dom.elements;
-
-		for (let i = 0; i < elements.length; i++) {
-			const el = elements[i];
-			if (!el.name || el.disabled || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
-
-			if (el.type === 'checkbox') {
-				if (!data[el.name]) data[el.name] = [];
-				if (el.checked) data[el.name].push(el.value);
-			} else if (el.type === 'radio') {
-				if (el.checked) data[el.name] = el.value;
-			} else if (el.type === 'select-multiple') {
-				data[el.name] = [];
-				for (let j = 0; j < el.options.length; j++) {
-					if (el.options[j].selected) data[el.name].push(el.options[j].value);
-				}
-			} else {
-				data[el.name] = el.value;
-			}
-		}
-
-		return data;
-	};
-
 	_component.prototype.fill = function (data) {
-		const elements = this.dom.elements;
-		const filled = [];
-
-		for (let i = 0; i < elements.length; i++) {
-			const el = elements[i];
-			if (!el.name || !(el.name in data) || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
-
-			const value = data[el.name];
-
-			if (el.type === 'checkbox') {
-				el.checked = Array.isArray(value) ? value.indexOf(el.value) !== -1 : !!value;
-				filled.push(el);
-			} else if (el.type === 'radio') {
-				el.checked = el.value === String(value);
-				filled.push(el);
-			} else if (el.type === 'select-multiple') {
-				if (Array.isArray(value)) {
-					for (let j = 0; j < el.options.length; j++) {
-						el.options[j].selected = value.indexOf(el.options[j].value) !== -1;
-					}
-				}
-				filled.push(el);
-			} else {
-				el.value = value;
-				filled.push(el);
-			}
-		}
+		const filled = populateForm(this.dom, data);
 
 		// Trigger events so ln-validate picks up the changes.
 		// Mirror the same isChangeBased logic as ln-validate:
-		// SELECT/checkbox/radio → 'change', everything else → 'input'
+		// SELECT/checkbox/radio -> 'change', everything else -> 'input'
 		for (let k = 0; k < filled.length; k++) {
 			const el = filled[k];
 			const isChangeBased = el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio';
@@ -184,7 +132,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 		if (!allValid) return;
 
-		const data = this._serialize();
+		const data = serializeForm(this.dom);
 		dispatch(this.dom, 'ln-form:submit', { data: data });
 	};
 

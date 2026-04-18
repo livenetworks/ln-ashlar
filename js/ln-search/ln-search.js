@@ -55,13 +55,14 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 		const self = this;
 
 		// Clear button inside the wrapper
-		const clearBtn = this.dom.querySelector('[data-ln-search-clear]');
-		if (clearBtn) {
-			clearBtn.addEventListener('click', function () {
+		this._clearBtn = this.dom.querySelector('[data-ln-search-clear]');
+		if (this._clearBtn) {
+			this._onClear = function () {
 				self.input.value = '';
 				self._search('');
 				self.input.focus();
-			});
+			};
+			this._clearBtn.addEventListener('click', this._onClear);
 		}
 
 		this._onInput = function () {
@@ -105,6 +106,9 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 		clearTimeout(this._debounceTimer);
 		if (this.input && this._onInput) {
 			this.input.removeEventListener('input', this._onInput);
+		}
+		if (this._clearBtn && this._onClear) {
+			this._clearBtn.removeEventListener('click', this._onClear);
 		}
 		this.dom.removeAttribute(INIT_ATTR);
 		delete this.dom[DOM_ATTRIBUTE];

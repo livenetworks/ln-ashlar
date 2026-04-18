@@ -4,9 +4,7 @@
 @use 'colors' as *;
 
 @mixin timeline {
-	list-style: none;
-	padding: 0;
-	margin: 0;
+	@include list-reset;
 	position: relative;
 
 	// Vertical rail — concentric with the bullet on both axes.

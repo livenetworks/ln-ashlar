@@ -43,8 +43,7 @@
 }
 
 @mixin form-actions {
-	list-style: none;
-	@include p(0);
+	@include list-reset;
 	@include flex;
 	@include justify-end;
 	@include gap(0.75rem);
@@ -296,9 +295,7 @@
 
 @mixin pill-group {
 	@include inline-flex;
-	list-style: none;
-	padding: 0;
-	margin: 0;
+	@include list-reset;
 
 	li label {
 		border-radius: 0;
@@ -326,9 +323,7 @@
 //   #dept-filter { @include check-list; }
 
 @mixin check-list {
-	list-style: none;
-	@include p(0);
-	@include m(0);
+	@include list-reset;
 }
 
 // ─── Validation states ─────────────────────────────────────────
@@ -352,9 +347,7 @@
 }
 
 @mixin form-validate-errors {
-	list-style: none;
-	@include p(0);
-	@include m(0);
+	@include list-reset;
 	@include mt(var(--spacing-xs));
 	font-size: var(--text-caption);
 	line-height: var(--lh-caption);

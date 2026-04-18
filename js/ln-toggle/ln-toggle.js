@@ -21,8 +21,7 @@ import { persistGet, persistSet } from '../ln-core';
 		}
 		for (const btn of triggers) {
 			if (btn[DOM_ATTRIBUTE + 'Trigger']) continue;
-			btn[DOM_ATTRIBUTE + 'Trigger'] = true;
-			btn.addEventListener('click', function (e) {
+			const handler = function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				e.preventDefault();
 				const targetId = btn.getAttribute('data-ln-toggle-for');
@@ -31,7 +30,9 @@ import { persistGet, persistSet } from '../ln-core';
 
 				const action = btn.getAttribute('data-ln-toggle-action') || 'toggle';
 				target[DOM_ATTRIBUTE][action]();
-			});
+			};
+			btn.addEventListener('click', handler);
+			btn[DOM_ATTRIBUTE + 'Trigger'] = handler;
 		}
 	}
 
@@ -74,6 +75,13 @@ import { persistGet, persistSet } from '../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		dispatch(this.dom, 'ln-toggle:destroyed', { target: this.dom });
+		const triggers = document.querySelectorAll('[data-ln-toggle-for="' + this.dom.id + '"]');
+		for (const btn of triggers) {
+			if (btn[DOM_ATTRIBUTE + 'Trigger']) {
+				btn.removeEventListener('click', btn[DOM_ATTRIBUTE + 'Trigger']);
+				delete btn[DOM_ATTRIBUTE + 'Trigger'];
+			}
+		}
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
