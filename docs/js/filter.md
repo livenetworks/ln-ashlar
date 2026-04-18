@@ -73,6 +73,7 @@ The hide rule for `[data-ln-filter-hide]` is bundled in ln-acme. Pill active sta
 - Filtering uses OR logic: items matching ANY active value are shown
 - Works independently alongside `ln-search` on the same target — each with its own hide attribute.
 - MutationObserver auto-initializes new `[data-ln-filter]` components but does NOT auto-re-filter when children are added to the target — call `el.lnFilter.filter()` manually after adding items.
+- **Browser form restore:** If no `data-ln-persist` state exists, the component reads initial checkbox states on init. Pre-checked inputs (browser back/forward restore or server-rendered) are detected and `ln-filter:changed` is dispatched so connected components (e.g. `ln-table`) receive the initial filter state.
 
 ---
 

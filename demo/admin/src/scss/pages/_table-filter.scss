@@ -16,26 +16,6 @@
 	}
 }
 
-// Filter button inside <th> — push to far right
-#employee-table th button[data-ln-popover-for],
-#employee-table th [data-ln-dropdown] {
-	float: right;
-}
-
-#employee-table th button[data-ln-popover-for],
-#employee-table th [data-ln-dropdown] > button {
-	@include inline-flex;
-	@include items-center;
-	padding: 0.125rem;
-	@include rounded-sm;
-	opacity: 0.5;
-
-	&:hover {
-		opacity: 1;
-		@include bg-secondary;
-	}
-}
-
 // Filter popover content layout
 #filter-dept,
 #filter-role {

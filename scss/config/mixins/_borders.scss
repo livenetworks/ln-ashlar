@@ -10,6 +10,21 @@
 @mixin border-b-light { border-bottom: var(--border-width) solid hsl(var(--color-border-light)); }
 @mixin border-none { border: none; }
 
+@mixin shadow-b {
+	position: relative;
+
+	&::after {
+		content: '';
+		position: absolute;
+		bottom: -0.625rem;
+		left: 0;
+		right: 0;
+		height: 0.625rem;
+		background: linear-gradient(to bottom, hsl(var(--color-border) / 0.5), transparent);
+		pointer-events: none;
+	}
+}
+
 @mixin rounded-sm   { border-radius: var(--radius-sm); }
 @mixin rounded-md   { border-radius: var(--radius-md); }
 @mixin rounded-lg   { border-radius: var(--radius-lg); }

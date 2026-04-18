@@ -26,13 +26,17 @@
 	overflow: hidden;
 	--sidebar-px: var(--spacing-md);
 
+	> * {
+		@include px(var(--sidebar-px));
+	}
+
 	> header {
 		@include flex;
 		@include items-center;
 		@include gap(0.75rem);
-		@include px(var(--sidebar-px));
 		@include py(var(--spacing-sm));
 		@include border-b;
+		@include shadow-b;
 	}
 
 	> main {
@@ -43,7 +47,6 @@
 
 	> footer {
 		@include border-t;
-		@include px(var(--sidebar-px));
 		@include py(var(--spacing-sm));
 
 		small {

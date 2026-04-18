@@ -44,6 +44,7 @@ Companion: `js/ln-table/ln-table-sort.js` (sort header clicks).
 | `data-ln-table` | component root | Initializes the table component |
 | `data-ln-sort="type"` | `<th>` | Sort type: `string`, `number`, or `date`. Enables sorting on this column |
 | `data-ln-filter-col="key"` | `<th>` | Maps this column to a filter key (used by `ln-filter` per-column filtering) |
+| `data-ln-filter-active` | `<th>` | **Set by JS.** Present when a column filter has active (non-reset) values |
 | `data-ln-value="raw"` | `<td>` | Override cell value for sorting (e.g., timestamp for dates) |
 | `data-ln-table-empty` | `<template>` | Content to show when filter/search yields zero results |
 
@@ -198,7 +199,20 @@ ln-table and ln-table-sort communicate only via events — no direct coupling.
 
 ### Companion: ln-filter (column filters)
 
-Per-column dropdown filters are implemented by placing `ln-filter` components inside `<th>` elements. When a filter button is clicked, `ln-filter` dispatches `ln-filter:changed` which bubbles up to `[data-ln-table]`. ln-table matches the filter `key` to a column via `th[data-ln-filter-col="key"]`.
+Per-column dropdown filters are implemented by placing `ln-filter` components inside or outside `<th>` elements (popover or dropdown pattern). When a filter checkbox changes, `ln-filter` dispatches `ln-filter:changed` which bubbles up to `[data-ln-table]`. ln-table matches the filter `key` to a column via `th[data-ln-filter-col="key"]`.
+
+#### Active filter indicator
+
+When a column filter has non-reset values, `ln-table` sets `data-ln-filter-active` on the matching `<th>`. When the filter is reset (all values cleared or "All" selected), the attribute is removed. This allows CSS to style the filter trigger button:
+
+```css
+th[data-ln-filter-active] .filter {
+    opacity: 1;
+    color: hsl(var(--color-primary));
+}
+```
+
+The `.filter` class is a convention for the trigger button. The `@mixin table-filter-button` in `scss/config/mixins/_table.scss` provides the default styling (float right, low opacity, hover highlight, active primary color).
 
 ### Internal Properties
 

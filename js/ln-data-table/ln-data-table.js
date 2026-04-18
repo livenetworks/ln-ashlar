@@ -243,6 +243,21 @@ import { cloneTemplateScoped, dispatch, findElements, guardBody } from '../ln-co
 				};
 				this._selectAllCheckbox.addEventListener('change', this._onSelectAll);
 			}
+
+			// Sync initial checkbox state (browser form restore)
+			if (this.tbody) {
+				const rows = this.tbody.querySelectorAll('[data-ln-row]');
+				for (let i = 0; i < rows.length; i++) {
+					const cb = rows[i].querySelector('[data-ln-row-select]');
+					const id = rows[i].getAttribute('data-ln-row-id');
+					if (cb && cb.checked && id != null) {
+						this.selectedIds.add(id);
+						rows[i].classList.add('ln-row-selected');
+					}
+				}
+				this.selectedCount = this.selectedIds.size;
+				if (this.selectedCount > 0) this._updateSelectAll();
+			}
 		}
 
 		// ─── Row click + Row actions ───────────────────────────

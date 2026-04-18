@@ -128,6 +128,17 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 				}
 				self._columnFilters[key] = lower;
 			}
+
+			// Mark <th> with active filter indicator
+			const th = self.dom.querySelector('th[data-ln-filter-col="' + key + '"]');
+			if (th) {
+				if (values && values.length > 0) {
+					th.setAttribute('data-ln-filter-active', '');
+				} else {
+					th.removeAttribute('data-ln-filter-active');
+				}
+			}
+
 			self._applyFilterAndSort();
 			self._vStart = -1;
 			self._vEnd = -1;
@@ -139,6 +150,44 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 			});
 		};
 		dom.addEventListener('ln-filter:changed', this._onColumnFilter);
+
+		// ─── Clear all — reset search + column filters ──────────────
+
+		dom.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-ln-table-clear]');
+			if (!btn) return;
+
+			// Clear search state + input
+			self._searchTerm = '';
+			const searchEl = document.querySelector('[data-ln-search="' + dom.id + '"]');
+			if (searchEl) {
+				const input = searchEl.tagName === 'INPUT' ? searchEl : searchEl.querySelector('input');
+				if (input) input.value = '';
+			}
+
+			// Clear column filter state + active indicators
+			self._columnFilters = {};
+			for (let i = 0; i < self.ths.length; i++) {
+				self.ths[i].removeAttribute('data-ln-filter-active');
+			}
+
+			// Reset filter component UI (checkboxes)
+			const filters = document.querySelectorAll('[data-ln-filter="' + dom.id + '"]');
+			for (let i = 0; i < filters.length; i++) {
+				if (filters[i].lnFilter) filters[i].lnFilter.reset();
+			}
+
+			// Re-render
+			self._applyFilterAndSort();
+			self._vStart = -1;
+			self._vEnd = -1;
+			self._render();
+			dispatch(dom, 'ln-table:filter', {
+				term: '',
+				matched: self._filteredData.length,
+				total: self._data.length
+			});
+		});
 
 		return this;
 	}
