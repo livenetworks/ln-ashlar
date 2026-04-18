@@ -46,12 +46,12 @@
 @use 'components/translations';
 @use 'components/data-table';
 @use 'components/ln-table';
+@use 'components/ajax';
 
 @use 'utilities/utilities';
 @use 'utilities/animations';
 
 // JS component co-located styles
-@use '../js/ln-ajax/ln-ajax';
 @use '../js/ln-modal/ln-modal';
 @use '../js/ln-dropdown/ln-dropdown';
 @use '../js/ln-tooltip/ln-tooltip';
