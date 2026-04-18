@@ -48,7 +48,6 @@ import { persistGet, persistSet } from '../ln-core';
 		this._clickHandlers = [];
 		for (const t of this.tabs) {
 			if (t[DOM_ATTRIBUTE + 'Trigger']) continue;
-			t[DOM_ATTRIBUTE + 'Trigger'] = true;
 			const handler = function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				const key = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
@@ -64,6 +63,7 @@ import { persistGet, persistSet } from '../ln-core';
 				}
 			};
 			t.addEventListener("click", handler);
+			t[DOM_ATTRIBUTE + 'Trigger'] = handler;
 			self._clickHandlers.push({ el: t, handler: handler });
 		}
 
@@ -125,6 +125,7 @@ import { persistGet, persistSet } from '../ln-core';
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		for (const { el, handler } of this._clickHandlers) {
 			el.removeEventListener("click", handler);
+			delete el[DOM_ATTRIBUTE + 'Trigger'];
 		}
 		if (this.hashEnabled) {
 			window.removeEventListener("hashchange", this._hashHandler);

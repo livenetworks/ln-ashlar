@@ -209,3 +209,69 @@ export function findElements(root, selector, attribute, ComponentClass) {
 		}
 	}
 }
+
+// ─── Visibility Check ─────────────────────────────────────
+
+export function isVisible(el) {
+	return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+}
+
+// ─── Form Serialization ───────────────────────────────────
+
+export function serializeForm(form) {
+	const data = {};
+	const elements = form.elements;
+
+	for (let i = 0; i < elements.length; i++) {
+		const el = elements[i];
+		if (!el.name || el.disabled || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
+
+		if (el.type === 'checkbox') {
+			if (!data[el.name]) data[el.name] = [];
+			if (el.checked) data[el.name].push(el.value);
+		} else if (el.type === 'radio') {
+			if (el.checked) data[el.name] = el.value;
+		} else if (el.type === 'select-multiple') {
+			data[el.name] = [];
+			for (let j = 0; j < el.options.length; j++) {
+				if (el.options[j].selected) data[el.name].push(el.options[j].value);
+			}
+		} else {
+			data[el.name] = el.value;
+		}
+	}
+
+	return data;
+}
+
+export function populateForm(form, data) {
+	const elements = form.elements;
+	const filled = [];
+
+	for (let i = 0; i < elements.length; i++) {
+		const el = elements[i];
+		if (!el.name || !(el.name in data) || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
+
+		const value = data[el.name];
+
+		if (el.type === 'checkbox') {
+			el.checked = Array.isArray(value) ? value.indexOf(el.value) !== -1 : !!value;
+			filled.push(el);
+		} else if (el.type === 'radio') {
+			el.checked = el.value === String(value);
+			filled.push(el);
+		} else if (el.type === 'select-multiple') {
+			if (Array.isArray(value)) {
+				for (let j = 0; j < el.options.length; j++) {
+					el.options[j].selected = value.indexOf(el.options[j].value) !== -1;
+				}
+			}
+			filled.push(el);
+		} else {
+			el.value = value;
+			filled.push(el);
+		}
+	}
+
+	return filled;
+}

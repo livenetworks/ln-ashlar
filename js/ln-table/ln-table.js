@@ -153,7 +153,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 		// ─── Clear all — reset search + column filters ──────────────
 
-		dom.addEventListener('click', function (e) {
+		this._onClear = function (e) {
 			const btn = e.target.closest('[data-ln-table-clear]');
 			if (!btn) return;
 
@@ -187,7 +187,8 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 				matched: self._filteredData.length,
 				total: self._data.length
 			});
-		});
+		};
+		dom.addEventListener('click', this._onClear);
 
 		return this;
 	}
@@ -446,6 +447,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this.dom.removeEventListener('ln-search:change', this._onSearch);
 		this.dom.removeEventListener('ln-table:sort', this._onSort);
 		this.dom.removeEventListener('ln-filter:changed', this._onColumnFilter);
+		this.dom.removeEventListener('click', this._onClear);
 		if (this._colgroup) {
 			this._colgroup.remove();
 			this._colgroup = null;

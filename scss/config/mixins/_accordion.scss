@@ -21,9 +21,7 @@
 @use 'interaction' as *;
 
 @mixin accordion {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+	@include list-reset;
 	@include border;
 	@include rounded-lg;
 	overflow: hidden;

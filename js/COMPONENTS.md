@@ -363,18 +363,35 @@ function _attachTriggers(root) {
     const triggers = Array.from(root.querySelectorAll('[data-ln-{name}-for]'));
     triggers.forEach(function (btn) {
         if (btn[DOM_ATTRIBUTE + 'Trigger']) return;  // already initialized
-        btn[DOM_ATTRIBUTE + 'Trigger'] = true;
-        btn.addEventListener('click', function (e) {
+        const handler = function (e) {
             if (e.ctrlKey || e.metaKey || e.button === 1) return;  // allow browser shortcuts
             e.preventDefault();
             // ...
-        });
+        };
+        btn.addEventListener('click', handler);
+        btn[DOM_ATTRIBUTE + 'Trigger'] = handler;  // store handler ref for later removeEventListener
     });
 }
 ```
 
+In `destroy()`, remove the trigger listeners using the stored handler reference:
+
+```javascript
+_component.prototype.destroy = function () {
+    // ... other cleanup ...
+    const triggers = document.querySelectorAll('[data-ln-{name}-for="' + this.dom.id + '"]');
+    for (const btn of triggers) {
+        if (btn[DOM_ATTRIBUTE + 'Trigger']) {
+            btn.removeEventListener('click', btn[DOM_ATTRIBUTE + 'Trigger']);
+            delete btn[DOM_ATTRIBUTE + 'Trigger'];
+        }
+    }
+};
+```
+
 **Rules:**
-- Guard: `btn[DOM_ATTRIBUTE + 'Trigger'] = true` (property on DOM element)
+- Guard: `btn[DOM_ATTRIBUTE + 'Trigger']` — truthy check works for both old boolean (`true`) and new handler reference (function)
+- Store the handler function (not `true`) so `destroy()` can call `removeEventListener` with the exact reference
 - Always allow ctrl/meta/middle-click before `e.preventDefault()`
 
 ---

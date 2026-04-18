@@ -1,14 +1,10 @@
-import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
+import { guardBody, dispatch, dispatchCancelable, isVisible } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-modal';
 	const DOM_ATTRIBUTE = 'lnModal';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	function _isVisible(el) {
-		return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
-	}
 
 	// ─── Constructor ───────────────────────────────────────────
 
@@ -36,15 +32,16 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 		}
 		for (const btn of triggers) {
 			if (btn[DOM_ATTRIBUTE + 'Trigger']) continue;
-			btn[DOM_ATTRIBUTE + 'Trigger'] = true;
-			btn.addEventListener('click', function (e) {
+			const handler = function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 				e.preventDefault();
 				const modalId = btn.getAttribute('data-ln-modal-for');
 				const target = document.getElementById(modalId);
 				if (!target || !target[DOM_ATTRIBUTE]) return;
 				target[DOM_ATTRIBUTE].toggle();
-			});
+			};
+			btn.addEventListener('click', handler);
+			btn[DOM_ATTRIBUTE + 'Trigger'] = handler;
 		}
 	}
 
@@ -65,7 +62,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 			// Focuses in DOM order — positive tabindex not supported (anti-pattern per WCAG)
 			const focusable = Array.prototype.filter.call(
 				self.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'),
-				_isVisible
+				isVisible
 			);
 			if (focusable.length === 0) return;
 			const first = focusable[0];
@@ -130,6 +127,14 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 			}
 		}
 
+		const triggers = document.querySelectorAll('[data-ln-modal-for="' + this.dom.id + '"]');
+		for (const btn of triggers) {
+			if (btn[DOM_ATTRIBUTE + 'Trigger']) {
+				btn.removeEventListener('click', btn[DOM_ATTRIBUTE + 'Trigger']);
+				delete btn[DOM_ATTRIBUTE + 'Trigger'];
+			}
+		}
+
 		dispatch(this.dom, 'ln-modal:destroyed', { modalId: this.dom.id, target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
@@ -159,15 +164,15 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 			document.addEventListener('keydown', instance._onFocusTrap);
 
 			const autoFocusEl = el.querySelector('[autofocus]');
-			if (autoFocusEl && _isVisible(autoFocusEl)) {
+			if (autoFocusEl && isVisible(autoFocusEl)) {
 				autoFocusEl.focus();
 			} else {
 				const inputs = el.querySelectorAll('input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])');
-				const firstInput = Array.prototype.find.call(inputs, _isVisible);
+				const firstInput = Array.prototype.find.call(inputs, isVisible);
 				if (firstInput) firstInput.focus();
 				else {
 					const buttons = el.querySelectorAll('a[href], button:not([disabled])');
-					const firstFocusable = Array.prototype.find.call(buttons, _isVisible);
+					const firstFocusable = Array.prototype.find.call(buttons, isVisible);
 					if (firstFocusable) firstFocusable.focus();
 				}
 			}

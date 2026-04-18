@@ -25,9 +25,7 @@
 	@include select-none;
 
 	ul {
-		list-style: none;
-		@include p(0);
-		margin: 0;
+		@include list-reset;
 	}
 
 	li {
