@@ -53,6 +53,13 @@
 	@include border-t;
 }
 
+// ─── Focus treatment (shared by form-input and icon-group) ─────
+
+@mixin _form-focus-style {
+	border-color: hsl(var(--color-primary));
+	@include focus-background-shift;
+}
+
 // ─── Text inputs, textareas, selects ────────────────────────────
 
 @mixin form-input {
@@ -69,8 +76,7 @@
 	outline: none;
 
 	&:focus-visible {
-		border-color: hsl(var(--color-primary));
-		@include focus-ring;
+		@include _form-focus-style;
 	}
 
 	&::placeholder {
@@ -147,8 +153,7 @@
 	margin-bottom: 0;
 
 	&:focus-within {
-		border-color: hsl(var(--color-primary));
-		@include focus-background-shift;
+		@include _form-focus-style;
 	}
 
 	> .ln-icon {
