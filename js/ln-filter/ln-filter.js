@@ -138,6 +138,10 @@ import { persistGet, persistSet } from '../ln-core';
 			if (initValues.length > 0) {
 				this.state.key = initKey;
 				this.state.values = initValues;
+				this._pendingEvents.push({
+					name: 'ln-filter:changed',
+					detail: { key: initKey, values: initValues }
+				});
 			}
 		}
 

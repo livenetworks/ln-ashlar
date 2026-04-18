@@ -54,6 +54,10 @@ When `data-ln-search` points to a `[data-ln-table]` element, `ln-table` intercep
 
 No extra configuration needed — the integration is automatic.
 
+## Browser form restore
+
+If the browser restores a search value on page refresh (e.g. back/forward navigation), the component detects the pre-filled value on init and applies the search automatically. The initial search is deferred via `queueMicrotask` to ensure all target components have initialized before the event dispatches.
+
 ## Examples
 
 ### On a wrapper element

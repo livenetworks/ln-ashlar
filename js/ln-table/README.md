@@ -95,6 +95,36 @@ filtering in memory.
 On a button — clears the connected search input value.
 Resolved via: `btn → closest [data-ln-table] → id → [data-ln-search="id"]`.
 
+### `th[data-ln-filter-col="key"]`
+
+On `<th>` elements — maps a column to a filter key used by `ln-filter`.
+When a per-column filter is active (non-reset values selected), `ln-table`
+automatically sets `data-ln-filter-active` on the `<th>`.
+
+```html
+<th data-ln-sort="string" data-ln-filter-col="dept">
+    Department
+    <button class="filter" type="button" data-ln-popover-for="filter-dept" aria-label="Filter department">
+        <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+    </button>
+</th>
+```
+
+Style the active state in project CSS:
+
+```css
+th[data-ln-filter-active] .filter {
+    opacity: 1;
+    color: hsl(var(--color-primary));
+}
+```
+
+### `th[data-ln-filter-active]`
+
+**Set by JS** — do not add manually. Present on `<th>` elements when a column
+filter has non-reset values selected. Removed automatically when the filter
+is reset (all values cleared or "All" checkbox selected).
+
 ### `th[data-ln-sort]`
 
 On `<th>` elements — makes columns sortable.

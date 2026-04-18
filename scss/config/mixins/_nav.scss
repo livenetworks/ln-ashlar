@@ -56,7 +56,6 @@
 	}
 
 	.nav-section {
-		@include px(1rem);
 		@include py(0.5rem);
 		@include text-xs;
 		@include font-medium;
@@ -69,7 +68,6 @@
 	.nav-divider {
 		@include border-t;
 		@include my(0.5rem);
-		@include mx(1rem);
 	}
 
 	// Default link style — override by applying a nav-links-* mixin after @include nav
@@ -103,8 +101,8 @@
 
 
 // ── 1. Rounded floating (default) ────────────────────────────────────────────
-// Links float as pills inside the sidebar. mx() is required so the rounded
-// corners don't touch the container wall (see visual-language.md rule 1).
+// Links float as pills inside the sidebar. Container provides horizontal
+// spacing — links use px() only for pill shape, no mx().
 // Active: primary-tinted bg + primary text. No bar indicator.
 @mixin nav-links-rounded {
 	@include _nav-link-active;
@@ -122,7 +120,6 @@
 	}
 
 	a {
-		@include mx(0.5rem);
 		@include px(0.75rem);
 		@include rounded-md;
 		transition: background-color 150ms ease, color 150ms ease;

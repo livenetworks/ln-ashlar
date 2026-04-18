@@ -35,6 +35,15 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 
 		this._attachHandler();
 
+		// Apply initial value (browser form restore may pre-fill the input).
+		// Deferred so all components finish init before the event dispatches.
+		if (this.input && this.input.value.trim()) {
+			const self = this;
+			queueMicrotask(function () {
+				self._search(self.input.value.trim().toLowerCase());
+			});
+		}
+
 		dom.setAttribute(INIT_ATTR, '');
 		return this;
 	}

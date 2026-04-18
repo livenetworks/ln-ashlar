@@ -60,3 +60,4 @@ el.lnSearch.destroy();    // remove listeners, clean up
 - With `data-ln-search-items`: iterates `target.querySelectorAll(selector)` — supports nested structures
 - Works independently alongside `ln-filter` on the same target
 - MutationObserver auto-initializes new `[data-ln-search]` elements — it does NOT re-filter when new children are added to the target
+- **Browser form restore:** If the input has a pre-filled value on init (browser back/forward, server-rendered), the search is applied automatically via deferred `queueMicrotask` — all target components finish initialization before the event dispatches

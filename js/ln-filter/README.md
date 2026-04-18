@@ -212,6 +212,8 @@ Add `data-ln-persist` to the `[data-ln-filter]` element to remember selected fil
 
 **Persisted state overrides DOM:** If localStorage has a saved filter, any `checked` attributes on inputs in the HTML are ignored.
 
+**Browser form restore:** If no persisted state exists, the component reads initial checkbox states on init. Pre-checked inputs (from browser back/forward restore or server-rendered HTML) are detected and a `ln-filter:changed` event is dispatched so connected components (e.g. `ln-table`) receive the initial filter state.
+
 ```html
 <nav id="status-filter" data-ln-filter="my-list" data-ln-persist>
     <ul>

@@ -162,3 +162,33 @@
 		@include size(1.5rem);
 	}
 }
+
+// ─── Column filter button ──────────────────────────────────────
+// Button inside <th> that triggers a filter popover/dropdown.
+// Convention: add class="filter" to the trigger button.
+// ln-table.js sets data-ln-filter-active on the <th> when active.
+
+@mixin table-filter-button {
+	th .filter {
+		@include inline-flex;
+		@include items-center;
+		float: right;
+		padding: 0.125rem;
+		@include rounded-sm;
+		opacity: 0.5;
+
+		&:hover {
+			opacity: 1;
+			@include bg-secondary;
+		}
+	}
+
+	th [data-ln-dropdown] {
+		float: right;
+	}
+
+	th[data-ln-filter-active] .filter {
+		opacity: 1;
+		color: hsl(var(--color-primary));
+	}
+}

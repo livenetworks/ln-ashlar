@@ -35,6 +35,8 @@
 
 	// ── Header delta ──
 	> header {
+		@include flex-wrap;
+
 		.logo {
 			@include flex-shrink-0;
 			@include size(2rem);
@@ -53,12 +55,11 @@
 			top: 0.5rem;
 			right: 0.5rem;
 		}
-	}
 
-	// ── Search — form-input-icon-group handles chrome ──
-	> .sidebar-search {
-		@include mx(var(--sidebar-px));
-		@include my(var(--spacing-sm));
+		.sidebar-search {
+			@include w-full;
+			@include mt(var(--spacing-xs));
+		}
 	}
 }
 
@@ -124,6 +125,7 @@
 	@include py(0.75rem);
 	@include bg-primary;
 	@include border-b;
+	@include shadow-b;
 	@include fixed;
 	top: 0;
 	@include w-full;
