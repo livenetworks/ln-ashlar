@@ -8,6 +8,7 @@ Inline translation system for forms. Adds translation inputs below translatable 
 |-----------|-----|-------------|
 | `data-ln-translations` | `<form>` | Initializes instance |
 | `data-ln-translations-default` | `<form>` | Default language code — sets flag on original inputs |
+| `data-ln-translations-locales='{"en":"English",...}'` | `<form>` | Available locales as JSON (default: en, sq, sr) |
 | `data-ln-translations-add` | `<button>` | Trigger button (inside `data-ln-dropdown` wrapper) |
 | `data-ln-translations-active` | `<ul>` | Container for active language badges |
 | `data-ln-translatable="field"` | form element wrapper (`<p>`, `<label>`, `<div>`, `<article>`) | Marks a translatable field + field name |
