@@ -68,3 +68,17 @@ td .actions {
 .loader {
 	@include loader;
 }
+
+// Column filter popovers
+#filter-category,
+#filter-status {
+	@include popover;
+	padding: var(--spacing-sm);
+
+	> ul { @include check-list; }
+}
+
+th [data-ln-popover-for] {
+	float: right;
+	padding: 0;
+}

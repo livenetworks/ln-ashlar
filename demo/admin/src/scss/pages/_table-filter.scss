@@ -19,6 +19,7 @@
 // Filter popover content layout
 #filter-dept,
 #filter-role {
+	@include popover;
 	> input[data-ln-search] {
 		@include w-full;
 		@include px(var(--spacing-sm));

@@ -316,8 +316,8 @@
 
 // ─── Check list — vertical label list ──────────────────────────
 // <ul><li><label><input> — same structure as pill-group but vertical.
-// Labels already have pill styling via the global component binding.
-// Apply on the container element.
+// Simple list reset: removes bullets + padding. Labels remain plain
+// (visible checkbox, block layout).
 //
 // Usage:
 //   #dept-filter { @include check-list; }

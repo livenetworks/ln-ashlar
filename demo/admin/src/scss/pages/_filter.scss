@@ -104,3 +104,27 @@
 		@include bg-secondary;
 	}
 }
+
+// ─── Pill styling for toolbar/standalone filter checkboxes ──────
+// Popovers and dropdowns are NOT included — they use check-list style
+// (vertical list with visible checkboxes).
+
+#filter-basic-nav,
+#filter-cards-nav,
+#combo-toolbar > nav,
+#persist-filter,
+nav[data-ln-filter-col] {
+	ul {
+		@include pill-group;
+	}
+
+	label:has(> input[type="checkbox"]),
+	label:has(> input[type="radio"]) {
+		@include pill;
+	}
+}
+
+// Multi-column inline filters (bare labels in <span>, no ul/li wrapper)
+span[data-ln-filter] label:has(> input[type="checkbox"]) {
+	@include pill;
+}
