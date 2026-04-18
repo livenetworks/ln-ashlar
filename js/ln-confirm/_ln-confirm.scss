@@ -1,40 +1,8 @@
-@use '../../scss/config/mixins' as *;
-
+// ── JS state: confirm mode color override ──
+// When data-confirming is set (by JS), override --color-primary to error
+// so the button turns red. Tooltip-mode buttons handle color differently.
 [data-confirming]:not(.ln-confirm-tooltip) {
 	--color-primary: var(--color-error);
-}
-
-// ── Icon-only confirm button (tooltip mode) ──
-// Default mode (text buttons) overrides --color-primary above.
-// Icon-only buttons need explicit color because they don't inherit
-// through --color-primary (their colors are set directly by consumers).
-.ln-confirm-tooltip {
-	position: relative;
-	overflow: visible !important;
-
-	// Confirm icon inherits this color
-	color: hsl(var(--color-error)) !important;
-
-	&::after {
-		content: attr(data-tooltip-text);
-		position: absolute;
-		bottom: 100%;
-		left: 50%;
-		transform: translateX(-50%);
-		margin-bottom: 8px;
-		background: hsl(var(--color-text-primary));
-		color: hsl(var(--color-white));
-		@include px(var(--spacing-sm));
-		@include py(var(--spacing-xs));
-		border-radius: var(--radius-sm);
-		font-size: var(--text-xs);
-		@include font-medium;
-		white-space: nowrap;
-		line-height: 1.2;
-		pointer-events: none;
-		z-index: var(--z-dropdown);
-		box-shadow: var(--shadow-md);
-	}
 }
 
 // ── Overflow escape: tooltip inside clipped containers ──

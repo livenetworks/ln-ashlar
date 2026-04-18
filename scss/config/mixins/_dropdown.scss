@@ -1,0 +1,98 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+@use 'typography' as *;
+@use 'sizing' as *;
+@use 'position' as *;
+@use 'interaction' as *;
+@use 'transitions' as *;
+@use 'motion' as *;
+
+// Dropdown menu — floating panel with menu items.
+//
+// Usage:
+//   [data-ln-dropdown] { @include dropdown; }
+//   [data-ln-dropdown-menu] { @include dropdown-menu; }
+//
+// Open/close state (display:none ↔ display:block + .open) is JS-driven
+// and lives in the co-located JS SCSS, not here.
+
+@mixin dropdown {
+	@include relative;
+}
+
+@mixin dropdown-menu {
+	@include absolute;
+	right: 0;
+	top: 100%;
+	@include mt(var(--spacing-xs));
+	@include bg-primary;
+	@include border-light;
+	@include rounded-md;
+	@include shadow-lg;
+	z-index: var(--z-dropdown);
+	list-style: none;
+	@include py(var(--spacing-xs));
+	padding-left: 0;
+	padding-right: 0;
+	margin: 0;
+	min-width: 10rem;
+
+	// ─── Menu item resets ──────────────────────────────
+	li {
+		margin: 0;
+		padding: 0;
+	}
+
+	form {
+		margin: 0;
+		padding: 0;
+	}
+
+	// ─── Menu items ────────────────────────────────────
+	a,
+	button,
+	input[type="submit"],
+	input[type="reset"],
+	input[type="button"] {
+		@include w-full;
+		@include flex;
+		@include items-center;
+		justify-content: flex-start;
+		@include gap(var(--spacing-sm));
+		@include text-left;
+		@include px(var(--spacing-sm));
+		@include py(var(--spacing-xs));
+		@include text-sm;
+		@include cursor-pointer;
+		@include transition-fast;
+		background: none;
+		border: none;
+		border-radius: 0;
+		color: hsl(var(--color-text-primary));
+		text-decoration: none;
+
+		&:hover:not(:disabled) {
+			@include bg-secondary;
+			color: hsl(var(--color-text-primary));
+		}
+
+		&:active:not(:disabled) {
+			@include bg-secondary;
+			color: hsl(var(--color-text-primary));
+		}
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
+
+	// ─── Separator ─────────────────────────────────────
+	hr {
+		border: none;
+		border-top: var(--border-width) solid hsl(var(--color-border-light));
+		@include my(var(--spacing-xs));
+	}
+}

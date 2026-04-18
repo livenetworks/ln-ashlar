@@ -1,0 +1,156 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'position' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+@use 'motion' as *;
+@use 'btn' as *;
+
+// Upload component -- drag-and-drop zone, file list, progress bar.
+//
+// Usage:
+//   .ln-upload { @include upload; }
+//   .ln-upload__zone { @include upload-zone; }
+
+@mixin upload {
+	width: 100%;
+}
+
+@mixin upload-icon {
+	margin-right: 0.5rem;
+	flex-shrink: 0;
+}
+
+@mixin upload-zone {
+	border: 2px dashed hsl(var(--color-border));
+	border-radius: var(--radius-md);
+	padding: var(--spacing-lg);
+	text-align: center;
+	@include cursor-pointer;
+	@include motion-safe {
+		transition: border-color var(--transition-base),
+		            background-color var(--transition-base);
+	}
+	background-color: hsl(var(--color-bg-secondary));
+
+	&:hover {
+		border-color: hsl(var(--color-primary));
+		background-color: hsl(var(--color-primary-lighter));
+	}
+
+	span {
+		display: block;
+		color: hsl(var(--color-text-secondary));
+		font-size: 0.875rem;
+	}
+
+	small {
+		display: block;
+		color: hsl(var(--color-text-muted));
+		font-size: 0.75rem;
+		margin-top: var(--spacing-xs);
+	}
+}
+
+@mixin upload-zone-dragover {
+	border-color: hsl(var(--color-primary));
+	background-color: hsl(var(--color-primary-light));
+	border-style: solid;
+}
+
+@mixin upload-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	margin-top: var(--spacing-sm);
+
+	&:empty {
+		display: none;
+	}
+}
+
+@mixin upload-item {
+	@include relative;
+	@include flex;
+	@include items-center;
+	flex-wrap: wrap;
+	padding: var(--spacing-sm) var(--spacing-md);
+	background-color: hsl(var(--color-bg-secondary));
+	border: var(--border-width) solid hsl(var(--color-border));
+	border-radius: var(--radius-sm);
+	@include mb(var(--spacing-sm));
+	font-size: 0.875rem;
+	@include overflow-hidden;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+@mixin upload-name {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: hsl(var(--color-text-primary));
+}
+
+@mixin upload-size {
+	color: hsl(var(--color-text-muted));
+	font-size: 0.75rem;
+	@include ml(var(--spacing-md));
+	flex-shrink: 0;
+}
+
+@mixin upload-remove {
+	@include close-button;
+	@include ml(var(--spacing-sm));
+}
+
+@mixin upload-progress {
+	@include absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background-color: hsl(var(--color-border));
+}
+
+@mixin upload-progress-bar {
+	height: 100%;
+	width: 0;
+	background-color: hsl(var(--color-primary));
+	@include motion-safe {
+		transition: width 0.15s ease-out;
+	}
+}
+
+@mixin upload-item-error {
+	border-color: hsl(var(--color-error));
+	background-color: hsl(var(--color-bg-error));
+
+	.ln-upload__progress-bar {
+		background-color: hsl(var(--color-error));
+	}
+}
+
+@mixin upload-item-deleting-spinner {
+	content: '';
+	box-sizing: border-box;
+	display: inline-block;
+	width: 1.25rem;
+	height: 1.25rem;
+	margin-right: 0.5rem;
+	border: 2px solid hsl(var(--color-border));
+	border-radius: 50%;
+	border-top-color: hsl(var(--color-primary));
+	background-image: none !important;
+	@include motion-safe {
+		animation: ln-upload-spin 0.6s linear infinite;
+	}
+	flex-shrink: 0;
+}

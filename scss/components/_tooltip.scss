@@ -3,3 +3,16 @@
 [data-ln-tooltip] {
 	@include tooltip;
 }
+
+#ln-tooltip-portal {
+	@include tooltip-portal;
+}
+
+.ln-tooltip {
+	@include tooltip-element;
+}
+
+@keyframes ln-tooltip-fade {
+	from { opacity: 0; transform: translateY(2px); }
+	to   { opacity: 1; transform: translateY(0); }
+}

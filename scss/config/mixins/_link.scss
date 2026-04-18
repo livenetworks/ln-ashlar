@@ -1,0 +1,53 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'position' as *;
+@use 'interaction' as *;
+@use 'motion' as *;
+
+// Clickable rows — cursor + selection prevention for data-ln-link containers.
+//
+// Usage:
+//   [data-ln-link] tr { @include link-row; }
+
+@mixin link-row {
+	@include cursor-pointer;
+	@include select-none;
+}
+
+// Status bar — mimics browser's native URL preview at bottom-left.
+//
+// Usage:
+//   .ln-link-status { @include link-status; }
+//
+// JS toggles .ln-link-status--visible to show/hide.
+
+@mixin link-status {
+	@include fixed;
+	bottom: 0;
+	left: 0;
+	@include px(0.75rem);
+	@include py(0.25rem);
+	@include bg-primary;
+	@include border-t;
+	@include border-r;
+	@include text-xs;
+	@include text-secondary;
+	@include rounded-sm;
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+	max-width: 50vw;
+	@include truncate;
+	@include z-toast;
+	opacity: 0;
+	pointer-events: none;
+	@include motion-safe {
+		transition: opacity var(--transition-fast);
+	}
+
+	&--visible {
+		opacity: 1;
+	}
+}

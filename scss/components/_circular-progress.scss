@@ -1,0 +1,29 @@
+@use '../config/mixins' as *;
+
+[data-ln-circular-progress] {
+	@include circular-progress;
+}
+
+[data-ln-circular-progress].sm {
+	@include circular-progress-sm;
+}
+
+[data-ln-circular-progress].lg {
+	@include circular-progress-lg;
+}
+
+[data-ln-circular-progress].xl {
+	@include circular-progress-xl;
+}
+
+[data-ln-circular-progress].green {
+	@include circular-progress-green;
+}
+
+[data-ln-circular-progress].red {
+	@include circular-progress-red;
+}
+
+[data-ln-circular-progress].yellow {
+	@include circular-progress-yellow;
+}

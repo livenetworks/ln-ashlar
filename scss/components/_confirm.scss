@@ -1,0 +1,5 @@
+@use '../config/mixins' as *;
+
+.ln-confirm-tooltip {
+	@include confirm-tooltip;
+}

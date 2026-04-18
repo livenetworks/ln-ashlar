@@ -1,0 +1,111 @@
+@use '../config/mixins' as *;
+
+[data-ln-translatable-lang] {
+	@include translations-flag-input;
+}
+
+[data-ln-toggle] button[data-ln-translations-lang] {
+	@include translations-dropdown-flag;
+}
+
+// ─── Flag icons per language ─────────────────────────────────────
+// Lang code (ISO 639-1) -> country flag (ISO 3166-1 alpha-2).
+
+$lang-flag-overrides: (
+	en: 'gb',
+	sq: 'al',
+	sr: 'rs',
+	ja: 'jp',
+	ko: 'kr',
+	zh: 'cn',
+	cs: 'cz',
+	da: 'dk',
+	el: 'gr',
+	he: 'il',
+	hi: 'in',
+	uk: 'ua',
+	vi: 'vn',
+	sv: 'se',
+	nb: 'no',
+	nn: 'no',
+	ca: 'es',
+	eu: 'es',
+	gl: 'es',
+	fa: 'ir',
+	ar: 'sa',
+	ms: 'my',
+	sl: 'si',
+	et: 'ee',
+	ka: 'ge',
+	hy: 'am',
+	be: 'by',
+	bs: 'ba',
+	hr: 'hr',
+	ga: 'ie',
+	cy: 'gb',
+	sw: 'ke',
+	bn: 'bd',
+	ur: 'pk',
+	ta: 'lk',
+	te: 'in',
+	ml: 'in',
+	kn: 'in',
+	mr: 'in',
+	gu: 'in',
+	pa: 'in',
+	ne: 'np',
+	km: 'kh',
+	lo: 'la',
+	my: 'mm',
+	af: 'za',
+	zu: 'za',
+);
+
+$lang-auto: mk, de, fr, it, bg, pt, ro, nl, pl, fi, hu, lt, lv, tr, az, is, mt, lb, no, ru, th, id;
+
+@each $lang, $country in $lang-flag-overrides {
+	[data-ln-translatable-lang="#{$lang}"],
+	[data-ln-translations-active] [data-ln-translations-lang="#{$lang}"],
+	[data-ln-toggle] button[data-ln-translations-lang="#{$lang}"]::before {
+		background-image: url('/assets/flags/#{$country}.svg');
+	}
+}
+
+@each $lang in $lang-auto {
+	[data-ln-translatable-lang="#{$lang}"],
+	[data-ln-translations-active] [data-ln-translations-lang="#{$lang}"],
+	[data-ln-toggle] button[data-ln-translations-lang="#{$lang}"]::before {
+		background-image: url('/assets/flags/#{$lang}.svg');
+	}
+}
+
+// ─── Header actions ──────────────────────────────────────────────
+
+.ln-translations__actions {
+	@include translations-actions;
+}
+
+[data-ln-translations-active] {
+	@include translations-active-list;
+}
+
+[data-ln-translations-active] p {
+	@include translations-badge;
+}
+
+[data-ln-translations-active] button {
+	@include translations-badge-remove;
+}
+
+[data-ln-translations-add] {
+	@include translations-add-button;
+}
+
+// ─── Reduced motion ─────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+	[data-ln-translations-add],
+	[data-ln-translations-active] button {
+		transition: none;
+	}
+}

@@ -1,0 +1,40 @@
+@use '../config/mixins' as *;
+
+[data-ln-data-table] {
+	@include data-table;
+}
+
+// ─── Sort indicators ──────────────────────────────────────
+
+[data-ln-col-sort] {
+	@include data-table-sort-button;
+}
+
+th:hover [data-ln-col-sort] {
+	opacity: 0.7;
+}
+
+.ln-sort-asc [data-ln-col-sort],
+.ln-sort-desc [data-ln-col-sort] {
+	@include data-table-sort-active;
+}
+
+// ─── Filter button ────────────────────────────────────────
+
+[data-ln-col-filter] {
+	@include data-table-filter-button;
+}
+
+th:hover [data-ln-col-filter] {
+	opacity: 0.7;
+}
+
+.ln-filter-active {
+	@include data-table-filter-active;
+}
+
+// ─── Filter dropdown ──────────────────────────────────────
+
+.column-filter-dropdown {
+	@include data-table-filter-dropdown;
+}

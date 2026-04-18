@@ -1,9 +1,25 @@
-@use '../../scss/config/mixins' as *;
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+@use 'position' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+@use 'motion' as *;
+@use 'btn' as *;
 
-/* ========== Live Networks Toast (Side-Accent Light Theme) ========== */
+// Toast notification -- side-accent card with icon, title, body, close button.
+//
+// Usage:
+//   [data-ln-toast] { @include toast-container; }
+//   .ln-toast__card { @include toast-card; }
+//
+// Color variants set --ln-toast-accent on the card.
 
-/* Container */
-[data-ln-toast] {
+@mixin toast-container {
 	@include fixed;
 	@include z-toast;
 	pointer-events: none;
@@ -16,28 +32,27 @@
 	@include p(0);
 }
 
-/* Transitions */
-[data-ln-toast] > .ln-toast__item {
+@mixin toast-item {
 	opacity: 0;
 	pointer-events: auto;
 	@include motion-safe {
 		transform: translateX(30px);
 		transition: all var(--transition-base) var(--easing-standard);
 	}
+
+	& + & {
+		@include mb(var(--spacing-md));
+	}
 }
 
-[data-ln-toast] > .ln-toast__item + .ln-toast__item {
-	@include mb(var(--spacing-md));
-}
-
-[data-ln-toast] > .ln-toast__item--in {
+@mixin toast-item-in {
 	opacity: 1;
 	@include motion-safe {
 		transform: translateX(0);
 	}
 }
 
-.ln-toast__item--out {
+@mixin toast-item-out {
 	opacity: 0 !important;
 	@include motion-safe {
 		transform: scale(0.95) !important;
@@ -45,8 +60,7 @@
 	}
 }
 
-/* Card */
-.ln-toast__card {
+@mixin toast-card {
 	@include flex;
 	@include bg-primary;
 	@include border;
@@ -57,8 +71,7 @@
 	@include overflow-hidden;
 }
 
-/* Icon Sidebar */
-.ln-toast__side {
+@mixin toast-side {
 	flex: 0 0 44px;
 	@include flex;
 	align-items: flex-start;
@@ -66,74 +79,77 @@
 	@include pt(var(--spacing-md));
 	background: var(--ln-toast-accent, hsl(var(--color-info)));
 	color: hsl(var(--color-white));
+
+	&::before {
+		width: 2rem;
+		height: 2rem;
+	}
 }
 
-.ln-toast__side::before {
-	width: 2rem;
-	height: 2rem;
-}
-
-/* Content Area */
-.ln-toast__content {
+@mixin toast-content {
 	@include flex-1;
 	padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-sm);
 	@include relative;
 }
 
-.ln-toast__card--success {
+// ─── Color variants ────────────────────────────────────
+
+@mixin toast-success {
 	--ln-toast-accent: hsl(var(--color-success));
 }
 
-.ln-toast__card--error {
+@mixin toast-error {
 	--ln-toast-accent: hsl(var(--color-error));
 }
 
-.ln-toast__card--warn {
+@mixin toast-warn {
 	--ln-toast-accent: hsl(var(--color-warning));
 }
 
-.ln-toast__card--info {
+@mixin toast-info {
 	--ln-toast-accent: hsl(var(--color-info));
 }
 
-/* Header & Close */
-.ln-toast__head {
+// ─── Header & close ────────────────────────────────────
+
+@mixin toast-head {
 	@include flex;
 	align-items: flex-start;
 	@include justify-between;
 	@include gap(var(--spacing-md));
 }
 
-.ln-toast__title {
+@mixin toast-title {
 	@include font-bold;
 	@include text-base;
 	@include text-primary;
 	line-height: 1.25;
 }
 
-.ln-toast__close {
+@mixin toast-close {
 	@include close-button;
 	@include absolute;
 	top: var(--spacing-sm);
 	right: var(--spacing-sm);
 }
 
-/* Body */
-.ln-toast__body {
+// ─── Body ──────────────────────────────────────────────
+
+@mixin toast-body {
 	@include mt(var(--spacing-sm));
 	font-size: 0.9375rem;
 	@include text-secondary;
 	line-height: 1.5;
 
 	p { @include m(0); }
-}
 
-.ln-toast__body ul {
-	margin: var(--spacing-sm) 0 0 0;
-	padding-left: 1.25rem;
-	@include text-sm;
-}
+	ul {
+		margin: var(--spacing-sm) 0 0 0;
+		padding-left: 1.25rem;
+		@include text-sm;
+	}
 
-.ln-toast__body li + li {
-	@include mt(var(--spacing-xs));
+	li + li {
+		@include mt(var(--spacing-xs));
+	}
 }

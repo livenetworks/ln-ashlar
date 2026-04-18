@@ -1,142 +1,10 @@
-@use '../../scss/config/mixins' as *;
-
-/* Upload Component Styles */
-
-/* File icon spacing in upload context */
-.ln-upload__item svg.ln-icon {
-	margin-right: 0.5rem;
-	flex-shrink: 0;
-}
-
-/* ==========================================================================
-   Upload Container
-   ========================================================================== */
-
-.ln-upload {
-	width: 100%;
-}
-
-/* Dictionary items - hidden */
+// ── JS state: upload display toggles ──
+// Dictionary items hidden by JS
 .ln-upload [data-ln-upload-dict] {
 	display: none;
 }
 
-/* ==========================================================================
-   Upload Zone (Drag & Drop area)
-   ========================================================================== */
-
-.ln-upload__zone {
-	border: 2px dashed hsl(var(--color-border));
-	border-radius: var(--radius-md);
-	padding: var(--spacing-lg);
-	text-align: center;
-	cursor: pointer;
-	@include motion-safe {
-		transition: border-color var(--transition-base),
-		            background-color var(--transition-base);
-	}
-	background-color: hsl(var(--color-bg-secondary));
-}
-
-.ln-upload__zone:hover {
-	border-color: hsl(var(--color-primary));
-	background-color: hsl(var(--color-primary-lighter));
-}
-
-.ln-upload__zone--dragover {
-	border-color: hsl(var(--color-primary));
-	background-color: hsl(var(--color-primary-light));
-	border-style: solid;
-}
-
-.ln-upload__zone span {
-	display: block;
-	color: hsl(var(--color-text-secondary));
-	font-size: 0.875rem;
-}
-
-.ln-upload__zone small {
-	display: block;
-	color: hsl(var(--color-text-muted));
-	font-size: 0.75rem;
-	margin-top: var(--spacing-xs);
-}
-
-/* ==========================================================================
-   File List
-   ========================================================================== */
-
-.ln-upload__list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	margin-top: var(--spacing-sm);
-}
-
-.ln-upload__list:empty {
-	display: none;
-}
-
-.ln-upload__item {
-	position: relative;
-	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	padding: var(--spacing-sm) var(--spacing-md);
-	background-color: hsl(var(--color-bg-secondary));
-	border: var(--border-width) solid hsl(var(--color-border));
-	border-radius: var(--radius-sm);
-	margin-bottom: var(--spacing-sm);
-	font-size: 0.875rem;
-	overflow: hidden;
-}
-
-.ln-upload__item:last-child {
-	margin-bottom: 0;
-}
-
-.ln-upload__name {
-	flex: 1;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	color: hsl(var(--color-text-primary));
-}
-
-.ln-upload__size {
-	color: hsl(var(--color-text-muted));
-	font-size: 0.75rem;
-	margin-left: var(--spacing-md);
-	flex-shrink: 0;
-}
-
-.ln-upload__remove {
-	@include close-button;
-	@include ml(var(--spacing-sm));
-}
-
-/* ==========================================================================
-   Upload Progress
-   ========================================================================== */
-
-.ln-upload__progress {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 3px;
-	background-color: hsl(var(--color-border));
-}
-
-.ln-upload__progress-bar {
-	height: 100%;
-	width: 0;
-	background-color: hsl(var(--color-primary));
-	@include motion-safe {
-		transition: width 0.15s ease-out;
-	}
-}
-
+// Progress bar visibility controlled by JS uploading state
 .ln-upload__item--uploading .ln-upload__progress {
 	display: block;
 }
@@ -145,43 +13,8 @@
 	display: none;
 }
 
-.ln-upload__item--error {
-	border-color: hsl(var(--color-error));
-	background-color: hsl(var(--color-bg-error));
-}
-
-.ln-upload__item--error .ln-upload__progress-bar {
-	background-color: hsl(var(--color-error));
-}
-
-/* ==========================================================================
-   Deletion State
-   ========================================================================== */
-
+// Deleting state — JS disables interaction
 .ln-upload__item--deleting {
 	opacity: 0.7;
 	pointer-events: none;
-}
-
-.ln-upload__item--deleting::before {
-	content: '';
-	box-sizing: border-box;
-	display: inline-block;
-	width: 1.25rem;
-	height: 1.25rem;
-	margin-right: 0.5rem;
-	border: 2px solid hsl(var(--color-border));
-	border-radius: 50%;
-	border-top-color: hsl(var(--color-primary));
-	background-image: none !important;
-	@include motion-safe {
-		animation: ln-upload-spin 0.6s linear infinite;
-	}
-	flex-shrink: 0;
-}
-
-@keyframes ln-upload-spin {
-	to {
-		transform: rotate(360deg);
-	}
 }

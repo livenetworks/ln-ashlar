@@ -1,0 +1,127 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+@use 'motion' as *;
+
+// Translation management -- flag icons, badges, trigger button.
+//
+// Usage:
+//   [data-ln-translatable-lang] { @include translations-flag-input; }
+//   [data-ln-translations-active] { @include translations-active-list; }
+
+// ─── Flag icon in input background ───────────────────────────────
+
+@mixin translations-flag-input {
+	--_flag-w: 1.25rem;
+	--_flag-h: calc(var(--_flag-w) * 3 / 4);
+	--_input-py: 0.5rem;
+	--_input-px: 0.75rem;
+	--_line-height: 1.5rem;
+
+	padding-left: calc(var(--_input-px) + var(--_flag-w) + var(--_input-px));
+	background-repeat: no-repeat;
+	background-size: var(--_flag-w) auto;
+	background-position: var(--_input-px) calc(var(--_input-py) + (var(--_line-height) - var(--_flag-h)) / 2);
+}
+
+// ─── Dropdown menu item: flag via ::before ───────────────────────
+
+@mixin translations-dropdown-flag {
+	@include flex;
+	@include items-center;
+	@include gap(0.5rem);
+
+	&::before {
+		content: '';
+		@include inline-block;
+		width: 1.25rem;
+		aspect-ratio: 4 / 3;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
+		flex-shrink: 0;
+	}
+}
+
+// ─── Header actions ──────────────────────────────────────────────
+
+@mixin translations-actions {
+	@include inline-flex;
+	@include items-center;
+	@include gap(var(--spacing-xs));
+	margin-left: auto;
+}
+
+// ─── Active translations list ────────────────────────────────────
+
+@mixin translations-active-list {
+	@include inline-flex;
+	@include items-center;
+	@include gap(var(--spacing-xs));
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+// ─── Badge with flag ─────────────────────────────────────────────
+
+@mixin translations-badge {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.25rem);
+	@include text-xs;
+	@include font-semibold;
+	@include rounded-sm;
+	@include px(var(--spacing-xs));
+	@include py(0.125rem);
+	background-color: hsl(var(--color-primary) / 0.08);
+	color: hsl(var(--color-primary));
+	@include select-none;
+	margin: 0;
+	background-repeat: no-repeat;
+	background-position: 0.25rem center;
+	background-size: 1rem auto;
+	padding-left: 1.5rem;
+}
+
+// ─── Badge remove button ─────────────────────────────────────────
+
+@mixin translations-badge-remove {
+	background: none;
+	border: none;
+	@include cursor-pointer;
+	@include text-sm;
+	@include font-bold;
+	color: inherit;
+	padding: 0;
+	line-height: 1;
+	@include transition-fast;
+
+	&:hover {
+		@include text-error;
+	}
+}
+
+// ─── Trigger button ──────────────────────────────────────────────
+
+@mixin translations-add-button {
+	@include inline-flex;
+	@include items-center;
+	@include justify-center;
+	@include size(1.5rem);
+	@include rounded-sm;
+	@include cursor-pointer;
+	@include transition-fast;
+	background: hsl(var(--color-primary) / 0.08);
+	color: hsl(var(--color-primary));
+	border: none;
+
+	&:hover {
+		background: hsl(var(--color-primary) / 0.15);
+	}
+}

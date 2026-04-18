@@ -1,0 +1,11 @@
+@use '../config/mixins' as *;
+
+[data-ln-link] tr,
+tr[data-ln-link],
+[data-ln-link]:not(table):not(tbody):not(tr) {
+	@include link-row;
+}
+
+.ln-link-status {
+	@include link-status;
+}

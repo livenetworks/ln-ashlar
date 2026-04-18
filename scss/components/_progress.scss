@@ -1,0 +1,17 @@
+@use '../config/mixins' as *;
+
+[data-ln-progress] {
+	@include progress;
+}
+
+[data-ln-progress].green {
+	@include progress-green;
+}
+
+[data-ln-progress].red {
+	@include progress-red;
+}
+
+[data-ln-progress].yellow {
+	@include progress-yellow;
+}

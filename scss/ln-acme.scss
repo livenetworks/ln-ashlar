@@ -35,6 +35,17 @@
 @use 'components/popover';
 @use 'components/chip';
 @use 'components/loader';
+@use 'components/progress';
+@use 'components/link';
+@use 'components/confirm';
+@use 'components/circular-progress';
+@use 'components/modal';
+@use 'components/dropdown';
+@use 'components/toast';
+@use 'components/upload';
+@use 'components/translations';
+@use 'components/data-table';
+@use 'components/ln-table';
 
 @use 'utilities/utilities';
 @use 'utilities/animations';
@@ -44,14 +55,8 @@
 @use '../js/ln-modal/ln-modal';
 @use '../js/ln-dropdown/ln-dropdown';
 @use '../js/ln-tooltip/ln-tooltip';
-@use '../js/ln-toast/ln-toast';
 @use '../js/ln-upload/ln-upload';
-@use '../js/ln-link/ln-link';
-@use '../js/ln-progress/ln-progress';
 @use '../js/ln-filter/ln-filter';
 @use '../js/ln-search/ln-search';
-@use '../js/ln-table/ln-table';
-@use '../js/ln-circular-progress/ln-circular-progress';
-@use '../js/ln-translations/ln-translations';
-@use '../js/ln-confirm/ln-confirm';
+@use '../js/ln-table/ln-table' as ln-table-state;
 @use '../js/ln-data-table/ln-data-table';

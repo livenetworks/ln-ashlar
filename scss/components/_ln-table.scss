@@ -1,0 +1,51 @@
+@use '../config/mixins' as *;
+
+[data-ln-table] {
+	@include ln-table;
+	@include ln-table-column-filter;
+	@include ln-table-sort;
+}
+
+.ln-table__toolbar {
+	@include ln-table-toolbar;
+}
+
+.ln-table__toolbar label:has(> input[type="search"]) > input {
+	@include ln-table-toolbar-search;
+}
+
+.ln-table__count {
+	@include ln-table-count;
+}
+
+.table-container {
+	@include ln-table-card-mode;
+}
+
+.ln-table__footer {
+	@include ln-table-footer;
+}
+
+.ln-table__timing {
+	@include ln-table-timing;
+}
+
+.ln-table__filters {
+	@include ln-table-filters;
+}
+
+.ln-table__chips {
+	@include ln-table-chips;
+}
+
+.ln-table__chip {
+	@include ln-table-chip;
+}
+
+.ln-table__clear-all {
+	@include ln-table-clear-all;
+}
+
+.ln-table__empty-state {
+	@include ln-table-empty-state;
+}

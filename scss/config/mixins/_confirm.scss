@@ -1,0 +1,40 @@
+@use 'spacing' as *;
+@use 'typography' as *;
+@use 'shadows' as *;
+
+// Confirm tooltip — visual tooltip for icon-only confirm buttons.
+//
+// Usage:
+//   .ln-confirm-tooltip { @include confirm-tooltip; }
+//
+// JS adds .ln-confirm-tooltip class and data-tooltip-text attribute
+// to icon-only buttons entering confirm state.
+
+@mixin confirm-tooltip {
+	position: relative;
+	overflow: visible !important;
+
+	// Confirm icon inherits this color
+	color: hsl(var(--color-error)) !important;
+
+	&::after {
+		content: attr(data-tooltip-text);
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		margin-bottom: 8px;
+		background: hsl(var(--color-text-primary));
+		color: hsl(var(--color-white));
+		@include px(var(--spacing-sm));
+		@include py(var(--spacing-xs));
+		border-radius: var(--radius-sm);
+		font-size: var(--text-xs);
+		@include font-medium;
+		white-space: nowrap;
+		line-height: 1.2;
+		pointer-events: none;
+		z-index: var(--z-dropdown);
+		box-shadow: var(--shadow-md);
+	}
+}

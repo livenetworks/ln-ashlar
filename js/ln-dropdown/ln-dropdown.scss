@@ -1,97 +1,15 @@
 @use '../../scss/config/mixins' as *;
 
-[data-ln-dropdown] {
-	@include relative;
-}
-
+// ── JS state: dropdown open/close ──
+// ln-toggle adds/removes .open class. display:none is default (no menu visible).
+// Animation plays on open via @keyframes in component file.
 [data-ln-dropdown-menu] {
 	display: none;
-	@include absolute;
-	right: 0;
-	top: 100%;
-	@include mt(var(--spacing-xs));
-	@include bg-primary;
-	@include border-light;
-	@include rounded-md;
-	@include shadow-lg;
-	@include z-dropdown;
-	list-style: none;
-	@include py(var(--spacing-xs));
-	padding-left: 0;
-	padding-right: 0;
-	margin: 0;
-	min-width: 10rem;
 
 	&.open {
 		display: block;
 		@include motion-safe {
 			animation: ln-dropdown-in var(--transition-fast);
 		}
-	}
-
-	// ─── Menu items ────────────────────────────────────────
-	li {
-		margin: 0;
-		padding: 0;
-	}
-
-	form {
-		margin: 0;
-		padding: 0;
-	}
-
-	a,
-	button,
-	input[type="submit"],
-	input[type="reset"],
-	input[type="button"] {
-		@include w-full;
-		@include flex;
-		@include items-center;
-		justify-content: flex-start;
-		@include gap(var(--spacing-sm));
-		@include text-left;
-		@include px(var(--spacing-sm));
-		@include py(var(--spacing-xs));
-		@include text-sm;
-		@include cursor-pointer;
-		@include transition-fast;
-		background: none;
-		border: none;
-		border-radius: 0;
-		color: hsl(var(--color-text-primary));
-		text-decoration: none;
-
-		&:hover:not(:disabled) {
-			@include bg-secondary;
-			color: hsl(var(--color-text-primary));
-		}
-
-		&:active:not(:disabled) {
-			@include bg-secondary;
-			color: hsl(var(--color-text-primary));
-		}
-
-		&:focus {
-			box-shadow: none;
-		}
-	}
-
-	// ─── Separator ─────────────────────────────────────────
-	hr {
-		border: none;
-		border-top: var(--border-width) solid hsl(var(--color-border-light));
-		@include my(var(--spacing-xs));
-	}
-}
-
-@keyframes ln-dropdown-in {
-	from {
-		opacity: 0;
-		transform: translateY(-4px) scale(0.98);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0) scale(1);
 	}
 }

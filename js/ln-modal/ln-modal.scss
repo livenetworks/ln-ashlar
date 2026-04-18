@@ -1,94 +1,11 @@
-@use '../../scss/config/mixins' as *;
-
-/* Modal Overlay */
-.ln-modal {
-	display: none;
-	@include fixed;
-	@include inset-0;
-	background-color: hsl(var(--color-neutral-900) / 0.5);
-	backdrop-filter: blur(4px);
-	-webkit-backdrop-filter: blur(4px);
-	@include z-modal;
-	@include items-center;
-	@include justify-center;
-	opacity: 0;
-	@include motion-safe {
-		transition: opacity var(--transition-base);
-	}
-}
-
+// ── JS state: modal open/close ──
+// data-ln-modal attribute drives visibility. JS sets "open"/"close".
 [data-ln-modal="open"] {
 	display: flex;
 	opacity: 1;
 }
 
-/* Modal Content */
-.ln-modal > form {
-	@include bg-primary;
-	@include rounded-md;
-	@include shadow-xl;
-	max-width: 600px;
-	width: 90%;
-	max-height: 90vh;
-	@include motion-safe {
-		animation: ln-modal-slideIn 0.3s ease;
-	}
-	display: grid;
-	grid-template-rows: auto 1fr auto;
-}
-
-/* Header */
-.ln-modal header {
-	@include panel-header;
-	@include mb(0);
-}
-
-.ln-modal header button[data-ln-modal-close] {
-	@include close-button;
-}
-
-/* Body */
-.ln-modal main {
-	@include p(var(--spacing-md));
-	min-height: 0;
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-
-/* Footer */
-.ln-modal footer {
-	@include px(1rem);
-	@include py(0.75rem);
-	@include border-t;
-	@include bg-secondary;
-	@include flex;
-	@include justify-end;
-	@include gap(var(--spacing-sm));
-	position: sticky;
-	bottom: 0;
-
-	button[type="button"] {
-		border: var(--border-width) solid hsl(var(--color-border));
-
-		&:hover {
-			background-color: hsl(var(--color-bg-body));
-		}
-	}
-}
-
-/* Animation */
-@keyframes ln-modal-slideIn {
-	from {
-		transform: translateY(-50px);
-		opacity: 0;
-	}
-	to {
-		transform: translateY(0);
-		opacity: 1;
-	}
-}
-
-/* Prevent body scroll when modal is open */
+// Prevent body scroll when modal is open
 body.ln-modal-open {
 	overflow: hidden;
 }

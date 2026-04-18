@@ -1,0 +1,32 @@
+@use '../config/mixins' as *;
+
+.ln-modal {
+	@include modal-overlay;
+}
+
+.ln-modal > form {
+	@include modal-panel;
+}
+
+.ln-modal header {
+	@include modal-header;
+}
+
+.ln-modal main {
+	@include modal-body;
+}
+
+.ln-modal footer {
+	@include modal-footer;
+}
+
+@keyframes ln-modal-slideIn {
+	from {
+		transform: translateY(-50px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}

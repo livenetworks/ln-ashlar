@@ -1,0 +1,59 @@
+@use '../config/mixins' as *;
+
+.ln-upload {
+	@include upload;
+}
+
+.ln-upload__item svg.ln-icon {
+	@include upload-icon;
+}
+
+.ln-upload__zone {
+	@include upload-zone;
+}
+
+.ln-upload__zone--dragover {
+	@include upload-zone-dragover;
+}
+
+.ln-upload__list {
+	@include upload-list;
+}
+
+.ln-upload__item {
+	@include upload-item;
+}
+
+.ln-upload__name {
+	@include upload-name;
+}
+
+.ln-upload__size {
+	@include upload-size;
+}
+
+.ln-upload__remove {
+	@include upload-remove;
+}
+
+.ln-upload__progress {
+	@include upload-progress;
+}
+
+.ln-upload__progress-bar {
+	@include upload-progress-bar;
+}
+
+.ln-upload__item--error {
+	@include upload-item-error;
+}
+
+.ln-upload__item--deleting::before {
+	@include upload-item-deleting-spinner;
+}
+
+@keyframes ln-upload-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}

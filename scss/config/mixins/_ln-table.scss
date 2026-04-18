@@ -1,0 +1,358 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+@use 'position' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
+@use 'motion' as *;
+@use 'layout' as *;
+@use 'card' as *;
+
+// ln-table -- Enhanced data table wrapper component.
+//
+// Provides toolbar, sticky headers, column filter dropdowns, sort
+// indicators, footer, filter chips, empty state, timing badge.
+//
+// Usage:
+//   [data-ln-table] { @include ln-table; }
+//   .ln-table__toolbar { @include ln-table-toolbar; }
+//
+// State-driven CSS (spacer rows, sort icon .hidden toggle, content overflow
+// fix) stays in the co-located JS SCSS file.
+
+@mixin ln-table {
+	@include border;
+	@include rounded-lg;
+	@include bg-primary;
+	overflow: clip;
+
+	// Table overrides inside component
+	table {
+		overflow: visible;
+		border-collapse: separate;
+		border-spacing: 0;
+		border-radius: 0;
+		box-shadow: none;
+	}
+
+	// Thead sticky (below toolbar)
+	thead th {
+		position: sticky;
+		top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 0px));
+		z-index: calc(var(--z-sticky) - 1);
+		background: hsl(var(--color-table-header-bg));
+	}
+
+	// Thead corner radius
+	thead tr:first-child th:first-child {
+		border-top-left-radius: var(--radius-lg);
+	}
+	thead tr:first-child th:last-child {
+		border-top-right-radius: var(--radius-lg);
+	}
+
+	// First td override -- remove global bold/bg
+	table td:first-child {
+		background: transparent;
+		font-weight: normal;
+		@include text-secondary;
+	}
+}
+
+// ─── Toolbar ──────────────────────────────────────────────
+
+@mixin ln-table-toolbar {
+	@include panel-header;
+	position: sticky;
+	top: var(--header-height, 3.5rem);
+	z-index: var(--z-sticky);
+	border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+@mixin ln-table-toolbar-search {
+	@include w(10rem);
+}
+
+// ─── Count badge ──────────────────────────────────────────
+
+@mixin ln-table-count {
+	@include text-sm;
+	@include text-secondary;
+
+	strong {
+		@include text-primary;
+		@include font-semibold;
+	}
+}
+
+// ─── Card mode container query ────────────────────────────
+
+@mixin ln-table-card-mode {
+	@container table (max-width: 640px) {
+		colgroup { display: none; }
+		table { table-layout: auto !important; }
+	}
+}
+
+// ─── Column filter dropdowns in th ────────────────────────
+
+@mixin ln-table-column-filter {
+	th [data-ln-dropdown] {
+		@include inline-flex;
+		@include items-center;
+	}
+
+	th [data-ln-dropdown] > button {
+		@include flex;
+		@include items-center;
+		@include gap(0.25rem);
+		background: none;
+		border: none;
+		color: inherit;
+		font: inherit;
+		@include cursor-pointer;
+		@include p(0);
+
+		.ln-icon-filter {
+			opacity: 0.4;
+			@include motion-safe {
+				transition: opacity var(--transition-fast);
+			}
+		}
+
+		&:hover .ln-icon-filter {
+			opacity: 1;
+		}
+	}
+
+	th [data-ln-dropdown-menu] button[data-ln-filter-key] {
+		@include w-full;
+		@include flex;
+		@include items-center;
+		@include text-left;
+		@include px(var(--spacing-sm));
+		@include py(var(--spacing-xs));
+		@include text-sm;
+		@include font-normal;
+		background: none;
+		border: none;
+		border-radius: 0;
+		color: hsl(var(--color-text-primary));
+		@include cursor-pointer;
+		@include transition-fast;
+
+		&:hover {
+			@include bg-secondary;
+		}
+
+		&[data-active] {
+			background-color: hsl(var(--color-primary) / 0.1);
+			color: hsl(var(--color-primary));
+			@include font-medium;
+		}
+	}
+}
+
+// ─── Sort indicators on th ────────────────────────────────
+
+@mixin ln-table-sort {
+	th[data-ln-sort] {
+		@include cursor-pointer;
+		@include select-none;
+
+		[data-ln-sort-icon] {
+			@include size(0.875rem);
+			@include ml(0.25rem);
+			vertical-align: middle;
+			opacity: 0.4;
+			@include motion-safe {
+				transition: opacity var(--transition-fast);
+			}
+		}
+
+		&:hover [data-ln-sort-icon] {
+			opacity: 0.7;
+		}
+
+		&[data-ln-sort-active] [data-ln-sort-icon] {
+			opacity: 1;
+		}
+	}
+}
+
+// ─── Footer ───────────────────────────────────────────────
+
+@mixin ln-table-footer {
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	@include px(1rem);
+	@include py(0.5rem);
+	@include border-t;
+	@include bg-secondary;
+	border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+	@include text-sm;
+	@include text-secondary;
+
+	strong {
+		@include text-primary;
+		@include font-semibold;
+	}
+}
+
+// ─── Timing badge ─────────────────────────────────────────
+
+@mixin ln-table-timing {
+	@include text-xs;
+	@include text-muted;
+	font-family: var(--font-mono);
+}
+
+// ─── Quick filter bar ─────────────────────────────────────
+
+@mixin ln-table-filters {
+	@include flex;
+	@include flex-wrap;
+	@include items-center;
+	@include gap(var(--spacing-lg));
+	@include px(1rem);
+	@include py(0.5rem);
+	@include border-b-light;
+
+	fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+		@include flex;
+		@include items-center;
+		@include gap(0.375rem);
+
+		legend {
+			@include text-xs;
+			@include font-medium;
+			@include text-muted;
+			float: left;
+			@include mr(0.5rem);
+			line-height: 1.75rem;
+		}
+
+		ul {
+			@include inline-flex;
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		li button {
+			@include px(0.5rem);
+			@include py(0.125rem);
+			@include text-xs;
+			@include font-medium;
+			@include rounded-full;
+			@include transition-fast;
+			background: transparent;
+			color: hsl(var(--color-text-secondary));
+			border: none;
+
+			&:hover {
+				background-color: hsl(var(--color-bg-secondary));
+				color: hsl(var(--color-text-primary));
+			}
+
+			&[data-active] {
+				background-color: hsl(var(--color-primary) / 0.1);
+				color: hsl(var(--color-primary));
+			}
+		}
+	}
+}
+
+// ─── Active filter chips ──────────────────────────────────
+
+@mixin ln-table-chips {
+	@include flex;
+	@include items-center;
+	@include flex-wrap;
+	@include gap(0.375rem);
+	@include px(1rem);
+	@include py(0.375rem);
+	@include border-b-light;
+	background-color: hsl(var(--color-primary) / 0.03);
+}
+
+@mixin ln-table-chip {
+	@include inline-flex;
+	@include items-center;
+	@include gap(0.25rem);
+	@include px(0.5rem);
+	@include py(0.125rem);
+	@include rounded-full;
+	@include text-xs;
+	background-color: hsl(var(--color-primary) / 0.1);
+	color: hsl(var(--color-primary));
+
+	strong {
+		@include font-semibold;
+	}
+
+	button {
+		background: none;
+		border: none;
+		color: hsl(var(--color-primary));
+		@include cursor-pointer;
+		@include text-sm;
+		@include font-bold;
+		line-height: 1;
+		padding: 0;
+		@include ml(0.125rem);
+
+		&:hover {
+			color: hsl(var(--color-error));
+		}
+	}
+}
+
+@mixin ln-table-clear-all {
+	@include text-xs;
+	@include font-medium;
+	color: hsl(var(--color-text-muted));
+	background: none;
+	border: none;
+	@include cursor-pointer;
+	@include ml(0.25rem);
+
+	&:hover {
+		color: hsl(var(--color-error));
+	}
+}
+
+// ─── Empty state ──────────────────────────────────────────
+
+@mixin ln-table-empty-state {
+	@include py(3rem);
+	@include text-center;
+
+	svg.ln-icon {
+		@include block;
+		@include mx(auto);
+		@include mb(1rem);
+		opacity: 0.3;
+	}
+
+	h3 {
+		@include text-lg;
+		@include font-semibold;
+		@include text-primary;
+		margin: 0 0 0.5rem;
+	}
+
+	p {
+		@include text-sm;
+		@include text-secondary;
+		margin: 0 0 1.5rem;
+	}
+}

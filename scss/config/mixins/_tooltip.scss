@@ -74,3 +74,33 @@
 		transform: translateY(-50%);
 	}
 }
+
+// ─── JS Portal (real DOM tooltip) ──────────────────────
+// When JS enhance is active, tooltips render as positioned
+// DOM elements inside #ln-tooltip-portal instead of ::after.
+
+@mixin tooltip-portal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	z-index: var(--z-toast);
+}
+
+@mixin tooltip-element {
+	position: fixed;
+	@include px(0.5rem);
+	@include py(0.25rem);
+	background: hsl(var(--color-neutral-900));
+	color: hsl(var(--color-neutral-50));
+	@include typography(caption);
+	@include rounded-sm;
+	white-space: nowrap;
+	box-shadow: var(--shadow-md);
+	max-width: 20rem;
+	pointer-events: none;
+
+	@include motion-safe {
+		animation: ln-tooltip-fade var(--transition-fast);
+	}
+}

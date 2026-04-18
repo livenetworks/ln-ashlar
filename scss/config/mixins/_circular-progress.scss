@@ -1,0 +1,88 @@
+@use 'display' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'position' as *;
+@use 'motion' as *;
+
+// Circular progress ring — SVG-based progress indicator with center label.
+//
+// Usage:
+//   [data-ln-circular-progress] { @include circular-progress; }
+//
+// Size variants: circular-progress-sm, circular-progress-lg, circular-progress-xl
+// Color variants: circular-progress-green, circular-progress-red, circular-progress-yellow
+
+@mixin circular-progress {
+	@include relative;
+	@include inline-flex;
+	@include flex-center;
+	@include size(4rem);
+
+	svg {
+		@include size(100%);
+	}
+
+	.ln-circular-progress__track {
+		stroke: hsl(var(--color-border));
+	}
+
+	.ln-circular-progress__fill {
+		stroke: hsl(var(--color-primary));
+		@include motion-safe {
+			transition: stroke-dashoffset var(--transition-base);
+		}
+	}
+
+	.ln-circular-progress__label {
+		@include absolute;
+		@include text-xs;
+		@include font-semibold;
+		@include text-primary;
+	}
+}
+
+// ─── Size variants ─────────────────────────────────────
+@mixin circular-progress-sm {
+	@include size(2.5rem);
+
+	.ln-circular-progress__label {
+		font-size: 0.625rem;
+		line-height: 0.75rem;
+	}
+}
+
+@mixin circular-progress-lg {
+	@include size(6rem);
+
+	.ln-circular-progress__label {
+		@include text-base;
+	}
+}
+
+@mixin circular-progress-xl {
+	@include size(8rem);
+
+	.ln-circular-progress__label {
+		@include text-xl;
+	}
+}
+
+// ─── Color variants ────────────────────────────────────
+@mixin circular-progress-green {
+	.ln-circular-progress__fill {
+		stroke: hsl(var(--color-success));
+	}
+}
+
+@mixin circular-progress-red {
+	.ln-circular-progress__fill {
+		stroke: hsl(var(--color-error));
+	}
+}
+
+@mixin circular-progress-yellow {
+	.ln-circular-progress__fill {
+		stroke: hsl(var(--color-warning));
+	}
+}

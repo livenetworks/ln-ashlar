@@ -1,6 +1,13 @@
 @use 'typography' as *;
 @use 'display' as *;
 @use 'btn' as *;
+@use 'spacing' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'shadows' as *;
+@use 'position' as *;
+@use 'motion' as *;
+@use 'card' as *;
 
 // Modal size mixins
 // Usage: #my-modal > form { @include modal-lg; }
@@ -10,3 +17,77 @@
 @mixin modal-lg { max-width: 42rem; }
 @mixin modal-xl { max-width: 48rem; }
 
+// ─── Modal layout ──────────────────────────────────────
+
+// Overlay backdrop — covers viewport, darkened + blurred.
+// Default: hidden (display:none). JS sets [data-ln-modal="open"]
+// to show — that state rule lives in the co-located JS SCSS.
+@mixin modal-overlay {
+	display: none;
+	@include fixed;
+	@include inset-0;
+	background-color: hsl(var(--color-neutral-900) / 0.5);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+	z-index: var(--z-modal);
+	@include items-center;
+	@include justify-center;
+	opacity: 0;
+	@include motion-safe {
+		transition: opacity var(--transition-base);
+	}
+}
+
+// Content panel — the <form> inside .ln-modal.
+@mixin modal-panel {
+	@include bg-primary;
+	@include rounded-md;
+	@include shadow-xl;
+	max-width: 600px;
+	width: 90%;
+	max-height: 90vh;
+	@include motion-safe {
+		animation: ln-modal-slideIn 0.3s ease;
+	}
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+}
+
+// Header — panel-header with close button.
+@mixin modal-header {
+	@include panel-header;
+	@include mb(0);
+
+	button[data-ln-modal-close] {
+		@include close-button;
+	}
+}
+
+// Body — scrollable content area.
+@mixin modal-body {
+	@include p(var(--spacing-md));
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+// Footer — sticky action bar with cancel/submit buttons.
+@mixin modal-footer {
+	@include px(1rem);
+	@include py(0.75rem);
+	@include border-t;
+	@include bg-secondary;
+	@include flex;
+	@include justify-end;
+	@include gap(var(--spacing-sm));
+	position: sticky;
+	bottom: 0;
+
+	button[type="button"] {
+		border: var(--border-width) solid hsl(var(--color-border));
+
+		&:hover {
+			background-color: hsl(var(--color-bg-body));
+		}
+	}
+}
