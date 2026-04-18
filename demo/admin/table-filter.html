@@ -61,6 +61,7 @@
 				<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
 					<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 					<input type="search" placeholder="Filter menu…">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				</label>
 			</header>
 
@@ -146,9 +147,10 @@
 					<header><h3>Employee Directory</h3></header>
 					<main>
 						<nav id="employee-toolbar">
-							<label>
+							<label data-ln-search="employee-table">
 								<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-								<input type="search" placeholder="Search employees..." data-ln-search="employee-table">
+								<input type="search" placeholder="Search employees...">
+								<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 							</label>
 						</nav>
 

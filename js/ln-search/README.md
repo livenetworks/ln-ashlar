@@ -10,6 +10,7 @@ Works on lists and on `[data-ln-table]` components.
 | `data-ln-search="targetId"` | wrapper element **or** directly on `<input>` | Target element by ID |
 | `data-ln-search-items="selector"` | same element as `data-ln-search` | CSS selector passed to `querySelectorAll` on the target — enables filtering nested elements instead of direct children |
 | `data-ln-search-hide` | children of target | Set by JS when the element doesn't match |
+| `data-ln-search-clear` | `<button>` inside wrapper | Clear button — clears the input value, fires a search reset, and refocuses the input. Hidden automatically via CSS when the input is empty (`:placeholder-shown` sibling selector). |
 
 When placed on a wrapper, the component finds the input inside it in this priority order: `[name="search"]`, `input[type="search"]`, `input[type="text"]`.
 When placed directly on an `<input>`, that input is used.
@@ -58,14 +59,21 @@ No extra configuration needed — the integration is automatic.
 
 If the browser restores a search value on page refresh (e.g. back/forward navigation), the component detects the pre-filled value on init and applies the search automatically. The initial search is deferred via `queueMicrotask` to ensure all target components have initialized before the event dispatches.
 
+## Clear button
+
+Add a `<button>` with `data-ln-search-clear` inside the wrapper to provide a visible clear action. On click, the input value is cleared, search is reset (all items shown), and the input is refocused.
+
+The clear button is automatically hidden when the input is empty — CSS uses `:placeholder-shown ~ [data-ln-search-clear]` inside the `form-input-icon-group` mixin. No JS is needed for the visibility toggle.
+
 ## Examples
 
 ### On a wrapper element
 
 ```html
 <label data-ln-search="my-list">
-    <span class="ln-icon-filter ln-icon--sm"></span>
+    <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
     <input type="search" placeholder="Search...">
+    <button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 </label>
 
 <ul id="my-list">

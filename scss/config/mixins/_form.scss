@@ -136,13 +136,10 @@
 	@include inline-flex;
 	@include items-center;
 	@include gap(var(--spacing-sm));
-	// Symmetric padding — the icon provides a left visual anchor, so the
-	// usual wider horizontal / narrower vertical rhythm of form-input would
-	// leave the icon "trapped" in a tall cell. Using spacing-sm on all four
-	// sides keeps icon-group compact and visually balanced in narrow
-	// toolbar/header contexts. Regular text inputs keep their px-md/py-sm
-	// rhythm via @mixin form-input — that asymmetry is hidden by their width.
-	@include p(var(--spacing-sm));
+	// Compact padding: tight vertical to keep total height close to a
+	// regular form-input despite the icon's fixed size.
+	@include px(var(--spacing-sm));
+	@include py(0.25rem);
 	@include bg-primary;
 	@include border;
 	@include rounded-md;
@@ -187,6 +184,23 @@
 		&:focus-visible {
 			border-color: transparent;
 			box-shadow: none;
+		}
+
+		// Hide clear button when input is empty
+		&:placeholder-shown ~ [data-ln-search-clear] {
+			@include hidden;
+		}
+	}
+
+	> [data-ln-search-clear] {
+		@include flex-shrink-0;
+		@include p(0.2rem);
+		@include cursor-pointer;
+		color: hsl(var(--color-text-muted));
+		@include transition-colors;
+
+		&:hover {
+			@include text-primary;
 		}
 	}
 }

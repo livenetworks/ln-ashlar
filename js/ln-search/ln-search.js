@@ -54,6 +54,16 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 		if (!this.input) return;
 		const self = this;
 
+		// Clear button inside the wrapper
+		const clearBtn = this.dom.querySelector('[data-ln-search-clear]');
+		if (clearBtn) {
+			clearBtn.addEventListener('click', function () {
+				self.input.value = '';
+				self._search('');
+				self.input.focus();
+			});
+		}
+
 		this._onInput = function () {
 			clearTimeout(self._debounceTimer);
 			self._debounceTimer = setTimeout(function () {
