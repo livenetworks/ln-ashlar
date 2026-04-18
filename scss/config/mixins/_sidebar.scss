@@ -1,0 +1,53 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+
+// ─── Sidebar ───────────────────────────────────────────────────────
+// Structural shell for a sidebar layout. Provides flex column, right
+// border, background, and consistent horizontal padding via
+// --sidebar-px. Projects add width, position, animation.
+//
+// Expected HTML:
+//   <aside>
+//     <header>...</header>
+//     <main>...</main>
+//     <footer>...</footer>
+//   </aside>
+//
+// Usage:
+//   #my-sidebar { @include sidebar; width: 16rem; @include fixed; }
+
+@mixin sidebar {
+	@include flex-col;
+	@include bg-primary;
+	@include border-r;
+	overflow: hidden;
+	--sidebar-px: var(--spacing-md);
+
+	> header {
+		@include flex;
+		@include items-center;
+		@include gap(0.75rem);
+		@include px(var(--sidebar-px));
+		@include py(var(--spacing-sm));
+		@include border-b;
+	}
+
+	> main {
+		@include flex-1;
+		overflow-y: auto;
+		@include py(var(--spacing-xs));
+	}
+
+	> footer {
+		@include border-t;
+		@include px(var(--sidebar-px));
+		@include py(var(--spacing-sm));
+
+		small {
+			@include text-muted;
+		}
+	}
+}
