@@ -1,0 +1,15 @@
+@use '../config/mixins' as *;
+
+.ln-ajax--loading {
+	@include ajax-loading;
+}
+
+.ln-ajax-spinner {
+	@include ajax-spinner;
+}
+
+@keyframes ln-ajax-spin {
+	to {
+		transform: translate(-50%, -50%) rotate(360deg);
+	}
+}
