@@ -47,6 +47,18 @@
 	@include pill-outline;
 }
 
+// Pill groups in form fieldsets — explicit application
+// (Global auto-pill removed; pill-group fieldsets need explicit opt-in)
+fieldset > ul:has(> li > label > input[type="checkbox"]),
+fieldset > ul:has(> li > label > input[type="radio"]) {
+	@include pill-group;
+}
+
+fieldset > ul > li > label:has(> input[type="checkbox"]),
+fieldset > ul > li > label:has(> input[type="radio"]) {
+	@include pill;
+}
+
 // ─── Input states demo ──────────────────────────────────
 #demo-input-states {
 	@include form-grid;

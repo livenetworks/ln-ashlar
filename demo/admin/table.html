@@ -165,7 +165,7 @@
 
 					<!-- Live Demo — 500 rows -->
 					<section class="section-card">
-						<header><h3>Live Demo — 500 rows with search and sort</h3></header>
+						<header><h3>Live Demo — 500 rows with search, sort and filter</h3></header>
 						<main>
 							<div data-ln-table id="demo-table">
 								<header class="ln-table__toolbar">
@@ -205,8 +205,22 @@
 												<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
 												<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 											</th>
-											<th data-ln-sort="string">
+											<th data-ln-sort="string" data-ln-filter-col="category">
 												Category
+												<button type="button" data-ln-popover-for="filter-category" aria-label="Filter category">
+													<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+												</button>
+												<div id="filter-category" data-ln-popover>
+													<ul data-ln-filter="demo-table">
+														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Electronics"> Electronics</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Peripherals"> Peripherals</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Storage"> Storage</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Networking"> Networking</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Accessories"> Accessories</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Components"> Components</label></li>
+													</ul>
+												</div>
 												<svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
 												<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
 												<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
@@ -219,6 +233,23 @@
 											</th>
 											<th data-ln-sort="number" class="numeric">
 												Stock
+												<svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+												<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+												<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+											</th>
+											<th data-ln-sort="string" data-ln-filter-col="status">
+												Status
+												<button type="button" data-ln-popover-for="filter-status" aria-label="Filter status">
+													<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+												</button>
+												<div id="filter-status" data-ln-popover>
+													<ul data-ln-filter="demo-table">
+														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="In Stock"> In Stock</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Low Stock"> Low Stock</label></li>
+														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Out of Stock"> Out of Stock</label></li>
+													</ul>
+												</div>
 												<svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
 												<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
 												<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
@@ -421,6 +452,7 @@ el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code>
 			var cat = categories[i % categories.length];
 			var price = 50 + Math.floor(Math.random() * 2000);
 			var stock = Math.floor(Math.random() * 500);
+			var status = stock === 0 ? 'Out of Stock' : stock <= 100 ? 'Low Stock' : 'In Stock';
 
 			html.push(
 				'<tr>' +
@@ -429,6 +461,7 @@ el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code>
 				'<td>' + cat + '</td>' +
 				'<td data-ln-value="' + price + '" class="numeric">' + formatPrice(price) + '</td>' +
 				'<td data-ln-value="' + stock + '" class="numeric">' + stock + '</td>' +
+				'<td>' + status + '</td>' +
 				'</tr>'
 			);
 		}
