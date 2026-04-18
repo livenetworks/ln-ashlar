@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Validate — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+	</template>
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Validate</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					</button>
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+				<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
+					<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Filter menu…">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="toggle-switch.html"><span class="nav-label">Toggle Switch</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>acme-gui v1.2.0</small>
+			</footer>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>Validate</h1>
+					<p>Per-field validation using the native ValidityState API. Shows/hides error messages, toggles CSS classes, emits valid/invalid events.</p>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-validate</code></td><td><code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;textarea&gt;</code></td><td>Creates a validation instance for this field</td></tr>
+									<tr><td><code>data-ln-validate-errors</code></td><td><code>&lt;ul&gt;</code></td><td>Error list container — sibling of the input inside <code>.form-element</code></td></tr>
+									<tr><td><code>data-ln-validate-error="key"</code></td><td><code>&lt;li&gt;</code></td><td>Individual error message. Shown when the matching validity check fails.</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Error Key Mapping -->
+					<section class="section-card">
+						<header><h3>Error Key Mapping</h3></header>
+						<main>
+							<table>
+								<thead><tr><th><code>data-ln-validate-error</code> value</th><th>HTML attribute</th><th>ValidityState property</th></tr></thead>
+								<tbody>
+									<tr><td><code>required</code></td><td><code>required</code></td><td><code>valueMissing</code></td></tr>
+									<tr><td><code>typeMismatch</code></td><td><code>type="email"</code>, <code>type="url"</code></td><td><code>typeMismatch</code></td></tr>
+									<tr><td><code>tooShort</code></td><td><code>minlength</code></td><td><code>tooShort</code></td></tr>
+									<tr><td><code>tooLong</code></td><td><code>maxlength</code></td><td><code>tooLong</code></td></tr>
+									<tr><td><code>patternMismatch</code></td><td><code>pattern</code></td><td><code>patternMismatch</code></td></tr>
+									<tr><td><code>rangeUnderflow</code></td><td><code>min</code></td><td><code>rangeUnderflow</code></td></tr>
+									<tr><td><code>rangeOverflow</code></td><td><code>max</code></td><td><code>rangeOverflow</code></td></tr>
+								</tbody>
+							</table>
+							<p>Validation rules come from native HTML attributes — zero JS configuration. Error messages live in HTML, rendered by the backend (multilanguage ready).</p>
+						</main>
+					</section>
+
+					<!-- Example — Text Input -->
+					<section class="section-card">
+						<header><h3>Example — Text Input (required + minlength)</h3></header>
+						<main>
+							<div class="form-element">
+								<label for="demo-name">Full Name</label>
+								<input type="text" id="demo-name" name="name" required minlength="3" data-ln-validate placeholder="Try leaving empty, or type 1–2 chars…">
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="required">Name is required</li>
+									<li class="hidden" data-ln-validate-error="tooShort">Must be at least 3 characters</li>
+								</ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example — Email Validation -->
+					<section class="section-card">
+						<header><h3>Example — Email Validation</h3></header>
+						<main>
+							<div class="form-element">
+								<label for="demo-email">Email Address</label>
+								<input type="email" id="demo-email" name="email" required minlength="5" data-ln-validate placeholder="Try 'abc' or 'test@'…">
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="required">Email is required</li>
+									<li class="hidden" data-ln-validate-error="typeMismatch">Invalid email format</li>
+									<li class="hidden" data-ln-validate-error="tooShort">Must be at least 5 characters</li>
+								</ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example — Select Field -->
+					<section class="section-card">
+						<header><h3>Example — Select Field</h3></header>
+						<main>
+							<div class="form-element">
+								<label for="demo-dept">Department</label>
+								<select id="demo-dept" name="department" required data-ln-validate>
+									<option value="">Select department…</option>
+									<option value="it">IT</option>
+									<option value="finance">Finance</option>
+									<option value="hr">Human Resources</option>
+									<option value="legal">Legal</option>
+								</select>
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="required">Please select a department</li>
+								</ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example — Pattern Validation -->
+					<section class="section-card">
+						<header><h3>Example — Pattern Validation</h3></header>
+						<main>
+							<div class="form-element">
+								<label for="demo-phone">Phone Number</label>
+								<input type="tel" id="demo-phone" name="phone" pattern="^\+?[\d\s\-]{7,}$" data-ln-validate placeholder="+389 70 123456">
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="patternMismatch">Invalid phone format (e.g. +389 70 123456)</li>
+								</ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example — Number Range -->
+					<section class="section-card">
+						<header><h3>Example — Number Range</h3></header>
+						<main>
+							<div class="form-element">
+								<label for="demo-salary">Annual Salary</label>
+								<input type="number" id="demo-salary" name="salary" min="20000" max="200000" data-ln-validate placeholder="20000 – 200000">
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="rangeUnderflow">Minimum salary is 20,000</li>
+									<li class="hidden" data-ln-validate-error="rangeOverflow">Maximum salary is 200,000</li>
+								</ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- Custom Validation -->
+					<section class="section-card">
+						<header><h3>Example — Custom Validation (Password Confirmation)</h3></header>
+						<main>
+							<p>Custom errors that native HTML can't express — the coordinator compares values and dispatches <code>ln-validate:set-custom</code> or <code>ln-validate:clear-custom</code>.</p>
+							<form id="demo-custom-form">
+								<div class="form-element">
+									<label for="demo-pass">Password</label>
+									<input type="password" id="demo-pass" name="password" required minlength="8" data-ln-validate placeholder="Min 8 characters">
+									<ul data-ln-validate-errors>
+										<li class="hidden" data-ln-validate-error="required">Password is required</li>
+										<li class="hidden" data-ln-validate-error="tooShort">Must be at least 8 characters</li>
+									</ul>
+								</div>
+								<div class="form-element">
+									<label for="demo-pass-confirm">Confirm Password</label>
+									<input type="password" id="demo-pass-confirm" name="password_confirmation" required data-ln-validate placeholder="Repeat password">
+									<ul data-ln-validate-errors>
+										<li class="hidden" data-ln-validate-error="required">Confirmation is required</li>
+										<li class="hidden" data-ln-validate-error="passwordMismatch">Passwords do not match</li>
+									</ul>
+								</div>
+							</form>
+						</main>
+					</section>
+
+					<!-- Programmatic API -->
+					<section class="section-card">
+						<header><h3>Programmatic API</h3></header>
+						<main>
+							<p>Force-validate, reset, and check validity on all fields in the examples above.</p>
+							<nav class="demo-actions">
+								<button type="button" class="btn" id="demo-force-validate">Force validate all</button>
+								<button type="button" id="demo-reset-validate">Reset all</button>
+								<button type="button" id="demo-check-valid">Check isValid</button>
+							</nav>
+							<pre><code>const input = document.getElementById('email');
+
+input.lnValidate.validate();  // Force validate — returns boolean
+input.lnValidate.reset();     // Clear touched state, remove classes, hide errors
+input.lnValidate.isValid;     // Boolean getter</code></pre>
+						</main>
+					</section>
+
+					<!-- CSS Classes -->
+					<section class="section-card">
+						<header><h3>CSS Classes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Class</th><th>When applied</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-validate-valid</code></td><td>Added to the input when it passes validation</td></tr>
+									<tr><td><code>ln-validate-invalid</code></td><td>Added to the input when it fails validation</td></tr>
+								</tbody>
+							</table>
+							<p>Both classes are removed when <code>reset()</code> is called.</p>
+						</main>
+					</section>
+
+					<!-- Events Emitted -->
+					<section class="section-card">
+						<header><h3>Events — Emitted</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>Bubbles</th><th>Cancelable</th><th>Detail</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-validate:valid</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement, field: String }</code></td></tr>
+									<tr><td><code>ln-validate:invalid</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement, field: String }</code></td></tr>
+									<tr><td><code>ln-validate:destroyed</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement }</code></td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Events Received -->
+					<section class="section-card">
+						<header><h3>Events — Received</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-validate:set-custom</code></td><td><code>{ error: String }</code></td><td>Show a custom error by name. Marks field as invalid.</td></tr>
+									<tr><td><code>ln-validate:clear-custom</code></td><td><code>{ error: String }</code> or <code>{}</code></td><td>Hide a custom error. Omit <code>error</code> to clear all custom errors.</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Event Log -->
+					<section class="section-card">
+						<header><h3>Event Log</h3></header>
+						<main>
+							<p>Validation events from all demos on this page appear here in real time.</p>
+							<h4>Event log</h4>
+							<pre id="validate-log"></pre>
+						</main>
+					</section>
+
+					<!-- Behavior -->
+					<section class="section-card">
+						<header><h3>Behavior</h3></header>
+						<main>
+							<ul>
+								<li>Fields start clean — no errors, no CSS classes on page load</li>
+								<li>Validation begins only after the first interaction (<code>input</code> event for text fields, <code>change</code> event for select/checkbox/radio)</li>
+								<li>Text inputs: validates on every <code>input</code> event (keystrokes, paste, autofill)</li>
+								<li>Select/checkbox/radio: validates on <code>change</code> event</li>
+								<li>Errors appear immediately when input becomes invalid</li>
+								<li>Errors clear immediately when input becomes valid</li>
+								<li>Works standalone or with <code>ln-form</code></li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;div class="form-element"&gt;
+    &lt;label for="email"&gt;Email&lt;/label&gt;
+    &lt;input id="email" name="email" type="email" required minlength="5" data-ln-validate&gt;
+    &lt;ul data-ln-validate-errors&gt;
+        &lt;li class="hidden" data-ln-validate-error="required"&gt;This field is required&lt;/li&gt;
+        &lt;li class="hidden" data-ln-validate-error="typeMismatch"&gt;Invalid email format&lt;/li&gt;
+        &lt;li class="hidden" data-ln-validate-error="tooShort"&gt;Must be at least 5 characters&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.2.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+	<script>
+	// Event log
+	(function () {
+		const log = document.getElementById('validate-log');
+
+		document.addEventListener('ln-validate:valid', function (e) {
+			log.textContent += '[valid] field=' + e.detail.field + '\n';
+		});
+
+		document.addEventListener('ln-validate:invalid', function (e) {
+			log.textContent += '[invalid] field=' + e.detail.field + '\n';
+		});
+
+		document.addEventListener('ln-validate:destroyed', function (e) {
+			log.textContent += '[destroyed]\n';
+		});
+	}());
+
+	// Password confirmation coordinator
+	(function () {
+		const passInput = document.getElementById('demo-pass');
+		const confirmInput = document.getElementById('demo-pass-confirm');
+
+		function checkMatch() {
+			if (!confirmInput.value) return;
+			if (passInput.value !== confirmInput.value) {
+				confirmInput.dispatchEvent(new CustomEvent('ln-validate:set-custom', {
+					bubbles: true,
+					detail: { error: 'passwordMismatch' }
+				}));
+			} else {
+				confirmInput.dispatchEvent(new CustomEvent('ln-validate:clear-custom', {
+					bubbles: true,
+					detail: { error: 'passwordMismatch' }
+				}));
+			}
+		}
+
+		confirmInput.addEventListener('input', checkMatch);
+		passInput.addEventListener('input', checkMatch);
+	}());
+
+	// Programmatic API buttons
+	(function () {
+		const allFields = document.querySelectorAll('[data-ln-validate]');
+
+		document.getElementById('demo-force-validate').addEventListener('click', function () {
+			allFields.forEach(function (el) {
+				if (el.lnValidate) el.lnValidate.validate();
+			});
+		});
+
+		document.getElementById('demo-reset-validate').addEventListener('click', function () {
+			allFields.forEach(function (el) {
+				if (el.lnValidate) el.lnValidate.reset();
+			});
+		});
+
+		document.getElementById('demo-check-valid').addEventListener('click', function () {
+			const results = [];
+			allFields.forEach(function (el) {
+				if (el.lnValidate) {
+					results.push((el.name || el.id) + ': ' + (el.lnValidate.isValid ? 'valid' : 'invalid'));
+				}
+			});
+			const log = document.getElementById('validate-log');
+			log.textContent += '[isValid check]\n' + results.join('\n') + '\n\n';
+		});
+	}());
+	</script>
+</body>
+</html>

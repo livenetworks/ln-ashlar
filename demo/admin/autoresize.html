@@ -3,13 +3,20 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Stat Card — ln-acme</title>
+	<title>Autoresize — ln-acme</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
+	<style>
+	#demo-maxheight textarea {
+		max-height: 6rem;
+		resize: none;
+		overflow-y: auto;
+	}
+	</style>
 </head>
 <body>
 	<!-- Toast container -->
@@ -21,7 +28,7 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
@@ -36,7 +43,7 @@
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
-				<h1>Stat Card</h1>
+				<h1>Autoresize</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
@@ -138,146 +145,110 @@
 
 		<!-- Main Panel -->
 		<div class="main-panel">
+
+			<!-- Content -->
 			<div class="content">
-				<h1>Stat Card / KPI Card</h1>
-				<p>Dashboard KPI tile. Large numeric value, small uppercase label, and optional trend indicator.</p>
+					<h1>Autoresize</h1>
+					<p>Auto-expanding textarea — grows with content, scrolls after max height.</p>
 
-				<!-- 4-across grid — all 3 trend variants -->
-				<section class="section-card">
-					<header><h3>KPI Grid — 4 cards, all trend variants</h3></header>
-					<main>
-						<div data-demo-kpi-grid>
-							<article data-ln-stat-card>
-								<p data-ln-stat-label>Total Documents</p>
-								<p data-ln-stat-value>1,247</p>
-								<p data-ln-stat-trend="up">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-									12% from last month
-								</p>
-							</article>
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-autoresize</code></td><td><code>&lt;textarea&gt;</code></td><td>Enables auto-resize behavior — grows with content on every input event</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
 
-							<article data-ln-stat-card>
-								<p data-ln-stat-label>Active Standards</p>
-								<p data-ln-stat-value>8</p>
-								<p data-ln-stat-trend="neutral">
-									No change
-								</p>
-							</article>
+					<!-- Example — Basic -->
+					<section class="section-card">
+						<header><h3>Example — Basic</h3></header>
+						<main>
+							<div class="form-element">
+								<label for="demo-basic">Notes</label>
+								<textarea id="demo-basic" data-ln-autoresize rows="1" placeholder="Type here and watch it grow…"></textarea>
+							</div>
+						</main>
+					</section>
 
-							<article data-ln-stat-card>
-								<p data-ln-stat-label>Pending Reviews</p>
-								<p data-ln-stat-value>34</p>
-								<p data-ln-stat-trend="down">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-									5% from last week
-								</p>
-							</article>
+					<!-- Example — Pre-filled -->
+					<section class="section-card">
+						<header><h3>Example — Pre-filled</h3></header>
+						<main>
+							<p>Pre-filled content is auto-sized on initialization — no manual height needed.</p>
+							<div class="form-element">
+								<label for="demo-prefilled">Employee Review</label>
+								<textarea id="demo-prefilled" data-ln-autoresize>Ana Kovachevska joined the Finance department in March 2023 and has consistently exceeded her quarterly targets. Her attention to detail in budget reconciliation and her collaborative approach to cross-department projects have made her a key contributor. Recommended for the senior analyst track in Q3 2026.</textarea>
+							</div>
+						</main>
+					</section>
 
-							<article data-ln-stat-card>
-								<p data-ln-stat-label>Approved This Month</p>
-								<p data-ln-stat-value>91</p>
-								<p data-ln-stat-trend="up">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-									22% from last month
-								</p>
-							</article>
-						</div>
-					</main>
-				</section>
+					<!-- Example — Max Height with Scroll -->
+					<section class="section-card" id="demo-maxheight">
+						<header><h3>Example — Max Height with Scroll</h3></header>
+						<main>
+							<p>Pair <code>data-ln-autoresize</code> with CSS <code>max-height</code> and <code>overflow-y: auto</code> to cap growth and enable scroll. The <code>&lt;style&gt;</code> in this page's <code>&lt;head&gt;</code> scopes the rule to <code>#demo-maxheight textarea</code>.</p>
+							<div class="form-element">
+								<label for="demo-capped">Capped textarea (max 6rem)</label>
+								<textarea id="demo-capped" data-ln-autoresize rows="1" placeholder="Keep typing — it stops growing at 6rem and scrolls instead…"></textarea>
+							</div>
+						</main>
+					</section>
 
-				<!-- Single card — no trend -->
-				<section class="section-card">
-					<header><h3>Single Card — No Trend</h3></header>
-					<main>
-						<div data-demo-single-card>
-							<article data-ln-stat-card>
-								<p data-ln-stat-label>Total Users</p>
-								<p data-ln-stat-value>3,581</p>
-							</article>
-						</div>
-					</main>
-				</section>
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>const el = document.querySelector('[data-ln-autoresize]');
+el.lnAutoresize.destroy();  // remove listener, reset height</code></pre>
+						</main>
+					</section>
 
-				<!-- Trend up -->
-				<section class="section-card">
-					<header><h3>Trend Up (success)</h3></header>
-					<main>
-						<div data-demo-single-card>
-							<article data-ln-stat-card>
-								<p data-ln-stat-label>Revenue</p>
-								<p data-ln-stat-value>€42,600</p>
-								<p data-ln-stat-trend="up">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-									18.4% from last quarter
-								</p>
-							</article>
-						</div>
-					</main>
-				</section>
+					<!-- Behavior -->
+					<section class="section-card">
+						<header><h3>Behavior</h3></header>
+						<main>
+							<ul>
+								<li>On every <code>input</code> event: resets height to <code>auto</code>, then sets to <code>scrollHeight</code></li>
+								<li>Pre-filled content is auto-sized on initialization</li>
+								<li>Works with dynamically added textareas (MutationObserver)</li>
+								<li>Only applies to <code>&lt;textarea&gt;</code> elements — warns if used on other tags</li>
+							</ul>
+						</main>
+					</section>
 
-				<!-- Trend down -->
-				<section class="section-card">
-					<header><h3>Trend Down (error)</h3></header>
-					<main>
-						<div data-demo-single-card>
-							<article data-ln-stat-card>
-								<p data-ln-stat-label>Overdue Items</p>
-								<p data-ln-stat-value>7</p>
-								<p data-ln-stat-trend="down">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-									3 more than last week
-								</p>
-							</article>
-						</div>
-					</main>
-				</section>
-
-				<!-- Trend neutral -->
-				<section class="section-card">
-					<header><h3>Trend Neutral (muted)</h3></header>
-					<main>
-						<div data-demo-single-card>
-							<article data-ln-stat-card>
-								<p data-ln-stat-label>Compliance Score</p>
-								<p data-ln-stat-value>97%</p>
-								<p data-ln-stat-trend="neutral">
-									No change from last audit
-								</p>
-							</article>
-						</div>
-					</main>
-				</section>
-
-				<!-- SCSS Usage -->
-				<section class="section-card">
-					<header><h3>SCSS Usage</h3></header>
-					<main>
-						<pre><code>// Default attribute — zero SCSS needed
-// &lt;article data-ln-stat-card&gt;
-//   &lt;p data-ln-stat-label&gt;Label&lt;/p&gt;
-//   &lt;p data-ln-stat-value&gt;1,247&lt;/p&gt;
-//   &lt;p data-ln-stat-trend="up"&gt;12% up&lt;/p&gt;
-// &lt;/article&gt;
-
-// Consumer semantic selector
-#dashboard .kpi { @include stat-card; }
-
-// Grid layout with container queries
-#dashboard-kpis {
-  @include container(kpigrid);
-  display: grid;
-  grid-template-columns: 1fr;
-  @include gap(1rem);
-  @container kpigrid (min-width: #{$cq-compact}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @container kpigrid (min-width: #{$cq-medium}) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;textarea data-ln-autoresize rows="1" placeholder="Type here..."&gt;&lt;/textarea&gt;</code></pre>
+							<p>With max height cap (in your project SCSS or a scoped <code>&lt;style&gt;</code>):</p>
+							<pre><code>textarea[data-ln-autoresize] {
+    resize: none;
+    max-height: 6rem;
+    overflow-y: auto;
 }</code></pre>
-					</main>
-				</section>
+						</main>
+					</section>
 
+					<!-- Dynamic Demo -->
+					<section class="section-card">
+						<header><h3>Dynamic Demo — MutationObserver</h3></header>
+						<main>
+							<p>Clicking the button creates a new <code>&lt;textarea data-ln-autoresize&gt;</code> via JavaScript. The MutationObserver picks it up automatically — no manual init needed.</p>
+							<nav class="demo-actions">
+								<button type="button" class="btn" id="demo-add-textarea">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+									Add textarea dynamically
+								</button>
+							</nav>
+							<div id="demo-dynamic-container"></div>
+						</main>
+					</section>
 			</div>
 
 			<!-- Footer -->
@@ -286,52 +257,17 @@
 				<span>ln-acme v1.2.0</span>
 			</footer>
 		</div>
-		</div>
-	</div>
-
-	<style>
-		[data-demo-kpi-grid] {
-			display: grid;
-			grid-template-columns: repeat(4, 1fr);
-			gap: 1rem;
-		}
-		@media (max-width: 900px) {
-			[data-demo-kpi-grid] {
-				grid-template-columns: repeat(2, 1fr);
-			}
-		}
-		@media (max-width: 540px) {
-			[data-demo-kpi-grid] {
-				grid-template-columns: 1fr;
-			}
-		}
-		[data-demo-single-card] {
-			max-width: 280px;
-		}
-	</style>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
 
 	<script>
-		(function () {
-			const KEY = 'ln-demo-theme';
-			const root = document.documentElement;
-
-			const stored = localStorage.getItem(KEY);
-			if (stored === 'dark' || stored === 'light') {
-				root.setAttribute('data-theme', stored);
-			}
-
-			const toggle = document.querySelector('[data-demo-theme-toggle]');
-			if (toggle) {
-				toggle.addEventListener('click', () => {
-					const current =
-						root.getAttribute('data-theme') ||
-						(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-					const next = current === 'dark' ? 'light' : 'dark';
-					root.setAttribute('data-theme', next);
-					localStorage.setItem(KEY, next);
-				});
-			}
-		})();
+	document.getElementById('demo-add-textarea').addEventListener('click', function () {
+		const ta = document.createElement('textarea');
+		ta.setAttribute('data-ln-autoresize', '');
+		ta.setAttribute('rows', '1');
+		ta.setAttribute('placeholder', 'Dynamically added — auto-resizes!');
+		document.getElementById('demo-dynamic-container').appendChild(ta);
+	});
 	</script>
 </body>
 </html>

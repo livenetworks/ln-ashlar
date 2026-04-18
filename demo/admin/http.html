@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HTTP — ln-acme</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="dist/admin.css">
+	<script src="../../dist/ln-acme.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<template data-ln-template="ln-toast-item">
+	<li class="ln-toast__item">
+		<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
+			<div class="ln-toast__side"></div>
+			<div class="ln-toast__content">
+				<div class="ln-toast__head">
+					<strong class="ln-toast__title" data-ln-field="title"></strong>
+				</div>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<div class="ln-toast__body" data-ln-show="hasBody"></div>
+			</div>
+		</div>
+	</li>
+	</template>
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header>
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>HTTP</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					</button>
+					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
+						Test Toast
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<div class="app-body">
+		<!-- Sidebar -->
+		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
+				<span class="app-name">acme-gui</span>
+				<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
+					<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Filter menu…">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="toggle-switch.html"><span class="nav-label">Toggle Switch</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>acme-gui v1.2.0</small>
+			</footer>
+		</aside>
+
+		<!-- Main Panel -->
+		<div class="main-panel">
+
+			<!-- Content -->
+			<div class="content">
+					<h1>HTTP</h1>
+					<p>Event-driven fetch service — lightweight JSON transport layer for coordinators and components.</p>
+
+					<!-- How It Works -->
+					<section class="section-card">
+						<header><h3>How It Works</h3></header>
+						<main>
+							<ol>
+								<li>Consumer dispatches <code>ln-http:request</code> on any DOM element</li>
+								<li>ln-http makes the fetch request</li>
+								<li>ln-http dispatches <code>ln-http:success</code> or <code>ln-http:error</code> back on the <strong>same element</strong></li>
+								<li>Consumer filters responses by <code>tag</code></li>
+							</ol>
+							<p>ln-http has a global listener on <code>document</code>, no DOM instances, no MutationObserver.</p>
+						</main>
+					</section>
+
+					<!-- Request Options -->
+					<section class="section-card">
+						<header><h3>Request Options</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>url</code></td><td>string</td><td><em>required</em></td><td>Request URL</td></tr>
+									<tr><td><code>method</code></td><td>string</td><td><code>POST</code> if body, <code>GET</code> otherwise</td><td>HTTP method</td></tr>
+									<tr><td><code>body</code></td><td>object</td><td>—</td><td>GET: query string, POST/PUT/DELETE: JSON body</td></tr>
+									<tr><td><code>ajax</code></td><td>boolean</td><td><code>false</code></td><td>Adds <code>X-Requested-With: XMLHttpRequest</code> header</td></tr>
+									<tr><td><code>abort</code></td><td>string</td><td>—</td><td>Abort key: cancels previous in-flight request with same key</td></tr>
+									<tr><td><code>tag</code></td><td>string</td><td>—</td><td>Passed back in response events for consumer filtering</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Response Events -->
+					<section class="section-card">
+						<header><h3>Response Events</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Event</th><th>Dispatched on</th><th>Detail</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-http:success</code></td><td>original target element</td><td><code>{ tag, ok: true, status, data }</code></td></tr>
+									<tr><td><code>ln-http:error</code></td><td>original target element</td><td><code>{ tag, ok: false, status, data }</code></td></tr>
+								</tbody>
+							</table>
+							<ul>
+								<li>Network failure: <code>{ tag, ok: false, status: 0, data: { error: true, message: 'Network error' } }</code></li>
+								<li>Invalid JSON: <code>{ tag, ok: false, status, data: { error: true, message: 'Invalid response' } }</code></li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Example — GET Request -->
+					<section class="section-card">
+						<header><h3>Example — GET Request</h3></header>
+						<main>
+							<p>Dispatches a GET request to <code>/api/employees</code>. Since no server is running, the error event path is demonstrated in the log below.</p>
+							<section id="demo-get">
+								<nav class="demo-actions">
+									<button type="button" class="btn" id="demo-get-btn">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-download"></use></svg>
+										GET /api/employees
+									</button>
+								</nav>
+								<h4>Event log</h4>
+								<pre id="demo-get-log"></pre>
+							</section>
+						</main>
+					</section>
+
+					<!-- Example — POST Request -->
+					<section class="section-card">
+						<header><h3>Example — POST Request</h3></header>
+						<main>
+							<p>Submit the form to dispatch a POST request. The coordinator collects form data and sends it via <code>ln-http:request</code>.</p>
+							<section id="demo-post">
+								<form data-ln-form id="demo-http-form">
+									<div class="form-element">
+										<label for="demo-http-name">Name</label>
+										<input type="text" id="demo-http-name" name="name" value="Marko Petrovski">
+									</div>
+									<div class="form-element">
+										<label for="demo-http-email">Email</label>
+										<input type="email" id="demo-http-email" name="email" value="marko@example.com">
+									</div>
+									<div class="form-element">
+										<label for="demo-http-dept">Department</label>
+										<input type="text" id="demo-http-dept" name="department" value="Engineering">
+									</div>
+									<ul class="form-actions">
+										<li><button type="submit">POST /api/employees</button></li>
+									</ul>
+								</form>
+								<h4>Event log</h4>
+								<pre id="demo-post-log"></pre>
+							</section>
+						</main>
+					</section>
+
+					<!-- Example — Search with Abort -->
+					<section class="section-card">
+						<header><h3>Example — Search with Abort</h3></header>
+						<main>
+							<p>Each keystroke dispatches a new request with the same <code>abort</code> key, cancelling the previous in-flight request. Only the last request resolves.</p>
+							<section id="demo-abort">
+								<div class="form-element">
+									<label for="demo-abort-input">Search employees</label>
+									<input type="search" id="demo-abort-input" placeholder="Type to search — each keystroke cancels previous…">
+								</div>
+								<h4>Event log</h4>
+								<pre id="demo-abort-log"></pre>
+							</section>
+						</main>
+					</section>
+
+					<!-- ln-http vs ln-ajax -->
+					<section class="section-card">
+						<header><h3>ln-http vs ln-ajax</h3></header>
+						<main>
+							<table>
+								<thead><tr><th></th><th>ln-http</th><th>ln-ajax</th></tr></thead>
+								<tbody>
+									<tr><td>Purpose</td><td>JSON API transport</td><td>Page navigation</td></tr>
+									<tr><td>Format</td><td>JSON only</td><td>FormData + HTML</td></tr>
+									<tr><td>DOM</td><td>No instances</td><td><code>data-ln-ajax</code> on elements</td></tr>
+									<tr><td>Features</td><td>Abort, tag</td><td>CSRF, toast, history, spinner, HTML replace</td></tr>
+									<tr><td>Consumer</td><td>Coordinators, components</td><td>Links, forms</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Code — Basic Pattern -->
+					<section class="section-card">
+						<header><h3>Code — Basic Pattern</h3></header>
+						<main>
+							<pre><code>const el = document.getElementById('my-component');
+
+el.addEventListener('ln-http:success', function (e) {
+    if (e.detail.tag !== 'load-data') return;
+    renderData(e.detail.data);
+});
+
+el.addEventListener('ln-http:error', function (e) {
+    if (e.detail.tag !== 'load-data') return;
+    showError(e.detail.data.message);
+});
+
+el.dispatchEvent(new CustomEvent('ln-http:request', {
+    bubbles: true,
+    detail: { url: '/api/data', tag: 'load-data' }
+}));</code></pre>
+						</main>
+					</section>
+
+					<!-- Code — POST Pattern -->
+					<section class="section-card">
+						<header><h3>Code — POST with Body</h3></header>
+						<main>
+							<pre><code>el.dispatchEvent(new CustomEvent('ln-http:request', {
+    bubbles: true,
+    detail: {
+        url: '/api/employees',
+        method: 'POST',
+        body: { name: 'Ana Kovachevska', email: 'ana@example.com' },
+        tag: 'create-employee'
+    }
+}));</code></pre>
+						</main>
+					</section>
+
+					<!-- Code — Abort Pattern -->
+					<section class="section-card">
+						<header><h3>Code — Search with Abort</h3></header>
+						<main>
+							<pre><code>input.addEventListener('input', function () {
+    el.dispatchEvent(new CustomEvent('ln-http:request', {
+        bubbles: true,
+        detail: {
+            url: '/api/employees/search',
+            body: { q: input.value },
+            abort: 'employee-search',
+            tag: 'search'
+        }
+    }));
+});</code></pre>
+						</main>
+					</section>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<span>acme-gui &copy; 2026 LiveNetworks</span>
+				<span>ln-acme v1.2.0</span>
+			</footer>
+		</div>
+		</div><!-- /.app-body -->
+	</div><!-- /.app-wrapper -->
+
+	<script>
+	// GET demo
+	(function () {
+		const btn = document.getElementById('demo-get-btn');
+		const log = document.getElementById('demo-get-log');
+		const section = document.getElementById('demo-get');
+
+		section.addEventListener('ln-http:success', function (e) {
+			if (e.detail.tag !== 'demo-get') return;
+			log.textContent += '[success] status=' + e.detail.status + '\n' + JSON.stringify(e.detail.data, null, 2) + '\n\n';
+		});
+
+		section.addEventListener('ln-http:error', function (e) {
+			if (e.detail.tag !== 'demo-get') return;
+			log.textContent += '[error] status=' + e.detail.status + ' — ' + (e.detail.data && e.detail.data.message ? e.detail.data.message : 'Request failed') + '\n\n';
+		});
+
+		btn.addEventListener('click', function () {
+			log.textContent += '[request] GET /api/employees\n';
+			section.dispatchEvent(new CustomEvent('ln-http:request', {
+				bubbles: true,
+				detail: { url: '/api/employees', tag: 'demo-get' }
+			}));
+		});
+	}());
+
+	// POST demo
+	(function () {
+		const form = document.getElementById('demo-http-form');
+		const log = document.getElementById('demo-post-log');
+		const section = document.getElementById('demo-post');
+
+		section.addEventListener('ln-http:success', function (e) {
+			if (e.detail.tag !== 'demo-post') return;
+			log.textContent += '[success] status=' + e.detail.status + '\n' + JSON.stringify(e.detail.data, null, 2) + '\n\n';
+		});
+
+		section.addEventListener('ln-http:error', function (e) {
+			if (e.detail.tag !== 'demo-post') return;
+			log.textContent += '[error] status=' + e.detail.status + ' — ' + (e.detail.data && e.detail.data.message ? e.detail.data.message : 'Request failed') + '\n\n';
+		});
+
+		form.addEventListener('ln-form:submit', function (e) {
+			const data = {};
+			new FormData(form).forEach(function (val, key) { data[key] = val; });
+			log.textContent += '[request] POST /api/employees ' + JSON.stringify(data) + '\n';
+			section.dispatchEvent(new CustomEvent('ln-http:request', {
+				bubbles: true,
+				detail: {
+					url: '/api/employees',
+					method: 'POST',
+					body: data,
+					tag: 'demo-post'
+				}
+			}));
+		});
+	}());
+
+	// Abort demo
+	(function () {
+		const input = document.getElementById('demo-abort-input');
+		const log = document.getElementById('demo-abort-log');
+		const section = document.getElementById('demo-abort');
+
+		section.addEventListener('ln-http:success', function (e) {
+			if (e.detail.tag !== 'demo-abort') return;
+			log.textContent += '[success] status=' + e.detail.status + '\n\n';
+		});
+
+		section.addEventListener('ln-http:error', function (e) {
+			if (e.detail.tag !== 'demo-abort') return;
+			if (e.detail.status === 0 && e.detail.data && e.detail.data.message === 'Aborted') {
+				log.textContent += '[aborted]\n';
+				return;
+			}
+			log.textContent += '[error] status=' + e.detail.status + ' — ' + (e.detail.data && e.detail.data.message ? e.detail.data.message : 'Request failed') + '\n\n';
+		});
+
+		input.addEventListener('input', function () {
+			log.textContent += '[request] GET /api/employees/search?q=' + input.value + '\n';
+			section.dispatchEvent(new CustomEvent('ln-http:request', {
+				bubbles: true,
+				detail: {
+					url: '/api/employees/search',
+					body: { q: input.value },
+					abort: 'demo-abort',
+					tag: 'demo-abort'
+				}
+			}));
+		});
+	}());
+	</script>
+</body>
+</html>
