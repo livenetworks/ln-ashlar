@@ -11,7 +11,7 @@ Locale-aware date formatting with native browser picker. File: `js/ln-date/ln-da
 After initialization, the DOM becomes:
 
 ```html
-<input type="text" readonly data-ln-date>
+<input type="text" data-ln-date>
 <input type="date" tabindex="-1" style="position:absolute;opacity:0;width:0;height:0;overflow:hidden;pointer-events:none">
 <input type="hidden" name="birthday" value="2026-04-19">
 <button type="button" aria-label="Open date picker">
@@ -47,7 +47,8 @@ el.lnDate.destroy();           // restore original input
 ## Behavior
 
 - On picker `change` event: reads ISO value, formats display, dispatches `ln-date:change`
-- Clicking display input or calendar button opens native picker via `showPicker()`
+- Display input accepts typed dates — on blur, parses and reformats (see Typed Input Flow)
+- Calendar button opens native picker via `showPicker()`
 - `showPicker()` wrapped in try/catch (throws if not triggered by user gesture)
 - Fallback: `picker.click()` for browsers without `showPicker()`
 - Pre-filled values formatted on initialization
@@ -74,8 +75,9 @@ Each `[data-ln-date]` input gets a `_component` instance stored at `element.lnDa
 | `_picker` | Element | Reference to the hidden date input (for showPicker) |
 | `_btn` | Element | Reference to the calendar button |
 | `_onPickerChange` | Function | Bound change handler for picker |
-| `_onDisplayClick` | Function | Bound click handler for display input |
+| `_onBlur` | Function | Bound blur handler for typed input parsing |
 | `_onBtnClick` | Function | Bound click handler for calendar button |
+| `_lastISO` | String | Last known valid ISO value (for revert on invalid input) |
 
 ### Formatter Cache
 
@@ -88,7 +90,7 @@ One entry per unique locale + options combo. Pattern matches ln-number/ln-time c
 ### Value Flow
 
 ```
-User clicks display input or calendar button
+User clicks calendar button
     |
     v
 showPicker() on hidden date input
@@ -131,6 +133,29 @@ _displayFormatted(date) → visible shows "19 апр 2026"
     |
     v
 picker.value = "2026-04-19" (sync picker state)
+```
+
+### Typed Input Flow
+
+```
+User types in display input → blur fires
+    |
+    v
+Read typed text, trim whitespace
+    |
+    v
+Empty? → clear value, dispatch change
+    |
+    v
+Unchanged from current formatted display? → no action
+    |
+    v
+_parseTyped(text) — separator-based detection
+    . → dd.MM.yyyy    / → MM/dd/yyyy    - → yyyy-MM-dd or dd-MM-yyyy
+    |
+    v
+Valid Date? → build ISO, update hidden + picker + display, dispatch change
+Invalid?   → revert display to previous formatted value
 ```
 
 ### MutationObserver

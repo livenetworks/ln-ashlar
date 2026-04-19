@@ -109,7 +109,6 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 
 		// ── Transform original input to text display ────────
 		dom.type = 'text';
-		dom.readOnly = true;
 
 		// ── Create calendar button ──────────────────────────
 		const btn = document.createElement('button');
@@ -118,6 +117,7 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 		btn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>';
 		picker.insertAdjacentElement('afterend', btn);
 		this._btn = btn;
+		this._lastISO = '';
 
 		// ── Intercept programmatic value sets on hidden input
 		Object.defineProperty(hidden, 'value', {
@@ -147,6 +147,7 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 				if (date) {
 					self._setHiddenRaw(val);
 					self._displayFormatted(date);
+					self._lastISO = val;
 					dispatch(self.dom, 'ln-date:change', {
 						value: val,
 						formatted: self.dom.value,
@@ -156,6 +157,7 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 			} else {
 				self._setHiddenRaw('');
 				self.dom.value = '';
+				self._lastISO = '';
 				dispatch(self.dom, 'ln-date:change', {
 					value: '',
 					formatted: '',
@@ -165,10 +167,63 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 		};
 		picker.addEventListener('change', this._onPickerChange);
 
-		this._onDisplayClick = function () {
-			self._openPicker();
+		this._onBlur = function () {
+			const typed = self.dom.value.trim();
+
+			// Empty input — clear if there was a value
+			if (typed === '') {
+				if (self._lastISO !== '') {
+					self._setHiddenRaw('');
+					_inputValueDesc.set.call(self._picker, '');
+					self.dom.value = '';
+					self._lastISO = '';
+					dispatch(self.dom, 'ln-date:change', {
+						value: '',
+						formatted: '',
+						date: null
+					});
+				}
+				return;
+			}
+
+			// Check if text is unchanged from current formatted display
+			if (self._lastISO) {
+				const currentDate = _parseISO(self._lastISO);
+				if (currentDate) {
+					const format = self.dom.getAttribute(DOM_SELECTOR) || '';
+					const locale = getLocale(self.dom);
+					const currentFormatted = _formatDate(currentDate, format, locale);
+					if (typed === currentFormatted) return;
+				}
+			}
+
+			// Try to parse the typed value
+			const parsed = _parseTyped(typed);
+			if (parsed) {
+				const y = parsed.getFullYear();
+				const m = String(parsed.getMonth() + 1).padStart(2, '0');
+				const d = String(parsed.getDate()).padStart(2, '0');
+				const iso = y + '-' + m + '-' + d;
+				self._setHiddenRaw(iso);
+				_inputValueDesc.set.call(self._picker, iso);
+				self._displayFormatted(parsed);
+				self._lastISO = iso;
+				dispatch(self.dom, 'ln-date:change', {
+					value: iso,
+					formatted: self.dom.value,
+					date: parsed
+				});
+			} else {
+				// Invalid input — revert to previous display
+				if (self._lastISO) {
+					const prevDate = _parseISO(self._lastISO);
+					if (prevDate) self._displayFormatted(prevDate);
+				} else {
+					self.dom.value = '';
+				}
+			}
 		};
-		dom.addEventListener('click', this._onDisplayClick);
+		dom.addEventListener('blur', this._onBlur);
 
 		this._onBtnClick = function () {
 			self._openPicker();
@@ -182,6 +237,7 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 				this._setHiddenRaw(initialValue);
 				_inputValueDesc.set.call(picker, initialValue);
 				this._displayFormatted(date);
+				this._lastISO = initialValue;
 			}
 		}
 
@@ -209,6 +265,64 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 		const date = new Date(y, m, d, h, min);
 		// Validate the date is real (e.g., Feb 30 would roll over)
 		if (date.getFullYear() !== y || date.getMonth() !== m || date.getDate() !== d) return null;
+		return date;
+	}
+
+	function _parseTyped(str) {
+		if (!str || typeof str !== 'string') return null;
+		str = str.trim();
+		if (str.length < 6) return null; // minimum: d.M.yy
+
+		// Detect separator
+		let sep, parts;
+		if (str.indexOf('.') !== -1) {
+			sep = '.';
+			parts = str.split('.');
+		} else if (str.indexOf('/') !== -1) {
+			sep = '/';
+			parts = str.split('/');
+		} else if (str.indexOf('-') !== -1) {
+			sep = '-';
+			parts = str.split('-');
+		} else {
+			return null;
+		}
+
+		if (parts.length !== 3) return null;
+		const nums = [];
+		for (let i = 0; i < 3; i++) {
+			const n = parseInt(parts[i], 10);
+			if (isNaN(n)) return null;
+			nums.push(n);
+		}
+
+		let day, month, year;
+
+		if (sep === '.') {
+			// dd.MM.yyyy (European)
+			day = nums[0]; month = nums[1]; year = nums[2];
+		} else if (sep === '/') {
+			// MM/dd/yyyy (US)
+			month = nums[0]; day = nums[1]; year = nums[2];
+		} else {
+			// dash: yyyy-MM-dd if first part is 4 digits, else dd-MM-yyyy
+			if (parts[0].length === 4) {
+				year = nums[0]; month = nums[1]; day = nums[2];
+			} else {
+				day = nums[0]; month = nums[1]; year = nums[2];
+			}
+		}
+
+		// Two-digit year pivot
+		if (year < 100) {
+			year += (year < 50) ? 2000 : 1900;
+		}
+
+		// Validate via Date constructor roundtrip
+		const date = new Date(year, month - 1, day);
+		if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+			return null;
+		}
 		return date;
 	}
 
@@ -246,6 +360,7 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 				this._setHiddenRaw('');
 				_inputValueDesc.set.call(this._picker, '');
 				this.dom.value = '';
+				this._lastISO = '';
 				return;
 			}
 			const date = _parseISO(isoStr);
@@ -253,6 +368,7 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 			this._setHiddenRaw(isoStr);
 			_inputValueDesc.set.call(this._picker, isoStr);
 			this._displayFormatted(date);
+			this._lastISO = isoStr;
 			dispatch(this.dom, 'ln-date:change', {
 				value: isoStr,
 				formatted: this.dom.value,
@@ -288,12 +404,11 @@ import { dispatch, getLocale, registerComponent } from '../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._picker.removeEventListener('change', this._onPickerChange);
-		this.dom.removeEventListener('click', this._onDisplayClick);
+		this.dom.removeEventListener('blur', this._onBlur);
 		this._btn.removeEventListener('click', this._onBtnClick);
 		// Restore original input
 		this.dom.name = this._hidden.name;
 		this.dom.type = 'date';
-		this.dom.readOnly = false;
 		const isoVal = this.value;
 		// Remove created elements
 		this._hidden.remove();

@@ -11,9 +11,31 @@ Locale-aware date formatting with native browser picker.
 On initialization, the component:
 1. Creates a hidden input with the original `name` attribute for form submission
 2. Creates a hidden date input for the native picker (`showPicker()`)
-3. Changes visible input to `type="text" readonly` for formatted display
+3. Changes visible input to `type="text"` for formatted display and typing
 4. Adds a calendar icon button that triggers the native picker
 5. Formats the display value with locale-aware date formatting
+
+## Typing Support
+
+The visible input accepts typed dates. On blur, the component parses the
+input and reformats it according to the configured display format.
+
+### Supported Input Formats
+
+| Separator | Assumed Format | Example |
+|-----------|---------------|---------|
+| `.` (dot) | dd.MM.yyyy (European) | `30.12.1979` or `30.12.79` |
+| `/` (slash) | MM/dd/yyyy (US) | `12/30/1979` or `12/30/79` |
+| `-` (dash) | yyyy-MM-dd if 4-digit first part (ISO), else dd-MM-yyyy | `1979-12-30` or `30-12-1979` |
+
+Two-digit years: 00–49 → 2000–2049, 50–99 → 1950–1999.
+
+### Blur Behavior
+
+- **Empty input**: clears the date value and dispatches `ln-date:change`
+- **Unchanged text**: no action (user clicked in and out without editing)
+- **Valid date**: updates the value, reformats display, dispatches `ln-date:change`
+- **Invalid input**: reverts to the previous formatted display
 
 The hidden input holds the ISO date string (YYYY-MM-DD) for form submission.
 
