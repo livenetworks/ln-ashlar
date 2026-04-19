@@ -1,0 +1,14 @@
+/* Theme: Nature — forest green, warm, organic */
+:root {
+	--color-primary: 150 55% 33%;
+	--color-primary-hover: 150 55% 25%;
+	--color-primary-focus: 150 55% 41%;
+	--color-primary-light: 150 55% 93%;
+	--color-primary-lighter: 150 55% 97%;
+
+	--color-secondary: 35 80% 50%;
+	--color-secondary-hover: 35 80% 40%;
+
+	--color-info: 190 60% 45%;
+	--color-info-hover: 190 60% 35%;
+}

@@ -1,0 +1,19 @@
+/* Theme: Corporate — navy, sharp corners, formal */
+:root {
+	--color-primary: 215 65% 28%;
+	--color-primary-hover: 215 65% 20%;
+	--color-primary-focus: 215 65% 36%;
+	--color-primary-light: 215 65% 93%;
+	--color-primary-lighter: 215 65% 97%;
+
+	--color-secondary: 200 20% 45%;
+	--color-secondary-hover: 200 20% 35%;
+
+	--radius-sm: 0;
+	--radius-md: 0;
+	--radius-lg: 0;
+	--radius-xl: 0;
+	--radius-full: 0;
+
+	--border-width: 2px;
+}

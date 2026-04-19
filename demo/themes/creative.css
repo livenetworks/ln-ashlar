@@ -1,0 +1,16 @@
+/* Theme: Creative — violet, rounded, playful */
+:root {
+	--color-primary: 270 70% 55%;
+	--color-primary-hover: 270 70% 45%;
+	--color-primary-focus: 270 70% 63%;
+	--color-primary-light: 270 70% 93%;
+	--color-primary-lighter: 270 70% 97%;
+
+	--color-secondary: 330 75% 55%;
+	--color-secondary-hover: 330 75% 45%;
+
+	--radius-sm: 0.375rem;
+	--radius-md: 0.75rem;
+	--radius-lg: 1rem;
+	--radius-xl: 1.5rem;
+}

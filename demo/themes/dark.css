@@ -1,0 +1,60 @@
+/* Theme: Dark — teal accent, dark backgrounds */
+:root {
+	--color-primary: 180 65% 50%;
+	--color-primary-hover: 180 65% 60%;
+	--color-primary-focus: 180 65% 42%;
+	--color-primary-light: 180 40% 18%;
+	--color-primary-lighter: 180 30% 12%;
+
+	--color-secondary: 270 50% 60%;
+	--color-secondary-hover: 270 50% 70%;
+
+	--color-success: 142 60% 48%;
+	--color-success-light: 142 40% 18%;
+	--color-success-lighter: 142 30% 12%;
+
+	--color-error: 0 70% 58%;
+	--color-error-light: 0 40% 18%;
+	--color-error-lighter: 0 30% 12%;
+
+	--color-warning: 32 80% 55%;
+	--color-warning-light: 32 40% 18%;
+	--color-warning-lighter: 32 30% 12%;
+
+	--color-info: 210 70% 60%;
+	--color-info-light: 210 40% 18%;
+	--color-info-lighter: 210 30% 12%;
+
+	--color-neutral-50: 220 18% 16%;
+	--color-neutral-100: 220 16% 18%;
+	--color-neutral-150: 220 14% 22%;
+	--color-neutral-200: 220 13% 26%;
+	--color-neutral-300: 220 12% 35%;
+	--color-neutral-400: 218 10% 50%;
+	--color-neutral-500: 220 8% 65%;
+	--color-neutral-600: 220 10% 75%;
+	--color-neutral-700: 220 12% 82%;
+	--color-neutral-800: 220 15% 90%;
+	--color-neutral-900: 220 20% 95%;
+
+	--color-text-primary: 0 0% 93%;
+	--color-text-secondary: 0 0% 65%;
+	--color-text-muted: 0 0% 45%;
+
+	--color-white: 220 20% 12%;
+	--color-bg-primary: 220 20% 12%;
+	--color-bg-secondary: 220 18% 16%;
+	--color-bg-body: 220 22% 8%;
+	--color-bg-error: 0 50% 15%;
+
+	--color-border: 220 15% 25%;
+	--color-border-light: 220 15% 20%;
+
+	--color-table-header-bg: 220 18% 18%;
+	--color-table-header-text: 0 0% 93%;
+	--color-table-section-bg: 220 18% 15%;
+
+	--shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+	--shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.3), 0 1px 2px -1px hsl(0 0% 0% / 0.15);
+	--shadow-md: 0 4px 12px -2px hsl(0 0% 0% / 0.35), 0 2px 4px -2px hsl(0 0% 0% / 0.2);
+}
