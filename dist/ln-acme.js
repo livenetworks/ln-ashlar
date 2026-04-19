@@ -726,6 +726,7 @@ function Et(d) {
     medium: { dateStyle: "medium" },
     long: { dateStyle: "long" },
     "short datetime": { dateStyle: "short", timeStyle: "short" },
+    "medium datetime": { dateStyle: "medium", timeStyle: "short" },
     "long datetime": { dateStyle: "long", timeStyle: "short" }
   };
   function l(s) {
