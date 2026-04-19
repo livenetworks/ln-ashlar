@@ -806,9 +806,16 @@ Forms use CSS Grid + `<div class="form-element">` with explicit `for`/`id`. **Us
 ```scss
 // Default: filled (input hidden, colored bg on checked)
 #role-filter ul { @include pill-group; }
+#role-filter label { @include pill; }
 
-// Outline variant: visible input indicator
-#role-filter ul { @include pill-group; @include pill-outline; }
+// Outline variant: standalone on label (visible input indicator)
+#role-filter label { @include pill-outline; }
+
+// Vertical list — outline labels
+#dept-filter { @include check-list-outline; }
+
+// Vertical list — filled labels
+#dept-filter { @include check-list; }
 
 // Color override
 #status-filter { --color-primary: var(--color-success); }

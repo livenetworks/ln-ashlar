@@ -76,6 +76,10 @@ td .actions {
 	padding: var(--spacing-sm);
 
 	> ul { @include check-list; }
+
+	label {
+		@include pill;
+	}
 }
 
 th [data-ln-popover-for] {

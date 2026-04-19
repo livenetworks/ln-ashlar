@@ -402,7 +402,7 @@ form.lnForm.reset();</code></pre>
 						</article>
 						<article>
 							<h4>Outline (<code>@include pill-outline</code>)</h4>
-							<p>Apply on parent to show the input indicator and use bordered style.</p>
+							<p>Apply directly on labels (standalone) to show the input indicator and use bordered style.</p>
 							<nav id="demo-pills-outline">
 								<fieldset>
 									<legend>Auth Method</legend>
@@ -428,8 +428,8 @@ form.lnForm.reset();</code></pre>
     &lt;li&gt;&lt;label&gt;&lt;input type="radio" name="role" value="editor"&gt; Editor&lt;/label&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-// SCSS — outline style on parent
-#my-form fieldset { @include pill-outline; }
+// SCSS — outline style on label (standalone)
+#my-form label { @include pill-outline; }
 
 // Color override per context
 #role-field { --color-primary: var(--color-secondary); }</code></pre>

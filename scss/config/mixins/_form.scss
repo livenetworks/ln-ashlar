@@ -253,10 +253,10 @@
 	}
 }
 
-// ─── Pill labels (filled) ───────────────────────────────────────
+// ─── Pill outline — base label (structure + visible border) ────
 
-@mixin pill {
-	@include inline-flex;
+@mixin pill-outline {
+	@include flex;
 	@include items-center;
 	@include gap(0.5rem);
 	@include px(1rem);
@@ -267,8 +267,23 @@
 	@include font-medium;
 	@include mb(0);
 	@include rounded-md;
+	border: var(--border-width) solid hsl(var(--color-border));
+
+	&:has(> input:checked) {
+		border-color: hsl(var(--color-primary));
+	}
+
+	&:hover:not(:has(> input:checked)) {
+		border-color: hsl(var(--color-primary));
+	}
+}
+
+// ─── Pill filled — extends pill-outline, hides input ───────────
+
+@mixin pill {
+	@include pill-outline;
 	background-color: hsl(var(--color-bg-secondary));
-	border: var(--border-width) solid transparent;
+	border-color: transparent;
 
 	> input { display: none; }
 
@@ -284,13 +299,6 @@
 	&:hover:has(> input:checked) {
 		background-color: hsl(var(--color-primary-hover));
 	}
-}
-
-// ─── Pill outline — adds visible border + shows input ──────────
-
-@mixin pill-outline {
-	border-color: hsl(var(--color-border));
-	> input { display: initial; }
 }
 
 @mixin pill-group {
@@ -314,16 +322,29 @@
 	}
 }
 
-// ─── Check list — vertical label list ──────────────────────────
+// ─── Check list outline — vertical list with outlined labels ───
 // <ul><li><label><input> — same structure as pill-group but vertical.
-// Simple list reset: removes bullets + padding. Labels remain plain
-// (visible checkbox, block layout).
+// List reset + pill-outline on labels (visible input, bordered).
+//
+// Usage:
+//   #dept-filter { @include check-list-outline; }
+
+@mixin check-list-outline {
+	@include list-reset;
+
+	li label { @include pill-outline; }
+}
+
+// ─── Check list filled — vertical list with filled labels ──────
+// Extends check-list-outline: hides input, fills bg on checked.
 //
 // Usage:
 //   #dept-filter { @include check-list; }
 
 @mixin check-list {
-	@include list-reset;
+	@include check-list-outline;
+
+	li label { @include pill; }
 }
 
 // ─── Validation states ─────────────────────────────────────────

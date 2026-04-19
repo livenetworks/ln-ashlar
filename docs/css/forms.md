@@ -95,12 +95,12 @@ Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on f
 
 | Style | How | Description |
 |-------|-----|-------------|
-| **Filled** (default) | Automatic | Gray bg, colored bg on checked, input hidden |
-| **Outline** | `@include pill-outline` on parent | Bordered, visible input indicator |
+| **Filled** (default) | `@include pill` on label (standalone) | Gray bg, colored bg on checked, input hidden |
+| **Outline** | `@include pill-outline` on label (standalone) | Bordered, visible input indicator |
 
 ```scss
-// Switch to outline on a parent container
-#my-form fieldset { @include pill-outline; }
+// Outline: standalone on label
+#my-form label { @include pill-outline; }
 
 // Color per context
 #role-field { --color-primary: var(--color-secondary); }

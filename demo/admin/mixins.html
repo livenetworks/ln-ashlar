@@ -818,9 +818,11 @@ table {
 								<tr><td><code>@include form-validate-invalid</code></td><td>Invalid input: error border color + error focus ring</td></tr>
 								<tr><td><code>@include form-validate-valid</code></td><td>Valid input: success border color + success focus ring</td></tr>
 								<tr><td><code>@include form-validate-errors</code></td><td>Error message list: no bullets, caption size, error color, top margin</td></tr>
-								<tr><td><code>@include pill</code></td><td>Filled pill label: gray bg, colored on checked, input hidden</td></tr>
+								<tr><td><code>@include pill-outline</code></td><td>Base pill label: structure + visible border + visible input indicator</td></tr>
+								<tr><td><code>@include pill</code></td><td>Filled pill label: extends pill-outline, gray bg, colored on checked, input hidden</td></tr>
 								<tr><td><code>@include pill-group</code></td><td>Joined pills: no gap, border-radius on first/last child only. For radio/checkbox groups</td></tr>
-								<tr><td><code>@include pill-outline</code></td><td>Switch pills to outline style: bordered, visible input indicator</td></tr>
+								<tr><td><code>@include check-list-outline</code></td><td>Vertical label list with pill-outline labels (visible input, bordered)</td></tr>
+								<tr><td><code>@include check-list</code></td><td>Vertical label list with filled pill labels (extends check-list-outline)</td></tr>
 							</tbody>
 						</table>
 						<pre><code>// Library default — already applied
@@ -835,8 +837,8 @@ label                   { @include form-label; }
   .form-actions { grid-column: span 6; }
 }
 
-// Pill outline variant
-#role-selector { @include pill-outline; }</code></pre>
+// Pill outline variant — standalone on label
+#role-selector label { @include pill-outline; }</code></pre>
 					</main>
 				</section>
 
