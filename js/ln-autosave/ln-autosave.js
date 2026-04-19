@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, findElements, serializeForm, populateForm } from '../ln-core';
+import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-autosave';
@@ -7,12 +7,6 @@ import { guardBody, dispatch, dispatchCancelable, findElements, serializeForm, p
 	const STORAGE_PREFIX = 'ln-autosave:';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-	}
 
 	// ─── Component ─────────────────────────────────────────────
 
@@ -141,44 +135,7 @@ import { guardBody, dispatch, dispatchCancelable, findElements, serializeForm, p
 		return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 	}
 
-	// ─── DOM Observer ──────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					if (mutations[i].type === 'childList') {
-						const nodes = mutations[i].addedNodes;
-						for (let j = 0; j < nodes.length; j++) {
-							if (nodes[j].nodeType === 1) {
-								findElements(nodes[j], DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-							}
-						}
-					} else if (mutations[i].type === 'attributes') {
-						findElements(mutations[i].target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR]
-			});
-		}, 'ln-autosave');
-	}
-
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-autosave');
 })();

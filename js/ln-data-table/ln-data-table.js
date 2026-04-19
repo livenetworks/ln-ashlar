@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, findElements, guardBody } from '../ln-core';
+import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-table';
@@ -17,12 +17,6 @@ import { cloneTemplateScoped, dispatch, findElements, guardBody } from '../ln-co
 
 	function _formatNum(n) {
 		return _numFmt ? _numFmt.format(n) : String(n);
-	}
-
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -917,35 +911,7 @@ import { cloneTemplateScoped, dispatch, findElements, guardBody } from '../ln-co
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── DOM Observer ──────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				mutations.forEach(function (mutation) {
-					if (mutation.type === 'childList') {
-						mutation.addedNodes.forEach(function (node) {
-							if (node.nodeType === 1) findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-						});
-					} else if (mutation.type === 'attributes') {
-						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-					}
-				});
-			});
-			observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
-		}, 'ln-data-table');
-	}
-
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-table');
 })();

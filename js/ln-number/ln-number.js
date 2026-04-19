@@ -1,4 +1,4 @@
-import { guardBody, dispatch, findElements } from '../ln-core';
+import { dispatch, getLocale, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-number';
@@ -9,11 +9,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	// ─── Formatter Cache ──────────────────────────────────────
 
 	const _formatters = {};
-
-	function _getLocale(el) {
-		const langEl = el.closest('[lang]');
-		return (langEl ? langEl.lang : null) || navigator.language;
-	}
+	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
 
 	function _getFormatter(locale) {
 		if (!_formatters[locale]) {
@@ -30,10 +26,16 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		return _formatters[locale];
 	}
 
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
+	function _formatNum(locale, num, maxDecimals) {
+		if (maxDecimals !== null) {
+			const max = parseInt(maxDecimals, 10);
+			const key = locale + '|d' + max;
+			if (!_formatters[key]) {
+				_formatters[key] = new Intl.NumberFormat(locale, { useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: max });
+			}
+			return _formatters[key].format(num);
+		}
+		return _getFormatter(locale).fmt.format(num);
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -58,13 +60,12 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 		// ── Intercept programmatic value sets on hidden input ──
 		const self = this;
-		const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
 		Object.defineProperty(hidden, 'value', {
 			get: function () {
-				return originalDescriptor.get.call(hidden);
+				return _inputValueDesc.get.call(hidden);
 			},
 			set: function (val) {
-				originalDescriptor.set.call(hidden, val);
+				_inputValueDesc.set.call(hidden, val);
 				// If set programmatically (e.g., populateForm), update display
 				if (val !== '' && !isNaN(parseFloat(val))) {
 					self._displayFormatted(parseFloat(val));
@@ -84,18 +85,19 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this._onPaste = function (e) {
 			e.preventDefault();
 			const pasted = (e.clipboardData || window.clipboardData).getData('text');
+			const info = _getFormatter(getLocale(dom));
+			const decSepEscaped = info.decimalSep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 			// Strip everything except digits, minus, and decimal separators
-			let cleaned = pasted.replace(new RegExp('[^0-9\\-' + _escapeRegex(_getFormatter(_getLocale(dom)).decimalSep) + '.]', 'g'), '');
+			let cleaned = pasted.replace(new RegExp('[^0-9\\-' + decSepEscaped + '.]', 'g'), '');
 			// Strip group separators before normalizing decimal
-			if (_getFormatter(_getLocale(dom)).groupSep) {
-				cleaned = cleaned.split(_getFormatter(_getLocale(dom)).groupSep).join('');
+			if (info.groupSep) {
+				cleaned = cleaned.split(info.groupSep).join('');
 			}
 			// Normalize: if locale decimal is not '.', replace it
-			let normalized = cleaned;
-			if (_getFormatter(_getLocale(dom)).decimalSep !== '.') {
-				normalized = cleaned.replace(_getFormatter(_getLocale(dom)).decimalSep, '.');
+			if (info.decimalSep !== '.') {
+				cleaned = cleaned.replace(info.decimalSep, '.');
 			}
-			const num = parseFloat(normalized);
+			const num = parseFloat(cleaned);
 			if (!isNaN(num)) {
 				self.value = num;
 			} else {
@@ -111,20 +113,16 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 			const num = parseFloat(initial);
 			if (!isNaN(num)) {
 				this._displayFormatted(num);
-				originalDescriptor.set.call(hidden, String(num));
+				_inputValueDesc.set.call(hidden, String(num));
 			}
 		}
 
 		return this;
 	}
 
-	function _escapeRegex(str) {
-		return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-	}
-
 	_component.prototype._handleInput = function () {
 		const dom = this.dom;
-		const info = _getFormatter(_getLocale(dom));
+		const info = _getFormatter(getLocale(dom));
 		const raw = dom.value;
 
 		// Edge case: empty
@@ -199,14 +197,16 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		// Format
 		let formatted;
 		if (maxDecimals !== null) {
-			const opts = { useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: parseInt(maxDecimals, 10) };
-			formatted = new Intl.NumberFormat(_getLocale(dom), opts).format(num);
+			formatted = _formatNum(getLocale(dom), num, maxDecimals);
 		} else {
 			// Preserve the user's decimal places
 			const userDecimals = decimalIndex !== -1 ? cleaned.slice(decimalIndex + 1).length : 0;
 			if (userDecimals > 0) {
-				const opts = { useGrouping: true, minimumFractionDigits: userDecimals, maximumFractionDigits: userDecimals };
-				formatted = new Intl.NumberFormat(_getLocale(dom), opts).format(num);
+				const key = getLocale(dom) + '|u' + userDecimals;
+				if (!_formatters[key]) {
+					_formatters[key] = new Intl.NumberFormat(getLocale(dom), { useGrouping: true, minimumFractionDigits: userDecimals, maximumFractionDigits: userDecimals });
+				}
+				formatted = _formatters[key].format(num);
 			} else {
 				formatted = info.fmt.format(num);
 			}
@@ -232,26 +232,11 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	};
 
 	_component.prototype._setHiddenRaw = function (num) {
-		// Use the original descriptor to avoid triggering our interceptor
-		const desc = Object.getOwnPropertyDescriptor(this._hidden, 'value');
-		if (desc && desc.set) {
-			// Our custom setter is on the instance — we need the prototype's
-			Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(this._hidden, String(num));
-		} else {
-			this._hidden.value = String(num);
-		}
+		_inputValueDesc.set.call(this._hidden, String(num));
 	};
 
 	_component.prototype._displayFormatted = function (num) {
-		const maxDecimals = this.dom.getAttribute('data-ln-number-decimals');
-		let formatted;
-		if (maxDecimals !== null) {
-			const opts = { useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: parseInt(maxDecimals, 10) };
-			formatted = new Intl.NumberFormat(_getLocale(this.dom), opts).format(num);
-		} else {
-			formatted = _getFormatter(_getLocale(this.dom)).fmt.format(num);
-		}
-		this.dom.value = formatted;
+		this.dom.value = _formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals'));
 	};
 
 	// ─── Public API ───────────────────────────────────────────
@@ -296,35 +281,6 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── DOM Observer ──────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) {
-								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR]
-			});
-		}, 'ln-number');
-	}
-
 	// ─── Locale Observer ──────────────────────────────────────
 
 	function _localeObserver() {
@@ -341,15 +297,6 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-number');
 	_localeObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
 })();

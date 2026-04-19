@@ -1,4 +1,4 @@
-import { dispatch, findElements, guardBody } from '../ln-core';
+import { dispatch, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-circular-progress';
@@ -10,10 +10,6 @@ import { dispatch, findElements, guardBody } from '../ln-core';
 	const VIEW_SIZE = 36;
 	const RADIUS = 16;
 	const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
-	}
 
 	function _constructor(dom) {
 		this.dom = dom;
@@ -90,33 +86,6 @@ import { dispatch, findElements, guardBody } from '../ln-core';
 		this.dom.appendChild(this.labelEl);
 	}
 
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (const mutation of mutations) {
-					if (mutation.type === 'childList') {
-						for (const item of mutation.addedNodes) {
-							if (item.nodeType === 1) {
-								findElements(item, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: ['data-ln-circular-progress']
-			});
-		}, 'ln-circular-progress');
-	}
-
-	_domObserver();
-
 	function _listenValues() {
 		const self = this;
 		const observer = new MutationObserver(function (mutations) {
@@ -158,13 +127,7 @@ import { dispatch, findElements, guardBody } from '../ln-core';
 		});
 	}
 
-	window[DOM_ATTRIBUTE] = constructor;
+	// ─── Init ──────────────────────────────────────────────────
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-circular-progress');
 })();

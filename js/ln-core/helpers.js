@@ -275,3 +275,55 @@ export function populateForm(form, data) {
 
 	return filled;
 }
+
+// ─── Locale Detection ─────────────────────────────────────
+
+export function getLocale(el) {
+	const langEl = el.closest('[lang]');
+	return (langEl ? langEl.lang : null) || navigator.language;
+}
+
+// ─── Component Registration ───────────────────────────────
+
+export function registerComponent(selector, attribute, ComponentFn, componentTag) {
+	function constructor(domRoot) {
+		findElements(domRoot, selector, attribute, ComponentFn);
+	}
+
+	guardBody(function () {
+		const observer = new MutationObserver(function (mutations) {
+			for (let i = 0; i < mutations.length; i++) {
+				const mutation = mutations[i];
+				if (mutation.type === 'childList') {
+					for (let j = 0; j < mutation.addedNodes.length; j++) {
+						const node = mutation.addedNodes[j];
+						if (node.nodeType === 1) {
+							findElements(node, selector, attribute, ComponentFn);
+						}
+					}
+				} else if (mutation.type === 'attributes') {
+					findElements(mutation.target, selector, attribute, ComponentFn);
+				}
+			}
+		});
+
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: [selector]
+		});
+	}, componentTag || selector.replace('data-', ''));
+
+	window[attribute] = constructor;
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', function () {
+			constructor(document.body);
+		});
+	} else {
+		constructor(document.body);
+	}
+
+	return constructor;
+}

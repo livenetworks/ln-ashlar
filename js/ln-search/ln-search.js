@@ -1,4 +1,4 @@
-import { guardBody, dispatchCancelable, findElements } from '../ln-core';
+import { dispatchCancelable, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-search';
@@ -8,12 +8,6 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 	const DEBOUNCE_MS = 150;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-	}
 
 	// ─── Component ─────────────────────────────────────────────
 
@@ -114,43 +108,7 @@ import { guardBody, dispatchCancelable, findElements } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── DOM Observer ──────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				mutations.forEach(function (mutation) {
-					if (mutation.type === 'childList') {
-						mutation.addedNodes.forEach(function (node) {
-							if (node.nodeType === 1) {
-								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-							}
-						});
-					} else if (mutation.type === 'attributes') {
-						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-					}
-				});
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR]
-			});
-		}, 'ln-search');
-	}
-
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-search');
 })();

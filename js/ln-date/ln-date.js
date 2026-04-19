@@ -1,4 +1,4 @@
-import { guardBody, dispatch, findElements } from '../ln-core';
+import { dispatch, getLocale, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-date';
@@ -9,11 +9,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	// ─── Formatter Cache ──────────────────────────────────────
 
 	const _formatters = {};
-
-	function _getLocale(el) {
-		const langEl = el.closest('[lang]');
-		return (langEl ? langEl.lang : null) || navigator.language;
-	}
+	const _inputValueDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
 
 	function _getFormatter(locale, options) {
 		const key = locale + '|' + JSON.stringify(options);
@@ -40,7 +36,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		if (!format || format === '') return { dateStyle: 'medium' };
 		const match = format.match(KEYWORD_RE);
 		if (match) {
-			return KEYWORD_OPTIONS[format] || { dateStyle: 'medium' };
+			return KEYWORD_OPTIONS[format];
 		}
 		return null; // custom pattern
 	}
@@ -49,36 +45,25 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 	function _formatCustom(date, pattern, locale) {
 		const day = date.getDate();
-		const month = date.getMonth(); // 0-based
+		const month = date.getMonth();
 		const year = date.getFullYear();
 		const hours = date.getHours();
 		const minutes = date.getMinutes();
 
-		// Get locale-aware month names when needed
-		let monthShort = '';
-		let monthLong = '';
-		if (pattern.indexOf('MMMM') !== -1) {
-			monthLong = _getFormatter(locale, { month: 'long' }).format(date);
-		}
-		if (pattern.indexOf('MMM') !== -1 && pattern.indexOf('MMMM') === -1) {
-			monthShort = _getFormatter(locale, { month: 'short' }).format(date);
-		}
+		const tokens = {
+			'yyyy': String(year),
+			'yy':   String(year).slice(-2),
+			'MMMM': _getFormatter(locale, { month: 'long' }).format(date),
+			'MMM':  _getFormatter(locale, { month: 'short' }).format(date),
+			'MM':   String(month + 1).padStart(2, '0'),
+			'M':    String(month + 1),
+			'dd':   String(day).padStart(2, '0'),
+			'd':    String(day),
+			'HH':   String(hours).padStart(2, '0'),
+			'mm':   String(minutes).padStart(2, '0')
+		};
 
-		// Replace tokens (order matters — longest first)
-		let result = pattern;
-		result = result.replace('yyyy', String(year));
-		result = result.replace('yy', String(year).slice(-2));
-		result = result.replace('MMMM', monthLong);
-		result = result.replace('MMM', monthShort);
-		result = result.replace('MM', String(month + 1).padStart(2, '0'));
-		// Single M — must not match MM already replaced
-		result = result.replace(/(?<![M0-9])M(?![M0-9])/, String(month + 1));
-		result = result.replace('dd', String(day).padStart(2, '0'));
-		result = result.replace(/(?<![d0-9])d(?![d0-9])/, String(day));
-		result = result.replace('HH', String(hours).padStart(2, '0'));
-		result = result.replace('mm', String(minutes).padStart(2, '0'));
-
-		return result;
+		return pattern.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d|HH|mm/g, function (m) { return tokens[m]; });
 	}
 
 	// ─── Format Date ──────────────────────────────────────────
@@ -89,12 +74,6 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 			return _getFormatter(locale, intlOptions).format(date);
 		}
 		return _formatCustom(date, format, locale);
-	}
-
-	// ─── Constructor ──────────────────────────────────────────
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 	}
 
 	// ─── Component ────────────────────────────────────────────
@@ -141,22 +120,21 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		this._btn = btn;
 
 		// ── Intercept programmatic value sets on hidden input
-		const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
 		Object.defineProperty(hidden, 'value', {
 			get: function () {
-				return originalDescriptor.get.call(hidden);
+				return _inputValueDesc.get.call(hidden);
 			},
 			set: function (val) {
-				originalDescriptor.set.call(hidden, val);
+				_inputValueDesc.set.call(hidden, val);
 				if (val && val !== '') {
 					const date = _parseISO(val);
 					if (date) {
 						self._displayFormatted(date);
-						originalDescriptor.set.call(picker, val);
+						_inputValueDesc.set.call(picker, val);
 					}
 				} else if (val === '') {
 					self.dom.value = '';
-					originalDescriptor.set.call(picker, '');
+					_inputValueDesc.set.call(picker, '');
 				}
 			}
 		});
@@ -202,7 +180,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 			const date = _parseISO(initialValue);
 			if (date) {
 				this._setHiddenRaw(initialValue);
-				originalDescriptor.set.call(picker, initialValue);
+				_inputValueDesc.set.call(picker, initialValue);
 				this._displayFormatted(date);
 			}
 		}
@@ -248,12 +226,12 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	};
 
 	_component.prototype._setHiddenRaw = function (val) {
-		Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(this._hidden, val);
+		_inputValueDesc.set.call(this._hidden, val);
 	};
 
 	_component.prototype._displayFormatted = function (date) {
 		const format = this.dom.getAttribute(DOM_SELECTOR) || '';
-		const locale = _getLocale(this.dom);
+		const locale = getLocale(this.dom);
 		this.dom.value = _formatDate(date, format, locale);
 	};
 
@@ -261,19 +239,19 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 	Object.defineProperty(_component.prototype, 'value', {
 		get: function () {
-			return Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').get.call(this._hidden);
+			return _inputValueDesc.get.call(this._hidden);
 		},
 		set: function (isoStr) {
 			if (!isoStr || isoStr === '') {
 				this._setHiddenRaw('');
-				Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(this._picker, '');
+				_inputValueDesc.set.call(this._picker, '');
 				this.dom.value = '';
 				return;
 			}
 			const date = _parseISO(isoStr);
 			if (!date) return;
 			this._setHiddenRaw(isoStr);
-			Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(this._picker, isoStr);
+			_inputValueDesc.set.call(this._picker, isoStr);
 			this._displayFormatted(date);
 			dispatch(this.dom, 'ln-date:change', {
 				value: isoStr,
@@ -327,35 +305,6 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── DOM Observer ─────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) {
-								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR]
-			});
-		}, 'ln-date');
-	}
-
 	// ─── Locale Observer ──────────────────────────────────────
 
 	function _localeObserver() {
@@ -373,15 +322,6 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 
 	// ─── Init ─────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-date');
 	_localeObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
 })();
