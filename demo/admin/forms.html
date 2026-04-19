@@ -916,6 +916,42 @@ form.lnForm.reset();</code></pre>
 					</main>
 				</section>
 
+				<!-- ==========================================
+				     NUMBER FORMATTING — ln-number
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Number Formatting — ln-number</h3></header>
+					<main>
+						<p>Real-time locale-aware number formatting. The component creates a hidden input for form submission and formats the visible input with thousand separators.</p>
+
+						<form id="demo-number-form" data-ln-form>
+							<div class="form-element">
+								<label for="demo-amount">Amount (free decimals)</label>
+								<input type="number" id="demo-amount" name="amount" data-ln-number>
+								<output id="demo-amount-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-price">Price (2 decimals)</label>
+								<input type="number" id="demo-price" name="price" data-ln-number data-ln-number-decimals="2">
+								<output id="demo-price-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-budget">Budget (pre-filled)</label>
+								<input type="number" id="demo-budget" name="budget" value="1500000" data-ln-number>
+								<output id="demo-budget-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-qty">Quantity (min: 0, max: 999999)</label>
+								<input type="number" id="demo-qty" name="quantity" data-ln-number data-ln-number-min="0" data-ln-number-max="999999">
+								<output id="demo-qty-raw"></output>
+							</div>
+						</form>
+					</main>
+				</section>
+
 			</div>
 
 			<!-- Footer -->
@@ -992,6 +1028,23 @@ form.lnForm.reset();</code></pre>
 			demoForm.lnForm.reset();
 			window.lnToast.enqueue({ type: 'info', title: 'Reset', message: 'Form cleared via lnForm.reset()' });
 		});
+
+		// ─── ln-number demo — show raw values ────────────
+		document.getElementById('demo-number-form').addEventListener('ln-number:input', function (e) {
+			var input = e.target;
+			var outputId = input.id + '-raw';
+			var output = document.getElementById(outputId);
+			if (output) {
+				output.textContent = 'Raw: ' + e.detail.value;
+			}
+		});
+
+		// Show pre-filled budget raw value
+		var budgetInput = document.getElementById('demo-budget');
+		if (budgetInput && budgetInput.lnNumber) {
+			var budgetRaw = document.getElementById('demo-budget-raw');
+			if (budgetRaw) budgetRaw.textContent = 'Raw: ' + budgetInput.lnNumber.value;
+		}
 	});
 	</script>
 </body>
