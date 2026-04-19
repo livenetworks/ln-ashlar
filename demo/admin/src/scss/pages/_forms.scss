@@ -174,3 +174,13 @@
 	@include rounded-md;
 	min-height: 3rem;
 }
+
+#demo-input-components {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	@include gap(var(--spacing-lg));
+
+	@media (max-width: 767px) {
+		grid-template-columns: 1fr;
+	}
+}
