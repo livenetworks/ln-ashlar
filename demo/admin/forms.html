@@ -952,6 +952,48 @@ form.lnForm.reset();</code></pre>
 					</main>
 				</section>
 
+				<!-- ==========================================
+				     DATE FORMATTING — ln-date
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Date Formatting — ln-date</h3></header>
+					<main>
+						<p>Locale-aware date formatting with native browser picker. The component creates a hidden input for form submission and formats the visible input using Intl.DateTimeFormat or custom patterns.</p>
+
+						<form id="demo-date-form" data-ln-form>
+							<div class="form-element">
+								<label for="demo-birthday">Birthday (default medium)</label>
+								<input type="date" id="demo-birthday" name="birthday" data-ln-date>
+								<output id="demo-birthday-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-due">Due Date (short)</label>
+								<input type="date" id="demo-due" name="due" data-ln-date="short">
+								<output id="demo-due-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-event">Event Date (long)</label>
+								<input type="date" id="demo-event" name="event" data-ln-date="long">
+								<output id="demo-event-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-custom-date">Custom Pattern (dd.MM.yyyy)</label>
+								<input type="date" id="demo-custom-date" name="custom" data-ln-date="dd.MM.yyyy">
+								<output id="demo-custom-date-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-prefilled-date">Pre-filled (medium)</label>
+								<input type="date" id="demo-prefilled-date" name="prefilled" value="2024-03-15" data-ln-date>
+								<output id="demo-prefilled-date-raw"></output>
+							</div>
+						</form>
+					</main>
+				</section>
+
 			</div>
 
 			<!-- Footer -->
@@ -1044,6 +1086,23 @@ form.lnForm.reset();</code></pre>
 		if (budgetInput && budgetInput.lnNumber) {
 			var budgetRaw = document.getElementById('demo-budget-raw');
 			if (budgetRaw) budgetRaw.textContent = 'Raw: ' + budgetInput.lnNumber.value;
+		}
+
+		// ─── ln-date demo — show raw values ──────────────
+		document.getElementById('demo-date-form').addEventListener('ln-date:change', function (e) {
+			var input = e.target;
+			var outputId = input.id + '-raw';
+			var output = document.getElementById(outputId);
+			if (output) {
+				output.textContent = 'ISO: ' + e.detail.value + ' | Formatted: ' + e.detail.formatted;
+			}
+		});
+
+		// Show pre-filled date raw value
+		var prefilledDate = document.getElementById('demo-prefilled-date');
+		if (prefilledDate && prefilledDate.lnDate) {
+			var prefilledRaw = document.getElementById('demo-prefilled-date-raw');
+			if (prefilledRaw) prefilledRaw.textContent = 'ISO: ' + prefilledDate.lnDate.value + ' | Formatted: ' + prefilledDate.lnDate.formatted;
 		}
 	});
 	</script>
