@@ -21,10 +21,16 @@ Four principles drive every decision in this library:
 
 ## Quick Start
 
+ln-acme is a source-only package. Import SCSS and JS directly and let
+your project's bundler compile them.
+
 ### npm
 ```js
-import 'ln-acme';
-import 'ln-acme/dist/ln-acme.css';
+// SCSS
+@use 'ln-acme/scss/ln-acme.scss';
+
+// JS
+import 'ln-acme/js/index.js';
 ```
 
 ### Git submodule
@@ -32,17 +38,17 @@ import 'ln-acme/dist/ln-acme.css';
 git submodule add .../ln-acme.git resources/ln-acme
 ```
 
-### Plain HTML
-```html
-<link rel="stylesheet" href="dist/ln-acme.css">
-<script src="dist/ln-acme.iife.js" defer></script>
+Then `@use 'resources/ln-acme/scss/ln-acme.scss'` and
+`import 'resources/ln-acme/js/index.js'` from the project.
+
+### Build (for the demo site only)
+```bash
+npm run build   # Produces demo/dist/ln-acme.{css,js,iife.js} + compiles demo pages
+npm run dev     # Watch mode (library only)
 ```
 
-### Build
-```bash
-npm run build   # dist/ln-acme.css + dist/ln-acme.js + dist/ln-acme.iife.js
-npm run dev     # Watch mode
-```
+The `demo/dist/` artefact exists for the demo site. Consumers bundle
+from source — don't point projects at it.
 
 ---
 
