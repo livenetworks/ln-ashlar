@@ -59,6 +59,41 @@ import { findElements } from '../ln-core'
 
 You provide the constructor. `findElements` handles discovery and guarding. MutationObserver is set up separately in `_domObserver` — it calls `findElements` on newly added nodes and attribute-changed targets.
 
+### Four Conventions Every Skeleton Encodes
+
+The skeleton above looks small, but it encodes four non-negotiable
+conventions. Every one of the 30+ `ln-*` components follows all four
+— when you read a neighbor component and wonder "why is it shaped
+like this?", the answer is one of these:
+
+- **Paired `DOM_SELECTOR` / `DOM_ATTRIBUTE` constants.** `data-ln-{name}`
+  is the HTML hook; `ln{Name}` is the JS key used for both the window
+  constructor and the per-element instance. They are derived from the
+  same source — `data-ln-modal` ↔ `lnModal` — so a reader can jump from
+  markup to JS without a lookup table.
+
+- **Instance lives on the DOM element, not on `window`.** `window.lnModal`
+  is just the constructor. Each `[data-ln-modal]` element gets its own
+  instance at `el.lnModal`. Multiple instances coexist; there is no
+  global registry.
+
+- **Paired before/after events for every state change.** State-changing
+  prototype methods dispatch `ln-{name}:before-{action}` (cancelable,
+  fires before) and `ln-{name}:{action}` (non-cancelable, fires after).
+  See `## Lifecycle Events` in [js/COMPONENTS.md](../../js/COMPONENTS.md)
+  for the contract.
+
+- **`destroy()` is a contract, not a convenience.** Every component
+  exposes `destroy()` on its instance. It removes pool memberships,
+  disconnects observers, removes `addEventListener` registrations kept
+  as instance refs, and deletes `el[DOM_ATTRIBUTE]`. The checklist at
+  the bottom of this file enumerates what must be cleaned up.
+
+Attribute sync — the MutationObserver hook that translates external
+`setAttribute(...)` calls into internal state — is a separate
+convention covered under `## MutationObserver — Attribute Watching`
+below, because not every component needs it.
+
 ---
 
 ## Zero Display Text — Hard Rule

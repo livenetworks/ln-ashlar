@@ -6,6 +6,38 @@ File: `scss/components/_form.scss`.
 
 All `input`, `textarea`, `select` are styled globally with border, rounded-md, focus ring. Full width by default.
 
+## Icon Groups
+
+A `<label>` wrapping one or more `<svg class="ln-icon">` plus an
+`<input>` — the icon(s) sit inline with the field (search magnifier,
+clear button, leading or trailing affordances). The `<label>` becomes
+the visual container; the nested `<input>` strips its own chrome so the
+wrapper owns border, padding, and focus ring.
+
+```html
+<label>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+    <input type="search" placeholder="Search…">
+</label>
+```
+
+Applied via `@include form-input-icon-group` on a semantic selector — no
+class needed on the `<label>`.
+
+### Vertical rhythm decision
+
+Icon-group inputs use a tighter line-height than a standalone
+`form-input`. This is deliberate: `form-input` inherits the body leading
+tuned for prose readability, which leaves visible leading above and
+below the glyph inside a single-line control and makes the icon-group
+feel airy once combined with the wrapper's padding. Icon groups are
+inline composition, not prose — they are tuned for density.
+
+The trade-off: icon groups look compact and sit closer to the
+surrounding label/value rhythm; standalone inputs stay comfortable for
+long-form typing. Concrete values live in the mixin at
+`scss/config/mixins/_form.scss`.
+
 ## Focus Indicators
 
 The default focus style is `@include focus-ring` — a soft outer glow applied automatically in `_global.scss`. No action needed for standard forms.
@@ -105,6 +137,39 @@ Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on f
 // Color per context
 #role-field { --color-primary: var(--color-secondary); }
 ```
+
+## Check List (Vertical)
+
+The vertical sibling of pill groups. Same `<ul> > <li> > <label> > <input>`
+markup, but stacked instead of joined horizontally — each label stands
+on its own row. Use for filter panels, settings lists, or any
+multi-select that reads top-to-bottom rather than as a horizontal
+segmented control.
+
+```html
+<ul>
+  <li><label><input type="checkbox" name="dept" value="sales"> Sales</label></li>
+  <li><label><input type="checkbox" name="dept" value="eng"> Engineering</label></li>
+  <li><label><input type="checkbox" name="dept" value="support"> Support</label></li>
+</ul>
+```
+
+### Two styles
+
+| Style | Mixin | Description |
+|-------|-------|-------------|
+| **Filled** | `@include check-list` | Gray bg, colored bg on checked, input hidden |
+| **Outline** | `@include check-list-outline` | Bordered, visible input indicator |
+
+```scss
+// Project SCSS — apply on the <ul>
+#dept-filter { @include check-list-outline; }
+```
+
+`check-list` extends `check-list-outline` with filled backgrounds, in
+the same layered way `pill` extends `pill-outline`. Color overrides and
+input-visibility rules match the pill variants — the only difference is
+layout direction.
 
 ## Buttons
 

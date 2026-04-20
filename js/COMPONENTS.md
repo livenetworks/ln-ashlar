@@ -989,13 +989,102 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-table-sort | Instance | `data-ln-sort` | Sort header handler (companion to ln-table) |
 | ln-sortable | Instance | `data-ln-sortable` | Drag & drop reorder |
 | ln-dropdown | Instance | `data-ln-dropdown` | Positioned dropdown menu (wraps ln-toggle) |
+| ln-popover | Instance | `data-ln-popover` | Rich popover with viewport-aware positioning and ESC-stack management |
 | ln-link | Instance | `data-ln-link` | Clickable rows/containers |
 | ln-confirm | Instance | `data-ln-confirm` | Two-click confirmation for destructive actions |
 | ln-autosave | Instance | `data-ln-autosave` | Auto-save form to localStorage on blur/change |
 | ln-autoresize | Instance | `data-ln-autoresize` | Auto-resize textarea height |
+| ln-date | Instance | `data-ln-date` | Locale-aware date formatter with native picker and typing support |
+| ln-number | Instance | `data-ln-number` | Locale-aware number formatter (decimal, currency, percent) |
+| ln-time | Instance | `data-ln-time` | Relative and absolute time formatter, auto-updates on shared 60s tick |
 | ln-translations | Instance | `data-ln-translations` | Multi-language form field management |
 | ln-external-links | Utility | — | External links handler |
 | ln-http | Global service | — | Event-driven JSON fetch with abort support |
+
+---
+
+## Component Relationships
+
+Components do not import each other. Every relationship below is
+through one of two channels:
+
+- **Events** — one component dispatches `ln-{a}:{action}`, another
+  listens for it (`ln-accordion` listens to `ln-toggle:open`).
+- **Shared DOM state** — one component sets a `data-ln-*` attribute,
+  another's MutationObserver reacts (ln-accordion setting
+  `data-ln-toggle="close"` on sibling toggles).
+
+No component ever does `import '../ln-toggle'` or calls
+`otherEl.lnToggle.open()`. If you catch yourself reaching for an import,
+re-read the Mediator section above.
+
+### ln-toggle — the state primitive
+
+`ln-toggle` is the only open/close state primitive. Components that
+need the "coordinator collapses siblings" pattern build on it:
+
+```
+ln-toggle  (state: data-ln-toggle attribute, ln-toggle:open/close events)
+  ├── ln-accordion   coordinator — listens to ln-toggle:open on children,
+  │                  sets data-ln-toggle="close" on siblings
+  └── ln-dropdown    wraps a child [data-ln-toggle] and adds viewport-aware
+                     positioning on ln-toggle:open
+```
+
+`ln-modal`, `ln-popover`, and `ln-tabs` are **not** built on `ln-toggle`.
+They each own an independent open/close state machine backed by their
+own attribute (`data-ln-modal`, `data-ln-popover`, `data-ln-tabs-active`).
+The "attribute is the single source of truth" pattern is shared; the
+specific attribute is not.
+
+### Form family — ln-form coordinates siblings
+
+```
+ln-form  (catches submit, reads ln-validate events)
+  ├── ln-validate   dispatches ln-validate:valid / ln-validate:invalid,
+  │                 which ln-form listens for
+  ├── ln-autosave   stores form state in localStorage; writes on blur/change
+  │                 independently of ln-form
+  └── ln-select     TomSelect wrapper; ln-form triggers input events so
+                    ln-validate picks up TomSelect changes
+```
+
+ln-form never calls `lnValidate.isValid()` or reads TomSelect state
+directly. It listens to the validation events and lets each sibling
+manage its own internals.
+
+### Data family — ln-data-table ↔ ln-store through the coordinator
+
+```
+ln-data-table                              ln-store
+      │                                        │
+      │  ln-data-table:request-data  ─────────▶│
+      │  (sort, filters, search)               │  (reads IndexedDB)
+      │                                        │
+      │◀───────  ln-data-table:set-data        │
+      │          (rows + totals)               │
+      │                                        │
+      │◀───────  ln-store:synced               │
+      │          (coordinator re-queries)      │
+                       ▲
+                       │
+                project coordinator
+```
+
+`ln-data-table` never imports or queries `ln-store`. It emits a request
+event; the project coordinator catches it, calls `storeEl.lnStore.getAll(...)`,
+and dispatches `ln-data-table:set-data` back. See
+[docs/js/component-guide.md](../docs/js/component-guide.md#data-flow-with-ln-store)
+for the full handshake.
+
+### Rule
+
+> **Relationships are through events, never imports.**
+
+If two components need to know about each other's state, introduce a
+coordinator between them. Components stay storage-agnostic and
+sibling-agnostic; the coordinator is the only piece that knows the
+whole stack.
 
 ---
 

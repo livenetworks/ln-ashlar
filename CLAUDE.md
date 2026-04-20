@@ -84,6 +84,8 @@ npm run build        # Produce dist/
 npm run dev          # Watch mode
 ```
 
+`npm run build` produces the library bundle via Vite, then compiles the demo pages (index, admin, docuflow). `npm run dev` watches the library only; demos are rebuilt on the next full build.
+
 Output:
 - `dist/ln-acme.css` — everything included
 - `dist/ln-acme.js` — ES module
@@ -128,24 +130,11 @@ In production, projects use semantic selectors instead.
 
 ### Global `<button>` — Structure + Neutral (Out of the Box)
 
-Every `<button>` gets **full structure + neutral colors** from `scss/base/_global.scss`:
-
-- Structure: inline-flex, centered, `px(1.25rem) py(0.625rem)`, text-sm, font-medium, rounded-md
-- Default: transparent background, muted text color
-- Hover: light gray background (`bg-secondary`), primary text
-- Active: border-color background
-- Focus-visible: focus ring
-- Disabled: 50% opacity
-
-Cancel, close, toggle, icon buttons all look usable **without any class or mixin**.
+Every `<button>` gets full structure and neutral colors from `scss/base/_global.scss` — inline-flex layout, consistent padding, hover and focus states. Cancel, close, toggle, and icon buttons all look usable **without any class or mixin**. See `scss/base/_global.scss` for the implementation and `@mixin btn` in `scss/config/mixins/_btn.scss` for the reusable structure recipe.
 
 ### `<button type="submit">` — Color Only (Structure Inherited)
 
-Submit buttons automatically get primary color on top of the global structure:
-
-- Background: solid `hsl(var(--color-primary))`, white text
-- Hover: `hsl(var(--color-primary-hover))` — color change only, no transform
-- Active: same primary-hover color
+Submit buttons automatically get primary color on top of the global structure — color change only, no transform. No class needed.
 
 ```html
 <!-- Cancel: neutral from global (no class needed) -->
@@ -171,14 +160,11 @@ For non-submit action buttons that need primary styling. Includes full structure
 
 ### Size Variants
 
-```scss
-#compact-action { @include btn; @include btn-sm; }
-#hero-cta       { @include btn; @include btn-lg; }
-```
+Size variants available via `btn-sm` and `btn-lg` mixins (see `scss/config/mixins/_btn.scss`).
 
 ### Icon / Close Buttons
 
-`@include close-button` resets padding to 0 and sets a fixed 2rem size — overrides the global structure padding. Use for any icon-only button.
+`@include close-button` is a fixed size override for icon-only buttons — resets padding to 0 and uses a square size. Use for any icon-only button.
 
 ### Rules
 
@@ -216,7 +202,8 @@ For non-submit action buttons that need primary styling. Includes full structure
 - **Non-submit buttons** need `type="button"` (close, cancel) to prevent form submission
 - **No `.ln-modal__content` class** — select semantically: `.ln-modal > form`
 - **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes
-- Available: `modal-sm` (28rem), `modal-md` (32rem), `modal-lg` (42rem), `modal-xl` (48rem)
+- Size variants: `modal-sm`, `modal-md`, `modal-lg`, `modal-xl` — see `scss/config/mixins/_modal.scss` for values.
+- **Entry animation** — modal panel slides in on open via the `ln-modal-slideIn` keyframe, gated through `motion-safe` so reduced-motion users see an instant state change. Keyframe and duration live in `scss/components/_modal.scss` and `scss/config/mixins/_modal.scss`.
 - **API** — `modal.lnModal.open()` / `.close()` just set the attribute, observer applies state
 - **Direct attribute** — `modal.setAttribute('data-ln-modal', 'open')` — identical result
 - **ESC listener** active only while modal is open (zero listeners when all closed)
@@ -429,6 +416,3 @@ See [docs/js/core.md](docs/js/core.md) for the reactive rendering layer: ln-core
 
 ---
 
-## Known Backlog
-
-- **ln-select** — depends on TomSelect (peer dependency)

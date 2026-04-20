@@ -4,15 +4,21 @@ Shared helper module imported by all components. File: `js/ln-core/`.
 
 No DOM attribute, no constructor, no MutationObserver. Pure utility functions re-exported from `js/ln-core/index.js`.
 
-## Exports
+## Helpers
 
-```js
-import {
-    cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable,
-    fill, fillTemplate, renderList, buildDict, guardBody, findElements,
-    reactiveState, deepReactive, createBatcher
-} from '../ln-core';
-```
+ln-core exposes helpers in these categories:
+
+- **Templates** — clone and populate `<template>` fragments
+- **Events** — dispatch standard and cancelable CustomEvents
+- **DOM binding** — declarative data-attribute-driven rendering (`fill`, `renderList`, `fillTemplate`)
+- **Forms** — serialize/populate by field `name`
+- **Dictionaries** — extract i18n strings from hidden elements
+- **Discovery** — `registerComponent` for MutationObserver-backed auto-init
+- **Reactivity** — `reactiveState`, `deepReactive`, `createBatcher`
+- **Layout** — viewport-aware positioning, teleport, measurement
+- **Persistence** — localStorage wrappers with `ln:` prefix
+
+Source of truth: `js/ln-core/helpers.js` and `js/ln-core/reactive.js`. Import from `'../ln-core'` (barrel).
 
 ---
 
@@ -224,6 +230,39 @@ const batchRender = createBatcher(
 - Multiple calls to `schedule()` within the same microtask result in one `renderFn` call
 - Optional `afterRender` callback fires after each render
 - Pattern: `deepReactive(state, batchRender)` — every state mutation schedules a batched render
+
+---
+
+## Reactive Rendering Pattern
+
+The three reactive primitives (`reactiveState` / `deepReactive` +
+`createBatcher` + `fill`) are designed to be used together. They are
+the canonical ln-acme render loop:
+
+1. **State mutation.** Component code assigns to a property on a
+   reactive proxy (`this.state.value = 'x'`). The proxy fires its
+   onChange callback.
+2. **Microtask queue.** The onChange is wired to a `createBatcher`
+   schedule function. Any number of synchronous assignments in the
+   same sync block schedule a single microtask.
+3. **One render.** When the microtask fires, the batcher calls
+   `renderFn` exactly once. `renderFn` typically calls `fill(this.dom,
+   this.state)` (or `renderList` for keyed collections) to project
+   state into the DOM, then the optional `afterRender` callback fires
+   (commonly used to dispatch a `ln-{component}:rendered` event).
+
+Two assignments on the same tick produce one DOM update. External
+callers that need to set several properties at once do not need a
+`batch()` helper — the batcher handles it.
+
+The pattern is: **state mutation → microtask queue → one render**.
+Never wire a reactive onChange directly to `_render()` without a
+batcher between them — you will get one render per assignment, and
+the DOM will thrash.
+
+For the full decision matrix (`reactiveState` vs `deepReactive`, when
+to use this pattern at all, anti-patterns), see
+[Reactive Rendering Pattern in js/COMPONENTS.md](../../js/COMPONENTS.md#reactive-rendering-pattern).
 
 ---
 

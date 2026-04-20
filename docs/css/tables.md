@@ -151,6 +151,31 @@ For project-level control of the stacked breakpoint:
 
 ---
 
+## Container-aware, not viewport-aware
+
+The stacked layout is triggered by a **container query**, not a media
+query. `.table-container` declares a container context; the `<table>`
+inside queries its own available width and switches to the responsive
+stacked layout when the container — not the viewport — is narrow
+enough.
+
+This is a deliberate architectural choice that applies to all ln-acme
+components: **a component adapts to the space it was given, not to the
+size of the browser window.** The same table dropped into a wide page
+main, a narrow modal, or a sidebar panel behaves correctly in each
+context with zero consuming-project overrides.
+
+Media queries are reserved for the app shell (header, sidebar, page
+columns). See `breakpoints.md` for the `@media` vs `@container` split
+and `ln-acme-container-queries.md` for the full rationale.
+
+The table's specific threshold (above which it is tabular, below which
+it stacks) is defined in `scss/components/_table.scss`. Projects
+override by applying `@include table-responsive` inside their own
+`@container` rule on a scoped selector — see the example above.
+
+---
+
 ## section-card integration
 
 When `main` contains a `<table>` (or `.table-container`) **as its only child**, `.section-card` auto-flushes padding to `0` and strips the table's own `border-radius`, `box-shadow`, and `margin-bottom`. The card's `overflow: hidden` handles the rounded corners. No extra classes needed.
