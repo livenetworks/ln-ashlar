@@ -4,7 +4,7 @@ import { resolve } from 'path';
 export default defineConfig({
 	plugins: [],
 	build: {
-		outDir: 'dist',
+		outDir: 'demo/dist',
 		emptyOutDir: true,
 		lib: {
 			entry: resolve(__dirname, 'js/index.js'),

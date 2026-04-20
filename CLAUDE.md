@@ -80,25 +80,35 @@ js/
 ## Build
 
 ```bash
-npm run build        # Produce dist/
-npm run dev          # Watch mode
+npm run build        # Build library into demo/dist/ + compile demo pages
+npm run dev          # Watch mode (library only)
 ```
 
-`npm run build` produces the library bundle via Vite, then compiles the demo pages (index, admin, docuflow). `npm run dev` watches the library only; demos are rebuilt on the next full build.
+`npm run build` bundles the library into `demo/dist/` via Vite, then
+compiles the demo pages (index, admin, docuflow). `npm run dev`
+watches the library only; demos are rebuilt on the next full build.
 
-Output:
-- `dist/ln-acme.css` — everything included
-- `dist/ln-acme.js` — ES module
-- `dist/ln-acme.iife.js` — for `<script>` tag
+Output (demo-only — not a public consumption path):
+- `demo/dist/ln-acme.css` — everything included
+- `demo/dist/ln-acme.js` — ES module
+- `demo/dist/ln-acme.iife.js` — for `<script>` tag
 
 ---
 
 ## Project Integration
 
+ln-acme is a **source-only** package. Consumers import SCSS and JS
+source files directly and run their own bundler (Vite, Webpack, etc).
+The `demo/dist/` artefact exists for the demo site only — do not point
+projects at it.
+
 ### npm
 ```js
-import 'ln-acme';                        // JS
-import 'ln-acme/dist/ln-acme.css';       // CSS
+// SCSS — import from source
+@use 'ln-acme/scss/ln-acme.scss';
+
+// JS — import from source
+import 'ln-acme/js/index.js';
 ```
 
 ### Git submodule
@@ -106,11 +116,8 @@ import 'ln-acme/dist/ln-acme.css';       // CSS
 git submodule add .../ln-acme.git resources/ln-acme
 ```
 
-### Plain HTML
-```html
-<link rel="stylesheet" href="dist/ln-acme.css">
-<script src="dist/ln-acme.iife.js"></script>
-```
+Then `@use 'resources/ln-acme/scss/ln-acme.scss'` and
+`import 'resources/ln-acme/js/index.js'` from the project.
 
 ---
 
