@@ -5,8 +5,8 @@
 	@include flex-col;
 	@include items-center;
 	@include justify-center;
-	@include gap(1rem);
-	@include p(2rem);
+	@include gap(var(--spacing-md));
+	@include p(var(--spacing-xl));
 	text-align: center;
 	max-width: 28rem;
 	margin-inline: auto;
@@ -21,6 +21,6 @@
 
 	button,
 	a {
-		margin-top: 0.5rem;
+		margin-top: var(--spacing-sm);
 	}
 }

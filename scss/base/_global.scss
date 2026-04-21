@@ -42,26 +42,28 @@ input[type="button"] {
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	@include gap(0.5rem);
-	@include px(1.25rem);
-	@include py(0.5rem);
+	@include gap(var(--spacing-sm));
+	@include px(var(--spacing-md-up));
+	@include py(var(--spacing-sm));
 	@include text-sm;
 	@include font-medium;
 	@include rounded-md;
 	white-space: nowrap;
-	border: none;
+	border: var(--border-width) solid hsl(var(--color-neutral-300));
 	outline: none;
-	background: transparent;
-	color: hsl(var(--color-text-secondary));
+	background: hsl(var(--color-bg-primary));
+	color: hsl(var(--color-text-primary));
 	@include transition-colors;
 
 	&:hover:not(:disabled) {
 		background: hsl(var(--color-bg-secondary));
 		color: hsl(var(--color-text-primary));
+		border-color: hsl(var(--color-neutral-400));
 	}
 
 	&:active:not(:disabled) {
 		background: hsl(var(--color-border));
+		border-color: hsl(var(--color-neutral-400));
 	}
 
 	&:focus-visible {
@@ -81,15 +83,18 @@ button[type="submit"],
 input[type="submit"] {
 	background: hsl(var(--color-primary));
 	color: hsl(var(--color-white));
+	border-color: hsl(var(--color-primary));
 
 	&:hover:not(:disabled) {
 		background: hsl(var(--color-primary-hover));
 		color: hsl(var(--color-white));
+		border-color: hsl(var(--color-primary-hover));
 	}
 
 	&:active:not(:disabled) {
 		background: hsl(var(--color-primary-hover));
 		color: hsl(var(--color-white));
+		border-color: hsl(var(--color-primary-hover));
 	}
 }
 

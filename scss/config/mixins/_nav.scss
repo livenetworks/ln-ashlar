@@ -35,8 +35,8 @@
 	a {
 		@include flex;
 		@include items-center;
-		@include gap(0.75rem);
-		@include py(0.625rem);
+		@include gap(var(--spacing-sm-up));
+		@include py(var(--spacing-sm-up));
 		font-size: var(--text-body-sm);
 		line-height: var(--lh-body-sm);
 		@include text-secondary;
@@ -54,18 +54,18 @@
 	}
 
 	.nav-section {
-		@include py(0.5rem);
+		@include py(var(--spacing-sm));
 		@include text-xs;
 		@include font-medium;
 		@include text-muted;
 		@include normal-case;
 		letter-spacing: normal;
-		@include mt(1rem);
+		@include mt(var(--spacing-md));
 	}
 
 	.nav-divider {
 		@include border-t;
-		@include my(0.5rem);
+		@include my(var(--spacing-sm));
 	}
 
 	// Default link style — override by applying a nav-links-* mixin after @include nav
@@ -114,11 +114,11 @@
 	// share edges. Using `li + li` avoids a top margin above the first item and
 	// sidesteps margin-collapse because only one side contributes.
 	li + li {
-		@include mt(0.125rem);
+		@include mt(var(--spacing-2xs));
 	}
 
 	a {
-		@include px(0.75rem);
+		@include px(var(--spacing-sm-up));
 		@include rounded-md;
 		transition: background-color 150ms ease, color 150ms ease;
 
@@ -146,7 +146,7 @@
 
 	a {
 		@include mx(0);
-		@include px(1rem);
+		@include px(var(--spacing-md));
 		border-radius: 0;
 		transition: box-shadow 150ms ease, background-color 150ms ease, color 150ms ease;
 
@@ -203,7 +203,7 @@
 
 	a {
 		@include mx(0);
-		@include px(1rem);
+		@include px(var(--spacing-md));
 		border-radius: 0;
 		transition: background-color 150ms ease, color 150ms ease;
 
@@ -261,7 +261,7 @@
 
 	a {
 		@include mx(0);
-		@include px(0.75rem);
+		@include px(var(--spacing-sm-up));
 		border-radius: 0;
 		transition: color 150ms ease;
 	}

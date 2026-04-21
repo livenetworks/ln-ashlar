@@ -85,7 +85,7 @@
 
 	tbody tr {
 		@include block;
-		@include mb(1rem);
+		@include mb(var(--spacing-md));
 		@include border;
 		@include rounded-md;
 		@include overflow-hidden;
@@ -94,8 +94,8 @@
 	td {
 		@include block;
 		@include text-right;
-		@include px(1rem);
-		@include py(0.75rem);
+		@include px(var(--spacing-md));
+		@include py(var(--spacing-sm-up));
 		@include border-b;
 		@include relative;
 		padding-left: 50%;
@@ -109,8 +109,8 @@
 			@include absolute;
 			top: 0;
 			bottom: 0;
-			left: 1rem;
-			width: calc(50% - 1.5rem);
+			left: var(--spacing-md);
+			width: calc(50% - var(--spacing-lg));
 			@include flex;
 			@include items-center;
 			@include text-left;
@@ -118,9 +118,7 @@
 			@include text-secondary;
 			@include text-xs;
 			@include uppercase;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+			@include truncate;
 		}
 	}
 }
@@ -149,8 +147,8 @@
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	@include px(0.5rem);
-	@include py(0.25rem);
+	@include px(var(--spacing-sm));
+	@include py(var(--spacing-xs));
 	@include text-sm;
 	@include transition-colors;
 
@@ -173,7 +171,7 @@
 		@include inline-flex;
 		@include items-center;
 		float: right;
-		padding: 0.125rem;
+		padding: var(--spacing-2xs);
 		@include rounded-sm;
 		opacity: 0.5;
 

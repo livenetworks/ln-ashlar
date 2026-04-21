@@ -5,29 +5,35 @@
 @use 'spacing' as *;
 @use 'motion' as *;
 
+// Shared dark-bubble chrome for ::after pseudo-tooltips (tooltip, confirm)
+// and JS-portal tooltip-element. Semantic token pair — in dark mode the
+// neutral scale inversion naturally flips the bubble to light-on-dark.
+@mixin tooltip-bubble {
+	@include px(var(--spacing-sm));
+	@include py(var(--spacing-xs));
+	background: hsl(var(--color-text-primary));
+	color: hsl(var(--color-bg-primary));
+	@include typography(caption);
+	@include rounded-sm;
+	white-space: nowrap;
+	pointer-events: none;
+	z-index: var(--z-dropdown);
+	box-shadow: var(--shadow-md);
+}
+
 @mixin tooltip {
 	position: relative;
 
 	&::after {
+		@include tooltip-bubble;
 		content: attr(data-ln-tooltip);
 		position: absolute;
-		@include px(0.5rem);
-		@include py(0.25rem);
-		// Direct neutral: always-dark tooltip -- intentionally opaque regardless of theme surface
-		background: hsl(var(--color-neutral-900));
-		color: hsl(var(--color-neutral-50));
-		@include typography(caption);
-		@include rounded-sm;
-		white-space: nowrap;
-		pointer-events: none;
 		opacity: 0;
-		z-index: var(--z-dropdown);
-		box-shadow: var(--shadow-md);
 
 		// Default placement: top, centered above the trigger.
 		// Position overrides below reset `bottom` / `left` to `auto` so
 		// the pseudo-element is not stretched between two coordinates.
-		bottom: calc(100% + 0.375rem);
+		bottom: calc(100% + var(--spacing-xs-up));
 		left: 50%;
 		transform: translateX(-50%);
 
@@ -52,7 +58,7 @@
 	// top placement or the pseudo-element stretches vertically.
 	&[data-ln-tooltip-position="bottom"]::after {
 		bottom: auto;
-		top: calc(100% + 0.375rem);
+		top: calc(100% + var(--spacing-xs-up));
 	}
 
 	// Left — reset `bottom` + `left` from the default, position to the left
@@ -60,7 +66,7 @@
 	&[data-ln-tooltip-position="left"]::after {
 		bottom: auto;
 		left: auto;
-		right: calc(100% + 0.375rem);
+		right: calc(100% + var(--spacing-xs-up));
 		top: 50%;
 		transform: translateY(-50%);
 	}
@@ -69,7 +75,7 @@
 	// edge, vertical-center via top + translateY.
 	&[data-ln-tooltip-position="right"]::after {
 		bottom: auto;
-		left: calc(100% + 0.375rem);
+		left: calc(100% + var(--spacing-xs-up));
 		top: 50%;
 		transform: translateY(-50%);
 	}
@@ -88,17 +94,9 @@
 }
 
 @mixin tooltip-element {
+	@include tooltip-bubble;
 	position: fixed;
-	@include px(0.5rem);
-	@include py(0.25rem);
-	background: hsl(var(--color-neutral-900));
-	color: hsl(var(--color-neutral-50));
-	@include typography(caption);
-	@include rounded-sm;
-	white-space: nowrap;
-	box-shadow: var(--shadow-md);
 	max-width: 20rem;
-	pointer-events: none;
 
 	@include motion-safe {
 		animation: ln-tooltip-fade var(--transition-fast);

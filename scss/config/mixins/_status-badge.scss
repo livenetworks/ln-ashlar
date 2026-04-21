@@ -1,3 +1,4 @@
+@use 'colors' as *;
 @use 'motion' as *;
 
 // Status Badge — inline semantic indicator with colored dot
@@ -25,8 +26,7 @@
 	padding: 0.2em 0.65em;
 	font-size: var(--text-xs);
 	font-weight: var(--font-medium);
-	background: hsl(var(--color-primary) / 0.12);
-	color: hsl(var(--color-primary));
+	@include tinted-surface(0.12);
 	line-height: 1.5;
 
 	// Colored dot

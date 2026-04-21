@@ -15,7 +15,7 @@
 		position: absolute;
 		top: calc(var(--lh-caption) * var(--text-caption) / 2);
 		bottom: calc(var(--lh-caption) * var(--text-caption) / 2);
-		left: calc(0.5rem - 1px);
+		left: calc(var(--spacing-sm) - var(--border-width));
 		width: 2px;
 		// Direct neutral: rail intentionally heavier than --color-border (neutral-200 vs alias)
 		background: hsl(var(--color-neutral-200));
@@ -23,8 +23,8 @@
 
 	> li {
 		position: relative;
-		padding-left: 2rem;
-		padding-bottom: 1.5rem;
+		padding-left: var(--spacing-xl);
+		padding-bottom: var(--spacing-lg);
 
 		&:last-child {
 			padding-bottom: 0;
@@ -36,8 +36,8 @@
 		&::before {
 			content: '';
 			position: absolute;
-			top: calc((var(--lh-caption) * var(--text-caption) - 0.75rem) / 2);
-			left: 0.125rem;
+			top: calc((var(--lh-caption) * var(--text-caption) - var(--spacing-sm-up)) / 2);
+			left: var(--spacing-2xs);
 			width: 0.75rem;
 			height: 0.75rem;
 			border-radius: 50%;
@@ -49,7 +49,7 @@
 			display: block;
 			@include typography(caption);
 			color: hsl(var(--color-text-muted));
-			@include mb(0.25rem);
+			@include mb(var(--spacing-xs));
 		}
 
 		> h4 {
@@ -61,7 +61,7 @@
 		> p {
 			@include typography(body-sm);
 			color: hsl(var(--color-text-secondary));
-			margin: 0.25rem 0 0;
+			margin: var(--spacing-xs) 0 0;
 		}
 	}
 }

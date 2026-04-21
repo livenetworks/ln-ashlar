@@ -365,6 +365,49 @@ Projects can override at any level:
 
 ---
 
+## Spacing Tokens — Single Source of Truth
+
+All spacing values (padding, margin, gap, inset, positional offsets
+used for layout) reference `--spacing-*` CSS variables defined in
+`scss/config/_tokens.scss`. No raw `rem` / `px` literals in spacing
+contexts. No per-component token families (no `--btn-py`, `--card-gap`,
+no private mixin-scoped `--_*`).
+
+**Why.** Change one token, every consumer reacts. Raw literals are
+silent divergence — updating `--spacing-md` does not cascade into
+`1rem` written directly into a mixin. Per-component tokens
+(`--btn-py`, `--modal-pad`) defeat the same purpose in reverse:
+touching one component forces touching its private tokens, not the
+scale.
+
+**When you need a new value — extend, don't silo.** Extend
+`--spacing-*`. Never create a component-scoped token. Use the t-shirt
+naming convention with `-up` / `-down` suffixes for intermediate steps:
+
+`2xs < xs < xs-up < sm < sm-up < md-down < md < md-up < lg < lg-up < xl < 2xl < 3xl < 4xl < 5xl`.
+
+**Monotonic ordering in compact mode.** Every addition to `--spacing-*`
+MUST be mirrored in `scss/config/_density.scss` under `.density-compact`
+with a value that preserves ascending order across the whole scale. A
+compact value that inverts ordering (e.g. `md-up=20` while `lg=16`)
+breaks any component that uses both.
+
+**Exceptions (allowed literals).**
+
+- `0` as unitless zero.
+- `1px` / `2px` borders go through `--border-width` /
+  `--border-width-strong`.
+- Intrinsic values: `100%`, `100vh`, `auto`, fractions (`1fr`, `50%`),
+  `9999px` for full radius.
+- Genuinely component-intrinsic dimensions — icon sizes, avatar sizes,
+  toggle-switch geometry, stepper-node, timeline-bullet, modal
+  max-widths, toast widths, popover/dropdown/tooltip min-/max-widths,
+  loader width/height. These are component design, not spacing rhythm.
+- Font sizes / line heights / letter spacing use their own scales
+  (`--text-*`, `--lh-*`, `--tracking-*`).
+
+---
+
 ## Icons
 
 Icons use SVG sprite injection — `ln-icons.js` fetches icons on demand from Tabler CDN (pinned to `@3.31.0`),

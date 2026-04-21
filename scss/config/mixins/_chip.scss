@@ -8,9 +8,9 @@
 @mixin chip {
 	@include inline-flex;
 	@include items-center;
-	@include gap(0.25rem);
-	@include px(0.625rem);
-	@include py(0.25rem);
+	@include gap(var(--spacing-xs));
+	@include px(var(--spacing-sm-up));
+	@include py(var(--spacing-xs));
 	@include typography(label-sm);
 	// Direct neutral: --color-bg-secondary (neutral-50) is too light for chip fill
 	background: hsl(var(--color-neutral-100));
@@ -22,9 +22,7 @@
 	> button {
 		all: unset;
 		cursor: pointer;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
+		@include inline-flex-center;
 		width: 1rem;
 		height: 1rem;
 		border-radius: 50%;

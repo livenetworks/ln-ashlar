@@ -18,44 +18,44 @@ h6 {
 h1 {
 	@include typography(display-sm);
 	@include tracking-tight;
-	@include mb(1rem);
+	@include mb(var(--spacing-md));
 }
 
 h2 {
 	@include typography(heading-md);
 	@include tracking-tight;
-	@include mb(1rem);
+	@include mb(var(--spacing-md));
 }
 
 h3 {
 	@include typography(heading-sm);
 	@include font-semibold;
-	@include mb(0.75rem);
+	@include mb(var(--spacing-sm-up));
 }
 
 h4 {
 	@include typography(title-md);
 	@include font-semibold;
-	@include mb(0.5rem);
+	@include mb(var(--spacing-sm));
 }
 
 h5 {
 	@include typography(title-sm);
 	@include font-semibold;
-	@include mb(0.5rem);
+	@include mb(var(--spacing-sm));
 }
 
 h6 {
 	@include typography(label-md);
 	@include font-semibold;
-	@include mb(0.25rem);
+	@include mb(var(--spacing-xs));
 }
 
 p {
 	font-size: var(--text-body-md);
 	@include text-primary;
 	line-height: 1.75;
-	@include mb(1rem);
+	@include mb(var(--spacing-md));
 
 	&:last-child {
 		margin-bottom: 0;
@@ -81,8 +81,8 @@ code {
 	@include font-mono;
 	@include text-sm;
 	background-color: hsl(var(--color-bg-body));
-	@include px(0.25rem);
-	@include py(0.125rem);
+	@include px(var(--spacing-xs));
+	@include py(var(--spacing-2xs));
 	@include rounded-sm;
 }
 
@@ -90,11 +90,11 @@ pre {
 	@include font-mono;
 	@include text-sm;
 	background-color: hsl(var(--color-bg-body));
-	@include p(1rem);
+	@include p(var(--spacing-md));
 	@include rounded-md;
 	@include border;
 	@include overflow-x-auto;
-	@include mb(1rem);
+	@include mb(var(--spacing-md));
 
 	code {
 		background: none;
@@ -103,7 +103,7 @@ pre {
 }
 
 table {
-	@include mb(1rem);
+	@include mb(var(--spacing-md));
 }
 
 kbd {
@@ -113,17 +113,17 @@ kbd {
 blockquote {
 	border-left: 3px solid hsl(var(--color-primary));
 	background-color: hsl(var(--color-bg-secondary));
-	@include p(1rem);
+	@include p(var(--spacing-md));
 	@include rounded-sm;
-	@include mb(1rem);
+	@include mb(var(--spacing-md));
 	@include text-secondary;
 	font-style: italic;
 }
 
 ul,
 ol {
-	@include pl(1.5rem);
-	@include mb(1rem);
+	@include pl(var(--spacing-lg));
+	@include mb(var(--spacing-md));
 }
 
 ul {
@@ -135,6 +135,6 @@ ol {
 }
 
 li {
-	@include mb(0.25rem);
+	@include mb(var(--spacing-xs));
 	line-height: 1.75;
 }

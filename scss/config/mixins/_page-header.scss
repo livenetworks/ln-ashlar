@@ -11,9 +11,9 @@
 		'breadcrumbs'
 		'title'
 		'actions';
-	@include gap(1rem);
-	@include pb(1.5rem);
-	@include mb(1.5rem);
+	@include gap(var(--spacing-md));
+	@include pb(var(--spacing-lg));
+	@include mb(var(--spacing-lg));
 	border-bottom: 1px solid hsl(var(--color-border));
 
 	@media (min-width: 880px) {
@@ -43,7 +43,7 @@
 		p {
 			@include typography(body-md);
 			color: hsl(var(--color-text-secondary));
-			margin: 0.25rem 0 0;
+			margin: var(--spacing-xs) 0 0;
 		}
 	}
 
@@ -51,7 +51,7 @@
 	> div:has(> a) {
 		grid-area: actions;
 		@include flex-row;
-		@include gap(0.5rem);
+		@include gap(var(--spacing-sm));
 
 		@media (max-width: 879px) {
 			justify-content: flex-start;

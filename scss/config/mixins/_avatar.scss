@@ -35,8 +35,8 @@
 @mixin avatar {
 	@include inline-flex;
 	@include items-center;
-	@include gap(0.625rem);
-	@include p(0.375rem);
+	@include gap(var(--spacing-sm-up));
+	@include p(var(--spacing-xs-up));
 	@include rounded-md;
 	@include cursor-pointer;
 	@include transition-fast;

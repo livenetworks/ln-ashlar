@@ -28,8 +28,8 @@
 	@include fixed;
 	bottom: 0;
 	left: 0;
-	@include px(0.75rem);
-	@include py(0.25rem);
+	@include px(var(--spacing-sm-up));
+	@include py(var(--spacing-xs));
 	@include bg-primary;
 	@include border-t;
 	@include border-r;

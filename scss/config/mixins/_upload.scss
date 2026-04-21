@@ -21,7 +21,7 @@
 }
 
 @mixin upload-icon {
-	margin-right: 0.5rem;
+	margin-right: var(--spacing-sm);
 	flex-shrink: 0;
 }
 
@@ -63,9 +63,7 @@
 }
 
 @mixin upload-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+	@include list-reset;
 	margin-top: var(--spacing-sm);
 
 	&:empty {
@@ -93,9 +91,7 @@
 
 @mixin upload-name {
 	flex: 1;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	@include truncate;
 	color: hsl(var(--color-text-primary));
 }
 
@@ -144,7 +140,7 @@
 	display: inline-block;
 	width: 1.25rem;
 	height: 1.25rem;
-	margin-right: 0.5rem;
+	margin-right: var(--spacing-sm);
 	border: 2px solid hsl(var(--color-border));
 	border-radius: 50%;
 	border-top-color: hsl(var(--color-primary));

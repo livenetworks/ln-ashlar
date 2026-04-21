@@ -8,16 +8,8 @@
 	@include modal-panel;
 }
 
-.ln-modal header {
-	@include modal-header;
-}
-
-.ln-modal main {
-	@include modal-body;
-}
-
-.ln-modal footer {
-	@include modal-footer;
+.ln-modal [data-ln-modal-close] {
+	@include close-button;
 }
 
 @keyframes ln-modal-slideIn {

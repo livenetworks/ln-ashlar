@@ -109,7 +109,7 @@
 	th [data-ln-dropdown] > button {
 		@include flex;
 		@include items-center;
-		@include gap(0.25rem);
+		@include gap(var(--spacing-xs));
 		background: none;
 		border: none;
 		color: inherit;
@@ -166,7 +166,7 @@
 
 		[data-ln-sort-icon] {
 			@include size(0.875rem);
-			@include ml(0.25rem);
+			@include ml(var(--spacing-xs));
 			vertical-align: middle;
 			opacity: 0.4;
 			@include motion-safe {
@@ -190,8 +190,8 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include px(1rem);
-	@include py(0.5rem);
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-sm));
 	@include border-t;
 	@include bg-secondary;
 	border-radius: 0 0 var(--radius-lg) var(--radius-lg);
@@ -219,8 +219,8 @@
 	@include flex-wrap;
 	@include items-center;
 	@include gap(var(--spacing-lg));
-	@include px(1rem);
-	@include py(0.5rem);
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-sm));
 	@include border-b-light;
 
 	fieldset {
@@ -229,27 +229,25 @@
 		margin: 0;
 		@include flex;
 		@include items-center;
-		@include gap(0.375rem);
+		@include gap(var(--spacing-xs-up));
 
 		legend {
 			@include text-xs;
 			@include font-medium;
 			@include text-muted;
 			float: left;
-			@include mr(0.5rem);
+			@include mr(var(--spacing-sm));
 			line-height: 1.75rem;
 		}
 
 		ul {
 			@include inline-flex;
-			list-style: none;
-			padding: 0;
-			margin: 0;
+			@include list-reset;
 		}
 
 		li button {
-			@include px(0.5rem);
-			@include py(0.125rem);
+			@include px(var(--spacing-sm));
+			@include py(var(--spacing-2xs));
 			@include text-xs;
 			@include font-medium;
 			@include rounded-full;
@@ -277,9 +275,9 @@
 	@include flex;
 	@include items-center;
 	@include flex-wrap;
-	@include gap(0.375rem);
-	@include px(1rem);
-	@include py(0.375rem);
+	@include gap(var(--spacing-xs-up));
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-xs-up));
 	@include border-b-light;
 	background-color: hsl(var(--color-primary) / 0.03);
 }
@@ -287,13 +285,12 @@
 @mixin ln-table-chip {
 	@include inline-flex;
 	@include items-center;
-	@include gap(0.25rem);
-	@include px(0.5rem);
-	@include py(0.125rem);
+	@include gap(var(--spacing-xs));
+	@include px(var(--spacing-sm));
+	@include py(var(--spacing-2xs));
 	@include rounded-full;
 	@include text-xs;
-	background-color: hsl(var(--color-primary) / 0.1);
-	color: hsl(var(--color-primary));
+	@include tinted-surface(0.1);
 
 	strong {
 		@include font-semibold;
@@ -308,7 +305,7 @@
 		@include font-bold;
 		line-height: 1;
 		padding: 0;
-		@include ml(0.125rem);
+		@include ml(var(--spacing-2xs));
 
 		&:hover {
 			color: hsl(var(--color-error));
@@ -323,7 +320,7 @@
 	background: none;
 	border: none;
 	@include cursor-pointer;
-	@include ml(0.25rem);
+	@include ml(var(--spacing-xs));
 
 	&:hover {
 		color: hsl(var(--color-error));
@@ -333,13 +330,13 @@
 // ─── Empty state ──────────────────────────────────────────
 
 @mixin ln-table-empty-state {
-	@include py(3rem);
+	@include py(var(--spacing-2xl));
 	@include text-center;
 
 	svg.ln-icon {
 		@include block;
 		@include mx(auto);
-		@include mb(1rem);
+		@include mb(var(--spacing-md));
 		opacity: 0.3;
 	}
 
@@ -347,12 +344,12 @@
 		@include text-lg;
 		@include font-semibold;
 		@include text-primary;
-		margin: 0 0 0.5rem;
+		margin: 0 0 var(--spacing-sm);
 	}
 
 	p {
 		@include text-sm;
 		@include text-secondary;
-		margin: 0 0 1.5rem;
+		margin: 0 0 var(--spacing-lg);
 	}
 }

@@ -1,10 +1,5 @@
-@use 'typography' as *;
 @use 'display' as *;
-@use 'btn' as *;
 @use 'spacing' as *;
-@use 'colors' as *;
-@use 'borders' as *;
-@use 'shadows' as *;
 @use 'position' as *;
 @use 'motion' as *;
 @use 'card' as *;
@@ -39,55 +34,32 @@
 }
 
 // Content panel — the <form> inside .ln-modal.
+// Structurally IS a section-card: reuse its chrome and its nested
+// > header / > main / > footer recipes (which themselves delegate
+// to panel-header / panel-body / panel-footer). Add only the
+// modal-specific behaviour on top: fixed size envelope, scrollable
+// body, sticky footer, slide-in animation, deeper shadow.
 @mixin modal-panel {
-	@include bg-primary;
-	@include rounded-md;
-	@include shadow-xl;
+	@include section-card;
+	@include mb(0);
+	box-shadow: var(--shadow-xl);
+	display: grid;
+	grid-template-rows: auto 1fr auto;
 	max-width: 600px;
 	width: 90%;
 	max-height: 90vh;
 	@include motion-safe {
-		animation: ln-modal-slideIn 0.3s ease;
+		animation: ln-modal-slideIn var(--transition-slow);
 	}
-	display: grid;
-	grid-template-rows: auto 1fr auto;
-}
 
-// Header — panel-header with close button.
-@mixin modal-header {
-	@include panel-header;
-	@include mb(0);
-
-	button[data-ln-modal-close] {
-		@include close-button;
+	> main {
+		min-height: 0;
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
-}
 
-// Body — scrollable content area.
-@mixin modal-body {
-	@include p(var(--spacing-md));
-	min-height: 0;
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-
-// Footer — sticky action bar with cancel/submit buttons.
-@mixin modal-footer {
-	@include px(1rem);
-	@include py(0.75rem);
-	@include border-t;
-	@include bg-secondary;
-	@include flex;
-	@include justify-end;
-	@include gap(var(--spacing-sm));
-	position: sticky;
-	bottom: 0;
-
-	button[type="button"] {
-		border: var(--border-width) solid hsl(var(--color-border));
-
-		&:hover {
-			background-color: hsl(var(--color-bg-body));
-		}
+	> footer {
+		position: sticky;
+		bottom: 0;
 	}
 }

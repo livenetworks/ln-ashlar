@@ -8,7 +8,7 @@
 
 @mixin stat-card {
 	@include flex-col;
-	@include gap(0.25rem);
+	@include gap(var(--spacing-xs));
 	@include p(var(--spacing-lg));
 	background: hsl(var(--color-bg-primary));
 	@include rounded-lg;
@@ -35,9 +35,9 @@
 	> [data-ln-stat-trend] {
 		@include flex-row;
 		@include items-center;
-		@include gap(0.25rem);
+		@include gap(var(--spacing-xs));
 		@include typography(body-sm);
-		margin: 0.25rem 0 0;
+		margin: var(--spacing-xs) 0 0;
 
 		svg.ln-icon {
 			width: 1rem;
