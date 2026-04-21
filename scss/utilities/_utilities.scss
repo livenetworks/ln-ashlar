@@ -18,14 +18,14 @@
 	@include w-full;
 	max-width: 80rem;
 	@include mx(auto);
-	@include px(1rem);
+	@include px(var(--spacing-md));
 
 	@media (min-width: 640px) {
-		@include px(1.5rem);
+		@include px(var(--spacing-lg));
 	}
 
 	@media (min-width: 1024px) {
-		@include px(2rem);
+		@include px(var(--spacing-xl));
 	}
 }
 
@@ -33,7 +33,7 @@
 	@include w-full;
 	max-width: 56rem;
 	@include mx(auto);
-	@include px(1rem);
+	@include px(var(--spacing-md));
 }
 
 // Semantic color overrides — set --color-primary and all sibling tokens on any component.

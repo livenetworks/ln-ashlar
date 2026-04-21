@@ -1,6 +1,7 @@
 @use 'spacing' as *;
 @use 'display' as *;
 @use 'typography' as *;
+@use 'colors' as *;
 @use 'borders' as *;
 @use 'btn' as *;
 
@@ -30,7 +31,7 @@
 	@include rounded-md;
 	@include text-sm;
 	border-left: 3px solid hsl(var(--color-primary));
-	background-color: hsl(var(--color-primary) / 0.08);
+	@include tinted-surface(0.08);
 	color: hsl(var(--color-text-primary));
 
 	.ln-icon {

@@ -33,9 +33,9 @@
 	> header aside label {
 		@include inline-flex;
 		@include items-center;
-		@include gap(0.375rem);
-		@include px(0.625rem);
-		@include py(0.25rem);
+		@include gap(var(--spacing-xs-up));
+		@include px(var(--spacing-sm-up));
+		@include py(var(--spacing-xs));
 		@include rounded-md;
 		@include border;
 		@include bg-primary;
@@ -92,8 +92,8 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	padding: 0.125rem;
-	margin-inline-start: 0.25rem;
+	padding: var(--spacing-2xs);
+	margin-inline-start: var(--spacing-xs);
 	vertical-align: middle;
 }
 
@@ -112,8 +112,8 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	padding: 0.125rem;
-	margin-inline-start: 0.125rem;
+	padding: var(--spacing-2xs);
+	margin-inline-start: var(--spacing-2xs);
 	vertical-align: middle;
 	@include relative;
 }
@@ -157,9 +157,7 @@
 	}
 
 	ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
+		@include list-reset;
 	}
 
 	li {

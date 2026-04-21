@@ -33,7 +33,7 @@
 	> header {
 		@include flex;
 		@include items-center;
-		@include gap(0.75rem);
+		@include gap(var(--spacing-sm-up));
 		@include py(var(--spacing-sm));
 		@include border-b;
 		@include shadow-b;

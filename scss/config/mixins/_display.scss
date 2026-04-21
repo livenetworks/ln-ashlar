@@ -25,6 +25,12 @@
 	justify-content: center;
 }
 
+@mixin inline-flex-center {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
 @mixin list-reset {
 	list-style: none;
 	padding: 0;

@@ -1,18 +1,15 @@
 @use 'spacing' as *;
 @use 'borders' as *;
 @use 'motion' as *;
+@use 'card' as *;
 
 @mixin popover {
+	@include floating-panel;
 	display: none;
 	position: fixed;
 	min-width: 14rem;
 	max-width: 24rem;
-	@include p(1rem);
-	background: hsl(var(--color-bg-primary));
-	border: 1px solid hsl(var(--color-border));
-	@include rounded-lg;
-	box-shadow: var(--shadow-lg);
-	z-index: var(--z-dropdown);
+	@include p(var(--spacing-md));
 
 	&[data-ln-popover="open"] {
 		display: block;

@@ -17,16 +17,10 @@
 // ─── Flag icon in input background ───────────────────────────────
 
 @mixin translations-flag-input {
-	--_flag-w: 1.25rem;
-	--_flag-h: calc(var(--_flag-w) * 3 / 4);
-	--_input-py: 0.5rem;
-	--_input-px: 0.75rem;
-	--_line-height: 1.5rem;
-
-	padding-left: calc(var(--_input-px) + var(--_flag-w) + var(--_input-px));
+	padding-left: calc(var(--spacing-sm-up) + var(--spacing-md-up) + var(--spacing-sm-up));
 	background-repeat: no-repeat;
-	background-size: var(--_flag-w) auto;
-	background-position: var(--_input-px) calc(var(--_input-py) + (var(--_line-height) - var(--_flag-h)) / 2);
+	background-size: var(--spacing-md-up) auto;
+	background-position: var(--spacing-sm-up) calc(var(--spacing-sm) + (var(--spacing-lg) - var(--spacing-md-up) * 3 / 4) / 2);
 }
 
 // ─── Dropdown menu item: flag via ::before ───────────────────────
@@ -34,7 +28,7 @@
 @mixin translations-dropdown-flag {
 	@include flex;
 	@include items-center;
-	@include gap(0.5rem);
+	@include gap(var(--spacing-sm));
 
 	&::before {
 		content: '';
@@ -63,9 +57,7 @@
 	@include inline-flex;
 	@include items-center;
 	@include gap(var(--spacing-xs));
-	list-style: none;
-	padding: 0;
-	margin: 0;
+	@include list-reset;
 }
 
 // ─── Badge with flag ─────────────────────────────────────────────
@@ -73,20 +65,19 @@
 @mixin translations-badge {
 	@include inline-flex;
 	@include items-center;
-	@include gap(0.25rem);
+	@include gap(var(--spacing-xs));
 	@include text-xs;
 	@include font-semibold;
 	@include rounded-sm;
 	@include px(var(--spacing-xs));
-	@include py(0.125rem);
-	background-color: hsl(var(--color-primary) / 0.08);
-	color: hsl(var(--color-primary));
+	@include py(var(--spacing-2xs));
+	@include tinted-surface(0.08);
 	@include select-none;
 	margin: 0;
 	background-repeat: no-repeat;
-	background-position: 0.25rem center;
+	background-position: var(--spacing-xs) center;
 	background-size: 1rem auto;
-	padding-left: 1.5rem;
+	padding-left: var(--spacing-lg);
 }
 
 // ─── Badge remove button ─────────────────────────────────────────
@@ -117,11 +108,10 @@
 	@include rounded-sm;
 	@include cursor-pointer;
 	@include transition-fast;
-	background: hsl(var(--color-primary) / 0.08);
-	color: hsl(var(--color-primary));
+	@include tinted-surface(0.08);
 	border: none;
 
 	&:hover {
-		background: hsl(var(--color-primary) / 0.15);
+		@include tinted-surface(0.15);
 	}
 }

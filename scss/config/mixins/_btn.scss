@@ -19,9 +19,9 @@
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	@include gap(0.5rem);
-	@include px(1.25rem);
-	@include py(0.625rem);
+	@include gap(var(--spacing-sm));
+	@include px(var(--spacing-md-up));
+	@include py(var(--spacing-sm));
 	@include text-sm;
 	@include font-medium;
 	@include rounded-md;
@@ -29,16 +29,18 @@
 
 	background-color: hsl(var(--color-primary));
 	color: hsl(var(--color-white));
-	border: none;
+	border: var(--border-width) solid hsl(var(--color-primary));
 
 	&:hover:not(:disabled) {
 		background-color: hsl(var(--color-primary-hover));
 		color: hsl(var(--color-white));
+		border-color: hsl(var(--color-primary-hover));
 	}
 
 	&:active:not(:disabled) {
 		background-color: hsl(var(--color-primary-hover));
 		color: hsl(var(--color-white));
+		border-color: hsl(var(--color-primary-hover));
 	}
 
 	&:focus-visible {
@@ -52,29 +54,42 @@
 }
 
 @mixin btn-sm {
-	@include px(0.875rem);
-	@include py(0.375rem);
+	@include px(var(--spacing-md-down));
+	@include py(var(--spacing-xs-up));
 	@include text-xs;
-	@include gap(0.25rem);
+	@include gap(var(--spacing-xs));
 }
 
 @mixin btn-lg {
-	@include px(1.75rem);
-	@include py(0.875rem);
+	@include px(var(--spacing-lg-up));
+	@include py(var(--spacing-md-down));
 	@include text-base;
-	@include gap(0.75rem);
+	@include gap(var(--spacing-sm-up));
 }
 
 @mixin btn-group {
 	@include inline-flex;
 	@include items-center;
-	@include gap(0.25rem);
+	@include gap(var(--spacing-xs));
 	@include list-reset;
+
+	button {
+		border: none;
+		background: transparent;
+		color: hsl(var(--color-text-muted));
+
+		&:hover:not(:disabled) {
+			background: hsl(var(--color-bg-secondary));
+			color: hsl(var(--color-text-primary));
+		}
+	}
 }
 
 @mixin close-button {
+	border: none;
+	background: transparent;
 	padding: 0;
-	@include size(2rem);
+	@include size(1.5rem);
 	@include flex-center;
 	@include rounded-sm;
 	@include transition-fast;

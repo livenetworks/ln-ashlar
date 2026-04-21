@@ -17,7 +17,7 @@
 	line-height: var(--lh-label-md);
 	@include font-medium;
 	@include text-primary;
-	@include mb(0.25rem);
+	@include mb(var(--spacing-xs));
 
 	// Required indicator — red * after label text
 	// Triggered by sibling input[required] via parent :has()
@@ -46,9 +46,9 @@
 	@include list-reset;
 	@include flex;
 	@include justify-end;
-	@include gap(0.75rem);
-	@include mt(1.5rem);
-	@include pt(1rem);
+	@include gap(var(--spacing-sm-up));
+	@include mt(var(--spacing-lg));
+	@include pt(var(--spacing-md));
 	@include border-t;
 }
 
@@ -108,7 +108,7 @@
 	--select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
 	background-image: var(--select-arrow);
 	background-repeat: no-repeat;
-	background-position: right 0.75rem center;
+	background-position: right var(--spacing-sm-up) center;
 	padding-right: 2.5rem;
 }
 
@@ -138,7 +138,7 @@
 	// Compact padding: tight vertical to keep total height close to a
 	// regular form-input despite the icon's fixed size.
 	@include px(var(--spacing-sm));
-	@include py(0.25rem);
+	@include py(var(--spacing-xs));
 	@include bg-primary;
 	@include border;
 	@include rounded-md;
@@ -193,7 +193,7 @@
 
 	> [data-ln-search-clear] {
 		@include flex-shrink-0;
-		@include p(0.2rem);
+		@include p(var(--spacing-2xs));
 		@include cursor-pointer;
 		color: hsl(var(--color-text-muted));
 		@include transition-colors;
@@ -258,9 +258,9 @@
 @mixin pill-outline {
 	@include flex;
 	@include items-center;
-	@include gap(0.5rem);
-	@include px(1rem);
-	@include py(0.5rem);
+	@include gap(var(--spacing-sm));
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-sm));
 	@include cursor-pointer;
 	@include transition;
 	@include text-sm;

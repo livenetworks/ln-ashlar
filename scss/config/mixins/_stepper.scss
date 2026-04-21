@@ -15,15 +15,13 @@
 		position: relative;
 		@include flex-col;
 		@include items-center;
-		@include gap(0.5rem);
+		@include gap(var(--spacing-sm));
 		min-width: 0;
 
 		// Numbered circle bullet
 		&::before {
 			content: counter(ln-step);
-			display: flex;
-			align-items: center;
-			justify-content: center;
+			@include flex-center;
 			width: 2rem;
 			height: 2rem;
 			border-radius: 50%;
@@ -39,9 +37,9 @@
 		&:not(:last-child)::after {
 			content: '';
 			position: absolute;
-			top: 1rem;
-			left: calc(50% + 1rem);
-			right: calc(-50% + 1rem);
+			top: var(--spacing-md);
+			left: calc(50% + var(--spacing-md));
+			right: calc(-50% + var(--spacing-md));
 			height: 2px;
 			// Direct neutral: connector line between steps -- no semantic "connector" token
 			background: hsl(var(--color-neutral-200));

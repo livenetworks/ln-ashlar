@@ -2,5 +2,5 @@
 
 .loader {
 	@include loader;
-	@include my(4.5rem);
+	@include my(var(--spacing-3xl));
 }

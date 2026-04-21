@@ -10,6 +10,7 @@
 @use 'interaction' as *;
 @use 'motion' as *;
 @use 'btn' as *;
+@use 'card' as *;
 
 // Toast notification -- side-accent card with icon, title, body, close button.
 //
@@ -27,9 +28,7 @@
 	bottom: var(--spacing-lg);
 	display: flex;
 	flex-direction: column-reverse;
-	list-style: none;
-	@include m(0);
-	@include p(0);
+	@include list-reset;
 }
 
 @mixin toast-item {
@@ -61,11 +60,8 @@
 }
 
 @mixin toast-card {
+	@include floating-panel;
 	@include flex;
-	@include bg-primary;
-	@include border;
-	@include rounded-md;
-	@include shadow-lg;
 	min-width: 320px;
 	max-width: 450px;
 	@include overflow-hidden;
@@ -145,7 +141,7 @@
 
 	ul {
 		margin: var(--spacing-sm) 0 0 0;
-		padding-left: 1.25rem;
+		padding-left: var(--spacing-md-up);
 		@include text-sm;
 	}
 

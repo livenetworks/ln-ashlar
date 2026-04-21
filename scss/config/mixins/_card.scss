@@ -21,7 +21,7 @@
 	box-shadow: var(--shadow-xs);
 
 	&:hover {
-		border-color: hsl(var(--color-primary) / 0.25);
+		border-color: hsl(var(--color-neutral-300));
 		box-shadow: var(--shadow-sm);
 	}
 }
@@ -37,23 +37,57 @@
 	@include transition;
 
 	h3 {
-		font-size: var(--text-title-sm);
-		line-height: var(--lh-title-sm);
-		@include font-semibold;
+		font-size: var(--text-body-sm);
+		line-height: var(--lh-body-sm);
+		@include font-medium;
 		@include text-primary;
 		margin: 0;
 	}
 }
 
+@mixin panel-body {
+	@include p(var(--spacing-md));
+
+	// Auto-flush: ONLY when the table (or .table-container) is the
+	// sole child of main — i.e. the card is a pure table card.
+	// Strip padding so the table spans edge-to-edge, and drop the
+	// table's own radius/shadow (card's overflow:hidden handles
+	// rounded corners).
+	//
+	// If main has mixed content (intro <p>, demo-split, <h4>,
+	// then <table>), :only-child doesn't match, padding stays,
+	// and the table keeps its own inset.
+	&:has(> table:only-child),
+	&:has(> .table-container:only-child) {
+		@include p(0);
+
+		> table,
+		> .table-container > table {
+			border-radius: 0;
+			box-shadow: none;
+			margin-bottom: 0;
+		}
+	}
+}
+
+@mixin panel-footer {
+	@include px(var(--spacing-md));
+	@include py(var(--spacing-sm));
+	@include border-t;
+	@include flex;
+	@include justify-end;
+	@include gap(var(--spacing-sm));
+}
+
 @mixin section {
-	@include mb(2rem);
+	@include mb(var(--spacing-xl));
 
 	header {
 		@include flex;
 		@include items-center;
 		@include justify-between;
-		@include mb(1rem);
-		@include pb(0.75rem);
+		@include mb(var(--spacing-md));
+		@include pb(var(--spacing-sm));
 		@include border-b;
 
 		h2 {
@@ -65,7 +99,7 @@
 
 		.section-actions {
 			@include flex;
-			@include gap(0.5rem);
+			@include gap(var(--spacing-sm));
 		}
 	}
 
@@ -145,46 +179,28 @@
 	@include overflow-hidden;
 	@include transition;
 	box-shadow: var(--shadow-xs);
-	@include mb(1rem);
+	@include mb(var(--spacing-md));
 
 	// Direct-child selectors only — nested <header>/<main>/<footer>
 	// elements inside the card's content are consumer-owned and
 	// must not inherit the card's own chrome styles.
-	> header {
-		@include panel-header;
-	}
+	> header { @include panel-header; }
+	> main   { @include panel-body; }
+	> footer { @include panel-footer; }
+}
 
-	> main {
-		@include p(var(--spacing-lg));
-
-		// Auto-flush: ONLY when the table (or .table-container) is the
-		// sole child of main — i.e. the card is a pure table card.
-		// Strip padding so the table spans edge-to-edge, and drop the
-		// table's own radius/shadow (card's overflow:hidden handles
-		// rounded corners).
-		//
-		// If main has mixed content (intro <p>, demo-split, <h4>,
-		// then <table>), :only-child doesn't match, padding stays,
-		// and the table keeps its own inset.
-		&:has(> table:only-child),
-		&:has(> .table-container:only-child) {
-			@include p(0);
-
-			> table,
-			> .table-container > table {
-				border-radius: 0;
-				box-shadow: none;
-				margin-bottom: 0;
-			}
-		}
-	}
-
-	> footer {
-		@include px(var(--spacing-md));
-		@include py(var(--spacing-sm));
-		@include border-t;
-		@include flex;
-		@include justify-end;
-		@include gap(var(--spacing-sm));
-	}
+// ─── Floating panel ────────────────────────────────────
+// Chrome recipe for floating overlays (popover, dropdown menu, toast).
+// Positioning is per-consumer; only the surface chrome (bg, border,
+// radius, shadow, z-index) is shared. The border uses --color-border-light
+// for a subtle edge against light backgrounds -- floating panels sit
+// ABOVE content, so a subtle border reads cleaner than a heavy one.
+//
+// Usage: consumers @include this mixin, then add their own positioning.
+@mixin floating-panel {
+	@include bg-primary;
+	@include border-light;
+	@include rounded-md;
+	@include shadow-lg;
+	z-index: var(--z-dropdown);
 }

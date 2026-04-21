@@ -1,6 +1,7 @@
 @use 'spacing' as *;
 @use 'display' as *;
 @use 'typography' as *;
+@use 'colors' as *;
 @use 'borders' as *;
 @use 'btn' as *;
 
@@ -43,7 +44,8 @@
 
 	> form {
 		// Override .ln-modal > form dialog chrome
-		background-color: hsl(var(--color-primary) / 0.06); // was: bg-primary (solid white/dark)
+		@include tinted-surface(0.06);
+		color: inherit;     // was: set by tinted-surface; banner body text inherits
 		border-radius: 0;   // was: rounded-md
 		box-shadow: none;   // was: shadow-xl
 		max-width: none;    // was: 600px

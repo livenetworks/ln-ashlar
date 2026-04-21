@@ -5,7 +5,7 @@
 
 @mixin grid {
 	display: grid;
-	@include gap(1.5rem);
+	@include gap(var(--spacing-lg));
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 
 	@media (min-width: 768px) {
@@ -19,7 +19,7 @@
 
 @mixin grid-2 {
 	display: grid;
-	@include gap(1.5rem);
+	@include gap(var(--spacing-lg));
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 
 	@media (min-width: 768px) {
@@ -29,7 +29,7 @@
 
 @mixin grid-4 {
 	display: grid;
-	@include gap(1.5rem);
+	@include gap(var(--spacing-lg));
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 
 	@media (min-width: 768px) {
@@ -41,7 +41,7 @@
 	}
 }
 
-@mixin stack($gap: 1rem) {
+@mixin stack($gap: var(--spacing-md)) {
 	@include flex-col;
 	@include gap($gap);
 }

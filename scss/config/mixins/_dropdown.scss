@@ -9,6 +9,7 @@
 @use 'interaction' as *;
 @use 'transitions' as *;
 @use 'motion' as *;
+@use 'card' as *;
 
 // Dropdown menu — floating panel with menu items.
 //
@@ -24,20 +25,13 @@
 }
 
 @mixin dropdown-menu {
+	@include floating-panel;
 	@include absolute;
 	right: 0;
 	top: 100%;
 	@include mt(var(--spacing-xs));
-	@include bg-primary;
-	@include border-light;
-	@include rounded-md;
-	@include shadow-lg;
-	z-index: var(--z-dropdown);
-	list-style: none;
+	@include list-reset;
 	@include py(var(--spacing-xs));
-	padding-left: 0;
-	padding-right: 0;
-	margin: 0;
 	min-width: 10rem;
 
 	// ─── Menu item resets ──────────────────────────────

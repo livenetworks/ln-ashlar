@@ -36,8 +36,8 @@
 			@include flex;
 			@include justify-between;
 			@include items-center;
-			@include px(1rem);
-			@include py(0.875rem);
+			@include px(var(--spacing-md));
+			@include py(var(--spacing-md-down));
 			@include cursor-pointer;
 
 			// Chevron — place <svg class="ln-icon ln-chevron"> inside the trigger
@@ -56,8 +56,8 @@
 
 		// Content body padding — on children, not the overflow:hidden wrapper
 		.collapsible-body > * {
-			@include px(1rem);
-			@include py(0.75rem);
+			@include px(var(--spacing-md));
+			@include py(var(--spacing-sm-up));
 			margin: 0;
 		}
 	}
