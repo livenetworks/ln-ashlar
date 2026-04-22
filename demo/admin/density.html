@@ -7,6 +7,20 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -21,17 +35,17 @@
 				<div class="ln-toast__head">
 					<strong class="ln-toast__title" data-ln-field="title"></strong>
 				</div>
-				<button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button"  class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<div class="ln-toast__body" data-ln-show="hasBody"></div>
 			</div>
 		</div>
 	</li>
-	</template>
+</template>
 	<ul data-ln-toast></ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<header>
+		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
@@ -40,20 +54,29 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
 					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+						</ul>
+					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
+						<span>Test Toast</span>
 					</button>
 				</div>
 			</div>
 		</header>
 
 		<!-- App Body -->
-		<div class="app-body">
+		<main class="app-main">
 		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
@@ -76,7 +99,7 @@
 						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
 						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
 						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
-						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="density.html" aria-current="page"><span class="nav-label">Density</span></a></li>
 						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
 						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
 						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
@@ -135,11 +158,11 @@
 				<small>acme-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<div class="app-scrim" data-ln-scrim></div>
 
-		<!-- Main Panel -->
-		<div class="main-panel">
-			<div class="content">
-				<h1>Density</h1>
+		<!-- Content -->
+		<section>
+<h1>Density</h1>
 				<p>Global spacing compression toggle. Add the <code>density-compact</code> class to any element — the subtree tightens. Tables show more rows, form inputs pack denser, cards shrink padding. Same components, same markup, same selectors — only the internal spacing tokens change.</p>
 
 				<section class="density-demo-controls">
@@ -180,6 +203,7 @@
 				<section class="section-card">
 					<header><h3>Table — reacts to density</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr>
@@ -191,22 +215,22 @@
 							</thead>
 							<tbody>
 								<tr>
-									<td>Quality Manual</td>
-									<td>ISO 9001</td>
-									<td>Approved</td>
-									<td>2025-12-01</td>
+									<td data-label="Document">Quality Manual</td>
+									<td data-label="Standard">ISO 9001</td>
+									<td data-label="Status">Approved</td>
+									<td data-label="Updated">2025-12-01</td>
 								</tr>
 								<tr>
-									<td>Risk Register</td>
-									<td>ISO 27001</td>
-									<td>In Review</td>
-									<td>2025-11-28</td>
+									<td data-label="Document">Risk Register</td>
+									<td data-label="Standard">ISO 27001</td>
+									<td data-label="Status">In Review</td>
+									<td data-label="Updated">2025-11-28</td>
 								</tr>
 								<tr>
-									<td>Internal Audit Plan</td>
-									<td>ISO 9001</td>
-									<td>Draft</td>
-									<td>2025-11-22</td>
+									<td data-label="Document">Internal Audit Plan</td>
+									<td data-label="Standard">ISO 9001</td>
+									<td data-label="Status">Draft</td>
+									<td data-label="Updated">2025-11-22</td>
 								</tr>
 								<tr>
 									<td>Supplier Evaluation Procedure</td>
@@ -228,6 +252,7 @@
 								</tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -270,58 +295,98 @@
 						</p>
 					</main>
 				</section>
-			</div>
+		</section>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
 				<span>ln-acme v1.2.0</span>
 			</footer>
-		</div>
-		</div>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
 	</div>
 
 	<script>
-		(function () {
-			const root = document.documentElement;
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const root = document.documentElement;
 
-			// Theme toggle (carry-over from other demos, persisted)
-			const THEME_KEY = 'ln-demo-theme';
-			const storedTheme = localStorage.getItem(THEME_KEY);
-			if (storedTheme === 'dark' || storedTheme === 'light') {
-				root.setAttribute('data-theme', storedTheme);
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
 			}
-			const themeToggle = document.querySelector('[data-demo-theme-toggle]');
-			if (themeToggle) {
-				themeToggle.addEventListener('click', () => {
-					const current =
-						root.getAttribute('data-theme') ||
-						(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-					const next = current === 'dark' ? 'light' : 'dark';
-					root.setAttribute('data-theme', next);
-					localStorage.setItem(THEME_KEY, next);
-				});
-			}
+		});
 
-			// Density — demo checkboxes (ephemeral, no localStorage)
-			const DENSITY_CLASS = 'density-compact';
-
-			const globalCheckbox = document.querySelector('[data-demo-density-global]');
-			const scopedCheckbox = document.querySelector('[data-demo-density-scoped]');
-			const scopedTarget = document.getElementById('density-scoped-target');
-
-			if (globalCheckbox) {
-				globalCheckbox.addEventListener('change', () => {
-					root.classList.toggle(DENSITY_CLASS, globalCheckbox.checked);
-				});
-			}
-
-			if (scopedCheckbox && scopedTarget) {
-				scopedCheckbox.addEventListener('change', () => {
-					scopedTarget.classList.toggle(DENSITY_CLASS, scopedCheckbox.checked);
-				});
-			}
-		})();
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
 	</script>
 </body>
 </html>

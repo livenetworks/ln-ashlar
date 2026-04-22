@@ -1,0 +1,847 @@
+<!-- ln-page: title="Forms &amp; Buttons — ln-acme" h1="Forms &amp; Buttons" -->
+
+<h1>Forms &amp; Buttons</h1>
+				<p>CSS Grid + <code>&lt;div class="form-element"&gt;</code> pattern. No <code>&lt;div class="form-group"&gt;</code> or <code>&lt;div class="form-row"&gt;</code>. The grid controls the layout via SCSS — not via HTML.</p>
+
+				<!-- ==========================================
+				     PRINCIPLE
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Principle</h3></header>
+					<main>
+						<p>Each field is a <code>&lt;div class="form-element"&gt;</code> containing a <code>&lt;label for="..."&gt;</code> and <code>&lt;input id="..."&gt;</code> (explicit association). The root <code>&lt;form&gt;</code> gets <code>@include form-grid</code> in SCSS — a 6-column grid, collapsing to 1 column on mobile. Column widths are set via <code>nth-child</code> in form-specific SCSS.</p>
+
+						<!-- Wrong vs Right -->
+						<div class="demo-split">
+							<article>
+								<h4>Wrong — wrapping label</h4>
+								<pre><code>&lt;!-- implicit label, no for/id --&gt;
+&lt;label&gt;
+  Name
+  &lt;input type="text" name="name"&gt;
+&lt;/label&gt;
+
+&lt;label&gt;
+  City
+  &lt;input type="text" name="city"&gt;
+&lt;/label&gt;</code></pre>
+							</article>
+							<article>
+								<h4>Correct — form-element</h4>
+								<pre><code>&lt;!-- explicit for/id, div wrapper --&gt;
+&lt;form id="my-form" data-ln-form&gt;
+
+  &lt;div class="form-element"&gt;
+    &lt;label for="name"&gt;Name&lt;/label&gt;
+    &lt;input type="text" id="name" name="name"
+           required data-ln-validate&gt;
+    &lt;ul data-ln-validate-errors&gt;
+      &lt;li class="hidden" data-ln-validate-error="required"&gt;
+        Required field
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+
+&lt;/form&gt;</code></pre>
+							</article>
+						</div>
+
+						<!-- Rules table -->
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr>
+									<th>Element</th>
+									<th>Rule</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td data-label="Element">Root</td>
+									<td data-label="Rule"><code>&lt;form id="..." data-ln-form&gt;</code> — styled with <code>@include form-grid</code> in SCSS (6 cols → 1 col on mobile)</td>
+								</tr>
+								<tr>
+									<td data-label="Element">Children</td>
+									<td data-label="Rule"><code>&lt;div class="form-element"&gt;</code> — wraps <code>&lt;label&gt;</code> + <code>&lt;input&gt;</code> + error list</td>
+								</tr>
+								<tr>
+									<td data-label="Element">Label</td>
+									<td data-label="Rule">Explicit <code>for</code>/<code>id</code> association: <code>&lt;label for="name"&gt;</code> + <code>&lt;input id="name"&gt;</code></td>
+								</tr>
+								<tr>
+									<td>Validation</td>
+									<td><code>data-ln-validate</code> on input + <code>&lt;ul data-ln-validate-errors&gt;</code> with <code>&lt;li data-ln-validate-error="..."&gt;</code></td>
+								</tr>
+								<tr>
+									<td>Column spans</td>
+									<td>In form-specific SCSS via <code>.form-element:nth-child(N)</code> — NEVER width classes on the element</td>
+								</tr>
+								<tr>
+									<td>Pill radio/checkbox</td>
+									<td><code>&lt;ul&gt; &gt; &lt;li&gt; &gt; &lt;label&gt; &gt; &lt;input&gt;</code> — grouped pills (see Pill Labels section)</td>
+								</tr>
+								<tr>
+									<td><code>.form-actions</code></td>
+									<td><code>&lt;ul class="form-actions"&gt;</code> with <code>&lt;li&gt;</code> per button — spans full-width in SCSS</td>
+								</tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     LIVE DEMO — ln-validate + ln-form
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Live demo — ln-validate + ln-form</h3></header>
+					<main>
+						<form id="demo-form-grid" data-ln-form>
+							<div class="form-element">
+								<label for="demo-fname">First Name</label>
+								<input type="text" id="demo-fname" name="fname" required placeholder="John" data-ln-validate>
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="required">First name is required</li>
+								</ul>
+							</div>
+							<div class="form-element">
+								<label for="demo-lname">Last Name</label>
+								<input type="text" id="demo-lname" name="lname" placeholder="Smith">
+							</div>
+							<div class="form-element">
+								<label for="demo-email">Email</label>
+								<input type="email" id="demo-email" name="email" required minlength="5" placeholder="email@example.com" data-ln-validate>
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="required">Email is required</li>
+									<li class="hidden" data-ln-validate-error="typeMismatch">Invalid email format</li>
+									<li class="hidden" data-ln-validate-error="tooShort">Must be at least 5 characters</li>
+								</ul>
+							</div>
+							<div class="form-element">
+								<label for="demo-phone">Phone</label>
+								<input type="tel" id="demo-phone" name="phone" placeholder="+1 555 ..." pattern="^\+?[\d\s\-]{7,}$" data-ln-validate>
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="patternMismatch">Invalid phone format</li>
+								</ul>
+							</div>
+							<div class="form-element">
+								<label for="demo-city">City</label>
+								<input type="text" id="demo-city" name="city" placeholder="New York">
+							</div>
+							<div class="form-element">
+								<label for="demo-zip">Postal Code</label>
+								<input type="text" id="demo-zip" name="zip" placeholder="1000">
+							</div>
+							<div class="form-element">
+								<label for="demo-country">Country</label>
+								<select id="demo-country" name="country">
+									<option>United States</option>
+									<option>United Kingdom</option>
+									<option>Germany</option>
+								</select>
+							</div>
+							<div class="form-element">
+								<label for="demo-message">Message</label>
+								<textarea id="demo-message" name="message" placeholder="Write a message..."></textarea>
+							</div>
+							<div class="form-element">
+								<label for="demo-disabled">Disabled field</label>
+								<input type="text" id="demo-disabled" name="disabled_field" disabled value="Cannot be changed">
+							</div>
+							<div class="form-element">
+								<label><input type="checkbox" name="confirmed" value="1"> I confirm the entered data</label>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+
+						<h4>Event log</h4>
+						<pre id="form-log"></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     AUTO-SUBMIT DEMO
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Auto-submit — search/filter forms</h3></header>
+					<main>
+						<p><code>data-ln-form-auto</code> submits on any input change. <code>data-ln-form-debounce="300"</code> waits 300ms after last change.</p>
+
+						<form id="demo-auto-submit" data-ln-form data-ln-form-auto data-ln-form-debounce="300">
+							<div class="form-element">
+								<label for="demo-search-q">Search</label>
+								<input type="search" id="demo-search-q" name="q" placeholder="Type to search...">
+							</div>
+							<div class="form-element">
+								<label for="demo-search-role">Role</label>
+								<select id="demo-search-role" name="role">
+									<option value="">All roles</option>
+									<option value="admin">Admin</option>
+									<option value="editor">Editor</option>
+									<option value="viewer">Viewer</option>
+								</select>
+							</div>
+						</form>
+
+						<h4>Event log</h4>
+						<pre id="auto-submit-log"></pre>
+
+						<h4>Code</h4>
+						<pre><code>&lt;form data-ln-form data-ln-form-auto data-ln-form-debounce="300"&gt;
+    &lt;input name="q" type="search" placeholder="Search..."&gt;
+    &lt;select name="role"&gt;
+        &lt;option value=""&gt;All roles&lt;/option&gt;
+        &lt;option value="admin"&gt;Admin&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/form&gt;
+
+// Coordinator listens for auto-submit
+document.addEventListener('ln-form:submit', function (e) {
+    console.log('Search:', e.detail.data);
+});</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     FILL DEMO
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Fill — edit mode</h3></header>
+					<main>
+						<p>Populate form fields programmatically. Two patterns:</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn" id="demo-fill-api-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg> Fill (API)</button>
+							<button type="button" id="demo-fill-coordinator-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg> Fill (Coordinator)</button>
+							<button type="button" id="demo-reset-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg> Reset</button>
+						</nav>
+						<h4>Code</h4>
+						<pre><code>// Pattern 1: Direct API — caller has a reference to the form
+form.lnForm.fill({ fname: 'Dalibor', email: 'd@test.com' });
+
+// Pattern 2: Coordinator — routes external events to the form
+// Table doesn't know about the form. Form doesn't know about the table.
+// The coordinator is the glue.
+table.addEventListener('ln-data-table:row-click', function (e) {
+    form.lnForm.fill(e.detail.record);
+});
+
+// Reset
+form.lnForm.reset();</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     PILL LABELS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Pill labels — checkbox &amp; radio</h3></header>
+					<main>
+						<article>
+							<h4>Filled (default)</h4>
+							<p>Radio and checkbox in <code>&lt;ul&gt; &gt; &lt;li&gt; &gt; &lt;label&gt;</code> — grouped, border-radius on first/last.</p>
+							<nav id="demo-pills-filled">
+								<fieldset>
+									<legend>Role</legend>
+									<ul>
+										<li><label><input type="radio" name="role" value="admin" checked> Admin</label></li>
+										<li><label><input type="radio" name="role" value="employee"> Employee</label></li>
+										<li><label><input type="radio" name="role" value="external"> External</label></li>
+									</ul>
+								</fieldset>
+								<fieldset>
+									<legend>Features</legend>
+									<ul>
+										<li><label><input type="checkbox" name="feat[]" value="api" checked> API</label></li>
+										<li><label><input type="checkbox" name="feat[]" value="export"> Export</label></li>
+										<li><label><input type="checkbox" name="feat[]" value="audit" checked> Audit</label></li>
+									</ul>
+								</fieldset>
+							</nav>
+						</article>
+						<article>
+							<h4>Outline (<code>@include pill-outline</code>)</h4>
+							<p>Apply directly on labels (standalone) to show the input indicator and use bordered style.</p>
+							<nav id="demo-pills-outline">
+								<fieldset>
+									<legend>Auth Method</legend>
+									<ul>
+										<li><label><input type="radio" name="auth" value="local" checked> Local</label></li>
+										<li><label><input type="radio" name="auth" value="ldap"> LDAP</label></li>
+									</ul>
+								</fieldset>
+								<fieldset>
+									<legend>Options</legend>
+									<ul>
+										<li><label><input type="checkbox" name="opt[]" value="notify" checked> Notifications</label></li>
+										<li><label><input type="checkbox" name="opt[]" value="2fa"> Two-factor</label></li>
+									</ul>
+								</fieldset>
+							</nav>
+						</article>
+						<article>
+							<h4>Code</h4>
+							<pre><code>&lt;!-- HTML — ul/li structure, grouped pills --&gt;
+&lt;ul&gt;
+    &lt;li&gt;&lt;label&gt;&lt;input type="radio" name="role" value="admin"&gt; Admin&lt;/label&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;label&gt;&lt;input type="radio" name="role" value="editor"&gt; Editor&lt;/label&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+// SCSS — outline style on label (standalone)
+#my-form label { @include pill-outline; }
+
+// Color override per context
+#role-field { --color-primary: var(--color-secondary); }</code></pre>
+						</article>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     INPUT STATES
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Input States</h3></header>
+					<main>
+						<section id="demo-input-states">
+							<div class="form-element">
+								<label for="state-default">Default</label>
+								<input type="text" id="state-default" placeholder="Click to see focus ring">
+							</div>
+							<div class="form-element">
+								<label for="state-filled">Filled</label>
+								<input type="text" id="state-filled" value="John Smith">
+							</div>
+							<div class="form-element">
+								<label for="state-disabled">Disabled</label>
+								<input type="text" id="state-disabled" disabled value="Cannot edit">
+							</div>
+							<div class="form-element">
+								<label for="state-readonly">Readonly</label>
+								<input type="text" id="state-readonly" readonly value="Read only value">
+							</div>
+							<div class="form-element">
+								<label for="state-invalid">Invalid (ln-validate)</label>
+								<input type="email" id="state-invalid" class="ln-validate-invalid" value="bad@">
+								<ul data-ln-validate-errors>
+									<li data-ln-validate-error="typeMismatch">Invalid email address</li>
+								</ul>
+							</div>
+							<div class="form-element">
+								<label for="state-valid">Valid (ln-validate)</label>
+								<input type="email" id="state-valid" class="ln-validate-valid" value="john@example.com">
+							</div>
+						</section>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     SELECT & TEXTAREA
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Select &amp; Textarea</h3></header>
+					<main>
+						<section id="demo-select-textarea">
+							<div class="form-element">
+								<label for="demo-sel1">Select</label>
+								<select id="demo-sel1">
+									<option value="">Choose an option...</option>
+									<option>Option A</option>
+									<option>Option B</option>
+									<option>Option C</option>
+								</select>
+							</div>
+							<div class="form-element">
+								<label for="demo-sel-dis">Disabled select</label>
+								<select id="demo-sel-dis" disabled>
+									<option>Locked option</option>
+								</select>
+							</div>
+							<div class="form-element">
+								<label for="demo-ta1">Textarea</label>
+								<textarea id="demo-ta1" placeholder="Write something..."></textarea>
+							</div>
+							<div class="form-element">
+								<label for="demo-ta-auto">Textarea with autoresize</label>
+								<textarea id="demo-ta-auto" data-ln-autoresize placeholder="Type here — height grows automatically..."></textarea>
+							</div>
+							<div class="form-element">
+								<label for="demo-ta-dis">Disabled textarea</label>
+								<textarea id="demo-ta-dis" disabled>Cannot edit this text</textarea>
+							</div>
+						</section>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     CHECKBOXES & RADIOS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Checkboxes &amp; Radios</h3></header>
+					<main>
+						<section id="demo-checks">
+							<fieldset>
+								<legend>Checkboxes</legend>
+								<div class="form-element"><label><input type="checkbox" checked> Receive notifications</label></div>
+								<div class="form-element"><label><input type="checkbox"> Subscribe to newsletter</label></div>
+								<div class="form-element"><label><input type="checkbox" disabled> Disabled option</label></div>
+								<div class="form-element"><label><input type="checkbox" checked disabled> Checked disabled</label></div>
+							</fieldset>
+							<fieldset>
+								<legend>Radios</legend>
+								<div class="form-element"><label><input type="radio" name="demo-radio" value="1" checked> Option one</label></div>
+								<div class="form-element"><label><input type="radio" name="demo-radio" value="2"> Option two</label></div>
+								<div class="form-element"><label><input type="radio" name="demo-radio" value="3"> Option three</label></div>
+								<div class="form-element"><label><input type="radio" name="demo-radio" value="4" disabled> Disabled</label></div>
+							</fieldset>
+						</section>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     BUTTONS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Buttons — Architecture</h3></header>
+					<main>
+						<p>Three tiers. No class needed for the first two — the browser <code>type</code> attribute determines the role.</p>
+
+						<h4>1. Neutral — <code>&lt;button type="button"&gt;</code></h4>
+						<p>All buttons get structure (padding, font, flex, hover) from <code>_global.scss</code>. Cancel/Close/Toggle buttons need no class.</p>
+						<nav class="demo-actions">
+							<button type="button">Cancel</button>
+							<button type="button">Reset</button>
+							<button type="button" disabled>Disabled</button>
+						</nav>
+
+						<h4>2. Primary — <code>type="submit"</code></h4>
+						<p>Submit buttons automatically receive primary fill color. Structure inherited from tier 1. No class needed.</p>
+						<nav class="demo-actions">
+							<button type="submit">Save</button>
+							<button type="submit" disabled>Disabled</button>
+						</nav>
+
+						<h4>3. Action button — <code>class="btn"</code></h4>
+						<p>Non-submit action buttons (Add, Delete, Export). In production, apply via <code>@include btn</code> on a semantic selector in project SCSS. <code>class="btn"</code> is for prototyping only.</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg> Add</button>
+							<button type="button" class="btn error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg> Delete</button>
+							<button type="button" class="btn success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg> Approve</button>
+							<button type="button" class="btn warning"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg> Archive</button>
+							<button type="button" class="btn info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-download"></use></svg> Export</button>
+							<button type="button" class="btn" disabled>Disabled</button>
+						</nav>
+
+						<h4>Color change — override <code>--color-primary</code></h4>
+						<p>Set <code>--color-primary</code> on the button or any parent. All states (hover, active, focus-ring) adapt automatically.</p>
+						<pre><code>/* Project SCSS — semantic selector */
+#delete-user  { @include btn; --color-primary: var(--color-error); }
+#approve-user { @include btn; --color-primary: var(--color-success); }
+
+/* Context override — all submit + action buttons inside change */
+.danger-zone  { --color-primary: var(--color-error); }</code></pre>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     BUTTON SIZES
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Button Sizes</h3></header>
+					<main>
+						<p>Size modifiers: <code>class="btn btn-sm"</code> and <code>class="btn btn-lg"</code>. In projects, apply via <code>@include btn-sm</code> / <code>@include btn-lg</code> after <code>@include btn</code>.</p>
+						<nav class="demo-actions">
+							<button type="button" class="btn btn-sm">Small</button>
+							<button type="button" class="btn">Default</button>
+							<button type="button" class="btn btn-lg">Large</button>
+						</nav>
+						<nav class="demo-actions" style="margin-top: 1rem;">
+							<button type="button" class="btn btn-sm error">Small Danger</button>
+							<button type="button" class="btn success">Default Success</button>
+							<button type="button" class="btn btn-lg info">Large Info</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     ICON BUTTONS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Icon-only Buttons</h3></header>
+					<main>
+						<p>Icon-only buttons use no class — they get neutral global styling (transparent, gray hover). No padding override needed.</p>
+						<nav class="demo-actions">
+							<button type="button" title="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
+							<button type="button" title="Copy"><svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg></button>
+							<button type="button" title="Print"><svg class="ln-icon" aria-hidden="true"><use href="#ln-printer"></use></svg></button>
+							<button type="button" title="Refresh"><svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg></button>
+							<button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     BUTTON GROUPS
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Button Groups — <code>btn-group</code></h3></header>
+					<main>
+						<p>Row action buttons grouped with small gap. In projects: <code>#users-table .row-actions { @include btn-group; }</code></p>
+						<ul class="btn-group">
+							<li><button type="button" title="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+							<li><button type="button" title="View"><svg class="ln-icon" aria-hidden="true"><use href="#ln-eye"></use></svg></button></li>
+							<li><button type="button" title="Copy"><svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg></button></li>
+							<li><button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     IMPLEMENTATION
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Implementation</h3></header>
+					<main>
+						<h4>HTML</h4>
+						<pre><code>&lt;form id="my-form" data-ln-form&gt;
+
+  &lt;div class="form-element"&gt;
+    &lt;label for="name"&gt;Name&lt;/label&gt;
+    &lt;input type="text" id="name" name="name" required data-ln-validate&gt;
+    &lt;ul data-ln-validate-errors&gt;
+      &lt;li class="hidden" data-ln-validate-error="required"&gt;Required field&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/p&gt;
+
+  &lt;div class="form-element"&gt;
+    &lt;label for="email"&gt;Email&lt;/label&gt;
+    &lt;input type="email" id="email" name="email" required data-ln-validate&gt;
+    &lt;ul data-ln-validate-errors&gt;
+      &lt;li class="hidden" data-ln-validate-error="required"&gt;Required&lt;/li&gt;
+      &lt;li class="hidden" data-ln-validate-error="typeMismatch"&gt;Invalid email&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/p&gt;
+
+  &lt;div class="form-element"&gt;
+    &lt;label for="category"&gt;Category&lt;/label&gt;
+    &lt;select id="category" name="category"&gt;
+      &lt;option value="a"&gt;Option A&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/p&gt;
+
+  &lt;ul class="form-actions"&gt;
+    &lt;li&gt;&lt;button type="button"&gt;Cancel&lt;/button&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;button type="submit"&gt;Save&lt;/button&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+
+&lt;/form&gt;</code></pre>
+
+						<h4>SCSS</h4>
+						<pre><code>#my-form {
+  @include form-grid;
+
+  .form-element { grid-column: span 3; }                   // default: half
+  .form-element:nth-child(3) { grid-column: span 6; }     // category: full
+  > fieldset { grid-column: span 6; }
+  .form-actions { grid-column: span 6; }
+}</code></pre>
+
+						<h4>Coordinator</h4>
+						<pre><code>document.addEventListener('ln-form:submit', function (e) {
+    if (e.target.id !== 'my-form') return;
+
+    fetch('/api/resource', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(e.detail.data)
+    })
+    .then(function (res) { return res.json(); })
+    .then(function () {
+        window.lnToast.enqueue({ type: 'success', title: 'Saved' });
+    });
+});</code></pre>
+					</main>
+				</section>
+
+				<!-- ─── Focus indicator presets ─────────────────────── -->
+
+				<section class="section-card">
+					<header><h3>focus-ring — outer glow (default)</h3></header>
+					<main>
+						<p class="demo-note">Safe, universally readable. No layout shift. Tailwind / Vercel convention.</p>
+						<form id="demo-focus-ring">
+							<div class="form-element">
+								<label for="fr-name">Name</label>
+								<input type="text" id="fr-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fr-email">Email</label>
+								<input type="email" id="fr-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fr-role">Role</label>
+								<select id="fr-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-border-thicken — structural outline</h3></header>
+					<main>
+						<p class="demo-note">Sharp, structural. No glow. Enterprise / business UI. Material Design style.</p>
+						<form id="demo-focus-border-thicken">
+							<div class="form-element">
+								<label for="fbt-name">Name</label>
+								<input type="text" id="fbt-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fbt-email">Email</label>
+								<input type="email" id="fbt-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fbt-role">Role</label>
+								<select id="fbt-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-combination — border + ring</h3></header>
+					<main>
+						<p class="demo-note">Border color + outer ring. Maximum signal strength. Accessibility-first.</p>
+						<form id="demo-focus-combination">
+							<div class="form-element">
+								<label for="fc-name">Name</label>
+								<input type="text" id="fc-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fc-email">Email</label>
+								<input type="email" id="fc-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fc-role">Role</label>
+								<select id="fc-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-background-shift — minimal tint</h3></header>
+					<main>
+						<p class="demo-note">Very light primary tint. No border change. Focus is felt, not announced.</p>
+						<form id="demo-focus-background-shift">
+							<div class="form-element">
+								<label for="fbs-name">Name</label>
+								<input type="text" id="fbs-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fbs-email">Email</label>
+								<input type="email" id="fbs-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fbs-role">Role</label>
+								<select id="fbs-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-accent-line — bottom border only</h3></header>
+					<main>
+						<p class="demo-note">Bottom border only changes. Subtle. Good inside bordered containers.</p>
+						<form id="demo-focus-accent-line">
+							<div class="form-element">
+								<label for="fal-name">Name</label>
+								<input type="text" id="fal-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fal-email">Email</label>
+								<input type="email" id="fal-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fal-role">Role</label>
+								<select id="fal-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>focus-inset-shadow — tactile sink</h3></header>
+					<main>
+						<p class="demo-note">Inner shadow — field visually sinks. Tactile, three-dimensional feel.</p>
+						<form id="demo-focus-inset-shadow">
+							<div class="form-element">
+								<label for="fis-name">Name</label>
+								<input type="text" id="fis-name" placeholder="John Smith">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fis-email">Email</label>
+								<input type="email" id="fis-email" placeholder="john@example.com">
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<div class="form-element">
+								<label for="fis-role">Role</label>
+								<select id="fis-role">
+									<option value="">Select role</option>
+									<option>Admin</option>
+									<option>Editor</option>
+									<option>Viewer</option>
+								</select>
+								<ul data-ln-validate-errors></ul>
+							</div>
+							<ul class="form-actions">
+								<li><button type="button">Cancel</button></li>
+								<li><button type="submit">Save</button></li>
+							</ul>
+						</form>
+					</main>
+				</section>
+
+				<div id="demo-input-components">
+
+				<!-- ==========================================
+				     NUMBER FORMATTING — ln-number
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Number Formatting — ln-number</h3></header>
+					<main>
+						<p>Real-time locale-aware number formatting. The component creates a hidden input for form submission and formats the visible input with thousand separators.</p>
+
+						<form id="demo-number-form" data-ln-form>
+							<div class="form-element">
+								<label for="demo-amount">Amount (free decimals)</label>
+								<input type="number" id="demo-amount" name="amount" data-ln-number>
+								<output id="demo-amount-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-price">Price (2 decimals)</label>
+								<input type="number" id="demo-price" name="price" data-ln-number data-ln-number-decimals="2">
+								<output id="demo-price-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-budget">Budget (pre-filled)</label>
+								<input type="number" id="demo-budget" name="budget" value="1500000" data-ln-number>
+								<output id="demo-budget-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-qty">Quantity (min: 0, max: 999999)</label>
+								<input type="number" id="demo-qty" name="quantity" data-ln-number data-ln-number-min="0" data-ln-number-max="999999">
+								<output id="demo-qty-raw"></output>
+							</div>
+						</form>
+					</main>
+				</section>
+
+				<!-- ==========================================
+				     DATE FORMATTING — ln-date
+				     ========================================== -->
+				<section class="section-card">
+					<header><h3>Date Formatting — ln-date</h3></header>
+					<main>
+						<p>Locale-aware date formatting with native browser picker. The component creates a hidden input for form submission and formats the visible input using Intl.DateTimeFormat or custom patterns.</p>
+
+						<form id="demo-date-form" data-ln-form>
+							<div class="form-element">
+								<label for="demo-birthday">Birthday (default medium)</label>
+								<input type="date" id="demo-birthday" name="birthday" data-ln-date>
+								<output id="demo-birthday-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-due">Due Date (short)</label>
+								<input type="date" id="demo-due" name="due" data-ln-date="short">
+								<output id="demo-due-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-event">Event Date (long)</label>
+								<input type="date" id="demo-event" name="event" data-ln-date="long">
+								<output id="demo-event-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-custom-date">Custom Pattern (dd.MM.yyyy)</label>
+								<input type="date" id="demo-custom-date" name="custom" data-ln-date="dd.MM.yyyy">
+								<output id="demo-custom-date-raw"></output>
+							</div>
+
+							<div class="form-element">
+								<label for="demo-prefilled-date">Pre-filled (medium)</label>
+								<input type="date" id="demo-prefilled-date" name="prefilled" value="2024-03-15" data-ln-date>
+								<output id="demo-prefilled-date-raw"></output>
+							</div>
+						</form>
+					</main>
+				</section>
+
+				</div>

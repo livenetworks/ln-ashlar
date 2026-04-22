@@ -1,0 +1,221 @@
+<!-- ln-page: title="Sortable — ln-acme" h1="Sortable" -->
+
+<h1>Sortable</h1>
+				<p>Drag &amp; drop reorder component using the Pointer Events API. Works with touch + mouse. The component only reorganizes the DOM — data model sync is the consumer's responsibility via events.</p>
+
+				<!-- Attributes -->
+				<section class="section-card">
+					<header><h3>Attributes</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+							<tbody>
+								<tr><td data-label="Attribute"><code>data-ln-sortable</code></td><td data-label="On element">container</td><td data-label="Description">Creates an instance. Sortable items = direct children.</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-sortable-handle</code></td><td data-label="On element">element inside a child</td><td data-label="Description">Drag handle. If absent — the entire child is draggable.</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Simple list (full child draggable) -->
+				<section class="section-card">
+					<header><h3>Simple List</h3></header>
+					<main>
+						<p>No handle — drag anywhere on the item.</p>
+						<ol id="sortable-simple" data-ln-sortable>
+							<li>First item</li>
+							<li>Second item</li>
+							<li>Third item</li>
+							<li>Fourth item</li>
+							<li>Fifth item</li>
+						</ol>
+					</main>
+				</section>
+
+				<!-- List with drag handle -->
+				<section class="section-card">
+					<header><h3>List with Drag Handle</h3></header>
+					<main>
+						<p>Drag only by the <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-menu"></use></svg> handle.</p>
+						<ol id="sortable-handle" data-ln-sortable>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Dashboard</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Users</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Reports</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Settings</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Archive</span>
+							</li>
+						</ol>
+					</main>
+				</section>
+
+				<!-- Enable/Disable -->
+				<section class="section-card">
+					<header><h3>Enable / Disable</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button class="btn btn-sm" onclick="document.getElementById('sortable-toggle').setAttribute('data-ln-sortable', '')">Enable</button>
+							<button class="btn-sm" onclick="document.getElementById('sortable-toggle').setAttribute('data-ln-sortable', 'disabled')">Disable</button>
+							<code id="toggle-status">Status: enabled</code>
+						</nav>
+						<ol id="sortable-toggle" data-ln-sortable>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Alpha</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Beta</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Gamma</span>
+							</li>
+						</ol>
+					</main>
+				</section>
+
+				<!-- Events log -->
+				<section class="section-card">
+					<header><h3>Events Log</h3></header>
+					<main>
+						<ol id="sortable-events" data-ln-sortable>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Item One</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Item Two</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Item Three</span>
+							</li>
+							<li>
+								<span class="sortable-handle" data-ln-sortable-handle><svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg></span>
+								<span>Item Four</span>
+							</li>
+						</ol>
+						<ul id="sortable-log"></ul>
+					</main>
+				</section>
+
+				<!-- CSS Classes -->
+				<section class="section-card">
+					<header><h3>CSS Classes</h3></header>
+					<main>
+						<p>The component adds/removes these classes. <strong>Does not ship CSS</strong> — the consumer styles them.</p>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Class</th><th>On</th><th>When</th></tr></thead>
+							<tbody>
+								<tr><td><code>.ln-sortable--active</code></td><td>container</td><td>While drag is in progress</td></tr>
+								<tr><td><code>.ln-sortable--dragging</code></td><td>dragged element</td><td>While being dragged</td></tr>
+								<tr><td><code>.ln-sortable--drop-before</code></td><td>target element</td><td>Pointer in top half</td></tr>
+								<tr><td><code>.ln-sortable--drop-after</code></td><td>target element</td><td>Pointer in bottom half</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Events reference -->
+				<section class="section-card">
+					<header><h3>Events</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Event</th><th>Bubbles</th><th>Cancelable</th><th>detail</th></tr></thead>
+							<tbody>
+								<tr><td><code>ln-sortable:before-drag</code></td><td>yes</td><td><strong>yes</strong></td><td><code>{ item, index }</code></td></tr>
+								<tr><td><code>ln-sortable:drag-start</code></td><td>yes</td><td>no</td><td><code>{ item, index }</code></td></tr>
+								<tr><td><code>ln-sortable:reordered</code></td><td>yes</td><td>no</td><td><code>{ item, oldIndex, newIndex }</code></td></tr>
+									<tr><td><code>ln-sortable:enabled</code></td><td>yes</td><td>no</td><td><code>{ target }</code></td></tr>
+									<tr><td><code>ln-sortable:disabled</code></td><td>yes</td><td>no</td><td><code>{ target }</code></td></tr>
+							</tbody>
+						</table>
+						</div>
+						<pre><code>document.addEventListener('ln-sortable:reordered', function (e) {
+    console.log('Moved from', e.detail.oldIndex, 'to', e.detail.newIndex);
+});
+
+// Cancel drag conditionally
+document.addEventListener('ln-sortable:before-drag', function (e) {
+    if (listIsLocked) e.preventDefault();
+});
+
+// Disable via attribute (single source of truth)
+list.setAttribute('data-ln-sortable', 'disabled');</code></pre>
+					</main>
+				</section>
+
+				<!-- HTML Structure -->
+				<section class="section-card">
+					<header><h3>HTML Structure</h3></header>
+					<main>
+						<pre><code>&lt;!-- Without handle (entire item draggable) --&gt;
+&lt;ul data-ln-sortable&gt;
+    &lt;li&gt;Drag me&lt;/li&gt;
+    &lt;li&gt;Me too&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- With handle --&gt;
+&lt;ol data-ln-sortable&gt;
+    &lt;li&gt;
+        &lt;span data-ln-sortable-handle&gt;⋮⋮&lt;/span&gt;
+        First item
+    &lt;/li&gt;
+    &lt;li&gt;
+        &lt;span data-ln-sortable-handle&gt;⋮⋮&lt;/span&gt;
+        Second item
+    &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;!-- Required CSS --&gt;
+&lt;style&gt;
+[data-ln-sortable-handle] {
+    touch-action: none;
+    cursor: grab;
+}
+.my-list &gt; li.ln-sortable--dragging { opacity: 0.4; }
+.my-list &gt; li.ln-sortable--drop-before { box-shadow: inset 0 2px 0 0 var(--color-primary); }
+.my-list &gt; li.ln-sortable--drop-after  { box-shadow: inset 0 -2px 0 0 var(--color-primary); }
+&lt;/style&gt;</code></pre>
+					</main>
+				</section>
+
+				<!-- API -->
+				<section class="section-card">
+					<header><h3>API</h3></header>
+					<main>
+						<pre><code>var list = document.querySelector('[data-ln-sortable]');
+
+// Via API (sets the attribute, observer syncs state)
+list.lnSortable.enable();     // sets data-ln-sortable=""
+list.lnSortable.disable();    // sets data-ln-sortable="disabled"
+list.lnSortable.isEnabled;    // boolean
+
+// Via attribute (identical result)
+list.setAttribute('data-ln-sortable', 'disabled');
+list.setAttribute('data-ln-sortable', '');
+
+// Constructor — only for non-standard cases
+window.lnSortable(container);</code></pre>
+					</main>
+				</section>

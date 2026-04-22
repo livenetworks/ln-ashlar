@@ -1,0 +1,192 @@
+<!-- ln-page: title="Select — ln-acme" h1="Select" -->
+
+<h1>Select</h1>
+					<p>TomSelect wrapper — enhances the standard <code>&lt;select&gt;</code> with search, tagging and create functionality.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td data-label="Attribute"><code>data-ln-select</code></td><td data-label="On element">&lt;select&gt;</td><td data-label="Description">Activates TomSelect with default configuration</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-select='{"create":true}'</code></td><td data-label="On element">&lt;select&gt;</td><td data-label="Description">JSON configuration (merged with defaults)</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Default configuration -->
+					<section class="section-card">
+						<header><h3>Default configuration</h3></header>
+						<main>
+							<pre><code>{
+    "allowEmptyOption": true,
+    "controlInput": null,
+    "create": false,
+    "highlight": true,
+    "closeAfterSelect": true,
+    "placeholder": "Select...",
+    "loadThrottle": 300
+}</code></pre>
+							<p><strong>Note:</strong> The <code>placeholder</code> attribute on <code>&lt;select&gt;</code> is used if set.</p>
+						</main>
+					</section>
+
+					<!-- Examples -->
+					<section class="section-card">
+						<header><h3>Example — Basic select</h3></header>
+						<main>
+							<select data-ln-select>
+								<option value="">Choose a role...</option>
+								<option value="user">Regular user</option>
+								<option value="admin">Administrator</option>
+								<option value="moderator">Moderator</option>
+								<option value="editor">Editor</option>
+							</select>
+						</main>
+					</section>
+
+					<!-- Select with create option -->
+					<section class="section-card">
+						<header><h3>Example — Select with create option</h3></header>
+						<main>
+							<p><strong>You can type a new value:</strong></p>
+							<select data-ln-select='{"create":true}' placeholder="Type or select...">
+								<option value="">Select...</option>
+								<option value="php">PHP</option>
+								<option value="python">Python</option>
+								<option value="javascript">JavaScript</option>
+								<option value="java">Java</option>
+							</select>
+						</main>
+					</section>
+
+					<!-- Multiple selects -->
+					<section class="section-card">
+						<header><h3>Example — Multiple selects in a form</h3></header>
+						<main>
+							<form>
+								<label>
+									Department
+									<select data-ln-select>
+										<option value="">Select...</option>
+										<option value="sales">Sales</option>
+										<option value="marketing">Marketing</option>
+										<option value="dev">Development</option>
+										<option value="hr">HR</option>
+									</select>
+								</label>
+								<label>
+									Team
+									<select data-ln-select>
+										<option value="">Select...</option>
+										<option value="frontend">Frontend</option>
+										<option value="backend">Backend</option>
+										<option value="devops">DevOps</option>
+									</select>
+								</label>
+								<button type="submit" class="btn">Save</button>
+							</form>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Manual initialization
+window.lnSelect.initialize(selectElement);
+
+// Destroy instance (cleanup)
+window.lnSelect.destroy(selectElement);
+
+// Get TomSelect instance for direct access
+var ts = window.lnSelect.getInstance(selectElement);
+
+// TomSelect API
+ts.addOption({ value: 'new', text: 'New option' });
+ts.setValue('new');
+ts.clear();
+ts.getItems();</code></pre>
+						</main>
+					</section>
+
+					<!-- Graceful degradation -->
+					<section id="select-graceful" class="section-card">
+						<header><h3>Graceful Degradation</h3></header>
+						<main>
+							<p>If <code>window.TomSelect</code> does not exist, the component silently does nothing. The <code>&lt;select&gt;</code> remains functional as a regular browser select.</p>
+							<p>
+								<strong>Best practice:</strong> Always include TomSelect before ln-acme if you are using it.
+							</p>
+						</main>
+					</section>
+
+					<!-- Lifecycle -->
+					<section class="section-card">
+						<header><h3>Lifecycle</h3></header>
+						<main>
+							<article>
+								<h4>On DOM remove</h4>
+								<p>The instance is automatically destroyed (cleanup).</p>
+							</article>
+							<article>
+								<h4>On form reset</h4>
+								<p>The selection is cleared automatically.</p>
+							</article>
+							<article>
+								<h4>Dynamically added select elements</h4>
+								<p>New select elements with <code>data-ln-select</code> are processed automatically.</p>
+							</article>
+						</main>
+					</section>
+
+					<!-- HTML example -->
+					<section class="section-card">
+						<header><h3>HTML structure</h3></header>
+						<main>
+							<pre><code>&lt;!-- Basic TomSelect --&gt;
+&lt;select data-ln-select&gt;
+    &lt;option value=""&gt;Select...&lt;/option&gt;
+    &lt;option value="option1"&gt;Option 1&lt;/option&gt;
+    &lt;option value="option2"&gt;Option 2&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;!-- TomSelect with create option --&gt;
+&lt;select data-ln-select='{"create":true}'
+        placeholder="Type or select..."&gt;
+    &lt;option value="opt1"&gt;Option 1&lt;/option&gt;
+    &lt;option value="opt2"&gt;Option 2&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;!-- TomSelect in a form --&gt;
+&lt;form&gt;
+    &lt;label for="my-select"&gt;Selection&lt;/label&gt;
+    &lt;select id="my-select" data-ln-select name="role"&gt;
+        &lt;option value="user"&gt;User&lt;/option&gt;
+        &lt;option value="admin"&gt;Admin&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/form&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- Dependencies -->
+					<section class="section-card">
+						<header><h3>Dependencies</h3></header>
+						<main>
+							<p><strong>Peer dependency:</strong> TomSelect must be loaded before ln-acme.</p>
+							<pre><code>&lt;!-- TomSelect CSS --&gt;
+&lt;link href="..." rel="stylesheet"&gt;
+
+&lt;!-- TomSelect JS (before ln-acme!) --&gt;
+&lt;script src="..."&gt;&lt;/script&gt;
+
+&lt;!-- ln-acme (with built-in TomSelect support) --&gt;
+&lt;link rel="stylesheet" href="dist/ln-acme.css"&gt;
+&lt;script src="dist/ln-acme.iife.js"&gt;&lt;/script&gt;</code></pre>
+						</main>
+					</section>

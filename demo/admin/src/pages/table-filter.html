@@ -1,0 +1,344 @@
+<!-- ln-page: title="Table Filter — ln-acme" h1="Table Filter" -->
+
+<h1>Table Filter</h1>
+				<p>Complete table filtering pattern — global search, per-column filters (popover + dropdown), and sort. Combines <code>ln-filter</code> (table column extension), <code>ln-dropdown</code>, <code>ln-popover</code>, and <code>ln-table-sort</code>.</p>
+
+				<!-- Employee table demo -->
+				<section class="section-card">
+					<header><h3>Employee Directory</h3></header>
+					<main>
+						<nav id="employee-toolbar">
+							<label data-ln-search="employee-table">
+								<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+								<input type="search" placeholder="Search employees...">
+								<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+							</label>
+						</nav>
+
+						<div data-ln-table id="employee-table">
+						<template data-ln-table-empty>
+							<article class="ln-table__empty-state">
+								<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-filter"></use></svg>
+								<h3>No results found</h3>
+								<p>Try a different search term or adjust your filters.</p>
+								<button type="button" data-ln-table-clear>Clear all</button>
+							</article>
+						</template>
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr>
+									<th data-ln-sort="string">
+										Name
+										<svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									</th>
+									<th data-ln-sort="string" data-ln-filter-col="dept">
+										Department
+										<button class="filter" type="button" data-ln-popover-for="filter-dept" aria-label="Filter department">
+											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+										</button>
+										<svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									</th>
+									<th data-ln-sort="string" data-ln-filter-col="role">
+										Role
+										<button class="filter" type="button" data-ln-popover-for="filter-role" aria-label="Filter role">
+											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+										</button>
+										<svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									</th>
+									<th data-ln-sort="string" data-ln-filter-col="status">
+										Status
+										<div data-ln-dropdown>
+											<button class="filter" type="button" data-ln-toggle-for="filter-status" aria-label="Filter status">
+												<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+											</button>
+											<ul id="filter-status" data-ln-toggle>
+												<li>
+													<nav data-ln-filter="employee-table">
+														<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label>
+														<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"> Active</label>
+														<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Inactive"> Inactive</label>
+														<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="On Leave"> On Leave</label>
+													</nav>
+												</li>
+											</ul>
+										</div>
+										<svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									</th>
+									<th data-ln-sort="string">
+										Location
+										<svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+										<svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td data-label="Name">Ana Petrova</td>
+									<td data-label="Department">Engineering</td>
+									<td data-label="Role">Senior Developer</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Marko Nikolov</td>
+									<td data-label="Department">Design</td>
+									<td data-label="Role">UI Designer</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Ivan Stojanovski</td>
+									<td data-label="Department">Engineering</td>
+									<td data-label="Role">Backend Developer</td>
+									<td data-label="Status"><span class="fail">Inactive</span></td>
+									<td data-label="Location">Bitola</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Sara Dimitrova</td>
+									<td data-label="Department">Marketing</td>
+									<td data-label="Role">Content Lead</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Elena Ristova</td>
+									<td data-label="Department">Design</td>
+									<td data-label="Role">UX Researcher</td>
+									<td data-label="Status"><span class="warn">On Leave</span></td>
+									<td data-label="Location">Ohrid</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Toni Angelov</td>
+									<td data-label="Department">QA</td>
+									<td data-label="Role">QA Engineer</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Boris Ilievski</td>
+									<td data-label="Department">Engineering</td>
+									<td data-label="Role">DevOps Engineer</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Kristina Gjorgjevska</td>
+									<td data-label="Department">Finance</td>
+									<td data-label="Role">Accountant</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Bitola</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Darko Mitevski</td>
+									<td data-label="Department">Finance</td>
+									<td data-label="Role">Financial Analyst</td>
+									<td data-label="Status"><span class="fail">Inactive</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Maja Kostadinova</td>
+									<td data-label="Department">HR</td>
+									<td data-label="Role">HR Manager</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Petar Blazevski</td>
+									<td data-label="Department">Engineering</td>
+									<td data-label="Role">System Admin</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Prilep</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Aleksandar Naumov</td>
+									<td data-label="Department">Engineering</td>
+									<td data-label="Role">Frontend Developer</td>
+									<td data-label="Status"><span class="warn">On Leave</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Vesna Todorova</td>
+									<td data-label="Department">HR</td>
+									<td data-label="Role">HR Specialist</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Ohrid</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Lidija Petrovska</td>
+									<td data-label="Department">Engineering</td>
+									<td data-label="Role">Security Engineer</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Nikola Trajkovski</td>
+									<td data-label="Department">Marketing</td>
+									<td data-label="Role">SEO Specialist</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Bitola</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Jovana Milosevska</td>
+									<td data-label="Department">QA</td>
+									<td data-label="Role">QA Lead</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Stefan Georgiev</td>
+									<td data-label="Department">Design</td>
+									<td data-label="Role">Motion Designer</td>
+									<td data-label="Status"><span class="fail">Inactive</span></td>
+									<td data-label="Location">Skopje</td>
+								</tr>
+								<tr>
+									<td data-label="Name">Teodora Angelova</td>
+									<td data-label="Department">Finance</td>
+									<td data-label="Role">Budget Analyst</td>
+									<td data-label="Status"><span class="pass">Active</span></td>
+									<td data-label="Location">Prilep</td>
+								</tr>
+							</tbody>
+						</table>
+						</div>
+						</div>
+
+						<!-- Department popover -->
+						<div data-ln-popover id="filter-dept">
+							<input type="search" placeholder="Search..." data-ln-search="filter-dept-list" data-ln-search-items="label">
+							<nav id="filter-dept-list" data-ln-filter="employee-table">
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Finance"> Finance</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="HR"> HR</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Marketing"> Marketing</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="QA"> QA</label>
+							</nav>
+						</div>
+
+						<!-- Role popover -->
+						<div data-ln-popover id="filter-role">
+							<input type="search" placeholder="Search..." data-ln-search="filter-role-list" data-ln-search-items="label">
+							<nav id="filter-role-list" data-ln-filter="employee-table">
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-reset checked> All</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Accountant"> Accountant</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Backend Developer"> Backend Developer</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Budget Analyst"> Budget Analyst</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Content Lead"> Content Lead</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="DevOps Engineer"> DevOps Engineer</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Financial Analyst"> Financial Analyst</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Frontend Developer"> Frontend Developer</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="HR Manager"> HR Manager</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="HR Specialist"> HR Specialist</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Motion Designer"> Motion Designer</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="QA Engineer"> QA Engineer</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="QA Lead"> QA Lead</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="SEO Specialist"> SEO Specialist</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Security Engineer"> Security Engineer</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Senior Developer"> Senior Developer</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="System Admin"> System Admin</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="UI Designer"> UI Designer</label>
+								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="UX Researcher"> UX Researcher</label>
+							</nav>
+						</div>
+					</main>
+				</section>
+
+				<!-- How It Works -->
+				<section class="section-card">
+					<header><h3>How It Works</h3></header>
+					<main>
+						<ul>
+							<li><strong>Global search</strong> — <code>ln-search</code> dispatches <code>ln-search:change</code> events on the <code>data-ln-table</code> wrapper. <code>ln-table</code> intercepts the event and filters rows in-memory — no custom script needed.</li>
+							<li><strong>Per-column filters</strong> — <code>ln-filter</code> dispatches <code>ln-filter:changed</code> events on the table wrapper. <code>ln-table</code> maps filter keys to columns via <code>data-ln-filter-col</code> on <code>&lt;th&gt;</code> elements. Multiple columns combine with AND logic; within a column, checked values use OR logic. When a filter is active, <code>ln-table</code> sets <code>data-ln-filter-active</code> on the <code>&lt;th&gt;</code> — the filter icon turns primary color.</li>
+							<li><strong>Popover pattern</strong> — Department and Role use <code>ln-popover</code> with hardcoded checkboxes. Each popover's <code>data-ln-filter</code> targets the <code>data-ln-table</code> wrapper ID.</li>
+							<li><strong>Dropdown pattern</strong> — Status uses <code>ln-dropdown</code> with hardcoded checkboxes embedded in the <code>&lt;th&gt;</code>.</li>
+							<li><strong>Sort</strong> — <code>ln-table-sort</code> via <code>data-ln-sort</code> on <code>&lt;th&gt;</code> elements. Click header to cycle: ascending → descending → unsorted.</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Code: Popover Pattern -->
+				<section class="section-card">
+					<header><h3>Popover Pattern</h3></header>
+					<main>
+						<p>Filter trigger in <code>&lt;th&gt;</code>, popover with hardcoded checkboxes. The <code>data-ln-filter</code> targets the <code>data-ln-table</code> wrapper ID. The <code>&lt;th&gt;</code> needs <code>data-ln-filter-col</code> set to the filter key so <code>ln-table</code> can map it to the column index.</p>
+						<pre><code>&lt;!-- Wrapper --&gt;
+&lt;div data-ln-table id="my-table"&gt;
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th data-ln-sort="string"&gt;Name&lt;/th&gt;
+                &lt;th data-ln-sort="string" data-ln-filter-col="dept"&gt;
+                    Department
+                    &lt;button class="filter" type="button" data-ln-popover-for="filter-dept" aria-label="Filter department"&gt;
+                        &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;...&lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/div&gt;
+
+&lt;!-- Popover (teleported to body on open) --&gt;
+&lt;div data-ln-popover id="filter-dept"&gt;
+    &lt;nav data-ln-filter="my-table"&gt;
+        &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked&gt; All&lt;/label&gt;
+        &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="IT"&gt; IT&lt;/label&gt;
+        &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="HR"&gt; HR&lt;/label&gt;
+    &lt;/nav&gt;
+&lt;/div&gt;</code></pre>
+					</main>
+				</section>
+
+				<!-- Code: Dropdown Pattern -->
+				<section class="section-card">
+					<header><h3>Dropdown Pattern (Inline in TH)</h3></header>
+					<main>
+						<p>For columns with few known values. The dropdown and filter live inside the <code>&lt;th&gt;</code>. The <code>&lt;th&gt;</code> needs <code>data-ln-filter-col</code> set to the filter key.</p>
+						<pre><code>&lt;th data-ln-sort="string" data-ln-filter-col="status"&gt;
+    Status
+    &lt;div data-ln-dropdown&gt;
+        &lt;button class="filter" type="button" data-ln-toggle-for="filter-status" aria-label="Filter status"&gt;
+            &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;
+        &lt;/button&gt;
+        &lt;ul id="filter-status" data-ln-toggle&gt;
+            &lt;li&gt;
+                &lt;nav data-ln-filter="my-table"&gt;
+                    &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked&gt; All&lt;/label&gt;
+                    &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"&gt; Active&lt;/label&gt;
+                    &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Inactive"&gt; Inactive&lt;/label&gt;
+                &lt;/nav&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/th&gt;</code></pre>
+					</main>
+				</section>
+
+				<!-- Code: Search Integration -->
+				<section class="section-card">
+					<header><h3>Search Integration</h3></header>
+					<main>
+						<p><code>ln-search</code> dispatches <code>ln-search:change</code> on the target element. When the target is a <code>data-ln-table</code> wrapper, <code>ln-table</code> intercepts the event, calls <code>preventDefault()</code>, and handles filtering in-memory. No custom script needed.</p>
+						<pre><code>&lt;!-- Search input targets the ln-table wrapper --&gt;
+&lt;input type="search" placeholder="Search..." data-ln-search="my-table"&gt;
+
+&lt;!-- ln-table wrapper --&gt;
+&lt;div data-ln-table id="my-table"&gt;
+    &lt;table&gt;...&lt;/table&gt;
+&lt;/div&gt;</code></pre>
+					</main>
+				</section>

@@ -1,0 +1,322 @@
+<!-- ln-page: title="Filter — ln-acme" h1="Filter" -->
+
+<h1>Filter</h1>
+				<p>Generic filter component — filters children of a target element by <code>data-*</code> attribute. Supports multi-select: multiple checkboxes can be active simultaneously (OR logic). Works independently alongside <code>ln-search</code>.</p>
+
+				<!-- Attributes -->
+				<section class="section-card">
+					<header><h3>Attributes</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+							<tbody>
+								<tr><td data-label="Attribute"><code>data-ln-filter="targetId"</code></td><td data-label="On element">component root</td><td data-label="Description">Target element by ID whose children are filtered</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter-key="field"</code></td><td data-label="On element"><code>&lt;input type="checkbox"&gt;</code></td><td data-label="Description">Name of data attribute for comparison on target children</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter-value="val"</code></td><td data-label="On element"><code>&lt;input type="checkbox"&gt;</code></td><td data-label="Description">Value for comparison</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter-reset</code></td><td data-label="On element"><code>&lt;input type="checkbox"&gt;</code></td><td data-label="Description">Marks the "All" (reset) checkbox. Replaces <code>data-ln-filter-value=""</code> which still works as fallback.</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter-hide</code></td><td data-label="On element">target children</td><td data-label="Description">Set by JS when element doesn't match</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-filter-col</code></td><td data-label="On element">Component root</td><td data-label="Description">Column index (0-based) for table row filtering. Reads <code>&lt;td&gt;</code> text at column N.</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Basic filter -->
+				<section class="section-card">
+					<header><h3>Basic Filter</h3></header>
+					<main>
+						<nav data-ln-filter="filter-basic-list" id="filter-basic-nav">
+							<ul>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="design"> Design</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="dev"> Development</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="qa"> QA</label></li>
+							</ul>
+						</nav>
+
+						<ul id="filter-basic-list">
+							<li data-category="design">Ana Petrova — UI Designer</li>
+							<li data-category="dev">Marko Nikolov — Frontend Developer</li>
+							<li data-category="dev">Ivan Stojanovski — Backend Developer</li>
+							<li data-category="qa">Sara Dimitrova — QA Engineer</li>
+							<li data-category="design">Elena Ristova — UX Designer</li>
+							<li data-category="qa">Toni Angelov — QA Lead</li>
+							<li data-category="dev">Boris Ilievski — Full Stack Developer</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Filter with cards -->
+				<section class="section-card">
+					<header><h3>Filter with Cards</h3></header>
+					<main>
+						<nav data-ln-filter="filter-cards-list" id="filter-cards-nav">
+							<ul>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="active"> Active</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="pending"> Pending</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="inactive"> Inactive</label></li>
+							</ul>
+						</nav>
+
+						<ul id="filter-cards-list">
+							<li data-status="active">
+								<strong>Project Alpha</strong>
+								<small>Status: Active</small>
+							</li>
+							<li data-status="pending">
+								<strong>Project Beta</strong>
+								<small>Status: Pending</small>
+							</li>
+							<li data-status="inactive">
+								<strong>Project Gamma</strong>
+								<small>Status: Inactive</small>
+							</li>
+							<li data-status="active">
+								<strong>Project Delta</strong>
+								<small>Status: Active</small>
+							</li>
+							<li data-status="pending">
+								<strong>Project Epsilon</strong>
+								<small>Status: Pending</small>
+							</li>
+							<li data-status="active">
+								<strong>Project Zeta</strong>
+								<small>Status: Active</small>
+							</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Filter + Search combo -->
+				<section class="section-card">
+					<header><h3>Filter + Search Combination</h3></header>
+					<main>
+						<p>Both components work <strong>independently</strong> on the same list — an item is visible only when neither hides it.</p>
+
+						<div id="combo-toolbar">
+							<nav data-ln-filter="combo-list">
+								<ul>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All departments</label></li>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="hr"> HR</label></li>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="it"> IT</label></li>
+									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="finance"> Finance</label></li>
+								</ul>
+							</nav>
+							<label>
+								<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+								<input type="search" placeholder="Search name..." data-ln-search="combo-list">
+							</label>
+						</div>
+
+						<ul id="combo-list">
+							<li data-dept="hr">Maja Kostadinova — HR Manager</li>
+							<li data-dept="it">Petar Blazevski — System Administrator</li>
+							<li data-dept="finance">Kristina Gjorgjevska — Accountant</li>
+							<li data-dept="it">Aleksandar Naumov — DevOps Engineer</li>
+							<li data-dept="hr">Vesna Todorova — HR Specialist</li>
+							<li data-dept="finance">Darko Mitevski — Financial Analyst</li>
+							<li data-dept="it">Lidija Petrovska — Security Engineer</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Programmatic API -->
+				<section class="section-card">
+					<header><h3>Programmatic API</h3></header>
+					<main>
+						<nav class="demo-actions" id="api-demo-actions">
+							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'high')">Filter: High</button>
+							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'medium')">Filter: Medium</button>
+							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', ['high', 'medium'])">Filter: High + Medium</button>
+							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'low')">Filter: Low</button>
+							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.reset()">Reset</button>
+							<code id="api-filter-status">Active filter: none</code>
+						</nav>
+
+						<nav data-ln-filter="api-filter-list" id="api-filter-nav" hidden></nav>
+
+						<ul id="api-filter-list">
+							<li data-priority="high">Task A — High priority</li>
+							<li data-priority="medium">Task B — Medium priority</li>
+							<li data-priority="low">Task C — Low priority</li>
+							<li data-priority="high">Task D — High priority</li>
+							<li data-priority="medium">Task E — Medium priority</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Table Column Filter (Hardcoded) -->
+				<section class="section-card">
+					<header><h3>Table Column Filter (Hardcoded)</h3></header>
+					<main>
+						<p>Filter a plain <code>&lt;table&gt;</code> by column text. No <code>data-*</code> attributes needed on rows.</p>
+
+						<nav data-ln-filter="demo-table-1" data-ln-filter-col="2">
+							<ul>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Marketing"> Marketing</label></li>
+							</ul>
+						</nav>
+
+						<div class="table-container">
+						<table id="demo-table-1">
+							<thead>
+								<tr><th>#</th><th>Name</th><th>Department</th><th>Status</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>1</td><td>Ana Petrova</td><td>Engineering</td><td>Active</td></tr>
+								<tr><td>2</td><td>Marko Nikolov</td><td>Design</td><td>Active</td></tr>
+								<tr><td>3</td><td>Ivan Stojanovski</td><td>Engineering</td><td>Inactive</td></tr>
+								<tr><td>4</td><td>Sara Dimitrova</td><td>Marketing</td><td>Active</td></tr>
+								<tr><td>5</td><td>Elena Ristova</td><td>Design</td><td>Pending</td></tr>
+								<tr><td>6</td><td>Toni Angelov</td><td>Marketing</td><td>Inactive</td></tr>
+								<tr><td>7</td><td>Boris Ilievski</td><td>Engineering</td><td>Active</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Multi-Column Table Filter -->
+				<section class="section-card">
+					<header><h3>Multi-Column Table Filter (AND logic)</h3></header>
+					<main>
+						<p>Two filters on the same table: department (column 2) AND status (column 3). Combined with AND logic across columns.</p>
+
+						<nav>
+							<strong>Department:</strong>
+							<span data-ln-filter="demo-table-2" data-ln-filter-col="2">
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label>
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Marketing"> Marketing</label>
+							</span>
+						</nav>
+						<nav>
+							<strong>Status:</strong>
+							<span data-ln-filter="demo-table-2" data-ln-filter-col="3">
+								<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label>
+								<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"> Active</label>
+								<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Inactive"> Inactive</label>
+								<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label>
+							</span>
+						</nav>
+
+						<div class="table-container">
+						<table id="demo-table-2">
+							<thead>
+								<tr><th>#</th><th>Name</th><th>Department</th><th>Status</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>1</td><td>Ana Petrova</td><td>Engineering</td><td>Active</td></tr>
+								<tr><td>2</td><td>Marko Nikolov</td><td>Design</td><td>Active</td></tr>
+								<tr><td>3</td><td>Ivan Stojanovski</td><td>Engineering</td><td>Inactive</td></tr>
+								<tr><td>4</td><td>Sara Dimitrova</td><td>Marketing</td><td>Active</td></tr>
+								<tr><td>5</td><td>Elena Ristova</td><td>Design</td><td>Pending</td></tr>
+								<tr><td>6</td><td>Toni Angelov</td><td>Marketing</td><td>Inactive</td></tr>
+								<tr><td>7</td><td>Boris Ilievski</td><td>Engineering</td><td>Active</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Auto-Populate + Search -->
+				<section class="section-card">
+					<header><h3>Auto-Populate from Column + Search</h3></header>
+					<main>
+						<p>Filter values auto-populated from column 2 text. Search input filters the checkbox list.</p>
+
+						<div>
+							<input type="search" placeholder="Search departments..." data-ln-search="filter-dept-list-3" data-ln-search-items="label">
+							<nav id="filter-dept-list-3" data-ln-filter="demo-table-3" data-ln-filter-col="2">
+								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
+								<template>
+									<label><input type="checkbox"> {{ text }}</label>
+								</template>
+							</nav>
+						</div>
+
+						<div class="table-container">
+						<table id="demo-table-3">
+							<thead>
+								<tr><th>#</th><th>Name</th><th>Department</th><th>Role</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>1</td><td>Ana Petrova</td><td>Engineering</td><td>Senior Dev</td></tr>
+								<tr><td>2</td><td>Marko Nikolov</td><td>Design</td><td>UI Designer</td></tr>
+								<tr><td>3</td><td>Ivan Stojanovski</td><td>Engineering</td><td>Backend Dev</td></tr>
+								<tr><td>4</td><td>Sara Dimitrova</td><td>Marketing</td><td>Content Lead</td></tr>
+								<tr><td>5</td><td>Elena Ristova</td><td>Design</td><td>UX Researcher</td></tr>
+								<tr><td>6</td><td>Toni Angelov</td><td>QA</td><td>QA Engineer</td></tr>
+								<tr><td>7</td><td>Boris Ilievski</td><td>Engineering</td><td>DevOps</td></tr>
+								<tr><td>8</td><td>Kristina Gjorgjevska</td><td>Finance</td><td>Accountant</td></tr>
+								<tr><td>9</td><td>Darko Mitevski</td><td>Finance</td><td>Analyst</td></tr>
+								<tr><td>10</td><td>Maja Kostadinova</td><td>HR</td><td>HR Manager</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Events -->
+				<section class="section-card">
+					<header><h3>Events</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Event</th><th>Bubbles</th><th>detail</th></tr></thead>
+							<tbody>
+								<tr><td><code>ln-filter:changed</code></td><td>yes</td><td><code>{ key, values: [] }</code></td></tr>
+								<tr><td><code>ln-filter:reset</code></td><td>yes</td><td><code>{}</code></td></tr>
+							</tbody>
+						</table>
+						</div>
+						<pre><code>document.addEventListener('ln-filter:changed', function (e) {
+    console.log('Filter:', e.detail.key, '=', e.detail.values.join(', '));
+});
+
+document.addEventListener('ln-filter:reset', function (e) {
+    console.log('Filter reset');
+});</code></pre>
+					</main>
+				</section>
+
+				<!-- HTML Structure -->
+				<section class="section-card">
+					<header><h3>HTML Structure</h3></header>
+					<main>
+						<pre><code>&lt;!-- Filter checkboxes --&gt;
+&lt;nav data-ln-filter="my-list"&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked&gt; All&lt;/label&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"&gt; Category A&lt;/label&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"&gt; Category B&lt;/label&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/nav&gt;
+
+&lt;!-- Target list (children have data-category attribute) --&gt;
+&lt;ul id="my-list"&gt;
+    &lt;li data-category="a"&gt;Element from category A&lt;/li&gt;
+    &lt;li data-category="b"&gt;Element from category B&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+					</main>
+				</section>
+
+				<!-- CSS -->
+				<section class="section-card">
+					<header><h3>Required CSS</h3></header>
+					<main>
+						<p>The hide rule is bundled in ln-acme. Pill styling (active state highlight) is automatic via <code>label:has(&gt; input:checked)</code> in the library defaults — no additional CSS needed for active state.</p>
+						<pre><code>/* Combined with ln-search */
+[data-ln-search-hide],
+[data-ln-filter-hide] {
+    display: none;
+}</code></pre>
+					</main>
+				</section>

@@ -1,0 +1,107 @@
+<!-- ln-page: title="Prose — ln-acme" h1="Prose" -->
+
+<h1>Prose</h1>
+				<p>Rich-text content styling for TipTap/editor output. Add <code>data-ln-prose</code> to any wrapper containing semantic HTML.</p>
+
+				<!-- Full element showcase -->
+				<section class="section-card">
+					<header><h3>All Elements — Full Showcase</h3></header>
+					<main>
+						<article data-ln-prose>
+							<h1>Document Title (h1)</h1>
+							<p>This is the opening paragraph of a rich-text document. It uses the <code>body-md</code> typography role with a reading-optimized max-width of 65 characters.</p>
+
+							<h2>Section Heading (h2)</h2>
+							<p>Paragraphs are spaced using the <code>> * + *</code> lobotomised owl selector so margin is only added between sibling elements.</p>
+							<p>A second paragraph follows. Links are <a href="#">styled with the primary colour</a> and an underline. Hover thickens the underline.</p>
+
+							<h3>Subsection (h3)</h3>
+							<p>Content continues under the subsection heading.</p>
+
+							<h4>Minor heading (h4)</h4>
+							<p>The heading hierarchy maps to <code>heading-lg</code>, <code>heading-md</code>, <code>heading-sm</code>, and <code>title-md</code> typography roles.</p>
+
+							<hr>
+
+							<h2>Text formatting</h2>
+							<p>Text can be <strong>bold (semibold weight)</strong>, <em>italic</em>, or contain <code>inline code</code> styled in monospace with a secondary background.</p>
+
+							<h2>Lists</h2>
+							<ul>
+								<li>Unordered list — disc style</li>
+								<li>Second item with a longer description that wraps onto multiple lines to show line-height behaviour</li>
+								<li>Third item</li>
+							</ul>
+
+							<ol>
+								<li>Ordered list — decimal</li>
+								<li>Second numbered step</li>
+								<li>Third step</li>
+							</ol>
+
+							<h2>Blockquote</h2>
+							<blockquote>
+								An organization's quality management system should be documented in a quality manual that includes the scope, exclusions, and references to procedures.
+							</blockquote>
+
+							<h2>Code block</h2>
+							<pre><code>// Example code block
+const document = await fetch('/api/documents/123');
+const data = await document.json();
+console.log(data.title);</code></pre>
+
+							<h2>Image</h2>
+							<figure>
+								<img src="ln-acme-logo.png" alt="ln-acme logo example">
+								<figcaption>Figure caption styled with the caption typography role</figcaption>
+							</figure>
+
+							<h2>Table</h2>
+							<div class="table-container">
+							<table>
+								<thead>
+									<tr>
+										<th>Document</th>
+										<th>Standard</th>
+										<th>Status</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td data-label="Document">Quality Manual</td>
+										<td data-label="Standard">ISO 9001</td>
+										<td data-label="Status">Approved</td>
+									</tr>
+									<tr>
+										<td data-label="Document">Risk Register</td>
+										<td data-label="Standard">ISO 27001</td>
+										<td data-label="Status">In Review</td>
+									</tr>
+									<tr>
+										<td data-label="Document">Incident Procedure</td>
+										<td data-label="Standard">ISO 45001</td>
+										<td data-label="Status">Draft</td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+
+							<hr>
+
+							<p>End of prose content. The max-width is <code>65ch</code> — enough for comfortable reading without excessive eye travel.</p>
+						</article>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Default attribute — zero SCSS needed
+// &lt;article data-ln-prose&gt;...&lt;/article&gt;
+
+// Consumer semantic selectors
+#document-viewer { @include prose; }
+#help-article    { @include prose; }</code></pre>
+					</main>
+				</section>

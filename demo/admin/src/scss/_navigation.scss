@@ -5,6 +5,10 @@
 	@include nav-links-border-grow;
 }
 
+.nav .nav-label {
+	@include truncate;
+}
+
 @container sidebar (max-width: 80px) {
 	.nav {
 		a {

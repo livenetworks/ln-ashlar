@@ -7,6 +7,20 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -31,7 +45,7 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<header>
+		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
@@ -40,20 +54,29 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
 					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+						</ul>
+					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
+						<span>Test Toast</span>
 					</button>
 				</div>
 			</div>
 		</header>
 
 		<!-- App Body -->
-		<div class="app-body">
+		<main class="app-main">
 		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
@@ -107,7 +130,7 @@
 						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
 						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
-						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="filter.html" aria-current="page"><span class="nav-label">Filter</span></a></li>
 						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
@@ -135,30 +158,30 @@
 				<small>acme-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<div class="app-scrim" data-ln-scrim></div>
 
-		<!-- Main Panel -->
-		<div class="main-panel">
-
-			<!-- Content -->
-			<div class="content">
-				<h1>Filter</h1>
+		<!-- Content -->
+		<section>
+<h1>Filter</h1>
 				<p>Generic filter component — filters children of a target element by <code>data-*</code> attribute. Supports multi-select: multiple checkboxes can be active simultaneously (OR logic). Works independently alongside <code>ln-search</code>.</p>
 
 				<!-- Attributes -->
 				<section class="section-card">
 					<header><h3>Attributes</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 							<tbody>
-								<tr><td><code>data-ln-filter="targetId"</code></td><td>component root</td><td>Target element by ID whose children are filtered</td></tr>
-								<tr><td><code>data-ln-filter-key="field"</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Name of data attribute for comparison on target children</td></tr>
-								<tr><td><code>data-ln-filter-value="val"</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Value for comparison</td></tr>
-								<tr><td><code>data-ln-filter-reset</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td>Marks the "All" (reset) checkbox. Replaces <code>data-ln-filter-value=""</code> which still works as fallback.</td></tr>
-								<tr><td><code>data-ln-filter-hide</code></td><td>target children</td><td>Set by JS when element doesn't match</td></tr>
-									<tr><td><code>data-ln-filter-col</code></td><td>Component root</td><td>Column index (0-based) for table row filtering. Reads <code>&lt;td&gt;</code> text at column N.</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter="targetId"</code></td><td data-label="On element">component root</td><td data-label="Description">Target element by ID whose children are filtered</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter-key="field"</code></td><td data-label="On element"><code>&lt;input type="checkbox"&gt;</code></td><td data-label="Description">Name of data attribute for comparison on target children</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter-value="val"</code></td><td data-label="On element"><code>&lt;input type="checkbox"&gt;</code></td><td data-label="Description">Value for comparison</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter-reset</code></td><td data-label="On element"><code>&lt;input type="checkbox"&gt;</code></td><td data-label="Description">Marks the "All" (reset) checkbox. Replaces <code>data-ln-filter-value=""</code> which still works as fallback.</td></tr>
+								<tr><td data-label="Attribute"><code>data-ln-filter-hide</code></td><td data-label="On element">target children</td><td data-label="Description">Set by JS when element doesn't match</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-filter-col</code></td><td data-label="On element">Component root</td><td data-label="Description">Column index (0-based) for table row filtering. Reads <code>&lt;td&gt;</code> text at column N.</td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -302,6 +325,7 @@
 							</ul>
 						</nav>
 
+						<div class="table-container">
 						<table id="demo-table-1">
 							<thead>
 								<tr><th>#</th><th>Name</th><th>Department</th><th>Status</th></tr>
@@ -316,6 +340,7 @@
 								<tr><td>7</td><td>Boris Ilievski</td><td>Engineering</td><td>Active</td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -344,6 +369,7 @@
 							</span>
 						</nav>
 
+						<div class="table-container">
 						<table id="demo-table-2">
 							<thead>
 								<tr><th>#</th><th>Name</th><th>Department</th><th>Status</th></tr>
@@ -358,6 +384,7 @@
 								<tr><td>7</td><td>Boris Ilievski</td><td>Engineering</td><td>Active</td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -377,6 +404,7 @@
 							</nav>
 						</div>
 
+						<div class="table-container">
 						<table id="demo-table-3">
 							<thead>
 								<tr><th>#</th><th>Name</th><th>Department</th><th>Role</th></tr>
@@ -394,6 +422,7 @@
 								<tr><td>10</td><td>Maja Kostadinova</td><td>HR</td><td>HR Manager</td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -401,6 +430,7 @@
 				<section class="section-card">
 					<header><h3>Events</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead><tr><th>Event</th><th>Bubbles</th><th>detail</th></tr></thead>
 							<tbody>
@@ -408,6 +438,7 @@
 								<tr><td><code>ln-filter:reset</code></td><td>yes</td><td><code>{}</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>document.addEventListener('ln-filter:changed', function (e) {
     console.log('Filter:', e.detail.key, '=', e.detail.values.join(', '));
 });
@@ -451,36 +482,98 @@ document.addEventListener('ln-filter:reset', function (e) {
 }</code></pre>
 					</main>
 				</section>
-
-			</div>
+		</section>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
 				<span>ln-acme v1.2.0</span>
 			</footer>
-		</div>
-		</div><!-- /.app-body -->
+		</main>
 	</div><!-- /.app-wrapper -->
 
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
+
 	<script>
-		// Programmatic API demo — update status label
-		document.addEventListener('ln-filter:changed', function (e) {
-			var el = document.getElementById('api-filter-status');
-			if (el && e.target.id === 'api-filter-nav') {
-				if (e.detail.values && e.detail.values.length > 0) {
-					el.textContent = 'Active filter: ' + e.detail.key + ' = ' + e.detail.values.join(', ');
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
 				} else {
-					el.textContent = 'Active filter: none';
+					btn.removeAttribute('aria-current');
 				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
 			}
 		});
-		document.addEventListener('ln-filter:reset', function (e) {
-			var el = document.getElementById('api-filter-status');
-			if (el && e.target.id === 'api-filter-nav') {
-				el.textContent = 'Active filter: none';
-			}
-		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
 	</script>
 </body>
 </html>

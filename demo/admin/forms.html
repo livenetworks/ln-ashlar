@@ -7,8 +7,21 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
 	<link rel="stylesheet" href="dist/admin.css">
-	<link id="ln-theme" rel="stylesheet" href="">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -32,7 +45,7 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<header>
+		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
@@ -41,32 +54,29 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
-					</button>
-					<button type="button" data-ln-popover-for="theme-switcher" aria-label="Switch theme">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
 					</button>
-					<div id="theme-switcher" data-ln-popover>
-						<nav>
-							<button type="button" onclick="document.getElementById('ln-theme').href=''">Default</button>
-							<button type="button" onclick="document.getElementById('ln-theme').href='../themes/corporate.css'">Corporate</button>
-							<button type="button" onclick="document.getElementById('ln-theme').href='../themes/creative.css'">Creative</button>
-							<button type="button" onclick="document.getElementById('ln-theme').href='../themes/nature.css'">Nature</button>
-							<button type="button" onclick="document.getElementById('ln-theme').href='../themes/dark.css'">Dark</button>
-						</nav>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+						</ul>
 					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
+						<span>Test Toast</span>
 					</button>
 				</div>
 			</div>
 		</header>
 
 		<!-- App Body -->
-		<div class="app-body">
+		<main class="app-main">
 		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
@@ -91,7 +101,7 @@
 						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
 						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
 						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
-						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="forms.html" aria-current="page"><span class="nav-label">Forms &amp; Buttons</span></a></li>
 						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
 						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
 						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
@@ -148,13 +158,11 @@
 				<small>acme-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<div class="app-scrim" data-ln-scrim></div>
 
-		<!-- Main Panel -->
-		<div class="main-panel">
-
-			<!-- Content -->
-			<div class="content">
-				<h1>Forms &amp; Buttons</h1>
+		<!-- Content -->
+		<section>
+<h1>Forms &amp; Buttons</h1>
 				<p>CSS Grid + <code>&lt;div class="form-element"&gt;</code> pattern. No <code>&lt;div class="form-group"&gt;</code> or <code>&lt;div class="form-row"&gt;</code>. The grid controls the layout via SCSS — not via HTML.</p>
 
 				<!-- ==========================================
@@ -201,6 +209,7 @@
 						</div>
 
 						<!-- Rules table -->
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr>
@@ -210,16 +219,16 @@
 							</thead>
 							<tbody>
 								<tr>
-									<td>Root</td>
-									<td><code>&lt;form id="..." data-ln-form&gt;</code> — styled with <code>@include form-grid</code> in SCSS (6 cols → 1 col on mobile)</td>
+									<td data-label="Element">Root</td>
+									<td data-label="Rule"><code>&lt;form id="..." data-ln-form&gt;</code> — styled with <code>@include form-grid</code> in SCSS (6 cols → 1 col on mobile)</td>
 								</tr>
 								<tr>
-									<td>Children</td>
-									<td><code>&lt;div class="form-element"&gt;</code> — wraps <code>&lt;label&gt;</code> + <code>&lt;input&gt;</code> + error list</td>
+									<td data-label="Element">Children</td>
+									<td data-label="Rule"><code>&lt;div class="form-element"&gt;</code> — wraps <code>&lt;label&gt;</code> + <code>&lt;input&gt;</code> + error list</td>
 								</tr>
 								<tr>
-									<td>Label</td>
-									<td>Explicit <code>for</code>/<code>id</code> association: <code>&lt;label for="name"&gt;</code> + <code>&lt;input id="name"&gt;</code></td>
+									<td data-label="Element">Label</td>
+									<td data-label="Rule">Explicit <code>for</code>/<code>id</code> association: <code>&lt;label for="name"&gt;</code> + <code>&lt;input id="name"&gt;</code></td>
 								</tr>
 								<tr>
 									<td>Validation</td>
@@ -239,6 +248,7 @@
 								</tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -997,118 +1007,98 @@ form.lnForm.reset();</code></pre>
 				</section>
 
 				</div>
-
-			</div>
+		</section>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
 				<span>ln-acme v1.2.0</span>
 			</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
 
-		</div>
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
 	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
 	</div>
 
 	<script>
-	document.addEventListener('DOMContentLoaded', function () {
-		var formLog = document.getElementById('form-log');
-		var autoLog = document.getElementById('auto-submit-log');
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const root = document.documentElement;
 
-		// ─── Main form event log ───────────────────────────
-		var formEvents = [
-			'ln-validate:valid', 'ln-validate:invalid',
-			'ln-form:submit'
-		];
-
-		formEvents.forEach(function (name) {
-			document.getElementById('demo-form-grid').addEventListener(name, function (e) {
-				var time = new Date().toLocaleTimeString();
-				var line = '[' + time + '] ' + name;
-				if (e.detail.field) line += ' — field: ' + e.detail.field;
-				if (e.detail.data) line += ' — ' + JSON.stringify(e.detail.data).substring(0, 100);
-				formLog.textContent = line + '\n' + formLog.textContent;
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
 			});
-		});
+		}
 
-		// ─── Auto-submit event log ─────────────────────────
-		document.getElementById('demo-auto-submit').addEventListener('ln-form:submit', function (e) {
-			var time = new Date().toLocaleTimeString();
-			var line = '[' + time + '] ln-form:submit — ' + JSON.stringify(e.detail.data);
-			autoLog.textContent = line + '\n' + autoLog.textContent;
-		});
-
-		// ─── Fill / Reset buttons ──────────────────────────
-		var demoForm = document.getElementById('demo-form-grid');
-
-		// Pattern 1: Direct API — caller holds a reference
-		document.getElementById('demo-fill-api-btn').addEventListener('click', function () {
-			demoForm.lnForm.fill({
-				fname: 'Dalibor',
-				lname: 'Sojic',
-				email: 'dalibor@example.com',
-				phone: '+389 70 123456',
-				city: 'Skopje',
-				zip: '1000',
-				message: 'Hello from fill()!'
-			});
-			window.lnToast.enqueue({ type: 'info', title: 'Filled', message: 'Form populated via direct API' });
-		});
-
-		// Pattern 2: Coordinator — routes external event to form
-		// In a real app this would be: table.addEventListener('ln-data-table:row-click', ...)
-		document.getElementById('demo-fill-coordinator-btn').addEventListener('click', function () {
-			demoForm.lnForm.fill({
-				fname: 'Jane',
-				lname: 'Doe',
-				email: 'jane@example.com',
-				phone: '+1 555 1234',
-				city: 'New York',
-				zip: '10001',
-				message: 'Hello from coordinator!'
-			});
-			window.lnToast.enqueue({ type: 'info', title: 'Filled', message: 'Form populated via coordinator pattern' });
-		});
-
-		document.getElementById('demo-reset-btn').addEventListener('click', function () {
-			demoForm.lnForm.reset();
-			window.lnToast.enqueue({ type: 'info', title: 'Reset', message: 'Form cleared via lnForm.reset()' });
-		});
-
-		// ─── ln-number demo — show raw values ────────────
-		document.getElementById('demo-number-form').addEventListener('ln-number:input', function (e) {
-			var input = e.target;
-			var outputId = input.id + '-raw';
-			var output = document.getElementById(outputId);
-			if (output) {
-				output.textContent = 'Raw: ' + e.detail.value;
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
 			}
 		});
 
-		// Show pre-filled budget raw value
-		var budgetInput = document.getElementById('demo-budget');
-		if (budgetInput && budgetInput.lnNumber) {
-			var budgetRaw = document.getElementById('demo-budget-raw');
-			if (budgetRaw) budgetRaw.textContent = 'Raw: ' + budgetInput.lnNumber.value;
-		}
-
-		// ─── ln-date demo — show raw values ──────────────
-		document.getElementById('demo-date-form').addEventListener('ln-date:change', function (e) {
-			var input = e.target;
-			var outputId = input.id + '-raw';
-			var output = document.getElementById(outputId);
-			if (output) {
-				output.textContent = 'ISO: ' + e.detail.value + ' | Formatted: ' + e.detail.formatted;
-			}
-		});
-
-		// Show pre-filled date raw value
-		var prefilledDate = document.getElementById('demo-prefilled-date');
-		if (prefilledDate && prefilledDate.lnDate) {
-			var prefilledRaw = document.getElementById('demo-prefilled-date-raw');
-			if (prefilledRaw) prefilledRaw.textContent = 'ISO: ' + prefilledDate.lnDate.value + ' | Formatted: ' + prefilledDate.lnDate.formatted;
-		}
-	});
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
 	</script>
 </body>
 </html>

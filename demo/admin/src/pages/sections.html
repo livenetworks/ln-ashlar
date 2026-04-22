@@ -1,0 +1,173 @@
+<!-- ln-page: title="Sections — ln-acme" h1="Sections" -->
+
+<h1>Sections</h1>
+
+		<!-- Breadcrumbs -->
+		<section class="section-card">
+			<header><h3>.breadcrumbs</h3></header>
+			<main>
+				<nav class="breadcrumbs" aria-label="Breadcrumbs">
+					<ol>
+						<li><a href="#">Home</a></li>
+						<li><a href="#">Users</a></li>
+						<li aria-current="page">John Smith</li>
+					</ol>
+				</nav>
+			</main>
+		</section>
+
+		<!-- Section -->
+		<section class="section-card">
+			<header><h3>&lt;section&gt; with .section class</h3></header>
+			<main>
+				<section class="section">
+					<header>
+						<h2>User List</h2>
+						<div class="section-actions">
+							<button class="btn">Filter</button>
+							<button class="btn">Add</button>
+						</div>
+					</header>
+					<main>
+						<p>Section content...</p>
+					</main>
+				</section>
+			</main>
+		</section>
+
+		<!-- Section Card -->
+		<section class="section-card">
+			<header><h3>.section-card</h3></header>
+			<main>
+				<section class="section-card">
+					<header><h3>Section Title</h3></header>
+					<main><p>Content with padding and border.</p></main>
+					<footer>
+						<button type="button">Cancel</button>
+						<button class="btn">Save</button>
+					</footer>
+				</section>
+			</main>
+		</section>
+
+		<!-- Inline Alert -->
+		<section class="section-card">
+			<header><h3>Inline Alert</h3></header>
+			<main>
+				<div class="alert" role="alert">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+					<p>Informational message. No action required.</p>
+					<button type="button" aria-label="Dismiss"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</div>
+				<div class="alert success" role="alert">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg>
+					<p>Changes saved successfully.</p>
+				</div>
+				<div class="alert warning" role="alert">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+					<p>Your session expires in 5 minutes.</p>
+				</div>
+				<div class="alert error" role="alert">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg>
+					<p>Failed to save. Check your connection and try again.</p>
+				</div>
+			</main>
+		</section>
+
+		<!-- Banner -->
+		<section class="section-card">
+			<header>
+				<h3>Banner — <code>.ln-modal.ln-banner</code></h3>
+				<div class="section-actions">
+					<button type="button" data-ln-modal-for="demo-top-banner">Reopen banner above</button>
+				</div>
+			</header>
+			<main>
+				<div class="ln-modal ln-banner" data-ln-modal="open">
+					<form>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+						<p>Default (primary) banner. Informational message.</p>
+						<button type="button" aria-label="Dismiss" data-ln-modal-close></button>
+					</form>
+				</div>
+				<div class="ln-modal ln-banner success" data-ln-modal="open">
+					<form>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg>
+						<p>Success banner. Settings saved.</p>
+						<button type="button" aria-label="Dismiss" data-ln-modal-close></button>
+					</form>
+				</div>
+				<div class="ln-modal ln-banner warning" data-ln-modal="open">
+					<form>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+						<p>Warning banner. Your session expires in 5 minutes.</p>
+						<button type="button" aria-label="Dismiss" data-ln-modal-close></button>
+					</form>
+				</div>
+				<div class="ln-modal ln-banner error" data-ln-modal="open">
+					<form>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg>
+						<p>Error banner. Deployment failed. Check the logs.</p>
+						<button type="button" aria-label="Dismiss" data-ln-modal-close></button>
+					</form>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;!-- Breadcrumbs --&gt;
+&lt;nav class="breadcrumbs" aria-label="Breadcrumbs"&gt;
+    &lt;ol&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Home&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Section&lt;/a&gt;&lt;/li&gt;
+        &lt;li aria-current="page"&gt;Current&lt;/li&gt;
+    &lt;/ol&gt;
+&lt;/nav&gt;
+
+&lt;!-- Section --&gt;
+&lt;section&gt;
+    &lt;header&gt;
+        &lt;h2&gt;Title&lt;/h2&gt;
+        &lt;div class="section-actions"&gt;&lt;button&gt;Action&lt;/button&gt;&lt;/div&gt;
+    &lt;/header&gt;
+    &lt;main&gt;...&lt;/main&gt;
+&lt;/section&gt;
+
+&lt;!-- Section Card --&gt;
+&lt;section class="section-card"&gt;
+    &lt;header&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;/header&gt;
+    &lt;main&gt;...&lt;/main&gt;
+    &lt;footer&gt;&lt;button&gt;Save&lt;/button&gt;&lt;/footer&gt;
+&lt;/section&gt;
+
+&lt;!-- Inline Alert --&gt;
+&lt;div class="alert" role="alert"&gt;
+    &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-info-circle"&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;p&gt;Informational message.&lt;/p&gt;
+    &lt;button type="button" aria-label="Dismiss"&gt;...&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="alert success" role="alert"&gt;...&lt;/div&gt;
+&lt;div class="alert warning" role="alert"&gt;...&lt;/div&gt;
+&lt;div class="alert error" role="alert"&gt;...&lt;/div&gt;
+
+&lt;!-- Banner (dismissible, inline, uses ln-modal JS) --&gt;
+&lt;div class="ln-modal ln-banner" id="my-banner" data-ln-modal="open"&gt;
+    &lt;form&gt;
+        &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-info-circle"&gt;&lt;/use&gt;&lt;/svg&gt;
+        &lt;p&gt;Banner message.&lt;/p&gt;
+        &lt;button type="button" aria-label="Dismiss" data-ln-modal-close&gt;&lt;/button&gt;
+    &lt;/form&gt;
+&lt;/div&gt;
+
+&lt;!-- Color variants via CSS variable --&gt;
+&lt;div class="ln-modal ln-banner success" data-ln-modal="open"&gt;...&lt;/div&gt;
+&lt;div class="ln-modal ln-banner warning" data-ln-modal="open"&gt;...&lt;/div&gt;
+&lt;div class="ln-modal ln-banner error" data-ln-modal="open"&gt;...&lt;/div&gt;
+
+&lt;!-- Trigger to reopen --&gt;
+&lt;button type="button" data-ln-modal-for="my-banner"&gt;Show banner&lt;/button&gt;</code></pre>
+			</main>
+		</section>

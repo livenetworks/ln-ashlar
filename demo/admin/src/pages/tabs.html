@@ -1,0 +1,160 @@
+<!-- ln-page: title="Tabs — ln-acme" h1="Tabs" -->
+
+<h1>Tabs</h1>
+					<p>Hash-aware tabs. Synchronized with URL hash (<code>#tab-key</code>).</p>
+
+					<!-- Basic tabs — Section 1 -->
+					<section class="section-card">
+						<header><h3>Example 1 — User</h3></header>
+						<main>
+							<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
+								<nav>
+									<button data-ln-tab="info">Information</button>
+									<button data-ln-tab="settings">Settings</button>
+									<button data-ln-tab="history">History</button>
+								</nav>
+
+								<section data-ln-panel="info">
+									<h4>Information</h4>
+									<p>This is the content of the first tab.</p>
+									<p>Hash format: <code>#user-tabs:info</code></p>
+								</section>
+
+								<section data-ln-panel="settings" class="hidden">
+									<h4>Settings</h4>
+									<label>
+										Language
+										<select><option>English</option><option>Spanish</option></select>
+									</label>
+									<label>
+										Timezone
+										<input type="text" value="America/New_York">
+									</label>
+								</section>
+
+								<section data-ln-panel="history" class="hidden">
+									<h4>History</h4>
+									<div class="table-container">
+									<table>
+										<thead><tr><th>Date</th><th>Action</th><th>User</th></tr></thead>
+										<tbody>
+											<tr><td data-label="Attribute">19.02.2026</td><td data-label="On element">Created</td><td data-label="Description">John</td></tr>
+											<tr><td data-label="Attribute">18.02.2026</td><td data-label="On element">Updated</td><td data-label="Description">Jane</td></tr>
+										</tbody>
+									</table>
+									</div>
+								</section>
+							</section>
+						</main>
+					</section>
+
+				<!-- Basic tabs — Section 2 (independent) -->
+					<section class="section-card">
+						<header><h3>Example 2 — Project</h3></header>
+						<main>
+							<section id="project-tabs" data-ln-tabs data-ln-tabs-default="overview">
+								<nav>
+									<button data-ln-tab="overview">Overview</button>
+									<button data-ln-tab="members">Members</button>
+									<button data-ln-tab="info">Info</button>
+								</nav>
+
+								<section data-ln-panel="overview">
+									<h4>Project Overview</h4>
+									<p>This section is completely independent from the one above.</p>
+									<p>Hash format: <code>#project-tabs:overview</code></p>
+									<p>Both sections have a tab <code>info</code> — no collision.</p>
+								</section>
+
+								<section data-ln-panel="members" class="hidden">
+									<h4>Members</h4>
+									<div class="table-container">
+									<table>
+										<thead><tr><th>User</th><th>Role</th></tr></thead>
+										<tbody>
+											<tr><td>John</td><td>Admin</td></tr>
+											<tr><td>Jane</td><td>Editor</td></tr>
+										</tbody>
+									</table>
+									</div>
+								</section>
+
+								<section data-ln-panel="info" class="hidden">
+									<h4>Project Information</h4>
+									<p>The same key <code>info</code> exists in section 1 as well — works independently.</p>
+								</section>
+							</section>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<article>
+								<h4>Lifecycle Events</h4>
+								<div class="table-container">
+								<table>
+									<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+									<tbody>
+										<tr><td><code>ln-tabs:change</code></td><td>After activating a new tab</td><td><code>{ key, tab, panel }</code></td></tr>
+									</tbody>
+								</table>
+								</div>
+							</article>
+							<article>
+								<h4>Live Demo</h4>
+								<output id="tabs-event-log">No events yet — click a tab.</output>
+							</article>
+							<article>
+								<h4>Code</h4>
+								<pre><code>document.getElementById(&#39;user-tabs&#39;).addEventListener(&#39;ln-tabs:change&#39;, function(e) {
+    console.log(&#39;Active tab:&#39;, e.detail.key);
+});
+
+// Global — for all tab sections
+document.addEventListener(&#39;ln-tabs:change&#39;, function(e) {
+    analytics.track(&#39;tab_change&#39;, { tab: e.detail.key });
+});</code></pre>
+							</article>
+						</main>
+					</section>
+
+					<!-- HTML -->
+					<section class="section-card">
+						<header><h3>HTML</h3></header>
+						<main>
+							<pre><code>&lt;!-- Namespace = id attribute (or data-ln-tabs-key) --&gt;
+&lt;section id="my-tabs" data-ln-tabs data-ln-tabs-default="first"&gt;
+
+    &lt;!-- Tab buttons --&gt;
+    &lt;nav&gt;
+        &lt;button data-ln-tab="first"&gt;First tab&lt;/button&gt;
+        &lt;button data-ln-tab="second"&gt;Second tab&lt;/button&gt;
+    &lt;/nav&gt;
+
+    &lt;!-- Panels --&gt;
+    &lt;section data-ln-panel="first"&gt;
+        Content of the first tab
+    &lt;/section&gt;
+
+    &lt;section data-ln-panel="second" class="hidden"&gt;
+        Content of the second tab
+    &lt;/section&gt;
+
+&lt;/section&gt;
+
+&lt;!-- Attributes --&gt;
+id="key"                   - namespace for hash (required for multiple sections)
+data-ln-tabs-key="key"     - alternative, if id is not suitable
+data-ln-tabs               - container
+data-ln-tabs-default="x"   - default tab
+data-ln-tabs-focus         - focus first input on change
+data-ln-tab="key"          - tab button
+data-ln-panel="key"        - panel content
+
+&lt;!-- Hash format: #my-tabs:second → activate second tab --&gt;
+&lt;!-- Multiple sections: #my-tabs:second&other-tabs:info --&gt;
+&lt;!-- Without id/data-ln-tabs-key → no hash sync, only defaultKey --&gt;</code></pre>
+						</main>
+					</section>

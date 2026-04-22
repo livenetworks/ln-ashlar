@@ -1,0 +1,221 @@
+<!-- ln-page: title="Store — ln-acme" h1="Store" -->
+
+<h1>Store</h1>
+					<p>Generic IndexedDB data layer — caches server data locally, syncs via delta protocol, handles optimistic mutations. Renders nothing — UI components consume data through its API and CustomEvents.</p>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>Required</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td data-label="Attribute"><code>data-ln-store</code></td><td data-label="On element">yes</td><td data-label="Description">Store name (IndexedDB object store name, event namespace)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-store-endpoint</code></td><td data-label="On element">yes</td><td data-label="Description">Server API base URL for this resource</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-store-stale</code></td><td data-label="On element">no</td><td data-label="Description">Staleness threshold in seconds (default: 300). <code>"0"</code> = always stale (syncs on every mount). <code>"-1"</code> or <code>"never"</code> = never auto-sync (only <code>forceSync()</code>)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-store-indexes</code></td><td data-label="On element">no</td><td data-label="Description">Comma-separated fields to index</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-store-search-fields</code></td><td data-label="On element">no</td><td data-label="Description">Comma-separated fields for text search</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Live Demo — Mock Store -->
+					<section class="section-card">
+						<header><h3>Live Demo — Mock Store</h3></header>
+						<main>
+							<p>This demo simulates <code>ln-store</code> behavior using an in-memory mock (no real IndexedDB or server). The event log shows the lifecycle.</p>
+
+							<div id="demo-store-controls">
+								<button id="demo-create">Create record</button>
+								<button id="demo-update">Update first record</button>
+								<button id="demo-delete">Delete first record</button>
+								<button id="demo-clear-log">Clear log</button>
+							</div>
+
+							<h4>Store State</h4>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Property</th><th>Value</th></tr></thead>
+								<tbody>
+									<tr><td><code>isLoaded</code></td><td id="demo-is-loaded">false</td></tr>
+									<tr><td><code>totalCount</code></td><td id="demo-total-count">0</td></tr>
+									<tr><td><code>isSyncing</code></td><td id="demo-is-syncing">false</td></tr>
+								</tbody>
+							</table>
+							</div>
+
+							<h4>Records</h4>
+							<ul id="demo-records"></ul>
+
+							<h4>Event Log</h4>
+							<pre id="demo-event-log" style="max-height:20rem;overflow:auto;font-size:0.85rem"></pre>
+						</main>
+					</section>
+
+					<!-- Events — Commands -->
+					<section class="section-card">
+						<header><h3>Events — Commands (dispatched TO the store)</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th><code>detail</code></th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-store:request-create</code></td><td><code>{ data }</code></td><td>Create record (optimistic with temp ID)</td></tr>
+									<tr><td><code>ln-store:request-update</code></td><td><code>{ id, data, expected_version }</code></td><td>Update record (optimistic, conflict detection)</td></tr>
+									<tr><td><code>ln-store:request-delete</code></td><td><code>{ id }</code></td><td>Delete record (optimistic)</td></tr>
+									<tr><td><code>ln-store:request-bulk-delete</code></td><td><code>{ ids }</code></td><td>Delete multiple records (optimistic)</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Events — Notifications -->
+					<section class="section-card">
+						<header><h3>Events — Notifications (emitted BY the store)</h3></header>
+						<main>
+							<h4>Data Events</h4>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-store:ready</code></td><td>Data available</td><td><code>{ store, count, source }</code></td></tr>
+									<tr><td><code>ln-store:loaded</code></td><td>Initial full load</td><td><code>{ store, count }</code></td></tr>
+									<tr><td><code>ln-store:synced</code></td><td>Delta sync complete</td><td><code>{ store, added, deleted, changed: bool }</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+
+							<h4>Mutation Events</h4>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-store:created</code></td><td>Optimistic create</td><td><code>{ store, record, tempId }</code></td></tr>
+									<tr><td><code>ln-store:updated</code></td><td>Optimistic update</td><td><code>{ store, record, previous }</code></td></tr>
+									<tr><td><code>ln-store:deleted</code></td><td>Optimistic delete</td><td><code>{ store, id }</code> or <code>{ store, ids }</code></td></tr>
+									<tr><td><code>ln-store:confirmed</code></td><td>Server confirmed</td><td><code>{ store, record, action }</code></td></tr>
+									<tr><td><code>ln-store:reverted</code></td><td>Mutation failed</td><td><code>{ store, record, action, error }</code></td></tr>
+									<tr><td><code>ln-store:conflict</code></td><td>Update conflict (409)</td><td><code>{ store, local, remote, field_diffs }</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+
+							<h4>Error Events</h4>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-store:error</code></td><td>Initial load failed</td><td><code>{ store, action, error, status }</code></td></tr>
+									<tr><td><code>ln-store:offline</code></td><td>Server unreachable</td><td><code>{ store }</code></td></tr>
+									<tr><td><code>ln-store:destroyed</code></td><td>Instance destroyed</td><td><code>{ store }</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Sync Lifecycle -->
+					<section class="section-card">
+						<header><h3>Sync Lifecycle</h3></header>
+						<main>
+							<pre><code>Init:
+  1. Open IndexedDB → read _meta
+  2. Schema mismatch? → clear, full load
+  3. Has cache? → emit ready (source: 'cache'), delta sync if stale
+  4. No cache? → full load → emit loaded, ready (source: 'server')
+
+Visibility change (tab returns):
+  → delta sync all stores if stale
+
+Delta sync:
+  1. GET {endpoint}?since={last_synced_at}
+  2. Upsert data[], delete deleted[]
+  3. Emit synced</code></pre>
+						</main>
+					</section>
+
+					<!-- Optimistic Mutations -->
+					<section class="section-card">
+						<header><h3>Optimistic Mutation Flow</h3></header>
+						<main>
+							<pre><code>Create:  insert temp → POST → confirmed | reverted
+Update:  save prev, update → PUT → confirmed | conflict | reverted
+Delete:  save, remove → DELETE → confirmed | reverted
+Bulk:    save all, remove → DELETE /bulk-delete → confirmed | reverted</code></pre>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>const storeEl = document.querySelector('[data-ln-store="documents"]');
+
+// Queries (all return Promise)
+storeEl.lnStore.getAll(options)        // → { data, total, filtered }
+storeEl.lnStore.getById(id)            // → Object|null
+storeEl.lnStore.count(filters)         // → Number
+storeEl.lnStore.aggregate(field, fn)   // → Number (sum, avg, count)
+
+// State
+storeEl.lnStore.isLoaded               // Boolean
+storeEl.lnStore.isSyncing              // Boolean
+storeEl.lnStore.lastSyncedAt           // Number|null
+storeEl.lnStore.totalCount             // Number
+
+// Manual triggers
+storeEl.lnStore.forceSync()            // delta sync
+storeEl.lnStore.fullReload()           // clear + full reload
+storeEl.lnStore.destroy()              // cleanup
+
+// Global
+window.lnStore.clearAll()              // wipe all stores (logout)
+window.lnStore.init(el)                // manual init</code></pre>
+						</main>
+					</section>
+
+					<!-- Query Options -->
+					<section class="section-card">
+						<header><h3>Query Options</h3></header>
+						<main>
+							<pre><code>storeEl.lnStore.getAll({
+    sort: { field: 'title', direction: 'asc' },
+    filters: { status: ['approved', 'draft'] },
+    search: 'ISO 27001',
+    offset: 0,
+    limit: 100
+})
+// → { data: [...], total: 1247, filtered: 45 }</code></pre>
+						</main>
+					</section>
+
+					<!-- Server Response -->
+					<section class="section-card">
+						<header><h3>Server Response Format</h3></header>
+						<main>
+							<pre><code>// Full load / Delta sync
+{
+    "data": [{ "id": 42, "title": "...", "updated_at": 1736952600 }],
+    "deleted": [17, 23],          // delta only
+    "synced_at": 1736953500       // next ?since= value
+}</code></pre>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;!-- One per resource, anywhere in the page --&gt;
+&lt;div data-ln-store="documents"
+     data-ln-store-endpoint="/api/documents"
+     data-ln-store-stale="300"
+     data-ln-store-indexes="status,category,updated_at"
+     data-ln-store-search-fields="title,description,author_name"&gt;
+&lt;/div&gt;</code></pre>
+						</main>
+					</section>

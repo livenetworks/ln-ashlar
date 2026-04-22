@@ -1,0 +1,119 @@
+<!-- ln-page: title="Stepper — ln-acme" h1="Stepper" -->
+
+<h1>Stepper</h1>
+				<p>Linear progress indicator for multi-step workflows. Numbers auto-generated via CSS <code>counter()</code>. Three states: <code>complete</code>, <code>current</code>, <code>upcoming</code>.</p>
+
+				<!-- 4-step approval flow — current at step 3 -->
+				<section class="section-card">
+					<header><h3>4-Step Approval Flow — Current: Approval</h3></header>
+					<main>
+						<ol data-ln-stepper>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Draft</span>
+							</li>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>In Review</span>
+							</li>
+							<li data-ln-step="current" aria-current="step">
+								<span data-ln-step-label>Approval</span>
+							</li>
+							<li data-ln-step="upcoming">
+								<span data-ln-step-label>Published</span>
+							</li>
+						</ol>
+					</main>
+				</section>
+
+				<!-- 4-step approval flow — current at step 1 -->
+				<section class="section-card">
+					<header><h3>4-Step Approval Flow — Current: Draft (start)</h3></header>
+					<main>
+						<ol data-ln-stepper>
+							<li data-ln-step="current" aria-current="step">
+								<span data-ln-step-label>Draft</span>
+							</li>
+							<li data-ln-step="upcoming">
+								<span data-ln-step-label>In Review</span>
+							</li>
+							<li data-ln-step="upcoming">
+								<span data-ln-step-label>Approval</span>
+							</li>
+							<li data-ln-step="upcoming">
+								<span data-ln-step-label>Published</span>
+							</li>
+						</ol>
+					</main>
+				</section>
+
+				<!-- 6-step onboarding — mixed states -->
+				<section class="section-card">
+					<header><h3>6-Step Onboarding — Current: Connect Data</h3></header>
+					<main>
+						<ol data-ln-stepper>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Create Account</span>
+							</li>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Verify Email</span>
+							</li>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Set Password</span>
+							</li>
+							<li data-ln-step="current" aria-current="step">
+								<span data-ln-step-label>Connect Data</span>
+							</li>
+							<li data-ln-step="upcoming">
+								<span data-ln-step-label>Invite Team</span>
+							</li>
+							<li data-ln-step="upcoming">
+								<span data-ln-step-label>Go Live</span>
+							</li>
+						</ol>
+					</main>
+				</section>
+
+				<!-- 6-step onboarding — all complete -->
+				<section class="section-card">
+					<header><h3>6-Step Onboarding — All Complete</h3></header>
+					<main>
+						<ol data-ln-stepper>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Create Account</span>
+							</li>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Verify Email</span>
+							</li>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Set Password</span>
+							</li>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Connect Data</span>
+							</li>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Invite Team</span>
+							</li>
+							<li data-ln-step="complete">
+								<span data-ln-step-label>Go Live</span>
+							</li>
+						</ol>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Default attribute — zero SCSS needed
+// &lt;ol data-ln-stepper&gt;
+//     &lt;li data-ln-step="complete"&gt;&lt;span data-ln-step-label&gt;Step 1&lt;/span&gt;&lt;/li&gt;
+//     &lt;li data-ln-step="current" aria-current="step"&gt;&lt;span data-ln-step-label&gt;Step 2&lt;/span&gt;&lt;/li&gt;
+//     &lt;li data-ln-step="upcoming"&gt;&lt;span data-ln-step-label&gt;Step 3&lt;/span&gt;&lt;/li&gt;
+// &lt;/ol&gt;
+
+// Consumer semantic selector
+#checkout-flow { @include stepper; }
+
+// Color override (e.g. error state on current step)
+[data-ln-step="current"] { --color-primary: var(--color-error); }</code></pre>
+					</main>
+				</section>

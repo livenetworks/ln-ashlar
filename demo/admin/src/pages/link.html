@@ -1,0 +1,157 @@
+<!-- ln-page: title="Link — ln-acme" h1="Link" -->
+
+<h1>Link</h1>
+					<p>Clickable containers — the entire row/element responds to a click, finding the first <code>&lt;a&gt;</code> inside. Compatible with ln-ajax.</p>
+
+					<!-- Table -->
+					<section class="section-card">
+						<header><h3>Table with clickable rows</h3></header>
+						<main>
+							<div class="table-container">
+							<table data-ln-link>
+								<thead>
+									<tr><th>Name</th><th>Email</th><th>Status</th></tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td data-label="Name"><a href="tables.html">Marko Petrovski</a></td>
+										<td data-label="Email">marko@example.com</td>
+										<td data-label="Status"><span class="badge success">Active</span></td>
+									</tr>
+									<tr>
+										<td data-label="Name"><a href="forms.html">Ana Stojanova</a></td>
+										<td data-label="Email">ana@example.com</td>
+										<td data-label="Status"><span class="badge success">Active</span></td>
+									</tr>
+									<tr>
+										<td data-label="Name"><a href="cards.html">Ivan Dimitrov</a></td>
+										<td data-label="Email">ivan@example.com</td>
+										<td data-label="Status"><span class="badge error">Inactive</span></td>
+									</tr>
+									<tr>
+										<td data-label="Name"><a href="icons.html">Elena Trajkova</a></td>
+										<td data-label="Email">elena@example.com</td>
+										<td data-label="Status"><span class="badge warning">Pending</span></td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+							<p><small>Click anywhere on the row — it navigates to the link. Ctrl+click opens in a new tab. Hover shows the URL in the status bar.</small></p>
+						</main>
+					</section>
+
+					<!-- Table with buttons -->
+					<section class="section-card">
+						<header><h3>Rows with interactive elements</h3></header>
+						<main>
+							<div class="table-container">
+							<table data-ln-link>
+								<thead>
+									<tr><th>Document</th><th>Date</th><th class="center">Actions</th></tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><a href="typography.html">Contract.pdf</a></td>
+										<td>15.02.2026</td>
+										<td class="center">
+											<button class="btn error" onclick="alert('Delete clicked!')">Delete</button>
+										</td>
+									</tr>
+									<tr>
+										<td><a href="layout.html">Invoice.pdf</a></td>
+										<td>10.02.2026</td>
+										<td class="center">
+											<button class="btn error" onclick="alert('Delete clicked!')">Delete</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+							<p><small>Clicking the "Delete" button triggers only the button, NOT the link. Clicking on the other cells navigates.</small></p>
+						</main>
+					</section>
+
+					<!-- Generic container -->
+					<section class="section-card">
+						<header><h3>Generic container</h3></header>
+						<main>
+							<article data-ln-link class="demo-link-article">
+								<h4><a href="index.html">Dashboard</a></h4>
+								<p>The entire container is clickable — not just the link text.</p>
+							</article>
+						</main>
+					</section>
+
+					<!-- HTML -->
+					<section class="section-card">
+						<header><h3>HTML</h3></header>
+						<main>
+							<pre><code>&lt;!-- Table: all rows clickable --&gt;
+&lt;table data-ln-link&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;a href="/users/1"&gt;Marko&lt;/a&gt;&lt;/td&gt;
+            &lt;td&gt;marko@example.com&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- Generic container --&gt;
+&lt;article data-ln-link&gt;
+    &lt;h3&gt;&lt;a href="/post/1"&gt;Title&lt;/a&gt;&lt;/h3&gt;
+    &lt;p&gt;Description&lt;/p&gt;
+&lt;/article&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- Behavior -->
+					<section class="section-card">
+						<header><h3>Behavior</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Action</th><th>Result</th></tr></thead>
+								<tbody>
+									<tr><td>Click on row</td><td>Navigates to the first <code>&lt;a&gt;</code></td></tr>
+									<tr><td>Click on <code>&lt;a&gt;</code> directly</td><td>Normal click (not intercepted)</td></tr>
+									<tr><td>Click on <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code></td><td>Normal click (not intercepted)</td></tr>
+									<tr><td>Ctrl/Cmd + click</td><td>Opens in a new tab</td></tr>
+									<tr><td>Hover on row</td><td>URL in status bar (bottom-left)</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Manual initialization of a new DOM element
+window.lnLink.init(document.getElementById('new-container'));</code></pre>
+						</main>
+					</section>
+
+					<!-- ln-ajax -->
+					<section class="section-card">
+						<header><h3>Compatibility with ln-ajax</h3></header>
+						<main>
+							<p>ln-link and ln-ajax are <strong>fully decoupled</strong> — they communicate via native DOM click events:</p>
+							<ol>
+								<li>ln-link triggers <code>.click()</code> on <code>&lt;a&gt;</code></li>
+								<li>ln-ajax intercepts the click event (if present)</li>
+								<li>If ln-ajax is not present — normal navigation</li>
+							</ol>
+							<pre><code>&lt;!-- Both components together --&gt;
+&lt;section data-ln-ajax&gt;
+    &lt;table data-ln-link&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+                &lt;td&gt;&lt;a href="/users/1"&gt;Marko&lt;/a&gt;&lt;/td&gt;
+                &lt;td&gt;marko@example.com&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/section&gt;</code></pre>
+						</main>
+					</section>

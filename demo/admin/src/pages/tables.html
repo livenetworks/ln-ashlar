@@ -1,0 +1,140 @@
+<!-- ln-page: title="Tables — ln-acme" h1="Tables" -->
+
+<h1>Tables</h1>
+					<p>Sortable headers, hover rows, section grouping, status badges, responsive mobile stacking. All via CSS mixins.</p>
+
+		<!-- Basic table -->
+		<section class="section-card">
+			<header><h3>Basic Table</h3></header>
+			<main>
+				<div class="table-container">
+				<table>
+					<thead>
+						<tr><th>Name</th><th>Email</th><th>Status</th><th class="numeric">Points</th></tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td data-label="Name">Marko Petrovski</td>
+							<td data-label="Email">marko@example.com</td>
+							<td data-label="Status"><span class="badge success">Active</span></td>
+							<td data-label="Points" class="numeric">95</td>
+						</tr>
+						<tr>
+							<td data-label="Name">Ana Stojanova</td>
+							<td data-label="Email">ana@example.com</td>
+							<td data-label="Status"><span class="badge success">Active</span></td>
+							<td data-label="Points" class="numeric">88</td>
+						</tr>
+						<tr>
+							<td data-label="Name">Ivan Dimitrov</td>
+							<td data-label="Email">ivan@example.com</td>
+							<td data-label="Status"><span class="badge error">Inactive</span></td>
+							<td data-label="Points" class="numeric">42</td>
+						</tr>
+						<tr>
+							<td data-label="Name">Elena Trajkova</td>
+							<td data-label="Email">elena@example.com</td>
+							<td data-label="Status"><span class="badge warning">Pending</span></td>
+							<td data-label="Points" class="numeric">71</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+			</main>
+		</section>
+
+		<!-- Section headers -->
+		<section class="section-card">
+			<header><h3>Section rows</h3></header>
+			<main>
+				<div class="table-container">
+				<table>
+					<thead>
+						<tr><th>Parameter</th><th>Value</th><th>Status</th></tr>
+					</thead>
+					<tbody>
+						<tr class="section-header"><td colspan="3">Network</td></tr>
+						<tr><td>IP Address</td><td>192.168.1.1</td><td><span class="badge success">OK</span></td></tr>
+						<tr><td>DNS</td><td>8.8.8.8</td><td><span class="badge success">OK</span></td></tr>
+						<tr class="section-header"><td colspan="3">System</td></tr>
+						<tr><td>CPU</td><td>78%</td><td><span class="badge warning">Warning</span></td></tr>
+						<tr><td>RAM</td><td>92%</td><td><span class="badge error">Critical</span></td></tr>
+						<tr><td>Disk</td><td>45%</td><td><span class="badge success">OK</span></td></tr>
+					</tbody>
+				</table>
+				</div>
+			</main>
+		</section>
+
+		<!-- Striped + actions -->
+		<section class="section-card">
+			<header><h3>Striped + Actions</h3></header>
+			<main>
+				<div class="table-container">
+				<table>
+					<thead><tr><th>Document</th><th>Date</th><th class="center">Actions</th></tr></thead>
+					<tbody>
+						<tr>
+							<td data-label="Document">Contract.pdf</td>
+							<td data-label="Date">15.02.2026</td>
+							<td data-label="Actions" class="center">
+								<ul class="actions">
+									<li><button type="button" class="action primary"><svg class="ln-icon" aria-hidden="true"><use href="#ln-eye"></use></svg></button></li>
+									<li><button type="button" class="action danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<td data-label="Document">Invoice.pdf</td>
+							<td data-label="Date">10.02.2026</td>
+							<td data-label="Actions" class="center">
+								<ul class="actions">
+									<li><button type="button" class="action primary"><svg class="ln-icon" aria-hidden="true"><use href="#ln-eye"></use></svg></button></li>
+									<li><button type="button" class="action danger"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+								</ul>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;table&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;&lt;th&gt;Column&lt;/th&gt;&lt;th class="numeric"&gt;Number&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr class="section-header"&gt;&lt;td colspan="2"&gt;Section&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td data-label="Column"&gt;Value&lt;/td&gt;
+            &lt;td data-label="Number" class="numeric"&gt;42&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- Status badges --&gt;
+&lt;span class="badge success"&gt;Active&lt;/span&gt;
+&lt;span class="badge error"&gt;Inactive&lt;/span&gt;
+&lt;span class="badge warning"&gt;Pending&lt;/span&gt;
+&lt;span class="badge info"&gt;In Review&lt;/span&gt;
+
+&lt;!-- Responsive: data-label for mobile --&gt;
+&lt;td data-label="Name"&gt;Marko&lt;/td&gt;
+
+&lt;!-- Striped: apply via SCSS on a semantic selector --&gt;
+&lt;!-- #audit-log { @include table-striped; } --&gt;
+
+&lt;!-- Actions column: buttons with ul.actions (project SCSS) --&gt;
+&lt;td&gt;
+    &lt;ul class="actions"&gt;
+        &lt;li&gt;&lt;button type="button" class="action primary"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-eye"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;button type="button" class="action danger"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-trash"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/td&gt;</code></pre>
+			</main>
+		</section>

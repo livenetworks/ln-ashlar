@@ -1,0 +1,90 @@
+<!-- ln-page: title="Confirm — ln-acme" h1="Confirm" -->
+					<h1>Confirm</h1>
+					<p>A confirmation prompt for destructive actions. First click changes the button text; second click allows the action.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td data-label="Attribute"><code>data-ln-confirm="Confirm?"</code></td><td data-label="On element">button</td><td data-label="Description">Enables confirm behavior. Value is the confirmation text.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-confirm-timeout="3"</code></td><td data-label="On element">button</td><td data-label="Description">Timeout in seconds before auto-revert (default: 3). Observable.</td></tr>
+									<tr><td data-label="Attribute"><code>data-confirming</code></td><td data-label="On element">button</td><td data-label="Description">Added automatically while awaiting confirmation.</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Simple Demo -->
+					<section class="section-card">
+						<header><h3>Example — Simple Buttons</h3></header>
+						<main>
+							<div class="demo-actions">
+								<button class="btn error" data-ln-confirm="Are you sure?">Delete Record</button>
+								<button type="button" data-ln-confirm="Reset settings?">Reset Defaults</button>
+							</div>
+						</main>
+					</section>
+
+					<!-- Custom Timeout -->
+					<section class="section-card">
+						<header><h3>Example — Custom Timeout</h3></header>
+						<main>
+							<p>Use <code>data-ln-confirm-timeout</code> to override the default 3-second revert. The attribute is observed — changing it dynamically restarts the timer.</p>
+							<div class="demo-actions">
+								<button class="btn error" data-ln-confirm="Confirm?" data-ln-confirm-timeout="1.5">1.5s timeout</button>
+								<button class="btn error" data-ln-confirm="Confirm?">3s default</button>
+								<button class="btn error" data-ln-confirm="Confirm?" data-ln-confirm-timeout="6">6s timeout</button>
+							</div>
+						</main>
+					</section>
+
+					<!-- Form Demo -->
+					<section class="section-card">
+						<header><h3>Example — Inside a Form</h3></header>
+						<main>
+							<form onsubmit="event.preventDefault(); window.lnToast.enqueue({type:'success', title:'Success', message:'Form submitted!'})">
+								<p>Confirmation prevents the form from submitting on the first click.</p>
+								<button type="submit" class="btn error" data-ln-confirm="Submit and Delete?">Confirm Action</button>
+							</form>
+						</main>
+					</section>
+
+					<!-- CSS Styling -->
+					<section class="section-card">
+						<header><h3>CSS Styling</h3></header>
+						<main>
+							<p>Use the <code>[data-confirming]</code> selector to style the button during the confirmation state.</p>
+							<pre><code>[data-confirming] {
+    background-color: var(--color-error);
+    color: white;
+}</code></pre>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API & Events</h3></header>
+						<main>
+							<article>
+								<h4>Constructor</h4>
+								<pre><code>// Manual initialization
+window.lnConfirm(document.body);</code></pre>
+							</article>
+							<article>
+								<h4>Events</h4>
+								<div class="table-container">
+								<table>
+									<thead><tr><th>Event</th><th>Detail</th></tr></thead>
+									<tbody>
+										<tr><td><code>ln-confirm:waiting</code></td><td><code>{ target }</code></td></tr>
+									</tbody>
+								</table>
+								</div>
+							</article>
+						</main>
+					</section>

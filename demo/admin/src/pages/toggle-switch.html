@@ -1,0 +1,90 @@
+<!-- ln-page: title="Toggle Switch — ln-acme" h1="Toggle Switch" -->
+
+<h1>Toggle Switch</h1>
+				<p>iOS-style switch using <code>input[type="checkbox"][data-ln-toggle-switch]</code>. Pure CSS — no JS. Slide knob, focus ring, and disabled state all supported.</p>
+
+				<!-- Basic toggle switches -->
+				<section class="section-card">
+					<header><h3>Basic Toggle Switches</h3></header>
+					<main>
+						<div data-demo-form-stack>
+							<label>
+								<input type="checkbox" data-ln-toggle-switch checked>
+								Email notifications
+							</label>
+							<label>
+								<input type="checkbox" data-ln-toggle-switch>
+								SMS alerts
+							</label>
+							<label>
+								<input type="checkbox" data-ln-toggle-switch checked>
+								Weekly digest
+							</label>
+						</div>
+					</main>
+				</section>
+
+				<!-- Disabled state -->
+				<section class="section-card">
+					<header><h3>Disabled State</h3></header>
+					<main>
+						<div data-demo-form-stack>
+							<label>
+								<input type="checkbox" data-ln-toggle-switch disabled>
+								Disabled off
+							</label>
+							<label>
+								<input type="checkbox" data-ln-toggle-switch checked disabled>
+								Disabled on
+							</label>
+						</div>
+					</main>
+				</section>
+
+				<!-- In a settings form -->
+				<section class="section-card">
+					<header><h3>Settings Form Context</h3></header>
+					<main>
+						<form data-demo-settings-form>
+							<fieldset>
+								<legend>Notification preferences</legend>
+								<div data-demo-form-stack>
+									<label>
+										<input type="checkbox" data-ln-toggle-switch checked>
+										Document approved
+									</label>
+									<label>
+										<input type="checkbox" data-ln-toggle-switch checked>
+										Review requested
+									</label>
+									<label>
+										<input type="checkbox" data-ln-toggle-switch>
+										Daily summary
+									</label>
+									<label>
+										<input type="checkbox" data-ln-toggle-switch>
+										System announcements
+									</label>
+								</div>
+							</fieldset>
+						</form>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Default — attribute selector, no config needed
+// &lt;label&gt;
+//     &lt;input type="checkbox" data-ln-toggle-switch&gt;
+//     Label text
+// &lt;/label&gt;
+
+// Disabled
+// &lt;input type="checkbox" data-ln-toggle-switch disabled&gt;
+
+// Consumer semantic selector
+.my-switch { @include toggle-switch; }</code></pre>
+					</main>
+				</section>

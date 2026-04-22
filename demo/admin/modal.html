@@ -7,6 +7,20 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -31,7 +45,7 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<header>
+		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
@@ -40,20 +54,29 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
 					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+						</ul>
+					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
+						<span>Test Toast</span>
 					</button>
 				</div>
 			</div>
 		</header>
 
 		<!-- App Body -->
-		<div class="app-body">
+		<main class="app-main">
 		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
@@ -110,7 +133,7 @@
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
 						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
-						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="modal.html" aria-current="page"><span class="nav-label">Modal</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
 						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
@@ -135,13 +158,11 @@
 				<small>acme-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<div class="app-scrim" data-ln-scrim></div>
 
-		<!-- Main Panel -->
-		<div class="main-panel">
-
-			<!-- Content -->
-			<div class="content">
-					<h1>Modal</h1>
+		<!-- Content -->
+		<section>
+<h1>Modal</h1>
 					<p>JS component for modal windows. The <code>data-ln-modal</code> attribute is the single source of truth for open/closed state. ESC closes.</p>
 
 		<!-- Triggers -->
@@ -257,14 +278,16 @@
 				</header>
 				<main>
 					<p>A larger modal for more content. Size set via <code>@include modal-lg</code> in SCSS.</p>
+					<div class="table-container">
 					<table>
 						<thead><tr><th>Name</th><th>Status</th><th>Points</th></tr></thead>
 						<tbody>
-							<tr><td>Marko</td><td><span class="badge success">OK</span></td><td class="numeric">95</td></tr>
-							<tr><td>Ana</td><td><span class="badge success">OK</span></td><td class="numeric">88</td></tr>
-							<tr><td>Ivan</td><td><span class="badge error">Error</span></td><td class="numeric">42</td></tr>
+							<tr><td data-label="Attribute">Marko</td><td data-label="On element"><span class="badge success">OK</span></td><td data-label="Description" class="numeric">95</td></tr>
+							<tr><td data-label="Attribute">Ana</td><td data-label="On element"><span class="badge success">OK</span></td><td data-label="Description" class="numeric">88</td></tr>
+							<tr><td data-label="Attribute">Ivan</td><td data-label="On element"><span class="badge error">Error</span></td><td data-label="Description" class="numeric">42</td></tr>
 						</tbody>
 					</table>
+					</div>
 				</main>
 				<footer>
 					<button type="button" data-ln-modal-close>Close</button>
@@ -392,6 +415,7 @@
 				</article>
 				<article>
 					<h4>In a table row context</h4>
+					<div class="table-container">
 					<table>
 						<thead><tr><th>Name</th><th>Role</th><th></th></tr></thead>
 						<tbody>
@@ -417,6 +441,7 @@
 							</tr>
 						</tbody>
 					</table>
+					</div>
 				</article>
 			</main>
 		</section>
@@ -427,6 +452,7 @@
 			<main>
 				<article>
 					<h4>Lifecycle Events</h4>
+					<div class="table-container">
 					<table>
 						<thead><tr><th>Event</th><th>Cancelable</th><th>When</th><th><code>detail</code></th></tr></thead>
 						<tbody>
@@ -437,6 +463,7 @@
 							<tr><td><code>ln-modal:destroyed</code></td><td>❌</td><td>Instance destroyed</td><td><code>{ modalId, target }</code></td></tr>
 						</tbody>
 					</table>
+					</div>
 				</article>
 				<article>
 					<h4>Live Demo</h4>
@@ -529,33 +556,98 @@ document.addEventListener('ln-modal:close', function(e) {
 &lt;/script&gt;</code></pre>
 			</main>
 		</section>
-			</div>
+		</section>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
 				<span>ln-acme v1.2.0</span>
 			</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
 
-		</div>
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
 	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
 	</div>
 
 	<script>
-		(function() {
-			var log = document.getElementById('modal-event-log');
-			if (!log) return;
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const root = document.documentElement;
 
-			function _update(eventName, detail) {
-				var time = new Date().toLocaleTimeString('en');
-				log.textContent = eventName + ' — ' + detail.modalId + ' (' + time + ')';
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
 			}
+		});
 
-			document.addEventListener('ln-modal:before-open', function(e) { _update('ln-modal:before-open', e.detail); });
-			document.addEventListener('ln-modal:open', function(e) { _update('ln-modal:open', e.detail); });
-			document.addEventListener('ln-modal:before-close', function(e) { _update('ln-modal:before-close', e.detail); });
-			document.addEventListener('ln-modal:close', function(e) { _update('ln-modal:close', e.detail); });
-		})();
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
 	</script>
 </body>
 </html>

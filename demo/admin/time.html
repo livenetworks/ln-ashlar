@@ -7,6 +7,20 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -31,7 +45,7 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<header>
+		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
@@ -40,20 +54,29 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
 					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+						</ul>
+					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
+						<span>Test Toast</span>
 					</button>
 				</div>
 			</div>
 		</header>
 
 		<!-- App Body -->
-		<div class="app-body">
+		<main class="app-main">
 		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
@@ -121,7 +144,7 @@
 						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
 						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
-						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="time.html" aria-current="page"><span class="nav-label">Time</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
 						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
@@ -135,27 +158,27 @@
 				<small>acme-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<div class="app-scrim" data-ln-scrim></div>
 
-		<!-- Main Panel -->
-		<div class="main-panel">
-
-			<!-- Content -->
-			<div class="content">
-					<h1>Time</h1>
+		<!-- Content -->
+		<section>
+<h1>Time</h1>
 					<p>Timezone-aware timestamp formatting using <code>Intl.DateTimeFormat</code> and <code>Intl.RelativeTimeFormat</code>. Enhances <code>&lt;time&gt;</code> elements — Blade renders fallback text, JS replaces with localized output.</p>
 
 					<!-- Attributes -->
 					<section class="section-card">
 						<header><h3>Attributes</h3></header>
 						<main>
+							<div class="table-container">
 							<table>
 								<thead><tr><th>Attribute</th><th>On</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-time="mode"</code></td><td><code>&lt;time&gt;</code></td><td>Format mode: <code>relative</code>, <code>short</code>, <code>full</code>, <code>date</code>, <code>time</code></td></tr>
-									<tr><td><code>datetime="1736952600"</code></td><td><code>&lt;time&gt;</code></td><td>Unix timestamp in seconds</td></tr>
-									<tr><td><code>data-ln-time-locale="mk"</code></td><td><code>&lt;time&gt;</code></td><td>Override locale (default: <code>&lt;html lang&gt;</code> or browser)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-time="mode"</code></td><td data-label="On element"><code>&lt;time&gt;</code></td><td data-label="Description">Format mode: <code>relative</code>, <code>short</code>, <code>full</code>, <code>date</code>, <code>time</code></td></tr>
+									<tr><td data-label="Attribute"><code>datetime="1736952600"</code></td><td data-label="On element"><code>&lt;time&gt;</code></td><td data-label="Description">Unix timestamp in seconds</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-time-locale="mk"</code></td><td data-label="On element"><code>&lt;time&gt;</code></td><td data-label="Description">Override locale (default: <code>&lt;html lang&gt;</code> or browser)</td></tr>
 								</tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -163,6 +186,7 @@
 					<section class="section-card">
 						<header><h3>Format Modes</h3></header>
 						<main>
+							<div class="table-container">
 							<table>
 								<thead><tr><th>Mode</th><th>Example Output</th><th>Intl Options</th></tr></thead>
 								<tbody>
@@ -173,6 +197,7 @@
 									<tr><td><code>time</code></td><td>2:30 PM</td><td><code>{ timeStyle: 'short' }</code></td></tr>
 								</tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -181,10 +206,12 @@
 						<header><h3>All Modes — Same Timestamp</h3></header>
 						<main>
 							<p>All elements below use the same <code>datetime</code> value. Hover for full date tooltip.</p>
+							<div class="table-container">
 							<table id="demo-modes-table">
 								<thead><tr><th>Mode</th><th>Output</th><th>HTML</th></tr></thead>
 								<tbody></tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -193,10 +220,12 @@
 						<header><h3>Relative Time — Thresholds</h3></header>
 						<main>
 							<p>Relative mode picks the best unit and uses <code>Intl.RelativeTimeFormat</code> for localized output. Auto-updates every 60 seconds.</p>
+							<div class="table-container">
 							<table id="demo-relative-table">
 								<thead><tr><th>Offset</th><th>Output</th></tr></thead>
 								<tbody></tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -205,10 +234,12 @@
 						<header><h3>Future Timestamps</h3></header>
 						<main>
 							<p>Relative mode handles future dates — <code>Intl.RelativeTimeFormat</code> produces "in X" automatically.</p>
+							<div class="table-container">
 							<table id="demo-future-table">
 								<thead><tr><th>Offset</th><th>Output</th></tr></thead>
 								<tbody></tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -217,10 +248,12 @@
 						<header><h3>Locale Override</h3></header>
 						<main>
 							<p>Default locale comes from <code>&lt;html lang="en"&gt;</code>. Override per-element with <code>data-ln-time-locale</code>.</p>
+							<div class="table-container">
 							<table id="demo-locale-table">
 								<thead><tr><th>Locale</th><th>Full</th><th>Relative</th></tr></thead>
 								<tbody></tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -249,6 +282,7 @@
 					<section class="section-card">
 						<header><h3>Edge Cases</h3></header>
 						<main>
+							<div class="table-container">
 							<table>
 								<thead><tr><th>Case</th><th>Element</th><th>Result</th></tr></thead>
 								<tbody>
@@ -274,6 +308,7 @@
 									</tr>
 								</tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -310,119 +345,98 @@ el.setAttribute('datetime', '1700000000');
 el.setAttribute('data-ln-time', 'date');  // switch mode</code></pre>
 						</main>
 					</section>
-			</div>
+		</section>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
 				<span>ln-acme v1.2.0</span>
 			</footer>
-		</div>
-		</div><!-- /.app-body -->
+		</main>
 	</div><!-- /.app-wrapper -->
 
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
+
 	<script>
-	document.addEventListener('DOMContentLoaded', function () {
-		var now = Math.floor(Date.now() / 1000);
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const root = document.documentElement;
 
-		// ─── All Modes — same timestamp (3 hours ago) ─────────
-		var ts = now - 10800;
-		var modes = ['relative', 'short', 'full', 'date', 'time'];
-		var modesBody = document.querySelector('#demo-modes-table tbody');
-		modes.forEach(function (mode) {
-			var tr = document.createElement('tr');
-			var escaped = '&lt;time data-ln-time="' + mode + '" datetime="' + ts + '"&gt;fallback&lt;/time&gt;';
-			tr.innerHTML = '<td><code>' + mode + '</code></td>'
-				+ '<td><time data-ln-time="' + mode + '" datetime="' + ts + '">loading...</time></td>'
-				+ '<td><code>' + escaped + '</code></td>';
-			modesBody.appendChild(tr);
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
 		});
 
-		// ─── Relative Thresholds ──────────────────────────────
-		var offsets = [
-			{ label: '5 seconds ago', delta: -5 },
-			{ label: '45 seconds ago', delta: -45 },
-			{ label: '5 minutes ago', delta: -300 },
-			{ label: '45 minutes ago', delta: -2700 },
-			{ label: '3 hours ago', delta: -10800 },
-			{ label: '18 hours ago', delta: -64800 },
-			{ label: '2 days ago', delta: -172800 },
-			{ label: '10 days ago', delta: -864000 },
-			{ label: '25 days ago', delta: -2160000 },
-			{ label: '60 days ago (falls back to short)', delta: -5184000 }
-		];
-		var relBody = document.querySelector('#demo-relative-table tbody');
-		offsets.forEach(function (o) {
-			var tr = document.createElement('tr');
-			tr.innerHTML = '<td>' + o.label + '</td>'
-				+ '<td><time data-ln-time="relative" datetime="' + (now + o.delta) + '">loading...</time></td>';
-			relBody.appendChild(tr);
-		});
-
-		// ─── Future Timestamps ────────────────────────────────
-		var futures = [
-			{ label: 'in 30 seconds', delta: 30 },
-			{ label: 'in 15 minutes', delta: 900 },
-			{ label: 'in 6 hours', delta: 21600 },
-			{ label: 'in 3 days', delta: 259200 },
-			{ label: 'in 2 weeks', delta: 1209600 }
-		];
-		var futBody = document.querySelector('#demo-future-table tbody');
-		futures.forEach(function (o) {
-			var tr = document.createElement('tr');
-			tr.innerHTML = '<td>' + o.label + '</td>'
-				+ '<td><time data-ln-time="relative" datetime="' + (now + o.delta) + '">loading...</time></td>';
-			futBody.appendChild(tr);
-		});
-
-		// ─── Locale Override ──────────────────────────────────
-		var localeTs = now - 10800;
-		var locales = [
-			{ code: 'en', name: 'English (default)' },
-			{ code: 'mk', name: 'Macedonian' },
-			{ code: 'de', name: 'German' },
-			{ code: 'fr', name: 'French' },
-			{ code: 'ja', name: 'Japanese' },
-			{ code: 'ar', name: 'Arabic' }
-		];
-		var locBody = document.querySelector('#demo-locale-table tbody');
-		locales.forEach(function (l) {
-			var tr = document.createElement('tr');
-			tr.innerHTML = '<td><code>' + l.code + '</code> — ' + l.name + '</td>'
-				+ '<td><time data-ln-time="full" datetime="' + localeTs + '" data-ln-time-locale="' + l.code + '">loading...</time></td>'
-				+ '<td><time data-ln-time="relative" datetime="' + localeTs + '" data-ln-time-locale="' + l.code + '">loading...</time></td>';
-			locBody.appendChild(tr);
-		});
-
-		// ─── Dynamic Insertion ────────────────────────────────
-		var dynCount = 0;
-		document.getElementById('demo-dynamic-btn').addEventListener('click', function () {
-			dynCount++;
-			var el = document.createElement('time');
-			el.setAttribute('data-ln-time', 'relative');
-			el.setAttribute('datetime', String(now - dynCount * 3600));
-			el.textContent = 'loading...';
-			var p = document.createElement('p');
-			p.appendChild(document.createTextNode('Inserted #' + dynCount + ': '));
-			p.appendChild(el);
-			document.getElementById('demo-dynamic-target').appendChild(p);
-		});
-
-		// ─── Reactive Attribute Change ────────────────────────
-		var reactModes = ['full', 'short', 'date', 'time', 'relative'];
-		var reactIdx = 0;
-		var reactEl = document.getElementById('demo-reactive');
-
-		document.getElementById('demo-reactive-ts').addEventListener('click', function () {
-			var randomTs = now - Math.floor(Math.random() * 31536000);
-			reactEl.setAttribute('datetime', String(randomTs));
-		});
-
-		document.getElementById('demo-reactive-mode').addEventListener('click', function () {
-			reactIdx = (reactIdx + 1) % reactModes.length;
-			reactEl.setAttribute('data-ln-time', reactModes[reactIdx]);
-		});
-	});
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
 	</script>
 </body>
 </html>
