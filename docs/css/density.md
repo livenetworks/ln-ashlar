@@ -90,7 +90,6 @@ Exempt surfaces — hardcoded rem or raw typography scale, intentionally.
 |---|---|
 | Buttons (`<button>`, `@include btn`, btn-sm, btn-lg) | WCAG 2.5.5 hit-target floor (~44px). Shrinking buttons violates the floor. Padding and font stay raw-scale values. |
 | Pill radio/checkbox | Interactive controls, same WCAG reasoning as buttons. |
-| Close buttons (`close-button` mixin) | Fixed 2rem tap target. |
 | Modal outer (`modal-sm/md/lg/xl`) | Only `max-width` declared in mixin — modal content inherits density via the cascade for its own `main` padding. |
 | Toasts | Ephemeral notification overlay. Fixed visual scale. |
 | Page-header outer chrome (pb, mb, gap) | Structural rhythm. Inner h1 DOES react via the display-sm token override. |

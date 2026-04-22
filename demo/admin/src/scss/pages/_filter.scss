@@ -3,22 +3,7 @@
 #filter-basic-nav,
 #filter-cards-nav,
 #combo-toolbar nav {
-	@include flex;
-	@include flex-wrap;
-	@include gap(0.5rem);
-	@include mb(1rem);
-
-	button {
-		@include btn;
-		font-size: var(--text-sm);
-		padding: var(--size-xs) var(--size-sm);
-
-		&[data-active] {
-			background-color: hsl(var(--color-primary));
-			color: hsl(var(--color-text-on-primary, 0 0% 100%));
-			border-color: hsl(var(--color-primary));
-		}
-	}
+	margin-bottom: var(--size-md);
 }
 
 #filter-basic-list,

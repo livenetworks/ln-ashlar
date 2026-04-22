@@ -9,13 +9,60 @@
 @use 'focus' as *;
 
 // Buttons
-// btn        — complete action button (structure + filled solid colors)
-// btn-sm     — smaller size modifier
-// btn-lg     — larger size modifier
-// btn-group  — inline list of peer action buttons
-// close-button — icon-only dismiss/close button
+// button-base  — shared neutral chrome (global button + anchor-as-button)
+// btn          — complete action button (structure + filled primary colors)
+// btn-sm       — smaller size modifier
+// btn-lg       — larger size modifier
+// btn-group    — inline list of peer action buttons (ghost rebind)
+
+// ─── button-base ──────────────────────────────────────
+// Neutral chrome shared by <button>, <input type="submit|reset|button">,
+// and anchors used as buttons (e.g. inside form-actions). Reads --btn-bg
+// and --btn-border for surface; hover/active bake in the neutral sunken
+// transition. Variants (e.g. @mixin btn) override --color-accent + bg/border
+// for primary-filled chrome.
+
+@mixin button-base {
+	@include inline-flex;
+	@include items-center;
+	@include justify-center;
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
+	@include text-sm;
+	@include font-medium;
+	@include rounded-md;
+	white-space: nowrap;
+	border: var(--border-width) solid var(--btn-border);
+	outline: none;
+	background: var(--btn-bg);
+	color: var(--color-fg);
+	@include transition-colors;
+
+	&:hover:not(:disabled) {
+		background: var(--color-bg-sunken);
+		color: var(--color-fg);
+		border-color: var(--color-border-strong-hover);
+	}
+
+	&:active:not(:disabled) {
+		background: hsl(var(--color-border));
+		border-color: var(--color-border-strong-hover);
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	&:disabled {
+		@include opacity-50;
+		@include cursor-not-allowed;
+	}
+}
 
 @mixin btn {
+	--color-accent: hsl(var(--color-primary));
+	--color-accent-hover: hsl(var(--color-primary-hover));
+	--color-accent-fg: hsl(var(--color-white));
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
@@ -77,21 +124,9 @@
 	@include list-reset;
 
 	button {
-		border: none;
-		background: transparent;
+		--btn-bg: transparent;
+		--btn-border: transparent;
 		color: var(--color-fg-subtle);
-
-		&:hover:not(:disabled) {
-			background: var(--color-bg-sunken);
-			color: var(--color-fg);
-		}
 	}
 }
 
-@mixin close-button {
-	--padding-x: var(--size-xs-up);
-	padding: var(--padding-y) var(--padding-x);
-	aspect-ratio: 1;
-	@include rounded-sm;
-	@include transition-fast;
-}

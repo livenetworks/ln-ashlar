@@ -208,7 +208,6 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Small button | `@include btn-sm` alongside `@include btn` |
 | Large button | `@include btn-lg` alongside `@include btn` |
 | Action button group (toolbar, table actions) | `@include btn-group` |
-| Close/dismiss button | `@include close-button` |
 | Inline alert (contextual feedback) | `@include alert` |
 | Full-width page banner (system status) | `@include banner` |
 | Expand/collapse parent | `@include collapsible` |
@@ -463,38 +462,6 @@ color: white;
 ```scss
 #compact-btn { @include btn; @include btn-sm; }   // toolbar, table actions
 #hero-cta    { @include btn; @include btn-lg; }
-```
-
-### `@include close-button`
-
-Icon-only dismiss button. Resets padding to zero, fixed 2rem size.
-
-**Expands to:**
-```css
-padding: 0;
-width: 2rem;
-height: 2rem;
-display: flex;
-align-items: center;
-justify-content: center;
-border-radius: var(--radius-sm);
-transition: all var(--transition-fast);
-color: hsl(var(--color-text-muted));
-
-&:hover  { color: hsl(var(--color-error)); background: hsl(var(--color-bg-secondary)); }
-&:active { color: hsl(var(--color-error-hover)); background: hsl(var(--color-bg-body)); }
-```
-
-```html
-<!-- In HTML — SVG icon inside the button -->
-<button type="button" aria-label="Close" data-ln-modal-close>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-</button>
-```
-
-```scss
-/* In SCSS */
-.ln-modal header button[data-ln-modal-close] { @include close-button; }
 ```
 
 ### `@include collapsible` + `@include collapsible-content`
@@ -755,7 +722,6 @@ z-index: 40;
 ```
 ```scss
 #edit-user > form { @include modal-lg; }
-#edit-user header button[data-ln-modal-close] { @include close-button; }
 #edit-user main { @include form-grid; }
 ```
 

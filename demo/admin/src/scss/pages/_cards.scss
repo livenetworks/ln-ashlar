@@ -1,15 +1,5 @@
 @use '../../../../../scss/config/mixins' as *;
 
-// File-local helper — cascade all status sibling tokens. Name prefixed with `-`
-// to signal "private to this file"; not @forward-ed, not a library mixin.
-@mixin -status-cascade($name) {
-	--color-primary:         var(--color-#{$name});
-	--color-primary-hover:   var(--color-#{$name}-hover);
-	--color-primary-focus:   var(--color-#{$name}-focus);
-	--color-primary-light:   var(--color-#{$name}-light);
-	--color-primary-lighter: var(--color-#{$name}-lighter);
-}
-
 // ─── Basic cards grid ──────────────────────────────────
 #demo-basic-cards {
 	@include grid-2;
@@ -34,11 +24,6 @@
 		h4 { margin: 0; }
 		p { margin: 0; @include text-sm; @include text-secondary; }
 	}
-
-	.accent-success { @include -status-cascade(success); }
-	.accent-error   { @include -status-cascade(error); }
-	.accent-warning { @include -status-cascade(warning); }
-	.accent-info    { @include -status-cascade(info); }
 }
 
 // ─── Accent left / side status ─────────────────────────
@@ -53,11 +38,6 @@
 		h4 { margin: 0; }
 		p { margin: 0; @include text-sm; @include text-secondary; }
 	}
-
-	.accent-success { @include -status-cascade(success); }
-	.accent-error   { @include -status-cascade(error); }
-	.accent-warning { @include -status-cascade(warning); }
-	.accent-info    { @include -status-cascade(info); }
 }
 
 // ─── Accent bottom ─────────────────────────────────────
@@ -72,11 +52,6 @@
 		h4 { margin: 0; }
 		p { margin: 0; @include text-sm; @include text-secondary; }
 	}
-
-	.accent-success { @include -status-cascade(success); }
-	.accent-error   { @include -status-cascade(error); }
-	.accent-warning { @include -status-cascade(warning); }
-	.accent-info    { @include -status-cascade(info); }
 }
 
 // ─── Tinted background cards ───────────────────────────
@@ -91,11 +66,6 @@
 		h4 { margin: 0; color: hsl(var(--color-primary)); }
 		p { margin: 0; @include text-sm; @include text-secondary; }
 	}
-
-	.tint-success { @include -status-cascade(success); }
-	.tint-error   { @include -status-cascade(error); }
-	.tint-warning { @include -status-cascade(warning); }
-	.tint-info    { @include -status-cascade(info); }
 }
 
 // ─── Stacked card ──────────────────────────────────────
@@ -145,11 +115,6 @@
 			color: hsl(var(--color-primary));
 		}
 	}
-
-	.stat-success { @include -status-cascade(success); }
-	.stat-error   { @include -status-cascade(error); }
-	.stat-warning { @include -status-cascade(warning); }
-	.stat-info    { @include -status-cascade(info); }
 }
 
 // ─── Card with fields ──────────────────────────────────

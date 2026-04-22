@@ -27,9 +27,9 @@
 //
 // What does NOT react: buttons and pill-controls — their padding and
 // font are hardcoded rem/raw-scale values in `_btn.scss`, `_form.scss`
-// (pill), `_global.scss` (native <button>), and `_btn.scss`
-// (close-button). This is deliberate — WCAG 2.5.5 hit-target size
-// floor (~44px) must not be shrunk by a visual density toggle.
+// (pill), and `_global.scss` (native <button>). This is deliberate —
+// WCAG 2.5.5 hit-target size floor (~44px) must not be shrunk by a
+// visual density toggle.
 // ==========================================================================
 
 :root {

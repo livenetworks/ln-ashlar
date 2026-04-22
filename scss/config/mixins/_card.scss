@@ -30,7 +30,7 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	padding: var(--size-sm) var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-b;
 	background: var(--color-bg-sunken);
 	@include transition;
@@ -45,7 +45,7 @@
 }
 
 @mixin panel-body {
-	padding: var(--size-md) var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 
 	// Auto-flush: ONLY when the table (or .table-container) is the
 	// sole child of main — i.e. the card is a pure table card.
@@ -70,7 +70,7 @@
 }
 
 @mixin panel-footer {
-	padding: var(--size-sm) var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-t;
 	@include flex;
 	@include justify-end;
@@ -200,4 +200,58 @@
 	border-radius: var(--radius);
 	box-shadow: var(--shadow-raised);
 	z-index: var(--z-dropdown);
+}
+
+// ─── Card field list (label/value rows) ────────────────
+// Dashboard/settings pattern: card body contains .field rows
+// with .label + .value. Separator between rows, none after last.
+// Apply on a scope that contains .field descendants — typically
+// the `.card` global binding, but any container works.
+//
+// Expected HTML:
+//   <div class="card">
+//     <main>
+//       <div class="field"><span class="label">Name</span><span class="value">Marko</span></div>
+//       <div class="field"><span class="label">Email</span><span class="value">m@x</span></div>
+//     </main>
+//   </div>
+
+@mixin card-field-list {
+	.field {
+		@include flex;
+		align-items: baseline;
+		@include justify-between;
+		gap: var(--gap);
+		padding-block: var(--size-xs-up);
+		@include border-b;
+
+		&:last-child {
+			@include border-none;
+			padding-bottom: 0;
+		}
+
+		.label {
+			@include text-xs;
+			@include font-semibold;
+			@include uppercase;
+			@include tracking-wider;
+			color: var(--color-fg-muted);
+			@include flex-shrink-0;
+		}
+
+		.value {
+			@include text-sm;
+			@include font-medium;
+			color: var(--color-fg);
+			text-align: right;
+			margin: 0;
+
+			em {
+				color: var(--color-fg-subtle);
+				@include text-xs;
+				font-style: normal;
+				font-weight: normal;
+			}
+		}
+	}
 }

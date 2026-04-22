@@ -33,46 +33,37 @@ a {
 
 // ─── All buttons — structure + neutral colors ───────────────────────────────
 // Every <button> gets padding, font, and a neutral hover out of the box.
-// Icon/close buttons override padding via their own mixin (@include close-button).
+// Icon/close buttons re-bind --padding-y/--padding-x on the parent scope's
+// descendant button selector to tighten the tap area.
 
 button,
 input[type="submit"],
 input[type="reset"],
 input[type="button"] {
-	@include inline-flex;
-	@include items-center;
-	@include justify-center;
-	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
-	@include text-sm;
-	@include font-medium;
-	@include rounded-md;
-	white-space: nowrap;
-	border: var(--border-width) solid var(--color-border-strong);
-	outline: none;
-	background: var(--color-bg);
-	color: var(--color-fg);
-	@include transition-colors;
+	--padding-x: var(--size-sm-up);
+	--padding-y: var(--size-sm);
+}
 
-	&:hover:not(:disabled) {
-		background: var(--color-bg-sunken);
-		color: var(--color-fg);
-		border-color: var(--color-border-strong-hover);
-	}
+// Tight buttons inside any <header> (close-X, toggles, icon actions).
+// Why only <header>: headers have a bounded height (app-header,
+// section-card header, modal header, panel header) and their buttons
+// are almost always icon-only — a full-sized button overflows the
+// chrome. Other container types (<footer>, <nav>, <aside>, <section>)
+// have no such height constraint and their buttons sit in content
+// flow, so they inherit the default size from :root without issue.
+// If a specific scope ever needs tight buttons, re-bind --padding-*
+// on that scope's descendant button selector — do NOT widen this
+// rule.
+header button {
+	--padding-y: var(--size-2xs);
+	--padding-x: var(--size-2xs);
+}
 
-	&:active:not(:disabled) {
-		background: hsl(var(--color-border));
-		border-color: var(--color-border-strong-hover);
-	}
-
-	&:focus-visible {
-		@include focus-ring;
-	}
-
-	&:disabled {
-		@include opacity-50;
-		@include cursor-not-allowed;
-	}
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+	@include button-base;
 }
 
 // ─── Submit — color only, structure inherited from above ────────────────────
@@ -80,6 +71,9 @@ input[type="button"] {
 
 button[type="submit"],
 input[type="submit"] {
+	--color-accent: hsl(var(--color-primary));
+	--color-accent-hover: hsl(var(--color-primary-hover));
+	--color-accent-fg: hsl(var(--color-white));
 	background: var(--color-accent);
 	color: var(--color-accent-fg);
 	border-color: var(--color-accent);

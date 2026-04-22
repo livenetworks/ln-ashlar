@@ -310,6 +310,8 @@
 	--color-border-subtle: hsl(var(--color-border-light));
 	--color-border-strong:       hsl(var(--color-neutral-300));
 	--color-border-strong-hover: hsl(var(--color-neutral-400));
+	--btn-bg:                    var(--color-bg);
+	--btn-border:                var(--color-border-strong);
 	--color-bg-recessed:         hsl(var(--color-bg-body));
 	--color-scrim:               hsl(var(--color-neutral-900) / 0.5);
 	// Note: --color-border already exists above as an HSL TRIPLET. We do

@@ -60,5 +60,5 @@ background:  hsl(var(--color-primary) / 0.08)   ← 8% tint
 
 .ln-icon  → primary color, flex-shrink-0
 p         → flex-1, no margin
-button    → @include close-button, margin-left: auto
+button    → --padding-y/x: size-2xs (tight tap area), margin-left: auto
 ```

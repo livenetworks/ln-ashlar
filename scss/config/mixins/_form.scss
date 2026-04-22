@@ -9,6 +9,7 @@
 @use 'interaction' as *;
 @use 'position' as *;
 @use 'focus' as *;
+@use 'btn' as *;
 
 // ─── Form layout ────────────────────────────────────────────────
 
@@ -62,32 +63,13 @@
 	@include border-t;
 
 	a {
-		@include inline-flex;
-		@include items-center;
-		@include justify-center;
-		// Reset parent's --gap re-bind; anchor's icon+text gap is tight.
+		// Anchor-as-button: inherit neutral button chrome from the library,
+		// then reset the --gap rebind (form-actions parent sets a wider
+		// action-button gap; anchors want the tighter icon+text gap) and
+		// strip default anchor underline.
 		--gap: var(--size-sm);
-		gap: var(--gap);
-		padding: var(--padding-y) var(--padding-x);
-		@include text-sm;
-		@include font-medium;
-		border-radius: var(--radius);
-		white-space: nowrap;
-		border: var(--border-width) solid var(--color-border-strong);
-		background: var(--color-bg);
-		color: var(--color-fg);
+		@include button-base;
 		text-decoration: none;
-		@include transition-colors;
-
-		&:hover {
-			background: var(--color-bg-sunken);
-			color: var(--color-fg);
-			border-color: var(--color-border-strong-hover);
-		}
-
-		&:focus-visible {
-			@include focus-ring;
-		}
 	}
 }
 

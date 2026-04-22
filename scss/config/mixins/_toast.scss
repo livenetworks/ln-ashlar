@@ -18,7 +18,7 @@
 //   [data-ln-toast] { @include toast-container; }
 //   .ln-toast__card { @include toast-card; }
 //
-// Color variants set --ln-toast-accent on the card.
+// Color: attach .success/.error/.warning/.info utility class on the card to cascade --color-accent.
 
 @mixin toast-container {
 	@include fixed;
@@ -73,7 +73,7 @@
 	align-items: flex-start;
 	@include justify-center;
 	padding-top: var(--size-md);
-	background: var(--ln-toast-accent, hsl(var(--color-info)));
+	background: var(--color-accent);
 	color: var(--color-accent-fg);
 
 	&::before {
@@ -86,24 +86,14 @@
 	@include flex-1;
 	padding: var(--size-md) var(--size-md) var(--size-md) var(--size-sm);
 	@include relative;
-}
 
-// ─── Color variants ────────────────────────────────────
-
-@mixin toast-success {
-	--ln-toast-accent: hsl(var(--color-success));
-}
-
-@mixin toast-error {
-	--ln-toast-accent: hsl(var(--color-error));
-}
-
-@mixin toast-warn {
-	--ln-toast-accent: hsl(var(--color-warning));
-}
-
-@mixin toast-info {
-	--ln-toast-accent: hsl(var(--color-info));
+	.ln-toast__close {
+		--padding-y: var(--size-2xs);
+		--padding-x: var(--size-2xs);
+		@include absolute;
+		top: var(--size-sm);
+		right: var(--size-sm);
+	}
 }
 
 // ─── Header & close ────────────────────────────────────
@@ -120,13 +110,6 @@
 	@include text-base;
 	color: var(--color-fg);
 	line-height: 1.25;
-}
-
-@mixin toast-close {
-	@include close-button;
-	@include absolute;
-	top: var(--size-sm);
-	right: var(--size-sm);
 }
 
 // ─── Body ──────────────────────────────────────────────

@@ -72,7 +72,8 @@
 		}
 
 		button[data-ln-modal-close] {
-			@include close-button;
+			--padding-y: var(--size-2xs);
+			--padding-x: var(--size-2xs);
 			@include flex-shrink-0;
 			margin-left: auto;
 		}

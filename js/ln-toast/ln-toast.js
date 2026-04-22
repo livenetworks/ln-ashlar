@@ -55,9 +55,13 @@ import { guardBody } from '../ln-core';
 			: "Information";
 	}
 
+	function _statusClass(type) {
+		return type === "warn" ? "warning" : type;
+	}
+
 	function _buildCard(type, title, li) {
 		const card = document.createElement("div");
-		card.className = "ln-toast__card ln-toast__card--" + type;
+		card.className = "ln-toast__card " + _statusClass(type);
 		card.setAttribute("role", type === "error" ? "alert" : "status");
 		card.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
 

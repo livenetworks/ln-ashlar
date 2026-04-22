@@ -47,7 +47,7 @@ scss/
 │   │   ├── _colors.scss     ← text-primary, bg-primary
 │   │   ├── _borders.scss    ← border, rounded-*
 │   │   ├── _form.scss       ← form-input, form-select, form-checkbox, pill, ...
-│   │   ├── _btn.scss        ← btn, btn-colors, close-button
+│   │   ├── _btn.scss        ← btn, btn-sm, btn-lg, btn-group
 │   │   ├── _table.scss      ← table-base, table-responsive, table-striped, ...
 │   │   ├── _card.scss       ← card, card-accent-*, card-bg, card-stacked, panel-header, section-card
 │   │   ├── _modal.scss      ← modal-sm, modal-md, modal-lg, modal-xl
@@ -171,7 +171,13 @@ Size variants available via `btn-sm` and `btn-lg` mixins (see `scss/config/mixin
 
 ### Icon / Close Buttons
 
-`@include close-button` is a fixed size override for icon-only buttons — resets padding to 0 and uses a square size. Use for any icon-only button.
+Icon-only close/dismiss buttons inherit the global `<button>` base styles. Re-bind `--padding-y` and `--padding-x` on the parent scope's descendant `button` selector to tighten the tap area:
+
+```scss
+.my-component {
+    button.close { --padding-y: var(--size-2xs); --padding-x: var(--size-2xs); }
+}
+```
 
 ### Rules
 

@@ -11,7 +11,8 @@
 //   [data-ln-circular-progress] { @include circular-progress; }
 //
 // Size variants: circular-progress-sm, circular-progress-lg, circular-progress-xl
-// Color variants: circular-progress-success, circular-progress-warning, circular-progress-error
+// Color variants: override --color-primary on the element or a wrapper:
+//   [data-ln-circular-progress].success { --color-primary: var(--color-success-hsl); }
 
 @mixin circular-progress {
 	@include relative;
@@ -68,21 +69,3 @@
 	}
 }
 
-// ─── Color variants ────────────────────────────────────
-@mixin circular-progress-success {
-	.ln-circular-progress__fill {
-		stroke: hsl(var(--color-success));
-	}
-}
-
-@mixin circular-progress-error {
-	.ln-circular-progress__fill {
-		stroke: hsl(var(--color-error));
-	}
-}
-
-@mixin circular-progress-warning {
-	.ln-circular-progress__fill {
-		stroke: hsl(var(--color-warning));
-	}
-}

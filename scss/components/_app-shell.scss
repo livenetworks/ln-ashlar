@@ -5,3 +5,4 @@
 .app-main    { @include app-main; }
 .app-sidebar { @include sidebar; @include sidebar-drawer; }
 .app-scrim   { @include app-scrim; }
+.app-footer  { @include app-footer; }

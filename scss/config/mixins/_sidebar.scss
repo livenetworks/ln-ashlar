@@ -51,11 +51,17 @@
 	}
 
 	> footer {
+		@include flex;
+		@include items-center;
+		padding-block: var(--padding-y);
 		@include border-t;
-		padding-block: var(--size-sm-up);
+		font-size: var(--text-body-sm);
+		line-height: var(--lh-body-sm);
+		color: var(--color-fg-muted);
 
 		small {
 			color: var(--color-fg-subtle);
+			font-size: inherit;
 		}
 	}
 }
