@@ -54,9 +54,7 @@
 		a {
 			@include inline-flex;
 			@include items-center;
-			--padding-x: var(--size-xs);
-			--padding-y: var(--size-2xs);
-			padding: var(--padding-y) var(--padding-x);
+			padding: var(--size-2xs) var(--size-xs);
 			@include rounded-sm;
 
 			&:focus-visible {
@@ -65,9 +63,7 @@
 		}
 
 		[aria-current="page"] {
-			--padding-x: var(--size-xs);
-			--padding-y: var(--size-2xs);
-			padding: var(--padding-y) var(--padding-x);
+			padding: var(--size-2xs) var(--size-xs);
 		}
 	}
 }

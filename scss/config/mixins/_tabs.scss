@@ -14,9 +14,7 @@
 @mixin tabs-tab {
 	all: unset;
 	box-sizing: border-box;
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-md);
 	@include text-sm;
 	@include font-medium;
 	color: var(--color-fg-muted);
@@ -56,7 +54,5 @@
 }
 
 @mixin tabs-panel {
-	--padding-x: var(--size-lg);
-	--padding-y: var(--size-lg);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-lg) var(--size-lg);
 }

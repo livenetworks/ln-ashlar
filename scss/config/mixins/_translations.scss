@@ -47,8 +47,7 @@
 @mixin translations-actions {
 	@include inline-flex;
 	@include items-center;
-	--gap: var(--size-xs);
-	gap: var(--gap);
+	gap: var(--size-xs);
 	margin-left: auto;
 }
 
@@ -57,8 +56,7 @@
 @mixin translations-active-list {
 	@include inline-flex;
 	@include items-center;
-	--gap: var(--size-xs);
-	gap: var(--gap);
+	gap: var(--size-xs);
 	@include list-reset;
 }
 
@@ -67,11 +65,8 @@
 @mixin translations-badge {
 	@include inline-flex;
 	@include items-center;
-	--gap: var(--size-xs);
-	--padding-x: var(--size-xs);
-	--padding-y: var(--size-2xs);
-	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
+	gap: var(--size-xs);
+	padding: var(--size-2xs) var(--size-xs);
 	@include text-xs;
 	@include font-semibold;
 	@include rounded-sm;

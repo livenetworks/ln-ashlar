@@ -109,8 +109,7 @@
 	th [data-ln-dropdown] > button {
 		@include flex;
 		@include items-center;
-		--gap: var(--size-xs);
-		gap: var(--gap);
+		gap: var(--size-xs);
 		background: none;
 		border: none;
 		color: inherit;
@@ -135,9 +134,7 @@
 		@include flex;
 		@include items-center;
 		@include text-left;
-		--padding-x: var(--size-sm);
-		--padding-y: var(--size-xs);
-		padding: var(--padding-y) var(--padding-x);
+		padding: var(--size-xs) var(--size-sm);
 		@include text-sm;
 		@include font-normal;
 		background: none;
@@ -192,9 +189,7 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-md);
 	@include border-t;
 	background: var(--color-bg-sunken);
 	border-radius: 0 0 var(--radius-lg) var(--radius-lg);
@@ -221,11 +216,8 @@
 	@include flex;
 	@include flex-wrap;
 	@include items-center;
-	--gap: var(--size-lg);
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
-	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
+	gap: var(--size-lg);
+	padding: var(--size-sm) var(--size-md);
 	@include border-b-light;
 
 	fieldset {
@@ -234,8 +226,7 @@
 		margin: 0;
 		@include flex;
 		@include items-center;
-		--gap: var(--size-xs-up);
-		gap: var(--gap);
+		gap: var(--size-xs-up);
 
 		legend {
 			@include text-xs;
@@ -252,9 +243,7 @@
 		}
 
 		li button {
-			--padding-x: var(--size-sm);
-			--padding-y: var(--size-2xs);
-			padding: var(--padding-y) var(--padding-x);
+			padding: var(--size-2xs) var(--size-sm);
 			@include text-xs;
 			@include font-medium;
 			@include rounded-full;
@@ -282,11 +271,8 @@
 	@include flex;
 	@include items-center;
 	@include flex-wrap;
-	--gap: var(--size-xs-up);
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-xs-up);
-	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
+	gap: var(--size-xs-up);
+	padding: var(--size-xs-up) var(--size-md);
 	@include border-b-light;
 	background-color: hsl(var(--color-primary) / 0.03);
 }
@@ -294,11 +280,8 @@
 @mixin ln-table-chip {
 	@include inline-flex;
 	@include items-center;
-	--gap: var(--size-xs);
-	--padding-x: var(--size-sm);
-	--padding-y: var(--size-2xs);
-	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
+	gap: var(--size-xs);
+	padding: var(--size-2xs) var(--size-sm);
 	@include rounded-full;
 	@include text-xs;
 	@include tinted-surface(0.1);
@@ -341,8 +324,7 @@
 // ─── Empty state ──────────────────────────────────────────
 
 @mixin ln-table-empty-state {
-	--padding-y: var(--size-2xl);
-	padding-block: var(--padding-y);
+	padding-block: var(--size-2xl);
 	@include text-center;
 
 	svg.ln-icon {

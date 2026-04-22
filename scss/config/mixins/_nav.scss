@@ -34,7 +34,6 @@
 
 	a {
 		--gap: var(--size-sm-up);
-		--padding-y: var(--size-sm-up);
 		@include flex;
 		@include items-center;
 		gap: var(--gap);
@@ -56,8 +55,7 @@
 	}
 
 	.nav-section {
-		--padding-y: var(--size-sm);
-		padding-block: var(--padding-y);
+		padding-block: var(--size-sm);
 		@include text-xs;
 		@include font-medium;
 		color: var(--color-fg-subtle);
@@ -109,7 +107,6 @@
 	}
 
 	a {
-		--padding-x: var(--size-sm-up);
 		padding-inline: var(--padding-x);
 		border-radius: var(--radius);
 		transition: background-color 150ms ease, color 150ms ease;
@@ -137,9 +134,8 @@
 	}
 
 	a {
-		--padding-x: var(--size-md);
 		margin-inline: 0;
-		padding-inline: var(--padding-x);
+		padding-inline: var(--size-md);
 		border-radius: 0;
 		transition: box-shadow 150ms ease, background-color 150ms ease, color 150ms ease;
 
@@ -194,9 +190,8 @@
 	}
 
 	a {
-		--padding-x: var(--size-md);
 		margin-inline: 0;
-		padding-inline: var(--padding-x);
+		padding-inline: var(--size-md);
 		border-radius: 0;
 		transition: background-color 150ms ease, color 150ms ease;
 
@@ -251,7 +246,6 @@
 	}
 
 	a {
-		--padding-x: var(--size-sm-up);
 		margin-inline: 0;
 		padding-inline: var(--padding-x);
 		border-radius: 0;

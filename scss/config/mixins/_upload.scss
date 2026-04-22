@@ -26,11 +26,9 @@
 }
 
 @mixin upload-zone {
-	--padding-x: var(--size-lg);
-	--padding-y: var(--size-lg);
 	border: 2px dashed hsl(var(--color-border));
 	border-radius: var(--radius);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-lg) var(--size-lg);
 	text-align: center;
 	@include cursor-pointer;
 	@include motion-safe {
@@ -74,13 +72,11 @@
 }
 
 @mixin upload-item {
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
 	@include relative;
 	@include flex;
 	@include items-center;
 	flex-wrap: wrap;
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-md);
 	background-color: var(--color-bg-sunken);
 	border: var(--border-width) solid hsl(var(--color-border));
 	border-radius: var(--radius-sm);

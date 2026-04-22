@@ -4,10 +4,8 @@
 @use 'borders' as *;
 
 @mixin kbd {
-	--padding-x: var(--size-xs-up);
-	--padding-y: var(--size-2xs);
 	display: inline-block;
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-2xs) var(--size-xs-up);
 	@include typography(caption);
 	font-family: var(--font-mono);
 	color: var(--color-fg);

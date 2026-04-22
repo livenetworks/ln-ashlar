@@ -295,8 +295,8 @@
 	// -----------------------------------------------------------------------
 
 	// -- Structure & rhythm -----------------------------------------------
-	--padding-x:       var(--size-md-up);
-	--padding-y:       var(--size-xs-up);
+	--padding-x:       var(--size-sm-up);
+	--padding-y:       var(--size-sm-up);
 	--gap:             var(--size-sm);
 	--radius:          var(--radius-md);
 
@@ -354,8 +354,7 @@
 // ---------------------------------------------------------------------------
 @include mq-down(md) {
 	:root {
-		--padding-x: var(--size-md);     // 20px → 16px
-		--padding-y: var(--size-xs);     // 6px → 4px
+		--padding-y: var(--size-xs);     // 12px → 4px
 		--gap:       var(--size-xs-up);  // 8px → 6px
 	}
 }

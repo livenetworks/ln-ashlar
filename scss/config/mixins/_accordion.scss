@@ -33,12 +33,10 @@
 
 		// Trigger
 		> [data-ln-toggle-for] {
-			--padding-x: var(--size-md);
-			--padding-y: var(--size-md);
 			@include flex;
 			@include justify-between;
 			@include items-center;
-			padding: var(--padding-y) var(--padding-x);
+			padding: var(--size-md) var(--size-md);
 			@include cursor-pointer;
 
 			// Chevron — place <svg class="ln-icon ln-chevron"> inside the trigger
@@ -57,9 +55,7 @@
 
 		// Content body padding — on children, not the overflow:hidden wrapper
 		.collapsible-body > * {
-			--padding-x: var(--size-md);
-			--padding-y: var(--size-sm-up);
-			padding: var(--padding-y) var(--padding-x);
+			padding: var(--size-sm-up) var(--size-md);
 			margin: 0;
 		}
 	}

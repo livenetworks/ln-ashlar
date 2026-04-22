@@ -101,10 +101,8 @@
 // ─── Text inputs, textareas, selects ────────────────────────────
 
 @mixin form-input {
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
 	@include w-full;
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-md);
 	font-size: var(--font-size);
 	line-height: var(--line-height);
 	color: var(--color-fg);
@@ -173,14 +171,12 @@
 // needed on the <label>.
 
 @mixin form-input-icon-group {
-	--padding-x: var(--size-sm);
-	--padding-y: var(--size-xs);
 	@include inline-flex;
 	@include items-center;
 	gap: var(--gap);
 	// Compact padding: tight vertical to keep total height close to a
 	// regular form-input despite the icon's fixed size.
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-xs) var(--size-sm);
 	background: var(--color-bg);
 	@include border;
 	border-radius: var(--radius);
@@ -234,10 +230,8 @@
 	}
 
 	> [data-ln-search-clear] {
-		--padding-x: var(--size-2xs);
-		--padding-y: var(--size-2xs);
 		@include flex-shrink-0;
-		padding: var(--padding-y) var(--padding-x);
+		padding: var(--size-2xs) var(--size-2xs);
 		@include cursor-pointer;
 		color: var(--color-fg-subtle);
 		@include transition-colors;
@@ -301,12 +295,10 @@
 // ─── Pill outline — base label (structure + visible border) ────
 
 @mixin pill-outline {
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
 	@include flex;
 	@include items-center;
 	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-md);
 	@include cursor-pointer;
 	@include transition;
 	@include text-sm;

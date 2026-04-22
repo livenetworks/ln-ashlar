@@ -33,11 +33,8 @@
 	> header aside label {
 		@include inline-flex;
 		@include items-center;
-		--gap: var(--size-xs-up);
-		--padding-x: var(--size-sm-up);
-		--padding-y: var(--size-xs);
-		gap: var(--gap);
-		padding: var(--padding-y) var(--padding-x);
+		gap: var(--size-xs-up);
+		padding: var(--size-xs) var(--size-sm-up);
 		border-radius: var(--radius);
 		@include border;
 		background: var(--color-bg);
@@ -94,9 +91,7 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	--padding-x: var(--size-2xs);
-	--padding-y: var(--size-2xs);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-2xs) var(--size-2xs);
 	margin-inline-start: var(--size-xs);
 	vertical-align: middle;
 }
@@ -116,9 +111,7 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	--padding-x: var(--size-2xs);
-	--padding-y: var(--size-2xs);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-2xs) var(--size-2xs);
 	margin-inline-start: var(--size-2xs);
 	vertical-align: middle;
 	@include relative;
@@ -151,9 +144,7 @@
 	border: var(--border-width) solid hsl(var(--color-border));
 	border-radius: var(--radius);
 	box-shadow: var(--shadow-raised);
-	--padding-x: var(--size-sm);
-	--padding-y: var(--size-sm);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-sm);
 	min-width: 12rem;
 	max-height: 20rem;
 	overflow-y: auto;

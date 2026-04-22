@@ -10,10 +10,6 @@
 // ─── Base table ─────────────────────────────────────────────────
 
 @mixin table-base {
-	// Table-wide cell rhythm: 16×8. Applies to both th and td unless
-	// a variant (table-responsive) re-binds.
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
 	@include w-full;
 	background: var(--color-bg);
 	border-radius: var(--radius-lg);
@@ -29,7 +25,7 @@
 
 	th {
 		@include text-left;
-		padding: var(--padding-y) var(--padding-x);
+		padding: var(--size-sm) var(--size-md);
 		@include font-semibold;
 		font-size: var(--text-label-sm);
 		line-height: var(--lh-label-sm);
@@ -48,7 +44,7 @@
 	}
 
 	td {
-		padding: var(--padding-y) var(--padding-x);
+		padding: var(--size-sm) var(--size-md);
 		@include border-b;
 		font-size: var(--font-size);
 		line-height: var(--line-height);
@@ -94,11 +90,10 @@
 	}
 
 	td {
-		// Stacked rows need taller vertical rhythm than desktop table cells.
-		--padding-y: var(--size-sm-up);
 		@include block;
 		@include text-right;
-		padding: var(--padding-y) var(--padding-x);
+		// Stacked rows need taller vertical rhythm than desktop table cells.
+		padding: var(--size-sm-up) var(--size-md);
 		@include border-b;
 		@include relative;
 		padding-left: 50%;
@@ -112,7 +107,7 @@
 			@include absolute;
 			top: 0;
 			bottom: 0;
-			left: var(--padding-x);
+			left: var(--size-md);
 			// Intrinsic layout math — not padding rhythm.
 			width: calc(50% - var(--size-lg));
 			@include flex;
@@ -148,12 +143,10 @@
 }
 
 @mixin table-action {
-	--padding-x: var(--size-sm);
-	--padding-y: var(--size-xs);
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-xs) var(--size-sm);
 	@include text-sm;
 	@include transition-colors;
 
@@ -173,12 +166,10 @@
 
 @mixin table-filter-button {
 	th .filter {
-		--padding-x: var(--size-2xs);
-		--padding-y: var(--size-2xs);
 		@include inline-flex;
 		@include items-center;
 		float: right;
-		padding: var(--padding-y) var(--padding-x);
+		padding: var(--size-2xs) var(--size-2xs);
 		@include rounded-sm;
 		opacity: 0.5;
 

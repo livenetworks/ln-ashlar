@@ -25,12 +25,10 @@
 // JS toggles .ln-link-status--visible to show/hide.
 
 @mixin link-status {
-	--padding-x: var(--size-sm-up);
-	--padding-y: var(--size-xs);
 	@include fixed;
 	bottom: 0;
 	left: 0;
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-xs) var(--size-sm-up);
 	background: var(--color-bg);
 	@include border-t;
 	@include border-r;

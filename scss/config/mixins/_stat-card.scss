@@ -6,12 +6,9 @@
 @use 'transitions' as *;
 
 @mixin stat-card {
-	--gap: var(--size-xs);
-	--padding-x: var(--size-lg);
-	--padding-y: var(--size-lg);
 	@include flex-col;
-	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
+	gap: var(--size-xs);
+	padding: var(--size-lg) var(--size-lg);
 	background: var(--color-bg);
 	@include rounded-lg;
 	box-shadow: var(--shadow-default);
@@ -37,7 +34,7 @@
 	> [data-ln-stat-trend] {
 		@include flex-row;
 		@include items-center;
-		gap: var(--gap);
+		gap: var(--size-xs);
 		@include typography(body-sm);
 		margin: var(--size-xs) 0 0;
 

@@ -27,12 +27,10 @@
 }
 
 @mixin panel-header {
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-md);
 	@include border-b;
 	background: var(--color-bg-sunken);
 	@include transition;
@@ -47,9 +45,7 @@
 }
 
 @mixin panel-body {
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-md);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-md) var(--size-md);
 
 	// Auto-flush: ONLY when the table (or .table-container) is the
 	// sole child of main — i.e. the card is a pure table card.
@@ -74,9 +70,7 @@
 }
 
 @mixin panel-footer {
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-sm);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-md);
 	@include border-t;
 	@include flex;
 	@include justify-end;

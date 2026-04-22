@@ -9,8 +9,6 @@
 	position: fixed;
 	min-width: 14rem;
 	max-width: 24rem;
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-md);
 	padding: var(--padding-y) var(--padding-x);
 
 	&[data-ln-popover="open"] {

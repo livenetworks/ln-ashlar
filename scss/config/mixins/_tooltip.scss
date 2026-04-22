@@ -9,9 +9,7 @@
 // and JS-portal tooltip-element. Semantic token pair — in dark mode the
 // neutral scale inversion naturally flips the bubble to light-on-dark.
 @mixin tooltip-bubble {
-	--padding-x: var(--size-sm);
-	--padding-y: var(--size-xs);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-xs) var(--size-sm);
 	background: var(--color-fg);
 	color: var(--color-bg);
 	@include typography(caption);

@@ -36,26 +36,23 @@
 
 	> header {
 		--gap: var(--size-sm-up);
-		--padding-y: var(--size-sm-up);
 		@include flex;
 		@include items-center;
 		gap: var(--gap);
-		padding-block: var(--padding-y);
+		padding-block: var(--size-sm-up);
 		@include border-b;
 		@include shadow-b;
 	}
 
 	> main {
-		--padding-y: var(--size-xs);
 		@include flex-1;
 		overflow-y: auto;
-		padding-block: var(--padding-y);
+		padding-block: var(--size-xs);
 	}
 
 	> footer {
-		--padding-y: var(--size-sm-up);
 		@include border-t;
-		padding-block: var(--padding-y);
+		padding-block: var(--size-sm-up);
 
 		small {
 			color: var(--color-fg-subtle);

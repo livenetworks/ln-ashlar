@@ -2,14 +2,11 @@
 @use 'display' as *;
 
 @mixin empty-state {
-	--gap: var(--size-md);
-	--padding-x: var(--size-xl);
-	--padding-y: var(--size-xl);
 	@include flex-col;
 	@include items-center;
 	@include justify-center;
-	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
+	gap: var(--size-md);
+	padding: var(--size-xl) var(--size-xl);
 	text-align: center;
 	max-width: 28rem;
 	margin-inline: auto;

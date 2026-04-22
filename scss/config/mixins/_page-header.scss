@@ -7,8 +7,6 @@
 @use 'breakpoints' as *;
 
 @mixin page-header {
-	--gap: var(--size-md);
-	--padding-y: var(--size-lg);
 	container-type: inline-size;
 	container-name: page-header;
 	display: grid;
@@ -16,8 +14,8 @@
 		'breadcrumbs'
 		'title'
 		'actions';
-	gap: var(--gap);
-	padding-bottom: var(--padding-y);
+	gap: var(--size-md);
+	padding-bottom: var(--size-lg);
 	margin-bottom: var(--size-lg);
 	border-bottom: var(--border-width) solid hsl(var(--color-border));
 
@@ -54,10 +52,9 @@
 
 	> div:has(> button),
 	> div:has(> a) {
-		--gap: var(--size-sm);
 		grid-area: actions;
 		@include flex-row;
-		gap: var(--gap);
+		gap: var(--size-sm);
 
 		@include cq-down(medium, page-header) {
 			justify-content: flex-start;

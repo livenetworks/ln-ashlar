@@ -72,8 +72,7 @@
 	@include flex;
 	align-items: flex-start;
 	@include justify-center;
-	--padding-y: var(--size-md);
-	padding-top: var(--padding-y);
+	padding-top: var(--size-md);
 	background: var(--ln-toast-accent, hsl(var(--color-info)));
 	color: var(--color-accent-fg);
 
@@ -85,9 +84,7 @@
 
 @mixin toast-content {
 	@include flex-1;
-	--padding-x: var(--size-md);
-	--padding-y: var(--size-md);
-	padding: var(--padding-y) var(--padding-x) var(--padding-y) var(--size-sm);
+	padding: var(--size-md) var(--size-md) var(--size-md) var(--size-sm);
 	@include relative;
 }
 
@@ -115,8 +112,7 @@
 	@include flex;
 	align-items: flex-start;
 	@include justify-between;
-	--gap: var(--size-md);
-	gap: var(--gap);
+	gap: var(--size-md);
 }
 
 @mixin toast-title {

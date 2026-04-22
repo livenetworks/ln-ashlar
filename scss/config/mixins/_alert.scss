@@ -23,12 +23,10 @@
 //   </div>
 
 @mixin alert {
-	--padding-y: var(--size-sm);
-	--padding-x: var(--size-md);
 	@include flex;
 	@include items-center;
 	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--size-sm) var(--size-md);
 	border-radius: var(--radius);
 	@include text-sm;
 	border-left: 3px solid var(--color-accent);

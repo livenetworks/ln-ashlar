@@ -31,8 +31,7 @@
 	top: 100%;
 	margin-top: var(--size-xs);
 	@include list-reset;
-	--padding-y: var(--size-xs);
-	padding-block: var(--padding-y);
+	padding-block: var(--size-xs);
 	min-width: 10rem;
 
 	// ─── Menu item resets ──────────────────────────────
@@ -58,9 +57,7 @@
 		justify-content: flex-start;
 		gap: var(--gap);
 		@include text-left;
-		--padding-x: var(--size-sm);
-		--padding-y: var(--size-xs);
-		padding: var(--padding-y) var(--padding-x);
+		padding: var(--size-xs) var(--size-sm);
 		@include text-sm;
 		@include cursor-pointer;
 		@include transition-fast;
