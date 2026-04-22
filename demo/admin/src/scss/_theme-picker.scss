@@ -10,14 +10,14 @@
 	ul {
 		list-style: none;
 		margin: 0;
-		padding: var(--spacing-xs);
+		padding: var(--size-xs);
 		min-width: 12rem;
 	}
 
 	li button {
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-sm));
+		gap: var(--size-sm);
 		width: 100%;
 		justify-content: flex-start;
 		text-align: left;
