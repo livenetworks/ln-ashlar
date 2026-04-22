@@ -1,0 +1,114 @@
+<!-- ln-page: title="Page Header — ln-acme" h1="Page Header" -->
+
+<h1>Page Header</h1>
+				<p>Three-slot grid: breadcrumbs (top), title + optional subtitle (left), action buttons (right). Collapses to a vertical stack on containers narrower than 880px. Requires a container-context ancestor (<code>container-type: inline-size</code>).</p>
+
+				<!-- Full: breadcrumbs + title + actions (wide) -->
+				<section class="section-card">
+					<header><h3>Full — Breadcrumbs + Title + Actions (wide container)</h3></header>
+					<main>
+						<div class="ph-wrap">
+							<header>
+								<nav aria-label="Breadcrumb">
+									<ol>
+										<li><a href="#">Home</a></li>
+										<li><a href="#">Documents</a></li>
+										<li aria-current="page">Quality Manual</li>
+									</ol>
+								</nav>
+								<div>
+									<h1>Quality Manual</h1>
+									<p>Version 2.3 — Approved 2026-03-15</p>
+								</div>
+								<div>
+									<button type="button">Edit</button>
+									<button type="submit">Publish</button>
+								</div>
+							</header>
+						</div>
+					</main>
+				</section>
+
+				<!-- Full: narrow container — stacks vertically -->
+				<section class="section-card">
+					<header><h3>Full — Narrow Container (max-width 600px → stacked)</h3></header>
+					<main>
+						<div class="ph-wrap ph-wrap--narrow">
+							<header>
+								<nav aria-label="Breadcrumb">
+									<ol>
+										<li><a href="#">Home</a></li>
+										<li><a href="#">Documents</a></li>
+										<li aria-current="page">Quality Manual</li>
+									</ol>
+								</nav>
+								<div>
+									<h1>Quality Manual</h1>
+									<p>Version 2.3 — Approved 2026-03-15</p>
+								</div>
+								<div>
+									<button type="button">Edit</button>
+									<button type="submit">Publish</button>
+								</div>
+							</header>
+						</div>
+					</main>
+				</section>
+
+				<!-- Title only — no breadcrumbs, no actions -->
+				<section class="section-card">
+					<header><h3>Title Only — No Breadcrumbs, No Actions</h3></header>
+					<main>
+						<div class="ph-wrap">
+							<header>
+								<div>
+									<h1>Dashboard</h1>
+								</div>
+							</header>
+						</div>
+					</main>
+				</section>
+
+				<!-- Title + subtitle, no actions -->
+				<section class="section-card">
+					<header><h3>Title + Subtitle — No Actions</h3></header>
+					<main>
+						<div class="ph-wrap">
+							<header>
+								<nav aria-label="Breadcrumb">
+									<ol>
+										<li><a href="#">Settings</a></li>
+										<li aria-current="page">Notifications</li>
+									</ol>
+								</nav>
+								<div>
+									<h1>Notification Settings</h1>
+									<p>Manage how and when you receive system notifications.</p>
+								</div>
+							</header>
+						</div>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Library default — applies @include page-header to .page-header.
+// Requires a container-query context on an ancestor.
+//
+//   &lt;main class="main"&gt;                           ← container-type: inline-size
+//       &lt;header class="page-header"&gt;
+//           &lt;nav aria-label="Breadcrumb"&gt;...&lt;/nav&gt;
+//           &lt;div&gt;&lt;h1&gt;...&lt;/h1&gt;&lt;/div&gt;
+//           &lt;div&gt;&lt;button&gt;...&lt;/button&gt;&lt;/div&gt;
+//       &lt;/header&gt;
+//   &lt;/main&gt;
+
+// Project layout establishes the container context
+.main { @include container; }  // container-type: inline-size
+
+// Custom project selector (second header, section header, etc.)
+#document-detail > header { @include page-header; }</code></pre>
+					</main>
+				</section>

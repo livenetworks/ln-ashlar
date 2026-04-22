@@ -7,6 +7,20 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -31,7 +45,7 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<header>
+		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
@@ -40,20 +54,29 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
 					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+						</ul>
+					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
+						<span>Test Toast</span>
 					</button>
 				</div>
 			</div>
 		</header>
 
 		<!-- App Body -->
-		<div class="app-body">
+		<main class="app-main">
 		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
@@ -84,7 +107,7 @@
 						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
 						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
 						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
-						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="mixins.html" aria-current="page"><span class="nav-label">Mixins Reference</span></a></li>
 						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
 						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
 						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
@@ -135,13 +158,11 @@
 				<small>acme-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<div class="app-scrim" data-ln-scrim></div>
 
-		<!-- Main Panel -->
-		<div class="main-panel">
-
-			<!-- Content -->
-			<div class="content">
-				<h1>Mixins Reference</h1>
+		<!-- Content -->
+		<section>
+<h1>Mixins Reference</h1>
 				<p>Complete list of <code>@include</code> mixins from <code>scss/config/_mixins.scss</code>. Import with <code>@use 'config/mixins' as *;</code> and use in semantic selectors.</p>
 
 				<!-- ==========================================
@@ -177,19 +198,22 @@ table {
 						</div>
 
 						<h4>When to use which selector</h4>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Situation</th><th>Mixin</th><th>Component selector</th></tr>
 							</thead>
 							<tbody>
-								<tr><td>Universal element (<code>label</code>, <code>table</code>, <code>input</code>)</td><td>yes</td><td><code>table { @include table-base; }</code></td></tr>
-								<tr><td>Page-level singleton</td><td>yes</td><td><code>.breadcrumbs { @include breadcrumbs; }</code></td></tr>
-								<tr><td>Component class (<code>.btn</code>, <code>.collapsible</code>)</td><td>yes</td><td><code>.btn { @include btn; }</code></td></tr>
-								<tr><td>Data-attr JS (<code>[data-ln-tabs]</code>)</td><td>not needed</td><td><code>[data-ln-tabs] nav { ... }</code></td></tr>
+								<tr><td data-label="Situation">Universal element (<code>label</code>, <code>table</code>, <code>input</code>)</td><td data-label="Mixin">yes</td><td data-label="Component selector"><code>table { @include table-base; }</code></td></tr>
+								<tr><td data-label="Situation">Page-level singleton</td><td data-label="Mixin">yes</td><td data-label="Component selector"><code>.breadcrumbs { @include breadcrumbs; }</code></td></tr>
+								<tr><td data-label="Situation">Component class (<code>.btn</code>, <code>.collapsible</code>)</td><td data-label="Mixin">yes</td><td data-label="Component selector"><code>.btn { @include btn; }</code></td></tr>
+								<tr><td data-label="Situation">Data-attr JS (<code>[data-ln-tabs]</code>)</td><td data-label="Mixin">not needed</td><td data-label="Component selector"><code>[data-ln-tabs] nav { ... }</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 
 						<h4>Project overrides — 4 levels</h4>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Need</th><th>Approach</th><th>Example</th></tr>
@@ -217,6 +241,7 @@ table {
 								</tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -254,6 +279,7 @@ table {
 						</div>
 
 						<h4>When to use which approach</h4>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Need</th><th>Approach</th><th>Example</th></tr>
@@ -276,6 +302,7 @@ table {
 								</tr>
 							</tbody>
 						</table>
+						</div>
 
 						<h4>Example: overriding btn in a project</h4>
 						<div class="demo-split">
@@ -338,6 +365,7 @@ table {
 					<header><h3>Spacing</h3></header>
 					<main>
 						<p>Accept any CSS value or <code>var(--size-*)</code> token.</p>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -354,6 +382,7 @@ table {
 								<tr><td><code>@include gap($val)</code></td><td><code>gap: $val</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>article {
   @include px(var(--size-lg));
   @include py(var(--size-md));
@@ -368,6 +397,7 @@ table {
 				<section class="section-card">
 					<header><h3>Display &amp; Flex</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -392,6 +422,7 @@ table {
 								<tr><td><code>@include flex-center</code></td><td><code>display: flex; align-items: center; justify-content: center</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -401,6 +432,7 @@ table {
 				<section class="section-card">
 					<header><h3>Width &amp; Height</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -414,6 +446,7 @@ table {
 								<tr><td><code>@include size($val)</code></td><td><code>width: $val; height: $val</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -423,6 +456,7 @@ table {
 				<section class="section-card">
 					<header><h3>Typography</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -448,6 +482,7 @@ table {
 								<tr><td><code>@include font-sans</code></td><td><code>font-family: var(--font-sans)</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -457,6 +492,7 @@ table {
 				<section class="section-card">
 					<header><h3>Colors</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -474,6 +510,7 @@ table {
 								<tr><td><code>@include bg-body</code></td><td><code>background-color: hsl(var(--color-bg-body))</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -483,6 +520,7 @@ table {
 				<section class="section-card">
 					<header><h3>Borders &amp; Radius</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -500,6 +538,7 @@ table {
 								<tr><td><code>@include rounded-full</code></td><td><code>border-radius: 9999px</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -509,6 +548,7 @@ table {
 				<section class="section-card">
 					<header><h3>Shadows</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -522,6 +562,7 @@ table {
 								<tr><td><code>@include shadow-xl</code></td><td>Extra large shadow</td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -531,6 +572,7 @@ table {
 				<section class="section-card">
 					<header><h3>Transitions</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -542,6 +584,7 @@ table {
 								<tr><td><code>@include transition-colors</code></td><td>Transitions only <code>color</code>, <code>background-color</code>, <code>border-color</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -551,6 +594,7 @@ table {
 				<section class="section-card">
 					<header><h3>Position &amp; Overflow</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -563,6 +607,7 @@ table {
 								<tr><td><code>@include overflow-x-auto</code></td><td><code>overflow-x: auto</code> with touch scrolling</td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -572,6 +617,7 @@ table {
 				<section class="section-card">
 					<header><h3>Cursor &amp; Interaction</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -583,6 +629,7 @@ table {
 								<tr><td><code>@include opacity-50</code></td><td><code>opacity: 0.5</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -592,6 +639,7 @@ table {
 				<section class="section-card">
 					<header><h3>Z-Index</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -605,6 +653,7 @@ table {
 								<tr><td><code>@include z($val)</code></td><td><code>z-index: $val</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -615,6 +664,7 @@ table {
 					<header><h3>Container Queries</h3></header>
 					<main>
 						<p>Parent declares the container context, child queries it with native <code>@container</code>. Never combine <code>container-type</code> with <code>overflow: hidden</code> on the same element.</p>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Output</th></tr>
@@ -624,6 +674,7 @@ table {
 								<tr><td><code>@include container(name)</code></td><td><code>container-type: inline-size; container-name: name</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>// Parent — declares the context
 #sidebar { @include container(sidebar); }
 
@@ -635,6 +686,7 @@ table {
   }
 }</code></pre>
 						<h4>Standard breakpoints</h4>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Width</th><th>Use</th></tr>
@@ -646,6 +698,7 @@ table {
 								<tr><td>1120px</td><td>3 &rarr; 4 columns</td></tr>
 							</tbody>
 						</table>
+						</div>
 					</main>
 				</section>
 
@@ -656,6 +709,7 @@ table {
 					<header><h3>Collapsible</h3></header>
 					<main>
 						<p>Grid-based expand/collapse animation. Uses <code>grid-template-rows: 0fr/1fr</code> transition.</p>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Role</th></tr>
@@ -665,6 +719,7 @@ table {
 								<tr><td><code>@include collapsible-content</code></td><td>Child — <code>overflow: hidden</code> to clip content</td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>.my-panel          { @include collapsible; }
 .my-panel > section { @include collapsible-content; }</code></pre>
 					</main>
@@ -676,6 +731,7 @@ table {
 				<section class="section-card">
 					<header><h3>Grid Layouts</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Columns</th><th>Responsive</th></tr>
@@ -688,6 +744,7 @@ table {
 								<tr><td><code>@include stack($gap)</code></td><td>Flex column</td><td>Vertical stack with configurable gap (default: 1rem)</td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>// Responsive grid
 #products { @include grid; }
 
@@ -707,6 +764,7 @@ table {
 				<section class="section-card">
 					<header><h3>Card &amp; Section</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Description</th></tr>
@@ -723,6 +781,7 @@ table {
 								<tr><td><code>@include section-card</code></td><td>Complete card with <code>header</code> (panel-header), <code>main</code> (padding), <code>footer</code> (border-top)</td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>// Semantic usage
 #user-profile { @include section-card; }
 
@@ -742,6 +801,7 @@ table {
 					<main>
 						<p>Two-tier system: <strong>structure is global</strong>, <strong>color is semantic</strong>.</p>
 
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Description</th></tr>
@@ -754,8 +814,10 @@ table {
 								<tr><td><code>@include close-button</code></td><td>Icon close button: resets to <code>padding: 0</code>, fixed 2rem size, hover-red color.</td></tr>
 							</tbody>
 						</table>
+						</div>
 
 						<h4>Global button tiers</h4>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Tier</th><th>How</th><th>Result</th></tr>
@@ -766,6 +828,7 @@ table {
 								<tr><td>3. Action</td><td><code>@include btn</code> on a semantic selector (or <code>class="btn"</code> for prototyping)</td><td>Filled primary color. Same as tier 2 but for non-submit action buttons.</td></tr>
 							</tbody>
 						</table>
+						</div>
 
 						<h4>Live demo</h4>
 						<nav id="demo-btn-variants" class="demo-actions">
@@ -801,6 +864,7 @@ table {
 					<header><h3>Form</h3></header>
 					<main>
 						<p>All form mixins live in <code>scss/config/mixins/_form.scss</code>. The component file <code>scss/components/_form.scss</code> applies them to default element selectors.</p>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Description</th></tr>
@@ -825,6 +889,7 @@ table {
 								<tr><td><code>@include check-list</code></td><td>Vertical label list with filled pill labels (extends check-list-outline)</td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>// Library default — already applied
 input, textarea, select { @include form-input; }
 input[type="checkbox"]  { @include form-checkbox; }
@@ -849,6 +914,7 @@ label                   { @include form-label; }
 					<header><h3>Table</h3></header>
 					<main>
 						<p>All table mixins live in <code>scss/config/mixins/_table.scss</code>. The component file applies <code>table-base</code> and <code>table-responsive</code> to the <code>table</code> element.</p>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Description</th></tr>
@@ -861,6 +927,7 @@ label                   { @include form-label; }
 								<tr><td><code>@include table-action</code></td><td>Inline action button/link in table cells</td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>// Library default — already applied
 table { @include table-base; }
 @media (max-width: 768px) { table { @include table-responsive; } }
@@ -881,6 +948,7 @@ table { @include table-base; }
 				<section class="section-card">
 					<header><h3>Breadcrumbs &amp; Loader</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Description</th><th>Default selector</th></tr>
@@ -890,6 +958,7 @@ table { @include table-base; }
 								<tr><td><code>@include loader</code></td><td>CSS-only spinner animation (box-shadow based)</td><td>none &mdash; project defines selector</td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>// Breadcrumbs — library applies to .breadcrumbs
 // HTML: &lt;nav class="breadcrumbs" aria-label="Breadcrumb"&gt;
 //           &lt;ol&gt;
@@ -910,6 +979,7 @@ table { @include table-base; }
 				<section class="section-card">
 					<header><h3>Avatar</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Description</th><th>Default selector</th></tr>
@@ -918,6 +988,7 @@ table { @include table-base; }
 								<tr><td><code>@include avatar</code></td><td>Profile button/link with square-ish image (rounded-md) + name/role text. Hover bg, focus ring. Works on <code>&lt;button&gt;</code> and <code>&lt;a&gt;</code>.</td><td><code>.avatar</code></td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>// Avatar — profile button with image + name/role
 &lt;button class="avatar"&gt;
     &lt;img src="avatar.jpg" alt=""&gt;
@@ -944,6 +1015,7 @@ table { @include table-base; }
 				<section class="section-card">
 					<header><h3>Navigation</h3></header>
 					<main>
+						<div class="table-container">
 						<table>
 							<thead>
 								<tr><th>Mixin</th><th>Description</th></tr>
@@ -952,6 +1024,7 @@ table { @include table-base; }
 								<tr><td><code>@include nav</code></td><td>General navigation reset: clean list, styled links (hover/active), <code>.nav-icon</code>, <code>.nav-label</code>, <code>.nav-section</code>, <code>.nav-divider</code>. Layout and background come from the parent.</td></tr>
 							</tbody>
 						</table>
+						</div>
 						<pre><code>// Sidebar — parent handles layout &amp; bg
 aside { @include flex-col; @include h-full; @include bg-primary; }
 aside nav { @include nav; }
@@ -970,17 +1043,98 @@ aside nav { @include nav; }
 // &lt;/nav&gt;</code></pre>
 					</main>
 				</section>
-
-			</div>
+		</section>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
 				<span>ln-acme v1.2.0</span>
 			</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
 
-		</div>
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
 	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
 	</div>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
 </body>
 </html>

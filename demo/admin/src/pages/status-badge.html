@@ -1,0 +1,161 @@
+<!-- ln-page: title="Status Badge — ln-acme" h1="Status Badge" -->
+
+<h1>Status Badge</h1>
+				<p>A compact inline label with a colored dot — pure CSS, no JS. Semantic color variants via <code>--color-primary</code> override. Pulse animation for live/active states.</p>
+
+				<!-- Variants -->
+				<section class="section-card">
+					<header><h3>Semantic Variants</h3></header>
+					<main>
+						<p>
+							<span class="badge success">Active</span>
+							<span class="badge warning">Pending</span>
+							<span class="badge error">Blocked</span>
+							<span class="badge info">In Review</span>
+							<span class="badge neutral">Inactive</span>
+							<span class="badge">Default</span>
+						</p>
+					</main>
+				</section>
+
+				<!-- Live / pulse -->
+				<section class="section-card">
+					<header><h3>Live State (Pulse Animation)</h3></header>
+					<main>
+						<p>
+							<span class="badge success live">Live</span>
+							<span class="badge info live">Syncing</span>
+							<span class="badge warning live">Processing</span>
+						</p>
+					</main>
+				</section>
+
+				<!-- Actionable button -->
+				<section class="section-card">
+					<header><h3>Actionable Badge (button)</h3></header>
+					<main>
+						<p>When applied to a <code>&lt;button&gt;</code>, hover and active states activate automatically.</p>
+						<p>
+							<button class="badge success">Active</button>
+							<button class="badge warning">Pending</button>
+							<button class="badge error">Blocked</button>
+							<button class="badge neutral">Inactive</button>
+						</p>
+					</main>
+				</section>
+
+				<!-- In context -->
+				<section class="section-card">
+					<header><h3>In Context — Table</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr>
+									<th>User</th>
+									<th>Role</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td data-label="Attribute">Alice Johnson</td>
+									<td data-label="Value">Admin</td>
+									<td data-label="Description"><span class="badge success live">Active</span></td>
+								</tr>
+								<tr>
+									<td data-label="Attribute">Bob Smith</td>
+									<td data-label="Value">Editor</td>
+									<td data-label="Description"><span class="badge warning">Pending</span></td>
+								</tr>
+								<tr>
+									<td data-label="Attribute">Carol White</td>
+									<td data-label="Value">Viewer</td>
+									<td data-label="Description"><span class="badge neutral">Inactive</span></td>
+								</tr>
+								<tr>
+									<td data-label="Attribute">Dave Brown</td>
+									<td data-label="Value">Editor</td>
+									<td data-label="Description"><span class="badge error">Blocked</span></td>
+								</tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Production usage -->
+				<section class="section-card">
+					<header><h3>Production Usage Pattern</h3></header>
+					<main>
+						<p>In production, avoid class utilities like <code>.success</code> on project-owned elements. Use <code>@include badge</code> on a semantic selector and override <code>--color-primary</code>:</p>
+						<pre><code>&lt;!-- Library classes (prototyping / design system demos) --&gt;
+&lt;span class="badge success"&gt;Active&lt;/span&gt;
+&lt;span class="badge warning"&gt;Pending&lt;/span&gt;
+&lt;span class="badge neutral"&gt;Inactive&lt;/span&gt;
+
+&lt;!-- Production pattern — project-owned selectors --&gt;
+&lt;span class="status active"&gt;Active&lt;/span&gt;
+&lt;span class="status pending"&gt;Pending&lt;/span&gt;
+&lt;span class="status inactive"&gt;Inactive&lt;/span&gt;</code></pre>
+
+						<pre><code>// Project SCSS
+.status          { @include badge; }
+.status.active   { --color-primary: var(--color-success); }
+.status.pending  { --color-primary: var(--color-warning); }
+.status.inactive { --color-primary: var(--color-text-muted); }
+
+// Add pulse for real-time states
+.status.live     { @include badge-live; }</code></pre>
+
+						<p>
+							<span class="status active">Active</span>
+							<span class="status pending">Pending</span>
+							<span class="status inactive">Inactive</span>
+						</p>
+					</main>
+				</section>
+
+				<!-- Mixin reference -->
+				<section class="section-card">
+					<header><h3>Mixin Reference</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr><th>Mixin</th><th>Description</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>@include badge</code></td><td>Base badge: dot + label, pill shape, primary color tint. On <code>&lt;button&gt;</code>: hover/active states automatic.</td></tr>
+								<tr><td><code>@include badge-live</code></td><td>Adds pulsing ring animation to the <code>::before</code> dot (2s loop).</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Token reference -->
+				<section class="section-card">
+					<header><h3>Token Reference</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr><th>Token</th><th>Used for</th></tr>
+							</thead>
+							<tbody>
+								<tr><td><code>--color-primary</code></td><td>Dot color, text color, background tint</td></tr>
+								<tr><td><code>--color-success</code></td><td><code>.badge.success</code> override</td></tr>
+								<tr><td><code>--color-warning</code></td><td><code>.badge.warning</code> override</td></tr>
+								<tr><td><code>--color-error</code></td><td><code>.badge.error</code> override</td></tr>
+								<tr><td><code>--color-info</code></td><td><code>.badge.info</code> override</td></tr>
+								<tr><td><code>--color-text-muted</code></td><td><code>.badge.neutral</code> override</td></tr>
+								<tr><td><code>--radius-full</code></td><td>Pill border-radius</td></tr>
+								<tr><td><code>--text-xs</code></td><td>Font size</td></tr>
+								<tr><td><code>--font-medium</code></td><td>Font weight</td></tr>
+								<tr><td><code>--transition-fast</code></td><td>Button hover transition</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>

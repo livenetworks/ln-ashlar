@@ -1,0 +1,113 @@
+<!-- ln-page: title="Chip — ln-acme" h1="Chip" -->
+				<h1>Chip</h1>
+				<p>Passive inline label for status, tags, and active filter display. Distinct from <code>pill</code> (input-backed interactive). Optional close button with accessible focus ring.</p>
+
+				<!-- Plain chips -->
+				<section class="section-card">
+					<header><h3>Plain Chips</h3></header>
+					<main>
+						<div data-demo-chip-row>
+							<span data-ln-chip>Draft</span>
+							<span data-ln-chip>In Review</span>
+							<span data-ln-chip>Approved</span>
+							<span data-ln-chip>Obsolete</span>
+						</div>
+					</main>
+				</section>
+
+				<!-- Tone variants -->
+				<section class="section-card">
+					<header><h3>Tone Variants</h3></header>
+					<main>
+						<div data-demo-chip-row>
+							<span data-ln-chip>Neutral</span>
+							<span data-ln-chip="success">Approved</span>
+							<span data-ln-chip="warning">Pending review</span>
+							<span data-ln-chip="error">Rejected</span>
+							<span data-ln-chip="info">In progress</span>
+						</div>
+					</main>
+				</section>
+
+				<!-- Chips with close buttons -->
+				<section class="section-card">
+					<header><h3>Chips with Close Button</h3></header>
+					<main>
+						<div data-demo-chip-row>
+							<span data-ln-chip>
+								Quality Manual
+								<button type="button" aria-label="Remove Quality Manual filter">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</span>
+							<span data-ln-chip>
+								ISO 9001
+								<button type="button" aria-label="Remove ISO 9001 filter">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</span>
+							<span data-ln-chip="info">
+								Draft
+								<button type="button" aria-label="Remove Draft filter">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</span>
+						</div>
+					</main>
+				</section>
+
+				<!-- As active filter tags -->
+				<section class="section-card">
+					<header><h3>Active Filter Tags Context</h3></header>
+					<main>
+						<div data-demo-filter-context>
+							<p>Active filters:</p>
+							<div data-demo-chip-row>
+								<span data-ln-chip>
+									Status: Draft
+									<button type="button" aria-label="Remove Status: Draft filter">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</span>
+								<span data-ln-chip>
+									Standard: ISO 9001
+									<button type="button" aria-label="Remove Standard: ISO 9001 filter">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</span>
+								<span data-ln-chip>
+									Type: Procedure
+									<button type="button" aria-label="Remove Type: Procedure filter">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</span>
+							</div>
+						</div>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Default — attribute selector, no config needed
+// &lt;span data-ln-chip&gt;Label&lt;/span&gt;
+
+// Tone variants
+// &lt;span data-ln-chip="success"&gt;Approved&lt;/span&gt;
+// &lt;span data-ln-chip="warning"&gt;Pending&lt;/span&gt;
+// &lt;span data-ln-chip="error"&gt;Rejected&lt;/span&gt;
+// &lt;span data-ln-chip="info"&gt;Draft&lt;/span&gt;
+
+// With close button (focus ring auto-applied on :focus-visible)
+// &lt;span data-ln-chip&gt;
+//     Label
+//     &lt;button type="button" aria-label="Remove"&gt;
+//         &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+//     &lt;/button&gt;
+// &lt;/span&gt;
+
+// Consumer semantic selector
+.my-chip { @include chip; }</code></pre>
+					</main>
+				</section>

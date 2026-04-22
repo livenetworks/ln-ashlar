@@ -1,0 +1,112 @@
+<!-- ln-page: title="Empty State — ln-acme" h1="Empty State" -->
+
+<h1>Empty State</h1>
+				<p>Centered, icon-led placeholder for lists with no data. Two semantic sub-types: <code>no-data</code> (nothing exists yet) and <code>no-results</code> (filter returned zero matches).</p>
+
+				<!-- Both variants side by side -->
+				<section class="section-card">
+					<header><h3>Both Variants</h3></header>
+					<main>
+						<div id="demo-empty-variants">
+							<div>
+								<div data-ln-empty-state="no-data">
+									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-folder"></use></svg>
+									<h3>No documents yet</h3>
+									<p>Upload your first document to get started.</p>
+									<button type="button">Upload document</button>
+								</div>
+								<small><strong>no-data</strong> — the list has never had items. Show the primary "create" action to guide the user toward the first entry.</small>
+							</div>
+							<div>
+								<div data-ln-empty-state="no-results">
+									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+									<h3>No matches</h3>
+									<p>Try a different search or clear your filters.</p>
+									<button type="button">Clear filters</button>
+								</div>
+								<small><strong>no-results</strong> — data exists but the current filter or search returned zero rows. Show a clear-filter action rather than a create action.</small>
+							</div>
+						</div>
+					</main>
+				</section>
+
+				<!-- no-data standalone -->
+				<section class="section-card">
+					<header><h3>no-data — Full Table Context</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr><th>Name</th><th>Type</th><th>Date</th><th>Size</th></tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td data-label="Attribute" colspan="4">
+										<div data-ln-empty-state="no-data">
+											<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-inbox"></use></svg>
+											<h3>No files uploaded</h3>
+											<p>Drag and drop files here or click Upload to add your first file.</p>
+											<button type="button">Upload file</button>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- no-results standalone -->
+				<section class="section-card">
+					<header><h3>no-results — Full Table Context</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr><th>Name</th><th>Type</th><th>Date</th><th>Size</th></tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td colspan="4">
+										<div data-ln-empty-state="no-results">
+											<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+											<h3>No matches for "contract"</h3>
+											<p>Try broadening your search or removing active filters.</p>
+											<button type="button">Clear search</button>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Icon-only minimal variant -->
+				<section class="section-card">
+					<header><h3>Minimal — Icon + Title Only</h3></header>
+					<main>
+						<div data-ln-empty-state>
+							<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-folder"></use></svg>
+							<h3>Nothing here yet</h3>
+						</div>
+					</main>
+				</section>
+
+				<!-- SCSS Reference -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Default attribute — zero SCSS needed
+// &lt;div data-ln-empty-state="no-data"&gt;...&lt;/div&gt;
+// &lt;div data-ln-empty-state="no-results"&gt;...&lt;/div&gt;
+
+// Consumer semantic selector
+#documents .empty { @include empty-state; }
+
+// Sub-type differentiation (optional)
+[data-ln-empty-state="no-results"] button {
+    --color-primary: var(--color-secondary);
+}</code></pre>
+					</main>
+				</section>

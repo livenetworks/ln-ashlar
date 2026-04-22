@@ -1,0 +1,113 @@
+<!-- ln-page: title="Kbd — ln-acme" h1="Kbd" -->
+
+<h1>Kbd</h1>
+				<p>Keycap styling for inline keyboard shortcut documentation. Applied globally to all <code>&lt;kbd&gt;</code> elements via <code>scss/base/_typography.scss</code>. No attribute needed.</p>
+
+				<!-- Basic shortcuts -->
+				<section class="section-card">
+					<header><h3>Basic Shortcuts</h3></header>
+					<main>
+						<p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to open the command palette.</p>
+						<p>Save the document with <kbd>Ctrl</kbd>+<kbd>S</kbd>.</p>
+						<p>Undo the last action with <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+					</main>
+				</section>
+
+				<!-- Modifier keys -->
+				<section class="section-card">
+					<header><h3>Modifier Keys</h3></header>
+					<main>
+						<p>Mac: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></p>
+						<p>Windows/Linux: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></p>
+						<p>Open terminal: <kbd>Ctrl</kbd> + <kbd>`</kbd></p>
+						<p>Force quit: <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>Esc</kbd></p>
+					</main>
+				</section>
+
+				<!-- Single keys -->
+				<section class="section-card">
+					<header><h3>Single Keys</h3></header>
+					<main>
+						<p>Navigate: <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></p>
+						<p>Confirm: <kbd>Enter</kbd></p>
+						<p>Cancel: <kbd>Esc</kbd></p>
+						<p>Arrow keys: <kbd>&uarr;</kbd> <kbd>&darr;</kbd> <kbd>&larr;</kbd> <kbd>&rarr;</kbd></p>
+						<p>Function keys: <kbd>F1</kbd> <kbd>F5</kbd> <kbd>F12</kbd></p>
+					</main>
+				</section>
+
+				<!-- In a shortcut table -->
+				<section class="section-card">
+					<header><h3>Shortcuts Reference Table</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr>
+									<th>Action</th>
+									<th>Shortcut</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td data-label="Action">Command palette</td>
+									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>K</kbd></td>
+								</tr>
+								<tr>
+									<td data-label="Action">Save</td>
+									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>S</kbd></td>
+								</tr>
+								<tr>
+									<td data-label="Action">Undo</td>
+									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>Z</kbd></td>
+								</tr>
+								<tr>
+									<td>Redo</td>
+									<td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td>
+								</tr>
+								<tr>
+									<td>Find</td>
+									<td><kbd>Ctrl</kbd>+<kbd>F</kbd></td>
+								</tr>
+								<tr>
+									<td>Bold</td>
+									<td><kbd>Ctrl</kbd>+<kbd>B</kbd></td>
+								</tr>
+								<tr>
+									<td>Italic</td>
+									<td><kbd>Ctrl</kbd>+<kbd>I</kbd></td>
+								</tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- In prose context -->
+				<section class="section-card">
+					<header><h3>Kbd inside Prose</h3></header>
+					<main>
+						<article data-ln-prose>
+							<h2>Keyboard shortcuts</h2>
+							<p>You can use keyboard shortcuts throughout the application. Press <kbd>Ctrl</kbd>+<kbd>K</kbd> to open the command palette, or <kbd>?</kbd> to see a full list of available shortcuts.</p>
+							<p>When editing a document, <kbd>Ctrl</kbd>+<kbd>S</kbd> saves your draft, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes the last change.</p>
+						</article>
+					</main>
+				</section>
+
+				<!-- SCSS Usage -->
+				<section class="section-card">
+					<header><h3>SCSS Usage</h3></header>
+					<main>
+						<pre><code>// Applied globally — no attribute or class needed.
+// &lt;kbd&gt; elements are styled automatically.
+
+// Applied via scss/base/_typography.scss:
+kbd {
+  @include kbd;
+}
+
+// Re-use the mixin in consumer code:
+.my-shortcut { @include kbd; }</code></pre>
+					</main>
+				</section>

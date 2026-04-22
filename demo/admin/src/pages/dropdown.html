@@ -1,0 +1,112 @@
+<!-- ln-page: title="Dropdown — ln-acme" h1="Dropdown" -->
+
+<h1>Dropdown</h1>
+					<p>A wrapper over ln-toggle that adds outside-click closing. Delegates all state to ln-toggle.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td data-label="Attribute"><code>data-ln-dropdown</code></td><td data-label="On element">wrapper</td><td data-label="Description">Creates a dropdown instance</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-toggle</code></td><td data-label="On element">menu</td><td data-label="Description">The toggle target (menu element)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-toggle-for</code></td><td data-label="On element">button</td><td data-label="Description">Trigger button, references menu by ID</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example 1: Basic -->
+					<section class="section-card">
+						<header><h3>Example — Basic Dropdown</h3></header>
+						<main>
+							<div data-ln-dropdown>
+								<button data-ln-toggle-for="demo-menu-1" type="button">Options</button>
+								<ul id="demo-menu-1" data-ln-toggle>
+									<li><button>Edit</button></li>
+									<li><button>Duplicate</button></li>
+									<li><button>Archive</button></li>
+									<li><button>Delete</button></li>
+								</ul>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example 2: Multiple -->
+					<section class="section-card">
+						<header><h3>Example — Multiple Dropdowns</h3></header>
+						<main>
+							<p>Each dropdown operates independently. Opening one does not close the other (unless you click outside).</p>
+							<div>
+								<div data-ln-dropdown>
+									<button data-ln-toggle-for="demo-menu-2a" type="button">Actions</button>
+									<ul id="demo-menu-2a" data-ln-toggle>
+										<li><button>Save</button></li>
+										<li><button>Export</button></li>
+										<li><button>Print</button></li>
+									</ul>
+								</div>
+								<div data-ln-dropdown>
+									<button data-ln-toggle-for="demo-menu-2b" type="button">Settings</button>
+									<ul id="demo-menu-2b" data-ln-toggle>
+										<li><button>Profile</button></li>
+										<li><button>Preferences</button></li>
+										<li><button>Logout</button></li>
+									</ul>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- API & Events -->
+					<section class="section-card">
+						<header><h3>API &amp; Events</h3></header>
+						<main>
+							<article>
+								<h4>Constructor</h4>
+								<pre><code>// Manual initialization
+window.lnDropdown(document.body);</code></pre>
+							</article>
+							<article>
+								<h4>Events</h4>
+								<div class="table-container">
+								<table>
+									<thead><tr><th>Event</th><th>Bubbles</th><th>Detail</th></tr></thead>
+									<tbody>
+										<tr><td><code>ln-dropdown:open</code></td><td>yes</td><td><code>{ target }</code></td></tr>
+										<tr><td><code>ln-dropdown:close</code></td><td>yes</td><td><code>{ target }</code></td></tr>
+										<tr><td><code>ln-dropdown:destroyed</code></td><td>yes</td><td><code>{ target }</code></td></tr>
+									</tbody>
+								</table>
+								</div>
+								<p>Open/close state is managed by ln-toggle. Use <code>ln-toggle:before-open</code> / <code>ln-toggle:before-close</code> to cancel.</p>
+							</article>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;div data-ln-dropdown&gt;
+    &lt;button data-ln-toggle-for="my-menu"&gt;Open&lt;/button&gt;
+    &lt;ul id="my-menu" data-ln-toggle&gt;
+        &lt;li&gt;&lt;button&gt;Option A&lt;/button&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;button&gt;Option B&lt;/button&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- Dependencies -->
+					<section class="section-card">
+						<header><h3>Dependencies</h3></header>
+						<main>
+							<p>Dropdown depends on <strong>ln-toggle</strong>. ln-toggle must be loaded before dropdown.</p>
+							<pre><code>&lt;script src="dist/ln-acme.iife.js"&gt;&lt;/script&gt;</code></pre>
+						</main>
+					</section>

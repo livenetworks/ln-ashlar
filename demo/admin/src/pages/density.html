@@ -1,0 +1,135 @@
+<!-- ln-page: title="Density — ln-acme" h1="Density" -->
+
+<h1>Density</h1>
+				<p>Global spacing compression toggle. Add the <code>density-compact</code> class to any element — the subtree tightens. Tables show more rows, form inputs pack denser, cards shrink padding. Same components, same markup, same selectors — only the internal spacing tokens change.</p>
+
+				<section class="density-demo-controls">
+					<header><h3>Try it</h3></header>
+					<main>
+						<p>Toggle the switches below to see density in action. <strong>Global</strong> affects the whole page. <strong>Scoped</strong> affects only the Form section below — notice how the surrounding table, stat card, and intro stay comfortable while the form shrinks.</p>
+						<ul>
+							<li><label><input type="checkbox" data-demo-density-global> Global compact</label></li>
+							<li><label><input type="checkbox" data-demo-density-scoped> Scoped compact (form section)</label></li>
+						</ul>
+					</main>
+				</section>
+
+				<section class="section-card" id="density-scoped-target">
+					<header><h3>Form — input padding shrinks</h3></header>
+					<main>
+						<form>
+							<div class="form-element">
+								<label for="density-name">Document title</label>
+								<input type="text" id="density-name" name="density-name" placeholder="ISO 9001 Quality Manual">
+							</div>
+							<div class="form-element">
+								<label for="density-standard">Standard</label>
+								<select id="density-standard" name="density-standard">
+									<option>ISO 9001</option>
+									<option>ISO 14001</option>
+									<option>ISO 27001</option>
+								</select>
+							</div>
+							<div class="form-element">
+								<label for="density-notes">Notes</label>
+								<textarea id="density-notes" name="density-notes" rows="3"></textarea>
+							</div>
+						</form>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>Table — reacts to density</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead>
+								<tr>
+									<th>Document</th>
+									<th>Standard</th>
+									<th>Status</th>
+									<th>Updated</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td data-label="Document">Quality Manual</td>
+									<td data-label="Standard">ISO 9001</td>
+									<td data-label="Status">Approved</td>
+									<td data-label="Updated">2025-12-01</td>
+								</tr>
+								<tr>
+									<td data-label="Document">Risk Register</td>
+									<td data-label="Standard">ISO 27001</td>
+									<td data-label="Status">In Review</td>
+									<td data-label="Updated">2025-11-28</td>
+								</tr>
+								<tr>
+									<td data-label="Document">Internal Audit Plan</td>
+									<td data-label="Standard">ISO 9001</td>
+									<td data-label="Status">Draft</td>
+									<td data-label="Updated">2025-11-22</td>
+								</tr>
+								<tr>
+									<td>Supplier Evaluation Procedure</td>
+									<td>ISO 9001</td>
+									<td>Approved</td>
+									<td>2025-11-15</td>
+								</tr>
+								<tr>
+									<td>Information Security Policy</td>
+									<td>ISO 27001</td>
+									<td>Approved</td>
+									<td>2025-11-10</td>
+								</tr>
+								<tr>
+									<td>Document Control Procedure</td>
+									<td>ISO 9001</td>
+									<td>Approved</td>
+									<td>2025-11-08</td>
+								</tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>Stat card — outer padding shrinks</h3></header>
+					<main>
+						<article data-ln-stat-card>
+							<p data-ln-stat-label>Total documents</p>
+							<p data-ln-stat-value>1,247</p>
+							<p data-ln-stat-trend="up">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+								12% from last month
+							</p>
+						</article>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>Activation</h3></header>
+					<main>
+						<p>Three activation paths — see <a href="https://github.com/livenetworks/ln-acme/blob/main/docs/css/density.md">density.md</a> for the full spec.</p>
+						<pre><code>&lt;!-- Global --&gt;
+&lt;html class="density-compact"&gt;
+
+&lt;!-- Scoped --&gt;
+&lt;main class="density-compact"&gt;
+
+&lt;!-- Default (no class) --&gt;
+&lt;html&gt;</code></pre>
+					</main>
+				</section>
+
+				<section class="section-card">
+					<header><h3>Buttons do NOT react (accessibility)</h3></header>
+					<main>
+						<p>Buttons keep their full hit-target size in compact mode — WCAG 2.5.5 recommends ≥44px. Density shrinks chrome and content, never controls.</p>
+						<p>
+							<button type="button">Cancel</button>
+							<button type="submit">Save document</button>
+						</p>
+					</main>
+				</section>

@@ -1,0 +1,107 @@
+@use 'display' as *;
+@use 'spacing' as *;
+@use 'position' as *;
+@use 'motion' as *;
+@use 'breakpoints' as *;
+@use 'sidebar' as *;
+
+// ─── App Shell ──────────────────────────────────────────────────────────────
+// Mobile-ready application shell: fixed header, sidebar drawer, scrim overlay.
+//
+// Intrinsic tokens (component design, not spacing rhythm):
+//   --app-header-height: 3.5rem   — fixed bar height; hard-code acceptable
+//   --app-sidebar-width: 16rem    — sidebar width; intrinsic to design
+//   --app-scrim-bg                — semi-transparent overlay behind drawer
+//
+// Expected HTML:
+//   <div class="app-wrapper">
+//     <header class="app-header">…</header>
+//     <main class="app-main">
+//       <aside class="app-sidebar" id="…" data-ln-toggle="open">…</aside>
+//       <section>…content…</section>
+//       <div class="app-scrim" data-ln-scrim></div>
+//     </main>
+//   </div>
+//
+// Usage (project):
+//   #shell         { @include app-wrapper; }
+//   #shell > header { @include app-header; }
+//   #shell > main   { @include app-main; }
+//   #my-sidebar    { @include sidebar; @include sidebar-drawer; }
+//   #my-scrim      { @include app-scrim; }
+// ────────────────────────────────────────────────────────────────────────────
+
+@mixin app-wrapper {
+	@include flex-col;
+	min-height: 100vh;
+	background: var(--color-bg-recessed);
+}
+
+@mixin app-header {
+	@include fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: var(--app-header-height);
+	z-index: var(--z-sticky);
+	padding: var(--padding-y) var(--padding-x);
+	background: var(--color-bg);
+	border-bottom: var(--border-width) solid var(--color-border-subtle);
+	box-shadow: var(--shadow-default);
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	gap: var(--gap);
+}
+
+@mixin app-main {
+	@include flex;
+	@include flex-1;
+	margin-top: var(--app-header-height);
+}
+
+@mixin sidebar-drawer {
+	// Layered on top of @mixin sidebar. Adds drawer positioning and
+	// open/close transform. Apply AFTER @include sidebar.
+	@include fixed;
+	top: var(--app-header-height);
+	left: 0;
+	height: calc(100vh - var(--app-header-height));
+	width: var(--app-sidebar-width);
+	z-index: var(--z-sticky);
+	transform: translateX(-100%);
+
+	@include motion-safe {
+		transition: transform var(--transition);
+	}
+
+	&[data-ln-toggle="open"] {
+		transform: translateX(0);
+	}
+
+	@include mq-down(md) {
+		z-index: var(--z-overlay);
+	}
+}
+
+@mixin app-scrim {
+	@include fixed;
+	@include inset-0;
+	background: var(--app-scrim-bg);
+	z-index: calc(var(--z-overlay) - 1);
+	opacity: 0;
+	pointer-events: none;
+
+	@include motion-safe {
+		transition: opacity var(--transition);
+	}
+
+	&[data-ln-scrim-active] {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	@include mq-up(md) {
+		display: none;
+	}
+}

@@ -7,6 +7,20 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -31,7 +45,7 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<header>
+		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
@@ -40,20 +54,29 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
 					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+						</ul>
+					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
+						<span>Test Toast</span>
 					</button>
 				</div>
 			</div>
 		</header>
 
 		<!-- App Body -->
-		<div class="app-body">
+		<main class="app-main">
 		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
@@ -124,7 +147,7 @@
 						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
 						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
-						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="translations.html" aria-current="page"><span class="nav-label">Translations</span></a></li>
 						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
 						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
 					</ul>
@@ -135,31 +158,31 @@
 				<small>acme-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<div class="app-scrim" data-ln-scrim></div>
 
-		<!-- Main Panel -->
-		<div class="main-panel">
-
-			<!-- Content -->
-			<div class="content">
-					<h1>Translations</h1>
+		<!-- Content -->
+		<section>
+<h1>Translations</h1>
 					<p>Inline translation system for forms. Adds translation inputs below translatable fields.</p>
 
 					<!-- Basics -->
 					<section class="section-card">
 						<header><h3>Basics</h3></header>
 						<main>
+							<div class="table-container">
 							<table>
 								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-translations</code></td><td><code>&lt;form&gt;</code></td><td>Initializes instance</td></tr>
-									<tr><td><code>data-ln-translations-default</code></td><td><code>&lt;form&gt;</code></td><td>Default language code (flag on originals)</td></tr>
-									<tr><td><code>data-ln-translations-add</code></td><td><code>&lt;button&gt;</code></td><td>Trigger button (inside <code>data-ln-dropdown</code>)</td></tr>
-									<tr><td><code>data-ln-translations-active</code></td><td><code>&lt;ul&gt;</code></td><td>Container for active language badges</td></tr>
-									<tr><td><code>data-ln-translatable="field"</code></td><td>wrapper</td><td>Marks a translatable field</td></tr>
-									<tr><td><code>data-ln-translations-prefix</code></td><td>wrapper</td><td>Nested prefix for name attr</td></tr>
-									<tr><td><code>data-ln-translatable-lang</code></td><td>input/textarea</td><td>Language code (set by JS or server)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-translations</code></td><td data-label="On element"><code>&lt;form&gt;</code></td><td data-label="Description">Initializes instance</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-translations-default</code></td><td data-label="On element"><code>&lt;form&gt;</code></td><td data-label="Description">Default language code (flag on originals)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-translations-add</code></td><td data-label="On element"><code>&lt;button&gt;</code></td><td data-label="Description">Trigger button (inside <code>data-ln-dropdown</code>)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-translations-active</code></td><td data-label="On element"><code>&lt;ul&gt;</code></td><td data-label="Description">Container for active language badges</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-translatable="field"</code></td><td data-label="On element">wrapper</td><td data-label="Description">Marks a translatable field</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-translations-prefix</code></td><td data-label="On element">wrapper</td><td data-label="Description">Nested prefix for name attr</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-translatable-lang</code></td><td data-label="On element">input/textarea</td><td data-label="Description">Language code (set by JS or server)</td></tr>
 								</tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -273,6 +296,7 @@ el.lnTranslations.getActiveLanguages();       // Set</code></pre>
 							</article>
 							<article>
 								<h4>Events</h4>
+								<div class="table-container">
 								<table>
 									<thead><tr><th>Event</th><th>Bubbles</th><th>Cancelable</th><th>Detail</th></tr></thead>
 									<tbody>
@@ -284,6 +308,7 @@ el.lnTranslations.getActiveLanguages();       // Set</code></pre>
 										<tr><td><code>ln-translations:request-remove</code></td><td>no</td><td>no</td><td><code>{ lang }</code></td></tr>
 									</tbody>
 								</table>
+								</div>
 							</article>
 							<article>
 								<h4>Name Generation</h4>
@@ -321,29 +346,98 @@ name="items[5][trans][en][title]"</code></pre>
 &lt;/form&gt;</code></pre>
 						</main>
 					</section>
-			</div>
+		</section>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
 				<span>ln-acme v1.2.0</span>
 			</footer>
-		</div>
-		</div><!-- /.app-body -->
+		</main>
 	</div><!-- /.app-wrapper -->
 
-	<!-- Templates -->
-	<template data-ln-template="ln-translations-badge">
-		<li>
-			<p data-ln-translations-lang>
-				<span></span>
-				<button type="button" aria-label="Remove"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-			</p>
-		</li>
-	</template>
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
 
-	<template data-ln-template="ln-translations-menu-item">
-		<li><button type="button" data-ln-translations-lang></button></li>
-	</template>
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
 </body>
 </html>

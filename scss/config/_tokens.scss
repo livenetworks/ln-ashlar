@@ -1,3 +1,5 @@
+@use 'mixins/breakpoints' as *;
+
 // ==========================================================================
 // Design Tokens — ln-acme
 // ==========================================================================
@@ -273,6 +275,13 @@
 	--z-toast: 50;
 
 	// -----------------------------------------------------------------------
+	// App shell — intrinsic dimensions (not spacing rhythm)
+	// -----------------------------------------------------------------------
+	--app-header-height: 3.5rem;
+	--app-sidebar-width: 16rem;
+	--app-scrim-bg: hsl(var(--color-neutral-900) / 0.4);
+
+	// -----------------------------------------------------------------------
 	// Logical tokens — the public contract mixins read
 	// -----------------------------------------------------------------------
 	// Rule: mixin bodies reference ONLY these tokens (and --text-*/--lh-*/
@@ -330,4 +339,23 @@
 	//   --shadow-overlay  hovers above everything (modals)
 	// --shadow is NOT introduced — conflicts with common short-name
 	// expectations. Always name the elevation tier explicitly.
+}
+
+// ---------------------------------------------------------------------------
+// Mobile rhythm — logical tokens tighten at ≤ md viewport.
+// Not the same as `.density-compact` (that's a user opt-in).
+// This is viewport-driven structural compression: content dominates chrome
+// at narrow widths. Components reading --padding-x/--padding-y/--gap
+// react via the cascade.
+//
+// Interaction with .density-compact: stacks. Compact user + mobile viewport =
+// both apply; the underlying --size-* scale is already tighter in
+// .density-compact so logical tokens resolve to the tightest value.
+// ---------------------------------------------------------------------------
+@include mq-down(md) {
+	:root {
+		--padding-x: var(--size-md);     // 20px → 16px
+		--padding-y: var(--size-xs);     // 6px → 4px
+		--gap:       var(--size-xs-up);  // 8px → 6px
+	}
 }

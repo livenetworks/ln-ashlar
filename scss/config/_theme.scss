@@ -112,3 +112,30 @@
 		@include ln-dark-tokens;
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Named presets — demo theme picker. Activation:
+//   <html data-theme="ocean">   <html data-theme="sunset">   etc.
+// ---------------------------------------------------------------------------
+
+[data-theme="ocean"] {
+	--color-primary:         190 80% 35%;
+	--color-primary-hover:   190 80% 28%;
+	--color-primary-light:   190 60% 90%;
+	--color-primary-lighter: 190 50% 95%;
+}
+
+[data-theme="sunset"] {
+	--color-primary:         10 80% 50%;
+	--color-primary-hover:   10 80% 42%;
+	--color-primary-light:   10 70% 92%;
+	--color-primary-lighter: 10 60% 96%;
+}
+
+[data-theme="midnight"] {
+	@include ln-dark-tokens;
+	--color-primary:         265 70% 60%;
+	--color-primary-hover:   265 70% 52%;
+	--color-primary-light:   265 50% 22%;
+	--color-primary-lighter: 265 40% 15%;
+}

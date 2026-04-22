@@ -1,0 +1,96 @@
+<!-- ln-page: title="Typography — ln-acme" h1="Typography" -->
+
+<h1>Typography</h1>
+					<p>Base typography styles. All fonts, weights and sizes come from <code>_tokens.scss</code>.</p>
+
+		<!-- Headings -->
+		<section class="section-card">
+			<header><h3>Headings</h3></header>
+			<main>
+				<h1>h1 — Main heading (2.25rem)</h1>
+				<h2>h2 — Secondary (1.5rem)</h2>
+				<h3>h3 — Sub-heading (1.25rem)</h3>
+				<h4>h4 — Smaller heading (1.125rem)</h4>
+				<h5>h5 — Small heading (1rem, semibold)</h5>
+				<h6>h6 — Smallest (0.875rem, semibold)</h6>
+			</main>
+		</section>
+
+		<!-- Text -->
+		<section class="section-card">
+			<header><h3>Text</h3></header>
+			<main>
+				<p>Regular paragraph with <strong>bold text</strong>, <em>italic text</em> and <small>small text</small>.</p>
+				<p>Link: <a href="#">Example link</a> with hover effect.</p>
+				<blockquote>Blockquote — a quote with a left border in primary color.</blockquote>
+			</main>
+		</section>
+
+		<!-- Code -->
+		<section class="section-card">
+			<header><h3>Code</h3></header>
+			<main>
+				<p>Inline code: <code>var(--color-primary)</code></p>
+				<pre><code>.card header {
+    @include px(var(--size-lg));
+    @include py(var(--size-md));
+    @include font-semibold;
+}</code></pre>
+			</main>
+		</section>
+
+		<!-- Lists -->
+		<section class="section-card">
+			<header><h3>Lists</h3></header>
+			<main>
+				<div class="demo-split">
+					<section>
+						<h5>Unordered</h5>
+						<ul>
+							<li>First item</li>
+							<li>Second item</li>
+							<li>Third item</li>
+						</ul>
+					</section>
+					<section>
+						<h5>Ordered</h5>
+						<ol>
+							<li>First step</li>
+							<li>Second step</li>
+							<li>Third step</li>
+						</ol>
+					</section>
+				</div>
+			</main>
+		</section>
+
+		<!-- Font sizes -->
+		<section class="section-card">
+			<header><h3>Font Size Tokens</h3></header>
+			<main>
+				<div class="table-container">
+				<table>
+					<thead><tr><th>Token</th><th>Value</th><th>Example</th></tr></thead>
+					<tbody>
+						<tr><td data-label="Token">--text-xs</td><td data-label="Value">0.75rem</td><td data-label="Example"><span style="font-size: var(--text-xs)">Small text xs</span></td></tr>
+						<tr><td data-label="Token">--text-sm</td><td data-label="Value">0.875rem</td><td data-label="Example"><span style="font-size: var(--text-sm)">Small text sm</span></td></tr>
+						<tr><td data-label="Token">--text-base</td><td data-label="Value">1rem</td><td data-label="Example"><span style="font-size: var(--text-base)">Base text base</span></td></tr>
+						<tr><td data-label="Token">--text-lg</td><td data-label="Value">1.125rem</td><td data-label="Example"><span style="font-size: var(--text-lg)">Larger lg</span></td></tr>
+						<tr><td data-label="Token">--text-xl</td><td data-label="Value">1.25rem</td><td data-label="Example"><span style="font-size: var(--text-xl)">Large xl</span></td></tr>
+						<tr><td data-label="Token">--text-2xl</td><td data-label="Value">1.5rem</td><td data-label="Example"><span style="font-size: var(--text-2xl)">Largest 2xl</span></td></tr>
+					</tbody>
+				</table>
+				</div>
+			</main>
+		</section>
+
+		<!-- HTML -->
+		<section class="section-card">
+			<header><h3>HTML</h3></header>
+			<main>
+				<pre><code>&lt;h1&gt;Heading&lt;/h1&gt;
+&lt;p&gt;Paragraph with &lt;strong&gt;bold&lt;/strong&gt; and &lt;code&gt;inline code&lt;/code&gt;.&lt;/p&gt;
+&lt;blockquote&gt;Quote&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;Code block&lt;/code&gt;&lt;/pre&gt;</code></pre>
+			</main>
+		</section>

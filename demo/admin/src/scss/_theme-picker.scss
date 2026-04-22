@@ -1,0 +1,44 @@
+// NOTE: swatch `background` values are raw HSL literals on purpose.
+// The picker must visualize what each preset LOOKS LIKE — not apply
+// the currently active token. These literals mirror the
+// `--color-primary` values in scss/config/_theme.scss; update them
+// in lockstep.
+
+@use '../../../../scss/config/mixins' as *;
+
+.demo-theme-picker {
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: var(--spacing-xs);
+		min-width: 12rem;
+	}
+
+	li button {
+		@include flex;
+		@include items-center;
+		@include gap(var(--spacing-sm));
+		width: 100%;
+		justify-content: flex-start;
+		text-align: left;
+
+		&[aria-current="true"] {
+			background-color: hsl(var(--color-primary-lighter));
+			color: hsl(var(--color-primary));
+		}
+	}
+}
+
+.demo-theme-swatch {
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+	border-radius: var(--radius-full);
+	border: var(--border-width) solid hsl(var(--color-border));
+
+	&[data-preset="light"]    { background: hsl(231 62% 27%); }
+	&[data-preset="dark"]     { background: hsl(231 62% 50%); }
+	&[data-preset="ocean"]    { background: hsl(190 80% 35%); }
+	&[data-preset="sunset"]   { background: hsl(10 80% 50%); }
+	&[data-preset="midnight"] { background: hsl(265 70% 60%); }
+}

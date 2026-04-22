@@ -1,0 +1,197 @@
+<!-- ln-page: title="HTTP — ln-acme" h1="HTTP" -->
+
+<h1>HTTP</h1>
+					<p>Event-driven fetch service — lightweight JSON transport layer for coordinators and components.</p>
+
+					<!-- How It Works -->
+					<section class="section-card">
+						<header><h3>How It Works</h3></header>
+						<main>
+							<ol>
+								<li>Consumer dispatches <code>ln-http:request</code> on any DOM element</li>
+								<li>ln-http makes the fetch request</li>
+								<li>ln-http dispatches <code>ln-http:success</code> or <code>ln-http:error</code> back on the <strong>same element</strong></li>
+								<li>Consumer filters responses by <code>tag</code></li>
+							</ol>
+							<p>ln-http has a global listener on <code>document</code>, no DOM instances, no MutationObserver.</p>
+						</main>
+					</section>
+
+					<!-- Request Options -->
+					<section class="section-card">
+						<header><h3>Request Options</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td data-label="Attribute"><code>url</code></td><td data-label="On element">string</td><td data-label="Description"><em>required</em></td><td>Request URL</td></tr>
+									<tr><td data-label="Attribute"><code>method</code></td><td data-label="On element">string</td><td data-label="Description"><code>POST</code> if body, <code>GET</code> otherwise</td><td>HTTP method</td></tr>
+									<tr><td data-label="Attribute"><code>body</code></td><td data-label="On element">object</td><td data-label="Description">—</td><td>GET: query string, POST/PUT/DELETE: JSON body</td></tr>
+									<tr><td data-label="Attribute"><code>ajax</code></td><td data-label="On element">boolean</td><td data-label="Description"><code>false</code></td><td>Adds <code>X-Requested-With: XMLHttpRequest</code> header</td></tr>
+									<tr><td data-label="Attribute"><code>abort</code></td><td data-label="On element">string</td><td data-label="Description">—</td><td>Abort key: cancels previous in-flight request with same key</td></tr>
+									<tr><td data-label="Attribute"><code>tag</code></td><td data-label="On element">string</td><td data-label="Description">—</td><td>Passed back in response events for consumer filtering</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Response Events -->
+					<section class="section-card">
+						<header><h3>Response Events</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th>Dispatched on</th><th>Detail</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-http:success</code></td><td>original target element</td><td><code>{ tag, ok: true, status, data }</code></td></tr>
+									<tr><td><code>ln-http:error</code></td><td>original target element</td><td><code>{ tag, ok: false, status, data }</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+							<ul>
+								<li>Network failure: <code>{ tag, ok: false, status: 0, data: { error: true, message: 'Network error' } }</code></li>
+								<li>Invalid JSON: <code>{ tag, ok: false, status, data: { error: true, message: 'Invalid response' } }</code></li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Example — GET Request -->
+					<section class="section-card">
+						<header><h3>Example — GET Request</h3></header>
+						<main>
+							<p>Dispatches a GET request to <code>/api/employees</code>. Since no server is running, the error event path is demonstrated in the log below.</p>
+							<section id="demo-get">
+								<nav class="demo-actions">
+									<button type="button" class="btn" id="demo-get-btn">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-download"></use></svg>
+										GET /api/employees
+									</button>
+								</nav>
+								<h4>Event log</h4>
+								<pre id="demo-get-log"></pre>
+							</section>
+						</main>
+					</section>
+
+					<!-- Example — POST Request -->
+					<section class="section-card">
+						<header><h3>Example — POST Request</h3></header>
+						<main>
+							<p>Submit the form to dispatch a POST request. The coordinator collects form data and sends it via <code>ln-http:request</code>.</p>
+							<section id="demo-post">
+								<form data-ln-form id="demo-http-form">
+									<div class="form-element">
+										<label for="demo-http-name">Name</label>
+										<input type="text" id="demo-http-name" name="name" value="Marko Petrovski">
+									</div>
+									<div class="form-element">
+										<label for="demo-http-email">Email</label>
+										<input type="email" id="demo-http-email" name="email" value="marko@example.com">
+									</div>
+									<div class="form-element">
+										<label for="demo-http-dept">Department</label>
+										<input type="text" id="demo-http-dept" name="department" value="Engineering">
+									</div>
+									<ul class="form-actions">
+										<li><button type="submit">POST /api/employees</button></li>
+									</ul>
+								</form>
+								<h4>Event log</h4>
+								<pre id="demo-post-log"></pre>
+							</section>
+						</main>
+					</section>
+
+					<!-- Example — Search with Abort -->
+					<section class="section-card">
+						<header><h3>Example — Search with Abort</h3></header>
+						<main>
+							<p>Each keystroke dispatches a new request with the same <code>abort</code> key, cancelling the previous in-flight request. Only the last request resolves.</p>
+							<section id="demo-abort">
+								<div class="form-element">
+									<label for="demo-abort-input">Search employees</label>
+									<input type="search" id="demo-abort-input" placeholder="Type to search — each keystroke cancels previous…">
+								</div>
+								<h4>Event log</h4>
+								<pre id="demo-abort-log"></pre>
+							</section>
+						</main>
+					</section>
+
+					<!-- ln-http vs ln-ajax -->
+					<section class="section-card">
+						<header><h3>ln-http vs ln-ajax</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th></th><th>ln-http</th><th>ln-ajax</th></tr></thead>
+								<tbody>
+									<tr><td>Purpose</td><td>JSON API transport</td><td>Page navigation</td></tr>
+									<tr><td>Format</td><td>JSON only</td><td>FormData + HTML</td></tr>
+									<tr><td>DOM</td><td>No instances</td><td><code>data-ln-ajax</code> on elements</td></tr>
+									<tr><td>Features</td><td>Abort, tag</td><td>CSRF, toast, history, spinner, HTML replace</td></tr>
+									<tr><td>Consumer</td><td>Coordinators, components</td><td>Links, forms</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Code — Basic Pattern -->
+					<section class="section-card">
+						<header><h3>Code — Basic Pattern</h3></header>
+						<main>
+							<pre><code>const el = document.getElementById('my-component');
+
+el.addEventListener('ln-http:success', function (e) {
+    if (e.detail.tag !== 'load-data') return;
+    renderData(e.detail.data);
+});
+
+el.addEventListener('ln-http:error', function (e) {
+    if (e.detail.tag !== 'load-data') return;
+    showError(e.detail.data.message);
+});
+
+el.dispatchEvent(new CustomEvent('ln-http:request', {
+    bubbles: true,
+    detail: { url: '/api/data', tag: 'load-data' }
+}));</code></pre>
+						</main>
+					</section>
+
+					<!-- Code — POST Pattern -->
+					<section class="section-card">
+						<header><h3>Code — POST with Body</h3></header>
+						<main>
+							<pre><code>el.dispatchEvent(new CustomEvent('ln-http:request', {
+    bubbles: true,
+    detail: {
+        url: '/api/employees',
+        method: 'POST',
+        body: { name: 'Ana Kovachevska', email: 'ana@example.com' },
+        tag: 'create-employee'
+    }
+}));</code></pre>
+						</main>
+					</section>
+
+					<!-- Code — Abort Pattern -->
+					<section class="section-card">
+						<header><h3>Code — Search with Abort</h3></header>
+						<main>
+							<pre><code>input.addEventListener('input', function () {
+    el.dispatchEvent(new CustomEvent('ln-http:request', {
+        bubbles: true,
+        detail: {
+            url: '/api/employees/search',
+            body: { q: input.value },
+            abort: 'employee-search',
+            tag: 'search'
+        }
+    }));
+});</code></pre>
+						</main>
+					</section>

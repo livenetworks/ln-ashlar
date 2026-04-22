@@ -1,0 +1,220 @@
+<!-- ln-page: title="acme-gui — Demo" h1="index" -->
+
+<!-- Stats -->
+				<section id="stats">
+					<ul>
+						<li>
+							<h3>Components</h3>
+							<strong>18</strong>
+							<div data-ln-progress>
+								<div data-ln-progress="18" data-ln-progress-max="20" class="success"></div>
+							</div>
+						</li>
+						<li>
+							<h3>JS Modules</h3>
+							<strong>10</strong>
+							<div data-ln-progress>
+								<div data-ln-progress="10" data-ln-progress-max="12" class="success"></div>
+							</div>
+						</li>
+						<li>
+							<h3>SCSS Files</h3>
+							<strong>22</strong>
+							<div data-ln-progress>
+								<div data-ln-progress="22" data-ln-progress-max="25" class="warning"></div>
+							</div>
+						</li>
+						<li>
+							<h3>Demo Pages</h3>
+							<strong>14</strong>
+							<div data-ln-progress>
+								<div data-ln-progress="14" data-ln-progress-max="14" class="success"></div>
+							</div>
+						</li>
+					</ul>
+				</section>
+
+				<!-- Modal Demo -->
+				<section class="section-card">
+					<header><h3>Modal</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
+							<button data-ln-modal-for="demo-form" class="btn">Form Modal</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- Tabs Demo -->
+				<section id="demo-tabs" class="section-card">
+					<header><h3>Tabs</h3></header>
+					<main>
+						<div data-ln-tabs data-ln-tabs-default="overview">
+							<nav class="demo-tabs">
+								<button data-ln-tab="overview">Overview</button>
+								<button data-ln-tab="users">Users</button>
+								<button data-ln-tab="settings">Settings</button>
+							</nav>
+
+							<div data-ln-panel="overview" class="demo-panel">
+								<p>Content of the <strong>Overview</strong> tab. Tabs are synchronized with the URL hash.</p>
+								<p>Change the URL hash to <code>#users</code> to see.</p>
+							</div>
+
+							<div data-ln-panel="users" class="demo-panel hidden">
+								<div class="table-container">
+								<table>
+									<thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+									<tbody>
+										<tr><td data-label="Name">John Smith</td><td data-label="Email">marko@example.com</td><td data-label="Role">Admin</td></tr>
+										<tr><td data-label="Name">Jane Doe</td><td data-label="Email">ana@example.com</td><td data-label="Role">User</td></tr>
+										<tr><td data-label="Name">Alex Johnson</td><td data-label="Email">ivan@example.com</td><td data-label="Role">Moderator</td></tr>
+									</tbody>
+								</table>
+								</div>
+							</div>
+
+							<div data-ln-panel="settings" class="demo-panel hidden">
+								<form>
+									<div class="form-element">
+										<label for="d-lang">Language</label>
+										<select id="d-lang"><option>English</option><option>Spanish</option></select>
+									</div>
+									<div class="form-element">
+										<label for="d-tz">Timezone</label>
+										<input type="text" id="d-tz" value="America/New_York">
+									</div>
+								</form>
+							</div>
+						</div>
+					</main>
+				</section>
+
+				<!-- Toggle & Progress -->
+				<section id="demo-panels">
+					<section id="demo-toggle" class="section-card">
+						<header><h3>Toggle — Collapsible</h3></header>
+						<main>
+							<article>
+								<header>
+									<strong>Server Status</strong>
+									<button type="button" data-ln-toggle-for="server-status" type="button" aria-label="Toggle server status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-down"></use></svg></button>
+								</header>
+								<section id="server-status" data-ln-toggle="open" class="collapsible">
+								<article class="collapsible-body">
+									<div class="table-container">
+									<table>
+										<thead><tr><th>Server</th><th>Status</th><th>Uptime</th></tr></thead>
+										<tbody>
+											<tr><td data-label="Server">web-01</td><td data-label="Status"><span class="badge success">OK</span></td><td data-label="Uptime" class="numeric">99.9%</td></tr>
+											<tr><td data-label="Server">web-02</td><td data-label="Status"><span class="badge success">OK</span></td><td data-label="Uptime" class="numeric">99.7%</td></tr>
+											<tr><td data-label="Server">db-01</td><td data-label="Status"><span class="badge error">Down</span></td><td data-label="Uptime" class="numeric">95.2%</td></tr>
+										</tbody>
+									</table>
+									</div>
+								</article>
+								</section>
+							</article>
+						</main>
+					</section>
+
+					<section id="demo-progress" class="section-card">
+						<header><h3>Progress</h3></header>
+						<main>
+							<ul>
+								<li>
+									<h4>CPU — 72%</h4>
+									<div data-ln-progress>
+										<div data-ln-progress="72" class="warning"></div>
+									</div>
+								</li>
+								<li>
+									<h4>RAM — 45%</h4>
+									<div data-ln-progress>
+										<div data-ln-progress="45" class="success"></div>
+									</div>
+								</li>
+								<li>
+									<h4>Disk — 89%</h4>
+									<div data-ln-progress>
+										<div data-ln-progress="89" class="error"></div>
+									</div>
+								</li>
+							</ul>
+						</main>
+					</section>
+				</section>
+
+				<!-- Toast Demo -->
+				<section class="section-card">
+					<header><h3>Toast Notifications</h3></header>
+					<main>
+						<nav class="demo-actions">
+							<button onclick="window.lnToast.enqueue({type:'success', title:'Success', message:'The record has been saved.'})" class="btn">Success</button>
+							<button onclick="window.lnToast.enqueue({type:'error', title:'Error', message:'Something went wrong.'})" class="btn error">Error</button>
+							<button onclick="window.lnToast.enqueue({type:'warn', title:'Warning', message:'Please check the data.'})" class="btn warning">Warning</button>
+							<button onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'A new version is available.'})" class="btn info">Info</button>
+							<button onclick="window.lnToast.enqueue({type:'error', title:'Validation', message:['Name is required','Email format is invalid','Password is too short']})" class="btn error">Validation Errors</button>
+						</nav>
+					</main>
+				</section>
+
+				<!-- Upload Demo -->
+				<section class="section-card">
+					<header><h3>Upload</h3></header>
+					<main>
+						<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
+							<div class="ln-upload__zone">
+								<span>Drop files here or click to upload</span>
+								<small>pdf, doc, docx, jpg, png</small>
+							</div>
+							<ul class="ln-upload__list"></ul>
+						</div>
+					</main>
+				</section>
+
+				<!-- AJAX -->
+				<section class="section-card">
+					<header><h3>ln-ajax — AJAX Navigation</h3></header>
+					<main>
+						<p>Component for AJAX navigation and form submission. Links and forms inside a <code>data-ln-ajax</code> container are automatically processed via fetch.</p>
+						<section id="demo-ajax-info">
+							<figure>
+								<pre><code>&lt;div data-ln-ajax&gt;
+    &lt;a href="/users"&gt;Users&lt;/a&gt;
+    &lt;form method="POST" action="/users"&gt;...&lt;/form&gt;
+&lt;/div&gt;
+
+&lt;!-- JSON response --&gt;
+{
+    "title": "Title",
+    "content": { "main": "&lt;p&gt;HTML&lt;/p&gt;" },
+    "message": { "type": "success", "title": "OK", "body": "Saved!" }
+}</code></pre>
+							</figure>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-ajax</code></td><td>Container — all <code>&lt;a&gt;</code> and <code>&lt;form&gt;</code> inside are AJAX</td></tr>
+									<tr><td><code>data-ln-ajax="false"</code></td><td>Exclude a specific element from AJAX processing</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>CSRF token automatically from <code>&lt;meta name="csrf-token"&gt;</code>. History pushState for links and GET forms.</p>
+						</section>
+					</main>
+				</section>
+
+				<!-- Quick Integration -->
+				<section class="section-card">
+					<header><h3>Quick Integration</h3></header>
+					<main>
+						<pre><code>&lt;link rel="stylesheet" href="dist/ln-acme.css"&gt;
+&lt;script src="dist/ln-acme.iife.js" defer&gt;&lt;/script&gt;
+
+&lt;!-- Or as npm module --&gt;
+import 'ln-acme';
+import 'ln-acme/dist/ln-acme.css';</code></pre>
+					</main>
+				</section>

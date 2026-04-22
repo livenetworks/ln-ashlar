@@ -7,6 +7,20 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<script src="../dist/ln-acme.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
@@ -31,7 +45,7 @@
 
 	<div class="app-wrapper">
 		<!-- Header -->
-		<header>
+		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
@@ -40,20 +54,29 @@
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
-					<button type="button" data-demo-theme-toggle aria-label="Toggle dark mode">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-moon"></use></svg>
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
 					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+						</ul>
+					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
-						Test Toast
+						<span>Test Toast</span>
 					</button>
 				</div>
 			</div>
 		</header>
 
 		<!-- App Body -->
-		<div class="app-body">
+		<main class="app-main">
 		<!-- Sidebar -->
-		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
@@ -119,7 +142,7 @@
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
 						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
-						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table.html" aria-current="page"><span class="nav-label">Table</span></a></li>
 						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
 						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
@@ -135,31 +158,31 @@
 				<small>acme-gui v1.2.0</small>
 			</footer>
 		</aside>
+		<div class="app-scrim" data-ln-scrim></div>
 
-		<!-- Main Panel -->
-		<div class="main-panel">
-
-			<!-- Content -->
-			<div class="content">
-					<h1>Table</h1>
+		<!-- Content -->
+		<section>
+<h1>Table</h1>
 					<p>Server-rendered data table — in-memory search, per-column filtering, sorting, virtual scroll. Rows arrive as HTML in <code>&lt;tbody&gt;</code>. Two independent components: <code>ln-table</code> (parse + render) and <code>ln-table-sort</code> (sort header clicks). Search provided by <code>ln-search</code>.</p>
 
 					<!-- Attributes -->
 					<section class="section-card">
 						<header><h3>Attributes</h3></header>
 						<main>
+							<div class="table-container">
 							<table>
 								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>data-ln-table</code></td><td>wrapper (needs <code>id</code>)</td><td>Component root. Parses rows, listens for events.</td></tr>
-									<tr><td><code>data-ln-search="tableId"</code></td><td><code>&lt;input&gt;</code> or wrapper</td><td>Standard <code>ln-search</code>. <code>ln-table</code> intercepts the event for in-memory filtering.</td></tr>
-									<tr><td><code>data-ln-table-clear</code></td><td><code>&lt;button&gt;</code></td><td>Clears search input.</td></tr>
-									<tr><td><code>th[data-ln-sort="type"]</code></td><td><code>&lt;th&gt;</code></td><td>Sortable column. Values: <code>string</code>, <code>number</code>, <code>date</code>.</td></tr>
-									<tr><td><code>td[data-ln-value]</code></td><td><code>&lt;td&gt;</code></td><td>Raw sort value when display text differs.</td></tr>
-									<tr><td><code>data-ln-filter-col="key"</code></td><td><code>&lt;th&gt;</code></td><td>Maps column to a filter key (used by <code>ln-filter</code>).</td></tr>
-									<tr><td><code>data-ln-table-empty</code></td><td><code>&lt;template&gt;</code></td><td>Content shown when filter returns 0 results.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-table</code></td><td data-label="On element">wrapper (needs <code>id</code>)</td><td data-label="Description">Component root. Parses rows, listens for events.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-search="tableId"</code></td><td data-label="On element"><code>&lt;input&gt;</code> or wrapper</td><td data-label="Description">Standard <code>ln-search</code>. <code>ln-table</code> intercepts the event for in-memory filtering.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-table-clear</code></td><td data-label="On element"><code>&lt;button&gt;</code></td><td data-label="Description">Clears search input.</td></tr>
+									<tr><td data-label="Attribute"><code>th[data-ln-sort="type"]</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Sortable column. Values: <code>string</code>, <code>number</code>, <code>date</code>.</td></tr>
+									<tr><td data-label="Attribute"><code>td[data-ln-value]</code></td><td data-label="On element"><code>&lt;td&gt;</code></td><td data-label="Description">Raw sort value when display text differs.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-filter-col="key"</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Maps column to a filter key (used by <code>ln-filter</code>).</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-table-empty</code></td><td data-label="On element"><code>&lt;template&gt;</code></td><td data-label="Description">Content shown when filter returns 0 results.</td></tr>
 								</tbody>
 							</table>
+							</div>
 						</main>
 					</section>
 
@@ -190,6 +213,7 @@
 									</article>
 								</template>
 
+								<div class="table-container">
 								<table>
 									<thead>
 										<tr>
@@ -258,6 +282,7 @@
 									</thead>
 									<tbody id="demo-tbody"></tbody>
 								</table>
+								</div>
 
 								<footer class="ln-table__footer">
 									<span>Total: <strong id="demo-total"></strong></span>
@@ -270,6 +295,7 @@
 					<section class="section-card">
 						<header><h3>Events</h3></header>
 						<main>
+							<div class="table-container">
 							<table>
 								<thead><tr><th>Event</th><th>Dispatched by</th><th><code>detail</code></th></tr></thead>
 								<tbody>
@@ -280,6 +306,7 @@
 									<tr><td><code>ln-table:empty</code></td><td><code>ln-table</code> — filter returns 0</td><td><code>{ term, total }</code></td></tr>
 								</tbody>
 							</table>
+							</div>
 							<pre><code>var table = document.getElementById('demo-table');
 
 table.addEventListener('ln-table:ready', function (e) {
@@ -390,83 +417,97 @@ var el = document.querySelector('[data-ln-table]');
 el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code></pre>
 						</main>
 					</section>
-			</div>
+		</section>
 
 			<!-- Footer -->
 			<footer class="footer">
 				<span>acme-gui &copy; 2026 LiveNetworks</span>
 				<span>ln-acme v1.2.0</span>
 			</footer>
-		</div>
-		</div><!-- /.app-body -->
+		</main>
 	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
 
 	<script>
 	(function () {
-		var TOTAL = 500;
-		var tableEl = document.getElementById('demo-table');
-		var tbody = document.getElementById('demo-tbody');
-		var countEl = document.getElementById('demo-count');
-		var totalEl = document.getElementById('demo-total');
-		if (!tableEl || !tbody) return;
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const root = document.documentElement;
 
-		// Wire up events
-		tableEl.addEventListener('ln-table:ready', function (e) {
-			var n = e.detail.total.toLocaleString();
-			if (countEl) countEl.textContent = n + ' products';
-			if (totalEl) totalEl.textContent = n;
-		});
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
 
-		tableEl.addEventListener('ln-table:filter', function (e) {
-			var matched = e.detail.matched;
-			var total = e.detail.total;
-			if (countEl) {
-				countEl.textContent = matched < total
-					? matched.toLocaleString() + ' / ' + total.toLocaleString()
-					: total.toLocaleString() + ' products';
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
 			}
-			if (totalEl) totalEl.textContent = matched.toLocaleString();
 		});
 
-		tableEl.addEventListener('ln-table:sorted', function (e) {
-			if (totalEl) totalEl.textContent = e.detail.matched.toLocaleString();
-		});
-
-		// Data
-		var products = [
-			'Laptop Pro', 'Wireless Mouse', 'USB-C Hub', 'Mechanical Keyboard',
-			'Monitor 27"', 'Webcam HD', 'Headset Pro', 'Docking Station',
-			'SSD 1TB', 'RAM 32GB', 'GPU Card', 'Network Switch',
-			'Power Supply', 'Cable Kit', 'Mouse Pad', 'Screen Protector'
-		];
-		var categories = ['Electronics', 'Peripherals', 'Storage', 'Networking', 'Accessories', 'Components'];
-
-		function formatPrice(n) {
-			return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-		}
-
-		// Generate rows
-		var html = [];
-		for (var i = 0; i < TOTAL; i++) {
-			var name = products[i % products.length];
-			var cat = categories[i % categories.length];
-			var price = 50 + Math.floor(Math.random() * 2000);
-			var stock = Math.floor(Math.random() * 500);
-			var status = stock === 0 ? 'Out of Stock' : stock <= 100 ? 'Low Stock' : 'In Stock';
-
-			html.push(
-				'<tr>' +
-				'<td>' + (i + 1) + '</td>' +
-				'<td>' + name + '</td>' +
-				'<td>' + cat + '</td>' +
-				'<td data-ln-value="' + price + '" class="numeric">' + formatPrice(price) + '</td>' +
-				'<td data-ln-value="' + stock + '" class="numeric">' + stock + '</td>' +
-				'<td>' + status + '</td>' +
-				'</tr>'
-			);
-		}
-
-		tbody.innerHTML = html.join('');
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
 	})();
 	</script>
 </body>

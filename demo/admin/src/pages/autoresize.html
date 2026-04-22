@@ -1,0 +1,105 @@
+<!-- ln-page: title="Autoresize — ln-acme" h1="Autoresize" -->
+
+					<h1>Autoresize</h1>
+					<p>Auto-expanding textarea — grows with content, scrolls after max height.</p>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td data-label="Attribute"><code>data-ln-autoresize</code></td><td data-label="On element"><code>&lt;textarea&gt;</code></td><td data-label="Description">Enables auto-resize behavior — grows with content on every input event</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example — Basic -->
+					<section class="section-card">
+						<header><h3>Example — Basic</h3></header>
+						<main>
+							<div class="form-element">
+								<label for="demo-basic">Notes</label>
+								<textarea id="demo-basic" data-ln-autoresize rows="1" placeholder="Type here and watch it grow…"></textarea>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example — Pre-filled -->
+					<section class="section-card">
+						<header><h3>Example — Pre-filled</h3></header>
+						<main>
+							<p>Pre-filled content is auto-sized on initialization — no manual height needed.</p>
+							<div class="form-element">
+								<label for="demo-prefilled">Employee Review</label>
+								<textarea id="demo-prefilled" data-ln-autoresize>Ana Kovachevska joined the Finance department in March 2023 and has consistently exceeded her quarterly targets. Her attention to detail in budget reconciliation and her collaborative approach to cross-department projects have made her a key contributor. Recommended for the senior analyst track in Q3 2026.</textarea>
+							</div>
+						</main>
+					</section>
+
+					<!-- Example — Max Height with Scroll -->
+					<section class="section-card" id="demo-maxheight">
+						<header><h3>Example — Max Height with Scroll</h3></header>
+						<main>
+							<p>Pair <code>data-ln-autoresize</code> with CSS <code>max-height</code> and <code>overflow-y: auto</code> to cap growth and enable scroll. The <code>&lt;style&gt;</code> in this page's <code>&lt;head&gt;</code> scopes the rule to <code>#demo-maxheight textarea</code>.</p>
+							<div class="form-element">
+								<label for="demo-capped">Capped textarea (max 6rem)</label>
+								<textarea id="demo-capped" data-ln-autoresize rows="1" placeholder="Keep typing — it stops growing at 6rem and scrolls instead…"></textarea>
+							</div>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>const el = document.querySelector('[data-ln-autoresize]');
+el.lnAutoresize.destroy();  // remove listener, reset height</code></pre>
+						</main>
+					</section>
+
+					<!-- Behavior -->
+					<section class="section-card">
+						<header><h3>Behavior</h3></header>
+						<main>
+							<ul>
+								<li>On every <code>input</code> event: resets height to <code>auto</code>, then sets to <code>scrollHeight</code></li>
+								<li>Pre-filled content is auto-sized on initialization</li>
+								<li>Works with dynamically added textareas (MutationObserver)</li>
+								<li>Only applies to <code>&lt;textarea&gt;</code> elements — warns if used on other tags</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;textarea data-ln-autoresize rows="1" placeholder="Type here..."&gt;&lt;/textarea&gt;</code></pre>
+							<p>With max height cap (in your project SCSS or a scoped <code>&lt;style&gt;</code>):</p>
+							<pre><code>textarea[data-ln-autoresize] {
+    resize: none;
+    max-height: 6rem;
+    overflow-y: auto;
+}</code></pre>
+						</main>
+					</section>
+
+					<!-- Dynamic Demo -->
+					<section class="section-card">
+						<header><h3>Dynamic Demo — MutationObserver</h3></header>
+						<main>
+							<p>Clicking the button creates a new <code>&lt;textarea data-ln-autoresize&gt;</code> via JavaScript. The MutationObserver picks it up automatically — no manual init needed.</p>
+							<nav class="demo-actions">
+								<button type="button" class="btn" id="demo-add-textarea">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+									Add textarea dynamically
+								</button>
+							</nav>
+							<div id="demo-dynamic-container"></div>
+						</main>
+					</section>

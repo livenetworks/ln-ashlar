@@ -1,0 +1,7 @@
+@use '../config/mixins' as *;
+
+.app-wrapper { @include app-wrapper; }
+.app-header  { @include app-header; }
+.app-main    { @include app-main; }
+.app-sidebar { @include sidebar; @include sidebar-drawer; }
+.app-scrim   { @include app-scrim; }

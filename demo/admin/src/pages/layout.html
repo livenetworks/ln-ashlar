@@ -1,0 +1,139 @@
+<!-- ln-page: title="Layout &amp; Grid — ln-acme" h1="Layout &amp; Grid" -->
+
+<h1>Layout &amp; Grid</h1>
+					<p>App layout with sidebar, grid system, stack, row and container.</p>
+
+		<!-- Grid -->
+		<section id="demo-grid-3" class="section-card">
+			<header><h3>.grid (3 columns)</h3></header>
+			<main>
+				<div>
+					<div class="demo-box">1</div>
+					<div class="demo-box">2</div>
+					<div class="demo-box">3</div>
+					<div class="demo-box">4</div>
+					<div class="demo-box">5</div>
+					<div class="demo-box">6</div>
+				</div>
+			</main>
+		</section>
+
+		<section id="demo-grid-2" class="section-card">
+			<header><h3>.grid-2 (2 columns)</h3></header>
+			<main>
+				<div>
+					<div class="demo-box">Left</div>
+					<div class="demo-box">Right</div>
+				</div>
+			</main>
+		</section>
+
+		<section id="demo-grid-4" class="section-card">
+			<header><h3>.grid-4 (4 columns)</h3></header>
+			<main>
+				<div>
+					<div class="demo-box">1</div>
+					<div class="demo-box">2</div>
+					<div class="demo-box">3</div>
+					<div class="demo-box">4</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- Stack & Row -->
+		<section id="demo-stack-row" class="section-card">
+			<header><h3>.stack, .row</h3></header>
+			<main>
+				<div>
+					<div>
+						<h5>stack (vertical)</h5>
+						<div class="demo-stack">
+							<div class="demo-box">Item 1</div>
+							<div class="demo-box">Item 2</div>
+							<div class="demo-box">Item 3</div>
+						</div>
+					</div>
+					<div>
+						<h5>row (horizontal)</h5>
+						<div class="demo-row">
+							<div class="demo-box">A</div>
+							<div class="demo-box">B</div>
+							<div class="demo-box">C</div>
+						</div>
+						<br>
+						<h5>row-between</h5>
+						<div class="demo-row-between">
+							<div class="demo-box">Left</div>
+							<div class="demo-box">Right</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</section>
+
+		<!-- App Layout -->
+		<section class="section-card">
+			<header><h3>App Layout structure</h3></header>
+			<main>
+				<pre><code>&lt;!-- Full app layout --&gt;
+&lt;div class="app-wrapper"&gt;
+
+    &lt;aside class="sidebar"&gt;
+        &lt;header&gt;
+            &lt;img class="logo" src="logo.svg"&gt;
+            &lt;span class="app-name"&gt;App Name&lt;/span&gt;
+        &lt;/header&gt;
+        &lt;main&gt;
+            &lt;nav class="nav"&gt;...&lt;/nav&gt;
+        &lt;/main&gt;
+        &lt;footer&gt;...&lt;/footer&gt;
+    &lt;/aside&gt;
+
+    &lt;div class="main-panel"&gt;
+        &lt;header class="header"&gt;
+            &lt;div class="header-left"&gt;
+                &lt;h1&gt;Page Title&lt;/h1&gt;
+            &lt;/div&gt;
+            &lt;div class="header-right"&gt;...&lt;/div&gt;
+        &lt;/header&gt;
+
+        &lt;div class="content"&gt;
+            &lt;!-- page content --&gt;
+        &lt;/div&gt;
+
+        &lt;footer class="footer"&gt;
+            &lt;span&gt;Footer text&lt;/span&gt;
+        &lt;/footer&gt;
+    &lt;/div&gt;
+
+&lt;/div&gt;</code></pre>
+			</main>
+		</section>
+
+		<!-- Grid HTML -->
+		<section class="section-card">
+			<header><h3>Grid HTML</h3></header>
+			<main>
+				<pre><code>&lt;!-- 3-column grid (responsive: 1→2→3) --&gt;
+&lt;div class="grid"&gt;
+    &lt;div&gt;...&lt;/div&gt;
+    &lt;div&gt;...&lt;/div&gt;
+    &lt;div&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 2-column --&gt;
+&lt;div class="grid-2"&gt;...&lt;/div&gt;
+
+&lt;!-- 4-column --&gt;
+&lt;div class="grid-4"&gt;...&lt;/div&gt;
+
+&lt;!-- Stack (vertical) --&gt;
+&lt;div class="stack"&gt;...&lt;/div&gt;
+&lt;div class="stack-sm"&gt;...&lt;/div&gt;  &lt;!-- smaller gap --&gt;
+
+&lt;!-- Row (horizontal) --&gt;
+&lt;div class="row"&gt;...&lt;/div&gt;
+&lt;div class="row-between"&gt;...&lt;/div&gt;
+&lt;div class="row-center"&gt;...&lt;/div&gt;</code></pre>
+			</main>
+		</section>

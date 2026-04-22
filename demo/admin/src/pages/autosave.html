@@ -1,0 +1,161 @@
+<!-- ln-page: title="Autosave — ln-acme" h1="Autosave" -->
+
+					<h1>Autosave</h1>
+					<p>Auto-saves form data to <code>localStorage</code> on field blur/change. Restores on next visit. Clears on submit, reset, or cancel.</p>
+
+					<!-- Basics -->
+					<section class="section-card">
+						<header><h3>Basics</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td data-label="Attribute"><code>data-ln-autosave</code></td><td data-label="On element"><code>&lt;form&gt;</code></td><td data-label="Description">Enables autosave. Uses <code>form.id</code> as storage key.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-autosave="key"</code></td><td data-label="On element"><code>&lt;form&gt;</code></td><td data-label="Description">Explicit storage key (overrides <code>form.id</code>).</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-autosave-clear</code></td><td data-label="On element">button inside form</td><td data-label="Description">Click clears saved draft (cancel/discard buttons).</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>Storage key format: <code>ln-autosave:{pathname}:{identifier}</code> — unique per URL + form.</p>
+						</main>
+					</section>
+
+					<!-- Live Demo -->
+					<section class="section-card">
+						<header><h3>Live demo — fill fields, close tab, reopen</h3></header>
+						<main>
+							<p>Fill in some fields below, then close (or refresh) this tab. When you reopen, the data is restored. Submitting the form clears the saved draft.</p>
+
+							<form id="demo-autosave" data-ln-autosave>
+								<div class="form-element">
+									<label for="as-name">Name</label>
+									<input type="text" id="as-name" name="name" placeholder="John Smith">
+								</div>
+								<div class="form-element">
+									<label for="as-email">Email</label>
+									<input type="email" id="as-email" name="email" placeholder="ivan@example.com">
+								</div>
+								<div class="form-element">
+									<label for="as-phone">Phone</label>
+									<input type="tel" id="as-phone" name="phone" placeholder="+1 555 ...">
+								</div>
+								<div class="form-element">
+									<label for="as-country">Country</label>
+									<select id="as-country" name="country">
+										<option value="">— Select —</option>
+										<option value="us">United States</option>
+										<option value="gb">United Kingdom</option>
+										<option value="de">Germany</option>
+										<option value="fr">France</option>
+									</select>
+								</div>
+								<div class="form-element">
+									<label for="as-message">Message</label>
+									<textarea id="as-message" name="message" placeholder="Write something..."></textarea>
+								</div>
+								<fieldset>
+									<legend>Role</legend>
+									<ul>
+										<li><label><input type="radio" name="role" value="admin"> Admin</label></li>
+										<li><label><input type="radio" name="role" value="editor"> Editor</label></li>
+										<li><label><input type="radio" name="role" value="viewer"> Viewer</label></li>
+									</ul>
+								</fieldset>
+								<fieldset>
+									<legend>Features</legend>
+									<ul>
+										<li><label><input type="checkbox" name="features[]" value="api"> API</label></li>
+										<li><label><input type="checkbox" name="features[]" value="export"> Export</label></li>
+										<li><label><input type="checkbox" name="features[]" value="audit"> Audit</label></li>
+									</ul>
+								</fieldset>
+								<ul class="form-actions">
+									<li><button type="button" data-ln-autosave-clear>Cancel</button></li>
+									<li><button type="reset">Reset</button></li>
+									<li><button type="submit">Submit</button></li>
+								</ul>
+							</form>
+						</main>
+					</section>
+
+					<!-- Events Demo -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th>Cancelable</th><th>Detail</th><th>When</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-autosave:before-restore</code></td><td><strong>yes</strong></td><td><code>{ target, data }</code></td><td>Before restoring saved data</td></tr>
+									<tr><td><code>ln-autosave:restored</code></td><td>no</td><td><code>{ target, data }</code></td><td>Data restored to form</td></tr>
+									<tr><td><code>ln-autosave:saved</code></td><td>no</td><td><code>{ target, data }</code></td><td>Data saved to localStorage</td></tr>
+									<tr><td><code>ln-autosave:cleared</code></td><td>no</td><td><code>{ target }</code></td><td>localStorage entry removed</td></tr>
+									<tr><td><code>ln-autosave:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>Instance destroyed</td></tr>
+								</tbody>
+							</table>
+							</div>
+
+							<article>
+								<h4>Event log</h4>
+								<p>Interact with the form above to see events here:</p>
+								<pre id="autosave-log" style="max-height: 12rem; overflow-y: auto; font-size: 0.8rem;"></pre>
+							</article>
+
+							<script>
+								document.addEventListener('DOMContentLoaded', function () {
+									var log = document.getElementById('autosave-log');
+									var events = ['ln-autosave:saved', 'ln-autosave:restored', 'ln-autosave:cleared'];
+									events.forEach(function (name) {
+										document.addEventListener(name, function (e) {
+											var time = new Date().toLocaleTimeString();
+											var line = '[' + time + '] ' + name;
+											if (e.detail.data) line += ' — ' + JSON.stringify(e.detail.data).substring(0, 80) + '…';
+											log.textContent = line + '\n' + log.textContent;
+										});
+									});
+								});
+							</script>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Instance API (on DOM element)
+var form = document.getElementById('my-form');
+form.lnAutosave.save();     // manually save
+form.lnAutosave.restore();  // manually restore
+form.lnAutosave.clear();    // remove saved data
+form.lnAutosave.destroy();  // cleanup listeners
+
+// Constructor (for dynamic content)
+window.lnAutosave(container);</code></pre>
+						</main>
+					</section>
+
+					<!-- Cancel Restore -->
+					<section class="section-card">
+						<header><h3>Cancel restore (server data takes priority)</h3></header>
+						<main>
+							<pre><code>// Prevent restore when form already has server data
+document.addEventListener('ln-autosave:before-restore', function (e) {
+    var form = e.detail.target;
+    if (form.dataset.hasServerData === 'true') {
+        e.preventDefault();       // don't overwrite server values
+        form.lnAutosave.clear();  // discard stale draft
+    }
+});</code></pre>
+						</main>
+					</section>
+
+					<!-- Submit handler for demo -->
+					<script>
+						document.addEventListener('DOMContentLoaded', function () {
+							document.getElementById('demo-autosave').addEventListener('submit', function (e) {
+								e.preventDefault();
+								window.lnToast.enqueue({ type: 'success', title: 'Submitted', message: 'Form data sent. Draft cleared from localStorage.' });
+							});
+						});
+					</script>

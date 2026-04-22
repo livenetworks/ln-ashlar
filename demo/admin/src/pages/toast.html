@@ -1,0 +1,61 @@
+<!-- ln-page: title="Toast — ln-acme" h1="Toast" -->
+
+<h1>Toast</h1>
+					<p>Notifications with a side accent and icon. They automatically disappear after 6 seconds.</p>
+
+					<!-- Triggers -->
+					<section class="section-card">
+						<header><h3>Examples</h3></header>
+						<main>
+							<nav class="demo-actions">
+								<button onclick="window.lnToast.enqueue({type:'success', title:'Success', message:'The record has been saved.'})" class="btn">Success</button>
+								<button onclick="window.lnToast.enqueue({type:'error', title:'Error', message:'Something went wrong.'})" class="btn error">Error</button>
+								<button onclick="window.lnToast.enqueue({type:'warn', title:'Warning', message:'Please check the data.'})" class="btn warning">Warning</button>
+								<button onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'A new version is available.'})" class="btn info">Info</button>
+							</nav>
+						</main>
+					</section>
+
+					<!-- Error with list -->
+					<section class="section-card">
+						<header><h3>Error with a list of errors</h3></header>
+						<main>
+							<button onclick="window.lnToast.enqueue({type:'error', title:'Validation', message:['Name is required','Email format is incorrect','Password is too short']})" class="btn error">Show validation errors</button>
+						</main>
+					</section>
+
+					<!-- HTML -->
+					<section class="section-card">
+						<header><h3>HTML &amp; JS API</h3></header>
+						<main>
+							<pre><code>&lt;!-- Toast container (once per page, no template needed) --&gt;
+&lt;ul data-ln-toast&gt;&lt;/ul&gt;
+
+&lt;!-- JS API --&gt;
+&lt;script&gt;
+// Basic toast — returns numeric id
+var id = window.lnToast.enqueue({
+    type: 'success',     // success | error | warn | info
+    title: 'Title',
+    message: 'Description...'
+});
+
+// Error with list
+window.lnToast.enqueue({
+    type: 'error',
+    title: 'Validation',
+    message: ['Error 1', 'Error 2', 'Error 3']
+});
+
+// Clear all
+window.lnToast.clear();
+&lt;/script&gt;
+
+&lt;!-- Static toast (hydrated on init) --&gt;
+&lt;ul data-ln-toast&gt;
+    &lt;li data-ln-toast-item data-type="success" data-title="OK"&gt;
+        Saved!
+    &lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+						</main>
+					</section>

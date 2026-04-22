@@ -1,0 +1,185 @@
+<!-- ln-page: title="Time — ln-acme" h1="Time" -->
+
+<h1>Time</h1>
+					<p>Timezone-aware timestamp formatting using <code>Intl.DateTimeFormat</code> and <code>Intl.RelativeTimeFormat</code>. Enhances <code>&lt;time&gt;</code> elements — Blade renders fallback text, JS replaces with localized output.</p>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td data-label="Attribute"><code>data-ln-time="mode"</code></td><td data-label="On element"><code>&lt;time&gt;</code></td><td data-label="Description">Format mode: <code>relative</code>, <code>short</code>, <code>full</code>, <code>date</code>, <code>time</code></td></tr>
+									<tr><td data-label="Attribute"><code>datetime="1736952600"</code></td><td data-label="On element"><code>&lt;time&gt;</code></td><td data-label="Description">Unix timestamp in seconds</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-time-locale="mk"</code></td><td data-label="On element"><code>&lt;time&gt;</code></td><td data-label="Description">Override locale (default: <code>&lt;html lang&gt;</code> or browser)</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Format Modes -->
+					<section class="section-card">
+						<header><h3>Format Modes</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Mode</th><th>Example Output</th><th>Intl Options</th></tr></thead>
+								<tbody>
+									<tr><td><code>relative</code></td><td>3 hr. ago, just now, in 2 hr.</td><td><code>Intl.RelativeTimeFormat</code></td></tr>
+									<tr><td><code>short</code></td><td>Jan 15 / Jan 15, 2024</td><td><code>{ month: 'short', day: 'numeric' }</code> + conditional year</td></tr>
+									<tr><td><code>full</code></td><td>January 15, 2025 at 2:30 PM</td><td><code>{ dateStyle: 'long', timeStyle: 'short' }</code></td></tr>
+									<tr><td><code>date</code></td><td>Jan 15, 2025</td><td><code>{ dateStyle: 'medium' }</code></td></tr>
+									<tr><td><code>time</code></td><td>2:30 PM</td><td><code>{ timeStyle: 'short' }</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Live: All Modes (same timestamp) -->
+					<section class="section-card">
+						<header><h3>All Modes — Same Timestamp</h3></header>
+						<main>
+							<p>All elements below use the same <code>datetime</code> value. Hover for full date tooltip.</p>
+							<div class="table-container">
+							<table id="demo-modes-table">
+								<thead><tr><th>Mode</th><th>Output</th><th>HTML</th></tr></thead>
+								<tbody></tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Relative Time -->
+					<section class="section-card">
+						<header><h3>Relative Time — Thresholds</h3></header>
+						<main>
+							<p>Relative mode picks the best unit and uses <code>Intl.RelativeTimeFormat</code> for localized output. Auto-updates every 60 seconds.</p>
+							<div class="table-container">
+							<table id="demo-relative-table">
+								<thead><tr><th>Offset</th><th>Output</th></tr></thead>
+								<tbody></tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Future Timestamps -->
+					<section class="section-card">
+						<header><h3>Future Timestamps</h3></header>
+						<main>
+							<p>Relative mode handles future dates — <code>Intl.RelativeTimeFormat</code> produces "in X" automatically.</p>
+							<div class="table-container">
+							<table id="demo-future-table">
+								<thead><tr><th>Offset</th><th>Output</th></tr></thead>
+								<tbody></tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Locale Override -->
+					<section class="section-card">
+						<header><h3>Locale Override</h3></header>
+						<main>
+							<p>Default locale comes from <code>&lt;html lang="en"&gt;</code>. Override per-element with <code>data-ln-time-locale</code>.</p>
+							<div class="table-container">
+							<table id="demo-locale-table">
+								<thead><tr><th>Locale</th><th>Full</th><th>Relative</th></tr></thead>
+								<tbody></tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Dynamic Insertion -->
+					<section class="section-card">
+						<header><h3>Dynamic Insertion (MutationObserver)</h3></header>
+						<main>
+							<p>Inserting <code>&lt;time&gt;</code> elements via JS auto-initializes them. Try it:</p>
+							<div id="demo-dynamic-target"></div>
+							<button id="demo-dynamic-btn">Insert &lt;time&gt; element</button>
+						</main>
+					</section>
+
+					<!-- Reactive Attribute Change -->
+					<section class="section-card">
+						<header><h3>Reactive Attribute Changes</h3></header>
+						<main>
+							<p>Changing <code>datetime</code> or <code>data-ln-time</code> re-renders automatically.</p>
+							<p><time id="demo-reactive" data-ln-time="full" datetime="1736952600">loading...</time></p>
+							<button id="demo-reactive-ts">Change timestamp</button>
+							<button id="demo-reactive-mode">Cycle mode</button>
+						</main>
+					</section>
+
+					<!-- Edge Cases -->
+					<section class="section-card">
+						<header><h3>Edge Cases</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Case</th><th>Element</th><th>Result</th></tr></thead>
+								<tbody>
+									<tr>
+										<td>Empty datetime</td>
+										<td><time data-ln-time="short" datetime="">fallback text</time></td>
+										<td>Skipped — fallback text preserved</td>
+									</tr>
+									<tr>
+										<td>Missing datetime</td>
+										<td><time data-ln-time="short">no datetime attr</time></td>
+										<td>Skipped — text preserved</td>
+									</tr>
+									<tr>
+										<td>Non-numeric datetime</td>
+										<td><time data-ln-time="short" datetime="2025-01-15T14:30:00Z">ISO string</time></td>
+										<td>Skipped — not a Unix timestamp</td>
+									</tr>
+									<tr>
+										<td>Epoch zero</td>
+										<td><time data-ln-time="full" datetime="0">epoch</time></td>
+										<td>Rendered normally (Jan 1, 1970)</td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- HTML Structure -->
+					<section class="section-card">
+						<header><h3>HTML Structure</h3></header>
+						<main>
+							<pre><code>&lt;!-- Blade renders fallback, JS enhances --&gt;
+&lt;time data-ln-time="relative" datetime="1736952600"&gt;Jan 15&lt;/time&gt;
+&lt;time data-ln-time="short" datetime="1736952600"&gt;Jan 15&lt;/time&gt;
+&lt;time data-ln-time="full" datetime="1736952600"&gt;January 15, 2025&lt;/time&gt;
+&lt;time data-ln-time="date" datetime="1736952600"&gt;Jan 15, 2025&lt;/time&gt;
+&lt;time data-ln-time="time" datetime="1736952600"&gt;14:30&lt;/time&gt;
+
+&lt;!-- Locale override --&gt;
+&lt;time data-ln-time="full" datetime="1736952600" data-ln-time-locale="mk"&gt;fallback&lt;/time&gt;</code></pre>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+							<pre><code>// Manual init (not needed for normal use — MutationObserver handles it)
+window.lnTime(document.body);
+
+// Instance API
+const el = document.querySelector('time[data-ln-time]');
+el.lnTime.render();    // Force re-render
+el.lnTime.destroy();   // Cleanup (remove from auto-update pool)
+
+// Reactive update — just change the attribute
+el.setAttribute('datetime', '1700000000');
+el.setAttribute('data-ln-time', 'date');  // switch mode</code></pre>
+						</main>
+					</section>
