@@ -157,6 +157,5 @@ Use case: destructive confirm dialogs — place `autofocus` on the Cancel button
 ```
 
 > **Icons:** The close button uses `<svg class="ln-icon"><use href="#ln-x">` — NEVER use `&times;` character.
-> `@include close-button` is already applied on `button[data-ln-modal-close]` in `ln-modal.scss`.
 >
 > **Non-submit buttons** inside `<form>` need `type="button"` (close, cancel) to prevent form submission.

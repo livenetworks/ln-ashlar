@@ -7,12 +7,12 @@
 .demo-split {
 	@include grid-2;
 	align-items: start;
-	@include gap(1rem);
+	@include gap(var(--size-md));
 
 	> article {
 		@include border;
 		@include rounded-md;
-		@include p(1rem);
+		@include p(var(--size-md));
 	}
 
 	> figure {
@@ -24,21 +24,21 @@
 
 		pre {
 			margin: 0;
-			@include p(1rem);
+			@include p(var(--size-md));
 		}
 	}
 }
 
 // Description section below the split
 .demo-why {
-	@include mt(1rem);
-	@include pt(1rem);
+	@include mt(var(--size-md));
+	@include pt(var(--size-md));
 	@include border-t;
 
 	h4 {
 		@include text-sm;
 		@include font-semibold;
-		margin: 0 0 0.5rem;
+		margin: 0 0 var(--size-sm);
 	}
 
 	p, ul {
@@ -48,8 +48,8 @@
 	}
 
 	ul {
-		@include mt(0.5rem);
-		padding-left: 1.25rem;
+		@include mt(var(--size-sm));
+		padding-left: var(--size-md-up);
 	}
 }
 
@@ -57,7 +57,6 @@
 .demo-actions {
 	@include flex;
 	@include items-center;
-	@include gap(0.75rem);
+	@include gap(var(--size-sm-up));
 	@include flex-wrap;
 }
-

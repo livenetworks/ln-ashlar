@@ -72,7 +72,7 @@ background:    hsl(var(--color-primary) / 0.06)
 
 .ln-icon → primary color, flex-shrink-0
 p        → flex-1, no margin, text-sm
-button   → @include close-button, margin-left: auto
+button   → --padding-y/x: size-2xs (tight tap area), margin-left: auto
 ```
 
 ## When to use

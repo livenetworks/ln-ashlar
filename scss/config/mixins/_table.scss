@@ -25,10 +25,10 @@
 
 	th {
 		@include text-left;
-		padding: var(--size-sm) var(--size-md);
+		padding: var(--padding-y) var(--padding-x);
 		@include font-semibold;
 		font-size: var(--text-label-sm);
-		line-height: var(--lh-label-sm);
+		line-height: var(--line-height);
 		letter-spacing: 0.4px;
 		@include uppercase;
 		color: hsl(var(--color-table-header-text));
@@ -44,7 +44,7 @@
 	}
 
 	td {
-		padding: var(--size-sm) var(--size-md);
+		padding: var(--padding-y) var(--padding-x);
 		@include border-b;
 		font-size: var(--font-size);
 		line-height: var(--line-height);

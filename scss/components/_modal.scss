@@ -8,10 +8,6 @@
 	@include modal-panel;
 }
 
-.ln-modal > form > header [data-ln-modal-close] {
-	@include close-button;
-}
-
 @keyframes ln-modal-slideIn {
 	from {
 		transform: translateY(-50px);

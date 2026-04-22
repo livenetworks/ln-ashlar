@@ -16,14 +16,14 @@
 	@include circular-progress-xl;
 }
 
-[data-ln-circular-progress].success {
-	@include circular-progress-success;
+[data-ln-circular-progress].success .ln-circular-progress__fill {
+	stroke: hsl(var(--color-success));
 }
 
-[data-ln-circular-progress].error {
-	@include circular-progress-error;
+[data-ln-circular-progress].error .ln-circular-progress__fill {
+	stroke: hsl(var(--color-error));
 }
 
-[data-ln-circular-progress].warning {
-	@include circular-progress-warning;
+[data-ln-circular-progress].warning .ln-circular-progress__fill {
+	stroke: hsl(var(--color-warning));
 }

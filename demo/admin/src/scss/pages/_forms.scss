@@ -43,20 +43,7 @@
 	}
 }
 
-// Pill groups in form fieldsets — scoped to specific demos
-#demo-pills-filled,
-#demo-autosave {
-	fieldset > ul:has(> li > label > input[type="checkbox"]),
-	fieldset > ul:has(> li > label > input[type="radio"]) {
-		@include pill-group;
-	}
-
-	fieldset > ul > li > label:has(> input[type="checkbox"]),
-	fieldset > ul > li > label:has(> input[type="radio"]) {
-		@include pill;
-	}
-}
-
+// Outline variant — overrides the global pill default for this demo only.
 #demo-pills-outline {
 	fieldset > ul:has(> li > label > input[type="checkbox"]),
 	fieldset > ul:has(> li > label > input[type="radio"]) {

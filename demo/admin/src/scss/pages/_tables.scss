@@ -5,39 +5,14 @@
 // as project-level styles. Real projects should use semantic selectors
 // instead of these classes.
 
-// Status badges — pill style (Tabler-inspired)
+// Status badges — thin wrapper around @include badge + status cascade.
 .pass,
 .fail,
-.warn {
-	@include inline-flex;
-	@include items-center;
-	@include px(0.5rem);
-	@include py(0.125rem);
-	@include rounded-full;
-	@include text-xs;
-	@include font-medium;
-	white-space: nowrap;
-}
+.warn { @include badge; }
 
-.pass {
-	background-color: hsl(var(--color-success) / 0.1);
-	color: hsl(var(--color-success));
-}
-
-.fail {
-	background-color: hsl(var(--color-error) / 0.1);
-	color: hsl(var(--color-error));
-}
-
-.warn {
-	background-color: hsl(var(--color-warning) / 0.1);
-	color: hsl(var(--color-warning));
-}
-
-// Cell modifiers
-.numeric { @include text-right; @include font-mono; }
-.center { @include text-center; }
-.nowrap { @include whitespace-nowrap; }
+.pass { --color-primary: var(--color-success); }
+.fail { --color-primary: var(--color-error); }
+.warn { --color-primary: var(--color-warning); }
 
 // Table container
 .table-container { @include overflow-x-auto; }

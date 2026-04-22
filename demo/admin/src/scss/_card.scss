@@ -1,8 +1,6 @@
 @use '../../../../scss/config/mixins' as *;
 
 .card {
-	@include card;
-
 	&:hover {
 		border-color: hsl(var(--color-primary));
 		@include shadow-md;
@@ -31,44 +29,6 @@
 			@include font-semibold;
 			@include text-primary;
 			margin: 0;
-		}
-	}
-
-	.field {
-		@include flex;
-		@include justify-between;
-		align-items: baseline;
-		@include gap(0.5rem);
-		@include pb(0.375rem);
-		@include border-b;
-
-		&:last-child {
-			border-bottom: none;
-			padding-bottom: 0;
-		}
-
-		.label {
-			@include text-xs;
-			@include font-semibold;
-			@include text-secondary;
-			@include uppercase;
-			@include tracking-wider;
-			@include flex-shrink-0;
-		}
-
-		.value {
-			@include text-sm;
-			@include text-primary;
-			@include font-semibold;
-			@include text-right;
-			margin: 0;
-
-			em {
-				@include text-muted;
-				@include font-normal;
-				font-style: normal;
-				@include text-xs;
-			}
 		}
 	}
 }

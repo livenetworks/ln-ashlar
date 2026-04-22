@@ -32,7 +32,8 @@
 		}
 
 		button[data-ln-toggle-action="close"] {
-			@include close-button;
+			--padding-y: var(--size-2xs);
+			--padding-x: var(--size-2xs);
 			@include absolute;
 			top: 0.25rem;
 			right: 0.25rem;

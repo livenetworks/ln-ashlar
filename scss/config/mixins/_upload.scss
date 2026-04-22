@@ -20,11 +20,6 @@
 	width: 100%;
 }
 
-@mixin upload-icon {
-	margin-right: var(--size-sm);
-	flex-shrink: 0;
-}
-
 @mixin upload-zone {
 	border: 2px dashed hsl(var(--color-border));
 	border-radius: var(--radius);
@@ -87,6 +82,17 @@
 	&:last-child {
 		margin-bottom: 0;
 	}
+
+	> svg.ln-icon {
+		margin-right: var(--size-sm);
+		flex-shrink: 0;
+	}
+
+	> .ln-upload__remove {
+		--padding-y: var(--size-2xs);
+		--padding-x: var(--size-2xs);
+		margin-left: var(--size-sm);
+	}
 }
 
 @mixin upload-name {
@@ -100,11 +106,6 @@
 	font-size: var(--text-xs);
 	margin-left: var(--size-md);
 	flex-shrink: 0;
-}
-
-@mixin upload-remove {
-	@include close-button;
-	margin-left: var(--size-sm);
 }
 
 @mixin upload-progress {

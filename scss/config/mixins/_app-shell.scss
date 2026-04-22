@@ -19,6 +19,7 @@
 //     <main class="app-main">
 //       <aside class="app-sidebar" id="…" data-ln-toggle="open">…</aside>
 //       <section>…content…</section>
+//       <footer class="app-footer">…</footer>
 //       <div class="app-scrim" data-ln-scrim></div>
 //     </main>
 //   </div>
@@ -29,6 +30,7 @@
 //   #shell > main   { @include app-main; }
 //   #my-sidebar    { @include sidebar; @include sidebar-drawer; }
 //   #my-scrim      { @include app-scrim; }
+//   .app-footer   { @include app-footer; }   (global binding — no project work needed)
 // ────────────────────────────────────────────────────────────────────────────
 
 @mixin app-wrapper {
@@ -55,7 +57,7 @@
 }
 
 @mixin app-main {
-	@include flex;
+	@include flex-col;
 	@include flex-1;
 	margin-top: var(--app-header-height);
 }
@@ -104,4 +106,19 @@
 	@include mq-up(md) {
 		display: none;
 	}
+}
+
+@mixin app-footer {
+	// Chrome bar at the bottom of .app-main. Reads logical tokens —
+	// padding/border/bg follow the same cascade as the header.
+	padding: var(--padding-y) var(--padding-x);
+	border-top: var(--border-width) solid var(--color-border-subtle);
+	background: var(--color-bg);
+	font-size: var(--text-body-sm);
+	line-height: var(--lh-body-sm);
+	color: var(--color-fg-muted);
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	user-select: none;
 }

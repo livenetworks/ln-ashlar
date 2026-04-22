@@ -12,14 +12,6 @@
 	@include tabs-tab;
 }
 
-[data-ln-tabs] [data-ln-tab][disabled] {
-	@include tabs-tab-disabled;
-}
-
-[data-ln-tabs] [data-ln-tab][data-active] {
-	@include tabs-tab-active;
-}
-
 [data-ln-tabs] [data-ln-panel] {
 	@include tabs-panel;
 }

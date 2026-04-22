@@ -4,10 +4,6 @@
 	@include upload;
 }
 
-.ln-upload__item svg.ln-icon {
-	@include upload-icon;
-}
-
 .ln-upload__zone {
 	@include upload-zone;
 }
@@ -30,10 +26,6 @@
 
 .ln-upload__size {
 	@include upload-size;
-}
-
-.ln-upload__remove {
-	@include upload-remove;
 }
 
 .ln-upload__progress {

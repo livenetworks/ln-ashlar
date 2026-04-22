@@ -29,7 +29,8 @@
 		}
 
 		[data-ln-toggle-action="close"] {
-			@include close-button;
+			--padding-y: var(--size-2xs);
+			--padding-x: var(--size-2xs);
 			@include absolute;
 			top: var(--size-sm);
 			right: var(--size-sm);
@@ -42,14 +43,17 @@
 	}
 }
 
-// Sidebar open → push content over (desktop only)
-.app-sidebar[data-ln-toggle="open"] ~ section {
-	margin-left: var(--app-sidebar-width);
+// Sidebar open → reserve its space on the main container (desktop only).
+// Padding on the parent shifts BOTH content and footer without inflating
+// child widths — avoids the horizontal overflow caused by margin-left on
+// width:100% children.
+.app-main:has(.app-sidebar[data-ln-toggle="open"]) {
+	padding-left: var(--app-sidebar-width);
 }
 
 @include mq-down(md) {
-	.app-sidebar[data-ln-toggle="open"] ~ section {
-		margin-left: 0;
+	.app-main:has(.app-sidebar[data-ln-toggle="open"]) {
+		padding-left: 0;
 	}
 }
 
@@ -66,34 +70,26 @@
 	@include transition;
 }
 
-// ─── Footer ────────────────────────────────────────────────────────────────
+// ─── Footer project delta ─────────────────────────────────────────────────
+// .app-footer itself is styled by the library. Only the right-hand span
+// gets the extra subtle tint at the demo level.
 
-.footer {
-	@include flex;
-	@include items-center;
-	@include justify-between;
-	@include px(var(--size-lg));
-	@include py(var(--size-sm-up));
-	@include border-t;
-	@include bg-primary;
-	@include text-sm;
-	@include text-secondary;
-	@include select-none;
-
-	span:last-child {
-		@include text-muted;
-	}
+.app-footer span:last-child {
+	color: var(--color-fg-subtle);
 }
 
 // ─── Header project delta ──────────────────────────────────────────────────
 
 .app-header {
+	// All .app-header buttons: ghost surface by default. Override
+	// per-scope (e.g. .header-actions button) if a variant needs a
+	// visible border back.
 	button {
-		@include p(0);
-		background: none;
-		border: none;
+		--btn-bg: transparent;
+		--btn-border: transparent;
+		padding: 0;
+		color: var(--color-fg-muted);
 		box-shadow: none;
-		@include cursor-pointer;
 
 		&:focus {
 			box-shadow: none;
@@ -109,12 +105,6 @@
 			@include flex-center;
 			@include size(2rem);
 			@include rounded-sm;
-			@include text-secondary;
-			@include transition-colors;
-
-			&:hover {
-				@include bg-secondary;
-			}
 		}
 
 		h1 {
@@ -131,55 +121,20 @@
 		@include gap(var(--size-md));
 	}
 
-	.header-search {
-		@include relative;
 
-		input {
-			@include pl(2.5rem);
-			@include pr(var(--size-md));
-			@include py(var(--size-sm));
-			@include text-sm;
-			@include rounded-md;
-			@include border;
-			@include bg-secondary;
-			width: 16rem;
-			@include transition;
-
-			&:focus {
-				@include bg-primary;
-				border-color: hsl(var(--color-primary));
-				width: 20rem;
-			}
-		}
-
-		.search-icon {
-			@include absolute;
-			left: var(--size-sm-up);
-			top: 50%;
-			transform: translateY(-50%);
-			@include text-muted;
-			@include size(1rem);
-		}
-	}
-
-	.header-actions {
+.header-actions {
 		@include flex;
 		@include items-center;
 		@include gap(var(--size-sm));
 
 		button {
-			@include px(var(--size-sm-up));
-			@include py(var(--size-xs));
-			@include text-xs;
-			@include font-medium;
-			@include rounded-sm;
-			@include text-secondary;
-			@include border;
-			@include transition-colors;
-
-			&:hover {
-				@include bg-secondary;
-			}
+			// Re-bind the bordered variant back over .app-header's ghost default.
+			--btn-border: var(--color-border);
+			--padding-y: var(--size-xs);
+			--padding-x: var(--size-sm-up);
+			font-size: var(--text-body-sm);
+			font-weight: var(--font-medium);
+			border-radius: var(--radius-sm);
 
 			> span {
 				@include mq-down(sm) {

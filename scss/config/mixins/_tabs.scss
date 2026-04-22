@@ -9,6 +9,23 @@
 @mixin tabs-nav {
 	@include flex;
 	@include border-b;
+
+	[data-ln-tab][data-active] {
+		color: var(--color-accent);
+		border-bottom-color: var(--color-accent);
+		background: none;
+	}
+
+	[data-ln-tab][disabled] {
+		color: var(--color-fg-subtle);
+		@include cursor-not-allowed;
+		@include opacity-50;
+
+		&:hover {
+			background: none;
+			border-bottom-color: transparent;
+		}
+	}
 }
 
 @mixin tabs-tab {
@@ -33,23 +50,6 @@
 	&:active,
 	&:visited {
 		background: none;
-	}
-}
-
-@mixin tabs-tab-active {
-	color: var(--color-accent);
-	border-bottom-color: var(--color-accent);
-	background: none;
-}
-
-@mixin tabs-tab-disabled {
-	color: var(--color-fg-subtle);
-	@include cursor-not-allowed;
-	@include opacity-50;
-
-	&:hover {
-		background: none;
-		border-bottom-color: transparent;
 	}
 }
 
