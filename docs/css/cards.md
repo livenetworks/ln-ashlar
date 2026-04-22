@@ -54,9 +54,9 @@ Composed card with structured regions. Internally calls `@include panel-header` 
 
 **Regions** (all spacing reads from tokens so the density cascade applies automatically):
 
-- `header` — `bg-secondary`, `px(--spacing-md) py(--spacing-sm)`, `border-b`, `transition`, h3 is `text-title-sm font-semibold margin:0`
-- `main` — `p(--spacing-lg)`
-- `footer` — `px(--spacing-md) py(--spacing-sm)`, `border-t`, `flex justify-end`, `gap(--spacing-sm)`
+- `header` — `bg-secondary`, `px(--size-md) py(--size-sm)`, `border-b`, `transition`, h3 is `text-title-sm font-semibold margin:0`
+- `main` — `p(--size-lg)`
+- `footer` — `px(--size-md) py(--size-sm)`, `border-t`, `flex justify-end`, `gap(--size-sm)`
 
 The section-card itself also gets `@include transition` on the root so border/shadow/background changes (density switches, hover states on parent cascades) animate smoothly.
 

@@ -91,7 +91,7 @@ import { dispatch, registerComponent } from '../ln-core';
 		// Viewport bounds
 		const vw = window.innerWidth;
 		const vh = window.innerHeight;
-		const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--spacing-xs')) * 16 || 4;
+		const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size-xs')) * 16 || 4;
 
 		// Vertical: prefer below, flip above if no room
 		let top;

@@ -100,7 +100,7 @@ _teleportBack():
 _positionMenu():
     1. Get trigger's bounding rect
     2. Measure menu dimensions (briefly show if hidden)
-    3. Read --spacing-xs token for gap
+    3. Read --size-xs token for gap
     4. Vertical: prefer below trigger, flip above if no room, fallback to bottom of viewport
     5. Horizontal: prefer right-aligned to trigger, flip left-aligned if no room, fallback to right edge
     6. Apply top/left as fixed coordinates

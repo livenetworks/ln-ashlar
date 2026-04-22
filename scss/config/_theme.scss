@@ -43,6 +43,11 @@
 	--color-bg-primary:   220 16% 13%;
 	--color-bg-secondary: 220 16% 17%;
 
+	// Scrim — keep dark overlay in dark mode (neutral-900 inverts to
+	// near-white, which would produce a LIGHT scrim; explicit override
+	// preserves conventional modal-darkening behavior).
+	--color-scrim: 0 0% 0% / 0.6;
+
 	// `--color-border-light` cascades through neutral-100 (12% in
 	// dark) which collides with bg-primary 13% — invisible edge.
 	// Bump to a visible subtle edge above bg-primary.

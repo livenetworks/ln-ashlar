@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 // ==========================================================================
 // Breakpoints — ln-acme
 // ==========================================================================
@@ -50,3 +52,21 @@ $cq-wide:    1120px;
 	--cq-medium:  #{$cq-medium};
 	--cq-wide:    #{$cq-wide};
 }
+
+// -----------------------------------------------------------------------
+// Unified breakpoint map — resolved by mq-*/cq-* mixins.
+// Keeps both scales looking up the same way; call-site mixin choice
+// (mq vs cq) decides media vs container emission.
+// -----------------------------------------------------------------------
+$breakpoints: (
+	sm:      $bp-sm,
+	md:      $bp-md,
+	lg:      $bp-lg,
+	xl:      $bp-xl,
+	2xl:     $bp-2xl,
+	3xl:     $bp-3xl,
+	narrow:  $cq-narrow,
+	compact: $cq-compact,
+	medium:  $cq-medium,
+	wide:    $cq-wide,
+);

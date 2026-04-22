@@ -1,7 +1,5 @@
-@use 'spacing' as *;
 @use 'display' as *;
 @use 'typography' as *;
-@use 'colors' as *;
 @use 'borders' as *;
 @use 'transitions' as *;
 @use 'interaction' as *;
@@ -16,18 +14,19 @@
 @mixin tabs-tab {
 	all: unset;
 	box-sizing: border-box;
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-sm));
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
 	@include font-medium;
-	@include text-secondary;
+	color: var(--color-fg-muted);
 	@include cursor-pointer;
 	@include transition;
 	border-bottom: 2px solid transparent;
 	margin-bottom: -1px;
 
 	&:hover {
-		color: hsl(var(--color-primary));
+		color: var(--color-accent);
 		background-color: hsl(var(--color-primary) / 0.05);
 		border-bottom-color: hsl(var(--color-primary) / 0.3);
 	}
@@ -40,13 +39,13 @@
 }
 
 @mixin tabs-tab-active {
-	color: hsl(var(--color-primary));
-	border-bottom-color: hsl(var(--color-primary));
+	color: var(--color-accent);
+	border-bottom-color: var(--color-accent);
 	background: none;
 }
 
 @mixin tabs-tab-disabled {
-	@include text-muted;
+	color: var(--color-fg-subtle);
 	@include cursor-not-allowed;
 	@include opacity-50;
 
@@ -57,5 +56,7 @@
 }
 
 @mixin tabs-panel {
-	@include p(var(--spacing-lg));
+	--padding-x: var(--size-lg);
+	--padding-y: var(--size-lg);
+	padding: var(--padding-y) var(--padding-x);
 }

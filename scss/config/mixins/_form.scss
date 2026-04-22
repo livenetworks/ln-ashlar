@@ -1,5 +1,6 @@
 @use 'spacing' as *;
 @use 'display' as *;
+@use 'breakpoints' as *;
 @use 'sizing' as *;
 @use 'typography' as *;
 @use 'colors' as *;
@@ -16,8 +17,9 @@
 	font-size: var(--text-label-md);
 	line-height: var(--lh-label-md);
 	@include font-medium;
-	@include text-primary;
-	@include mb(var(--spacing-xs));
+	color: var(--color-fg);
+	// Structural label-to-input gap (not shell rhythm).
+	margin-bottom: var(--size-xs);
 
 	// Required indicator — red * after label text
 	// Triggered by sibling input[required] via parent :has()
@@ -31,46 +33,84 @@
 }
 
 @mixin form-grid {
+	--gap: var(--size-md);
+	container-type: inline-size;
+	container-name: form-grid;
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
-	@include gap(var(--spacing-md));
+	gap: var(--gap);
 
 	> * { margin: 0; }
 
-	@media (max-width: 767px) {
+	@include cq-down(md, form-grid) {
 		grid-template-columns: repeat(1, minmax(0, 1fr));
 	}
 }
 
 @mixin form-actions {
+	--gap: var(--size-sm-up);
 	@include list-reset;
 	@include flex;
 	@include justify-end;
-	@include gap(var(--spacing-sm-up));
-	@include mt(var(--spacing-lg));
-	@include pt(var(--spacing-md));
+	gap: var(--gap);
+	// Structural margin-top (not shell rhythm).
+	margin-top: var(--size-lg);
+	// Structural padding-top (border-t offset). Kept literal to avoid
+	// cascading --padding-y into nested anchors, which use button-standard
+	// --padding-y from :root.
+	padding-top: var(--size-md);
 	@include border-t;
+
+	a {
+		@include inline-flex;
+		@include items-center;
+		@include justify-center;
+		// Reset parent's --gap re-bind; anchor's icon+text gap is tight.
+		--gap: var(--size-sm);
+		gap: var(--gap);
+		padding: var(--padding-y) var(--padding-x);
+		@include text-sm;
+		@include font-medium;
+		border-radius: var(--radius);
+		white-space: nowrap;
+		border: var(--border-width) solid var(--color-border-strong);
+		background: var(--color-bg);
+		color: var(--color-fg);
+		text-decoration: none;
+		@include transition-colors;
+
+		&:hover {
+			background: var(--color-bg-sunken);
+			color: var(--color-fg);
+			border-color: var(--color-border-strong-hover);
+		}
+
+		&:focus-visible {
+			@include focus-ring;
+		}
+	}
 }
 
 // ─── Focus treatment (shared by form-input and icon-group) ─────
 
 @mixin _form-focus-style {
-	border-color: hsl(var(--color-primary));
+	border-color: var(--color-accent);
 	@include focus-background-shift;
 }
 
 // ─── Text inputs, textareas, selects ────────────────────────────
 
 @mixin form-input {
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
 	@include w-full;
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-sm));
-	font-size: var(--text-body-md);
-	line-height: var(--lh-body-md);
-	@include text-primary;
-	@include bg-primary;
+	padding: var(--padding-y) var(--padding-x);
+	font-size: var(--font-size);
+	line-height: var(--line-height);
+	color: var(--color-fg);
+	background: var(--color-bg);
 	@include border;
-	@include rounded-md;
+	border-radius: var(--radius);
 	@include transition;
 	outline: none;
 
@@ -79,13 +119,13 @@
 	}
 
 	&::placeholder {
-		@include text-muted;
+		color: var(--color-fg-subtle);
 	}
 
 	&:disabled {
 		@include opacity-50;
 		@include cursor-not-allowed;
-		@include bg-secondary;
+		background: var(--color-bg-sunken);
 	}
 
 	// Hide native UA clear button on <input type="search"> — we never use it;
@@ -108,7 +148,8 @@
 	--select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
 	background-image: var(--select-arrow);
 	background-repeat: no-repeat;
-	background-position: right var(--spacing-sm-up) center;
+	// Intrinsic arrow offset (not shell padding rhythm).
+	background-position: right var(--size-sm-up) center;
 	padding-right: 2.5rem;
 }
 
@@ -132,19 +173,20 @@
 // needed on the <label>.
 
 @mixin form-input-icon-group {
+	--padding-x: var(--size-sm);
+	--padding-y: var(--size-xs);
 	@include inline-flex;
 	@include items-center;
-	@include gap(var(--spacing-sm));
+	gap: var(--gap);
 	// Compact padding: tight vertical to keep total height close to a
 	// regular form-input despite the icon's fixed size.
-	@include px(var(--spacing-sm));
-	@include py(var(--spacing-xs));
-	@include bg-primary;
+	padding: var(--padding-y) var(--padding-x);
+	background: var(--color-bg);
 	@include border;
-	@include rounded-md;
+	border-radius: var(--radius);
 	@include transition;
-	font-size: var(--text-body-md);
-	line-height: var(--lh-body-md);
+	font-size: var(--font-size);
+	line-height: var(--line-height);
 	// Wrapping-label reset: undo form-label defaults that would otherwise leak.
 	margin-bottom: 0;
 
@@ -154,12 +196,12 @@
 
 	> .ln-icon {
 		@include flex-shrink-0;
-		color: hsl(var(--color-text-muted));
+		color: var(--color-fg-subtle);
 	}
 
 	> input {
 		// Strip container chrome inherited from form-input — label owns it now.
-		@include p(0);
+		padding: 0;
 		@include border-none;
 		background: transparent;
 		outline: none;
@@ -192,14 +234,16 @@
 	}
 
 	> [data-ln-search-clear] {
+		--padding-x: var(--size-2xs);
+		--padding-y: var(--size-2xs);
 		@include flex-shrink-0;
-		@include p(var(--spacing-2xs));
+		padding: var(--padding-y) var(--padding-x);
 		@include cursor-pointer;
-		color: hsl(var(--color-text-muted));
+		color: var(--color-fg-subtle);
 		@include transition-colors;
 
 		&:hover {
-			@include text-primary;
+			color: var(--color-fg);
 		}
 	}
 }
@@ -211,15 +255,16 @@
 	@include size(1.25rem);
 	padding: 0;
 	@include flex-shrink-0;
+	// Non-standard 1.5px stroke — optical weight at small checkbox size.
 	border: 1.5px solid hsl(var(--color-border));
-	@include bg-primary;
+	background: var(--color-bg);
 	@include cursor-pointer;
 	@include transition;
 	vertical-align: middle;
 
 	&:checked {
-		background-color: hsl(var(--color-primary));
-		border-color: hsl(var(--color-primary));
+		background-color: var(--color-accent);
+		border-color: var(--color-accent);
 		// Inline SVG: native <input type="checkbox"> cannot contain child elements,
 		// so a data URI is the only way to embed a checkmark here.
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
@@ -249,32 +294,33 @@
 
 	&:checked {
 		background-image: none;
-		box-shadow: inset 0 0 0 3px hsl(var(--color-bg-primary));
+		box-shadow: inset 0 0 0 3px var(--color-bg);
 	}
 }
 
 // ─── Pill outline — base label (structure + visible border) ────
 
 @mixin pill-outline {
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
 	@include flex;
 	@include items-center;
-	@include gap(var(--spacing-sm));
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-sm));
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
 	@include cursor-pointer;
 	@include transition;
 	@include text-sm;
 	@include font-medium;
-	@include mb(0);
-	@include rounded-md;
+	margin-bottom: 0;
+	border-radius: var(--radius);
 	border: var(--border-width) solid hsl(var(--color-border));
 
 	&:has(> input:checked) {
-		border-color: hsl(var(--color-primary));
+		border-color: var(--color-accent);
 	}
 
 	&:hover:not(:has(> input:checked)) {
-		border-color: hsl(var(--color-primary));
+		border-color: var(--color-accent);
 	}
 }
 
@@ -282,14 +328,14 @@
 
 @mixin pill {
 	@include pill-outline;
-	background-color: hsl(var(--color-bg-secondary));
+	background-color: var(--color-bg-sunken);
 	border-color: transparent;
 
 	> input { display: none; }
 
 	&:has(> input:checked) {
-		background-color: hsl(var(--color-primary));
-		color: hsl(var(--color-white));
+		background-color: var(--color-accent);
+		color: var(--color-accent-fg);
 	}
 
 	&:hover:not(:has(> input:checked)) {
@@ -297,7 +343,7 @@
 	}
 
 	&:hover:has(> input:checked) {
-		background-color: hsl(var(--color-primary-hover));
+		background-color: var(--color-accent-hover);
 	}
 }
 
@@ -310,15 +356,15 @@
 	}
 
 	li:first-child label {
-		border-radius: var(--radius-md) 0 0 var(--radius-md);
+		border-radius: var(--radius) 0 0 var(--radius);
 	}
 
 	li:last-child label {
-		border-radius: 0 var(--radius-md) var(--radius-md) 0;
+		border-radius: 0 var(--radius) var(--radius) 0;
 	}
 
 	li:only-child label {
-		@include rounded-md;
+		border-radius: var(--radius);
 	}
 }
 
@@ -348,6 +394,8 @@
 }
 
 // ─── Validation states ─────────────────────────────────────────
+// Status colors (error/success) stay raw — no logical --color-status
+// token in scope (see parent plan §6.2).
 
 @mixin form-validate-invalid {
 	border-color: hsl(var(--color-error));
@@ -369,7 +417,8 @@
 
 @mixin form-validate-errors {
 	@include list-reset;
-	@include mt(var(--spacing-xs));
+	// Structural error-list margin (not shell rhythm).
+	margin-top: var(--size-xs);
 	font-size: var(--text-caption);
 	line-height: var(--lh-caption);
 	color: hsl(var(--color-error));

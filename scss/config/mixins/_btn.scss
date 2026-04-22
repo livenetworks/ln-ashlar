@@ -19,28 +19,27 @@
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	@include gap(var(--spacing-sm));
-	@include px(var(--spacing-md-up));
-	@include py(var(--spacing-sm));
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
 	@include font-medium;
-	@include rounded-md;
+	border-radius: var(--radius);
 	white-space: nowrap;
 
-	background-color: hsl(var(--color-primary));
-	color: hsl(var(--color-white));
-	border: var(--border-width) solid hsl(var(--color-primary));
+	background-color: var(--color-accent);
+	color: var(--color-accent-fg);
+	border: var(--border-width) solid var(--color-accent);
 
 	&:hover:not(:disabled) {
-		background-color: hsl(var(--color-primary-hover));
-		color: hsl(var(--color-white));
-		border-color: hsl(var(--color-primary-hover));
+		background-color: var(--color-accent-hover);
+		color: var(--color-accent-fg);
+		border-color: var(--color-accent-hover);
 	}
 
 	&:active:not(:disabled) {
-		background-color: hsl(var(--color-primary-hover));
-		color: hsl(var(--color-white));
-		border-color: hsl(var(--color-primary-hover));
+		background-color: var(--color-accent-hover);
+		color: var(--color-accent-fg);
+		border-color: var(--color-accent-hover);
 	}
 
 	&:focus-visible {
@@ -54,58 +53,45 @@
 }
 
 @mixin btn-sm {
-	@include px(var(--spacing-md-down));
-	@include py(var(--spacing-xs-up));
+	--padding-x: var(--size-sm-up);
+	--gap:       var(--size-xs);
+	padding: var(--padding-y) var(--padding-x);
+	gap: var(--gap);
 	@include text-xs;
-	@include gap(var(--spacing-xs));
 }
 
 @mixin btn-lg {
-	@include px(var(--spacing-lg-up));
-	@include py(var(--spacing-md-down));
+	--padding-x: var(--size-lg);
+	--padding-y: var(--size-md);
+	--gap:       var(--size-sm-up);
+	padding: var(--padding-y) var(--padding-x);
+	gap: var(--gap);
 	@include text-base;
-	@include gap(var(--spacing-sm-up));
 }
 
 @mixin btn-group {
+	--gap: var(--size-xs);
 	@include inline-flex;
 	@include items-center;
-	@include gap(var(--spacing-xs));
+	gap: var(--gap);
 	@include list-reset;
 
 	button {
 		border: none;
 		background: transparent;
-		color: hsl(var(--color-text-muted));
+		color: var(--color-fg-subtle);
 
 		&:hover:not(:disabled) {
-			background: hsl(var(--color-bg-secondary));
-			color: hsl(var(--color-text-primary));
+			background: var(--color-bg-sunken);
+			color: var(--color-fg);
 		}
 	}
 }
 
 @mixin close-button {
-	border: none;
-	background: transparent;
-	padding: 0;
-	@include size(1.5rem);
-	@include flex-center;
+	--padding-x: var(--size-xs-up);
+	padding: var(--padding-y) var(--padding-x);
+	aspect-ratio: 1;
 	@include rounded-sm;
 	@include transition-fast;
-	color: hsl(var(--color-text-muted));
-
-	&:hover:not(:disabled) {
-		color: hsl(var(--color-error));
-		background: hsl(var(--color-bg-secondary));
-	}
-
-	&:active:not(:disabled) {
-		color: hsl(var(--color-error-hover));
-		@include bg-body;
-	}
-
-	&:focus-visible {
-		@include focus-ring;
-	}
 }

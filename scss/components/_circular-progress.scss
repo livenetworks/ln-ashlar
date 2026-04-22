@@ -16,14 +16,14 @@
 	@include circular-progress-xl;
 }
 
-[data-ln-circular-progress].green {
-	@include circular-progress-green;
+[data-ln-circular-progress].success {
+	@include circular-progress-success;
 }
 
-[data-ln-circular-progress].red {
-	@include circular-progress-red;
+[data-ln-circular-progress].error {
+	@include circular-progress-error;
 }
 
-[data-ln-circular-progress].yellow {
-	@include circular-progress-yellow;
+[data-ln-circular-progress].warning {
+	@include circular-progress-warning;
 }

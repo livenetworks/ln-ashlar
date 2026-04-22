@@ -1,70 +1,74 @@
 @use 'spacing' as *;
 @use 'display' as *;
+@use 'breakpoints' as *;
 
 // Layout — grid, stack, container
 
 @mixin grid {
 	display: grid;
-	@include gap(var(--spacing-lg));
+	--gap: var(--size-lg);
+	gap: var(--gap);
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 
-	@media (min-width: 768px) {
+	@include mq-up(md) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	@media (min-width: 1024px) {
+	@include mq-up(lg) {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 }
 
 @mixin grid-2 {
 	display: grid;
-	@include gap(var(--spacing-lg));
+	--gap: var(--size-lg);
+	gap: var(--gap);
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 
-	@media (min-width: 768px) {
+	@include mq-up(md) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
 @mixin grid-4 {
 	display: grid;
-	@include gap(var(--spacing-lg));
+	--gap: var(--size-lg);
+	gap: var(--gap);
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 
-	@media (min-width: 768px) {
+	@include mq-up(md) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	@media (min-width: 1024px) {
+	@include mq-up(lg) {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 }
 
-@mixin stack($gap: var(--spacing-md)) {
+@mixin stack($gap: var(--size-md)) {
 	@include flex-col;
 	@include gap($gap);
 }
 
-@mixin row($gap: var(--spacing-sm)) {
+@mixin row($gap: var(--size-sm)) {
 	@include flex-row;
 	@include items-center;
 	@include gap($gap);
 }
 
-@mixin row-between($gap: var(--spacing-sm)) {
+@mixin row-between($gap: var(--size-sm)) {
 	@include row($gap);
 	@include justify-between;
 }
 
-@mixin row-center($gap: var(--spacing-sm)) {
+@mixin row-center($gap: var(--size-sm)) {
 	@include row($gap);
 	@include justify-center;
 }
 
 // Container Queries
 // Parent: @include container(name)
-// Child:  @container name (min-width: 580px) { ... }
+// Child:  @include cq-up(compact, name) { ... }
 //
 // IMPORTANT: Do NOT combine container-type with overflow:hidden on the same element
 //

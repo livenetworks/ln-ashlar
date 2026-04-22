@@ -17,13 +17,13 @@
 		// Trigger — element-level colors, typography, hover
 		> [data-ln-toggle-for] {
 			@include font-medium;
-			@include text-primary;
+			color: var(--color-fg);
 			@include transition;
 
-			&:hover { @include bg-secondary; }
+			&:hover { background: var(--color-bg-sunken); }
 
 			svg.ln-chevron {
-				color: hsl(var(--color-text-muted));
+				color: var(--color-fg-subtle);
 			}
 		}
 	}

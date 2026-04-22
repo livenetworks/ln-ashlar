@@ -5,16 +5,16 @@
 
 	svg.ln-icon,
 	svg.ln-icon--xl {
-		color: hsl(var(--color-neutral-400));
+		color: var(--color-fg-subtle);
 	}
 
 	h3 {
 		@include typography(heading-sm);
-		color: hsl(var(--color-text-primary));
+		color: var(--color-fg);
 	}
 
 	p {
 		@include typography(body-md);
-		color: hsl(var(--color-text-secondary));
+		color: var(--color-fg-muted);
 	}
 }

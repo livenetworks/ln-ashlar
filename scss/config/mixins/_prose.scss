@@ -5,7 +5,7 @@
 
 @mixin prose {
 	max-width: var(--max-w-prose);
-	color: hsl(var(--color-text-primary));
+	color: var(--color-fg);
 
 	> * + * {
 		margin-top: 1em;
@@ -19,7 +19,7 @@
 	p { @include typography(body-md); }
 
 	a {
-		color: hsl(var(--color-primary));
+		color: var(--color-accent);
 		text-decoration: underline;
 		text-decoration-thickness: 1px;
 		text-underline-offset: 2px;
@@ -44,25 +44,25 @@
 	ol { list-style: decimal; }
 
 	blockquote {
-		border-left: 3px solid hsl(var(--color-primary));
-		padding-left: var(--spacing-md);
-		color: hsl(var(--color-text-secondary));
+		border-left: 3px solid var(--color-accent);
+		padding-left: var(--size-md);
+		color: var(--color-fg-muted);
 		font-style: italic;
 	}
 
 	code {
-		background: hsl(var(--color-bg-secondary));
-		@include px(var(--spacing-xs-up));
-		@include py(var(--spacing-2xs));
+		background: var(--color-bg-sunken);
+		padding-inline: var(--size-xs-up);
+		padding-block: var(--size-2xs);
 		@include rounded-sm;
 		font-family: var(--font-mono);
 		@include typography(body-sm);
-		color: hsl(var(--color-primary));
+		color: var(--color-accent);
 	}
 
 	pre {
-		background: hsl(var(--color-bg-secondary));
-		@include p(var(--spacing-md));
+		background: var(--color-bg-sunken);
+		padding: var(--size-md);
 		@include rounded-md;
 		overflow-x: auto;
 
@@ -84,7 +84,7 @@
 
 		figcaption {
 			@include typography(caption);
-			color: hsl(var(--color-text-muted));
+			color: var(--color-fg-subtle);
 			text-align: center;
 			margin-top: 0.5em;
 		}
@@ -96,14 +96,14 @@
 		margin-top: 1.5em;
 
 		th, td {
-			padding: var(--spacing-sm) var(--spacing-sm-up);
+			padding: var(--size-sm) var(--size-sm-up);
 			border-bottom: 1px solid hsl(var(--color-border));
 			text-align: left;
 		}
 
 		th {
 			@include typography(label-md);
-			color: hsl(var(--color-text-primary));
+			color: var(--color-fg);
 			font-weight: var(--font-semibold);
 		}
 	}

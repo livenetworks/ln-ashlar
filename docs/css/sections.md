@@ -32,9 +32,9 @@ Card-like section with background, border, shadow, and transitions.
 
 **Region styling** (all values read from spacing tokens so the density cascade applies automatically):
 
-- `header` — `bg-secondary`, `px(--spacing-md) py(--spacing-sm)`, `border-b`, `transition`, h3 is `text-title-sm font-semibold margin:0`
-- `main` — `p(--spacing-lg)`
-- `footer` — `px(--spacing-md) py(--spacing-sm)`, `border-t`, `flex justify-end`, `gap(--spacing-sm)`
+- `header` — `bg-secondary`, `px(--size-md) py(--size-sm)`, `border-b`, `transition`, h3 is `text-title-sm font-semibold margin:0`
+- `main` — `p(--size-lg)`
+- `footer` — `px(--size-md) py(--size-sm)`, `border-t`, `flex justify-end`, `gap(--size-sm)`
 
 ### Auto-flush for tables
 

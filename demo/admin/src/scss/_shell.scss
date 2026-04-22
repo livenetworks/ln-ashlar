@@ -52,13 +52,13 @@
 		[data-ln-toggle-action="close"] {
 			@include close-button;
 			@include absolute;
-			top: 0.5rem;
-			right: 0.5rem;
+			top: var(--size-sm);
+			right: var(--size-sm);
 		}
 
 		.sidebar-search {
 			@include w-full;
-			@include mt(var(--spacing-xs));
+			@include mt(var(--size-xs));
 		}
 	}
 }
@@ -76,20 +76,20 @@
 
 .content {
 	@include flex-1;
-	@include p(1rem);
+	@include p(var(--size-md));
 	@include overflow-auto;
 	max-width: 80rem;
 	@include mx(auto);
 	@include w-full;
-	@include stack(1rem);
+	@include stack(var(--size-md));
 }
 
 .footer {
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include px(1.5rem);
-	@include py(0.75rem);
+	@include px(var(--size-lg));
+	@include py(var(--size-sm-up));
 	@include border-t;
 	@include bg-primary;
 	@include text-sm;
@@ -101,7 +101,7 @@
 	}
 }
 
-@media (max-width: 768px) {
+@include mq-down(md) {
 	.sidebar {
 		@include z-overlay;
 	}
@@ -121,8 +121,8 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include px(1.5rem);
-	@include py(0.75rem);
+	@include px(var(--size-lg));
+	@include py(var(--size-sm-up));
 	@include bg-primary;
 	@include border-b;
 	@include shadow-b;
@@ -147,7 +147,7 @@
 	.header-left {
 		@include flex;
 		@include items-center;
-		@include gap(0.75rem);
+		@include gap(var(--size-sm-up));
 
 		.menu-toggle {
 			@include flex-center;
@@ -172,7 +172,7 @@
 	.header-right {
 		@include flex;
 		@include items-center;
-		@include gap(1rem);
+		@include gap(var(--size-md));
 	}
 
 	.header-search {
@@ -180,8 +180,8 @@
 
 		input {
 			@include pl(2.5rem);
-			@include pr(1rem);
-			@include py(0.5rem);
+			@include pr(var(--size-md));
+			@include py(var(--size-sm));
 			@include text-sm;
 			@include rounded-md;
 			@include border;
@@ -198,7 +198,7 @@
 
 		.search-icon {
 			@include absolute;
-			left: 0.75rem;
+			left: var(--size-sm-up);
 			top: 50%;
 			transform: translateY(-50%);
 			@include text-muted;
@@ -209,11 +209,11 @@
 	.header-actions {
 		@include flex;
 		@include items-center;
-		@include gap(0.5rem);
+		@include gap(var(--size-sm));
 
 		button {
-			@include px(0.75rem);
-			@include py(0.25rem);
+			@include px(var(--size-sm-up));
+			@include py(var(--size-xs));
 			@include text-xs;
 			@include font-medium;
 			@include rounded-sm;

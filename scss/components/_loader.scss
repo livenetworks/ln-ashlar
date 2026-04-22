@@ -2,5 +2,5 @@
 
 .loader {
 	@include loader;
-	@include my(var(--spacing-3xl));
+	margin-block: var(--size-3xl);
 }

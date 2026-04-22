@@ -27,7 +27,7 @@
 @mixin ln-table {
 	@include border;
 	@include rounded-lg;
-	@include bg-primary;
+	background: var(--color-bg);
 	overflow: clip;
 
 	// Table overrides inside component
@@ -59,7 +59,7 @@
 	table td:first-child {
 		background: transparent;
 		font-weight: normal;
-		@include text-secondary;
+		color: var(--color-fg-muted);
 	}
 }
 
@@ -81,10 +81,10 @@
 
 @mixin ln-table-count {
 	@include text-sm;
-	@include text-secondary;
+	color: var(--color-fg-muted);
 
 	strong {
-		@include text-primary;
+		color: var(--color-fg);
 		@include font-semibold;
 	}
 }
@@ -109,13 +109,14 @@
 	th [data-ln-dropdown] > button {
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-xs));
+		--gap: var(--size-xs);
+		gap: var(--gap);
 		background: none;
 		border: none;
 		color: inherit;
 		font: inherit;
 		@include cursor-pointer;
-		@include p(0);
+		padding: 0;
 
 		.ln-icon-filter {
 			opacity: 0.4;
@@ -134,24 +135,25 @@
 		@include flex;
 		@include items-center;
 		@include text-left;
-		@include px(var(--spacing-sm));
-		@include py(var(--spacing-xs));
+		--padding-x: var(--size-sm);
+		--padding-y: var(--size-xs);
+		padding: var(--padding-y) var(--padding-x);
 		@include text-sm;
 		@include font-normal;
 		background: none;
 		border: none;
 		border-radius: 0;
-		color: hsl(var(--color-text-primary));
+		color: var(--color-fg);
 		@include cursor-pointer;
 		@include transition-fast;
 
 		&:hover {
-			@include bg-secondary;
+			background: var(--color-bg-sunken);
 		}
 
 		&[data-active] {
 			background-color: hsl(var(--color-primary) / 0.1);
-			color: hsl(var(--color-primary));
+			color: var(--color-accent);
 			@include font-medium;
 		}
 	}
@@ -166,7 +168,7 @@
 
 		[data-ln-sort-icon] {
 			@include size(0.875rem);
-			@include ml(var(--spacing-xs));
+			margin-left: var(--size-xs);
 			vertical-align: middle;
 			opacity: 0.4;
 			@include motion-safe {
@@ -190,16 +192,17 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-sm));
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-t;
-	@include bg-secondary;
+	background: var(--color-bg-sunken);
 	border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 	@include text-sm;
-	@include text-secondary;
+	color: var(--color-fg-muted);
 
 	strong {
-		@include text-primary;
+		color: var(--color-fg);
 		@include font-semibold;
 	}
 }
@@ -208,7 +211,7 @@
 
 @mixin ln-table-timing {
 	@include text-xs;
-	@include text-muted;
+	color: var(--color-fg-subtle);
 	font-family: var(--font-mono);
 }
 
@@ -218,9 +221,11 @@
 	@include flex;
 	@include flex-wrap;
 	@include items-center;
-	@include gap(var(--spacing-lg));
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-sm));
+	--gap: var(--size-lg);
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-b-light;
 
 	fieldset {
@@ -229,14 +234,15 @@
 		margin: 0;
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-xs-up));
+		--gap: var(--size-xs-up);
+		gap: var(--gap);
 
 		legend {
 			@include text-xs;
 			@include font-medium;
-			@include text-muted;
+			color: var(--color-fg-subtle);
 			float: left;
-			@include mr(var(--spacing-sm));
+			margin-right: var(--size-sm);
 			line-height: 1.75rem;
 		}
 
@@ -246,24 +252,25 @@
 		}
 
 		li button {
-			@include px(var(--spacing-sm));
-			@include py(var(--spacing-2xs));
+			--padding-x: var(--size-sm);
+			--padding-y: var(--size-2xs);
+			padding: var(--padding-y) var(--padding-x);
 			@include text-xs;
 			@include font-medium;
 			@include rounded-full;
 			@include transition-fast;
 			background: transparent;
-			color: hsl(var(--color-text-secondary));
+			color: var(--color-fg-muted);
 			border: none;
 
 			&:hover {
-				background-color: hsl(var(--color-bg-secondary));
-				color: hsl(var(--color-text-primary));
+				background-color: var(--color-bg-sunken);
+				color: var(--color-fg);
 			}
 
 			&[data-active] {
 				background-color: hsl(var(--color-primary) / 0.1);
-				color: hsl(var(--color-primary));
+				color: var(--color-accent);
 			}
 		}
 	}
@@ -275,9 +282,11 @@
 	@include flex;
 	@include items-center;
 	@include flex-wrap;
-	@include gap(var(--spacing-xs-up));
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-xs-up));
+	--gap: var(--size-xs-up);
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-xs-up);
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-b-light;
 	background-color: hsl(var(--color-primary) / 0.03);
 }
@@ -285,9 +294,11 @@
 @mixin ln-table-chip {
 	@include inline-flex;
 	@include items-center;
-	@include gap(var(--spacing-xs));
-	@include px(var(--spacing-sm));
-	@include py(var(--spacing-2xs));
+	--gap: var(--size-xs);
+	--padding-x: var(--size-sm);
+	--padding-y: var(--size-2xs);
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
 	@include rounded-full;
 	@include text-xs;
 	@include tinted-surface(0.1);
@@ -299,13 +310,13 @@
 	button {
 		background: none;
 		border: none;
-		color: hsl(var(--color-primary));
+		color: var(--color-accent);
 		@include cursor-pointer;
 		@include text-sm;
 		@include font-bold;
 		line-height: 1;
 		padding: 0;
-		@include ml(var(--spacing-2xs));
+		margin-left: var(--size-2xs);
 
 		&:hover {
 			color: hsl(var(--color-error));
@@ -316,11 +327,11 @@
 @mixin ln-table-clear-all {
 	@include text-xs;
 	@include font-medium;
-	color: hsl(var(--color-text-muted));
+	color: var(--color-fg-subtle);
 	background: none;
 	border: none;
 	@include cursor-pointer;
-	@include ml(var(--spacing-xs));
+	margin-left: var(--size-xs);
 
 	&:hover {
 		color: hsl(var(--color-error));
@@ -330,26 +341,27 @@
 // ─── Empty state ──────────────────────────────────────────
 
 @mixin ln-table-empty-state {
-	@include py(var(--spacing-2xl));
+	--padding-y: var(--size-2xl);
+	padding-block: var(--padding-y);
 	@include text-center;
 
 	svg.ln-icon {
 		@include block;
 		@include mx(auto);
-		@include mb(var(--spacing-md));
+		margin-bottom: var(--size-md);
 		opacity: 0.3;
 	}
 
 	h3 {
 		@include text-lg;
 		@include font-semibold;
-		@include text-primary;
-		margin: 0 0 var(--spacing-sm);
+		color: var(--color-fg);
+		margin: 0 0 var(--size-sm);
 	}
 
 	p {
 		@include text-sm;
-		@include text-secondary;
-		margin: 0 0 var(--spacing-lg);
+		color: var(--color-fg-muted);
+		margin: 0 0 var(--size-lg);
 	}
 }

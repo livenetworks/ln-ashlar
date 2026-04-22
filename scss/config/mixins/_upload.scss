@@ -21,50 +21,52 @@
 }
 
 @mixin upload-icon {
-	margin-right: var(--spacing-sm);
+	margin-right: var(--size-sm);
 	flex-shrink: 0;
 }
 
 @mixin upload-zone {
+	--padding-x: var(--size-lg);
+	--padding-y: var(--size-lg);
 	border: 2px dashed hsl(var(--color-border));
-	border-radius: var(--radius-md);
-	padding: var(--spacing-lg);
+	border-radius: var(--radius);
+	padding: var(--padding-y) var(--padding-x);
 	text-align: center;
 	@include cursor-pointer;
 	@include motion-safe {
-		transition: border-color var(--transition-base),
-		            background-color var(--transition-base);
+		transition: border-color var(--transition),
+		            background-color var(--transition);
 	}
-	background-color: hsl(var(--color-bg-secondary));
+	background-color: var(--color-bg-sunken);
 
 	&:hover {
-		border-color: hsl(var(--color-primary));
-		background-color: hsl(var(--color-primary-lighter));
+		border-color: var(--color-accent);
+		background-color: var(--color-accent-tint);
 	}
 
 	span {
 		display: block;
-		color: hsl(var(--color-text-secondary));
-		font-size: 0.875rem;
+		color: var(--color-fg-muted);
+		font-size: var(--text-sm);
 	}
 
 	small {
 		display: block;
-		color: hsl(var(--color-text-muted));
-		font-size: 0.75rem;
-		margin-top: var(--spacing-xs);
+		color: var(--color-fg-subtle);
+		font-size: var(--text-xs);
+		margin-top: var(--size-xs);
 	}
 }
 
 @mixin upload-zone-dragover {
-	border-color: hsl(var(--color-primary));
-	background-color: hsl(var(--color-primary-light));
+	border-color: var(--color-accent);
+	background-color: var(--color-accent-tint-strong);
 	border-style: solid;
 }
 
 @mixin upload-list {
 	@include list-reset;
-	margin-top: var(--spacing-sm);
+	margin-top: var(--size-sm);
 
 	&:empty {
 		display: none;
@@ -72,16 +74,18 @@
 }
 
 @mixin upload-item {
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
 	@include relative;
 	@include flex;
 	@include items-center;
 	flex-wrap: wrap;
-	padding: var(--spacing-sm) var(--spacing-md);
-	background-color: hsl(var(--color-bg-secondary));
+	padding: var(--padding-y) var(--padding-x);
+	background-color: var(--color-bg-sunken);
 	border: var(--border-width) solid hsl(var(--color-border));
 	border-radius: var(--radius-sm);
-	@include mb(var(--spacing-sm));
-	font-size: 0.875rem;
+	margin-bottom: var(--size-sm);
+	font-size: var(--text-sm);
 	@include overflow-hidden;
 
 	&:last-child {
@@ -92,19 +96,19 @@
 @mixin upload-name {
 	flex: 1;
 	@include truncate;
-	color: hsl(var(--color-text-primary));
+	color: var(--color-fg);
 }
 
 @mixin upload-size {
-	color: hsl(var(--color-text-muted));
-	font-size: 0.75rem;
-	@include ml(var(--spacing-md));
+	color: var(--color-fg-subtle);
+	font-size: var(--text-xs);
+	margin-left: var(--size-md);
 	flex-shrink: 0;
 }
 
 @mixin upload-remove {
 	@include close-button;
-	@include ml(var(--spacing-sm));
+	margin-left: var(--size-sm);
 }
 
 @mixin upload-progress {
@@ -119,7 +123,7 @@
 @mixin upload-progress-bar {
 	height: 100%;
 	width: 0;
-	background-color: hsl(var(--color-primary));
+	background-color: var(--color-accent);
 	@include motion-safe {
 		transition: width 0.15s ease-out;
 	}
@@ -140,10 +144,10 @@
 	display: inline-block;
 	width: 1.25rem;
 	height: 1.25rem;
-	margin-right: var(--spacing-sm);
+	margin-right: var(--size-sm);
 	border: 2px solid hsl(var(--color-border));
 	border-radius: 50%;
-	border-top-color: hsl(var(--color-primary));
+	border-top-color: var(--color-accent);
 	background-image: none !important;
 	@include motion-safe {
 		animation: ln-upload-spin 0.6s linear infinite;

@@ -39,7 +39,7 @@ Menu is positioned relative to the trigger element:
 
 - **Vertical**: prefer below trigger; flip above if insufficient viewport space
 - **Horizontal**: prefer right-aligned to trigger; flip left-aligned if no room
-- **Gap**: uses `--spacing-xs` token between trigger and menu
+- **Gap**: uses `--size-xs` token between trigger and menu
 
 ### Scroll → reposition
 

@@ -3,22 +3,24 @@
 @use 'typography' as *;
 @use 'colors' as *;
 @use 'borders' as *;
-@use 'shadows' as *;
 @use 'transitions' as *;
 
 @mixin stat-card {
+	--gap: var(--size-xs);
+	--padding-x: var(--size-lg);
+	--padding-y: var(--size-lg);
 	@include flex-col;
-	@include gap(var(--spacing-xs));
-	@include p(var(--spacing-lg));
-	background: hsl(var(--color-bg-primary));
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
+	background: var(--color-bg);
 	@include rounded-lg;
-	@include shadow-sm;
-	border: 1px solid hsl(var(--color-border));
+	box-shadow: var(--shadow-default);
+	border: var(--border-width) solid hsl(var(--color-border));
 	@include transition;
 
 	> [data-ln-stat-label] {
 		@include typography(label-md);
-		color: hsl(var(--color-text-secondary));
+		color: var(--color-fg-muted);
 		text-transform: uppercase;
 		letter-spacing: var(--tracking-wide);
 		margin: 0;
@@ -28,16 +30,16 @@
 		@include typography(heading-lg);
 		font-weight: var(--font-bold);
 		font-variant-numeric: tabular-nums;
-		color: hsl(var(--color-text-primary));
+		color: var(--color-fg);
 		margin: 0;
 	}
 
 	> [data-ln-stat-trend] {
 		@include flex-row;
 		@include items-center;
-		@include gap(var(--spacing-xs));
+		gap: var(--gap);
 		@include typography(body-sm);
-		margin: var(--spacing-xs) 0 0;
+		margin: var(--size-xs) 0 0;
 
 		svg.ln-icon {
 			width: 1rem;
@@ -51,7 +53,7 @@
 			color: hsl(var(--color-error));
 		}
 		&[data-ln-stat-trend="neutral"] {
-			color: hsl(var(--color-text-muted));
+			color: var(--color-fg-subtle);
 		}
 	}
 }

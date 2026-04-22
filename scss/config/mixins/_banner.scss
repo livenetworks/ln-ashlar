@@ -55,14 +55,16 @@
 		display: flex;      // was: grid (dialog uses grid-template-rows for header/main/footer)
 
 		// Banner layout
+		--gap: var(--size-md);
+		--padding-y: var(--size-sm);
+		--padding-x: var(--size-lg);
 		@include items-center;
-		@include gap(var(--spacing-md));
-		@include py(var(--spacing-sm));
-		@include px(var(--spacing-lg));
+		gap: var(--gap);
+		padding: var(--padding-y) var(--padding-x);
 		border-bottom: var(--border-width) solid hsl(var(--color-primary) / 0.2);
 
 		.ln-icon {
-			color: hsl(var(--color-primary));
+			color: var(--color-accent);
 			@include flex-shrink-0;
 		}
 

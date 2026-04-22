@@ -1,0 +1,62 @@
+@use 'sass:map';
+@use '../breakpoints' as bp;
+
+// ==========================================================================
+// Breakpoint mixins — resolve against $breakpoints map in
+// scss/config/_breakpoints.scss. Never hardcode px inside @media or
+// @container; always use these.
+//
+// Usage:
+//   @include mq-up(md)                     → @media (min-width: 768px)
+//   @include mq-down(lg)                   → @media (max-width: 1023px)
+//   @include cq-up(medium, page-header)    → @container page-header (min-width: 880px)
+//   @include cq-down(compact)              → anonymous @container, max-width: 579px
+//
+// Unknown $name raises @error.
+// ==========================================================================
+
+@function _resolve($name) {
+	$value: map.get(bp.$breakpoints, $name);
+	@if $value == null {
+		@error "Unknown breakpoint name: #{$name}. Valid keys: #{map.keys(bp.$breakpoints)}";
+	}
+	@return $value;
+}
+
+@mixin mq-up($name) {
+	@media (min-width: _resolve($name)) {
+		@content;
+	}
+}
+
+@mixin mq-down($name) {
+	@media (max-width: _resolve($name) - 1px) {
+		@content;
+	}
+}
+
+@mixin cq-up($name, $container: null) {
+	$min: _resolve($name);
+	@if $container {
+		@container #{$container} (min-width: #{$min}) {
+			@content;
+		}
+	} @else {
+		@container (min-width: #{$min}) {
+			@content;
+		}
+	}
+}
+
+@mixin cq-down($name, $container: null) {
+	$max: _resolve($name);
+	@if $container {
+		@container #{$container} (max-width: #{$max - 1px}) {
+			@content;
+		}
+	} @else {
+		@container (max-width: #{$max - 1px}) {
+			@content;
+		}
+	}
+}

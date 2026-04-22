@@ -4,19 +4,24 @@
 @use 'colors' as *;
 @use 'borders' as *;
 @use 'breadcrumbs' as *;
+@use 'breakpoints' as *;
 
 @mixin page-header {
+	--gap: var(--size-md);
+	--padding-y: var(--size-lg);
+	container-type: inline-size;
+	container-name: page-header;
 	display: grid;
 	grid-template-areas:
 		'breadcrumbs'
 		'title'
 		'actions';
-	@include gap(var(--spacing-md));
-	@include pb(var(--spacing-lg));
-	@include mb(var(--spacing-lg));
-	border-bottom: 1px solid hsl(var(--color-border));
+	gap: var(--gap);
+	padding-bottom: var(--padding-y);
+	margin-bottom: var(--size-lg);
+	border-bottom: var(--border-width) solid hsl(var(--color-border));
 
-	@media (min-width: 880px) {
+	@include cq-up(medium, page-header) {
 		grid-template-areas:
 			'breadcrumbs breadcrumbs'
 			'title       actions';
@@ -42,18 +47,19 @@
 
 		p {
 			@include typography(body-md);
-			color: hsl(var(--color-text-secondary));
-			margin: var(--spacing-xs) 0 0;
+			color: var(--color-fg-muted);
+			margin: var(--size-xs) 0 0;
 		}
 	}
 
 	> div:has(> button),
 	> div:has(> a) {
+		--gap: var(--size-sm);
 		grid-area: actions;
 		@include flex-row;
-		@include gap(var(--spacing-sm));
+		gap: var(--gap);
 
-		@media (max-width: 879px) {
+		@include cq-down(medium, page-header) {
 			justify-content: flex-start;
 		}
 	}

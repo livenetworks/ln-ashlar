@@ -11,7 +11,7 @@
 //   [data-ln-circular-progress] { @include circular-progress; }
 //
 // Size variants: circular-progress-sm, circular-progress-lg, circular-progress-xl
-// Color variants: circular-progress-green, circular-progress-red, circular-progress-yellow
+// Color variants: circular-progress-success, circular-progress-warning, circular-progress-error
 
 @mixin circular-progress {
 	@include relative;
@@ -28,7 +28,7 @@
 	}
 
 	.ln-circular-progress__fill {
-		stroke: hsl(var(--color-primary));
+		stroke: var(--color-accent);
 		@include motion-safe {
 			transition: stroke-dashoffset var(--transition-base);
 		}
@@ -38,7 +38,7 @@
 		@include absolute;
 		@include text-xs;
 		@include font-semibold;
-		@include text-primary;
+		color: var(--color-fg);
 	}
 }
 
@@ -69,19 +69,19 @@
 }
 
 // ─── Color variants ────────────────────────────────────
-@mixin circular-progress-green {
+@mixin circular-progress-success {
 	.ln-circular-progress__fill {
 		stroke: hsl(var(--color-success));
 	}
 }
 
-@mixin circular-progress-red {
+@mixin circular-progress-error {
 	.ln-circular-progress__fill {
 		stroke: hsl(var(--color-error));
 	}
 }
 
-@mixin circular-progress-yellow {
+@mixin circular-progress-warning {
 	.ln-circular-progress__fill {
 		stroke: hsl(var(--color-warning));
 	}

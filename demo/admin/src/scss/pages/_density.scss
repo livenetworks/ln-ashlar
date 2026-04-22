@@ -6,7 +6,7 @@
 // density toggles. Fixed rems, no density tokens inside.
 
 .density-demo-controls {
-	@include mb(var(--spacing-lg));
+	@include mb(var(--size-lg));
 	@include p(1.5rem);
 	@include border;
 	@include rounded-md;

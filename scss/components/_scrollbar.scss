@@ -6,7 +6,7 @@
 }
 
 ::-webkit-scrollbar-track {
-	background: hsl(var(--color-bg-secondary));
+	background: var(--color-bg-sunken);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -16,7 +16,7 @@
 	background-clip: content-box;
 
 	&:hover {
-		background-color: hsl(var(--color-text-muted));
+		background-color: var(--color-fg-subtle);
 	}
 }
 
@@ -26,5 +26,5 @@
 
 * {
 	scrollbar-width: thin;
-	scrollbar-color: hsl(var(--color-border)) hsl(var(--color-bg-secondary));
+	scrollbar-color: hsl(var(--color-border)) var(--color-bg-sunken);
 }

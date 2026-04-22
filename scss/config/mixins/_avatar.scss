@@ -19,14 +19,14 @@
 
 // ─── Shared ring ───────────────────────────────────────
 @mixin _avatar-ring {
-	box-shadow: 0 0 0 2px hsl(var(--color-bg-primary)),
+	box-shadow: 0 0 0 2px var(--color-bg),
 	            0 0 0 3px hsl(var(--color-border));
 }
 
 // ─── Shared image / initials base ──────────────────────
 @mixin _avatar-media {
 	@include size(2.5rem);
-	@include rounded-md;
+	border-radius: var(--radius);
 	@include flex-shrink-0;
 	@include _avatar-ring;
 }
@@ -35,9 +35,12 @@
 @mixin avatar {
 	@include inline-flex;
 	@include items-center;
-	@include gap(var(--spacing-sm-up));
-	@include p(var(--spacing-xs-up));
-	@include rounded-md;
+	--gap: var(--size-sm-up);
+	--padding-x: var(--size-xs-up);
+	--padding-y: var(--size-xs-up);
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
+	border-radius: var(--radius);
 	@include cursor-pointer;
 	@include transition-fast;
 	@include select-none;
@@ -48,7 +51,7 @@
 	font: inherit;
 
 	&:hover {
-		@include bg-secondary;
+		background: var(--color-bg-sunken);
 	}
 
 	&:focus-visible {
@@ -68,7 +71,7 @@
 		@include text-sm;
 		@include font-semibold;
 		background-color: hsl(var(--color-primary) / 0.15);
-		color: hsl(var(--color-primary));
+		color: var(--color-accent);
 		padding: 0;
 	}
 
@@ -77,14 +80,14 @@
 		@include flex-col;
 		@include text-sm;
 		@include font-medium;
-		@include text-primary;
+		color: var(--color-fg);
 		@include text-left;
 		line-height: 1.3;
 
 		small {
 			@include text-xs;
 			@include font-normal;
-			@include text-muted;
+			color: var(--color-fg-subtle);
 		}
 	}
 }

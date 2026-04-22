@@ -15,9 +15,9 @@ A visual progress indicator. Reactive: automatically updates when `data-ln-progr
 
 | Class | Color |
 |-------|-------|
-| `.green` | Success (green) |
-| `.red` | Error (red) |
-| `.yellow` | Warning (yellow) |
+| `.success` | Success (green) |
+| `.error` | Error (red) |
+| `.warning` | Warning (yellow) |
 | (no class) | Default background |
 
 ## Behavior
@@ -34,26 +34,26 @@ A visual progress indicator. Reactive: automatically updates when `data-ln-progr
 ```html
 <!-- Single progress bar -->
 <div data-ln-progress role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-    <div data-ln-progress="75" class="green"></div>
+    <div data-ln-progress="75" class="success"></div>
 </div>
 
 <!-- Custom maximum value -->
 <div data-ln-progress role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="50">
-    <div data-ln-progress="30" data-ln-progress-max="50" class="green"></div>
+    <div data-ln-progress="30" data-ln-progress-max="50" class="success"></div>
 </div>
 
 <!-- Stacked (multiple segments) — each bar is a % of 100 -->
 <div data-ln-progress role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
-    <div data-ln-progress="40" class="green"></div>
-    <div data-ln-progress="20" class="yellow"></div>
-    <div data-ln-progress="10" class="red"></div>
+    <div data-ln-progress="40" class="success"></div>
+    <div data-ln-progress="20" class="warning"></div>
+    <div data-ln-progress="10" class="error"></div>
 </div>
 
 <!-- Stacked with shared max — fills 100% proportionally -->
 <div data-ln-progress data-ln-progress-max="15">
-    <div data-ln-progress="7" class="green"></div>
-    <div data-ln-progress="3" class="yellow"></div>
-    <div data-ln-progress="5" class="red"></div>
+    <div data-ln-progress="7" class="success"></div>
+    <div data-ln-progress="3" class="warning"></div>
+    <div data-ln-progress="5" class="error"></div>
 </div>
 ```
 

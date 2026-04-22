@@ -365,28 +365,38 @@ Projects can override at any level:
 
 ---
 
-## Spacing Tokens — Single Source of Truth
+## Size Tokens — Single Source of Truth
 
-All spacing values (padding, margin, gap, inset, positional offsets
-used for layout) reference `--spacing-*` CSS variables defined in
+All spacing values (padding, margin, gap, inset, positional offsets used
+for layout) reference `--size-*` CSS variables defined in
 `scss/config/_tokens.scss`. No raw `rem` / `px` literals in spacing
 contexts. No per-component token families (no `--btn-py`, `--card-gap`,
 no private mixin-scoped `--_*`).
 
 **Why.** Change one token, every consumer reacts. Raw literals are
-silent divergence — updating `--spacing-md` does not cascade into
-`1rem` written directly into a mixin. Per-component tokens
-(`--btn-py`, `--modal-pad`) defeat the same purpose in reverse:
-touching one component forces touching its private tokens, not the
-scale.
+silent divergence — updating `--size-md` does not cascade into `1rem`
+written directly into a mixin. Per-component tokens (`--btn-py`,
+`--modal-pad`) defeat the same purpose in reverse: touching one
+component forces touching its private tokens, not the scale.
 
-**When you need a new value — extend, don't silo.** Extend
-`--spacing-*`. Never create a component-scoped token. Use the t-shirt
+**Mixins read logical tokens, not scale tokens.** Mixin bodies use
+`--padding-x`, `--padding-y`, `--gap`, `--radius`, `--color-bg`,
+`--color-fg`, `--color-border`, `--color-accent`, `--shadow-default`,
+etc. — the semantic public contract. The `--size-*` scale is back-end
+plumbing read only by `:root`, `.density-compact`, and region scopes
+that re-bind the logical tokens. See
+`.claude/plans/refactor-logical-tokens-architecture.md` for the full
+contract.
+
+**When you need a new spacing value — extend, don't silo.** Extend
+`--size-*`. Never create a component-scoped token. Use the t-shirt
 naming convention with `-up` / `-down` suffixes for intermediate steps:
 
-`2xs < xs < xs-up < sm < sm-up < md-down < md < md-up < lg < lg-up < xl < 2xl < 3xl < 4xl < 5xl`.
+`0 < 2xs < xs < xs-up < sm < sm-up < md < md-up < lg < xl < 2xl < 3xl`
 
-**Monotonic ordering in compact mode.** Every addition to `--spacing-*`
+(12 canonical steps.)
+
+**Monotonic ordering in compact mode.** Every addition to `--size-*`
 MUST be mirrored in `scss/config/_density.scss` under `.density-compact`
 with a value that preserves ascending order across the whole scale. A
 compact value that inverts ordering (e.g. `md-up=20` while `lg=16`)
@@ -394,7 +404,7 @@ breaks any component that uses both.
 
 **Exceptions (allowed literals).**
 
-- `0` as unitless zero.
+- `0` as unitless zero (or use `var(--size-0)` for clarity).
 - `1px` / `2px` borders go through `--border-width` /
   `--border-width-strong`.
 - Intrinsic values: `100%`, `100vh`, `auto`, fractions (`1fr`, `50%`),
@@ -405,6 +415,187 @@ breaks any component that uses both.
   loader width/height. These are component design, not spacing rhythm.
 - Font sizes / line heights / letter spacing use their own scales
   (`--text-*`, `--lh-*`, `--tracking-*`).
+
+**Logical color + shadow tokens (Phase 5 additions).** Beyond
+`--color-bg`, `--color-fg`, `--color-border`, `--color-accent`, the
+library also exposes:
+
+- `--color-border-strong` / `-hover` — stronger neutral edge for button
+  borders and outlined controls.
+- `--color-bg-recessed` — sunken surface for code blocks, progress
+  tracks, chip fills.
+- `--color-scrim` — modal overlay.
+- `--color-accent-tint` / `-strong` — subtle accent washes (upload
+  hover, active nav background).
+- `--shadow-default` (resting), `--shadow-raised` (floating),
+  `--shadow-overlay` (modal).
+
+Every mixin read must go through the logical layer, not a scale token
+directly. Consumers override logical tokens at `:root` or at a region
+scope.
+
+---
+
+## Logical Token Surface — Component Contract
+
+Mixin bodies read ONLY the logical tokens listed below. The
+back-end scales (`--size-*`, `--color-neutral-*`, `--color-primary*`,
+`--color-bg-*`, `--shadow-xs`…`2xl`, `--text-body-*`, `--lh-body-*`)
+are plumbing — they live in `_tokens.scss` and are re-bound by
+density / theme / region scopes. Mixins never touch them directly.
+
+### The logical tokens (public contract)
+
+Structure and rhythm:
+
+- `--padding-x`, `--padding-y` — default horizontal / vertical chrome
+- `--gap` — flex/grid gap between siblings
+- `--radius` — default corner radius
+- `--border-width` — default border stroke (also
+  `--border-width-strong`)
+
+Surface colors:
+
+- `--color-bg` — element surface
+- `--color-bg-raised` — elevated surface (dropdowns, popovers,
+  floating panels)
+- `--color-bg-sunken` — recessed surface (body behind cards, `thead`)
+- `--color-bg-recessed` — sunken fill (code blocks, progress tracks,
+  chip fills)
+- `--color-fg` — primary text
+- `--color-fg-muted` — secondary text
+- `--color-fg-subtle` — disabled / helper text
+- `--color-border-subtle` — dividers, floating-panel edges
+- `--color-border-strong`, `--color-border-strong-hover` — button
+  borders, outlined controls
+- `--color-scrim` — modal overlay
+
+Accent:
+
+- `--color-accent`, `--color-accent-hover`, `--color-accent-fg`
+- `--color-accent-tint`, `--color-accent-tint-strong` — subtle accent
+  washes (upload hover, active nav background)
+
+Typography:
+
+- `--font-size`, `--line-height`
+
+Motion and depth:
+
+- `--shadow-default` (resting: cards, tables, stat-cards)
+- `--shadow-raised` (floating: tooltips, dropdowns, popovers)
+- `--shadow-overlay` (modal)
+- `--transition`
+
+### Rule — mixins read the logical layer
+
+```scss
+// RIGHT — mixin body reads logical tokens
+@mixin card {
+	padding: var(--padding-y) var(--padding-x);
+	background: var(--color-bg);
+	color: var(--color-fg);
+	border: var(--border-width) solid var(--color-border-subtle);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-default);
+	transition: var(--transition);
+}
+
+// WRONG — mixin body reaches through to the scale
+@mixin card {
+	padding: var(--size-xs-up) var(--size-md-up);                // scale
+	background: hsl(var(--color-bg-primary));                     // scale
+	border: 1px solid hsl(var(--color-neutral-200));              // scale + literal
+	box-shadow: var(--shadow-sm);                                  // scale
+}
+```
+
+### Rule — context overrides re-bind the logical token
+
+A region that needs tighter vertical rhythm re-binds
+`--padding-y` on the region root; every descendant that reads
+`--padding-y` (inputs, buttons, cells, panel headers) adapts via
+the cascade:
+
+```scss
+.dense-region {
+	--padding-y:  var(--size-xs);
+	--gap:        var(--size-xs-up);
+	--font-size:  var(--text-body-sm);
+}
+```
+
+Same mechanism as `.density-compact`, theme overrides, and status
+re-binds (`.alert-warn { --color-accent: hsl(var(--color-warning)); }`).
+
+### Rule — `:root` wires logical → scale
+
+The `:root` block in `_tokens.scss` is the only place outside
+density/theme scopes that wires a logical token to a back-end
+scale token. That wiring lives at the bottom of `_tokens.scss`
+under `// Logical tokens — the public contract mixins read`.
+Editing the wiring changes every mixin's default reading in one
+edit.
+
+### What NOT to do
+
+- Do not read `--size-*` inside a mixin body. Read `--padding-*`,
+  `--gap`, or `--radius` instead.
+- Do not read `--color-neutral-*` inside a mixin body. Read
+  `--color-bg`, `--color-fg`, `--color-border-*`, or
+  `--color-bg-recessed` instead.
+- Do not read `--color-primary*` inside a mixin body. Read
+  `--color-accent`, `--color-accent-hover`, `--color-accent-fg`,
+  or `--color-accent-tint*` instead.
+- Do not read `--shadow-xs…2xl` inside a mixin body. Read
+  `--shadow-default`, `--shadow-raised`, or `--shadow-overlay`.
+- Do not introduce a per-component logical token
+  (`--card-padding-y`, `--btn-gap`). Re-bind the shared logical
+  token on the component's root selector instead.
+
+---
+
+## Breakpoint Tokens — Use the Mixin, Not the Literal
+
+All responsive breakpoints resolve through `@mixin mq-up / mq-down /
+cq-up / cq-down` (defined in `scss/config/mixins/_breakpoints.scss`).
+Never hardcode px values inside `@media` or `@container` in library
+code.
+
+```scss
+// RIGHT — token-driven
+@include mq-up(md)                        { ... }
+@include cq-up(medium, page-header)       { ... }
+@include cq-down(compact)                 { ... }   // anonymous container
+
+// WRONG — orphan literal
+@media (min-width: 768px)                 { ... }
+@container page-header (min-width: 880px) { ... }
+```
+
+**Media vs container — when to use which:**
+
+- **`mq-*` (viewport)** — app-shell patterns only: `.container`
+  utility, sidebar-drawer, page columns, modal backdrop sizing.
+  Anything directly coupled to viewport geometry.
+- **`cq-*` (container)** — reusable components: grids, form-grid,
+  page-header, cards, any mixin a project might drop into a
+  sidebar / main / card / modal.
+
+**Container registration is the mixin's job.** A mixin that uses
+`cq-*` internally must declare `container-type: inline-size` (and
+`container-name: <name>` if not anonymous) on the selector it styles
+— the consumer should not have to register containers manually.
+
+**Exceptions (allowed raw `@media`).**
+
+- `prefers-color-scheme` in `_theme.scss` — OS-level, not a breakpoint.
+- `prefers-reduced-motion` in `_motion.scss` / `_translations.scss`
+  — OS-level, not a breakpoint.
+
+**When you need a new breakpoint — extend the map, don't silo.**
+Add to `$breakpoints` in `scss/config/_breakpoints.scss`. Never
+hardcode a value in a component.
 
 ---
 

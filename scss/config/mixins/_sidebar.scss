@@ -7,7 +7,7 @@
 // ─── Sidebar ───────────────────────────────────────────────────────
 // Structural shell for a sidebar layout. Provides flex column, right
 // border, background, and consistent horizontal padding via
-// --sidebar-px. Projects add width, position, animation.
+// --padding-x. Projects add width, position, animation.
 //
 // Expected HTML:
 //   <aside>
@@ -18,39 +18,47 @@
 //
 // Usage:
 //   #my-sidebar { @include sidebar; width: 16rem; @include fixed; }
+//
+// Project override — same-rhythm adjustment:
+//   #my-sidebar { @include sidebar; --padding-x: var(--size-lg); }
 
 @mixin sidebar {
+	// Sidebar-wide horizontal rhythm. All direct children inherit this.
+	--padding-x: var(--size-md);
 	@include flex-col;
-	@include bg-primary;
+	background: var(--color-bg);
 	@include border-r;
 	overflow: hidden;
-	--sidebar-px: var(--spacing-md);
 
 	> * {
-		@include px(var(--sidebar-px));
+		padding-inline: var(--padding-x);
 	}
 
 	> header {
+		--gap: var(--size-sm-up);
+		--padding-y: var(--size-sm-up);
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-sm-up));
-		@include py(var(--spacing-sm));
+		gap: var(--gap);
+		padding-block: var(--padding-y);
 		@include border-b;
 		@include shadow-b;
 	}
 
 	> main {
+		--padding-y: var(--size-xs);
 		@include flex-1;
 		overflow-y: auto;
-		@include py(var(--spacing-xs));
+		padding-block: var(--padding-y);
 	}
 
 	> footer {
+		--padding-y: var(--size-sm-up);
 		@include border-t;
-		@include py(var(--spacing-sm));
+		padding-block: var(--padding-y);
 
 		small {
-			@include text-muted;
+			color: var(--color-fg-subtle);
 		}
 	}
 }

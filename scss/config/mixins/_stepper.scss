@@ -1,12 +1,10 @@
-@use 'spacing' as *;
 @use 'display' as *;
 @use 'typography' as *;
-@use 'colors' as *;
 
 @mixin stepper {
 	display: flex;
 	@include list-reset;
-	@include gap(0);
+	gap: 0;
 	counter-reset: ln-step;
 
 	> li {
@@ -15,7 +13,7 @@
 		position: relative;
 		@include flex-col;
 		@include items-center;
-		@include gap(var(--spacing-sm));
+		gap: var(--gap);
 		min-width: 0;
 
 		// Numbered circle bullet
@@ -25,9 +23,8 @@
 			width: 2rem;
 			height: 2rem;
 			border-radius: 50%;
-			// Direct neutral: inactive step circle -- no semantic "step-inactive" token
-			background: hsl(var(--color-neutral-200));
-			color: hsl(var(--color-text-secondary));
+			background: hsl(var(--color-border));
+			color: var(--color-fg-muted);
 			@include typography(label-md);
 			font-weight: var(--font-semibold);
 			z-index: 1;
@@ -37,42 +34,41 @@
 		&:not(:last-child)::after {
 			content: '';
 			position: absolute;
-			top: var(--spacing-md);
-			left: calc(50% + var(--spacing-md));
-			right: calc(-50% + var(--spacing-md));
+			top: var(--size-md);
+			left: calc(50% + var(--size-md));
+			right: calc(-50% + var(--size-md));
 			height: 2px;
-			// Direct neutral: connector line between steps -- no semantic "connector" token
-			background: hsl(var(--color-neutral-200));
+			background: hsl(var(--color-border));
 		}
 
 		> [data-ln-step-label] {
 			@include typography(label-md);
-			color: hsl(var(--color-text-secondary));
+			color: var(--color-fg-muted);
 			text-align: center;
 		}
 
 		// States
 		&[data-ln-step="complete"] {
 			&::before {
-				background: hsl(var(--color-primary));
-				color: hsl(var(--color-white));
+				background: var(--color-accent);
+				color: var(--color-accent-fg);
 			}
 			&::after {
-				background: hsl(var(--color-primary));
+				background: var(--color-accent);
 			}
 			> [data-ln-step-label] {
-				color: hsl(var(--color-text-primary));
+				color: var(--color-fg);
 			}
 		}
 
 		&[data-ln-step="current"] {
 			&::before {
-				background: hsl(var(--color-primary));
-				color: hsl(var(--color-white));
+				background: var(--color-accent);
+				color: var(--color-accent-fg);
 				box-shadow: 0 0 0 4px hsl(var(--color-primary) / 0.2);
 			}
 			> [data-ln-step-label] {
-				color: hsl(var(--color-text-primary));
+				color: var(--color-fg);
 				font-weight: var(--font-semibold);
 			}
 		}

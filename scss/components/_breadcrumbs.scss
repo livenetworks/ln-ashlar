@@ -10,21 +10,21 @@
 
 	> ol {
 		> li + li::before {
-			color: hsl(var(--color-text-muted));
+			color: var(--color-fg-subtle);
 		}
 
 		a {
-			color: hsl(var(--color-text-secondary));
+			color: var(--color-fg-muted);
 			text-decoration: none;
 			@include transition-colors;
 
 			&:hover {
-				color: hsl(var(--color-primary));
+				color: var(--color-accent);
 			}
 		}
 
 		[aria-current="page"] {
-			color: hsl(var(--color-text-primary));
+			color: var(--color-fg);
 			@include font-medium;
 		}
 	}

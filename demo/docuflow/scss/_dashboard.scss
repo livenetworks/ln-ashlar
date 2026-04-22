@@ -15,13 +15,13 @@
 		@include p(0);
 		@include m(0);
 		@include flex-col;
-		@include gap(var(--spacing-sm));
+		@include gap(var(--size-sm));
 	}
 
 	li {
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-sm));
+		@include gap(var(--size-sm));
 		@include text-sm;
 		color: hsl(var(--color-text-secondary));
 		line-height: 1.5;
@@ -35,27 +35,27 @@
 		@include p(0);
 		@include m(0);
 		@include flex-col;
-		@include gap(var(--spacing-md));
+		@include gap(var(--size-md));
 	}
 
 	li {
 		@include flex;
 		@include items-start;
-		@include gap(var(--spacing-sm));
+		@include gap(var(--size-sm));
 	}
 
 	img {
 		@include rounded-full;
 		@include size(1.75rem);
 		@include flex-shrink-0;
-		@include mt(var(--spacing-xs));
+		@include mt(var(--size-xs));
 	}
 
 	p {
 		@include text-sm;
 		color: hsl(var(--color-text-secondary));
 		@include m(0);
-		@include mb(var(--spacing-xs));
+		@include mb(var(--size-xs));
 		line-height: 1.5;
 
 		a {
@@ -68,7 +68,7 @@
 	time {
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-xs));
+		@include gap(var(--size-xs));
 		@include text-xs;
 		color: hsl(var(--color-text-muted));
 	}
@@ -86,8 +86,8 @@
 
 	li {
 		&.divider {
-			@include mt(var(--spacing-sm));
-			@include pt(var(--spacing-sm));
+			@include mt(var(--size-sm));
+			@include pt(var(--size-sm));
 			border-top: 1px solid hsl(var(--color-border));
 		}
 	}
@@ -95,9 +95,9 @@
 	a {
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-sm));
-		@include px(var(--spacing-md));
-		@include py(var(--spacing-sm));
+		@include gap(var(--size-sm));
+		@include px(var(--size-md));
+		@include py(var(--size-sm));
 		@include text-sm;
 		@include rounded-md;
 		@include transition-fast;
@@ -142,7 +142,7 @@
 		@include flex;
 		@include items-center;
 		@include justify-between;
-		@include mb(var(--spacing-lg));
+		@include mb(var(--size-lg));
 
 		h1 {
 			@include text-2xl;
@@ -163,7 +163,7 @@
 		> ul {
 			display: grid;
 			grid-template-columns: 1fr;
-			@include gap(var(--spacing-xl));
+			@include gap(var(--size-xl));
 			list-style: none;
 			@include p(0);
 			@include m(0);
@@ -215,8 +215,8 @@
 		.folder-info {
 			@include flex-1;
 			@include flex-col;
-			@include p(var(--spacing-lg));
-			@include gap(var(--spacing-xs));
+			@include p(var(--size-lg));
+			@include gap(var(--size-xs));
 
 			h3 {
 				@include text-base;
@@ -255,7 +255,7 @@
 		> header {
 			@include flex-col;
 			@include items-start;
-			@include gap(var(--spacing-md));
+			@include gap(var(--size-md));
 
 			nav { @include w-full; }
 			nav a { @include w-full; @include text-center; }
@@ -279,8 +279,8 @@
 	@include m(0);
 	@include flex;
 	@include flex-wrap;
-	@include gap(var(--spacing-sm));
-	@include mb(var(--spacing-lg));
+	@include gap(var(--size-sm));
+	@include mb(var(--size-lg));
 }
 
 .ln-tag {
@@ -296,7 +296,7 @@
 
 	// Icon
 	&::before {
-		@include ml(var(--spacing-xs));
+		@include ml(var(--size-xs));
 		@include mr(2px);
 		width: 0.875rem;
 		height: 0.875rem;
@@ -306,7 +306,7 @@
 	// The 'clause', 'type', etc. label
 	small {
 		background-color: hsl(var(--color-bg-secondary));
-		@include px(var(--spacing-xs));
+		@include px(var(--size-xs));
 		@include py(2px);
 		@include font-medium;
 		color: hsl(var(--color-text-muted));
@@ -316,7 +316,7 @@
 
 	// The value
 	strong {
-		@include px(var(--spacing-xs));
+		@include px(var(--size-xs));
 		@include py(2px);
 		@include font-medium;
 		color: hsl(var(--color-text-secondary));

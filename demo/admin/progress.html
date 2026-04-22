@@ -167,9 +167,9 @@
 							<table>
 								<thead><tr><th>Class</th><th>Color</th><th>Usage</th></tr></thead>
 								<tbody>
-									<tr><td><code>.green</code></td><td>Success (green)</td><td>&lt;div data-ln-progress="80" class="green"&gt;</td></tr>
-									<tr><td><code>.yellow</code></td><td>Warning (yellow)</td><td>&lt;div data-ln-progress="50" class="yellow"&gt;</td></tr>
-									<tr><td><code>.red</code></td><td>Error (red)</td><td>&lt;div data-ln-progress="20" class="red"&gt;</td></tr>
+									<tr><td><code>.success</code></td><td>Success</td><td>&lt;div data-ln-progress="80" class="success"&gt;</td></tr>
+									<tr><td><code>.warning</code></td><td>Warning</td><td>&lt;div data-ln-progress="50" class="warning"&gt;</td></tr>
+									<tr><td><code>.error</code></td><td>Error</td><td>&lt;div data-ln-progress="20" class="error"&gt;</td></tr>
 									<tr><td>(no class)</td><td>Default primary</td><td>&lt;div data-ln-progress="60"&gt;</td></tr>
 								</tbody>
 							</table>
@@ -184,19 +184,19 @@
 								<li>
 									<h4>Success (80%)</h4>
 									<div data-ln-progress>
-										<div data-ln-progress="80" class="green"></div>
+										<div data-ln-progress="80" class="success"></div>
 									</div>
 								</li>
 								<li>
 									<h4>Warning (50%)</h4>
 									<div data-ln-progress>
-										<div data-ln-progress="50" class="yellow"></div>
+										<div data-ln-progress="50" class="warning"></div>
 									</div>
 								</li>
 								<li>
 									<h4>Error (25%)</h4>
 									<div data-ln-progress>
-										<div data-ln-progress="25" class="red"></div>
+										<div data-ln-progress="25" class="error"></div>
 									</div>
 								</li>
 								<li>
@@ -217,13 +217,13 @@
 								<li>
 									<h4>Storage: 7.5 GB of 10 GB</h4>
 									<div data-ln-progress>
-										<div data-ln-progress="7.5" data-ln-progress-max="10" class="yellow"></div>
+										<div data-ln-progress="7.5" data-ln-progress-max="10" class="warning"></div>
 									</div>
 								</li>
 								<li>
 									<h4>Backup: 45 of 50 items</h4>
 									<div data-ln-progress>
-										<div data-ln-progress="45" data-ln-progress-max="50" class="green"></div>
+										<div data-ln-progress="45" data-ln-progress-max="50" class="success"></div>
 									</div>
 								</li>
 							</ul>
@@ -238,25 +238,25 @@
 								<li>
 									<h4>Resources (%) — CPU, RAM, Disk</h4>
 									<div data-ln-progress>
-										<div data-ln-progress="40" class="green"></div>
-										<div data-ln-progress="30" class="yellow"></div>
-										<div data-ln-progress="30" class="red"></div>
+										<div data-ln-progress="40" class="success"></div>
+										<div data-ln-progress="30" class="warning"></div>
+										<div data-ln-progress="30" class="error"></div>
 									</div>
 								</li>
 								<li>
 									<h4>Tasks — 4 done, 2 in progress, 1 pending (max=7, filled)</h4>
 									<div data-ln-progress data-ln-progress-max="7">
-										<div data-ln-progress="4" class="green"></div>
-										<div data-ln-progress="2" class="yellow"></div>
-										<div data-ln-progress="1" class="red"></div>
+										<div data-ln-progress="4" class="success"></div>
+										<div data-ln-progress="2" class="warning"></div>
+										<div data-ln-progress="1" class="error"></div>
 									</div>
 								</li>
 								<li>
 									<h4>Tasks — without max (7% filled)</h4>
 									<div data-ln-progress>
-										<div data-ln-progress="4" class="green"></div>
-										<div data-ln-progress="2" class="yellow"></div>
-										<div data-ln-progress="1" class="red"></div>
+										<div data-ln-progress="4" class="success"></div>
+										<div data-ln-progress="2" class="warning"></div>
+										<div data-ln-progress="1" class="error"></div>
 									</div>
 								</li>
 							</ul>
@@ -271,7 +271,7 @@
 								<li>
 									<h4>Click to change value:</h4>
 									<div id="react-progress" data-ln-progress>
-										<div id="react-bar" data-ln-progress="0" class="green"></div>
+										<div id="react-bar" data-ln-progress="0" class="success"></div>
 									</div>
 									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '25')" class="btn btn-sm">25%</button>
 									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '50')" class="btn btn-sm">50%</button>
@@ -288,7 +288,7 @@
 						<main>
 							<pre><code>&lt;!-- Simple progress bar --&gt;
 &lt;div data-ln-progress&gt;
-    &lt;div data-ln-progress="75" class="green"&gt;&lt;/div&gt;
+    &lt;div data-ln-progress="75" class="success"&gt;&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;!-- Custom maximum value --&gt;
@@ -298,16 +298,16 @@
 
 &lt;!-- Stacked (multiple bars) --&gt;
 &lt;div data-ln-progress&gt;
-    &lt;div data-ln-progress="40" class="green"&gt;&lt;/div&gt;
-    &lt;div data-ln-progress="35" class="yellow"&gt;&lt;/div&gt;
-    &lt;div data-ln-progress="25" class="red"&gt;&lt;/div&gt;
+    &lt;div data-ln-progress="40" class="success"&gt;&lt;/div&gt;
+    &lt;div data-ln-progress="35" class="warning"&gt;&lt;/div&gt;
+    &lt;div data-ln-progress="25" class="error"&gt;&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;!-- Stacked with shared max — fills 100% proportionally --&gt;
 &lt;div data-ln-progress data-ln-progress-max="15"&gt;
-    &lt;div data-ln-progress="7" class="green"&gt;&lt;/div&gt;
-    &lt;div data-ln-progress="3" class="yellow"&gt;&lt;/div&gt;
-    &lt;div data-ln-progress="5" class="red"&gt;&lt;/div&gt;
+    &lt;div data-ln-progress="7" class="success"&gt;&lt;/div&gt;
+    &lt;div data-ln-progress="3" class="warning"&gt;&lt;/div&gt;
+    &lt;div data-ln-progress="5" class="error"&gt;&lt;/div&gt;
 &lt;/div&gt;</code></pre>
 						</main>
 					</section>

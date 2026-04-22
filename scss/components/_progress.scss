@@ -4,14 +4,14 @@
 	@include progress;
 }
 
-[data-ln-progress].green {
-	@include progress-green;
+[data-ln-progress].success {
+	@include progress-success;
 }
 
-[data-ln-progress].red {
-	@include progress-red;
+[data-ln-progress].error {
+	@include progress-error;
 }
 
-[data-ln-progress].yellow {
-	@include progress-yellow;
+[data-ln-progress].warning {
+	@include progress-warning;
 }

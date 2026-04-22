@@ -29,9 +29,10 @@
 	@include absolute;
 	right: 0;
 	top: 100%;
-	@include mt(var(--spacing-xs));
+	margin-top: var(--size-xs);
 	@include list-reset;
-	@include py(var(--spacing-xs));
+	--padding-y: var(--size-xs);
+	padding-block: var(--padding-y);
 	min-width: 10rem;
 
 	// ─── Menu item resets ──────────────────────────────
@@ -55,27 +56,28 @@
 		@include flex;
 		@include items-center;
 		justify-content: flex-start;
-		@include gap(var(--spacing-sm));
+		gap: var(--gap);
 		@include text-left;
-		@include px(var(--spacing-sm));
-		@include py(var(--spacing-xs));
+		--padding-x: var(--size-sm);
+		--padding-y: var(--size-xs);
+		padding: var(--padding-y) var(--padding-x);
 		@include text-sm;
 		@include cursor-pointer;
 		@include transition-fast;
 		background: none;
 		border: none;
 		border-radius: 0;
-		color: hsl(var(--color-text-primary));
+		color: var(--color-fg);
 		text-decoration: none;
 
 		&:hover:not(:disabled) {
-			@include bg-secondary;
-			color: hsl(var(--color-text-primary));
+			background: var(--color-bg-sunken);
+			color: var(--color-fg);
 		}
 
 		&:active:not(:disabled) {
-			@include bg-secondary;
-			color: hsl(var(--color-text-primary));
+			background: var(--color-bg-sunken);
+			color: var(--color-fg);
 		}
 
 		&:focus {
@@ -86,7 +88,7 @@
 	// ─── Separator ─────────────────────────────────────
 	hr {
 		border: none;
-		border-top: var(--border-width) solid hsl(var(--color-border-light));
-		@include my(var(--spacing-xs));
+		border-top: var(--border-width) solid var(--color-border-subtle);
+		margin-block: var(--size-xs);
 	}
 }

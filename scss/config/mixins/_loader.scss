@@ -6,7 +6,7 @@
 @use 'motion' as *;
 
 @mixin loader {
-	color: hsl(var(--color-primary));
+	color: var(--color-accent);
 	// Spinner is drawn with em-based box-shadow; font-size is the intrinsic
 	// size knob. Callers override per-use (e.g. font-size: 32px) — see
 	// docs/css/loader.md. Page-level margin is a binding concern, not a

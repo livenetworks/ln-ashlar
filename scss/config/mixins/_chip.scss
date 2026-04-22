@@ -8,13 +8,14 @@
 @mixin chip {
 	@include inline-flex;
 	@include items-center;
-	@include gap(var(--spacing-xs));
-	@include px(var(--spacing-sm-up));
-	@include py(var(--spacing-xs));
+	--gap: var(--size-xs);
+	--padding-x: var(--size-sm-up);
+	--padding-y: var(--size-xs);
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
 	@include typography(label-sm);
-	// Direct neutral: --color-bg-secondary (neutral-50) is too light for chip fill
-	background: hsl(var(--color-neutral-100));
-	color: hsl(var(--color-text-primary));
+	background: var(--color-bg-recessed);
+	color: var(--color-fg);
 	@include rounded-full;
 	white-space: nowrap;
 	line-height: 1.4;
@@ -26,12 +27,11 @@
 		width: 1rem;
 		height: 1rem;
 		border-radius: 50%;
-		color: hsl(var(--color-text-secondary));
+		color: var(--color-fg-muted);
 
 		&:hover {
-			// Direct neutral: close-button hover needs one step darker than chip fill
-			background: hsl(var(--color-neutral-200));
-			color: hsl(var(--color-text-primary));
+			background: hsl(var(--color-border));
+			color: var(--color-fg);
 		}
 
 		&:focus-visible {

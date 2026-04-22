@@ -33,13 +33,15 @@
 	}
 
 	a {
+		--gap: var(--size-sm-up);
+		--padding-y: var(--size-sm-up);
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-sm-up));
-		@include py(var(--spacing-sm-up));
+		gap: var(--gap);
+		padding-block: var(--padding-y);
 		font-size: var(--text-body-sm);
 		line-height: var(--lh-body-sm);
-		@include text-secondary;
+		color: var(--color-fg-muted);
 		text-decoration: none;
 	}
 
@@ -54,18 +56,21 @@
 	}
 
 	.nav-section {
-		@include py(var(--spacing-sm));
+		--padding-y: var(--size-sm);
+		padding-block: var(--padding-y);
 		@include text-xs;
 		@include font-medium;
-		@include text-muted;
+		color: var(--color-fg-subtle);
 		@include normal-case;
 		letter-spacing: normal;
-		@include mt(var(--spacing-md));
+		// Structural margin above section header.
+		margin-top: var(--size-md);
 	}
 
 	.nav-divider {
 		@include border-t;
-		@include my(var(--spacing-sm));
+		// Structural block margin around divider.
+		margin-block: var(--size-sm);
 	}
 
 	// Default link style — override by applying a nav-links-* mixin after @include nav
@@ -74,24 +79,15 @@
 
 
 // ─── Nav Link Style Presets ──────────────────────────────────────────────────
-// Each preset fully controls: padding/margin, radius, hover state, active
-// state, and any indicator element.
-//
-// Hover is always softer (lower opacity indicator + lighter bg) than active.
-// No translateY, no scale, no shadow appear — color + indicator only.
 
-
-// ── Private base — shared active/hover state across all nav-links-* presets ─
-// Every preset: hover → primary text; active → primary color + semibold.
-// Indicator-specific styles (bg, border, box-shadow) live in each preset.
 @mixin _nav-link-active {
 	a {
 		&:hover {
-			@include text-primary;
+			color: var(--color-fg);
 		}
 
 		&.active {
-			color: hsl(var(--color-primary));
+			color: var(--color-accent);
 			@include font-semibold;
 		}
 	}
@@ -99,9 +95,7 @@
 
 
 // ── 1. Rounded floating (default) ────────────────────────────────────────────
-// Links float as pills inside the sidebar. Container provides horizontal
-// spacing — links use px() only for pill shape, no mx().
-// Active: primary-tinted bg + primary text. No bar indicator.
+
 @mixin nav-links-rounded {
 	@include _nav-link-active;
 
@@ -109,24 +103,24 @@
 		&::before { display: none; }
 	}
 
-	// Vertical breathing room between floating pills.
-	// Only this preset needs it — flush full-width presets (border-*) deliberately
-	// share edges. Using `li + li` avoids a top margin above the first item and
-	// sidesteps margin-collapse because only one side contributes.
+	// Structural spacing between floating pills.
 	li + li {
-		@include mt(var(--spacing-2xs));
+		margin-top: var(--size-2xs);
 	}
 
 	a {
-		@include px(var(--spacing-sm-up));
-		@include rounded-md;
+		--padding-x: var(--size-sm-up);
+		padding-inline: var(--padding-x);
+		border-radius: var(--radius);
 		transition: background-color 150ms ease, color 150ms ease;
 
 		&:hover {
+			// alpha tint — reads --color-primary triplet (see plan §0.3)
 			background-color: hsl(var(--color-primary) / 0.07);
 		}
 
 		&.active {
+			// brand tint (--color-primary-lighter), not neutral scale
 			background-color: hsl(var(--color-primary-lighter));
 		}
 	}
@@ -134,9 +128,7 @@
 
 
 // ── 2. Left border — instant (inset shadow) ───────────────────────────────────
-// Full-width flush links. box-shadow: inset renders a left border without
-// affecting layout and without pseudo-elements.
-// Hover: thin faint bar (2px, 30% opacity). Active: solid 3px bar.
+
 @mixin nav-links-border-left {
 	@include _nav-link-active;
 
@@ -145,8 +137,9 @@
 	}
 
 	a {
-		@include mx(0);
-		@include px(var(--spacing-md));
+		--padding-x: var(--size-md);
+		margin-inline: 0;
+		padding-inline: var(--padding-x);
 		border-radius: 0;
 		transition: box-shadow 150ms ease, background-color 150ms ease, color 150ms ease;
 
@@ -156,7 +149,7 @@
 		}
 
 		&.active {
-			box-shadow: inset 3px 0 0 hsl(var(--color-primary));
+			box-shadow: inset 3px 0 0 var(--color-accent);
 			background-color: hsl(var(--color-primary) / 0.07);
 		}
 	}
@@ -164,8 +157,7 @@
 
 
 // ── 3. Growing left bar — animated (spring easing) ──────────────────────────
-// li::before bar scales from center. Hover: full height, low opacity (0.4) — no size change.
-// Active: full height, full opacity. Spring cubic-bezier for organic feel.
+
 @mixin nav-links-border-grow {
 	@include _nav-link-active;
 
@@ -179,7 +171,7 @@
 			top: 0;
 			bottom: 0;
 			width: 3px;
-			background-color: hsl(var(--color-primary));
+			background-color: var(--color-accent);
 			border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 			transform: scaleY(0);
 			transform-origin: center;
@@ -202,8 +194,9 @@
 	}
 
 	a {
-		@include mx(0);
-		@include px(var(--spacing-md));
+		--padding-x: var(--size-md);
+		margin-inline: 0;
+		padding-inline: var(--padding-x);
 		border-radius: 0;
 		transition: background-color 150ms ease, color 150ms ease;
 
@@ -219,9 +212,7 @@
 
 
 // ── 4. Top bar — grow from center (horizontal navs) ──────────────────────────
-// For top navigation, tab bars, breadcrumb rows.
-// Top border grows from 50%/50% → full width via left/right transition.
-// Hover: partial (25–75%) + faint. Active: full width, full opacity.
+
 @mixin nav-links-border-top {
 	@include _nav-link-active;
 
@@ -235,7 +226,7 @@
 			left: 50%;
 			right: 50%;
 			height: 2px;
-			background-color: hsl(var(--color-primary));
+			background-color: var(--color-accent);
 			border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 			opacity: 0;
 			@include motion-safe {
@@ -260,8 +251,9 @@
 	}
 
 	a {
-		@include mx(0);
-		@include px(var(--spacing-sm-up));
+		--padding-x: var(--size-sm-up);
+		margin-inline: 0;
+		padding-inline: var(--padding-x);
 		border-radius: 0;
 		transition: color 150ms ease;
 	}

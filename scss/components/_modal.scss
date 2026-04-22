@@ -8,7 +8,7 @@
 	@include modal-panel;
 }
 
-.ln-modal [data-ln-modal-close] {
+.ln-modal > form > header [data-ln-modal-close] {
 	@include close-button;
 }
 

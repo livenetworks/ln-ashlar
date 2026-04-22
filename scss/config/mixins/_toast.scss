@@ -24,8 +24,8 @@
 	@include fixed;
 	@include z-toast;
 	pointer-events: none;
-	right: var(--spacing-lg);
-	bottom: var(--spacing-lg);
+	right: var(--size-lg);
+	bottom: var(--size-lg);
 	display: flex;
 	flex-direction: column-reverse;
 	@include list-reset;
@@ -40,7 +40,7 @@
 	}
 
 	& + & {
-		@include mb(var(--spacing-md));
+		margin-bottom: var(--size-md);
 	}
 }
 
@@ -72,9 +72,10 @@
 	@include flex;
 	align-items: flex-start;
 	@include justify-center;
-	@include pt(var(--spacing-md));
+	--padding-y: var(--size-md);
+	padding-top: var(--padding-y);
 	background: var(--ln-toast-accent, hsl(var(--color-info)));
-	color: hsl(var(--color-white));
+	color: var(--color-accent-fg);
 
 	&::before {
 		width: 2rem;
@@ -84,7 +85,9 @@
 
 @mixin toast-content {
 	@include flex-1;
-	padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-md);
+	padding: var(--padding-y) var(--padding-x) var(--padding-y) var(--size-sm);
 	@include relative;
 }
 
@@ -112,40 +115,41 @@
 	@include flex;
 	align-items: flex-start;
 	@include justify-between;
-	@include gap(var(--spacing-md));
+	--gap: var(--size-md);
+	gap: var(--gap);
 }
 
 @mixin toast-title {
 	@include font-bold;
 	@include text-base;
-	@include text-primary;
+	color: var(--color-fg);
 	line-height: 1.25;
 }
 
 @mixin toast-close {
 	@include close-button;
 	@include absolute;
-	top: var(--spacing-sm);
-	right: var(--spacing-sm);
+	top: var(--size-sm);
+	right: var(--size-sm);
 }
 
 // ─── Body ──────────────────────────────────────────────
 
 @mixin toast-body {
-	@include mt(var(--spacing-sm));
-	font-size: 0.9375rem;
-	@include text-secondary;
+	margin-top: var(--size-sm);
+	font-size: var(--text-base);
+	color: var(--color-fg-muted);
 	line-height: 1.5;
 
 	p { @include m(0); }
 
 	ul {
-		margin: var(--spacing-sm) 0 0 0;
-		padding-left: var(--spacing-md-up);
+		margin: var(--size-sm) 0 0 0;
+		padding-left: var(--size-md-up);
 		@include text-sm;
 	}
 
 	li + li {
-		@include mt(var(--spacing-xs));
+		margin-top: var(--size-xs);
 	}
 }

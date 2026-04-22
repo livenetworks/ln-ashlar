@@ -1343,7 +1343,7 @@ function At(u) {
     b && (this.toggleEl.style.visibility = "hidden", this.toggleEl.style.display = "block");
     const p = this.toggleEl.offsetWidth, o = this.toggleEl.offsetHeight;
     b && (this.toggleEl.style.visibility = "", this.toggleEl.style.display = "");
-    const t = window.innerWidth, n = window.innerHeight, e = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--spacing-xs")) * 16 || 4;
+    const t = window.innerWidth, n = window.innerHeight, e = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--size-xs")) * 16 || 4;
     let r;
     f.bottom + e + o <= n ? r = f.bottom + e : f.top - e - o >= 0 ? r = f.top - e - o : r = Math.max(0, n - o);
     let s;

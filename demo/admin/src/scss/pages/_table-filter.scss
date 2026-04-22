@@ -22,16 +22,16 @@
 	@include popover;
 	> input[data-ln-search] {
 		@include w-full;
-		@include px(var(--spacing-sm));
-		@include py(var(--spacing-xs));
+		@include px(var(--size-sm));
+		@include py(var(--size-xs));
 		@include text-sm;
 		background: none;
 		border: none;
 		@include border-b;
 		border-radius: 0;
 		outline: none;
-		@include mb(var(--spacing-xs));
-		margin-top: calc(var(--spacing-sm) * -1);
+		@include mb(var(--size-xs));
+		margin-top: calc(var(--size-sm) * -1);
 
 		&:focus-visible {
 			@include focus-background-shift;

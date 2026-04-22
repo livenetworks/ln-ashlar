@@ -6,7 +6,7 @@ Circular (ring) progress indicator using SVG. File: `js/ln-circular-progress/ln-
 
 ```html
 <!-- Basic -->
-<div data-ln-circular-progress="75" class="green"></div>
+<div data-ln-circular-progress="75" class="success"></div>
 
 <!-- Custom max -->
 <div data-ln-circular-progress="7" data-ln-circular-progress-max="10"></div>
@@ -16,7 +16,7 @@ Circular (ring) progress indicator using SVG. File: `js/ln-circular-progress/ln-
      data-ln-circular-progress-label="3/5"></div>
 
 <!-- Size + color -->
-<div data-ln-circular-progress="50" class="lg yellow"></div>
+<div data-ln-circular-progress="50" class="lg warning"></div>
 ```
 
 ## Attributes
@@ -35,9 +35,9 @@ Circular (ring) progress indicator using SVG. File: `js/ln-circular-progress/ln-
 
 | Class | Color |
 |-------|-------|
-| `.green` | `--color-success` |
-| `.red` | `--color-error` |
-| `.yellow` | `--color-warning` |
+| `.success` | `--color-success` |
+| `.error` | `--color-error` |
+| `.warning` | `--color-warning` |
 
 ## Events
 

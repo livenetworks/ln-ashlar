@@ -11,17 +11,17 @@
 //
 // HTML:
 //   <div data-ln-progress>
-//       <div data-ln-progress class="green" style="width: 60%"></div>
-//       <div data-ln-progress class="red" style="width: 20%"></div>
+//       <div data-ln-progress class="success" style="width: 60%"></div>
+//       <div data-ln-progress class="error" style="width: 20%"></div>
 //   </div>
 //
-// Color variants: .green, .red, .yellow override background-color.
+// Color variants: .success, .warning, .error override background-color.
 
 @mixin progress {
-	height: var(--spacing-xs);
+	height: var(--size-xs);
 	@include w-full;
 	@include rounded-full;
-	background-color: hsl(var(--color-bg-body));
+	background-color: var(--color-bg-recessed);
 	overflow: hidden;
 	@include flex;
 
@@ -41,14 +41,14 @@
 }
 
 // ─── Color variants ────────────────────────────────────
-@mixin progress-green {
+@mixin progress-success {
 	background-color: hsl(var(--color-success));
 }
 
-@mixin progress-red {
+@mixin progress-error {
 	background-color: hsl(var(--color-error));
 }
 
-@mixin progress-yellow {
+@mixin progress-warning {
 	background-color: hsl(var(--color-warning));
 }

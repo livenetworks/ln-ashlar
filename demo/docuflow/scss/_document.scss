@@ -30,8 +30,8 @@
 		@include flex;
 		@include items-center;
 		@include relative;
-		@include py(var(--spacing-xs));
-		@include pr(var(--spacing-sm));
+		@include py(var(--size-xs));
+		@include pr(var(--size-sm));
 		@include text-sm;
 		text-decoration: none;
 		color: hsl(var(--color-text-secondary));
@@ -106,10 +106,10 @@
 		a {
 			@include flex;
 			@include items-start;
-			@include gap(var(--spacing-sm));
-			@include py(var(--spacing-sm));
-			@include pr(var(--spacing-sm));
-			@include pl(var(--spacing-xs));
+			@include gap(var(--size-sm));
+			@include py(var(--size-sm));
+			@include pr(var(--size-sm));
+			@include pl(var(--size-xs));
 			@include text-sm;
 			text-decoration: none;
 			color: hsl(var(--color-text-secondary));

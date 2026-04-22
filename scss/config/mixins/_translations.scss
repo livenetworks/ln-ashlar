@@ -17,10 +17,10 @@
 // ─── Flag icon in input background ───────────────────────────────
 
 @mixin translations-flag-input {
-	padding-left: calc(var(--spacing-sm-up) + var(--spacing-md-up) + var(--spacing-sm-up));
+	padding-left: calc(var(--size-sm-up) + var(--size-md-up) + var(--size-sm-up));
 	background-repeat: no-repeat;
-	background-size: var(--spacing-md-up) auto;
-	background-position: var(--spacing-sm-up) calc(var(--spacing-sm) + (var(--spacing-lg) - var(--spacing-md-up) * 3 / 4) / 2);
+	background-size: var(--size-md-up) auto;
+	background-position: var(--size-sm-up) calc(var(--size-sm) + (var(--size-lg) - var(--size-md-up) * 3 / 4) / 2);
 }
 
 // ─── Dropdown menu item: flag via ::before ───────────────────────
@@ -28,7 +28,7 @@
 @mixin translations-dropdown-flag {
 	@include flex;
 	@include items-center;
-	@include gap(var(--spacing-sm));
+	gap: var(--gap);
 
 	&::before {
 		content: '';
@@ -47,7 +47,8 @@
 @mixin translations-actions {
 	@include inline-flex;
 	@include items-center;
-	@include gap(var(--spacing-xs));
+	--gap: var(--size-xs);
+	gap: var(--gap);
 	margin-left: auto;
 }
 
@@ -56,7 +57,8 @@
 @mixin translations-active-list {
 	@include inline-flex;
 	@include items-center;
-	@include gap(var(--spacing-xs));
+	--gap: var(--size-xs);
+	gap: var(--gap);
 	@include list-reset;
 }
 
@@ -65,19 +67,21 @@
 @mixin translations-badge {
 	@include inline-flex;
 	@include items-center;
-	@include gap(var(--spacing-xs));
+	--gap: var(--size-xs);
+	--padding-x: var(--size-xs);
+	--padding-y: var(--size-2xs);
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
 	@include text-xs;
 	@include font-semibold;
 	@include rounded-sm;
-	@include px(var(--spacing-xs));
-	@include py(var(--spacing-2xs));
 	@include tinted-surface(0.08);
 	@include select-none;
 	margin: 0;
 	background-repeat: no-repeat;
-	background-position: var(--spacing-xs) center;
+	background-position: var(--size-xs) center;
 	background-size: 1rem auto;
-	padding-left: var(--spacing-lg);
+	padding-left: var(--size-lg);
 }
 
 // ─── Badge remove button ─────────────────────────────────────────

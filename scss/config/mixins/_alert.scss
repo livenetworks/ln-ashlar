@@ -23,19 +23,20 @@
 //   </div>
 
 @mixin alert {
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-md);
 	@include flex;
 	@include items-center;
-	@include gap(var(--spacing-sm));
-	@include py(var(--spacing-sm));
-	@include px(var(--spacing-md));
-	@include rounded-md;
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
+	border-radius: var(--radius);
 	@include text-sm;
-	border-left: 3px solid hsl(var(--color-primary));
+	border-left: 3px solid var(--color-accent);
 	@include tinted-surface(0.08);
-	color: hsl(var(--color-text-primary));
+	color: var(--color-fg);
 
 	.ln-icon {
-		color: hsl(var(--color-primary));
+		color: var(--color-accent);
 		@include flex-shrink-0;
 	}
 

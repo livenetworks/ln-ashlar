@@ -1,7 +1,5 @@
-@use 'spacing' as *;
 @use 'display' as *;
 @use 'typography' as *;
-@use 'colors' as *;
 
 @mixin timeline {
 	@include list-reset;
@@ -15,16 +13,15 @@
 		position: absolute;
 		top: calc(var(--lh-caption) * var(--text-caption) / 2);
 		bottom: calc(var(--lh-caption) * var(--text-caption) / 2);
-		left: calc(var(--spacing-sm) - var(--border-width));
+		left: calc(var(--size-sm) - var(--border-width));
 		width: 2px;
-		// Direct neutral: rail intentionally heavier than --color-border (neutral-200 vs alias)
-		background: hsl(var(--color-neutral-200));
+		background: hsl(var(--color-border));
 	}
 
 	> li {
 		position: relative;
-		padding-left: var(--spacing-xl);
-		padding-bottom: var(--spacing-lg);
+		padding-left: var(--size-xl);
+		padding-bottom: var(--size-lg);
 
 		&:last-child {
 			padding-bottom: 0;
@@ -36,32 +33,32 @@
 		&::before {
 			content: '';
 			position: absolute;
-			top: calc((var(--lh-caption) * var(--text-caption) - var(--spacing-sm-up)) / 2);
-			left: var(--spacing-2xs);
+			top: calc((var(--lh-caption) * var(--text-caption) - var(--size-sm-up)) / 2);
+			left: var(--size-2xs);
 			width: 0.75rem;
 			height: 0.75rem;
 			border-radius: 50%;
-			background: hsl(var(--color-primary));
-			box-shadow: 0 0 0 3px hsl(var(--color-bg-primary));
+			background: var(--color-accent);
+			box-shadow: 0 0 0 3px var(--color-bg);
 		}
 
 		> time {
 			display: block;
 			@include typography(caption);
-			color: hsl(var(--color-text-muted));
-			@include mb(var(--spacing-xs));
+			color: var(--color-fg-subtle);
+			margin-bottom: var(--size-xs);
 		}
 
 		> h4 {
 			@include typography(title-sm);
-			color: hsl(var(--color-text-primary));
+			color: var(--color-fg);
 			margin: 0;
 		}
 
 		> p {
 			@include typography(body-sm);
-			color: hsl(var(--color-text-secondary));
-			margin: var(--spacing-xs) 0 0;
+			color: var(--color-fg-muted);
+			margin: var(--size-xs) 0 0;
 		}
 	}
 }

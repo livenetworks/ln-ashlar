@@ -46,7 +46,7 @@ body {
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include px(var(--spacing-lg));
+	@include px(var(--size-lg));
 	height: var(--layout-header-height);
 	background-color: hsl(var(--color-header-bg));
 	@include text-white;
@@ -57,7 +57,7 @@ body {
 	.header-brand {
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-md));
+		@include gap(var(--size-md));
 
 		.menu-toggle {
 			background: transparent;
@@ -65,7 +65,7 @@ body {
 			@include text-white;
 			@include text-xl;
 			@include cursor-pointer;
-			@include p(var(--spacing-xs));
+			@include p(var(--size-xs));
 
 			&:hover {
 				background-color: hsl(0 0% 100% / 0.1);
@@ -87,7 +87,7 @@ body {
 	.header-center {
 		@include flex-1;
 		@include flex-center;
-		@include px(var(--spacing-xl));
+		@include px(var(--size-xl));
 
 		.header-search {
 			@include relative;
@@ -96,7 +96,7 @@ body {
 
 			.search-icon {
 				@include absolute;
-				left: var(--spacing-sm);
+				left: var(--size-sm);
 				top: 50%;
 				transform: translateY(-50%);
 				color: hsl(0 0% 100% / 0.7);
@@ -104,9 +104,9 @@ body {
 
 			input {
 				@include w-full;
-				@include py(var(--spacing-sm));
+				@include py(var(--size-sm));
 				@include pl(2.5rem);
-				@include pr(var(--spacing-md));
+				@include pr(var(--size-md));
 				background-color: hsl(0 0% 100% / 0.2);
 				border: 1px solid hsl(0 0% 100% / 0.1);
 				@include text-white;
@@ -129,7 +129,7 @@ body {
 	.header-nav {
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-md));
+		@include gap(var(--size-md));
 
 		.header-avatar img {
 			@include rounded-full;
@@ -171,7 +171,7 @@ body {
 // 3-Column Layout
 .page-columns {
 	@include flex;
-	@include gap(var(--spacing-xl));
+	@include gap(var(--size-xl));
 	@include w-full;
 	flex: 1;
 	min-height: 0; // Allow flex children to shrink and scroll
@@ -190,9 +190,9 @@ body {
 	width: var(--layout-panel-width);
 	@include flex-shrink-0;
 	@include flex-col;
-	@include gap(var(--spacing-lg));
+	@include gap(var(--size-lg));
 	padding-top: 6rem;
-	@include px(var(--spacing-md));
+	@include px(var(--size-md));
 	overflow-y: auto; // Independent scroll
 
 	@media (max-width: 1024px) {
@@ -203,7 +203,7 @@ body {
 
 	section {
 		@include flex-col;
-		@include gap(var(--spacing-sm));
+		@include gap(var(--size-sm));
 
 		h3 {
 			@include font-sans;
@@ -212,7 +212,7 @@ body {
 			letter-spacing: -0.02em;
 			color: hsl(var(--color-text-primary));
 			@include m(0);
-			@include pb(var(--spacing-xs));
+			@include pb(var(--size-xs));
 			@include border-b;
 			border-color: hsl(var(--color-border) / 0.5);
 		}
@@ -242,7 +242,7 @@ body {
 	ol {
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-sm));
+		@include gap(var(--size-sm));
 		list-style: none;
 		@include p(0);
 		@include m(0);
@@ -259,7 +259,7 @@ body {
 			content: '\203A'; // Single Right-Pointing Angle Quotation Mark
 			font-size: 1.25rem;
 			@include font-bold;
-			@include ml(var(--spacing-md));
+			@include ml(var(--size-md));
 			color: hsl(var(--color-text-muted) / 0.8);
 			transform: translateY(-1px);
 		}
@@ -267,8 +267,8 @@ body {
 		&:last-child {
 			color: hsl(var(--color-primary));
 			@include font-medium;
-			@include px(var(--spacing-md));
-			@include py(var(--spacing-xs));
+			@include px(var(--size-md));
+			@include py(var(--size-xs));
 			&::after { content: none; }
 		}
 	}
@@ -278,14 +278,14 @@ body {
 		text-decoration: none;
 		@include transition;
 
-		@include px(var(--spacing-lg));
-		@include py(var(--spacing-sm));
+		@include px(var(--size-lg));
+		@include py(var(--size-sm));
 		border: 1px solid transparent;
 		@include rounded-md;
 
 		@include flex;
 		@include items-center;
-		@include gap(var(--spacing-xs));
+		@include gap(var(--size-xs));
 
 		&:hover {
 			color: hsl(var(--color-primary));
@@ -301,12 +301,12 @@ body {
 	background-color: hsl(0 0% 100%);
 	@include rounded-lg;
 	@include shadow-lg;
-	@include p(var(--spacing-2xl));
+	@include p(var(--size-2xl));
 	min-height: 60vh;
 	line-height: 1.65;
 
 	@media (max-width: 1024px) {
-		@include p(var(--spacing-xl));
+		@include p(var(--size-xl));
 	}
 
 	h1, h2, h3, h4, h5 {
@@ -326,8 +326,8 @@ body {
 // App Footer
 // ───────────────────────────────────────────────────────────
 .app-footer {
-	@include mt(var(--spacing-2xl));
-	@include mb(var(--spacing-xl));
+	@include mt(var(--size-2xl));
+	@include mb(var(--size-xl));
 	@include flex-center;
 	@include w-full;
 	color: hsl(var(--color-text-muted));

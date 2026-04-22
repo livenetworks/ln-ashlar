@@ -16,10 +16,10 @@
 	&::after {
 		content: '';
 		position: absolute;
-		bottom: calc(-1 * var(--spacing-sm-up));
+		bottom: calc(-1 * var(--size-sm-up));
 		left: 0;
 		right: 0;
-		height: var(--spacing-sm-up);
+		height: var(--size-sm-up);
 		background: linear-gradient(to bottom, hsl(var(--color-border) / 0.5), transparent);
 		pointer-events: none;
 	}

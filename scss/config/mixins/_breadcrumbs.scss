@@ -1,5 +1,4 @@
 @use 'display' as *;
-@use 'spacing' as *;
 @use 'borders' as *;
 @use 'focus' as *;
 @use 'interaction' as *;
@@ -32,13 +31,13 @@
 		@include flex;
 		@include items-center;
 		@include flex-wrap;
-		@include gap(var(--spacing-sm));
+		gap: var(--gap);
 		@include list-reset;
 
 		> li {
 			@include flex;
 			@include items-center;
-			@include gap(var(--spacing-sm));
+			gap: var(--gap);
 			font-size: var(--text-body-sm);
 			line-height: var(--lh-body-sm);
 			margin: 0;
@@ -55,8 +54,9 @@
 		a {
 			@include inline-flex;
 			@include items-center;
-			@include px(var(--spacing-xs));
-			@include py(var(--spacing-2xs));
+			--padding-x: var(--size-xs);
+			--padding-y: var(--size-2xs);
+			padding: var(--padding-y) var(--padding-x);
 			@include rounded-sm;
 
 			&:focus-visible {
@@ -65,8 +65,9 @@
 		}
 
 		[aria-current="page"] {
-			@include px(var(--spacing-xs));
-			@include py(var(--spacing-2xs));
+			--padding-x: var(--size-xs);
+			--padding-y: var(--size-2xs);
+			padding: var(--padding-y) var(--padding-x);
 		}
 	}
 }

@@ -6,11 +6,11 @@ h3,
 h4,
 h5,
 h6 {
-	@include text-primary;
+	color: var(--color-fg);
 	@include font-bold;
 }
 
-// The global 1rem bottom margin is the default for h1 rendered inline
+// The global size-md bottom margin is the default for h1 rendered inline
 // with surrounding content (articles, page body, demo index). Containers
 // that provide their own spacing via `gap` — notably `@include page-header`
 // — intentionally zero this margin on their internal h1 so the gap is the
@@ -18,44 +18,44 @@ h6 {
 h1 {
 	@include typography(display-sm);
 	@include tracking-tight;
-	@include mb(var(--spacing-md));
+	margin-bottom: var(--size-md);
 }
 
 h2 {
 	@include typography(heading-md);
 	@include tracking-tight;
-	@include mb(var(--spacing-md));
+	margin-bottom: var(--size-md);
 }
 
 h3 {
 	@include typography(heading-sm);
 	@include font-semibold;
-	@include mb(var(--spacing-sm-up));
+	margin-bottom: var(--size-sm-up);
 }
 
 h4 {
 	@include typography(title-md);
 	@include font-semibold;
-	@include mb(var(--spacing-sm));
+	margin-bottom: var(--size-sm);
 }
 
 h5 {
 	@include typography(title-sm);
 	@include font-semibold;
-	@include mb(var(--spacing-sm));
+	margin-bottom: var(--size-sm);
 }
 
 h6 {
 	@include typography(label-md);
 	@include font-semibold;
-	@include mb(var(--spacing-xs));
+	margin-bottom: var(--size-xs);
 }
 
 p {
 	font-size: var(--text-body-md);
-	@include text-primary;
+	color: var(--color-fg);
 	line-height: 1.75;
-	@include mb(var(--spacing-md));
+	margin-bottom: var(--size-md);
 
 	&:last-child {
 		margin-bottom: 0;
@@ -74,27 +74,26 @@ i {
 
 small {
 	@include text-sm;
-	@include text-secondary;
+	color: var(--color-fg-muted);
 }
 
 code {
 	@include font-mono;
 	@include text-sm;
-	background-color: hsl(var(--color-bg-body));
-	@include px(var(--spacing-xs));
-	@include py(var(--spacing-2xs));
+	background-color: var(--color-bg-recessed);
+	padding: var(--size-2xs) var(--size-xs);
 	@include rounded-sm;
 }
 
 pre {
 	@include font-mono;
 	@include text-sm;
-	background-color: hsl(var(--color-bg-body));
-	@include p(var(--spacing-md));
+	background-color: var(--color-bg-recessed);
+	padding: var(--size-md);
 	@include rounded-md;
 	@include border;
 	@include overflow-x-auto;
-	@include mb(var(--spacing-md));
+	margin-bottom: var(--size-md);
 
 	code {
 		background: none;
@@ -103,7 +102,7 @@ pre {
 }
 
 table {
-	@include mb(var(--spacing-md));
+	margin-bottom: var(--size-md);
 }
 
 kbd {
@@ -111,19 +110,19 @@ kbd {
 }
 
 blockquote {
-	border-left: 3px solid hsl(var(--color-primary));
-	background-color: hsl(var(--color-bg-secondary));
-	@include p(var(--spacing-md));
+	border-left: 3px solid var(--color-accent);
+	background-color: var(--color-bg-sunken);
+	padding: var(--size-md);
 	@include rounded-sm;
-	@include mb(var(--spacing-md));
-	@include text-secondary;
+	margin-bottom: var(--size-md);
+	color: var(--color-fg-muted);
 	font-style: italic;
 }
 
 ul,
 ol {
-	@include pl(var(--spacing-lg));
-	@include mb(var(--spacing-md));
+	padding-left: var(--size-lg);
+	margin-bottom: var(--size-md);
 }
 
 ul {
@@ -135,6 +134,6 @@ ol {
 }
 
 li {
-	@include mb(var(--spacing-xs));
+	margin-bottom: var(--size-xs);
 	line-height: 1.75;
 }

@@ -11,7 +11,7 @@ pages, modals, and onboarding screens do not.
 
 Density is implemented as a **cascade-driven base-token override**,
 not a parallel token scale, not a component override. The
-`.density-compact` class re-tunes the base `--spacing-*`, `--text-*`,
+`.density-compact` class re-tunes the base `--size-*`, `--text-*`,
 and `--lh-*` tokens on the element where the class is applied, and
 every descendant that reads those tokens shrinks automatically.
 Same mechanism as theme color overrides (`--color-primary`) — one
@@ -53,7 +53,7 @@ form — comfortable IS the default `:root` state (values live in
 
 | Token group | Overridden | Effect |
 |---|---|---|
-| `--spacing-xs/sm/md/lg` | yes | Form input padding, table cell padding, card body padding, panel header padding, alert/banner/tabs chrome, grid gaps |
+| `--size-xs/sm/md/lg` | yes | Form input padding, table cell padding, card body padding, panel header padding, alert/banner/tabs chrome, grid gaps |
 | `--text-body-md`, `--lh-body-md` | yes | Body paragraphs, table cells, form inputs, nav link text |
 | `--text-body-sm`, `--lh-body-sm` | yes | Small body text, breadcrumbs, nav links |
 | `--text-label-md`, `--lh-label-md` | yes | Form labels, h6 |
@@ -78,7 +78,7 @@ Long answer — tested surfaces:
 - Stat card — outer padding, value font, label font, trend font (all via heading-lg / label-md / body-sm tokens)
 - Nav — link font
 - Breadcrumbs — link font
-- Alerts, banners, tabs — padding and gaps (via `--spacing-*`)
+- Alerts, banners, tabs — padding and gaps (via `--size-*`)
 - Body paragraphs — `<p>` text
 - All headings `h1`–`h6` — via `typography(...)` role mixin
 
@@ -132,18 +132,18 @@ stat-card selector.
   `.density-compact table td { padding: ... }`. That explodes
   specificity and duplicates rules. Use the token-override route
   (this file's `.density-compact` block) or — if a new component
-  doesn't react — switch its hardcoded padding to `var(--spacing-*)`.
+  doesn't react — switch its hardcoded padding to `var(--size-*)`.
 - **Shrinking buttons or interactive controls.** WCAG hit target is
   non-negotiable. Density shrinks chrome and content, never controls.
 - **Introducing new `--density-*` tokens.** The refactor DELETED the
   parallel scale. New components react by consuming the existing
-  base tokens (`--spacing-*`, `--text-body-md`, role typography
+  base tokens (`--size-*`, `--text-body-md`, role typography
   tokens). If a component cannot be made to react with the base
   tokens alone, that is a signal the component is chrome, not content.
 
 ## Dark mode interaction
 
-Density and dark mode are orthogonal. Density only touches `--spacing-*`
+Density and dark mode are orthogonal. Density only touches `--size-*`
 and typography tokens; dark mode (`_theme.scss`) only touches `--color-*`.
 They cannot collide:
 
@@ -159,7 +159,7 @@ in both comfortable and compact modes.
 
 ## Adding a new component to density
 
-1. Use `var(--spacing-*)` for padding and gap instead of hardcoded rem.
+1. Use `var(--size-*)` for padding and gap instead of hardcoded rem.
 2. Use `font-size: var(--text-body-md); line-height: var(--lh-body-md);`
    (or the matching role token) instead of raw `@include text-base`
    when the element is content text.
@@ -175,11 +175,11 @@ Earlier v1.2 builds had a parallel `--density-pad-*`, `--density-gap-*`,
 Consumer code that referenced them directly (rare — they were documented
 as private implementation detail) must switch:
 
-- `var(--density-pad-md)` → `var(--spacing-md)`
-- `var(--density-pad-sm)` → `var(--spacing-sm)`
-- `var(--density-pad-lg)` → `var(--spacing-lg)`
-- `var(--density-pad-xs)` → `var(--spacing-xs)`
-- `var(--density-gap-md)` → `var(--spacing-sm)` (nearest equivalent)
+- `var(--density-pad-md)` → `var(--size-md)`
+- `var(--density-pad-sm)` → `var(--size-sm)`
+- `var(--density-pad-lg)` → `var(--size-lg)`
+- `var(--density-pad-xs)` → `var(--size-xs)`
+- `var(--density-gap-md)` → `var(--size-sm)` (nearest equivalent)
 - `var(--density-font-body)` → `var(--text-body-md)`
 - `var(--density-lh-body)` → `var(--lh-body-md)`
 - `var(--density-row-h)` → unchanged (still exists)

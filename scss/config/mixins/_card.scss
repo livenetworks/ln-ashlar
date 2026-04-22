@@ -11,42 +11,45 @@
 // Card & Section — composite mixins
 
 @mixin card {
-	@include bg-primary;
+	background: var(--color-bg);
 	@include border;
 	@include w-full;
 	@include flex-col;
-	@include rounded-md;
+	border-radius: var(--radius);
 	@include overflow-hidden;
 	@include transition;
-	box-shadow: var(--shadow-xs);
+	box-shadow: var(--shadow-default);
 
 	&:hover {
-		border-color: hsl(var(--color-neutral-300));
-		box-shadow: var(--shadow-sm);
+		border-color: var(--color-border-strong);
+		box-shadow: var(--shadow-raised);
 	}
 }
 
 @mixin panel-header {
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-sm));
+	padding: var(--padding-y) var(--padding-x);
 	@include border-b;
-	@include bg-secondary;
+	background: var(--color-bg-sunken);
 	@include transition;
 
 	h3 {
 		font-size: var(--text-body-sm);
 		line-height: var(--lh-body-sm);
 		@include font-medium;
-		@include text-primary;
+		color: var(--color-fg);
 		margin: 0;
 	}
 }
 
 @mixin panel-body {
-	@include p(var(--spacing-md));
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 
 	// Auto-flush: ONLY when the table (or .table-container) is the
 	// sole child of main — i.e. the card is a pure table card.
@@ -59,7 +62,7 @@
 	// and the table keeps its own inset.
 	&:has(> table:only-child),
 	&:has(> .table-container:only-child) {
-		@include p(0);
+		padding: 0;
 
 		> table,
 		> .table-container > table {
@@ -71,80 +74,83 @@
 }
 
 @mixin panel-footer {
-	@include px(var(--spacing-md));
-	@include py(var(--spacing-sm));
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-t;
 	@include flex;
 	@include justify-end;
-	@include gap(var(--spacing-sm));
+	gap: var(--gap);
 }
 
 @mixin section {
-	@include mb(var(--spacing-xl));
+	// Structural section margin (not shell rhythm; no logical token).
+	margin-bottom: var(--size-xl);
 
 	header {
 		@include flex;
 		@include items-center;
 		@include justify-between;
-		@include mb(var(--spacing-md));
-		@include pb(var(--spacing-sm));
+		margin-bottom: var(--size-md);
+		padding-bottom: var(--size-sm);
 		@include border-b;
 
 		h2 {
 			@include text-xl;
 			@include font-bold;
-			@include text-primary;
+			color: var(--color-fg);
 			margin: 0;
 		}
 
 		.section-actions {
 			@include flex;
-			@include gap(var(--spacing-sm));
+			gap: var(--gap);
 		}
 	}
 
 	main {
-		@include p(0);
+		padding: 0;
 	}
 }
 
 // ─── Card accents (Tabler-inspired colored lines) ──────
-// Color reads from --color-primary, override per element
+// Accent reads --color-accent (solid) for borders, --color-primary
+// (raw triplet) for alpha hover tints — see plan §0.3.
 // Usage: #my-card { @include card; @include card-accent-top; }
 
 @mixin _card-accent-base {
 	&:hover {
+		// alpha tint — requires raw-triplet access (see plan §0.3)
 		background-color: hsl(var(--color-primary) / 0.04);
 	}
 }
 
 @mixin card-accent-top {
 	@include _card-accent-base;
-	border-top: 3px solid hsl(var(--color-primary));
+	border-top: 3px solid var(--color-accent);
 	&:hover {
-		border-top-color: hsl(var(--color-primary));
+		border-top-color: var(--color-accent);
 	}
 }
 
 @mixin card-accent-bottom {
 	@include _card-accent-base;
-	border-bottom: 3px solid hsl(var(--color-primary));
+	border-bottom: 3px solid var(--color-accent);
 	&:hover {
-		border-bottom-color: hsl(var(--color-primary));
+		border-bottom-color: var(--color-accent);
 	}
 }
 
 @mixin card-accent-left {
 	@include _card-accent-base;
-	border-left: 3px solid hsl(var(--color-primary));
+	border-left: 3px solid var(--color-accent);
 	&:hover {
-		border-left-color: hsl(var(--color-primary));
+		border-left-color: var(--color-accent);
 	}
 }
 
 // ─── Card tinted background ────────────────────────────
-// Soft colored bg — for hero cards, alerts, highlights
-// Usage: #welcome { @include card; @include card-bg; }
+// Alpha-tinted — reads --color-primary triplet (see plan §0.3).
 
 @mixin card-bg {
 	background-color: hsl(var(--color-primary) / 0.06);
@@ -152,7 +158,6 @@
 }
 
 // ─── Card stacked (visual depth illusion) ──────────────
-// Adds pseudo-element "cards behind" the main card
 
 @mixin card-stacked {
 	@include relative;
@@ -164,22 +169,23 @@
 		left: 6px;
 		right: 6px;
 		height: 10px;
-		@include bg-primary;
-		@include rounded-md;
-		@include shadow-xs;
-		border: var(--border-width) solid hsl(var(--color-border-light));
+		background: var(--color-bg);
+		border-radius: var(--radius);
+		box-shadow: var(--shadow-default);
+		border: var(--border-width) solid var(--color-border-subtle);
 		z-index: -1;
 	}
 }
 
 @mixin section-card {
-	@include bg-primary;
+	background: var(--color-bg);
 	@include border;
-	@include rounded-md;
+	border-radius: var(--radius);
 	@include overflow-hidden;
 	@include transition;
-	box-shadow: var(--shadow-xs);
-	@include mb(var(--spacing-md));
+	box-shadow: var(--shadow-default);
+	// Structural section-card margin (not shell rhythm; no logical token).
+	margin-bottom: var(--size-md);
 
 	// Direct-child selectors only — nested <header>/<main>/<footer>
 	// elements inside the card's content are consumer-owned and
@@ -191,16 +197,13 @@
 
 // ─── Floating panel ────────────────────────────────────
 // Chrome recipe for floating overlays (popover, dropdown menu, toast).
-// Positioning is per-consumer; only the surface chrome (bg, border,
-// radius, shadow, z-index) is shared. The border uses --color-border-light
-// for a subtle edge against light backgrounds -- floating panels sit
-// ABOVE content, so a subtle border reads cleaner than a heavy one.
-//
-// Usage: consumers @include this mixin, then add their own positioning.
+// Reads --color-bg-raised to allow separate dark-theme re-bind of
+// raised surfaces vs ground surfaces.
+
 @mixin floating-panel {
-	@include bg-primary;
-	@include border-light;
-	@include rounded-md;
-	@include shadow-lg;
+	background: var(--color-bg-raised);
+	border: var(--border-width) solid var(--color-border-subtle);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-raised);
 	z-index: var(--z-dropdown);
 }

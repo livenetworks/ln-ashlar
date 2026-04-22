@@ -6,25 +6,25 @@ Animated progress bar. File: `js/ln-progress/ln-progress.js`.
 
 ```html
 <div data-ln-progress>
-    <div data-ln-progress="65" class="green"></div>
+    <div data-ln-progress="65" class="success"></div>
 </div>
 
 <!-- Custom max -->
 <div data-ln-progress>
-    <div data-ln-progress="130" data-ln-progress-max="200" class="yellow"></div>
+    <div data-ln-progress="130" data-ln-progress-max="200" class="warning"></div>
 </div>
 
 <!-- Multiple segments -->
 <div data-ln-progress>
-    <div data-ln-progress="30" class="green"></div>
-    <div data-ln-progress="20" class="red"></div>
+    <div data-ln-progress="30" class="success"></div>
+    <div data-ln-progress="20" class="error"></div>
 </div>
 
 <!-- Stacked with shared max — fills 100% proportionally -->
 <div data-ln-progress data-ln-progress-max="15">
-    <div data-ln-progress="7" class="green"></div>
-    <div data-ln-progress="3" class="yellow"></div>
-    <div data-ln-progress="5" class="red"></div>
+    <div data-ln-progress="7" class="success"></div>
+    <div data-ln-progress="3" class="warning"></div>
+    <div data-ln-progress="5" class="error"></div>
 </div>
 ```
 
@@ -41,11 +41,11 @@ Animated progress bar. File: `js/ln-progress/ln-progress.js`.
 
 | Class | Color |
 |-------|-------|
-| `.green` | `--color-success` |
-| `.red` | `--color-error` |
-| `.yellow` | `--color-warning` |
+| `.success` | `--color-success` |
+| `.error` | `--color-error` |
+| `.warning` | `--color-warning` |
 
-> **Note**: These presentational classes are an intentional exception to the `--color-primary` override convention. Progress bars represent categorical status (success/error/warning) rather than themed UI, so named classes map directly to semantic tokens. To use a custom color, skip the class and set `background-color` on the bar element directly.
+> **Note**: These semantic classes parallel `status-badge`, `alert`, and `toast` — progress bars represent categorical status (success / warning / error), so class names map directly to the matching semantic color tokens (`--color-success`, `--color-warning`, `--color-error`). To use a custom color, skip the class and set `background-color` on the bar element directly, or override `--color-primary` on a parent scope.
 
 ## Events
 

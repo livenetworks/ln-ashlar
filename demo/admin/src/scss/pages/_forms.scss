@@ -22,7 +22,7 @@
 #demo-pills-filled,
 #demo-pills-outline {
 	@include flex;
-	@include gap(var(--spacing-xl));
+	@include gap(var(--size-xl));
 
 	fieldset {
 		border: none;
@@ -86,7 +86,7 @@
 // ─── Checkbox & Radio demo ─────────────────────────────
 #demo-checks {
 	@include flex;
-	@include gap(var(--spacing-xl));
+	@include gap(var(--size-xl));
 
 	fieldset {
 		border: none;
@@ -178,7 +178,7 @@
 #demo-input-components {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	@include gap(var(--spacing-lg));
+	@include gap(var(--size-lg));
 
 	@media (max-width: 767px) {
 		grid-template-columns: 1fr;

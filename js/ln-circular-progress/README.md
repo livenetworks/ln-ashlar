@@ -14,9 +14,9 @@ A circular (ring) progress indicator built with SVG. Reactive: automatically upd
 
 | Class | Color |
 |-------|-------|
-| `.green` | `--color-success` |
-| `.red` | `--color-error` |
-| `.yellow` | `--color-warning` |
+| `.success` | `--color-success` |
+| `.error` | `--color-error` |
+| `.warning` | `--color-warning` |
 | (no class) | `--color-primary` |
 
 ## Size Classes
@@ -32,7 +32,7 @@ A circular (ring) progress indicator built with SVG. Reactive: automatically upd
 
 ```html
 <!-- Basic usage -->
-<div data-ln-circular-progress="75" class="green"></div>
+<div data-ln-circular-progress="75" class="success"></div>
 
 <!-- Custom max -->
 <div data-ln-circular-progress="7" data-ln-circular-progress-max="10"></div>
@@ -42,7 +42,7 @@ A circular (ring) progress indicator built with SVG. Reactive: automatically upd
      data-ln-circular-progress-label="3/5"></div>
 
 <!-- Size variant -->
-<div data-ln-circular-progress="50" class="lg yellow"></div>
+<div data-ln-circular-progress="50" class="lg warning"></div>
 ```
 
 The component auto-generates an SVG ring and a `<strong>` label inside the element.

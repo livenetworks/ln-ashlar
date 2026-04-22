@@ -15,19 +15,19 @@ body {
 body {
 	font-size: var(--text-body-md);
 	line-height: var(--lh-body-md);
-	@include text-primary;
+	color: var(--color-fg);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
 a {
-	color: hsl(var(--color-primary));
+	color: var(--color-accent);
 	text-decoration: none;
 	@include transition-colors;
 	@include relative;
 
 	&:hover {
-		color: hsl(var(--color-primary-hover));
+		color: var(--color-accent-hover);
 	}
 }
 
@@ -42,28 +42,27 @@ input[type="button"] {
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	@include gap(var(--spacing-sm));
-	@include px(var(--spacing-md-up));
-	@include py(var(--spacing-sm));
+	gap: var(--gap);
+	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
 	@include font-medium;
 	@include rounded-md;
 	white-space: nowrap;
-	border: var(--border-width) solid hsl(var(--color-neutral-300));
+	border: var(--border-width) solid var(--color-border-strong);
 	outline: none;
-	background: hsl(var(--color-bg-primary));
-	color: hsl(var(--color-text-primary));
+	background: var(--color-bg);
+	color: var(--color-fg);
 	@include transition-colors;
 
 	&:hover:not(:disabled) {
-		background: hsl(var(--color-bg-secondary));
-		color: hsl(var(--color-text-primary));
-		border-color: hsl(var(--color-neutral-400));
+		background: var(--color-bg-sunken);
+		color: var(--color-fg);
+		border-color: var(--color-border-strong-hover);
 	}
 
 	&:active:not(:disabled) {
 		background: hsl(var(--color-border));
-		border-color: hsl(var(--color-neutral-400));
+		border-color: var(--color-border-strong-hover);
 	}
 
 	&:focus-visible {
@@ -81,20 +80,20 @@ input[type="button"] {
 
 button[type="submit"],
 input[type="submit"] {
-	background: hsl(var(--color-primary));
-	color: hsl(var(--color-white));
-	border-color: hsl(var(--color-primary));
+	background: var(--color-accent);
+	color: var(--color-accent-fg);
+	border-color: var(--color-accent);
 
 	&:hover:not(:disabled) {
-		background: hsl(var(--color-primary-hover));
-		color: hsl(var(--color-white));
-		border-color: hsl(var(--color-primary-hover));
+		background: var(--color-accent-hover);
+		color: var(--color-accent-fg);
+		border-color: var(--color-accent-hover);
 	}
 
 	&:active:not(:disabled) {
-		background: hsl(var(--color-primary-hover));
-		color: hsl(var(--color-white));
-		border-color: hsl(var(--color-primary-hover));
+		background: var(--color-accent-hover);
+		color: var(--color-accent-fg);
+		border-color: var(--color-accent-hover);
 	}
 }
 
@@ -106,5 +105,5 @@ img {
 
 ::selection {
 	background-color: hsl(var(--color-primary) / 0.2);
-	color: hsl(var(--color-text-primary));
+	color: var(--color-fg);
 }

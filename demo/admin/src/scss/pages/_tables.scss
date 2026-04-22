@@ -73,7 +73,7 @@ td .actions {
 #filter-category,
 #filter-status {
 	@include popover;
-	padding: var(--spacing-sm);
+	padding: var(--size-sm);
 
 	> ul { @include check-list; }
 

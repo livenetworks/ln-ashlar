@@ -129,12 +129,18 @@ in-place (Phase 6).
 
 | Token | Value | px |
 |-------|-------|----|
-| `--spacing-xs` | 0.25rem | 4px |
-| `--spacing-sm` | 0.5rem | 8px |
-| `--spacing-md` | 1rem | 16px |
-| `--spacing-lg` | 1.5rem | 24px |
-| `--spacing-xl` | 2rem | 32px |
-| `--spacing-2xl` | 3rem | 48px |
+| `--size-0` | 0 | 0px |
+| `--size-2xs` | 0.125rem | 2px |
+| `--size-xs` | 0.25rem | 4px |
+| `--size-xs-up` | 0.375rem | 6px |
+| `--size-sm` | 0.5rem | 8px |
+| `--size-sm-up` | 0.625rem | 10px |
+| `--size-md` | 1rem | 16px |
+| `--size-md-up` | 1.25rem | 20px |
+| `--size-lg` | 1.5rem | 24px |
+| `--size-xl` | 2rem | 32px |
+| `--size-2xl` | 3rem | 48px |
+| `--size-3xl` | 4rem | 64px |
 
 ---
 
@@ -278,10 +284,8 @@ Token names are always **semantic** (by function), never by color:
 
 | Token | Value | Use |
 |---|---|---|
-| `--spacing-2xs` | 2px | Tight gaps inside compound components (icon-next-to-text) |
-| `--spacing-3xl` | 4rem | Section separators on large dashboards |
-| `--spacing-4xl` | 6rem | Hero layouts |
-| `--spacing-5xl` | 8rem | Page-level hero spacing |
+| `--size-2xs` | 2px | Tight gaps inside compound components (icon-next-to-text) |
+| `--size-3xl` | 4rem | Section separators on large dashboards |
 
 ### Content widths
 

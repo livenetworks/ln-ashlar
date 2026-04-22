@@ -11,7 +11,7 @@
 	button {
 		@include btn;
 		font-size: var(--text-sm);
-		padding: var(--spacing-xs) var(--spacing-sm);
+		padding: var(--size-xs) var(--size-sm);
 
 		&[data-active] {
 			background-color: hsl(var(--color-primary));

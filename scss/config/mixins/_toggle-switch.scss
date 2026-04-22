@@ -6,9 +6,8 @@
 	position: relative;
 	width: 2.5rem;
 	height: 1.5rem;
-	// Direct neutral: off-state track -- no semantic "track-inactive" token exists
-	background: hsl(var(--color-neutral-300));
-	border-radius: 9999px;
+	background: var(--color-border-strong);
+	border-radius: var(--radius-full);
 	cursor: pointer;
 	vertical-align: middle;
 	flex-shrink: 0;
@@ -28,7 +27,7 @@
 		height: 1.25rem;
 		background: hsl(var(--color-white));
 		border-radius: 50%;
-		box-shadow: var(--shadow-sm);
+		box-shadow: var(--shadow-default);
 
 		@include motion-safe {
 			transition: transform var(--transition-fast);
@@ -36,7 +35,7 @@
 	}
 
 	&:checked {
-		background: hsl(var(--color-primary));
+		background: var(--color-accent);
 
 		&::before {
 			transform: translateX(1rem);

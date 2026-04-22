@@ -33,12 +33,14 @@
 	> header aside label {
 		@include inline-flex;
 		@include items-center;
-		@include gap(var(--spacing-xs-up));
-		@include px(var(--spacing-sm-up));
-		@include py(var(--spacing-xs));
-		@include rounded-md;
+		--gap: var(--size-xs-up);
+		--padding-x: var(--size-sm-up);
+		--padding-y: var(--size-xs);
+		gap: var(--gap);
+		padding: var(--padding-y) var(--padding-x);
+		border-radius: var(--radius);
 		@include border;
-		@include bg-primary;
+		background: var(--color-bg);
 		@include transition-fast;
 
 		input[type="search"] {
@@ -50,7 +52,7 @@
 			@include w(10rem);
 
 			&::placeholder {
-				@include text-muted;
+				color: var(--color-fg-subtle);
 			}
 
 			&::-webkit-search-cancel-button {
@@ -59,7 +61,7 @@
 		}
 
 		&:focus-within {
-			border-color: hsl(var(--color-primary));
+			border-color: var(--color-accent);
 			box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.1);
 		}
 	}
@@ -69,7 +71,7 @@
 		position: sticky;
 		top: 0;
 		z-index: var(--z-sticky);
-		background: hsl(var(--color-bg-primary));
+		background: var(--color-bg);
 	}
 
 	// Sticky footer
@@ -77,8 +79,8 @@
 		position: sticky;
 		bottom: 0;
 		z-index: var(--z-sticky);
-		background: hsl(var(--color-bg-primary));
-		border-top: 1px solid hsl(var(--color-border));
+		background: var(--color-bg);
+		border-top: var(--border-width) solid hsl(var(--color-border));
 	}
 }
 
@@ -92,14 +94,16 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	padding: var(--spacing-2xs);
-	margin-inline-start: var(--spacing-xs);
+	--padding-x: var(--size-2xs);
+	--padding-y: var(--size-2xs);
+	padding: var(--padding-y) var(--padding-x);
+	margin-inline-start: var(--size-xs);
 	vertical-align: middle;
 }
 
 @mixin data-table-sort-active {
 	opacity: 1;
-	color: hsl(var(--color-primary));
+	color: var(--color-accent);
 }
 
 // ─── Filter button ────────────────────────────────────────
@@ -112,15 +116,17 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	padding: var(--spacing-2xs);
-	margin-inline-start: var(--spacing-2xs);
+	--padding-x: var(--size-2xs);
+	--padding-y: var(--size-2xs);
+	padding: var(--padding-y) var(--padding-x);
+	margin-inline-start: var(--size-2xs);
 	vertical-align: middle;
 	@include relative;
 }
 
 @mixin data-table-filter-active {
 	opacity: 1;
-	color: hsl(var(--color-primary));
+	color: var(--color-accent);
 
 	&::after {
 		content: '';
@@ -130,7 +136,7 @@
 		width: 0.375rem;
 		height: 0.375rem;
 		border-radius: var(--radius-full);
-		background: hsl(var(--color-primary));
+		background: var(--color-accent);
 	}
 }
 
@@ -141,11 +147,13 @@
 	top: 100%;
 	left: 0;
 	z-index: var(--z-dropdown);
-	background: hsl(var(--color-bg-primary));
-	border: 1px solid hsl(var(--color-border));
-	border-radius: var(--radius-md);
-	box-shadow: var(--shadow-md);
-	padding: var(--spacing-sm);
+	background: var(--color-bg-raised);
+	border: var(--border-width) solid hsl(var(--color-border));
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-raised);
+	--padding-x: var(--size-sm);
+	--padding-y: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	min-width: 12rem;
 	max-height: 20rem;
 	overflow-y: auto;
@@ -153,7 +161,7 @@
 	[data-ln-filter-search] {
 		@include form-input;
 		width: 100%;
-		margin-bottom: var(--spacing-sm);
+		margin-bottom: var(--size-sm);
 	}
 
 	ul {
@@ -161,13 +169,13 @@
 	}
 
 	li {
-		padding: var(--spacing-xs) 0;
+		padding: var(--size-xs) 0;
 	}
 
 	label {
 		display: flex;
 		align-items: center;
-		gap: var(--spacing-sm);
+		gap: var(--gap);
 		@include cursor-pointer;
 		font-size: var(--text-sm);
 	}
@@ -175,7 +183,7 @@
 	[data-ln-filter-clear] {
 		@include btn;
 		width: 100%;
-		margin-top: var(--spacing-sm);
+		margin-top: var(--size-sm);
 		font-size: var(--text-sm);
 	}
 }

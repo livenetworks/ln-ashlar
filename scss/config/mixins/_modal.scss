@@ -21,7 +21,7 @@
 	display: none;
 	@include fixed;
 	@include inset-0;
-	background-color: hsl(var(--color-neutral-900) / 0.5);
+	background-color: var(--color-scrim);
 	backdrop-filter: blur(4px);
 	-webkit-backdrop-filter: blur(4px);
 	z-index: var(--z-modal);
@@ -29,19 +29,20 @@
 	@include justify-center;
 	opacity: 0;
 	@include motion-safe {
-		transition: opacity var(--transition-base);
+		transition: opacity var(--transition);
 	}
 }
 
 // Content panel — the <form> inside .ln-modal.
 // Structurally IS a section-card: reuse its chrome and its nested
-// > header / > main / > footer recipes (which themselves delegate
-// to panel-header / panel-body / panel-footer). Add only the
-// modal-specific behaviour on top: fixed size envelope, scrollable
-// body, sticky footer, slide-in animation, deeper shadow.
+// > header / > main / > footer recipes. Add only the modal-specific
+// behaviour on top: fixed size envelope, scrollable body, sticky
+// footer, slide-in animation, deeper shadow.
 @mixin modal-panel {
 	@include section-card;
-	@include mb(0);
+	margin-bottom: 0;
+	// Explicit role-scale read — modals use max elevation (deeper than
+	// the --shadow-raised default used by floating panels).
 	box-shadow: var(--shadow-xl);
 	display: grid;
 	grid-template-rows: auto 1fr auto;

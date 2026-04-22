@@ -4,14 +4,15 @@
 @use 'borders' as *;
 
 @mixin kbd {
+	--padding-x: var(--size-xs-up);
+	--padding-y: var(--size-2xs);
 	display: inline-block;
-	@include px(var(--spacing-xs-up));
-	@include py(var(--spacing-2xs));
+	padding: var(--padding-y) var(--padding-x);
 	@include typography(caption);
 	font-family: var(--font-mono);
-	color: hsl(var(--color-text-primary));
-	background: hsl(var(--color-bg-secondary));
-	border: 1px solid hsl(var(--color-border));
+	color: var(--color-fg);
+	background: var(--color-bg-sunken);
+	border: var(--border-width) solid hsl(var(--color-border));
 	border-bottom-width: 2px;
 	@include rounded-sm;
 	line-height: 1;

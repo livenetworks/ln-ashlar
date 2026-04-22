@@ -19,7 +19,7 @@
 // It is NEVER auto-switched by viewport — viewport breakpoints handle
 // layout, density handles information density inside that layout.
 //
-// What reacts: everything that reads `--spacing-*`, `--text-body-*`,
+// What reacts: everything that reads `--size-*`, `--text-body-*`,
 // `--text-label-*`, `--text-title-*`, `--text-heading-*`,
 // `--text-display-sm`, or `--density-row-h`. That is the majority of
 // the library (tables, forms, cards, stat-card, nav, breadcrumbs,
@@ -59,15 +59,13 @@
 .density-compact {
 
 	// -- Spacing — structural compression ---------------------------------
-	--spacing-xs:      0.125rem;   // 2px
-	--spacing-xs-up:   0.25rem;    // 4px
-	--spacing-sm:      0.375rem;   // 6px
-	--spacing-sm-up:   0.5rem;     // 8px
-	--spacing-md-down: 0.5625rem;  // 9px
-	--spacing-md:      0.625rem;   // 10px
-	--spacing-md-up:   0.8125rem;  // 13px
-	--spacing-lg:      1rem;       // 16px
-	--spacing-lg-up:   1.25rem;    // 20px
+	--size-xs:      0.125rem;   // 2px
+	--size-xs-up:   0.25rem;    // 4px
+	--size-sm:      0.375rem;   // 6px
+	--size-sm-up:   0.5rem;     // 8px
+	--size-md:      0.625rem;   // 10px
+	--size-md-up:   0.8125rem;  // 13px
+	--size-lg:      1rem;       // 16px
 
 	// -- Body text --------------------------------------------------------
 	--text-body-md: 0.875rem;

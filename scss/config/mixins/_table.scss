@@ -4,30 +4,32 @@
 @use 'typography' as *;
 @use 'colors' as *;
 @use 'borders' as *;
-@use 'shadows' as *;
 @use 'transitions' as *;
 @use 'position' as *;
 
 // ─── Base table ─────────────────────────────────────────────────
 
 @mixin table-base {
+	// Table-wide cell rhythm: 16×8. Applies to both th and td unless
+	// a variant (table-responsive) re-binds.
+	--padding-x: var(--size-md);
+	--padding-y: var(--size-sm);
 	@include w-full;
-	@include bg-primary;
-	@include rounded-lg;
+	background: var(--color-bg);
+	border-radius: var(--radius-lg);
 	@include overflow-hidden;
-	@include shadow-sm;
+	box-shadow: var(--shadow-default);
 	border-collapse: collapse;
 	font-variant-numeric: tabular-nums;
 
 	thead {
 		background: hsl(var(--color-table-header-bg));
-		border-bottom: 2px solid hsl(var(--color-border));
+		border-bottom: var(--border-width-strong) solid hsl(var(--color-border));
 	}
 
 	th {
 		@include text-left;
-		@include px(var(--spacing-md));
-		@include py(var(--spacing-sm));
+		padding: var(--padding-y) var(--padding-x);
 		@include font-semibold;
 		font-size: var(--text-label-sm);
 		line-height: var(--lh-label-sm);
@@ -41,16 +43,15 @@
 		min-height: var(--density-row-h);
 
 		&:hover {
-			@include bg-secondary;
+			background: var(--color-bg-sunken);
 		}
 	}
 
 	td {
-		@include px(var(--spacing-md));
-		@include py(var(--spacing-sm));
+		padding: var(--padding-y) var(--padding-x);
 		@include border-b;
-		font-size: var(--text-body-md);
-		line-height: var(--lh-body-md);
+		font-size: var(--font-size);
+		line-height: var(--line-height);
 		vertical-align: top;
 	}
 
@@ -85,17 +86,19 @@
 
 	tbody tr {
 		@include block;
-		@include mb(var(--spacing-md));
+		// Structural gap between stacked row-cards.
+		margin-bottom: var(--size-md);
 		@include border;
-		@include rounded-md;
+		border-radius: var(--radius);
 		@include overflow-hidden;
 	}
 
 	td {
+		// Stacked rows need taller vertical rhythm than desktop table cells.
+		--padding-y: var(--size-sm-up);
 		@include block;
 		@include text-right;
-		@include px(var(--spacing-md));
-		@include py(var(--spacing-sm-up));
+		padding: var(--padding-y) var(--padding-x);
 		@include border-b;
 		@include relative;
 		padding-left: 50%;
@@ -109,13 +112,14 @@
 			@include absolute;
 			top: 0;
 			bottom: 0;
-			left: var(--spacing-md);
-			width: calc(50% - var(--spacing-lg));
+			left: var(--padding-x);
+			// Intrinsic layout math — not padding rhythm.
+			width: calc(50% - var(--size-lg));
 			@include flex;
 			@include items-center;
 			@include text-left;
 			@include font-semibold;
-			@include text-secondary;
+			color: var(--color-fg-muted);
 			@include text-xs;
 			@include uppercase;
 			@include truncate;
@@ -127,7 +131,7 @@
 
 @mixin table-striped {
 	tbody tr:nth-child(odd) {
-		@include bg-secondary;
+		background: var(--color-bg-sunken);
 	}
 }
 
@@ -135,7 +139,7 @@
 	background: hsl(var(--color-table-section-bg));
 	@include font-semibold;
 	@include text-sm;
-	color: hsl(var(--color-text-secondary));
+	color: var(--color-fg-muted);
 	letter-spacing: 0.3px;
 
 	&:hover {
@@ -144,16 +148,17 @@
 }
 
 @mixin table-action {
+	--padding-x: var(--size-sm);
+	--padding-y: var(--size-xs);
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	@include px(var(--spacing-sm));
-	@include py(var(--spacing-xs));
+	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
 	@include transition-colors;
 
 	&:hover {
-		@include bg-secondary;
+		background: var(--color-bg-sunken);
 	}
 
 	svg {
@@ -168,16 +173,18 @@
 
 @mixin table-filter-button {
 	th .filter {
+		--padding-x: var(--size-2xs);
+		--padding-y: var(--size-2xs);
 		@include inline-flex;
 		@include items-center;
 		float: right;
-		padding: var(--spacing-2xs);
+		padding: var(--padding-y) var(--padding-x);
 		@include rounded-sm;
 		opacity: 0.5;
 
 		&:hover {
 			opacity: 1;
-			@include bg-secondary;
+			background: var(--color-bg-sunken);
 		}
 	}
 
@@ -187,6 +194,6 @@
 
 	th[data-ln-filter-active] .filter {
 		opacity: 1;
-		color: hsl(var(--color-primary));
+		color: var(--color-accent);
 	}
 }

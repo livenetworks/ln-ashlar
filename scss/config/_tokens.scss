@@ -112,25 +112,29 @@
 	--color-table-section-bg:  var(--color-neutral-150);
 
 	// -----------------------------------------------------------------------
-	// Spacing
+	// Size scale — canonical spacing primitives
 	// -----------------------------------------------------------------------
-	// Public API surface — full scale exposed; internal usage may skip levels.
-	// Intermediate steps use t-shirt + `-up` / `-down` suffix.
-	--spacing-2xs:     0.125rem; // 2px
-	--spacing-xs:      0.25rem;  // 4px
-	--spacing-xs-up:   0.375rem; // 6px
-	--spacing-sm:      0.5rem;   // 8px
-	--spacing-sm-up:   0.75rem;  // 12px
-	--spacing-md-down: 0.875rem; // 14px
-	--spacing-md:      1rem;     // 16px
-	--spacing-md-up:   1.25rem;  // 20px
-	--spacing-lg:      1.5rem;   // 24px
-	--spacing-lg-up:   1.75rem;  // 28px
-	--spacing-xl:      2rem;     // 32px
-	--spacing-2xl:     3rem;     // 48px
-	--spacing-3xl:     4rem;     // 64px
-	--spacing-4xl:     6rem;     // 96px
-	--spacing-5xl:     8rem;     // 128px
+	// Public API surface — full scale exposed. All padding, margin, gap,
+	// inset, and positional-offset spacing references one of these steps.
+	// Intermediate steps use t-shirt + `-up` suffix.
+	//
+	// Mixin bodies read --size-* only when a logical token (--padding-x,
+	// --padding-y, --gap) is not semantically appropriate. Otherwise they
+	// read the logical token, which is re-bound under density / theme /
+	// region scopes (see Logical tokens block below).
+	// -----------------------------------------------------------------------
+	--size-0:      0;
+	--size-2xs:    0.125rem;   // 2px
+	--size-xs:     0.25rem;    // 4px
+	--size-xs-up:  0.375rem;   // 6px
+	--size-sm:     0.5rem;     // 8px
+	--size-sm-up:  0.75rem;    // 12px
+	--size-md:     1rem;       // 16px
+	--size-md-up:  1.25rem;    // 20px
+	--size-lg:     1.5rem;     // 24px
+	--size-xl:     2rem;       // 32px
+	--size-2xl:    3rem;       // 48px
+	--size-3xl:    4rem;       // 64px
 
 	// -----------------------------------------------------------------------
 	// Border Width
@@ -267,4 +271,63 @@
 	--z-overlay: 30;
 	--z-modal: 40;
 	--z-toast: 50;
+
+	// -----------------------------------------------------------------------
+	// Logical tokens — the public contract mixins read
+	// -----------------------------------------------------------------------
+	// Rule: mixin bodies reference ONLY these tokens (and --text-*/--lh-*/
+	// --radius-*/--shadow-*/--transition-*/--easing-* role scales). Back-end
+	// scales (--size-*, --color-neutral-*) are re-bound here and in context
+	// scopes (density, theme, region overrides) — never read directly
+	// inside a component mixin.
+	//
+	// See .claude/plans/refactor-logical-tokens-architecture.md for the
+	// full contract.
+	// -----------------------------------------------------------------------
+
+	// -- Structure & rhythm -----------------------------------------------
+	--padding-x:       var(--size-md-up);
+	--padding-y:       var(--size-xs-up);
+	--gap:             var(--size-sm);
+	--radius:          var(--radius-md);
+
+	// -- Surface colors ---------------------------------------------------
+	--color-bg:            hsl(var(--color-bg-primary));
+	--color-bg-raised:     hsl(var(--color-bg-primary));
+	--color-bg-sunken:     hsl(var(--color-bg-secondary));
+	--color-fg:            hsl(var(--color-text-primary));
+	--color-fg-muted:      hsl(var(--color-text-secondary));
+	--color-fg-subtle:     hsl(var(--color-text-muted));
+	--color-border-subtle: hsl(var(--color-border-light));
+	--color-border-strong:       hsl(var(--color-neutral-300));
+	--color-border-strong-hover: hsl(var(--color-neutral-400));
+	--color-bg-recessed:         hsl(var(--color-bg-body));
+	--color-scrim:               hsl(var(--color-neutral-900) / 0.5);
+	// Note: --color-border already exists above as an HSL TRIPLET. We do
+	// NOT redefine it here — consumers that need the composed color use
+	// `hsl(var(--color-border))` as today. Revisit in Phase 2 if mixin
+	// migration reveals a need for a pre-composed form.
+
+	// -- Accent -----------------------------------------------------------
+	--color-accent:        hsl(var(--color-primary));
+	--color-accent-hover:  hsl(var(--color-primary-hover));
+	--color-accent-fg:     hsl(var(--color-white));
+	--color-accent-tint:         hsl(var(--color-primary-lighter));
+	--color-accent-tint-strong:  hsl(var(--color-primary-light));
+
+	// -- Typography ------------------------------------------------------
+	--font-size:    var(--text-body-md);
+	--line-height:  var(--lh-body-md);
+
+	// -- Motion & depth --------------------------------------------------
+	--shadow-default: var(--shadow-sm);
+	--shadow-raised:  var(--shadow-md);
+	--shadow-overlay: var(--shadow-xl);
+	--transition:     var(--transition-base);
+	// Note: three elevation slots.
+	//   --shadow-default  rests on the page (cards, tables, stat-cards)
+	//   --shadow-raised   floats over content (tooltips, dropdowns, popovers)
+	//   --shadow-overlay  hovers above everything (modals)
+	// --shadow is NOT introduced — conflicts with common short-name
+	// expectations. Always name the elevation tier explicitly.
 }
