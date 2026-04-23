@@ -36,7 +36,7 @@ td .action {
 td .actions {
 	@include inline-flex;
 	@include items-center;
-	@include gap(0.125rem);
+	@include gap(var(--size-2xs));
 }
 
 // Loader

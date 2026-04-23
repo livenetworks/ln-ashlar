@@ -4,11 +4,11 @@
 	@include grid-2;
 
 	article {
-		@include p(1rem);
+		@include p(var(--size-md));
 		@include rounded-md;
 		@include transition;
 
-		h5 { margin-top: 0; @include mb(0.5rem); }
+		h5 { margin-top: 0; @include mb(var(--size-sm)); }
 		ul { margin: 0; }
 	}
 
@@ -50,7 +50,7 @@
 	word-break: break-all;
 	@include font-mono;
 	@include text-sm;
-	@include p(0.75rem);
+	@include p(var(--size-sm-up));
 	@include rounded-md;
 	background-color: hsl(var(--color-info) / 0.08);
 	color: hsl(var(--color-info));

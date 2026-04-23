@@ -7,7 +7,7 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	@include mb(1rem);
+	@include mb(var(--size-md));
 
 	// Label picks up form-input-icon-group from global binding.
 	// Only delta: constrain input width for toolbar context.
@@ -40,16 +40,16 @@
 	}
 
 	nav {
-		@include stack(0.25rem);
+		@include stack(var(--size-xs));
 		max-height: 16rem;
 		@include overflow-auto;
-		@include pr(0.5rem);
+		@include pr(var(--size-sm));
 	}
 }
 
 // Dropdown filter content (Status)
 #filter-status nav {
-	@include stack(0.25rem);
-	@include p(0.5rem);
+	@include stack(var(--size-xs));
+	@include p(var(--size-sm));
 	min-width: 10rem;
 }

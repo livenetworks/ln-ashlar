@@ -1,7 +1,7 @@
 @use '../../../../../scss/config/mixins' as *;
 
 .demo-note {
-	@include p(1rem);
+	@include p(var(--size-md));
 	background: hsl(var(--color-bg-warning, 48 96% 89%));
 	@include border;
 	@include rounded-md;

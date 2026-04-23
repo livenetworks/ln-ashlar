@@ -1,8 +1,15 @@
 @use 'display' as *;
 @use 'spacing' as *;
+@use 'sizing' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
 @use 'position' as *;
 @use 'motion' as *;
+@use 'layout' as *;
 @use 'breakpoints' as *;
+@use 'transitions' as *;
+@use 'interaction' as *;
 @use 'sidebar' as *;
 
 // ─── App Shell ──────────────────────────────────────────────────────────────
@@ -54,12 +61,131 @@
 	@include items-center;
 	@include justify-between;
 	gap: var(--gap);
+
+	// Ghost surface by default for every button in the bar. Variants
+	// (e.g. @mixin app-header-actions) re-bind --btn-border and padding
+	// on top of this default.
+	button {
+		--btn-bg: transparent;
+		--btn-border: transparent;
+		padding: 0;
+		color: var(--color-fg-muted);
+		box-shadow: none;
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
+
+@mixin app-header-left {
+	@include flex;
+	@include items-center;
+	gap: var(--size-sm-up);
+
+	.menu-toggle {
+		@include flex-center;
+		@include size(2rem);
+		@include rounded-sm;
+	}
+
+	h1 {
+		@include text-xl;
+		@include font-bold;
+		@include text-primary;
+		margin: 0;
+	}
+}
+
+@mixin app-header-right {
+	@include flex;
+	@include items-center;
+	gap: var(--size-md);
+}
+
+@mixin app-header-actions {
+	@include flex;
+	@include items-center;
+	gap: var(--size-sm);
+
+	button {
+		// Bordered variant re-bound over @mixin app-header's ghost
+		// default. --color-border is a raw HSL triplet; compose via
+		// hsl() before handing to --btn-border, which feeds a
+		// `border: ... solid <color>` rule.
+		--btn-border: hsl(var(--color-border));
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-sm-up);
+		@include text-xs;
+		font-weight: var(--font-medium);
+		border-radius: var(--radius-sm);
+
+		// Label visually-hidden on small viewports — icon remains.
+		> span {
+			@include mq-down(sm) {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
+			}
+		}
+	}
+}
+
+@mixin header-avatar {
+	// Plain 2rem circular thumbnail. Distinct from @mixin avatar
+	// (profile-button with ring + hover) — this is a non-interactive
+	// image circle used as a popover trigger target.
+	@include size(2rem);
+	@include rounded-full;
+	@include overflow-hidden;
+	@include cursor-pointer;
+
+	img {
+		@include w-full;
+		@include h-full;
+		object-fit: cover;
+	}
 }
 
 @mixin app-main {
 	@include flex-col;
 	@include flex-1;
 	margin-top: var(--app-header-height);
+
+	// When the sidebar drawer is open on desktop, reserve its space
+	// on THIS element (the parent) so both content and footer shift
+	// together. Padding on the parent keeps child widths at 100% and
+	// avoids the horizontal overflow caused by margin-left on
+	// width:100% children.
+	&:has(.app-sidebar[data-ln-toggle="open"]) {
+		padding-left: var(--app-sidebar-width);
+	}
+
+	// On mobile the sidebar overlays (scrim covers content) —
+	// no content shift.
+	@include mq-down(md) {
+		&:has(.app-sidebar[data-ln-toggle="open"]) {
+			padding-left: 0;
+		}
+	}
+
+	// Content column: centred, capped, padded, vertical stack.
+	> section {
+		@include flex-1;
+		@include p(var(--padding-x));
+		@include overflow-auto;
+		max-width: var(--max-w-container);
+		@include mx(auto);
+		@include w-full;
+		@include stack(var(--gap));
+		@include transition;
+	}
 }
 
 @mixin sidebar-drawer {
@@ -121,4 +247,10 @@
 	@include items-center;
 	@include justify-between;
 	user-select: none;
+
+	// Two-span pattern — second span (typically brand/version) gets
+	// the subtler tint for clear hierarchy.
+	> span:last-child {
+		color: var(--color-fg-subtle);
+	}
 }

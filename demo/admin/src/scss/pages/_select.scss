@@ -5,7 +5,7 @@
 }
 
 #select-graceful > p:last-child {
-	@include p(1rem);
+	@include p(var(--size-md));
 	@include bg-secondary;
 	@include rounded-md;
 	@include text-muted;

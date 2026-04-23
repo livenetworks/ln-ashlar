@@ -1,8 +1,14 @@
 @use '../config/mixins' as *;
 
-.app-wrapper { @include app-wrapper; }
-.app-header  { @include app-header; }
-.app-main    { @include app-main; }
-.app-sidebar { @include sidebar; @include sidebar-drawer; }
-.app-scrim   { @include app-scrim; }
-.app-footer  { @include app-footer; }
+.app-wrapper      { @include app-wrapper; }
+.app-header       { @include app-header; }
+.app-main         { @include app-main; }
+.app-sidebar      { @include sidebar; @include sidebar-drawer; }
+.app-scrim        { @include app-scrim; }
+.app-footer       { @include app-footer; }
+
+// Header region structural classes — same tier as .app-header itself.
+.header-left      { @include app-header-left; }
+.header-right     { @include app-header-right; }
+.header-actions   { @include app-header-actions; }
+.header-avatar    { @include header-avatar; }

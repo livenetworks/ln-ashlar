@@ -2,14 +2,14 @@
 
 .demo-nav-example {
 	@include border;
-	@include p(1rem);
+	@include p(var(--size-md));
 	@include rounded-md;
 
-	h5 { margin-top: 0; @include mb(0.5rem); }
+	h5 { margin-top: 0; @include mb(var(--size-sm)); }
 
 	nav {
 		@include flex;
-		@include gap(1rem);
-		@include py(0.5rem);
+		@include gap(var(--size-md));
+		@include py(var(--size-sm));
 	}
 }

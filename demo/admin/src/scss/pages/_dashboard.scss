@@ -10,7 +10,7 @@
 
 	li {
 		@include card;
-		@include p(1rem);
+		@include p(var(--size-md));
 	}
 
 	h3 {
@@ -27,6 +27,6 @@
 	}
 
 	[data-ln-progress] {
-		@include mt(0.5rem);
+		@include mt(var(--size-sm));
 	}
 }

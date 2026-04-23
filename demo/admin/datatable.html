@@ -163,237 +163,6 @@
 		<!-- Content -->
 		<section>
 <h1>Data Table</h1>
-					<p>In-memory filter, sort, virtual scroll. Search is provided by <code>ln-search</code>; sort by <code>ln-table-sort</code>; rendering by <code>ln-table</code>.</p>
-
-					<!-- Attributes -->
-					<section class="section-card">
-						<header><h3>Attributes</h3></header>
-						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-table</code></td><td data-label="On element">wrapper (needs <code>id</code>)</td><td data-label="Description">Marks the component root. Parses rows, listens for search/sort events.</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-search="tableId"</code></td><td data-label="On element"><code>&lt;input&gt;</code> or wrapper</td><td data-label="Description">Standard <code>ln-search</code> — <code>ln-table</code> intercepts the event and handles filtering in-memory.</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-table-clear</code></td><td data-label="On element"><code>&lt;button&gt;</code></td><td data-label="Description">Clears the search input. Resolves via <code>closest [data-ln-table]</code> → id → <code>[data-ln-search="id"]</code>.</td></tr>
-									<tr><td data-label="Attribute"><code>th[data-ln-sort="string"]</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Makes a column sortable. Values: <code>string</code>, <code>number</code>, <code>date</code>.</td></tr>
-									<tr><td data-label="Attribute"><code>td[data-ln-value]</code></td><td data-label="On element"><code>&lt;td&gt;</code></td><td data-label="Description">Raw sort/filter value when display text differs (formatted numbers, dates).</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-table-empty</code></td><td data-label="On element"><code>&lt;template&gt;</code></td><td data-label="Description">Content shown when search returns 0 results.</td></tr>
-								</tbody>
-							</table>
-							</div>
-						</main>
-					</section>
-
-					<!-- Live demo — 10.000 rows -->
-					<section class="section-card">
-						<header><h3>Live Demo — 10,000 rows with filters</h3></header>
-						<main>
-							<div data-ln-table id="demo-table">
-								<header class="ln-table__toolbar">
-									<div>
-										<h3>Employees</h3>
-										<small>Manage employee records. Click column headers to sort.</small>
-									</div>
-									<aside>
-										<label>
-											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-											<input type="search" placeholder="Search employees..." data-ln-search="demo-table">
-										</label>
-										<span class="ln-table__count" id="demo-count"></span>
-										<span class="ln-table__timing" id="demo-timing"></span>
-									</aside>
-								</header>
-
-								<template data-ln-table-empty>
-									<article class="ln-table__empty-state">
-										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
-										<h3>No results</h3>
-										<p>Try different search terms or clear filters.</p>
-										<button class="btn" data-ln-table-clear>Clear search</button>
-									</article>
-								</template>
-
-								<div class="table-container">
-								<table>
-									<thead>
-										<tr>
-											<th data-ln-sort="number">#</th>
-											<th data-ln-sort="string">Employee</th>
-											<th data-ln-sort="string" data-ln-filter-col="dept">
-												<div data-ln-dropdown>
-													<button data-ln-toggle-for="filter-dept-dd">Department <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
-													<ul id="filter-dept-dd" data-ln-toggle data-ln-dropdown-menu data-ln-filter="demo-table">
-														<li><button data-ln-filter-key="dept" data-ln-filter-value="" data-active>All</button></li>
-														<li><button data-ln-filter-key="dept" data-ln-filter-value="IT">IT</button></li>
-														<li><button data-ln-filter-key="dept" data-ln-filter-value="Finance">Finance</button></li>
-														<li><button data-ln-filter-key="dept" data-ln-filter-value="Legal">Legal</button></li>
-														<li><button data-ln-filter-key="dept" data-ln-filter-value="Marketing">Marketing</button></li>
-														<li><button data-ln-filter-key="dept" data-ln-filter-value="HR">HR</button></li>
-														<li><button data-ln-filter-key="dept" data-ln-filter-value="Sales">Sales</button></li>
-													</ul>
-												</div>
-											</th>
-											<th data-ln-sort="string">Position</th>
-											<th data-ln-sort="date">Hire Date</th>
-											<th data-ln-sort="number" class="numeric">Salary (USD)</th>
-											<th data-ln-filter-col="status">
-												<div data-ln-dropdown>
-													<button data-ln-toggle-for="filter-status-dd">Status <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
-													<ul id="filter-status-dd" data-ln-toggle data-ln-dropdown-menu data-ln-filter="demo-table">
-														<li><button data-ln-filter-key="status" data-ln-filter-value="" data-active>All</button></li>
-														<li><button data-ln-filter-key="status" data-ln-filter-value="Active">Active</button></li>
-														<li><button data-ln-filter-key="status" data-ln-filter-value="Inactive">Inactive</button></li>
-														<li><button data-ln-filter-key="status" data-ln-filter-value="On Leave">On Leave</button></li>
-														<li><button data-ln-filter-key="status" data-ln-filter-value="Suspended">Suspended</button></li>
-													</ul>
-												</div>
-											</th>
-											<th class="center">Actions</th>
-										</tr>
-									</thead>
-									<tbody id="demo-tbody"></tbody>
-								</table>
-								</div>
-
-								<footer class="ln-table__footer">
-									<span>Showing <strong id="demo-total"></strong> records</span>
-									<span class="ln-table__timing" id="demo-timing-footer"></span>
-								</footer>
-							</div>
-						</main>
-					</section>
-
-					<!-- Events -->
-					<section class="section-card">
-						<header><h3>Events</h3></header>
-						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Event</th><th>Dispatched by</th><th><code>detail</code></th></tr></thead>
-								<tbody>
-									<tr><td><code>ln-table:ready</code></td><td><code>ln-table</code> — after row parse</td><td><code>{ total }</code></td></tr>
-									<tr><td><code>ln-table:filter</code></td><td><code>ln-table</code> — after filter render</td><td><code>{ term, matched, total }</code></td></tr>
-									<tr><td><code>ln-table:sort</code></td><td><code>ln-table-sort</code> — on <code>th</code> click</td><td><code>{ column, sortType, direction }</code></td></tr>
-									<tr><td><code>ln-table:sorted</code></td><td><code>ln-table</code> — after sort render</td><td><code>{ column, direction, matched, total }</code></td></tr>
-									<tr><td><code>ln-table:empty</code></td><td><code>ln-table</code> — filter returns 0</td><td><code>{ term, total }</code></td></tr>
-								</tbody>
-							</table>
-							</div>
-							<pre><code>var table = document.getElementById('demo-table');
-
-table.addEventListener('ln-table:ready', function (e) {
-    countEl.textContent = e.detail.total.toLocaleString() + ' records';
-});
-
-table.addEventListener('ln-table:filter', function (e) {
-    countEl.textContent = e.detail.matched < e.detail.total
-        ? e.detail.matched.toLocaleString() + ' / ' + e.detail.total.toLocaleString()
-        : e.detail.total.toLocaleString() + ' records';
-});</code></pre>
-						</main>
-					</section>
-
-					<!-- HTML Structure -->
-					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
-						<main>
-							<pre><code>&lt;div id="employees" data-ln-table&gt;
-
-    &lt;!-- Optional toolbar (sticky) --&gt;
-    &lt;header class="ln-table__toolbar"&gt;
-        &lt;h3&gt;Employees&lt;/h3&gt;
-        &lt;aside&gt;
-            &lt;label&gt;
-                &lt;span class="ln-icon-filter ln-icon--sm"&gt;&lt;/span&gt;
-                &lt;input type="search" placeholder="Search..." data-ln-search="employees"&gt;
-            &lt;/label&gt;
-            &lt;span class="ln-table__count"&gt;&lt;/span&gt;
-            &lt;span class="ln-table__timing"&gt;&lt;/span&gt;
-        &lt;/aside&gt;
-    &lt;/header&gt;
-
-    &lt;!-- Optional empty state --&gt;
-    &lt;template data-ln-table-empty&gt;
-        &lt;article class="ln-table__empty-state"&gt;
-            &lt;span class="ln-icon-filter ln-icon--xl"&gt;&lt;/span&gt;
-            &lt;h3&gt;No results&lt;/h3&gt;
-            &lt;button class="btn btn--secondary" data-ln-table-clear&gt;Clear&lt;/button&gt;
-        &lt;/article&gt;
-    &lt;/template&gt;
-
-    &lt;table&gt;
-        &lt;thead&gt;
-            &lt;tr&gt;
-                &lt;th data-ln-sort="number"&gt;#&lt;/th&gt;
-                &lt;th data-ln-sort="string"&gt;Name&lt;/th&gt;
-                &lt;th data-ln-sort="date"&gt;Date&lt;/th&gt;
-                &lt;th data-ln-sort="number"&gt;Salary&lt;/th&gt;
-                &lt;th&gt;Actions&lt;/th&gt;
-            &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody&gt;
-            &lt;tr&gt;
-                &lt;td&gt;1&lt;/td&gt;
-                &lt;td&gt;Marko Petrovski&lt;/td&gt;
-                &lt;td data-ln-value="1700000000"&gt;15.11.2023&lt;/td&gt;
-                &lt;td data-ln-value="55000"&gt;55.000&lt;/td&gt;
-                &lt;td&gt;&lt;button&gt;...&lt;/button&gt;&lt;/td&gt;
-            &lt;/tr&gt;
-        &lt;/tbody&gt;
-    &lt;/table&gt;
-
-    &lt;!-- Optional footer --&gt;
-    &lt;footer class="ln-table__footer"&gt;
-        &lt;span&gt;Total: &lt;strong&gt;&lt;/strong&gt;&lt;/span&gt;
-    &lt;/footer&gt;
-&lt;/div&gt;</code></pre>
-						</main>
-					</section>
-
-					<!-- data-ln-value -->
-					<section class="section-card">
-						<header><h3>data-ln-value — sort/filter raw value</h3></header>
-						<main>
-							<p>When display text differs from the sort/filter key, add <code>data-ln-value</code> on the <code>&lt;td&gt;</code>:</p>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Case</th><th>Without data-ln-value</th><th>With data-ln-value</th></tr></thead>
-								<tbody>
-									<tr><td>Formatted number</td><td>Sorts by <code>"55.000"</code> (string)</td><td>Sorts by <code>55000</code> (number)</td></tr>
-									<tr><td>Formatted date</td><td>Sorts by <code>"15.11.2023"</code> (string)</td><td>Sorts by Unix timestamp (number)</td></tr>
-								</tbody>
-							</table>
-							</div>
-							<pre><code>&lt;td data-ln-value="55000"&gt;55.000&lt;/td&gt;
-&lt;td data-ln-value="1700000000"&gt;15.11.2023&lt;/td&gt;</code></pre>
-						</main>
-					</section>
-
-					<!-- Virtual scroll -->
-					<section class="section-card">
-						<header><h3>Virtual Scroll</h3></header>
-						<main>
-							<p>Automatically activates when filtered rows exceed <strong>200</strong>. Only visible rows + 15 buffer rows are rendered. Deactivates automatically when rows drop below the threshold.</p>
-							<p>Column widths are locked on first parse to prevent layout shifts during virtual rendering.</p>
-						</main>
-					</section>
-
-					<!-- Dynamic rows -->
-					<section class="section-card">
-						<header><h3>Dynamic Rows (AJAX)</h3></header>
-						<main>
-							<p>If <code>&lt;tbody&gt;</code> is empty at init, <code>ln-table</code> waits — a MutationObserver detects when rows are added and parses them automatically.</p>
-							<pre><code>// After AJAX — set innerHTML directly, ln-table will detect it
-document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pre>
-						</main>
-					</section>
-
-					<!-- ═══════════════════════════════════════════════════ -->
-					<!-- ln-data-table — event-driven component            -->
-					<!-- ═══════════════════════════════════════════════════ -->
-
-					<h1>ln-data-table</h1>
 					<p>Event-driven data table. Receives data via <code>ln-data-table:set-data</code>, renders rows from <code>&lt;template&gt;</code>. Sort, filter, search, selection, virtual scroll, keyboard navigation.</p>
 
 					<!-- ln-data-table Attributes -->
@@ -423,7 +192,7 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 
 					<!-- ln-data-table Live Demo -->
 					<section class="section-card">
-						<header><h3>Live Demo — 1,000 rows (ln-data-table)</h3></header>
+						<header><h3>Live Demo — 10,000 rows</h3></header>
 						<main>
 							<section data-ln-data-table="demo-docs"
 							         data-ln-data-table-selectable
@@ -568,6 +337,108 @@ document.querySelector('#employees tbody').innerHTML = generatedHtml;</code></pr
 							</div>
 						</main>
 					</section>
+
+<script>
+// ─── ln-data-table demo — 10,000 documents (coordinator) ───
+(function () {
+	var TOTAL = 10000;
+	var tableEl = document.getElementById('demo-data-table');
+	if (!tableEl) return;
+
+	var titles = [
+		'ISO 27001 Policy', 'Risk Assessment', 'Access Control', 'Data Protection',
+		'Business Continuity', 'Incident Response', 'Security Audit', 'Compliance Report',
+		'Network Policy', 'User Guide', 'Training Manual', 'Vendor Agreement',
+		'Privacy Policy', 'SLA Document', 'Change Request', 'Release Notes'
+	];
+	var departments = ['IT', 'Finance', 'Legal', 'Marketing', 'HR', 'Sales', 'Operations'];
+	var statusList = ['Approved', 'Draft', 'Pending', 'Rejected', 'Archived'];
+
+	function pad(n) { return n < 10 ? '0' + n : n; }
+
+	var allData = [];
+	for (var i = 0; i < TOTAL; i++) {
+		var d = new Date(2023, 0, 1);
+		d.setDate(d.getDate() + Math.floor(Math.random() * 730));
+		allData.push({
+			id: i + 1,
+			title: titles[i % titles.length] + ' #' + (i + 1),
+			department: departments[i % departments.length],
+			status: statusList[i % statusList.length],
+			date: pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear(),
+			_dateTs: d.getTime()
+		});
+	}
+
+	document.addEventListener('ln-data-table:request-data', function (e) {
+		if (e.detail.table !== 'demo-docs') return;
+		var sort = e.detail.sort;
+		var filters = e.detail.filters;
+		var search = e.detail.search;
+
+		var result = allData.slice();
+
+		if (search) {
+			var q = search.toLowerCase();
+			result = result.filter(function (r) {
+				return r.title.toLowerCase().indexOf(q) !== -1
+					|| r.department.toLowerCase().indexOf(q) !== -1
+					|| r.status.toLowerCase().indexOf(q) !== -1;
+			});
+		}
+
+		if (filters) {
+			for (var field in filters) {
+				var vals = filters[field];
+				if (vals && vals.length) {
+					result = result.filter(function (r) {
+						return vals.indexOf(String(r[field])) !== -1;
+					});
+				}
+			}
+		}
+
+		if (sort && sort.field) {
+			var dir = sort.direction === 'desc' ? -1 : 1;
+			var f = sort.field;
+			result.sort(function (a, b) {
+				var av = f === 'date' ? a._dateTs : a[f];
+				var bv = f === 'date' ? b._dateTs : b[f];
+				if (av < bv) return -1 * dir;
+				if (av > bv) return 1 * dir;
+				return 0;
+			});
+		}
+
+		tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+			bubbles: true,
+			detail: {
+				data: result,
+				total: allData.length,
+				filtered: result.length
+			}
+		}));
+	});
+
+	document.addEventListener('ln-data-table:row-click', function (e) {
+		if (e.detail.table !== 'demo-docs') return;
+		window.lnToast.enqueue({
+			type: 'info',
+			title: 'Row clicked',
+			message: 'ID: ' + e.detail.id + ' — ' + (e.detail.record.title || '')
+		});
+	});
+
+	document.addEventListener('ln-data-table:row-action', function (e) {
+		if (e.detail.table !== 'demo-docs') return;
+		window.lnToast.enqueue({
+			type: e.detail.action === 'delete' ? 'error' : 'info',
+			title: e.detail.action.charAt(0).toUpperCase() + e.detail.action.slice(1),
+			message: e.detail.record.title || 'ID: ' + e.detail.id
+		});
+	});
+})();
+</script>
 		</section>
 
 		<!-- Footer -->

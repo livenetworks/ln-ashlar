@@ -30,13 +30,13 @@
 		margin: 0;
 		@include flex;
 		@include flex-wrap;
-		@include gap(0.5rem);
+		@include gap(var(--size-sm));
 
 		legend {
 			@include text-sm;
 			@include text-secondary;
 			@include font-medium;
-			@include mb(0.5rem);
+			@include mb(var(--size-sm));
 			float: left;
 			width: 100%;
 		}
@@ -84,16 +84,16 @@
 			@include text-sm;
 			@include font-semibold;
 			@include text-primary;
-			@include mb(0.75rem);
+			@include mb(var(--size-sm-up));
 		}
 
 		.form-element {
-			@include mb(0.5rem);
+			@include mb(var(--size-sm));
 
 			label {
 				@include flex;
 				@include items-center;
-				@include gap(0.5rem);
+				@include gap(var(--size-sm));
 				@include cursor-pointer;
 			}
 		}
@@ -105,7 +105,7 @@
 	@include flex;
 	@include flex-wrap;
 	@include items-center;
-	@include gap(0.5rem);
+	@include gap(var(--size-sm));
 }
 
 // ─── Focus indicator preset demos ─────────────────────────
@@ -157,7 +157,7 @@
 	max-height: 10rem;
 	overflow-y: auto;
 	background: hsl(var(--color-surface-alt));
-	@include p(0.75rem);
+	@include p(var(--size-sm-up));
 	@include rounded-md;
 	min-height: 3rem;
 }

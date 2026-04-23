@@ -8,24 +8,8 @@
 
 .demo-theme-picker {
 	ul {
-		list-style: none;
-		margin: 0;
-		padding: var(--size-xs);
+		@include menu-items;
 		min-width: 12rem;
-	}
-
-	li button {
-		@include flex;
-		@include items-center;
-		gap: var(--size-sm);
-		width: 100%;
-		justify-content: flex-start;
-		text-align: left;
-
-		&[aria-current="true"] {
-			background-color: hsl(var(--color-primary-lighter));
-			color: hsl(var(--color-primary));
-		}
 	}
 }
 

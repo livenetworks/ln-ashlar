@@ -24,6 +24,39 @@
 		border-color: var(--color-border-strong);
 		box-shadow: var(--shadow-raised);
 	}
+
+	// Direct-child selectors only — nested <header>/<main>/<footer>
+	// inside card content are consumer-owned and must not inherit the
+	// card's chrome. Same rationale as @mixin section-card.
+	> header { @include panel-header; }
+	> main   { @include panel-body; }
+	> footer { @include panel-footer; }
+
+	// Card-tile behavior: main stretches to equalize heights when
+	// cards are placed in a grid row, and provides rhythm between
+	// stacked children (h3, p, .field) via the logical gap token.
+	> main {
+		@include flex-1;
+		gap: var(--gap);
+	}
+
+	// Whole-card-as-link: <a> wraps card content and fills the card.
+	> a {
+		@include flex-col;
+		@include flex-1;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	// Tile-header h3: when a card carries a title inside > main
+	// without a <header> wrapper, the global h3 cascade (heading-sm)
+	// is too large for tile context. Tighten to tile-title sizing.
+	> main h3 {
+		font-size: var(--text-body-sm);
+		@include font-semibold;
+		color: inherit;
+		margin: 0;
+	}
 }
 
 @mixin panel-header {

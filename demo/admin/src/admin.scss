@@ -10,10 +10,7 @@
 @use '../../../scss/ln-acme';
 
 // Admin shell (layout)
-@use 'scss/shell';
 @use 'scss/navigation';
-@use 'scss/sections';
-@use 'scss/card';
 
 // Demo infrastructure
 @use 'scss/demo-layout';
@@ -31,11 +28,9 @@
 @use 'scss/pages/nav';
 @use 'scss/pages/progress';
 @use 'scss/pages/select';
-@use 'scss/pages/tabs';
 @use 'scss/pages/ajax';
 @use 'scss/pages/filter';
 @use 'scss/pages/sortable';
-@use 'scss/pages/mixins';
 @use 'scss/pages/modal';
 @use 'scss/pages/tables';
 @use 'scss/pages/status-badge';

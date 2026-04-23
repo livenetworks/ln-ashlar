@@ -75,6 +75,14 @@
 	--text-body-sm: 0.8125rem;
 	--lh-body-sm:   1.45;
 
+	// Explicit rebind — `--font-size` is defined at `:root` as
+	// `var(--text-body-md)`. Lazy resolution SHOULD cascade, but
+	// form inputs (font-size: var(--font-size)) don't shrink in
+	// practice. Explicit rebind here forces the compact value to
+	// reach every consumer of --font-size.
+	--font-size:    var(--text-body-md);
+	--line-height:  var(--lh-body-md);
+
 	// -- Labels -----------------------------------------------------------
 	--text-label-md: 0.8125rem;
 	--lh-label-md:   1.4;

@@ -133,3 +133,25 @@
 						</p>
 					</main>
 				</section>
+
+<script>
+(function () {
+	const htmlEl = document.documentElement;
+	const scopedTarget = document.getElementById('density-scoped-target');
+
+	const globalCb = document.querySelector('[data-demo-density-global]');
+	const scopedCb = document.querySelector('[data-demo-density-scoped]');
+
+	if (globalCb) {
+		globalCb.addEventListener('change', function () {
+			htmlEl.classList.toggle('density-compact', globalCb.checked);
+		});
+	}
+
+	if (scopedCb && scopedTarget) {
+		scopedCb.addEventListener('change', function () {
+			scopedTarget.classList.toggle('density-compact', scopedCb.checked);
+		});
+	}
+})();
+</script>

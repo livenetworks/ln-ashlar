@@ -1,8 +1,10 @@
 @use 'spacing' as *;
 @use 'display' as *;
+@use 'sizing' as *;
 @use 'typography' as *;
 @use 'colors' as *;
 @use 'borders' as *;
+@use 'position' as *;
 
 // ─── Sidebar ───────────────────────────────────────────────────────
 // Structural shell for a sidebar layout. Provides flex column, right
@@ -36,12 +38,44 @@
 
 	> header {
 		--gap: var(--size-sm-up);
+		@include relative;
 		@include flex;
 		@include items-center;
+		@include flex-wrap;
 		gap: var(--gap);
 		padding-block: var(--size-sm-up);
 		@include border-b;
 		@include shadow-b;
+
+		// Brand row: logo + name, with optional drawer close button
+		// absolutely positioned top-right. Library owns the
+		// data-ln-toggle-action and data-ln-search attributes.
+		> img {
+			@include flex-shrink-0;
+			@include size(2rem);
+		}
+
+		> .app-name {
+			@include text-lg;
+			@include font-bold;
+			@include text-primary;
+			@include truncate;
+		}
+
+		> [data-ln-toggle-action="close"] {
+			--padding-y: var(--size-2xs);
+			--padding-x: var(--size-2xs);
+			@include absolute;
+			top: var(--size-sm);
+			right: var(--size-sm);
+		}
+
+		// Search field drops to a full-width second row below the
+		// brand triad (enabled by `flex-wrap` above).
+		> [data-ln-search] {
+			@include w-full;
+			@include mt(var(--size-xs));
+		}
 	}
 
 	> main {

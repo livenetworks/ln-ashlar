@@ -6,7 +6,7 @@
 
 	article {
 		@include card;
-		@include p(1rem);
+		@include p(var(--size-md));
 
 		p { margin: 0; }
 	}
@@ -19,7 +19,7 @@
 	article {
 		@include card;
 		@include card-accent-top;
-		@include p(1rem);
+		@include p(var(--size-md));
 
 		h4 { margin: 0; }
 		p { margin: 0; @include text-sm; @include text-secondary; }
@@ -33,7 +33,7 @@
 	article {
 		@include card;
 		@include card-accent-left;
-		@include p(1rem);
+		@include p(var(--size-md));
 
 		h4 { margin: 0; }
 		p { margin: 0; @include text-sm; @include text-secondary; }
@@ -47,7 +47,7 @@
 	article {
 		@include card;
 		@include card-accent-bottom;
-		@include p(1rem);
+		@include p(var(--size-md));
 
 		h4 { margin: 0; }
 		p { margin: 0; @include text-sm; @include text-secondary; }
@@ -61,7 +61,7 @@
 	article {
 		@include card;
 		@include card-bg;
-		@include p(1rem);
+		@include p(var(--size-md));
 
 		h4 { margin: 0; color: hsl(var(--color-primary)); }
 		p { margin: 0; @include text-sm; @include text-secondary; }
@@ -75,8 +75,8 @@
 	article {
 		@include card;
 		@include card-stacked;
-		@include p(1rem);
-		@include mb(1rem);
+		@include p(var(--size-md));
+		@include mb(var(--size-md));
 
 		h4 { margin: 0; }
 		p { margin: 0; @include text-sm; @include text-secondary; }
@@ -90,7 +90,7 @@
 	article {
 		@include card;
 		@include card-accent-top;
-		@include p(1rem);
+		@include p(var(--size-md));
 		text-align: center;
 
 		.stat-value {
@@ -106,12 +106,12 @@
 			@include text-muted;
 			@include uppercase;
 			@include tracking-wider;
-			@include mt(0.25rem);
+			@include mt(var(--size-xs));
 		}
 
 		.stat-change {
 			@include text-sm;
-			@include mt(0.5rem);
+			@include mt(var(--size-sm));
 			color: hsl(var(--color-primary));
 		}
 	}
@@ -126,7 +126,7 @@
 
 	article {
 		@include card;
-		@include p(1rem);
+		@include p(var(--size-md));
 
 		h4 { margin: 0; }
 		p { margin: 0; @include text-sm; @include text-secondary; }
@@ -157,8 +157,8 @@
 
 #demo-secondary-buttons {
 	@include flex;
-	@include gap(0.75rem);
-	@include mt(1rem);
+	@include gap(var(--size-sm-up));
+	@include mt(var(--size-md));
 
 	button {
 		@include btn;
@@ -177,19 +177,19 @@
 		}
 
 		main {
-			@include p(1rem);
+			@include p(var(--size-md));
 
 			p { margin: 0; @include text-sm; @include text-secondary; }
 		}
 
 		footer {
-			@include px(1rem);
-			@include py(0.75rem);
+			@include px(var(--size-md));
+			@include py(var(--size-sm-up));
 			@include border-t-light;
 			@include bg-secondary;
 			@include flex;
 			@include justify-end;
-			@include gap(0.5rem);
+			@include gap(var(--size-sm));
 
 			button { @include btn-sm; }
 		}

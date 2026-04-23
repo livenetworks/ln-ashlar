@@ -21,7 +21,7 @@
 [data-demo-tooltip-toolbar] {
 	@include flex;
 	@include items-center;
-	@include gap(0.5rem);
+	@include gap(var(--size-sm));
 }
 
 // Four-position compass grid — CSS baseline positions showcase
@@ -30,7 +30,7 @@
 	grid-template-columns: 10rem 10rem 10rem;
 	grid-template-rows: 3.5rem 3.5rem 3.5rem;
 	place-items: center;
-	@include p(2rem);
+	@include p(var(--size-xl));
 	@include mx(auto);
 	width: fit-content;
 
@@ -45,7 +45,7 @@
 // right-side tooltip has no room and flips to the left.
 [data-demo-tooltip-flip-row] {
 	@include flex;
-	@include gap(0.5rem);
+	@include gap(var(--size-sm));
 
 	> button:last-child {
 		margin-left: auto;

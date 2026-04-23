@@ -11,10 +11,10 @@
 	list-style: none;
 	padding: 0;
 	margin: 0;
-	@include stack(0.5rem);
+	@include stack(var(--size-sm));
 
 	li {
-		@include p(0.75rem);
+		@include p(var(--size-sm-up));
 		@include border;
 		@include rounded-md;
 		@include bg-secondary;
@@ -25,15 +25,15 @@
 	display: grid;
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 	@media (min-width: 768px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-	@include gap(1rem);
+	@include gap(var(--size-md));
 	list-style: none;
 	padding: 0;
 	margin: 0;
 
 	li {
 		@include card;
-		@include p(1rem);
-		@include stack(0.25rem);
+		@include p(var(--size-md));
+		@include stack(var(--size-xs));
 
 		strong { @include block; }
 		small { @include text-secondary; }
@@ -44,17 +44,17 @@
 	@include flex;
 	@include flex-wrap;
 	@include items-center;
-	@include gap(1rem);
-	@include mb(1rem);
+	@include gap(var(--size-md));
+	@include mb(var(--size-md));
 
 	> label {
 		@include flex;
 		@include items-center;
-		@include gap(0.5rem);
+		@include gap(var(--size-sm));
 		@include border;
 		@include rounded-md;
-		@include px(0.75rem);
-		@include py(0.375rem);
+		@include px(var(--size-sm-up));
+		@include py(var(--size-xs-up));
 		@include bg-primary;
 
 		input {
@@ -67,7 +67,7 @@
 }
 
 #api-demo-actions {
-	@include mb(1rem);
+	@include mb(var(--size-md));
 
 	code {
 		@include text-sm;
@@ -80,10 +80,10 @@
 	list-style: none;
 	padding: 0;
 	margin: 0;
-	@include stack(0.5rem);
+	@include stack(var(--size-sm));
 
 	li {
-		@include p(0.75rem);
+		@include p(var(--size-sm-up));
 		@include border;
 		@include rounded-md;
 		@include bg-secondary;

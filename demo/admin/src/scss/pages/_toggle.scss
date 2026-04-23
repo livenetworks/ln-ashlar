@@ -2,7 +2,7 @@
 
 .demo-toggle-sidebar {
 	@include flex;
-	@include gap(1rem);
+	@include gap(var(--size-md));
 	min-height: 12rem;
 	@include border;
 	@include rounded-md;
@@ -10,7 +10,7 @@
 
 	aside {
 		@include relative;
-		@include p(1rem);
+		@include p(var(--size-md));
 		@include bg-secondary;
 		width: 12rem;
 		@include border-r;
@@ -22,7 +22,7 @@
 
 		h4 {
 			margin: 0;
-			@include mb(0.5rem);
+			@include mb(var(--size-sm));
 		}
 
 		ul {
@@ -35,16 +35,16 @@
 			--padding-y: var(--size-2xs);
 			--padding-x: var(--size-2xs);
 			@include absolute;
-			top: 0.25rem;
-			right: 0.25rem;
+			top: var(--size-xs);
+			right: var(--size-xs);
 		}
 	}
 
 	> article {
-		@include p(1rem);
+		@include p(var(--size-md));
 		@include flex;
 		flex-direction: column;
-		@include gap(0.5rem);
+		@include gap(var(--size-sm));
 	}
 }
 
@@ -56,45 +56,12 @@
 		@include flex;
 		@include justify-between;
 		@include items-center;
-		@include p(1rem);
+		@include p(var(--size-md));
 		@include border-b;
 	}
 
 	.collapsible-body {
-		@include p(1rem);
-		@include stack(0.5rem);
-	}
-}
-
-.demo-toggle-dropdown {
-	@include relative;
-
-	ul {
-		display: none;
-		@include absolute;
-		top: 100%;
-		left: 0;
-		@include mt(0.25rem);
-		@include bg-primary;
-		@include border;
-		@include rounded-md;
-		@include shadow-md;
-		list-style: none;
-		padding: 0;
-		min-width: 10rem;
-		z-index: 10;
-
-		&.open { display: block; }
-
-		a {
-			@include block;
-			@include px(1rem);
-			@include py(0.5rem);
-			text-decoration: none;
-			color: inherit;
-			@include transition;
-
-			&:hover { @include bg-secondary; }
-		}
+		@include p(var(--size-md));
+		@include stack(var(--size-sm));
 	}
 }

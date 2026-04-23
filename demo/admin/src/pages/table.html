@@ -30,9 +30,7 @@
 						<main>
 							<div data-ln-table id="demo-table">
 								<header class="ln-table__toolbar">
-									<div>
-										<h3>Products</h3>
-									</div>
+									<h3>Products</h3>
 									<aside>
 										<label>
 											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
@@ -255,3 +253,78 @@ var el = document.querySelector('[data-ln-table]');
 el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code></pre>
 						</main>
 					</section>
+
+<script>
+(function () {
+	var TOTAL = 500;
+	var tableEl = document.getElementById('demo-table');
+	var tbody = document.getElementById('demo-tbody');
+	var countEl = document.getElementById('demo-count');
+	var totalEl = document.getElementById('demo-total');
+	if (!tableEl || !tbody) return;
+
+	// Wire up events
+	tableEl.addEventListener('ln-table:ready', function (e) {
+		var n = e.detail.total.toLocaleString();
+		if (countEl) countEl.textContent = n + ' products';
+		if (totalEl) totalEl.textContent = n;
+	});
+
+	tableEl.addEventListener('ln-table:filter', function (e) {
+		var matched = e.detail.matched;
+		var total = e.detail.total;
+		if (countEl) {
+			countEl.textContent = matched < total
+				? matched.toLocaleString() + ' / ' + total.toLocaleString()
+				: total.toLocaleString() + ' products';
+		}
+		if (totalEl) totalEl.textContent = matched.toLocaleString();
+	});
+
+	tableEl.addEventListener('ln-table:sorted', function (e) {
+		if (totalEl) totalEl.textContent = e.detail.matched.toLocaleString();
+	});
+
+	// Data
+	var products = [
+		'Laptop Pro', 'Wireless Mouse', 'USB-C Hub', 'Mechanical Keyboard',
+		'Monitor 27"', 'Webcam HD', 'Headset Pro', 'Docking Station',
+		'SSD 1TB', 'RAM 32GB', 'GPU Card', 'Network Switch',
+		'Power Supply', 'Cable Kit', 'Mouse Pad', 'Screen Protector'
+	];
+	var categories = ['Electronics', 'Peripherals', 'Storage', 'Networking', 'Accessories', 'Components'];
+
+	function formatPrice(n) {
+		return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+	}
+
+	function statusFor(stock) {
+		if (stock === 0) return 'Out of Stock';
+		if (stock < 50) return 'Low Stock';
+		return 'In Stock';
+	}
+
+	// Generate rows
+	var html = [];
+	for (var i = 0; i < TOTAL; i++) {
+		var name = products[i % products.length];
+		var cat = categories[i % categories.length];
+		var price = 50 + Math.floor(Math.random() * 2000);
+		var stock = Math.floor(Math.random() * 500);
+		var status = statusFor(stock);
+
+		html.push(
+			'<tr>' +
+			'<td>' + (i + 1) + '</td>' +
+			'<td>' + name + '</td>' +
+			'<td>' + cat + '</td>' +
+			'<td data-ln-value="' + price + '" class="numeric">' + formatPrice(price) + '</td>' +
+			'<td data-ln-value="' + stock + '" class="numeric">' + stock + '</td>' +
+			'<td>' + status + '</td>' +
+			'</tr>'
+		);
+	}
+
+	tbody.innerHTML = html.join('');
+})();
+</script>
