@@ -130,6 +130,14 @@ Checkbox/radio pills use `<ul> > <li> > <label>` — grouped, border-radius on f
 | **Filled** (default) | `@include pill` on label (standalone) | Gray bg, colored bg on checked, input hidden |
 | **Outline** | `@include pill-outline` on label (standalone) | Bordered, visible input indicator |
 
+`@mixin pill-outline` is idempotent — it can be applied as a runtime
+override on top of the globally-bound `@mixin pill` and will correctly
+reset the fill (`background: transparent`), reveal the native input
+indicator (`display: revert`), and switch to accent text color on
+checked (border + color → `--color-accent`, background stays
+transparent). This means a project can layer `@include pill-outline`
+over an existing pill context without needing to un-apply `pill` first.
+
 ```scss
 // Outline: standalone on label
 #my-form label { @include pill-outline; }

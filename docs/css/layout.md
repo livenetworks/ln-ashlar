@@ -92,7 +92,6 @@ Components don't know where they'll be placed. `@include container` on the paren
 ```scss
 // RIGHT
 container-name: foldersgrid;
-container-name: sidebar;
 container-name: cardgrid;
 container-name: searchresults;
 
@@ -100,6 +99,11 @@ container-name: searchresults;
 container-name: left-panel;   // position-based
 container-name: card-grid;    // hyphens not allowed
 ```
+
+The `sidebar` example was removed — app-shell sidebar is media-query
+driven (see `docs/css/app-shell.md`), it does not declare a container
+and does not host a `@container sidebar (...)` query anywhere in the
+library.
 
 ### Rules
 

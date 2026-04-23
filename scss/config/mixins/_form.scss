@@ -275,6 +275,14 @@
 }
 
 // ─── Pill outline — base label (structure + visible border) ────
+//
+// Self-contained outline variant: transparent background, visible native
+// input indicator, accent border + accent text on checked.
+//
+// Must be idempotent when re-applied over `@include pill` (the filled
+// default installed globally by components/_form.scss on fieldset pills).
+// Each rule below resets a behavior that `pill` adds: bg-sunken fill,
+// hidden input, accent-fg text on checked.
 
 @mixin pill-outline {
 	@include flex;
@@ -288,9 +296,19 @@
 	margin-bottom: 0;
 	border-radius: var(--radius);
 	border: var(--border-width) solid hsl(var(--color-border));
+	// Reset pill's --color-bg-sunken fill. Outline = transparent surface.
+	background: transparent;
+
+	// Restore the native input indicator. `display: revert` returns the
+	// UA default (inline-block for checkbox/radio) and cleanly undoes
+	// pill's `display: none` when pill-outline is applied as an override.
+	> input { display: revert; }
 
 	&:has(> input:checked) {
 		border-color: var(--color-accent);
+		color: var(--color-accent);
+		// Reset pill's accent fill on checked — outline stays transparent.
+		background: transparent;
 	}
 
 	&:hover:not(:has(> input:checked)) {

@@ -15,20 +15,54 @@ File: `scss/config/mixins/_card.scss`. Applied: `scss/components/_card.scss`.
 
 ## `@mixin card`
 
-Bare container: `bg-primary`, `border`, `rounded-md`, `shadow-xs`, `flex-col`, `overflow-hidden`.
+Bare container + structured child bindings. Reads the logical
+`--color-bg`, `--color-border-strong`, `--radius`, `--shadow-default`,
+`--shadow-raised` tokens.
 
-**Hover**: border-color → `hsl(--color-primary / 0.25)`, shadow upgrades to `shadow-sm`.
+**Root chrome:** `bg`, `border`, `radius`, `flex-col`,
+`overflow-hidden`, `shadow-default`.
+
+**Hover:** border-color → `--color-border-strong`, shadow upgrades to
+`--shadow-raised`.
+
+**Direct-child bindings** (apply on `>`-child only, so nested
+`<header>`/`<main>`/`<footer>` inside card content are NOT rewritten):
+
+| Child | Applied mixin / rules |
+|---|---|
+| `> header` | `@include panel-header` |
+| `> main` | `@include panel-body` + `flex-1` + `gap: var(--gap)` (tile rhythm) |
+| `> footer` | `@include panel-footer` |
+| `> a` | `flex-col` + `flex-1` + `text-decoration: none` + `color: inherit` (whole-card-as-link) |
+| `> main h3` | `font-size: var(--text-body-sm)`, `font-semibold`, `margin: 0`, `color: inherit` (tile-title sizing) |
+
+Two common shapes:
 
 ```html
+<!-- Data card -->
 <article>
     <h3>Title</h3>
     <p>Content</p>
+</article>
+
+<!-- Card as link tile -->
+<article>
+    <a href="/report/42">
+        <main>
+            <h3>Q4 compliance report</h3>
+            <p>Compiled 2026-04-21</p>
+        </main>
+    </a>
 </article>
 ```
 
 ```scss
 article { @include card; }
 ```
+
+The `> main h3` rule keeps tile titles at body-sm size. If a card uses
+a `<header>` wrapper instead, the regular `panel-header` h3 (title-sm)
+applies — hierarchy by structure, not by class.
 
 ---
 

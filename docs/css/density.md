@@ -55,6 +55,7 @@ form — comfortable IS the default `:root` state (values live in
 |---|---|---|
 | `--size-xs/sm/md/lg` | yes | Form input padding, table cell padding, card body padding, panel header padding, alert/banner/tabs chrome, grid gaps |
 | `--text-body-md`, `--lh-body-md` | yes | Body paragraphs, table cells, form inputs, nav link text |
+| `--font-size`, `--line-height` (explicit rebind) | yes | Logical font tokens — mirrored from `--text-body-md` / `--lh-body-md` so form inputs and any mixin reading `var(--font-size)` shrink reliably. See §"Explicit `--font-size` rebind" below. |
 | `--text-body-sm`, `--lh-body-sm` | yes | Small body text, breadcrumbs, nav links |
 | `--text-label-md`, `--lh-label-md` | yes | Form labels, h6 |
 | `--text-label-sm`, `--lh-label-sm` | yes | Table column headers (`th`) |
@@ -66,6 +67,37 @@ form — comfortable IS the default `:root` state (values live in
 `--density-row-h` is the only token that stays density-named. It has
 no analogue in the base token scale (there is no `--row-height` in
 `_tokens.scss`) and is only consumed by table row `min-height`.
+
+## Explicit `--font-size` rebind
+
+`--font-size` is declared at `:root` as `var(--text-body-md)`.
+Theoretically the lazy-var cascade should deliver the compact value
+to any mixin that reads `var(--font-size)` (for example,
+`input { font-size: var(--font-size) }`). In practice it did not —
+the variable is resolved at the point of declaration, and form
+inputs kept the comfortable value even under `.density-compact`.
+
+The compact block therefore rebinds both `--font-size` and
+`--line-height` explicitly:
+
+```scss
+.density-compact {
+	--font-size:   var(--text-body-md);
+	--line-height: var(--lh-body-md);
+}
+```
+
+This is the ONLY density exception to "override the scale token,
+the logical layer follows." Every other logical token (`--padding-*`,
+`--gap`, `--radius`, `--color-*`) composes via pure cascade; the
+font-size / line-height pair needs the explicit nudge.
+
+Consumers do NOT need to replicate this rebind — it's handled inside
+`_density.scss`. This subsection exists so the pattern is visible
+when debugging "why is this input still at comfortable size inside
+density-compact?" — the answer is always: the mixin is NOT reading
+`var(--font-size)` at all (it's hardcoded), or the re-bind did not
+reach the consumer's scope.
 
 ## What reacts to density
 
@@ -159,9 +191,13 @@ in both comfortable and compact modes.
 ## Adding a new component to density
 
 1. Use `var(--size-*)` for padding and gap instead of hardcoded rem.
-2. Use `font-size: var(--text-body-md); line-height: var(--lh-body-md);`
-   (or the matching role token) instead of raw `@include text-base`
-   when the element is content text.
+2. For content text, use EITHER
+   `font-size: var(--text-body-md); line-height: var(--lh-body-md);`
+   (direct scale token — most explicit) OR
+   `font-size: var(--font-size); line-height: var(--line-height);`
+   (logical-token flavor — composes with any region scope that
+   re-binds `--font-size`). Both react to `.density-compact`. Never
+   use raw `@include text-base` for content text.
 3. Leave structural chrome hardcoded.
 
 That's it. No new tokens, no per-component density rules. The cascade

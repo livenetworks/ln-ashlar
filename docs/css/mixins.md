@@ -381,27 +381,25 @@ Vertical flex layout with configurable gap (default 1rem).
 
 ### `@include card`
 
-Base card container — bg, border, shadow, rounded corners. No built-in header/footer.
+Base card container — bg, border, shadow, rounded corners, plus
+direct-child bindings for `> header / > main / > footer / > a`.
 
-**Expands to:**
-```css
-background-color: hsl(var(--color-bg-primary));
-border: 1px solid hsl(var(--color-border));
-width: 100%;
-display: flex;
-flex-direction: column;
-border-radius: var(--radius-md);        /* 8px */
-overflow: hidden;
-box-shadow: var(--shadow-xs);
-transition: all var(--transition-base);
+**Root** — reads `--color-bg`, `--color-border-strong`, `--radius`,
+`--shadow-default`, `--shadow-raised` (hover).
 
-&:hover {
-    border-color: hsl(var(--color-primary) / 0.25);
-    box-shadow: var(--shadow-sm);
-}
-```
+**Direct-child bindings:**
 
-See [cards.md](cards.md) for accent variants (`card-accent-top/left/bottom`), `card-bg`, `card-stacked`.
+| Child | Binding |
+|---|---|
+| `> header` | `@include panel-header` |
+| `> main` | `@include panel-body` + `flex-1` + `gap: var(--gap)` |
+| `> footer` | `@include panel-footer` |
+| `> a` | whole-card-as-link (`flex-col; flex-1; text-decoration:none; color:inherit`) |
+| `> main h3` | tile title sizing (`--text-body-sm`, `font-semibold`) |
+
+See [cards.md](cards.md) for full bindings, accent variants
+(`card-accent-top/left/bottom`), `card-bg`, `card-stacked`,
+`card-field-list`.
 
 ### `@include section-card`
 
@@ -512,6 +510,51 @@ Styled accordion list — contained card with chevron rotation. Applied automati
 
 > Chevron is CSS `::after` — no SVG element needed in HTML.
 > For custom accordion selectors: `#my-list { @include accordion; }`
+
+---
+
+### `@include menu-items`
+
+Shared recipe for "list of interactive menu items" content — without
+the container chrome or positioning. Composes with any floating
+surface: dropdown menus, popovers that host a menu, or bespoke
+panels.
+
+Applies: list-reset + `li` / `form` resets + uniform button/link/input
+(submit|reset|button) rows (hover = `bg-sunken`, `transition-fast`, no
+focus glow) + `<hr>` separator using `--color-border-subtle`.
+
+**Active item selection** — reads `aria-current="true"` on the
+interactive child and paints it with `--color-accent-tint` background
++ `--color-accent` foreground. The rule is scoped to the **boolean**
+flavor of `aria-current` only, so it deliberately does NOT collide
+with breadcrumbs (`aria-current="page"`) or stepper
+(`aria-current="step"`).
+
+```html
+<ul>
+    <li><a href="/account">Account</a></li>
+    <li><button type="button" aria-current="true">Dark theme</button></li>
+    <li><button type="button">Light theme</button></li>
+    <li><hr></li>
+    <li><form method="post" action="/logout"><button type="submit">Sign out</button></form></li>
+</ul>
+```
+
+```scss
+// On a dropdown
+[data-ln-dropdown-menu] { @include dropdown-menu; }   // already composes menu-items
+
+// On a popover-as-menu (theme picker, language picker, user menu)
+#theme-menu { @include floating-panel; @include menu-items;
+    padding-block: var(--size-xs); min-width: 12rem;
+}
+```
+
+> `@include dropdown-menu` already composes `@include menu-items` on
+> top of `@include floating-panel` + absolute positioning. Reach for
+> `menu-items` directly only when the floating container is NOT a
+> dropdown (most commonly: `data-ln-popover` used as a menu).
 
 ---
 
