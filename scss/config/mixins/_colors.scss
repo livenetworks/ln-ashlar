@@ -18,3 +18,17 @@
 	background-color: hsl(var(--color-primary) / #{$opacity});
 	color: hsl(var(--color-primary));
 }
+
+// Semantic color recipe — re-binds the --color-primary family to a
+// status family (success / warning / error / info / secondary).
+// Used by .success / .warning / .error / .info / .secondary classes
+// in _utilities.scss. Cascading all sibling tokens (hover/focus/
+// light/lighter) ensures hover and focus states read from the
+// status family, not the default primary blue.
+@mixin semantic-color($family) {
+	--color-primary:         var(--color-#{$family});
+	--color-primary-hover:   var(--color-#{$family}-hover);
+	--color-primary-focus:   var(--color-#{$family}-focus);
+	--color-primary-light:   var(--color-#{$family}-light);
+	--color-primary-lighter: var(--color-#{$family}-lighter);
+}

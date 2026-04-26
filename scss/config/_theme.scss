@@ -167,46 +167,22 @@
 	--shadow-xl:  none;
 	--shadow-2xl: none;
 
-	// ── Buttons — neutral surface tokenised, accent variant via
-	// scoped property overrides.
-	//
-	// Why direct properties for the accent variant: a :root-declared
-	// intermediate token (--btn-accent-bg etc.) freezes --color-accent
-	// at :root, which breaks the .success/.error/.warning/.info
-	// semantic-color cascade. Direct property declarations resolve
-	// var() at the consumer (button element), so a descendant
-	// --color-primary override propagates through --color-accent and
-	// lands correctly. Specificity of [data-theme="glass"] .btn
-	// (0,2,0) beats the .btn base (0,1,0).
+	// ── Buttons — neutral chrome via --btn-* rebind, accent variant via
+	// cross-cutting --color-accent-bg-* companion tokens. Theme rebinds
+	// at :root only; library owns structure. See CLAUDE.md
+	// ## Theme Architecture for the contract.
 	--btn-bg:           var(--color-bg-raised);
 	--btn-bg-hover:     var(--color-bg-elevated);
 	--btn-border:       var(--color-accent);
 	--btn-border-hover: var(--color-accent-hover);
 
-	// ── Accent variant — Glass override (tinted bg + colored border + colored fg)
-	button[type="submit"],
-	input[type="submit"],
-	.btn {
-		// Direct hsl(var(--color-primary-*)) — resolves --color-primary
-		// at the consumer element so .success/.error/.warning/.info
-		// semantic cascade lands. var(--color-accent-tint) and similar
-		// intermediate tokens freeze at :root, blocking the cascade.
-		background: hsl(var(--color-primary-lighter));
-		color: hsl(var(--color-primary));
-		border-color: hsl(var(--color-primary));
-
-		&:hover:not(:disabled) {
-			background: hsl(var(--color-primary-light));
-			color: hsl(var(--color-primary-hover));
-			border-color: hsl(var(--color-primary-hover));
-		}
-
-		&:active:not(:disabled) {
-			background: hsl(var(--color-primary-light));
-			color: hsl(var(--color-primary-hover));
-			border-color: hsl(var(--color-primary-hover));
-		}
-	}
+	// Translucent accent surface — companions read by @mixin btn via
+	// fallback. Glass flips the accent button to tinted bg + accent fg
+	// while keeping --color-accent-fg (white) intact for solid-accent
+	// surfaces (toast-side, pill-checked, stepper active/complete).
+	--color-accent-bg:       hsl(var(--color-primary) / 0.2);
+	--color-accent-bg-hover: hsl(var(--color-primary) / 0.3);
+	--color-accent-bg-fg:    hsl(var(--color-primary));
 
 	// ── Nav lists — join items with per-side divider lines ─────────
 	// Scoped to library-opt-in structures (data-ln-nav sidebar,

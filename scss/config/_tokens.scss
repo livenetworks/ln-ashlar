@@ -325,16 +325,28 @@
 	--color-accent-tint:         hsl(var(--color-primary-lighter));
 	--color-accent-tint-strong:  hsl(var(--color-primary-light));
 
+	// Translucent accent surface — companions for themes that opt in to a
+	// non-solid accent button (e.g. Glass: tinted bg + accent-colored fg).
+	// NO defaults — `@mixin btn` reads these via fallback to
+	// `--color-accent` / `--color-accent-fg`, so the default theme stays
+	// solid + white. Themes rebind these at theme :root to flip the
+	// accent button surface to translucent. Solid-accent consumers
+	// (toast-side, pill checked, stepper active/complete) read
+	// `--color-accent` / `--color-accent-fg` directly and are unaffected.
+	// --color-accent-bg
+	// --color-accent-bg-hover
+	// --color-accent-bg-fg
+
 	// -- Button surface (neutral default) --------------------------------
-	// Read by @mixin button-base across idle + hover + active.
-	//
-	// NOTE: There is no companion --btn-accent-* token surface. The
-	// accent variant (submit + @mixin btn) declares background, color,
-	// and border-color DIRECTLY in those scopes — token indirection at
-	// :root would freeze --color-accent at :root and break the
-	// .success / .error / .warning / .info semantic-color cascade. See
-	// scss/config/mixins/_btn.scss header comment for the full
-	// rationale.
+	// Read by @mixin button-base across idle + hover + active. The
+	// neutral default wires here. Accent variants (submit + @mixin btn)
+	// REBIND --btn-* on the consumer element (not at :root) — this
+	// preserves the .success/.error/.warning/.info semantic-color
+	// cascade because var() resolves at the declaration site. A
+	// companion --btn-accent-* surface AT :ROOT would freeze
+	// --color-accent at :root and break that cascade; the fix is
+	// consumer-scoped rebinding, not a parallel :root surface. See
+	// scss/config/mixins/_btn.scss header for the full rationale.
 	--btn-bg:           var(--color-bg);
 	--btn-fg:           var(--color-fg);
 	--btn-border:       var(--color-border-strong);

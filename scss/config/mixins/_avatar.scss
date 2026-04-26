@@ -19,8 +19,8 @@
 
 // ─── Shared ring ───────────────────────────────────────
 @mixin _avatar-ring {
-	box-shadow: 0 0 0 2px var(--color-bg),
-	            0 0 0 3px hsl(var(--color-border));
+	box-shadow: 0 0 0 var(--border-width-strong) var(--color-bg),
+	            0 0 0 calc(var(--border-width-strong) + var(--border-width)) hsl(var(--color-border));
 }
 
 // ─── Shared image / initials base ──────────────────────

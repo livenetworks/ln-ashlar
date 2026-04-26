@@ -364,6 +364,103 @@ Projects can override at any level:
 4. **Full replace** → exclude the component, use only the mixin on a custom selector
 5. **Project selectors never change** — they describe WHAT, not HOW
 
+## Theme Architecture
+
+Themes (e.g. `[data-theme="glass"]`) are a **palette layer**, not a structural
+layer. They override colors via token rebinds at the theme `:root` scope.
+They do NOT redeclare component structure (`background`, `color`,
+`border-color`, hover/active blocks).
+
+### Rule — themes rebind at theme `:root`, never via descendant selectors
+
+```scss
+// RIGHT — palette rebind at theme :root only
+[data-theme="glass"] {
+	--color-bg-raised:    hsl(var(--color-neutral-950));
+	--color-accent-bg:    hsl(var(--color-primary) / 0.5);
+	--color-accent-bg-fg: hsl(var(--color-primary));
+	// ...
+}
+
+// WRONG — descendant selector at higher specificity, structural override
+[data-theme="glass"] .btn {
+	background: hsl(var(--color-primary-lighter));
+	color: hsl(var(--color-primary));
+	border-color: hsl(var(--color-primary));
+	&:hover:not(:disabled) { ... }
+	&:active:not(:disabled) { ... }
+}
+```
+
+**Why:** the WRONG form wins via 0,2,0 specificity over the library's
+`.btn` (0,1,0) — that is a specificity hack, not a token rebind. It
+locks the theme into redeclaring everything the library already does,
+and any library change to button structure needs a parallel theme
+change. The RIGHT form lets the library own structure; the theme just
+shifts the palette through tokens the library is already designed to
+consume.
+
+### Companion logical tokens for theme-shift-able properties
+
+When a property must differ between themes but no logical token
+currently exposes it, ADD the missing token with a fallback pattern
+in the consumer mixin. Do not escalate specificity.
+
+```scss
+// @mixin btn — reads via fallback so default theme stays solid
+--btn-bg:           var(--color-accent-bg,    var(--color-accent));
+--btn-fg:           var(--color-accent-bg-fg, var(--color-accent-fg));
+--btn-bg-hover:     var(--color-accent-bg-hover, var(--color-accent-hover));
+--btn-fg-hover:     var(--color-accent-bg-fg, var(--color-accent-fg));
+
+// Default theme — no companion override; mixin falls back to --color-accent / --color-accent-fg (= solid + white)
+
+// Glass theme — rebind companions at theme :root
+[data-theme="glass"] {
+	--color-accent-bg:       hsl(var(--color-primary) / 0.5);
+	--color-accent-bg-hover: hsl(var(--color-primary-hover) / 0.6);
+	--color-accent-bg-fg:    hsl(var(--color-primary));
+	// --color-accent-fg stays at :root default (white) — solid-accent
+	// surfaces (toast-side, pill-checked, stepper-active) keep white
+	// text on solid primary fill.
+}
+```
+
+**Solid vs translucent accent surface — separate fg tokens.** The
+`--color-accent-*` family distinguishes two flavors of accent surface:
+
+- **Solid** (`--color-accent` + `--color-accent-fg`) — used by
+  `@mixin toast-side`, `@mixin pill` (checked state), stepper active /
+  complete, and `@mixin btn` under default theme. fg = white.
+- **Translucent** (`--color-accent-bg` + `--color-accent-bg-fg`) — only
+  used by `@mixin btn` under themes that opt in (Glass). fg flips to
+  match accent (`--color-primary`) for legibility on the translucent
+  fill.
+
+Themes that introduce the translucent variant rebind the `-bg-*`
+companions ONLY. They leave `--color-accent-fg` alone so solid-accent
+surfaces are unaffected. Conflating them (e.g. Glass setting
+`--color-accent-fg: hsl(var(--color-primary))` at :root) collapses
+toast/pill/stepper text to invisible primary-on-primary.
+
+The fallback pattern makes theme overrides transparent: default theme
+has no companion → mixin reads `var(--color-accent)` (solid). Glass
+rebinds → mixin reads the translucent value. The cascade through
+`.success`/`.error`/`.warning`/`.info` still works because `var()`
+resolves at the consumer element, and `--color-primary` re-resolves
+there.
+
+Companion tokens live in the cross-cutting `--color-accent-*` family
+in the logical token surface. They are NOT `--btn-accent-*`
+per-component-surface tokens (those would freeze at `:root` and break
+the semantic-color cascade — see `scss/config/mixins/_btn.scss` header).
+
+### What NOT to do (themes)
+
+- Do not write `[data-theme="..."] .selector { background: ... }`. Rebind tokens at theme `:root` instead.
+- Do not duplicate `&:hover`/`&:active` blocks in theme overrides — the library's base mixin handles them via `*-hover` companion tokens.
+- Do not introduce `--btn-accent-*` or any other per-component-surface companion at `:root`. Use cross-cutting `--color-accent-*` companions read via fallback inside the mixin.
+
 ## Changing Design Tokens
 
 1. Edit `scss/config/_tokens.scss`
@@ -490,18 +587,47 @@ Buttons:
 - `--btn-bg-hover`, `--btn-fg-hover`, `--btn-border-hover` — hover /
   active states for the neutral surface.
 
-The accent variant (`button[type="submit"]` + `@mixin btn`) does NOT
-have a companion `--btn-accent-*` token surface. It declares
-`background`, `color`, and `border-color` directly against
-`--color-accent` / `--color-accent-fg` / `--color-accent-hover`.
-This is intentional: a `:root`-declared intermediate token would
-freeze `--color-accent` at `:root` and break the
-`.success` / `.error` / `.warning` / `.info` semantic-color cascade,
-since custom-property `var()` references resolve at the **declaration
-site**, not at the consumer. Themes that need a different accent
-surface (e.g. Glass) override `background` / `color` / `border-color`
-on a scoped selector instead of rebinding tokens. See
-`scss/config/mixins/_btn.scss` header for the full rationale.
+The accent variant (`button[type="submit"]` + `@mixin btn`) is also
+fully token-driven through the same `--btn-*` surface — the variant
+rebinds `--btn-*` on the consumer element (not at `:root`):
+
+```scss
+@mixin btn {
+    --color-accent:       hsl(var(--color-primary));
+    --color-accent-hover: hsl(var(--color-primary-hover));
+    --color-accent-fg:    hsl(var(--color-white));
+
+    --btn-bg:           var(--color-accent);
+    --btn-fg:           var(--color-accent-fg);
+    --btn-border:       var(--color-accent);
+    --btn-bg-hover:     var(--color-accent-hover);
+    --btn-fg-hover:     var(--color-accent-fg);
+    --btn-border-hover: var(--color-accent-hover);
+}
+```
+
+Why this preserves the semantic-color cascade: `var()` resolves at the
+**declaration site**. When `.success { --color-primary: ...; }` is on
+the button element, `@mixin btn`'s rebinds resolve `var(--color-primary)`
+→ `--color-accent` → `--btn-*` all at the same element scope. A
+companion `--btn-accent-*` surface AT `:root` would freeze
+`--color-accent` at `:root` and break `.success`/`.error`/`.warning`/`.info`
+— the fix is consumer-scoped rebinding (inside a mixin body), not a
+parallel `:root` surface.
+
+Override targets:
+
+- Whole-theme accent shift → rebind `--color-primary` at theme scope.
+- Single button color variant → rebind `--color-primary` on the
+  element or parent (e.g. `.delete-action { --color-primary: var(--color-error); }`).
+- Theme-specific button palette (e.g. Glass translucent fill) → rebind
+  `--color-accent-bg` / `--color-accent-bg-hover` / `--color-accent-bg-fg`
+  at the theme `:root`
+  scope (`[data-theme="glass"] { ... }`). Never on a descendant
+  selector — see `## Theme Architecture` for the full rule.
+
+See `scss/config/mixins/_btn.scss` header for the full cascade
+rationale.
 
 Typography:
 
@@ -594,6 +720,84 @@ under `// Logical tokens — the public contract mixins read`.
 Editing the wiring changes every mixin's default reading in one
 edit.
 
+### Rule — variants rebind the surface, don't redeclare properties
+
+When a base mixin reads from a `--component-*` token surface (e.g.
+`@mixin button-base` reads `--btn-bg` / `--btn-fg` / `--btn-border`
+plus `-hover` companions), a VARIANT of that base rebinds those
+tokens — it does NOT declare `background:` / `color:` /
+`border-color:` directly, and does NOT duplicate the
+`&:hover` / `&:active` blocks the base already provides.
+
+```scss
+// RIGHT — variant rebinds the --btn-* surface
+@mixin btn {
+	--color-accent:       hsl(var(--color-primary));
+	--color-accent-hover: hsl(var(--color-primary-hover));
+	--color-accent-fg:    hsl(var(--color-white));
+
+	--btn-bg:           var(--color-accent);
+	--btn-fg:           var(--color-accent-fg);
+	--btn-border:       var(--color-accent);
+	--btn-bg-hover:     var(--color-accent-hover);
+	--btn-fg-hover:     var(--color-accent-fg);
+	--btn-border-hover: var(--color-accent-hover);
+}
+
+// WRONG — variant bypasses the surface, duplicates base behavior
+@mixin btn {
+	background: var(--color-accent);
+	color: var(--color-accent-fg);
+	border-color: var(--color-accent);
+
+	&:hover:not(:disabled) {
+		background: var(--color-accent-hover);
+		color: var(--color-accent-fg);
+		border-color: var(--color-accent-hover);
+	}
+	&:active:not(:disabled) { /* duplicate */ }
+}
+```
+
+**Why.** Two reasons stack on top of each other:
+
+1. **No duplication of base behavior.** The base mixin already
+   declares `background` / `color` / `border-color` and
+   `&:hover` / `&:active`. A variant that re-declares those
+   properties duplicates the contract — every future change to the
+   base (a new state, a transition tweak, a focus rule) has to be
+   mirrored manually into the variant. Rebinding the surface tokens
+   inherits all of that automatically.
+
+2. **The semantic-color cascade still works.** A natural worry with
+   token indirection is "won't the intermediate token freeze the
+   value?" The answer: no, as long as the rebind happens INSIDE THE
+   VARIANT MIXIN BODY (consumer scope), not at `:root`. `var()`
+   resolves at the **declaration site**. When the variant rebind
+   lands on the consumer element (the same element where the base
+   reads), descendant overrides (`.success { --color-primary: ...; }`)
+   re-resolve through the variant's rebind chain cleanly. The freeze
+   only happens when the intermediate token is declared at `:root` —
+   which is why `--component-accent-*` companion surfaces at `:root`
+   are the wrong fix.
+
+**Concrete cascade for `<button class="btn success">`:**
+
+1. `.success { --color-primary: ...; }` rebinds at consumer.
+2. `@mixin btn` body declares `--color-accent: hsl(var(--color-primary))`
+   at consumer — resolves through `.success`.
+3. `@mixin btn` body declares `--btn-bg: var(--color-accent)` at
+   consumer — resolves through step 2.
+4. `@mixin button-base` reads `background: var(--btn-bg)` at consumer
+   — resolves through step 3.
+
+Every step resolves at the consumer element, so the cascade lands.
+
+**Applies to any base/variant pair using a token surface.** Today this
+is `button-base` ↔ `btn`. As more components grow `--component-*`
+surfaces, the same rule applies — a future `card-accent` variant
+rebinds `--card-bg` / `--card-fg`, not declares them directly.
+
 ### What NOT to do
 
 - Do not read `--size-*` inside a mixin body. Read `--padding-*`,
@@ -609,6 +813,15 @@ edit.
 - Do not introduce a per-component logical token
   (`--card-padding-y`, `--btn-gap`). Re-bind the shared logical
   token on the component's root selector instead.
+- Do not declare `background:`, `color:`, or `border-color:`
+  directly inside a variant mixin when the base mixin reads from a
+  `--component-*` token surface (e.g. `@mixin button-base` reads
+  `--btn-*`). Rebind the surface tokens instead — `--btn-bg:
+  var(--color-accent);` not `background: var(--color-accent);`.
+  Direct property declarations duplicate what the base already does
+  and bypass the surface that themes/variants override. See the
+  "Rule — variants rebind the surface, don't redeclare properties"
+  subsection above.
 
 ---
 

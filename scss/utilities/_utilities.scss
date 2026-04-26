@@ -37,47 +37,13 @@
 	padding-inline: var(--size-md);
 }
 
-// Semantic color overrides — set --color-primary and all sibling tokens on any component.
-// Cascading all four siblings (hover/focus/light/lighter) ensures hover and focus
-// states read from the status family, not the default primary blue.
-.success {
-	--color-primary:         var(--color-success);
-	--color-primary-hover:   var(--color-success-hover);
-	--color-primary-focus:   var(--color-success-focus);
-	--color-primary-light:   var(--color-success-light);
-	--color-primary-lighter: var(--color-success-lighter);
-}
-
-.warning {
-	--color-primary:         var(--color-warning);
-	--color-primary-hover:   var(--color-warning-hover);
-	--color-primary-focus:   var(--color-warning-focus);
-	--color-primary-light:   var(--color-warning-light);
-	--color-primary-lighter: var(--color-warning-lighter);
-}
-
-.error {
-	--color-primary:         var(--color-error);
-	--color-primary-hover:   var(--color-error-hover);
-	--color-primary-focus:   var(--color-error-focus);
-	--color-primary-light:   var(--color-error-light);
-	--color-primary-lighter: var(--color-error-lighter);
-}
-
-.info {
-	--color-primary:         var(--color-info);
-	--color-primary-hover:   var(--color-info-hover);
-	--color-primary-focus:   var(--color-info-focus);
-	--color-primary-light:   var(--color-info-light);
-	--color-primary-lighter: var(--color-info-lighter);
-}
-
-.secondary {
-	--color-primary:         var(--color-secondary);
-	--color-primary-hover:   var(--color-secondary-hover);
-	--color-primary-focus:   var(--color-secondary-focus);
-	--color-primary-light:   var(--color-secondary-light);
-	--color-primary-lighter: var(--color-secondary-lighter);
-}
+// Semantic color overrides — re-bind --color-primary family to a
+// status family. See @mixin semantic-color in
+// scss/config/mixins/_colors.scss.
+.success   { @include semantic-color(success); }
+.warning   { @include semantic-color(warning); }
+.error     { @include semantic-color(error); }
+.info      { @include semantic-color(info); }
+.secondary { @include semantic-color(secondary); }
 
 .neutral { --color-primary: var(--color-text-subtle); }
