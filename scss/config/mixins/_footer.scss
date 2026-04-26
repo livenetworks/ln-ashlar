@@ -1,0 +1,39 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'interaction' as *;
+
+// ─── App / shell footer chrome ──────────────────────────────────────────────
+// Single recipe for any shell bottom region. Used by:
+//   - `.app-footer`                         (bottom of .app-main)
+//   - `<aside class="app-sidebar"> > footer` (bottom of the sidebar drawer)
+//
+// Reads logical tokens only — padding, border, bg, and type follow
+// the same cascade as the header. To re-bind for a region, override
+// --padding-y / --color-bg / etc. on the parent scope.
+//
+// Inner-text contract:
+//   - Two <span>s    → second tinted via `> span:last-child`.
+//   - Single <small> → tinted via `> small`; `font-size: inherit`
+//     neutralises the UA 0.875em shrink.
+
+@mixin app-footer {
+	padding: var(--padding-y) var(--padding-x);
+	border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border-subtle));
+	background: var(--color-bg);
+	font-size: var(--text-body-sm);
+	line-height: var(--lh-body-sm);
+	color: var(--color-fg-muted);
+	@include flex;
+	@include items-center;
+	@include justify-between;
+	user-select: none;
+
+	> small,
+	> span:last-child {
+		color: var(--color-fg-subtle);
+		font-size: inherit;
+	}
+}

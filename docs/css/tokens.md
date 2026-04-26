@@ -17,7 +17,7 @@ background-color: hsl(var(--color-primary));
 background-color: hsl(var(--color-primary) / 0.5);
 
 /* Theming — override at any scope */
-.dark-section { --color-bg-primary: 240 14% 15%; }
+.dark-section { --color-bg-default: 240 14% 15%; }
 #alert-panel   { --color-primary: var(--color-error); }
 ```
 
@@ -96,16 +96,16 @@ in-place (Phase 6).
 
 ### Text
 ```css
---color-text-primary:   var(--color-neutral-900);  /* Main text */
---color-text-secondary: var(--color-neutral-500);  /* Secondary text */
+--color-text-default:   var(--color-neutral-900);  /* Main text */
+--color-text-muted:     var(--color-neutral-500);  /* Secondary text */
 --color-text-muted:     var(--color-neutral-400);  /* Muted / disabled */
 ```
 
 ### Backgrounds
 ```css
 --color-white:        0 0% 100%;
---color-bg-primary:   var(--color-white);          /* Cards, panels */
---color-bg-secondary: var(--color-neutral-50);     /* Headers, footers, alternating rows */
+--color-bg-default:   var(--color-white);          /* Cards, panels */
+--color-bg-elevated:  var(--color-neutral-50);     /* Headers, footers, alternating rows */
 --color-bg-body:      var(--color-neutral-100);    /* Page background */
 --color-bg-error:     0 86% 97%;                   /* Error state background */
 ```
@@ -199,7 +199,7 @@ cool tint that reads as modern/expensive on daylight backgrounds.
 `@include focus-ring($color: var(--color-primary))` produces a
 three-layer halo:
 
-1. 2px inner ring in `--color-bg-primary` — visual separator
+1. 2px inner ring in `--color-bg-default` — visual separator
 2. 2px middle ring in `$color` at 60% alpha — main signal
 3. 2px outer glow in `$color` at 15% alpha — soft halo
 

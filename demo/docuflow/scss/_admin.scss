@@ -26,13 +26,13 @@
 		@include rounded-md;
 		@include text-sm;
 		@include font-medium;
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 		text-decoration: none;
 		@include transition;
 
 		&:hover {
 			@include bg-secondary;
-			color: hsl(var(--color-text-primary));
+			color: hsl(var(--color-text-default));
 		}
 
 		&.active {

@@ -34,7 +34,7 @@
 		@include pr(var(--size-sm));
 		@include text-sm;
 		text-decoration: none;
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 		line-height: 1.45;
 		@include transition-fast;
 
@@ -112,7 +112,7 @@
 			@include pl(var(--size-xs));
 			@include text-sm;
 			text-decoration: none;
-			color: hsl(var(--color-text-secondary));
+			color: hsl(var(--color-text-muted));
 			border-left: 4px solid transparent;
 			line-height: 1.45;
 			@include transition-fast;
@@ -133,7 +133,7 @@
 
 			&:hover {
 				background-color: hsl(var(--palette-jade) / 0.07);
-				color: hsl(var(--color-text-primary));
+				color: hsl(var(--color-text-default));
 				border-left-color: hsl(var(--palette-jade));
 			}
 

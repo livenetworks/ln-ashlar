@@ -210,7 +210,7 @@ body {
 			@include text-lg;
 			@include font-semibold;
 			letter-spacing: -0.02em;
-			color: hsl(var(--color-text-primary));
+			color: hsl(var(--color-text-default));
 			@include m(0);
 			@include pb(var(--size-xs));
 			@include border-b;
@@ -252,7 +252,7 @@ body {
 		@include flex;
 		@include items-center;
 		@include text-sm;
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 		@include font-medium;
 
 		&::after {
@@ -274,7 +274,7 @@ body {
 	}
 
 	a {
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 		text-decoration: none;
 		@include transition;
 
@@ -339,7 +339,7 @@ body {
 	}
 
 	strong {
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 		@include font-semibold;
 	}
 }

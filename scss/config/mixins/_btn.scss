@@ -10,17 +10,28 @@
 
 // Buttons
 // button-base  — shared neutral chrome (global button + anchor-as-button)
-// btn          — complete action button (structure + filled primary colors)
+// btn          — complete action button (structure + filled accent colors)
 // btn-sm       — smaller size modifier
 // btn-lg       — larger size modifier
 // btn-group    — inline list of peer action buttons (ghost rebind)
 
 // ─── button-base ──────────────────────────────────────
 // Neutral chrome shared by <button>, <input type="submit|reset|button">,
-// and anchors used as buttons (e.g. inside form-actions). Reads --btn-bg
-// and --btn-border for surface; hover/active bake in the neutral sunken
-// transition. Variants (e.g. @mixin btn) override --color-accent + bg/border
-// for primary-filled chrome.
+// and anchors used as buttons (e.g. inside form-actions). Reads the
+// six-token --btn-* surface: --btn-bg/fg/border (idle) and
+// --btn-bg-hover/fg-hover/border-hover (hover + active). The default
+// (neutral) variant is fully token-driven; theme overrides rebind
+// --btn-* (e.g. Glass rebinds --btn-bg to --color-bg-raised, and
+// --btn-border to --color-accent for an outlined neutral chrome).
+//
+// Accent variants (submit + @mixin btn) override background, color,
+// and border-color DIRECTLY (not via tokens). Direct properties are
+// consumer-resolved at the button element, so a descendant override
+// of --color-primary (e.g. `<button class="btn success">`) cascades
+// through --color-accent and lands on the button's own properties.
+// An intermediate :root-declared token would freeze the resolved
+// value at :root and break semantic .success/.error/.warning/.info
+// classes.
 
 @mixin button-base {
 	@include inline-flex;
@@ -35,18 +46,18 @@
 	border: var(--border-width) solid var(--btn-border);
 	outline: none;
 	background: var(--btn-bg);
-	color: var(--color-fg);
+	color: var(--btn-fg);
 	@include transition-colors;
 
 	&:hover:not(:disabled) {
-		background: var(--color-bg-sunken);
-		color: var(--color-fg);
-		border-color: var(--color-border-strong-hover);
+		background: var(--btn-bg-hover);
+		color: var(--btn-fg-hover);
+		border-color: var(--btn-border-hover);
 	}
 
 	&:active:not(:disabled) {
-		background: hsl(var(--color-border));
-		border-color: var(--color-border-strong-hover);
+		background: var(--btn-bg-hover);
+		border-color: var(--btn-border-hover);
 	}
 
 	&:focus-visible {
@@ -60,42 +71,29 @@
 }
 
 @mixin btn {
-	--color-accent: hsl(var(--color-primary));
+	// Accent variant — re-declares --color-accent on .btn element so
+	// var(--color-primary) re-resolves at this scope. .success/.error
+	// /.warning/.info classes override --color-primary; without these
+	// re-declarations, --color-accent stays frozen at :root scope and
+	// semantic colors don't cascade.
+	--color-accent:       hsl(var(--color-primary));
 	--color-accent-hover: hsl(var(--color-primary-hover));
-	--color-accent-fg: hsl(var(--color-white));
-	@include inline-flex;
-	@include items-center;
-	@include justify-center;
-	gap: var(--gap);
-	padding: var(--padding-y) var(--padding-x);
-	@include text-sm;
-	@include font-medium;
-	border-radius: var(--radius);
-	white-space: nowrap;
+	--color-accent-fg:    hsl(var(--color-white));
 
-	background-color: var(--color-accent);
+	background: var(--color-accent);
 	color: var(--color-accent-fg);
-	border: var(--border-width) solid var(--color-accent);
+	border-color: var(--color-accent);
 
 	&:hover:not(:disabled) {
-		background-color: var(--color-accent-hover);
+		background: var(--color-accent-hover);
 		color: var(--color-accent-fg);
 		border-color: var(--color-accent-hover);
 	}
 
 	&:active:not(:disabled) {
-		background-color: var(--color-accent-hover);
+		background: var(--color-accent-hover);
 		color: var(--color-accent-fg);
 		border-color: var(--color-accent-hover);
-	}
-
-	&:focus-visible {
-		@include focus-ring;
-	}
-
-	&:disabled {
-		@include opacity-50;
-		@include cursor-not-allowed;
 	}
 }
 

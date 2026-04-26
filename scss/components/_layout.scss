@@ -1,0 +1,8 @@
+@use '../config/mixins' as *;
+
+// Prototype-tier class bindings for layout mixins. Production code
+// applies @include on semantic selectors — this class exists for
+// rapid prototyping and inspector experimentation.
+.flat-stack {
+	@include flat-stack;
+}

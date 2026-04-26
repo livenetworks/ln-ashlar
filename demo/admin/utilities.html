@@ -12,7 +12,7 @@
 	<script>
 	(function () {
 		var KEY = 'ln-demo-theme';
-		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
 		try {
 			var stored = localStorage.getItem(KEY);
 			if (stored && VALID.indexOf(stored) !== -1) {
@@ -64,6 +64,7 @@
 							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
 							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
 							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
 						</ul>
 					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
@@ -197,7 +198,7 @@
 						<tr><td><code>.error</code></td><td>--color-error-*</td><td><button type="submit" class="error">Error</button></td></tr>
 						<tr><td><code>.info</code></td><td>--color-info-*</td><td><button type="submit" class="info">Info</button></td></tr>
 						<tr><td><code>.secondary</code></td><td>--color-secondary-*</td><td><button type="submit" class="secondary">Secondary</button></td></tr>
-						<tr><td><code>.neutral</code></td><td>--color-text-muted</td><td><button type="submit" class="neutral">Neutral</button></td></tr>
+						<tr><td><code>.neutral</code></td><td>--color-text-subtle</td><td><button type="submit" class="neutral">Neutral</button></td></tr>
 					</tbody>
 				</table>
 				</div>
@@ -264,7 +265,7 @@
 	<script>
 	(function () {
 		const KEY = 'ln-demo-theme';
-		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
 		const root = document.documentElement;
 
 		function markActive() {

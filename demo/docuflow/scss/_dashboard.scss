@@ -23,7 +23,7 @@
 		@include items-center;
 		@include gap(var(--size-sm));
 		@include text-sm;
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 		line-height: 1.5;
 	}
 }
@@ -53,7 +53,7 @@
 
 	p {
 		@include text-sm;
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 		@include m(0);
 		@include mb(var(--size-xs));
 		line-height: 1.5;
@@ -101,18 +101,18 @@
 		@include text-sm;
 		@include rounded-md;
 		@include transition-fast;
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 		text-decoration: none;
 		@include font-medium;
 
 		&:hover {
-			background-color: hsl(var(--color-bg-secondary));
-			color: hsl(var(--color-text-primary));
+			background-color: hsl(var(--color-bg-elevated));
+			color: hsl(var(--color-text-default));
 		}
 
 		&.active {
-			background-color: hsl(var(--color-bg-secondary));
-			color: hsl(var(--color-text-primary));
+			background-color: hsl(var(--color-bg-elevated));
+			color: hsl(var(--color-text-default));
 		}
 
 		&.primary-action {
@@ -149,7 +149,7 @@
 			@include font-semibold;
 			letter-spacing: -0.025em;
 			margin: 0;
-			color: hsl(var(--color-text-primary));
+			color: hsl(var(--color-text-default));
 		}
 	}
 
@@ -209,7 +209,7 @@
 			height: auto;
 			object-fit: contain;
 			@include block;
-			background-color: hsl(var(--color-bg-secondary));
+			background-color: hsl(var(--color-bg-elevated));
 		}
 
 		.folder-info {
@@ -221,7 +221,7 @@
 			h3 {
 				@include text-base;
 				@include font-semibold;
-				color: hsl(var(--color-text-primary));
+				color: hsl(var(--color-text-default));
 				@include m(0);
 				line-height: 1.35;
 				letter-spacing: -0.015em;
@@ -229,7 +229,7 @@
 
 			p {
 				@include text-sm;
-				color: hsl(var(--color-text-secondary));
+				color: hsl(var(--color-text-muted));
 				@include m(0);
 				line-height: 1.6;
 			}
@@ -291,8 +291,8 @@
 	@include rounded-sm;
 	@include overflow-hidden;
 	border: 1px solid hsl(var(--color-border));
-	background-color: hsl(var(--color-bg-secondary));
-	color: hsl(var(--color-text-secondary));
+	background-color: hsl(var(--color-bg-elevated));
+	color: hsl(var(--color-text-muted));
 
 	// Icon
 	&::before {
@@ -305,7 +305,7 @@
 
 	// The 'clause', 'type', etc. label
 	small {
-		background-color: hsl(var(--color-bg-secondary));
+		background-color: hsl(var(--color-bg-elevated));
 		@include px(var(--size-xs));
 		@include py(2px);
 		@include font-medium;
@@ -319,6 +319,6 @@
 		@include px(var(--size-xs));
 		@include py(2px);
 		@include font-medium;
-		color: hsl(var(--color-text-secondary));
+		color: hsl(var(--color-text-muted));
 	}
 }

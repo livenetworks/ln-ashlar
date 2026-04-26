@@ -50,6 +50,7 @@ scss/
 │   │   ├── _btn.scss        ← btn, btn-sm, btn-lg, btn-group
 │   │   ├── _table.scss      ← table-base, table-responsive, table-striped, ...
 │   │   ├── _card.scss       ← card, card-accent-*, card-bg, card-stacked, panel-header, section-card
+│   │   ├── _footer.scss     ← shared shell-footer chrome (app-footer + sidebar > footer)
 │   │   ├── _modal.scss      ← modal-sm, modal-md, modal-lg, modal-xl
 │   │   ├── _nav.scss        ← nav (general navigation reset)
 │   │   ├── _tabs.scss       ← tabs-nav, tabs-tab, tabs-tab-active, tabs-panel
@@ -482,6 +483,26 @@ Accent:
 - `--color-accent-tint`, `--color-accent-tint-strong` — subtle accent
   washes (upload hover, active nav background)
 
+Buttons:
+
+- `--btn-bg`, `--btn-fg`, `--btn-border` — default (neutral) button
+  surface read by `@mixin button-base`.
+- `--btn-bg-hover`, `--btn-fg-hover`, `--btn-border-hover` — hover /
+  active states for the neutral surface.
+
+The accent variant (`button[type="submit"]` + `@mixin btn`) does NOT
+have a companion `--btn-accent-*` token surface. It declares
+`background`, `color`, and `border-color` directly against
+`--color-accent` / `--color-accent-fg` / `--color-accent-hover`.
+This is intentional: a `:root`-declared intermediate token would
+freeze `--color-accent` at `:root` and break the
+`.success` / `.error` / `.warning` / `.info` semantic-color cascade,
+since custom-property `var()` references resolve at the **declaration
+site**, not at the consumer. Themes that need a different accent
+surface (e.g. Glass) override `background` / `color` / `border-color`
+on a scoped selector instead of rebinding tokens. See
+`scss/config/mixins/_btn.scss` header for the full rationale.
+
 Typography:
 
 - `--font-size`, `--line-height`
@@ -492,6 +513,35 @@ Motion and depth:
 - `--shadow-raised` (floating: tooltips, dropdowns, popovers)
 - `--shadow-overlay` (modal)
 - `--transition`
+
+Per-side borders (soft — NO `:root` default):
+
+- `--border-block-start` — replaces `border-top` for joinable surfaces
+- `--border-block-end` — replaces `border-bottom`
+- `--border-inline-start` — replaces `border-left` (LTR)
+- `--border-inline-end` — replaces `border-right` (LTR)
+
+These four tokens have NO default in `:root`. Mixins read them with
+a per-mixin fallback (`var(--border-block-end, <fallback>)`), so a
+scope that does NOT re-bind them inherits exactly the mixin's
+existing border. A scope that re-binds e.g. `--border-block-start: none`
+on `.joined-stack > * + *` flattens the top edge of every joined
+sibling so they share a single rule.
+
+Migrated mixins (read soft tokens): `border`, `border-t/-b/-l/-r`,
+`border-light`, `border-t-light`, `border-b-light`, `card`,
+`section-card`, `floating-panel`, `panel-header`, `panel-footer`,
+`section`, `stat-card`, `page-header`, `app-header`, `app-footer`,
+`accordion` (items), `dropdown-menu` (hr separator), `table-base`
+(thead, td), `data-table` (tfoot, filter-dropdown), `sidebar`
+(header, footer, right edge — via `border-r/-b/-t`), `tabs-nav` (via
+`border-b`).
+
+NOT migrated (intentional — accent personality or non-joinable):
+`btn` / `button-base`, `pill-outline`, `form-check`, `alert` (left
+accent), `banner` (tinted bottom), `tabs-tab` (underline indicator),
+`kbd`, `upload-zone` (dashed), `upload-item`, `card-stacked`
+(decorative ::after), `card-accent-top/-bottom/-left`.
 
 ### Rule — mixins read the logical layer
 

@@ -71,9 +71,14 @@ input[type="button"] {
 
 button[type="submit"],
 input[type="submit"] {
-	--color-accent: hsl(var(--color-primary));
+	// Re-declare --color-accent on submit element so var(--color-primary)
+	// re-resolves at this scope. Required for .success/.error/.warning/
+	// .info classes to cascade — see _btn.scss @mixin btn for full
+	// cascade rationale.
+	--color-accent:       hsl(var(--color-primary));
 	--color-accent-hover: hsl(var(--color-primary-hover));
-	--color-accent-fg: hsl(var(--color-white));
+	--color-accent-fg:    hsl(var(--color-white));
+
 	background: var(--color-accent);
 	color: var(--color-accent-fg);
 	border-color: var(--color-accent);

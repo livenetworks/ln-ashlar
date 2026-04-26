@@ -2,7 +2,7 @@
 
 body {
 	background-color: hsl(var(--color-bg-body));
-	color: hsl(var(--color-text-primary));
+	color: hsl(var(--color-text-default));
 	font-family: 'Inter', -apple-system, sans-serif;
 	margin: 0;
 	@include flex-center;
@@ -23,7 +23,7 @@ header {
 h1 {
 	font-size: 2.5rem;
 	@include mb(1rem);
-	color: hsl(var(--color-text-primary));
+	color: hsl(var(--color-text-default));
 }
 
 p {
@@ -39,7 +39,7 @@ p {
 }
 
 .demo-card {
-	background: hsl(var(--color-bg-primary));
+	background: hsl(var(--color-bg-default));
 	@include rounded-lg;
 	@include p(2rem);
 	text-decoration: none;
@@ -80,7 +80,7 @@ p {
 	@include font-semibold;
 	@include px(0.75rem);
 	@include py(0.25rem);
-	background: hsl(var(--color-bg-secondary));
+	background: hsl(var(--color-bg-elevated));
 	@include rounded-full;
 	color: hsl(var(--color-text-muted));
 }

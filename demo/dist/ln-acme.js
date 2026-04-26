@@ -4039,7 +4039,7 @@ function At(u) {
     const t = this;
     if (this._onSetData = function(n) {
       const e = n.detail || {};
-      t._data = e.data || [], t._lastTotal = e.total != null ? e.total : t._data.length, t._lastFiltered = e.filtered != null ? e.filtered : t._data.length, t.totalCount = t._lastTotal, t.visibleCount = t._lastFiltered, t.isLoaded = !0, t._renderRows(), t._updateFooter(), T(o, "ln-data-table:rendered", {
+      t._data = e.data || [], t._lastTotal = e.total != null ? e.total : t._data.length, t._lastFiltered = e.filtered != null ? e.filtered : t._data.length, t.totalCount = t._lastTotal, t.visibleCount = t._lastFiltered, t.isLoaded = !0, t._vStart = -1, t._vEnd = -1, t._renderRows(), t._updateFooter(), T(o, "ln-data-table:rendered", {
         table: t.name,
         total: t.totalCount,
         visible: t.visibleCount

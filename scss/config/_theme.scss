@@ -31,7 +31,7 @@
 
 	// Surface elevation — explicit re-tune.
 	//
-	// Light mode routes `--color-bg-primary` through `--color-white`
+	// Light mode routes `--color-bg-default` through `--color-white`
 	// (a hardcoded literal that does not cascade) and uses
 	// neutral-50 for `bg-secondary` (lighter than body = elevated).
 	// After the neutral-scale inversion above, neutral-50 would be
@@ -39,9 +39,9 @@
 	// UI convention (Apple HIG, Material, GitHub) keeps elevated =
 	// lighter, so we restate the three surface tokens explicitly as
 	// a clean ladder: body < primary < secondary (each ~4% lighter).
-	--color-bg-body:      220 16%  9%;
-	--color-bg-primary:   220 16% 13%;
-	--color-bg-secondary: 220 16% 17%;
+	--color-bg-body:     220 16%  9%;
+	--color-bg-default:  220 16% 13%;
+	--color-bg-elevated: 220 16% 17%;
 
 	// Scrim — keep dark overlay in dark mode (neutral-900 inverts to
 	// near-white, which would produce a LIGHT scrim; explicit override
@@ -138,4 +138,107 @@
 	--color-primary-hover:   265 70% 52%;
 	--color-primary-light:   265 50% 22%;
 	--color-primary-lighter: 265 40% 15%;
+}
+
+[data-theme="glass"] {
+	@include ln-dark-tokens;
+
+	// Electric blue accent — luminescent on dark navy glass
+	--color-primary:         218 95% 62%;
+	--color-primary-hover:   218 90% 54%;
+	--color-primary-focus:   218 95% 70%;
+	--color-primary-light:   218 55% 24%;
+	--color-primary-lighter: 218 50% 16%;
+
+	// Flat — zero radius everywhere
+	--radius-sm:   0;
+	--radius-md:   0;
+	--radius-lg:   0;
+	--radius-xl:   0;
+	--radius-full: 0;
+
+	// Flat — no elevation shadows. --shadow-inner kept for recessed
+	// surfaces (code blocks, progress tracks) which read it as a depth
+	// affordance rather than elevation.
+	--shadow-xs:  none;
+	--shadow-sm:  none;
+	--shadow-md:  none;
+	--shadow-lg:  none;
+	--shadow-xl:  none;
+	--shadow-2xl: none;
+
+	// ── Buttons — neutral surface tokenised, accent variant via
+	// scoped property overrides.
+	//
+	// Why direct properties for the accent variant: a :root-declared
+	// intermediate token (--btn-accent-bg etc.) freezes --color-accent
+	// at :root, which breaks the .success/.error/.warning/.info
+	// semantic-color cascade. Direct property declarations resolve
+	// var() at the consumer (button element), so a descendant
+	// --color-primary override propagates through --color-accent and
+	// lands correctly. Specificity of [data-theme="glass"] .btn
+	// (0,2,0) beats the .btn base (0,1,0).
+	--btn-bg:           var(--color-bg-raised);
+	--btn-bg-hover:     var(--color-bg-elevated);
+	--btn-border:       var(--color-accent);
+	--btn-border-hover: var(--color-accent-hover);
+
+	// ── Accent variant — Glass override (tinted bg + colored border + colored fg)
+	button[type="submit"],
+	input[type="submit"],
+	.btn {
+		// Direct hsl(var(--color-primary-*)) — resolves --color-primary
+		// at the consumer element so .success/.error/.warning/.info
+		// semantic cascade lands. var(--color-accent-tint) and similar
+		// intermediate tokens freeze at :root, blocking the cascade.
+		background: hsl(var(--color-primary-lighter));
+		color: hsl(var(--color-primary));
+		border-color: hsl(var(--color-primary));
+
+		&:hover:not(:disabled) {
+			background: hsl(var(--color-primary-light));
+			color: hsl(var(--color-primary-hover));
+			border-color: hsl(var(--color-primary-hover));
+		}
+
+		&:active:not(:disabled) {
+			background: hsl(var(--color-primary-light));
+			color: hsl(var(--color-primary-hover));
+			border-color: hsl(var(--color-primary-hover));
+		}
+	}
+
+	// ── Nav lists — join items with per-side divider lines ─────────
+	// Scoped to library-opt-in structures (data-ln-nav sidebar,
+	// data-ln-dropdown-menu popover, .menu-items surface). Replaces
+	// the default margin-between-items rhythm with a shared top
+	// border. Does NOT apply to breadcrumbs, tab-strips, pagination,
+	// button-groups, or pill-groups — those have their own layout.
+	nav[data-ln-nav] ul {
+		// Bleed list to the sidebar's vertical borders so dividers
+		// reach edge-to-edge. <a> keeps its own padding-inline (from
+		// @mixin nav-links-rounded) so text stays visually inset.
+		margin-inline: calc(-1 * var(--padding-x));
+	}
+
+	nav[data-ln-nav] a {
+		border: var(--border-width) solid transparent;
+		margin: calc(-1 * var(--border-width));
+		transition: border-color var(--transition-fast), background-color var(--transition-fast);
+
+		&:hover {
+			border-color: var(--color-accent);
+		}
+
+		&.active {
+			border-color: var(--color-accent);
+			background-color: hsl(var(--color-primary-light));
+		}
+	}
+
+	[data-ln-dropdown-menu] li + li,
+	.menu-items li + li {
+		border-block-start: var(--border-width) solid var(--color-border-subtle);
+	}
+
 }

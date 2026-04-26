@@ -12,7 +12,7 @@
 //   hsl(var(--color-primary) / 0.5)    → 50% transparent
 //
 // Theming example:
-//   .dark-theme { --color-bg-primary: 240 14% 15%; }
+//   .dark-theme { --color-bg-default: 240 14% 15%; }
 // ==========================================================================
 
 :root {
@@ -28,7 +28,7 @@
 
 	// -----------------------------------------------------------------------
 	// Colors — Secondary (brand accent — surface/element color, NOT text)
-	// For subdued text color, see --color-text-secondary in the Text section.
+	// For subdued text color, see --color-text-muted in the Text section.
 	// -----------------------------------------------------------------------
 	--color-secondary: 160 76% 40%;
 	--color-secondary-hover: 162 93% 31%;
@@ -85,18 +85,18 @@
 
 	// -----------------------------------------------------------------------
 	// Colors — Text (reference neutral scale — NOT the same as --color-secondary)
-	// --color-text-secondary = muted text; --color-secondary = brand accent surface.
+	// --color-text-muted = muted text; --color-secondary = brand accent surface.
 	// -----------------------------------------------------------------------
-	--color-text-primary:   var(--color-neutral-900);
-	--color-text-secondary: var(--color-neutral-500);
-	--color-text-muted:     var(--color-neutral-400);
+	--color-text-default: var(--color-neutral-900);
+	--color-text-muted:   var(--color-neutral-500);
+	--color-text-subtle:  var(--color-neutral-400);
 
 	// -----------------------------------------------------------------------
 	// Colors — Backgrounds
 	// -----------------------------------------------------------------------
 	--color-white:        0 0% 100%;
-	--color-bg-primary:   var(--color-white);
-	--color-bg-secondary: var(--color-neutral-50);
+	--color-bg-default:  var(--color-white);
+	--color-bg-elevated: var(--color-neutral-50);
 	--color-bg-body:      var(--color-neutral-100);
 	--color-bg-error:     0 86% 97%;
 
@@ -157,10 +157,11 @@
 	// -----------------------------------------------------------------------
 	// Border Radius
 	// -----------------------------------------------------------------------
-	--radius-sm: 0.25rem;    // 4px
-	--radius-md: 0.5rem;     // 8px
-	--radius-lg: 0.75rem;    // 12px
-	--radius-xl: 1rem;       // 16px
+	--radius-none: 0;
+	--radius-sm:   0.25rem;    // 4px
+	--radius-md:   0.5rem;     // 8px
+	--radius-lg:   0.75rem;    // 12px
+	--radius-xl:   1rem;       // 16px
 	--radius-full: 9999px;
 
 	// -----------------------------------------------------------------------
@@ -301,17 +302,15 @@
 	--radius:          var(--radius-md);
 
 	// -- Surface colors ---------------------------------------------------
-	--color-bg:            hsl(var(--color-bg-primary));
-	--color-bg-raised:     hsl(var(--color-bg-primary));
-	--color-bg-sunken:     hsl(var(--color-bg-secondary));
-	--color-fg:            hsl(var(--color-text-primary));
-	--color-fg-muted:      hsl(var(--color-text-secondary));
-	--color-fg-subtle:     hsl(var(--color-text-muted));
+	--color-bg:            hsl(var(--color-bg-default));
+	--color-bg-raised:     hsl(var(--color-bg-default));
+	--color-bg-sunken:     hsl(var(--color-bg-elevated));
+	--color-fg:            hsl(var(--color-text-default));
+	--color-fg-muted:      hsl(var(--color-text-muted));
+	--color-fg-subtle:     hsl(var(--color-text-subtle));
 	--color-border-subtle: hsl(var(--color-border-light));
 	--color-border-strong:       hsl(var(--color-neutral-300));
 	--color-border-strong-hover: hsl(var(--color-neutral-400));
-	--btn-bg:                    var(--color-bg);
-	--btn-border:                var(--color-border-strong);
 	--color-bg-recessed:         hsl(var(--color-bg-body));
 	--color-scrim:               hsl(var(--color-neutral-900) / 0.5);
 	// Note: --color-border already exists above as an HSL TRIPLET. We do
@@ -325,6 +324,23 @@
 	--color-accent-fg:     hsl(var(--color-white));
 	--color-accent-tint:         hsl(var(--color-primary-lighter));
 	--color-accent-tint-strong:  hsl(var(--color-primary-light));
+
+	// -- Button surface (neutral default) --------------------------------
+	// Read by @mixin button-base across idle + hover + active.
+	//
+	// NOTE: There is no companion --btn-accent-* token surface. The
+	// accent variant (submit + @mixin btn) declares background, color,
+	// and border-color DIRECTLY in those scopes — token indirection at
+	// :root would freeze --color-accent at :root and break the
+	// .success / .error / .warning / .info semantic-color cascade. See
+	// scss/config/mixins/_btn.scss header comment for the full
+	// rationale.
+	--btn-bg:           var(--color-bg);
+	--btn-fg:           var(--color-fg);
+	--btn-border:       var(--color-border-strong);
+	--btn-bg-hover:     var(--color-bg-sunken);
+	--btn-fg-hover:     var(--color-fg);
+	--btn-border-hover: var(--color-border-strong-hover);
 
 	// -- Typography ------------------------------------------------------
 	--font-size:    var(--text-body-md);
@@ -341,6 +357,20 @@
 	//   --shadow-overlay  hovers above everything (modals)
 	// --shadow is NOT introduced — conflicts with common short-name
 	// expectations. Always name the elevation tier explicitly.
+
+	// -- Per-side borders (SOFT — no default) ----------------------------
+	// --border-block-start, --border-block-end,
+	// --border-inline-start, --border-inline-end
+	//
+	// Read by structural mixins (card, section-card, floating-panel,
+	// stat-card, app-header, app-footer, accordion items, table cells,
+	// tab-nav, sidebar edges, page-header, etc.) with a per-mixin
+	// fallback. NOT defined here — that is intentional. A scope that
+	// re-binds e.g. `--border-block-start: none` flattens the top edge
+	// of the matched element so siblings can join with a shared rule.
+	//
+	// Joining example:
+	//   .joined-stack > * + * { --border-block-start: none; }
 }
 
 // ---------------------------------------------------------------------------

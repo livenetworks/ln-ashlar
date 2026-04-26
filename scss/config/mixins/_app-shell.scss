@@ -55,7 +55,7 @@
 	z-index: var(--z-sticky);
 	padding: var(--padding-y) var(--padding-x);
 	background: var(--color-bg);
-	border-bottom: var(--border-width) solid var(--color-border-subtle);
+	border-block-end: var(--border-block-end, var(--border-width) solid var(--color-border-subtle));
 	box-shadow: var(--shadow-default);
 	@include flex;
 	@include items-center;
@@ -158,6 +158,16 @@
 	@include flex-1;
 	margin-top: var(--app-header-height);
 
+	// Mirror @mixin sidebar-drawer's vertical anchor so the bottom
+	// edge of .app-main lands at viewport bottom on short pages.
+	// Without this floor, `flex: 1` against `app-wrapper`'s
+	// `min-height: 100vh` plus the `margin-top` above pushes
+	// app-main's bottom past the viewport, and `<footer
+	// class="app-footer">` (the last flex-col child) misaligns
+	// vertically with the sidebar drawer's footer (which is fixed
+	// to the same calc).
+	min-height: calc(100vh - var(--app-header-height));
+
 	// When the sidebar drawer is open on desktop, reserve its space
 	// on THIS element (the parent) so both content and footer shift
 	// together. Padding on the parent keeps child widths at 100% and
@@ -234,23 +244,6 @@
 	}
 }
 
-@mixin app-footer {
-	// Chrome bar at the bottom of .app-main. Reads logical tokens —
-	// padding/border/bg follow the same cascade as the header.
-	padding: var(--padding-y) var(--padding-x);
-	border-top: var(--border-width) solid var(--color-border-subtle);
-	background: var(--color-bg);
-	font-size: var(--text-body-sm);
-	line-height: var(--lh-body-sm);
-	color: var(--color-fg-muted);
-	@include flex;
-	@include items-center;
-	@include justify-between;
-	user-select: none;
-
-	// Two-span pattern — second span (typically brand/version) gets
-	// the subtler tint for clear hierarchy.
-	> span:last-child {
-		color: var(--color-fg-subtle);
-	}
-}
+// @mixin app-footer — extracted to _footer.scss.
+// Forwarded by _index.scss. Consumers: `.app-footer` (components/_app-shell.scss)
+// and `<aside> > footer` (via @mixin sidebar in _sidebar.scss).

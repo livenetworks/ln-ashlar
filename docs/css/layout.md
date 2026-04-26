@@ -15,6 +15,7 @@ Grid and container query utilities. File: `scss/config/mixins/_layout.scss`.
 | `.row` | `@include row` | Horizontal flex, items-center, gap 0.5rem |
 | `.row-between` | `@include row-between` | Horizontal flex, items-center, justify-between |
 | `.row-center` | `@include row-center` | Horizontal flex, items-center, justify-center |
+| `.flat-stack` | `@include flat-stack` | Joined panel stack, single shared rule |
 | `.container` | — | Max 80rem, centered, responsive padding |
 | `.container-sm` | — | Max 56rem, centered |
 
@@ -41,6 +42,31 @@ All three grid mixins use `gap: 1.5rem`.
 > #stats ul { @include grid-4; list-style: none; padding: 0; margin: 0; }
 > #stats li { @include card; @include p(1rem); }
 > ```
+
+## Flat Stack
+
+Parent-scope re-bind. Children sit flush with a single shared
+horizontal rule between them. Works on any panel mixin that reads
+the logical tokens (`card`, `section-card`, `stat-card`).
+
+```scss
+.my-list { @include flat-stack; }
+
+// Works with card children:
+.my-list > li > article { @include card; }
+```
+
+Re-binds on the parent scope:
+
+- `--gap: 0` — no space between siblings
+- On direct children: `--radius: 0`, `--shadow-default: none` —
+  flattens corners and elevation regardless of theme
+- On siblings after the first: `--border-block-start: none` —
+  suppresses the top edge so neighbours share the previous sibling's
+  bottom edge
+
+Block-axis only. For horizontal joined controls use `btn-group` or
+`pill-group`.
 
 ## Container Queries
 

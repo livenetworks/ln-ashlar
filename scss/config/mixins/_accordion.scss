@@ -27,9 +27,9 @@
 	overflow: hidden;
 
 	> li {
-		border-bottom: var(--border-width) solid hsl(var(--color-border));
+		border-block-end: var(--border-block-end, var(--border-width) solid hsl(var(--color-border)));
 
-		&:last-child { border-bottom: none; }
+		&:last-child { border-block-end: none; }
 
 		// Trigger
 		> [data-ln-toggle-for] {

@@ -5,6 +5,7 @@
 @use 'colors' as *;
 @use 'borders' as *;
 @use 'position' as *;
+@use 'footer' as *;
 
 // ─── Sidebar ───────────────────────────────────────────────────────
 // Structural shell for a sidebar layout. Provides flex column, right
@@ -85,17 +86,6 @@
 	}
 
 	> footer {
-		@include flex;
-		@include items-center;
-		padding-block: var(--padding-y);
-		@include border-t;
-		font-size: var(--text-body-sm);
-		line-height: var(--lh-body-sm);
-		color: var(--color-fg-muted);
-
-		small {
-			color: var(--color-fg-subtle);
-			font-size: inherit;
-		}
+		@include app-footer;
 	}
 }

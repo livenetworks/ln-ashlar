@@ -229,7 +229,10 @@
 
 @mixin floating-panel {
 	background: var(--color-bg-raised);
-	border: var(--border-width) solid var(--color-border-subtle);
+	border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border-subtle));
+	border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border-subtle));
+	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border-subtle));
+	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border-subtle));
 	border-radius: var(--radius);
 	box-shadow: var(--shadow-raised);
 	z-index: var(--z-dropdown);

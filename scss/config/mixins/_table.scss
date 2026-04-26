@@ -20,7 +20,7 @@
 
 	thead {
 		background: hsl(var(--color-table-header-bg));
-		border-bottom: var(--border-width-strong) solid hsl(var(--color-border));
+		border-block-end: var(--border-block-end, var(--border-width-strong) solid hsl(var(--color-border)));
 	}
 
 	th {

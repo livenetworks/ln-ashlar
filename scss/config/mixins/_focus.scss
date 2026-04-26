@@ -18,7 +18,7 @@
 //   3. 2px outer glow at 15% — soft halo outside the main ring
 @mixin focus-ring($color: var(--color-primary)) {
 	box-shadow:
-		0 0 0 2px hsl(var(--color-bg-primary)),
+		0 0 0 2px hsl(var(--color-bg-default)),
 		0 0 0 4px hsl($color / 0.6),
 		0 0 0 6px hsl($color / 0.15);
 	outline: none;

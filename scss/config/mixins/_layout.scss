@@ -79,3 +79,39 @@
 	container-type: inline-size;
 	@if $name { container-name: $name; }
 }
+
+// ─── Flat stack ────────────────────────────────────────
+// Vertical joined-panel pattern: children sit flush with a single
+// shared horizontal rule between them. Consumes the per-side border
+// soft token `--border-block-start` (no :root default) to suppress
+// each child's top edge after the first.
+//
+// Works on any child that reads --radius and --shadow-default for
+// its own chrome (card, section-card, stat-card, bare <article>
+// with @include card). Self-contained: also re-binds --radius: 0
+// and --shadow-default: none on direct children so rounded corners
+// and elevation shadows do not conflict with the flat shared rule.
+//
+// Cascade note: the --radius / --shadow-default re-binds cascade
+// into grandchildren. If a consumer nests a rounded card inside a
+// flat-stack panel, re-bind --radius on that nested element.
+//
+// Block-axis only. For horizontal joined controls use btn-group or
+// pill-group — they use border-radius tricks on first/last children
+// instead of border-block-* suppression.
+//
+// Usage:
+//   .flat-stack { @include flat-stack; }       // prototype class
+//   #users > ul { @include flat-stack; }       // project selector
+@mixin flat-stack {
+	--gap: 0;
+
+	> * {
+		--radius: 0;
+		--shadow-default: none;
+	}
+
+	> * + * {
+		--border-block-start: none;
+	}
+}

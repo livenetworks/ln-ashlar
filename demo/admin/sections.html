@@ -12,7 +12,7 @@
 	<script>
 	(function () {
 		var KEY = 'ln-demo-theme';
-		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
 		try {
 			var stored = localStorage.getItem(KEY);
 			if (stored && VALID.indexOf(stored) !== -1) {
@@ -64,6 +64,7 @@
 							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
 							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
 							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
 						</ul>
 					</div>
 					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
@@ -276,6 +277,28 @@
 			</main>
 		</section>
 
+		<!-- Flat stack of section-cards -->
+		<section class="section-card">
+			<header><h3>Flat Stack with <code>section-card</code> children</h3></header>
+			<main>
+				<p><code>flat-stack</code> works with any panel mixin that reads the logical tokens — <code>card</code>, <code>section-card</code>, <code>stat-card</code>, or a bare element with <code>@include card</code>.</p>
+				<div class="flat-stack">
+					<section class="section-card">
+						<header><h3>Section A</h3></header>
+						<main><p>First section-card in the stack.</p></main>
+					</section>
+					<section class="section-card">
+						<header><h3>Section B</h3></header>
+						<main><p>Joined via shared block-start suppression.</p></main>
+					</section>
+					<section class="section-card">
+						<header><h3>Section C</h3></header>
+						<main><p>No radius, no shadow, no gap.</p></main>
+					</section>
+				</div>
+			</main>
+		</section>
+
 		<!-- HTML -->
 		<section class="section-card">
 			<header><h3>HTML</h3></header>
@@ -394,7 +417,7 @@
 	<script>
 	(function () {
 		const KEY = 'ln-demo-theme';
-		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight'];
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
 		const root = document.documentElement;
 
 		function markActive() {

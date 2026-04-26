@@ -16,7 +16,7 @@
 	@include relative;
 	pointer-events: none;
 	@include cursor-not-allowed;
-	box-shadow: inset 0 0 0 9999px hsl(var(--color-bg-primary) / 0.6);
+	box-shadow: inset 0 0 0 9999px hsl(var(--color-bg-default) / 0.6);
 }
 
 @mixin ajax-spinner {

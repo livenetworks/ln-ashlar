@@ -85,6 +85,14 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 			self.visibleCount = self._lastFiltered;
 			self.isLoaded = true;
 
+			// Invalidate virtual-scroll window cache: data changed, so the
+			// cached startRow/endRow in _renderVirtual no longer reflect
+			// the current _data. Without this, sort/filter changes that
+			// preserve the viewport window would early-return and keep
+			// stale rows.
+			self._vStart = -1;
+			self._vEnd = -1;
+
 			self._renderRows();
 			self._updateFooter();
 

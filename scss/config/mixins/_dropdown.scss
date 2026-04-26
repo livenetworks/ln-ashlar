@@ -101,7 +101,7 @@
 	// ─── Separator ─────────────────────────────────────
 	hr {
 		border: none;
-		border-top: var(--border-width) solid var(--color-border-subtle);
+		border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border-subtle));
 		margin-block: var(--size-xs);
 	}
 }

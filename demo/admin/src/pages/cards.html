@@ -261,6 +261,34 @@
 						</main>
 					</section>
 
+					<!-- Flat stack — joined panels with shared rule -->
+					<section id="demo-flat-stack" class="section-card">
+						<header><h3>Flat Stack — <code>flat-stack</code></h3></header>
+						<main>
+							<p>Cards sit flush with a single shared rule between them. Applies <code>@include flat-stack</code> on the parent. Self-contained: forces <code>--radius: 0</code> and <code>--shadow-default: none</code> on children regardless of theme.</p>
+							<ul class="flat-stack">
+								<li>
+									<article>
+										<h3>Panel one</h3>
+										<p>Top child — keeps its own top border.</p>
+									</article>
+								</li>
+								<li>
+									<article>
+										<h3>Panel two</h3>
+										<p>Top border suppressed via <code>--border-block-start: none</code>.</p>
+									</article>
+								</li>
+								<li>
+									<article>
+										<h3>Panel three</h3>
+										<p>Same joined rule continues down the stack.</p>
+									</article>
+								</li>
+							</ul>
+						</main>
+					</section>
+
 					<!-- SCSS Reference -->
 					<section class="section-card">
 						<header><h3>SCSS Usage</h3></header>

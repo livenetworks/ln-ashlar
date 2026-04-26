@@ -17,7 +17,7 @@
 	gap: var(--size-md);
 	padding-bottom: var(--size-lg);
 	margin-bottom: var(--size-lg);
-	border-bottom: var(--border-width) solid hsl(var(--color-border));
+	border-block-end: var(--border-block-end, var(--border-width) solid hsl(var(--color-border)));
 
 	@include cq-up(medium, page-header) {
 		grid-template-areas:

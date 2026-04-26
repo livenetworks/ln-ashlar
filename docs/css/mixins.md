@@ -105,15 +105,15 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 
 | Instead of writing... | Use |
 |---|---|
-| `color: var(--color-text-primary)` | `@include text-primary` |
-| `color: var(--color-text-secondary)` | `@include text-secondary` |
+| `color: var(--color-text-default)` | `@include text-primary` |
+| `color: var(--color-text-muted)` | `@include text-secondary` |
 | `color: var(--color-text-muted)` | `@include text-muted` |
 | `color: white` | `@include text-white` |
 | `color: var(--color-error)` | `@include text-error` |
 | `color: var(--color-success)` | `@include text-success` |
 | `color: var(--color-warning)` | `@include text-warning` |
-| `background-color: var(--color-bg-primary)` | `@include bg-primary` |
-| `background-color: var(--color-bg-secondary)` | `@include bg-secondary` |
+| `background-color: var(--color-bg-default)` | `@include bg-primary` |
+| `background-color: var(--color-bg-elevated)` | `@include bg-secondary` |
 | `background-color: var(--color-bg-body)` | `@include bg-body` |
 
 ### Borders & Radius
@@ -415,13 +415,13 @@ display: flex;
 align-items: center;
 justify-content: space-between;
 padding: 0.75rem 1rem;
-background-color: hsl(var(--color-bg-secondary));
+background-color: hsl(var(--color-bg-elevated));
 border-bottom: 1px solid hsl(var(--color-border));
 
 h3 {
     font-size: var(--text-base);        /* 1rem */
     font-weight: var(--font-semibold);  /* 600 */
-    color: hsl(var(--color-text-primary));
+    color: hsl(var(--color-text-default));
     margin: 0;
 }
 ```

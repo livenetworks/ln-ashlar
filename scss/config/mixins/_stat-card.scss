@@ -12,7 +12,10 @@
 	background: var(--color-bg);
 	@include rounded-lg;
 	box-shadow: var(--shadow-default);
-	border: var(--border-width) solid hsl(var(--color-border));
+	border-block-start:  var(--border-block-start,  var(--border-width) solid hsl(var(--color-border)));
+	border-block-end:    var(--border-block-end,    var(--border-width) solid hsl(var(--color-border)));
+	border-inline-start: var(--border-inline-start, var(--border-width) solid hsl(var(--color-border)));
+	border-inline-end:   var(--border-inline-end,   var(--border-width) solid hsl(var(--color-border)));
 	@include transition;
 
 	> [data-ln-stat-label] {

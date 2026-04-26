@@ -32,7 +32,7 @@ threads.
 
 A vertical 2px rail runs the full height of the list via `::before` on
 the `<ol>`. Bullets are primary-coloured 12px circles rendered via
-`::before` on each `<li>`. A 3px ring in `--color-bg-primary` visually
+`::before` on each `<li>`. A 3px ring in `--color-bg-default` visually
 separates the bullet from the rail, and adapts correctly in dark mode
 because it reads the surface token.
 
