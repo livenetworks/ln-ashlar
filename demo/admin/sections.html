@@ -238,44 +238,45 @@
 		</section>
 
 		<!-- Banner -->
-		<section class="section-card">
-			<header>
-				<h3>Banner — <code>.ln-modal.ln-banner</code></h3>
-				<div class="section-actions">
-					<button type="button" data-ln-modal-for="demo-top-banner">Reopen banner above</button>
-				</div>
-			</header>
-			<main>
-				<div class="ln-modal ln-banner" data-ln-modal="open">
-					<form>
+			<section class="section-card">
+				<header>
+					<h3>Banner — <code>.alert.banner</code></h3>
+				</header>
+				<main>
+					<div class="alert banner" role="status" aria-live="polite" data-ln-toggle="open" id="demo-banner-info">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
-						<p>Default (primary) banner. Informational message.</p>
-						<button type="button" aria-label="Dismiss" data-ln-modal-close></button>
-					</form>
-				</div>
-				<div class="ln-modal ln-banner success" data-ln-modal="open">
-					<form>
+						<p>Default (info) banner. Informational message.</p>
+						<button type="button" aria-label="Dismiss" data-ln-toggle-for="demo-banner-info" data-ln-toggle-action="close">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+						</button>
+					</div>
+					<div class="alert banner success" role="status" aria-live="polite" data-ln-toggle="open" id="demo-banner-success">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg>
 						<p>Success banner. Settings saved.</p>
-						<button type="button" aria-label="Dismiss" data-ln-modal-close></button>
-					</form>
-				</div>
-				<div class="ln-modal ln-banner warning" data-ln-modal="open">
-					<form>
+						<button type="button" aria-label="Dismiss" data-ln-toggle-for="demo-banner-success" data-ln-toggle-action="close">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+						</button>
+					</div>
+					<div class="alert banner warning" role="status" aria-live="polite" data-ln-toggle="open" id="demo-banner-warning">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
 						<p>Warning banner. Your session expires in 5 minutes.</p>
-						<button type="button" aria-label="Dismiss" data-ln-modal-close></button>
-					</form>
-				</div>
-				<div class="ln-modal ln-banner error" data-ln-modal="open">
-					<form>
+						<button type="button" aria-label="Dismiss" data-ln-toggle-for="demo-banner-warning" data-ln-toggle-action="close">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+						</button>
+					</div>
+					<div class="alert banner error" role="status" aria-live="polite" data-ln-toggle="open" id="demo-banner-error">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg>
 						<p>Error banner. Deployment failed. Check the logs.</p>
-						<button type="button" aria-label="Dismiss" data-ln-modal-close></button>
-					</form>
-				</div>
-			</main>
-		</section>
+					</div>
+					<div class="alert banner" role="status" aria-live="polite" data-ln-toggle="open" data-ln-persist id="demo-banner-persisted">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+						<p>Persisted banner — dismiss it and reload the page; it stays closed (<code>data-ln-persist</code>).</p>
+						<button type="button" aria-label="Dismiss" data-ln-toggle-for="demo-banner-persisted" data-ln-toggle-action="close">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+						</button>
+					</div>
+				</main>
+			</section>
 
 		<!-- Flat stack of section-cards -->
 		<section class="section-card">
@@ -338,22 +339,22 @@
 &lt;div class="alert warning" role="alert"&gt;...&lt;/div&gt;
 &lt;div class="alert error" role="alert"&gt;...&lt;/div&gt;
 
-&lt;!-- Banner (dismissible, inline, uses ln-modal JS) --&gt;
-&lt;div class="ln-modal ln-banner" id="my-banner" data-ln-modal="open"&gt;
-    &lt;form&gt;
-        &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-info-circle"&gt;&lt;/use&gt;&lt;/svg&gt;
-        &lt;p&gt;Banner message.&lt;/p&gt;
-        &lt;button type="button" aria-label="Dismiss" data-ln-modal-close&gt;&lt;/button&gt;
-    &lt;/form&gt;
+&lt;!-- Banner — full-width variant of alert, dismissed via ln-toggle --&gt;
+&lt;div class="alert banner" id="trial-notice" role="status" aria-live="polite"
+     data-ln-toggle="open" data-ln-persist&gt;
+    &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-info-circle"&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;p&gt;Trial expires in 3 days.&lt;/p&gt;
+    &lt;button type="button" aria-label="Dismiss"
+            data-ln-toggle-for="trial-notice"
+            data-ln-toggle-action="close"&gt;
+        &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/button&gt;
 &lt;/div&gt;
 
-&lt;!-- Color variants via CSS variable --&gt;
-&lt;div class="ln-modal ln-banner success" data-ln-modal="open"&gt;...&lt;/div&gt;
-&lt;div class="ln-modal ln-banner warning" data-ln-modal="open"&gt;...&lt;/div&gt;
-&lt;div class="ln-modal ln-banner error" data-ln-modal="open"&gt;...&lt;/div&gt;
-
-&lt;!-- Trigger to reopen --&gt;
-&lt;button type="button" data-ln-modal-for="my-banner"&gt;Show banner&lt;/button&gt;</code></pre>
+&lt;!-- Color variants — same status classes as alert --&gt;
+&lt;div class="alert banner success"&gt;...&lt;/div&gt;
+&lt;div class="alert banner warning"&gt;...&lt;/div&gt;
+&lt;div class="alert banner error"&gt;...&lt;/div&gt;</code></pre>
 			</main>
 		</section>
 		</section>

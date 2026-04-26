@@ -15,26 +15,3 @@
 
 // Table row action buttons
 td ul { @include btn-group; }
-
-// Banner demos
-#demo-banner-info,
-#demo-banner-warning,
-#demo-banner-error {
-	@include banner;
-}
-
-#demo-banner-warning {
-	--color-primary:         var(--color-warning);
-	--color-primary-hover:   var(--color-warning-hover);
-	--color-primary-focus:   var(--color-warning-focus);
-	--color-primary-light:   var(--color-warning-light);
-	--color-primary-lighter: var(--color-warning-lighter);
-}
-
-#demo-banner-error {
-	--color-primary:         var(--color-error);
-	--color-primary-hover:   var(--color-error-hover);
-	--color-primary-focus:   var(--color-error-focus);
-	--color-primary-light:   var(--color-error-light);
-	--color-primary-lighter: var(--color-error-lighter);
-}

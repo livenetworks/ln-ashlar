@@ -153,13 +153,13 @@ svg.ln-icon.ln-icon--xl { width: 4rem;   height: 4rem;   }
 
 ## Accordion Chevron
 
-`@mixin accordion` in `_collapsible.scss` rotates `svg.ln-chevron` on open state:
+`@mixin accordion` in `_collapsible.scss` rotates `.ln-chevron` on open state:
 
 ```scss
-[data-ln-accordion] li > [data-ln-toggle-for] svg.ln-chevron {
+[data-ln-accordion] li > [data-ln-toggle-for] .ln-chevron {
     transition: transform var(--transition-base);
 }
-[data-ln-accordion] li:has(> .collapsible.open) > [data-ln-toggle-for] svg.ln-chevron {
+[data-ln-accordion] li:has(> .collapsible.open) > [data-ln-toggle-for] .ln-chevron {
     transform: rotate(180deg);
 }
 ```

@@ -539,7 +539,8 @@ Migrated mixins (read soft tokens): `border`, `border-t/-b/-l/-r`,
 
 NOT migrated (intentional — accent personality or non-joinable):
 `btn` / `button-base`, `pill-outline`, `form-check`, `alert` (left
-accent), `banner` (tinted bottom), `tabs-tab` (underline indicator),
+accent + banner variant — both tinted), `tabs-tab` (underline
+indicator),
 `kbd`, `upload-zone` (dashed), `upload-item`, `card-stacked`
 (decorative ::after), `card-accent-top/-bottom/-left`.
 

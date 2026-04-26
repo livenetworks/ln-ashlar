@@ -1,3 +1,5 @@
 @use '../config/mixins' as *;
 
-.alert { @include alert; }
+.alert        { @include alert; }
+.alert.banner { @include alert-banner; }
+.alert[data-ln-toggle="close"] { display: none; }

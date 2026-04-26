@@ -209,7 +209,7 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Large button | `@include btn-lg` alongside `@include btn` |
 | Action button group (toolbar, table actions) | `@include btn-group` |
 | Inline alert (contextual feedback) | `@include alert` |
-| Full-width page banner (system status) | `@include banner` |
+| Full-width page banner (system status) | `@include alert; @include alert-banner;` (or `class="alert banner"`) |
 | Expand/collapse parent | `@include collapsible` |
 | Expand/collapse child | `@include collapsible-content` |
 | Accordion list (styled + chevron) | `@include accordion` |
@@ -490,7 +490,10 @@ Styled accordion list — contained card with chevron rotation. Applied automati
 ```html
 <ul data-ln-accordion>
     <li>
-        <header data-ln-toggle-for="panel1">Section Title</header>
+        <header data-ln-toggle-for="panel1">
+            Section Title
+            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+        </header>
         <main id="panel1" data-ln-toggle class="collapsible">
             <div class="collapsible-body">
                 <p>Content goes here.</p>
@@ -498,7 +501,10 @@ Styled accordion list — contained card with chevron rotation. Applied automati
         </main>
     </li>
     <li>
-        <header data-ln-toggle-for="panel2">Another Section</header>
+        <header data-ln-toggle-for="panel2">
+            Another Section
+            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+        </header>
         <main id="panel2" data-ln-toggle class="collapsible">
             <div class="collapsible-body">
                 <p>More content.</p>
@@ -508,7 +514,8 @@ Styled accordion list — contained card with chevron rotation. Applied automati
 </ul>
 ```
 
-> Chevron is CSS `::after` — no SVG element needed in HTML.
+> **Chevron is icon-system-agnostic.** The mixin rotates any element with `class="ln-chevron"` inside the trigger — `<svg>`, `<i>`, `<span>`, `<img>`. Use the ln-acme icon (`<svg class="ln-icon ln-chevron">`), a different icon library (`<i class="fas fa-chevron-down ln-chevron">`), or a text indicator (`<span class="ln-chevron">▾</span>`).
+>
 > For custom accordion selectors: `#my-list { @include accordion; }`
 
 ---

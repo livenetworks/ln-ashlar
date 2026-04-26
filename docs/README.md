@@ -37,7 +37,6 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 |-------|--------|------|
 | Alert | `scss/components/_alert.scss` | [alert.md](css/alert.md) |
 | Avatar | `scss/components/_avatar.scss` | [avatar.md](css/avatar.md) |
-| Banner | `scss/components/_banner.scss` | [banner.md](css/banner.md) |
 | Breadcrumbs | `scss/components/_breadcrumbs.scss` | [breadcrumbs.md](css/breadcrumbs.md) |
 | Cards | `scss/components/_card.scss` | [cards.md](css/cards.md) |
 | Chip | `scss/components/_chip.scss` | [chip.md](css/chip.md) |

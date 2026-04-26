@@ -39,8 +39,8 @@
 			padding: var(--size-md) var(--size-md);
 			@include cursor-pointer;
 
-			// Chevron — place <svg class="ln-icon ln-chevron"> inside the trigger
-			svg.ln-chevron {
+			// Chevron — place <element class="ln-chevron"> inside the trigger
+			.ln-chevron {
 				@include flex-shrink-0;
 				@include motion-safe {
 					transition: transform var(--transition);
@@ -49,7 +49,7 @@
 		}
 
 		// Rotate chevron when panel is open
-		&:has(> .collapsible.open) > [data-ln-toggle-for] svg.ln-chevron {
+		&:has(> .collapsible.open) > [data-ln-toggle-for] .ln-chevron {
 			transform: rotate(180deg);
 		}
 

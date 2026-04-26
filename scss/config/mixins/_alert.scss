@@ -51,3 +51,29 @@
 		margin-left: auto;
 	}
 }
+
+// Banner variant — full-width strip, bottom-border, no radius.
+// Apply ON TOP of @include alert (sets the structural delta only).
+//
+// Usage:
+//   .alert.banner { @include alert-banner; }
+//
+// HTML (dismissible via ln-toggle, dismissed state persists across reloads):
+//   <div class="alert banner" role="status" aria-live="polite"
+//        data-ln-toggle="open" data-ln-persist id="trial-notice">
+//       <svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+//       <p>Trial expires in 3 days.</p>
+//       <button type="button" aria-label="Dismiss"
+//               data-ln-toggle-for="trial-notice"
+//               data-ln-toggle-action="close">
+//           <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+//       </button>
+//   </div>
+
+@mixin alert-banner {
+	border-left: none;
+	border-radius: 0;
+	border-bottom: var(--border-width) solid hsl(var(--color-primary) / 0.2);
+	padding-inline: var(--size-lg);
+	width: 100%;
+}
