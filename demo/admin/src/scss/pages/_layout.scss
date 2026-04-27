@@ -1,12 +1,12 @@
 @use '../../../../../scss/config/mixins' as *;
 
 .demo-box {
-	@include bg-secondary;
+	background-color: var(--bg-sunken);
 	@include border;
 	@include rounded-sm;
 	@include p(var(--size-sm-up));
 	@include text-sm;
-	@include text-secondary;
+	color: var(--fg-muted);
 	text-align: center;
 }
 

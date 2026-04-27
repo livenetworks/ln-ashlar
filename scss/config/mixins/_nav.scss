@@ -34,13 +34,14 @@
 
 	a {
 		--gap: var(--size-sm-up);
+		--color-fg: var(--fg-muted);
 		@include flex;
 		@include items-center;
 		gap: var(--gap);
 		padding-block: var(--padding-y);
 		font-size: var(--text-body-sm);
 		line-height: var(--lh-body-sm);
-		color: var(--color-fg-muted);
+		color: var(--color-fg);
 		text-decoration: none;
 	}
 
@@ -55,10 +56,11 @@
 	}
 
 	.nav-section {
+		--color-fg: var(--fg-subtle);
 		padding-block: var(--size-sm);
 		@include text-xs;
 		@include font-medium;
-		color: var(--color-fg-subtle);
+		color: var(--color-fg);
 		@include normal-case;
 		letter-spacing: normal;
 		// Structural margin above section header.

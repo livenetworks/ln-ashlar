@@ -6,21 +6,23 @@
 @use 'transitions' as *;
 
 @mixin stat-card {
+	--shadow: var(--shadow-resting);
 	@include flex-col;
 	gap: var(--size-xs);
 	padding: var(--size-lg) var(--size-lg);
 	background: var(--color-bg);
 	@include rounded-lg;
-	box-shadow: var(--shadow-default);
-	border-block-start:  var(--border-block-start,  var(--border-width) solid hsl(var(--color-border)));
-	border-block-end:    var(--border-block-end,    var(--border-width) solid hsl(var(--color-border)));
-	border-inline-start: var(--border-inline-start, var(--border-width) solid hsl(var(--color-border)));
-	border-inline-end:   var(--border-inline-end,   var(--border-width) solid hsl(var(--color-border)));
+	box-shadow: var(--shadow);
+	border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border));
+	border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border));
+	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border));
+	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
 	@include transition;
 
 	> [data-ln-stat-label] {
+		--color-fg: var(--fg-muted);
 		@include typography(label-md);
-		color: var(--color-fg-muted);
+		color: var(--color-fg);
 		text-transform: uppercase;
 		letter-spacing: var(--tracking-wide);
 		margin: 0;
@@ -53,7 +55,8 @@
 			color: hsl(var(--color-error));
 		}
 		&[data-ln-stat-trend="neutral"] {
-			color: var(--color-fg-subtle);
+			--color-fg: var(--fg-subtle);
+			color: var(--color-fg);
 		}
 	}
 }

@@ -33,7 +33,8 @@
 	@include border-t;
 	@include border-r;
 	@include text-xs;
-	color: var(--color-fg-muted);
+	--color-fg: var(--fg-muted);
+	color: var(--color-fg);
 	@include rounded-sm;
 	border-bottom-left-radius: 0;
 	border-top-left-radius: 0;

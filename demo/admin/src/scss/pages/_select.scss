@@ -6,7 +6,7 @@
 
 #select-graceful > p:last-child {
 	@include p(var(--size-md));
-	@include bg-secondary;
+	background-color: var(--bg-sunken);
 	@include rounded-md;
-	@include text-muted;
+	color: var(--fg-subtle);
 }

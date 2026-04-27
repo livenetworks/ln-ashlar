@@ -15,8 +15,8 @@
 	@include border;
 	@include rounded-md;
 	@include text-xs;
-	@include text-secondary;
+	color: var(--fg-muted);
 	text-align: center;
 
-	&:hover { @include bg-secondary; }
+	&:hover { background-color: var(--bg-sunken); }
 }

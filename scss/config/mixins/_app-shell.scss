@@ -43,10 +43,12 @@
 @mixin app-wrapper {
 	@include flex-col;
 	min-height: 100vh;
-	background: var(--color-bg-recessed);
+	background: var(--bg-recessed);
 }
 
 @mixin app-header {
+	--color-border: var(--border-subtle);
+	--shadow: var(--shadow-resting);
 	@include fixed;
 	top: 0;
 	left: 0;
@@ -55,8 +57,8 @@
 	z-index: var(--z-sticky);
 	padding: var(--padding-y) var(--padding-x);
 	background: var(--color-bg);
-	border-block-end: var(--border-block-end, var(--border-width) solid var(--color-border-subtle));
-	box-shadow: var(--shadow-default);
+	border-block-end: var(--border-block-end, var(--border-width) solid var(--color-border));
+	box-shadow: var(--shadow);
 	@include flex;
 	@include items-center;
 	@include justify-between;
@@ -68,8 +70,9 @@
 	button {
 		--btn-bg: transparent;
 		--btn-border: transparent;
+		--color-fg: var(--fg-muted);
 		padding: 0;
-		color: var(--color-fg-muted);
+		color: var(--color-fg);
 		box-shadow: none;
 
 		&:focus {
@@ -110,10 +113,9 @@
 
 	button {
 		// Bordered variant re-bound over @mixin app-header's ghost
-		// default. --color-border is a raw HSL triplet; compose via
-		// hsl() before handing to --btn-border, which feeds a
-		// `border: ... solid <color>` rule.
-		--btn-border: hsl(var(--color-border));
+		// default. --color-border is already a composed hsl() value;
+		// read directly (no extra hsl() wrap).
+		--btn-border: var(--color-border);
 		--padding-y: var(--size-xs);
 		--padding-x: var(--size-sm-up);
 		@include text-xs;

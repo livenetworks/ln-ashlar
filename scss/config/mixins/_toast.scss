@@ -115,9 +115,10 @@
 // ─── Body ──────────────────────────────────────────────
 
 @mixin toast-body {
+	--color-fg: var(--fg-muted);
 	margin-top: var(--size-sm);
 	font-size: var(--text-base);
-	color: var(--color-fg-muted);
+	color: var(--color-fg);
 	line-height: 1.5;
 
 	p { @include m(0); }

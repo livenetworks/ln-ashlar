@@ -18,11 +18,12 @@
 	border-radius: var(--radius);
 	@include overflow-hidden;
 	@include transition;
-	box-shadow: var(--shadow-default);
+	--shadow: var(--shadow-resting);
+	box-shadow: var(--shadow);
 
 	&:hover {
-		border-color: var(--color-border-strong);
-		box-shadow: var(--shadow-raised);
+		--color-border: var(--border-strong);
+		--shadow: var(--shadow-floating);
 	}
 
 	// Direct-child selectors only — nested <header>/<main>/<footer>
@@ -65,7 +66,8 @@
 	@include justify-between;
 	padding: var(--padding-y) var(--padding-x);
 	@include border-b;
-	background: var(--color-bg-sunken);
+	--color-bg: var(--bg-sunken);
+	background: var(--color-bg);
 	@include transition;
 
 	h3 {
@@ -198,8 +200,10 @@
 		height: 10px;
 		background: var(--color-bg);
 		border-radius: var(--radius);
-		box-shadow: var(--shadow-default);
-		border: var(--border-width) solid var(--color-border-subtle);
+		--shadow: var(--shadow-resting);
+		box-shadow: var(--shadow);
+		--color-border: var(--border-subtle);
+		border: var(--border-width) solid var(--color-border);
 		z-index: -1;
 	}
 }
@@ -210,7 +214,8 @@
 	border-radius: var(--radius);
 	@include overflow-hidden;
 	@include transition;
-	box-shadow: var(--shadow-default);
+	--shadow: var(--shadow-resting);
+	box-shadow: var(--shadow);
 	// Structural section-card margin (not shell rhythm; no logical token).
 	margin-bottom: var(--size-md);
 
@@ -224,17 +229,20 @@
 
 // ─── Floating panel ────────────────────────────────────
 // Chrome recipe for floating overlays (popover, dropdown menu, toast).
-// Reads --color-bg-raised to allow separate dark-theme re-bind of
-// raised surfaces vs ground surfaces.
+// Rebinds --color-bg to elevated surface and --shadow to floating
+// shadow so floating panels lift off the page surface correctly.
 
 @mixin floating-panel {
-	background: var(--color-bg-raised);
-	border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border-subtle));
-	border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border-subtle));
-	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border-subtle));
-	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border-subtle));
+	--color-bg:     var(--bg-elevated);
+	--color-border: var(--border-subtle);
+	--shadow:       var(--shadow-floating);
+	background: var(--color-bg);
+	border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border));
+	border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border));
+	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border));
+	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
 	border-radius: var(--radius);
-	box-shadow: var(--shadow-raised);
+	box-shadow: var(--shadow);
 	z-index: var(--z-dropdown);
 }
 
@@ -271,7 +279,8 @@
 			@include font-semibold;
 			@include uppercase;
 			@include tracking-wider;
-			color: var(--color-fg-muted);
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
 			@include flex-shrink-0;
 		}
 
@@ -283,7 +292,8 @@
 			margin: 0;
 
 			em {
-				color: var(--color-fg-subtle);
+				--color-fg: var(--fg-subtle);
+				color: var(--color-fg);
 				@include text-xs;
 				font-style: normal;
 				font-weight: normal;

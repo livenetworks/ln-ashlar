@@ -59,7 +59,7 @@ the logical tokens (`card`, `section-card`, `stat-card`).
 Re-binds on the parent scope:
 
 - `--gap: 0` — no space between siblings
-- On direct children: `--radius: 0`, `--shadow-default: none` —
+- On direct children: `--radius: 0`, `--shadow: none` —
   flattens corners and elevation regardless of theme
 - On siblings after the first: `--border-block-start: none` —
   suppresses the top edge so neighbours share the previous sibling's

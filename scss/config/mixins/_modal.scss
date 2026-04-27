@@ -42,7 +42,7 @@
 	@include section-card;
 	margin-bottom: 0;
 	// Explicit role-scale read — modals use max elevation (deeper than
-	// the --shadow-raised default used by floating panels).
+	// the --shadow-floating default used by floating panels).
 	box-shadow: var(--shadow-xl);
 	display: grid;
 	grid-template-rows: auto 1fr auto;

@@ -101,7 +101,7 @@ button {
 	--btn-bg: transparent;
 	--btn-border: transparent;
 	padding: 0;
-	color: var(--color-fg-muted);
+	color: var(--fg-muted);
 	box-shadow: none;
 	&:focus { box-shadow: none; }
 }
@@ -156,7 +156,7 @@ content in `<section>` — no extra container class needed.
 
 Reads the same logical tokens as `app-header`. The second `<span>`
 (typically version / brand / small meta) gets the subtler
-`--color-fg-subtle` tint:
+`--fg-subtle` tint:
 
 ```html
 <footer>
@@ -265,8 +265,8 @@ distinction.
 ## Composition with density
 
 All logical tokens (`--padding-y`, `--padding-x`, `--gap`,
-`--font-size`, `--color-fg-muted`, `--color-bg`,
-`--color-border-subtle`) in app-shell mixins cascade through
+`--font-size`, `--color-fg`, `--color-bg`,
+`--color-border`) in app-shell mixins cascade through
 `.density-compact`. Intrinsic tokens (`--app-header-height`,
 `--app-sidebar-width`) do NOT — the shell preserves its overall
 geometry across density modes; only the internal rhythm tightens.

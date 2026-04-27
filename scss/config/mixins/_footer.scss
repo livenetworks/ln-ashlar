@@ -20,12 +20,14 @@
 //     neutralises the UA 0.875em shrink.
 
 @mixin app-footer {
+	--color-fg:     var(--fg-muted);
+	--color-border: var(--border-subtle);
 	padding: var(--padding-y) var(--padding-x);
-	border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border-subtle));
+	border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
 	background: var(--color-bg);
 	font-size: var(--text-body-sm);
 	line-height: var(--lh-body-sm);
-	color: var(--color-fg-muted);
+	color: var(--color-fg);
 	@include flex;
 	@include items-center;
 	@include justify-between;
@@ -33,7 +35,8 @@
 
 	> small,
 	> span:last-child {
-		color: var(--color-fg-subtle);
+		--color-fg: var(--fg-subtle);
+		color: var(--color-fg);
 		font-size: inherit;
 	}
 }

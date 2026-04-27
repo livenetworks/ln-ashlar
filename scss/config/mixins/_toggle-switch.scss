@@ -6,7 +6,8 @@
 	position: relative;
 	width: 2.5rem;
 	height: 1.5rem;
-	background: var(--color-border-strong);
+	--color-bg: var(--border-strong);
+	background: var(--color-bg);
 	border-radius: var(--radius-full);
 	cursor: pointer;
 	vertical-align: middle;
@@ -27,7 +28,8 @@
 		height: 1.25rem;
 		background: hsl(var(--color-white));
 		border-radius: 50%;
-		box-shadow: var(--shadow-default);
+		--shadow: var(--shadow-resting);
+		box-shadow: var(--shadow);
 
 		@include motion-safe {
 			transition: transform var(--transition-fast);

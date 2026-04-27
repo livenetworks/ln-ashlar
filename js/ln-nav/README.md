@@ -38,11 +38,13 @@ If the URL is `/users/42`, the `/users` link will get the `active` class.
 
 ```scss
 nav a {
-    @include text-secondary;
+    --color-fg: var(--fg-muted);
+    color: var(--color-fg);
     &.active {
         @include text-primary;
         @include font-bold;
-        @include bg-secondary;
+        --color-bg: var(--bg-sunken);
+        background: var(--color-bg);
     }
 }
 ```

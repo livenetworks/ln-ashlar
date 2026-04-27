@@ -43,6 +43,49 @@ metadata display.
 | `data-ln-chip="error"` | Error 12% |
 | `data-ln-chip="info"` | Info 12% |
 
+## Tokens read
+
+The chip mixin rebinds the shared primitives on its own scope and reads
+them. Override primitives or vocabulary on a parent scope to retheme
+the chip in that context.
+
+| Rebind inside mixin | Vocabulary chosen | Role |
+|---|---|---|
+| `--color-bg: var(--bg-recessed)` | `--bg-recessed` | Default chip background (neutral tone) |
+| `--color-fg: var(--fg-muted)` | `--fg-muted` | Default chip text |
+
+The chip mixin reads `--color-bg` for background and `--color-fg` for
+text. The close button resting icon reads `--color-fg` at reduced
+opacity; its hover background reads `--color-border`.
+
+Tone variants resolve their background and text from the corresponding
+status token at 12% alpha:
+
+| Tone | Background | Text |
+|---|---|---|
+| `success` | `hsl(var(--color-success) / 0.12)` | `hsl(var(--color-success))` |
+| `warning` | `hsl(var(--color-warning) / 0.12)` | `hsl(var(--color-warning))` |
+| `error` | `hsl(var(--color-error) / 0.12)` | `hsl(var(--color-error))` |
+| `info` | `hsl(var(--color-info) / 0.12)` | `hsl(var(--color-info))` |
+
+Examples:
+
+```scss
+// Shift the chip to an elevated surface in one section
+#filter-bar { --bg-recessed: var(--bg-elevated); }
+
+// One-off custom tone (matches the success/warning/error pattern)
+#legal-chip[data-ln-chip] {
+	background: hsl(var(--color-secondary) / 0.12);
+	color:      hsl(var(--color-secondary));
+}
+```
+
+Note that rebinding `--bg-recessed` at a parent shifts every component
+in scope that chooses that vocabulary value (chip, code blocks, progress
+tracks, kbd) — by design. See `docs/css/tokens.md` § "Value vocabulary"
+for the rationale.
+
 ## Accessibility
 
 The close button uses `all: unset` to reset browser defaults.

@@ -44,7 +44,7 @@
 		position: sticky;
 		top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 0px));
 		z-index: calc(var(--z-sticky) - 1);
-		background: hsl(var(--color-table-header-bg));
+		background: var(--bg-sunken);
 	}
 
 	// Thead corner radius
@@ -59,7 +59,8 @@
 	table td:first-child {
 		background: transparent;
 		font-weight: normal;
-		color: var(--color-fg-muted);
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
 	}
 }
 
@@ -81,7 +82,8 @@
 
 @mixin ln-table-count {
 	@include text-sm;
-	color: var(--color-fg-muted);
+	--color-fg: var(--fg-muted);
+	color: var(--color-fg);
 
 	strong {
 		color: var(--color-fg);
@@ -145,7 +147,8 @@
 		@include transition-fast;
 
 		&:hover {
-			background: var(--color-bg-sunken);
+			--color-bg: var(--bg-sunken);
+			background: var(--color-bg);
 		}
 
 		&[data-active] {
@@ -191,10 +194,12 @@
 	@include justify-between;
 	padding: var(--size-sm) var(--size-md);
 	@include border-t;
-	background: var(--color-bg-sunken);
+	--color-bg: var(--bg-sunken);
+	background: var(--color-bg);
 	border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 	@include text-sm;
-	color: var(--color-fg-muted);
+	--color-fg: var(--fg-muted);
+	color: var(--color-fg);
 
 	strong {
 		color: var(--color-fg);
@@ -206,7 +211,8 @@
 
 @mixin ln-table-timing {
 	@include text-xs;
-	color: var(--color-fg-subtle);
+	--color-fg: var(--fg-subtle);
+	color: var(--color-fg);
 	font-family: var(--font-mono);
 }
 
@@ -218,7 +224,7 @@
 	@include items-center;
 	gap: var(--size-lg);
 	padding: var(--size-sm) var(--size-md);
-	@include border-b-light;
+	@include border-b;
 
 	fieldset {
 		border: none;
@@ -231,7 +237,8 @@
 		legend {
 			@include text-xs;
 			@include font-medium;
-			color: var(--color-fg-subtle);
+			--color-fg: var(--fg-subtle);
+			color: var(--color-fg);
 			float: left;
 			margin-right: var(--size-sm);
 			line-height: 1.75rem;
@@ -249,11 +256,13 @@
 			@include rounded-full;
 			@include transition-fast;
 			background: transparent;
-			color: var(--color-fg-muted);
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
 			border: none;
 
 			&:hover {
-				background-color: var(--color-bg-sunken);
+				--color-bg: var(--bg-sunken);
+				background-color: var(--color-bg);
 				color: var(--color-fg);
 			}
 
@@ -273,7 +282,7 @@
 	@include flex-wrap;
 	gap: var(--size-xs-up);
 	padding: var(--size-xs-up) var(--size-md);
-	@include border-b-light;
+	@include border-b;
 	background-color: hsl(var(--color-primary) / 0.03);
 }
 
@@ -310,7 +319,8 @@
 @mixin ln-table-clear-all {
 	@include text-xs;
 	@include font-medium;
-	color: var(--color-fg-subtle);
+	--color-fg: var(--fg-subtle);
+	color: var(--color-fg);
 	background: none;
 	border: none;
 	@include cursor-pointer;
@@ -343,7 +353,8 @@
 
 	p {
 		@include text-sm;
-		color: var(--color-fg-muted);
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
 		margin: 0 0 var(--size-lg);
 	}
 }

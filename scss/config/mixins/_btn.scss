@@ -24,9 +24,9 @@
 // the difference is which values --btn-* resolves to.
 //
 // Neutral default: --btn-* read from :root, where they wire to
-// --color-bg / --color-fg / --color-border-strong (and -hover
+// --color-bg / --color-fg / --border-strong (and --border-strong-hover
 // companions for the hover state). Theme overrides rebind --btn-*
-// (e.g. Glass rebinds --btn-bg to --color-bg-raised, --btn-border
+// (e.g. Glass rebinds --btn-bg to --bg-elevated, --btn-border
 // to --color-accent for an outlined neutral chrome).
 //
 // Accent variant (submit + @mixin btn): rebinds --btn-* on the
@@ -154,7 +154,7 @@
 	button {
 		--btn-bg: transparent;
 		--btn-border: transparent;
-		color: var(--color-fg-subtle);
+		color: var(--fg-subtle);
 	}
 }
 

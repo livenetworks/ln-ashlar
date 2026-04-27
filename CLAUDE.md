@@ -374,9 +374,9 @@ They do NOT redeclare component structure (`background`, `color`,
 ### Rule — themes rebind at theme `:root`, never via descendant selectors
 
 ```scss
-// RIGHT — palette rebind at theme :root only
+// RIGHT — vocabulary rebind at theme :root only
 [data-theme="glass"] {
-	--color-bg-raised:    hsl(var(--color-neutral-950));
+	--bg-elevated:        hsl(var(--color-neutral-950));
 	--color-accent-bg:    hsl(var(--color-primary) / 0.5);
 	--color-accent-bg-fg: hsl(var(--color-primary));
 	// ...
@@ -415,10 +415,12 @@ in the consumer mixin. Do not escalate specificity.
 
 // Default theme — no companion override; mixin falls back to --color-accent / --color-accent-fg (= solid + white)
 
-// Glass theme — rebind companions at theme :root
+// Glass theme — rebind vocabulary + accent companions at theme :root
 [data-theme="glass"] {
-	--color-accent-bg:       hsl(var(--color-primary) / 0.5);
-	--color-accent-bg-hover: hsl(var(--color-primary-hover) / 0.6);
+	--bg-elevated:           hsl(220 16% 17%);
+	--bg-sunken:             hsl(220 16% 20%);
+	--color-accent-bg:       hsl(var(--color-primary) / 0.2);
+	--color-accent-bg-hover: hsl(var(--color-primary) / 0.3);
 	--color-accent-bg-fg:    hsl(var(--color-primary));
 	// --color-accent-fg stays at :root default (white) — solid-accent
 	// surfaces (toast-side, pill-checked, stepper-active) keep white
@@ -483,14 +485,12 @@ written directly into a mixin. Per-component tokens (`--btn-py`,
 `--modal-pad`) defeat the same purpose in reverse: touching one
 component forces touching its private tokens, not the scale.
 
-**Mixins read logical tokens, not scale tokens.** Mixin bodies use
+**Mixins read primitives, not scale tokens.** Mixin bodies use
 `--padding-x`, `--padding-y`, `--gap`, `--radius`, `--color-bg`,
-`--color-fg`, `--color-border`, `--color-accent`, `--shadow-default`,
-etc. — the semantic public contract. The `--size-*` scale is back-end
+`--color-fg`, `--color-border`, `--color-accent`, `--shadow`,
+etc. — the public contract. The `--size-*` scale is back-end
 plumbing read only by `:root`, `.density-compact`, and region scopes
-that re-bind the logical tokens. See
-`.claude/plans/refactor-logical-tokens-architecture.md` for the full
-contract.
+that re-bind the primitives.
 
 **When you need a new spacing value — extend, don't silo.** Extend
 `--size-*`. Never create a component-scoped token. Use the t-shirt
@@ -520,171 +520,138 @@ breaks any component that uses both.
 - Font sizes / line heights / letter spacing use their own scales
   (`--text-*`, `--lh-*`, `--tracking-*`).
 
-**Logical color + shadow tokens (Phase 5 additions).** Beyond
-`--color-bg`, `--color-fg`, `--color-border`, `--color-accent`, the
-library also exposes:
+**Color and shadow primitives.** Mixins read four single primitives for
+color and shadow. Components rebind these on their own scope to select
+a different vocabulary value:
 
-- `--color-border-strong` / `-hover` — stronger neutral edge for button
-  borders and outlined controls.
-- `--color-bg-recessed` — sunken surface for code blocks, progress
-  tracks, chip fills.
-- `--color-scrim` — modal overlay.
-- `--color-accent-tint` / `-strong` — subtle accent washes (upload
-  hover, active nav background).
-- `--shadow-default` (resting), `--shadow-raised` (floating),
-  `--shadow-overlay` (modal).
+- `--color-bg` — element surface (default: `var(--bg-base)`)
+- `--color-fg` — text color (default: `var(--fg-default)`)
+- `--color-border` — border color (default: `var(--border-subtle)`)
+- `--shadow` — box shadow (default: `var(--shadow-resting)`)
+- `--color-scrim` — modal overlay (kept as-is — single purpose primitive)
+- `--color-accent-tint` / `--color-accent-tint-strong` — accent wash vocabulary (upload, active nav)
 
-Every mixin read must go through the logical layer, not a scale token
-directly. Consumers override logical tokens at `:root` or at a region
-scope.
+Every mixin read must go through the primitive layer, not a scale token
+directly. Components rebind primitives on their own scope; themes rebind
+vocabulary at theme `:root`.
 
 ---
 
-## Logical Token Surface — Component Contract
+## Token Surface — Primitives + Vocabulary
 
-Mixin bodies read ONLY the logical tokens listed below. The
-back-end scales (`--size-*`, `--color-neutral-*`, `--color-primary*`,
-`--color-bg-*`, `--shadow-xs`…`2xl`, `--text-body-*`, `--lh-body-*`)
-are plumbing — they live in `_tokens.scss` and are re-bound by
-density / theme / region scopes. Mixins never touch them directly.
+The token system has three layers:
 
-### The logical tokens (public contract)
+1. **Scale** (`--size-*`, `--color-neutral-*`, `--shadow-sm/md/xl`) — back-end plumbing. Lives in `_tokens.scss`. Mixins never read these directly.
+2. **Vocabulary** (`--bg-base`, `--fg-default`, `--border-subtle`, `--shadow-resting`, etc.) — named value choices. Pre-composed `hsl(...)` values. Themes rebind vocabulary at theme `:root`.
+3. **Primitives** (`--color-bg`, `--color-fg`, `--color-border`, `--shadow`) — what mixins read. Single token per concern. Default-wired to vocabulary at `:root`. Components rebind primitives on their own scope to choose a different vocabulary value.
+
+This mirrors spacing: `--padding-x/y`, `--gap`, `--radius` are the primitives; `--size-*` is the vocabulary.
+
+### The primitives (what mixin bodies read)
 
 Structure and rhythm:
 
-- `--padding-x`, `--padding-y` — default horizontal / vertical chrome
+- `--padding-x`, `--padding-y` — horizontal / vertical chrome
 - `--gap` — flex/grid gap between siblings
 - `--radius` — default corner radius
-- `--border-width` — default border stroke (also
-  `--border-width-strong`)
+- `--border-width` — default border stroke (also `--border-width-strong`)
 
-Surface colors:
+Surface colors (single primitive per concern):
 
-- `--color-bg` — element surface
-- `--color-bg-raised` — elevated surface (dropdowns, popovers,
-  floating panels)
-- `--color-bg-sunken` — recessed surface (body behind cards, `thead`)
-- `--color-bg-recessed` — sunken fill (code blocks, progress tracks,
-  chip fills)
-- `--color-fg` — primary text
-- `--color-fg-muted` — secondary text
-- `--color-fg-subtle` — disabled / helper text
-- `--color-border-subtle` — dividers, floating-panel edges
-- `--color-border-strong`, `--color-border-strong-hover` — button
-  borders, outlined controls
-- `--color-scrim` — modal overlay
+- `--color-bg` — element surface (default: `var(--bg-base)`)
+- `--color-fg` — text color (default: `var(--fg-default)`)
+- `--color-border` — border color (default: `var(--border-subtle)`)
+- `--shadow` — box shadow (default: `var(--shadow-resting)`)
+- `--color-scrim` — modal overlay (single-purpose primitive, kept as-is)
 
 Accent:
 
 - `--color-accent`, `--color-accent-hover`, `--color-accent-fg`
-- `--color-accent-tint`, `--color-accent-tint-strong` — subtle accent
-  washes (upload hover, active nav background)
+- `--color-accent-tint`, `--color-accent-tint-strong` — subtle accent washes
 
-Buttons:
+Buttons (state-surface family — kept for hover/active inside the component):
 
-- `--btn-bg`, `--btn-fg`, `--btn-border` — default (neutral) button
-  surface read by `@mixin button-base`.
-- `--btn-bg-hover`, `--btn-fg-hover`, `--btn-border-hover` — hover /
-  active states for the neutral surface.
-
-The accent variant (`button[type="submit"]` + `@mixin btn`) is also
-fully token-driven through the same `--btn-*` surface — the variant
-rebinds `--btn-*` on the consumer element (not at `:root`):
-
-```scss
-@mixin btn {
-    --color-accent:       hsl(var(--color-primary));
-    --color-accent-hover: hsl(var(--color-primary-hover));
-    --color-accent-fg:    hsl(var(--color-white));
-
-    --btn-bg:           var(--color-accent);
-    --btn-fg:           var(--color-accent-fg);
-    --btn-border:       var(--color-accent);
-    --btn-bg-hover:     var(--color-accent-hover);
-    --btn-fg-hover:     var(--color-accent-fg);
-    --btn-border-hover: var(--color-accent-hover);
-}
-```
-
-Why this preserves the semantic-color cascade: `var()` resolves at the
-**declaration site**. When `.success { --color-primary: ...; }` is on
-the button element, `@mixin btn`'s rebinds resolve `var(--color-primary)`
-→ `--color-accent` → `--btn-*` all at the same element scope. A
-companion `--btn-accent-*` surface AT `:root` would freeze
-`--color-accent` at `:root` and break `.success`/`.error`/`.warning`/`.info`
-— the fix is consumer-scoped rebinding (inside a mixin body), not a
-parallel `:root` surface.
-
-Override targets:
-
-- Whole-theme accent shift → rebind `--color-primary` at theme scope.
-- Single button color variant → rebind `--color-primary` on the
-  element or parent (e.g. `.delete-action { --color-primary: var(--color-error); }`).
-- Theme-specific button palette (e.g. Glass translucent fill) → rebind
-  `--color-accent-bg` / `--color-accent-bg-hover` / `--color-accent-bg-fg`
-  at the theme `:root`
-  scope (`[data-theme="glass"] { ... }`). Never on a descendant
-  selector — see `## Theme Architecture` for the full rule.
-
-See `scss/config/mixins/_btn.scss` header for the full cascade
-rationale.
+- `--btn-bg`, `--btn-fg`, `--btn-border` — default (neutral) surface read by `@mixin button-base`
+- `--btn-bg-hover`, `--btn-fg-hover`, `--btn-border-hover` — hover / active states
 
 Typography:
 
-- `--font-size`, `--line-height`
-
-Motion and depth:
-
-- `--shadow-default` (resting: cards, tables, stat-cards)
-- `--shadow-raised` (floating: tooltips, dropdowns, popovers)
-- `--shadow-overlay` (modal)
-- `--transition`
+- `--font-size`, `--line-height`, `--transition`
 
 Per-side borders (soft — NO `:root` default):
 
-- `--border-block-start` — replaces `border-top` for joinable surfaces
-- `--border-block-end` — replaces `border-bottom`
-- `--border-inline-start` — replaces `border-left` (LTR)
-- `--border-inline-end` — replaces `border-right` (LTR)
+- `--border-block-start`, `--border-block-end`, `--border-inline-start`, `--border-inline-end`
 
-These four tokens have NO default in `:root`. Mixins read them with
-a per-mixin fallback (`var(--border-block-end, <fallback>)`), so a
-scope that does NOT re-bind them inherits exactly the mixin's
-existing border. A scope that re-binds e.g. `--border-block-start: none`
-on `.joined-stack > * + *` flattens the top edge of every joined
-sibling so they share a single rule.
+These four have NO `:root` default. Mixins read them with a per-mixin fallback — default rendering is unchanged. A scope that rebinds e.g. `--border-block-start: none` flattens the top edge of every joined sibling.
 
-Migrated mixins (read soft tokens): `border`, `border-t/-b/-l/-r`,
-`border-light`, `border-t-light`, `border-b-light`, `card`,
-`section-card`, `floating-panel`, `panel-header`, `panel-footer`,
-`section`, `stat-card`, `page-header`, `app-header`, `app-footer`,
-`accordion` (items), `dropdown-menu` (hr separator), `table-base`
-(thead, td), `data-table` (tfoot, filter-dropdown), `sidebar`
-(header, footer, right edge — via `border-r/-b/-t`), `tabs-nav` (via
-`border-b`).
+### The vocabulary (value choices)
 
-NOT migrated (intentional — accent personality or non-joinable):
-`btn` / `button-base`, `pill-outline`, `form-check`, `alert` (left
-accent + banner variant — both tinted), `tabs-tab` (underline
-indicator),
-`kbd`, `upload-zone` (dashed), `upload-item`, `card-stacked`
-(decorative ::after), `card-accent-top/-bottom/-left`.
+Background: `--bg-base`, `--bg-elevated`, `--bg-sunken`, `--bg-recessed`
 
-### Rule — mixins read the logical layer
+Foreground: `--fg-default`, `--fg-muted`, `--fg-subtle`
+
+Border: `--border-subtle`, `--border-strong`, `--border-strong-hover`
+
+Shadow: `--shadow-resting`, `--shadow-floating`, `--shadow-overlay`
+
+### Cascade rebind pattern
+
+Components rebind the primitive on their own scope to pick a vocabulary value:
 
 ```scss
-// RIGHT — mixin body reads logical tokens
+@mixin chip {
+	--color-bg: var(--bg-recessed);    // rebind primitive
+	--color-fg: var(--fg-muted);       // rebind primitive
+	background: var(--color-bg);       // read primitive
+	color: var(--color-fg);            // read primitive
+}
+
+@mixin floating-panel {
+	--color-bg:     var(--bg-elevated);
+	--color-border: var(--border-subtle);
+	--shadow:       var(--shadow-floating);
+	background: var(--color-bg);
+	border: var(--border-width) solid var(--color-border);
+	box-shadow: var(--shadow);
+}
+```
+
+Cascade leak is intentional — a chip's children inherit `--color-bg: var(--bg-recessed)`. If a nested component needs a different value, it rebinds again on its own root.
+
+### Theme rebind pattern
+
+Themes rebind vocabulary at theme `:root`. Primitives wire to vocabulary, so all consumers adapt:
+
+```scss
+[data-theme="dark"] {
+	--bg-base:     hsl(220 16% 13%);
+	--bg-elevated: hsl(220 16% 17%);
+	--bg-sunken:   hsl(220 16% 20%);
+	--bg-recessed: hsl(220 16%  9%);
+	--fg-default:  hsl(0 0% 95%);
+	--fg-muted:    hsl(220  9% 60%);
+	--fg-subtle:   hsl(218 11% 52%);
+	--border-subtle:       hsl(220 14% 20%);
+	--border-strong:       hsl(220 13% 36%);
+	--border-strong-hover: hsl(218 11% 52%);
+}
+```
+
+### Rule — mixins read primitives, never scale tokens
+
+```scss
+// RIGHT — mixin body reads primitives
 @mixin card {
 	padding: var(--padding-y) var(--padding-x);
 	background: var(--color-bg);
 	color: var(--color-fg);
-	border: var(--border-width) solid var(--color-border-subtle);
+	border: var(--border-width) solid var(--color-border);
 	border-radius: var(--radius);
-	box-shadow: var(--shadow-default);
+	box-shadow: var(--shadow);
 	transition: var(--transition);
 }
 
-// WRONG — mixin body reaches through to the scale
+// WRONG — mixin body reaches through to scale or old logical tokens
 @mixin card {
 	padding: var(--size-xs-up) var(--size-md-up);                // scale
 	background: hsl(var(--color-bg-primary));                     // scale
@@ -693,12 +660,9 @@ indicator),
 }
 ```
 
-### Rule — context overrides re-bind the logical token
+### Rule — context overrides rebind the primitive
 
-A region that needs tighter vertical rhythm re-binds
-`--padding-y` on the region root; every descendant that reads
-`--padding-y` (inputs, buttons, cells, panel headers) adapts via
-the cascade:
+A region that needs tighter rhythm rebinds the primitive on the region root:
 
 ```scss
 .dense-region {
@@ -708,17 +672,20 @@ the cascade:
 }
 ```
 
-Same mechanism as `.density-compact`, theme overrides, and status
-re-binds (`.alert-warn { --color-accent: hsl(var(--color-warning)); }`).
+Same mechanism as `.density-compact`, theme overrides, and status rebinds.
 
-### Rule — `:root` wires logical → scale
+### Rule — `:root` wires primitives → vocabulary
 
-The `:root` block in `_tokens.scss` is the only place outside
-density/theme scopes that wires a logical token to a back-end
-scale token. That wiring lives at the bottom of `_tokens.scss`
-under `// Logical tokens — the public contract mixins read`.
-Editing the wiring changes every mixin's default reading in one
-edit.
+The `:root` block in `_tokens.scss` wires each primitive to its vocabulary default. That wiring is the only place outside density/theme scopes where primitives get their value:
+
+```scss
+:root {
+	--color-bg:     var(--bg-base);
+	--color-fg:     var(--fg-default);
+	--color-border: var(--border-subtle);
+	--shadow:       var(--shadow-resting);
+}
+```
 
 ### Rule — variants rebind the surface, don't redeclare properties
 
@@ -776,10 +743,7 @@ tokens — it does NOT declare `background:` / `color:` /
    resolves at the **declaration site**. When the variant rebind
    lands on the consumer element (the same element where the base
    reads), descendant overrides (`.success { --color-primary: ...; }`)
-   re-resolve through the variant's rebind chain cleanly. The freeze
-   only happens when the intermediate token is declared at `:root` —
-   which is why `--component-accent-*` companion surfaces at `:root`
-   are the wrong fix.
+   re-resolve through the variant's rebind chain cleanly.
 
 **Concrete cascade for `<button class="btn success">`:**
 
@@ -791,37 +755,33 @@ tokens — it does NOT declare `background:` / `color:` /
 4. `@mixin button-base` reads `background: var(--btn-bg)` at consumer
    — resolves through step 3.
 
-Every step resolves at the consumer element, so the cascade lands.
-
-**Applies to any base/variant pair using a token surface.** Today this
-is `button-base` ↔ `btn`. As more components grow `--component-*`
-surfaces, the same rule applies — a future `card-accent` variant
-rebinds `--card-bg` / `--card-fg`, not declares them directly.
+See `scss/config/mixins/_btn.scss` header for the full cascade rationale.
 
 ### What NOT to do
 
 - Do not read `--size-*` inside a mixin body. Read `--padding-*`,
   `--gap`, or `--radius` instead.
 - Do not read `--color-neutral-*` inside a mixin body. Read
-  `--color-bg`, `--color-fg`, `--color-border-*`, or
-  `--color-bg-recessed` instead.
+  `--color-bg`, `--color-fg`, or `--color-border` instead.
 - Do not read `--color-primary*` inside a mixin body. Read
   `--color-accent`, `--color-accent-hover`, `--color-accent-fg`,
   or `--color-accent-tint*` instead.
-- Do not read `--shadow-xs…2xl` inside a mixin body. Read
-  `--shadow-default`, `--shadow-raised`, or `--shadow-overlay`.
+- Do not read `--shadow-xs…2xl` inside a mixin body. Read `--shadow`.
+  (Floating panels rebind `--shadow: var(--shadow-floating)` on
+  their own scope.)
 - Do not introduce a per-component logical token
-  (`--card-padding-y`, `--btn-gap`). Re-bind the shared logical
-  token on the component's root selector instead.
+  (`--card-padding-y`, `--btn-gap`). Rebind the shared primitive
+  on the component's root selector instead.
 - Do not declare `background:`, `color:`, or `border-color:`
   directly inside a variant mixin when the base mixin reads from a
-  `--component-*` token surface (e.g. `@mixin button-base` reads
-  `--btn-*`). Rebind the surface tokens instead — `--btn-bg:
-  var(--color-accent);` not `background: var(--color-accent);`.
-  Direct property declarations duplicate what the base already does
-  and bypass the surface that themes/variants override. See the
-  "Rule — variants rebind the surface, don't redeclare properties"
-  subsection above.
+  `--component-*` token surface. Rebind the surface tokens instead.
+- Do not use the old `--color-bg-raised`, `--color-bg-sunken`,
+  `--color-bg-recessed`, `--color-fg-muted`, `--color-fg-subtle`,
+  `--color-border-subtle`, `--color-border-strong`, `--shadow-default`,
+  `--shadow-raised` aliases — these were renamed. Use the current
+  vocabulary: `--bg-base`, `--bg-sunken`, `--bg-recessed`, `--fg-muted`,
+  `--fg-subtle`, `--border-subtle`, `--border-strong`,
+  `--shadow-resting`, `--shadow-floating`.
 
 ---
 

@@ -11,7 +11,8 @@
 	gap: var(--size-xs);
 	padding: var(--size-xs) var(--size-sm-up);
 	@include typography(label-sm);
-	background: var(--color-bg-recessed);
+	--color-bg: var(--bg-recessed);
+	background: var(--color-bg);
 	color: var(--color-fg);
 	@include rounded-full;
 	white-space: nowrap;
@@ -24,10 +25,11 @@
 		width: 1rem;
 		height: 1rem;
 		border-radius: 50%;
-		color: var(--color-fg-muted);
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
 
 		&:hover {
-			background: hsl(var(--color-border));
+			background: var(--color-border);
 			color: var(--color-fg);
 		}
 

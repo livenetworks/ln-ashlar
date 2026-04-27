@@ -29,29 +29,30 @@
 	--color-neutral-800: 220 20% 90%;
 	--color-neutral-900: 221 30% 97%;
 
-	// Surface elevation — explicit re-tune.
-	//
-	// Light mode routes `--color-bg-default` through `--color-white`
-	// (a hardcoded literal that does not cascade) and uses
-	// neutral-50 for `bg-secondary` (lighter than body = elevated).
-	// After the neutral-scale inversion above, neutral-50 would be
-	// DARKER than neutral-100 — flipping elevation direction. Dark
-	// UI convention (Apple HIG, Material, GitHub) keeps elevated =
-	// lighter, so we restate the three surface tokens explicitly as
-	// a clean ladder: body < primary < secondary (each ~4% lighter).
-	--color-bg-body:     220 16%  9%;
-	--color-bg-default:  220 16% 13%;
-	--color-bg-elevated: 220 16% 17%;
+	// Vocabulary — bg
+	// Explicit ladder: body (darkest) < base < elevated < sunken (mid).
+	// Dark UI convention keeps elevated = lighter; the neutral-scale
+	// inversion alone would flip elevation direction, so we restate
+	// the four vocabulary entries explicitly.
+	--bg-base:     hsl(220 16% 13%);
+	--bg-elevated: hsl(220 16% 17%);
+	--bg-sunken:   hsl(220 16% 20%);
+	--bg-recessed: hsl(220 16%  9%);
+
+	// Vocabulary — fg
+	--fg-default: hsl(0 0% 95%);
+	--fg-muted:   hsl(220  9% 60%);
+	--fg-subtle:  hsl(218 11% 52%);
+
+	// Vocabulary — border (collapses old --color-border-light bump)
+	--border-subtle:       hsl(220 14% 20%);
+	--border-strong:       hsl(220 13% 36%);
+	--border-strong-hover: hsl(218 11% 52%);
 
 	// Scrim — keep dark overlay in dark mode (neutral-900 inverts to
 	// near-white, which would produce a LIGHT scrim; explicit override
 	// preserves conventional modal-darkening behavior).
-	--color-scrim: 0 0% 0% / 0.6;
-
-	// `--color-border-light` cascades through neutral-100 (12% in
-	// dark) which collides with bg-primary 13% — invisible edge.
-	// Bump to a visible subtle edge above bg-primary.
-	--color-border-light: 220 14% 20%;
+	--color-scrim: hsl(0 0% 0% / 0.6);
 
 	// Primary tint layers — re-tuned for dark surfaces
 	--color-primary-light:   232 60% 22%;
@@ -70,9 +71,6 @@
 	// Secondary tint layers — re-tuned for dark surfaces
 	--color-secondary-light:   160 55% 20%;
 	--color-secondary-lighter: 160 45% 14%;
-
-	// Error-bg re-tuned
-	--color-bg-error: 0 40% 15%;
 
 	// Shadows — solid black, boosted alpha, no hue (cool-tint
 	// disappears on dark surfaces)
@@ -171,18 +169,25 @@
 	// cross-cutting --color-accent-bg-* companion tokens. Theme rebinds
 	// at :root only; library owns structure. See CLAUDE.md
 	// ## Theme Architecture for the contract.
-	--btn-bg:           var(--color-bg-raised);
-	--btn-bg-hover:     var(--color-bg-elevated);
+	--btn-bg:           var(--bg-elevated);
+	--btn-bg-hover:     var(--bg-sunken);
 	--btn-border:       var(--color-accent);
 	--btn-border-hover: var(--color-accent-hover);
 
-	// Translucent accent surface — companions read by @mixin btn via
-	// fallback. Glass flips the accent button to tinted bg + accent fg
-	// while keeping --color-accent-fg (white) intact for solid-accent
-	// surfaces (toast-side, pill-checked, stepper active/complete).
-	--color-accent-bg:       hsl(var(--color-primary) / 0.2);
-	--color-accent-bg-hover: hsl(var(--color-primary) / 0.3);
-	--color-accent-bg-fg:    hsl(var(--color-primary));
+	// ── Accent buttons — translucent fill via consumer-scope rebind
+	// Rebind --btn-* on the button itself (not at theme :root) so
+	// var(--color-primary) inside the values resolves on the button's
+	// cascade — letting .success / .error / .warning / .info status
+	// overrides reach the fill and text color. Token-only rebinds; no
+	// background/color/border-color declarations, no &:hover blocks
+	// (button-base already handles state via --btn-*-hover).
+	button[type="submit"],
+	.btn {
+		--btn-bg:       hsl(var(--color-primary) / 0.2);
+		--btn-fg:       hsl(var(--color-primary));
+		--btn-bg-hover: hsl(var(--color-primary) / 0.3);
+		--btn-fg-hover: hsl(var(--color-primary));
+	}
 
 	// ── Nav lists — join items with per-side divider lines ─────────
 	// Scoped to library-opt-in structures (data-ln-nav sidebar,
@@ -214,7 +219,7 @@
 
 	[data-ln-dropdown-menu] li + li,
 	.menu-items li + li {
-		border-block-start: var(--border-width) solid var(--color-border-subtle);
+		border-block-start: var(--border-width) solid var(--color-border);
 	}
 
 }

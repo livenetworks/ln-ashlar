@@ -13,7 +13,8 @@
 	cursor: pointer;
 
 	&:hover {
-		background: hsl(var(--color-bg-elevated));
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
 	}
 }
 

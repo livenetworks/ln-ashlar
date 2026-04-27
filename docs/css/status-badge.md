@@ -29,7 +29,7 @@ Inline semantic indicator with a colored dot. Files: `scss/config/mixins/_status
 | `.warning` | `--color-warning` | Pending, expiring, attention |
 | `.error` | `--color-error` | Failed, blocked, critical |
 | `.info` | `--color-info` | Draft, informational |
-| `.neutral` | `--color-text-muted` | Archived, inactive, disabled |
+| `.neutral` | `--fg-muted` | Archived, inactive, disabled |
 
 ## Live pulse
 

@@ -17,7 +17,8 @@
 	}
 
 	[data-ln-tab][disabled] {
-		color: var(--color-fg-subtle);
+		--color-fg: var(--fg-subtle);
+		color: var(--color-fg);
 		@include cursor-not-allowed;
 		@include opacity-50;
 
@@ -29,12 +30,13 @@
 }
 
 @mixin tabs-tab {
+	--color-fg: var(--fg-muted);
 	all: unset;
 	box-sizing: border-box;
 	padding: var(--size-sm) var(--size-md);
 	@include text-sm;
 	@include font-medium;
-	color: var(--color-fg-muted);
+	color: var(--color-fg);
 	@include cursor-pointer;
 	@include transition;
 	border-bottom: 2px solid transparent;

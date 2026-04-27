@@ -46,4 +46,4 @@
 .info      { @include semantic-color(info); }
 .secondary { @include semantic-color(secondary); }
 
-.neutral { --color-primary: var(--color-text-subtle); }
+.neutral { --color-primary: var(--fg-subtle); }

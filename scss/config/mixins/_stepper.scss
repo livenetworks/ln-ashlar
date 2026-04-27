@@ -23,8 +23,9 @@
 			width: 2rem;
 			height: 2rem;
 			border-radius: 50%;
-			background: hsl(var(--color-border));
-			color: var(--color-fg-muted);
+			background: var(--color-border);
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
 			@include typography(label-md);
 			font-weight: var(--font-semibold);
 			z-index: 1;
@@ -38,12 +39,13 @@
 			left: calc(50% + var(--size-md));
 			right: calc(-50% + var(--size-md));
 			height: 2px;
-			background: hsl(var(--color-border));
+			background: var(--color-border);
 		}
 
 		> [data-ln-step-label] {
 			@include typography(label-md);
-			color: var(--color-fg-muted);
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
 			text-align: center;
 		}
 

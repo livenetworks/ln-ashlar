@@ -34,7 +34,7 @@
 
 		legend {
 			@include text-sm;
-			@include text-secondary;
+			color: var(--fg-muted);
 			@include font-medium;
 			@include mb(var(--size-sm));
 			float: left;

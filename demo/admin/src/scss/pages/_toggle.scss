@@ -11,7 +11,7 @@
 	aside {
 		@include relative;
 		@include p(var(--size-md));
-		@include bg-secondary;
+		background-color: var(--bg-sunken);
 		width: 12rem;
 		@include border-r;
 		@include transition;

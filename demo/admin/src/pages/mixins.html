@@ -336,16 +336,12 @@ table {
 								<tr><th>Mixin</th><th>Output</th></tr>
 							</thead>
 							<tbody>
-								<tr><td><code>@include text-primary</code></td><td><code>color: hsl(var(--color-text-default))</code></td></tr>
-								<tr><td><code>@include text-secondary</code></td><td><code>color: hsl(var(--color-text-muted))</code></td></tr>
-								<tr><td><code>@include text-muted</code></td><td><code>color: hsl(var(--color-text-subtle))</code></td></tr>
+								<tr><td><code>@include text-primary</code></td><td><code>color: var(--color-fg)</code></td></tr>
 								<tr><td><code>@include text-white</code></td><td><code>color: hsl(var(--color-white))</code></td></tr>
 								<tr><td><code>@include text-error</code></td><td><code>color: hsl(var(--color-error))</code></td></tr>
 								<tr><td><code>@include text-success</code></td><td><code>color: hsl(var(--color-success))</code></td></tr>
 								<tr><td><code>@include text-warning</code></td><td><code>color: hsl(var(--color-warning))</code></td></tr>
-								<tr><td><code>@include bg-primary</code></td><td><code>background-color: hsl(var(--color-bg-default))</code></td></tr>
-								<tr><td><code>@include bg-secondary</code></td><td><code>background-color: hsl(var(--color-bg-elevated))</code></td></tr>
-								<tr><td><code>@include bg-body</code></td><td><code>background-color: hsl(var(--color-bg-body))</code></td></tr>
+								<tr><td><code>@include bg-primary</code></td><td><code>background-color: var(--color-bg)</code></td></tr>
 							</tbody>
 						</table>
 						</div>
@@ -365,9 +361,7 @@ table {
 							</thead>
 							<tbody>
 								<tr><td><code>@include border</code></td><td><code>border: 1px solid hsl(var(--color-border))</code></td></tr>
-								<tr><td><code>@include border-light</code></td><td><code>border: 1px solid hsl(var(--color-border-light))</code> — softer</td></tr>
 								<tr><td><code>@include border-t</code>, <code>border-b</code>, <code>border-l</code>, <code>border-r</code></td><td>Individual border sides</td></tr>
-								<tr><td><code>@include border-t-light</code>, <code>border-b-light</code></td><td>Light individual sides</td></tr>
 								<tr><td><code>@include border-none</code></td><td><code>border: none</code></td></tr>
 								<tr><td><code>@include rounded-sm</code></td><td><code>border-radius: var(--radius-sm)</code> — 2px</td></tr>
 								<tr><td><code>@include rounded-md</code></td><td><code>border-radius: var(--radius-md)</code> — 6px</td></tr>

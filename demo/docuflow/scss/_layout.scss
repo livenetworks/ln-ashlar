@@ -210,7 +210,7 @@ body {
 			@include text-lg;
 			@include font-semibold;
 			letter-spacing: -0.02em;
-			color: hsl(var(--color-text-default));
+			color: var(--fg-default);
 			@include m(0);
 			@include pb(var(--size-xs));
 			@include border-b;
@@ -252,7 +252,7 @@ body {
 		@include flex;
 		@include items-center;
 		@include text-sm;
-		color: hsl(var(--color-text-muted));
+		color: var(--fg-muted);
 		@include font-medium;
 
 		&::after {
@@ -260,7 +260,7 @@ body {
 			font-size: 1.25rem;
 			@include font-bold;
 			@include ml(var(--size-md));
-			color: hsl(var(--color-text-muted) / 0.8);
+			color: hsl(var(--color-neutral-500) / 0.8);
 			transform: translateY(-1px);
 		}
 
@@ -274,7 +274,7 @@ body {
 	}
 
 	a {
-		color: hsl(var(--color-text-muted));
+		color: var(--fg-muted);
 		text-decoration: none;
 		@include transition;
 
@@ -330,7 +330,7 @@ body {
 	@include mb(var(--size-xl));
 	@include flex-center;
 	@include w-full;
-	color: hsl(var(--color-text-muted));
+	color: var(--fg-muted);
 	@include text-xs;
 	opacity: 0.7;
 
@@ -339,7 +339,7 @@ body {
 	}
 
 	strong {
-		color: hsl(var(--color-text-muted));
+		color: var(--fg-muted);
 		@include font-semibold;
 	}
 }

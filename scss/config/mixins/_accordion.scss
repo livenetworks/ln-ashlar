@@ -27,7 +27,7 @@
 	overflow: hidden;
 
 	> li {
-		border-block-end: var(--border-block-end, var(--border-width) solid hsl(var(--color-border)));
+		border-block-end: var(--border-block-end, var(--border-width) solid var(--color-border));
 
 		&:last-child { border-block-end: none; }
 

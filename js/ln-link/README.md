@@ -83,7 +83,7 @@ table[data-ln-link] tbody tr {
     @include transition;
 
     &:hover {
-        @include bg-secondary;
+        background-color: var(--bg-sunken);
     }
 }
 ```

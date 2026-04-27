@@ -7,18 +7,20 @@ CSS custom properties defined in `scss/config/_tokens.scss`. Single source of tr
 
 ## How to use
 
-Colors are stored as **bare HSL triplets** — this enables alpha transparency:
+Colors are stored as **bare HSL triplets** — this enables alpha transparency. Status/brand/neutral scale tokens are stored as triplets. Vocabulary and primitive tokens are pre-composed `hsl(...)` values that mixins read directly.
 
 ```css
-/* Solid color */
+/* Scale token — bare triplet, compose at use site */
 background-color: hsl(var(--color-primary));
-
-/* With transparency */
 background-color: hsl(var(--color-primary) / 0.5);
 
-/* Theming — override at any scope */
-.dark-section { --color-bg-default: 240 14% 15%; }
-#alert-panel   { --color-primary: var(--color-error); }
+/* Primitive — pre-composed, read directly */
+background: var(--color-bg);
+color: var(--color-fg);
+
+/* Rebind primitive on a scope to shift that component's surface */
+.dark-section { --color-bg: var(--bg-elevated); }
+#alert-panel  { --color-primary: var(--color-error); }
 ```
 
 ---
@@ -73,54 +75,112 @@ To change a component's status color, prefer the library helper classes (`.succe
 
 ### Neutral scale (v1.1)
 
-The canonical grey layer. All semantic colors (text, background,
-border, table) reference this scale. Dark mode inverts the scale
-in-place (Phase 6).
+The canonical grey layer. Status, vocabulary, and border tokens reference this scale. Dark mode rebinds vocabulary tokens directly.
 
-| Token | Value | Maps to |
+| Token | Value | Feeds vocabulary |
 |---|---|---|
-| `--color-neutral-50` | `220 20% 98%` | `bg-secondary` (lightest surface) |
-| `--color-neutral-100` | `220 16% 96%` | `bg-body`, `border-light` |
-| `--color-neutral-150` | `220 14% 93%` | `table-section-bg` (intermediate) |
-| `--color-neutral-200` | `220 13% 91%` | `border`, `table-header-bg` |
-| `--color-neutral-300` | `220 13% 83%` | disabled field borders |
-| `--color-neutral-400` | `218 11% 65%` | `text-muted`, placeholder |
-| `--color-neutral-500` | `220  9% 46%` | `text-secondary`, helper text |
-| `--color-neutral-600` | `220 11% 34%` | strong secondary text |
-| `--color-neutral-700` | `220 14% 24%` | strong body text |
-| `--color-neutral-800` | `220 20% 15%` | heading text (dark-on-light) |
-| `--color-neutral-900` | `221 39% 11%` | `text-primary` (maximum contrast) |
+| `--color-neutral-50` | `220 20% 98%` | `--bg-elevated` |
+| `--color-neutral-100` | `220 16% 96%` | `--bg-sunken`, `--bg-recessed`, `--border-subtle` |
+| `--color-neutral-300` | `220 13% 83%` | `--border-strong` |
+| `--color-neutral-400` | `218 11% 65%` | `--fg-subtle`, placeholder |
+| `--color-neutral-500` | `220  9% 46%` | `--fg-muted`, helper text |
+| `--color-neutral-900` | `221 39% 11%` | `--fg-default` (maximum contrast) |
 
 **Why stored as bare HSL triplets:** enables alpha transparency via
 `hsl(var(--color-neutral-900) / 0.5)`.
 
-### Text
+### Value vocabulary
+
+Vocabulary tokens are pre-composed `hsl(...)` values that provide the
+available choices for each primitive. Components rebind the primitive
+(`--color-bg`, `--color-fg`, `--color-border`, `--shadow`) on their
+own scope to pick a different vocabulary value. Themes override
+vocabulary at theme `:root`.
+
+#### Background vocabulary
+
+| Token | Value | Role |
+|---|---|---|
+| `--bg-base` | `hsl(var(--color-white))` | Page-level surface (cards, inputs, modals) |
+| `--bg-elevated` | `hsl(var(--color-neutral-50))` | Raised surfaces (floating panels, dropdowns) |
+| `--bg-sunken` | `hsl(var(--color-neutral-100))` | Sunken surfaces (`thead`, panel headers, scrollbar track) |
+| `--bg-recessed` | `hsl(var(--color-neutral-100))` | Recessed fills (chip, code blocks, progress tracks) |
+
+#### Foreground vocabulary
+
+| Token | Value | Role |
+|---|---|---|
+| `--fg-default` | `hsl(var(--color-neutral-900))` | Primary text |
+| `--fg-muted` | `hsl(var(--color-neutral-500))` | Secondary / helper text |
+| `--fg-subtle` | `hsl(var(--color-neutral-400))` | Disabled / placeholder text |
+
+#### Border vocabulary
+
+| Token | Value | Role |
+|---|---|---|
+| `--border-subtle` | `hsl(var(--color-neutral-100))` | Dividers, floating-panel edges |
+| `--border-strong` | `hsl(var(--color-neutral-300))` | Button borders, outlined controls |
+| `--border-strong-hover` | `hsl(var(--color-neutral-400))` | Hover state for strong borders |
+
+#### Shadow vocabulary
+
+| Token | Wires to | Role |
+|---|---|---|
+| `--shadow-resting` | `var(--shadow-sm)` | Cards, tables, stat-cards |
+| `--shadow-floating` | `var(--shadow-md)` | Tooltips, dropdowns, popovers |
+| `--shadow-overlay` | `var(--shadow-xl)` | Modals |
+
+### Primitives — what mixins read
+
+Mixins read ONLY these single primitives. The primitive defaults wire
+to the vocabulary. Components rebind the primitive on their own scope.
+
+| Primitive | Default (wires to vocabulary) | What reads it |
+|---|---|---|
+| `--color-bg` | `var(--bg-base)` | Background of any surface |
+| `--color-fg` | `var(--fg-default)` | Text color |
+| `--color-border` | `var(--border-subtle)` | Border color |
+| `--shadow` | `var(--shadow-resting)` | Box shadow |
+
+**Rebind pattern — picking a different vocabulary value:**
+
 ```css
---color-text-default:   var(--color-neutral-900);  /* Main text */
---color-text-muted:     var(--color-neutral-500);  /* Secondary text */
---color-text-muted:     var(--color-neutral-400);  /* Muted / disabled */
+/* Floating panel — rebind primitives on its own scope */
+.my-dropdown {
+    --color-bg:     var(--bg-elevated);
+    --color-border: var(--border-subtle);
+    --shadow:       var(--shadow-floating);
+}
+
+/* Chip — recessed fill + muted text */
+.chip {
+    --color-bg: var(--bg-recessed);
+    --color-fg: var(--fg-muted);
+}
+
+/* Modal — overlay shadow */
+.my-modal {
+    --shadow: var(--shadow-overlay);
+}
 ```
 
-### Backgrounds
+**Theme override — rebind vocabulary at theme `:root`:**
+
 ```css
---color-white:        0 0% 100%;
---color-bg-default:   var(--color-white);          /* Cards, panels */
---color-bg-elevated:  var(--color-neutral-50);     /* Headers, footers, alternating rows */
---color-bg-body:      var(--color-neutral-100);    /* Page background */
---color-bg-error:     0 86% 97%;                   /* Error state background */
+[data-theme="contrast"] {
+    --bg-base:       hsl(0 0% 100%);
+    --bg-sunken:     hsl(0 0% 92%);
+    --fg-default:    hsl(0 0% 0%);
+    --border-strong: hsl(0 0% 0%);
+}
 ```
 
-### Borders
-```css
---color-border:       var(--color-neutral-200);
---color-border-light: var(--color-neutral-100);    /* Softer variant */
-```
+### Border
 
-### Table-specific
 ```css
---color-table-header-bg:   var(--color-neutral-200);
---color-table-header-text: var(--color-neutral-900);
---color-table-section-bg:  var(--color-neutral-150);
+--color-border:         var(--border-subtle);   /* primitive — composed */
+--border-width:         1px;
+--border-width-strong:  2px;
 ```
 
 ---
@@ -199,7 +259,7 @@ cool tint that reads as modern/expensive on daylight backgrounds.
 `@include focus-ring($color: var(--color-primary))` produces a
 three-layer halo:
 
-1. 2px inner ring in `--color-bg-default` — visual separator
+1. 2px inner ring in `--color-bg` — visual separator
 2. 2px middle ring in `$color` at 60% alpha — main signal
 3. 2px outer glow in `$color` at 15% alpha — soft halo
 

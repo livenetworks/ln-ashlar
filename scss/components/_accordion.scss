@@ -20,10 +20,14 @@
 			color: var(--color-fg);
 			@include transition;
 
-			&:hover { background: var(--color-bg-sunken); }
+			&:hover {
+				--color-bg: var(--bg-sunken);
+				background: var(--color-bg);
+			}
 
 			.ln-chevron {
-				color: var(--color-fg-subtle);
+				--color-fg: var(--fg-subtle);
+				color: var(--color-fg);
 			}
 		}
 	}

@@ -105,16 +105,23 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 
 | Instead of writing... | Use |
 |---|---|
-| `color: var(--color-text-default)` | `@include text-primary` |
-| `color: var(--color-text-muted)` | `@include text-secondary` |
-| `color: var(--color-text-muted)` | `@include text-muted` |
+| `color: var(--color-fg)` | `@include text-primary` |
 | `color: white` | `@include text-white` |
 | `color: var(--color-error)` | `@include text-error` |
 | `color: var(--color-success)` | `@include text-success` |
 | `color: var(--color-warning)` | `@include text-warning` |
-| `background-color: var(--color-bg-default)` | `@include bg-primary` |
-| `background-color: var(--color-bg-elevated)` | `@include bg-secondary` |
-| `background-color: var(--color-bg-body)` | `@include bg-body` |
+| `background-color: var(--color-bg)` | `@include bg-primary` |
+
+For muted/secondary text or sunken backgrounds, rebind the primitive on
+the scope:
+
+```scss
+// Muted text
+.my-label { --color-fg: var(--fg-muted); color: var(--color-fg); }
+
+// Sunken background (panel header, thead)
+.my-header { --color-bg: var(--bg-sunken); background: var(--color-bg); }
+```
 
 ### Borders & Radius
 
@@ -203,7 +210,7 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | Horizontal flex row, justify-center | `@include row-center` |
 | Card container (bg + border + shadow + rounded) | `@include card` |
 | Full structured card (header + main + footer) | `@include section-card` |
-| Panel header bar (flex + bg-secondary + border-b) | `@include panel-header` |
+| Panel header bar (flex + bg-sunken + border-b) | `@include panel-header` |
 | Primary action button | `@include btn` |
 | Small button | `@include btn-sm` alongside `@include btn` |
 | Large button | `@include btn-lg` alongside `@include btn` |
@@ -384,8 +391,8 @@ Vertical flex layout with configurable gap (default 1rem).
 Base card container — bg, border, shadow, rounded corners, plus
 direct-child bindings for `> header / > main / > footer / > a`.
 
-**Root** — reads `--color-bg`, `--color-border-strong`, `--radius`,
-`--shadow-default`, `--shadow-raised` (hover).
+**Root** — reads `--color-bg`, `--color-border`, `--radius`, `--shadow`
+(default: `--shadow-resting`; hover: rebinds to `--shadow-floating`).
 
 **Direct-child bindings:**
 
@@ -414,14 +421,14 @@ Header bar used by `section-card`, `ln-modal`, and any custom panel.
 display: flex;
 align-items: center;
 justify-content: space-between;
-padding: 0.75rem 1rem;
-background-color: hsl(var(--color-bg-elevated));
-border-bottom: 1px solid hsl(var(--color-border));
+padding: var(--padding-y) var(--padding-x);
+background: var(--color-bg);    /* rebinds --color-bg: var(--bg-sunken) inside the mixin */
+border-bottom: var(--border-width) solid var(--color-border);
 
 h3 {
     font-size: var(--text-base);        /* 1rem */
     font-weight: var(--font-semibold);  /* 600 */
-    color: hsl(var(--color-text-default));
+    color: var(--color-fg);
     margin: 0;
 }
 ```
@@ -432,19 +439,14 @@ Complete primary action button — structure + filled primary colors. Use for no
 
 **Expands to:**
 ```css
-display: inline-flex;
-align-items: center;
-justify-content: center;
-gap: 0.5rem;
-padding: 0.5rem 1.25rem;        /* py(0.5rem) after global button reduction */
-font-size: var(--text-sm);
-font-weight: var(--font-medium);
-border-radius: var(--radius-md);
-white-space: nowrap;
-background-color: hsl(var(--color-primary));
-color: white;
-
-&:hover { background-color: hsl(var(--color-primary-hover)); }
+/* Rebinds --btn-* surface tokens with accent values */
+--btn-bg:           var(--color-accent);
+--btn-fg:           var(--color-accent-fg);
+--btn-border:       var(--color-accent);
+--btn-bg-hover:     var(--color-accent-hover);
+--btn-fg-hover:     var(--color-accent-fg);
+--btn-border-hover: var(--color-accent-hover);
+/* Structure from @mixin button-base (inherited via global <button>) */
 ```
 
 > `<button type="submit">` gets primary colors automatically from `_global.scss` — no `@include btn` needed.
@@ -528,8 +530,8 @@ surface: dropdown menus, popovers that host a menu, or bespoke
 panels.
 
 Applies: list-reset + `li` / `form` resets + uniform button/link/input
-(submit|reset|button) rows (hover = `bg-sunken`, `transition-fast`, no
-focus glow) + `<hr>` separator using `--color-border-subtle`.
+(submit|reset|button) rows (hover = `var(--bg-sunken)`, `transition-fast`, no
+focus glow) + `<hr>` separator using `var(--color-border)`.
 
 **Active item selection** — reads `aria-current="true"` on the
 interactive child and paints it with `--color-accent-tint` background
@@ -714,7 +716,7 @@ z-index: 40;
 #stats {
     ul { @include grid-4; list-style: none; padding: 0; margin: 0; }
     li { @include card; @include p(1rem); }
-    h3 { @include text-sm; @include text-secondary; @include font-normal; margin: 0; }
+    h3 { @include text-sm; @include font-normal; margin: 0; color: var(--fg-muted); }
     strong { @include text-2xl; @include font-bold; @include block; }
 }
 ```
@@ -739,7 +741,7 @@ z-index: 40;
 #stats {
     ul { @include grid-4; list-style: none; padding: 0; margin: 0; }
     li { @include card; @include p(1rem); }
-    h3 { @include text-sm; @include text-secondary; @include font-normal; margin: 0; }
+    h3 { @include text-sm; @include font-normal; margin: 0; color: var(--fg-muted); }
     strong { @include text-2xl; @include font-bold; @include block; }
 }
 ```

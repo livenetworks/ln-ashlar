@@ -21,7 +21,8 @@
 }
 
 @mixin upload-zone {
-	border: 2px dashed hsl(var(--color-border));
+	--color-bg: var(--bg-sunken);
+	border: 2px dashed var(--color-border);
 	border-radius: var(--radius);
 	padding: var(--size-lg) var(--size-lg);
 	text-align: center;
@@ -30,7 +31,7 @@
 		transition: border-color var(--transition),
 		            background-color var(--transition);
 	}
-	background-color: var(--color-bg-sunken);
+	background-color: var(--color-bg);
 
 	&:hover {
 		border-color: var(--color-accent);
@@ -38,14 +39,16 @@
 	}
 
 	span {
+		--color-fg: var(--fg-muted);
 		display: block;
-		color: var(--color-fg-muted);
+		color: var(--color-fg);
 		font-size: var(--text-sm);
 	}
 
 	small {
+		--color-fg: var(--fg-subtle);
 		display: block;
-		color: var(--color-fg-subtle);
+		color: var(--color-fg);
 		font-size: var(--text-xs);
 		margin-top: var(--size-xs);
 	}
@@ -67,13 +70,14 @@
 }
 
 @mixin upload-item {
+	--color-bg: var(--bg-sunken);
 	@include relative;
 	@include flex;
 	@include items-center;
 	flex-wrap: wrap;
 	padding: var(--size-sm) var(--size-md);
-	background-color: var(--color-bg-sunken);
-	border: var(--border-width) solid hsl(var(--color-border));
+	background-color: var(--color-bg);
+	border: var(--border-width) solid var(--color-border);
 	border-radius: var(--radius-sm);
 	margin-bottom: var(--size-sm);
 	font-size: var(--text-sm);
@@ -102,7 +106,8 @@
 }
 
 @mixin upload-size {
-	color: var(--color-fg-subtle);
+	--color-fg: var(--fg-subtle);
+	color: var(--color-fg);
 	font-size: var(--text-xs);
 	margin-left: var(--size-md);
 	flex-shrink: 0;
@@ -114,7 +119,7 @@
 	left: 0;
 	right: 0;
 	height: 3px;
-	background-color: hsl(var(--color-border));
+	background-color: var(--color-border);
 }
 
 @mixin upload-progress-bar {
@@ -128,7 +133,7 @@
 
 @mixin upload-item-error {
 	border-color: hsl(var(--color-error));
-	background-color: hsl(var(--color-bg-error));
+	background-color: hsl(var(--color-error) / 0.1);
 
 	.ln-upload__progress-bar {
 		background-color: hsl(var(--color-error));
@@ -142,7 +147,7 @@
 	width: 1.25rem;
 	height: 1.25rem;
 	margin-right: var(--size-sm);
-	border: 2px solid hsl(var(--color-border));
+	border: 2px solid var(--color-border);
 	border-radius: 50%;
 	border-top-color: var(--color-accent);
 	background-image: none !important;

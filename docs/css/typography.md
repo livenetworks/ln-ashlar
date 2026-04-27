@@ -41,7 +41,7 @@ ln-acme typography has two layers:
 @use 'ln-acme/scss/config/mixins' as *;
 
 .document-title { @include typography(display-sm); @include font-bold; }
-.meta           { @include typography(caption); @include text-muted; }
+.meta           { @include typography(caption); color: var(--fg-muted); }
 .form-field label { @include typography(label-md); }
 ```
 

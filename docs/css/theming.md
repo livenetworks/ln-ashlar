@@ -4,20 +4,20 @@ File: `scss/config/_theme.scss`. Added in v1.1.
 
 ## Philosophy
 
-ln-acme v1.1 supports a single dark-mode variant plus any number of
-consumer-defined themes. Dark mode is built by **inverting the
-neutral scale** — every semantic token references
-`var(--color-neutral-*)`, so flipping the scale flips every downstream
-token automatically.
+ln-acme supports a dark-mode variant plus any number of consumer-defined
+themes. Themes are a **palette layer** — they rebind vocabulary tokens at
+theme `:root`. They never override component structure via descendant
+selectors at higher specificity.
 
-Consumer projects can re-theme at any scope:
+Consumer projects can re-theme at any scope by rebinding primitives or
+vocabulary:
 
 ```scss
 // Tenant-specific primary color
 .tenant-acme { --color-primary: 340 75% 52%; }
 
-// Section-specific neutral override
-.print-preview { --color-bg-body: var(--color-neutral-100); }
+// Section-specific surface override (rebind primitive on scope)
+.print-preview { --color-bg: var(--bg-base); }
 ```
 
 ## Dark mode activation
@@ -71,21 +71,85 @@ document.documentElement.removeAttribute('data-theme');
 
 ## What dark mode overrides
 
-- **Neutral scale:** all 11 steps (`50` → `900`), inverted.
-- **Surface elevation:** `--color-bg-body`, `--color-bg-default`,
-  `--color-bg-elevated`, `--color-border-light`. These are
-  re-stated explicitly (not cascaded) because light-mode
-  elevation uses `--color-white` as the top layer, and the
-  light-to-dark ladder direction cannot be expressed by a
-  single neutral-scale inversion. Dark mode encodes its own
-  elevation ladder: `bg-body` (9%) < `bg-default` (13%) <
-  `bg-elevated` (17%).
-- **Primary tint layers:** `--color-primary-light`, `--color-primary-lighter`.
-- **Error background:** `--color-bg-error`.
-- **Shadows:** solid black, higher alpha.
+Dark mode rebinds **vocabulary** tokens at theme `:root`. Primitives
+wire to vocabulary, so every consumer mixin adapts automatically without
+any per-component dark declarations.
 
-All other semantic tokens (`--color-text-default`, `--color-border`,
-etc.) reference the neutral scale and flip automatically.
+```scss
+[data-theme="dark"] {
+	// Background vocabulary
+	--bg-base:     hsl(220 16% 13%);
+	--bg-elevated: hsl(220 16% 17%);
+	--bg-sunken:   hsl(220 16% 20%);
+	--bg-recessed: hsl(220 16%  9%);
+
+	// Foreground vocabulary
+	--fg-default: hsl(0 0% 95%);
+	--fg-muted:   hsl(220  9% 60%);
+	--fg-subtle:  hsl(218 11% 52%);
+
+	// Border vocabulary
+	--border-subtle:       hsl(220 14% 20%);
+	--border-strong:       hsl(220 13% 36%);
+	--border-strong-hover: hsl(218 11% 52%);
+
+	// Shadows — solid black, higher alpha
+	--shadow-resting:  var(--shadow-sm);
+	--shadow-floating: var(--shadow-md);
+	--shadow-overlay:  var(--shadow-xl);
+
+	// Primary tints
+	--color-primary-light:   232 60% 22%;
+	--color-primary-lighter: 232 50% 15%;
+}
+```
+
+Primitives (`--color-bg`, `--color-fg`, `--color-border`, `--shadow`)
+wire to vocabulary at `:root`. A dark rebind of `--bg-base` shifts
+`--color-bg` for every mixin that reads it — no further changes needed.
+
+## Theming via vocabulary rebind
+
+For consumer themes (tenant brand, contrast variant, marketing landing),
+rebind vocabulary tokens at the theme `:root` scope:
+
+```scss
+[data-theme="contrast"] {
+	// Background vocabulary
+	--bg-base:       hsl(0 0% 100%);
+	--bg-elevated:   hsl(0 0% 100%);
+	--bg-sunken:     hsl(0 0% 92%);
+	--bg-recessed:   hsl(0 0% 85%);
+
+	// Foreground vocabulary
+	--fg-default:    hsl(0 0% 0%);
+	--fg-muted:      hsl(0 0% 20%);
+
+	// Border vocabulary
+	--border-strong: hsl(0 0% 0%);
+}
+```
+
+Why rebind vocabulary, not primitives: vocabulary is the palette layer.
+When a theme rebinds `--bg-recessed`, every component that reads
+`--color-bg` (after rebinding it to `--bg-recessed` on its own scope)
+adapts — no per-component override needed.
+
+**Never use descendant selectors at higher specificity:**
+
+```scss
+// WRONG — specificity hack, locks theme into redeclaring library structure
+[data-theme="contrast"] .card {
+	background: hsl(0 0% 100%);
+	border-color: hsl(0 0% 0%);
+}
+
+// RIGHT — rebind vocabulary at theme :root; library reads it
+[data-theme="contrast"] {
+	--bg-base:       hsl(0 0% 100%);
+	--border-strong: hsl(0 0% 0%);
+}
+```
 
 ## What dark mode does NOT override
 
@@ -97,24 +161,24 @@ etc.) reference the neutral scale and flip automatically.
 ## Per-component dark tuning
 
 **You should not need it.** If a component looks wrong in dark mode,
-the bug is almost always a hardcoded color somewhere in the
-component — it should reference a token instead. Only fall back to
-per-component dark overrides for genuinely unique cases (e.g., a
-hero illustration with baked-in shadows).
+the bug is almost always a hardcoded color somewhere — it should
+reference a vocabulary token via the primitive. Only fall back to
+per-component dark overrides for genuinely unique cases (e.g., a hero
+illustration with baked-in shadows).
 
 ## Extending
 
-Custom theme:
+Custom theme — rebind vocabulary at theme `:root`:
 
 ```scss
 [data-theme="high-contrast"] {
-	--color-neutral-900: 0 0% 100%;
-	--color-neutral-50:  0 0% 0%;
-	--color-border:      var(--color-neutral-900);
+	--fg-default: hsl(0 0% 100%);
+	--bg-base:    hsl(0 0% 0%);
+	--border-strong: hsl(0 0% 100%);
 }
 ```
 
-Or tenant branding:
+Or tenant branding (rebind the semantic primitive):
 
 ```scss
 .tenant-acme {
@@ -129,5 +193,5 @@ Or tenant branding:
 - Secondary text ≥ 4.5:1 (AA)
 - Focus ring ≥ 3:1 non-text (WCAG 1.4.11)
 
-The default neutral-900/50 flip clears all three. Custom themes must
+The default dark vocabulary rebind clears all three. Custom themes must
 re-verify with a contrast checker.

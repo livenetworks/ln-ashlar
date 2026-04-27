@@ -265,7 +265,7 @@
 					<section id="demo-flat-stack" class="section-card">
 						<header><h3>Flat Stack — <code>flat-stack</code></h3></header>
 						<main>
-							<p>Cards sit flush with a single shared rule between them. Applies <code>@include flat-stack</code> on the parent. Self-contained: forces <code>--radius: 0</code> and <code>--shadow-default: none</code> on children regardless of theme.</p>
+							<p>Cards sit flush with a single shared rule between them. Applies <code>@include flat-stack</code> on the parent. Self-contained: forces <code>--radius: 0</code> and <code>--shadow-resting: none</code> on children regardless of theme.</p>
 							<ul class="flat-stack">
 								<li>
 									<article>
@@ -317,7 +317,7 @@ article {
     @include card;
     header { @include panel-header; }
     main   { @include p(1rem); }
-    footer { @include px(1rem); @include py(0.75rem); @include border-t-light; }
+    footer { @include px(1rem); @include py(0.75rem); @include border-t; }
 }</code></pre>
 						</main>
 					</section>

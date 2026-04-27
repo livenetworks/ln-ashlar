@@ -10,11 +10,13 @@
 
 	> ol {
 		> li + li::before {
-			color: var(--color-fg-subtle);
+			--color-fg: var(--fg-subtle);
+			color: var(--color-fg);
 		}
 
 		a {
-			color: var(--color-fg-muted);
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
 			text-decoration: none;
 			@include transition-colors;
 

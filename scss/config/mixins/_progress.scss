@@ -21,7 +21,8 @@
 	height: var(--size-xs);
 	@include w-full;
 	@include rounded-full;
-	background-color: var(--color-bg-recessed);
+	--color-bg: var(--bg-recessed);
+	background-color: var(--color-bg);
 	overflow: hidden;
 	@include flex;
 

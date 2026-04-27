@@ -16,7 +16,11 @@
 	@include relative;
 	pointer-events: none;
 	@include cursor-not-allowed;
-	box-shadow: inset 0 0 0 9999px hsl(var(--color-bg-default) / 0.6);
+	// Alpha composition: blend the page surface at 60% opacity so the
+	// loading overlay tints the content beneath. color-mix produces the
+	// equivalent of the old hsl(triplet / 0.6) without needing a bare
+	// triplet. Adapts automatically via --color-bg cascade (dark/theme).
+	box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--color-bg) 60%, transparent);
 }
 
 @mixin ajax-spinner {

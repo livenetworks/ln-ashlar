@@ -4,13 +4,14 @@
 @use 'borders' as *;
 
 @mixin kbd {
+	--color-bg: var(--bg-sunken);
 	display: inline-block;
 	padding: var(--size-2xs) var(--size-xs-up);
 	@include typography(caption);
 	font-family: var(--font-mono);
 	color: var(--color-fg);
-	background: var(--color-bg-sunken);
-	border: var(--border-width) solid hsl(var(--color-border));
+	background: var(--color-bg);
+	border: var(--border-width) solid var(--color-border);
 	border-bottom-width: 2px;
 	@include rounded-sm;
 	line-height: 1;

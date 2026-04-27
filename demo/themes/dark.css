@@ -37,18 +37,18 @@
 	--color-neutral-800: 220 15% 90%;
 	--color-neutral-900: 220 20% 95%;
 
-	--color-text-default: 0 0% 93%;
-	--color-text-muted:   0 0% 65%;
-	--color-text-subtle:  0 0% 45%;
+	--color-fg:     0 0% 93%;
+	--fg-muted:     0 0% 65%;
+	--fg-subtle:    0 0% 45%;
 
 	--color-white: 220 20% 12%;
-	--color-bg-default:  220 20% 12%;
-	--color-bg-elevated: 220 18% 16%;
-	--color-bg-body: 220 22% 8%;
+	--color-bg:    hsl(220 20% 12%);
+	--bg-elevated: hsl(220 18% 16%);
+	--bg-recessed: hsl(220 22% 8%);
 	--color-bg-error: 0 50% 15%;
 
 	--color-border: 220 15% 25%;
-	--color-border-light: 220 15% 20%;
+	--border-subtle: hsl(220 15% 20%);
 
 	--color-table-header-bg: 220 18% 18%;
 	--color-table-header-text: 0 0% 93%;

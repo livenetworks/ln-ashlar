@@ -1,16 +1,12 @@
 // Colors — references --color-* tokens
 
 @mixin text-primary   { color: var(--color-fg); }
-@mixin text-secondary { color: var(--color-fg-muted); }
-@mixin text-muted     { color: var(--color-fg-subtle); }
 @mixin text-white     { color: hsl(var(--color-white)); }
 @mixin text-error     { color: hsl(var(--color-error)); }
 @mixin text-success   { color: hsl(var(--color-success)); }
 @mixin text-warning   { color: hsl(var(--color-warning)); }
 
 @mixin bg-primary   { background-color: var(--color-bg); }
-@mixin bg-secondary { background-color: var(--color-bg-sunken); }
-@mixin bg-body      { background-color: hsl(var(--color-bg-body)); }
 
 // Tinted surface — semi-transparent primary fill + solid primary text.
 // Override --color-primary on the element/ancestor to restyle (e.g. error, success).

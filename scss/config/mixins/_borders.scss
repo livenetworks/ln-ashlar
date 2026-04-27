@@ -1,25 +1,17 @@
 // Borders — references --color-border and --radius-* tokens
 
 @mixin border {
-	border-block-start:  var(--border-block-start,  var(--border-width) solid hsl(var(--color-border)));
-	border-block-end:    var(--border-block-end,    var(--border-width) solid hsl(var(--color-border)));
-	border-inline-start: var(--border-inline-start, var(--border-width) solid hsl(var(--color-border)));
-	border-inline-end:   var(--border-inline-end,   var(--border-width) solid hsl(var(--color-border)));
+	border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border));
+	border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border));
+	border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border));
+	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
 }
 
-@mixin border-t { border-block-start:  var(--border-block-start,  var(--border-width) solid hsl(var(--color-border))); }
-@mixin border-b { border-block-end:    var(--border-block-end,    var(--border-width) solid hsl(var(--color-border))); }
-@mixin border-l { border-inline-start: var(--border-inline-start, var(--border-width) solid hsl(var(--color-border))); }
-@mixin border-r { border-inline-end:   var(--border-inline-end,   var(--border-width) solid hsl(var(--color-border))); }
+@mixin border-t { border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border)); }
+@mixin border-b { border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border)); }
+@mixin border-l { border-inline-start: var(--border-inline-start, var(--border-width) solid var(--color-border)); }
+@mixin border-r { border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border)); }
 
-@mixin border-light {
-	border-block-start:  var(--border-block-start,  var(--border-width) solid hsl(var(--color-border-light)));
-	border-block-end:    var(--border-block-end,    var(--border-width) solid hsl(var(--color-border-light)));
-	border-inline-start: var(--border-inline-start, var(--border-width) solid hsl(var(--color-border-light)));
-	border-inline-end:   var(--border-inline-end,   var(--border-width) solid hsl(var(--color-border-light)));
-}
-@mixin border-t-light { border-block-start: var(--border-block-start, var(--border-width) solid hsl(var(--color-border-light))); }
-@mixin border-b-light { border-block-end:   var(--border-block-end,   var(--border-width) solid hsl(var(--color-border-light))); }
 @mixin border-none { border: none; }
 
 @mixin shadow-b {
@@ -32,7 +24,7 @@
 		left: 0;
 		right: 0;
 		height: var(--size-sm-up);
-		background: linear-gradient(to bottom, hsl(var(--color-border) / 0.5), transparent);
+		background: linear-gradient(to bottom, hsl(var(--color-neutral-200) / 0.5), transparent);
 		pointer-events: none;
 	}
 }

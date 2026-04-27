@@ -146,7 +146,7 @@ With an explicit custom key instead of `id`:
 
 ```scss
 [data-ln-tab] {
-    @include text-secondary;
+    color: var(--fg-muted);
     &[data-active] {
         @include text-primary;
         @include font-bold;

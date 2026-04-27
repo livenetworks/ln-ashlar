@@ -52,7 +52,7 @@ For inline or button-level loading states, see the pseudo-element guidance in CL
 The spinner uses `color: hsl(var(--color-primary))`. Override on the element:
 
 ```scss
-#page-loader { @include loader; --color-primary: var(--color-text-subtle); }
+#page-loader { @include loader; --color-primary: var(--fg-subtle); }
 ```
 
 ## Note

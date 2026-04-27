@@ -233,13 +233,13 @@
 						<header><h3>CSS Styling</h3></header>
 						<main>
 							<pre><code>nav a {
-    @include text-secondary;
+    color: var(--fg-muted);
     @include transition;
 
     &.active {
         @include text-primary;
         @include font-bold;
-        @include bg-secondary;
+        background-color: var(--bg-elevated);
         @include px(0.75rem);
         @include rounded-md;
     }

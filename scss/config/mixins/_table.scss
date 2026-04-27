@@ -14,13 +14,15 @@
 	background: var(--color-bg);
 	border-radius: var(--radius-lg);
 	@include overflow-hidden;
-	box-shadow: var(--shadow-default);
+	--shadow: var(--shadow-resting);
+	box-shadow: var(--shadow);
 	border-collapse: collapse;
 	font-variant-numeric: tabular-nums;
 
 	thead {
-		background: hsl(var(--color-table-header-bg));
-		border-block-end: var(--border-block-end, var(--border-width-strong) solid hsl(var(--color-border)));
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
+		border-block-end: var(--border-block-end, var(--border-width-strong) solid var(--color-border));
 	}
 
 	th {
@@ -31,7 +33,7 @@
 		line-height: var(--line-height);
 		letter-spacing: 0.4px;
 		@include uppercase;
-		color: hsl(var(--color-table-header-text));
+		color: var(--color-fg);
 	}
 
 	tbody tr {
@@ -39,7 +41,8 @@
 		min-height: var(--density-row-h);
 
 		&:hover {
-			background: var(--color-bg-sunken);
+			--color-bg: var(--bg-sunken);
+			background: var(--color-bg);
 		}
 	}
 
@@ -114,7 +117,8 @@
 			@include items-center;
 			@include text-left;
 			@include font-semibold;
-			color: var(--color-fg-muted);
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
 			@include text-xs;
 			@include uppercase;
 			@include truncate;
@@ -126,19 +130,22 @@
 
 @mixin table-striped {
 	tbody tr:nth-child(odd) {
-		background: var(--color-bg-sunken);
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
 	}
 }
 
 @mixin table-section-header {
-	background: hsl(var(--color-table-section-bg));
+	--color-bg: var(--bg-sunken);
+	background: var(--color-bg);
 	@include font-semibold;
 	@include text-sm;
-	color: var(--color-fg-muted);
+	--color-fg: var(--fg-muted);
+	color: var(--color-fg);
 	letter-spacing: 0.3px;
 
 	&:hover {
-		background-color: hsl(var(--color-table-section-bg));
+		background-color: var(--bg-sunken);
 	}
 }
 
@@ -151,7 +158,8 @@
 	@include transition-colors;
 
 	&:hover {
-		background: var(--color-bg-sunken);
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
 	}
 
 	svg {
@@ -175,7 +183,8 @@
 
 		&:hover {
 			opacity: 1;
-			background: var(--color-bg-sunken);
+			--color-bg: var(--bg-sunken);
+			background: var(--color-bg);
 		}
 	}
 

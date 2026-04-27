@@ -15,7 +15,7 @@
 		bottom: calc(var(--lh-caption) * var(--text-caption) / 2);
 		left: calc(var(--size-sm) - var(--border-width));
 		width: 2px;
-		background: hsl(var(--color-border));
+		background: var(--color-border);
 	}
 
 	> li {
@@ -45,7 +45,8 @@
 		> time {
 			display: block;
 			@include typography(caption);
-			color: var(--color-fg-subtle);
+			--color-fg: var(--fg-subtle);
+			color: var(--color-fg);
 			margin-bottom: var(--size-xs);
 		}
 
@@ -57,7 +58,8 @@
 
 		> p {
 			@include typography(body-sm);
-			color: var(--color-fg-muted);
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
 			margin: var(--size-xs) 0 0;
 		}
 	}

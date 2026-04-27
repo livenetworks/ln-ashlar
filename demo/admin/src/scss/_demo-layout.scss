@@ -17,7 +17,7 @@
 
 	> figure {
 		margin: 0;
-		@include bg-secondary;
+		background-color: var(--bg-sunken);
 		@include border;
 		@include rounded-md;
 		overflow: auto;
@@ -43,7 +43,7 @@
 
 	p, ul {
 		@include text-sm;
-		@include text-secondary;
+		color: var(--fg-muted);
 		margin: 0;
 	}
 

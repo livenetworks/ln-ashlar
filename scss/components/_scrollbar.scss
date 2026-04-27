@@ -6,17 +6,19 @@
 }
 
 ::-webkit-scrollbar-track {
-	background: var(--color-bg-sunken);
+	--color-bg: var(--bg-sunken);
+	background: var(--color-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: hsl(var(--color-border));
+	background-color: var(--color-border);
 	border-radius: 4px;
 	border: 2px solid transparent;
 	background-clip: content-box;
 
 	&:hover {
-		background-color: var(--color-fg-subtle);
+		--color-fg: var(--fg-subtle);
+		background-color: var(--color-fg);
 	}
 }
 
@@ -26,5 +28,5 @@
 
 * {
 	scrollbar-width: thin;
-	scrollbar-color: hsl(var(--color-border)) var(--color-bg-sunken);
+	scrollbar-color: var(--color-border) var(--bg-sunken);
 }

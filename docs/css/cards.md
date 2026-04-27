@@ -16,14 +16,14 @@ File: `scss/config/mixins/_card.scss`. Applied: `scss/components/_card.scss`.
 ## `@mixin card`
 
 Bare container + structured child bindings. Reads the logical
-`--color-bg`, `--color-border-strong`, `--radius`, `--shadow-default`,
-`--shadow-raised` tokens.
+`--color-bg`, `--color-border`, `--radius`, `--shadow` tokens; rebinds
+`--color-border: var(--border-strong)` on hover.
 
 **Root chrome:** `bg`, `border`, `radius`, `flex-col`,
-`overflow-hidden`, `shadow-default`.
+`overflow-hidden`, resting shadow.
 
-**Hover:** border-color → `--color-border-strong`, shadow upgrades to
-`--shadow-raised`.
+**Hover:** border-color → `--border-strong`, shadow upgrades to
+`--shadow-floating`.
 
 **Direct-child bindings** (apply on `>`-child only, so nested
 `<header>`/`<main>`/`<footer>` inside card content are NOT rewritten):

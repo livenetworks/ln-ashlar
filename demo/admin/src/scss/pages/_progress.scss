@@ -8,7 +8,7 @@
 
 	h4 {
 		@include text-sm;
-		@include text-secondary;
+		color: var(--fg-muted);
 		@include font-normal;
 		margin: 0;
 		@include mb(var(--size-sm));

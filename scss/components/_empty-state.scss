@@ -5,7 +5,8 @@
 
 	svg.ln-icon,
 	svg.ln-icon--xl {
-		color: var(--color-fg-subtle);
+		--color-fg: var(--fg-subtle);
+		color: var(--color-fg);
 	}
 
 	h3 {
@@ -15,6 +16,7 @@
 
 	p {
 		@include typography(body-md);
-		color: var(--color-fg-muted);
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
 	}
 }

@@ -46,12 +46,14 @@
 	blockquote {
 		border-left: 3px solid var(--color-accent);
 		padding-left: var(--size-md);
-		color: var(--color-fg-muted);
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
 		font-style: italic;
 	}
 
 	code {
-		background: var(--color-bg-sunken);
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
 		padding-inline: var(--size-xs-up);
 		padding-block: var(--size-2xs);
 		@include rounded-sm;
@@ -61,7 +63,8 @@
 	}
 
 	pre {
-		background: var(--color-bg-sunken);
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
 		padding: var(--size-md);
 		@include rounded-md;
 		overflow-x: auto;
@@ -84,7 +87,8 @@
 
 		figcaption {
 			@include typography(caption);
-			color: var(--color-fg-subtle);
+			--color-fg: var(--fg-subtle);
+			color: var(--color-fg);
 			text-align: center;
 			margin-top: 0.5em;
 		}
@@ -97,7 +101,7 @@
 
 		th, td {
 			padding: var(--size-sm) var(--size-sm-up);
-			border-bottom: 1px solid hsl(var(--color-border));
+			border-bottom: 1px solid var(--color-border);
 			text-align: left;
 		}
 
@@ -110,7 +114,7 @@
 
 	hr {
 		border: none;
-		border-top: 1px solid hsl(var(--color-border));
+		border-top: 1px solid var(--color-border);
 		margin: 2em 0;
 	}
 }

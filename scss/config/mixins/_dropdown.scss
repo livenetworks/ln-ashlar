@@ -81,7 +81,8 @@
 
 		&:hover:not(:disabled),
 		&:active:not(:disabled) {
-			background: var(--color-bg-sunken);
+			--color-bg: var(--bg-sunken);
+			background: var(--color-bg);
 			color: var(--color-fg);
 		}
 
@@ -101,7 +102,7 @@
 	// ─── Separator ─────────────────────────────────────
 	hr {
 		border: none;
-		border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border-subtle));
+		border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
 		margin-block: var(--size-xs);
 	}
 }

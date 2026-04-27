@@ -22,7 +22,7 @@
 		@include p(var(--size-md));
 
 		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; @include text-secondary; }
+		p { margin: 0; @include text-sm; color: var(--fg-muted); }
 	}
 }
 
@@ -36,7 +36,7 @@
 		@include p(var(--size-md));
 
 		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; @include text-secondary; }
+		p { margin: 0; @include text-sm; color: var(--fg-muted); }
 	}
 }
 
@@ -50,7 +50,7 @@
 		@include p(var(--size-md));
 
 		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; @include text-secondary; }
+		p { margin: 0; @include text-sm; color: var(--fg-muted); }
 	}
 }
 
@@ -64,7 +64,7 @@
 		@include p(var(--size-md));
 
 		h4 { margin: 0; color: hsl(var(--color-primary)); }
-		p { margin: 0; @include text-sm; @include text-secondary; }
+		p { margin: 0; @include text-sm; color: var(--fg-muted); }
 	}
 }
 
@@ -79,7 +79,7 @@
 		@include mb(var(--size-md));
 
 		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; @include text-secondary; }
+		p { margin: 0; @include text-sm; color: var(--fg-muted); }
 	}
 }
 
@@ -103,7 +103,7 @@
 		.stat-label {
 			@include text-xs;
 			@include font-medium;
-			@include text-muted;
+			color: var(--fg-subtle);
 			@include uppercase;
 			@include tracking-wider;
 			@include mt(var(--size-xs));
@@ -129,7 +129,7 @@
 		@include p(var(--size-md));
 
 		h4 { margin: 0; }
-		p { margin: 0; @include text-sm; @include text-secondary; }
+		p { margin: 0; @include text-sm; color: var(--fg-muted); }
 	}
 
 	// First card: accent-top with secondary color
@@ -178,7 +178,7 @@
 		@include p(var(--size-md));
 
 		h3 { margin: 0 0 var(--size-xs); }
-		p  { margin: 0; @include text-sm; @include text-secondary; }
+		p  { margin: 0; @include text-sm; color: var(--fg-muted); }
 	}
 }
 
@@ -196,14 +196,14 @@
 		main {
 			@include p(var(--size-md));
 
-			p { margin: 0; @include text-sm; @include text-secondary; }
+			p { margin: 0; @include text-sm; color: var(--fg-muted); }
 		}
 
 		footer {
 			@include px(var(--size-md));
 			@include py(var(--size-sm-up));
-			@include border-t-light;
-			@include bg-secondary;
+			@include border-t;
+			background-color: var(--bg-sunken);
 			@include flex;
 			@include justify-end;
 			@include gap(var(--size-sm));

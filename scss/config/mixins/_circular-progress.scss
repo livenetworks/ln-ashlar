@@ -25,7 +25,7 @@
 	}
 
 	.ln-circular-progress__track {
-		stroke: hsl(var(--color-border));
+		stroke: var(--color-border);
 	}
 
 	.ln-circular-progress__fill {

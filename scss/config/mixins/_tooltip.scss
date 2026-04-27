@@ -17,7 +17,8 @@
 	white-space: nowrap;
 	pointer-events: none;
 	z-index: var(--z-dropdown);
-	box-shadow: var(--shadow-raised);
+	--shadow: var(--shadow-floating);
+	box-shadow: var(--shadow);
 }
 
 @mixin tooltip {

@@ -74,13 +74,15 @@ i {
 
 small {
 	@include text-sm;
-	color: var(--color-fg-muted);
+	--color-fg: var(--fg-muted);
+	color: var(--color-fg);
 }
 
 code {
 	@include font-mono;
 	@include text-sm;
-	background-color: var(--color-bg-recessed);
+	--color-bg: var(--bg-recessed);
+	background-color: var(--color-bg);
 	padding: var(--size-2xs) var(--size-xs);
 	@include rounded-sm;
 }
@@ -88,7 +90,8 @@ code {
 pre {
 	@include font-mono;
 	@include text-sm;
-	background-color: var(--color-bg-recessed);
+	--color-bg: var(--bg-recessed);
+	background-color: var(--color-bg);
 	padding: var(--size-md);
 	@include rounded-md;
 	@include border;
@@ -111,11 +114,13 @@ kbd {
 
 blockquote {
 	border-left: 3px solid var(--color-accent);
-	background-color: var(--color-bg-sunken);
+	--color-bg: var(--bg-sunken);
+	background-color: var(--color-bg);
 	padding: var(--size-md);
 	@include rounded-sm;
 	margin-bottom: var(--size-md);
-	color: var(--color-fg-muted);
+	--color-fg: var(--fg-muted);
+	color: var(--color-fg);
 	font-style: italic;
 }
 

@@ -103,7 +103,7 @@
 .status          { @include badge; }
 .status.active   { --color-primary: var(--color-success); }
 .status.pending  { --color-primary: var(--color-warning); }
-.status.inactive { --color-primary: var(--color-text-subtle); }
+.status.inactive { --color-primary: var(--fg-subtle); }
 
 // Add pulse for real-time states
 .status.live     { @include badge-live; }</code></pre>
@@ -149,7 +149,7 @@
 								<tr><td><code>--color-warning</code></td><td><code>.badge.warning</code> override</td></tr>
 								<tr><td><code>--color-error</code></td><td><code>.badge.error</code> override</td></tr>
 								<tr><td><code>--color-info</code></td><td><code>.badge.info</code> override</td></tr>
-								<tr><td><code>--color-text-subtle</code></td><td><code>.badge.neutral</code> override</td></tr>
+								<tr><td><code>--fg-subtle</code></td><td><code>.badge.neutral</code> override</td></tr>
 								<tr><td><code>--radius-full</code></td><td>Pill border-radius</td></tr>
 								<tr><td><code>--text-xs</code></td><td>Font size</td></tr>
 								<tr><td><code>--font-medium</code></td><td>Font weight</td></tr>

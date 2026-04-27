@@ -43,7 +43,7 @@
 .sortable-handle {
 	touch-action: none;
 	cursor: grab;
-	@include text-muted;
+	color: var(--fg-subtle);
 	@include flex;
 	@include items-center;
 
@@ -53,7 +53,7 @@
 #toggle-status,
 #api-filter-status {
 	@include text-sm;
-	@include text-secondary;
+	color: var(--fg-muted);
 	@include font-mono;
 }
 
@@ -66,9 +66,9 @@
 	li {
 		@include text-sm;
 		@include font-mono;
-		@include text-secondary;
+		color: var(--fg-muted);
 		@include p(var(--size-sm));
-		@include bg-secondary;
+		background-color: var(--bg-sunken);
 		@include rounded-sm;
 	}
 }
