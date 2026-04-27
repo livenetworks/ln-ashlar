@@ -377,7 +377,13 @@
 }
 
 // ─── Pills — GCD for joined-pill checkbox/radio lists ──────────
-// Combines pill-group on the <ul> + pill on each <li><label><input>.
+// Joined-group filled pills: pill on each <li><label><input>, with
+// joined-corner border-radius (square middles, partial-radius first/
+// last) inlined here rather than composed via pill-group. Inlining
+// is required because pill-group's `li label` selectors (0,1,5) are
+// out-specificityed by pill's :has selector (0,2,5), which would
+// reassert full radius on every pill. The selectors below match
+// pill's :has shape so source-order/specificity resolves cleanly.
 // Apply to a <ul> whose direct children are <li><label><input> pairs.
 //
 // Usage: project SCSS applies this on its own ul selector:
@@ -392,11 +398,28 @@
 //     </ul>
 
 @mixin pills {
-	@include pill-group;
+	@include inline-flex;
+	@include list-reset;
 
 	> li > label:has(> input[type="checkbox"]),
 	> li > label:has(> input[type="radio"]) {
 		@include pill;
+		border-radius: 0;
+	}
+
+	> li:first-child > label:has(> input[type="checkbox"]),
+	> li:first-child > label:has(> input[type="radio"]) {
+		border-radius: var(--radius) 0 0 var(--radius);
+	}
+
+	> li:last-child > label:has(> input[type="checkbox"]),
+	> li:last-child > label:has(> input[type="radio"]) {
+		border-radius: 0 var(--radius) var(--radius) 0;
+	}
+
+	> li:only-child > label:has(> input[type="checkbox"]),
+	> li:only-child > label:has(> input[type="radio"]) {
+		border-radius: var(--radius);
 	}
 }
 
