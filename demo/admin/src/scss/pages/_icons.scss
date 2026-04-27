@@ -1,5 +1,9 @@
 @use '../../../../../scss/config/mixins' as *;
 
+#icon-category-pills {
+	@include pills;
+}
+
 .icon-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));

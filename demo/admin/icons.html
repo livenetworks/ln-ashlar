@@ -178,34 +178,27 @@
 						margin-bottom: 1.5rem;
 					}
 
-					.icon-toolbar nav {
-						display: flex;
-						flex-wrap: wrap;
-						gap: 0.25rem;
-					}
-
-					.icon-toolbar label {
-						display: flex;
-						align-items: center;
-						gap: 0.5rem;
+					.icon-toolbar > label {
 						margin-left: auto;
 					}
 
-					.icon-toolbar label input {
+					.icon-toolbar > label input[type="search"] {
 						width: 14rem;
 					}
 				</style>
 
 				<div class="icon-toolbar">
 					<nav data-ln-filter="icon-categories">
-						<button type="button" data-ln-filter-key="category" data-ln-filter-value="">All</button>
-						<button type="button" data-ln-filter-key="category" data-ln-filter-value="navigation">Navigation</button>
-						<button type="button" data-ln-filter-key="category" data-ln-filter-value="actions">Actions</button>
-						<button type="button" data-ln-filter-key="category" data-ln-filter-value="arrows">Arrows</button>
-						<button type="button" data-ln-filter-key="category" data-ln-filter-value="status">Status</button>
-						<button type="button" data-ln-filter-key="category" data-ln-filter-value="data-content">Data / Content</button>
-						<button type="button" data-ln-filter-key="category" data-ln-filter-value="people-contact">People / Contact</button>
-						<button type="button" data-ln-filter-key="category" data-ln-filter-value="file-types">File Types</button>
+						<ul id="icon-category-pills">
+							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
+							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="navigation"> Navigation</label></li>
+							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="actions"> Actions</label></li>
+							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="arrows"> Arrows</label></li>
+							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="status"> Status</label></li>
+							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="data-content"> Data / Content</label></li>
+							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="people-contact"> People / Contact</label></li>
+							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="file-types"> File Types</label></li>
+						</ul>
 					</nav>
 					<label>
 						<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>

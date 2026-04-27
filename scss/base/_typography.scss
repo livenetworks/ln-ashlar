@@ -73,7 +73,7 @@ i {
 }
 
 small {
-	@include text-sm;
+	font-size: var(--text-sm);
 	--color-fg: var(--fg-muted);
 	color: var(--color-fg);
 }
