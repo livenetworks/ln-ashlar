@@ -66,12 +66,15 @@
 
 	// Ghost surface by default for every button in the bar. Variants
 	// (e.g. @mixin app-header-actions) re-bind --btn-border and padding
-	// on top of this default.
+	// on top of this default. Padding is rebound via primitives (not a
+	// literal `padding: 0`) so variants' --padding-* rebinds resolve
+	// through button-base's `padding: var(--padding-y) var(--padding-x)`.
 	button {
 		--btn-bg: transparent;
 		--btn-border: transparent;
 		--color-fg: var(--fg-muted);
-		padding: 0;
+		--padding-y: 0;
+		--padding-x: 0;
 		color: var(--color-fg);
 		box-shadow: none;
 
@@ -124,6 +127,13 @@
 		@include text-xs;
 		font-weight: var(--font-medium);
 		border-radius: var(--radius-sm);
+		// Equalize height across icon-only and text-only siblings.
+		// Geometric — locks the border-box chrome to the icon-content
+		// height (1.25rem) plus rebound padding-y and border-width on
+		// both edges, so a text-only button reserves the same vertical
+		// space as one with a 1.25rem icon. Border-box is the project
+		// default (scss/base/_reset.scss).
+		min-height: calc(1.25rem + 2 * var(--padding-y) + 2 * var(--border-width));
 
 		// Label visually-hidden on small viewports — icon remains.
 		> span {
