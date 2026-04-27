@@ -49,11 +49,11 @@
 		font-family: inherit;
 
 		&:hover {
-			background: hsl(var(--color-primary) / 0.2);
+			background: color-mix(in srgb, var(--color-accent) 20%, transparent);
 		}
 
 		&:active {
-			background: hsl(var(--color-primary) / 0.28);
+			background: color-mix(in srgb, var(--color-accent) 28%, transparent);
 		}
 	}
 }
@@ -67,11 +67,11 @@
 @mixin badge-live {
 	@keyframes badge-pulse {
 		0% {
-			box-shadow: 0 0 0 0 hsl(var(--color-primary) / 0.7);
+			box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
 		}
 		70%,
 		100% {
-			box-shadow: 0 0 0 0.6em hsl(var(--color-primary) / 0);
+			box-shadow: 0 0 0 0.6em color-mix(in srgb, var(--color-accent) 0%, transparent);
 		}
 	}
 

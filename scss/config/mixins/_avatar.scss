@@ -71,7 +71,7 @@
 		@include flex-center;
 		@include text-sm;
 		@include font-semibold;
-		background-color: hsl(var(--color-primary) / 0.15);
+		background-color: color-mix(in srgb, var(--color-accent) 15%, transparent);
 		color: var(--color-accent);
 		padding: 0;
 	}

@@ -151,8 +151,7 @@
 
 @mixin _card-accent-base {
 	&:hover {
-		// alpha tint — requires raw-triplet access (see plan §0.3)
-		background-color: hsl(var(--color-primary) / 0.04);
+		background-color: color-mix(in srgb, var(--color-accent) 4%, transparent);
 	}
 }
 
@@ -181,11 +180,10 @@
 }
 
 // ─── Card tinted background ────────────────────────────
-// Alpha-tinted — reads --color-primary triplet (see plan §0.3).
 
 @mixin card-bg {
-	background-color: hsl(var(--color-primary) / 0.06);
-	border-color: hsl(var(--color-primary) / 0.15);
+	background-color: color-mix(in srgb, var(--color-accent) 6%, transparent);
+	border-color: color-mix(in srgb, var(--color-accent) 15%, transparent);
 }
 
 // ─── Card stacked (visual depth illusion) ──────────────

@@ -68,7 +68,7 @@
 			&::before {
 				background: var(--color-accent);
 				color: var(--color-accent-fg);
-				box-shadow: 0 0 0 4px hsl(var(--color-primary) / 0.2);
+				box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 20%, transparent);
 			}
 			> [data-ln-step-label] {
 				color: var(--color-fg);

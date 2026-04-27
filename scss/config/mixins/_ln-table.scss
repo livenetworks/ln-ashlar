@@ -155,7 +155,7 @@
 		}
 
 		&[data-active] {
-			background-color: hsl(var(--color-primary) / 0.1);
+			background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
 			color: var(--color-accent);
 			@include font-medium;
 		}
@@ -280,7 +280,7 @@
 			}
 
 			&[data-active] {
-				background-color: hsl(var(--color-primary) / 0.1);
+				background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
 				color: var(--color-accent);
 			}
 		}
@@ -299,7 +299,7 @@
 	--padding-x: var(--size-md);
 	padding: var(--padding-y) var(--padding-x);
 	@include border-b;
-	background-color: hsl(var(--color-primary) / 0.03);
+	background-color: color-mix(in srgb, var(--color-accent) 3%, transparent);
 }
 
 @mixin ln-table-chip {

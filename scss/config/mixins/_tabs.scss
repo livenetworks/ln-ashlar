@@ -46,8 +46,8 @@
 
 	&:hover {
 		color: var(--color-accent);
-		background-color: hsl(var(--color-primary) / 0.05);
-		border-bottom-color: hsl(var(--color-primary) / 0.3);
+		background-color: color-mix(in srgb, var(--color-accent) 5%, transparent);
+		border-bottom-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
 	}
 
 	&:focus,

@@ -130,8 +130,7 @@
 			border-color     150ms ease;
 
 		&:hover {
-			// alpha tint — reads --color-primary triplet (see plan §0.3)
-			background-color: hsl(var(--color-primary) / 0.07);
+			background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
 		}
 
 		&.active {
@@ -160,13 +159,13 @@
 		transition: box-shadow 150ms ease, background-color 150ms ease, color 150ms ease;
 
 		&:hover {
-			box-shadow: inset 2px 0 0 hsl(var(--color-primary) / 0.3);
-			background-color: hsl(var(--color-primary) / 0.04);
+			box-shadow: inset 2px 0 0 color-mix(in srgb, var(--color-accent) 30%, transparent);
+			background-color: color-mix(in srgb, var(--color-accent) 4%, transparent);
 		}
 
 		&.active {
 			box-shadow: inset 3px 0 0 var(--color-accent);
-			background-color: hsl(var(--color-primary) / 0.07);
+			background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
 		}
 	}
 }
@@ -217,11 +216,11 @@
 		transition: background-color 150ms ease, color 150ms ease;
 
 		&:hover {
-			background-color: hsl(var(--color-primary) / 0.04);
+			background-color: color-mix(in srgb, var(--color-accent) 4%, transparent);
 		}
 
 		&.active {
-			background-color: hsl(var(--color-primary) / 0.07);
+			background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
 		}
 	}
 }

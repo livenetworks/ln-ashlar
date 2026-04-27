@@ -16,40 +16,40 @@
 //      element's own background
 //   2. 2px ring at 60% of the colour — the main focus signal
 //   3. 2px outer glow at 15% — soft halo outside the main ring
-@mixin focus-ring($color: var(--color-primary)) {
+@mixin focus-ring($color: var(--color-accent)) {
 	box-shadow:
 		0 0 0 2px var(--color-bg),
-		0 0 0 4px hsl($color / 0.6),
-		0 0 0 6px hsl($color / 0.15);
+		0 0 0 4px color-mix(in srgb, #{$color} 60%, transparent),
+		0 0 0 6px color-mix(in srgb, #{$color} 15%, transparent);
 	outline: none;
 }
 
 // Thickens the outline without causing layout shift (outline, not border).
-@mixin focus-border-thicken($color: var(--color-primary)) {
-	outline: 2px solid hsl($color);
+@mixin focus-border-thicken($color: var(--color-accent)) {
+	outline: 2px solid $color;
 	outline-offset: -1px;
 	box-shadow: none;
 }
 
 // Border color change + outer ring — maximum signal.
-@mixin focus-combination($color: var(--color-primary), $width: 3px) {
-	border-color: hsl($color);
-	box-shadow: 0 0 0 $width hsl($color / 0.12);
+@mixin focus-combination($color: var(--color-accent), $width: 3px) {
+	border-color: $color;
+	box-shadow: 0 0 0 $width color-mix(in srgb, #{$color} 12%, transparent);
 }
 
 // Very light primary tint on the field background. No border change.
-@mixin focus-background-shift($color: var(--color-primary)) {
-	background-color: hsl($color / 0.04);
+@mixin focus-background-shift($color: var(--color-accent)) {
+	background-color: color-mix(in srgb, #{$color} 4%, transparent);
 	box-shadow: none;
 }
 
 // Only the bottom border changes to primary. Other sides stay neutral.
-@mixin focus-accent-line($color: var(--color-primary)) {
-	border-bottom-color: hsl($color);
+@mixin focus-accent-line($color: var(--color-accent)) {
+	border-bottom-color: $color;
 	box-shadow: none;
 }
 
 // Inner shadow — field visually sinks.
-@mixin focus-inset-shadow($color: var(--color-primary), $width: 3px) {
-	box-shadow: inset 0 0 0 $width hsl($color / 0.15);
+@mixin focus-inset-shadow($color: var(--color-accent), $width: 3px) {
+	box-shadow: inset 0 0 0 $width color-mix(in srgb, #{$color} 15%, transparent);
 }

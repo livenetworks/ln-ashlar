@@ -75,7 +75,7 @@
 @mixin alert-banner {
 	border-left: none;
 	border-radius: 0;
-	border-bottom: var(--border-width) solid hsl(var(--color-primary) / 0.2);
+	border-bottom: var(--border-width) solid color-mix(in srgb, var(--color-accent) 20%, transparent);
 	--padding-x: var(--size-lg);
 	padding-inline: var(--padding-x);
 	width: 100%;
