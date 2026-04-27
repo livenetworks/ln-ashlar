@@ -1,0 +1,43 @@
+// Demo-only utility classes — pull inline styles out of demo HTML.
+// Tokens-only; no raw literals.
+
+// ─── Typography preview ────────────────────────────────
+.demo-text-xs   { font-size: var(--text-xs); }
+.demo-text-sm   { font-size: var(--text-sm); }
+.demo-text-base { font-size: var(--text-base); }
+.demo-text-lg   { font-size: var(--text-lg); }
+.demo-text-xl   { font-size: var(--text-xl); }
+.demo-text-2xl  { font-size: var(--text-2xl); }
+
+// ─── Event/log output containers ───────────────────────
+.demo-log {
+	max-height: 20rem;
+	overflow-y: auto;
+	font-size: var(--text-body-sm);
+}
+
+.demo-log--compact {
+	max-height: 12rem;
+}
+
+// ─── Layout helpers (popover demos) ────────────────────
+.demo-row-end {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.demo-row-spaced {
+	margin-top: var(--size-xs-up);
+	display: flex;
+	gap: var(--size-xs-up);
+}
+
+.demo-status-line {
+	margin-top: var(--size-xs-up);
+	font-size: var(--text-body-sm);
+}
+
+// ─── Forms demo nav spacing ────────────────────────────
+.demo-actions--spaced {
+	margin-top: var(--size-md);
+}

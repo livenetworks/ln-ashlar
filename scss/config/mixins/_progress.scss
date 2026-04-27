@@ -18,7 +18,7 @@
 // Color variants: .success, .warning, .error override background-color.
 
 @mixin progress {
-	height: var(--size-xs);
+	height: var(--size-xs); // Intrinsic component dimension — track thickness.
 	@include w-full;
 	@include rounded-full;
 	--color-bg: var(--bg-recessed);

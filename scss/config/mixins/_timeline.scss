@@ -13,15 +13,17 @@
 		position: absolute;
 		top: calc(var(--lh-caption) * var(--text-caption) / 2);
 		bottom: calc(var(--lh-caption) * var(--text-caption) / 2);
-		left: calc(var(--size-sm) - var(--border-width));
+		left: calc(var(--size-sm) - var(--border-width)); // Geometric — rail x-position aligned with bullet center.
 		width: 2px;
 		background: var(--color-border);
 	}
 
 	> li {
 		position: relative;
-		padding-left: var(--size-xl);
-		padding-bottom: var(--size-lg);
+		--padding-x: var(--size-xl);
+		padding-left: var(--padding-x);
+		--padding-y: var(--size-lg);
+		padding-bottom: var(--padding-y);
 
 		&:last-child {
 			padding-bottom: 0;
@@ -33,8 +35,8 @@
 		&::before {
 			content: '';
 			position: absolute;
-			top: calc((var(--lh-caption) * var(--text-caption) - var(--size-sm-up)) / 2);
-			left: var(--size-2xs);
+			top: calc((var(--lh-caption) * var(--text-caption) - var(--size-sm-up)) / 2); // Geometric — bullet vertical alignment to caption baseline.
+			left: var(--size-2xs); // Geometric — bullet x-position inside li padding.
 			width: 0.75rem;
 			height: 0.75rem;
 			border-radius: 50%;
@@ -47,7 +49,8 @@
 			@include typography(caption);
 			--color-fg: var(--fg-subtle);
 			color: var(--color-fg);
-			margin-bottom: var(--size-xs);
+			--margin-block: var(--size-xs);
+			margin-bottom: var(--margin-block);
 		}
 
 		> h4 {
@@ -60,7 +63,8 @@
 			@include typography(body-sm);
 			--color-fg: var(--fg-muted);
 			color: var(--color-fg);
-			margin: var(--size-xs) 0 0;
+			--margin-block: var(--size-xs);
+			margin: var(--margin-block) 0 0;
 		}
 	}
 }

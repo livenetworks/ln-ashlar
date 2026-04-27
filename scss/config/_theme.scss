@@ -189,37 +189,33 @@
 		--btn-fg-hover: hsl(var(--color-primary));
 	}
 
-	// ── Nav lists — join items with per-side divider lines ─────────
-	// Scoped to library-opt-in structures (data-ln-nav sidebar,
-	// data-ln-dropdown-menu popover, .menu-items surface). Replaces
-	// the default margin-between-items rhythm with a shared top
-	// border. Does NOT apply to breadcrumbs, tab-strips, pagination,
-	// button-groups, or pill-groups — those have their own layout.
-	nav[data-ln-nav] ul {
-		// Bleed list to the sidebar's vertical borders so dividers
-		// reach edge-to-edge. <a> keeps its own padding-inline (from
-		// @mixin nav-links-rounded) so text stays visually inset.
-		margin-inline: calc(-1 * var(--padding-x));
-	}
+	// ── Nav surface — palette-only rebind ──────────────────────────
+	// @mixin nav reads --nav-link-border-color* via fallback (defaults:
+	// transparent). Glass rebinds them so hover/active draw an accent
+	// ring. --nav-list-bleed shifts the ul to the sidebar's vertical
+	// borders so dividers reach edge-to-edge; @mixin nav reads it with
+	// `0` fallback so default theme is unaffected.
+	--nav-link-border-color-hover:  var(--color-accent);
+	--nav-link-border-color-active: var(--color-accent);
+	--nav-list-bleed:               calc(-1 * var(--padding-x));
 
-	nav[data-ln-nav] a {
-		border: var(--border-width) solid transparent;
-		margin: calc(-1 * var(--border-width));
-		transition: border-color var(--transition-fast), background-color var(--transition-fast);
+	// Active-nav wash — Glass shifts --color-accent-tint one step
+	// darker (var(--color-primary-light) instead of -lighter) for
+	// stronger contrast on the deep dark surface. Replaces the
+	// pre-refactor descendant override on a.active. Side-effect:
+	// dropdown active items + upload drop-zone also pick up the
+	// slightly darker tint — improvement, not regression.
+	--color-accent-tint: hsl(var(--color-primary-light));
 
-		&:hover {
-			border-color: var(--color-accent);
-		}
-
-		&.active {
-			border-color: var(--color-accent);
-			background-color: hsl(var(--color-primary-light));
-		}
-	}
-
-	[data-ln-dropdown-menu] li + li,
-	.menu-items li + li {
-		border-block-start: var(--border-width) solid var(--color-border);
+	// ── Dropdown / menu-items dividers ─────────────────────────────
+	// @mixin menu-items reads SOFT --border-block-start on `li + li`
+	// and `hr` with `none` fallback. Glass rebinds the slot in scope
+	// so the divider appears for both. Scoped (not theme :root)
+	// because --border-block-start is read by ~10 other mixins
+	// (cards, tables, accordions) where the divider should NOT appear.
+	[data-ln-dropdown-menu],
+	.menu-items {
+		--border-block-start: var(--border-width) solid var(--color-border);
 	}
 
 }

@@ -45,7 +45,8 @@
 
 	blockquote {
 		border-left: 3px solid var(--color-accent);
-		padding-left: var(--size-md);
+		--padding-x: var(--size-md);
+		padding-left: var(--padding-x);
 		--color-fg: var(--fg-muted);
 		color: var(--color-fg);
 		font-style: italic;
@@ -54,8 +55,10 @@
 	code {
 		--color-bg: var(--bg-sunken);
 		background: var(--color-bg);
-		padding-inline: var(--size-xs-up);
-		padding-block: var(--size-2xs);
+		--padding-x: var(--size-xs-up);
+		padding-inline: var(--padding-x);
+		--padding-y: var(--size-2xs);
+		padding-block: var(--padding-y);
 		@include rounded-sm;
 		font-family: var(--font-mono);
 		@include typography(body-sm);
@@ -65,7 +68,9 @@
 	pre {
 		--color-bg: var(--bg-sunken);
 		background: var(--color-bg);
-		padding: var(--size-md);
+		--padding-y: var(--size-md);
+		--padding-x: var(--size-md);
+		padding: var(--padding-y) var(--padding-x);
 		@include rounded-md;
 		overflow-x: auto;
 
@@ -100,7 +105,9 @@
 		margin-top: 1.5em;
 
 		th, td {
-			padding: var(--size-sm) var(--size-sm-up);
+			--padding-y: var(--size-sm);
+			--padding-x: var(--size-sm-up);
+			padding: var(--padding-y) var(--padding-x);
 			border-bottom: 1px solid var(--color-border);
 			text-align: left;
 		}

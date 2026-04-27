@@ -1,31 +1,10 @@
-// ── JS state: data table row states + loading + spacer ──
-
-.ln-row-selected {
-	background: hsl(var(--color-primary-lighter));
-}
-
-.ln-row-focused {
-	outline: 2px solid hsl(var(--color-primary-focus));
-	outline-offset: -2px;
-}
-
-[data-ln-row] {
-	cursor: pointer;
-
-	&:hover {
-		--color-bg: var(--bg-sunken);
-		background: var(--color-bg);
-	}
-}
+// ── JS state: data table loading ──
+// Loading-class added by JS while async data fetches; visual stays here
+// because it's a transient JS-controlled state transition.
 
 .ln-data-table--loading {
 	tbody {
 		opacity: 0.5;
 		pointer-events: none;
 	}
-}
-
-.ln-data-table__spacer td {
-	padding: 0 !important;
-	border: none !important;
 }

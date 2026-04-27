@@ -84,7 +84,8 @@
 @mixin app-header-left {
 	@include flex;
 	@include items-center;
-	gap: var(--size-sm-up);
+	--gap: var(--size-sm-up);
+	gap: var(--gap);
 
 	.menu-toggle {
 		@include flex-center;
@@ -103,13 +104,15 @@
 @mixin app-header-right {
 	@include flex;
 	@include items-center;
-	gap: var(--size-md);
+	--gap: var(--size-md);
+	gap: var(--gap);
 }
 
 @mixin app-header-actions {
 	@include flex;
 	@include items-center;
-	gap: var(--size-sm);
+	--gap: var(--size-sm);
+	gap: var(--gap);
 
 	button {
 		// Bordered variant re-bound over @mixin app-header's ghost

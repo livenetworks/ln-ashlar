@@ -14,9 +14,12 @@
 		'breadcrumbs'
 		'title'
 		'actions';
-	gap: var(--size-md);
-	padding-bottom: var(--size-lg);
-	margin-bottom: var(--size-lg);
+	--gap: var(--size-md);
+	gap: var(--gap);
+	--padding-y: var(--size-lg);
+	padding-bottom: var(--padding-y);
+	--margin-block: var(--size-lg);
+	margin-bottom: var(--margin-block);
 	border-block-end: var(--border-block-end, var(--border-width) solid var(--color-border));
 
 	@include cq-up(medium, page-header) {
@@ -47,7 +50,8 @@
 			--color-fg: var(--fg-muted);
 			@include typography(body-md);
 			color: var(--color-fg);
-			margin: var(--size-xs) 0 0;
+			--margin-block: var(--size-xs);
+			margin: var(--margin-block) 0 0;
 		}
 	}
 
@@ -55,7 +59,8 @@
 	> div:has(> a) {
 		grid-area: actions;
 		@include flex-row;
-		gap: var(--size-sm);
+		--gap: var(--size-sm);
+		gap: var(--gap);
 
 		@include cq-down(medium, page-header) {
 			justify-content: flex-start;

@@ -113,15 +113,17 @@
 }
 
 @mixin section {
-	// Structural section margin (not shell rhythm; no logical token).
-	margin-bottom: var(--size-xl);
+	--margin-block: var(--size-xl);
+	margin-bottom: var(--margin-block);
 
 	header {
 		@include flex;
 		@include items-center;
 		@include justify-between;
-		margin-bottom: var(--size-md);
-		padding-bottom: var(--size-sm);
+		--margin-block: var(--size-md);
+		margin-bottom: var(--margin-block);
+		--padding-y: var(--size-sm);
+		padding-bottom: var(--padding-y);
 		@include border-b;
 
 		h2 {
@@ -216,8 +218,8 @@
 	@include transition;
 	--shadow: var(--shadow-resting);
 	box-shadow: var(--shadow);
-	// Structural section-card margin (not shell rhythm; no logical token).
-	margin-bottom: var(--size-md);
+	--margin-block: var(--size-md);
+	margin-bottom: var(--margin-block);
 
 	// Direct-child selectors only — nested <header>/<main>/<footer>
 	// elements inside the card's content are consumer-owned and
@@ -266,7 +268,8 @@
 		align-items: baseline;
 		@include justify-between;
 		gap: var(--gap);
-		padding-block: var(--size-xs-up);
+		--padding-y: var(--size-xs-up);
+		padding-block: var(--padding-y);
 		@include border-b;
 
 		&:last-child {

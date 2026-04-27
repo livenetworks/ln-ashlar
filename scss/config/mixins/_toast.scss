@@ -24,6 +24,8 @@
 	@include fixed;
 	@include z-toast;
 	pointer-events: none;
+	// Viewport-edge offsets — toast container distance from viewport,
+	// not shell rhythm.
 	right: var(--size-lg);
 	bottom: var(--size-lg);
 	display: flex;
@@ -40,7 +42,8 @@
 	}
 
 	& + & {
-		margin-bottom: var(--size-md);
+		--margin-block: var(--size-md);
+		margin-bottom: var(--margin-block);
 	}
 }
 
@@ -68,11 +71,14 @@
 }
 
 @mixin toast-side {
+	--color-accent:    hsl(var(--color-primary));
+	--color-accent-fg: hsl(var(--color-white));
 	flex: 0 0 44px;
 	@include flex;
 	align-items: flex-start;
 	@include justify-center;
-	padding-top: var(--size-md);
+	--padding-y: var(--size-md);
+	padding-top: var(--padding-y);
 	background: var(--color-accent);
 	color: var(--color-accent-fg);
 
@@ -84,13 +90,16 @@
 
 @mixin toast-content {
 	@include flex-1;
-	padding: var(--size-md) var(--size-md) var(--size-md) var(--size-sm);
+	--padding-y: var(--size-md);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x) var(--padding-y) var(--size-sm);  // 4th arm: icon-side gutter, component-design intrinsic.
 	@include relative;
 
 	.ln-toast__close {
 		--padding-y: var(--size-2xs);
 		--padding-x: var(--size-2xs);
 		@include absolute;
+		// Geometric — close button positioned inside content padding.
 		top: var(--size-sm);
 		right: var(--size-sm);
 	}
@@ -102,7 +111,8 @@
 	@include flex;
 	align-items: flex-start;
 	@include justify-between;
-	gap: var(--size-md);
+	--gap: var(--size-md);
+	gap: var(--gap);
 }
 
 @mixin toast-title {
@@ -116,7 +126,8 @@
 
 @mixin toast-body {
 	--color-fg: var(--fg-muted);
-	margin-top: var(--size-sm);
+	--margin-block: var(--size-sm);
+	margin-top: var(--margin-block);
 	font-size: var(--text-base);
 	color: var(--color-fg);
 	line-height: 1.5;
@@ -124,12 +135,15 @@
 	p { @include m(0); }
 
 	ul {
-		margin: var(--size-sm) 0 0 0;
-		padding-left: var(--size-md-up);
+		--margin-block: var(--size-sm);
+		margin: var(--margin-block) 0 0 0;
+		--padding-x: var(--size-md-up);
+		padding-left: var(--padding-x);
 		@include text-sm;
 	}
 
 	li + li {
-		margin-top: var(--size-xs);
+		--margin-block: var(--size-xs);
+		margin-top: var(--margin-block);
 	}
 }

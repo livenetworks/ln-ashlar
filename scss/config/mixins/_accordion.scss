@@ -36,7 +36,9 @@
 			@include flex;
 			@include justify-between;
 			@include items-center;
-			padding: var(--size-md) var(--size-md);
+			--padding-y: var(--size-md);
+			--padding-x: var(--size-md);
+			padding: var(--padding-y) var(--padding-x);
 			@include cursor-pointer;
 
 			// Chevron — place <element class="ln-chevron"> inside the trigger
@@ -55,7 +57,9 @@
 
 		// Content body padding — on children, not the overflow:hidden wrapper
 		.collapsible-body > * {
-			padding: var(--size-sm-up) var(--size-md);
+			--padding-y: var(--size-sm-up);
+			--padding-x: var(--size-md);
+			padding: var(--padding-y) var(--padding-x);
 			margin: 0;
 		}
 	}

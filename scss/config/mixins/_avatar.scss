@@ -35,8 +35,11 @@
 @mixin avatar {
 	@include inline-flex;
 	@include items-center;
-	gap: var(--size-sm-up);
-	padding: var(--size-xs-up) var(--size-xs-up);
+	--gap: var(--size-sm-up);
+	gap: var(--gap);
+	--padding-y: var(--size-xs-up);
+	--padding-x: var(--size-xs-up);
+	padding: var(--padding-y) var(--padding-x);
 	border-radius: var(--radius);
 	@include cursor-pointer;
 	@include transition-fast;

@@ -44,7 +44,8 @@
 		@include items-center;
 		@include flex-wrap;
 		gap: var(--gap);
-		padding-block: var(--size-sm-up);
+		--padding-y: var(--size-sm-up);
+		padding-block: var(--padding-y);
 		@include border-b;
 		@include shadow-b;
 
@@ -67,6 +68,7 @@
 			--padding-y: var(--size-2xs);
 			--padding-x: var(--size-2xs);
 			@include absolute;
+			// Geometric — close button positioned inside header padding.
 			top: var(--size-sm);
 			right: var(--size-sm);
 		}
@@ -75,14 +77,16 @@
 		// brand triad (enabled by `flex-wrap` above).
 		> [data-ln-search] {
 			@include w-full;
-			@include mt(var(--size-xs));
+			--margin-block: var(--size-xs);
+			@include mt(var(--margin-block));
 		}
 	}
 
 	> main {
 		@include flex-1;
 		overflow-y: auto;
-		padding-block: var(--size-xs);
+		--padding-y: var(--size-xs);
+		padding-block: var(--padding-y);
 	}
 
 	> footer {

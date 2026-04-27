@@ -69,7 +69,9 @@
 		justify-content: flex-start;
 		gap: var(--gap);
 		@include text-left;
-		padding: var(--size-xs) var(--size-sm);
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-sm);
+		padding: var(--padding-y) var(--padding-x);
 		@include text-sm;
 		@include cursor-pointer;
 		@include transition-fast;
@@ -99,11 +101,19 @@
 		}
 	}
 
+	// Inter-item divider — SOFT --border-block-start primitive read with
+	// `none` fallback. Default theme: no divider. Themes that opt in
+	// (Glass) rebind --border-block-start in scope.
+	li + li {
+		border-block-start: var(--border-block-start, none);
+	}
+
 	// ─── Separator ─────────────────────────────────────
 	hr {
 		border: none;
 		border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
-		margin-block: var(--size-xs);
+		--margin-block: var(--size-xs);
+		margin-block: var(--margin-block);
 	}
 }
 
@@ -116,8 +126,10 @@
 	@include absolute;
 	right: 0;
 	top: 100%;
-	margin-top: var(--size-xs);
-	padding-block: var(--size-xs);
+	--margin-block: var(--size-xs);
+	margin-top: var(--margin-block);
+	--padding-y: var(--size-xs);
+	padding-block: var(--padding-y);
 	min-width: 10rem;
 
 	@include menu-items;

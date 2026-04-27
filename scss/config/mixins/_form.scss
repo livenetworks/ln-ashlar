@@ -20,7 +20,8 @@
 	@include font-medium;
 	color: var(--color-fg);
 	// Structural label-to-input gap (not shell rhythm).
-	margin-bottom: var(--size-xs);
+	--margin-block: var(--size-xs);
+	margin-bottom: var(--margin-block);
 
 	// Required indicator — red * after label text
 	// Triggered by sibling input[required] via parent :has()
@@ -55,11 +56,13 @@
 	@include justify-end;
 	gap: var(--gap);
 	// Structural margin-top (not shell rhythm).
-	margin-top: var(--size-lg);
+	--margin-block: var(--size-lg);
+	margin-top: var(--margin-block);
 	// Structural padding-top (border-t offset). Kept literal to avoid
 	// cascading --padding-y into nested anchors, which use button-standard
 	// --padding-y from :root.
-	padding-top: var(--size-md);
+	--padding-y: var(--size-md);
+	padding-top: var(--padding-y);
 	@include border-t;
 
 	a {
@@ -84,7 +87,9 @@
 
 @mixin form-input {
 	@include w-full;
-	padding: var(--size-sm) var(--size-md);
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	font-size: var(--font-size);
 	line-height: var(--line-height);
 	color: var(--color-fg);
@@ -160,7 +165,9 @@
 	gap: var(--gap);
 	// Compact padding: tight vertical to keep total height close to a
 	// regular form-input despite the icon's fixed size.
-	padding: var(--size-xs) var(--size-sm);
+	--padding-y: var(--size-xs);
+	--padding-x: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	background: var(--color-bg);
 	@include border;
 	border-radius: var(--radius);
@@ -216,7 +223,9 @@
 
 	> [data-ln-search-clear] {
 		@include flex-shrink-0;
-		padding: var(--size-2xs) var(--size-2xs);
+		--padding-y: var(--size-2xs);
+		--padding-x: var(--size-2xs);
+		padding: var(--padding-y) var(--padding-x);
 		@include cursor-pointer;
 		--color-fg: var(--fg-subtle);
 		color: var(--color-fg);
@@ -292,7 +301,9 @@
 	@include flex;
 	@include items-center;
 	gap: var(--gap);
-	padding: var(--size-sm) var(--size-md);
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	@include cursor-pointer;
 	@include transition;
 	@include text-sm;
@@ -365,6 +376,30 @@
 	}
 }
 
+// ─── Pills — GCD for joined-pill checkbox/radio lists ──────────
+// Combines pill-group on the <ul> + pill on each <li><label><input>.
+// Apply to a <ul> whose direct children are <li><label><input> pairs.
+//
+// Usage: project SCSS applies this on its own ul selector:
+//
+//     #my-filter-pills { @include pills; }
+//
+// where the structure is:
+//
+//     <ul id="my-filter-pills">
+//         <li><label><input type="checkbox"> Label</label></li>
+//         ...
+//     </ul>
+
+@mixin pills {
+	@include pill-group;
+
+	> li > label:has(> input[type="checkbox"]),
+	> li > label:has(> input[type="radio"]) {
+		@include pill;
+	}
+}
+
 // ─── Check list outline — vertical list with outlined labels ───
 // <ul><li><label><input> — same structure as pill-group but vertical.
 // List reset + pill-outline on labels (visible input, bordered).
@@ -415,7 +450,8 @@
 @mixin form-validate-errors {
 	@include list-reset;
 	// Structural error-list margin (not shell rhythm).
-	margin-top: var(--size-xs);
+	--margin-block: var(--size-xs);
+	margin-top: var(--margin-block);
 	font-size: var(--text-caption);
 	line-height: var(--lh-caption);
 	color: hsl(var(--color-error));

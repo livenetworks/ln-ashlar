@@ -15,16 +15,28 @@
 	color: hsl(var(--color-primary));
 }
 
-// Semantic color recipe — re-binds the --color-primary family to a
-// status family (success / warning / error / info / secondary).
-// Used by .success / .warning / .error / .info / .secondary classes
-// in _utilities.scss. Cascading all sibling tokens (hover/focus/
-// light/lighter) ensures hover and focus states read from the
-// status family, not the default primary blue.
+// Semantic color recipe — re-binds the --color-primary family AND the
+// --color-accent vocabulary to a status family (success / warning /
+// error / info / secondary). Used by .success / .warning / .error /
+// .info / .secondary classes in _utilities.scss. Cascading both families
+// ensures every downstream consumer (btn, toast-side, card-accent,
+// alert, badge, etc.) picks up the status color through inherited
+// custom-property values — no per-mixin redeclare required.
 @mixin semantic-color($family) {
 	--color-primary:         var(--color-#{$family});
 	--color-primary-hover:   var(--color-#{$family}-hover);
 	--color-primary-focus:   var(--color-#{$family}-focus);
 	--color-primary-light:   var(--color-#{$family}-light);
 	--color-primary-lighter: var(--color-#{$family}-lighter);
+
+	// Re-declare accent vocabulary at this scope so var() resolves
+	// here instead of staying frozen at :root. Without this, descendants
+	// reading --color-accent get :root's primary blue regardless of the
+	// semantic class. --color-accent-fg stays at :root (white) — text on
+	// any colored accent surface should stay white.
+	--color-accent:             hsl(var(--color-primary));
+	--color-accent-hover:       hsl(var(--color-primary-hover));
+	--color-accent-tint:        hsl(var(--color-primary-lighter));
+	--color-accent-tint-strong: hsl(var(--color-primary-light));
+	--color-accent-focus:       hsl(var(--color-primary-focus));
 }

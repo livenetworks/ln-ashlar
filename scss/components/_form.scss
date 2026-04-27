@@ -59,12 +59,7 @@ label:not(:has(> input)) {
 
 fieldset > ul:has(> li > label > input[type="checkbox"]),
 fieldset > ul:has(> li > label > input[type="radio"]) {
-	@include pill-group;
-}
-
-fieldset > ul > li > label:has(> input[type="checkbox"]),
-fieldset > ul > li > label:has(> input[type="radio"]) {
-	@include pill;
+	@include pills;
 }
 
 .form-actions {

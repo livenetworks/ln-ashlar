@@ -318,6 +318,7 @@
 	--color-accent-fg:     hsl(var(--color-white));
 	--color-accent-tint:         hsl(var(--color-primary-lighter));
 	--color-accent-tint-strong:  hsl(var(--color-primary-light));
+	--color-accent-focus:        hsl(var(--color-primary-focus));
 
 	// Translucent accent surface — companions for themes that opt in to a
 	// non-solid accent button. NO defaults — `@mixin btn` reads these via
@@ -335,6 +336,15 @@
 	// --color-accent-bg
 	// --color-accent-bg-hover
 	// --color-accent-bg-fg
+
+	// Nav surface — companions for themes that opt in to a bordered/inset
+	// nav appearance (e.g. Glass). NO defaults — `@mixin nav` reads these
+	// via fallback to no-op values (transparent border, zero bleed), so
+	// the default theme renders unchanged. Themes rebind at theme :root.
+	// --nav-link-border-color
+	// --nav-link-border-color-hover
+	// --nav-link-border-color-active
+	// --nav-list-bleed
 
 	// -- Button surface (neutral default) --------------------------------
 	// Read by @mixin button-base across idle + hover + active. The
@@ -373,6 +383,31 @@
 	//
 	// Joining example:
 	//   .joined-stack > * + * { --border-block-start: none; }
+
+	// -- Margin (SOFT — no default) --------------------------------
+	// --margin-block, --margin-inline
+	//
+	// Read by structural rhythm rules (label-to-input gap, section
+	// margin, header→body separation, sibling stacking,
+	// element-pushing horizontal offsets) with a per-mixin rebind.
+	// NOT defined here — the value varies too widely across
+	// consumers for a single :root default to be useful. Each
+	// consumer rebinds locally:
+	//
+	//   @mixin section {
+	//       --margin-block: var(--size-xl);
+	//       margin-bottom: var(--margin-block);
+	//   }
+	//
+	// Density-compact reacts automatically: density-compact rebinds
+	// the underlying --size-* scale, and the consumer's
+	// `--margin-block: var(--size-md)` re-resolves at the consumer
+	// element under the compact scope.
+	//
+	// --margin-inline is the horizontal companion. Used for
+	// element-pushing structural offsets (icon→text gap inside a
+	// row, sibling element offsets). NOT for flex/grid sibling
+	// spacing — that is --gap.
 }
 
 // ---------------------------------------------------------------------------

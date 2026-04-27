@@ -5,13 +5,6 @@
 	overflow: visible;
 }
 
-// Virtual scroll spacer rows (JS-created)
-.ln-table__spacer td {
-	padding: 0 !important;
-	border: none !important;
-	background: transparent !important;
-}
-
 // Sort icon visibility toggled by JS (.hidden class)
 [data-ln-table] th[data-ln-sort] [data-ln-sort-icon].hidden {
 	display: none;

@@ -6,7 +6,9 @@
 @mixin kbd {
 	--color-bg: var(--bg-sunken);
 	display: inline-block;
-	padding: var(--size-2xs) var(--size-xs-up);
+	--padding-y: var(--size-2xs);
+	--padding-x: var(--size-xs-up);
+	padding: var(--padding-y) var(--padding-x);
 	@include typography(caption);
 	font-family: var(--font-mono);
 	color: var(--color-fg);

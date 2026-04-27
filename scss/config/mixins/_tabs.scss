@@ -33,7 +33,9 @@
 	--color-fg: var(--fg-muted);
 	all: unset;
 	box-sizing: border-box;
-	padding: var(--size-sm) var(--size-md);
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
 	@include font-medium;
 	color: var(--color-fg);
@@ -56,5 +58,7 @@
 }
 
 @mixin tabs-panel {
-	padding: var(--size-lg) var(--size-lg);
+	--padding-y: var(--size-lg);
+	--padding-x: var(--size-lg);
+	padding: var(--padding-y) var(--padding-x);
 }

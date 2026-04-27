@@ -33,8 +33,11 @@
 	> header aside label {
 		@include inline-flex;
 		@include items-center;
-		gap: var(--size-xs-up);
-		padding: var(--size-xs) var(--size-sm-up);
+		--gap: var(--size-xs-up);
+		gap: var(--gap);
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-sm-up);
+		padding: var(--padding-y) var(--padding-x);
 		border-radius: var(--radius);
 		@include border;
 		background: var(--color-bg);
@@ -92,8 +95,11 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	padding: var(--size-2xs) var(--size-2xs);
-	margin-inline-start: var(--size-xs);
+	--padding-y: var(--size-2xs);
+	--padding-x: var(--size-2xs);
+	padding: var(--padding-y) var(--padding-x);
+	--margin-inline: var(--size-xs);
+	margin-inline-start: var(--margin-inline);
 	vertical-align: middle;
 }
 
@@ -112,8 +118,11 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	padding: var(--size-2xs) var(--size-2xs);
-	margin-inline-start: var(--size-2xs);
+	--padding-y: var(--size-2xs);
+	--padding-x: var(--size-2xs);
+	padding: var(--padding-y) var(--padding-x);
+	--margin-inline: var(--size-2xs);
+	margin-inline-start: var(--margin-inline);
 	vertical-align: middle;
 	@include relative;
 }
@@ -150,7 +159,9 @@
 	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
 	border-radius: var(--radius);
 	box-shadow: var(--shadow);
-	padding: var(--size-sm) var(--size-sm);
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	min-width: 12rem;
 	max-height: 20rem;
 	overflow-y: auto;
@@ -158,7 +169,8 @@
 	[data-ln-filter-search] {
 		@include form-input;
 		width: 100%;
-		margin-bottom: var(--size-sm);
+		--margin-block: var(--size-sm);
+		margin-bottom: var(--margin-block);
 	}
 
 	ul {
@@ -166,7 +178,8 @@
 	}
 
 	li {
-		padding: var(--size-xs) 0;
+		--padding-y: var(--size-xs);
+		padding: var(--padding-y) 0;
 	}
 
 	label {
@@ -180,7 +193,37 @@
 	[data-ln-filter-clear] {
 		@include btn;
 		width: 100%;
-		margin-top: var(--size-sm);
+		--margin-block: var(--size-sm);
+		margin-top: var(--margin-block);
 		font-size: var(--text-sm);
+	}
+}
+
+// Row interaction state — applied to JS-marked clickable rows.
+
+@mixin data-table-row {
+	cursor: pointer;
+
+	&:hover {
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
+	}
+}
+
+@mixin data-table-row-selected {
+	background: var(--color-accent-tint);
+}
+
+@mixin data-table-row-focused {
+	outline: 2px solid var(--color-accent-focus);
+	outline-offset: -2px;
+}
+
+// Virtual-scroll spacer rows (JS-injected) — neutralize default cell padding/border.
+
+@mixin data-table-spacer-row {
+	td {
+		padding: 0 !important;
+		border: none !important;
 	}
 }

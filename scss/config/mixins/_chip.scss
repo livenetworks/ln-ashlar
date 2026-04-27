@@ -8,8 +8,11 @@
 @mixin chip {
 	@include inline-flex;
 	@include items-center;
-	gap: var(--size-xs);
-	padding: var(--size-xs) var(--size-sm-up);
+	--gap: var(--size-xs);
+	gap: var(--gap);
+	--padding-y: var(--size-xs);
+	--padding-x: var(--size-sm-up);
+	padding: var(--padding-y) var(--padding-x);
 	@include typography(label-sm);
 	--color-bg: var(--bg-recessed);
 	background: var(--color-bg);

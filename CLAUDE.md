@@ -519,6 +519,23 @@ breaks any component that uses both.
   loader width/height. These are component design, not spacing rhythm.
 - Font sizes / line heights / letter spacing use their own scales
   (`--text-*`, `--lh-*`, `--tracking-*`).
+- **`--size-*` direct reads in geometric component math.** When
+  `--size-*` is the length input to a positional / dimensional
+  calculation (connector-line endpoints, bullet alignment to a
+  text baseline, ::before label width inside a flex cell, shadow
+  decoration offsets), it is component-intrinsic geometry, not
+  spacing rhythm. Each occurrence needs a code comment explaining
+  the intent (`// Geometric — <intent>, not spacing rhythm.`).
+- **`--size-*` direct reads in `background-position` /
+  `background-size`** for intrinsic icon decoration. Component
+  design, not rhythm. Comment required.
+- **Viewport-edge offsets** (toast container `right` / `bottom`,
+  similar shell-positioning use cases). Single use site each;
+  no shell-edge primitive warranted. Comment required.
+- **`--size-*` direct reads inside `width` / `height` `calc()`** that
+  compute intrinsic component dimensions (track thickness,
+  label-width inside a stacked cell). Component design, not
+  rhythm. Comment required.
 
 **Color and shadow primitives.** Mixins read four single primitives for
 color and shadow. Components rebind these on their own scope to select
@@ -555,6 +572,10 @@ Structure and rhythm:
 - `--gap` — flex/grid gap between siblings
 - `--radius` — default corner radius
 - `--border-width` — default border stroke (also `--border-width-strong`)
+- `--margin-block`, `--margin-inline` — vertical / horizontal
+  structural margin (soft — NO `:root` default). Read by mixins that
+  set element-pushing margin (label-to-input gap, section margins,
+  sibling stacking, in-component element offsets).
 
 Surface colors (single primitive per concern):
 
@@ -583,6 +604,20 @@ Per-side borders (soft — NO `:root` default):
 - `--border-block-start`, `--border-block-end`, `--border-inline-start`, `--border-inline-end`
 
 These four have NO `:root` default. Mixins read them with a per-mixin fallback — default rendering is unchanged. A scope that rebinds e.g. `--border-block-start: none` flattens the top edge of every joined sibling.
+
+**Margin primitives `--margin-block` and `--margin-inline` follow the
+same SOFT pattern.** No `:root` default — value variation is too wide
+across consumers. Each mixin rebinds locally:
+
+```scss
+@mixin section {
+	--margin-block: var(--size-xl);
+	margin-bottom: var(--margin-block);
+}
+```
+
+Density-compact reacts via the underlying `--size-*` cascade — no
+parallel rebind needed in `.density-compact`.
 
 ### The vocabulary (value choices)
 
@@ -782,6 +817,9 @@ See `scss/config/mixins/_btn.scss` header for the full cascade rationale.
   vocabulary: `--bg-base`, `--bg-sunken`, `--bg-recessed`, `--fg-muted`,
   `--fg-subtle`, `--border-subtle`, `--border-strong`,
   `--shadow-resting`, `--shadow-floating`.
+- Do not introduce a per-component-surface margin token
+  (`--card-margin`, `--toast-margin`). Use the cross-cutting
+  `--margin-block` / `--margin-inline` primitives instead.
 
 ---
 

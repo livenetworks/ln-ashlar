@@ -9,7 +9,9 @@
 // and JS-portal tooltip-element. Semantic token pair — in dark mode the
 // neutral scale inversion naturally flips the bubble to light-on-dark.
 @mixin tooltip-bubble {
-	padding: var(--size-xs) var(--size-sm);
+	--padding-y: var(--size-xs);
+	--padding-x: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	background: var(--color-fg);
 	color: var(--color-bg);
 	@include typography(caption);
@@ -33,7 +35,8 @@
 		// Default placement: top, centered above the trigger.
 		// Position overrides below reset `bottom` / `left` to `auto` so
 		// the pseudo-element is not stretched between two coordinates.
-		bottom: calc(100% + var(--size-xs-up));
+		--gap: var(--size-xs-up);
+		bottom: calc(100% + var(--gap));
 		left: 50%;
 		transform: translateX(-50%);
 
@@ -57,16 +60,18 @@
 	// Bottom — push below the trigger. Must reset `bottom` from the default
 	// top placement or the pseudo-element stretches vertically.
 	&[data-ln-tooltip-position="bottom"]::after {
+		--gap: var(--size-xs-up);
 		bottom: auto;
-		top: calc(100% + var(--size-xs-up));
+		top: calc(100% + var(--gap));
 	}
 
 	// Left — reset `bottom` + `left` from the default, position to the left
 	// of the trigger, vertical-center via top + translateY.
 	&[data-ln-tooltip-position="left"]::after {
+		--gap: var(--size-xs-up);
 		bottom: auto;
 		left: auto;
-		right: calc(100% + var(--size-xs-up));
+		right: calc(100% + var(--gap));
 		top: 50%;
 		transform: translateY(-50%);
 	}
@@ -74,8 +79,9 @@
 	// Right — reset `bottom` from the default, override `left` to the right
 	// edge, vertical-center via top + translateY.
 	&[data-ln-tooltip-position="right"]::after {
+		--gap: var(--size-xs-up);
 		bottom: auto;
-		left: calc(100% + var(--size-xs-up));
+		left: calc(100% + var(--gap));
 		top: 50%;
 		transform: translateY(-50%);
 	}

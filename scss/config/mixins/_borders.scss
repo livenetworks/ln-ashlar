@@ -20,10 +20,10 @@
 	&::after {
 		content: '';
 		position: absolute;
-		bottom: calc(-1 * var(--size-sm-up));
+		bottom: calc(-1 * var(--size-sm-up)); // Geometric — shadow-b decoration offset, not spacing rhythm.
 		left: 0;
 		right: 0;
-		height: var(--size-sm-up);
+		height: var(--size-sm-up); // Intrinsic shadow-decoration height, not spacing rhythm.
 		background: linear-gradient(to bottom, hsl(var(--color-neutral-200) / 0.5), transparent);
 		pointer-events: none;
 	}

@@ -49,3 +49,7 @@
 .ln-table__empty-state {
 	@include ln-table-empty-state;
 }
+
+.ln-table__spacer {
+	@include ln-table-spacer-row;
+}

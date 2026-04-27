@@ -24,7 +24,9 @@
 	--color-bg: var(--bg-sunken);
 	border: 2px dashed var(--color-border);
 	border-radius: var(--radius);
-	padding: var(--size-lg) var(--size-lg);
+	--padding-y: var(--size-lg);
+	--padding-x: var(--size-lg);
+	padding: var(--padding-y) var(--padding-x);
 	text-align: center;
 	@include cursor-pointer;
 	@include motion-safe {
@@ -50,7 +52,8 @@
 		display: block;
 		color: var(--color-fg);
 		font-size: var(--text-xs);
-		margin-top: var(--size-xs);
+		--margin-block: var(--size-xs);
+		margin-top: var(--margin-block);
 	}
 }
 
@@ -62,7 +65,8 @@
 
 @mixin upload-list {
 	@include list-reset;
-	margin-top: var(--size-sm);
+	--margin-block: var(--size-sm);
+	margin-top: var(--margin-block);
 
 	&:empty {
 		display: none;
@@ -75,11 +79,14 @@
 	@include flex;
 	@include items-center;
 	flex-wrap: wrap;
-	padding: var(--size-sm) var(--size-md);
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	background-color: var(--color-bg);
 	border: var(--border-width) solid var(--color-border);
 	border-radius: var(--radius-sm);
-	margin-bottom: var(--size-sm);
+	--margin-block: var(--size-sm);
+	margin-bottom: var(--margin-block);
 	font-size: var(--text-sm);
 	@include overflow-hidden;
 
@@ -88,14 +95,16 @@
 	}
 
 	> svg.ln-icon {
-		margin-right: var(--size-sm);
+		--margin-inline: var(--size-sm);
+		margin-right: var(--margin-inline);
 		flex-shrink: 0;
 	}
 
 	> .ln-upload__remove {
 		--padding-y: var(--size-2xs);
 		--padding-x: var(--size-2xs);
-		margin-left: var(--size-sm);
+		--margin-inline: var(--size-sm);
+		margin-left: var(--margin-inline);
 	}
 }
 
@@ -109,7 +118,8 @@
 	--color-fg: var(--fg-subtle);
 	color: var(--color-fg);
 	font-size: var(--text-xs);
-	margin-left: var(--size-md);
+	--margin-inline: var(--size-md);
+	margin-left: var(--margin-inline);
 	flex-shrink: 0;
 }
 
@@ -146,7 +156,8 @@
 	display: inline-block;
 	width: 1.25rem;
 	height: 1.25rem;
-	margin-right: var(--size-sm);
+	--margin-inline: var(--size-sm);
+	margin-right: var(--margin-inline);
 	border: 2px solid var(--color-border);
 	border-radius: 50%;
 	border-top-color: var(--color-accent);

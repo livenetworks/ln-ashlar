@@ -38,3 +38,23 @@ th:hover [data-ln-col-filter] {
 .column-filter-dropdown {
 	@include data-table-filter-dropdown;
 }
+
+// ─── Row interaction states ─────────────────────────────
+
+[data-ln-row] {
+	@include data-table-row;
+}
+
+.ln-row-selected {
+	@include data-table-row-selected;
+}
+
+.ln-row-focused {
+	@include data-table-row-focused;
+}
+
+// ─── Virtual-scroll spacer ──────────────────────────────
+
+.ln-data-table__spacer {
+	@include data-table-spacer-row;
+}

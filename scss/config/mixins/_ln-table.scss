@@ -111,7 +111,8 @@
 	th [data-ln-dropdown] > button {
 		@include flex;
 		@include items-center;
-		gap: var(--size-xs);
+		--gap: var(--size-xs);
+		gap: var(--gap);
 		background: none;
 		border: none;
 		color: inherit;
@@ -136,7 +137,9 @@
 		@include flex;
 		@include items-center;
 		@include text-left;
-		padding: var(--size-xs) var(--size-sm);
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-sm);
+		padding: var(--padding-y) var(--padding-x);
 		@include text-sm;
 		@include font-normal;
 		background: none;
@@ -168,7 +171,8 @@
 
 		[data-ln-sort-icon] {
 			@include size(0.875rem);
-			margin-left: var(--size-xs);
+			--margin-inline: var(--size-xs);
+			margin-left: var(--margin-inline);
 			vertical-align: middle;
 			opacity: 0.4;
 			@include motion-safe {
@@ -192,7 +196,9 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	padding: var(--size-sm) var(--size-md);
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-t;
 	--color-bg: var(--bg-sunken);
 	background: var(--color-bg);
@@ -222,8 +228,11 @@
 	@include flex;
 	@include flex-wrap;
 	@include items-center;
-	gap: var(--size-lg);
-	padding: var(--size-sm) var(--size-md);
+	--gap: var(--size-lg);
+	gap: var(--gap);
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-b;
 
 	fieldset {
@@ -232,7 +241,8 @@
 		margin: 0;
 		@include flex;
 		@include items-center;
-		gap: var(--size-xs-up);
+		--gap: var(--size-xs-up);
+		gap: var(--gap);
 
 		legend {
 			@include text-xs;
@@ -240,7 +250,8 @@
 			--color-fg: var(--fg-subtle);
 			color: var(--color-fg);
 			float: left;
-			margin-right: var(--size-sm);
+			--margin-inline: var(--size-sm);
+			margin-right: var(--margin-inline);
 			line-height: 1.75rem;
 		}
 
@@ -250,7 +261,9 @@
 		}
 
 		li button {
-			padding: var(--size-2xs) var(--size-sm);
+			--padding-y: var(--size-2xs);
+			--padding-x: var(--size-sm);
+			padding: var(--padding-y) var(--padding-x);
 			@include text-xs;
 			@include font-medium;
 			@include rounded-full;
@@ -280,8 +293,11 @@
 	@include flex;
 	@include items-center;
 	@include flex-wrap;
-	gap: var(--size-xs-up);
-	padding: var(--size-xs-up) var(--size-md);
+	--gap: var(--size-xs-up);
+	gap: var(--gap);
+	--padding-y: var(--size-xs-up);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	@include border-b;
 	background-color: hsl(var(--color-primary) / 0.03);
 }
@@ -289,8 +305,11 @@
 @mixin ln-table-chip {
 	@include inline-flex;
 	@include items-center;
-	gap: var(--size-xs);
-	padding: var(--size-2xs) var(--size-sm);
+	--gap: var(--size-xs);
+	gap: var(--gap);
+	--padding-y: var(--size-2xs);
+	--padding-x: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	@include rounded-full;
 	@include text-xs;
 	@include tinted-surface(0.1);
@@ -308,7 +327,8 @@
 		@include font-bold;
 		line-height: 1;
 		padding: 0;
-		margin-left: var(--size-2xs);
+		--margin-inline: var(--size-2xs);
+		margin-left: var(--margin-inline);
 
 		&:hover {
 			color: hsl(var(--color-error));
@@ -324,7 +344,8 @@
 	background: none;
 	border: none;
 	@include cursor-pointer;
-	margin-left: var(--size-xs);
+	--margin-inline: var(--size-xs);
+	margin-left: var(--margin-inline);
 
 	&:hover {
 		color: hsl(var(--color-error));
@@ -334,13 +355,15 @@
 // ─── Empty state ──────────────────────────────────────────
 
 @mixin ln-table-empty-state {
-	padding-block: var(--size-2xl);
+	--padding-y: var(--size-2xl);
+	padding-block: var(--padding-y);
 	@include text-center;
 
 	svg.ln-icon {
 		@include block;
 		@include mx(auto);
-		margin-bottom: var(--size-md);
+		--margin-block: var(--size-md);
+		margin-bottom: var(--margin-block);
 		opacity: 0.3;
 	}
 
@@ -348,13 +371,25 @@
 		@include text-lg;
 		@include font-semibold;
 		color: var(--color-fg);
-		margin: 0 0 var(--size-sm);
+		--margin-block: var(--size-sm);
+		margin: 0 0 var(--margin-block);
 	}
 
 	p {
 		@include text-sm;
 		--color-fg: var(--fg-muted);
 		color: var(--color-fg);
-		margin: 0 0 var(--size-lg);
+		--margin-block: var(--size-lg);
+		margin: 0 0 var(--margin-block);
+	}
+}
+
+// Virtual-scroll spacer rows (JS-injected) — neutralize cell chrome including bg.
+
+@mixin ln-table-spacer-row {
+	td {
+		padding: 0 !important;
+		border: none !important;
+		background: transparent !important;
 	}
 }

@@ -17,6 +17,8 @@
 // ─── Flag icon in input background ───────────────────────────────
 
 @mixin translations-flag-input {
+	// Intrinsic flag-icon decoration math — pad-left + bg-pos + bg-size
+	// composed against the icon's own dimensions, not shell rhythm.
 	padding-left: calc(var(--size-sm-up) + var(--size-md-up) + var(--size-sm-up));
 	background-repeat: no-repeat;
 	background-size: var(--size-md-up) auto;
@@ -47,7 +49,8 @@
 @mixin translations-actions {
 	@include inline-flex;
 	@include items-center;
-	gap: var(--size-xs);
+	--gap: var(--size-xs);
+	gap: var(--gap);
 	margin-left: auto;
 }
 
@@ -56,7 +59,8 @@
 @mixin translations-active-list {
 	@include inline-flex;
 	@include items-center;
-	gap: var(--size-xs);
+	--gap: var(--size-xs);
+	gap: var(--gap);
 	@include list-reset;
 }
 
@@ -65,8 +69,11 @@
 @mixin translations-badge {
 	@include inline-flex;
 	@include items-center;
-	gap: var(--size-xs);
-	padding: var(--size-2xs) var(--size-xs);
+	--gap: var(--size-xs);
+	gap: var(--gap);
+	--padding-y: var(--size-2xs);
+	--padding-x: var(--size-xs);
+	padding: var(--padding-y) var(--padding-x);
 	@include text-xs;
 	@include font-semibold;
 	@include rounded-sm;
@@ -74,9 +81,10 @@
 	@include select-none;
 	margin: 0;
 	background-repeat: no-repeat;
-	background-position: var(--size-xs) center;
+	background-position: var(--size-xs) center; // Intrinsic flag-icon position, not shell rhythm.
 	background-size: 1rem auto;
-	padding-left: var(--size-lg);
+	--padding-x: var(--size-lg);
+	padding-left: var(--padding-x);
 }
 
 // ─── Badge remove button ─────────────────────────────────────────

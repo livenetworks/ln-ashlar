@@ -45,23 +45,23 @@
 	}
 }
 
-@mixin stack($gap: var(--size-md)) {
+@mixin stack($gap: var(--gap)) {
 	@include flex-col;
 	@include gap($gap);
 }
 
-@mixin row($gap: var(--size-sm)) {
+@mixin row($gap: var(--gap)) {
 	@include flex-row;
 	@include items-center;
 	@include gap($gap);
 }
 
-@mixin row-between($gap: var(--size-sm)) {
+@mixin row-between($gap: var(--gap)) {
 	@include row($gap);
 	@include justify-between;
 }
 
-@mixin row-center($gap: var(--size-sm)) {
+@mixin row-center($gap: var(--gap)) {
 	@include row($gap);
 	@include justify-center;
 }

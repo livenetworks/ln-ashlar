@@ -26,6 +26,7 @@
 
 	ul {
 		@include list-reset;
+		margin-inline: var(--nav-list-bleed, 0);
 	}
 
 	li {
@@ -43,6 +44,12 @@
 		line-height: var(--lh-body-sm);
 		color: var(--color-fg);
 		text-decoration: none;
+		// Always-present 1px border slot. Color defaults to transparent
+		// (default theme = invisible). Themes that opt in (Glass) rebind
+		// --nav-link-border-color* at theme :root. Negative margin
+		// compensates so the slot doesn't shift adjacent siblings.
+		border: var(--border-width) solid var(--nav-link-border-color, transparent);
+		margin: calc(-1 * var(--border-width));
 	}
 
 	.nav-icon {
@@ -57,20 +64,23 @@
 
 	.nav-section {
 		--color-fg: var(--fg-subtle);
-		padding-block: var(--size-sm);
+		--padding-y: var(--size-sm);
+		padding-block: var(--padding-y);
 		@include text-xs;
 		@include font-medium;
 		color: var(--color-fg);
 		@include normal-case;
 		letter-spacing: normal;
 		// Structural margin above section header.
-		margin-top: var(--size-md);
+		--margin-block: var(--size-md);
+		margin-top: var(--margin-block);
 	}
 
 	.nav-divider {
 		@include border-t;
 		// Structural block margin around divider.
-		margin-block: var(--size-sm);
+		--margin-block: var(--size-sm);
+		margin-block: var(--margin-block);
 	}
 
 	// Default link style — override by applying a nav-links-* mixin after @include nav
@@ -84,10 +94,12 @@
 	a {
 		&:hover {
 			color: var(--color-fg);
+			border-color: var(--nav-link-border-color-hover, transparent);
 		}
 
 		&.active {
 			color: var(--color-accent);
+			border-color: var(--nav-link-border-color-active, transparent);
 			@include font-semibold;
 		}
 	}
@@ -105,13 +117,17 @@
 
 	// Structural spacing between floating pills.
 	li + li {
-		margin-top: var(--size-2xs);
+		--margin-block: var(--size-2xs);
+		margin-top: var(--margin-block);
 	}
 
 	a {
 		padding-inline: var(--padding-x);
 		border-radius: var(--radius);
-		transition: background-color 150ms ease, color 150ms ease;
+		transition:
+			background-color 150ms ease,
+			color            150ms ease,
+			border-color     150ms ease;
 
 		&:hover {
 			// alpha tint — reads --color-primary triplet (see plan §0.3)
@@ -119,8 +135,9 @@
 		}
 
 		&.active {
-			// brand tint (--color-primary-lighter), not neutral scale
-			background-color: hsl(var(--color-primary-lighter));
+			// accent wash vocabulary (CLAUDE.md L532) — was reaching
+			// through to --color-primary-lighter scale.
+			background-color: var(--color-accent-tint);
 		}
 	}
 }
@@ -137,7 +154,8 @@
 
 	a {
 		margin-inline: 0;
-		padding-inline: var(--size-md);
+		--padding-x: var(--size-md);
+		padding-inline: var(--padding-x);
 		border-radius: 0;
 		transition: box-shadow 150ms ease, background-color 150ms ease, color 150ms ease;
 
@@ -193,7 +211,8 @@
 
 	a {
 		margin-inline: 0;
-		padding-inline: var(--size-md);
+		--padding-x: var(--size-md);
+		padding-inline: var(--padding-x);
 		border-radius: 0;
 		transition: background-color 150ms ease, color 150ms ease;
 

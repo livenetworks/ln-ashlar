@@ -1,8 +1,8 @@
 @use '../../../../../scss/config/mixins' as *;
 
-#filter-basic-nav,
-#filter-cards-nav,
-#combo-toolbar nav {
+#filter-basic-pills,
+#filter-cards-pills,
+#filter-combo-pills {
 	margin-bottom: var(--size-md);
 }
 
@@ -94,19 +94,12 @@
 // Popovers and dropdowns are NOT included — they use check-list style
 // (vertical list with visible checkboxes).
 
-#filter-basic-nav,
-#filter-cards-nav,
-#combo-toolbar > nav,
-#persist-filter,
-nav[data-ln-filter-col] {
-	ul {
-		@include pill-group;
-	}
-
-	label:has(> input[type="checkbox"]),
-	label:has(> input[type="radio"]) {
-		@include pill;
-	}
+#filter-basic-pills,
+#filter-cards-pills,
+#filter-combo-pills,
+#filter-persist-pills,
+nav[data-ln-filter-col] > ul {
+	@include pills;
 }
 
 // Multi-column inline filters (bare labels in <span>, no ul/li wrapper)

@@ -86,7 +86,8 @@
 	tbody tr {
 		@include block;
 		// Structural gap between stacked row-cards.
-		margin-bottom: var(--size-md);
+		--margin-block: var(--size-md);
+		margin-bottom: var(--margin-block);
 		@include border;
 		border-radius: var(--radius);
 		@include overflow-hidden;
@@ -96,7 +97,9 @@
 		@include block;
 		@include text-right;
 		// Stacked rows need taller vertical rhythm than desktop table cells.
-		padding: var(--size-sm-up) var(--size-md);
+		--padding-y: var(--size-sm-up);
+		--padding-x: var(--size-md);
+		padding: var(--padding-y) var(--padding-x);
 		@include border-b;
 		@include relative;
 		padding-left: 50%;
@@ -110,8 +113,8 @@
 			@include absolute;
 			top: 0;
 			bottom: 0;
-			left: var(--size-md);
-			// Intrinsic layout math — not padding rhythm.
+			left: var(--size-md); // Geometric — ::before label inset matches td padding-x.
+			// Geometric — label width less the gutter to value column.
 			width: calc(50% - var(--size-lg));
 			@include flex;
 			@include items-center;
@@ -153,7 +156,9 @@
 	@include inline-flex;
 	@include items-center;
 	@include justify-center;
-	padding: var(--size-xs) var(--size-sm);
+	--padding-y: var(--size-xs);
+	--padding-x: var(--size-sm);
+	padding: var(--padding-y) var(--padding-x);
 	@include text-sm;
 	@include transition-colors;
 
@@ -177,7 +182,9 @@
 		@include inline-flex;
 		@include items-center;
 		float: right;
-		padding: var(--size-2xs) var(--size-2xs);
+		--padding-y: var(--size-2xs);
+		--padding-x: var(--size-2xs);
+		padding: var(--padding-y) var(--padding-x);
 		@include rounded-sm;
 		opacity: 0.5;
 

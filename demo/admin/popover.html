@@ -220,7 +220,7 @@
 					<header><h3>3. Auto-flip near viewport edge</h3></header>
 					<main>
 						<p>The button below is pushed to the far right. Its popover prefers <code>right</code> but flips to <code>left</code> because there is no room on the right. Inspect <code>data-ln-popover-placement</code> after opening — it should read <code>left</code>.</p>
-						<div style="display:flex; justify-content:flex-end;">
+						<div class="demo-row-end">
 							<button type="button" class="btn" data-ln-popover-for="demo-autoflip">Flip me</button>
 						</div>
 						<div data-ln-popover data-ln-popover-position="right" id="demo-autoflip">
@@ -262,9 +262,9 @@
 							<form onsubmit="event.preventDefault(); alert('Invited! (demo)')">
 								<label for="invite-email">Email address</label>
 								<input id="invite-email" type="email" placeholder="colleague@example.com" autocomplete="off">
-								<div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
-									<button type="submit" class="btn">Send invite</button>
-									<button type="button" class="btn btn--ghost" onclick="document.getElementById('demo-form-popover').lnPopover.close()">Cancel</button>
+								<div class="demo-row-spaced">
+									<button type="submit">Send invite</button>
+									<button type="button" onclick="document.getElementById('demo-form-popover').lnPopover.close()">Cancel</button>
 								</div>
 							</form>
 						</div>
@@ -279,7 +279,7 @@
 						<nav class="demo-actions">
 							<button type="button" class="btn" id="demo-aria-trigger" data-ln-popover-for="demo-aria-popover">Toggle popover</button>
 						</nav>
-						<p id="demo-aria-status" style="margin-top:0.5rem; font-size:0.875rem;">
+						<p id="demo-aria-status" class="demo-status-line">
 							aria-expanded on trigger = <code id="demo-aria-value">false</code>
 						</p>
 

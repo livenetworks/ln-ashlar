@@ -26,7 +26,9 @@
 	@include flex;
 	@include items-center;
 	gap: var(--gap);
-	padding: var(--size-sm) var(--size-md);
+	--padding-y: var(--size-sm);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
 	border-radius: var(--radius);
 	@include text-sm;
 	border-left: 3px solid var(--color-accent);
@@ -74,6 +76,7 @@
 	border-left: none;
 	border-radius: 0;
 	border-bottom: var(--border-width) solid hsl(var(--color-primary) / 0.2);
-	padding-inline: var(--size-lg);
+	--padding-x: var(--size-lg);
+	padding-inline: var(--padding-x);
 	width: 100%;
 }

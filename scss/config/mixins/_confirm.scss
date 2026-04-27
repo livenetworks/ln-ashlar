@@ -25,6 +25,7 @@
 		bottom: 100%;
 		left: 50%;
 		transform: translateX(-50%);
-		margin-bottom: var(--size-sm);
+		--margin-block: var(--size-sm);
+		margin-bottom: var(--margin-block);
 	}
 }

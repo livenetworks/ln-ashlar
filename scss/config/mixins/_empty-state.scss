@@ -5,8 +5,11 @@
 	@include flex-col;
 	@include items-center;
 	@include justify-center;
-	gap: var(--size-md);
-	padding: var(--size-xl) var(--size-xl);
+	--gap: var(--size-md);
+	gap: var(--gap);
+	--padding-y: var(--size-xl);
+	--padding-x: var(--size-xl);
+	padding: var(--padding-y) var(--padding-x);
 	text-align: center;
 	max-width: 28rem;
 	margin-inline: auto;
@@ -21,6 +24,7 @@
 
 	button,
 	a {
-		margin-top: var(--size-sm);
+		--margin-block: var(--size-sm);
+		margin-top: var(--margin-block);
 	}
 }

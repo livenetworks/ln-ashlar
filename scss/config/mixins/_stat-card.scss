@@ -8,8 +8,11 @@
 @mixin stat-card {
 	--shadow: var(--shadow-resting);
 	@include flex-col;
-	gap: var(--size-xs);
-	padding: var(--size-lg) var(--size-lg);
+	--gap: var(--size-xs);
+	gap: var(--gap);
+	--padding-y: var(--size-lg);
+	--padding-x: var(--size-lg);
+	padding: var(--padding-y) var(--padding-x);
 	background: var(--color-bg);
 	@include rounded-lg;
 	box-shadow: var(--shadow);
@@ -39,9 +42,11 @@
 	> [data-ln-stat-trend] {
 		@include flex-row;
 		@include items-center;
-		gap: var(--size-xs);
+		--gap: var(--size-xs);
+		gap: var(--gap);
 		@include typography(body-sm);
-		margin: var(--size-xs) 0 0;
+		--margin-block: var(--size-xs);
+		margin: var(--margin-block) 0 0;
 
 		svg.ln-icon {
 			width: 1rem;

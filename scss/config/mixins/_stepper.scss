@@ -35,7 +35,8 @@
 		&:not(:last-child)::after {
 			content: '';
 			position: absolute;
-			top: var(--size-md);
+			top: var(--size-md); // Geometric — connector vertical center matches bullet radius.
+			// Geometric — connector horizontal endpoints clear bullet edge.
 			left: calc(50% + var(--size-md));
 			right: calc(-50% + var(--size-md));
 			height: 2px;
