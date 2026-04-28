@@ -51,7 +51,6 @@
 
 @mixin form-actions {
 	--gap: var(--size-sm-up);
-	@include list-reset;
 	@include flex;
 	@include justify-end;
 	gap: var(--gap);
@@ -357,7 +356,6 @@
 
 @mixin pill-group {
 	@include inline-flex;
-	@include list-reset;
 
 	li label {
 		border-radius: 0;
@@ -399,7 +397,6 @@
 
 @mixin pills {
 	@include inline-flex;
-	@include list-reset;
 
 	> li > label:has(> input[type="checkbox"]),
 	> li > label:has(> input[type="radio"]) {
@@ -431,8 +428,6 @@
 //   #dept-filter { @include check-list-outline; }
 
 @mixin check-list-outline {
-	@include list-reset;
-
 	li label { @include pill-outline; }
 }
 
@@ -471,7 +466,6 @@
 }
 
 @mixin form-validate-errors {
-	@include list-reset;
 	// Structural error-list margin (not shell rhythm).
 	--margin-block: var(--size-xs);
 	margin-top: var(--margin-block);

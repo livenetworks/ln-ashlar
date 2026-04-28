@@ -257,7 +257,6 @@
 
 		ul {
 			@include inline-flex;
-			@include list-reset;
 		}
 
 		li button {

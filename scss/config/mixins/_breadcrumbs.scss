@@ -32,7 +32,6 @@
 		@include items-center;
 		@include flex-wrap;
 		gap: var(--gap);
-		@include list-reset;
 
 		> li {
 			@include flex;

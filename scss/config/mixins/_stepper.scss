@@ -3,7 +3,6 @@
 
 @mixin stepper {
 	display: flex;
-	@include list-reset;
 	gap: 0;
 	counter-reset: ln-step;
 

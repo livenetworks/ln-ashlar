@@ -149,7 +149,6 @@
 	@include inline-flex;
 	@include items-center;
 	gap: var(--gap);
-	@include list-reset;
 
 	button {
 		--btn-bg: transparent;

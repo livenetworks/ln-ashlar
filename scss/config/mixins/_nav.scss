@@ -25,7 +25,6 @@
 	@include select-none;
 
 	ul {
-		@include list-reset;
 		margin-inline: var(--nav-list-bleed, 0);
 	}
 

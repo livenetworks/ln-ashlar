@@ -64,7 +64,6 @@
 }
 
 @mixin upload-list {
-	@include list-reset;
 	--margin-block: var(--size-sm);
 	margin-top: var(--margin-block);
 
