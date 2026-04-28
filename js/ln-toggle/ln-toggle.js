@@ -33,6 +33,20 @@ import { persistGet, persistSet } from '../ln-core';
 			};
 			btn.addEventListener('click', handler);
 			btn[DOM_ATTRIBUTE + 'Trigger'] = handler;
+			const targetId = btn.getAttribute('data-ln-toggle-for');
+			const target = document.getElementById(targetId);
+			if (target && target[DOM_ATTRIBUTE]) {
+				btn.setAttribute('aria-expanded', target[DOM_ATTRIBUTE].isOpen ? 'true' : 'false');
+			}
+		}
+	}
+
+	function _syncTriggerAria(panelEl, isOpen) {
+		const triggers = document.querySelectorAll(
+			'[data-ln-toggle-for="' + panelEl.id + '"]'
+		);
+		for (const trigger of triggers) {
+			trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 		}
 	}
 
@@ -54,6 +68,8 @@ import { persistGet, persistSet } from '../ln-core';
 		if (this.isOpen) {
 			dom.classList.add('open');
 		}
+
+		_syncTriggerAria(dom, this.isOpen);
 
 		return this;
 	}
@@ -104,6 +120,7 @@ import { persistGet, persistSet } from '../ln-core';
 			}
 			instance.isOpen = true;
 			el.classList.add('open');
+			_syncTriggerAria(el, true);
 			dispatch(el, 'ln-toggle:open', { target: el });
 			if (el.hasAttribute('data-ln-persist')) {
 				persistSet('toggle', el, 'open');
@@ -116,6 +133,7 @@ import { persistGet, persistSet } from '../ln-core';
 			}
 			instance.isOpen = false;
 			el.classList.remove('open');
+			_syncTriggerAria(el, false);
 			dispatch(el, 'ln-toggle:close', { target: el });
 			if (el.hasAttribute('data-ln-persist')) {
 				persistSet('toggle', el, 'close');

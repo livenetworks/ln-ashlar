@@ -145,6 +145,26 @@ Buttons with `data-ln-toggle-for="id"` are wired up by `_attachTriggers()`:
 4. Guard: `btn[lnToggleTrigger] = true` prevents duplicate listeners when MutationObserver re-fires on existing triggers
 5. Modifier keys (ctrl/meta) and middle-click are allowed through without `preventDefault()` — this preserves native browser behavior (open in new tab, etc.)
 
+### Trigger A11y Sync
+
+Whenever a panel's state changes, `_syncTriggerAria(panelEl, isOpen)` runs
+and sets `aria-expanded` on every `[data-ln-toggle-for="<panel.id>"]` in
+the document. Called from three places:
+
+1. `_component(dom)` — on init, so server-rendered open panels start with
+   `aria-expanded="true"` on their triggers (no flash of `false`).
+2. `_syncAttribute(el)` — before each open/close event fires, so all DOM
+   state (panel `.open` class + trigger `aria-expanded`) is settled before
+   any listener runs.
+3. `_attachTriggers(root)` — when a trigger is attached to the DOM after
+   its target was already initialized, the new trigger inherits the
+   current state.
+
+The CSS chevron-rotation rule
+(`[data-ln-toggle-for][aria-expanded="true"] .ln-chevron { transform: rotate(180deg); }`)
+is driven by this attribute, so chevron rotation works for any toggle —
+not just inside an accordion.
+
 ### MutationObserver
 
 A single global observer watches `document.body` for:

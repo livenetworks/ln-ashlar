@@ -17,7 +17,6 @@
 @use 'spacing' as *;
 @use 'display' as *;
 @use 'borders' as *;
-@use 'motion' as *;
 @use 'interaction' as *;
 
 @mixin accordion {
@@ -39,19 +38,6 @@
 			--padding-x: var(--size-md);
 			padding: var(--padding-y) var(--padding-x);
 			@include cursor-pointer;
-
-			// Chevron — place <element class="ln-chevron"> inside the trigger
-			.ln-chevron {
-				@include flex-shrink-0;
-				@include motion-safe {
-					transition: transform var(--transition);
-				}
-			}
-		}
-
-		// Rotate chevron when panel is open
-		&:has(> .collapsible.open) > [data-ln-toggle-for] .ln-chevron {
-			transform: rotate(180deg);
 		}
 
 		// Content body padding — on children, not the overflow:hidden wrapper

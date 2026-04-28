@@ -487,7 +487,7 @@ Grid-based expand/collapse animation. **NEVER use `max-height` hack.**
 
 ### `@include accordion`
 
-Styled accordion list — contained card with chevron rotation. Applied automatically to `[data-ln-accordion]`.
+Styled accordion list — contained card. Chevron rotation comes from the generic toggle layer (see `[data-ln-toggle-for][aria-expanded="true"]` rule in `scss/components/_toggle.scss`). Applied automatically to `[data-ln-accordion]`.
 
 ```html
 <ul data-ln-accordion>
@@ -516,7 +516,7 @@ Styled accordion list — contained card with chevron rotation. Applied automati
 </ul>
 ```
 
-> **Chevron is icon-system-agnostic.** The mixin rotates any element with `class="ln-chevron"` inside the trigger — `<svg>`, `<i>`, `<span>`, `<img>`. Use the ln-acme icon (`<svg class="ln-icon ln-chevron">`), a different icon library (`<i class="fas fa-chevron-down ln-chevron">`), or a text indicator (`<span class="ln-chevron">▾</span>`).
+> **Chevron is icon-system-agnostic.** The toggle layer (`scss/components/_toggle.scss`) rotates any element with `class="ln-chevron"` inside a `[data-ln-toggle-for]` trigger — `<svg>`, `<i>`, `<span>`, `<img>`. Driven by `aria-expanded` (set by `ln-toggle.js`), so it works for accordion items AND standalone toggles. Use the ln-acme icon (`<svg class="ln-icon ln-chevron">`), a different icon library (`<i class="fas fa-chevron-down ln-chevron">`), or a text indicator (`<span class="ln-chevron">▾</span>`).
 >
 > For custom accordion selectors: `#my-list { @include accordion; }`
 
@@ -588,7 +588,7 @@ SVG sprite injected into `<body>` at init by `ln-icons.js`. No init call require
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 </button>
 
-<!-- Accordion chevron — rotates on open/close via CSS -->
+<!-- Toggle chevron — rotates on open/close via CSS (works inside accordion or standalone) -->
 <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 ```
 

@@ -889,7 +889,7 @@ builds a hidden `<svg>` sprite, and inserts it into `<body>` at init. Fetched SV
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 </button>
 
-<!-- Accordion chevron (CSS rotates it on open) -->
+<!-- Toggle chevron (CSS rotates it on open — works inside accordion or standalone) -->
 <header data-ln-toggle-for="panel1">
     Title
     <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>

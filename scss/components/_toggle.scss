@@ -34,3 +34,48 @@
 		@include collapsible-content;
 	}
 }
+
+// ──────────────────────────────────────────────────────────────────────
+// Chevron — generic toggle behavior
+// ──────────────────────────────────────────────────────────────────────
+// .ln-chevron is the icon-class convention for "this is a chevron-style
+// indicator inside a toggle trigger". The rotation is driven by
+// aria-expanded (set by ln-toggle.js on every [data-ln-toggle-for]
+// when its target panel opens/closes). Works for accordion items and
+// standalone toggles alike — no DOM-proximity dependency.
+
+[data-ln-toggle-for] .ln-chevron {
+	@include flex-shrink-0;
+	@include motion-safe {
+		transition: transform var(--transition);
+	}
+}
+
+[data-ln-toggle-for][aria-expanded="true"] .ln-chevron {
+	transform: rotate(180deg);
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Icon-only trigger button — strip default button chrome
+// ──────────────────────────────────────────────────────────────────────
+// When the trigger is <button data-ln-toggle-for> with a single .ln-icon
+// child, it should read as a subtle affordance, not a chunky action
+// button. Hover gets a soft bg lift to confirm clickability.
+//
+// Text triggers (<button data-ln-toggle-for>Options</button>) and
+// triggers with class="btn" keep full button chrome — the
+// :has(> .ln-icon:only-child) predicate excludes them.
+// <header data-ln-toggle-for> in accordion is unaffected — element
+// match is `button` only.
+//
+// Per CLAUDE.md "Variant rebinds the surface, doesn't redeclare":
+// this rebinds --btn-* tokens; the @mixin button-base body still
+// owns background/border-color declarations and hover/active blocks.
+
+button[data-ln-toggle-for]:has(> .ln-icon:only-child) {
+	--btn-bg:           transparent;
+	--btn-border:       transparent;
+	--btn-bg-hover:     var(--bg-sunken);
+	--btn-border-hover: transparent;
+	--btn-fg-hover:     var(--color-fg);
+}

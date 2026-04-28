@@ -151,18 +151,20 @@ svg.ln-icon.ln-icon--xl { width: 4rem;   height: 4rem;   }
 
 `vite.config.js` copies `js/ln-icons/icons/*.svg` → `dist/icons/` on build. Upload these to `window.LN_ICONS_CUSTOM_CDN`.
 
-## Accordion Chevron
+## Toggle Chevron
 
-`@mixin accordion` in `_collapsible.scss` rotates `.ln-chevron` on open state:
+`ln-toggle.js` sets `aria-expanded` on every `[data-ln-toggle-for]` trigger when its target panel opens/closes. CSS in `scss/components/_toggle.scss` rotates `.ln-chevron` based on that attribute — generic, not accordion-specific:
 
 ```scss
-[data-ln-accordion] li > [data-ln-toggle-for] .ln-chevron {
-    transition: transform var(--transition-base);
+[data-ln-toggle-for] .ln-chevron {
+    transition: transform var(--transition);
 }
-[data-ln-accordion] li:has(> .collapsible.open) > [data-ln-toggle-for] .ln-chevron {
+[data-ln-toggle-for][aria-expanded="true"] .ln-chevron {
     transform: rotate(180deg);
 }
 ```
+
+Works inside accordion items AND for standalone toggles — anywhere the trigger references a `data-ln-toggle` panel by id.
 
 ## JS Components That Inject Icons
 

@@ -20,6 +20,18 @@ All state changes flow through the attribute. The JS API methods (`open()`, `clo
 | `data-ln-toggle-for="id"` | button | References the target element by ID |
 | `data-ln-toggle-action="open\|close"` | button | Explicit action (default: toggle) |
 
+## Trigger A11y — `aria-expanded`
+
+When a toggle's open/closed state changes, every `[data-ln-toggle-for]`
+pointing at it gets `aria-expanded="true"` or `aria-expanded="false"`
+synced automatically. This works across DOM distance — triggers and the
+target panel can live anywhere in the document.
+
+The CSS chevron-rotation rule is driven by this attribute, so any
+`<element class="ln-chevron">` inside a `[data-ln-toggle-for]` rotates
+180° automatically on open. Works for accordion items AND standalone
+toggles — no special wrapper needed.
+
 ## API
 
 ```javascript
