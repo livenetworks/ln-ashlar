@@ -2,7 +2,6 @@
 @use 'typography' as *;
 
 @mixin timeline {
-	@include list-reset;
 	position: relative;
 
 	// Vertical rail — concentric with the bullet on both axes.

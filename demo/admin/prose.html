@@ -164,13 +164,13 @@
 		<!-- Content -->
 		<section>
 <h1>Prose</h1>
-				<p>Rich-text content styling for TipTap/editor output. Add <code>data-ln-prose</code> to any wrapper containing semantic HTML.</p>
+				<p>Rich-text content styling for TipTap/editor output. Add <code>class="prose"</code> to any wrapper containing semantic HTML.</p>
 
 				<!-- Full element showcase -->
 				<section class="section-card">
 					<header><h3>All Elements — Full Showcase</h3></header>
 					<main>
-						<article data-ln-prose>
+						<article class="prose">
 							<h1>Document Title (h1)</h1>
 							<p>This is the opening paragraph of a rich-text document. It uses the <code>body-md</code> typography role with a reading-optimized max-width of 65 characters.</p>
 
@@ -260,8 +260,8 @@ console.log(data.title);</code></pre>
 				<section class="section-card">
 					<header><h3>SCSS Usage</h3></header>
 					<main>
-						<pre><code>// Default attribute — zero SCSS needed
-// &lt;article data-ln-prose&gt;...&lt;/article&gt;
+						<pre><code>// Default class — zero SCSS needed
+// &lt;article class="prose"&gt;...&lt;/article&gt;
 
 // Consumer semantic selectors
 #document-viewer { @include prose; }

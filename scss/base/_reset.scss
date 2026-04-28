@@ -8,6 +8,10 @@
 	display: none !important;
 }
 
+ul, ol, ul li, ol li {
+	list-style: none;
+}
+
 html {
 	font-size: 16px;
 }

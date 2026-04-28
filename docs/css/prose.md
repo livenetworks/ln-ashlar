@@ -8,7 +8,7 @@ Semantic rich-text styling for content that comes from rich editors
 ## Structure
 
 ```html
-<article data-ln-prose>
+<article class="prose">
 	<!-- arbitrary semantic HTML -->
 	<h2>Introduction</h2>
 	<p>Lorem ipsum...</p>

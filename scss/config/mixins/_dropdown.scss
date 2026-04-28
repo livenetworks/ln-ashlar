@@ -44,8 +44,6 @@
 // stepper and have their own styling in those mixins.
 
 @mixin menu-items {
-	@include list-reset;
-
 	// ─── Row resets ────────────────────────────────────
 	li {
 		margin: 0;

@@ -123,22 +123,3 @@ blockquote {
 	color: var(--color-fg);
 	font-style: italic;
 }
-
-ul,
-ol {
-	padding-left: var(--size-lg);
-	margin-bottom: var(--size-md);
-}
-
-ul {
-	list-style-type: disc;
-}
-
-ol {
-	list-style-type: decimal;
-}
-
-li {
-	margin-bottom: var(--size-xs);
-	line-height: 1.75;
-}

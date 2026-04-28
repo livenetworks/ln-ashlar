@@ -30,7 +30,6 @@
 	bottom: var(--size-lg);
 	display: flex;
 	flex-direction: column-reverse;
-	@include list-reset;
 }
 
 @mixin toast-item {
