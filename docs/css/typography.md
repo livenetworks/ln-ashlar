@@ -7,7 +7,7 @@ Files:
 
 ## Two layers
 
-ln-acme typography has two layers:
+ln-ashlar typography has two layers:
 
 1. **Primitives** — `text-xs`, `text-sm`, `text-base`, `text-lg`,
    `text-xl`, `text-2xl`. Plain font-size + line-height mixins. Use
@@ -38,7 +38,7 @@ ln-acme typography has two layers:
 ## Usage
 
 ```scss
-@use 'ln-acme/scss/config/mixins' as *;
+@use 'ln-ashlar/scss/config/mixins' as *;
 
 .document-title { @include typography(display-sm); @include font-bold; }
 .meta           { @include typography(caption); color: var(--fg-muted); }

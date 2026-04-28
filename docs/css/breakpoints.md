@@ -2,9 +2,9 @@
 
 File: `scss/config/_breakpoints.scss`. Added in v1.1.
 
-ln-acme uses two independent breakpoint vocabularies: **app-shell
+ln-ashlar uses two independent breakpoint vocabularies: **app-shell
 media breakpoints** (for `@media`) and **container-query breakpoints**
-(for `@container`). See `ln-acme-container-queries.md` for when to
+(for `@container`). See `ln-ashlar-container-queries.md` for when to
 use which.
 
 ## Mixin API (preferred)
@@ -13,7 +13,7 @@ Use the mixins — they resolve from the breakpoint tokens, no px
 literals in components or utilities.
 
 ```scss
-@use 'ln-acme/scss/config/mixins' as *;
+@use 'ln-ashlar/scss/config/mixins' as *;
 
 // Media queries (app shell)
 @include mq-up(md)    { ... }   // min-width: 768px
@@ -54,7 +54,7 @@ Never for components.
 | `$bp-3xl` | `--bp-3xl` | 1920px |
 
 ```scss
-@use 'ln-acme/scss/config/breakpoints' as *;
+@use 'ln-ashlar/scss/config/breakpoints' as *;
 
 .app-shell {
 	display: grid;
@@ -79,7 +79,7 @@ parent; children query their own width via `@container`.
 | `$cq-wide` | `--cq-wide` | 1120px | 3→4 columns |
 
 ```scss
-@use 'ln-acme/scss/config/breakpoints' as *;
+@use 'ln-ashlar/scss/config/breakpoints' as *;
 
 #folders { @include container(foldersgrid); }
 

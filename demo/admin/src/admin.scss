@@ -1,13 +1,13 @@
 // ==========================================================================
 // Admin Demo — Bundled build
 // ==========================================================================
-// This is the project layer: uses ln-acme mixins/tokens to build the
-// admin dashboard design. ln-acme CSS is included in the build via @use;
+// This is the project layer: uses ln-ashlar mixins/tokens to build the
+// admin dashboard design. ln-ashlar CSS is included in the build via @use;
 // the output is a single CSS file in dist/admin.css.
 // ==========================================================================
 
-// Framework (includes full ln-acme CSS)
-@use '../../../scss/ln-acme';
+// Framework (includes full ln-ashlar CSS)
+@use '../../../scss/ln-ashlar';
 
 // Admin shell (layout)
 @use 'scss/navigation';

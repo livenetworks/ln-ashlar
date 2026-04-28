@@ -1,4 +1,4 @@
-# SCSS Reference — ln-acme
+# SCSS Reference — ln-ashlar
 
 Complete reference for all `@include` mixins, design tokens, and the icon system.
 
@@ -516,7 +516,7 @@ Styled accordion list — contained card. Chevron rotation comes from the generi
 </ul>
 ```
 
-> **Chevron is icon-system-agnostic.** The toggle layer (`scss/components/_toggle.scss`) rotates any element with `class="ln-chevron"` inside a `[data-ln-toggle-for]` trigger — `<svg>`, `<i>`, `<span>`, `<img>`. Driven by `aria-expanded` (set by `ln-toggle.js`), so it works for accordion items AND standalone toggles. Use the ln-acme icon (`<svg class="ln-icon ln-chevron">`), a different icon library (`<i class="fas fa-chevron-down ln-chevron">`), or a text indicator (`<span class="ln-chevron">▾</span>`).
+> **Chevron is icon-system-agnostic.** The toggle layer (`scss/components/_toggle.scss`) rotates any element with `class="ln-chevron"` inside a `[data-ln-toggle-for]` trigger — `<svg>`, `<i>`, `<span>`, `<img>`. Driven by `aria-expanded` (set by `ln-toggle.js`), so it works for accordion items AND standalone toggles. Use the ln-ashlar icon (`<svg class="ln-icon ln-chevron">`), a different icon library (`<i class="fas fa-chevron-down ln-chevron">`), or a text indicator (`<span class="ln-chevron">▾</span>`).
 >
 > For custom accordion selectors: `#my-list { @include accordion; }`
 

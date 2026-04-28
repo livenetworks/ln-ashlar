@@ -1,4 +1,24 @@
-<!-- ln-page: title="acme-gui — Demo" h1="index" -->
+<!-- ln-page: title="ashlar-gui — Demo" h1="Dashboard" -->
+
+<!-- Philosophy -->
+				<section class="section-card">
+					<header><h3>Philosophy</h3></header>
+					<main class="prose">
+						<h4>An ashlar library.</h4>
+						<p>An <em>ashlar</em> is a finely cut block of stone — small, regular, ready to assemble. Cathedrals are built from ashlars. So are walls.</p>
+						<p>ln-ashlar gives you the blocks. Tokens, mixins, components — small primitives, well-formed, predictable. You stack them into the building you actually need.</p>
+
+						<h4>How</h4>
+						<p><strong>Token-driven.</strong> Spacing, color, radius, shadow — every value lives in <code>--size-*</code>, <code>--color-*</code>, <code>--radius-*</code>. Change one token, every consumer reacts. No hardcoded literals in components.</p>
+						<p><strong>Recipe + application.</strong> Each pattern has two layers: a <code>@mixin</code> (the recipe) and a default selector (the application). Use the default, apply the recipe to your own semantic selector, or rebind the surface tokens. Three first-class paths.</p>
+						<p><strong>Zero dependencies.</strong> Vanilla JS IIFE components, CustomEvent communication, MutationObserver auto-init. No framework, no runtime — drop the SCSS and JS into any project.</p>
+						<p><strong>Themes are palette only.</strong> A theme rebinds vocabulary tokens at its own <code>:root</code>. It never restructures a component. Switching themes is a token swap, not a rewrite.</p>
+
+						<h4>Why</h4>
+						<p>A library should give you primitives and get out of the way. Most CSS frameworks give you a finished building — beautiful for one project, awkward for the next.</p>
+						<p>ln-ashlar gives you the stones. Stack them however your project needs. The stones are simple. The buildings can be as complicated as you want.</p>
+					</main>
+				</section>
 
 <!-- Stats -->
 				<section id="stats">
@@ -210,11 +230,11 @@
 				<section class="section-card">
 					<header><h3>Quick Integration</h3></header>
 					<main>
-						<pre><code>&lt;link rel="stylesheet" href="dist/ln-acme.css"&gt;
-&lt;script src="dist/ln-acme.iife.js" defer&gt;&lt;/script&gt;
+						<pre><code>&lt;link rel="stylesheet" href="dist/ln-ashlar.css"&gt;
+&lt;script src="dist/ln-ashlar.iife.js" defer&gt;&lt;/script&gt;
 
 &lt;!-- Or as npm module --&gt;
-import 'ln-acme';
-import 'ln-acme/dist/ln-acme.css';</code></pre>
+import 'ln-ashlar';
+import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
 					</main>
 				</section>

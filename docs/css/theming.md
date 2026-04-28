@@ -4,7 +4,7 @@ File: `scss/config/_theme.scss`. Added in v1.1.
 
 ## Philosophy
 
-ln-acme supports a dark-mode variant plus any number of consumer-defined
+ln-ashlar supports a dark-mode variant plus any number of consumer-defined
 themes. Themes are a **palette layer** — they rebind vocabulary tokens at
 theme `:root`. They never override component structure via descendant
 selectors at higher specificity.
@@ -40,7 +40,7 @@ Library does not persist preference; consumer does.
 ```
 
 When the OS is in dark mode and no `data-theme` attribute is set,
-ln-acme automatically applies dark tokens via
+ln-ashlar automatically applies dark tokens via
 `@media (prefers-color-scheme: dark)`.
 
 ### 3. Opt-out of auto

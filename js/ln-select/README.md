@@ -1,7 +1,7 @@
 # ln-select
 
 TomSelect wrapper — enhances the standard `<select>` with search, tagging and create functionality.
-Depends on [TomSelect](https://tom-select.js.org/) (peer dependency, must be loaded before ln-acme).
+Depends on [TomSelect](https://tom-select.js.org/) (peer dependency, must be loaded before ln-ashlar).
 
 ## Attributes
 
@@ -74,10 +74,10 @@ ts.setValue('new');
 
 ## Peer dependency
 
-TomSelect must be loaded before ln-acme:
+TomSelect must be loaded before ln-ashlar:
 
 ```html
 <link rel="stylesheet" href="tom-select/dist/css/tom-select.css">
 <script src="tom-select/dist/js/tom-select.complete.min.js"></script>
-<script src="dist/ln-acme.iife.js" defer></script>
+<script src="dist/ln-ashlar.iife.js" defer></script>
 ```

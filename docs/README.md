@@ -1,4 +1,4 @@
-# ln-acme Documentation
+# ln-ashlar Documentation
 
 Unified frontend library — SCSS CSS framework + vanilla JS components.
 
@@ -29,7 +29,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Layout | `scss/config/mixins/_layout.scss` | [layout.md](css/layout.md) |
 | Mixins Reference | `scss/config/mixins/` | [mixins.md](css/mixins.md) |
 | Icons (CSS) | `scss/config/_icons.scss` | [../js/ln-icons/README.md](../js/ln-icons/README.md) |
-| Container Queries | — | [ln-acme-container-queries.md](ln-acme-container-queries.md) |
+| Container Queries | — | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |
 
 **Components** (alphabetical)
 
@@ -108,7 +108,7 @@ Two files per component:
 |-------|------|
 | JS Component Patterns | [js/component-guide.md](js/component-guide.md) |
 | Reactive Architecture (v2) | [v2-reactive.md](v2-reactive.md) |
-| Container Queries | [ln-acme-container-queries.md](ln-acme-container-queries.md) |
+| Container Queries | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |
 
 ---
 

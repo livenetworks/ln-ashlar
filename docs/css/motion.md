@@ -6,7 +6,7 @@ Files:
 
 ## Philosophy
 
-ln-acme respects `prefers-reduced-motion: reduce`. Every animation
+ln-ashlar respects `prefers-reduced-motion: reduce`. Every animation
 and every transform/height/opacity transition is gated so users who
 have opted out of motion see instant state changes.
 
@@ -24,7 +24,7 @@ have opted out of motion see instant state changes.
 ## Using motion-safe
 
 ```scss
-@use 'ln-acme/scss/config/mixins' as *;
+@use 'ln-ashlar/scss/config/mixins' as *;
 
 .my-animated-panel {
 	opacity: 0;

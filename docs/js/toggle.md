@@ -104,7 +104,7 @@ There is no reactive proxy — state is a single boolean, and the attribute is t
 
 ### Attribute-Driven Flow
 
-This is the canonical pattern that other ln-acme components (ln-modal, ln-accordion) are built on:
+This is the canonical pattern that other ln-ashlar components (ln-modal, ln-accordion) are built on:
 
 ```
 API call or trigger click
@@ -174,9 +174,9 @@ A single global observer watches `document.body` for:
 
 ### Why This Matters
 
-This attribute-driven reactive pattern is the foundation of ln-acme's component model:
+This attribute-driven reactive pattern is the foundation of ln-ashlar's component model:
 
 - **ln-accordion** coordinates multiple ln-toggle instances — it listens for toggle events and closes siblings
 - **External code** can drive state purely through `setAttribute` without importing anything
 - **Server-rendered state** works automatically — `data-ln-toggle="open"` in HTML applies `.open` class on init
-- **ln-acme v2** generalizes this pattern with Proxy-based reactivity, but the attribute-as-source-of-truth principle remains
+- **ln-ashlar v2** generalizes this pattern with Proxy-based reactivity, but the attribute-as-source-of-truth principle remains

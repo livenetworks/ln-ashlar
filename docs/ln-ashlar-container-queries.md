@@ -1,12 +1,12 @@
-# Container Queries — ln-acme
+# Container Queries — ln-ashlar
 
-> Transfer this file to the ln-acme repository and apply the changes described below.
+> Transfer this file to the ln-ashlar repository and apply the changes described below.
 
 ---
 
 ## Philosophy
 
-Components in ln-acme do not know where they will be placed. A card grid rendered in a wide main column, a narrow modal, or a sidebar panel must adapt correctly in all three contexts — without the consuming project writing layout-specific overrides.
+Components in ln-ashlar do not know where they will be placed. A card grid rendered in a wide main column, a narrow modal, or a sidebar panel must adapt correctly in all three contexts — without the consuming project writing layout-specific overrides.
 
 CSS Container Queries make this possible: the **parent** declares a container context, and the **child** adapts to the available space of that parent — not the viewport.
 

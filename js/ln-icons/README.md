@@ -79,7 +79,7 @@ Set on `window` before the script loads:
 <script>
     window.LN_ICONS_CUSTOM_CDN = 'https://your-cdn.com/icons';
 </script>
-<script src="dist/ln-acme.iife.js" defer></script>
+<script src="dist/ln-ashlar.iife.js" defer></script>
 ```
 
 ## Adding a Custom Icon

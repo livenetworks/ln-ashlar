@@ -1,13 +1,13 @@
 // ==========================================================================
 // DocuFlow Demo — Bundled build
 // ==========================================================================
-// This is the project layer: uses ln-acme mixins/tokens to build the
-// DocuFlow 3-column layout design. ln-acme CSS is included in the build
+// This is the project layer: uses ln-ashlar mixins/tokens to build the
+// DocuFlow 3-column layout design. ln-ashlar CSS is included in the build
 // via @use; the output is a single CSS file in dist/docuflow.css.
 // ==========================================================================
 
-// Framework (includes full ln-acme CSS)
-@use '../../scss/ln-acme';
+// Framework (includes full ln-ashlar CSS)
+@use '../../scss/ln-ashlar';
 
 // Foundation
 @use 'scss/palette';

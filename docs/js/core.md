@@ -237,7 +237,7 @@ const batchRender = createBatcher(
 
 The three reactive primitives (`reactiveState` / `deepReactive` +
 `createBatcher` + `fill`) are designed to be used together. They are
-the canonical ln-acme render loop:
+the canonical ln-ashlar render loop:
 
 1. **State mutation.** Component code assigns to a property on a
    reactive proxy (`this.state.value = 'x'`). The proxy fires its

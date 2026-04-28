@@ -1,4 +1,4 @@
-# ln-acme
+# ln-ashlar
 
 Unified frontend library for LiveNetworks projects — SCSS CSS framework + vanilla JS components, zero dependencies.
 
@@ -21,29 +21,29 @@ Four principles drive every decision in this library:
 
 ## Quick Start
 
-ln-acme is a source-only package. Import SCSS and JS directly and let
+ln-ashlar is a source-only package. Import SCSS and JS directly and let
 your project's bundler compile them.
 
 ### npm
 ```js
 // SCSS
-@use 'ln-acme/scss/ln-acme.scss';
+@use 'ln-ashlar/scss/ln-ashlar.scss';
 
 // JS
-import 'ln-acme/js/index.js';
+import 'ln-ashlar/js/index.js';
 ```
 
 ### Git submodule
 ```bash
-git submodule add .../ln-acme.git resources/ln-acme
+git submodule add .../ln-ashlar.git resources/ln-ashlar
 ```
 
-Then `@use 'resources/ln-acme/scss/ln-acme.scss'` and
-`import 'resources/ln-acme/js/index.js'` from the project.
+Then `@use 'resources/ln-ashlar/scss/ln-ashlar.scss'` and
+`import 'resources/ln-ashlar/js/index.js'` from the project.
 
 ### Build (for the demo site only)
 ```bash
-npm run build   # Produces demo/dist/ln-acme.{css,js,iife.js} + compiles demo pages
+npm run build   # Produces demo/dist/ln-ashlar.{css,js,iife.js} + compiles demo pages
 npm run dev     # Watch mode (library only)
 ```
 
@@ -66,7 +66,7 @@ scss/base/                   ← Reset, global element defaults
 **Mixins** define how something looks. **Components** apply mixins to default selectors. Projects override by re-applying mixins on their own semantic selectors:
 
 ```scss
-// ln-acme ships: table { @include table-base; }
+// ln-ashlar ships: table { @include table-base; }
 // Project overrides one specific table:
 #audit-log { @include table-base; @include table-striped; }
 ```
@@ -129,7 +129,7 @@ Components expose a JS API on the element (`el.lnModal.open()`) and fire namespa
 
 ## Demo
 
-Interactive demos in `demo/admin/` — each JS and CSS component has its own page. The demo is itself a project consuming ln-acme, showing how to write project-level SCSS using mixins and tokens.
+Interactive demos in `demo/admin/` — each JS and CSS component has its own page. The demo is itself a project consuming ln-ashlar, showing how to write project-level SCSS using mixins and tokens.
 
 ```
 demo/admin/index.html       ← Dashboard

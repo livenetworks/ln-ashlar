@@ -1025,7 +1025,7 @@ function wt(u) {
 (function() {
   const u = window.TomSelect;
   if (!u) {
-    console.warn("[ln-select] TomSelect not found. Load TomSelect before ln-acme."), window.lnSelect = { initialize: function() {
+    console.warn("[ln-select] TomSelect not found. Load TomSelect before ln-ashlar."), window.lnSelect = { initialize: function() {
     }, destroy: function() {
     }, getInstance: function() {
       return null;

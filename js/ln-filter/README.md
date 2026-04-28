@@ -176,7 +176,7 @@ Each filter must use a unique `data-ln-filter-key`. Row visibility is determined
 
 ## CSS
 
-The hide rule is bundled in ln-acme. Pill styling (active state highlight via primary color) is automatic for `label:has(> input[type="checkbox"])` via the library defaults. The consumer only needs the hide rule when combining with `ln-search`:
+The hide rule is bundled in ln-ashlar. Pill styling (active state highlight via primary color) is automatic for `label:has(> input[type="checkbox"])` via the library defaults. The consumer only needs the hide rule when combining with `ln-search`:
 
 ```css
 [data-ln-search-hide],

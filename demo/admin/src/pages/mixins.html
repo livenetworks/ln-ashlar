@@ -1,4 +1,4 @@
-<!-- ln-page: title="Mixins Reference — ln-acme" h1="Mixins Reference" -->
+<!-- ln-page: title="Mixins Reference — ln-ashlar" h1="Mixins Reference" -->
 
 <h1>Mixins Reference</h1>
 				<p>Complete list of <code>@include</code> mixins from <code>scss/config/_mixins.scss</code>. Import with <code>@use 'config/mixins' as *;</code> and use in semantic selectors.</p>
@@ -145,8 +145,8 @@ table {
 						<h4>Example: overriding btn in a project</h4>
 						<div class="demo-split">
 							<article>
-								<h4>ln-acme default</h4>
-								<pre><code>// scss/config/_mixins.scss (ln-acme)
+								<h4>ln-ashlar default</h4>
+								<pre><code>// scss/config/_mixins.scss (ln-ashlar)
 @mixin btn {
   @include flex;
   @include items-center;
@@ -183,10 +183,10 @@ table {
 
 						<h4>How to set up the override</h4>
 						<pre><code>// project/scss/main.scss
-// 1. Import ln-acme (loads default mixins)
-@use 'ln-acme/scss/ln-acme';
+// 1. Import ln-ashlar (loads default mixins)
+@use 'ln-ashlar/scss/ln-ashlar';
 
-// 2. Import project overrides AFTER ln-acme
+// 2. Import project overrides AFTER ln-ashlar
 //    This file redefines mixins with the same name
 @use 'overrides';
 

@@ -8,15 +8,15 @@ export default defineConfig({
 		emptyOutDir: true,
 		lib: {
 			entry: resolve(__dirname, 'js/index.js'),
-			name: 'LnAcme',
+			name: 'LnAshlar',
 			formats: ['es', 'iife'],
-			fileName: (format) => format === 'es' ? 'ln-acme.js' : 'ln-acme.iife.js'
+			fileName: (format) => format === 'es' ? 'ln-ashlar.js' : 'ln-ashlar.iife.js'
 		},
 		rollupOptions: {
 			output: {
 				assetFileNames: (assetInfo) => {
 					if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-						return 'ln-acme.css';
+						return 'ln-ashlar.css';
 					}
 					return 'assets/[name][extname]';
 				}

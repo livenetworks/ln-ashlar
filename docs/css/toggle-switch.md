@@ -18,7 +18,7 @@ toggles the switch (native browser behavior).
 
 ## Why a separate attribute?
 
-ln-acme already has `ln-toggle` (collapsible panel) and plain
+ln-ashlar already has `ln-toggle` (collapsible panel) and plain
 checkboxes (styled via `form-checkbox` mixin). `data-ln-toggle-switch`
 distinguishes the iOS switch use case so the other patterns stay
 untouched.

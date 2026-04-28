@@ -9,8 +9,8 @@ const SIDEBAR_CANONICAL = `		<!-- Sidebar -->
 		<aside class="sidebar open" id="demo-sidebar" data-ln-toggle="open">
 			<div class="sidebar-header">
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
-				<span class="app-name">acme-gui</span>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
 			</div>
 
 			<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
@@ -82,7 +82,7 @@ const SIDEBAR_CANONICAL = `		<!-- Sidebar -->
 			</div>
 
 			<div class="sidebar-footer">
-				<small>acme-gui v1.2.0</small>
+				<small>ashlar-gui v1.2.0</small>
 			</div>
 		</aside>`;
 

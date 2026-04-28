@@ -62,7 +62,7 @@ el.lnFilter.destroy();                          // remove listeners, clean up
 }
 ```
 
-The hide rule for `[data-ln-filter-hide]` is bundled in ln-acme. Pill active state is handled automatically via `label:has(> input:checked)` in the library defaults.
+The hide rule for `[data-ln-filter-hide]` is bundled in ln-ashlar. Pill active state is handled automatically via `label:has(> input:checked)` in the library defaults.
 
 ## Behavior
 

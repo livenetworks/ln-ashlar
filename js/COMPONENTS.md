@@ -1,8 +1,8 @@
 # JS Components — Conventions and Patterns
 
-## ln-acme Project Architecture (mandatory)
+## ln-ashlar Project Architecture (mandatory)
 
-Every project using ln-acme JS components **MUST** follow three layers:
+Every project using ln-ashlar JS components **MUST** follow three layers:
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -13,7 +13,7 @@ Every project using ln-acme JS components **MUST** follow three layers:
 │  Components (reusable)                               │
 │  State + CRUD + request listeners + notifications    │
 ├─────────────────────────────────────────────────────┤
-│  ln-acme (library)                                   │
+│  ln-ashlar (library)                                 │
 │  ln-toggle, ln-accordion, ln-modal, ln-toast...      │
 └─────────────────────────────────────────────────────┘
 ```
@@ -425,7 +425,7 @@ The architecture follows the **Mediator pattern** (GoF): components do not commu
 
 ### Canonical Example: ln-accordion / ln-toggle
 
-The ln-acme library already implements this:
+The ln-ashlar library already implements this:
 
 - **ln-toggle** is a component (state layer): `data-ln-toggle` attribute is the single source of truth. MutationObserver detects attribute changes → applies `.open` class, emits `ln-toggle:open` / `ln-toggle:close`. API methods (`open()`, `close()`) just set the attribute.
 - **ln-accordion** is a coordinator (mediator): listens to `ln-toggle:open` from children, sets `data-ln-toggle="close"` on siblings. **Never** calls `el.lnToggle.close()`. Emits its own `ln-accordion:change`
@@ -447,7 +447,7 @@ Toggle **doesn't know** that other toggles exist. Accordion **doesn't know** abo
 
 The same pattern scales from library to application:
 
-| ln-acme (library) | Project (application) | Role |
+| ln-ashlar (library) | Project (application) | Role |
 |---|---|---|
 | ln-toggle | ln-profile, ln-playlist, ln-deck | Component (state + events) |
 | ln-accordion | ln-mixer (coordinator) | Mediator (event wiring) |
@@ -574,7 +574,7 @@ import './ln-{name}/ln-{name}.scss';
 
 ## Request Events — Details
 
-> Architecture is defined in [ln-acme Project Architecture](#ln-acme-project-architecture-mandatory). This section covers technical details only.
+> Architecture is defined in [ln-ashlar Project Architecture](#ln-ashlar-project-architecture-mandatory). This section covers technical details only.
 
 ### Implementation in Component
 

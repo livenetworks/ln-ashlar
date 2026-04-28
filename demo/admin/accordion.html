@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Accordion — ln-acme</title>
+	<title>Accordion — ln-ashlar</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
-	<script src="../dist/ln-acme.iife.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
 <body>
@@ -80,8 +80,8 @@
 		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
-				<span class="app-name">acme-gui</span>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
 				<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
 					<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 					<input type="search" placeholder="Filter menu…">
@@ -156,7 +156,7 @@
 			</main>
 
 			<footer>
-				<small>acme-gui v1.2.0</small>
+				<small>ashlar-gui v1.2.0</small>
 			</footer>
 		</aside>
 		<div class="app-scrim" data-ln-scrim></div>
@@ -190,12 +190,12 @@
 							<ul data-ln-accordion>
 								<li>
 									<header data-ln-toggle-for="panel1">
-										<strong>What is ln-acme?</strong>
+										<strong>What is ln-ashlar?</strong>
 									<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 					</header>
 									<section id="panel1" data-ln-toggle="open" class="collapsible">
 										<article class="collapsible-body">
-											<p>ln-acme is a unified frontend library for LiveNetworks projects. It contains an SCSS CSS framework + vanilla JS components, with zero dependencies.</p>
+											<p>ln-ashlar is a unified frontend library for LiveNetworks projects. It contains an SCSS CSS framework + vanilla JS components, with zero dependencies.</p>
 										</article>
 									</section>
 								</li>
@@ -207,8 +207,8 @@
 									<section id="panel2" data-ln-toggle class="collapsible">
 										<article class="collapsible-body">
 											<p>You can use it as an npm package, via git submodule, or directly with <code>&lt;link&gt;</code> and <code>&lt;script&gt;</code> tags.</p>
-											<pre><code>import 'ln-acme';
-import 'ln-acme/dist/ln-acme.css';</code></pre>
+											<pre><code>import 'ln-ashlar';
+import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
 										</article>
 									</section>
 								</li>
@@ -219,7 +219,7 @@ import 'ln-acme/dist/ln-acme.css';</code></pre>
 					</header>
 									<section id="panel3" data-ln-toggle class="collapsible">
 										<article class="collapsible-body">
-											<p>ln-acme is fully independent. All JS components are written in vanilla JavaScript using the IIFE pattern.</p>
+											<p>ln-ashlar is fully independent. All JS components are written in vanilla JavaScript using the IIFE pattern.</p>
 											<p><strong>Exception:</strong> ln-select depends on TomSelect (peer dependency).</p>
 										</article>
 									</section>
@@ -349,15 +349,15 @@ window.lnAccordion(document.body);</code></pre>
 						<header><h3>Dependencies</h3></header>
 						<main>
 							<p>Accordion depends on the <strong>ln-toggle</strong> component. ln-toggle must be loaded before accordion.</p>
-							<pre><code>&lt;script src="dist/ln-acme.iife.js"&gt;&lt;/script&gt;</code></pre>
+							<pre><code>&lt;script src="dist/ln-ashlar.iife.js"&gt;&lt;/script&gt;</code></pre>
 						</main>
 					</section>
 		</section>
 
 		<!-- Footer -->
 		<footer class="app-footer">
-			<span>acme-gui &copy; 2026 LiveNetworks</span>
-			<span>ln-acme v1.2.0</span>
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
 		</footer>
 		</main>
 	</div><!-- /.app-wrapper -->

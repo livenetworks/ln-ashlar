@@ -1,4 +1,4 @@
-# CLAUDE.md — ln-acme Project
+# CLAUDE.md — ln-ashlar Project
 
 ## Working Mode
 
@@ -24,7 +24,7 @@ For implementation tasks ("create this file", "fix this bug"), execute directly.
 
 ## What is this?
 
-`ln-acme` is a unified frontend library for LiveNetworks projects.
+`ln-ashlar` is a unified frontend library for LiveNetworks projects.
 Contains **SCSS CSS framework** + **vanilla JS components**, zero dependencies.
 Used in Laravel projects and other web applications.
 
@@ -90,15 +90,15 @@ compiles the demo pages (index, admin, docuflow). `npm run dev`
 watches the library only; demos are rebuilt on the next full build.
 
 Output (demo-only — not a public consumption path):
-- `demo/dist/ln-acme.css` — everything included
-- `demo/dist/ln-acme.js` — ES module
-- `demo/dist/ln-acme.iife.js` — for `<script>` tag
+- `demo/dist/ln-ashlar.css` — everything included
+- `demo/dist/ln-ashlar.js` — ES module
+- `demo/dist/ln-ashlar.iife.js` — for `<script>` tag
 
 ---
 
 ## Project Integration
 
-ln-acme is a **source-only** package. Consumers import SCSS and JS
+ln-ashlar is a **source-only** package. Consumers import SCSS and JS
 source files directly and run their own bundler (Vite, Webpack, etc).
 The `demo/dist/` artefact exists for the demo site only — do not point
 projects at it.
@@ -106,19 +106,19 @@ projects at it.
 ### npm
 ```js
 // SCSS — import from source
-@use 'ln-acme/scss/ln-acme.scss';
+@use 'ln-ashlar/scss/ln-ashlar.scss';
 
 // JS — import from source
-import 'ln-acme/js/index.js';
+import 'ln-ashlar/js/index.js';
 ```
 
 ### Git submodule
 ```bash
-git submodule add .../ln-acme.git resources/ln-acme
+git submodule add .../ln-ashlar.git resources/ln-ashlar
 ```
 
-Then `@use 'resources/ln-acme/scss/ln-acme.scss'` and
-`import 'resources/ln-acme/js/index.js'` from the project.
+Then `@use 'resources/ln-ashlar/scss/ln-ashlar.scss'` and
+`import 'resources/ln-ashlar/js/index.js'` from the project.
 
 ---
 
@@ -182,7 +182,7 @@ Icon-only close/dismiss buttons inherit the global `<button>` base styles. Re-bi
 
 ### Rules
 
-- **No `btn--*` variant classes** in ln-acme — use `--color-primary` override
+- **No `btn--*` variant classes** in ln-ashlar — use `--color-primary` override
 - **No `translateY` or `box-shadow` on hover** — color change only
 - **ZERO hardcoded colors** — every color reads `var(--token)`
 - Production HTML uses semantic selectors, not `.btn` class
@@ -307,7 +307,7 @@ The co-located SCSS should be minimal or empty.
    @use '../config/mixins' as *;
    #new-component { @include new-component; }
    ```
-5. Add `@use 'components/new-component'` to `scss/ln-acme.scss`
+5. Add `@use 'components/new-component'` to `scss/ln-ashlar.scss`
 6. Use `@include` mixins for properties, `var(--token)` for values — **NEVER** hardcoded colors
 
 ## Adding a New JS Component
@@ -355,7 +355,7 @@ This does NOT apply to trivial fixes or established patterns — only new/substa
 
 ## Override Architecture
 
-ln-acme ships two layers: **mixins** (recipes) + **components** (defaults applied to selectors).
+ln-ashlar ships two layers: **mixins** (recipes) + **components** (defaults applied to selectors).
 Projects can override at any level:
 
 1. **Use the default** → do nothing, library CSS works out of the box

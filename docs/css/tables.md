@@ -159,7 +159,7 @@ inside queries its own available width and switches to the responsive
 stacked layout when the container — not the viewport — is narrow
 enough.
 
-This is a deliberate architectural choice that applies to all ln-acme
+This is a deliberate architectural choice that applies to all ln-ashlar
 components: **a component adapts to the space it was given, not to the
 size of the browser window.** The same table dropped into a wide page
 main, a narrow modal, or a sidebar panel behaves correctly in each
@@ -167,7 +167,7 @@ context with zero consuming-project overrides.
 
 Media queries are reserved for the app shell (header, sidebar, page
 columns). See `breakpoints.md` for the `@media` vs `@container` split
-and `ln-acme-container-queries.md` for the full rationale.
+and `ln-ashlar-container-queries.md` for the full rationale.
 
 The table's specific threshold (above which it is tabular, below which
 it stacks) is defined in `scss/components/_table.scss`. Projects

@@ -1,6 +1,6 @@
 # Reactive Architecture Reference
 
-How ln-acme components manage internal state and drive DOM updates. Covers the four primitives exported from `ln-core` (`fill`, `renderList`, `reactiveState`, `deepReactive`) and the `createBatcher` scheduler.
+How ln-ashlar components manage internal state and drive DOM updates. Covers the four primitives exported from `ln-core` (`fill`, `renderList`, `reactiveState`, `deepReactive`) and the `createBatcher` scheduler.
 
 For the high-level pattern summary, see [js/COMPONENTS.md — Reactive Rendering Pattern](../js/COMPONENTS.md).
 
@@ -8,7 +8,7 @@ For the high-level pattern summary, see [js/COMPONENTS.md — Reactive Rendering
 
 ## Two-Layer State Model
 
-Every ln-acme component has two state layers that serve different purposes. They are not alternatives — they work together.
+Every ln-ashlar component has two state layers that serve different purposes. They are not alternatives — they work together.
 
 ### External State — Attributes
 
@@ -198,7 +198,7 @@ this.state = reactiveState({
 });
 ```
 
-Use when the state is a flat object with primitive values (strings, numbers, booleans). This covers most ln-acme library components.
+Use when the state is a flat object with primitive values (strings, numbers, booleans). This covers most ln-ashlar library components.
 
 Setting the same value twice does not call `onChange` (strict equality check before dispatch).
 

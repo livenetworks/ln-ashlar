@@ -1,14 +1,14 @@
-# ln-acme JS Component Guide
+# ln-ashlar JS Component Guide
 
-> Concrete patterns for building ln-acme components.
+> Concrete patterns for building ln-ashlar components.
 > For general JS principles (IIFE, CustomEvent, coordinator pattern) → see `js` skill in claude-skills.
-> This document covers ln-acme SPECIFIC conventions that go beyond the generic patterns.
+> This document covers ln-ashlar SPECIFIC conventions that go beyond the generic patterns.
 
 ---
 
 ## Component Skeleton
 
-Every ln-acme component uses `findElements` from `ln-core` instead of raw MutationObserver setup:
+Every ln-ashlar component uses `findElements` from `ln-core` instead of raw MutationObserver setup:
 
 ```javascript
 import { findElements } from '../ln-core'
@@ -108,7 +108,7 @@ All display text comes from outside the component:
 | Dynamic labels (button text, toast messages) | `data-ln-*-dict` attribute | Blade renders JSON with translations |
 | Formatted values (dates, numbers, currency) | `Intl` API | Browser localizes automatically from `<html lang>` |
 
-**Why:** ln-acme is a multilingual library. If "No results" is hardcoded in JS, it can't be translated. Templates and dictionaries are rendered by Blade, which has access to Laravel's translation system (`__()`, `@lang`).
+**Why:** ln-ashlar is a multilingual library. If "No results" is hardcoded in JS, it can't be translated. Templates and dictionaries are rendered by Blade, which has access to Laravel's translation system (`__()`, `@lang`).
 
 **What IS allowed in JS:**
 - Console messages: `console.warn('[ln-time] Missing datetime')` — developer-only, not user-facing

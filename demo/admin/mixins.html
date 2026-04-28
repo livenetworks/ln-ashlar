@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Mixins Reference — ln-acme</title>
+	<title>Mixins Reference — ln-ashlar</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
-	<script src="../dist/ln-acme.iife.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
 <body>
@@ -80,8 +80,8 @@
 		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-				<img class="logo" src="ln-acme-logo.png" alt="ln-acme">
-				<span class="app-name">acme-gui</span>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
 				<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
 					<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 					<input type="search" placeholder="Filter menu…">
@@ -156,7 +156,7 @@
 			</main>
 
 			<footer>
-				<small>acme-gui v1.2.0</small>
+				<small>ashlar-gui v1.2.0</small>
 			</footer>
 		</aside>
 		<div class="app-scrim" data-ln-scrim></div>
@@ -308,8 +308,8 @@ table {
 						<h4>Example: overriding btn in a project</h4>
 						<div class="demo-split">
 							<article>
-								<h4>ln-acme default</h4>
-								<pre><code>// scss/config/_mixins.scss (ln-acme)
+								<h4>ln-ashlar default</h4>
+								<pre><code>// scss/config/_mixins.scss (ln-ashlar)
 @mixin btn {
   @include flex;
   @include items-center;
@@ -346,10 +346,10 @@ table {
 
 						<h4>How to set up the override</h4>
 						<pre><code>// project/scss/main.scss
-// 1. Import ln-acme (loads default mixins)
-@use 'ln-acme/scss/ln-acme';
+// 1. Import ln-ashlar (loads default mixins)
+@use 'ln-ashlar/scss/ln-ashlar';
 
-// 2. Import project overrides AFTER ln-acme
+// 2. Import project overrides AFTER ln-ashlar
 //    This file redefines mixins with the same name
 @use 'overrides';
 
@@ -1041,8 +1041,8 @@ aside nav { @include nav; }
 
 		<!-- Footer -->
 		<footer class="app-footer">
-			<span>acme-gui &copy; 2026 LiveNetworks</span>
-			<span>ln-acme v1.2.0</span>
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
 		</footer>
 		</main>
 	</div><!-- /.app-wrapper -->

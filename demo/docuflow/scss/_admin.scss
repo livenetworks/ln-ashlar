@@ -100,7 +100,7 @@
 		}
 	}
 
-	// Badge — uses ln-acme badge mixin, color via --color-primary override
+	// Badge — uses ln-ashlar badge mixin, color via --color-primary override
 	.badge {
 		@include badge;
 	}

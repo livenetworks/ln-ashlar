@@ -4,7 +4,7 @@ File: `scss/config/_density.scss`. Added in v1.2, refactored in v1.3.
 
 ## Philosophy
 
-ln-acme supports a global density toggle for data-dense UIs.
+ln-ashlar supports a global density toggle for data-dense UIs.
 Compliance dashboards, audit log tables, settings pages with many
 fields — these benefit from showing more content on screen. Marketing
 pages, modals, and onboarding screens do not.
