@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-core';
+import { registerComponent, dispatch, dispatchCancelable, findElements } from '../ln-core';
 import { persistGet, persistSet } from '../ln-core';
 
 (function () {
@@ -7,12 +7,6 @@ import { persistGet, persistSet } from '../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-		_attachTriggers(domRoot);
-	}
 
 	function _attachTriggers(root) {
 		const triggers = Array.from(root.querySelectorAll('[data-ln-toggle-for]'));
@@ -141,51 +135,11 @@ import { persistGet, persistSet } from '../ln-core';
 		}
 	}
 
-	// ─── DOM Observer ──────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) {
-								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-								_attachTriggers(node);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						if (mutation.attributeName === DOM_SELECTOR && mutation.target[DOM_ATTRIBUTE]) {
-							_syncAttribute(mutation.target);
-						} else {
-							findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-							_attachTriggers(mutation.target);
-						}
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR, 'data-ln-toggle-for']
-			});
-		}, 'ln-toggle');
-	}
-
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-toggle', {
+		extraAttributes: ['data-ln-toggle-for'],
+		onAttributeChange: _syncAttribute,
+		onInit: _attachTriggers
+	});
 })();
