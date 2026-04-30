@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, isVisible } from '../ln-core';
+import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-modal';
@@ -6,24 +6,6 @@ import { guardBody, dispatch, dispatchCancelable, isVisible } from '../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		_findModals(domRoot);
-		_attachTriggers(domRoot);
-	}
-
-	function _findModals(root) {
-		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-			items.push(root);
-		}
-		for (const el of items) {
-			if (!el[DOM_ATTRIBUTE]) {
-				el[DOM_ATTRIBUTE] = new _component(el);
-			}
-		}
-	}
 
 	function _attachTriggers(root) {
 		const triggers = Array.from(root.querySelectorAll('[data-ln-modal-for]'));
@@ -207,51 +189,11 @@ import { guardBody, dispatch, dispatchCancelable, isVisible } from '../ln-core';
 		}
 	}
 
-	// ─── DOM Observer ──────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) {
-								_findModals(node);
-								_attachTriggers(node);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						if (mutation.attributeName === DOM_SELECTOR && mutation.target[DOM_ATTRIBUTE]) {
-							_syncAttribute(mutation.target);
-						} else {
-							_findModals(mutation.target);
-							_attachTriggers(mutation.target);
-						}
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR, 'data-ln-modal-for']
-			});
-		}, 'ln-modal');
-	}
-
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-modal', {
+		extraAttributes: ['data-ln-modal-for'],
+		onAttributeChange: _syncAttribute,
+		onInit: _attachTriggers
+	});
 })();

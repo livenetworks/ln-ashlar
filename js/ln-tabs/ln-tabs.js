@@ -1,5 +1,5 @@
 /* Live Networks - lnTabs (hash-aware tabs via <a href="#key">) */
-import { dispatch, guardBody, findElements } from '../ln-core';
+import { registerComponent, dispatch, findElements } from '../ln-core';
 import { persistGet, persistSet } from '../ln-core';
 
 (function () {
@@ -8,7 +8,6 @@ import { persistGet, persistSet } from '../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined && window[DOM_ATTRIBUTE] !== null) return;
 
-	function constructor(domRoot = document.body) { findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component); }
 
 	function _parseHash() {
 		const h = (location.hash || "").replace("#", "");
@@ -134,27 +133,13 @@ import { persistGet, persistSet } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (const mutation of mutations) {
-					if (mutation.type === 'attributes') {
-						if (mutation.attributeName === 'data-ln-tabs-active' && mutation.target[DOM_ATTRIBUTE]) {
-							const key = mutation.target.getAttribute('data-ln-tabs-active');
-							mutation.target[DOM_ATTRIBUTE]._applyActive(key);
-							continue;
-						}
-						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-						continue;
-					}
-					for (const node of mutation.addedNodes) { findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component); }
-				}
-			});
-			observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR, 'data-ln-tabs-active'] });
-		}, 'ln-tabs');
-	}
+	// ─── Init ──────────────────────────────────────────────────
 
-	_domObserver();
-	window[DOM_ATTRIBUTE] = constructor;
-	constructor(document.body);
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-tabs', {
+		extraAttributes: ['data-ln-tabs-active'],
+		onAttributeChange: function (el) {
+			const key = el.getAttribute('data-ln-tabs-active');
+			el[DOM_ATTRIBUTE]._applyActive(key);
+		}
+	});
 })();

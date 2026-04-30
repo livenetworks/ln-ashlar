@@ -285,9 +285,15 @@ export function getLocale(el) {
 
 // ─── Component Registration ───────────────────────────────
 
-export function registerComponent(selector, attribute, ComponentFn, componentTag) {
+export function registerComponent(selector, attribute, ComponentFn, componentTag, options = {}) {
+	const extraAttributes = options.extraAttributes || [];
+	const onAttributeChange = options.onAttributeChange || null;
+	const onInit = options.onInit || null;
+
 	function constructor(domRoot) {
-		findElements(domRoot, selector, attribute, ComponentFn);
+		const root = domRoot || document.body;
+		findElements(root, selector, attribute, ComponentFn);
+		if (onInit) onInit(root);
 	}
 
 	guardBody(function () {
@@ -299,10 +305,16 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 						const node = mutation.addedNodes[j];
 						if (node.nodeType === 1) {
 							findElements(node, selector, attribute, ComponentFn);
+							if (onInit) onInit(node);
 						}
 					}
 				} else if (mutation.type === 'attributes') {
-					findElements(mutation.target, selector, attribute, ComponentFn);
+					if (onAttributeChange && mutation.target[attribute] && mutation.attributeName === selector) {
+						onAttributeChange(mutation.target, mutation.attributeName);
+					} else {
+						findElements(mutation.target, selector, attribute, ComponentFn);
+						if (onInit) onInit(mutation.target);
+					}
 				}
 			}
 		});
@@ -311,7 +323,7 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 			childList: true,
 			subtree: true,
 			attributes: true,
-			attributeFilter: [selector]
+			attributeFilter: [selector].concat(extraAttributes)
 		});
 	}, componentTag || selector.replace('data-', ''));
 
@@ -327,3 +339,4 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 
 	return constructor;
 }
+
