@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBody, measureHidden, isVisible } from '../ln-core';
+import { dispatch, dispatchCancelable, computePlacement, teleportToBody, measureHidden, isVisible, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-popover';
@@ -29,52 +29,6 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 		if (!escListener) return;
 		document.removeEventListener('keydown', escListener);
 		escListener = null;
-	}
-
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		_findPopovers(domRoot);
-		_attachTriggers(domRoot);
-	}
-
-	function _findPopovers(root) {
-		if (!root || root.nodeType !== 1) return;
-		const items = Array.from(root.querySelectorAll('[' + DOM_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
-			items.push(root);
-		}
-		for (const el of items) {
-			if (!el[DOM_ATTRIBUTE]) {
-				el[DOM_ATTRIBUTE] = new _component(el);
-			}
-		}
-	}
-
-	function _attachTriggers(root) {
-		if (!root || root.nodeType !== 1) return;
-		const triggers = Array.from(root.querySelectorAll('[' + TRIGGER_SELECTOR + ']'));
-		if (root.hasAttribute && root.hasAttribute(TRIGGER_SELECTOR)) {
-			triggers.push(root);
-		}
-		for (const btn of triggers) {
-			if (btn[DOM_ATTRIBUTE + 'Trigger']) continue;
-
-			const popoverId = btn.getAttribute(TRIGGER_SELECTOR);
-			btn.setAttribute('aria-haspopup', 'dialog');
-			btn.setAttribute('aria-expanded', 'false');
-			btn.setAttribute('aria-controls', popoverId);
-
-			const handler = function (e) {
-				if (e.ctrlKey || e.metaKey || e.button === 1) return;
-				e.preventDefault();
-				const target = document.getElementById(popoverId);
-				if (!target || !target[DOM_ATTRIBUTE]) return;
-				target[DOM_ATTRIBUTE].toggle(btn);
-			};
-			btn.addEventListener('click', handler);
-			btn[DOM_ATTRIBUTE + 'Trigger'] = handler;
-		}
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -258,101 +212,77 @@ import { guardBody, dispatch, dispatchCancelable, computePlacement, teleportToBo
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		if (this.isOpen) this._applyClose();
-		const triggers = document.querySelectorAll('[' + TRIGGER_SELECTOR + '="' + this.dom.id + '"]');
-		for (const btn of triggers) {
-			if (btn[DOM_ATTRIBUTE + 'Trigger']) {
-				btn.removeEventListener('click', btn[DOM_ATTRIBUTE + 'Trigger']);
-				delete btn[DOM_ATTRIBUTE + 'Trigger'];
-			}
-		}
+		delete this.dom[DOM_ATTRIBUTE];
 		dispatch(this.dom, 'ln-popover:destroyed', {
 			popoverId: this.dom.id,
 			target: this.dom
 		});
-		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── Attribute Sync ────────────────────────────────────────
+	// ─── Trigger Component ─────────────────────────────────────
 
-	function _syncAttribute(el) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance) return;
+	function _triggerComponent(dom) {
+		this.dom = dom;
+		const popoverId = dom.getAttribute(TRIGGER_SELECTOR);
+		dom.setAttribute('aria-haspopup', 'dialog');
+		dom.setAttribute('aria-expanded', 'false');
+		dom.setAttribute('aria-controls', popoverId);
 
-		const value = el.getAttribute(DOM_SELECTOR);
-		const shouldBeOpen = value === 'open';
-
-		if (shouldBeOpen === instance.isOpen) return;
-
-		if (shouldBeOpen) {
-			const before = dispatchCancelable(el, 'ln-popover:before-open', {
-				popoverId: el.id,
-				target: el,
-				trigger: instance.trigger
-			});
-			if (before.defaultPrevented) {
-				el.setAttribute(DOM_SELECTOR, 'closed');
-				return;
-			}
-			instance._applyOpen(instance.trigger);
-		} else {
-			const before = dispatchCancelable(el, 'ln-popover:before-close', {
-				popoverId: el.id,
-				target: el,
-				trigger: instance.trigger
-			});
-			if (before.defaultPrevented) {
-				el.setAttribute(DOM_SELECTOR, 'open');
-				return;
-			}
-			instance._applyClose();
-		}
+		const self = this;
+		this._onClick = function (e) {
+			if (e.ctrlKey || e.metaKey || e.button === 1) return;
+			e.preventDefault();
+			const target = document.getElementById(popoverId);
+			if (!target || !target[DOM_ATTRIBUTE]) return;
+			target[DOM_ATTRIBUTE].toggle(dom);
+		};
+		dom.addEventListener('click', this._onClick);
+		return this;
 	}
 
-	// ─── DOM Observer ──────────────────────────────────────────
+	_triggerComponent.prototype.destroy = function () {
+		this.dom.removeEventListener('click', this._onClick);
+		delete this.dom[DOM_ATTRIBUTE + 'Trigger'];
+	};
 
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) {
-								_findPopovers(node);
-								_attachTriggers(node);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						if (mutation.attributeName === DOM_SELECTOR && mutation.target[DOM_ATTRIBUTE]) {
-							_syncAttribute(mutation.target);
-						} else {
-							_findPopovers(mutation.target);
-							_attachTriggers(mutation.target);
-						}
-					}
+	// ─── Registration ──────────────────────────────────────────
+
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-popover', {
+		onAttributeChange: function (el) {
+			const instance = el[DOM_ATTRIBUTE];
+			if (!instance) return;
+
+			const value = el.getAttribute(DOM_SELECTOR);
+			const shouldBeOpen = value === 'open';
+
+			if (shouldBeOpen === instance.isOpen) return;
+
+			if (shouldBeOpen) {
+				const before = dispatchCancelable(el, 'ln-popover:before-open', {
+					popoverId: el.id,
+					target: el,
+					trigger: instance.trigger
+				});
+				if (before.defaultPrevented) {
+					el.setAttribute(DOM_SELECTOR, 'closed');
+					return;
 				}
-			});
+				instance._applyOpen(instance.trigger);
+			} else {
+				const before = dispatchCancelable(el, 'ln-popover:before-close', {
+					popoverId: el.id,
+					target: el,
+					trigger: instance.trigger
+				});
+				if (before.defaultPrevented) {
+					el.setAttribute(DOM_SELECTOR, 'open');
+					return;
+				}
+				instance._applyClose();
+			}
+		}
+	});
 
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR, TRIGGER_SELECTOR]
-			});
-		}, 'ln-popover');
-	}
-
-	// ─── Init ──────────────────────────────────────────────────
-
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(TRIGGER_SELECTOR, DOM_ATTRIBUTE + 'Trigger', _triggerComponent, 'ln-popover-trigger');
 })();
+

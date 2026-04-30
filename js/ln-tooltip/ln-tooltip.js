@@ -1,4 +1,4 @@
-import { guardBody, computePlacement, dispatch } from '../ln-core';
+import { computePlacement, dispatch, registerComponent } from '../ln-core';
 
 (function () {
 	const TRIGGER_SELECTOR = 'data-ln-tooltip-enhance';
@@ -112,101 +112,48 @@ import { guardBody, computePlacement, dispatch } from '../ln-core';
 		_removeEscListener();
 	}
 
-	// ─── Trigger attach ────────────────────────────────────────
+	// ─── Component ─────────────────────────────────────────────
 
-	function _attachTrigger(el) {
-		if (el[DOM_ATTRIBUTE]) return;
-		el[DOM_ATTRIBUTE] = true;
+	function _component(el) {
+		this.dom = el;
 
-		const onEnter = function () { _show(el); };
-		const onLeave = function () {
+		const self = this;
+		this._onEnter = function () { _show(el); };
+		this._onLeave = function () {
 			if (activeTrigger === el) _hide();
 		};
-		const onFocus = function () { _show(el); };
-		const onBlur = function () {
+		this._onFocus = function () { _show(el); };
+		this._onBlur = function () {
 			if (activeTrigger === el) _hide();
 		};
 
-		el.addEventListener('mouseenter', onEnter);
-		el.addEventListener('mouseleave', onLeave);
-		el.addEventListener('focus', onFocus, true);
-		el.addEventListener('blur', onBlur, true);
+		el.addEventListener('mouseenter', this._onEnter);
+		el.addEventListener('mouseleave', this._onLeave);
+		el.addEventListener('focus', this._onFocus, true);
+		el.addEventListener('blur', this._onBlur, true);
 
-		// Stash for cleanup if anyone calls destroy.
-		el[DOM_ATTRIBUTE + 'Cleanup'] = function () {
-			el.removeEventListener('mouseenter', onEnter);
-			el.removeEventListener('mouseleave', onLeave);
-			el.removeEventListener('focus', onFocus, true);
-			el.removeEventListener('blur', onBlur, true);
-			if (activeTrigger === el) _hide();
-			delete el[DOM_ATTRIBUTE];
-			delete el[DOM_ATTRIBUTE + 'Cleanup'];
-			delete el[DOM_ATTRIBUTE + 'Uid'];
-			dispatch(el, 'ln-tooltip:destroyed', { trigger: el });
-		};
+		return this;
 	}
 
-	function _findTriggers(root) {
-		if (!root || root.nodeType !== 1) return;
-		// Match elements that are either explicitly opted in (`-enhance`) or
-		// have both `data-ln-tooltip` and `title` (auto-enhance — the CSS
-		// baseline cannot strip `title`, so JS must take over to prevent the
-		// browser's native tooltip leaking alongside the styled one).
-		const items = Array.from(root.querySelectorAll(
-			'[' + TRIGGER_SELECTOR + '], [' + TEXT_ATTR + '][title]'
-		));
-		if (root.hasAttribute && (
-			root.hasAttribute(TRIGGER_SELECTOR) ||
-			(root.hasAttribute(TEXT_ATTR) && root.hasAttribute('title'))
-		)) {
-			items.push(root);
-		}
-		for (const el of items) {
-			_attachTrigger(el);
-		}
-	}
+	_component.prototype.destroy = function () {
+		const el = this.dom;
+		el.removeEventListener('mouseenter', this._onEnter);
+		el.removeEventListener('mouseleave', this._onLeave);
+		el.removeEventListener('focus', this._onFocus, true);
+		el.removeEventListener('blur', this._onBlur, true);
+		if (activeTrigger === el) _hide();
+		delete el[DOM_ATTRIBUTE];
+		delete el[DOM_ATTRIBUTE + 'Uid'];
+		dispatch(el, 'ln-tooltip:destroyed', { trigger: el });
+	};
 
-	function constructor(domRoot) {
-		_findTriggers(domRoot);
-	}
+	// ─── Registration ──────────────────────────────────────────
 
-	// ─── DOM Observer ──────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) _findTriggers(node);
-						}
-					} else if (mutation.type === 'attributes') {
-						_findTriggers(mutation.target);
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [TRIGGER_SELECTOR, TEXT_ATTR]
-			});
-		}, 'ln-tooltip');
-	}
-
-	// ─── Init ──────────────────────────────────────────────────
-
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(
+		'[' + TRIGGER_SELECTOR + '], [' + TEXT_ATTR + '][title]',
+		DOM_ATTRIBUTE,
+		_component,
+		'ln-tooltip'
+	);
 })();
+

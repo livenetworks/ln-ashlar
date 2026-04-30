@@ -199,8 +199,13 @@ export function buildDict(root, selector) {
 
 export function findElements(root, selector, attribute, ComponentClass) {
 	if (root.nodeType !== 1) return;
-	const items = Array.from(root.querySelectorAll('[' + selector + ']'));
-	if (root.hasAttribute && root.hasAttribute(selector)) {
+
+	// Support both simple attribute names and full CSS selectors
+	const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
+	const query = isComplex ? selector : '[' + selector + ']';
+
+	const items = Array.from(root.querySelectorAll(query));
+	if (root.matches && root.matches(query)) {
 		items.push(root);
 	}
 	for (const el of items) {
@@ -309,7 +314,11 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 						}
 					}
 				} else if (mutation.type === 'attributes') {
-					if (onAttributeChange && mutation.target[attribute] && mutation.attributeName === selector) {
+					// If onAttributeChange is provided and it's the main selector attribute, call it.
+					// Note: for complex selectors, we check if the changed attribute is one of the attributes in the selector.
+					const isMainAttr = mutation.attributeName === selector || (selector.indexOf('[' + mutation.attributeName) !== -1);
+
+					if (onAttributeChange && mutation.target[attribute] && isMainAttr) {
 						onAttributeChange(mutation.target, mutation.attributeName);
 					} else {
 						findElements(mutation.target, selector, attribute, ComponentFn);
@@ -319,13 +328,25 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 			}
 		});
 
+		// Extract attribute names from selector for attributeFilter
+		let observedAttributes = [];
+		if (selector.indexOf('[') !== -1) {
+			const re = /\[([\w-]+)/g;
+			let match;
+			while ((match = re.exec(selector)) !== null) {
+				observedAttributes.push(match[1]);
+			}
+		} else {
+			observedAttributes.push(selector);
+		}
+
 		observer.observe(document.body, {
 			childList: true,
 			subtree: true,
 			attributes: true,
-			attributeFilter: [selector].concat(extraAttributes)
+			attributeFilter: observedAttributes.concat(extraAttributes)
 		});
-	}, componentTag || selector.replace('data-', ''));
+	}, componentTag || (selector.indexOf('[') === -1 ? selector.replace('data-', '') : 'component'));
 
 	window[attribute] = constructor;
 
