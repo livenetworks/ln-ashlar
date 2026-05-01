@@ -22,6 +22,8 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -332,6 +334,35 @@
 }</code></pre>
 						</main>
 					</section>
+
+<script>
+	(function () {
+		const target = document.getElementById('demo-custom');
+		const result = document.getElementById('demo-custom-result');
+		if (!target || !result) return;
+
+		target.addEventListener('ln-search:change', function (e) {
+			e.preventDefault();
+			const term = (e.detail && e.detail.term ? e.detail.term : '').toLowerCase();
+			const items = target.querySelectorAll(':scope > li');
+			const total = items.length;
+			let matches = 0;
+			items.forEach(function (li) {
+				const text = li.textContent.toLowerCase();
+				if (term === '' || text.indexOf(term) !== -1) matches++;
+			});
+
+			if (term === '') {
+				result.textContent = 'Type to search...';
+			} else if (matches === 0) {
+				result.textContent = 'No results for "' + term + '"';
+			} else {
+				const word = matches === 1 ? 'match' : 'matches';
+				result.textContent = matches + ' of ' + total + ' ' + word;
+			}
+		});
+	})();
+</script>
 		</section>
 
 		<!-- Footer -->

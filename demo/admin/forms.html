@@ -22,6 +22,8 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -1009,6 +1011,131 @@ form.lnForm.reset();</code></pre>
 				</section>
 
 				</div>
+
+<script>
+(function () {
+	const ts = function () {
+		const d = new Date();
+		const pad = function (n) { return String(n).padStart(2, '0'); };
+		return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+	};
+
+	const appendLog = function (pre, line) {
+		pre.textContent += (pre.textContent ? '\n' : '') + line;
+		pre.scrollTop = pre.scrollHeight;
+	};
+
+	const truncate = function (str, max) {
+		return str.length > max ? str.slice(0, max) + '…' : str;
+	};
+
+	// ─── 1A — Live demo event log ──────────────────────────────
+	const liveForm = document.getElementById('demo-form-grid');
+	const liveLog = document.getElementById('form-log');
+	liveForm.addEventListener('ln-form:submit', function (e) {
+		e.preventDefault();
+		const json = truncate(JSON.stringify(e.detail.data), 200);
+		appendLog(liveLog, '[' + ts() + '] ln-form:submit  data=' + json);
+	});
+
+	// ─── 1B — Auto-submit log ──────────────────────────────────
+	const autoForm = document.getElementById('demo-auto-submit');
+	const autoLog = document.getElementById('auto-submit-log');
+	autoForm.addEventListener('ln-form:submit', function (e) {
+		e.preventDefault();
+		const json = truncate(JSON.stringify(e.detail.data), 200);
+		appendLog(autoLog, '[' + ts() + '] ln-form:submit  data=' + json);
+	});
+
+	// ─── 1C — Fill demo ────────────────────────────────────────
+	const sampleData = {
+		fname: 'Marko',
+		lname: 'Petrovski',
+		email: 'marko@example.com',
+		phone: '+1 555 1234',
+		city: 'Skopje',
+		zip: '1000',
+		country: 'Germany',
+		message: 'Filled via demo coordinator.',
+		confirmed: '1'
+	};
+
+	// Pattern 1 — direct API
+	document.getElementById('demo-fill-api-btn').addEventListener('click', function () {
+		liveForm.lnForm.fill(sampleData);
+	});
+
+	// Pattern 2 — event-based coordinator
+	// Listener simulates the form coordinator: catches a synthetic table row-click
+	// and routes the record into the form via lnForm.fill().
+	document.addEventListener('ln-data-table:row-click', function (e) {
+		liveForm.lnForm.fill(e.detail.record);
+	});
+
+	document.getElementById('demo-fill-coordinator-btn').addEventListener('click', function (e) {
+		// Dispatch from the button itself — no synthetic table needed for the demo.
+		e.currentTarget.dispatchEvent(new CustomEvent('ln-data-table:row-click', {
+			bubbles: true,
+			detail: { record: sampleData }
+		}));
+	});
+
+	// Reset
+	document.getElementById('demo-reset-btn').addEventListener('click', function () {
+		liveForm.lnForm.reset();
+	});
+
+	// ─── 1D — Number formatting raw outputs ────────────────────
+	// ln-number stores the raw value on instance.value (getter reads from
+	// adjacent hidden input that the component creates on init).
+	const numberFields = [
+		{ inputId: 'demo-amount',  outputId: 'demo-amount-raw' },
+		{ inputId: 'demo-price',   outputId: 'demo-price-raw' },
+		{ inputId: 'demo-budget',  outputId: 'demo-budget-raw' },
+		{ inputId: 'demo-qty',     outputId: 'demo-qty-raw' }
+	];
+
+	const writeNumberRaw = function (input, output) {
+		const inst = input.lnNumber;
+		const raw = inst ? inst.value : NaN;
+		output.textContent = isNaN(raw) ? 'Raw: —' : 'Raw: ' + raw;
+	};
+
+	numberFields.forEach(function (pair) {
+		const input = document.getElementById(pair.inputId);
+		const output = document.getElementById(pair.outputId);
+		input.addEventListener('input', function () { writeNumberRaw(input, output); });
+		// Initial paint — ln-number init runs on DOMContentLoaded; inline scripts
+		// in <body> run after parse, but lnNumber may attach in either order.
+		// Defer one tick to guarantee instance is wired (especially for #demo-budget).
+		setTimeout(function () { writeNumberRaw(input, output); }, 0);
+	});
+
+	// ─── 1E — Date formatting raw outputs ──────────────────────
+	// ln-date exposes ISO via instance.value (getter reads from the adjacent
+	// hidden input). Listen for ln-date:change AND input/change for typed edits.
+	const dateFields = [
+		{ inputId: 'demo-birthday',       outputId: 'demo-birthday-raw' },
+		{ inputId: 'demo-due',            outputId: 'demo-due-raw' },
+		{ inputId: 'demo-event',          outputId: 'demo-event-raw' },
+		{ inputId: 'demo-custom-date',    outputId: 'demo-custom-date-raw' },
+		{ inputId: 'demo-prefilled-date', outputId: 'demo-prefilled-date-raw' }
+	];
+
+	const writeDateRaw = function (input, output) {
+		const inst = input.lnDate;
+		const iso = inst ? inst.value : '';
+		output.textContent = iso ? 'Raw: ' + iso : 'Raw: —';
+	};
+
+	dateFields.forEach(function (pair) {
+		const input = document.getElementById(pair.inputId);
+		const output = document.getElementById(pair.outputId);
+		input.addEventListener('ln-date:change', function () { writeDateRaw(input, output); });
+		setTimeout(function () { writeDateRaw(input, output); }, 0);
+	});
+})();
+</script>
 		</section>
 
 		<!-- Footer -->

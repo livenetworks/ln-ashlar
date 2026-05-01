@@ -219,3 +219,44 @@ list.setAttribute('data-ln-sortable', '');
 window.lnSortable(container);</code></pre>
 					</main>
 				</section>
+
+<script>
+	(function () {
+		function pad(n) { return n < 10 ? '0' + n : '' + n; }
+		function stamp() {
+			const d = new Date();
+			return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+		}
+
+		// 5a — toggle status indicator
+		const toggle = document.getElementById('sortable-toggle');
+		const status = document.getElementById('toggle-status');
+		if (toggle && status) {
+			function syncStatus() {
+				const value = toggle.getAttribute('data-ln-sortable');
+				const state = value === 'disabled' ? 'disabled' : 'enabled';
+				status.textContent = 'Status: ' + state;
+			}
+			syncStatus();
+			const observer = new MutationObserver(syncStatus);
+			observer.observe(toggle, { attributes: true, attributeFilter: ['data-ln-sortable'] });
+		}
+
+		// 5b — events log
+		const eventsList = document.getElementById('sortable-events');
+		const log = document.getElementById('sortable-log');
+		const MAX_ENTRIES = 10;
+		if (eventsList && log) {
+			eventsList.addEventListener('ln-sortable:reordered', function (e) {
+				const li = document.createElement('li');
+				const oldIdx = e.detail && typeof e.detail.oldIndex === 'number' ? e.detail.oldIndex : '?';
+				const newIdx = e.detail && typeof e.detail.newIndex === 'number' ? e.detail.newIndex : '?';
+				li.textContent = '[' + stamp() + '] reordered: ' + oldIdx + ' → ' + newIdx;
+				log.insertBefore(li, log.firstChild);
+				while (log.children.length > MAX_ENTRIES) {
+					log.removeChild(log.lastChild);
+				}
+			});
+		}
+	})();
+</script>

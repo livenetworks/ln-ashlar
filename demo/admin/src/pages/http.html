@@ -195,3 +195,92 @@ el.dispatchEvent(new CustomEvent('ln-http:request', {
 });</code></pre>
 						</main>
 					</section>
+
+					<script>
+					(function () {
+						const pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+						const stamp = function () {
+							const d = new Date();
+							return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+						};
+						const log = function (pre, eventName, detail) {
+							const status = detail && typeof detail.status !== 'undefined' ? detail.status : '?';
+							let payload = '';
+							try { payload = JSON.stringify(detail && detail.data); }
+							catch (e) { payload = '[unserializable]'; }
+							if (payload && payload.length > 200) payload = payload.slice(0, 200) + '…';
+							pre.textContent += '[' + stamp() + '] ' + eventName + '  status=' + status + '  ' + payload + '\n';
+							pre.scrollTop = pre.scrollHeight;
+						};
+
+						// GET demo
+						const getRoot = document.getElementById('demo-get');
+						const getBtn = document.getElementById('demo-get-btn');
+						const getLog = document.getElementById('demo-get-log');
+						getBtn.addEventListener('click', function () {
+							getRoot.dispatchEvent(new CustomEvent('ln-http:request', {
+								bubbles: true,
+								detail: { url: '/api/employees', tag: 'list-employees' }
+							}));
+						});
+						getRoot.addEventListener('ln-http:success', function (e) {
+							if (e.detail.tag !== 'list-employees') return;
+							log(getLog, 'ln-http:success', e.detail);
+						});
+						getRoot.addEventListener('ln-http:error', function (e) {
+							if (e.detail.tag !== 'list-employees') return;
+							log(getLog, 'ln-http:error', e.detail);
+						});
+
+						// POST demo
+						const postRoot = document.getElementById('demo-post');
+						const postForm = document.getElementById('demo-http-form');
+						const postLog = document.getElementById('demo-post-log');
+						postForm.addEventListener('submit', function (e) {
+							e.preventDefault();
+							const data = new FormData(postForm);
+							const body = {
+								name: data.get('name'),
+								email: data.get('email'),
+								department: data.get('department')
+							};
+							postRoot.dispatchEvent(new CustomEvent('ln-http:request', {
+								bubbles: true,
+								detail: { url: '/api/employees', method: 'POST', body: body, tag: 'create-employee' }
+							}));
+						});
+						postRoot.addEventListener('ln-http:success', function (e) {
+							if (e.detail.tag !== 'create-employee') return;
+							log(postLog, 'ln-http:success', e.detail);
+						});
+						postRoot.addEventListener('ln-http:error', function (e) {
+							if (e.detail.tag !== 'create-employee') return;
+							log(postLog, 'ln-http:error', e.detail);
+						});
+
+						// Abort demo
+						const abortRoot = document.getElementById('demo-abort');
+						const abortInput = document.getElementById('demo-abort-input');
+						const abortLog = document.getElementById('demo-abort-log');
+						abortInput.addEventListener('input', function () {
+							if (abortInput.value === '') return;
+							abortRoot.dispatchEvent(new CustomEvent('ln-http:request', {
+								bubbles: true,
+								detail: {
+									url: '/api/employees/search',
+									body: { q: abortInput.value },
+									abort: 'employee-search',
+									tag: 'search'
+								}
+							}));
+						});
+						abortRoot.addEventListener('ln-http:success', function (e) {
+							if (e.detail.tag !== 'search') return;
+							log(abortLog, 'ln-http:success', e.detail);
+						});
+						abortRoot.addEventListener('ln-http:error', function (e) {
+							if (e.detail.tag !== 'search') return;
+							log(abortLog, 'ln-http:error', e.detail);
+						});
+					})();
+					</script>

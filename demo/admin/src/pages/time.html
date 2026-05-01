@@ -183,3 +183,167 @@ el.setAttribute('datetime', '1700000000');
 el.setAttribute('data-ln-time', 'date');  // switch mode</code></pre>
 						</main>
 					</section>
+
+<script>
+(function() {
+	const NOW = Math.floor(Date.now() / 1000);
+
+	function escapeHtml(s) {
+		return s
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;');
+	}
+
+	function makeTime(mode, ts, locale) {
+		const t = document.createElement('time');
+		t.setAttribute('data-ln-time', mode);
+		t.setAttribute('datetime', String(ts));
+		if (locale) t.setAttribute('data-ln-time-locale', locale);
+		t.textContent = 'loading…';
+		return t;
+	}
+
+	function appendCell(row, content) {
+		const td = document.createElement('td');
+		if (typeof content === 'string') td.textContent = content;
+		else td.appendChild(content);
+		row.appendChild(td);
+	}
+
+	function appendCellNode(row, node) {
+		const td = document.createElement('td');
+		td.appendChild(node);
+		row.appendChild(td);
+	}
+
+	// ---------- Modes table ----------
+	(function() {
+		const tbody = document.querySelector('#demo-modes-table tbody');
+		const ts = NOW - 3 * 3600;
+		const modes = ['relative', 'short', 'full', 'date', 'time'];
+		modes.forEach(function(mode) {
+			const tr = document.createElement('tr');
+
+			const tdMode = document.createElement('td');
+			const code = document.createElement('code');
+			code.textContent = mode;
+			tdMode.appendChild(code);
+			tr.appendChild(tdMode);
+
+			appendCellNode(tr, makeTime(mode, ts));
+
+			const tdHtml = document.createElement('td');
+			const htmlCode = document.createElement('code');
+			htmlCode.textContent = '<time data-ln-time="' + mode + '" datetime="' + ts + '">';
+			tdHtml.appendChild(htmlCode);
+			tr.appendChild(tdHtml);
+
+			tbody.appendChild(tr);
+		});
+	})();
+
+	// ---------- Relative table ----------
+	(function() {
+		const tbody = document.querySelector('#demo-relative-table tbody');
+		const rows = [
+			{ label: '30 sec ago',  ts: NOW - 30 },
+			{ label: '5 min ago',   ts: NOW - 5 * 60 },
+			{ label: '1 hr ago',    ts: NOW - 3600 },
+			{ label: '3 hr ago',    ts: NOW - 3 * 3600 },
+			{ label: '1 day ago',   ts: NOW - 86400 },
+			{ label: '5 days ago',  ts: NOW - 5 * 86400 },
+			{ label: '1 month ago', ts: NOW - 30 * 86400 },
+		];
+		rows.forEach(function(r) {
+			const tr = document.createElement('tr');
+			appendCell(tr, r.label);
+			appendCellNode(tr, makeTime('relative', r.ts));
+			tbody.appendChild(tr);
+		});
+	})();
+
+	// ---------- Future table ----------
+	(function() {
+		const tbody = document.querySelector('#demo-future-table tbody');
+		const rows = [
+			{ label: 'in 30 sec', ts: NOW + 30 },
+			{ label: 'in 5 min',  ts: NOW + 5 * 60 },
+			{ label: 'in 1 hr',   ts: NOW + 3600 },
+			{ label: 'in 1 day',  ts: NOW + 86400 },
+			{ label: 'in 1 week', ts: NOW + 7 * 86400 },
+		];
+		rows.forEach(function(r) {
+			const tr = document.createElement('tr');
+			appendCell(tr, r.label);
+			appendCellNode(tr, makeTime('relative', r.ts));
+			tbody.appendChild(tr);
+		});
+	})();
+
+	// ---------- Locale table ----------
+	(function() {
+		const tbody = document.querySelector('#demo-locale-table tbody');
+		const ts = NOW - 2 * 86400;
+		const locales = ['en', 'mk', 'de', 'ja'];
+		locales.forEach(function(locale) {
+			const tr = document.createElement('tr');
+
+			const tdLocale = document.createElement('td');
+			const code = document.createElement('code');
+			code.textContent = locale;
+			tdLocale.appendChild(code);
+			tr.appendChild(tdLocale);
+
+			appendCellNode(tr, makeTime('full', ts, locale));
+			appendCellNode(tr, makeTime('relative', ts, locale));
+
+			tbody.appendChild(tr);
+		});
+	})();
+
+	// ---------- Dynamic insertion ----------
+	(function() {
+		const target = document.getElementById('demo-dynamic-target');
+		const btn = document.getElementById('demo-dynamic-btn');
+		btn.addEventListener('click', function() {
+			const now = Math.floor(Date.now() / 1000);
+			const d = new Date();
+			const hh = String(d.getHours()).padStart(2, '0');
+			const mm = String(d.getMinutes()).padStart(2, '0');
+			const ss = String(d.getSeconds()).padStart(2, '0');
+
+			const p = document.createElement('p');
+			p.appendChild(document.createTextNode('Inserted at ' + hh + ':' + mm + ':' + ss + ' — '));
+			const t = document.createElement('time');
+			t.setAttribute('data-ln-time', 'relative');
+			t.setAttribute('datetime', String(now));
+			t.textContent = 'just now';
+			p.appendChild(t);
+			target.appendChild(p);
+		});
+	})();
+
+	// ---------- Reactive section ----------
+	(function() {
+		const reactive = document.getElementById('demo-reactive');
+		const tsBtn = document.getElementById('demo-reactive-ts');
+		const modeBtn = document.getElementById('demo-reactive-mode');
+		const modes = ['relative', 'short', 'full', 'date', 'time'];
+		let modeIndex = 2; // starts at 'full' on page
+
+		tsBtn.addEventListener('click', function() {
+			const now = Math.floor(Date.now() / 1000);
+			const range = 14 * 86400; // 14-day window
+			const offset = Math.floor(Math.random() * range) - 7 * 86400;
+			reactive.setAttribute('datetime', String(now + offset));
+		});
+
+		modeBtn.addEventListener('click', function() {
+			modeIndex = (modeIndex + 1) % modes.length;
+			reactive.setAttribute('data-ln-time', modes[modeIndex]);
+		});
+	})();
+})();
+</script>

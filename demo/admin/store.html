@@ -22,6 +22,8 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -384,6 +386,145 @@ window.lnStore.init(el)                // manual init</code></pre>
 					<p>For a live CRUD wiring example with table + create/edit modal + 409-conflict handling, see <a href="store-usecase.html">Store — Usecase</a>.</p>
 						</main>
 					</section>
+
+<script>
+(function() {
+	const state = {
+		records: [],
+		nextId: 1,
+		isLoaded: false,
+		isSyncing: false,
+	};
+
+	const isLoadedEl = document.getElementById('demo-is-loaded');
+	const totalCountEl = document.getElementById('demo-total-count');
+	const isSyncingEl = document.getElementById('demo-is-syncing');
+	const recordsEl = document.getElementById('demo-records');
+	const logEl = document.getElementById('demo-event-log');
+	const createBtn = document.getElementById('demo-create');
+	const updateBtn = document.getElementById('demo-update');
+	const deleteBtn = document.getElementById('demo-delete');
+	const clearLogBtn = document.getElementById('demo-clear-log');
+
+	function pad(n) {
+		return String(n).padStart(2, '0');
+	}
+
+	function timestamp() {
+		const now = new Date();
+		return pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+	}
+
+	function log(eventName, detail) {
+		const json = JSON.stringify(detail);
+		const truncated = json.length > 100 ? json.substring(0, 100) : json;
+		const line = '[' + timestamp() + '] ' + eventName + '  ' + truncated + '\n';
+		logEl.appendChild(document.createTextNode(line));
+		logEl.scrollTop = logEl.scrollHeight;
+	}
+
+	function logWarn(message) {
+		const line = '[' + timestamp() + '] WARN  ' + message + '\n';
+		logEl.appendChild(document.createTextNode(line));
+		logEl.scrollTop = logEl.scrollHeight;
+	}
+
+	function renderState() {
+		isLoadedEl.textContent = String(state.isLoaded);
+		totalCountEl.textContent = String(state.records.length);
+		isSyncingEl.textContent = String(state.isSyncing);
+	}
+
+	function renderRecords() {
+		recordsEl.replaceChildren();
+		if (state.records.length === 0) {
+			const li = document.createElement('li');
+			const em = document.createElement('em');
+			em.textContent = '(no records)';
+			li.appendChild(em);
+			recordsEl.appendChild(li);
+			return;
+		}
+		state.records.forEach(function(record) {
+			const li = document.createElement('li');
+			li.textContent = '#' + record.id + ' — ' + record.title + ' (' + record.status + ', v' + record.version + ')';
+			recordsEl.appendChild(li);
+		});
+	}
+
+	function dispatchMock(eventName, detail) {
+		document.dispatchEvent(new CustomEvent(eventName, { detail: detail, bubbles: true }));
+		log(eventName, detail);
+	}
+
+	createBtn.addEventListener('click', function() {
+		const id = state.nextId++;
+		const record = { id: id, title: 'New record #' + id, status: 'Draft', version: 1 };
+		state.records.push(record);
+		dispatchMock('ln-store:created', { tempId: id, record: record });
+		renderRecords();
+		renderState();
+		setTimeout(function() {
+			dispatchMock('ln-store:confirmed', { record: record, action: 'create' });
+		}, 300);
+	});
+
+	updateBtn.addEventListener('click', function() {
+		if (state.records.length === 0) {
+			logWarn('No records to update');
+			return;
+		}
+		const record = state.records[0];
+		const previous = { id: record.id, title: record.title, status: record.status, version: record.version };
+		record.version += 1;
+		record.title += ' (edited)';
+		dispatchMock('ln-store:updated', { record: record, previous: previous });
+		renderRecords();
+		setTimeout(function() {
+			dispatchMock('ln-store:confirmed', { record: record, action: 'update' });
+		}, 300);
+	});
+
+	deleteBtn.addEventListener('click', function() {
+		if (state.records.length === 0) {
+			logWarn('No records to delete');
+			return;
+		}
+		const removed = state.records.shift();
+		dispatchMock('ln-store:deleted', { id: removed.id });
+		renderRecords();
+		renderState();
+		setTimeout(function() {
+			dispatchMock('ln-store:confirmed', { id: removed.id, action: 'delete' });
+		}, 300);
+	});
+
+	clearLogBtn.addEventListener('click', function() {
+		logEl.replaceChildren();
+	});
+
+	// Initial mock load
+	state.isSyncing = true;
+	renderState();
+	renderRecords();
+	dispatchMock('ln-store:syncing', { store: 'demo' });
+
+	setTimeout(function() {
+		const seed = [
+			{ id: state.nextId++, title: 'ISO 27001 Policy', status: 'Approved', version: 1 },
+			{ id: state.nextId++, title: 'Risk Assessment', status: 'Draft', version: 1 },
+			{ id: state.nextId++, title: 'Access Control', status: 'Approved', version: 1 },
+		];
+		state.records = seed;
+		state.isLoaded = true;
+		state.isSyncing = false;
+		dispatchMock('ln-store:loaded', { count: seed.length });
+		dispatchMock('ln-store:ready', { count: seed.length, source: 'server' });
+		renderRecords();
+		renderState();
+	}, 400);
+})();
+</script>
 		</section>
 
 		<!-- Footer -->

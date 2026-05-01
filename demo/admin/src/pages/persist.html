@@ -275,8 +275,8 @@
 						<p>Inspect and clear all <code>ln:*</code> localStorage keys written by persist integrations on this page.</p>
 
 						<p>
-							<button type="button" onclick="showPersistKeys()">Show localStorage</button>
-							<button type="button" onclick="clearAllPersistKeys()">Clear all persisted state</button>
+							<button type="button" id="show-persist-keys-btn">Show localStorage</button>
+							<button type="button" id="clear-persist-keys-btn">Clear all persisted state</button>
 						</p>
 
 						<pre id="persist-debug-output">(click "Show localStorage" to inspect)</pre>
@@ -299,3 +299,40 @@
 						</article>
 					</main>
 				</section>
+
+<script>
+(function () {
+	const showBtn = document.getElementById('show-persist-keys-btn');
+	const clearBtn = document.getElementById('clear-persist-keys-btn');
+	const output = document.getElementById('persist-debug-output');
+	if (!showBtn || !clearBtn || !output) return;
+
+	function collectKeys() {
+		const keys = [];
+		for (let i = 0; i < localStorage.length; i++) {
+			const key = localStorage.key(i);
+			if (key && key.startsWith('ln:')) keys.push(key);
+		}
+		keys.sort();
+		return keys;
+	}
+
+	showBtn.addEventListener('click', function () {
+		const keys = collectKeys();
+		if (keys.length === 0) {
+			output.textContent = '(no ln:* keys yet — interact with the toggles/tabs/filter above first)';
+			return;
+		}
+		const lines = keys.map(function (key) {
+			return key + ': ' + localStorage.getItem(key);
+		});
+		output.textContent = lines.join('\n');
+	});
+
+	clearBtn.addEventListener('click', function () {
+		const keys = collectKeys();
+		keys.forEach(function (key) { localStorage.removeItem(key); });
+		output.textContent = 'Cleared ' + keys.length + ' keys. Refresh the page to see the demos reset.';
+	});
+})();
+</script>

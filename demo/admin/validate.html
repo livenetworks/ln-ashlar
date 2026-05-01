@@ -22,6 +22,8 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -421,6 +423,89 @@ input.lnValidate.isValid;     // Boolean getter</code></pre>
 &lt;/div&gt;</code></pre>
 						</main>
 					</section>
+
+<script>
+(function () {
+	const ts = function () {
+		const d = new Date();
+		const pad = function (n) { return String(n).padStart(2, '0'); };
+		return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+	};
+
+	const appendLog = function (pre, line) {
+		pre.textContent += (pre.textContent ? '\n' : '') + line;
+		pre.scrollTop = pre.scrollHeight;
+	};
+
+	// ─── 2A — Custom validation (password confirmation) ────────
+	const pass = document.getElementById('demo-pass');
+	const passConfirm = document.getElementById('demo-pass-confirm');
+
+	const evaluateMatch = function () {
+		const a = pass.value;
+		const b = passConfirm.value;
+		if (a !== '' && b !== '' && a !== b) {
+			passConfirm.dispatchEvent(new CustomEvent('ln-validate:set-custom', {
+				bubbles: true,
+				detail: { error: 'passwordMismatch' }
+			}));
+		} else {
+			passConfirm.dispatchEvent(new CustomEvent('ln-validate:clear-custom', {
+				bubbles: true,
+				detail: { error: 'passwordMismatch' }
+			}));
+		}
+	};
+
+	pass.addEventListener('input', evaluateMatch);
+	passConfirm.addEventListener('input', evaluateMatch);
+
+	// ─── 2B — Programmatic API buttons ─────────────────────────
+	const allInputs = function () {
+		return document.querySelectorAll('[data-ln-validate]');
+	};
+
+	document.getElementById('demo-force-validate').addEventListener('click', function () {
+		allInputs().forEach(function (input) {
+			if (input.lnValidate) input.lnValidate.validate();
+		});
+	});
+
+	document.getElementById('demo-reset-validate').addEventListener('click', function () {
+		allInputs().forEach(function (input) {
+			if (input.lnValidate) input.lnValidate.reset();
+		});
+	});
+
+	document.getElementById('demo-check-valid').addEventListener('click', function () {
+		let validCount = 0;
+		let invalidCount = 0;
+		allInputs().forEach(function (input) {
+			if (!input.lnValidate) return;
+			if (input.lnValidate.isValid === true) validCount++;
+			else invalidCount++;
+		});
+		window.lnToast.enqueue({
+			type: 'info',
+			title: 'Validity check',
+			message: validCount + ' valid, ' + invalidCount + ' invalid'
+		});
+	});
+
+	// ─── 2C — Event log ────────────────────────────────────────
+	const log = document.getElementById('validate-log');
+
+	const onValidateEvent = function (e) {
+		const target = e.target;
+		const targetLabel = target.id || target.name || '?';
+		const field = (e.detail && e.detail.field) || 'unknown';
+		appendLog(log, '[' + ts() + '] ' + e.type + '  field=' + field + '  target=' + targetLabel);
+	};
+
+	document.addEventListener('ln-validate:valid', onValidateEvent);
+	document.addEventListener('ln-validate:invalid', onValidateEvent);
+})();
+</script>
 		</section>
 
 		<!-- Footer -->

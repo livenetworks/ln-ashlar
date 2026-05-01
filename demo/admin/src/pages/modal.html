@@ -352,3 +352,29 @@ document.addEventListener('ln-modal:close', function(e) {
 &lt;/script&gt;</code></pre>
 			</main>
 		</section>
+
+<script>
+	(function () {
+		const log = document.getElementById('modal-event-log');
+		if (!log) return;
+		const events = [];
+		const TARGET_ID = 'demo-events';
+		const NAMES = ['ln-modal:before-open', 'ln-modal:open', 'ln-modal:before-close', 'ln-modal:close'];
+		function pad(n) { return n < 10 ? '0' + n : '' + n; }
+		function stamp() {
+			const d = new Date();
+			return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+		}
+		function record(eventName) {
+			events.push('[' + stamp() + '] ' + eventName);
+			if (events.length > 5) events.splice(0, events.length - 5);
+			log.textContent = events.join('\n');
+		}
+		NAMES.forEach(function (name) {
+			document.addEventListener(name, function (e) {
+				if (!e.detail || e.detail.modalId !== TARGET_ID) return;
+				record(name);
+			});
+		});
+	})();
+</script>

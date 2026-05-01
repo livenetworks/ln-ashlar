@@ -182,3 +182,41 @@ document.addEventListener('ln-external-links:processed', function(e) {
 			</footer>
 		</form>
 	</div>
+
+<script>
+(function () {
+	const demo = document.getElementById('external-links-demo');
+	const modal = document.getElementById('external-link-modal');
+	const urlEl = document.getElementById('external-link-url');
+	const confirmBtn = document.getElementById('external-link-confirm');
+	if (!demo || !modal || !urlEl || !confirmBtn) return;
+
+	let pendingUrl = null;
+
+	demo.addEventListener('click', function (e) {
+		const link = e.target.closest('a[target="_blank"]');
+		if (!link) return;
+		if (e.ctrlKey || e.metaKey || e.button === 1) return;
+		e.preventDefault();
+		pendingUrl = link.href;
+		urlEl.textContent = pendingUrl;
+		if (modal.lnModal && modal.lnModal.open) {
+			modal.lnModal.open();
+		} else {
+			modal.setAttribute('data-ln-modal', 'open');
+		}
+	});
+
+	confirmBtn.addEventListener('click', function () {
+		if (pendingUrl) {
+			window.open(pendingUrl, '_blank', 'noopener,noreferrer');
+		}
+		if (modal.lnModal && modal.lnModal.close) {
+			modal.lnModal.close();
+		} else {
+			modal.setAttribute('data-ln-modal', 'close');
+		}
+		pendingUrl = null;
+	});
+})();
+</script>

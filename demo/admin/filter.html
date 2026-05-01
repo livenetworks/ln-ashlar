@@ -22,6 +22,8 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -484,6 +486,30 @@ document.addEventListener('ln-filter:reset', function (e) {
 }</code></pre>
 					</main>
 				</section>
+
+<script>
+	(function () {
+		const status = document.getElementById('api-filter-status');
+		const nav = document.getElementById('api-filter-nav');
+		if (!status || !nav) return;
+
+		document.addEventListener('ln-filter:changed', function (e) {
+			if (e.target !== nav) return;
+			const key = e.detail && e.detail.key ? e.detail.key : '';
+			const values = e.detail && Array.isArray(e.detail.values) ? e.detail.values : [];
+			if (!key || values.length === 0) {
+				status.textContent = 'Active filter: none';
+			} else {
+				status.textContent = 'Active filter: ' + key + ' = ' + values.join(', ');
+			}
+		});
+
+		document.addEventListener('ln-filter:reset', function (e) {
+			if (e.target !== nav) return;
+			status.textContent = 'Active filter: none';
+		});
+	})();
+</script>
 		</section>
 
 		<!-- Footer -->

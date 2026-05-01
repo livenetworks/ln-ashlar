@@ -1,5 +1,13 @@
 <!-- ln-page: title="Autoresize — ln-ashlar" h1="Autoresize" -->
 
+<style>
+	#demo-maxheight textarea {
+		resize: none;
+		max-height: 6rem;
+		overflow-y: auto;
+	}
+</style>
+
 					<h1>Autoresize</h1>
 					<p>Auto-expanding textarea — grows with content, scrolls after max height.</p>
 
@@ -45,7 +53,7 @@
 					<section class="section-card" id="demo-maxheight">
 						<header><h3>Example — Max Height with Scroll</h3></header>
 						<main>
-							<p>Pair <code>data-ln-autoresize</code> with CSS <code>max-height</code> and <code>overflow-y: auto</code> to cap growth and enable scroll. The <code>&lt;style&gt;</code> in this page's <code>&lt;head&gt;</code> scopes the rule to <code>#demo-maxheight textarea</code>.</p>
+							<p>Pair <code>data-ln-autoresize</code> with CSS <code>max-height</code> and <code>overflow-y: auto</code> to cap growth and enable scroll. The <code>&lt;style&gt;</code> block at the top of this page scopes the rule to <code>#demo-maxheight textarea</code>.</p>
 							<div class="form-element">
 								<label for="demo-capped">Capped textarea (max 6rem)</label>
 								<textarea id="demo-capped" data-ln-autoresize rows="1" placeholder="Keep typing — it stops growing at 6rem and scrolls instead…"></textarea>
@@ -103,3 +111,19 @@ el.lnAutoresize.destroy();  // remove listener, reset height</code></pre>
 							<div id="demo-dynamic-container"></div>
 						</main>
 					</section>
+
+<script>
+	(function () {
+		const button = document.getElementById('demo-add-textarea');
+		const container = document.getElementById('demo-dynamic-container');
+		if (!button || !container) return;
+
+		button.addEventListener('click', function () {
+			const ta = document.createElement('textarea');
+			ta.setAttribute('data-ln-autoresize', '');
+			ta.setAttribute('rows', '1');
+			ta.setAttribute('placeholder', 'Dynamically inserted...');
+			container.appendChild(ta);
+		});
+	})();
+</script>
