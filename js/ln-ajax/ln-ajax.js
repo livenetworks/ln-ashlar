@@ -192,6 +192,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 			});
 	}
 
+	// Local findElements — intentional divergence from ln-core helper: returns { links, forms } partition, not per-element constructors.
 	function findElements(domRoot) {
 		const items = { links: [], forms: [] };
 

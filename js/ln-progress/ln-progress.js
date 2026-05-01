@@ -15,6 +15,7 @@ import { dispatch, guardBody } from '../ln-core';
 		findElements(domRoot);
 	}
 
+	// Local findElements — intentional divergence from ln-core helper: filters by _isBar (non-empty data-ln-progress).
 	function findElements(domRoot) {
 		const items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
 

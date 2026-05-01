@@ -15,6 +15,7 @@ import { persistGet, persistSet } from '../ln-core';
 		findElements(domRoot);
 	}
 
+	// Local findElements — intentional divergence from ln-core helper: tag selector ('table') + two-arg constructor (table, ths).
 	function findElements(root) {
 		const tables = Array.from(root.querySelectorAll('table'));
 		if (root.tagName === 'TABLE') tables.push(root);

@@ -1,5 +1,5 @@
 /* Live Networks - lnTabs (hash-aware tabs via <a href="#key">) */
-import { registerComponent, dispatch, findElements } from '../ln-core';
+import { registerComponent, dispatch } from '../ln-core';
 import { persistGet, persistSet } from '../ln-core';
 
 (function () {
