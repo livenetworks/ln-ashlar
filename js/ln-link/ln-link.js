@@ -128,6 +128,7 @@ import { dispatchCancelable, guardBody } from '../ln-core';
 
 	// ─── Find & Init ───────────────────────────────────────────
 
+	// Local findElements — intentional divergence from ln-core helper: invokes _initContainer (function, flag-based) and processes child rows.
 	function findElements(root) {
 		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) {
 			_initContainer(root);

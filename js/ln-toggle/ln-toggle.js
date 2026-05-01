@@ -1,4 +1,4 @@
-import { registerComponent, dispatch, dispatchCancelable, findElements } from '../ln-core';
+import { registerComponent, dispatch, dispatchCancelable } from '../ln-core';
 import { persistGet, persistSet } from '../ln-core';
 
 (function () {

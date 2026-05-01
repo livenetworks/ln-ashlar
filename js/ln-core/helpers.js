@@ -360,4 +360,3 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 
 	return constructor;
 }
-
