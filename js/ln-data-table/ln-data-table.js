@@ -43,6 +43,14 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		this._lastTotal = 0;
 		this._lastFiltered = 0;
 
+		// Column filter options cache — grows additively; never shrinks on filtered payloads
+		this._filterOptions = {};
+		this._filterableFields = this.ths
+			.filter(function (th) {
+				return th.getAttribute('data-ln-col') && th.querySelector('[data-ln-col-filter]');
+			})
+			.map(function (th) { return th.getAttribute('data-ln-col'); });
+
 		// Virtual scroll state
 		this._virtual = false;
 		this._rowHeight = 0;
@@ -84,6 +92,8 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 			self.totalCount = self._lastTotal;
 			self.visibleCount = self._lastFiltered;
 			self.isLoaded = true;
+
+			self._updateFilterOptions(detail.filterOptions);
 
 			// Invalidate virtual-scroll window cache: data changed, so the
 			// cached startRow/endRow in _renderVirtual no longer reflect
@@ -613,21 +623,46 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		this._requestData();
 	};
 
-	_component.prototype._getUniqueValues = function (field) {
-		const seen = {};
-		const result = [];
-		const data = this._data;
-
-		for (let i = 0; i < data.length; i++) {
-			const val = data[i][field];
-			if (val != null && !seen[val]) {
-				seen[val] = true;
-				result.push(String(val));
+	_component.prototype._updateFilterOptions = function (authoritative) {
+		if (authoritative !== null && typeof authoritative === 'object' && !Array.isArray(authoritative)) {
+			// Coordinator-supplied authoritative values — replace per-field
+			const keys = Object.keys(authoritative);
+			for (let i = 0; i < keys.length; i++) {
+				const field = keys[i];
+				const vals = authoritative[field];
+				if (!Array.isArray(vals)) continue;
+				const seen = {};
+				const unique = [];
+				for (let j = 0; j < vals.length; j++) {
+					const s = String(vals[j]);
+					if (!seen[s]) { seen[s] = true; unique.push(s); }
+				}
+				this._filterOptions[field] = unique.sort();
+			}
+		} else {
+			// Auto-derive from current payload — additive merge only
+			const fields = this._filterableFields;
+			const data = this._data;
+			for (let fi = 0; fi < fields.length; fi++) {
+				const field = fields[fi];
+				if (!this._filterOptions[field]) this._filterOptions[field] = [];
+				const existing = this._filterOptions[field];
+				const seen = {};
+				for (let k = 0; k < existing.length; k++) { seen[existing[k]] = true; }
+				for (let i = 0; i < data.length; i++) {
+					const val = data[i][field];
+					if (val != null) {
+						const s = String(val);
+						if (!seen[s]) { seen[s] = true; existing.push(s); }
+					}
+				}
+				existing.sort();
 			}
 		}
+	};
 
-		result.sort();
-		return result;
+	_component.prototype._getUniqueValues = function (field) {
+		return (this._filterOptions[field] || []).slice().sort();
 	};
 
 	_component.prototype._updateFilterIndicators = function () {

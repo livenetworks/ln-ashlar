@@ -61,7 +61,7 @@ Canonical HTML:
             <span>© 2026 Acme</span>
             <span>v1.3.0</span>
         </footer>
-        <div class="app-scrim" data-ln-scrim></div>
+        <div class="app-scrim"></div>
     </main>
 </div>
 ```
@@ -88,7 +88,7 @@ drop-in use. Projects can use semantic selectors:
 | `@mixin app-header` | Fixed top bar — header-height, logical padding/bg/border/shadow, flex row with default ghost buttons |
 | `@mixin app-main` | Offset-top main column, sidebar-open padding shift, `> section` content recipe |
 | `@mixin sidebar-drawer` | Drawer positioning + open/close transform (layered over `@include sidebar`) |
-| `@mixin app-scrim` | Mobile-only overlay, opacity transition on `data-ln-scrim-active` |
+| `@mixin app-scrim` | Mobile-only overlay, activates via sibling combinator on `aside[data-ln-toggle="open"]` |
 | `@mixin app-footer` | Bottom chrome bar — flex, muted color, two-span pattern |
 
 ### `@mixin app-header` — ghost buttons by default
@@ -111,6 +111,27 @@ This makes icon-only triggers (menu toggle, search, notification
 bell, avatar trigger) look correct out of the box. Variants that need
 bordered buttons (e.g. `app-header-actions`) re-bind `--btn-border`
 and `--padding-*` on top of this default.
+
+### `@mixin app-scrim` — sidebar-driven activation
+
+The scrim has no JS wiring of its own. Visibility is driven by a
+sibling combinator against the sidebar's toggle state:
+
+```scss
+aside[data-ln-toggle="open"] ~ & {
+    opacity: 1;
+    pointer-events: auto;
+}
+```
+
+This relies on the scrim being a later sibling of `<aside>` inside
+`<main class="app-main">` — which the documented HTML structure
+guarantees. The `data-ln-toggle` attribute is owned by the
+`ln-toggle` JS component, so the scrim reacts to whatever drives
+the sidebar (menu button, ESC handler, link click).
+
+There is no `data-ln-scrim` attribute. The scrim is selected by
+class alone. On `mq-up(md)` it is `display: none`.
 
 ### `@mixin app-main` — sidebar-open content shift
 
