@@ -27,7 +27,7 @@
 //       <aside class="app-sidebar" id="…" data-ln-toggle="open">…</aside>
 //       <section>…content…</section>
 //       <footer class="app-footer">…</footer>
-//       <div class="app-scrim" data-ln-scrim></div>
+//       <div class="app-scrim"></div>
 //     </main>
 //   </div>
 //
@@ -249,7 +249,10 @@
 		transition: opacity var(--transition);
 	}
 
-	&[data-ln-scrim-active] {
+	// State-driven via sibling combinator — no JS wiring needed.
+	// The scrim reacts to the sidebar drawer's existing toggle attribute,
+	// which is owned by the ln-toggle JS component.
+	aside[data-ln-toggle="open"] ~ & {
 		opacity: 1;
 		pointer-events: auto;
 	}

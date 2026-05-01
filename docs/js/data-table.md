@@ -93,7 +93,7 @@ All events dispatch on the `[data-ln-data-table]` element and bubble.
 
 | Event | When | `detail` |
 |-------|------|----------|
-| `ln-data-table:set-data` | Feed data to render | `{ data: [], total, filtered }` |
+| `ln-data-table:set-data` | Feed data to render | `{ data: [], total, filtered, filterOptions? }` |
 | `ln-data-table:set-loading` | Toggle loading state | `{ loading: Boolean }` |
 
 ## Data Flow — Coordinator Pattern
@@ -146,7 +146,15 @@ For each record in `data`:
 
 ## Column Filter Dropdown
 
-Clicking `[data-ln-col-filter]` clones the `column-filter` template and populates it with unique values from the current dataset for that column. Checkboxes allow multi-select. A search input filters the list (hidden when ≤8 unique values).
+Clicking `[data-ln-col-filter]` clones the `column-filter` template and populates it with unique values for that column. Checkboxes allow multi-select. A search input filters the list (hidden when ≤8 unique values).
+
+### Filter options cache
+
+The component maintains a `_filterOptions` cache (`{ [field]: string[] }`) that only grows — values seen in any prior payload stay available even after filtering reduces the visible rows.
+
+**Authoritative path** — Pass `filterOptions: { department: ['IT', 'Finance', ...], status: [...] }` in the `set-data` detail. The component replaces the cache for each provided field. Coordinator computes once (e.g. from the unfiltered source) and includes on every `set-data` dispatch.
+
+**Auto-fallback** — When `filterOptions` is absent, the component additively merges unique non-null values from the current payload into the cache for each filterable column (any `<th>` that has both `data-ln-col` and a `[data-ln-col-filter]` descendant). The first unfiltered response seeds the full option list; subsequent filtered responses only add new values, never remove existing ones.
 
 ## Virtual Scroll
 

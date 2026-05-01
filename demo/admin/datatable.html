@@ -143,6 +143,7 @@
 						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
 						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
 						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><span class="nav-label">Store — Usecase</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
 						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
 						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
@@ -159,7 +160,7 @@
 				<small>ashlar-gui v1.2.0</small>
 			</footer>
 		</aside>
-		<div class="app-scrim" data-ln-scrim></div>
+		<div class="app-scrim"></div>
 
 		<!-- Content -->
 		<section>
@@ -371,6 +372,12 @@
 		});
 	}
 
+	// Authoritative filter options — computed once from the full source dataset
+	var allFilterOptions = {
+		department: departments.slice().sort(),
+		status: statusList.slice().sort()
+	};
+
 	document.addEventListener('ln-data-table:request-data', function (e) {
 		if (e.detail.table !== 'demo-docs') return;
 		var sort = e.detail.sort;
@@ -416,7 +423,8 @@
 			detail: {
 				data: result,
 				total: allData.length,
-				filtered: result.length
+				filtered: result.length,
+				filterOptions: allFilterOptions
 			}
 		}));
 	});

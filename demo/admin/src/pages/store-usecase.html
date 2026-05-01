@@ -1,0 +1,506 @@
+<!-- ln-page: title="Store — Usecase | ln-ashlar" h1="Store — Usecase" -->
+
+<!-- (a) Mock backend MUST install before any [data-ln-store] element is parsed below. -->
+<script>
+(function () {
+	const STORAGE_KEY = 'ln-mock-documents';
+	const ENDPOINT = '/api/documents';
+	const realFetch = window.fetch.bind(window);
+
+	const departments = ['IT', 'Finance', 'Legal', 'Marketing', 'HR', 'Operations'];
+	const statuses    = ['Draft', 'Pending', 'Approved', 'Archived'];
+
+	function nowSec() { return Math.floor(Date.now() / 1000); }
+	function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+	function load() {
+		try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || []; }
+		catch (_) { return []; }
+	}
+	function save(records) { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+	function nextId(records) {
+		let max = 0;
+		for (let i = 0; i < records.length; i++) if (records[i].id > max) max = records[i].id;
+		return max + 1;
+	}
+
+	function seed() {
+		const t0 = nowSec() - 60 * 60 * 24 * 30; // 30 days ago
+		const out = [];
+		const titles = [
+			'ISO 27001 Policy', 'Risk Assessment 2025', 'Access Control Matrix',
+			'Data Protection Notice', 'Business Continuity Plan', 'Incident Response Runbook',
+			'Vendor Security Review', 'Compliance Quarterly Report', 'Network Topology Doc',
+			'Onboarding User Guide', 'Security Awareness Training', 'Vendor MSA',
+			'Privacy Policy v3', 'Production SLA', 'Change Request Template',
+			'Release Notes — Q1', 'Backup Recovery Procedure', 'Penetration Test Report',
+			'Architecture Decision Record', 'API Authentication Spec',
+			'Logging Standard', 'GDPR DPIA', 'Software Bill of Materials',
+			'Disaster Recovery Test', 'Vendor Risk Scorecard'
+		];
+		for (let i = 0; i < titles.length; i++) {
+			const t = t0 + i * 60 * 60 * 6 + Math.floor(Math.random() * 3600);
+			out.push({
+				id: i + 1,
+				title: titles[i],
+				department: rand(departments),
+				status: rand(statuses),
+				created_at: t,
+				updated_at: t
+			});
+		}
+		save(out);
+		return out;
+	}
+
+	function getRecords() {
+		let r = load();
+		if (r.length === 0) r = seed();
+		return r;
+	}
+
+	// Toggle state — read live from DOM each call so user can flip mid-session
+	function $sim(id) { const el = document.getElementById(id); return el && el.checked; }
+
+	function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+	function jsonResponse(body, status) {
+		return new Response(JSON.stringify(body), {
+			status: status || 200,
+			headers: { 'Content-Type': 'application/json' }
+		});
+	}
+
+	async function handle(input, init) {
+		// Optional latency
+		if ($sim('sim-latency')) await delay(600);
+
+		const url = typeof input === 'string' ? input : input.url;
+		const u = new URL(url, window.location.origin);
+		const method = (init && init.method) || (typeof input !== 'string' && input.method) || 'GET';
+		const path = u.pathname;
+		const records = getRecords();
+
+		// GET /api/documents (full or delta)
+		if (path === ENDPOINT && method === 'GET') {
+			const since = u.searchParams.get('since');
+			if (since != null) {
+				const sinceN = Number(since);
+				const upserted = records.filter((r) => r.updated_at > sinceN);
+				return jsonResponse({ data: upserted, deleted: [], synced_at: nowSec() });
+			}
+			return jsonResponse({ data: records, synced_at: nowSec() });
+		}
+
+		// POST /api/documents (create)
+		if (path === ENDPOINT && method === 'POST') {
+			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
+			const data = JSON.parse(init.body || '{}');
+			const t = nowSec();
+			const rec = Object.assign({}, data, {
+				id: nextId(records),
+				created_at: t,
+				updated_at: t
+			});
+			records.push(rec);
+			save(records);
+			return jsonResponse(rec); // BARE record — store reads response.json() directly
+		}
+
+		// PUT /api/documents/:id (update)
+		const putMatch = path.match(/^\/api\/documents\/(\d+)$/);
+		if (putMatch && method === 'PUT') {
+			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
+			const id = Number(putMatch[1]);
+			const idx = records.findIndex((r) => r.id === id);
+			if (idx === -1) return jsonResponse({ error: 'not found' }, 404);
+			const body = JSON.parse(init.body || '{}');
+			const expected = body.expected_version;
+			delete body.expected_version;
+			const stored = records[idx];
+
+			// Conflict check — only if caller passed expected_version AND sim-conflict on
+			if (expected != null && $sim('sim-conflict') && Math.random() < 0.10) {
+				// Bump stored.updated_at to simulate that someone else edited it,
+				// then return 409 with current
+				stored.updated_at = nowSec();
+				save(records);
+				return jsonResponse({ current: stored }, 409); // store reads conflict.current
+			}
+
+			const updated = Object.assign({}, stored, body, { updated_at: nowSec() });
+			records[idx] = updated;
+			save(records);
+			return jsonResponse(updated); // BARE record
+		}
+
+		// DELETE /api/documents/:id
+		const delMatch = path.match(/^\/api\/documents\/(\d+)$/);
+		if (delMatch && method === 'DELETE') {
+			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
+			const id = Number(delMatch[1]);
+			const filtered = records.filter((r) => r.id !== id);
+			save(filtered);
+			return jsonResponse({ ok: true });
+		}
+
+		// DELETE /api/documents/bulk-delete
+		if (path === ENDPOINT + '/bulk-delete' && method === 'DELETE') {
+			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
+			const body = JSON.parse(init.body || '{}');
+			const ids = (body.ids || []).map(Number);
+			const filtered = records.filter((r) => ids.indexOf(r.id) === -1);
+			save(filtered);
+			return jsonResponse({ ok: true });
+		}
+
+		// Fall through to real fetch for any other URL
+		return realFetch(input, init);
+	}
+
+	window.fetch = function (input, init) {
+		const url = typeof input === 'string' ? input : input.url;
+		// Only intercept our endpoint
+		if (url && url.indexOf(ENDPOINT) !== -1) return handle(input, init);
+		return realFetch(input, init);
+	};
+})();
+</script>
+
+<h1>Store — Usecase</h1>
+<p>Live CRUD example for <code>ln-store</code> (indexed storage). Companion to the <a href="store.html">Store reference</a> — that page documents the API, this one shows it wired to a data table, modal, and form. Reload — data survives. Open two tabs — they sync.</p>
+
+<!-- 1. Store (renders nothing) -->
+<div data-ln-store="documents"
+     data-ln-store-endpoint="/api/documents"
+     data-ln-store-stale="60"
+     data-ln-store-indexes="department,status,updated_at"
+     data-ln-store-search-fields="title,department"
+     id="documents-store"></div>
+
+<!-- 2. Mock backend toggles -->
+<section class="section-card">
+	<header><h3>Mock backend behavior</h3></header>
+	<main>
+		<ul>
+			<li><label><input type="checkbox" id="sim-latency"> Simulate 600 ms latency on every request</label></li>
+			<li><label><input type="checkbox" id="sim-failure"> ~15% of mutations fail (drives <code>ln-store:reverted</code>)</label></li>
+			<li><label><input type="checkbox" id="sim-conflict"> ~10% of updates return 409 (drives <code>ln-store:conflict</code>)</label></li>
+		</ul>
+		<p><button id="reset-data">Reset seed data</button> — wipes localStorage + IndexedDB + reloads.</p>
+	</main>
+</section>
+
+<!-- 3. Data table -->
+<section data-ln-data-table="documents" data-ln-data-table-selectable id="documents-table">
+	<header class="ln-table__toolbar">
+		<div>
+			<h3>Documents</h3>
+			<span data-ln-data-table-selected-wrap class="hidden">
+				· <button id="bulk-delete-btn">Delete selected (<span data-ln-data-table-selected></span>)</button>
+			</span>
+		</div>
+		<aside>
+			<label>
+				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+				<input type="search" placeholder="Search…" data-ln-data-table-search>
+			</label>
+			<button id="create-document" data-ln-modal-for="document-modal">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+				New
+			</button>
+		</aside>
+	</header>
+
+	<div class="table-container">
+		<table>
+			<thead>
+				<tr>
+					<th data-ln-col-select></th>
+					<th data-ln-col="title">Title <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button></th>
+					<th data-ln-col="department">Department <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button> <button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+					<th data-ln-col="status">Status <button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+					<th data-ln-col="updated_at">Updated <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button></th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody data-ln-data-table-body></tbody>
+			<tfoot>
+				<tr>
+					<td colspan="99" data-ln-data-table-footer>
+						<span data-ln-data-table-total></span> items
+						<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+
+	<template data-ln-template="documents-row">
+		<tr data-ln-row>
+			<td><input type="checkbox" data-ln-row-select></td>
+			<td data-ln-cell="title"></td>
+			<td data-ln-cell="department"></td>
+			<td data-ln-cell="status"></td>
+			<td data-ln-cell="updated_display"></td>
+			<td>
+				<button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
+				<button data-ln-row-action="delete" aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
+			</td>
+		</tr>
+	</template>
+
+	<template data-ln-template="documents-empty">
+		<tr><td colspan="99">
+			<article class="ln-table__empty-state">
+				<h3>No documents yet</h3>
+				<p>Click <strong>New</strong> to create one.</p>
+			</article>
+		</td></tr>
+	</template>
+
+	<template data-ln-template="documents-empty-filtered">
+		<tr><td colspan="99">
+			<article class="ln-table__empty-state">
+				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+				<h3>No results</h3>
+				<p>Try adjusting your search or filters.</p>
+				<button data-ln-data-table-clear-all class="btn">Clear all filters</button>
+			</article>
+		</td></tr>
+	</template>
+
+	<template data-ln-template="column-filter">
+		<div class="column-filter-dropdown">
+			<input type="search" data-ln-filter-search placeholder="Search…">
+			<ul data-ln-filter-options></ul>
+			<button data-ln-filter-clear>Clear filter</button>
+		</div>
+	</template>
+</section>
+
+<!-- 4. Create / Edit modal -->
+<div class="ln-modal" data-ln-modal id="document-modal">
+	<form data-ln-form="document-form" id="document-form">
+		<header>
+			<h3 id="document-modal-title">New document</h3>
+			<button type="button" aria-label="Close" data-ln-modal-close>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<input type="hidden" name="id">
+			<input type="hidden" name="updated_at">
+			<div class="form-element">
+				<label for="doc-title">Title</label>
+				<input id="doc-title" name="title" required autofocus>
+			</div>
+			<div class="form-element">
+				<label for="doc-department">Department</label>
+				<select id="doc-department" name="department" required>
+					<option value="">—</option>
+					<option>IT</option><option>Finance</option><option>Legal</option>
+					<option>Marketing</option><option>HR</option><option>Operations</option>
+				</select>
+			</div>
+			<div class="form-element">
+				<label for="doc-status">Status</label>
+				<select id="doc-status" name="status" required>
+					<option value="Draft">Draft</option>
+					<option value="Pending">Pending</option>
+					<option value="Approved">Approved</option>
+					<option value="Archived">Archived</option>
+				</select>
+			</div>
+		</main>
+		<footer class="form-actions">
+			<button type="button" data-ln-modal-close>Cancel</button>
+			<button type="submit">Save</button>
+		</footer>
+	</form>
+</div>
+
+<!-- 5. Confirm-delete modal -->
+<div class="ln-modal" data-ln-modal id="confirm-delete-modal">
+	<form id="confirm-delete-form">
+		<header>
+			<h3>Delete document?</h3>
+			<button type="button" aria-label="Close" data-ln-modal-close>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<p id="confirm-delete-message">This action cannot be undone.</p>
+		</main>
+		<footer class="form-actions">
+			<button type="button" data-ln-modal-close>Cancel</button>
+			<button type="submit" id="confirm-delete-btn" style="--color-primary: var(--color-error)">Delete</button>
+		</footer>
+	</form>
+</div>
+
+<!-- (c) Coordinator -->
+<script>
+(function () {
+	const storeEl    = document.getElementById('documents-store');
+	const tableEl    = document.getElementById('documents-table');
+	const formEl     = document.getElementById('document-form');
+	const modalEl    = document.getElementById('document-modal');
+	const titleEl    = document.getElementById('document-modal-title');
+	const confirmEl  = document.getElementById('confirm-delete-modal');
+	const confirmMsg = document.getElementById('confirm-delete-message');
+	const bulkBtn    = document.getElementById('bulk-delete-btn');
+	const confirmForm = document.getElementById('confirm-delete-form');
+	const resetBtn   = document.getElementById('reset-data');
+
+	let lastQuery     = { sort: null, filters: {}, search: '' };
+	let pendingDelete = null;
+	let editMode      = false;
+
+	// Authoritative filter options — matches form select values, stable for this data schema
+	const filterOptions = {
+		department: ['Finance', 'HR', 'IT', 'Legal', 'Marketing', 'Operations'],
+		status:     ['Approved', 'Archived', 'Draft', 'Pending']
+	};
+
+	function decorate(r) {
+		return Object.assign({}, r, {
+			updated_display: new Date(r.updated_at * 1000).toLocaleString()
+		});
+	}
+
+	function refresh() {
+		if (!storeEl.lnStore) return;
+		storeEl.lnStore.getAll(lastQuery).then(function (r) {
+			tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+				bubbles: true,
+				detail: {
+					data: r.data.map(decorate),
+					total: r.total,
+					filtered: r.filtered,
+					filterOptions: filterOptions
+				}
+			}));
+		});
+	}
+
+	document.addEventListener('ln-data-table:request-data', function (e) {
+		if (e.detail.table !== 'documents') return;
+		lastQuery = {
+			sort: e.detail.sort,
+			filters: e.detail.filters,
+			search: e.detail.search
+		};
+		refresh();
+	});
+
+	storeEl.addEventListener('ln-store:ready',     refresh);
+	storeEl.addEventListener('ln-store:loaded',    refresh);
+	storeEl.addEventListener('ln-store:synced',    function (e) { if (e.detail.changed) refresh(); });
+	storeEl.addEventListener('ln-store:created',   refresh);
+	storeEl.addEventListener('ln-store:updated',   refresh);
+	storeEl.addEventListener('ln-store:deleted',   refresh);
+	storeEl.addEventListener('ln-store:confirmed', refresh);
+	storeEl.addEventListener('ln-store:reverted',  refresh);
+
+	// Reset form on before-open unless we're entering edit mode
+	modalEl.addEventListener('ln-modal:before-open', function () {
+		if (!editMode) {
+			formEl.lnForm.reset();
+			titleEl.textContent = 'New document';
+		}
+		editMode = false;
+	});
+
+	document.addEventListener('ln-data-table:row-action', function (e) {
+		if (e.detail.table !== 'documents') return;
+		if (e.detail.action === 'edit') {
+			editMode = true;
+			formEl.lnForm.fill(e.detail.record);
+			titleEl.textContent = 'Edit document';
+			modalEl.setAttribute('data-ln-modal', 'open');
+		} else if (e.detail.action === 'delete') {
+			pendingDelete = { ids: [Number(e.detail.id)] };
+			confirmMsg.textContent = 'Delete "' + e.detail.record.title + '"?';
+			confirmEl.setAttribute('data-ln-modal', 'open');
+		}
+	});
+
+	bulkBtn.addEventListener('click', function (e) {
+		e.preventDefault();
+		const ids = Array.from(tableEl.lnDataTable.selectedIds).map(Number);
+		if (!ids.length) return;
+		pendingDelete = { ids: ids };
+		confirmMsg.textContent = 'Delete ' + ids.length + ' document' + (ids.length > 1 ? 's' : '') + '?';
+		confirmEl.setAttribute('data-ln-modal', 'open');
+	});
+
+	confirmForm.addEventListener('submit', function (e) {
+		e.preventDefault();
+		if (!pendingDelete) return;
+		const ids = pendingDelete.ids;
+		if (ids.length === 1) {
+			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', { detail: { id: ids[0] } }));
+		} else {
+			storeEl.dispatchEvent(new CustomEvent('ln-store:request-bulk-delete', { detail: { ids: ids } }));
+		}
+		pendingDelete = null;
+		confirmEl.setAttribute('data-ln-modal', 'close');
+	});
+
+	formEl.addEventListener('ln-form:submit', function (e) {
+		const data = Object.assign({}, e.detail.data);
+		const id = data.id;
+		const ev = data.updated_at ? Number(data.updated_at) : undefined;
+		delete data.id;
+		delete data.updated_at;
+		if (id) {
+			storeEl.dispatchEvent(new CustomEvent('ln-store:request-update',
+				{ detail: { id: Number(id), data: data, expected_version: ev } }));
+		} else {
+			storeEl.dispatchEvent(new CustomEvent('ln-store:request-create',
+				{ detail: { data: data } }));
+		}
+		modalEl.setAttribute('data-ln-modal', 'close');
+	});
+
+	storeEl.addEventListener('ln-store:confirmed', function (e) {
+		window.lnToast.enqueue({
+			type: 'success',
+			title: 'Saved',
+			message: e.detail.action + ' confirmed by server'
+		});
+	});
+	storeEl.addEventListener('ln-store:reverted', function (e) {
+		window.lnToast.enqueue({
+			type: 'error',
+			title: 'Reverted',
+			message: e.detail.error || 'Server rejected the change'
+		});
+	});
+	storeEl.addEventListener('ln-store:conflict', function (e) {
+		window.lnToast.enqueue({
+			type: 'warning',
+			title: 'Conflict',
+			message: 'Document was modified elsewhere — reloaded latest version'
+		});
+		const idField = formEl.querySelector('[name="id"]');
+		if (idField && idField.value && Number(idField.value) === e.detail.local.id) {
+			editMode = true; // suppress before-open reset on the next focus cycle
+			formEl.lnForm.fill(e.detail.remote);
+		}
+	});
+	storeEl.addEventListener('ln-store:offline', function () {
+		window.lnToast.enqueue({
+			type: 'warning',
+			title: 'Offline',
+			message: 'Server unreachable — changes queued'
+		});
+	});
+
+	resetBtn.addEventListener('click', function () {
+		localStorage.removeItem('ln-mock-documents');
+		window.lnStore.clearAll().then(function () { location.reload(); });
+	});
+})();
+</script>
