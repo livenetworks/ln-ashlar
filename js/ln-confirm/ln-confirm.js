@@ -1,4 +1,4 @@
-import { guardBody, dispatch, findElements } from '../ln-core';
+import { registerComponent, dispatch } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-confirm';
@@ -7,12 +7,6 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 	const DEFAULT_TIMEOUT = 3;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-	}
 
 	// ─── Component ─────────────────────────────────────────────
 
@@ -109,58 +103,7 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── Attribute Sync ────────────────────────────────────────
-
-	function _syncTimeout(el) {
-		const instance = el[DOM_ATTRIBUTE];
-		if (!instance || !instance.confirming) return;
-		// Restart timer with new timeout value
-		instance._startTimer();
-	}
-
-	// ─── DOM Observer ──────────────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) {
-								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						if (mutation.attributeName === TIMEOUT_ATTR && mutation.target[DOM_ATTRIBUTE]) {
-							_syncTimeout(mutation.target);
-						} else {
-							findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-						}
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR, TIMEOUT_ATTR]
-			});
-		}, 'ln-confirm');
-	}
-
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-confirm');
 })();

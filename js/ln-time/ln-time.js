@@ -1,4 +1,4 @@
-import { guardBody, findElements } from '../ln-core';
+import { registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-time';
@@ -157,58 +157,36 @@ import { guardBody, findElements } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── Init ─────────────────────────────────────────────────
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
+	// ─── Attribute / Mutation Hooks ───────────────────────────
+
+	function _onAttributeChange(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		const mode = el.getAttribute(DOM_SELECTOR);
+		if (mode === 'relative') {
+			_relativeElements.add(instance);
+			_startInterval();
+		} else {
+			_relativeElements.delete(instance);
+			if (_relativeElements.size === 0) _stopInterval();
+		}
+		_render(instance);
 	}
 
-	// ─── MutationObserver ─────────────────────────────────────
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (const mutation of mutations) {
-					if (mutation.type === 'childList') {
-						for (const node of mutation.addedNodes) {
-							if (node.nodeType === 1) {
-								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						const el = mutation.target;
-						if (el[DOM_ATTRIBUTE]) {
-							const mode = el.getAttribute(DOM_SELECTOR);
-							if (mode === 'relative') {
-								_relativeElements.add(el[DOM_ATTRIBUTE]);
-								_startInterval();
-							} else {
-								_relativeElements.delete(el[DOM_ATTRIBUTE]);
-								if (_relativeElements.size === 0) _stopInterval();
-							}
-							_render(el[DOM_ATTRIBUTE]);
-						} else {
-							findElements(el, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor);
-						}
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR, 'datetime']
-			});
-		}, 'ln-time');
+	function _onInit(node) {
+		// Re-render any data-ln-time element in the mutation target subtree.
+		// Covers `datetime` extra-attribute changes (extras don't fire onAttributeChange).
+		if (node.nodeType !== 1) return;
+		if (node.hasAttribute && node.hasAttribute(DOM_SELECTOR) && node[DOM_ATTRIBUTE]) {
+			_render(node[DOM_ATTRIBUTE]);
+		}
 	}
 
-	_domObserver();
-	window[DOM_ATTRIBUTE] = constructor;
+	// ─── Registration ─────────────────────────────────────────
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-time', {
+		extraAttributes: ['datetime'],
+		onAttributeChange: _onAttributeChange,
+		onInit: _onInit
+	});
 })();

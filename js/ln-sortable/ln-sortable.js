@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-core';
+import { registerComponent, dispatch, dispatchCancelable } from '../ln-core';
 
 (function () {
 	'use strict';
@@ -8,12 +8,6 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 	const HANDLE_ATTR = 'data-ln-sortable-handle';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	// ─── Constructor ───────────────────────────────────────────
-
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-	}
 
 	// ─── Component ─────────────────────────────────────────────
 
@@ -190,55 +184,20 @@ import { guardBody, dispatch, dispatchCancelable, findElements } from '../ln-cor
 		this._dragging = null;
 	};
 
-	// ─── DOM Observer ──────────────────────────────────────────
+	// ─── Attribute Sync ────────────────────────────────────────
 
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) {
-								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						const el = mutation.target;
-						const instance = el[DOM_ATTRIBUTE];
-						if (instance) {
-							const shouldBeEnabled = el.getAttribute(DOM_SELECTOR) !== 'disabled';
-							if (shouldBeEnabled !== instance.isEnabled) {
-								instance.isEnabled = shouldBeEnabled;
-								dispatch(el, shouldBeEnabled ? 'ln-sortable:enabled' : 'ln-sortable:disabled', { target: el });
-							}
-						} else {
-							findElements(el, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-						}
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR]
-			});
-		}, 'ln-sortable');
+	function _syncEnabled(el) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		const shouldBeEnabled = el.getAttribute(DOM_SELECTOR) !== 'disabled';
+		if (shouldBeEnabled === instance.isEnabled) return;
+		instance.isEnabled = shouldBeEnabled;
+		dispatch(el, shouldBeEnabled ? 'ln-sortable:enabled' : 'ln-sortable:disabled', { target: el });
 	}
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-sortable', {
+		onAttributeChange: _syncEnabled
+	});
 })();

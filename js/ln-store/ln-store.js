@@ -1,4 +1,4 @@
-import { guardBody, dispatch, findElements } from '../ln-core';
+import { registerComponent, dispatch } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-store';
@@ -936,50 +936,15 @@ import { guardBody, dispatch, findElements } from '../ln-core';
 		});
 	}
 
-	// ─── Constructor + DOM Observer ────────────────────────
+	// ─── Registration + Public API ─────────────────────────
 
-	function constructor(domRoot) {
-		findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-store');
 
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (let i = 0; i < mutations.length; i++) {
-					const mutation = mutations[i];
-					if (mutation.type === 'childList') {
-						for (let j = 0; j < mutation.addedNodes.length; j++) {
-							const node = mutation.addedNodes[j];
-							if (node.nodeType === 1) {
-								findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						findElements(mutation.target, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: [DOM_SELECTOR]
-			});
-		}, 'ln-store');
-	}
-
-	// ─── Window Export + Init ──────────────────────────────
-
-	window[DOM_ATTRIBUTE] = { init: constructor, clearAll: _clearAll };
-
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	// Preserve legacy public API documented in js/ln-store/README.md:
+	//   window.lnStore.clearAll()  — wipe all IndexedDB stores
+	//   window.lnStore.init(el)    — manual init alias for the constructor
+	// `registerComponent` writes the bare constructor to window[DOM_ATTRIBUTE];
+	// we hang the legacy methods on it so both call shapes keep working.
+	window[DOM_ATTRIBUTE].clearAll = _clearAll;
+	window[DOM_ATTRIBUTE].init = window[DOM_ATTRIBUTE];
 })();
