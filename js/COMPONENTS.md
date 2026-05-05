@@ -275,7 +275,7 @@ Use reactive rendering when a component has **2+ state properties** that togethe
 
 ### Used in
 
-- **ln-filter** — `{ key, value }` state drives button active states and target element visibility
+*No library component currently uses this pattern. It remains documented for project-level components that need multi-property reactive state.*
 
 ---
 

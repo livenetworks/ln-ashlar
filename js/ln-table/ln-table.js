@@ -170,10 +170,15 @@ import { dispatch, registerComponent } from '../ln-core';
 				self.ths[i].removeAttribute('data-ln-filter-active');
 			}
 
-			// Reset filter component UI (checkboxes)
+			// Reset filter component UI — synthetic change event on the "All"
+			// sentinel checkbox of each connected filter.
 			const filters = document.querySelectorAll('[data-ln-filter="' + dom.id + '"]');
 			for (let i = 0; i < filters.length; i++) {
-				if (filters[i].lnFilter) filters[i].lnFilter.reset();
+				const resetInput = filters[i].querySelector('[data-ln-filter-reset]');
+				if (resetInput) {
+					resetInput.checked = true;
+					resetInput.dispatchEvent(new Event('change', { bubbles: true }));
+				}
 			}
 
 			// Re-render

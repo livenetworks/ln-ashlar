@@ -1,5 +1,5 @@
 import { dispatch, fillTemplate, registerComponent } from '../ln-core';
-import { deepReactive, createBatcher } from '../ln-core';
+import { createBatcher } from '../ln-core';
 import { persistGet, persistSet } from '../ln-core';
 
 (function () {
@@ -19,6 +19,26 @@ import { persistGet, persistSet } from '../ln-core';
 
 	function _isReset(input) {
 		return input.hasAttribute(RESET_ATTR) || input.getAttribute(VALUE_ATTR) === '';
+	}
+
+	function _deriveActive(self) {
+		let key = null;
+		const values = [];
+		for (let i = 0; i < self.inputs.length; i++) {
+			const input = self.inputs[i];
+			if (input.checked && !_isReset(input)) {
+				if (key === null) key = input.getAttribute(KEY_ATTR);
+				const v = input.getAttribute(VALUE_ATTR);
+				if (v) values.push(v);
+			}
+		}
+		return { key: key, values: values };
+	}
+
+	function _arraysDiffer(a, b) {
+		if (a.length !== b.length) return true;
+		for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return true;
+		return false;
 	}
 
 	// ─── Auto-populate from table column ───────────────────────
@@ -79,7 +99,6 @@ import { persistGet, persistSet } from '../ln-core';
 
 		this.dom = dom;
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
-		this._pendingEvents = [];
 
 		// Column index for table filtering (null = not a table column filter)
 		const colAttr = dom.getAttribute(COL_ATTR);
@@ -92,6 +111,9 @@ import { persistGet, persistSet } from '../ln-core';
 		this.inputs = Array.from(dom.querySelectorAll('[' + KEY_ATTR + ']'));
 		this._filterKey = this.inputs.length > 0 ? this.inputs[0].getAttribute(KEY_ATTR) : null;
 
+		// Event-diff cache — null means never dispatched yet
+		this._lastSnapshot = null;
+
 		const self = this;
 
 		const queueRender = createBatcher(
@@ -99,10 +121,8 @@ import { persistGet, persistSet } from '../ln-core';
 			function () { self._afterRender(); }
 		);
 
-		this.state = deepReactive({
-			key: null,
-			values: []
-		}, queueRender);
+		// Stash for use in change handler
+		this._queueRender = queueRender;
 
 		this._attachHandlers();
 
@@ -111,31 +131,32 @@ import { persistGet, persistSet } from '../ln-core';
 		if (dom.hasAttribute('data-ln-persist')) {
 			const saved = persistGet('filter', dom);
 			if (saved && saved.key && Array.isArray(saved.values) && saved.values.length > 0) {
-				this.state.key = saved.key;
-				this.state.values = saved.values;
+				// Write input.checked on matching inputs
+				for (let i = 0; i < this.inputs.length; i++) {
+					const input = this.inputs[i];
+					if (_isReset(input)) {
+						input.checked = false;
+					} else if (input.getAttribute(KEY_ATTR) === saved.key &&
+					           saved.values.indexOf(input.getAttribute(VALUE_ATTR)) !== -1) {
+						input.checked = true;
+					} else {
+						input.checked = false;
+					}
+				}
+				queueRender();
 				_persistRestored = true;
 			}
 		}
 
 		if (!_persistRestored) {
-			// Initialize from existing DOM — collect all pre-checked inputs
-			let initKey = null;
-			const initValues = [];
+			// DOM is already canonical — only schedule render if anything is pre-checked
+			// so visibility is applied and the initial ln-filter:changed fires (via
+			// null-snapshot diff in _afterRender).
 			for (let i = 0; i < this.inputs.length; i++) {
-				const input = this.inputs[i];
-				if (input.checked && !_isReset(input)) {
-					if (!initKey) initKey = input.getAttribute(KEY_ATTR);
-					const val = input.getAttribute(VALUE_ATTR);
-					if (val) initValues.push(val);
+				if (this.inputs[i].checked && !_isReset(this.inputs[i])) {
+					queueRender();
+					break;
 				}
-			}
-			if (initValues.length > 0) {
-				this.state.key = initKey;
-				this.state.values = initValues;
-				this._pendingEvents.push({
-					name: 'ln-filter:changed',
-					detail: { key: initKey, values: initValues }
-				});
 			}
 		}
 
@@ -153,47 +174,40 @@ import { persistGet, persistSet } from '../ln-core';
 			input[DOM_ATTRIBUTE + 'Bound'] = true;
 
 			input._lnFilterChange = function () {
-				const key = input.getAttribute(KEY_ATTR);
-				const value = input.getAttribute(VALUE_ATTR) || '';
-
 				if (_isReset(input)) {
-					// "All" checkbox -- reset everything
-					self._pendingEvents.push({
-						name: 'ln-filter:changed',
-						detail: { key: key, values: [] }
-					});
-					self.reset();
+					// Reset sentinel — regardless of direction, enforce checked + clear values
+					for (let i = 0; i < self.inputs.length; i++) {
+						if (!_isReset(self.inputs[i])) self.inputs[i].checked = false;
+					}
+					// Force sentinel back to checked (clicking an already-checked sentinel
+					// would natively uncheck it; force back to checked)
+					input.checked = true;
+					self._queueRender();
 					return;
 				}
 
-				// Non-reset checkbox toggled
 				if (input.checked) {
-					// Add value to active set
-					if (self.state.values.indexOf(value) === -1) {
-						self.state.key = key;
-						self.state.values.push(value);
+					// Mutual exclusion: uncheck all reset sentinels
+					for (let i = 0; i < self.inputs.length; i++) {
+						if (_isReset(self.inputs[i])) self.inputs[i].checked = false;
 					}
 				} else {
-					// Remove value from active set
-					const idx = self.state.values.indexOf(value);
-					if (idx !== -1) {
-						self.state.values.splice(idx, 1);
+					// If no non-reset values remain checked, fall back to reset
+					let anyChecked = false;
+					for (let i = 0; i < self.inputs.length; i++) {
+						if (!_isReset(self.inputs[i]) && self.inputs[i].checked) {
+							anyChecked = true;
+							break;
+						}
 					}
-					// If no values left, auto-reset
-					if (self.state.values.length === 0) {
-						self._pendingEvents.push({
-							name: 'ln-filter:changed',
-							detail: { key: key, values: [] }
-						});
-						self.reset();
-						return;
+					if (!anyChecked) {
+						for (let i = 0; i < self.inputs.length; i++) {
+							if (_isReset(self.inputs[i])) self.inputs[i].checked = true;
+						}
 					}
 				}
 
-				self._pendingEvents.push({
-					name: 'ln-filter:changed',
-					detail: { key: self.state.key, values: self.state.values.slice() }
-				});
+				self._queueRender();
 			};
 			input.addEventListener('change', input._lnFilterChange);
 		});
@@ -203,35 +217,19 @@ import { persistGet, persistSet } from '../ln-core';
 
 	_component.prototype._render = function () {
 		const self = this;
-		const activeKey = this.state.key;
-		const activeValues = this.state.values;
-		const isReset = activeKey === null || activeValues.length === 0;
+		const active = _deriveActive(this);
+		const isReset = active.key === null || active.values.length === 0;
 
 		// Build lowercase lookup for target filtering
 		const lowerValues = [];
-		for (let i = 0; i < activeValues.length; i++) {
-			lowerValues.push(activeValues[i].toLowerCase());
+		for (let i = 0; i < active.values.length; i++) {
+			lowerValues.push(active.values[i].toLowerCase());
 		}
-
-		// Update input checked states
-		this.inputs.forEach(function (input) {
-			if (isReset) {
-				// Reset state -- only "All" is checked
-				input.checked = _isReset(input);
-			} else if (_isReset(input)) {
-				// Active filters -- "All" is unchecked
-				input.checked = false;
-			} else {
-				// Check if this input's value is in the active set
-				const inputValue = input.getAttribute(VALUE_ATTR) || '';
-				input.checked = activeValues.indexOf(inputValue) !== -1;
-			}
-		});
 
 		// Apply filter
 		if (self.colIndex !== null) {
 			// Table column filtering — shared multi-column logic
-			self._filterTableRows();
+			self._filterTableRows(active);
 		} else {
 			// Standard target-children filtering by data attribute
 			const target = document.getElementById(self.targetId);
@@ -246,7 +244,7 @@ import { persistGet, persistSet } from '../ln-core';
 					continue;
 				}
 
-				const attr = el.getAttribute('data-' + activeKey);
+				const attr = el.getAttribute('data-' + active.key);
 				el.removeAttribute(HIDE_ATTR);
 
 				if (attr === null) continue;
@@ -260,17 +258,33 @@ import { persistGet, persistSet } from '../ln-core';
 	};
 
 	_component.prototype._afterRender = function () {
-		const events = this._pendingEvents;
-		this._pendingEvents = [];
+		const active = _deriveActive(this);
+		const prev = this._lastSnapshot;
+		const changed = !prev
+			|| prev.key !== active.key
+			|| _arraysDiffer(prev.values, active.values);
 
-		for (let i = 0; i < events.length; i++) {
-			this._dispatchOnBoth(events[i].name, events[i].detail);
+		if (changed) {
+			// ln-filter:changed always fires when state moves
+			this._dispatchOnBoth('ln-filter:changed', {
+				key: active.key,
+				values: active.values.slice()
+			});
+
+			// ln-filter:reset fires only on transition into reset state
+			const wasActive = prev && prev.values.length > 0;
+			const nowReset = active.values.length === 0;
+			if (wasActive && nowReset) {
+				this._dispatchOnBoth('ln-filter:reset', {});
+			}
+
+			this._lastSnapshot = { key: active.key, values: active.values.slice() };
 		}
 
 		// Persist current filter state
 		if (this.dom.hasAttribute('data-ln-persist')) {
-			if (this.state.key && this.state.values.length > 0) {
-				persistSet('filter', this.dom, { key: this.state.key, values: this.state.values.slice() });
+			if (active.key && active.values.length > 0) {
+				persistSet('filter', this.dom, { key: active.key, values: active.values.slice() });
 			} else {
 				persistSet('filter', this.dom, null);
 			}
@@ -287,7 +301,7 @@ import { persistGet, persistSet } from '../ln-core';
 
 	// ─── Table Row Filtering ───────────────────────────────────
 
-	_component.prototype._filterTableRows = function () {
+	_component.prototype._filterTableRows = function (active) {
 		const target = document.getElementById(this.targetId);
 		if (!target) return;
 
@@ -297,8 +311,8 @@ import { persistGet, persistSet } from '../ln-core';
 		// Guard: don't filter if this is an ln-table (it handles its own filtering)
 		if (target.hasAttribute('data-ln-table')) return;
 
-		const key = this.state.key || this._filterKey;
-		const values = this.state.values;
+		const key = active.key || this._filterKey;
+		const values = active.values;
 
 		// Get or create shared filter map for this table
 		if (!_tableFilters.has(table)) {
@@ -354,42 +368,7 @@ import { persistGet, persistSet } from '../ln-core';
 		}
 	};
 
-	// ─── Public API ────────────────────────────────────────────
-
-	_component.prototype.filter = function (key, value) {
-		if (Array.isArray(value)) {
-			// Bulk set: replace all values
-			if (value.length === 0) {
-				this.reset();
-				return;
-			}
-			this.state.key = key;
-			this.state.values = value.slice();
-		} else if (!value) {
-			// Empty/falsy value: reset
-			this.reset();
-			return;
-		} else {
-			// Single value: set as sole active filter
-			this.state.key = key;
-			this.state.values = [value];
-		}
-		this._pendingEvents.push({
-			name: 'ln-filter:changed',
-			detail: { key: this.state.key, values: this.state.values.slice() }
-		});
-	};
-
-	_component.prototype.reset = function () {
-		this._pendingEvents.push({ name: 'ln-filter:reset', detail: {} });
-		this.state.key = null;
-		this.state.values = [];
-	};
-
-	_component.prototype.getActive = function () {
-		if (this.state.key === null || this.state.values.length === 0) return null;
-		return { key: this.state.key, values: this.state.values.slice() };
-	};
+	// ─── Destroy ───────────────────────────────────────────────
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
@@ -401,7 +380,7 @@ import { persistGet, persistSet } from '../ln-core';
 				const table = target.tagName === 'TABLE' ? target : target.querySelector('table');
 				if (table && _tableFilters.has(table)) {
 					const filters = _tableFilters.get(table);
-					const key = this.state.key || this._filterKey;
+					const key = this._filterKey;
 					if (key && filters[key]) delete filters[key];
 					if (Object.keys(filters).length === 0) _tableFilters.delete(table);
 				}
