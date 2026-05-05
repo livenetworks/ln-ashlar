@@ -166,50 +166,147 @@
 
 		<!-- Content -->
 		<section>
-<h1>Circular Progress</h1>
-					<p>SVG-based circular progress indicator. Reactive: automatically updates when attributes change.</p>
+<style>
+	.demo-circular-progress-row {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--size-lg);
+		align-items: flex-end;
+	}
+	.demo-circular-progress-row > li {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--size-xs);
+	}
+	.demo-circular-progress-row > li > span {
+		font-size: var(--text-body-sm);
+		color: var(--fg-muted);
+	}
+	.demo-circular-progress-buttons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--size-xs);
+		margin-block-start: var(--size-md);
+	}
+	#demo-event-log {
+		max-height: 8rem;
+		overflow-y: auto;
+		font-family: var(--font-mono);
+		font-size: var(--text-body-sm);
+		color: var(--fg-muted);
+		margin-block-start: var(--size-sm);
+		white-space: pre-wrap;
+	}
+</style>
 
-					<!-- Basics -->
+					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Basics</h3></header>
+						<header><h3>Overview</h3></header>
 						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Attribute</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-circular-progress="75"</code></td><td data-label="On element">Current value</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-circular-progress-max="100"</code></td><td data-label="On element">Maximum value (default: 100)</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-circular-progress-label="text"</code></td><td data-label="On element">Custom text in center (default: percentage)</td></tr>
-								</tbody>
-							</table>
-							</div>
+							<p>A 133-line passive renderer for an SVG ring + centre label. <code>ln-circular-progress</code> derives one visual from one number attribute: write <code>data-ln-circular-progress="42"</code>, and the component picks up the change via MutationObserver, recomputes the arc length from value and max, writes the new <code>stroke-dashoffset</code> on the fill circle, and updates the percentage label. The attribute IS the API — there is no <code>setValue(n)</code>, no <code>update()</code>, no imperative entry point.</p>
+							<p>The design choice this contract reflects: state lives in the DOM, not in JS. A server-rendered template can stamp <code>data-ln-circular-progress="75"</code> directly into markup; a consumer JS that updates the value writes the same attribute. Both paths flow through the same MutationObserver. There is one source of truth — the attribute — and DOM Inspector shows it. This is the same pattern <code>ln-progress</code> (linear sibling), <code>ln-stepper</code>, and <code>ln-data-table</code>'s display layer all use: passive renderers driven by external state.</p>
+							<p>Native <code>&lt;progress&gt;</code> would have given screen-readers automatic <code>role="progressbar"</code> and <code>aria-valuenow</code> sync. It does not shape into a ring — the platform offers no hook to reshape the geometry, and overlaying SVG on top of a hidden <code>&lt;progress&gt;</code> ends up replacing the whole visual anyway. The trade-off accepted by <code>ln-circular-progress</code>: full geometric control via SVG, theme-driven colours via CSS variables, animated arc transitions via CSS — at the cost of consumer-written ARIA on the host element. See "Accessibility" below.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-circular-progress/README.md"><code>ln-circular-progress</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/circular-progress.md">architecture reference</a>.</p>
 						</main>
 					</section>
 
-					<!-- CSS classes -->
+					<!-- Anatomy -->
 					<section class="section-card">
-						<header><h3>CSS Classes</h3></header>
+						<header><h3>Anatomy</h3></header>
 						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Class</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td><code>.success</code></td><td>Success color</td></tr>
-									<tr><td><code>.warning</code></td><td>Warning color</td></tr>
-									<tr><td><code>.error</code></td><td>Error color</td></tr>
-									<tr><td><code>.sm</code></td><td>Small size (2.5rem)</td></tr>
-									<tr><td><code>.lg</code></td><td>Large size (6rem)</td></tr>
-									<tr><td><code>.xl</code></td><td>Extra large (8rem)</td></tr>
-								</tbody>
-							</table>
-							</div>
+							<p>The minimum invocation is one attribute on a host element:</p>
+<pre><code>&lt;div data-ln-circular-progress="75"&gt;&lt;/div&gt;</code></pre>
+
+							<p>The constructor builds the SVG and label and appends them inside the host. After init, the DOM looks like:</p>
+<pre><code>&lt;div data-ln-circular-progress="75"
+     data-ln-circular-progress-initialized=""
+     class="success"&gt;
+    &lt;svg viewBox="0 0 36 36" aria-hidden="true"&gt;
+        &lt;circle cx="18" cy="18" r="16" fill="none" stroke-width="3"
+                class="ln-circular-progress__track"&gt;&lt;/circle&gt;
+        &lt;circle cx="18" cy="18" r="16" fill="none" stroke-width="3"
+                stroke-linecap="round"
+                stroke-dasharray="100.53"
+                stroke-dashoffset="25.13"
+                transform="rotate(-90 18 18)"
+                class="ln-circular-progress__fill"&gt;&lt;/circle&gt;
+    &lt;/svg&gt;
+    &lt;strong class="ln-circular-progress__label"&gt;75%&lt;/strong&gt;
+&lt;/div&gt;</code></pre>
+
+							<p>Three numbers worth knowing: viewBox <code>36×36</code>, radius <code>16</code>, circumference <code>2·π·16 ≈ 100.53</code>. These are module-level constants in <code>ln-circular-progress.js:10-12</code> and are NOT configurable per instance — size variants scale via CSS, the SVG <code>viewBox</code> stays at 36. The <code>transform="rotate(-90 18 18)"</code> on the fill is what makes the arc start at 12 o'clock instead of 3 o'clock.</p>
+
+							<h4>Reactive state — the attribute IS the API</h4>
+							<p>Two observed attributes: <code>data-ln-circular-progress</code> (the value) and <code>data-ln-circular-progress-max</code> (default 100). The MutationObserver in <code>_listenValues</code> is filtered to exactly these two — nothing else triggers a re-render. The label attribute (<code>data-ln-circular-progress-label</code>) is read inside <code>_render</code> but is NOT in the filter; mutating it alone does not update the visible label. See "Common mistakes" item 1.</p>
+
+							<h4>What state goes where</h4>
+							<p>"Should this element be a circular progress?" lives on <code>data-ln-circular-progress</code> (presence) — owned by the author or consumer markup. "Current value" lives on the same attribute (value) — owned by author at render time, consumer JS at runtime. "Maximum" lives on <code>data-ln-circular-progress-max</code>; "label override" on <code>data-ln-circular-progress-label</code>. "Computed arc offset" lives on <code>stroke-dashoffset</code> of the fill circle, written by JS but never read by anything except the browser's renderer. There is no JS-side cached "value" property — every <code>_render</code> call reads the attribute fresh.</p>
 						</main>
 					</section>
 
-					<!-- Colors -->
+					<!-- Attributes -->
 					<section class="section-card">
-						<header><h3>Colors</h3></header>
+						<header><h3>Attributes</h3></header>
 						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-circular-progress="N"</code></td><td>host element</td><td>Current value. Number — can be negative or above max; rendered percentage clamps to 0–100, but the attribute itself is never rewritten.</td></tr>
+									<tr><td><code>data-ln-circular-progress-max="N"</code></td><td>host element</td><td>Maximum value. Default <code>100</code>. Used as denominator. <code>max="0"</code> is treated as 0% (avoids divide-by-zero).</td></tr>
+									<tr><td><code>data-ln-circular-progress-label="text"</code></td><td>host element</td><td>Custom centre label. Replaces the auto-computed percentage. NOT in the MutationObserver filter — only updates on the next value/max write.</td></tr>
+									<tr><td><code>data-ln-circular-progress-initialized</code></td><td>host element (auto)</td><td>Set by the constructor; removed by <code>destroy()</code>. Internal marker.</td></tr>
+								</tbody>
+							</table>
+							</div>
+
+							<h4>Visual variants — class-driven, no JS involvement</h4>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Class</th><th>Effect</th></tr></thead>
+								<tbody>
+									<tr><td><code>.success</code></td><td>Fill stroke = <code>hsl(var(--color-success))</code></td></tr>
+									<tr><td><code>.warning</code></td><td>Fill stroke = <code>hsl(var(--color-warning))</code></td></tr>
+									<tr><td><code>.error</code></td><td>Fill stroke = <code>hsl(var(--color-error))</code></td></tr>
+									<tr><td>(no class)</td><td>Fill stroke = <code>var(--color-accent)</code> — follows theme</td></tr>
+									<tr><td><code>.sm</code></td><td>2.5rem — small</td></tr>
+									<tr><td>(no class)</td><td>4rem — default</td></tr>
+									<tr><td><code>.lg</code></td><td>6rem — large</td></tr>
+									<tr><td><code>.xl</code></td><td>8rem — extra large</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>Variants are pure CSS — the component does not read or write <code>className</code>. Toggling classes via <code>el.classList.add('success')</code> applies the new colour instantly without a re-render.</p>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th>On</th><th>Bubbles</th><th>Cancelable</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-circular-progress:change</code></td><td>host element</td><td>yes</td><td>no</td><td><code>{ target, value, max, percentage }</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p><code>detail.value</code> is the <em>raw</em> <code>parseFloat</code> of the value attribute — unclamped. <code>detail.max</code> is the parsed max (or 100 if missing). <code>detail.percentage</code> is the <em>clamped</em> 0–100 percentage. A consumer that wants to detect overshoot (<code>value &gt; max</code>) reads <code>value</code> directly; a consumer that wants the visible percentage reads <code>percentage</code>.</p>
+							<p>The event fires on every <code>_render</code> call — including the initial render at construction. A document-level listener attached before the bundle loads will see one event per ring on the page during <code>DOMContentLoaded</code>. Listeners attached after init miss the initial event.</p>
+							<p>The event is <strong>not</strong> cancelable. Unlike <code>ln-search</code>, there is no default behaviour for a consumer to opt out of — the rendering IS the contract for a passive renderer.</p>
+						</main>
+					</section>
+
+					<!-- Demo: colours -->
+					<section class="section-card">
+						<header><h3>Example — Colour variants</h3></header>
+						<main>
+							<p>Colour is class-driven. The shipped <code>.success</code> / <code>.warning</code> / <code>.error</code> classes override <code>stroke</code> directly on the fill circle in <code>scss/components/_circular-progress.scss</code>; the default (no class) reads <code>var(--color-accent)</code> and follows the active theme.</p>
 							<ul class="demo-circular-progress-row">
 								<li>
 									<div data-ln-circular-progress="75"></div>
@@ -217,24 +314,25 @@
 								</li>
 								<li>
 									<div data-ln-circular-progress="90" class="success"></div>
-									<span>Success (90%)</span>
+									<span>.success (90%)</span>
 								</li>
 								<li>
 									<div data-ln-circular-progress="55" class="warning"></div>
-									<span>Warning (55%)</span>
+									<span>.warning (55%)</span>
 								</li>
 								<li>
 									<div data-ln-circular-progress="25" class="error"></div>
-									<span>Error (25%)</span>
+									<span>.error (25%)</span>
 								</li>
 							</ul>
 						</main>
 					</section>
 
-					<!-- Sizes -->
+					<!-- Demo: sizes -->
 					<section class="section-card">
-						<header><h3>Sizes</h3></header>
+						<header><h3>Example — Size variants</h3></header>
 						<main>
+							<p>Size variants scale the host element via CSS. The SVG <code>viewBox</code> is unchanged; the SVG fills the host's pixel dimensions. Each size variant also rebinds the label font-size proportionally.</p>
 							<ul class="demo-circular-progress-row">
 								<li>
 									<div data-ln-circular-progress="65" class="sm success"></div>
@@ -256,10 +354,11 @@
 						</main>
 					</section>
 
-					<!-- Custom label -->
+					<!-- Demo: custom max + label -->
 					<section class="section-card">
-						<header><h3>Custom label</h3></header>
+						<header><h3>Example — Non-percentage scale (max + label)</h3></header>
 						<main>
+							<p>For "X out of Y" indicators, set <code>data-ln-circular-progress-max="Y"</code> to shift the denominator and <code>data-ln-circular-progress-label="X/Y"</code> to override the auto-computed percentage. Without the label override, the centre would show the ratio (e.g. "70%") instead of the count.</p>
 							<ul class="demo-circular-progress-row">
 								<li>
 									<div data-ln-circular-progress="7" data-ln-circular-progress-max="10" data-ln-circular-progress-label="7/10" class="lg"></div>
@@ -267,52 +366,113 @@
 								</li>
 								<li>
 									<div data-ln-circular-progress="85" data-ln-circular-progress-label="A+" class="lg success"></div>
-									<span>Grade</span>
+									<span>Letter grade</span>
 								</li>
 								<li>
 									<div data-ln-circular-progress="42" data-ln-circular-progress-label="42" class="lg warning"></div>
-									<span>Number</span>
+									<span>Raw count</span>
 								</li>
 							</ul>
 						</main>
 					</section>
 
-					<!-- Reactivity -->
+					<!-- Demo: reactive (the canonical attribute write) -->
 					<section class="section-card">
-						<header><h3>Reactivity — click to change</h3></header>
+						<header><h3>Example — Reactive updates (attribute write)</h3></header>
 						<main>
+							<p>The attribute IS the API. Each button below writes <code>data-ln-circular-progress</code> to a new value; the MutationObserver fires, <code>_render</code> recomputes the offset, and the browser's CSS transition smoothly animates the arc from the previous angle to the new one. Open DOM Inspector and watch the attribute change with each click.</p>
 							<ul class="demo-circular-progress-row">
 								<li>
-									<figure id="react-circle" data-ln-circular-progress="0" class="xl"></figure>
+									<figure id="demo-react-circle" data-ln-circular-progress="0" class="xl"></figure>
+									<span>Click below to change</span>
 								</li>
 							</ul>
 							<nav class="demo-circular-progress-buttons">
-								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '0')" class="btn btn-sm">0%</button>
-								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '25')" class="btn btn-sm">25%</button>
-								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '50')" class="btn btn-sm">50%</button>
-								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '75')" class="btn btn-sm">75%</button>
-								<button onclick="document.getElementById('react-circle').setAttribute('data-ln-circular-progress', '100')" class="btn btn-sm btn">100%</button>
+								<button type="button" data-ln-set-progress="0">0%</button>
+								<button type="button" data-ln-set-progress="25">25%</button>
+								<button type="button" data-ln-set-progress="50">50%</button>
+								<button type="button" data-ln-set-progress="75">75%</button>
+								<button type="button" data-ln-set-progress="100">100%</button>
+								<button type="button" data-ln-set-progress="150">150% (overshoot)</button>
+								<button type="button" data-ln-set-progress="-30">-30% (undershoot)</button>
 							</nav>
+							<p style="margin-block-start: var(--size-md); font-size: var(--text-body-sm); color: var(--fg-muted);">Try the overshoot and undershoot buttons. The attribute holds the raw value (visible in DOM Inspector), but the rendered arc clamps to 0–100% — the ring fills fully at 100% and stays empty at 0%, no matter how far the value strays.</p>
 						</main>
 					</section>
 
-					<!-- HTML structure -->
+					<!-- Demo: event log -->
 					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
+						<header><h3>Example — Listening for <code>ln-circular-progress:change</code></h3></header>
 						<main>
-							<pre><code>&lt;!-- Basic usage --&gt;
-&lt;div data-ln-circular-progress="75"&gt;&lt;/div&gt;
+							<p>Every render dispatches the event with both the raw value and the clamped percentage. The log below shows what a document-level listener sees as you click the buttons in the previous example. Notice how an overshoot value (<code>150</code>) appears in <code>value</code> but is clamped to <code>100</code> in <code>percentage</code>.</p>
+							<output id="demo-event-log" aria-live="polite">No events yet — click a button above.</output>
+						</main>
+					</section>
 
-&lt;!-- With color and size --&gt;
-&lt;div data-ln-circular-progress="90" class="success lg"&gt;&lt;/div&gt;
+					<!-- Demo: theme awareness (default class follows theme) -->
+					<section class="section-card">
+						<header><h3>Example — Theme awareness</h3></header>
+						<main>
+							<p>The default ring (no colour class) reads <code>var(--color-accent)</code> for the fill and <code>var(--color-border)</code> for the track. Both are vocabulary tokens that themes rebind at theme <code>:root</code>. Switch the theme via the palette icon at the top right of the page — the default ring follows the new accent without any per-component CSS or class swap. The <code>.success</code> / <code>.warning</code> / <code>.error</code> variants use absolute status colours and are not theme-shifted.</p>
+							<ul class="demo-circular-progress-row">
+								<li>
+									<div data-ln-circular-progress="60" class="lg"></div>
+									<span>Default — follows theme accent</span>
+								</li>
+								<li>
+									<div data-ln-circular-progress="60" class="lg success"></div>
+									<span>.success — fixed status colour</span>
+								</li>
+							</ul>
+						</main>
+					</section>
 
-&lt;!-- With max value --&gt;
-&lt;div data-ln-circular-progress="7"
-        data-ln-circular-progress-max="10"&gt;&lt;/div&gt;
+					<!-- Demo: indeterminate has no built-in mode -->
+					<section class="section-card">
+						<header><h3>Example — There is no indeterminate mode</h3></header>
+						<main>
+							<p>Setting <code>data-ln-circular-progress=""</code> or <code>"abc"</code> renders an empty ring (0% — <code>parseFloat</code> failure falls through <code>|| 0</code>). There is no spinning state, no "loading…" mode. The component IS the determinate ring; for an unbounded operation use <code>@mixin loader</code> (a separate primitive — different visual idiom).</p>
+							<ul class="demo-circular-progress-row">
+								<li>
+									<div data-ln-circular-progress="" class="lg"></div>
+									<span>Empty value — renders as 0%</span>
+								</li>
+								<li>
+									<div data-ln-circular-progress="abc" class="lg"></div>
+									<span>Invalid value — renders as 0%</span>
+								</li>
+							</ul>
+						</main>
+					</section>
 
-&lt;!-- With custom label --&gt;
-&lt;div data-ln-circular-progress="85"
-        data-ln-circular-progress-label="A+"&gt;&lt;/div&gt;</code></pre>
+					<!-- Accessibility -->
+					<section class="section-card">
+						<header><h3>Accessibility — consumer-written ARIA</h3></header>
+						<main>
+							<p>The component sets <code>aria-hidden="true"</code> on the SVG (so screen readers skip the visual) and writes <strong>nothing else</strong> accessibility-related to the host. It does NOT write <code>role="progressbar"</code>, <code>aria-valuenow</code>, <code>aria-valuemin</code>, or <code>aria-valuemax</code>. If those matter for your audience, add them in markup and keep them in sync when you write the value:</p>
+<pre><code>&lt;div data-ln-circular-progress="75"
+     role="progressbar"
+     aria-valuenow="75"
+     aria-valuemin="0"
+     aria-valuemax="100"
+     aria-label="Upload progress"
+     class="success"&gt;
+&lt;/div&gt;</code></pre>
+<pre><code>function setProgress(el, value) {
+    el.setAttribute('data-ln-circular-progress', value);
+    el.setAttribute('aria-valuenow', value);
+}</code></pre>
+							<p>The split is deliberate — consumers often have richer accessibility semantics than <code>aria-valuenow</code> alone (live regions, <code>aria-labelledby</code>, parallel <code>&lt;output&gt;</code> announcers), and writing default ARIA inside the component would force consumers to override it.</p>
+						</main>
+					</section>
+
+					<!-- Composition -->
+					<section class="section-card">
+						<header><h3>Composition — siblings and the upload gap</h3></header>
+						<main>
+							<p><strong><code>ln-progress</code> (linear sibling)</strong> shares the contract shape — same <code>:change</code> event detail (<code>{ target, value, max, percentage }</code>), same attribute pattern. They are independent implementations of the same idea in different geometries; ln-circular-progress does not extend ln-progress. <code>ln-progress</code> additionally supports a parent-track shared max (multiple bars stacking inside one track), which <code>ln-circular-progress</code> does NOT — circular indicators read max only from their own host attribute.</p>
+							<p><strong><code>ln-upload</code></strong> uses its own raw <code>&lt;div class="ln-upload__progress-bar"&gt;</code> with manual <code>style.width</code> writes (see <code>js/ln-upload/ln-upload.js:149-152</code>). It does NOT compose with <code>ln-circular-progress</code> or <code>ln-progress</code> — the upload component predates the progress components and was not refactored. If your project wants a circular indicator inside an upload list item, swap the inline progress bar for a <code>&lt;div data-ln-circular-progress&gt;</code> in markup and replace the <code>style.width</code> write with <code>setAttribute('data-ln-circular-progress', percent)</code>.</p>
+							<p><strong><code>ln-form</code></strong> does not own progress UI; submit-state feedback comes from <code>aria-busy</code> on the form. If a long-running form needs a progress ring, drive it from the consumer's <code>xhr.upload.progress</code> listener directly — see the README's "Upload progress" example.</p>
 						</main>
 					</section>
 
@@ -320,22 +480,79 @@
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<pre><code>// Manual initialization
-window.lnCircularProgress(document.body);
+<pre><code>const el = document.querySelector('[data-ln-circular-progress]');
 
-// Change value dynamically (reactive):
-var el = document.getElementById('my-circle');
-el.setAttribute('data-ln-circular-progress', '80');
+el.lnCircularProgress.dom;             // back-reference to host
+el.lnCircularProgress.svg;             // the constructed &lt;svg&gt;
+el.lnCircularProgress.progressCircle;  // the fill &lt;circle&gt;
+el.lnCircularProgress.labelEl;         // the &lt;strong&gt; label
+el.lnCircularProgress.destroy();       // disconnect observer, remove SVG + label
 
-// Custom label:
-el.setAttribute('data-ln-circular-progress-label', '8/10');
-
-// Event:
-el.addEventListener('ln-circular-progress:change', function(e) {
-    console.log(e.detail.percentage); // 80
-});</code></pre>
+window.lnCircularProgress(root);       // re-run init scan over `root`
+                                       //   only needed for Shadow DOM / iframe</code></pre>
+							<p>There is no <code>setValue(n)</code>, <code>setMax(n)</code>, or <code>redraw()</code> method. The canonical update path is the attribute:</p>
+<pre><code>el.setAttribute('data-ln-circular-progress', 75);
+// → MutationObserver fires → _render runs → SVG redraws → :change dispatches</code></pre>
+							<p>Adding an imperative setter would create a second mutation channel that the MutationObserver would also see, without removing the need to write the attribute for screen-readers / DOM Inspector / serialization. The single source of truth is the attribute.</p>
 						</main>
 					</section>
+
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<h4>1. Updating only the label and expecting a re-render</h4>
+							<p>The MutationObserver filter is exactly <code>['data-ln-circular-progress', 'data-ln-circular-progress-max']</code>. The label attribute is read inside <code>_render</code> but is NOT a trigger. Mutate label and value together: write the label, then re-write the value (rewriting the same value still fires the observer).</p>
+
+							<h4>2. Pre-existing content inside the host</h4>
+							<p>The constructor <code>appendChild</code>s the SVG and label into the host without clearing existing children. <code>&lt;div data-ln-circular-progress="50"&gt;Loading...&lt;/div&gt;</code> ends up with "Loading..." text overlapping the ring. Keep the host empty; place descriptive text on a sibling (e.g. <code>&lt;figcaption&gt;</code>).</p>
+
+							<h4>3. Writing values above max and expecting attribute clamping</h4>
+							<p>The component clamps the rendered <em>percentage</em> (0–100), not the attribute. <code>el.setAttribute('data-ln-circular-progress', 150)</code> leaves the attribute at <code>"150"</code>; <code>e.detail.value</code> is <code>150</code>, <code>e.detail.percentage</code> is <code>100</code>. Clamp before writing if you need the attribute itself bounded.</p>
+
+							<h4>4. Decimal value, integer label disagreement</h4>
+							<p><code>data-ln-circular-progress="42.7"</code> draws the arc at exactly 42.7% but shows "43%" in the label (<code>Math.round</code>). The label-only rounding is intentional — visual-noise reduction — but it does mean the rendered shape and the rendered text disagree by up to 0.5%. Round the value before writing if pixel-accurate label-to-arc match matters.</p>
+
+							<h4>5. Firing 60+ writes per second from a tight loop</h4>
+							<p>Every attribute write triggers the MutationObserver, runs <code>_render</code>, and dispatches <code>:change</code>. At 60Hz that's 60 events per ring. The CSS transition makes per-frame writes pointless anyway — set the value once and let CSS animate. If you genuinely need stepwise animation, throttle to ~10Hz (every 100ms).</p>
+
+							<h4>6. Expecting an indeterminate / spinning state</h4>
+							<p>There is no spinner mode. Empty / invalid values render as 0%. For an unbounded operation use <code>@mixin loader</code> — different visual idiom, separate primitive.</p>
+
+							<h4>7. Calling <code>destroy()</code> and expecting the host to stay empty</h4>
+							<p><code>destroy()</code> removes the SVG and label, but leaves <code>data-ln-circular-progress</code> in place. Any subsequent attribute write triggers <code>registerComponent</code>'s shared MutationObserver, which re-instantiates the component. To remove the component permanently, also remove the attribute: <code>el.removeAttribute('data-ln-circular-progress')</code>.</p>
+						</main>
+					</section>
+
+<script>
+	(function () {
+		// Reactive demo — wire up the value-setter buttons to the demo ring.
+		const ring = document.getElementById('demo-react-circle');
+		const log = document.getElementById('demo-event-log');
+		if (!ring) return;
+
+		const buttons = document.querySelectorAll('[data-ln-set-progress]');
+		buttons.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				const value = btn.getAttribute('data-ln-set-progress');
+				ring.setAttribute('data-ln-circular-progress', value);
+			});
+		});
+
+		// Listen for change events on the demo ring and log them.
+		if (log) {
+			let entries = [];
+			ring.addEventListener('ln-circular-progress:change', function (e) {
+				const time = new Date().toLocaleTimeString();
+				const d = e.detail;
+				const line = '[' + time + ']  value=' + d.value + '  max=' + d.max + '  percentage=' + d.percentage.toFixed(1) + '%';
+				entries.unshift(line);
+				if (entries.length > 8) entries = entries.slice(0, 8);
+				log.textContent = entries.join('\n');
+			});
+		}
+	})();
+</script>
 		</section>
 
 		<!-- Footer -->

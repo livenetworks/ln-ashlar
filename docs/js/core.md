@@ -214,7 +214,7 @@ state.toasts.push({ title: 'Hello' }); // triggers onChange
 - Auto-wraps newly assigned objects/arrays
 - `deleteProperty` also triggers `onChange`
 - Internal `Symbol('deepReactive')` flag prevents double-wrapping
-- Used by `ln-toast`, `ln-upload`, `ln-table` for complex state
+- Used by `ln-toast`, `ln-upload` for complex state
 
 ### createBatcher(renderFn, afterRender)
 

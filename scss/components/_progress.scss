@@ -1,6 +1,6 @@
 @use '../config/mixins' as *;
 
-[data-ln-progress] {
+.progress {
 	@include progress;
 }
 

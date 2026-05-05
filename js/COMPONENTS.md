@@ -128,9 +128,9 @@ _component.prototype.close = function () { ... };
 
 **Usage:**
 ```javascript
-// Instance API on the element
-document.getElementById('sidebar').lnToggle.open();
-document.getElementById('sidebar').lnToggle.close();
+// Attribute is the contract — write data-ln-toggle to change state
+document.getElementById('sidebar').setAttribute('data-ln-toggle', 'open');
+document.getElementById('sidebar').setAttribute('data-ln-toggle', 'close');
 
 // Constructor — only for non-standard cases (Shadow DOM, iframe)
 // Dynamic AJAX HTML does NOT require manual init — MutationObserver handles it automatically
@@ -401,7 +401,7 @@ _component.prototype.destroy = function () {
 When a component depends on another (e.g. ln-accordion → ln-toggle):
 
 1. **Listen only to post-action events** (`ln-toggle:open`) — not before-events, unless you need to cancel
-2. **Communicate only via events** — dispatch `request-*` events to the target element, NEVER call another component directly (`el.lnToggle.close()`)
+2. **Communicate only via events or attributes** — dispatch `request-*` events to the target element, or write the target's `data-ln-*` attribute. NEVER reach into another component's instance to mutate state.
 3. **Emit your own events** for your own actions (`ln-accordion:change`)
 4. **Never import** another component — CustomEvent communication only
 
@@ -427,8 +427,8 @@ The architecture follows the **Mediator pattern** (GoF): components do not commu
 
 The ln-ashlar library already implements this:
 
-- **ln-toggle** is a component (state layer): `data-ln-toggle` attribute is the single source of truth. MutationObserver detects attribute changes → applies `.open` class, emits `ln-toggle:open` / `ln-toggle:close`. API methods (`open()`, `close()`) just set the attribute.
-- **ln-accordion** is a coordinator (mediator): listens to `ln-toggle:open` from children, sets `data-ln-toggle="close"` on siblings. **Never** calls `el.lnToggle.close()`. Emits its own `ln-accordion:change`
+- **ln-toggle** is a component (state layer): `data-ln-toggle` attribute is the single source of truth. MutationObserver detects attribute changes → applies `.open` class, emits `ln-toggle:open` / `ln-toggle:close`. The component exposes no state-mutating method; consumers write the attribute.
+- **ln-accordion** is a coordinator (mediator): listens to `ln-toggle:open` from children, sets `data-ln-toggle="close"` on siblings. **Never** reaches into a sibling's instance — writes the attribute and lets each toggle's own observer run its own close pipeline. Emits its own `ln-accordion:change`.
 
 ```
 [Toggle A opens — attribute set to "open"]
@@ -493,7 +493,7 @@ Most components: the constructor is registered on `window`. Instances live on DO
 
 ```javascript
 window[DOM_ATTRIBUTE] = constructor;    // window.lnToggle, window.lnModal, ...
-// Instance: el.lnToggle.open(), el.lnModal.close()
+// Instance: el.lnToggle.destroy(), el.lnModal.close()
 ```
 
 Use when: component has DOM instances, each element gets its own API.
@@ -1014,9 +1014,10 @@ through one of two channels:
   another's MutationObserver reacts (ln-accordion setting
   `data-ln-toggle="close"` on sibling toggles).
 
-No component ever does `import '../ln-toggle'` or calls
-`otherEl.lnToggle.open()`. If you catch yourself reaching for an import,
-re-read the Mediator section above.
+No component ever does `import '../ln-toggle'` or reaches into
+`otherEl.lnToggle` to mutate its state. If you catch yourself reaching
+for an import or for a sibling's instance, re-read the Mediator section
+above — write the attribute instead.
 
 ### ln-toggle — the state primitive
 

@@ -52,6 +52,17 @@ import { registerComponent, dispatch } from '../ln-core';
 			iconUse.setAttribute('href', '#ln-check');
 			this.dom.classList.add('ln-confirm-tooltip');
 			this.dom.setAttribute('data-tooltip-text', this.confirmText);
+			// Accessibility — swap aria-label so the new accessible name
+			// matches the prompt, and append a transient role="alert"
+			// announcer so AT speaks the prompt immediately (aria-label
+			// mutation alone is not announced on a focused element).
+			this.originalAriaLabel = this.dom.getAttribute('aria-label');
+			this.dom.setAttribute('aria-label', this.confirmText);
+			this.alertNode = document.createElement('span');
+			this.alertNode.className = 'sr-only';
+			this.alertNode.setAttribute('role', 'alert');
+			this.alertNode.textContent = this.confirmText;
+			this.dom.appendChild(this.alertNode);
 		} else {
 			this.dom.textContent = this.confirmText;
 		}
@@ -84,6 +95,17 @@ import { registerComponent, dispatch } from '../ln-core';
 			}
 			this.dom.classList.remove('ln-confirm-tooltip');
 			this.dom.removeAttribute('data-tooltip-text');
+			// Accessibility — restore aria-label and remove the announcer.
+			if (this.originalAriaLabel !== null && this.originalAriaLabel !== undefined) {
+				this.dom.setAttribute('aria-label', this.originalAriaLabel);
+			} else {
+				this.dom.removeAttribute('aria-label');
+			}
+			this.originalAriaLabel = null;
+			if (this.alertNode && this.alertNode.parentNode === this.dom) {
+				this.dom.removeChild(this.alertNode);
+			}
+			this.alertNode = null;
 			this.isIconButton = false;
 			this.originalIconHref = null;
 		} else {

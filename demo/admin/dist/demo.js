@@ -22,19 +22,11 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 		const mq = window.matchMedia('(max-width: ' + bpMd + 'px)');
 
 		const closeSidebar = function () {
-			if (sidebar.lnToggle) {
-				sidebar.lnToggle.close();
-			} else {
-				sidebar.setAttribute('data-ln-toggle', 'close');
-			}
+			sidebar.setAttribute('data-ln-toggle', 'close');
 		};
 
 		const openSidebar = function () {
-			if (sidebar.lnToggle) {
-				sidebar.lnToggle.open();
-			} else {
-				sidebar.setAttribute('data-ln-toggle', 'open');
-			}
+			sidebar.setAttribute('data-ln-toggle', 'open');
 		};
 
 		if (mq.matches) {

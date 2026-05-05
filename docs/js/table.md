@@ -1,239 +1,349 @@
 # Table
 
-Data table component — client-side search, per-column filtering, sorting, virtual scroll. File: `js/ln-table/ln-table.js`.
+> Architecture mirror for `js/ln-table/ln-table.js`. Companion to the
+> consumer-facing README at `js/ln-table/README.md`. This file
+> documents internal state, render pipeline, and design decisions for
+> library maintainers.
 
-Companion: `js/ln-table/ln-table-sort.js` (sort header clicks).
-
-## HTML
-
-```html
-<div data-ln-table>
-    <div class="ln-table__toolbar">
-        <!-- ln-search, ln-filter, or custom controls here -->
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th data-ln-sort="string">Name</th>
-                <th data-ln-sort="number" data-ln-filter-col="dept">Dept</th>
-                <th data-ln-sort="date">Joined</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Alice</td>
-                <td>Engineering</td>
-                <td data-ln-value="1672531200">2023-01-01</td>
-                <td><button>Edit</button></td>
-            </tr>
-            <!-- server-rendered rows -->
-        </tbody>
-    </table>
-
-    <template data-ln-table-empty>
-        <p>No results found.</p>
-    </template>
-</div>
-```
-
-## Attributes
-
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-table` | component root | Initializes the table component |
-| `data-ln-persist` | component root | Persist active sort column + direction across page loads (uses `id` or attribute value as storage key) |
-| `data-ln-sort="type"` | `<th>` | Sort type: `string`, `number`, or `date`. Enables sorting on this column |
-| `data-ln-sort-active="asc\|desc"` | `<th>` | **Set by JS** (`ln-table-sort`). Present on the currently sorted column with value `asc` or `desc`. Removed when column returns to unsorted state |
-| `data-ln-filter-col="key"` | `<th>` | Maps this column to a filter key (used by `ln-filter` per-column filtering) |
-| `data-ln-filter-active` | `<th>` | **Set by JS.** Present when a column filter has active (non-reset) values |
-| `data-ln-value="raw"` | `<td>` | Override cell value for sorting (e.g., timestamp for dates) |
-| `data-ln-table-empty` | `<template>` | Content to show when filter/search yields zero results |
-
-## Events
-
-### Emitted
-
-| Event | Bubbles | `detail` | When |
-|-------|---------|----------|------|
-| `ln-table:ready` | yes | `{ total }` | After initial row parse completes |
-| `ln-table:filter` | yes | `{ term, matched, total }` | After search or column filter changes |
-| `ln-table:sorted` | yes | `{ column, direction, matched, total }` | After sort changes |
-| `ln-table:empty` | yes | `{ term, total }` | When filter/search produces zero results |
-
-### Consumed
-
-| Event | From | Purpose |
-|-------|------|---------|
-| `ln-search:change` | ln-search | Full-text search. `e.preventDefault()` tells ln-search to skip its own DOM hiding |
-| `ln-table:sort` | ln-table-sort | Sort by column. Detail: `{ column, sortType, direction }` |
-| `ln-filter:changed` | ln-filter | Per-column filter. Detail: `{ key, value }` |
-
-## API
+## Imports
 
 ```js
-const el = document.querySelector('[data-ln-table]');
-el.lnTable.destroy();   // remove all listeners, virtual scroll, column locks
+import { dispatch, registerComponent } from '../ln-core';
 ```
 
-## CSS (consumer provides)
+Two helpers from `ln-core`:
 
-```css
-.ln-table__toolbar { /* toolbar above the table */ }
-.ln-table__empty td { text-align: center; padding: 2rem; }
-.ln-table__spacer { /* virtual scroll spacer rows — styled inline, usually no overrides needed */ }
-```
+- `dispatch(el, name, detail)` — bubbling, non-cancelable
+  CustomEvent. Used for the four emitted events.
+- `registerComponent(selector, attribute, ComponentFn, componentTag)`
+  — global init plumbing. Sets up the document-body MutationObserver
+  with `attributeFilter: ['data-ln-table']`, attaches the constructor
+  to `window.lnTable`, and runs `findElements` on init.
 
----
+No `dispatchCancelable` — none of the four emitted events are
+cancelable. The component's "before" gate is the implicit one:
+`_applyFilterAndSort()` runs synchronously inside the handler before
+the dispatch, so consumers cannot intercept between filter and render.
 
-## Internal Architecture
+No `cloneTemplate` — empty-state cloning uses `document.importNode`
+on a directly-located `<template data-ln-table-empty>` (selected via
+`this.dom.querySelector` so each table can carry its own empty
+template). The `cloneTemplate` helper looks up by `data-ln-template`
+name with a global cache; ln-table predates that pattern.
 
-This section explains how the component works internally. The goal: a developer or AI reading this should fully understand the data flow, state model, and render pipeline without reading the source.
+## Instance state
 
-### Data Model
+Every property on `this`, with intent:
 
-ln-table is a **server-rendered** table component. Rows arrive as HTML in `<tbody>`, not from a JS data source. On initialization, `_parseRows()` reads the existing DOM rows once and builds an in-memory array (`_data`). Each entry stores:
+| Property | Type | Initial | Purpose |
+|---|---|---|---|
+| `dom` | HTMLElement | — | The `[data-ln-table]` wrapper. |
+| `table` | HTMLTableElement \| null | — | Cached `dom.querySelector('table')`. Rendering operates on `tbody`, but `_lockColumnWidths` reads + injects on `table`. |
+| `tbody` | HTMLTableSectionElement \| null | — | Render target. `null` triggers a no-op in `_render()`. |
+| `thead` | HTMLTableSectionElement \| null | — | Used to compute virtual-scroll offsets (`theadH = thead.offsetHeight`). |
+| `ths` | HTMLTableCellElement[] | from `thead` | Sort-type lookup, filter-column-key lookup, colspan source. |
+| `_data` | Array<RowEntry> | `[]` | Parsed row cache. Each entry: `{ html, sortKeys, rawTexts, searchText }`. |
+| `_filteredData` | Array<RowEntry> | `[]` | Current filtered + sorted view. Re-derived on every event. |
+| `_searchTerm` | string | `''` | Lowercased search query. |
+| `_sortCol` | number | `-1` | Index in `ths`. `-1` means no sort. |
+| `_sortDir` | `'asc' \| 'desc' \| null` | `null` | Sort direction. |
+| `_sortType` | `'string' \| 'number' \| 'date' \| null` | `null` | Cached from the last `ln-table:sort` event. |
+| `_columnFilters` | `{ [key: string]: string[] }` | `{}` | Active per-column filters; values are lowercased. |
+| `_virtual` | boolean | `false` | Whether virtual-scroll mode is active. |
+| `_rowHeight` | number | `0` | Measured from row 0 at parse time. Falls back to `40` if `offsetHeight === 0`. |
+| `_vStart` | number | `-1` | First row in current virtual window. `-1` forces recalc. |
+| `_vEnd` | number | `-1` | Last row in current virtual window (exclusive). |
+| `_rafId` | number \| null | `null` | `requestAnimationFrame` id used to coalesce scroll/resize fires. |
+| `_scrollHandler` | Function \| null | `null` | The single scroll/resize listener; stored for `removeEventListener` on destroy. |
+| `_colgroup` | HTMLElement \| null | `null` | Reference to the injected `<colgroup>`. Removed on destroy. |
+| `_emptyTbodyObserver` | MutationObserver \| null | `null` | **NEW (post-fix)** — watches the empty tbody for the first row insertion. Stored so `destroy()` can disconnect. |
+| `_onSearch` | Function | bound | `ln-search:change` handler. Stored as instance property for symmetric `removeEventListener`. |
+| `_onSort` | Function | bound | `ln-table:sort` handler. |
+| `_onColumnFilter` | Function | bound | `ln-filter:changed` handler. |
+| `_onClear` | Function | bound | Document-delegated click handler for `[data-ln-table-clear]`. |
 
-```
-{
-    html:       String    // tr.outerHTML — the full row markup, frozen at parse time
-    sortKeys:   Array     // per-column: parsed float for number/date, string for string, null for unsortable
-    rawTexts:   Array     // per-column: td.textContent.trim().toLowerCase()
-    searchText: String    // all columns except the last, joined with space (lowercase)
-}
-```
+The four `_on*` handlers are bound as closures over `self = this` to
+avoid `.bind(this)` allocation on every render. They are stored on
+the instance specifically for `removeEventListener` symmetry — every
+listener attached in the constructor is detached in `destroy()`.
 
-After parsing, the original `<tbody>` rows are replaced by re-rendering from these cached HTML strings. All subsequent filtering, sorting, and rendering operate on this in-memory array — the DOM is output-only.
+## Init topology
 
-**Why `outerHTML` strings?** The component supports virtual scroll (only visible rows in DOM). Storing pre-rendered HTML strings means rendering a window of rows is a single `innerHTML` assignment. No `createElement` chains, no template cloning, no `fill()` — the markup was already built by the server.
-
-### State Properties
-
-Filter/sort parameters are plain instance properties — no reactive proxy, no batching:
-
-```
-this._searchTerm    = ''       // from ln-search:change
-this._sortCol       = -1       // column index, -1 = no sort
-this._sortDir       = null     // 'asc' | 'desc' | null
-this._sortType      = null     // 'string' | 'number' | 'date' | null
-this._columnFilters = {}       // { filterKey: [values], ... }
-```
-
-Each event handler (search, sort, column filter) updates these properties directly, then calls `_applyFilterAndSort()` → `_render()` → `dispatch()` synchronously in the same handler.
-
-### Update Flow
-
-```
-event handler (e.g. _onSearch):
-    1. set this._searchTerm = term
-    2. _applyFilterAndSort()    — recompute _filteredData from _data
-    3. reset _vStart/_vEnd      — force virtual scroll recalc
-    4. _render()                — choose render path based on count
-    5. dispatch('ln-table:filter', { term, matched, total })
-```
-
-No microtask batching, no pending events queue. Each handler runs the full pipeline synchronously and dispatches its event immediately after rendering.
-
-**Initial render** (`_parseRows`) sets `_filteredData = _data.slice()` and calls `_render()` directly, then dispatches `ln-table:ready`.
-
-### Render Paths
-
-`_render()` decides which path based on filtered row count and active filters:
-
-| Condition | Path | Description |
-|-----------|------|-------------|
-| count = 0 AND (search or column filter active) | `_showEmptyState()` | Clones `<template data-ln-table-empty>` into a full-width `<td>`, dispatches `ln-table:empty` |
-| count > 200 (`VIRTUAL_THRESHOLD`) | `_renderVirtual()` | Only visible rows + buffer in DOM |
-| otherwise | `_renderAll()` | All filtered rows via `innerHTML` |
-
-Transitions between paths are automatic. Entering virtual scroll calls `_enableVirtualScroll()` (attaches scroll/resize listeners). Leaving it calls `_disableVirtualScroll()` (removes listeners, cancels pending rAF).
-
-### Virtual Scroll
-
-Activated when `_filteredData.length > 200`. The mechanism:
-
-1. **Row height**: measured from the first row at parse time (`_rowHeight`). Assumed uniform.
-2. **Column widths**: locked via `<colgroup>` with explicit `col.style.width` values + `table-layout: fixed`. Prevents layout shift when rows change.
-3. **Visible window**: on each scroll/resize (throttled via `requestAnimationFrame`), compute which rows are visible based on `window.scrollY` and the table's position.
-4. **Buffer**: `BUFFER_ROWS = 15` rows above and below the viewport to prevent flicker during fast scroll.
-5. **Spacer rows**: `<tr class="ln-table__spacer" aria-hidden="true">` with calculated height above/below the visible window to maintain scroll height.
-6. **Skip check**: if `startRow` and `endRow` haven't changed since last render, skip DOM update entirely.
-
-Virtual scroll listeners are passive (no `preventDefault`). Cleanup on destroy removes both `scroll` and `resize` listeners.
-
-### Filter + Sort Pipeline
-
-`_applyFilterAndSort()` is called by each event handler. It produces `_filteredData` from `_data`:
-
-1. **Text search**: if `_searchTerm` is set, rows where `searchText.indexOf(term) === -1` are excluded. Search covers all columns except the last (assumed to be an actions column).
-2. **Column filters**: if `_columnFilters` has entries, each key is mapped to a column index via `th[data-ln-filter-col]`. Only columns with a mapped `data-ln-filter-col` are processed — unmapped filter keys are ignored. Multiple column filters are AND-combined; values within a single filter are OR-combined (any match passes).
-3. **Sort**: if `_sortCol >= 0` and `_sortDir` is set, `_filteredData` is sorted in-place. Numeric/date columns compare `sortKeys` (pre-parsed floats). String columns use `Intl.Collator` (locale-aware, case-insensitive) with fallback to `<`/`>` comparison.
-
-Search and column filters stack — both must pass for a row to appear.
-
-### Event Flow
-
-Events dispatch synchronously at the end of each handler, after render completes:
+Single-call init via `ln-core`'s `registerComponent`:
 
 ```
-_onSearch handler:
-    1. e.preventDefault()
-    2. set _searchTerm = term
-    3. _applyFilterAndSort()
-    4. reset virtual scroll range
-    5. _render()
-    6. dispatch('ln-table:filter', { term, matched, total })
+registerComponent('data-ln-table', 'lnTable', _component, 'ln-table')
+    → guardBody — ensures document.body exists
+    → MutationObserver on document.body
+        watches:
+            childList: subtree              (new wrappers inserted)
+            attributes: [data-ln-table]     (attribute set on existing element)
+    → window.lnTable = constructor
+    → DOMContentLoaded → constructor(document.body)
 ```
 
-Because dispatch happens after `_render()`, event listeners receive correct `matched`/`total` counts that reflect the already-updated DOM.
+Per-instance constructor flow:
 
-The `ln-search:change` handler calls `e.preventDefault()` — this tells ln-search to skip its own DOM show/hide logic (ln-table handles all rendering itself).
-
-### Companion: ln-table-sort
-
-`ln-table-sort.js` is a separate component that auto-initializes on any `<table>` containing `th[data-ln-sort]`. It handles:
-
-- Click cycle on `<th>`: asc → desc → unsorted → asc
-- `data-ln-sort-active="asc|desc"` attribute on the active `<th>`
-- Dispatches `ln-table:sort` event (bubbles up to `[data-ln-table]`)
-
-ln-table and ln-table-sort communicate only via events — no direct coupling.
-
-### Companion: ln-filter (column filters)
-
-Per-column dropdown filters are implemented by placing `ln-filter` components inside or outside `<th>` elements (popover or dropdown pattern). When a filter checkbox changes, `ln-filter` dispatches `ln-filter:changed` which bubbles up to `[data-ln-table]`. ln-table matches the filter `key` to a column via `th[data-ln-filter-col="key"]`.
-
-#### Active filter indicator
-
-When a column filter has non-reset values, `ln-table` sets `data-ln-filter-active` on the matching `<th>`. When the filter is reset (all values cleared or "All" selected), the attribute is removed. This allows CSS to style the filter trigger button:
-
-```css
-th[data-ln-filter-active] .filter {
-    opacity: 1;
-    color: hsl(var(--color-primary));
-}
+```
+new _component(dom):
+    1. cache dom, table, tbody, thead, ths
+    2. zero state (_data, _filteredData, _searchTerm, _sortCol, _columnFilters)
+    3. zero virtual state (_virtual=false, _rowHeight=0, _vStart=_vEnd=-1)
+    4. measure toolbar height → CSS var --ln-table-toolbar-h
+    5. branch on tbody state:
+        if rows.length > 0  → _parseRows() now (synchronous)
+        else                → start MutationObserver on tbody;
+                              when rows arrive, disconnect + parse
+    6. attach _onSearch, _onSort, _onColumnFilter listeners on dom
+    7. attach _onClear (delegated click) on dom
 ```
 
-The `.filter` class is a convention for the trigger button. The `@mixin table-filter-button` in `scss/config/mixins/_table.scss` provides the default styling (float right, low opacity, hover highlight, active primary color).
+`_parseRows` is the only path that populates `_data`. It runs once
+per instance lifetime — there is no "re-parse on tbody mutation"
+beyond the initial empty-tbody wait. After parse, the tbody becomes
+output-only.
 
-### Internal Properties
+## Method flows
 
-| Property | Purpose |
-|----------|---------|
-| `_data` | Full parsed row array. Set once in `_parseRows` |
-| `_filteredData` | Derived from `_data` by `_applyFilterAndSort` |
-| `_searchTerm` | Current search term (string) |
-| `_sortCol`, `_sortDir`, `_sortType` | Current sort state |
-| `_columnFilters` | Active column filters (`{ key: [values] }`) |
-| `_virtual` | Boolean — whether virtual scroll is currently active |
-| `_vStart`, `_vEnd` | Current visible row range. Reset to -1 to force recalc |
-| `_rowHeight` | Measured once at parse time. Assumed uniform for virtual scroll math |
-| `_colgroup` | Reference to injected `<colgroup>` for width locking |
-| `_rafId`, `_scrollHandler` | Virtual scroll rAF and listener references for cleanup |
+### `_parseRows()`
 
-### Lifecycle
+```
+_parseRows:
+    1. read sortType per column from th[data-ln-sort]
+    2. _rowHeight = rows[0].offsetHeight || 40
+    3. _lockColumnWidths()
+    4. for each row:
+        - per cell: textContent, raw (data-ln-value || textContent),
+                    type (from sortTypes[j])
+        - sortKeys[j] = parseFloat(raw)||0  (number/date)
+                      | String(raw)         (string)
+                      | null                (no type)
+        - rawTexts[j] = textContent.toLowerCase()
+        - searchParts.push(textContent.lowercase) IF j < cells.length-1
+        - push { sortKeys, rawTexts, html: tr.outerHTML, searchText }
+    5. _filteredData = _data.slice()
+    6. _render()
+    7. dispatch('ln-table:ready', { total })
+```
 
-1. **Init**: MutationObserver or DOMContentLoaded → `findElements` → `new _component(dom)`
-2. **Parse**: if `<tbody>` has rows, `_parseRows()` runs immediately. Otherwise, a MutationObserver waits for rows to appear (AJAX-loaded tables).
-3. **Steady state**: event handler → update properties → `_applyFilterAndSort()` → `_render()` → `dispatch()`
-4. **Destroy**: `destroy()` removes event listeners, virtual scroll, colgroup, clears data, deletes instance from DOM element
+Last column exclusion (step 4, `j < cells.length - 1`) is the actions
+column convention. Search index built BEFORE virtual-scroll math —
+`_render()` reads `_data.length` to decide between virtual and
+all-rows path.
+
+### `_applyFilterAndSort()`
+
+```
+_applyFilterAndSort:
+    1. resolve hasColFilters, build colIndexByKey: { key → idx }
+    2. if !term && !hasColFilters:
+           _filteredData = _data.slice()
+       else:
+           filter _data → _filteredData via:
+               (a) row.searchText includes term
+               (b) for each colFilter: row.rawTexts[idx] in values
+    3. early-return if _sortCol < 0 || !_sortDir
+    4. sort _filteredData in-place:
+           numeric/date: (a.sortKeys[col] - b.sortKeys[col]) * mult
+           string:       _collator.compare(a.sortKeys[col], b.sortKeys[col]) * mult
+```
+
+`_collator` is a module-level singleton initialized once at script
+load with `document.documentElement.lang || undefined`. Same
+collator across all table instances on the page.
+
+### `_render()`
+
+```
+_render:
+    if !tbody                              → return
+    count = _filteredData.length
+    if count === 0 && (term || colFilters) → _disableVirtualScroll() + _showEmptyState()
+    elif count > 200                       → _enableVirtualScroll() + _renderVirtual()
+    else                                   → _disableVirtualScroll() + _renderAll()
+```
+
+Three branches, mutually exclusive. Mode transitions
+(virtual→all, all→virtual, anything→empty) are handled by the
+adjacent `_enableVirtualScroll` / `_disableVirtualScroll` calls.
+`_disableVirtualScroll()` is idempotent (the `if (!this._virtual)
+return` guard at the top), so repeatedly calling it on every
+non-virtual render is safe.
+
+### `_renderAll()` and `_renderVirtual()`
+
+```
+_renderAll:
+    join _filteredData[].html → tbody.innerHTML
+
+_renderVirtual:
+    1. compute scroll offset:
+           tableTopInPage = table.getBoundingClientRect().top + scrollY
+           dataStartInPage = tableTopInPage + thead.offsetHeight
+           scrollIntoData = scrollY - dataStartInPage
+    2. compute window:
+           startRow = max(0, floor(scrollIntoData / rowH) - BUFFER)
+           endRow   = min(startRow + ceil(innerHeight / rowH) + BUFFER*2, total)
+    3. skip if (startRow, endRow) === (_vStart, _vEnd)
+    4. emit:
+           top spacer    (if startRow > 0)
+           rows[start..end]  joined
+           bottom spacer (if endRow < total)
+       tbody.innerHTML = html
+```
+
+Spacer rows are `<tr class="ln-table__spacer" aria-hidden="true">`
+with inline `height: Npx; padding: 0; border: none`. The inline
+styles bypass any project SCSS that might re-pad table rows. Spacer
+rows have a single `<td colspan="N">`.
+
+## Lifecycle
+
+```
+init                    → constructor → wait-or-parse
+attribute change        → registerComponent's observer re-runs constructor
+                          (no-op if already initialized — findElements guards by attribute presence)
+event (search/sort/filter/clear)
+                        → handler → _applyFilterAndSort → _render → dispatch
+destroy()               → _disableVirtualScroll
+                        → remove the four event listeners
+                        → disconnect _emptyTbodyObserver if present
+                        → remove colgroup, reset table-layout
+                        → clear _data, _filteredData
+                        → delete dom[DOM_ATTRIBUTE]
+```
+
+There is no auto-destroy on element removal. The global
+MutationObserver from `registerComponent` does NOT detect node
+removal; it only watches `addedNodes` and the `attributeFilter`.
+Manually call `destroy()` before removing a table from the DOM if
+you care about listener cleanup. In practice, page navigation makes
+this irrelevant.
+
+## Why this, not that
+
+### Why parse to `outerHTML` strings, not to records?
+
+The component is opinionated about its scope: it does not own row
+markup. The server already produced it; the JS layer adds in-place
+sort/filter/virtual-scroll. Storing `outerHTML` strings means render
+is a single `innerHTML` write — no `createElement` chains, no
+template clones, no per-cell formatting calls. Sort and filter only
+need the canonical sort keys and lowercased text; both are computed
+once at parse and cached on the entry.
+
+Cost: cell content is frozen. If you need live cells, use
+`ln-data-table`.
+
+### Why no Proxy / no batcher?
+
+State is flat and updates are coarse — one event handler runs the
+full pipeline. There is no scenario where two state changes batch
+into one render: each event handler is the unit of work. Adding a
+batcher would only delay events past the user-perceptible threshold
+(every render is microtask-or-later) for no benefit.
+
+`ln-data-table` does the same — its render is also synchronous per
+event, no batcher. Both predate the `createBatcher` helper that
+later components use; both have no reason to migrate.
+
+### Why window-level scroll listener, not container-scoped?
+
+Tables are typically the dominant content of a page; the page
+scrolls. Window scroll covers the common case. A container-scoped
+listener would require resolving the scroll parent (which is
+not always obvious — `overflow: auto` ancestors, sticky parents,
+contained-block stacking), and would still need a window-scroll
+fallback for tables in normal flow.
+
+The trade-off: tables inside scroll containers do not virtual-scroll
+correctly. This is documented under "What it does NOT do" in the
+README. In practice, server-rendered listings live on standalone
+admin pages, not inside modal bodies. If you need a virtual table
+inside an overflow container, this is the wrong component.
+
+### Why is the last column excluded from search?
+
+Convention: the last column is "Actions" (Edit / Delete / View
+buttons). Including button text in search would mean every row
+matches "Edit". The convention is baked in; there is no
+`data-ln-no-search` opt-out per cell. Tables without an actions
+column either accept the limitation, add a trailing empty
+presentational column, or use `ln-data-table` (which has no
+last-column convention — search is per-cell-explicit via
+`data-ln-cell` attributes).
+
+### Why is `data-ln-value` honored for sort but not for filter/search?
+
+Sort needs a canonical comparable value (timestamps for dates,
+numbers for currency strings). Filter and search work on what the
+user reads — typing "Nov" should match `"15.11.2023"` if the cell
+displays in DD.MM.YYYY format, not the underlying timestamp.
+
+This split is also implicit in the `_parseRows` pipeline: `sortKeys`
+reads `data-ln-value`, `rawTexts` and `searchText` read
+`textContent` only.
+
+### Why three independent components instead of one mega-table?
+
+`ln-search`, `ln-table-sort`, `ln-filter`, and `ln-table` evolved as
+independent units that compose via CustomEvents. Each can be
+replaced (custom search bar, custom sort UI, custom filter dropdown)
+by anything that dispatches the same event shape. The cost is wiring
+overhead in HTML — every consumer page repeats the toolbar markup.
+The benefit is that each unit is small, testable, and evolves
+independently. (`ln-data-table` chose the opposite trade-off: one
+big component that owns its toolbar.)
+
+## Where this could change
+
+Forward-looking notes for future maintainers — these are NOT bugs,
+but areas where the design has known limitations that may be revisited.
+
+- **`aria-sort`** — currently not set by `ln-table-sort`. Adding it
+  is non-controversial; the only reason it is missing is that the
+  companion was written before the team standardized on full ARIA
+  coverage. A 3-line patch in `ln-table-sort.js` (`th.setAttribute(
+  'aria-sort', dir === 'asc' ? 'ascending' : 'descending')`) closes
+  the gap. Tracked separately from the ln-table audit.
+
+- **Empty-tbody MutationObserver leak** — fixed in the current pass
+  (Phase 4 below). The observer reference is now stored as
+  `_emptyTbodyObserver` and disconnected in `destroy()`.
+
+- **Container-scoped virtual scroll** — would require resolving the
+  scroll parent at init, attaching scroll listeners to that parent
+  instead of `window`, and recomputing scroll offsets relative to
+  that parent's scroll position. Doable but adds ~50 lines and
+  edge cases (resize observer for parent dimension changes,
+  fallback chain when the parent has its own
+  `overflow-anchor: none`, etc.). Not on the roadmap; consumers
+  with this need use `ln-data-table` or render fewer rows.
+
+- **`data-ln-value` honored by filter** — would let date columns be
+  filtered by raw timestamp values. This is more invasive than it
+  looks: ln-filter populates its checkbox list from the data, so
+  the filter options would need to be the formatted display string
+  but the comparison would need to be against the raw value. The
+  cleanest path is "use ln-data-table". Not on the roadmap for
+  ln-table.
+
+- **Coordinator/component split** — the current model has events
+  flowing INTO the table (`ln-search:change`, `ln-filter:changed`)
+  but no "request" events flowing out beyond the four notifications.
+  The pattern in newer components is "request events for mutations,
+  notification events for state changes" — ln-table's API is read-
+  only because there are no mutation paths to expose. If the
+  component ever grows a "set rows from JS" path (effectively
+  becoming a half-ln-data-table), that path SHOULD use a
+  `ln-table:request-set-data` request event, not a direct method
+  call. Not on the roadmap.
+
+## See also
+
+- [`../../js/ln-table/README.md`](../../js/ln-table/README.md) — consumer doc.
+- [`./table-sort.md`](./table-sort.md) — companion architecture mirror.
+- [`./data-table.md`](./data-table.md) — the event-driven sibling.
+- [`./search.md`](./search.md) — the search input that fires `ln-search:change`.
+- [`./filter.md`](./filter.md) — per-column filter dropdown.
+- [`./core.md`](./core.md) — `dispatch`, `registerComponent`, helper layer.

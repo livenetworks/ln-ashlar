@@ -26,7 +26,7 @@
 		@include block;
 	}
 
-	[data-ln-progress] {
+	.progress {
 		@include mt(var(--size-sm));
 	}
 }

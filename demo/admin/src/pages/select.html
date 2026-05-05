@@ -1,128 +1,342 @@
 <!-- ln-page: title="Select — ln-ashlar" h1="Select" -->
 
-<h1>Select</h1>
-					<p>TomSelect wrapper — enhances the standard <code>&lt;select&gt;</code> with search, tagging and create functionality.</p>
-
-					<!-- Basics -->
+					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Basics</h3></header>
+						<header><h3>Overview</h3></header>
 						<main>
-							<div class="table-container">
+							<p>A 152-line wrapper around <a href="https://tom-select.js.org/">TomSelect</a> that exists for one reason: the platform's native <code>&lt;select&gt;</code> is usable but not enough. It cannot search 200 options, cannot tag, cannot create on the fly, cannot render multi-select chips that survive a finger on a touchscreen. TomSelect solves all of that. ln-select adds the smallest amount of glue — auto-init via <code>MutationObserver</code>, JSON-config from a single attribute, form-reset hookup, graceful degradation when TomSelect is missing — so the form layer (<a href="forms.html"><code>ln-form</code></a>, <a href="validate.html"><code>ln-validate</code></a>, <a href="autosave.html"><code>ln-autosave</code></a>) can compose with TomSelect through the platform's own <code>change</code> event without ever knowing TomSelect exists.</p>
+							<p>The contract is one sentence: <strong>put <code>data-ln-select</code> on a <code>&lt;select&gt;</code> and TomSelect upgrades it; remove the element from the DOM and the instance is destroyed.</strong> Configuration travels as JSON inside the attribute value (<code>data-ln-select='{"create": true}'</code>), merged on top of seven sensible defaults. The TomSelect instance itself lives in a module-scoped <code>WeakMap</code>, accessible via <code>window.lnSelect.getInstance(element)</code> — never on <code>el.lnSelect</code> directly.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-select/README.md"><code>ln-select</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/select.md">architecture reference</a>.</p>
+						</main>
+					</section>
+
+					<!-- Anatomy -->
+					<section class="section-card">
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>A select-enhanced field is one element — a <code>&lt;select&gt;</code> with <code>data-ln-select</code>. Optional JSON in the attribute value overrides any of the wrapper's seven defaults.</p>
+<pre><code>&lt;select data-ln-select name="role"&gt;
+    &lt;option value=""&gt;Select a role…&lt;/option&gt;
+    &lt;option value="admin"&gt;Administrator&lt;/option&gt;
+    &lt;option value="editor"&gt;Editor&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;select data-ln-select='{"create":true}' name="tags[]" multiple&gt;
+    &lt;option value="design"&gt;design&lt;/option&gt;
+    &lt;option value="engineering"&gt;engineering&lt;/option&gt;
+&lt;/select&gt;</code></pre>
+
+							<h4>The host — <code>&lt;select data-ln-select&gt;</code></h4>
+							<p>The init scan filters by <code>select[data-ln-select]</code>. Putting the attribute on a <code>&lt;div&gt;</code>, <code>&lt;input&gt;</code>, or any other tag does nothing — silent skip, no <code>console.warn</code>. The element renders as written.</p>
+
+							<h4>The configuration — JSON in the attribute value</h4>
+							<p>Empty value <em>or</em> boolean attribute uses defaults. Non-empty value is parsed as JSON and merged on top:</p>
+<pre><code>// Defaults the wrapper applies
+{
+    allowEmptyOption: true,    // honor &lt;option value=""&gt; as a real choice
+    controlInput:     null,    // hide type-to-search input on single-select
+    create:           false,   // disallow user-typed new options
+    highlight:        true,    // highlight matched substring in dropdown
+    closeAfterSelect: true,    // close dropdown after each pick
+    placeholder:      &lt;element placeholder&gt; || 'Select...',
+    loadThrottle:     300,     // ms throttle for async load callback
+}</code></pre>
+							<p>Invalid JSON logs <code>[ln-select] Invalid JSON in data-ln-select attribute:</code> and the wrapper falls back to <code>{}</code> — degraded, not crashed.</p>
+
+							<h4>What state goes where</h4>
+							<p>"Should this <code>&lt;select&gt;</code> be enhanced?" lives in <code>data-ln-select</code> presence. "Currently selected value" lives in <code>&lt;select&gt;.value</code> (single) or <code>&lt;select&gt;.selectedOptions</code> (multiple) — TomSelect writes through. The TomSelect instance itself lives in a module-scoped <code>WeakMap</code>, accessed via <code>window.lnSelect.getInstance(el)</code>. The visible chip pills / dropdown panel are TomSelect's own DOM (<code>.ts-wrapper</code> sibling of the <code>&lt;select&gt;</code>).</p>
+						</main>
+					</section>
+
+					<!-- Why WeakMap -->
+					<section class="section-card">
+						<header><h3>Why <code>WeakMap</code> instead of <code>el.lnSelect</code>?</h3></header>
+						<main>
+							<p>Most ln-ashlar components store their instance directly on the host element — <code>el.lnToggle</code>, <code>el.lnTabs</code>, <code>el.lnAutosave</code>. ln-select deliberately does not.</p>
+							<p>TomSelect mutates the host <code>&lt;select&gt;</code> heavily: hides it with inline <code>display: none</code>, inserts a sibling <code>.ts-wrapper</code> DOM, intercepts every option / change / click. Storing a wrapper instance on <code>select.lnSelect</code> would mean every TomSelect-internal query (<code>select.options</code>, jQuery-style <code>$select</code>, <code>Object.keys(select)</code>) would have to skip past an ln-ashlar-specific property. The <code>WeakMap</code> keeps the instance findable for the wrapper's API while leaving the element's own attribute / property surface untouched.</p>
+							<p>The <code>WeakMap</code> also enables GC of detached elements automatically. When a <code>&lt;select&gt;</code> is removed from the DOM and there are no other references to it, the <code>WeakMap</code> entry becomes eligible for garbage collection along with the element.</p>
+							<p>The trade-off is that <code>el.lnSelect</code> is <code>undefined</code>. Consumers must go through <code>window.lnSelect.getInstance(el)</code> — which is the load-bearing detail that makes <code>ln-autosave</code>'s dead-code branch (<code>if (restored[k].lnSelect &amp;&amp; restored[k].lnSelect.setValue)</code> at <code>ln-autosave.js:97-99</code>) never execute. The synthetic-<code>change</code> dispatch one line above does the actual work.</p>
+						</main>
+					</section>
+
+					<!-- Live: basic single-select -->
+					<section class="section-card">
+						<header><h3>Live demo — single select with search</h3></header>
+						<main>
+							<p>The dropdown is searchable: type "ad" to filter to "Administrator". Keyboard (arrow keys, enter), mouse, or touch — all three commit the selection by writing to the underlying <code>&lt;select&gt;.value</code> and firing <code>change</code>.</p>
+							<form>
+								<div class="form-element">
+									<label for="role-basic">Role</label>
+									<select id="role-basic" name="role" data-ln-select>
+										<option value="">Select a role…</option>
+										<option value="admin">Administrator</option>
+										<option value="editor">Editor</option>
+										<option value="moderator">Moderator</option>
+										<option value="viewer">Viewer</option>
+										<option value="contributor">Contributor</option>
+										<option value="guest">Guest</option>
+									</select>
+								</div>
+							</form>
+							<p>Open DevTools and inspect the <code>&lt;select&gt;</code> — <code>select.value</code> mirrors whatever you picked. The visible chip is TomSelect's <code>.ts-wrapper</code> sibling.</p>
+						</main>
+					</section>
+
+					<!-- Live: multi-select with cap -->
+					<section class="section-card">
+						<header><h3>Live demo — multi-select with cap (<code>maxItems: 3</code>)</h3></header>
+						<main>
+							<p>The <code>multiple</code> attribute on the <code>&lt;select&gt;</code> turns the picker into chip pills. The <code>{"maxItems":3}</code> JSON config caps the number of selections at 3 — after the third, the dropdown stops accepting new picks until the user removes one.</p>
+							<form>
+								<div class="form-element">
+									<label for="tags-multi">Favorite tags (max 3)</label>
+									<select id="tags-multi" name="tags[]" data-ln-select='{"maxItems":3}' multiple>
+										<option value="design">Design</option>
+										<option value="engineering">Engineering</option>
+										<option value="product">Product</option>
+										<option value="marketing">Marketing</option>
+										<option value="sales">Sales</option>
+										<option value="support">Support</option>
+										<option value="ops">Operations</option>
+									</select>
+								</div>
+							</form>
+							<p>The <code>[]</code> in the <code>name</code> attribute is the Laravel / Rails / Express convention for "this is an array on the server side." When the form serializes, the field appears as repeated <code>tags[]=design&amp;tags[]=engineering</code>.</p>
+						</main>
+					</section>
+
+					<!-- Live: tagging (create) -->
+					<section class="section-card">
+						<header><h3>Live demo — tagging (<code>create: true</code>)</h3></header>
+						<main>
+							<p>With <code>{"create":true}</code>, the user can type a value that is not in the option list and press Enter to add it. TomSelect appends a new <code>&lt;option&gt;</code> to the underlying <code>&lt;select&gt;</code> as the user creates, so the new tag is in the serialized payload alongside the existing ones.</p>
+							<form>
+								<div class="form-element">
+									<label for="tags-create">Tags (type to add new)</label>
+									<select id="tags-create" name="tags[]" data-ln-select='{"create":true}' multiple>
+										<option value="javascript">javascript</option>
+										<option value="php">php</option>
+										<option value="python">python</option>
+									</select>
+								</div>
+							</form>
+							<p>Try typing <code>rust</code> and pressing Enter. Then inspect the <code>&lt;select&gt;</code> in DevTools — the new <code>&lt;option value="rust"&gt;</code> is there.</p>
+						</main>
+					</section>
+
+					<!-- Live: composes with ln-validate -->
+					<section class="section-card">
+						<header><h3>Live demo — composes with <code>ln-validate</code></h3></header>
+						<main>
+							<p>The <code>required</code> HTML attribute on the <code>&lt;select&gt;</code> is honored by <code>dom.checkValidity()</code> — the value the user picks is what gets validated. <code>ln-validate</code> wires a <code>change</code> listener; TomSelect commits selections via <code>change</code> on the underlying <code>&lt;select&gt;</code>; validation runs on every selection commit. <strong>Zero coordinator wiring.</strong></p>
+							<form>
+								<div class="form-element">
+									<label for="country-validate">Country</label>
+									<select id="country-validate" name="country" required data-ln-select data-ln-validate>
+										<option value="">Choose a country…</option>
+										<option value="mk">North Macedonia</option>
+										<option value="rs">Serbia</option>
+										<option value="al">Albania</option>
+										<option value="bg">Bulgaria</option>
+										<option value="gr">Greece</option>
+										<option value="tr">Turkey</option>
+									</select>
+									<ul data-ln-validate-errors>
+										<li class="hidden" data-ln-validate-error="required">Please choose a country</li>
+									</ul>
+								</div>
+							</form>
+							<p>Pick a country and then re-select the empty option. The error appears immediately. Pick a real country again, the error clears. The <code>change</code> listener in <code>ln-validate</code> sees the platform event regardless of which UI committed it.</p>
+						</main>
+					</section>
+
+					<!-- Live: composes with ln-form (fill / reset) -->
+					<section class="section-card">
+						<header><h3>Live demo — composes with <code>ln-form</code> (fill, reset, submit)</h3></header>
+						<main>
+							<p><code>ln-form.fill()</code> writes <code>select.value = "..."</code> via <code>populateForm()</code> and dispatches synthetic <code>change</code> on every restored field. TomSelect's internal <code>change</code> listener catches the synthetic event and re-syncs its visible UI. The integration works because TomSelect listens for <strong>the platform's <code>change</code> event</strong>, not for a custom <code>ln-form:fill</code> event.</p>
+							<form id="form-fill-demo" data-ln-form>
+								<div class="form-element">
+									<label for="lang-fill">Language</label>
+									<select id="lang-fill" name="language" required data-ln-select data-ln-validate>
+										<option value="">Pick…</option>
+										<option value="js">JavaScript</option>
+										<option value="ts">TypeScript</option>
+										<option value="php">PHP</option>
+										<option value="py">Python</option>
+										<option value="rb">Ruby</option>
+										<option value="go">Go</option>
+										<option value="rs">Rust</option>
+									</select>
+									<ul data-ln-validate-errors>
+										<li class="hidden" data-ln-validate-error="required">Pick a language</li>
+									</ul>
+								</div>
+								<div class="form-element">
+									<label for="frameworks-fill">Frameworks</label>
+									<select id="frameworks-fill" name="frameworks[]" data-ln-select multiple>
+										<option value="laravel">Laravel</option>
+										<option value="rails">Rails</option>
+										<option value="django">Django</option>
+										<option value="express">Express</option>
+										<option value="nest">NestJS</option>
+										<option value="fastapi">FastAPI</option>
+									</select>
+								</div>
+								<div class="form-actions">
+									<button type="button" onclick="document.getElementById('form-fill-demo').dispatchEvent(new CustomEvent('ln-form:fill', { detail: { language: 'ts', frameworks: ['laravel', 'rails'] } }))">Fill (TypeScript + Laravel/Rails)</button>
+									<button type="reset">Reset</button>
+									<button type="submit">Save</button>
+								</div>
+							</form>
+							<p>Click <em>Fill</em> — both selects animate to the filled values. Click <em>Reset</em> — the wrapper's <code>reset</code> hookup runs <code>tomSelect.clear()</code> + <code>clearOptions()</code> + <code>sync()</code> on the next tick (after the platform finishes resetting the underlying <code>&lt;select&gt;</code>).</p>
+						</main>
+					</section>
+
+					<!-- Live: composes with ln-autosave -->
+					<section class="section-card">
+						<header><h3>Live demo — composes with <code>ln-autosave</code> (restore via synthetic <code>change</code>)</h3></header>
+						<main>
+							<p>Pick values, then reload the page. <code>ln-autosave</code> reads the draft from <code>localStorage</code>, calls <code>populateForm()</code> which writes <code>select.value = ...</code> and dispatches synthetic <code>change</code>. TomSelect's listener fires and re-renders the chip pills to match. The dead-code branch at <code>ln-autosave.js:97-99</code> (<code>restored[k].lnSelect.setValue</code>) does NOT execute — instances are in the <code>WeakMap</code>, not on the element. The synthetic-<code>change</code> path (one line above, at <code>ln-autosave.js:94-95</code>) is what actually drives TomSelect's UI sync.</p>
+							<form id="form-autosave-demo" data-ln-autosave="select-demo">
+								<div class="form-element">
+									<label for="client-autosave">Client</label>
+									<select id="client-autosave" name="client_id" data-ln-select>
+										<option value="">Select a client…</option>
+										<option value="1">Acme Corp</option>
+										<option value="2">Beta LLC</option>
+										<option value="3">Gamma Inc</option>
+										<option value="4">Delta Co</option>
+									</select>
+								</div>
+								<div class="form-element">
+									<label for="services-autosave">Services</label>
+									<select id="services-autosave" name="services[]" data-ln-select='{"create":true}' multiple>
+										<option value="design">Design</option>
+										<option value="dev">Development</option>
+										<option value="ops">Operations</option>
+									</select>
+								</div>
+								<div class="form-actions">
+									<button type="button" data-ln-autosave-clear>Discard draft</button>
+									<button type="submit">Save</button>
+								</div>
+							</form>
+							<p>Inspect <code>localStorage</code> after picking — the key is <code>ln-autosave:&lt;path&gt;:select-demo</code> with the serialized values.</p>
+						</main>
+					</section>
+
+					<!-- Reading and writing programmatically -->
+					<section class="section-card">
+						<header><h3>Reading and writing programmatically</h3></header>
+						<main>
+							<p>For most reads, the platform value is the right choice — TomSelect keeps the underlying <code>&lt;select&gt;</code> in sync, so <code>select.value</code> is always current.</p>
+<pre><code>const select = document.getElementById('role');
+
+// Native — works whether TomSelect is upgraded or not
+console.log(select.value);              // "admin"
+
+// Via TomSelect (only after upgrade)
+const ts = window.lnSelect.getInstance(select);
+if (ts) {
+    console.log(ts.getValue());         // "admin"
+    console.log(ts.items);              // ["admin"]
+}</code></pre>
+							<p>For writes, use <code>ts.setValue()</code> or dispatch <code>change</code> manually after a direct <code>.value</code> write — otherwise TomSelect's UI does not re-render.</p>
+<pre><code>// RIGHT — via TomSelect's API (preferred)
+const ts = window.lnSelect.getInstance(select);
+if (ts) ts.setValue('editor');
+
+// RIGHT — direct write + synthetic change (works because TomSelect listens for change)
+select.value = 'editor';
+select.dispatchEvent(new Event('change', { bubbles: true }));
+
+// WRONG — direct write without dispatching change (TomSelect UI stale)
+select.value = 'editor';</code></pre>
+						</main>
+					</section>
+
+					<!-- API reference -->
+					<section class="section-card">
+						<header><h3>API — <code>window.lnSelect</code></h3></header>
+						<main>
 							<table>
-								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<thead><tr><th>Method</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-select</code></td><td data-label="On element">&lt;select&gt;</td><td data-label="Description">Activates TomSelect with default configuration</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-select='{"create":true}'</code></td><td data-label="On element">&lt;select&gt;</td><td data-label="Description">JSON configuration (merged with defaults)</td></tr>
+									<tr><td><code>initialize(element)</code></td><td>Upgrade the element. Idempotent — repeat calls are no-ops. Used internally by the observer; rarely needed in consumer code.</td></tr>
+									<tr><td><code>destroy(element)</code></td><td>Tear down the TomSelect instance, unwire the form-reset listener, delete the WeakMap entry. Used internally by the observer's <code>removedNodes</code> path.</td></tr>
+									<tr><td><code>getInstance(element)</code></td><td>Return the TomSelect instance, or <code>undefined</code> if the element is not upgraded. The single source of truth for finding the wrapper.</td></tr>
 								</tbody>
 							</table>
-							</div>
+							<p>There is no <code>reinit()</code>, no <code>getAll()</code>, no event emitter. The API is intentionally narrow. The <code>js/ln-ajax/README.md:95</code> example that calls <code>window.lnSelect.reinit()</code> is a documentation bug — the <code>MutationObserver</code> covers AJAX inserts automatically, no manual reinit needed.</p>
 						</main>
 					</section>
 
-					<!-- Default configuration -->
+					<!-- Configuration reference -->
 					<section class="section-card">
-						<header><h3>Default configuration</h3></header>
+						<header><h3>Configuration — defaults vs user</h3></header>
 						<main>
-							<pre><code>{
-    "allowEmptyOption": true,
-    "controlInput": null,
-    "create": false,
-    "highlight": true,
-    "closeAfterSelect": true,
-    "placeholder": "Select...",
-    "loadThrottle": 300
-}</code></pre>
-							<p><strong>Note:</strong> The <code>placeholder</code> attribute on <code>&lt;select&gt;</code> is used if set.</p>
+							<p>The merge is shallow object spread. User-provided keys overwrite the wrapper's defaults; nested objects (<code>render</code>, <code>plugins</code>) are replaced wholesale, not merged.</p>
+							<table>
+								<thead><tr><th>Default</th><th>Why this default</th></tr></thead>
+								<tbody>
+									<tr><td><code>allowEmptyOption: true</code></td><td>Honor <code>&lt;option value=""&gt;Select…&lt;/option&gt;</code> as a real selectable choice.</td></tr>
+									<tr><td><code>controlInput: null</code></td><td>Hide the type-to-search input on single-select. Set to <code>'&lt;input&gt;'</code> to re-enable.</td></tr>
+									<tr><td><code>create: false</code></td><td>Default is "fixed list of options." Override to <code>true</code> for tag inputs.</td></tr>
+									<tr><td><code>highlight: true</code></td><td>Bold the matched substring in the dropdown.</td></tr>
+									<tr><td><code>closeAfterSelect: true</code></td><td>Single-pick: close after pick. Multi-pick: also close after each pick. Override to <code>false</code> for power-user multi-select flows.</td></tr>
+									<tr><td><code>placeholder</code></td><td>Reads the <code>placeholder</code> attribute on the <code>&lt;select&gt;</code> if set; otherwise <code>'Select...'</code>.</td></tr>
+									<tr><td><code>loadThrottle: 300</code></td><td>Async load callback throttle in ms.</td></tr>
+								</tbody>
+							</table>
+							<p>Every other TomSelect option is reachable via the JSON config. Function-valued options (<code>load</code>, <code>render</code>, <code>onChange</code>) cannot live in JSON — for those, use the wrapper's defaults via the attribute and reach for the TomSelect instance via <code>getInstance(el)</code> for any imperative customization.</p>
 						</main>
 					</section>
 
-					<!-- Examples -->
+					<!-- Common mistakes -->
 					<section class="section-card">
-						<header><h3>Example — Basic select</h3></header>
+						<header><h3>Common mistakes</h3></header>
 						<main>
-							<select data-ln-select>
-								<option value="">Choose a role...</option>
-								<option value="user">Regular user</option>
-								<option value="admin">Administrator</option>
-								<option value="moderator">Moderator</option>
-								<option value="editor">Editor</option>
-							</select>
-						</main>
-					</section>
 
-					<!-- Select with create option -->
-					<section class="section-card">
-						<header><h3>Example — Select with create option</h3></header>
-						<main>
-							<p><strong>You can type a new value:</strong></p>
-							<select data-ln-select='{"create":true}' placeholder="Type or select...">
-								<option value="">Select...</option>
-								<option value="php">PHP</option>
-								<option value="python">Python</option>
-								<option value="javascript">JavaScript</option>
-								<option value="java">Java</option>
-							</select>
-						</main>
-					</section>
+							<h4>Putting <code>data-ln-select</code> on a non-<code>&lt;select&gt;</code></h4>
+<pre><code>&lt;!-- Silently ignored. The init scan filters by select[data-ln-select]. --&gt;
+&lt;div data-ln-select&gt;Choose…&lt;/div&gt;
+&lt;input data-ln-select&gt;</code></pre>
 
-					<!-- Multiple selects -->
-					<section class="section-card">
-						<header><h3>Example — Multiple selects in a form</h3></header>
-						<main>
-							<form>
-								<label>
-									Department
-									<select data-ln-select>
-										<option value="">Select...</option>
-										<option value="sales">Sales</option>
-										<option value="marketing">Marketing</option>
-										<option value="dev">Development</option>
-										<option value="hr">HR</option>
-									</select>
-								</label>
-								<label>
-									Team
-									<select data-ln-select>
-										<option value="">Select...</option>
-										<option value="frontend">Frontend</option>
-										<option value="backend">Backend</option>
-										<option value="devops">DevOps</option>
-									</select>
-								</label>
-								<button type="submit">Save</button>
-							</form>
-						</main>
-					</section>
+							<h4>Forgetting to load TomSelect before ln-ashlar</h4>
+							<p>The wrapper checks <code>window.TomSelect</code> at script load (lines 15-20 of <code>ln-select.js</code>). If TomSelect hasn't been parsed yet, the wrapper installs a no-op API and exits. Loading TomSelect afterwards does NOT retroactively upgrade — the observer was never registered.</p>
+<pre><code>&lt;!-- RIGHT — TomSelect first, ln-ashlar second --&gt;
+&lt;link rel="stylesheet" href="tom-select/dist/css/tom-select.css"&gt;
+&lt;script src="tom-select/dist/js/tom-select.complete.min.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="dist/ln-ashlar.css"&gt;
+&lt;script src="dist/ln-ashlar.iife.js"&gt;&lt;/script&gt;</code></pre>
 
-					<!-- API -->
-					<section class="section-card">
-						<header><h3>API</h3></header>
-						<main>
-							<pre><code>// Manual initialization
-window.lnSelect.initialize(selectElement);
+							<h4>Direct <code>select.value = ...</code> without dispatching <code>change</code></h4>
+							<p>TomSelect's visible UI does not update; ln-validate does not validate; ln-autosave does not save. Either use <code>ts.setValue()</code> or dispatch <code>change</code> manually.</p>
 
-// Destroy instance (cleanup)
-window.lnSelect.destroy(selectElement);
+							<h4>Disabling the underlying <code>&lt;select&gt;</code> directly</h4>
+<pre><code>// WRONG — TomSelect's chip pill / dropdown stays interactive
+select.disabled = true;
 
-// Get TomSelect instance for direct access
-var ts = window.lnSelect.getInstance(selectElement);
+// RIGHT — use TomSelect's API
+const ts = window.lnSelect.getInstance(select);
+if (ts) ts.disable();   // visual disable + sets &lt;select&gt;.disabled</code></pre>
 
-// TomSelect API
-ts.addOption({ value: 'new', text: 'New option' });
-ts.setValue('new');
-ts.clear();
-ts.getItems();</code></pre>
+							<h4>Calling <code>window.lnSelect.reinit()</code></h4>
+							<p>There is no <code>reinit()</code> on the API surface — only <code>initialize</code>, <code>destroy</code>, and <code>getInstance</code>. The <code>MutationObserver</code> covers AJAX inserts automatically. The example in <code>js/ln-ajax/README.md:95</code> is a documentation bug; ignore it.</p>
+
+							<h4>Form-reset clears user-created options too</h4>
+							<p>The wrapper's reset handler runs <code>clear</code> + <code>clearOptions</code> + <code>sync</code> in the next tick. Options created via <code>{"create":true}</code> are NOT preserved — reset means "back to the form's initial state." If you need to preserve user-created options, use <code>&lt;button type="button"&gt;</code> + manual <code>ts.clear()</code> instead of <code>type="reset"</code>.</p>
+
 						</main>
 					</section>
 
 					<!-- Graceful degradation -->
-					<section id="select-graceful" class="section-card">
-						<header><h3>Graceful Degradation</h3></header>
+					<section class="section-card">
+						<header><h3>Graceful degradation</h3></header>
 						<main>
-							<p>If <code>window.TomSelect</code> does not exist, the component silently does nothing. The <code>&lt;select&gt;</code> remains functional as a regular browser select.</p>
-							<p>
-								<strong>Best practice:</strong> Always include TomSelect before ln-ashlar if you are using it.
-							</p>
+							<p>If <code>window.TomSelect</code> does not exist, the wrapper logs <code>[ln-select] TomSelect not found. Load TomSelect before ln-ashlar.</code> and installs a no-op <code>window.lnSelect = { initialize, destroy, getInstance }</code>. Every <code>&lt;select data-ln-select&gt;</code> continues to work as a plain native dropdown. The page does not crash; the attribute becomes a noop marker.</p>
+							<p>This is the right default for cases where the TomSelect bundle was forgotten, blocked by a CSP, or excluded from a minimal build. The page degrades visually (no search, no chip pills, no tagging) but the underlying form stays functional.</p>
 						</main>
 					</section>
 
@@ -130,63 +344,36 @@ ts.getItems();</code></pre>
 					<section class="section-card">
 						<header><h3>Lifecycle</h3></header>
 						<main>
-							<article>
-								<h4>On DOM remove</h4>
-								<p>The instance is automatically destroyed (cleanup).</p>
-							</article>
-							<article>
-								<h4>On form reset</h4>
-								<p>The selection is cleared automatically.</p>
-							</article>
-							<article>
-								<h4>Dynamically added select elements</h4>
-								<p>New select elements with <code>data-ln-select</code> are processed automatically.</p>
-							</article>
+							<table>
+								<thead><tr><th>Trigger</th><th>What the wrapper does</th></tr></thead>
+								<tbody>
+									<tr><td>Script load with <code>window.TomSelect</code> present</td><td>Create <code>WeakMap</code>, schedule <code>initializeAll</code> + <code>observeDOM</code> at <code>DOMContentLoaded</code> (or immediately if already loaded).</td></tr>
+									<tr><td>Script load with <code>window.TomSelect</code> missing</td><td>Log <code>console.warn</code>, install no-op API, exit.</td></tr>
+									<tr><td><code>data-ln-select</code> added to existing <code>&lt;select&gt;</code></td><td>Observer fires on attribute mutation, calls <code>initializeSelect</code> (idempotent).</td></tr>
+									<tr><td>New <code>&lt;select data-ln-select&gt;</code> added to DOM</td><td>Observer fires on <code>addedNodes</code>, walks subtree, calls <code>initializeSelect</code> for each match.</td></tr>
+									<tr><td><code>&lt;select data-ln-select&gt;</code> removed from DOM</td><td>Observer fires on <code>removedNodes</code>, walks subtree, calls <code>destroySelect</code> for each match.</td></tr>
+									<tr><td>Form fires <code>reset</code></td><td>Wrapper's listener runs; <code>setTimeout(0)</code> defers <code>clear</code> + <code>clearOptions</code> + <code>sync</code> until after the platform's reset completes.</td></tr>
+									<tr><td>User picks an option</td><td>TomSelect commits to <code>&lt;select&gt;.value</code>, fires <code>change</code>. ln-validate, ln-autosave, project listeners react via the platform event.</td></tr>
+									<tr><td><code>data-ln-select</code> attribute removed</td><td>Observer fires, but the matcher <code>select[data-ln-select]</code> fails. The instance stays alive — clean teardown requires <code>window.lnSelect.destroy(el)</code> before attribute removal.</td></tr>
+								</tbody>
+							</table>
 						</main>
 					</section>
 
-					<!-- HTML example -->
+					<!-- Peer dependency -->
 					<section class="section-card">
-						<header><h3>HTML structure</h3></header>
+						<header><h3>Peer dependency</h3></header>
 						<main>
-							<pre><code>&lt;!-- Basic TomSelect --&gt;
-&lt;select data-ln-select&gt;
-    &lt;option value=""&gt;Select...&lt;/option&gt;
-    &lt;option value="option1"&gt;Option 1&lt;/option&gt;
-    &lt;option value="option2"&gt;Option 2&lt;/option&gt;
-&lt;/select&gt;
+							<p>TomSelect is a <strong>peer dependency</strong>, not a bundled one. Load both CSS and JS before ln-ashlar:</p>
+<pre><code>&lt;!-- TomSelect CSS --&gt;
+&lt;link rel="stylesheet" href="tom-select/dist/css/tom-select.css"&gt;
 
-&lt;!-- TomSelect with create option --&gt;
-&lt;select data-ln-select='{"create":true}'
-        placeholder="Type or select..."&gt;
-    &lt;option value="opt1"&gt;Option 1&lt;/option&gt;
-    &lt;option value="opt2"&gt;Option 2&lt;/option&gt;
-&lt;/select&gt;
+&lt;!-- TomSelect JS — must come BEFORE ln-ashlar --&gt;
+&lt;script src="tom-select/dist/js/tom-select.complete.min.js"&gt;&lt;/script&gt;
 
-&lt;!-- TomSelect in a form --&gt;
-&lt;form&gt;
-    &lt;label for="my-select"&gt;Selection&lt;/label&gt;
-    &lt;select id="my-select" data-ln-select name="role"&gt;
-        &lt;option value="user"&gt;User&lt;/option&gt;
-        &lt;option value="admin"&gt;Admin&lt;/option&gt;
-    &lt;/select&gt;
-&lt;/form&gt;</code></pre>
-						</main>
-					</section>
-
-					<!-- Dependencies -->
-					<section class="section-card">
-						<header><h3>Dependencies</h3></header>
-						<main>
-							<p><strong>Peer dependency:</strong> TomSelect must be loaded before ln-ashlar.</p>
-							<pre><code>&lt;!-- TomSelect CSS --&gt;
-&lt;link href="..." rel="stylesheet"&gt;
-
-&lt;!-- TomSelect JS (before ln-ashlar!) --&gt;
-&lt;script src="..."&gt;&lt;/script&gt;
-
-&lt;!-- ln-ashlar (with built-in TomSelect support) --&gt;
+&lt;!-- ln-ashlar --&gt;
 &lt;link rel="stylesheet" href="dist/ln-ashlar.css"&gt;
 &lt;script src="dist/ln-ashlar.iife.js"&gt;&lt;/script&gt;</code></pre>
+							<p>The wrapper does not re-document TomSelect — for option reference, render hooks, plugin list, async <code>load</code> callback signature, see the <a href="https://tom-select.js.org/docs/">TomSelect docs</a>.</p>
 						</main>
 					</section>

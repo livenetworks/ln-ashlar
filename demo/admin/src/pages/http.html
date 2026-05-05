@@ -1,286 +1,490 @@
 <!-- ln-page: title="HTTP — ln-ashlar" h1="HTTP" -->
 
+<!--
+	The mock fetch interceptor MUST be installed before the deferred
+	ln-ashlar.iife.js loads, so ln-http captures the mock as its
+	_origFetch. Inline scripts in the page body run during parsing,
+	before defer scripts execute — this snippet runs first.
+-->
+<script>
+(function () {
+	if (window.__demoHttpMockInstalled) return;
+	window.__demoHttpMockInstalled = true;
+
+	const _nativeFetch = window.fetch.bind(window);
+
+	function _delay(ms, signal) {
+		return new Promise(function (resolve, reject) {
+			const t = setTimeout(resolve, ms);
+			if (signal) {
+				if (signal.aborted) { clearTimeout(t); reject(_abortError()); return; }
+				signal.addEventListener('abort', function () {
+					clearTimeout(t);
+					reject(_abortError());
+				}, { once: true });
+			}
+		});
+	}
+
+	function _abortError() {
+		const err = new Error('The operation was aborted.');
+		err.name = 'AbortError';
+		return err;
+	}
+
+	function _jsonResponse(payload, status) {
+		return new Response(JSON.stringify(payload), {
+			status:  status || 200,
+			headers: { 'Content-Type': 'application/json' }
+		});
+	}
+
+	const EMPLOYEES = [
+		{ id: 1, name: 'Marko Petrovski',   department: 'Engineering' },
+		{ id: 2, name: 'Ana Kovachevska',   department: 'Design'      },
+		{ id: 3, name: 'Stefan Iliev',      department: 'Sales'       },
+		{ id: 4, name: 'Elena Stojanovska', department: 'Engineering' },
+		{ id: 5, name: 'Nikola Ristov',     department: 'Marketing'   },
+		{ id: 6, name: 'Ivana Dimitrova',   department: 'Engineering' }
+	];
+
+	const TODOS = [
+		{ id: 1, label: 'Plan sprint',        order: 0 },
+		{ id: 2, label: 'Review designs',     order: 1 },
+		{ id: 3, label: 'Sync with backend',  order: 2 },
+		{ id: 4, label: 'Update changelog',   order: 3 }
+	];
+
+	async function _handle(url, options) {
+		const u = new URL(url, window.location.origin);
+		const path = u.pathname;
+		const method = ((options && options.method) || 'GET').toUpperCase();
+		const signal = options && options.signal;
+
+		// /api/search?q=…  → 600ms delay, filtered employees
+		if (path === '/api/search' && method === 'GET') {
+			await _delay(600, signal);
+			const q = (u.searchParams.get('q') || '').toLowerCase();
+			const matches = q
+				? EMPLOYEES.filter(function (e) { return e.name.toLowerCase().includes(q); })
+				: [];
+			return _jsonResponse({ q: q, results: matches });
+		}
+
+		// /api/slow  → 4000ms delay, used for cancel-by-url demo
+		if (path === '/api/slow' && method === 'GET') {
+			await _delay(4000, signal);
+			return _jsonResponse({ note: 'Slow request finished.' });
+		}
+
+		// /api/users  → 250ms delay, returns user with body echoed (POST)
+		if (path === '/api/users' && method === 'POST') {
+			await _delay(250, signal);
+			let body;
+			try { body = options && options.body ? JSON.parse(options.body) : {}; }
+			catch (e) { body = {}; }
+			return _jsonResponse({ id: Math.floor(Math.random() * 9000) + 1000, name: body.name || 'Unknown' }, 201);
+		}
+
+		// /api/lists/:id/reorder  → 800ms delay, echoes order (POST)
+		if (/^\/api\/lists\/\d+\/reorder$/.test(path) && method === 'POST') {
+			await _delay(800, signal);
+			let body;
+			try { body = options && options.body ? JSON.parse(options.body) : {}; }
+			catch (e) { body = {}; }
+			return _jsonResponse({ ok: true, savedAt: new Date().toISOString(), order: body.ids || [] });
+		}
+
+		// /api/todos  → 250ms delay, returns todo list (GET)
+		if (path === '/api/todos' && method === 'GET') {
+			await _delay(250, signal);
+			return _jsonResponse(TODOS);
+		}
+
+		// Anything else → pass through to native fetch
+		return _nativeFetch(url, options);
+	}
+
+	window.fetch = function (resource, options) {
+		const url = typeof resource === 'string'
+			? resource
+			: (resource instanceof URL ? resource.href
+				: (resource instanceof Request ? resource.url : String(resource)));
+		// Defer the dispatch one microtask so the wrapper's signal is fully
+		// installed before _delay runs (Path B composes signals after we run).
+		return _handle(url, options);
+	};
+})();
+</script>
+
 <h1>HTTP</h1>
-					<p>Event-driven fetch service — lightweight JSON transport layer for coordinators and components.</p>
+<p>Two-path HTTP coordinator. Path A wraps <code>window.fetch</code> for transparent URL-keyed dedup of GET / HEAD. Path B is a <code>ln-http:request</code> event with a string <code>key</code> for explicit-cancel of any method (including POST). The two paths share state-tracking maps but otherwise do not interact.</p>
 
-					<!-- How It Works -->
-					<section class="section-card">
-						<header><h3>How It Works</h3></header>
-						<main>
-							<ol>
-								<li>Consumer dispatches <code>ln-http:request</code> on any DOM element</li>
-								<li>ln-http makes the fetch request</li>
-								<li>ln-http dispatches <code>ln-http:success</code> or <code>ln-http:error</code> back on the <strong>same element</strong></li>
-								<li>Consumer filters responses by <code>tag</code></li>
-							</ol>
-							<p>ln-http has a global listener on <code>document</code>, no DOM instances, no MutationObserver.</p>
-						</main>
-					</section>
+<!-- What it does -->
+<section class="section-card">
+	<header><h3>What it does (short version)</h3></header>
+	<main>
+		<ul>
+			<li><strong>Path A</strong> — wraps <code>window.fetch</code>. Idempotent dedup on GET / HEAD: a new request to the same URL aborts the previous one. POST / PUT / PATCH / DELETE are NEVER auto-cancelled — losing one of two POSTs would silently drop user-intent data.</li>
+			<li><strong>Path B</strong> — listens for <code>ln-http:request</code> on <code>document</code>. If the dispatch carries <code>detail.key</code>, a previous in-flight request with the same key is aborted regardless of method. Response fires as <code>ln-http:response</code> on the original target with the raw <code>Response</code>; the consumer calls <code>.json()</code>.</li>
+			<li><strong>Public API</strong> — <code>lnHttp.cancel(url)</code>, <code>lnHttp.cancelByKey(key)</code>, <code>lnHttp.cancelAll()</code>, <code>lnHttp.inflight</code>, <code>lnHttp.destroy()</code>.</li>
+			<li><strong>What ln-http does NOT do:</strong> no header injection, no auth/CSRF handling, no body shaping, no JSON parsing, no retry, no timeout, no progress events. The consumer composes the request; ln-http coordinates cancellation.</li>
+		</ul>
+		<p>The demos below run against a page-local mock fetch — no server is required. The mock simulates network delay so dedup behavior is observable.</p>
+	</main>
+</section>
 
-					<!-- Request Options -->
-					<section class="section-card">
-						<header><h3>Request Options</h3></header>
-						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td data-label="Attribute"><code>url</code></td><td data-label="On element">string</td><td data-label="Description"><em>required</em></td><td>Request URL</td></tr>
-									<tr><td data-label="Attribute"><code>method</code></td><td data-label="On element">string</td><td data-label="Description"><code>POST</code> if body, <code>GET</code> otherwise</td><td>HTTP method</td></tr>
-									<tr><td data-label="Attribute"><code>body</code></td><td data-label="On element">object</td><td data-label="Description">—</td><td>GET: query string, POST/PUT/DELETE: JSON body</td></tr>
-									<tr><td data-label="Attribute"><code>ajax</code></td><td data-label="On element">boolean</td><td data-label="Description"><code>false</code></td><td>Adds <code>X-Requested-With: XMLHttpRequest</code> header</td></tr>
-									<tr><td data-label="Attribute"><code>abort</code></td><td data-label="On element">string</td><td data-label="Description">—</td><td>Abort key: cancels previous in-flight request with same key</td></tr>
-									<tr><td data-label="Attribute"><code>tag</code></td><td data-label="On element">string</td><td data-label="Description">—</td><td>Passed back in response events for consumer filtering</td></tr>
-								</tbody>
-							</table>
-							</div>
-						</main>
-					</section>
+<!-- Demo 1 — Search-as-you-type (Path A) -->
+<section class="section-card">
+	<header><h3>Demo 1 — Search-as-you-type (Path A)</h3></header>
+	<main>
+		<p>Type rapidly. Each keystroke fires a GET to <code>/api/search?q=…</code>. Different URLs (different <code>q</code>) run independently; same URLs (e.g. backspacing to a previously-typed query) collapse — the older aborts. The log shows abort errors with <code>AbortError</code>; only the latest typed query's response renders.</p>
+		<section id="demo1">
+			<div class="form-element">
+				<label for="demo1-input">Search employees</label>
+				<input type="search" id="demo1-input" placeholder="Type a name to search… (try typing fast)">
+			</div>
+			<h4>Event log</h4>
+			<pre id="demo1-log" class="demo-log"></pre>
+			<h4>Results</h4>
+			<ul id="demo1-results" class="demo-results"></ul>
+		</section>
+	</main>
+</section>
 
-					<!-- Response Events -->
-					<section class="section-card">
-						<header><h3>Response Events</h3></header>
-						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Event</th><th>Dispatched on</th><th>Detail</th></tr></thead>
-								<tbody>
-									<tr><td><code>ln-http:success</code></td><td>original target element</td><td><code>{ tag, ok: true, status, data }</code></td></tr>
-									<tr><td><code>ln-http:error</code></td><td>original target element</td><td><code>{ tag, ok: false, status, data }</code></td></tr>
-								</tbody>
-							</table>
-							</div>
-							<ul>
-								<li>Network failure: <code>{ tag, ok: false, status: 0, data: { error: true, message: 'Network error' } }</code></li>
-								<li>Invalid JSON: <code>{ tag, ok: false, status, data: { error: true, message: 'Invalid response' } }</code></li>
-							</ul>
-						</main>
-					</section>
+<!-- Demo 2 — Drag-reorder (Path B) -->
+<section class="section-card">
+	<header><h3>Demo 2 — Drag-reorder POST with explicit key (Path B)</h3></header>
+	<main>
+		<p>Click <strong>Move up</strong> / <strong>Move down</strong> rapidly. Each click dispatches a POST <code>ln-http:request</code> with <code>key: 'reorder-list-1'</code>. Path A would NOT cancel POSTs by URL; Path B aborts the previous in-flight one because the keys match. The log shows that fast clicks produce only one <code>ln-http:response</code> at the end.</p>
+		<section id="demo2">
+			<ul id="demo2-list" class="demo-reorder">
+				<!-- Filled at init -->
+			</ul>
+			<h4>Event log</h4>
+			<pre id="demo2-log" class="demo-log"></pre>
+		</section>
+	</main>
+</section>
 
-					<!-- Example — GET Request -->
-					<section class="section-card">
-						<header><h3>Example — GET Request</h3></header>
-						<main>
-							<p>Dispatches a GET request to <code>/api/employees</code>. Since no server is running, the error event path is demonstrated in the log below.</p>
-							<section id="demo-get">
-								<nav class="demo-actions">
-									<button type="button" class="btn" id="demo-get-btn">
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-download"></use></svg>
-										GET /api/employees
-									</button>
-								</nav>
-								<h4>Event log</h4>
-								<pre id="demo-get-log"></pre>
-							</section>
-						</main>
-					</section>
+<!-- Demo 3 — Independent POSTs -->
+<section class="section-card">
+	<header><h3>Demo 3 — Independent POSTs (no dedup)</h3></header>
+	<main>
+		<p>Click <strong>Create both</strong> to fire two POSTs to <code>/api/users</code> with different bodies. Path A does not auto-cancel non-idempotent methods; both succeed independently. Each call is a raw <code>fetch()</code> — no <code>ln-http:request</code> dispatch needed.</p>
+		<section id="demo3">
+			<nav class="demo-actions">
+				<button type="button" id="demo3-btn">Create both</button>
+			</nav>
+			<h4>Event log</h4>
+			<pre id="demo3-log" class="demo-log"></pre>
+		</section>
+	</main>
+</section>
 
-					<!-- Example — POST Request -->
-					<section class="section-card">
-						<header><h3>Example — POST Request</h3></header>
-						<main>
-							<p>Submit the form to dispatch a POST request. The coordinator collects form data and sends it via <code>ln-http:request</code>.</p>
-							<section id="demo-post">
-								<form data-ln-form id="demo-http-form">
-									<div class="form-element">
-										<label for="demo-http-name">Name</label>
-										<input type="text" id="demo-http-name" name="name" value="Marko Petrovski">
-									</div>
-									<div class="form-element">
-										<label for="demo-http-email">Email</label>
-										<input type="email" id="demo-http-email" name="email" value="marko@example.com">
-									</div>
-									<div class="form-element">
-										<label for="demo-http-dept">Department</label>
-										<input type="text" id="demo-http-dept" name="department" value="Engineering">
-									</div>
-									<ul class="form-actions">
-										<li><button type="submit">POST /api/employees</button></li>
-									</ul>
-								</form>
-								<h4>Event log</h4>
-								<pre id="demo-post-log"></pre>
-							</section>
-						</main>
-					</section>
+<!-- Demo 4 — Cancel by URL (Path A) -->
+<section class="section-card">
+	<header><h3>Demo 4 — Cancel a slow GET by URL (Path A)</h3></header>
+	<main>
+		<p>Click <strong>Start slow GET</strong> to fire a <code>fetch('/api/slow')</code> that takes 4s. Click <strong>Cancel /api/slow</strong> to call <code>lnHttp.cancel('/api/slow')</code>. The original fetch promise rejects with <code>AbortError</code>; the result panel shows that.</p>
+		<section id="demo4">
+			<nav class="demo-actions">
+				<button type="button" id="demo4-start">Start slow GET</button>
+				<button type="button" id="demo4-cancel">Cancel /api/slow</button>
+			</nav>
+			<h4>Event log</h4>
+			<pre id="demo4-log" class="demo-log"></pre>
+		</section>
+	</main>
+</section>
 
-					<!-- Example — Search with Abort -->
-					<section class="section-card">
-						<header><h3>Example — Search with Abort</h3></header>
-						<main>
-							<p>Each keystroke dispatches a new request with the same <code>abort</code> key, cancelling the previous in-flight request. Only the last request resolves.</p>
-							<section id="demo-abort">
-								<div class="form-element">
-									<label for="demo-abort-input">Search employees</label>
-									<input type="search" id="demo-abort-input" placeholder="Type to search — each keystroke cancels previous…">
-								</div>
-								<h4>Event log</h4>
-								<pre id="demo-abort-log"></pre>
-							</section>
-						</main>
-					</section>
+<!-- Demo 5 — Cancel by key (Path B) -->
+<section class="section-card">
+	<header><h3>Demo 5 — Cancel a Path B request by key</h3></header>
+	<main>
+		<p>Click <strong>Start reorder POST</strong> to dispatch a Path B request with <code>key: 'demo5-key'</code>. Click <strong>Cancel demo5-key</strong> to call <code>lnHttp.cancelByKey('demo5-key')</code>. Aborted Path B requests fire NO event (silent abort); the log records the cancel call and the absence of any <code>ln-http:response</code>.</p>
+		<section id="demo5">
+			<nav class="demo-actions">
+				<button type="button" id="demo5-start">Start reorder POST</button>
+				<button type="button" id="demo5-cancel">Cancel demo5-key</button>
+			</nav>
+			<h4>Event log</h4>
+			<pre id="demo5-log" class="demo-log"></pre>
+		</section>
+	</main>
+</section>
 
-					<!-- ln-http vs ln-ajax -->
-					<section class="section-card">
-						<header><h3>ln-http vs ln-ajax</h3></header>
-						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th></th><th>ln-http</th><th>ln-ajax</th></tr></thead>
-								<tbody>
-									<tr><td>Purpose</td><td>JSON API transport</td><td>Page navigation</td></tr>
-									<tr><td>Format</td><td>JSON only</td><td>FormData + HTML</td></tr>
-									<tr><td>DOM</td><td>No instances</td><td><code>data-ln-ajax</code> on elements</td></tr>
-									<tr><td>Features</td><td>Abort, tag</td><td>CSRF, toast, history, spinner, HTML replace</td></tr>
-									<tr><td>Consumer</td><td>Coordinators, components</td><td>Links, forms</td></tr>
-								</tbody>
-							</table>
-							</div>
-						</main>
-					</section>
+<!-- Demo 6 — Inflight inspector -->
+<section class="section-card">
+	<header><h3>Demo 6 — Inflight inspector</h3></header>
+	<main>
+		<p>Live readout of <code>lnHttp.inflight</code>. Path A entries appear as <code>{ method, url }</code>; Path B entries appear as <code>{ key }</code>. A Path B GET with a <code>key</code> appears in BOTH (one entry per map). Polled every 200&nbsp;ms.</p>
+		<section id="demo6">
+			<nav class="demo-actions">
+				<button type="button" id="demo6-trigger-a">Fire two slow GETs (Path A)</button>
+				<button type="button" id="demo6-trigger-b">Fire keyed GET (Path B + Path A)</button>
+				<button type="button" id="demo6-cancel-all">Cancel all</button>
+			</nav>
+			<h4>Currently in flight</h4>
+			<pre id="demo6-out" class="demo-log">[]</pre>
+		</section>
+	</main>
+</section>
 
-					<!-- Code — Basic Pattern -->
-					<section class="section-card">
-						<header><h3>Code — Basic Pattern</h3></header>
-						<main>
-							<pre><code>const el = document.getElementById('my-component');
+<!-- ln-http vs ln-ajax -->
+<section class="section-card">
+	<header><h3>ln-http vs ln-ajax</h3></header>
+	<main>
+		<div class="table-container">
+		<table>
+			<thead><tr><th></th><th>ln-http</th><th>ln-ajax</th></tr></thead>
+			<tbody>
+				<tr><td>Purpose</td><td>Transport coordination (dedup, cancel)</td><td>HTML page navigation</td></tr>
+				<tr><td>Wraps <code>window.fetch</code>?</td><td>Yes (Path A) — transparent</td><td>No — calls native <code>fetch</code></td></tr>
+				<tr><td>Event API</td><td><code>ln-http:request</code> → <code>ln-http:response</code> / <code>ln-http:error</code> (Path B)</td><td><code>ln-ajax:before-start</code> / <code>:start</code> / <code>:complete</code> / <code>:error</code></td></tr>
+				<tr><td>Per-element attribute</td><td>None (global service)</td><td><code>data-ln-ajax</code> on element / link / form</td></tr>
+				<tr><td>Auto-cancel</td><td>GET/HEAD on same URL (Path A); any method by <code>key</code> (Path B)</td><td>None</td></tr>
+				<tr><td>Header injection</td><td>None</td><td>Adds <code>X-Requested-With</code> + <code>X-CSRF-TOKEN</code> from meta</td></tr>
+				<tr><td>Body handling</td><td>Forwarded raw — consumer composes</td><td>Builds <code>FormData</code> from form, appends <code>_token</code></td></tr>
+				<tr><td>Response parsing</td><td>None — forwards raw <code>Response</code></td><td><code>.json()</code> on the response</td></tr>
+				<tr><td>Visual feedback</td><td>None</td><td>Spinner + <code>ln-ajax--loading</code> class on element</td></tr>
+				<tr><td>Use when</td><td>You want dedup / cancel coordination across raw <code>fetch</code> calls</td><td>You want links / forms to swap server-rendered HTML without a full page load</td></tr>
+			</tbody>
+		</table>
+		</div>
+		<p>The two coexist. <code>ln-ajax</code>'s internal <code>fetch</code> calls go through <code>ln-http</code>'s wrapper transparently — its GET path inherits Path A dedup. Their concerns don't overlap.</p>
+	</main>
+</section>
 
-el.addEventListener('ln-http:success', function (e) {
-    if (e.detail.tag !== 'load-data') return;
-    renderData(e.detail.data);
+<!-- Wiring script — runs after defer bundles, after DOMContentLoaded -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+	const pad   = function (n) { return n < 10 ? '0' + n : '' + n; };
+	const stamp = function () {
+		const d = new Date();
+		return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + '.' + String(d.getMilliseconds()).padStart(3, '0');
+	};
+	const writeLog = function (pre, line) {
+		pre.textContent += '[' + stamp() + '] ' + line + '\n';
+		pre.scrollTop = pre.scrollHeight;
+	};
+
+	// ─── Demo 1 — Search-as-you-type (Path A) ─────────────────────────
+	(function () {
+		const input   = document.getElementById('demo1-input');
+		const log     = document.getElementById('demo1-log');
+		const results = document.getElementById('demo1-results');
+		if (!input) return;
+
+		input.addEventListener('input', async function () {
+			const q = input.value.trim();
+			if (!q) { results.innerHTML = ''; return; }
+			const url = '/api/search?q=' + encodeURIComponent(q);
+			writeLog(log, 'fetch  ' + url);
+			try {
+				const response = await fetch(url);
+				const json = await response.json();
+				writeLog(log, 'resolved q="' + json.q + '"  matches=' + json.results.length);
+				if (input.value.trim() !== q) return; // older response, ignore
+				results.innerHTML = '';
+				for (const u of json.results) {
+					const li = document.createElement('li');
+					li.textContent = u.name + ' — ' + u.department;
+					results.appendChild(li);
+				}
+			} catch (err) {
+				if (err.name === 'AbortError') {
+					writeLog(log, 'aborted q="' + q + '" (superseded by newer keystroke)');
+					return;
+				}
+				writeLog(log, 'error  ' + (err && err.message ? err.message : String(err)));
+			}
+		});
+	})();
+
+	// ─── Demo 2 — Drag-reorder POST (Path B) ──────────────────────────
+	(function () {
+		const list = document.getElementById('demo2-list');
+		const log  = document.getElementById('demo2-log');
+		if (!list) return;
+
+		const items = [
+			{ id: 1, label: 'Plan sprint'        },
+			{ id: 2, label: 'Review designs'     },
+			{ id: 3, label: 'Sync with backend'  },
+			{ id: 4, label: 'Update changelog'   }
+		];
+
+		const render = function () {
+			list.innerHTML = '';
+			items.forEach(function (item, idx) {
+				const li = document.createElement('li');
+				li.textContent = item.label + ' ';
+				const up = document.createElement('button');
+				up.type = 'button';
+				up.textContent = 'Move up';
+				up.disabled = idx === 0;
+				up.addEventListener('click', function () { move(idx, idx - 1); });
+				const down = document.createElement('button');
+				down.type = 'button';
+				down.textContent = 'Move down';
+				down.disabled = idx === items.length - 1;
+				down.addEventListener('click', function () { move(idx, idx + 1); });
+				li.appendChild(up);
+				li.appendChild(down);
+				list.appendChild(li);
+			});
+		};
+
+		const move = function (from, to) {
+			const [m] = items.splice(from, 1);
+			items.splice(to, 0, m);
+			render();
+			const ids = items.map(function (i) { return i.id; });
+			writeLog(log, 'dispatch  POST /api/lists/1/reorder  ids=[' + ids.join(',') + ']  key=reorder-list-1');
+			list.dispatchEvent(new CustomEvent('ln-http:request', {
+				bubbles: true,
+				detail: {
+					url:    '/api/lists/1/reorder',
+					method: 'POST',
+					body:   JSON.stringify({ ids: ids }),
+					key:    'reorder-list-1'
+				}
+			}));
+		};
+
+		list.addEventListener('ln-http:response', async function (e) {
+			if (!e.detail.ok) {
+				writeLog(log, 'response  status=' + e.detail.status + ' (non-2xx)');
+				return;
+			}
+			const json = await e.detail.response.json();
+			writeLog(log, 'response  status=' + e.detail.status + '  savedAt=' + json.savedAt + '  order=[' + json.order.join(',') + ']');
+		});
+		list.addEventListener('ln-http:error', function (e) {
+			writeLog(log, 'error  ' + (e.detail.error && e.detail.error.message ? e.detail.error.message : 'network error'));
+		});
+
+		render();
+	})();
+
+	// ─── Demo 3 — Independent POSTs (no dedup) ───────────────────────
+	(function () {
+		const btn = document.getElementById('demo3-btn');
+		const log = document.getElementById('demo3-log');
+		if (!btn) return;
+
+		const post = async function (name) {
+			writeLog(log, 'fetch  POST /api/users  name=' + name);
+			try {
+				const r = await fetch('/api/users', {
+					method:  'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body:    JSON.stringify({ name: name })
+				});
+				const json = await r.json();
+				writeLog(log, 'resolved  name=' + name + '  id=' + json.id + '  status=' + r.status);
+			} catch (err) {
+				writeLog(log, 'rejected  name=' + name + '  ' + (err && err.message ? err.message : String(err)));
+			}
+		};
+
+		btn.addEventListener('click', function () {
+			post('Ana Kovachevska');
+			post('Marko Petrovski');
+		});
+	})();
+
+	// ─── Demo 4 — Cancel slow GET by URL (Path A) ────────────────────
+	(function () {
+		const startBtn  = document.getElementById('demo4-start');
+		const cancelBtn = document.getElementById('demo4-cancel');
+		const log       = document.getElementById('demo4-log');
+		if (!startBtn) return;
+
+		startBtn.addEventListener('click', async function () {
+			writeLog(log, 'fetch  GET /api/slow  (4s delay)');
+			try {
+				const r = await fetch('/api/slow');
+				const json = await r.json();
+				writeLog(log, 'resolved  ' + JSON.stringify(json));
+			} catch (err) {
+				if (err.name === 'AbortError') {
+					writeLog(log, 'aborted  /api/slow (cancel button pressed)');
+					return;
+				}
+				writeLog(log, 'rejected  ' + (err && err.message ? err.message : String(err)));
+			}
+		});
+		cancelBtn.addEventListener('click', function () {
+			const aborted = window.lnHttp ? window.lnHttp.cancel('/api/slow') : false;
+			writeLog(log, 'lnHttp.cancel("/api/slow") → ' + aborted);
+		});
+	})();
+
+	// ─── Demo 5 — Cancel Path B by key ───────────────────────────────
+	(function () {
+		const root      = document.getElementById('demo5');
+		const startBtn  = document.getElementById('demo5-start');
+		const cancelBtn = document.getElementById('demo5-cancel');
+		const log       = document.getElementById('demo5-log');
+		if (!root) return;
+
+		root.addEventListener('ln-http:response', async function (e) {
+			const json = await e.detail.response.json();
+			writeLog(log, 'ln-http:response  status=' + e.detail.status + '  savedAt=' + json.savedAt);
+		});
+		root.addEventListener('ln-http:error', function (e) {
+			writeLog(log, 'ln-http:error  ' + (e.detail.error && e.detail.error.message ? e.detail.error.message : 'network error'));
+		});
+
+		startBtn.addEventListener('click', function () {
+			writeLog(log, 'dispatch  POST /api/lists/2/reorder  key=demo5-key');
+			root.dispatchEvent(new CustomEvent('ln-http:request', {
+				bubbles: true,
+				detail: {
+					url:    '/api/lists/2/reorder',
+					method: 'POST',
+					body:   JSON.stringify({ ids: [3, 2, 1] }),
+					key:    'demo5-key'
+				}
+			}));
+		});
+		cancelBtn.addEventListener('click', function () {
+			const aborted = window.lnHttp ? window.lnHttp.cancelByKey('demo5-key') : false;
+			writeLog(log, 'lnHttp.cancelByKey("demo5-key") → ' + aborted + '  (no event will fire — silent abort)');
+		});
+	})();
+
+	// ─── Demo 6 — Inflight inspector ─────────────────────────────────
+	(function () {
+		const out      = document.getElementById('demo6-out');
+		const triggerA = document.getElementById('demo6-trigger-a');
+		const triggerB = document.getElementById('demo6-trigger-b');
+		const cancelAll = document.getElementById('demo6-cancel-all');
+		const root     = document.getElementById('demo6');
+		if (!out) return;
+
+		setInterval(function () {
+			if (!window.lnHttp) { out.textContent = 'lnHttp not loaded'; return; }
+			out.textContent = JSON.stringify(window.lnHttp.inflight, null, 2) || '[]';
+		}, 200);
+
+		triggerA.addEventListener('click', function () {
+			// Two slow GETs to different URLs — both visible as Path A entries.
+			fetch('/api/slow').catch(function () {});
+			fetch('/api/search?q=demo6').catch(function () {});
+		});
+		triggerB.addEventListener('click', function () {
+			// A keyed Path B GET — appears in both _keyed (key) and _inflight (method+url).
+			root.dispatchEvent(new CustomEvent('ln-http:request', {
+				bubbles: true,
+				detail: { url: '/api/slow', method: 'GET', key: 'demo6-poll' }
+			}));
+		});
+		cancelAll.addEventListener('click', function () {
+			if (window.lnHttp) window.lnHttp.cancelAll();
+		});
+	})();
 });
-
-el.addEventListener('ln-http:error', function (e) {
-    if (e.detail.tag !== 'load-data') return;
-    showError(e.detail.data.message);
-});
-
-el.dispatchEvent(new CustomEvent('ln-http:request', {
-    bubbles: true,
-    detail: { url: '/api/data', tag: 'load-data' }
-}));</code></pre>
-						</main>
-					</section>
-
-					<!-- Code — POST Pattern -->
-					<section class="section-card">
-						<header><h3>Code — POST with Body</h3></header>
-						<main>
-							<pre><code>el.dispatchEvent(new CustomEvent('ln-http:request', {
-    bubbles: true,
-    detail: {
-        url: '/api/employees',
-        method: 'POST',
-        body: { name: 'Ana Kovachevska', email: 'ana@example.com' },
-        tag: 'create-employee'
-    }
-}));</code></pre>
-						</main>
-					</section>
-
-					<!-- Code — Abort Pattern -->
-					<section class="section-card">
-						<header><h3>Code — Search with Abort</h3></header>
-						<main>
-							<pre><code>input.addEventListener('input', function () {
-    el.dispatchEvent(new CustomEvent('ln-http:request', {
-        bubbles: true,
-        detail: {
-            url: '/api/employees/search',
-            body: { q: input.value },
-            abort: 'employee-search',
-            tag: 'search'
-        }
-    }));
-});</code></pre>
-						</main>
-					</section>
-
-					<script>
-					(function () {
-						const pad = function (n) { return n < 10 ? '0' + n : '' + n; };
-						const stamp = function () {
-							const d = new Date();
-							return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
-						};
-						const log = function (pre, eventName, detail) {
-							const status = detail && typeof detail.status !== 'undefined' ? detail.status : '?';
-							let payload = '';
-							try { payload = JSON.stringify(detail && detail.data); }
-							catch (e) { payload = '[unserializable]'; }
-							if (payload && payload.length > 200) payload = payload.slice(0, 200) + '…';
-							pre.textContent += '[' + stamp() + '] ' + eventName + '  status=' + status + '  ' + payload + '\n';
-							pre.scrollTop = pre.scrollHeight;
-						};
-
-						// GET demo
-						const getRoot = document.getElementById('demo-get');
-						const getBtn = document.getElementById('demo-get-btn');
-						const getLog = document.getElementById('demo-get-log');
-						getBtn.addEventListener('click', function () {
-							getRoot.dispatchEvent(new CustomEvent('ln-http:request', {
-								bubbles: true,
-								detail: { url: '/api/employees', tag: 'list-employees' }
-							}));
-						});
-						getRoot.addEventListener('ln-http:success', function (e) {
-							if (e.detail.tag !== 'list-employees') return;
-							log(getLog, 'ln-http:success', e.detail);
-						});
-						getRoot.addEventListener('ln-http:error', function (e) {
-							if (e.detail.tag !== 'list-employees') return;
-							log(getLog, 'ln-http:error', e.detail);
-						});
-
-						// POST demo
-						const postRoot = document.getElementById('demo-post');
-						const postForm = document.getElementById('demo-http-form');
-						const postLog = document.getElementById('demo-post-log');
-						postForm.addEventListener('submit', function (e) {
-							e.preventDefault();
-							const data = new FormData(postForm);
-							const body = {
-								name: data.get('name'),
-								email: data.get('email'),
-								department: data.get('department')
-							};
-							postRoot.dispatchEvent(new CustomEvent('ln-http:request', {
-								bubbles: true,
-								detail: { url: '/api/employees', method: 'POST', body: body, tag: 'create-employee' }
-							}));
-						});
-						postRoot.addEventListener('ln-http:success', function (e) {
-							if (e.detail.tag !== 'create-employee') return;
-							log(postLog, 'ln-http:success', e.detail);
-						});
-						postRoot.addEventListener('ln-http:error', function (e) {
-							if (e.detail.tag !== 'create-employee') return;
-							log(postLog, 'ln-http:error', e.detail);
-						});
-
-						// Abort demo
-						const abortRoot = document.getElementById('demo-abort');
-						const abortInput = document.getElementById('demo-abort-input');
-						const abortLog = document.getElementById('demo-abort-log');
-						abortInput.addEventListener('input', function () {
-							if (abortInput.value === '') return;
-							abortRoot.dispatchEvent(new CustomEvent('ln-http:request', {
-								bubbles: true,
-								detail: {
-									url: '/api/employees/search',
-									body: { q: abortInput.value },
-									abort: 'employee-search',
-									tag: 'search'
-								}
-							}));
-						});
-						abortRoot.addEventListener('ln-http:success', function (e) {
-							if (e.detail.tag !== 'search') return;
-							log(abortLog, 'ln-http:success', e.detail);
-						});
-						abortRoot.addEventListener('ln-http:error', function (e) {
-							if (e.detail.tag !== 'search') return;
-							log(abortLog, 'ln-http:error', e.detail);
-						});
-					})();
-					</script>
+</script>

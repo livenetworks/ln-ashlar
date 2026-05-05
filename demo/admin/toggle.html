@@ -166,79 +166,106 @@
 
 		<!-- Content -->
 		<section>
-<h1>Toggle</h1>
-					<p>Generic toggle component — adds/removes the <code>.open</code> class on an element. Works for sidebar, collapsible, dropdown — anything.</p>
-
-					<!-- Basics -->
+<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Basics</h3></header>
+						<header><h3>Overview</h3></header>
+						<main>
+							<p>The smallest reactive primitive in ln-ashlar: an attribute on an element, a class derived from that attribute, and a pair of events on each side of the transition. 145 lines of JS that exist so every other open/close component in the library — accordion, dropdown, sidebar drawer, dismissible alert, language menu — does not have to re-implement the same state machine.</p>
+							<p>The contract is one sentence: <strong>the attribute is the state, and the state is the attribute.</strong> <code>data-ln-toggle="open"</code> means open; anything else (<code>"close"</code> or empty) means closed. API methods, trigger clicks, sibling components, external scripts, and DevTools edits all funnel into one <code>setAttribute</code> call. A single <code>MutationObserver</code> callback runs the open/close pipeline. There is no second path.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-toggle/README.md"><code>ln-toggle</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/toggle.md">architecture reference</a>. Read it before reaching for ln-accordion or ln-dropdown — both are thin layers on top of the toggle's contract.</p>
+						</main>
+					</section>
+
+					<!-- Anatomy -->
+					<section class="section-card">
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>A toggle has two halves: the <strong>panel</strong> (the thing that opens and closes) and the <strong>trigger</strong> (the thing that controls it). The pairing is by ID; the elements can live anywhere in the DOM relative to each other.</p>
+<pre><code>&lt;!-- Trigger anywhere --&gt;
+&lt;button data-ln-toggle-for="my-panel"&gt;Toggle&lt;/button&gt;
+
+&lt;!-- Panel anywhere --&gt;
+&lt;section id="my-panel" data-ln-toggle class="collapsible"&gt;
+    &lt;article class="collapsible-body"&gt;&lt;p&gt;Hello.&lt;/p&gt;&lt;/article&gt;
+&lt;/section&gt;</code></pre>
+
+							<h4>The panel — <code>[data-ln-toggle]</code></h4>
+							<p>The presence of the attribute is what makes the element a toggle; the value is the state. <code>"open"</code> is open; anything else is closed. Empty (<code>data-ln-toggle</code> with no value) is also closed — the comparison is literal-string equality with <code>"open"</code>.</p>
+							<p>The element should have an <code>id</code> so triggers can reference it. The element type is the consumer's choice — <code>&lt;section&gt;</code>, <code>&lt;aside&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;div&gt;</code> all work. Do NOT use <code>&lt;main&gt;</code> — the HTML spec allows only one per page.</p>
+
+							<h4>The trigger — <code>[data-ln-toggle-for="id"]</code></h4>
+							<p>Any element with <code>data-ln-toggle-for</code> becomes a click target. <code>&lt;button&gt;</code> is the right semantic for a state-toggling action; <code>&lt;header&gt;</code> is also common in accordion patterns where the entire heading is the clickable surface. The pairing is purely by ID — a trigger in the page header can open a sidebar in the page footer; multiple triggers anywhere in the document can all point to the same panel.</p>
+
+							<h4>The trigger action — <code>data-ln-toggle-action</code></h4>
+							<p>Default is <code>toggle</code> (flip to the opposite state). Override with <code>data-ln-toggle-action="open"</code> or <code>"close"</code> to force one direction — the canonical pattern for the X close button inside a sidebar drawer or dismissible alert.</p>
+
+							<h4>What state goes where</h4>
+							<p>"Is this panel open?" lives on the panel's <code>data-ln-toggle</code> attribute. "Is the trigger's chevron rotated?" lives on the trigger's <code>aria-expanded</code> (synced from panel state). "What animation runs?" lives in CSS reading the <code>.open</code> class. The toggle's instance state is two fields: <code>dom</code> and <code>isOpen</code>. The attribute is the source of truth; <code>isOpen</code> is a cached comparison the observer uses to skip no-op transitions.</p>
+						</main>
+					</section>
+
+					<!-- Single source of truth -->
+					<section class="section-card">
+						<header><h3>Single source of truth</h3></header>
+						<main>
+							<p>Every consumer that wants to change state writes the attribute. There is no imperative API method — <code>setAttribute</code> is the only path.</p>
+<pre><code>const el = document.getElementById('my-panel');
+
+// Open / close / read state
+el.setAttribute('data-ln-toggle', 'open');
+el.setAttribute('data-ln-toggle', 'close');
+el.lnToggle.isOpen;       // boolean — read-only
+el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
+							<p>Trigger click, sibling component, external script, DevTools — all write the attribute. The <code>MutationObserver</code> runs the same pipeline regardless of caller: <code>.open</code> class addition, <code>aria-expanded</code> sync on every matching trigger, <code>:open</code> event dispatch, <code>localStorage</code> write. One channel. One audited path.</p>
+						</main>
+					</section>
+
+					<!-- Attributes reference -->
+					<section class="section-card">
+						<header><h3>Attributes reference</h3></header>
 						<main>
 							<div class="table-container">
 							<table>
 								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-toggle</code></td><td data-label="On element">target element</td><td data-label="Description">Creates an instance, starts closed</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-toggle="open"</code></td><td data-label="On element">target element</td><td data-label="Description">Starts open (receives the <code>.open</code> class)</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-toggle-for="id"</code></td><td data-label="On element">button</td><td data-label="Description">References the target element by ID</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-toggle-action="open|close"</code></td><td data-label="On element">button</td><td data-label="Description">Explicit action (default: toggle)</td></tr>
+									<tr><td><code>data-ln-toggle</code></td><td>panel</td><td>Creates the instance. Value <code>"open"</code> = open; anything else = closed.</td></tr>
+									<tr><td><code>data-ln-toggle-for="id"</code></td><td>trigger</td><td>References the panel by ID. Click toggles it.</td></tr>
+									<tr><td><code>data-ln-toggle-action="open|close"</code></td><td>trigger</td><td>Forces one direction. Default: <code>toggle</code>.</td></tr>
+									<tr><td><code>data-ln-persist</code></td><td>panel</td><td>Opts in to <code>localStorage</code> persistence. Boolean (no value), or <code>data-ln-persist="custom-key"</code> for an explicit key.</td></tr>
+									<tr><td><code>id</code></td><td>panel</td><td>Required so triggers can resolve the panel.</td></tr>
+									<tr><td><code>class="open"</code></td><td>panel</td><td>Written by ln-toggle when open. CSS reads this for visual state.</td></tr>
+									<tr><td><code>aria-expanded</code></td><td>trigger</td><td>Written by ln-toggle on every state change. Drives chevron rotation in the default CSS.</td></tr>
 								</tbody>
 							</table>
 							</div>
 						</main>
 					</section>
 
-					<!-- Single Source of Truth -->
+					<!-- Events reference -->
 					<section class="section-card">
-						<header><h3>Single Source of Truth</h3></header>
-						<main>
-							<p>The <code>data-ln-toggle</code> attribute is the single source of truth. All state changes flow through it &mdash; API methods just set the attribute, and the MutationObserver applies the state (<code>.open</code> class, events).</p>
-							<pre><code>var el = document.getElementById('my-element');
-
-// Via API (sets the attribute, observer does the rest)
-el.lnToggle.open();      // sets data-ln-toggle="open"
-el.lnToggle.close();     // sets data-ln-toggle="close"
-el.lnToggle.toggle();    // toggles based on current state
-el.lnToggle.isOpen;      // boolean (read-only)
-
-// Via attribute (identical result)
-el.setAttribute('data-ln-toggle', 'open');
-el.setAttribute('data-ln-toggle', 'close');</code></pre>
-						</main>
-					</section>
-
-					<!-- Events -->
-					<section class="section-card">
-						<header><h3>Events</h3></header>
+						<header><h3>Events reference</h3></header>
 						<main>
 							<div class="table-container">
 							<table>
-								<thead><tr><th>Event</th><th>Bubbles</th><th>Cancelable</th><th>Detail</th></tr></thead>
+								<thead><tr><th>Event</th><th>Cancelable</th><th><code>detail</code></th><th>Dispatched at</th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-toggle:before-open</code></td><td>yes</td><td><strong>yes</strong></td><td><code>{ target: HTMLElement }</code></td></tr>
-									<tr><td><code>ln-toggle:open</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement }</code></td></tr>
-									<tr><td><code>ln-toggle:before-close</code></td><td>yes</td><td><strong>yes</strong></td><td><code>{ target: HTMLElement }</code></td></tr>
-									<tr><td><code>ln-toggle:close</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement }</code></td></tr>
+									<tr><td><code>ln-toggle:before-open</code></td><td><strong>yes</strong></td><td><code>{ target }</code></td><td>After attribute flips to <code>"open"</code>, before <code>.open</code> class is added. <code>preventDefault()</code> reverts the attribute to <code>"close"</code>.</td></tr>
+									<tr><td><code>ln-toggle:open</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>.open</code> class added, after <code>aria-expanded</code> synced, before persist write.</td></tr>
+									<tr><td><code>ln-toggle:before-close</code></td><td><strong>yes</strong></td><td><code>{ target }</code></td><td>After attribute flips to <code>"close"</code>, before <code>.open</code> class is removed. <code>preventDefault()</code> reverts to <code>"open"</code>.</td></tr>
+									<tr><td><code>ln-toggle:close</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>.open</code> class removed, after <code>aria-expanded</code> synced, before persist write.</td></tr>
+									<tr><td><code>ln-toggle:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>First action inside <code>destroy()</code>.</td></tr>
 								</tbody>
 							</table>
 							</div>
-							<p>If <code>before-open</code> / <code>before-close</code> is canceled (<code>preventDefault()</code>), the observer reverts the attribute.</p>
-							<pre><code>document.addEventListener('ln-toggle:open', function (e) {
-    console.log('Opened:', e.detail.target.id);
-});
-
-// Cancel opening conditionally
-document.addEventListener('ln-toggle:before-open', function (e) {
-    if (!userHasPermission()) e.preventDefault();
-    // observer reverts attribute back to "close"
-});</code></pre>
+							<p>All events bubble. <code>detail.target</code> is always the panel element, not a trigger. When <code>:before-open</code> or <code>:before-close</code> is canceled, the observer reverts the attribute; the revert is itself an attribute change, but the no-op guard at the top of <code>_syncAttribute</code> catches it (since <code>isOpen</code> never updated). No infinite loop.</p>
 						</main>
 					</section>
 
 					<!-- Example: Sidebar -->
 					<section class="section-card">
-						<header><h3>Example — Sidebar</h3></header>
+						<header><h3>Example — Sidebar drawer</h3></header>
 						<main>
-							<p><strong>Click the button to open/close the sidebar</strong></p>
+							<p>The library's <code>@mixin sidebar-drawer</code> reads <code>data-ln-toggle="open"</code> directly from CSS and applies a <code>translateX(0)</code> transform. No JS coordinator — toggle owns the state, CSS owns the animation. The X close button uses <code>data-ln-toggle-action="close"</code> to always-close, never re-open.</p>
 							<section class="demo-toggle-sidebar">
 								<aside id="demo-sidebar-example" class="sidebar open" data-ln-toggle="open">
 									<h4>Sidebar</h4>
@@ -247,11 +274,11 @@ document.addEventListener('ln-toggle:before-open', function (e) {
 										<li><a href="#">Link 2</a></li>
 										<li><a href="#">Link 3</a></li>
 									</ul>
-									<button  data-ln-toggle-for="demo-sidebar-example" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+									<button data-ln-toggle-for="demo-sidebar-example" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 								</aside>
 								<article>
 									<button data-ln-toggle-for="demo-sidebar-example" class="btn">Toggle Sidebar</button>
-									<p>Sidebar receives the <code>.open</code> class when open.</p>
+									<p>Sidebar receives the <code>.open</code> class when open. Open DevTools and watch <code>data-ln-toggle</code> flip on the <code>&lt;aside&gt;</code>.</p>
 								</article>
 							</section>
 						</main>
@@ -261,6 +288,7 @@ document.addEventListener('ln-toggle:before-open', function (e) {
 					<section class="section-card">
 						<header><h3>Example — Collapsible section</h3></header>
 						<main>
+							<p>For an inline expand/collapse with a smooth height animation, pair ln-toggle with the <code>.collapsible</code> mixin. The chevron rotates 180° on open via the trigger's <code>aria-expanded</code>; <code>.collapsible</code> animates <code>grid-template-rows</code> from <code>0fr</code> to <code>1fr</code>; <code>.collapsible-body</code> holds the padding so the parent can collapse cleanly to zero height.</p>
 							<article class="demo-toggle-collapsible">
 								<header>
 									<strong>Advanced options</strong>
@@ -284,6 +312,7 @@ document.addEventListener('ln-toggle:before-open', function (e) {
 					<section class="section-card">
 						<header><h3>Example — Dropdown menu</h3></header>
 						<main>
+							<p><code>ln-dropdown</code> is a wrapper that adds menu-grade behavior on top of one toggle: outside-click closes, resize closes, scroll repositions, body teleport for proper z-index. The underlying open/closed state still lives in <code>data-ln-toggle</code> on the inner menu element.</p>
 							<div data-ln-dropdown>
 								<button data-ln-toggle-for="dropdown-example" class="btn">Menu</button>
 								<ul id="dropdown-example" data-ln-toggle>
@@ -295,16 +324,118 @@ document.addEventListener('ln-toggle:before-open', function (e) {
 						</main>
 					</section>
 
+					<!-- Example: Multiple triggers -->
+					<section class="section-card">
+						<header><h3>Example — Multiple triggers per panel</h3></header>
+						<main>
+							<p>Triggers are matched by ID, not by DOM proximity. Multiple triggers pointing to the same panel all work; clicking any one toggles the panel; all of them have their <code>aria-expanded</code> synced. Useful when the same action is exposed from multiple parts of a layout — header bar, sidebar, inline content.</p>
+<pre><code>&lt;button data-ln-toggle-for="info"&gt;Top trigger&lt;/button&gt;
+&lt;button data-ln-toggle-for="info"&gt;Side trigger&lt;/button&gt;
+
+&lt;section id="info" data-ln-toggle&gt;
+    &lt;p&gt;Either button toggles me; both stay in sync.&lt;/p&gt;
+    &lt;button aria-label="Close"
+            data-ln-toggle-for="info"
+            data-ln-toggle-action="close"&gt;×&lt;/button&gt;
+&lt;/section&gt;</code></pre>
+							<p>The aria sync iterates <code>document.querySelectorAll('[data-ln-toggle-for="info"]')</code> on every state change, so any number of triggers at any DOM location stay coherent.</p>
+						</main>
+					</section>
+
+					<!-- Persistence -->
+					<section class="section-card">
+						<header><h3>Persistence</h3></header>
+						<main>
+							<p>Add <code>data-ln-persist</code> to a panel to remember its open/closed state in <code>localStorage</code>. State restores on page load before the first event fires. Storage key format: <code>ln:toggle:{pagePath}:{id}</code>.</p>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Markup</th><th>Page</th><th>Storage key</th></tr></thead>
+								<tbody>
+									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist&gt;</code></td><td><code>/admin/users</code></td><td><code>ln:toggle:/admin/users:sidebar</code></td></tr>
+									<tr><td><code>&lt;aside id="sidebar" data-ln-toggle data-ln-persist="left-panel"&gt;</code></td><td><code>/admin/users</code></td><td><code>ln:toggle:/admin/users:left-panel</code></td></tr>
+									<tr><td><code>&lt;section id="faq-1" data-ln-toggle data-ln-persist&gt;</code></td><td><code>/</code></td><td><code>ln:toggle:/:faq-1</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>Path is part of the key on purpose — same <code>id="sidebar"</code> on different pages resolves to two different keys, so each page remembers its own sidebar state. Restore happens inside the constructor before reactivity starts; the user's choice always wins over markup defaults on subsequent visits.</p>
+							<p>If <code>data-ln-persist</code> is present but the element has neither an <code>id</code> nor an explicit key value, the persist module logs a warning and silently skips — the toggle continues to function without persistence. <code>localStorage</code> failures (private browsing, quota exceeded) are also silent.</p>
+						</main>
+					</section>
+
+					<!-- Cancelable example -->
+					<section class="section-card">
+						<header><h3>Cancelable transitions</h3></header>
+						<main>
+							<p>Listeners on <code>:before-open</code> and <code>:before-close</code> can call <code>preventDefault()</code> to halt the transition. The observer reverts the attribute; the revert is itself an attribute change, but the no-op guard catches it. Use this for permission checks, unsaved-data warnings, async confirmations.</p>
+<pre><code>document.addEventListener('ln-toggle:before-open', function (e) {
+    if (e.detail.target.id === 'admin-panel' &amp;&amp; !window.currentUser.isAdmin) {
+        e.preventDefault();
+        // observer reverts attribute back to "close"
+        // _syncAttribute re-fires but no-ops because isOpen never flipped
+    }
+});</code></pre>
+							<p>Do not write <code>data-ln-toggle</code> on <em>another</em> panel from inside a <code>:before-open</code> handler. Cancelable handlers conflate "I might prevent this" with "I want to react to it" — listen to the post-event (<code>:open</code>) for fan-out instead.</p>
+						</main>
+					</section>
+
+					<!-- Cross-component -->
+					<section class="section-card">
+						<header><h3>Cross-component coordination</h3></header>
+						<main>
+							<p>ln-toggle is the foundation; several other components are thin layers on top. They all reach the toggle the same way: listen for events, or write the attribute.</p>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Component</th><th>How it uses ln-toggle</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-accordion</code></td><td>Listens for bubbled <code>ln-toggle:open</code> on the wrapper. Sets <code>data-ln-toggle="close"</code> on every other open sibling. Each sibling's observer runs its own close pipeline. Never reaches into a sibling's instance — the attribute is the only path.</td></tr>
+									<tr><td><code>ln-dropdown</code></td><td>Listens for <code>ln-toggle:open</code> / <code>:close</code> on the inner menu. On open: teleport to <code>&lt;body&gt;</code>, position, attach outside-click and resize-close listeners. On close: reverse. Writes <code>data-ln-toggle="close"</code> from the outside-click and resize handlers.</td></tr>
+									<tr><td><code>ln-translations</code></td><td>The language-add menu uses a <code>[data-ln-dropdown] &gt; [data-ln-toggle]</code> shape. After the user picks a language, ln-translations writes <code>data-ln-toggle="close"</code> to dismiss the menu.</td></tr>
+									<tr><td>App shell sidebar</td><td><code>@mixin sidebar-drawer</code> reads <code>[data-ln-toggle="open"]</code> directly from CSS for the translate-x animation. The scrim overlay reacts via sibling selector. No JS coordinator.</td></tr>
+									<tr><td>Dismissible alert</td><td><code>.alert[data-ln-toggle="close"] { display: none; }</code> in <code>scss/components/_alert.scss</code> hides closed alerts. With <code>data-ln-persist</code>, the dismissal sticks.</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p><code>ln-modal</code>, <code>ln-popover</code>, and <code>ln-tabs</code> are NOT built on ln-toggle. They have their own state machines because they need different contracts (modal owns ESC + scrim + focus trap; tabs own active-panel selection; popovers own positioning). If a piece of UI feels open/close-shaped but ships with a different attribute surface, that's intentional.</p>
+						</main>
+					</section>
+
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<h4>Setting <code>data-ln-toggle</code> on a panel without an <code>id</code></h4>
+							<p>The panel works (you can flip <code>data-ln-toggle</code> on it directly via <code>setAttribute</code>), but no <code>[data-ln-toggle-for]</code> trigger can find it — <code>document.getElementById</code> returns <code>null</code> and the click handler returns silently. Add an <code>id</code>.</p>
+
+							<h4>Removing <code>data-ln-toggle</code> to "close" the panel</h4>
+							<p><code>removeAttribute('data-ln-toggle')</code> does NOT close the panel via the toggle pipeline. The <code>.open</code> class persists; <code>aria-expanded</code> does not update. To close, write the value: <code>setAttribute('data-ln-toggle', 'close')</code>. To dispose entirely, call <code>destroy()</code> first.</p>
+
+							<h4>Putting <code>data-ln-toggle</code> on <code>&lt;main&gt;</code></h4>
+							<p>HTML spec allows only one <code>&lt;main&gt;</code> per page. Use <code>&lt;section&gt;</code>, <code>&lt;aside&gt;</code>, <code>&lt;article&gt;</code>, or <code>&lt;div&gt;</code> with a class.</p>
+
+							<h4>Adding padding to <code>.collapsible</code> directly</h4>
+							<p>The collapse animation transitions <code>grid-template-rows</code> from <code>0fr</code> to <code>1fr</code>. Padding on the parent shows as a thin always-visible strip when collapsed. Padding goes on <code>.collapsible-body</code>, never on <code>.collapsible</code>.</p>
+
+							<h4>Expecting ESC or outside-click to close</h4>
+							<p>ln-toggle has no keyboard handler and no document-level click listener. For ESC-to-close drawers, wire it on the consumer side (<code>document.addEventListener('keydown', ...)</code>). For dropdown-style outside-click, use <code>ln-dropdown</code>. For modal-style ESC + focus trap + scrim, use <code>ln-modal</code> (which is NOT built on ln-toggle).</p>
+
+							<h4>Putting <code>data-ln-toggle</code> and <code>data-ln-toggle-for</code> on the same element</h4>
+							<p>The element becomes a panel that controls itself — clicking it would call <code>toggle()</code> on its own instance. Rarely intentional. Split into trigger and panel.</p>
+
+							<h4>Persisting a panel without <code>id</code> or explicit key</h4>
+							<p><code>data-ln-persist</code> in boolean form requires an <code>id</code>. Without one, the persist module logs <code>[ln-persist] Element requires id or data-ln-persist="key"</code> and silently skips. Use <code>data-ln-persist="custom-key"</code> if the panel has no <code>id</code>.</p>
+						</main>
+					</section>
+
 					<!-- HTML structure -->
 					<section class="section-card">
-						<header><h3>HTML structure</h3></header>
+						<header><h3>HTML structure reference</h3></header>
 						<main>
-							<pre><code>&lt;!-- Element that will be toggled --&gt;
+<pre><code>&lt;!-- Panel that will be toggled --&gt;
 &lt;aside id="my-sidebar" data-ln-toggle&gt;
     Content
 &lt;/aside&gt;
 
-&lt;!-- Button that controls it --&gt;
+&lt;!-- Trigger that controls it --&gt;
 &lt;button data-ln-toggle-for="my-sidebar"&gt;
     Toggle
 &lt;/button&gt;
@@ -314,11 +445,16 @@ document.addEventListener('ln-toggle:before-open', function (e) {
     Open content
 &lt;/section&gt;
 
-&lt;!-- Explicit action --&gt;
+&lt;!-- Explicit close-only action — for X buttons inside drawers/alerts --&gt;
 &lt;button data-ln-toggle-for="panel"
         data-ln-toggle-action="close"&gt;
     Close
-&lt;/button&gt;</code></pre>
+&lt;/button&gt;
+
+&lt;!-- Persisted across reloads --&gt;
+&lt;aside id="sidebar" data-ln-toggle data-ln-persist&gt;
+    State remembered in localStorage
+&lt;/aside&gt;</code></pre>
 						</main>
 					</section>
 
@@ -326,59 +462,59 @@ document.addEventListener('ln-toggle:before-open', function (e) {
 					<section class="section-card">
 						<header><h3>CSS for animations</h3></header>
 						<main>
-							<p>ln-toggle adds/removes the <code>.open</code> class. For CSS animations use the collapsible pattern:</p>
-							<pre><code>// Sidebar — transform animation
+							<p>ln-toggle adds/removes the <code>.open</code> class. Visual transition is the consumer's CSS. Three patterns are common:</p>
+<pre><code>// Sidebar — transform animation
 .sidebar {
     transform: translateX(-100%);
     @include transition;
-    &.open { transform: translateX(0); }
+    &amp;.open { transform: translateX(0); }
 }
 
-// Collapsible — grid-template-rows (RECOMMENDED)
-// Use .collapsible class or @include collapsible
+// Collapsible — grid-template-rows (RECOMMENDED for height animation)
 &lt;section id="panel" data-ln-toggle class="collapsible"&gt;
     &lt;article class="collapsible-body"&gt;
         Content...
     &lt;/article&gt;
 &lt;/section&gt;
 
-// SCSS:
-.collapsible      { @include collapsible; }
-.collapsible > *  { @include collapsible-content; }
+// Or via @include in project SCSS:
+.my-panel              { @include collapsible; }
+.my-panel &gt; .my-body   { @include collapsible-content; }
 
-// Or semantically in project SCSS:
-#panel         { @include collapsible; }
-#panel > .body { @include collapsible-content; }</code></pre>
+// Hidden via display:none (for dismissible alerts)
+.alert[data-ln-toggle="close"] { display: none; }</code></pre>
+							<p>The library ships <code>@mixin collapsible</code> (grid-template-rows pattern), <code>@mixin sidebar-drawer</code> (translate-x pattern), and the dismissible-alert pattern out of the box.</p>
 						</main>
 					</section>
 
-					<!-- Constructor -->
+					<!-- Dynamic DOM -->
 					<section class="section-card">
 						<header><h3>Dynamic DOM</h3></header>
 						<main>
-							<p>The component uses <strong>MutationObserver</strong> — it automatically initializes all new elements added to the DOM, including dynamic HTML from AJAX or JS.</p>
-							<pre><code>// No manual initialization needed.
-// MutationObserver automatically detects new data-ln-toggle elements.
+							<p>The component uses a document-level <strong>MutationObserver</strong> — it automatically initializes new elements added to the DOM, including content from AJAX, <code>innerHTML</code> replacement, or template-driven rendering.</p>
+<pre><code>// No manual initialization needed.
+// MutationObserver detects new [data-ln-toggle] elements.
 
-fetch('/partial').then(r => r.text()).then(html => {
+fetch('/partial').then(r =&gt; r.text()).then(html =&gt; {
     document.getElementById('content').innerHTML = html;
-    // lnToggle automatically initializes the new elements
+    // ln-toggle automatically initializes the new elements
 });</code></pre>
-							<p><code>window.lnToggle</code> is available only for non-standard cases (Shadow DOM, iframe) where MutationObserver does not observe.</p>
+							<p><code>window.lnToggle(root)</code> is escape-hatch only — for Shadow DOM, iframes, or any context the document-level observer doesn't see.</p>
 						</main>
 					</section>
 
-					<!-- Practical examples -->
+					<!-- Practical uses -->
 					<section class="section-card">
 						<header><h3>Practical uses</h3></header>
 						<main>
 							<ul>
-								<li><strong>Sidebar navigation</strong> — opening/closing on mobile</li>
-								<li><strong>Collapsible FAQ/documentation</strong> — Q&A panels</li>
-								<li><strong>Dropdown menus</strong> — user menu, actions menu</li>
-								<li><strong>Modal backdrop</strong> — via ln-modal component</li>
-								<li><strong>Tabs panels</strong> — via ln-tabs component</li>
-								<li><strong>Accordion</strong> — via ln-accordion component</li>
+								<li><strong>Sidebar drawer</strong> — pair with <code>@mixin sidebar-drawer</code>; persist with <code>data-ln-persist</code>; close button uses <code>data-ln-toggle-action="close"</code>.</li>
+								<li><strong>Inline collapsibles</strong> — pair with <code>@mixin collapsible</code>; chevron icon rotates via <code>aria-expanded</code> automatically.</li>
+								<li><strong>Accordion panels</strong> — wrap with <code>[data-ln-accordion]</code> for single-open coordination. See the accordion docs.</li>
+								<li><strong>Dropdown menus</strong> — wrap with <code>[data-ln-dropdown]</code> for outside-click, repositioning, and z-index teleport. See the dropdown docs.</li>
+								<li><strong>Dismissible alerts</strong> — combine with <code>data-ln-persist</code>; <code>.alert[data-ln-toggle="close"]</code> hides the alert globally.</li>
+								<li><strong>Conditional panels</strong> — listen for <code>:before-open</code> and call <code>preventDefault()</code> on permission failure.</li>
+								<li><strong>URL-driven panels</strong> — listen for <code>hashchange</code> and write <code>data-ln-toggle="open"</code> on the panel matching the hash.</li>
 							</ul>
 						</main>
 					</section>

@@ -1,9 +1,76 @@
 <!-- ln-page: title="Search — ln-ashlar" h1="Search" -->
 
-<h1>Search</h1>
-					<p>Generic search component — filters children of a target element by <code>textContent</code>. Works on lists, card grids, or any container. Also integrates with <code>ln-table</code> for in-memory table filtering.</p>
+<style>
+	#demo-icon-grid > section {
+		margin-block: var(--size-md);
+	}
+	#demo-icon-grid h4 {
+		margin-block-end: var(--size-xs);
+		color: var(--fg-muted);
+	}
+	#demo-icon-grid ul {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+		gap: var(--size-xs);
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	#demo-server-log {
+		max-height: 8rem;
+		overflow-y: auto;
+		font-family: var(--font-mono);
+		font-size: var(--text-body-sm);
+		color: var(--fg-muted);
+	}
+</style>
 
-					<!-- Attributes -->
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview</h3></header>
+						<main>
+							<p>A 114-line component for the input-side of a search box. <code>ln-search</code> debounces keystrokes and announces "the user typed X" via a single cancelable <code>ln-search:change</code> event. The component does <em>not</em> own filtering — it announces intent and lets whichever consumer cares the most respond. The default fallback (when no consumer steps in) is a cheap DOM walk that adds <code>data-ln-search-hide</code> to non-matching items.</p>
+							<p>Two consumer paths for the same event. A passive consumer — no listener attached — gets the cheap DOM walk for free. An active consumer (<code>ln-table</code>, custom server-search code) listens for the event, calls <code>preventDefault()</code>, and runs its own filter pipeline; the default walk never fires. The cancelable contract is the off-switch — no separate "default behavior" attribute, no mode flag.</p>
+							<p>The component does one piece of plumbing that matters. Browser form-restore (back-button navigation, server-rendered pre-filled inputs) deposits a value into the input <em>before</em> JS runs. Without intervention, the consumer would see an unfiltered target with a non-empty search box. <code>ln-search</code> detects the pre-filled value at construction and dispatches the initial event through <code>queueMicrotask</code>, which defers the dispatch until after the current tick — by then every other component has finished initializing, so the listener (e.g. <code>ln-table</code>) is wired and ready.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-search/README.md"><code>ln-search</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/search.md">architecture reference</a>.</p>
+						</main>
+					</section>
+
+					<!-- Anatomy -->
+					<section class="section-card">
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>Two markup shapes. The minimum invocation puts <code>data-ln-search</code> directly on an input:</p>
+<pre><code>&lt;input type="search" placeholder="Search..." data-ln-search="my-list"&gt;
+
+&lt;ul id="my-list"&gt;
+    &lt;li&gt;Argentina&lt;/li&gt;
+    &lt;li&gt;Brazil&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+							<p>The wrapper variant places the attribute on a <code>&lt;label&gt;</code> and lets the component find the input inside. This is the canonical chrome — search icon on the left, optional clear button on the right:</p>
+<pre><code>&lt;label data-ln-search="my-list"&gt;
+    &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;input type="search" placeholder="Search..."&gt;
+    &lt;button type="button" data-ln-search-clear aria-label="Clear search"&gt;
+        &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/button&gt;
+&lt;/label&gt;</code></pre>
+
+							<p>The chrome (border, focus ring, icon spacing, clear-button visibility) comes from <code>@mixin form-input-icon-group</code> applied via <code>&lt;label&gt;:has(input[type="search"])</code> in <code>scss/components/_form.scss</code> — no class on the label.</p>
+
+							<h4>Input resolution priority</h4>
+							<p>When <code>data-ln-search</code> is on a wrapper, the input is found in this order: <code>[name="search"]</code>, <code>input[type="search"]</code>, <code>input[type="text"]</code>. If you nest multiple inputs inside the wrapper, the first match wins.</p>
+
+							<h4>Default vs. deep targeting</h4>
+							<p>The default behavior iterates <code>target.children</code> — direct children only. For nested structures where items are not direct children, opt into a CSS-selector pass via <code>data-ln-search-items="selector"</code>; the component then runs <code>target.querySelectorAll(selector)</code> on every search.</p>
+
+							<h4>What state goes where</h4>
+							<p>"Should this input drive search?" lives on <code>data-ln-search="targetId"</code> (owned by the author). "Currently typed term" lives on <code>input.value</code> (owned by the platform). "Item is hidden by search" lives on <code>data-ln-search-hide="true"</code> on each non-matching child of the target (owned by <code>ln-search</code>'s default path only — consumers that <code>preventDefault()</code> own this themselves). Active debounce timer lives on the JS instance.</p>
+						</main>
+					</section>
+
+					<!-- Attributes reference -->
 					<section class="section-card">
 						<header><h3>Attributes</h3></header>
 						<main>
@@ -11,42 +78,45 @@
 							<table>
 								<thead><tr><th>Attribute</th><th>On</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-search="targetId"</code></td><td data-label="On">wrapper or <code>&lt;input&gt;</code></td><td data-label="Description">Target element by ID</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-search-hide</code></td><td data-label="On">children of target</td><td data-label="Description">Set by JS when element doesn't match</td></tr>
+									<tr><td><code>data-ln-search="targetId"</code></td><td><code>&lt;input&gt;</code> directly, or a wrapper element</td><td>Marks the search input. Value is the <code>id</code> of the target whose children will be filtered. Captured at construction.</td></tr>
+									<tr><td><code>data-ln-search-items="selector"</code></td><td>Same element as <code>data-ln-search</code></td><td>CSS selector for <code>target.querySelectorAll</code>. Replaces the default <code>target.children</code> iteration with deep matching. Captured at construction.</td></tr>
+									<tr><td><code>data-ln-search-hide</code></td><td>Children of the target (auto)</td><td>Set by <code>_search</code> on items that do not match. Removed when the term changes or empties. The CSS rule that hides them ships in <code>js/ln-search/ln-search.scss</code>.</td></tr>
+									<tr><td><code>data-ln-search-clear</code></td><td><code>&lt;button&gt;</code> inside the wrapper</td><td>Marks an in-input clear button. The component wires a click listener that empties the input, calls <code>_search('')</code> synchronously (bypassing debounce), and refocuses.</td></tr>
 								</tbody>
 							</table>
 							</div>
-							<p>On a wrapper: finds <code>input[type="search"]</code>, <code>input[type="text"]</code>, or <code>[name="search"]</code> inside.<br>Directly on <code>&lt;input&gt;</code>: that input is used.</p>
 						</main>
 					</section>
 
-					<!-- Events -->
+					<!-- Events reference -->
 					<section class="section-card">
 						<header><h3>Events</h3></header>
 						<main>
 							<div class="table-container">
 							<table>
-								<thead><tr><th>Event</th><th>On</th><th>Cancelable</th><th><code>detail</code></th></tr></thead>
+								<thead><tr><th>Event</th><th>On</th><th>Bubbles</th><th>Cancelable</th><th><code>detail</code></th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-search:change</code></td><td>target element</td><td>yes</td><td><code>{ term, targetId }</code></td></tr>
+									<tr><td><code>ln-search:change</code></td><td>target element</td><td>yes</td><td><strong>yes</strong></td><td><code>{ term, targetId }</code></td></tr>
 								</tbody>
 							</table>
 							</div>
-							<p>Fires on the <strong>target</strong> element (not the input). If <code>preventDefault()</code> is called, ln-search skips its default show/hide — the consumer handles filtering (e.g. <code>ln-table</code>).</p>
+							<p><code>detail.term</code> is already lowercased and trimmed — listeners receive a normalized string. <code>detail.targetId</code> echoes the value of <code>data-ln-search</code> for delegate disambiguation. The event is dispatched on the <strong>target</strong>, not the input — consumers naturally listen on the thing they care about (the table, the list), not on the input that drives it. Bubbling-up to <code>document</code> works for global listeners.</p>
+							<p>Calling <code>preventDefault()</code> from any listener disables the component's default DOM walk. Whatever the consumer does instead — table filter, server request, custom DOM swap — is now its responsibility. <code>ln-table</code> uses this exact pattern.</p>
 						</main>
 					</section>
 
-					<!-- Demo 1: Simple List -->
+					<!-- Demo: simple list (default behavior) -->
 					<section class="section-card">
-						<header><h3>Demo — Filter a list</h3></header>
+						<header><h3>Example — Filter a list (default behavior)</h3></header>
 						<main>
-							<p>Type to filter the list below. Default behavior: ln-search adds <code>data-ln-search-hide</code> to non-matching children.</p>
-
+							<p>The minimum case: an input, a target list, no JavaScript. The component walks <code>target.children</code> on every keystroke (after the 150ms debounce) and toggles <code>data-ln-search-hide</code>. The library's CSS rule (<code>display: none !important</code>) hides matched items.</p>
 							<label data-ln-search="demo-list">
 								<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 								<input type="search" placeholder="Search countries...">
+								<button type="button" data-ln-search-clear aria-label="Clear search">
+									<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
 							</label>
-
 							<ul id="demo-list">
 								<li>Argentina</li>
 								<li>Australia</li>
@@ -72,14 +142,12 @@
 						</main>
 					</section>
 
-					<!-- Demo 2: Directly on input -->
+					<!-- Demo: input-direct (no wrapper) -->
 					<section class="section-card">
-						<header><h3>Demo — Input directly</h3></header>
+						<header><h3>Example — Directly on the input (no wrapper)</h3></header>
 						<main>
-							<p><code>data-ln-search</code> directly on the <code>&lt;input&gt;</code> element — no wrapper needed.</p>
-
+							<p><code>data-ln-search</code> can sit directly on an <code>&lt;input&gt;</code> with no surrounding label. The component uses the input itself as both the trigger and the input source.</p>
 							<input type="search" placeholder="Search teams..." data-ln-search="demo-teams">
-
 							<ul id="demo-teams">
 								<li>Engineering — builds the product</li>
 								<li>Design — creates user interfaces</li>
@@ -93,15 +161,13 @@
 						</main>
 					</section>
 
-					<!-- Demo 3: Custom event handling -->
+					<!-- Demo: custom listener with preventDefault -->
 					<section class="section-card">
-						<header><h3>Demo — Custom event handler</h3></header>
+						<header><h3>Example — Custom event handler with <code>preventDefault()</code></h3></header>
 						<main>
-							<p>Use <code>preventDefault()</code> to handle filtering yourself. This example shows a match counter instead of hiding elements.</p>
-
+							<p>Listen for <code>ln-search:change</code> on the target, call <code>preventDefault()</code>, and own the visual response. This example shows a match counter instead of hiding elements — the items stay visible, but the count below updates.</p>
 							<input type="search" placeholder="Search (custom handler)..." data-ln-search="demo-custom">
-
-							<p id="demo-custom-result">Type to search...</p>
+							<p id="demo-custom-result" aria-live="polite">Type to search...</p>
 							<ul id="demo-custom">
 								<li>Alpha framework</li>
 								<li>Beta library</li>
@@ -112,88 +178,197 @@
 						</main>
 					</section>
 
-					<!-- Table Integration -->
+					<!-- Demo: deep targeting with data-ln-search-items -->
 					<section class="section-card">
-						<header><h3>Table Integration</h3></header>
+						<header><h3>Example — Deep targeting with <code>data-ln-search-items</code></h3></header>
 						<main>
-							<p>When <code>data-ln-search</code> points to a <code>[data-ln-table]</code> element, <code>ln-table</code> intercepts <code>ln-search:change</code> and calls <code>preventDefault()</code>. No extra configuration — the integration is automatic.</p>
-							<pre><code>&lt;input type="search" data-ln-search="my-table"&gt;
+							<p>Items are nested under category sections. With <code>data-ln-search-items=".icon-cell"</code>, the component runs <code>target.querySelectorAll('.icon-cell')</code> on every search and toggles <code>data-ln-search-hide</code> on each match. Section wrappers and headings stay visible regardless. To collapse empty sections, that is consumer code — see the <code>ln-search</code> README's "Deep nested filtering" example.</p>
+							<input type="search" placeholder="Search icons..." data-ln-search="demo-icon-grid" data-ln-search-items=".icon-cell">
+							<div id="demo-icon-grid">
+								<section>
+									<h4>Navigation</h4>
+									<ul>
+										<li class="icon-cell">home — go home</li>
+										<li class="icon-cell">arrow-left — back</li>
+										<li class="icon-cell">arrow-right — forward</li>
+										<li class="icon-cell">menu — open navigation</li>
+									</ul>
+								</section>
+								<section>
+									<h4>Actions</h4>
+									<ul>
+										<li class="icon-cell">plus — add new</li>
+										<li class="icon-cell">trash — delete</li>
+										<li class="icon-cell">edit — modify</li>
+										<li class="icon-cell">copy — duplicate</li>
+									</ul>
+								</section>
+								<section>
+									<h4>Status</h4>
+									<ul>
+										<li class="icon-cell">check — success</li>
+										<li class="icon-cell">x — error</li>
+										<li class="icon-cell">alert-triangle — warning</li>
+										<li class="icon-cell">info-circle — information</li>
+									</ul>
+								</section>
+							</div>
+						</main>
+					</section>
+
+					<!-- Demo: server-search simulation -->
+					<section class="section-card">
+						<header><h3>Example — Server-side search simulation</h3></header>
+						<main>
+							<p>The handler calls <code>preventDefault()</code> and pretends to issue an HTTP request. The log below shows the dispatched terms with their normalization (lowercased, trimmed) — note that rapid typing produces only one entry, the result of the 150ms debounce coalescing keystrokes.</p>
+							<input type="search" placeholder="Type rapidly to see debouncing..." data-ln-search="demo-server-target">
+							<output id="demo-server-target" hidden></output>
+							<div id="demo-server-log" aria-live="polite">Type to see dispatched search events...</div>
+						</main>
+					</section>
+
+					<!-- Demo: pre-filled value -->
+					<section class="section-card">
+						<header><h3>Example — Pre-filled input (browser form-restore simulation)</h3></header>
+						<main>
+							<p>A pre-filled input simulates the back-button-restore case. The constructor detects the non-empty value and dispatches <code>ln-search:change</code> via <code>queueMicrotask</code> — the search applies on its own at page load, no consumer wiring needed. Reload the page to see it run again.</p>
+							<input type="search" value="france" data-ln-search="demo-prefilled">
+							<ul id="demo-prefilled">
+								<li>Argentina</li>
+								<li>Brazil</li>
+								<li>Canada</li>
+								<li>France</li>
+								<li>Germany</li>
+								<li>Japan</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Table integration -->
+					<section class="section-card">
+						<header><h3>Composition — <code>ln-table</code> integration</h3></header>
+						<main>
+							<p>When <code>data-ln-search</code> targets a <code>[data-ln-table]</code> element, <code>ln-table</code>'s constructor wires a listener at <code>js/ln-table/ln-table.js:62-78</code> that calls <code>preventDefault()</code> and applies the term in its in-memory filter pipeline. No coordinator, no extra configuration:</p>
+<pre><code>&lt;input type="search" placeholder="Search..." data-ln-search="my-table"&gt;
 
 &lt;div id="my-table" data-ln-table&gt;
     &lt;table&gt;...&lt;/table&gt;
 &lt;/div&gt;</code></pre>
-							<p>See the <a href="datatable.html">Data Table</a> and <a href="table.html">Table</a> demos for live examples.</p>
+							<p>See the <a href="table.html">Table</a> and <a href="table-filter.html">Table Filter</a> demos for live integrations.</p>
 						</main>
 					</section>
 
-					<!-- Combination with ln-filter -->
+					<!-- Coordination with ln-filter -->
 					<section class="section-card">
-						<header><h3>Combination with ln-filter</h3></header>
+						<header><h3>Composition — independence from <code>ln-filter</code></h3></header>
 						<main>
-							<p><code>ln-search</code> and <code>ln-filter</code> work independently on the same target. Each uses its own hide attribute. An element is visible only when no hide attribute is present:</p>
-							<pre><code>[data-ln-search-hide],
+							<p><code>ln-search</code> and <code>ln-filter</code> operate on the same target without coordinating. Each manages its own hide attribute; an item is visible iff both are absent:</p>
+<pre><code>[data-ln-search-hide],
 [data-ln-filter-hide] {
-    display: none;
+    display: none !important;
 }</code></pre>
+							<p>The CSS rules ship in the library defaults. Neither component knows about the other.</p>
 						</main>
 					</section>
 
-					<!-- HTML Structure -->
+					<!-- Asymmetry callout -->
 					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
+						<header><h3>Composition — what <code>ln-search</code> does <em>not</em> compose with</h3></header>
 						<main>
-							<pre><code>&lt;!-- On a wrapper --&gt;
-&lt;label data-ln-search="my-list"&gt;
-    &lt;span class="ln-icon-search ln-icon--sm"&gt;&lt;/span&gt;
-    &lt;input type="search" placeholder="Search..."&gt;
-&lt;/label&gt;
-
-&lt;ul id="my-list"&gt;
-    &lt;li&gt;First element&lt;/li&gt;
-    &lt;li&gt;Second element&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;!-- Directly on input --&gt;
-&lt;input type="search" data-ln-search="my-list"&gt;</code></pre>
+							<p><strong><code>ln-data-table</code> does NOT consume <code>ln-search</code>.</strong> The data-table component has its own input attribute, <code>data-ln-data-table-search</code>, placed inside the data-table element. Search is part of the request payload joined with sort, pagination, and column filters in the <code>ln-data-table:request-data</code> event consumed by <code>ln-store</code>. Putting <code>ln-search</code> in front would create a parallel channel the data-table layer would have to ignore. They are different problems with different lifecycles.</p>
+							<p><strong><code>ln-form</code> does not coordinate with <code>ln-search</code>.</strong> A search input inside <code>&lt;form data-ln-form&gt;</code> works the same as outside one. <code>ln-search</code> listens to <code>input</code> only — never <code>keydown</code> or <code>submit</code>. Pressing Enter triggers the form's native submit; the 150ms debounce timer may still be running. If you need Enter-to-search semantics, wire the form's <code>submit</code> handler directly. See the <code>ln-search</code> README "Common mistakes" item 2.</p>
 						</main>
 					</section>
 
-					<!-- CSS -->
+					<!-- API -->
 					<section class="section-card">
-						<header><h3>Required CSS</h3></header>
+						<header><h3>API</h3></header>
 						<main>
-							<pre><code>/* Hide non-matching elements */
-[data-ln-search-hide] {
-    display: none;
-}</code></pre>
+<pre><code>const el = document.querySelector('[data-ln-search]');
+
+el.lnSearch.targetId;          // string — captured at construction
+el.lnSearch.input;             // HTMLInputElement — the resolved input
+el.lnSearch.itemsSelector;     // string | null — value of data-ln-search-items
+el.lnSearch.destroy();         // remove listeners, clear timer, deregister
+
+window.lnSearch(root);         // re-run init scan over `root` — only needed
+                               //   for Shadow DOM / iframe roots that the
+                               //   global MutationObserver cannot see</code></pre>
+							<p>There is no <code>search(term)</code> or <code>clear()</code> method. Trigger search programmatically by writing <code>input.value</code> and dispatching an <code>input</code> event:</p>
+<pre><code>input.value = 'argentina';
+input.dispatchEvent(new Event('input', { bubbles: true }));
+// → triggers the debounced search 150ms later</code></pre>
+						</main>
+					</section>
+
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<h4>1. Listening for <code>input</code> directly to bypass debounce</h4>
+							<p>Bypasses the component's own debounce — every keystroke fires your handler. Listen for <code>ln-search:change</code> on the target instead; you get the debounce for free, and <code>e.detail.term</code> is already normalized.</p>
+
+							<h4>2. Pressing Enter inside a form and expecting search-only behavior</h4>
+							<p>The component listens to <code>input</code> only, not to <code>keydown</code> or <code>submit</code>. Pressing Enter in a form submits the form (native behavior). Either keep the input outside a form, or wire the form's <code>submit</code> handler explicitly.</p>
+
+							<h4>3. Setting <code>input.value</code> programmatically and expecting search to fire</h4>
+							<p>The platform does NOT fire <code>input</code> on property writes. Dispatch the event yourself: <code>input.dispatchEvent(new Event('input', { bubbles: true }))</code>. Or use <code>[data-ln-form]</code>'s <code>ln-form:fill</code>, which dispatches <code>input</code> on every populated field.</p>
+
+							<h4>4. Two <code>data-ln-search</code> inputs targeting the same target</h4>
+							<p>Each input has its own debounce, its own dispatch, its own state. Typing in one does NOT clear or sync the other. The listener on the target sees whichever input fired most recently. Sync manually at the document level if you need it, or — better — collapse to a single search box.</p>
+
+							<h4>5. Confusing <code>data-ln-search</code> with <code>data-ln-data-table-search</code></h4>
+							<p><code>ln-data-table</code> does NOT listen for <code>ln-search:change</code>. It uses its own <code>data-ln-data-table-search</code> input. Choose the renderer that matches your data shape: <code>ln-table</code> for fully-loaded data + <code>ln-search</code>; <code>ln-data-table</code> with its built-in search for server-coordinated data.</p>
+
+							<h4>6. Adding the clear button after construction</h4>
+							<p>The constructor finds the clear button via <code>querySelector</code> once. Adding one later via <code>setAttribute</code> or <code>appendChild</code> gives an unwired button. Include the clear button in the initial markup, or destroy and re-init.</p>
+
+							<h4>7. Mutating <code>data-ln-search</code> to switch targets</h4>
+							<p>The <code>targetId</code> is captured at construction. Mutating the attribute does not re-resolve. To switch targets: <code>el.lnSearch.destroy()</code>, change the attribute, then <code>window.lnSearch(parent)</code>.</p>
 						</main>
 					</section>
 
 <script>
 	(function () {
+		// Custom handler — match counter
 		const target = document.getElementById('demo-custom');
 		const result = document.getElementById('demo-custom-result');
-		if (!target || !result) return;
-
-		target.addEventListener('ln-search:change', function (e) {
-			e.preventDefault();
-			const term = (e.detail && e.detail.term ? e.detail.term : '').toLowerCase();
-			const items = target.querySelectorAll(':scope > li');
-			const total = items.length;
-			let matches = 0;
-			items.forEach(function (li) {
-				const text = li.textContent.toLowerCase();
-				if (term === '' || text.indexOf(term) !== -1) matches++;
+		if (target && result) {
+			target.addEventListener('ln-search:change', function (e) {
+				e.preventDefault();
+				const term = (e.detail && e.detail.term ? e.detail.term : '');
+				const items = target.querySelectorAll(':scope > li');
+				const total = items.length;
+				let matches = 0;
+				items.forEach(function (li) {
+					const text = li.textContent.toLowerCase();
+					if (term === '' || text.indexOf(term) !== -1) matches++;
+				});
+				if (term === '') {
+					result.textContent = 'Type to search...';
+				} else if (matches === 0) {
+					result.textContent = 'No results for "' + term + '"';
+				} else {
+					const word = matches === 1 ? 'match' : 'matches';
+					result.textContent = matches + ' of ' + total + ' ' + word;
+				}
 			});
+		}
 
-			if (term === '') {
-				result.textContent = 'Type to search...';
-			} else if (matches === 0) {
-				result.textContent = 'No results for "' + term + '"';
-			} else {
-				const word = matches === 1 ? 'match' : 'matches';
-				result.textContent = matches + ' of ' + total + ' ' + word;
-			}
-		});
+		// Server-search simulation — log dispatched terms
+		const serverTarget = document.getElementById('demo-server-target');
+		const serverLog = document.getElementById('demo-server-log');
+		if (serverTarget && serverLog) {
+			let entries = [];
+			serverTarget.addEventListener('ln-search:change', function (e) {
+				e.preventDefault();
+				const term = e.detail.term;
+				const time = new Date().toLocaleTimeString();
+				const display = term === '' ? '(empty — search cleared)' : '"' + term + '"';
+				entries.unshift('[' + time + '] dispatch → ' + display);
+				if (entries.length > 8) entries = entries.slice(0, 8);
+				serverLog.textContent = entries.join('\n');
+			});
+		}
 	})();
 </script>

@@ -1,4 +1,4 @@
-/* Live Networks - lnTabs (hash-aware tabs via <a href="#key">) */
+/* Live Networks - lnTabs (hash-aware tabs — supports <button> and <a href="#nsKey:key"> triggers) */
 import { registerComponent, dispatch } from '../ln-core';
 import { persistGet, persistSet } from '../ln-core';
 
@@ -20,17 +20,49 @@ import { persistGet, persistSet } from '../ln-core';
 		return map;
 	}
 
+	function _keyFromTrigger(t, nsKey) {
+		const explicit = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
+		if (explicit) return explicit;
+		if (t.tagName !== "A") return "";
+		const href = t.getAttribute("href") || "";
+		if (!href.startsWith("#")) return "";
+		const raw = href.slice(1);
+		if (!raw) return "";
+		const fragments = raw.split("&");
+		if (nsKey) {
+			for (const frag of fragments) {
+				const sep = frag.indexOf(":");
+				if (sep > 0 && frag.slice(0, sep).toLowerCase().trim() === nsKey) {
+					return frag.slice(sep + 1).toLowerCase().trim();
+				}
+			}
+		}
+		const last = fragments[fragments.length - 1] || "";
+		const sep = last.indexOf(":");
+		return (sep > 0 ? last.slice(sep + 1) : last).toLowerCase().trim();
+	}
+
 	function _component(dom) { this.dom = dom; _init.call(this); return this; }
 
 	function _init() {
 		this.tabs   = Array.from(this.dom.querySelectorAll("[data-ln-tab]"));
 		this.panels = Array.from(this.dom.querySelectorAll("[data-ln-panel]"));
 
+		// nsKey/hashEnabled resolved BEFORE mapTabs build — anchor key
+		// derivation in _keyFromTrigger needs nsKey to pick the right
+		// fragment.
+		this.nsKey       = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
+		this.hashEnabled = !!this.nsKey;
+
 		this.mapTabs = {};
 		this.mapPanels = {};
 		for (const t of this.tabs) {
-			const key = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
-			if (key) this.mapTabs[key] = t;
+			const key = _keyFromTrigger(t, this.nsKey);
+			if (key) {
+				this.mapTabs[key] = t;
+			} else {
+				console.warn('[ln-tabs] Trigger has no resolvable key — needs `data-ln-tab="key"` or `<a href="#…">`.', t);
+			}
 		}
 		for (const p of this.panels) {
 			const key = (p.getAttribute("data-ln-panel") || "").toLowerCase().trim();
@@ -40,8 +72,6 @@ import { persistGet, persistSet } from '../ln-core';
 		this.defaultKey   = (this.dom.getAttribute("data-ln-tabs-default") || "").toLowerCase().trim()
 			|| Object.keys(this.mapTabs)[0] || "";
 		this.autoFocus    = (this.dom.getAttribute("data-ln-tabs-focus") || "true").toLowerCase() !== "false";
-		this.nsKey        = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
-		this.hashEnabled  = !!this.nsKey;
 
 		const self = this;
 		this._clickHandlers = [];
@@ -49,8 +79,9 @@ import { persistGet, persistSet } from '../ln-core';
 			if (t[DOM_ATTRIBUTE + 'Trigger']) continue;
 			const handler = function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
-				const key = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
+				const key = _keyFromTrigger(t, self.nsKey);
 				if (!key) return;
+				if (t.tagName === "A") e.preventDefault();
 				if (self.hashEnabled) {
 					const map = _parseHash();
 					map[self.nsKey] = key;

@@ -23,7 +23,15 @@ import { persistGet, persistSet } from '../ln-core';
 				if (!target || !target[DOM_ATTRIBUTE]) return;
 
 				const action = btn.getAttribute('data-ln-toggle-action') || 'toggle';
-				target[DOM_ATTRIBUTE][action]();
+				if (action === 'open') {
+					target.setAttribute(DOM_SELECTOR, 'open');
+				} else if (action === 'close') {
+					target.setAttribute(DOM_SELECTOR, 'close');
+				} else if (action === 'toggle') {
+					const current = target.getAttribute(DOM_SELECTOR);
+					target.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
+				}
+				// unknown action — silent no-op
 			};
 			btn.addEventListener('click', handler);
 			btn[DOM_ATTRIBUTE + 'Trigger'] = handler;
@@ -67,20 +75,6 @@ import { persistGet, persistSet } from '../ln-core';
 
 		return this;
 	}
-
-	_component.prototype.open = function () {
-		if (this.isOpen) return;
-		this.dom.setAttribute(DOM_SELECTOR, 'open');
-	};
-
-	_component.prototype.close = function () {
-		if (!this.isOpen) return;
-		this.dom.setAttribute(DOM_SELECTOR, 'close');
-	};
-
-	_component.prototype.toggle = function () {
-		this.isOpen ? this.close() : this.open();
-	};
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;

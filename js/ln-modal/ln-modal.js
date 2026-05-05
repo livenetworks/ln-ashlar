@@ -19,7 +19,11 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../l
 				e.preventDefault();
 				const modalId = btn.getAttribute('data-ln-modal-for');
 				const target = document.getElementById(modalId);
-				if (!target || !target[DOM_ATTRIBUTE]) return;
+				if (!target) {
+					console.warn('[ln-modal] No modal found for data-ln-modal-for="' + modalId + '"');
+					return;
+				}
+				if (!target[DOM_ATTRIBUTE]) return;
 				target[DOM_ATTRIBUTE].toggle();
 			};
 			btn.addEventListener('click', handler);
@@ -96,6 +100,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../l
 			this.dom.removeAttribute('aria-modal');
 			document.removeEventListener('keydown', this._onEscape);
 			document.removeEventListener('keydown', this._onFocusTrap);
+			this._returnFocusEl = null;
 			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
 				document.body.classList.remove('ln-modal-open');
 			}
@@ -145,6 +150,9 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../l
 			document.addEventListener('keydown', instance._onEscape);
 			document.addEventListener('keydown', instance._onFocusTrap);
 
+			const previouslyFocused = document.activeElement;
+			instance._returnFocusEl = (previouslyFocused && previouslyFocused !== document.body) ? previouslyFocused : null;
+
 			const autoFocusEl = el.querySelector('[autofocus]');
 			if (autoFocusEl && isVisible(autoFocusEl)) {
 				autoFocusEl.focus();
@@ -171,6 +179,13 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../l
 			document.removeEventListener('keydown', instance._onEscape);
 			document.removeEventListener('keydown', instance._onFocusTrap);
 			dispatch(el, 'ln-modal:close', { modalId: el.id, target: el });
+
+			if (instance._returnFocusEl
+				&& document.contains(instance._returnFocusEl)
+				&& typeof instance._returnFocusEl.focus === 'function') {
+				instance._returnFocusEl.focus();
+			}
+			instance._returnFocusEl = null;
 
 			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
 				document.body.classList.remove('ln-modal-open');

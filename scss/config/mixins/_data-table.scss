@@ -101,6 +101,15 @@
 	--margin-inline: var(--size-xs);
 	margin-inline-start: var(--margin-inline);
 	vertical-align: middle;
+
+	// Icon-trio visibility — neutral state shows the dual-arrow icon.
+	// Active states (.ln-sort-asc / .ln-sort-desc on ancestor <th>)
+	// flip to a single directional icon. See component file for the
+	// active-state overrides.
+	[data-ln-sort-icon="asc"],
+	[data-ln-sort-icon="desc"] {
+		display: none;
+	}
 }
 
 @mixin data-table-sort-active {
