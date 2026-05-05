@@ -235,26 +235,19 @@ What happens:
 
 ### 4.3 Coordinator — what's left for the consumer to write
 
+"Coordinator" here means the **page-level** flavor — the
+consumer-written shim that wires data-flow components together on a
+specific page. Library-shipped coordinators (e.g. `ln-accordion`)
+are a separate concern; see the [glossary entry](#14-glossary).
+
 In the canonical case, **nothing**. Both bindings are declarative.
 The consumer writes zero JavaScript glue.
 
 A coordinator only appears when behaviour is genuinely consumer-specific
-— e.g. translating `ln-store:change` to a custom renderer's
-domain-specific protocol. Even then, the coordinator is small:
-
-```html
-<!-- Phase A bridge: until ln-data-table reads ln-store:change directly,
-     the page-level shim translates the event to the data-table protocol.
-     This is two lines. Three when you count the variable assignment. -->
-<script>
-	const table = document.querySelector('[data-ln-store-source="documents"]');
-	table.addEventListener('ln-store:change', e => {
-		table.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
-			detail: { records: e.detail.records }
-		}));
-	});
-</script>
-```
+— e.g. translating one component's event into the protocol another
+component expects. Even when it does appear, it stays small (a few
+lines, no logic). A canonical example will be added back once the
+data-table protocol stabilizes.
 
 A coordinator with logic in it (more than a translation shim) is a
 warning sign — see §10.1.
@@ -1036,6 +1029,7 @@ plan is in the Phase B document (to be written after Phase A lands).
 
 | Term | Definition |
 |------|------------|
+| **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavors: page-level coordinators are consumer-written shims that bridge data-flow components (typical: translating `ln-store:change` to a renderer's protocol — see §4.3); library-shipped coordinators ship inside ln-ashlar and encapsulate a reusable cross-component rule (e.g. `ln-accordion` listens for `ln-toggle:open` and writes `data-ln-toggle="close"` on siblings). |
 | **Store** | An `ln-store` instance bound to a single resource (e.g. `documents`). One element, one cache, one queue. |
 | **Renderer** | Any element with `data-ln-store-source="<storeName>"`. Receives `ln-store:change` events. |
 | **Form binding** | Attaching `data-ln-store-form="<storeName>"` to a `<form>` so its `ln-form:submit` is routed to the store. |
