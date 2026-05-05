@@ -123,20 +123,49 @@
 					</main>
 				</section>
 
-				<!-- Programmatic API -->
+				<!-- Driving filter state from outside -->
 				<section class="section-card">
-					<header><h3>Programmatic API</h3></header>
+					<header><h3>Driving filter state from outside</h3></header>
 					<main>
+						<p>ln-filter has no imperative API. External code drives state by setting <code>input.checked</code> on the filter's checkboxes and dispatching a bubbling <code>change</code> event.</p>
+
+						<script>
+							(function () {
+								const NAV_ID = 'api-filter-nav';
+								window.setApiFilter = function (values) {
+									const nav = document.getElementById(NAV_ID);
+									if (!nav) return;
+									const inputs = nav.querySelectorAll('input[data-ln-filter-key]');
+									inputs.forEach(function (input) {
+										if (input.hasAttribute('data-ln-filter-reset')) {
+											input.checked = values.length === 0;
+										} else {
+											const v = input.getAttribute('data-ln-filter-value');
+											input.checked = values.indexOf(v) !== -1;
+										}
+									});
+									// Dispatch change once on any input so ln-filter renders.
+									const first = inputs[0];
+									if (first) first.dispatchEvent(new Event('change', { bubbles: true }));
+								};
+							})();
+						</script>
+
 						<nav class="demo-actions" id="api-demo-actions">
-							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'high')">Filter: High</button>
-							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'medium')">Filter: Medium</button>
-							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', ['high', 'medium'])">Filter: High + Medium</button>
-							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.filter('priority', 'low')">Filter: Low</button>
-							<button class="btn btn-sm" onclick="document.querySelector('#api-filter-nav').lnFilter.reset()">Reset</button>
+							<button class="btn btn-sm" onclick="setApiFilter(['high'])">Filter: High</button>
+							<button class="btn btn-sm" onclick="setApiFilter(['medium'])">Filter: Medium</button>
+							<button class="btn btn-sm" onclick="setApiFilter(['high','medium'])">Filter: High + Medium</button>
+							<button class="btn btn-sm" onclick="setApiFilter(['low'])">Filter: Low</button>
+							<button class="btn btn-sm" onclick="setApiFilter([])">Reset</button>
 							<code id="api-filter-status">Active filter: none</code>
 						</nav>
 
-						<nav data-ln-filter="api-filter-list" id="api-filter-nav" hidden></nav>
+						<nav data-ln-filter="api-filter-list" id="api-filter-nav" hidden>
+							<label><input type="checkbox" data-ln-filter-key="priority" data-ln-filter-reset checked> All</label>
+							<label><input type="checkbox" data-ln-filter-key="priority" data-ln-filter-value="high"> High</label>
+							<label><input type="checkbox" data-ln-filter-key="priority" data-ln-filter-value="medium"> Medium</label>
+							<label><input type="checkbox" data-ln-filter-key="priority" data-ln-filter-value="low"> Low</label>
+						</nav>
 
 						<ul id="api-filter-list">
 							<li data-priority="high">Task A — High priority</li>

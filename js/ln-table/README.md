@@ -231,7 +231,7 @@ The `id` also feeds the `data-ln-table-clear` resolver path.
 | `data-ln-filter-active` | `<th>` | **Set by JS** (`ln-table` itself). Present when the column has a non-empty filter. CSS uses this to highlight the filter trigger. |
 | `data-ln-value="raw"` | `<td>` | Raw value used **for sort only**. Falls back to `td.textContent` when absent. Filters and search ignore this attribute. |
 | `data-ln-table-empty` | `<template>` | Markup cloned into a full-width `<td>` when filter/search produces zero results. |
-| `data-ln-table-clear` | `<button>` | Click resets search term, column filters, calls `ln-filter.lnFilter.reset()` on connected filter components, re-renders. Resolves the search input via `[data-ln-search="<wrapper-id>"]`. |
+| `data-ln-table-clear` | `<button>` | Click resets search term and column filters, then dispatches a synthetic `change` event on each connected filter's `[data-ln-filter-reset]` checkbox to clear filter UI, then re-renders. Resolves the search input via `[data-ln-search="<wrapper-id>"]`. |
 
 ## Events
 
