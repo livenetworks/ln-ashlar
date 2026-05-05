@@ -5,16 +5,16 @@ maintainers — for usage, see `js/ln-modal/README.md`.
 
 ## Single source of truth
 
-`data-ln-modal` is THE state. JS API methods (`open()` / `close()` /
-`toggle()`) only `setAttribute`. The MutationObserver fires,
-`_syncAttribute(el)` runs, and that's where the actual work happens
-(aria, body class, listener attachment, focus, dispatched events).
+`data-ln-modal` is THE state. Every consumer (trigger click, close
+button, ESC key, external script) writes the attribute. The
+MutationObserver fires, `_syncAttribute(el)` runs, and that's where
+the actual work happens (aria, body class, listener attachment, focus,
+dispatched events).
 
-External code that calls `el.setAttribute('data-ln-modal', 'open')`
-hits the same code path as `el.lnModal.open()`. There is no second
-path. Cancellation is implemented as **observer-driven attribute
-revert** (see `_syncAttribute` flow below) — there is no imperative
-branch that aborts the open early.
+External code mutates the modal by writing the attribute. There is
+no second path. Cancellation is implemented as **observer-driven
+attribute revert** (see `_syncAttribute` flow below) — there is no
+imperative branch that aborts the open early.
 
 ## Lifecycle
 
@@ -127,26 +127,14 @@ construct the instance.
 The trigger attacher (`_attachTriggers`) accepts both subtree and
 self — an element can be the trigger or contain triggers.
 
-## ESC listener lifecycle — per-modal, NOT a stack
+## ESC listener lifecycle
 
-This is the single biggest divergence from `ln-popover`.
-
-`ln-popover` maintains a global `openStack[]` and a single shared
-`escListener` registered when the stack becomes non-empty,
-unregistered when the stack drains. ESC closes the topmost popover
-only.
-
-`ln-modal` has **no stack**. Every open modal attaches its own
-`_onEscape` handler to `document.keydown`. With two modals open,
-two handlers run on a single ESC press, each calling
-`self.close()` on its own modal. Both close.
-
-This is **deliberate but opinionated**: the library does not
-recommend stacking modals (see README "What it does NOT do"), and
-the per-modal handler model is simpler. If a project ever needs
-stacked-modal coordination, the pattern from `ln-popover` is the
-prior art to copy — but it would be a code change, not a
-configuration.
+Each open modal attaches its own `_onEscape` handler to
+`document.keydown`. There is no global open-stack; one ESC press fires
+every open modal's handler concurrently, each setting
+`data-ln-modal="close"` on its own modal via `setAttribute`. This is
+intentional — the library does not recommend stacking modals (see
+README §What it does NOT do).
 
 ## Focus management
 
@@ -219,41 +207,30 @@ platforms where `overflow: hidden` resets scroll position, the
 page jumps. Fixing this would require a `getComputedStyle` /
 `scrollY` snapshot pair, which the component does not implement.
 
-## Trigger buttons
+## Trigger and close button wiring
 
-`[data-ln-modal-for="<id>"]` triggers, attached by `_attachTriggers`
-on init and on observer-detected DOM additions:
+`[data-ln-modal-for="<id>"]` triggers are attached by `_attachTriggers`
+on init and on observer-detected DOM additions. Click handler:
 
-- Click handler: bails on `ctrlKey || metaKey || button === 1` so
-  middle-click and Ctrl+click pass through (open in new tab on `<a>`
-  triggers).
-- Otherwise `preventDefault()` + `target.lnModal.toggle()`.
-- If `document.getElementById(modalId)` returns null at click
-  time, the handler emits a `console.warn` with the broken id
-  and bails. If the element exists but has no instance yet,
-  the handler bails silently (legitimate race).
+- Bails on `ctrlKey || metaKey || button === 1` so middle-click and
+  Ctrl/Cmd+click pass through.
+- Otherwise `preventDefault()` then `target.setAttribute('data-ln-modal', current === 'open' ? 'close' : 'open')`.
+- If `document.getElementById(modalId)` returns null at click time,
+  emits a `console.warn` and bails.
+- If the element exists but has no instance yet, bails silently
+  (legitimate race during async DOM init).
 - Re-init guard: `btn.lnModalTrigger` flag stores the handler
-  reference. Skip if set. Used for cleanup in `destroy()`.
-- Trigger registered as `extraAttributes: ['data-ln-modal-for']`
-  in the `registerComponent` call, so observer fires on
-  `data-ln-modal-for` mutations and re-runs `_attachTriggers`.
+  reference; cleanup removes it in `destroy()`.
 
-The trigger lookup happens at click time
-(`document.getElementById(modalId)`), not at attach time. Modals
-loaded after the trigger still wire correctly — clicking the
-trigger looks up the modal fresh on every click.
+The trigger lookup happens at click time, not at attach time —
+modals loaded after the trigger still wire correctly.
 
-## Close buttons
-
-`[data-ln-modal-close]` inside the modal:
-
-- Wired during construction by `_attachCloseButtons(instance)`.
-- Click → `instance._onClose(e)` → `e.preventDefault(); self.close()`.
-- Re-init guard: `btn.lnModalClose` stores the handler reference.
-- The handler is a single function shared across every close button
-  in the modal — same instance reference, attached once per button.
-- Cleanup in `destroy()` removes the handler from every close
-  button.
+`[data-ln-modal-close]` buttons inside the modal are wired during
+construction by `_attachCloseButtons(instance)`. Click →
+`instance._onClose(e)` → `e.preventDefault(); self.dom.setAttribute('data-ln-modal', 'close')`. Re-init
+guard: `btn.lnModalClose` flag. The handler is shared across every
+close button in the modal — same function reference, attached once
+per button.
 
 ## Event detail wrapping
 
@@ -262,11 +239,8 @@ Every dispatched event carries `{ modalId: el.id, target: el }` in
 `dispatchCancelable` call — `ln-core`'s `dispatch` helper does not
 auto-inject component metadata.
 
-The `target` field is redundant (matches `event.target`), but is
-kept for consistency with other library components and makes
-listener code easier to read (`e.detail.target` is unambiguous in
-nested-component scenarios where `event.target` could be a
-descendant).
+`target` duplicates `event.target`; it is kept for listener-code
+readability in nested-component scenarios.
 
 ## DOM mutations performed
 
@@ -302,45 +276,15 @@ From `scss/config/_tokens.scss`:
 
 The modal sits between overlay and toast — toasts intentionally
 appear on top of modals (so a "Saved" confirmation is visible
-even if the user is still looking at the form). Dropdowns and
-popovers (z-dropdown) sit below the modal; if a project needs a
-dropdown inside a modal, the dropdown's portal-into-body pattern
-should be reviewed (popovers may render below the modal scrim).
+even if the user is still looking at the form).
 
 ## Boot-time-already-open shortcut
 
 If the modal mounts with `data-ln-modal="open"` already set, the
-constructor applies open-state side effects directly (aria, body
-class, listeners) without going through `_syncAttribute` and
-without dispatching `ln-modal:before-open` / `ln-modal:open`.
-Rationale: there is no closed→open transition to fire events for —
-the modal was open from the start.
-
-This is a deliberate asymmetry. Listeners attached **after** the
-DOM-content-loaded event still cannot retroactively cancel the
-open. If a project needs cancelable boot-time-open semantics,
-mount the modal closed and call `open()` after listener
-attachment.
-
-## Cross-component coordination
-
-ln-modal does not import, listen to, or coordinate with any other
-component. Cooperation with `ln-form`, `ln-validate`, `ln-http`,
-`ln-store` happens at the DOM level — they share the `<form>`
-element, but the modal is unaware. Closing a modal does not reset
-form state; that is `ln-form`'s `reset()` if you want it.
-
-`ln-confirm` and `ln-modal` are alternatives, not collaborators.
-See README "Cross-component composition" for the
-when-to-use-which decision.
-
-## Known gaps (documented as part of the spec)
-
-These are intentional limits, not bugs:
-
-- No backdrop click to close.
-- No `aria-hidden` / `inert` on background.
-- No stacked-modal coordination.
-- No scroll position preservation.
-- Boot-time-open does not dispatch open events.
-- `role="dialog"` is set on first open, never removed.
+constructor applies open-state side effects directly — `aria-modal`,
+`role="dialog"`, body class, ESC and focus-trap listeners — without
+going through `_syncAttribute`. `ln-modal:before-open` and
+`ln-modal:open` are NOT dispatched. Boot-time-open is therefore not
+cancelable; if cancelable boot-time semantics are needed, mount the
+modal closed and set `data-ln-modal="open"` after the listeners are
+attached.

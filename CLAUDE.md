@@ -260,8 +260,7 @@ Icon-only close/dismiss buttons inherit the global `<button>` base styles. Re-bi
 - **Sizes** via mixins: `#my-modal > form { @include modal-lg; }` — not CSS classes
 - Size variants: `modal-sm`, `modal-md`, `modal-lg`, `modal-xl` — see `scss/config/mixins/_modal.scss` for values.
 - **Entry animation** — modal panel slides in on open via the `ln-modal-slideIn` keyframe, gated through `motion-safe` so reduced-motion users see an instant state change. Keyframe and duration live in `scss/components/_modal.scss` and `scss/config/mixins/_modal.scss`.
-- **API** — `modal.lnModal.open()` / `.close()` just set the attribute, observer applies state
-- **Direct attribute** — `modal.setAttribute('data-ln-modal', 'open')` — identical result
+- **Attribute is the contract** — write `data-ln-modal="open"` or `"close"` on the modal element. Observer applies state, dispatches events.
 - **ESC listener** active only while modal is open (zero listeners when all closed)
 
 ## Button Groups vs Pill Groups

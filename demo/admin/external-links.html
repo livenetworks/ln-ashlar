@@ -545,20 +545,12 @@ window.lnExternalLinks.process(link.parentElement);</code></pre>
 			e.preventDefault();
 			pendingUrl = link.href;
 			urlEl.textContent = pendingUrl;
-			if (modal.lnModal && modal.lnModal.open) {
-				modal.lnModal.open();
-			} else {
-				modal.setAttribute('data-ln-modal', 'open');
-			}
+			modal.setAttribute('data-ln-modal', 'open');
 		}, true);
 
 		confirmBtn.addEventListener('click', function () {
 			if (pendingUrl) window.open(pendingUrl, '_blank', 'noopener,noreferrer');
-			if (modal.lnModal && modal.lnModal.close) {
-				modal.lnModal.close();
-			} else {
-				modal.setAttribute('data-ln-modal', 'close');
-			}
+			modal.setAttribute('data-ln-modal', 'close');
 			pendingUrl = null;
 		});
 	}

@@ -24,7 +24,8 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../l
 					return;
 				}
 				if (!target[DOM_ATTRIBUTE]) return;
-				target[DOM_ATTRIBUTE].toggle();
+				const current = target.getAttribute(DOM_SELECTOR);
+				target.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
 			};
 			btn.addEventListener('click', handler);
 			btn[DOM_ATTRIBUTE + 'Trigger'] = handler;
@@ -40,7 +41,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../l
 		const self = this;
 
 		this._onEscape = function (e) {
-			if (e.key === 'Escape') self.close();
+			if (e.key === 'Escape') self.dom.setAttribute(DOM_SELECTOR, 'close');
 		};
 
 		this._onFocusTrap = function (e) {
@@ -62,7 +63,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../l
 
 		this._onClose = function (e) {
 			e.preventDefault();
-			self.close();
+			self.dom.setAttribute(DOM_SELECTOR, 'close');
 		};
 
 		_attachCloseButtons(this);
@@ -78,20 +79,6 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../l
 
 		return this;
 	}
-
-	_component.prototype.open = function () {
-		if (this.isOpen) return;
-		this.dom.setAttribute(DOM_SELECTOR, 'open');
-	};
-
-	_component.prototype.close = function () {
-		if (!this.isOpen) return;
-		this.dom.setAttribute(DOM_SELECTOR, 'close');
-	};
-
-	_component.prototype.toggle = function () {
-		this.isOpen ? this.close() : this.open();
-	};
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
