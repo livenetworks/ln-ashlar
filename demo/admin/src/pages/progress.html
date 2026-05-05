@@ -1,91 +1,191 @@
 <!-- ln-page: title="Progress — ln-ashlar" h1="Progress" -->
 
-<h1>Progress</h1>
-					<p>A visual progress indicator. Reactive: automatically updates when attributes change.</p>
+<style>
+	.demo-progress-row {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--size-md);
+	}
+	.demo-progress-row > li {
+		display: flex;
+		flex-direction: column;
+		gap: var(--size-xs);
+	}
+	.demo-progress-row > li > .label {
+		font-size: var(--text-body-sm);
+		color: var(--fg-muted);
+	}
+	.demo-progress-buttons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--size-xs);
+		margin-block-start: var(--size-md);
+	}
+	#demo-event-log {
+		max-height: 8rem;
+		overflow-y: auto;
+		font-family: var(--font-mono);
+		font-size: var(--text-body-sm);
+		color: var(--fg-muted);
+		margin-block-start: var(--size-sm);
+		white-space: pre-wrap;
+	}
+</style>
 
-					<!-- Basics -->
+					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Basics</h3></header>
+						<header><h3>Overview</h3></header>
 						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-progress</code></td><td data-label="On element">track (empty)</td><td data-label="Description">Marks the progress track container</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-progress="50"</code></td><td data-label="On element">bar</td><td data-label="Description">Current progress value</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-progress-max="100"</code></td><td data-label="On element">bar</td><td data-label="Description">Maximum value for a single bar (default: 100)</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-progress-max="N"</code></td><td data-label="On element">track</td><td data-label="Description">Shared max for stacked bars — children fill proportionally</td></tr>
-								</tbody>
-							</table>
-							</div>
+							<p>A 145-line passive renderer for a linear progress bar. <code>ln-progress</code> derives one visual (a child <code>&lt;div&gt;</code> whose <code>width</code> is a percentage) from one number attribute on the bar, plus an optional max attribute on either the bar or its parent track. Write <code>data-ln-progress="42"</code> on a bar; the component picks up the change via MutationObserver, computes the percentage from value and max, and writes the new <code>style.width</code>. The attribute IS the API — there is no <code>setValue(n)</code>, no <code>update()</code>, no imperative entry point.</p>
+							<p>The design choice this contract reflects: state lives in the DOM, not in JS. A server-rendered template can stamp <code>data-ln-progress="75"</code> directly into markup; consumer JS that updates the value writes the same attribute. Both paths flow through the same MutationObserver. There is one source of truth — the attribute — and DOM Inspector shows it. This is the same pattern <code>ln-circular-progress</code> (circular sibling), <code>ln-stepper</code>, and <code>ln-data-table</code>'s display layer all use: passive renderers driven by external state.</p>
+							<p>Native <code>&lt;progress&gt;</code> would have given screen-readers automatic <code>role="progressbar"</code> and <code>aria-valuenow</code> sync. It does not support multiple coloured value bars stacked inside a single track — a constraint that becomes load-bearing for "CPU 40% / RAM 30% / Disk 30%" or "4 done + 2 in progress + 1 pending" patterns. The trade-off accepted by <code>ln-progress</code>: full visual control via <code>&lt;div&gt;</code>s, theme-driven colours via CSS variables, animated width transitions via CSS. ARIA is auto-managed on each bar (<code>role="progressbar"</code>, <code>aria-valuemin</code>, <code>aria-valuemax</code>, <code>aria-valuenow</code> clamped to <code>[0, max]</code>) — consumers add an <code>aria-label</code> on the bar for context but do nothing for value sync.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-progress/README.md"><code>ln-progress</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/progress.md">architecture reference</a>.</p>
 						</main>
 					</section>
 
-					<!-- CSS classes -->
+					<!-- Anatomy -->
 					<section class="section-card">
-						<header><h3>Color Classes</h3></header>
+						<header><h3>Anatomy</h3></header>
 						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Class</th><th>Color</th><th>Usage</th></tr></thead>
-								<tbody>
-									<tr><td><code>.success</code></td><td>Success</td><td>&lt;div data-ln-progress="80" class="success"&gt;</td></tr>
-									<tr><td><code>.warning</code></td><td>Warning</td><td>&lt;div data-ln-progress="50" class="warning"&gt;</td></tr>
-									<tr><td><code>.error</code></td><td>Error</td><td>&lt;div data-ln-progress="20" class="error"&gt;</td></tr>
-									<tr><td>(no class)</td><td>Default primary</td><td>&lt;div data-ln-progress="60"&gt;</td></tr>
-								</tbody>
-							</table>
-							</div>
+							<p>The minimum invocation is one track wrapping at least one bar:</p>
+<pre><code>&lt;div class="progress"&gt;
+    &lt;div data-ln-progress="75" class="success"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+							<p>Two roles, two distinct markers:</p>
+							<ul>
+								<li><strong>Track:</strong> <code>class="progress"</code> on the wrapper. Plain styled element with no per-instance JS state — purely a CSS hook for the track chrome.</li>
+								<li><strong>Bar:</strong> <code>data-ln-progress="N"</code> on the inner element. Gets a per-instance constructor that writes <code>style.width</code> and registers attribute observers.</li>
+							</ul>
+
+							<h4>Reactive state — the attribute IS the API</h4>
+							<p>Two observed attributes on the bar: <code>data-ln-progress</code> (value) and <code>data-ln-progress-max</code> (default 100, or the parent's shared max if present). The MutationObserver in <code>_listenValues</code> is filtered to exactly these two — nothing else triggers a re-render.</p>
+							<p>An additional per-bar observer (<code>_listenParent</code>) watches the <em>parent track's</em> <code>data-ln-progress-max</code>, but ONLY if the parent had that attribute at construction. Parents that gain the attribute later are not watched — see "Common mistakes" item 4.</p>
+
+							<h4>What state goes where</h4>
+							<p>"Should this element be a track?" lives on <code>class="progress"</code>. "Should this element be a bar?" lives on the presence of <code>data-ln-progress</code>. "Current value" lives in that same attribute on the bar. "Maximum" can live on the bar (per-bar denominator) or on the parent track (shared denominator for stacked bars). "Computed bar width" lives in the bar's <code>style.width</code>, written by JS but never read by anything except the browser's renderer. There is no JS-side cached "value" property — every <code>_render</code> call reads the attributes fresh.</p>
 						</main>
 					</section>
 
-					<!-- Single bars -->
+					<!-- The asymmetry — shared parent max -->
 					<section class="section-card">
-						<header><h3>Single Progress Bars</h3></header>
+						<header><h3>Asymmetry with circular sibling — shared parent max</h3></header>
 						<main>
-							<ul class="demo-progress-item">
+							<p><code>ln-progress</code> supports a feature <code>ln-circular-progress</code> does NOT: <strong>a single <code>data-ln-progress-max</code> on the parent track that all children read as the denominator</strong>. This is the difference between "three bars stacking inside a 100% track" and "three bars stacking inside a 7-unit track." The shared-max mode exists because stacked bars with mismatched denominators look broken — three bars filling 4%, 2%, 1% of a 100-unit track make a track that's mostly empty, which reads as "an unfinished operation," not "a complete tally of seven items."</p>
+							<p>For the circular sibling, the equivalent visual would be three concentric rings sharing one denominator — a different component, not currently shipped. The asymmetry is deliberate: each component is canonical for a different pattern.</p>
+
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Component</th><th>Shared-max source</th><th>Why</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-progress</code></td><td>parent track (preferred) → bar's own max → default 100</td><td>Stacked bars need to fill one track proportionally</td></tr>
+									<tr><td><code>ln-circular-progress</code></td><td>bar's own max → default 100</td><td>A single ring; multi-ring stacking is a different idiom</td></tr>
+								</tbody>
+							</table>
+							</div>
+
+							<p><code>ln-circular-progress</code> is the canonical reference for SVG-based progress geometry and the centre-label override pattern. <code>ln-progress</code> is the canonical reference for shared-max parent-track patterns and multi-segment stacking. Cross-link both READMEs when documenting shared concerns.</p>
+						</main>
+					</section>
+
+					<!-- Attributes -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>class="progress"</code></td><td>track element</td><td>Marks the wrapper. Pure CSS hook — no JS instance is created. The track element styles itself via <code>@include progress</code>.</td></tr>
+									<tr><td><code>data-ln-progress="N"</code></td><td>bar element</td><td>Current value. Number — can be negative or above max; rendered percentage clamps to 0–100, but the attribute itself is never rewritten.</td></tr>
+									<tr><td><code>data-ln-progress-max="N"</code></td><td>bar element</td><td>Per-bar maximum. Default <code>100</code>. Used as denominator when the parent does not declare a shared max. <code>max="0"</code> is treated as 0% (avoids divide-by-zero).</td></tr>
+									<tr><td><code>data-ln-progress-max="N"</code></td><td>track element</td><td>Shared maximum for all bar children. Wins over each bar's own max (<code>parentMax || ownMax || 100</code> at line 126). Watched by each child's <code>_parentObserver</code>, but only if the attribute existed at the child's construction.</td></tr>
+								</tbody>
+							</table>
+							</div>
+
+							<h4>Visual variants — class-driven, no JS involvement</h4>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Class</th><th>Effect</th></tr></thead>
+								<tbody>
+									<tr><td><code>.success</code></td><td>Bar background = <code>hsl(var(--color-success))</code></td></tr>
+									<tr><td><code>.warning</code></td><td>Bar background = <code>hsl(var(--color-warning))</code></td></tr>
+									<tr><td><code>.error</code></td><td>Bar background = <code>hsl(var(--color-error))</code></td></tr>
+									<tr><td>(no class)</td><td>Bar background inherits — typically transparent against the track's <code>--bg-recessed</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>Variants are pure CSS — the component does not read or write <code>className</code>. Toggling classes via <code>el.classList.add('success')</code> applies the new colour instantly without a re-render.</p>
+							<p>Unlike <code>ln-circular-progress</code>, there is no default theme-aware colour: if you don't add a status class, the bar's background is transparent and the bar reads as "no fill" against the track. Add <code>.success</code> for the typical "in progress" indicator, or override the bar's background in project SCSS.</p>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th>On</th><th>Bubbles</th><th>Cancelable</th><th><code>detail</code></th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-progress:change</code></td><td>bar element</td><td>yes</td><td>no</td><td><code>{ target, value, max, percentage }</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p><code>detail.target</code> is the bar. <code>detail.value</code> is the <em>raw</em> <code>parseFloat</code> of the value attribute — unclamped. <code>detail.max</code> is the <em>resolved</em> max (parent's first, then bar's, then 100). <code>detail.percentage</code> is the <em>clamped</em> 0–100 percentage. A consumer that wants to detect overshoot (<code>value &gt; max</code>) reads <code>value</code> directly; a consumer that wants the visible percentage reads <code>percentage</code>.</p>
+							<p>The shape is identical to <code>ln-circular-progress:change</code> — both passive renderers expose the same four-property detail. A document-level listener can treat both event types uniformly.</p>
+							<p>The event fires on every <code>_render</code> call — including the initial render at construction. A document-level listener attached before the bundle loads will see one event per bar on the page during <code>DOMContentLoaded</code>. Listeners attached after init miss the initial event.</p>
+							<p>The event is <strong>not</strong> cancelable. Unlike <code>ln-search</code>, there is no default behaviour for a consumer to opt out of — the rendering IS the contract for a passive renderer.</p>
+						</main>
+					</section>
+
+					<!-- Demo: single bars (colour variants) -->
+					<section class="section-card">
+						<header><h3>Example — Colour variants</h3></header>
+						<main>
+							<p>Colour is class-driven. The shipped <code>.success</code> / <code>.warning</code> / <code>.error</code> classes override <code>background-color</code> directly in <code>scss/components/_progress.scss</code>; the bar without a class has no fill colour and reads as empty. Status colours intentionally bypass the theme accent cascade because status semantics are absolute (a "success" bar should be green even if the theme accent is purple).</p>
+							<ul class="demo-progress-row">
 								<li>
-									<h4>Success (80%)</h4>
-									<div data-ln-progress>
+									<span class="label">Success (80%)</span>
+									<div class="progress">
 										<div data-ln-progress="80" class="success"></div>
 									</div>
 								</li>
 								<li>
-									<h4>Warning (50%)</h4>
-									<div data-ln-progress>
+									<span class="label">Warning (50%)</span>
+									<div class="progress">
 										<div data-ln-progress="50" class="warning"></div>
 									</div>
 								</li>
 								<li>
-									<h4>Error (25%)</h4>
-									<div data-ln-progress>
+									<span class="label">Error (25%)</span>
+									<div class="progress">
 										<div data-ln-progress="25" class="error"></div>
-									</div>
-								</li>
-								<li>
-									<h4>Default (60%)</h4>
-									<div data-ln-progress>
-										<div data-ln-progress="60"></div>
 									</div>
 								</li>
 							</ul>
 						</main>
 					</section>
 
-					<!-- Custom max -->
+					<!-- Demo: custom per-bar max -->
 					<section class="section-card">
-						<header><h3>Custom Maximum Value</h3></header>
+						<header><h3>Example — Custom per-bar max</h3></header>
 						<main>
-							<ul class="demo-progress-item">
+							<p>Set <code>data-ln-progress-max</code> on the bar to shift the denominator. The width is computed as <code>(value / max) * 100%</code>. There is no centre-label override (that's an <code>ln-circular-progress</code> feature) — if you need descriptive text, place it as a sibling element.</p>
+							<ul class="demo-progress-row">
 								<li>
-									<h4>Storage: 7.5 GB of 10 GB</h4>
-									<div data-ln-progress>
+									<span class="label">Storage: 7.5 GB of 10 GB (75% of track)</span>
+									<div class="progress">
 										<div data-ln-progress="7.5" data-ln-progress-max="10" class="warning"></div>
 									</div>
 								</li>
 								<li>
-									<h4>Backup: 45 of 50 items</h4>
-									<div data-ln-progress>
+									<span class="label">Backup: 45 of 50 items (90% of track)</span>
+									<div class="progress">
 										<div data-ln-progress="45" data-ln-progress-max="50" class="success"></div>
 									</div>
 								</li>
@@ -93,120 +193,128 @@
 						</main>
 					</section>
 
-					<!-- Stacked progress -->
+					<!-- Demo: stacked, default max -->
 					<section class="section-card">
-						<header><h3>Stacked Progress (Multiple Segments)</h3></header>
+						<header><h3>Example — Stacked bars, default max=100</h3></header>
 						<main>
-							<ul class="demo-progress-item">
+							<p>Multiple bars inside a single track. Each bar uses its own max (default 100), so its <code>style.width</code> is its value as a percentage. If the values sum to less than 100, the remainder of the track stays empty (showing through as <code>--bg-recessed</code>); if more than 100, each bar still renders at its clamped 0–100 width and they overflow horizontally — the track's <code>overflow: hidden</code> clips the overflow visually but the maths is wrong.</p>
+							<ul class="demo-progress-row">
 								<li>
-									<h4>Resources (%) — CPU, RAM, Disk</h4>
-									<div data-ln-progress>
+									<span class="label">Resources: CPU 40%, RAM 30%, Disk 30% (fills the track exactly)</span>
+									<div class="progress">
 										<div data-ln-progress="40" class="success"></div>
 										<div data-ln-progress="30" class="warning"></div>
 										<div data-ln-progress="30" class="error"></div>
 									</div>
 								</li>
 								<li>
-									<h4>Tasks — 4 done, 2 in progress, 1 pending (max=7, filled)</h4>
-									<div data-ln-progress data-ln-progress-max="7">
-										<div data-ln-progress="4" class="success"></div>
-										<div data-ln-progress="2" class="warning"></div>
-										<div data-ln-progress="1" class="error"></div>
-									</div>
-								</li>
-								<li>
-									<h4>Tasks — without max (7% filled)</h4>
-									<div data-ln-progress>
+									<span class="label">Three small values without parent max — bars fill 4 + 2 + 1 = 7% of the track</span>
+									<div class="progress">
 										<div data-ln-progress="4" class="success"></div>
 										<div data-ln-progress="2" class="warning"></div>
 										<div data-ln-progress="1" class="error"></div>
 									</div>
 								</li>
 							</ul>
+							<p style="margin-block-start: var(--size-md); font-size: var(--text-body-sm); color: var(--fg-muted);">The second example renders mostly empty because each bar uses the default max of 100. To make 4 + 2 + 1 fill the entire track, declare the parent's shared max — see the next example.</p>
 						</main>
 					</section>
 
-					<!-- Reactive update -->
+					<!-- Demo: stacked, parent shared max (the asymmetry) -->
 					<section class="section-card">
-						<header><h3>Reactive Updates</h3></header>
+						<header><h3>Example — Stacked bars with shared max on the track</h3></header>
 						<main>
-							<ul class="demo-progress-item">
+							<p>This is the canonical pattern that is <strong>asymmetric</strong> with <code>ln-circular-progress</code>. The parent's <code>data-ln-progress-max</code> wins over each bar's default 100 (resolution: <code>parentMax || ownMax || 100</code> at line 126), and the three bars together fill the track to 100%.</p>
+							<ul class="demo-progress-row">
 								<li>
-									<h4>Click to change value:</h4>
-									<div id="react-progress" data-ln-progress>
-										<div id="react-bar" data-ln-progress="0" class="success"></div>
+									<span class="label">Tasks — 4 done + 2 in progress + 1 pending = 7 total (parent max=7, fills exactly)</span>
+									<div class="progress" data-ln-progress-max="7">
+										<div data-ln-progress="4" class="success"></div>
+										<div data-ln-progress="2" class="warning"></div>
+										<div data-ln-progress="1" class="error"></div>
 									</div>
-									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '25')" class="btn btn-sm">25%</button>
-									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '50')" class="btn btn-sm">50%</button>
-									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '75')" class="btn btn-sm">75%</button>
-									<button onclick="document.getElementById('react-bar').setAttribute('data-ln-progress', '100')" class="btn btn-sm">100%</button>
+								</li>
+								<li>
+									<span class="label">Same values, parent max=15 (track partially filled, 7/15)</span>
+									<div class="progress" data-ln-progress-max="15">
+										<div data-ln-progress="4" class="success"></div>
+										<div data-ln-progress="2" class="warning"></div>
+										<div data-ln-progress="1" class="error"></div>
+									</div>
 								</li>
 							</ul>
+							<p style="margin-block-start: var(--size-md); font-size: var(--text-body-sm); color: var(--fg-muted);">The <code>ln-circular-progress</code> equivalent has no parent-shared-max mode. Three rings sharing a denominator of 7 must declare <code>data-ln-circular-progress-max="7"</code> on each individually.</p>
 						</main>
 					</section>
 
-					<!-- HTML structure -->
+					<!-- Demo: reactive (the canonical attribute write) -->
 					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
+						<header><h3>Example — Reactive updates (attribute write)</h3></header>
 						<main>
-							<pre><code>&lt;!-- Simple progress bar --&gt;
-&lt;div data-ln-progress&gt;
-    &lt;div data-ln-progress="75" class="success"&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Custom maximum value --&gt;
-&lt;div data-ln-progress&gt;
-    &lt;div data-ln-progress="7" data-ln-progress-max="10"&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Stacked (multiple bars) --&gt;
-&lt;div data-ln-progress&gt;
-    &lt;div data-ln-progress="40" class="success"&gt;&lt;/div&gt;
-    &lt;div data-ln-progress="35" class="warning"&gt;&lt;/div&gt;
-    &lt;div data-ln-progress="25" class="error"&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Stacked with shared max — fills 100% proportionally --&gt;
-&lt;div data-ln-progress data-ln-progress-max="15"&gt;
-    &lt;div data-ln-progress="7" class="success"&gt;&lt;/div&gt;
-    &lt;div data-ln-progress="3" class="warning"&gt;&lt;/div&gt;
-    &lt;div data-ln-progress="5" class="error"&gt;&lt;/div&gt;
-&lt;/div&gt;</code></pre>
-						</main>
-					</section>
-
-					<!-- Width calculation -->
-					<section class="section-card">
-						<header><h3>Width Calculation</h3></header>
-						<main>
-							<p><strong>Formula:</strong> <code>width = (value / max) * 100%</code></p>
-							<p>Max priority: parent track <code>data-ln-progress-max</code> &gt; bar's own <code>data-ln-progress-max</code> &gt; default 100.</p>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Value</th><th>Max</th><th>Width</th></tr></thead>
-								<tbody>
-									<tr><td>75</td><td>100</td><td>75%</td></tr>
-									<tr><td>7</td><td>10</td><td>70%</td></tr>
-									<tr><td>50</td><td>100 (default)</td><td>50%</td></tr>
-									<tr><td>7 (parent max=15)</td><td>15</td><td>46.7%</td></tr>
-								</tbody>
-							</table>
+							<p>The attribute IS the API. Each button below writes <code>data-ln-progress</code> on the bar to a new value; the per-bar MutationObserver fires, <code>_render</code> recomputes the percentage, and the browser's CSS transition smoothly animates the width from the previous size to the new one. Open DOM Inspector and watch the attribute (and the inline <code>style.width</code>) change with each click.</p>
+							<div id="demo-react-track" class="progress">
+								<div id="demo-react-bar" data-ln-progress="0" class="success"
+									 aria-label="Reactive progress demo"></div>
 							</div>
+							<nav class="demo-progress-buttons">
+								<button type="button" data-ln-set-progress="0">0%</button>
+								<button type="button" data-ln-set-progress="25">25%</button>
+								<button type="button" data-ln-set-progress="50">50%</button>
+								<button type="button" data-ln-set-progress="75">75%</button>
+								<button type="button" data-ln-set-progress="100">100%</button>
+								<button type="button" data-ln-set-progress="150">150% (overshoot)</button>
+								<button type="button" data-ln-set-progress="-30">-30% (undershoot)</button>
+							</nav>
+							<p style="margin-block-start: var(--size-md); font-size: var(--text-body-sm); color: var(--fg-muted);">Try the overshoot and undershoot buttons. The attribute holds the raw value (visible in DOM Inspector), but the rendered bar clamps to 0–100% — the bar fills fully at 100% and stays empty at 0%, no matter how far the value strays.</p>
 						</main>
 					</section>
 
-					<!-- CSS details -->
+					<!-- Demo: event log -->
 					<section class="section-card">
-						<header><h3>CSS Details</h3></header>
+						<header><h3>Example — Listening for <code>ln-progress:change</code></h3></header>
 						<main>
-							<article>
-								<h4>Rounded corners</h4>
-								<p>The last bar in a stacked progress gets a rounded right edge.</p>
-							</article>
-							<article>
-								<h4>Reactivity</h4>
-								<p>The component uses MutationObserver to watch <code>data-ln-progress</code> and <code>data-ln-progress-max</code> attributes on both bars and the parent track.</p>
-							</article>
+							<p>Every render dispatches the event with both the raw value and the clamped percentage. The log below shows what a document-level listener sees as you click the buttons in the previous example. Notice how an overshoot value (<code>150</code>) appears in <code>value</code> but is clamped to <code>100</code> in <code>percentage</code>.</p>
+							<output id="demo-event-log" aria-live="polite">No events yet — click a button above.</output>
+						</main>
+					</section>
+
+					<!-- Demo: indeterminate has no built-in mode -->
+					<section class="section-card">
+						<header><h3>Example — There is no indeterminate mode</h3></header>
+						<main>
+							<p>Setting <code>data-ln-progress=""</code> would mark the element as a track, not a bar — no instance is constructed and no width is written. Setting <code>data-ln-progress="abc"</code> renders the bar at 0% (<code>parseFloat</code> failure falls through <code>|| 0</code>). There is no animated-stripes overlay, no shimmer, no pulse mode. The component IS the determinate bar; for an unbounded operation use <code>@mixin loader</code> (a separate primitive — different visual idiom).</p>
+							<ul class="demo-progress-row">
+								<li>
+									<span class="label">Invalid value <code>"abc"</code> — renders as 0%</span>
+									<div class="progress">
+										<div data-ln-progress="abc" class="success"></div>
+									</div>
+								</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Accessibility -->
+					<section class="section-card">
+						<header><h3>Accessibility — auto-managed</h3></header>
+						<main>
+							<p>The component writes <code>role="progressbar"</code>, <code>aria-valuemin="0"</code>, <code>aria-valuemax</code>, and <code>aria-valuenow</code> on <strong>each bar element</strong> on every render. The four attributes are written inside <code>_render</code> after the <code>style.width</code> calculation; <code>aria-valuenow</code> is clamped to <code>[0, max]</code> so screen-reader reports match the rendered bar even on overshoot.</p>
+							<p>Consumers add <code>aria-label</code> on the bar for context — what the bar represents (<code>"Upload progress"</code>, <code>"Tasks done"</code>, <code>"CPU usage"</code>). The component does not invent a label.</p>
+<pre><code>&lt;div class="progress"&gt;
+    &lt;div data-ln-progress="75" class="success"
+         aria-label="Upload progress"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+							<p>For multi-segment stacked tracks, each bar is its own <code>progressbar</code> — semantically each segment is a distinct value advertised separately. Add a per-bar <code>aria-label</code> ("Done", "In progress", "Pending") and the screen reader announces three progressbars in sequence; trying to compress three values into a single track-level <code>aria-valuenow</code> would lose information.</p>
+						</main>
+					</section>
+
+					<!-- Composition -->
+					<section class="section-card">
+						<header><h3>Composition — siblings and the upload gap</h3></header>
+						<main>
+							<p><strong><code>ln-circular-progress</code> (circular sibling)</strong> shares the contract shape — same <code>:change</code> event detail (<code>{ target, value, max, percentage }</code>), same attribute pattern. They are independent implementations of the same idea in different geometries; ln-progress does not extend ln-circular-progress (the components do not share code). <strong>Asymmetries:</strong> <code>ln-progress</code> additionally supports parent-shared max (multiple bars stacking inside one track); <code>ln-circular-progress</code> additionally supports a centre-label override (<code>data-ln-circular-progress-label</code>) that has no linear analogue (the bar IS the visual, no label slot inside it).</p>
+							<p><strong><code>ln-upload</code></strong> uses its own raw <code>&lt;div class="ln-upload__progress-bar"&gt;</code> with manual <code>style.width</code> writes (see <code>js/ln-upload/ln-upload.js:149-152</code>). It does NOT compose with <code>ln-progress</code> or <code>ln-circular-progress</code> — the upload component predates the progress components and was not refactored. If your project wants a managed progress bar inside an upload list item, swap the inline progress markup for a <code>&lt;div data-ln-progress&gt;</code> track wrapping a <code>&lt;div data-ln-progress="0"&gt;</code> bar and replace the <code>style.width</code> write with <code>setAttribute('data-ln-progress', percent)</code>.</p>
+							<p><strong><code>ln-form</code></strong> does not own progress UI; submit-state feedback comes from <code>aria-busy</code> on the form. If a long-running form needs a progress bar, drive it from the consumer's <code>xhr.upload.progress</code> listener directly — see the README's "Upload progress" example.</p>
 						</main>
 					</section>
 
@@ -214,12 +322,78 @@
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<pre><code>// Manual initialization
-window.lnProgress(document.body);
+<pre><code>const bar = document.querySelector('[data-ln-progress]');
 
-// Dynamic update:
-const bar = document.getElementById('my-bar');
-bar.setAttribute('data-ln-progress', '50');
-bar.setAttribute('data-ln-progress-max', '100');</code></pre>
+bar.lnProgress.dom;              // back-reference to bar element
+bar.lnProgress._attrObserver;    // observer for bar's own value/max attrs
+bar.lnProgress._parentObserver;  // observer for parent track's max — null if parent had no max at construction
+bar.lnProgress.destroy();        // disconnect observers, delete bar.lnProgress
+
+window.lnProgress(root);         // re-run init scan over `root`
+                                 //   only needed for Shadow DOM / iframe</code></pre>
+							<p>There is no <code>setValue(n)</code>, <code>setMax(n)</code>, or <code>redraw()</code> method. The canonical update path is the attribute:</p>
+<pre><code>bar.setAttribute('data-ln-progress', 75);
+// → MutationObserver fires → _render runs → style.width updates → :change dispatches</code></pre>
+							<p>Adding an imperative setter would create a second mutation channel that the MutationObserver would also see, without removing the need to write the attribute for screen-readers / DOM Inspector / serialization. The single source of truth is the attribute.</p>
 						</main>
 					</section>
+
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<h4>1. Setting width manually inside the markup</h4>
+							<p>The constructor's first action is <code>_render</code>, which writes <code>style.width</code> based on the value/max attributes. Whatever inline width you set in markup is overwritten on the first paint. Use <code>data-ln-progress="N"</code> instead of <code>style="width: N%"</code>.</p>
+
+							<h4>2. Mixing percentage values with absolute max</h4>
+							<p><code>data-ln-progress="50" data-ln-progress-max="500"</code> renders 50/500 = 10% of the track, which is probably not what you meant. Either write the absolute count (<code>data-ln-progress="250"</code>) or drop the max (defaults to 100, value is a percentage).</p>
+
+							<h4>3. Multiple bars sharing a parent and forgetting parent-max</h4>
+							<p>Three bars at <code>4</code> / <code>2</code> / <code>1</code> without a parent <code>data-ln-progress-max</code> use the default max of 100 each — bars fill 4 + 2 + 1 = 7% of the track. To make them fill the track exactly, set the parent's max: <code>&lt;div data-ln-progress data-ln-progress-max="7"&gt;</code>.</p>
+
+							<h4>4. Setting parent max AFTER construction</h4>
+							<p><code>_listenParent</code> bails immediately if the parent does not declare <code>data-ln-progress-max</code> at construction time. The parent observer is conditional, not lazy. If the parent gains the attribute later, the bars do not re-render in response. Workaround: rewrite each bar's own attribute (<code>bar.setAttribute('data-ln-progress', bar.getAttribute('data-ln-progress'))</code>) to fire <code>_listenValues</code> and force <code>_render</code> to re-resolve max with the now-set parent max in scope.</p>
+
+							<h4>5. Updating value rapidly from a tight loop</h4>
+							<p>Every attribute write triggers the MutationObserver, runs <code>_render</code>, and dispatches <code>:change</code>. At 60Hz that's 60 events per bar. The CSS transition makes per-frame writes pointless anyway — set the value once and let CSS animate. If you genuinely need stepwise animation, throttle to ~10Hz (every 100ms).</p>
+
+							<h4>6. Writing values above max and expecting attribute clamping</h4>
+							<p>The component clamps the rendered <em>percentage</em> (0–100), not the attribute. <code>bar.setAttribute('data-ln-progress', 150)</code> leaves the attribute at <code>"150"</code>; <code>e.detail.value</code> is <code>150</code>, <code>e.detail.percentage</code> is <code>100</code>. Clamp before writing if you need the attribute itself bounded.</p>
+
+							<h4>7. Track inside a flex / grid container without sizing</h4>
+							<p><code>@mixin progress</code> includes <code>width: 100%</code>, but inside a flex container that resolves against the flex basis. Give the track <code>flex: 1</code> (in project SCSS, not inline) so it grows to fill the available space.</p>
+
+							<h4>8. Calling <code>destroy()</code> and expecting the bar to stay inert</h4>
+							<p><code>destroy()</code> disconnects observers but leaves <code>data-ln-progress</code> in place. Any subsequent attribute write triggers the document-level <code>_domObserver</code>, which re-instantiates the bar. To remove the component permanently, also remove the attribute: <code>bar.removeAttribute('data-ln-progress')</code>.</p>
+						</main>
+					</section>
+
+<script>
+	(function () {
+		// Reactive demo — wire up the value-setter buttons to the demo bar.
+		const bar = document.getElementById('demo-react-bar');
+		const log = document.getElementById('demo-event-log');
+		if (!bar) return;
+
+		const buttons = document.querySelectorAll('[data-ln-set-progress]');
+		buttons.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				const value = btn.getAttribute('data-ln-set-progress');
+				bar.setAttribute('data-ln-progress', value);
+			});
+		});
+
+		// Listen for change events on the demo bar and log them.
+		if (log) {
+			let entries = [];
+			bar.addEventListener('ln-progress:change', function (e) {
+				const time = new Date().toLocaleTimeString();
+				const d = e.detail;
+				const line = '[' + time + ']  value=' + d.value + '  max=' + d.max + '  percentage=' + d.percentage.toFixed(1) + '%';
+				entries.unshift(line);
+				if (entries.length > 8) entries = entries.slice(0, 8);
+				log.textContent = entries.join('\n');
+			});
+		}
+	})();
+</script>

@@ -77,6 +77,20 @@
 		color: var(--color-fg);
 		margin: 0;
 	}
+
+	// Equalize control chrome inside the header. Geometric height lock
+	// matching @mixin app-header-actions: icon-content (1.25rem) + 2 ×
+	// rebound --padding-y + 2 × border-width. Buttons inherit --padding-y
+	// from this rebind; search-icon labels read it from
+	// @mixin form-input-icon-group (same var(--size-xs) value), so the
+	// formula resolves identically for both. Descendant selector — these
+	// controls are commonly wrapped in <aside>/<nav>/<div> inside the
+	// header. panel-header is chrome (no body labels), so descendant
+	// `label` here is always a search-icon-group, never a field label.
+	:is(button, label) {
+		--padding-y: var(--size-xs);
+		min-height: calc(1.25rem + 2 * var(--padding-y) + 2 * var(--border-width));
+	}
 }
 
 @mixin panel-body {

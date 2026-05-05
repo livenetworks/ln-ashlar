@@ -1,31 +1,62 @@
 <!-- ln-page: title="Autosave — ln-ashlar" h1="Autosave" -->
 
-					<h1>Autosave</h1>
-					<p>Auto-saves form data to <code>localStorage</code> on field blur/change. Restores on next visit. Clears on submit, reset, or cancel.</p>
-
-					<!-- Basics -->
+					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Basics</h3></header>
+						<header><h3>Overview</h3></header>
 						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-autosave</code></td><td data-label="On element"><code>&lt;form&gt;</code></td><td data-label="Description">Enables autosave. Uses <code>form.id</code> as storage key.</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-autosave="key"</code></td><td data-label="On element"><code>&lt;form&gt;</code></td><td data-label="Description">Explicit storage key (overrides <code>form.id</code>).</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-autosave-clear</code></td><td data-label="On element">button inside form</td><td data-label="Description">Click clears saved draft (cancel/discard buttons).</td></tr>
-								</tbody>
-							</table>
-							</div>
-							<p>Storage key format: <code>ln-autosave:{pathname}:{identifier}</code> — unique per URL + form.</p>
+							<p>A 141-line localStorage-backed draft buffer for HTML forms. Set <code>data-ln-autosave</code> on a <code>&lt;form&gt;</code> with an <code>id</code> and the form's serialised state is written to localStorage on every <code>focusout</code> and <code>change</code>, restored on construction, and cleared on <code>submit</code>, <code>reset</code>, or any click on a <code>[data-ln-autosave-clear]</code> button. The user never sees it work and never sees it not work; they just notice that their form is still filled in when they come back.</p>
+							<p><strong>Storage is localStorage, not IndexedDB or a server endpoint.</strong> localStorage is synchronous (so the save on <code>focusout</code> has no race window with submit), origin-isolated, persisted across tab close, and universally available. <code>ln-store</code> uses IndexedDB for record cache; <code>ln-autosave</code> uses localStorage for form drafts. Different layers, different lifecycles, different keys (<code>ln-autosave:</code> vs <code>ln_app_cache</code>).</p>
+							<p><strong>The save trigger is <code>focusout</code> + <code>change</code>, not <code>input</code>.</strong> Field-boundary events are naturally rate-limited by user behaviour — one save per field-leave, not one per keystroke. There is no <code>data-ln-autosave-debounce</code> attribute. The trade-off: a user typing continuously into a single textarea for 30 minutes with no blur triggers ZERO saves. For compose-style editors this is the wrong tool; see "Mistake 5" in the README.</p>
+							<p><strong>The clear trigger is three signals.</strong> Submit means "the draft has become a real record." Reset means "user explicitly threw the draft away." <code>[data-ln-autosave-clear]</code> on a non-submit non-reset button means "Cancel" — discard the draft without resetting form values. Three signals, one effect.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-autosave/README.md"><code>ln-autosave</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/autosave.md">architecture reference</a>.</p>
 						</main>
 					</section>
 
-					<!-- Live Demo -->
+					<!-- Anatomy -->
 					<section class="section-card">
-						<header><h3>Live demo — fill fields, close tab, reopen</h3></header>
+						<header><h3>Anatomy</h3></header>
 						<main>
-							<p>Fill in some fields below, then close (or refresh) this tab. When you reopen, the data is restored. Submitting the form clears the saved draft.</p>
+							<p>The minimum invocation is one attribute on the form:</p>
+<pre><code>&lt;form id="edit-user" data-ln-autosave&gt;
+    &lt;input name="name" type="text"&gt;
+    &lt;input name="email" type="email"&gt;
+    &lt;button type="submit"&gt;Save&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+							<p>The storage key is <code>ln-autosave:{pathname}:{identifier}</code> — unique per URL + form. The identifier is the value of <code>data-ln-autosave</code> if present, falling back to <code>form.id</code>. Empty attribute (<code>data-ln-autosave=""</code>) falls back to <code>form.id</code>. Missing both → <code>console.warn</code> and the constructor exits without instantiating.</p>
+
+							<h4>Why localStorage and not something else</h4>
+							<p>localStorage is synchronous (no race window with submit), origin-isolated, persisted across tab close, and universally available. <code>sessionStorage</code> would lose the draft on tab close — that's the headline scenario. IndexedDB would make every save async and force the component to think about race conditions on submit. A server endpoint would couple "save the draft" to "the network is up," defeating the resilience guarantee. localStorage's ~5MB cap is the price; for typical forms this is generous.</p>
+
+							<h4>What state lives where</h4>
+							<p>"Should this form autosave?" lives on <code>data-ln-autosave</code> on the <code>&lt;form&gt;</code>. The currently-saved draft lives in <code>localStorage["ln-autosave:{path}:{id}"]</code>. "Discard the draft on click" lives on <code>data-ln-autosave-clear</code> on any descendant button. There is no instance-level state worth speaking of — no in-memory cached draft, no debounce timer, no in-flight save promise. The component is essentially a listener bundle.</p>
+
+							<p>The pathname and identifier are captured ONCE at construction. Mutating <code>data-ln-autosave</code> later, or pushing a new History API URL while the form remains in the DOM, does NOT re-key the instance. To switch keys, destroy and re-mount.</p>
+						</main>
+					</section>
+
+					<!-- Attributes reference -->
+					<section class="section-card">
+						<header><h3>Attributes reference</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Owned by</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-autosave</code></td><td><code>&lt;form&gt;</code></td><td>author</td><td>Marks the form as autosaved. Empty value uses <code>form.id</code> as the storage identifier; non-empty value uses the attribute value instead. If neither resolves, the constructor logs a warning and exits.</td></tr>
+									<tr><td><code>data-ln-autosave="custom-key"</code></td><td><code>&lt;form&gt;</code></td><td>author</td><td>Explicit storage identifier. Useful when the form has no <code>id</code> or when two forms intentionally share a draft (rare; usually a smell — see "Mistake 4").</td></tr>
+									<tr><td><code>data-ln-autosave-clear</code></td><td>any descendant button</td><td>author</td><td>Click delegate marker. When clicked, calls <code>clear()</code> on the form's autosave instance. Does NOT reset form values — only wipes the localStorage entry. Typical use: a "Cancel" button inside a modal that closes-and-discards.</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>There are no other attributes. No <code>data-ln-autosave-debounce</code>, no <code>-trigger</code>, no <code>-expire</code>. The contract is intentionally narrow.</p>
+						</main>
+					</section>
+
+					<!-- Live demo -->
+					<section class="section-card">
+						<header><h3>Live demo — fill, close, reopen</h3></header>
+						<main>
+							<p>Fill in some fields below, then close (or refresh) this tab. When you reopen, the data is restored. Submitting the form clears the saved draft. Open DevTools → Application → Local Storage to watch the <code>ln-autosave:</code>-prefixed key appear and disappear.</p>
 
 							<form id="demo-autosave" data-ln-autosave>
 								<div class="form-element">
@@ -71,7 +102,7 @@
 									</ul>
 								</fieldset>
 								<ul class="form-actions">
-									<li><button type="button" data-ln-autosave-clear>Cancel</button></li>
+									<li><button type="button" data-ln-autosave-clear>Cancel (clear draft)</button></li>
 									<li><button type="reset">Reset</button></li>
 									<li><button type="submit">Submit</button></li>
 								</ul>
@@ -79,19 +110,20 @@
 						</main>
 					</section>
 
-					<!-- Events Demo -->
+					<!-- Events -->
 					<section class="section-card">
 						<header><h3>Events</h3></header>
 						<main>
+							<p>All events bubble. Only <code>before-restore</code> is cancelable. <code>detail.target</code> is always the form element.</p>
 							<div class="table-container">
 							<table>
 								<thead><tr><th>Event</th><th>Cancelable</th><th>Detail</th><th>When</th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-autosave:before-restore</code></td><td><strong>yes</strong></td><td><code>{ target, data }</code></td><td>Before restoring saved data</td></tr>
-									<tr><td><code>ln-autosave:restored</code></td><td>no</td><td><code>{ target, data }</code></td><td>Data restored to form</td></tr>
-									<tr><td><code>ln-autosave:saved</code></td><td>no</td><td><code>{ target, data }</code></td><td>Data saved to localStorage</td></tr>
-									<tr><td><code>ln-autosave:cleared</code></td><td>no</td><td><code>{ target }</code></td><td>localStorage entry removed</td></tr>
-									<tr><td><code>ln-autosave:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>Instance destroyed</td></tr>
+									<tr><td><code>ln-autosave:before-restore</code></td><td><strong>yes</strong></td><td><code>{ target, data }</code></td><td>Inside <code>restore()</code>, after parsing localStorage, BEFORE applying values. Calling <code>preventDefault()</code> skips the apply step entirely; <code>:restored</code> does NOT fire afterwards.</td></tr>
+									<tr><td><code>ln-autosave:restored</code></td><td>no</td><td><code>{ target, data }</code></td><td>After <code>populateForm()</code> has written values AND after synthetic <code>input</code> + <code>change</code> have been dispatched on every restored field. ln-validate / ln-autoresize have already re-reacted by this point.</td></tr>
+									<tr><td><code>ln-autosave:saved</code></td><td>no</td><td><code>{ target, data }</code></td><td>After <code>localStorage.setItem</code> succeeds. If the write throws (quota exceeded, localStorage disabled), the <code>try/catch</code> swallows silently and NO event fires — there is no <code>:save-failed</code> event.</td></tr>
+									<tr><td><code>ln-autosave:cleared</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>localStorage.removeItem</code> runs. Idempotent — fires even if there was nothing in localStorage to remove.</td></tr>
+									<tr><td><code>ln-autosave:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>Last action of <code>destroy()</code>, after listeners are removed but before <code>el.lnAutosave</code> is deleted.</td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -101,61 +133,159 @@
 								<p>Interact with the form above to see events here:</p>
 								<pre id="autosave-log" class="demo-log demo-log--compact"></pre>
 							</article>
-
-							<script>
-								document.addEventListener('DOMContentLoaded', function () {
-									var log = document.getElementById('autosave-log');
-									var events = ['ln-autosave:saved', 'ln-autosave:restored', 'ln-autosave:cleared'];
-									events.forEach(function (name) {
-										document.addEventListener(name, function (e) {
-											var time = new Date().toLocaleTimeString();
-											var line = '[' + time + '] ' + name;
-											if (e.detail.data) line += ' — ' + JSON.stringify(e.detail.data).substring(0, 80) + '…';
-											log.textContent = line + '\n' + log.textContent;
-										});
-									});
-								});
-							</script>
 						</main>
 					</section>
 
 					<!-- API -->
 					<section class="section-card">
-						<header><h3>API</h3></header>
+						<header><h3>API — <code>el.lnAutosave</code></h3></header>
 						<main>
-							<pre><code>// Instance API (on DOM element)
-var form = document.getElementById('my-form');
-form.lnAutosave.save();     // manually save
-form.lnAutosave.restore();  // manually restore
-form.lnAutosave.clear();    // remove saved data
-form.lnAutosave.destroy();  // cleanup listeners
+							<p>The instance lives on the form element as <code>form.lnAutosave</code>. Methods:</p>
+<pre><code>const form = document.getElementById('edit-user');
 
-// Constructor (for dynamic content)
+form.lnAutosave.save();      // serialise the form, write to localStorage, dispatch :saved
+form.lnAutosave.restore();   // re-read localStorage, dispatch :before-restore (cancelable),
+                             // populate, dispatch synthetic input/change, dispatch :restored
+form.lnAutosave.clear();     // remove from localStorage, dispatch :cleared
+                             // (does NOT reset form values — only wipes localStorage)
+form.lnAutosave.destroy();   // remove all listeners, dispatch :destroyed, delete back-reference
+                             // (does NOT call clear() — destroy is not "discard the draft")
+
+form.lnAutosave.key;         // the resolved storage key string
+form.lnAutosave.dom;         // back-reference to the form
+
+// Manual init scan (Shadow DOM, iframe). The shared MutationObserver
+// covers everything inside document.body — call this only for contexts
+// the observer cannot see.
 window.lnAutosave(container);</code></pre>
+							<p>There is no <code>getDraft()</code>, <code>hasDraft()</code>, or <code>setKey()</code>. To inspect a draft without applying it, read localStorage directly using <code>form.lnAutosave.key</code>.</p>
 						</main>
 					</section>
 
-					<!-- Cancel Restore -->
+					<!-- Cancel restore -->
 					<section class="section-card">
-						<header><h3>Cancel restore (server data takes priority)</h3></header>
+						<header><h3>Cancel restore — server data takes priority</h3></header>
 						<main>
-							<pre><code>// Prevent restore when form already has server data
-document.addEventListener('ln-autosave:before-restore', function (e) {
-    var form = e.detail.target;
+							<p>The canonical edit-page pattern. The server has already rendered the form with current record values; a stale draft restoring over them produces inconsistent state.</p>
+<pre><code>&lt;form id="edit-user" data-ln-autosave data-has-server-data="true" action="/users/42" method="POST"&gt;
+    &lt;input name="name" type="text" value="Maria"&gt; &lt;!-- server-rendered --&gt;
+    &lt;input name="email" type="email" value="maria@example.com"&gt;
+    &lt;!-- ... --&gt;
+&lt;/form&gt;</code></pre>
+<pre><code>document.addEventListener('ln-autosave:before-restore', function (e) {
+    const form = e.detail.target;
     if (form.dataset.hasServerData === 'true') {
-        e.preventDefault();       // don't overwrite server values
-        form.lnAutosave.clear();  // discard stale draft
+        e.preventDefault();              // do not apply the draft
+        form.lnAutosave.clear();         // and discard it permanently
     }
 });</code></pre>
+							<p>The <code>data-has-server-data</code> attribute is a project convention, not an ln-autosave feature. The listener inspects whatever signal the form carries — could be <code>form.dataset.recordId</code>, could be a hidden input, could be a non-empty value field — and decides case-by-case.</p>
 						</main>
 					</section>
 
-					<!-- Submit handler for demo -->
+					<!-- Modal cancel -->
+					<section class="section-card">
+						<header><h3>Modal forms — close-and-discard</h3></header>
+						<main>
+							<p>Inside a modal, three exit paths typically need to wipe the draft: the X icon, the Cancel button, and the platform <code>submit</code> on Create. Combine <code>data-ln-modal-close</code> with <code>data-ln-autosave-clear</code> on the same button:</p>
+<pre><code>&lt;div id="invoice-modal" class="ln-modal" data-ln-modal&gt;
+    &lt;form id="invoice" data-ln-autosave action="/invoices" method="POST"&gt;
+        &lt;header&gt;
+            &lt;h3&gt;New Invoice&lt;/h3&gt;
+            &lt;button type="button" aria-label="Close"
+                    data-ln-modal-close data-ln-autosave-clear&gt;
+                &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+            &lt;/button&gt;
+        &lt;/header&gt;
+        &lt;main&gt;
+            &lt;input name="client" type="text" required&gt;
+            &lt;input name="amount" type="number" required&gt;
+        &lt;/main&gt;
+        &lt;footer&gt;
+            &lt;button type="button" data-ln-modal-close data-ln-autosave-clear&gt;Cancel&lt;/button&gt;
+            &lt;button type="submit"&gt;Create&lt;/button&gt;
+        &lt;/footer&gt;
+    &lt;/form&gt;
+&lt;/div&gt;</code></pre>
+							<p><strong>Note:</strong> if the user dismisses the modal via ESC (which <code>ln-modal</code> handles natively), the draft is NOT cleared — the ESC-close path does not fire <code>submit</code>, <code>reset</code>, or click any clear button. To wire ESC-close to discard, listen for the modal's close event and call <code>form.lnAutosave.clear()</code>.</p>
+						</main>
+					</section>
+
+					<!-- Cross-component reality -->
+					<section class="section-card">
+						<header><h3>Cross-component reality</h3></header>
+						<main>
+							<p>ln-autosave does NOT import, listen for, or coordinate with any other component's custom events. The platform's <code>input</code>, <code>change</code>, <code>submit</code>, <code>reset</code> are the only connectors. Compositions that "just work":</p>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Component</th><th>Coordination</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-form</code></td><td>None at the JS level. Both share <code>serializeForm</code> / <code>populateForm</code> from <code>ln-core/helpers.js</code>. The form's <code>submit</code> event is the natural connector — ln-form catches it for AJAX submission, ln-autosave catches it to clear the draft. No imports.</td></tr>
+									<tr><td><code>ln-validate</code></td><td>None directly. After <code>:restored</code>, the synthetic <code>input</code> / <code>change</code> events bubble up; ln-validate's input listener catches them and validates. Post-restore validation is correct without coordinator wiring.</td></tr>
+									<tr><td><code>ln-autoresize</code></td><td>None directly. Same propagation path — restored textareas grow to fit because the synthetic <code>input</code> reaches the autoresize listener.</td></tr>
+									<tr><td><code>ln-select</code> (TomSelect)</td><td>The <code>el.lnSelect.setValue()</code> branch in the source (lines 97-99) is dead code — TomSelect instances are stored in a module-scoped WeakMap, NOT as <code>el.lnSelect</code>. The integration works via the dispatched <code>change</code> event on the underlying <code>&lt;select&gt;</code> instead.</td></tr>
+									<tr><td><code>ln-store</code></td><td><strong>None.</strong> Different layer entirely. ln-store uses IndexedDB for record cache; ln-autosave uses localStorage for form drafts. See "Mistake 7" in the README.</td></tr>
+									<tr><td><code>ln-toast</code></td><td>None. ln-autosave is silent by default — no "draft saved" toasts. Listen for <code>ln-autosave:saved</code> and dispatch your own toast if wanted (usually noisier than an inline <code>aria-live</code> indicator).</td></tr>
+									<tr><td><code>ln-modal</code></td><td>None directly. A <code>&lt;form data-ln-autosave&gt;</code> inside a modal works without wiring. The Cancel button uses <code>data-ln-modal-close</code> + <code>data-ln-autosave-clear</code>.</td></tr>
+									<tr><td><code>ln-core/persist.js</code></td><td>Independent storage layers. ln-core/persist uses <code>ln:</code> prefix for UI state; ln-autosave uses <code>ln-autosave:</code> for form drafts. The two cannot collide.</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<ul>
+								<li><strong>Putting the attribute on a wrapper <code>&lt;div&gt;</code> instead of the <code>&lt;form&gt;</code>.</strong> The form's <code>elements</code> collection only exists on actual <code>&lt;form&gt;</code> elements, and <code>submit</code> / <code>reset</code> events do not fire on divs. Always put <code>data-ln-autosave</code> on the form itself.</li>
+								<li><strong>Expecting <code>clear()</code> to reset the form.</strong> It removes the localStorage entry, period. Form values are untouched. To reset both, call <code>form.reset()</code> (which also fires <code>reset</code>, which calls <code>clear()</code> internally — they compose).</li>
+								<li><strong>Saving sensitive fields.</strong> localStorage is plaintext, accessible to any script on the origin (XSS risk). Drop <code>data-ln-autosave</code> on sensitive forms entirely, or filter sensitive keys in a <code>:saved</code> listener (rewriting localStorage post-save).</li>
+								<li><strong>Two forms with the same key on the same page.</strong> They share localStorage, race on save, and overwrite each other. Use distinct identifiers (<code>data-ln-autosave="step1"</code>, <code>data-ln-autosave="step2"</code>) or collapse into one form.</li>
+								<li><strong>Long single-field forms (compose textareas) with no field-boundary saves.</strong> The user types for 30 minutes without blurring; the draft was never saved. Add a periodic save (<code>setInterval(() =&gt; form.lnAutosave.save(), 60000)</code>) or move to an <code>input</code>-based save in project code.</li>
+								<li><strong>Form schema changes between save and restore.</strong> Renamed field names produce stranded localStorage data and empty fields. Migrate at restore time by mutating <code>e.detail.data</code> in the <code>:before-restore</code> listener, OR schema-version the key (<code>data-ln-autosave="user-form-v2"</code>).</li>
+								<li><strong>Confusing <code>ln-autosave</code> with <code>ln-store</code>.</strong> Form drafts → <code>ln-autosave</code> (localStorage, per-form, per-URL). Record cache → <code>ln-store</code> (IndexedDB, per-table, application-wide).</li>
+								<li><strong>Expecting cross-tab sync.</strong> The <code>storage</code> event is not observed. Two tabs with the same form do not sync as edits happen — only on hard refresh. ln-autosave is for single-tab "my laptop closed" recovery, not collaborative editing.</li>
+								<li><strong>Calling <code>form.submit()</code> programmatically and expecting the draft to clear.</strong> <code>form.submit()</code> bypasses the <code>submit</code> event entirely. Use <code>form.requestSubmit()</code> instead — it fires the platform validation AND the <code>submit</code> event, which ln-autosave catches.</li>
+								<li><strong>Storage quota exceeded silently.</strong> A draft pushing past 5MB causes <code>setItem</code> to throw <code>QuotaExceededError</code>; ln-autosave's <code>try/catch</code> swallows it without any event or warning. There is no <code>:save-failed</code> event today (asymmetric with <code>ln-store:quota-exceeded</code>). For huge forms, monitor proactively.</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Submit handler for demo + event log -->
 					<script>
-						document.addEventListener('DOMContentLoaded', function () {
-							document.getElementById('demo-autosave').addEventListener('submit', function (e) {
-								e.preventDefault();
-								window.lnToast.enqueue({ type: 'success', title: 'Submitted', message: 'Form data sent. Draft cleared from localStorage.' });
-							});
-						});
+						(function () {
+							const form = document.getElementById('demo-autosave');
+							const log = document.getElementById('autosave-log');
+
+							if (form) {
+								form.addEventListener('submit', function (e) {
+									e.preventDefault();
+									if (window.lnToast && window.lnToast.enqueue) {
+										window.lnToast.enqueue({
+											type: 'success',
+											title: 'Submitted',
+											message: 'Form data sent. Draft cleared from localStorage.'
+										});
+									}
+								});
+							}
+
+							if (log) {
+								const events = ['ln-autosave:saved', 'ln-autosave:restored', 'ln-autosave:cleared', 'ln-autosave:before-restore'];
+								events.forEach(function (name) {
+									document.addEventListener(name, function (e) {
+										const ts = new Date().toLocaleTimeString();
+										let line = '[' + ts + '] ' + name;
+										if (e.detail && e.detail.data) {
+											line += ' — ' + JSON.stringify(e.detail.data).substring(0, 100) + '…';
+										}
+										log.textContent = line + '\n' + log.textContent;
+									});
+								});
+							}
+						})();
 					</script>
+</content>
+</invoke>

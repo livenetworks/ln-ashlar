@@ -14,18 +14,15 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../ln-
 
 	function _component(form) {
 		this.dom = form;
-		this._invalidFields = new Set();
 		this._debounceTimer = null;
 
 		const self = this;
 
-		this._onValid = function (e) {
-			self._invalidFields.delete(e.detail.field);
+		this._onValid = function () {
 			self._updateSubmitButton();
 		};
 
-		this._onInvalid = function (e) {
-			self._invalidFields.add(e.detail.field);
+		this._onInvalid = function () {
 			self._updateSubmitButton();
 		};
 
@@ -132,12 +129,34 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../ln-
 
 	_component.prototype.reset = function () {
 		this.dom.reset();
+
+		// Mirror fill() — dispatch input/change so reactive consumers
+		// (ln-autoresize, ln-validate, custom listeners) re-react to the
+		// cleared values. dom.reset() clears .value but does NOT fire
+		// input/change events; without these dispatches, ln-autoresize
+		// keeps its previous height, etc.
+		//
+		// Order matters: this loop MUST run BEFORE _resetValidation().
+		// ln-validate's input handler will mark default-empty required
+		// fields as invalid (touched + validate); _resetValidation()
+		// below clears that transient state. Moving _resetValidation
+		// above the dispatch loop would leave fields visibly invalid.
+		const fields = this.dom.querySelectorAll('input, textarea, select');
+		for (let k = 0; k < fields.length; k++) {
+			const el = fields[k];
+			const isChangeBased = el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio';
+			el.dispatchEvent(new Event(isChangeBased ? 'change' : 'input', { bubbles: true }));
+		}
+
 		this._resetValidation();
+
+		// Notify high-level subscribers (custom controls that hold their
+		// own value and cannot be reset via input/change). Distinct from
+		// the incoming 'ln-form:reset' request event to avoid a loop.
+		dispatch(this.dom, 'ln-form:reset-complete', { target: this.dom });
 	};
 
 	_component.prototype._resetValidation = function () {
-		this._invalidFields.clear();
-
 		const fields = this.dom.querySelectorAll('[' + VALIDATE_SELECTOR + ']');
 		for (let i = 0; i < fields.length; i++) {
 			const instance = fields[i][VALIDATE_ATTRIBUTE];

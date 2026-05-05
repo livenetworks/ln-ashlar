@@ -6,26 +6,24 @@ import { dispatch, guardBody } from '../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	function _isBar(el) {
-		const val = el.getAttribute('data-ln-progress');
-		return val !== null && val !== '';
-	}
-
 	function constructor(domRoot) {
 		findElements(domRoot);
 	}
 
-	// Local findElements — intentional divergence from ln-core helper: filters by _isBar (non-empty data-ln-progress).
+	// Local findElements — intentional divergence from ln-core helper:
+	// inlines selector + constructor (no ComponentClass parameter) and
+	// includes a domRoot self-match branch so the childList re-init
+	// path picks up the inserted root itself.
 	function findElements(domRoot) {
 		const items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
 
 		for (const item of items) {
-			if (_isBar(item) && !item[DOM_ATTRIBUTE]) {
+			if (!item[DOM_ATTRIBUTE]) {
 				item[DOM_ATTRIBUTE] = new _constructor(item);
 			}
 		}
 
-		if (domRoot.hasAttribute && domRoot.hasAttribute('data-ln-progress') && _isBar(domRoot) && !domRoot[DOM_ATTRIBUTE]) {
+		if (domRoot.hasAttribute && domRoot.hasAttribute('data-ln-progress') && !domRoot[DOM_ATTRIBUTE]) {
 			domRoot[DOM_ATTRIBUTE] = new _constructor(domRoot);
 		}
 	}
@@ -130,6 +128,13 @@ import { dispatch, guardBody } from '../ln-core';
 		if (percentage > 100) percentage = 100;
 
 		this.dom.style.width = percentage + '%';
+
+		const clampedValue = Math.max(0, Math.min(value, max));
+		this.dom.setAttribute('role', 'progressbar');
+		this.dom.setAttribute('aria-valuemin', '0');
+		this.dom.setAttribute('aria-valuemax', String(max));
+		this.dom.setAttribute('aria-valuenow', String(clampedValue));
+
 		dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
 	}
 

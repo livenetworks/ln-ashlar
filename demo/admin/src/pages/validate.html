@@ -1,35 +1,82 @@
 <!-- ln-page: title="Validate — ln-ashlar" h1="Validate" -->
 
-<h1>Validate</h1>
-					<p>Per-field validation using the native ValidityState API. Shows/hides error messages, toggles CSS classes, emits valid/invalid events.</p>
-
-					<!-- Attributes -->
+					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Attributes</h3></header>
+						<header><h3>Overview</h3></header>
 						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-validate</code></td><td data-label="On element"><code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;textarea&gt;</code></td><td data-label="Description">Creates a validation instance for this field</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-validate-errors</code></td><td data-label="On element"><code>&lt;ul&gt;</code></td><td data-label="Description">Error list container — sibling of the input inside <code>.form-element</code></td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-validate-error="key"</code></td><td data-label="On element"><code>&lt;li&gt;</code></td><td data-label="Description">Individual error message. Shown when the matching validity check fails.</td></tr>
-								</tbody>
-							</table>
-							</div>
+							<p>Per-field validation primitive for the form layer. 160 lines of JS that wrap the native <code>ValidityState</code> API, expose its state through two CSS classes and a pair of events, and add one strictly-typed escape hatch (<code>set-custom</code> / <code>clear-custom</code>) for errors the browser cannot express.</p>
+							<p>The component does not run validation rules — the browser already does that. <code>required</code>, <code>type="email"</code>, <code>minlength</code>, <code>pattern</code>, <code>min</code>, <code>max</code> are all native HTML attributes; <code>dom.checkValidity()</code> returns the boolean. <code>ln-validate</code> decides <strong>when to listen</strong> (input vs change, depending on field type), <strong>when to render</strong> (silent until the field has been touched at least once), and <strong>how to surface the result</strong> (CSS classes, <code>.hidden</code> toggles on error <code>&lt;li&gt;</code> elements, bubbling <code>:valid</code> / <code>:invalid</code> events).</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-validate/README.md"><code>ln-validate</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/validate.md">architecture reference</a>. The <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-form/README.md"><code>ln-form</code> README</a> is the companion read — the two components together are the form layer's contract.</p>
 						</main>
 					</section>
 
-					<!-- Error Key Mapping -->
+					<!-- Anatomy -->
 					<section class="section-card">
-						<header><h3>Error Key Mapping</h3></header>
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>The minimum invocation is <code>data-ln-validate</code> on a field plus a sibling <code>&lt;ul data-ln-validate-errors&gt;</code> error list inside a <code>.form-element</code> wrapper.</p>
+<pre><code>&lt;div class="form-element"&gt;
+    &lt;label for="email"&gt;Email&lt;/label&gt;
+    &lt;input id="email" name="email" type="email" required minlength="5" data-ln-validate&gt;
+    &lt;ul data-ln-validate-errors&gt;
+        &lt;li class="hidden" data-ln-validate-error="required"&gt;Email is required&lt;/li&gt;
+        &lt;li class="hidden" data-ln-validate-error="typeMismatch"&gt;Invalid email format&lt;/li&gt;
+        &lt;li class="hidden" data-ln-validate-error="tooShort"&gt;Must be at least 5 characters&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+							<h4>The field — <code>[data-ln-validate]</code></h4>
+							<p>Marker on <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>, or <code>&lt;textarea&gt;</code>. Presence creates the instance; the value is ignored. Validation rules come from native HTML attributes — <code>data-ln-validate</code> is a participation marker, not a rule definition.</p>
+
+							<h4>The error list — <code>[data-ln-validate-errors]</code></h4>
+							<p>A sibling <code>&lt;ul&gt;</code> inside the same <code>.form-element</code> wrapper. The component finds it via <code>dom.closest('.form-element').querySelector('[data-ln-validate-errors]')</code>, so the wrapper class must be <code>.form-element</code> — that string is hardcoded.</p>
+
+							<h4>The error message — <code>[data-ln-validate-error="key"]</code></h4>
+							<p>Each <code>&lt;li&gt;</code> carries a key matching either a <code>ValidityState</code> property (mapped) or a custom-error name (unmapped). Both flavours live in the same <code>&lt;ul&gt;</code> — the component only renders native errors via the validation loop and only renders custom errors via the <code>set-custom</code> / <code>clear-custom</code> event handlers. The split is invisible in the markup; it only matters in the code path.</p>
+
+							<h4>What state goes where</h4>
+							<p>The instance state is two fields: <code>_touched</code> (Boolean — has the user interacted yet?) and <code>_customErrors</code> (Set of active custom-error names). The DOM holds the value; the browser holds <code>validity</code>. The CSS classes (<code>ln-validate-valid</code>, <code>ln-validate-invalid</code>) on the field are the visible state for project SCSS to hook. The <code>.hidden</code> class on each <code>&lt;li&gt;</code> is the per-message visibility toggle.</p>
+						</main>
+					</section>
+
+					<!-- The _touched gate -->
+					<section class="section-card">
+						<header><h3>The <code>_touched</code> gate — silent until first interaction</h3></header>
+						<main>
+							<p>The single most consequential UX decision in the component. Validation runs silently until the field has fired its first <code>input</code> or <code>change</code> event. Without this, every page load would render a wall of "this field is required" messages on every empty form. With it, errors appear only after the user has actually engaged with the field.</p>
+							<p>The flag is forward-only during normal flow — once <code>true</code>, stays <code>true</code> until <code>reset()</code>. Note that <code>validate()</code> itself does NOT check <code>_touched</code>; force-validating an untouched field renders errors immediately. That is intentional — <code>lnForm.submit()</code> calls <code>instance.validate()</code> on every field exactly to catch untouched required fields and prevent submission.</p>
+							<p>The flag is read by <code>ln-form._updateSubmitButton</code>, which disables the submit button if NO field has been touched yet (in addition to the standard "any field invalid" check). This implements "you can't submit a form you haven't started yet."</p>
+						</main>
+					</section>
+
+					<!-- Listener discriminator -->
+					<section class="section-card">
+						<header><h3>The listener discriminator — input vs change</h3></header>
+						<main>
+							<p>The constructor reads the field's tag and type to decide which events to listen for:</p>
+<pre><code>const isChangeBased = tag === 'SELECT' || type === 'checkbox' || type === 'radio';</code></pre>
+							<div class="table-container">
+							<table>
+								<thead><tr><th><code>isChangeBased</code></th><th>Field types</th><th>Listeners</th></tr></thead>
+								<tbody>
+									<tr><td><code>false</code></td><td>text, email, tel, url, password, number, search, date, time inputs; textarea</td><td><code>input</code> AND <code>change</code></td></tr>
+									<tr><td><code>true</code></td><td><code>&lt;select&gt;</code>, <code>&lt;input type="checkbox"&gt;</code>, <code>&lt;input type="radio"&gt;</code></td><td><code>change</code> only</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>The fork exists because <code>input</code> does not fire on SELECT, checkbox, or radio elements — the platform's contract for those is "value commits on change." This same discriminator is mirrored exactly in <code>ln-form.fill()</code>, <code>ln-form.reset()</code>, and <code>ln-autosave</code>'s synthetic-event dispatch — programmatic value writes route through the same listener as user interaction.</p>
+						</main>
+					</section>
+
+					<!-- Error key mapping -->
+					<section class="section-card">
+						<header><h3>Error key mapping</h3></header>
 						<main>
 							<div class="table-container">
 							<table>
-								<thead><tr><th><code>data-ln-validate-error</code> value</th><th>HTML attribute</th><th>ValidityState property</th></tr></thead>
+								<thead><tr><th><code>data-ln-validate-error</code></th><th>HTML constraint</th><th><code>ValidityState</code> property</th></tr></thead>
 								<tbody>
 									<tr><td><code>required</code></td><td><code>required</code></td><td><code>valueMissing</code></td></tr>
-									<tr><td><code>typeMismatch</code></td><td><code>type="email"</code>, <code>type="url"</code></td><td><code>typeMismatch</code></td></tr>
+									<tr><td><code>typeMismatch</code></td><td><code>type="email"</code>, <code>type="url"</code>, <code>type="number"</code>, etc.</td><td><code>typeMismatch</code></td></tr>
 									<tr><td><code>tooShort</code></td><td><code>minlength</code></td><td><code>tooShort</code></td></tr>
 									<tr><td><code>tooLong</code></td><td><code>maxlength</code></td><td><code>tooLong</code></td></tr>
 									<tr><td><code>patternMismatch</code></td><td><code>pattern</code></td><td><code>patternMismatch</code></td></tr>
@@ -38,13 +85,13 @@
 								</tbody>
 							</table>
 							</div>
-							<p>Validation rules come from native HTML attributes — zero JS configuration. Error messages live in HTML, rendered by the backend (multilanguage ready).</p>
+							<p>Keys not in this map are treated as <strong>custom errors</strong> — managed exclusively via <code>ln-validate:set-custom</code> / <code>ln-validate:clear-custom</code>. Validation rules come from native HTML attributes, with zero JS configuration; error message text lives in HTML, rendered by the backend (multilanguage ready).</p>
 						</main>
 					</section>
 
-					<!-- Example — Text Input -->
+					<!-- Live demo: text input -->
 					<section class="section-card">
-						<header><h3>Example — Text Input (required + minlength)</h3></header>
+						<header><h3>Demo — Text input (required + minlength)</h3></header>
 						<main>
 							<div class="form-element">
 								<label for="demo-name">Full Name</label>
@@ -57,9 +104,9 @@
 						</main>
 					</section>
 
-					<!-- Example — Email Validation -->
+					<!-- Live demo: email -->
 					<section class="section-card">
-						<header><h3>Example — Email Validation</h3></header>
+						<header><h3>Demo — Email validation</h3></header>
 						<main>
 							<div class="form-element">
 								<label for="demo-email">Email Address</label>
@@ -73,9 +120,9 @@
 						</main>
 					</section>
 
-					<!-- Example — Select Field -->
+					<!-- Live demo: select -->
 					<section class="section-card">
-						<header><h3>Example — Select Field</h3></header>
+						<header><h3>Demo — Select field (change-based)</h3></header>
 						<main>
 							<div class="form-element">
 								<label for="demo-dept">Department</label>
@@ -93,9 +140,9 @@
 						</main>
 					</section>
 
-					<!-- Example — Pattern Validation -->
+					<!-- Live demo: pattern -->
 					<section class="section-card">
-						<header><h3>Example — Pattern Validation</h3></header>
+						<header><h3>Demo — Pattern validation</h3></header>
 						<main>
 							<div class="form-element">
 								<label for="demo-phone">Phone Number</label>
@@ -107,9 +154,9 @@
 						</main>
 					</section>
 
-					<!-- Example — Number Range -->
+					<!-- Live demo: number range -->
 					<section class="section-card">
-						<header><h3>Example — Number Range</h3></header>
+						<header><h3>Demo — Number range</h3></header>
 						<main>
 							<div class="form-element">
 								<label for="demo-salary">Annual Salary</label>
@@ -122,11 +169,11 @@
 						</main>
 					</section>
 
-					<!-- Custom Validation -->
+					<!-- Live demo: custom validation -->
 					<section class="section-card">
-						<header><h3>Example — Custom Validation (Password Confirmation)</h3></header>
+						<header><h3>Demo — Custom validation (password confirmation)</h3></header>
 						<main>
-							<p>Custom errors that native HTML can't express — the coordinator compares values and dispatches <code>ln-validate:set-custom</code> or <code>ln-validate:clear-custom</code>.</p>
+							<p>Custom errors that native HTML cannot express. The coordinator compares values cross-field and dispatches <code>ln-validate:set-custom</code> when they mismatch, <code>ln-validate:clear-custom</code> when they match. The <code>passwordMismatch</code> key is NOT in <code>ERROR_MAP</code> — its <code>&lt;li&gt;</code> is invisible to the native validation loop and only toggles via the event handlers.</p>
 							<form id="demo-custom-form">
 								<div class="form-element">
 									<label for="demo-pass">Password</label>
@@ -152,109 +199,128 @@
 					<section class="section-card">
 						<header><h3>Programmatic API</h3></header>
 						<main>
-							<p>Force-validate, reset, and check validity on all fields in the examples above.</p>
+							<p>Force-validate every field above, reset all of them, or check current validity. Each button below operates on every <code>[data-ln-validate]</code> on this page.</p>
 							<nav class="demo-actions">
 								<button type="button" class="btn" id="demo-force-validate">Force validate all</button>
 								<button type="button" id="demo-reset-validate">Reset all</button>
 								<button type="button" id="demo-check-valid">Check isValid</button>
 							</nav>
-							<pre><code>const input = document.getElementById('email');
+<pre><code>const input = document.getElementById('email');
 
-input.lnValidate.validate();  // Force validate — returns boolean
-input.lnValidate.reset();     // Clear touched state, remove classes, hide errors
-input.lnValidate.isValid;     // Boolean getter</code></pre>
+input.lnValidate.validate();   // Force-validate now — returns Boolean
+input.lnValidate.reset();      // Clear _touched, hide all errors, remove classes
+input.lnValidate.isValid;      // Live getter — checkValidity() && _customErrors.size === 0
+input.lnValidate.destroy();    // Detach listeners, dispatch :destroyed</code></pre>
 						</main>
 					</section>
 
-					<!-- CSS Classes -->
+					<!-- Attributes reference -->
 					<section class="section-card">
-						<header><h3>CSS Classes</h3></header>
+						<header><h3>Attributes reference</h3></header>
 						<main>
 							<div class="table-container">
 							<table>
-								<thead><tr><th>Class</th><th>When applied</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-validate-valid</code></td><td>Added to the input when it passes validation</td></tr>
-									<tr><td><code>ln-validate-invalid</code></td><td>Added to the input when it fails validation</td></tr>
-								</tbody>
-							</table>
-							</div>
-							<p>Both classes are removed when <code>reset()</code> is called.</p>
-						</main>
-					</section>
-
-					<!-- Events Emitted -->
-					<section class="section-card">
-						<header><h3>Events — Emitted</h3></header>
-						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Event</th><th>Bubbles</th><th>Cancelable</th><th>Detail</th></tr></thead>
-								<tbody>
-									<tr><td><code>ln-validate:valid</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement, field: String }</code></td></tr>
-									<tr><td><code>ln-validate:invalid</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement, field: String }</code></td></tr>
-									<tr><td><code>ln-validate:destroyed</code></td><td>yes</td><td>no</td><td><code>{ target: HTMLElement }</code></td></tr>
+									<tr><td><code>data-ln-validate</code></td><td><code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;textarea&gt;</code></td><td>Marks the field as participating. Creates the instance, attaches listeners. Value ignored.</td></tr>
+									<tr><td><code>data-ln-validate-errors</code></td><td><code>&lt;ul&gt;</code></td><td>Identifies the error-message list. Must be inside the same <code>.form-element</code> wrapper as the field.</td></tr>
+									<tr><td><code>data-ln-validate-error="key"</code></td><td><code>&lt;li&gt;</code></td><td>Identifies a specific error message. Key matches a <code>ValidityState</code> property (native, mapped) or a custom-error name (unmapped).</td></tr>
+									<tr><td><code>.hidden</code> (class)</td><td><code>&lt;li&gt;</code></td><td>Toggle target. Default-applied; removed by <code>validate()</code> (or <code>set-custom</code>) when the matching error is active.</td></tr>
+									<tr><td><code>.ln-validate-valid</code> (class)</td><td>field (auto)</td><td>Written by ln-validate when <code>isValid</code> is true.</td></tr>
+									<tr><td><code>.ln-validate-invalid</code> (class)</td><td>field (auto)</td><td>Written by ln-validate when <code>isValid</code> is false.</td></tr>
 								</tbody>
 							</table>
 							</div>
 						</main>
 					</section>
 
-					<!-- Events Received -->
+					<!-- Events emitted -->
 					<section class="section-card">
-						<header><h3>Events — Received</h3></header>
+						<header><h3>Events — emitted</h3></header>
 						<main>
 							<div class="table-container">
 							<table>
-								<thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
+								<thead><tr><th>Event</th><th>Cancelable</th><th><code>detail</code></th><th>Dispatched when</th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-validate:set-custom</code></td><td><code>{ error: String }</code></td><td>Show a custom error by name. Marks field as invalid.</td></tr>
-									<tr><td><code>ln-validate:clear-custom</code></td><td><code>{ error: String }</code> or <code>{}</code></td><td>Hide a custom error. Omit <code>error</code> to clear all custom errors.</td></tr>
+									<tr><td><code>ln-validate:valid</code></td><td>no</td><td><code>{ target, field }</code></td><td>After <code>validate()</code> determines the field is valid (native + no custom errors).</td></tr>
+									<tr><td><code>ln-validate:invalid</code></td><td>no</td><td><code>{ target, field }</code></td><td>After <code>validate()</code> determines the field is invalid.</td></tr>
+									<tr><td><code>ln-validate:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>destroy()</code> detaches listeners and removes the instance reference.</td></tr>
 								</tbody>
 							</table>
 							</div>
+							<p>All events bubble. <code>detail.field</code> is <code>dom.name</code> — the value of the <code>name</code> attribute, exposed for consumers that want to key per-field state without re-querying the DOM.</p>
 						</main>
 					</section>
 
-					<!-- Event Log -->
+					<!-- Events received -->
 					<section class="section-card">
-						<header><h3>Event Log</h3></header>
+						<header><h3>Events — received</h3></header>
 						<main>
-							<p>Validation events from all demos on this page appear here in real time.</p>
-							<h4>Event log</h4>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th><code>detail</code></th><th>Behavior</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-validate:set-custom</code></td><td><code>{ error: String }</code></td><td>Adds <code>error</code> to <code>_customErrors</code>, sets <code>_touched = true</code>, unhides the matching <code>&lt;li&gt;</code>, flips CSS classes to invalid. <strong>Does NOT call <code>validate()</code> or dispatch <code>:invalid</code></strong>.</td></tr>
+									<tr><td><code>ln-validate:clear-custom</code></td><td><code>{ error: String }</code> or <code>{}</code></td><td>If <code>error</code> provided: removes from set, hides matching <code>&lt;li&gt;</code>. If empty: clears all custom errors, hides every custom <code>&lt;li&gt;</code>. Then if <code>_touched</code>, calls <code>validate()</code> to re-render native state.</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>The asymmetry is intentional. <code>set-custom</code> is silent because the caller already knows the field is invalid. <code>clear-custom</code> must call <code>validate()</code> because removing one custom error might leave other customs active, native errors active, or none of the above — only a fresh <code>validate()</code> can resolve the new state.</p>
+						</main>
+					</section>
+
+					<!-- Event log -->
+					<section class="section-card">
+						<header><h3>Event log</h3></header>
+						<main>
+							<p>Validation events from every demo on this page appear here in real time. Try interacting with the fields above and watch the events fire — note especially how <code>set-custom</code> on the password-confirm field does NOT dispatch <code>:invalid</code> (asymmetric custom-error path).</p>
 							<pre id="validate-log"></pre>
 						</main>
 					</section>
 
-					<!-- Behavior -->
+					<!-- Cross-component coordination -->
 					<section class="section-card">
-						<header><h3>Behavior</h3></header>
+						<header><h3>Cross-component coordination</h3></header>
 						<main>
-							<ul>
-								<li>Fields start clean — no errors, no CSS classes on page load</li>
-								<li>Validation begins only after the first interaction (<code>input</code> event for text fields, <code>change</code> event for select/checkbox/radio)</li>
-								<li>Text inputs: validates on every <code>input</code> event (keystrokes, paste, autofill)</li>
-								<li>Select/checkbox/radio: validates on <code>change</code> event</li>
-								<li>Errors appear immediately when input becomes invalid</li>
-								<li>Errors clear immediately when input becomes valid</li>
-								<li>Works standalone or with <code>ln-form</code></li>
-							</ul>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Component</th><th>Coordination</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-form</code></td><td>Listens for bubbled <code>:valid</code> / <code>:invalid</code>, re-evaluates submit-button state by re-querying <code>[data-ln-validate]</code> fields and calling <code>checkValidity()</code> on each. On <code>lnForm.submit()</code>, force-validates every field. On <code>lnForm.reset()</code>, dispatches synthetic <code>input</code>/<code>change</code> first, then calls <code>instance.reset()</code> on every validate field — order matters.</td></tr>
+									<tr><td><code>ln-autosave</code></td><td>None directly. Restores values via <code>populateForm()</code>, dispatches synthetic <code>input</code>/<code>change</code>. ln-validate's listeners catch them and validate. Pure platform event flow.</td></tr>
+									<tr><td><code>ln-confirm</code></td><td>Independent. Confirm gates the click on a destructive button; validate operates on form fields. Different elements, different event channels.</td></tr>
+									<tr><td><code>ln-store</code></td><td>None directly. ln-store dispatches <code>ln-form:error</code> on the form for 4xx server responses. ln-validate does NOT subscribe — the application or a future form-coordinator translates server errors into <code>ln-validate:set-custom</code> dispatches. The injection point is <code>set-custom</code>; the producer is consumer code.</td></tr>
+									<tr><td><code>ln-autoresize</code></td><td>Indirectly. Both listen to <code>input</code> on textareas. They don't coordinate — they happen to react to the same trigger. A <code>&lt;textarea data-ln-validate data-ln-autoresize&gt;</code> resizes and validates simultaneously on every keystroke.</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>The pattern is consistent: ln-validate writes to the platform (classes, <code>.hidden</code> toggles, custom events) and reads from the platform (<code>input</code>, <code>change</code>, browser <code>validity</code>). Other components compose by doing the same. None of them import each other.</p>
 						</main>
 					</section>
 
-					<!-- HTML Structure -->
+					<!-- Common mistakes -->
 					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
+						<header><h3>Common mistakes</h3></header>
 						<main>
-							<pre><code>&lt;div class="form-element"&gt;
-    &lt;label for="email"&gt;Email&lt;/label&gt;
-    &lt;input id="email" name="email" type="email" required minlength="5" data-ln-validate&gt;
-    &lt;ul data-ln-validate-errors&gt;
-        &lt;li class="hidden" data-ln-validate-error="required"&gt;This field is required&lt;/li&gt;
-        &lt;li class="hidden" data-ln-validate-error="typeMismatch"&gt;Invalid email format&lt;/li&gt;
-        &lt;li class="hidden" data-ln-validate-error="tooShort"&gt;Must be at least 5 characters&lt;/li&gt;
-    &lt;/ul&gt;
-&lt;/div&gt;</code></pre>
+							<h4>1. Skipping the <code>.form-element</code> wrapper</h4>
+							<p><code>validate()</code> uses <code>dom.closest('.form-element')</code> — null returns short-circuit the error-list lookup. CSS classes on the field still toggle, but no message renders.</p>
+
+							<h4>2. Programmatic <code>el.value = '...'</code> writes don't validate</h4>
+							<p>Setting <code>.value</code> is silent — neither <code>input</code> nor <code>change</code> fires. Either dispatch the event yourself (mirror the <code>isChangeBased</code> fork) or use <code>lnForm.fill(data)</code> which does the dispatch loop.</p>
+
+							<h4>3. Listening for <code>:invalid</code> after <code>set-custom</code></h4>
+							<p><code>_onSetCustom</code> is intentionally silent at the event level — visible-state changes only, no <code>:invalid</code> dispatch. To make <code>ln-form</code>'s submit-button gate learn about custom errors, also call <code>instance.validate()</code> after the dispatch — that path dispatches <code>:invalid</code>, which triggers ln-form to re-evaluate.</p>
+
+							<h4>4. Relying on the browser's <code>:invalid</code> pseudo-class</h4>
+							<p>CSS <code>:invalid</code> fires on every empty required field on page load — exactly what <code>_touched</code> exists to avoid. Use <code>.ln-validate-invalid</code> instead.</p>
+
+							<h4>5. Putting <code>data-ln-validate</code> on a non-form element</h4>
+							<p><code>&lt;div data-ln-validate&gt;</code> crashes on the first event — <code>div.checkValidity()</code> is undefined. Mark only inputs, selects, and textareas.</p>
+
+							<h4>6. Multiple <code>&lt;li&gt;</code>s with the same key</h4>
+							<p>Both unhide simultaneously — the user sees duplicate messages. Pick one and use a custom-error key for the variant.</p>
+
+							<p>For the full list with code samples and explanations, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-validate/README.md#common-mistakes">README §Common mistakes</a>.</p>
 						</main>
 					</section>
 
@@ -271,7 +337,7 @@ input.lnValidate.isValid;     // Boolean getter</code></pre>
 		pre.scrollTop = pre.scrollHeight;
 	};
 
-	// ─── 2A — Custom validation (password confirmation) ────────
+	// ─── Custom validation: password confirmation ──────────────
 	const pass = document.getElementById('demo-pass');
 	const passConfirm = document.getElementById('demo-pass-confirm');
 
@@ -294,7 +360,7 @@ input.lnValidate.isValid;     // Boolean getter</code></pre>
 	pass.addEventListener('input', evaluateMatch);
 	passConfirm.addEventListener('input', evaluateMatch);
 
-	// ─── 2B — Programmatic API buttons ─────────────────────────
+	// ─── Programmatic API buttons ─────────────────────────────
 	const allInputs = function () {
 		return document.querySelectorAll('[data-ln-validate]');
 	};
@@ -326,7 +392,7 @@ input.lnValidate.isValid;     // Boolean getter</code></pre>
 		});
 	});
 
-	// ─── 2C — Event log ────────────────────────────────────────
+	// ─── Event log ─────────────────────────────────────────────
 	const log = document.getElementById('validate-log');
 
 	const onValidateEvent = function (e) {

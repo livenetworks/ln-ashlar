@@ -12,7 +12,7 @@
 //
 // Size variants: circular-progress-sm, circular-progress-lg, circular-progress-xl
 // Color variants: override --color-primary on the element or a wrapper:
-//   [data-ln-circular-progress].success { --color-primary: var(--color-success-hsl); }
+//   [data-ln-circular-progress].success { --color-primary: var(--color-success); }
 
 @mixin circular-progress {
 	@include relative;

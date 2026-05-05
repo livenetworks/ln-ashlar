@@ -22,6 +22,48 @@ execute. Instead:
 This applies to architecture discussions, spec reviews, and planning.
 For implementation tasks ("create this file", "fix this bug"), execute directly.
 
+## Grep before claiming (non-negotiable)
+
+Before recommending an architecture, refactor, or claiming that a behavior /
+method / event exists, run a cross-component `grep` first. Trust the code,
+not the mental model of "what the canonical shape should be."
+
+This strengthens Working Mode §3 ("Reference existing decisions"). Mental
+shorthand: **claim → grep → propose**. Never claim → propose → discover-too-late.
+
+**Applies to:**
+
+- Behavior claims ("X already does Y")
+- Existence claims ("event Z is dispatched", "method W is on the prototype",
+  "this listener already wires to that")
+- Architectural recommendations ("the coordinator should sort", "the store
+  should hold the data") — verify what currently does it before suggesting
+  who should.
+
+**Workflow:**
+
+1. Identify the concept (sort, filter, fetch, validation, render, sync,
+   event name, attribute, helper utility, etc.).
+2. `grep` across the WHOLE library — `js/`, `scss/`, demos — not just the
+   component currently in focus.
+3. Only after that, write the proposal.
+
+**Real failures from past sessions** — every one was a 2-second `grep` away:
+
+- Recommended coordinator-driven sort while `ln-store._sort` already existed
+  (`js/ln-store/ln-store.js`).
+- Claimed `ln-form:success` / `ln-form:error` existed — only `ln-form:submit`
+  does. Other consumers must dispatch outcome events themselves.
+- Suggested using `document.querySelectorAll` for runtime fan-out — direct
+  violation of the library's "no post-init DOM scans" rule.
+- Documented `_dateTs` as a coordinator-side pattern when sort by canonical
+  value is a store concern.
+
+**Auto-mode caveat.** Auto mode biases toward "action over planning."
+That bias makes skip-grep MORE likely, not less. The rule is strictest in
+auto mode — discovery is part of the action, not a separate planning step
+to skip.
+
 ## What is this?
 
 `ln-ashlar` is a unified frontend library for LiveNetworks projects.

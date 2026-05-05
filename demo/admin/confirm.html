@@ -166,95 +166,291 @@
 
 		<!-- Content -->
 		<section>
-<h1>Confirm</h1>
-					<p>A confirmation prompt for destructive actions. First click changes the button text; second click allows the action.</p>
-
-					<!-- Basics -->
+<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Basics</h3></header>
+						<header><h3>Overview</h3></header>
+						<main>
+							<p>A 109-line two-click gate for destructive actions. Set <code>data-ln-confirm="Are you sure?"</code> on the destructive button. First click is silently swallowed and the button morphs into the prompt; second click within the timeout (default 3 seconds) passes through to whatever the button was already going to do — submit a form, follow a link, run an existing click handler. Auto-reverts if the second click does not arrive.</p>
+							<p><code>window.confirm()</code> is banned in this project — synchronous (freezes the page), unstyleable (looks like a 1998 system dialog), unkeyboardable in some browsers, untranslatable. <code>ln-confirm</code> is the lighter answer: the destructive button becomes its own gate. There is no separate dialog, no <code>:accept</code> callback, no rewiring of the form's <code>action</code> or the button's <code>onclick</code>. The platform's native event flow runs unmodified on the second click.</p>
+							<p><strong>The accept semantic IS the platform <code>click</code>.</strong> ln-confirm intercepts the first click via <code>preventDefault</code> + <code>stopImmediatePropagation</code>, but the second click is released — no <code>preventDefault</code>, no <code>stopImmediatePropagation</code>. The form submits, the link navigates, the existing click handler fires. There is exactly one custom event: <code>ln-confirm:waiting</code> on the FIRST click, for analytics. There is no <code>ln-confirm:accept</code>. If you need to run code on accept, attach to the form's <code>submit</code>, the button's <code>click</code>, or the link's navigation — exactly as you would without <code>ln-confirm</code>.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-confirm/README.md"><code>ln-confirm</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/confirm.md">architecture reference</a>.</p>
+						</main>
+					</section>
+
+					<!-- Anatomy -->
+					<section class="section-card">
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>The minimum invocation is one attribute on the destructive button:</p>
+<pre><code>&lt;button data-ln-confirm="Are you sure?"&gt;Delete record&lt;/button&gt;</code></pre>
+
+							<h4>Two render modes — text button and icon-only button</h4>
+							<p>The component branches at confirm time on whether the button has any text content at construction (it captures <code>dom.textContent.trim()</code> in the constructor and reads it back later):</p>
+							<ul>
+								<li><strong>Text button</strong> (constructor saw non-empty text) — confirm-state replaces <code>textContent</code> with the prompt. The button visually says "Are you sure?" while armed and reverts to its original label on revert.</li>
+								<li><strong>Icon-only button</strong> (constructor saw empty text) — confirm-state finds the inner <code>svg.ln-icon use</code>, swaps its <code>href</code> to <code>#ln-check</code>, adds <code>.ln-confirm-tooltip</code> on the button, and writes the prompt text into <code>data-tooltip-text</code>. CSS reads the attribute and renders an <code>::after</code> tooltip bubble above the button. <code>ln-icons</code> watches the <code>&lt;use href&gt;</code> mutation and ensures the swap target icon is in the sprite.</li>
+							</ul>
+							<p>The branch is determined ONCE at construction. If you mount <code>data-ln-confirm</code> on an empty-text button and later add text content, the next confirm cycle still treats it as an icon button (because <code>this.originalText</code> was captured empty on construction). Re-init by calling <code>btn.lnConfirm.destroy()</code> followed by re-creating the instance, or set the text BEFORE the attribute lands.</p>
+
+							<h4>What state goes where</h4>
+							<p>"Should this button confirm before action?" lives on <code>data-ln-confirm</code> (presence). "Currently armed?" lives on <code>data-confirming="true"</code> on the button — the public CSS hook. "Auto-revert timeout (seconds)" lives on <code>data-ln-confirm-timeout</code>. "Original label" / "original icon <code>href</code>" live on the JS instance, captured at construction (text) or at first arm (icon).</p>
+							<p>The underlying destructive action — <code>type="submit"</code>, <code>href</code>, an existing <code>click</code> listener — is owned by you, untouched by <code>ln-confirm</code>. The component does not run it; the second click does, by way of the platform's default action handling.</p>
+						</main>
+					</section>
+
+					<!-- Attributes reference -->
+					<section class="section-card">
+						<header><h3>Attributes reference</h3></header>
 						<main>
 							<div class="table-container">
 							<table>
-								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Owned by</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-confirm="Confirm?"</code></td><td data-label="On element">button</td><td data-label="Description">Enables confirm behavior. Value is the confirmation text.</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-confirm-timeout="3"</code></td><td data-label="On element">button</td><td data-label="Description">Timeout in seconds before auto-revert (default: 3). Observable.</td></tr>
-									<tr><td data-label="Attribute"><code>data-confirming</code></td><td data-label="On element">button</td><td data-label="Description">Added automatically while awaiting confirmation.</td></tr>
+									<tr><td><code>data-ln-confirm="text"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code></td><td>Marks the button as confirm-gated. Value is the prompt text shown on first click. If empty, defaults to <code>"Confirm?"</code>. Captured at construction; mutating later does not propagate to the live instance.</td></tr>
+									<tr><td><code>data-ln-confirm-timeout="3"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code></td><td>Auto-revert delay in seconds. Default <code>3</code>. Accepts decimals (<code>"1.5"</code>). Read fresh at first-click time inside <code>_startTimer</code>; mutating mid-armed does NOT extend the running timer (NOT in the observer's <code>attributeFilter</code>).</td></tr>
+									<tr><td><code>data-confirming="true"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Set by JS while the button is armed. Removed on second click, on timer fire, or on <code>destroy()</code>. Public CSS hook for the confirming state.</td></tr>
+									<tr><td><code>.ln-confirm-tooltip</code> (class)</td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Added in icon-only mode while armed. Removed on revert. Marker for the tooltip-bubble CSS in <code>@mixin confirm-tooltip</code>.</td></tr>
+									<tr><td><code>data-tooltip-text="text"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Set in icon-only mode while armed. Carries the prompt text for the CSS-driven <code>::after</code> tooltip bubble (read via <code>attr(data-tooltip-text)</code> in <code>@mixin confirm-tooltip</code>). Distinct from <code>data-ln-tooltip</code>.</td></tr>
 								</tbody>
 							</table>
 							</div>
 						</main>
 					</section>
 
-					<!-- Simple Demo -->
+					<!-- Basic Example -->
 					<section class="section-card">
-						<header><h3>Example — Simple Buttons</h3></header>
+						<header><h3>Example — Text buttons</h3></header>
 						<main>
+							<p>Click once: the button morphs into the prompt and turns red. Click within 3 seconds: the click passes through (these have no <code>type="submit"</code> and no <code>onclick</code>, so nothing happens — that's the point: the component does not <em>cause</em> an action, it gates an existing one). Wait 3 seconds: the button auto-reverts.</p>
 							<div class="demo-actions">
-								<button class="btn error" data-ln-confirm="Are you sure?">Delete Record</button>
-								<button type="button" data-ln-confirm="Reset settings?">Reset Defaults</button>
+								<button data-ln-confirm="Are you sure?">Delete record</button>
+								<button data-ln-confirm="Reset settings?">Reset defaults</button>
 							</div>
+						</main>
+					</section>
+
+					<!-- Icon-only Example -->
+					<section class="section-card">
+						<header><h3>Example — Icon-only buttons</h3></header>
+						<main>
+							<p>The constructor sees empty text and a <code>svg.ln-icon use</code> child, so the icon-only branch runs on first click: the trash icon swaps to a check icon, the button gets <code>.ln-confirm-tooltip</code> + <code>data-tooltip-text="Delete?"</code>, and CSS renders a tooltip bubble above the button via <code>@mixin confirm-tooltip</code>. The icon-only branch also handles screen-reader output — it captures the original <code>aria-label</code> ("Delete"), swaps it to the prompt text ("Delete?"), and appends a transient <code>&lt;span class="sr-only" role="alert"&gt;</code> announcer inside the button. AT speaks the prompt on first click; on revert, the announcer is removed and the original <code>aria-label</code> is restored. Try it with VoiceOver / NVDA.</p>
+							<ul class="demo-actions">
+								<li>
+									<button aria-label="Delete" data-ln-confirm="Delete?">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+									</button>
+								</li>
+								<li>
+									<button aria-label="Archive" data-ln-confirm="Archive?">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-archive"></use></svg>
+									</button>
+								</li>
+								<li>
+									<button aria-label="Remove" data-ln-confirm="Remove this?">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</li>
+							</ul>
 						</main>
 					</section>
 
 					<!-- Custom Timeout -->
 					<section class="section-card">
-						<header><h3>Example — Custom Timeout</h3></header>
+						<header><h3>Example — Custom timeout</h3></header>
 						<main>
-							<p>Use <code>data-ln-confirm-timeout</code> to override the default 3-second revert. The attribute is observed — changing it dynamically restarts the timer.</p>
+							<p>Use <code>data-ln-confirm-timeout</code> to override the default 3-second auto-revert. Read fresh at first-click time only — mutating the attribute mid-armed does NOT extend the running timer (the attribute is not in the observer's <code>attributeFilter</code>; see "Common mistakes" item 4 in the README).</p>
 							<div class="demo-actions">
-								<button class="btn error" data-ln-confirm="Confirm?" data-ln-confirm-timeout="1.5">1.5s timeout</button>
-								<button class="btn error" data-ln-confirm="Confirm?">3s default</button>
-								<button class="btn error" data-ln-confirm="Confirm?" data-ln-confirm-timeout="6">6s timeout</button>
+								<button data-ln-confirm="Confirm?" data-ln-confirm-timeout="1.5">1.5s timeout</button>
+								<button data-ln-confirm="Confirm?">3s default</button>
+								<button data-ln-confirm="Confirm?" data-ln-confirm-timeout="6">6s timeout</button>
 							</div>
 						</main>
 					</section>
 
-					<!-- Form Demo -->
+					<!-- Form submit Example -->
 					<section class="section-card">
-						<header><h3>Example — Inside a Form</h3></header>
+						<header><h3>Example — Inside a form (the canonical pattern)</h3></header>
 						<main>
-							<form onsubmit="event.preventDefault(); window.lnToast.enqueue({type:'success', title:'Success', message:'Form submitted!'})">
-								<p>Confirmation prevents the form from submitting on the first click.</p>
-								<button type="submit" class="error" data-ln-confirm="Submit and Delete?">Confirm Action</button>
+							<p>The destructive flow that <code>ln-confirm</code> exists for. First click arms the button. Second click within timeout — <code>_reset</code> runs synchronously, the click continues through the platform's default action processor, the form's <code>submit</code> event fires (because nothing called <code>preventDefault</code>), and the form submits via its native <code>action</code> / <code>method</code>. No JS rewiring; <code>type="submit"</code> is the contract.</p>
+							<p>This demo intercepts the <code>submit</code> event with a toast just to keep the page from navigating — production code would let the platform POST run.</p>
+							<form id="demo-form-submit">
+								<div class="form-actions">
+									<button type="submit" data-ln-confirm="Submit and Delete?">Submit destructive action</button>
+								</div>
 							</form>
 						</main>
 					</section>
 
-					<!-- CSS Styling -->
+					<!-- AJAX click Example -->
 					<section class="section-card">
-						<header><h3>CSS Styling</h3></header>
+						<header><h3>Example — Non-form button with AJAX click handler</h3></header>
 						<main>
-							<p>Use the <code>[data-confirming]</code> selector to style the button during the confirmation state.</p>
-							<pre><code>[data-confirming] {
-    background-color: var(--color-error);
-    color: white;
-}</code></pre>
+							<p>When the destructive action is an AJAX call that does NOT go through a form, attach the destructive code to the button's <code>click</code> listener as you normally would. <code>ln-confirm</code> gates the first click via <code>preventDefault</code> + <code>stopImmediatePropagation</code>, so this listener does NOT run on the first click. On the second click, <code>ln-confirm</code> returns silently (no <code>preventDefault</code>), so this listener runs.</p>
+							<div class="demo-actions">
+								<button id="demo-ajax-btn" data-ln-confirm="Clear cache?">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+									Clear server cache
+								</button>
+							</div>
+							<p><strong>Listener attachment order matters.</strong> <code>stopImmediatePropagation</code> only blocks listeners on the SAME element that have not yet run. <code>ln-confirm</code> attaches at construction time (typically <code>DOMContentLoaded</code> or shortly after); listeners attached BEFORE then will fire on the first click too. In normal flow this is rarely an issue because ln-ashlar loads early.</p>
+						</main>
+					</section>
+
+					<!-- Listening to :waiting -->
+					<section class="section-card">
+						<header><h3>Example — Listening for arm events</h3></header>
+						<main>
+							<p>The one event <code>ln-confirm</code> dispatches: <code>ln-confirm:waiting</code> on the first click, AFTER the visual swap and timer schedule, with <code>{ target }</code> in the detail. Use it for analytics ("user almost-deleted"), page-level chrome ("show a Cancel All button while any confirm is armed"), or debugging.</p>
+							<p>Note that by the time the event fires, the button's <code>textContent</code> is the prompt text (<code>"Are you sure?"</code>), not the original label. Read <code>btn.lnConfirm.originalText</code> if you want the original label, or attach a more specific listener that knows the button identity.</p>
+							<div class="demo-actions">
+								<button id="demo-arm-track" data-ln-confirm="Track this arm?">Track me</button>
+							</div>
+							<p id="demo-arm-log" class="demo-log">Arm event log will appear here.</p>
+						</main>
+					</section>
+
+					<!-- Button group Example -->
+					<section class="section-card">
+						<header><h3>Example — Multiple confirms in a button group</h3></header>
+						<main>
+							<p>Each <code>[data-ln-confirm]</code> button is its own instance with its own arm-state. Arming one does NOT arm the others; arming one does NOT reset already-armed siblings. Each runs its own auto-revert timer.</p>
+							<ul class="demo-actions">
+								<li>
+									<button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
+								</li>
+								<li>
+									<button aria-label="Duplicate"><svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg></button>
+								</li>
+								<li>
+									<button aria-label="Archive" data-ln-confirm="Archive?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-archive"></use></svg></button>
+								</li>
+								<li>
+									<button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
+								</li>
+							</ul>
+						</main>
+					</section>
+
+					<!-- Inside a table Example -->
+					<section class="section-card">
+						<header><h3>Example — Inside <code>[data-ln-table]</code> (overflow escape)</h3></header>
+						<main>
+							<p><code>ln-data-table</code> uses <code>overflow: clip</code> on <code>[data-ln-table]</code>, which would clip the icon-only mode's tooltip bubble. The co-located rule <code>[data-ln-table]:has([data-confirming]) { overflow: visible; }</code> reverts the table to <code>overflow: visible</code> while ANY descendant button is armed. The moment the button reverts, <code>:has()</code> unmatches and the clip is restored.</p>
+							<div class="table-container" data-ln-table>
+								<table>
+									<thead><tr><th>Item</th><th>Status</th><th>Actions</th></tr></thead>
+									<tbody>
+										<tr>
+											<td>Project Alpha</td>
+											<td>Active</td>
+											<td>
+												<ul>
+													<li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+													<li><button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+												</ul>
+											</td>
+										</tr>
+										<tr>
+											<td>Project Beta</td>
+											<td>Archived</td>
+											<td>
+												<ul>
+													<li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+													<li><button aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+												</ul>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</main>
 					</section>
 
 					<!-- API -->
 					<section class="section-card">
-						<header><h3>API & Events</h3></header>
+						<header><h3>API</h3></header>
 						<main>
-							<article>
-								<h4>Constructor</h4>
-								<pre><code>// Manual initialization
-window.lnConfirm(document.body);</code></pre>
-							</article>
-							<article>
-								<h4>Events</h4>
-								<div class="table-container">
-								<table>
-									<thead><tr><th>Event</th><th>Detail</th></tr></thead>
-									<tbody>
-										<tr><td><code>ln-confirm:waiting</code></td><td><code>{ target }</code></td></tr>
-									</tbody>
-								</table>
-								</div>
-							</article>
+<pre><code>const btn = document.querySelector('[data-ln-confirm]');
+
+btn.lnConfirm.confirming;       // boolean — true while armed
+btn.lnConfirm.originalText;     // string — captured at construction
+btn.lnConfirm.confirmText;      // string — captured at construction
+
+btn.lnConfirm.destroy();        // _reset() if armed, then unbind click listener,
+                                //   delete instance reference. data-ln-confirm
+                                //   attribute stays in place — caller controls
+                                //   markup.
+
+window.lnConfirm(root);         // re-run init scan over `root`. Only needed for
+                                //   Shadow DOM / iframe roots the global
+                                //   MutationObserver cannot see.</code></pre>
+							<p>There is no <code>arm()</code>, <code>accept()</code>, or <code>cancel()</code> method. The component shape is "click is the only input." Programmatic open/close would contradict the in-place model — the second click IS the accept, and there is nothing else for ln-confirm to do.</p>
 						</main>
 					</section>
+
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<h4>1. Listening for an <code>:accept</code> event that does not exist</h4>
+							<p>There is no <code>ln-confirm:accept</code>. The accept semantic IS the platform <code>click</code> on the second click — attach to the form's <code>submit</code>, the button's <code>click</code>, or the link's navigation. <code>ln-confirm:waiting</code> (the only event) fires on the FIRST click, not the second.</p>
+
+							<h4>2. Both an <code>onclick</code> and a <code>&lt;form action&gt;</code></h4>
+							<p>Both run on the second click, in order — the in-place pattern doesn't change platform behavior. If only one should run, drop the other or call <code>e.preventDefault()</code> in the click handler.</p>
+
+							<h4>3. Double-click protection is the consumer's job</h4>
+							<p>Once the second click passes through, <code>ln-confirm</code> is done. If the user clicks again during the AJAX round-trip, the action runs again. Disable the button in your <code>submit</code> / <code>click</code> handler, or wire <code>data-ln-form</code> which handles <code>aria-busy</code>.</p>
+
+							<h4>4. Expecting <code>data-ln-confirm-timeout</code> mutations to take effect mid-confirm</h4>
+							<p>Does NOT work. The attribute is read fresh at first-click time only, and is not in the observer's <code>attributeFilter</code>. Change the attribute BEFORE the user arms (in markup, or in coordinator code that updates the attribute when destructiveness changes). Earlier docs claimed this was reactive — that was a documentation bug.</p>
+
+							<h4>5. Using <code>&lt;a data-ln-confirm&gt;</code> for destructive actions</h4>
+							<p>Works (the second click navigates), but destructive actions over GET are an antipattern — pre-fetchers, link-preview crawlers, and shared-link unfurlers can fire GET requests at the URL without any user interaction. Use a form-submit button for actually-destructive actions.</p>
+
+							<h4>6. Calling <code>.click()</code> programmatically and expecting two-clicks behavior</h4>
+							<p>Two synchronous <code>.click()</code> calls pass through the gate (first arms, second clears). <code>ln-confirm</code> doesn't check <code>isTrusted</code> — it's a UX gate, not a security gate. Server-side checks (CSRF, second-factor) are the right defense against programmatic destruction.</p>
+						</main>
+					</section>
+
+<script>
+	(function () {
+		// Form submit demo — toast on submit instead of POST navigation
+		const form = document.getElementById('demo-form-submit');
+		if (form) {
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
+				if (window.lnToast && window.lnToast.enqueue) {
+					window.lnToast.enqueue({ type: 'success', title: 'Submitted', message: 'Form submit fired (the platform default action ran on the second click).' });
+				}
+			});
+		}
+
+		// AJAX click demo — toast instead of fetch
+		const ajaxBtn = document.getElementById('demo-ajax-btn');
+		if (ajaxBtn) {
+			ajaxBtn.addEventListener('click', function () {
+				// Runs only on the SECOND click — first click is preventDefault'd
+				// and stopImmediatePropagation'd by ln-confirm before reaching here.
+				if (window.lnToast && window.lnToast.enqueue) {
+					window.lnToast.enqueue({ type: 'success', title: 'Cleared', message: 'Cache clear request fired (this listener runs only on the second click).' });
+				}
+			});
+		}
+
+		// Track arm event demo
+		const trackBtn = document.getElementById('demo-arm-track');
+		const trackLog = document.getElementById('demo-arm-log');
+		if (trackBtn && trackLog) {
+			trackBtn.addEventListener('ln-confirm:waiting', function (e) {
+				const original = e.detail.target.lnConfirm
+					? e.detail.target.lnConfirm.originalText
+					: '(unknown)';
+				const ts = new Date().toLocaleTimeString();
+				trackLog.textContent = '[' + ts + '] ln-confirm:waiting fired on button "' + original + '"';
+			});
+		}
+	})();
+</script>
 		</section>
 
 		<!-- Footer -->

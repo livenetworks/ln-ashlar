@@ -19,6 +19,19 @@ th:hover [data-ln-col-sort] {
 	@include data-table-sort-active;
 }
 
+// Active-state icon swap — hide the neutral dual-arrow, show the
+// matching directional icon. Mixin defaults all three to "none shown,
+// asc/desc hidden"; we override per active class.
+.ln-sort-asc [data-ln-col-sort] {
+	[data-ln-sort-icon="none"] { display: none; }
+	[data-ln-sort-icon="asc"]  { display: inline-block; }
+}
+
+.ln-sort-desc [data-ln-col-sort] {
+	[data-ln-sort-icon="none"] { display: none; }
+	[data-ln-sort-icon="desc"] { display: inline-block; }
+}
+
 // ─── Filter button ────────────────────────────────────────
 
 [data-ln-col-filter] {

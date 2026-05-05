@@ -166,12 +166,88 @@
 
 		<!-- Content -->
 		<section>
-<h1>Data Table</h1>
-					<p>Event-driven data table. Receives data via <code>ln-data-table:set-data</code>, renders rows from <code>&lt;template&gt;</code>. Sort, filter, search, selection, virtual scroll, keyboard navigation.</p>
+<section class="section-card">
+						<header><h3>Overview</h3></header>
+						<main>
+							<p>Event-driven data table. Receives data via <code>ln-data-table:set-data</code>, renders rows from <code>&lt;template&gt;</code>. Sort, filter, search, selection, virtual scroll, keyboard navigation.</p>
+							<p>The table is a render engine, not a data source. It announces what it needs through <code>ln-data-table:request-data</code> and waits for a coordinator to feed records back via <code>ln-data-table:set-data</code>. Server-driven, client-cached or static — the table doesn't care; it only knows about markup, events and rendering.</p>
+							<p>This page documents the markup anatomy, then exercises every feature on a 10,000-row demo. For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-data-table/README.md"><code>ln-data-table</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/data-table.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
-					<!-- ln-data-table Attributes -->
+					<!-- Anatomy -->
 					<section class="section-card">
-						<header><h3>Attributes</h3></header>
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>The minimal shape — every working table is a variation on this skeleton.</p>
+<pre><code>&lt;section data-ln-data-table="documents" data-ln-data-table-selectable&gt;
+
+    &lt;header&gt; &lt;!-- toolbar (yours) --&gt;
+        &lt;input type="search" data-ln-data-table-search&gt;
+    &lt;/header&gt;
+
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th data-ln-col-select&gt;&lt;/th&gt;
+                &lt;th data-ln-col="title"&gt;
+                    Title
+                    &lt;button data-ln-col-sort aria-label="Sort"&gt;
+                        &lt;svg data-ln-sort-icon="none"&gt;&lt;use href="#ln-arrows-sort"&gt;&lt;/use&gt;&lt;/svg&gt;
+                        &lt;svg data-ln-sort-icon="asc"&gt; &lt;use href="#ln-arrow-up"&gt;&lt;/use&gt;&lt;/svg&gt;
+                        &lt;svg data-ln-sort-icon="desc"&gt;&lt;use href="#ln-arrow-down"&gt;&lt;/use&gt;&lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/th&gt;
+                &lt;th data-ln-col="department"&gt;
+                    Department
+                    &lt;button data-ln-col-filter&gt;&lt;svg&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;
+                &lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody data-ln-data-table-body&gt;&lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;template data-ln-template="documents-row"&gt;
+        &lt;tr data-ln-row&gt;
+            &lt;td&gt;&lt;input type="checkbox" data-ln-row-select&gt;&lt;/td&gt;
+            &lt;td data-ln-cell="title"&gt;&lt;/td&gt;
+            &lt;td data-ln-cell="department"&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/template&gt;
+&lt;/section&gt;</code></pre>
+
+							<h4>The component root — <code>&lt;section data-ln-data-table="..."&gt;</code></h4>
+							<p>The attribute value is the <strong>table name</strong>, unique per page. It's echoed in every event the table dispatches (<code>detail.table === 'documents'</code>) so a coordinator listening at <code>document</code> level can route by name. <code>data-ln-data-table-selectable</code> is opt-in — it switches on row checkboxes, select-all, and the <code>ln-data-table:select</code> event.</p>
+
+							<h4>The toolbar — yours, the table just listens</h4>
+							<p>The component does not build the toolbar. It only watches for one element: an <code>&lt;input&gt;</code> carrying <code>data-ln-data-table-search</code>. Each keystroke updates state, dispatches <code>ln-data-table:search</code> and triggers a fresh <code>request-data</code>. Place the input wherever it fits the page layout.</p>
+
+							<h4>Column headers — <code>&lt;th data-ln-col="field"&gt;</code></h4>
+							<p>The string after <code>data-ln-col=</code> is the data field name. It ties the column to the row template — <code>&lt;th data-ln-col="title"&gt;</code> matches <code>&lt;td data-ln-cell="title"&gt;</code>. Without <code>data-ln-col</code>, the column has no field to sort or filter on; it's treated as presentational (the "Actions" column is the typical example).</p>
+
+							<h4>The sort button — three icons, one source of truth</h4>
+							<p>The sort button contains <strong>three</strong> sibling <code>&lt;svg&gt;</code> icons, distinguished by <code>data-ln-sort-icon="none|asc|desc"</code>. All three sit in the DOM at all times. CSS shows exactly one based on a class on the ancestor <code>&lt;th&gt;</code>:</p>
+							<ul>
+								<li>Default (no class) → the <code>"none"</code> icon (<code>ln-arrows-sort</code>) is visible.</li>
+								<li><code>&lt;th class="ln-sort-asc"&gt;</code> → the <code>"asc"</code> icon (<code>ln-arrow-up</code>) is visible.</li>
+								<li><code>&lt;th class="ln-sort-desc"&gt;</code> → the <code>"desc"</code> icon (<code>ln-arrow-down</code>) is visible.</li>
+							</ul>
+							<p>The component never swaps an SVG, never replaces an icon URL, never sets inline styles. It toggles a class on the <code>&lt;th&gt;</code>; CSS does the rest. This is the cleanest example in the library of <em>markup-driven state</em> — every visual change is a class flip, and the icons live declaratively in HTML where you can read them.</p>
+
+							<h4>The row template — <code>&lt;template data-ln-template="{name}-row"&gt;</code></h4>
+							<p>The component clones this template once per record and fills cells: <code>data-ln-cell="field"</code> sets <code>textContent</code>, <code>data-ln-cell-attr="field:attr"</code> sets attributes (comma-separated for multiple). Why a <code>&lt;template&gt;</code> and not a static row? A static row would render empty in the initial paint. A <code>&lt;template&gt;</code> is inert until cloned — the component owns when rows appear. Why not build rows in JS? Because then the row layout lives in your script file and you'd have to redeploy JS to add a column.</p>
+
+							<h4>Cell text is set via <code>textContent</code>, never <code>innerHTML</code></h4>
+							<p>This is intentional and load-bearing — <code>textContent</code> is XSS-safe. Records can contain any string, including <code>&lt;script&gt;</code> tags or attribute-injection payloads, and they will render as visible text rather than be parsed as markup. If you need rich content per cell, render plain text and use <code>row-click</code> to open a detail view.</p>
+
+							<h4>The footer — count spans with hide-on-zero wrappers</h4>
+							<p>Three optional spans report numbers: <code>data-ln-data-table-total</code>, <code>data-ln-data-table-filtered</code>, <code>data-ln-data-table-selected</code>. The "filtered" and "selected" spans live inside <code>-wrap</code> parents that get the <code>hidden</code> class when the count is zero — so the punctuation around them ("· 12 filtered") disappears with the value. No awkward " · 0 filtered" or empty leading separator.</p>
+						</main>
+					</section>
+
+					<!-- Attributes reference -->
+					<section class="section-card">
+						<header><h3>Attributes reference</h3></header>
 						<main>
 							<div class="table-container">
 							<table>
@@ -185,6 +261,7 @@
 									<tr><td><code>data-ln-col-filter</code></td><td><code>&lt;button&gt;</code></td><td>Filter dropdown trigger.</td></tr>
 									<tr><td><code>data-ln-col-select</code></td><td><code>&lt;th&gt;</code></td><td>Select-all checkbox column.</td></tr>
 									<tr><td><code>data-ln-cell="field"</code></td><td><code>&lt;td&gt;</code> in template</td><td>JS fills cell with field value.</td></tr>
+									<tr><td><code>data-ln-cell-attr="field:attr"</code></td><td>any in template</td><td>JS sets <code>setAttribute(attr, record[field])</code>. Comma-separated for multiple.</td></tr>
 									<tr><td><code>data-ln-row</code></td><td><code>&lt;tr&gt;</code> in template</td><td>Click target for row navigation.</td></tr>
 									<tr><td><code>data-ln-row-select</code></td><td><code>&lt;input&gt;</code> in template</td><td>Row selection checkbox.</td></tr>
 									<tr><td><code>data-ln-row-action="name"</code></td><td><code>&lt;button&gt;</code> in template</td><td>Row action button (edit, delete).</td></tr>
@@ -194,10 +271,12 @@
 						</main>
 					</section>
 
-					<!-- ln-data-table Live Demo -->
+					<!-- Live Demo -->
 					<section class="section-card">
-						<header><h3>Live Demo — 10,000 rows</h3></header>
+						<header><h3>Example — Server-driven listing (10,000 rows)</h3></header>
 						<main>
+							<p>This is the canonical production shape. A coordinator script (see the <code>&lt;script&gt;</code> at the bottom of this page) listens for <code>request-data</code>, applies sort / filter / search to a 10,000-record array, and dispatches <code>set-data</code> back with <code>filterOptions</code> for authoritative filter dropdowns. The 10,000 rows trigger virtual scroll automatically — only visible rows + 15 buffer rows render at a time, but scroll height stays correct via spacer <code>&lt;tr&gt;</code> elements. Try sorting any column, filtering by department or status, searching, selecting individual rows, or pressing <kbd>/</kbd> to focus the search field.</p>
+
 							<section data-ln-data-table="demo-docs"
 							         data-ln-data-table-selectable
 							         id="demo-data-table">
@@ -222,11 +301,11 @@
 											<th data-ln-col-select></th>
 											<th data-ln-col="title">
 												Title
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 											</th>
 											<th data-ln-col="department">
 												Department
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 												<button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 											</th>
 											<th data-ln-col="status">
@@ -235,7 +314,7 @@
 											</th>
 											<th data-ln-col="date">
 												Date
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg></button>
+												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 											</th>
 											<th>Actions</th>
 										</tr>
@@ -306,25 +385,26 @@
 						</main>
 					</section>
 
-					<!-- ln-data-table Events -->
+					<!-- Events reference -->
 					<section class="section-card">
-						<header><h3>Events — ln-data-table</h3></header>
+						<header><h3>Events</h3></header>
 						<main>
+							<p>All events bubble from the <code>[data-ln-data-table]</code> element. Listen at <code>document</code> level for cross-component coordination, or directly on the table for tight scoping. None of the events are cancelable — the table announces; the coordinator decides.</p>
 							<h4>Emitted by table</h4>
 							<div class="table-container">
 							<table>
 								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
 								<tbody>
+									<tr><td><code>ln-data-table:request-data</code></td><td>Init, sort, filter, search, clear</td><td><code>{ table, sort, filters, search }</code></td></tr>
+									<tr><td><code>ln-data-table:rendered</code></td><td>Rows rendered into <code>&lt;tbody&gt;</code></td><td><code>{ table, total, visible }</code></td></tr>
 									<tr><td><code>ln-data-table:sort</code></td><td>User clicks sort</td><td><code>{ table, field, direction }</code></td></tr>
 									<tr><td><code>ln-data-table:filter</code></td><td>User changes filter</td><td><code>{ table, field, values }</code></td></tr>
+									<tr><td><code>ln-data-table:clear-filters</code></td><td>User clears all filters</td><td><code>{ table }</code></td></tr>
 									<tr><td><code>ln-data-table:search</code></td><td>User types in search</td><td><code>{ table, query }</code></td></tr>
 									<tr><td><code>ln-data-table:row-click</code></td><td>User clicks a row</td><td><code>{ table, id, record }</code></td></tr>
 									<tr><td><code>ln-data-table:row-action</code></td><td>User clicks action button</td><td><code>{ table, id, action, record }</code></td></tr>
 									<tr><td><code>ln-data-table:select</code></td><td>Selection changes</td><td><code>{ table, selectedIds, count }</code></td></tr>
-									<tr><td><code>ln-data-table:rendered</code></td><td>Rows rendered</td><td><code>{ table, total, visible }</code></td></tr>
-									<tr><td><code>ln-data-table:clear-filters</code></td><td>User clears all filters</td><td><code>{ table }</code></td></tr>
 									<tr><td><code>ln-data-table:select-all</code></td><td>Select-all toggled</td><td><code>{ table, selected }</code></td></tr>
-									<tr><td><code>ln-data-table:request-data</code></td><td>Table needs data</td><td><code>{ table, sort, filters, search }</code></td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -339,6 +419,42 @@
 								</tbody>
 							</table>
 							</div>
+						</main>
+					</section>
+
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<h4>Putting row markup directly in <code>&lt;tbody&gt;</code></h4>
+<pre><code>&lt;!-- WRONG --&gt;
+&lt;tbody data-ln-data-table-body&gt;
+    &lt;tr data-ln-row&gt;
+        &lt;td data-ln-cell="title"&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/tbody&gt;</code></pre>
+							<p>The component clears <code>&lt;tbody&gt;</code> on every <code>set-data</code> and replaces it with clones from the row template. Static rows are wiped on the first render. Put the row layout inside <code>&lt;template data-ln-template="{name}-row"&gt;</code>.</p>
+
+							<h4>Mismatched <code>data-ln-col</code> and <code>data-ln-cell</code> field names</h4>
+<pre><code>&lt;!-- WRONG — column says "title", cell says "name" --&gt;
+&lt;th data-ln-col="title"&gt;Title&lt;/th&gt;
+...
+&lt;td data-ln-cell="name"&gt;&lt;/td&gt;</code></pre>
+							<p>The cell renders empty because the record has no <code>name</code> field, or the sort request sends <code>field: "title"</code> but the data was prepared under <code>name</code>. Both attributes are the same identifier — pick a convention (the API field name) and align both sides.</p>
+
+							<h4>Single sort icon with JS-driven <code>&lt;use href&gt;</code> swap</h4>
+<pre><code>&lt;!-- WRONG --&gt;
+&lt;button data-ln-col-sort&gt;
+    &lt;svg class="ln-icon"&gt;&lt;use href="#ln-arrows-sort"&gt;&lt;/use&gt;&lt;/svg&gt;
+&lt;/button&gt;</code></pre>
+							<p>Tempting because "one icon, JS swaps the href on sort." It works visually but the wrong layer is doing the work — JS is mutating SVG attributes to convey state that already lives in a class on the <code>&lt;th&gt;</code>. The library shape is three sibling icons; CSS shows the right one. Use the three-icon pattern.</p>
+
+							<h4>Building rows in JS instead of using the template</h4>
+<pre><code>// WRONG
+data.forEach(r =&gt; {
+    tbody.innerHTML += `&lt;tr&gt;&lt;td&gt;${r.title}&lt;/td&gt;&lt;/tr&gt;`;
+});</code></pre>
+							<p>Bypasses the template, opens an XSS hole on <code>r.title</code>, and pulls row layout into the script file. Use <code>set-data</code>; let the component render via the template.</p>
 						</main>
 					</section>
 

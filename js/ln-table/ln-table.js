@@ -47,16 +47,21 @@ import { dispatch, registerComponent } from '../ln-core';
 
 		const self = this;
 
+		// MutationObserver that waits for AJAX-loaded rows. Stored on the
+		// instance so destroy() can disconnect it if rows never arrive.
+		this._emptyTbodyObserver = null;
+
 		if (this.tbody && this.tbody.rows.length > 0) {
 			this._parseRows();
 		} else if (this.tbody) {
-			const observer = new MutationObserver(function () {
+			this._emptyTbodyObserver = new MutationObserver(function () {
 				if (self.tbody.rows.length > 0) {
-					observer.disconnect();
+					self._emptyTbodyObserver.disconnect();
+					self._emptyTbodyObserver = null;
 					self._parseRows();
 				}
 			});
-			observer.observe(this.tbody, { childList: true });
+			this._emptyTbodyObserver.observe(this.tbody, { childList: true });
 		}
 
 		// ─── Search — ln-search dispatches ln-search:change on the target ─────
@@ -438,6 +443,10 @@ import { dispatch, registerComponent } from '../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._disableVirtualScroll();
+		if (this._emptyTbodyObserver) {
+			this._emptyTbodyObserver.disconnect();
+			this._emptyTbodyObserver = null;
+		}
 		this.dom.removeEventListener('ln-search:change', this._onSearch);
 		this.dom.removeEventListener('ln-table:sort', this._onSort);
 		this.dom.removeEventListener('ln-filter:changed', this._onColumnFilter);

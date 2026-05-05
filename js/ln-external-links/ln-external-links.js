@@ -14,7 +14,10 @@ import { dispatch, guardBody } from '../ln-core';
 		if (!_isExternalLink(link)) return;
 
 		link.target = '_blank';
-		link.rel = 'noopener noreferrer';
+		const existing = (link.rel || '').split(/\s+/).filter(Boolean);
+		if (!existing.includes('noopener')) existing.push('noopener');
+		if (!existing.includes('noreferrer')) existing.push('noreferrer');
+		link.rel = existing.join(' ');
 
 		const hint = document.createElement('span');
 		hint.className = 'sr-only';
@@ -38,18 +41,20 @@ import { dispatch, guardBody } from '../ln-core';
 	}
 
 	function _setupClickTracking() {
-		document.body.addEventListener('click', function(e) {
-			const link = e.target.closest('a, area');
-			if (!link) return;
+		guardBody(function() {
+			document.body.addEventListener('click', function(e) {
+				const link = e.target.closest('a, area');
+				if (!link) return;
 
-			if (link.getAttribute('data-ln-external-link') === 'processed') {
-				dispatch(link, 'ln-external-links:clicked', {
-					link: link,
-					href: link.href,
-					text: link.textContent || link.title || ''
-				});
-			}
-		});
+				if (link.getAttribute('data-ln-external-link') === 'processed') {
+					dispatch(link, 'ln-external-links:clicked', {
+						link: link,
+						href: link.href,
+						text: link.textContent || link.title || ''
+					});
+				}
+			});
+		}, 'ln-external-links');
 	}
 
 	function _domObserver() {
@@ -71,12 +76,21 @@ import { dispatch, guardBody } from '../ln-core';
 							}
 						}
 					}
+
+					if (mutation.type === 'attributes' && mutation.attributeName === 'href') {
+						const target = mutation.target;
+						if (target.matches && (target.matches('a') || target.matches('area'))) {
+							_processLink(target);
+						}
+					}
 				}
 			});
 
 			observer.observe(document.body, {
 				childList: true,
-				subtree: true
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['href']
 			});
 		}, 'ln-external-links');
 	}

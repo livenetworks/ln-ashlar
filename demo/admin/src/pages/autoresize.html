@@ -1,35 +1,76 @@
 <!-- ln-page: title="Autoresize — ln-ashlar" h1="Autoresize" -->
 
 <style>
-	#demo-maxheight textarea {
+	#demo-capped-wrapper textarea {
 		resize: none;
 		max-height: 6rem;
 		overflow-y: auto;
 	}
+	#demo-no-handle textarea {
+		resize: none;
+	}
 </style>
 
-					<h1>Autoresize</h1>
-					<p>Auto-expanding textarea — grows with content, scrolls after max height.</p>
-
-					<!-- Attributes -->
+					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Attributes</h3></header>
+						<header><h3>Overview</h3></header>
 						<main>
+							<p>A 47-line utility that turns a plain <code>&lt;textarea&gt;</code> into one whose height tracks its content. Set <code>data-ln-autoresize</code>; the field grows as the user types and shrinks when they delete. That is the entire feature surface — there is no "max-rows" config, no <code>ResizeObserver</code>, no dispatched events.</p>
+							<p>The component exists for one reason: every project that wants growing comment fields, note inputs, or chat composers ends up writing the same five lines of resize code, and the naive version usually flickers, fails to shrink, or skips the initial measurement on pre-filled content. <code>ln-autoresize</code> is the canonical implementation so no project ships its own.</p>
+							<p>The trick that matters: to make the textarea shrink as well as grow, the height must be reset to <code>auto</code> <em>before</em> <code>scrollHeight</code> is read. Otherwise the previous tall height keeps <code>scrollHeight</code> pinned and the field never collapses. That is why <code>_resize</code> is two lines instead of one. The browser flushes layout synchronously between the two writes, so the user only sees the final height — no flash.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-autoresize/README.md"><code>ln-autoresize</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/autoresize.md">architecture reference</a>.</p>
+						</main>
+					</section>
+
+					<!-- Anatomy -->
+					<section class="section-card">
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>The complete invocation. There is no markup contract beyond this:</p>
+<pre><code>&lt;textarea data-ln-autoresize rows="1" placeholder="Notes..."&gt;&lt;/textarea&gt;</code></pre>
+
+							<h4>Element type — <code>&lt;textarea&gt;</code> only</h4>
+							<p>The component validates <code>tagName === 'TEXTAREA'</code> in the constructor and bails on anything else with a console warning (<code>[ln-autoresize] Can only be applied to &lt;textarea&gt;, got: …</code>). For <code>contenteditable</code> auto-grow, this is a different problem — those elements already grow with content because they are not constrained by <code>rows</code>.</p>
+
+							<h4><code>rows="1"</code> — initial height before JS runs</h4>
+							<p>The browser default for <code>&lt;textarea&gt;</code> is <code>rows="2"</code>, which means the field renders at two lines before <code>ln-autoresize</code> attaches and runs the initial <code>_resize</code>. Setting <code>rows="1"</code> makes the empty starting state match the post-init state — no visible snap-shut on first paint. <strong><code>rows</code> is not a "max rows" cap.</strong> Once <code>ln-autoresize</code> writes inline <code>style.height</code>, that wins over <code>rows</code> for the lifetime of the instance.</p>
+
+							<h4>Pairing with CSS for capped growth</h4>
+							<p>Pure auto-resize grows forever. Most real use cases want a ceiling past which the field starts scrolling instead. The component does nothing here — that is CSS:</p>
+<pre><code>textarea[data-ln-autoresize] {
+    resize: none;
+    max-height: 6rem;
+    overflow-y: auto;
+}</code></pre>
+							<p><code>resize: none</code> removes the manual drag handle (the global <code>@mixin form-textarea</code> sets <code>resize: vertical</code> by default — when you opt into autoresize, override it, since the manual handle and auto-grow are the same affordance done two different ways and they fight each other). <code>max-height</code> caps the inline height the component writes; <code>overflow-y: auto</code> reveals the scrollbar past the cap.</p>
+
+							<h4>What state goes where</h4>
+							<p>"Should this textarea auto-size?" lives on the presence of <code>data-ln-autoresize</code> (owned by <code>ln-autoresize</code>). "Current height" lives on the inline <code>style.height</code> the component writes after every <code>input</code> and on construction. "Maximum height" and "minimum height" live in CSS, owned by the project. "Initial height before JS" lives on the <code>rows</code> attribute, owned by the browser. The component's instance has two fields: <code>dom</code> and <code>_onInput</code>. Nothing else.</p>
+						</main>
+					</section>
+
+					<!-- Attributes reference -->
+					<section class="section-card">
+						<header><h3>Attributes reference</h3></header>
+						<main>
+							<p><code>ln-autoresize</code>'s entire attribute surface is one marker on one element type. Every other attribute (<code>rows</code>, <code>placeholder</code>, <code>id</code>, <code>name</code>, <code>required</code>, <code>maxlength</code>) is a native textarea attribute that the component does not read or write.</p>
 							<div class="table-container">
 							<table>
-								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Owned by</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-autoresize</code></td><td data-label="On element"><code>&lt;textarea&gt;</code></td><td data-label="Description">Enables auto-resize behavior — grows with content on every input event</td></tr>
+									<tr><td><code>data-ln-autoresize</code></td><td><code>&lt;textarea&gt;</code></td><td><code>ln-autoresize</code></td><td>Marks the textarea as auto-sizing. Presence creates the instance and runs an initial <code>_resize</code>. No value.</td></tr>
+									<tr><td><code>rows</code></td><td><code>&lt;textarea&gt;</code></td><td>Browser</td><td>Initial visible row count before JS runs. Use <code>"1"</code> to avoid a snap-shut on first paint.</td></tr>
 								</tbody>
 							</table>
 							</div>
 						</main>
 					</section>
 
-					<!-- Example — Basic -->
+					<!-- Basic Example -->
 					<section class="section-card">
-						<header><h3>Example — Basic</h3></header>
+						<header><h3>Example — Basic auto-grow</h3></header>
 						<main>
+							<p>Type into the field. The height tracks the content as you add and remove lines. Open DevTools and watch <code>style="height: …px"</code> update on each keystroke — that is the only thing the component writes.</p>
 							<div class="form-element">
 								<label for="demo-basic">Notes</label>
 								<textarea id="demo-basic" data-ln-autoresize rows="1" placeholder="Type here and watch it grow…"></textarea>
@@ -37,11 +78,11 @@
 						</main>
 					</section>
 
-					<!-- Example — Pre-filled -->
+					<!-- Pre-filled Example -->
 					<section class="section-card">
-						<header><h3>Example — Pre-filled</h3></header>
+						<header><h3>Example — Pre-filled content</h3></header>
 						<main>
-							<p>Pre-filled content is auto-sized on initialization — no manual height needed.</p>
+							<p>Server-rendered content sizes to fit on first paint. The constructor calls <code>_resize</code> once before returning, so by the time the page is interactive the height already matches the value — there is no flash of the default <code>rows</code>-height before the resize catches up.</p>
 							<div class="form-element">
 								<label for="demo-prefilled">Employee Review</label>
 								<textarea id="demo-prefilled" data-ln-autoresize>Ana Kovachevska joined the Finance department in March 2023 and has consistently exceeded her quarterly targets. Her attention to detail in budget reconciliation and her collaborative approach to cross-department projects have made her a key contributor. Recommended for the senior analyst track in Q3 2026.</textarea>
@@ -49,11 +90,11 @@
 						</main>
 					</section>
 
-					<!-- Example — Max Height with Scroll -->
-					<section class="section-card" id="demo-maxheight">
-						<header><h3>Example — Max Height with Scroll</h3></header>
+					<!-- Capped + scroll Example -->
+					<section class="section-card" id="demo-capped-wrapper">
+						<header><h3>Example — Capped at 6rem with scroll</h3></header>
 						<main>
-							<p>Pair <code>data-ln-autoresize</code> with CSS <code>max-height</code> and <code>overflow-y: auto</code> to cap growth and enable scroll. The <code>&lt;style&gt;</code> block at the top of this page scopes the rule to <code>#demo-maxheight textarea</code>.</p>
+							<p>Pair <code>data-ln-autoresize</code> with CSS <code>max-height</code> and <code>overflow-y: auto</code> to cap growth and enable scroll. The <code>&lt;style&gt;</code> block at the top of this page scopes the rule to <code>#demo-capped-wrapper textarea</code>.</p>
 							<div class="form-element">
 								<label for="demo-capped">Capped textarea (max 6rem)</label>
 								<textarea id="demo-capped" data-ln-autoresize rows="1" placeholder="Keep typing — it stops growing at 6rem and scrolls instead…"></textarea>
@@ -61,49 +102,55 @@
 						</main>
 					</section>
 
-					<!-- API -->
+					<!-- Programmatic value Example -->
 					<section class="section-card">
-						<header><h3>API</h3></header>
+						<header><h3>Example — Programmatic value writes need <code>input</code> dispatch</h3></header>
 						<main>
-							<pre><code>const el = document.querySelector('[data-ln-autoresize]');
-el.lnAutoresize.destroy();  // remove listener, reset height</code></pre>
+							<p>Setting <code>el.value = …</code> directly is silent — the platform does not fire <code>input</code>, so <code>ln-autoresize</code>'s listener never runs. Either dispatch the event yourself, or go through <code>[data-ln-form]</code>'s <code>ln-form:fill</code> event which dispatches <code>input</code> for every populated field automatically. The two buttons below illustrate the difference: the first sets <code>.value</code> silently and the height stays wrong; the second dispatches <code>input</code> and the height adjusts.</p>
+							<div class="form-element">
+								<label for="demo-prog">Bio</label>
+								<textarea id="demo-prog" data-ln-autoresize rows="1"></textarea>
+							</div>
+							<nav class="demo-actions">
+								<button type="button" id="demo-prog-set-silent">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+									Set .value (silent — height stays wrong)
+								</button>
+								<button type="button" id="demo-prog-set-event">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-check"></use></svg>
+									Set .value + dispatch input (correct)
+								</button>
+								<button type="button" id="demo-prog-clear">Clear</button>
+							</nav>
 						</main>
 					</section>
 
-					<!-- Behavior -->
+					<!-- Reset Example -->
 					<section class="section-card">
-						<header><h3>Behavior</h3></header>
+						<header><h3>Example — Reset inside <code>[data-ln-form]</code> re-measures automatically</h3></header>
 						<main>
-							<ul>
-								<li>On every <code>input</code> event: resets height to <code>auto</code>, then sets to <code>scrollHeight</code></li>
-								<li>Pre-filled content is auto-sized on initialization</li>
-								<li>Works with dynamically added textareas (MutationObserver)</li>
-								<li>Only applies to <code>&lt;textarea&gt;</code> elements — warns if used on other tags</li>
-							</ul>
-						</main>
-					</section>
-
-					<!-- HTML Structure -->
-					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
-						<main>
-							<pre><code>&lt;textarea data-ln-autoresize rows="1" placeholder="Type here..."&gt;&lt;/textarea&gt;</code></pre>
-							<p>With max height cap (in your project SCSS or a scoped <code>&lt;style&gt;</code>):</p>
-							<pre><code>textarea[data-ln-autoresize] {
-    resize: none;
-    max-height: 6rem;
-    overflow-y: auto;
-}</code></pre>
+							<p>Type a long reply, then click <strong>Reset (lnForm)</strong>. The textarea clears AND shrinks back to one row in the same operation. <code>lnForm.reset()</code> dispatches synthetic <code>input</code> on every field after the native reset, which <code>ln-autoresize</code> catches and uses to re-measure. No coordinator workaround needed.</p>
+							<p>For comparison, the second button is a bare <code>&lt;button type="reset"&gt;</code> — it fires the platform <code>reset</code> event but <em>not</em> through the <code>lnForm</code> API path. Native reset on its own does NOT dispatch <code>input</code>, so the textarea clears but the height stays tall. This is the case you must work around manually if you cannot use the <code>lnForm.reset()</code> API — see the autoresize README "Common mistakes" item 4.</p>
+							<form id="demo-reset-form" data-ln-form>
+								<div class="form-element">
+									<label for="demo-reset">Reply</label>
+									<textarea id="demo-reset" data-ln-autoresize rows="1" placeholder="Type a long reply, then reset…"></textarea>
+								</div>
+								<div class="form-actions">
+									<button type="button" id="demo-reset-lnform">Reset (lnForm — correct)</button>
+									<button type="reset">Reset (bare native — height stuck)</button>
+								</div>
+							</form>
 						</main>
 					</section>
 
 					<!-- Dynamic Demo -->
 					<section class="section-card">
-						<header><h3>Dynamic Demo — MutationObserver</h3></header>
+						<header><h3>Example — Dynamically inserted textareas</h3></header>
 						<main>
-							<p>Clicking the button creates a new <code>&lt;textarea data-ln-autoresize&gt;</code> via JavaScript. The MutationObserver picks it up automatically — no manual init needed.</p>
+							<p>Click the button to create a new <code>&lt;textarea data-ln-autoresize&gt;</code> via JavaScript. The shared <code>MutationObserver</code> registered through <code>registerComponent</code> picks it up automatically — no manual <code>lnAutoresize(container)</code> call is needed for live document inserts.</p>
 							<nav class="demo-actions">
-								<button type="button" class="btn" id="demo-add-textarea">
+								<button type="button" id="demo-add-textarea">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 									Add textarea dynamically
 								</button>
@@ -112,18 +159,132 @@ el.lnAutoresize.destroy();  // remove listener, reset height</code></pre>
 						</main>
 					</section>
 
+					<!-- Hidden parent Example -->
+					<section class="section-card">
+						<header><h3>Example — Hidden-then-revealed needs manual <code>_resize</code></h3></header>
+						<main>
+							<p>A textarea inside <code>display: none</code> measures <code>scrollHeight</code> as <code>0</code> at construction time. When the parent becomes visible later, the textarea will be too short. The component does not detect visibility changes — there is no <code>IntersectionObserver</code>. Force a re-measure when the panel opens.</p>
+							<nav class="demo-actions">
+								<button type="button" id="demo-toggle-hidden">Show hidden textarea</button>
+							</nav>
+							<div id="demo-hidden-container" hidden>
+								<div class="form-element">
+									<label for="demo-hidden">Pre-filled hidden textarea</label>
+									<textarea id="demo-hidden" data-ln-autoresize rows="1">This long content was rendered while the parent was hidden, so scrollHeight measured as 0 and the inline height was set to 0px. After reveal we call _resize() manually to re-measure. Without that call the textarea would appear collapsed.</textarea>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+<pre><code>const el = document.querySelector('[data-ln-autoresize]');
+
+el.lnAutoresize._resize();   // force a re-measure (after .value writes,
+                             //   reveal of hidden parent, font load, etc.)
+
+el.lnAutoresize.destroy();   // remove input listener, clear inline height
+                             //   (data-ln-autoresize attribute stays in place)
+
+window.lnAutoresize(root);   // re-run init scan over `root` — only needed
+                             //   for Shadow DOM / iframe roots that the
+                             //   global MutationObserver cannot see</code></pre>
+						</main>
+					</section>
+
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<h4>1. Setting <code>.value</code> directly and expecting the height to update</h4>
+							<p>Silent — the platform does not fire <code>input</code>. Dispatch it yourself, or use <code>[data-ln-form]</code>'s <code>ln-form:fill</code> event.</p>
+
+							<h4>2. Using <code>rows</code> as a max-rows cap</h4>
+							<p><code>rows</code> is the initial render height before JS attaches. Once the inline <code>style.height</code> is written, <code>rows</code> is overridden. Use CSS <code>max-height</code> to cap.</p>
+
+							<h4>3. Mounting inside a hidden parent</h4>
+							<p>Construction-time <code>scrollHeight</code> is <code>0</code> when the element is hidden. Call <code>_resize</code> after reveal.</p>
+
+							<h4>4. Bare <code>&lt;button type="reset"&gt;</code> outside <code>[data-ln-form]</code> leaves the height tall</h4>
+							<p>Native <code>reset</code> does not fire <code>input</code>. Either wrap the form in <code>data-ln-form</code> and call <code>form.lnForm.reset()</code>, or dispatch <code>input</code> manually in a <code>setTimeout</code> after the native <code>reset</code> event fires.</p>
+
+							<h4>5. Applying to non-textarea elements</h4>
+							<p>Logged warning + the attribute does nothing. Use a real <code>&lt;textarea&gt;</code>.</p>
+
+							<h4>6. Forgetting to override <code>resize: vertical</code></h4>
+							<p>The default <code>@mixin form-textarea</code> ships <code>resize: vertical</code>, giving a manual drag handle. The handle works until the user types; then <code>_resize</code> overwrites their dragged height. Set <code>resize: none</code> on the selector when you opt into autoresize.</p>
+						</main>
+					</section>
+
 <script>
 	(function () {
-		const button = document.getElementById('demo-add-textarea');
-		const container = document.getElementById('demo-dynamic-container');
-		if (!button || !container) return;
+		// Dynamic textarea creation
+		const addBtn = document.getElementById('demo-add-textarea');
+		const dynContainer = document.getElementById('demo-dynamic-container');
+		if (addBtn && dynContainer) {
+			addBtn.addEventListener('click', function () {
+				const ta = document.createElement('textarea');
+				ta.setAttribute('data-ln-autoresize', '');
+				ta.setAttribute('rows', '1');
+				ta.setAttribute('placeholder', 'Dynamically inserted...');
+				dynContainer.appendChild(ta);
+			});
+		}
 
-		button.addEventListener('click', function () {
-			const ta = document.createElement('textarea');
-			ta.setAttribute('data-ln-autoresize', '');
-			ta.setAttribute('rows', '1');
-			ta.setAttribute('placeholder', 'Dynamically inserted...');
-			container.appendChild(ta);
-		});
+		// Programmatic value buttons
+		const progEl = document.getElementById('demo-prog');
+		const setSilent = document.getElementById('demo-prog-set-silent');
+		const setEvent = document.getElementById('demo-prog-set-event');
+		const clearBtn = document.getElementById('demo-prog-clear');
+		const sample = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
+
+		if (setSilent && progEl) {
+			setSilent.addEventListener('click', function () {
+				progEl.value = sample;
+				// Intentionally NO event dispatch — height stays at previous value
+			});
+		}
+		if (setEvent && progEl) {
+			setEvent.addEventListener('click', function () {
+				progEl.value = sample;
+				progEl.dispatchEvent(new Event('input'));
+			});
+		}
+		if (clearBtn && progEl) {
+			clearBtn.addEventListener('click', function () {
+				progEl.value = '';
+				progEl.dispatchEvent(new Event('input'));
+			});
+		}
+
+		// Reset via lnForm.reset() — fires synthetic input on every
+		// field, which ln-autoresize catches and shrinks the textarea.
+		const resetForm = document.getElementById('demo-reset-form');
+		const resetLnFormBtn = document.getElementById('demo-reset-lnform');
+		if (resetLnFormBtn && resetForm) {
+			resetLnFormBtn.addEventListener('click', function () {
+				if (resetForm.lnForm) resetForm.lnForm.reset();
+			});
+		}
+
+		// Hidden parent reveal
+		const hiddenBtn = document.getElementById('demo-toggle-hidden');
+		const hiddenContainer = document.getElementById('demo-hidden-container');
+		const hiddenTextarea = document.getElementById('demo-hidden');
+		if (hiddenBtn && hiddenContainer && hiddenTextarea) {
+			hiddenBtn.addEventListener('click', function () {
+				const isHidden = hiddenContainer.hasAttribute('hidden');
+				if (isHidden) {
+					hiddenContainer.removeAttribute('hidden');
+					if (hiddenTextarea.lnAutoresize) hiddenTextarea.lnAutoresize._resize();
+					hiddenBtn.textContent = 'Hide textarea';
+				} else {
+					hiddenContainer.setAttribute('hidden', '');
+					hiddenBtn.textContent = 'Show hidden textarea';
+				}
+			});
+		}
 	})();
 </script>

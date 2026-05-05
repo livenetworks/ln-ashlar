@@ -166,23 +166,135 @@
 
 		<!-- Content -->
 		<section>
-<h1>Tabs</h1>
-					<p>Hash-aware tabs. Synchronized with URL hash (<code>#tab-key</code>).</p>
-
-					<!-- Basic tabs — Section 1 -->
+<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Example 1 — User</h3></header>
+						<header><h3>Overview</h3></header>
 						<main>
+							<p>N-way exclusive panel selection on a single container — the tab primitive in ln-ashlar. 145 lines of JS that own three things at once: which tab is active (a string key on the wrapper), how to persist it (URL hash for namespaced sections, <code>localStorage</code> as the opt-in fallback), and how to keep ARIA in sync.</p>
+							<p>The contract is one sentence: <strong>the active tab lives in <code>data-ln-tabs-active</code> on the wrapper, and the wrapper is the source of truth.</strong> Click handlers, hash sync, the <code>activate()</code> API, persistence restore — every entry point funnels into one <code>setAttribute('data-ln-tabs-active', key)</code> call. A single <code>MutationObserver</code> callback runs the activation pipeline. There is no second path.</p>
+							<p>Tabs are deliberately <strong>NOT</strong> built on <a href="toggle.html"><code>ln-toggle</code></a>. The contracts diverge: ln-toggle is binary open/close, tabs are N-way exclusive; toggle uses <code>aria-expanded</code> (disclosure), tabs use <code>aria-selected</code> (tablist); toggle persists per element, tabs use namespace-scoped URL hashes OR per-page <code>localStorage</code> (mutually exclusive). Squeezing tabs into N coordinated toggles would put coordinator logic in the wrong place. See the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-tabs/README.md#why-not-ln-toggle">README "Why not ln-toggle"</a> section for the full architectural argument.</p>
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-tabs/README.md"><code>ln-tabs</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/tabs.md">architecture reference</a>.</p>
+						</main>
+					</section>
+
+					<!-- Anatomy -->
+					<section class="section-card">
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>A tabs section has three structural pieces — a wrapper, a list of tab buttons, and a list of matching panels. The pairing is by key, not by DOM position.</p>
+<pre><code>&lt;section id="user-tabs" data-ln-tabs data-ln-tabs-default="info"&gt;
+    &lt;nav&gt;
+        &lt;button data-ln-tab="info"&gt;Information&lt;/button&gt;
+        &lt;button data-ln-tab="settings"&gt;Settings&lt;/button&gt;
+    &lt;/nav&gt;
+
+    &lt;section data-ln-panel="info"&gt;…&lt;/section&gt;
+    &lt;section data-ln-panel="settings" class="hidden"&gt;…&lt;/section&gt;
+&lt;/section&gt;</code></pre>
+
+							<h4>The wrapper — <code>[data-ln-tabs]</code></h4>
+							<p>The element with <code>data-ln-tabs</code> is the tabs root. Presence of the attribute creates the instance; the value is unused. The wrapper hosts the active-key attribute (<code>data-ln-tabs-active</code>, written by the component), the default-key attribute (<code>data-ln-tabs-default</code>), and the namespace (<code>id</code> or <code>data-ln-tabs-key</code>). Use <code>&lt;section&gt;</code>, <code>&lt;div&gt;</code>, <code>&lt;article&gt;</code>; do NOT use <code>&lt;main&gt;</code>.</p>
+
+							<h4>The tab buttons — <code>[data-ln-tab="key"]</code></h4>
+							<p>Each tab button is queried by a deep selector inside the wrapper. The buttons are typically inside a <code>&lt;nav&gt;</code> for grouping, but the position is not enforced. Each button SHOULD be a <code>&lt;button&gt;</code> — the global library style and the <code>tabs-tab</code> mixin assume it. <strong>Inside a form, every tab button needs <code>type="button"</code></strong> to avoid submitting the form on click.</p>
+
+							<h4>The panels — <code>[data-ln-panel="key"]</code></h4>
+							<p>Each panel matches a tab by key. Inactive panels MUST be shipped with <code>class="hidden"</code> so they start hidden — without it, the user sees a flash of all-panels-stacked before the component initializes and collapses to one.</p>
+
+							<p>Triggers may be <code>&lt;button&gt;</code> or <code>&lt;a href="#nsKey:key"&gt;</code>. Anchor triggers produce shareable URLs (right-click → copy link, middle-click → open in new tab) — the click handler calls <code>event.preventDefault()</code> so the browser's default navigation does not race with the JS state write. Use the boolean form (<code>data-ln-tab</code> with no value) on anchors so the key only appears in <code>href</code>; explicit <code>data-ln-tab="key"</code> works too if you prefer the redundancy. See the live demo below.</p>
+
+							<h4>What state goes where</h4>
+							<p>"Which tab is active?" lives in <code>data-ln-tabs-active</code> on the wrapper. "Is this tab visually selected?" lives in <code>data-active</code> + <code>aria-selected</code> on the button (synced from the wrapper's attribute). "Is this panel visible?" lives in the <code>.hidden</code> class + <code>aria-hidden</code> on the panel (also synced). The component instance carries caches (<code>mapTabs</code>, <code>mapPanels</code>) and configuration (<code>defaultKey</code>, <code>nsKey</code>, <code>autoFocus</code>), but every observable piece of state is on the DOM.</p>
+						</main>
+					</section>
+
+					<!-- Single source of truth -->
+					<section class="section-card">
+						<header><h3>Single source of truth</h3></header>
+						<main>
+							<p>Every consumer that wants to change the active tab writes <code>data-ln-tabs-active</code> on the wrapper. The imperative API method <code>activate(key)</code> is sugar over <code>setAttribute</code>; the click handler reduces to the same write (or to <code>location.hash</code> when hash sync is enabled, which routes back through <code>hashchange</code> → <code>activate()</code> → <code>setAttribute</code>).</p>
+<pre><code>const tabs = document.getElementById('user-tabs');
+
+// Via API
+tabs.lnTabs.activate('settings');   // → setAttribute('data-ln-tabs-active', 'settings')
+
+// Via attribute — IDENTICAL behavior
+tabs.setAttribute('data-ln-tabs-active', 'settings');
+
+// Via hash (when hash sync is enabled)
+location.hash = 'user-tabs:settings';
+location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
+							<p>All paths produce the same <code>data-active</code> / <code>aria-selected</code> flips on tab buttons, the same <code>.hidden</code> / <code>aria-hidden</code> toggles on panels, the same <code>ln-tabs:change</code> event, the same <code>localStorage</code> write (if persistence is opted in and hash sync is off).</p>
+						</main>
+					</section>
+
+					<!-- Attributes reference -->
+					<section class="section-card">
+						<header><h3>Attributes</h3></header>
+						<main>
+							<table>
+								<thead><tr><th>Attribute</th><th>On</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-tabs</code></td><td>wrapper</td><td>Creates the instance. Value unused.</td></tr>
+									<tr><td><code>data-ln-tabs-active</code></td><td>wrapper</td><td>Currently active key. <strong>Written by the component</strong>; watched by the observer.</td></tr>
+									<tr><td><code>data-ln-tabs-default="key"</code></td><td>wrapper</td><td>Default key. Falls back to first <code>[data-ln-tab]</code> if absent.</td></tr>
+									<tr><td><code>data-ln-tabs-focus="false"</code></td><td>wrapper</td><td>Opt out of auto-focus on the panel's first focusable element. Default: enabled.</td></tr>
+									<tr><td><code>data-ln-tabs-key="name"</code></td><td>wrapper</td><td>Hash namespace, when <code>id</code> is unsuitable. Falls back to <code>id</code>.</td></tr>
+									<tr><td><code>id="name"</code></td><td>wrapper</td><td>Doubles as hash namespace if <code>data-ln-tabs-key</code> is absent. Enables hash sync.</td></tr>
+									<tr><td><code>data-ln-tab="key"</code></td><td>tab button</td><td>Marks the button as a tab. Key is normalized lowercase.</td></tr>
+									<tr><td><code>data-ln-panel="key"</code></td><td>panel</td><td>Matches against <code>data-ln-tab</code> by key.</td></tr>
+									<tr><td><code>data-ln-persist</code></td><td>wrapper</td><td>Opt in to <code>localStorage</code>. Boolean form requires <code>id</code>; explicit form is <code>data-ln-persist="custom-key"</code>. <strong>Mutually exclusive with hash sync</strong> — ignored when <code>id</code> or <code>data-ln-tabs-key</code> is present.</td></tr>
+								</tbody>
+							</table>
+						</main>
+					</section>
+
+					<!-- Live: plain tabs (no hash, no persistence) -->
+					<section class="section-card">
+						<header><h3>Live demo — plain tabs (no hash, no persistence)</h3></header>
+						<main>
+							<p>No <code>id</code>, no <code>data-ln-tabs-key</code>, no <code>data-ln-persist</code>. Active key lives only in <code>data-ln-tabs-active</code> on the wrapper. Reload the page and the default tab is selected.</p>
+
+							<section data-ln-tabs data-ln-tabs-default="overview">
+								<nav>
+									<button type="button" data-ln-tab="overview">Overview</button>
+									<button type="button" data-ln-tab="details">Details</button>
+									<button type="button" data-ln-tab="settings">Settings</button>
+								</nav>
+
+								<section data-ln-panel="overview">
+									<h4>Overview</h4>
+									<p>This is the default panel. The wrapper has <code>data-ln-tabs-default="overview"</code>.</p>
+								</section>
+
+								<section data-ln-panel="details" class="hidden">
+									<h4>Details</h4>
+									<p>Open DevTools and inspect the wrapper element — you'll see <code>data-ln-tabs-active</code> change to <code>"details"</code>.</p>
+								</section>
+
+								<section data-ln-panel="settings" class="hidden">
+									<h4>Settings</h4>
+									<p>The URL hash does not change — there is no <code>id</code> or <code>data-ln-tabs-key</code> on the wrapper.</p>
+								</section>
+							</section>
+						</main>
+					</section>
+
+					<!-- Live: hash-deep-linkable tabs -->
+					<section class="section-card">
+						<header><h3>Live demo — hash-deep-linkable tabs</h3></header>
+						<main>
+							<p>The wrapper has <code>id="user-tabs"</code>, which doubles as the hash namespace. Click a tab and the URL updates: <code>#user-tabs:settings</code>. Bookmark, share, hit the back button — all the URL-as-state benefits.</p>
+
 							<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
 								<nav>
-									<button data-ln-tab="info">Information</button>
-									<button data-ln-tab="settings">Settings</button>
-									<button data-ln-tab="history">History</button>
+									<button type="button" data-ln-tab="info">Information</button>
+									<button type="button" data-ln-tab="settings">Settings</button>
+									<button type="button" data-ln-tab="history">History</button>
 								</nav>
 
 								<section data-ln-panel="info">
 									<h4>Information</h4>
-									<p>This is the content of the first tab.</p>
 									<p>Hash format: <code>#user-tabs:info</code></p>
 								</section>
 
@@ -204,8 +316,8 @@
 									<table>
 										<thead><tr><th>Date</th><th>Action</th><th>User</th></tr></thead>
 										<tbody>
-											<tr><td data-label="Attribute">19.02.2026</td><td data-label="On element">Created</td><td data-label="Description">John</td></tr>
-											<tr><td data-label="Attribute">18.02.2026</td><td data-label="On element">Updated</td><td data-label="Description">Jane</td></tr>
+											<tr><td data-label="Date">19.02.2026</td><td data-label="Action">Created</td><td data-label="User">John</td></tr>
+											<tr><td data-label="Date">18.02.2026</td><td data-label="Action">Updated</td><td data-label="User">Jane</td></tr>
 										</tbody>
 									</table>
 									</div>
@@ -214,22 +326,57 @@
 						</main>
 					</section>
 
-				<!-- Basic tabs — Section 2 (independent) -->
+					<!-- Live: anchor-trigger tabs -->
 					<section class="section-card">
-						<header><h3>Example 2 — Project</h3></header>
+						<header><h3>Live demo — anchor triggers (shareable URLs)</h3></header>
 						<main>
+							<p>Triggers are <code>&lt;a href="#nsKey:key"&gt;</code> instead of <code>&lt;button&gt;</code>. Right-click any tab → copy link → paste into a new browser → the right tab activates on first paint. Middle-click opens the link in a new browser tab. <code>data-ln-tab</code> is boolean here; the key derives from <code>href</code>.</p>
+
+							<section id="docs-tabs" data-ln-tabs data-ln-tabs-default="install">
+								<nav>
+									<a href="#docs-tabs:install" data-ln-tab>Install</a>
+									<a href="#docs-tabs:usage" data-ln-tab>Usage</a>
+									<a href="#docs-tabs:api" data-ln-tab>API</a>
+								</nav>
+
+								<section data-ln-panel="install">
+									<h4>Install</h4>
+									<p>Right-click this tab and copy the link — you'll see <code>#docs-tabs:install</code> in the URL.</p>
+									<pre><code>npm install ln-ashlar</code></pre>
+								</section>
+
+								<section data-ln-panel="usage" class="hidden">
+									<h4>Usage</h4>
+									<p>Hash format: <code>#docs-tabs:usage</code>. Bookmark this URL — reload, the Usage tab is active.</p>
+								</section>
+
+								<section data-ln-panel="api" class="hidden">
+									<h4>API</h4>
+									<p>The component does not generate the <code>href</code> for you — the markup author writes it. The format mirrors the click-driven hash exactly.</p>
+								</section>
+							</section>
+
+							<p>The click handler calls <code>event.preventDefault()</code> so the browser's default navigation does not race with the JS state write. Ctrl/Meta-click and middle-click skip <code>preventDefault</code> and bubble to the browser as expected — the standard "open in new tab" affordance.</p>
+						</main>
+					</section>
+
+					<!-- Live: multiple independent sections -->
+					<section class="section-card">
+						<header><h3>Live demo — two independent sections, same page</h3></header>
+						<main>
+							<p>Each instance reads only its own namespace from the hash. Hash format <code>#user-tabs:settings&amp;project-tabs:members</code> activates Settings in the first section AND Members in the second. Both sections have a tab named <code>info</code> — they live in separate namespaces, no collision.</p>
+
 							<section id="project-tabs" data-ln-tabs data-ln-tabs-default="overview">
 								<nav>
-									<button data-ln-tab="overview">Overview</button>
-									<button data-ln-tab="members">Members</button>
-									<button data-ln-tab="info">Info</button>
+									<button type="button" data-ln-tab="overview">Overview</button>
+									<button type="button" data-ln-tab="members">Members</button>
+									<button type="button" data-ln-tab="info">Info</button>
 								</nav>
 
 								<section data-ln-panel="overview">
 									<h4>Project Overview</h4>
-									<p>This section is completely independent from the one above.</p>
-									<p>Hash format: <code>#project-tabs:overview</code></p>
-									<p>Both sections have a tab <code>info</code> — no collision.</p>
+									<p>This section is completely independent from the one above. Hash format: <code>#project-tabs:overview</code></p>
+									<p>Both sections have a tab key <code>info</code> — no collision because they live in different namespaces.</p>
 								</section>
 
 								<section data-ln-panel="members" class="hidden">
@@ -247,7 +394,38 @@
 
 								<section data-ln-panel="info" class="hidden">
 									<h4>Project Information</h4>
-									<p>The same key <code>info</code> exists in section 1 as well — works independently.</p>
+									<p>The same key <code>info</code> exists in the user-tabs section above — works independently.</p>
+								</section>
+							</section>
+						</main>
+					</section>
+
+					<!-- Live: persistent tabs without hash sync -->
+					<section class="section-card">
+						<header><h3>Live demo — persistent tabs without hash sync</h3></header>
+						<main>
+							<p>No <code>id</code> (so no hash sync), explicit <code>data-ln-persist="settings-tabs"</code> (so the storage key doesn't depend on a generated <code>id</code>). The active tab is remembered across page loads via <code>localStorage</code> under key <code>ln:tabs:&lt;path&gt;:settings-tabs</code>. Useful for "settings page" tabs where the user expects "the last tab I had open is the one I'll see when I come back."</p>
+
+							<section data-ln-tabs data-ln-persist="settings-tabs" data-ln-tabs-default="general">
+								<nav>
+									<button type="button" data-ln-tab="general">General</button>
+									<button type="button" data-ln-tab="security">Security</button>
+									<button type="button" data-ln-tab="notifications">Notifications</button>
+								</nav>
+
+								<section data-ln-panel="general">
+									<h4>General</h4>
+									<p>Switch to another tab, reload the page — that tab is restored.</p>
+								</section>
+
+								<section data-ln-panel="security" class="hidden">
+									<h4>Security</h4>
+									<p>Inspect <code>localStorage</code> in DevTools — you'll see the key <code>ln:tabs:…:settings-tabs</code> with the active key value.</p>
+								</section>
+
+								<section data-ln-panel="notifications" class="hidden">
+									<h4>Notifications</h4>
+									<p>To clear: <code>localStorage.removeItem('ln:tabs:&lt;path&gt;:settings-tabs')</code>.</p>
 								</section>
 							</section>
 						</main>
@@ -257,49 +435,72 @@
 					<section class="section-card">
 						<header><h3>Events</h3></header>
 						<main>
-							<article>
-								<h4>Lifecycle Events</h4>
-								<div class="table-container">
-								<table>
-									<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
-									<tbody>
-										<tr><td><code>ln-tabs:change</code></td><td>After activating a new tab</td><td><code>{ key, tab, panel }</code></td></tr>
-									</tbody>
-								</table>
-								</div>
-							</article>
-							<article>
-								<h4>Live Demo</h4>
-								<output id="tabs-event-log">No events yet — click a tab.</output>
-							</article>
-							<article>
-								<h4>Code</h4>
-								<pre><code>document.getElementById(&#39;user-tabs&#39;).addEventListener(&#39;ln-tabs:change&#39;, function(e) {
-    console.log(&#39;Active tab:&#39;, e.detail.key);
+							<table>
+								<thead><tr><th>Event</th><th>Cancelable</th><th><code>detail</code></th><th>Dispatched when</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-tabs:change</code></td><td>no</td><td><code>{ key, tab, panel }</code></td><td>After the active panel is swapped, ARIA synced, focus moved, and <code>localStorage</code> written.</td></tr>
+									<tr><td><code>ln-tabs:destroyed</code></td><td>no</td><td><code>{ target }</code></td><td>After <code>destroy()</code> removes listeners and deletes the instance.</td></tr>
+								</tbody>
+							</table>
+							<p>There is no <code>:before-change</code> — the activation pipeline has no cancelable side-effects worth gating. If you need a "block this navigation" hook (unsaved form changes), wire it on the click side: listen on <code>[data-ln-tab]</code> clicks, check whether the current panel is dirty, and call <code>event.preventDefault()</code> before the click bubbles.</p>
+
+							<h4>Live event log</h4>
+							<output id="tabs-event-log">No events yet — click a tab in either of the live demos above.</output>
+<pre><code>// Per-section listener
+document.getElementById('user-tabs').addEventListener('ln-tabs:change', e =&gt; {
+    console.log('Active key:', e.detail.key);
+    console.log('Tab button:', e.detail.tab);   // DOM element
+    console.log('Panel:',      e.detail.panel); // DOM element
 });
 
-// Global — for all tab sections
-document.addEventListener(&#39;ln-tabs:change&#39;, function(e) {
-    analytics.track(&#39;tab_change&#39;, { tab: e.detail.key });
+// Document-level — every tabs instance on the page
+document.addEventListener('ln-tabs:change', e =&gt; {
+    analytics.track('tab_change', {
+        section: e.target.id,
+        tab:     e.detail.key,
+    });
 });</code></pre>
-							</article>
 						</main>
 					</section>
 
-					<!-- HTML -->
+					<!-- Common mistakes -->
+					<section class="section-card">
+						<header><h3>Common mistakes</h3></header>
+						<main>
+							<h4>1. Tab buttons inside a form without <code>type="button"</code></h4>
+							<p>The HTML default for <code>&lt;button&gt;</code> is <code>type="submit"</code>. A tab click inside a form will submit the form before the tab handler runs. Every tab button inside a form needs <code>type="button"</code>.</p>
+
+							<h4>2. Forgetting <code>class="hidden"</code> on inactive panels</h4>
+							<p>Until the component initializes, all panels are visible. The user sees a flash of all-panels-stacked before they collapse to one. Ship inactive panels with <code>class="hidden"</code>.</p>
+
+							<h4>3. Mixing hash sync and <code>data-ln-persist</code></h4>
+							<p>The two persistence mechanisms are mutually exclusive. <code>id</code> (or <code>data-ln-tabs-key</code>) enables hash sync, which silently disables <code>data-ln-persist</code>. Pick one.</p>
+
+							<h4>4. Programmatically adding tabs after init</h4>
+							<p>The instance's <code>mapTabs</code> / <code>mapPanels</code> are populated at <code>_init</code> — adding new <code>[data-ln-tab]</code> / <code>[data-ln-panel]</code> children later does NOT register them. To add tabs dynamically: <code>el.lnTabs.destroy()</code> + modify DOM + <code>window.lnTabs(parent)</code>, or replace the entire wrapper subtree (the document-level observer auto-inits a new wrapper).</p>
+
+							<h4>5. Expecting keyboard arrow nav</h4>
+							<p>ln-tabs does not implement Arrow Left/Right or Home/End. Tab key cycles through tab buttons via the browser default; Enter/Space activates. Arrow nav is a WAI-ARIA enhancement, not baseline. Wire it on the consumer side if your audit requires it.</p>
+
+							<h4>6. Putting <code>data-ln-tabs</code> on <code>&lt;main&gt;</code></h4>
+							<p>HTML spec allows only one <code>&lt;main&gt;</code> per page. Use <code>&lt;section&gt;</code>, <code>&lt;aside&gt;</code>, <code>&lt;article&gt;</code>, or <code>&lt;div&gt;</code>.</p>
+						</main>
+					</section>
+
+					<!-- HTML reference -->
 					<section class="section-card">
 						<header><h3>HTML</h3></header>
 						<main>
-							<pre><code>&lt;!-- Namespace = id attribute (or data-ln-tabs-key) --&gt;
+<pre><code>&lt;!-- Namespace = id attribute (or data-ln-tabs-key) --&gt;
 &lt;section id="my-tabs" data-ln-tabs data-ln-tabs-default="first"&gt;
 
-    &lt;!-- Tab buttons --&gt;
+    &lt;!-- Tab buttons — type="button" if inside a form! --&gt;
     &lt;nav&gt;
-        &lt;button data-ln-tab="first"&gt;First tab&lt;/button&gt;
-        &lt;button data-ln-tab="second"&gt;Second tab&lt;/button&gt;
+        &lt;button type="button" data-ln-tab="first"&gt;First tab&lt;/button&gt;
+        &lt;button type="button" data-ln-tab="second"&gt;Second tab&lt;/button&gt;
     &lt;/nav&gt;
 
-    &lt;!-- Panels --&gt;
+    &lt;!-- Panels — inactive ones start hidden --&gt;
     &lt;section data-ln-panel="first"&gt;
         Content of the first tab
     &lt;/section&gt;
@@ -310,18 +511,10 @@ document.addEventListener(&#39;ln-tabs:change&#39;, function(e) {
 
 &lt;/section&gt;
 
-&lt;!-- Attributes --&gt;
-id="key"                   - namespace for hash (required for multiple sections)
-data-ln-tabs-key="key"     - alternative, if id is not suitable
-data-ln-tabs               - container
-data-ln-tabs-default="x"   - default tab
-data-ln-tabs-focus         - focus first input on change
-data-ln-tab="key"          - tab button
-data-ln-panel="key"        - panel content
-
 &lt;!-- Hash format: #my-tabs:second → activate second tab --&gt;
-&lt;!-- Multiple sections: #my-tabs:second&other-tabs:info --&gt;
-&lt;!-- Without id/data-ln-tabs-key → no hash sync, only defaultKey --&gt;</code></pre>
+&lt;!-- Multiple sections: #my-tabs:second&amp;other-tabs:info --&gt;
+&lt;!-- Without id/data-ln-tabs-key → no hash sync, only defaultKey --&gt;
+&lt;!-- With data-ln-persist (and no id/data-ln-tabs-key) → localStorage --&gt;</code></pre>
 						</main>
 					</section>
 

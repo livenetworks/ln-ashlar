@@ -117,6 +117,17 @@
 	--gap: var(--size-sm);
 	gap: var(--gap);
 
+	// Equalize height across icon-only and text-only siblings AND
+	// search-icon labels. Geometric — locks the border-box chrome to
+	// the icon-content height (1.25rem) plus rebound --padding-y and
+	// border-width on both edges. Buttons rebind --padding-y below;
+	// search labels read --padding-y from @mixin form-input-icon-group
+	// (same var(--size-xs) value), so the formula resolves identically
+	// for both. Border-box is the project default (scss/base/_reset.scss).
+	:is(button, label) {
+		min-height: calc(1.25rem + 2 * var(--padding-y) + 2 * var(--border-width));
+	}
+
 	button {
 		// Bordered variant re-bound over @mixin app-header's ghost
 		// default. --color-border is already a composed hsl() value;
@@ -127,13 +138,6 @@
 		@include text-xs;
 		font-weight: var(--font-medium);
 		border-radius: var(--radius-sm);
-		// Equalize height across icon-only and text-only siblings.
-		// Geometric — locks the border-box chrome to the icon-content
-		// height (1.25rem) plus rebound padding-y and border-width on
-		// both edges, so a text-only button reserves the same vertical
-		// space as one with a 1.25rem icon. Border-box is the project
-		// default (scss/base/_reset.scss).
-		min-height: calc(1.25rem + 2 * var(--padding-y) + 2 * var(--border-width));
 
 		// Label visually-hidden on small viewports — icon remains.
 		> span {
