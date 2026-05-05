@@ -34,13 +34,9 @@ Symbol IDs in the sprite mirror the full `href` value minus `#`:
 
 ## Config
 
-Read from `window` at init (before DOMContentLoaded):
-
-```javascript
-var BASE_CDN   = window.LN_ICONS_CDN        || 'https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline';
-var CUSTOM_CDN = window.LN_ICONS_CUSTOM_CDN || '';
-```
-
+Read from `window` at init (before DOMContentLoaded): `LN_ICONS_CDN`
+(fallback: the jsDelivr Tabler 3.31.0 outline URL) and
+`LN_ICONS_CUSTOM_CDN` (fallback: empty string).
 `lnc-` icons silently skip if `CUSTOM_CDN` is not set.
 
 ## DOM Scan — `_scan(root)`
@@ -72,11 +68,7 @@ var pending = new Set();  // fetch in flight
 
 Fetched SVG content is persisted in `localStorage` with prefix `lni:` (e.g. `lni:ln-home`). On each `_load(href)` call, localStorage is checked before `fetch()`. Cache hits inject the symbol synchronously — no network request.
 
-```javascript
-var CACHE_PREFIX  = 'lni:';
-var CACHE_VER_KEY = 'lni:v';
-var CACHE_VERSION = '1';
-```
+Storage keys use the prefix `lni:`, version key `lni:v`, and current version `'1'`.
 
 Cache invalidation: bumping `CACHE_VERSION` clears all `lni:*` keys on next page load, forcing a re-fetch. All `localStorage` access is wrapped in `try/catch` to handle private browsing and storage-full scenarios gracefully.
 
@@ -106,16 +98,9 @@ Cache invalidation: bumping `CACHE_VERSION` clears all `lni:*` keys on next page
 
 ## Sprite Element
 
-Created lazily on first icon load, inserted as `document.body.firstChild`:
-
-```html
-<svg id="ln-icons-sprite" hidden aria-hidden="true">
-    <defs>
-        <symbol id="ln-home" viewBox="0 0 24 24">...</symbol>
-        <symbol id="lnc-file-pdf" viewBox="0 0 24 24">...</symbol>
-    </defs>
-</svg>
-```
+Created lazily on first icon load, inserted as `document.body.firstChild`.
+The element is `<svg id="ln-icons-sprite" hidden aria-hidden="true">` with
+a `<defs>` child; each loaded icon becomes a `<symbol>` inside that `<defs>`.
 
 ## MutationObserver
 
@@ -133,19 +118,7 @@ Full list of available Tabler icon names: `scss/tabler-icons.txt`
 
 ## CSS — `scss/config/_icons.scss`
 
-```scss
-svg.ln-icon {
-    display: inline-block;
-    width: 1.25rem;
-    height: 1.25rem;
-    flex-shrink: 0;
-    vertical-align: middle;
-}
-
-svg.ln-icon.ln-icon--sm { width: 1rem;   height: 1rem;   }
-svg.ln-icon.ln-icon--lg { width: 1.5rem; height: 1.5rem; }
-svg.ln-icon.ln-icon--xl { width: 4rem;   height: 4rem;   }
-```
+Size variants live in `scss/config/_icons.scss` — `.ln-icon--sm` (1rem), default (1.25rem), `.ln-icon--lg` (1.5rem), `.ln-icon--xl` (4rem). The `.ln-icon` element inherits `currentColor` from its parent.
 
 ## Build Output
 

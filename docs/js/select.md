@@ -64,25 +64,10 @@ There are no other imports. ln-select does not know about `ln-form`,
 ## Internal state — the WeakMap
 
 The single source of truth for "which `<select>` elements are
-upgraded" is a module-scoped `WeakMap`:
-
-```javascript
-const instances = new WeakMap();   // line 22
-```
-
-Keys are `<select>` DOM elements. Values are the corresponding
-TomSelect instances. The `WeakMap` is exposed indirectly through
-three exported methods on `window.lnSelect`:
-
-```javascript
-window.lnSelect = {
-    initialize: initializeSelect,                        // upgrade an element
-    destroy: destroySelect,                              // tear down + remove from map
-    getInstance: function (element) {                    // read access
-        return instances.get(element);
-    },
-};
-```
+upgraded" is a module-scoped `WeakMap` keyed by `<select>` DOM
+elements (line 22). Values are the corresponding TomSelect instances.
+The WeakMap is exposed indirectly through three exported methods on
+`window.lnSelect`: `initialize`, `destroy`, and `getInstance`.
 
 ### Why a `WeakMap` and not `el.lnSelect`?
 
@@ -161,24 +146,12 @@ justify it.
 
 ### 1. Script load (lines 12-21)
 
-The IIFE runs. It checks `window.TomSelect`. If missing, log a
-`console.warn` and install a no-op API:
-
-```javascript
-if (!TomSelect) {
-    console.warn('[ln-select] TomSelect not found. Load TomSelect before ln-ashlar.');
-    window.lnSelect = {
-        initialize: function () {},
-        destroy: function () {},
-        getInstance: function () { return null; },
-    };
-    return;
-}
-```
-
-The `return` exits the IIFE before the observer is registered, before
-the WeakMap is created, before `initializeAll()` is called.
-`<select data-ln-select>` elements remain native; the page works.
+The IIFE runs. It checks `window.TomSelect`. If missing, it logs a
+`console.warn`, installs a no-op API (`initialize`, `destroy`, and
+`getInstance` as no-ops returning `null`), and returns. The `return`
+exits the IIFE before the observer is registered, before the WeakMap
+is created, before `initializeAll()` is called. `<select data-ln-select>`
+elements remain native; the page works.
 
 ### 2. WeakMap creation (line 22)
 
@@ -190,23 +163,9 @@ write the map.
 ### 3. DOM-ready scheduling (lines 137-145)
 
 If the document is still loading, defer to `DOMContentLoaded`;
-otherwise run immediately:
-
-```javascript
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-        initializeAll();
-        observeDOM();
-    });
-} else {
-    initializeAll();
-    observeDOM();
-}
-```
-
-The order is fixed: scan first (upgrade everything that already
-exists), then start the observer (catch everything that arrives
-later).
+otherwise run immediately. The order is fixed: scan first (upgrade
+everything that already exists), then start the observer (catch
+everything that arrives later).
 
 ### 4. `initializeAll()` (lines 83-87)
 
@@ -219,16 +178,8 @@ a no-op.
 
 Sets up the document-level `MutationObserver`. Wrapped in
 `guardBody(...)` so the call defers if `<body>` is not yet parsed.
-The observer watches:
-
-```javascript
-{
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['data-ln-select'],
-}
-```
+Observer config: `childList: true, subtree: true, attributes: true,
+attributeFilter: ['data-ln-select']`.
 
 Three mutation paths are handled (lines 92-124):
 
@@ -301,25 +252,10 @@ They are wrapper-internal; consumers must not read or write them.
 
 ## `destroySelect` — the teardown pipeline
 
-Lines 72-81:
-
-```javascript
-function destroySelect(element) {
-    const instance = instances.get(element);
-    if (instance) {
-        if (instance._lnResetForm && instance._lnResetHandler) {
-            instance._lnResetForm.removeEventListener('reset', instance._lnResetHandler);
-        }
-        instance.destroy();
-        instances.delete(element);
-    }
-}
-```
-
-Three steps:
+Lines 72-81. Three steps, in order:
 
 1. **Unwire the reset listener** — using the bookkeeping
-   properties stored at init.
+   properties stored at init (`_lnResetForm.removeEventListener('reset', _lnResetHandler)`).
 2. **Call `tomSelect.destroy()`** — TomSelect's own teardown,
    which removes the `.ts-wrapper` DOM, restores the original
    `<select>`'s `display`, and detaches every TomSelect-internal
@@ -337,17 +273,10 @@ Three edge cases the wrapper does NOT address:
 
 ### Attribute removal does not auto-destroy
 
-```javascript
-select.removeAttribute('data-ln-select');
-// → observer fires (attributeFilter matches)
-// → matcher select[data-ln-select] fails (attribute is gone)
-// → no branch matches; the existing instance stays alive
-```
-
-The instance keeps its TomSelect DOM, keeps the form-reset
-listener, keeps the WeakMap entry. The user-perceived effect is
-that the `<select>` looks the same as before — the `.ts-wrapper`
-is still rendered and TomSelect is still managing it.
+When `data-ln-select` is removed from an element, the observer fires
+but the `select[data-ln-select]` matcher fails — no branch matches
+and the existing instance stays alive. The TomSelect DOM, the
+form-reset listener, and the WeakMap entry all persist.
 
 The clean teardown for "stop using ln-select on this element" is:
 
@@ -362,18 +291,10 @@ the canonical lifecycle, not attribute removal.
 
 ### Mid-life config change does not re-init
 
-```javascript
-select.setAttribute('data-ln-select', '{"create":true}');
-// (was previously '{}' or boolean)
-// → observer fires
-// → initializeSelect called
-// → instances.has(element) is true
-// → returns early; new config is ignored
-```
-
-The WeakMap-presence guard is "have we initialized this element?",
-not "has the config changed?" Mutating the attribute value does
-NOT reconfigure TomSelect. To switch configs:
+Mutating the `data-ln-select` attribute value on an already-upgraded
+element does NOT reconfigure TomSelect. The WeakMap-presence guard is
+"have we initialized this element?", not "has the config changed?" To
+switch configs, destroy first and re-initialize:
 
 ```javascript
 window.lnSelect.destroy(select);
@@ -381,16 +302,8 @@ select.setAttribute('data-ln-select', '{"create":true}');
 window.lnSelect.initialize(select);
 ```
 
-Or in one mutation that re-triggers the observer cleanly:
-
-```javascript
-window.lnSelect.destroy(select);
-// observer-friendly: remove + re-add the attribute
-select.removeAttribute('data-ln-select');
-select.setAttribute('data-ln-select', '{"create":true}');
-// initializeSelect runs at the second observer tick (the one for
-// the attribute addition), reads the new config, upgrades fresh
-```
+Alternatively, remove then re-add the attribute so the observer
+handles the re-init at the second tick cleanly.
 
 ### TomSelect-load timing race (script-injection scenario)
 
@@ -407,24 +320,11 @@ init scan) would penalize the common case for an edge case.
 
 ## The form-reset `setTimeout(0)`
 
-Lines 56-62:
-
-```javascript
-const resetHandler = () => {
-    setTimeout(() => {
-        tomSelect.clear();
-        tomSelect.clearOptions();
-        tomSelect.sync();
-    }, 0);
-};
-form.addEventListener('reset', resetHandler);
-```
-
 The reset event fires on the form BEFORE the platform actually
-clears field values. (Per the HTML spec, `reset` fires synchronously
+clears field values. Per the HTML spec, `reset` fires synchronously
 during form reset; field values are reset as part of the same
 event-dispatch sequence, so the order is: reset event fires →
-listeners run → field values are reset.)
+listeners run → field values are reset.
 
 If TomSelect ran `clear` + `clearOptions` + `sync` synchronously
 inside the listener, two things would go wrong:
@@ -478,16 +378,6 @@ cleanup pass.
 
 ## API surface (window.lnSelect)
 
-```javascript
-window.lnSelect = {
-    initialize: initializeSelect,   // (element) => void
-    destroy: destroySelect,         // (element) => void
-    getInstance: function (element) {  // (element) => TomSelect | undefined
-        return instances.get(element);
-    },
-};
-```
-
 | Method | Description | Common use |
 |---|---|---|
 | `initialize(element)` | Upgrade the element. Idempotent. Used internally by the observer; also exposed for manual calls (Shadow DOM, iframe, manual race against the observer's tick). | Rare. Most consumers do not need this. |
@@ -501,26 +391,10 @@ Project code that needs the TomSelect instance reaches for it via
 
 ## Configuration merge — defaults vs user
 
-Lines 38-48:
-
-```javascript
-const defaultConfig = {
-    allowEmptyOption: true,
-    controlInput: null,
-    create: false,
-    highlight: true,
-    closeAfterSelect: true,
-    placeholder: element.getAttribute('placeholder') || 'Select...',
-    loadThrottle: 300,
-};
-
-const finalConfig = { ...defaultConfig, ...config };
-```
-
-The merge is shallow object spread — user-provided keys overwrite
-default keys. There is no deep merge. For nested options
-(`render: { option: ..., item: ... }`), the entire `render` object
-is replaced, not merged.
+Lines 38-48. The merge is a shallow object spread — user-provided
+keys overwrite default keys (`{ ...defaultConfig, ...config }`).
+There is no deep merge; for nested options (`render: { option: ..., item: ... }`),
+the entire `render` object is replaced, not merged.
 
 The default choices are tuned for admin-form contexts:
 
@@ -682,5 +556,3 @@ That invisibility is what makes the wrapper composable. Drop
 `data-ln-select` on a `<select>`, drop `data-ln-validate` on the
 same element, drop `data-ln-autosave` on the parent form — three
 attributes, one cohesive UX, zero coordinator wiring.
-</content>
-</invoke>

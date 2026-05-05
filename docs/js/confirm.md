@@ -207,13 +207,10 @@ button's `click` listener.
 
 ### The `_submitted` re-entrancy guard
 
-```js
-if (self._submitted) return;
-self._submitted = true;
-```
-
-This guard exists for an unusual edge case: a click handler that
-synthesizes ANOTHER click on the same element synchronously. For
+The `_submitted` flag is a re-entrancy guard against synthetic clicks
+dispatching back into the same handler. It exists for an unusual edge
+case: a click handler that synthesizes ANOTHER click on the same
+element synchronously. For
 instance, a project that does `btn.click()` from inside a click
 handler attached to the same button. Without the guard, the second
 synthetic click would run the second-click branch, then the
@@ -227,23 +224,10 @@ the suspenders.
 
 ## Auto-revert timer mechanics
 
-`_startTimer` does the standard `clearTimeout` then `setTimeout`
-pattern, reading the timeout value fresh from `data-ln-confirm-timeout`:
-
-```js
-_component.prototype._startTimer = function () {
-    if (this.revertTimer) clearTimeout(this.revertTimer);
-    const ms = this._getTimeout() * 1000;
-    this.revertTimer = setTimeout(() => self._reset(), ms);
-};
-
-_component.prototype._getTimeout = function () {
-    const val = parseFloat(this.dom.getAttribute(TIMEOUT_ATTR));
-    return (isNaN(val) || val <= 0) ? DEFAULT_TIMEOUT : val;
-};
-```
-
-`_getTimeout` reads `data-ln-confirm-timeout` and applies validation:
+`_startTimer` uses the standard clear-then-schedule pattern: it
+calls `clearTimeout(this.revertTimer)` if set, then schedules a new
+`setTimeout` based on `_getTimeout() * 1000`. `_getTimeout` reads
+`data-ln-confirm-timeout` fresh and applies validation:
 
 - `parseFloat` parses a leading number (so `"1.5"` → `1.5`,
   `"abc"` → `NaN`).
@@ -278,23 +262,9 @@ mid-confirm timeout changes; it was just incorrect prose.
 
 ## Icon-only branch — detection and rendering
 
-The branch decision is made at construction time:
-
-```js
-this.originalText = dom.textContent.trim();   // captured at construct
-```
-
-Then in `_enterConfirm`:
-
-```js
-var iconUse = this.dom.querySelector('svg.ln-icon use');
-if (iconUse && this.originalText === '') {
-    this.isIconButton = true;
-    // ... swap href, add tooltip class + attribute
-}
-```
-
-The branch fires only if BOTH:
+`originalText` is captured at construction time as
+`dom.textContent.trim()`. Then in `_enterConfirm`, the icon branch
+fires only if BOTH:
 
 1. `originalText === ''` — the constructor saw an empty button (no
    text node descendants, just whitespace or icon).
@@ -436,15 +406,10 @@ parallel rule. The library only ships the rule for `[data-ln-table]`.
 
 ## MutationObserver via `registerComponent`
 
-Initialization is delegated to the shared `registerComponent` helper:
-
-```js
-registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-confirm');
-```
-
-No `extraAttributes`, no `onAttributeChange`, no `onInit`. The
-helper sets up a single global `MutationObserver` on `document.body`
-configured with:
+Initialization is delegated to `registerComponent` with `'ln-confirm'`
+tag, no `extraAttributes`, no `onAttributeChange`, no `onInit`
+(see `ln-confirm.js:108`). The helper sets up a single global
+`MutationObserver` on `document.body` configured with:
 
 - `childList: true, subtree: true` — fires on any descendant
   insertion. New `[data-ln-confirm]` buttons anywhere in the document
@@ -471,16 +436,7 @@ codebase.
 
 ## Destroy lifecycle
 
-```js
-_component.prototype.destroy = function () {
-    if (!this.dom[DOM_ATTRIBUTE]) return;
-    this._reset();
-    this.dom.removeEventListener('click', this._onClick);
-    delete this.dom[DOM_ATTRIBUTE];
-};
-```
-
-Three steps:
+Three steps (see `ln-confirm.js:99-104`):
 
 1. **Idempotency guard.** If the instance is already destroyed,
    exit silently. Standard pattern.

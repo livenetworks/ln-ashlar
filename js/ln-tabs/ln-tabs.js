@@ -100,7 +100,7 @@ import { persistGet, persistSet } from '../ln-core';
 		this._hashHandler = function () {
 			if (!self.hashEnabled) return;
 			const map = _parseHash();
-			self.activate(self.nsKey in map ? map[self.nsKey] : self.defaultKey);
+			self.dom.setAttribute('data-ln-tabs-active', self.nsKey in map ? map[self.nsKey] : self.defaultKey);
 		};
 
 		if (this.hashEnabled) {
@@ -114,14 +114,9 @@ import { persistGet, persistSet } from '../ln-core';
 					initialKey = saved;
 				}
 			}
-			this.activate(initialKey);
+			this.dom.setAttribute('data-ln-tabs-active', initialKey);
 		}
 	}
-
-	_component.prototype.activate = function (key) {
-		if (!key || !(key in this.mapPanels)) key = this.defaultKey;
-		this.dom.setAttribute('data-ln-tabs-active', key);
-	};
 
 	_component.prototype._applyActive = function (key) {
 		if (!key || !(key in this.mapPanels)) key = this.defaultKey;

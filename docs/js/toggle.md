@@ -291,18 +291,10 @@ in the listener.
 
 ### `_syncTriggerAria(panelEl, isOpen)`
 
-(Lines 38-45.)
-
-```js
-const triggers = document.querySelectorAll(
-    '[data-ln-toggle-for="' + panelEl.id + '"]'
-);
-for (const trigger of triggers) {
-    trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-}
-```
-
-Document-scoped query because triggers can live anywhere — a
+(Lines 38-45.) Document-scoped query for every
+`[data-ln-toggle-for="<panelEl.id>"]`, then `setAttribute('aria-expanded',
+isOpen ? 'true' : 'false')` on each. Document-scoped because triggers
+can live anywhere — a
 trigger in the page header for a sidebar in the page footer, a
 trigger inside a modal for a panel outside, etc. The query runs
 on every state change; for typical page sizes this is sub-microsecond
@@ -336,17 +328,7 @@ caller.
 
 ### Key derivation
 
-`persist.js:_resolveKey('toggle', el)`:
-
-```js
-const persist = el.getAttribute('data-ln-persist');
-const id = (persist !== null && persist !== '') ? persist : el.id;
-if (!id) {
-    console.warn('[ln-persist] Element requires id or data-ln-persist="key"', el);
-    return null;
-}
-return PREFIX + 'toggle' + ':' + _pageKey() + ':' + id;
-```
+`persist.js:_resolveKey('toggle', el)` builds the key from four parts:
 
 | Part | Source |
 |---|---|
@@ -362,20 +344,9 @@ Path-scoping is non-overrideable. Two pages with the same panel
 
 ### Restore — constructor path
 
-```js
-if (dom.hasAttribute('data-ln-persist')) {
-    const saved = persistGet('toggle', dom);
-    if (saved !== null) {
-        dom.setAttribute(DOM_SELECTOR, saved);
-    }
-}
-
-this.isOpen = dom.getAttribute(DOM_SELECTOR) === 'open';
-```
-
-(Lines 53-60.)
-
-The `setAttribute` happens inside the constructor, before the
+(Lines 53-60.) The constructor calls `persistGet('toggle', dom)` and,
+if a saved value is found, applies it via `dom.setAttribute(DOM_SELECTOR, saved)`,
+then re-reads the attribute to set `this.isOpen`. The `setAttribute` happens inside the constructor, before the
 observer can react meaningfully (the instance is not yet stored on
 the element — `el[DOM_ATTRIBUTE]` is `undefined` until
 `findElements` assigns it). Even if the observer fires for the
@@ -392,15 +363,9 @@ proceeds as if the markup had said `data-ln-toggle="open"` (or
 
 ### Save — `_syncAttribute` path
 
-```js
-if (el.hasAttribute('data-ln-persist')) {
-    persistSet('toggle', el, 'open');  // or 'close'
-}
-```
-
-(Lines 119-121, 132-134.)
-
-Save runs *after* the post-event dispatches. If a listener
+(Lines 119-121, 132-134.) After the transition completes, if
+`data-ln-persist` is present, `persistSet('toggle', el, 'open' | 'close')`
+is called. Save runs *after* the post-event dispatches. If a listener
 on `:open` calls `e.detail.target.removeAttribute('data-ln-persist')`
 synchronously, the persist write does not happen — the
 `hasAttribute` check is re-evaluated after dispatch. (Edge case;

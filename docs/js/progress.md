@@ -94,37 +94,11 @@ dispatched.
 
 ## Render flow
 
-`_render` (lines 120–134) is the only function that mutates DOM
-after construction. It reads three attributes (value, parent's max,
-own max), computes one number (clamped percentage), and writes six DOM
-artefacts: `style.width`, the four ARIA attributes (`role`,
-`aria-valuemin`, `aria-valuemax`, `aria-valuenow` — `aria-valuenow`
-clamped to `[0, max]`), and the dispatched event:
-
-```js
-function _render() {
-    const value = parseFloat(this.dom.getAttribute('data-ln-progress')) || 0;
-    const parent = this.dom.parentElement;
-    const parentMax = parent && parent.hasAttribute('data-ln-progress-max')
-        ? parseFloat(parent.getAttribute('data-ln-progress-max'))
-        : null;
-    const max = parentMax || parseFloat(this.dom.getAttribute('data-ln-progress-max')) || 100;
-    let percentage = (max > 0) ? (value / max) * 100 : 0;
-
-    if (percentage < 0) percentage = 0;
-    if (percentage > 100) percentage = 100;
-
-    this.dom.style.width = percentage + '%';
-
-    const clampedValue = Math.max(0, Math.min(value, max));
-    this.dom.setAttribute('role', 'progressbar');
-    this.dom.setAttribute('aria-valuemin', '0');
-    this.dom.setAttribute('aria-valuemax', String(max));
-    this.dom.setAttribute('aria-valuenow', String(clampedValue));
-
-    dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
-}
-```
+`_render` (lines 120–134 of `js/ln-progress/ln-progress.js`) is the only function
+that mutates DOM after construction. It reads three attributes (value, parent's max,
+own max), computes one number (clamped percentage), and writes six DOM artefacts:
+`style.width`, the four ARIA attributes (`role`, `aria-valuemin`, `aria-valuemax`,
+`aria-valuenow` — `aria-valuenow` clamped to `[0, max]`), and the dispatched event.
 
 Five implementation choices worth flagging:
 
@@ -222,11 +196,8 @@ observers watch an already-instantiated bar for *value* changes.
 
 ## Max priority resolution
 
-Line 126 of `_render`:
-
-```js
-const max = parentMax || parseFloat(this.dom.getAttribute('data-ln-progress-max')) || 100;
-```
+The resolution chain in `_render` (line 126) reads parent max first,
+then own max, then defaults to 100 — all via `||` short-circuit.
 
 Three sources, in order:
 

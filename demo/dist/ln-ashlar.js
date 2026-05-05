@@ -1212,7 +1212,7 @@ function Et(h) {
     if (this._hashHandler = function() {
       if (!r.hashEnabled) return;
       const n = b();
-      r.activate(r.nsKey in n ? n[r.nsKey] : r.defaultKey);
+      r.dom.setAttribute("data-ln-tabs-active", r.nsKey in n ? n[r.nsKey] : r.defaultKey);
     }, this.hashEnabled)
       window.addEventListener("hashchange", this._hashHandler), this._hashHandler();
     else {
@@ -1221,12 +1221,10 @@ function Et(h) {
         const t = ft("tabs", this.dom);
         t !== null && t in this.mapPanels && (n = t);
       }
-      this.activate(n);
+      this.dom.setAttribute("data-ln-tabs-active", n);
     }
   }
-  p.prototype.activate = function(r) {
-    (!r || !(r in this.mapPanels)) && (r = this.defaultKey), this.dom.setAttribute("data-ln-tabs-active", r);
-  }, p.prototype._applyActive = function(r) {
+  p.prototype._applyActive = function(r) {
     var n;
     (!r || !(r in this.mapPanels)) && (r = this.defaultKey);
     for (const t in this.mapTabs) {

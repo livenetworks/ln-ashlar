@@ -72,16 +72,10 @@ const _inflight  = new Map();   // "METHOD URL" → AbortController (Path A)
 const _keyed     = new Map();   // consumer key → AbortController (Path B)
 ```
 
-Plus one private reference at line 57:
-
-```js
-const _origFetch = window.fetch.bind(window);
-```
-
-`_origFetch` is the unwrapped `fetch`, captured at script load before
-the wrapper is installed. Used internally (Path B re-enters the
-wrapped `fetch` deliberately to compose the two paths) and restored
-on `destroy()` (line 215).
+Plus one private reference at line 57: `_origFetch = window.fetch.bind(window)` —
+the unwrapped `fetch`, captured at script load before the wrapper is installed.
+Used internally (Path B re-enters the wrapped `fetch` deliberately to compose
+the two paths) and restored on `destroy()` (line 215).
 
 ### `_inflight` lifecycle (Path A)
 
