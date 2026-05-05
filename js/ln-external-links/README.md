@@ -384,12 +384,12 @@ manually using `ln-modal` for the dialog and a click capture handler:
         e.preventDefault();
         pendingUrl = link.href;
         urlEl.textContent = pendingUrl;
-        modal.lnModal.open();
+        modal.setAttribute('data-ln-modal', 'open');
     }, true); // capture phase — runs before ln-external-links' delegate
 
     confirmBtn.addEventListener('click', function () {
         if (pendingUrl) window.open(pendingUrl, '_blank', 'noopener,noreferrer');
-        modal.lnModal.close();
+        modal.setAttribute('data-ln-modal', 'close');
         pendingUrl = null;
     });
 })();

@@ -517,7 +517,9 @@ function Et(h) {
           console.warn('[ln-modal] No modal found for data-ln-modal-for="' + o + '"');
           return;
         }
-        s[c] && s[c].toggle();
+        if (!s[c]) return;
+        const u = s.getAttribute(h);
+        s.setAttribute(h, u === "open" ? "close" : "open");
       };
       t.addEventListener("click", i), t[c + "Trigger"] = i;
     }
@@ -526,7 +528,7 @@ function Et(h) {
     this.dom = r, this.isOpen = r.getAttribute(h) === "open";
     const n = this;
     return this._onEscape = function(t) {
-      t.key === "Escape" && n.close();
+      t.key === "Escape" && n.dom.setAttribute(h, "close");
     }, this._onFocusTrap = function(t) {
       if (t.key !== "Tab") return;
       const i = Array.prototype.filter.call(
@@ -537,16 +539,10 @@ function Et(h) {
       const e = i[0], o = i[i.length - 1];
       t.shiftKey ? document.activeElement === e && (t.preventDefault(), o.focus()) : document.activeElement === o && (t.preventDefault(), e.focus());
     }, this._onClose = function(t) {
-      t.preventDefault(), n.close();
+      t.preventDefault(), n.dom.setAttribute(h, "close");
     }, _(this), this.isOpen && (this.dom.setAttribute("aria-modal", "true"), this.dom.setAttribute("role", "dialog"), document.body.classList.add("ln-modal-open"), document.addEventListener("keydown", this._onEscape), document.addEventListener("keydown", this._onFocusTrap)), this;
   }
-  g.prototype.open = function() {
-    this.isOpen || this.dom.setAttribute(h, "open");
-  }, g.prototype.close = function() {
-    this.isOpen && this.dom.setAttribute(h, "close");
-  }, g.prototype.toggle = function() {
-    this.isOpen ? this.close() : this.open();
-  }, g.prototype.destroy = function() {
+  g.prototype.destroy = function() {
     if (!this.dom[c]) return;
     this.isOpen && (this.dom.removeAttribute("aria-modal"), document.removeEventListener("keydown", this._onEscape), document.removeEventListener("keydown", this._onFocusTrap), this._returnFocusEl = null, document.querySelector("[" + h + '="open"]') || document.body.classList.remove("ln-modal-open"));
     const r = this.dom.querySelectorAll("[data-ln-modal-close]");

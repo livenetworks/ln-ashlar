@@ -87,7 +87,7 @@ All components use `data-ln-{name}` attributes. Place the attribute in HTML — 
 <input data-ln-search="my-list" type="search">    <!-- Search -->
 ```
 
-Components expose a JS API on the element (`el.lnModal.open()`) and fire namespaced events (`ln-modal:open`). See individual component docs for details.
+Components expose a JS API on the element (e.g. read state via `el.lnModal.isOpen`) and fire namespaced events (`ln-modal:open`). See individual component docs for details.
 
 ---
 

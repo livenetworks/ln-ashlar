@@ -493,7 +493,7 @@ Most components: the constructor is registered on `window`. Instances live on DO
 
 ```javascript
 window[DOM_ATTRIBUTE] = constructor;    // window.lnToggle, window.lnModal, ...
-// Instance: el.lnToggle.destroy(), el.lnModal.close()
+// Instance: el.lnToggle.destroy(), el.lnModal.destroy()
 ```
 
 Use when: component has DOM instances, each element gets its own API.
@@ -655,7 +655,7 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
                 }));
             }
             input.value = '';
-            document.getElementById('modal-new-profile').lnModal.close();
+            document.getElementById('modal-new-profile').setAttribute('data-ln-modal', 'close');
         });
 
         // 3. Notification → UI feedback

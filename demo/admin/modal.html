@@ -506,13 +506,9 @@ document.addEventListener('ln-modal:close', function(e) {
     &lt;/form&gt;
 &lt;/div&gt;
 
-&lt;!-- JS API (sets the attribute, observer does the rest) --&gt;
+&lt;!-- Attribute IS the contract — observer applies state. --&gt;
 &lt;script&gt;
     const modal = document.getElementById('my-modal');
-    modal.lnModal.open();       // sets data-ln-modal="open"
-    modal.lnModal.close();      // sets data-ln-modal="close"
-
-    // Direct attribute change — identical result
     modal.setAttribute('data-ln-modal', 'open');
     modal.setAttribute('data-ln-modal', 'close');
 &lt;/script&gt;</code></pre>

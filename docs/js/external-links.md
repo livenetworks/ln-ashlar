@@ -294,7 +294,7 @@ It does not coordinate with:
 
 - `ln-modal` — the demo's "leaving the site" interstitial is project
   code that listens to the platform `click` in capture phase and
-  invokes `modal.lnModal.open()`. ln-external-links is unaware.
+  sets `data-ln-modal="open"` on the modal. ln-external-links is unaware.
 - `ln-ajax` / `ln-store` — links inside AJAX-loaded fragments are
   decorated by the MutationObserver. The data-loading components
   do not signal "I just inserted markup, please re-process";
