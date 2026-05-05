@@ -167,17 +167,9 @@ search call `preventDefault()` and run their own logic.
 ## Event shape
 
 `ln-search:change` is dispatched via `dispatchCancelable` from
-`js/ln-core/helpers.js`:
-
-```js
-const event = new CustomEvent('ln-search:change', {
-    bubbles: true,
-    cancelable: true,
-    detail: { term, targetId }
-});
-target.dispatchEvent(event);
-return event;
-```
+`js/ln-core/helpers.js` — a bubbling, cancelable `CustomEvent` with
+`detail: { term, targetId }` dispatched on the target element and
+returned to the caller so `defaultPrevented` can be checked.
 
 The event:
 

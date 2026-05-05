@@ -109,13 +109,8 @@ directly (or from `e.detail` of subsequent events).
 ## SVG geometry
 
 The geometric constants are module-level (lines 10–12) and not
-configurable per instance:
-
-```js
-const VIEW_SIZE = 36;
-const RADIUS = 16;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;   // ≈ 100.531
-```
+configurable per instance: `VIEW_SIZE = 36`, `RADIUS = 16`, and
+`CIRCUMFERENCE = 2 * Math.PI * RADIUS` (≈ 100.531).
 
 The `viewBox` is `"0 0 36 36"`, the SVG element fills the host
 (`width: 100%`, `height: 100%`), and both circles have `cx=18`,
@@ -156,28 +151,8 @@ Reduced-motion users see an instant snap.
 
 `_render` is the only function that mutates DOM after construction.
 It reads three attributes, computes one number, and writes two DOM
-properties:
-
-```js
-function _render() {
-    const value = parseFloat(this.dom.getAttribute('data-ln-circular-progress')) || 0;
-    const max = parseFloat(this.dom.getAttribute('data-ln-circular-progress-max')) || 100;
-    let percentage = (max > 0) ? (value / max) * 100 : 0;
-
-    if (percentage < 0) percentage = 0;
-    if (percentage > 100) percentage = 100;
-
-    const offset = CIRCUMFERENCE - (percentage / 100) * CIRCUMFERENCE;
-    this.progressCircle.setAttribute('stroke-dashoffset', offset);
-
-    const label = this.dom.getAttribute('data-ln-circular-progress-label');
-    this.labelEl.textContent = label !== null ? label : Math.round(percentage) + '%';
-
-    dispatch(this.dom, 'ln-circular-progress:change', { ... });
-}
-```
-
-Three implementation choices worth flagging:
+properties (see `js/ln-circular-progress/ln-circular-progress.js` for
+the full body). Three implementation choices worth flagging:
 
 1. **`|| 0` / `|| 100` fallbacks.** `parseFloat('')` is `NaN`,
    which is falsy, so `NaN || 0` is `0`. Same for any non-numeric
@@ -308,11 +283,8 @@ There are TWO valid override paths, both documented:
 on the element or a wrapper. The `--color-accent` token is wired at
 `:root` to `hsl(var(--color-primary))`, so changing `--color-primary`
 at consumer scope re-resolves `--color-accent` at the fill's read
-site. The mixin's header comment documents this path:
-
-```scss
-// [data-ln-circular-progress].success { --color-primary: var(--color-success); }
-```
+site. The mixin's header comment illustrates the pattern:
+`[data-ln-circular-progress].success { --color-primary: var(--color-success); }`.
 
 This is the right path for custom variants that should follow theme
 shifts (Glass, Dark, etc).

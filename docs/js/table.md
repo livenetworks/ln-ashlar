@@ -7,10 +7,6 @@
 
 ## Imports
 
-```js
-import { dispatch, registerComponent } from '../ln-core';
-```
-
 Two helpers from `ln-core`:
 
 - `dispatch(el, name, detail)` — bubbling, non-cancelable

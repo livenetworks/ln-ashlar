@@ -25,15 +25,8 @@ DOM hardening, applied uniformly, with no consumer wiring.
 
 ## Decision table — what counts as "external"
 
-The single test, on line 9 of the source:
-
-```js
-function _isExternalLink(link) {
-    return link.hostname && link.hostname !== window.location.hostname;
-}
-```
-
-Behavior, exhaustively:
+The single test (line 9): truthy `link.hostname` AND
+`link.hostname !== window.location.hostname`. Behavior, exhaustively:
 
 | `href`                                  | `link.hostname`                | External? | Decorated? |
 |-----------------------------------------|--------------------------------|-----------|------------|
@@ -155,16 +148,8 @@ unconditional once the guards pass.
 
 ## MutationObserver scope and limitations
 
-```js
-observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['href']
-});
-```
-
-What this catches:
+The observer watches `document.body` with `childList: true, subtree: true,
+attributes: true, attributeFilter: ['href']`. What this catches:
 
 - New `<a>` or `<area>` element appended anywhere in `document.body`.
 - New subtrees containing `<a>` / `<area>` descendants. The handler
@@ -204,25 +189,11 @@ crash.
 
 The delegate is set up inside `guardBody`, so the
 `document.body.addEventListener` call is deferred to `DOMContentLoaded`
-when the script loads before `<body>` exists. The listener body itself
-is unchanged from the source:
-
-```js
-document.body.addEventListener('click', function (e) {
-    const link = e.target.closest('a, area');
-    if (!link) return;
-
-    if (link.getAttribute('data-ln-external-link') === 'processed') {
-        dispatch(link, 'ln-external-links:clicked', {
-            link: link,
-            href: link.href,
-            text: link.textContent || link.title || ''
-        });
-    }
-});
-```
-
-Three properties of this delegate are worth noting:
+when the script loads before `<body>` exists. The handler uses
+`e.target.closest('a, area')` to find the anchor, then dispatches
+`ln-external-links:clicked` with `{ link, href, text }` if the
+`processed` marker is present. Three properties of this delegate are
+worth noting:
 
 1. **`closest('a, area')` resolves nested clicks.** A click on a
    `<svg>` inside `<a>` resolves to the anchor — the anchor is the
@@ -248,16 +219,9 @@ mistakes" item 3.
 
 ## Accessibility — the sr-only hint
 
-Lines 19-22:
-
-```js
-const hint = document.createElement('span');
-hint.className = 'sr-only';
-hint.textContent = '(opens in new tab)';
-link.appendChild(hint);
-```
-
-The hint is a WCAG 2.4.4 ("Link Purpose (In Context)") affordance —
+The hint is a `<span class="sr-only">` with text `"(opens in new tab)"`,
+appended as the link's last child (lines 19-22 of the source). It is a
+WCAG 2.4.4 ("Link Purpose (In Context)") affordance —
 users of assistive tech get a verbal cue that the link will open in
 a new tab, which is an accessibility expectation for `target="_blank"`.
 Sighted users see no change because `.sr-only` (defined in

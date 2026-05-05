@@ -301,18 +301,10 @@ catches the new form.
 
 ## Storage key mechanics
 
-`_getStorageKey(form)` (lines 126-131):
-
-```js
-function _getStorageKey(form) {
-    const value = form.getAttribute(DOM_SELECTOR);
-    const identifier = value || form.id;
-    if (!identifier) return null;
-    return STORAGE_PREFIX + window.location.pathname + ':' + identifier;
-}
-```
-
-The resolution rule is `attribute value OR form.id`. Empty attribute
+`_getStorageKey(form)` (lines 126-131) resolves the key as
+`STORAGE_PREFIX + window.location.pathname + ':' + identifier`,
+where `identifier` is the attribute value if non-empty, otherwise
+`form.id`. The resolution rule is `attribute value OR form.id`. Empty attribute
 value (`data-ln-autosave=""`) is falsy, so it falls through to
 `form.id`. Missing both → `null`, which the constructor logs and
 exits on.
@@ -409,18 +401,9 @@ stop having their work saved — and they have no way to know.
 
 This is asymmetric with `ln-store`, which dispatches
 `ln-store:quota-exceeded` on the same `QuotaExceededError`. A future
-enhancement could add a parallel event:
-
-```js
-} catch (e) {
-    if (e.name === 'QuotaExceededError') {
-        dispatch(this.dom, 'ln-autosave:quota-exceeded', { error: e });
-    }
-    return;
-}
-```
-
-Not done today. Flagged.
+enhancement could add a parallel `ln-autosave:quota-exceeded` event,
+dispatching on `QuotaExceededError` before returning. Not done today.
+Flagged.
 
 ### 3. Construction-time `restore()` runs before back-reference is set
 
@@ -431,21 +414,15 @@ need to call `form.lnAutosave.clear()` must defer via
 `queueMicrotask`.
 
 A future refactor could wrap the construction-time restore in a
-`queueMicrotask`:
-
-```js
-queueMicrotask(function () {
-    self.restore();
-});
-```
-
-The trade-off: the restore would no longer be synchronous from
-construction's point of view, so a consumer expecting
-`form.lnAutosave` to have already-restored values immediately after
-construction (rare, but possible) would break. The current behaviour
-is the "synchronous on construction" contract; the proposed refactor
-is a "microtask-deferred restore" contract. They are not equivalent;
-the right choice depends on how consumers actually use the timing.
+`queueMicrotask` so the back-reference is always set by the time
+listeners run. The trade-off: the restore would no longer be
+synchronous from construction's point of view, so a consumer
+expecting `form.lnAutosave` to have already-restored values
+immediately after construction (rare, but possible) would break. The
+current behaviour is the "synchronous on construction" contract; the
+proposed refactor is a "microtask-deferred restore" contract. They are
+not equivalent; the right choice depends on how consumers actually use
+the timing.
 
 For now, the current shape is what the source does. The README and
 this doc call out the workaround.

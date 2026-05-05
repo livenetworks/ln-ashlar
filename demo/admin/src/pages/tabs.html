@@ -5,7 +5,7 @@
 						<header><h3>Overview</h3></header>
 						<main>
 							<p>N-way exclusive panel selection on a single container — the tab primitive in ln-ashlar. 145 lines of JS that own three things at once: which tab is active (a string key on the wrapper), how to persist it (URL hash for namespaced sections, <code>localStorage</code> as the opt-in fallback), and how to keep ARIA in sync.</p>
-							<p>The contract is one sentence: <strong>the active tab lives in <code>data-ln-tabs-active</code> on the wrapper, and the wrapper is the source of truth.</strong> Click handlers, hash sync, the <code>activate()</code> API, persistence restore — every entry point funnels into one <code>setAttribute('data-ln-tabs-active', key)</code> call. A single <code>MutationObserver</code> callback runs the activation pipeline. There is no second path.</p>
+							<p>The contract is one sentence: <strong>the active tab lives in <code>data-ln-tabs-active</code> on the wrapper, and the wrapper is the source of truth.</strong> Click handlers, hash sync, persistence restore, external code — every entry point funnels into one <code>setAttribute('data-ln-tabs-active', key)</code> call. A single <code>MutationObserver</code> callback runs the activation pipeline. There is no second path.</p>
 							<p>Tabs are deliberately <strong>NOT</strong> built on <a href="toggle.html"><code>ln-toggle</code></a>. The contracts diverge: ln-toggle is binary open/close, tabs are N-way exclusive; toggle uses <code>aria-expanded</code> (disclosure), tabs use <code>aria-selected</code> (tablist); toggle persists per element, tabs use namespace-scoped URL hashes OR per-page <code>localStorage</code> (mutually exclusive). Squeezing tabs into N coordinated toggles would put coordinator logic in the wrong place. See the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-tabs/README.md#why-not-ln-toggle">README "Why not ln-toggle"</a> section for the full architectural argument.</p>
 							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-tabs/README.md"><code>ln-tabs</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/tabs.md">architecture reference</a>.</p>
 						</main>
@@ -46,13 +46,10 @@
 					<section class="section-card">
 						<header><h3>Single source of truth</h3></header>
 						<main>
-							<p>Every consumer that wants to change the active tab writes <code>data-ln-tabs-active</code> on the wrapper. The imperative API method <code>activate(key)</code> is sugar over <code>setAttribute</code>; the click handler reduces to the same write (or to <code>location.hash</code> when hash sync is enabled, which routes back through <code>hashchange</code> → <code>activate()</code> → <code>setAttribute</code>).</p>
+							<p>Every consumer that wants to change the active tab writes <code>data-ln-tabs-active</code> on the wrapper. There is no second path — click handlers and the <code>hashchange</code> listener both end at <code>setAttribute</code>.</p>
 <pre><code>const tabs = document.getElementById('user-tabs');
 
-// Via API
-tabs.lnTabs.activate('settings');   // → setAttribute('data-ln-tabs-active', 'settings')
-
-// Via attribute — IDENTICAL behavior
+// Canonical write — switches the active tab
 tabs.setAttribute('data-ln-tabs-active', 'settings');
 
 // Via hash (when hash sync is enabled)

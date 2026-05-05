@@ -204,15 +204,9 @@ clears that transient state. Reordering leaves fields visibly invalid.
 
 ### Native `<button type="reset">` path — `_onNativeReset`
 
-```javascript
-this._onNativeReset = function () {
-	setTimeout(function () { self._resetValidation(); }, 0);
-};
-```
-
 A `<button type="reset">` click fires the platform `reset` event. The
 component intercepts it and runs ONLY `_resetValidation()`, deferred by
-one tick so the browser has applied the DOM reset first.
+one tick via `setTimeout(..., 0)` so the browser has applied the DOM reset first.
 
 Intentionally absent from this path: synthetic input/change loop and
 `ln-form:reset-complete` dispatch. Projects that use native reset get
@@ -222,12 +216,7 @@ event are the full reactive paths.
 ### Auto-submit
 
 When `data-ln-form-auto` is present, both `input` and `change` events on
-the form trigger `submit()`:
-
-```javascript
-form.addEventListener('input', this._onAutoInput);
-form.addEventListener('change', this._onAutoInput);
-```
+the form trigger `submit()` via the same `_onAutoInput` handler.
 
 With `data-ln-form-debounce="N"`, each event clears and restarts a timer.
 `submit()` fires only after N ms of silence.

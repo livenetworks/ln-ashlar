@@ -108,11 +108,8 @@ README "Hidden-then-revealed" example.
 ## MutationObserver via `registerComponent`
 
 Initialization is delegated to the shared `registerComponent` helper
-in `js/ln-core/helpers.js`:
-
-```js
-registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-autoresize');
-```
+in `js/ln-core/helpers.js`, called at the bottom of the IIFE with the
+selector, attribute key, constructor, and tag name as arguments.
 
 The helper sets up a single global `MutationObserver` on
 `document.body` configured with:
@@ -133,14 +130,8 @@ calls (`if (!el[attribute])`).
 
 ## Tag validation
 
-The constructor's first line:
-
-```js
-if (dom.tagName !== 'TEXTAREA') {
-    console.warn('[ln-autoresize] Can only be applied to <textarea>, got:', dom.tagName);
-    return this;
-}
-```
+The constructor checks `dom.tagName !== 'TEXTAREA'` immediately and,
+if true, logs a warning and returns `this` early.
 
 The early-`return this` produces an instance with only the prototype
 methods — no `dom` property is set, no listener is attached. Side
@@ -154,16 +145,7 @@ state is benign (no listeners, no leaks, just a stale instance).
 
 ## Destroy lifecycle
 
-```js
-_component.prototype.destroy = function () {
-    if (!this.dom[DOM_ATTRIBUTE]) return;
-    this.dom.removeEventListener('input', this._onInput);
-    this.dom.style.height = '';
-    delete this.dom[DOM_ATTRIBUTE];
-};
-```
-
-Three steps:
+Three steps (see `js/ln-autoresize/ln-autoresize.js` lines 37–42):
 
 1. **Idempotency guard.** If the instance is already destroyed (or
    was never properly initialized — see "Tag validation"), exit

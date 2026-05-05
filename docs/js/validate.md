@@ -77,14 +77,10 @@ pass them back to `removeEventListener` — closures referencing
 
 ## The listener discriminator
 
-The constructor reads two properties of the field to decide which
-events to listen for:
-
-```javascript
-const tag = dom.tagName;
-const type = dom.type;
-const isChangeBased = tag === 'SELECT' || type === 'checkbox' || type === 'radio';
-```
+The constructor reads `tagName` and `type` to decide which events to
+listen for — change-based for SELECT, checkbox, and radio; `input`
+plus `change` for everything else. This is the `isChangeBased`
+discriminator (see `ln-validate.js:33`).
 
 | `isChangeBased` | Field types | Listeners attached |
 |---|---|---|
@@ -113,16 +109,10 @@ documented invariant that has to stay in sync across files. If a
 future commit changes the discriminator on one side, every other
 side must change with it — see the inline comment in `ln-form.js:106-107`.
 
-Both `_onInput` and `_onChange` have the same body:
-
-```javascript
-this._onInput = function () { self._touched = true; self.validate(); };
-this._onChange = function () { self._touched = true; self.validate(); };
-```
-
-Two separate handlers exist (rather than one shared) so that
-`destroy()` can pass distinct references to `removeEventListener`.
-Behaviorally identical.
+Both `_onInput` and `_onChange` have the same body: set
+`_touched = true` and call `validate()`. Two separate handlers exist
+(rather than one shared function) so that `destroy()` can pass
+distinct references to `removeEventListener`. Behaviorally identical.
 
 ## The `validate()` flow
 
@@ -152,19 +142,18 @@ ends up here.
 
 Step 4 is the key integration point. The component iterates every
 `<li data-ln-validate-error>` in the field's `.form-element`
-wrapper and checks each key against `ERROR_MAP`:
+wrapper and checks each key against `ERROR_MAP` (defined at
+`ln-validate.js:84`):
 
-```javascript
-const ERROR_MAP = {
-    required: 'valueMissing',
-    typeMismatch: 'typeMismatch',
-    tooShort: 'tooShort',
-    tooLong: 'tooLong',
-    patternMismatch: 'patternMismatch',
-    rangeUnderflow: 'rangeUnderflow',
-    rangeOverflow: 'rangeOverflow'
-};
-```
+| `data-ln-validate-error` key | `ValidityState` property |
+|---|---|
+| `required` | `valueMissing` |
+| `typeMismatch` | `typeMismatch` |
+| `tooShort` | `tooShort` |
+| `tooLong` | `tooLong` |
+| `patternMismatch` | `patternMismatch` |
+| `rangeUnderflow` | `rangeUnderflow` |
+| `rangeOverflow` | `rangeOverflow` |
 
 Keys IN the map → toggle based on `validity[mappedProperty]`.
 Keys NOT in the map → skipped entirely (`continue`). This is the
@@ -293,17 +282,11 @@ form you haven't started yet."
 
 ## The `isValid` getter
 
-```javascript
-Object.defineProperty(_component.prototype, 'isValid', {
-    get: function () {
-        return this.dom.checkValidity() && this._customErrors.size === 0;
-    }
-});
-```
-
-A pure read. No side effects: no class toggles, no `<li>` updates,
-no event dispatches, no `_touched` mutation. Reads live state
-through `checkValidity()` (which itself is a pure read) and
+A pure read: `dom.checkValidity() && _customErrors.size === 0`.
+No side effects — no class toggles, no `<li>` updates, no event
+dispatches, no `_touched` mutation. Defined as a prototype getter
+via `Object.defineProperty` (see `ln-validate.js:139`). Reads live
+state through `checkValidity()` (which itself is a pure read) and
 `_customErrors.size`.
 
 This is what consumer code reaches for when it wants to know "is
@@ -405,20 +388,11 @@ debug overlays) react. It carries `{ target: dom }` and bubbles.
 
 ## Listener attachment timeline
 
-The constructor wires four listeners on the field element
-(`ln-validate.js:82-87`):
-
-```javascript
-if (!isChangeBased) {
-    dom.addEventListener('input', this._onInput);
-}
-dom.addEventListener('change', this._onChange);
-dom.addEventListener('ln-validate:set-custom', this._onSetCustom);
-dom.addEventListener('ln-validate:clear-custom', this._onClearCustom);
-```
-
-All four target the field directly, not the form or document. This
-matters for two reasons:
+The constructor wires four listeners on the field element directly
+(`ln-validate.js:82-87`): `input` (text fields only), `change`,
+`ln-validate:set-custom`, and `ln-validate:clear-custom`. All four
+target the field, not the form or document. This matters for two
+reasons:
 
 1. **Event delegation for `:set-custom` / `:clear-custom`.** The
    events bubble (CustomEvent default), but the listener is on the

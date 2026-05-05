@@ -6,13 +6,10 @@ browser's native URL preview. File: `js/ln-link/ln-link.js` (~196 lines).
 
 ## Imports
 
-```js
-import { dispatchCancelable, guardBody } from '../ln-core';
-```
-
-These are the **only two imports**. The component does not use `dispatch`,
-`findElements`, `cloneTemplate`, `renderList`, or any template helper from
-`js/ln-core/helpers.js`. See `js/ln-core/helpers.js` for source definitions.
+The component imports only `dispatchCancelable` and `guardBody` from `../ln-core`.
+It does not use `dispatch`, `findElements`, `cloneTemplate`, `renderList`, or any
+template helper from `js/ln-core/helpers.js`. See `js/ln-core/helpers.js` for
+source definitions.
 
 - `dispatchCancelable` — dispatches `ln-link:navigate` as a cancelable
   `CustomEvent` and returns the event object so the caller can check
@@ -106,11 +103,8 @@ pattern, so the function lives inline.
 ## MutationObserver
 
 The observer (line 147) is registered inside `guardBody` to ensure
-`document.body` exists. It watches `document.body` with:
-
-```
-{ childList: true, subtree: true, attributes: true, attributeFilter: ['data-ln-link'] }
-```
+`document.body` exists. It watches `document.body` with `childList: true,
+subtree: true, attributes: true, attributeFilter: ['data-ln-link']`.
 
 Two mutation branches:
 
@@ -194,12 +188,8 @@ rows, which have no listeners. The old listeners leak. Always call
 
 ## Registration pattern (legacy)
 
-`ln-link` uses the direct assignment form:
-
-```js
-window[DOM_ATTRIBUTE] = { init: constructor, destroy: _destroyContainer };
-// → window.lnLink = { init, destroy }
-```
+`ln-link` uses the pre-`registerComponent` direct assignment pattern:
+`window.lnLink = { init: constructor, destroy: _destroyContainer }`.
 
 This is the pre-`registerComponent` pattern. At the time of writing,
 `ln-link` is on the migration backlog alongside:
