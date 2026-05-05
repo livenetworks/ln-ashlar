@@ -1,33 +1,20 @@
 # ln-accordion
 
-> Coordinator that enforces single-open across a list of `ln-toggle` panels — opening one closes the others, via attribute, not by calling anything.
+> [Coordinator](../../docs/architecture/data-flow.md#14-glossary) that enforces single-open across a list of `ln-toggle` panels — opening one closes the others, via attribute, not by calling anything.
 
 ## Philosophy
 
-`ln-accordion` exists for one reason: a list of `ln-toggle` panels in
-which only one should be open at a time. It is a 38-line coordinator,
-and that's the entire feature surface. It does not animate the panels
-(CSS does, via `.collapsible`), it does not own each panel's
-open/closed state (`ln-toggle` does, via `data-ln-toggle`), and it does
-not run any logic when nothing is opening — it sits idle until an
-`ln-toggle:open` event bubbles up.
+`ln-accordion` enforces a single-open rule across a list of
+[`ln-toggle`](../ln-toggle/README.md) panels: when one panel opens,
+the others close. It does this entirely through attributes — it sets
+`data-ln-toggle="close"` on each open sibling and leaves the rest to
+the toggle's own `MutationObserver`. Because the close goes through
+`ln-toggle`'s own state machine, cancelable events, `aria-expanded`
+sync, and persistence all behave identically to a direct user close.
 
-The shape it has — a wrapper `<ul data-ln-accordion>` around toggle
-children — is a deliberate consequence of the architecture in
-[`docs/architecture/data-flow.md`](../../docs/architecture/data-flow.md).
-Components in this library do not call each other; they communicate
-through events on the DOM, and they read each other's state from
-attributes. So when one panel opens and the others must close, the
-accordion's job is *not* to reach into a sibling's instance. The
-toggle exposes no state-mutating method anyway, but the deeper reason
-is the same one that drove the API shape: a sibling-instance call would
-let the wrapper bypass the toggle's own state machine —
-its `before-close` cancelable event, its `aria-expanded` sync, its
-persistence write, all skipped. Instead, the accordion sets
-`data-ln-toggle="close"` on each open sibling, and the toggle's own
-`MutationObserver` reacts and runs the full close pipeline. The
-attribute is the contract; everyone reads and writes the same field.
-This is why the file is so short.
+For the architectural rationale — why attribute-writing beats
+instance-calling, the coordinator contract, and the event lifecycle —
+see [`docs/js/accordion.md`](../../docs/js/accordion.md).
 
 What this component does **not** do:
 
@@ -35,27 +22,8 @@ What this component does **not** do:
   `.collapsible` mixin (`grid-template-rows: 0fr → 1fr`), applied to
   the panel element. The accordion never touches geometry.
 - **Does not allow multi-open.** "Multi-open" is just `data-ln-toggle`
-  panels without an accordion wrapper around them — drop the wrapper
-  if you want that behavior.
-- **Does not auto-open the first panel.** Initial state is whatever
-  the markup says. Mark one panel `data-ln-toggle="open"` if you want
-  it open on load.
-- **Does not persist state.** Persistence is a per-toggle concern via
-  `data-ln-persist` on individual `[data-ln-toggle]` elements.
-  ln-accordion has zero persistence code.
-- **Does not auto-init nested accordions** in any special way — but
-  nested accordions are fully supported. Each accordion's listener
-  only manages toggles whose nearest `[data-ln-accordion]` ancestor
-  is itself, so an inner accordion's opens stay inside it and the
-  outer leaves them alone. See "Nested accordions" under Examples.
-
-How it relates to other components: ln-accordion is a thin layer over
-`ln-toggle`. Every panel in the accordion is an independent
-`ln-toggle` instance — its open/close API, persistence, cancelable
-events, and aria sync all come from there. Read
-[`js/ln-toggle/README.md`](../ln-toggle/README.md) first if you have
-not. ln-accordion adds exactly one rule on top of that: when one
-`ln-toggle:open` happens inside this wrapper, the others close.
+  panels without an accordion wrapper — drop the wrapper if you want
+  that behavior.
 
 ## Markup anatomy
 
@@ -425,62 +393,6 @@ Outer 2 closes Outer 1 (collapsing the inner accordion with it) and
 does not touch the inner panels' `data-ln-toggle` state — they
 remain whatever they were when the outer collapsed, ready to re-show
 in their previous state if Outer 1 is re-opened.
-
-## Common mistakes
-
-### Mistake 1 — Putting `data-ln-toggle` on a panel that is *not* a child of the accordion's `<li>`
-
-```html
-<!-- WRONG — ID-based pairing across the accordion boundary -->
-<ul data-ln-accordion>
-    <li><header data-ln-toggle-for="p1">Section 1</header></li>
-    <li><header data-ln-toggle-for="p2">Section 2</header></li>
-</ul>
-
-<section id="p1" data-ln-toggle class="collapsible">…</section>
-<section id="p2" data-ln-toggle class="collapsible">…</section>
-```
-
-`ln-toggle` will work — it resolves panels by ID, not DOM proximity —
-but the accordion's `_onToggleOpen` only looks inside its own
-subtree. The `ln-toggle:open` event from a panel *outside* the
-wrapper does not bubble through the accordion, so the single-open
-rule won't fire. Keep panels inside the accordion's DOM subtree (the
-canonical pattern is one `<li>` per panel + trigger pair).
-
-### Mistake 2 — Adding padding directly to the `.collapsible` element
-
-```html
-<!-- WRONG — panel won't fully collapse to 0 height -->
-<section id="p1" data-ln-toggle class="collapsible" style="padding: 1rem;">
-    <p>Content</p>
-</section>
-```
-
-The collapse animation works by transitioning `grid-template-rows`
-from `0fr` to `1fr`. If the parent `.collapsible` has padding, that
-padding remains visible at "collapsed" — you'll see a thin strip
-where the content should be invisible. Padding/margins go on the
-inner `.collapsible-body`, never on `.collapsible`.
-
-### Mistake 3 — Adding `data-ln-toggle` to the `<header>`
-
-```html
-<!-- WRONG — header is the trigger, not the panel -->
-<li>
-    <header data-ln-toggle data-ln-toggle-for="p1">Section 1</header>
-    <section id="p1" class="collapsible">…</section>
-</li>
-```
-
-`data-ln-toggle` creates a panel (the thing that opens and closes).
-`data-ln-toggle-for` creates a trigger (the thing that controls a
-panel). Putting both on the header makes the header into a panel
-that controls itself — the click listener would try to call
-`toggle()` on the header, which would flip its own attribute and
-animate its own height. Read [`ln-toggle` README](../ln-toggle/README.md)
-for the trigger-vs-panel split; the accordion does not change those
-semantics.
 
 ## Related
 
