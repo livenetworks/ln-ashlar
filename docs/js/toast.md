@@ -21,16 +21,42 @@ One `_Component` instance per `[data-ln-toast]` container element. No reactive p
 | `timeoutDefault` | number | `data-ln-toast-timeout` (default 6000) |
 | `max` | number | `data-ln-toast-max` (default 5) |
 
+## Default template injection
+
+ln-toast ships a built-in `<template data-ln-template="ln-toast-item">`
+as a raw HTML file (`js/ln-toast/template.html`) imported via `?raw` and
+resolved to a string constant at build time. On `guardBody` setup —
+before any listener is attached — `_ensureTemplate()` checks if a
+template with that name already exists anywhere in the document:
+
+- **Exists** (project supplied it) → no-op.
+- **Doesn't exist** → create a `<template>` element, set
+  `data-ln-template="ln-toast-item"`, set `innerHTML` to the raw
+  string, append to `document.body`.
+
+Idempotency is delegated to the existence check; no boolean flag.
+Eager injection (at setup, not at first enqueue) ensures any subsequent
+`cloneTemplateScoped` call is guaranteed to find a template at
+some level — the only way a "Template not found" warning fires now
+is if the project explicitly removed both the auto-injected template
+and any custom one.
+
 ## Render pipeline
 
 enqueue listener flow:
 
 1. Resolve container — explicit `detail.container` | first `[data-ln-toast]`
 2. Get or create `_Component` for the container
-3. `cloneTemplateScoped(container, 'ln-toast-item', 'ln-toast')` — falls back to document-level template if none under the container. If no template found anywhere → `console.warn` + return.
+3. `cloneTemplateScoped(container, 'ln-toast-item', 'ln-toast')` —
+   resolves in order: per-container `<template>` → document-global
+   `<template>` (project-supplied OR auto-injected default). If
+   nothing is found anywhere → `console.warn` + return. Under normal
+   conditions this can't happen because `_ensureTemplate` ran at
+   setup; the warn path covers projects that removed the default
+   after init.
 4. `fill(li, { title, role, ariaLive, hasBody })` — declarative bind
 5. `classList.add(STATUS_CLASS[type])` on `.ln-toast__card`
-6. `innerHTML = ICONS[type]` on `.ln-toast__side`
+6. Set `href` on `<use>` inside `.ln-toast__side` to `#ln-{icon}` via `TYPE_ICON[type]`
 7. `_renderBody(.ln-toast__body, detail)` — string → `<p>`; array → `<ul>`; `data.errors` → `<ul>`
 8. Attach click handler on `.ln-toast__close` → `_dismiss(li)`
 9. `_append(cmp, li)` — enforce max via shift, animate in
@@ -68,9 +94,9 @@ Single render pipeline — no separate code path for SSR.
 
 `destroy()` (per `_Component`) dismisses all current toasts and removes the instance reference. Not exposed via event — internal cleanup only.
 
-## ICONS map (internal)
+## TYPE_ICON map (internal)
 
-The four SVG strings in the `ICONS` constant are NOT a public extension point. Custom icon sets are out of scope; revisit when a real consumer needs it.
+`TYPE_ICON` maps `success | error | warn | info` to Tabler icon names (`circle-check`, `circle-x`, `alert-triangle`, `info-circle`). After cloning the template, JS finds the `<use>` inside `.ln-toast__side` and sets `href` to `#ln-{name}`. Icons are rendered via the ln-icons sprite — no inline SVG strings in JS.
 
 ## Why no JS API
 
