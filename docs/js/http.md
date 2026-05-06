@@ -1,9 +1,9 @@
 # http — architecture
 
-> A ~165-line global service that wraps `window.fetch` for transparent
-> URL-keyed dedup (Path A) and listens for `ln-http:request` to provide
-> explicit-key dedup on any method (Path B). Two closure-private maps,
-> no DOM state, no instances.
+> Global service that wraps `window.fetch` for transparent URL-keyed
+> dedup (Path A) and listens for `ln-http:request` to provide
+> explicit-key dedup on any method (Path B). Two closure-private
+> maps, no DOM state, no instances.
 
 The implementation lives in
 [`js/ln-http/ln-http.js`](../../js/ln-http/ln-http.js). This document
@@ -38,30 +38,6 @@ through the wrapper and inherit Path A dedup. When ln-http does NOT
 load, the same components still work — they just don't get URL
 auto-dedup. No component has a hard dependency on ln-http; the
 contract is one-way.
-
-## Embodied principles
-
-ln-http embodies the same cross-cutting principles as the rest of the
-library:
-
-- **Event-driven coordination (Path B).** Consumers dispatch
-  `ln-http:request` instead of importing an HTTP client. Same pattern
-  as `ln-form:submit`, `ln-store:change`, `ln-validate:set-custom`.
-- **Response on the original target, not on `document` (Path B).** The
-  service captures `e.target` at the start of the handler
-  (`js/ln-http/ln-http.js:125`) and uses the captured reference for
-  every later `dispatch` call (`js/ln-http/ln-http.js:156, 165`). This
-  scopes responses by DOM subtree.
-- **No `document.querySelectorAll` post-init.** ln-http never scans
-  the DOM. Its only state is two closure-private maps keyed by strings.
-- **Attribute-as-contract is N/A.** Global service — there is no
-  per-element attribute or instance. The contract is the wrapped
-  `fetch` signature (Path A) and the event detail (Path B).
-- **Idempotent operations.** Both paths' aborts are idempotent: calling
-  `.abort()` twice on the same controller does nothing the second time;
-  the cleanup checks (`_inflight.get(key) === controller`,
-  `_keyed.get(userKey) === controller`) prevent stale entries from
-  wiping fresh ones during reentrant cleanup.
 
 ## Internal state
 
@@ -266,14 +242,10 @@ Aborted requests dispatch nothing. The dispatch target is **always
 the original element the consumer fired from** — captured at line 125
 and held in the closure for the duration of the async chain.
 
-### Why no `ln-http:success` event
-
-A separate "success" event would force consumers to wire two listeners
-(`response` for non-2xx, `success` for 2xx) and provide no benefit —
-the consumer already knows how to read `response.ok` or branch on
-`status`. Forwarding the raw `Response` and letting the consumer
-inspect it is simpler and matches `fetch`'s own contract: `fetch` does
-not reject on 4xx/5xx; neither does `ln-http:response`.
+There is no `ln-http:success`: a 4xx is a successful network
+round-trip, and the consumer branches on `e.detail.ok` or
+`e.detail.status`. Pre-rejecting on non-2xx would diverge from
+`fetch`'s own contract.
 
 ## Coordinator / cross-component contract
 
@@ -344,8 +316,6 @@ expect HTML, text, or binary.
 - **No Promise return on Path B.** `dispatchEvent` returns boolean;
   the response is async and arrives as an event. Wrap in a Promise
   yourself if needed (README example).
-- **No `ln-http:before-request`.** Cancellation channel is `key`,
-  `cancelByKey`, or `signal`.
 
 ## Edge cases
 
@@ -452,71 +422,21 @@ DELETE / PUT cancel behavior on demand.
 
 ### Third-party scripts on the page get their fetch wrapped too
 
-Once `window.fetch = _wrappedFetch` (line 117), every script in the
-page sees the wrapper — including third-party SDKs (analytics, error
-reporting, A/B test frameworks). The dedup applies to their GETs as
-well. This is acceptable because:
-
-- Path A is GET/HEAD only. Third-party GETs that race the same URL
-  would have been racing anyway; ln-http makes the loser quiet.
-- Browsers have per-host connection caps (HTTP/1.1: ~6 per host) —
-  on a busy page, racing GETs already serialize at the network layer.
-- Third-party POSTs are NEVER auto-cancelled (Path A leaves them
-  alone; Path B requires a `key` they don't dispatch).
-
-The cost is a closure dispatch per `fetch` call, regardless of
-origin. For pages with thousands of `fetch` calls per second, this
-overhead is negligible compared to the network. For pages that
-disagree with this trade-off, `lnHttp.destroy()` restores the original
-fetch.
-
-### Body mutation after dispatch (Path B)
-
-`opts.body` is captured at the start of `_onRequest` and used at line
-148. The `fetch` call that uses it (line 153) runs synchronously inside
-the dispatch, so any mutation of the consumer's body object after
-`dispatchEvent` returns happens AFTER the fetch starts — fetch has
-already taken its snapshot by then. Mutation between dispatch and the
-synchronous fetch call (a capture-phase listener that mutates
-`e.detail.body`) WOULD leak. Don't do that.
-
-### Concurrent dispatches with different `key`s
-
-`_keyed` is keyed by string. Two simultaneous dispatches with different
-keys are independent — both run, both produce events. The map's lookup
-is `O(1)`; the listener does not serialize. The browser's connection
-pool is the only throttle.
+Once `window.fetch = _wrappedFetch`, every script in the page
+sees the wrapper — analytics, error reporting, A/B SDKs.
+Path A is GET/HEAD only and POST is untouched, so the practical
+effect is "their racing GETs cancel each other," which is
+harmless or beneficial. Pages that disagree can call
+`lnHttp.destroy()` to restore the original `fetch`.
 
 ## Performance considerations
 
-Cost per Path A `fetch`:
-
-- One `_extractUrl` call — three `instanceof` tests at most.
-- One `_extractMethod` call — at most one method-property read.
-- One `_key` string concat.
-- One `Map.has` + `Map.get` + maybe `.abort()` + `Map.delete`.
-- One `AbortController` allocation.
-- One conditional `.addEventListener` on the consumer signal.
-- One `Object.assign` shallow-copy of options.
-- One `Map.set`.
-- One `_origFetch` call (the real network).
-- One `.finally` callback registration.
-
-All of this is O(1) and synchronous. The dominant cost is the network
-itself.
-
-Cost per Path B dispatch:
-
-- All of the above (the wrapped fetch is called from line 153).
-- Plus: one `Map.has` + maybe `.abort()` + `Map.delete` for `_keyed`.
-- Plus: one `Map.set` if `userKey` is truthy.
-- Plus: two `.then` / `.catch` callback registrations.
-- Plus: one `dispatch` (CustomEvent + dispatchEvent) on response /
-  error.
-
-The two maps are tiny in normal usage (typically 0-5 entries each).
-Lookups are O(1). There is no batching, queue, throttle, or rate
-limit; the browser's connection pool is the only natural throttle.
+Both paths add O(1) overhead per request — a few `Map` operations,
+one `AbortController` allocation, one `Object.assign` shallow copy
+on Path A. The two dedup maps are tiny in normal use (typically
+0–5 entries). Dominant cost is the network; the browser's
+per-host connection pool is the only natural throttle. There is
+no batching, queue, or rate limiting.
 
 ## Design decisions
 
@@ -566,8 +486,6 @@ matches the principle of least surprise.
 
 ### Why forward the raw `Response` instead of pre-parsing JSON?
 
-Three reasons.
-
 First, `Response.body` is consumed by any read call (`.json()`,
 `.text()`, `.blob()`, `.arrayBuffer()`, `.formData()`). Calling one of
 them inside ln-http means consumers cannot call any of the others
@@ -577,22 +495,6 @@ Second, parsing eagerly biases the contract. Pre-parsing JSON makes
 ln-http look like a JSON transport; it is not. The same component
 should be able to dispatch a `ln-http:request` to an HTML endpoint or
 a binary blob endpoint and get the body in the right shape.
-
-Third, error handling shifts. A pre-parsed JSON path would have to
-synthesize a new error shape on parse failure ("invalid response"), and
-the consumer would lose access to the raw status code and headers. By
-forwarding the raw `Response`, the consumer gets the full HTTP
-information and chooses the parse strategy themselves.
-
-### Why no `ln-http:request-success` event for POST without a `key`?
-
-A keyless Path B dispatch is a one-shot. The consumer chose not to
-opt into dedup. Adding a parallel "success" event for that path
-would create a contract surface that says "fire-and-forget POSTs
-have a different success channel" — but they don't; they have the
-same `ln-http:response` channel as keyed dispatches. The simpler
-contract: every Path B dispatch (keyed or not) gets `ln-http:response`
-on resolve and `ln-http:error` on network failure.
 
 ### Why is `_inflight` keyed by `"METHOD URL"` instead of just URL?
 
@@ -618,90 +520,7 @@ other. Keyed entries would need synthetic URL-method keys; URL-method
 entries would need synthetic keys. Both would be lies. Two maps, two
 clear ownership boundaries.
 
-### Why does `cancel(url)` scan `_inflight` instead of taking method as a parameter?
-
-The common use case is "cancel all in-flight calls to this URL,
-regardless of method." A consumer typically wants `cancel('/api/slow-report')`
-to nuke whatever's racing on that URL. Adding a method parameter
-would force consumers to know which method is in flight, which they
-often don't care about.
-
-If we needed `cancel(url, method)` for finer control, we'd add an
-overload. So far no consumer has requested it.
-
-### Why is `cancelByKey` a separate API from `cancel`?
-
-The two namespaces are different. `cancel('/api/users')` operates on
-URL strings; `cancelByKey('my-poll')` operates on consumer-chosen
-keys. A unified API would have to disambiguate ("is `'reorder'` a URL
-or a key?") with a heuristic — leading-slash detection, for example —
-and that heuristic is exactly the kind of magic that breaks when a
-URL happens to look like a key or vice versa. Two methods, two
-explicit namespaces.
-
-## Why not X?
-
-### Why not auto-cancel POSTs with same URL + body hash?
-
-Body hashing is expensive per-request (every body is hashed even when
-no dedup will trigger), the equivalence check is wrong for `FormData`
-(streams, files), and "I want this POST to supersede a previous one
-with the same body" is not a real use case — if the consumer wanted
-that, the previous POST was redundant and should not have been fired.
-
-The Path B `key` channel handles "supersede previous non-idempotent
-request" explicitly. The consumer chooses the key; the wrapper does
-not guess.
-
-### Why not return a Promise from `dispatchEvent` (Path B)?
-
-`dispatchEvent` is a DOM API; its return type is boolean (the
-`cancelable` flag). Wrapping every Path B dispatch to return a
-Promise would either monkey-patch every event (no) or split the
-contract into "use the event" and "use a function" (which one is
-authoritative? what happens if both fire?). The README provides a
-15-line wrapper for the Promise-shaped consumer; that lives in
-consumer code where it belongs.
-
-### Why not bake in retry logic?
-
-Per-feature. Search retry = "type again." Save retry = "queue and
-drain on online" (an `ln-store` pending-queue concern). Polling retry
-= "wait for next interval." None of these are uniform enough to
-deserve a default.
-
-### Why not handle CSRF via meta tag automatically?
-
-It is consumer-specific. Laravel uses `X-CSRF-TOKEN` or `_token`
-body field. Rails uses `X-CSRF-Token`. Other frameworks use other
-names. Sniffing one specific tag and one specific header would be
-wrong for every other framework. The dispatch site adds the token
-itself — three lines of code, one place per project.
-
-### Why not parse non-JSON responses?
-
-ln-http forwards the raw `Response`. Parsing is the consumer's job.
-Adding a `responseType` field on Path B would mean shipping a
-discriminated union, doubled error paths, and a meaningful chance of
-mis-parsing. The consumer knows what shape the endpoint returns;
-they call `.json()`, `.text()`, `.blob()` themselves.
-
-### Why no per-element `data-ln-http` attribute?
-
-There is nothing per-element to configure. The contract IS the event
-detail (Path B) or the `fetch` call signature (Path A). A
-`data-ln-http` attribute would have to do one of:
-
-- Mark elements as "request anchors" (gain: nothing — any element can
-  dispatch today).
-- Pre-configure default URLs / methods (gain: marginal — JS could put
-  them in the detail directly).
-- Auto-bind submit handlers (overlaps with `ln-form`).
-
-None of those carry their weight against "no attribute, just dispatch
-the event."
-
-### Why is `inflight` a getter that returns a snapshot, not a live `Map`?
+### Why is `inflight` a getter that returns a snapshot?
 
 Returning the live `Map` would let consumer code mutate it and break
 the dedup invariants. A getter that builds a fresh array on each access
@@ -716,23 +535,18 @@ the right abstraction layer for what the library does (transparent
 URL-dedup), but it has implications:
 
 - **Other libraries' fetches are wrapped.** Analytics, error
-  reporting, A/B test SDKs, Service Worker registrations — they all go
-  through `_wrappedFetch`. Path A is GET/HEAD-only and POST is
-  untouched, so the practical impact is "their racing GETs cancel each
-  other," which is at worst harmless (browsers limit per-host
-  connections anyway) and at best beneficial.
+  reporting, A/B test SDKs — they all go through `_wrappedFetch`.
+  Path A is GET/HEAD-only and POST is untouched, so the practical
+  impact is "their racing GETs cancel each other."
 
 - **Hot-reload / re-init.** A reloading dev tool that loads ln-http
   twice without `destroy()` between would hit the double-load guard
-  (line 55) and bail. This protects against double-wrapping. Tests
-  that need clean state should call `destroy()` in teardown.
+  and bail. Tests that need clean state should call `destroy()` in teardown.
 
-- **Custom fetch polyfills.** A page that imports a `fetch` polyfill
-  (e.g. for IE) needs the polyfill installed BEFORE ln-http loads.
-  Otherwise `_origFetch` captures the polyfill, the wrapper installs
-  on top, and everything works fine — but if the polyfill loads
-  AFTER ln-http, it will overwrite `window.fetch` with the unwrapped
-  polyfill and ln-http's wrapper is bypassed.
+- **Custom fetch polyfills.** A polyfill installed BEFORE ln-http
+  works fine; `_origFetch` captures it and the wrapper installs on
+  top. If the polyfill loads AFTER ln-http, it overwrites
+  `window.fetch` and bypasses the wrapper.
 
 - **`Response` re-use.** Because `e.detail.response` on Path B is the
   raw `Response`, two consumers listening on the same target both see
@@ -741,21 +555,3 @@ URL-dedup), but it has implications:
   Response and gets a TypeError. If two listeners genuinely need the
   body, one of them must `.clone()` first. This is a `fetch`
   contract, not a ln-http quirk.
-
-These risks are acceptable because the alternative — every component
-implementing its own dedup — is worse. The risk is concentrated and
-auditable.
-
-## Reading order
-
-If you have just been onboarded and need to understand how an HTTP
-request flows through the library:
-
-1. **README.md** — what the component does and how to use both paths.
-2. **This document, "The fetch wrapper"** — the per-call flow for
-   Path A, top to bottom.
-3. **This document, "Per-event flow"** — the per-dispatch flow for
-   Path B and how it composes with Path A.
-4. **`js/ln-http/ln-http.js`** — the full source, ~165 lines.
-5. **"Edge cases" + "Risk surface"** — re-read on unexpected behavior;
-   most of it is in the listed cases.
