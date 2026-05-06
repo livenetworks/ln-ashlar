@@ -7,14 +7,6 @@
 				<section class="section-card">
 					<header><h3>Employee Directory</h3></header>
 					<main>
-						<nav id="employee-toolbar">
-							<label data-ln-search="employee-table">
-								<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-								<input type="search" placeholder="Search employees...">
-								<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-							</label>
-						</nav>
-
 						<div data-ln-table id="employee-table">
 						<template data-ln-table-empty>
 							<article class="ln-table__empty-state">
@@ -24,9 +16,19 @@
 								<button type="button" data-ln-table-clear>Clear all</button>
 							</article>
 						</template>
-						<div class="table-container">
 						<table>
 							<thead>
+								<tr>
+									<th colspan="5">
+										<div>
+											<label data-ln-search="employee-table">
+												<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+												<input type="search" placeholder="Search employees...">
+												<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+											</label>
+										</div>
+									</th>
+								</tr>
 								<tr>
 									<th data-ln-sort="string">
 										Name
@@ -210,7 +212,6 @@
 								</tr>
 							</tbody>
 						</table>
-						</div>
 						</div>
 
 						<!-- Department popover -->

@@ -85,13 +85,12 @@ new _component(dom):
     1. cache dom, table, tbody, thead, ths
     2. zero state (_data, _filteredData, _searchTerm, _sortCol, _columnFilters)
     3. zero virtual state (_virtual=false, _rowHeight=0, _vStart=_vEnd=-1)
-    4. measure toolbar height → CSS var --ln-table-toolbar-h
-    5. branch on tbody state:
+    4. branch on tbody state:
         if rows.length > 0  → _parseRows() now (synchronous)
         else                → start MutationObserver on tbody;
                               when rows arrive, disconnect + parse
-    6. attach _onSearch, _onSort, _onColumnFilter listeners on dom
-    7. attach _onClear (delegated click) on dom
+    5. attach _onSearch, _onSort, _onColumnFilter listeners on dom
+    6. attach _onClear (delegated click) on dom
 ```
 
 `_parseRows` is the only path that populates `_data`. It runs once

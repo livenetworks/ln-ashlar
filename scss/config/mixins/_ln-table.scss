@@ -39,20 +39,15 @@
 		box-shadow: none;
 	}
 
-	// Thead sticky (below toolbar)
-	thead th {
-		position: sticky;
-		top: calc(var(--header-height, 3.5rem) + var(--ln-table-toolbar-h, 0px));
-		z-index: calc(var(--z-sticky) - 1);
-		background: var(--bg-sunken);
+	// Whole thead sticky as one unit (toolbar row + column-headers row).
+	// Wrapper's `overflow: clip` + `rounded-lg` clip the top corners,
+	// so per-th radius is unnecessary.
+	thead {
+		@include sticky-top;
 	}
 
-	// Thead corner radius
-	thead tr:first-child th:first-child {
-		border-top-left-radius: var(--radius-lg);
-	}
-	thead tr:first-child th:last-child {
-		border-top-right-radius: var(--radius-lg);
+	thead th {
+		background: var(--bg-sunken);
 	}
 
 	// First td override -- remove global bold/bg
@@ -69,9 +64,39 @@
 @mixin ln-table-toolbar {
 	@include panel-header;
 	position: sticky;
-	top: var(--header-height, 3.5rem);
+	top: 0;
 	z-index: var(--z-sticky);
 	border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+// ─── In-thead toolbar (first thead row, single colspan th) ───────
+//
+// Applied to the <th colspan="N"> in the first thead row of an
+// ln-table. Expected HTML:
+//
+//   <tr><th colspan="N"><div> ...toolbar content... </div></th></tr>
+//
+// The <th> stays display:table-cell so colspan participates in
+// table layout normally. The wrapper <div> carries the panel-header
+// chrome (flex layout, padding, border-bottom, sunken bg). The
+// <th> itself gets padding:0 plus explicit resets to break the
+// @mixin table-base cascade (uppercase / text-label-sm /
+// letter-spacing / semibold) so the toolbar's <h3>, <span>, <label>
+// children render with normal text styling, not column-header
+// styling.
+
+@mixin ln-table-thead-toolbar {
+	// <th> resets — chrome lives on the inner <div>.
+	padding: 0;
+	text-align: left;
+	text-transform: none;
+	letter-spacing: normal;
+	font-size: var(--font-size);
+	font-weight: normal;
+
+	> div {
+		@include panel-header;
+	}
 }
 
 @mixin ln-table-toolbar-search {

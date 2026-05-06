@@ -164,19 +164,29 @@ Minimal — sortable, searchable, with column filter and an empty state:
 
 ```html
 <div id="employees" data-ln-table>
-	<header class="ln-table__toolbar">
-		<h3>Employees</h3>
-		<aside>
-			<label>
-				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-				<input type="search" placeholder="Search..." data-ln-search="employees">
-			</label>
-			<button data-ln-table-clear>Clear</button>
-		</aside>
-	</header>
+	<template data-ln-table-empty>
+		<article class="ln-table__empty-state">
+			<h3>No results</h3>
+			<button type="button" data-ln-table-clear>Clear</button>
+		</article>
+	</template>
 
 	<table>
 		<thead>
+			<tr>
+				<th colspan="5">
+					<div>
+						<h3>Employees</h3>
+						<aside>
+							<label>
+								<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+								<input type="search" placeholder="Search..." data-ln-search="employees">
+							</label>
+							<button data-ln-table-clear>Clear</button>
+						</aside>
+					</div>
+				</th>
+			</tr>
 			<tr>
 				<th data-ln-sort="number">
 					#
@@ -205,13 +215,6 @@ Minimal — sortable, searchable, with column filter and an empty state:
 			<!-- more server-rendered rows... -->
 		</tbody>
 	</table>
-
-	<template data-ln-table-empty>
-		<article class="ln-table__empty-state">
-			<h3>No results</h3>
-			<button type="button" data-ln-table-clear>Clear</button>
-		</article>
-	</template>
 </div>
 ```
 
@@ -331,10 +334,21 @@ filter.
 
 ```html
 <div id="users" data-ln-table>
-	<header class="ln-table__toolbar">
-		<input type="search" data-ln-search="users" placeholder="Search...">
-	</header>
-	<table>...</table>
+	<table>
+		<thead>
+			<tr>
+				<th colspan="N">
+					<div>
+						<input type="search" data-ln-search="users" placeholder="Search...">
+					</div>
+				</th>
+			</tr>
+			<tr>
+				<!-- column headers -->
+			</tr>
+		</thead>
+		<tbody>...</tbody>
+	</table>
 </div>
 ```
 
@@ -496,6 +510,16 @@ table.addEventListener('ln-table:sort', function (e) {
 	});
 });
 ```
+
+10. **Wrapping `[data-ln-table]`'s `<table>` in
+    `<div class="table-container">`.** `.table-container` declares
+    `overflow-x: auto`, which makes it a scroll container on both
+    axes for sticky positioning. The sticky `<thead>` then binds to
+    `.table-container` instead of escaping to the outer page-scroll
+    surface, so the header does not pin as the user scrolls the
+    page. Put the `<table>` directly inside `[data-ln-table]`. For
+    narrow-viewport handling, use `@mixin ln-table-card-mode`
+    instead.
 
 ## Edge cases
 

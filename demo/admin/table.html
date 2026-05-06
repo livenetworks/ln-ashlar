@@ -181,17 +181,6 @@
 						<header><h3>Live Demo — 500 rows with search, sort and filter</h3></header>
 						<main>
 							<div data-ln-table id="demo-table">
-								<header class="ln-table__toolbar">
-									<h3>Products</h3>
-									<aside>
-										<label>
-											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-											<input type="search" placeholder="Search products..." data-ln-search="demo-table">
-										</label>
-										<span class="ln-table__count" id="demo-count"></span>
-									</aside>
-								</header>
-
 								<template data-ln-table-empty>
 									<article class="ln-table__empty-state">
 										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
@@ -201,9 +190,22 @@
 									</article>
 								</template>
 
-								<div class="table-container">
 								<table>
 									<thead>
+										<tr>
+											<th colspan="6">
+												<div>
+													<h3>Products</h3>
+													<aside>
+														<label>
+															<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+															<input type="search" placeholder="Search products..." data-ln-search="demo-table">
+														</label>
+														<span class="ln-table__count" id="demo-count"></span>
+													</aside>
+												</div>
+											</th>
+										</tr>
 										<tr>
 											<th data-ln-sort="number">
 												#
@@ -270,7 +272,6 @@
 									</thead>
 									<tbody id="demo-tbody"></tbody>
 								</table>
-								</div>
 
 								<footer class="ln-table__footer">
 									<span>Total: <strong id="demo-total"></strong></span>
@@ -348,16 +349,6 @@ document.querySelector('#products tbody').innerHTML = generatedHtml;</code></pre
 						<header><h3>HTML Structure</h3></header>
 						<main>
 							<pre><code>&lt;div id="products" data-ln-table&gt;
-    &lt;header class="ln-table__toolbar"&gt;
-        &lt;h3&gt;Products&lt;/h3&gt;
-        &lt;aside&gt;
-            &lt;label&gt;
-                &lt;span class="ln-icon-search ln-icon--sm"&gt;&lt;/span&gt;
-                &lt;input type="search" placeholder="Search..." data-ln-search="products"&gt;
-            &lt;/label&gt;
-        &lt;/aside&gt;
-    &lt;/header&gt;
-
     &lt;template data-ln-table-empty&gt;
         &lt;article class="ln-table__empty-state"&gt;
             &lt;h3&gt;No results&lt;/h3&gt;
@@ -367,6 +358,19 @@ document.querySelector('#products tbody').innerHTML = generatedHtml;</code></pre
 
     &lt;table&gt;
         &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th colspan="5"&gt;
+                    &lt;div&gt;
+                        &lt;h3&gt;Products&lt;/h3&gt;
+                        &lt;aside&gt;
+                            &lt;label&gt;
+                                &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
+                                &lt;input type="search" placeholder="Search..." data-ln-search="products"&gt;
+                            &lt;/label&gt;
+                        &lt;/aside&gt;
+                    &lt;/div&gt;
+                &lt;/th&gt;
+            &lt;/tr&gt;
             &lt;tr&gt;
                 &lt;th data-ln-sort="number"&gt;#&lt;/th&gt;
                 &lt;th data-ln-sort="string"&gt;Name&lt;/th&gt;
