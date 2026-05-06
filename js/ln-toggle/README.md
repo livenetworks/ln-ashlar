@@ -91,10 +91,9 @@ el.lnToggle.destroy();                       // detach trigger listeners, dispat
 ```
 
 The attribute is the only mutator. There is no `open()` / `close()` /
-`toggle()` method — every consumer (trigger click, sibling component,
-external script, DevTools) writes `data-ln-toggle` and the observer
-runs the pipeline. `destroy()` is the only public method, and it does
-real cleanup work the attribute alone cannot.
+`toggle()` method. `destroy()` is the only public method — it detaches
+trigger listeners and dispatches `:destroyed`, work the attribute alone
+cannot do.
 
 `window.lnToggle(root)` upgrades a custom root (Shadow DOM, iframe). Ordinary AJAX inserts and `setAttribute` on existing elements are handled automatically by the document-level observer.
 
