@@ -4,7 +4,7 @@
 > contract lives in [`js/ln-circular-progress/README.md`](../../js/ln-circular-progress/README.md);
 > this document is the why-behind-the-how, not a re-statement of usage.
 
-File: `js/ln-circular-progress/ln-circular-progress.js` (133 lines).
+File: `js/ln-circular-progress/ln-circular-progress.js`.
 
 ## Position in the architecture
 
@@ -16,8 +16,7 @@ single visual (an SVG ring with a label) from two attributes
 plus an optional label override. Every state change comes from
 outside the component; every internal reaction is a re-read of the attributes.
 
-The component dispatches a **non-cancelable** notification event because the
-rendering IS the contract — there is no default behaviour for a consumer to override.
+The dispatched `:change` event is non-cancelable — the rendering IS the contract; there is no default behaviour for a consumer to override.
 
 ## State
 
@@ -46,7 +45,7 @@ at line 132 wires the standard scaffolding:
 3. The constructor sets `this.dom = dom`, then immediately calls `_buildSvg.call(this)` to create and append the SVG and label.
 4. `_render.call(this)` runs to compute the initial arc offset from the current attribute values and dispatch the first `ln-circular-progress:change` event.
 5. `_listenValues.call(this)` registers the per-instance MutationObserver that watches the host's value and max attributes for subsequent changes.
-6. `dom.setAttribute('data-ln-circular-progress-initialized', '')` marks the element as initialised. (Defensive — `registerComponent`'s own guard via `el.lnCircularProgress` covers the same case.)
+6. `dom.setAttribute('data-ln-circular-progress-initialized', '')` marks the element as initialised.
 
 The instance is returned and assigned to `el.lnCircularProgress` by `registerComponent`'s standard wiring.
 
@@ -119,12 +118,6 @@ The track stroke reads `--color-border` (default: `var(--border-subtle)`); the f
 
 The shipped colour variants (`.success`, `.error`, `.warning`) override `stroke` directly on `.ln-circular-progress__fill` for absolute status colours that do not shift with theme accent. The two override paths (token cascade vs direct stroke) are documented in the SCSS mixin header comment.
 
-## Why not native `<progress>` or a Web Component?
-
-**Native `<progress>` with overlay SVG.** The native element provides implicit ARIA, saving manual `role="progressbar"` wiring. The trade-off: the native element cannot be visually replaced — only overlaid with an absolutely-positioned SVG. That creates two overlapping children with conflicting layout expectations, and requires synchronising two parallel attribute sets (`value`/`max` vs `data-ln-circular-progress`/`-max`). The ARIA saving is real but smaller than the added synchronisation surface.
-
-**Custom Element / Web Component.** A `<ln-circular-progress>` tag with Shadow DOM would encapsulate SVG construction. The trade-off: all project components are data-attribute-based for server-side rendering friendliness and zero-build SCSS coupling (`@mixin circular-progress` applies to a CSS selector, not a shadow-root host). Adopting Custom Elements for one component would create a stylistic split with the rest of the library.
-
 ## Performance characteristics
 
 | Operation | Cost |
@@ -137,13 +130,3 @@ The shipped colour variants (`.success`, `.error`, `.warning`) override `stroke`
 | Destroy | O(1) — one MutationObserver disconnect, two DOM removals. |
 
 The component's runtime cost is dominated by the CSS transition (GPU compositing of the `stroke-dashoffset` change), not by the JS.
-
-## Anti-features
-
-The 133-line size is partly the result of explicit decisions not to include:
-
-- **No indeterminate mode.** No spinning ring, no `data-ln-circular-progress="indeterminate"` switch. Indeterminate is a different idiom (`@mixin loader`).
-- **No threshold colour logic.** Colour is via class, set by the consumer.
-- **No `setValue(n)` / `setMax(n)` / `redraw()` API.** The attribute is the API.
-- **No parent-track shared max** (which `ln-progress` does support). A consumer that wants multiple rings to share a denominator sets `data-ln-circular-progress-max` on each.
-- **No automatic ARIA writing** (`role`, `aria-valuenow`, etc.). Consumer responsibility.
