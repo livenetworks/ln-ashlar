@@ -170,7 +170,7 @@
 						<header><h3>Example — Inside <code>[data-ln-table]</code> (overflow escape)</h3></header>
 						<main>
 							<p><code>ln-data-table</code> uses <code>overflow: clip</code> on <code>[data-ln-table]</code>, which would clip the icon-only mode's tooltip bubble. The co-located rule <code>[data-ln-table]:has([data-confirming]) { overflow: visible; }</code> reverts the table to <code>overflow: visible</code> while ANY descendant button is armed. The moment the button reverts, <code>:has()</code> unmatches and the clip is restored.</p>
-							<div class="table-container" data-ln-table>
+							<div data-ln-table>
 								<table>
 									<thead><tr><th>Item</th><th>Status</th><th>Actions</th></tr></thead>
 									<tbody>

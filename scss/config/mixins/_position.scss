@@ -10,3 +10,23 @@
 @mixin overflow-hidden { overflow: hidden; }
 @mixin overflow-auto   { overflow: auto; }
 @mixin overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+// Sticky pin to the top of the nearest scroll container.
+//
+// Default $top: 0 — most common case (pin flush at scroll port top).
+// Pass a positive value to offset (e.g. when stacking sticky elements,
+// or when a sibling above this one is also pinned).
+//
+// Example:
+//   thead             { @include sticky-top; }                    // top: 0
+//   .sidebar-card     { @include sticky-top(var(--app-header-height)); }
+//   .below-toolbar    { @include sticky-top(2rem); }
+//
+// Z-index is fixed at var(--z-sticky) by design — sticky elements
+// across the system share the same z-layer.
+
+@mixin sticky-top($top: 0) {
+	position: sticky;
+	top: $top;
+	z-index: var(--z-sticky);
+}

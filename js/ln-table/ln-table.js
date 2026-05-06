@@ -23,7 +23,11 @@ import { dispatch, registerComponent } from '../ln-core';
 		this.table = dom.querySelector('table');
 		this.tbody = dom.querySelector('tbody');
 		this.thead = dom.querySelector('thead');
-		this.ths = this.thead ? Array.from(this.thead.querySelectorAll('th')) : [];
+		// Scope to the column-headers row (last <tr> in thead). The
+		// first thead row may be a colspan toolbar that does not map to
+		// a data column.
+		const colHeaderRow = this.thead ? this.thead.querySelector('tr:last-child') : null;
+		this.ths = colHeaderRow ? Array.from(colHeaderRow.querySelectorAll('th')) : [];
 
 		this._data = [];
 		this._filteredData = [];
@@ -41,9 +45,6 @@ import { dispatch, registerComponent } from '../ln-core';
 		this._rafId = null;
 		this._scrollHandler = null;
 		this._colgroup = null;
-
-		const toolbar = dom.querySelector('.ln-table__toolbar');
-		if (toolbar) dom.style.setProperty('--ln-table-toolbar-h', toolbar.offsetHeight + 'px');
 
 		const self = this;
 

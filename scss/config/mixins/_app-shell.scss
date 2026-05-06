@@ -42,7 +42,11 @@
 
 @mixin app-wrapper {
 	@include flex-col;
-	min-height: 100vh;
+	// Bounded shell — body never scrolls. The .app-main child is the
+	// inner viewport (viewport − fixed header). dvh tracks live viewport
+	// so mobile URL bar collapse/expand stays in sync.
+	height: 100dvh;
+	overflow: hidden;
 	background: var(--bg-recessed);
 }
 
@@ -176,16 +180,13 @@
 	@include flex-col;
 	@include flex-1;
 	margin-top: var(--app-header-height);
-
-	// Mirror @mixin sidebar-drawer's vertical anchor so the bottom
-	// edge of .app-main lands at viewport bottom on short pages.
-	// Without this floor, `flex: 1` against `app-wrapper`'s
-	// `min-height: 100vh` plus the `margin-top` above pushes
-	// app-main's bottom past the viewport, and `<footer
-	// class="app-footer">` (the last flex-col child) misaligns
-	// vertically with the sidebar drawer's footer (which is fixed
-	// to the same calc).
-	min-height: calc(100vh - var(--app-header-height));
+	// Bounded inner viewport: exactly the space below the fixed
+	// .app-header. The `> section` child flex-fills and becomes the
+	// scroll surface (its overflow-auto finally activates here).
+	// Footer sits below section as a sibling, intrinsic height,
+	// pinned to bottom by flex distribution.
+	height: calc(100dvh - var(--app-header-height));
+	overflow: hidden;
 
 	// When the sidebar drawer is open on desktop, reserve its space
 	// on THIS element (the parent) so both content and footer shift
@@ -205,15 +206,43 @@
 	}
 
 	// Content column: centred, capped, padded, vertical stack.
+	// flex-1 + min-height: 0 — bounded parent + flex-shrink past content
+	// height activates @include overflow-auto. Without min-height: 0,
+	// flex items default to min-height: auto and refuse to shrink below
+	// intrinsic content size, defeating the bounded scroll contract.
 	> section {
 		@include flex-1;
-		@include p(var(--padding-x));
+		min-height: 0;
+		// Padding split: NO padding-block-start so sticky descendants
+		// (e.g. ln-table's <thead>) pin flush at the section's top:0
+		// instead of at the inner padding edge. The lost top breathing
+		// room is restored INSIDE the scroll flow via `> *:first-child`
+		// margin-block-start below — that margin scrolls past with the
+		// content, leaving sticky to pin against the actual section top.
+		padding-inline: var(--padding-x);
+		padding-block-end: var(--padding-x);
 		@include overflow-auto;
 		max-width: var(--max-w-container);
 		@include mx(auto);
 		@include w-full;
 		@include stack(var(--gap));
 		@include transition;
+
+		// Children keep intrinsic height — wrapper's overflow-auto
+		// handles the scroll. Without this, section-cards (which set
+		// overflow: clip, making their min-height: auto resolve to 0)
+		// get flex-shrunk to fit the bounded parent before scroll
+		// activates — visible as "briefly open, then collapse" on load.
+		> * {
+			flex-shrink: 0;
+		}
+
+		// First child gets the visual top breathing room that used to
+		// be padding-block-start. As margin, it lives inside the scroll
+		// flow — scrolls past, doesn't push sticky descendants down.
+		> *:first-child {
+			margin-block-start: var(--padding-x);
+		}
 	}
 }
 

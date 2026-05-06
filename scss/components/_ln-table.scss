@@ -6,6 +6,11 @@
 	@include ln-table-sort;
 }
 
+// In-thead toolbar — first thead row's colspan th.
+[data-ln-table] thead > tr:first-child:has(> th[colspan]) > th {
+	@include ln-table-thead-toolbar;
+}
+
 .ln-table__toolbar {
 	@include ln-table-toolbar;
 }
