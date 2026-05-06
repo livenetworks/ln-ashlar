@@ -1,12 +1,12 @@
 # toggle — architecture
 
-> The 145-line primitive that defines ln-ashlar's attribute-as-contract pattern. Every consumer of toggle state — internal API, trigger click, sibling component, external script, DevTools — funnels through one `setAttribute` call into one `MutationObserver` callback that runs the entire open/close pipeline.
+> The primitive that defines ln-ashlar's attribute-as-contract pattern. Every consumer of toggle state — internal API, trigger click, sibling component, external script, DevTools — funnels through one `setAttribute` call into one `MutationObserver` callback that runs the entire open/close pipeline.
 
 The implementation lives in
 [`js/ln-toggle/ln-toggle.js`](../../js/ln-toggle/ln-toggle.js).
 This document covers internals — instance state, attribute observer
 wiring, event lifecycle, persistence semantics, and the design
-decisions that produced this particular 145-line shape. For
+decisions that produced this particular shape. For
 consumer-facing usage see
 [`js/ln-toggle/README.md`](../../js/ln-toggle/README.md).
 
@@ -33,8 +33,8 @@ that data-flow §10–§11 describe:
   by the observer. There is no second codepath into state
   application.
 - **No `document.querySelectorAll` post-init for the component
-  itself.** The component is initialized via `registerComponent`
-  (`ln-core/helpers.js:293`), which handles the document-level
+  itself.** The component is initialized via `registerComponent`,
+  which handles the document-level
   observer pattern. The only document-scope queries are
   `_syncTriggerAria` walking matching `[data-ln-toggle-for]`
   elements (necessary because triggers can live anywhere) and
@@ -59,8 +59,8 @@ as `dom.lnToggle`. The state surface is two fields:
 
 | Field | Set by | Read by |
 |---|---|---|
-| `dom` | constructor (line 50) | `destroy` (event dispatch target, listener detach) |
-| `isOpen` | constructor (line 60), `_syncAttribute` (now ~line 103, 116) | `_syncAttribute` (transition-needed comparison); also exposed as a read-only property on the instance for ergonomic external reads. |
+| `dom` | constructor | `destroy` (event dispatch target, listener detach) |
+| `isOpen` | constructor and `_syncAttribute` | `_syncAttribute` (transition-needed comparison); also exposed as a read-only property on the instance for ergonomic external reads. |
 
 That is the entirety of the per-instance state. There is no:
 
@@ -84,7 +84,7 @@ re-querying.
 ## Init flow
 
 1. `registerComponent('data-ln-toggle', 'lnToggle', _component, 'ln-toggle', { extraAttributes: ['data-ln-toggle-for'], onAttributeChange: _syncAttribute, onInit: _attachTriggers })`
-   on script load (lines 140-144).
+   on script load.
 2. `registerComponent` performs an initial `findElements` scan of
    `document.body` for `[data-ln-toggle]` and instantiates
    `_component(el)` for each match. It also calls `_attachTriggers(document.body)`
@@ -100,9 +100,9 @@ re-querying.
      previously-untracked element, new trigger added), calls
      `findElements` + `_attachTriggers` to upgrade the new
      element.
-4. `_component(dom)` (lines 49-69):
+4. `_component(dom)`:
    - Stores `this.dom = dom`.
-   - **Persistence restore** (lines 53-58): if
+   - **Persistence restore**: if
      `dom.hasAttribute('data-ln-persist')`, calls
      `persistGet('toggle', dom)`. If it returns a non-null
      saved value, calls `dom.setAttribute(DOM_SELECTOR, saved)`.
@@ -121,7 +121,7 @@ re-querying.
 
 After construction, the instance is registered on the element
 (`el[DOM_ATTRIBUTE] = instance`, done by `findElements` in
-`ln-core/helpers.js:213`). From this point forward, the observer
+`ln-core/helpers.js`). From this point forward, the observer
 handles all state changes through `_syncAttribute`.
 
 No `:open` event fires during init, even if the panel is
@@ -134,7 +134,7 @@ themselves.
 
 ### Trigger attachment
 
-`_attachTriggers(root)` (lines 11-36) is called from two places:
+`_attachTriggers(root)` is called from two places:
 the `onInit` hook on every observer callback that adds nodes or
 mutates non-state attributes, and on initial scan. It:
 
@@ -162,15 +162,6 @@ mutates non-state attributes, and on initial scan. It:
    open shows the right state without waiting for the next
    transition.
 
-The `attributeFilter` on the observer includes `data-ln-toggle-for`
-(passed in `extraAttributes`), so a `setAttribute('data-ln-toggle-for', 'newId')`
-on an existing button re-fires the observer, which re-runs
-`_attachTriggers` on the button's parent — but the duplicate-guard
-sees `btnTrigger` already set and skips. Re-pointing a trigger to
-a different panel at runtime requires removing the old listener
-manually (the component does not auto-detach when the attribute
-changes); this is rarely needed in practice.
-
 ## State transition flow
 
 When any consumer writes `data-ln-toggle="open"` or `"close"` on a
@@ -192,8 +183,6 @@ else
     → findElements(mutation.target, ...) + _attachTriggers(...)
 ```
 
-(`ln-core/helpers.js:316-326`)
-
 So `_syncAttribute` only runs when the element already has an
 `lnToggle` instance. For a brand-new element that just got the
 attribute (e.g. `el.setAttribute('data-ln-toggle', 'open')` on an
@@ -204,8 +193,6 @@ class, syncs aria. No `:before-open` cancelable runs in that case
 — init is not a transition.
 
 ### `_syncAttribute(el)`
-
-(Lines 100-136.)
 
 ```
 1. Look up instance: const instance = el[DOM_ATTRIBUTE]
@@ -247,14 +234,7 @@ class, syncs aria. No `:before-open` cancelable runs in that case
 The order inside step 4 is deliberate. Each piece happens before
 the next:
 
-1. **`isOpen` flips first** — so if a `:before-open` listener
-   re-reads `instance.isOpen`, it sees the about-to-be state.
-   (Actually no — `isOpen` flips at `c`, after the cancelable
-   dispatch. Re-read: a listener inside `:before-open` sees
-   `instance.isOpen === false` for an opening transition. The
-   `isOpen` value is the *current* state, not the *target* state.
-   This matters for cancellation semantics — a listener inspecting
-   state during cancellation sees pre-transition state.)
+1. **Cancelable dispatches first** — listeners see `instance.isOpen` at its **current** (pre-transition) value, so a listener that vetoes the transition can compare against where the system *is*, not where it's headed.
 2. **Class flips second** — so a CSS rule reading the class lands
    after the (non-canceled) cancelable.
 3. **Aria sync third** — so the trigger's `aria-expanded` updates
@@ -266,8 +246,7 @@ the next:
    complete. If a `:open` listener throws, persistence still
    runs (the dispatch does not bubble exceptions out of the
    observer callback in the platform's CustomEvent dispatch
-   semantics — but the `dispatch` helper in
-   `ln-core/helpers.js:22-27` does not catch). This is fine in
+   semantics — the `dispatch` helper does not catch). This is fine in
    practice; persistence reflects "the DOM agreed to open," not
    "every listener completed without error."
 
@@ -291,7 +270,7 @@ in the listener.
 
 ### `_syncTriggerAria(panelEl, isOpen)`
 
-(Lines 38-45.) Document-scoped query for every
+Document-scoped query for every
 `[data-ln-toggle-for="<panelEl.id>"]`, then `setAttribute('aria-expanded',
 isOpen ? 'true' : 'false')` on each. Document-scoped because triggers
 can live anywhere — a
@@ -306,7 +285,7 @@ The `aria-expanded` attribute drives two things:
   "expanded" / "collapsed."
 - **CSS chevron rotation.** The library's
   `[data-ln-toggle-for][aria-expanded="true"] .ln-chevron { transform: rotate(180deg); }`
-  rule (`scss/components/_toggle.scss:54-56`) rotates any chevron
+  rule (`scss/components/_toggle.scss`) rotates any chevron
   icon inside any matching trigger. This works for any toggle
   shape — accordion, standalone, dropdown — without DOM-proximity
   requirements.
@@ -344,7 +323,7 @@ Path-scoping is non-overrideable. Two pages with the same panel
 
 ### Restore — constructor path
 
-(Lines 53-60.) The constructor calls `persistGet('toggle', dom)` and,
+The constructor calls `persistGet('toggle', dom)` and,
 if a saved value is found, applies it via `dom.setAttribute(DOM_SELECTOR, saved)`,
 then re-reads the attribute to set `this.isOpen`. The `setAttribute` happens inside the constructor, before the
 observer can react meaningfully (the instance is not yet stored on
@@ -363,7 +342,7 @@ proceeds as if the markup had said `data-ln-toggle="open"` (or
 
 ### Save — `_syncAttribute` path
 
-(Lines 119-121, 132-134.) After the transition completes, if
+After the transition completes, if
 `data-ln-persist` is present, `persistSet('toggle', el, 'open' | 'close')`
 is called. Save runs *after* the post-event dispatches. If a listener
 on `:open` calls `e.detail.target.removeAttribute('data-ln-persist')`
@@ -374,8 +353,7 @@ not common.)
 ### Storage failure — silent
 
 `persistGet` and `persistSet` wrap their `localStorage` calls in
-`try/catch` and silently swallow exceptions (`persist.js:31-39`,
-`41-49`). Private browsing, quota-exceeded, disabled storage —
+`try/catch` and silently swallow exceptions. Private browsing, quota-exceeded, disabled storage —
 the toggle continues to work without persistence; no error surfaces
 to the consumer.
 
@@ -434,7 +412,7 @@ transitions are driven by the `MutationObserver` (which is set up
 by `registerComponent`, not by the component itself); trigger
 clicks are wired in `_attachTriggers`.
 
-The trigger handler (line 18) listens for `click` only — no
+The trigger handler listens for `click` only — no
 `keydown`, no `submit`, no `keypress`. `<button>` triggers fire
 `click` for both mouse and keyboard activation (Space/Enter), so
 keyboard accessibility is automatic. `<header>` triggers (the
@@ -449,9 +427,7 @@ projects with strict keyboard requirements should put a
 
 ### What the component does NOT listen for
 
-- **No keyboard.** No ESC handler, no Space/Enter on the panel
-  itself. Consumers wire ESC if needed (see
-  [ln-toggle README §Common mistake 6](../../js/ln-toggle/README.md#mistake-6--expecting-esc-to-close-the-panel)).
+- **No keyboard.** No ESC handler, no Space/Enter on the panel itself. Consumers wire ESC at the document level if needed.
 - **No outside click.** No document-level click listener.
   Consumers wrap with `ln-dropdown` if they need menu-style
   outside-click-closes.
@@ -473,8 +449,8 @@ two ways:
 ### 1. Listen for `ln-toggle:open` / `:close`
 
 ```
-ln-accordion        — listens on its wrapper (ln-accordion.js:26)
-ln-dropdown         — listens on its inner [data-ln-toggle] (ln-dropdown.js:63-64)
+ln-accordion        — listens on its wrapper
+ln-dropdown         — listens on its inner [data-ln-toggle]
 ```
 
 `ln-accordion` listens at the wrapper for the bubbled event from
@@ -497,9 +473,9 @@ trigger or to external code writing the attribute.
 ### 2. Write `data-ln-toggle="..."` directly
 
 ```
-ln-accordion        — writes 'close' on siblings (ln-accordion.js:21)
-ln-dropdown         — writes 'close' from outside-click (ln-dropdown.js:163)
-                    — writes 'close' from resize-close (ln-dropdown.js:206)
+ln-accordion        — writes 'close' on siblings
+ln-dropdown         — writes 'close' from outside-click
+                    — writes 'close' from resize-close
 ln-modal/cancel     — does NOT use ln-toggle; ln-modal owns its own attribute (data-ln-modal)
 ```
 
@@ -527,33 +503,13 @@ truthful and the system becomes harder to reason about.
 
 ## Performance considerations
 
-Cost per state transition:
-
-- One `MutationObserver` callback (already cheap; the observer
-  uses `attributeFilter` to skip irrelevant attributes).
-- One `_syncAttribute` call. Inside:
-  - Two `getAttribute` reads (one in the early-exit comparison,
-    one for the value).
-  - One `dispatchEvent` for the cancelable.
-  - One `classList.add` / `remove`.
-  - One `_syncTriggerAria` call: one `querySelectorAll` scoped
-    to the document (linear in matching trigger count, typically
-    1-3), and one `setAttribute` per match.
-  - One `dispatchEvent` for the post-event.
-  - One `persistSet` call (if opted in): one `_resolveKey` (string
-    concatenation), one `localStorage.setItem` (synchronous).
-
-For a typical toggle interaction (user click), this is sub-millisecond
-work even on weak mobile CPUs. There is no virtualisation, no
-debouncing, no batching. None is needed at this scale.
-
-The one cost worth noting: `localStorage.setItem` is synchronous
-and can block on storage pressure. For a sidebar that toggles
-once per session, this is invisible. For a hypothetical UI that
-toggled an alert dozens of times per second, persisting every
-toggle would matter — but no real UI does that. If you find
-yourself flipping a persisted toggle in a tight loop, persistence
-is probably the wrong feature for that toggle.
+State transitions are sub-millisecond on weak mobile CPUs. The
+observer's `attributeFilter` skips irrelevant attribute writes,
+`_syncTriggerAria` runs a document-scoped `querySelectorAll` over a
+typically small (1–3) trigger set, and `localStorage.setItem` is
+synchronous but invisible at human-interaction frequency. There is
+no virtualisation, debouncing, or batching — none is needed at this
+scale.
 
 ## Why not X?
 
@@ -572,81 +528,6 @@ which is a "summary + details" content shape — the native element
 is also semantically wrong. ln-toggle is general-purpose; the
 `<details>` element is content-specific.
 
-### Why an attribute instead of `class="open"`?
-
-A class is a presentational concern; the same element can carry
-many classes. State should be a single, named field. An attribute
-with two enumerated values (`"open"` / anything else) is more
-honest about that. It also pairs naturally with the
-`MutationObserver`'s `attributeFilter` (filtering on a single
-attribute is cheap; filtering on class changes would require
-matching the changed-classes list).
-
-The `.open` class is *also* applied (on top of the attribute) for
-CSS convenience — a CSS rule reading `.collapsible.open` is more
-ergonomic than `.collapsible[data-ln-toggle="open"]`. Both work;
-the class is sugar.
-
-### Why does `destroy()` not remove the `.open` class or the `data-ln-toggle` attribute?
-
-Because the consumer might want to keep the panel visually as it
-is, just without the JS coupling. A consumer that is replacing
-ln-toggle with a different state machine (or just disposing of
-the page) shouldn't have to scramble to re-apply the visible
-state. The destroy contract is "stop reacting to state changes,"
-not "reset visual state to default."
-
-If the consumer wants a full visual reset, they call:
-
-```js
-el.lnToggle.destroy();
-el.classList.remove('open');
-el.removeAttribute('data-ln-toggle');
-```
-
-…on the consumer side. Three lines. The component does not need
-to opine on which subset of those is correct for any given
-consumer.
-
-### Why no array of children pattern (like ln-accordion)?
-
-ln-toggle is a per-element primitive. Each `[data-ln-toggle]` is
-its own instance; there is no notion of "the toggle owning a
-group of things." If you need group semantics, use a wrapper
-component (ln-accordion, ln-dropdown). The toggle stays focused on
-the per-element contract.
-
-### Why does the constructor restore persistence via `setAttribute` instead of writing `isOpen` directly?
-
-Two reasons:
-
-1. **The attribute is the contract.** Bypassing it during restore
-   would create the one path that doesn't go through
-   `setAttribute` — and once that path exists, there's an
-   inconsistency for consumers and tests to remember.
-2. **The `setAttribute` is harmless during construction.** The
-   instance isn't yet attached to the element, so the observer's
-   `_syncAttribute` early-exits via `if (!instance) return`. The
-   attribute settles before anything reactive can see it; the
-   constructor then reads the (settled) attribute fresh.
-
-The alternative — reading from `localStorage` and setting `isOpen`
-without touching the attribute — would also produce a state where
-the attribute and `isOpen` disagree until the next transition.
-That is the kind of subtle drift the attribute-as-contract pattern
-exists to prevent.
-
-### Why no public state-mutating methods at all?
-
-Because the attribute is the contract. `setAttribute('data-ln-toggle',
-'open' | 'close')` is the only path; every consumer (trigger click,
-sibling component, external script, DevTools) writes the attribute and
-the `MutationObserver` runs `_syncAttribute`. A public `open()` /
-`close()` / `toggle()` method would be sugar over the same
-`setAttribute` — a second name for the same operation. Two names for
-one operation invite drift over time (one path picks up a fix the other
-doesn't). One name, one path.
-
 ### Why does `:before-open` fire *after* the attribute flips, not before?
 
 Because the cancelable signal is "the system noticed someone wants
@@ -658,20 +539,3 @@ to happen — much harder API surface.
 The revert on cancellation costs one extra observer round-trip.
 That is cheap, and the revert is a no-op for `instance.isOpen`
 purposes (step 3's comparison catches it). The simpler API wins.
-
-## Extension points
-
-There are no documented extension points. The contract is small
-enough that consumers should:
-
-- Listen on `ln-toggle:before-open` / `:before-close` to veto.
-- Listen on `ln-toggle:open` / `:close` to react.
-- Write `data-ln-toggle="open"` / `"close"` to drive state.
-
-If a consumer needs different state semantics (multi-state,
-stateful triggers, group coordination, focus management,
-keyboard shortcuts), the path is to write a wrapper component
-that consumes ln-toggle, not to extend ln-toggle itself. The
-primitive is intentionally not configurable. ln-accordion,
-ln-dropdown, and ln-modal are three illustrations of that
-pattern.
