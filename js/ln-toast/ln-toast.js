@@ -1,9 +1,10 @@
-/* Live Networks — lnToast (side-accent with icons) */
-import { guardBody } from '../ln-core';
+/* Live Networks — ln-toast (side-accent with icons) */
+import { guardBody, cloneTemplateScoped, fill } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-toast";
 	const DOM_ATTRIBUTE = "lnToast";
+	const TEMPLATE_NAME = "ln-toast-item";
 
 	const ICONS = {
 		success: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>`,
@@ -12,12 +13,12 @@ import { guardBody } from '../ln-core';
 		info: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`
 	};
 
-	if (window[DOM_ATTRIBUTE] !== undefined && window[DOM_ATTRIBUTE] !== null) return;
+	const STATUS_CLASS = { success: 'success', error: 'error', warn: 'warning', info: 'info' };
 
-	function constructor(domRoot = document.body) {
-		_findContainers(domRoot);
-		return api;
-	}
+	const DEFAULT_TITLES = { success: 'Success', error: 'Error', warn: 'Warning', info: 'Information' };
+
+	if (window.__lnToastLoaded) return;
+	window.__lnToastLoaded = true;
 
 	function _findContainers(root) {
 		if (!root || root.nodeType !== 1) return;
@@ -35,7 +36,7 @@ import { guardBody } from '../ln-core';
 		this.max = parseInt(dom.getAttribute("data-ln-toast-max") || "5", 10);
 
 		for (const li of Array.from(dom.querySelectorAll("[data-ln-toast-item]"))) {
-			_hydrateLI(li);
+			_hydrateLI(li, dom);
 		}
 		return this;
 	}
@@ -48,78 +49,66 @@ import { guardBody } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	function _defaultTitle(type) {
-		return type === "success" ? "Success"
-			: type === "error" ? "Error"
-			: type === "warn" ? "Warning"
-			: "Information";
-	}
-
-	function _statusClass(type) {
-		return type === "warn" ? "warning" : type;
-	}
-
-	function _buildCard(type, title, li) {
-		const card = document.createElement("div");
-		card.className = "ln-toast__card " + _statusClass(type);
-		card.setAttribute("role", type === "error" ? "alert" : "status");
-		card.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
-
-		const side = document.createElement("div");
-		side.className = "ln-toast__side";
-		// Trust boundary: ICONS[type] contains hardcoded SVG strings defined in this module
-		side.innerHTML = ICONS[type] || ICONS.info;
-
-		const content = document.createElement("div");
-		content.className = "ln-toast__content";
-
-		const head = document.createElement("div");
-		head.className = "ln-toast__head";
-
-		const tt = document.createElement("strong");
-		tt.className = "ln-toast__title";
-		tt.textContent = title || _defaultTitle(type);
-
-		const x = document.createElement("button");
-		x.type = "button";
-		x.className = "ln-toast__close";
-		x.setAttribute("aria-label", "Close");
-		// Trust boundary: hardcoded close-icon SVG string literal
-		x.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>';
-		x.addEventListener("click", function () { _dismiss(li); });
-
-		head.appendChild(tt);
-		content.appendChild(head);
-		content.appendChild(x);
-		card.appendChild(side);
-		card.appendChild(content);
-
-		return { card: card, content: content };
-	}
-
-	function _hydrateLI(li) {
-		const type = ((li.getAttribute("data-type") || "info") + "").toLowerCase();
-		const titleA = li.getAttribute("data-title");
-		const msgText = (li.innerText || li.textContent || "").trim();
-
-		li.className = "ln-toast__item";
-		li.removeAttribute("data-ln-toast-item");
-
-		const built = _buildCard(type, titleA, li);
-
-		if (msgText) {
-			const body = document.createElement("div");
-			body.className = "ln-toast__body";
-			const p = document.createElement("p");
-			p.textContent = msgText;
-			body.appendChild(p);
-			built.content.appendChild(body);
+	function _buildItem(opts, container) {
+		const type = ((opts.type || "info") + "").toLowerCase();
+		const fragment = cloneTemplateScoped(container, TEMPLATE_NAME, 'ln-toast');
+		if (!fragment) {
+			console.warn('[ln-toast] Template "' + TEMPLATE_NAME + '" not found');
+			return null;
 		}
+		const li = fragment.firstElementChild;
+		if (!li) return null;
 
-		li.innerHTML = "";
-		li.appendChild(built.card);
+		const hasBody = !!(opts.message || (opts.data && opts.data.errors));
 
-		requestAnimationFrame(() => li.classList.add("ln-toast__item--in"));
+		fill(li, {
+			title: opts.title || DEFAULT_TITLES[type] || DEFAULT_TITLES.info,
+			role: type === 'error' ? 'alert' : 'status',
+			ariaLive: type === 'error' ? 'assertive' : 'polite',
+			hasBody: hasBody
+		});
+
+		const card = li.querySelector('.ln-toast__card');
+		if (card) card.classList.add(STATUS_CLASS[type] || 'info');
+
+		const side = li.querySelector('.ln-toast__side');
+		// Trust boundary: ICONS[type] contains hardcoded SVG strings defined in this module
+		if (side) side.innerHTML = ICONS[type] || ICONS.info;
+
+		const bodyEl = li.querySelector('.ln-toast__body');
+		if (bodyEl && hasBody) _renderBody(bodyEl, opts);
+
+		const closeBtn = li.querySelector('.ln-toast__close');
+		if (closeBtn) closeBtn.addEventListener('click', function () { _dismiss(li); });
+
+		return li;
+	}
+
+	function _renderBody(bodyEl, opts) {
+		if (opts.message) {
+			if (Array.isArray(opts.message)) {
+				const ul = document.createElement("ul");
+				for (const msg of opts.message) {
+					const lie = document.createElement("li");
+					lie.textContent = msg;
+					ul.appendChild(lie);
+				}
+				bodyEl.appendChild(ul);
+			} else {
+				const p = document.createElement("p");
+				p.textContent = opts.message;
+				bodyEl.appendChild(p);
+			}
+		}
+		if (opts.data && opts.data.errors) {
+			const ul = document.createElement("ul");
+			for (const err of Object.values(opts.data.errors).flat()) {
+				const lie = document.createElement("li");
+				lie.textContent = err;
+				ul.appendChild(lie);
+			}
+			bodyEl.appendChild(ul);
+		}
 	}
 
 	function _append(cmp, li) {
@@ -136,79 +125,66 @@ import { guardBody } from '../ln-core';
 		setTimeout(() => { li.parentNode && li.parentNode.removeChild(li); }, 200);
 	}
 
-	function enqueue(opts = {}) {
-		let container = opts.container;
+	function _resolveContainer(detail) {
+		let container = detail && detail.container;
 		if (typeof container === "string") container = document.querySelector(container);
 		if (!(container instanceof HTMLElement)) {
 			container = document.querySelector("[" + DOM_SELECTOR + "]") || document.getElementById("ln-toast-container");
 		}
+		return container || null;
+	}
+
+	function _hydrateLI(li, container) {
+		const type = ((li.getAttribute("data-type") || "info") + "").toLowerCase();
+		const titleA = li.getAttribute("data-title");
+		const msgText = (li.innerText || li.textContent || "").trim();
+
+		const built = _buildItem({
+			type: type,
+			title: titleA,
+			message: msgText || undefined
+		}, container);
+
+		if (!built) return;
+
+		li.parentNode && li.parentNode.replaceChild(built, li);
+		requestAnimationFrame(() => built.classList.add("ln-toast__item--in"));
+	}
+
+	function _onEnqueue(e) {
+		const detail = e.detail || {};
+		const container = _resolveContainer(detail);
 		if (!container) {
 			console.warn('[ln-toast] No toast container found');
-			return null;
+			return;
 		}
-
 		const cmp = container[DOM_ATTRIBUTE] || new _Component(container);
-		const timeout = Number.isFinite(opts.timeout) ? opts.timeout : cmp.timeoutDefault;
-		const type = (opts.type || "info").toLowerCase();
-
-		const li = document.createElement("li");
-		li.className = "ln-toast__item";
-
-		const built = _buildCard(type, opts.title, li);
-
-		if (opts.message || (opts.data && opts.data.errors)) {
-			const body = document.createElement("div");
-			body.className = "ln-toast__body";
-			if (opts.message) {
-				if (Array.isArray(opts.message)) {
-					const ul = document.createElement("ul");
-					for (const msg of opts.message) {
-						const lie = document.createElement("li");
-						lie.textContent = msg;
-						ul.appendChild(lie);
-					}
-					body.appendChild(ul);
-				} else {
-					const p = document.createElement("p");
-					p.textContent = opts.message;
-					body.appendChild(p);
-				}
-			}
-			if (opts.data && opts.data.errors) {
-				const ul = document.createElement("ul");
-				for (const err of Object.values(opts.data.errors).flat()) {
-					const lie = document.createElement("li");
-					lie.textContent = err;
-					ul.appendChild(lie);
-				}
-				body.appendChild(ul);
-			}
-			built.content.appendChild(body);
-		}
-
-		li.appendChild(built.card);
+		const li = _buildItem(detail, container);
+		if (!li) return;
+		const timeout = Number.isFinite(detail.timeout) ? detail.timeout : cmp.timeoutDefault;
 		_append(cmp, li);
 		if (timeout > 0) li._timer = setTimeout(() => _dismiss(li), timeout);
-		return li;
 	}
 
-	function clear(container) {
-		let el = container;
-		if (typeof el === "string") el = document.querySelector(el);
-		if (!(el instanceof HTMLElement)) {
-			el = document.querySelector("[" + DOM_SELECTOR + "]") || document.getElementById("ln-toast-container");
-		}
-		if (!el) return;
-		for (const child of Array.from(el.children)) {
-			_dismiss(child);
+	function _onClear(e) {
+		const detail = (e && e.detail) || {};
+		if (detail.container) {
+			const el = _resolveContainer(detail);
+			if (el) {
+				for (const child of Array.from(el.children)) _dismiss(child);
+			}
+		} else {
+			const containers = document.querySelectorAll("[" + DOM_SELECTOR + "]");
+			for (const el of Array.from(containers)) {
+				for (const child of Array.from(el.children)) _dismiss(child);
+			}
 		}
 	}
-
-	const api = function (domRoot) { return constructor(domRoot); };
-	api.enqueue = enqueue;
-	api.clear = clear;
 
 	guardBody(function () {
+		window.addEventListener('ln-toast:enqueue', _onEnqueue);
+		window.addEventListener('ln-toast:clear', _onClear);
+
 		const observer = new MutationObserver(function (muts) {
 			for (const m of muts) {
 				if (m.type === 'attributes') { _findContainers(m.target); continue; }
@@ -218,15 +194,7 @@ import { guardBody } from '../ln-core';
 			}
 		});
 		observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
+
+		_findContainers(document.body);
 	}, 'ln-toast');
-
-	window[DOM_ATTRIBUTE] = api;
-
-	window.addEventListener('ln-toast:enqueue', function (e) {
-		if (e.detail) {
-			api.enqueue(e.detail);
-		}
-	});
-
-	constructor(document.body);
 })();

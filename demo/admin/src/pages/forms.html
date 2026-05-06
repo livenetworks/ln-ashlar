@@ -558,7 +558,7 @@ form.lnForm.reset();</code></pre>
     })
     .then(function (res) { return res.json(); })
     .then(function () {
-        window.lnToast.enqueue({ type: 'success', title: 'Saved' });
+        window.dispatchEvent(new CustomEvent('ln-toast:enqueue', { detail: { type: 'success', title: 'Saved' } }));
     });
 });</code></pre>
 					</main>

@@ -598,8 +598,8 @@ If you prefer a toast over an inline indicator:
 
 ```js
 form.addEventListener('ln-autosave:saved', function () {
-    document.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-        detail: { type: 'info', message: 'Draft saved.', duration: 1500 }
+    window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+        detail: { type: 'info', message: 'Draft saved.', timeout: 1500 }
     }));
 });
 ```

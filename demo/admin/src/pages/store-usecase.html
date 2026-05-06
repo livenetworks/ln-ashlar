@@ -465,25 +465,31 @@
 	});
 
 	storeEl.addEventListener('ln-store:confirmed', function (e) {
-		window.lnToast.enqueue({
-			type: 'success',
-			title: 'Saved',
-			message: e.detail.action + ' confirmed by server'
-		});
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: 'success',
+				title: 'Saved',
+				message: e.detail.action + ' confirmed by server'
+			}
+		}));
 	});
 	storeEl.addEventListener('ln-store:reverted', function (e) {
-		window.lnToast.enqueue({
-			type: 'error',
-			title: 'Reverted',
-			message: e.detail.error || 'Server rejected the change'
-		});
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: 'error',
+				title: 'Reverted',
+				message: e.detail.error || 'Server rejected the change'
+			}
+		}));
 	});
 	storeEl.addEventListener('ln-store:conflict', function (e) {
-		window.lnToast.enqueue({
-			type: 'warning',
-			title: 'Conflict',
-			message: 'Document was modified elsewhere — reloaded latest version'
-		});
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: 'warning',
+				title: 'Conflict',
+				message: 'Document was modified elsewhere — reloaded latest version'
+			}
+		}));
 		const idField = formEl.querySelector('[name="id"]');
 		if (idField && idField.value && Number(idField.value) === e.detail.local.id) {
 			editMode = true; // suppress before-open reset on the next focus cycle
@@ -491,11 +497,13 @@
 		}
 	});
 	storeEl.addEventListener('ln-store:offline', function () {
-		window.lnToast.enqueue({
-			type: 'warning',
-			title: 'Offline',
-			message: 'Server unreachable — changes queued'
-		});
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: 'warning',
+				title: 'Offline',
+				message: 'Server unreachable — changes queued'
+			}
+		}));
 	});
 
 	resetBtn.addEventListener('click', function () {

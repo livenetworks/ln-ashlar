@@ -172,14 +172,17 @@ import { guardBody, dispatch, dispatchCancelable } from '../ln-core';
 					dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, status: result.status, data: data });
 				}
 
-				// Auto-show response message as toast
-				if (data.message && window.lnToast) {
+				// Auto-dispatch response message as a toast event.
+				// Any listener (ln-toast by default) can pick it up.
+				if (data.message) {
 					const msg = data.message;
-					window.lnToast.enqueue({
-						type: msg.type || (result.ok ? 'success' : 'error'),
-						title: msg.title || '',
-						message: msg.body || ''
-					});
+					window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+						detail: {
+							type: msg.type || (result.ok ? 'success' : 'error'),
+							title: msg.title || '',
+							message: msg.body || ''
+						}
+					}));
 				}
 
 				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });

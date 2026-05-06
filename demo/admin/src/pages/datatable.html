@@ -383,20 +383,24 @@ data.forEach(r =&gt; {
 
 	document.addEventListener('ln-data-table:row-click', function (e) {
 		if (e.detail.table !== 'demo-docs') return;
-		window.lnToast.enqueue({
-			type: 'info',
-			title: 'Row clicked',
-			message: 'ID: ' + e.detail.id + ' — ' + (e.detail.record.title || '')
-		});
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: 'info',
+				title: 'Row clicked',
+				message: 'ID: ' + e.detail.id + ' — ' + (e.detail.record.title || '')
+			}
+		}));
 	});
 
 	document.addEventListener('ln-data-table:row-action', function (e) {
 		if (e.detail.table !== 'demo-docs') return;
-		window.lnToast.enqueue({
-			type: e.detail.action === 'delete' ? 'error' : 'info',
-			title: e.detail.action.charAt(0).toUpperCase() + e.detail.action.slice(1),
-			message: e.detail.record.title || 'ID: ' + e.detail.id
-		});
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: e.detail.action === 'delete' ? 'error' : 'info',
+				title: e.detail.action.charAt(0).toUpperCase() + e.detail.action.slice(1),
+				message: e.detail.record.title || 'ID: ' + e.detail.id
+			}
+		}));
 	});
 })();
 </script>

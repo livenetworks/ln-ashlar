@@ -253,9 +253,9 @@ window.lnConfirm(root);         // re-run init scan over `root`. Only needed for
 		if (form) {
 			form.addEventListener('submit', function (e) {
 				e.preventDefault();
-				if (window.lnToast && window.lnToast.enqueue) {
-					window.lnToast.enqueue({ type: 'success', title: 'Submitted', message: 'Form submit fired (the platform default action ran on the second click).' });
-				}
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: { type: 'success', title: 'Submitted', message: 'Form submit fired (the platform default action ran on the second click).' }
+				}));
 			});
 		}
 
@@ -265,9 +265,9 @@ window.lnConfirm(root);         // re-run init scan over `root`. Only needed for
 			ajaxBtn.addEventListener('click', function () {
 				// Runs only on the SECOND click — first click is preventDefault'd
 				// and stopImmediatePropagation'd by ln-confirm before reaching here.
-				if (window.lnToast && window.lnToast.enqueue) {
-					window.lnToast.enqueue({ type: 'success', title: 'Cleared', message: 'Cache clear request fired (this listener runs only on the second click).' });
-				}
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: { type: 'success', title: 'Cleared', message: 'Cache clear request fired (this listener runs only on the second click).' }
+				}));
 			});
 		}
 

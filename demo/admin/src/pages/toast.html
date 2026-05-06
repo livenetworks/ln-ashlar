@@ -8,10 +8,10 @@
 						<header><h3>Examples</h3></header>
 						<main>
 							<nav class="demo-actions">
-								<button onclick="window.lnToast.enqueue({type:'success', title:'Success', message:'The record has been saved.'})" class="btn">Success</button>
-								<button onclick="window.lnToast.enqueue({type:'error', title:'Error', message:'Something went wrong.'})" class="btn error">Error</button>
-								<button onclick="window.lnToast.enqueue({type:'warn', title:'Warning', message:'Please check the data.'})" class="btn warning">Warning</button>
-								<button onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'A new version is available.'})" class="btn info">Info</button>
+								<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'success', title:'Success', message:'The record has been saved.'}}))" class="btn">Success</button>
+								<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Error', message:'Something went wrong.'}}))" class="btn error">Error</button>
+								<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'warn', title:'Warning', message:'Please check the data.'}}))" class="btn warning">Warning</button>
+								<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'A new version is available.'}}))" class="btn info">Info</button>
 							</nav>
 						</main>
 					</section>
@@ -20,7 +20,7 @@
 					<section class="section-card">
 						<header><h3>Error with a list of errors</h3></header>
 						<main>
-							<button onclick="window.lnToast.enqueue({type:'error', title:'Validation', message:['Name is required','Email format is incorrect','Password is too short']})" class="btn error">Show validation errors</button>
+							<button onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'error', title:'Validation', message:['Name is required','Email format is incorrect','Password is too short']}}))" class="btn error">Show validation errors</button>
 						</main>
 					</section>
 
@@ -28,27 +28,47 @@
 					<section class="section-card">
 						<header><h3>HTML &amp; JS API</h3></header>
 						<main>
-							<pre><code>&lt;!-- Toast container (once per page, no template needed) --&gt;
+							<pre><code>&lt;!-- Template (required once per page) --&gt;
+&lt;template data-ln-template="ln-toast-item"&gt;
+    &lt;li class="ln-toast__item"&gt;
+        &lt;div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive"&gt;
+            &lt;div class="ln-toast__side"&gt;&lt;/div&gt;
+            &lt;div class="ln-toast__content"&gt;
+                &lt;div class="ln-toast__head"&gt;
+                    &lt;strong class="ln-toast__title" data-ln-field="title"&gt;&lt;/strong&gt;
+                &lt;/div&gt;
+                &lt;button type="button" class="ln-toast__close" aria-label="Close"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;
+                &lt;div class="ln-toast__body" data-ln-show="hasBody"&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/li&gt;
+&lt;/template&gt;
+
+&lt;!-- Toast container (once per page) --&gt;
 &lt;ul data-ln-toast&gt;&lt;/ul&gt;
 
-&lt;!-- JS API --&gt;
+&lt;!-- JS — dispatch event to show a toast --&gt;
 &lt;script&gt;
-// Basic toast — returns numeric id
-var id = window.lnToast.enqueue({
-    type: 'success',     // success | error | warn | info
-    title: 'Title',
-    message: 'Description...'
-});
+// Basic toast
+window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+    detail: {
+        type: 'success',     // success | error | warn | info
+        title: 'Title',
+        message: 'Description...'
+    }
+}));
 
 // Error with list
-window.lnToast.enqueue({
-    type: 'error',
-    title: 'Validation',
-    message: ['Error 1', 'Error 2', 'Error 3']
-});
+window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+    detail: {
+        type: 'error',
+        title: 'Validation',
+        message: ['Error 1', 'Error 2', 'Error 3']
+    }
+}));
 
 // Clear all
-window.lnToast.clear();
+window.dispatchEvent(new CustomEvent('ln-toast:clear'));
 &lt;/script&gt;
 
 &lt;!-- Static toast (hydrated on init) --&gt;

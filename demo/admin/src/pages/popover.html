@@ -147,13 +147,13 @@
 			if (form) {
 				form.addEventListener('submit', function (e) {
 					e.preventDefault();
-					if (window.lnToast && typeof window.lnToast.enqueue === 'function') {
-						window.lnToast.enqueue({
+					window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+						detail: {
 							type: 'success',
 							title: 'Invited',
 							message: 'Invitation sent (demo)'
-						});
-					}
+						}
+					}));
 					if (formPopover.lnPopover && typeof formPopover.lnPopover.close === 'function') {
 						formPopover.lnPopover.close();
 					}

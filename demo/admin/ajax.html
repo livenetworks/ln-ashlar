@@ -69,7 +69,7 @@
 							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
 						</ul>
 					</div>
-					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
 						<span>Test Toast</span>
 					</button>
 				</div>
@@ -336,7 +336,7 @@ window.lnAjax(document.getElementById('new-container'));</code></pre>
 							</article>
 							<article>
 								<h4>Integration with ln-toast</h4>
-								<p>If <code>window.lnToast</code> exists and the response contains a <code>message</code> object, <code>ln-ajax</code> automatically shows a toast. No project-level wiring needed.</p>
+								<p>If the response contains a <code>message</code> object, <code>ln-ajax</code> dispatches <code>ln-toast:enqueue</code> on <code>window</code>. The <code>ln-toast</code> component listens for this event by default; any other listener can intercept.</p>
 								<pre><code>// Cancel a request conditionally (ln-ajax:before-start is cancelable)
 document.addEventListener('ln-ajax:before-start', function(e) {
     if (!userIsAuthenticated()) {
