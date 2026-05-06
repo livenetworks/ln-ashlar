@@ -385,11 +385,13 @@ input.lnValidate.destroy();    // Detach listeners, dispatch :destroyed</code></
 			if (input.lnValidate.isValid === true) validCount++;
 			else invalidCount++;
 		});
-		window.lnToast.enqueue({
-			type: 'info',
-			title: 'Validity check',
-			message: validCount + ' valid, ' + invalidCount + ' invalid'
-		});
+		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+			detail: {
+				type: 'info',
+				title: 'Validity check',
+				message: validCount + ' valid, ' + invalidCount + ' invalid'
+			}
+		}));
 	});
 
 	// ─── Event log ─────────────────────────────────────────────

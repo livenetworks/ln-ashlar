@@ -508,19 +508,22 @@ container.lnUploadAPI = { getFileIds, getFiles, clear, destroy };
 
 Use when: instance state is complex (closures, Maps) and doesn't fit the prototype pattern. Multiple instances on the same page each get their own API object.
 
-### 3. Functional API (singleton)
+### 3. Global event listener (singleton)
 
-ln-toast: the window registration IS the API. No per-element instances — one global queue.
+ln-toast: no window registration. Pure event listener — the contract is two window events (`ln-toast:enqueue`, `ln-toast:clear`). Project code dispatches; ln-toast listens.
 
 ```javascript
-const api = function (domRoot) { return constructor(domRoot); };
-api.enqueue = enqueue;
-api.clear = clear;
-window[DOM_ATTRIBUTE] = api;
-// Usage: window.lnToast.enqueue({ type: 'success', message: '...' })
+// In ln-toast.js — no window[DOM_ATTRIBUTE] = api anywhere
+window.addEventListener('ln-toast:enqueue', _onEnqueue);
+window.addEventListener('ln-toast:clear',   _onClear);
+
+// Usage from any component
+window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+    detail: { type: 'success', message: 'Saved' }
+}));
 ```
 
-Use when: the component is a global service with no per-element state (toast queue, HTTP layer).
+Use when: the component is a global service that other components should be able to invoke without having a reference to it. Pure event dispatch is portable across iframes, web components, and any script-loading order.
 
 ### Choosing a pattern
 
@@ -528,7 +531,7 @@ Use when: the component is a global service with no per-element state (toast que
 |-----------|---------|
 | Multiple instances, each with own DOM + state | Global constructor |
 | Multiple instances, complex closure state | Element API |
-| Single global service, no per-element instances | Functional API |
+| Single global service, no per-element instances | Global event listener |
 
 Do NOT standardize to one pattern — each exists for architectural reasons.
 

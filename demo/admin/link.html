@@ -69,7 +69,7 @@
 							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
 						</ul>
 					</div>
-					<button type="button" onclick="window.lnToast.enqueue({type:'info', title:'Info', message:'This is a demo notification.'})">
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
 						<span>Test Toast</span>
 					</button>
 				</div>
@@ -220,14 +220,14 @@
 										<td><a href="typography.html">Contract.pdf</a></td>
 										<td>15.02.2026</td>
 										<td class="center">
-											<button class="btn error" onclick="window.lnToast.enqueue({type:'info', title:'Delete', message:'Delete clicked! (demo)'})">Delete</button>
+											<button class="btn error" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Delete', message:'Delete clicked! (demo)'}}))">Delete</button>
 										</td>
 									</tr>
 									<tr>
 										<td><a href="layout.html">Invoice.pdf</a></td>
 										<td>10.02.2026</td>
 										<td class="center">
-											<button class="btn error" onclick="window.lnToast.enqueue({type:'info', title:'Delete', message:'Delete clicked! (demo)'})">Delete</button>
+											<button class="btn error" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Delete', message:'Delete clicked! (demo)'}}))">Delete</button>
 										</td>
 									</tr>
 								</tbody>

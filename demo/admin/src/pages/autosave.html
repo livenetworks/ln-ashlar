@@ -262,13 +262,13 @@ window.lnAutosave(container);</code></pre>
 							if (form) {
 								form.addEventListener('submit', function (e) {
 									e.preventDefault();
-									if (window.lnToast && window.lnToast.enqueue) {
-										window.lnToast.enqueue({
+									window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+										detail: {
 											type: 'success',
 											title: 'Submitted',
 											message: 'Form data sent. Draft cleared from localStorage.'
-										});
-									}
+										}
+									}));
 								});
 							}
 
