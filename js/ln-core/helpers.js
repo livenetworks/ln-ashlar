@@ -314,11 +314,7 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 						}
 					}
 				} else if (mutation.type === 'attributes') {
-					// If onAttributeChange is provided and it's the main selector attribute, call it.
-					// Note: for complex selectors, we check if the changed attribute is one of the attributes in the selector.
-					const isMainAttr = mutation.attributeName === selector || (selector.indexOf('[' + mutation.attributeName) !== -1);
-
-					if (onAttributeChange && mutation.target[attribute] && isMainAttr) {
+					if (onAttributeChange && mutation.target[attribute]) {
 						onAttributeChange(mutation.target, mutation.attributeName);
 					} else {
 						findElements(mutation.target, selector, attribute, ComponentFn);

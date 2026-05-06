@@ -155,10 +155,7 @@ function B(p, a, v, g, m = {}) {
             const r = f.addedNodes[o];
             r.nodeType === 1 && (_t(r, p, a, v), n && n(r));
           }
-        else if (f.type === "attributes") {
-          const o = f.attributeName === p || p.indexOf("[" + f.attributeName) !== -1;
-          l && f.target[a] && o ? l(f.target, f.attributeName) : (_t(f.target, p, a, v), n && n(f.target));
-        }
+        else f.type === "attributes" && (l && f.target[a] ? l(f.target, f.attributeName) : (_t(f.target, p, a, v), n && n(f.target)));
       }
     });
     let e = [];
