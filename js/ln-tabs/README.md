@@ -11,18 +11,11 @@ that invariant in one attribute on the wrapper (`data-ln-tabs-active="<key>"`)
 and lets everything else — ARIA sync, hash deep-linking, `localStorage`
 persistence, auto-focus — flow from it.
 
-`data-ln-tabs-active="settings"` means the settings panel is active.
-The attribute is the only mutator. Trigger clicks, `hashchange`, persistence
-restores, external scripts, and DevTools all write `data-ln-tabs-active`, and a
-`MutationObserver` runs the activation pipeline (tab button state,
-panel visibility, ARIA, focus, event dispatch, persistence write). There is no
-second path.
-
-Tabs are deliberately NOT built on `ln-toggle`. The contracts diverge at three
-points: cardinality (N-way vs binary), ARIA role (`aria-selected` + tablist vs
-`aria-expanded` + disclosure), and persistence (namespace-scoped URL hash or
-`localStorage`, mutually exclusive, vs per-element `localStorage`). For the
-full architectural rationale see [`docs/js/tabs.md`](../../docs/js/tabs.md).
+Trigger clicks, `hashchange`, persistence restores, external scripts, and
+DevTools all write `data-ln-tabs-active`. A single `MutationObserver` runs
+the activation pipeline (tab button state, panel visibility, ARIA, focus,
+event dispatch, persistence write). There is no second path. For why tabs
+are not built on `ln-toggle`, see [`docs/js/tabs.md`](../../docs/js/tabs.md).
 
 ## HTML contract
 
@@ -78,9 +71,11 @@ still works.
 
 ### Optional full WAI-ARIA triplet
 
-The component sets `aria-selected` on tab buttons and `aria-hidden` on panels.
-For full WAI-ARIA Authoring Practices compliance, add `role="tablist"`,
-`role="tab"`, and `role="tabpanel"` in markup:
+The component writes `aria-selected` on tab buttons and `aria-hidden` on
+panels but does NOT auto-inject `role="tablist"` / `role="tab"` /
+`role="tabpanel"` — wrapper element type varies and we do not want to
+overwrite a consumer's `role="region"`. If your audit requires full WAI-ARIA
+compliance, ship the roles in markup:
 
 ```html
 <section id="user-tabs" data-ln-tabs>
@@ -90,10 +85,6 @@ For full WAI-ARIA Authoring Practices compliance, add `role="tablist"`,
     <section role="tabpanel" id="info-panel" data-ln-panel="info">…</section>
 </section>
 ```
-
-The component does NOT auto-inject roles — the wrapper element type varies and
-we do not want to overwrite a consumer's `role="region"`. The `role` triplet is
-static markup the consumer ships.
 
 ## JS API
 
@@ -176,9 +167,7 @@ because it is user-visible and shareable.
 
 For storage-key format, fallback behaviour in private browsing, and
 `data-ln-persist="custom-key"` overrides, see
-[`docs/js/core.md`](../../docs/js/core.md) and the
-[`ln-toggle` persistence section](../ln-toggle/README.md#persistence)
-(same helper, same semantics).
+[`docs/js/core.md`](../../docs/js/core.md).
 
 ## What it does NOT do
 
@@ -188,9 +177,6 @@ The component is intentionally narrow. These are NOT tab concerns:
 - **No keyboard arrow navigation.** Arrow Left/Right/Home/End do not move focus or activation. Tab key cycles through buttons via browser default; Enter/Space activates. Arrow nav is a WAI-ARIA enhancement; wire it on the consumer side if your audit requires it.
 - **No lazy-loading.** All panels are in the DOM at init; inactive panels are hidden, not removed. Lazy loading is consumer-side — listen for `ln-tabs:change`.
 - **No scroll-position memory per panel.** Switching from a scrolled panel back resets to the top.
-- **No key validation.** A mismatched or typo'd key silently falls back to the default. The component is permissive; verify your markup keys.
-- **No `role="tablist"` / `role="tab"` / `role="tabpanel"` auto-injection.** See §Optional full WAI-ARIA triplet above.
-- **No form-submission interception.** Tab buttons inside a `<form>` need `type="button"` (default `<button>` type is `submit`).
 
 ## Examples
 
@@ -272,8 +258,7 @@ on" is the expected restore.
 
 ## See also
 
-- **[`ln-toggle`](../ln-toggle/README.md)** — binary open/close primitive. Tabs are not built on toggle; see [`docs/js/tabs.md`](../../docs/js/tabs.md) for the rationale.
+- **[`ln-toggle`](../ln-toggle/README.md)** — binary open/close primitive.
 - **[`ln-accordion`](../ln-accordion/README.md)** — single-open coordinator built on `ln-toggle`. Contrast: accordion enforces single-open reactively; tabs enforce it by construction.
-- **[`ln-modal`](../ln-modal/README.md)** — also its own state machine separate from toggle. Same pattern: a piece of UI that needs a different attribute contract.
-- **`@mixin tabs-nav`, `@mixin tabs-tab`, `@mixin tabs-panel`** (`scss/config/mixins/_tabs.scss`) — the visual recipe. Applied by default to `[data-ln-tabs]` children.
+- **`@mixin tabs-nav`, `@mixin tabs-tab`, `@mixin tabs-panel`** (`scss/config/mixins/_tabs.scss`) — the visual recipe.
 - **Architecture deep-dive:** [`docs/js/tabs.md`](../../docs/js/tabs.md) — observer wiring, hash round-trip, anchor key derivation, persistence internals.

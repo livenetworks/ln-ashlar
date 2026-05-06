@@ -5,22 +5,21 @@ maintainers — for usage, see [`js/ln-tabs/README.md`](../../js/ln-tabs/README.
 
 ## Where this sits in the layered architecture
 
-`ln-tabs` is **not** part of the data-flow pipeline described in
-[`docs/architecture/data-flow.md`](../architecture/data-flow.md). It is a UI
-primitive — render-layer adjacent (it shows and hides DOM) but with no record
-awareness, no submit pipeline involvement, no validate-layer hooks. It is a
-canonical embodiment of the markup-driven state and MutationObserver discipline
-patterns that data-flow §10–§11 document. Read that doc for the cross-cutting
-principles; this doc covers what is specific to tabs.
+`ln-tabs` is a UI primitive — it shows and hides DOM but has no record
+awareness, no submit pipeline involvement, no validate-layer hooks. It sits
+outside the data-flow pipeline described in
+[`docs/architecture/data-flow.md`](../architecture/data-flow.md); read that
+doc for the cross-cutting markup-driven state and MutationObserver
+principles, and this doc for what is specific to tabs.
 
 The component imports only `registerComponent` and `dispatch` from
-`ln-core/helpers.js`, and `persistGet` / `persistSet` from
+`ln-core/helpers.js`, plus `persistGet` / `persistSet` from
 `ln-core/persist.js`. Zero cross-component dependencies.
 
 ## Why not ln-toggle (architectural)
 
-The README's "Why not ln-toggle" is the consumer-facing version. The
-architectural version is more compact:
+Tabs are deliberately not built on `ln-toggle`. The contracts diverge at the
+attribute layer:
 
 **`ln-toggle`'s state alphabet is `{open, close}`.** Two values, one
 attribute (`data-ln-toggle`), one observer-driven sync. Every consumer that
@@ -120,37 +119,7 @@ triggers `_applyActive`, making the attribute the single source of truth.
 
 ## The activation pipeline (`_applyActive`)
 
-```js
-_component.prototype._applyActive = function (key) {
-    if (!key || !(key in this.mapPanels)) key = this.defaultKey;
-    for (const k in this.mapTabs) {
-        const btn = this.mapTabs[k];
-        if (k === key) {
-            btn.setAttribute("data-active", "");
-            btn.setAttribute("aria-selected", "true");
-        } else {
-            btn.removeAttribute("data-active");
-            btn.setAttribute("aria-selected", "false");
-        }
-    }
-    for (const k in this.mapPanels) {
-        const panel = this.mapPanels[k];
-        const show = (k === key);
-        panel.classList.toggle("hidden", !show);
-        panel.setAttribute("aria-hidden", show ? "false" : "true");
-    }
-    if (this.autoFocus) {
-        const first = this.mapPanels[key]?.querySelector('input,button,select,textarea,[tabindex]:not([tabindex="-1"])');
-        if (first) setTimeout(() => first.focus({ preventScroll: true }), 0);
-    }
-    dispatch(this.dom, 'ln-tabs:change', { key: key, tab: this.mapTabs[key], panel: this.mapPanels[key] });
-    if (this.dom.hasAttribute('data-ln-persist') && !this.hashEnabled) {
-        persistSet('tabs', this.dom, key);
-    }
-};
-```
-
-Order matters:
+Once `_applyActive(key)` runs, the order of work matters:
 
 1. **Validity guard.** An invalid key (typo, removed panel, malicious URL) silently resolves to `defaultKey`. Permissive on purpose — the component is downstream of attribute writes and should be defensive.
 2. **Tab buttons first, then panels.** Natural read order for accessibility tooling — flip the active tab indicator first, then reveal the panel it controls.
@@ -243,33 +212,16 @@ to pick the right fragment.
 
 ## The persistence path
 
-```
-_init {
-    if (data-ln-persist && !hashEnabled) {
-        saved = persistGet('tabs', dom)        // reads ln:tabs:<path>:<id>
-        if (saved && saved in mapPanels) {
-            initialKey = saved
-        }
-    }
-    dom.setAttribute('data-ln-tabs-active', initialKey)
-}
-
-_applyActive(key) {
-    // ... DOM and ARIA work ...
-    dispatch('ln-tabs:change', ...)
-    if (data-ln-persist && !hashEnabled) {
-        persistSet('tabs', dom, key)           // writes ln:tabs:<path>:<id>
-    }
-}
-```
-
 Restore happens in `_init` BEFORE the first attribute write, so the initial
 pipeline runs with the restored key. No flash of default-then-restored.
+The check is `data-ln-persist` present AND `hashEnabled === false`; if both
+fail, `initialKey` stays as `defaultKey`.
 
-Save happens in `_applyActive` AFTER event dispatch, so listeners see the new
-state when the save occurs. If a listener throws, the save still runs (no
-`try/catch` around the dispatch; throws in listeners propagate but don't unwind
-the calling scope per the `CustomEvent` contract).
+Save happens at the END of `_applyActive` AFTER `dispatch('ln-tabs:change',
+…)`, so listeners see the new state when the save occurs.
+
+The save runs after dispatch — listener exceptions are reported by the user
+agent and do not unwind into `_applyActive`.
 
 The hash-precedence guard (`!this.hashEnabled`) appears in both restore and save
 paths. Without it, a wrapper with both `id` and `data-ln-persist` would write to
@@ -338,26 +290,10 @@ The validity guard makes every call self-correcting — even rapidly toggled inv
 ## Performance characteristics
 
 - **Init.** O(T + P) where T = tab button count, P = panel count. One `querySelectorAll` per wrapper (rooted at wrapper, not document). Click handler attachment is O(T).
-- **`_applyActive`.** O(T + P) — iterates `mapTabs` and `mapPanels`. T and P are typically 3–7; cost is negligible per switch.
-- **`_hashHandler`.** O(N) where N = `&`-separated fragment count in the hash. `_parseHash` builds a fresh map each time; hash is a small string, caching is not warranted.
-- **Persistence.** `persistGet` is one `localStorage.getItem` + `JSON.parse`. `persistSet` is one `JSON.stringify` + `localStorage.setItem`. Neither is on a hot path.
-- **Memory.** Per instance: `tabs[]`, `panels[]`, `mapTabs`, `mapPanels`, `_clickHandlers` (one `{el, handler}` pair per trigger), one bound `_hashHandler`. No timers, no intervals, no `ResizeObserver`. Instance is GC'd after `destroy()` or page navigation.
-
-## Comparison with sibling components
-
-| Concern | ln-toggle | ln-tabs | ln-modal |
-|---|---|---|---|
-| State alphabet | `{open, close}` | open string set (markup-defined) | `{open, close}` |
-| State attribute | `data-ln-toggle` | `data-ln-tabs-active` | `data-ln-modal` |
-| Coordinator? | external (`ln-accordion`) | internal | internal |
-| Cancelable open? | yes (`ln-toggle:before-open`) | no (no semantic gate) | no |
-| Hash sync? | no | yes (opt-in via namespace) | no |
-| Persistence? | per-element `localStorage` | hash OR `localStorage` (mutually exclusive) | no |
-| Auto-focus? | no | yes (configurable) | yes |
-| ESC-to-close? | no | n/a | yes |
-
-Each component owns its concerns. The shared substrate is `registerComponent`,
-`dispatch`, and the attribute-as-source-of-truth pattern.
+- **`_applyActive`.** O(T + P) — iterates `mapTabs` and `mapPanels`.
+- **`_hashHandler`.** O(N) where N = `&`-separated fragment count in the hash. `_parseHash` builds a fresh map each call.
+- **Persistence.** `persistGet` is one `localStorage.getItem` + `JSON.parse`; `persistSet` is one `JSON.stringify` + `localStorage.setItem`.
+- **Memory.** Per instance: `tabs[]`, `panels[]`, `mapTabs`, `mapPanels`, `_clickHandlers` (one `{el, handler}` pair per trigger), one bound `_hashHandler`. No timers, no intervals, no `ResizeObserver`.
 
 ## Read further
 
@@ -367,4 +303,4 @@ Each component owns its concerns. The shared substrate is `registerComponent`,
 - `js/ln-core/helpers.js` — `registerComponent`, including `extraAttributes` and `onAttributeChange` options `ln-tabs` uses.
 - `js/ln-core/persist.js` — `persistGet` / `persistSet`, the shared `localStorage` wrappers.
 - `scss/config/mixins/_tabs.scss` — the underline-style visual recipe (`tabs-nav`, `tabs-tab`, `tabs-panel`).
-- `scss/components/_tabs.scss` — applies the mixins to default selectors and adds the `.hidden` rule.
+- `scss/components/_tabs.scss` — applies the mixins to default selectors and scopes panel hiding to `[data-ln-tabs] [data-ln-panel].hidden`.
