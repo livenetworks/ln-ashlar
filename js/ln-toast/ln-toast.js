@@ -1,17 +1,13 @@
 /* Live Networks — ln-toast (side-accent with icons) */
 import { guardBody, cloneTemplateScoped, fill } from '../ln-core';
+import DEFAULT_TEMPLATE_HTML from './template.html?raw';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-toast";
 	const DOM_ATTRIBUTE = "lnToast";
 	const TEMPLATE_NAME = "ln-toast-item";
 
-	const ICONS = {
-		success: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>`,
-		error: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`,
-		warn: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 1.67 10.42 18.04H1.58L12 1.67z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`,
-		info: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`
-	};
+	const TYPE_ICON = { success: 'circle-check', error: 'circle-x', warn: 'alert-triangle', info: 'info-circle' };
 
 	const STATUS_CLASS = { success: 'success', error: 'error', warn: 'warning', info: 'info' };
 
@@ -19,6 +15,16 @@ import { guardBody, cloneTemplateScoped, fill } from '../ln-core';
 
 	if (window.__lnToastLoaded) return;
 	window.__lnToastLoaded = true;
+
+	function _ensureTemplate() {
+		if (document.querySelector('[data-ln-template="ln-toast-item"]')) return;
+		if (!document.body) return;
+		const tmpl = document.createElement('template');
+		// Trust boundary: DEFAULT_TEMPLATE_HTML is a hardcoded library constant resolved at build time via ?raw import.
+		tmpl.setAttribute('data-ln-template', 'ln-toast-item');
+		tmpl.innerHTML = DEFAULT_TEMPLATE_HTML;
+		document.body.appendChild(tmpl);
+	}
 
 	function _findContainers(root) {
 		if (!root || root.nodeType !== 1) return;
@@ -72,8 +78,10 @@ import { guardBody, cloneTemplateScoped, fill } from '../ln-core';
 		if (card) card.classList.add(STATUS_CLASS[type] || 'info');
 
 		const side = li.querySelector('.ln-toast__side');
-		// Trust boundary: ICONS[type] contains hardcoded SVG strings defined in this module
-		if (side) side.innerHTML = ICONS[type] || ICONS.info;
+		if (side) {
+			const useEl = side.querySelector('use');
+			if (useEl) useEl.setAttribute('href', '#ln-' + (TYPE_ICON[type] || TYPE_ICON.info));
+		}
 
 		const bodyEl = li.querySelector('.ln-toast__body');
 		if (bodyEl && hasBody) _renderBody(bodyEl, opts);
@@ -182,6 +190,8 @@ import { guardBody, cloneTemplateScoped, fill } from '../ln-core';
 	}
 
 	guardBody(function () {
+		_ensureTemplate();
+
 		window.addEventListener('ln-toast:enqueue', _onEnqueue);
 		window.addEventListener('ln-toast:clear', _onClear);
 
