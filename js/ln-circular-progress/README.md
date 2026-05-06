@@ -1,9 +1,7 @@
 # ln-circular-progress
 
-> Attribute-driven SVG ring renderer. Set `data-ln-circular-progress="75"`,
-> the component wires a MutationObserver, recomputes the arc from value and
-> max, and updates the `stroke-dashoffset` plus the centre label. The
-> attribute IS the state — no imperative setter, no JS-side value cache.
+> Attribute-driven SVG ring renderer. Set `data-ln-circular-progress="75"` on an
+> empty host; the component builds the SVG, watches the attribute, and redraws on every change. The attribute IS the state — no imperative setter.
 
 ## Quick start
 
@@ -16,9 +14,7 @@ track circle and fill circle, creates a `<strong>` label, and appends both to th
 host. The SVG fills the host's dimensions via CSS (`width: 100%`, `height: 100%`),
 so size comes from the host — or from a size class (`.sm`, `.lg`, `.xl`).
 
-The host element must be empty at init — the constructor appends the SVG
-and label via `appendChild`, not `innerHTML`. Pre-existing children stay
-in the DOM after the SVG and can cause visual overlap.
+The host element must be empty at init — the constructor `appendChild`s the SVG and label; pre-existing children stay in the DOM and overlap the ring.
 
 ## Attributes
 
@@ -29,13 +25,6 @@ in the DOM after the SVG and can cause visual overlap.
 | `data-ln-circular-progress-label="text"` | host element | Custom centre label, replaces the auto-computed percentage. Read inside `_render`, but **NOT in the MutationObserver filter** — mutating this attribute alone does not trigger a re-render. Update the label alongside a value or max write. |
 
 `data-ln-circular-progress-initialized=""` is set by the constructor and removed by `destroy()`. It is an internal marker — do not read it from project code; use `el.lnCircularProgress` instead.
-
-**Label + value atomically.** To change the label and have it immediately visible, also write value (or rewrite the same value back to itself). The observer fires on any value/max write, including rewrites of the current value, so this reliably flushes the label:
-
-```js
-el.setAttribute('data-ln-circular-progress-label', '8/10');
-el.setAttribute('data-ln-circular-progress', el.getAttribute('data-ln-circular-progress'));
-```
 
 **Size variants** — apply a class to the host: `.sm` (2.5 rem), default (4 rem), `.lg` (6 rem), `.xl` (8 rem). Each rebinds the label font-size.
 
@@ -62,18 +51,6 @@ document.addEventListener('ln-circular-progress:change', function (e) {
 
 The event fires on the initial render at construction, as well as on every subsequent value or max attribute change. A document-level listener sees a `:change` for every ring on the page during init.
 
-## Behavior
-
-Set the value attribute → MutationObserver fires → `_render` re-reads value, max, and label → recomputes percentage (clamped 0–100) → writes `stroke-dashoffset` → updates label `textContent` → dispatches `ln-circular-progress:change`.
-
-The observer's `attributeFilter` is `['data-ln-circular-progress', 'data-ln-circular-progress-max']`. Changing only `data-ln-circular-progress-label` does not trigger a re-render; the label updates the next time value or max changes. To flush a label-only change, also write the value (even back to the same value — the observer fires on any write, including identical ones).
-
-The percentage is clamped to 0–100 before writing the offset. The attribute itself is left raw — `getAttribute('data-ln-circular-progress')` returns the original value written, even if it exceeds max.
-
-Arc transitions are handled by `transition: stroke-dashoffset var(--transition-base)` in `@mixin circular-progress`, gated through `@include motion-safe`. Reduced-motion users see an instant snap.
-
-There is no debounce on rapid attribute writes. For high-frequency updates (upload progress events firing many times per second), the CSS transition smooths the visual — the canonical pattern is to set the final value in one write and let CSS animate the sweep, not to write every intermediate step.
-
 ## Accessibility
 
 The component sets `aria-hidden="true"` on the constructed `<svg>` — screen readers skip the SVG element. The component does **not** write `role`, `aria-valuenow`, `aria-valuemin`, or `aria-valuemax` on the host. Consumer owns the accessibility tree:
@@ -89,16 +66,7 @@ The component sets `aria-hidden="true"` on the constructed `<svg>` — screen re
 </div>
 ```
 
-Keep `aria-valuenow` in sync when writing `data-ln-circular-progress` — the component does not do this automatically. A minimal helper:
-
-```js
-function setProgress(el, value) {
-	el.setAttribute('data-ln-circular-progress', value);
-	el.setAttribute('aria-valuenow', value);
-}
-```
-
-The component intentionally does NOT write `role` or `aria-valuenow`. Consumers often need richer semantics than bare `aria-valuenow` — a live region, an `<output>` with a text description, an `aria-labelledby` linking to a sibling caption. Writing defaults inside the component would force consumers to override them.
+Keep `aria-valuenow` in sync when writing `data-ln-circular-progress` — the component does not do this automatically.
 
 ## API
 
@@ -143,9 +111,6 @@ document.getElementById('advance').addEventListener('click', function () {
 Each attribute write triggers a re-render and a `:change` event. The CSS
 transition animates the arc from the previous offset to the new one.
 
-To advance from 0 to 100 in a single smooth sweep, write the target value once
-and let CSS handle the animation — no `requestAnimationFrame` loop needed.
-
 ### Custom max + label
 
 ```html
@@ -159,16 +124,12 @@ and let CSS handle the animation — no `requestAnimationFrame` loop needed.
 
 `max="10"` shifts the denominator so 7 maps to 70% of the arc. `label="7/10"` overrides the centre text — without it, the centre would read "70%". Both attributes are usually set together for non-percentage scales.
 
-If only one is present: `max="10"` alone → arc at 70%, label "70%". `label="7/10"` alone (no max) → arc at 7% of 100, label "7/10" — the arc is wrong because max defaulted to 100.
-
 ## What it does NOT do
 
 - No indeterminate / spinner mode. An empty value renders 0% (empty track). For an indeterminate spinner use `@mixin loader`.
 - No automatic ARIA. Consumer adds `role="progressbar"` and keeps `aria-valuenow` in sync.
-- No parent-track shared max. Unlike `ln-progress`, each ring reads max only from its own attribute.
-- No debounce on rapid attribute writes. Each write triggers a synchronous render. For high-frequency flows (upload progress at 60 Hz), the CSS transition smooths the visual — set the final value and let CSS do the sweep rather than writing every frame.
+- No debounce on rapid attribute writes — each write triggers a synchronous render and a `:change` event.
 - No `setValue()` / `setMax()` / imperative API. `el.setAttribute('data-ln-circular-progress', n)` is the canonical update path.
-- No `:initialized` or `:destroyed` lifecycle events. The initial render fires a regular `ln-circular-progress:change` at construction (serving as the init signal); `destroy()` is silent.
 
 ## See also
 
