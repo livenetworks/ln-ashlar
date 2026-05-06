@@ -160,8 +160,8 @@ of the form layer relies on.
   values at init. The integration with `ln-autosave` works through
   the platform's `change` event: `ln-select` registers earlier
   in `js/index.js` (line 11) than `ln-autosave` (line 31), so by
-  the time `ln-autosave.restore()` runs in its constructor and
-  dispatches synthetic `change` on every restored field, the
+  the time ln-autosave's construction-time restore runs and dispatches
+  synthetic `change` on every restored field, the
   underlying `<select>` is already upgraded — TomSelect's internal
   `change` listener catches the synthetic event and re-syncs the
   visible chip pills / dropdown to the restored value. Order is
@@ -590,8 +590,8 @@ select.dispatchEvent(new Event('change', { bubbles: true }));
 ```
 
 The synthetic-`change` workaround is what `ln-form.fill()`,
-`ln-form.reset()`, and `ln-autosave.restore()` all do under the
-hood (`js/ln-form/ln-form.js:108-112`). It is the right pattern
+`ln-form.reset()`, and ln-autosave's construction-time restore all do
+under the hood (`js/ln-form/ln-form.js:108-112`). It is the right pattern
 for "I just wrote `.value` and need TomSelect to catch up."
 
 ### Composing with `ln-autosave` — restore an unfinished selection

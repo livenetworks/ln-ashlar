@@ -907,8 +907,8 @@ input.dispatchEvent(new Event(isChangeBased ? 'change' : 'input', { bubbles: tru
 ```
 
 This is the same fork that `ln-form.fill()`, `ln-form.reset()`,
-and `ln-autosave.restore()` use internally. Mirror it from
-project code.
+and ln-autosave's construction-time restore use internally. Mirror it
+from project code.
 
 If you are setting many fields at once, use `lnForm.fill(data)`
 instead — it does the dispatch loop for you (`js/ln-form/ln-form.js:102-113`).
