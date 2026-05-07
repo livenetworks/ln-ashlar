@@ -222,13 +222,8 @@ informational and may have zero listeners.
 
 ### Cancelable events
 
-None. The component's design is fire-and-forget — it announces
-intentions, the coordinator decides how to respond. If a coordinator
-wants to "block" a sort, it can ignore the next `request-data` and
-respond with the previous data set, which causes the table to
-re-render with the old order; the sort class on `<th>` will already
-have been updated optically, so this is a discouraged pattern. Use
-`set-loading` to indicate the request is in flight instead.
+None. The component announces, the coordinator decides. Use
+`set-loading` to indicate a request is in flight.
 
 ## Coordinator / cross-component contract
 
@@ -251,6 +246,8 @@ lines). It is the only place that knows both about the table and about
 the data source. Components on the data side (`ln-store`) and on the
 UI side (`ln-modal`, `ln-toast`) communicate with the coordinator via
 their own events, never with the table directly.
+
+See [`core.md`](core.md) for the library-wide coordinator pattern.
 
 ## Performance considerations
 
@@ -372,12 +369,11 @@ stays at "I announce, you respond."
 ### Why coordinator events instead of direct method calls?
 
 Direct calls (`tableEl.lnDataTable.setData([...])`) would couple the
-caller to the component's identity and import path. With events, any
-script that has a reference to the table element (or listens at
-`document`) can drive it. Multiple coordinators can listen to the
-same `request-data` (e.g., a primary fetcher + an analytics logger)
-without knowing about each other. This is the same coordinator
-pattern documented in [`docs/js/core.md`](core.md).
+caller to the component's identity. With events, any script that has
+a reference to the element can drive it, and multiple listeners can
+react to the same `request-data` (primary fetcher + analytics logger)
+without knowing about each other. See [`core.md`](core.md) for the
+library-wide pattern.
 
 ### Why `<template>` clone instead of `innerHTML`?
 
@@ -387,17 +383,6 @@ re-parsing on every render, and forces the row layout into a JS
 string. `<template>` is parsed once when the page loads, the
 content is `cloneNode`'d cheaply, and `data-ln-cell` uses
 `textContent` which is XSS-safe by construction.
-
-### Why no row-level dirty tracking / virtual DOM?
-
-The component's renders are atomic — `<tbody>` is replaced wholesale
-on every `set-data`. A virtual-DOM diff would help only if rows
-mutated frequently while their neighbors did not, which is not the
-expected pattern: data tables receive bulk updates (a fresh page,
-a fresh search result), not per-cell streams. Atomic replacement
-also keeps selection restoration simple — `_buildRow` consults
-`selectedIds` and re-applies `ln-row-selected` to rows whose IDs
-match.
 
 ### Why classes for sort state instead of attributes on the icons?
 
