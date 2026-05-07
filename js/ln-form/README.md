@@ -6,77 +6,23 @@ auto-submit. Works with `ln-validate` for per-field validation. Emits
 
 ## Philosophy
 
-### ln-form is a coordinator, not a validator
+`ln-form` is a coordinator, not a validator. The browser runs the
+rules, `ln-validate` decides when to surface them, and `ln-form` only
+gates the submit button by re-querying `[data-ln-validate]` fields on
+every `:valid` / `:invalid` event. There is no internal field index —
+adding a `[data-ln-validate]` field after init is picked up
+automatically.
 
-`ln-form` does not run validation rules. The browser runs them, and
-`ln-validate` decides when to surface the result. `ln-form`'s only
-validation concern is **coordinating the submit-button gate** based on
-what the fields report.
+`ln-form:submit` carries the serialized data and stops there. No
+fetch, no XHR — wire the network layer through `ln-http`, `ln-store`,
+or a manual handler.
 
-It does this by listening for `ln-validate:valid` / `ln-validate:invalid`
-events that bubble from child fields. Each bubbled event is a **trigger**
-— a signal to re-evaluate state. On each trigger, `_updateSubmitButton()`
-re-queries every `[data-ln-validate]` field and reads `field.checkValidity()`
-and `instance._touched` directly from the DOM and the validate instance.
-`checkValidity()` is the source of truth, not an internal index.
-
-The implication: if you add a `[data-ln-validate]` field after the form
-initializes, it is picked up automatically on the next event — there is
-nothing to register.
-
-### Submit produces a data event, not a network request
-
-`ln-form:submit` carries the serialized form data in `e.detail.data`.
-The component stops there. No `fetch`, no `XMLHttpRequest`, no server
-roundtrip. Wire the network layer via `ln-http`, `ln-store`, a
-coordinator, or a manual `fetch()` in your event handler.
-
-This keeps `ln-form` ignorant of server state, which means it also does
-not know about server-side errors. If you need server errors to block
-the submit button, see "What it does NOT do" and "Cross-component
-composition" below.
-
-### Reset is reactive
-
-`lnForm.reset()` calls `dom.reset()` to clear `.value` on every form
-control, then dispatches a synthetic `input` or `change` event on every
-field (same `isChangeBased` discriminator as `fill()`). Those events
-wake up `ln-autoresize` (which shrinks back to initial height),
-`ln-validate` (which re-validates), and any custom listener that keys
-off `input` / `change`. After the dispatch loop, `_resetValidation()`
-clears the transient validation state left by the synthetic events.
-
-Native `<button type="reset">` does NOT go through this path. See
-"Native `<button type="reset">` path" below.
-
-### There is no before-submit cancelable event — intentional
-
-`ln-form:submit` is not cancelable. `e.preventDefault()` inside a
-`ln-form:submit` handler is a no-op. This is deliberate.
-
-The submit handler IS the gate. When the user clicks submit, `ln-form`
-force-validates every `[data-ln-validate]` field. If any field fails,
-the submit aborts silently — no `ln-form:submit` event is dispatched.
-The submit handler therefore receives only valid-form submissions.
-Consumers that want post-validation logic (e.g. "wait for a CAPTCHA")
-add it inside the `ln-form:submit` handler, not a before-event.
-
-### `isValid` getter ≠ submit-button logic
-
-These two answer different questions:
-
-- **`form.lnForm.isValid`** — "Is the form's data acceptable for
-  submission right now?" Checks `field.checkValidity()` across all
-  `[data-ln-validate]` fields. Ignores `_touched`.
-- **Submit button `disabled`** — "Is the form in a state where the
-  user should be invited to submit?" Checks BOTH `checkValidity()`
-  AND `instance._touched`. A fresh form with no interaction has
-  `isValid === true` (if no required fields are blank by default)
-  but Save is still disabled — no field has been touched yet, so
-  the "you haven't started" guard keeps the button disabled.
-
-This is **deliberate and observable**. The two surfaces answer
-different questions and should not be conflated.
+`ln-form:submit` is intentionally **not cancelable**. The submit
+handler IS the gate: `ln-form` force-validates every field before
+dispatching, so the handler only ever runs on valid data. Mechanism
+detail (`isValid` vs button-disabled, the reset event order, the
+native reset path) lives in
+[docs/js/form.md](../../docs/js/form.md).
 
 ---
 
@@ -113,19 +59,10 @@ different questions and should not be conflated.
 </form>
 ```
 
-What each piece does:
-
-- `data-ln-form` on `<form>` — creates the component instance. The
-  coordinator attaches its listeners immediately and runs
-  `_updateSubmitButton()` once at init.
-- `data-ln-validate` on inputs — marks the field as part of the
-  validation gate. `ln-form` only manages button state and the
-  submit gate for marked fields.
-- `type="button"` on Cancel — required. Without it the browser
-  treats the button as `type="submit"`, causing Cancel to submit
-  the form.
-- No class on buttons — `type="submit"` gets primary fill from
-  the library's global button styling. Cancel inherits neutral.
+- `data-ln-form` on `<form>` creates the instance and runs the submit-button
+  gate once at init.
+- `type="button"` is required on Cancel — without it the browser treats
+  the button as `type="submit"`, and Cancel submits the form.
 
 ---
 
@@ -164,12 +101,6 @@ mount of dynamically inserted HTML):
 // handles this automatically.
 window.lnForm(container);
 ```
-
-**Mutations through requests, queries through API.** Reading
-`form.lnForm.isValid` is fine. Calling `form.lnForm.reset()` is fine.
-Setting the instance properties directly (`form.lnForm._debounceTimer =
-null`) is not — it bypasses the component's own cleanup. Always go
-through the public methods.
 
 ---
 
@@ -219,115 +150,52 @@ to the form is inconvenient.
 
 ## Submit-button state
 
-The submit button is automatically disabled/enabled based on validation.
-State is computed by `_updateSubmitButton()` on every `ln-validate:valid`
-/ `ln-validate:invalid` event that bubbles to the form, and once at init.
+`button[type="submit"]` and `input[type="submit"]` inside a
+`data-ln-form` are auto-disabled based on `[data-ln-validate]` fields:
 
-Rules:
+- No `[data-ln-validate]` fields → button state not managed.
+- No field touched yet → disabled (fresh-form guard).
+- Any field fails `checkValidity()` → disabled.
+- All fields pass AND at least one was touched → enabled.
 
-- If no `[data-ln-validate]` fields exist → button state is not managed.
-- If `[data-ln-validate]` fields exist:
-  - **No field has been touched yet** → disabled (fresh-form guard).
-  - **Any field fails `checkValidity()`** → disabled.
-  - **All fields pass `checkValidity()` AND at least one was touched** → enabled.
-
-Targets: `button[type="submit"]` and `input[type="submit"]` within the
-form. All are set to the same `disabled` value — no "primary submit only"
-distinction.
-
-The guard logic re-queries `[data-ln-validate]` and reads
-`instance._touched` + `field.checkValidity()` on **every trigger event**,
-not from a cached Set. This means a field added to the form after init is
-picked up automatically on the next user interaction.
+Recomputed on every `ln-validate:valid` / `:invalid` event that bubbles
+to the form. Fields added after init participate automatically — no
+registration step. Full event-trigger flow: see
+[docs/js/form.md](../../docs/js/form.md#validation-tracking).
 
 ---
 
-## Validation flow
+## Reset
 
-1. User interacts with a field → `ln-validate` dispatches
-   `ln-validate:valid` or `ln-validate:invalid` (bubbles up to the form).
-2. `ln-form._onValid` / `._onInvalid` catches the event and calls
-   `_updateSubmitButton()`. The event's `detail` is ignored — the handler
-   is a pure re-evaluation trigger.
-3. `_updateSubmitButton()` re-queries all `[data-ln-validate]` fields,
-   reads `instance._touched` and `field.checkValidity()` per field, and
-   sets `submit.disabled = anyInvalid || !anyTouched`.
-4. On submit: `ln-form.submit()` force-validates each field via
-   `instance.validate()`. If any return false, abort. Otherwise serialize
-   + dispatch `ln-form:submit`.
-
----
-
-## Reset flow
-
-`lnForm.reset()` does four things in order:
-
-1. **Native form reset** — `dom.reset()` clears `.value` on every form
-   control to its default.
-2. **Synthetic input/change dispatch** — for each `<input>`, `<textarea>`,
-   `<select>` in the form, dispatch `input` (or `change` for SELECT,
-   checkbox, radio — same `isChangeBased` discriminator as `fill()`). This
-   wakes reactive children:
-   - `ln-autoresize` re-measures and shrinks to initial height.
-   - `ln-validate` re-validates the now-empty value (transient — see step 3).
-3. **Validation cleanup** — `_resetValidation()` calls `instance.reset()`
-   on every `[data-ln-validate]` field (clears `_touched`, removes classes,
-   hides error messages), then calls `_updateSubmitButton()`.
-4. **`ln-form:reset-complete`** — dispatched on the form element. Custom
-   controls that hold their own value outside `<input>` / `<textarea>` /
-   `<select>` listen for this to reset themselves.
-
-Step 2 MUST run before step 3. The synthetic events trigger `ln-validate`
-to mark default-empty required fields as invalid. Step 3 then clears that
-transient state. Reordering would leave fields visibly invalid after reset.
-
-`ln-form:reset-complete` is named to avoid clashing with the incoming
-`ln-form:reset` request event — the form's listener for `ln-form:reset`
-calls `this.reset()`, which dispatches `reset-complete`. The distinct names
-prevent recursion.
+`lnForm.reset()` clears every form control, dispatches synthetic
+`input` / `change` per field so reactive children (`ln-autoresize`,
+`ln-validate`) re-react, then clears validation state and emits
+`ln-form:reset-complete`. Custom controls that hold their own state
+outside `<input>` / `<textarea>` / `<select>` listen for
+`ln-form:reset-complete` to reset themselves. Internal flow:
+[docs/js/form.md](../../docs/js/form.md#reset--flow).
 
 ---
 
 ## Native `<button type="reset">` path
 
-When a `<button type="reset">` inside the form is clicked, the browser
-fires a native `reset` event. `ln-form` listens for it and runs:
-
-```javascript
-this._onNativeReset = function () {
-	setTimeout(function () { self._resetValidation(); }, 0);
-};
-```
-
-This is the minimal path: only `_resetValidation()`, deferred by one
-tick so the browser has applied the reset to the DOM first.
-
-**What is NOT on this path:**
-
-- Synthetic `input` / `change` dispatch — `ln-autoresize` keeps its
-  height; custom listeners do not re-react.
-- `ln-form:reset-complete` dispatch — custom controls are not notified.
-
-This is deliberate. The native path is platform behavior, kept minimal
-so projects that opt into it get exactly what HTML defines. Use
-`lnForm.reset()` or dispatch `ln-form:reset` for the full reactive reset.
+A native `<button type="reset">` click runs ONLY validation cleanup —
+no synthetic `input` / `change` dispatch and no
+`ln-form:reset-complete`. `ln-autoresize` keeps its pre-reset height,
+custom listeners are not notified. Use `lnForm.reset()` (or dispatch
+`ln-form:reset`) for the full reactive path. Mechanism:
+[docs/js/form.md](../../docs/js/form.md#native-button-typereset-path--_onnativereset).
 
 ---
 
-## Auto-submit + validation interaction
+## Auto-submit + validation
 
-When `data-ln-form-auto` is present, both `input` and `change` events on
-the form trigger `submit()`. With `data-ln-form-debounce="N"`, each event
-clears and restarts a timer; `submit()` fires only after N ms of silence.
+With `data-ln-form-auto`, both `input` and `change` events trigger
+`submit()`. With `data-ln-form-debounce="N"`, each event clears and
+restarts the timer; `submit()` fires after N ms of silence.
 
-Auto-submit forms typically have no `[data-ln-validate]` fields — `submit()`
-serializes and dispatches immediately without validation gating.
-
-If they do have `[data-ln-validate]` fields, each `input` / `change` event
-triggers `submit()`, which force-validates via `instance.validate()`. A
-failed validation aborts the auto-submit silently — no event dispatched,
-no network call. The user-perceived effect: invalid fields show errors,
-no submit fires.
+Auto-submit forms with `[data-ln-validate]` fields force-validate on
+each fire — invalid data aborts silently, no `ln-form:submit` event.
 
 ---
 
@@ -342,109 +210,35 @@ no submit fires.
 - **Manage submit-button state when no `[data-ln-validate]` fields are
   present.** If the form has no marked fields, `_updateSubmitButton()`
   early-returns. Button state is left to the browser / consumer.
-- **Expose a `ln-form:before-submit` cancelable event.** Intentional.
-  The submit handler IS the gate. The force-validate pass ensures the
-  handler only runs on valid data.
-- **Track invalid fields in a Set.** The `_invalidFields` Set was removed
-  (it was initialized and mutated but never read — `_updateSubmitButton`
-  always re-queried the DOM). If you are migrating from a pre-cleanup
-  version: there is no `_invalidFields` on the instance. Use
-  `form.lnForm.isValid` or read the `ln-validate:valid` / `:invalid`
-  event flow directly.
-- **Clear `_debounceTimer` on `_resetValidation()`.** Calling
-  `lnForm.reset()` mid-debounce on an auto-submit form WILL fire the
-  queued submit on the now-empty form. This is known behavior — the timer
-  runs `submit()`, which force-validates and aborts (fields are empty,
-  native `required` fails). In practice the aborted submit is silent. If
-  you need to cancel the timer explicitly, do
-  `clearTimeout(form.lnForm._debounceTimer)` before calling `reset()`.
-- **Cancel a queued auto-submit when fields become invalid mid-debounce.**
-  Each `input` / `change` event clears and restarts the timer. The timer
-  eventually fires `submit()`, which force-validates and aborts if invalid.
-  Bad data won't reach the server, but the timer fire itself cannot be
-  suppressed mid-flight.
+- **Expose a `ln-form:before-submit` cancelable event.** Intentional —
+  the force-validate pass already gates dispatch; gate logic belongs
+  inside the `ln-form:submit` handler.
 
 ---
 
-## Cross-component composition
+## Composes with
 
-### ln-form + ln-modal
+`ln-form` is data-only — it neither imports nor is imported by other
+components. It composes with:
 
-Modal hosts the form. `data-ln-modal` on the overlay, `data-ln-form` on
-the `<form>` — different elements, no overlap:
-
-```html
-<div class="ln-modal" data-ln-modal id="user-modal">
-	<form data-ln-form>
-		<header>
-			<h3>Edit User</h3>
-			<button type="button" data-ln-modal-close aria-label="Close">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-			</button>
-		</header>
-		<main>
-			<div class="form-element">
-				<label for="name">Name</label>
-				<input id="name" name="name" required data-ln-validate>
-				<ul data-ln-validate-errors>
-					<li hidden data-ln-validate-error="required">Name is required</li>
-				</ul>
-			</div>
-		</main>
-		<footer>
-			<button type="button" data-ln-modal-close>Cancel</button>
-			<button type="submit">Save</button>
-		</footer>
-	</form>
-</div>
-```
-
-Neither component imports the other. `ln-modal` owns the overlay state;
-`ln-form` owns form submission. They coexist because they attach to
-different elements.
-
-### ln-form + ln-validate
-
-The core composition. `ln-form` reads two surfaces from `ln-validate`:
-
-- `instance._touched` — read inside `_updateSubmitButton()` to guard the
-  fresh-form case.
-- `instance.validate()` — called on every `[data-ln-validate]` field
-  during the force-validate gate in `submit()`.
-- `instance.reset()` — called on every `[data-ln-validate]` field during
-  `_resetValidation()`.
-
-Events go the other direction: `ln-validate` dispatches `:valid` /
-`:invalid`; `ln-form` listens. These are the only touch points — no
-shared module, no import.
-
-### ln-form + ln-autoresize
-
-`ln-autoresize` listens to `input` events. `lnForm.fill()` and
-`lnForm.reset()` dispatch synthetic `input` per text field, so
-`ln-autoresize` re-measures correctly after programmatic value writes.
-No direct integration — they share the platform event.
-
-### ln-form + ln-autosave
-
-Independent. `ln-autosave` restores draft values by calling
-`populateForm()` and dispatching synthetic `input` / `change` per field.
-Those events are caught by `ln-validate`'s own listeners (which set
-`_touched = true` and run `validate()`), which in turn dispatch
-`:valid` / `:invalid` up to `ln-form`. The submit-button state reflects
-the restored draft's validity automatically — with zero direct wiring
-between `ln-autosave` and `ln-form`.
-
-### ln-form + ln-http / ln-store
-
-`ln-form` emits `ln-form:submit` with serialized data. `ln-http` (or a
-coordinator) listens for it and runs the network request. Server-side
-errors are dispatched as `ln-form:error` on the form element by the data
-layer. `ln-validate` does NOT subscribe to `ln-form:error` — a
-coordinator or application code translates server errors into
-`ln-validate:set-custom` dispatches per field, then calls
-`instance.validate()` to push the `:invalid` event that updates the
-submit-button gate.
+- **[ln-validate](../ln-validate/README.md)** — bubbled `:valid` /
+  `:invalid` events drive the submit gate; `submit()` calls
+  `instance.validate()` on each field; `reset()` calls
+  `instance.reset()`. See
+  [ln-validate README §Cross-component coordination](../ln-validate/README.md#cross-component-coordination)
+  for the mirrored contract.
+- **[ln-modal](../ln-modal/README.md)** — modal hosts the form on a
+  separate element. No shared API; both attach to different roots.
+- **[ln-autoresize](../ln-autoresize/README.md)** — receives the
+  synthetic `input` events that `fill()` / `reset()` dispatch, so
+  programmatic value writes re-measure correctly.
+- **[ln-autosave](../ln-autosave/README.md)** — restored draft values
+  fire synthetic `input` / `change` per field; `ln-validate` reacts
+  and the submit gate updates automatically. Zero direct wiring.
+- **ln-http / ln-store / coordinator** — listens for `ln-form:submit`
+  and runs the network request. Server errors are translated into
+  `ln-validate:set-custom` dispatches by the consumer's coordinator,
+  not by `ln-form`.
 
 ---
 
@@ -458,9 +252,8 @@ submit-button gate.
 
 ### Relying on native `<button type="reset">` for ln-autoresize re-measure
 
-The native reset path runs `_resetValidation()` only — no synthetic
-`input` dispatch. `ln-autoresize` keeps its pre-reset height. Use
-`lnForm.reset()` or dispatch `ln-form:reset` for the full reactive path.
+Native reset only clears validation state. Use `lnForm.reset()` for
+synthetic-event dispatch and full reactive reset.
 
 ### Calling `lnForm.fill()` on an auto-submit form
 
@@ -471,19 +264,10 @@ after the last fill event. This is consistent with the architecture but
 can be surprising. Either populate the form before attaching
 `data-ln-form-auto`, or accept the auto-submit fire.
 
-### Listening for "valid form" via `_invalidFields`
-
-The `_invalidFields` Set was removed. It was never the right API — it
-tracked field names as strings, which collapsed nameless fields and
-could be stale. Use `form.lnForm.isValid` for a synchronous boolean
-check, or listen to `ln-validate:valid` / `:invalid` events at the form
-level for reactive tracking.
-
 ### Trying to cancel submit via `e.preventDefault()` on `ln-form:submit`
 
-`ln-form:submit` is not cancelable. `e.preventDefault()` is a no-op. The
-force-validate gate (which runs before the event is dispatched) is the
-only abort path. Gate logic belongs inside the `ln-form:submit` handler.
+The event is not cancelable. Gate logic goes inside the handler; the
+force-validate gate is the only abort path.
 
 ### Adding a separate `addEventListener('submit', ...)` with `preventDefault()`
 
@@ -494,10 +278,9 @@ pattern.
 
 ### Mutating `data-ln-form-debounce` at runtime
 
-Attributes are read once at init. Changing `data-ln-form-debounce` on a
-live form has no effect. To change the debounce: call `form.lnForm.destroy()`,
-update the attribute, then restore `data-ln-form` (the MutationObserver
-re-initializes).
+Attributes are read once at init. To change the debounce: call
+`lnForm.destroy()`, set the attribute, restore `data-ln-form` (the
+observer re-initializes).
 
 ---
 
@@ -613,35 +396,6 @@ form.addEventListener('ln-form:reset-complete', function () {
 	myCustomInput.clear();
 });
 ```
-
----
-
-## Edge cases
-
-- **Form with no fields.** `submit()` passes the force-validate loop
-  (no iterations), serializes, and dispatches `ln-form:submit` with
-  empty data. The form is always "valid" in the trivial sense.
-- **Form with `[data-ln-validate]` but no submit button.**
-  `_updateSubmitButton()` early-returns (`if (!buttons.length) return`).
-  No error, no loop — safe no-op.
-- **Form with multiple submit buttons.** All are targeted by
-  `querySelectorAll('button[type="submit"], input[type="submit"]')`.
-  All get the same `disabled` value simultaneously.
-- **`dom.reset()` called externally** (not via `lnForm.reset()`).
-  The browser fires a native `reset` event, which triggers
-  `_onNativeReset`, which runs `_resetValidation()` only. Synthetic
-  events and `ln-form:reset-complete` are not dispatched.
-- **Field added to the form after init.** Picked up automatically.
-  `_updateSubmitButton()` re-queries on every event — there is no
-  static field index. The new field participates in the submit gate
-  as soon as the user interacts with any field.
-- **`lnForm.submit()` called when an auto-submit timer is queued.**
-  Submit fires immediately. The queued timer eventually fires again
-  (another `submit()` call). In most cases this is a double-serialize
-  of an already-submitted form — usually harmless (the server sees two
-  identical requests). In advanced cases, do
-  `clearTimeout(form.lnForm._debounceTimer)` before calling `submit()`
-  manually.
 
 ---
 

@@ -253,27 +253,6 @@ worth distinguishing.
 
 ---
 
-## Why no Set
-
-The `_invalidFields` Set was removed. It was initialized in the
-constructor, mutated in `_onValid` / `_onInvalid`, and cleared in
-`_resetValidation` — but never read. Every piece of code that needed
-to know "how many fields are invalid" called `_updateSubmitButton()`,
-which re-queries `[data-ln-validate]` and reads `checkValidity()` directly.
-
-The removal is not a performance improvement — the DOM walk was happening
-anyway. The gain is one fewer source of truth to keep in sync. An internal
-Set that tracks field names can become stale (e.g. a field removed from
-the DOM after an `:invalid` event was still in the Set until a matching
-`:valid` fired). The DOM is always authoritative; re-querying it on every
-event is the correct pattern.
-
-Future audits: do NOT re-introduce the Set. If a performance problem
-is observed, measure first — `querySelectorAll('[data-ln-validate]')` on
-a form with 10-20 fields is negligible.
-
----
-
 ## Relation to ln-validate
 
 `ln-form` and `ln-validate` are independent components. `ln-form` integrates
@@ -287,39 +266,11 @@ with `ln-validate` through three touch points:
    `instance.reset()` on every `[data-ln-validate]` field, and reads
    `instance._touched` inside `_updateSubmitButton()`.
 
-A form without `[data-ln-validate]` fields works fully — no validation
-tracking, submit button unmanaged.
-
 ---
 
 ## Dependencies
 
-- `ln-core` — `dispatch`, `serializeForm`, `populateForm`, `registerComponent`
-  (these are the actual imports on `js/ln-form/ln-form.js:1`).
+- `ln-core` — `dispatch`, `serializeForm`, `populateForm`, `registerComponent`.
 - `ln-validate` — optional. Read `instance._touched`, call
   `instance.validate()` and `instance.reset()` at the touch points above.
 
----
-
-## Where this code could change
-
-- **`ln-form.isValid` does not check custom errors.** The getter reads
-  `field.checkValidity()` directly, not `field.lnValidate.isValid`. A
-  field with `_customErrors.size > 0` but native-valid would report
-  as valid at the form level. Consider aligning with
-  `field.lnValidate.isValid` if custom-error correctness in `isValid`
-  is needed.
-- **`set-custom` + form-level submit gate.** `_onSetCustom` does not
-  dispatch `ln-validate:invalid`. A coordinator wiring server-side
-  errors must call `instance.validate()` after `set-custom` to
-  trigger the submit-button re-evaluation. A future change could make
-  `_onSetCustom` dispatch `:invalid` always, at the cost of redundant
-  events for callers that don't need the bubbling path.
-- **`_debounceTimer` not cleared on `_resetValidation()`.** Calling
-  `lnForm.reset()` mid-debounce fires the queued `submit()` on the
-  now-empty form. `submit()` force-validates and aborts (fields are
-  blank, native `required` fails), so no bad data reaches the server.
-  The aborted submit is silent. If explicit cancellation is required,
-  consumers must do `clearTimeout(form.lnForm._debounceTimer)` before
-  calling `reset()`. The fix would be to clear the timer inside
-  `reset()` — low-risk but currently undocumented as behavior.
