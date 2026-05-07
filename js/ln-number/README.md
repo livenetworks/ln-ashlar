@@ -8,13 +8,7 @@ Real-time locale-aware number formatting for input fields.
 <input type="number" name="amount" data-ln-number>
 ```
 
-On initialization, the component:
-1. Creates a hidden input with the original `name` attribute
-2. Removes `name` from the visible input
-3. Changes visible input to `type="text"` with `inputmode="decimal"`
-4. Formats the display value with locale-aware thousand separators
-
-The hidden input holds the raw numeric value for form submission.
+The component creates a hidden input that holds the raw numeric value for form submission and formats the visible input with locale-aware thousand separators. See [`docs/js/number.md`](../../docs/js/number.md#html) for the resulting DOM.
 
 ## Attributes
 
@@ -44,17 +38,14 @@ el.lnNumber.formatted;       // get formatted display string
 el.lnNumber.destroy();       // remove component, restore original input
 ```
 
-## Locale Detection
+## Locale
 
-The locale is detected by walking up the DOM tree to find the nearest
-`[lang]` attribute:
+The component reads the nearest ancestor `[lang]` attribute (typically `<html lang>`); falls back to `navigator.language`. Locale changes propagate live — re-formatting all instances when `<html lang>` changes.
 
-```html
-<html lang="mk">        <!-- mk locale: 1.234.567 -->
-<html lang="en-US">      <!-- en-US locale: 1,234,567 -->
-```
-
-Fallback: `navigator.language`.
+| `lang` | Display |
+|---|---|
+| `mk` | `1.234.567` |
+| `en-US` | `1,234,567` |
 
 ## Examples
 

@@ -1,5 +1,7 @@
 # ln-icons
 
+> On-demand SVG sprite — author `<use href="#ln-{name}">` for Tabler icons or `<use href="#lnc-{name}">` for custom icons. Fetches once, caches in `localStorage`, no init call.
+
 On-demand SVG icon loader — scans the DOM for `<use href="#ln-*">` and `<use href="#lnc-*">`, fetches each icon individually from CDN, and builds a hidden `<svg>` sprite at runtime. Fetched SVGs are cached in `localStorage` so subsequent page loads resolve instantly without network requests.
 
 ## Two Prefixes
@@ -46,14 +48,15 @@ Routing is determined entirely by the prefix — no lists, no config arrays.
 Icons inherit `currentColor` — set via CSS `color` on any ancestor:
 
 ```html
-<span style="color: hsl(var(--color-error));">
+<p class="text-error">
     <svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
-</span>
+    Something went wrong.
+</p>
 ```
 
 **Exception:** custom multi-color icons (`lnc-file-pdf`, `lnc-file-doc`, `lnc-file-epub`) have semantic stroke colors embedded in their SVG source and do not follow `currentColor`.
 
-## Accordion Chevron
+## Toggle Chevron
 
 ```html
 <header data-ln-toggle-for="panel1">
@@ -61,6 +64,8 @@ Icons inherit `currentColor` — set via CSS `color` on any ancestor:
     <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 </header>
 ```
+
+Works inside any `[data-ln-toggle-for]` trigger (accordion items, standalone toggles, sidebar collapses). See [docs/js/icons.md](../../docs/js/icons.md#toggle-chevron) for the CSS rotation mechanism.
 
 ## Available Tabler Icons
 

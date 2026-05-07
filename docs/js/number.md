@@ -15,43 +15,9 @@ After initialization, the DOM becomes:
 <input type="hidden" name="amount" value="1234567">
 ```
 
-## Attributes
-
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-number` | `<input>` | Creates instance |
-| `data-ln-number-decimals` | `<input>` | Max decimal places |
-| `data-ln-number-min` | `<input>` | Minimum value |
-| `data-ln-number-max` | `<input>` | Maximum value |
-
-## Events
-
-| Event | Bubbles | Cancelable | Detail |
-|-------|---------|------------|--------|
-| `ln-number:input` | yes | no | `{ value: Number, formatted: String }` |
-| `ln-number:destroyed` | yes | no | `{ target: Element }` |
-
-## API
-
-```js
-const el = document.querySelector('[data-ln-number]');
-el.lnNumber.value;           // Number or NaN
-el.lnNumber.value = 42000;   // set + format + dispatch event
-el.lnNumber.formatted;       // "42.000" (mk) or "42,000" (en)
-el.lnNumber.destroy();       // restore original input
-```
-
-## Behavior
-
-- On every `input` event: parses, formats with `Intl.NumberFormat`, restores cursor
-- Cursor restoration: counts digits-left-of-cursor before/after formatting
-- Edge cases skip formatting: bare `-`, trailing decimal separator, trailing zeros after decimal
-- Paste: strips non-numeric characters, normalizes decimal, formats
-- Pre-filled values formatted on initialization
-
----
-
 ## Internal Architecture
+
+Consumer-facing reference (attributes, events, API, examples, integration) lives in [`js/ln-number/README.md`](../../js/ln-number/README.md).
 
 ### State
 
@@ -61,7 +27,6 @@ Each `[data-ln-number]` input gets a `_component` instance stored at `element.ln
 |----------|------|-------------|
 | `dom` | Element | Reference to the visible input |
 | `_hidden` | Element | Reference to the hidden input |
-| `_localeInfo` | Object | Cached `{ fmt, groupSep, decimalSep }` |
 | `_onInput` | Function | Bound input handler |
 | `_onPaste` | Function | Bound paste handler |
 
@@ -75,7 +40,7 @@ _formatters[locale] = {
 }
 ```
 
-One entry per unique locale. Pattern matches ln-time's `_formatters` cache.
+One cache entry per unique locale (a second internal key shape — `locale + '|d' + max` and `locale + '|u' + n` — exists for decimal-fixed and user-decimal-preserving formatters; both also live on the module-level `_formatters` map).
 
 ### Input Flow
 

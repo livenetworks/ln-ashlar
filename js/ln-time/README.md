@@ -14,7 +14,7 @@ Timezone-aware timestamp formatting. Enhances `<time>` elements with `Intl.DateT
 
 | Mode | Output Example | Intl Options |
 |------|---------------|-------------|
-| `relative` | "3 hr. ago", "now", "in 2 hr." | `Intl.RelativeTimeFormat` |
+| `relative` | "3 hr. ago", "now", "in 2 hr." | `Intl.RelativeTimeFormat` (narrow, numeric: auto) |
 | `short` | "Jan 15" (same year) / "Jan 15, 2024" (different year) | `{ month: 'short', day: 'numeric' }` + conditional year |
 | `full` | "January 15, 2025 at 2:30 PM" | `{ dateStyle: 'long', timeStyle: 'short' }` |
 | `date` | "Jan 15, 2025" | `{ dateStyle: 'medium' }` |
@@ -76,15 +76,7 @@ el.lnTime.render();    // Force re-render
 el.lnTime.destroy();   // Cleanup (remove from auto-update pool)
 ```
 
-## Reactive Updates
-
-```javascript
-// Change timestamp — auto re-renders
-el.setAttribute('datetime', '1700000000');
-
-// Change mode — auto re-renders
-el.setAttribute('data-ln-time', 'date');
-```
+Changing `datetime` or `data-ln-time` on the element re-renders automatically — the MutationObserver picks up attribute changes and dispatches a re-render via the same path as init.
 
 ## Edge Cases
 
