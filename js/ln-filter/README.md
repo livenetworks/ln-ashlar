@@ -2,10 +2,6 @@
 
 Generic filter component. `[data-ln-filter="targetId"]` defines the trigger group; `data-ln-filter-key` / `-value` checkboxes inside it directly drive visibility — children of the target element are hidden by data attribute, or `<table>` rows by column text.
 
-## Philosophy
-
-State lives where the user already controls it: on the `<input>` checkboxes themselves. There is no JS state layer mediating between user interaction and the DOM, and therefore no public state-change API — drive the filter by toggling checkboxes (or dispatching a synthetic `change` event on them). The "All" sentinel uses `data-ln-filter-reset`. Multiple non-reset checkboxes can be checked simultaneously (OR within a column). Events fire on both the filter element and the target element (dual dispatch), so `ln-table` and other listening components can hear filter changes on themselves without knowing which filter triggered them.
-
 For internal mechanics — state model, render pipeline, multi-column WeakMap registry, persistence flow — see [`docs/js/filter.md`](../../docs/js/filter.md).
 
 ## HTML contract
@@ -50,11 +46,9 @@ high.checked = true;
 high.dispatchEvent(new Event('change', { bubbles: true }));
 ```
 
-To clear the filter, set the sentinel `[data-ln-filter-reset]` checkbox to `checked = true` and dispatch `change` (or, in the UI, click "All"). The sentinel handles uncheck-everything-else as a side effect.
+To clear the filter, set the sentinel `[data-ln-filter-reset]` checkbox to `checked = true` and dispatch `change` — the sentinel unchecks every other input as a side effect.
 
-For teardown only, each `[data-ln-filter]` element exposes `element.lnFilter.destroy()` — removes change listeners, table-filter registry entry, and the instance reference.
-
-`window.lnFilter(root)` upgrades a custom root (Shadow DOM, iframe). Ordinary AJAX inserts are handled automatically by the document-level MutationObserver.
+For teardown, each `[data-ln-filter]` element exposes `element.lnFilter.destroy()` — removes change listeners, table-filter registry entry, and the instance reference. `window.lnFilter(root)` upgrades a custom root (Shadow DOM, iframe); ordinary AJAX inserts are handled automatically by the document-level MutationObserver.
 
 ## Events
 
@@ -84,14 +78,8 @@ document.addEventListener('ln-filter:changed', function (e) {
 
 ## Behavior
 
-- Multiple checkboxes can be checked simultaneously (multi-select)
-- "All" (`data-ln-filter-reset`) unchecks all filter checkboxes and resets to show-all state
-- Any filter checkbox being checked unchecks "All"
-- When the last filter checkbox is unchecked, "All" auto-checks (auto-reset)
-- Filtering uses OR logic: items matching ANY active value are shown
-- Items without the filtered data attribute are left visible
-- When the target is `[data-ln-table]`, ln-filter does nothing — ln-table owns its row filtering
-- When children are added to the target after init, ln-filter does not re-filter automatically. To re-apply, dispatch `change` on any active filter checkbox — the next render visits the new children.
+- The reset sentinel and value checkboxes are mutually exclusive: checking a value input unchecks the sentinel; unchecking the last value input re-checks the sentinel; checking the sentinel directly unchecks every value input.
+- Items without the filtered data attribute on the target child are left visible — the filter only hides children whose attribute exists and does not match.
 
 ## Table column filtering
 
@@ -166,7 +154,7 @@ Select "Active", refresh — "Active" is still checked and the list is filtered.
 
 ## CSS
 
-The hide rule for `[data-ln-filter-hide]` is bundled in ln-ashlar. Pill active state (checked highlight) is handled automatically via `label:has(> input:checked)`. When combining with `ln-search`, both hide rules must be present in your project's CSS:
+The hide rule for `[data-ln-filter-hide]` is bundled in ln-ashlar. Pill active state (checked highlight) is handled automatically via `label:has(> input:checked)`. `ln-filter` and `ln-search` work independently on the same target — each manages its own hide attribute, so both rules can apply concurrently:
 
 ```css
 [data-ln-search-hide],
@@ -174,8 +162,6 @@ The hide rule for `[data-ln-filter-hide]` is bundled in ln-ashlar. Pill active s
     display: none;
 }
 ```
-
-`ln-filter` and `ln-search` work independently on the same target — each manages its own hide attribute.
 
 ## What it does NOT do
 
