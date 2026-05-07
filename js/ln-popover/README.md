@@ -4,10 +4,6 @@
 
 For internal mechanics — focus-restore behavior, observer flow, openStack, viewport-aware positioning — see [`docs/js/popover.md`](../../docs/js/popover.md).
 
-## Single Source of Truth
-
-`"open"` = open. `"closed"` (or any non-`"open"` value, or no value) = closed. If a `before-open` / `before-close` listener calls `preventDefault()`, the observer reverts the attribute to its previous value.
-
 ## Attributes
 
 | Attribute | On | Description |
@@ -66,11 +62,10 @@ document.getElementById('user-menu').addEventListener('ln-popover:close', functi
 
 - Click outside the popover and its trigger closes it.
 - Escape closes the most recently opened popover (LIFO). Each subsequent Escape closes the next one.
-- On open, focus moves to the first focusable element inside the popover, or to the popover container if none (it has `tabindex="-1"` and `role="dialog"` auto-set).
-- Tab is not trapped — it moves through the page in document order; the popover stays open.
+- On open, focus moves into the popover; Tab is not trapped — it moves through the page in document order, and the popover stays open.
 - Nested popovers stay open: opening B from inside A leaves A open.
-- If the preferred side does not fit in the viewport, the popover flips to the opposite side and is clamped to the viewport.
-- `aria-expanded` on the trigger is synced; `aria-haspopup="dialog"` and `aria-controls` are set on attach.
+- If the preferred side does not fit in the viewport, the popover flips to the opposite side.
+- `aria-expanded` on the trigger is synced; `tabindex="-1"`, `role="dialog"`, `aria-haspopup="dialog"`, and `aria-controls` are set automatically on attach.
 
 ## HTML Structure
 
