@@ -56,7 +56,7 @@ URL the URL parser does not understand becomes "internal by default"
 ## Script-load lifecycle
 
 The component is a single IIFE. Three phases on initial script
-execution (lines 84–95):
+execution:
 
 ```
 script eval
@@ -81,13 +81,13 @@ _initialize() runs:
 ```
 
 Both delegate-setup paths defer through `guardBody`
-(`ln-core/helpers.js:156-165`) — if `document.body` is null at script
+(`guardBody` in `ln-core/helpers.js`) — if `document.body` is null at script
 load (e.g. `<head>`-loaded without `defer`), each setup re-schedules
 itself for `DOMContentLoaded`. The script is safe to load anywhere on
 the page.
 
-The `_processLinks()` initial scan path is guarded by the
-`readyState` check on line 88 — `'loading'` means body might not yet
+The `_processLinks()` initial scan path is guarded by
+the `readyState` check on the `_initialize` caller — `'loading'` means body might not yet
 exist, so the call is deferred to `DOMContentLoaded`; in any other
 state body is guaranteed present.
 
@@ -107,9 +107,10 @@ The component's only persistent state is:
 | `window.lnExternalLinks.process` | Public re-scan API. | Document lifetime. |
 | `window.lnExternalLinks` (sentinel for double-load guard) | Prevents re-execution. | Document lifetime. |
 
-The double-load guard (line 6) reads `window[DOM_ATTRIBUTE]` —
-`'lnExternalLinks'` — and bails if defined. The same property is then
-populated with `{ process: _processLinks }` on line 97. Loading the
+The double-load guard reads `window[DOM_ATTRIBUTE]` —
+`'lnExternalLinks'` — near the top of the IIFE and bails if defined.
+The same property is populated with `{ process: _processLinks }`
+after `_initialize()` runs. Loading the
 script twice is a no-op on the second load.
 
 ## Processing pipeline
@@ -180,11 +181,6 @@ What it does NOT catch:
   rogue script that swaps the entire `<body>` would orphan the
   observer. In practice this is not a real-world concern.
 
-Both `_setupClickTracking` and `_domObserver` are wrapped in
-`guardBody`, so both setup paths defer cleanly when the script is
-loaded in `<head>` without `defer` — no asymmetry, no script-load
-crash.
-
 ## Click delegation
 
 The delegate is set up inside `guardBody`, so the
@@ -214,8 +210,7 @@ worth noting:
    external," not "user clicked an actually-cross-host link."
 
 The `text` field in the detail concatenates `link.textContent` —
-which includes the appended sr-only hint span. See README "Common
-mistakes" item 3.
+which includes the appended sr-only hint span.
 
 ## Accessibility — the sr-only hint
 
@@ -241,17 +236,11 @@ A future revision could read the string from a `lang`-aware
 dictionary or from a `window.LN_EXTERNAL_LINKS_HINT` global, but
 that is not in the current source.
 
-The hint span is appended unconditionally; there is no detection of
-existing screen-reader text in the link, so a link that already
-contains its own visually-hidden "opens in new tab" hint will get a
-duplicate.
-
 ## Cross-component coordination
 
 ln-external-links does not import any other ln-* component, does not
 listen for any `ln-*` event, and does not consume any global other
-than `dispatch` and `guardBody` from `ln-core/helpers.js` (lines
-1, 26, 56, 81 of the source). The two helpers are pulled in via
+than `dispatch` and `guardBody` from `ln-core/helpers.js`. The two helpers are pulled in via
 `import { dispatch, guardBody } from '../ln-core'`.
 
 It does not coordinate with:
@@ -263,53 +252,6 @@ It does not coordinate with:
   decorated by the MutationObserver. The data-loading components
   do not signal "I just inserted markup, please re-process";
   decoration is purely insertion-driven.
-- `ln-icons` — adding an "external link" indicator icon is project
-  SCSS via `a[data-ln-external-link="processed"]::after`, not part
-  of this component's behavior.
-
-The only library dependency at runtime is `.sr-only` from
-`scss/utilities/_utilities.scss`. If a project does not include
-ln-ashlar's utilities bundle, the hint span is created but stays
-visually rendered (not visually hidden), causing literal "(opens in
-new tab)" to appear next to every external link.
-
-## Performance notes
-
-- **Initial scan**: O(n) over `document.body.querySelectorAll('a, area')`.
-  On a typical admin page with a few hundred links, this is sub-
-  millisecond. The five DOM operations per external link (set
-  `target`, set `rel`, create span, append span, set marker, dispatch
-  event) total a handful of microseconds.
-- **MutationObserver fan-out**: O(k) per mutation batch, where k is
-  the count of `<a>` / `<area>` in the inserted subtree. Already-
-  processed links early-return at the first guard, so re-scans of
-  re-inserted DOM are cheap.
-- **Click delegate**: one listener for the entire page. Each click
-  does one `closest('a, area')` traversal (O(depth)) and at most one
-  `getAttribute` read. Negligible.
-
-There is no batching, no debouncing, no `requestAnimationFrame`. The
-synchronous mutations are fine because each one is constant-cost; the
-forced layouts that other components worry about (`scrollHeight` reads,
-position calculations) are absent here.
-
-## Source map
-
-| Lines | Concern |
-|-------|---------|
-| 1     | `dispatch`, `guardBody` import |
-| 3-6   | IIFE wrapper + double-load guard via `window.lnExternalLinks` |
-| 8-10  | `_isExternalLink` — host comparison |
-| 12-33 | `_processLink` — idempotency guard, host check, four mutations, marker, dispatch |
-| 35-41 | `_processLinks` — bulk wrapper over `_processLink`, defaults container to `document.body` |
-| 43-58 | `_setupClickTracking` — single body-level click delegate, guarded by `guardBody` |
-| 60-93 | `_domObserver` — MutationObserver setup, guarded by `guardBody`; observes `childList`, `subtree`, and `attributes` filtered on `href` |
-| 95-107 | `_initialize` — runs both setups, then runs initial `_processLinks()` (deferred to DOMContentLoaded if document is still loading) |
-| 109-111 | Public API surface — `window.lnExternalLinks = { process: _processLinks }` |
-| 113   | `_initialize()` invocation |
-
-Both delegate-setup paths run under `guardBody`. The file is symmetric
-end to end — no structural quirks.
 
 ## Known gaps and future work
 

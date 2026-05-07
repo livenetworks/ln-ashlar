@@ -23,15 +23,6 @@ Symbol IDs in the sprite mirror the full `href` value minus `#`:
 <symbol id="lnc-file-pdf" ...>
 ```
 
-## Architecture Shift: Bundle → On-Demand
-
-| | Old | New |
-|---|---|---|
-| Source | `import.meta.glob` inlined all SVGs at build time | Fetched at runtime, one per unique icon |
-| Custom routing | `window.LN_ICONS_CUSTOM` array | `lnc-` prefix in HTML |
-| Bundle size | grows with icon count | zero SVG content |
-| Vite dependency | `import.meta.glob` | none |
-
 ## Config
 
 Read from `window` at init (before DOMContentLoaded): `LN_ICONS_CDN`
@@ -154,4 +145,4 @@ Works inside accordion items AND for standalone toggles — anywhere the trigger
 
 ## Dependencies
 
-None. No `import.meta.glob`. Works in any environment that supports `fetch` and `MutationObserver`.
+None. Works in any environment that supports `fetch` and `MutationObserver`.

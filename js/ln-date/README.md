@@ -8,12 +8,7 @@ Locale-aware date formatting with native browser picker.
 <input type="date" name="birthday" data-ln-date>
 ```
 
-On initialization, the component:
-1. Creates a hidden input with the original `name` attribute for form submission
-2. Creates a hidden date input for the native picker (`showPicker()`)
-3. Changes visible input to `type="text"` for formatted display and typing
-4. Adds a calendar icon button that triggers the native picker
-5. Formats the display value with locale-aware date formatting
+On initialization, the component transforms the input into a text-display element with a paired calendar button and a hidden form-submit input. See [`docs/js/date.md`](../../docs/js/date.md) for the full transform.
 
 ## Typing Support
 
@@ -52,6 +47,7 @@ The hidden input holds the ISO date string (YYYY-MM-DD) for form submission.
 | (empty) | 19 апр 2026 | Apr 19, 2026 |
 | `short` | 19.4.2026 | 4/19/2026 |
 | `medium` | 19 апр 2026 | Apr 19, 2026 |
+| `medium datetime` | 19 апр 2026, 14:30 | Apr 19, 2026, 2:30 PM |
 | `long` | 19 април 2026 | April 19, 2026 |
 | `short datetime` | 19.4.2026 14:30 | 4/19/26, 2:30 PM |
 | `long datetime` | 19 април 2026, 14:30 | April 19, 2026, 2:30 PM |
@@ -94,17 +90,7 @@ el.lnDate.destroy();           // remove component, restore original input
 
 ## Locale Detection
 
-The locale is detected by walking up the DOM tree to find the nearest
-`[lang]` attribute:
-
-```html
-<html lang="mk">        <!-- mk locale: 19 апр 2026 -->
-<html lang="en-US">      <!-- en-US locale: Apr 19, 2026 -->
-```
-
-Fallback: `navigator.language`.
-
-Changes to the `lang` attribute on `<html>` automatically re-format all instances.
+Locale is detected by walking up the DOM tree to find the nearest `[lang]` attribute (e.g. `<html lang="mk">` → `mk`, `<html lang="en-US">` → `en-US`). Fallback: `navigator.language`. Changes to the `lang` attribute on `<html>` automatically re-format all instances.
 
 ## Examples
 
@@ -142,6 +128,4 @@ Changes to the `lang` attribute on `<html>` automatically re-format all instance
 
 ## Integration with ln-form
 
-Works automatically. `serializeForm()` reads the hidden input (which has the
-`name`). `populateForm()` sets the hidden input's value, which triggers the
-display update via the value interceptor.
+Works automatically. The hidden input carries the `name` attribute, so form serialization and population go through it transparently.

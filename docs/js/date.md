@@ -2,13 +2,7 @@
 
 Locale-aware date formatting with native browser picker. File: `js/ln-date/ln-date.js`.
 
-## HTML
-
-```html
-<input type="date" name="birthday" data-ln-date>
-```
-
-After initialization, the DOM becomes:
+## Post-Init DOM Transform
 
 ```html
 <input type="text" data-ln-date>
@@ -19,50 +13,15 @@ After initialization, the DOM becomes:
 </button>
 ```
 
-## Attributes
+## Internal Architecture
 
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-date` | `<input>` | Creates instance. Value = format keyword or custom pattern |
+This document covers the internal mechanism: state model, formatter cache, format resolution, the value/programmatic-set/typed-input flows, and the picker trigger. Consumer-facing reference (attributes, events, API, format keywords, custom pattern tokens, locale detection) lives in [`js/ln-date/README.md`](../../js/ln-date/README.md).
 
-## Events
-
-| Event | Bubbles | Cancelable | Detail |
-|-------|---------|------------|--------|
-| `ln-date:change` | yes | no | `{ value: String, formatted: String, date: Date }` |
-| `ln-date:destroyed` | yes | no | `{ target: Element }` |
-
-## API
-
-```js
-const el = document.querySelector('[data-ln-date]');
-el.lnDate.value;               // ISO string or ''
-el.lnDate.value = '2026-04-19'; // set + format + dispatch event
-el.lnDate.date;                // Date object or null
-el.lnDate.date = new Date();   // set via Date object
-el.lnDate.formatted;           // "19 апр 2026" (mk) or "Apr 19, 2026" (en)
-el.lnDate.destroy();           // restore original input
-```
-
-## Behavior
-
-- On picker `change` event: reads ISO value, formats display, dispatches `ln-date:change`
-- Display input accepts typed dates — on blur, parses and reformats (see Typed Input Flow)
-- Calendar button opens native picker via `showPicker()`
-- `showPicker()` wrapped in try/catch (throws if not triggered by user gesture)
-- Fallback: `picker.click()` for browsers without `showPicker()`
-- Pre-filled values formatted on initialization
-- Locale changes on `<html lang>` automatically re-format all instances
-
-## Format Resolution
+### Format Resolution
 
 1. Read `data-ln-date` attribute value
-2. Empty or keyword match (`short`, `medium`, `long`, `short datetime`, `long datetime`) -> Intl.DateTimeFormat
+2. Empty or keyword match (`short`, `medium`, `long`, `short datetime`, `medium datetime`, `long datetime`) -> Intl.DateTimeFormat
 3. Otherwise -> custom ICU token pattern with locale-aware month names via Intl
-
----
-
-## Internal Architecture
 
 ### State
 
@@ -116,6 +75,10 @@ Set display input value = formatted string
     v
 Dispatch 'ln-date:change' { value, formatted, date }
 ```
+
+#### Picker Trigger
+
+Calendar button calls `picker.showPicker()`, wrapped in try/catch — `showPicker()` throws if not triggered by a user gesture, in which case the component falls back to `picker.click()`. Browsers without `showPicker()` use `picker.click()` directly.
 
 ### Programmatic Set Flow
 
