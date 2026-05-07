@@ -1,78 +1,40 @@
 # ln-validate
 
-> Per-field validation primitive for the form layer. 160 lines of JS
-> that wrap the native `ValidityState` API, expose its state through
-> two CSS classes and a pair of events, and add one strictly-typed
-> escape hatch (`set-custom` / `clear-custom`) for errors the
-> browser cannot express. The component does not run validation
-> rules; the browser already does that. The component decides **when
-> to listen, when to render, and how to surface the result** so the
-> rest of the form layer (`ln-form`'s submit gate, `ln-autosave`'s
-> restore flow, `ln-form.reset()`'s cleanup loop) can compose without
-> ever calling validation logic directly.
+> Per-field validity primitive. Wraps native `ValidityState`, gates
+> rendering on first interaction (`_touched`), and surfaces the
+> result via two CSS classes plus `ln-validate:valid` / `:invalid`
+> events for `ln-form` to consume.
 
 ## Philosophy
 
-A field's validity is not something `ln-validate` invents. The
-browser ships a `ValidityState` object on every `<input>`,
-`<select>`, and `<textarea>`, populated from the element's native
-constraints — `required`, `type="email"`, `minlength`, `maxlength`,
-`pattern`, `min`, `max`. `dom.checkValidity()` returns the boolean.
-`dom.validity.valueMissing`, `.typeMismatch`, `.tooShort`, etc.
-expose the individual reasons. This is not a polyfill or a parallel
-universe; it is the platform's first-class validation API and it
-has been on every modern browser for a decade.
+The browser already validates. Every `<input>`, `<select>`, and
+`<textarea>` ships a `ValidityState` object populated from native
+constraints (`required`, `type="email"`, `minlength`, `pattern`,
+`min`, `max`). What the platform does NOT ship is a UX — by default
+an invalid field is silent until submit, at which point it pops a
+system tooltip in OS chrome that cannot be styled, translated, or
+kept on screen. ln-validate is the layer that decides **when to
+listen, when to render, and how to surface the result** so the
+form layer (`ln-form`'s submit gate, projects' visual styling,
+analytics) can compose without ever calling validation logic
+directly.
 
-What the platform does NOT ship is a UX. By default, an invalid
-field is silent until the form is submitted, at which point the
-browser pops a system tooltip in OS chrome ("Please fill in this
-field") that cannot be styled, translated to project tone, or kept
-on screen. That tooltip is the reason every serious project ends up
-writing its own validation layer.
-
-`ln-validate` is that layer, kept small. Its job is three things:
-
-1. **Decide when to listen.** Text inputs validate on `input` (every
-   keystroke) so errors appear and clear in real time. SELECT,
-   checkbox, and radio fields validate on `change` (selection
-   commit). The discriminator is one line —
-   `tag === 'SELECT' || type === 'checkbox' || type === 'radio'` —
-   and it is mirrored exactly in `ln-form.fill()` and
-   `ln-form.reset()` so programmatic value writes go through the
-   same fork.
-2. **Decide when to render.** The component holds a `_touched`
-   boolean, initially `false`. Until the field has fired its first
-   `input` or `change`, validation runs silently and renders nothing
-   — no error pills, no red border, no aria flag. This is the
-   single most consequential UX decision in the file. Without it,
-   every page load would render a wall of "this field is required"
-   messages on every empty form. With it, errors appear only after
-   the user has actually engaged with the field.
-3. **Surface the result through a fixed contract.** Two CSS classes
-   on the input (`ln-validate-valid`, `ln-validate-invalid`), one
-   `.hidden` class toggled on each `<li data-ln-validate-error>`
-   inside the field's `.form-element` wrapper, and one event per
-   transition (`ln-validate:valid` or `ln-validate:invalid`). That
-   surface is what `ln-form` consumes for its submit-button gate
-   and what project CSS hooks into for visual feedback. Nothing
-   else leaks.
-
-The custom-error escape hatch — `ln-validate:set-custom` /
-`ln-validate:clear-custom` — exists because some failures are not
-expressible as native constraints. "Username already taken" is a
-server check. "Passwords do not match" is a cross-field check. "API
-quota exceeded for this category" is a domain rule. All three need
-to render a red field with a specific error message, and none of
-them have an HTML attribute. The custom-error path attaches a
-named error to the field's instance, marks it touched and invalid,
-and unhides the matching `<li data-ln-validate-error="<name>">`.
-The visible result is identical to a native error; the architectural
-result is that the application code that detects the failure
-dispatches one event and walks away. No DOM digging, no class
-juggling.
-
-That is the whole component. Read on for the contracts the rest of
-the form layer relies on.
+The component holds two pieces of state: `_touched` (a Boolean,
+initially `false`, flipped on the field's first `input` or `change`)
+and `_customErrors` (a `Set<String>` of active custom-error keys).
+Native validity comes from `dom.checkValidity()` — the component
+caches nothing. On every input/change, `_touched` flips and
+`validate()` runs: it toggles `.ln-validate-valid` / `.ln-validate-invalid`
+on the field, toggles `.hidden` on each `<li data-ln-validate-error>`
+inside the field's `.form-element` wrapper, and dispatches
+`ln-validate:valid` or `ln-validate:invalid`. Custom errors —
+failures the platform cannot express (`emailTaken`, cross-field
+mismatches, domain rules) — flow through the
+`ln-validate:set-custom` / `ln-validate:clear-custom` event pair
+and share the same `<ul>` as native errors without conflict. The
+full mechanism (the discriminator, the asymmetric custom-error
+path, the listener attachment) is in
+[`docs/js/validate.md`](../../docs/js/validate.md).
 
 ## What state goes where
 
@@ -86,7 +48,7 @@ the form layer relies on.
 | Which error message is shown? | `.hidden` toggled on each `<li data-ln-validate-error>` inside `.form-element` | `ln-validate` |
 | Submit-button enabled? | nothing on the validate instance — coordinated by `ln-form` | `ln-form` (consumes `:valid` / `:invalid`) |
 | Server-side error attached to a field? | dispatched as `ln-validate:set-custom` by application code | application code (consumed by `ln-validate`) |
-| Visual styling for invalid border / focus ring | `@mixin form-validate-invalid` reads the class | library SCSS (`scss/components/_form.scss:71`) |
+| Visual styling for invalid border / focus ring | `@mixin form-validate-invalid` reads the class | library SCSS (`scss/components/_form.scss`) |
 
 The instance state is two fields total: `_touched` and
 `_customErrors`. The DOM is the source of truth for the value; the
@@ -98,108 +60,71 @@ are currently attached?"
 
 - **Does NOT define validation rules.** Required-ness, email-ness,
   pattern matching, range bounds — all of it comes from native HTML
-  attributes. `data-ln-validate` is a *participation marker*, not a
+  attributes. `data-ln-validate` is a participation marker, not a
   rule definition. If you want a field to require a value, write
-  `required`. If you want it to be an email, write `type="email"`.
-  The component does not invent rules; it surfaces the platform's
-  result.
+  `required`. The component surfaces the platform's result.
 - **Does NOT submit anything.** No `fetch`, no form submission, no
-  network. Validation is purely local to the field. The submit gate
-  lives in `ln-form` and consumes `ln-validate:valid` / `:invalid`
-  events to decide whether the submit button is enabled — see
-  Cross-component coordination below.
-- **Does NOT normalize values.** No trimming, no lowercase, no date
-  parsing. The value the user typed is the value the browser
-  validates. If your business logic needs a normalized form, do it
-  on serialize (after `ln-form:submit`) or on the server.
-- **Does NOT auto-fix.** When a field becomes invalid, the user
-  sees the error; they fix it. No auto-pad, no auto-format, no
-  silent value rewrite.
-- **Does NOT show the browser's native bubble.** The library's
-  global form CSS sets `:invalid` styling and the component's
-  `.ln-validate-invalid` class adds the red border, but the native
-  OS tooltip from `<input required>` would still pop on
-  `form.submit()`. `ln-form.submit()` does NOT call the form's
-  native submit — it calls `instance.validate()` on every field
-  itself, then dispatches `ln-form:submit` if all return true. The
-  native bubble path is bypassed entirely. (If you call
-  `form.submit()` directly without going through `lnForm.submit()`,
-  the native bubble appears. Don't.)
+  network. Validation is purely local to the field. The submit
+  gate lives in `ln-form` and consumes `ln-validate:valid` /
+  `:invalid` to decide whether the submit button is enabled.
+- **Does NOT show the browser's native bubble.** The library default
+  CSS uses `.ln-validate-invalid`, not the `:invalid` pseudo-class,
+  so untouched fields don't render errors. `lnForm.submit()`
+  bypasses the native submit path entirely (it calls
+  `instance.validate()` per field and dispatches `ln-form:submit`
+  if all pass) — the OS tooltip path is not reachable through the
+  documented flow.
 - **Does NOT validate fields without `data-ln-validate`.** An
   unmarked field with `required` will have its native constraint
-  honored by `dom.checkValidity()` if anything ever calls it, but
-  no `ln-validate-invalid` class is added, no error `<li>` is
-  toggled, no event is dispatched, and `ln-form`'s submit gate
-  ignores the field entirely (the gate iterates
-  `[data-ln-validate]` only). Mark the field if you want it
-  surfaced.
-- **Does NOT skip disabled or hidden fields explicitly.** The
-  component adds `input` / `change` listeners regardless of the
-  field's disabled or visibility state. The platform handles
-  disabled gracefully — `dom.checkValidity()` returns `true` for
-  disabled fields per the HTML spec, so a disabled `[required]`
-  field is "valid" for native purposes and never surfaces errors.
-  A field hidden via `display: none` still receives synthetic
-  events (e.g. from `ln-form.fill()`) and validates as normal —
-  `display: none` does NOT exempt the field from
-  `checkValidity()`. If you need a hidden field to be exempt,
-  remove its `required` attribute or do not mark it with
-  `data-ln-validate`.
-- **Does NOT consume `ln-form:error`.** Server-side validation
-  errors (the 4xx response from a POST / PUT) are a coordination
-  point between the data layer and the form layer — `ln-store`
-  dispatches `ln-form:error` on the form element, and the wiring
-  that translates each `{ field: [msg, ...] }` entry into a
-  `ln-validate:set-custom` dispatch is the application's
-  responsibility today (or, in Phase A of the architecture
-  roadmap, the form's coordinator). `ln-validate` provides the
-  injection point — `set-custom` — but does not subscribe to
-  `ln-form:error` directly. See
-  [`docs/architecture/data-flow.md`](../../docs/architecture/data-flow.md)
-  §6.2 for the contract.
+  honored if anything ever calls `checkValidity()` on it, but no
+  class is added, no event fires, and `ln-form`'s submit gate
+  ignores the field (the gate iterates `[data-ln-validate]` only).
+  Mark the field if you want it surfaced. (Disabled and `display:
+  none` fields receive listeners; per HTML spec, disabled fields
+  are valid for `checkValidity()` purposes — remove `data-ln-validate`
+  if you need a hidden field exempt.)
+- **Does NOT consume server-side errors.** `ln-validate` provides
+  the injection point — `ln-validate:set-custom` — for any code
+  that detects a field-level failure (a 4xx response, a cross-field
+  rule, a domain check). The translation from
+  `{ field: [msg, ...] }` to a `set-custom` dispatch is consumer-
+  side wiring; `ln-validate` does not subscribe to any outcome
+  event from `ln-form` or `ln-store`. (Per project convention,
+  `ln-form` only dispatches `ln-form:submit`; consumers dispatch
+  their own success/error events.)
 - **Does NOT dispatch on `set-custom` directly.** When a custom
   error arrives, `_onSetCustom` unhides the matching `<li>`,
   flips the CSS classes, and bumps `_touched` — but it does NOT
-  call `validate()` and does NOT dispatch `ln-validate:invalid`.
-  The custom flag is purely visible-state. `ln-form`'s submit-
-  button gate listens for the bubbled `:invalid` event to
-  re-evaluate and therefore does not learn about a custom error
-  attached out-of-band; the consumer that dispatched
-  `set-custom` is responsible for deciding whether to also block
-  submission. (`isValid` does account for `_customErrors.size`,
-  so a manual call to `instance.validate()` afterwards re-runs
-  the dispatch path and `ln-form` picks it up.)
-- **Does NOT debounce.** Every keystroke triggers `validate()`
-  for non-change-based fields. The work is local — `checkValidity()`
-  is microsecond-fast, the DOM operations touch only the field's
-  own `.form-element` subtree. Debouncing would only delay the
-  user's feedback and is not warranted.
+  call `validate()` and does NOT dispatch `:invalid`. If you need
+  `ln-form`'s submit-button gate to re-evaluate after a custom
+  error, call `instance.validate()` after dispatching
+  `set-custom`. (`isValid` does account for `_customErrors.size`,
+  so the manual call re-runs the dispatch path correctly.)
 - **Does NOT set `aria-invalid`.** The component manages classes
-  and `.hidden` toggles, not ARIA. The browser's native
-  `:invalid` pseudo-class is also not consumed — see "Common
-  mistakes" item 6. If your accessibility audit requires
-  `aria-invalid`, wire it on the consumer side via the
+  and `.hidden` toggles, not ARIA. If your accessibility audit
+  requires `aria-invalid`, wire it on the consumer side via the
   `ln-validate:invalid` event.
 
 ### Cross-component coordination
 
-`ln-validate` is the field-level primitive. Three sibling
-components in the form layer all interact with it via the
-platform's event flow — no imports, no direct method calls.
+`ln-validate` is the field-level primitive. Two sibling components
+in the form layer compose with it via the platform event flow —
+no imports, no direct method calls.
 
-| Component | Coordination | Verified at |
-|---|---|---|
-| `ln-form` | `ln-form` listens for `ln-validate:valid` / `:invalid` bubbling from the form's descendants. Each event triggers `_updateSubmitButton()`, which re-queries every `[data-ln-validate]` field and reads `instance._touched` + `field.checkValidity()` to compute `anyInvalid \|\| !anyTouched`, then toggles `disabled` on every submit button. The bubbled events are the trigger; `checkValidity()` is the source of truth — ln-form holds no internal index of invalid fields. On `lnForm.submit()`, it iterates every `[data-ln-validate]` field and calls `instance.validate()` directly — this is the force-validate gate that catches untouched required fields. On `lnForm.reset()`, it dispatches synthetic `input` / `change` on every form field FIRST (which `ln-validate` interprets as a real interaction and validates, transiently marking default-empty required fields as invalid), THEN calls `instance.reset()` on every validate instance to clear the transient state. Order matters and is documented in `ln-form.js:142-146`. | `js/ln-form/ln-form.js:49-50` (event listeners), `:78-100` (`_updateSubmitButton` reads `instance._touched`), `:115-131` (`submit` calls `instance.validate()`), `:133-160` (`reset` dispatches input/change before `_resetValidation`) |
-| `ln-autosave` | None at the JS level — no imports, no event listeners between them. ln-autosave restores draft values via `populateForm()` and dispatches synthetic `input` (or `change` for SELECT/checkbox/radio) on every restored field. Those bubbling events are caught by `ln-validate`'s own `input` / `change` listeners, which set `_touched = true` and run `validate()`. The user-perceived effect is "after restore, every restored field has correct validation state" — but the wiring is the platform event flow, not custom integration. Verify by grep: `js/ln-autosave/ln-autosave.js` has zero references to `ln-validate` or `lnValidate`. | `js/ln-validate/ln-validate.js:82-85` (input/change listeners); `js/ln-autosave/ln-autosave.js:94-95` (synthetic dispatch — same fork as ln-validate's `isChangeBased`) |
-| `ln-confirm` | Independent. ln-confirm gates the first click on a destructive button (form submit or non-form click); ln-validate operates on form fields. There is no overlap in the elements they touch, no event channel they share. A `<form data-ln-form>` with a `<button type="submit" data-ln-confirm="...">` and `<input data-ln-validate>` works because the click flow is sequential: ln-confirm first (gate the click), then native `submit` event (only on second click), then ln-form's submit handler (which iterates and validates fields). | grep — zero cross-references between `js/ln-confirm/` and `js/ln-validate/`; `js/ln-form/README.md` Examples section |
-| `ln-toggle` / `ln-toggle-switch` | Independent. Toggle owns open/close; toggle-switch owns a checkbox's checked state for the form layer. A `<input type="checkbox" data-ln-toggle-switch data-ln-validate required>` would validate as normal — the validate component's `change` listener catches the toggle-switch's commit. | grep — zero cross-references |
-| `ln-store` (data layer) | None directly. ln-store's pipeline dispatches `ln-form:error` on the form element when the server returns a 4xx during initial submit. ln-validate does NOT subscribe to that event. The wiring that translates `{ errors: { field: [msg, ...] } }` into `ln-validate:set-custom` dispatches is the consumer's responsibility (Phase A roadmap moves it to a coordinator hook). The injection point — `ln-validate:set-custom` — is the contract; the producer is whatever code knows about server-side validation. | `docs/architecture/data-flow.md` §6.2; `js/ln-validate/ln-validate.js:86-87` (set-custom listener) |
-| `ln-autoresize` | Indirectly. Both are field-level primitives that listen to the platform `input` event. They do not coordinate — they happen to react to the same trigger. A `<textarea data-ln-validate data-ln-autoresize required>` resizes and validates on every keystroke, in whichever order their listeners were attached (typically autoresize first because it registers earlier in `js/index.js`'s import order, but neither relies on order). | grep — zero cross-references |
+| Component | Coordination |
+|---|---|
+| `ln-form` | Listens for `ln-validate:valid` / `:invalid` bubbling from form descendants and re-evaluates submit-button state. On `lnForm.submit()`, force-validates every `[data-ln-validate]` field. On `lnForm.fill()` and `lnForm.reset()`, dispatches synthetic `input` / `change` on every field — ln-validate's own listeners catch them and mark each field touched. The `isChangeBased` discriminator (SELECT / checkbox / radio → `change`; everything else → `input`) is mirrored exactly across both files; a change to one is a change to all. |
+| `ln-autosave` | None at the JS level — no imports, no event listeners between them. ln-autosave restores draft values via `populateForm()` and dispatches synthetic `input` (or `change` for SELECT/checkbox/radio) on every restored field. ln-validate's own listeners catch the bubbling events and run `validate()`. The user-perceived effect is "after restore, every restored field has correct validation state." Verify by grep: `js/ln-autosave/ln-autosave.js` has zero references to `ln-validate` or `lnValidate`. |
+
+> **Note:** `ln-validate` does not subscribe to outcome events from
+> any other component. The injection point for server-side errors
+> is `ln-validate:set-custom`, dispatched by whatever consumer code
+> detects the failure.
 
 The pattern is consistent: `ln-validate` writes to the platform
 (classes, `.hidden` toggles, custom events) and reads from the
-platform (`input`, `change`, browser `validity`). Other components
-that compose with it do the same. None of them import each other.
+platform (`input`, `change`, browser `validity`). Components that
+compose with it do the same. None import each other.
 
 ## Markup anatomy
 
@@ -261,8 +186,9 @@ For `isChangeBased` fields, only `change` is listened to. For
 everything else, both `input` and `change` are wired so keystrokes
 and paste events both fire validation. This same fork is mirrored
 by `ln-form.fill()` and `ln-form.reset()` so programmatic value
-writes route through the same listener — see
-`js/ln-form/ln-form.js:108-112` and `:147-152`.
+writes route through the same listener — the `isChangeBased`
+discriminator is mirrored in `ln-form` (fill/reset) and
+`ln-autosave` (restore).
 
 ### The error list — `[data-ln-validate-errors]`
 
@@ -270,8 +196,7 @@ A sibling `<ul>` inside the same `.form-element` wrapper holds the
 error messages. The component finds it via
 `dom.closest('.form-element').querySelector('[data-ln-validate-errors]')`,
 so the wrapper class **must be `.form-element`** — that string is
-hardcoded in `ln-validate.js:50, 99`. (See "Common mistakes" item
-1 for what happens if you skip the wrapper.)
+hardcoded in `ln-validate.js`.
 
 Each `<li>` inside carries `data-ln-validate-error="<key>"` and
 starts with `class="hidden"`. The component reads the key, looks
@@ -290,8 +215,7 @@ true.
 
 The first three are native errors mapped from `ValidityState`. The
 fourth (`emailTaken`) is a custom error — its key is NOT in the
-`ERROR_MAP`, so `validate()` skips it (the `if (!validityProp)
-continue` guard at `ln-validate.js:107`). Custom errors are only
+`ERROR_MAP`, so `validate()` skips it. Custom errors are only
 shown / hidden by the `_onSetCustom` / `_onClearCustom` paths, not
 by the native validation loop. This separation is the architectural
 hinge: native errors and custom errors live in the same `<ul>`
@@ -353,35 +277,10 @@ constraints used in production today.
 ## Visual feedback
 
 Two CSS classes on the field, plus `.hidden` toggling on each
-`<li data-ln-validate-error>`. The library default styling lives
-in `scss/components/_form.scss:71-77`, hooked via mixins in
-`scss/config/mixins/_form.scss:450-475`:
-
-```scss
-@mixin form-validate-invalid {
-    border-color: hsl(var(--color-error));
-    &:focus-visible {
-        border-color: hsl(var(--color-error));
-        box-shadow: 0 0 0 3px hsl(var(--color-error) / 0.15);
-    }
-}
-
-@mixin form-validate-valid {
-    border-color: hsl(var(--color-success));
-    &:focus-visible {
-        border-color: hsl(var(--color-success));
-        box-shadow: 0 0 0 3px hsl(var(--color-success) / 0.15);
-    }
-}
-
-@mixin form-validate-errors {
-    --margin-block: var(--size-xs);
-    margin-top: var(--margin-block);
-    font-size: var(--text-caption);
-    line-height: var(--lh-caption);
-    color: hsl(var(--color-error));
-}
-```
+`<li data-ln-validate-error>`. The library default visual styling is applied to `.ln-validate-invalid`
+and `.ln-validate-valid` by `@mixin form-validate-invalid` and
+`@mixin form-validate-valid` (in `scss/config/mixins/_form.scss`,
+applied via `scss/components/_form.scss`).
 
 Project SCSS hooks the same classes for any project-specific
 styling — the contract is the class names, not the default visuals.
@@ -453,6 +352,20 @@ input.lnValidate.destroy();    // Detach listeners, dispatch :destroyed, delete 
 | `dom` | property | Back-reference to the field element. |
 | `_touched` | property (Boolean) | Internal, but read by `ln-form._updateSubmitButton`. Underscore-prefixed by convention, not enforcement; do not write to it from consumer code. |
 | `_customErrors` | property (Set) | Internal. Holds active custom-error keys. Do not write to directly — use `set-custom` / `clear-custom` events. |
+
+### Programmatic value writes — dispatch the matching event
+
+Setting `el.value = '...'` does NOT fire `input` or `change`, so
+neither `ln-validate` nor `ln-form` reacts. After a programmatic
+write, dispatch the matching event:
+
+```js
+input.value = 'hello@example.com';
+const isChangeBased = input.tagName === 'SELECT' || input.type === 'checkbox' || input.type === 'radio';
+input.dispatchEvent(new Event(isChangeBased ? 'change' : 'input', { bubbles: true }));
+```
+
+Or use `lnForm.fill(data)` — it does the dispatch loop for you.
 
 ### Constructor — `window.lnValidate(root)`
 
@@ -581,15 +494,8 @@ The state graph for one field, end to end:
        └─────────────────────────┘  └──────────────────────────────┘
 ```
 
-There is a parallel path for custom errors. `set-custom` writes
-the visible state directly (unhide `<li>`, add invalid class,
-mark touched) without going through `validate()`. `clear-custom`
-hides the `<li>` directly, then re-runs `validate()` if
-`_touched` is true. The two paths interleave in the same DOM
-without conflict because they target different `<li>` elements
-(native keys vs custom keys), and the CSS class on the field is
-a single state — whichever path last set it, wins, until the next
-`validate()` recomputes from `dom.checkValidity() && _customErrors.size`.
+The custom-error path runs in parallel — see
+[`docs/js/validate.md` § The custom-error path](../../docs/js/validate.md#the-custom-error-path).
 
 ## Examples
 
@@ -626,13 +532,7 @@ mixins).
 </div>
 ```
 
-The browser only flips ONE `validity` flag at a time — typically
-the most specific failure. An empty `required` field shows
-`valueMissing`; a non-empty malformed input shows `typeMismatch`;
-a short malformed input shows `tooShort`. Each `<li>` toggles
-independently based on its mapped property, so multiple can be
-visible at once if multiple flags are set. In practice, browsers
-return one flag per call.
+The browser only flips ONE `validity` flag at a time — typically the most specific failure. Each `<li>` toggles independently; in practice browsers return one flag per call.
 
 ### Select — change-based listener only
 
@@ -734,46 +634,36 @@ confirm.addEventListener('input', evaluate);
 toggled by the cross-field comparator. `ln-validate` treats the
 `<li>` exactly like any other custom-error item.
 
-### Server-side errors via the form layer — Phase A pattern
+### Server-side errors via the form layer
 
 ```js
-// In the form's coordinator, listen for ln-form:error from ln-store:
-form.addEventListener('ln-form:error', function (e) {
-    const errors = e.detail.errors;  // { fieldName: ['msg', 'msg'], ... }
-    Object.keys(errors).forEach(function (fieldName) {
-        const field = form.querySelector('[name="' + fieldName + '"]');
-        if (!field) return;
-        // Use the first message as the custom-error key (or a stable name like 'server')
-        // and ensure the corresponding <li data-ln-validate-error> exists in the field's wrapper.
-        field.dispatchEvent(new CustomEvent('ln-validate:set-custom', {
-            bubbles: true, detail: { error: 'server' }
-        }));
+// The consumer's submit handler — fire the request and translate
+// 4xx field errors into ln-validate:set-custom dispatches.
+form.addEventListener('ln-form:submit', async function (e) {
+    const res = await fetch('/api/users', {
+        method: 'POST',
+        body: JSON.stringify(e.detail.data)
     });
+    if (res.status === 422) {
+        const { errors } = await res.json();   // { fieldName: ['msg', ...], ... }
+        Object.keys(errors).forEach(function (fieldName) {
+            const field = form.querySelector('[name="' + fieldName + '"]');
+            if (!field) return;
+            field.dispatchEvent(new CustomEvent('ln-validate:set-custom', {
+                bubbles: true,
+                detail: { error: 'server' }
+            }));
+        });
+    }
 });
 ```
 
-The `<li data-ln-validate-error="server">` `<li>` should exist in
-each field's wrapper, with the message text either pre-rendered or
-filled in by the same coordinator (e.g. setting
-`li.textContent = errors[fieldName].join('. ')`). The architecture
-roadmap (`docs/architecture/data-flow.md` §6.2) anticipates moving
-this wiring into a stable form-coordinator hook — until then, the
-consumer wires it.
-
-### Programmatic — force-validate on demand
-
-```js
-// Force-validate every field in a form (skip the native bubble path)
-document.querySelectorAll('#my-form [data-ln-validate]').forEach(function (input) {
-    input.lnValidate.validate();
-});
-```
-
-This is what `ln-form.submit()` does internally — see
-`js/ln-form/ln-form.js:115-131`. It iterates every
-`[data-ln-validate]` field, calls `instance.validate()`, and
-dispatches `ln-form:submit` only if every call returned `true`.
-Untouched fields render errors after the force-validate.
+Each field carries an `<li data-ln-validate-error="server">`
+with the message text either pre-rendered or filled in by the
+same handler (e.g. `li.textContent = errors[fieldName].join('. ')`).
+`ln-form` dispatches `ln-form:submit` with serialized data — it
+does NOT dispatch outcome events. The translation of the server
+response into per-field errors is consumer-side wiring.
 
 ### Composing with `ln-form` and `ln-autosave`
 
@@ -801,386 +691,39 @@ Untouched fields render errors after the force-validate.
 </form>
 ```
 
-What happens — entirely via the platform event flow:
+What happens, all via the platform event flow: ln-autosave
+restores any draft on init by dispatching synthetic input/change;
+ln-validate's listeners react and validate the restored values;
+`ln-form._updateSubmitButton` re-evaluates from the bubbled
+events. Every keystroke runs the same path. `lnForm.submit()`
+force-validates and dispatches `ln-form:submit`; `lnForm.reset()`
+clears values then resets validation state per field.
 
-1. **Page load** — `ln-form`, `ln-autosave`, `ln-validate` all
-   upgrade. ln-autosave restores any draft from `localStorage` by
-   calling `populateForm()` and dispatching synthetic `input` /
-   `change` on every restored field. Each `ln-validate` instance's
-   `_onInput` / `_onChange` fires, `_touched = true`, `validate()`
-   runs, errors and CSS classes appear on whatever fields the
-   restored draft left invalid. ln-form's `_updateSubmitButton`
-   (registered as a listener on `:valid` / `:invalid`) re-runs and
-   sets the Save button's `disabled` based on the restored state.
-2. **User edits** — every keystroke fires `input`,
-   `ln-validate.validate()` runs and dispatches `:valid` /
-   `:invalid` (bubbles), `ln-form._updateSubmitButton()` re-runs
-   and re-evaluates the submit-button state from the live
-   `checkValidity()` of each field. `ln-autosave` writes the
-   draft on `focusout`.
-3. **User clicks Save** — form `submit` fires, `ln-form` catches
-   it, calls `lnForm.submit()`, force-validates every field,
-   dispatches `ln-form:submit` if all pass. Application code
-   handles the dispatch, fetches, on success dispatches
-   `ln-autosave:clear` to drop the draft, `lnForm.reset()` to
-   clear field state.
-4. **`lnForm.reset()`** — dispatches synthetic `input` /
-   `change` on every field (so `ln-autoresize` shrinks back, etc.),
-   then calls `instance.reset()` on every `[data-ln-validate]`
-   field. The intermediate state where empty `required` fields
-   are transiently invalid is real but invisible — `_resetValidation`
-   runs immediately after the dispatch loop and clears it.
-
-Zero glue code. The components share no imports, no listeners.
-The DOM is the wiring.
-
-## Common mistakes
-
-### Mistake 1 — Skipping the `.form-element` wrapper
-
-```html
-<!-- WRONG — no .form-element ancestor; error list is invisible to validate() -->
-<label for="email">Email</label>
-<input id="email" name="email" required data-ln-validate>
-<ul data-ln-validate-errors>
-    <li class="hidden" data-ln-validate-error="required">Email is required</li>
-</ul>
-```
-
-`validate()` does `dom.closest('.form-element')`, which returns
-`null` if the field isn't inside one. The error-list lookup
-short-circuits, no `<li>` ever unhides. The CSS class on the input
-still toggles (the field gets the red border), but the user sees
-no message — just a red box with no explanation.
-
-```html
-<!-- RIGHT — wrapper present, errors render -->
-<div class="form-element">
-    <label for="email">Email</label>
-    <input id="email" name="email" required data-ln-validate>
-    <ul data-ln-validate-errors>
-        <li class="hidden" data-ln-validate-error="required">Email is required</li>
-    </ul>
-</div>
-```
-
-### Mistake 2 — Putting `data-ln-validate` on a non-form element
-
-```html
-<!-- WRONG — div has no .validity, no .checkValidity() -->
-<div data-ln-validate>...</div>
-```
-
-The constructor reads `dom.tagName` and `dom.type` to decide
-`isChangeBased`; it does not check that the element is actually a
-form control. `validate()` then calls `dom.checkValidity()`, which
-on a `<div>` is `undefined` — calling `undefined()` throws
-`TypeError: dom.checkValidity is not a function`. The first
-`input` / `change` event (or first `instance.validate()` call)
-crashes.
-
-The component does not validate the upgrade preconditions.
-`data-ln-validate` belongs only on `<input>`, `<select>`, or
-`<textarea>`.
-
-### Mistake 3 — Programmatic `el.value = '...'` writes don't validate
-
-```js
-// WRONG — assignment does NOT fire 'input' or 'change'
-document.getElementById('email').value = 'hello@example.com';
-// → ln-validate has no idea the value changed
-// → _touched stays false (or whatever it was)
-// → submit-button gating in ln-form doesn't update
-```
-
-Setting `.value` is a silent platform write. Neither `input` nor
-`change` fires, so neither `ln-validate` nor `ln-form` reacts.
-The field's value is now what you wrote, but every component that
-listens for the value to change is unaware.
-
-```js
-// RIGHT — dispatch the matching event after the assignment
-const input = document.getElementById('email');
-input.value = 'hello@example.com';
-const isChangeBased = input.tagName === 'SELECT' || input.type === 'checkbox' || input.type === 'radio';
-input.dispatchEvent(new Event(isChangeBased ? 'change' : 'input', { bubbles: true }));
-```
-
-This is the same fork that `ln-form.fill()`, `ln-form.reset()`,
-and ln-autosave's construction-time restore use internally. Mirror it
-from project code.
-
-If you are setting many fields at once, use `lnForm.fill(data)`
-instead — it does the dispatch loop for you (`js/ln-form/ln-form.js:102-113`).
-
-### Mistake 4 — Listening for `ln-validate:invalid` after `set-custom`
-
-```js
-// WRONG — set-custom does NOT dispatch :invalid
-document.addEventListener('ln-validate:invalid', function (e) {
-    if (e.detail.field === 'email') log('email is invalid');
-});
-
-// Fires set-custom — log handler does NOT run
-document.getElementById('email').dispatchEvent(new CustomEvent('ln-validate:set-custom', {
-    bubbles: true, detail: { error: 'emailTaken' }
-}));
-```
-
-`_onSetCustom` is intentionally silent at the event level — see
-the asymmetry note above. The visible-state changes (class flip,
-`<li>` unhide), but no `:invalid` event fires. Listeners that
-key off the event miss the state change.
-
-The fix depends on intent. If you want to know whenever the field
-becomes invalid by *any* path, also call `validate()` after the
-`set-custom`:
-
-```js
-const input = document.getElementById('email');
-input.dispatchEvent(new CustomEvent('ln-validate:set-custom', {
-    bubbles: true, detail: { error: 'emailTaken' }
-}));
-input.lnValidate.validate();   // forces :invalid dispatch (since _customErrors.size > 0)
-```
-
-Or watch a different signal — e.g. a class mutation observer on
-`.ln-validate-invalid`. `ln-form`'s submit-button gate has the
-same blind spot, since it re-evaluates on bubbled `:valid` /
-`:invalid` events and `set-custom` doesn't dispatch one — if you
-need server-side errors to gate the submit button, force-validate
-after `set-custom`.
-
-### Mistake 5 — Server validation race
-
-```js
-// WRONG — race between server response and user typing
-form.addEventListener('ln-form:submit', async function (e) {
-    const res = await fetch('/api/users', { method: 'POST', body: JSON.stringify(e.detail.data) });
-    if (res.status === 422) {
-        const { errors } = await res.json();
-        // Apply errors via set-custom
-        Object.keys(errors).forEach(function (field) {
-            form.querySelector('[name="' + field + '"]').dispatchEvent(new CustomEvent('ln-validate:set-custom', {
-                bubbles: true, detail: { error: 'server' }
-            }));
-        });
-    }
-});
-```
-
-Between the user clicking Save and the server returning 422, the
-user might already have started typing in the email field. By the
-time the response arrives and `set-custom` fires, the user's
-keystroke has already triggered `validate()`, which (let's say)
-just dispatched `:valid` — then `set-custom` fires and unhides the
-server `<li>` and adds the invalid class, BUT does not re-evaluate
-the now-newly-typed value against the server.
-
-The user sees a red border on a value they're actively editing,
-with the server's stale rejection still attached. Dispatching
-`:set-custom` always adds the error; clearing it requires the user
-to either retype the same value (no-op for the server check) or
-the application to detect "the user typed in this field, drop the
-stale server error":
-
-```js
-// RIGHT — clear server error on user input after server response arrives
-input.addEventListener('input', function () {
-    if (input.lnValidate._customErrors.has('server')) {
-        input.dispatchEvent(new CustomEvent('ln-validate:clear-custom', {
-            bubbles: true, detail: { error: 'server' }
-        }));
-    }
-});
-```
-
-This is a pattern, not a fix shipped in `ln-validate` — the
-component has no opinion on staleness because it has no model of
-where the custom error came from.
-
-### Mistake 6 — Relying on the browser's `:invalid` pseudo-class
-
-```scss
-/* WRONG — fires on every empty required field, including untouched ones */
-input:invalid { border-color: red; }
-```
-
-The CSS `:invalid` pseudo-class is set by the browser the moment
-the field's constraints are evaluated, regardless of user
-interaction. A fresh form with three empty `required` fields
-renders three red boxes on page load — exactly the UX `_touched`
-exists to avoid.
-
-`ln-validate-invalid` is the right hook because it is added by
-the component only after the field has been touched (or
-explicitly force-validated):
-
-```scss
-/* RIGHT — only fields that have been interacted with */
-input.ln-validate-invalid { border-color: hsl(var(--color-error)); }
-```
-
-The library default mixins follow this — `@mixin form-validate-invalid`
-is applied to `.ln-validate-invalid`, not to `:invalid`.
-
-### Mistake 7 — Multiple `<li data-ln-validate-error="X">` for the same key
-
-```html
-<!-- AMBIGUOUS — two <li>s with the same key -->
-<ul data-ln-validate-errors>
-    <li class="hidden" data-ln-validate-error="required">Required (first)</li>
-    <li class="hidden" data-ln-validate-error="required">Required (second)</li>
-</ul>
-```
-
-`validate()` iterates every `<li>` in the wrapper and toggles
-`.hidden` based on the mapped validity property. Both `<li>`s
-unhide simultaneously — the user sees two duplicate "Required"
-messages. There is no first-match logic.
-
-This is rarely intentional. If you need conditional messages
-(e.g. "Required" vs "Required for premium accounts"), pick one and
-make it dynamic via a custom error:
-
-```html
-<ul data-ln-validate-errors>
-    <li class="hidden" data-ln-validate-error="required">Required</li>
-    <li class="hidden" data-ln-validate-error="requiredPremium">Required for premium accounts</li>
-</ul>
-```
-
-```js
-// In the coordinator, choose which to attach based on context
-input.dispatchEvent(new CustomEvent('ln-validate:set-custom', {
-    bubbles: true, detail: { error: 'requiredPremium' }
-}));
-```
-
-### Mistake 8 — Expecting `validate()` to skip untouched fields
-
-```js
-input.lnValidate.validate();   // renders errors immediately on an untouched field
-```
-
-`validate()` does NOT check `_touched` before rendering. Calling
-it on a fresh field renders errors right then — that is the whole
-point: it's the force-validate gate that `ln-form.submit()` uses
-to catch untouched required fields.
-
-If you want to validate only if touched (e.g., for an "is the form
-clean enough to autosave?" check), read `instance._touched` and
-short-circuit:
-
-```js
-if (input.lnValidate._touched) {
-    input.lnValidate.validate();
-}
-```
-
-Or use `instance.isValid` — the getter does not render or dispatch.
-
-### Mistake 9 — Removing `data-ln-validate` and expecting clean teardown
-
-```js
-// Probably not what you want
-input.removeAttribute('data-ln-validate');
-```
-
-The shared MutationObserver fires on the attribute removal, but
-`registerComponent`'s default behavior is to call `findElements`
-on the mutation target, which would re-instantiate if the
-attribute were present and skip otherwise. The existing
-`input.lnValidate` instance is NOT torn down — its listeners
-remain attached, the CSS classes stay where they are, the error
-`<li>`s keep their visibility state.
-
-The cleaner pattern for "stop validating this field":
-
-```js
-input.lnValidate.destroy();        // detach listeners, dispatch :destroyed, delete instance
-input.removeAttribute('data-ln-validate');
-input.classList.remove('ln-validate-valid', 'ln-validate-invalid');  // destroy() removes these too, but be defensive
-```
-
-`destroy()` does NOT hide error `<li>`s. If you need a clean
-visual state, also iterate the wrapper's `[data-ln-validate-error]`
-items and re-add `.hidden` — or call `instance.reset()` first.
-
-### Mistake 10 — Putting `data-ln-validate` on a `<fieldset>`
-
-```html
-<!-- WRONG — fieldset is not a form control -->
-<fieldset data-ln-validate>
-    <legend>Role</legend>
-    <input type="radio" name="role" value="admin" required>
-    <input type="radio" name="role" value="editor">
-</fieldset>
-```
-
-Same shape as Mistake 2 — `<fieldset>` has no `validity` and no
-`checkValidity()` (well, it has `checkValidity()` since HTML5 but
-it traverses children, and the component is not designed for that
-flow). The first `change` event crashes.
-
-For a radio group, put `data-ln-validate` on each radio (or on the
-first one — only that instance dispatches errors). Native browser
-behavior treats `required` on any single radio in a `name` group
-as "the group is required":
-
-```html
-<fieldset>
-    <legend>Role</legend>
-    <ul>
-        <li><label><input type="radio" name="role" value="admin" required data-ln-validate>Admin</label></li>
-        <li><label><input type="radio" name="role" value="editor">Editor</label></li>
-    </ul>
-    <ul data-ln-validate-errors>
-        <li class="hidden" data-ln-validate-error="required">Please choose a role</li>
-    </ul>
-</fieldset>
-```
-
-The wrapper here is the `<fieldset>`, which also serves as the
-`.form-element` equivalent for grouped radios — but the validation
-component finds the error list via `dom.closest('.form-element')`,
-not via `closest('fieldset')`. If you keep the radios inside a
-`.form-element` wrapper, the lookup works. If the `<fieldset>` IS
-the `.form-element`, add `class="form-element"` to it.
+Zero glue code. The components share no imports. The DOM is the
+wiring.
 
 ## Related
 
 - **[`ln-form`](../ln-form/README.md)** — the form-level coordinator
   that consumes `ln-validate:valid` / `:invalid` for submit-button
-  gating, force-validates every field on `lnForm.submit()`, and
-  dispatches synthetic `input` / `change` from `lnForm.fill()` and
-  `lnForm.reset()` so `ln-validate` re-runs on programmatic value
-  changes. The two components together make up the form layer's
-  contract — read both READMEs together.
+  gating and force-validates every field on `lnForm.submit()`.
 - **[`ln-autosave`](../ln-autosave/README.md)** — restores draft
-  values via `populateForm()` and dispatches synthetic `input` /
-  `change` on every restored field. `ln-validate` reacts via the
-  platform event flow with no direct integration. Indirect, but
-  reliable — see the Cross-component coordination section above.
-- **[`ln-confirm`](../ln-confirm/README.md)** — gates the first
-  click on a destructive button. Independent of `ln-validate`; the
-  click flow is sequential (confirm gate → form submit → validate
-  gate). They sit on different elements and don't share any event
-  channel.
-- **`@mixin form-validate-invalid`** (`scss/config/mixins/_form.scss:450`)
+  values and dispatches synthetic input/change; ln-validate reacts
+  via the platform event flow with no direct integration.
+- **[`ln-confirm`](../ln-confirm/README.md)** — gates destructive
+  button clicks; independent of ln-validate.
+- **`@mixin form-validate-invalid`** (`scss/config/mixins/_form.scss`)
   — red border + focus ring for `.ln-validate-invalid`.
-- **`@mixin form-validate-valid`** (`scss/config/mixins/_form.scss:459`)
+- **`@mixin form-validate-valid`** (`scss/config/mixins/_form.scss`)
   — green border + focus ring for `.ln-validate-valid`.
-- **`@mixin form-validate-errors`** (`scss/config/mixins/_form.scss:468`)
+- **`@mixin form-validate-errors`** (`scss/config/mixins/_form.scss`)
   — error-list typography (caption size, error color).
 - **Architecture deep-dive:** [`docs/js/validate.md`](../../docs/js/validate.md)
   for component internals, the `_touched` lifecycle, the
   custom-error path, and the validate-vs-set-custom dispatch
   asymmetry.
 - **Form-layer architecture:** [`docs/architecture/data-flow.md`](../../docs/architecture/data-flow.md)
-  — `ln-validate` is the validate layer (§3.4); the form-layer
-  contract for server-side errors (`ln-form:error` →
-  `ln-validate:set-custom`) lives in §6.2.
+  — `ln-validate` is the validate layer (§3.4).
 - **Native ValidityState API:** [MDN — ValidityState](https://developer.mozilla.org/en-US/docs/Web/API/ValidityState)
   for the full list of validity properties (including `stepMismatch`
   and `badInput`, which are NOT in `ERROR_MAP` — extend it if

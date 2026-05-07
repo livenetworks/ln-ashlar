@@ -1,12 +1,9 @@
 # validate — architecture
 
-> The 160-line primitive that defines the form layer's validity
-> contract. Wraps the browser's native `ValidityState` API with three
-> additions: a `_touched` boolean that defers rendering until first
-> interaction, a custom-error escape hatch for failures the platform
-> can't express, and a stable event surface (`ln-validate:valid` /
-> `:invalid`) that `ln-form`, projects, and analytics can all consume
-> without ever calling validation logic directly.
+> Field-level validity primitive. Wraps the browser's `ValidityState`,
+> defers rendering until first interaction (`_touched`), and exposes
+> a stable event surface (`ln-validate:valid` / `:invalid`) plus a
+> custom-error escape hatch (`set-custom` / `clear-custom`).
 
 The implementation lives in
 [`js/ln-validate/ln-validate.js`](../../js/ln-validate/ln-validate.js).
@@ -27,9 +24,10 @@ wrapper. It does NOT own:
 
 - The form-level submit gate (`ln-form` consumes the bubbling events).
 - Form serialization (`ln-core/serializeForm`).
-- Server-side error injection (the application or a future
-  form-coordinator subscribes to `ln-form:error` and dispatches
-  `ln-validate:set-custom`).
+- Server-side error injection (the application subscribes to whatever
+  event its consumer code dispatches after a 4xx, then dispatches
+  `ln-validate:set-custom`). `ln-form` only dispatches `ln-form:submit`;
+  consumers dispatch their own success/error events.
 - Visual styling (library SCSS reads the classes the component sets;
   the component itself never inlines styles).
 
@@ -50,7 +48,7 @@ as `dom.lnValidate`. The state surface is three fields:
 | Field | Type | Set by | Read by |
 |---|---|---|---|
 | `dom` | `HTMLElement` | constructor (line 26) | every prototype method (`validate`, `reset`, `destroy`, `isValid` getter), every event handler closure |
-| `_touched` | `Boolean` | constructor (line 27) initial `false`; `_onInput` (line 36); `_onChange` (line 41); `_onSetCustom` (line 49); `reset` (line 129) sets back to `false` | `ln-form._updateSubmitButton` (`js/ln-form/ln-form.js:91`); referenced by consumer code via `instance._touched` for "should I force-validate this?" gating |
+| `_touched` | `Boolean` | constructor (line 27) initial `false`; `_onInput` (line 36); `_onChange` (line 41); `_onSetCustom` (line 49); `reset` (line 129) sets back to `false` | `ln-form._updateSubmitButton`; referenced by consumer code via `instance._touched` for "should I force-validate this?" gating |
 | `_customErrors` | `Set<String>` | constructor (line 28) initial empty; `_onSetCustom` adds (line 48); `_onClearCustom` deletes (line 63) or clears (line 76); `reset` clears (line 130) | `validate()` (line 96 — `isValid` computation); `isValid` getter (line 143); read by `_onClearCustom` to decide which `<li>`s to hide when clearing all (line 70) |
 
 That is the entirety of the per-instance state. There is no:
@@ -96,18 +94,15 @@ listener per field.
 
 This same fork is mirrored exactly in:
 
-- `ln-form.fill()` (`js/ln-form/ln-form.js:108-112`) — dispatches
-  `change` for SELECT / checkbox / radio, `input` for everything
-  else.
-- `ln-form.reset()` (`js/ln-form/ln-form.js:147-152`) — same
-  pattern.
-- `ln-autosave` restore path (`js/ln-autosave/ln-autosave.js:94-95`)
-  — same pattern.
+- `ln-form.fill()` — dispatches `change` for SELECT / checkbox / radio,
+  `input` for everything else.
+- `ln-form.reset()` — same pattern.
+- `ln-autosave` restore path — same pattern.
 
 The mirroring is not enforced by code (no shared helper); it is a
 documented invariant that has to stay in sync across files. If a
 future commit changes the discriminator on one side, every other
-side must change with it — see the inline comment in `ln-form.js:106-107`.
+side must change with it — see the `ln-form.fill()` inline comment.
 
 Both `_onInput` and `_onChange` have the same body: set
 `_touched = true` and call `validate()`. Two separate handlers exist
@@ -142,8 +137,8 @@ ends up here.
 
 Step 4 is the key integration point. The component iterates every
 `<li data-ln-validate-error>` in the field's `.form-element`
-wrapper and checks each key against `ERROR_MAP` (defined at
-`ln-validate.js:84`):
+wrapper and checks each key against `ERROR_MAP` (defined at the
+top of `ln-validate.js`, lines 11-19):
 
 | `data-ln-validate-error` key | `ValidityState` property |
 |---|---|
@@ -166,7 +161,7 @@ inside a `.form-element` wrapper, `parent` is `null`, the entire
 error-rendering block is skipped, but the CSS class toggle (steps
 5–6) and the event dispatch (step 7) still run. The field gets the
 red border and the event fires; only the message rendering is
-silent. This is the README's "Common mistakes" item 1.
+silent.
 
 ## The custom-error path
 
@@ -249,11 +244,12 @@ user hasn't earned the right to see yet).
 
 ## The `_touched` lifecycle
 
-`_touched` is the single most consequential UX decision in the
-file. It gates whether `validate()` writes anything visible to the
-DOM... actually, no — `validate()` writes unconditionally; what
-`_touched` actually gates is whether the listener handlers call
-`validate()` in the first place. Re-reading the source:
+`_touched` does not gate what `validate()` writes — `validate()`
+writes unconditionally. `_touched` gates **whether the listener
+handlers call `validate()` in the first place**. The flag flips on
+the field's first `input` or `change` (or first `set-custom`).
+After that, every keystroke calls `validate()`, which renders
+errors. Until then, the field is silent.
 
 | Path | `_touched` set to `true`? | `validate()` called? |
 |---|---|---|
@@ -273,10 +269,9 @@ to call `validate()` on every `[data-ln-validate]` field
 regardless of touched state.
 
 The flag is read by exactly one external consumer:
-`ln-form._updateSubmitButton` (`js/ln-form/ln-form.js:91`). It
-iterates every `[data-ln-validate]` field, reads
-`fields[i][VALIDATE_ATTRIBUTE]._touched`, and disables the submit
-button if NO field has been touched (in addition to the standard
+`ln-form._updateSubmitButton`. It iterates every `[data-ln-validate]`
+field, reads `fields[i][VALIDATE_ATTRIBUTE]._touched`, and disables the
+submit button if NO field has been touched (in addition to the standard
 "any field invalid" check). This implements "you can't submit a
 form you haven't started yet."
 
@@ -285,7 +280,7 @@ form you haven't started yet."
 A pure read: `dom.checkValidity() && _customErrors.size === 0`.
 No side effects — no class toggles, no `<li>` updates, no event
 dispatches, no `_touched` mutation. Defined as a prototype getter
-via `Object.defineProperty` (see `ln-validate.js:139`). Reads live
+via `Object.defineProperty` (see `ln-validate.js:142`). Reads live
 state through `checkValidity()` (which itself is a pure read) and
 `_customErrors.size`.
 
@@ -300,14 +295,6 @@ pipeline. Use cases:
 - An analytics event keyed off "user has now made the form valid
   for the first time" — read `isValid` post-input and compare to a
   previous snapshot.
-
-The getter is NOT used by `ln-form.isValid` (which has its own
-implementation that iterates and calls `checkValidity()` directly,
-without consulting custom errors — `js/ln-form/ln-form.js:174-182`).
-This is a minor inconsistency: `ln-form.isValid` returns `true`
-even if a field has active `_customErrors`. Flag for a future
-audit: should `ln-form.isValid` also account for custom errors?
-Probably yes; the README documents the current behavior either way.
 
 ## The `reset()` flow
 
@@ -333,9 +320,10 @@ Resets the field to its pre-interaction state. Notably:
   value — the form element does. `ln-form.reset()` calls
   `this.dom.reset()` (the native form reset) before iterating
   `[data-ln-validate]` fields and calling `instance.reset()` on
-  each — see `js/ln-form/ln-form.js:133-160`.
+  each — see `ln-form`'s reset implementation.
 
-The order in `ln-form.reset()` matters and is documented inline:
+The order in `ln-form.reset()` matters — see the inline comment in
+`ln-form.reset()`:
 
 ```
 1. dom.reset()                          // native — clears values
@@ -355,9 +343,7 @@ re-evaluate, and any custom listener react. Without step 2,
 `ln-autoresize` would keep its previous height. With step 2, every
 field is transiently "touched + invalid" — step 3 then immediately
 clears that transient state. The user perceives the form as
-"reset, no errors." Reordering would leave fields visibly invalid
-after reset. See `js/ln-form/ln-form.js:142-146` for the inline
-comment.
+"reset, no errors."
 
 ## The `destroy()` flow
 
@@ -386,33 +372,24 @@ both, they can call `instance.reset()` before `instance.destroy()`.
 The `ln-validate:destroyed` event lets external listeners (analytics,
 debug overlays) react. It carries `{ target: dom }` and bubbles.
 
-## Listener attachment timeline
+## Listener attachment
 
-The constructor wires four listeners on the field element directly
-(`ln-validate.js:82-87`): `input` (text fields only), `change`,
-`ln-validate:set-custom`, and `ln-validate:clear-custom`. All four
-target the field, not the form or document. This matters for two
-reasons:
+The constructor attaches four listeners on the field element directly:
+`input` (text/textarea only — gated by `isChangeBased`), `change`,
+`ln-validate:set-custom`, `ln-validate:clear-custom`. All four
+target the field, not the form or document — there are no global
+listeners.
 
-1. **Event delegation for `:set-custom` / `:clear-custom`.** The
-   events bubble (CustomEvent default), but the listener is on the
-   field. A coordinator dispatching from the form level
-   (`form.dispatchEvent(...)`) would NOT reach the field —
-   bubbling goes UP, not DOWN. Dispatching must target the field
-   element directly (or any descendant; the event bubbles up
-   through the field on its way out). The README examples always
-   show `input.dispatchEvent(...)` — that is the contract.
-2. **No global pollution.** Each field instance has four listeners
-   on itself; there are no document-level listeners. A page with
-   100 validated fields has 400 listeners total, all scoped. No
-   capture-phase delegation, no `event.target` filtering — every
-   listener knows the exact element it cares about.
+The `set-custom` / `clear-custom` events bubble (CustomEvent default),
+but the listener is on the field, so dispatching from a parent will
+NOT reach the listener — bubbling goes up, not down. Dispatch must
+target the field element (or any descendant; the event bubbles up
+through the field on its way out). The README's examples always
+show `input.dispatchEvent(...)` — that is the contract.
 
-The component does NOT listen for `ln-form:error` directly. That
-wiring (translate `{ field: [msg] }` errors to `set-custom`
-dispatches) belongs to a coordinator — see
-`docs/architecture/data-flow.md` §6.2 for the contract and the
-Phase A roadmap note.
+`ln-validate` does not listen for `ln-form:error` or any sibling-
+component event. The translation of server errors to `set-custom`
+dispatches is consumer-side wiring.
 
 ## MutationObserver wiring
 
@@ -439,235 +416,64 @@ selector. Re-rendering after error-list HTML changes requires a
 manual `instance.validate()` call — but this is rare; error-list
 HTML is typically server-rendered and static.
 
-## Cross-component contract — the form layer
+## Cross-component contract
 
-The form layer is the cluster of components whose contract centers
-on `<form>` and its descendants:
+`ln-form` listens for `ln-validate:valid` / `:invalid` bubbling from
+the form's descendants and re-evaluates submit-button state on each
+event. `ln-form.fill()` and `ln-form.reset()` dispatch synthetic
+`input` / `change` events on every field; ln-validate reacts via
+its own platform listeners. `ln-autosave` does the same on restore.
+None of these components import each other — the wiring IS the
+platform event flow.
 
-```
-            ┌──────────────────────────────────────────────────────┐
-            │                  ln-form                             │
-            │   (form-level coordinator)                            │
-            │                                                      │
-            │   Listens (on form):                                 │
-            │     ln-validate:valid    ─┐  Re-evaluates submit-    │
-            │     ln-validate:invalid  ─┘  button state            │
-            │                                                      │
-            │   On submit() (force-validate gate):                 │
-            │     for each [data-ln-validate]:                     │
-            │       instance.validate()  ──→ may dispatch :invalid │
-            │                                                      │
-            │   On fill(data) / reset():                           │
-            │     dispatch input/change on every field             │
-            │       ──→ ln-validate _onInput/_onChange fires       │
-            │       ──→ validate() runs, errors render             │
-            └──────────────────────────────────────────────────────┘
-                                   ▲
-                                   │ events bubble up
-                                   │
-            ┌──────────────────────────────────────────────────────┐
-            │                ln-validate                           │
-            │   (per-field instance — one per [data-ln-validate])  │
-            │                                                      │
-            │   On 'input' / 'change':                             │
-            │     _touched = true                                  │
-            │     validate() ──→ dispatch :valid / :invalid        │
-            │                                                      │
-            │   On 'ln-validate:set-custom' / ':clear-custom':     │
-            │     manage _customErrors set                         │
-            │     toggle <li data-ln-validate-error="..."> .hidden │
-            └──────────────────────────────────────────────────────┘
-                                   ▲
-                                   │ synthetic input/change
-                                   │ from restore / fill / reset
-                                   │
-            ┌──────────────────────────────────────────────────────┐
-            │   ln-autosave           ln-form.fill()               │
-            │   (independent)         ln-form.reset()              │
-            │                         (form-internal)              │
-            └──────────────────────────────────────────────────────┘
-```
-
-Three components compose without importing each other. The wiring
-is the platform's event flow. A change in any one component's
-public contract (event names, listener targets, the `isChangeBased`
-discriminator) requires a parallel change in the others — the
-mirroring is documented but not enforced.
-
-The contract that matters most is the **listener discriminator
-mirroring**:
+The cross-cutting invariant is the listener discriminator:
 
 ```
-ln-validate.js:33      ln-form.js:110       ln-autosave.js (synthetic)
-const isChangeBased   const isChangeBased  const isChangeBased
-  = tag === 'SELECT'    = tag === 'SELECT'   = tag === 'SELECT'
-  || type === 'checkbox'|| type === 'checkbox'|| type === 'checkbox'
-  || type === 'radio';  || type === 'radio'; || type === 'radio';
+ln-validate.js (init)        ln-form.js (fill/reset)    ln-autosave.js (restore)
+const isChangeBased         const isChangeBased        const isChangeBased
+  = tag === 'SELECT'          = tag === 'SELECT'         = tag === 'SELECT'
+  || type === 'checkbox'      || type === 'checkbox'     || type === 'checkbox'
+  || type === 'radio';        || type === 'radio';       || type === 'radio';
 ```
 
 If `ln-validate` ever stopped listening for `input` on text fields,
-the synthetic `input` events from `ln-form.fill()` would not
-trigger validation — the form fill would silently leave fields
-unvalidated.
-
-If `ln-form.fill()` ever dispatched `change` instead of `input` for
-text fields, `ln-validate` would still validate (it listens for
-both on text fields), but `ln-autoresize` would not resize (it
-listens only for `input` — see `js/ln-autoresize/ln-autoresize.js`).
-
-The cluster works because all three sides agree on the
+synthetic `input` events from `ln-form.fill()` would not trigger
+validation. If `ln-form.fill()` ever dispatched `change` instead of
+`input` for text fields, `ln-validate` would still validate (it
+listens for both on text fields), but `ln-autoresize` would not
+resize. The cluster works because all three sides agree on the
 discriminator. A change to one is a change to all.
-
-## Public APIs at a glance
-
-### Instance — `el.lnValidate`
-
-| Method / property | Description |
-|---|---|
-| `validate()` | Force-validate now. Reads `dom.checkValidity()`, recomputes `isValid`, toggles classes, toggles error `<li>` visibility, dispatches `:valid` or `:invalid`, returns Boolean. Does NOT set `_touched`. |
-| `reset()` | `_touched = false`, `_customErrors.clear()`, remove both CSS classes, hide every error `<li>` in the wrapper. Does NOT dispatch any event. |
-| `isValid` (getter) | Live `Boolean`: `dom.checkValidity() && _customErrors.size === 0`. No side effects. |
-| `destroy()` | Detach all four listeners, remove CSS classes, dispatch `:destroyed`, delete `dom.lnValidate`. Does NOT hide error `<li>` items. |
-| `dom` | Back-reference. |
-| `_touched` | Internal Boolean — read by `ln-form._updateSubmitButton`. |
-| `_customErrors` | Internal `Set<String>` — do not mutate directly. |
-
-### Constructor — `window.lnValidate(root)`
-
-Re-runs the upgrade scan over `root`. Used only for Shadow DOM /
-iframe injection; the document-level observer covers normal cases.
-
-### Events — emitted
-
-| Event | Cancelable | `detail` |
-|---|---|---|
-| `ln-validate:valid` | no | `{ target, field }` |
-| `ln-validate:invalid` | no | `{ target, field }` |
-| `ln-validate:destroyed` | no | `{ target }` |
-
-### Events — received
-
-| Event | `detail` |
-|---|---|
-| `ln-validate:set-custom` | `{ error: String }` |
-| `ln-validate:clear-custom` | `{ error: String }` (clear one) or `{}` (clear all) |
 
 ## Design decisions worth flagging
 
-### Why no `aria-invalid`?
+**Why no `aria-invalid`?** The component owns one visual signal
+(class-driven CSS) and downstream concerns (ARIA, high-contrast
+modes, project decoration) hook into the same class. Adding
+`aria-invalid` writes would create a second contract surface. If
+your accessibility audit needs it, wire it on the consumer side
+via the `ln-validate:invalid` event.
 
-The component manages classes and `.hidden` toggles, not ARIA. The
-browser's native `:invalid` pseudo-class is not consumed either.
-This is a consistency choice: the component owns one visual signal
-(class + class-driven CSS), and downstream concerns (ARIA,
-high-contrast modes, project-specific decoration) hook into the
-same class. Adding `aria-invalid` writes would create a second
-contract surface.
+**Why does `_onSetCustom` skip the dispatch?** `set-custom` is
+fired by code that already knows the field is invalid; dispatching
+`:invalid` would be redundant. `clear-custom` cannot pre-determine
+the new state (other custom errors might still be active, or
+native errors), so it calls `validate()` if `_touched`. Cost:
+`ln-form`'s submit-button gate doesn't learn about server-side
+errors via `set-custom` alone — a coordinator must call
+`instance.validate()` after `set-custom` if it wants the gate to
+react. Documented in README §What it does NOT do.
 
-If a project's accessibility audit requires `aria-invalid="true"`
-on invalid fields, wire it on the consumer side via the
-`ln-validate:invalid` event:
+**Why is `field` in the event detail?** `detail.target` is the
+element. `detail.field` is `dom.name`, exposed for consumer-side
+keying without re-querying the DOM. A field without `name` dispatches
+`field: ""` — name your fields. `ln-form` itself does not consume
+`detail.field`; its submit gate re-queries `[data-ln-validate]`
+on every event.
 
-```js
-document.addEventListener('ln-validate:invalid', function (e) {
-    e.detail.target.setAttribute('aria-invalid', 'true');
-});
-document.addEventListener('ln-validate:valid', function (e) {
-    e.detail.target.removeAttribute('aria-invalid');
-});
-```
-
-This kind of hook is what the event surface is for.
-
-### Why does `_onSetCustom` skip the dispatch?
-
-The asymmetry between `set-custom` (silent) and `clear-custom`
-(dispatches via `validate()` if touched) is documented in the
-README and the source comments. Reasoning recap:
-
-- `set-custom` is fired by code that already knows the field is
-  invalid. Dispatching `:invalid` is redundant — the caller has
-  the information that triggered the dispatch.
-- `clear-custom` cannot pre-determine the new state. Removing one
-  custom error might leave the field fully valid, partially
-  invalid (other customs still active), or natively invalid.
-  `validate()` is the only path that resolves this.
-
-The cost: `ln-form`'s submit-button gate does not learn about
-server-side errors via `set-custom` alone. The gate re-evaluates
-on bubbled `ln-validate:valid` / `:invalid` events, and
-`set-custom` does not dispatch one. A coordinator wiring
-server-side errors must also call `instance.validate()` after
-`set-custom` if it wants the form's submit-button gate to react.
-The README's "Mistake 4" documents this; the architecture flag is
-whether to make `set-custom` always dispatch or always silent —
-current behavior is silent, and changing it would propagate
-redundant events to every existing consumer.
-
-### Why is `field` in the event detail?
-
-`detail.target` is the element. `detail.field` is `dom.name`. The
-duplication exists for consumer-side keying — coordinators that
-want to track per-field state (e.g. a server-error display
-keyed by field name, an inline-progress indicator) can read the
-name directly off the event without re-querying the DOM.
-`ln-form` itself does not consume `detail.field` — its submit-
-button gate re-queries `[data-ln-validate]` and reads each
-field's `checkValidity()` and `_touched` flag on every event,
-ignoring the detail entirely.
-
-A field without `name` dispatches `field: ""` — README
-documents "name your fields" as the workaround. Consumers that
-key by name will collapse nameless fields into one bucket;
-those that key by `detail.target` (the element reference) will
-not.
-
-### Why does `validate()` always render, including on untouched fields?
-
-`validate()` is the force-validate gate that `ln-form.submit()`
-uses to catch untouched required fields. Gating it on `_touched`
-would defeat that use case. The component instead gates the
-listener handlers (which set `_touched = true` first), so user
-interaction triggers the render, but programmatic force-validate
-also works.
-
-The cost: a coordinator that wants "validate but don't render if
-untouched" has to read `instance._touched` itself and short-circuit:
-
-```js
-if (input.lnValidate._touched) input.lnValidate.validate();
-```
-
-This is rare in practice. Most consumers want either "force-validate
-now" (`lnForm.submit()`'s pattern) or "react to user input"
-(automatic via the listeners).
-
-## Where this code could change
-
-Things flagged for future audits:
-
-- **`ln-form.isValid` does not check custom errors.** The form's
-  getter reads `field.checkValidity()` directly, not
-  `field.lnValidate.isValid`. A field with `_customErrors.size > 0`
-  but native-valid would report as valid at the form level.
-  Probably worth aligning — see "The `isValid` getter" section.
-- **`set-custom` + form-level submit gate.** As above, custom
-  errors do not trigger ln-form's submit-button re-evaluation
-  because `_onSetCustom` does not dispatch `:invalid`. A
-  coordinator must call `instance.validate()` after `set-custom`
-  to push the bubbled event through. A future change could make
-  `_onSetCustom` dispatch `:invalid` always, at the cost of
-  redundant events for callers who don't need the bubbling path.
-- **`ERROR_MAP` coverage.** `stepMismatch` and `badInput` are
-  native `ValidityState` properties not in the map. Add them if a
-  consumer needs them, or document the pattern for treating them
-  as custom errors.
-- **`ln-form:error` consumer.** Currently the application or a
-  page-level coordinator translates server errors into
-  `set-custom` dispatches. The Phase A roadmap moves this to a
-  stable coordinator hook in `ln-form` or a new helper. Until
-  then, projects wire it manually (README "Examples" §
-  "Server-side errors via the form layer").
-
-These are open items, not bugs. The current shape works; the flags
-are for the maintainer's audit list.
+**Why does `validate()` always render, including on untouched
+fields?** `validate()` is the force-validate gate that
+`ln-form.submit()` uses to catch untouched required fields. Gating
+it on `_touched` would defeat that use case. The component instead
+gates the listener handlers (which set `_touched = true` first),
+so user interaction triggers the render and programmatic force-
+validate also works.
