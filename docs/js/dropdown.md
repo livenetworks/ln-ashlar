@@ -68,43 +68,42 @@ Each `[data-ln-dropdown]` element gets a `_component` instance stored at `elemen
 | `dom` | Element | The wrapper element |
 | `toggleEl` | Element | The `[data-ln-toggle]` menu inside the wrapper |
 | `triggerBtn` | Element | The `[data-ln-toggle-for]` trigger button |
-| `_menuParent` | Element | Original parent of the menu (before teleport) |
-| `_placeholder` | Comment | DOM comment node marking the menu's original position |
+| `_teleportRestore` | Function\|null | Cleanup closure returned by `teleportToBody()`; restores menu to original DOM position on close |
 
-### Teleport Mechanism
+### Teleport + Placement (delegated to ln-core)
 
 ```
 ln-toggle:open fires on toggleEl
     |
     v
-_teleportToBody():
-    1. Save reference to menu's current parent (_menuParent)
-    2. Insert a comment node placeholder where the menu was
-    3. appendChild(menu) to document.body
-    4. Set position: fixed
-    5. _positionMenu() — calculate coordinates
+_onToggleOpen():
+    1. this._teleportRestore = teleportToBody(toggleEl)  — moves menu to <body>, saves restore closure
+    2. toggleEl.style.position = 'fixed'
+    3. _reposition()  — measure + place via ln-core helpers
     |
     v
 ln-toggle:close fires on toggleEl
     |
     v
-_teleportBack():
-    1. Clear inline position styles
-    2. insertBefore(menu, placeholder) — return to original position
-    3. Remove placeholder comment
+_onToggleClose():
+    1. Clear inline position styles (position, top, left, right, transform, margin)
+    2. this._teleportRestore()  — returns menu to original DOM position
+    3. this._teleportRestore = null
 ```
 
 ### Positioning Algorithm
 
 ```
-_positionMenu():
-    1. Get trigger's bounding rect
-    2. Measure menu dimensions (briefly show if hidden)
-    3. Read --size-xs token for gap
-    4. Vertical: prefer below trigger, flip above if no room, fallback to bottom of viewport
-    5. Horizontal: prefer right-aligned to trigger, flip left-aligned if no room, fallback to right edge
-    6. Apply top/left as fixed coordinates
+_reposition():
+    1. Get trigger's bounding rect (getBoundingClientRect)
+    2. measureHidden(toggleEl)  — ln-core: hidden-safe dimension read
+    3. Read --size-xs token for gap (~4px)
+    4. computePlacement(rect, size, 'bottom-end', gap)  — ln-core: bottom-end = below trigger, right-aligned;
+       flips to top-end if no room below; clamped to viewport
+    5. Apply top/left as fixed coordinates
 ```
+
+`computePlacement` accepts floating-ui-style `<side>-<alignment>` strings. `'bottom-end'` aligns the right edge of the menu to the right edge of the trigger. Alignment is preserved through the fallback chain (e.g. `bottom-end` → `top-end` when flipping above).
 
 ### Event Listeners Lifecycle
 
