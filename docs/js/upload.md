@@ -1,54 +1,8 @@
 # Upload
 
-File upload component — drag-and-drop zone with XHR progress, validation, and server communication. File: `js/ln-upload/ln-upload.js`.
-
-## HTML
-
-```html
-<div data-ln-upload="/api/upload" data-ln-upload-accept=".pdf,.doc,.docx">
-    <div class="ln-upload__zone">
-        <p>Drop files here or click to browse</p>
-        <small>Allowed: PDF, DOC</small>
-    </div>
-    <ul class="ln-upload__list"></ul>
-
-    <!-- Optional dictionary for i18n -->
-    <ul hidden>
-        <li data-ln-upload-dict="remove">Remove</li>
-        <li data-ln-upload-dict="error">Error</li>
-        <li data-ln-upload-dict="invalid-type">File type not allowed</li>
-    </ul>
-</div>
-```
-
-## Attributes
-
-| Attribute | Description |
-|-----------|-------------|
-| `data-ln-upload="url"` | Upload endpoint URL |
-| `data-ln-upload-accept=".ext,.ext"` | Allowed extensions (comma-separated) |
-| `data-ln-upload-context="value"` | Context string sent with upload |
-| `data-ln-upload-dict="key"` | I18n text override for built-in messages |
-
-## JS API (on container element)
-
-```js
-const el = document.querySelector('[data-ln-upload]');
-el.lnUploadAPI.getFileIds();   // returns array of server IDs
-el.lnUploadAPI.getFiles();     // returns [{serverId, name, size}, ...]
-el.lnUploadAPI.clear();        // DELETE all from server, clear list
-el.lnUploadAPI.destroy();      // remove all listeners, clear list, remove instance
-```
-
-## Events
-
-| Event | Bubbles | `detail` |
-|-------|---------|----------|
-| `ln-upload:uploaded` | yes | `{ localId, serverId, name }` |
-| `ln-upload:removed` | yes | `{ localId, serverId }` |
-| `ln-upload:error` | yes | `{ file, message }` |
-| `ln-upload:invalid` | yes | `{ file, message }` |
-| `ln-upload:cleared` | yes | `{}` |
+Architecture reference for `ln-upload`. File:
+`js/ln-upload/ln-upload.js`. For attributes, events, API, and HTML
+structure, see [`js/ln-upload/README.md`](../../js/ln-upload/README.md).
 
 ---
 
@@ -80,25 +34,11 @@ Each upload container has a closure-scoped `uploadedFiles` Map: `localId → { s
 8. On 2xx: `fill(li, { sizeText: formatSize, uploading: false })`, enable remove button, store in `uploadedFiles` Map, update hidden inputs, dispatch `ln-upload:uploaded`.
 9. On non-2xx or XHR error: `handleError(msg)` — sets progress bar to 100%, `fill(li, { sizeText: dict.error, uploading: false, error: true })`, dispatches `ln-upload:error`, enqueues error toast.
 
-### Template slots
+### Click delegation
 
-The component reads these slot attributes in the cloned `<li>`:
-
-- `data-ln-field="name"` — file name text
-- `data-ln-field="sizeText"` — status/size text, reused across states
-- `data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting"` — state class toggles
-- `data-ln-attr="href:iconHref"` on a `<use>` element — file-type icon reference
-- `data-ln-attr="aria-label:removeLabel, title:removeLabel"` on the remove button
-- `data-ln-upload-action="remove"` — behavioral hook for delegated click
-- `.ln-upload__progress-bar` class — selected directly for `style.width` animation
-
-The remove button listener is delegated on `.ln-upload__list` and resolved via `e.target.closest('[data-ln-upload-action="remove"]')`, so clicks on nested `<svg>`/`<use>` elements work correctly.
-
-### File Icons
-
-Icons are created via SVG `<use>` (loaded by icon loader):
-- `#lnc-file-pdf`, `#lnc-file-doc`, `#lnc-file-epub` — custom CDN icons
-- `#ln-file` — generic Tabler icon for all other types
+The remove-button listener is delegated on `.ln-upload__list` and
+resolved via `e.target.closest('[data-ln-upload-action="remove"]')`,
+so clicks on nested `<svg>` / `<use>` children resolve correctly.
 
 ### Hidden Inputs
 

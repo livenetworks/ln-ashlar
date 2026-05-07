@@ -1,7 +1,6 @@
 # ln-upload
 
-File upload component — drag & drop zone with progress bar, validation, and server communication.
-Automatic upload on file select/drop, with progress tracking via XHR. File deletion from server.
+File upload component — drag-and-drop zone with XHR progress, client-side validation, and auto-rendered hidden inputs for form submit.
 
 ## Attributes
 
@@ -41,23 +40,6 @@ Example (full override):
 </ul>
 ```
 
-## CSS Classes
-
-| Class | Description |
-|-------|-------------|
-| `.ln-upload__zone` | Drag & drop zone (clickable) |
-| `.ln-upload__zone--dragover` | When a file is dragged over the zone |
-| `.ln-upload__list` | List of uploaded files |
-| `.ln-upload__item` | Individual file |
-| `.ln-upload__item--uploading` | File currently uploading |
-| `.ln-upload__item--error` | Failed upload |
-| `.ln-upload__item--deleting` | File being deleted from server |
-| `.ln-upload__name` | File name |
-| `.ln-upload__size` | Size / percentage |
-| `.ln-upload__remove` | Delete button |
-| `.ln-upload__progress` | Progress bar container |
-| `.ln-upload__progress-bar` | Progress bar (width %) |
-
 ## Customization — item template
 
 The component clones a `<template data-ln-template="ln-upload-item">` for every file row. Lookup order:
@@ -87,8 +69,8 @@ Your template MUST include these elements for the component to function:
 		<li class="ln-upload__item" data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
 			<svg class="ln-icon ln-icon--lg" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-file"></use></svg>
 			<article>
-				<p class="ln-upload__name" data-ln-field="name"></p>
-				<small class="ln-upload__size" data-ln-field="sizeText"></small>
+				<span class="ln-upload__name" data-ln-field="name"></span>
+				<span class="ln-upload__size" data-ln-field="sizeText"></span>
 			</article>
 			<button type="button" class="ln-upload__remove" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
@@ -110,6 +92,7 @@ const uploader = document.getElementById('my-upload');
 uploader.lnUploadAPI.getFileIds();   // [1, 2, 3] — server IDs
 uploader.lnUploadAPI.getFiles();     // [{serverId, name, size}, ...]
 uploader.lnUploadAPI.clear();        // Deletes everything (from server too)
+uploader.lnUploadAPI.destroy();      // Cleanup — remove listeners and clear state
 
 // Global API — only for non-standard cases (Shadow DOM, iframe)
 // For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
@@ -148,33 +131,13 @@ Expected status: `200`
 
 ```html
 <div data-ln-upload="/files/upload" data-ln-upload-accept=".pdf,.doc,.docx" data-ln-upload-context="documents">
-    <!-- Optional: scoped item template override (see "Customization" section) -->
-    <!-- <template data-ln-template="ln-upload-item"> ... </template> -->
-
     <div class="ln-upload__zone">
         <p>Drag files here or click to browse</p>
     </div>
     <ul class="ln-upload__list"></ul>
 
-    <!-- Dictionary (optional, for i18n) -->
-    <ul hidden>
-        <li data-ln-upload-dict="remove">Remove</li>
-        <li data-ln-upload-dict="error">Error</li>
-        <li data-ln-upload-dict="invalid-type">This file type is not allowed</li>
-    </ul>
+    <!-- Dictionary (optional) — see "Dictionary (i18n)" section above -->
 </div>
-```
-
-## Programmatic
-
-```javascript
-// Listen for successful upload
-document.addEventListener('ln-upload:uploaded', function(e) {
-    console.log('Uploaded:', e.detail.name, 'Server ID:', e.detail.serverId);
-});
-
-// Get all uploaded IDs before form submit
-const ids = document.getElementById('my-upload').lnUploadAPI.getFileIds();
 ```
 
 ## File Icons
