@@ -1,65 +1,15 @@
 # Dropdown
 
-Positioned dropdown menu. Wraps an `ln-toggle` element, teleports it to `<body>` with fixed positioning. File: `js/ln-dropdown/ln-dropdown.js`.
+Implementation notes for `ln-dropdown`. The user-facing contract —
+attributes, events, API examples — lives in
+[`js/ln-dropdown/README.md`](../../js/ln-dropdown/README.md). This
+document covers internal mechanics: per-component lifecycle around
+the shared `ln-core` helpers (`computePlacement`, `teleportToBody`,
+`measureHidden`).
 
-## HTML
+File: `js/ln-dropdown/ln-dropdown.js`
 
-```html
-<nav data-ln-dropdown>
-    <button data-ln-toggle-for="user-menu">Options</button>
-    <ul id="user-menu" data-ln-toggle>
-        <li><a href="/profile">Profile</a></li>
-        <li><a href="/settings">Settings</a></li>
-        <li><button type="button">Logout</button></li>
-    </ul>
-</nav>
-```
-
-The `data-ln-dropdown` wrapper coordinates with the inner `data-ln-toggle` element. The trigger button uses `data-ln-toggle-for` (handled by ln-toggle).
-
-## Attributes
-
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-dropdown` | wrapper element | Creates instance |
-| `data-ln-toggle` | menu element (inside wrapper) | The menu to position (managed by ln-toggle) |
-| `data-ln-toggle-for="id"` | trigger button | Opens/closes the menu (managed by ln-toggle) |
-
-## Events
-
-| Event | Bubbles | Cancelable | `detail` |
-|-------|---------|------------|----------|
-| `ln-dropdown:open` | yes | no | `{ target }` |
-| `ln-dropdown:close` | yes | no | `{ target }` |
-| `ln-dropdown:destroyed` | yes | no | `{ target }` |
-
-## API
-
-```js
-const dropdown = document.querySelector('[data-ln-dropdown]');
-dropdown.lnDropdown.destroy();   // cleanup all listeners, teleport back
-
-// Manual init (Shadow DOM, iframe only)
-window.lnDropdown(container);
-```
-
-Open/close is controlled via the inner ln-toggle element, not directly on the dropdown instance.
-
-## Behavior
-
-- **Teleport**: on open, menu is moved to `<body>` with `position: fixed` to escape overflow/clipping contexts
-- **Positioning**: below trigger (right-aligned), flips above if no room below, flips left-aligned if no room on the right
-- **Close on outside click**: clicks outside both the wrapper and menu close the dropdown
-- **Close on resize**: window resize closes the dropdown
-- **Reposition on scroll**: window scroll repositions the menu (while open)
-- **Teleport back**: on close, menu is returned to its original DOM position
-- **ARIA**: sets `aria-haspopup="menu"` and `aria-expanded` on trigger, `role="menu"` on menu, `role="menuitem"` on direct children
-
----
-
-## Internal Architecture
-
-### State
+## State
 
 Each `[data-ln-dropdown]` element gets a `_component` instance stored at `element.lnDropdown`. Instance state:
 
@@ -70,7 +20,7 @@ Each `[data-ln-dropdown]` element gets a `_component` instance stored at `elemen
 | `triggerBtn` | Element | The `[data-ln-toggle-for]` trigger button |
 | `_teleportRestore` | Function\|null | Cleanup closure returned by `teleportToBody()`; restores menu to original DOM position on close |
 
-### Teleport + Placement (delegated to ln-core)
+## Teleport + Placement (delegated to ln-core)
 
 ```
 ln-toggle:open fires on toggleEl
@@ -91,7 +41,7 @@ _onToggleClose():
     3. this._teleportRestore = null
 ```
 
-### Positioning Algorithm
+## Positioning Algorithm
 
 ```
 _reposition():
@@ -105,7 +55,7 @@ _reposition():
 
 `computePlacement` accepts floating-ui-style `<side>-<alignment>` strings. `'bottom-end'` aligns the right edge of the menu to the right edge of the trigger. Alignment is preserved through the fallback chain (e.g. `bottom-end` → `top-end` when flipping above).
 
-### Event Listeners Lifecycle
+## Event Listeners Lifecycle
 
 | Listener | Added | Removed |
 |----------|-------|---------|
@@ -117,11 +67,14 @@ _reposition():
 
 The outside click listener is deferred by one tick (`setTimeout(0)`) to prevent the opening click from immediately closing the menu.
 
-### Dependency on ln-toggle
+## Dependency on ln-toggle
 
-Dropdown does not manage open/close state itself. It listens to `ln-toggle:open` and `ln-toggle:close` events from the inner toggle element. The toggle's `data-ln-toggle` attribute remains the single source of truth for the menu's open/closed state.
+Dropdown does not manage open/close state. It listens for
+`ln-toggle:open` and `ln-toggle:close` on the inner
+`[data-ln-toggle]` element and runs its teleport / positioning /
+listener-lifecycle steps in response.
 
-### MutationObserver
+## MutationObserver
 
 A single global observer watches `document.body` for:
 
