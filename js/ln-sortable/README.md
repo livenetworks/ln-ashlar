@@ -23,7 +23,7 @@ All state changes flow through the attribute. The JS API methods (`enable()`, `d
 
 ```javascript
 // Instance API (on the DOM element)
-var list = document.querySelector('[data-ln-sortable]');
+const list = document.querySelector('[data-ln-sortable]');
 list.lnSortable.enable();     // sets data-ln-sortable="" → observer syncs state
 list.lnSortable.disable();    // sets data-ln-sortable="disabled" → observer syncs state
 list.lnSortable.isEnabled;    // boolean
@@ -33,8 +33,7 @@ list.lnSortable.destroy();    // removes all listeners, dispatches ln-sortable:d
 list.setAttribute('data-ln-sortable', '');           // same as enable()
 list.setAttribute('data-ln-sortable', 'disabled');   // same as disable()
 
-// Constructor — only for non-standard cases (Shadow DOM, iframe)
-// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
+// Constructor — initialises a container manually (auto-init covers normal AJAX flow)
 window.lnSortable(container);
 ```
 
