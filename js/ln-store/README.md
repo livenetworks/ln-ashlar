@@ -1,7 +1,12 @@
 # ln-store
 
-Generic IndexedDB data layer — caches server data locally, syncs via delta protocol, handles optimistic mutations.
-It renders NOTHING. UI components consume data through its API and CustomEvents.
+> Coordinator/store for cached, synced server data. Caches in
+> IndexedDB, syncs via delta protocol, handles optimistic mutations.
+> Renders nothing — UI components consume data via its API and CustomEvents.
+
+`data-ln-store` on a `<div>` (one per resource) is the contract. The
+`window.lnStore` API is a thin convenience layer for manual init and
+global operations.
 
 ## Attributes
 
@@ -51,7 +56,12 @@ Mutations go through request events. The coordinator dispatches these on the sto
 |-------|------|----------|
 | `ln-store:error` | Initial load failed (no cache) | `{ store, action, error, status }` |
 | `ln-store:offline` | Server unreachable during sync | `{ store }` |
+| `ln-store:quota-exceeded` | IndexedDB write quota exceeded | `{ error }` |
 | `ln-store:destroyed` | Store instance destroyed | `{ store }` |
+
+> `ln-store:quota-exceeded` bubbles from `document` (it can fire
+> before any store instance exists). All other events are dispatched
+> on the store element.
 
 ## API (instance on DOM element)
 
@@ -80,11 +90,11 @@ storeEl.lnStore.destroy()              // Remove listeners, cancel pending fetch
 
 ```javascript
 storeEl.lnStore.getAll({
-    sort: { field: 'title', direction: 'asc' },
-    filters: { status: ['approved', 'draft'], category: ['Policy'] },
-    search: 'ISO 27001',
-    offset: 0,
-    limit: 100
+	sort: { field: 'title', direction: 'asc' },
+	filters: { status: ['approved', 'draft'], category: ['Policy'] },
+	search: 'ISO 27001',
+	offset: 0,
+	limit: 100
 })
 ```
 
@@ -99,7 +109,7 @@ window.lnStore.init(el)     // Manual init (MutationObserver handles dynamic DOM
 
 - IndexedDB (browser built-in)
 - Fetch API (browser built-in)
-- `ln-core` — `dispatch`, `findElements`
+- `ln-core` — `registerComponent`, `dispatch`
 
 ## HTML Structure
 
@@ -111,6 +121,35 @@ window.lnStore.init(el)     // Manual init (MutationObserver handles dynamic DOM
      data-ln-store-indexes="status,category,updated_at"
      data-ln-store-search-fields="title,description,author_name">
 </div>
+```
+
+## Examples
+
+### Coordinator wiring
+
+```javascript
+const storeEl = document.querySelector('[data-ln-store="documents"]');
+
+// Read after data is ready
+storeEl.addEventListener('ln-store:ready', async () => {
+	const { data } = await storeEl.lnStore.getAll({
+		sort: { field: 'updated_at', direction: 'desc' },
+		limit: 50
+	});
+	renderTable(data);
+});
+
+// Mutate via request event (never call methods directly)
+saveBtn.addEventListener('click', () => {
+	storeEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
+		detail: { id: 42, data: { title: 'New' }, expected_version: 3 }
+	}));
+});
+
+// React to confirmed / reverted / conflict
+storeEl.addEventListener('ln-store:reverted', (e) => {
+	showToast(`Save failed: ${e.detail.error}`);
+});
 ```
 
 ## Server Response Format
@@ -128,11 +167,13 @@ window.lnStore.init(el)     // Manual init (MutationObserver handles dynamic DOM
 - `data` — records created or updated (full load: all records, delta: only changed)
 - `deleted` — IDs removed since last sync (delta only)
 - `synced_at` — server timestamp, becomes next `?since=` value
-- `updated_at` is **mandatory** in every record (used for conflict detection)
 
-## Sync Lifecycle
+The store treats records as opaque except for `id` (the keyPath).
+Conflict detection on update uses `expected_version` if the
+coordinator passes it in the request `detail`.
 
-1. **Init** — has cache? emit `ready` (source: 'cache'), delta sync if stale. No cache? full load.
-2. **Visibility change** — tab becomes visible → delta sync if stale.
-3. **Delta sync** — `GET {endpoint}?since={last_synced_at}` → upsert/delete → emit `synced`.
-4. **Mutation** — optimistic update → server request → `confirmed` or `reverted`/`conflict`.
+## Lifecycle
+
+See [docs/js/store.md](../../docs/js/store.md#sync-lifecycle) for the
+full sync + optimistic mutation flow (init, visibility-change sync,
+delta sync, optimistic create/update/delete).
