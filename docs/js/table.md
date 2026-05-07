@@ -24,8 +24,7 @@ the dispatch, so consumers cannot intercept between filter and render.
 No `cloneTemplate` — empty-state cloning uses `document.importNode`
 on a directly-located `<template data-ln-table-empty>` (selected via
 `this.dom.querySelector` so each table can carry its own empty
-template). The `cloneTemplate` helper looks up by `data-ln-template`
-name with a global cache; ln-table predates that pattern.
+template).
 
 ## Instance state
 
@@ -52,7 +51,7 @@ Every property on `this`, with intent:
 | `_rafId` | number \| null | `null` | `requestAnimationFrame` id used to coalesce scroll/resize fires. |
 | `_scrollHandler` | Function \| null | `null` | The single scroll/resize listener; stored for `removeEventListener` on destroy. |
 | `_colgroup` | HTMLElement \| null | `null` | Reference to the injected `<colgroup>`. Removed on destroy. |
-| `_emptyTbodyObserver` | MutationObserver \| null | `null` | **NEW (post-fix)** — watches the empty tbody for the first row insertion. Stored so `destroy()` can disconnect. |
+| `_emptyTbodyObserver` | MutationObserver \| null | `null` | watches the empty tbody for the first row insertion. Stored so `destroy()` can disconnect. |
 | `_onSearch` | Function | bound | `ln-search:change` handler. Stored as instance property for symmetric `removeEventListener`. |
 | `_onSort` | Function | bound | `ln-table:sort` handler. |
 | `_onColumnFilter` | Function | bound | `ln-filter:changed` handler. |
@@ -302,10 +301,6 @@ but areas where the design has known limitations that may be revisited.
   'aria-sort', dir === 'asc' ? 'ascending' : 'descending')`) closes
   the gap. Tracked separately from the ln-table audit.
 
-- **Empty-tbody MutationObserver leak** — fixed in the current pass
-  (Phase 4 below). The observer reference is now stored as
-  `_emptyTbodyObserver` and disconnected in `destroy()`.
-
 - **Container-scoped virtual scroll** — would require resolving the
   scroll parent at init, attaching scroll listeners to that parent
   instead of `window`, and recomputing scroll offsets relative to
@@ -326,13 +321,8 @@ but areas where the design has known limitations that may be revisited.
 - **Coordinator/component split** — the current model has events
   flowing INTO the table (`ln-search:change`, `ln-filter:changed`)
   but no "request" events flowing out beyond the four notifications.
-  The pattern in newer components is "request events for mutations,
-  notification events for state changes" — ln-table's API is read-
-  only because there are no mutation paths to expose. If the
-  component ever grows a "set rows from JS" path (effectively
-  becoming a half-ln-data-table), that path SHOULD use a
-  `ln-table:request-set-data` request event, not a direct method
-  call. Not on the roadmap.
+  ln-table's API is read-only because there are no mutation paths to
+  expose.
 
 ## See also
 
