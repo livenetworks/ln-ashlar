@@ -1,6 +1,6 @@
 # ln-translations
 
-Inline translation system for forms. Adds translation inputs below translatable fields — one clone per language, per field. Translation inputs are bare clones of the original element with a flag background-image driven by CSS.
+Inline translation system for forms. Adds translation inputs below translatable fields — one clone per language, per field.
 
 ## Attributes
 
@@ -39,14 +39,14 @@ Required `<template>` elements (before `</body>`):
 ```javascript
 // Instance API (on DOM element)
 const el = document.querySelector('[data-ln-translations]');
-el.lnTranslations.addLanguage('en');          // add language
-el.lnTranslations.addLanguage('en', values);  // add with existing values
-el.lnTranslations.removeLanguage('en');       // remove language
-el.lnTranslations.getActiveLanguages();       // Set of active language codes
-el.lnTranslations.hasLanguage('en');          // boolean
+el.lnTranslations.addLanguage('en');                               // add language
+el.lnTranslations.addLanguage('en', values);                       // add with existing values
+el.lnTranslations.addLanguage('sq', { scope: 'Prodhimi i ushqimit' }); // add with values
+el.lnTranslations.removeLanguage('en');                            // remove language
+el.lnTranslations.getActiveLanguages();                            // Set of active language codes
+el.lnTranslations.hasLanguage('en');                               // boolean
 
-// Constructor — only for non-standard cases (Shadow DOM, iframe)
-// Dynamic DOM or setAttribute: MutationObserver auto-initializes
+// Manual init — non-standard cases only (Shadow DOM, iframe). Normal DOM is auto-initialized.
 window.lnTranslations(container);
 ```
 
@@ -58,65 +58,27 @@ window.lnTranslations(container);
 | `ln-translations:added` | yes | no | `{ target, lang, langName }` |
 | `ln-translations:before-remove` | yes | **yes** | `{ target, lang }` |
 | `ln-translations:removed` | yes | no | `{ target, lang }` |
-| `ln-translations:request-add` | no | no | `{ lang }` |
-| `ln-translations:request-remove` | no | no | `{ lang }` |
+
+**Request events (incoming):**
+
+| Event | Bubbles | Detail | Description |
+|-------|---------|--------|-------------|
+| `ln-translations:request-add` | no | `{ lang }` | Dispatch on the form to add a language |
+| `ln-translations:request-remove` | no | `{ lang }` | Dispatch on the form to remove a language |
 
 ```javascript
-// Cancel adding a language conditionally
-element.addEventListener('ln-translations:before-add', function (e) {
-    if (!userHasPermission(e.detail.lang)) e.preventDefault();
-});
-
-// React after language added
-document.addEventListener('ln-translations:added', function (e) {
-    console.log('Added:', e.detail.lang, e.detail.langName);
-});
-
-// Request events (dispatch on the component element)
+// Dispatch a request event on the component element
 element.dispatchEvent(new CustomEvent('ln-translations:request-add', {
-    detail: { lang: 'en' }
-}));
-element.dispatchEvent(new CustomEvent('ln-translations:request-remove', {
     detail: { lang: 'en' }
 }));
 ```
 
 ## Flags
 
-Flag icons are country SVGs from the `flag-icons` npm package, stored in `assets/flags/` (ISO 3166-1 alpha-2 filenames: `mk.svg`, `gb.svg`, etc.). CSS maps language codes to the correct flag via two Sass collections in `ln-translations.scss`:
-
-**`$lang-flag-overrides`** — languages where the lang code differs from the country code:
-
-| Lang | Flag | Language |
-|------|------|----------|
-| `en` | `gb` | English |
-| `sq` | `al` | Albanian |
-| `sr` | `rs` | Serbian |
-| `ja` | `jp` | Japanese |
-| `ko` | `kr` | Korean |
-| `zh` | `cn` | Chinese |
-| `cs` | `cz` | Czech |
-| `da` | `dk` | Danish |
-| `el` | `gr` | Greek |
-| `sv` | `se` | Swedish |
-| `uk` | `ua` | Ukrainian |
-| `sl` | `si` | Slovenian |
-| `et` | `ee` | Estonian |
-| `ka` | `ge` | Georgian |
-| `bs` | `ba` | Bosnian |
-| ... | ... | (35 total, see SCSS) |
-
-**`$lang-auto`** — languages where lang code = country code (no override needed):
-
-`mk`, `de`, `fr`, `it`, `bg`, `pt`, `ro`, `nl`, `pl`, `fi`, `hu`, `lt`, `lv`, `tr`, `az`, `is`, `mt`, `lb`, `no`, `ru`, `th`, `id`
-
-### Adding a new language flag
-
-1. Check if the SVG already exists in `assets/flags/` (271 flags available)
-2. If lang code = country code (e.g. `se` for Swedish? No — `sv`→`se`, so add to overrides):
-   - **Same**: add to `$lang-auto` list in `ln-translations.scss`
-   - **Different**: add to `$lang-flag-overrides` map: `lang: 'country-code'`
-3. Rebuild: `npm run build`
+Flag icons render via CSS background-image keyed off
+`data-ln-translatable-lang`. Lang-code → country-code mapping
+lives in `scss/components/_translations.scss`. Adding a new
+language is a SCSS edit, not a JS one.
 
 ## Name Generation
 
@@ -159,31 +121,7 @@ name="items[5][trans][en][title]"
 </form>
 ```
 
-### With Existing Translations (server-rendered)
-
-```html
-<form data-ln-translations
-      data-ln-translations-default="en">
-    <header>
-        <h3>Standard Details</h3>
-        <div class="ln-translations__actions">
-            <ul data-ln-translations-active></ul>
-            <div data-ln-dropdown>
-                <button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu">
-                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
-                </button>
-                <ul id="trans-menu" data-ln-toggle></ul>
-            </div>
-        </div>
-    </header>
-    <main>
-        <p data-ln-translatable="title">
-            <label>Title <input type="text" name="title" value="Information Security"></label>
-            <input data-ln-translatable-lang="en" name="trans[en][title]" value="Information Security" placeholder="English translation">
-        </p>
-    </main>
-</form>
-```
+Server-rendered translations are auto-detected — add `data-ln-translatable-lang="{lang}"` to pre-rendered translation inputs and the component picks them up on init.
 
 ### Nested (Prefix)
 
@@ -213,21 +151,7 @@ name="items[5][trans][en][title]"
 </form>
 ```
 
-### Programmatic
+## Behavior
 
-```javascript
-const el = document.querySelector('[data-ln-translations]');
-
-// Add language
-el.lnTranslations.addLanguage('en');
-
-// Add language with values
-el.lnTranslations.addLanguage('sq', { scope: 'Prodhimi i ushqimit' });
-
-// Check
-el.lnTranslations.hasLanguage('en');          // true
-el.lnTranslations.getActiveLanguages();       // Set {'en', 'sq'}
-
-// Remove
-el.lnTranslations.removeLanguage('en');
-```
+- Server-rendered translations are auto-detected on init via `[data-ln-translatable-lang]` elements already in the DOM.
+- The "Add Language" trigger is hidden when all locales are active.
