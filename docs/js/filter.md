@@ -132,23 +132,7 @@ checkboxes.
 
 ## Event flow
 
-Events dispatch in `_afterRender()` against a cached previous snapshot:
-
-```
-input change (user click or synthetic):
-    1. handler enforces sentinel ↔ value mutual exclusion (DOM ops)
-    2. queueRender()
-    ─── microtask boundary ───
-    3. _render() — derive active, apply visibility
-    4. _afterRender() — derive active again, compare to _lastSnapshot:
-       - if changed → dispatch ln-filter:changed
-       - if was-active && now-reset → dispatch ln-filter:reset
-       - update _lastSnapshot
-       - persist
-```
-
-One render = at most one `ln-filter:changed` and at most one `ln-filter:reset`.
-There is no event queue; the diff is the queue.
+`_afterRender` is the single dispatch site. One render cycle produces at most one `ln-filter:changed` (fired whenever the derived snapshot differs from `_lastSnapshot`) and at most one `ln-filter:reset` (fired only on the active → empty transition). There is no event queue — the snapshot diff is the queue.
 
 ## Dual dispatch
 
@@ -201,10 +185,6 @@ first paint and the initial `ln-filter:changed` fires (consumers like ln-table
 hear about server-rendered state). If nothing is pre-checked, no render is
 scheduled and no event fires.
 
-Persisted state (`data-ln-persist`) takes precedence: when present, it overwrites
-the DOM-checked state by mutating `input.checked` on the rehydrated values before
-the render call.
-
 ## Change handlers
 
 `_attachHandlers()` adds `change` listeners to all `[data-ln-filter-key]` inputs.
@@ -232,17 +212,6 @@ The handler does not dispatch events directly. It schedules a render;
 2. **Checkbox listeners**: removes all `change` listeners and the `Bound` guard
    property from each input.
 
-## Why NOT `fill()` / `renderList()`
-
-- Inputs are server-rendered, not from templates. The change handler and
-  persistence rehydration toggle `input.checked` on existing inputs directly.
-- Target items are external DOM (a separate container by ID). ln-filter doesn't
-  own or create them — it only sets/removes `data-ln-filter-hide`.
-- Auto-populate uses direct template cloning (`template.content.cloneNode(true)`)
-  + `fillTemplate()` for `{{ text }}` placeholder replacement. Uses `fillTemplate`
-  (not `fill`) because the label text is inline within the `<label>` element, not
-  in a separate `[data-ln-field]` element.
-
 ## Lifecycle
 
 1. **Init**: MutationObserver or DOMContentLoaded → `_findElements` → `new _component(dom)`
@@ -254,6 +223,6 @@ The handler does not dispatch events directly. It schedules a render;
 ## See also
 
 - [`../../js/ln-filter/README.md`](../../js/ln-filter/README.md) — consumer doc (attributes, events, API, HTML examples).
-- [`./table.md`](./table.md) — `ln-table` architecture; see also "Why NOT fill / renderList" above for ln-filter's relationship to ln-table's self-filtering.
+- [`./table.md`](./table.md) — `ln-table` architecture; ln-filter's column-filter mode skips `[data-ln-table]` targets so ln-table can own its own row filtering.
 - [`./search.md`](./search.md) — sibling component that shares the hide-attribute pattern (`data-ln-search-hide`).
 - [`./core.md`](./core.md) — `dispatch`, `createBatcher`, `persistGet`/`persistSet`.
