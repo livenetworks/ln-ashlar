@@ -2,83 +2,9 @@
 
 Drag & drop reorder component using Pointer Events API. Works with touch + mouse. File: `js/ln-sortable/ln-sortable.js`.
 
-## Single Source of Truth
-
-The `data-ln-sortable` attribute is the single source of truth. `data-ln-sortable="disabled"` disables sorting. API methods just set the attribute, and the MutationObserver syncs state.
-
-## HTML
-
-```html
-<!-- List with drag handle -->
-<ol data-ln-sortable>
-    <li>
-        <span data-ln-sortable-handle>⋮⋮</span>
-        First item
-    </li>
-    <li>
-        <span data-ln-sortable-handle>⋮⋮</span>
-        Second item
-    </li>
-</ol>
-
-<!-- Without handle (entire child is draggable) -->
-<ul data-ln-sortable>
-    <li>Drag me</li>
-    <li>Me too</li>
-</ul>
-```
-
-## Attributes
-
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-sortable` | container (`<ol>`, `<ul>`, etc.) | Creates instance, enabled by default |
-| `data-ln-sortable="disabled"` | container | Creates instance, starts disabled |
-| `data-ln-sortable-handle` | element inside child | Drag handle. If absent, entire child is draggable. |
-
-## Events
-
-| Event | Bubbles | Cancelable | `detail` |
-|-------|---------|------------|----------|
-| `ln-sortable:before-drag` | yes | **yes** | `{ item, index }` |
-| `ln-sortable:drag-start` | yes | no | `{ item, index }` |
-| `ln-sortable:reordered` | yes | no | `{ item, oldIndex, newIndex }` |
-| `ln-sortable:enabled` | yes | no | `{ target }` |
-| `ln-sortable:disabled` | yes | no | `{ target }` |
-| `ln-sortable:destroyed` | yes | no | `{ target }` |
-
-## CSS Classes (set by JS, styled by consumer)
-
-| Class | On | When |
-|-------|----|------|
-| `ln-sortable--active` | container | During drag |
-| `ln-sortable--dragging` | dragged element | While being dragged |
-| `ln-sortable--drop-before` | target element | Pointer in upper half |
-| `ln-sortable--drop-after` | target element | Pointer in lower half |
-
-## API
-
-```js
-const list = document.querySelector('[data-ln-sortable]');
-list.lnSortable.enable();     // sets attribute → observer syncs state
-list.lnSortable.disable();    // sets attribute → observer syncs state
-list.lnSortable.isEnabled;    // boolean
-list.lnSortable.destroy();    // removes all listeners, dispatches ln-sortable:destroyed
-
-// Direct attribute change — identical result
-list.setAttribute('data-ln-sortable', 'disabled');
-```
-
-## Behavior
-
-- Only reorders DOM — data model sync is the consumer's responsibility (via events)
-- Handle element needs `touch-action: none` and `cursor: grab` in CSS for proper touch behavior
-
----
-
 ## Internal Architecture
 
-This section explains how the component works internally. A developer or AI reading this should fully understand the data flow, state model, and event pipeline without reading the source.
+This document covers the internal mechanism: state model, pointer event pipeline, handle resolution, and DOM reorder algorithm. Consumer-facing reference (attributes, events, CSS classes, API) lives in [`js/ln-sortable/README.md`](../../js/ln-sortable/README.md).
 
 ### State
 
@@ -98,7 +24,7 @@ The `data-ln-sortable` attribute controls enabled/disabled state:
 - `data-ln-sortable` or `data-ln-sortable=""` → enabled
 - `data-ln-sortable="disabled"` → disabled
 
-API methods (`enable()`, `disable()`) set the attribute. The MutationObserver detects the change and updates `instance.isEnabled` inline, then dispatches `ln-sortable:enabled` or `ln-sortable:disabled`. Unlike ln-toggle/ln-modal, there are no cancelable before-events for enable/disable — the state change is immediate.
+API methods (`enable()`, `disable()`) set the attribute. The MutationObserver detects the change and updates `instance.isEnabled` inline, then dispatches `ln-sortable:enabled` or `ln-sortable:disabled`. The state change is immediate — there are no cancelable before-events for enable/disable.
 
 ### Pointer Events Lifecycle
 
