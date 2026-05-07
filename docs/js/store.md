@@ -1,6 +1,10 @@
-# Store
+# ln-store — architecture
 
-Generic IndexedDB data layer — caches server data locally, syncs via delta protocol, handles optimistic mutations. It renders NOTHING. UI components consume data through its API and CustomEvents. File: `js/ln-store/ln-store.js`.
+> Internal architecture: IndexedDB layout, sync lifecycle, optimistic
+> mutation flow, error / state machine. For consumer docs (attributes,
+> events, API), see [README](../../js/ln-store/README.md).
+
+Source: `js/ln-store/ln-store.js`
 
 ## HTML
 
@@ -13,57 +17,8 @@ Generic IndexedDB data layer — caches server data locally, syncs via delta pro
 </div>
 ```
 
-One element per resource, anywhere in the page (typically in layout). Multiple UI components share the same store.
-
-## Attributes
-
-| Attribute | Required | Description |
-|-----------|----------|-------------|
-| `data-ln-store` | yes | Store name (IndexedDB object store name, event namespace) |
-| `data-ln-store-endpoint` | yes | Server API base URL for this resource |
-| `data-ln-store-stale` | no | Staleness threshold in seconds (default: 300 = 5 min). `"0"` = always stale (syncs on every mount). `"-1"` or `"never"` = never auto-sync (only `forceSync()`) |
-| `data-ln-store-indexes` | no | Comma-separated fields to index: `"status,category,updated_at"` |
-| `data-ln-store-search-fields` | no | Comma-separated fields for text search: `"title,description,author_name"` |
-
-## Events — Commands (dispatched TO the store)
-
-Mutations go through request events. The coordinator dispatches these on the store element.
-
-| Event | `detail` | Description |
-|-------|----------|-------------|
-| `ln-store:request-create` | `{ data }` | Create a new record (optimistic with temp ID) |
-| `ln-store:request-update` | `{ id, data, expected_version }` | Update a record (optimistic, conflict detection via `expected_version`) |
-| `ln-store:request-delete` | `{ id }` | Delete a record (optimistic) |
-| `ln-store:request-bulk-delete` | `{ ids }` | Delete multiple records (optimistic) |
-
-## Events — Notifications (emitted BY the store)
-
-### Data Events
-
-| Event | When | `detail` |
-|-------|------|----------|
-| `ln-store:ready` | Data available (cache or server) | `{ store, count, source: 'cache'\|'server' }` |
-| `ln-store:loaded` | Initial full load complete | `{ store, count }` |
-| `ln-store:synced` | Delta sync complete | `{ store, added, deleted, changed: bool }` |
-
-### Mutation Events
-
-| Event | When | `detail` |
-|-------|------|----------|
-| `ln-store:created` | Optimistic create applied | `{ store, record, tempId }` |
-| `ln-store:updated` | Optimistic update applied | `{ store, record, previous }` |
-| `ln-store:deleted` | Optimistic delete applied | `{ store, id }` or `{ store, ids }` |
-| `ln-store:confirmed` | Server confirmed mutation | `{ store, record, action }` |
-| `ln-store:reverted` | Mutation failed, reverted | `{ store, record, action, error }` |
-| `ln-store:conflict` | Update conflict (409) | `{ store, local, remote, field_diffs }` |
-
-### Error Events
-
-| Event | When | `detail` |
-|-------|------|----------|
-| `ln-store:error` | Initial load failed (no cache) | `{ store, action, error, status }` |
-| `ln-store:offline` | Server unreachable during sync | `{ store }` |
-| `ln-store:destroyed` | Store instance destroyed | `{ store }` |
+One per resource at layout level. Multiple UI components consume the
+same store via events.
 
 ## Sync Lifecycle
 
@@ -106,63 +61,43 @@ Delete:
   4. Error: restore in IDB → emit reverted
 ```
 
-## API (instance on DOM element)
+## State
 
-```javascript
-const storeEl = document.querySelector('[data-ln-store="documents"]');
+### Per-instance (on `storeEl.lnStore`)
 
-// Queries (all return Promise)
-storeEl.lnStore.getAll(options)        // → { data, total, filtered }
-storeEl.lnStore.getById(id)            // → Object|null
-storeEl.lnStore.count(filters)         // → Number
-storeEl.lnStore.aggregate(field, fn)   // → Number (sum, avg, count)
+| Field | Type | Purpose |
+|-------|------|---------|
+| `isLoaded` | Boolean | Cache populated (from IDB or full load) |
+| `isSyncing` | Boolean | A delta sync or full load is in flight |
+| `lastSyncedAt` | Number\|null | Unix ts of last successful sync (`?since=` value) |
+| `totalCount` | Number | Last-known record count (cached in `_meta`) |
+| `_abortController` | AbortController\|null | Cancels pending fetch on `destroy()` |
+| `_handlers` | Object\|null | Stored references for `removeEventListener` on destroy |
 
-// State
-storeEl.lnStore.isLoaded               // Boolean
-storeEl.lnStore.isSyncing              // Boolean
-storeEl.lnStore.lastSyncedAt           // Number|null (Unix timestamp)
-storeEl.lnStore.totalCount             // Number
+### Module-level
 
-// Manual triggers
-storeEl.lnStore.forceSync()            // → Promise (delta sync)
-storeEl.lnStore.fullReload()           // → Promise (clear cache + full reload)
-storeEl.lnStore.destroy()              // Remove listeners, cancel pending fetches
-```
+| Field | Purpose |
+|-------|---------|
+| `_db` | Open IDBDatabase connection (one per page) |
+| `_dbReady` | Promise — resolves when `_db` is ready or null (no IDB) |
+| `_stores` | `{ name: instance }` — global registry, drives visibility-change sync |
+| `_visibilityHandler` | Listener attached only while `_stores` non-empty |
 
-### Query Options
+The page holds **one** IDBDatabase connection shared by all store
+instances (multiple `data-ln-store` elements). Stores share the
+connection via `_getDb()`; transactions are scoped per store name.
 
-```javascript
-storeEl.lnStore.getAll({
-    sort: { field: 'title', direction: 'asc' },
-    filters: { status: ['approved', 'draft'], category: ['Policy'] },
-    search: 'ISO 27001',
-    offset: 0,
-    limit: 100
-})
-```
+## Event surface
 
-### Global
+See [README §Events — Commands](../../js/ln-store/README.md#events--commands-dispatched-to-the-store)
+and [§Events — Notifications](../../js/ln-store/README.md#events--notifications-emitted-by-the-store)
+for the full table of dispatched events. This document covers WHEN
+each event fires within the lifecycle / mutation flow above.
 
-```javascript
-window.lnStore.clearAll()   // Wipe all IndexedDB stores + meta (for logout)
-window.lnStore.init(el)     // Manual init
-```
+## API surface
 
-## Server Response Format
-
-### Full load / Delta sync
-
-```json
-{
-    "data": [{ "id": 42, "title": "...", "updated_at": 1736952600 }],
-    "deleted": [17, 23],
-    "synced_at": 1736953500
-}
-```
-
-- `data` — records created or updated (full load: all records, delta: only changed)
-- `deleted` — IDs removed since last sync (delta only)
-- `synced_at` — server timestamp, becomes next `?since=` value
+See [README §API](../../js/ln-store/README.md#api-instance-on-dom-element)
+for the full API + query options + global methods.
 
 ## Error Handling
 
@@ -172,11 +107,17 @@ window.lnStore.init(el)     // Manual init
 | Server unreachable (delta sync) | Emit `ln-store:offline`, cached data still usable |
 | Server 4xx/5xx on mutation | Revert optimistic update, emit `ln-store:reverted` |
 | Server 409 on update | Revert, emit `ln-store:conflict` with both versions |
+| IndexedDB quota exceeded | Dispatch `ln-store:quota-exceeded` on `document` (write fails, in-memory fallback) |
 | IndexedDB unavailable | Fall back to in-memory, warn via console |
 | Schema version mismatch | Clear all stores, full reload |
 
-## Dependencies
+## DOM mutations
 
-- IndexedDB (browser built-in)
-- Fetch API (browser built-in)
-- `ln-core` — `dispatch`, `findElements`
+The store renders nothing. The only DOM-side effects are:
+
+- attaches `request-*` listeners on the store element
+- attaches one `visibilitychange` listener on `document` (shared
+  across all store instances; removed when last store is destroyed)
+- writes `dom.lnStore = instance` on the store element
+- dispatches `ln-store:*` events on the store element
+  (`quota-exceeded` dispatches on `document`)
