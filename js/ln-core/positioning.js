@@ -13,6 +13,16 @@
  * Returns { top, left, placement } in viewport pixels. `placement`
  * is the side that won (one of 'top' | 'bottom' | 'left' | 'right').
  *
+ * Accepts floating-ui-style placement strings:
+ *   '<side>'            — side only, alignment defaults to 'center'
+ *   '<side>-start'      — aligned to start (left for top/bottom, top for left/right)
+ *   '<side>-end'        — aligned to end   (right for top/bottom, bottom for left/right)
+ *
+ * Alignment is preserved through the fallback chain (e.g. 'bottom-end' → 'top-end'
+ * if no room below). The returned `placement` reports the winning side only,
+ * not the alignment (e.g. 'bottom', not 'bottom-end') — backward compatible with
+ * all existing callers that pass bare 'top' / 'bottom' / 'left' / 'right'.
+ *
  * Edge cases:
  *  - Anchor scrolled off-screen: returns coordinates relative to viewport
  *    anyway; caller decides whether to hide.
@@ -22,7 +32,7 @@
  *
  * @param {DOMRect|{top:number,left:number,right:number,bottom:number,width:number,height:number}} anchorRect
  * @param {{width:number, height:number}} floatingSize
- * @param {'top'|'bottom'|'left'|'right'} preferred
+ * @param {'top'|'bottom'|'left'|'right'|'top-start'|'top-end'|'bottom-start'|'bottom-end'|'left-start'|'left-end'|'right-start'|'right-end'} preferred
  * @param {number} offset Gap in pixels between anchor and floating element.
  * @returns {{top:number, left:number, placement:string}}
  */
@@ -33,6 +43,12 @@ export function computePlacement(anchorRect, floatingSize, preferred, offset) {
 	const fw = floatingSize.width;
 	const fh = floatingSize.height;
 
+	// Parse '<side>' or '<side>-<alignment>' placement string.
+	const parts = (preferred || 'bottom').split('-');
+	const side0 = parts[0];
+	// 'start' | 'end' | 'center' (default when no suffix)
+	const alignment = (parts[1] === 'start' || parts[1] === 'end') ? parts[1] : 'center';
+
 	// Fallback chain for each preferred side.
 	const chains = {
 		top:    ['top', 'bottom', 'right', 'left'],
@@ -41,7 +57,25 @@ export function computePlacement(anchorRect, floatingSize, preferred, offset) {
 		right:  ['right', 'left', 'top', 'bottom']
 	};
 
-	const chain = chains[preferred] || chains.bottom;
+	const chain = chains[side0] || chains.bottom;
+
+	// Compute the cross-axis (alignment) offset for a given side.
+	// For top/bottom sides the cross axis is horizontal (left).
+	// For left/right sides the cross axis is vertical (top).
+	function crossOffset(side) {
+		if (side === 'top' || side === 'bottom') {
+			if (alignment === 'start') return anchorRect.left;
+			if (alignment === 'end')   return anchorRect.right - fw;
+			// center (default)
+			return anchorRect.left + (anchorRect.width - fw) / 2;
+		} else {
+			// left / right
+			if (alignment === 'start') return anchorRect.top;
+			if (alignment === 'end')   return anchorRect.bottom - fh;
+			// center (default)
+			return anchorRect.top + (anchorRect.height - fh) / 2;
+		}
+	}
 
 	function tryPlace(side) {
 		let top;
@@ -50,18 +84,18 @@ export function computePlacement(anchorRect, floatingSize, preferred, offset) {
 
 		if (side === 'top') {
 			top = anchorRect.top - gap - fh;
-			left = anchorRect.left + (anchorRect.width - fw) / 2;
+			left = crossOffset(side);
 			if (top < 0) fits = false;
 		} else if (side === 'bottom') {
 			top = anchorRect.bottom + gap;
-			left = anchorRect.left + (anchorRect.width - fw) / 2;
+			left = crossOffset(side);
 			if (top + fh > vh) fits = false;
 		} else if (side === 'left') {
-			top = anchorRect.top + (anchorRect.height - fh) / 2;
+			top = crossOffset(side);
 			left = anchorRect.left - gap - fw;
 			if (left < 0) fits = false;
 		} else { // right
-			top = anchorRect.top + (anchorRect.height - fh) / 2;
+			top = crossOffset(side);
 			left = anchorRect.right + gap;
 			if (left + fw > vw) fits = false;
 		}

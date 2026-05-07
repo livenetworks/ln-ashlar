@@ -1,4 +1,4 @@
-import { dispatch, registerComponent } from '../ln-core';
+import { dispatch, computePlacement, teleportToBody, measureHidden, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-dropdown';
@@ -11,12 +11,11 @@ import { dispatch, registerComponent } from '../ln-core';
 	function _component(dom) {
 		this.dom = dom;
 		this.toggleEl = dom.querySelector('[data-ln-toggle]');
+		this._teleportRestore = null;
 		this._boundDocClick = null;
 		this._docClickTimeout = null;
 		this._boundScrollReposition = null;
 		this._boundResizeClose = null;
-		this._menuParent = null;
-		this._placeholder = null;
 
 		if (this.toggleEl) {
 			this.toggleEl.setAttribute('data-ln-dropdown-menu', '');
@@ -42,7 +41,9 @@ import { dispatch, registerComponent } from '../ln-core';
 		this._onToggleOpen = function (e) {
 			if (e.detail.target !== self.toggleEl) return;
 			if (self.triggerBtn) self.triggerBtn.setAttribute('aria-expanded', 'true');
-			self._teleportToBody();
+			self._teleportRestore = teleportToBody(self.toggleEl);
+			self.toggleEl.style.position = 'fixed';
+			self._reposition();
 			self._addOutsideClickListener();
 			self._addScrollRepositionListener();
 			self._addResizeCloseListener();
@@ -55,7 +56,13 @@ import { dispatch, registerComponent } from '../ln-core';
 			self._removeOutsideClickListener();
 			self._removeScrollRepositionListener();
 			self._removeResizeCloseListener();
-			self._teleportBack();
+			self.toggleEl.style.position = '';
+			self.toggleEl.style.top = '';
+			self.toggleEl.style.left = '';
+			self.toggleEl.style.right = '';
+			self.toggleEl.style.transform = '';
+			self.toggleEl.style.margin = '';
+			if (self._teleportRestore) { self._teleportRestore(); self._teleportRestore = null; }
 			dispatch(dom, 'ln-dropdown:close', { target: e.detail.target });
 		};
 
@@ -69,86 +76,14 @@ import { dispatch, registerComponent } from '../ln-core';
 
 	// ─── Positioning ───────────────────────────────────────────
 
-	_component.prototype._positionMenu = function () {
-		const trigger = this.dom.querySelector('[data-ln-toggle-for]');
-		if (!trigger || !this.toggleEl) return;
-
-		const rect = trigger.getBoundingClientRect();
-
-		// Measure menu dimensions (briefly show off-screen to get size)
-		const wasHidden = this.toggleEl.style.display === 'none' || this.toggleEl.style.display === '';
-		if (wasHidden) {
-			this.toggleEl.style.visibility = 'hidden';
-			this.toggleEl.style.display = 'block';
-		}
-		const menuW = this.toggleEl.offsetWidth;
-		const menuH = this.toggleEl.offsetHeight;
-		if (wasHidden) {
-			this.toggleEl.style.visibility = '';
-			this.toggleEl.style.display = '';
-		}
-
-		// Viewport bounds
-		const vw = window.innerWidth;
-		const vh = window.innerHeight;
+	_component.prototype._reposition = function () {
+		if (!this.triggerBtn || !this.toggleEl) return;
+		const rect = this.triggerBtn.getBoundingClientRect();
+		const size = measureHidden(this.toggleEl);
 		const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size-xs')) * 16 || 4;
-
-		// Vertical: prefer below, flip above if no room
-		let top;
-		if (rect.bottom + gap + menuH <= vh) {
-			top = rect.bottom + gap;
-		} else if (rect.top - gap - menuH >= 0) {
-			top = rect.top - gap - menuH;
-		} else {
-			top = Math.max(0, vh - menuH);
-		}
-
-		// Horizontal: prefer right-aligned to trigger, flip left-aligned if no room
-		let left;
-		if (rect.right - menuW >= 0) {
-			left = rect.right - menuW;
-		} else if (rect.left + menuW <= vw) {
-			left = rect.left;
-		} else {
-			left = Math.max(0, vw - menuW);
-		}
-
-		this.toggleEl.style.top = top + 'px';
-		this.toggleEl.style.left = left + 'px';
-		this.toggleEl.style.right = 'auto';
-		this.toggleEl.style.transform = 'none';
-		this.toggleEl.style.margin = '0';
-	};
-
-	// ─── Teleport ──────────────────────────────────────────────
-
-	_component.prototype._teleportToBody = function () {
-		if (!this.toggleEl || this.toggleEl.parentNode === document.body) return;
-
-		this._menuParent = this.toggleEl.parentNode;
-		this._placeholder = document.createComment('ln-dropdown');
-		this._menuParent.insertBefore(this._placeholder, this.toggleEl);
-
-		document.body.appendChild(this.toggleEl);
-
-		this.toggleEl.style.position = 'fixed';
-		this._positionMenu();
-	};
-
-	_component.prototype._teleportBack = function () {
-		if (!this._placeholder || !this._menuParent) return;
-
-		this.toggleEl.style.position = '';
-		this.toggleEl.style.top = '';
-		this.toggleEl.style.left = '';
-		this.toggleEl.style.right = '';
-		this.toggleEl.style.transform = '';
-		this.toggleEl.style.margin = '';
-
-		this._menuParent.insertBefore(this.toggleEl, this._placeholder);
-		this._menuParent.removeChild(this._placeholder);
-		this._menuParent = null;
-		this._placeholder = null;
+		const p = computePlacement(rect, size, 'bottom-end', gap);
+		this.toggleEl.style.top = p.top + 'px';
+		this.toggleEl.style.left = p.left + 'px';
 	};
 
 	// ─── Outside click ─────────────────────────────────────────
@@ -185,7 +120,7 @@ import { dispatch, registerComponent } from '../ln-core';
 	_component.prototype._addScrollRepositionListener = function () {
 		const self = this;
 		this._boundScrollReposition = function () {
-			self._positionMenu();
+			self._reposition();
 		};
 		window.addEventListener('scroll', this._boundScrollReposition, { passive: true, capture: true });
 	};
@@ -223,7 +158,7 @@ import { dispatch, registerComponent } from '../ln-core';
 		this._removeOutsideClickListener();
 		this._removeScrollRepositionListener();
 		this._removeResizeCloseListener();
-		this._teleportBack();
+		if (this._teleportRestore) { this._teleportRestore(); this._teleportRestore = null; }
 		if (this.toggleEl) {
 			this.toggleEl.removeEventListener('ln-toggle:open', this._onToggleOpen);
 			this.toggleEl.removeEventListener('ln-toggle:close', this._onToggleClose);
