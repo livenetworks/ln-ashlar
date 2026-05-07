@@ -1,7 +1,8 @@
 # ln-ajax
 
-AJAX navigation component — links and forms are sent asynchronously, the response updates the DOM without a full page reload.
-Supports browser history (pushState), CSRF token, and JSON response protocol.
+Intercepts clicks on `<a>` and submits on `<form>` inside `data-ln-ajax`,
+sends the request via `fetch`, and swaps DOM regions named in the JSON
+response. Re-attaches handlers in any injected nodes.
 
 ## Attributes
 
@@ -16,6 +17,7 @@ Supports browser history (pushState), CSRF token, and JSON response protocol.
 - Click makes a GET AJAX request to `href`
 - Ctrl/Cmd+Click and middle-click work normally (open in new tab)
 - Links with `#` in href are skipped
+- Links to a different hostname are skipped (open as normal links)
 - After a successful response, the URL is added to browser history (pushState)
 
 ### Forms (`<form>`)
@@ -25,8 +27,16 @@ Supports browser history (pushState), CSRF token, and JSON response protocol.
 - GET forms: parameters go in URL query string + pushState
 - POST/PUT/DELETE: body is FormData
 
-### CSS class for loading
-- `.ln-ajax--loading` is added to the element during the request
+### Loading state
+
+During the request, `.ln-ajax--loading` is added to the trigger element and a `<span class="ln-ajax-spinner">` is appended as a child.
+
+### Request headers
+
+Every AJAX request sends:
+- `X-Requested-With: XMLHttpRequest`
+- `Accept: application/json`
+- `X-CSRF-TOKEN: {token}` (from `<meta name="csrf-token">`)
 
 ## Server JSON Response Protocol
 
@@ -50,7 +60,7 @@ Supports browser history (pushState), CSRF token, and JSON response protocol.
 |-------|-------------|
 | `title` | Update `document.title` |
 | `content` | Object: key = element ID, value = new innerHTML |
-| `message` | Message — available in `ln-ajax:success` event, the project decides how to display it |
+| `message` | If present (success OR error), auto-dispatched on `window` as `ln-toast:enqueue`. See [ln-toast README](../ln-toast/README.md#enqueue-detail) for the envelope shape. |
 
 ## Events
 
@@ -61,7 +71,7 @@ All events are dispatched on the element that initiated the request (link or for
 | `ln-ajax:before-start` | yes | Before everything (can cancel request) | `{ method, url }` |
 | `ln-ajax:start` | no | After adding spinner, before fetch | `{ method, url }` |
 | `ln-ajax:success` | no | After successful response | `{ method, url, data }` |
-| `ln-ajax:error` | no | After fetch error | `{ method, url, error }` |
+| `ln-ajax:error` | no | HTTP-status error or fetch rejection | HTTP error: `{ method, url, status, data }` · Fetch rejection: `{ method, url, error }` |
 | `ln-ajax:complete` | no | After completion (success or error) | `{ method, url }` |
 
 ### Cancelling a request
@@ -76,43 +86,6 @@ document.addEventListener('ln-ajax:before-start', function(e) {
 });
 ```
 
-### Integration with ln-toast
-
-If the response contains a `message` object, `ln-ajax` dispatches `ln-toast:enqueue` on `window`. The `ln-toast` component listens for this event by default; any other listener can intercept.
-
-To show a toast with custom options, listen for `ln-ajax:success` / `ln-ajax:error` and dispatch your own `ln-toast:enqueue` event with the desired detail.
-
-### Other examples
-
-```javascript
-// Show custom loading indicator
-document.addEventListener('ln-ajax:start', function(e) {
-    console.log('Request started:', e.detail.method, e.detail.url);
-});
-
-// Refresh component after successful response
-document.addEventListener('ln-ajax:success', function(e) {
-    window.lnSelect && window.lnSelect.reinit();
-});
-
-// Global error handler
-document.addEventListener('ln-ajax:error', function(e) {
-    console.error('AJAX failed:', e.detail.url, e.detail.error);
-});
-
-// Completion (always)
-document.addEventListener('ln-ajax:complete', function(e) {
-    console.log('Request complete:', e.detail.url);
-});
-```
-
-## Headers
-
-Every AJAX request sends:
-- `X-Requested-With: XMLHttpRequest`
-- `Accept: application/json`
-- `X-CSRF-TOKEN: {token}` (from `<meta name="csrf-token">`)
-
 ## HTML Structure
 
 ```html
@@ -121,7 +94,7 @@ Every AJAX request sends:
     <nav>
         <a href="/users">Users</a>
         <a href="/settings">Settings</a>
-        <a href="/external" data-ln-ajax="false">External (no AJAX)</a>
+        <a href="/download.pdf" data-ln-ajax="false">Download (full page)</a>
     </nav>
 
     <form method="POST" action="/users/create">
@@ -137,8 +110,15 @@ Every AJAX request sends:
 
 ## API
 
+ln-ajax is attribute-driven: set `data-ln-ajax` on an element and the
+MutationObserver picks it up. Removal is symmetric — drop the
+attribute, the observer ignores it.
+
 ```javascript
-// Constructor — only for non-standard cases (Shadow DOM, iframe)
-// For AJAX/dynamic DOM or setAttribute: MutationObserver auto-initializes
-window.lnAjax(document.getElementById('new-content'));
+// Manual init — only when the element is unreachable by the observer
+// (detached DOM tree, Shadow DOM root, sandboxed iframe).
+window.lnAjax(element);
+
+// Manual destroy — remove all listeners attached by the constructor.
+window.lnAjax.destroy(element);
 ```
