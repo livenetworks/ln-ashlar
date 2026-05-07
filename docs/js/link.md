@@ -2,20 +2,18 @@
 
 Turns containers into click-navigable surfaces by triggering `.click()` on
 the first inner `<a>`. Hover shows a bottom-left status bar mirroring the
-browser's native URL preview. File: `js/ln-link/ln-link.js` (~196 lines).
+browser's native URL preview. File: `js/ln-link/ln-link.js`.
 
 ## Imports
 
-The component imports only `dispatchCancelable` and `guardBody` from `../ln-core`.
-It does not use `dispatch`, `findElements`, `cloneTemplate`, `renderList`, or any
-template helper from `js/ln-core/helpers.js`. See `js/ln-core/helpers.js` for
-source definitions.
+The component imports `dispatchCancelable` and `guardBody` from
+`../ln-core`.
 
-- `dispatchCancelable` — dispatches `ln-link:navigate` as a cancelable
-  `CustomEvent` and returns the event object so the caller can check
-  `defaultPrevented`.
-- `guardBody` — defers observer registration until `document.body` is
-  available, regardless of script-load order.
+- `dispatchCancelable` — dispatches `ln-link:navigate` as a
+  cancelable `CustomEvent` and returns the event so the caller can
+  check `defaultPrevented`.
+- `guardBody` — defers observer registration until `document.body`
+  is available, regardless of script-load order.
 
 ## State surface
 
@@ -82,23 +80,16 @@ needing to be stored per-row.
 
 ## Local `findElements`
 
-`findElements(root)` (line 132) is a local function, NOT the `findElements`
-helper from `ln-core`. The inline code comment at line 131 says explicitly:
+`findElements(root)` (line 132) is local, not the `findElements`
+helper from `ln-core`. The inline source comment notes the divergence:
+"invokes `_initContainer` (function, flag-based) and processes child
+rows."
 
-> Local findElements — intentional divergence from ln-core helper: invokes
-> `_initContainer` (function, flag-based) and processes child rows.
-
-The ln-core `findElements` helper expects a simple init function that takes
-one element. `ln-link`'s equivalent must:
-
-1. Check if `root` itself carries the attribute (line 133–135) and call
-   `_initContainer` on it.
-2. Also iterate `root.querySelectorAll('[data-ln-link]')` (line 137) to
-   find nested containers.
-
-Both steps call `_initContainer`, not a simple per-element callback.
-The ln-core helper's signature does not accommodate this dual-path
-pattern, so the function lives inline.
+The ln-core helper expects a simple per-element init callback.
+ln-link's equivalent must check the root itself for the attribute
+AND iterate `root.querySelectorAll('[data-ln-link]')`, both paths
+calling `_initContainer`. The dual-path shape doesn't fit the
+ln-core signature, so the function lives inline.
 
 ## MutationObserver
 
@@ -186,22 +177,14 @@ listeners) are detached from the DOM and the destroy loop iterates the NEW
 rows, which have no listeners. The old listeners leak. Always call
 `destroy(container)` first, then replace innerHTML, then re-init.
 
-## Registration pattern (legacy)
+## Registration pattern
 
-`ln-link` uses the pre-`registerComponent` direct assignment pattern:
-`window.lnLink = { init: constructor, destroy: _destroyContainer }`.
-
-This is the pre-`registerComponent` pattern. At the time of writing,
-`ln-link` is on the migration backlog alongside:
-`ln-ajax`, `ln-external-links`, `ln-nav`, `ln-progress`, `ln-toast`,
-`ln-table-sort`, `ln-upload` (the 8-component legacy cohort).
-
-Commit `2ae1a37 refactor(js): migrate 4 legacy components to registerComponent`
-migrated four of that cohort but not `ln-link`. The behavior is equivalent
-— `registerComponent` is a de-duplication of the boilerplate: double-load
-guard, `window[name]` assignment, MutationObserver registration, and
-DOMContentLoaded handling. `ln-link` implements all of these manually and
-correctly; the migration is purely a code-hygiene improvement.
+Direct `window.lnLink = { init: constructor, destroy: _destroyContainer }`
+assignment rather than the shared `registerComponent` helper used by
+newer components. Behavior is equivalent — `registerComponent` is a
+boilerplate de-duplicator (double-load guard, window assignment,
+observer registration, DOMContentLoaded wiring), all of which
+ln-link implements manually and correctly.
 
 ## What re-binds vs what stays static
 
