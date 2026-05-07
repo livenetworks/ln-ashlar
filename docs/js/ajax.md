@@ -1,59 +1,81 @@
-# AJAX
+# AJAX — architecture
 
-SPA-like navigation for links and forms. File: `js/ln-ajax/ln-ajax.js`.
+> Contract, attributes, events, examples → [`js/ln-ajax/README.md`](../../js/ln-ajax/README.md). This file documents internals: lifecycle, MutationObserver, DOM mutations, trust boundary.
+>
+> Source: `js/ln-ajax/ln-ajax.js`.
 
-## HTML
+## Request lifecycle
 
-```html
-<div data-ln-ajax>
-    <a href="/users">Users</a>
-    <a href="/settings">Settings</a>
+Steps performed on each request, in order:
 
-    <form method="POST" action="/users">
-        <input name="name">
-        <button type="submit">Save</button>
-    </form>
+1. **Event intercept** — click listener on `<a>` or submit listener on `<form>` fires. Modifier-key clicks (Ctrl, Cmd, middle) and `#`-href links are passed through unchanged.
+2. **External-hostname skip** — if the link's hostname differs from `window.location.hostname`, the request is aborted and the browser follows the link normally (no opt-out required).
+3. **`ln-ajax:before-start` dispatch** — cancelable event on the trigger element. If `preventDefault()` is called, the request stops here; no spinner, no fetch.
+4. **Spinner mount** — `.ln-ajax--loading` added to trigger; `<span class="ln-ajax-spinner">` appended as a child of the trigger. Form buttons are disabled.
+5. **`ln-ajax:start` dispatch** — non-cancelable; signals that fetch is about to begin.
+6. **`fetch()` call** — request built from element attributes (`href` / `action`, `method`, `FormData`). Headers always include `X-Requested-With`, `Accept: application/json`, and `X-CSRF-TOKEN` from the page meta tag.
+7. **Response handling**:
+   - HTTP error (`!response.ok`): parse body as JSON, dispatch `ln-ajax:error` with `{ method, url, status, data }` shape, auto-dispatch `ln-toast:enqueue` if `data.message` present.
+   - Fetch rejection (network error, JSON parse failure): dispatch `ln-ajax:error` with `{ method, url, error }` shape.
+   - Success: parse body as JSON, update `document.title`, swap `target.innerHTML` for each `data.content[id]`, auto-dispatch `ln-toast:enqueue` if `data.message` present, push to `history.pushState` for `<a>` and GET `<form>`.
+8. **`ln-ajax:success` / `ln-ajax:error` dispatch** — on the trigger element, bubbles.
+9. **Cleanup** — `.ln-ajax--loading` removed, `.ln-ajax-spinner` element removed, buttons re-enabled.
+10. **`ln-ajax:complete` dispatch** — always fires after success or error.
 
-    <!-- Exclude from AJAX -->
-    <a href="/download.pdf" data-ln-ajax="false">Download</a>
-</div>
+## MutationObserver flow
+
+A single `MutationObserver` is registered on `document.body` at init. It handles three distinct cases:
+
+### Branch 1 — new `data-ln-ajax` root injected
+
+When a node with `data-ln-ajax` appears in the DOM (e.g. server-rendered HTML swapped into a region), the observer runs `new lnAjax(node)` to attach listeners. This covers AJAX-injected frames, `innerHTML` swaps, and dynamic attribute additions on an existing element.
+
+### Branch 2 — elements injected inside an existing AJAX root
+
+When child nodes are injected inside a node that already has a live `lnAjax` instance (i.e. `data-ln-ajax` already present on an ancestor), the observer re-runs `findElements` on the injected subtree and attaches listeners to any `<a>` or `<form>` found there. This is the re-attachment behavior added in commits `91e8118` / `e32656a` — injected links and forms become AJAX participants without a full re-init of the root.
+
+### Branch 3 — `data-ln-ajax` attribute added to existing element
+
+When `data-ln-ajax` is set programmatically on an element that was already in the DOM (without being inside an existing AJAX root), the `attributes` branch of the observer fires and runs `new lnAjax(node)`. This makes programmatic opt-in work seamlessly.
+
+## DOM mutations performed
+
+| Phase | Mutation |
+|-------|----------|
+| Request start | `.ln-ajax--loading` class added to trigger element |
+| Request start | `<span class="ln-ajax-spinner">` appended as last child of trigger |
+| Request start | `disabled` set on all `<button>` descendants of a `<form>` trigger |
+| Success | `target.innerHTML` replaced for each `id` key in `data.content` |
+| Success | `document.title` updated to `data.title` (if present) |
+| Success / `<a>` or GET `<form>` | `history.pushState` called with final URL |
+| Completion | `.ln-ajax--loading` class removed from trigger |
+| Completion | `<span class="ln-ajax-spinner">` removed from trigger |
+| Completion | `disabled` cleared on form buttons |
+
+## `findElements` local divergence
+
+The source uses a local `findElements` function rather than the `ln-core` helper of the same name. The divergence is intentional: `findElements` in ln-core returns a flat list of elements for iteration, while ln-ajax needs a `{ links, forms }` partition so it can attach different listeners to each group (`click` on links, `submit` on forms) in a single pass. A comment in source explains the reasoning. The two implementations should not be merged without updating all call sites.
+
+## Trust boundary
+
+Source contains an explicit trust-boundary comment: server responses are assumed to come from the same origin and are inserted as raw `innerHTML` without sanitization. This is intentional for same-origin AJAX. Consumers who extend ln-ajax to handle third-party or user-generated content MUST sanitize `data.content` values before they reach `innerHTML`. The comment flags this as a known design constraint, not an oversight.
+
+## Error detail shape divergence
+
+`ln-ajax:error` is dispatched with two distinct `detail` shapes depending on the failure mode:
+
+**HTTP-status error** — response received but `!response.ok`:
 ```
-
-## Attributes
-
-| Attribute | Description |
-|-----------|-------------|
-| `data-ln-ajax` | Container — all links and forms inside are AJAX |
-| `data-ln-ajax="false"` | Exclude specific element |
-
-## Expected JSON Response
-
-```json
-{
-    "title": "Page Title",
-    "content": {
-        "main": "<p>HTML content</p>",
-        "sidebar": "<nav>...</nav>"
-    },
-    "message": {
-        "type": "success",
-        "title": "Saved",
-        "body": "Record updated"
-    }
-}
+{ method, url, status, data }
 ```
+`status` is the HTTP status code; `data` is the parsed JSON body (may contain `message`).
 
-- `title` -- Updates `document.title`
-- `content` -- Keys map to element IDs, values replace `innerHTML`
-- `message` -- Dispatched as `ln-toast:enqueue` event on `window`
+**Fetch rejection** — network failure, DNS failure, JSON parse error, or other thrown exception:
+```
+{ method, url, error }
+```
+`error` is the caught `Error` object; no `status` or `data` fields.
 
-## Behavior
+A consumer writing a single `ln-ajax:error` listener must guard with `'status' in e.detail` before reading `status`, and `'error' in e.detail` before reading `error`.
 
-- CSRF token from `<meta name="csrf-token">`
-- `X-Requested-With: XMLHttpRequest` header
-- GET forms append data as query params
-- Links and GET forms push to `history.pushState`
-- Ctrl/Cmd+click and middle-click open normally (not intercepted)
-- `.ln-ajax--loading` class added during request
-- Buttons disabled during form submission
-- If the response contains a `message` object, `ln-ajax` dispatches `ln-toast:enqueue` on `window`. The `ln-toast` component listens for this event by default; any other listener can intercept.
+**Known divergence — flagged for follow-up.** The two shapes are a source-level contract inconsistency introduced by separate error-path implementations. This file documents the current behavior accurately. A follow-up task should unify the error detail shape (e.g. always include `status` and `error`, with `null` for whichever does not apply) to make single-listener code reliable.
