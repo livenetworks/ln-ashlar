@@ -1,21 +1,18 @@
 # ln-popover
 
-Click-triggered rich-content panel component. Instance-based: each `[data-ln-popover]` gets its own instance. Supports smart viewport-aware positioning, nested popovers, and full keyboard/ARIA wiring.
+> `data-ln-popover` on the popover element is the single source of truth for open/closed state. The JS API (`open()`, `close()`, `toggle()`) is a thin convenience layer over `setAttribute`.
+
+For internal mechanics — focus-restore behavior, observer flow, openStack, viewport-aware positioning — see [`docs/js/popover.md`](../../docs/js/popover.md).
 
 ## Single Source of Truth
 
-The `data-ln-popover` attribute is the single source of truth for open/closed state:
-- `data-ln-popover="open"` — popover is open
-- `data-ln-popover="closed"` or `data-ln-popover` (no value) — popover is closed
-
-All state changes flow through the attribute. The JS API methods (`open()`, `close()`, `toggle()`) simply set the attribute — the MutationObserver detects the change and applies the actual state (visibility, positioning, aria, focus, events). External code can set the attribute directly with the same result.
+`"open"` = open. `"closed"` (or any non-`"open"` value, or no value) = closed. If a `before-open` / `before-close` listener calls `preventDefault()`, the observer reverts the attribute to its previous value.
 
 ## Attributes
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
-| `data-ln-popover` | popover element | Creates instance, starts closed |
-| `data-ln-popover="open"` | popover element | Starts open |
+| `data-ln-popover` | popover element | Creates instance and drives state. `"open"` = open; `"closed"` (or no value) = closed. |
 | `data-ln-popover-for="popoverId"` | trigger button/link | Click toggles the popover with that ID |
 | `data-ln-popover-position` | popover element | Preferred placement side: `top`, `bottom` (default), `left`, `right` |
 | `data-ln-popover-placement` | popover element | Set by JS — actual winning side after auto-flip |
@@ -26,15 +23,14 @@ Popovers are auto-initialized by MutationObserver. Each `[data-ln-popover]` elem
 
 ```javascript
 const popover = document.getElementById('my-popover');
-popover.lnPopover.open(triggerEl);  // sets data-ln-popover="open" → observer applies state
-popover.lnPopover.close();          // sets data-ln-popover="closed" → observer applies state
-popover.lnPopover.toggle(triggerEl);// toggles based on current state
-popover.lnPopover.destroy();        // removes all listeners, cleans up instance
 
-// Direct attribute change — identical result
-popover.setAttribute('data-ln-popover', 'open');
-popover.setAttribute('data-ln-popover', 'closed');
+popover.setAttribute('data-ln-popover', 'open');    // open the popover
+popover.setAttribute('data-ln-popover', 'closed');  // close it
+popover.lnPopover.isOpen;                           // boolean — read-only
+popover.lnPopover.destroy();                        // detach listeners, dispatch :destroyed
 ```
+
+`open(trigger)`, `close()`, and `toggle(trigger)` exist as thin shortcuts that call `setAttribute` under the hood. They are equivalent to the attribute writes above. Pass the `trigger` element to `open()` / `toggle()` so positioning, `aria-expanded` sync, and the `trigger` field on emitted events are populated; otherwise `trigger` is `null`.
 
 ## Events
 
@@ -68,14 +64,13 @@ document.getElementById('user-menu').addEventListener('ln-popover:close', functi
 
 ## Behavior
 
-- Click outside the popover and its trigger closes it. Focus is NOT yanked back to the trigger — the user's new focus target is respected.
-- Escape closes the most recently opened popover only (LIFO stack). Each subsequent Escape closes the next one.
-- On open: focus moves to the first focusable element inside the popover. If there are no focusable children, the popover container itself receives focus (it has `tabindex="-1"` set automatically).
-- Tab key is NOT trapped. Tab moves to the next focusable element in document order; the popover stays open.
-- Nested popovers stay open: if popover A is open and a trigger inside A opens popover B, A stays open. The click that opened B originated inside A's DOM subtree, so it is not an "outside click" relative to A.
-- Position auto-flip: the preferred side is tried first. If it doesn't fit in the viewport, the opposite side is tried, then the perpendicular pair. The element is always clamped to stay inside the viewport.
-- Popover teleports to `<body>` on open so `position: fixed` coordinates are reliable (avoids stacking context issues from ancestor `transform`/`contain`). It is restored to its original DOM position on close.
-- `aria-expanded` on the trigger is synced with open/closed state. `aria-haspopup="dialog"` and `aria-controls` are set once on trigger attach.
+- Click outside the popover and its trigger closes it.
+- Escape closes the most recently opened popover (LIFO). Each subsequent Escape closes the next one.
+- On open, focus moves to the first focusable element inside the popover, or to the popover container if none (it has `tabindex="-1"` and `role="dialog"` auto-set).
+- Tab is not trapped — it moves through the page in document order; the popover stays open.
+- Nested popovers stay open: opening B from inside A leaves A open.
+- If the preferred side does not fit in the viewport, the popover flips to the opposite side and is clamped to the viewport.
+- `aria-expanded` on the trigger is synced; `aria-haspopup="dialog"` and `aria-controls` are set on attach.
 
 ## HTML Structure
 
@@ -85,7 +80,7 @@ document.getElementById('user-menu').addEventListener('ln-popover:close', functi
 <!-- Trigger button -->
 <button data-ln-popover-for="user-menu">Account</button>
 
-<!-- Popover -->
+<!-- Popover — role="dialog" and tabindex="-1" are set automatically -->
 <div data-ln-popover id="user-menu">
     <p>user@example.com</p>
     <nav>
