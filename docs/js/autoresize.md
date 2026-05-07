@@ -4,7 +4,7 @@
 > lives in [`js/ln-autoresize/README.md`](../../js/ln-autoresize/README.md);
 > this document is the why-behind-the-how, not a re-statement of usage.
 
-File: `js/ln-autoresize/ln-autoresize.js` (47 lines).
+File: `js/ln-autoresize/ln-autoresize.js`.
 
 ## Position in the architecture
 
@@ -16,11 +16,10 @@ is not a Data, Submit, Render, or Validate participant. It listens
 to a single platform event (`input`) on its own element and writes a
 single inline style (`style.height`). Nothing else.
 
-The reason it exists as a component rather than a copy-paste snippet
-is centralization: every project would otherwise reinvent the
-two-step `auto → scrollHeight` dance, and most reinventions ship with
-at least one of the bugs the canonical version avoids (flicker,
-no-shrink, no initial measure, observer leak).
+The component exists as a centralisation: every project would otherwise
+reinvent the two-step `auto → scrollHeight` dance, and most reinventions
+ship with at least one of the bugs the canonical version avoids
+(flicker, no-shrink, no initial measure).
 
 ## State
 
@@ -66,24 +65,6 @@ The reflow between steps 1 and 3 is synchronous inside the same JS
 tick, so the browser never paints the intermediate `auto` state. The
 user sees one transition: old height → new height. There is no
 flicker, no `requestAnimationFrame`, no scheduled re-measure.
-
-## Why no `requestAnimationFrame`?
-
-A common variant of this pattern wraps the two-step in `rAF`
-ostensibly to "wait for layout" before reading `scrollHeight`. That
-is unnecessary here:
-
-- Layout reads (`scrollHeight`) inside a synchronous handler trigger
-  the browser to flush any pending style/layout work *before*
-  returning the value (this is "forced layout" or "layout thrashing"
-  — usually a performance concern but here exactly what we want).
-- The `input` event already fires after the value mutation has been
-  applied; layout is already invalidated by the time our handler
-  runs.
-
-`rAF` would only delay the resize to the next frame, producing a
-visible one-frame lag between the keystroke and the height change.
-The synchronous version is faster and visually tighter.
 
 ## Initial resize
 
@@ -133,19 +114,15 @@ calls (`if (!el[attribute])`).
 The constructor checks `dom.tagName !== 'TEXTAREA'` immediately and,
 if true, logs a warning and returns `this` early.
 
-The early-`return this` produces an instance with only the prototype
-methods — no `dom` property is set, no listener is attached. Side
-effect: the helper still assigns this neutered instance to
-`element[DOM_ATTRIBUTE]`, so the element is now marked as initialized
-even though the instance is non-functional. If the element is later
-swapped to a real `<textarea>`, the marker prevents re-initialization.
-This is a minor edge case — applying the attribute to non-textareas
-is a developer error caught by the warning, and the post-warning
-state is benign (no listeners, no leaks, just a stale instance).
+The early-`return this` produces an instance with no `dom` property
+and no listener. The element is still marked as initialized via
+`element[DOM_ATTRIBUTE]`, so re-attaching `data-ln-autoresize` after
+swapping to a real `<textarea>` will not re-init — the developer must
+remove and re-add the attribute (or call `destroy()`) to recover.
 
 ## Destroy lifecycle
 
-Three steps (see `js/ln-autoresize/ln-autoresize.js` lines 37–42):
+Three steps (see the `destroy` prototype in `ln-autoresize.js`):
 
 1. **Idempotency guard.** If the instance is already destroyed (or
    was never properly initialized — see "Tag validation"), exit
@@ -199,8 +176,9 @@ indirectly through that `input` listener:
   synthetic `input` dispatch. Native reset is intentionally minimal
   on this path because the user explicitly triggered the platform
   behavior. Projects that need auto-shrink on bare native reset
-  must wire it manually (see README "Common mistakes" item 4) or
-  switch to the `lnForm.reset()` API path.
+  must wire it manually (see the README's §Common mistakes section for
+  the `setTimeout`-after-native-`reset` fallback) or switch to the
+  `lnForm.reset()` API path.
 
 No other library component talks to the textarea's height path.
 
@@ -219,20 +197,3 @@ target element), so the per-frame cost stays at one resize regardless
 of total field count. There is no `ResizeObserver` watching layout
 changes, so external layout shifts (window resize, font load) do
 NOT trigger a resize cascade.
-
-## Source map
-
-| Lines | Concern |
-|---|---|
-| 1 | `registerComponent` import |
-| 3-7 | IIFE wrapper + double-load guard via `window[DOM_ATTRIBUTE]` |
-| 11-15 | Tag validation |
-| 17-29 | Constructor: assign `dom`, bind `_onInput`, attach listener, run initial `_resize` |
-| 32-35 | `_resize` prototype method (the two-step) |
-| 37-42 | `destroy` prototype method |
-| 46 | `registerComponent` registration — selector, attribute, constructor, tag |
-
-47 lines total. There is no further code path; everything not in this
-file (instance attachment, MutationObserver, `findElements` scan) is
-in `js/ln-core/helpers.js` under `registerComponent` and is shared
-by every `ln-*` instance-based component.
