@@ -1,8 +1,8 @@
 # Core
 
-Shared helper module imported by all components. File: `js/ln-core/`.
-
-No DOM attribute, no constructor, no MutationObserver. Pure utility functions re-exported from `js/ln-core/index.js`.
+Shared helper module imported by all components — re-exported from
+`js/ln-core/index.js`. No DOM attribute, no constructor, no
+MutationObserver. Source: `js/ln-core/`.
 
 ## Helpers
 
@@ -96,7 +96,7 @@ fillTemplate(frag, { text: 'Engineering' });
 - Walks text nodes via `TreeWalker(clone, NodeFilter.SHOW_TEXT)`
 - Replaces `{{ key }}` with `data[key]` (whitespace inside braces is flexible)
 - Missing keys produce empty string
-- No-op when no `{{` found in any text node — zero cost for templates without placeholders
+- No-op when no `{{` found in any text node
 - Returns `clone` for chaining
 - Coexists with `fill()` — `{{ key }}` for inline text, `data-ln-field` for element content. Both patterns are valid and can be mixed in the same template
 - Called automatically by `renderList` after cloning — templates can use `{{ key }}` text nodes alongside `data-ln-field` elements without extra code
@@ -120,6 +120,7 @@ renderList(
 - `fillFn(el, item, index)` updates the DOM element with item data
 - Reuses existing elements with matching `data-ln-key` (avoids re-clone)
 - Replaces all container children atomically (`textContent = '' + appendChild(frag)`)
+- Calls `fillTemplate(clone, item)` automatically for newly-cloned elements — `{{ key }}` placeholders in the template resolve from the item data without extra wiring.
 
 ### guardBody(setupFn, componentTag)
 
@@ -180,6 +181,98 @@ dict['error']   // 'Error'
 - Missing keys return `undefined` — caller provides fallback: `dict['key'] || 'default text'`
 - Convention: `data-{component}-dict="key"` on `<li>` elements inside a single `<ul hidden>`
 - Server (Blade, Twig, etc.) translates the text — JS never contains display strings
+
+### isVisible(el)
+
+Boolean — true if the element has non-zero layout box (any of
+`offsetWidth`, `offsetHeight`, or `getClientRects().length`).
+
+```js
+if (!isVisible(panel)) return;
+```
+
+- Cheap layout-time check — does NOT compute styles.
+- Returns `false` for elements with `display: none`, detached nodes,
+  and zero-sized elements.
+
+### serializeForm(form)
+
+Walk `form.elements`, return a plain object keyed by element `name`.
+
+```js
+const data = serializeForm(this.dom);
+// { username: 'alice', roles: ['admin', 'editor'], country: 'mk' }
+```
+
+- Skips disabled fields, file inputs, submit / button inputs, and
+  unnamed elements.
+- Checkboxes collect as `string[]` under the shared `name`.
+- Radios collect as a single `string` (winning value).
+- `<select multiple>` collects as `string[]`.
+- Everything else collects as the raw `el.value`.
+
+### populateForm(form, data)
+
+Inverse of `serializeForm`. Walks `form.elements`, assigns from `data`
+keyed by `name`. Returns the array of populated elements (caller can
+re-validate them).
+
+```js
+const populated = populateForm(this.dom, { username: 'alice', roles: ['admin'] });
+populated.forEach(function (el) { dispatch(el, 'input'); });
+```
+
+- Skips elements not present as keys in `data`, file inputs, submit /
+  button inputs.
+- Checkbox + array value → `checked` if value is in the array.
+- Checkbox + scalar value → `checked = !!value`.
+- Radio → `checked` if value matches.
+- `<select multiple>` + array → marks matching options selected.
+
+### getLocale(el)
+
+Resolve the active locale for an element. Walks ancestors for `[lang]`,
+falls back to `navigator.language`.
+
+```js
+const locale = getLocale(this.dom); // 'mk', 'en-US', ...
+```
+
+- Used by date / number / collator-driven components.
+- Walks via `el.closest('[lang]')` — first ancestor with a `lang`
+  attribute wins.
+
+### registerComponent(selector, attribute, ComponentFn, componentTag, options)
+
+End-to-end component registration. Replaces the hand-rolled IIFE
+boilerplate of `findElements` + `MutationObserver` + `guardBody` +
+DOMContentLoaded + `window[attribute] =` registration with one call.
+
+```js
+import { registerComponent } from '../ln-core';
+
+function _component(dom) { this.dom = dom; /* ... */ }
+
+registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
+    extraAttributes: ['data-ln-example-state'],
+    onAttributeChange: function (target, name) { /* attribute → state bridge */ },
+    onInit: function (root) { /* post-init hook, per added subtree */ }
+});
+```
+
+- `selector` — attribute name (`'data-ln-foo'`) OR a full CSS selector
+  if it contains `[`, `.`, or `#` (e.g. `'[data-ln-foo]:not([disabled])'`).
+- `attribute` — JS-side key used both as `window[attribute]` (the
+  constructor function) and `el[attribute]` (the per-element instance).
+- `options.extraAttributes` — additional attribute names to include in
+  the MutationObserver's `attributeFilter` (e.g. state attributes set
+  by coordinator).
+- `options.onAttributeChange(target, attrName)` — called when a
+  filtered attribute changes on an already-initialized element. The
+  attribute → state bridge hook.
+- `options.onInit(root)` — called after `findElements` per subtree
+  (initial DOM, added childList nodes, attribute-mutated subtrees).
+- Returns the constructor function (also stored at `window[attribute]`).
 
 ---
 
@@ -266,6 +359,76 @@ to use this pattern at all, anti-patterns), see
 
 ---
 
+## positioning.js
+
+### computePlacement(anchorRect, floatingSize, preferred, offset)
+
+Compute viewport coordinates for a floating element (popover, tooltip,
+dropdown) relative to an anchor rectangle.
+
+```js
+import { computePlacement } from '../ln-core';
+
+const rect = trigger.getBoundingClientRect();
+const size = measureHidden(panel);
+const { top, left, placement } = computePlacement(rect, size, 'bottom-end', 8);
+panel.style.top  = top  + 'px';
+panel.style.left = left + 'px';
+panel.setAttribute('data-ln-placement', placement);
+```
+
+- `anchorRect` — `DOMRect` or any rect-shaped object.
+- `floatingSize` — `{ width, height }`. Use `measureHidden` when the
+  panel is currently hidden.
+- `preferred` — `'top' | 'bottom' | 'left' | 'right'` with optional
+  `-start` / `-end` alignment (floating-ui-style). Default `'bottom'`.
+- `offset` — gap in pixels between anchor and floating element.
+  Default `4`.
+- Returns `{ top, left, placement }`. `placement` is the side that
+  won (alignment suffix is preserved internally but not reported in
+  the return value).
+- Fallback chain: tries preferred side → opposite side → perpendicular
+  pair → clamps to viewport edge if nothing fits.
+- Pure function. No DOM side effects.
+
+### teleportToBody(el)
+
+Move an element into `<body>`, leaving a comment placeholder so it can
+be restored to its original parent.
+
+```js
+const restore = teleportToBody(panel);
+// ... later
+restore();
+```
+
+- Returns a cleanup function that restores the element to its origin.
+- No-op + no-op cleanup if the element is already in `<body>` or
+  parent is missing.
+- Used for floating UI that needs to escape `overflow: hidden`
+  ancestors (popovers, dropdowns).
+- Does NOT set inline styles — the caller's CSS rule (e.g.
+  `[data-ln-popover] { position: fixed }`) is responsible for
+  positioning context.
+
+### measureHidden(el)
+
+Read `offsetWidth` / `offsetHeight` of an element that may currently
+be hidden via `display: none`.
+
+```js
+const { width, height } = measureHidden(panel);
+```
+
+- Temporarily applies `visibility: hidden; display: block; position:
+  fixed` to force layout, reads dimensions, then restores the inline
+  style values.
+- Returns `{ width: 0, height: 0 }` for a falsy element.
+- Brief inline-style mutation is restored before the function returns
+  — the visible DOM never reflects the temporary state.
+
+---
+
 ## persist.js
 
 ### persistGet(component, el)
@@ -343,15 +506,9 @@ ln:filter:/admin/users:status-filter
 
 Persistence is always opt-in. Elements without `data-ln-persist` are never touched.
 
-### Supported components
-
-| Component | `data-ln-persist` on | What's persisted | Stored value |
-|-----------|---------------------|-----------------|--------------|
-| ln-toggle | `[data-ln-toggle]` element | open/close state | `"open"` or `"close"` |
-| ln-accordion | each `[data-ln-toggle]` inside | per-panel open/close | `"open"` or `"close"` |
-| ln-tabs | `[data-ln-tabs]` wrapper (non-hash only) | active tab key | `"tab-key"` string |
-| ln-table-sort | `[data-ln-table]` wrapper | sort column + direction | `{ col: number, dir: string }` |
-| ln-filter | `[data-ln-filter]` element | selected filter values | `{ key: string, values: string[] }` |
+Components that support `data-ln-persist` document the stored value
+shape in their own READMEs (ln-toggle, ln-accordion, ln-tabs,
+ln-table-sort, ln-filter).
 
 ### Graceful degradation
 
