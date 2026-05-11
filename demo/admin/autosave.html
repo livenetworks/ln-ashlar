@@ -374,7 +374,6 @@ window.lnAutosave(container);</code></pre>
 									<tr><td><code>ln-form</code></td><td>None at the JS level. Both share <code>serializeForm</code> / <code>populateForm</code> from <code>ln-core/helpers.js</code>. The form's <code>submit</code> event is the natural connector.</td></tr>
 									<tr><td><code>ln-validate</code></td><td>None directly. After <code>:restored</code>, the synthetic <code>input</code> / <code>change</code> events bubble up; ln-validate's input listener catches them and validates.</td></tr>
 									<tr><td><code>ln-autoresize</code></td><td>None directly. Restored textareas grow to fit because the synthetic <code>input</code> reaches the autoresize listener.</td></tr>
-									<tr><td><code>ln-select</code> (TomSelect)</td><td>None directly. Integration works via the dispatched <code>change</code> event on the underlying <code>&lt;select&gt;</code> — TomSelect listens internally and re-syncs its UI.</td></tr>
 									<tr><td><code>ln-store</code></td><td><strong>None.</strong> Different layer entirely. ln-store uses IndexedDB for record cache; ln-autosave uses localStorage for form drafts.</td></tr>
 									<tr><td><code>ln-modal</code></td><td>None directly. A <code>&lt;form data-ln-autosave&gt;</code> inside a modal works without wiring. Cancel button combines <code>data-ln-modal-close</code> + <code>data-ln-autosave-clear</code>.</td></tr>
 								</tbody>

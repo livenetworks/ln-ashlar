@@ -109,13 +109,8 @@ The closure-scoped `_restore()` helper:
 7. for each restored field:
      a. dispatchEvent(new Event('input', { bubbles: true }))
      b. dispatchEvent(new Event('change', { bubbles: true }))
-        // ln-select integration is via this dispatched 'change' event;
-        // TomSelect listens on the underlying <select> and re-syncs its UI.
 8. dispatch('ln-autosave:restored', { target, data })
 ```
-
-The dead `lnSelect.setValue` branch from the previous version is removed.
-TomSelect integration continues to work via the dispatched `change` event.
 
 Both `input` and `change` are dispatched on every field so every listener
 fires regardless of field type — `input` for text/textarea, `change` for
