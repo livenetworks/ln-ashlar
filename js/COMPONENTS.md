@@ -985,7 +985,6 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-ajax | Functional | `data-ln-ajax` | AJAX navigation |
 | ln-progress | Functional | `data-ln-progress` | Progress bar |
 | ln-circular-progress | Instance | `data-ln-circular-progress` | Circular (ring) progress indicator |
-| ln-select | Wrapper | `data-ln-select` | TomSelect wrapper |
 | ln-search | Instance | `data-ln-search` | Generic search (textContent filter) |
 | ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
 | ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll) |
@@ -1047,10 +1046,8 @@ specific attribute is not.
 ln-form  (catches submit, reads ln-validate events)
   ├── ln-validate   dispatches ln-validate:valid / ln-validate:invalid,
   │                 which ln-form listens for
-  ├── ln-autosave   stores form state in localStorage; writes on blur/change
-  │                 independently of ln-form
-  └── ln-select     TomSelect wrapper; ln-form triggers input events so
-                    ln-validate picks up TomSelect changes
+  └── ln-autosave   stores form state in localStorage; writes on blur/change
+                    independently of ln-form
 ```
 
 ln-form never calls `lnValidate.isValid()` or reads TomSelect state

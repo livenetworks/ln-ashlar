@@ -8,7 +8,6 @@ import './ln-modal/ln-modal.js';
 import './ln-number/ln-number.js';
 import './ln-date/ln-date.js';
 import './ln-nav/ln-nav.js';
-import './ln-select/ln-select.js';
 import './ln-tabs/ln-tabs.js';
 import './ln-toggle/ln-toggle.js';
 import './ln-accordion/ln-accordion.js';

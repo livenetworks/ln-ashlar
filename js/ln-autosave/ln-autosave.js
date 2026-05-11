@@ -43,7 +43,6 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 			const restored = populateForm(form, data);
 			for (let k = 0; k < restored.length; k++) {
 				restored[k].dispatchEvent(new Event('input', { bubbles: true }));
-				// ln-select integration is via the dispatched 'change' event below.
 				restored[k].dispatchEvent(new Event('change', { bubbles: true }));
 			}
 			dispatch(form, 'ln-autosave:restored', { target: form, data: data });

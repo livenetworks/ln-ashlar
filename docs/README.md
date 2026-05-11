@@ -94,7 +94,6 @@ Two files per component:
 | Form | `data-ln-form` | [js/ln-form/README.md](../js/ln-form/README.md) | [form.md](js/form.md) |
 | Validate | `data-ln-validate` | [js/ln-validate/README.md](../js/ln-validate/README.md) | [validate.md](js/validate.md) |
 | Time | `data-ln-time` | [js/ln-time/README.md](../js/ln-time/README.md) | [time.md](js/time.md) |
-| Select | `data-ln-select` | [js/ln-select/README.md](../js/ln-select/README.md) | [select.md](js/select.md) |
 | Autosave | `data-ln-autosave` | [js/ln-autosave/README.md](../js/ln-autosave/README.md) | [autosave.md](js/autosave.md) |
 | Autoresize | `data-ln-autoresize` | [js/ln-autoresize/README.md](../js/ln-autoresize/README.md) | [autoresize.md](js/autoresize.md) |
 | Translations | `data-ln-translations` | [js/ln-translations/README.md](../js/ln-translations/README.md) | [translations.md](js/translations.md) |
