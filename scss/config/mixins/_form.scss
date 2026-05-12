@@ -335,6 +335,12 @@
 @mixin pill {
 	@include pill-outline;
 	--color-bg: var(--bg-sunken);
+	// Derive hover from --color-accent at this scope (label element).
+	// Lets .error/.success/.warning/.info parents cascade to the checked-
+	// state hover via the .success { --color-primary } chain. See
+	// _btn.scss for the syntax rationale (number form, not percentage).
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
+
 	background-color: var(--color-bg);
 	border-color: transparent;
 

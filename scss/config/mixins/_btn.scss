@@ -116,7 +116,29 @@
 	// surfaces (which there are none here, but the redundancy is
 	// noise either way).
 	--color-accent:       hsl(var(--color-primary));
-	--color-accent-hover: hsl(var(--color-primary-hover));
+
+	// Hover state derived from --color-accent at THIS scope via CSS
+	// relative color syntax — same hue + saturation, lightness reduced
+	// by 8. Computing here (consumer scope) instead of reading a
+	// separate :root token means a consumer override (e.g.
+	// `style="--color-primary: var(--color-error)"` or a .error
+	// ancestor via @mixin semantic-color) cascades to BOTH the idle
+	// and hover surfaces — the whole state machine follows from a
+	// single token change.
+	//
+	// IMPORTANT — `calc(l - 8)` not `calc(l - 8%)`. Inside
+	// relative color syntax, channel keywords (h/s/l) evaluate to
+	// <number> tokens, not <percentage>. `l - 8%` mixes types →
+	// invalid color → browser falls back to `transparent` and the
+	// hover bg vanishes. The number form is what the spec mandates;
+	// hsl(216 95 34) without `%` is valid CSS Color 4 and reads as
+	// "lightness 34%" exactly like the legacy hsl(216 95% 34%) form.
+	//
+	// Pattern shared with @mixin pill, @mixin data-table-row-focused,
+	// the anchor hover in _global.scss, and @mixin semantic-color's
+	// status-family cascade. -light / -lighter remain explicit tokens
+	// (theme-controlled, not derivable from base).
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
 
 	// --btn-bg / --btn-fg read translucent companions via fallback.
 	// Default theme: companions unset → falls back to --color-accent
