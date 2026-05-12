@@ -41,40 +41,38 @@ the prose after the snippet for the *why*.
 		</aside>
 	</header>
 
-	<div class="table-container">
-		<table>
-			<thead>
-				<tr>
-					<th data-ln-col-select></th>
-					<th data-ln-col="title">
-						Title
-						<button data-ln-col-sort aria-label="Sort">
-							<svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
-							<svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
-							<svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
-						</button>
-					</th>
-					<th data-ln-col="department">
-						Department
-						<button data-ln-col-filter aria-label="Filter">
-							<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
-						</button>
-					</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody data-ln-data-table-body></tbody>
-			<tfoot>
-				<tr>
-					<td colspan="99">
-						<span data-ln-data-table-total></span> items
-						<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
-						<span data-ln-data-table-selected-wrap> · <span data-ln-data-table-selected></span> selected</span>
-					</td>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
+	<table>
+		<thead>
+			<tr>
+				<th data-ln-col-select></th>
+				<th data-ln-col="title">
+					Title
+					<button data-ln-col-sort aria-label="Sort">
+						<svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
+						<svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
+						<svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
+					</button>
+				</th>
+				<th data-ln-col="department">
+					Department
+					<button data-ln-col-filter aria-label="Filter">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+					</button>
+				</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody data-ln-data-table-body></tbody>
+		<tfoot>
+			<tr>
+				<td colspan="99">
+					<span data-ln-data-table-total></span> items
+					<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
+					<span data-ln-data-table-selected-wrap> · <span data-ln-data-table-selected></span> selected</span>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
 
 	<template data-ln-template="documents-row">
 		<tr data-ln-row>
@@ -133,13 +131,36 @@ carrying `data-ln-data-table-search`. Every keystroke updates
 is trivial; if it goes to a server, the coordinator is the right layer
 to debounce.
 
-### The table — `<table>`, not a wrapping `<div>`
+### The table — `<table>` directly inside the component root
 
-`<table>` is the root the component operates on. The `<table>` belongs
-inside an outer `<div class="table-container">` so horizontal overflow
-on narrow screens scrolls the table without breaking the page chrome.
-The component does not require the container — it requires the
-`<table>`.
+`<table>` is the root the component operates on. Place it as a direct
+child of `[data-ln-data-table]` — do not wrap it in a scroll-trapping
+`<div>` (an element with `overflow-y: auto`/`scroll`, or any wrapper
+that establishes a vertical scroll context).
+
+Two things depend on that:
+
+- **Sticky `<thead>` pins to the consumer's scroll surface.** The
+  mixin sets `position: sticky` on `<thead>`, which binds to the
+  nearest scrolling ancestor. In `ln-ashlar`'s app shell that's
+  `.app-main > section`. A scroll-trapping wrapper between the table
+  and that section would capture sticky binding and prevent the
+  header from pinning visibly.
+- **Virtual scroll auto-detects the scroll ancestor.** The component
+  walks up from its root and listens on the nearest element with
+  `overflow-y: auto`/`scroll`, falling back to `window` if none
+  exists. Avoid inserting a scroll-trapping wrapper in between, or
+  virtual scroll will read scroll position from the wrapper (which
+  may never actually scroll if its height isn't constrained) instead
+  of from the surface the user actually scrolls.
+
+If the table has columns wider than the consumer's surface,
+horizontal overflow is the consumer's call to make on a parent that
+is NOT a vertical scroll context (e.g. `overflow-x: auto;
+overflow-y: visible` resolves to `auto`/`auto` per CSS spec — that
+won't work). The simplest answer is letting `.app-main > section`
+scroll on both axes when needed; the component does not impose
+horizontal-overflow chrome of its own.
 
 ### Column headers — `<th data-ln-col="field">`
 

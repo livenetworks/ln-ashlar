@@ -52,6 +52,16 @@ th:hover [data-ln-col-filter] {
 	@include data-table-filter-dropdown;
 }
 
+// ─── Row action buttons ─────────────────────────────────
+
+[data-ln-row-action] {
+	@include data-table-row-action;
+}
+
+[data-ln-row-action="delete"] {
+	@include data-table-row-action-delete;
+}
+
 // ─── Row interaction states ─────────────────────────────
 
 [data-ln-row] {

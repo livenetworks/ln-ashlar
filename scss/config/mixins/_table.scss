@@ -13,7 +13,13 @@
 	@include w-full;
 	background: var(--color-bg);
 	border-radius: var(--radius-lg);
-	@include overflow-hidden;
+	// `overflow: clip` not `overflow: hidden` — clips at rounded corners
+	// without establishing a scroll container, so sticky descendants
+	// (e.g. `@mixin data-table` thead/tfoot) bind to the outer
+	// `.app-main > section` scroll surface instead of being trapped
+	// inside the <table> element. Same rationale as `@mixin section-card`
+	// and `@mixin ln-table`.
+	overflow: clip;
 	--shadow: var(--shadow-resting);
 	box-shadow: var(--shadow);
 	border-collapse: collapse;

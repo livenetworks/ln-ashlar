@@ -68,6 +68,12 @@
 	outline: none;
 	background: var(--btn-bg);
 	color: var(--btn-fg);
+	// Subtle resting shadow — gives buttons a "lifted from surface" feel
+	// out of the box. Reads the `--shadow` primitive (default
+	// `--shadow-resting` = `--shadow-sm` at :root), so scopes that
+	// shouldn't have it (e.g. icon buttons in `<header>` chrome) rebind
+	// `--shadow: none` locally instead of overriding `box-shadow:`.
+	box-shadow: var(--shadow);
 	@include transition-colors;
 
 	&:hover:not(:disabled) {

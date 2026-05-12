@@ -24,38 +24,25 @@
 		return max + 1;
 	}
 
-	function seed() {
-		const t0 = nowSec() - 60 * 60 * 24 * 30; // 30 days ago
-		const out = [];
-		const titles = [
-			'ISO 27001 Policy', 'Risk Assessment 2025', 'Access Control Matrix',
-			'Data Protection Notice', 'Business Continuity Plan', 'Incident Response Runbook',
-			'Vendor Security Review', 'Compliance Quarterly Report', 'Network Topology Doc',
-			'Onboarding User Guide', 'Security Awareness Training', 'Vendor MSA',
-			'Privacy Policy v3', 'Production SLA', 'Change Request Template',
-			'Release Notes — Q1', 'Backup Recovery Procedure', 'Penetration Test Report',
-			'Architecture Decision Record', 'API Authentication Spec',
-			'Logging Standard', 'GDPR DPIA', 'Software Bill of Materials',
-			'Disaster Recovery Test', 'Vendor Risk Scorecard'
-		];
-		for (let i = 0; i < titles.length; i++) {
-			const t = t0 + i * 60 * 60 * 6 + Math.floor(Math.random() * 3600);
-			out.push({
-				id: i + 1,
-				title: titles[i],
-				department: rand(departments),
-				status: rand(statuses),
-				created_at: t,
-				updated_at: t
-			});
+	// Seed pulled once from the shared 10k-record fixture. Cached as a
+	// promise so concurrent in-flight handle() calls all await the same
+	// fetch and only save once.
+	let seedPromise = null;
+	function loadSeed() {
+		if (!seedPromise) {
+			seedPromise = realFetch('./data/documents.json')
+				.then((res) => res.json())
+				.then((payload) => {
+					save(payload.data);
+					return payload.data;
+				});
 		}
-		save(out);
-		return out;
+		return seedPromise;
 	}
 
-	function getRecords() {
+	async function getRecords() {
 		let r = load();
-		if (r.length === 0) r = seed();
+		if (r.length === 0) r = await loadSeed();
 		return r;
 	}
 
@@ -79,7 +66,7 @@
 		const u = new URL(url, window.location.origin);
 		const method = (init && init.method) || (typeof input !== 'string' && input.method) || 'GET';
 		const path = u.pathname;
-		const records = getRecords();
+		const records = await getRecords();
 
 		// GET /api/documents (full or delta)
 		if (path === ENDPOINT && method === 'GET') {
@@ -97,11 +84,15 @@
 			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
 			const data = JSON.parse(init.body || '{}');
 			const t = nowSec();
-			const rec = Object.assign({}, data, {
-				id: nextId(records),
-				created_at: t,
-				updated_at: t
-			});
+			const rec = Object.assign(
+				{ file_size: 10 + Math.floor(Math.random() * 49990) },
+				data,
+				{
+					id: nextId(records),
+					created_at: t,
+					updated_at: t
+				}
+			);
 			records.push(rec);
 			save(records);
 			return jsonResponse(rec); // BARE record — store reads response.json() directly
@@ -174,8 +165,8 @@
 <div data-ln-store="documents"
      data-ln-store-endpoint="/api/documents"
      data-ln-store-stale="60"
-     data-ln-store-indexes="department,status,updated_at"
-     data-ln-store-search-fields="title,department"
+     data-ln-store-indexes="department,status,priority,updated_at"
+     data-ln-store-search-fields="title,department,owner"
      id="documents-store"></div>
 
 <!-- 2. Mock backend toggles -->
@@ -197,7 +188,10 @@
 		<div>
 			<h3>Documents</h3>
 			<span data-ln-data-table-selected-wrap class="hidden">
-				· <button id="bulk-delete-btn">Delete selected (<span data-ln-data-table-selected></span>)</button>
+				<button id="bulk-delete-btn" class="btn" style="--color-primary: var(--color-error)">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+				Delete selected (<span data-ln-data-table-selected></span>)
+			</button>
 			</span>
 		</div>
 		<aside>
@@ -205,21 +199,21 @@
 				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 				<input type="search" placeholder="Search…" data-ln-data-table-search>
 			</label>
-			<button id="create-document" data-ln-modal-for="document-modal">
+			<button id="create-document" class="btn" data-ln-modal-for="document-modal">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 				New
 			</button>
 		</aside>
 	</header>
 
-	<div class="table-container">
-		<table>
-			<thead>
-				<tr>
-					<th data-ln-col-select></th>
-					<th data-ln-col="title">Title <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+	<table>
+		<thead>
+			<tr>
+				<th data-ln-col-select></th>
+				<th data-ln-col="title">Title <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 					<th data-ln-col="department">Department <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
 					<th data-ln-col="status">Status <button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+					<th data-ln-col="file_size">Size <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 					<th data-ln-col="updated_at">Updated <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 					<th>Actions</th>
 				</tr>
@@ -234,7 +228,6 @@
 				</tr>
 			</tfoot>
 		</table>
-	</div>
 
 	<template data-ln-template="documents-row">
 		<tr data-ln-row>
@@ -242,10 +235,11 @@
 			<td data-ln-cell="title"></td>
 			<td data-ln-cell="department"></td>
 			<td data-ln-cell="status"></td>
+			<td data-ln-cell="size_display"></td>
 			<td data-ln-cell="updated_display"></td>
 			<td>
 				<button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
-				<button data-ln-row-action="delete" aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
+				<button data-ln-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
 			</td>
 		</tr>
 	</template>
@@ -300,7 +294,7 @@
 				<select id="doc-department" name="department" required>
 					<option value="">—</option>
 					<option>IT</option><option>Finance</option><option>Legal</option>
-					<option>Marketing</option><option>HR</option><option>Operations</option>
+					<option>Marketing</option><option>HR</option><option>Sales</option><option>Operations</option>
 				</select>
 			</div>
 			<div class="form-element">
@@ -309,6 +303,7 @@
 					<option value="Draft">Draft</option>
 					<option value="Pending">Pending</option>
 					<option value="Approved">Approved</option>
+					<option value="Rejected">Rejected</option>
 					<option value="Archived">Archived</option>
 				</select>
 			</div>
@@ -365,7 +360,10 @@
 
 	function decorate(r) {
 		return Object.assign({}, r, {
-			updated_display: new Date(r.updated_at * 1000).toLocaleString()
+			updated_display: new Date(r.updated_at * 1000).toLocaleString(),
+			size_display:    r.file_size >= 1024
+				? (r.file_size / 1024).toFixed(1) + ' MB'
+				: (r.file_size || 0) + ' KB'
 		});
 	}
 
@@ -420,9 +418,14 @@
 			titleEl.textContent = 'Edit document';
 			modalEl.setAttribute('data-ln-modal', 'open');
 		} else if (e.detail.action === 'delete') {
-			pendingDelete = { ids: [Number(e.detail.id)] };
-			confirmMsg.textContent = 'Delete "' + e.detail.record.title + '"?';
-			confirmEl.setAttribute('data-ln-modal', 'open');
+			// Row-level delete is gated by `data-ln-confirm` on the trash
+			// button — by the time this handler runs, ln-confirm has
+			// already passed the second click through, so we delete
+			// immediately. Bulk delete still goes through the modal
+			// (multi-row delete isn't expressible in a single button).
+			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+				detail: { id: Number(e.detail.id) }
+			}));
 		}
 	});
 

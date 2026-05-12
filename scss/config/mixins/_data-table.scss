@@ -24,9 +24,35 @@
 @mixin data-table {
 	@include relative;
 
+	// Inner table — `border-collapse: separate` + `border-spacing: 0` is
+	// required for `position: sticky` on `<thead> th` / `<tfoot> td` to
+	// actually pin in Chrome. With the `border-collapse: collapse` that
+	// `@mixin table-base` sets by default, Chrome silently drops sticky
+	// behavior on table cells — the same reason `@mixin ln-table`
+	// applies this exact override. Borders are restored cell-by-cell via
+	// table-base's `td { @include border-b }`, so no visual change.
+	> table {
+		border-collapse: separate;
+		border-spacing: 0;
+	}
+
 	// Toolbar
 	> header {
 		@include panel-header;
+	}
+
+	// Toolbar right-side group — flex row, items vertically centered, gap
+	// between siblings so search input + action buttons line up. Pure
+	// layout opinion (positioning + spacing of the consumer's elements);
+	// the appearance of those elements stays the consumer's concern.
+	// Without this, `<aside>` would be default-block and children would
+	// flow inline by text baseline, leaving action buttons visually
+	// offset from the taller search-input wrapper.
+	> header aside {
+		@include flex;
+		@include items-center;
+		--gap: var(--size-sm);
+		gap: var(--gap);
 	}
 
 	// Search label in toolbar
@@ -150,6 +176,44 @@
 		border-radius: var(--radius-full);
 		background: var(--color-accent);
 	}
+}
+
+// ─── Row action buttons ───────────────────────────────────
+//
+// `[data-ln-row-action]` is the ln-data-table attribute for in-row
+// action buttons (edit, delete, custom). They're conventionally
+// icon-only and live in narrow `<td>` cells — full button chrome
+// inflates row height and visually competes with the row content.
+//
+// Style is ghost: no bg, no border, no shadow, dim opacity at rest,
+// full opacity on hover. Targets the BUTTON via its own attribute,
+// not via ancestor selectors — a `data-ln-row-action` button looks
+// the same anywhere.
+
+@mixin data-table-row-action {
+	background: none;
+	border: none;
+	--shadow: none;
+	--padding-y: var(--size-2xs);
+	--padding-x: var(--size-2xs);
+	padding: var(--padding-y) var(--padding-x);
+	opacity: 0.5;
+	@include motion-safe {
+		transition: opacity 0.15s;
+	}
+
+	&:hover:not(:disabled) {
+		background: none;
+		opacity: 1;
+	}
+}
+
+// Destructive variant — semantic-color cascade via --color-primary
+// rebind so the icon and any confirm-state overlay both read the
+// same source. Applied on top of `data-table-row-action`.
+@mixin data-table-row-action-delete {
+	--color-primary: var(--color-error);
+	color: hsl(var(--color-primary));
 }
 
 // ─── Filter dropdown ──────────────────────────────────────
