@@ -183,7 +183,6 @@ Or tenant branding (rebind the semantic primitive):
 ```scss
 .tenant-acme {
 	--color-primary: 340 75% 52%;
-	--color-primary-hover: 340 75% 42%;
 }
 ```
 

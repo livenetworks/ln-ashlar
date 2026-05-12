@@ -287,6 +287,10 @@
 }
 
 @mixin data-table-row-focused {
+	// Derive focus from --color-accent at this scope (same hue/saturation,
+	// lightness +8). Number form (not percentage) — see _btn.scss for the
+	// syntax rationale.
+	--color-accent-focus: hsl(from var(--color-accent) h s calc(l + 8));
 	outline: 2px solid var(--color-accent-focus);
 	outline-offset: -2px;
 }

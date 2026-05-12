@@ -21,6 +21,13 @@ body {
 }
 
 a {
+	// Derive hover from --color-accent at this scope. Same hue/saturation,
+	// lightness reduced by 8 (number form — see _btn.scss for the syntax
+	// rationale). Local derivation means a semantic-color parent (.error,
+	// .success, etc.) that rebinds --color-primary cascades to the hover
+	// because var(--color-accent) re-resolves on the anchor element.
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
+
 	color: var(--color-accent);
 	text-decoration: none;
 	@include transition-colors;

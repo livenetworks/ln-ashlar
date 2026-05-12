@@ -23,9 +23,15 @@
 // alert, badge, etc.) picks up the status color through inherited
 // custom-property values — no per-mixin redeclare required.
 @mixin semantic-color($family) {
+	// Re-bind the base color and the theme-controlled tint companions.
+	// --color-primary-hover / -focus are NOT rebound — consumers derive
+	// hover/focus from --color-accent locally via CSS relative color
+	// syntax. See _btn.scss / _form.scss / _data-table.scss / _global.scss
+	// for the derivation pattern. --color-primary-light / -lighter ARE
+	// rebound because their values are theme-controlled (light themes
+	// use near-white tints, dark themes use subtle dark surfaces) and
+	// cannot be derived from the base.
 	--color-primary:         var(--color-#{$family});
-	--color-primary-hover:   var(--color-#{$family}-hover);
-	--color-primary-focus:   var(--color-#{$family}-focus);
 	--color-primary-light:   var(--color-#{$family}-light);
 	--color-primary-lighter: var(--color-#{$family}-lighter);
 
@@ -35,8 +41,6 @@
 	// semantic class. --color-accent-fg stays at :root (white) — text on
 	// any colored accent surface should stay white.
 	--color-accent:             hsl(var(--color-primary));
-	--color-accent-hover:       hsl(var(--color-primary-hover));
 	--color-accent-tint:        hsl(var(--color-primary-lighter));
 	--color-accent-tint-strong: hsl(var(--color-primary-light));
-	--color-accent-focus:       hsl(var(--color-primary-focus));
 }
