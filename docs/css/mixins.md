@@ -441,14 +441,18 @@ Complete primary action button — structure + filled primary colors. Use for no
 **Expands to:**
 ```css
 /* Rebinds --btn-* surface tokens with accent values */
---btn-bg:           var(--color-accent);
---btn-fg:           var(--color-accent-fg);
+--color-accent:       hsl(var(--color-primary));
+--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
+--btn-bg:           var(--color-accent-bg,       var(--color-accent));
+--btn-fg:           var(--color-accent-bg-fg,    var(--color-accent-fg));
 --btn-border:       var(--color-accent);
---btn-bg-hover:     var(--color-accent-hover);
---btn-fg-hover:     var(--color-accent-fg);
+--btn-bg-hover:     var(--color-accent-bg-hover, var(--color-accent-hover));
+--btn-fg-hover:     var(--color-accent-bg-fg,    var(--color-accent-fg));
 --btn-border-hover: var(--color-accent-hover);
 /* Structure from @mixin button-base (inherited via global <button>) */
 ```
+
+Hover is derived at consumer scope so `.error` / `.success` / `.warning` / `.info` ancestors propagate through a single `--color-primary` rebind. `--color-accent-bg-*` fallback wrappers let themes (e.g. Glass) opt into a translucent surface by rebinding those companions at theme `:root`.
 
 > `<button type="submit">` gets primary colors automatically from `_global.scss` — no `@include btn` needed.
 > `<button type="button">` gets neutral (transparent + gray hover) automatically.

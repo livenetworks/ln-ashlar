@@ -29,49 +29,42 @@ color: var(--color-fg);
 
 ### Primary
 ```css
---color-primary:        232 75% 52%;   /* Brand blue */
---color-primary-hover:  232 75% 42%;
---color-primary-focus:  232 75% 60%;
---color-primary-light:  232 75% 93%;   /* Active nav, focus rings */
---color-primary-lighter: 232 75% 97%;
+--color-primary:         216 95% 42%;   /* Brand blue */
+--color-primary-light:   216 95% 93%;   /* Active nav, focus rings */
+--color-primary-lighter: 216 95% 97%;
 ```
+
+Hover and focus states are derived at consumer scope via CSS relative color syntax — see [Status color overrides](#status-color-overrides) below.
 
 ### Secondary
 ```css
---color-secondary:       160 76% 40%;  /* Green */
---color-secondary-hover: 162 93% 31%;
+--color-secondary:         160 76% 40%;  /* Green */
+--color-secondary-light:   160 76% 93%;
+--color-secondary-lighter: 160 76% 97%;
 ```
 
 ### Status
 ```css
 --color-success:         142 76% 36%;
---color-success-hover:   142 76% 26%;
---color-success-focus:   142 76% 44%;
 --color-success-light:   142 76% 93%;
 --color-success-lighter: 142 76% 97%;
 
 --color-error:           0 84% 50%;
---color-error-hover:     0 74% 42%;
---color-error-focus:     0 84% 58%;
 --color-error-light:     0 84% 93%;
 --color-error-lighter:   0 84% 97%;
 
 --color-warning:         32 95% 44%;
---color-warning-hover:   32 95% 34%;
---color-warning-focus:   32 95% 52%;
 --color-warning-light:   32 95% 93%;
 --color-warning-lighter: 32 95% 97%;
 
 --color-info:            217 91% 60%;
---color-info-hover:      217 91% 50%;
---color-info-focus:      217 91% 68%;
 --color-info-light:      217 91% 93%;
 --color-info-lighter:    217 91% 97%;
 ```
 
 ### Status color overrides
 
-To change a component's status color, prefer the library helper classes (`.success`, `.warning`, `.error`, `.info`) which cascade all sibling tokens (`-hover`, `-focus`, `-light`, `-lighter`). If you override `--color-primary` directly on a selector, remember to also override its siblings to keep hover/focus/tint states in the variant color family.
+To change a component's status color, prefer the library helper classes (`.success`, `.warning`, `.error`, `.info`) — they rebind `--color-primary` plus its `-light` / `-lighter` companions on the scope. Hover and focus surfaces are derived from `--color-primary` at consumer scope via CSS relative color syntax (`hsl(from var(--color-accent) h s calc(l ± 8))`), so a single `--color-primary` override propagates to the full state machine. If you override `--color-primary` directly on a selector and need the tint surfaces to follow, also override `-light` and `-lighter`.
 
 ### Neutral scale (v1.1)
 
