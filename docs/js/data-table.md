@@ -101,20 +101,29 @@ otherwise                     → render all (_renderAll)
 3. Replace `<tbody>` content atomically.
 4. Refresh select-all state if selectable.
 
-### `_renderVirtual` (lines 802–860)
+### `_renderVirtual`
 
 Computes which slice of `_data` is currently visible:
 
-1. Get `<table>` bounding rect, calculate `dataStartInPage` (top of `<tbody>` in absolute page coords).
-2. `scrollIntoData = window.scrollY - dataStartInPage`.
-3. `startRow = max(0, floor(scrollIntoData / rowHeight) - BUFFER_ROWS)`.
-4. `endRow = min(startRow + ceil(window.innerHeight / rowHeight) + BUFFER_ROWS*2, total)`.
-5. Early-return if `startRow`/`endRow` unchanged from last call (memoized via `_vStart` / `_vEnd`).
-6. Build a fragment containing:
+1. Resolve the scroll target. `this._scrollContainer` was cached in
+   `_enableVirtualScroll` by walking ancestors for the nearest
+   `overflow-y: auto`/`scroll` element. `null` means no scrolling
+   ancestor — the page itself scrolls.
+2. Compute `dataStart` (top of `<tbody>`) in the scroll target's
+   coordinate system:
+   - With a container: `(tableRect.top - scRect.top) + sc.scrollTop + theadH`.
+   - Without a container: `tableRect.top + window.scrollY + theadH`.
+3. `scrollIntoData = scrollTop - dataStart` (where `scrollTop` is
+   `sc.scrollTop` or `window.scrollY`).
+4. `startRow = max(0, floor(scrollIntoData / rowHeight) - BUFFER_ROWS)`.
+5. `endRow = min(startRow + ceil(viewportH / rowHeight) + BUFFER_ROWS*2, total)`
+   where `viewportH` is `sc.clientHeight` or `window.innerHeight`.
+6. Early-return if `startRow`/`endRow` unchanged from last call (memoized via `_vStart` / `_vEnd`).
+7. Build a fragment containing:
    - top spacer `<tr>` of height `startRow * rowHeight`
    - real rows from `startRow` to `endRow`
    - bottom spacer `<tr>` of height `(total - endRow) * rowHeight`
-7. Replace `<tbody>` content.
+8. Replace `<tbody>` content.
 
 `BUFFER_ROWS = 15` and `VIRTUAL_THRESHOLD = 200` are constants at the
 top of the file. `BUFFER_ROWS` provides scroll headroom so the user
@@ -264,13 +273,27 @@ heights (multi-line cells, expandable content), virtual-scroll math
 will drift — the alignment between scroll offset and visible row count
 becomes incorrect. The component is designed for uniform-height rows.
 
-### Scroll listener — passive + RAF-coalesced
+### Scroll listener — passive + RAF-coalesced, auto-targeted
 
-`_scrollHandler` is registered with `{ passive: true }` to allow the
-browser to scroll without waiting for JS. Inside, all rendering is
-coalesced into a single `requestAnimationFrame` — multiple scroll
-events between two RAFs result in one render. `cancelAnimationFrame`
-is called on `_disableVirtualScroll` to clean up.
+`_enableVirtualScroll` resolves the scroll target via
+`_findScrollContainer(this.dom)` — the nearest ancestor with
+`overflow-y: auto`/`scroll`, or `null` if none. The handler is
+registered on that target (or `window` when null) with
+`{ passive: true }` so the browser can scroll without waiting for
+JS. Inside, all rendering is coalesced into a single
+`requestAnimationFrame` — multiple scroll events between two RAFs
+result in one render. `cancelAnimationFrame` is called on
+`_disableVirtualScroll` to clean up.
+
+Resize stays on `window` regardless of the scroll target: viewport
+size changes always affect how many rows fit, even when scrolling
+itself happens inside a container.
+
+`_scrollContainer` is re-resolved on every `_enableVirtualScroll`
+call rather than cached for the lifetime of the component. The DOM
+may have moved between the previous disable and the next enable
+(re-parenting, the row count crossing `VIRTUAL_THRESHOLD` after a
+filter, etc.), so the ancestor walk needs to repeat.
 
 The `<tbody>` window-cache (`_vStart` / `_vEnd`) early-returns when
 scroll position has not crossed a row boundary. This matters on

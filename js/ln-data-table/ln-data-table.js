@@ -19,6 +19,20 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		return _numFmt ? _numFmt.format(n) : String(n);
 	}
 
+	// Walk ancestors, find the nearest element that establishes a vertical
+	// scroll context. Returns null if no such ancestor exists (the page
+	// itself is the scroll surface — caller falls back to window).
+	function _findScrollContainer(el) {
+		let p = el.parentElement;
+		while (p && p !== document.body && p !== document.documentElement) {
+			const cs = getComputedStyle(p);
+			const oy = cs.overflowY;
+			if (oy === 'auto' || oy === 'scroll') return p;
+			p = p.parentElement;
+		}
+		return null;
+	}
+
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
@@ -58,6 +72,7 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		this._vEnd = -1;
 		this._rafId = null;
 		this._scrollHandler = null;
+		this._scrollContainer = null;
 
 		// Footer elements
 		this._totalSpan = dom.querySelector('[data-ln-data-table-total]');
@@ -770,6 +785,13 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 			}
 		}
 
+		// Resolve the scroll target every time we enable — the DOM may have
+		// moved between the previous disable and now (re-parenting, modal
+		// open, list crosses VIRTUAL_THRESHOLD again after a filter).
+		// null → page scrolls; we listen on window.
+		this._scrollContainer = _findScrollContainer(this.dom);
+		const scrollTarget = this._scrollContainer || window;
+
 		this._scrollHandler = function () {
 			if (self._rafId) return;
 			self._rafId = requestAnimationFrame(function () {
@@ -778,7 +800,9 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 			});
 		};
 
-		window.addEventListener('scroll', this._scrollHandler, { passive: true });
+		scrollTarget.addEventListener('scroll', this._scrollHandler, { passive: true });
+		// Viewport resize always matters (changes visible-row count), even
+		// when scrolling happens inside a container.
 		window.addEventListener('resize', this._scrollHandler, { passive: true });
 	};
 
@@ -787,10 +811,12 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		this._virtual = false;
 
 		if (this._scrollHandler) {
-			window.removeEventListener('scroll', this._scrollHandler);
+			const scrollTarget = this._scrollContainer || window;
+			scrollTarget.removeEventListener('scroll', this._scrollHandler);
 			window.removeEventListener('resize', this._scrollHandler);
 			this._scrollHandler = null;
 		}
+		this._scrollContainer = null;
 		if (this._rafId) {
 			cancelAnimationFrame(this._rafId);
 			this._rafId = null;
@@ -805,14 +831,31 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		const rowH = this._rowHeight;
 		if (!rowH || !total) return;
 
-		const tableRect = this.table.getBoundingClientRect();
-		const tableTopInPage = tableRect.top + window.scrollY;
 		const theadH = this.thead ? this.thead.offsetHeight : 0;
-		const dataStartInPage = tableTopInPage + theadH;
+		const sc = this._scrollContainer;
+		let scrollIntoData;
+		let viewportH;
 
-		const scrollIntoData = window.scrollY - dataStartInPage;
+		if (sc) {
+			// Scrolling happens inside an ancestor element. Compute table
+			// position relative to that container, using its scrollTop and
+			// clientHeight as the viewport.
+			const tableRect = this.table.getBoundingClientRect();
+			const scRect = sc.getBoundingClientRect();
+			const dataStartInContainer = (tableRect.top - scRect.top) + sc.scrollTop + theadH;
+			scrollIntoData = sc.scrollTop - dataStartInContainer;
+			viewportH = sc.clientHeight;
+		} else {
+			// No scrolling ancestor — page scrolls. Use window coords.
+			const tableRect = this.table.getBoundingClientRect();
+			const tableTopInPage = tableRect.top + window.scrollY;
+			const dataStartInPage = tableTopInPage + theadH;
+			scrollIntoData = window.scrollY - dataStartInPage;
+			viewportH = window.innerHeight;
+		}
+
 		const startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
-		const endRow = Math.min(startRow + Math.ceil(window.innerHeight / rowH) + (BUFFER_ROWS * 2), total);
+		const endRow = Math.min(startRow + Math.ceil(viewportH / rowH) + (BUFFER_ROWS * 2), total);
 
 		if (startRow === this._vStart && endRow === this._vEnd) return;
 		this._vStart = startRow;
