@@ -776,8 +776,11 @@ tokens — it does NOT declare `background:` / `color:` /
 // RIGHT — variant rebinds the --btn-* surface
 @mixin btn {
 	--color-accent:       hsl(var(--color-primary));
-	--color-accent-hover: hsl(var(--color-primary-hover));
-	--color-accent-fg:    hsl(var(--color-white));
+	// Hover derived from accent at THIS scope via CSS relative
+	// color syntax. Number form `calc(l - 8)`, NOT `calc(l - 8%)`
+	// — channels evaluate to <number>, percentage is a type error
+	// that falls back to `transparent`.
+	--color-accent-hover: hsl(from var(--color-accent) h s calc(l - 8));
 
 	--btn-bg:           var(--color-accent);
 	--btn-fg:           var(--color-accent-fg);
