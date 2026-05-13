@@ -213,14 +213,14 @@
 	> section {
 		@include flex-1;
 		min-height: 0;
-		// Padding split: NO padding-block-start so sticky descendants
-		// (e.g. ln-table's <thead>) pin flush at the section's top:0
-		// instead of at the inner padding edge. The lost top breathing
-		// room is restored INSIDE the scroll flow via `> *:first-child`
-		// margin-block-start below — that margin scrolls past with the
-		// content, leaving sticky to pin against the actual section top.
+		// NO padding-block — sticky descendants (e.g. ln-table's <thead>
+		// at top:0, ln-data-table's <footer> at bottom:0) pin flush at the
+		// section edges instead of at the inner padding edge. The lost
+		// breathing room is restored INSIDE the scroll flow via
+		// `> *:first-child` / `> *:last-child` margins below — those
+		// margins scroll past with the content, leaving sticky to pin
+		// against the actual section edges.
 		padding-inline: var(--padding-x);
-		padding-block-end: var(--padding-x);
 		@include overflow-auto;
 		max-width: var(--max-w-container);
 		@include mx(auto);
@@ -237,11 +237,17 @@
 			flex-shrink: 0;
 		}
 
-		// First child gets the visual top breathing room that used to
-		// be padding-block-start. As margin, it lives inside the scroll
-		// flow — scrolls past, doesn't push sticky descendants down.
+		// First / last children carry the visual breathing room that used to
+		// be padding-block-start / padding-block-end. As margin, it lives
+		// inside the scroll flow — scrolls past, doesn't push sticky
+		// descendants (sticky top:0 toolbar/thead, sticky bottom:0 footer)
+		// to the inside of the padding edge.
 		> *:first-child {
 			margin-block-start: var(--padding-x);
+		}
+
+		> *:last-child {
+			margin-block-end: var(--padding-x);
 		}
 	}
 }
