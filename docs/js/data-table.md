@@ -26,6 +26,7 @@ the methods that mutate data.
 | `_totalSpan`, `_filteredSpan`, `_selectedSpan` | `[data-ln-data-table-total/...]` | Footer text update |
 | `_filteredWrap`, `_selectedWrap` | closest `[data-ln-data-table-*-wrap]` | Hide/show wrapper for "· N filtered" / "· N selected" |
 | `_selectAllCheckbox` | input inside `[data-ln-col-select]` (auto-created if `<th>` empty) | Select-all change listener |
+| `_toolbar`, `_toolbarRO` | `:scope > header`, `ResizeObserver` | Writes `--data-table-toolbar-h` on root so sticky `<thead>` clears the sticky toolbar |
 | `_filterableFields` | derived from `<th>` having `data-ln-col` + `[data-ln-col-filter]` descendant | Auto-derive filter options on `set-data` without explicit `filterOptions` |
 
 ### Public state (read by consumers, mutated by handlers)
@@ -184,6 +185,24 @@ There is no debounce. Adding one would be wrong at this layer: in
 client-side mode the filter is in-memory and fast; in server-side mode
 the coordinator can debounce its `fetch` call without blocking the
 event for analytics consumers.
+
+## Sticky shell
+
+Three elements are sticky inside the scroll container of the section root:
+
+- `<section data-ln-data-table> > header` — toolbar, pins at `top: 0`.
+  Height tracked via `ResizeObserver` and exposed as
+  `--data-table-toolbar-h` on the section root.
+- `thead th` — pins at `top: var(--data-table-toolbar-h, 0)` so it
+  sits flush under the toolbar.
+- `<section data-ln-data-table> > footer` — pins at `bottom: 0`. NOT
+  a `<tfoot>` — table-cell sticky combined with the virtual-scroll
+  bottom-spacer row was unreliable in Chromium.
+
+All three pin against the same scroll container resolved by
+`_findScrollContainer` (typically `.app-main > section`). The data-table
+section itself is `position: relative` but does not establish a scroll
+context, so sticky descendants escape to the outer scroller.
 
 ## Event lifecycle
 

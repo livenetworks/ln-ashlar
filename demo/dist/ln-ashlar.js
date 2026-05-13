@@ -184,13 +184,13 @@ function kt(h, c) {
     }));
   };
 }
-const xt = "ln:";
-function Ot() {
+const Ot = "ln:";
+function xt() {
   return location.pathname.replace(/\/+$/, "").toLowerCase() || "/";
 }
 function wt(h, c) {
   const y = c.getAttribute("data-ln-persist"), _ = y !== null && y !== "" ? y : c.id;
-  return _ ? xt + h + ":" + Ot() + ":" + _ : (console.warn('[ln-persist] Element requires id or data-ln-persist="key"', c), null);
+  return _ ? Ot + h + ":" + xt() + ":" + _ : (console.warn('[ln-persist] Element requires id or data-ln-persist="key"', c), null);
 }
 function ht(h, c) {
   const y = wt(h, c);
@@ -420,8 +420,8 @@ function yt(h) {
       if (A.ok) {
         if (C.title && (document.title = C.title), C.content)
           for (const I in C.content) {
-            const q = document.getElementById(I);
-            q && (q.innerHTML = C.content[I]);
+            const F = document.getElementById(I);
+            F && (F.innerHTML = C.content[I]);
           }
         if (u.tagName === "A") {
           const I = u.getAttribute("href");
@@ -802,13 +802,13 @@ function yt(h) {
       if (d._lastISO) {
         const C = i(d._lastISO);
         if (C) {
-          const I = d.dom.getAttribute(h) || "", q = $(d.dom), D = n(C, I, q);
+          const I = d.dom.getAttribute(h) || "", F = $(d.dom), D = n(C, I, F);
           if (E === D) return;
         }
       }
       const A = l(E);
       if (A) {
-        const C = A.getFullYear(), I = String(A.getMonth() + 1).padStart(2, "0"), q = String(A.getDate()).padStart(2, "0"), D = C + "-" + I + "-" + q;
+        const C = A.getFullYear(), I = String(A.getMonth() + 1).padStart(2, "0"), F = String(A.getDate()).padStart(2, "0"), D = C + "-" + I + "-" + F;
         d._setHiddenRaw(D), _.set.call(d._picker, D), d._displayFormatted(A), d._lastISO = D, T(d.dom, "ln-date:change", {
           value: D,
           formatted: d.dom.value,
@@ -1500,8 +1500,8 @@ const It = `<li class="ln-toast__item">
       const M = I.querySelector("use");
       M && M.setAttribute("href", "#ln-" + (_[v] || _.info));
     }
-    const q = E.querySelector(".ln-toast__body");
-    q && A && t(q, r);
+    const F = E.querySelector(".ln-toast__body");
+    F && A && t(F, r);
     const D = E.querySelector(".ln-toast__close");
     return D && D.addEventListener("click", function() {
       l(E);
@@ -1632,7 +1632,7 @@ const It = `<li class="ln-toast__item">
       const R = document.querySelector('meta[name="csrf-token"]');
       return R ? R.getAttribute("content") : "";
     }
-    function q(R) {
+    function F(R) {
       if (!t(R, m)) {
         const k = d["invalid-type"];
         T(o, "ln-upload:invalid", {
@@ -1665,8 +1665,8 @@ const It = `<li class="ln-toast__item">
       const S = new XMLHttpRequest();
       S.upload.addEventListener("progress", function(k) {
         if (k.lengthComputable) {
-          const x = Math.round(k.loaded / k.total * 100);
-          st.style.width = x + "%", J(K, { sizeText: x + "%" });
+          const O = Math.round(k.loaded / k.total * 100);
+          st.style.width = O + "%", J(K, { sizeText: O + "%" });
         }
       }), S.addEventListener("load", function() {
         if (S.status >= 200 && S.status < 300) {
@@ -1674,7 +1674,7 @@ const It = `<li class="ln-toast__item">
           try {
             k = JSON.parse(S.responseText);
           } catch {
-            O("Invalid response");
+            x("Invalid response");
             return;
           }
           J(K, { sizeText: s(k.size || R.size), uploading: !1 }), f && (f.disabled = !1), A.set(P, {
@@ -1692,12 +1692,12 @@ const It = `<li class="ln-toast__item">
             k = JSON.parse(S.responseText).message || k;
           } catch {
           }
-          O(k);
+          x(k);
         }
       }), S.addEventListener("error", function() {
-        O(d["network-error"] || "Network error");
+        x(d["network-error"] || "Network error");
       });
-      function O(k) {
+      function x(k) {
         st && (st.style.width = "100%"), J(K, { sizeText: d.error || "Error", uploading: !1, error: !0 }), f && (f.disabled = !1), T(o, "ln-upload:error", {
           file: R,
           message: k
@@ -1748,7 +1748,7 @@ const It = `<li class="ln-toast__item">
     }
     function H(R) {
       for (const P of R)
-        q(P);
+        F(P);
       v.value = "";
     }
     const V = function() {
@@ -2086,20 +2086,20 @@ const It = `<li class="ln-toast__item">
     const v = m.tagName === "TABLE" ? m : m.querySelector("table");
     if (!v || m.hasAttribute("data-ln-table")) return;
     const w = {}, E = [], A = v.tBodies;
-    for (let q = 0; q < A.length; q++) {
-      const D = A[q].rows;
+    for (let F = 0; F < A.length; F++) {
+      const D = A[F].rows;
       for (let M = 0; M < D.length; M++) {
         const H = D[M].cells[p], V = H ? H.textContent.trim() : "";
         V && !w[V] && (w[V] = !0, E.push(V));
       }
     }
-    E.sort(function(q, D) {
-      return q.localeCompare(D);
+    E.sort(function(F, D) {
+      return F.localeCompare(D);
     });
     const C = d.querySelector("[" + _ + "]"), I = C ? C.getAttribute(_) : d.getAttribute("data-ln-filter-key") || "col" + p;
-    for (let q = 0; q < E.length; q++) {
+    for (let F = 0; F < E.length; F++) {
       const D = r.content.cloneNode(!0), M = D.querySelector("input");
-      M && (M.setAttribute(_, I), M.setAttribute(g, E[q]), Tt(D, { text: E[q] }), d.appendChild(D));
+      M && (M.setAttribute(_, I), M.setAttribute(g, E[F]), Tt(D, { text: E[F] }), d.appendChild(D));
     }
   }
   function u(o) {
@@ -2215,8 +2215,8 @@ const It = `<li class="ln-toast__item">
     const w = Object.keys(v), E = w.length > 0, A = p.tBodies;
     for (let C = 0; C < A.length; C++) {
       const I = A[C].rows;
-      for (let q = 0; q < I.length; q++) {
-        const D = I[q];
+      for (let F = 0; F < I.length; F++) {
+        const D = I[F];
         if (!E) {
           D.removeAttribute(b);
           continue;
@@ -3165,19 +3165,19 @@ const It = `<li class="ln-toast__item">
     return b(A, { timeStyle: "short" }).format(E);
   }
   function p(E, A) {
-    const C = Math.floor(Date.now() / 1e3), q = Math.floor(E.getTime() / 1e3) - C, D = Math.abs(q);
+    const C = Math.floor(Date.now() / 1e3), F = Math.floor(E.getTime() / 1e3) - C, D = Math.abs(F);
     if (D < 10) return a(A).format(0, "second");
     let M, H;
     if (D < 60)
-      M = "second", H = q;
+      M = "second", H = F;
     else if (D < 3600)
-      M = "minute", H = Math.round(q / 60);
+      M = "minute", H = Math.round(F / 60);
     else if (D < 86400)
-      M = "hour", H = Math.round(q / 3600);
+      M = "hour", H = Math.round(F / 3600);
     else if (D < 604800)
-      M = "day", H = Math.round(q / 86400);
+      M = "day", H = Math.round(F / 86400);
     else if (D < 2592e3)
-      M = "week", H = Math.round(q / 604800);
+      M = "week", H = Math.round(F / 604800);
     else
       return u(E, A);
     return a(A).format(H, M);
@@ -3187,9 +3187,9 @@ const It = `<li class="ln-toast__item">
     if (!A) return;
     const C = Number(A);
     if (isNaN(C)) return;
-    const I = new Date(C * 1e3), q = E.dom.getAttribute(h) || "short", D = g(E.dom);
+    const I = new Date(C * 1e3), F = E.dom.getAttribute(h) || "short", D = g(E.dom);
     let M;
-    switch (q) {
+    switch (F) {
       case "relative":
         M = p(I, D);
         break;
@@ -3206,7 +3206,7 @@ const It = `<li class="ln-toast__item">
         M = u(I, D);
         break;
     }
-    E.dom.textContent = M, q !== "full" && (E.dom.title = l(I, D));
+    E.dom.textContent = M, F !== "full" && (E.dom.title = l(I, D));
   }
   function m(E) {
     return this.dom = E, r(this), E.getAttribute(h) === "relative" && (s.add(this), n()), this;
@@ -3252,8 +3252,8 @@ const It = `<li class="ln-toast__item">
   function t() {
     const f = document.querySelectorAll("[" + h + "]"), L = {};
     for (let S = 0; S < f.length; S++) {
-      const O = f[S].getAttribute(h);
-      O && (L[O] = {
+      const x = f[S].getAttribute(h);
+      x && (L[x] = {
         indexes: (f[S].getAttribute("data-ln-store-indexes") || "").split(",").map(function(k) {
           return k.trim();
         }).filter(Boolean)
@@ -3267,24 +3267,24 @@ const It = `<li class="ln-toast__item">
         console.warn("[ln-store] IndexedDB not available — falling back to in-memory store"), f(null);
         return;
       }
-      const S = t(), O = Object.keys(S), k = indexedDB.open(y);
+      const S = t(), x = Object.keys(S), k = indexedDB.open(y);
       k.onerror = function() {
         console.warn("[ln-store] IndexedDB open failed — falling back to in-memory store"), f(null);
-      }, k.onsuccess = function(x) {
-        const F = x.target.result, N = Array.from(F.objectStoreNames);
+      }, k.onsuccess = function(O) {
+        const q = O.target.result, N = Array.from(q.objectStoreNames);
         let j = !1;
         N.indexOf(_) === -1 && (j = !0);
-        for (let tt = 0; tt < O.length; tt++)
-          if (N.indexOf(O[tt]) === -1) {
+        for (let tt = 0; tt < x.length; tt++)
+          if (N.indexOf(x[tt]) === -1) {
             j = !0;
             break;
           }
         if (!j) {
-          l(F), b = F, f(F);
+          l(q), b = q, f(q);
           return;
         }
-        const lt = F.version;
-        F.close();
+        const lt = q.version;
+        q.close();
         const dt = indexedDB.open(y, lt + 1);
         dt.onblocked = function() {
           console.warn("[ln-store] Database upgrade blocked — waiting for other tabs to close connection");
@@ -3293,8 +3293,8 @@ const It = `<li class="ln-toast__item">
         }, dt.onupgradeneeded = function(tt) {
           const G = tt.target.result;
           G.objectStoreNames.contains(_) || G.createObjectStore(_, { keyPath: "key" });
-          for (let pt = 0; pt < O.length; pt++) {
-            const mt = O[pt];
+          for (let pt = 0; pt < x.length; pt++) {
+            const mt = x[pt];
             if (!G.objectStoreNames.contains(mt)) {
               const Lt = G.createObjectStore(mt, { keyPath: "id" }), gt = S[mt].indexes;
               for (let ut = 0; ut < gt.length; ut++)
@@ -3380,10 +3380,10 @@ const It = `<li class="ln-toast__item">
     this._staleThreshold = L === "never" || L === "-1" ? -1 : isNaN(S) ? 300 : S, this._searchFields = (f.getAttribute("data-ln-store-search-fields") || "").split(",").map(function(k) {
       return k.trim();
     }).filter(Boolean), this._abortController = null, this._handlers = null, this.isLoaded = !1, this.isSyncing = !1, this.lastSyncedAt = null, this.totalCount = 0, s[this._name] = this;
-    const O = this;
-    return q(O), Q(O), this;
+    const x = this;
+    return F(x), Q(x), this;
   }
-  function q(f) {
+  function F(f) {
     f._handlers = {
       create: function(L) {
         D(f, L.detail);
@@ -3400,77 +3400,77 @@ const It = `<li class="ln-toast__item">
     }, f.dom.addEventListener("ln-store:request-create", f._handlers.create), f.dom.addEventListener("ln-store:request-update", f._handlers.update), f.dom.addEventListener("ln-store:request-delete", f._handlers.delete), f.dom.addEventListener("ln-store:request-bulk-delete", f._handlers.bulkDelete);
   }
   function D(f, L) {
-    const S = L.data || {}, O = "_temp_" + e(), k = Object.assign({}, S, { id: O });
+    const S = L.data || {}, x = "_temp_" + e(), k = Object.assign({}, S, { id: x });
     m(f._name, k).then(function() {
       return f.totalCount++, T(f.dom, "ln-store:created", {
         store: f._name,
         record: k,
-        tempId: O
+        tempId: x
       }), fetch(f._endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(S)
       });
-    }).then(function(x) {
-      if (!x.ok) throw new Error("HTTP " + x.status);
-      return x.json();
-    }).then(function(x) {
-      return v(f._name, O).then(function() {
-        return m(f._name, x);
+    }).then(function(O) {
+      if (!O.ok) throw new Error("HTTP " + O.status);
+      return O.json();
+    }).then(function(O) {
+      return v(f._name, x).then(function() {
+        return m(f._name, O);
       }).then(function() {
         T(f.dom, "ln-store:confirmed", {
           store: f._name,
-          record: x,
-          tempId: O,
+          record: O,
+          tempId: x,
           action: "create"
         });
       });
-    }).catch(function(x) {
-      v(f._name, O).then(function() {
+    }).catch(function(O) {
+      v(f._name, x).then(function() {
         f.totalCount--, T(f.dom, "ln-store:reverted", {
           store: f._name,
           record: k,
           action: "create",
-          error: x.message
+          error: O.message
         });
       });
     });
   }
   function M(f, L) {
-    const S = L.id, O = L.data || {}, k = L.expected_version;
-    let x = null;
-    r(f._name, S).then(function(F) {
-      if (!F) throw new Error("Record not found: " + S);
-      x = Object.assign({}, F);
-      const N = Object.assign({}, F, O);
+    const S = L.id, x = L.data || {}, k = L.expected_version;
+    let O = null;
+    r(f._name, S).then(function(q) {
+      if (!q) throw new Error("Record not found: " + S);
+      O = Object.assign({}, q);
+      const N = Object.assign({}, q, x);
       return m(f._name, N).then(function() {
         return T(f.dom, "ln-store:updated", {
           store: f._name,
           record: N,
-          previous: x
+          previous: O
         }), N;
       });
-    }).then(function(F) {
-      const N = Object.assign({}, O);
+    }).then(function(q) {
+      const N = Object.assign({}, x);
       return k && (N.expected_version = k), fetch(f._endpoint + "/" + S, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(N)
       });
-    }).then(function(F) {
-      if (F.status === 409)
-        return F.json().then(function(N) {
-          return m(f._name, x).then(function() {
+    }).then(function(q) {
+      if (q.status === 409)
+        return q.json().then(function(N) {
+          return m(f._name, O).then(function() {
             T(f.dom, "ln-store:conflict", {
               store: f._name,
-              local: x,
+              local: O,
               remote: N.current || N,
               field_diffs: N.field_diffs || null
             });
           });
         });
-      if (!F.ok) throw new Error("HTTP " + F.status);
-      return F.json().then(function(N) {
+      if (!q.ok) throw new Error("HTTP " + q.status);
+      return q.json().then(function(N) {
         return m(f._name, N).then(function() {
           T(f.dom, "ln-store:confirmed", {
             store: f._name,
@@ -3479,23 +3479,23 @@ const It = `<li class="ln-toast__item">
           });
         });
       });
-    }).catch(function(F) {
-      x && m(f._name, x).then(function() {
+    }).catch(function(q) {
+      O && m(f._name, O).then(function() {
         T(f.dom, "ln-store:reverted", {
           store: f._name,
-          record: x,
+          record: O,
           action: "update",
-          error: F.message
+          error: q.message
         });
       });
     });
   }
   function H(f, L) {
     const S = L.id;
-    let O = null;
+    let x = null;
     r(f._name, S).then(function(k) {
       if (k)
-        return O = Object.assign({}, k), v(f._name, S).then(function() {
+        return x = Object.assign({}, k), v(f._name, S).then(function() {
           return f.totalCount--, T(f.dom, "ln-store:deleted", {
             store: f._name,
             id: S
@@ -3508,14 +3508,14 @@ const It = `<li class="ln-toast__item">
       if (!k || !k.ok) throw new Error("HTTP " + (k ? k.status : "unknown"));
       T(f.dom, "ln-store:confirmed", {
         store: f._name,
-        record: O,
+        record: x,
         action: "delete"
       });
     }).catch(function(k) {
-      O && m(f._name, O).then(function() {
+      x && m(f._name, x).then(function() {
         f.totalCount++, T(f.dom, "ln-store:reverted", {
           store: f._name,
-          record: O,
+          record: x,
           action: "delete",
           error: k.message
         });
@@ -3525,12 +3525,12 @@ const It = `<li class="ln-toast__item">
   function V(f, L) {
     const S = L.ids || [];
     if (S.length === 0) return;
-    let O = [];
-    const k = S.map(function(x) {
-      return r(f._name, x);
+    let x = [];
+    const k = S.map(function(O) {
+      return r(f._name, O);
     });
-    Promise.all(k).then(function(x) {
-      return O = x.filter(Boolean), rt(f._name, S).then(function() {
+    Promise.all(k).then(function(O) {
+      return x = O.filter(Boolean), rt(f._name, S).then(function() {
         return f.totalCount -= S.length, T(f.dom, "ln-store:deleted", {
           store: f._name,
           ids: S
@@ -3540,22 +3540,22 @@ const It = `<li class="ln-toast__item">
           body: JSON.stringify({ ids: S })
         });
       });
-    }).then(function(x) {
-      if (!x.ok) throw new Error("HTTP " + x.status);
+    }).then(function(O) {
+      if (!O.ok) throw new Error("HTTP " + O.status);
       T(f.dom, "ln-store:confirmed", {
         store: f._name,
         record: null,
         ids: S,
         action: "bulk-delete"
       });
-    }).catch(function(x) {
-      O.length > 0 && it(f._name, O).then(function() {
-        f.totalCount += O.length, T(f.dom, "ln-store:reverted", {
+    }).catch(function(O) {
+      x.length > 0 && it(f._name, x).then(function() {
+        f.totalCount += x.length, T(f.dom, "ln-store:reverted", {
           store: f._name,
           record: null,
           ids: S,
           action: "bulk-delete",
-          error: x.message
+          error: O.message
         });
       });
     });
@@ -3587,15 +3587,15 @@ const It = `<li class="ln-toast__item">
       if (!L.ok) throw new Error("HTTP " + L.status);
       return L.json();
     }).then(function(L) {
-      const S = L.data || [], O = L.synced_at || Math.floor(Date.now() / 1e3);
+      const S = L.data || [], x = L.synced_at || Math.floor(Date.now() / 1e3);
       return it(f._name, S).then(function() {
         return C(f._name, {
           schema_version: g,
-          last_synced_at: O,
+          last_synced_at: x,
           record_count: S.length
         });
       }).then(function() {
-        f.isLoaded = !0, f.isSyncing = !1, f.lastSyncedAt = O, f.totalCount = S.length, f._abortController = null, T(f.dom, "ln-store:loaded", {
+        f.isLoaded = !0, f.isSyncing = !1, f.lastSyncedAt = x, f.totalCount = S.length, f._abortController = null, T(f.dom, "ln-store:loaded", {
           store: f._name,
           count: S.length
         }), T(f.dom, "ln-store:ready", {
@@ -3621,10 +3621,10 @@ const It = `<li class="ln-toast__item">
       if (!S.ok) throw new Error("HTTP " + S.status);
       return S.json();
     }).then(function(S) {
-      const O = S.data || [], k = S.deleted || [], x = S.synced_at || Math.floor(Date.now() / 1e3), F = O.length > 0 || k.length > 0;
+      const x = S.data || [], k = S.deleted || [], O = S.synced_at || Math.floor(Date.now() / 1e3), q = x.length > 0 || k.length > 0;
       let N = Promise.resolve();
-      return O.length > 0 && (N = N.then(function() {
-        return it(f._name, O);
+      return x.length > 0 && (N = N.then(function() {
+        return it(f._name, x);
       })), k.length > 0 && (N = N.then(function() {
         return rt(f._name, k);
       })), N.then(function() {
@@ -3632,15 +3632,15 @@ const It = `<li class="ln-toast__item">
       }).then(function(j) {
         return f.totalCount = j, C(f._name, {
           schema_version: g,
-          last_synced_at: x,
+          last_synced_at: O,
           record_count: j
         });
       }).then(function() {
-        f.isSyncing = !1, f.lastSyncedAt = x, f._abortController = null, T(f.dom, "ln-store:synced", {
+        f.isSyncing = !1, f.lastSyncedAt = O, f._abortController = null, T(f.dom, "ln-store:synced", {
           store: f._name,
-          added: O.length,
+          added: x.length,
           deleted: k.length,
-          changed: F
+          changed: q
         });
       });
     }).catch(function(S) {
@@ -3650,14 +3650,14 @@ const It = `<li class="ln-toast__item">
   function it(f, L) {
     return u().then(function(S) {
       if (S)
-        return new Promise(function(O, k) {
-          const x = S.transaction(f, "readwrite"), F = x.objectStore(f);
+        return new Promise(function(x, k) {
+          const O = S.transaction(f, "readwrite"), q = O.objectStore(f);
           for (let N = 0; N < L.length; N++)
-            F.put(L[N]);
-          x.oncomplete = function() {
-            O();
-          }, x.onerror = function() {
-            n(x.error), k(x.error);
+            q.put(L[N]);
+          O.oncomplete = function() {
+            x();
+          }, O.onerror = function() {
+            n(O.error), k(O.error);
           };
         });
     });
@@ -3665,14 +3665,14 @@ const It = `<li class="ln-toast__item">
   function rt(f, L) {
     return u().then(function(S) {
       if (S)
-        return new Promise(function(O, k) {
-          const x = S.transaction(f, "readwrite"), F = x.objectStore(f);
+        return new Promise(function(x, k) {
+          const O = S.transaction(f, "readwrite"), q = O.objectStore(f);
           for (let N = 0; N < L.length; N++)
-            F.delete(L[N]);
-          x.oncomplete = function() {
-            O();
-          }, x.onerror = function() {
-            k(x.error);
+            q.delete(L[N]);
+          O.oncomplete = function() {
+            x();
+          }, O.onerror = function() {
+            k(O.error);
           };
         });
     });
@@ -3689,27 +3689,27 @@ const It = `<li class="ln-toast__item">
   const P = new Intl.Collator(void 0, { numeric: !0, sensitivity: "base" });
   function U(f, L) {
     if (!L || !L.field) return f;
-    const S = L.field, O = L.direction === "desc";
-    return f.slice().sort(function(k, x) {
-      const F = k[S], N = x[S];
-      if (F == null && N == null) return 0;
-      if (F == null) return O ? 1 : -1;
-      if (N == null) return O ? -1 : 1;
+    const S = L.field, x = L.direction === "desc";
+    return f.slice().sort(function(k, O) {
+      const q = k[S], N = O[S];
+      if (q == null && N == null) return 0;
+      if (q == null) return x ? 1 : -1;
+      if (N == null) return x ? -1 : 1;
       let j;
-      return typeof F == "string" && typeof N == "string" ? j = P.compare(F, N) : j = F < N ? -1 : F > N ? 1 : 0, O ? -j : j;
+      return typeof q == "string" && typeof N == "string" ? j = P.compare(q, N) : j = q < N ? -1 : q > N ? 1 : 0, x ? -j : j;
     });
   }
   function X(f, L) {
     if (!L) return f;
     const S = Object.keys(L);
-    return S.length === 0 ? f : f.filter(function(O) {
+    return S.length === 0 ? f : f.filter(function(x) {
       for (let k = 0; k < S.length; k++) {
-        const x = S[k], F = L[x];
-        if (!Array.isArray(F) || F.length === 0) continue;
-        const N = O[x];
+        const O = S[k], q = L[O];
+        if (!Array.isArray(q) || q.length === 0) continue;
+        const N = x[O];
         let j = !1;
-        for (let lt = 0; lt < F.length; lt++)
-          if (String(N) === String(F[lt])) {
+        for (let lt = 0; lt < q.length; lt++)
+          if (String(N) === String(q[lt])) {
             j = !0;
             break;
           }
@@ -3720,11 +3720,11 @@ const It = `<li class="ln-toast__item">
   }
   function ct(f, L, S) {
     if (!L || !S || S.length === 0) return f;
-    const O = L.toLowerCase();
+    const x = L.toLowerCase();
     return f.filter(function(k) {
-      for (let x = 0; x < S.length; x++) {
-        const F = k[S[x]];
-        if (F != null && String(F).toLowerCase().indexOf(O) !== -1)
+      for (let O = 0; O < S.length; O++) {
+        const q = k[S[O]];
+        if (q != null && String(q).toLowerCase().indexOf(x) !== -1)
           return !0;
       }
       return !1;
@@ -3733,26 +3733,26 @@ const It = `<li class="ln-toast__item">
   function K(f, L, S) {
     if (f.length === 0) return 0;
     if (S === "count") return f.length;
-    let O = 0, k = 0;
-    for (let x = 0; x < f.length; x++) {
-      const F = parseFloat(f[x][L]);
-      isNaN(F) || (O += F, k++);
+    let x = 0, k = 0;
+    for (let O = 0; O < f.length; O++) {
+      const q = parseFloat(f[O][L]);
+      isNaN(q) || (x += q, k++);
     }
-    return S === "sum" ? O : S === "avg" && k > 0 ? O / k : 0;
+    return S === "sum" ? x : S === "avg" && k > 0 ? x / k : 0;
   }
   I.prototype.getAll = function(f) {
     const L = this;
     return f = f || {}, p(L._name).then(function(S) {
-      const O = S.length;
+      const x = S.length;
       f.filters && (S = X(S, f.filters)), f.search && (S = ct(S, f.search, L._searchFields));
       const k = S.length;
       if (f.sort && (S = U(S, f.sort)), f.offset || f.limit) {
-        const x = f.offset || 0, F = f.limit || S.length;
-        S = S.slice(x, x + F);
+        const O = f.offset || 0, q = f.limit || S.length;
+        S = S.slice(O, O + q);
       }
       return {
         data: S,
-        total: O,
+        total: x,
         filtered: k
       };
     });
@@ -3764,8 +3764,8 @@ const It = `<li class="ln-toast__item">
       return X(S, f).length;
     }) : E(L._name);
   }, I.prototype.aggregate = function(f, L) {
-    return p(this._name).then(function(O) {
-      return K(O, f, L);
+    return p(this._name).then(function(x) {
+      return K(x, f, L);
     });
   }, I.prototype.forceSync = function() {
     return nt(this);
@@ -3781,14 +3781,14 @@ const It = `<li class="ln-toast__item">
     return u().then(function(f) {
       if (!f) return;
       const L = Array.from(f.objectStoreNames);
-      return new Promise(function(S, O) {
+      return new Promise(function(S, x) {
         const k = f.transaction(L, "readwrite");
-        for (let x = 0; x < L.length; x++)
-          k.objectStore(L[x]).clear();
+        for (let O = 0; O < L.length; O++)
+          k.objectStore(L[O]).clear();
         k.oncomplete = function() {
           S();
         }, k.onerror = function() {
-          O(k.error);
+          x(k.error);
         };
       });
     }).then(function() {
@@ -3818,11 +3818,20 @@ const It = `<li class="ln-toast__item">
     return null;
   }
   function s(e) {
-    this.dom = e, this.name = e.getAttribute(h) || "", this.table = e.querySelector("table"), this.tbody = e.querySelector("[data-ln-data-table-body]") || e.querySelector("tbody"), this.thead = e.querySelector("thead"), this.ths = this.thead ? Array.from(this.thead.querySelectorAll("th")) : [], this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._data = [], this._lastTotal = 0, this._lastFiltered = 0, this._filterOptions = {}, this._filterableFields = this.ths.filter(function(t) {
+    if (this.dom = e, this.name = e.getAttribute(h) || "", this.table = e.querySelector("table"), this.tbody = e.querySelector("[data-ln-data-table-body]") || e.querySelector("tbody"), this.thead = e.querySelector("thead"), this.ths = this.thead ? Array.from(this.thead.querySelectorAll("th")) : [], this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._data = [], this._lastTotal = 0, this._lastFiltered = 0, this._filterOptions = {}, this._filterableFields = this.ths.filter(function(t) {
       return t.getAttribute("data-ln-col") && t.querySelector("[data-ln-col-filter]");
     }).map(function(t) {
       return t.getAttribute("data-ln-col");
-    }), this._virtual = !1, this._rowHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._scrollContainer = null, this._totalSpan = e.querySelector("[data-ln-data-table-total]"), this._filteredSpan = e.querySelector("[data-ln-data-table-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== e ? this._filteredSpan.closest("[data-ln-data-table-filtered-wrap]") || this._filteredSpan.parentNode : null), this._selectedSpan = e.querySelector("[data-ln-data-table-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== e ? this._selectedSpan.closest("[data-ln-data-table-selected-wrap]") || this._selectedSpan.parentNode : null);
+    }), this._virtual = !1, this._rowHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._scrollContainer = null, this._toolbar = e.querySelector(":scope > header"), this._toolbarRO = null, this._toolbar && typeof ResizeObserver < "u") {
+      const t = this;
+      this._toolbarRO = new ResizeObserver(function(i) {
+        for (let l = 0; l < i.length; l++) {
+          const u = i[l].contentRect.height;
+          t.dom.style.setProperty("--data-table-toolbar-h", u + "px");
+        }
+      }), this._toolbarRO.observe(this._toolbar);
+    }
+    this._totalSpan = e.querySelector("[data-ln-data-table-total]"), this._filteredSpan = e.querySelector("[data-ln-data-table-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== e ? this._filteredSpan.closest("[data-ln-data-table-filtered-wrap]") || this._filteredSpan.parentNode : null), this._selectedSpan = e.querySelector("[data-ln-data-table-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== e ? this._selectedSpan.closest("[data-ln-data-table-selected-wrap]") || this._selectedSpan.parentNode : null);
     const n = this;
     if (this._onSetData = function(t) {
       const i = t.detail || {};
@@ -4213,7 +4222,7 @@ const It = `<li class="ln-toast__item">
       this._selectedSpan.textContent = i > 0 ? b(i) : "", this._selectedWrap && this._selectedWrap.classList.toggle("hidden", i === 0);
     }
   }, s.prototype.destroy = function() {
-    this.dom[c] && (this.dom.removeEventListener("ln-data-table:set-data", this._onSetData), this.dom.removeEventListener("ln-data-table:set-loading", this._onSetLoading), this.thead && (this.thead.removeEventListener("click", this._onSortClick), this.thead.removeEventListener("click", this._onFilterClick)), document.removeEventListener("click", this._onDocClick), document.removeEventListener("keydown", this._onKeydown), this._searchInput && this._searchInput.removeEventListener("input", this._onSearchInput), this.tbody && (this.tbody.removeEventListener("click", this._onRowClick), this.tbody.removeEventListener("click", this._onRowAction)), this._selectable && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this.dom.removeEventListener("click", this._onClearAll), this._closeFilterDropdown(), this._disableVirtualScroll(), this._data = [], delete this.dom[c]);
+    this.dom[c] && (this.dom.removeEventListener("ln-data-table:set-data", this._onSetData), this.dom.removeEventListener("ln-data-table:set-loading", this._onSetLoading), this.thead && (this.thead.removeEventListener("click", this._onSortClick), this.thead.removeEventListener("click", this._onFilterClick)), document.removeEventListener("click", this._onDocClick), document.removeEventListener("keydown", this._onKeydown), this._searchInput && this._searchInput.removeEventListener("input", this._onSearchInput), this.tbody && (this.tbody.removeEventListener("click", this._onRowClick), this.tbody.removeEventListener("click", this._onRowAction)), this._selectable && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this.dom.removeEventListener("click", this._onClearAll), this._toolbarRO && (this._toolbarRO.disconnect(), this._toolbarRO = null), this._closeFilterDropdown(), this._disableVirtualScroll(), this._data = [], delete this.dom[c]);
   }, B(h, c, s, "ln-data-table");
 })();
 (function() {
@@ -4240,9 +4249,9 @@ const It = `<li class="ln-toast__item">
     return m.indexOf(y) === 0 ? s + "/" + m.slice(y.length) + ".svg" : a + "/" + m.slice(c.length) + ".svg";
   }
   function o(m, v) {
-    const w = v.match(/viewBox="([^"]+)"/), E = w ? w[1] : "0 0 24 24", A = v.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i), C = A ? A[1].trim() : "", I = v.match(/<svg([^>]*)>/i), q = I ? I[1] : "", D = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
+    const w = v.match(/viewBox="([^"]+)"/), E = w ? w[1] : "0 0 24 24", A = v.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i), C = A ? A[1].trim() : "", I = v.match(/<svg([^>]*)>/i), F = I ? I[1] : "", D = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
     D.id = m, D.setAttribute("viewBox", E), ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin"].forEach(function(M) {
-      const H = q.match(new RegExp(M + '="([^"]*)"'));
+      const H = F.match(new RegExp(M + '="([^"]*)"'));
       H && D.setAttribute(M, H[1]);
     }), D.innerHTML = C, l().querySelector("defs").appendChild(D);
   }

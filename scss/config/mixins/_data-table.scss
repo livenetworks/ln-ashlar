@@ -24,13 +24,36 @@
 @mixin data-table {
 	@include relative;
 
+	// Row hover token — local to data-table so chrome (toolbar, thead,
+	// footer) reading --bg-sunken stays visually distinct from the row
+	// the cursor is on. --bg-elevated is unsuitable: it equals --bg-base
+	// in light theme, making hover invisible. Derive a 4-point lightness
+	// step from --bg-base via CSS relative color syntax (number form, see
+	// _btn.scss header for percentage-vs-number rationale).
+	//
+	// Light theme:  hsl(white)            → ~hsl(0 0% 96%)
+	// Dark theme:   hsl(220 16% 13%)      → hsl(220 16% 17%)  ≈ --bg-elevated dark
+	//
+	// The 4-point step is monotonically distinct from --bg-sunken
+	// (light: neutral-100 ≈ 95%; dark: 220 16% 20%) on both sides.
+	--bg-row-hover: hsl(from var(--bg-base) h s calc(l - 4));
+
+	// Override @mixin table-base's `tbody tr:hover` to use the local hover
+	// token instead of --bg-sunken. Default hover stays --bg-sunken for
+	// standalone tables; data-table re-binds so its hover disambiguates from
+	// chrome that also uses --bg-sunken.
+	> table tbody tr:hover {
+		--color-bg: var(--bg-row-hover);
+		background: var(--color-bg);
+	}
+
 	// Inner table — `border-collapse: separate` + `border-spacing: 0` is
-	// required for `position: sticky` on `<thead> th` / `<tfoot> td` to
-	// actually pin in Chrome. With the `border-collapse: collapse` that
-	// `@mixin table-base` sets by default, Chrome silently drops sticky
-	// behavior on table cells — the same reason `@mixin ln-table`
-	// applies this exact override. Borders are restored cell-by-cell via
-	// table-base's `td { @include border-b }`, so no visual change.
+	// required for `position: sticky` on `<thead> th` to actually pin in
+	// Chrome. With the `border-collapse: collapse` that `@mixin table-base`
+	// sets by default, Chrome silently drops sticky behavior on table cells —
+	// the same reason `@mixin ln-table` applies this exact override. Borders
+	// are restored cell-by-cell via table-base's `td { @include border-b }`,
+	// so no visual change.
 	> table {
 		border-collapse: separate;
 		border-spacing: 0;
@@ -39,6 +62,13 @@
 	// Toolbar
 	> header {
 		@include panel-header;
+		// Sticky toolbar — pins to the scroll container's top edge, same
+		// surface as the sticky thead. Section root is position:relative
+		// (line 25 above), which does NOT trap sticky — sticky uses
+		// scroll container, not containing block, for offset reference.
+		@include sticky;
+		top: 0;
+		z-index: var(--z-sticky);
 	}
 
 	// Toolbar right-side group — flex row, items vertically centered, gap
@@ -96,18 +126,35 @@
 	// Sticky header
 	thead th {
 		position: sticky;
-		top: 0;
+		// Offset by toolbar height so thead sits flush under it. JS writes
+		// --data-table-toolbar-h on the section root via ResizeObserver on
+		// the <header> child. Fallback 0 keeps static (no-JS) render
+		// behaving like before — thead pins at top:0 and the toolbar
+		// overlaps until JS measures. Acceptable degradation.
+		top: var(--data-table-toolbar-h, 0);
 		z-index: var(--z-sticky);
 		background: var(--color-bg);
 	}
 
-	// Sticky footer
-	tfoot td {
+	// Section footer — sibling of <table>, NOT inside it. Moved out of
+	// <tfoot> because Chromium drops sticky on table cells when a
+	// virtual-scroll spacer <tr> sits between the data and the tfoot row.
+	// As a section-level <footer> sticky works reliably and shares the
+	// same scroll container as the toolbar.
+	//
+	// Chrome surface visually symmetric with panel-header: --bg-sunken
+	// fill, muted fg, body-sm text, border-block-start for separation.
+	> footer {
+		padding: var(--padding-y) var(--padding-x);
+		border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
+		font-size: var(--text-body-sm);
 		position: sticky;
 		bottom: 0;
 		z-index: var(--z-sticky);
-		background: var(--color-bg);
-		border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
 	}
 }
 

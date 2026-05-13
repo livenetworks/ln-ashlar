@@ -47,6 +47,9 @@
 		min-height: var(--density-row-h);
 
 		&:hover {
+			// Default hover stays --bg-sunken for standalone tables. Data-table
+			// re-binds --color-bg locally (see _data-table.scss) so its hover
+			// disambiguates from chrome that also uses --bg-sunken.
 			--color-bg: var(--bg-sunken);
 			background: var(--color-bg);
 		}

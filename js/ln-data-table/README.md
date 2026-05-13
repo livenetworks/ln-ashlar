@@ -63,16 +63,13 @@ the prose after the snippet for the *why*.
 			</tr>
 		</thead>
 		<tbody data-ln-data-table-body></tbody>
-		<tfoot>
-			<tr>
-				<td colspan="99">
-					<span data-ln-data-table-total></span> items
-					<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
-					<span data-ln-data-table-selected-wrap> · <span data-ln-data-table-selected></span> selected</span>
-				</td>
-			</tr>
-		</tfoot>
 	</table>
+
+	<footer>
+		<span data-ln-data-table-total></span> items
+		<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
+		<span data-ln-data-table-selected-wrap> · <span data-ln-data-table-selected></span> selected</span>
+	</footer>
 
 	<template data-ln-template="documents-row">
 		<tr data-ln-row>
@@ -238,7 +235,12 @@ just that column's filter.
 
 ### The footer — `data-ln-data-table-total` / `-filtered` / `-selected`
 
-The footer is yours. The component looks for three optional spans:
+The footer is a `<footer>` sibling of `<table>` inside the section root
+— NOT a `<tfoot>` inside the table. (Sticky positioning on table cells
+combined with the virtual-scroll bottom-spacer row was unreliable in
+Chromium; a section-level `<footer>` shares the same scroll container
+as the toolbar and pins reliably.) The component looks for three
+optional spans, anywhere inside the section root:
 
 - `data-ln-data-table-total` — gets the total count, formatted via
   `Intl.NumberFormat` for the document's `lang`
