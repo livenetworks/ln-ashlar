@@ -7,17 +7,17 @@
 				<section class="section-card" data-demo-html>
 					<header><h3>Semantic Variants</h3></header>
 					<main>
-						<p>
-							<span class="badge success">Active</span>
-							<span class="badge warning">Pending</span>
-							<span class="badge error">Blocked</span>
-							<span class="badge info">In Review</span>
-							<span class="badge neutral">Inactive</span>
-							<span class="badge">Default</span>
-						</p>
+						<ul class="demo-badge-list">
+							<li class="success">Active</li>
+							<li class="warning">Pending</li>
+							<li class="error">Blocked</li>
+							<li class="info">In Review</li>
+							<li class="neutral">Inactive</li>
+							<li>Default</li>
+						</ul>
 					</main>
 					<script type="text/plain" data-demo-scss>
-					.badge {
+					.demo-badge-list li {
 						@include badge;
 
 						// Semantic overrides
@@ -25,7 +25,7 @@
 						&.warning { --color-primary: var(--color-warning); }
 						&.error   { --color-primary: var(--color-error); }
 						&.info    { --color-primary: var(--color-info); }
-						&.neutral { --color-primary: var(--fg-subtle); }
+						&.neutral { --color-primary: var(--color-neutral-400); }
 					}
 					</script>
 				</section>
@@ -34,14 +34,14 @@
 				<section class="section-card" data-demo-html>
 					<header><h3>Live State (Pulse Animation)</h3></header>
 					<main>
-						<p>
-							<span class="badge success live">Live</span>
-							<span class="badge info live">Syncing</span>
-							<span class="badge warning live">Processing</span>
-						</p>
+						<ul class="demo-badge-list">
+							<li class="success live">Live</li>
+							<li class="info live">Syncing</li>
+							<li class="warning live">Processing</li>
+						</ul>
 					</main>
 					<script type="text/plain" data-demo-scss>
-					.badge {
+					.demo-badge-list li {
 						@include badge;
 
 						&.live {
@@ -56,16 +56,16 @@
 					<header><h3>Actionable Badge (button)</h3></header>
 					<main>
 						<p>When applied to a <code>&lt;button&gt;</code>, hover and active states activate automatically.</p>
-						<p>
-							<button class="badge success">Active</button>
-							<button class="badge warning">Pending</button>
-							<button class="badge error">Blocked</button>
-							<button class="badge neutral">Inactive</button>
-						</p>
+						<ul class="demo-badge-list">
+							<li><button class="success">Active</button></li>
+							<li><button class="warning">Pending</button></li>
+							<li><button class="error">Blocked</button></li>
+							<li><button class="neutral">Inactive</button></li>
+						</ul>
 					</main>
 					<script type="text/plain" data-demo-scss>
 					// Applied to <button> - hover/active states are handled automatically in `@mixin badge`
-					button.badge {
+					.demo-badge-list li button {
 						@include badge;
 					}
 					</script>
@@ -116,7 +116,7 @@
 						
 						&.success { --color-primary: var(--color-success); }
 						&.warning { --color-primary: var(--color-warning); }
-						&.neutral { --color-primary: var(--fg-subtle); }
+						&.neutral { --color-primary: var(--color-neutral-400); }
 						&.error   { --color-primary: var(--color-error); }
 						
 						&.live {
@@ -132,29 +132,35 @@
 					<main>
 						<p>In production, avoid class utilities like <code>.success</code> on project-owned elements. Use <code>@include badge</code> on a semantic selector and override <code>--color-primary</code>:</p>
 						<pre><code>&lt;!-- Library classes (prototyping / design system demos) --&gt;
-&lt;span class="badge success"&gt;Active&lt;/span&gt;
-&lt;span class="badge warning"&gt;Pending&lt;/span&gt;
-&lt;span class="badge neutral"&gt;Inactive&lt;/span&gt;
+&lt;ul class="demo-badge-list"&gt;
+	&lt;li class="success"&gt;Active&lt;/li&gt;
+	&lt;li class="warning"&gt;Pending&lt;/li&gt;
+	&lt;li class="neutral"&gt;Inactive&lt;/li&gt;
+&lt;/ul>
 
 &lt;!-- Production pattern — project-owned selectors --&gt;
-&lt;span class="status active"&gt;Active&lt;/span&gt;
-&lt;span class="status pending"&gt;Pending&lt;/span&gt;
-&lt;span class="status inactive"&gt;Inactive&lt;/span&gt;</code></pre>
+&lt;ul class="status-list"&gt;
+	&lt;li class="active"&gt;Active&lt;/li&gt;
+	&lt;li class="pending"&gt;Pending&lt;/li&gt;
+	&lt;li class="inactive"&gt;Inactive&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
 
 						<pre><code>// Project SCSS
-.status          { @include badge; }
-.status.active   { --color-primary: var(--color-success); }
-.status.pending  { --color-primary: var(--color-warning); }
-.status.inactive { --color-primary: var(--fg-subtle); }
+.status-list li {
+	@include badge;
+	&.active   { --color-primary: var(--color-success); }
+	&.pending  { --color-primary: var(--color-warning); }
+	&.inactive { --color-primary: var(--color-neutral-400); }
+}
 
 // Add pulse for real-time states
-.status.live     { @include badge-live; }</code></pre>
+.status-list li.live { @include badge-live; }</code></pre>
 
-						<p>
-							<span class="status active">Active</span>
-							<span class="status pending">Pending</span>
-							<span class="status inactive">Inactive</span>
-						</p>
+						<ul class="status-list">
+							<li class="active">Active</li>
+							<li class="pending">Pending</li>
+							<li class="inactive">Inactive</li>
+						</ul>
 					</main>
 				</section>
 
@@ -191,7 +197,7 @@
 								<tr><td><code>--color-warning</code></td><td><code>.badge.warning</code> override</td></tr>
 								<tr><td><code>--color-error</code></td><td><code>.badge.error</code> override</td></tr>
 								<tr><td><code>--color-info</code></td><td><code>.badge.info</code> override</td></tr>
-								<tr><td><code>--fg-subtle</code></td><td><code>.badge.neutral</code> override</td></tr>
+								<tr><td><code>--color-neutral-400</code></td><td><code>.badge.neutral</code> override</td></tr>
 								<tr><td><code>--radius-full</code></td><td>Pill border-radius</td></tr>
 								<tr><td><code>--text-xs</code></td><td>Font size</td></tr>
 								<tr><td><code>--font-medium</code></td><td>Font weight</td></tr>

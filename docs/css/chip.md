@@ -16,10 +16,10 @@ metadata display.
 
 ```html
 <!-- Plain chip -->
-<span data-ln-chip>Draft</span>
+<span class="ln-chip">Draft</span>
 
 <!-- Chip with remove button (for active filters) -->
-<span data-ln-chip>
+<span class="ln-chip">
 	Quality Manual
 	<button type="button" aria-label="Remove">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
@@ -27,21 +27,21 @@ metadata display.
 </span>
 
 <!-- Tone variants -->
-<span data-ln-chip="success">Approved</span>
-<span data-ln-chip="warning">Pending</span>
-<span data-ln-chip="error">Rejected</span>
-<span data-ln-chip="info">Draft</span>
+<span class="ln-chip success">Approved</span>
+<span class="ln-chip warning">Pending</span>
+<span class="ln-chip error">Rejected</span>
+<span class="ln-chip info">Draft</span>
 ```
 
 ## Tone variants
 
-| Attribute | Background tint |
+| Class / Selector | Background tint |
 |---|---|
 | (none) | Neutral grey |
-| `data-ln-chip="success"` | Success 12% |
-| `data-ln-chip="warning"` | Warning 12% |
-| `data-ln-chip="error"` | Error 12% |
-| `data-ln-chip="info"` | Info 12% |
+| `.ln-chip.success` | Success 12% |
+| `.ln-chip.warning` | Warning 12% |
+| `.ln-chip.error` | Error 12% |
+| `.ln-chip.info` | Info 12% |
 
 ## Tokens read
 
@@ -75,7 +75,7 @@ Examples:
 #filter-bar { --bg-recessed: var(--bg-elevated); }
 
 // One-off custom tone (matches the success/warning/error pattern)
-#legal-chip[data-ln-chip] {
+#legal-chip.ln-chip {
 	background: hsl(var(--color-secondary) / 0.12);
 	color:      hsl(var(--color-secondary));
 }

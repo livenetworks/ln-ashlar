@@ -12,4 +12,8 @@
 	@include items-center;
 	@include flex-wrap;
 	@include gap(var(--size-xs));
+
+	li {
+		@include chip;
+	}
 }

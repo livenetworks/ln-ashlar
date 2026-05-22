@@ -47,19 +47,19 @@
 	}
 
 	// Tone variants
-	&[data-ln-chip="success"] {
+	&.success {
 		background: hsl(var(--color-success) / 0.12);
 		color: hsl(var(--color-success));
 	}
-	&[data-ln-chip="warning"] {
+	&.warning {
 		background: hsl(var(--color-warning) / 0.12);
 		color: hsl(var(--color-warning));
 	}
-	&[data-ln-chip="error"] {
+	&.error {
 		background: hsl(var(--color-error) / 0.12);
 		color: hsl(var(--color-error));
 	}
-	&[data-ln-chip="info"] {
+	&.info {
 		background: hsl(var(--color-info) / 0.12);
 		color: hsl(var(--color-info));
 	}
