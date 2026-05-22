@@ -11,7 +11,7 @@ or own a data source. Instead, it announces what it needs
 back (`ln-data-table:set-data`). That "someone" is a tiny coordinator
 script you write per page — typically 10–20 lines that bridges the
 table and your data source (an `ln-store` IndexedDB cache, a
-`fetch()` to a Laravel endpoint, or a static JS array).
+`fetch()` to a server endpoint, or a static JS array).
 
 This split exists for one reason: the table is the same regardless of
 where the data comes from. Server-paginated, fully-cached, pre-loaded
@@ -23,6 +23,9 @@ For the design trade-offs (no built-in pagination, no built-in fetch,
 one row template per table), see
 [`data-table.md` §Why not X?](../../docs/js/data-table.md#why-not-x).
 
+For complete copy-pasteable HTML blueprints and coordinator patterns, see the master [Table & Data-Table Integration Patterns](../../docs/js/table-integration.md).
+
+
 ## Markup anatomy
 
 Below is a complete minimal table. Each piece exists for a reason — read
@@ -33,12 +36,12 @@ the prose after the snippet for the *why*.
 
 	<header>
 		<h3>Documents</h3>
-		<aside>
+		<form role="search" onsubmit="return false;">
 			<label>
 				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 				<input type="search" placeholder="Search..." data-ln-data-table-search>
 			</label>
-		</aside>
+		</form>
 	</header>
 
 	<table>
@@ -74,8 +77,8 @@ the prose after the snippet for the *why*.
 	<template data-ln-template="documents-row">
 		<tr data-ln-row>
 			<td><input type="checkbox" data-ln-row-select></td>
-			<td data-ln-cell="title"></td>
-			<td data-ln-cell="department"></td>
+			<td>{{ title }}</td>
+			<td>{{ department }}</td>
 			<td>
 				<button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
 				<button data-ln-row-action="delete" aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
@@ -97,7 +100,22 @@ the prose after the snippet for the *why*.
 	<template data-ln-template="column-filter">
 		<div class="column-filter-dropdown">
 			<input type="search" data-ln-filter-search placeholder="Search...">
-			<ul data-ln-filter-options></ul>
+			<ul data-ln-filter-options>
+				<li>
+					<label>
+						<input type="checkbox" data-ln-filter-reset>
+						All
+					</label>
+				</li>
+				<template data-ln-template="column-filter-item">
+					<li>
+						<label>
+							<input type="checkbox" data-ln-attr="value:value">
+							<span data-ln-field="value"></span>
+						</label>
+					</li>
+				</template>
+			</ul>
 			<button data-ln-filter-clear>Clear filter</button>
 		</div>
 	</template>
@@ -163,7 +181,7 @@ horizontal-overflow chrome of its own.
 
 Each header `<th>` is bound to a data field via `data-ln-col="field"`.
 The string `field` is the property name read from records in the row
-template — `<th data-ln-col="title">` matches `<td data-ln-cell="title">`.
+template — `<th data-ln-col="title">` matches the text placeholder `{{ title }}`.
 Without `data-ln-col`, the column has no field to sort or filter on; it's
 treated as a presentational column (e.g. the "Actions" header in the
 example above is plain `<th>Actions</th>` because there is no underlying
@@ -185,20 +203,21 @@ for rationale.
 
 A header may contain a filter button in addition to (or instead of) a
 sort button. Clicking it clones the `column-filter` template, populates
-it with the unique values for that column, and appends it inside the
-`<th>`. CSS positions it (the `<th>` is `position: relative`, the
-dropdown is `position: absolute`). When at least one value is unchecked,
+it with the unique values for that column (along with an "All" sentinel),
+and appends it inside the `<th>`. CSS positions it (the `<th>` is
+`position: relative`, the dropdown is `position: absolute`). When a filter
+is active (i.e., specific values are selected and "All" is deselected),
 JS adds `ln-filter-active` to the button — CSS draws an active dot.
 
 ### The row template — `<template data-ln-template="{name}-row">`
 
 The row template lives **inside the component root**, named
 `{table}-row`. The component clones it once per record and fills the
-cells. Two attributes do the filling:
+cells. Two methods do the filling:
 
-- `data-ln-cell="field"` → `el.textContent = record[field]`
-- `data-ln-cell-attr="field:attr"` → `el.setAttribute(attr, record[field])`,
-  comma-separated for multiple: `"id:data-id,url:href"`
+- **Cell Attributes**:
+  - `data-ln-cell-attr="field:attr"` → `el.setAttribute(attr, record[field])`,
+    comma-separated for multiple: `"id:data-id,url:href"`
 
 The row layout MUST live in `<template>`, not directly in `<tbody>`
 and not built in JS — see §Common mistakes 1 and 3 below.
@@ -228,10 +247,13 @@ column filters and re-requests data.
 
 `{table}-column-filter` (or the shared default `column-filter`) is the
 template cloned every time a filter button is clicked. The dropdown
-renders unique column values as checkboxes. A search input inside the
-dropdown lets the user filter the option list itself (auto-hidden when
-there are 8 or fewer values). A `[data-ln-filter-clear]` button clears
-just that column's filter.
+renders unique column values as checkboxes within the `[data-ln-filter-options]` element.
+The component automatically manages the options list:
+- An **"All"** sentinel checkbox (with `data-ln-filter-reset` attribute) is statically defined at the top of the option list.
+- Individual value checkboxes are rendered using the nested `<template data-ln-template="column-filter-item">` (or `{table}-column-filter-item`) below it.
+- Mutual exclusion is automatically enforced: checking any value checkbox deselects "All"; checking "All" (or deselecting the last value) checks "All" and deselects all values.
+- A search input inside the dropdown lets the user filter the option list itself (auto-hidden when there are 8 or fewer values).
+- A `[data-ln-filter-clear]` button clears just that column's filter.
 
 ### The footer — `data-ln-data-table-total` / `-filtered` / `-selected`
 
@@ -305,14 +327,9 @@ JS-driven inline styles in the rendering path.
 | `data-ln-row-id` | `<tr>` | Set by JS from `record.id` | Used internally for selection tracking and exposed in events |
 | `data-ln-row-select` | `<input type="checkbox">` | Row selection checkbox | Selection only activates if `selectable` is set on the root |
 | `data-ln-row-action="name"` | `<button>` | Row action button | Decouples "what action" (markup) from "what it does" (coordinator) |
-| `data-ln-cell="field"` | any element inside the row | JS fills `textContent` | Most cells are simple text — this is the 90% case |
 | `data-ln-cell-attr="field:attr"` | any element | JS sets attributes | For setting `href`, `src`, `data-*` from record values; comma-separated for multiple |
 
-`data-ln-cell` and `data-ln-cell-attr` use `setAttribute` /
-`textContent` — never `innerHTML`. If a record contains HTML, it is
-escaped, not interpreted. If you need rich content per cell, generate
-it as plain text in the coordinator before dispatching `set-data`, or
-dispatch a `row-click` and open a modal — never inject HTML strings.
+`data-ln-cell-attr` uses `setAttribute` and double curly brace interpolation uses `textContent` — never `innerHTML`. If a record contains HTML, it is escaped, not interpreted. If you need rich content per cell, generate it as plain text in the coordinator before dispatching `set-data`, or dispatch a `row-click` and open a modal — never inject HTML strings.
 
 ### Footer — anywhere inside the component root
 
@@ -417,17 +434,17 @@ The smallest possible table — sort on one column, nothing else.
 
 	<template data-ln-template="logs-row">
 		<tr data-ln-row>
-			<td data-ln-cell="time"></td>
-			<td data-ln-cell="message"></td>
+			<td>{{ time }}</td>
+			<td>{{ message }}</td>
 		</tr>
 	</template>
 </section>
 ```
 
-### Server-driven — typical Laravel listing
+### Server-driven — typical backend REST API listing
 
 The most common production shape. Coordinator listens for `request-data`,
-calls a Laravel endpoint, dispatches `set-data` back. Search and filters
+calls a server endpoint, dispatches `set-data` back. Search and filters
 are part of the request payload — the server does the work, the table
 just renders.
 
@@ -460,29 +477,6 @@ document.addEventListener('ln-data-table:request-data', async function (e) {
 
 	tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-loading', {
 		detail: { loading: false }
-	}));
-});
-```
-
-### Client-side cache via ln-store
-
-When data is small enough to live in IndexedDB. The coordinator reads
-from the store, applies sort/filter/search synchronously, and feeds
-results back. Search is instant because there's no network round-trip.
-
-```javascript
-document.addEventListener('ln-data-table:request-data', async function (e) {
-	if (e.detail.table !== 'documents') return;
-
-	const store = document.querySelector('[data-ln-store="documents"]');
-	const result = await store.lnStore.query({
-		sort: e.detail.sort,
-		filters: e.detail.filters,
-		search: e.detail.search
-	});
-
-	tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
-		detail: result
 	}));
 });
 ```
@@ -544,7 +538,7 @@ document.getElementById('bulk-delete').addEventListener('click', function () {
 <!-- WRONG -->
 <tbody data-ln-data-table-body>
 	<tr data-ln-row>
-		<td data-ln-cell="title"></td>
+		<td>{{ title }}</td>
 	</tr>
 </tbody>
 ```
@@ -553,22 +547,7 @@ The component clears `<tbody>` on every `set-data` and replaces it with
 clones from the `{table}-row` template. Static rows are wiped on the first
 render. Put the row layout inside `<template data-ln-template="{name}-row">`.
 
-### Mistake 2 — Mismatched `data-ln-col` and `data-ln-cell` field names
-
-```html
-<!-- WRONG — column says "title", cell says "name" -->
-<th data-ln-col="title">Title</th>
-...
-<td data-ln-cell="name"></td>
-```
-
-The cell stays empty because the record has no field called `name` (or
-because the sort request sends `field: "title"` but the data was
-prepared under `name`). The two strings must match exactly — they're
-the same identifier. Pick a convention (the API field name) and keep
-both sides aligned.
-
-### Mistake 3 — Building rows in JS instead of using the template
+### Mistake 2 — Building rows in JS instead of using the template
 
 ```javascript
 // WRONG
@@ -580,9 +559,9 @@ data.forEach(r => {
 This bypasses the template, opens an XSS hole on `r.title`, and
 duplicates row layout in the script file (now you have to redeploy JS
 to add a column). Use `set-data`, let the component render via the
-template — `data-ln-cell` uses `textContent` and is XSS-safe.
+template — double-curly brace template interpolation uses `textContent` and is XSS-safe.
 
-### Mistake 4 — Calling internal methods from outside
+### Mistake 3 — Calling internal methods from outside
 
 ```javascript
 // WRONG
