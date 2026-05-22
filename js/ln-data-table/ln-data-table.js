@@ -74,23 +74,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		this._scrollHandler = null;
 		this._scrollContainer = null;
 
-		// ─── Toolbar height tracking ───────────────────────────────
-		// CSS reads --data-table-toolbar-h on the section root to offset the
-		// sticky <thead> below the sticky <header>. ResizeObserver keeps it
-		// in sync with content/density changes (text wrap, button growth,
-		// theme switch shifting padding).
-		this._toolbar = dom.querySelector(':scope > header');
-		this._toolbarRO = null;
-		if (this._toolbar && typeof ResizeObserver !== 'undefined') {
-			const self0 = this;
-			this._toolbarRO = new ResizeObserver(function (entries) {
-				for (let i = 0; i < entries.length; i++) {
-					const h = entries[i].contentRect.height;
-					self0.dom.style.setProperty('--data-table-toolbar-h', h + 'px');
-				}
-			});
-			this._toolbarRO.observe(this._toolbar);
-		}
+
 
 		// Footer elements
 		this._totalSpan = dom.querySelector('[data-ln-data-table-total]');
@@ -1083,10 +1067,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);
 		if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 		this.dom.removeEventListener('click', this._onClearAll);
-		if (this._toolbarRO) {
-			this._toolbarRO.disconnect();
-			this._toolbarRO = null;
-		}
+
 		this._closeFilterDropdown();
 		this._disableVirtualScroll();
 		this._data = [];

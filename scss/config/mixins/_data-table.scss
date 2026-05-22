@@ -12,6 +12,7 @@
 @use 'form' as *;
 @use 'btn' as *;
 @use 'card' as *;
+@use 'ln-table';
 
 // Data Table -- enhanced table with toolbar, sort, filter, virtual scroll.
 //
@@ -59,81 +60,77 @@
 		border-spacing: 0;
 	}
 
-	// Toolbar
-	> header {
-		@include panel-header;
-		// Sticky toolbar — pins to the scroll container's top edge, same
-		// surface as the sticky thead. Section root is position:relative
-		// (line 25 above), which does NOT trap sticky — sticky uses
-		// scroll container, not containing block, for offset reference.
-		@include sticky;
-		top: 0;
-		z-index: var(--z-sticky);
+
+
+	// Sticky header - Pins the entire thead (including the in-thead toolbar) at top:0
+	thead {
+		@include sticky-top;
 	}
 
-	// Toolbar right-side group — flex row, items vertically centered, gap
-	// between siblings so search input + action buttons line up. Pure
-	// layout opinion (positioning + spacing of the consumer's elements);
-	// the appearance of those elements stays the consumer's concern.
-	// Without this, `<aside>` would be default-block and children would
-	// flow inline by text baseline, leaving action buttons visually
-	// offset from the taller search-input wrapper.
-	> header aside {
-		@include flex;
-		@include items-center;
-		--gap: var(--size-sm);
-		gap: var(--gap);
-	}
-
-	// Search label in toolbar
-	> header aside label {
-		@include inline-flex;
-		@include items-center;
-		--gap: var(--size-xs-up);
-		gap: var(--gap);
-		--padding-y: var(--size-xs);
-		--padding-x: var(--size-sm-up);
-		padding: var(--padding-y) var(--padding-x);
-		border-radius: var(--radius);
-		@include border;
-		background: var(--color-bg);
-		@include transition-fast;
-
-		input[type="search"] {
-			@include border-none;
-			@include text-sm;
-			background: transparent;
-			outline: none;
-			box-shadow: none;
-			@include w(10rem);
-
-			&::placeholder {
-				--color-fg: var(--fg-subtle);
-				color: var(--color-fg);
-			}
-
-			&::-webkit-search-cancel-button {
-				-webkit-appearance: none;
-			}
-		}
-
-		&:focus-within {
-			border-color: var(--color-accent);
-			box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 10%, transparent);
-		}
-	}
-
-	// Sticky header
 	thead th {
-		position: sticky;
-		// Offset by toolbar height so thead sits flush under it. JS writes
-		// --data-table-toolbar-h on the section root via ResizeObserver on
-		// the <header> child. Fallback 0 keeps static (no-JS) render
-		// behaving like before — thead pins at top:0 and the toolbar
-		// overlaps until JS measures. Acceptable degradation.
-		top: var(--data-table-toolbar-h, 0);
-		z-index: var(--z-sticky);
-		background: var(--color-bg);
+		position: relative;
+		top: auto;
+		z-index: auto;
+		background: var(--bg-sunken);
+
+		&[data-ln-col] {
+			// Maintain standard table-cell layout so columns don't break or stack vertically
+			white-space: normal;
+
+			// Add padding-inline-end to prevent text from overlapping absolute buttons
+			
+			// Case 1: Has both sort and filter buttons
+			&:has([data-ln-col-sort]):has([data-ln-col-filter]) {
+				padding-inline-end: calc(var(--padding-x) + 2.5rem);
+
+				[data-ln-col-filter] {
+					position: absolute;
+					top: 50%;
+					transform: translateY(-50%);
+					right: var(--padding-x);
+					margin: 0;
+				}
+
+				[data-ln-col-sort] {
+					position: absolute;
+					top: 50%;
+					transform: translateY(-50%);
+					right: calc(var(--padding-x) + 1.25rem);
+					margin: 0;
+				}
+			}
+
+			// Case 2: Has only sort button
+			&:has([data-ln-col-sort]):not(:has([data-ln-col-filter])) {
+				padding-inline-end: calc(var(--padding-x) + 1.25rem);
+
+				[data-ln-col-sort] {
+					position: absolute;
+					top: 50%;
+					transform: translateY(-50%);
+					right: var(--padding-x);
+					margin: 0;
+				}
+			}
+
+			// Case 3: Has only filter button
+			&:has([data-ln-col-filter]):not(:has([data-ln-col-sort])) {
+				padding-inline-end: calc(var(--padding-x) + 1.25rem);
+
+				[data-ln-col-filter] {
+					position: absolute;
+					top: 50%;
+					transform: translateY(-50%);
+					right: var(--padding-x);
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	// Support for the in-thead toolbar row inside ln-data-table
+	thead > tr:first-child:has(> th[colspan]) > th {
+		@include ln-table.ln-table-thead-toolbar;
 	}
 
 	// Section footer — sibling of <table>, NOT inside it. Moved out of
