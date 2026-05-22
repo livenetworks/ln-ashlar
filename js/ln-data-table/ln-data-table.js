@@ -937,7 +937,8 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			viewportH = window.innerHeight;
 		}
 
-		const startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
+		let startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
+		startRow = Math.min(startRow, total);
 		const endRow = Math.min(startRow + Math.ceil(viewportH / rowH) + (BUFFER_ROWS * 2), total);
 
 		if (startRow === this._vStart && endRow === this._vEnd) return;
