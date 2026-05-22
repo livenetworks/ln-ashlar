@@ -4,7 +4,7 @@
 				<p>Centered, icon-led placeholder for lists with no data. Two semantic sub-types: <code>no-data</code> (nothing exists yet) and <code>no-results</code> (filter returned zero matches).</p>
 
 				<!-- Both variants side by side -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Both Variants</h3></header>
 					<main>
 						<div id="demo-empty-variants">
@@ -28,10 +28,20 @@
 							</div>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Default attribute — zero SCSS needed
+// <div data-ln-empty-state="no-data">...</div>
+// <div data-ln-empty-state="no-results">...</div>
+
+// Or custom styling via mixin:
+.my-empty-state {
+    @include empty-state;
+}
+					</script>
 				</section>
 
 				<!-- no-data standalone -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>no-data — Full Table Context</h3></header>
 					<main>
 						<div class="table-container">
@@ -54,10 +64,16 @@
 						</table>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Add empty-state styling to a table-nested container:
+.table-empty-container {
+    @include empty-state;
+}
+					</script>
 				</section>
 
 				<!-- no-results standalone -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>no-results — Full Table Context</h3></header>
 					<main>
 						<div class="table-container">
@@ -80,10 +96,20 @@
 						</table>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Sub-type styling custom override example:
+[data-ln-empty-state="no-results"] {
+    @include empty-state;
+
+    button {
+        --color-primary: var(--color-secondary);
+    }
+}
+					</script>
 				</section>
 
 				<!-- Icon-only minimal variant -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Minimal — Icon + Title Only</h3></header>
 					<main>
 						<div data-ln-empty-state>
@@ -91,22 +117,11 @@
 							<h3>Nothing here yet</h3>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Minimal empty state without description/button
+.minimal-empty {
+    @include empty-state;
+}
+					</script>
 				</section>
 
-				<!-- SCSS Reference -->
-				<section class="section-card">
-					<header><h3>SCSS Usage</h3></header>
-					<main>
-						<pre><code>// Default attribute — zero SCSS needed
-// &lt;div data-ln-empty-state="no-data"&gt;...&lt;/div&gt;
-// &lt;div data-ln-empty-state="no-results"&gt;...&lt;/div&gt;
-
-// Consumer semantic selector
-#documents .empty { @include empty-state; }
-
-// Sub-type differentiation (optional)
-[data-ln-empty-state="no-results"] button {
-    --color-primary: var(--color-secondary);
-}</code></pre>
-					</main>
-				</section>

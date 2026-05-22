@@ -165,9 +165,8 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	--padding-y: var(--size-2xs);
-	--padding-x: var(--size-2xs);
-	padding: var(--padding-y) var(--padding-x);
+	--btn-padding-y: var(--size-2xs);
+	--btn-padding-x: var(--size-2xs);
 	--margin-inline: var(--size-xs);
 	margin-inline-start: var(--margin-inline);
 	vertical-align: middle;
@@ -197,9 +196,8 @@
 	@include cursor-pointer;
 	background: none;
 	border: none;
-	--padding-y: var(--size-2xs);
-	--padding-x: var(--size-2xs);
-	padding: var(--padding-y) var(--padding-x);
+	--btn-padding-y: var(--size-2xs);
+	--btn-padding-x: var(--size-2xs);
 	--margin-inline: var(--size-2xs);
 	margin-inline-start: var(--margin-inline);
 	vertical-align: middle;
@@ -238,9 +236,8 @@
 	background: none;
 	border: none;
 	--shadow: none;
-	--padding-y: var(--size-2xs);
-	--padding-x: var(--size-2xs);
-	padding: var(--padding-y) var(--padding-x);
+	--btn-padding-y: var(--size-2xs);
+	--btn-padding-x: var(--size-2xs);
 	opacity: 0.5;
 	@include motion-safe {
 		transition: opacity 0.15s;

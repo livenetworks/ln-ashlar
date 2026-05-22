@@ -25,7 +25,7 @@
 					</section>
 
 					<!-- Example 1: Basic -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Basic</h3></header>
 						<main>
 							<form data-ln-translations
@@ -59,7 +59,7 @@
 					</section>
 
 					<!-- Example 2: Pre-loaded -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — With Existing Translations</h3></header>
 						<main>
 							<form data-ln-translations
@@ -89,7 +89,7 @@
 					</section>
 
 					<!-- Example 3: Nested (prefix) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Nested Items (Prefix)</h3></header>
 						<main>
 							<form data-ln-translations
@@ -159,28 +159,4 @@ name="items[5][trans][en][title]"</code></pre>
 						</main>
 					</section>
 
-					<!-- HTML Structure -->
-					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
-						<main>
-							<pre><code>&lt;form data-ln-translations
-      data-ln-translations-default="en"&gt;
-    &lt;header&gt;
-        &lt;h3&gt;Section Title&lt;/h3&gt;
-        &lt;div class="ln-translations__actions"&gt;
-            &lt;ul data-ln-translations-active&gt;&lt;/ul&gt;
-            &lt;div data-ln-dropdown&gt;
-                &lt;button type="button" data-ln-translations-add
-                        data-ln-toggle-for="menu-id" class="ln-icon-globe"&gt;&lt;/button&gt;
-                &lt;ul id="menu-id" data-ln-toggle&gt;&lt;/ul&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
-    &lt;/header&gt;
-    &lt;main&gt;
-        &lt;p data-ln-translatable="scope"&gt;
-            &lt;label&gt;Scope &lt;textarea name="scope"&gt;...&lt;/textarea&gt;&lt;/label&gt;
-        &lt;/p&gt;
-    &lt;/main&gt;
-&lt;/form&gt;</code></pre>
-						</main>
-					</section>
+

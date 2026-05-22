@@ -143,7 +143,8 @@
 		color: inherit;
 		font: inherit;
 		@include cursor-pointer;
-		padding: 0;
+		--btn-padding-y: 0;
+		--btn-padding-x: 0;
 
 		.ln-icon-filter {
 			opacity: 0.4;
@@ -162,9 +163,8 @@
 		@include flex;
 		@include items-center;
 		@include text-left;
-		--padding-y: var(--size-xs);
-		--padding-x: var(--size-sm);
-		padding: var(--padding-y) var(--padding-x);
+		--btn-padding-y: var(--size-xs);
+		--btn-padding-x: var(--size-sm);
 		@include text-sm;
 		@include font-normal;
 		background: none;
@@ -285,9 +285,8 @@
 		}
 
 		li button {
-			--padding-y: var(--size-2xs);
-			--padding-x: var(--size-sm);
-			padding: var(--padding-y) var(--padding-x);
+			--btn-padding-y: var(--size-2xs);
+			--btn-padding-x: var(--size-sm);
 			@include text-xs;
 			@include font-medium;
 			@include rounded-full;
@@ -350,7 +349,8 @@
 		@include text-sm;
 		@include font-bold;
 		line-height: 1;
-		padding: 0;
+		--btn-padding-y: 0;
+		--btn-padding-x: 0;
 		--margin-inline: var(--size-2xs);
 		margin-left: var(--margin-inline);
 

@@ -114,6 +114,12 @@ Components expose a JS API on the element (e.g. read state via `el.lnModal.isOpe
 | [docs/js/component-guide.md](docs/js/component-guide.md) | IIFE pattern, MutationObserver, events, reactive state |
 | [docs/js/core.md](docs/js/core.md) | ln-core helpers: dispatch, fill, renderList, reactiveState |
 
+### Core Architecture Specifications
+
+| Document | Contents |
+|----------|----------|
+| [docs/architecture/reference.md](docs/architecture/reference.md) | Full architectural specifications (Buttons, Modals, Tokens, Themes, Breakpoints, Icons) |
+
 ### Full index
 
 [docs/README.md](docs/README.md) — complete table of all CSS and JS docs, with links to both usage guides (`js/ln-*/README.md`) and architecture references (`docs/js/*.md`). Also hosts the v1.1 roadmap index.

@@ -242,7 +242,7 @@
 					</section>
 
 					<!-- Live demo: text input -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Demo — Text input (required + minlength)</h3></header>
 						<main>
 							<div class="form-element">
@@ -254,10 +254,29 @@
 								</ul>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Стилизирање на полињата при валидација
+input.ln-validate-invalid,
+select.ln-validate-invalid,
+textarea.ln-validate-invalid {
+  @include form-validate-invalid;
+}
+
+input.ln-validate-valid,
+select.ln-validate-valid,
+textarea.ln-validate-valid {
+  @include form-validate-valid;
+}
+
+// Стилизирање на листата со грешки
+[data-ln-validate-errors] {
+  @include form-validate-errors;
+}
+						</script>
 					</section>
 
 					<!-- Live demo: email -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Demo — Email validation</h3></header>
 						<main>
 							<div class="form-element">
@@ -273,7 +292,7 @@
 					</section>
 
 					<!-- Live demo: select -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Demo — Select field (change-based)</h3></header>
 						<main>
 							<div class="form-element">
@@ -293,7 +312,7 @@
 					</section>
 
 					<!-- Live demo: pattern -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Demo — Pattern validation</h3></header>
 						<main>
 							<div class="form-element">
@@ -307,7 +326,7 @@
 					</section>
 
 					<!-- Live demo: number range -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Demo — Number range</h3></header>
 						<main>
 							<div class="form-element">
@@ -322,7 +341,7 @@
 					</section>
 
 					<!-- Live demo: custom validation -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Demo — Custom validation (password confirmation)</h3></header>
 						<main>
 							<p>Custom errors that native HTML cannot express. The coordinator compares values cross-field and dispatches <code>ln-validate:set-custom</code> when they mismatch, <code>ln-validate:clear-custom</code> when they match. The <code>passwordMismatch</code> key is NOT in <code>ERROR_MAP</code> — its <code>&lt;li&gt;</code> is invisible to the native validation loop and only toggles via the event handlers.</p>

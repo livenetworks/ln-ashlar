@@ -176,7 +176,7 @@
 				</section>
 
 				<!-- Basic filter -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Basic Filter</h3></header>
 					<main>
 						<nav data-ln-filter="filter-basic-list">
@@ -198,10 +198,16 @@
 							<li data-category="dev">Boris Ilievski — Full Stack Developer</li>
 						</ul>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Filter bar pill styling:
+nav[data-ln-filter] {
+    @include filter-bar;
+}
+					</script>
 				</section>
 
 				<!-- Filter with cards -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Filter with Cards</h3></header>
 					<main>
 						<nav data-ln-filter="filter-cards-list">
@@ -240,10 +246,16 @@
 							</li>
 						</ul>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Filter bar navigation layout:
+nav[data-ln-filter] {
+    @include filter-bar;
+}
+					</script>
 				</section>
 
 				<!-- Filter + Search combo -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Filter + Search Combination</h3></header>
 					<main>
 						<p>Both components work <strong>independently</strong> on the same list — an item is visible only when neither hides it.</p>
@@ -273,10 +285,21 @@
 							<li data-dept="it">Lidija Petrovska — Security Engineer</li>
 						</ul>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Search and filter toolbar styling:
+#combo-toolbar {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+nav[data-ln-filter] {
+    @include filter-bar;
+}
+					</script>
 				</section>
 
 				<!-- Driving filter state from outside -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Driving filter state from outside</h3></header>
 					<main>
 						<p>ln-filter has no imperative API. External code drives state by setting <code>input.checked</code> on the filter's checkboxes and dispatching a bubbling <code>change</code> event.</p>
@@ -327,10 +350,16 @@
 							<li data-priority="medium">Task E — Medium priority</li>
 						</ul>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// API controlled filter navigation:
+#api-filter-nav {
+    @include filter-bar;
+}
+					</script>
 				</section>
 
 				<!-- Table Column Filter (Hardcoded) -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Table Column Filter (Hardcoded)</h3></header>
 					<main>
 						<p>Filter a plain <code>&lt;table&gt;</code> by column text. No <code>data-*</code> attributes needed on rows.</p>
@@ -361,10 +390,19 @@
 						</table>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Column filter menu list:
+nav[data-ln-filter] {
+    @include filter-bar;
+}
+table {
+    @include table-base;
+}
+					</script>
 				</section>
 
 				<!-- Multi-Column Table Filter -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Multi-Column Table Filter (AND logic)</h3></header>
 					<main>
 						<p>Two filters on the same table: department (column 2) AND status (column 3). Combined with AND logic across columns.</p>
@@ -405,10 +443,19 @@
 						</table>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Multi-column filter tracks:
+span[data-ln-filter] {
+    @include filter-bar;
+}
+table {
+    @include table-base;
+}
+					</script>
 				</section>
 
 				<!-- Auto-Populate + Search -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Auto-Populate from Column + Search</h3></header>
 					<main>
 						<p>Filter values auto-populated from column 2 text. Search input filters the checkbox list.</p>
@@ -443,6 +490,15 @@
 						</table>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Auto-populated search filter:
+#filter-dept-list-3 {
+    @include filter-bar;
+}
+table {
+    @include table-base;
+}
+					</script>
 				</section>
 
 				<!-- Events -->
@@ -468,26 +524,7 @@ document.addEventListener('ln-filter:reset', function (e) {
 					</main>
 				</section>
 
-				<!-- HTML Structure -->
-				<section class="section-card">
-					<header><h3>HTML Structure</h3></header>
-					<main>
-						<pre><code>&lt;!-- Filter checkboxes --&gt;
-&lt;nav data-ln-filter="my-list"&gt;
-    &lt;ul&gt;
-        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked&gt; All&lt;/label&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"&gt; Category A&lt;/label&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"&gt; Category B&lt;/label&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-&lt;/nav&gt;
 
-&lt;!-- Target list (children have data-category attribute) --&gt;
-&lt;ul id="my-list"&gt;
-    &lt;li data-category="a"&gt;Element from category A&lt;/li&gt;
-    &lt;li data-category="b"&gt;Element from category B&lt;/li&gt;
-&lt;/ul&gt;</code></pre>
-					</main>
-				</section>
 
 				<!-- CSS -->
 				<section class="section-card">

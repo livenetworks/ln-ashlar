@@ -21,7 +21,7 @@
 					</section>
 
 					<!-- Example 1: Basic -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Basic Dropdown</h3></header>
 						<main>
 							<div data-ln-dropdown>
@@ -34,10 +34,20 @@
 								</ul>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-dropdown] {
+							@include dropdown;
+
+							// The dropdown menu/list
+							[data-ln-toggle] {
+								@include dropdown-menu;
+							}
+						}
+						</script>
 					</section>
 
 					<!-- Example 2: Multiple -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Multiple Dropdowns</h3></header>
 						<main>
 							<p>Each dropdown operates independently. Opening one does not close the other (unless you click outside).</p>
@@ -60,6 +70,16 @@
 								</div>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-dropdown] {
+							@include dropdown;
+
+							// The dropdown menu/list
+							[data-ln-toggle] {
+								@include dropdown-menu;
+							}
+						}
+						</script>
 					</section>
 
 					<!-- API & Events -->
@@ -88,19 +108,7 @@ window.lnDropdown(document.body);</code></pre>
 						</main>
 					</section>
 
-					<!-- HTML Structure -->
-					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
-						<main>
-							<pre><code>&lt;div data-ln-dropdown&gt;
-    &lt;button data-ln-toggle-for="my-menu"&gt;Open&lt;/button&gt;
-    &lt;ul id="my-menu" data-ln-toggle&gt;
-        &lt;li&gt;&lt;button&gt;Option A&lt;/button&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;button&gt;Option B&lt;/button&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-&lt;/div&gt;</code></pre>
-						</main>
-					</section>
+
 
 					<!-- Dependencies -->
 					<section class="section-card">

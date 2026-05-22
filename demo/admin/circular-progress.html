@@ -289,7 +289,7 @@
 					</section>
 
 					<!-- Demo: colours -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Colour variants</h3></header>
 						<main>
 							<p>Colour is class-driven. The shipped <code>.success</code> / <code>.warning</code> / <code>.error</code> classes override <code>stroke</code> directly on the fill circle in <code>scss/components/_circular-progress.scss</code>; the default (no class) reads <code>var(--color-accent)</code> and follows the active theme.</p>
@@ -312,10 +312,26 @@
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Basic circular progress element:
+[data-ln-circular-progress] {
+    @include circular-progress;
+}
+// Colour variants are applied by overriding --color-primary:
+.success {
+    --color-primary: var(--color-success);
+}
+.warning {
+    --color-primary: var(--color-warning);
+}
+.error {
+    --color-primary: var(--color-error);
+}
+						</script>
 					</section>
 
 					<!-- Demo: sizes -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Size variants</h3></header>
 						<main>
 							<p>Size variants scale the host element via CSS. The SVG <code>viewBox</code> is unchanged; the SVG fills the host's pixel dimensions. Each size variant also rebinds the label font-size proportionally.</p>
@@ -338,10 +354,22 @@
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Size variants mixins scale element size:
+.sm {
+    @include circular-progress-sm;
+}
+.lg {
+    @include circular-progress-lg;
+}
+.xl {
+    @include circular-progress-xl;
+}
+						</script>
 					</section>
 
 					<!-- Demo: custom max + label -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Non-percentage scale (max + label)</h3></header>
 						<main>
 							<p>For "X out of Y" indicators, set <code>data-ln-circular-progress-max="Y"</code> to shift the denominator and <code>data-ln-circular-progress-label="X/Y"</code> to override the auto-computed percentage. Without the label override, the centre would show the ratio (e.g. "70%") instead of the count.</p>
@@ -360,10 +388,16 @@
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Custom denominator or letter grades:
+[data-ln-circular-progress] {
+    @include circular-progress;
+}
+						</script>
 					</section>
 
 					<!-- Demo: reactive (the canonical attribute write) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Reactive updates (attribute write)</h3></header>
 						<main>
 							<p>The attribute IS the API. Each button below writes <code>data-ln-circular-progress</code> to a new value; the MutationObserver fires, <code>_render</code> recomputes the offset, and the browser's CSS transition smoothly animates the arc from the previous angle to the new one. Open DOM Inspector and watch the attribute change with each click.</p>
@@ -384,6 +418,12 @@
 							</nav>
 							<p style="margin-block-start: var(--size-md); font-size: var(--text-body-sm); color: var(--fg-muted);">Try the overshoot and undershoot buttons. The attribute holds the raw value (visible in DOM Inspector), but the rendered arc clamps to 0–100% — the ring fills fully at 100% and stays empty at 0%, no matter how far the value strays.</p>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Transition animates the svg path's stroke-dashoffset:
+[data-ln-circular-progress] {
+    @include circular-progress;
+}
+						</script>
 					</section>
 
 					<!-- Demo: event log -->

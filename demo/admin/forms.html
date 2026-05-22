@@ -245,7 +245,7 @@
 				<!-- ==========================================
 				     LIVE DEMO — ln-validate + ln-form
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Live demo — ln-validate + ln-form</h3></header>
 					<main>
 						<form id="demo-form-grid" data-ln-form>
@@ -312,12 +312,35 @@
 						<h4>Event log</h4>
 						<pre id="form-log"></pre>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Authentic form layout and controls:
+form {
+    @include form-grid; // 6-column grid wrapping fields
+}
+.form-element label {
+    @include form-label;
+}
+input[type="text"], input[type="email"], input[type="tel"] {
+    @include form-input;
+}
+select {
+    @include form-input;
+    @include form-select;
+}
+textarea {
+    @include form-input;
+    @include form-textarea;
+}
+.form-actions {
+    @include form-actions;
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
 				     AUTO-SUBMIT DEMO
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Auto-submit — search/filter forms</h3></header>
 					<main>
 						<p><code>data-ln-form-auto</code> submits on any input change. <code>data-ln-form-debounce="300"</code> waits 300ms after last change.</p>
@@ -388,7 +411,7 @@ form.lnForm.reset();</code></pre>
 				<!-- ==========================================
 				     PILL LABELS
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Pill labels — checkbox &amp; radio</h3></header>
 					<main>
 						<article>
@@ -453,7 +476,7 @@ form.lnForm.reset();</code></pre>
 				<!-- ==========================================
 				     INPUT STATES
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Input States</h3></header>
 					<main>
 						<section id="demo-input-states">
@@ -486,12 +509,29 @@ form.lnForm.reset();</code></pre>
 							</div>
 						</section>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Styling form input states:
+input {
+    @include form-input;
+    
+    &:disabled {
+        opacity: 0.5;
+        background: var(--bg-sunken);
+    }
+    &.ln-validate-invalid {
+        @include form-validate-invalid;
+    }
+    &.ln-validate-valid {
+        @include form-validate-valid;
+    }
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
 				     SELECT & TEXTAREA
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Select &amp; Textarea</h3></header>
 					<main>
 						<section id="demo-select-textarea">
@@ -524,12 +564,23 @@ form.lnForm.reset();</code></pre>
 							</div>
 						</section>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Dropdown selects and textareas:
+select {
+    @include form-input;
+    @include form-select; // Custom arrow down SVG background
+}
+textarea {
+    @include form-input;
+    @include form-textarea; // Min-height and vertical resize
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
 				     CHECKBOXES & RADIOS
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Checkboxes &amp; Radios</h3></header>
 					<main>
 						<section id="demo-checks">
@@ -549,12 +600,21 @@ form.lnForm.reset();</code></pre>
 							</fieldset>
 						</section>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Checkboxes and Radios styled states:
+input[type="checkbox"] {
+    @include form-checkbox;
+}
+input[type="radio"] {
+    @include form-radio;
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
 				     BUTTONS
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Buttons — Architecture</h3></header>
 					<main>
 						<p>Three tiers. No class needed for the first two — the browser <code>type</code> attribute determines the role.</p>
@@ -594,12 +654,26 @@ form.lnForm.reset();</code></pre>
 /* Context override — all submit + action buttons inside change */
 .danger-zone  { --color-primary: var(--color-error); }</code></pre>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Buttons default architecture:
+button {
+    @include button-base;
+}
+// Accent variant (e.g. type="submit") uses btn rebind:
+button[type="submit"] {
+    @include btn;
+}
+// Action button prototyping:
+.btn {
+    @include btn;
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
 				     BUTTON SIZES
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Button Sizes</h3></header>
 					<main>
 						<p>Size modifiers: <code>class="btn btn-sm"</code> and <code>class="btn btn-lg"</code>. In projects, apply via <code>@include btn-sm</code> / <code>@include btn-lg</code> after <code>@include btn</code>.</p>
@@ -614,12 +688,21 @@ form.lnForm.reset();</code></pre>
 							<button type="button" class="btn btn-lg info">Large Info</button>
 						</nav>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Button sizes modifiers:
+.btn-sm {
+    @include btn-sm;
+}
+.btn-lg {
+    @include btn-lg;
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
 				     ICON BUTTONS
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Icon-only Buttons</h3></header>
 					<main>
 						<p>Icon-only buttons use no class — they get neutral global styling (transparent, gray hover). No padding override needed.</p>
@@ -631,12 +714,20 @@ form.lnForm.reset();</code></pre>
 							<button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
 						</nav>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Icon buttons rely on default button-base with --btn-bg/border transparent:
+button.btn-icon {
+    --btn-bg: transparent;
+    --btn-border: transparent;
+    color: var(--fg-subtle);
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
 				     BUTTON GROUPS
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Button Groups — <code>btn-group</code></h3></header>
 					<main>
 						<p>Row action buttons grouped with small gap. In projects: <code>#users-table .row-actions { @include btn-group; }</code></p>
@@ -647,6 +738,12 @@ form.lnForm.reset();</code></pre>
 							<li><button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 						</ul>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Button group mixin:
+.btn-group {
+    @include btn-group;
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
@@ -718,7 +815,7 @@ form.lnForm.reset();</code></pre>
 
 				<!-- ─── Focus indicator presets ─────────────────────── -->
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>focus-ring — outer glow (default)</h3></header>
 					<main>
 						<p class="demo-note">Safe, universally readable. No layout shift. Tailwind / Vercel convention.</p>
@@ -749,9 +846,15 @@ form.lnForm.reset();</code></pre>
 							</ul>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Safe, universally readable halo preset:
+input:focus-visible {
+    @include focus-ring;
+}
+					</script>
 				</section>
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>focus-border-thicken — structural outline</h3></header>
 					<main>
 						<p class="demo-note">Sharp, structural. No glow. Enterprise / business UI. Material Design style.</p>
@@ -782,9 +885,15 @@ form.lnForm.reset();</code></pre>
 							</ul>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Thick structural outline (no layout shift):
+input:focus-visible {
+    @include focus-border-thicken;
+}
+					</script>
 				</section>
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>focus-combination — border + ring</h3></header>
 					<main>
 						<p class="demo-note">Border color + outer ring. Maximum signal strength. Accessibility-first.</p>
@@ -815,9 +924,15 @@ form.lnForm.reset();</code></pre>
 							</ul>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Border color shift + soft outer ring (maximum signal):
+input:focus-visible {
+    @include focus-combination;
+}
+					</script>
 				</section>
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>focus-background-shift — minimal tint</h3></header>
 					<main>
 						<p class="demo-note">Very light primary tint. No border change. Focus is felt, not announced.</p>
@@ -848,9 +963,15 @@ form.lnForm.reset();</code></pre>
 							</ul>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Minimal soft background tint only:
+input:focus-visible {
+    @include focus-background-shift;
+}
+					</script>
 				</section>
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>focus-accent-line — bottom border only</h3></header>
 					<main>
 						<p class="demo-note">Bottom border only changes. Subtle. Good inside bordered containers.</p>
@@ -881,9 +1002,15 @@ form.lnForm.reset();</code></pre>
 							</ul>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Subtle accent bottom border color shift only:
+input:focus-visible {
+    @include focus-accent-line;
+}
+					</script>
 				</section>
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>focus-inset-shadow — tactile sink</h3></header>
 					<main>
 						<p class="demo-note">Inner shadow — field visually sinks. Tactile, three-dimensional feel.</p>
@@ -914,6 +1041,12 @@ form.lnForm.reset();</code></pre>
 							</ul>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Tactile three-dimensional inner shadow:
+input:focus-visible {
+    @include focus-inset-shadow;
+}
+					</script>
 				</section>
 
 				<div id="demo-input-components">
@@ -921,7 +1054,7 @@ form.lnForm.reset();</code></pre>
 				<!-- ==========================================
 				     NUMBER FORMATTING — ln-number
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Number Formatting — ln-number</h3></header>
 					<main>
 						<p>Real-time locale-aware number formatting. The component creates a hidden input for form submission and formats the visible input with thousand separators.</p>
@@ -952,12 +1085,18 @@ form.lnForm.reset();</code></pre>
 							</div>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Text fields and formatted numbers use form-input mixin:
+input[data-ln-number] {
+    @include form-input;
+}
+					</script>
 				</section>
 
 				<!-- ==========================================
 				     DATE FORMATTING — ln-date
 				     ========================================== -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Date Formatting — ln-date</h3></header>
 					<main>
 						<p>Locale-aware date formatting with native browser picker. The component creates a hidden input for form submission and formats the visible input using Intl.DateTimeFormat or custom patterns.</p>
@@ -994,6 +1133,12 @@ form.lnForm.reset();</code></pre>
 							</div>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Date fields and formatted dates use form-input mixin:
+input[data-ln-date] {
+    @include form-input;
+}
+					</script>
 				</section>
 
 				</div>

@@ -248,8 +248,14 @@ el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
 					</section>
 
 					<!-- Example: Sidebar -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Sidebar drawer</h3></header>
+						<script type="text/plain" data-demo-scss>
+// Sidebar drawer transition
+.sidebar {
+	@include sidebar-drawer;
+}
+						</script>
 						<main>
 							<p>The library's <code>@mixin sidebar-drawer</code> reads <code>data-ln-toggle="open"</code> directly from CSS and applies a <code>translateX(0)</code> transform. No JS coordinator — toggle owns the state, CSS owns the animation. The X close button uses <code>data-ln-toggle-action="close"</code> to always-close, never re-open.</p>
 							<section class="demo-toggle-sidebar">
@@ -271,8 +277,17 @@ el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
 					</section>
 
 					<!-- Example: Collapsible -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Collapsible section</h3></header>
+						<script type="text/plain" data-demo-scss>
+// Smooth grid-based collapsible panel
+.collapsible {
+	@include collapsible;
+}
+.collapsible-body {
+	@include collapsible-content;
+}
+						</script>
 						<main>
 							<p>For an inline expand/collapse with a smooth height animation, pair ln-toggle with the <code>.collapsible</code> mixin. The chevron rotates 180° on open via the trigger's <code>aria-expanded</code>; <code>.collapsible</code> animates <code>grid-template-rows</code> from <code>0fr</code> to <code>1fr</code>; <code>.collapsible-body</code> holds the padding so the parent can collapse cleanly to zero height.</p>
 							<article class="demo-toggle-collapsible">
@@ -295,7 +310,7 @@ el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
 					</section>
 
 					<!-- Example: Dropdown -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Dropdown menu</h3></header>
 						<main>
 							<p><code>ln-dropdown</code> is a wrapper that adds menu-grade behavior on top of one toggle: outside-click closes, resize closes, scroll repositions, body teleport for proper z-index. The underlying open/closed state still lives in <code>data-ln-toggle</code> on the inner menu element.</p>
@@ -412,37 +427,7 @@ el.lnToggle.destroy();    // detach listeners, dispatch :destroyed</code></pre>
 						</main>
 					</section>
 
-					<!-- HTML structure -->
-					<section class="section-card">
-						<header><h3>HTML structure reference</h3></header>
-						<main>
-<pre><code>&lt;!-- Panel that will be toggled --&gt;
-&lt;aside id="my-sidebar" data-ln-toggle&gt;
-    Content
-&lt;/aside&gt;
 
-&lt;!-- Trigger that controls it --&gt;
-&lt;button data-ln-toggle-for="my-sidebar"&gt;
-    Toggle
-&lt;/button&gt;
-
-&lt;!-- Starts open --&gt;
-&lt;section id="panel" data-ln-toggle="open"&gt;
-    Open content
-&lt;/section&gt;
-
-&lt;!-- Explicit close-only action — for X buttons inside drawers/alerts --&gt;
-&lt;button data-ln-toggle-for="panel"
-        data-ln-toggle-action="close"&gt;
-    Close
-&lt;/button&gt;
-
-&lt;!-- Persisted across reloads --&gt;
-&lt;aside id="sidebar" data-ln-toggle data-ln-persist&gt;
-    State remembered in localStorage
-&lt;/aside&gt;</code></pre>
-						</main>
-					</section>
 
 					<!-- CSS for animations -->
 					<section class="section-card">

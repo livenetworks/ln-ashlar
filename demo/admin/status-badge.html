@@ -156,7 +156,7 @@
 				<p>A compact inline label with a colored dot — pure CSS, no JS. Semantic color variants via <code>--color-primary</code> override. Pulse animation for live/active states.</p>
 
 				<!-- Variants -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Semantic Variants</h3></header>
 					<main>
 						<p>
@@ -168,10 +168,22 @@
 							<span class="badge">Default</span>
 						</p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					.badge {
+						@include badge;
+
+						// Semantic overrides
+						&.success { --color-primary: var(--color-success); }
+						&.warning { --color-primary: var(--color-warning); }
+						&.error   { --color-primary: var(--color-error); }
+						&.info    { --color-primary: var(--color-info); }
+						&.neutral { --color-primary: var(--fg-subtle); }
+					}
+					</script>
 				</section>
 
 				<!-- Live / pulse -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Live State (Pulse Animation)</h3></header>
 					<main>
 						<p>
@@ -180,10 +192,19 @@
 							<span class="badge warning live">Processing</span>
 						</p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					.badge {
+						@include badge;
+
+						&.live {
+							@include badge-live;
+						}
+					}
+					</script>
 				</section>
 
 				<!-- Actionable button -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Actionable Badge (button)</h3></header>
 					<main>
 						<p>When applied to a <code>&lt;button&gt;</code>, hover and active states activate automatically.</p>
@@ -194,10 +215,16 @@
 							<button class="badge neutral">Inactive</button>
 						</p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Applied to <button> - hover/active states are handled automatically in `@mixin badge`
+					button.badge {
+						@include badge;
+					}
+					</script>
 				</section>
 
 				<!-- In context -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>In Context — Table</h3></header>
 					<main>
 						<div class="table-container">
@@ -234,6 +261,21 @@
 						</table>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Badges inside table layout cells
+					.badge {
+						@include badge;
+						
+						&.success { --color-primary: var(--color-success); }
+						&.warning { --color-primary: var(--color-warning); }
+						&.neutral { --color-primary: var(--fg-subtle); }
+						&.error   { --color-primary: var(--color-error); }
+						
+						&.live {
+							@include badge-live;
+						}
+					}
+					</script>
 				</section>
 
 				<!-- Production usage -->

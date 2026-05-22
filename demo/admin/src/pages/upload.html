@@ -4,7 +4,7 @@
 					<p>File upload with drag-drop, progress bar, file type validation. A server is required for actual upload.</p>
 
 					<!-- Upload zone -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Upload Zone (demo — no server)</h3></header>
 						<main>
 							<div data-ln-upload="/api/files" data-ln-upload-accept="pdf,doc,docx,jpg,png">
@@ -27,10 +27,37 @@
 								</ul>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Стил за целата upload компонента
+.ln-upload {
+  @include upload;
+
+  &__zone {
+    @include upload-zone;
+
+    // Стил за dragover состојба
+    &.ln-upload__zone--dragover {
+      @include upload-zone-dragover;
+    }
+  }
+
+  &__list {
+    @include upload-list;
+  }
+
+  &__item {
+    @include upload-item;
+
+    &--error {
+      @include upload-item-error;
+    }
+  }
+}
+						</script>
 					</section>
 
 					<!-- Custom template -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Custom Item Template (scoped override)</h3></header>
 						<main>
 							<p>This uploader provides its own <code>&lt;template&gt;</code> inside the container — the default is ignored for this instance only.</p>
@@ -56,62 +83,88 @@
 								<ul class="ln-upload__list"></ul>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Прилагодување на внатрешните делови преку соодветни mixins
+.ln-upload {
+  &__name {
+    @include upload-name;
+  }
+
+  &__size {
+    @include upload-size;
+  }
+
+  &__progress {
+    @include upload-progress;
+
+    &-bar {
+      @include upload-progress-bar;
+    }
+  }
+}
+						</script>
 					</section>
 
-					<!-- HTML -->
+					<!-- API Documentation -->
 					<section class="section-card">
-						<header><h3>HTML</h3></header>
+						<header><h3>API &amp; Events</h3></header>
 						<main>
-							<pre><code>&lt;!-- Upload container --&gt;
-&lt;div data-ln-upload="/api/upload-endpoint"
-     data-ln-upload-accept="pdf,doc,jpg,png"&gt;
+							<h4>Attributes</h4>
+							<div class="table-container">
+								<table>
+									<thead>
+										<tr>
+											<th>Attribute</th>
+											<th>Description</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><code>data-ln-upload="URL"</code></td>
+											<td>Upload endpoint.</td>
+										</tr>
+										<tr>
+											<td><code>data-ln-upload-accept="ext,ext"</code></td>
+											<td>Comma-separated list of allowed file extensions.</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 
-    &lt;!-- Drop zone --&gt;
-    &lt;div class="ln-upload__zone"&gt;
-        &lt;p&gt;Drag files here&lt;/p&gt;
-    &lt;/div&gt;
-
-    &lt;!-- File list (populated automatically) --&gt;
-    &lt;ul class="ln-upload__list"&gt;&lt;/ul&gt;
-
-&lt;/div&gt;
-
-&lt;!-- Attributes --&gt;
-data-ln-upload="URL"           - upload endpoint
-data-ln-upload-accept="ext,ext" - allowed extensions
-
-&lt;!-- JS API (available on the container element) --&gt;
-&lt;script&gt;
-const container = document.querySelector('[data-ln-upload]');
+							<h4 class="mt-4">JS API (available on the container element)</h4>
+							<pre><code>const container = document.querySelector('[data-ln-upload]');
 container.lnUploadAPI.getFileIds();   // [1, 2, 3]
 container.lnUploadAPI.getFiles();     // file objects
-container.lnUploadAPI.clear();        // clear everything
-&lt;/script&gt;
+container.lnUploadAPI.clear();        // clear everything</code></pre>
 
-&lt;!-- Custom Events --&gt;
-ln-upload:uploaded   - {id, name, size}
-ln-upload:removed    - {id}
-ln-upload:error      - {message}
-ln-upload:invalid    - {file, reason}
-
-&lt;!-- Hidden inputs for form --&gt;
-&lt;!-- Created automatically: --&gt;
-&lt;input type="hidden" name="file_ids[]" value="123"&gt;
-
-&lt;!-- Custom item template (optional scoped override) --&gt;
-&lt;div data-ln-upload="/api/upload"&gt;
-    &lt;template data-ln-template="ln-upload-item"&gt;
-        &lt;li class="ln-upload__item"
-            data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting"&gt;
-            &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use data-ln-attr="href:iconHref" href="#ln-file"&gt;&lt;/use&gt;&lt;/svg&gt;
-            &lt;span data-ln-field="name"&gt;&lt;/span&gt;
-            &lt;span data-ln-field="sizeText"&gt;&lt;/span&gt;
-            &lt;button type="button" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel"&gt;...&lt;/button&gt;
-            &lt;div class="ln-upload__progress"&gt;&lt;div class="ln-upload__progress-bar"&gt;&lt;/div&gt;&lt;/div&gt;
-        &lt;/li&gt;
-    &lt;/template&gt;
-    &lt;div class="ln-upload__zone"&gt;&lt;p&gt;Drop files&lt;/p&gt;&lt;/div&gt;
-    &lt;ul class="ln-upload__list"&gt;&lt;/ul&gt;
-&lt;/div&gt;</code></pre>
+							<h4 class="mt-4">Custom Events</h4>
+							<div class="table-container">
+								<table>
+									<thead>
+										<tr>
+											<th>Event</th>
+											<th>Detail</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><code>ln-upload:uploaded</code></td>
+											<td><code>{id, name, size}</code></td>
+										</tr>
+										<tr>
+											<td><code>ln-upload:removed</code></td>
+											<td><code>{id}</code></td>
+										</tr>
+										<tr>
+											<td><code>ln-upload:error</code></td>
+											<td><code>{message}</code></td>
+										</tr>
+										<tr>
+											<td><code>ln-upload:invalid</code></td>
+											<td><code>{file, reason}</code></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</main>
 					</section>

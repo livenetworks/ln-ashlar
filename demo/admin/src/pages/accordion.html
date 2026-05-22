@@ -78,7 +78,7 @@
 					</section>
 
 					<!-- Basic Example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Basic accordion</h3></header>
 						<main>
 							<p>Three panels, one open by default. Try clicking each header — opening one closes the previously-open one. Open DevTools and watch <code>data-ln-toggle</code> flip on each <code>&lt;section&gt;</code>; that single attribute is the source of truth.</p>
@@ -120,10 +120,23 @@ import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-accordion] {
+							@include accordion;
+						}
+
+						.collapsible {
+							@include collapsible;
+						}
+
+						.collapsible-body {
+							@include collapsible-content;
+						}
+						</script>
 					</section>
 
 					<!-- Complex Example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Headers with rich content</h3></header>
 						<main>
 							<p>Triggers are full <code>&lt;header&gt;</code> elements. They can hold any markup — headings, badges, multi-line content. The whole header is the click target. Below: each panel uses <code>&lt;h4&gt;</code> in the trigger and <code>&lt;ul&gt;</code> with the <code>prose</code> class for the body content.</p>
@@ -180,10 +193,23 @@ import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-accordion] {
+							@include accordion;
+						}
+
+						.collapsible {
+							@include collapsible;
+						}
+
+						.collapsible-body.prose {
+							@include collapsible-content;
+						}
+						</script>
 					</section>
 
 					<!-- Nested accordion example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Nested accordions</h3></header>
 						<main>
 							<p>Nested accordions are supported. Each accordion only manages toggles whose nearest <code>[data-ln-accordion]</code> ancestor is itself — opening an inner panel does not affect the outer panel, and opening an outer panel does not touch the inner accordion's open/closed state. Try it: open Inner 2 and watch Outer 1 stay open; close Outer 1 and re-open it to see the inner accordion's previous state preserved.</p>
@@ -236,6 +262,19 @@ import 'ln-ashlar/dist/ln-ashlar.css';</code></pre>
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-accordion] {
+							@include accordion;
+
+							[data-ln-accordion] {
+								margin-top: var(--size-sm);
+							}
+						}
+
+						.collapsible {
+							@include collapsible;
+						}
+						</script>
 					</section>
 
 					<!-- Events -->

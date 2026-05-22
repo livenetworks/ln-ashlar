@@ -77,8 +77,8 @@
 		--btn-bg: transparent;
 		--btn-border: transparent;
 		--color-fg: var(--fg-muted);
-		--padding-y: 0;
-		--padding-x: 0;
+		--btn-padding-y: 0;
+		--btn-padding-x: 0;
 		color: var(--color-fg);
 		box-shadow: none;
 
@@ -137,8 +137,8 @@
 		// default. --color-border is already a composed hsl() value;
 		// read directly (no extra hsl() wrap).
 		--btn-border: var(--color-border);
-		--padding-y: var(--size-xs);
-		--padding-x: var(--size-sm-up);
+		--btn-padding-y: var(--size-xs);
+		--btn-padding-x: var(--size-sm-up);
 		@include text-xs;
 		font-weight: var(--font-medium);
 		border-radius: var(--radius-sm);

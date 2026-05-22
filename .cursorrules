@@ -1,4 +1,4 @@
-# CLAUDE.md — ln-ashlar Project (AI Core Rules)
+# AI Core Rules (.cursorrules)
 
 ## Working Mode
 
@@ -58,12 +58,3 @@ Before recommending an architecture, refactor, or claiming that a behavior/metho
 | **Icons (Tabler CDN)** | [docs/architecture/reference.md#icons](docs/architecture/reference.md#icons) |
 | **Reactive / core.md** | [docs/js/core.md](docs/js/core.md) & [docs/js/component-guide.md](docs/js/component-guide.md) |
 | **Global Standards** | `.claude/skills/` (html, css, js files) |
-
----
-
-## Build Commands
-
-```bash
-npm run build        # Build library into demo/dist/ + compile demo pages
-npm run dev          # Watch mode (library only)
-```

@@ -4,7 +4,7 @@
 					<p>Sortable headers, hover rows, section grouping, status badges, responsive mobile stacking. All via CSS mixins.</p>
 
 		<!-- Basic table -->
-		<section class="section-card">
+		<section class="section-card" data-demo-html>
 			<header><h3>Basic Table</h3></header>
 			<main>
 				<div class="table-container">
@@ -41,10 +41,16 @@
 				</table>
 				</div>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Standard table mixin styling:
+table {
+    @include table-base;
+}
+			</script>
 		</section>
 
 		<!-- Section headers -->
-		<section class="section-card">
+		<section class="section-card" data-demo-html>
 			<header><h3>Section rows</h3></header>
 			<main>
 				<div class="table-container">
@@ -64,10 +70,16 @@
 				</table>
 				</div>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Section header row styling in table:
+tr.section-header td {
+    @include table-section-header;
+}
+			</script>
 		</section>
 
 		<!-- Striped + actions -->
-		<section class="section-card">
+		<section class="section-card" data-demo-html>
 			<header><h3>Striped + Actions</h3></header>
 			<main>
 				<div class="table-container">
@@ -98,43 +110,14 @@
 				</table>
 				</div>
 			</main>
-		</section>
-
-		<!-- HTML -->
-		<section class="section-card">
-			<header><h3>HTML</h3></header>
-			<main>
-				<pre><code>&lt;table&gt;
-    &lt;thead&gt;
-        &lt;tr&gt;&lt;th&gt;Column&lt;/th&gt;&lt;th class="numeric"&gt;Number&lt;/th&gt;&lt;/tr&gt;
-    &lt;/thead&gt;
-    &lt;tbody&gt;
-        &lt;tr class="section-header"&gt;&lt;td colspan="2"&gt;Section&lt;/td&gt;&lt;/tr&gt;
-        &lt;tr&gt;
-            &lt;td data-label="Column"&gt;Value&lt;/td&gt;
-            &lt;td data-label="Number" class="numeric"&gt;42&lt;/td&gt;
-        &lt;/tr&gt;
-    &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;!-- Status badges --&gt;
-&lt;span class="badge success"&gt;Active&lt;/span&gt;
-&lt;span class="badge error"&gt;Inactive&lt;/span&gt;
-&lt;span class="badge warning"&gt;Pending&lt;/span&gt;
-&lt;span class="badge info"&gt;In Review&lt;/span&gt;
-
-&lt;!-- Responsive: data-label for mobile --&gt;
-&lt;td data-label="Name"&gt;Marko&lt;/td&gt;
-
-&lt;!-- Striped: apply via SCSS on a semantic selector --&gt;
-&lt;!-- #audit-log { @include table-striped; } --&gt;
-
-&lt;!-- Actions column: buttons with ul.actions (project SCSS) --&gt;
-&lt;td&gt;
-    &lt;ul class="actions"&gt;
-        &lt;li&gt;&lt;button type="button" class="action primary"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-eye"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/li&gt;
-        &lt;li&gt;&lt;button type="button" class="action danger"&gt;&lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-trash"&gt;&lt;/use&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-&lt;/td&gt;</code></pre>
-			</main>
+			<script type="text/plain" data-demo-scss>
+// Striped table variant and row action mixins:
+table {
+    @include table-base;
+    @include table-striped;
+}
+.actions button {
+    @include table-action;
+}
+			</script>
 		</section>

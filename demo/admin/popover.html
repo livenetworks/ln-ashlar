@@ -156,7 +156,7 @@
 				<p>JS component for click-triggered rich-content panels. The <code>data-ln-popover</code> attribute is the single source of truth for open/closed state. Click outside or press ESC to close.</p>
 
 				<!-- 1. Basic -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>1. Basic — Account popover</h3></header>
 					<main>
 						<p>Click the avatar button to open the account popover. Focus moves into the popover on open. Click outside or press ESC to close.</p>
@@ -175,10 +175,15 @@
 							</nav>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					[data-ln-popover] {
+						@include popover;
+					}
+					</script>
 				</section>
 
 				<!-- 2. Position attribute -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>2. Position attribute</h3></header>
 					<main>
 						<p>Four buttons with explicit preferred placement. The popover flips to the opposite side if the preferred side doesn't fit.</p>
@@ -202,10 +207,15 @@
 							<p>Preferred: <strong>right</strong>.</p>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					[data-ln-popover] {
+						@include popover;
+					}
+					</script>
 				</section>
 
 				<!-- 3. Auto-flip -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>3. Auto-flip near viewport edge</h3></header>
 					<main>
 						<p>The button below is pushed to the far right. Its popover prefers <code>right</code> but flips to <code>left</code> because there is no room on the right. Inspect <code>data-ln-popover-placement</code> after opening — it should read <code>left</code>.</p>
@@ -216,10 +226,15 @@
 							<p>I flipped to the left because there was no space on the right. <code>data-ln-popover-placement</code> = <em>left</em>.</p>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					[data-ln-popover] {
+						@include popover;
+					}
+					</script>
 				</section>
 
 				<!-- 4. Nested -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>4. Nested popovers — A stays open when B opens</h3></header>
 					<main>
 						<p>Open popover A, then click the button inside A to open popover B. Both A and B should be open simultaneously. Press ESC once to close B, again to close A.</p>
@@ -236,10 +251,15 @@
 							<p><strong>Popover B</strong> — A is still open. Press ESC to close me first.</p>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					[data-ln-popover] {
+						@include popover;
+					}
+					</script>
 				</section>
 
 				<!-- 5. Form inside popover -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>5. Form inside popover</h3></header>
 					<main>
 						<p>Interactive content inside a popover. Tab navigates the form fields; the popover stays open. Submit fires the form action.</p>
@@ -258,10 +278,22 @@
 							</form>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					[data-ln-popover] {
+						@include popover;
+						
+						// Form layouts inside a popover panel
+						form {
+							display: flex;
+							flex-direction: column;
+							gap: var(--gap);
+						}
+					}
+					</script>
 				</section>
 
 				<!-- 6. aria-expanded indicator -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>6. <code>aria-expanded</code> live indicator</h3></header>
 					<main>
 						<p>The trigger button below has its <code>aria-expanded</code> wired automatically. Watch the status line update as you open and close the popover.</p>
@@ -276,6 +308,11 @@
 							<p>Popover is open. Check the status line above.</p>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					[data-ln-popover] {
+						@include popover;
+					}
+					</script>
 				</section>
 
 <script>

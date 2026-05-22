@@ -258,7 +258,7 @@
 					</section>
 
 					<!-- Demo: simple list (default behavior) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Filter a list (default behavior)</h3></header>
 						<main>
 							<p>The minimum case: an input, a target list, no JavaScript. The component walks <code>target.children</code> on every keystroke (after the 150ms debounce) and toggles <code>data-ln-search-hide</code>. The library's CSS rule (<code>display: none !important</code>) hides matched items.</p>
@@ -292,10 +292,16 @@
 								<li>United States</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Wrapped search input styling:
+label:has(input[type="search"]) {
+    @include form-input-icon-group;
+}
+						</script>
 					</section>
 
 					<!-- Demo: input-direct (no wrapper) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Directly on the input (no wrapper)</h3></header>
 						<main>
 							<p><code>data-ln-search</code> can sit directly on an <code>&lt;input&gt;</code> with no surrounding label. The component uses the input itself as both the trigger and the input source.</p>
@@ -311,10 +317,16 @@
 								<li>HR — manages people</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Plain search input styling:
+input[type="search"] {
+    @include form-input;
+}
+						</script>
 					</section>
 
 					<!-- Demo: custom listener with preventDefault -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Custom event handler with <code>preventDefault()</code></h3></header>
 						<main>
 							<p>Listen for <code>ln-search:change</code> on the target, call <code>preventDefault()</code>, and own the visual response. This example shows a match counter instead of hiding elements — the items stay visible, but the count below updates.</p>
@@ -328,10 +340,16 @@
 								<li>Epsilon runtime</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Plain search input styling:
+input[type="search"] {
+    @include form-input;
+}
+						</script>
 					</section>
 
 					<!-- Demo: deep targeting with data-ln-search-items -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Deep targeting with <code>data-ln-search-items</code></h3></header>
 						<main>
 							<p>Items are nested under category sections. With <code>data-ln-search-items=".icon-cell"</code>, the component runs <code>target.querySelectorAll('.icon-cell')</code> on every search and toggles <code>data-ln-search-hide</code> on each match. Section wrappers and headings stay visible regardless. To collapse empty sections, that is consumer code — see the <code>ln-search</code> README's "Deep nested filtering" example.</p>
@@ -366,10 +384,16 @@
 								</section>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Nested search input styling:
+input[type="search"] {
+    @include form-input;
+}
+						</script>
 					</section>
 
 					<!-- Demo: server-search simulation -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Server-side search simulation</h3></header>
 						<main>
 							<p>The handler calls <code>preventDefault()</code> and pretends to issue an HTTP request. The log below shows the dispatched terms with their normalization (lowercased, trimmed) — note that rapid typing produces only one entry, the result of the 150ms debounce coalescing keystrokes.</p>
@@ -377,10 +401,16 @@
 							<output id="demo-server-target" hidden></output>
 							<div id="demo-server-log" aria-live="polite">Type to see dispatched search events...</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Plain search input styling:
+input[type="search"] {
+    @include form-input;
+}
+						</script>
 					</section>
 
 					<!-- Demo: pre-filled value -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Pre-filled input (browser form-restore simulation)</h3></header>
 						<main>
 							<p>A pre-filled input simulates the back-button-restore case. The constructor detects the non-empty value and dispatches <code>ln-search:change</code> via <code>queueMicrotask</code> — the search applies on its own at page load, no consumer wiring needed. Reload the page to see it run again.</p>
@@ -394,6 +424,12 @@
 								<li>Japan</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Plain search input styling:
+input[type="search"] {
+    @include form-input;
+}
+						</script>
 					</section>
 
 					<!-- Table integration -->

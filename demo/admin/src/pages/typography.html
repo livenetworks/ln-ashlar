@@ -4,7 +4,7 @@
 					<p>Base typography styles. All fonts, weights and sizes come from <code>_tokens.scss</code>.</p>
 
 		<!-- Headings -->
-		<section class="section-card">
+		<section class="section-card" data-demo-html>
 			<header><h3>Headings</h3></header>
 			<main>
 				<h1>h1 — Main heading (2.25rem)</h1>
@@ -14,20 +14,47 @@
 				<h5>h5 — Small heading (1rem, semibold)</h5>
 				<h6>h6 — Smallest (0.875rem, semibold)</h6>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Role-based heading typography mixins:
+h1 { @include typography(display-sm); }
+h2 { @include typography(heading-lg); }
+h3 { @include typography(heading-md); }
+h4 { @include typography(heading-sm); }
+h5 { @include typography(title-md); }
+h6 { @include typography(title-sm); }
+			</script>
 		</section>
 
 		<!-- Text -->
-		<section class="section-card">
+		<section class="section-card" data-demo-html>
 			<header><h3>Text</h3></header>
 			<main>
 				<p>Regular paragraph with <strong>bold text</strong>, <em>italic text</em> and <small>small text</small>.</p>
 				<p>Link: <a href="#">Example link</a> with hover effect.</p>
 				<blockquote>Blockquote — a quote with a left border in primary color.</blockquote>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Paragraph and inline formatting mixins:
+p {
+    @include text-base;
+    @include font-normal;
+    color: var(--color-fg);
+}
+strong { @include font-semibold; }
+small { @include text-sm; }
+a {
+    color: var(--color-primary);
+    @include transition-colors;
+}
+blockquote {
+    border-left: var(--border-width-strong) solid var(--color-primary);
+    padding-left: var(--size-md);
+}
+			</script>
 		</section>
 
 		<!-- Code -->
-		<section class="section-card">
+		<section class="section-card" data-demo-html>
 			<header><h3>Code</h3></header>
 			<main>
 				<p>Inline code: <code>var(--color-primary)</code></p>
@@ -37,10 +64,27 @@
     @include font-semibold;
 }</code></pre>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Monospace and code formatting mixins:
+code {
+    @include font-mono;
+    font-size: var(--text-sm);
+    background: var(--bg-sunken);
+    padding: var(--size-2xs) var(--size-xs);
+    border-radius: var(--radius-sm);
+}
+pre {
+    @include block;
+    overflow-x: auto;
+    background: var(--bg-sunken);
+    padding: var(--size-md);
+    border-radius: var(--radius);
+}
+			</script>
 		</section>
 
 		<!-- Lists -->
-		<section class="section-card">
+		<section class="section-card" data-demo-html>
 			<header><h3>Lists</h3></header>
 			<main>
 				<div class="demo-split">
@@ -62,6 +106,22 @@
 					</section>
 				</div>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Lists inside a rich text (prose) context:
+.prose {
+    ul {
+        list-style-type: disc;
+        padding-left: var(--size-lg);
+    }
+    ol {
+        list-style-type: decimal;
+        padding-left: var(--size-lg);
+    }
+    li {
+        margin-bottom: var(--size-xs);
+    }
+}
+			</script>
 		</section>
 
 		<!-- Font sizes -->
@@ -84,13 +144,4 @@
 			</main>
 		</section>
 
-		<!-- HTML -->
-		<section class="section-card">
-			<header><h3>HTML</h3></header>
-			<main>
-				<pre><code>&lt;h1&gt;Heading&lt;/h1&gt;
-&lt;p&gt;Paragraph with &lt;strong&gt;bold&lt;/strong&gt; and &lt;code&gt;inline code&lt;/code&gt;.&lt;/p&gt;
-&lt;blockquote&gt;Quote&lt;/blockquote&gt;
-&lt;pre&gt;&lt;code&gt;Code block&lt;/code&gt;&lt;/pre&gt;</code></pre>
-			</main>
-		</section>
+

@@ -175,7 +175,7 @@
 					</section>
 
 					<!-- Live Demo — Mock Store -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Live Demo — Mock Store</h3></header>
 						<main>
 							<p>This demo simulates <code>ln-store</code> behavior using an in-memory mock (no real IndexedDB or server). The event log shows the lifecycle.</p>
@@ -204,6 +204,8 @@
 
 							<h4>Event Log</h4>
 							<pre id="demo-event-log" class="demo-log"></pre>
+
+							<p>For a live CRUD wiring example with table + create/edit modal + 409-conflict handling, see <a href="store-usecase.html">Store — Usecase</a>.</p>
 						</main>
 					</section>
 
@@ -358,20 +360,7 @@ window.lnStore.init(el)                // manual init</code></pre>
 						</main>
 					</section>
 
-					<!-- HTML Structure -->
-					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
-						<main>
-							<pre><code>&lt;!-- One per resource, anywhere in the page --&gt;
-&lt;div data-ln-store="documents"
-     data-ln-store-endpoint="/api/documents"
-     data-ln-store-stale="300"
-     data-ln-store-indexes="status,category,updated_at"
-     data-ln-store-search-fields="title,description,author_name"&gt;
-&lt;/div&gt;</code></pre>
-					<p>For a live CRUD wiring example with table + create/edit modal + 409-conflict handling, see <a href="store-usecase.html">Store — Usecase</a>.</p>
-						</main>
-					</section>
+
 
 <script>
 (function() {

@@ -135,7 +135,7 @@
 </section>
 
 <!-- Demo 1 — Search-as-you-type (Path A) -->
-<section class="section-card">
+<section class="section-card" data-demo-html>
 	<header><h3>Demo 1 — Search-as-you-type (Path A)</h3></header>
 	<main>
 		<p>Type rapidly. Each keystroke fires a GET to <code>/api/search?q=…</code>. Different URLs (different <code>q</code>) run independently; same URLs (e.g. backspacing to a previously-typed query) collapse — the older aborts. The log shows abort errors with <code>AbortError</code>; only the latest typed query's response renders.</p>
@@ -153,7 +153,7 @@
 </section>
 
 <!-- Demo 2 — Drag-reorder (Path B) -->
-<section class="section-card">
+<section class="section-card" data-demo-html>
 	<header><h3>Demo 2 — Drag-reorder POST with explicit key (Path B)</h3></header>
 	<main>
 		<p>Click <strong>Move up</strong> / <strong>Move down</strong> rapidly. Each click dispatches a POST <code>ln-http:request</code> with <code>key: 'reorder-list-1'</code>. Path A would NOT cancel POSTs by URL; Path B aborts the previous in-flight one because the keys match. The log shows that fast clicks produce only one <code>ln-http:response</code> at the end.</p>
@@ -168,7 +168,7 @@
 </section>
 
 <!-- Demo 3 — Independent POSTs -->
-<section class="section-card">
+<section class="section-card" data-demo-html>
 	<header><h3>Demo 3 — Independent POSTs (no dedup)</h3></header>
 	<main>
 		<p>Click <strong>Create both</strong> to fire two POSTs to <code>/api/users</code> with different bodies. Path A does not auto-cancel non-idempotent methods; both succeed independently. Each call is a raw <code>fetch()</code> — no <code>ln-http:request</code> dispatch needed.</p>
@@ -183,7 +183,7 @@
 </section>
 
 <!-- Demo 4 — Cancel by URL (Path A) -->
-<section class="section-card">
+<section class="section-card" data-demo-html>
 	<header><h3>Demo 4 — Cancel a slow GET by URL (Path A)</h3></header>
 	<main>
 		<p>Click <strong>Start slow GET</strong> to fire a <code>fetch('/api/slow')</code> that takes 4s. Click <strong>Cancel /api/slow</strong> to call <code>lnHttp.cancel('/api/slow')</code>. The original fetch promise rejects with <code>AbortError</code>; the result panel shows that.</p>
@@ -199,7 +199,7 @@
 </section>
 
 <!-- Demo 5 — Cancel by key (Path B) -->
-<section class="section-card">
+<section class="section-card" data-demo-html>
 	<header><h3>Demo 5 — Cancel a Path B request by key</h3></header>
 	<main>
 		<p>Click <strong>Start reorder POST</strong> to dispatch a Path B request with <code>key: 'demo5-key'</code>. Click <strong>Cancel demo5-key</strong> to call <code>lnHttp.cancelByKey('demo5-key')</code>. Aborted Path B requests fire NO event (silent abort); the log records the cancel call and the absence of any <code>ln-http:response</code>.</p>
@@ -215,7 +215,7 @@
 </section>
 
 <!-- Demo 6 — Inflight inspector -->
-<section class="section-card">
+<section class="section-card" data-demo-html>
 	<header><h3>Demo 6 — Inflight inspector</h3></header>
 	<main>
 		<p>Live readout of <code>lnHttp.inflight</code>. Path A entries appear as <code>{ method, url }</code>; Path B entries appear as <code>{ key }</code>. A Path B GET with a <code>key</code> appears in BOTH (one entry per map). Polled every 200&nbsp;ms.</p>

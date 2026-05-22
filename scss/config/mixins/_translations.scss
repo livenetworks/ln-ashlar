@@ -95,7 +95,8 @@
 	@include text-sm;
 	@include font-bold;
 	color: inherit;
-	padding: 0;
+	--btn-padding-y: 0;
+	--btn-padding-x: 0;
 	line-height: 1;
 	@include transition-fast;
 

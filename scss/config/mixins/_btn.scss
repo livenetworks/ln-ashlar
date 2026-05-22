@@ -150,18 +150,16 @@
 }
 
 @mixin btn-sm {
-	--padding-x: var(--size-sm-up);
-	--gap:       var(--size-xs);
-	padding: var(--padding-y) var(--padding-x);
+	--btn-padding-x: var(--size-sm-up);
+	--gap:           var(--size-xs);
 	gap: var(--gap);
 	@include text-xs;
 }
 
 @mixin btn-lg {
-	--padding-x: var(--size-lg);
-	--padding-y: var(--size-md);
-	--gap:       var(--size-sm-up);
-	padding: var(--padding-y) var(--padding-x);
+	--btn-padding-x: var(--size-lg);
+	--btn-padding-y: var(--size-md);
+	--gap:           var(--size-sm-up);
 	gap: var(--gap);
 	@include text-base;
 }

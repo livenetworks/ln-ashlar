@@ -177,7 +177,7 @@
 					</section>
 
 					<!-- Live Demo — 500 rows -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Live Demo — 500 rows with search, sort and filter</h3></header>
 						<main>
 							<div data-ln-table id="demo-table">
@@ -278,6 +278,12 @@
 								</footer>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Table component base styling:
+[data-ln-table] {
+    @include table-base;
+}
+						</script>
 					</section>
 
 					<!-- Events -->
@@ -344,58 +350,7 @@ document.querySelector('#products tbody').innerHTML = generatedHtml;</code></pre
 						</main>
 					</section>
 
-					<!-- HTML Structure -->
-					<section class="section-card">
-						<header><h3>HTML Structure</h3></header>
-						<main>
-							<pre><code>&lt;div id="products" data-ln-table&gt;
-    &lt;template data-ln-table-empty&gt;
-        &lt;article class="ln-table__empty-state"&gt;
-            &lt;h3&gt;No results&lt;/h3&gt;
-            &lt;button data-ln-table-clear&gt;Clear&lt;/button&gt;
-        &lt;/article&gt;
-    &lt;/template&gt;
 
-    &lt;table&gt;
-        &lt;thead&gt;
-            &lt;tr&gt;
-                &lt;th colspan="5"&gt;
-                    &lt;div&gt;
-                        &lt;h3&gt;Products&lt;/h3&gt;
-                        &lt;aside&gt;
-                            &lt;label&gt;
-                                &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
-                                &lt;input type="search" placeholder="Search..." data-ln-search="products"&gt;
-                            &lt;/label&gt;
-                        &lt;/aside&gt;
-                    &lt;/div&gt;
-                &lt;/th&gt;
-            &lt;/tr&gt;
-            &lt;tr&gt;
-                &lt;th data-ln-sort="number"&gt;#&lt;/th&gt;
-                &lt;th data-ln-sort="string"&gt;Name&lt;/th&gt;
-                &lt;th data-ln-sort="date"&gt;Date&lt;/th&gt;
-                &lt;th data-ln-sort="number"&gt;Price&lt;/th&gt;
-                &lt;th&gt;Actions&lt;/th&gt;
-            &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody&gt;
-            &lt;tr&gt;
-                &lt;td&gt;1&lt;/td&gt;
-                &lt;td&gt;Widget A&lt;/td&gt;
-                &lt;td data-ln-value="1700000000"&gt;15.11.2023&lt;/td&gt;
-                &lt;td data-ln-value="1250"&gt;1.250&lt;/td&gt;
-                &lt;td&gt;&lt;button&gt;Edit&lt;/button&gt;&lt;/td&gt;
-            &lt;/tr&gt;
-        &lt;/tbody&gt;
-    &lt;/table&gt;
-
-    &lt;footer class="ln-table__footer"&gt;
-        &lt;span&gt;Total: &lt;strong&gt;&lt;/strong&gt;&lt;/span&gt;
-    &lt;/footer&gt;
-&lt;/div&gt;</code></pre>
-						</main>
-					</section>
 
 					<!-- API -->
 					<section class="section-card">

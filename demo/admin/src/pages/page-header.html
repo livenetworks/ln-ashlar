@@ -4,7 +4,7 @@
 				<p>Three-slot grid: breadcrumbs (top), title + optional subtitle (left), action buttons (right). Collapses to a vertical stack on containers narrower than 880px. Requires a container-context ancestor (<code>container-type: inline-size</code>).</p>
 
 				<!-- Full: breadcrumbs + title + actions (wide) -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Full — Breadcrumbs + Title + Actions (wide container)</h3></header>
 					<main>
 						<div class="ph-wrap">
@@ -27,10 +27,16 @@
 							</header>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Standard three-slot page header:
+.page-header {
+    @include page-header;
+}
+					</script>
 				</section>
 
 				<!-- Full: narrow container — stacks vertically -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Full — Narrow Container (max-width 600px → stacked)</h3></header>
 					<main>
 						<div class="ph-wrap ph-wrap--narrow">
@@ -53,10 +59,18 @@
 							</header>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Page header responsive stacking inside a narrow container:
+.page-header {
+    @include page-header;
+    
+    // Automatically wraps to vertical stack at container width < 880px
+}
+					</script>
 				</section>
 
 				<!-- Title only — no breadcrumbs, no actions -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Title Only — No Breadcrumbs, No Actions</h3></header>
 					<main>
 						<div class="ph-wrap">
@@ -67,10 +81,16 @@
 							</header>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Minimal header with title only:
+.page-header-simple {
+    @include page-header;
+}
+					</script>
 				</section>
 
 				<!-- Title + subtitle, no actions -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Title + Subtitle — No Actions</h3></header>
 					<main>
 						<div class="ph-wrap">
@@ -88,27 +108,11 @@
 							</header>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Page header with breadcrumbs and title/subtitle:
+.page-header-details {
+    @include page-header;
+}
+					</script>
 				</section>
 
-				<!-- SCSS Usage -->
-				<section class="section-card">
-					<header><h3>SCSS Usage</h3></header>
-					<main>
-						<pre><code>// Library default — applies @include page-header to .page-header.
-// Requires a container-query context on an ancestor.
-//
-//   &lt;main class="main"&gt;                           ← container-type: inline-size
-//       &lt;header class="page-header"&gt;
-//           &lt;nav aria-label="Breadcrumb"&gt;...&lt;/nav&gt;
-//           &lt;div&gt;&lt;h1&gt;...&lt;/h1&gt;&lt;/div&gt;
-//           &lt;div&gt;&lt;button&gt;...&lt;/button&gt;&lt;/div&gt;
-//       &lt;/header&gt;
-//   &lt;/main&gt;
-
-// Project layout establishes the container context
-.main { @include container; }  // container-type: inline-size
-
-// Custom project selector (second header, section header, etc.)
-#document-detail > header { @include page-header; }</code></pre>
-					</main>
-				</section>
