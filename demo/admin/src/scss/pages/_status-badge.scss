@@ -1,21 +1,54 @@
 @use '../../../../../scss/config/mixins' as *;
 
-// Production pattern demo — simulates project-owned selectors
-.status          { @include badge; }
-.status.active {
-	--color-primary:         var(--color-success);
-	--color-primary-hover:   var(--color-success-hover);
-	--color-primary-focus:   var(--color-success-focus);
-	--color-primary-light:   var(--color-success-light);
-	--color-primary-lighter: var(--color-success-lighter);
+// ─── Demo Badge List ──────────────────────────────────────
+.demo-badge-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-xs);
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	// Style list items directly without requiring a nested .badge class
+	li {
+		&:not(:has(button)) {
+			@include badge;
+
+			&.success { --color-primary: var(--color-success); }
+			&.warning { --color-primary: var(--color-warning); }
+			&.error   { --color-primary: var(--color-error); }
+			&.info    { --color-primary: var(--color-info); }
+			&.neutral { --color-primary: var(--color-neutral-400); }
+
+			&.live {
+				@include badge-live;
+			}
+		}
+
+		button {
+			@include badge;
+
+			&.success { --color-primary: var(--color-success); }
+			&.warning { --color-primary: var(--color-warning); }
+			&.error   { --color-primary: var(--color-error); }
+			&.neutral { --color-primary: var(--color-neutral-400); }
+		}
+	}
 }
 
-.status.pending {
-	--color-primary:         var(--color-warning);
-	--color-primary-hover:   var(--color-warning-hover);
-	--color-primary-focus:   var(--color-warning-focus);
-	--color-primary-light:   var(--color-warning-light);
-	--color-primary-lighter: var(--color-warning-lighter);
-}
+// ─── Production Pattern Demo ──────────────────────────────
+.status-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-xs);
+	list-style: none;
+	padding: 0;
+	margin: 0;
 
-.status.inactive { --color-primary: var(--fg-subtle); }
+	li {
+		@include badge;
+		&.active   { --color-primary: var(--color-success); }
+		&.pending  { --color-primary: var(--color-warning); }
+		&.inactive { --color-primary: var(--color-neutral-400); }
+	}
+}

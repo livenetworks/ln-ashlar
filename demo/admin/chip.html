@@ -160,14 +160,14 @@
 					<header><h3>Plain Chips</h3></header>
 					<main>
 						<ul class="demo-chip-list">
-							<li data-ln-chip>Draft</li>
-							<li data-ln-chip>In Review</li>
-							<li data-ln-chip>Approved</li>
-							<li data-ln-chip>Obsolete</li>
+							<li>Draft</li>
+							<li>In Review</li>
+							<li>Approved</li>
+							<li>Obsolete</li>
 						</ul>
 					</main>
 					<script type="text/plain" data-demo-scss>
-					[data-ln-chip] {
+					.demo-chip-list li {
 						@include chip;
 					}
 					</script>
@@ -178,16 +178,16 @@
 					<header><h3>Tone Variants</h3></header>
 					<main>
 						<ul class="demo-chip-list">
-							<li data-ln-chip>Neutral</li>
-							<li data-ln-chip="success">Approved</li>
-							<li data-ln-chip="warning">Pending review</li>
-							<li data-ln-chip="error">Rejected</li>
-							<li data-ln-chip="info">In progress</li>
+							<li>Neutral</li>
+							<li class="success">Approved</li>
+							<li class="warning">Pending review</li>
+							<li class="error">Rejected</li>
+							<li class="info">In progress</li>
 						</ul>
 					</main>
 					<script type="text/plain" data-demo-scss>
-					// Tone variants override `--color-primary` internally in @mixin chip
-					[data-ln-chip] {
+					// Tone variants override status variables on the matching classes
+					.demo-chip-list li {
 						@include chip;
 					}
 					</script>
@@ -198,19 +198,19 @@
 					<header><h3>Chips with Close Button</h3></header>
 					<main>
 						<ul class="demo-chip-list">
-							<li data-ln-chip>
+							<li>
 								Quality Manual
 								<button type="button" aria-label="Remove Quality Manual filter">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 								</button>
 							</li>
-							<li data-ln-chip>
+							<li>
 								ISO 9001
 								<button type="button" aria-label="Remove ISO 9001 filter">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 								</button>
 							</li>
-							<li data-ln-chip="info">
+							<li class="info">
 								Draft
 								<button type="button" aria-label="Remove Draft filter">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
@@ -220,7 +220,7 @@
 					</main>
 					<script type="text/plain" data-demo-scss>
 					// Optional close button and its accessible focus ring are handled by `@mixin chip`
-					[data-ln-chip] {
+					.demo-chip-list li {
 						@include chip;
 					}
 					</script>
@@ -233,19 +233,19 @@
 						<div data-demo-filter-context>
 							<p>Active filters:</p>
 							<ul class="demo-chip-list">
-								<li data-ln-chip>
+								<li>
 									Status: Draft
 									<button type="button" aria-label="Remove Status: Draft filter">
 										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 									</button>
 								</li>
-								<li data-ln-chip>
+								<li>
 									Standard: ISO 9001
 									<button type="button" aria-label="Remove Standard: ISO 9001 filter">
 										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 									</button>
 								</li>
-								<li data-ln-chip>
+								<li>
 									Type: Procedure
 									<button type="button" aria-label="Remove Type: Procedure filter">
 										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
@@ -264,7 +264,7 @@
 						padding: 0;
 						margin: 0;
 
-						[data-ln-chip] {
+						li {
 							@include chip;
 						}
 					}
