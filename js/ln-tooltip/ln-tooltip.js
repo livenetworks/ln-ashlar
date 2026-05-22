@@ -117,6 +117,13 @@ import { computePlacement, dispatch, registerComponent } from '../ln-core';
 	function _component(el) {
 		this.dom = el;
 
+		// Set data-ln-tooltip-enhanced attribute so CSS knows JS has taken over,
+		// preventing the CSS ::after fallback from rendering when `title` is stashed/removed.
+		if (!el.hasAttribute('data-ln-tooltip-enhanced')) {
+			el.setAttribute('data-ln-tooltip-enhanced', '');
+			this._addedEnhancedAttr = true;
+		}
+
 		const self = this;
 		this._onEnter = function () { _show(el); };
 		this._onLeave = function () {
@@ -142,6 +149,9 @@ import { computePlacement, dispatch, registerComponent } from '../ln-core';
 		el.removeEventListener('focus', this._onFocus, true);
 		el.removeEventListener('blur', this._onBlur, true);
 		if (activeTrigger === el) _hide();
+		if (this._addedEnhancedAttr) {
+			el.removeAttribute('data-ln-tooltip-enhanced');
+		}
 		delete el[DOM_ATTRIBUTE];
 		delete el[DOM_ATTRIBUTE + 'Uid'];
 		dispatch(el, 'ln-tooltip:destroyed', { trigger: el });

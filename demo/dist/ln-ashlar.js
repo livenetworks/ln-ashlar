@@ -1416,7 +1416,7 @@ function yt(m) {
     o && (o.removeAttribute("aria-describedby"), e !== null && o.setAttribute("title", e)), e = null, l.parentNode && l.parentNode.removeChild(l), l = null, o = null, u();
   }
   function f(r) {
-    return this.dom = r, this._onEnter = function() {
+    return this.dom = r, r.hasAttribute("data-ln-tooltip-enhanced") || (r.setAttribute("data-ln-tooltip-enhanced", ""), this._addedEnhancedAttr = !0), this._onEnter = function() {
       i(r);
     }, this._onLeave = function() {
       o === r && c();
@@ -1428,7 +1428,7 @@ function yt(m) {
   }
   f.prototype.destroy = function() {
     const r = this.dom;
-    r.removeEventListener("mouseenter", this._onEnter), r.removeEventListener("mouseleave", this._onLeave), r.removeEventListener("focus", this._onFocus, !0), r.removeEventListener("blur", this._onBlur, !0), o === r && c(), delete r[_], delete r[_ + "Uid"], T(r, "ln-tooltip:destroyed", { trigger: r });
+    r.removeEventListener("mouseenter", this._onEnter), r.removeEventListener("mouseleave", this._onLeave), r.removeEventListener("focus", this._onFocus, !0), r.removeEventListener("blur", this._onBlur, !0), o === r && c(), this._addedEnhancedAttr && r.removeAttribute("data-ln-tooltip-enhanced"), delete r[_], delete r[_ + "Uid"], T(r, "ln-tooltip:destroyed", { trigger: r });
   }, B(
     "[" + m + "], [" + d + "][title]",
     _,
