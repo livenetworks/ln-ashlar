@@ -66,8 +66,8 @@ intent is a UI concern, execution is a data concern.
 ### 2.2 Render — `ln-data-table` and other renderers
 
 **Owns.** Cloning a `<template>` per record and filling it via
-`data-ln-cell` / `data-ln-cell-attr` (and `{{ field }}` text-node
-substitution — see §5). Virtual scrolling for large sets. Empty,
+`data-ln-cell-attr` and `{{ field }}` text-node substitution — see §5.
+Virtual scrolling for large sets. Empty,
 loading, and error templates. Translation of UI events (column click
 → sort intent, search input → search intent) into payloads the data
 layer can consume.
@@ -321,7 +321,7 @@ behaviour) and can't be reflected in the submit-button gating that
 
 ---
 
-## 5. Template syntax — `{{ }}` vs `data-ln-cell`
+## 5. Template syntax — `{{ }}` vs `data-ln-cell-attr`
 
 ln-ashlar has two complementary text-substitution patterns, shared
 across renderers (`ln-data-table`, `ln-upload`, `ln-filter`,
@@ -330,45 +330,39 @@ lifecycle.
 
 ### 5.1 `{{ field }}` — text-node placeholder
 
-For substitution that lives **inside text content**, not at an element
-boundary. Implemented in `ln-core/helpers.js` via `fillTemplate(clone,
-data)`. Walks text nodes and applies the regex.
-
-```html
-<template data-ln-template="row">
-    <tr><td>Created {{ created_at }} by {{ author }}</td></tr>
-</template>
-```
-
-Use when the substituted value is concatenated with surrounding
-literal text inside a single text node, and you'd rather not wrap it
-in a `<span>` just to host a `data-ln-cell`.
-
-### 5.2 `data-ln-cell="field"` — element anchor
-
-For substitution that **fills the element's whole text content** or
-**drives an attribute**. Implemented in renderer components.
+For substitution that lives **inside text content**. Implemented in `ln-core/helpers.js` via `fillTemplate(clone, data)`. Walks text nodes and applies the regex to replace `{{ field }}` with `record[field]`.
 
 ```html
 <template data-ln-template="row">
     <tr>
-        <td data-ln-cell="title"></td>
-        <td><a data-ln-cell="title" data-ln-cell-attr="id:href"></a></td>
+        <td>{{ title }}</td>
+        <td>Created {{ created_at }} by {{ author }}</td>
     </tr>
 </template>
 ```
 
-Use when the element exists primarily to host the field value,
-especially when you also need to set attributes from the same record.
+Use for all standard text content interpolation inside table cells or other templates.
+
+### 5.2 `data-ln-cell-attr="field:attr"` — attribute mapping
+
+For setting an element's attribute from the record data (e.g. href, src, id, etc.). Implemented in renderer components.
+
+```html
+<template data-ln-template="row">
+    <tr>
+        <td><a data-ln-cell-attr="id:href">{{ title }}</a></td>
+    </tr>
+</template>
+```
+
+Use when an element needs to receive attributes dynamically mapped from the record.
 
 ### 5.3 Decision matrix
 
 | Need                                          | Use                              |
 |-----------------------------------------------|----------------------------------|
-| Value is the whole text content of an element | `data-ln-cell="field"`           |
-| Value is concatenated with literal text inline| `{{ field }}` in text node       |
-| Value drives an attribute                     | `data-ln-cell-attr="field:attr"` |
-| Both text and attribute on same element       | `data-ln-cell` + `data-ln-cell-attr` |
+| Value is text content of an element or inline | `{{ field }}` in text node       |
+| Value drives an element attribute             | `data-ln-cell-attr="field:attr"` |
 
 ---
 

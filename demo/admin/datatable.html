@@ -196,8 +196,8 @@
     &lt;template data-ln-template="documents-row"&gt;
         &lt;tr data-ln-row&gt;
             &lt;td&gt;&lt;input type="checkbox" data-ln-row-select&gt;&lt;/td&gt;
-            &lt;td data-ln-cell="title"&gt;&lt;/td&gt;
-            &lt;td data-ln-cell="department"&gt;&lt;/td&gt;
+            &lt;td&gt;{{ title }}&lt;/td&gt;
+            &lt;td&gt;{{ department }}&lt;/td&gt;
         &lt;/tr&gt;
     &lt;/template&gt;
 &lt;/section&gt;</code></pre>
@@ -209,7 +209,7 @@
 							<p>The component does not build the toolbar. It only watches for one element: an <code>&lt;input&gt;</code> carrying <code>data-ln-data-table-search</code>. Each keystroke updates state, dispatches <code>ln-data-table:search</code> and triggers a fresh <code>request-data</code>. Place the input wherever it fits the page layout.</p>
 
 							<h4>Column headers — <code>&lt;th data-ln-col="field"&gt;</code></h4>
-							<p>The string after <code>data-ln-col=</code> is the data field name. It ties the column to the row template — <code>&lt;th data-ln-col="title"&gt;</code> matches <code>&lt;td data-ln-cell="title"&gt;</code>. Without <code>data-ln-col</code>, the column has no field to sort or filter on; it's treated as presentational (the "Actions" column is the typical example).</p>
+							<p>The string after <code>data-ln-col=</code> is the data field name. It ties the column to the row template — <code>&lt;th data-ln-col="title"&gt;</code> matches <code>{{ title }}</code>. Without <code>data-ln-col</code>, the column has no field to sort or filter on; it's treated as presentational (the "Actions" column is the typical example).</p>
 
 							<h4>The sort button — three icons, one source of truth</h4>
 							<p>The sort button contains <strong>three</strong> sibling <code>&lt;svg&gt;</code> icons, distinguished by <code>data-ln-sort-icon="none|asc|desc"</code>. All three sit in the DOM at all times. CSS shows exactly one based on a class on the ancestor <code>&lt;th&gt;</code>:</p>
@@ -221,7 +221,7 @@
 							<p>The component never swaps an SVG, never replaces an icon URL, never sets inline styles. It toggles a class on the <code>&lt;th&gt;</code>; CSS does the rest. This is the cleanest example in the library of <em>markup-driven state</em> — every visual change is a class flip, and the icons live declaratively in HTML where you can read them.</p>
 
 							<h4>The row template — <code>&lt;template data-ln-template="{name}-row"&gt;</code></h4>
-							<p>The component clones this template once per record and fills cells: <code>data-ln-cell="field"</code> sets <code>textContent</code>, <code>data-ln-cell-attr="field:attr"</code> sets attributes (comma-separated for multiple). Why a <code>&lt;template&gt;</code> and not a static row? A static row would render empty in the initial paint. A <code>&lt;template&gt;</code> is inert until cloned — the component owns when rows appear. Why not build rows in JS? Because then the row layout lives in your script file and you'd have to redeploy JS to add a column.</p>
+							<p>The component clones this template once per record and fills cells: it natively parses double-curly braces like <code>{{ title }}</code> for dynamic text injection, and also supports <code>data-ln-cell-attr="field:attr"</code> for attributes (comma-separated for multiple). Why a <code>&lt;template&gt;</code> and not a static row? A static row would render empty in the initial paint. A <code>&lt;template&gt;</code> is inert until cloned — the component owns when rows appear. Why not build rows in JS? Because then the row layout lives in your script file and you'd have to redeploy JS to add a column.</p>
 
 							<h4>Cell text is set via <code>textContent</code>, never <code>innerHTML</code></h4>
 							<p>This is intentional and load-bearing — <code>textContent</code> is XSS-safe. Records can contain any string, including <code>&lt;script&gt;</code> tags or attribute-injection payloads, and they will render as visible text rather than be parsed as markup. If you need rich content per cell, render plain text and use <code>row-click</code> to open a detail view.</p>
@@ -246,7 +246,7 @@
 									<tr><td><code>data-ln-col-sort</code></td><td><code>&lt;button&gt;</code></td><td>Sort toggle button (3-state cycle).</td></tr>
 									<tr><td><code>data-ln-col-filter</code></td><td><code>&lt;button&gt;</code></td><td>Filter dropdown trigger.</td></tr>
 									<tr><td><code>data-ln-col-select</code></td><td><code>&lt;th&gt;</code></td><td>Select-all checkbox column.</td></tr>
-									<tr><td><code>data-ln-cell="field"</code></td><td><code>&lt;td&gt;</code> in template</td><td>JS fills cell with field value.</td></tr>
+									<tr><td><code>{{ field }}</code></td><td>text node in template</td><td>JS interpolates field value natively. (Recommended)</td></tr>
 									<tr><td><code>data-ln-cell-attr="field:attr"</code></td><td>any in template</td><td>JS sets <code>setAttribute(attr, record[field])</code>. Comma-separated for multiple.</td></tr>
 									<tr><td><code>data-ln-row</code></td><td><code>&lt;tr&gt;</code> in template</td><td>Click target for row navigation.</td></tr>
 									<tr><td><code>data-ln-row-select</code></td><td><code>&lt;input&gt;</code> in template</td><td>Row selection checkbox.</td></tr>
@@ -272,12 +272,12 @@
 									<div>
 										<h3>Documents</h3>
 									</div>
-									<aside>
+									<form role="search" onsubmit="return false;">
 										<label>
 											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 											<input type="search" placeholder="Search documents..." data-ln-data-table-search>
 										</label>
-									</aside>
+									</form>
 								</header>
 
 								<table>
@@ -329,13 +329,13 @@
 								<template data-ln-template="demo-docs-row">
 									<tr data-ln-row>
 										<td><input type="checkbox" data-ln-row-select></td>
-										<td data-ln-cell="title"></td>
-										<td data-ln-cell="department"></td>
-										<td data-ln-cell="status"></td>
-										<td data-ln-cell="priority"></td>
-										<td data-ln-cell="owner"></td>
-										<td data-ln-cell="file_size_display"></td>
-										<td data-ln-cell="updated_display"></td>
+										<td>{{ title }}</td>
+										<td>{{ department }}</td>
+										<td>{{ status }}</td>
+										<td>{{ priority }}</td>
+										<td>{{ owner }}</td>
+										<td>{{ file_size_display }}</td>
+										<td>{{ updated_display }}</td>
 										<td>
 											<button data-ln-row-action="edit"  aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
 											<button data-ln-row-action="delete"  aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
@@ -373,7 +373,22 @@
 								<template data-ln-template="column-filter">
 									<div class="column-filter-dropdown">
 										<input type="search" data-ln-filter-search placeholder="Search...">
-										<ul data-ln-filter-options></ul>
+										<ul data-ln-filter-options>
+											<li>
+												<label>
+													<input type="checkbox" data-ln-filter-reset>
+													All
+												</label>
+											</li>
+											<template data-ln-template="column-filter-item">
+												<li>
+													<label>
+														<input type="checkbox" data-ln-attr="value:value">
+														<span data-ln-field="value"></span>
+													</label>
+												</li>
+											</template>
+										</ul>
 										<button data-ln-filter-clear>Clear filter</button>
 									</div>
 								</template>
@@ -418,6 +433,222 @@
 						</main>
 					</section>
 
+					<!-- Implementation Patterns & Snippets -->
+					<section class="section-card">
+						<header><h3>Implementation Patterns & Copy-Paste Snippets</h3></header>
+						<main>
+							<p>Use these production-ready code snippets to integrate <code>ln-data-table</code> in your next project. Simply copy/paste and adapt the identifiers to match your schema.</p>
+
+							<h4>1. Production-Ready HTML Blueprint</h4>
+							<p>This template includes search integration, select-all checkboxes, sortable and filterable headers (utilizing the new template-scoped filter dropdown), empty states, and dynamic footers.</p>
+<pre><code>&lt;!-- Component Container --&gt;
+&lt;section data-ln-data-table="products" data-ln-data-table-selectable id="products-table"&gt;
+    &lt;header&gt;
+        &lt;h3&gt;Products&lt;/h3&gt;
+        &lt;form role="search" onsubmit="return false;"&gt;
+            &lt;label&gt;
+                &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
+                &lt;input type="search" placeholder="Search..." data-ln-data-table-search&gt;
+            &lt;/label&gt;
+        &lt;/form&gt;
+    &lt;/header&gt;
+
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th data-ln-col-select&gt;&lt;/th&gt;
+                &lt;th data-ln-col="name"&gt;
+                    Product Name
+                    &lt;button data-ln-col-sort aria-label="Sort"&gt;
+                        &lt;svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"&gt;&lt;use href="#ln-arrows-sort"&gt;&lt;/use&gt;&lt;/svg&gt;
+                        &lt;svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"&gt;&lt;use href="#ln-arrow-up"&gt;&lt;/use&gt;&lt;/svg&gt;
+                        &lt;svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"&gt;&lt;use href="#ln-arrow-down"&gt;&lt;/use&gt;&lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/th&gt;
+                &lt;th data-ln-col="category"&gt;
+                    Category
+                    &lt;button data-ln-col-filter aria-label="Filter"&gt;
+                        &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody data-ln-data-table-body&gt;&lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;footer&gt;
+        &lt;span data-ln-data-table-total&gt;&lt;/span&gt; products
+        &lt;span data-ln-data-table-filtered-wrap&gt; · &lt;span data-ln-data-table-filtered&gt;&lt;/span&gt; filtered&lt;/span&gt;
+        &lt;span data-ln-data-table-selected-wrap&gt; · &lt;span data-ln-data-table-selected&gt;&lt;/span&gt; selected&lt;/span&gt;
+    &lt;/footer&gt;
+
+    &lt;!-- Row Template --&gt;
+    &lt;template data-ln-template="products-row"&gt;
+        &lt;tr data-ln-row&gt;
+            &lt;td&gt;&lt;input type="checkbox" data-ln-row-select&gt;&lt;/td&gt;
+            &lt;td&gt;{{ name }}&lt;/td&gt;
+            &lt;td&gt;{{ category }}&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/template&gt;
+
+    &lt;!-- Empty States --&gt;
+    &lt;template data-ln-template="products-empty"&gt;
+        &lt;tr&gt;&lt;td colspan="99"&gt;&lt;article class="ln-table__empty-state"&gt;No products found.&lt;/article&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/template&gt;
+    &lt;template data-ln-template="products-empty-filtered"&gt;
+        &lt;tr&gt;
+            &lt;td colspan="99"&gt;
+                &lt;article class="ln-table__empty-state"&gt;
+                    &lt;p&gt;No matches for selected filters.&lt;/p&gt;
+                    &lt;button data-ln-data-table-clear-all class="btn"&gt;Clear all filters&lt;/button&gt;
+                &lt;/article&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/template&gt;
+
+    &lt;!-- Dynamic Column Filter Dropdown Template (cloned and populated in JS) --&gt;
+    &lt;template data-ln-template="column-filter"&gt;
+        &lt;div class="column-filter-dropdown"&gt;
+            &lt;input type="search" data-ln-filter-search placeholder="Search categories..."&gt;
+            &lt;ul data-ln-filter-options&gt;
+                &lt;li&gt;
+                    &lt;label&gt;
+                        &lt;input type="checkbox" data-ln-filter-reset&gt;
+                        All Categories
+                    &lt;/label&gt;
+                &lt;/li&gt;
+                &lt;template data-ln-template="column-filter-item"&gt;
+                    &lt;li&gt;
+                        &lt;label&gt;
+                            &lt;input type="checkbox" data-ln-attr="value:value"&gt;
+                            &lt;span data-ln-field="value"&gt;&lt;/span&gt;
+                        &lt;/label&gt;
+                    &lt;/li&gt;
+                &lt;/template&gt;
+            &lt;/ul&gt;
+            &lt;button data-ln-filter-clear&gt;Clear Filter&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/template&gt;
+&lt;/section&gt;</code></pre>
+
+							<h4>2. AJAX Server-Side Coordinator (Backend REST API)</h4>
+							<p>This JS block registers the coordinator. It listens for sort, search, and filter intentions, makes an asynchronous API call, handles the visual loading indicators, and pushes the data back to the component.</p>
+<pre><code>(function () {
+    const tableEl = document.getElementById('products-table');
+    if (!tableEl) return;
+
+    tableEl.addEventListener('ln-data-table:request-data', function (e) {
+        if (e.detail.table !== 'products') return;
+
+        // 1. Show loading state
+        tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-loading', {
+            detail: { loading: true }
+        }));
+
+        // 2. Build Query Parameters
+        const params = new URLSearchParams();
+        if (e.detail.search) params.append('search', e.detail.search);
+        
+        if (e.detail.sort) {
+            params.append('sort_field', e.detail.sort.field);
+            params.append('sort_dir', e.detail.sort.direction); // 'asc' or 'desc'
+        }
+
+        // Filters object: { fieldName: ['val1', 'val2'] }
+        if (e.detail.filters) {
+            Object.keys(e.detail.filters).forEach(field => {
+                const values = e.detail.filters[field];
+                values.forEach(val => params.append(`filter_${field}[]`, val));
+            });
+        }
+
+        // 3. Fetch from Server API
+        fetch('/api/products?' + params.toString(), {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(res => {
+            // 4. Set data and hide loading indicator
+            tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+                detail: {
+                    data: res.data,          // Array of records
+                    total: res.total,        // Total count of unfiltered records
+                    filtered: res.filtered,  // Total count of search/filtered matches
+                    filterOptions: res.options // Optional: preset filter choices
+                }
+            }));
+        })
+        .catch(err => {
+            console.error('Failed to load table data:', err);
+            tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-loading', {
+                detail: { loading: false }
+            }));
+        });
+    });
+})();</code></pre>
+
+							<h4>3. In-Memory Client-Side Coordinator</h4>
+							<p>For small datasets preloaded on the page. Sorts, searches, and filters the array inside the browser instantly without network requests.</p>
+<pre><code>(function () {
+    const tableEl = document.getElementById('products-table');
+    const ALL_ITEMS = window.__INITIAL_DATA__ || []; // Your source array
+    if (!tableEl) return;
+
+    tableEl.addEventListener('ln-data-table:request-data', function (e) {
+        if (e.detail.table !== 'products') return;
+
+        let result = ALL_ITEMS.slice();
+
+        // 1. Apply Search Filter
+        if (e.detail.search) {
+            const query = e.detail.search.toLowerCase();
+            result = result.filter(item => 
+                item.name.toLowerCase().includes(query) || 
+                item.category.toLowerCase().includes(query)
+            );
+        }
+
+        // 2. Apply Column Filters (AND logic across fields, OR within a field)
+        if (e.detail.filters && Object.keys(e.detail.filters).length > 0) {
+            const activeFilterFields = Object.keys(e.detail.filters);
+            result = result.filter(item => {
+                return activeFilterFields.every(field => {
+                    const values = e.detail.filters[field];
+                    if (values.length === 0) return true;
+                    // Check if item field matches any of selected filter values
+                    const itemVal = (item[field] || '').toString().toLowerCase();
+                    return values.some(v => v.toLowerCase() === itemVal);
+                });
+            });
+        }
+
+        // 3. Apply Column Sorting
+        if (e.detail.sort) {
+            const field = e.detail.sort.field;
+            const multiplier = e.detail.sort.direction === 'desc' ? -1 : 1;
+            result.sort((a, b) => {
+                const valA = a[field] || '';
+                const valB = b[field] || '';
+                if (typeof valA === 'number' && typeof valB === 'number') {
+                    return (valA - valB) * multiplier;
+                }
+                return valA.toString().localeCompare(valB.toString()) * multiplier;
+            });
+        }
+
+        // 4. Return Data
+        tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+            detail: {
+                data: result,
+                total: ALL_ITEMS.length,
+                filtered: result.length
+            }
+        }));
+    });
+})();</code></pre>
+						</main>
+					</section>
+
 					<!-- Common mistakes -->
 					<section class="section-card">
 						<header><h3>Common mistakes</h3></header>
@@ -426,17 +657,10 @@
 <pre><code>&lt;!-- WRONG --&gt;
 &lt;tbody data-ln-data-table-body&gt;
     &lt;tr data-ln-row&gt;
-        &lt;td data-ln-cell="title"&gt;&lt;/td&gt;
+        &lt;td&gt;{{ title }}&lt;/td&gt;
     &lt;/tr&gt;
 &lt;/tbody&gt;</code></pre>
 							<p>The component clears <code>&lt;tbody&gt;</code> on every <code>set-data</code> and replaces it with clones from the row template. Static rows are wiped on the first render. Put the row layout inside <code>&lt;template data-ln-template="{name}-row"&gt;</code>.</p>
-
-							<h4>Mismatched <code>data-ln-col</code> and <code>data-ln-cell</code> field names</h4>
-<pre><code>&lt;!-- WRONG — column says "title", cell says "name" --&gt;
-&lt;th data-ln-col="title"&gt;Title&lt;/th&gt;
-...
-&lt;td data-ln-cell="name"&gt;&lt;/td&gt;</code></pre>
-							<p>The cell renders empty because the record has no <code>name</code> field, or the sort request sends <code>field: "title"</code> but the data was prepared under <code>name</code>. Both attributes are the same identifier — pick a convention (the API field name) and align both sides.</p>
 
 							<h4>Single sort icon with JS-driven <code>&lt;use href&gt;</code> swap</h4>
 <pre><code>&lt;!-- WRONG --&gt;

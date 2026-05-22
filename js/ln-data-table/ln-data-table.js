@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
+import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } from '../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-table';
@@ -213,96 +213,9 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 
 		// ─── Selection — row checkboxes + select-all ──────────
 		this._selectable = dom.hasAttribute('data-ln-data-table-selectable');
+		this._selectableActive = false;
 		if (this._selectable) {
-			this._onSelectionChange = function (e) {
-				const checkbox = e.target.closest('[data-ln-row-select]');
-				if (!checkbox) return;
-				const tr = checkbox.closest('[data-ln-row]');
-				if (!tr) return;
-				const id = tr.getAttribute('data-ln-row-id');
-				if (id == null) return;
-
-				if (checkbox.checked) {
-					self.selectedIds.add(id);
-					tr.classList.add('ln-row-selected');
-				} else {
-					self.selectedIds.delete(id);
-					tr.classList.remove('ln-row-selected');
-				}
-
-				self.selectedCount = self.selectedIds.size;
-				self._updateSelectAll();
-				self._updateFooter();
-
-				dispatch(dom, 'ln-data-table:select', {
-					table: self.name,
-					selectedIds: self.selectedIds,
-					count: self.selectedCount
-				});
-			};
-			if (this.tbody) this.tbody.addEventListener('change', this._onSelectionChange);
-
-			// Select-all checkbox in header
-			this._selectAllCheckbox = dom.querySelector('[data-ln-col-select] input[type="checkbox"]')
-				|| dom.querySelector('[data-ln-col-select]');
-			if (this._selectAllCheckbox && this._selectAllCheckbox.tagName === 'TH') {
-				// Create a checkbox inside the th if it doesn't have one
-				const cb = document.createElement('input');
-				cb.type = 'checkbox';
-				cb.setAttribute('aria-label', 'Select all');
-				this._selectAllCheckbox.appendChild(cb);
-				this._selectAllCheckbox = cb;
-			}
-
-			if (this._selectAllCheckbox) {
-				this._onSelectAll = function () {
-					const checked = self._selectAllCheckbox.checked;
-					const rows = self.tbody ? self.tbody.querySelectorAll('[data-ln-row]') : [];
-
-					for (let i = 0; i < rows.length; i++) {
-						const id = rows[i].getAttribute('data-ln-row-id');
-						const rowCb = rows[i].querySelector('[data-ln-row-select]');
-						if (id == null) continue;
-
-						if (checked) {
-							self.selectedIds.add(id);
-							rows[i].classList.add('ln-row-selected');
-						} else {
-							self.selectedIds.delete(id);
-							rows[i].classList.remove('ln-row-selected');
-						}
-						if (rowCb) rowCb.checked = checked;
-					}
-
-					self.selectedCount = self.selectedIds.size;
-					dispatch(dom, 'ln-data-table:select-all', {
-						table: self.name,
-						selected: checked
-					});
-					dispatch(dom, 'ln-data-table:select', {
-						table: self.name,
-						selectedIds: self.selectedIds,
-						count: self.selectedCount
-					});
-					self._updateFooter();
-				};
-				this._selectAllCheckbox.addEventListener('change', this._onSelectAll);
-			}
-
-			// Sync initial checkbox state (browser form restore)
-			if (this.tbody) {
-				const rows = this.tbody.querySelectorAll('[data-ln-row]');
-				for (let i = 0; i < rows.length; i++) {
-					const cb = rows[i].querySelector('[data-ln-row-select]');
-					const id = rows[i].getAttribute('data-ln-row-id');
-					if (cb && cb.checked && id != null) {
-						this.selectedIds.add(id);
-						rows[i].classList.add('ln-row-selected');
-					}
-				}
-				this.selectedCount = this.selectedIds.size;
-				if (this.selectedCount > 0) this._updateSelectAll();
-			}
+			this._enableSelection();
 		}
 
 		// ─── Row click + Row actions ───────────────────────────
@@ -514,6 +427,140 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		set: function () { /* computed from selectedIds */ }
 	});
 
+	_component.prototype._enableSelection = function () {
+		if (this._selectableActive) return;
+		this._selectableActive = true;
+
+		const self = this;
+		this._onSelectionChange = function (e) {
+			const checkbox = e.target.closest('[data-ln-row-select]');
+			if (!checkbox) return;
+			const tr = checkbox.closest('[data-ln-row]');
+			if (!tr) return;
+			const id = tr.getAttribute('data-ln-row-id');
+			if (id == null) return;
+
+			if (checkbox.checked) {
+				self.selectedIds.add(id);
+				tr.classList.add('ln-row-selected');
+			} else {
+				self.selectedIds.delete(id);
+				tr.classList.remove('ln-row-selected');
+			}
+
+			self.selectedCount = self.selectedIds.size;
+			self._updateSelectAll();
+			self._updateFooter();
+
+			dispatch(self.dom, 'ln-data-table:select', {
+				table: self.name,
+				selectedIds: self.selectedIds,
+				count: self.selectedCount
+			});
+		};
+		if (this.tbody) this.tbody.addEventListener('change', this._onSelectionChange);
+
+		// Select-all checkbox in header
+		this._selectAllCheckbox = this.dom.querySelector('[data-ln-col-select] input[type="checkbox"]')
+			|| this.dom.querySelector('[data-ln-col-select]');
+		if (this._selectAllCheckbox && this._selectAllCheckbox.tagName === 'TH') {
+			// Create a checkbox inside the th if it doesn't have one
+			const cb = document.createElement('input');
+			cb.type = 'checkbox';
+			cb.setAttribute('aria-label', 'Select all');
+			this._selectAllCheckbox.appendChild(cb);
+			this._selectAllCheckbox = cb;
+		}
+
+		if (this._selectAllCheckbox) {
+			this._onSelectAll = function () {
+				const checked = self._selectAllCheckbox.checked;
+				const rows = self.tbody ? self.tbody.querySelectorAll('[data-ln-row]') : [];
+
+				for (let i = 0; i < rows.length; i++) {
+					const id = rows[i].getAttribute('data-ln-row-id');
+					const rowCb = rows[i].querySelector('[data-ln-row-select]');
+					if (id == null) continue;
+
+					if (checked) {
+						self.selectedIds.add(id);
+						rows[i].classList.add('ln-row-selected');
+					} else {
+						self.selectedIds.delete(id);
+						rows[i].classList.remove('ln-row-selected');
+					}
+					if (rowCb) rowCb.checked = checked;
+				}
+
+				self.selectedCount = self.selectedIds.size;
+				dispatch(self.dom, 'ln-data-table:select-all', {
+					table: self.name,
+					selected: checked
+				});
+				dispatch(self.dom, 'ln-data-table:select', {
+					table: self.name,
+					selectedIds: self.selectedIds,
+					count: self.selectedCount
+				});
+				self._updateFooter();
+			};
+			this._selectAllCheckbox.addEventListener('change', this._onSelectAll);
+		}
+
+		// Sync initial checkbox state (browser form restore)
+		if (this.tbody) {
+			const rows = this.tbody.querySelectorAll('[data-ln-row]');
+			for (let i = 0; i < rows.length; i++) {
+				const cb = rows[i].querySelector('[data-ln-row-select]');
+				const id = rows[i].getAttribute('data-ln-row-id');
+				if (cb && cb.checked && id != null) {
+					this.selectedIds.add(id);
+					rows[i].classList.add('ln-row-selected');
+				}
+			}
+			this.selectedCount = this.selectedIds.size;
+			if (this.selectedCount > 0) this._updateSelectAll();
+		}
+	};
+
+	_component.prototype._disableSelection = function () {
+		if (!this._selectableActive) return;
+		this._selectableActive = false;
+
+		if (this.tbody && this._onSelectionChange) {
+			this.tbody.removeEventListener('change', this._onSelectionChange);
+		}
+		if (this._selectAllCheckbox && this._onSelectAll) {
+			this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
+		}
+
+		// Remove dynamically created checkbox in TH
+		const th = this.dom.querySelector('[data-ln-col-select]');
+		if (th) {
+			const cb = th.querySelector('input[type="checkbox"]');
+			if (cb) {
+				cb.remove();
+			}
+		}
+		this._selectAllCheckbox = null;
+
+		// Clear selections
+		this.selectedIds.clear();
+		this.selectedCount = 0;
+
+		// Clear visual state of rows
+		if (this.tbody) {
+			const rows = this.tbody.querySelectorAll('[data-ln-row]');
+			for (let i = 0; i < rows.length; i++) {
+				rows[i].classList.remove('ln-row-selected');
+				const cb = rows[i].querySelector('[data-ln-row-select]');
+				if (cb) cb.checked = false;
+			}
+		}
+
+		this._updateFooter();
+	};
+
 	// ─── Keyboard focus ───────────────────────────────────────
 
 	_component.prototype._focusRow = function (rows) {
@@ -559,23 +606,35 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 
 		// Build checkbox items
 		if (optionsList) {
-			for (let i = 0; i < uniqueValues.length; i++) {
-				const val = uniqueValues[i];
-				const li = document.createElement('li');
-				const label = document.createElement('label');
-				const checkbox = document.createElement('input');
-				checkbox.type = 'checkbox';
-				checkbox.value = val;
-				checkbox.checked = activeValues.length === 0 || activeValues.indexOf(val) !== -1;
-				label.appendChild(checkbox);
-				label.appendChild(document.createTextNode(' ' + val));
-				li.appendChild(label);
-				optionsList.appendChild(li);
+			// Update the "All" reset checkbox status if statically present in template
+			const resetCheckbox = optionsList.querySelector('[data-ln-filter-reset]');
+			if (resetCheckbox) {
+				resetCheckbox.checked = activeValues.length === 0;
 			}
 
-			// Checkbox change handler
+			// Get the options item template (scoped first, fall back to generic)
+			const itemTmpl = cloneTemplateScoped(dropdown, this.name + '-column-filter-item', 'ln-data-table')
+				|| cloneTemplateScoped(dropdown, 'column-filter-item', 'ln-data-table');
+
+			if (itemTmpl) {
+				for (let i = 0; i < uniqueValues.length; i++) {
+					const val = uniqueValues[i];
+					const itemClone = itemTmpl.cloneNode(true);
+					fill(itemClone, { value: val });
+
+					const checkbox = itemClone.querySelector('input[type="checkbox"]');
+					if (checkbox) {
+						checkbox.value = val;
+						checkbox.checked = activeValues.length > 0 && activeValues.indexOf(val) !== -1;
+					}
+					optionsList.appendChild(itemClone);
+				}
+			}
+
+			// Checkbox change handler — mutual exclusion + filter update
 			optionsList.addEventListener('change', function (e) {
 				if (e.target.type !== 'checkbox') return;
+				self._applyFilterMutualExclusion(e.target, optionsList);
 				self._onFilterChange(field, optionsList);
 			});
 		}
@@ -625,21 +684,43 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		this._activeDropdown = null;
 	};
 
-	_component.prototype._onFilterChange = function (field, optionsList) {
-		const checkboxes = optionsList.querySelectorAll('input[type="checkbox"]');
-		const checked = [];
-		let allChecked = true;
+	// ─── Filter sentinel mutual exclusion ──────────────────────
+	// Same pattern as ln-filter: "All" sentinel + value checkboxes.
 
-		for (let i = 0; i < checkboxes.length; i++) {
-			if (checkboxes[i].checked) {
-				checked.push(checkboxes[i].value);
-			} else {
-				allChecked = false;
+	_component.prototype._applyFilterMutualExclusion = function (cb, optionsList) {
+		const isReset = cb.hasAttribute('data-ln-filter-reset');
+		const resetCb = optionsList.querySelector('[data-ln-filter-reset]');
+		const valueCbs = optionsList.querySelectorAll('input[type="checkbox"]:not([data-ln-filter-reset])');
+
+		if (isReset) {
+			// "All" clicked — force checked, uncheck all values
+			cb.checked = true;
+			for (let i = 0; i < valueCbs.length; i++) valueCbs[i].checked = false;
+		} else if (cb.checked) {
+			// Value checked — uncheck "All"
+			if (resetCb) resetCb.checked = false;
+		} else {
+			// Value unchecked — if none left, re-check "All"
+			let any = false;
+			for (let i = 0; i < valueCbs.length; i++) {
+				if (valueCbs[i].checked) { any = true; break; }
 			}
+			if (!any && resetCb) resetCb.checked = true;
+		}
+	};
+
+	_component.prototype._onFilterChange = function (field, optionsList) {
+		const resetCb = optionsList.querySelector('[data-ln-filter-reset]');
+		const valueCbs = optionsList.querySelectorAll('input[type="checkbox"]:not([data-ln-filter-reset])');
+		const checked = [];
+
+		for (let i = 0; i < valueCbs.length; i++) {
+			if (valueCbs[i].checked) checked.push(valueCbs[i].value);
 		}
 
-		// All checked = no filter active for this field
-		if (allChecked || checked.length === 0) {
+		// "All" checked or nothing checked = no filter active
+		const isReset = (resetCb && resetCb.checked) || checked.length === 0;
+		if (isReset) {
 			delete this.currentFilters[field];
 		} else {
 			this.currentFilters[field] = checked;
@@ -650,7 +731,7 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		dispatch(this.dom, 'ln-data-table:filter', {
 			table: this.name,
 			field: field,
-			values: allChecked ? [] : checked
+			values: isReset ? [] : checked
 		});
 
 		this._requestData();
@@ -923,15 +1004,8 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 	// ─── Fill row cells ────────────────────────────────────────
 
 	_component.prototype._fillRow = function (tr, record) {
-		// data-ln-cell="field" → textContent
-		const cells = tr.querySelectorAll('[data-ln-cell]');
-		for (let i = 0; i < cells.length; i++) {
-			const el = cells[i];
-			const field = el.getAttribute('data-ln-cell');
-			if (record[field] != null) {
-				el.textContent = record[field];
-			}
-		}
+		// Native double curly brace interpolation: {{ field }}
+		fillTemplate(tr, record);
 
 		// data-ln-cell-attr="field:attr" → setAttribute
 		const cellAttrs = tr.querySelectorAll('[data-ln-cell-attr]');
@@ -1006,8 +1080,8 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 			this.tbody.removeEventListener('click', this._onRowClick);
 			this.tbody.removeEventListener('click', this._onRowAction);
 		}
-		if (this._selectable && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);
-		if (this._selectAllCheckbox) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
+		if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);
+		if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 		this.dom.removeEventListener('click', this._onClearAll);
 		if (this._toolbarRO) {
 			this._toolbarRO.disconnect();
@@ -1019,7 +1093,29 @@ import { cloneTemplateScoped, dispatch, registerComponent } from '../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	// ─── Attribute Sync ────────────────────────────────────────
+
+	function _syncAttribute(el, attrName) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+
+		if (attrName === 'data-ln-data-table-selectable') {
+			const hasSelectable = el.hasAttribute('data-ln-data-table-selectable');
+			if (hasSelectable !== instance._selectable) {
+				instance._selectable = hasSelectable;
+				if (hasSelectable) {
+					instance._enableSelection();
+				} else {
+					instance._disableSelection();
+				}
+			}
+		}
+	}
+
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-table');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-data-table', {
+		extraAttributes: ['data-ln-data-table-selectable'],
+		onAttributeChange: _syncAttribute
+	});
 })();

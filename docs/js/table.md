@@ -263,9 +263,7 @@ buttons). Including button text in search would mean every row
 matches "Edit". The convention is baked in; there is no
 `data-ln-no-search` opt-out per cell. Tables without an actions
 column either accept the limitation, add a trailing empty
-presentational column, or use `ln-data-table` (which has no
-last-column convention — search is per-cell-explicit via
-`data-ln-cell` attributes).
+presentational column, or use `ln-data-table` (which has no last-column convention — search is based on all cell text nodes populated via template interpolation).
 
 ### Why is `data-ln-value` honored for sort but not for filter/search?
 

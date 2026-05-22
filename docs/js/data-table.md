@@ -8,6 +8,9 @@ event lifecycle, performance considerations and the design decisions that
 shape the shape of the component. For consumer-facing usage see
 [`js/ln-data-table/README.md`](../../js/ln-data-table/README.md).
 
+For complete copy-pasteable HTML blueprints and coordinator patterns, see the master [Table & Data-Table Integration Patterns](table-integration.md).
+
+
 ## Internal state
 
 Each instance is a JS object created by `_component(dom)` and stored as
@@ -142,20 +145,23 @@ The class change on `<th>` is the only state mutation needed for the
 icon swap. CSS reads the class and shows the matching
 `data-ln-sort-icon` SVG. No JS touches the icons directly.
 
-### Filter change (`_onFilterChange`, lines 595–624)
+### Filter change (`_onFilterChange`, lines 667–693)
 
-1. Read all checkboxes in the dropdown's `[data-ln-filter-options]` list.
-2. Compute `checked` array and `allChecked` boolean.
-3. If all checked or none checked → `delete currentFilters[field]` (no filter active).
-4. Otherwise → `currentFilters[field] = checked`.
-5. `_updateFilterIndicators()` — toggle `ln-filter-active` on each `<th>`'s filter button.
-6. Dispatch `ln-data-table:filter`.
-7. `_requestData()`.
+The column filter dropdown is populated with an "All" sentinel checkbox (`data-ln-filter-reset`) and individual value checkboxes. Mutual exclusion is enforced via `_applyFilterMutualExclusion`:
 
-Treating "all checked" the same as "no filter" is intentional — the
-event payload `values: []` signals "clear this column's filter" rather
-than "match every value individually." The coordinator never has to
-enumerate the full option list.
+1. When "All" is checked, all value checkboxes are automatically unchecked.
+2. When a value checkbox is checked, "All" is automatically unchecked.
+3. When a value checkbox is unchecked, if no value checkboxes remain checked, "All" is automatically checked.
+
+When a checkbox change occurs, `_onFilterChange` executes:
+1. Read the state of the "All" sentinel checkbox and the value checkboxes.
+2. If "All" is checked (or if no checkboxes are checked) → `delete currentFilters[field]` (no filter active).
+3. Otherwise → `currentFilters[field]` is set to the array of checked value strings.
+4. `_updateFilterIndicators()` — toggle `ln-filter-active` on each `<th>`'s filter button.
+5. Dispatch `ln-data-table:filter`.
+6. `_requestData()`.
+
+Using an explicit "All" sentinel ensures a unified filtering experience across the framework, matching the standalone `ln-filter` component. The coordinator receives an empty `values: []` array when "All" is active, indicating no filter is applied to the column.
 
 ### Selection change (`_onSelectionChange`, lines 184–209)
 
@@ -361,7 +367,7 @@ subclassing or callbacks.
 
 ### Templates as extension points
 
-- `{table}-row` — controls per-row layout. Add cells, change cell elements (`<td><a>` instead of `<td>`), add badges around `[data-ln-cell]` text. The component reads `data-ln-cell` / `data-ln-cell-attr` regardless of the surrounding markup.
+- `{table}-row` — controls per-row layout. Add cells, change cell elements (`<td><a>` instead of `<td>`), add badges around text cells. The component natively supports text-node double curly braces `{{ field }}` interpolation, and also reads `data-ln-cell-attr` for attribute mapping regardless of the surrounding markup.
 - `{table}-empty` and `{table}-empty-filtered` — the entire empty-state UI is yours; the component just clones the template into `<tbody>`.
 - `{table}-column-filter` (or shared `column-filter`) — change the dropdown layout, add a "select all" link, replace checkboxes with toggle pills, etc. The component requires only `[data-ln-filter-options]` (the `<ul>` it populates), `[data-ln-filter-search]` (optional), `[data-ln-filter-clear]` (optional).
 
@@ -423,8 +429,8 @@ library-wide pattern.
 record value containing `<script>` becomes executable, requires
 re-parsing on every render, and forces the row layout into a JS
 string. `<template>` is parsed once when the page loads, the
-content is `cloneNode`'d cheaply, and `data-ln-cell` uses
-`textContent` which is XSS-safe by construction.
+content is `cloneNode`'d cheaply, and cell values are populated via
+`textContent` (through `fillTemplate` double curly braces `{{ field }}`) which is XSS-safe by construction.
 
 ### Why classes for sort state instead of attributes on the icons?
 

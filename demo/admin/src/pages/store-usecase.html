@@ -194,16 +194,16 @@
 			</button>
 			</span>
 		</div>
-		<aside>
+		<form role="search" onsubmit="return false;">
 			<label>
 				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
 				<input type="search" placeholder="Search…" data-ln-data-table-search>
 			</label>
-			<button id="create-document" class="btn" data-ln-modal-for="document-modal">
+			<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 				New
 			</button>
-		</aside>
+		</form>
 	</header>
 
 	<table>
@@ -228,11 +228,11 @@
 	<template data-ln-template="documents-row">
 		<tr data-ln-row>
 			<td><input type="checkbox" data-ln-row-select></td>
-			<td data-ln-cell="title"></td>
-			<td data-ln-cell="department"></td>
-			<td data-ln-cell="status"></td>
-			<td data-ln-cell="size_display"></td>
-			<td data-ln-cell="updated_display"></td>
+			<td>{{ title }}</td>
+			<td>{{ department }}</td>
+			<td>{{ status }}</td>
+			<td>{{ size_display }}</td>
+			<td>{{ updated_display }}</td>
 			<td>
 				<button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
 				<button data-ln-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
@@ -263,7 +263,22 @@
 	<template data-ln-template="column-filter">
 		<div class="column-filter-dropdown">
 			<input type="search" data-ln-filter-search placeholder="Search…">
-			<ul data-ln-filter-options></ul>
+			<ul data-ln-filter-options>
+				<li>
+					<label>
+						<input type="checkbox" data-ln-filter-reset>
+						All
+					</label>
+				</li>
+				<template data-ln-template="column-filter-item">
+					<li>
+						<label>
+							<input type="checkbox" data-ln-attr="value:value">
+							<span data-ln-field="value"></span>
+						</label>
+					</li>
+				</template>
+			</ul>
 			<button data-ln-filter-clear>Clear filter</button>
 		</div>
 	</template>
