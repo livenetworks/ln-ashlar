@@ -3,6 +3,7 @@
    `title` attribute is present (JS auto-attaches to strip the native
    browser tooltip, which CSS alone cannot do). */
 [data-ln-tooltip][data-ln-tooltip-enhance]::after,
+[data-ln-tooltip][data-ln-tooltip-enhanced]::after,
 [data-ln-tooltip][title]::after {
 	content: none;
 }
