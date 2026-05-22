@@ -1,0 +1,150 @@
+import { dispatch, guardBody } from '../../ln-core';
+
+(function () {
+	const DOM_SELECTOR = '[data-ln-progress]';
+	const DOM_ATTRIBUTE = 'lnProgress';
+
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	function constructor(domRoot) {
+		findElements(domRoot);
+	}
+
+	// Local findElements — intentional divergence from ln-core helper:
+	// inlines selector + constructor (no ComponentClass parameter) and
+	// includes a domRoot self-match branch so the childList re-init
+	// path picks up the inserted root itself.
+	function findElements(domRoot) {
+		const items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
+
+		for (const item of items) {
+			if (!item[DOM_ATTRIBUTE]) {
+				item[DOM_ATTRIBUTE] = new _constructor(item);
+			}
+		}
+
+		if (domRoot.hasAttribute && domRoot.hasAttribute('data-ln-progress') && !domRoot[DOM_ATTRIBUTE]) {
+			domRoot[DOM_ATTRIBUTE] = new _constructor(domRoot);
+		}
+	}
+
+	function _constructor(dom) {
+		this.dom = dom;
+		this._attrObserver = null;
+		this._parentObserver = null;
+		_render.call(this);
+		_listenValues.call(this);
+		_listenParent.call(this);
+		return this;
+	}
+
+	_constructor.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this._attrObserver) {
+			this._attrObserver.disconnect();
+		}
+		if (this._parentObserver) {
+			this._parentObserver.disconnect();
+		}
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
+	function _domObserver() {
+		guardBody(function () {
+			const observer = new MutationObserver(function (mutations) {
+				for (const mutation of mutations) {
+					if (mutation.type === "childList") {
+						for (const item of mutation.addedNodes) {
+							if (item.nodeType === 1) {
+								findElements(item);
+							}
+						}
+					} else if (mutation.type === 'attributes') {
+						findElements(mutation.target);
+					}
+				}
+			});
+
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['data-ln-progress']
+			});
+		}, 'ln-progress');
+	}
+
+	_domObserver();
+
+	function _listenValues() {
+		const self = this;
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
+				if (mutation.attributeName === 'data-ln-progress' || mutation.attributeName === 'data-ln-progress-max') {
+					_render.call(self);
+				}
+			}
+		});
+
+		observer.observe(this.dom, {
+			attributes: true,
+			attributeFilter: ['data-ln-progress', 'data-ln-progress-max']
+		});
+
+		this._attrObserver = observer;
+	}
+
+	function _listenParent() {
+		const self = this;
+		const parent = this.dom.parentElement;
+		if (!parent || !parent.hasAttribute('data-ln-progress-max')) return;
+
+		const observer = new MutationObserver(function (mutations) {
+			for (const mutation of mutations) {
+				if (mutation.attributeName === 'data-ln-progress-max') {
+					_render.call(self);
+				}
+			}
+		});
+
+		observer.observe(parent, {
+			attributes: true,
+			attributeFilter: ['data-ln-progress-max']
+		});
+
+		this._parentObserver = observer;
+	}
+
+	function _render() {
+		const value = parseFloat(this.dom.getAttribute('data-ln-progress')) || 0;
+		const parent = this.dom.parentElement;
+		const parentMax = parent && parent.hasAttribute('data-ln-progress-max')
+			? parseFloat(parent.getAttribute('data-ln-progress-max'))
+			: null;
+		const max = parentMax || parseFloat(this.dom.getAttribute('data-ln-progress-max')) || 100;
+		let percentage = (max > 0) ? (value / max) * 100 : 0;
+
+		if (percentage < 0) percentage = 0;
+		if (percentage > 100) percentage = 100;
+
+		this.dom.style.width = percentage + '%';
+
+		const clampedValue = Math.max(0, Math.min(value, max));
+		this.dom.setAttribute('role', 'progressbar');
+		this.dom.setAttribute('aria-valuemin', '0');
+		this.dom.setAttribute('aria-valuemax', String(max));
+		this.dom.setAttribute('aria-valuenow', String(clampedValue));
+
+		dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
+	}
+
+	window[DOM_ATTRIBUTE] = constructor;
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', function () {
+			constructor(document.body);
+		});
+	} else {
+		constructor(document.body);
+	}
+})();
