@@ -72,6 +72,13 @@ Used in Laravel projects and other web applications.
 
 > **Coding standards** → see global SKILL files (css, html, js). This file covers project-specific details only.
 
+### HTML & CSS Coding Standards (CRITICAL)
+
+- **STRICTLY PROHIBITED: Decorative inline styles (`style="..."`) in HTML templates.** All layout, spacing, colors, margins, and typography must be declared in SCSS classes using semantic logical design tokens (`var(--token)`).
+- **NO JS-DRIVEN DECORATIVE STYLES.** Do not set `element.style.background`, colors, transitions, or display properties via JavaScript. Use class list toggles (`classList.toggle`) or data attributes (`data-state="..."`) and style states declaratively in SCSS instead.
+- **Floating UI Exception.** The only allowed exception is absolute/fixed coordinates (`top`/`left`) computed dynamically by floating UI scripts (e.g. tooltips, popovers, dropdown positions). Structural parameters (like `position: fixed` or `z-index`) must still be defined in SCSS.
+- **Why?** Inline styles override design tokens and have maximum specificity, which breaks theme responsiveness (Light, Dark, Glass, Midnight modes) and density modes (`data-density="compact"`), resulting in visual regression.
+
 ---
 
 ## File Structure

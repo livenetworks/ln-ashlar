@@ -3818,20 +3818,11 @@ const It = `<li class="ln-toast__item">\r
     return null;
   }
   function l(e) {
-    if (this.dom = e, this.name = e.getAttribute(m) || "", this.table = e.querySelector("table"), this.tbody = e.querySelector("[data-ln-data-table-body]") || e.querySelector("tbody"), this.thead = e.querySelector("thead"), this.ths = this.thead ? Array.from(this.thead.querySelectorAll("th")) : [], this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._data = [], this._lastTotal = 0, this._lastFiltered = 0, this._filterOptions = {}, this._filterableFields = this.ths.filter(function(n) {
+    this.dom = e, this.name = e.getAttribute(m) || "", this.table = e.querySelector("table"), this.tbody = e.querySelector("[data-ln-data-table-body]") || e.querySelector("tbody"), this.thead = e.querySelector("thead"), this.ths = this.thead ? Array.from(this.thead.querySelectorAll("th")) : [], this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._data = [], this._lastTotal = 0, this._lastFiltered = 0, this._filterOptions = {}, this._filterableFields = this.ths.filter(function(n) {
       return n.getAttribute("data-ln-col") && n.querySelector("[data-ln-col-filter]");
     }).map(function(n) {
       return n.getAttribute("data-ln-col");
-    }), this._virtual = !1, this._rowHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._scrollContainer = null, this._toolbar = e.querySelector(":scope > header"), this._toolbarRO = null, this._toolbar && typeof ResizeObserver < "u") {
-      const n = this;
-      this._toolbarRO = new ResizeObserver(function(s) {
-        for (let u = 0; u < s.length; u++) {
-          const i = s[u].contentRect.height;
-          n.dom.style.setProperty("--data-table-toolbar-h", i + "px");
-        }
-      }), this._toolbarRO.observe(this._toolbar);
-    }
-    this._totalSpan = e.querySelector("[data-ln-data-table-total]"), this._filteredSpan = e.querySelector("[data-ln-data-table-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== e ? this._filteredSpan.closest("[data-ln-data-table-filtered-wrap]") || this._filteredSpan.parentNode : null), this._selectedSpan = e.querySelector("[data-ln-data-table-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== e ? this._selectedSpan.closest("[data-ln-data-table-selected-wrap]") || this._selectedSpan.parentNode : null);
+    }), this._virtual = !1, this._rowHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._scrollContainer = null, this._totalSpan = e.querySelector("[data-ln-data-table-total]"), this._filteredSpan = e.querySelector("[data-ln-data-table-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== e ? this._filteredSpan.closest("[data-ln-data-table-filtered-wrap]") || this._filteredSpan.parentNode : null), this._selectedSpan = e.querySelector("[data-ln-data-table-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== e ? this._selectedSpan.closest("[data-ln-data-table-selected-wrap]") || this._selectedSpan.parentNode : null);
     const t = this;
     return this._onSetData = function(n) {
       const s = n.detail || {};
@@ -4259,7 +4250,7 @@ const It = `<li class="ln-toast__item">\r
       this._selectedSpan.textContent = s > 0 ? b(s) : "", this._selectedWrap && this._selectedWrap.classList.toggle("hidden", s === 0);
     }
   }, l.prototype.destroy = function() {
-    this.dom[d] && (this.dom.removeEventListener("ln-data-table:set-data", this._onSetData), this.dom.removeEventListener("ln-data-table:set-loading", this._onSetLoading), this.thead && (this.thead.removeEventListener("click", this._onSortClick), this.thead.removeEventListener("click", this._onFilterClick)), document.removeEventListener("click", this._onDocClick), document.removeEventListener("keydown", this._onKeydown), this._searchInput && this._searchInput.removeEventListener("input", this._onSearchInput), this.tbody && (this.tbody.removeEventListener("click", this._onRowClick), this.tbody.removeEventListener("click", this._onRowAction)), this._onSelectionChange && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._onSelectAll && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this.dom.removeEventListener("click", this._onClearAll), this._toolbarRO && (this._toolbarRO.disconnect(), this._toolbarRO = null), this._closeFilterDropdown(), this._disableVirtualScroll(), this._data = [], delete this.dom[d]);
+    this.dom[d] && (this.dom.removeEventListener("ln-data-table:set-data", this._onSetData), this.dom.removeEventListener("ln-data-table:set-loading", this._onSetLoading), this.thead && (this.thead.removeEventListener("click", this._onSortClick), this.thead.removeEventListener("click", this._onFilterClick)), document.removeEventListener("click", this._onDocClick), document.removeEventListener("keydown", this._onKeydown), this._searchInput && this._searchInput.removeEventListener("input", this._onSearchInput), this.tbody && (this.tbody.removeEventListener("click", this._onRowClick), this.tbody.removeEventListener("click", this._onRowAction)), this._onSelectionChange && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._onSelectAll && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this.dom.removeEventListener("click", this._onClearAll), this._closeFilterDropdown(), this._disableVirtualScroll(), this._data = [], delete this.dom[d]);
   };
   function o(e, t) {
     const n = e[d];

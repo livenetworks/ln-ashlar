@@ -167,13 +167,15 @@
 						<main>
 							<p>The minimal shape — every working table is a variation on this skeleton.</p>
 <pre><code>&lt;section data-ln-data-table="documents" data-ln-data-table-selectable&gt;
-
-    &lt;header&gt; &lt;!-- toolbar (yours) --&gt;
-        &lt;input type="search" data-ln-data-table-search&gt;
-    &lt;/header&gt;
-
     &lt;table&gt;
         &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th colspan="3"&gt;
+                    &lt;div class="ln-table__toolbar"&gt;
+                        &lt;input type="search" data-ln-data-table-search&gt;
+                    &lt;/div&gt;
+                &lt;/th&gt;
+            &lt;/tr&gt;
             &lt;tr&gt;
                 &lt;th data-ln-col-select&gt;&lt;/th&gt;
                 &lt;th data-ln-col="title"&gt;
@@ -267,21 +269,23 @@
 							         data-ln-data-table-selectable
 							         id="demo-data-table">
 
-								<!-- Toolbar -->
-								<header class="ln-table__toolbar">
-									<div>
-										<h3>Documents</h3>
-									</div>
-									<form role="search" onsubmit="return false;">
-										<label>
-											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-											<input type="search" placeholder="Search documents..." data-ln-data-table-search>
-										</label>
-									</form>
-								</header>
-
 								<table>
 									<thead>
+										<tr>
+											<th colspan="9">
+												<div class="ln-table__toolbar">
+													<div>
+														<h3>Documents</h3>
+													</div>
+													<form role="search" onsubmit="return false;">
+														<label>
+															<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+															<input type="search" placeholder="Search documents..." data-ln-data-table-search>
+														</label>
+													</form>
+												</div>
+											</th>
+										</tr>
 										<tr>
 											<th data-ln-col-select></th>
 											<th data-ln-col="title">
@@ -443,18 +447,23 @@
 							<p>This template includes search integration, select-all checkboxes, sortable and filterable headers (utilizing the new template-scoped filter dropdown), empty states, and dynamic footers.</p>
 <pre><code>&lt;!-- Component Container --&gt;
 &lt;section data-ln-data-table="products" data-ln-data-table-selectable id="products-table"&gt;
-    &lt;header&gt;
-        &lt;h3&gt;Products&lt;/h3&gt;
-        &lt;form role="search" onsubmit="return false;"&gt;
-            &lt;label&gt;
-                &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
-                &lt;input type="search" placeholder="Search..." data-ln-data-table-search&gt;
-            &lt;/label&gt;
-        &lt;/form&gt;
-    &lt;/header&gt;
-
     &lt;table&gt;
         &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th colspan="3"&gt;
+                    &lt;div class="ln-table__toolbar"&gt;
+                        &lt;div&gt;
+                            &lt;h3&gt;Products&lt;/h3&gt;
+                        &lt;/div&gt;
+                        &lt;form role="search" onsubmit="return false;"&gt;
+                            &lt;label&gt;
+                                &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
+                                &lt;input type="search" placeholder="Search..." data-ln-data-table-search&gt;
+                            &lt;/label&gt;
+                        &lt;/form&gt;
+                    &lt;/div&gt;
+                &lt;/th&gt;
+            &lt;/tr&gt;
             &lt;tr&gt;
                 &lt;th data-ln-col-select&gt;&lt;/th&gt;
                 &lt;th data-ln-col="name"&gt;

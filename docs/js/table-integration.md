@@ -112,18 +112,23 @@ The `ln-table` component works with standard HTML tables. Filters, sorting, and 
 ### HTML Blueprint
 ```html
 <section data-ln-data-table="products" data-ln-data-table-selectable id="products-table">
-    <header class="toolbar">
-        <h3>Products</h3>
-        <form role="search" onsubmit="return false;">
-            <label>
-                <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-                <input type="search" placeholder="Search..." data-ln-data-table-search>
-            </label>
-        </form>
-    </header>
-
     <table>
         <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="ln-table__toolbar">
+                        <div>
+                            <h3>Products</h3>
+                        </div>
+                        <form role="search" onsubmit="return false;">
+                            <label>
+                                <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+                                <input type="search" placeholder="Search..." data-ln-data-table-search>
+                            </label>
+                        </form>
+                    </div>
+                </th>
+            </tr>
             <tr>
                 <th data-ln-col-select></th>
                 <th data-ln-col="name">
