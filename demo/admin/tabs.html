@@ -233,7 +233,7 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 					</section>
 
 					<!-- Live: plain tabs (no hash, no persistence) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — plain tabs (no hash, no persistence)</h3></header>
 						<main>
 							<p>No <code>id</code>, no <code>data-ln-tabs-key</code>, no <code>data-ln-persist</code>. Active key lives only in <code>data-ln-tabs-active</code> on the wrapper. Reload the page and the default tab is selected.</p>
@@ -261,10 +261,25 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 								</section>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-tabs] {
+							nav {
+								@include tabs-nav;
+
+								[data-ln-tab] {
+									@include tabs-tab;
+								}
+							}
+
+							[data-ln-panel] {
+								@include tabs-panel;
+							}
+						}
+						</script>
 					</section>
 
 					<!-- Live: hash-deep-linkable tabs -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — hash-deep-linkable tabs</h3></header>
 						<main>
 							<p>The wrapper has <code>id="user-tabs"</code>, which doubles as the hash namespace. Click a tab and the URL updates: <code>#user-tabs:settings</code>. Bookmark, share, hit the back button — all the URL-as-state benefits.</p>
@@ -307,10 +322,25 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 								</section>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-tabs] {
+							nav {
+								@include tabs-nav;
+
+								[data-ln-tab] {
+									@include tabs-tab;
+								}
+							}
+
+							[data-ln-panel] {
+								@include tabs-panel;
+							}
+						}
+						</script>
 					</section>
 
 					<!-- Live: anchor-trigger tabs -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — anchor triggers (shareable URLs)</h3></header>
 						<main>
 							<p>Triggers are <code>&lt;a href="#nsKey:key"&gt;</code> instead of <code>&lt;button&gt;</code>. Right-click any tab → copy link → paste into a new browser → the right tab activates on first paint. Middle-click opens the link in a new browser tab. <code>data-ln-tab</code> is boolean here; the key derives from <code>href</code>.</p>
@@ -341,10 +371,26 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 
 							<p>The click handler calls <code>event.preventDefault()</code> so the browser's default navigation does not race with the JS state write. Ctrl/Meta-click and middle-click skip <code>preventDefault</code> and bubble to the browser as expected — the standard "open in new tab" affordance.</p>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-tabs] {
+							nav {
+								@include tabs-nav;
+
+								// Tab anchors match tab button mixin styling
+								[data-ln-tab] {
+									@include tabs-tab;
+								}
+							}
+
+							[data-ln-panel] {
+								@include tabs-panel;
+							}
+						}
+						</script>
 					</section>
 
 					<!-- Live: multiple independent sections -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — two independent sections, same page</h3></header>
 						<main>
 							<p>Each instance reads only its own namespace from the hash. Hash format <code>#user-tabs:settings&amp;project-tabs:members</code> activates Settings in the first section AND Members in the second. Both sections have a tab named <code>info</code> — they live in separate namespaces, no collision.</p>
@@ -381,10 +427,25 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 								</section>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-tabs] {
+							nav {
+								@include tabs-nav;
+
+								[data-ln-tab] {
+									@include tabs-tab;
+								}
+							}
+
+							[data-ln-panel] {
+								@include tabs-panel;
+							}
+						}
+						</script>
 					</section>
 
 					<!-- Live: persistent tabs without hash sync -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — persistent tabs without hash sync</h3></header>
 						<main>
 							<p>No <code>id</code> (so no hash sync), explicit <code>data-ln-persist="settings-tabs"</code> (so the storage key doesn't depend on a generated <code>id</code>). The active tab is remembered across page loads via <code>localStorage</code> under key <code>ln:tabs:&lt;path&gt;:settings-tabs</code>. Useful for "settings page" tabs where the user expects "the last tab I had open is the one I'll see when I come back."</p>
@@ -412,6 +473,21 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 								</section>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						[data-ln-tabs] {
+							nav {
+								@include tabs-nav;
+
+								[data-ln-tab] {
+									@include tabs-tab;
+								}
+							}
+
+							[data-ln-panel] {
+								@include tabs-panel;
+							}
+						}
+						</script>
 					</section>
 
 					<!-- Events -->
@@ -467,37 +543,6 @@ document.addEventListener('ln-tabs:change', e =&gt; {
 
 							<h4>6. Putting <code>data-ln-tabs</code> on <code>&lt;main&gt;</code></h4>
 							<p>HTML spec allows only one <code>&lt;main&gt;</code> per page. Use <code>&lt;section&gt;</code>, <code>&lt;aside&gt;</code>, <code>&lt;article&gt;</code>, or <code>&lt;div&gt;</code>.</p>
-						</main>
-					</section>
-
-					<!-- HTML reference -->
-					<section class="section-card">
-						<header><h3>HTML</h3></header>
-						<main>
-<pre><code>&lt;!-- Namespace = id attribute (or data-ln-tabs-key) --&gt;
-&lt;section id="my-tabs" data-ln-tabs data-ln-tabs-default="first"&gt;
-
-    &lt;!-- Tab buttons — type="button" if inside a form! --&gt;
-    &lt;nav&gt;
-        &lt;button type="button" data-ln-tab="first"&gt;First tab&lt;/button&gt;
-        &lt;button type="button" data-ln-tab="second"&gt;Second tab&lt;/button&gt;
-    &lt;/nav&gt;
-
-    &lt;!-- Panels — inactive ones start hidden --&gt;
-    &lt;section data-ln-panel="first"&gt;
-        Content of the first tab
-    &lt;/section&gt;
-
-    &lt;section data-ln-panel="second" class="hidden"&gt;
-        Content of the second tab
-    &lt;/section&gt;
-
-&lt;/section&gt;
-
-&lt;!-- Hash format: #my-tabs:second → activate second tab --&gt;
-&lt;!-- Multiple sections: #my-tabs:second&amp;other-tabs:info --&gt;
-&lt;!-- Without id/data-ln-tabs-key → no hash sync, only defaultKey --&gt;
-&lt;!-- With data-ln-persist (and no id/data-ln-tabs-key) → localStorage --&gt;</code></pre>
 						</main>
 					</section>
 

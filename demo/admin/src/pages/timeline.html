@@ -4,7 +4,7 @@
 				<p>Vertical activity feed for audit logs, version history, and comment threads. Vertical rail and bullet markers via CSS <code>::before</code>/<code>::after</code>. No JS.</p>
 
 				<!-- Audit log — 6 entries -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Audit Log — 6 Entries</h3></header>
 					<main>
 						<ol data-ln-timeline>
@@ -40,10 +40,16 @@
 							</li>
 						</ol>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Standard timeline mixin usage:
+#audit-trail {
+    @include timeline;
+}
+					</script>
 				</section>
 
 				<!-- Minimal — 2 entries, no descriptions -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Minimal — 2 Entries (title only)</h3></header>
 					<main>
 						<ol data-ln-timeline>
@@ -57,10 +63,16 @@
 							</li>
 						</ol>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Minimal list layout timeline:
+.minimal-timeline {
+    @include timeline;
+}
+					</script>
 				</section>
 
 				<!-- Single entry -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Single Entry</h3></header>
 					<main>
 						<ol data-ln-timeline>
@@ -71,22 +83,11 @@
 							</li>
 						</ol>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Single entry timeline behaves identically:
+.single-item-timeline {
+    @include timeline;
+}
+					</script>
 				</section>
 
-				<!-- SCSS Usage -->
-				<section class="section-card">
-					<header><h3>SCSS Usage</h3></header>
-					<main>
-						<pre><code>// Default attribute — zero SCSS needed
-// &lt;ol data-ln-timeline&gt;
-//     &lt;li&gt;
-//         &lt;time datetime="2026-04-14T09:32"&gt;Apr 14, 09:32&lt;/time&gt;
-//         &lt;h4&gt;Document approved&lt;/h4&gt;
-//         &lt;p&gt;Review completed&lt;/p&gt;
-//     &lt;/li&gt;
-// &lt;/ol&gt;
-
-// Consumer semantic selector
-#audit-log { @include timeline; }</code></pre>
-					</main>
-				</section>

@@ -4,7 +4,7 @@
 					<p>App layout with sidebar, grid system, stack, row and container.</p>
 
 		<!-- Grid -->
-		<section id="demo-grid-3" class="section-card">
+		<section id="demo-grid-3" class="section-card" data-demo-html>
 			<header><h3>.grid (3 columns)</h3></header>
 			<main>
 				<div>
@@ -16,9 +16,15 @@
 					<div class="demo-box">6</div>
 				</div>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Responsive 3-column grid layout mixin:
+.grid {
+    @include grid;
+}
+			</script>
 		</section>
 
-		<section id="demo-grid-2" class="section-card">
+		<section id="demo-grid-2" class="section-card" data-demo-html>
 			<header><h3>.grid-2 (2 columns)</h3></header>
 			<main>
 				<div>
@@ -26,9 +32,15 @@
 					<div class="demo-box">Right</div>
 				</div>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Responsive 2-column grid layout mixin:
+.grid-2 {
+    @include grid-2;
+}
+			</script>
 		</section>
 
-		<section id="demo-grid-4" class="section-card">
+		<section id="demo-grid-4" class="section-card" data-demo-html>
 			<header><h3>.grid-4 (4 columns)</h3></header>
 			<main>
 				<div>
@@ -38,10 +50,16 @@
 					<div class="demo-box">4</div>
 				</div>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Responsive 4-column grid layout mixin:
+.grid-4 {
+    @include grid-4;
+}
+			</script>
 		</section>
 
 		<!-- Stack & Row -->
-		<section id="demo-stack-row" class="section-card">
+		<section id="demo-stack-row" class="section-card" data-demo-html>
 			<header><h3>.stack, .row</h3></header>
 			<main>
 				<div>
@@ -69,6 +87,18 @@
 					</div>
 				</div>
 			</main>
+			<script type="text/plain" data-demo-scss>
+// Flexbox based utility mixins:
+.stack {
+    @include stack; // vertical flex
+}
+.row {
+    @include row; // horizontal flex centered
+}
+.row-between {
+    @include row-between; // horizontal flex with space-between
+}
+			</script>
 		</section>
 
 		<!-- App Layout -->

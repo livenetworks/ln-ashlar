@@ -4,8 +4,14 @@
 				<p>iOS-style switch using <code>input[type="checkbox"][data-ln-toggle-switch]</code>. Pure CSS — no JS. Slide knob, focus ring, and disabled state all supported.</p>
 
 				<!-- Basic toggle switches -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Basic Toggle Switches</h3></header>
+					<script type="text/plain" data-demo-scss>
+// Custom toggle switch styling
+.my-switch {
+	@include toggle-switch;
+}
+					</script>
 					<main>
 						<div data-demo-form-stack>
 							<label>
@@ -25,7 +31,7 @@
 				</section>
 
 				<!-- Disabled state -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Disabled State</h3></header>
 					<main>
 						<div data-demo-form-stack>
@@ -42,7 +48,7 @@
 				</section>
 
 				<!-- In a settings form -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Settings Form Context</h3></header>
 					<main>
 						<form data-demo-settings-form>
@@ -71,20 +77,4 @@
 					</main>
 				</section>
 
-				<!-- SCSS Usage -->
-				<section class="section-card">
-					<header><h3>SCSS Usage</h3></header>
-					<main>
-						<pre><code>// Default — attribute selector, no config needed
-// &lt;label&gt;
-//     &lt;input type="checkbox" data-ln-toggle-switch&gt;
-//     Label text
-// &lt;/label&gt;
 
-// Disabled
-// &lt;input type="checkbox" data-ln-toggle-switch disabled&gt;
-
-// Consumer semantic selector
-.my-switch { @include toggle-switch; }</code></pre>
-					</main>
-				</section>

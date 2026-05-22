@@ -60,3 +60,124 @@
 	@include gap(var(--size-sm-up));
 	@include flex-wrap;
 }
+
+// ==========================================================================
+// Expandable/Collapsible Demo Code Panel (HTML & SCSS)
+// ==========================================================================
+.demo-code-container {
+	border-block-start: var(--border-width) solid var(--border-subtle);
+	background-color: var(--bg-sunken);
+
+	.demo-code-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: var(--size-xs) var(--size-md);
+		border-bottom: var(--border-width) solid var(--border-subtle);
+		background-color: color-mix(in srgb, var(--bg-sunken) 95%, black);
+	}
+
+	.demo-code-tabs {
+		display: flex;
+		gap: var(--size-xs);
+
+		button {
+			background: none;
+			border: none;
+			padding: var(--size-xs) var(--size-sm);
+			font-size: var(--text-xs);
+			font-weight: var(--font-semibold);
+			color: var(--fg-muted);
+			cursor: pointer;
+			border-radius: var(--radius);
+			transition: all 0.2s;
+
+			&:hover {
+				color: var(--color-fg);
+				background-color: var(--border-subtle);
+			}
+
+			&.active {
+				color: hsl(var(--color-primary));
+				background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
+			}
+		}
+	}
+
+	.demo-code-title {
+		font-size: var(--text-xs);
+		font-weight: var(--font-semibold);
+		color: var(--fg-muted);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wider);
+	}
+
+	.btn-copy-code {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--size-xs);
+		background: none;
+		border: var(--border-width) solid var(--border-subtle);
+		padding: var(--size-xs) var(--size-sm);
+		font-size: var(--text-xs);
+		font-weight: var(--font-medium);
+		color: var(--fg-muted);
+		border-radius: var(--radius);
+		cursor: pointer;
+		transition: all 0.2s;
+
+		&:hover {
+			color: var(--color-fg);
+			background-color: var(--border-subtle);
+			border-color: var(--border-strong);
+		}
+
+		&.copied {
+			color: hsl(var(--color-success));
+			border-color: hsl(var(--color-success) / 0.5);
+			background-color: color-mix(in srgb, var(--color-success) 10%, transparent);
+		}
+	}
+
+	.demo-code-body {
+		pre {
+			margin: 0;
+			padding: var(--size-md);
+			overflow-x: auto;
+			font-size: var(--text-xs);
+			line-height: 1.5;
+			color: var(--color-fg);
+		}
+	}
+}
+
+// Trigger button inside section-card header
+.section-card > header {
+	.btn-demo-code {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: none;
+		border: var(--border-width) solid var(--border-subtle);
+		color: var(--fg-muted);
+		width: 2rem;
+		height: 2rem;
+		border-radius: var(--radius);
+		cursor: pointer;
+		transition: all 0.2s;
+		padding: 0;
+
+		&:hover {
+			color: var(--color-fg);
+			background-color: var(--bg-sunken);
+			border-color: var(--border-strong);
+		}
+
+		&[aria-expanded="true"] {
+			color: hsl(var(--color-primary));
+			border-color: hsl(var(--color-primary) / 0.5);
+			background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+		}
+	}
+}
+

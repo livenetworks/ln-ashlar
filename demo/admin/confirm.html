@@ -204,7 +204,7 @@
 					</section>
 
 					<!-- Basic Example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Text buttons</h3></header>
 						<main>
 							<p>Click once: the button morphs into the prompt and turns red. Click within 3 seconds: the click passes through (these have no <code>type="submit"</code> and no <code>onclick</code>, so nothing happens — that's the point: the component does not <em>cause</em> an action, it gates an existing one). Wait 3 seconds: the button auto-reverts.</p>
@@ -213,10 +213,16 @@
 								<button data-ln-confirm="Reset settings?">Reset defaults</button>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Gated buttons have data-ln-confirm:
+button[data-ln-confirm] {
+    transition: all var(--transition-base);
+}
+						</script>
 					</section>
 
 					<!-- Icon-only Example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Icon-only buttons</h3></header>
 						<main>
 							<p>The constructor sees empty text and a <code>svg.ln-icon use</code> child, so the icon-only branch runs on first click: the trash icon swaps to a check icon, the button gets <code>.ln-confirm-tooltip</code> + <code>data-tooltip-text="Delete?"</code>, and CSS renders a tooltip bubble above the button via <code>@mixin confirm-tooltip</code>. The icon-only branch also handles screen-reader output — it captures the original <code>aria-label</code> ("Delete"), swaps it to the prompt text ("Delete?"), and appends a transient <code>&lt;span class="sr-only" role="alert"&gt;</code> announcer inside the button. AT speaks the prompt on first click; on revert, the announcer is removed and the original <code>aria-label</code> is restored. Try it with VoiceOver / NVDA.</p>
@@ -238,10 +244,16 @@
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Tooltip style is applied via confirm-tooltip mixin:
+.ln-confirm-tooltip {
+    @include confirm-tooltip;
+}
+						</script>
 					</section>
 
 					<!-- Custom Timeout -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Custom timeout</h3></header>
 						<main>
 							<p>Use <code>data-ln-confirm-timeout</code> to override the default 3-second auto-revert. Read fresh at first-click time only — mutating the attribute mid-armed does NOT extend the running timer (the attribute is not in the observer's <code>attributeFilter</code>; see "Common mistakes" item 4 in the README).</p>
@@ -251,10 +263,16 @@
 								<button data-ln-confirm="Confirm?" data-ln-confirm-timeout="6">6s timeout</button>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Custom timeouts rely on the timeout attribute:
+button[data-ln-confirm-timeout] {
+    transition: all var(--transition-base);
+}
+						</script>
 					</section>
 
 					<!-- Form submit Example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Inside a form (the canonical pattern)</h3></header>
 						<main>
 							<p>The destructive flow that <code>ln-confirm</code> exists for. First click arms the button. Second click within timeout — <code>_reset</code> runs synchronously, the click continues through the platform's default action processor, the form's <code>submit</code> event fires (because nothing called <code>preventDefault</code>), and the form submits via its native <code>action</code> / <code>method</code>. No JS rewiring; <code>type="submit"</code> is the contract.</p>
@@ -265,10 +283,16 @@
 								</div>
 							</form>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Works inside forms and form action controls:
+.form-actions {
+    @include form-actions;
+}
+						</script>
 					</section>
 
 					<!-- AJAX click Example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Non-form button with AJAX click handler</h3></header>
 						<main>
 							<p>When the destructive action is an AJAX call that does NOT go through a form, attach the destructive code to the button's <code>click</code> listener as you normally would. <code>ln-confirm</code> gates the first click via <code>preventDefault</code> + <code>stopImmediatePropagation</code>, so this listener does NOT run on the first click. On the second click, <code>ln-confirm</code> returns silently (no <code>preventDefault</code>), so this listener runs.</p>
@@ -280,10 +304,16 @@
 							</div>
 							<p><strong>Listener attachment order matters.</strong> <code>stopImmediatePropagation</code> only blocks listeners on the SAME element that have not yet run. <code>ln-confirm</code> attaches at construction time (typically <code>DOMContentLoaded</code> or shortly after); listeners attached BEFORE then will fire on the first click too. In normal flow this is rarely an issue because ln-ashlar loads early.</p>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Semantic AJAX destructive buttons:
+#demo-ajax-btn {
+    transition: all var(--transition-base);
+}
+						</script>
 					</section>
 
 					<!-- Listening to :waiting -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Listening for arm events</h3></header>
 						<main>
 							<p>The one event <code>ln-confirm</code> dispatches: <code>ln-confirm:waiting</code> on the first click, AFTER the visual swap and timer schedule, with <code>{ target }</code> in the detail. Use it for analytics ("user almost-deleted"), page-level chrome ("show a Cancel All button while any confirm is armed"), or debugging.</p>
@@ -293,10 +323,16 @@
 							</div>
 							<p id="demo-arm-log" class="demo-log">Arm event log will appear here.</p>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Gated click handlers with telemetry:
+#demo-arm-track {
+    transition: all var(--transition-base);
+}
+						</script>
 					</section>
 
 					<!-- Button group Example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Multiple confirms in a button group</h3></header>
 						<main>
 							<p>Each <code>[data-ln-confirm]</code> button is its own instance with its own arm-state. Arming one does NOT arm the others; arming one does NOT reset already-armed siblings. Each runs its own auto-revert timer.</p>
@@ -315,10 +351,17 @@
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Confirm buttons inside standard action lists:
+.demo-actions {
+    @include flex;
+    gap: var(--size-xs);
+}
+						</script>
 					</section>
 
 					<!-- Inside a table Example -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Inside <code>[data-ln-table]</code> (overflow escape)</h3></header>
 						<main>
 							<p><code>ln-data-table</code> uses <code>overflow: clip</code> on <code>[data-ln-table]</code>, which would clip the icon-only mode's tooltip bubble. The co-located rule <code>[data-ln-table]:has([data-confirming]) { overflow: visible; }</code> reverts the table to <code>overflow: visible</code> while ANY descendant button is armed. The moment the button reverts, <code>:has()</code> unmatches and the clip is restored.</p>
@@ -350,6 +393,12 @@
 								</table>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Table overflow escape for tooltip bubbles:
+[data-ln-table]:has([data-confirming]) {
+    overflow: visible;
+}
+						</script>
 					</section>
 
 					<!-- API -->

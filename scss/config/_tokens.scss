@@ -349,6 +349,10 @@
 	--btn-fg-hover:     var(--color-fg);
 	--btn-border-hover: var(--border-strong-hover);
 
+	// Button padding tokens
+	--btn-padding-x:    var(--size-md);
+	--btn-padding-y:    var(--size-sm);
+
 	// -- Typography ------------------------------------------------------
 	--font-size:    var(--text-body-md);
 	--line-height:  var(--lh-body-md);

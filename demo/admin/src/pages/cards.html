@@ -3,7 +3,7 @@
 					<p>Card variants with colored accents, tinted backgrounds, stat layouts, and stacked effects.</p>
 
 					<!-- Basic card -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Basic Card</h3></header>
 						<main>
 							<section id="demo-basic-cards">
@@ -17,10 +17,16 @@
 								</article>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							@include p(var(--size-md));
+						}
+						</script>
 					</section>
 
 					<!-- Accent Top -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Accent Top — <code>card-accent-top</code></h3></header>
 						<main>
 							<section id="demo-accent-top">
@@ -42,10 +48,17 @@
 								</article>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							@include card-accent-top;
+							@include p(var(--size-md));
+						}
+						</script>
 					</section>
 
 					<!-- Accent Left -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Accent Left — <code>card-accent-left</code></h3></header>
 						<main>
 							<section id="demo-accent-left">
@@ -67,10 +80,17 @@
 								</article>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							@include card-accent-left;
+							@include p(var(--size-md));
+						}
+						</script>
 					</section>
 
 					<!-- Accent Bottom -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Accent Bottom — <code>card-accent-bottom</code></h3></header>
 						<main>
 							<section id="demo-accent-bottom">
@@ -92,10 +112,17 @@
 								</article>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							@include card-accent-bottom;
+							@include p(var(--size-md));
+						}
+						</script>
 					</section>
 
 					<!-- Tinted Background -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Tinted Background — <code>card-bg</code></h3></header>
 						<main>
 							<section id="demo-tinted">
@@ -117,10 +144,17 @@
 								</article>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							@include card-bg;
+							@include p(var(--size-md));
+						}
+						</script>
 					</section>
 
 					<!-- Stat Cards -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Stat Cards</h3></header>
 						<main>
 							<section id="demo-stat-cards">
@@ -146,10 +180,30 @@
 								</article>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							@include card-accent-top;
+							@include p(var(--size-md));
+							text-align: center;
+
+							.stat-value {
+								@include text-2xl;
+								@include font-bold;
+								@include text-primary;
+							}
+							.stat-label {
+								@include text-xs;
+								@include font-medium;
+								@include uppercase;
+								@include tracking-wider;
+							}
+						}
+						</script>
 					</section>
 
 					<!-- Stacked -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Stacked Card — <code>card-stacked</code></h3></header>
 						<main>
 							<section id="demo-stacked">
@@ -163,10 +217,17 @@
 								</article>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							@include card-stacked;
+							@include p(var(--size-md));
+						}
+						</script>
 					</section>
 
 					<!-- Full Card (header + body + footer) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Full Card — Header + Body + Footer</h3></header>
 						<main>
 							<section id="demo-full-cards">
@@ -191,10 +252,25 @@
 								</article>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							header { @include panel-header; }
+							main   { @include p(var(--size-md)); }
+							footer {
+								@include px(var(--size-md));
+								@include py(var(--size-sm-up));
+								@include border-t;
+								@include flex;
+								@include justify-end;
+								@include gap(var(--size-sm));
+							}
+						}
+						</script>
 					</section>
 
 					<!-- Card with Fields -->
-					<section id="demo-card-fields" class="section-card">
+					<section id="demo-card-fields" class="section-card" data-demo-html>
 						<header><h3>Card with Fields</h3></header>
 						<main>
 							<div>
@@ -225,10 +301,16 @@
 								</div>
 							</div>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						.card {
+							@include card;
+							@include card-field-list;
+						}
+						</script>
 					</section>
 
 					<!-- Secondary Brand Accent -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Secondary Brand Accent — <code>--color-secondary</code></h3></header>
 						<main>
 							<p>The secondary color family provides a brand accent (teal) distinct from
@@ -259,10 +341,19 @@
 								<button type="submit" class="secondary">Secondary Submit</button>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+						article {
+							@include card;
+							@include p(var(--size-md));
+						}
+						.secondary {
+							--color-accent: var(--color-secondary);
+						}
+						</script>
 					</section>
 
 					<!-- Flat stack — joined panels with shared rule -->
-					<section id="demo-flat-stack" class="section-card">
+					<section id="demo-flat-stack" class="section-card" data-demo-html>
 						<header><h3>Flat Stack — <code>flat-stack</code></h3></header>
 						<main>
 							<p>Cards sit flush with a single shared rule between them. Applies <code>@include flat-stack</code> on the parent. Self-contained: forces <code>--radius: 0</code> and <code>--shadow-resting: none</code> on children regardless of theme.</p>
@@ -287,37 +378,13 @@
 								</li>
 							</ul>
 						</main>
-					</section>
-
-					<!-- SCSS Reference -->
-					<section class="section-card">
-						<header><h3>SCSS Usage</h3></header>
-						<main>
-							<pre><code>// Base card
-#my-card { @include card; @include p(1rem); }
-
-// Colored accent lines (reads --color-primary)
-#alerts  { @include card; @include card-accent-top; }
-#status  { @include card; @include card-accent-left; }
-#tasks   { @include card; @include card-accent-bottom; }
-
-// Override color per element
-#errors  { @include card; @include card-accent-top; --color-primary: var(--color-error); }
-#success { @include card; @include card-accent-left; --color-primary: var(--color-success); }
-
-// Tinted background
-#welcome { @include card; @include card-bg; }
-#warning { @include card; @include card-bg; --color-primary: var(--color-warning); }
-
-// Stacked effect
-#archive { @include card; @include card-stacked; }
-
-// Full card with header/body/footer
-article {
-    @include card;
-    header { @include panel-header; }
-    main   { @include p(1rem); }
-    footer { @include px(1rem); @include py(0.75rem); @include border-t; }
-}</code></pre>
-						</main>
-					</section>
+						<script type="text/plain" data-demo-scss>
+						.flat-stack {
+							@include flat-stack;
+						}
+						article {
+							@include card;
+							@include p(var(--size-md));
+						}
+						</script>
+					</section>

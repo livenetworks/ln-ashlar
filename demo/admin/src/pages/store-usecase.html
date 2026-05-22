@@ -183,105 +183,110 @@
 </section>
 
 <!-- 3. Data table -->
-<section data-ln-data-table="documents" data-ln-data-table-selectable id="documents-table">
-	<header class="ln-table__toolbar">
-		<div>
-			<h3>Documents</h3>
-			<span data-ln-data-table-selected-wrap class="hidden">
-				<button id="bulk-delete-btn" class="btn" style="--color-primary: var(--color-error)">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
-				Delete selected (<span data-ln-data-table-selected></span>)
-			</button>
-			</span>
-		</div>
-		<form role="search" onsubmit="return false;">
-			<label>
-				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-				<input type="search" placeholder="Search…" data-ln-data-table-search>
-			</label>
-			<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
-				New
-			</button>
-		</form>
-	</header>
-
-	<table>
-		<thead>
-			<tr>
-				<th data-ln-col-select></th>
-				<th data-ln-col="title">Title <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-					<th data-ln-col="department">Department <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
-					<th data-ln-col="status">Status <button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
-					<th data-ln-col="file_size">Size <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-					<th data-ln-col="updated_at">Updated <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody data-ln-data-table-body></tbody>
-		</table>
-		<footer>
-			<span data-ln-data-table-total></span> items
-			<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
-		</footer>
-
-	<template data-ln-template="documents-row">
-		<tr data-ln-row>
-			<td><input type="checkbox" data-ln-row-select></td>
-			<td>{{ title }}</td>
-			<td>{{ department }}</td>
-			<td>{{ status }}</td>
-			<td>{{ size_display }}</td>
-			<td>{{ updated_display }}</td>
-			<td>
-				<button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
-				<button data-ln-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
-			</td>
-		</tr>
-	</template>
-
-	<template data-ln-template="documents-empty">
-		<tr><td colspan="99">
-			<article class="ln-table__empty-state">
-				<h3>No documents yet</h3>
-				<p>Click <strong>New</strong> to create one.</p>
-			</article>
-		</td></tr>
-	</template>
-
-	<template data-ln-template="documents-empty-filtered">
-		<tr><td colspan="99">
-			<article class="ln-table__empty-state">
-				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
-				<h3>No results</h3>
-				<p>Try adjusting your search or filters.</p>
-				<button data-ln-data-table-clear-all class="btn">Clear all filters</button>
-			</article>
-		</td></tr>
-	</template>
-
-	<template data-ln-template="column-filter">
-		<div class="column-filter-dropdown">
-			<input type="search" data-ln-filter-search placeholder="Search…">
-			<ul data-ln-filter-options>
-				<li>
+<section class="section-card" data-demo-html>
+	<header><h3>Live Usecase Demo — Documents Manager</h3></header>
+	<main>
+		<section data-ln-data-table="documents" data-ln-data-table-selectable id="documents-table">
+			<header class="ln-table__toolbar">
+				<div>
+					<h3>Documents</h3>
+					<span data-ln-data-table-selected-wrap class="hidden">
+						<button id="bulk-delete-btn" class="btn" style="--color-primary: var(--color-error)">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+						Delete selected (<span data-ln-data-table-selected></span>)
+					</button>
+					</span>
+				</div>
+				<form role="search" onsubmit="return false;">
 					<label>
-						<input type="checkbox" data-ln-filter-reset>
-						All
+						<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+						<input type="search" placeholder="Search…" data-ln-data-table-search>
 					</label>
-				</li>
-				<template data-ln-template="column-filter-item">
-					<li>
-						<label>
-							<input type="checkbox" data-ln-attr="value:value">
-							<span data-ln-field="value"></span>
-						</label>
-					</li>
-				</template>
-			</ul>
-			<button data-ln-filter-clear>Clear filter</button>
-		</div>
-	</template>
+					<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+						New
+					</button>
+				</form>
+			</header>
+
+			<table>
+				<thead>
+					<tr>
+						<th data-ln-col-select></th>
+						<th data-ln-col="title">Title <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-col="department">Department <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-col="status">Status <button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-col="file_size">Size <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-col="updated_at">Updated <button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody data-ln-data-table-body></tbody>
+			</table>
+			<footer>
+				<span data-ln-data-table-total></span> items
+				<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
+			</footer>
+
+			<template data-ln-template="documents-row">
+				<tr data-ln-row>
+					<td><input type="checkbox" data-ln-row-select></td>
+					<td>{{ title }}</td>
+					<td>{{ department }}</td>
+					<td>{{ status }}</td>
+					<td>{{ size_display }}</td>
+					<td>{{ updated_display }}</td>
+					<td>
+						<button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
+						<button data-ln-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
+					</td>
+				</tr>
+			</template>
+
+			<template data-ln-template="documents-empty">
+				<tr><td colspan="99">
+					<article class="ln-table__empty-state">
+						<h3>No documents yet</h3>
+						<p>Click <strong>New</strong> to create one.</p>
+					</article>
+				</td></tr>
+			</template>
+
+			<template data-ln-template="documents-empty-filtered">
+				<tr><td colspan="99">
+					<article class="ln-table__empty-state">
+						<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+						<h3>No results</h3>
+						<p>Try adjusting your search or filters.</p>
+						<button data-ln-data-table-clear-all class="btn">Clear all filters</button>
+					</article>
+				</td></tr>
+			</template>
+
+			<template data-ln-template="column-filter">
+				<div class="column-filter-dropdown">
+					<input type="search" data-ln-filter-search placeholder="Search…">
+					<ul data-ln-filter-options>
+						<li>
+							<label>
+								<input type="checkbox" data-ln-filter-reset>
+								All
+							</label>
+						</li>
+						<template data-ln-template="column-filter-item">
+							<li>
+								<label>
+									<input type="checkbox" data-ln-attr="value:value">
+									<span data-ln-field="value"></span>
+								</label>
+							</li>
+						</template>
+					</ul>
+					<button data-ln-filter-clear>Clear filter</button>
+				</div>
+			</template>
+		</section>
+	</main>
 </section>
 
 <!-- 4. Create / Edit modal -->

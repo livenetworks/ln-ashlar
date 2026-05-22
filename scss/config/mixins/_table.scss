@@ -191,9 +191,8 @@
 		@include inline-flex;
 		@include items-center;
 		float: right;
-		--padding-y: var(--size-2xs);
-		--padding-x: var(--size-2xs);
-		padding: var(--padding-y) var(--padding-x);
+		--btn-padding-y: var(--size-2xs);
+		--btn-padding-x: var(--size-2xs);
 		@include rounded-sm;
 		opacity: 0.5;
 

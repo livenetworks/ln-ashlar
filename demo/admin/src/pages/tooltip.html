@@ -6,7 +6,7 @@
 				<!-- ─── CSS baseline ─────────────────────────────────────── -->
 
 				<!-- 1. Default position (top) -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>1. CSS baseline — default position (top)</h3></header>
 					<main>
 						<p>Icon buttons with <code>data-ln-tooltip="…"</code>. The default position is <code>top</code>. <code>aria-label</code> is still required for screen readers — the tooltip text is only visual.</p>
@@ -22,10 +22,16 @@
 							</button>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Baseline CSS tooltip styling
+					[data-ln-tooltip] {
+						@include tooltip;
+					}
+					</script>
 				</section>
 
 				<!-- 2. All four positions -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>2. CSS baseline — all four positions</h3></header>
 					<main>
 						<p>Override the default with <code>data-ln-tooltip-position="bottom|left|right"</code>. The compass layout below places one trigger per position.</p>
@@ -36,20 +42,32 @@
 							<button type="button" data-ln-tooltip="Right tooltip" data-ln-tooltip-position="right" aria-label="Right tooltip example">Right</button>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Baseline CSS tooltip handles all 4 placements
+					[data-ln-tooltip] {
+						@include tooltip;
+					}
+					</script>
 				</section>
 
 				<!-- 3. On inline text -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>3. CSS baseline — on inline text</h3></header>
 					<main>
 						<p>Hover over <span data-ln-tooltip="ISO 9001 Quality Management">ISO 9001</span> to see the full standard name. This is the pure CSS baseline — no JS runs for elements without a <code>title</code> attribute.</p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Inline text triggers
+					[data-ln-tooltip] {
+						@include tooltip;
+					}
+					</script>
 				</section>
 
 				<!-- ─── JS enhance ───────────────────────────────────────── -->
 
 				<!-- 4. Side-by-side comparison -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>4. JS enhance — side by side</h3></header>
 					<main>
 						<p>Hover both buttons. Both show a tooltip. Only the enhanced button gets <code>aria-describedby</code> when focused — inspect with DevTools.</p>
@@ -63,10 +81,20 @@
 						</nav>
 						<p><small>Tab to the JS-enhanced button. Open DevTools Elements tab. The button should have <code>aria-describedby="ln-tooltip-1"</code> pointing at a node inside <code>#ln-tooltip-portal</code>.</small></p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// JS enhanced tooltips render in a global portal container
+					.ln-tooltip-portal {
+						@include tooltip-portal;
+					}
+
+					.ln-tooltip {
+						@include tooltip-element;
+					}
+					</script>
 				</section>
 
 				<!-- 5. Edge auto-flip (right → left) -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>5. JS enhance — edge auto-flip (right &rarr; left)</h3></header>
 					<main>
 						<p>The last button is pushed to the far right edge of the container. Its preferred side is <code>right</code>. Hover it — the tooltip should appear on the <strong>left</strong> because there is no room on the right. Inspect <code>data-ln-tooltip-placement</code> on the tooltip node.</p>
@@ -76,10 +104,16 @@
 							<button type="button" data-ln-tooltip="I flipped to the left — no room on right!" data-ln-tooltip-enhance data-ln-tooltip-position="right">Far right — flip me</button>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Viewport-aware tooltips are rendered in the portal
+					.ln-tooltip {
+						@include tooltip-element;
+					}
+					</script>
 				</section>
 
 				<!-- 6. Long text wrapping -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>6. JS enhance — long-text max-width wrap</h3></header>
 					<main>
 						<p>The tooltip below has text that exceeds 20 rem. Hover it to verify the <code>max-width: 20rem</code> wraps the text instead of overflowing the viewport.</p>
@@ -87,10 +121,16 @@
 							Long tooltip text
 						</button>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Portal elements carry standard styling and wrap automatically
+					.ln-tooltip {
+						@include tooltip-element;
+					}
+					</script>
 				</section>
 
 				<!-- 7. Keyboard focus check -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>7. JS enhance — keyboard focus + <code>aria-describedby</code></h3></header>
 					<main>
 						<p><strong>Instructions:</strong> Tab to the button below. Open DevTools (F12) and switch to the Elements panel. Inspect the button — it should have <code>aria-describedby="ln-tooltip-N"</code>. Inspect <code>#ln-tooltip-portal</code> in the body — there should be a <code>&lt;div class="ln-tooltip"&gt;</code> with the matching id. Tab away — both attributes should disappear.</p>
@@ -98,35 +138,26 @@
 							Tab to me
 						</button>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Focus triggered portal tooltips
+					.ln-tooltip {
+						@include tooltip-element;
+					}
+					</script>
 				</section>
 
 				<!-- 8. Title fallback (<abbr> pattern) -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>8. JS enhance — auto-attach on <code>[data-ln-tooltip][title]</code></h3></header>
 					<main>
 						<p>Any element with both <code>data-ln-tooltip</code> and <code>title</code> auto-enhances — the JS layer attaches without requiring <code>data-ln-tooltip-enhance</code>. The CSS baseline cannot strip <code>title</code>, so the browser's native tooltip would leak alongside the styled one. Auto-enhance resolves this for the semantic <code>&lt;abbr&gt;</code> pattern.</p>
 						<p>Hover (or tab to) <abbr data-ln-tooltip title="International Organization for Standardization" tabindex="0">ISO</abbr>. Open DevTools and watch the <code>title</code> attribute — it is stripped while the styled tooltip is visible and restored on hide. No <code>data-ln-tooltip-enhance</code> flag is required.</p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Auto-attach wraps [title] attributes with the JS portal
+					.ln-tooltip {
+						@include tooltip-element;
+					}
+					</script>
 				</section>
 
-				<!-- 9. SCSS usage -->
-				<section class="section-card">
-					<header><h3>9. SCSS usage</h3></header>
-					<main>
-						<pre><code>// CSS baseline — attribute selector, no config needed
-// &lt;button data-ln-tooltip="Save" aria-label="Save"&gt;...&lt;/button&gt;
-
-// Positions
-// data-ln-tooltip-position="top"    (default)
-// data-ln-tooltip-position="bottom"
-// data-ln-tooltip-position="left"
-// data-ln-tooltip-position="right"
-
-// JS enhance — add data-ln-tooltip-enhance for viewport-aware
-// placement + aria-describedby wiring
-// &lt;button data-ln-tooltip="Save" data-ln-tooltip-enhance&gt;...&lt;/button&gt;
-
-// Consumer semantic selector for the baseline mixin
-.my-trigger { @include tooltip; }</code></pre>
-					</main>
-				</section>

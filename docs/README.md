@@ -6,7 +6,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 
 | Location | What | For whom |
 |----------|------|----------|
-| `CLAUDE.md` (root) | Project rules, coding standards, architectural decisions | AI — loaded every session |
+| `CLAUDE.md` (root) | Project AI Core Rules & Pre-Code Checklist | AI — loaded every session |
 | `docs/README.md` | This file — documentation index | Humans |
 | `docs/css/*.md` | CSS architecture per topic (tokens, mixins, cards, forms, etc.) | Humans + AI on-demand |
 | `docs/js/*.md` | JS component architecture (internal state, render flow, design decisions) | Humans + AI on-demand |
@@ -108,6 +108,7 @@ Two files per component:
 | JS Component Patterns | [js/component-guide.md](js/component-guide.md) |
 | Reactive Architecture (v2) | [v2-reactive.md](v2-reactive.md) |
 | Container Queries | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |
+| Core Component & Styling Specs | [architecture/reference.md](architecture/reference.md) |
 
 ---
 

@@ -144,7 +144,7 @@
 					</section>
 
 					<!-- Demo: single bars (colour variants) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Colour variants</h3></header>
 						<main>
 							<p>Colour is class-driven. The shipped <code>.success</code> / <code>.warning</code> / <code>.error</code> classes override <code>background-color</code> directly in <code>scss/components/_progress.scss</code>; the bar without a class has no fill colour and reads as empty. Status colours intentionally bypass the theme accent cascade because status semantics are absolute (a "success" bar should be green even if the theme accent is purple).</p>
@@ -169,10 +169,26 @@
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Linear progress track
+.progress {
+    @include progress;
+}
+// Bar status colors
+[data-ln-progress].success {
+    @include progress-success;
+}
+[data-ln-progress].warning {
+    @include progress-warning;
+}
+[data-ln-progress].error {
+    @include progress-error;
+}
+						</script>
 					</section>
 
 					<!-- Demo: custom per-bar max -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Custom per-bar max</h3></header>
 						<main>
 							<p>Set <code>data-ln-progress-max</code> on the bar to shift the denominator. The width is computed as <code>(value / max) * 100%</code>. There is no centre-label override (that's an <code>ln-circular-progress</code> feature) — if you need descriptive text, place it as a sibling element.</p>
@@ -191,10 +207,16 @@
 								</li>
 							</ul>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Linear progress bar styling with custom max limit:
+.progress {
+    @include progress;
+}
+						</script>
 					</section>
 
 					<!-- Demo: stacked, default max -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Stacked bars, default max=100</h3></header>
 						<main>
 							<p>Multiple bars inside a single track. Each bar uses its own max (default 100), so its <code>style.width</code> is its value as a percentage. If the values sum to less than 100, the remainder of the track stays empty (showing through as <code>--bg-recessed</code>); if more than 100, each bar still renders at its clamped 0–100 width and they overflow horizontally — the track's <code>overflow: hidden</code> clips the overflow visually but the maths is wrong.</p>
@@ -218,10 +240,16 @@
 							</ul>
 							<p style="margin-block-start: var(--size-md); font-size: var(--text-body-sm); color: var(--fg-muted);">The second example renders mostly empty because each bar uses the default max of 100. To make 4 + 2 + 1 fill the entire track, declare the parent's shared max — see the next example.</p>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Stacked bars inherit the layout of the track:
+.progress {
+    @include progress;
+}
+						</script>
 					</section>
 
 					<!-- Demo: stacked, parent shared max (the asymmetry) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Stacked bars with shared max on the track</h3></header>
 						<main>
 							<p>This is the canonical pattern that is <strong>asymmetric</strong> with <code>ln-circular-progress</code>. The parent's <code>data-ln-progress-max</code> wins over each bar's default 100 (resolution: <code>parentMax || ownMax || 100</code> at line 126), and the three bars together fill the track to 100%.</p>
@@ -245,10 +273,16 @@
 							</ul>
 							<p style="margin-block-start: var(--size-md); font-size: var(--text-body-sm); color: var(--fg-muted);">The <code>ln-circular-progress</code> equivalent has no parent-shared-max mode. Three rings sharing a denominator of 7 must declare <code>data-ln-circular-progress-max="7"</code> on each individually.</p>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Parent max handles multi-segment proportional tracking:
+.progress {
+    @include progress;
+}
+						</script>
 					</section>
 
 					<!-- Demo: reactive (the canonical attribute write) -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Reactive updates (attribute write)</h3></header>
 						<main>
 							<p>The attribute IS the API. Each button below writes <code>data-ln-progress</code> on the bar to a new value; the per-bar MutationObserver fires, <code>_render</code> recomputes the percentage, and the browser's CSS transition smoothly animates the width from the previous size to the new one. Open DOM Inspector and watch the attribute (and the inline <code>style.width</code>) change with each click.</p>
@@ -267,6 +301,12 @@
 							</nav>
 							<p style="margin-block-start: var(--size-md); font-size: var(--text-body-sm); color: var(--fg-muted);">Try the overshoot and undershoot buttons. The attribute holds the raw value (visible in DOM Inspector), but the rendered bar clamps to 0–100% — the bar fills fully at 100% and stays empty at 0%, no matter how far the value strays.</p>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// MutationObserver-driven transitions:
+.progress {
+    @include progress;
+}
+						</script>
 					</section>
 
 					<!-- Demo: event log -->

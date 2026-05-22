@@ -237,11 +237,8 @@
 								</tbody>
 							</table>
 							</div>
-						</main>
-					</section>
-
-					<!-- Live demo -->
-					<section class="section-card" id="external-links-demo">
+						</mai					<!-- Live demo -->
+					<section class="section-card" id="external-links-demo" data-demo-html>
 						<header><h3>Live demo — decorated vs. untouched</h3></header>
 						<main>
 							<p>Inspect the links below in DevTools. The external ones carry <code>target="_blank"</code>, <code>rel="noopener noreferrer"</code>, and a <code>data-ln-external-link="processed"</code> marker — none of which is in this page's HTML source. The internal links are unmodified.</p>
@@ -270,7 +267,7 @@
 					</section>
 
 					<!-- Event tracking demo -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Tracking <code>:processed</code> and <code>:clicked</code> events</h3></header>
 						<main>
 							<p>Two events bubble out of every processed link: <code>ln-external-links:processed</code> when the decoration finishes, and <code>ln-external-links:clicked</code> when the user clicks. The log below subscribes to both. Click any external link in the section above — open them in a new tab, no harm done — and watch the entries appear.</p>
@@ -286,7 +283,7 @@
 					</section>
 
 					<!-- Dynamic insertion demo -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Dynamically inserted external links</h3></header>
 						<main>
 							<p>The <code>MutationObserver</code> watches <code>document.body</code> with <code>childList: true, subtree: true</code>. New <code>&lt;a&gt;</code> nodes (and any nested in inserted subtrees) get decorated automatically. Click the button to insert a fragment containing one external and one internal link via <code>innerHTML</code>; watch the inserted external link gain its decoration in DevTools.</p>
@@ -302,7 +299,7 @@
 					</section>
 
 					<!-- href mutation demo -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Mutating <code>href</code> redecorates automatically</h3></header>
 						<main>
 							<p>The <code>MutationObserver</code> watches <code>attributeFilter: ['href']</code> in addition to <code>childList</code>. Changing an existing link's <code>href</code> from internal to external triggers <code>_processLink</code> on the next microtask — no manual call needed. The link below starts internal (<code>/dashboard</code>); the first button flips its <code>href</code> to <code>https://example.com</code> and the decoration appears. The reset button restores the original state.</p>
@@ -320,7 +317,7 @@
 					</section>
 
 					<!-- rel merge demo -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — <code>rel="me"</code> merge mode</h3></header>
 						<main>
 							<p>The component reads the link's existing <code>rel</code> token list, ensures <code>noopener</code> and <code>noreferrer</code> are present, and writes the result back. Microformat values authored on the link survive the decoration pass. Inspect the link below in DevTools — the authored <code>rel="me"</code> is preserved alongside the added flags.</p>
@@ -330,7 +327,7 @@
 					</section>
 
 					<!-- Whitelisting demo -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Opting out via the unofficial whitelist hatch</h3></header>
 						<main>
 							<p>There is no public opt-out attribute. The unofficial path is to <strong>pre-set</strong> <code>data-ln-external-link="processed"</code> in your markup — the idempotency guard at line 13 treats the link as already-decorated and skips it. The link below is external but pre-marked, so it stays in the same tab without <code>target="_blank"</code>.</p>
@@ -344,7 +341,7 @@
 					</section>
 
 					<!-- Confirm modal interstitial -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Confirm-before-leaving interstitial</h3></header>
 						<main>
 							<p>The library does not ship an interstitial. The pattern below composes <code>ln-modal</code> with a capture-phase click listener that intercepts the navigation BEFORE <code>ln-external-links</code>' bubble-phase delegate dispatches <code>:clicked</code>. Modifier-key clicks (<code>Ctrl</code>, <code>Cmd</code>, <code>Shift</code>, middle-click) are passed through so users keep their browser-native shortcuts.</p>
@@ -353,6 +350,8 @@
 								<li><a href="https://www.mozilla.org">Mozilla (with confirm)</a></li>
 							</ul>
 							<p><small>Modifier-key click (Ctrl/Cmd/Shift/middle) bypasses the modal — try it.</small></p>
+						</main>
+					</section>l — try it.</small></p>
 						</main>
 					</section>
 

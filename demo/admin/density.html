@@ -166,7 +166,7 @@
 					</main>
 				</section>
 
-				<section class="section-card" id="density-scoped-target">
+				<section class="section-card" id="density-scoped-target" data-demo-html>
 					<header><h3>Form — input padding shrinks</h3></header>
 					<main>
 						<form>
@@ -188,9 +188,17 @@
 							</div>
 						</form>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Scoped density compaction:
+.density-compact {
+    // Re-tunes spacing and font tokens in this subtree
+    --padding-y: var(--size-xs-up); // 4px (normally 12px)
+    --font-size: var(--text-body-sm);
+}
+					</script>
 				</section>
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Table — reacts to density</h3></header>
 					<main>
 						<div class="table-container">
@@ -244,9 +252,16 @@
 						</table>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Tables react automatically to compact class:
+.density-compact table {
+    // row height reduces:
+    --density-row-h: 2.25rem; // normally 2.75rem
+}
+					</script>
 				</section>
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Stat card — outer padding shrinks</h3></header>
 					<main>
 						<article data-ln-stat-card>
@@ -258,6 +273,12 @@
 							</p>
 						</article>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Stat cards reduce padding and header/value text size:
+.density-compact [data-ln-stat-card] {
+    --text-heading-lg: 1.75rem; // gentle reduction for stat number
+}
+					</script>
 				</section>
 
 				<section class="section-card">
@@ -275,7 +296,7 @@
 					</main>
 				</section>
 
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Buttons do NOT react (accessibility)</h3></header>
 					<main>
 						<p>Buttons keep their full hit-target size in compact mode — WCAG 2.5.5 recommends ≥44px. Density shrinks chrome and content, never controls.</p>
@@ -284,6 +305,14 @@
 							<button type="submit">Save document</button>
 						</p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Buttons explicitly do NOT react to density to preserve target size:
+button {
+    // Padding and font-size use raw rem scales to stay >= 44px
+    --padding-y: var(--size-sm);
+    --padding-x: var(--size-md);
+}
+					</script>
 				</section>
 
 <script>

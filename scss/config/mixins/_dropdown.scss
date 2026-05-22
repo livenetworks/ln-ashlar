@@ -67,9 +67,6 @@
 		justify-content: flex-start;
 		gap: var(--gap);
 		@include text-left;
-		--padding-y: var(--size-xs);
-		--padding-x: var(--size-sm);
-		padding: var(--padding-y) var(--padding-x);
 		@include text-sm;
 		@include cursor-pointer;
 		@include transition-fast;
@@ -97,6 +94,17 @@
 			background: var(--color-accent-tint);
 			color: var(--color-accent);
 		}
+	}
+
+	a {
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-sm);
+		padding: var(--padding-y) var(--padding-x);
+	}
+
+	:is(button, input[type="submit"], input[type="reset"], input[type="button"]) {
+		--btn-padding-y: var(--size-xs);
+		--btn-padding-x: var(--size-sm);
 	}
 
 	// Inter-item divider — SOFT --border-block-start primitive read with

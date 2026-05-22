@@ -200,28 +200,31 @@
 						</main>
 					</section>
 
-					<!-- HTML example -->
-					<section class="section-card">
-						<header><h3>HTML Example</h3></header>
+					
+					<!-- Example with multiple navigations -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Multiple Navigations</h3></header>
 						<main>
-							<pre><code>&lt;nav data-ln-nav="active"&gt;
-    &lt;a href="/"&gt;Home&lt;/a&gt;
-    &lt;a href="/users"&gt;Users&lt;/a&gt;
-    &lt;a href="/users/new"&gt;New User&lt;/a&gt;
-    &lt;a href="/settings"&gt;Settings&lt;/a&gt;
-&lt;/nav&gt;
-
-&lt;!-- If the URL is /users/42 --&gt;
-&lt;!-- The /users link receives class .active (parent match) --&gt;
-&lt;!-- The /users/new link does NOT receive the class --&gt;</code></pre>
+							<article class="demo-nav-example">
+								<h5>Top Navigation</h5>
+								<nav data-ln-nav="active">
+									<a href="nav.html" aria-current="page">Nav (current)</a>
+									<a href="/users">Users</a>
+									<a href="/reports">Reports</a>
+								</nav>
+							</article>
+							<article class="demo-nav-example">
+								<h5>Side Navigation</h5>
+								<nav data-ln-nav="active">
+									<a href="nav.html" aria-current="page">Nav (current)</a>
+									<a href="/settings/profile">Profile</a>
+									<a href="/settings/security">Security</a>
+								</nav>
+							</article>
 						</main>
-					</section>
-
-					<!-- CSS styling -->
-					<section class="section-card">
-						<header><h3>CSS Styling</h3></header>
-						<main>
-							<pre><code>nav a {
+						<script type="text/plain" data-demo-scss>
+// Navigation item styling in SCSS:
+nav a {
     color: var(--fg-muted);
     @include transition;
 
@@ -232,8 +235,8 @@
         @include px(0.75rem);
         @include rounded-md;
     }
-}</code></pre>
-						</main>
+}
+						</script>
 					</section>
 
 					<!-- Reactivity -->
@@ -265,29 +268,6 @@ window.lnNav.init(navElement);
 // Manually update active links
 // (usually not needed — works automatically)
 window.lnNav.updateActive();</code></pre>
-						</main>
-					</section>
-
-					<!-- Example with multiple navigations -->
-					<section class="section-card">
-						<header><h3>Example — Multiple Navigations at the Same Time</h3></header>
-						<main>
-							<article class="demo-nav-example">
-								<h5>Top Navigation</h5>
-								<nav data-ln-nav="active">
-									<a href="nav.html" aria-current="page">Nav (current)</a>
-									<a href="/users">Users</a>
-									<a href="/reports">Reports</a>
-								</nav>
-							</article>
-							<article class="demo-nav-example">
-								<h5>Side Navigation</h5>
-								<nav data-ln-nav="active">
-									<a href="nav.html" aria-current="page">Nav (current)</a>
-									<a href="/settings/profile">Profile</a>
-									<a href="/settings/security">Security</a>
-								</nav>
-							</article>
 						</main>
 					</section>
 		</section>

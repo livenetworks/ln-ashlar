@@ -87,9 +87,25 @@
 	// controls are commonly wrapped in <aside>/<nav>/<div> inside the
 	// header. panel-header is chrome (no body labels), so descendant
 	// `label` here is always a search-icon-group, never a field label.
-	:is(button, label) {
+	label {
 		--padding-y: var(--size-xs);
+	}
+
+	button {
+		--btn-padding-y: var(--size-xs);
+	}
+
+	:is(button, label) {
 		min-height: calc(1.25rem + 2 * var(--padding-y) + 2 * var(--border-width));
+	}
+
+	// Close/dismiss and toggle buttons inside the header should be tight and flat.
+	button[data-ln-modal-close],
+	button[aria-label="Close"],
+	button[data-ln-toggle] {
+		--btn-padding-y: var(--size-2xs);
+		--btn-padding-x: var(--size-2xs);
+		--shadow: none;
 	}
 }
 

@@ -156,7 +156,7 @@
 				<p>Rich-text content styling for TipTap/editor output. Add <code>class="prose"</code> to any wrapper containing semantic HTML.</p>
 
 				<!-- Full element showcase -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>All Elements — Full Showcase</h3></header>
 					<main>
 						<article class="prose">
@@ -243,19 +243,12 @@ console.log(data.title);</code></pre>
 							<p>End of prose content. The max-width is <code>65ch</code> — enough for comfortable reading without excessive eye travel.</p>
 						</article>
 					</main>
-				</section>
-
-				<!-- SCSS Usage -->
-				<section class="section-card">
-					<header><h3>SCSS Usage</h3></header>
-					<main>
-						<pre><code>// Default class — zero SCSS needed
-// &lt;article class="prose"&gt;...&lt;/article&gt;
-
-// Consumer semantic selectors
-#document-viewer { @include prose; }
-#help-article    { @include prose; }</code></pre>
-					</main>
+					<script type="text/plain" data-demo-scss>
+// Standard prose mixin usage:
+#document-viewer {
+    @include prose;
+}
+					</script>
 				</section>
 		</section>
 

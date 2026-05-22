@@ -156,7 +156,7 @@
 				<p>Complete table filtering pattern — global search, per-column filters (popover + dropdown), and sort. Combines <code>ln-filter</code> (table column extension), <code>ln-dropdown</code>, <code>ln-popover</code>, and <code>ln-table-sort</code>.</p>
 
 				<!-- Employee table demo -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Employee Directory</h3></header>
 					<main>
 						<div data-ln-table id="employee-table">
@@ -406,6 +406,12 @@
 							</nav>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Filter button/bar styling in table:
+.filter {
+    @include filter-bar;
+}
+					</script>
 				</section>
 
 				<!-- How It Works -->

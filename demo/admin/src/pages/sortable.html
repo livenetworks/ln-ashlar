@@ -20,7 +20,7 @@
 				</section>
 
 				<!-- Simple list (full child draggable) -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Simple List</h3></header>
 					<main>
 						<p>No handle — drag anywhere on the item.</p>
@@ -32,10 +32,24 @@
 							<li>Fifth item</li>
 						</ol>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Draggable items style:
+#sortable-simple li {
+    padding: var(--size-xs) var(--size-sm);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+    margin-block-end: var(--size-2xs);
+    cursor: grab;
+    
+    &.ln-sortable--dragging {
+        opacity: 0.5;
+    }
+}
+					</script>
 				</section>
 
 				<!-- List with drag handle -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>List with Drag Handle</h3></header>
 					<main>
 						<p>Drag only by the <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-menu"></use></svg> handle.</p>
@@ -62,10 +76,20 @@
 							</li>
 						</ol>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Drag handle styling:
+.sortable-handle {
+    touch-action: none;
+    cursor: grab;
+    display: inline-flex;
+    align-items: center;
+    padding: var(--size-2xs);
+}
+					</script>
 				</section>
 
 				<!-- Enable/Disable -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Enable / Disable</h3></header>
 					<main>
 						<nav class="demo-actions">
@@ -88,10 +112,20 @@
 							</li>
 						</ol>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Toggleable list items:
+#sortable-toggle li {
+    display: flex;
+    align-items: center;
+    gap: var(--size-xs);
+    padding: var(--size-2xs) var(--size-xs);
+    border-block-end: 1px solid var(--border-subtle);
+}
+					</script>
 				</section>
 
 				<!-- Events log -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Events Log</h3></header>
 					<main>
 						<ol id="sortable-events" data-ln-sortable>
@@ -114,6 +148,14 @@
 						</ol>
 						<ul id="sortable-log"></ul>
 					</main>
+					<script type="text/plain" data-demo-scss>
+// Events list logger styling:
+#sortable-log {
+    margin-block-start: var(--size-md);
+    padding-inline-start: var(--size-md);
+    color: var(--fg-muted);
+}
+					</script>
 				</section>
 
 				<!-- CSS Classes -->
@@ -165,40 +207,7 @@ list.setAttribute('data-ln-sortable', 'disabled');</code></pre>
 					</main>
 				</section>
 
-				<!-- HTML Structure -->
-				<section class="section-card">
-					<header><h3>HTML Structure</h3></header>
-					<main>
-						<pre><code>&lt;!-- Without handle (entire item draggable) --&gt;
-&lt;ul data-ln-sortable&gt;
-    &lt;li&gt;Drag me&lt;/li&gt;
-    &lt;li&gt;Me too&lt;/li&gt;
-&lt;/ul&gt;
 
-&lt;!-- With handle --&gt;
-&lt;ol data-ln-sortable&gt;
-    &lt;li&gt;
-        &lt;span data-ln-sortable-handle&gt;⋮⋮&lt;/span&gt;
-        First item
-    &lt;/li&gt;
-    &lt;li&gt;
-        &lt;span data-ln-sortable-handle&gt;⋮⋮&lt;/span&gt;
-        Second item
-    &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;!-- Required CSS --&gt;
-&lt;style&gt;
-[data-ln-sortable-handle] {
-    touch-action: none;
-    cursor: grab;
-}
-.my-list &gt; li.ln-sortable--dragging { opacity: 0.4; }
-.my-list &gt; li.ln-sortable--drop-before { box-shadow: inset 0 2px 0 0 var(--color-primary); }
-.my-list &gt; li.ln-sortable--drop-after  { box-shadow: inset 0 -2px 0 0 var(--color-primary); }
-&lt;/style&gt;</code></pre>
-					</main>
-				</section>
 
 				<!-- API -->
 				<section class="section-card">

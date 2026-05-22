@@ -95,8 +95,8 @@
 	@include relative;
 
 	.ln-toast__close {
-		--padding-y: var(--size-2xs);
-		--padding-x: var(--size-2xs);
+		--btn-padding-y: var(--size-2xs);
+		--btn-padding-x: var(--size-2xs);
 		@include absolute;
 		// Geometric — close button positioned inside content padding.
 		top: var(--size-sm);

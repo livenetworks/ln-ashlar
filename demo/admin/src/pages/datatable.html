@@ -108,7 +108,7 @@
 					</section>
 
 					<!-- Live Demo -->
-					<section class="section-card">
+					<section class="section-card" data-demo-html>
 						<header><h3>Example — Server-driven listing (10,000 rows)</h3></header>
 						<main>
 							<p>This is the canonical production shape. A coordinator script (see the <code>&lt;script&gt;</code> at the bottom of this page) fetches <code>./data/documents.json</code> (a 10,000-record fixture), listens for <code>request-data</code>, applies sort / filter / search, and dispatches <code>set-data</code> back with <code>filterOptions</code> for authoritative filter dropdowns. The 10,000 rows trigger virtual scroll automatically — only visible rows + 15 buffer rows render at a time, but scroll height stays correct via spacer <code>&lt;tr&gt;</code> elements. Try sorting Title / Department / Priority / Owner / Size / Updated, filtering by Department / Status / Priority, searching across title / owner / department / tags, selecting individual rows, or pressing <kbd>/</kbd> to focus the search field.</p>
@@ -246,6 +246,17 @@
 								</template>
 							</section>
 						</main>
+						<script type="text/plain" data-demo-scss>
+// Data table component mixin:
+[data-ln-data-table] {
+    @include data-table;
+}
+
+// Base table styles:
+table {
+    @include table-base;
+}
+						</script>
 					</section>
 
 					<!-- Events reference -->
@@ -291,104 +302,7 @@
 						<main>
 							<p>Use these production-ready code snippets to integrate <code>ln-data-table</code> in your next project. Simply copy/paste and adapt the identifiers to match your schema.</p>
 
-							<h4>1. Production-Ready HTML Blueprint</h4>
-							<p>This template includes search integration, select-all checkboxes, sortable and filterable headers (utilizing the new template-scoped filter dropdown), empty states, and dynamic footers.</p>
-<pre><code>&lt;!-- Component Container --&gt;
-&lt;section data-ln-data-table="products" data-ln-data-table-selectable id="products-table"&gt;
-    &lt;table&gt;
-        &lt;thead&gt;
-            &lt;tr&gt;
-                &lt;th colspan="3"&gt;
-                    &lt;div class="ln-table__toolbar"&gt;
-                        &lt;div&gt;
-                            &lt;h3&gt;Products&lt;/h3&gt;
-                        &lt;/div&gt;
-                        &lt;form role="search" onsubmit="return false;"&gt;
-                            &lt;label&gt;
-                                &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
-                                &lt;input type="search" placeholder="Search..." data-ln-data-table-search&gt;
-                            &lt;/label&gt;
-                        &lt;/form&gt;
-                    &lt;/div&gt;
-                &lt;/th&gt;
-            &lt;/tr&gt;
-            &lt;tr&gt;
-                &lt;th data-ln-col-select&gt;&lt;/th&gt;
-                &lt;th data-ln-col="name"&gt;
-                    Product Name
-                    &lt;button data-ln-col-sort aria-label="Sort"&gt;
-                        &lt;svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"&gt;&lt;use href="#ln-arrows-sort"&gt;&lt;/use&gt;&lt;/svg&gt;
-                        &lt;svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"&gt;&lt;use href="#ln-arrow-up"&gt;&lt;/use&gt;&lt;/svg&gt;
-                        &lt;svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"&gt;&lt;use href="#ln-arrow-down"&gt;&lt;/use&gt;&lt;/svg&gt;
-                    &lt;/button&gt;
-                &lt;/th&gt;
-                &lt;th data-ln-col="category"&gt;
-                    Category
-                    &lt;button data-ln-col-filter aria-label="Filter"&gt;
-                        &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;
-                    &lt;/button&gt;
-                &lt;/th&gt;
-            &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody data-ln-data-table-body&gt;&lt;/tbody&gt;
-    &lt;/table&gt;
-
-    &lt;footer&gt;
-        &lt;span data-ln-data-table-total&gt;&lt;/span&gt; products
-        &lt;span data-ln-data-table-filtered-wrap&gt; · &lt;span data-ln-data-table-filtered&gt;&lt;/span&gt; filtered&lt;/span&gt;
-        &lt;span data-ln-data-table-selected-wrap&gt; · &lt;span data-ln-data-table-selected&gt;&lt;/span&gt; selected&lt;/span&gt;
-    &lt;/footer&gt;
-
-    &lt;!-- Row Template --&gt;
-    &lt;template data-ln-template="products-row"&gt;
-        &lt;tr data-ln-row&gt;
-            &lt;td&gt;&lt;input type="checkbox" data-ln-row-select&gt;&lt;/td&gt;
-            &lt;td&gt;{{ name }}&lt;/td&gt;
-            &lt;td&gt;{{ category }}&lt;/td&gt;
-        &lt;/tr&gt;
-    &lt;/template&gt;
-
-    &lt;!-- Empty States --&gt;
-    &lt;template data-ln-template="products-empty"&gt;
-        &lt;tr&gt;&lt;td colspan="99"&gt;&lt;article class="ln-table__empty-state"&gt;No products found.&lt;/article&gt;&lt;/td&gt;&lt;/tr&gt;
-    &lt;/template&gt;
-    &lt;template data-ln-template="products-empty-filtered"&gt;
-        &lt;tr&gt;
-            &lt;td colspan="99"&gt;
-                &lt;article class="ln-table__empty-state"&gt;
-                    &lt;p&gt;No matches for selected filters.&lt;/p&gt;
-                    &lt;button data-ln-data-table-clear-all class="btn"&gt;Clear all filters&lt;/button&gt;
-                &lt;/article&gt;
-            &lt;/td&gt;
-        &lt;/tr&gt;
-    &lt;/template&gt;
-
-    &lt;!-- Dynamic Column Filter Dropdown Template (cloned and populated in JS) --&gt;
-    &lt;template data-ln-template="column-filter"&gt;
-        &lt;div class="column-filter-dropdown"&gt;
-            &lt;input type="search" data-ln-filter-search placeholder="Search categories..."&gt;
-            &lt;ul data-ln-filter-options&gt;
-                &lt;li&gt;
-                    &lt;label&gt;
-                        &lt;input type="checkbox" data-ln-filter-reset&gt;
-                        All Categories
-                    &lt;/label&gt;
-                &lt;/li&gt;
-                &lt;template data-ln-template="column-filter-item"&gt;
-                    &lt;li&gt;
-                        &lt;label&gt;
-                            &lt;input type="checkbox" data-ln-attr="value:value"&gt;
-                            &lt;span data-ln-field="value"&gt;&lt;/span&gt;
-                        &lt;/label&gt;
-                    &lt;/li&gt;
-                &lt;/template&gt;
-            &lt;/ul&gt;
-            &lt;button data-ln-filter-clear&gt;Clear Filter&lt;/button&gt;
-        &lt;/div&gt;
-    &lt;/template&gt;
-&lt;/section&gt;</code></pre>
-
-							<h4>2. AJAX Server-Side Coordinator (Backend REST API)</h4>
+							<h4>1. AJAX Server-Side Coordinator (Backend REST API)</h4>
 							<p>This JS block registers the coordinator. It listens for sort, search, and filter intentions, makes an asynchronous API call, handles the visual loading indicators, and pushes the data back to the component.</p>
 <pre><code>(function () {
     const tableEl = document.getElementById('products-table');
@@ -444,7 +358,7 @@
     });
 })();</code></pre>
 
-							<h4>3. In-Memory Client-Side Coordinator</h4>
+							<h4>2. In-Memory Client-Side Coordinator</h4>
 							<p>For small datasets preloaded on the page. Sorts, searches, and filters the array inside the browser instantly without network requests.</p>
 <pre><code>(function () {
     const tableEl = document.getElementById('products-table');

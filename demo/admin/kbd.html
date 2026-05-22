@@ -156,17 +156,23 @@
 				<p>Keycap styling for inline keyboard shortcut documentation. Applied globally to all <code>&lt;kbd&gt;</code> elements via <code>scss/base/_typography.scss</code>. No attribute needed.</p>
 
 				<!-- Basic shortcuts -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Basic Shortcuts</h3></header>
 					<main>
 						<p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to open the command palette.</p>
 						<p>Save the document with <kbd>Ctrl</kbd>+<kbd>S</kbd>.</p>
 						<p>Undo the last action with <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					// Applied globally in ln-ashlar
+					kbd {
+						@include kbd;
+					}
+					</script>
 				</section>
 
 				<!-- Modifier keys -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Modifier Keys</h3></header>
 					<main>
 						<p>Mac: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></p>
@@ -174,10 +180,15 @@
 						<p>Open terminal: <kbd>Ctrl</kbd> + <kbd>`</kbd></p>
 						<p>Force quit: <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>Esc</kbd></p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					kbd {
+						@include kbd;
+					}
+					</script>
 				</section>
 
 				<!-- Single keys -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Single Keys</h3></header>
 					<main>
 						<p>Navigate: <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></p>
@@ -186,10 +197,15 @@
 						<p>Arrow keys: <kbd>&uarr;</kbd> <kbd>&darr;</kbd> <kbd>&larr;</kbd> <kbd>&rarr;</kbd></p>
 						<p>Function keys: <kbd>F1</kbd> <kbd>F5</kbd> <kbd>F12</kbd></p>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					kbd {
+						@include kbd;
+					}
+					</script>
 				</section>
 
 				<!-- In a shortcut table -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Shortcuts Reference Table</h3></header>
 					<main>
 						<div class="table-container">
@@ -233,10 +249,15 @@
 						</table>
 						</div>
 					</main>
+					<script type="text/plain" data-demo-scss>
+					kbd {
+						@include kbd;
+					}
+					</script>
 				</section>
 
 				<!-- In prose context -->
-				<section class="section-card">
+				<section class="section-card" data-demo-html>
 					<header><h3>Kbd inside Prose</h3></header>
 					<main>
 						<article class="prose">
@@ -245,23 +266,11 @@
 							<p>When editing a document, <kbd>Ctrl</kbd>+<kbd>S</kbd> saves your draft, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes the last change.</p>
 						</article>
 					</main>
-				</section>
-
-				<!-- SCSS Usage -->
-				<section class="section-card">
-					<header><h3>SCSS Usage</h3></header>
-					<main>
-						<pre><code>// Applied globally — no attribute or class needed.
-// &lt;kbd&gt; elements are styled automatically.
-
-// Applied via scss/base/_typography.scss:
-kbd {
-  @include kbd;
-}
-
-// Re-use the mixin in consumer code:
-.my-shortcut { @include kbd; }</code></pre>
-					</main>
+					<script type="text/plain" data-demo-scss>
+					kbd {
+						@include kbd;
+					}
+					</script>
 				</section>
 		</section>
 

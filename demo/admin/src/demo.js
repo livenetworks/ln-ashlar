@@ -54,3 +54,159 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 
 	init();
 })();
+
+// Dynamic Demo Code Inspector (HTML & SCSS)
+(function initDemoCodeInspectors() {
+	function escapeHtml(string) {
+		return string
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#039;');
+	}
+
+	function cleanCodeIndentation(html) {
+		if (!html) return '';
+		let lines = html.split('\n');
+		
+		// Strip initial empty lines
+		while (lines.length > 0 && lines[0].trim() === '') {
+			lines.shift();
+		}
+		// Strip trailing empty lines
+		while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+			lines.pop();
+		}
+
+		// Find minimum common indentation for non-empty lines
+		let minIndent = Infinity;
+		lines.forEach(line => {
+			if (line.trim() === '') return;
+			const match = line.match(/^(\s*)/);
+			if (match) {
+				minIndent = Math.min(minIndent, match[1].length);
+			}
+		});
+
+		// Remove common indentation from all lines
+		if (minIndent !== Infinity && minIndent > 0) {
+			lines = lines.map(line => {
+				return line.length >= minIndent ? line.substring(minIndent) : line.trim();
+			});
+		}
+
+		return lines.join('\n');
+	}
+
+	document.querySelectorAll('.section-card[data-demo-html]').forEach(function (section, index) {
+		const header = section.querySelector('header');
+		const main = section.querySelector('main');
+		if (!main) return;
+
+		// 1. Extract HTML
+		const cleanHTML = cleanCodeIndentation(main.innerHTML);
+
+		// 2. Extract SCSS if present
+		const scssScript = section.querySelector('script[data-demo-scss]');
+		const cleanSCSS = scssScript ? cleanCodeIndentation(scssScript.textContent) : null;
+
+		// 3. Create Toggle Button in Header
+		if (header) {
+			const panelId = 'demo-code-' + index;
+
+			const btnToggle = document.createElement('button');
+			btnToggle.type = 'button';
+			btnToggle.className = 'btn-demo-code';
+			btnToggle.setAttribute('aria-label', 'Show HTML / SCSS Code');
+			btnToggle.title = 'Show HTML / SCSS Code';
+			btnToggle.setAttribute('data-ln-tooltip', 'Show HTML / SCSS Code');
+			btnToggle.setAttribute('data-ln-toggle-for', panelId);
+			btnToggle.setAttribute('data-ln-toggle-action', 'toggle');
+			btnToggle.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-code"></use></svg>';
+			header.appendChild(btnToggle);
+
+			// 4. Create Collapsible Wrapper and Code Panel Container
+			const collapsibleWrapper = document.createElement('div');
+			collapsibleWrapper.id = panelId;
+			collapsibleWrapper.className = 'collapsible';
+			collapsibleWrapper.setAttribute('data-ln-toggle', 'close');
+
+			const container = document.createElement('div');
+			container.className = 'demo-code-container';
+
+			// Header of panel (tabs vs single title)
+			let headerHtml = '';
+			if (cleanSCSS) {
+				headerHtml = `
+					<div class="demo-code-tabs">
+						<button type="button" class="active" data-tab="html">HTML</button>
+						<button type="button" data-tab="scss">SCSS</button>
+					</div>
+				`;
+			} else {
+				headerHtml = `<span class="demo-code-title">HTML Source</span>`;
+			}
+
+			container.innerHTML = `
+				<div class="demo-code-header">
+					${headerHtml}
+					<button type="button" class="btn-copy-code" aria-label="Copy code">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg>
+						<span>Copy</span>
+					</button>
+				</div>
+				<div class="demo-code-body">
+					<pre data-pane="html"><code>${escapeHtml(cleanHTML)}</code></pre>
+					${cleanSCSS ? `<pre data-pane="scss" style="display: none;"><code>${escapeHtml(cleanSCSS)}</code></pre>` : ''}
+				</div>
+			`;
+
+			collapsibleWrapper.appendChild(container);
+			section.appendChild(collapsibleWrapper);
+
+			// Tab switching logic
+			if (cleanSCSS) {
+				const tabs = container.querySelectorAll('.demo-code-tabs button');
+				const panes = container.querySelectorAll('.demo-code-body pre');
+				tabs.forEach(function (tabBtn) {
+					tabBtn.addEventListener('click', function () {
+						tabs.forEach(t => t.classList.remove('active'));
+						tabBtn.classList.add('active');
+
+						const targetTab = tabBtn.getAttribute('data-tab');
+						panes.forEach(function (pane) {
+							if (pane.getAttribute('data-pane') === targetTab) {
+								pane.style.display = 'block';
+							} else {
+								pane.style.display = 'none';
+							}
+						});
+					});
+				});
+			}
+
+			// Copy to Clipboard logic
+			const btnCopy = container.querySelector('.btn-copy-code');
+			btnCopy.addEventListener('click', function () {
+				let activePane = container.querySelector('.demo-code-body pre:not([style*="display: none"])');
+				if (!activePane) activePane = container.querySelector('.demo-code-body pre');
+				if (!activePane) return;
+
+				const textToCopy = activePane.querySelector('code').textContent;
+				navigator.clipboard.writeText(textToCopy).then(function () {
+					btnCopy.classList.add('copied');
+					btnCopy.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-check"></use></svg><span>Copied!</span>';
+					
+					setTimeout(function () {
+						btnCopy.classList.remove('copied');
+						btnCopy.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg><span>Copy</span>';
+					}, 2000);
+				}).catch(function (err) {
+					console.error('Failed to copy text: ', err);
+				});
+			});
+		}
+	});
+})();
+
