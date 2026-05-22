@@ -1,7 +1,5 @@
 # Container Queries — ln-ashlar
 
-> Transfer this file to the ln-ashlar repository and apply the changes described below.
-
 ---
 
 ## Philosophy

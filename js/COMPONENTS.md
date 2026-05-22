@@ -164,6 +164,15 @@ _component.prototype.open = function () {
 
 **Rule:** If a prototype method changes state, its entire body is `this.dom.setAttribute(...)`. All state logic lives in `_syncAttribute()` (or equivalent), called only by the MutationObserver.
 
+### Off-Doctrine: Checkbox State (The "Checkbox Hack")
+
+While utilizing an `<input type="checkbox">` and the CSS sibling selector (`:checked ~ .menu`) is a common "pure CSS" pattern for toggling dropdowns or modals, it is **off-doctrine** for `ln-ashlar` components and must not be used:
+
+1. **Non-Observable Programmatic Updates:** Changing `.checked = true` programmatically via JavaScript **does not** dispatch native browser `'change'` or `'input'` events. It also **does not** trigger the `MutationObserver` (which only watches attribute modifications in the HTML markup). This completely breaks the reactive attribute-driven bridge.
+2. **Teleportation Conflict:** `ln-ashlar` components regularly teleport overlays to `document.body` (e.g., dropdown menus, modals) to prevent parent `z-index` and `overflow: hidden` issues. Teleportation immediately breaks the CSS sibling/child relationships required for CSS-only checkbox selectors.
+3. **Broken Encapsulation:** A checkbox lives inside or beside the component. To read or write state, external coordinators or other components would have to query the internal DOM structure (e.g., `modal.querySelector('input[type="checkbox"]').checked`), exposing private details.
+4. **Accessibility (ARIA) Semantic Mismatch:** Modals, dropdown triggers, and popovers require specific ARIA roles (e.g., `role="dialog"`, `aria-haspopup="menu"`, `aria-expanded`). A checkbox natively announces itself as a checkbox, which confuses screen readers and causes accessibility regressions.
+
 ---
 
 ## MutationObserver (mandatory)
