@@ -4207,7 +4207,9 @@ const It = `<li class="ln-toast__item">\r
       const O = this.table.getBoundingClientRect().top + window.scrollY + s;
       i = window.scrollY - O, c = window.innerHeight;
     }
-    const f = Math.max(0, Math.floor(i / n) - 15), r = Math.min(f + Math.ceil(c / n) + 30, t);
+    let f = Math.max(0, Math.floor(i / n) - 15);
+    f = Math.min(f, t);
+    const r = Math.min(f + Math.ceil(c / n) + 30, t);
     if (f === this._vStart && r === this._vEnd) return;
     this._vStart = f, this._vEnd = r;
     const p = this.ths.length || 1, v = f * n, w = (t - r) * n, E = document.createDocumentFragment();
