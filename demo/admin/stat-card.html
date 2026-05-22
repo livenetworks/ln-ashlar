@@ -210,29 +210,16 @@
 					</script>
 				</section>
 
-				<!-- Single card — no trend -->
+				<!-- Stat Card Variants -->
 				<section class="section-card" data-demo-html>
-					<header><h3>Single Card — No Trend</h3></header>
+					<header><h3>Stat Card Variants</h3></header>
 					<main>
-						<div data-demo-single-card>
+						<div data-demo-stat-flex>
 							<article data-ln-stat-card>
 								<p data-ln-stat-label>Total Users</p>
 								<p data-ln-stat-value>3,581</p>
 							</article>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					[data-ln-stat-card] {
-						@include stat-card;
-					}
-					</script>
-				</section>
 
-				<!-- Trend up -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Trend Up (success)</h3></header>
-					<main>
-						<div data-demo-single-card>
 							<article data-ln-stat-card>
 								<p data-ln-stat-label>Revenue</p>
 								<p data-ln-stat-value>€42,600</p>
@@ -241,21 +228,7 @@
 									18.4% from last quarter
 								</p>
 							</article>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					// Trend colors (success/error/muted) are handled internally via `data-ln-stat-trend`
-					[data-ln-stat-card] {
-						@include stat-card;
-					}
-					</script>
-				</section>
 
-				<!-- Trend down -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Trend Down (error)</h3></header>
-					<main>
-						<div data-demo-single-card>
 							<article data-ln-stat-card>
 								<p data-ln-stat-label>Overdue Items</p>
 								<p data-ln-stat-value>7</p>
@@ -264,20 +237,7 @@
 									3 more than last week
 								</p>
 							</article>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					[data-ln-stat-card] {
-						@include stat-card;
-					}
-					</script>
-				</section>
 
-				<!-- Trend neutral -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Trend Neutral (muted)</h3></header>
-					<main>
-						<div data-demo-single-card>
 							<article data-ln-stat-card>
 								<p data-ln-stat-label>Compliance Score</p>
 								<p data-ln-stat-value>97%</p>
@@ -290,6 +250,13 @@
 					<script type="text/plain" data-demo-scss>
 					[data-ln-stat-card] {
 						@include stat-card;
+						flex: 1 1 240px;
+					}
+
+					[data-demo-stat-flex] {
+						display: flex;
+						flex-wrap: wrap;
+						gap: var(--size-md);
 					}
 					</script>
 				</section>

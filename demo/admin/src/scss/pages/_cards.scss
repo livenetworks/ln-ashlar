@@ -212,3 +212,20 @@
 		}
 	}
 }
+
+// ─── Stat Card page demo containers ────────────────────
+[data-demo-kpi-grid] {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: var(--size-md);
+}
+
+[data-demo-stat-flex] {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-md);
+
+	[data-ln-stat-card] {
+		flex: 1 1 240px;
+	}
+}
