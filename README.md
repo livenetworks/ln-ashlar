@@ -2,10 +2,6 @@
 
 Unified frontend library for LiveNetworks projects — SCSS CSS framework + vanilla JS components, zero dependencies.
 
-> **v1.1 in flight** — design system refresh in progress. Roadmap:
-> [plans/design-system-v1.1-roadmap.md](plans/design-system-v1.1-roadmap.md).
-> Phase checklist: [todo.md](todo.md) § "Design System v1.1".
-
 ---
 
 ## Philosophy
