@@ -10,6 +10,27 @@ Real-time locale-aware number formatting for input fields.
 
 The component creates a hidden input that holds the raw numeric value for form submission and formats the visible input with locale-aware thousand separators. See [`docs/js/number.md`](../../docs/js/number.md#html) for the resulting DOM.
 
+## Loading & Source Files
+
+### Loading the Component
+
+#### 1. In-Bundle (Standard Integration)
+To load `ln-number` as part of the main `ln-ashlar` bundle, include the compiled bundle script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+To load `ln-number` as a standalone component, include its compiled IIFE under the component directory:
+```html
+<script src="js/ln-number/ln-number.js" defer></script>
+```
+
+### Source Files
+
+* **Active Development Source**: [js/ln-number/src/ln-number.js](file:///c:/laragon/www/ln-ashlar/js/ln-number/src/ln-number.js) (source of truth)
+* **Compiled Standalone**: [js/ln-number/ln-number.js](file:///c:/laragon/www/ln-ashlar/js/ln-number/ln-number.js)
+
 ## Attributes
 
 | Attribute | On | Description |

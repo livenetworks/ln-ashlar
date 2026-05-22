@@ -19,6 +19,24 @@ dispatch via `queueMicrotask` so all components finish init first.
 
 For internal mechanics see [`docs/js/search.md`](../../docs/js/search.md).
 
+## Integration
+
+### In-Bundle (Standard Integration)
+To load `ln-search` as part of the unified `ln-ashlar` bundle, include the main script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone (Zero-Dependency IIFE)
+If you only need the search input component, load the compiled zero-dependency IIFE directly:
+```html
+<script src="js/ln-search/ln-search.js" defer></script>
+```
+
+### Source Files & Development
+- **Active Development Source**: [js/ln-search/src/ln-search.js](file:///c:/laragon/www/ln-ashlar/js/ln-search/src/ln-search.js) — The source of truth for component logic.
+- **Compiled Standalone**: [js/ln-search/ln-search.js](file:///c:/laragon/www/ln-ashlar/js/ln-search/ln-search.js) — The compiled, ready-to-use standalone bundle.
+
 ## HTML contract
 
 ### Minimal — `data-ln-search` directly on the input

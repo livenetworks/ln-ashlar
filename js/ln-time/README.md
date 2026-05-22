@@ -2,6 +2,24 @@
 
 Timezone-aware timestamp formatting. Enhances `<time>` elements with `Intl.DateTimeFormat` and `Intl.RelativeTimeFormat`. Blade renders a fallback — JS replaces with localized, timezone-aware output.
 
+## Integration
+
+### In-Bundle (Standard Integration)
+To load `ln-time` as part of the unified `ln-ashlar` bundle, include the main script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone (Zero-Dependency IIFE)
+If you only need the time formatter component, load the compiled zero-dependency IIFE directly:
+```html
+<script src="js/ln-time/ln-time.js" defer></script>
+```
+
+### Source Files & Development
+- **Active Development Source**: [js/ln-time/src/ln-time.js](file:///c:/laragon/www/ln-ashlar/js/ln-time/src/ln-time.js) — The source of truth for component logic.
+- **Compiled Standalone**: [js/ln-time/ln-time.js](file:///c:/laragon/www/ln-ashlar/js/ln-time/ln-time.js) — The compiled, ready-to-use standalone bundle.
+
 ## Attributes
 
 | Attribute | On | Description |

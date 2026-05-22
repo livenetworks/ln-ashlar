@@ -272,6 +272,29 @@ populates the body.
 </table>
 ```
 
+## Integration & Development
+
+### Integration
+
+To integrate `ln-link` into your application, you can choose between loading the unified bundle or importing the component standalone.
+
+#### In-Bundle (Standard Integration)
+This is the recommended approach for standard integration, loading the component as part of the main `ln-ashlar` bundle:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### Standalone (Zero-Dependency IIFE)
+If you only need this component and want to avoid loading the full bundle, you can load it standalone using its zero-dependency compiled IIFE:
+```html
+<script src="js/ln-link/ln-link.js" defer></script>
+```
+
+### Source Files
+
+- **Active Development (Source of Truth)**: [js/ln-link/src/ln-link.js](file:///c:/laragon/www/ln-ashlar/js/ln-link/src/ln-link.js)
+- **Compiled Standalone Distribution**: [js/ln-link/ln-link.js](file:///c:/laragon/www/ln-ashlar/js/ln-link/ln-link.js)
+
 ## See also
 
 - [`../../docs/js/link.md`](../../docs/js/link.md) — architecture mirror (internal state, observer topology, click-flow, registration pattern)

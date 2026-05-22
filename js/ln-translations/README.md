@@ -155,3 +155,26 @@ Server-rendered translations are auto-detected — add `data-ln-translatable-lan
 
 - Server-rendered translations are auto-detected on init via `[data-ln-translatable-lang]` elements already in the DOM.
 - The "Add Language" trigger is hidden when all locales are active.
+
+## Integration & Development
+
+### Integration
+
+#### 1. In-Bundle (Standard Integration)
+To load `ln-translations` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you wish to load the `ln-translations` component standalone, include its compiled zero-dependency IIFE script directly:
+```html
+<script src="js/ln-translations/ln-translations.js" defer></script>
+```
+
+### Source Files
+
+For development, testing, and debugging, refer to the following local file paths:
+- **Source of Truth (Active Development):** [js/ln-translations/src/ln-translations.js](file:///c:/laragon/www/ln-ashlar/js/ln-translations/src/ln-translations.js)
+- **Compiled Standalone:** [js/ln-translations/ln-translations.js](file:///c:/laragon/www/ln-ashlar/js/ln-translations/ln-translations.js)
+

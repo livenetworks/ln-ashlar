@@ -122,3 +122,26 @@ window.lnAjax(element);
 // Manual destroy — remove all listeners attached by the constructor.
 window.lnAjax.destroy(element);
 ```
+
+## Integration & Development
+
+### Integration
+
+#### 1. In-Bundle (Standard Integration)
+To use `ln-ajax` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you wish to use `ln-ajax` standalone without the rest of the bundle, load its individual IIFE compiled script:
+```html
+<script src="js/ln-ajax/ln-ajax.js" defer></script>
+```
+
+### Source Files
+
+For development, testing, and debugging, refer to the following local file paths:
+- **Source of Truth (Active Development):** [js/ln-ajax/src/ln-ajax.js](file:///c:/laragon/www/ln-ashlar/js/ln-ajax/src/ln-ajax.js)
+- **Compiled Standalone Build:** [js/ln-ajax/ln-ajax.js](file:///c:/laragon/www/ln-ashlar/js/ln-ajax/ln-ajax.js)
+

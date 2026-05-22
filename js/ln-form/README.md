@@ -399,6 +399,31 @@ form.addEventListener('ln-form:reset-complete', function () {
 
 ---
 
+## Integration & Development
+
+### Loading the Component
+
+You can integrate `ln-form` in two ways:
+
+#### 1. In-Bundle (Standard Integration)
+Include the component as part of the main unified `ln-ashlar` bundle:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+Load the component individually to keep the footprint minimal:
+```html
+<script src="js/ln-form/ln-form.js" defer></script>
+```
+
+### Source Files
+
+- **Active Development**: [ln-form.js](file:///c:/laragon/www/ln-ashlar/js/ln-form/src/ln-form.js) is the source of truth.
+- **Compiled Standalone**: [ln-form.js](file:///c:/laragon/www/ln-ashlar/js/ln-form/ln-form.js) is the generated IIFE distribution.
+
+---
+
 ## See also
 
 - `js/ln-validate/README.md` — per-field validation primitive.

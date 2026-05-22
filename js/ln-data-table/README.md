@@ -26,6 +26,29 @@ one row template per table), see
 For complete copy-pasteable HTML blueprints and coordinator patterns, see the master [Table & Data-Table Integration Patterns](../../docs/js/table-integration.md).
 
 
+## Integration & Loading
+
+`ln-data-table` can be integrated into your application in one of two ways:
+
+### 1. In-Bundle (Standard Integration)
+Include the main compiled `ln-ashlar` library bundle. This automatically initializes the component on any matching DOM subtree via the global observer.
+
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### 2. Standalone (Zero-Dependency IIFE)
+If you only need `ln-data-table` without the rest of the library, load the compiled zero-dependency IIFE standalone script:
+
+```html
+<script src="js/ln-data-table/ln-data-table.js" defer></script>
+```
+
+### 3. Source & Compiled Files
+- **Active Development Source:** [ln-data-table.js](file:///c:/laragon/www/ln-ashlar/js/ln-data-table/src/ln-data-table.js) (located at `js/ln-data-table/src/ln-data-table.js`) is the source of truth for development.
+- **Compiled Standalone IIFE:** [ln-data-table.js](file:///c:/laragon/www/ln-ashlar/js/ln-data-table/ln-data-table.js) (located at `js/ln-data-table/ln-data-table.js`) is the built distribution file.
+
+
 ## Markup anatomy
 
 Below is a complete minimal table. Each piece exists for a reason — read

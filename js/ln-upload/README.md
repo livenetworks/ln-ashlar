@@ -153,3 +153,28 @@ Custom icons require `window.LN_ICONS_CUSTOM_CDN` to be set. See `js/ln-icons/RE
 ## Hidden Inputs
 
 After each successful upload, the component automatically creates `<input type="hidden" name="file_ids[]" value="serverId">` for each file. On form submit, the server receives the IDs directly.
+
+## Integration & Source Files
+
+### Loading the Component
+
+The `ln-upload` component can be integrated into your project using one of the following methods:
+
+#### 1. In-Bundle (Standard Integration)
+Include the main unified `ln-ashlar` bundle to load all component observers together, which is standard for full application environments:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you only need file upload capability without the rest of the bundle, load the standalone, self-registering IIFE version of the component directly:
+```html
+<script src="js/ln-upload/ln-upload.js" defer></script>
+```
+
+### Source Files
+
+For reference, active development, or customization, the component's codebase is structured into two main files:
+
+* **Active Development Source (ESM)**: The primary development file where all component features, drag-and-drop mechanics, validation, and XHR progress logic are implemented is [js/ln-upload/src/ln-upload.js](file:///c:/laragon/www/ln-ashlar/js/ln-upload/src/ln-upload.js).
+* **Compiled Standalone (IIFE)**: The built zero-dependency distribution version compiled for browser execution is [js/ln-upload/ln-upload.js](file:///c:/laragon/www/ln-ashlar/js/ln-upload/ln-upload.js).

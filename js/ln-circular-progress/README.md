@@ -131,6 +131,26 @@ transition animates the arc from the previous offset to the new one.
 - No debounce on rapid attribute writes — each write triggers a synchronous render and a `:change` event.
 - No `setValue()` / `setMax()` / imperative API. `el.setAttribute('data-ln-circular-progress', n)` is the canonical update path.
 
+## Integration and Source Files
+
+This component can be loaded either as part of the unified Ashlar bundle or as a standalone zero-dependency script.
+
+### 1. In-Bundle (Standard Integration)
+Include the main Ashlar bundle in your HTML. This bundle registers all Ashlar components, including `ln-circular-progress`:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### 2. Standalone (Zero-Dependency IIFE)
+If you only need circular progress indicators without the rest of the Ashlar library, load the component's standalone IIFE script:
+```html
+<script src="js/ln-circular-progress/ln-circular-progress.js" defer></script>
+```
+
+### 3. Source & Reference
+* **Active Development Source**: [js/ln-circular-progress/src/ln-circular-progress.js](file:///c:/laragon/www/ln-ashlar/js/ln-circular-progress/src/ln-circular-progress.js) — The source of truth containing the ES module implementation.
+* **Compiled Standalone Release**: [js/ln-circular-progress/ln-circular-progress.js](file:///c:/laragon/www/ln-ashlar/js/ln-circular-progress/ln-circular-progress.js) — The compiled IIFE distribution file.
+
 ## See also
 
 - `@mixin circular-progress` (`scss/config/mixins/_circular-progress.scss`) — SVG layout, fill/track stroke tokens, motion-safe transition, size variant mixins.

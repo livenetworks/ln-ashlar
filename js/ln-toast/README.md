@@ -157,3 +157,25 @@ The wrapper lives in your project, not in the library.
 | `error` | Error | `assertive` | `alert` |
 | `warn` | Warning | `polite` | `status` |
 | `info` | Information | `polite` | `status` |
+
+## Integration & Development
+
+### Integration
+
+#### 1. In-Bundle (Standard Integration)
+To load `ln-toast` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you wish to load the `ln-toast` component standalone, include its compiled zero-dependency IIFE script directly:
+```html
+<script src="js/ln-toast/ln-toast.js" defer></script>
+```
+
+### Source Files
+
+For development, testing, and debugging, refer to the following local file paths:
+- **Source of Truth (Active Development):** [ln-toast.js](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js)
+- **Compiled Standalone:** [ln-toast.js](file:///c:/laragon/www/ln-ashlar/js/ln-toast/ln-toast.js)
