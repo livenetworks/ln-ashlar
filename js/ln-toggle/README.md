@@ -155,6 +155,28 @@ cannot do.
 
 `.alert[data-ln-toggle="close"] { display: none; }` (`scss/components/_alert.scss`) hides the alert; `data-ln-persist` keeps it dismissed across reloads.
 
+## Integration & Development
+
+### Integration
+
+#### 1. In-Bundle (Standard Integration)
+To load `ln-toggle` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you wish to load the `ln-toggle` component standalone, include its compiled zero-dependency IIFE script directly:
+```html
+<script src="js/ln-toggle/ln-toggle.js" defer></script>
+```
+
+### Source Files
+
+For development, testing, and debugging, refer to the following local file paths:
+- **Source of Truth (Active Development):** [js/ln-toggle/src/ln-toggle.js](file:///c:/laragon/www/ln-ashlar/js/ln-toggle/src/ln-toggle.js)
+- **Compiled Standalone:** [js/ln-toggle/ln-toggle.js](file:///c:/laragon/www/ln-ashlar/js/ln-toggle/ln-toggle.js)
+
 ## Related
 
 - **[`ln-accordion`](../ln-accordion/README.md)** — single-open coordinator for a list of toggle panels.

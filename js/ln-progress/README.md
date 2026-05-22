@@ -5,6 +5,24 @@
 > change via MutationObserver and writes the new `width` as a
 > percentage. 145 lines of JS.
 
+## Integration
+
+### In-Bundle (Standard Integration)
+To load `ln-progress` as part of the unified `ln-ashlar` bundle, include the main script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone (Zero-Dependency IIFE)
+If you only need the progress bar component, load the compiled zero-dependency IIFE directly:
+```html
+<script src="js/ln-progress/ln-progress.js" defer></script>
+```
+
+### Source Files & Development
+- **Active Development Source**: [js/ln-progress/src/ln-progress.js](file:///c:/laragon/www/ln-ashlar/js/ln-progress/src/ln-progress.js) — The source of truth for component logic.
+- **Compiled Standalone**: [js/ln-progress/ln-progress.js](file:///c:/laragon/www/ln-ashlar/js/ln-progress/ln-progress.js) — The compiled, ready-to-use standalone bundle.
+
 ## Philosophy
 
 A linear progress indicator is mechanically a track `<div>` wrapping

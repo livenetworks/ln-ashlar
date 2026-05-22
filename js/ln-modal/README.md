@@ -201,6 +201,28 @@ override:
 The cap is on `max-width` — on small viewports the panel is `90%` of
 the viewport regardless of mixin.
 
+## Integration & Development
+
+### Integration
+
+#### 1. In-Bundle (Standard Integration)
+To load `ln-modal` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you wish to load the `ln-modal` component standalone, include its compiled zero-dependency IIFE script directly:
+```html
+<script src="js/ln-modal/ln-modal.js" defer></script>
+```
+
+### Source Files
+
+For development, testing, and debugging, refer to the following local file paths:
+- **Source of Truth (Active Development):** [js/ln-modal/src/ln-modal.js](file:///c:/laragon/www/ln-ashlar/js/ln-modal/src/ln-modal.js)
+- **Compiled Standalone:** [js/ln-modal/ln-modal.js](file:///c:/laragon/www/ln-ashlar/js/ln-modal/ln-modal.js)
+
 ## See also
 
 - `js/ln-form/README.md` — form submission, autosave, reset.

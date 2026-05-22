@@ -13,6 +13,24 @@ On-demand SVG icon loader — scans the DOM for `<use href="#ln-*">` and `<use h
 
 Routing is determined entirely by the prefix — no lists, no config arrays.
 
+## Integration
+
+### In-Bundle (Standard Integration)
+To load `ln-icons` as part of the unified `ln-ashlar` bundle, include the main script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone (Zero-Dependency IIFE)
+If you only need the icon loader component, load the compiled zero-dependency IIFE directly:
+```html
+<script src="js/ln-icons/ln-icons.js" defer></script>
+```
+
+### Source Files & Development
+- **Active Development Source**: [js/ln-icons/src/ln-icons.js](file:///c:/laragon/www/ln-ashlar/js/ln-icons/src/ln-icons.js) — The source of truth for component logic.
+- **Compiled Standalone**: [js/ln-icons/ln-icons.js](file:///c:/laragon/www/ln-ashlar/js/ln-icons/ln-icons.js) — The compiled, ready-to-use standalone bundle.
+
 ## HTML
 
 ```html
@@ -80,11 +98,20 @@ Set on `window` before the script loads:
 | `window.LN_ICONS_CDN` | `https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline` | Tabler CDN base URL |
 | `window.LN_ICONS_CUSTOM_CDN` | — | CDN base URL for `lnc-` icons |
 
+### In-Bundle Configuration
 ```html
 <script>
     window.LN_ICONS_CUSTOM_CDN = 'https://your-cdn.com/icons';
 </script>
 <script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone Configuration
+```html
+<script>
+    window.LN_ICONS_CUSTOM_CDN = 'https://your-cdn.com/icons';
+</script>
+<script src="js/ln-icons/ln-icons.js" defer></script>
 ```
 
 ## Adding a Custom Icon

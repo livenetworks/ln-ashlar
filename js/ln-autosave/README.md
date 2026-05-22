@@ -201,6 +201,29 @@ For ESC-discard-on-modal, use `data-ln-autosave-clear` on a button, dispatch a
 synthetic `reset` event on the form (`form.dispatchEvent(new Event('reset'))`),
 or remove the localStorage entry directly (`localStorage.removeItem(form.lnAutosave.key)`).
 
+## Integration & Development
+
+### Loading the Component
+
+You can integrate `ln-autosave` in two ways:
+
+#### 1. In-Bundle (Standard Integration)
+Include the component as part of the main unified `ln-ashlar` bundle:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+Load the component individually to keep the footprint minimal:
+```html
+<script src="js/ln-autosave/ln-autosave.js" defer></script>
+```
+
+### Source Files
+
+- **Active Development**: [js/ln-autosave/src/ln-autosave.js](file:///c:/laragon/www/ln-ashlar/js/ln-autosave/src/ln-autosave.js) is the source of truth.
+- **Compiled Standalone**: [js/ln-autosave/ln-autosave.js](file:///c:/laragon/www/ln-ashlar/js/ln-autosave/ln-autosave.js) is the generated IIFE distribution.
+
 ## Related
 
 - **`ln-form`** ([README](../ln-form/README.md)) — AJAX-submit layer. Composes

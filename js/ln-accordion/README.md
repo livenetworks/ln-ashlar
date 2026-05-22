@@ -394,6 +394,31 @@ does not touch the inner panels' `data-ln-toggle` state — they
 remain whatever they were when the outer collapsed, ready to re-show
 in their previous state if Outer 1 is re-opened.
 
+## Integration & Source Files
+
+### Loading the Component
+
+The `ln-accordion` component can be integrated into your project using one of the following methods:
+
+#### 1. In-Bundle (Standard Integration)
+Include the main unified `ln-ashlar` bundle to load all component observers together, which is standard for full application environments:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you only need accordion coordination without the rest of the bundle, load the standalone, self-registering IIFE version of the component directly:
+```html
+<script src="js/ln-accordion/ln-accordion.js" defer></script>
+```
+
+### Source Files
+
+For reference, active development, or customization, the component's codebase is structured into two main files:
+
+* **Active Development Source (ESM)**: The primary development file where all component features, state-checking, and event dispatches are implemented is [js/ln-accordion/src/ln-accordion.js](file:///c:/laragon/www/ln-ashlar/js/ln-accordion/src/ln-accordion.js).
+* **Compiled Standalone (IIFE)**: The built zero-dependency distribution version compiled for browser execution is [js/ln-accordion/ln-accordion.js](file:///c:/laragon/www/ln-ashlar/js/ln-accordion/ln-accordion.js).
+
 ## Related
 
 - **[`ln-toggle`](../ln-toggle/README.md)** — every panel in the

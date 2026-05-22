@@ -105,6 +105,24 @@ window.lnStore.clearAll()   // Wipe all IndexedDB stores + meta (for logout)
 window.lnStore.init(el)     // Manual init (MutationObserver handles dynamic DOM automatically)
 ```
 
+## Integration
+
+### In-Bundle (Standard Integration)
+To load `ln-store` as part of the unified `ln-ashlar` bundle, include the main script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone (Zero-Dependency IIFE)
+If you only need the store component, load the compiled zero-dependency IIFE directly:
+```html
+<script src="js/ln-store/ln-store.js" defer></script>
+```
+
+### Source Files & Development
+- **Active Development Source**: [js/ln-store/src/ln-store.js](file:///c:/laragon/www/ln-ashlar/js/ln-store/src/ln-store.js) — The source of truth for component logic.
+- **Compiled Standalone**: [js/ln-store/ln-store.js](file:///c:/laragon/www/ln-ashlar/js/ln-store/ln-store.js) — The compiled, ready-to-use standalone bundle.
+
 ## Dependencies
 
 - IndexedDB (browser built-in)

@@ -5,6 +5,24 @@ Works with `pushState` (ln-ajax) and `popstate` (browser back/forward).
 
 For internal mechanics — singleton `history.pushState` patch, per-instance MutationObserver, URL normalization — see [`docs/js/nav.md`](../../docs/js/nav.md).
 
+## Integration
+
+### In-Bundle (Standard Integration)
+To load `ln-nav` as part of the unified `ln-ashlar` bundle, include the main script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone (Zero-Dependency IIFE)
+If you only need the active link highlighter component, load the compiled zero-dependency IIFE directly:
+```html
+<script src="js/ln-nav/ln-nav.js" defer></script>
+```
+
+### Source Files & Development
+- **Active Development Source**: [js/ln-nav/src/ln-nav.js](file:///c:/laragon/www/ln-ashlar/js/ln-nav/src/ln-nav.js) — The source of truth for component logic.
+- **Compiled Standalone**: [js/ln-nav/ln-nav.js](file:///c:/laragon/www/ln-ashlar/js/ln-nav/ln-nav.js) — The compiled, ready-to-use standalone bundle.
+
 ## Attributes
 
 | Attribute | On | Description |

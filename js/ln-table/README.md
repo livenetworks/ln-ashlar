@@ -315,6 +315,29 @@ separate tables with separate roots.
   is visible at init, or call `el.lnTable.destroy()` after the
   container becomes visible and re-init via attribute reset.
 
+## Integration & Development
+
+### Integration
+
+This component can be loaded in one of two ways depending on your application structure:
+
+#### 1. In-Bundle (Standard Integration)
+Include the main compiled bundle which includes `ln-table` along with the rest of the `ln-ashlar` component library:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you only need table capabilities without the entire library, you can import the standalone, compiled self-initializing IIFE directly:
+```html
+<script src="js/ln-table/ln-table.js" defer></script>
+```
+
+### Development & Source Files
+
+- **Active Development Source**: The raw, uncompiled ES module source of truth is located at [js/ln-table/src/ln-table.js](file:///c:/laragon/www/ln-ashlar/js/ln-table/src/ln-table.js).
+- **Compiled Standalone Distribution**: The built standalone bundle is located at [js/ln-table/ln-table.js](file:///c:/laragon/www/ln-ashlar/js/ln-table/ln-table.js).
+
 ## See also
 
 - [`docs/js/table.md`](../../docs/js/table.md) — architecture mirror (state, render pipeline, virtual scroll math, lifecycle).

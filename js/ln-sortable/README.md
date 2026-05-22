@@ -3,6 +3,24 @@
 Drag & drop reorder component — moves elements in a list using the Pointer Events API.
 Works with touch + mouse. The component only reorganizes the DOM — data model sync is the consumer's responsibility (via events).
 
+## Integration
+
+### In-Bundle (Standard Integration)
+To load `ln-sortable` as part of the unified `ln-ashlar` bundle, include the main script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone (Zero-Dependency IIFE)
+If you only need the sortable component, load the compiled zero-dependency IIFE directly:
+```html
+<script src="js/ln-sortable/ln-sortable.js" defer></script>
+```
+
+### Source Files & Development
+- **Active Development Source**: [js/ln-sortable/src/ln-sortable.js](file:///c:/laragon/www/ln-ashlar/js/ln-sortable/src/ln-sortable.js) — The source of truth for component logic.
+- **Compiled Standalone**: [js/ln-sortable/ln-sortable.js](file:///c:/laragon/www/ln-ashlar/js/ln-sortable/ln-sortable.js) — The compiled, ready-to-use standalone bundle.
+
 ## Single Source of Truth
 
 The `data-ln-sortable` attribute is the single source of truth for enabled/disabled state:

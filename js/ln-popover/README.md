@@ -4,6 +4,24 @@
 
 For internal mechanics — focus-restore behavior, observer flow, openStack, viewport-aware positioning — see [`docs/js/popover.md`](../../docs/js/popover.md).
 
+## Integration
+
+### In-Bundle (Standard Integration)
+To load `ln-popover` as part of the unified `ln-ashlar` bundle, include the main script:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### Standalone (Zero-Dependency IIFE)
+If you only need the popover component, load the compiled zero-dependency IIFE directly:
+```html
+<script src="js/ln-popover/ln-popover.js" defer></script>
+```
+
+### Source Files & Development
+- **Active Development Source**: [js/ln-popover/src/ln-popover.js](file:///c:/laragon/www/ln-ashlar/js/ln-popover/src/ln-popover.js) — The source of truth for component logic.
+- **Compiled Standalone**: [js/ln-popover/ln-popover.js](file:///c:/laragon/www/ln-ashlar/js/ln-popover/ln-popover.js) — The compiled, ready-to-use standalone bundle.
+
 ## Attributes
 
 | Attribute | On | Description |

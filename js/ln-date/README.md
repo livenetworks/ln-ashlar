@@ -129,3 +129,23 @@ Locale is detected by walking up the DOM tree to find the nearest `[lang]` attri
 ## Integration with ln-form
 
 Works automatically. The hidden input carries the `name` attribute, so form serialization and population go through it transparently.
+
+## Integration and Source Files
+
+This component can be loaded either as part of the unified Ashlar bundle or as a standalone zero-dependency script.
+
+### 1. In-Bundle (Standard Integration)
+Include the main Ashlar bundle in your HTML. This bundle registers all Ashlar components, including `ln-date`:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### 2. Standalone (Zero-Dependency IIFE)
+If you only need date-formatting functionality without the rest of the Ashlar library, load the component's standalone IIFE script:
+```html
+<script src="js/ln-date/ln-date.js" defer></script>
+```
+
+### 3. Source & Reference
+* **Active Development Source**: [js/ln-date/src/ln-date.js](file:///c:/laragon/www/ln-ashlar/js/ln-date/src/ln-date.js) — The source of truth containing the ES module implementation.
+* **Compiled Standalone Release**: [js/ln-date/ln-date.js](file:///c:/laragon/www/ln-ashlar/js/ln-date/ln-date.js) — The compiled IIFE distribution file.

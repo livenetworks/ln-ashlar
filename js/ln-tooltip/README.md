@@ -115,3 +115,25 @@ guess at its meaning.
   or `focus` in some browsers. The tooltip will not appear. If the disabled state needs to explain
   itself, wrap the button in a focusable container with the tooltip on the wrapper, or use a
   non-disabled `<button>` with `aria-disabled="true"` (which still fires events).
+
+## Integration & Development
+
+### Integration
+
+#### 1. In-Bundle (Standard Integration)
+To load `ln-tooltip` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+#### 2. Standalone (Zero-Dependency IIFE)
+If you wish to load the `ln-tooltip` component standalone, include its compiled zero-dependency IIFE script directly:
+```html
+<script src="js/ln-tooltip/ln-tooltip.js" defer></script>
+```
+
+### Source Files
+
+For development, testing, and debugging, refer to the following local file paths:
+- **Source of Truth (Active Development):** [js/ln-tooltip/src/ln-tooltip.js](file:///c:/laragon/www/ln-ashlar/js/ln-tooltip/src/ln-tooltip.js)
+- **Compiled Standalone:** [js/ln-tooltip/ln-tooltip.js](file:///c:/laragon/www/ln-ashlar/js/ln-tooltip/ln-tooltip.js)

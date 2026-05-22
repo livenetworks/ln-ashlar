@@ -6,6 +6,27 @@
 > supersedes any previous in-flight request bearing the same key
 > (any method).
 
+## Integration and Loading
+
+There are two primary ways to load and use `ln-http` in your application:
+
+### 1. In-Bundle (Standard Integration)
+Include the main `ln-ashlar` bundle to load `ln-http` along with all other components:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### 2. Standalone (Zero-Dependency IIFE)
+If you only need the HTTP coordinator component, you can load it standalone using its compiled IIFE:
+```html
+<script src="js/ln-http/ln-http.js" defer></script>
+```
+
+### Source Files
+For development, testing, and debugging, refer to the following local source locations:
+* **Active Development**: [js/ln-http/src/ln-http.js](file:///c:/laragon/www/ln-ashlar/js/ln-http/src/ln-http.js) (the primary source of truth for component logic)
+* **Compiled Standalone IIFE**: [js/ln-http/ln-http.js](file:///c:/laragon/www/ln-ashlar/js/ln-http/ln-http.js) (the built/compiled version of the standalone asset)
+
 ## Philosophy
 
 Two patterns recur: (a) search-as-you-type, where racing GETs to

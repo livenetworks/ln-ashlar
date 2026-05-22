@@ -666,6 +666,26 @@ JS. If your security model needs to defend against programmatic
 clicks, that's a server-side check (CSRF token, second-factor
 re-auth, etc.), not a client-side concern at all.
 
+## Integration and Source Files
+
+This component can be loaded either as part of the unified Ashlar bundle or as a standalone zero-dependency script.
+
+### 1. In-Bundle (Standard Integration)
+Include the main Ashlar bundle in your HTML. This bundle registers all Ashlar components, including `ln-confirm`:
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### 2. Standalone (Zero-Dependency IIFE)
+If you only need confirmation buttons without the rest of the Ashlar library, load the component's standalone IIFE script:
+```html
+<script src="js/ln-confirm/ln-confirm.js" defer></script>
+```
+
+### 3. Source & Reference
+* **Active Development Source**: [js/ln-confirm/src/ln-confirm.js](file:///c:/laragon/www/ln-ashlar/js/ln-confirm/src/ln-confirm.js) — The source of truth containing the ES module implementation.
+* **Compiled Standalone Release**: [js/ln-confirm/ln-confirm.js](file:///c:/laragon/www/ln-ashlar/js/ln-confirm/ln-confirm.js) — The compiled IIFE distribution file.
+
 ## Related
 
 - **`@mixin confirm-tooltip`** (`scss/config/mixins/_confirm.scss`)

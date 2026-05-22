@@ -702,6 +702,29 @@ clears values then resets validation state per field.
 Zero glue code. The components share no imports. The DOM is the
 wiring.
 
+## Installation & Loading
+
+The component can be integrated in one of two ways:
+
+### 1. In-Bundle (Standard Integration)
+To use `ln-validate` as part of the unified `ln-ashlar` library, load the main compiled IIFE bundle in your document:
+
+```html
+<script src="dist/ln-ashlar.iife.js" defer></script>
+```
+
+### 2. Standalone (Zero-Dependency IIFE)
+If you only need validation capabilities without loading the entire library, import the standalone compiled script directly:
+
+```html
+<script src="js/ln-validate/ln-validate.js" defer></script>
+```
+
+### Source Files
+For development, extending rules, or troubleshooting, refer to these local files:
+- **Active Development (Source Code)**: [js/ln-validate/src/ln-validate.js](file:///c:/laragon/www/ln-ashlar/js/ln-validate/src/ln-validate.js)
+- **Compiled Standalone (Distribution)**: [js/ln-validate/ln-validate.js](file:///c:/laragon/www/ln-ashlar/js/ln-validate/ln-validate.js)
+
 ## Related
 
 - **[`ln-form`](../ln-form/README.md)** — the form-level coordinator
