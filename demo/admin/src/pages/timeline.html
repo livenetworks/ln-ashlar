@@ -7,7 +7,7 @@
 				<section class="section-card" data-demo-html>
 					<header><h3>Audit Log — 6 Entries</h3></header>
 					<main>
-						<ol data-ln-timeline>
+						<ol id="audit-log">
 							<li>
 								<time datetime="2026-04-14T09:32">Apr 14, 09:32</time>
 								<h4>Document approved</h4>
@@ -42,7 +42,7 @@
 					</main>
 					<script type="text/plain" data-demo-scss>
 // Standard timeline mixin usage:
-#audit-trail {
+#audit-log {
     @include timeline;
 }
 					</script>
@@ -52,7 +52,7 @@
 				<section class="section-card" data-demo-html>
 					<header><h3>Minimal — 2 Entries (title only)</h3></header>
 					<main>
-						<ol data-ln-timeline>
+						<ol class="timeline">
 							<li>
 								<time datetime="2026-04-14T09:32">Apr 14, 09:32</time>
 								<h4>Published</h4>
@@ -75,7 +75,7 @@
 				<section class="section-card" data-demo-html>
 					<header><h3>Single Entry</h3></header>
 					<main>
-						<ol data-ln-timeline>
+						<ol class="timeline">
 							<li>
 								<time datetime="2026-04-14T09:32">Apr 14, 09:32</time>
 								<h4>Record created</h4>

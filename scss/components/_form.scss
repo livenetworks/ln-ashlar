@@ -52,15 +52,34 @@ label:not(:has(> input)) {
 	@include form-label;
 }
 
-// ─── Pill groups — radio & checkbox lists in fieldsets ──────────
-// Semantic trigger: any <ul> inside <fieldset> whose <li><label> wraps
-// a radio or checkbox input. Gets joined pill styling by default.
-// Opt into the outline variant per-scope by re-binding `@include pill-outline`.
+// ─── Pill groups — radio & checkbox lists ──────────────────────────
+// Clean class-driven segmented controls and switch panels.
+// No <fieldset> tag dependency to prevent layout collisions.
 
-fieldset > ul:has(> li > label > input[type="checkbox"]),
-fieldset > ul:has(> li > label > input[type="radio"]) {
+.pills {
 	@include pills;
 }
+
+.pills-outline {
+	@include pills-outline;
+}
+
+.pills-switch {
+	@include pills-switch;
+}
+
+.pill {
+	@include pill;
+}
+
+.pill-outline {
+	@include pill-outline;
+}
+
+.pill-switch {
+	@include pill-switch;
+}
+
 
 .form-actions {
 	@include form-actions;
