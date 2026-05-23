@@ -13,11 +13,36 @@
 
 					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>A 47-line utility that turns a plain <code>&lt;textarea&gt;</code> into one whose height tracks its content. Set <code>data-ln-autoresize</code>; the field grows as the user types and shrinks when they delete. That is the entire feature surface — there is no "max-rows" config, no <code>ResizeObserver</code>, no dispatched events.</p>
-							<p>The component exists for one reason: every project that wants growing comment fields, note inputs, or chat composers ends up writing the same five lines of resize code, and the naive version usually flickers, fails to shrink, or skips the initial measurement on pre-filled content. <code>ln-autoresize</code> is the canonical implementation so no project ships its own.</p>
-							<p>The trick that matters: to make the textarea shrink as well as grow, the height must be reset to <code>auto</code> <em>before</em> <code>scrollHeight</code> is read. Otherwise the previous tall height keeps <code>scrollHeight</code> pinned and the field never collapses. That is why <code>_resize</code> is two lines instead of one. The browser flushes layout synchronously between the two writes, so the user only sees the final height — no flash.</p>
+							<p>Almost every modern web application features dynamic comment composers, chat inputs, or feedback fields that grow seamlessly with their content. Typically, developers either resort to heavy, complex JavaScript third-party wrapper components, or write naive resize scripts that flicker, jump, or completely fail to shrink when text is deleted.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-autoresize</code>, a highly-optimized, zero-dependency **UX Helper Primitive** (~47 lines of JavaScript). Instead of introducing heavy observers or layouts, it hooks directly into the browser's high-performance layout rendering cycle. It watches standard <code>input</code> events, reads the element's dynamic scroll height, and updates the inline CSS size instantaneously.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Scroll-Height Observation Trick
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									To shrink a textarea successfully, its CSS height must be reset to <code>auto</code> <em>before</em> reading <code>scrollHeight</code>. Otherwise, the dynamic container stays locked to its previous large size and never collapses. Resetting to <code>auto</code> and reading <code>scrollHeight</code> in immediate sequence forces a synchronous layout flush in the browser. It resizes perfectly with zero visual flicker.
+								</p>
+							</div>
+
+							<h4>Concerns Scoped Strictly by Layer</h4>
+							<p>The growing input experience is achieved by decoupling layout ceilings, browser defaults, and active observation:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Content Shell (HTML <code>rows</code> Attribute):</strong> Standard inputs default to <code>rows="2"</code>, causing empty textareas to start tall and snaps shut on initialization. Explicitly declaring <code>rows="1"</code> aligns the starting layout with the initial javascript paint for a seamless loading experience.
+								</li>
+								<li>
+									<strong>The Ceiling Controller (CSS Constraints):</strong> Limits on height are defined strictly inside project stylesheets using standard <code>max-height: 6rem</code> and <code>overflow-y: auto</code>. This lets developers cap expansion and enable scrolling using pure CSS, without touching a single line of JavaScript.
+								</li>
+								<li>
+									<strong>The Resizing Primitive (<code>ln-autoresize</code>):</strong> The script acts as a stateless, reactive observation node. It binds only to the <code>input</code> event stream, tracks pre-filled database text on load, and responds to programmatic changes.
+								</li>
+							</ol>
+
 							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-autoresize/README.md"><code>ln-autoresize</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/autoresize.md">architecture reference</a>.</p>
 						</main>
 					</section>

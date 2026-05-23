@@ -154,12 +154,37 @@
 			<div class="app-content-wrapper">
 <!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>N-way exclusive panel selection on a single container — the tab primitive in ln-ashlar. 145 lines of JS that own three things at once: which tab is active (a string key on the wrapper), how to persist it (URL hash for namespaced sections, <code>localStorage</code> as the opt-in fallback), and how to keep ARIA in sync.</p>
-							<p>The contract is one sentence: <strong>the active tab lives in <code>data-ln-tabs-active</code> on the wrapper, and the wrapper is the source of truth.</strong> Click handlers, hash sync, persistence restore, external code — every entry point funnels into one <code>setAttribute('data-ln-tabs-active', key)</code> call. A single <code>MutationObserver</code> callback runs the activation pipeline. There is no second path.</p>
-							<p>Tabs are deliberately <strong>NOT</strong> built on <a href="toggle.html"><code>ln-toggle</code></a>. The contracts diverge: ln-toggle is binary open/close, tabs are N-way exclusive; toggle uses <code>aria-expanded</code> (disclosure), tabs use <code>aria-selected</code> (tablist); toggle persists per element, tabs use namespace-scoped URL hashes OR per-page <code>localStorage</code> (mutually exclusive). Squeezing tabs into N coordinated toggles would put coordinator logic in the wrong place. See the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-tabs/README.md#why-not-ln-toggle">README "Why not ln-toggle"</a> section for the full architectural argument.</p>
-							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-tabs/README.md"><code>ln-tabs</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/tabs.md">architecture reference</a>.</p>
+							<p>When presenting structured, contextual content that needs to fit into a single viewport section, a tabbed interface is the standard UI paradigm. It enables users to switch between multiple alternative panels (an N-way exclusive view) without cluttering the screen or loading separate pages.</p>
+
+							<p>In <code>ln-ashlar</code>, this paradigm is managed by <strong><code>ln-tabs</code></strong>, a lightweight state container (145 lines of JavaScript) that handles three responsibilities concurrently: managing the active tab key, synchronizing URL hashes for deep-linking, and ensuring full ARIA accessibility state is reflected in the DOM.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Tabs Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									The contract is simple and absolute: <strong>the active tab key lives in <code>data-ln-tabs-active</code> on the wrapper element, and the wrapper is the sole source of truth.</strong> Click events, URL hashchanges, localStorage restorations, and external programmatic writes all funnel into a single <code>setAttribute</code> call on the wrapper. <strong>A single MutationObserver callback runs the entire update pipeline. There is no second path.</strong>
+								</p>
+							</div>
+
+							<h4>Why ln-tabs is NOT built on ln-toggle</h4>
+							<p>It is common in frontend frameworks to squeeze tabs into N coordinated toggles. In <code>ln-ashlar</code>, we intentionally avoid this due to three major architectural differences:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>Exclusive by Design:</strong> <code>ln-toggle</code> is a binary open/closed primitive. Squeezing tabs into it would require a complex coordinator layer to handle mutual exclusivity. <code>ln-tabs</code> enforces N-way exclusive selection by construction at the root wrapper level.
+								</li>
+								<li>
+									<strong>Accessibility (ARIA):</strong> <code>ln-toggle</code> operates as a disclosure widget using <code>aria-expanded</code>. Tabs represent a standard tablist using <code>aria-selected="true/false"</code> on buttons and <code>aria-hidden="true/false"</code> on panels.
+								</li>
+								<li>
+									<strong>Persistence Scopes:</strong> While <code>ln-toggle</code> panels persist individually, tabs use namespace-scoped URL hashes (e.g. <code>#user-tabs:settings&amp;project-tabs:members</code>) or page-level <code>localStorage</code> namespaces to allow multiple independent tabsets to coexist cleanly on a single page.
+								</li>
+							</ol>
+
+							<p>For the complete developer reference, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-tabs/README.md"><code>ln-tabs</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/tabs.md">architecture reference</a>.</p>
 						</main>
 					</section>
 

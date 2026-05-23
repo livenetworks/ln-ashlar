@@ -1,7 +1,41 @@
 <!-- ln-page: title="Icons — ln-ashlar" h1="Icons" -->
 
 <h1>Icons</h1>
-				<p>On-demand SVG icon loader — <code>ln-icons.js</code> scans the DOM for <code>&lt;use href="#ln-*"&gt;</code>, fetches each icon from <a href="https://tabler.io/icons" target="_blank" rel="noopener">Tabler Icons</a> via jsDelivr CDN, and builds a hidden sprite at runtime. Any Tabler icon name works. No bundled SVG content, no init call needed.</p>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>Standard SVG icon strategies in modern web development present a difficult tradeoff: either developers must import massive icon library packages that bloat the production bundle, or manually copy-paste hundreds of raw, cluttered SVG path tags directly into their markup. Both approaches hurt the developer experience (DX) and slow down page load times.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-icons</code>, a zero-dependency **On-Demand SVG Sprite Generator**. Operating as a background service, it monitors the document for any vector reference matching the <code>#ln-</code> or <code>#lnc-</code> prefix, fetches the required icon asynchronously from a remote CDN, caches the response locally, and injects it into a single hidden SVG sprite sheet inside the DOM body.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Asset Pipeline Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									An icon utility is not responsible for defining or editing vector files. It acts strictly as an on-demand compiler. By mapping DOM references to distinct CDN endpoints, it ensures that your bundle size remains zero regardless of how many icons are loaded. <strong>The SVG `use` href attribute is the sole contract.</strong>
+								</p>
+							</div>
+
+							<h4>Key Architectural Advantages</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>Dual CDN Routing Channels:</strong> Automatically detects the prefix on the icon reference. <code>#ln-{name}</code> loads outline icons from the global <a href="https://tabler.io/icons" target="_blank" rel="noopener">Tabler Icons</a> suite, while <code>#lnc-{name}</code> routes to a customizable corporate asset server for specialized brand icons.
+								</li>
+								<li>
+									<strong>Local Caching Layer:</strong> Fetches each icon once. The raw vector payload is cached inside <code>localStorage</code> with a version prefix (<code>lni:{name}</code>). Subsequent page renders read the vector path directly from cache, resulting in instant rendering with zero network latency.
+								</li>
+								<li>
+									<strong>Re-Rendering Observer:</strong> Equipped with a robust <code>MutationObserver</code>. Any dynamically created DOM node or runtime modification to an icon's <code>href</code> attribute (e.g. morphing a button icon to a checkmark) is captured and compiled instantly.
+								</li>
+							</ol>
+
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-icons/README.md"><code>ln-icons</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/icons.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
 				<style>
 					[data-ln-filter-hide] { display: none; }

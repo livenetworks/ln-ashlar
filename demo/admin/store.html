@@ -153,7 +153,49 @@
 		<section>
 			<div class="app-content-wrapper">
 <h1>Store</h1>
-					<p>Generic IndexedDB data layer — caches server data locally, syncs via delta protocol, handles optimistic mutations. Renders nothing — UI components consume data through its API and CustomEvents.</p>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>In traditional web applications, the network is treated as a blocking dependency. Clicking a save button displays a spinner while blocking the UI, waiting for a round-trip network payload. If the connection is unstable, operations timeout, data is lost, and the user is blocked.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-store</code>, a highly-optimized, zero-dependency **Local-First Sync Layer**. It acts as a client-side database (backed by standard browser IndexedDB) that decouples user interactions from network transport speeds. The application renders data directly from local storage, handles writes optimistically in real-time, and synchronizes data with the server in the background using a lightweight delta protocol.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Local-First Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									A local-first store never forces the UI to await network requests. Write actions are committed locally to IndexedDB instantly and dispatched to the interface, while background queues (with exponential backoff and version conflict resolution) sync mutations with the server. <strong>The local IndexedDB cache is the single source of truth for the UI.</strong>
+								</p>
+							</div>
+
+							<h4>Three Orthogonal Layers of the Data Pipeline</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Cache Storage (IndexedDB):</strong> A native, highly-performant browser database capable of storing megabytes of structured JSON data. It supports indexing, fast text-based search queries, and stays persisted fully across app restarts and offline sessions.
+								</li>
+								<li>
+									<strong>The Sync Engine (Delta Protocol):</strong> A background service that communicates with server API endpoints. It tracks timestamps, fetches only records changed since the last sync (delta arrays), processes conflict resolutions, and maintains outbox write queues.
+								</li>
+								<li>
+									<strong>The Presentation Layer (UI Elements):</strong> Data tables (<code>ln-data-table</code>) and select controls render data directly from local IndexedDB queries. They listen to bubbled store events (like <code>ln-store:created</code>, <code>ln-store:updated</code>) to update lists in real-time.
+								</li>
+							</ol>
+
+							<h4>How the Data Flow Coherence Works</h4>
+							<p>When a record is created or mutated by the user:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>The UI dispatches an event (e.g. <code>ln-store:request-create</code>) with the form payload.</li>
+								<li>The component assigns a temporary ID, saves the record locally, and instantly dispatches <code>ln-store:created</code>. Sibling tables receive the event and display the new record immediately.</li>
+								<li>In the background, the sync outbox pushes a POST request. If the server confirms, it responds with the permanent ID and version, triggering <code>ln-store:confirmed</code>. If it fails or conflicts, the store dispatches <code>ln-store:reverted</code> or <code>ln-store:conflict</code>, letting the UI rollback safely.</li>
+							</ol>
+
+							<p>For a detailed breakdown of local-first patterns, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-store/README.md"><code>ln-store</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/store.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
 					<!-- Attributes -->
 					<section class="section-card">

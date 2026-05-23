@@ -1,7 +1,41 @@
 <!-- ln-page: title="Time — ln-ashlar" h1="Time" -->
 
 <h1>Time</h1>
-					<p>Timezone-aware timestamp formatting using <code>Intl.DateTimeFormat</code> and <code>Intl.RelativeTimeFormat</code>. Enhances <code>&lt;time&gt;</code> elements — Blade renders fallback text, JS replaces with localized output.</p>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>Displaying dates, times, and relative periods (e.g. "3 hours ago") in multi-regional web portals is surprisingly complex. Server-side rendering often binds timestamps to a single static timezone, leaving international users to do timezone math in their heads. At the same time, loading massive, multi-kilobyte datetime formatting libraries in the browser compromises initial page loading speeds.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-time</code>, a zero-dependency **Timezone-Aware Timestamp Formatter**. Operating as a progressive enhancement layer, it upgrades native HTML <code>&lt;time&gt;</code> elements. Server engines render a clean UTC date or relative string fallback. On script boot, the component parses the Unix timestamp, formats the output based on the user's local timezone and browser language using high-performance standard APIs, and schedules a single background interval to update relative timestamps live.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Localized Datetime Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									A time formatter does not parse complex custom string tokens or manage calendars. It acts strictly as an enhancer of standard HTML `<time>` tags. It offloads localized translations and timezone offsets directly to standard browser APIs. <strong>The native `datetime` attribute containing a Unix timestamp in seconds is the sole contract.</strong>
+								</p>
+							</div>
+
+							<h4>Key Architectural Advantages</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>Standard-Based Concurrency (Zero Bloat):</strong> Offloads formatting entirely to native <code>Intl.DateTimeFormat</code> and <code>Intl.RelativeTimeFormat</code> APIs. Bypasses heavy parsing packages to maintain a zero-bloat footprint.
+								</li>
+								<li>
+									<strong>Centralized Interval Timer:</strong> Relative timestamps are updated dynamically. To maximize performance, the component runs a single global 60-second background ticker to update all elements on the page, automatically sweeping away orphaned nodes.
+								</li>
+								<li>
+									<strong>Reactive Property Mutation:</strong> Fully integrates with modern reactive workflows. Any dynamic updates to <code>datetime</code> or <code>data-ln-time</code> attributes via JavaScript are observed and rendered instantly.
+								</li>
+							</ol>
+
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-time/README.md"><code>ln-time</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/time.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
 					<!-- Attributes -->
 					<section class="section-card">

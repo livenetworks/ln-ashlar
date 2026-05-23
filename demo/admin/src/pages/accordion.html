@@ -2,11 +2,52 @@
 
 					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>A 38-line coordinator that turns a list of <code>ln-toggle</code> panels into a single-open group. It listens for one bubbled event (<code>ln-toggle:open</code>) and writes to one attribute (<code>data-ln-toggle="close"</code>) on every other open sibling. It does not animate — the <code>.collapsible</code> mixin does. It does not own panel state — each <code>ln-toggle</code> does. It does not persist — that's a per-toggle <code>data-ln-persist</code> opt-in.</p>
-							<p>The shape is a deliberate consequence of the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">cross-component principles</a>: components don't call each other; they communicate through events on the DOM, and they read each other's state from attributes. Opening one panel sets <code>data-ln-toggle="close"</code> on every other open sibling and lets the toggle's own observer run the close pipeline. The attribute is the contract — there is no sibling-instance method to call.</p>
-							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-accordion/README.md"><code>ln-accordion</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/accordion.md">architecture reference</a>.</p>
+							<p>In traditional frontend libraries, an accordion is a heavy, monolithic component that owns everything: click events, height transitions, keyboard accessibility (ARIA), active-panel state, and storage persistence. If you want a multi-open variant or different persistence, you have to pass complex configuration flags.</p>
+
+							<p>In <code>ln-ashlar</code>, an accordion is fundamentally different: <strong>it is a "Coordinator"</strong>. A coordinator is a lightweight, stateless ruleset that mediates between independent, highly-specialized primitives. The <code>ln-accordion</code> component is only 38 lines of JavaScript, and it possesses no state of its own. It simply sits back, listens to the DOM, and coordinates two other completely independent players: <code>ln-toggle</code> (which manages binary state and ARIA) and the CSS <code>.collapsible</code> mixin (which manages transitions).</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Coordinator Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									A coordinator never invokes instance methods directly on other components, nor does it maintain a JavaScript registry of their states. It listens for events bubbling up from the DOM, and applies decisions by writing standard HTML attributes back to the target elements. <strong>The HTML attribute is the sole contract.</strong>
+								</p>
+							</div>
+
+							<h4>The Mindset: Three Orthogonal Layers</h4>
+							<p>Every accordion you see on this page is a perfect synchronization of three isolated concerns, layered gracefully on top of each other:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The State Primitive (<code>ln-toggle</code>):</strong> Each accordion panel is an independent <code>ln-toggle</code> instance. It owns the binary <code>open</code> / <code>close</code> state, coordinates trigger buttons, synchronizes <code>aria-expanded</code> and <code>aria-controls</code>, and handles per-panel localStorage persistence (<code>data-ln-persist</code>). It knows absolutely nothing about other panels or the fact that it is inside an accordion.
+								</li>
+								<li>
+									<strong>The Animation Engine (CSS <code>.collapsible</code>):</strong> The height transition is handled entirely in Vanilla CSS via the <code>@mixin collapsible</code>. It transitions <code>grid-template-rows</code> from <code>0fr</code> to <code>1fr</code>. No JavaScript timers, no inline element style hacks, and no framerate stuttering.
+								</li>
+								<li>
+									<strong>The Coordinator (<code>ln-accordion</code>):</strong> This is the glue. It lives on the wrapper element and enforces a single, exclusive rule: <em>"When one panel opens, all other open panels in this group must close."</em>
+								</li>
+							</ol>
+
+							<h4>How the Coordination Flows</h4>
+							<p>When a user clicks a trigger to open a panel:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li><code>ln-toggle</code> intercepts the click, opens the target panel by setting its attribute to <code>data-ln-toggle="open"</code>, and dispatches a bubbled <code>ln-toggle:open</code> CustomEvent.</li>
+								<li>The event bubbles up to the <code>[data-ln-accordion]</code> wrapper. The coordinator intercepts it, queries the immediate subtree for other elements carrying <code>[data-ln-toggle]</code>, and sets <code>data-ln-toggle="close"</code> on them.</li>
+								<li>Each closed panel's own <code>ln-toggle</code> MutationObserver reacts to its attribute change, fires its standard <code>before-close</code> hooks, handles persistence updates, and collapses its content using CSS.</li>
+							</ol>
+
+							<h4>Why This Mindset is Superior</h4>
+							<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li><strong>Zero-configuration Multi-open:</strong> If you want multiple panels to be open at the same time, you do not need to configure an options object or change JavaScript properties. You simply <em>remove the coordinator wrapper</em> (<code>data-ln-accordion</code>), and the individual <code>ln-toggle</code> panels work perfectly on their own.</li>
+								<li><strong>Unified Execution:</strong> Because the coordinator triggers a close by writing to the attribute, the closing panel runs through the exact same state machine as a direct user click. Cancelable events (<code>before-close</code>) are respected, chevrons rotate back smoothly, and localStorage persistence is automatically updated.</li>
+								<li><strong>Nestable by Nature:</strong> Since ownership is determined purely by DOM ancestry (using <code>.closest('[data-ln-accordion]')</code>), accordions can be nested inside accordions infinitely. The inner coordinator handles its group, the outer coordinator handles its group, and they remain completely oblivious to each other.</li>
+							</ul>
+
+							<p>For a deeper dive into the architectural rationale, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-accordion/README.md"><code>ln-accordion</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/accordion.md">architecture deep-dive</a>.</p>
 						</main>
 					</section>
 

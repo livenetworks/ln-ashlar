@@ -1,207 +1,99 @@
 # ln-filter
 
-Generic filter component. `[data-ln-filter="targetId"]` defines the trigger group; `data-ln-filter-key` / `-value` checkboxes inside it directly drive visibility — children of the target element are hidden by data attribute, or `<table>` rows by column text.
+A zero-dependency, event-driven **Generic List & Table Filter Primitive** that manages item visibility states through declarative checkbox controls.
 
-For internal mechanics — state model, render pipeline, multi-column WeakMap registry, persistence flow — see [`docs/js/filter.md`](../../docs/js/filter.md).
+It filters target elements either by comparing child dataset attributes (for custom cards/lists) or scanning table column cell contents (for plain HTML tables). It operates independently of and in harmony with `ln-search`, combining multiple filter criteria seamlessly.
 
-## HTML contract
+---
 
+## 🧭 Philosophy & Architecture
+
+1. **Declarative State Model:** The component has no custom imperative state-change methods. Filter state is driven entirely by native checkboxes. External scripts update selections by writing `input.checked = true` and dispatching a standard bubbled `change` event.
+2. **Sentinel Mutual Exclusion:** The `data-ln-filter-reset` ("All") checkbox is kept in sync automatically: checking any value checkbox unchecks the reset sentinel; checking the sentinel unchecks all value inputs; unchecking all value inputs re-checks the sentinel.
+3. **Table Column & Auto-Population Mode:** By defining `data-ln-filter-col="N"`, the component filters plain HTML `<table>` rows by column cell text. When a `<template>` tag is nested inside, the component automatically populates value checkboxes from the column's unique values on page load.
+4. **Local State Persistence:** Adding the `data-ln-persist` attribute saves active filter selections to `localStorage` under `lnf:{id}`, ensuring filter states survive page reloads and browser transitions.
+
+---
+
+## 📦 Minimal Blueprint
+
+### Generic List Attribute Filter (Zero-JS)
+Bind the filter to a container `id`. Target items declare attributes matching the filter key.
 ```html
-<!-- Filter nav — data-ln-filter points to the target's id. -->
-<nav data-ln-filter="my-list">
-    <ul>
-        <!-- Reset checkbox: data-ln-filter-reset marks the "All" sentinel. -->
-        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label></li>
-        <!-- Value checkboxes: data-ln-filter-key + data-ln-filter-value pair drives filtering. -->
-        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="a"> Category A</label></li>
-        <li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="b"> Category B</label></li>
-    </ul>
+<nav data-ln-filter="employees-list">
+  <!-- Reset Sentinel -->
+  <label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-reset checked> All</label>
+  <!-- Values -->
+  <label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="design"> Design</label>
+  <label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="dev"> Development</label>
 </nav>
 
-<!-- Target list — children carry the data attribute being filtered. -->
-<ul id="my-list">
-    <li data-category="a">Element from category A</li>
-    <li data-category="b">Element from category B</li>
-    <li data-category="a">Another element A</li>
+<ul id="employees-list">
+  <li data-category="design">Ana Petrova — UI Designer</li>
+  <li data-category="dev">Marko Nikolov — Developer</li>
 </ul>
 ```
 
-What each piece does:
-
-- `data-ln-filter="targetId"` — creates the instance; value is the id of the element whose children are filtered.
-- `data-ln-filter-key="field"` — name of the data attribute to compare on target children (e.g. `data-category`).
-- `data-ln-filter-value="val"` — value to match.
-- `data-ln-filter-reset` — marks the "All" (reset) checkbox.
-- `data-ln-filter-hide` — set by JS on target children that don't match any active value.
-
-## JS API
-
-`ln-filter` has no public state-change API. Filter state is driven by the `<input>` checkboxes — toggle them in the UI, or dispatch a synthetic `change` event from script. The component listens for the native `change` event on every checkbox inside `[data-ln-filter]` and re-renders.
-
-```javascript
-const nav  = document.querySelector('[data-ln-filter]');
-const high = nav.querySelector('[data-ln-filter-value="high"]');
-
-high.checked = true;
-high.dispatchEvent(new Event('change', { bubbles: true }));
-```
-
-To clear the filter, set the sentinel `[data-ln-filter-reset]` checkbox to `checked = true` and dispatch `change` — the sentinel unchecks every other input as a side effect.
-
-For teardown, each `[data-ln-filter]` element exposes `element.lnFilter.destroy()` — removes change listeners, table-filter registry entry, and the instance reference. `window.lnFilter(root)` upgrades a custom root (Shadow DOM, iframe); ordinary AJAX inserts are handled automatically by the document-level MutationObserver.
-
-## Events
-
-| Event | Bubbles | Cancelable | Detail |
-|-------|---------|------------|--------|
-| `ln-filter:changed` | yes | no | `{ key: string, values: string[] }` |
-| `ln-filter:reset` | yes | no | `{}` |
-
-Both events dispatch on the filter element AND the target element (dual dispatch).
-
-```javascript
-document.addEventListener('ln-filter:changed', function (e) {
-    console.log('Filter:', e.detail.key, '=', e.detail.values.join(', '));
-});
-```
-
-## Attribute reference
-
-| Attribute | On | Description |
-|---------|-----|------|
-| `data-ln-filter="targetId"` | component root | Target element by ID whose children are filtered |
-| `data-ln-filter-key="field"` | `<input type="checkbox">` inside | Name of data attribute for comparison on target children |
-| `data-ln-filter-value="val"` | `<input type="checkbox">` inside | Value for comparison |
-| `data-ln-filter-reset` | `<input type="checkbox">` inside | Marks the "All" (reset) checkbox |
-| `data-ln-filter-hide` | target children | Set by JS when element doesn't match any active value |
-| `data-ln-filter-col="N"` | component root | 0-based column index for table row filtering |
-
-## Behavior
-
-- The reset sentinel and value checkboxes are mutually exclusive: checking a value input unchecks the sentinel; unchecking the last value input re-checks the sentinel; checking the sentinel directly unchecks every value input.
-- Items without the filtered data attribute on the target child are left visible — the filter only hides children whose attribute exists and does not match.
-
-## Table column filtering
-
-Use `data-ln-filter-col="N"` (0-based) on the filter root to filter plain `<table>` rows by the text content of a specific column. No `data-*` attributes are needed on `<tr>` elements. Only works on plain `<table>` elements — not `[data-ln-table]` targets.
-
-### Hardcoded values
-
+### Table Column Filter with Auto-Population & Persistence
+Auto-populates filter checkboxes from Column Index `2` (Department) and saves state to storage.
 ```html
-<nav data-ln-filter="my-table" data-ln-filter-col="2">
-    <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
-    <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>
-    <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label>
+<nav id="dept-filter" data-ln-filter="users-table" data-ln-filter-col="2" data-ln-persist>
+  <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All Departments</label>
+  <!-- Checklist generated dynamically here -->
+  <template>
+    <label><input type="checkbox"> {{ text }}</label>
+  </template>
 </nav>
 
-<table id="my-table">
-    <thead><tr><th>#</th><th>Name</th><th>Department</th></tr></thead>
-    <tbody>
-        <tr><td>1</td><td>Alice</td><td>Engineering</td></tr>
-        <tr><td>2</td><td>Bob</td><td>Design</td></tr>
-    </tbody>
+<table id="users-table">
+  <thead>
+    <tr><th>ID</th><th>Name</th><th>Department</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Ana Petrova</td><td>Engineering</td></tr>
+    <tr><td>2</td><td>Marko Nikolov</td><td>Design</td></tr>
+  </tbody>
 </table>
 ```
 
-### Auto-populate from column data
+---
 
-When a `<template>` is present inside the filter root and `data-ln-filter-col` is set, ln-filter populates checkboxes from the column's unique sorted values on init:
+## 🛠️ Declarative API Contract
 
-```html
-<nav data-ln-filter="my-table" data-ln-filter-col="2">
-    <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
-    <template>
-        <label><input type="checkbox"> {{ text }}</label>
-    </template>
-</nav>
-```
+### HTML Attributes
 
-### Multi-column AND filtering
+| Attribute | Elements | Description |
+| :--- | :--- | :--- |
+| `data-ln-filter` | Container root | Component root. Value is the `id` of the target container whose items are filtered. |
+| `data-ln-filter-key` | `<input type="checkbox">` | The field name representing the target dataset attribute (e.g. `category` matches `data-category`). |
+| `data-ln-filter-value` | `<input type="checkbox">` | The value to match. Active checkboxes show matching items; others are hidden. |
+| `data-ln-filter-reset` | `<input type="checkbox">` | Marks the reset ("All") sentinel. |
+| `data-ln-filter-col` | Container root | Opt-in. 0-based column index to filter plain `<table>` rows by column cell text. |
+| `data-ln-persist` | Container root | Opt-in. Persists active checkbox selections in `localStorage` under `lnf:{id}`. |
+| `data-ln-filter-hide` | Children of target | *State*. Automatically toggled on non-matching elements (`display: none !important`). |
 
-Multiple `[data-ln-filter]` elements can target the same table with different `data-ln-filter-col` values. Filters combine with AND logic across columns, OR logic within a single column. Each filter must use a unique `data-ln-filter-key`.
+---
 
-```html
-<!-- Filter by department (column 2) -->
-<span data-ln-filter="my-table" data-ln-filter-col="2">
-    <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
-    <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>
-</span>
+## ⚡ DOM Events
 
-<!-- Filter by status (column 3) -->
-<span data-ln-filter="my-table" data-ln-filter-col="3">
-    <label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label>
-    <label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"> Active</label>
-</span>
-```
+Events are dispatched on **both** the filter navigation container and the target element (dual dispatch).
 
-## Persistence
+### `ln-filter:changed`
+Fired when any filter selection is modified.
+- **Payload (`detail`)**: `{ key: string, values: string[] }` (where `values` lists active filter options).
 
-Add `data-ln-persist` to the `[data-ln-filter]` element to remember selected filter values across page loads. The element must have an `id` (or a `data-ln-persist="custom-key"` value); without one a warning is emitted and persistence is silently skipped.
+### `ln-filter:reset`
+Fired when the reset sentinel is activated.
+- **Payload (`detail`)**: `{}`
 
-Persisted state overrides DOM-checked attributes; if no persisted state exists, pre-checked inputs trigger an initial `ln-filter:changed` (browser back/forward restore or server-rendered HTML). Reset clears storage.
+---
 
-```html
-<nav id="status-filter" data-ln-filter="my-list" data-ln-persist>
-    <ul>
-        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
-        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="active"> Active</label></li>
-        <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="pending"> Pending</label></li>
-    </ul>
-</nav>
-```
+## ⚠️ Common Pitfalls
 
-Select "Active", refresh — "Active" is still checked and the list is filtered. Reset ("All"), refresh — no filter active. See [`docs/js/core.md`](../../docs/js/core.md) for storage-key format.
-
-## CSS
-
-The hide rule for `[data-ln-filter-hide]` is bundled in ln-ashlar. Pill active state (checked highlight) is handled automatically via `label:has(> input:checked)`. `ln-filter` and `ln-search` work independently on the same target — each manages its own hide attribute, so both rules can apply concurrently:
-
-```css
-[data-ln-search-hide],
-[data-ln-filter-hide] {
-    display: none;
-}
-```
-
-## What it does NOT do
-
-The component is intentionally narrow. These are NOT filter concerns:
-
-- **Auto-create checkboxes from data** when `data-ln-filter-col` is absent. Without both a `<template>` and `data-ln-filter-col`, the consumer provides checkbox markup.
-- **Re-filter automatically when target children mutate.** ln-filter does not observe the target for new children. Dispatch `change` on an active filter checkbox to force a re-pass.
-- **Filter `[data-ln-table]` targets.** ln-table owns its row filtering. ln-filter's row-hide logic is skipped when the target has `data-ln-table`.
-- **Pagination, virtualisation, sorting.** These belong to `ln-table` / `ln-data-table`.
-
-## Loading & Development
-
-### 1. In-Bundle (Standard Integration)
-
-To load `ln-filter` as part of the unified `ln-ashlar` library, include the main bundle in your HTML document:
-
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-When loaded via the main bundle, the component automatically initializes and registers itself, listening for DOM mutations to scan and attach to matching elements.
-
-### 2. Standalone (Zero-Dependency IIFE)
-
-If you only need the filtering functionality without the rest of the `ln-ashlar` suite, you can load the compiled standalone IIFE version:
-
-```html
-<script src="js/ln-filter/ln-filter.js" defer></script>
-```
-
-This self-contained script executes immediately and sets up the necessary hooks and global initializer `window.lnFilter` without requiring any external dependencies.
-
-### 3. Source & Development Paths
-
-*   **Active Development Source:** [js/ln-filter/src/ln-filter.js](file:///c:/laragon/www/ln-ashlar/js/ln-filter/src/ln-filter.js) — The authoring source code containing the ES module implementation. Any new features, bug fixes, or behavioral changes must be written here.
-*   **Compiled Standalone:** [js/ln-filter/ln-filter.js](file:///c:/laragon/www/ln-ashlar/js/ln-filter/ln-filter.js) — The compiled distribution file generated from the source code during the build process. Do not edit this file directly.
-
-## See also
-
-- `js/ln-search/README.md` — independent text-search filter on the same target; shares the hide-attribute pattern.
-- `js/ln-table/README.md` — table consumer with built-in column filters.
-- `js/ln-data-table/README.md` — virtualised data table.
-- `docs/js/filter.md` — internal architecture for library maintainers.
+- **Driving State Programmatically Without Events:** Changing `input.checked = true` using JavaScript does not trigger browser `change` listeners. You must explicitly dispatch the event:
+  ```javascript
+  input.checked = true;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+  ```
+- **Missing `id` on Persisted Filters:** The `data-ln-persist` storage key relies on the filter element's ID (e.g. `<nav id="my-filter" data-ln-persist>`). If the ID is missing, the component will fail to initialize persistence.
+- **Filtering Coordinated Tables:** `ln-filter` is designed for static lists or plain native tables. Do not target virtualised components like `ln-table` or `ln-data-table`, which manage their own column filters internally.

@@ -27,12 +27,36 @@
 
 					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>A 114-line component for the input-side of a search box. <code>ln-search</code> debounces keystrokes and announces "the user typed X" via a single cancelable <code>ln-search:change</code> event. The component does <em>not</em> own filtering — it announces intent and lets whichever consumer cares the most respond. The default fallback (when no consumer steps in) is a cheap DOM walk that adds <code>data-ln-search-hide</code> to non-matching items.</p>
-							<p>Two consumer paths for the same event. A passive consumer — no listener attached — gets the cheap DOM walk for free. An active consumer (<code>ln-table</code>, custom server-search code) listens for the event, calls <code>preventDefault()</code>, and runs its own filter pipeline; the default walk never fires. The cancelable contract is the off-switch — no separate "default behavior" attribute, no mode flag.</p>
-							<p>The component does one piece of plumbing that matters. Browser form-restore (back-button navigation, server-rendered pre-filled inputs) deposits a value into the input <em>before</em> JS runs. Without intervention, the consumer would see an unfiltered target with a non-empty search box. <code>ln-search</code> detects the pre-filled value at construction and dispatches the initial event through <code>queueMicrotask</code>, which defers the dispatch until after the current tick — by then every other component has finished initializing, so the listener (e.g. <code>ln-table</code>) is wired and ready.</p>
-							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-search/README.md"><code>ln-search</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/search.md">architecture reference</a>.</p>
+							<p>Asynchronous list filtering in complex web layouts often creates tight coupling between search inputs and target containers. Hardcoding filtering logic into inputs breaks reusability, while forcing developers to write custom debounce hooks and DOM manipulation routines on every new page duplicates effort and introduces race conditions.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-search</code>, a zero-dependency **Debounced Search Primitive**. It functions strictly as an **intent announcer**. When a user types, it debounces the keystrokes and dispatches a single, normalized, and cancelable event (<code>ln-search:change</code>) directly on the target container. It does not own data filtering itself, allowing tables, lists, or custom server-search pipelines to intercept the search intent or let it fall back to a highly optimized built-in DOM-walking filter.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Filtering Intent Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									A search primitive should only supervise the input channel—handling keystroke debouncing, input clearing, and browser back-button value restorations. It must remain decoupled from data rendering. <strong>The cancelable `ln-search:change` event is the sole contract.</strong>
+								</p>
+							</div>
+
+							<h4>Orthogonal Integration Lifecycles</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Passive Path (Zero-JS Fallback):</strong> When no custom event listener is attached, the primitive performs a lightweight direct child DOM walk on the target list, tagging non-matching items with <code>data-ln-search-hide="true"</code>, which are hidden instantly via global library utility CSS.
+								</li>
+								<li>
+									<strong>The Active Path (Custom &amp; Table Integration):</strong> Active components (such as <code>ln-table</code> or custom server-side search scripts) intercept <code>ln-search:change</code>, call <code>e.preventDefault()</code> to deactivate the default DOM walk, and run their own internal in-memory or remote query pipelines instead.
+								</li>
+								<li>
+									<strong>The Restoration Tick:</strong> Form recovery (back-button navigation or pre-filled inputs) is intercepted at construction. The component schedules an initial search dispatch via <code>queueMicrotask</code>, ensuring that all listener components are completely initialized and wired before the filter executes.
+								</li>
+							</ol>
+
+							<p style="margin-top: var(--size-sm);">For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-search/README.md"><code>ln-search</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/search.md">architecture reference</a>.</p>
 						</main>
 					</section>
 

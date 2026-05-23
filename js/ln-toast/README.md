@@ -1,29 +1,85 @@
 # ln-toast
 
-Toast notification component — temporary status messages with side
-accent and icon. Auto-dismisses after a timeout.
+> Service-style non-blocking status notifications, managed reactively via window events.
 
-The library ships a default item template and injects it into the
-DOM on init. Drop a `<ul data-ln-toast>` somewhere in your page and
-toasts work — no template setup required.
+---
 
-**Bundler caveat:** the default template is loaded via a `?raw` import
-(`./template.html?raw`). This resolves at build time under Vite
-(and Webpack with `raw-loader`, esbuild with a raw plugin). Source
-consumers without `?raw` support must manually inline a
-`<template data-ln-template="ln-toast-item">` in their HTML to
-override the auto-injection path.
+## 1. Philosophy & The Toast Mindset
 
-## HTML
+In `ln-ashlar`, the core design principle is **decoupling**. Toasts are a pure application-level service.
 
-### Container (required)
+1. **Zero-Markup Dispatch (JavaScript)**: Components and pages never import toast files or call imperative layout methods directly. To show a notification, any script or controller simply dispatches an `ln-toast:enqueue` event to the global `window` object.
+2. **Central Coordination (The Service)**: A single viewport container (`[data-ln-toast]`) listens for these window-level events, builds card elements dynamically from templates, coordinates automatic 6-second exit timers, pauses timers on mouse hover, and destroys elements after animations.
+3. **Decoupled Styling (CSS)**: Visual alert chrome, slide-in animations, and side-accent status colors are handled in Vanilla CSS. The library ships mixins like `@include toast-container` and `@include toast-card` for styling.
+
+---
+
+## 2. Minimal Blueprint
+
+To enable toasts, simply place a single container `<ul>` in your HTML layout (typically right before the closing `</body>` tag).
 
 ```html
+<!-- The Central Toast Container -->
 <ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
 ```
 
-### Server-rendered toasts (Laravel flash)
+### Key Anatomy Rules
+- **The Container (`data-ln-toast`)**: Creates the toast listener service.
+- **Auto-Dismiss Timeout (`data-ln-toast-timeout="6000"`)**: Default dismissal duration in milliseconds. Use `0` for persistent notifications.
+- **Max Stack size (`data-ln-toast-max="5"`)**: Evicts the oldest toast when the count exceeds the threshold.
 
+---
+
+## 3. The Window API Contract
+
+Toasts are triggered exclusively by dispatching CustomEvents on the global `window` object. **The window event is the sole contract.**
+
+```js
+// Dispatch a success notification
+window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+    detail: { 
+        type: 'success', 
+        title: 'Saved', 
+        message: 'Changes have been saved successfully.' 
+    }
+}));
+```
+
+### Enqueue Event Options (`ln-toast:enqueue`)
+Pass options inside the event's `detail` object:
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | `success\|error\|warn\|info` | Toast category. Drives accents, aria-live roles, and default titles. |
+| `title` | string | Optional card title. |
+| `message` | string \| string[] | Card body content. Pass an array of strings to render a bulleted validation error list. |
+| `timeout` | number | Dismissal timeout in ms. Use `0` to make it persistent. |
+
+### Clear Event (`ln-toast:clear`)
+Dismiss all active toasts in the viewport:
+```js
+window.dispatchEvent(new CustomEvent('ln-toast:clear'));
+```
+
+---
+
+## 4. Toast Types & Default Accessibility
+
+ARIA roles and accessibility live-regions are injected automatically by the component depending on the category:
+
+| Category | Default Title | `aria-live` | `role` |
+|---|---|---|---|
+| `success` | Success | `polite` | `status` |
+| `error` | Error | `assertive` | `alert` |
+| `warn` | Warning | `polite` | `status` |
+| `info` | Information | `polite` | `status` |
+
+---
+
+## 5. Integration Patterns
+
+### A. SSR-Rendered Flash Messages (Hydration)
+For server-side frameworks (like Laravel, Rails, or ASP.NET), you can place initial toast cards inside the container. The component will hydrate and auto-dismiss them on load:
 ```html
 <ul data-ln-toast>
     <li data-ln-toast-item data-type="success" data-title="Saved">
@@ -32,150 +88,35 @@ override the auto-injection path.
 </ul>
 ```
 
-### Override the item template (optional)
-
-To customize the toast layout, place a
-`<template data-ln-template="ln-toast-item">` anywhere in the page
-**before** the first toast fires. The library detects it on init and
-skips its built-in default. Lookup order matches the rest of the
-library's templating: per-container scoped first, then
-document-global.
-
-```html
-<!-- Document-global override — applies to every [data-ln-toast] -->
-<template data-ln-template="ln-toast-item">
-    <li class="ln-toast__item">
-        <!-- your custom layout here; required slots listed below -->
-    </li>
-</template>
-
-<ul data-ln-toast></ul>
-```
-
-#### Required slots
-
-Your override MUST keep these elements/attributes — the component
-reads them when filling the toast:
-
-| Element | Attribute | Purpose |
-|---------|-----------|---------|
-| `.ln-toast__card` root | `data-ln-attr="role:role, aria-live:ariaLive"` | a11y attrs filled per toast type |
-| Title element | `data-ln-field="title"` | toast title text |
-| Body element | `data-ln-show="hasBody"` | hidden when no message/errors |
-| `.ln-toast__side > svg > use` | (no attribute) | `href` is set per toast type to `#ln-{icon}` |
-| `.ln-toast__close` | (any element) | click handler is bound to dismiss |
-
-## Container attributes
-
-| Attribute | Description |
-|-----------|-------------|
-| `data-ln-toast` | Marks the container `<ul>` |
-| `data-ln-toast-timeout="6000"` | Default auto-dismiss in ms (0 = persistent) |
-| `data-ln-toast-max="5"` | Max simultaneous toasts (oldest evicted first) |
-
-## SSR-toast attributes (on `<li>` inside container)
-
-| Attribute | Description |
-|-----------|-------------|
-| `data-ln-toast-item` | Marks an SSR toast for hydration |
-| `data-type="success\|error\|warn\|info"` | Toast type |
-| `data-title="..."` | Optional title (default depends on type) |
-
-## Events
-
-| Event | Target | Direction | Description |
-|-------|--------|-----------|-------------|
-| `ln-toast:enqueue` | `window` | in | Show a toast. Detail = enqueue options |
-| `ln-toast:clear` | `window` | in | Dismiss all toasts (or a specific container) |
-
-### enqueue detail
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `type` | `success\|error\|warn\|info` | Toast type (defaults to `info`) |
-| `title` | string | Optional, defaults by type |
-| `message` | string \| string[] | Body content |
-| `data.errors` | `{ [field]: string[] }` | Laravel-style field errors |
-| `timeout` | number | ms; 0 = persistent; omitted = container default |
-| `container` | string \| Element | Optional target container; defaults to first `[data-ln-toast]` |
-
-### clear detail
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `container` | string \| Element | Optional; without it, all containers clear |
-
-## Examples
-
+### B. Bulleted Validation Error Maps
+To display a list of form validation errors inside a single toast, pass an array of strings to `message`:
 ```js
-// Basic toast
-window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-    detail: { type: 'success', title: 'Saved', message: 'Changes have been saved.' }
-}));
-
-// Validation errors (Laravel-style)
 window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
     detail: {
         type: 'error',
-        title: 'Validation failed',
-        data: { errors: { email: ['Email is required'], name: ['Name is too short'] } }
+        title: 'Validation Failed',
+        message: ['Email is required.', 'Password is too short.']
     }
 }));
-
-// Persistent toast (no auto-dismiss)
-window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-    detail: { type: 'warn', message: 'Your session is about to expire.', timeout: 0 }
-}));
-
-// Clear all toasts
-window.dispatchEvent(new CustomEvent('ln-toast:clear'));
-
-// Clear a specific container
-window.dispatchEvent(new CustomEvent('ln-toast:clear', {
-    detail: { container: '#my-toasts' }
-}));
 ```
 
-## Project helper (optional)
+---
 
-If you fire toasts often, wrap the dispatch:
+## 6. Integration & Source Files
 
-```js
-function toast(detail) {
-    window.dispatchEvent(new CustomEvent('ln-toast:enqueue', { detail }));
-}
-toast({ type: 'success', message: 'Saved' });
-```
+- **Unified Bundle**: Loaded automatically with the main bundle:
+  ```html
+  <script src="dist/ln-ashlar.iife.js" defer></script>
+  ```
+- **Standalone IIFE**: For lightweight pages, load the standalone, self-registering IIFE version:
+  ```html
+  <script src="js/ln-toast/ln-toast.js" defer></script>
+  ```
+- **Active Source (ESM)**: Development source is located at [js/ln-toast/src/ln-toast.js](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js).
 
-The wrapper lives in your project, not in the library.
+---
 
-## Types
-
-| Type | Default title | `aria-live` | `role` |
-|------|--------------|-------------|--------|
-| `success` | Success | `polite` | `status` |
-| `error` | Error | `assertive` | `alert` |
-| `warn` | Warning | `polite` | `status` |
-| `info` | Information | `polite` | `status` |
-
-## Integration & Development
-
-### Integration
-
-#### 1. In-Bundle (Standard Integration)
-To load `ln-toast` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-#### 2. Standalone (Zero-Dependency IIFE)
-If you wish to load the `ln-toast` component standalone, include its compiled zero-dependency IIFE script directly:
-```html
-<script src="js/ln-toast/ln-toast.js" defer></script>
-```
-
-### Source Files
-
-For development, testing, and debugging, refer to the following local file paths:
-- **Source of Truth (Active Development):** [ln-toast.js](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js)
-- **Compiled Standalone:** [ln-toast.js](file:///c:/laragon/www/ln-ashlar/js/ln-toast/ln-toast.js)
+## Related
+- **[`ln-modal`](../ln-modal/README.md)** — Viewport-blocking focus-gated dialogs.
+- **[`ln-confirm`](../ln-confirm/README.md)** — Lightweight inline action confirmations.
+- **Architecture deep-dive** — [`docs/js/toast.md`](../../docs/js/toast.md).

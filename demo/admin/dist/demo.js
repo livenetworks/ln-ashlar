@@ -99,13 +99,106 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 		return lines.join('\n');
 	}
 
+	function formatHTMLCode(node, depth = 0) {
+		const indent = '\t'.repeat(depth);
+		
+		if (node.nodeType === Node.TEXT_NODE) {
+			const text = node.textContent.trim();
+			if (!text) return '';
+			return text;
+		}
+		
+		if (node.nodeType !== Node.ELEMENT_NODE) {
+			return '';
+		}
+		
+		const tagName = node.tagName.toLowerCase();
+		
+		let attrStr = '';
+		for (let i = 0; i < node.attributes.length; i++) {
+			const attr = node.attributes[i];
+			attrStr += ` ${attr.name}="${attr.value}"`;
+		}
+		
+		const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+		if (voidElements.includes(tagName)) {
+			return `${indent}<${tagName}${attrStr}>`;
+		}
+		
+		let childHTML = '';
+		let hasBlockChildren = false;
+		
+		const blockTags = ['div', 'ul', 'ol', 'li', 'section', 'article', 'header', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tr', 'p', 'pre'];
+		
+		for (let i = 0; i < node.childNodes.length; i++) {
+			const child = node.childNodes[i];
+			if (child.nodeType === Node.ELEMENT_NODE && blockTags.includes(child.tagName.toLowerCase())) {
+				hasBlockChildren = true;
+				break;
+			}
+		}
+		
+		if (hasBlockChildren) {
+			const parts = [];
+			for (let i = 0; i < node.childNodes.length; i++) {
+				const child = node.childNodes[i];
+				const part = formatHTMLCode(child, depth + 1);
+				if (part) {
+					parts.push(part);
+				}
+			}
+			childHTML = '\n' + parts.join('\n') + '\n' + indent;
+			return `${indent}<${tagName}${attrStr}>${childHTML}</${tagName}>`;
+		} else {
+			let inlineText = '';
+			for (let i = 0; i < node.childNodes.length; i++) {
+				const child = node.childNodes[i];
+				if (child.nodeType === Node.TEXT_NODE) {
+					inlineText += child.textContent;
+				} else if (child.nodeType === Node.ELEMENT_NODE) {
+					const childTagName = child.tagName.toLowerCase();
+					let childAttrStr = '';
+					for (let j = 0; j < child.attributes.length; j++) {
+						const attr = child.attributes[j];
+						childAttrStr += ` ${attr.name}="${attr.value}"`;
+					}
+					const innerContent = Array.from(child.childNodes).map(c => c.textContent).join('');
+					if (voidElements.includes(childTagName)) {
+						inlineText += `<${childTagName}${childAttrStr}>`;
+					} else {
+						inlineText += `<${childTagName}${childAttrStr}>${innerContent}</${childTagName}>`;
+					}
+				}
+			}
+			
+			if (tagName === 'pre') {
+				return `${indent}<${tagName}${attrStr}>${inlineText}</${tagName}>`;
+			}
+			
+			const trimmedText = inlineText.trim();
+			return `${indent}<${tagName}${attrStr}>${trimmedText}</${tagName}>`;
+		}
+	}
+
+	function getCleanFormattedHTML(mainElement) {
+		const parts = [];
+		for (let i = 0; i < mainElement.childNodes.length; i++) {
+			const child = mainElement.childNodes[i];
+			const part = formatHTMLCode(child, 0);
+			if (part) {
+				parts.push(part);
+			}
+		}
+		return parts.join('\n');
+	}
+
 	document.querySelectorAll('.section-card[data-demo-html]').forEach(function (section, index) {
 		const header = section.querySelector('header');
 		const main = section.querySelector('main');
 		if (!main) return;
 
 		// 1. Extract HTML
-		const cleanHTML = cleanCodeIndentation(main.innerHTML);
+		const cleanHTML = getCleanFormattedHTML(main);
 
 		// 2. Extract SCSS if present
 		const scssScript = section.querySelector('script[data-demo-scss]');
@@ -162,8 +255,8 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 					</button>
 				</div>
 				<div class="demo-code-body">
-					<pre data-ln-panel="html"><code>${escapeHtml(cleanHTML)}</code></pre>
-					${cleanSCSS ? `<pre data-ln-panel="scss" class="hidden"><code>${escapeHtml(cleanSCSS)}</code></pre>` : ''}
+					<pre data-ln-panel="html" style="white-space: pre-wrap; word-break: break-word;"><code>${escapeHtml(cleanHTML)}</code></pre>
+					${cleanSCSS ? `<pre data-ln-panel="scss" class="hidden" style="white-space: pre-wrap; word-break: break-word;"><code>${escapeHtml(cleanSCSS)}</code></pre>` : ''}
 				</div>
 			`;
 

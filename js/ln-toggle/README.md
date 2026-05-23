@@ -1,186 +1,137 @@
 # ln-toggle
 
-Open/close state primitive. The panel's `data-ln-toggle` attribute is the source of truth: API methods, trigger clicks, sibling components, external scripts, and DevTools all funnel through `setAttribute`, and a `MutationObserver` runs the open/close pipeline.
+> The smallest reactive primitive in `ln-ashlar` — a highly-specialized binary state machine. 
 
-Used by `ln-accordion`, `ln-dropdown`, sidebar drawers, and dismissible alerts.
+---
 
-## Markup
+## 1. Philosophy & The Primitive Mindset
 
-Panel and trigger pair by ID; they can live anywhere in the DOM relative to each other.
+In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating heavy components that mix state, visual presentation, and layout, we separate them into isolated concerns:
+
+1. **The State Machine (JavaScript)**: The `ln-toggle` component (145 lines) only manages binary `open` / `close` state in the DOM and synchronizes ARIA accessibility. It does not own animations or visual geometries.
+2. **The Visual Presentation (CSS)**: Visual transitions are handled in Vanilla CSS. The component simply toggles the `.open` class on the panel. CSS reads this class and runs transitions (e.g. height collapse or sliding drawers).
+3. **Decoupled Binding (HTML)**: Triggers and panels are matched purely by ID. They can live anywhere in the DOM. Multiple triggers pointing to a single panel are supported natively, and all triggers stay perfectly synchronized.
+
+---
+
+## 2. Minimal Blueprint
+
+Triggers and panels are bound via ID. A panel must have a unique `id` and the `data-ln-toggle` attribute.
 
 ```html
-<button data-ln-toggle-for="my-panel">Toggle</button>
+<!-- Trigger anywhere -->
+<button data-ln-toggle-for="example-panel">Toggle Options</button>
 
-<section id="my-panel" data-ln-toggle class="collapsible">
+<!-- Panel anywhere -->
+<section id="example-panel" data-ln-toggle class="collapsible">
     <article class="collapsible-body">
-        <p>Hello.</p>
+        <p>This is smooth collapsible content.</p>
     </article>
 </section>
 ```
 
-- **Panel** — `[data-ln-toggle]`. Attribute presence creates the instance; value `"open"` means open, anything else means closed.
-- **Trigger** — `[data-ln-toggle-for="id"]`. Click toggles the matching panel. Any tag works; `<button>` is the right semantic, `<header>` is common in accordions.
-- **Multiple triggers per panel** are supported. All matching `[data-ln-toggle-for]` elements stay in sync — `aria-expanded` updates on every state change.
+### Key Anatomy Rules
+- **The Panel (`data-ln-toggle`)**: The value `open` represents open; anything else (empty or `close`) represents closed.
+- **The Trigger (`data-ln-toggle-for="id"`)**: Automatically intercepts clicks to toggle the panel. 
+- **The Close Trigger (`data-ln-toggle-action="close"`)**: Forces the trigger to only close the panel (e.g. an "X" button inside a sidebar drawer).
+- **The Body (`.collapsible-body`)**: Holds all padding and margins. The parent `.collapsible` container must have zero padding so it can transition to exactly `0px` height cleanly.
 
-## Attributes
+---
 
-| Attribute | On | Description |
-|---|---|---|
-| `data-ln-toggle` | panel | Creates the instance. `"open"` = open; anything else = closed. |
-| `data-ln-toggle-for="id"` | trigger | References the panel by ID. Click toggles it. |
-| `data-ln-toggle-action="open\|close"` | trigger | Forces one direction. Default: `toggle`. |
-| `data-ln-persist` | panel | Opts in to `localStorage` persistence. Boolean, or `data-ln-persist="custom-key"`. |
+## 3. The Declarative API & State Contract
 
-`aria-expanded` on the trigger is written by the component — not an input.
+There are no imperative JavaScript methods (like `open()` or `close()`) on the component instance. **The HTML attribute is the sole contract.** 
 
-### Trigger action
-
-`data-ln-toggle-action="close"` is the canonical pattern for an inline close button (the X inside a drawer or alert):
-
-```html
-<button aria-label="Close" data-ln-toggle-for="drawer" data-ln-toggle-action="close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-</button>
-```
-
-The button always closes — safe to leave in the DOM when the panel is closed (no-op on click).
-
-### Chevron rotation
-
-The library's `[data-ln-toggle-for][aria-expanded="true"] .ln-chevron { transform: rotate(180deg); }` rule (`scss/components/_toggle.scss`) rotates any chevron icon inside any matching trigger when its panel opens. Drop a `<svg class="ln-icon ln-chevron">` inside any trigger and it rotates automatically.
-
-## Persistence
-
-Add `data-ln-persist` to a panel to opt into `localStorage` persistence
-via the shared `ln-core` persist helper. State restores on init before
-any event fires; the persisted value wins over the markup default. See
-[`docs/js/core.md`](../../docs/js/core.md) for the storage-key format
-and lifecycle.
-
-## Events
-
-All events bubble. `detail.target` is always the panel element.
-
-| Event | Cancelable | Dispatched when |
-|---|---|---|
-| `ln-toggle:before-open` | **yes** | After attribute flips to `"open"`, before `.open` class added. `preventDefault()` reverts to `"close"`. |
-| `ln-toggle:open` | no | After `.open` class, `aria-expanded` sync, persist write. |
-| `ln-toggle:before-close` | **yes** | After attribute flips to `"close"`, before `.open` class removed. `preventDefault()` reverts to `"open"`. |
-| `ln-toggle:close` | no | After `.open` class removed, `aria-expanded` synced, persist written. |
-| `ln-toggle:destroyed` | no | First action inside `destroy()`. |
+Triggers, sibling components, external scripts, and manual DevTools edits all change state by writing the attribute:
 
 ```js
-document.addEventListener('ln-toggle:before-open', function (e) {
-    if (e.detail.target.id === 'admin-panel' && !userIsAdmin()) {
-        e.preventDefault();
+const panel = document.getElementById('example-panel');
+
+// Open the panel
+panel.setAttribute('data-ln-toggle', 'open');
+
+// Close the panel
+panel.setAttribute('data-ln-toggle', 'close');
+
+// Read-only state query
+panel.lnToggle.isOpen; // Returns true/false
+```
+
+### Attributes
+- `data-ln-toggle`: Placed on the panel to create the toggle instance.
+- `data-ln-toggle-for`: Placed on triggers referencing the panel ID.
+- `data-ln-toggle-action="open|close"`: Forces a trigger button to only open or only close the target.
+- `data-ln-persist`: Saves the panel state individually in `localStorage`. 
+  - storage key: `ln:toggle:{pagePath}:{id}`. Same IDs on different pages store separately.
+
+---
+
+## 4. Transition Events
+
+All events bubble. `event.detail.target` is always the panel element.
+
+| Event | Cancelable | Dispatched When |
+|---|---|---|
+| **`ln-toggle:before-open`** | **Yes** | After attribute flips to `"open"`, before transition starts. Calling `event.preventDefault()` cancels the transition and reverts the attribute. |
+| **`ln-toggle:open`** | No | After panel is fully open, classes added, and ARIA synced. |
+| **`ln-toggle:before-close`** | **Yes** | After attribute flips to `"close"`, before transition starts. Calling `event.preventDefault()` cancels the close and reverts the attribute. |
+| **`ln-toggle:close`** | No | After panel is fully closed, classes removed, and ARIA synced. |
+
+```js
+// Example: Cancel open transition for unauthorized users
+document.addEventListener('ln-toggle:before-open', (e) => {
+    if (e.detail.target.id === 'secure-panel' && !currentUser.isAdmin) {
+        e.preventDefault(); // Reverts attribute back to "close"
     }
 });
 ```
 
-## API
+---
 
-Each `[data-ln-toggle]` element carries an `lnToggle` property pointing to its instance.
+## 5. Integration Patterns
 
-```js
-const el = document.getElementById('my-panel');
-
-el.setAttribute('data-ln-toggle', 'open');   // open the panel
-el.setAttribute('data-ln-toggle', 'close');  // close the panel
-el.lnToggle.isOpen;                          // boolean — read-only
-el.lnToggle.destroy();                       // detach trigger listeners, dispatch :destroyed
-```
-
-The attribute is the only mutator. There is no `open()` / `close()` /
-`toggle()` method. `destroy()` is the only public method — it detaches
-trigger listeners and dispatches `:destroyed`, work the attribute alone
-cannot do.
-
-`window.lnToggle(root)` upgrades a custom root (Shadow DOM, iframe). Ordinary AJAX inserts and `setAttribute` on existing elements are handled automatically by the document-level observer.
-
-## Examples
-
-### Sidebar drawer
-
+### A. Sidebar Drawer
+Combine the panel with the library's `@mixin sidebar-drawer` and add a close button inside the sidebar:
 ```html
-<aside id="app-sidebar" class="app-sidebar" data-ln-toggle="open" data-ln-persist>
-    <header>
-        <h2>Menu</h2>
-        <button aria-label="Close sidebar"
-                data-ln-toggle-for="app-sidebar"
-                data-ln-toggle-action="close">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-        </button>
-    </header>
-    <nav>
-        <a href="/admin/users">Users</a>
-        <a href="/admin/clients">Clients</a>
-    </nav>
+<aside id="menu" data-ln-toggle data-ln-persist class="sidebar">
+    <button data-ln-toggle-for="menu" data-ln-toggle-action="close">×</button>
 </aside>
-
-<button class="menu-toggle" aria-label="Open menu" data-ln-toggle-for="app-sidebar">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
-</button>
 ```
 
-`@mixin sidebar-drawer` (`scss/config/mixins/_app-shell.scss`) reads `[data-ln-toggle="open"]` directly from CSS — no JS coordinator needed.
-
-### Collapsible section
-
+### B. Smooth Height Collapsible
+Combine the panel with the library's `@mixin collapsible` and `.collapsible-body` wrapper to animate height cleanly:
 ```html
-<header data-ln-toggle-for="advanced">
-    <strong>Advanced options</strong>
-    <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-</header>
-<section id="advanced" data-ln-toggle class="collapsible">
-    <article class="collapsible-body">
-        <p>Hidden by default.</p>
-    </article>
+<section id="panel" data-ln-toggle class="collapsible">
+    <div class="collapsible-body">Content goes here...</div>
 </section>
 ```
 
-`.collapsible` animates `grid-template-rows: 0fr ↔ 1fr`; `.collapsible-body` holds the padding. Padding goes on the body, never on `.collapsible` directly — the parent must collapse to zero height cleanly.
-
-### Dismissible alert
-
+### C. Dismissible Alert
+Combine the alert card with `data-ln-persist` so that once the user closes the alert, it stays closed across page reloads:
 ```html
-<div class="alert" id="trial-notice" data-ln-toggle="open" data-ln-persist role="status">
-    <p>Your trial expires in 5 days.</p>
-    <button aria-label="Dismiss"
-            data-ln-toggle-for="trial-notice"
-            data-ln-toggle-action="close">
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-    </button>
+<div class="alert" id="promo-banner" data-ln-toggle="open" data-ln-persist>
+    <p>Promo code active!</p>
+    <button data-ln-toggle-for="promo-banner" data-ln-toggle-action="close">×</button>
 </div>
 ```
 
-`.alert[data-ln-toggle="close"] { display: none; }` (`scss/components/_alert.scss`) hides the alert; `data-ln-persist` keeps it dismissed across reloads.
+---
 
-## Integration & Development
+## 6. Integration & Source Files
 
-### Integration
+- **Unified Bundle**: Loaded automatically with the main bundle:
+  ```html
+  <script src="dist/ln-ashlar.iife.js" defer></script>
+  ```
+- **Standalone IIFE**: For lightweight pages, load the standalone, self-registering IIFE version:
+  ```html
+  <script src="js/ln-toggle/ln-toggle.js" defer></script>
+  ```
+- **Active Source (ESM)**: Development source is located at [js/ln-toggle/src/ln-toggle.js](file:///c:/laragon/www/ln-ashlar/js/ln-toggle/src/ln-toggle.js).
 
-#### 1. In-Bundle (Standard Integration)
-To load `ln-toggle` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-#### 2. Standalone (Zero-Dependency IIFE)
-If you wish to load the `ln-toggle` component standalone, include its compiled zero-dependency IIFE script directly:
-```html
-<script src="js/ln-toggle/ln-toggle.js" defer></script>
-```
-
-### Source Files
-
-For development, testing, and debugging, refer to the following local file paths:
-- **Source of Truth (Active Development):** [js/ln-toggle/src/ln-toggle.js](file:///c:/laragon/www/ln-ashlar/js/ln-toggle/src/ln-toggle.js)
-- **Compiled Standalone:** [js/ln-toggle/ln-toggle.js](file:///c:/laragon/www/ln-ashlar/js/ln-toggle/ln-toggle.js)
+---
 
 ## Related
-
-- **[`ln-accordion`](../ln-accordion/README.md)** — single-open coordinator for a list of toggle panels.
-- **[`ln-dropdown`](../ln-dropdown/README.md)** — menu wrapper that adds outside-click, resize-close, scroll-reposition, and body teleport.
-- **`@mixin collapsible`** (`scss/config/mixins/_collapsible.scss`) — `grid-template-rows: 0fr → 1fr` height animation. `.collapsible` is the parent (zero padding); `.collapsible-body` is the padded child.
-- **`@mixin sidebar-drawer`** (`scss/config/mixins/_app-shell.scss`) — translate-x animation. Reads `[data-ln-toggle="open"]` directly from CSS.
-- **Architecture deep-dive:** [`docs/js/toggle.md`](../../docs/js/toggle.md) — internals, observer wiring, persistence semantics, design rationale.
+- **[`ln-accordion`](../ln-accordion/README.md)** — Single-open coordinator for toggle panels.
+- **[`ln-dropdown`](../ln-dropdown/README.md)** — Menu wrapper adding click-outside/teleportation.
+- **Architecture deep-dive** — [`docs/js/toggle.md`](../../docs/js/toggle.md).

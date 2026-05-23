@@ -1,11 +1,45 @@
 <!-- ln-page: title="Data Table — ln-ashlar" h1="Data Table" -->
 
+					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Event-driven data table. Receives data via <code>ln-data-table:set-data</code>, renders rows from <code>&lt;template&gt;</code>. Sort, filter, search, selection, virtual scroll, keyboard navigation.</p>
-							<p>The table is a render engine, not a data source. It announces what it needs through <code>ln-data-table:request-data</code> and waits for a coordinator to feed records back via <code>ln-data-table:set-data</code>. Server-driven, client-cached or static — the table doesn't care; it only knows about markup, events and rendering.</p>
-							<p>This page documents the markup anatomy, then exercises every feature on a 10,000-row demo. For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-data-table/README.md"><code>ln-data-table</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/data-table.md">architecture reference</a>.</p>
+							<p>Rendering heavy grids and lists in dynamic web applications is a common source of performance bottlenecks. Traditional approaches load all rows into the DOM instantly (causing paint lags on huge sets), or couple data-fetching logic directly to the table markup itself, which prevents testing and reuse.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-data-table</code>, a highly-performant, event-driven **Presenter Component**. Instead of managing database calls or maintaining visual coupling, the table functions as a pure presentation and query shell. It outputs user sorting, searching, and filtering intents, and awaits datasets to render. It features built-in virtual scrolling (rendering only visible and buffer rows to support 10,000+ items seamlessly) and premium keyboard navigation.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Presenter Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									A presenter component never holds direct references to network services or database cached caches (like <code>ln-store</code>). It states what filter/sort actions occurred through bubbled request events, and receives rendered datasets asynchronously. <strong>The table is completely decoupled from the data layer.</strong>
+								</p>
+							</div>
+
+							<h4>Three Orthogonal Layers of Grid Performance</h4>
+							<p>Slick grid presentation is achieved by strictly dividing structural markup, lifecycle queries, and visual updates:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Render Template (HTML <code>&lt;template&gt;</code>):</strong> Individual row layouts are written in standard HTML template tags, fully isolated from Javascript. Cells support safe <code>{{ field }}</code> text interpolation (XSS-safe by using native <code>textContent</code>) and dynamic attribute mapping.
+								</li>
+								<li>
+									<strong>The Visual Class Hooks (CSS State):</strong> Visual indicators (such as sort states or filter overlays) are managed purely by toggling standard classes on header cells (e.g. <code>.ln-sort-asc</code>). The button markup contains three static icons; CSS determines which one to display.
+								</li>
+								<li>
+									<strong>The Presentation Shell (<code>ln-data-table</code>):</strong> The script manages user interactions. It tracks scroll positions for virtual rendering, coordinates row selections, captures search bar input delays, and dispatches data intents.
+								</li>
+							</ol>
+
+							<h4>How the Presentation Flow Coherence Works</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>On load or user change, the table dispatches <code>ln-data-table:request-data</code>, carrying the current query parameters (sort field, filters, search string).</li>
+								<li>An external coordinator (or local sync store) captures the intent, queries the cache (or backend API), and dispatches <code>ln-data-table:set-data</code> back.</li>
+								<li>The component receives the payload, flushes old nodes, clones template elements, populates cells, and sets scroll bounds. Sighted tables load immediately.</li>
+							</ol>
+
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-data-table/README.md"><code>ln-data-table</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/data-table.md">architecture reference</a>.</p>
 						</main>
 					</section>
 

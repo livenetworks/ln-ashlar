@@ -1,50 +1,60 @@
 <!-- ln-page: title="Forms &amp; Buttons — ln-ashlar" h1="Forms &amp; Buttons" -->
 
 <h1>Forms &amp; Buttons</h1>
-				<p>CSS Grid + <code>&lt;div class="form-element"&gt;</code> pattern. No <code>&lt;div class="form-group"&gt;</code> or <code>&lt;div class="form-row"&gt;</code>. The grid controls the layout via SCSS — not via HTML.</p>
 
-				<!-- ==========================================
-				     PRINCIPLE
-				     ========================================== -->
+				<!-- Overview / philosophy -->
 				<section class="section-card">
-					<header><h3>Principle</h3></header>
+					<header><h3>Overview &amp; Philosophy</h3></header>
+					<main>
+						<p>In traditional frontend development, forms are notoriously complex. Libraries either force you into a heavy, reactive JavaScript state container (which controls every keystroke and delays rendering), or they leave you to write brittle, manual validation loops that bypass native browser capabilities.</p>
+
+						<p>In <code>ln-ashlar</code>, forms are built on a strict, platform-first **Coordinator &amp; Primitive** doctrine. Instead of inventing a custom JS state engine, we upgrade native HTML forms. Under this architecture, a form is split into three decoupled layers that communicate seamlessly using standard DOM events and attributes:</p>
+
+						<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+							<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+								<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+								The Decoupled Form Doctrine
+							</h4>
+							<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+								The form layer has zero direct references to layout widths or validation logic. JavaScript only manages the high-level gate (submit, fill, reset), while individual fields own their state via the platform's <code>ValidityState</code> API. <strong>The DOM is the single source of truth.</strong>
+							</p>
+						</div>
+
+						<h4>Three Orthogonal Layers of Form UX</h4>
+						<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<li>
+								<strong>The Layout Engine (CSS Grid Mixins):</strong> Responsive multi-column layouts are handled purely in SCSS using the <code>@include form-grid</code> mixin. Column spans are defined inside form-specific stylesheets via semantic <code>nth-child</code> selectors. The HTML contains no layout classes (like <code>.col-md-6</code> or <code>.form-row</code>), keeping markup clean and flexible.
+							</li>
+							<li>
+								<strong>The Validity Primitive (<code>ln-validate</code>):</strong> Each input, select, or textarea is a standalone validation primitive. It wraps the browser's native <code>ValidityState</code>, controls when to surface errors visually (only after the field is touched), and manages custom/server-side errors via the <code>ln-validate:set-custom</code> event channel.
+							</li>
+							<li>
+								<strong>The Form Coordinator (<code>ln-form</code>):</strong> This is the coordinator. It sits on the root <code>&lt;form&gt;</code> element and intercepts interactions. It automatically disables the submit button if any field is invalid, blocks invalid submissions, serializes form data into clean JSON objects on <code>ln-form:submit</code>, and handles bulk fills or resets.
+							</li>
+						</ol>
+
+						<h4>Data and Validation Flow</h4>
+						<p>When a user interacts with a form:</p>
+						<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<li>The user types in a field. The field's <code>ln-validate</code> primitive catches the <code>input</code> or <code>change</code> event, marks the field as touched, evaluates validity using <code>dom.checkValidity()</code>, updates the input's visual classes (<code>.ln-validate-valid</code> / <code>.ln-validate-invalid</code>), toggles the matching error in the error list, and dispatches a bubbled <code>ln-validate:valid</code> or <code>ln-validate:invalid</code> CustomEvent.</li>
+							<li>The event bubbles up to the root <code>[data-ln-form]</code>. The coordinator intercepts it, scans the active fields, and re-calculates the submit button's <code>disabled</code> state.</li>
+							<li>When the user submits the form, the coordinator intercepts the submit event, force-validates all fields to ensure no untouched invalid inputs are missed, serializes all values into a key-value object, and dispatches an <code>ln-form:submit</code> event.</li>
+						</ol>
+
+						<h4>Why This Decoupled Approach is Superior</h4>
+						<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<li><strong>Ultra-Lightweight &amp; Responsive:</strong> Because validation is delegated to the browser's native engine, there is no sluggish JS-based validation loop running on every keystroke. Typing remains instantaneous.</li>
+							<li><strong>Seamless Server Integration:</strong> Server-side validation errors are easily mapped back to fields using standard <code>ln-validate:set-custom</code> events. The coordinator and form are agnostic to where errors originate.</li>
+							<li><strong>Unified Execution on Fill/Reset:</strong> Programmatic bulk population (via <code>lnForm.fill()</code>) fires synthetic events, ensuring textareas resize instantly, fields re-validate, and the submit button enables itself.</li>
+						</ul>
+					</main>
+				</section>
+
+				<!-- Principle Table -->
+				<section class="section-card">
+					<header><h3>Anatomy &amp; Rules</h3></header>
 					<main>
 						<p>Each field is a <code>&lt;div class="form-element"&gt;</code> containing a <code>&lt;label for="..."&gt;</code> and <code>&lt;input id="..."&gt;</code> (explicit association). The root <code>&lt;form&gt;</code> gets <code>@include form-grid</code> in SCSS — a 6-column grid, collapsing to 1 column on mobile. Column widths are set via <code>nth-child</code> in form-specific SCSS.</p>
-
-						<!-- Wrong vs Right -->
-						<div class="demo-split">
-							<article>
-								<h4>Wrong — wrapping label</h4>
-								<pre><code>&lt;!-- implicit label, no for/id --&gt;
-&lt;label&gt;
-  Name
-  &lt;input type="text" name="name"&gt;
-&lt;/label&gt;
-
-&lt;label&gt;
-  City
-  &lt;input type="text" name="city"&gt;
-&lt;/label&gt;</code></pre>
-							</article>
-							<article>
-								<h4>Correct — form-element</h4>
-								<pre><code>&lt;!-- explicit for/id, div wrapper --&gt;
-&lt;form id="my-form" data-ln-form&gt;
-
-  &lt;div class="form-element"&gt;
-    &lt;label for="name"&gt;Name&lt;/label&gt;
-    &lt;input type="text" id="name" name="name"
-           required data-ln-validate&gt;
-    &lt;ul data-ln-validate-errors&gt;
-      &lt;li class="hidden" data-ln-validate-error="required"&gt;
-        Required field
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/div&gt;
-
-&lt;/form&gt;</code></pre>
-							</article>
-						</div>
 
 						<!-- Rules table -->
 						<div class="table-container">
@@ -52,37 +62,40 @@
 							<thead>
 								<tr>
 									<th>Element</th>
-									<th>Rule</th>
+									<th>Rule / Attribute</th>
+									<th>Description</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr>
-									<td data-label="Element">Root</td>
-									<td data-label="Rule"><code>&lt;form id="..." data-ln-form&gt;</code> — styled with <code>@include form-grid</code> in SCSS (6 cols → 1 col on mobile)</td>
+									<td data-label="Element">Root Form</td>
+									<td data-label="Rule"><code>&lt;form data-ln-form&gt;</code></td>
+									<td>Creates the form coordinator instance. Styled with <code>@include form-grid</code>.</td>
 								</tr>
 								<tr>
-									<td data-label="Element">Children</td>
-									<td data-label="Rule"><code>&lt;div class="form-element"&gt;</code> — wraps <code>&lt;label&gt;</code> + <code>&lt;input&gt;</code> + error list</td>
+									<td data-label="Element">Field Wrapper</td>
+									<td data-label="Rule"><code>&lt;div class="form-element"&gt;</code></td>
+									<td>Wraps the label, input control, and error list. Controls alignment and column spans.</td>
 								</tr>
 								<tr>
 									<td data-label="Element">Label</td>
-									<td data-label="Rule">Explicit <code>for</code>/<code>id</code> association: <code>&lt;label for="name"&gt;</code> + <code>&lt;input id="name"&gt;</code></td>
+									<td data-label="Rule"><code>&lt;label for="my-id"&gt;</code></td>
+									<td>Explicit association with input's ID for premium accessibility (clicks focus input).</td>
 								</tr>
 								<tr>
-									<td>Validation</td>
-									<td><code>data-ln-validate</code> on input + <code>&lt;ul data-ln-validate-errors&gt;</code> with <code>&lt;li data-ln-validate-error="..."&gt;</code></td>
+									<td>Input / Control</td>
+									<td><code>&lt;input id="my-id" data-ln-validate&gt;</code></td>
+									<td>The native control. Rules like <code>required</code> or <code>type="email"</code> reside natively here.</td>
 								</tr>
 								<tr>
-									<td>Column spans</td>
-									<td>In form-specific SCSS via <code>.form-element:nth-child(N)</code> — NEVER width classes on the element</td>
+									<td>Error List</td>
+									<td><code>&lt;ul data-ln-validate-errors&gt;</code></td>
+									<td>Container for <code>&lt;li class="hidden" data-ln-validate-error="rule"&gt;</code> error messages.</td>
 								</tr>
 								<tr>
-									<td>Pill radio/checkbox</td>
-									<td><code>&lt;ul&gt; &gt; &lt;li&gt; &gt; &lt;label&gt; &gt; &lt;input&gt;</code> — grouped pills (see Pill Labels section)</td>
-								</tr>
-								<tr>
-									<td><code>.form-actions</code></td>
-									<td><code>&lt;ul class="form-actions"&gt;</code> with <code>&lt;li&gt;</code> per button — spans full-width in SCSS</td>
+									<td>Button Group</td>
+									<td><code>&lt;ul class="form-actions"&gt;</code></td>
+									<td>Handles form action button wrapping. Cancel is <code>type="button"</code>; Save is <code>type="submit"</code>.</td>
 								</tr>
 							</tbody>
 						</table>

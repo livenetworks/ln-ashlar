@@ -152,8 +152,34 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Toast</h1>
-					<p>Notifications with a side accent and icon. They automatically disappear after 6 seconds.</p>
+<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>When an asynchronous event completes, or a background system action finishes—such as saving a record, encountering a network error, or warning the user about a quota threshold—we need to notify the user. However, a modal dialog is too disruptive. We need a non-blocking, temporary notification card that slides into view at the corner of the screen.</p>
+
+							<p>In <code>ln-ashlar</code>, this is managed by <strong><code>ln-toast</code></strong>. It is a service-style, zero-markup component that handles a dynamic queue of alert cards. It exposes a single, global event listener, builds notification cards from templates dynamically, manages auto-dismiss timers, supports rich layouts (including bulleted validation error maps), and cleans up DOM elements after exit transitions.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Toast Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									Toasts are completely decoupled from UI producers. <strong>Components never import or call toast APIs directly.</strong> To trigger a notification, any script or component anywhere in the page simply dispatches an <code>ln-toast:enqueue</code> event on the <code>window</code> object. The central toast coordinator catches the event, adds it to the rendering queue, and handles the DOM. <strong>The window event is the sole contract.</strong>
+								</p>
+							</div>
+
+							<h4>Dynamic Features &amp; Sizing</h4>
+							<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li><strong>Automatic Dismissal:</strong> Every toast card automatically triggers its close animation after 6 seconds. If a user hovers over a toast, the timer is paused, resuming once the mouse leaves.</li>
+								<li><strong>Validation Lists:</strong> If the <code>message</code> detail is an array of strings, the toast automatically renders it as an unordered list, perfect for displaying multiple form validation errors in a single compact card.</li>
+								<li><strong>Categorized Types:</strong> Supports <code>success</code> (green accent), <code>error</code> (red accent), <code>warn</code> (yellow accent), and <code>info</code> (blue accent) with matching icon sprites dynamically loaded.</li>
+							</ul>
+
+							<p>For the complete developer reference, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-toast/README.md"><code>ln-toast</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/toast.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
 					<!-- Triggers -->
 					<section class="section-card" data-demo-html>
