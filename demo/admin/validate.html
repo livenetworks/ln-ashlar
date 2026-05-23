@@ -154,11 +154,45 @@
 			<div class="app-content-wrapper">
 <!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>Per-field validation primitive for the form layer. 160 lines of JS that wrap the native <code>ValidityState</code> API, expose its state through two CSS classes and a pair of events, and add one strictly-typed escape hatch (<code>set-custom</code> / <code>clear-custom</code>) for errors the browser cannot express.</p>
-							<p>The component does not run validation rules — the browser already does that. <code>required</code>, <code>type="email"</code>, <code>minlength</code>, <code>pattern</code>, <code>min</code>, <code>max</code> are all native HTML attributes; <code>dom.checkValidity()</code> returns the boolean. <code>ln-validate</code> decides <strong>when to listen</strong> (input vs change, depending on field type), <strong>when to render</strong> (silent until the field has been touched at least once), and <strong>how to surface the result</strong> (CSS classes, <code>.hidden</code> toggles on error <code>&lt;li&gt;</code> elements, bubbling <code>:valid</code> / <code>:invalid</code> events).</p>
-							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-validate/README.md"><code>ln-validate</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/validate.md">architecture reference</a>. The <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-form/README.md"><code>ln-form</code> README</a> is the companion read — the two components together are the form layer's contract.</p>
+							<p>Validation in modern web projects is often over-engineered, relying on heavy client-side JavaScript schema engines. This introduces significant lag, delays keystroke rendering, and completely ignores the high-performance validation engine already built into every modern web browser.</p>
+
+							<p>In <code>ln-ashlar</code>, validation is handled by <code>ln-validate</code>, which functions as a pure **Validity Primitive**. It is a lightweight, high-performance module (~160 lines of JavaScript) that does not define or execute validation rules itself. Instead, it wraps the browser's native, highly-optimized <code>ValidityState</code> API and acts as a bridge: managing exactly <em>when</em> to show errors, <em>how</em> to surface them visually, and <em>what</em> events to dispatch so external form coordinators can react.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Primitive Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									A validity primitive has no awareness of form-level submissions or target button states. It focuses on a single field, managing its binary touched/untouched state, native constraints, and custom server-side errors. It publishes its status by toggling classes and dispatching bubbled events. <strong>The DOM attributes are the single source of truth.</strong>
+								</p>
+							</div>
+
+							<h4>The Mindset: Three Isolated Concerns</h4>
+							<p>Each validated field on this page is a perfect synchronization of three isolated concerns, layered gracefully on top of each other:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Browser Engine (Native Constraints):</strong> Constraints are declared directly in native HTML attributes (like <code>required</code>, <code>type="email"</code>, <code>minlength="5"</code>, or <code>pattern="..."</code>). The browser's native C++ engine handles the complex parsing and validation matching instantly.
+								</li>
+								<li>
+									<strong>The Visual Interface (CSS Classes &amp; Errors):</strong> Visual state is bound to standard CSS classes: <code>.ln-validate-valid</code> for success and <code>.ln-validate-invalid</code> for failures, while error messages start hidden (<code>.hidden</code>) in a sibling <code>&lt;ul data-ln-validate-errors&gt;</code>.
+								</li>
+								<li>
+									<strong>The Lifecycle Manager (<code>ln-validate</code>):</strong> The JavaScript component acts purely as the lifecycle coordinator. It gates visual feedback so fields remain silent until they are touched, maps active <code>ValidityState</code> failures to their corresponding HTML error items, and exposes programmatic methods (like <code>validate()</code> and <code>reset()</code>).
+								</li>
+							</ol>
+
+							<h4>How the Interaction Flows</h4>
+							<p>When a user starts typing in a validated input:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>The component intercepts the <code>input</code> or <code>change</code> event and instantly flips the field's internal state to <code>_touched = true</code>.</li>
+								<li>The component queries <code>dom.checkValidity()</code>. If it fails, it adds <code>.ln-validate-invalid</code> to the input, matches the browser's active <code>ValidityState</code> key (e.g. <code>valueMissing</code>) to the target HTML element (<code>data-ln-validate-error="required"</code>), removes its <code>.hidden</code> class, and dispatches a bubbled <code>ln-validate:invalid</code> CustomEvent.</li>
+								<li>If validation passes, it cleans up all visual error classes, restores the <code>.hidden</code> state on all message elements, and dispatches a bubbled <code>ln-validate:valid</code> CustomEvent.</li>
+							</ol>
+
+							<p>For a deeper dive into the architectural rationale, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-validate/README.md"><code>ln-validate</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/validate.md">architecture deep-dive</a>.</p>
 						</main>
 					</section>
 

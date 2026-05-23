@@ -1,180 +1,96 @@
 # ln-translations
 
-Inline translation system for forms. Adds translation inputs below translatable fields — one clone per language, per field.
+A zero-dependency, event-driven **Form Translation Coordinator** that manages inline multi-lingual inputs by dynamically cloning translatable fields on-demand.
 
-## Attributes
+Instead of writing custom layout handlers to manage multi-language fields, this component intercepts locale additions and removals, duplicates translatable fields with appropriate naming conventions, and handles pre-rendered server payloads automatically.
 
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-translations` | `<form>` | Initializes instance |
-| `data-ln-translations-default` | `<form>` | Default language code — sets flag on original inputs |
-| `data-ln-translations-locales='{"en":"English",...}'` | `<form>` | Available locales as JSON (default: en, sq, sr) |
-| `data-ln-translations-add` | `<button>` | Trigger button (inside `data-ln-dropdown` wrapper) |
-| `data-ln-translations-active` | `<ul>` | Container for active language badges |
-| `data-ln-translatable="field"` | form element wrapper (`<p>`, `<label>`, `<div>`, `<article>`) | Marks a translatable field + field name |
-| `data-ln-translations-prefix` | `[data-ln-translatable]` | Nested prefix for name attr: `"items[5]"` |
-| `data-ln-translatable-lang` | input/textarea | Language code (set by JS or pre-rendered by server) |
+---
 
-## Templates
+## 🧭 Philosophy & Architecture
 
-Required `<template>` elements (before `</body>`):
+1. **Inline Field Cloning:** Translatable containers carrying `data-ln-translatable="field"` are treated as templates. When a language is activated, the coordinator clones the inner input/textarea, binds the target language value, and appends it beneath the original.
+2. **Deterministic Name Generation:** To support clean form submission, cloned inputs automatically update their name attribute following standard nested arrays:
+   - **Default Name**: `scope` becomes `trans[en][scope]` for English.
+   - **Nested Name**: `items[5][title]` with prefix `items[5]` becomes `items[5][trans][en][title]`.
+3. **Menu & Badge Coordination:** It coordinates locale-selector dropdowns and active language indicator badges using native HTML `<template>` nodes, keeping visual UI elements synchronized in real-time.
+4. **Server-Rendered Auto-Detection:** If the server pre-renders localized fields with `data-ln-translatable-lang="{lang}"` on page load, the coordinator auto-detects and integrates them instantly.
 
+---
+
+## 📦 Minimal Blueprint
+
+### Translatable Form Structure
 ```html
+<form data-ln-translations data-ln-translations-default="en">
+  <header class="ln-translations__header">
+    <h3>Form Content</h3>
+    <!-- Active Language Badges -->
+    <ul data-ln-translations-active></ul>
+    <!-- Locale Add Menu (Dropdown coordinated) -->
+    <div data-ln-dropdown>
+      <button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu">
+        <svg class="ln-icon"><use href="#ln-world"></use></svg>
+      </button>
+      <ul id="trans-menu" data-ln-toggle data-ln-dropdown-menu></ul>
+    </div>
+  </header>
+
+  <main>
+    <div data-ln-translatable="description">
+      <label>Description <textarea name="description">Acme scope...</textarea></label>
+    </div>
+  </main>
+</form>
+
+<!-- REQUIRED GLOBAL TEMPLATES (Declared once before body closing) -->
 <template data-ln-template="ln-translations-badge">
-    <li>
-        <p data-ln-translations-lang>
-            <span></span>
-            <button type="button" aria-label="Remove"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-        </p>
-    </li>
+  <li>
+    <p data-ln-translations-lang>
+      <span></span>
+      <button type="button" aria-label="Remove"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+    </p>
+  </li>
 </template>
-
 <template data-ln-template="ln-translations-menu-item">
-    <li><button type="button" data-ln-translations-lang></button></li>
+  <li><button type="button" data-ln-translations-lang></button></li>
 </template>
 ```
 
-## API
+---
 
-```javascript
-// Instance API (on DOM element)
-const el = document.querySelector('[data-ln-translations]');
-el.lnTranslations.addLanguage('en');                               // add language
-el.lnTranslations.addLanguage('en', values);                       // add with existing values
-el.lnTranslations.addLanguage('sq', { scope: 'Prodhimi i ushqimit' }); // add with values
-el.lnTranslations.removeLanguage('en');                            // remove language
-el.lnTranslations.getActiveLanguages();                            // Set of active language codes
-el.lnTranslations.hasLanguage('en');                               // boolean
+## 🛠️ Declarative API Contract
 
-// Manual init — non-standard cases only (Shadow DOM, iframe). Normal DOM is auto-initialized.
-window.lnTranslations(container);
-```
+### HTML Attributes
 
-## Events
+| Attribute | Elements | Description |
+| :--- | :--- | :--- |
+| `data-ln-translations` | `<form>` | Component root. Initializes the translations coordinator. |
+| `data-ln-translations-default` | `<form>` | Default language code (e.g. `"en"`). Sets a flag on the original inputs. |
+| `data-ln-translations-locales` | `<form>` | Opt-in. Custom locales JSON list (e.g. `'{"en":"English", "de":"German"}'`). |
+| `data-ln-translations-add` | `<button>` | Trigger button inside `data-ln-dropdown` to open language menu. |
+| `data-ln-translations-active` | `<ul>` | Mount container where active language badges will be rendered. |
+| `data-ln-translatable="field"` | Form field wrapper | Marks a translatable group. Value is the entity's field name. |
+| `data-ln-translations-prefix` | Form field wrapper | Opt-in. Naming prefix (e.g. `"items[1]"`) for nested form layouts. |
+| `data-ln-translatable-lang` | `<input>`, `<textarea>` | Language code identifying a cloned or pre-rendered translation input. |
 
-| Event | Bubbles | Cancelable | Detail |
-|-------|---------|------------|--------|
-| `ln-translations:before-add` | yes | **yes** | `{ target, lang, langName }` |
-| `ln-translations:added` | yes | no | `{ target, lang, langName }` |
-| `ln-translations:before-remove` | yes | **yes** | `{ target, lang }` |
-| `ln-translations:removed` | yes | no | `{ target, lang }` |
+---
 
-**Request events (incoming):**
+## ⚡ DOM Events
 
-| Event | Bubbles | Detail | Description |
-|-------|---------|--------|-------------|
-| `ln-translations:request-add` | no | `{ lang }` | Dispatch on the form to add a language |
-| `ln-translations:request-remove` | no | `{ lang }` | Dispatch on the form to remove a language |
+### Telemetry (Dispatched by component)
+- **`ln-translations:before-add`** / **`ln-translations:before-remove`** (Cancelable)
+  - Detail: `{ target, lang, langName }`
+- **`ln-translations:added`** / **`ln-translations:removed`**
+  - Detail: `{ target, lang }`
 
-```javascript
-// Dispatch a request event on the component element
-element.dispatchEvent(new CustomEvent('ln-translations:request-add', {
-    detail: { lang: 'en' }
-}));
-```
+### Commands (Dispatched to component)
+- **`ln-translations:request-add`** / **`ln-translations:request-remove`**
+  - Detail: `{ lang: string }` (dispatched on the `<form>` to programmatically toggle languages).
 
-## Flags
+---
 
-Flag icons render via CSS background-image keyed off
-`data-ln-translatable-lang`. Lang-code → country-code mapping
-lives in `scss/components/_translations.scss`. Adding a new
-language is a SCSS edit, not a JS one.
+## ⚠️ Common Pitfalls
 
-## Name Generation
-
-```
-// Without prefix:
-name="trans[en][scope]"
-
-// With prefix (nested entities):
-// data-ln-translations-prefix="items[5]"
-name="items[5][trans][en][title]"
-```
-
-## Examples
-
-### Basic
-
-```html
-<form data-ln-translations
-      data-ln-translations-default="en">
-    <header>
-        <h3>Company Info</h3>
-        <div class="ln-translations__actions">
-            <ul data-ln-translations-active></ul>
-            <div data-ln-dropdown>
-                <button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu">
-                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
-                </button>
-                <ul id="trans-menu" data-ln-toggle></ul>
-            </div>
-        </div>
-    </header>
-    <main>
-        <p data-ln-translatable="scope">
-            <label>Scope <textarea name="scope">Food and beverage production</textarea></label>
-        </p>
-        <p>
-            <label>Code <input type="text" name="code" value="28"></label>
-        </p>
-    </main>
-</form>
-```
-
-Server-rendered translations are auto-detected — add `data-ln-translatable-lang="{lang}"` to pre-rendered translation inputs and the component picks them up on init.
-
-### Nested (Prefix)
-
-```html
-<form data-ln-translations
-      data-ln-translations-default="en">
-    <header>
-        <h3>Nested Items</h3>
-        <div class="ln-translations__actions">
-            <ul data-ln-translations-active></ul>
-            <div data-ln-dropdown>
-                <button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu">
-                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
-                </button>
-                <ul id="trans-menu" data-ln-toggle></ul>
-            </div>
-        </div>
-    </header>
-    <main>
-        <article data-ln-translatable="title" data-ln-translations-prefix="items[1]">
-            <label>Item 1 <input type="text" name="items[1][title]" value="Leadership"></label>
-        </article>
-        <article data-ln-translatable="title" data-ln-translations-prefix="items[2]">
-            <label>Item 2 <input type="text" name="items[2][title]" value="Planning"></label>
-        </article>
-    </main>
-</form>
-```
-
-## Behavior
-
-- Server-rendered translations are auto-detected on init via `[data-ln-translatable-lang]` elements already in the DOM.
-- The "Add Language" trigger is hidden when all locales are active.
-
-## Integration & Development
-
-### Integration
-
-#### 1. In-Bundle (Standard Integration)
-To load `ln-translations` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-#### 2. Standalone (Zero-Dependency IIFE)
-If you wish to load the `ln-translations` component standalone, include its compiled zero-dependency IIFE script directly:
-```html
-<script src="js/ln-translations/ln-translations.js" defer></script>
-```
-
-### Source Files
-
-For development, testing, and debugging, refer to the following local file paths:
-- **Source of Truth (Active Development):** [js/ln-translations/src/ln-translations.js](file:///c:/laragon/www/ln-ashlar/js/ln-translations/src/ln-translations.js)
-- **Compiled Standalone:** [js/ln-translations/ln-translations.js](file:///c:/laragon/www/ln-ashlar/js/ln-translations/ln-translations.js)
-
+- **Forgetting Global Templates:** The coordinator will fail to render badges or locale dropdowns if `ln-translations-badge` and `ln-translations-menu-item` templates are missing from the page.
+- **Incorrect Translatable Wrappers:** `data-ln-translatable` must sit on the parent container (e.g. `<div data-ln-translatable="title">`) wrapping the default `<input>`/`<label>`, not on the input itself.
+- **Mismatched Prefixes:** When nesting entities (e.g., repeating list items), ensure the translatable wrapper declares the correct scope prefix: `data-ln-translations-prefix="items[index]"` to generate valid submission structures.

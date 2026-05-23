@@ -1,232 +1,154 @@
 # ln-modal
 
-> Modal dialog with `<form>` as the content root. `data-ln-modal` on the
-> overlay is the single source of truth for open/closed; the JS API is a
-> thin convenience layer over `setAttribute`.
+> Focus-gated viewport-blocking dialog overlays, managed reactively via the DOM.
 
-## Philosophy
+---
 
-The DOM contract is small and fixed: the modal is the overlay
-(`<div class="ln-modal" data-ln-modal>`), and its only direct child is
-a `<form>`. The form IS the panel — there is no `.ln-modal__content`
-wrapper, no inner BEM, no separate "modal action area". Footer buttons
-live inside the form: `<button type="submit">` triggers submission and
-gets primary fill from globals; `<button type="button"
-data-ln-modal-close>` dismisses. Sizing is per-modal via mixins on
-`> form`, not classes (see §Sizing variants).
+## 1. Philosophy & The Modal Mindset
 
-`data-ln-modal="open"` means open. `data-ln-modal="close"` (or any
-other value, or no value) means closed. The attribute is the only
-mutator — trigger clicks, ESC, close buttons, sibling components,
-external scripts, and DevTools all write `data-ln-modal`, and a
-MutationObserver applies the actual side effects — aria, body scroll
-lock, ESC and focus-trap listeners, focus movement, before/after
-events. A listener that calls `preventDefault()` on
-`ln-modal:before-open` causes the observer to revert the attribute
-back to `"close"`. Focus is captured before auto-focus runs and
-restored on close. ESC and focus-trap listeners are attached on open
-and detached on close — when no modals are open, no listeners exist.
-Slide-in animation is gated through `motion-safe` (CSS-only;
-reduced-motion users see an instant state change).
+In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating a heavy component that bundles form handlers, visual layouts, focus traps, backdrop styling, and dimensions, `ln-modal` splits them cleanly:
 
-For internal mechanics — focus tier priority, attribute observer
-flow, body scroll-lock gating, boot-time-already-open shortcut — see
-[`docs/js/modal.md`](../../docs/js/modal.md).
+1. **State & Accessibility (JavaScript)**: The `ln-modal` script (145 lines) only manages binary `open` / `close` state, suppresses parent `<body>` scrolling, intercepts tab navigation to trap focus inside the modal, closes topmost modals on ESC key, and restores focus back to the trigger on close.
+2. **The Content Root (HTML)**: The modal content root is ALWAYS a `<form>`. The form IS the panel — there are no redundant BEM wrappers like `.ln-modal__content`. Cancel and submit buttons live directly inside the form.
+3. **Visual Presentation & Sizing (CSS)**: Overlay backdrops, Sticky headers/footers, and scrollable body areas are styled using Vanilla CSS. Sizing variants (`modal-sm|md|lg|xl`) are applied via SCSS mixins on `> form`, keeping markup completely clean.
 
-## HTML contract
+---
 
-The full annotated example. Every required attribute and ARIA piece is
-called out.
+## 2. Minimal Blueprint
+
+Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `data-ln-modal`. The direct child must always be a `<form>`.
 
 ```html
-<!-- Trigger — anywhere in the page. data-ln-modal-for points to the modal id. -->
-<button data-ln-modal-for="my-modal">Open</button>
+<!-- Trigger button -->
+<button data-ln-modal-for="user-modal">Add User</button>
 
-<!-- Modal — the .ln-modal class supplies the overlay chrome. -->
-<div class="ln-modal" data-ln-modal id="my-modal">
-    <!-- Form is ALWAYS the direct child. No wrapper div. -->
+<!-- Modal overlay -->
+<div class="ln-modal" data-ln-modal id="user-modal">
     <form>
-        <!-- Header — title + close button. -->
+        <!-- Header -->
         <header>
-            <h3>Title</h3>
-            <!-- Close button: type="button" so it doesn't submit; aria-label
-                 because it is icon-only; data-ln-modal-close so the
-                 component wires the click handler. -->
+            <h3>Add User</h3>
             <button type="button" data-ln-modal-close aria-label="Close">
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
             </button>
         </header>
-
-        <!-- Main — scrollable region. -->
+        
+        <!-- Scrollable content -->
         <main>
-            <label>Name <input type="text" name="name"></label>
+            <label>Name <input type="text" name="name" autofocus></label>
         </main>
-
-        <!-- Footer — sticky to the bottom. -->
+        
+        <!-- Sticky footer -->
         <footer>
-            <!-- Cancel: type="button" prevents accidental submit. -->
             <button type="button" data-ln-modal-close>Cancel</button>
-            <!-- Save: type="submit" gets primary fill from globals. -->
             <button type="submit">Save</button>
         </footer>
     </form>
 </div>
 ```
 
-What each piece does:
+### Key Anatomy Rules
+- **The Overlay (`data-ln-modal`)**: Driven by the value `"open"` (open) and `"close"` or empty (closed).
+- **The Trigger (`data-ln-modal-for="id"`)**: Placed on buttons/links to toggle modal display.
+- **The Dismiss button (`data-ln-modal-close`)**: Placed on cancel or close buttons. Always needs `type="button"` inside a form.
+- **Focus Override (`autofocus`)**: Place on any form field to override the default behavior of focusing the first input on open.
 
-- `class="ln-modal"` — applies the overlay chrome (fixed, full-viewport, scrim, blur, centered, hidden by default).
-- `data-ln-modal` — creates the component instance, default closed. `data-ln-modal="open"` boots the modal already open.
-- `id="my-modal"` — the trigger reference. Every modal needs a stable id.
-- `data-ln-modal-for="my-modal"` on a trigger — clicking it sets `data-ln-modal` to the opposite state on the matching modal. Ctrl/Cmd+click and middle-click pass through (open in new tab still works on `<a>` triggers).
-- `data-ln-modal-close` on a button — clicking it sets `data-ln-modal="close"` on the parent modal. Works on any button in any depth inside the modal.
-- `type="button"` on Cancel and Close — non-negotiable. Forms default buttons to submit.
-- `aria-label="Close"` on the icon-only close button — required because the SVG has `aria-hidden="true"`.
+---
 
-## JS API
+## 3. Declarative API & State Contract
 
-Each `[data-ln-modal]` element gets a per-element instance at
-`element.lnModal`. The constructor is registered globally as
-`window.lnModal` (call it on a DOM subtree to initialize new modals
-inside it).
+There are no imperative JavaScript methods (like `open()` or `close()`) on the component instance. **The HTML attribute is the sole contract.** 
+
+Triggers, backdrop dismissals, ESC handlers, and custom scripts all change state by writing the active attribute on the modal element:
 
 ```js
-const modal = document.getElementById('my-modal');
+const modal = document.getElementById('user-modal');
 
-modal.setAttribute('data-ln-modal', 'open');   // open the modal
-modal.setAttribute('data-ln-modal', 'close');  // close the modal
-modal.lnModal.isOpen;                          // boolean — read-only
-modal.lnModal.destroy();                       // detach listeners, dispatch :destroyed
+// Open the modal
+modal.setAttribute('data-ln-modal', 'open');
+
+// Close the modal
+modal.setAttribute('data-ln-modal', 'close');
+
+// Read-only state query
+modal.lnModal.isOpen; // Returns true/false
 ```
 
-The attribute is the only mutator. There is no `open()` / `close()` /
-`toggle()` method — every consumer (trigger click, close button, ESC
-key, sibling component, external script, DevTools) writes
-`data-ln-modal` and the observer runs the pipeline (cancelable
-before-events, aria, body scroll lock, focus capture/restore, focus
-trap). `destroy()` is the only public method, and it does real
-cleanup work the attribute alone cannot.
+### Attributes
+- `data-ln-modal`: Placed on the overlay element. Value `"open"` = open; `"close"` = closed.
+- `data-ln-modal-for="id"`: Placed on trigger elements referencing the modal ID.
+- `data-ln-modal-close`: Placed on any close trigger inside the modal.
 
-`window.lnModal(root)` upgrades a custom root (Shadow DOM, iframe).
-Ordinary AJAX inserts and `setAttribute` on existing elements are
-handled automatically by the document-level observer.
+---
 
-## Events
+## 4. Transition Events
 
-All events are dispatched on the modal element and bubble. Every
-event's `detail` carries `{ modalId, target }`.
+All events bubble. The dispatch target is the overlay element. Every event's `detail` carries `{ modalId, target }`.
 
-| Event                  | Cancelable | When                                                  |
-|------------------------|:----------:|-------------------------------------------------------|
-| `ln-modal:before-open` |    yes     | Before opening. `preventDefault()` reverts attribute. |
-| `ln-modal:open`        |    no      | Modal opened (state applied, focus moved).            |
-| `ln-modal:before-close`|    yes     | Before closing. `preventDefault()` reverts attribute. |
-| `ln-modal:close`       |    no      | Modal closed (listeners detached).                    |
-| `ln-modal:destroyed`   |    no      | Instance destroyed, listeners removed.                |
-
-Cancellation pattern:
+| Event | Cancelable | Dispatched When |
+|---|:---:|---|
+| **`ln-modal:before-open`** | **Yes** | Before opening. Calling `event.preventDefault()` cancels the transition and reverts the attribute. |
+| **`ln-modal:open`** | No | After modal is active, body scroll locked, and focus trapped. |
+| **`ln-modal:before-close`** | **Yes** | Before closing. Calling `event.preventDefault()` cancels the close and reverts the attribute. |
+| **`ln-modal:close`** | No | After modal is closed, scroll locks released, and focus restored. |
 
 ```js
-// Conditionally block opening
-document.addEventListener('ln-modal:before-open', (e) => {
-    if (e.detail.modalId === 'edit-modal' && !userIsEditor()) {
-        e.preventDefault();   // observer reverts data-ln-modal="open" → "close"
-    }
-});
-
-// Confirm before closing on unsaved changes
-document.getElementById('edit-modal').addEventListener('ln-modal:before-close', (e) => {
-    if (hasUnsavedChanges()) {
-        e.preventDefault();   // observer reverts data-ln-modal="close" → "open"
+// Example: Block close transition if form is dirty (unsaved changes)
+const modal = document.getElementById('user-modal');
+modal.addEventListener('ln-modal:before-close', (e) => {
+    if (formIsDirty()) {
+        e.preventDefault(); // Reverts attribute back to "open"
     }
 });
 ```
 
-There is no `ln-modal:before-destroy` event — destruction is a teardown
-operation, not a state change.
+---
 
-## Attribute reference
+## 5. Visual Sizing & SCSS Mixins
 
-| Attribute              | On                          | Purpose                                                      |
-|------------------------|-----------------------------|--------------------------------------------------------------|
-| `data-ln-modal`        | overlay element             | Creates instance. Value `"open"` or `"close"` is the state.  |
-| `data-ln-modal-for`    | trigger button (anywhere)   | Click toggles the modal whose `id` matches the value.        |
-| `data-ln-modal-close`  | any button inside the modal | Click closes the parent modal.                               |
-| `id`                   | overlay element             | Required. Used by triggers and external API.                 |
-| `autofocus`            | any element inside modal    | Receives focus on open, overriding the default first-input.  |
+Do not use visual layout utility classes in your markup. Apply structural sizing variants inside your SCSS to the modal form element:
 
-Standard attributes the component sets/removes (do not set these manually):
-
-| Attribute       | When                  |
-|-----------------|-----------------------|
-| `aria-modal`    | `true` while open     |
-| `role`          | `dialog` while open (set on first open; never removed) |
-
-## What it does NOT do
-
-The component is intentionally narrow. These are NOT modal concerns:
-
-- **Form submission.** The `<form>` is yours. `type="submit"` fires
-  the form's `submit` event; whatever handler you attach (vanilla,
-  `ln-form`, `ln-validate`, `ln-http`) runs as it would for a form
-  outside a modal. The modal does not intercept submit.
-- **Validation.** That's `ln-validate` (per-field) and `ln-form`
-  (form-level). They work inside a modal because the form is just a
-  form.
-- **Backdrop click to close.** Clicking the dark area outside the
-  panel does nothing. Closing happens via ESC, the close button, the
-  close API, or a cancelable before-event. If you want
-  backdrop-click-to-close, wire it yourself in a coordinator.
-- **Stacked-modal coordination.** Each open modal attaches its own
-  ESC listener; one ESC press closes them all. There is no z-index
-  bumping or topmost tracking. Don't stack modals — refactor to a
-  single multi-step flow.
-
-## Sizing variants
-
-| Mixin       | `max-width` | When to use                                          |
-|-------------|-------------|------------------------------------------------------|
-| `modal-sm`  | `28rem`     | Single-field forms, simple confirms with copy.       |
-| `modal-md`  | `32rem`     | Standard 2–4 field forms.                            |
-| `modal-lg`  | `42rem`     | Wider forms, side-by-side fields, short tables.      |
-| `modal-xl`  | `48rem`     | Detail panes, previews, multi-section forms.         |
-
-Default panel: `width: 90%`, capped at `600px`. Apply a mixin to
-override:
+| Mixin | `max-width` | Ideal For |
+|---|---|---|
+| `@include modal-sm;` | `28rem` | Simple confirms, single-field inputs |
+| `@include modal-md;` | `32rem` | Standard 2-4 field forms (Default) |
+| `@include modal-lg;` | `42rem` | Wide multi-column forms, data lists |
+| `@include modal-xl;` | `48rem` | Detail previews, large forms |
 
 ```scss
-#user-modal > form { @include modal-lg; }
+// Apply in project SCSS
+.ln-modal {
+    @include modal-overlay;
+
+    > form {
+        @include modal-panel;
+        @include modal-md; // default
+    }
+    
+    &#user-modal > form {
+        @include modal-lg; // Override specific modal width
+    }
+}
 ```
 
-The cap is on `max-width` — on small viewports the panel is `90%` of
-the viewport regardless of mixin.
+---
 
-## Integration & Development
+## 6. Integration & Source Files
 
-### Integration
+- **Unified Bundle**: Loaded automatically with the main bundle:
+  ```html
+  <script src="dist/ln-ashlar.iife.js" defer></script>
+  ```
+- **Standalone IIFE**: For lightweight pages, load the standalone, self-registering IIFE version:
+  ```html
+  <script src="js/ln-modal/ln-modal.js" defer></script>
+  ```
+- **Active Source (ESM)**: Development source is located at [js/ln-modal/src/ln-modal.js](file:///c:/laragon/www/ln-ashlar/js/ln-modal/src/ln-modal.js).
 
-#### 1. In-Bundle (Standard Integration)
-To load `ln-modal` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
+---
 
-#### 2. Standalone (Zero-Dependency IIFE)
-If you wish to load the `ln-modal` component standalone, include its compiled zero-dependency IIFE script directly:
-```html
-<script src="js/ln-modal/ln-modal.js" defer></script>
-```
-
-### Source Files
-
-For development, testing, and debugging, refer to the following local file paths:
-- **Source of Truth (Active Development):** [js/ln-modal/src/ln-modal.js](file:///c:/laragon/www/ln-ashlar/js/ln-modal/src/ln-modal.js)
-- **Compiled Standalone:** [js/ln-modal/ln-modal.js](file:///c:/laragon/www/ln-ashlar/js/ln-modal/ln-modal.js)
-
-## See also
-
-- `js/ln-form/README.md` — form submission, autosave, reset.
-- `js/ln-validate/README.md` — per-field validation.
-- `js/ln-confirm/README.md` — single-button confirm pattern; the
-  lightweight alternative to a modal.
-- `docs/js/modal.md` — internal architecture for library maintainers.
+## Related
+- **[`ln-confirm`](../ln-confirm/README.md)** — Two-click inline confirm actions (lightweight alternative to modals).
+- **[`ln-form`](../ln-form/README.md)** — Form serialization and success/error cascades.
+- **[`ln-validate`](../ln-validate/README.md)** — Declarative field-level constraints and visual errors.
+- **Architecture deep-dive** — [`docs/js/modal.md`](../../docs/js/modal.md).

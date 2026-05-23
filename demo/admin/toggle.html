@@ -154,11 +154,37 @@
 			<div class="app-content-wrapper">
 <!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>The smallest reactive primitive in ln-ashlar: an attribute on an element, a class derived from that attribute, and a pair of events on each side of the transition. 145 lines of JS that exist so every other open/close component in the library — accordion, dropdown, sidebar drawer, dismissible alert, language menu — does not have to re-implement the same state machine.</p>
-							<p>The contract is one sentence: <strong>the attribute is the state, and the state is the attribute.</strong> <code>data-ln-toggle="open"</code> means open; anything else (<code>"close"</code> or empty) means closed. API methods, trigger clicks, sibling components, external scripts, and DevTools edits all funnel into one <code>setAttribute</code> call. A single <code>MutationObserver</code> callback runs the open/close pipeline. There is no second path.</p>
-							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-toggle/README.md"><code>ln-toggle</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/toggle.md">architecture reference</a>. Read it before reaching for ln-accordion or ln-dropdown — both are thin layers on top of the toggle's contract.</p>
+							<p>Every complex open/close user interface element in a modern web application—whether it is a sidebar drawer, a dropdown menu, a collapsible section, a dismissible alert, or a single-open accordion—shares a common heart. They all require a reliable state machine to transition between "open" and "closed".</p>
+
+							<p>In <code>ln-ashlar</code>, this state machine is encapsulated in <strong><code>ln-toggle</code></strong>, the library's smallest and most fundamental reactive primitive. By isolating binary state into a single, high-fidelity primitive, we ensure that higher-level components do not have to reinvent the state wheel. In fact, advanced components like <code>ln-accordion</code> and <code>ln-dropdown</code> are simply lightweight coordinators sitting on top of <code>ln-toggle</code>.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Primitive Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									The contract is absolute: <strong>the HTML attribute is the state, and the state is the HTML attribute.</strong> <code>data-ln-toggle="open"</code> represents open; anything else (<code>"close"</code> or empty) represents closed. Trigger clicks, JavaScript API writes, sibling coordinators, and manual DevTools edits all converge into one standard <code>setAttribute</code> call. <strong>A single MutationObserver runs the pipeline. There is no second path.</strong>
+								</p>
+							</div>
+
+							<h4>Orthogonality: Pure State vs Pure Layout</h4>
+							<p>To keep the codebase modular, <code>ln-toggle</code> enforces a strict separation of concerns. It operates at three completely orthogonal layers:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The State Machine (JavaScript):</strong> The <code>ln-toggle</code> script (only 145 lines) handles two things: maintaining state in the DOM via the <code>data-ln-toggle</code> attribute, and synchronizing <code>aria-expanded</code> and <code>aria-controls</code> attributes across all associated trigger buttons. It does not touch layout, dimensions, or animations.
+								</li>
+								<li>
+									<strong>The Visual Presentation (CSS):</strong> When the state flips to open, <code>ln-toggle</code> adds the <code>.open</code> class to the panel. All animations, translations, and transitions are defined in Vanilla CSS by reading the class and attribute. The library ships mixins like <code>@mixin collapsible</code> (smooth grid-template-rows height transitions) and <code>@mixin sidebar-drawer</code> (smooth translate transforms) to handle this elegantly.
+								</li>
+								<li>
+									<strong>The Trigger (HTML Decoupling):</strong> Triggers (elements with <code>data-ln-toggle-for</code>) and panels (elements with <code>data-ln-toggle</code>) are bound purely by element ID, not DOM proximity. Triggers can live anywhere on the page—allowing a button in the header to control a panel in the footer, or multiple buttons to sync with a single panel simultaneously.
+								</li>
+							</ol>
+
+							<p>For the complete developer reference, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-toggle/README.md"><code>ln-toggle</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/toggle.md">architecture reference</a>.</p>
 						</main>
 					</section>
 

@@ -1,5 +1,49 @@
 <!-- ln-page: title="Store — Usecase | ln-ashlar" h1="Store — Usecase" -->
 
+<h1>Store — Usecase</h1>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>Understanding local-first architecture in isolation is difficult. True appreciation comes from seeing a fully-wired CRUD application working flawlessly in real-world scenarios: syncing data instantly across tabs, queuing actions while offline, and automatically resolving server version conflicts (409) without freezing the UI.</p>
+
+							<p>This demo page illustrates the ultimate **Local-First CRUD Pipeline** in <code>ln-ashlar</code>, orchestrating five independent, highly-specialized components through standard DOM event channels:</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Multi-Tab Coherence
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									Open this page in a second browser window side-by-side. Make a change in one window—it saves locally, pushes to the backend mock, and immediately broadcasts to the other window using delta events. The other tab’s data table repaints itself instantly. <strong>No manual polling or web socket servers needed.</strong>
+								</p>
+							</div>
+
+							<h4>Five Interlocking Primitive Players</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Cache Store (<code>ln-store</code>):</strong> Renders nothing. Manages local IndexedDB storage, outbox write queues, delta sync loops, and optimistic states.
+								</li>
+								<li>
+									<strong>The Presenter (<code>ln-data-table</code>):</strong> Displays the records. It triggers query fetches, processes local column filters/sorting, renders templates, and captures selection events.
+								</li>
+								<li>
+									<strong>The Form Gate (<code>ln-form</code>):</strong> Manages inputs. It handles native validation, block submissions, bulk-fills from row selections, and serializes updates.
+								</li>
+								<li>
+									<strong>The Focus Gate (<code>ln-modal</code>):</strong> Houses the editor form. It keeps focus trapped, responds to escape cancellations, and opens or closes on demand.
+								</li>
+								<li>
+									<strong>The Safety Gate (<code>ln-confirm</code>):</strong> Prevents accidental row deletions. It gates trash clicks in-place, arming and releasing actions cleanly.
+								</li>
+							</ol>
+
+							<h4>Telemetry and Tele-Coordinating</h4>
+							<p>All operations are mediated by a single, lightweight coordinator script at the bottom of the page. The coordinator coordinates queries, intercepts store mutations to refresh tables, handles toast notifications, and resolves complex 409 server conflicts dynamically by feeding merged payloads back into form fields.</p>
+						</main>
+					</section>
+
 <!-- (a) Mock backend MUST install before any [data-ln-store] element is parsed below. -->
 <script>
 (function () {
@@ -157,9 +201,6 @@
 	};
 })();
 </script>
-
-<h1>Store — Usecase</h1>
-<p>Live CRUD example for <code>ln-store</code> (indexed storage). Companion to the <a href="store.html">Store reference</a> — that page documents the API, this one shows it wired to a data table, modal, and form. Reload — data survives. Open two tabs — they sync.</p>
 
 <!-- 1. Store (renders nothing) -->
 <div data-ln-store="documents"

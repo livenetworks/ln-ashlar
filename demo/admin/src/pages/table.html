@@ -1,7 +1,48 @@
 <!-- ln-page: title="Table — ln-ashlar" h1="Table" -->
 
 <h1>Table</h1>
-					<p>Server-rendered data table — in-memory search, per-column filtering, sorting, virtual scroll. Rows arrive as HTML in <code>&lt;tbody&gt;</code>. Two independent components: <code>ln-table</code> (parse + render) and <code>ln-table-sort</code> (sort header clicks). Search provided by <code>ln-search</code>.</p>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>In web application design, data grids can often be pre-rendered completely on the server. In these scenarios, introducing a heavy client-side JSON-to-HTML template rendering pipeline (such as <code>ln-data-table</code>) is unnecessary overhead. The DOM already contains the correct HTML rows on initial load.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-table</code>, a highly-optimized **Server-Rendered Table Primitive**. Instead of generating rows dynamically, it parses existing DOM rows directly on paint. It layers ultra-fast, in-memory client-side sorting, column filtering, text searches, and virtual scroll on top of standard pre-rendered HTML, providing a fluid desktop-grid experience with zero database fetching overhead.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Server-Rendered Integration
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									Unlike data tables (which consume raw JSON via event streams), <code>ln-table</code> expects standard rows (<code>&lt;tr&gt;</code>) already printed in <code>&lt;tbody&gt;</code> on page load. It acts as an upgrade node: parsing cell texts dynamically and hiding or sorting DOM elements in-place. <strong>The HTML DOM is the single source of truth.</strong>
+								</p>
+							</div>
+
+							<h4>Three Orthogonal Layers of HTML Table Enhancements</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Pre-Rendered Markup (HTML DOM):</strong> Rows arrive completely rendered from the server. Cells can contain rich markup (links, pills, or custom badges) natively on initial paint.
+								</li>
+								<li>
+									<strong>The Visual Class Hooks (CSS State):</strong> Visual indicators (such as sort states or popover filters) are managed by standard CSS classes. The button markup contains static icons; CSS manages what is shown.
+								</li>
+								<li>
+									<strong>The Parsing Shell (<code>ln-table</code>):</strong> The script acts as an enhancement node. It scans cells, parses raw values (using optional <code>data-ln-value</code> attributes), manages in-memory sort orders, and hides rows dynamically using filter criteria.
+								</li>
+							</ol>
+
+							<h4>How the Local Search and Sort Coherence Works</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>On load, the script parses every row, mapping text strings or custom <code>data-ln-value</code> targets into highly-optimized search and sort indexes in memory.</li>
+								<li>When a user types in a connected search bar (<code>data-ln-search</code>) or clicks a sort header (<code>data-ln-sort</code>), the component executes in-memory, local array filters instantly.</li>
+								<li>The component updates table rows in-place (toggling visibility or re-ordering nodes in the DOM). If the visible row count exceeds 200, it automatically activates virtual scrolling.</li>
+							</ol>
+
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-table/README.md"><code>ln-table</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/table.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
 					<!-- Attributes -->
 					<section class="section-card">

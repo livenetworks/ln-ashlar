@@ -1,197 +1,106 @@
 # ln-store
 
-> Coordinator/store for cached, synced server data. Caches in
-> IndexedDB, syncs via delta protocol, handles optimistic mutations.
-> Renders nothing — UI components consume data via its API and CustomEvents.
+A zero-dependency, local-first **Optimistic Sync Store** backed by standard browser `IndexedDB`. It functions as a data-access layer that caches server payloads locally, performs offline-safe write mutations instantly (optimistic state), and reconciles changes via background sync delta loops.
 
-`data-ln-store` on a `<div>` (one per resource) is the contract. The
-`window.lnStore` API is a thin convenience layer for manual init and
-global operations.
+It possesses no visual interface; instead, it coordinates data states through declarative API queries and CustomEvents.
 
-## Attributes
+---
 
-| Attribute | Required | Description |
-|-----------|----------|-------------|
-| `data-ln-store` | yes | Store name (IndexedDB object store name, event namespace) |
-| `data-ln-store-endpoint` | yes | Server API base URL for this resource |
-| `data-ln-store-stale` | no | Staleness threshold in seconds (default: 300). `"0"` = always stale (syncs on every mount). `"-1"` or `"never"` = never auto-sync (only `forceSync()`) |
-| `data-ln-store-indexes` | no | Comma-separated fields to index: `"status,category,updated_at"` |
-| `data-ln-store-search-fields` | no | Comma-separated fields for text search: `"title,description,author_name"` |
+## 🧭 Philosophy & Architecture
 
-## Events — Commands (dispatched TO the store)
+1. **Local-First Database:** The local IndexedDB is the single source of truth for the UI. Views query local store states instantly without awaiting HTTP responses.
+2. **Optimistic Mutations:** Creating, updating, or deleting records writes immediately to the local cache and fires optimistic events (e.g. `ln-store:updated`) so that list views refresh instantly.
+3. **Delta Sync Protocol:** Syncing is incremental. The outbox pushes out mutations with automatic backoffs, while the inbox fetches only modified server rows using a `?since=timestamp` query.
+4. **Version Conflict Resolution:** Updates gate validation using version-locking (`expected_version`). Standard HTTP 409 status codes trigger conflict events for custom UI merges.
 
-Mutations go through request events. The coordinator dispatches these on the store element.
+---
 
-| Event | `detail` | Description |
-|-------|----------|-------------|
-| `ln-store:request-create` | `{ data }` | Create a new record (optimistic with temp ID) |
-| `ln-store:request-update` | `{ id, data, expected_version }` | Update a record (optimistic, conflict detection via `expected_version`) |
-| `ln-store:request-delete` | `{ id }` | Delete a record (optimistic) |
-| `ln-store:request-bulk-delete` | `{ ids }` | Delete multiple records (optimistic) |
-
-## Events — Notifications (emitted BY the store)
-
-### Data Events
-
-| Event | When | `detail` |
-|-------|------|----------|
-| `ln-store:ready` | Data available (cache or server) | `{ store, count, source: 'cache'\|'server' }` |
-| `ln-store:loaded` | Initial full load complete | `{ store, count }` |
-| `ln-store:synced` | Delta sync complete | `{ store, added, deleted, changed: bool }` |
-
-### Mutation Events
-
-| Event | When | `detail` |
-|-------|------|----------|
-| `ln-store:created` | Optimistic create applied | `{ store, record, tempId }` |
-| `ln-store:updated` | Optimistic update applied | `{ store, record, previous }` |
-| `ln-store:deleted` | Optimistic delete applied | `{ store, id }` or `{ store, ids }` |
-| `ln-store:confirmed` | Server confirmed mutation | `{ store, record, action }` |
-| `ln-store:reverted` | Mutation failed, reverted | `{ store, record, action, error }` |
-| `ln-store:conflict` | Update conflict (409) | `{ store, local, remote, field_diffs }` |
-
-### Error Events
-
-| Event | When | `detail` |
-|-------|------|----------|
-| `ln-store:error` | Initial load failed (no cache) | `{ store, action, error, status }` |
-| `ln-store:offline` | Server unreachable during sync | `{ store }` |
-| `ln-store:quota-exceeded` | IndexedDB write quota exceeded | `{ error }` |
-| `ln-store:destroyed` | Store instance destroyed | `{ store }` |
-
-> `ln-store:quota-exceeded` bubbles from `document` (it can fire
-> before any store instance exists). All other events are dispatched
-> on the store element.
-
-## API (instance on DOM element)
-
-```javascript
-const storeEl = document.querySelector('[data-ln-store="documents"]');
-
-// Queries (all return Promise)
-storeEl.lnStore.getAll(options)        // → { data, total, filtered }
-storeEl.lnStore.getById(id)            // → Object|null
-storeEl.lnStore.count(filters)         // → Number
-storeEl.lnStore.aggregate(field, fn)   // → Number (sum, avg, count)
-
-// State
-storeEl.lnStore.isLoaded               // Boolean
-storeEl.lnStore.isSyncing              // Boolean
-storeEl.lnStore.lastSyncedAt           // Number|null (Unix timestamp)
-storeEl.lnStore.totalCount             // Number
-
-// Manual triggers
-storeEl.lnStore.forceSync()            // → Promise (delta sync)
-storeEl.lnStore.fullReload()           // → Promise (clear cache + full reload)
-storeEl.lnStore.destroy()              // Remove listeners, cancel pending fetches
-```
-
-### Query Options
-
-```javascript
-storeEl.lnStore.getAll({
-	sort: { field: 'title', direction: 'asc' },
-	filters: { status: ['approved', 'draft'], category: ['Policy'] },
-	search: 'ISO 27001',
-	offset: 0,
-	limit: 100
-})
-```
-
-### Global
-
-```javascript
-window.lnStore.clearAll()   // Wipe all IndexedDB stores + meta (for logout)
-window.lnStore.init(el)     // Manual init (MutationObserver handles dynamic DOM automatically)
-```
-
-## Integration
-
-### In-Bundle (Standard Integration)
-To load `ln-store` as part of the unified `ln-ashlar` bundle, include the main script:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-### Standalone (Zero-Dependency IIFE)
-If you only need the store component, load the compiled zero-dependency IIFE directly:
-```html
-<script src="js/ln-store/ln-store.js" defer></script>
-```
-
-### Source Files & Development
-- **Active Development Source**: [js/ln-store/src/ln-store.js](file:///c:/laragon/www/ln-ashlar/js/ln-store/src/ln-store.js) — The source of truth for component logic.
-- **Compiled Standalone**: [js/ln-store/ln-store.js](file:///c:/laragon/www/ln-ashlar/js/ln-store/ln-store.js) — The compiled, ready-to-use standalone bundle.
-
-## Dependencies
-
-- IndexedDB (browser built-in)
-- Fetch API (browser built-in)
-- `ln-core` — `registerComponent`, `dispatch`
-
-## HTML Structure
+## 📦 Minimal Blueprint
 
 ```html
-<!-- One per resource, anywhere in the page -->
+<!-- One per resource, declared anywhere in the page -->
 <div data-ln-store="documents"
      data-ln-store-endpoint="/api/documents"
      data-ln-store-stale="300"
-     data-ln-store-indexes="status,category,updated_at"
-     data-ln-store-search-fields="title,description,author_name">
+     data-ln-store-indexes="status,department,updated_at"
+     data-ln-store-search-fields="title,owner">
 </div>
 ```
 
-## Examples
+---
 
-### Coordinator wiring
+## 🛠️ Declarative API Contract
+
+### HTML Attributes
+
+| Attribute | Elements | Description |
+| :--- | :--- | :--- |
+| `data-ln-store` | `<div>` | Store namespace and target IndexedDB table name. |
+| `data-ln-store-endpoint` | `<div>` | Base server API endpoint (supports GET, POST, PUT, DELETE). |
+| `data-ln-store-stale` | `<div>` | Staleness limit in seconds (default `300`). `"0"` always syncs. |
+| `data-ln-store-indexes` | `<div>` | Comma-separated fields to index for high-performance queries. |
+
+### JS API (On the element)
+
+Access the database layer directly via the `lnStore` property on the store container:
 
 ```javascript
-const storeEl = document.querySelector('[data-ln-store="documents"]');
+const store = document.querySelector('[data-ln-store="documents"]');
 
-// Read after data is ready
-storeEl.addEventListener('ln-store:ready', async () => {
-	const { data } = await storeEl.lnStore.getAll({
-		sort: { field: 'updated_at', direction: 'desc' },
-		limit: 50
-	});
-	renderTable(data);
+// 1. Queries (returns Promise)
+const { data, total, filtered } = await store.lnStore.getAll({
+  sort: { field: 'updated_at', direction: 'desc' },
+  filters: { status: ['Approved'] },
+  search: 'ISO 27001',
+  limit: 50
 });
 
-// Mutate via request event (never call methods directly)
-saveBtn.addEventListener('click', () => {
-	storeEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
-		detail: { id: 42, data: { title: 'New' }, expected_version: 3 }
-	}));
-});
+const doc = await store.lnStore.getById(42);
 
-// React to confirmed / reverted / conflict
-storeEl.addEventListener('ln-store:reverted', (e) => {
-	showToast(`Save failed: ${e.detail.error}`);
-});
+// 2. States
+const loaded = store.lnStore.isLoaded;   // Boolean
+const syncing = store.lnStore.isSyncing; // Boolean
+
+// 3. Sync Triggers
+store.lnStore.forceSync();  // Initiates delta synchronization
+store.lnStore.fullReload(); // Purges cache and runs fresh pull
 ```
 
-## Server Response Format
+---
 
-### Full load / Delta sync
+## ⚡ DOM Events
 
-```json
-{
-    "data": [{ "id": 42, "title": "...", "updated_at": 1736952600 }],
-    "deleted": [17, 23],
-    "synced_at": 1736953500
-}
+### Commands (Dispatched TO the store)
+
+*Never invoke write methods directly.* Route all mutations through DOM commands:
+
+```javascript
+// Create optimistically
+store.dispatchEvent(new CustomEvent('ln-store:request-create', {
+  detail: { data: { title: 'New Document', status: 'Draft' } }
+}));
+
+// Update with version locks
+store.dispatchEvent(new CustomEvent('ln-store:request-update', {
+  detail: { id: 42, data: { title: 'Updated title' }, expected_version: 3 }
+}));
 ```
 
-- `data` — records created or updated (full load: all records, delta: only changed)
-- `deleted` — IDs removed since last sync (delta only)
-- `synced_at` — server timestamp, becomes next `?since=` value
+### Notifications (Emitted BY the store)
 
-The store treats records as opaque except for `id` (the keyPath).
-Conflict detection on update uses `expected_version` if the
-coordinator passes it in the request `detail`.
+| Event | Payload | Description |
+| :--- | :--- | :--- |
+| `ln-store:ready` | `{ store, count, source }` | Cache loaded (`cache`) or delta sync finished (`server`). |
+| `ln-store:created` | `{ store, record, tempId }` | Dispatched instantly on optimistic create. |
+| `ln-store:updated` | `{ store, record, previous }` | Dispatched instantly on optimistic update. |
+| `ln-store:confirmed` | `{ store, record, action }` | Server verified mutation; outbox item cleared. |
+| `ln-store:reverted` | `{ store, record, action, error }` | Server mutation failed; UI rolled back. |
+| `ln-store:conflict` | `{ store, local, remote }` | Server returned 409 conflict; triggers data-merge flow. |
 
-## Lifecycle
+---
 
-See [docs/js/store.md](../../docs/js/store.md#sync-lifecycle) for the
-full sync + optimistic mutation flow (init, visibility-change sync,
-delta sync, optimistic create/update/delete).
+## ⚠️ Common Pitfalls
+
+- **Bypassing the Optimistic Event Loop:** Modifying local arrays in memory directly avoids saving changes to IndexedDB and leaves background outbox queues empty. Always dispatch `ln-store:request-*` events.
+- **Nameless Store Identifiers:** `data-ln-store` must have a value matching a unique table name, or the database constructor will fail to initialize.
+- **Skipping Server Delta Handlers:** Server endpoints must support the delta structure: returning lists under `"data"`, soft deletes under `"deleted"`, and the next query stamp under `"synced_at"`.

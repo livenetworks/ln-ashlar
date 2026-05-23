@@ -1,117 +1,81 @@
 # ln-time
 
-Timezone-aware timestamp formatting. Enhances `<time>` elements with `Intl.DateTimeFormat` and `Intl.RelativeTimeFormat`. Blade renders a fallback — JS replaces with localized, timezone-aware output.
+A zero-dependency, progressive **Timezone-Aware Timestamp Formatter** that localizes standard HTML `<time>` elements using native browser APIs.
 
-## Integration
+It replaces server-rendered fallback text with localized, timezone-aware date and time formats, performing automatic live updates for relative timestamps using a single shared timer scheduler.
 
-### In-Bundle (Standard Integration)
-To load `ln-time` as part of the unified `ln-ashlar` bundle, include the main script:
+---
+
+## 🧭 Philosophy & Architecture
+
+1. **Progressive Enhancement:** Server layouts (e.g. Laravel Blade templates) render standard text fallbacks inside native `<time>` elements. If JavaScript fails or is blocked, the original text is preserved; when active, the component compiles and overwrites it.
+2. **Standard-Based API Concurrency:** Built entirely on standard browser APIs (`Intl.DateTimeFormat` and `Intl.RelativeTimeFormat`). It bypasses heavy date-parsing libraries, leveraging the browser's native locale and timezone mappings.
+3. **Shared Interval Loop:** Dynamic relative timestamps (e.g., "5 minutes ago") auto-update every 60 seconds. Instead of spinning up individual intervals, a single global interval manager coordinates all active elements, automatically purging detached nodes.
+4. **Reactive State Resolution:** All state changes are governed by native HTML attributes. Changing `datetime` or `data-ln-time` triggers automatic DOM re-renders via `MutationObserver` synchronization.
+
+---
+
+## 📦 Minimal Blueprint
+
+### Static Localized Date
+Provide a Unix timestamp (in seconds) via `datetime` and specify the formatting mode.
 ```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-### Standalone (Zero-Dependency IIFE)
-If you only need the time formatter component, load the compiled zero-dependency IIFE directly:
-```html
-<script src="js/ln-time/ln-time.js" defer></script>
-```
-
-### Source Files & Development
-- **Active Development Source**: [js/ln-time/src/ln-time.js](file:///c:/laragon/www/ln-ashlar/js/ln-time/src/ln-time.js) — The source of truth for component logic.
-- **Compiled Standalone**: [js/ln-time/ln-time.js](file:///c:/laragon/www/ln-ashlar/js/ln-time/ln-time.js) — The compiled, ready-to-use standalone bundle.
-
-## Attributes
-
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-time="mode"` | `<time>` | Format mode: `relative`, `short`, `full`, `date`, `time` |
-| `datetime="1736952600"` | `<time>` | Unix timestamp in seconds |
-| `data-ln-time-locale="mk"` | `<time>` | Override locale (default: `<html lang>` or browser) |
-
-## Format Modes
-
-| Mode | Output Example | Intl Options |
-|------|---------------|-------------|
-| `relative` | "3 hr. ago", "now", "in 2 hr." | `Intl.RelativeTimeFormat` (narrow, numeric: auto) |
-| `short` | "Jan 15" (same year) / "Jan 15, 2024" (different year) | `{ month: 'short', day: 'numeric' }` + conditional year |
-| `full` | "January 15, 2025 at 2:30 PM" | `{ dateStyle: 'long', timeStyle: 'short' }` |
-| `date` | "Jan 15, 2025" | `{ dateStyle: 'medium' }` |
-| `time` | "2:30 PM" | `{ timeStyle: 'short' }` |
-
-## HTML Structure
-
-```html
-<!-- Blade renders fallback text, JS enhances -->
-<time data-ln-time="relative" datetime="1736952600">Jan 15</time>
-<time data-ln-time="short" datetime="1736952600">Jan 15</time>
+<!-- Server renders a fallback, JS enhances with user timezone and locale -->
 <time data-ln-time="full" datetime="1736952600">January 15, 2025</time>
-<time data-ln-time="date" datetime="1736952600">Jan 15, 2025</time>
-<time data-ln-time="time" datetime="1736952600">14:30</time>
-
-<!-- Locale override -->
-<time data-ln-time="full" datetime="1736952600" data-ln-time-locale="mk">fallback</time>
 ```
 
-## Relative Time Thresholds
-
-| Elapsed | Unit | Example |
-|---------|------|---------|
-| < 10s | — | "now" (via `Intl.RelativeTimeFormat` `numeric: 'auto'`) |
-| < 60s | second | "45 sec. ago" |
-| < 60min | minute | "5 min. ago" |
-| < 24h | hour | "3 hr. ago" |
-| < 7d | day | "2 days ago" |
-| < 30d | week | "2 wk. ago" |
-| >= 30d | — | Falls back to `short` format |
-
-Future timestamps use the same thresholds — `Intl.RelativeTimeFormat` produces "in 5 min." automatically.
-
-## Auto-Update
-
-Relative times auto-refresh every 60 seconds via a single shared `setInterval`. The interval starts when the first relative element exists and stops when the last one is removed. Orphaned elements (removed from DOM without `destroy()`) are cleaned up automatically.
-
-## Locale Resolution
-
-```
-data-ln-time-locale attribute → document.documentElement.lang → browser default
+### Auto-Updating Relative Timestamp
+```html
+<!-- Automatically updates every 60s (e.g. "3 minutes ago") -->
+<time data-ln-time="relative" datetime="1736952600">Jan 15</time>
 ```
 
-No locale attribute needed in most cases — `<html lang="en">` is sufficient.
-
-## Accessibility
-
-Non-full modes set a `title` attribute with the full formatted date, providing a tooltip on hover.
-
-## API
-
-```javascript
-// Manual init (not needed — MutationObserver handles dynamic elements)
-window.lnTime(document.body);
-
-// Instance API
-const el = document.querySelector('time[data-ln-time]');
-el.lnTime.render();    // Force re-render
-el.lnTime.destroy();   // Cleanup (remove from auto-update pool)
+### Custom Localized Override
+```html
+<!-- Localizes the time string to Macedonian regardless of browser defaults -->
+<time data-ln-time="full" datetime="1736952600" data-ln-time-locale="mk">Јануари 15, 2025</time>
 ```
 
-Changing `datetime` or `data-ln-time` on the element re-renders automatically — the MutationObserver picks up attribute changes and dispatches a re-render via the same path as init.
+---
 
-## Edge Cases
+## 🛠️ Declarative API Contract
 
-- `datetime` empty or missing — skipped, fallback text preserved
-- `datetime` not a number (ISO string) — skipped
-- Timestamp `0` (epoch) — rendered normally (Jan 1, 1970)
-- Element removed from DOM — cleaned up on next interval tick
+### HTML Attributes
 
-## Example: Laravel Blade
+| Attribute | Elements | Description |
+| :--- | :--- | :--- |
+| `data-ln-time` | `<time>` | Format mode: `relative`, `short`, `full`, `date`, `time`. |
+| `datetime` | `<time>` | **Required**. Unix timestamp in **seconds** (not milliseconds). |
+| `data-ln-time-locale`| `<time>` | Opt-in. Force-overrides translation locale (e.g. `"de"`, `"mk"`). |
 
-```blade
-{{-- Server renders GMT fallback, JS enhances with user's timezone --}}
-<time data-ln-time="relative" datetime="{{ $user->created_at->timestamp }}">
-    {{ $user->created_at->diffForHumans() }}
-</time>
+### Format Modes
 
-<time data-ln-time="full" datetime="{{ $order->placed_at->timestamp }}">
-    {{ $order->placed_at->format('F j, Y \a\t H:i') }}
-</time>
-```
+| Mode | Output Example | Intl Engine |
+| :--- | :--- | :--- |
+| `relative` | `"3 hr. ago"`, `"just now"`, `"in 2 hr."` | `Intl.RelativeTimeFormat` |
+| `short` | `"Jan 15"` (current year) / `"Jan 15, 2024"` | `{ month: 'short', day: 'numeric' }` |
+| `full` | `"January 15, 2025 at 2:30 PM"` | `{ dateStyle: 'long', timeStyle: 'short' }` |
+| `date` | `"Jan 15, 2025"` | `{ dateStyle: 'medium' }` |
+| `time` | `"2:30 PM"` | `{ timeStyle: 'short' }` |
+
+---
+
+## ⚡ Live Relative Thresholds
+
+| Elapsed Time | Evaluated Unit | Output Example (English) |
+| :--- | :--- | :--- |
+| `< 10 seconds` | — | `"now"` |
+| `< 60 seconds` | `second` | `"45 sec. ago"` |
+| `< 60 minutes` | `minute` | `"5 min. ago"` |
+| `< 24 hours` | `hour` | `"3 hr. ago"` |
+| `< 7 days` | `day` | `"2 days ago"` |
+| `< 30 days` | `week` | `"2 wk. ago"` |
+| `>= 30 days` | — | Falls back to static `short` date. |
+
+---
+
+## ⚠️ Common Pitfalls
+
+- **Passing Millisecond Timestamps:** Standard database fields and JS date objects often return milliseconds (13 digits). `ln-time` maps strictly to Unix seconds (10 digits). Divide milliseconds by `1000` before rendering.
+- **Using ISO Strings:** `datetime="2025-01-15T14:30:00Z"` is not parsed. The component skips non-numeric values, leaving the original fallback text.
+- **Empty `datetime` Attributes:** If the `datetime` attribute is omitted or empty, the component will skip formatting to preserve server fallback strings.

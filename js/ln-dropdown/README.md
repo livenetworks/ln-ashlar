@@ -1,30 +1,31 @@
 # ln-dropdown
 
-> Dropdown menu — wraps an `[data-ln-toggle]` menu, teleports it to
-> `<body>` on open, positions relative to the trigger, and closes on
-> outside click or viewport resize. Open/close state lives on the
-> inner `data-ln-toggle` attribute (managed by `ln-toggle`).
+> A menu-grade coordinator that adds click-outside, body teleportation, and automatic positioning on top of `ln-toggle`.
 
-For internal mechanics — teleport flow, positioning algorithm, listener
-lifecycle — see [`docs/js/dropdown.md`](../../docs/js/dropdown.md).
+---
 
-## Attributes
+## 1. Philosophy & The Dropdown Mindset
 
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-dropdown` | wrapper element | Creates dropdown instance; contains trigger + menu |
-| `data-ln-toggle-for="menuId"` | trigger (`<button>`) | Opens/closes the menu by ID |
-| `data-ln-toggle` | menu element | The toggleable menu (managed by ln-toggle) |
-| `data-ln-dropdown-menu` | menu element | Auto-added by JS; used for CSS styling |
+In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating a heavy component that bundles state, LIFO click stacks, teleportation contexts, and styles, `ln-dropdown` splits them cleanly:
 
-**Auto-added ARIA**: `aria-haspopup="menu"` and `aria-expanded` on the trigger; `role="menu"` on the menu element; `role="menuitem"` on each direct child of the menu.
+1. **State Primitive (`ln-toggle`)**: Open/close state lives entirely on the inner `data-ln-toggle` attribute on the menu. `ln-dropdown` does not re-implement state; it is a thin behavior layer on top.
+2. **Behavior & Positioning (JavaScript)**: The `ln-dropdown` coordinator handles click-outside detection, viewport resize closures (which makes absolute positioning unreliable), layout teleportation to `<body>` to escape parent `overflow: hidden` clips, and scroll position tracking.
+3. **Visual Presentation (CSS)**: Visual layouts, background shadows, and borders are handled in Vanilla CSS. The library ships mixins like `@include dropdown` and `@include dropdown-menu` to style the wrapper and popup elements.
 
-## HTML Pattern
+---
+
+## 2. Minimal Blueprint
+
+Triggers and dropdown menus are paired by ID inside a wrapper container. Inactive menus are hidden via `ln-toggle` default rules.
 
 ```html
+<!-- The Wrapper -->
 <div data-ln-dropdown>
-    <button type="button" data-ln-toggle-for="my-menu">Open</button>
-    <ul id="my-menu" data-ln-toggle>
+    <!-- The Trigger -->
+    <button type="button" data-ln-toggle-for="options-menu">Options</button>
+    
+    <!-- The Menu (State Primitive) -->
+    <ul id="options-menu" data-ln-toggle>
         <li><a href="/profile">Profile</a></li>
         <li><a href="/settings">Settings</a></li>
         <li><hr></li>
@@ -33,68 +34,84 @@ lifecycle — see [`docs/js/dropdown.md`](../../docs/js/dropdown.md).
 </div>
 ```
 
-## Behavior
+### Key Anatomy Rules
+- **The Wrapper (`data-ln-dropdown`)**: Creates the dropdown coordinator instance.
+- **The Trigger (`data-ln-toggle-for="id"`)**: Standard `ln-toggle` button. ARIA attributes `aria-haspopup="menu"` and `aria-expanded` are synced automatically.
+- **The Menu (`data-ln-toggle`)**: Standard `ln-toggle` element. Value `open` represents open; anything else is closed. Role `menu` is auto-injected.
 
-- **Teleport** — on open, the menu is moved to `<body>` so it escapes ancestor `overflow: hidden` and stacking contexts; on close it returns to its original DOM position.
-- **Positioning** — menu opens below the trigger, right-aligned to it; flips above if there is no room below; flips left-aligned if there is no room on the right. Gap is the `--size-xs` token (override on the menu to tune).
-- **Scroll** — while open, the menu repositions on every scroll (including nested scrollable containers) so it tracks the trigger.
-- **Resize** — viewport resize closes the menu (layout reflow makes repositioning unreliable).
-- **Outside click** — clicking outside the wrapper or the menu closes it.
+---
 
-## Events
+## 3. Declarative API & State Contract
 
-| Event | Bubbles | Cancelable | Detail |
-|-------|---------|------------|--------|
-| `ln-dropdown:open` | yes | no | `{ target: menuElement }` |
-| `ln-dropdown:close` | yes | no | `{ target: menuElement }` |
-| `ln-dropdown:destroyed` | yes | no | `{ target: wrapperElement }` |
+There are no imperative JavaScript methods (like `open()` or `close()`) on the coordinator instance. **The HTML attribute is the sole contract.** 
 
-```javascript
-document.addEventListener('ln-dropdown:open', function (e) {
-    console.log('Dropdown opened:', e.detail.target.id);
+Outside clicks, window resizes, triggers, and custom scripts all change state by writing the active attribute on the inner menu element:
+
+```js
+const wrapper = document.querySelector('[data-ln-dropdown]');
+const menu = wrapper.querySelector('[data-ln-toggle]');
+
+// Open the menu (dropdown teleports and positions it automatically)
+menu.setAttribute('data-ln-toggle', 'open');
+
+// Close the menu
+menu.setAttribute('data-ln-toggle', 'close');
+
+// Cleanup the coordinator instance
+wrapper.lnDropdown.destroy();
+```
+
+### Attributes
+- `data-ln-dropdown`: Placed on the wrapper element to create the coordinator.
+- `data-ln-toggle-for="id"`: Placed on trigger referencing the menu ID.
+- `data-ln-toggle`: Placed on the menu element. Value `"open"` = open; anything else = closed.
+
+---
+
+## 4. Transition Events
+
+All events bubble. The dispatch target is the inner menu element (except `:destroyed` which dispatches on the wrapper).
+
+| Event | Bubbles | Detail | Dispatched When |
+|---|---|---|---|
+| **`ln-dropdown:open`** | Yes | `{ target: menuElement }` | After teleportation and positioning are complete. |
+| **`ln-dropdown:close`** | Yes | `{ target: menuElement }` | After menu is closed, teleported back, and outside listeners removed. |
+| **`ln-dropdown:destroyed`** | Yes | `{ target: wrapperElement }` | Inside `destroy()`, after removing listeners. |
+
+*Note*: Open/close state is managed by `ln-toggle`. Use `ln-toggle:before-open` / `ln-toggle:before-close` to cancel transitions.
+
+```js
+// Example: React to dropdown open
+document.addEventListener('ln-dropdown:open', (e) => {
+    console.log('Active dropdown:', e.detail.target.id);
 });
 ```
 
-## API
+---
 
-Each `[data-ln-dropdown]` element gets an instance at
-`element.lnDropdown`. The dropdown does not have its own
-`open()` / `close()` methods — open/close lives on the inner
-`[data-ln-toggle]` element. To open or close programmatically,
-toggle the `data-ln-toggle` attribute on the menu (or click the
-trigger).
+## 5. Behavior & Integration
 
-```javascript
-const el = document.querySelector('[data-ln-dropdown]');
-const menu = el.querySelector('[data-ln-toggle]');
+- **Teleportation**: On open, the menu is moved to `<body>` so it escapes ancestor `overflow: hidden` clipping and parent stacking contexts. On close, it returns to its original position in the DOM.
+- **Positioning**: The menu opens below the trigger, right-aligned to it. It automatically flips above if there is no vertical space below, and left-aligned if there is no horizontal space on the right.
+- **Scroll & Resize Tracking**: Repositions automatically on every scroll to track the trigger. A window viewport resize closes the menu to prevent layout misalignments.
 
-// Open / close via attribute on the menu:
-menu.setAttribute('data-ln-toggle', 'open');
-menu.setAttribute('data-ln-toggle', 'close');
+---
 
-// Cleanup the dropdown instance:
-el.lnDropdown.destroy();
-```
+## 6. Integration & Source Files
 
-## Integration & Development
+- **Unified Bundle**: Loaded automatically with the main bundle:
+  ```html
+  <script src="dist/ln-ashlar.iife.js" defer></script>
+  ```
+- **Standalone IIFE**: For lightweight pages, load the standalone, self-registering IIFE version:
+  ```html
+  <script src="js/ln-dropdown/ln-dropdown.js" defer></script>
+  ```
+- **Active Source (ESM)**: Development source is located at [js/ln-dropdown/src/ln-dropdown.js](file:///c:/laragon/www/ln-ashlar/js/ln-dropdown/src/ln-dropdown.js).
 
-### Integration
+---
 
-#### 1. In-Bundle (Standard Integration)
-To use `ln-dropdown` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-#### 2. Standalone (Zero-Dependency IIFE)
-If you wish to use `ln-dropdown` standalone without the rest of the bundle, load its individual IIFE compiled script:
-```html
-<script src="js/ln-dropdown/ln-dropdown.js" defer></script>
-```
-
-### Source Files
-
-For development, testing, and debugging, refer to the following local file paths:
-- **Source of Truth (Active Development):** [js/ln-dropdown/src/ln-dropdown.js](file:///c:/laragon/www/ln-ashlar/js/ln-dropdown/src/ln-dropdown.js)
-- **Compiled Standalone Build:** [js/ln-dropdown/ln-dropdown.js](file:///c:/laragon/www/ln-ashlar/js/ln-dropdown/ln-dropdown.js)
-
+## Related
+- **[`ln-toggle`](../ln-toggle/README.md)** — Binary disclosure state primitive.
+- **[`ln-popover`](../ln-popover/README.md)** — Viewport-aware click-triggered rich-content overlays.
+- **Architecture deep-dive** — [`docs/js/dropdown.md`](../../docs/js/dropdown.md).

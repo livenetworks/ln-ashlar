@@ -1,147 +1,91 @@
 # ln-ajax
 
-Intercepts clicks on `<a>` and submits on `<form>` inside `data-ln-ajax`,
-sends the request via `fetch`, and swaps DOM regions named in the JSON
-response. Re-attaches handlers in any injected nodes.
+A zero-dependency, event-driven **HTML Fragment Swapping Primitive** that intercepts clicks on `<a>` elements and submits on `<form>` tags to enable instant, SPA-like navigation without full page reloads.
 
-## Attributes
+It communicates via a structured server JSON protocol, exchanging targeted DOM updates, updating browser history states, and re-attaching lifecycle managers to newly injected nodes.
 
-| Attribute | On | Description |
-|-----------|-----|-------------|
-| `data-ln-ajax` | container, `<a>`, or `<form>` | Activates AJAX on the element and all its children |
-| `data-ln-ajax="false"` | `<a>` or `<form>` | Disables AJAX for a specific element inside an AJAX container |
+---
 
-## Behavior
+## 🧭 Philosophy & Architecture
 
-### Links (`<a>`)
-- Click makes a GET AJAX request to `href`
-- Ctrl/Cmd+Click and middle-click work normally (open in new tab)
-- Links with `#` in href are skipped
-- Links to a different hostname are skipped (open as normal links)
-- After a successful response, the URL is added to browser history (pushState)
+1. **HTML-First Swapping:** The server remains the single source of truth for both data and markup. Instead of client routers rendering JSON arrays, the server compiles standard HTML fragments and returns them inside a structured JSON payload.
+2. **Selective DOM Merges:** The response maps selector IDs (e.g. `main-content`) directly to their new HTML chunks, replacing only the specified regions in-place.
+3. **Transparent Enhancements:** Intercepts only native interactions (links to the same origin, form submissions). Safely falls back to native browser redirects on errors or external hosts.
 
-### Forms (`<form>`)
-- Submit makes an AJAX request (method and action from the form)
-- FormData is automatically created from the form
-- Buttons are disabled during the request
-- GET forms: parameters go in URL query string + pushState
-- POST/PUT/DELETE: body is FormData
+---
 
-### Loading state
+## 📦 Minimal Blueprint
 
-During the request, `.ln-ajax--loading` is added to the trigger element and a `<span class="ln-ajax-spinner">` is appended as a child.
+Wrap interactive elements or entire layouts with the `data-ln-ajax` selector.
 
-### Request headers
+```html
+<div data-ln-ajax>
+  <!-- Clicking this fetches /dashboard and swaps only the returned targets -->
+  <a href="/dashboard">Dashboard</a>
+  
+  <!-- Submitting this posts data and swaps target parts on success -->
+  <form method="POST" action="/users/create">
+    <input name="username" type="text" required>
+    <button type="submit">Create User</button>
+  </form>
 
-Every AJAX request sends:
-- `X-Requested-With: XMLHttpRequest`
-- `Accept: application/json`
-- `X-CSRF-TOKEN: {token}` (from `<meta name="csrf-token">`)
+  <!-- Exclude specific elements from AJAX handling -->
+  <a href="/logout" data-ln-ajax="false">Logout</a>
+</div>
+```
 
-## Server JSON Response Protocol
+---
+
+## 🛠️ Declarative API Contract
+
+### HTML Attributes
+
+| Attribute | Elements | Description |
+| :--- | :--- | :--- |
+| `data-ln-ajax` | Container, `<a>`, `<form>` | Activates AJAX capture on the element and its descendants. |
+| `data-ln-ajax="false"` | `<a>`, `<form>` | Excludes the specific link or form from AJAX interception. |
+
+### Server Response Protocol
+
+The server must return JSON with the `application/json` Content-Type:
 
 ```json
 {
-    "title": "New page",
-    "content": {
-        "main-content": "<h1>Content</h1><p>New HTML</p>",
-        "sidebar-nav": "<ul><li>New navigation</li></ul>"
-    },
-    "message": {
-        "type": "success",
-        "title": "Saved",
-        "body": "Changes have been saved.",
-        "data": {}
-    }
+  "title": "New Dashboard Page",
+  "content": {
+    "main-content": "<h1>Dashboard</h1><p>Welcome back!</p>",
+    "sidebar-nav": "<ul><li>Active Nav Item</li></ul>"
+  },
+  "message": {
+    "type": "success",
+    "title": "User Created",
+    "body": "The user was registered successfully."
+  }
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `title` | Update `document.title` |
-| `content` | Object: key = element ID, value = new innerHTML |
-| `message` | If present (success OR error), auto-dispatched on `window` as `ln-toast:enqueue`. See [ln-toast README](../ln-toast/README.md#enqueue-detail) for the envelope shape. |
+* **`title`**: Updates `document.title` on page swap.
+* **`content`**: Key-value pairs matching container `id` selectors to their new `innerHTML` content.
+* **`message`**: Optional. If present, automatically dispatches `ln-toast:enqueue` on the `window` to trigger native notifications.
 
-## Events
+---
 
-All events are dispatched on the element that initiated the request (link or form) and bubble up.
+## ⚡ DOM Events
 
-| Event | Cancelable | When | `detail` |
-|-------|-----------|------|----------|
-| `ln-ajax:before-start` | yes | Before everything (can cancel request) | `{ method, url }` |
-| `ln-ajax:start` | no | After adding spinner, before fetch | `{ method, url }` |
-| `ln-ajax:success` | no | After successful response | `{ method, url, data }` |
-| `ln-ajax:error` | no | HTTP-status error or fetch rejection | HTTP error: `{ method, url, status, data }` · Fetch rejection: `{ method, url, error }` |
-| `ln-ajax:complete` | no | After completion (success or error) | `{ method, url }` |
+All events are dispatched on the initiating element (`<a>` or `<form>`) and bubble.
 
-### Cancelling a request
+| Event | Cancelable | Description | Payload (`detail`) |
+| :--- | :--- | :--- | :--- |
+| `ln-ajax:before-start` | **Yes** | Fires before any network activity. Call `e.preventDefault()` to cancel. | `{ method, url }` |
+| `ln-ajax:start` | No | Fires as the loader class is added and fetch begins. | `{ method, url }` |
+| `ln-ajax:success` | No | Fires after successful DOM swaps. | `{ method, url, data }` |
+| `ln-ajax:error` | No | Fires on HTTP status failure or network rejects. | `{ method, url, status, data }` or `{ method, url, error }` |
+| `ln-ajax:complete` | No | Fires at the very end of the lifecycle (success or error). | `{ method, url }` |
 
-```javascript
-// Prevent AJAX for a specific element conditionally
-document.addEventListener('ln-ajax:before-start', function(e) {
-    if (!userIsAuthenticated()) {
-        e.preventDefault(); // request is cancelled, no spinner
-        redirectToLogin();
-    }
-});
-```
+---
 
-## HTML Structure
+## ⚠️ Common Pitfalls
 
-```html
-<!-- AJAX container — all links and forms inside are AJAX -->
-<div data-ln-ajax>
-    <nav>
-        <a href="/users">Users</a>
-        <a href="/settings">Settings</a>
-        <a href="/download.pdf" data-ln-ajax="false">Download (full page)</a>
-    </nav>
-
-    <form method="POST" action="/users/create">
-        <input name="name" type="text">
-        <button type="submit">Save</button>
-    </form>
-</div>
-
-<!-- Or directly on an element -->
-<a href="/dashboard" data-ln-ajax>Dashboard</a>
-<form data-ln-ajax method="POST" action="/api/save">...</form>
-```
-
-## API
-
-ln-ajax is attribute-driven: set `data-ln-ajax` on an element and the
-MutationObserver picks it up. Removal is symmetric — drop the
-attribute, the observer ignores it.
-
-```javascript
-// Manual init — only when the element is unreachable by the observer
-// (detached DOM tree, Shadow DOM root, sandboxed iframe).
-window.lnAjax(element);
-
-// Manual destroy — remove all listeners attached by the constructor.
-window.lnAjax.destroy(element);
-```
-
-## Integration & Development
-
-### Integration
-
-#### 1. In-Bundle (Standard Integration)
-To use `ln-ajax` as part of the main `ln-ashlar` bundle, include the compiled IIFE in your document:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-#### 2. Standalone (Zero-Dependency IIFE)
-If you wish to use `ln-ajax` standalone without the rest of the bundle, load its individual IIFE compiled script:
-```html
-<script src="js/ln-ajax/ln-ajax.js" defer></script>
-```
-
-### Source Files
-
-For development, testing, and debugging, refer to the following local file paths:
-- **Source of Truth (Active Development):** [js/ln-ajax/src/ln-ajax.js](file:///c:/laragon/www/ln-ashlar/js/ln-ajax/src/ln-ajax.js)
-- **Compiled Standalone Build:** [js/ln-ajax/ln-ajax.js](file:///c:/laragon/www/ln-ashlar/js/ln-ajax/ln-ajax.js)
-
+- **Missing DOM IDs on Swap Targets:** If the server returns a key in `content` that does not match a mounting ID in the active document (e.g. `id="main-content"`), that segment swap fails silently.
+- **Forgetting CSRF Meta:** `ln-ajax` automatically reads `<meta name="csrf-token" content="...">` to inject the `X-CSRF-TOKEN` header on non-GET calls. If this meta tag is missing, POST/PUT requests may fail authentication.
+- **Breaking External Links:** Links with different hostnames are ignored automatically, but absolute paths on the same host are captured. Ensure assets/downloads use `data-ln-ajax="false"`.

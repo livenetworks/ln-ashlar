@@ -1,150 +1,95 @@
 # ln-sortable
 
-Drag & drop reorder component — moves elements in a list using the Pointer Events API.
-Works with touch + mouse. The component only reorganizes the DOM — data model sync is the consumer's responsibility (via events).
+A zero-dependency, high-performance **Drag & Drop Reordering Primitive** driven by browser Pointer Events APIs, designed for seamless mouse and touch interactions.
 
-## Integration
+It focuses strictly on visual DOM restructuring, delegating server-side synchronization, database persistence, and list state saves completely to the parent coordinator via telemetry events.
 
-### In-Bundle (Standard Integration)
-To load `ln-sortable` as part of the unified `ln-ashlar` bundle, include the main script:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
+---
 
-### Standalone (Zero-Dependency IIFE)
-If you only need the sortable component, load the compiled zero-dependency IIFE directly:
-```html
-<script src="js/ln-sortable/ln-sortable.js" defer></script>
-```
+## 🧭 Philosophy & Architecture
 
-### Source Files & Development
-- **Active Development Source**: [js/ln-sortable/src/ln-sortable.js](file:///c:/laragon/www/ln-ashlar/js/ln-sortable/src/ln-sortable.js) — The source of truth for component logic.
-- **Compiled Standalone**: [js/ln-sortable/ln-sortable.js](file:///c:/laragon/www/ln-ashlar/js/ln-sortable/ln-sortable.js) — The compiled, ready-to-use standalone bundle.
+1. **Pointer Concurrency:** Built natively on Pointer Events APIs (`pointerdown`, `pointermove`, `pointerup`). It replaces heavy HTML5 Drag & Drop frameworks, offering high-performance dragging and layout shifts across desktop, mobile, and hybrid touch displays.
+2. **Visual Isolation:** The primitive does not import or inject inline styles or layout rules. Instead, it exposes CSS state hooks (e.g. `.ln-sortable--dragging`) on active elements, leaving transitions and placeholders fully to the stylesheet.
+3. **HTML Attribute as Single Source of Truth:** Component states are governed entirely by the `data-ln-sortable` attribute. Standard JS API calls (`enable()`, `disable()`) write directly to the attribute, which is observed via `MutationObserver` to coordinate internals.
 
-## Single Source of Truth
+---
 
-The `data-ln-sortable` attribute is the single source of truth for enabled/disabled state:
-- `data-ln-sortable` — enabled (default)
-- `data-ln-sortable="disabled"` — disabled
+## 📦 Minimal Blueprint
 
-All state changes flow through the attribute. The JS API methods (`enable()`, `disable()`) simply set the attribute — the MutationObserver detects the change and syncs the internal state. External code can set the attribute directly with the same result.
-
-## Attributes
-
-| Attribute | On | Description |
-|---------|-----|------|
-| `data-ln-sortable` | container (`<ol>`, `<ul>`, etc.) | Creates an instance, enabled by default |
-| `data-ln-sortable="disabled"` | container | Creates an instance, starts disabled |
-| `data-ln-sortable-handle` | element inside a child | Drag handle. If absent — the entire child is draggable. |
-
-## API
-
-```javascript
-// Instance API (on the DOM element)
-const list = document.querySelector('[data-ln-sortable]');
-list.lnSortable.enable();     // sets data-ln-sortable="" → observer syncs state
-list.lnSortable.disable();    // sets data-ln-sortable="disabled" → observer syncs state
-list.lnSortable.isEnabled;    // boolean
-list.lnSortable.destroy();    // removes all listeners, dispatches ln-sortable:destroyed
-
-// Direct attribute change — identical result
-list.setAttribute('data-ln-sortable', '');           // same as enable()
-list.setAttribute('data-ln-sortable', 'disabled');   // same as disable()
-
-// Constructor — initialises a container manually (auto-init covers normal AJAX flow)
-window.lnSortable(container);
-```
-
-## Events
-
-| Event | Bubbles | Cancelable | Detail |
-|-------|---------|------------|--------|
-| `ln-sortable:before-drag` | yes | **yes** | `{ item: HTMLElement, index: number }` |
-| `ln-sortable:drag-start` | yes | no | `{ item: HTMLElement, index: number }` |
-| `ln-sortable:reordered` | yes | no | `{ item: HTMLElement, oldIndex: number, newIndex: number }` |
-| `ln-sortable:enabled` | yes | no | `{ target: HTMLElement }` |
-| `ln-sortable:disabled` | yes | no | `{ target: HTMLElement }` |
-| `ln-sortable:destroyed` | yes | no | `{ target: HTMLElement }` |
-
-```javascript
-// Listen for reordering
-document.addEventListener('ln-sortable:reordered', function (e) {
-    console.log('Moved from', e.detail.oldIndex, 'to', e.detail.newIndex);
-});
-
-// Cancel drag conditionally
-document.addEventListener('ln-sortable:before-drag', function (e) {
-    if (listIsLocked) e.preventDefault();
-});
-
-// Disable while saving (via attribute or API — identical result)
-list.setAttribute('data-ln-sortable', 'disabled');
-saveOrder().then(function () {
-    list.setAttribute('data-ln-sortable', '');
-});
-```
-
-## CSS Classes
-
-The component adds/removes these classes. **Does not ship CSS** — the consumer styles them.
-
-| Class | On | When |
-|-------|----|------|
-| `ln-sortable--active` | container | While drag is in progress |
-| `ln-sortable--dragging` | dragged element | While being dragged |
-| `ln-sortable--drop-before` | target element | Pointer in top half |
-| `ln-sortable--drop-after` | target element | Pointer in bottom half |
-
-Example CSS:
-```css
-.my-list > li.ln-sortable--dragging {
-    opacity: 0.4;
-}
-.my-list > li.ln-sortable--drop-before {
-    box-shadow: inset 0 2px 0 0 var(--accent);
-}
-.my-list > li.ln-sortable--drop-after {
-    box-shadow: inset 0 -2px 0 0 var(--accent);
-}
-```
-
-> **Important:** The handle element needs `touch-action: none` and `cursor: grab` in CSS for correct behavior on touch devices.
-
-## Examples
-
-### List with drag handle
-
-```html
-<ol data-ln-sortable>
-    <li>
-        <span data-ln-sortable-handle>⋮⋮</span>
-        First item
-    </li>
-    <li>
-        <span data-ln-sortable-handle>⋮⋮</span>
-        Second item
-    </li>
-</ol>
-```
-
-### List without handle (entire child is draggable)
-
+### Drag Anywhere List
+Mark the container list directly with `data-ln-sortable`. All direct children become instantly sortable.
 ```html
 <ul data-ln-sortable>
-    <li>Drag me</li>
-    <li>Me too</li>
+  <li>First Item</li>
+  <li>Second Item</li>
+  <li>Third Item</li>
 </ul>
 ```
 
-### Programmatic
-
-```javascript
-// Via API (sets the attribute, observer does the rest)
-list.lnSortable.disable();
-saveOrder().then(function () {
-    list.lnSortable.enable();
-});
-
-// Via attribute (identical result)
-list.setAttribute('data-ln-sortable', 'disabled');
+### Handles-Only List (Premium Touch-Safe)
+For touch screens, limit drag triggers to a specific nested grab handle via `data-ln-sortable-handle`.
+```html
+<ol data-ln-sortable>
+  <li>
+    <span data-ln-sortable-handle>
+      <svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+    </span>
+    <span>Dashboard</span>
+  </li>
+  <li>
+    <span data-ln-sortable-handle>
+      <svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+    </span>
+    <span>Users</span>
+  </li>
+</ol>
 ```
+
+---
+
+## 🛠️ Declarative API Contract
+
+### HTML Attributes
+
+| Attribute | Elements | Description |
+| :--- | :--- | :--- |
+| `data-ln-sortable` | Container (`<ul>`, `<ol>`, etc.) | Component root. Can be empty (enabled) or `"disabled"`. |
+| `data-ln-sortable-handle` | Descendant of list item | Identifies drag trigger. When present, pointer clicks outside fail to drag. |
+
+### CSS Class Hooks
+
+The component toggles these visual state classes at runtime:
+
+| Class | Element | Description |
+| :--- | :--- | :--- |
+| `.ln-sortable--active` | Container | Drag session in progress. Pointer events on text selection are locked. |
+| `.ln-sortable--dragging` | Dragged item | The item currently being dragged. Typically styled with reduced opacity. |
+| `.ln-sortable--drop-before` | Neighbor item | Target item top-half placeholder. Highlight top border. |
+| `.ln-sortable--drop-after` | Neighbor item | Target item bottom-half placeholder. Highlight bottom border. |
+
+---
+
+## ⚡ DOM Events
+
+All events bubble from the container element.
+
+### `ln-sortable:before-drag`
+Fired when pointer down triggers drag.
+- **Cancelable**: Yes. Call `e.preventDefault()` to cancel the drag action (e.g. list is locked).
+- **Payload (`detail`)**: `{ item: HTMLElement, index: number }`
+
+### `ln-sortable:reordered`
+Fired when an item drop successfully changes the DOM index order.
+- **Payload (`detail`)**: `{ item: HTMLElement, oldIndex: number, newIndex: number }`
+
+---
+
+## ⚠️ Common Pitfalls
+
+- **Missing `touch-action: none`:** Drag handles must carry `touch-action: none` in CSS. Failing to add this prevents mobile browsers from scrolling, causing the browser to capture pointer tracks and breaking touch drags.
+- **Auto-Sync Assumptions:** The primitive does not call servers automatically. You must wire an `ln-sortable:reordered` listener and dispatch your sync request (e.g. via `ln-http`):
+  ```javascript
+  document.addEventListener('ln-sortable:reordered', function(e) {
+    saveNewListOrder(e.target.id, e.detail.oldIndex, e.detail.newIndex);
+  });
+  ```

@@ -1,143 +1,88 @@
 # ln-icons
 
-> On-demand SVG sprite — author `<use href="#ln-{name}">` for Tabler icons or `<use href="#lnc-{name}">` for custom icons. Fetches once, caches in `localStorage`, no init call.
+A zero-dependency, local-first **On-Demand SVG Sprite Generator** that dynamically monitors, fetches, and compiles SVG icons at runtime.
 
-On-demand SVG icon loader — scans the DOM for `<use href="#ln-*">` and `<use href="#lnc-*">`, fetches each icon individually from CDN, and builds a hidden `<svg>` sprite at runtime. Fetched SVGs are cached in `localStorage` so subsequent page loads resolve instantly without network requests.
+Instead of bundling thousands of heavy vector paths or requiring complex manual build steps, it intercepts standard DOM `<use>` tags, fetches vector definitions from a remote CDN, caches them in `localStorage`, and injects them into a single unified hidden SVG sprite sheet.
 
-## Two Prefixes
+---
 
-| Prefix | Source | Config required |
-|--------|--------|----------------|
-| `#ln-` | [Tabler Icons](https://tabler.io/icons) via jsDelivr | no |
-| `#lnc-` | Your custom CDN | `window.LN_ICONS_CUSTOM_CDN` |
+## 🧭 Philosophy & Architecture
 
-Routing is determined entirely by the prefix — no lists, no config arrays.
+1. **Declarative On-Demand Rendering:** Icons are declared directly in HTML. The component monitors the DOM via `MutationObserver` for `<use>` references with `#ln-` and `#lnc-` prefixes. It only fetches and compiles icons that are actively present on the page.
+2. **Dual-Prefix Routing:**
+   - **`#ln-{name}`**: Automatically routes to the [Tabler Icons](https://tabler.io/icons) library fetched from a public CDN. No configuration required.
+   - **`#lnc-{name}`**: Routes to a custom corporate CDN defined via global window settings.
+3. **Local Caching Layer:** Fetched SVG path structures are instantly cached in `localStorage` under `lni:{id}`. Subsequent visits render icons instantly with zero network roundtrips.
 
-## Integration
+---
 
-### In-Bundle (Standard Integration)
-To load `ln-icons` as part of the unified `ln-ashlar` bundle, include the main script:
+## 📦 Minimal Blueprint
+
+### Native Tabler Icon
 ```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
+<svg class="ln-icon" aria-hidden="true">
+  <use href="#ln-home"></use>
+</svg>
 ```
 
-### Standalone (Zero-Dependency IIFE)
-If you only need the icon loader component, load the compiled zero-dependency IIFE directly:
-```html
-<script src="js/ln-icons/ln-icons.js" defer></script>
-```
-
-### Source Files & Development
-- **Active Development Source**: [js/ln-icons/src/ln-icons.js](file:///c:/laragon/www/ln-ashlar/js/ln-icons/src/ln-icons.js) — The source of truth for component logic.
-- **Compiled Standalone**: [js/ln-icons/ln-icons.js](file:///c:/laragon/www/ln-ashlar/js/ln-icons/ln-icons.js) — The compiled, ready-to-use standalone bundle.
-
-## HTML
-
-```html
-<!-- Tabler icon -->
-<svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg>
-
-<!-- Custom icon -->
-<svg class="ln-icon" aria-hidden="true"><use href="#lnc-file-pdf"></use></svg>
-
-<!-- Icon in a button with text -->
-<button>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
-    Add User
-</button>
-
-<!-- Icon-only button — aria-label required -->
-<button aria-label="Close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-</button>
-```
-
-## Sizes
-
-| Class | Size |
-|-------|------|
-| `ln-icon--sm` | 1rem |
-| *(default)* | 1.25rem |
-| `ln-icon--lg` | 1.5rem |
-| `ln-icon--xl` | 4rem |
-
-## Color
-
-Icons inherit `currentColor` — set via CSS `color` on any ancestor:
-
-```html
-<p class="text-error">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
-    Something went wrong.
-</p>
-```
-
-**Exception:** custom multi-color icons (`lnc-file-pdf`, `lnc-file-doc`, `lnc-file-epub`) have semantic stroke colors embedded in their SVG source and do not follow `currentColor`.
-
-## Toggle Chevron
-
-```html
-<header data-ln-toggle-for="panel1">
-    Section Title
-    <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-</header>
-```
-
-Works inside any `[data-ln-toggle-for]` trigger (accordion items, standalone toggles, sidebar collapses). See [docs/js/icons.md](../../docs/js/icons.md#toggle-chevron) for the CSS rotation mechanism.
-
-## Available Tabler Icons
-
-Any icon from [tabler.io/icons](https://tabler.io/icons). Full name list: `scss/tabler-icons.txt`
-
-## Config
-
-Set on `window` before the script loads:
-
-| Property | Default | Description |
-|---|---|---|
-| `window.LN_ICONS_CDN` | `https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline` | Tabler CDN base URL |
-| `window.LN_ICONS_CUSTOM_CDN` | — | CDN base URL for `lnc-` icons |
-
-### In-Bundle Configuration
+### Custom Asset Icon
+Define your custom CDN endpoint before importing the library:
 ```html
 <script>
-    window.LN_ICONS_CUSTOM_CDN = 'https://your-cdn.com/icons';
+  window.LN_ICONS_CUSTOM_CDN = "https://cdn.mycompany.com/assets/icons";
 </script>
 <script src="dist/ln-ashlar.iife.js" defer></script>
+
+<!-- Renders icon from your custom CDN -->
+<svg class="ln-icon" aria-hidden="true">
+  <use href="#lnc-corporate-logo"></use>
+</svg>
 ```
 
-### Standalone Configuration
-```html
-<script>
-    window.LN_ICONS_CUSTOM_CDN = 'https://your-cdn.com/icons';
-</script>
-<script src="js/ln-icons/ln-icons.js" defer></script>
+---
+
+## 🛠️ Declarative API Contract
+
+### CSS Utility Classes
+
+Configure icon sizes and alignments using standard CSS classes:
+
+| Class | Size | Description |
+| :--- | :--- | :--- |
+| `ln-icon` | `1.25rem` | Base styles, sets `fill: none`, `stroke: currentColor`, inherits color. |
+| `ln-icon--sm` | `1rem` | Small icon, designed for inline text badges or buttons. |
+| `ln-icon--lg` | `1.5rem` | Large icon, designed for toolbar buttons. |
+| `ln-icon--xl` | `4rem` | Extra-large icon, designed for empty state illustrations. |
+| `ln-chevron` | — | Automatically rotates `90deg` when an ancestor `.is-active` class is toggled. |
+
+### Global Configuration (`window`)
+
+Configure these properties before script initialization:
+
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `LN_ICONS_CDN` | `https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline` | Base CDN URL for Tabler Icons. |
+| `LN_ICONS_CUSTOM_CDN` | `null` | Base CDN URL for custom `#lnc-` prefixed SVG resources. |
+
+---
+
+## ⚡ Dynamic Interaction Flow
+
+### Automated Mutation Observability
+The loader observes the DOM continuously. When new content is injected (e.g. by `ln-ajax` or `ln-store`), any new icon `<use>` tag is intercepted, resolved, and rendered.
+
+### Dynamic Attribute Swaps
+Modifying the `href` attribute of a `<use>` element dynamically via JavaScript triggers automatic resolution of the new target icon:
+```javascript
+const useElement = document.querySelector('use');
+// Dynamically fetches and switches the icon to a checkmark
+useElement.setAttribute('href', '#ln-check');
 ```
 
-## Adding a Custom Icon
+---
 
-1. Add `js/ln-icons/icons/{name}.svg` — use `stroke="currentColor"` or `fill="currentColor"`
-2. Run `npm run build` → file appears in `dist/icons/`
-3. Upload `dist/icons/{name}.svg` to your CDN
-4. Use as `<use href="#lnc-{name}">`
+## ⚠️ Common Pitfalls
 
-No config update needed — the `lnc-` prefix routes automatically.
-
-## Caching
-
-Fetched SVG content is stored in `localStorage` with the prefix `lni:` (e.g. `lni:ln-home`). On subsequent page loads, icons are injected from cache without any network requests.
-
-Cache is versioned via `CACHE_VERSION` inside `ln-icons.js`. Bumping the version clears all cached icons and re-fetches them.
-
-## No Init Required
-
-Runs automatically on `DOMContentLoaded`. MutationObserver handles icons added dynamically after page load.
-
-## Dynamic `href` Swaps
-
-Runtime changes to the `href` attribute on a `<use>` element are detected automatically — the new icon is fetched and added to the sprite. This supports patterns like `ln-confirm` swapping an action icon to `#ln-check` on first click.
-
-```js
-// Works without manual intervention — the new icon is fetched on demand:
-useEl.setAttribute('href', '#ln-check');
-```
+- **Forgetting `ln-icon` Class:** Standard SVGs default to `100%` width/height. Failing to include the `ln-icon` class will cause the icon to blow up to full viewport size.
+- **Incorrect Prefix Configuration:** Forgetting to define `window.LN_ICONS_CUSTOM_CDN` when using `#lnc-` will cause the loader to fail silently with undefined endpoint errors.
+- **Omitting `aria-hidden="true"`:** Screen readers attempt to read SVG nodes. Always decorate decorative icons with `aria-hidden="true"`, or include an `aria-label` on their parent button.

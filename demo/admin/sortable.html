@@ -153,7 +153,41 @@
 		<section>
 			<div class="app-content-wrapper">
 <h1>Sortable</h1>
-				<p>Drag &amp; drop reorder component using the Pointer Events API. Works with touch + mouse. The component only reorganizes the DOM — data model sync is the consumer's responsibility via events.</p>
+
+				<!-- Overview / philosophy -->
+				<section class="section-card">
+					<header><h3>Overview &amp; Philosophy</h3></header>
+					<main>
+						<p>Drag-and-drop interfaces in modern web applications are notoriously difficult to implement correctly. Standard HTML5 Drag &amp; Drop APIs are clunky, inconsistent across browsers, and fail completely on touch devices without third-party polyfills. Conversely, heavy UI frameworks require importing megabytes of dependencies just to reorder items inside a list.</p>
+
+						<p>In <code>ln-ashlar</code>, this is solved by <code>ln-sortable</code>, a zero-dependency **Drag &amp; Drop Reordering Primitive**. Built natively on the browser's Pointer Events API, it supports both touch and mouse operations out of the box. It separates visual DOM layout changes from business logic: focusing strictly on re-sorting elements in-place and dispatching high-impact telemetry events so that parent coordinators can synchronize data models or issue server updates.</p>
+
+						<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+							<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+								<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+								The Reordering Doctrine
+							</h4>
+							<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+								A sortable primitive is not responsible for updating databases, syncing state stores, or managing layout transitions. It acts as an isolated DOM manipulator. It provides layout shifts and dispatches index changes, leaving styling to standard CSS classes. <strong>The HTML container attribute is the sole contract.</strong>
+							</p>
+						</div>
+
+						<h4>Architectural Design Features</h4>
+						<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<li>
+								<strong>Pointer API Concurrency:</strong> Unified mouse and touch track tracking. The component locks screen scrolling on drag handles using <code>touch-action: none</code> to prevent drag delays or stuttering on mobile screens.
+							</li>
+							<li>
+								<strong>Attribute Governance:</strong> Drag status is managed entirely by the <code>data-ln-sortable</code> attribute on the parent list. Setting it to <code>"disabled"</code> deactivates sorting instantly, which is perfect during network saves or locked layouts.
+							</li>
+							<li>
+								<strong>Clean Telemetry Hooks:</strong> Emits clean cancelable events (<code>ln-sortable:before-drag</code>) to prevent accidental drags, and completion notifications (<code>ln-sortable:reordered</code>) detailing the exact <code>oldIndex</code> and <code>newIndex</code> shifts for instant store updates.
+							</li>
+						</ol>
+
+						<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-sortable/README.md"><code>ln-sortable</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/sortable.md">architecture reference</a>.</p>
+					</main>
+				</section>
 
 				<!-- Attributes -->
 				<section class="section-card">

@@ -118,21 +118,46 @@
 </script>
 
 <h1>HTTP</h1>
-<p>Two-path HTTP coordinator. Path A wraps <code>window.fetch</code> for transparent URL-keyed dedup of GET / HEAD. Path B is a <code>ln-http:request</code> event with a string <code>key</code> for explicit-cancel of any method (including POST). The two paths share state-tracking maps but otherwise do not interact.</p>
 
-<!-- What it does -->
-<section class="section-card">
-	<header><h3>What it does (short version)</h3></header>
-	<main>
-		<ul>
-			<li><strong>Path A</strong> — wraps <code>window.fetch</code>. Idempotent dedup on GET / HEAD: a new request to the same URL aborts the previous one. POST / PUT / PATCH / DELETE are NEVER auto-cancelled — losing one of two POSTs would silently drop user-intent data.</li>
-			<li><strong>Path B</strong> — listens for <code>ln-http:request</code> on <code>document</code>. If the dispatch carries <code>detail.key</code>, a previous in-flight request with the same key is aborted regardless of method. Response fires as <code>ln-http:response</code> on the original target with the raw <code>Response</code>; the consumer calls <code>.json()</code>.</li>
-			<li><strong>Public API</strong> — <code>lnHttp.cancel(url)</code>, <code>lnHttp.cancelByKey(key)</code>, <code>lnHttp.cancelAll()</code>, <code>lnHttp.inflight</code>, <code>lnHttp.destroy()</code>.</li>
-			<li><strong>What ln-http does NOT do:</strong> no header injection, no auth/CSRF handling, no body shaping, no JSON parsing, no retry, no timeout, no progress events. The consumer composes the request; ln-http coordinates cancellation.</li>
-		</ul>
-		<p>The demos below run against a page-local mock fetch — no server is required. The mock simulates network delay so dedup behavior is observable.</p>
-	</main>
-</section>
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>In modern asynchronous web applications, managing network concurrency is highly complex. Rapid keystrokes inside search fields, quick clicks on list reordering controls, or multi-modal submissions often trigger overlapping HTTP requests. Without strict controls, these requests finish out-of-order, corrupting the UI with stale data ("race conditions") or executing duplicate transactions on the database.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-http</code>, a lightweight, zero-dependency **HTTP Concurrency Coordinator**. Instead of requiring developers to pass manual <code>AbortController</code> signals inside every fetch, `ln-http` operates globally. It coordinates in-flight requests on two parallel channels (Path A and Path B) to handle transparent URL-keyed de-duplication and explicit key-based cancellations.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Concurrency Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									A concurrency coordinator does not inject credentials, authorize tokens, or format JSON bodies. It focuses strictly on request cancellations. It runs as a global utility capturing fetch promises and aborting obsolete ones, leaving custom headers and payloads fully to the caller. <strong>The browser's native AbortController is the underlying contract.</strong>
+								</p>
+							</div>
+
+							<h4>Two Parallel Concurrency Channels</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>Path A (Transparent URL-Keyed GET de-duplication):</strong> Wraps the global <code>window.fetch</code> natively. Whenever a GET or HEAD request is fired, it scans in-flight records. If it finds a matching URL (e.g. during fast keystroke searches), it automatically aborts the previous request. POST, PUT, and DELETE methods are **never** auto-canceled here to prevent dropping user intent.
+								</li>
+								<li>
+									<strong>Path B (Explicit Key-Based Event Cancellation):</strong> Listens for <code>ln-http:request</code> events bubbling from descendants. If the request carries an explicit string `key` (e.g. `reorder-list-1`), any matching in-flight request—regardless of HTTP method—is instantly aborted. This prevents double-click issues on destructive actions and lists reordering.
+								</li>
+							</ol>
+
+							<h4>How the Cancellation Flow Coheres</h4>
+							<p>When a de-duplicated request is canceled:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>A new request arrives on Path A or B, matching the active URL or key.</li>
+								<li>The coordinator calls <code>.abort()</code> on the older request's `AbortController` instantly, and wipes its cache pointer.</li>
+								<li>The browser terminates the older network socket immediately. The initial fetch promise rejects with an <code>AbortError</code>, which is safely captured and ignored by presenters, while the new request runs cleanly.</li>
+							</ol>
+
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-http/README.md"><code>ln-http</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/http.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
 <!-- Demo 1 — Search-as-you-type (Path A) -->
 <section class="section-card" data-demo-html>

@@ -2,11 +2,43 @@
 
 					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>A localStorage-backed draft buffer for HTML forms. Set <code>data-ln-autosave</code> on a <code>&lt;form&gt;</code> with an <code>id</code> and the form's serialised state is written to localStorage on every <code>focusout</code> and <code>change</code>, restored on construction, and cleared on <code>submit</code>, <code>reset</code>, or any click on a <code>[data-ln-autosave-clear]</code> button. The user never sees it work and never sees it not work; they just notice that their form is still filled in when they come back.</p>
-							<p><strong>Storage is localStorage, not IndexedDB or a server endpoint.</strong> localStorage is synchronous (so the save on <code>focusout</code> has no race window with submit), origin-isolated, persisted across tab close, and universally available. <code>ln-store</code> uses IndexedDB for record cache; <code>ln-autosave</code> uses localStorage for form drafts. Different layers, different lifecycles, different keys (<code>ln-autosave:</code> vs <code>ln_app_cache</code>).</p>
-							<p><strong>The save trigger is <code>focusout</code> + <code>change</code>, not <code>input</code>.</strong> Field-boundary events are naturally rate-limited — one save per field-leave, not one per keystroke. The trade-off: a user typing continuously into a single textarea for 30 minutes with no blur triggers ZERO saves. For compose-style editors, add <code>data-ln-autosave-debounce-input</code> to the form (see the section below).</p>
+							<p>Losing filled-out form data due to an accidental tab close, network interruption, or browser crash is one of the most frustrating experiences in web applications. While most developers attempt to solve this by continuously streaming drafts to server-side endpoints, this approach introduces heavy network overhead, concurrency conflicts, and race conditions.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-autosave</code>, a zero-dependency **Draft Buffer Primitive** that handles data persistence entirely on the client. It intercepts standard DOM events on forms, serializes states, and saves drafts directly to <code>localStorage</code>. It is visual-silent, extremely fast, and completely decoupled from network transport layers.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Local Storage Choice
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									Unlike background sync components (which use IndexedDB), <code>ln-autosave</code> relies strictly on synchronous <code>localStorage</code>. This ensures saving occurs immediately on field boundaries (<code>focusout</code> / <code>change</code>) with zero race-condition window on page navigation. Drafts are keyed uniquely via a combination of URL path and element identifier.
+								</p>
+							</div>
+
+							<h4>Concerns Scoped Strictly by Layer</h4>
+							<p>Automatic draft persistence and lifecycle synchronization are achieved by layering separate, orthogonal concerns:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Storage Layer (Browser <code>localStorage</code>):</strong> A synchronous, origin-isolated browser storage engine. It persists values perfectly across tab restarts and system reboots, and automatically cleans up after successful form submissions.
+								</li>
+								<li>
+									<strong>The Form Interface (Native Inputs):</strong> Forms declare draft buffering declaratively using the <code>data-ln-autosave</code> attribute. Inputs preserve native value formatting, options, and radio sets, leaving markup clean and standard.
+								</li>
+								<li>
+									<strong>The Coordinator Integrator (DOM Event Flow):</strong> Because values are restored on load by dispatching synthetic <code>input</code> / <code>change</code> events, sibling primitives like textareas (<code>ln-autoresize</code>) and validation states (<code>ln-validate</code>) re-evaluate themselves automatically.
+								</li>
+							</ol>
+
+							<h4>How the Persistence Flows</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>When a user interacts with a form, fields fire <code>focusout</code> or <code>change</code>. The component intercepts these events, serializes the active form values, and writes them instantly to the resolved <code>localStorage</code> key.</li>
+								<li>On document load, the component initializes, detects any matching localStorage entry, parses the JSON payload, populates form fields, and dispatches synthetic events.</li>
+								<li>When the form is submitted successfully or reset via standard buttons, the component automatically deletes the draft from local storage, leaving a clean workspace.</li>
+							</ol>
+
 							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-autosave/README.md"><code>ln-autosave</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/autosave.md">architecture reference</a>.</p>
 						</main>
 					</section>

@@ -1,7 +1,41 @@
 <!-- ln-page: title="Filter — ln-ashlar" h1="Filter" -->
 
 <h1>Filter</h1>
-				<p>Generic filter component — filters children of a target element by <code>data-*</code> attribute. Supports multi-select: multiple checkboxes can be active simultaneously (OR logic). Works independently alongside <code>ln-search</code>.</p>
+
+				<!-- Overview / philosophy -->
+				<section class="section-card">
+					<header><h3>Overview &amp; Philosophy</h3></header>
+					<main>
+						<p>Navigational and tabular layout filtering in web dashboards often requires heavy JavaScript frameworks to manage checkbox states, coordinate multiple column parameters, and update the view dynamically. Writing custom state management code for every filter bar increases development cost and introduces UI bugs.</p>
+
+						<p>In <code>ln-ashlar</code>, this is solved by <code>ln-filter</code>, a zero-dependency **Generic List &amp; Table Filter Primitive**. Operating as an event-driven layer, it upgrades standard HTML checkboxes. It monitors checklist changes natively, filters list items by dataset attributes or table rows by cell columns, synchronizes active states automatically, and can persist filters in local browser storage across page refreshes.</p>
+
+						<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+							<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+								<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+								The Filter Primitive Doctrine
+							</h4>
+							<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+								A filter primitive does not maintain a virtual state cache or coordinate remote databases. It uses native HTML checkboxes as the single source of truth for its selection state. It maps UI changes directly to visual visibility tokens, allowing items to be filtered immediately in the DOM. <strong>The checked state of standard inputs is the sole contract.</strong>
+							</p>
+						</div>
+
+						<h4>Architectural Design Features</h4>
+						<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+							<li>
+								<strong>Attribute &amp; Tabular Modes:</strong> Toggles visibility of generic list items matching <code>data-{key}="{value}"</code> attributes, or filters standard HTML <code>&lt;table&gt;</code> rows by parsing cell text inside Column Index <code>N</code>.
+							</li>
+							<li>
+								<strong>Multi-Column AND Composition:</strong> Multiple filter instances can coordinate on the same native table target with different column indices (e.g. Department and Status). Checkboxes within a single column are evaluated with OR logic, while filters across different columns combine with AND logic.
+							</li>
+							<li>
+								<strong>Auto-Population &amp; Local Persistence:</strong> When a column filter is given a <code>&lt;template&gt;</code> slot, it dynamically extracts unique sorted cell values from the table to build its checklist on load. Adding <code>data-ln-persist</code> remembers active checkbox selections in the user's browser storage.
+							</li>
+						</ol>
+
+						<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-filter/README.md"><code>ln-filter</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/filter.md">architecture reference</a>.</p>
+					</main>
+				</section>
 
 				<!-- Attributes -->
 				<section class="section-card">

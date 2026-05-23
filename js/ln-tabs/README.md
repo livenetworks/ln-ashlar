@@ -1,289 +1,137 @@
 # ln-tabs
 
-> N-way exclusive panel selection on a single container. `data-ln-tabs-active`
-> on the wrapper is the single source of truth for which tab is active; the JS
-> API is a thin convenience layer over `setAttribute`.
+> N-way exclusive panel selection on a single container, managed reactively via the DOM.
 
-## Philosophy
+---
 
-A tab interface is exactly one active panel at a time. `ln-tabs` centralises
-that invariant in one attribute on the wrapper (`data-ln-tabs-active="<key>"`)
-and lets everything else — ARIA sync, hash deep-linking, `localStorage`
-persistence, auto-focus — flow from it.
+## 1. Philosophy & The Tabs Mindset
 
-Trigger clicks, `hashchange`, persistence restores, external scripts, and
-DevTools all write `data-ln-tabs-active`. A single `MutationObserver` runs
-the activation pipeline (tab button state, panel visibility, ARIA, focus,
-event dispatch, persistence write). There is no second path. For why tabs
-are not built on `ln-toggle`, see [`docs/js/tabs.md`](../../docs/js/tabs.md).
+In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating heavy components that mix state, visual presentation, and layout, `ln-tabs` separates them into isolated concerns:
 
-## HTML contract
+1. **State & ARIA (JavaScript)**: The `ln-tabs` component (145 lines) only manages the active tab key in the DOM, maps namespace URL hashes, handles optional `localStorage` persistence, and synchronizes ARIA accessibility. It possesses zero visual styles.
+2. **Visual Presentation (CSS)**: Visual layouts, borders, alignments, and active indicator designs are handled in Vanilla CSS. The library ships mixins like `@mixin tabs-nav`, `@mixin tabs-tab`, and `@mixin tabs-panel` to handle this elegantly.
+3. **Decoupled Binding (HTML)**: Tab triggers and panels are paired purely by string keys (`data-ln-tab="key"` and `data-ln-panel="key"`), decoupled from their relative DOM positions.
 
-The full annotated example. Every required attribute is called out.
+### Why not built on `ln-toggle`?
+While similar on the surface, their contracts diverge. `ln-toggle` is a binary disclosure primitive (using `aria-expanded`). `ln-tabs` is an N-way exclusive tablist (using `aria-selected` and `aria-hidden`) that supports advanced, namespace-scoped URL deep-linking out of the box.
+
+---
+
+## 2. Minimal Blueprint
+
+Triggers and panels are bound via matching keys inside a wrapper. Inactive panels must carry `class="hidden"` to prevent a layout flash before initialization.
 
 ```html
-<!-- Wrapper — id doubles as the hash namespace. Use <section>, <div>, or <article>.
-     Do NOT use <main> (spec allows only one per page). -->
 <section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
-
-    <!-- Tab buttons — inside a <form> every button needs type="button"
-         to prevent accidental form submission on click. -->
+    <!-- Tab list (triggers) -->
     <nav>
         <button type="button" data-ln-tab="info">Information</button>
         <button type="button" data-ln-tab="settings">Settings</button>
-        <button type="button" data-ln-tab="history">History</button>
     </nav>
 
-    <!-- Panels — inactive panels MUST start with class="hidden" to avoid
-         a flash of all-panels-stacked before the component initializes. -->
-    <section data-ln-panel="info">…</section>
-    <section data-ln-panel="settings" class="hidden">…</section>
-    <section data-ln-panel="history"  class="hidden">…</section>
-
+    <!-- Tab panels -->
+    <section data-ln-panel="info">
+        <p>This is the info panel.</p>
+    </section>
+    <section data-ln-panel="settings" class="hidden">
+        <p>This is the settings panel.</p>
+    </section>
 </section>
 ```
 
-What each piece does:
+### Key Anatomy Rules
+- **The Wrapper (`data-ln-tabs`)**: Creates the tabs root instance.
+- **The Trigger (`data-ln-tab="key"`)**: Marks the element as a click target. Must be a `<button>` (with `type="button"` inside forms) or an `<a>` anchor.
+- **The Panel (`data-ln-panel="key"`)**: Matches the trigger by key. Inactive panels must carry `class="hidden"`.
 
-- `data-ln-tabs` on wrapper — creates the instance. Value unused.
-- `data-ln-tabs-active` — written by the component after init. The observer watches it.
-- `id="user-tabs"` — doubles as the hash namespace; enables hash deep-linking. Omit for transient tabs (no URL change on click).
-- `data-ln-tabs-default="info"` — which tab is active on first load. Falls back to the first `[data-ln-tab]` if absent.
-- `data-ln-tab="key"` on a button or anchor — marks the element as a trigger; value is the key (normalized lowercase).
-- `data-ln-panel="key"` on a panel — pairs with the trigger by key. Match must be exact (after normalization).
-- `class="hidden"` on inactive panels — required to prevent flash of all-panels-visible before init.
-- `type="button"` on tab buttons — required when tabs live inside a `<form>` (default type is `submit`).
+---
 
-### Trigger shape table
+## 3. The Declarative API & State Contract
 
-Tab triggers may be `<button>` or `<a href="…">`:
+There are no imperative JavaScript methods (like `activate()` or `open()`) on the component instance. **The HTML attribute is the sole contract.** 
 
-| Form | Markup | Notes |
-|---|---|---|
-| `<button>` | `<button data-ln-tab="settings">` | Key from attribute value. |
-| `<a>` explicit | `<a href="#user-tabs:settings" data-ln-tab="settings">` | Explicit `data-ln-tab` value wins. |
-| `<a>` boolean | `<a href="#user-tabs:settings" data-ln-tab>` | Key derives from `href`. Canonical form for shareable URLs. |
-
-Anchor triggers get `e.preventDefault()` on click so the browser's default
-navigation does not race with the JS hash write. Ctrl/Meta-click and
-middle-click skip `preventDefault` — the standard "open in new tab" affordance
-still works.
-
-### Optional full WAI-ARIA triplet
-
-The component writes `aria-selected` on tab buttons and `aria-hidden` on
-panels but does NOT auto-inject `role="tablist"` / `role="tab"` /
-`role="tabpanel"` — wrapper element type varies and we do not want to
-overwrite a consumer's `role="region"`. If your audit requires full WAI-ARIA
-compliance, ship the roles in markup:
-
-```html
-<section id="user-tabs" data-ln-tabs>
-    <nav role="tablist">
-        <button role="tab" aria-controls="info-panel" data-ln-tab="info">Info</button>
-    </nav>
-    <section role="tabpanel" id="info-panel" data-ln-panel="info">…</section>
-</section>
-```
-
-## JS API
-
-Each `[data-ln-tabs]` element gets a per-element instance at `element.lnTabs`.
-The constructor is registered globally as `window.lnTabs`.
+Clicks, URL hash changes, localStorage restorations, and external scripts all change state by writing the active attribute on the wrapper:
 
 ```js
 const tabs = document.getElementById('user-tabs');
 
-tabs.setAttribute('data-ln-tabs-active', 'settings');  // switch tab
-tabs.getAttribute('data-ln-tabs-active');               // read current key
-tabs.lnTabs.destroy();                                  // detach listeners, dispatch :destroyed
+// Canonical write — switches the active tab
+tabs.setAttribute('data-ln-tabs-active', 'settings');
+
+// Read-only state query
+tabs.getAttribute('data-ln-tabs-active'); // Returns currently active key
 ```
 
-The attribute is the only mutator. There is no `activate()` / `open()` /
-`close()` method — every consumer (trigger click, hashchange listener, external
-script, DevTools) writes `data-ln-tabs-active` and the observer runs the
-pipeline. `destroy()` is the only public method, and it does real cleanup the
-attribute alone cannot.
+### Attributes
+- `data-ln-tabs`: Placed on the wrapper to create the instance.
+- `data-ln-tabs-active`: Currently active key (written by the component, watched by the observer).
+- `data-ln-tabs-default="key"`: Default key selected on load. Falls back to the first tab trigger if omitted.
+- `data-ln-tabs-focus="false"`: Opt out of auto-focusing the first focusable element inside the active panel. Default: enabled.
+- `data-ln-tabs-key="name"`: Hash namespace. Falls back to wrapper `id` if omitted.
+- `id="name"`: Enables hash sync. The wrapper `id` acts as the URL namespace key.
+- `data-ln-persist`: Saves the active tab key in `localStorage` (effective only when hash sync is OFF).
 
-`window.lnTabs(root)` upgrades a custom root (Shadow DOM, iframe). Ordinary
-AJAX inserts and `setAttribute` on existing elements are handled automatically
-by the document-level observer.
+---
 
-## Events
+## 4. Transition Events
 
 All events bubble. The dispatch target is the wrapper element.
 
-| Event | Cancelable | `detail` | Dispatched when |
+| Event | Cancelable | `detail` | Dispatched When |
 |---|---|---|---|
-| `ln-tabs:change` | no | `{ key, tab, panel }` | After the active panel is swapped, ARIA synced, focus moved (if enabled), and `localStorage` written. The pipeline is fully complete. |
-| `ln-tabs:destroyed` | no | `{ target }` | After `destroy()` removes click and hashchange listeners and deletes the instance. |
-
-There is no `:before-change` — the activation pipeline has no cancelable
-side-effects worth gating. If you need a "block this navigation" hook (unsaved
-form changes), wire it on the trigger click: listen on `[data-ln-tab]` clicks,
-check the current panel, and call `event.preventDefault()` before the click
-bubbles.
+| **`ln-tabs:change`** | No | `{ key, tab, panel }` | After the active panel is swapped, ARIA synced, focus moved (if enabled), and localStorage updated. |
+| **`ln-tabs:destroyed`** | No | `{ target }` | Inside `destroy()`, after removing click and hashchange listeners. |
 
 ```js
-// Document-level delegation — every tabs instance on the page
-document.addEventListener('ln-tabs:change', e => {
-    analytics.track('tab_change', {
-        section: e.target.id,
-        tab:     e.detail.key,
-    });
+// Example: Listen for tab changes
+document.addEventListener('ln-tabs:change', (e) => {
+    console.log(`Active tab in ${e.target.id} changed to: ${e.detail.key}`);
 });
 ```
 
-## Attribute reference
+---
 
-| Attribute | On | Description |
-|---|---|---|
-| `data-ln-tabs` | wrapper | Creates the instance. Value unused. Presence creates the component; active key lives separately on `data-ln-tabs-active`. |
-| `data-ln-tabs-active` | wrapper | Currently active key. **Written by the component**; watched by the observer. Single source of truth. |
-| `data-ln-tabs-default="key"` | wrapper | Default key when nothing else picks one. Falls back to the first `[data-ln-tab]` if absent. |
-| `data-ln-tabs-focus="false"` | wrapper | Opt out of auto-focus on the panel's first focusable element after activation. Default: enabled. Opt out for panels that host charts, iframes, or other elements where stealing focus is jarring. |
-| `data-ln-tabs-key="name"` | wrapper | Hash namespace when `id` is unsuitable (e.g. multiple instances from the same template). Falls back to `id`. |
-| `id="name"` | wrapper | Doubles as the hash namespace if `data-ln-tabs-key` is absent. An `id` enables hash sync; omit it for transient tabs that should not write to the URL. |
-| `data-ln-tab="key"` | trigger | Marks the element as a tab trigger. Value is the key (normalized lowercase). Boolean form (`data-ln-tab` with no value) valid only on `<a href="…">`. |
-| `data-ln-panel="key"` | panel | Marks the panel and declares its key. Must match a `data-ln-tab` value. |
-| `data-ln-persist` | wrapper | Opt in to `localStorage` persistence. Boolean form requires `id`; explicit form is `data-ln-persist="custom-key"`. **Mutually exclusive with hash sync** — silently ignored when `id` or `data-ln-tabs-key` is present (hash wins). |
+## 5. Integration Patterns
 
-Output attributes written by the component (do not set these manually):
-
-| Attribute | On | When |
-|---|---|---|
-| `data-ln-tabs-active` | wrapper | Set at init; updated on every tab switch. |
-| `data-active` | active tab button | Present on the active tab; absent on others. |
-| `aria-selected` | every tab button | `"true"` on the active tab, `"false"` on others. |
-| `aria-hidden` | every panel | `"false"` on the active panel, `"true"` on others. |
-
-## Persistence
-
-Add `data-ln-persist` to a wrapper to remember the active key in
-`localStorage` across page loads. **Only effective when hash sync is OFF**
-(no `id` or `data-ln-tabs-key`). With hash sync on, the URL is the source of
-persistence and `data-ln-persist` is silently ignored — the URL always wins
-because it is user-visible and shareable.
-
-For storage-key format, fallback behaviour in private browsing, and
-`data-ln-persist="custom-key"` overrides, see
-[`docs/js/core.md`](../../docs/js/core.md).
-
-## What it does NOT do
-
-The component is intentionally narrow. These are NOT tab concerns:
-
-- **No animated panel transitions.** Switching flips `.hidden` on panels — a `display: none` toggle. No fade, no slide, no crossfade.
-- **No keyboard arrow navigation.** Arrow Left/Right/Home/End do not move focus or activation. Tab key cycles through buttons via browser default; Enter/Space activates. Arrow nav is a WAI-ARIA enhancement; wire it on the consumer side if your audit requires it.
-- **No lazy-loading.** All panels are in the DOM at init; inactive panels are hidden, not removed. Lazy loading is consumer-side — listen for `ln-tabs:change`.
-- **No scroll-position memory per panel.** Switching from a scrolled panel back resets to the top.
-
-## Examples
-
-### Plain tabs (no hash, no persistence)
-
+### A. Hash-Deep-Linkable Tabs (URL-as-State)
+Add an `id` to the wrapper. Clicking tabs automatically writes to the URL hash (e.g. `#user-tabs:settings`). Sharing, bookmarking, or using back/forward buttons restores the active tab on load.
 ```html
-<section data-ln-tabs data-ln-tabs-default="overview">
-    <nav>
-        <button type="button" data-ln-tab="overview">Overview</button>
-        <button type="button" data-ln-tab="details">Details</button>
-    </nav>
-    <section data-ln-panel="overview">…</section>
-    <section data-ln-panel="details" class="hidden">…</section>
-</section>
+<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">...</section>
 ```
 
-No `id`, no `data-ln-tabs-key`, no `data-ln-persist`. Active key lives only in
-`data-ln-tabs-active`. Reload the page and the default tab is selected — the
-right choice for ephemeral tab UIs (e.g. inside a modal that closes between
-visits).
-
-### Hash-deep-linkable tabs
-
+### B. Anchor Triggers (Deep Links)
+Use `<a>` triggers with matching `href` format and boolean `data-ln-tab` attributes. Right-click copy link and middle-click "open in new tab" work out of the box.
 ```html
-<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
-    <nav>
-        <button type="button" data-ln-tab="info">Information</button>
-        <button type="button" data-ln-tab="settings">Settings</button>
-    </nav>
-    <section data-ln-panel="info">…</section>
-    <section data-ln-panel="settings" class="hidden">…</section>
-</section>
+<a href="#user-tabs:info" data-ln-tab>Information</a>
+<a href="#user-tabs:settings" data-ln-tab>Settings</a>
 ```
 
-Open the page at `/admin/users#user-tabs:settings` → Settings is active on
-first paint. Click Information → URL becomes `#user-tabs:info`. Bookmark,
-share, hit the back button — URL-as-state. Multiple independent tablists on the
-same page use separate namespaces: `#user-tabs:info&project-tabs:members`.
+### C. Multiple Independent Tabsets
+Multiple independent tabsets on the same page will coexist cleanly in the URL hash, namespaced by their respective wrapper `id`s (e.g., `#user-tabs:settings&project-tabs:members`).
 
-### Anchor triggers (shareable links)
-
+### D. Persistent Tabs (Without URL Hash)
+Omit the wrapper `id` and add `data-ln-persist="key"` to remember the active tab in `localStorage` without changing the URL hash.
 ```html
-<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
-    <nav>
-        <a href="#user-tabs:info"      data-ln-tab>Information</a>
-        <a href="#user-tabs:settings"  data-ln-tab>Settings</a>
-        <a href="#user-tabs:history"   data-ln-tab>History</a>
-    </nav>
-    <section data-ln-panel="info">…</section>
-    <section data-ln-panel="settings" class="hidden">…</section>
-    <section data-ln-panel="history"  class="hidden">…</section>
-</section>
+<section data-ln-tabs data-ln-persist="settings-tabs" data-ln-tabs-default="general">...</section>
 ```
 
-Right-click → copy link → paste into a new browser → the right tab is active on
-first paint. Middle-click opens in a new tab. The `href` IS the canonical hash
-format — `data-ln-tab` without a value tells the component to derive the key
-from the `href`.
+---
 
-### Persistent tabs without hash sync
+## 6. Integration & Source Files
 
-```html
-<section data-ln-tabs data-ln-persist="settings-tabs" data-ln-tabs-default="general">
-    <nav>
-        <button type="button" data-ln-tab="general">General</button>
-        <button type="button" data-ln-tab="security">Security</button>
-        <button type="button" data-ln-tab="notifications">Notifications</button>
-    </nav>
-    <section data-ln-panel="general">…</section>
-    <section data-ln-panel="security"       class="hidden">…</section>
-    <section data-ln-panel="notifications"  class="hidden">…</section>
-</section>
-```
+- **Unified Bundle**: Loaded automatically with the main bundle:
+  ```html
+  <script src="dist/ln-ashlar.iife.js" defer></script>
+  ```
+- **Standalone IIFE**: For lightweight pages, load the standalone, self-registering IIFE version:
+  ```html
+  <script src="js/ln-tabs/ln-tabs.js" defer></script>
+  ```
+- **Active Source (ESM)**: Development source is located at [js/ln-tabs/src/ln-tabs.js](file:///c:/laragon/www/ln-ashlar/js/ln-tabs/src/ln-tabs.js).
 
-No `id` (no hash sync), explicit `data-ln-persist="settings-tabs"` (storage key
-doesn't depend on a generated `id`). The user's active tab is remembered across
-page loads via `localStorage`. Useful for settings pages where "last tab I was
-on" is the expected restore.
+---
 
-## Integration & Source Files
-
-### Loading the Component
-
-The `ln-tabs` component can be integrated into your project using one of the following methods:
-
-#### 1. In-Bundle (Standard Integration)
-Include the main unified `ln-ashlar` bundle to load all component observers together, which is standard for full application environments:
-```html
-<script src="dist/ln-ashlar.iife.js" defer></script>
-```
-
-#### 2. Standalone (Zero-Dependency IIFE)
-If you only need tab navigation without the rest of the bundle, load the standalone, self-registering IIFE version of the component directly:
-```html
-<script src="js/ln-tabs/ln-tabs.js" defer></script>
-```
-
-### Source Files
-
-For reference, active development, or customization, the component's codebase is structured into two main files:
-
-* **Active Development Source (ESM)**: The primary development file where all component features, state-checking, and event dispatches are implemented is [js/ln-tabs/src/ln-tabs.js](file:///c:/laragon/www/ln-ashlar/js/ln-tabs/src/ln-tabs.js).
-* **Compiled Standalone (IIFE)**: The built zero-dependency distribution version compiled for browser execution is [js/ln-tabs/ln-tabs.js](file:///c:/laragon/www/ln-ashlar/js/ln-tabs/ln-tabs.js).
-
-## See also
-
-- **[`ln-toggle`](../ln-toggle/README.md)** — binary open/close primitive.
-- **[`ln-accordion`](../ln-accordion/README.md)** — single-open coordinator built on `ln-toggle`. Contrast: accordion enforces single-open reactively; tabs enforce it by construction.
-- **`@mixin tabs-nav`, `@mixin tabs-tab`, `@mixin tabs-panel`** (`scss/config/mixins/_tabs.scss`) — the visual recipe.
-- **Architecture deep-dive:** [`docs/js/tabs.md`](../../docs/js/tabs.md) — observer wiring, hash round-trip, anchor key derivation, persistence internals.
+## Related
+- **[`ln-toggle`](../ln-toggle/README.md)** — Binary disclosure state primitive.
+- **[`ln-accordion`](../ln-accordion/README.md)** — Single-open coordinator built on `ln-toggle`.
+- **Architecture deep-dive** — [`docs/js/tabs.md`](../../docs/js/tabs.md).

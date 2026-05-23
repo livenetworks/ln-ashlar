@@ -1,7 +1,41 @@
 <!-- ln-page: title="Translations — ln-ashlar" h1="Translations" -->
 
 <h1>Translations</h1>
-					<p>Inline translation system for forms. Adds translation inputs below translatable fields.</p>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>Building forms that support multi-lingual input editing presents massive layout and data organization challenges. Standard approaches either require developers to render side-by-side tabs for every single field—bloating the DOM and confusing the user—or build heavy client-side templates that serialize and parse nested JSON fields manually before sending requests to the server.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-translations</code>, a zero-dependency **Form Translation Coordinator**. Operating as a form-level supervisor, it intercepts language selection events, manages active language list badges, and dynamically duplicates translatable fields inside the DOM. It automatically handles input cloning, coordinates custom menus, auto-detects pre-rendered server payloads, and generates structured name attributes ready for backend database mapping.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Translation Mapping Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									A translation utility should only coordinate input fields and serialization layouts. It remains detached from language dictionaries or API translating services. It operates on structured form boundaries, mapping fields dynamically using deterministic HTML attributes. <strong>The generated input name attribute is the sole contract.</strong>
+								</p>
+							</div>
+
+							<h4>Key Architectural Advantages</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>On-Demand Field Cloning:</strong> Translatable containers carrying <code>data-ln-translatable</code> serve as templates. When a language is toggled, the coordinator clones the internal input or textarea, sets appropriate placeholder guides, and mounts it cleanly.
+								</li>
+								<li>
+									<strong>Clean Serialization Prefixes:</strong> Supports simple fields and complex nested lists. Cloned inputs compile structured array names (e.g. <code>trans[en][title]</code> or <code>items[1][trans][en][title]</code>), allowing standard form submissions to parse arrays natively.
+								</li>
+								<li>
+									<strong>Server &amp; UI Coordination:</strong> Detects pre-rendered localized fields on load seamlessly, integrates with `ln-dropdown` to manage locale selection menus, and renders active language badges using standard HTML <code>&lt;template&gt;</code> elements.
+								</li>
+							</ol>
+
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-translations/README.md"><code>ln-translations</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/translations.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
 					<!-- Basics -->
 					<section class="section-card">

@@ -2,11 +2,43 @@
 
 					<!-- Overview / philosophy -->
 					<section class="section-card">
-						<header><h3>Overview</h3></header>
+						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>A 109-line two-click gate for destructive actions. Set <code>data-ln-confirm="Are you sure?"</code> on the destructive button. First click is silently swallowed and the button morphs into the prompt; second click within the timeout (default 3 seconds) passes through to whatever the button was already going to do — submit a form, follow a link, run an existing click handler. Auto-reverts if the second click does not arrive.</p>
-							<p><code>window.confirm()</code> is banned in this project — synchronous (freezes the page), unstyleable (looks like a 1998 system dialog), unkeyboardable in some browsers, untranslatable. <code>ln-confirm</code> is the lighter answer: the destructive button becomes its own gate. There is no separate dialog, no <code>:accept</code> callback, no rewiring of the form's <code>action</code> or the button's <code>onclick</code>. The platform's native event flow runs unmodified on the second click.</p>
-							<p><strong>The accept semantic IS the platform <code>click</code>.</strong> ln-confirm intercepts the first click via <code>preventDefault</code> + <code>stopImmediatePropagation</code>, but the second click is released — no <code>preventDefault</code>, no <code>stopImmediatePropagation</code>. The form submits, the link navigates, the existing click handler fires. There is exactly one custom event: <code>ln-confirm:waiting</code> on the FIRST click, for analytics. There is no <code>ln-confirm:accept</code>. If you need to run code on accept, attach to the form's <code>submit</code>, the button's <code>click</code>, or the link's navigation — exactly as you would without <code>ln-confirm</code>.</p>
+							<p>Confirming dangerous or destructive actions (like deleting a user or clearing a database) is a critical requirement in modern admin interfaces. Traditionally, libraries solve this by blocking interaction with heavy modals or using browser-native <code>window.confirm()</code> dialogues, which freeze thread execution, look unstyled, and disrupt developer flows.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-confirm</code>, an ultra-lightweight **Interaction Gate Primitive** (~109 lines of JavaScript). Instead of popping up disruptive separate overlays, it turns the target button itself into a self-contained, two-click confirmation gate. It swallows the first click, morphs in-place to reveal the confirmation prompt, and releases the second click directly to the platform's native event processors.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The In-Place Action Gate
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									The confirmation action IS the platform click. The script intercepts the first click via event prevention and propagation stopping, but releases the second click completely. If clicked within the armed timeout, the form submits, the link navigates, and existing AJAX handlers fire naturally. <strong>There is no rewrite of the default action.</strong>
+								</p>
+							</div>
+
+							<h4>Orthogonal Layers of Danger Gating</h4>
+							<p>Destructive confirmation is achieved by separating visual morphs, automatic timing, and platform defaults:</p>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Platform Default (Trigger Action):</strong> The core action — standard form submits (<code>type="submit"</code>) or link targets (<code>href</code>) — is declared natively on the HTML button or link, untouched by the component.
+								</li>
+								<li>
+									<strong>The Visual Morph (In-Place States):</strong> The button represents its state through HTML attributes (<code>data-confirming="true"</code>). CSS mixins (<code>@include confirm-tooltip</code>) read attributes to transition text values or reveal overlay icon tooltips.
+								</li>
+								<li>
+									<strong>The State Gate (<code>ln-confirm</code>):</strong> The JavaScript component coordinates the armed state. It schedules the countdown timer, intercepts the first user interaction, and reverts labels or icon paths on expiration.
+								</li>
+							</ol>
+
+							<h4>How the Interaction Flows</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>The user clicks a destructive button. The component intercepts the event, calls <code>e.preventDefault()</code> and <code>e.stopImmediatePropagation()</code>, transitions the button to <code>data-confirming="true"</code>, replaces its label/icon with the armed prompt, schedules an auto-revert timer, and dispatches <code>ln-confirm:waiting</code>.</li>
+								<li>If the user clicks the armed button again before the timer expires, the component intercepts the second click, runs cleanups synchronously, and lets the event pass through. The browser executes the natural submit, navigate, or AJAX handler.</li>
+								<li>If the timer expires before a second click arrives, the button automatically clears the armed state, restores its original text or icon, and disarms.</li>
+							</ol>
+
 							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-confirm/README.md"><code>ln-confirm</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/confirm.md">architecture reference</a>.</p>
 						</main>
 					</section>

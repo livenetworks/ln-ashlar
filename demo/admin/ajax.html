@@ -153,7 +153,48 @@
 		<section>
 			<div class="app-content-wrapper">
 <h1>AJAX</h1>
-					<p>Navigation component — links and forms inside a <strong>data-ln-ajax</strong> container are sent asynchronously, without a full page reload.</p>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>Single Page Applications (SPAs) often come with massive architectural overhead: requiring developers to ship megabytes of client-side routing bundles, re-implement layout structures in JavaScript templates, and manage heavy state synchronization pipelines simply to update a view when clicking a link.</p>
+
+							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-ajax</code>, a zero-dependency **Navigation &amp; Swapping Primitive**. Instead of building a complex client-side router, it upgrades standard HTML links and forms. It intercepts clicks and form submissions, requests server-side JSON representations of target pages, and swaps pre-compiled HTML fragments directly into the DOM while updating the browser's address history.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Swapping Doctrine
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									An AJAX primitive has no internal routes, layout schemas, or database caches. It expects the server to act as the single source of truth for pages, returning structured JSON payloads containing page titles, DOM target selectors, and new HTML chunks to inject. <strong>The server-rendered HTML fragment is the final contract.</strong>
+								</p>
+							</div>
+
+							<h4>Three Orthogonal Layers of the Navigation Lifecycle</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Navigation Trigger (Native HTML Links &amp; Forms):</strong> Elements declare AJAX capabilities declaratively using the <code>data-ln-ajax</code> attribute. Clicking a link or submitting a form initiates the asynchronous lifecycle.
+								</li>
+								<li>
+									<strong>The Transport Layer (AJAX Request):</strong> Handles the network exchange: adding CSRF token headers, preparing FormData, checking authorization boundaries, and communicating with server endpoints.
+								</li>
+								<li>
+									<strong>The DOM Reconciliation Layer (Page Swap):</strong> Receives the server's structured JSON payload. It parses HTML fragments, matches target selectors (e.g. replacing `#main-content`), updates page titles, and commits the address bar state via browser History APIs.
+								</li>
+							</ol>
+
+							<h4>How the Page Swapping Flows</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>A user clicks an AJAX-marked link. The component intercepts the event, adds the loading class <code>.ln-ajax--loading</code> to the container, and dispatches a bubbled <code>ln-ajax:before-start</code> event.</li>
+								<li>It fires a background GET request. The server intercepts the request and responds with a JSON payload specifying which parts of the page to replace.</li>
+								<li>The component swaps the HTML segments in-place, updates the browser's address history, dispatches `ln-ajax:success`, and clears loading classes. Newly loaded forms are immediately upgraded.</li>
+							</ol>
+
+							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-ajax/README.md"><code>ln-ajax</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/ajax.md">architecture reference</a>.</p>
+						</main>
+					</section>
 
 					<!-- Basics -->
 					<section class="section-card">
