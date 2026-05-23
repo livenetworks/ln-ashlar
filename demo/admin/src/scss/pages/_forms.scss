@@ -17,43 +17,13 @@
 	.form-element { grid-column: span 3; }
 }
 
-// ─── Pill labels demo ────────────────────────────────────────
-
-#demo-pills-filled,
-#demo-pills-outline {
-	@include flex;
-	@include gap(var(--size-xl));
-
-	fieldset {
-		border: none;
-		padding: 0;
-		margin: 0;
-		@include flex;
-		@include flex-wrap;
-		@include gap(var(--size-sm));
-
-		legend {
-			@include text-sm;
-			color: var(--fg-muted);
-			@include font-medium;
-			@include mb(var(--size-sm));
-			float: left;
-			width: 100%;
-		}
-	}
-}
-
-// Outline variant — overrides the global pill default for this demo only.
-#demo-pills-outline {
-	fieldset > ul:has(> li > label > input[type="checkbox"]),
-	fieldset > ul:has(> li > label > input[type="radio"]) {
-		@include pill-group;
-	}
-
-	fieldset > ul > li > label:has(> input[type="checkbox"]),
-	fieldset > ul > li > label:has(> input[type="radio"]) {
-		@include pill-outline;
-	}
+// ─── Pill labels demo — custom standalone outline helper ───────────────────
+.demo-standalone-outline {
+	@include inline-flex;
+	gap: var(--size-xs);
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
 // ─── Input states demo ──────────────────────────────────
