@@ -6,6 +6,7 @@
 .app-sidebar      { @include sidebar; @include sidebar-drawer; }
 .app-scrim        { @include app-scrim; }
 .app-footer       { @include app-footer; }
+.app-content-wrapper { @include app-content-wrapper; }
 
 // Header region structural classes — same tier as .app-header itself.
 .header-left      { @include app-header-left; }

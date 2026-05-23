@@ -222,8 +222,6 @@
 		// against the actual section edges.
 		padding-inline: var(--padding-x);
 		@include overflow-auto;
-		max-width: var(--max-w-container);
-		@include mx(auto);
 		@include w-full;
 		@include stack(var(--gap));
 		@include transition;
@@ -304,3 +302,11 @@
 // @mixin app-footer — extracted to _footer.scss.
 // Forwarded by _index.scss. Consumers: `.app-footer` (components/_app-shell.scss)
 // and `<aside> > footer` (via @mixin sidebar in _sidebar.scss).
+
+@mixin app-content-wrapper {
+	max-width: var(--max-w-container);
+	@include mx(auto);
+	@include w-full;
+	@include stack(var(--gap));
+}
+
