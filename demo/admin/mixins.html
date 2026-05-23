@@ -860,6 +860,7 @@ table {
 								<tr><td><code>@include form-input</code></td><td>Base input styling: border, focus ring, placeholder, disabled state</td></tr>
 								<tr><td><code>@include form-textarea</code></td><td>Min-height 6rem, vertical resize</td></tr>
 								<tr><td><code>@include form-select</code></td><td>Custom appearance with SVG arrow indicator</td></tr>
+								<tr><td><code>@include form-input-icon-group</code></td><td>Label wrapping icon(s) + input. Handles flex layout and focus ring</td></tr>
 								<tr><td><code>@include form-check</code></td><td>Base checkbox/radio: appearance none, custom border, checked state</td></tr>
 								<tr><td><code>@include form-checkbox</code></td><td>Checkbox: form-check + rounded-sm corners</td></tr>
 								<tr><td><code>@include form-radio</code></td><td>Radio: form-check + circle + dot indicator</td></tr>
@@ -868,7 +869,12 @@ table {
 								<tr><td><code>@include form-validate-errors</code></td><td>Error message list: no bullets, caption size, error color, top margin</td></tr>
 								<tr><td><code>@include pill-outline</code></td><td>Base pill label: structure + visible border + visible input indicator</td></tr>
 								<tr><td><code>@include pill</code></td><td>Filled pill label: extends pill-outline, gray bg, colored on checked, input hidden</td></tr>
-								<tr><td><code>@include pill-group</code></td><td>Joined pills: no gap, border-radius on first/last child only. For radio/checkbox groups</td></tr>
+								<tr><td><code>@include pill-group</code></td><td>Joined pills (base modifier): border-radius on first/last child only</td></tr>
+								<tr><td><code>@include pills</code></td><td>Joined-group filled pills: apply to <code>&lt;ul&gt;</code> containing <code>&lt;li&gt;&lt;label&gt;&lt;input&gt;</code></td></tr>
+								<tr><td><code>@include pills-outline</code></td><td>Joined-group outline pills: apply to <code>&lt;ul&gt;</code> containing <code>&lt;li&gt;&lt;label&gt;&lt;input&gt;</code></td></tr>
+								<tr><td><code>@include toggle-switch</code></td><td>Base switch element (applied to <code>&lt;input type="checkbox"&gt;</code>)</td></tr>
+								<tr><td><code>@include pill-switch</code></td><td>Switch label: layout with text + switch</td></tr>
+								<tr><td><code>@include pills-switch</code></td><td>Vertical list of switches (applied to <code>&lt;ul&gt;</code>)</td></tr>
 								<tr><td><code>@include check-list-outline</code></td><td>Vertical label list with pill-outline labels (visible input, bordered)</td></tr>
 								<tr><td><code>@include check-list</code></td><td>Vertical label list with filled pill labels (extends check-list-outline)</td></tr>
 							</tbody>
