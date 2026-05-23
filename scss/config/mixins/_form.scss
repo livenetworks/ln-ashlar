@@ -6,6 +6,8 @@
 @use 'colors' as *;
 @use 'borders' as *;
 @use 'transitions' as *;
+@use 'motion' as *;
+@use 'layout' as *;
 @use 'interaction' as *;
 @use 'position' as *;
 @use 'focus' as *;
@@ -312,6 +314,7 @@
 	border: var(--border-width) solid var(--color-border);
 	// Reset pill's filled bg. Outline = transparent surface.
 	background: transparent;
+	position: relative;
 
 	// Restore the native input indicator. `display: revert` returns the
 	// UA default (inline-block for checkbox/radio) and cleanly undoes
@@ -323,10 +326,12 @@
 		color: var(--color-accent);
 		// Reset pill's accent fill on checked — outline stays transparent.
 		background: transparent;
+		z-index: 1;
 	}
 
 	&:hover:not(:has(> input:checked)) {
 		border-color: var(--color-accent);
+		z-index: 1;
 	}
 }
 
@@ -423,6 +428,121 @@
 	> li:only-child > label:has(> input[type="checkbox"]),
 	> li:only-child > label:has(> input[type="radio"]) {
 		border-radius: var(--radius);
+	}
+}
+
+@mixin pills-outline {
+	@include inline-flex;
+
+	> li {
+		position: relative;
+
+		&:not(:first-child) {
+			margin-left: calc(var(--border-width) * -1);
+		}
+
+		&:hover,
+		&:has(> label > input:checked) {
+			z-index: 1;
+		}
+	}
+
+	> li > label:has(> input[type="checkbox"]),
+	> li > label:has(> input[type="radio"]) {
+		@include pill-outline;
+		border-radius: 0;
+	}
+
+	> li:first-child > label:has(> input[type="checkbox"]),
+	> li:first-child > label:has(> input[type="radio"]) {
+		border-radius: var(--radius) 0 0 var(--radius);
+	}
+
+	> li:last-child > label:has(> input[type="checkbox"]),
+	> li:last-child > label:has(> input[type="radio"]) {
+		border-radius: 0 var(--radius) var(--radius) 0;
+	}
+
+	> li:only-child > label:has(> input[type="checkbox"]),
+	> li:only-child > label:has(> input[type="radio"]) {
+		border-radius: var(--radius);
+	}
+}
+
+@mixin toggle-switch {
+	appearance: none;
+	position: relative;
+	width: 2.5rem;
+	height: 1.5rem;
+	--color-bg: var(--border-strong);
+	background: var(--color-bg);
+	border-radius: var(--radius-full);
+	cursor: pointer;
+	vertical-align: middle;
+	flex-shrink: 0;
+	border: none;
+	transition: none;
+
+	@include motion-safe {
+		transition: background-color var(--transition-fast);
+	}
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		width: 1.25rem;
+		height: 1.25rem;
+		background: hsl(var(--color-white));
+		border-radius: 50%;
+		--shadow: var(--shadow-resting);
+		box-shadow: var(--shadow);
+
+		@include motion-safe {
+			transition: transform var(--transition-fast);
+		}
+	}
+
+	&:checked {
+		background: var(--color-accent);
+
+		&::before {
+			transform: translateX(1rem);
+		}
+	}
+
+	&:focus-visible {
+		@include focus-ring;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}
+
+@mixin pill-switch {
+	@include row(var(--size-sm));
+	@include cursor-pointer;
+	@include text-sm;
+	@include font-medium;
+	color: var(--color-fg);
+	margin-bottom: 0;
+
+	> input[type="checkbox"] {
+		@include toggle-switch;
+	}
+}
+
+@mixin pills-switch {
+	@include stack(var(--size-sm));
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	> li > label {
+		@include pill-switch;
 	}
 }
 

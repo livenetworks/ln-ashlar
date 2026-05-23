@@ -11,21 +11,21 @@
 // the tooltip is visible without clipping.
 // ─────────────────────────────────────────────────────────────────
 
-.section-card:has(> main > [data-demo-tooltip-grid]),
-.section-card:has(> main > [data-demo-tooltip-toolbar]),
-.section-card:has(> main > [data-demo-tooltip-flip-row]) {
+.section-card:has(> main > .tooltip-grid),
+.section-card:has(> main > .tooltip-toolbar),
+.section-card:has(> main > .tooltip-flip-row) {
 	overflow: visible;
 }
 
 // Icon toolbar — a row of icon buttons with tooltips
-[data-demo-tooltip-toolbar] {
+.tooltip-toolbar {
 	@include flex;
 	@include items-center;
 	@include gap(var(--size-sm));
 }
 
 // Four-position compass grid — CSS baseline positions showcase
-[data-demo-tooltip-grid] {
+.tooltip-grid {
 	display: grid;
 	grid-template-columns: 10rem 10rem 10rem;
 	grid-template-rows: 3.5rem 3.5rem 3.5rem;
@@ -43,7 +43,7 @@
 
 // Edge auto-flip row — last button pushed to the far right so its
 // right-side tooltip has no room and flips to the left.
-[data-demo-tooltip-flip-row] {
+.tooltip-flip-row {
 	@include flex;
 	@include gap(var(--size-sm));
 
@@ -51,3 +51,4 @@
 		margin-left: auto;
 	}
 }
+

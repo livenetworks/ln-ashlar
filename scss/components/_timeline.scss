@@ -1,5 +1,14 @@
 @use '../config/mixins' as *;
 
-[data-ln-timeline] {
+// Prototype-tier class — available out of the box for prototyping and
+// inspector experimentation. Production projects apply the mixin on
+// their own semantic selector:
+//
+//   #audit-log { @include timeline; }
+.timeline {
+	@include timeline;
+}
+
+#audit-log {
 	@include timeline;
 }

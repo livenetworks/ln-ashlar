@@ -10,7 +10,7 @@
 					<header><h3>1. CSS baseline — default position (top)</h3></header>
 					<main>
 						<p>Icon buttons with <code>data-ln-tooltip="…"</code>. The default position is <code>top</code>. <code>aria-label</code> is still required for screen readers — the tooltip text is only visual.</p>
-						<div data-demo-tooltip-toolbar>
+						<div class="tooltip-toolbar">
 							<button type="button" data-ln-tooltip="Save as draft" aria-label="Save as draft">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg>
 							</button>
@@ -35,7 +35,7 @@
 					<header><h3>2. CSS baseline — all four positions</h3></header>
 					<main>
 						<p>Override the default with <code>data-ln-tooltip-position="bottom|left|right"</code>. The compass layout below places one trigger per position.</p>
-						<div data-demo-tooltip-grid>
+						<div class="tooltip-grid">
 							<button type="button" data-ln-tooltip="Top tooltip" data-ln-tooltip-position="top" aria-label="Top tooltip example">Top</button>
 							<button type="button" data-ln-tooltip="Bottom tooltip" data-ln-tooltip-position="bottom" aria-label="Bottom tooltip example">Bottom</button>
 							<button type="button" data-ln-tooltip="Left tooltip" data-ln-tooltip-position="left" aria-label="Left tooltip example">Left</button>
@@ -98,7 +98,7 @@
 					<header><h3>5. JS enhance — edge auto-flip (right &rarr; left)</h3></header>
 					<main>
 						<p>The last button is pushed to the far right edge of the container. Its preferred side is <code>right</code>. Hover it — the tooltip should appear on the <strong>left</strong> because there is no room on the right. Inspect <code>data-ln-tooltip-placement</code> on the tooltip node.</p>
-						<div data-demo-tooltip-flip-row>
+						<div class="tooltip-flip-row">
 							<button type="button" data-ln-tooltip="First button" data-ln-tooltip-enhance data-ln-tooltip-position="right">Right (fits)</button>
 							<button type="button" data-ln-tooltip="Second button" data-ln-tooltip-enhance data-ln-tooltip-position="right">Right (fits)</button>
 							<button type="button" data-ln-tooltip="I flipped to the left — no room on right!" data-ln-tooltip-enhance data-ln-tooltip-position="right">Far right — flip me</button>

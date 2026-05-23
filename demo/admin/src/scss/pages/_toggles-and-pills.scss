@@ -1,0 +1,10 @@
+@use '../../../../../scss/config/mixins' as *;
+
+// ─── Standalone outline demo list ─────────────────────────
+.demo-standalone-outline {
+	@include inline-flex;
+	gap: var(--size-xs);
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
