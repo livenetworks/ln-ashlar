@@ -152,6 +152,7 @@
 
 		<!-- Content -->
 		<section>
+			<div class="app-content-wrapper">
 <h1>Table</h1>
 					<p>Server-rendered data table — in-memory search, per-column filtering, sorting, virtual scroll. Rows arrive as HTML in <code>&lt;tbody&gt;</code>. Two independent components: <code>ln-table</code> (parse + render) and <code>ln-table-sort</code> (sort header clicks). Search provided by <code>ln-search</code>.</p>
 
@@ -439,6 +440,7 @@ el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code>
 	tbody.innerHTML = html.join('');
 })();
 </script>
+			</div>
 		</section>
 
 		<!-- Footer -->

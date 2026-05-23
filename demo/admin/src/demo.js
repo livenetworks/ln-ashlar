@@ -138,11 +138,16 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 			// Header of panel (tabs vs single title)
 			let headerHtml = '';
 			if (cleanSCSS) {
+				container.id = panelId + '-tabs';
+				container.setAttribute('data-ln-tabs', '');
+				container.setAttribute('data-ln-tabs-default', 'html');
 				headerHtml = `
-					<div class="demo-code-tabs">
-						<button type="button" class="active" data-tab="html">HTML</button>
-						<button type="button" data-tab="scss">SCSS</button>
-					</div>
+					<nav>
+						<ul>
+							<li><a href="#${container.id}:html" data-ln-tab>HTML</a></li>
+							<li><a href="#${container.id}:scss" data-ln-tab>SCSS</a></li>
+						</ul>
+					</nav>
 				`;
 			} else {
 				headerHtml = `<span class="demo-code-title">HTML Source</span>`;
@@ -157,39 +162,18 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 					</button>
 				</div>
 				<div class="demo-code-body">
-					<pre data-pane="html"><code>${escapeHtml(cleanHTML)}</code></pre>
-					${cleanSCSS ? `<pre data-pane="scss" style="display: none;"><code>${escapeHtml(cleanSCSS)}</code></pre>` : ''}
+					<pre data-ln-panel="html"><code>${escapeHtml(cleanHTML)}</code></pre>
+					${cleanSCSS ? `<pre data-ln-panel="scss" class="hidden"><code>${escapeHtml(cleanSCSS)}</code></pre>` : ''}
 				</div>
 			`;
 
 			collapsibleWrapper.appendChild(container);
 			section.appendChild(collapsibleWrapper);
 
-			// Tab switching logic
-			if (cleanSCSS) {
-				const tabs = container.querySelectorAll('.demo-code-tabs button');
-				const panes = container.querySelectorAll('.demo-code-body pre');
-				tabs.forEach(function (tabBtn) {
-					tabBtn.addEventListener('click', function () {
-						tabs.forEach(t => t.classList.remove('active'));
-						tabBtn.classList.add('active');
-
-						const targetTab = tabBtn.getAttribute('data-tab');
-						panes.forEach(function (pane) {
-							if (pane.getAttribute('data-pane') === targetTab) {
-								pane.style.display = 'block';
-							} else {
-								pane.style.display = 'none';
-							}
-						});
-					});
-				});
-			}
-
 			// Copy to Clipboard logic
 			const btnCopy = container.querySelector('.btn-copy-code');
 			btnCopy.addEventListener('click', function () {
-				let activePane = container.querySelector('.demo-code-body pre:not([style*="display: none"])');
+				let activePane = container.querySelector('.demo-code-body pre:not(.hidden)');
 				if (!activePane) activePane = container.querySelector('.demo-code-body pre');
 				if (!activePane) return;
 

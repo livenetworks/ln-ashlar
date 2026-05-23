@@ -77,29 +77,39 @@
 		background-color: color-mix(in srgb, var(--bg-sunken) 95%, black);
 	}
 
-	.demo-code-tabs {
-		display: flex;
-		gap: var(--size-xs);
+	nav {
+		ul {
+			display: flex;
+			gap: var(--size-xs);
+			list-style: none;
+			margin: 0;
+			padding: 0;
 
-		button {
-			background: none;
-			border: none;
-			padding: var(--size-xs) var(--size-sm);
-			font-size: var(--text-xs);
-			font-weight: var(--font-semibold);
-			color: var(--fg-muted);
-			cursor: pointer;
-			border-radius: var(--radius);
-			transition: all 0.2s;
-
-			&:hover {
-				color: var(--color-fg);
-				background-color: var(--border-subtle);
+			li {
+				margin: 0;
+				padding: 0;
 			}
 
-			&.active {
-				color: hsl(var(--color-primary));
-				background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
+			a {
+				display: inline-block;
+				text-decoration: none;
+				padding: var(--size-xs) var(--size-sm);
+				font-size: var(--text-xs);
+				font-weight: var(--font-semibold);
+				color: var(--fg-muted);
+				cursor: pointer;
+				border-radius: var(--radius);
+				transition: all 0.2s;
+
+				&:hover {
+					color: var(--color-fg);
+					background-color: var(--border-subtle);
+				}
+
+				&[data-active] {
+					color: hsl(var(--color-primary));
+					background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
+				}
 			}
 		}
 	}

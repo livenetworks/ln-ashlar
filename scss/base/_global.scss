@@ -4,6 +4,7 @@ html,
 body {
 	@include w-full;
 	@include h-full;
+	overflow: hidden;
 	background-color: var(--bg-recessed);
 	@include font-sans;
 	-webkit-tap-highlight-color: transparent;
