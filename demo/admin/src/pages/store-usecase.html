@@ -203,7 +203,7 @@
 </script>
 
 <!-- 1. Store (renders nothing) -->
-<div data-ln-store="documents"
+<div data-ln-data-store="documents"
      data-ln-store-endpoint="/api/documents"
      data-ln-store-stale="60"
      data-ln-store-indexes="department,status,priority,updated_at"
@@ -391,184 +391,119 @@
 	</form>
 </div>
 
-<!-- (c) Coordinator -->
 <script>
 (function () {
-	const storeEl    = document.getElementById('documents-store');
-	const tableEl    = document.getElementById('documents-table');
-	const formEl     = document.getElementById('document-form');
-	const modalEl    = document.getElementById('document-modal');
-	const titleEl    = document.getElementById('document-modal-title');
-	const confirmEl  = document.getElementById('confirm-delete-modal');
-	const confirmMsg = document.getElementById('confirm-delete-message');
-	const bulkBtn    = document.getElementById('bulk-delete-btn');
-	const confirmForm = document.getElementById('confirm-delete-form');
-	const resetBtn   = document.getElementById('reset-data');
+	const storeEl = document.querySelector('[data-ln-data-store="documents"]');
+	const tableEl = document.querySelector('[data-ln-data-table="documents"]');
+	const formEl  = document.querySelector('[data-ln-form="document-form"]');
 
-	let lastQuery     = { sort: null, filters: {}, search: '' };
-	let pendingDelete = null;
-	let editMode      = false;
+	let lastQuery = { sort: null, filters: {}, search: '' }, pendingDelete = null, editMode = false;
 
-	// Authoritative filter options — matches form select values, stable for this data schema
 	const filterOptions = {
 		department: ['Finance', 'HR', 'IT', 'Legal', 'Marketing', 'Operations'],
 		status:     ['Approved', 'Archived', 'Draft', 'Pending']
 	};
 
-	function decorate(r) {
-		return Object.assign({}, r, {
-			updated_display: new Date(r.updated_at * 1000).toLocaleString(),
-			size_display:    r.file_size >= 1024
-				? (r.file_size / 1024).toFixed(1) + ' MB'
-				: (r.file_size || 0) + ' KB'
-		});
-	}
-
-	function refresh() {
-		if (!storeEl.lnStore) return;
-		storeEl.lnStore.getAll(lastQuery).then(function (r) {
-			tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
-				bubbles: true,
-				detail: {
-					data: r.data.map(decorate),
-					total: r.total,
-					filtered: r.filtered,
-					filterOptions: filterOptions
-				}
-			}));
-		});
-	}
-
-	document.addEventListener('ln-data-table:request-data', function (e) {
-		if (e.detail.table !== 'documents') return;
-		lastQuery = {
-			sort: e.detail.sort,
-			filters: e.detail.filters,
-			search: e.detail.search
-		};
-		refresh();
+	const decorate = r => Object.assign({}, r, {
+		updated_display: new Date(r.updated_at * 1000).toLocaleString(),
+		size_display: r.file_size >= 1024 ? (r.file_size / 1024).toFixed(1) + ' MB' : (r.file_size || 0) + ' KB'
 	});
 
-	storeEl.addEventListener('ln-store:ready',     refresh);
-	storeEl.addEventListener('ln-store:loaded',    refresh);
-	storeEl.addEventListener('ln-store:synced',    function (e) { if (e.detail.changed) refresh(); });
-	storeEl.addEventListener('ln-store:created',   refresh);
-	storeEl.addEventListener('ln-store:updated',   refresh);
-	storeEl.addEventListener('ln-store:deleted',   refresh);
-	storeEl.addEventListener('ln-store:confirmed', refresh);
-	storeEl.addEventListener('ln-store:reverted',  refresh);
+	const refresh = () => storeEl.lnDataStore?.getAll(lastQuery).then(r => {
+		tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+			bubbles: true,
+			detail: { data: r.data.map(decorate), total: r.total, filtered: r.filtered, filterOptions }
+		}));
+	});
 
-	// Reset form on before-open unless we're entering edit mode
-	modalEl.addEventListener('ln-modal:before-open', function () {
+	// Store Listeners
+	['ready', 'loaded', 'created', 'updated', 'deleted', 'confirmed', 'reverted'].forEach(ev => 
+		storeEl.addEventListener(`ln-store:${ev}`, refresh)
+	);
+	storeEl.addEventListener('ln-store:synced', e => e.detail.changed && refresh());
+
+	// Table Listeners
+	document.addEventListener('ln-data-table:request-data', e => {
+		if (e.detail.table === 'documents') {
+			lastQuery = { sort: e.detail.sort, filters: e.detail.filters, search: e.detail.search };
+			refresh();
+		}
+	});
+
+	document.addEventListener('ln-data-table:row-action', e => {
+		if (e.detail.table !== 'documents') return;
+		const modal = formEl.closest('.ln-modal');
+		if (e.detail.action === 'edit') {
+			editMode = true;
+			formEl.lnForm.fill(e.detail.record);
+			modal.querySelector('h3').textContent = 'Edit document';
+			modal.setAttribute('data-ln-modal', 'open');
+		} else {
+			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', { detail: { id: Number(e.detail.id) } }));
+		}
+	});
+
+	// Form & Modal Reset Listeners
+	formEl.closest('.ln-modal').addEventListener('ln-modal:before-open', e => {
 		if (!editMode) {
 			formEl.lnForm.reset();
-			titleEl.textContent = 'New document';
+			e.target.closest('.ln-modal').querySelector('h3').textContent = 'New document';
 		}
 		editMode = false;
 	});
 
-	document.addEventListener('ln-data-table:row-action', function (e) {
-		if (e.detail.table !== 'documents') return;
-		if (e.detail.action === 'edit') {
-			editMode = true;
-			formEl.lnForm.fill(e.detail.record);
-			titleEl.textContent = 'Edit document';
-			modalEl.setAttribute('data-ln-modal', 'open');
-		} else if (e.detail.action === 'delete') {
-			// Row-level delete is gated by `data-ln-confirm` on the trash
-			// button — by the time this handler runs, ln-confirm has
-			// already passed the second click through, so we delete
-			// immediately. Bulk delete still goes through the modal
-			// (multi-row delete isn't expressible in a single button).
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
-				detail: { id: Number(e.detail.id) }
-			}));
+	formEl.addEventListener('ln-form:submit', e => {
+		const data = Object.assign({}, e.detail.data), id = data.id, ev = data.updated_at ? Number(data.updated_at) : undefined;
+		delete data.id; delete data.updated_at;
+		const eventName = id ? 'ln-store:request-update' : 'ln-store:request-create';
+		const detail = id ? { id: Number(id), data, expected_version: ev } : { data };
+		storeEl.dispatchEvent(new CustomEvent(eventName, { detail }));
+		formEl.closest('.ln-modal').setAttribute('data-ln-modal', 'close');
+	});
+
+	// Bulk Delete & Reset Data (Event Delegation)
+	document.addEventListener('click', e => {
+		const btn = e.target.closest('#bulk-delete-btn, #reset-data');
+		if (!btn) return;
+		if (btn.id === 'bulk-delete-btn') {
+			const ids = Array.from(tableEl.lnDataTable.selectedIds).map(Number);
+			if (!ids.length) return;
+			pendingDelete = { ids };
+			const confirmForm = document.querySelector('#confirm-delete-form');
+			if (confirmForm) {
+				const confirmModal = confirmForm.closest('.ln-modal');
+				confirmModal.querySelector('p').textContent = `Delete ${ids.length} document${ids.length > 1 ? 's' : ''}?`;
+				confirmModal.setAttribute('data-ln-modal', 'open');
+			}
+		} else {
+			localStorage.removeItem('ln-mock-documents');
+			window.lnDataStore.clearAll().then(() => location.reload());
 		}
 	});
 
-	bulkBtn.addEventListener('click', function (e) {
-		e.preventDefault();
-		const ids = Array.from(tableEl.lnDataTable.selectedIds).map(Number);
-		if (!ids.length) return;
-		pendingDelete = { ids: ids };
-		confirmMsg.textContent = 'Delete ' + ids.length + ' document' + (ids.length > 1 ? 's' : '') + '?';
-		confirmEl.setAttribute('data-ln-modal', 'open');
-	});
-
-	confirmForm.addEventListener('submit', function (e) {
+	document.querySelector('#confirm-delete-form')?.addEventListener('submit', e => {
 		e.preventDefault();
 		if (!pendingDelete) return;
 		const ids = pendingDelete.ids;
-		if (ids.length === 1) {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', { detail: { id: ids[0] } }));
-		} else {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-bulk-delete', { detail: { ids: ids } }));
-		}
+		const eventName = ids.length === 1 ? 'ln-store:request-delete' : 'ln-store:request-bulk-delete';
+		const detail = ids.length === 1 ? { id: ids[0] } : { ids };
+		storeEl.dispatchEvent(new CustomEvent(eventName, { detail }));
 		pendingDelete = null;
-		confirmEl.setAttribute('data-ln-modal', 'close');
+		e.target.closest('.ln-modal').setAttribute('data-ln-modal', 'close');
 	});
 
-	formEl.addEventListener('ln-form:submit', function (e) {
-		const data = Object.assign({}, e.detail.data);
-		const id = data.id;
-		const ev = data.updated_at ? Number(data.updated_at) : undefined;
-		delete data.id;
-		delete data.updated_at;
-		if (id) {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-update',
-				{ detail: { id: Number(id), data: data, expected_version: ev } }));
-		} else {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-create',
-				{ detail: { data: data } }));
-		}
-		modalEl.setAttribute('data-ln-modal', 'close');
-	});
-
-	storeEl.addEventListener('ln-store:confirmed', function (e) {
-		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-			detail: {
-				type: 'success',
-				title: 'Saved',
-				message: e.detail.action + ' confirmed by server'
-			}
-		}));
-	});
-	storeEl.addEventListener('ln-store:reverted', function (e) {
-		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-			detail: {
-				type: 'error',
-				title: 'Reverted',
-				message: e.detail.error || 'Server rejected the change'
-			}
-		}));
-	});
-	storeEl.addEventListener('ln-store:conflict', function (e) {
-		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-			detail: {
-				type: 'warning',
-				title: 'Conflict',
-				message: 'Document was modified elsewhere — reloaded latest version'
-			}
-		}));
+	// Toasts & Telemetry
+	const toast = (type, title, message) => window.dispatchEvent(new CustomEvent('ln-toast:enqueue', { detail: { type, title, message } }));
+	storeEl.addEventListener('ln-store:confirmed', e => toast('success', 'Saved', `${e.detail.action} confirmed by server`));
+	storeEl.addEventListener('ln-store:reverted', e => toast('error', 'Reverted', e.detail.error || 'Server rejected the change'));
+	storeEl.addEventListener('ln-store:offline', () => toast('warning', 'Offline', 'Server unreachable — changes queued'));
+	storeEl.addEventListener('ln-store:conflict', e => {
+		toast('warning', 'Conflict', 'Document was modified elsewhere — reloaded latest version');
 		const idField = formEl.querySelector('[name="id"]');
 		if (idField && idField.value && Number(idField.value) === e.detail.local.id) {
-			editMode = true; // suppress before-open reset on the next focus cycle
+			editMode = true;
 			formEl.lnForm.fill(e.detail.remote);
 		}
-	});
-	storeEl.addEventListener('ln-store:offline', function () {
-		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-			detail: {
-				type: 'warning',
-				title: 'Offline',
-				message: 'Server unreachable — changes queued'
-			}
-		}));
-	});
-
-	resetBtn.addEventListener('click', function () {
-		localStorage.removeItem('ln-mock-documents');
-		window.lnStore.clearAll().then(function () { location.reload(); });
 	});
 })();
 </script>
