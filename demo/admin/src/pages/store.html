@@ -197,28 +197,28 @@ Bulk:    save all, remove → DELETE /bulk-delete → confirmed | reverted</code
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<pre><code>const storeEl = document.querySelector('[data-ln-store="documents"]');
+							<pre><code>const storeEl = document.querySelector('[data-ln-data-store="documents"]');
 
 // Queries (all return Promise)
-storeEl.lnStore.getAll(options)        // → { data, total, filtered }
-storeEl.lnStore.getById(id)            // → Object|null
-storeEl.lnStore.count(filters)         // → Number
-storeEl.lnStore.aggregate(field, fn)   // → Number (sum, avg, count)
+storeEl.lnDataStore.getAll(options)        // → { data, total, filtered }
+storeEl.lnDataStore.getById(id)            // → Object|null
+storeEl.lnDataStore.count(filters)         // → Number
+storeEl.lnDataStore.aggregate(field, fn)   // → Number (sum, avg, count)
 
 // State
-storeEl.lnStore.isLoaded               // Boolean
-storeEl.lnStore.isSyncing              // Boolean
-storeEl.lnStore.lastSyncedAt           // Number|null
-storeEl.lnStore.totalCount             // Number
+storeEl.lnDataStore.isLoaded               // Boolean
+storeEl.lnDataStore.isSyncing              // Boolean
+storeEl.lnDataStore.lastSyncedAt           // Number|null
+storeEl.lnDataStore.totalCount             // Number
 
 // Manual triggers
-storeEl.lnStore.forceSync()            // delta sync
-storeEl.lnStore.fullReload()           // clear + full reload
-storeEl.lnStore.destroy()              // cleanup
+storeEl.lnDataStore.forceSync()            // delta sync
+storeEl.lnDataStore.fullReload()           // clear + full reload
+storeEl.lnDataStore.destroy()              // cleanup
 
 // Global
-window.lnStore.clearAll()              // wipe all stores (logout)
-window.lnStore.init(el)                // manual init</code></pre>
+window.lnDataStore.clearAll()              // wipe all stores (logout)
+window.lnDataStore.init(el)                // manual init</code></pre>
 						</main>
 					</section>
 
@@ -226,7 +226,7 @@ window.lnStore.init(el)                // manual init</code></pre>
 					<section class="section-card">
 						<header><h3>Query Options</h3></header>
 						<main>
-							<pre><code>storeEl.lnStore.getAll({
+							<pre><code>storeEl.lnDataStore.getAll({
     sort: { field: 'title', direction: 'asc' },
     filters: { status: ['approved', 'draft'] },
     search: 'ISO 27001',

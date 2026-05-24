@@ -32,6 +32,10 @@ import './ln-autoresize/src/ln-autoresize.js';
 import './ln-validate/src/ln-validate.js';
 import './ln-form/src/ln-form.js';
 import './ln-time/src/ln-time.js';
-import './ln-store/src/ln-store.js';
+import './ln-data-store/src/ln-data-store.js';
+import './ln-api-connector/src/ln-api-connector.js';
+import './ln-couchdb-connector/src/ln-couchdb-connector.js';
+import './ln-data-coordinator/src/ln-data-coordinator.js';
 import './ln-data-table/src/ln-data-table.js';
 import './ln-icons/src/ln-icons.js';
+

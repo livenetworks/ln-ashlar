@@ -1,141 +1,173 @@
-# ln-ashlar
+# 🚀 ln-ashlar
 
-Unified frontend library for LiveNetworks projects — SCSS CSS framework + vanilla JS components, zero dependencies.
-
----
-
-## Philosophy
-
-Four principles drive every decision in this library:
-
-1. **HTML describes WHAT, not HOW** — semantic elements only. No presentational classes in markup (`grid-4`, `text-secondary`, `flex`). Visual changes happen in SCSS, never in HTML.
-2. **Style via `@include` on semantic selectors** — projects write `#user-table { @include table-base; }`, not `<table class="table table-striped">`. The selector describes the element; the mixin describes how it looks.
-3. **Every color is a CSS variable** — `hsl(var(--color-primary))`, never `#2737a1`. This makes the entire color system overridable at any scope via `--color-primary: var(--color-error)`.
-4. **JS is attribute-driven, zero init** — `data-ln-modal`, `data-ln-filter`, `data-ln-toggle`. MutationObserver discovers and initializes components automatically. No `new Component()`, no `init()` calls.
+> **Unified frontend library for LiveNetworks projects.** Delivering a high-performance harmony between server-rendered HTML, semantic SCSS mixins, and attribute-driven, zero-initialization vanilla JS components. Built with **zero dependencies** for maximum speed, longevity, and security.
 
 ---
 
-## Quick Start
+## 🏛️ The DOM-First Paradigm (Why `ln-ashlar`?)
 
-ln-ashlar is a source-only package. Import SCSS and JS directly and let
-your project's bundler compile them.
+Modern web development has fallen into a trap of excessive complexity. **`ln-ashlar` is an architectural statement: the browser works with HTML, not a Virtual DOM.**
 
-### npm
+Instead of downloading megabytes of JavaScript, compiling in runtime, and displaying empty "skeleton screens" while waiting for cascading API waterfalls, `ln-ashlar` champions a **DOM-First, progressive, and local-first** approach:
+
+1. **Server-Rendered HTML**: Your backend (Laravel, Go, Rails, etc.) delivers complete, semantic, indexable HTML. Fast to paint, SEO-friendly, and accessible in milliseconds.
+2. **Zero-Initialization JS**: Modular interactivity is driven by standard HTML attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-store`). A native `MutationObserver` registers and activates components automatically. No `new Component()` or `init()` boilerplate required.
+3. **Pure SCSS Styling via `@include`**: HTML remains semantic, describing *what* the element is. SCSS mixins describe *how* it looks. Visual styling is fully decoupled from markup.
+4. **Zero Dependencies**: 100% immune to npm supply chain attacks and package obsolescence. Built exclusively on eternal, backward-compatible W3C web standards.
+
+> [!TIP]
+> 📖 **Прочитајте го комплетниот инженерски манифест на македонски јазик!**  
+> За детална историска анализа на циклусите на процесирање, перформансите (Skeleton Screens наспроти IndexedDB кеш), проблемите со застарување на SPA рамките и безбедносните CVE ризици кај npm, прочитајте ја нашата целосна [Архитектонска филозофија](docs/architecture/philosophy.md).
+
+---
+
+### JS-First (React / Vue / Angular) vs. DOM-First with `ln-ashlar`
+
+| Architectural Challenge | Mainstream JS-First (SPA) | DOM-First with `ln-ashlar` |
+| :--- | :--- | :--- |
+| **Primary Rendering** | Client-side via heavy Virtual DOM compilation. | Server-side via standard HTML. |
+| **Binding & Config** | Inside JS files via imports, props, and states. | Directly in HTML via semantic `data-ln` attributes. |
+| **Network Overhead** | Megabytes of JS, hundreds of transitive `npm` packages. | **Zero-Dependency (0 npm packages at runtime)**. |
+| **Security Risks** | High (transitive dependency supply chain vulnerability). | Zero. Native vanilla JS communicating directly with Web APIs. |
+| **Longevity & Support** | EOL cycles every 6-18 months (breaking framework upgrades). | **100% Stable (backed by permanent W3C web standards)**. |
+| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-data-table` onto any layout. |
+
+---
+
+## 🧭 Four Core Philosophy Principles
+
+Four strict principles drive every technical decision in this library:
+
+1. **HTML describes WHAT, not HOW** — Use semantic elements only. No presentational or utility classes in markup (avoid `grid-4`, `text-secondary`, `flex`). Visual changes happen in SCSS, never in HTML.
+2. **Style via `@include` on semantic selectors** — Projects write `#user-table { @include table-base; }`, not `<table class="table table-striped">`. The selector describes the element; the mixin describes how it looks.
+3. **Every color is a CSS variable** — Always use `hsl(var(--color-primary))`, never hardcoded hex codes like `#2737a1`. This makes the entire design system fully customizable at any scope via simple variable overrides.
+4. **JS is attribute-driven, zero init** — Interactivity is declared via attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-toggle`). A single `MutationObserver` registers, binds, and cleans up instances automatically.
+
+---
+
+## ⚡ Quick Start
+
+`ln-ashlar` is a source-only package. Import SCSS and JS directly and let your project's bundler compile them.
+
+### 1. Install via npm
+```bash
+npm install ln-ashlar
+```
+
+Import source files into your main entries:
 ```js
-// SCSS
+// main.scss - Import SCSS tokens, mixins, and defaults
 @use 'ln-ashlar/scss/ln-ashlar.scss';
 
-// JS
+// main.js - Import and auto-initialize JS components
 import 'ln-ashlar/js/index.js';
 ```
 
-### Git submodule
+### 2. Install as a Git Submodule (Alternative)
 ```bash
 git submodule add .../ln-ashlar.git resources/ln-ashlar
 ```
 
-Then `@use 'resources/ln-ashlar/scss/ln-ashlar.scss'` and
-`import 'resources/ln-ashlar/js/index.js'` from the project.
+Then reference the submodule paths:
+```scss
+@use 'resources/ln-ashlar/scss/ln-ashlar.scss';
+```
+```js
+import 'resources/ln-ashlar/js/index.js';
+```
 
-### Build (for the demo site only)
+### 3. Build & Watch (For Library Demos Only)
+If you are developing inside this repository, compile the static demo assets:
 ```bash
-npm run build   # Produces demo/dist/ln-ashlar.{css,js,iife.js} + compiles demo pages
-npm run dev     # Watch mode (library only)
+npm run build   # Produces demo/dist/ln-ashlar.{css,js,iife.js} + compiles HTML demo pages
+npm run dev     # Watch mode (automatic compilation on SCSS or JS changes)
 ```
-
-The `demo/dist/` artefact exists for the demo site. Consumers bundle
-from source — don't point projects at it.
+*Note: The `demo/dist/` artifact exists solely for the demo pages. Product consumers should always bundle from source.*
 
 ---
 
-## Architecture
+## 📐 Core Architecture Specifications
 
-### CSS — Two Layers
+Deep architectural blueprints detailing the engine driving `ln-ashlar`.
 
-```
-scss/config/_tokens.scss     ← :root CSS variables (colors, spacing, radius, z-index)
-scss/config/mixins/          ← @mixin definitions (recipes, no CSS output)
-scss/components/             ← mixins applied to default selectors (CSS output)
-scss/base/                   ← Reset, global element defaults
-```
-
-**Mixins** define how something looks. **Components** apply mixins to default selectors. Projects override by re-applying mixins on their own semantic selectors:
-
-```scss
-// ln-ashlar ships: table { @include table-base; }
-// Project overrides one specific table:
-#audit-log { @include table-base; @include table-striped; }
-```
-
-Color changes need only a variable override — all states (hover, active, focus) adapt automatically:
-
-```scss
-#delete-user { --color-primary: var(--color-error); }
-```
-
-### JS — Attribute-Driven
-
-All components use `data-ln-{name}` attributes. Place the attribute in HTML — the component initializes itself.
-
-```html
-<div data-ln-modal id="edit-user">...</div>       <!-- Modal -->
-<nav data-ln-filter="my-list">...</nav>            <!-- Filter -->
-<input data-ln-search="my-list" type="search">    <!-- Search -->
-```
-
-Components expose a JS API on the element (e.g. read state via `el.lnModal.isOpen`) and fire namespaced events (`ln-modal:open`). See individual component docs for details.
+| Specification | Contents |
+|:---|:---|
+| 📖 **[Architecture Philosophy](docs/architecture/philosophy.md)** | The DOM-First engineering manifesto detailing computing cycles, framework EOL risks, and performance. *(Written in Macedonian)* |
+| 🔄 **[Data Flow Architecture](docs/architecture/data-flow.md)** | Rules governing how data moves. Splits responsibilities into **four isolated concerns**: Data (`ln-store`), Render (`ln-data-table`), Submit (`ln-form`), and Validate (`ln-validate`). Details the **optimistic and offline write pipeline** with a comprehensive Mermaid flow diagram. |
+| 🧭 **[3-Tier Local-First Storage Specs](docs/architecture/data-store-architecture.md)** | Technical reference for decoupling storage caches (`ln-data-store`), network gateways (`ln-*-connector`), and data transformations (`ln-mapper`) under a single parent **Data Coordinator** (`ln-data-coordinator`). |
+| ⚡ **[Reactive Architecture Reference](docs/v2-reactive.md)** | Blueprint on how components manage internal state using Proxy traps (`reactiveState` and `deepReactive`), batched microtask rendering, DOM bindings (`fill`, `renderList`), and attribute-to-state bridges. |
+| 📐 **[Design System Specifications](docs/architecture/reference.md)** | Complete styling specs covering CSS Custom Properties, layout grids, buttons, responsive breakpoints, typography hierarchies, dark mode theming, and icons. |
 
 ---
 
-## Documentation
+## 📚 General Documentation Index
 
-### CSS
+For detailed manual instructions, properties, attributes, and events of individual components:
 
-| Document | Contents |
-|----------|----------|
-| [docs/css/tokens.md](docs/css/tokens.md) | All CSS custom properties — colors, spacing, radius, z-index, typography |
-| [docs/css/mixins.md](docs/css/mixins.md) | Full `@include` mixin reference |
-| [docs/css/forms.md](docs/css/forms.md) | Form layout pattern, grid, validation |
-| [docs/css/cards.md](docs/css/cards.md) | Card and section-card mixins |
-| [docs/css/tables.md](docs/css/tables.md) | Table mixins and responsive layout |
-| [docs/css/navigation.md](docs/css/navigation.md) | Nav mixin, sidebar structure |
-| [docs/css/layout.md](docs/css/layout.md) | Grid, container queries, collapsible |
-| [docs/css/sections.md](docs/css/sections.md) | Section mixins |
-| [docs/css/breadcrumbs.md](docs/css/breadcrumbs.md) | Breadcrumb mixin |
+* 📚 **[Complete Documentation Index](docs/README.md)** — The master roadmap containing direct links to usage guides (`js/ln-*/README.md`) and internal architecture sheets (`docs/js/*.md`) for every module.
 
-### JS
+### CSS Layer Reference
 
-| Document | Contents |
-|----------|----------|
-| [docs/js/component-guide.md](docs/js/component-guide.md) | IIFE pattern, MutationObserver, events, reactive state |
-| [docs/js/core.md](docs/js/core.md) | ln-core helpers: dispatch, fill, renderList, reactiveState |
+| Guide | Scope |
+|---|---|
+| 🎨 **[Design Tokens](docs/css/tokens.md)** | All CSS custom properties: colors, spacing, borders, typography scale, z-index. |
+| 🎛️ **[Mixins Reference](docs/css/mixins.md)** | Extensive list of all SCSS `@include` recipes available for semantic styling. |
+| 📑 **[Forms](docs/css/forms.md)** | Declarative layout patterns, spacing, grids, and input validation states. |
+| 📇 **[Cards](docs/css/cards.md)** | Custom properties and mixins for basic card structures and section headers. |
+| 📊 **[Tables](docs/css/tables.md)** | Tabular layout patterns, striped themes, and responsive screen-overflow. |
+| 🗺️ **[Navigation](docs/css/navigation.md)** | Semantic navigation bar mixins, sidebar layouts, and collapsible drawer states. |
+| 📏 **[Layout](docs/css/layout.md)** | Flexbox, grid utilities, container query states, and collapsible selectors. |
+| 📁 **[Sections](docs/css/sections.md)** | Visual separation blocks and responsive layout containers. |
+| 🧭 **[Breadcrumbs](docs/css/breadcrumbs.md)** | Horizontal navigation trail styling mixins. |
+| 📦 **[Container Queries](docs/ln-ashlar-container-queries.md)** | Mobile-first component layouts reacting to the width of their parent container. |
 
-### Core Architecture Specifications
+### JS Components Reference
 
-| Document | Contents |
-|----------|----------|
-| [docs/architecture/reference.md](docs/architecture/reference.md) | Full architectural specifications (Buttons, Modals, Tokens, Themes, Breakpoints, Icons) |
-
-### Full index
-
-[docs/README.md](docs/README.md) — complete table of all CSS and JS docs, with links to both usage guides (`js/ln-*/README.md`) and architecture references (`docs/js/*.md`). Also hosts the v1.1 roadmap index.
-
-### Icons
-
-| Document | Contents |
-|----------|----------|
-| [js/ln-icons/README.md](js/ln-icons/README.md) | SVG sprite system — HTML patterns, available icons, adding new icons |
-| [docs/js/icons.md](docs/js/icons.md) | Architecture — on-demand CDN loading, runtime sprite injection, #ln- vs #lnc- routing |
+| Component | Usage Guide (HTML Attributes / Events) | Technical Architecture (State / Render Loops) |
+|---|---|---|
+| **Core Utilities** | — | 🛠️ **[Core helpers reference](docs/js/core.md)** |
+| **Component Pattern** | — | 🧠 **[JS Component Design Guide](docs/js/component-guide.md)** |
+| **SVG Icons** | 🏷️ **[Icon SVG Sprite Reference](js/ln-icons/README.md)** | 🌐 **[On-Demand CDN routing & injection](docs/js/icons.md)** |
+| **Toggle** | 🎚️ **[ln-toggle docs](js/ln-toggle/README.md)** | 📄 **[toggle architecture](docs/js/toggle.md)** |
+| **Accordion** | 📂 **[ln-accordion docs](js/ln-accordion/README.md)** | 📄 **[accordion architecture](docs/js/accordion.md)** |
+| **Modal** | 🪟 **[ln-modal docs](js/ln-modal/README.md)** | 📄 **[modal architecture](docs/js/modal.md)** |
+| **Tabs** | 🔖 **[ln-tabs docs](js/ln-tabs/README.md)** | 📄 **[tabs architecture](docs/js/tabs.md)** |
+| **Toast** | 🔔 **[ln-toast docs](js/ln-toast/README.md)** | 📄 **[toast architecture](docs/js/toast.md)** |
+| **Dropdown** | 🔽 **[ln-dropdown docs](js/ln-dropdown/README.md)** | 📄 **[dropdown architecture](docs/js/dropdown.md)** |
+| **Popover** | 💬 **[ln-popover docs](js/ln-popover/README.md)** | 📄 **[popover architecture](docs/js/popover.md)** |
+| **Tooltip (JS)** | 💬 **[ln-tooltip docs](js/ln-tooltip/README.md)** | 📄 **[tooltip architecture](docs/js/tooltip.md)** |
+| **Navigation** | 🗺️ **[ln-nav docs](js/ln-nav/README.md)** | 📄 **[nav architecture](docs/js/nav.md)** |
+| **Filter** | 🔍 **[ln-filter docs](js/ln-filter/README.md)** | 📄 **[filter architecture](docs/js/filter.md)** |
+| **Search** | 🔎 **[ln-search docs](js/ln-search/README.md)** | 📄 **[search architecture](docs/js/search.md)** |
+| **Table** | 📊 **[ln-table docs](js/ln-table/README.md)** | 📄 **[table architecture](docs/js/table.md)** |
+| **Table Sort** | 📊 **[ln-table docs (Sort)](js/ln-table/README.md)** | 📄 **[table-sort architecture](docs/js/table-sort.md)** |
+| **Data Table** | 📊 **[ln-data-table docs](js/ln-data-table/README.md)** | 📄 **[data-table architecture](docs/js/data-table.md)** |
+| **Sortable** | 🔃 **[ln-sortable docs](js/ln-sortable/README.md)** | 📄 **[sortable architecture](docs/js/sortable.md)** |
+| **Progress** | 📈 **[ln-progress docs](js/ln-progress/README.md)** | 📄 **[progress architecture](docs/js/progress.md)** |
+| **Circular Progress** | 📈 **[ln-circular-progress docs](js/ln-circular-progress/README.md)** | 📄 **[circular-progress architecture](docs/js/circular-progress.md)** |
+| **Link** | 🔗 **[ln-link docs](js/ln-link/README.md)** | 📄 **[link architecture](docs/js/link.md)** |
+| **Confirm** | ⚠️ **[ln-confirm docs](js/ln-confirm/README.md)** | 📄 **[confirm architecture](docs/js/confirm.md)** |
+| **Upload** | 📤 **[ln-upload docs](js/ln-upload/README.md)** | 📄 **[upload architecture](docs/js/upload.md)** |
+| **AJAX** | 🔄 **[ln-ajax docs](js/ln-ajax/README.md)** | 📄 **[ajax architecture](docs/js/ajax.md)** |
+| **HTTP** | — | 📄 **[http service architecture](docs/js/http.md)** |
+| **Store** | 🗄️ **[ln-store docs](js/ln-store/README.md)** | 📄 **[store cache architecture](docs/js/store.md)** |
+| **Form** | 📝 **[ln-form docs](js/ln-form/README.md)** | 📄 **[form lifecycle architecture](docs/js/form.md)** |
+| **Validate** | ⚠️ **[ln-validate docs](js/ln-validate/README.md)** | 📄 **[validate architecture](docs/js/validate.md)** |
+| **Time** | 🕒 **[ln-time docs](js/ln-time/README.md)** | 📄 **[time architecture](docs/js/time.md)** |
+| **Autosave** | 💾 **[ln-autosave docs](js/ln-autosave/README.md)** | 📄 **[autosave architecture](docs/js/autosave.md)** |
+| **Autoresize** | ↕️ **[ln-autoresize docs](js/ln-autoresize/README.md)** | 📄 **[autoresize architecture](docs/js/autoresize.md)** |
+| **Translations** | 🗣️ **[ln-translations docs](js/ln-translations/README.md)** | 📄 **[translations architecture](docs/js/translations.md)** |
+| **External Links** | 🌐 **[ln-external-links docs](js/ln-external-links/README.md)** | 📄 **[external-links architecture](docs/js/external-links.md)** |
 
 ---
 
-## Demo
+## 🖥️ Interactive Demo Site
 
-Interactive demos in `demo/admin/` — each JS and CSS component has its own page. The demo is itself a project consuming ln-ashlar, showing how to write project-level SCSS using mixins and tokens.
+`ln-ashlar` ships with a complete local dashboard environment inside `demo/admin/`. The demo is itself a project consuming `ln-ashlar`, showing real-world layout structures, component setups, and customized semantic SCSS:
 
 ```
-demo/admin/index.html       ← Dashboard
-demo/admin/mixins.html      ← Full mixin reference (visual)
-demo/admin/icons.html       ← All icons with search + filter
-demo/admin/{component}.html ← Per-component demos
+demo/admin/index.html       ← Dashboard Overview (cards, navigation, timelines)
+demo/admin/mixins.html      ← Interactive visual catalog of all SCSS mixins
+demo/admin/icons.html       ← Live SVG sprite icons browser (with live search/filter)
+demo/admin/{component}.html ← Standalone interactive playground pages for JS components
 ```
