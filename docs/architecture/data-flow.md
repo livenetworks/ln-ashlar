@@ -423,7 +423,7 @@ _scan(document.body);  // init
 
 | Term | Definition |
 |------|------------|
-| **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`). |
+| **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`). For details, see the [Coordinator Doctrine](coordinator.md). |
 | **Store** | An `ln-store` instance bound to a single resource. One element, one cache, one queue. |
 | **Renderer** | Any element with `data-ln-store-source="<storeName>"`. Receives `ln-store:change` events. |
 | **Form binding** | `data-ln-store-form="<storeName>"` on a `<form>` routes its `ln-form:submit` to the named store. |
