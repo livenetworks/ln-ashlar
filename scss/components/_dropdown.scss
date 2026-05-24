@@ -6,6 +6,11 @@
 
 [data-ln-dropdown-menu] {
 	@include dropdown-menu;
+
+	// Reset right-alignment when teleported to body to prevent 100% width stretching
+	body > & {
+		right: auto;
+	}
 }
 
 @keyframes ln-dropdown-in {
