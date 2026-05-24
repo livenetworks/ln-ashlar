@@ -74,6 +74,8 @@ Dropdown does not manage open/close state. It listens for
 `[data-ln-toggle]` element and runs its teleport / positioning /
 listener-lifecycle steps in response.
 
+This is a classic implementation of a library-shipped **Presentation Coordinator**. For a detailed explanation of this design pattern and when to use it, see the [Coordinator Doctrine Reference](../architecture/coordinator.md).
+
 ## MutationObserver
 
 A single global observer watches `document.body` for:

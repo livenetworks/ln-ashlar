@@ -157,7 +157,7 @@ is the accordion wrapper itself.
 
 ## Coordinator / cross-component contract
 
-The accordion is a [coordinator](../architecture/data-flow.md#14-glossary)
+The accordion is a [coordinator](../architecture/coordinator.md)
 — it listens for `ln-toggle:open` and delegates the close work to
 siblings via attribute writes, never by calling instance methods.
 The contract:
