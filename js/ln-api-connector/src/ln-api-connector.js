@@ -28,9 +28,14 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 		this.baseUrl = dom.getAttribute('data-ln-api-base-url') || '';
 		this.path = dom.getAttribute('data-ln-api-path') || '';
+		this.credentials = 'same-origin';
 
 		const rawHeaders = dom.getAttribute('data-ln-api-headers') || '';
 		this.headers = parseHeaders(rawHeaders, 'ln-api-connector');
+
+		if (rawHeaders.toLowerCase().includes('authorization') || rawHeaders.toLowerCase().includes('bearer') || rawHeaders.toLowerCase().includes('basic')) {
+			console.warn('[ln-api-connector] Security Warning: Sensitive authorization credentials detected in data-ln-api-headers attribute. Storing secrets in HTML DOM attributes is highly discouraged and vulnerable to XSS credential extraction. Please use HttpOnly session cookies or a Backend Proxy Gateway instead.');
+		}
 
 		dispatch(dom, 'ln-api-connector:config-changed', {
 			baseUrl: this.baseUrl,
@@ -49,7 +54,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			url += (url.indexOf('?') !== -1 ? '&' : '?') + 'since=' + encodeURIComponent(since);
 		}
 
-		return window.fetch(url, { method: 'GET', headers: getHeaders(self.headers) })
+		return window.fetch(url, { method: 'GET', headers: getHeaders(self.headers), credentials: self.credentials })
 			.then(res => {
 				if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 				return res.json();
@@ -61,6 +66,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		return window.fetch(buildUrl(self.baseUrl, self.path), {
 			method: 'POST',
 			headers: getHeaders(self.headers),
+			credentials: self.credentials,
 			body: JSON.stringify(payload)
 		})
 		.then(res => {
@@ -74,6 +80,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		return window.fetch(buildUrl(self.baseUrl, self.path, id), {
 			method: 'PUT',
 			headers: getHeaders(self.headers),
+			credentials: self.credentials,
 			body: JSON.stringify(payload)
 		})
 		.then(res => {
@@ -92,7 +99,8 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		const self = this;
 		return window.fetch(buildUrl(self.baseUrl, self.path, id), {
 			method: 'DELETE',
-			headers: getHeaders(self.headers)
+			headers: getHeaders(self.headers),
+			credentials: self.credentials
 		})
 		.then(res => {
 			if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
@@ -105,6 +113,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		return window.fetch(buildUrl(self.baseUrl, self.path) + '/bulk-delete', {
 			method: 'DELETE',
 			headers: getHeaders(self.headers),
+			credentials: self.credentials,
 			body: JSON.stringify({ ids: ids })
 		})
 		.then(res => {

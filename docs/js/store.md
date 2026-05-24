@@ -111,6 +111,31 @@ for the full API + query options + global methods.
 | IndexedDB unavailable | Fall back to in-memory, warn via console |
 | Schema version mismatch | Clear all stores, full reload |
 
+## Database Encryption at Rest
+
+To protect local cache data on client devices, `ln-data-store` features transparent envelope encryption using high-performance **AES-GCM 256-bit** encryption backed by the browser **Web Crypto API**.
+
+### The Encryption Pipeline
+
+When a database key is active (via `window.lnCore.setStorageKey`):
+1. **Write Intervention (`_putRecord` / `_putBulk`)**: 
+   The framework extracts the record `id` and the sync marker `_pending` to keep them in plaintext. The remaining record payload is encrypted using a unique, random 12-byte IV.
+   ```
+   Plaintext:  { id: 'usr_1', name: 'Alice', role: 'admin', _pending: true }
+   Encrypted:  { id: 'usr_1', encrypted: true, iv: '...', data: '...', _pending: true }
+   ```
+   This ensures that IndexedDB store keys and indexes can be searched natively by the browser without reading/writing the decrypted data to disk.
+2. **Read Intervention (`_getAllRecords` / `_getRecord`)**: 
+   Whenever records are read from IndexedDB, they are automatically decrypted in memory before they are passed to the in-memory sorting, filtering, and search engine.
+3. **Index & Query Integrity**:
+   Because the sorting, filtering, and searching functions run **in-memory** over the retrieved records rather than querying IndexedDB indexes directly, all search, pagination, and multi-field filtering capabilities function identically whether storage encryption is enabled or disabled.
+
+### Activation
+
+Call `window.lnCore.setStorageKey(passphrase)` to activate database encryption. All subsequent writes will be encrypted.
+
+For detailed security guidelines, see [Security Architecture & Best Practices](../architecture/security.md).
+
 ## DOM mutations
 
 The store renders nothing. The only DOM-side effects are:

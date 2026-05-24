@@ -1,4 +1,4 @@
-import { registerComponent, dispatch } from '../../ln-core';
+import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-store';
@@ -130,6 +130,34 @@ import { registerComponent, dispatch } from '../../ln-core';
 		return _openDatabase();
 	}
 
+	// ─── Cryptographic Wrappers (DRY using ln-core) ──────────
+
+	async function _encryptRecord(record) {
+		if (!getCryptoKey() || !record) return record;
+
+		// Isolate ID and metadata we want in plain text for IndexedDB queries
+		const plainRecord = { ...record };
+		const recordId = plainRecord.id;
+		const pending = plainRecord._pending;
+
+		// Encrypt payload using core helper
+		const encryptedPayload = await encryptData(plainRecord);
+		if (!encryptedPayload || !encryptedPayload.encrypted) return record;
+
+		return {
+			id: recordId,
+			_pending: pending,
+			encrypted: true,
+			iv: encryptedPayload.iv,
+			data: encryptedPayload.data
+		};
+	}
+
+	async function _decryptRecord(record) {
+		if (!record || !record.encrypted || !getCryptoKey()) return record;
+		return decryptData(record);
+	}
+
 	// ─── IndexedDB CRUD Helpers ────────────────────────────
 
 	const _tx = (storeName, mode) => _getDb().then(db => db ? db.transaction(storeName, mode).objectStore(storeName) : null);
@@ -144,9 +172,19 @@ import { registerComponent, dispatch } from '../../ln-core';
 		});
 	}
 
-	const _getAllRecords = storeName => _tx(storeName, 'readonly').then(store => store ? _idbRequest(store.getAll()) : []);
-	const _getRecord = (storeName, id) => _tx(storeName, 'readonly').then(store => store ? _idbRequest(store.get(id)) : null);
-	const _putRecord = (storeName, record) => _tx(storeName, 'readwrite').then(store => store ? _idbRequest(store.put(record)) : null);
+	const _getAllRecords = storeName => _tx(storeName, 'readonly')
+		.then(store => store ? _idbRequest(store.getAll()) : [])
+		.then(records => getCryptoKey() ? Promise.all(records.map(r => _decryptRecord(r))) : records);
+
+	const _getRecord = (storeName, id) => _tx(storeName, 'readonly')
+		.then(store => store ? _idbRequest(store.get(id)) : null)
+		.then(record => record ? _decryptRecord(record) : null);
+
+	const _putRecord = (storeName, record) => {
+		const prepPromise = getCryptoKey() ? _encryptRecord(record) : Promise.resolve(record);
+		return prepPromise.then(prepped => _tx(storeName, 'readwrite').then(store => store ? _idbRequest(store.put(prepped)) : null));
+	};
+
 	const _deleteRecord = (storeName, id) => _tx(storeName, 'readwrite').then(store => store ? _idbRequest(store.delete(id)) : null);
 	const _clearStore = storeName => _tx(storeName, 'readwrite').then(store => store ? _idbRequest(store.clear()) : null);
 	const _countRecords = storeName => _tx(storeName, 'readonly').then(store => store ? _idbRequest(store.count()) : 0);
@@ -302,15 +340,22 @@ import { registerComponent, dispatch } from '../../ln-core';
 	function _putBulk(storeName, records) {
 		return _getDb().then(db => {
 			if (!db) return;
-			return new Promise((resolve, reject) => {
-				const tx = db.transaction(storeName, 'readwrite');
-				const store = tx.objectStore(storeName);
-				records.forEach(r => store.put(r));
-				tx.oncomplete = () => resolve();
-				tx.onerror = () => {
-					_checkQuota(tx.error);
-					reject(tx.error);
-				};
+
+			const prepPromise = getCryptoKey()
+				? Promise.all(records.map(r => _encryptRecord(r)))
+				: Promise.resolve(records);
+
+			return prepPromise.then(preppedRecords => {
+				return new Promise((resolve, reject) => {
+					const tx = db.transaction(storeName, 'readwrite');
+					const store = tx.objectStore(storeName);
+					preppedRecords.forEach(r => store.put(r));
+					tx.oncomplete = () => resolve();
+					tx.onerror = () => {
+						_checkQuota(tx.error);
+						reject(tx.error);
+					};
+				});
 			});
 		});
 	}
@@ -645,4 +690,10 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 	window[DOM_ATTRIBUTE].clearAll = _clearAll;
 	window[DOM_ATTRIBUTE].init = window[DOM_ATTRIBUTE];
+	window[DOM_ATTRIBUTE].setStorageKey = setCryptoKey;
+
+	if (typeof window !== 'undefined') {
+		window.lnCore = window.lnCore || {};
+		window.lnCore.setStorageKey = setCryptoKey;
+	}
 })();

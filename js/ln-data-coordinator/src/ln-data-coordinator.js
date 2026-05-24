@@ -29,23 +29,16 @@ import { registerComponent, dispatch } from '../../ln-core';
 	_component.prototype.refreshMapper = function () {
 		this.mapper = null;
 
-		// 1. Try inline script mapper first
+		// 1. Check for deprecated/insecure inline script mapper
 		const inlineScript = this.dom.querySelector('script[data-ln-mapper]');
 		if (inlineScript) {
-			try {
-				// Evaluate the object expression safely
-				this.mapper = new Function('return ' + inlineScript.textContent.trim())();
-			} catch (err) {
-				console.error('[ln-data-coordinator] Inline mapper evaluation failed:', err);
-			}
+			console.error('[ln-data-coordinator] Security Error: Inline script mappers using <script data-ln-mapper> are deprecated and disabled due to XSS vulnerability risks (unsafe-eval). Please register your mappers securely via window.lnCore.registerDataMapper() instead.');
 		}
 
-		// 2. Fallback to registered external mapper
-		if (!this.mapper) {
-			const mapperName = this.dom.getAttribute('data-ln-data-mapper');
-			if (mapperName && window.lnCore && typeof window.lnCore.getDataMapper === 'function') {
-				this.mapper = window.lnCore.getDataMapper(mapperName);
-			}
+		// 2. Resolve to registered external mapper
+		const mapperName = this.dom.getAttribute('data-ln-data-mapper') || this.dom.getAttribute('data-ln-data-coordinator');
+		if (mapperName && window.lnCore && typeof window.lnCore.getDataMapper === 'function') {
+			this.mapper = window.lnCore.getDataMapper(mapperName);
 		}
 
 		// 3. Ultimate safe fallback: no-op mapper

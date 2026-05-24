@@ -29,9 +29,17 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		this.url = dom.getAttribute('data-ln-couchdb-url') || '';
 		this.db = dom.getAttribute('data-ln-couchdb-db') || '';
 		this.auth = dom.getAttribute('data-ln-couchdb-auth') || '';
+		this.credentials = 'same-origin';
 
 		const rawHeaders = dom.getAttribute('data-ln-couchdb-headers') || '';
 		this.headers = parseHeaders(rawHeaders, 'ln-couchdb-connector');
+
+		if (this.auth) {
+			console.warn('[ln-couchdb-connector] Security Warning: Sensitive authorization credentials detected in data-ln-couchdb-auth attribute. Storing basic authentication credentials in HTML DOM attributes is highly discouraged and vulnerable to XSS credential extraction. Please use HttpOnly session cookies or a Backend Proxy Gateway instead.');
+		}
+		if (rawHeaders.toLowerCase().includes('authorization')) {
+			console.warn('[ln-couchdb-connector] Security Warning: Sensitive authorization credentials detected in data-ln-couchdb-headers attribute. Please use HttpOnly session cookies or a Backend Proxy Gateway instead.');
+		}
 
 		dispatch(dom, 'ln-couchdb-connector:config-changed', {
 			url: this.url,
@@ -53,7 +61,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		if (since) params.push('since=' + encodeURIComponent(since));
 		const url = buildUrl(self.url, self.db, '_changes') + '?' + params.join('&');
 
-		return window.fetch(url, { method: 'GET', headers: getHeaders(self.headers, self.auth) })
+		return window.fetch(url, { method: 'GET', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
 			.then(res => {
 				if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 				return res.json();
@@ -80,6 +88,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		return window.fetch(buildUrl(self.url, self.db), {
 			method: 'POST',
 			headers: getHeaders(self.headers, self.auth),
+			credentials: self.credentials,
 			body: JSON.stringify(doc)
 		})
 		.then(res => {
@@ -100,7 +109,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		const rev = doc._rev || doc.rev;
 
 		const getRevPromise = rev ? Promise.resolve(rev) : 
-			window.fetch(buildUrl(self.url, self.db, null, id), { method: 'GET', headers: getHeaders(self.headers, self.auth) })
+			window.fetch(buildUrl(self.url, self.db, null, id), { method: 'GET', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
 				.then(res => {
 					if (!res.ok) throw new Error('Could not retrieve document for revision mapping');
 					return res.json().then(d => d._rev);
@@ -114,6 +123,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			return window.fetch(buildUrl(self.url, self.db, null, id), {
 				method: 'PUT',
 				headers: headers,
+				credentials: self.credentials,
 				body: JSON.stringify(finalDoc)
 			})
 			.then(res => {
@@ -136,7 +146,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	_component.prototype.delete = function (id, rev) {
 		const self = this;
 		const getRevPromise = rev ? Promise.resolve(rev) : 
-			window.fetch(buildUrl(self.url, self.db, null, id), { method: 'GET', headers: getHeaders(self.headers, self.auth) })
+			window.fetch(buildUrl(self.url, self.db, null, id), { method: 'GET', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
 				.then(res => {
 					if (!res.ok) throw new Error('Could not retrieve document for revision delete');
 					return res.json().then(d => d._rev);
@@ -144,7 +154,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 		return getRevPromise.then(activeRev => {
 			const deleteUrl = buildUrl(self.url, self.db, null, id) + '?rev=' + encodeURIComponent(activeRev);
-			return window.fetch(deleteUrl, { method: 'DELETE', headers: getHeaders(self.headers, self.auth) })
+			return window.fetch(deleteUrl, { method: 'DELETE', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
 				.then(res => {
 					if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 					return res.json();
@@ -163,6 +173,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		return window.fetch(buildUrl(self.url, self.db, '_all_docs'), {
 			method: 'POST',
 			headers: getHeaders(self.headers, self.auth),
+			credentials: self.credentials,
 			body: JSON.stringify({ keys: ids })
 		})
 		.then(res => {
@@ -180,6 +191,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			return window.fetch(buildUrl(self.url, self.db, '_bulk_docs'), {
 				method: 'POST',
 				headers: getHeaders(self.headers, self.auth),
+				credentials: self.credentials,
 				body: JSON.stringify({ docs: docsToDelete })
 			})
 			.then(res => {
