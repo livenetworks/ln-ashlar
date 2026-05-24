@@ -1328,7 +1328,7 @@ async function Ht(h, c = nt) {
         _.setAttribute("role", "menuitem");
     const g = this;
     return this._onToggleOpen = function(_) {
-      _.detail.target === g.toggleEl && (g.triggerBtn && g.triggerBtn.setAttribute("aria-expanded", "true"), g._teleportRestore = Dt(g.toggleEl), g.toggleEl.style.position = "fixed", g._reposition(), g._addOutsideClickListener(), g._addScrollRepositionListener(), g._addResizeCloseListener(), L(p, "ln-dropdown:open", { target: _.detail.target }));
+      _.detail.target === g.toggleEl && (g.triggerBtn && g.triggerBtn.setAttribute("aria-expanded", "true"), g._teleportRestore = Dt(g.toggleEl), g.toggleEl.style.position = "fixed", g.toggleEl.style.right = "auto", g._reposition(), g._addOutsideClickListener(), g._addScrollRepositionListener(), g._addResizeCloseListener(), L(p, "ln-dropdown:open", { target: _.detail.target }));
     }, this._onToggleClose = function(_) {
       _.detail.target === g.toggleEl && (g.triggerBtn && g.triggerBtn.setAttribute("aria-expanded", "false"), g._removeOutsideClickListener(), g._removeScrollRepositionListener(), g._removeResizeCloseListener(), g.toggleEl.style.position = "", g.toggleEl.style.top = "", g.toggleEl.style.left = "", g.toggleEl.style.right = "", g.toggleEl.style.transform = "", g.toggleEl.style.margin = "", g._teleportRestore && (g._teleportRestore(), g._teleportRestore = null), L(p, "ln-dropdown:close", { target: _.detail.target }));
     }, this.toggleEl && (this.toggleEl.addEventListener("ln-toggle:open", this._onToggleOpen), this.toggleEl.addEventListener("ln-toggle:close", this._onToggleClose)), this;

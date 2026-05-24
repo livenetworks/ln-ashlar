@@ -43,6 +43,7 @@ import { dispatch, computePlacement, teleportToBody, measureHidden, registerComp
 			if (self.triggerBtn) self.triggerBtn.setAttribute('aria-expanded', 'true');
 			self._teleportRestore = teleportToBody(self.toggleEl);
 			self.toggleEl.style.position = 'fixed';
+			self.toggleEl.style.right = 'auto';
 			self._reposition();
 			self._addOutsideClickListener();
 			self._addScrollRepositionListener();
