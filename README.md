@@ -16,8 +16,8 @@ Instead of downloading megabytes of JavaScript, compiling in runtime, and displa
 4. **Zero Dependencies**: 100% immune to npm supply chain attacks and package obsolescence. Built exclusively on eternal, backward-compatible W3C web standards.
 
 > [!TIP]
-> 📖 **Прочитајте го комплетниот инженерски манифест на македонски јазик!**  
-> За детална историска анализа на циклусите на процесирање, перформансите (Skeleton Screens наспроти IndexedDB кеш), проблемите со застарување на SPA рамките и безбедносните CVE ризици кај npm, прочитајте ја нашата целосна [Архитектонска филозофија](docs/architecture/philosophy.md).
+> 📖 **Read the complete engineering manifesto!**  
+> For a detailed historical analysis of processing cycles, performance (Skeleton Screens vs. IndexedDB cache), the obsolescence issues of SPA frameworks, and security CVE risks with npm, read our complete [Architectural Philosophy](docs/architecture/philosophy.md).
 
 ---
 
@@ -92,7 +92,7 @@ Deep architectural blueprints detailing the engine driving `ln-ashlar`.
 
 | Specification | Contents |
 |:---|:---|
-| 📖 **[Architecture Philosophy](docs/architecture/philosophy.md)** | The DOM-First engineering manifesto detailing computing cycles, framework EOL risks, and performance. *(Written in Macedonian)* |
+| 📖 **[Architecture Philosophy](docs/architecture/philosophy.md)** | The DOM-First engineering manifesto detailing computing cycles, framework EOL risks, and performance. |
 | 🔄 **[Data Flow Architecture](docs/architecture/data-flow.md)** | Rules governing how data moves. Splits responsibilities into **four isolated concerns**: Data (`ln-store`), Render (`ln-data-table`), Submit (`ln-form`), and Validate (`ln-validate`). Details the **optimistic and offline write pipeline** with a comprehensive Mermaid flow diagram. |
 | 🧭 **[3-Tier Local-First Storage Specs](docs/architecture/data-store-architecture.md)** | Technical reference for decoupling storage caches (`ln-data-store`), network gateways (`ln-*-connector`), and data transformations (`ln-mapper`) under a single parent **Data Coordinator** (`ln-data-coordinator`). |
 | ⚡ **[Reactive Architecture Reference](docs/v2-reactive.md)** | Blueprint on how components manage internal state using Proxy traps (`reactiveState` and `deepReactive`), batched microtask rendering, DOM bindings (`fill`, `renderList`), and attribute-to-state bridges. |
