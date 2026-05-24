@@ -31,7 +31,7 @@
 	<header><h3>Declarative 3-Tier Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- 3-Tier Data Layer: Parent Coordinator enclosing store cache, REST connector, and inline JS mapper -->
-		<div data-ln-data-coordinator="demo-docs" id="demo-coordinator">
+		<div data-ln-data-coordinator="demo-docs" data-ln-data-mapper="demo-docs" id="demo-coordinator">
 			
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
 			<div data-ln-data-store="demo-docs"
@@ -45,8 +45,8 @@
 			     data-ln-api-path="/documents">
 			</div>
 
-			<!-- Tier 3: Ingress/Egress Schema Mapper -->
-			<script type="application/javascript" data-ln-mapper>
+			<!-- Tier 3: Ingress/Egress Schema Mapper (Illustrative Template) -->
+			<script type="application/javascript" data-ln-mapper-demo>
 				({
 					// INGRESS: Server Raw JSON -> Clean Local DB record
 					ingress(serverRaw) {
@@ -427,6 +427,47 @@
 		return realFetch(input, init);
 	};
 })();
+</script>
+
+<!-- Register Mapper securely in global registry -->
+<script>
+	window.lnCore.registerDataMapper('demo-docs', {
+		// INGRESS: Server Raw JSON -> Clean Local DB record
+		ingress(serverRaw) {
+			return {
+				id: serverRaw.doc_id,
+				title: serverRaw.title,
+				department: serverRaw.department || 'General',
+				status: serverRaw.status || 'Draft',
+				// Rename size field
+				file_size: serverRaw.file_size_bytes || 0,
+				// Parse server ISO date string to local Unix timestamp (for IndexedDB sorting)
+				updated_at: serverRaw.server_timestamp 
+					? Math.floor(Date.parse(serverRaw.server_timestamp) / 1000)
+					: Math.floor(Date.now() / 1000),
+				// Flatten nested object structure
+				author_name: serverRaw.author?.name || 'System'
+			};
+		},
+
+		// EGRESS: Clean Local DB record -> Server Raw JSON Payload
+		egress(localDb) {
+			return {
+				doc_id: localDb.id,
+				title: localDb.title,
+				department: localDb.department,
+				status: localDb.status,
+				file_size_bytes: localDb.file_size,
+				// Convert local Unix timestamp back to server ISO string format
+				server_timestamp: localDb.updated_at 
+					? new Date(localDb.updated_at * 1000).toISOString()
+					: new Date().toISOString(),
+				author: {
+					name: localDb.author_name || 'System'
+				}
+			};
+		}
+	});
 </script>
 
 <!-- Interactive Live Demo Wiring & Telemetry Logging -->

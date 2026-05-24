@@ -26,22 +26,23 @@ Below is the visual structure representing how elements are nested in the DOM, i
 │     │  - Standard IndexedDB storage, schemas, & indexes          │     │
 │     │  - Pure local queries (filter, sort, search)               │     │
 │     │  - Reactive event dispatching to UI tables & lists         │     │
-│     │  - ZERO awareness of REST paths, socket URLs, or tokens    │     │
+│     │  - ZERO awareness of REST paths, socket URLs, or cookies   │     │
 │     └────────────────────────────────────────────────────────────┘     │
 │                                                                        │
 │     ┌────────────────────────────────────────────────────────────┐     │
 │     │  DOM: <div data-ln-rest-connector>                         │     │
 │     │                                                            │     │
 │     │  [TRANSPORT GATEWAY (Child 2)]                             │     │
-│     │  - Manages HTTP headers, base URLs, login tokens, retries  │     │
+│     │  - Manages secure connection pathways, endpoints, & sync   │     │
 │     │  - Agnostic of store data schema and Ingress/Egress mappers│     │
 │     └────────────────────────────────────────────────────────────┘     │
 │                                                                        │
 │     ┌────────────────────────────────────────────────────────────┐     │
-│     │  DOM: <script type="application/javascript" data-ln-mapper>│     │
+│     │  JS REGISTRY: window.lnCore.getDataMapper('documents')     │     │
 │     │                                                            │     │
-│     │  [JS MAPPER LOGIC (Child 3)]                               │     │
+│     │  [JS MAPPER LOGIC (Secure Compiled Registry Mapper)]       │     │
 │     │  - Defines ingress(serverRaw) and egress(localDb)          │     │
+│     │  - Safe against XSS; strict CSP-compliant (no dynamic eval)│     │
 │     └────────────────────────────────────────────────────────────┘     │
 └────────────────────────────────────────────────────────────────────────┘
 ```
@@ -62,7 +63,7 @@ flowchart TD
 
     subgraph Subtree ["DOM: data-ln-data-coordinator"]
         Coord["data-ln-data-coordinator (Parent Orchestrator)"]
-        Mapper["Inline JS Mapper (Ingress/Egress)"]
+        Mapper["Registry Data Mapper (Ingress/Egress)"]
         Store["data-ln-data-store (Local Cache)"]
         Connector["data-ln-*-connector (Transport)"]
     end
@@ -91,23 +92,25 @@ flowchart TD
 
 ## 2. Declarative HTML Setup
 
-All transport-specific properties (base URLs, auth tokens, endpoint paths, reconnect configs) are kept strictly inside the **Transport child component**, completely removing connectivity configurations from the parent Coordinator.
+All transport-specific connection properties (base URLs, endpoints, and path configs) are kept strictly inside the **Transport child component**, completely removing connectivity configuration from the parent Coordinator.
+
+> [!WARNING]
+> **Credential Safety**: Never hardcode credentials, session tokens, or authentication headers inside HTML attributes. `ln-ashlar` transport components are designed to use secure, browser-managed HttpOnly session cookies (by implicitly sending `credentials: 'same-origin'`). Alternatively, use a secure Same-Origin backend API Proxy Gateway. See [Security Architecture & Best Practices](security.md) for full context.
 
 ### Scenario A: REST API Resource Coordinator
 ```html
 <!-- Parent Coordinator: encapsulates documents domain, no gateway or path attributes -->
-<div data-ln-data-coordinator="documents">
+<div data-ln-data-coordinator="documents" data-ln-data-mapper="demo-docs">
      
     <!-- Child 1: Storage Layer (IndexedDB Database Cache - pure and blind) -->
     <div data-ln-data-store 
          data-ln-store-indexes="department,status,updated_at">
     </div>
 
-    <!-- Child 2: Transport Gateway (REST Connector - owns path, base URL, and tokens!) -->
+    <!-- Child 2: Transport Gateway (REST Connector - owns path and base URL) -->
     <div data-ln-rest-connector 
          data-ln-rest-base-url="https://api.livenetworks.com/v1"
-         data-ln-rest-path="/documents"
-         data-ln-rest-headers='{"Authorization": "Bearer tok_123"}'>
+         data-ln-rest-path="/documents">
     </div>
 </div>
 ```
@@ -121,11 +124,10 @@ All transport-specific properties (base URLs, auth tokens, endpoint paths, recon
          data-ln-store-indexes="timestamp">
     </div>
 
-    <!-- Child 2: Transport Gateway (WebSocket Connector - owns ws URL, channel, and token!) -->
+    <!-- Child 2: Transport Gateway (WebSocket Connector - owns ws URL and channel) -->
     <div data-ln-websocket-connector 
          data-ln-websocket-url="wss://api.livenetworks.com/realtime"
-         data-ln-websocket-channel="rooms:lobby"
-         data-ln-websocket-token="token456">
+         data-ln-websocket-channel="rooms:lobby">
     </div>
 </div>
 ```
@@ -139,75 +141,32 @@ All transport-specific properties (base URLs, auth tokens, endpoint paths, recon
          data-ln-store-indexes="due_date,priority">
     </div>
 
-    <!-- Child 2: Transport Gateway (CouchDB Sync Connector - owns db details and sync basic auth!) -->
+    <!-- Child 2: Transport Gateway (CouchDB Sync Connector - owns db details and local sync endpoint) -->
     <div data-ln-couchdb-connector 
          data-ln-couchdb-url="https://couch.livenetworks.com"
-         data-ln-couchdb-db="tasks"
-         data-ln-couchdb-auth="Basic dXNlcjpwYXNz">
+         data-ln-couchdb-db="tasks">
     </div>
 </div>
 ```
 
 ---
 
-## 3. Ingress & Egress Data Restructuring (JS Mapper)
+## 3. Ingress & Egress Data Restructuring (Secure Mapper)
 
-To support flexibility, data restructuring is represented by a JavaScript Ingress/Egress contract. Developers can choose between an **inline HTML script mapper** (highly encapsulated) or an **externally registered class** (highly reusable).
+To support flexibility while maintaining strict security, data restructuring is represented by a JavaScript Ingress/Egress contract registered securely via the compiled **Core Mapper Registry**.
 
-### Approach A: Inline JS Script Mapper (Encapsulated in HTML)
-Perfect for writing custom data transformations directly on the page without cluttering the codebase with small, one-off mapper files.
+> [!CAUTION]
+> **Deprecated Evaluation**: Inline script mappers using `<script data-ln-mapper>` are deprecated and disabled. Storing executable logic inside HTML tags violates strict Content Security Policies (CSP) and relies on insecure execution vectors (`new Function` / `eval`) which are vulnerable to XSS credential extraction.
 
-```html
-<div data-ln-data-coordinator="documents">
-    <!-- Cache and REST transport children -->
-    <div data-ln-data-store data-ln-store-indexes="department,status"></div>
-    <div data-ln-rest-connector data-ln-rest-base-url="/api" data-ln-rest-path="/documents"></div>
-
-    <!-- Nested JS Mapping Logic directly inside the DOM subtree -->
-    <script type="application/javascript" data-ln-mapper>
-      ({
-        // INGRESS: Server Raw -> Local IndexedDB
-        ingress(serverRaw) {
-          return {
-            id: serverRaw.id,
-            title: serverRaw.title,
-            department: serverRaw.department,
-            status: serverRaw.status,
-            file_size: serverRaw.file_size_bytes, // rename
-            
-            // Parse ISO string to Unix timestamp (Number) for IndexedDB sorting
-            updated_at: Date.parse(serverRaw.updated_at) / 1000,
-            
-            // Flatten nested object
-            author_name: serverRaw.author?.name || 'System'
-          };
-        },
-
-        // EGRESS: Local IndexedDB -> Server Raw
-        egress(localDb) {
-          return {
-            title: localDb.title,
-            department: localDb.department,
-            status: localDb.status,
-            file_size_bytes: localDb.file_size,
-            
-            // Convert Unix timestamp back to ISO string for backend
-            updated_at: new Date(localDb.updated_at * 1000).toISOString()
-          };
-        }
-      })
-    </script>
-</div>
-```
-
-### Approach B: External JS-Registered Domain Mappers (Reusability & Custom Coordinators)
-Ideal for centralizing core domain entities used across multiple application layouts, or when extending a custom Coordinator subclass.
+### JS-Registered Domain Mappers (Standard & Secure)
+This is the standard secure pattern. Define and compile your mapping logic within your application's compiled modules, registering them globally with the core framework barrel.
 
 ```javascript
 // js/domain/mappers/documents.js
 import { registerDataMapper } from '../../ln-core';
 
 registerDataMapper('documents', {
+  // INGRESS: Server Raw -> Local IndexedDB Cache
   ingress(serverRaw) {
     return {
       id: serverRaw.id,
@@ -217,6 +176,7 @@ registerDataMapper('documents', {
       author_name: serverRaw.author?.name || 'System'
     };
   },
+  // EGRESS: Local IndexedDB Cache -> Server Raw payload
   egress(localDb) {
     return {
       title: localDb.title,
@@ -227,10 +187,13 @@ registerDataMapper('documents', {
 });
 ```
 
-Bound cleanly in HTML via reference:
+This mapper is then bound cleanly and safely in HTML via a reference attribute:
 ```html
 <div data-ln-data-coordinator="documents" data-ln-data-mapper="documents">
+    <!-- Child 1: Database Store Cache -->
     <div data-ln-data-store data-ln-store-indexes="department,status"></div>
+
+    <!-- Child 2: Transport Connector Gateway -->
     <div data-ln-rest-connector data-ln-rest-base-url="/api" data-ln-rest-path="/documents"></div>
 </div>
 ```
@@ -290,24 +253,19 @@ function _initCoordinator(self) {
 }
 
 function _resolveMapper(self) {
-  // Try inline script first
+  // 1. Scan for deprecated/insecure inline script mapper
   const inlineScript = self.dom.querySelector('script[data-ln-mapper]');
   if (inlineScript) {
-    try {
-      // Evaluate the object expression safely
-      return new Function('return ' + inlineScript.textContent.trim())();
-    } catch (err) {
-      console.error('[ln-data-coordinator] Inline mapper evaluation failed:', err);
-    }
+    console.error('[ln-data-coordinator] Security Error: Inline script mappers using <script data-ln-mapper> are deprecated and disabled due to XSS vulnerability risks (unsafe-eval). Please register your mappers securely via window.lnCore.registerDataMapper() instead.');
   }
 
-  // Fallback to registered external mapper
-  const mapperName = self.dom.getAttribute('data-ln-data-mapper');
+  // 2. Resolve to registered external mapper
+  const mapperName = self.dom.getAttribute('data-ln-data-mapper') || self.dom.getAttribute('data-ln-data-coordinator');
   if (mapperName) {
     return window.lnCore.getDataMapper(mapperName);
   }
 
-  // Standard no-op mapper fallback
+  // 3. Ultimate safe fallback: no-op mapper
   return { ingress: r => r, egress: r => r };
 }
 ```

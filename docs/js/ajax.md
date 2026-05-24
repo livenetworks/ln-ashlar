@@ -56,9 +56,17 @@ When `data-ln-ajax` is set programmatically on an element that was already in th
 
 The source uses a local `findElements` function rather than the `ln-core` helper of the same name. The divergence is intentional: `findElements` in ln-core returns a flat list of elements for iteration, while ln-ajax needs a `{ links, forms }` partition so it can attach different listeners to each group (`click` on links, `submit` on forms) in a single pass. A comment in source explains the reasoning. The two implementations should not be merged without updating all call sites.
 
-## Trust boundary
+## Trust boundary & HTML Sanitization Filter
 
-Source contains an explicit trust-boundary comment: server responses are assumed to come from the same origin and are inserted as raw `innerHTML` without sanitization. This is intentional for same-origin AJAX. Consumers who extend ln-ajax to handle third-party or user-generated content MUST sanitize `data.content` values before they reach `innerHTML`. The comment flags this as a known design constraint, not an oversight.
+To mitigate DOM-based Cross-Site Scripting (XSS) during `innerHTML` swaps, `ln-ajax.js` automatically applies a defense-in-depth HTML sanitization filter on all dynamic content:
+
+1. **DOMPurify Integration (Recommended)**: If the `DOMPurify` library is globally imported on the page, `ln-ajax` routes all HTML response fragments through `DOMPurify.sanitize()` prior to DOM insertion.
+2. **Safe Fallback Sanitizer**: If DOMPurify is not available, the framework runs a strict regex-based fallback filter that automatically parses and strips:
+   - `<script>` blocks
+   - Inline event handlers (such as `onload`, `onerror`, `onclick`, `onmouseover`, etc.)
+   - Dangerous URI schemes (such as `javascript:`, `data:`, `vbscript:`)
+
+This ensures that any HTML injected via AJAX is secure by default, even in the absence of a global sanitization library. For full context on the framework's security model, see [Security Architecture & Best Practices](../architecture/security.md).
 
 ## Error detail shape divergence
 
