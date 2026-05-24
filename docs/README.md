@@ -105,6 +105,7 @@ Two files per component:
 
 | Topic | File |
 |-------|------|
+| Master Architect Overview | [architecture/overview.md](architecture/overview.md) |
 | JS Component Patterns | [js/component-guide.md](js/component-guide.md) |
 | Reactive Architecture (v2) | [v2-reactive.md](v2-reactive.md) |
 | Container Queries | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |
