@@ -1,110 +1,110 @@
-# Филозофија и архитектонски принципи зад `ln-ashlar`
+# Philosophy and Architectural Principles Behind `ln-ashlar`
 
-Овој документ ја елаборира филозофската и техничката позадина зад развојот на `ln-ashlar`. Тој објаснува зошто одбравме **DOM-First (клиентски децентрализиран, но серверски рендериран)** пристап, анализирајќи ги историските циклуси на компјутерското процесирање, перформансите, безбедносните ризици на мејнстрим рамките и долгорочната одржливост на веб апликациите.
+This document elaborates on the philosophical and technical background behind the development of `ln-ashlar`. It explains why we chose a **DOM-First (client-side decentralized but server-side rendered)** approach, analyzing historical processing cycles, performance, the security risks of mainstream frameworks, and the long-term sustainability of web applications.
 
 ---
 
-## 1. Историски циклуси на процесирањето: Нишалото на компјутерската архитектура
+## 1. Historical Computing Cycles: The Pendulum of Computer Architecture
 
-Компјутерската индустрија се движи во циклуси кои периодично ја префрлаат одговорноста за процесирање помеѓу централниот сервер и крајниот клиент. Како историско нишало, архитектурите се вртат во круг:
+The computer industry moves in cycles that periodically shift processing responsibility between the central server and the end client. Like a historical pendulum, architectures swing in a circle:
 
 ```
 ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
 │ 1. Centralized  │       │ 2. Distributed  │       │ 3. Centralized  │
 │   (Mainframe)   ├──────►│   (Fat Client)  ├──────►│   (Early Web)   │
-│ Сервер-терминал │       │ Локален десктоп │       │ Серверски HTML  │
+│ Server-Terminal │       │  Local Desktop  │       │ Server-side HTML│
 └─────────────────┘       └─────────────────┘       └───────┬─────────┘
                                                             │
 ┌─────────────────┐       ┌─────────────────┐               │
 │ 5. Progressive  │       │   4. Client JS  │               │
 │   (DOM-First)   │◄──────┤      (SPA)      │◄──────────────┘
-│    концепт      │       │ React/Vue/Ang   │
+│     concept     │       │  React/Vue/Ang  │
 └─────────────────┘       └─────────────────┘
 ```
 
-1. **Ера на Mainframe (Сервер-Терминал):** Корисниците работат на т.н. „глупави терминали“ кои само прикажуваат текст, додека целата пресметковна моќ е на еден огромен сервер.
-2. **Ера на Fat Clients (Локално процесирање):** Со појавата на личните компјутери (PC), процесирањето целосно се префрла на клиентот преку локално инсталирани десктоп апликации.
-3. **Рана ера на Веб (Серверски рендериран HTML):** Првите веб апликации ја враќаат бизнис логиката на серверот. Прелистувачот бара страница, серверот генерира готов HTML, а клиентот само го црта.
-4. **Ера на Single-Page Applications (SPA / Heavy Client Web):** Со појавата на Angular, React и Vue, нишалото повторно се врати кај клиентот. Прелистувачот презема празен HTML и огромен JavaScript пакет кој во runtime го конструира целиот интерфејс на клиентот.
-5. **Прогресивен / DOM-First концепт:** Денес индустријата сè повеќе сфаќа дека преземањето мегабајти JavaScript за најобични CRUD страници е неефикасно. Парадигмата се движи кон хибриден модел: **серверот го испорачува готовиот структуриран HTML, а лесниот клиентски JS прогресивно го „оживува“ со користење на самиот DOM како извор на вистината.** Во овој контекст, `ln-ashlar` е развиен токму како имплементација на овој концепт.
+1. **Mainframe Era (Server-Terminal):** Users work on so-called "dumb terminals" that only display text, while all computational power resides on a single massive server.
+2. **Fat Clients Era (Local Processing):** With the advent of personal computers (PCs), processing completely shifted to the client via locally installed desktop applications.
+3. **Early Web Era (Server-Side Rendered HTML):** The first web applications returned business logic to the server. The browser requests a page, the server generates complete HTML, and the client simply paints it.
+4. **Single-Page Applications Era (SPA / Heavy Client Web):** With the rise of Angular, React, and Vue, the pendulum swung back to the client. The browser downloads an empty HTML skeleton and a massive JavaScript bundle that constructs the entire user interface on the client at runtime.
+5. **Progressive / DOM-First Concept:** Today, the industry increasingly realizes that downloading megabytes of JavaScript for simple CRUD pages is highly inefficient. The paradigm is shifting toward a hybrid model: **the server delivers fully structured, ready-to-render HTML, and a lightweight client-side JS progressively "enlivens" it, using the DOM itself as the single source of truth.** In this context, `ln-ashlar` has been developed specifically as an implementation of this concept.
 
-### Веб стандард: Прелистувачот работи со HTML, а не со Virtual DOM
-Без оглед на тоа кој мејнстрим JS framework се користи (React, Vue, Angular), сите тие на крајот мора да генерираат **чист HTML DOM**. Тоа е единственото нешто што веб прелистувачот нативно го разбира. 
+### Web Standard: The Browser Works with HTML, Not a Virtual DOM
+Regardless of which mainstream JS framework is used (React, Vue, Angular), they all ultimately must generate **clean HTML DOM**. That is the only thing the web browser natively understands.
 
-Разликата е само **каде и кога** се генерира тој DOM:
-* **Кај SPA:** Клиентскиот процесор мора да преземе мегабајти JS, да го компајлира во runtime, да изгради Virtual DOM во меморијата, да го изврши т.н. „diffing“ алгоритам и дури тогаш да го вбризга во реалниот DOM.
-* **Кај `ln-ashlar`:** Серверот (бил тој во PHP/Laravel, Go, Python или Node) го испраќа готовиот, семантички HTML. Прелистувачот го прикажува веднаш, а `ln-ashlar` progressive-скриптите го преземаат и активираат локалното однесување во милисекунди.
+The difference is simply **where and when** that DOM is generated:
+* **In SPAs:** The client-side processor must download megabytes of JS, compile it at runtime, build a Virtual DOM in memory, run the so-called "diffing" algorithm, and only then inject it into the real DOM.
+* **In `ln-ashlar`:** The server (whether written in PHP/Laravel, Go, Python, or Node) sends ready-to-render, semantic HTML. The browser displays it immediately, and the `ln-ashlar` progressive scripts take over and activate local behavior in milliseconds.
 
 ---
 
-## 2. Перформанси: Илузијата на SPA брзината vs. Локален кеш
+## 2. Performance: The Illusion of SPA Speed vs. Local Cache
 
-Мејнстрим заедницата често тврди дека SPA апликациите се екстремно брзи бидејќи рендерирањето на Virtual DOM се случува директно кај клиентот. Меѓутоа, во реалноста, архитектурата на овие системи страда од сериозна латентност:
+The mainstream community often claims that SPA applications are extremely fast because Virtual DOM rendering happens directly on the client. However, in reality, the architecture of these systems suffers from severe latency:
 
-### 2.1 Илузијата на Skeleton Screens (Skeletons) и водопадот од API повици
-За да се прикаже една единствена страница, класичната SPA апликација мора да направи **водопад од асинхрони API повици** (често 10+ паралелни повици: за менија, профили, кориснички поставки, нотификации, табели, графикони и статистики). 
+### 2.1 The Illusion of Skeleton Screens and the API Waterfall
+To display a single page, a classical SPA application must execute a **waterfall of asynchronous API calls** (often 10+ parallel requests: for menus, profiles, user settings, notifications, tables, charts, and statistics).
 
-Додека овие мрежни повици патуваат до серверот и назад, корисникот гледа сив празен лејаут со вештачки кутии — т.н. **Skeleton Screens / Skeleton Loaders**. 
+While these network requests travel to the server and back, the user sees a gray, empty layout filled with artificial boxes — so-called **Skeleton Screens / Skeleton Loaders**.
 > [!IMPORTANT]
-> Сивите placeholders (skeletons) не се естетска дизајнерска карактеристика, туку **архитектонски козметички фластер** со кој се маскира бавноста на мрежниот водопад кај апликации кои немаат локален кеш.
+> Gray placeholders (skeletons) are not an aesthetic design feature; they are an **architectural cosmetic bandage** designed to mask the slowness of the network waterfall in applications that lack a local cache.
 
-Најочигледен пример за овој проблем е контролниот панел на **Cloudflare**: иако е поддржан од најбрзата глобална CDN мрежа во светот, неговиот React-базиран SPA интерфејс е катастрофално бавен и фрустрирачки. Секој клик и транзиција иницираат нов бран на API водопади и сиви skeletons, принудувајќи го корисникот константно да чека.
+The most obvious example of this issue is the **Cloudflare** dashboard: even though it is backed by one of the fastest global CDN networks in the world, its React-based SPA interface is catastrophically slow and frustrating. Every click and transition initiates a new wave of API waterfalls and gray skeletons, forcing the user to constantly wait.
 
-### 2.2 Решението кај `ln-ashlar`: Моментален приказ преку IndexedDB
-Кај `ln-ashlar`, овој проблем е елиминиран во два чекори:
-1. **Елиминирање на FCP блокаторите:** Прелистувачот веднаш добива готов HTML од серверот при првично вчитување.
-2. **Локален IndexedDB кеш како извор на вистината:** Податоците не се влечат преку мрежни водопади при секој клик. Упитите се извршуваат моментално врз локалната база на клиентот. Интерфејсот реагира во милисекунди без никакви „сиви placeholders“, додека делта-синхронизацијата со бекендот се одвива тивко во позадина.
-
----
-
-## 3. Проблемот со застареност и краток животен век на SPA рамките
-
-Индустријата на JavaScript frameworks се развива со екстремно брзо темпо, што често резултира со фундаментални промени кои ги прават постоечките апликации небезбедни или нефункционални по само неколку години.
-
-**Документирани примери на нестабилност:**
-
-* **Angular (EOL циклуси на секои 6 месеци):** Angular објавува нова major верзија двапати годишно, а секоја верзија добива поддршка од само 18 месеци (6 месеци активна + 12 месеци LTS). Преминот од AngularJS (v1) на Angular 2 значеше комплетно препишување на кодот. Апликациите напишани во верзиите од v2 до v18 веќе се официјално надвор од безбедносна поддршка (End of Life).
-* **React (Постојана промена на парадигмата):** React трипати ја смени препорачаната развојна доктрина во рок од 6 години (Class Components → Hooks → React Server Components). Секоја промена бара промена на архитектурата и повторно учење.
-* **Vue ( Vue 2 → Vue 3 преминот):** Vue 3 воведе breaking changes кои ги направија Vue 2 апликациите неподдржани по крајот на 2023 година, принудувајќи ги развојните тимови на масивни рефакторирања поради некомпатибилност на екосистемот од додатоци.
-* **Next.js (Нестабилност во рутирањето):** Воведувањето на Pages Router, па потоа App Router и Server Actions создаде каскаден бран на некомпатибилност во документацијата и библиотеките во рок од само 2 години.
-
-`ln-ashlar` е изграден врз **нативни веб стандарди кои не застаруваат**. HTML и CustomEvents се дизајнирани со доживотна компатибилност наназад (backward compatibility), гарантирајќи дека напишаниот код ќе продолжи да работи безбедно и стабилно во секој современ веб прелистувач.
+### 2.2 The `ln-ashlar` Solution: Instant Render via IndexedDB
+In `ln-ashlar`, this problem is eliminated in two steps:
+1. **Eliminating FCP (First Contentful Paint) Blockers:** The browser receives fully rendered HTML from the server instantly upon initial load.
+2. **Local IndexedDB Cache as the Source of Truth:** Data is not pulled via network waterfalls on every click. Queries are executed instantaneously against the client's local database. The interface responds in milliseconds without any "gray placeholders," while delta-synchronization with the backend runs silently in the background.
 
 ---
 
-## 4. Supply Chain напади и безбедносни ризици кај npm
+## 3. The Framework Obsolescence Trap: Short Lifespan of SPA Ecosystems
 
-Мејнстрим JS апликациите работат во рамките на `npm` екосистемот, каде една просечна апликација повлекува од **500 до 1500 транзитивни пакети во `node_modules`**. Програмерот реално одржува 20-тина пакети, а за останатите илјада нема поим кој ги напишал и кој ги ажурира.
+The JavaScript framework industry evolves at an extremely rapid pace, frequently resulting in breaking changes that render existing applications insecure or non-functional after only a few years.
 
-Ова создава сериозни **Supply Chain (ланец на снабдување)** безбедносни ризици:
+**Documented Examples of Instability:**
 
-* ** event-stream инцидентот (2018):** Напаѓач го презеде одржувањето на популарен пакет со милиони преземања неделно и вметна малициозен код за кражба на податоци. Илјадници апликации го презедоа малициозниот код преку автоматски ажурирања.
-* **ua-parser-js, coa и rc компромитации (2021):** Пакети со десетици милиони неделни преземања беа киднапирани соpassword stealers и крипто-рудари.
-* **Ранливост без закрпа:** Голем дел од npm пакетите се хоби проекти од поединци. Кога ќе се открие безбедносна ранливост (CVE), често поминуваат месеци пред да се објави закрпа (patch), додека проектот во меѓувреме е ранлив.
+* **Angular (EOL Cycles Every 6 Months):** Angular releases a new major version twice a year, with each version receiving only 18 months of support (6 months active + 12 months LTS). The migration from AngularJS (v1) to Angular 2 required a complete rewrite of the codebase. Applications written in versions v2 through v18 are already officially End of Life (EOL) and lack security support.
+* **React (Constant Paradigm Shifts):** React has changed its recommended development paradigm three times in 6 years (Class Components → Hooks → React Server Components). Every shift demands architectural changes and continuous developer retraining.
+* **Vue (Vue 2 → Vue 3 Transition):** Vue 3 introduced breaking changes that left Vue 2 applications unsupported after the end of 2023, forcing development teams into massive refactorings due to plugin ecosystem incompatibilities.
+* **Next.js (Routing Instability):** The introduction of the Pages Router, followed by the App Router and Server Actions, triggered a cascading wave of incompatibilities in documentation, tutorials, and third-party libraries in less than 2 years.
 
-`ln-ashlar` се справува со овој безбедносен кошмар преку **нулта зависност (zero-dependency)** политика. Кодовите во `ln-ashlar` се напишани во чист, нативен JavaScript кој директно комуницира со веб API-то на прелистувачот, со што површината за напад е сведена на апсолутна нула.
+`ln-ashlar` is built on **native web standards that do not expire**. HTML attributes and `CustomEvent` interfaces are designed with lifelong backward compatibility, guaranteeing that written code will continue to run securely and stably in any modern web browser.
 
 ---
 
-## 5. Зошто е создаден `ln-ashlar`?
+## 4. Supply Chain Attacks and Security Risks in npm
 
-`ln-ashlar` е изграден да понуди **Алтернативен, Одржлив и Безбеден Пат** за модерни веб апликации.
+Mainstream JS applications operate within the `npm` ecosystem, where an average application pulls anywhere from **500 to 1,500 transitive packages into `node_modules`**. While a developer actively maintains around 20 direct dependencies, they have no idea who wrote or maintains the other thousand packages in the tree.
 
-Наместо да избираме помеѓу стариот „глупав“ серверски приказ и новиот „комплексен“ JS-First хаос, `ln-ashlar` ги спојува најдобрите одлики на двата света:
+This creates severe **Supply Chain** security risks:
 
-1. **Серверот ја рендерира структурата:** Серверот ( Laravel, Go, Rails, итн.) брзо ја генерира семантичката HTML структура и ја испорачува на клиентот.
-2. **DOM-от е координатор:** Наместо JS да го гради интерфејсот, HTML ознаките ја дефинираат конфигурацијата и однесувањето.
-3. **Прогресивна и нативна интерактивност:** Лесните, модуларни vanilla JS компоненти на `ln-ashlar` (како `ln-data-store`, `ln-data-table`, `ln-modal`) се будат преку MutationObservers и комуницираат преку нативни CustomEvents.
+* **The `event-stream` incident (2018):** A malicious actor took over maintenance of a popular package with millions of weekly downloads and injected data-stealing malware. Thousands of applications downloaded the compromised version via automated minor version updates.
+* **`ua-parser-js`, `coa`, and `rc` compromises (2021):** High-profile packages with tens of millions of weekly downloads were hijacked to deliver password stealers and crypto-miners.
+* **Unpatched Vulnerabilities:** A significant portion of npm packages are hobby projects maintained by single individuals. When security vulnerabilities (CVEs) are discovered, months can pass before a patch is published, leaving downstream enterprise applications exposed in the meantime.
 
-### Резиме на архитектонската споредба
+`ln-ashlar` addresses this security nightmare via a strict **zero-dependency** policy. All client-side code in `ln-ashlar` is written in clean, native JavaScript that communicates directly with the browser's native Web APIs, reducing the dependency attack surface to absolute zero.
 
-| Архитектонски предизвик | Мејнстрим JS-First (React/Vue/Angular) | DOM-First со `ln-ashlar` |
+---
+
+## 5. Why was `ln-ashlar` Created?
+
+`ln-ashlar` was built to offer an **alternative, sustainable, and secure path** for modern web applications.
+
+Instead of forcing a choice between the outdated "dumb" server-rendered paint and the complex "JS-first" chaos of mainstream frameworks, `ln-ashlar` merges the best qualities of both worlds:
+
+1. **The Server Renders the Structure:** The backend (Laravel, Go, Rails, etc.) quickly generates the semantic HTML structure and delivers it to the client.
+2. **The DOM is the Coordinator:** Instead of JavaScript dynamically building the markup, declarative HTML attributes define the configuration and behavioral scope.
+3. **Progressive and Native Interactivity:** Lightweight, modular vanilla JS components (`ln-data-store`, `ln-data-table`, `ln-modal`) are dynamically registered via `MutationObserver` and communicate using native `CustomEvent` flows.
+
+### Summary of Architectural Comparison
+
+| Architectural Challenge | Mainstream JS-First (React/Vue/Angular) | DOM-First with `ln-ashlar` |
 | :--- | :--- | :--- |
-| **Примарно рендерирање** | На клиентот преку тежок Virtual DOM. | На серверот преку стандарден HTML. |
-| **Поврзување и конфигурација** | Во JS код преку imports и props. | Директно во DOM преку семантички `data-ln` елементи. |
-| **Мрежна зависност (npm)** | Стотици до илјадници пакети (`node_modules`). | **Нулта зависност (Zero-Dependency)**. |
-| **Опасност од Supply Chain напади** | Висока (над десетици познати CVE неделно). | Нулта. Нативен и чист код. |
-| **Поддршка по 5 години** | Екстремно ниска (задолжителни upgrades на верзии). | **100% сигурна (базирана на вечни W3C веб стандарди)**. |
-| **Прогресивност** | SPA бара целосен SPA deployment. | Прогресивно: може да додадеш само еден `ln-data-table` на обична страница. |
+| **Primary Rendering** | Client-side via heavy Virtual DOM compilation. | Server-side via standard HTML. |
+| **Binding & Config** | Inside JS files via imports, props, and states. | Directly in HTML via semantic `data-ln` attributes. |
+| **Dependency Overhead** | Hundreds to thousands of packages (`node_modules`). | **Zero-Dependency (0 npm packages at runtime)**. |
+| **Supply Chain Exposure** | High (dozens of newly discovered CVEs weekly). | Zero. Native and clean custom-built code. |
+| **Longevity & Support** | Extremely low (mandatory breaking upgrades). | **100% Stable (backed by permanent W3C web standards)**. |
+| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-data-table` onto any layout. |
 
-`ln-ashlar` не е само збирка на JS компоненти; тој е **архитектонска изјава** дека развојот на веб апликации може да биде поедноставен, побрз, побезбеден и долгорочно одржлив.
+`ln-ashlar` is not merely a collection of JS components; it is an **architectural statement** that developing web applications can be simpler, faster, safer, and sustainable over decades.
