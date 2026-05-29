@@ -153,6 +153,8 @@ For detailed manual instructions, properties, attributes, and events of individu
 | **AJAX** | 🔄 **[ln-ajax docs](js/ln-ajax/README.md)** | 📄 **[ajax architecture](docs/js/ajax.md)** |
 | **HTTP** | — | 📄 **[http service architecture](docs/js/http.md)** |
 | **Store** | 🗄️ **[ln-store docs](js/ln-store/README.md)** | 📄 **[store cache architecture](docs/js/store.md)** |
+| **API Connector** | 🔌 **[ln-api-connector docs](js/ln-api-connector/README.md)** | — |
+| **CouchDB Connector** | 🔌 **[ln-couchdb-connector docs](js/ln-couchdb-connector/README.md)** | 📄 **[couchdb-connector architecture](docs/js/couchdb-connector.md)** |
 | **Form** | 📝 **[ln-form docs](js/ln-form/README.md)** | 📄 **[form lifecycle architecture](docs/js/form.md)** |
 | **Validate** | ⚠️ **[ln-validate docs](js/ln-validate/README.md)** | 📄 **[validate architecture](docs/js/validate.md)** |
 | **Time** | 🕒 **[ln-time docs](js/ln-time/README.md)** | 📄 **[time architecture](docs/js/time.md)** |

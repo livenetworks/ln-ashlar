@@ -220,7 +220,7 @@ The co-located SCSS should be minimal or empty.
 7. Create `js/ln-{name}/README.md` — usage guide (attributes, events, API, HTML examples)
 8. Create `docs/js/{name}.md` — architecture reference (internal state, render flow, event lifecycle)
 9. Create `demo/admin/{name}.html` — interactive demo page
-10. Detailed architecture: [js/COMPONENTS.md](js/COMPONENTS.md)
+10. Detailed architecture: [docs/js/component-guide.md](../js/component-guide.md)
 
 ---
 
@@ -456,122 +456,12 @@ vocabulary at theme `:root`.
 
 ## Token Surface — Primitives + Vocabulary
 
-The token system has three layers:
+The styling system enforces a clean separation between scale values (the scale tokens), named design choices (the vocabulary), and what components actually read (the primitives).
 
-1. **Scale** (`--size-*`, `--color-neutral-*`, `--shadow-sm/md/xl`) — back-end plumbing. Lives in `_tokens.scss`. Mixins never read these directly.
-2. **Vocabulary** (`--bg-base`, `--fg-default`, `--border-subtle`, `--shadow-resting`, etc.) — named value choices. Pre-composed `hsl(...)` values. Themes rebind vocabulary at theme `:root`.
-3. **Primitives** (`--color-bg`, `--color-fg`, `--color-border`, `--shadow`) — what mixins read. Single token per concern. Default-wired to vocabulary at `:root`. Components rebind primitives on their own scope to choose a different vocabulary value.
+For a complete, exhaustive catalog of all CSS spacing scales, background/foreground vocabularies, border custom properties, and full tables of Primitives and Vocabulary, see [Design Tokens](../css/tokens.md).
 
-This mirrors spacing: `--padding-x/y`, `--gap`, `--radius` are the primitives; `--size-*` is the vocabulary.
+The following rules govern how these tokens are applied and overridden within the codebase:
 
-### The primitives (what mixin bodies read)
-
-Structure and rhythm:
-
-- `--padding-x`, `--padding-y` — horizontal / vertical chrome
-- `--gap` — flex/grid gap between siblings
-- `--radius` — default corner radius
-- `--border-width` — default border stroke (also `--border-width-strong`)
-- `--margin-block`, `--margin-inline` — vertical / horizontal
-  structural margin (soft — NO `:root` default). Read by mixins that
-  set element-pushing margin (label-to-input gap, section margins,
-  sibling stacking, in-component element offsets).
-
-Surface colors (single primitive per concern):
-
-- `--color-bg` — element surface (default: `var(--bg-base)`)
-- `--color-fg` — text color (default: `var(--fg-default)`)
-- `--color-border` — border color (default: `var(--border-subtle)`)
-- `--shadow` — box shadow (default: `var(--shadow-resting)`)
-- `--color-scrim` — modal overlay (single-purpose primitive, kept as-is)
-
-Accent:
-
-- `--color-accent`, `--color-accent-hover`, `--color-accent-fg`
-- `--color-accent-tint`, `--color-accent-tint-strong` — subtle accent washes
-
-Buttons (state-surface family — kept for hover/active inside the component and layout hooks):
-
-- `--btn-bg`, `--btn-fg`, `--btn-border` — default (neutral) surface read by `@mixin button-base`
-- `--btn-bg-hover`, `--btn-fg-hover`, `--btn-border-hover` — hover / active states
-- `--btn-padding-x`, `--btn-padding-y` — button padding hooks mapped to `--padding-x` and `--padding-y` on generic button elements
-
-Typography:
-
-- `--font-size`, `--line-height`, `--transition`
-
-Per-side borders (soft — NO `:root` default):
-
-- `--border-block-start`, `--border-block-end`, `--border-inline-start`, `--border-inline-end`
-
-These four have NO `:root` default. Mixins read them with a per-mixin fallback — default rendering is unchanged. A scope that rebinds e.g. `--border-block-start: none` flattens the top edge of every joined sibling.
-
-**Margin primitives `--margin-block` and `--margin-inline` follow the
-same SOFT pattern.** No `:root` default — value variation is too wide
-across consumers. Each mixin rebinds locally:
-
-```scss
-@mixin section {
-	--margin-block: var(--size-xl);
-	margin-bottom: var(--margin-block);
-}
-```
-
-Density-compact reacts via the underlying `--size-*` cascade — no
-parallel rebind needed in `.density-compact`.
-
-### The vocabulary (value choices)
-
-Background: `--bg-base`, `--bg-elevated`, `--bg-sunken`, `--bg-recessed`
-
-Foreground: `--fg-default`, `--fg-muted`, `--fg-subtle`
-
-Border: `--border-subtle`, `--border-strong`, `--border-strong-hover`
-
-Shadow: `--shadow-resting`, `--shadow-floating`, `--shadow-overlay`
-
-### Cascade rebind pattern
-
-Components rebind the primitive on their own scope to pick a vocabulary value:
-
-```scss
-@mixin chip {
-	--color-bg: var(--bg-recessed);    // rebind primitive
-	--color-fg: var(--fg-muted);       // rebind primitive
-	background: var(--color-bg);       // read primitive
-	color: var(--color-fg);            // read primitive
-}
-
-@mixin floating-panel {
-	--color-bg:     var(--bg-elevated);
-	--color-border: var(--border-subtle);
-	--shadow:       var(--shadow-floating);
-	background: var(--color-bg);
-	border: var(--border-width) solid var(--color-border);
-	box-shadow: var(--shadow);
-}
-```
-
-Cascade leak is intentional — a chip's children inherit `--color-bg: var(--bg-recessed)`. If a nested component needs a different value, it rebinds again on its own root.
-
-### Theme rebind pattern
-
-Themes rebind vocabulary at theme `:root`. Primitives wire to vocabulary, so all consumers adapt:
-
-```scss
-[data-theme="dark"] {
-	--bg-base:     hsl(220 16% 13%);
-	--bg-elevated: hsl(220 16% 17%);
-	--bg-sunken:   hsl(220 16% 20%);
-	--bg-recessed: hsl(220 16%  9%);
-	--fg-default:  hsl(0 0% 95%);
-	--fg-muted:    hsl(220  9% 60%);
-	--fg-subtle:   hsl(218 11% 52%);
-	--border-subtle:       hsl(220 14% 20%);
-	--border-strong:       hsl(220 13% 36%);
-	--border-strong-hover: hsl(218 11% 52%);
-}
-```
 
 ### Rule — mixins read primitives, never scale tokens
 
@@ -819,8 +709,10 @@ Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon
 Color: icons follow the parent's `color` property automatically. Exception: `lnc-file-pdf`, `lnc-file-doc`,
 `lnc-file-epub` have embedded semantic stroke colors.
 
-To add a custom icon: add SVG to `js/ln-icons/icons/{name}.svg`, run `npm run build`,
-upload `dist/icons/{name}.svg` to custom CDN, use as `#lnc-{name}`.
+To host custom icons in production:
+1. Save the custom SVG icon files in a directory on your production asset server or public CDN (e.g., `/public/assets/icons/` or `https://cdn.mycompany.com/assets/icons/`).
+2. Before the library initializes, define the CDN URL globally using `window.LN_ICONS_CUSTOM_CDN = "https://cdn.mycompany.com/assets/icons";`.
+3. In HTML, reference the icon as `#lnc-{name}` (e.g., `<use href="#lnc-corporate-logo"></use>`). The on-demand sprite generator will fetch, cache, and inject the SVG automatically from your custom CDN.
 
 ---
 

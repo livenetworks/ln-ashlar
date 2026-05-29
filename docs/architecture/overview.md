@@ -68,7 +68,7 @@ Here are the core SCSS mixins available in `ln-ashlar` and guidance on when to u
 | :--- | :--- | :--- |
 | `btn` | `_btn.scss` | Apply to buttons or anchor links that act as primary call-to-actions. |
 | `btn-group` | `_btn.scss` | Wrap lists of related actions (like toolbars or table actions) to establish spacing. |
-| `pill-group` | `_btn.scss` | Use for connected, gapless pill filters (radio/checkbox layouts) where only first/last have radius. |
+| `pill-group` | `_form.scss` | Use for connected, gapless pill filters (radio/checkbox layouts) where only first/last have radius. |
 | `card` | `_card.scss` | Use for content wrappers, dashboard panels, and modular sections. |
 | `modal` | `_modal.scss` | Apply to dialog boxes and overlay panels. Includes animation scales. |
 | `table-base` | `_table.scss` | Apply to tabular data layouts. Options include striping and density overrides. |
@@ -113,6 +113,8 @@ Here is the inventory of our zero-dependency vanilla JS components:
 | **ln-http** | *(Service-style)* | CustomEvent-driven gateway for standard fetch requests. |
 | **ln-data-coordinator**| `data-ln-data-coordinator`| Decouples storage (`ln-data-store`) and gateways (`ln-*-connector`). |
 | **ln-data-store** | `data-ln-data-store` | IndexedDB database cache. Pure, blind local query and write pipeline. |
+| **ln-api-connector** | `data-ln-api-connector` | Decoupled transport gateway for REST APIs. Manages base URLs, paths, credentials, and headers; isolates cache stores from networking. |
+| **ln-couchdb-connector**| `data-ln-couchdb-connector`| Decoupled transport gateway for CouchDB / Sync Gateway. Implements delta synchronization protocols over the Changes Feed. |
 | **ln-form** | `data-ln-form` | Form life-cycle wrapper. Serializes and blocks submit on invalid inputs. |
 | **ln-validate** | `data-ln-validate` | Standard field validation. Interfaces with the browser Validation API. |
 | **ln-time** | `data-ln-time` | Dynamic relative time text elements (e.g. "3 minutes ago"). |

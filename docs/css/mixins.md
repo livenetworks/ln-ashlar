@@ -857,5 +857,4 @@ Forms use CSS Grid + `<div class="form-element">` with explicit `for`/`id`. **Us
 | `scss/base/_global.scss` | Global element styles — all buttons, links, images, `::selection` |
 | `scss/base/_typography.scss` | h1–h6, p, code, pre, blockquote, lists |
 | `scss/components/` | Apply mixins to default selectors (CSS output) |
-| `js/ln-icons/icons/` | Bundled SVG icons (~47, Tabler-based) |
-| `js/ln-icons/tabler/` | Full Tabler icon source library (~4000, not bundled) |
+| `js/ln-icons/` | Zero-dependency dynamic on-demand SVG icon sprite loader |
