@@ -351,9 +351,12 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 								items.push(node);
 							}
 							for (let k = 0; k < items.length; k++) {
-								const inst = items[k][attribute];
-								if (inst && typeof inst.destroy === 'function') {
-									inst.destroy();
+								const item = items[k];
+								if (!document.contains(item)) {
+									const inst = item[attribute];
+									if (inst && typeof inst.destroy === 'function') {
+										inst.destroy();
+									}
 								}
 							}
 						}
