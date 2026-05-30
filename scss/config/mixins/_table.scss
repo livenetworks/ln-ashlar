@@ -12,7 +12,8 @@
 @mixin table-base {
 	@include w-full;
 	background: var(--color-bg);
-	border-radius: var(--radius-lg);
+	--radius: var(--radius-lg);
+	border-radius: var(--radius);
 	// `overflow: clip` not `overflow: hidden` — clips at rounded corners
 	// without establishing a scroll container, so sticky descendants
 	// (e.g. `@mixin data-table` thead/tfoot) bind to the outer
