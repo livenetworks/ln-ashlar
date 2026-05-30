@@ -664,32 +664,37 @@ z-index: 40;
 @include z-modal;
 ```
 
-### Redundant Single-Property Mixins → Use Standard CSS
+### Redundant Single-Property Mixins → Stick to CSS Standards
 
-While `ln-ashlar` provides utility mixins like `@include w()` and `@include h()`, using them with arbitrary, hardcoded values (like `16rem` or `100vh`) is a redundant practice. 
+While `ln-ashlar` provides utility mixins like `@include w()` and `@include h()`, using them is discouraged in favor of standard CSS properties. 
 
-A mixin should only be used when it enforces **design tokens**, **encapsulates complex behavior**, or **avoids magic numbers**.
+**It is not about character counts; it is about preserving web standards.** Every developer already knows standard CSS like `width: 100%` and `height: 100vh`. Forcing developers to learn proprietary, library-specific shorthands (like `@include w(...)` or `@include h(...)`) creates a pointless learning curve and fragments the codebase for no functional gain.
+
+As a core rule: **Write standard CSS for single-line declarations, and reserve `@include` mixins for:**
+1. **Design Tokens:** Mapping properties to system variables to keep design consistency (e.g., `@include rounded-md` which binds to `var(--radius-md)`).
+2. **Multi-line Abstractions:** Wrapping 2 or more lines of complex layout/logic to avoid duplication (e.g., `@include flex-center`, `@include stack`).
 
 ```scss
-// WRONG — Redundant mixins for simple CSS properties (longer to write, less standard)
+// WRONG — Unnecessary proprietary learning curve for standard CSS properties
 .sidebar {
-    @include w(16rem);  // 21 characters
-    @include h(100vh);  // 21 characters
+    @include w(16rem);
+    @include h(100vh);
 }
 
-// CORRECT — Standard, readable CSS/SCSS
+// CORRECT — Stick to the standard CSS platform
 .sidebar {
-    width: 16rem;       // 14 characters
-    height: 100vh;      // 14 characters
+    width: 16rem;
+    height: 100vh;
 }
 
-// CORRECT — Mixins that map to design system tokens or encapsulate multiple lines of logic
+// CORRECT — Mixins that bundle multi-line logic or bridge to design tokens
 .sidebar-card {
     @include rounded-md;  // Enforces system border-radius tokens: var(--radius-md)
     @include z-modal;     // Enforces system layering rules: var(--z-modal)
-    @include flex-center; // Encapsulates display: flex; align-items: center; justify-content: center;
+    @include flex-center; // Combines: display: flex; align-items: center; justify-content: center;
 }
 ```
+
 
 
 ### `max-height` collapse → Use `@include collapsible`
