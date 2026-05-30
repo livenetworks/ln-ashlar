@@ -75,8 +75,6 @@ Then use `@include` instead of hardcoded CSS. Classes exist for prototyping, but
 | `width: 100%` | `@include w-full` |
 | `height: 100%` | `@include h-full` |
 | `min-height: 100vh` | `@include min-h-screen` |
-| `width: X` | `@include w(X)` |
-| `height: X` | `@include h(X)` |
 | `width: X; height: X` | `@include size(X)` |
 
 ### Typography

@@ -179,7 +179,7 @@
 		}
 
 		input[type="color"] {
-			@include h(2.5rem);
+			height: 2.5rem;
 			@include p(var(--size-xs));
 			@include cursor-pointer;
 		}

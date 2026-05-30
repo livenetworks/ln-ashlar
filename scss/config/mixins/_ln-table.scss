@@ -100,7 +100,7 @@
 }
 
 @mixin ln-table-toolbar-search {
-	@include w(10rem);
+	width: 10rem;
 }
 
 // ─── Count badge ──────────────────────────────────────────
