@@ -8,7 +8,17 @@ Locale-aware date formatting with native browser picker.
 <input type="date" name="birthday" data-ln-date>
 ```
 
-On initialization, the component transforms the input into a text-display element with a paired calendar button and a hidden form-submit input. See [`docs/js/date.md`](../../docs/js/date.md) for the full transform.
+On initialization, the component wraps the original input in a `<span data-ln-date-field>` container and injects a visible text input, a hidden native date picker, a hidden form-submit input, and a calendar button. See [`docs/js/date.md`](../../docs/js/date.md) for the full DOM transform.
+
+## Styling
+
+Apply the `form-field-group` mixin to the wrapper element:
+
+```scss
+[data-ln-date-field] {
+    @include form-field-group;
+}
+```
 
 ## Typing Support
 

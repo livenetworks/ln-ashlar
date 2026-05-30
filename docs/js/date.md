@@ -5,12 +5,22 @@ Locale-aware date formatting with native browser picker. File: `js/ln-date/ln-da
 ## Post-Init DOM Transform
 
 ```html
-<input type="text" data-ln-date>
-<input type="date" tabindex="-1" style="position:absolute;opacity:0;width:0;height:0;overflow:hidden;pointer-events:none">
-<input type="hidden" name="birthday" value="2026-04-19">
-<button type="button" aria-label="Open date picker">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>
-</button>
+<span data-ln-date-field>
+    <input type="text" data-ln-date>
+    <input type="date" tabindex="-1" style="position:absolute;opacity:0;width:0;height:0;overflow:hidden;pointer-events:none">
+    <input type="hidden" name="birthday" value="2026-04-19">
+    <button type="button" aria-label="Open date picker">
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>
+    </button>
+</span>
+```
+
+The `<span data-ln-date-field>` wrapper is the SCSS styling hook. Apply the `form-field-group` mixin to it:
+
+```scss
+[data-ln-date-field] {
+    @include form-field-group;
+}
 ```
 
 ## Internal Architecture
@@ -30,6 +40,7 @@ Each `[data-ln-date]` input gets a `_component` instance stored at `element.lnDa
 | Property | Type | Description |
 |----------|------|-------------|
 | `dom` | Element | Reference to the visible display input |
+| `_wrapper` | Element | Reference to the `<span data-ln-date-field>` container |
 | `_hidden` | Element | Reference to the hidden form input |
 | `_picker` | Element | Reference to the hidden date input (for showPicker) |
 | `_btn` | Element | Reference to the calendar button |

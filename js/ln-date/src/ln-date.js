@@ -91,6 +91,13 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 		const initialValue = dom.value; // ISO string (YYYY-MM-DD) or empty
 		const name = dom.name;
 
+		// ── Wrap field: replace dom with <span data-ln-date-field> and move dom inside ──
+		const wrapper = document.createElement('span');
+		wrapper.setAttribute('data-ln-date-field', '');
+		dom.parentNode.insertBefore(wrapper, dom);
+		wrapper.appendChild(dom);
+		this._wrapper = wrapper;
+
 		// ── Create hidden input for form submission ─────────
 		const hidden = document.createElement('input');
 		hidden.type = 'hidden';
@@ -414,6 +421,11 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 		this._hidden.remove();
 		this._picker.remove();
 		this._btn.remove();
+		// Unwrap: move dom back out and drop the wrapper
+		if (this._wrapper && this._wrapper.parentNode) {
+			this._wrapper.parentNode.insertBefore(this.dom, this._wrapper);
+			this._wrapper.remove();
+		}
 		// Restore value
 		if (isoVal) this.dom.value = isoVal;
 		dispatch(this.dom, 'ln-date:destroyed', { target: this.dom });
