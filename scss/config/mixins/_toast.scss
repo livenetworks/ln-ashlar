@@ -23,6 +23,9 @@
 @mixin toast-container {
 	@include fixed;
 	@include z-toast;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 	pointer-events: none;
 	// Viewport-edge offsets — toast container distance from viewport,
 	// not shell rhythm.
@@ -33,6 +36,7 @@
 }
 
 @mixin toast-item {
+	list-style: none;
 	opacity: 0;
 	pointer-events: auto;
 	@include motion-safe {
