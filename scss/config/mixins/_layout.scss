@@ -4,11 +4,15 @@
 
 // Layout — grid, stack, container
 
-@mixin grid {
+@mixin _grid-base {
 	display: grid;
 	--gap: var(--size-lg);
 	gap: var(--gap);
 	grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@mixin grid {
+	@include _grid-base;
 
 	@include mq-up(md) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -20,10 +24,7 @@
 }
 
 @mixin grid-2 {
-	display: grid;
-	--gap: var(--size-lg);
-	gap: var(--gap);
-	grid-template-columns: repeat(1, minmax(0, 1fr));
+	@include _grid-base;
 
 	@include mq-up(md) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -31,10 +32,7 @@
 }
 
 @mixin grid-4 {
-	display: grid;
-	--gap: var(--size-lg);
-	gap: var(--gap);
-	grid-template-columns: repeat(1, minmax(0, 1fr));
+	@include _grid-base;
 
 	@include mq-up(md) {
 		grid-template-columns: repeat(2, minmax(0, 1fr));

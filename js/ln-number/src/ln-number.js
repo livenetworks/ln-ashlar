@@ -1,4 +1,4 @@
-import { dispatch, getLocale, registerComponent } from '../../ln-core';
+import { dispatch, getLocale, registerComponent, interceptValueProperty } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-number';
@@ -46,6 +46,9 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 			return this;
 		}
 
+		if (dom[DOM_ATTRIBUTE]) return dom[DOM_ATTRIBUTE];
+		dom[DOM_ATTRIBUTE] = this;
+
 		this.dom = dom;
 
 		// ── Create hidden input ─────────────────────────────
@@ -68,9 +71,48 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 				_inputValueDesc.set.call(hidden, val);
 				// If set programmatically (e.g., populateForm), update display
 				if (val !== '' && !isNaN(parseFloat(val))) {
-					self._displayFormatted(parseFloat(val));
+					const num = parseFloat(val);
+					self._displayFormatted(num);
+					dispatch(self.dom, 'ln-number:input', { value: num, formatted: self.dom.value });
+					self.dom.dispatchEvent(new Event('input', { bubbles: true }));
 				} else if (val === '') {
 					self.dom.value = '';
+					dispatch(self.dom, 'ln-number:input', { value: NaN, formatted: '' });
+					self.dom.dispatchEvent(new Event('input', { bubbles: true }));
+				}
+			}
+		});
+
+		// ── Intercept programmatic value sets on visible input (2-way binding) ──
+		interceptValueProperty(dom, _inputValueDesc, {
+			get: function () {
+				return _inputValueDesc.get.call(dom);
+			},
+			set: function (val, originalSet) {
+				if (self._isFormatting) {
+					originalSet(val);
+					return;
+				}
+				if (val === '') {
+					originalSet('');
+					self._setHiddenRaw('');
+					dispatch(dom, 'ln-number:input', { value: NaN, formatted: '' });
+					dom.dispatchEvent(new Event('input', { bubbles: true }));
+					return;
+				}
+				// Parse and format
+				let num = typeof val === 'number' ? val : parseFloat(String(val).replace(/[^\d.-]/g, ''));
+				if (isNaN(num)) {
+					originalSet(String(val));
+					self._setHiddenRaw('');
+					dispatch(dom, 'ln-number:input', { value: NaN, formatted: String(val) });
+					dom.dispatchEvent(new Event('input', { bubbles: true }));
+				} else {
+					self._setHiddenRaw(num);
+					const formatted = _formatNum(getLocale(dom), num, dom.getAttribute('data-ln-number-decimals'));
+					originalSet(formatted);
+					dispatch(dom, 'ln-number:input', { value: num, formatted: formatted });
+					dom.dispatchEvent(new Event('input', { bubbles: true }));
 				}
 			}
 		});
@@ -114,6 +156,8 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 			if (!isNaN(num)) {
 				this._displayFormatted(num);
 				_inputValueDesc.set.call(hidden, String(num));
+				dispatch(dom, 'ln-number:input', { value: num, formatted: dom.value });
+				dom.dispatchEvent(new Event('input', { bubbles: true }));
 			}
 		}
 
@@ -236,7 +280,9 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 	};
 
 	_component.prototype._displayFormatted = function (num) {
+		this._isFormatting = true;
 		this.dom.value = _formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals'));
+		this._isFormatting = false;
 	};
 
 	// ─── Public API ───────────────────────────────────────────
@@ -250,6 +296,7 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 			if (typeof num !== 'number' || isNaN(num)) {
 				this.dom.value = '';
 				this._setHiddenRaw('');
+				this.dom.dispatchEvent(new Event('input', { bubbles: true }));
 				return;
 			}
 			this._displayFormatted(num);
@@ -258,6 +305,7 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 				value: num,
 				formatted: this.dom.value
 			});
+			this.dom.dispatchEvent(new Event('input', { bubbles: true }));
 		}
 	});
 

@@ -25,9 +25,12 @@
 	--margin-block: var(--size-xs);
 	margin-bottom: var(--margin-block);
 
-	// Required indicator — red * after label text
-	// Triggered by sibling input[required] via parent :has()
-	.form-element:has([required]) > & {
+	// Required indicator — red * after label text.
+	// Supports standard wrapping classes/tags (.form-element, .form-group, label)
+	// and general siblings preceding a required input.
+	:is(.form-element, .form-group, .form-field):has([required]) > &,
+	label:has([required]) &,
+	&:has(~ :is(input, select, textarea)[required]) {
 		&::after {
 			content: ' *';
 			color: hsl(var(--color-error));
@@ -166,6 +169,8 @@
 	@include form-input;       // visual shell: border, bg, radius, transition, outline
 	@include inline-flex;      // override form-input's block display
 	@include items-center;
+	position: relative;        // anchors any absolute-positioned children (e.g. native pickers)
+	overflow: hidden;          // clips child corners to the shell's border-radius automatically
 	width: auto;               // cancel form-input's w-full
 	padding: 0;                // shell owns NO padding; children manage their own
 	margin-bottom: 0;          // defensive: wrapping <label> carries form-label margin
@@ -176,6 +181,28 @@
 		> input,
 		> select {
 			box-shadow: none;  // suppress child's own form-input focus ring
+		}
+	}
+
+	// Propagate validation states to the parent visual shell
+	&:has(> .ln-validate-invalid) {
+		@include form-validate-invalid;
+	}
+	&:has(> .ln-validate-valid) {
+		@include form-validate-valid;
+	}
+
+	// Propagate disabled states to the parent visual shell
+	&:has(> input:disabled),
+	&:has(> select:disabled),
+	&:has(> button:disabled) {
+		@include opacity-50;
+		@include cursor-not-allowed;
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
+
+		* {
+			@include cursor-not-allowed;
 		}
 	}
 
@@ -196,17 +223,34 @@
 		@include flex-1;
 		min-width: 0;
 
-		// Tighten leading for a single-line control. form-input inherits the
-		// prose-tuned --line-height (~1.6); inside this compact shell that
-		// wastes vertical space. 1.25 keeps descenders safe and the control tight.
-		line-height: 1.25;
+		// Tighten inner padding when adjacent to icons or buttons inside the group
+		&:not(:first-child) {
+			padding-left: var(--size-xs);
+		}
+		&:not(:last-child) {
+			padding-right: var(--size-xs);
+		}
 	}
 
 	> button {
-		@include btn;
+		@include button-base;
 		@include flex-shrink-0;
 		@include border-none;
-		border-radius: 0;
+		align-self: stretch;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding-top: 0;
+		padding-bottom: 0;
+		// Tighter horizontal padding for icon-only button inside groups to keep it compact and squarish
+		padding-left: var(--size-sm);
+		padding-right: var(--size-sm);
+		border-radius: 0; // Square the button to sit flush with the input border
+
+		> .ln-icon {
+			--color-fg: var(--fg-subtle);
+			color: var(--color-fg);
+		}
 	}
 }
 

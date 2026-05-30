@@ -288,6 +288,34 @@ export function getLocale(el) {
 	return (langEl ? langEl.lang : null) || navigator.language;
 }
 
+// ─── Value Property Interception ───────────────────────────
+
+/**
+ * Intercept the programmatic `value` getter/setter on an input element.
+ * Useful for custom components that need to sync/format programmatic changes.
+ * @param {HTMLInputElement} dom - The visible input element.
+ * @param {Object} descriptor - The original property descriptor of HTMLInputElement.prototype.value.
+ * @param {Object} callbacks - Getter and setter callbacks.
+ */
+export function interceptValueProperty(dom, descriptor, { get, set }) {
+	Object.defineProperty(dom, 'value', {
+		get: function () {
+			if (get) {
+				return get.call(this);
+			}
+			return descriptor.get.call(this);
+		},
+		set: function (val) {
+			if (set) {
+				set.call(this, val, (originalVal) => descriptor.set.call(this, originalVal));
+			} else {
+				descriptor.set.call(this, val);
+			}
+		},
+		configurable: true
+	});
+}
+
 // ─── Component Registration ───────────────────────────────
 
 export function registerComponent(selector, attribute, ComponentFn, componentTag, options = {}) {
@@ -311,6 +339,23 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 						if (node.nodeType === 1) {
 							findElements(node, selector, attribute, ComponentFn);
 							if (onInit) onInit(node);
+						}
+					}
+					for (let j = 0; j < mutation.removedNodes.length; j++) {
+						const node = mutation.removedNodes[j];
+						if (node.nodeType === 1) {
+							const isComplex = selector.indexOf('[') !== -1 || selector.indexOf('.') !== -1 || selector.indexOf('#') !== -1;
+							const query = isComplex ? selector : '[' + selector + ']';
+							const items = Array.from(node.querySelectorAll(query));
+							if (node.matches && node.matches(query)) {
+								items.push(node);
+							}
+							for (let k = 0; k < items.length; k++) {
+								const inst = items[k][attribute];
+								if (inst && typeof inst.destroy === 'function') {
+									inst.destroy();
+								}
+							}
 						}
 					}
 				} else if (mutation.type === 'attributes') {

@@ -1,4 +1,4 @@
-import { dispatch, getLocale, registerComponent } from '../../ln-core';
+import { dispatch, getLocale, registerComponent, interceptValueProperty } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-date';
@@ -84,6 +84,9 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 			return this;
 		}
 
+		if (dom[DOM_ATTRIBUTE]) return dom[DOM_ATTRIBUTE];
+		dom[DOM_ATTRIBUTE] = this;
+
 		this.dom = dom;
 		const self = this;
 
@@ -138,10 +141,90 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 					if (date) {
 						self._displayFormatted(date);
 						_inputValueDesc.set.call(picker, val);
+						self._lastISO = val;
+						dispatch(self.dom, 'ln-date:change', {
+							value: val,
+							formatted: self.dom.value,
+							date: date
+						});
+						self.dom.dispatchEvent(new Event('change', { bubbles: true }));
 					}
 				} else if (val === '') {
 					self.dom.value = '';
 					_inputValueDesc.set.call(picker, '');
+					self._lastISO = '';
+					dispatch(self.dom, 'ln-date:change', {
+						value: '',
+						formatted: '',
+						date: null
+					});
+					self.dom.dispatchEvent(new Event('change', { bubbles: true }));
+				}
+			}
+		});
+
+		// ── Intercept programmatic value sets on visible input (2-way binding) ──
+		interceptValueProperty(dom, _inputValueDesc, {
+			get: function () {
+				return _inputValueDesc.get.call(dom);
+			},
+			set: function (val, originalSet) {
+				if (self._isFormatting) {
+					originalSet(val);
+					return;
+				}
+				if (!val || val === '') {
+					originalSet('');
+					self._setHiddenRaw('');
+					_inputValueDesc.set.call(self._picker, '');
+					self._lastISO = '';
+					dispatch(dom, 'ln-date:change', {
+						value: '',
+						formatted: '',
+						date: null
+					});
+					dom.dispatchEvent(new Event('change', { bubbles: true }));
+					return;
+				}
+
+				// Programmatic value could be an ISO string (YYYY-MM-DD) or a formatted date string
+				let date = _parseISO(val);
+				if (!date) {
+					date = _parseTyped(val);
+				}
+
+				if (date) {
+					const y = date.getFullYear();
+					const m = String(date.getMonth() + 1).padStart(2, '0');
+					const d = String(date.getDate()).padStart(2, '0');
+					const iso = y + '-' + m + '-' + d;
+
+					self._setHiddenRaw(iso);
+					_inputValueDesc.set.call(self._picker, iso);
+					self._lastISO = iso;
+
+					const format = dom.getAttribute(DOM_SELECTOR) || '';
+					const locale = getLocale(dom);
+					const formatted = _formatDate(date, format, locale);
+					originalSet(formatted);
+
+					dispatch(dom, 'ln-date:change', {
+						value: iso,
+						formatted: formatted,
+						date: date
+					});
+					dom.dispatchEvent(new Event('change', { bubbles: true }));
+				} else {
+					originalSet(String(val));
+					self._setHiddenRaw('');
+					_inputValueDesc.set.call(self._picker, '');
+					self._lastISO = '';
+					dispatch(dom, 'ln-date:change', {
+						value: '',
+						formatted: String(val),
+						date: null
+					});
+					dom.dispatchEvent(new Event('change', { bubbles: true }));
 				}
 			}
 		});
@@ -245,6 +328,12 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 				_inputValueDesc.set.call(picker, initialValue);
 				this._displayFormatted(date);
 				this._lastISO = initialValue;
+				dispatch(dom, 'ln-date:change', {
+					value: initialValue,
+					formatted: dom.value,
+					date: date
+				});
+				dom.dispatchEvent(new Event('change', { bubbles: true }));
 			}
 		}
 
@@ -353,7 +442,9 @@ import { dispatch, getLocale, registerComponent } from '../../ln-core';
 	_component.prototype._displayFormatted = function (date) {
 		const format = this.dom.getAttribute(DOM_SELECTOR) || '';
 		const locale = getLocale(this.dom);
+		this._isFormatting = true;
 		this.dom.value = _formatDate(date, format, locale);
+		this._isFormatting = false;
 	};
 
 	// ─── Public API ───────────────────────────────────────────
