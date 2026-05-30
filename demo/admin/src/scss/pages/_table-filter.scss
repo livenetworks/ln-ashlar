@@ -12,7 +12,7 @@
 	// Label picks up form-input-icon-group from global binding.
 	// Only delta: constrain input width for toolbar context.
 	> label input {
-		@include w(16rem);
+		width: 16rem;
 	}
 }
 
