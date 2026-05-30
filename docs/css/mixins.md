@@ -664,6 +664,34 @@ z-index: 40;
 @include z-modal;
 ```
 
+### Redundant Single-Property Mixins → Use Standard CSS
+
+While `ln-ashlar` provides utility mixins like `@include w()` and `@include h()`, using them with arbitrary, hardcoded values (like `16rem` or `100vh`) is a redundant practice. 
+
+A mixin should only be used when it enforces **design tokens**, **encapsulates complex behavior**, or **avoids magic numbers**.
+
+```scss
+// WRONG — Redundant mixins for simple CSS properties (longer to write, less standard)
+.sidebar {
+    @include w(16rem);  // 21 characters
+    @include h(100vh);  // 21 characters
+}
+
+// CORRECT — Standard, readable CSS/SCSS
+.sidebar {
+    width: 16rem;       // 14 characters
+    height: 100vh;      // 14 characters
+}
+
+// CORRECT — Mixins that map to design system tokens or encapsulate multiple lines of logic
+.sidebar-card {
+    @include rounded-md;  // Enforces system border-radius tokens: var(--radius-md)
+    @include z-modal;     // Enforces system layering rules: var(--z-modal)
+    @include flex-center; // Encapsulates display: flex; align-items: center; justify-content: center;
+}
+```
+
+
 ### `max-height` collapse → Use `@include collapsible`
 
 ```scss
