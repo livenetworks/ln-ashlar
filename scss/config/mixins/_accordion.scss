@@ -21,7 +21,8 @@
 
 @mixin accordion {
 	@include border;
-	@include rounded-lg;
+	--radius: var(--radius-lg);
+	border-radius: var(--radius);
 	overflow: hidden;
 
 	> li {

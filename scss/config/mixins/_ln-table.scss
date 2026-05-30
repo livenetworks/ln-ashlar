@@ -26,7 +26,8 @@
 
 @mixin ln-table {
 	@include border;
-	@include rounded-lg;
+	--radius: var(--radius-lg);
+	border-radius: var(--radius);
 	background: var(--color-bg);
 	overflow: clip;
 

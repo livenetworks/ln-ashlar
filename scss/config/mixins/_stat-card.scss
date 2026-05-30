@@ -14,7 +14,8 @@
 	--padding-x: var(--size-lg);
 	padding: var(--padding-y) var(--padding-x);
 	background: var(--color-bg);
-	@include rounded-lg;
+	--radius: var(--radius-lg);
+	border-radius: var(--radius);
 	box-shadow: var(--shadow);
 	border-block-start:  var(--border-block-start,  var(--border-width) solid var(--color-border));
 	border-block-end:    var(--border-block-end,    var(--border-width) solid var(--color-border));

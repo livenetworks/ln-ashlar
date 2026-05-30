@@ -15,7 +15,8 @@
 	background: var(--color-fg);
 	color: var(--color-bg);
 	@include typography(caption);
-	@include rounded-sm;
+	--radius: var(--radius-sm);
+	border-radius: var(--radius);
 	white-space: nowrap;
 	pointer-events: none;
 	z-index: var(--z-dropdown);

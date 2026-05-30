@@ -15,7 +15,8 @@
 	background: var(--color-bg);
 	border: var(--border-width) solid var(--color-border);
 	border-bottom-width: 2px;
-	@include rounded-sm;
+	--radius: var(--radius-sm);
+	border-radius: var(--radius);
 	line-height: 1;
 	white-space: nowrap;
 }
