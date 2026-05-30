@@ -172,8 +172,11 @@ function N(h, c, v, p, m = {}) {
               const l = h.indexOf("[") !== -1 || h.indexOf(".") !== -1 || h.indexOf("#") !== -1 ? h : "[" + h + "]", g = Array.from(d.querySelectorAll(l));
               d.matches && d.matches(l) && g.push(d);
               for (let y = 0; y < g.length; y++) {
-                const w = g[y][c];
-                w && typeof w.destroy == "function" && w.destroy();
+                const w = g[y];
+                if (!document.contains(w)) {
+                  const A = w[c];
+                  A && typeof A.destroy == "function" && A.destroy();
+                }
               }
             }
           }
