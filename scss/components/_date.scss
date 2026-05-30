@@ -1,0 +1,22 @@
+@use '../config/mixins' as *;
+
+// ─── Date field — ln-date merged input ──────────────────────────
+// Applied to the wrapper <span> that ln-date generates around the
+// visible input, hidden submit input, native picker, and calendar button.
+// Uses the generic form-field-group mixin (bordered flex shell).
+
+[data-ln-date-field] {
+	@include form-field-group;
+
+	// ln-date emits a hidden submit input and an invisible native picker.
+	> input[type="hidden"],
+	> input[type="date"] {
+		display: none;
+	}
+
+	// Calendar trigger icon stays subtle grey (date-specific).
+	> button > .ln-icon {
+		--color-fg: var(--fg-subtle);
+		color: var(--color-fg);
+	}
+}

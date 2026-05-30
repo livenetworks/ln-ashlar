@@ -1114,9 +1114,11 @@ input[data-ln-number] {
 						</form>
 					</main>
 					<script type="text/plain" data-demo-scss>
-// Date fields and formatted dates use form-input mixin:
-input[data-ln-date] {
-    @include form-input;
+// ln-date wraps its controls in a merged field shell.
+// The wrapper owns the border, radius, and focus ring;
+// the calendar button sits flush on the right.
+[data-ln-date-field] {
+    @include form-field-group;
 }
 					</script>
 				</section>

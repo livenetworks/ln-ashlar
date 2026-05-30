@@ -141,82 +141,85 @@
 	padding-right: 2.5rem;
 }
 
-// ─── Input group — label wrapping icon(s) + input ──────────────────
+// ─── Field group — generic bordered flex shell ────────────────────
 //
-// Pattern:
-//   <label>
-//     <svg class="ln-icon"/>   ← leading icon (optional)
-//     <input type="…">
-//     <svg class="ln-icon"/>   ← trailing icon (optional)
-//   </label>
+// One mixin for any control that is a bordered shell wrapping a row of
+// children: a leading/trailing icon, the input (or select), and/or an
+// interactive button (search submit, date-picker trigger).
 //
-// The <label> becomes the visual container (border, padding, focus
-// ring). The nested <input> strips its form-input container chrome so
-// that horizontal rhythm is owned by the label's px + gap, and vertical
-// rhythm by the label's py. Without this, the input keeps its own
-// padding and fights the wrapper — see the asymmetric spacing that
-// motivated this mixin.
+//   <label>                    <span data-ln-date-field>
+//     <svg class="ln-icon"/>     <input type="text" …>
+//     <input …>                  <button>…</button>
+//   </label>                   </span>
 //
-// Applied via semantic selector in components/_form.scss — no class
-// needed on the <label>.
+// The wrapper is the VISUAL SHELL only: form-input supplies border, bg,
+// radius, transition; the mixin adds flex layout and zeroes the shell's
+// own padding. Each child owns its padding. Children strip only the chrome
+// the shell now owns (border, bg, box-shadow). Focus is handled once on the
+// shell via :focus-within; children suppress their own focus ring.
+//
+// Applied via semantic selectors (no class on the wrapper):
+//   - components/_form.scss → label:has(.ln-icon):has(text input)
+//   - components/_date.scss → [data-ln-date-field]
 
-@mixin form-input-icon-group {
-	@include inline-flex;
+@mixin form-field-group {
+	@include form-input;       // visual shell: border, bg, radius, transition, outline
+	@include inline-flex;      // override form-input's block display
 	@include items-center;
-	gap: var(--gap);
-	// Compact padding: tight vertical to keep total height close to a
-	// regular form-input despite the icon's fixed size.
-	--padding-y: var(--size-xs);
-	--padding-x: var(--size-sm);
-	padding: var(--padding-y) var(--padding-x);
-	background: var(--color-bg);
-	@include border;
-	border-radius: var(--radius);
-	@include transition;
-	font-size: var(--font-size);
-	line-height: var(--line-height);
-	// Wrapping-label reset: undo form-label defaults that would otherwise leak.
-	margin-bottom: 0;
+	width: auto;               // cancel form-input's w-full
+	padding: 0;                // shell owns NO padding; children manage their own
+	margin-bottom: 0;          // defensive: wrapping <label> carries form-label margin
 
 	&:focus-within {
 		@include _form-focus-style;
+
+		> input,
+		> select {
+			box-shadow: none;  // suppress child's own form-input focus ring
+		}
 	}
 
 	> .ln-icon {
 		@include flex-shrink-0;
+		padding: var(--size-xs) var(--size-sm);   // icon provides its own row spacing
 		--color-fg: var(--fg-subtle);
 		color: var(--color-fg);
 	}
 
-	> input {
-		// Strip container chrome inherited from form-input — label owns it now.
-		padding: 0;
+	> input,
+	> select {
+		// form-input is already applied globally — strip only shell-owned chrome.
 		@include border-none;
 		background: transparent;
-		outline: none;
 		box-shadow: none;
-
-		// Tighten leading for a single-line control. form-input inherits
-		// --lh-body-md (1.6) which is tuned for prose readability, not form
-		// controls — that leaves ~7px of wasted leading above and below the
-		// glyph inside the input's own line box, which compounds with the
-		// label's padding and makes icon-group feel airy. 1.25 keeps
-		// descenders (g/p/j/y) safe and brings the label down to ~36px total.
-		line-height: 1.25;
-
-		// Take the remaining flex space. width: auto cancels form-input's
-		// width: 100%; flex-1 + min-width: 0 lets the field shrink below
-		// its intrinsic min-content inside a narrow label.
 		width: auto;
 		@include flex-1;
 		min-width: 0;
 
-		&:focus-visible {
-			border-color: transparent;
-			box-shadow: none;
-		}
+		// Tighten leading for a single-line control. form-input inherits the
+		// prose-tuned --line-height (~1.6); inside this compact shell that
+		// wastes vertical space. 1.25 keeps descenders safe and the control tight.
+		line-height: 1.25;
+	}
 
-		// Hide clear button when input is empty
+	> button {
+		@include btn;
+		@include flex-shrink-0;
+		@include border-none;
+		border-radius: 0;
+	}
+}
+
+// ─── Icon input group — search/icon field (thin wrapper) ──────────
+//
+// form-field-group + the search-clear control, which is the only piece
+// unique to this binding.
+
+@mixin form-input-icon-group {
+	@include form-field-group;
+
+	> input {
+		// Hide the clear button while the field is empty.
 		&:placeholder-shown ~ [data-ln-search-clear] {
 			@include hidden;
 		}
