@@ -1273,7 +1273,7 @@ input[data-ln-number] {
 // The wrapper owns the border, radius, and focus ring;
 // the calendar button sits flush on the right.
 [data-ln-date-field] {
-    @include date-field;
+    @include form-field-group;
 }
 					</script>
 				</section>
@@ -1373,10 +1373,7 @@ input[data-ln-number] {
 		const input = document.getElementById(pair.inputId);
 		const output = document.getElementById(pair.outputId);
 		input.addEventListener('input', function () { writeNumberRaw(input, output); });
-		// Initial paint — ln-number init runs on DOMContentLoaded; inline scripts
-		// in <body> run after parse, but lnNumber may attach in either order.
-		// Defer one tick to guarantee instance is wired (especially for #demo-budget).
-		setTimeout(function () { writeNumberRaw(input, output); }, 0);
+		// Initial paint runs automatically via event dispatched on component initialization
 	});
 
 	// ─── 1E — Date formatting raw outputs ──────────────────────
@@ -1400,7 +1397,7 @@ input[data-ln-number] {
 		const input = document.getElementById(pair.inputId);
 		const output = document.getElementById(pair.outputId);
 		input.addEventListener('ln-date:change', function () { writeDateRaw(input, output); });
-		setTimeout(function () { writeDateRaw(input, output); }, 0);
+		// Initial paint runs automatically via event dispatched on component initialization
 	});
 })();
 </script>

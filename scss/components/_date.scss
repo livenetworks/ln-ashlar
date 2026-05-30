@@ -7,16 +7,15 @@
 
 [data-ln-date-field] {
 	@include form-field-group;
-
-	// ln-date emits a hidden submit input and an invisible native picker.
-	> input[type="hidden"],
-	> input[type="date"] {
+	// The submit value input has no visual role — hide it entirely.
+	> input[type="hidden"] {
 		display: none;
 	}
 
-	// Calendar trigger icon stays subtle grey (date-specific).
-	> button > .ln-icon {
-		--color-fg: var(--fg-subtle);
-		color: var(--color-fg);
+	// The native date picker stays rendered (position:absolute via inline style)
+	// so showPicker() can anchor the calendar popup to this element's position.
+	> input[type="date"] {
+		position: absolute;
+		pointer-events: none;
 	}
 }
