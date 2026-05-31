@@ -39,7 +39,7 @@ the methods that mutate data.
 | `totalCount` | `_onSetData` (from `detail.total`) | Footer + consumer |
 | `visibleCount` | `_onSetData` (from `detail.filtered`) | Footer + consumer |
 | `currentSort` | `_handleSort` | `_requestData` payload |
-| `currentFilters` | `_onFilterChange`, `_onClearAll`, filter-clear button | `_requestData` payload, `_updateFilterIndicators` |
+| `currentFilters` | `_onFilterChange`, `_onClearAll` | `_requestData` payload, `_updateFilterIndicators` |
 | `currentSearch` | `_onSearchInput` | `_requestData` payload |
 | `selectedIds` | `_onSelectionChange`, `_onSelectAll` | `_buildRow` (restore selection on re-render), consumer |
 | `selectedCount` | computed property over `selectedIds.size` | Footer |
@@ -362,7 +362,7 @@ subclassing or callbacks.
 
 - `{table}-row` — controls per-row layout. Add cells, change cell elements (`<td><a>` instead of `<td>`), add badges around text cells. The component natively supports text-node double curly braces `{{ field }}` interpolation, and also reads `data-ln-cell-attr` for attribute mapping regardless of the surrounding markup.
 - `{table}-empty` and `{table}-empty-filtered` — the entire empty-state UI is yours; the component just clones the template into `<tbody>`.
-- `{table}-column-filter` (or shared `column-filter`) — change the dropdown layout, add a "select all" link, replace checkboxes with toggle pills, etc. The component requires only `[data-ln-filter-options]` (the `<ul>` it populates), `[data-ln-filter-search]` (optional), `[data-ln-filter-clear]` (optional).
+- `{table}-column-filter` (or shared `column-filter`) — change the dropdown layout, add a "select all" link, replace checkboxes with toggle pills, etc. The component requires only `[data-ln-filter-options]` (the `<ul>` it populates) and `[data-ln-filter-search]` (optional). The `data-ln-filter-reset` "All" sentinel checkbox is the reset affordance — no separate clear button is needed.
 
 The lookup is scoped: `cloneTemplateScoped(this.dom, name, ...)` first
 looks for a `<template data-ln-template="{name}">` inside the component

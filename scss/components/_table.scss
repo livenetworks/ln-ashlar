@@ -2,7 +2,6 @@
 
 table {
 	@include table-base;
-	@include table-filter-button;
 
 	tr.section-header td {
 		@include table-section-header;
@@ -17,3 +16,58 @@ table {
 		table { @include table-responsive; }
 	}
 }
+
+// ─── Shared Column Sort & Filter Buttons ────────────────────────
+// CSS targets the unprefixed structural helper class on the button, NOT the data-ln-* JS
+// hook. .table-sort / .table-filter are thin bindings that mirror the mixins; a consumer
+// may instead @include table-sort / table-filter on their own selector (the class is a
+// convenience, not a mandate — see "Naming & class architecture"). Behavior hooks
+// (data-ln-col-sort / data-ln-table-sort / data-ln-popover-for / data-ln-col-filter) are
+// the per-system functional layer and intentionally differ.
+
+.table-sort { @include table-sort; }
+th:hover .table-sort { opacity: 0.7; }
+
+// Active sort — JS-state class on the <th>, set by sort JS (client) or server.
+.ln-sort-asc .table-sort,
+.ln-sort-desc .table-sort { @include table-sort-active; }
+
+.ln-sort-asc .table-sort {
+	[data-ln-sort-icon="none"] { display: none; }
+	[data-ln-sort-icon="asc"]  { display: inline-block; }
+}
+.ln-sort-desc .table-sort {
+	[data-ln-sort-icon="none"] { display: none; }
+	[data-ln-sort-icon="desc"] { display: inline-block; }
+}
+
+.table-filter { @include table-filter; }
+th:hover .table-filter { opacity: 0.7; }
+
+// Active filter — JS-state class set DIRECTLY on the button (self-selector), combined with
+// the structural helper class. Fixes the latent ln-data-table bug: JS toggles
+// .ln-filter-active on the button itself, but the old CSS used a descendant combinator
+// (.ln-filter-active [data-ln-col-filter]) that never matched, so the dot never rendered.
+// See D2.
+.table-filter.ln-filter-active { @include table-filter-active; }
+
+
+
+// ─── Data Table JS-State Classes ───────────────────────────────
+// JS-added state classes only. Row chrome (clickable cursor/hover, action
+// buttons, sticky header) is a CONSUMER concern — applied via semantic
+// selectors in project SCSS, never keyed off the data-ln-* JS hooks.
+
+.ln-row-selected {
+	@include table-row-selected;
+}
+
+.ln-row-focused {
+	@include table-row-focused;
+}
+
+// Virtual-scroll spacer
+.ln-data-table__spacer {
+	@include table-spacer-row;
+}
+

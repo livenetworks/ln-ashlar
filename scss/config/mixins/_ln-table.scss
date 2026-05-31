@@ -21,8 +21,14 @@
 //   [data-ln-table] { @include ln-table; }
 //   .ln-table__toolbar { @include ln-table-toolbar; }
 //
-// State-driven CSS (spacer rows, sort icon .hidden toggle, content overflow
-// fix) stays in the co-located JS SCSS file.
+// Sort/filter button styling is SHARED via scss/components/_table.scss
+// (.table-sort / .table-filter structural helper classes + the :has() stack
+// in @mixin table-base). No ln-table-specific sort/filter button mixins here.
+// Under D1 (Option A) the <th> is no longer the sort click target, so no
+// ln-table-specific cursor:pointer / select-none on the <th> is needed.
+//
+// State-driven CSS (spacer rows, content overflow fix) stays in
+// the co-located JS SCSS file.
 
 @mixin ln-table {
 	@include border;
@@ -126,95 +132,6 @@
 	}
 }
 
-// ─── Column filter dropdowns in th ────────────────────────
-
-@mixin ln-table-column-filter {
-	th [data-ln-dropdown] {
-		@include inline-flex;
-		@include items-center;
-	}
-
-	th [data-ln-dropdown] > button {
-		@include flex;
-		@include items-center;
-		--gap: var(--size-xs);
-		gap: var(--gap);
-		background: none;
-		border: none;
-		color: inherit;
-		font: inherit;
-		@include cursor-pointer;
-		--btn-padding-y: 0;
-		--btn-padding-x: 0;
-
-		.ln-icon-filter {
-			opacity: 0.4;
-			@include motion-safe {
-				transition: opacity var(--transition-fast);
-			}
-		}
-
-		&:hover .ln-icon-filter {
-			opacity: 1;
-		}
-	}
-
-	th [data-ln-dropdown-menu] button[data-ln-filter-key] {
-		@include w-full;
-		@include flex;
-		@include items-center;
-		@include text-left;
-		--btn-padding-y: var(--size-xs);
-		--btn-padding-x: var(--size-sm);
-		@include text-sm;
-		@include font-normal;
-		background: none;
-		border: none;
-		border-radius: 0;
-		color: var(--color-fg);
-		@include cursor-pointer;
-		@include transition-fast;
-
-		&:hover {
-			--color-bg: var(--bg-sunken);
-			background: var(--color-bg);
-		}
-
-		&[data-active] {
-			background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
-			color: var(--color-accent);
-			@include font-medium;
-		}
-	}
-}
-
-// ─── Sort indicators on th ────────────────────────────────
-
-@mixin ln-table-sort {
-	th[data-ln-sort] {
-		@include cursor-pointer;
-		@include select-none;
-
-		[data-ln-sort-icon] {
-			@include size(0.875rem);
-			--margin-inline: var(--size-xs);
-			margin-left: var(--margin-inline);
-			vertical-align: middle;
-			opacity: 0.4;
-			@include motion-safe {
-				transition: opacity var(--transition-fast);
-			}
-		}
-
-		&:hover [data-ln-sort-icon] {
-			opacity: 0.7;
-		}
-
-		&[data-ln-sort-active] [data-ln-sort-icon] {
-			opacity: 1;
-		}
-	}
-}
 
 // ─── Footer ───────────────────────────────────────────────
 
@@ -418,3 +335,5 @@
 		background: transparent !important;
 	}
 }
+
+

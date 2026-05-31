@@ -34,6 +34,7 @@
 @use 'components/scrollbar';
 @use 'components/tooltip';
 @use 'components/popover';
+@use 'components/filter';
 @use 'components/chip';
 @use 'components/loader';
 @use 'components/progress';
@@ -45,7 +46,6 @@
 @use 'components/toast';
 @use 'components/upload';
 @use 'components/translations';
-@use 'components/data-table';
 @use 'components/ln-table';
 @use 'components/ajax';
 

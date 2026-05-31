@@ -61,3 +61,40 @@ th [data-ln-popover-for] {
 	float: right;
 	padding: 0;
 }
+
+// ─── Data-table chrome (consumer pattern) ──────────────────────
+// The library no longer styles data-tables via their data-ln-* JS hooks.
+// A data-table is just a <table> (already styled by the global table base)
+// plus JS behaviour. Here we opt this demo's data-tables into the richer
+// chrome the way a real consumer would — via a semantic class on the
+// component root, NOT by re-keying off data-ln-row / data-ln-row-action.
+
+.data-table-demo {
+	// Sticky header + footer: re-apply the enhanced table recipe to the
+	// demo's OWN <table>. table-base($sticky:true) binds thead/footer sticky
+	// and gives the relative/border-spacing layout the virtual scroll needs.
+	table { @include table-base($sticky: true); }
+
+	// Clickable rows: cursor + hover. Scoped to rendered body rows.
+	tbody tr { @include table-row; }
+
+	// Row-action button group — see <ul class="row-actions"> in templates.
+	.row-actions {
+		@include inline-flex;
+		@include items-center;
+		@include gap(var(--size-2xs));
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		// The action buttons themselves. data-ln-row-action stays on each
+		// <button> as a JS hook; we target the semantic group, not the hook.
+		button { @include table-row-action; }
+
+		// Delete variant: the only distinguisher on the button is its JS
+		// hook value, so we read it here purely as a CSS selector (the button
+		// already carries it for JS). This keeps the destructive colour on
+		// the right button without inventing a presentational class.
+		[data-ln-row-action="delete"] { @include table-row-action-delete; }
+	}
+}

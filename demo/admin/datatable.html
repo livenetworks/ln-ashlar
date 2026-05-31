@@ -22,6 +22,7 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
 	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
@@ -142,6 +143,7 @@
 						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
 						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
 						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
 					</ul>
 				</nav>
 			</main>
@@ -304,7 +306,8 @@
 
 							<section data-ln-data-table="demo-docs"
 							         data-ln-data-table-selectable
-							         id="demo-data-table">
+							         id="demo-data-table"
+							         class="data-table-demo">
 
 								<table>
 									<thead>
@@ -327,33 +330,33 @@
 											<th data-ln-col-select></th>
 											<th data-ln-col="title">
 												Title
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+												<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 											</th>
 											<th data-ln-col="department">
 												Department
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
-												<button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
+												<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+												<button type="button" class="table-filter" data-ln-col-filter aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 											</th>
 											<th data-ln-col="status">
 												Status
-												<button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
+												<button type="button" class="table-filter" data-ln-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 											</th>
 											<th data-ln-col="priority">
 												Priority
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
-												<button data-ln-col-filter><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
+												<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+												<button type="button" class="table-filter" data-ln-col-filter aria-label="Filter priority"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 											</th>
 											<th data-ln-col="owner">
 												Owner
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+												<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 											</th>
 											<th data-ln-col="file_size">
 												Size
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+												<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 											</th>
 											<th data-ln-col="updated_at">
 												Updated
-												<button data-ln-col-sort><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+												<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 											</th>
 											<th>Actions</th>
 										</tr>
@@ -378,8 +381,10 @@
 										<td>{{ file_size_display }}</td>
 										<td>{{ updated_display }}</td>
 										<td>
-											<button data-ln-row-action="edit"  aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
-											<button data-ln-row-action="delete"  aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
+											<ul class="row-actions">
+												<li><button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+												<li><button data-ln-row-action="delete" aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+											</ul>
 										</td>
 									</tr>
 								</template>
@@ -430,20 +435,29 @@
 												</li>
 											</template>
 										</ul>
-										<button data-ln-filter-clear>Clear filter</button>
-									</div>
+								</div>
 								</template>
 							</section>
 						</main>
 						<script type="text/plain" data-demo-scss>
-// Data table component mixin:
-[data-ln-data-table] {
-    @include data-table;
-}
+// A data-table is a plain table + JS. data-ln-* attributes are JS hooks
+// ONLY — never style through them. Opt into chrome via your own semantic
+// selector on the component root.
 
-// Base table styles:
+// Base table styling is global — every <table> already gets it:
 table {
     @include table-base;
+}
+
+// Opt this table into sticky header/footer + clickable rows + action group:
+.data-table-demo {
+    table { @include table-base($sticky: true); }
+    tbody tr { @include table-row; }
+
+    .row-actions {
+        button { @include table-row-action; }
+        [data-ln-row-action="delete"] { @include table-row-action-delete; }
+    }
 }
 						</script>
 					</section>

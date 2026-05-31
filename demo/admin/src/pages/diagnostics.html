@@ -1,0 +1,147 @@
+<!-- ln-page: title="Diagnostics & Linter — ln-ashlar" h1="Diagnostics (DOM Linter)" -->
+
+<h1>Diagnostics &amp; DOM Linter</h1>
+<p>Visual, CSS-based linter that runs only during local development. It flags integration mistakes, missing attributes, and DOM layout errors instantly in the browser without any runtime performance overhead.</p>
+
+<div class="alert warning">
+	<h5>Development-Only Warning</h5>
+	<p>These warnings are powered by the <code>ln-ashlar-dev.css</code> stylesheet. In production environments, this stylesheet is excluded, guaranteeing zero layout overrides and zero performance penalty.</p>
+</div>
+
+<hr class="my-lg">
+
+<!-- Case 1: Missing Sort Button Warning -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>1. Missing Sort Button Warning</h3>
+		<p>Flags a <code>th[data-ln-sort]</code> that is configured to be sortable but is missing the required <code>&lt;button data-ln-table-sort&gt;</code> trigger.</p>
+	</header>
+	<main>
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<!-- ERROR: data-ln-sort is set, but no data-ln-table-sort button exists -->
+						<th data-ln-sort="string">
+							Username
+						</th>
+						<th>Email</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>petar_p</td>
+						<td>petar@example.com</td>
+					</tr>
+					<tr>
+						<td>marija_s</td>
+						<td>marija@example.com</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-inline-error:
+th[data-ln-sort]:not(:has([data-ln-table-sort])) {
+    @include dev-inline-error("missing sort button");
+}
+	</script>
+</section>
+
+<!-- Case 2: Missing Wrapper ID Warning -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>2. Missing Table Wrapper ID Warning</h3>
+		<p>Flags interactive table wrappers <code>[data-ln-table]</code> that are missing a unique <code>id</code> attribute (which is required for mapping search and column filters correctly).</p>
+	</header>
+	<main>
+		<!-- ERROR: data-ln-table is present, but no 'id' attribute is defined -->
+		<div data-ln-table>
+			<div class="table-container">
+				<table>
+					<thead>
+						<tr>
+							<th>Title</th>
+							<th>Category</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Strategic Plan.pdf</td>
+							<td>Planning</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-dom-error:
+[data-ln-table]:not([id]) {
+    @include dev-dom-error("[data-ln-table] is missing a required 'id' attribute for filter mapping.");
+}
+	</script>
+</section>
+
+<!-- Case 3: Correct Implementation -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>3. Correct Implementation (No Errors)</h3>
+		<p>When the HTML structure and attributes are fully correct, no diagnostics warnings are shown.</p>
+	</header>
+	<main>
+		<!-- CORRECT: wrapper has an id -->
+		<div data-ln-table id="correct-demo-table">
+			<div class="table-container">
+				<table>
+					<thead>
+						<tr>
+							<!-- CORRECT: sortable header contains the correct button -->
+							<th data-ln-sort="string">
+								System Service
+								<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
+									<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+									<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+									<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								</button>
+							</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Web Server (Nginx)</td>
+							<td><span class="badge success">Active</span></td>
+						</tr>
+						<tr>
+							<td>Database Server (MariaDB)</td>
+							<td><span class="badge success">Active</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</main>
+</section>
+
+<!-- Section 4: Writing Custom Diagnostics -->
+<section class="section-card">
+	<header>
+		<h3>Writing Your Own Diagnostic Rules</h3>
+		<p>You can easily extend the linter by writing your own CSS selectors in <code>scss/ln-ashlar-dev.scss</code> and using the shared DRY mixins.</p>
+	</header>
+	<main>
+		<p>The system provides two shared mixins in <code>config/mixins/_diagnostics.scss</code>:</p>
+		<ul>
+			<li><strong><code>@include dev-dom-error($message)</code></strong>: Best for wrapping block elements with a dashed red border and a warning header.</li>
+			<li><strong><code>@include dev-inline-error($message)</code></strong>: Best for injecting red text warning labels next to small elements or headers.</li>
+		</ul>
+		
+		<h5 class="my-sm">Example: Flagging form elements missing name attributes</h5>
+		<pre><code class="language-scss">// Warns if any text input inside a validation form is missing its name attribute
+[data-ln-validate] input[type="text"]:not([name]) {
+    @include dev-dom-error("Input is missing a 'name' attribute, which prevents serialization.");
+}</code></pre>
+	</main>
+</section>

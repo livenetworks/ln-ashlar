@@ -2,8 +2,6 @@
 
 [data-ln-table] {
 	@include ln-table;
-	@include ln-table-column-filter;
-	@include ln-table-sort;
 }
 
 // In-thead toolbar — first thead row's colspan th.
@@ -58,3 +56,4 @@
 .ln-table__spacer {
 	@include ln-table-spacer-row;
 }
+
