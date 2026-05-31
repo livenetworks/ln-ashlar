@@ -1,0 +1,49 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'interaction' as *;
+@use 'transitions' as *;
+@use 'form' as *;
+
+// ─── Filter dropdown — content chrome only ─────────────────────────
+// The floating shell (chrome, fixed positioning, min-width, show/hide)
+// comes from `@mixin popover` on the popover-driven path, OR from
+// `@mixin floating-panel` + scroll box on the ln-data-table dynamic
+// path (see components/_filter.scss). This mixin styles ONLY the inner
+// content: scrollable options box, search input, and the options list
+// (pills via check-list).
+//
+// NOTE: there is intentionally NO clear-button block. The redundant
+// "Clear Filter" button was removed library-wide — the `data-ln-filter-reset`
+// "All" sentinel checkbox already performs the reset. Do not re-introduce a
+// `[data-ln-filter-clear]` selector here.
+//
+// Tunables (consumer-overridable via --var with sane defaults):
+//   --filter-dropdown-max-height  (default 20rem)
+//   --filter-dropdown-overflow-y  (default auto)
+//   --filter-dropdown-text        (default var(--text-xs))   ← sm density
+//   --filter-dropdown-item-pad-y  (default var(--size-3xs))
+//
+// Usage:
+//   .column-filter-dropdown { @include filter-dropdown; }
+
+@mixin filter-dropdown {
+	max-height: var(--filter-dropdown-max-height, 20rem);
+	overflow-y: var(--filter-dropdown-overflow-y, auto);
+	text-transform: none; // reset inherited header uppercase
+
+	[data-ln-filter-search] {
+		@include form-input;
+		font-size: var(--filter-dropdown-text, var(--text-xs));
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-sm);
+		width: 100%;
+		margin-bottom: var(--size-sm);
+	}
+
+	[data-ln-filter-options] {
+		@include check-list;
+		font-size: var(--filter-dropdown-text, var(--text-xs));
+
+		li { padding: var(--filter-dropdown-item-pad-y, var(--size-3xs)) 0; }
+	}
+}

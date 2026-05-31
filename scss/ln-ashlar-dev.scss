@@ -1,0 +1,21 @@
+// ==========================================================================
+// Dev & Validation Diagnostics — ln-ashlar
+// ==========================================================================
+// This stylesheet contains diagnostic CSS tools to validate correct HTML 
+// structure, missing integration attributes, and accessibility warnings during 
+// development. Do not compile or deploy this file to production.
+// ==========================================================================
+
+@use 'config/mixins' as *;
+
+// 1. Table Sort: missing sort button warning
+// Detects when a th[data-ln-sort] is sortable but doesn't contain a <button data-ln-table-sort>
+th[data-ln-sort]:not(:has([data-ln-table-sort])) {
+	@include dev-inline-error("missing sort button");
+}
+
+// 2. Table Integration: missing ID warning
+// Warns if a table wrapper [data-ln-table] is missing an ID, which breaks search/filter integration
+[data-ln-table]:not([id]) {
+	@include dev-dom-error("[data-ln-table] is missing a required 'id' attribute for filter mapping.");
+}

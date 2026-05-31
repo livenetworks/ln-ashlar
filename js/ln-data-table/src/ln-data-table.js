@@ -635,22 +635,6 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			});
 		}
 
-		// Clear filter button
-		const clearBtn = dropdown.querySelector('[data-ln-filter-clear]');
-		if (clearBtn) {
-			clearBtn.addEventListener('click', function () {
-				delete self.currentFilters[field];
-				self._closeFilterDropdown();
-				self._updateFilterIndicators();
-				dispatch(self.dom, 'ln-data-table:filter', {
-					table: self.name,
-					field: field,
-					values: []
-				});
-				self._requestData();
-			});
-		}
-
 		// Append to th — CSS handles positioning (th is relative, dropdown is absolute)
 		th.appendChild(dropdown);
 

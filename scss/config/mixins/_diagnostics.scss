@@ -1,0 +1,37 @@
+@use 'colors' as *;
+@use 'spacing' as *;
+@use 'position' as *;
+
+// ─── DOM Diagnostics & Linter Mixins ───────────────────────────
+// These mixins are for developer-only diagnostic overlays and validations.
+// They should be completely isolated from production bundles.
+
+// Generic block element DOM diagnostic error
+// Applies a red dashed border and a prominent warning banner at the top.
+@mixin dev-dom-error($message) {
+	outline: 2px dashed hsl(var(--color-error));
+	@include relative;
+
+	&::before {
+		content: " ⚠ #{$message}";
+		display: block;
+		background: color-mix(in srgb, hsl(var(--color-error)) 15%, transparent);
+		color: hsl(var(--color-error));
+		padding: var(--size-xs) var(--size-sm);
+		font-size: var(--text-xs, 0.75rem);
+		font-weight: bold;
+		border-bottom: 1px solid hsl(var(--color-strong));
+	}
+}
+
+// Generic inline/element-level DOM diagnostic warning
+// Appends a red inline text warning adjacent to the targeted element.
+@mixin dev-inline-error($message) {
+	&::after {
+		content: " ⚠ #{$message}";
+		color: hsl(var(--color-error));
+		font-weight: normal;
+		white-space: nowrap;
+		margin-inline-start: var(--size-xs, 0.5rem);
+	}
+}

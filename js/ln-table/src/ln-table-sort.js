@@ -4,7 +4,7 @@ import { persistGet, persistSet } from '../../ln-core';
 (function () {
 	const DOM_ATTRIBUTE = 'lnTableSort';
 	const SORT_ATTR = 'data-ln-sort';
-	const SORT_ACTIVE_ATTR = 'data-ln-sort-active';
+	const BUTTON_HOOK = 'data-ln-table-sort';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -29,20 +29,6 @@ import { persistGet, persistSet } from '../../ln-core';
 
 	// ─── Component ─────────────────────────────────────────────
 
-	function _setSortIcon(th, dir) {
-		const icons = th.querySelectorAll('[data-ln-sort-icon]');
-		icons.forEach(function (icon) {
-			const val = icon.getAttribute('data-ln-sort-icon');
-			if (dir === null || dir === undefined) {
-				// Neutral: show the no-value icon, hide asc/desc
-				icon.classList.toggle('hidden', val !== null && val !== '');
-			} else {
-				// Show matching direction, hide others
-				icon.classList.toggle('hidden', val !== dir);
-			}
-		});
-	}
-
 	function _component(table, ths) {
 		this.table = table;
 		this.ths = ths;
@@ -54,13 +40,15 @@ import { persistGet, persistSet } from '../../ln-core';
 			if (th[DOM_ATTRIBUTE + 'Bound']) return;
 			th[DOM_ATTRIBUTE + 'Bound'] = true;
 
-			th._lnSortClick = function (e) {
-				// Don't sort when user clicks an interactive child (filter button, etc.)
-				const interactive = e.target.closest('button, a, input, select, textarea, [data-ln-dropdown]');
-				if (interactive && interactive !== th) return;
+			// D1/Option A: bind click to the sort button, not the whole <th>.
+			// Columns without a [data-ln-table-sort] button skip binding.
+			const btn = th.querySelector('[' + BUTTON_HOOK + ']');
+			if (!btn) return;
+
+			btn._lnSortClick = function () {
 				self._handleClick(index, th);
 			};
-			th.addEventListener('click', th._lnSortClick);
+			btn.addEventListener('click', btn._lnSortClick);
 		});
 
 		// ─── Restore persisted sort ───────────────────────────────
@@ -92,9 +80,9 @@ import { persistGet, persistSet } from '../../ln-core';
 			newDir = 'asc';
 		}
 
+		// JS-2: use state classes on <th>; CSS owns icon visibility.
 		this.ths.forEach(function (t) {
-			t.removeAttribute(SORT_ACTIVE_ATTR);
-			_setSortIcon(t, null);
+			t.classList.remove('ln-sort-asc', 'ln-sort-desc');
 		});
 
 		if (newDir === null) {
@@ -103,8 +91,7 @@ import { persistGet, persistSet } from '../../ln-core';
 		} else {
 			this._col = colIndex;
 			this._dir = newDir;
-			th.setAttribute(SORT_ACTIVE_ATTR, newDir);
-			_setSortIcon(th, newDir);
+			th.classList.add(newDir === 'asc' ? 'ln-sort-asc' : 'ln-sort-desc');
 		}
 
 		dispatch(this.table, 'ln-table:sort', {
@@ -125,9 +112,10 @@ import { persistGet, persistSet } from '../../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.table[DOM_ATTRIBUTE]) return;
 		this.ths.forEach(function (th) {
-			if (th._lnSortClick) {
-				th.removeEventListener('click', th._lnSortClick);
-				delete th._lnSortClick;
+			const btn = th.querySelector('[' + BUTTON_HOOK + ']');
+			if (btn && btn._lnSortClick) {
+				btn.removeEventListener('click', btn._lnSortClick);
+				delete btn._lnSortClick;
 			}
 			delete th[DOM_ATTRIBUTE + 'Bound'];
 		});

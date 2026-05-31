@@ -111,4 +111,6 @@ Two files per component:
 | Container Queries | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |
 | Core Component & Styling Specs | [architecture/reference.md](architecture/reference.md) |
 | Security Architecture & Best Practices | [architecture/security.md](architecture/security.md) |
+| Dev Diagnostics & DOM Linter | [architecture/diagnostics.md](architecture/diagnostics.md) |
+
 

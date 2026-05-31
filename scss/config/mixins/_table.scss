@@ -6,30 +6,59 @@
 @use 'borders' as *;
 @use 'transitions' as *;
 @use 'position' as *;
+@use 'motion' as *;
+@use 'interaction' as *;
+@use 'form' as *;
+@use 'btn' as *;
+@use 'card' as *;
+@use 'ln-table';
 
 // ─── Base table ─────────────────────────────────────────────────
 
-@mixin table-base {
+@mixin table-base($sticky: false) {
 	@include w-full;
 	background: var(--color-bg);
 	--radius: var(--radius-lg);
 	border-radius: var(--radius);
 	// `overflow: clip` not `overflow: hidden` — clips at rounded corners
 	// without establishing a scroll container, so sticky descendants
-	// (e.g. `@mixin data-table` thead/tfoot) bind to the outer
-	// `.app-main > section` scroll surface instead of being trapped
-	// inside the <table> element. Same rationale as `@mixin section-card`
-	// and `@mixin ln-table`.
+	// bind to the outer scroll surface instead of being trapped inside.
 	overflow: clip;
 	--shadow: var(--shadow-resting);
 	box-shadow: var(--shadow);
-	border-collapse: collapse;
+	
+	@if $sticky {
+		@include relative;
+		border-collapse: separate;
+		border-spacing: 0;
+	} @else {
+		border-collapse: collapse;
+	}
 	font-variant-numeric: tabular-nums;
+
+	// Row hover transition color. Sticky/enhanced tables use a relative lightness calculation
+	// to make the hovered row visually distinct from --bg-sunken chrome headers/footers.
+	$bg-hover: var(--bg-sunken);
+	@if $sticky {
+		$bg-hover: hsl(from var(--bg-base) h s calc(l - 4));
+	}
+	--bg-row-hover: #{$bg-hover};
 
 	thead {
 		--color-bg: var(--bg-sunken);
 		background: var(--color-bg);
 		border-block-end: var(--border-block-end, var(--border-width-strong) solid var(--color-border));
+		
+		@if $sticky {
+			@include sticky-top;
+		}
+	}
+
+	// Support for in-thead toolbar inside sticky tables
+	@if $sticky {
+		thead > tr:first-child:has(> th[colspan]) > th {
+			@include ln-table.ln-table-thead-toolbar;
+		}
 	}
 
 	th {
@@ -41,6 +70,54 @@
 		letter-spacing: 0.4px;
 		@include uppercase;
 		color: var(--color-fg);
+		position: relative;
+		top: auto;
+		z-index: auto;
+
+		// Shared header-button stack — keyed off the unprefixed structural button classes,
+		// so table / ln-table / ln-data-table all share one positioning rule.
+		&:has(.table-sort):has(.table-filter) {
+			padding-inline-end: calc(var(--padding-x) + 2.5rem);
+
+			.table-filter {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				right: var(--padding-x);
+				margin: 0;
+			}
+			.table-sort {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				right: calc(var(--padding-x) + 1.25rem);
+				margin: 0;
+			}
+		}
+
+		&:has(.table-sort):not(:has(.table-filter)) {
+			padding-inline-end: calc(var(--padding-x) + 1.25rem);
+
+			.table-sort {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				right: var(--padding-x);
+				margin: 0;
+			}
+		}
+
+		&:has(.table-filter):not(:has(.table-sort)) {
+			padding-inline-end: calc(var(--padding-x) + 1.25rem);
+
+			.table-filter {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				right: var(--padding-x);
+				margin: 0;
+			}
+		}
 	}
 
 	tbody tr {
@@ -48,10 +125,7 @@
 		min-height: var(--density-row-h);
 
 		&:hover {
-			// Default hover stays --bg-sunken for standalone tables. Data-table
-			// re-binds --color-bg locally (see _data-table.scss) so its hover
-			// disambiguates from chrome that also uses --bg-sunken.
-			--color-bg: var(--bg-sunken);
+			--color-bg: var(--bg-row-hover);
 			background: var(--color-bg);
 		}
 	}
@@ -82,6 +156,21 @@
 	td.nowrap,
 	th.nowrap {
 		@include whitespace-nowrap;
+	}
+
+	// Sticky section footer inside sticky/enhanced tables
+	@if $sticky {
+		> footer {
+			padding: var(--padding-y) var(--padding-x);
+			border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
+			--color-bg: var(--bg-sunken);
+			background: var(--color-bg);
+			--color-fg: var(--fg-muted);
+			color: var(--color-fg);
+			font-size: var(--text-body-sm);
+			position: sticky;
+			z-index: var(--z-sticky);
+		}
 	}
 }
 
@@ -182,34 +271,114 @@
 	}
 }
 
-// ─── Column filter button ──────────────────────────────────────
-// Button inside <th> that triggers a filter popover/dropdown.
-// Convention: add class="filter" to the trigger button.
-// ln-table.js sets data-ln-filter-active on the <th> when active.
+// ─── Column sort & filter buttons ──────────────────────────────
 
-@mixin table-filter-button {
-	th .filter {
-		@include inline-flex;
-		@include items-center;
-		float: right;
-		--btn-padding-y: var(--size-2xs);
-		--btn-padding-x: var(--size-2xs);
-		@include rounded-sm;
-		opacity: 0.5;
-
-		&:hover {
-			opacity: 1;
-			--color-bg: var(--bg-sunken);
-			background: var(--color-bg);
-		}
+@mixin table-sort {
+	opacity: 0.4;
+	@include motion-safe {
+		transition: opacity 0.15s;
 	}
+	@include cursor-pointer;
+	background: none;
+	border: none;
+	--btn-padding-y: var(--size-2xs);
+	--btn-padding-x: var(--size-2xs);
+	--margin-inline: var(--size-xs);
+	margin-inline-start: var(--margin-inline);
+	vertical-align: middle;
 
-	th [data-ln-dropdown] {
-		float: right;
-	}
-
-	th[data-ln-filter-active] .filter {
-		opacity: 1;
-		color: var(--color-accent);
+	[data-ln-sort-icon="asc"],
+	[data-ln-sort-icon="desc"] {
+		display: none;
 	}
 }
+
+@mixin table-sort-active {
+	opacity: 1;
+	color: var(--color-accent);
+}
+
+@mixin table-filter {
+	opacity: 0.4;
+	@include motion-safe {
+		transition: opacity 0.15s;
+	}
+	@include cursor-pointer;
+	background: none;
+	border: none;
+	--btn-padding-y: var(--size-2xs);
+	--btn-padding-x: var(--size-2xs);
+	--margin-inline: var(--size-2xs);
+	margin-inline-start: var(--margin-inline);
+	vertical-align: middle;
+	@include relative;
+}
+
+@mixin table-filter-active {
+	opacity: 1;
+	color: var(--color-accent);
+
+	&::after {
+		content: '';
+		@include absolute;
+		top: 0;
+		right: 0;
+		width: 0.375rem;
+		height: 0.375rem;
+		border-radius: var(--radius-full);
+		background: var(--color-accent);
+	}
+}
+
+
+
+
+
+@mixin table-row-action {
+	background: none;
+	border: none;
+	--shadow: none;
+	--btn-padding-y: var(--size-2xs);
+	--btn-padding-x: var(--size-2xs);
+	opacity: 0.5;
+	@include motion-safe {
+		transition: opacity 0.15s;
+	}
+
+	&:hover:not(:disabled) {
+		background: none;
+		opacity: 1;
+	}
+}
+
+@mixin table-row-action-delete {
+	--color-primary: var(--color-error);
+	color: hsl(var(--color-primary));
+}
+
+@mixin table-row {
+	cursor: pointer;
+
+	&:hover {
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
+	}
+}
+
+@mixin table-row-selected {
+	background: var(--color-accent-tint);
+}
+
+@mixin table-row-focused {
+	--color-accent-focus: hsl(from var(--color-accent) h s calc(l + 8));
+	outline: 2px solid var(--color-accent-focus);
+	outline-offset: -2px;
+}
+
+@mixin table-spacer-row {
+	td {
+		padding: 0 !important;
+		border: none !important;
+	}
+}
+

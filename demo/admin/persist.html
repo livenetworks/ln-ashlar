@@ -22,6 +22,7 @@
 	})();
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
 	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
@@ -142,6 +143,7 @@
 						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
 						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
 						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
 					</ul>
 				</nav>
 			</main>
@@ -329,11 +331,46 @@
 							<table>
 								<thead>
 									<tr>
-										<th data-ln-sort="string">Name</th>
-										<th data-ln-sort="string">Department</th>
-										<th data-ln-sort="string">Role</th>
-										<th data-ln-sort="number" class="numeric">Salary</th>
-										<th data-ln-sort="date">Start date</th>
+										<th data-ln-sort="string">
+											Name
+											<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
+												<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+											</button>
+										</th>
+										<th data-ln-sort="string">
+											Department
+											<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
+												<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+											</button>
+										</th>
+										<th data-ln-sort="string">
+											Role
+											<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
+												<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+											</button>
+										</th>
+										<th data-ln-sort="number" class="numeric">
+											Salary
+											<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
+												<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+											</button>
+										</th>
+										<th data-ln-sort="date">
+											Start date
+											<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
+												<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+												<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+											</button>
+										</th>
 									</tr>
 								</thead>
 								<tbody>

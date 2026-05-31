@@ -31,40 +31,33 @@ The `ln-table` component works with standard HTML tables. Filters, sorting, and 
         <thead>
             <tr>
                 <!-- Column Sortable -->
-                <th data-ln-sort="string">
+                <th data-ln-col="name" data-ln-sort="string">
                     Name
-                    <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                    <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                    <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                    <button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
+                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
+                    </button>
                 </th>
                 <!-- Column Filterable (Popover Pattern) -->
-                <th data-ln-sort="string" data-ln-filter-col="dept">
+                <th data-ln-col="dept" data-ln-sort="string" data-ln-filter-col="dept">
                     Department
-                    <button class="filter-btn" type="button" data-ln-popover-for="filter-dept">
-                        <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+                    <button type="button" class="table-filter" aria-label="Filter" data-ln-popover-for="filter-dept">
+                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
                     </button>
                     <!-- Sort Icons -->
-                    <svg class="ln-icon" data-ln-sort-icon aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                    <svg class="ln-icon hidden" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                    <svg class="ln-icon hidden" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                    <button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
+                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
+                    </button>
                 </th>
-                <!-- Column Filterable (Dropdown Pattern) -->
-                <th data-ln-sort="string" data-ln-filter-col="status">
+                <!-- Column Filterable (Popover Pattern with Auto-Populate) -->
+                <th data-ln-col="status" data-ln-sort="string" data-ln-filter-col="status">
                     Status
-                    <div data-ln-dropdown>
-                        <button class="filter-btn" type="button" data-ln-toggle-for="filter-status">
-                            <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
-                        </button>
-                        <ul id="filter-status" data-ln-toggle>
-                            <li>
-                                <nav data-ln-filter="employee-table">
-                                    <label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label>
-                                    <label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"> Active</label>
-                                    <label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Inactive"> Inactive</label>
-                                </nav>
-                            </li>
-                        </ul>
-                    </div>
+                    <button type="button" class="table-filter" aria-label="Filter" data-ln-popover-for="filter-status">
+                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+                    </button>
                 </th>
             </tr>
         </thead>
@@ -94,13 +87,58 @@ The `ln-table` component works with standard HTML tables. Filters, sorting, and 
 </div>
 
 <!-- Department Popover (Teleported on open) -->
-<div data-ln-popover id="filter-dept">
-    <nav data-ln-filter="employee-table">
-        <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
-        <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label>
-        <label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>
-    </nav>
+<div data-ln-popover id="filter-dept" class="column-filter-dropdown">
+    <div data-ln-filter="employee-table">
+        <input type="search" data-ln-search="dept-list" data-ln-search-items="li" data-ln-filter-search placeholder="Search departments...">
+        <ul id="dept-list" data-ln-filter-options>
+            <li>
+                <label>
+                    <input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked>
+                    All Departments
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design">
+                    Design
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering">
+                    Engineering
+                </label>
+            </li>
+        </ul>
+    </div>
 </div>
+<!-- Note: ln-popover teleports this element to <body> on open. ln-filter resolves its
+     target table by getElementById, so teleport is safe — it does not rely on DOM ancestry. -->
+
+<!-- Status Popover (Teleported on open, auto-populates via template) -->
+<div data-ln-popover id="filter-status" class="column-filter-dropdown">
+    <div data-ln-filter="employee-table" data-ln-filter-col="2"> <!-- index of Status column -->
+        <input type="search" data-ln-search="status-list" data-ln-search-items="li" data-ln-filter-search placeholder="Search status...">
+        <ul id="status-list" data-ln-filter-options>
+            <li>
+                <label>
+                    <input type="checkbox" data-ln-filter-reset checked>
+                    All Statuses
+                </label>
+            </li>
+            <template>
+                <li>
+                    <label>
+                        <input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="{{ text }}">
+                        {{ text }}
+                    </label>
+                </li>
+            </template>
+        </ul>
+    </div>
+</div>
+<!-- Note: ln-popover teleports this element to <body> on open. ln-filter resolves its
+     target table by getElementById, so teleport is safe — it does not rely on DOM ancestry. -->
 ```
 
 ---
@@ -200,7 +238,8 @@ The `ln-table` component works with standard HTML tables. Filters, sorting, and 
                     </li>
                 </template>
             </ul>
-            <button data-ln-filter-clear>Clear Filter</button>
+            <!-- data-ln-filter-reset "All" sentinel is the reset affordance — no clear button needed. -->
+            <!-- ln-data-table manages its own dropdown shell (no ln-popover); .column-filter-dropdown supplies content chrome only. -->
         </div>
     </template>
 </section>
@@ -344,3 +383,34 @@ Both client-side `ln-table` and server-side `ln-data-table` strictly share the u
    - Checking any individual specific value checkbox automatically deselects the "All" sentinel.
    - Deselecting a specific value checkbox automatically re-checks the "All" sentinel if no other checkboxes are selected.
    - Restoring a default reset state completely clears active filters, making data requests simple and clean.
+
+---
+
+## 4. Development Diagnostics & DOM Validation (DOM Linter)
+
+To maintain a zero-runtime footprint in production, `ln-ashlar` excludes developer warnings and HTML layout diagnostic checks from the main `ln-ashlar.css` stylesheet. Instead, they are compiled into a dedicated development validation stylesheet:
+
+📂 **Path:** `demo/dist/ln-ashlar-dev.css`  
+🔧 **Build command:** `npm run build:dev-css` (or automatically via `npm run build`)
+
+### Active Validation Diagnostics
+
+During local development, linking `ln-ashlar-dev.css` acts as an active **visual DOM linter** that highlights integration errors instantly on the screen:
+
+#### 1. Missing Sort Buttons
+A sortable table header `th[data-ln-sort]` expects a `<button data-ln-table-sort>` inside it to capture clicks correctly.
+*   **Trigger:** A `<th>` has `data-ln-sort` but is missing a child button with `data-ln-table-sort`.
+*   **Result:** A red warning label is rendered dynamically on screen: `⚠ missing sort button`.
+
+#### 2. Missing Table Identifiers (IDs)
+Interactive table wrappers `[data-ln-table]` require a unique `id` attribute to match them to search and column filter popovers.
+*   **Trigger:** A `[data-ln-table]` container has no `id` attribute.
+*   **Result:** The entire table wrapper gets an immediate red dashed border and a prominent red diagnostic block at the top:
+    ```
+    ⚠ [data-ln-table] is missing a required 'id' attribute for filter mapping.
+    ```
+
+> [!WARNING]
+> **Production Deployment Safety:**
+> Never deploy `ln-ashlar-dev.css` to production environments. It is solely designed for domestic development, testing, and CI/CD DOM validation pipelines.
+
