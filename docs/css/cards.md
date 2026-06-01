@@ -66,6 +66,61 @@ applies — hierarchy by structure, not by class.
 
 ---
 
+## Nesting & Visual Depth (Elevated Surfaces)
+
+To preserve visual depth, cards nested inside other cards, sections, or section-cards climb to an elevated surface:
+- **Background:** shifts to `var(--bg-elevated)`
+- **Shadow:** shifts to `var(--shadow-floating)`
+
+### Automatic Elevation with Classes
+If you are using the standard components `.card`, `.section`, or `.section-card` in your HTML, this elevation is handled automatically:
+```html
+<div class="card">
+    <div class="card">
+        <!-- This nested card is automatically elevated -->
+    </div>
+</div>
+```
+
+### Custom Selectors (Semantic SCSS)
+When using production-ready semantic selectors with `@include card`, **Sass cannot statically detect the parent-child nesting relationship**. 
+
+For example, the following will **not** trigger automatic elevation:
+```html
+<!-- HTML -->
+<div id="user-list">
+    <div id="user-item">...</div>
+</div>
+```
+```scss
+// SCSS
+#user-list {
+    @include card;
+}
+#user-item {
+    @include card; // Will NOT be automatically elevated!
+}
+```
+
+#### The Solution: Manual Nesting & Elevation in SCSS
+To correctly elevate the nested card when using custom selectors, nest the child selector and explicitly rebind the background and shadow variables:
+
+```scss
+#user-list {
+    @include card;
+
+    #user-item {
+        @include card;
+        
+        // Manual elevation for the nested context
+        --color-bg: var(--bg-elevated);
+        --shadow:   var(--shadow-floating);
+    }
+}
+```
+
+---
+
 ## `@mixin section-card`
 
 Composed card with structured regions. Internally calls `@include panel-header` for `header`.

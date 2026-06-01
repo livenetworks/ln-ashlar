@@ -403,9 +403,7 @@ direct-child bindings for `> header / > main / > footer / > a`.
 | `> a` | whole-card-as-link (`flex-col; flex-1; text-decoration:none; color:inherit`) |
 | `> main h3` | tile title sizing (`--text-body-sm`, `font-semibold`) |
 
-See [cards.md](cards.md) for full bindings, accent variants
-(`card-accent-top/left/bottom`), `card-bg`, `card-stacked`,
-`card-field-list`.
+See [cards.md](cards.md) for full nesting guidelines (including manual elevation rules for custom semantic selectors), accent variants (`card-accent-top/left/bottom`), `card-bg`, `card-stacked`, and `card-field-list`.
 
 ### `@include section-card`
 
