@@ -35,3 +35,14 @@
 		margin-inline-start: var(--size-xs, 0.5rem);
 	}
 }
+
+// Replaced-element DOM diagnostic error (img, video, iframe, etc.)
+// Replaced elements do NOT render ::before/::after generated content, so this
+// mixin uses a visible outline + translucent wash instead of a text label.
+// The human-readable reason is carried by surrounding copy (e.g. a demo
+// section header), not by a pseudo-element.
+@mixin dev-replaced-error {
+	outline: 2px dashed hsl(var(--color-error));
+	outline-offset: var(--size-xs);
+	background: color-mix(in srgb, hsl(var(--color-error)) 15%, transparent);
+}

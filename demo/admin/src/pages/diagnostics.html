@@ -84,10 +84,82 @@ th[data-ln-sort]:not(:has([data-ln-table-sort])) {
 	</script>
 </section>
 
+<!-- Case 3: Modal Trigger Missing Target Warning -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>3. Modal Trigger Missing Target Warning</h3>
+		<p>Flags a modal trigger <code>[data-ln-modal-for]</code> that is declared with an empty value, so it has no target modal <code>id</code> to open.</p>
+	</header>
+	<main>
+		<!-- ERROR: data-ln-modal-for is present but empty — no target modal id -->
+		<button type="button" class="btn" data-ln-modal-for="">Open Settings</button>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-inline-error:
+[data-ln-modal-for=""] {
+    @include dev-inline-error("data-ln-modal-for is missing a target modal id");
+}
+	</script>
+</section>
+
+<!-- Case 4: Image Missing Alt Attribute -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>4. Image Missing Alt Attribute</h3>
+		<p>Flags an <code>&lt;img&gt;</code> that has no <code>alt</code> attribute at all. An empty <code>alt=""</code> is intentionally allowed — it is the valid, WCAG-endorsed pattern for purely decorative images, so it is never flagged.</p>
+	</header>
+	<main>
+		<!-- ERROR: img has no alt attribute -->
+		<img src="ln-ashlar-logo.png">
+	</main>
+	<script type="text/plain" data-demo-scss>
+// Replaced elements can't show ::after labels, so this uses dev-replaced-error:
+img:not([alt]) {
+    @include dev-replaced-error;
+}
+	</script>
+</section>
+
+<!-- Case 5: Abbr Missing Title -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>5. Abbr Missing Title</h3>
+		<p>Flags an <code>&lt;abbr&gt;</code> that is missing its <code>title</code> attribute. Without a title the abbreviation has no expansion and is meaningless to readers and assistive tech.</p>
+	</header>
+	<main>
+		<!-- ERROR: abbr has no title attribute -->
+		<p>The agency known as <abbr>NASA</abbr> was founded in 1958.</p>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-inline-error:
+abbr:not([title]) {
+    @include dev-inline-error("abbr is missing a title attribute");
+}
+	</script>
+</section>
+
+<!-- Case 6: Empty Tooltip (No Title Fallback) -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>6. Empty Tooltip (No Title Fallback)</h3>
+		<p>Flags a <code>[data-ln-tooltip]</code> declared with an empty value and no native <code>title</code> fallback, so it would render an empty bubble. An empty <code>data-ln-tooltip</code> with a <code>title</code> present is valid (it falls back to the title) and is not flagged.</p>
+	</header>
+	<main>
+		<!-- ERROR: data-ln-tooltip is empty and has no title fallback -->
+		<button type="button" class="btn" data-ln-tooltip="">Hover me</button>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-inline-error:
+[data-ln-tooltip=""]:not([title]) {
+    @include dev-inline-error("data-ln-tooltip is empty and has no title fallback");
+}
+	</script>
+</section>
+
 <!-- Case 3: Correct Implementation -->
 <section class="section-card" data-demo-html>
 	<header>
-		<h3>3. Correct Implementation (No Errors)</h3>
+		<h3>7. Correct Implementation (No Errors)</h3>
 		<p>When the HTML structure and attributes are fully correct, no diagnostics warnings are shown.</p>
 	</header>
 	<main>

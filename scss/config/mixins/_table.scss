@@ -36,13 +36,9 @@
 	}
 	font-variant-numeric: tabular-nums;
 
-	// Row hover transition color. Sticky/enhanced tables use a relative lightness calculation
-	// to make the hovered row visually distinct from --bg-sunken chrome headers/footers.
-	$bg-hover: var(--bg-sunken);
-	@if $sticky {
-		$bg-hover: hsl(from var(--bg-base) h s calc(l - 4));
-	}
-	--bg-row-hover: #{$bg-hover};
+	// Row hover transition color. Default to a discrete tint of the primary color
+	// mixed with transparent to create a harmonious background shift across themes.
+	--bg-row-hover: var(--color-row-hover, color-mix(in srgb, var(--color-primary) 6%, transparent));
 
 	thead {
 		--color-bg: var(--bg-sunken);
@@ -77,44 +73,44 @@
 		// Shared header-button stack — keyed off the unprefixed structural button classes,
 		// so table / ln-table / ln-data-table all share one positioning rule.
 		&:has(.table-sort):has(.table-filter) {
-			padding-inline-end: calc(var(--padding-x) + 2.5rem);
+			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 3.75rem);
 
 			.table-filter {
 				position: absolute;
 				top: 50%;
 				transform: translateY(-50%);
-				right: var(--padding-x);
+				right: var(--padding-x, var(--size-md));
 				margin: 0;
 			}
 			.table-sort {
 				position: absolute;
 				top: 50%;
 				transform: translateY(-50%);
-				right: calc(var(--padding-x) + 1.25rem);
+				right: calc(var(--padding-x, var(--size-md)) + 1.75rem);
 				margin: 0;
 			}
 		}
 
 		&:has(.table-sort):not(:has(.table-filter)) {
-			padding-inline-end: calc(var(--padding-x) + 1.25rem);
+			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
 
 			.table-sort {
 				position: absolute;
 				top: 50%;
 				transform: translateY(-50%);
-				right: var(--padding-x);
+				right: var(--padding-x, var(--size-md));
 				margin: 0;
 			}
 		}
 
 		&:has(.table-filter):not(:has(.table-sort)) {
-			padding-inline-end: calc(var(--padding-x) + 1.25rem);
+			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
 
 			.table-filter {
 				position: absolute;
 				top: 50%;
 				transform: translateY(-50%);
-				right: var(--padding-x);
+				right: var(--padding-x, var(--size-md));
 				margin: 0;
 			}
 		}
@@ -273,18 +269,31 @@
 
 // ─── Column sort & filter buttons ──────────────────────────────
 
-@mixin table-sort {
-	opacity: 0.4;
-	@include motion-safe {
-		transition: opacity 0.15s;
-	}
-	@include cursor-pointer;
-	background: none;
+@mixin _table-header-btn-base {
+	width: 1.75rem;
+	height: 1.75rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border-radius: 50%;
+	background: transparent;
 	border: none;
-	--btn-padding-y: var(--size-2xs);
-	--btn-padding-x: var(--size-2xs);
-	--margin-inline: var(--size-xs);
-	margin-inline-start: var(--margin-inline);
+	color: inherit;
+	cursor: pointer;
+	box-shadow: none;
+	opacity: 0.45;
+	transition: all 0.15s ease-in-out;
+
+	&:hover {
+		background-color: hsl(var(--color-primary) / 0.12);
+		color: hsl(var(--color-primary));
+		opacity: 1;
+	}
+}
+
+@mixin table-sort {
+	@include _table-header-btn-base;
 	vertical-align: middle;
 
 	[data-ln-sort-icon="asc"],
@@ -299,19 +308,9 @@
 }
 
 @mixin table-filter {
-	opacity: 0.4;
-	@include motion-safe {
-		transition: opacity 0.15s;
-	}
-	@include cursor-pointer;
-	background: none;
-	border: none;
-	--btn-padding-y: var(--size-2xs);
-	--btn-padding-x: var(--size-2xs);
-	--margin-inline: var(--size-2xs);
-	margin-inline-start: var(--margin-inline);
+	@include _table-header-btn-base;
 	vertical-align: middle;
-	@include relative;
+	position: relative;
 }
 
 @mixin table-filter-active {

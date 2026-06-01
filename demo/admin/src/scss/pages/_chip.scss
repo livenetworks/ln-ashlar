@@ -15,5 +15,12 @@
 
 	li {
 		@include chip;
+
+		// Status tones override the primitive tokens the chip mixin reads
+		// (--color-bg / --color-fg) — no background/color re-declaration.
+		&.approved       { --color-fg: hsl(var(--color-success)); --color-bg: hsl(var(--color-success) / 0.12); }
+		&.pending-review { --color-fg: hsl(var(--color-warning)); --color-bg: hsl(var(--color-warning) / 0.12); }
+		&.rejected       { --color-fg: hsl(var(--color-error));   --color-bg: hsl(var(--color-error) / 0.12); }
+		&.in-progress    { --color-fg: hsl(var(--color-info));    --color-bg: hsl(var(--color-info) / 0.12); }
 	}
 }

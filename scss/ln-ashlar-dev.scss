@@ -19,3 +19,27 @@ th[data-ln-sort]:not(:has([data-ln-table-sort])) {
 [data-ln-table]:not([id]) {
 	@include dev-dom-error("[data-ln-table] is missing a required 'id' attribute for filter mapping.");
 }
+
+// 3. Modal Trigger: missing target id warning
+// Warns if a modal trigger [data-ln-modal-for] has an empty value (no modal id to open)
+[data-ln-modal-for=""] {
+	@include dev-inline-error("data-ln-modal-for is missing a target modal id");
+}
+
+// 4. Image Missing Alt: accessibility warning
+// Flags an <img> with NO alt attribute (empty alt="" is the valid decorative pattern and is intentionally NOT flagged)
+img:not([alt]) {
+	@include dev-replaced-error;
+}
+
+// 5. Abbr Missing Title: accessibility warning
+// Flags an <abbr> with no title — the abbreviation has no expansion and is meaningless to readers
+abbr:not([title]) {
+	@include dev-inline-error("abbr is missing a title attribute");
+}
+
+// 6. Empty Tooltip: accessibility warning
+// Flags a [data-ln-tooltip] declared empty with no native title fallback (renders an empty bubble); :not([title]) honors the documented title fallback
+[data-ln-tooltip=""]:not([title]) {
+	@include dev-inline-error("data-ln-tooltip is empty and has no title fallback");
+}
