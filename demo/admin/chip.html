@@ -184,16 +184,22 @@
 					<main>
 						<ul class="demo-chip-list">
 							<li>Neutral</li>
-							<li class="success">Approved</li>
-							<li class="warning">Pending review</li>
-							<li class="error">Rejected</li>
-							<li class="info">In progress</li>
+							<li class="approved">Approved</li>
+							<li class="pending-review">Pending review</li>
+							<li class="rejected">Rejected</li>
+							<li class="in-progress">In progress</li>
 						</ul>
 					</main>
 					<script type="text/plain" data-demo-scss>
-					// Tone variants override status variables on the matching classes
 					.demo-chip-list li {
 						@include chip;
+
+						// Status tones override the primitive tokens the chip mixin reads
+						// (--color-bg / --color-fg) — no background/color re-declaration.
+						&.approved       { --color-fg: hsl(var(--color-success)); --color-bg: hsl(var(--color-success) / 0.12); }
+						&.pending-review { --color-fg: hsl(var(--color-warning)); --color-bg: hsl(var(--color-warning) / 0.12); }
+						&.rejected       { --color-fg: hsl(var(--color-error));   --color-bg: hsl(var(--color-error) / 0.12); }
+						&.in-progress    { --color-fg: hsl(var(--color-info));    --color-bg: hsl(var(--color-info) / 0.12); }
 					}
 					</script>
 				</section>
@@ -215,9 +221,9 @@
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 								</button>
 							</li>
-							<li class="info">
-								Draft
-								<button type="button" aria-label="Remove Draft filter">
+							<li class="in-progress">
+								In progress
+								<button type="button" aria-label="Remove In progress filter">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 								</button>
 							</li>
