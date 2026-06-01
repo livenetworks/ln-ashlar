@@ -83,41 +83,29 @@ If you are using the standard components `.card`, `.section`, or `.section-card`
 ```
 
 ### Custom Selectors (Semantic SCSS)
-When using production-ready semantic selectors with `@include card`, **Sass cannot statically detect the parent-child nesting relationship**. 
+When using production-ready semantic selectors with `@include card`, **automatic elevation for nested cards is handled fully automatically**!
 
-For example, the following will **not** trigger automatic elevation:
+Under the hood, `@mixin card` applies the elevated design tokens (`--nested-card-bg` and `--nested-card-shadow`) to all of its descendants:
+
 ```html
 <!-- HTML -->
 <div id="user-list">
     <div id="user-item">...</div>
 </div>
 ```
+
 ```scss
 // SCSS
 #user-list {
-    @include card;
-}
-#user-item {
-    @include card; // Will NOT be automatically elevated!
-}
-```
-
-#### The Solution: Manual Nesting & Elevation in SCSS
-To correctly elevate the nested card when using custom selectors, nest the child selector and explicitly rebind the background and shadow variables:
-
-```scss
-#user-list {
-    @include card;
+    @include card; // Automatically sets elevated tokens on all descendants!
 
     #user-item {
-        @include card;
-        
-        // Manual elevation for the nested context
-        --color-bg: var(--bg-elevated);
-        --shadow:   var(--shadow-floating);
+        @include card; // Automatically picks up the elevated tokens!
     }
 }
 ```
+
+Since the elevated tokens are propagated down the DOM tree, **no manual rebinding of `--color-bg` or `--shadow` is required** for custom semantic nesting contexts.
 
 ---
 

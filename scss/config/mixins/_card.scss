@@ -97,6 +97,7 @@
 	--color-bg: var(--bg-sunken);
 	background: var(--color-bg);
 	@include transition;
+	margin-bottom: 0;
 
 	:is(h1, h2, h3, h4, h5, h6) {
 		font-size: var(--text-body-sm);
