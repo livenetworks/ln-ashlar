@@ -22,12 +22,11 @@ import { persistGet, persistSet } from '../../ln-core';
 	}
 
 	function _deriveActive(self) {
-		let key = null;
+		let key = self._filterKey;
 		const values = [];
 		for (let i = 0; i < self.inputs.length; i++) {
 			const input = self.inputs[i];
 			if (input.checked && !_isReset(input)) {
-				if (key === null) key = input.getAttribute(KEY_ATTR);
 				const v = input.getAttribute(VALUE_ATTR);
 				if (v) values.push(v);
 			}

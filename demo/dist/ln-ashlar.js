@@ -2246,12 +2246,11 @@ const jt = `<li class="ln-toast__item">\r
     return s.hasAttribute(o) || s.getAttribute(m) === "";
   }
   function t(s) {
-    let d = null;
+    let d = s._filterKey;
     const f = [];
     for (let l = 0; l < s.inputs.length; l++) {
       const g = s.inputs[l];
       if (g.checked && !n(g)) {
-        d === null && (d = g.getAttribute(p));
         const y = g.getAttribute(m);
         y && f.push(y);
       }
