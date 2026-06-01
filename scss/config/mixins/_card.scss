@@ -11,6 +11,9 @@
 // Card & Section — composite mixins
 
 @mixin card {
+	--color-bg: var(--nested-card-bg, var(--bg-surface));
+	--shadow:   var(--nested-card-shadow, var(--shadow-resting));
+
 	background: var(--color-bg);
 	@include border;
 	@include w-full;
@@ -18,12 +21,28 @@
 	border-radius: var(--radius);
 	@include overflow-hidden;
 	@include transition;
-	--shadow: var(--shadow-resting);
 	box-shadow: var(--shadow);
 
 	&:hover {
 		--color-border: var(--border-strong);
-		--shadow: var(--shadow-floating);
+		--shadow: var(--nested-card-shadow-hover, var(--shadow-floating));
+	}
+
+	// Nesting ladder: when nested inside a section-card or another card,
+	// climb to elevated surface to preserve visual depth.
+	.section-card &,
+	.section &,
+	.card & {
+		--color-bg: var(--bg-elevated);
+		--shadow:   var(--shadow-floating);
+	}
+
+	// Bulletproof nesting support for custom/semantic selectors:
+	// sets the elevated background variables on all descendants.
+	& * {
+		--nested-card-bg: var(--bg-elevated);
+		--nested-card-shadow: var(--shadow-floating);
+		--nested-card-shadow-hover: var(--shadow-floating);
 	}
 
 	// Direct-child selectors only — nested <header>/<main>/<footer>
@@ -47,6 +66,15 @@
 		@include flex-1;
 		text-decoration: none;
 		color: inherit;
+
+		> header { @include panel-header; }
+		> main   { @include panel-body; }
+		> footer { @include panel-footer; }
+
+		> main {
+			@include flex-1;
+			gap: var(--gap);
+		}
 	}
 
 	// Tile-header h3: when a card carries a title inside > main
@@ -146,7 +174,7 @@
 	--margin-block: var(--size-xl);
 	margin-bottom: var(--margin-block);
 
-	header {
+	> header {
 		@include flex;
 		@include items-center;
 		@include justify-between;
