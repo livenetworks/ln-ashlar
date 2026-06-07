@@ -101,8 +101,7 @@ Here is the inventory of our zero-dependency vanilla JS components:
 | **ln-nav** | `data-ln-nav` | Collapsible mobile-navigation menus and drawer systems. |
 | **ln-filter** | `data-ln-filter` | Binds UI filters (like checkbox list dropdowns) to data streams. |
 | **ln-search** | `data-ln-search` | Captures input keystrokes, debounces them, and dispatches search queries. |
-| **ln-table** | `data-ln-table` | Base table features (sticky headers, simple client-side cell sorting). |
-| **ln-data-table** | `data-ln-data-table` | Heavy virtual-scrolling grid. Clones rows from a template dynamically. |
+| **ln-table** | `data-ln-table` | Base table features (sticky headers, simple client-side cell sorting). Supports data-driven virtual-scroll mode: clones rows from a template dynamically. |
 | **ln-sortable** | `data-ln-sortable` | Drag-and-drop ordering for lists and table rows. |
 | **ln-progress** | `data-ln-progress` | Responsive progress bar indicator. |
 | **ln-circular-progress**| `data-ln-circular-progress`| SVG circular progress spinner. |

@@ -260,7 +260,7 @@ form.lnForm.fill({ fname: 'Dalibor', email: 'd@test.com' });
 // Pattern 2: Coordinator — routes external events to the form
 // Table doesn't know about the form. Form doesn't know about the table.
 // The coordinator is the glue.
-table.addEventListener('ln-data-table:row-click', function (e) {
+table.addEventListener('ln-table:row-click', function (e) {
     form.lnForm.fill(e.detail.record);
 });
 

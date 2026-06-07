@@ -14,7 +14,7 @@ Components separate by concern:
 | # | Concern  | Component(s)                                | Owns                                       |
 |---|----------|---------------------------------------------|--------------------------------------------|
 | 1 | Data     | `ln-store`                                  | Local cache, query engine, sync state      |
-| 2 | Render   | `ln-data-table`, `ln-upload`, future renderers | Visual presentation of records          |
+| 2 | Render   | `ln-table`, `ln-upload`, future renderers | Visual presentation of records          |
 | 3 | Submit   | `ln-form`, `ln-confirm`, `ln-http`          | Form serialization, validation gate, transport |
 | 4 | Validate | `ln-validate`                               | Field-level validity + error display       |
 
@@ -63,7 +63,7 @@ over records. The store consumes the intent via `getAll()` options
 and runs the actual query against the cache. The split is general:
 intent is a UI concern, execution is a data concern.
 
-### 2.2 Render — `ln-data-table` and other renderers
+### 2.2 Render — `ln-table` and other renderers
 
 **Owns.** Cloning a `<template>` per record and filling it via
 `data-ln-cell-attr` and `{{ field }}` text-node substitution — see §5.
@@ -206,7 +206,7 @@ already lived with the alternative.
 const records  = storeEl.lnStore.getAll();
 const sorted   = records.sort((a, b) => a.created_at < b.created_at ? 1 : -1);
 const filtered = sorted.filter(r => r.status === 'published');
-tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data',
+tableEl.dispatchEvent(new CustomEvent('ln-table:set-data',
     { detail: { records: filtered } }));
 ```
 
@@ -266,7 +266,7 @@ See §6.
 // REJECTED
 storeEl.addEventListener('ln-store:ready', () => {
     storeEl.lnStore.getAll({ sort: 'created_at' }).then(records => {
-        tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data',
+        tableEl.dispatchEvent(new CustomEvent('ln-table:set-data',
             { detail: { records } }));
     });
 });
@@ -324,7 +324,7 @@ behaviour) and can't be reflected in the submit-button gating that
 ## 5. Template syntax — `{{ }}` vs `data-ln-cell-attr`
 
 ln-ashlar has two complementary text-substitution patterns, shared
-across renderers (`ln-data-table`, `ln-upload`, `ln-filter`,
+across renderers (`ln-table`, `ln-upload`, `ln-filter`,
 `ln-translations`, future list / card renderers). Pick by location and
 lifecycle.
 

@@ -57,7 +57,7 @@ The diagram below maps how the DOM boundary isolates system flows. The UI presen
 flowchart TD
     %% DOM Boundaries
     subgraph UI ["1. Presentation Layer (UI)"]
-        Table["ln-data-table / Grid"]
+        Table["ln-table / Grid"]
         Form["ln-form / Modal Editor"]
     end
 

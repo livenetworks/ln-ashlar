@@ -115,7 +115,6 @@
 						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
 						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
-						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
 						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
@@ -135,6 +134,8 @@
 						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
 						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
 						<li><a href="table.html" aria-current="page"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
 						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
 						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
@@ -163,7 +164,7 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>In web application design, data grids can often be pre-rendered completely on the server. In these scenarios, introducing a heavy client-side JSON-to-HTML template rendering pipeline (such as <code>ln-data-table</code>) is unnecessary overhead. The DOM already contains the correct HTML rows on initial load.</p>
+							<p>In web application design, data grids can often be pre-rendered completely on the server. In these scenarios, introducing a heavy client-side JSON-to-HTML template rendering pipeline (such as <code>ln-table</code>) is unnecessary overhead. The DOM already contains the correct HTML rows on initial load.</p>
 
 							<p>In <code>ln-ashlar</code>, this is solved by <code>ln-table</code>, a highly-optimized **Server-Rendered Table Primitive**. Instead of generating rows dynamically, it parses existing DOM rows directly on paint. It layers ultra-fast, in-memory client-side sorting, column filtering, text searches, and virtual scroll on top of standard pre-rendered HTML, providing a fluid desktop-grid experience with zero database fetching overhead.</p>
 

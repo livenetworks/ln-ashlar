@@ -79,9 +79,8 @@ Two files per component:
 | Nav | `data-ln-nav` | [js/ln-nav/README.md](../js/ln-nav/README.md) | [nav.md](js/nav.md) |
 | Filter | `data-ln-filter` | [js/ln-filter/README.md](../js/ln-filter/README.md) | [filter.md](js/filter.md) |
 | Search | `data-ln-search` | [js/ln-search/README.md](../js/ln-search/README.md) | [search.md](js/search.md) |
-| Table | `data-ln-table` | [js/ln-table/README.md](../js/ln-table/README.md) | [table.md](js/table.md) |
+| Table | `data-ln-table` | [js/ln-table/README.md](../js/ln-table/README.md) | [table.md](js/table.md), [table-integration.md](js/table-integration.md) |
 | Table Sort | `data-ln-sort` | [js/ln-table/README.md](../js/ln-table/README.md) | [table-sort.md](js/table-sort.md) |
-| Data Table | `data-ln-data-table` | [js/ln-data-table/README.md](../js/ln-data-table/README.md) | [data-table.md](js/data-table.md) |
 | Sortable | `data-ln-sortable` | [js/ln-sortable/README.md](../js/ln-sortable/README.md) | [sortable.md](js/sortable.md) |
 | Progress | `data-ln-progress` | [js/ln-progress/README.md](../js/ln-progress/README.md) | [progress.md](js/progress.md) |
 | Circular Progress | `data-ln-circular-progress` | [js/ln-circular-progress/README.md](../js/ln-circular-progress/README.md) | [circular-progress.md](js/circular-progress.md) |

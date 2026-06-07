@@ -115,7 +115,6 @@
 						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
 						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="confirm.html" aria-current="page"><span class="nav-label">Confirm</span></a></li>
-						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
 						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
@@ -135,6 +134,8 @@
 						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
 						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
 						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
 						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
@@ -401,7 +402,7 @@ button[data-ln-confirm-timeout] {
 					<section class="section-card" data-demo-html>
 						<header><h3>Example — Inside <code>[data-ln-table]</code> (overflow escape)</h3></header>
 						<main>
-							<p><code>ln-data-table</code> uses <code>overflow: clip</code> on <code>[data-ln-table]</code>, which would clip the icon-only mode's tooltip bubble. The co-located rule <code>[data-ln-table]:has([data-confirming]) { overflow: visible; }</code> reverts the table to <code>overflow: visible</code> while ANY descendant button is armed. The moment the button reverts, <code>:has()</code> unmatches and the clip is restored.</p>
+							<p><code>ln-table</code> uses <code>overflow: clip</code> on <code>[data-ln-table]</code>, which would clip the icon-only mode's tooltip bubble. The co-located rule <code>[data-ln-table]:has([data-confirming]) { overflow: visible; }</code> reverts the table to <code>overflow: visible</code> while ANY descendant button is armed. The moment the button reverts, <code>:has()</code> unmatches and the clip is restored.</p>
 							<div data-ln-table>
 								<table>
 									<thead><tr><th>Item</th><th>Status</th><th>Actions</th></tr></thead>

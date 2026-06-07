@@ -255,18 +255,18 @@ click event for `ln-confirm` to intercept.
 For confirmation flows on row navigation, use `ln-link:navigate`
 with `e.preventDefault()` instead — see §Events.
 
-### With ln-data-table
+### With ln-table
 
-`ln-data-table` inserts `<tr>` elements into a `<tbody>` from a
+`ln-table` inserts `<tr>` elements into a `<tbody>` from a
 template. `ln-link`'s MutationObserver wires each new row as it
-arrives — no manual re-init is needed after `ln-data-table`
+arrives — no manual re-init is needed after `ln-table`
 populates the body.
 
 ```html
 <table data-ln-link data-ln-table>
 	<thead>...</thead>
 	<tbody>
-		<!-- ln-data-table inserts <tr> elements here dynamically;
+		<!-- ln-table inserts <tr> elements here dynamically;
 		     ln-link wires them automatically. -->
 	</tbody>
 </table>

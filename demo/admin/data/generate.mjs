@@ -1,4 +1,4 @@
-// Generator for documents.json — 10,000 records for ln-data-table / ln-store demos.
+// Generator for documents.json — 10,000 records for ln-table / ln-store demos.
 // Run: node demo/admin/data/generate.mjs
 // Output: demo/admin/data/documents.json
 //

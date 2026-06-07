@@ -94,7 +94,7 @@ Instead of forcing a choice between the outdated "dumb" server-rendered paint an
 
 1. **The Server Renders the Structure:** The backend (Laravel, Go, Rails, etc.) quickly generates the semantic HTML structure and delivers it to the client.
 2. **The DOM is the Coordinator:** Instead of JavaScript dynamically building the markup, declarative HTML attributes define the configuration and behavioral scope.
-3. **Progressive and Native Interactivity:** Lightweight, modular vanilla JS components (`ln-data-store`, `ln-data-table`, `ln-modal`) are dynamically registered via `MutationObserver` and communicate using native `CustomEvent` flows.
+3. **Progressive and Native Interactivity:** Lightweight, modular vanilla JS components (`ln-data-store`, `ln-table`, `ln-modal`) are dynamically registered via `MutationObserver` and communicate using native `CustomEvent` flows.
 
 ### Summary of Architectural Comparison
 
@@ -105,6 +105,6 @@ Instead of forcing a choice between the outdated "dumb" server-rendered paint an
 | **Dependency Overhead** | Hundreds to thousands of packages (`node_modules`). | **Zero-Dependency (0 npm packages at runtime)**. |
 | **Supply Chain Exposure** | High (dozens of newly discovered CVEs weekly). | Zero. Native and clean custom-built code. |
 | **Longevity & Support** | Extremely low (mandatory breaking upgrades). | **100% Stable (backed by permanent W3C web standards)**. |
-| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-data-table` onto any layout. |
+| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-table` onto any layout. |
 
 `ln-ashlar` is not merely a collection of JS components; it is an **architectural statement** that developing web applications can be simpler, faster, safer, and sustainable over decades.

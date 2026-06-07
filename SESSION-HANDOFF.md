@@ -35,7 +35,7 @@ All files are in this conversation's outputs. Download them and place as follows
 | File | Destination | Action |
 |------|-------------|--------|
 | `ln-store.md` | `docs/js/ln-store.md` | NEW (create `docs/js/` dir) |
-| `ln-data-table.md` | `docs/js/ln-data-table.md` | NEW |
+| `ln-table.md` | `docs/js/ln-table.md` | NEW |
 
 ### NOT placing yet (deferred)
 
@@ -72,10 +72,10 @@ All files are in this conversation's outputs. Download them and place as follows
 
 ### 4. ln-acme Components — Two Separate IIFEs
 - **ln-store**: generic data layer (IndexedDB CRUD, sync, optimistic mutations). Not UI-aware.
-- **ln-data-table**: pure UI (virtual scroll, rendering, sort/filter controls). Not data-aware.
+- **ln-table**: pure UI (virtual scroll, rendering, sort/filter controls). Not data-aware.
 - Connected via coordinator pattern (project-specific JS, CustomEvent communication)
 - ln-store is reusable by any component (autocomplete, dashboard KPIs, etc.)
-- WebSocket can be added to ln-store later without touching ln-data-table
+- WebSocket can be added to ln-store later without touching ln-table
 
 ### 5. Form Validation
 - Validate on **keyup** (not blur, not submit-only)
@@ -104,13 +104,13 @@ All files are in this conversation's outputs. Download them and place as follows
 ### After That
 3. **CSS skill** — remove motion duplication, add reference to ln-acme tokens
 4. **HTML skill** — fix cross-references (`SKILL-CSS.md` → correct path)
-5. **JS skill** — fix cross-references, add ln-store/ln-data-table integration patterns
+5. **JS skill** — fix cross-references, add ln-store/ln-table integration patterns
 
 ### Architecture
 6. Add brief cross-reference in `architecture/SKILL.md` § 5 pointing to `data-layer.md`
 
 ### ln-acme Implementation
-7. Actually build `ln-store.js` and `ln-data-table.js` following the specs
+7. Actually build `ln-store.js` and `ln-table.js` following the specs
 
 ---
 

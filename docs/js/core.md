@@ -153,7 +153,7 @@ findElements(node, DOM_SELECTOR, DOM_ATTRIBUTE, _component);
 Clone a `<template>` with scoped lookup — searches inside `root` first, falls back to global `cloneTemplate`.
 
 ```js
-const frag = cloneTemplateScoped(this.dom, 'column-filter', 'ln-data-table');
+const frag = cloneTemplateScoped(this.dom, 'column-filter', 'ln-table');
 ```
 
 - First searches for `<template data-ln-template="name">` inside `root`
