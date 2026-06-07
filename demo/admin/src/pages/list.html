@@ -1,0 +1,409 @@
+<!-- ln-page: title="SSR List & Data Sync — ln-ashlar" h1="SSR List & Data Sync" -->
+
+<style>
+	#hybrid-log {
+		background: var(--bg-sunken);
+		padding: var(--size-md);
+		border-radius: var(--radius-md);
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
+		height: 160px;
+		overflow-y: auto;
+		border: 1px solid var(--border-muted);
+		line-height: 1.6;
+	}
+	.demo-card-item {
+		transition: background-color 0.15s ease;
+	}
+	.demo-card-item:hover {
+		background-color: var(--bg-secondary);
+	}
+	.demo-card-item.ln-item-selected {
+		background-color: var(--bg-secondary);
+		border-left: 4px solid var(--color-primary);
+	}
+	.demo-controls {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--size-xs);
+		margin-block-end: var(--size-md);
+	}
+</style>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Architecture</h3></header>
+						<main>
+							<p>For applications where fast initial paint is critical but huge background datasets (10,000+ rows) are needed for offline usage or responsive scrolling, <code>ln-list</code> provides a high-performance **SSR Hydration &amp; Data Sync** pipeline matching the <code>ln-table</code> synchronization protocol.</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									Lifecycle Mechanics
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									1. **Instant SSR Paint**: The list loads with a fast pre-rendered subset of items (e.g. 10 items printed inside the container by the server).  
+									2. **Local Hydration**: The JS layer instantly parses these pre-rendered items on load, enabling immediate client-side search.  
+									3. **Background Sync**: Simultaneously, the coordinator fetches the complete 10,000 records from the PHP backend API.  
+									4. **Smooth Virtualization Upgrade**: When the API completes, the list merges the dataset, upgrades to Virtual Scroll, and updates page counters.
+								</p>
+							</div>
+
+							<h4>Remote Full-Text Search Integration</h4>
+							<p>When searching, the list first filters local cached items for instant visual response, and then dispatches the search term to the PHP backend. The PHP API runs a full-text search across <code>title</code>, <code>department</code>, <code>owner</code>, and <code>tags</code> properties, returning matches from the entire 10k database.</p>
+						</main>
+					</section>
+
+					<!-- Live Control Panel -->
+					<section class="section-card">
+						<header><h3>Sandbox Controls</h3></header>
+						<main>
+							<div style="display: flex; gap: var(--size-md); flex-wrap: wrap; margin-bottom: var(--size-md);">
+								<label style="display: flex; align-items: center; gap: var(--size-xs);">
+									<input type="checkbox" id="hybrid-latency" checked> 
+									Simulate 2000ms network latency on background fetches (so you can test local searching on the initial items)
+								</label>
+								<button type="button" id="trigger-sync-btn" class="btn">Force Background Re-Sync</button>
+								<button type="button" id="btn-clear-selection" class="btn btn--secondary">Clear Selection</button>
+								<button type="button" id="btn-clear-log" class="btn btn--secondary">Clear Log</button>
+							</div>
+							
+							<h4>Integration Log Terminal</h4>
+							<pre id="hybrid-log"></pre>
+						</main>
+					</section>
+
+					<!-- Active List Component -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Interactive List Demo</h3></header>
+						<main>
+							<!-- Search Bar -->
+							<div style="margin-block-end: var(--size-sm);">
+								<label data-ln-search="hybrid-list">
+									<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+									<input type="search" placeholder="Search cache or server...">
+									<button type="button" data-ln-search-clear aria-label="Clear search">
+										<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</label>
+							</div>
+
+							<!-- Scrollable Container with data-ln-list-body -->
+							<ul id="hybrid-list" 
+							    data-ln-list="hybrid-docs" 
+							    data-ln-list-source="hybrid-docs" 
+							    data-ln-list-selectable
+							    data-ln-list-body
+							    style="height: 350px; overflow-y: auto; border: 1px solid var(--border-color); padding: 0; list-style: none; border-radius: var(--radius-md); margin-block: var(--size-md);">
+								
+								<!-- First 10 SSR Pre-rendered Items -->
+								<li data-ln-item data-ln-item-id="1" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">Operations</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Security Policy #1</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Sofia Risteska</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="2" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">Operations</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Privacy Plan #2</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Igor Jones</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="3" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">Legal</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Compliance Roadmap #3</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Sofia Vukomanovska</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="4" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">IT</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Risk Specification #4</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Igor Miller</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="5" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">Operations</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Audit Assessment #5</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Nikola Jovanovska</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="6" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">Finance</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Operations Guide #6</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Petra Smith</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="7" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">Legal</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Finance Memo #7</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Marko Tomić</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="8" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">IT</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">HR Report #8</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Lena Wilson</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="9" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">Sales</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Legal Review #9</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Petra Ilieva</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+								<li data-ln-item data-ln-item-id="10" class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;">Operations</span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;">Marketing Charter #10</strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By Elena Vukomanovska</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+							</ul>
+
+							<!-- Stats Footer -->
+							<div class="demo-controls" style="margin-block-start: var(--size-xs); font-size: var(--text-body-sm); color: var(--fg-muted);">
+								<span>Total: <strong id="lbl-total">10</strong> items</span>
+								<span id="lbl-filtered-wrap" class="hidden"> · Filtered: <strong id="lbl-filtered">0</strong></span>
+								<span id="lbl-selected-wrap" class="hidden"> · Selected: <strong id="lbl-selected">0</strong></span>
+							</div>
+
+							<!-- Item Row Template -->
+							<template data-ln-template="hybrid-docs-row">
+								<li data-ln-item class="demo-card-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: var(--size-md);">
+									<div style="display: flex; align-items: center; gap: var(--size-sm);">
+										<input type="checkbox" data-ln-item-select>
+										<div>
+											<span class="badge" data-ln-field="department" style="font-size: var(--text-body-xs); font-weight: bold; background: var(--bg-sunken); padding: 2px 6px; border-radius: 4px;"></span>
+											<strong data-ln-field="title" style="display: block; margin-top: 4px;"></strong>
+											<span style="font-size: var(--text-body-sm); color: var(--fg-muted);">By {{ owner }}</span>
+										</div>
+									</div>
+									<button type="button" data-ln-item-action="delete" class="btn btn--danger btn--sm" style="padding: 4px 8px;">Delete</button>
+								</li>
+							</template>
+
+							<!-- Empty States -->
+							<template data-ln-template="hybrid-docs-empty">
+								<li style="padding: 2rem; text-align: center; color: var(--fg-muted);">No documents available.</li>
+							</template>
+
+							<template data-ln-template="hybrid-docs-empty-filtered">
+								<li style="padding: 2rem; text-align: center; color: var(--fg-muted);">No matching documents found.</li>
+							</template>
+						</main>
+					</section>
+
+<script>
+(function() {
+	const logConsole = document.getElementById('hybrid-log');
+	const listEl = document.getElementById('hybrid-list');
+	const triggerBtn = document.getElementById('trigger-sync-btn');
+	const latencyCheckbox = document.getElementById('hybrid-latency');
+	const totalLbl = document.getElementById('lbl-total');
+	const filteredLbl = document.getElementById('lbl-filtered');
+	const filteredWrap = document.getElementById('lbl-filtered-wrap');
+	const selectedLbl = document.getElementById('lbl-selected');
+	const selectedWrap = document.getElementById('lbl-selected-wrap');
+
+	let isSynced = false;
+	let currentAbortController = null;
+
+	function log(msg, color = 'var(--fg-muted)') {
+		const time = new Date().toLocaleTimeString() + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+		const span = document.createElement('span');
+		span.textContent = `[${time}] ${msg}\n`;
+		span.style.color = color;
+		logConsole.appendChild(span);
+		logConsole.scrollTop = logConsole.scrollHeight;
+	}
+
+	function formatSize(bytes) {
+		if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
+		return bytes + ' B';
+	}
+
+	function formatDate(ts) {
+		const d = new Date(ts * 1000);
+		return d.toISOString().split('T')[0];
+	}
+
+	function delay(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	// Trigger API fetch
+	async function fetchBackgroundData(searchQuery = '') {
+		if (currentAbortController) {
+			currentAbortController.abort();
+			log("Previous background sync request aborted.", '#ef4444');
+		}
+
+		currentAbortController = new AbortController();
+		const signal = currentAbortController.signal;
+
+		log(`Starting background sync from PHP API... (search: "${searchQuery}")`, '#38bdf8');
+		
+		listEl.dispatchEvent(new CustomEvent('ln-list:set-loading', {
+			detail: { loading: true }
+		}));
+
+		if (latencyCheckbox.checked) {
+			log("Simulating 2000ms network latency...", '#a1a1aa');
+			try {
+				await delay(2000);
+				if (signal.aborted) return;
+			} catch (e) {
+				return;
+			}
+		}
+
+		const params = new URLSearchParams();
+		if (searchQuery) {
+			params.append('search', searchQuery);
+		}
+
+		try {
+			const res = await fetch('data/api.php?' + params.toString(), { signal });
+			const payload = await res.json();
+			
+			if (payload.error) {
+				throw new Error(payload.error);
+			}
+
+			const data = payload.data || [];
+			log(`Received ${data.length} records from PHP API. Setting data...`, '#34d399');
+
+			listEl.dispatchEvent(new CustomEvent('ln-list:set-data', {
+				detail: {
+					data: data,
+					total: payload.total,
+					filtered: payload.filtered
+				}
+			}));
+
+			isSynced = true;
+			log("Background synchronization complete. Virtual Scroll upgraded.", '#c084fc');
+		} catch (err) {
+			if (err.name === 'AbortError') {
+				return;
+			}
+			log(`Fetch failed: ${err.message}`, 'var(--color-error)');
+			listEl.dispatchEvent(new CustomEvent('ln-list:set-loading', {
+				detail: { loading: false }
+			}));
+		} finally {
+			if (currentAbortController && currentAbortController.signal === signal) {
+				currentAbortController = null;
+			}
+		}
+	}
+
+	// ─── Component Events Integration ──────────────────────────
+
+	document.addEventListener('DOMContentLoaded', function() {
+		log("Page loaded. 10 SSR pre-rendered items visible in the list.", 'var(--color-primary)');
+		log("Unified ln-list parsed SSR items synchronously during initialization.", 'var(--color-primary)');
+	});
+
+	listEl.addEventListener('ln-list:request-data', function (e) {
+		log(`Component emitted 'ln-list:request-data' due to query change.`, '#fbbf24');
+		fetchBackgroundData(e.detail.search);
+	});
+
+	listEl.addEventListener('ln-list:ready', function(e) {
+		log(`Component emitted 'ln-list:ready' (Total parsed: ${e.detail.total}).`, 'var(--color-primary)');
+	});
+
+	listEl.addEventListener('ln-list:rendered', function(e) {
+		log(`Component emitted 'ln-list:rendered' (Visible: ${e.detail.visible}, Total: ${e.detail.total}).`, 'var(--color-primary)');
+		
+		// Update footer counts
+		totalLbl.textContent = e.detail.total;
+		filteredLbl.textContent = e.detail.visible;
+		filteredWrap.classList.toggle('hidden', e.detail.visible === e.detail.total);
+	});
+
+	listEl.addEventListener('ln-list:item-click', function(e) {
+		log(`Item clicked: "${e.detail.record.title}" (ID: ${e.detail.id})`, '#38bdf8');
+	});
+
+	listEl.addEventListener('ln-list:item-action', function(e) {
+		log(`Item action: [${e.detail.action}] clicked for ID: ${e.detail.id}`, '#f43f5e');
+		if (e.detail.action === 'delete') {
+			log(`Deleting item ID ${e.detail.id} optimistically.`, '#ef4444');
+			// In a real coordinator, this would emit delete event to Store
+		}
+	});
+
+	listEl.addEventListener('ln-list:select', function(e) {
+		log(`Selection updated. Count: ${e.detail.count}`, '#fbbf24');
+		selectedLbl.textContent = e.detail.count;
+		selectedWrap.classList.toggle('hidden', e.detail.count === 0);
+	});
+
+	triggerBtn.addEventListener('click', function() {
+		isSynced = false;
+		fetchBackgroundData(listEl.lnList.currentSearch || '');
+	});
+
+	document.getElementById('btn-clear-selection').addEventListener('click', function() {
+		if (listEl.lnList && typeof listEl.lnList._disableSelection === 'function') {
+			listEl.lnList._disableSelection();
+			listEl.lnList._enableSelection();
+		}
+	});
+
+	document.getElementById('btn-clear-log').addEventListener('click', function() {
+		logConsole.textContent = '';
+	});
+})();
+</script>

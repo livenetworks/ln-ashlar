@@ -1,0 +1,6 @@
+// ── JS state: ln-list structural/state overrides ──
+
+.ln-list--loading [data-ln-list-body] {
+	opacity: 0.5;
+	pointer-events: none;
+}

@@ -23,6 +23,7 @@ import './ln-filter/src/ln-filter.js';
 import './ln-search/src/ln-search.js';
 import './ln-table/src/ln-table-sort.js';
 import './ln-table/src/ln-table.js';
+import './ln-list/src/ln-list.js';
 import './ln-circular-progress/src/ln-circular-progress.js';
 import './ln-sortable/src/ln-sortable.js';
 import './ln-confirm/src/ln-confirm.js';
