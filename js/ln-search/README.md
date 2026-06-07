@@ -74,7 +74,7 @@ Dispatched on the **target** element whenever the search term changes.
 
 ## ⚠️ Common Pitfalls
 
-- **Confusing with `ln-data-table` Search:** `ln-data-table` manages its own internal search input via `data-ln-data-table-search` to join sorting and pagination into unified API request arrays. Do not place `ln-search` in front of `ln-data-table`.
+- **Confusing with `ln-table` Search:** `ln-table` manages its own internal search input via `data-ln-table-search` to join sorting and pagination into unified API request arrays. Do not place `ln-search` in front of `ln-table`.
 - **Bypassing Debounce via Native Input Listeners:** Listening to native `input` events directly will bypass the 150ms debounce and execute expensive logic on every single keystroke. Always listen to `ln-search:change`.
 - **Programmatic Value Mutations:** Assigning `input.value = "text"` programmatically does not trigger search. You must manually dispatch an `input` event:
   ```javascript

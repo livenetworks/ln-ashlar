@@ -115,7 +115,6 @@
 						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
 						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
-						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
 						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
@@ -135,6 +134,8 @@
 						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
 						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
 						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
 						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
@@ -197,7 +198,7 @@
 						<header><h3>Overview</h3></header>
 						<main>
 							<p>A 145-line passive renderer for a linear progress bar. <code>ln-progress</code> derives one visual (a child <code>&lt;div&gt;</code> whose <code>width</code> is a percentage) from one number attribute on the bar, plus an optional max attribute on either the bar or its parent track. Write <code>data-ln-progress="42"</code> on a bar; the component picks up the change via MutationObserver, computes the percentage from value and max, and writes the new <code>style.width</code>. The attribute IS the API — there is no <code>setValue(n)</code>, no <code>update()</code>, no imperative entry point.</p>
-							<p>The design choice this contract reflects: state lives in the DOM, not in JS. A server-rendered template can stamp <code>data-ln-progress="75"</code> directly into markup; consumer JS that updates the value writes the same attribute. Both paths flow through the same MutationObserver. There is one source of truth — the attribute — and DOM Inspector shows it. This is the same pattern <code>ln-circular-progress</code> (circular sibling), <code>ln-stepper</code>, and <code>ln-data-table</code>'s display layer all use: passive renderers driven by external state.</p>
+							<p>The design choice this contract reflects: state lives in the DOM, not in JS. A server-rendered template can stamp <code>data-ln-progress="75"</code> directly into markup; consumer JS that updates the value writes the same attribute. Both paths flow through the same MutationObserver. There is one source of truth — the attribute — and DOM Inspector shows it. This is the same pattern <code>ln-circular-progress</code> (circular sibling), <code>ln-stepper</code>, and <code>ln-table</code>'s display layer all use: passive renderers driven by external state.</p>
 							<p>Native <code>&lt;progress&gt;</code> would have given screen-readers automatic <code>role="progressbar"</code> and <code>aria-valuenow</code> sync. It does not support multiple coloured value bars stacked inside a single track — a constraint that becomes load-bearing for "CPU 40% / RAM 30% / Disk 30%" or "4 done + 2 in progress + 1 pending" patterns. The trade-off accepted by <code>ln-progress</code>: full visual control via <code>&lt;div&gt;</code>s, theme-driven colours via CSS variables, animated width transitions via CSS. ARIA is auto-managed on each bar (<code>role="progressbar"</code>, <code>aria-valuemin</code>, <code>aria-valuemax</code>, <code>aria-valuenow</code> clamped to <code>[0, max]</code>) — consumers add an <code>aria-label</code> on the bar for context but do nothing for value sync.</p>
 							<p>For the full guide see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-progress/README.md"><code>ln-progress</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/progress.md">architecture reference</a>.</p>
 						</main>

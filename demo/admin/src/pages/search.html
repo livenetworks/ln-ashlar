@@ -335,7 +335,7 @@ input[type="search"] {
 					<section class="section-card">
 						<header><h3>Composition — what <code>ln-search</code> does <em>not</em> compose with</h3></header>
 						<main>
-							<p><strong><code>ln-data-table</code> does NOT consume <code>ln-search</code>.</strong> The data-table component has its own input attribute, <code>data-ln-data-table-search</code>, placed inside the data-table element. Search is part of the request payload joined with sort, pagination, and column filters in the <code>ln-data-table:request-data</code> event consumed by <code>ln-store</code>. Putting <code>ln-search</code> in front would create a parallel channel the data-table layer would have to ignore. They are different problems with different lifecycles.</p>
+							<p><strong><code>ln-table</code> does NOT consume <code>ln-search</code>.</strong> The data-table component has its own input attribute, <code>data-ln-table-search</code>, placed inside the data-table element. Search is part of the request payload joined with sort, pagination, and column filters in the <code>ln-table:request-data</code> event consumed by <code>ln-store</code>. Putting <code>ln-search</code> in front would create a parallel channel the data-table layer would have to ignore. They are different problems with different lifecycles.</p>
 							<p><strong><code>ln-form</code> does not coordinate with <code>ln-search</code>.</strong> A search input inside <code>&lt;form data-ln-form&gt;</code> works the same as outside one. <code>ln-search</code> listens to <code>input</code> only — never <code>keydown</code> or <code>submit</code>. Pressing Enter triggers the form's native submit; the 150ms debounce timer may still be running. If you need Enter-to-search semantics, wire the form's <code>submit</code> handler directly. See the <code>ln-search</code> README "Common mistakes" item 2.</p>
 						</main>
 					</section>
@@ -377,8 +377,8 @@ input.dispatchEvent(new Event('input', { bubbles: true }));
 							<h4>4. Two <code>data-ln-search</code> inputs targeting the same target</h4>
 							<p>Each input has its own debounce, its own dispatch, its own state. Typing in one does NOT clear or sync the other. The listener on the target sees whichever input fired most recently. Sync manually at the document level if you need it, or — better — collapse to a single search box.</p>
 
-							<h4>5. Confusing <code>data-ln-search</code> with <code>data-ln-data-table-search</code></h4>
-							<p><code>ln-data-table</code> does NOT listen for <code>ln-search:change</code>. It uses its own <code>data-ln-data-table-search</code> input. Choose the renderer that matches your data shape: <code>ln-table</code> for fully-loaded data + <code>ln-search</code>; <code>ln-data-table</code> with its built-in search for server-coordinated data.</p>
+							<h4>5. Confusing <code>data-ln-search</code> with <code>data-ln-table-search</code></h4>
+							<p><code>ln-table</code> does NOT listen for <code>ln-search:change</code>. It uses its own <code>data-ln-table-search</code> input. Choose the renderer that matches your data shape: <code>ln-table</code> for fully-loaded data + <code>ln-search</code>; <code>ln-table</code> with its built-in search for server-coordinated data.</p>
 
 							<h4>6. Adding the clear button after construction</h4>
 							<p>The constructor finds the clear button via <code>querySelector</code> once. Adding one later via <code>setAttribute</code> or <code>appendChild</code> gives an unwired button. Include the clear button in the initial markup, or destroy and re-init.</p>

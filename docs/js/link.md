@@ -108,8 +108,8 @@ This handles: a new `[data-ln-link]` table injected via AJAX, a new
 **Special case for `<tr>` (lines 154–157):** if the added node's tagName
 is `'TR'`, walk up to the nearest `[data-ln-link]` ancestor via
 `node.closest('[data-ln-link]')`. If found, call `_initRow(node)` on
-the newly added row directly. This handles the `ln-data-table` / `ln-ajax`
-append-row case where `ln-data-table` inserts `<tr>` elements into an
+the newly added row directly. This handles the `ln-table` / `ln-ajax`
+append-row case where `ln-table` inserts `<tr>` elements into an
 existing `[data-ln-link]` table — `findElements(node)` alone would not
 catch it because a `<tr>` is not a `[data-ln-link]` container.
 

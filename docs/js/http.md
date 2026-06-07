@@ -31,7 +31,7 @@ Both rules are about cancellation. Neither rule is about composition,
 parsing, or auth. Those concerns are the dispatch site's.
 
 The component is **parasitic**: other components in this library
-(`ln-form`, `ln-ajax`, `ln-store`, `ln-data-table`,
+(`ln-form`, `ln-ajax`, `ln-store`, `ln-table`,
 `ln-icons`) call `fetch()` directly without importing or referencing
 ln-http. When ln-http loads, those `fetch` calls are silently routed
 through the wrapper and inherit Path A dedup. When ln-http does NOT

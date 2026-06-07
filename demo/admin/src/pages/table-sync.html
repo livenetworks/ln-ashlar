@@ -1,4 +1,4 @@
-<!-- ln-page: title="Hybrid Table & Search — ln-ashlar" h1="Hybrid Table & Search" -->
+<!-- ln-page: title="SSR Table & Data Sync — ln-ashlar" h1="SSR Table & Data Sync" -->
 
 <style>
 	#hybrid-log {
@@ -15,14 +15,14 @@
 </style>
 
 <section class="section-card">
-	<header><h3>Overview & Hybrid Architecture</h3></header>
+	<header><h3>Overview & Architecture</h3></header>
 	<main>
-		<p>For applications where fast initial paint is critical but huge background datasets (10,000+ rows) are needed for offline usage or responsive scrolling, <code>ln-table</code> provides a high-performance **Hybrid Hydration & Sync** pipeline.</p>
+		<p>For applications where fast initial paint is critical but huge background datasets (10,000+ rows) are needed for offline usage or responsive scrolling, <code>ln-table</code> provides a high-performance **SSR Hydration & Data Sync** pipeline.</p>
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
 				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
-				Hybrid Lifecycle Mechanics
+				Lifecycle Mechanics
 			</h4>
 			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
 				1. **Instant SSR Paint**: The table loads with a fast pre-rendered subset of rows (e.g. 10 rows printed inside <code>&lt;tbody&gt;</code> by the server).  
@@ -39,7 +39,7 @@
 
 <!-- Live Control Panel -->
 <section class="section-card">
-	<header><h3>Hybrid Mode Sandbox Controls</h3></header>
+	<header><h3>Sandbox Controls</h3></header>
 	<main>
 		<div style="display: flex; gap: var(--size-md); flex-wrap: wrap; margin-bottom: var(--size-md);">
 			<label style="display: flex; align-items: center; gap: var(--size-xs);">
@@ -56,7 +56,7 @@
 
 <!-- Active Table Component -->
 <section class="section-card" data-demo-html>
-	<header><h3>Interactive Hybrid Grid Demo</h3></header>
+	<header><h3>Interactive Table Demo</h3></header>
 	<main>
 		<section data-ln-table="hybrid-docs"
 		         data-ln-table-source="hybrid-docs"

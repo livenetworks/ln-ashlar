@@ -279,7 +279,7 @@ Use reactive rendering when a component has **2+ state properties** that togethe
 
 **Don't use it for:**
 - Single boolean state — `this.isOpen = true; dom.classList.toggle(...)` is simpler
-- Event-driven rendering — components that receive data via `set-data` events (ln-data-table)
+- Event-driven rendering — components that receive data via `set-data` events (ln-table)
 - One-shot renders — clone template + fill once, no ongoing state
 
 ### Used in
@@ -882,7 +882,7 @@ State transitions are just successive `fill()` calls with different values — n
 **Imperative escape hatches** — two things `fill()` can't express cleanly:
 
 1. `removeBtn.disabled = !uploaded` — the `disabled` boolean attribute doesn't round-trip through `data-ln-attr` (setting vs. removing).
-2. `progressBar.style.width = percent + '%'` — a continuous animation value, not discrete state. Same precedent as `ln-data-table` virtual-scroll spacer heights.
+2. `progressBar.style.width = percent + '%'` — a continuous animation value, not discrete state. Same precedent as `ln-table` virtual-scroll spacer heights.
 
 Both are one-line assignments right after the `fill()` call and are the only non-declarative touches in the render path.
 
@@ -956,7 +956,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | Component | Template(s) | Lookup | Notes |
 |---|---|---|---|
 | **ln-upload** | `ln-upload-item` | `cloneTemplateScoped` | Scoped → global → auto-injected default on first init |
-| **ln-data-table** | `{name}-row`, `{name}-empty`, `{name}-empty-filtered`, `column-filter` (also falls back to `{name}-column-filter`) | `cloneTemplateScoped` | Scoped-first per table instance |
+| **ln-table** | `{name}-row`, `{name}-empty`, `{name}-empty-filtered`, `column-filter` (also falls back to `{name}-column-filter`) | `cloneTemplateScoped` | Scoped-first per table instance |
 | **ln-translations** | `ln-translations-menu-item`, `ln-translations-badge` | `cloneTemplate` | Single global template, no per-instance override |
 
 ### Rules
@@ -1063,15 +1063,15 @@ ln-form never calls `lnValidate.isValid()` or reads TomSelect state
 directly. It listens to the validation events and lets each sibling
 manage its own internals.
 
-### Data family — ln-data-table ↔ ln-store through the coordinator
+### Data family — ln-table ↔ ln-store through the coordinator
 
 ```
-ln-data-table                              ln-store
+ln-table                                   ln-store
       │                                        │
-      │  ln-data-table:request-data  ─────────▶│
+      │  ln-table:request-data  ──────────────▶│
       │  (sort, filters, search)               │  (reads IndexedDB)
       │                                        │
-      │◀───────  ln-data-table:set-data        │
+      │◀───────  ln-table:set-data             │
       │          (rows + totals)               │
       │                                        │
       │◀───────  ln-store:synced               │
@@ -1081,9 +1081,9 @@ ln-data-table                              ln-store
                 project coordinator
 ```
 
-`ln-data-table` never imports or queries `ln-store`. It emits a request
+`ln-table` never imports or queries `ln-store`. It emits a request
 event; the project coordinator catches it, calls `storeEl.lnStore.getAll(...)`,
-and dispatches `ln-data-table:set-data` back. See
+and dispatches `ln-table:set-data` back. See
 [docs/js/component-guide.md](../docs/js/component-guide.md#data-flow-with-ln-store)
 for the full handshake.
 

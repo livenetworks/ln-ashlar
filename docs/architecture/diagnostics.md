@@ -50,7 +50,7 @@ Best for inline elements, labels, or inline warnings. It appends a clean red tex
 
 Below is the list of active validation rules implemented in the framework, grouped by component.
 
-### 1. Tables (`ln-table` / `ln-data-table`)
+### 1. Tables (`ln-table`)
 
 #### A. Missing Sort Buttons
 A sortable table header `th[data-ln-sort]` expects a `<button data-ln-table-sort>` inside it to capture sort clicks correctly.

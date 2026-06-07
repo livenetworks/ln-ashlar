@@ -115,7 +115,6 @@
 						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
 						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
 						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
-						<li><a href="datatable.html"><span class="nav-label">Data Table</span></a></li>
 						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
@@ -135,6 +134,8 @@
 						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
 						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
 						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
 						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
 						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
@@ -186,7 +187,7 @@
 									<strong>The Sync Engine (Delta Protocol):</strong> A background service that communicates with server API endpoints. It tracks timestamps, fetches only records changed since the last sync (delta arrays), processes conflict resolutions, and maintains outbox write queues.
 								</li>
 								<li>
-									<strong>The Presentation Layer (UI Elements):</strong> Data tables (<code>ln-data-table</code>) and select controls render data directly from local IndexedDB queries. They listen to bubbled store events (like <code>ln-store:created</code>, <code>ln-store:updated</code>) to update lists in real-time.
+									<strong>The Presentation Layer (UI Elements):</strong> Data tables (<code>ln-table</code>) and select controls render data directly from local IndexedDB queries. They listen to bubbled store events (like <code>ln-store:created</code>, <code>ln-store:updated</code>) to update lists in real-time.
 								</li>
 							</ol>
 

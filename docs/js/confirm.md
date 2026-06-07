@@ -391,7 +391,7 @@ own `--color-primary` rebind. Excluding the tooltip mode prevents
 double-application — the tooltip mixin owns the icon's red color.
 
 The second rule (`overflow: visible` on `[data-ln-table]`) is the
-table-clip escape hatch. `ln-data-table` and similar containers use
+table-clip escape hatch. `ln-table` and similar containers use
 `overflow: clip` on `[data-ln-table]` to enforce row alignment, but
 this clips the icon-only mode's `::after` tooltip bubble outside
 the row's visual frame. The `:has()` selector keys on any
@@ -518,7 +518,7 @@ interactions are worth documenting:
   dispatches the request. Path B's `key` parameter is independent
   of ln-confirm. Same-element, different listener, second click
   only.
-- **`ln-data-table`** — destructive icon buttons inside a row
+- **`ln-table`** — destructive icon buttons inside a row
   (delete row, delete cell) are a common pattern. The
   `[data-ln-table]:has([data-confirming]) { overflow: visible; }`
   rule in ln-confirm's co-located SCSS handles the table's

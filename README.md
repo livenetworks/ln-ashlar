@@ -30,7 +30,7 @@ Instead of downloading megabytes of JavaScript, compiling in runtime, and displa
 | **Network Overhead** | Megabytes of JS, hundreds of transitive `npm` packages. | **Zero-Dependency (0 npm packages at runtime)**. |
 | **Security Risks** | High (transitive dependency supply chain vulnerability). | Zero. Native vanilla JS communicating directly with Web APIs. |
 | **Longevity & Support** | EOL cycles every 6-18 months (breaking framework upgrades). | **100% Stable (backed by permanent W3C web standards)**. |
-| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-data-table` onto any layout. |
+| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-table` onto any layout. |
 
 ---
 
@@ -93,7 +93,7 @@ Deep architectural blueprints detailing the engine driving `ln-ashlar`.
 | Specification | Contents |
 |:---|:---|
 | 📖 **[Architecture Philosophy](docs/architecture/philosophy.md)** | The DOM-First engineering manifesto detailing computing cycles, framework EOL risks, and performance. |
-| 🔄 **[Data Flow Architecture](docs/architecture/data-flow.md)** | Rules governing how data moves. Splits responsibilities into **four isolated concerns**: Data (`ln-store`), Render (`ln-data-table`), Submit (`ln-form`), and Validate (`ln-validate`). Details the **optimistic and offline write pipeline** with a comprehensive Mermaid flow diagram. |
+| 🔄 **[Data Flow Architecture](docs/architecture/data-flow.md)** | Rules governing how data moves. Splits responsibilities into **four isolated concerns**: Data (`ln-store`), Render (`ln-table`), Submit (`ln-form`), and Validate (`ln-validate`). Details the **optimistic and offline write pipeline** with a comprehensive Mermaid flow diagram. |
 | 🧭 **[3-Tier Local-First Storage Specs](docs/architecture/data-store-architecture.md)** | Technical reference for decoupling storage caches (`ln-data-store`), network gateways (`ln-*-connector`), and data transformations (`ln-mapper`) under a single parent **Data Coordinator** (`ln-data-coordinator`). |
 | ⚡ **[Reactive Architecture Reference](docs/v2-reactive.md)** | Blueprint on how components manage internal state using Proxy traps (`reactiveState` and `deepReactive`), batched microtask rendering, DOM bindings (`fill`, `renderList`), and attribute-to-state bridges. |
 | 📐 **[Design System Specifications](docs/architecture/reference.md)** | Complete styling specs covering CSS Custom Properties, layout grids, buttons, responsive breakpoints, typography hierarchies, dark mode theming, and icons. |
@@ -143,7 +143,6 @@ For detailed manual instructions, properties, attributes, and events of individu
 | **Search** | 🔎 **[ln-search docs](js/ln-search/README.md)** | 📄 **[search architecture](docs/js/search.md)** |
 | **Table** | 📊 **[ln-table docs](js/ln-table/README.md)** | 📄 **[table architecture](docs/js/table.md)** |
 | **Table Sort** | 📊 **[ln-table docs (Sort)](js/ln-table/README.md)** | 📄 **[table-sort architecture](docs/js/table-sort.md)** |
-| **Data Table** | 📊 **[ln-data-table docs](js/ln-data-table/README.md)** | 📄 **[data-table architecture](docs/js/data-table.md)** |
 | **Sortable** | 🔃 **[ln-sortable docs](js/ln-sortable/README.md)** | 📄 **[sortable architecture](docs/js/sortable.md)** |
 | **Progress** | 📈 **[ln-progress docs](js/ln-progress/README.md)** | 📄 **[progress architecture](docs/js/progress.md)** |
 | **Circular Progress** | 📈 **[ln-circular-progress docs](js/ln-circular-progress/README.md)** | 📄 **[circular-progress architecture](docs/js/circular-progress.md)** |

@@ -19,7 +19,7 @@ that element.
 
 That positioning matters: tooltips never participate in coordinator
 events for data flow. They share no event channel with `ln-form`,
-`ln-validate`, `ln-store`, or `ln-data-table`. The only event the
+`ln-validate`, `ln-store`, or `ln-table`. The only event the
 component dispatches is `ln-tooltip:destroyed`, a cleanup
 notification. Tooltips are mechanically inert from the data layer's
 perspective — adding or removing a tooltip changes nothing about

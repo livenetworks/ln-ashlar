@@ -96,4 +96,4 @@ Fired when the reset sentinel is activated.
   input.dispatchEvent(new Event('change', { bubbles: true }));
   ```
 - **Missing `id` on Persisted Filters:** The `data-ln-persist` storage key relies on the filter element's ID (e.g. `<nav id="my-filter" data-ln-persist>`). If the ID is missing, the component will fail to initialize persistence.
-- **Filtering Coordinated Tables:** `ln-filter` is designed for static lists or plain native tables. Do not target virtualised components like `ln-table` or `ln-data-table`, which manage their own column filters internally.
+- **Filtering Coordinated Tables:** `ln-filter` is designed for static lists or plain native tables. Do not target virtualised components like `ln-table`, which manages its own column filters internally.
