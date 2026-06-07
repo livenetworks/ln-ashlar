@@ -5,6 +5,7 @@
 @mixin block         { display: block; }
 @mixin inline-block  { display: inline-block; }
 @mixin hidden        { display: none; }
+@mixin invisible     { visibility: hidden; }
 
 @mixin flex-col      { display: flex; flex-direction: column; }
 @mixin flex-row      { display: flex; flex-direction: row; }

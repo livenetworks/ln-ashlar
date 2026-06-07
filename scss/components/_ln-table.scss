@@ -13,7 +13,7 @@
 	@include ln-table-toolbar;
 }
 
-.ln-table__toolbar label:has(> input[type="search"]) > input {
+.ln-table__toolbar label:has(> input[type="search"]) {
 	@include ln-table-toolbar-search;
 }
 
