@@ -263,26 +263,60 @@
 @mixin form-input-icon-group {
 	@include form-field-group;
 
-	> input {
-		// Hide the clear button while the field is empty.
-		&:placeholder-shown ~ [data-ln-search-clear] {
-			@include hidden;
+	// Visually hide the clear button while the field is empty (visibility:hidden
+	// preserves layout space so the input width stays stable).
+	// Structural target: the only button in this group is the clear control.
+	> input:placeholder-shown ~ button {
+		@include invisible;
+	}
+
+	// Clear control — square hit area, circular highlight on hover only.
+	// Overrides the flush date/submit-button styling inherited from
+	// form-field-group > button (equal specificity, emitted later → wins).
+	> button {
+		align-self: center;                    // cancel inherited stretch
+		aspect-ratio: 1;                       // square hit area
+		padding: var(--size-2xs);              // equal padding all sides (cancels L+R size-sm and T+B 0)
+		border-radius: var(--radius-full);     // circular highlight (square in flat theme)
+		background: transparent;               // transparent idle
+		@include transition-colors;
+
+		> .ln-icon {
+			--color-fg: var(--fg-subtle);      // idle icon color
+			color: var(--color-fg);
+			@include transition-colors;        // icon recolor must animate (parent transition won't drive child color)
+		}
+
+		&:hover {
+			background: var(--btn-bg-hover);   // circle highlight appears
+			> .ln-icon {
+				--color-fg: var(--fg-default);
+			}
 		}
 	}
 
-	> [data-ln-search-clear] {
-		@include flex-shrink-0;
-		--padding-y: var(--size-2xs);
-		--padding-x: var(--size-2xs);
-		padding: var(--padding-y) var(--padding-x);
-		@include cursor-pointer;
-		--color-fg: var(--fg-subtle);
-		color: var(--color-fg);
-		@include transition-colors;
+	// Fix C — pull the leading icon and the input text closer.
+	// Inherited from form-field-group at equal specificity; emitted later → wins per property.
 
-		&:hover {
-			color: var(--color-fg);
+	// 1. Zero the input's OWN adjacent side padding (the user's explicit minimum).
+	//    Mirror form-field-group's :not() structure so the override lands at equal
+	//    specificity and replaces only the horizontal padding it set.
+	> input,
+	> select {
+		&:not(:first-child) {
+			padding-left: 0;
 		}
+		&:not(:last-child) {
+			padding-right: 0;
+		}
+	}
+
+	// 2. Reduce ONLY the leading icon's INNER (right) padding so the magnifier sits
+	//    close to the text. KEEP the left padding (inherited --size-sm outer breathing
+	//    room) and KEEP vertical padding. Set padding-right ONLY — never the `padding`
+	//    shorthand (it would clobber left + vertical).
+	> .ln-icon {
+		padding-right: var(--size-xs);   // 8px → 4px; left + vertical inherited from form-field-group
 	}
 }
 

@@ -34,10 +34,10 @@
 	[data-ln-filter-search] {
 		@include form-input;
 		font-size: var(--filter-dropdown-text, var(--text-xs));
-		--padding-y: var(--size-xs);
+		--padding-y: var(--size-2xs);
 		--padding-x: var(--size-sm);
 		width: 100%;
-		margin-bottom: var(--size-sm);
+		margin-bottom: var(--size-xs);
 	}
 
 	[data-ln-filter-options] {

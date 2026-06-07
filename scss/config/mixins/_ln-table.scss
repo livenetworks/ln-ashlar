@@ -111,7 +111,17 @@
 }
 
 @mixin ln-table-toolbar-search {
-	width: 10rem;
+	--padding-y: var(--size-2xs);   // lowers panel-header min-height floor for this label
+
+	> .ln-icon {
+		padding-top: var(--size-2xs);     // tighten leading icon vertical padding (was var(--size-xs))
+		padding-bottom: var(--size-2xs);  // horizontal padding (size-sm) inherited from form-field-group
+	}
+
+	> input {
+		--padding-y: var(--size-2xs);  // tighten vertical padding on the input itself
+		width: 10rem;                  // preserve existing width cap
+	}
 }
 
 // ─── Count badge ──────────────────────────────────────────
