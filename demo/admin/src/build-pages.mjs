@@ -7,7 +7,6 @@ const pagesDir = join(__dir, 'pages');
 const shellPath = join(__dir, 'shell.html');
 const outDir = join(__dir, '..');
 
-const metaPattern = /^<!--\s*ln-page:\s*title="([^"]+)"\s*h1="([^"]+)"\s*-->/;
 
 function escapeRegex(str) {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -18,6 +17,8 @@ try {
 
 	const entries = await readdir(pagesDir);
 	const pages = entries.filter(f => f.endsWith('.html'));
+
+	const metaPattern = /^<!--\s*ln-page:\s*title="([^"]+)"\s*h1="([^"]+)"\s*-->/;
 
 	for (const file of pages) {
 		const src = await readFile(join(pagesDir, file), 'utf8');

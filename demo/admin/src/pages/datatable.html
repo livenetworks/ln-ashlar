@@ -147,8 +147,9 @@
 						<main>
 							<p>This is the canonical production shape. A coordinator script (see the <code>&lt;script&gt;</code> at the bottom of this page) fetches <code>./data/documents.json</code> (a 10,000-record fixture), listens for <code>request-data</code>, applies sort / filter / search, and dispatches <code>set-data</code> back with <code>filterOptions</code> for authoritative filter dropdowns. The 10,000 rows trigger virtual scroll automatically — only visible rows + 15 buffer rows render at a time, but scroll height stays correct via spacer <code>&lt;tr&gt;</code> elements. Try sorting Title / Department / Priority / Owner / Size / Updated, filtering by Department / Status / Priority, searching across title / owner / department / tags, selecting individual rows, or pressing <kbd>/</kbd> to focus the search field.</p>
 
-							<section data-ln-data-table="demo-docs"
-							         data-ln-data-table-selectable
+							<section data-ln-table="demo-docs"
+							         data-ln-table-source="demo-docs"
+							         data-ln-table-selectable
 							         id="demo-data-table"
 							         class="data-table-demo">
 
@@ -161,9 +162,12 @@
 														<h3>Documents</h3>
 													</div>
 													<form role="search" onsubmit="return false;">
-														<label>
+														<label data-ln-search="demo-data-table">
 															<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-															<input type="search" placeholder="Search documents..." data-ln-data-table-search>
+															<input type="search" placeholder="Search documents..." data-ln-table-search>
+															<button type="button" data-ln-search-clear aria-label="Clear search">
+																<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+															</button>
 														</label>
 													</form>
 												</div>
@@ -204,12 +208,12 @@
 											<th>Actions</th>
 										</tr>
 									</thead>
-									<tbody data-ln-data-table-body></tbody>
+									<tbody data-ln-table-body></tbody>
 								</table>
-								<footer>
-									<span data-ln-data-table-total></span> items
-									<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
-									<span data-ln-data-table-selected-wrap class="hidden"> · <span data-ln-data-table-selected></span> selected</span>
+								<footer class="ln-table__footer">
+									<span data-ln-table-total></span> items
+									<span data-ln-table-filtered-wrap> · <span data-ln-table-filtered></span> filtered</span>
+									<span data-ln-table-selected-wrap class="hidden"> · <span data-ln-table-selected></span> selected</span>
 								</footer>
 
 								<!-- Row template -->
@@ -252,7 +256,7 @@
 												<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
 												<h3>No results</h3>
 												<p>Try adjusting your search or filters.</p>
-												<button data-ln-data-table-clear-all class="btn">Clear all filters</button>
+												<button data-ln-table-clear-all class="btn">Clear all filters</button>
 											</article>
 										</td>
 									</tr>
@@ -354,11 +358,11 @@ table {
     const tableEl = document.getElementById('products-table');
     if (!tableEl) return;
 
-    tableEl.addEventListener('ln-data-table:request-data', function (e) {
+    tableEl.addEventListener('ln-table:request-data', function (e) {
         if (e.detail.table !== 'products') return;
 
         // 1. Show loading state
-        tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-loading', {
+        tableEl.dispatchEvent(new CustomEvent('ln-table:set-loading', {
             detail: { loading: true }
         }));
 
@@ -386,7 +390,7 @@ table {
         .then(response => response.json())
         .then(res => {
             // 4. Set data and hide loading indicator
-            tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+            tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
                 detail: {
                     data: res.data,          // Array of records
                     total: res.total,        // Total count of unfiltered records
@@ -397,7 +401,7 @@ table {
         })
         .catch(err => {
             console.error('Failed to load table data:', err);
-            tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-loading', {
+            tableEl.dispatchEvent(new CustomEvent('ln-table:set-loading', {
                 detail: { loading: false }
             }));
         });
@@ -411,7 +415,7 @@ table {
     const ALL_ITEMS = window.__INITIAL_DATA__ || []; // Your source array
     if (!tableEl) return;
 
-    tableEl.addEventListener('ln-data-table:request-data', function (e) {
+    tableEl.addEventListener('ln-table:request-data', function (e) {
         if (e.detail.table !== 'products') return;
 
         let result = ALL_ITEMS.slice();
@@ -454,7 +458,7 @@ table {
         }
 
         // 4. Return Data
-        tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+        tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
             detail: {
                 data: result,
                 total: ALL_ITEMS.length,
@@ -584,7 +588,7 @@ data.forEach(r =&gt; {
 			});
 		}
 
-		tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+		tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
 			bubbles: true,
 			detail: {
 				data: result,
@@ -595,7 +599,7 @@ data.forEach(r =&gt; {
 		}));
 	}
 
-	document.addEventListener('ln-data-table:request-data', function (e) {
+	document.addEventListener('ln-table:request-data', function (e) {
 		if (e.detail.table !== 'demo-docs') return;
 		lastRequest = {
 			sort: e.detail.sort,
@@ -605,7 +609,7 @@ data.forEach(r =&gt; {
 		respond();
 	});
 
-	document.addEventListener('ln-data-table:row-click', function (e) {
+	document.addEventListener('ln-table:row-click', function (e) {
 		if (e.detail.table !== 'demo-docs') return;
 		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 			detail: {
@@ -616,7 +620,7 @@ data.forEach(r =&gt; {
 		}));
 	});
 
-	document.addEventListener('ln-data-table:row-action', function (e) {
+	document.addEventListener('ln-table:row-action', function (e) {
 		if (e.detail.table !== 'demo-docs') return;
 		window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 			detail: {

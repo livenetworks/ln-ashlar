@@ -227,21 +227,24 @@
 <section class="section-card" data-demo-html>
 	<header><h3>Live Usecase Demo — Documents Manager</h3></header>
 	<main>
-		<section data-ln-data-table="documents" data-ln-data-table-selectable id="documents-table" class="data-table-demo">
+		<section data-ln-table="documents" data-ln-table-source="documents" data-ln-table-selectable id="documents-table" class="data-table-demo">
 			<header class="ln-table__toolbar">
 				<div>
 					<h3>Documents</h3>
-					<span data-ln-data-table-selected-wrap class="hidden">
+					<span data-ln-table-selected-wrap class="hidden">
 						<button id="bulk-delete-btn" class="btn" style="--color-primary: var(--color-error)">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
-						Delete selected (<span data-ln-data-table-selected></span>)
+						Delete selected (<span data-ln-table-selected></span>)
 					</button>
 					</span>
 				</div>
 				<form role="search" onsubmit="return false;">
-					<label>
+					<label data-ln-search="documents-table">
 						<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-						<input type="search" placeholder="Search…" data-ln-data-table-search>
+						<input type="search" placeholder="Search…" data-ln-table-search>
+						<button type="button" data-ln-search-clear aria-label="Clear search">
+							<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+						</button>
 					</label>
 					<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
@@ -262,11 +265,11 @@
 						<th>Actions</th>
 					</tr>
 				</thead>
-				<tbody data-ln-data-table-body></tbody>
+				<tbody data-ln-table-body></tbody>
 			</table>
-			<footer>
-				<span data-ln-data-table-total></span> items
-				<span data-ln-data-table-filtered-wrap> · <span data-ln-data-table-filtered></span> filtered</span>
+			<footer class="ln-table__footer">
+				<span data-ln-table-total></span> items
+				<span data-ln-table-filtered-wrap> · <span data-ln-table-filtered></span> filtered</span>
 			</footer>
 
 			<template data-ln-template="documents-row">
@@ -301,7 +304,7 @@
 						<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
 						<h3>No results</h3>
 						<p>Try adjusting your search or filters.</p>
-						<button data-ln-data-table-clear-all class="btn">Clear all filters</button>
+						<button data-ln-table-clear-all class="btn">Clear all filters</button>
 					</article>
 				</td></tr>
 			</template>
@@ -395,7 +398,7 @@
 <script>
 (function () {
 	const storeEl = document.querySelector('[data-ln-data-store="documents"]');
-	const tableEl = document.querySelector('[data-ln-data-table="documents"]');
+	const tableEl = document.querySelector('[data-ln-table="documents"]');
 	const formEl  = document.querySelector('[data-ln-form="document-form"]');
 
 	let lastQuery = { sort: null, filters: {}, search: '' }, pendingDelete = null, editMode = false;
@@ -411,7 +414,7 @@
 	});
 
 	const refresh = () => storeEl.lnDataStore?.getAll(lastQuery).then(r => {
-		tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+		tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
 			bubbles: true,
 			detail: { data: r.data.map(decorate), total: r.total, filtered: r.filtered, filterOptions }
 		}));
@@ -424,14 +427,14 @@
 	storeEl.addEventListener('ln-store:synced', e => e.detail.changed && refresh());
 
 	// Table Listeners
-	document.addEventListener('ln-data-table:request-data', e => {
+	document.addEventListener('ln-table:request-data', e => {
 		if (e.detail.table === 'documents') {
 			lastQuery = { sort: e.detail.sort, filters: e.detail.filters, search: e.detail.search };
 			refresh();
 		}
 	});
 
-	document.addEventListener('ln-data-table:row-action', e => {
+	document.addEventListener('ln-table:row-action', e => {
 		if (e.detail.table !== 'documents') return;
 		const modal = formEl.closest('.ln-modal');
 		if (e.detail.action === 'edit') {
@@ -467,7 +470,7 @@
 		const btn = e.target.closest('#bulk-delete-btn, #reset-data');
 		if (!btn) return;
 		if (btn.id === 'bulk-delete-btn') {
-			const ids = Array.from(tableEl.lnDataTable.selectedIds).map(Number);
+			const ids = Array.from(tableEl.lnTable.selectedIds).map(Number);
 			if (!ids.length) return;
 			pendingDelete = { ids };
 			const confirmForm = document.querySelector('#confirm-delete-form');

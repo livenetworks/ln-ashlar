@@ -109,15 +109,18 @@
 	<header><h3>Interactive Documents Manager Usecase</h3></header>
 	<main>
 		<!-- Table Presenter reading directly from our local cache store -->
-		<section data-ln-data-table="demo-docs" id="demo-table" class="data-table-demo">
+		<section data-ln-table="demo-docs" data-ln-table-source="demo-docs" id="demo-table" class="data-table-demo">
 			<header class="ln-table__toolbar">
 				<div>
 					<h3>IndexedDB-backed Documents Table</h3>
 				</div>
 				<form role="search" onsubmit="return false;">
-					<label>
+					<label data-ln-search="demo-table">
 						<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-						<input type="search" placeholder="Search cache…" data-ln-data-table-search>
+						<input type="search" placeholder="Search cache…" data-ln-table-search>
+						<button type="button" data-ln-search-clear aria-label="Clear search">
+							<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+						</button>
 					</label>
 					<button type="button" id="open-modal-btn" class="btn" data-ln-modal-for="doc-modal">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
@@ -138,11 +141,11 @@
 						<th>Actions</th>
 					</tr>
 				</thead>
-				<tbody data-ln-data-table-body></tbody>
+				<tbody data-ln-table-body></tbody>
 			</table>
-			<footer>
-				<span data-ln-data-table-total>0</span> items in cache
-				<span data-ln-data-table-filtered-wrap class="hidden"> · <span data-ln-data-table-filtered>0</span> filtered</span>
+			<footer class="ln-table__footer">
+				<span data-ln-table-total>0</span> items in cache
+				<span data-ln-table-filtered-wrap class="hidden"> · <span data-ln-table-filtered>0</span> filtered</span>
 			</footer>
 
 			<!-- Row Template -->
@@ -180,7 +183,7 @@
 						<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
 						<h3>No matching records</h3>
 						<p>Try adjusting your search query or column filters.</p>
-						<button data-ln-data-table-clear-all class="btn">Clear Filters</button>
+						<button data-ln-table-clear-all class="btn">Clear Filters</button>
 					</article>
 				</td></tr>
 			</template>
@@ -600,7 +603,7 @@
 	function refreshTable() {
 		if (!storeEl.lnDataStore) return;
 		storeEl.lnDataStore.getAll(lastQuery).then(function(res) {
-			tableEl.dispatchEvent(new CustomEvent('ln-data-table:set-data', {
+			tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
 				bubbles: true,
 				detail: {
 					data: res.data.map(formatDisplay),
@@ -616,7 +619,7 @@
 	}
 
 	// Capture table query requests
-	document.addEventListener('ln-data-table:request-data', function(e) {
+	document.addEventListener('ln-table:request-data', function(e) {
 		if (e.detail.table !== 'demo-docs') return;
 		lastQuery = {
 			sort: e.detail.sort,
@@ -648,7 +651,7 @@
 	});
 
 	// Capture edit/delete clicks in table
-	document.addEventListener('ln-data-table:row-action', function(e) {
+	document.addEventListener('ln-table:row-action', function(e) {
 		if (e.detail.table !== 'demo-docs') return;
 		if (e.detail.action === 'edit') {
 			editMode = true;

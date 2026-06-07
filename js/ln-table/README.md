@@ -1,24 +1,23 @@
 # ln-table
 
-A zero-dependency, high-performance **Server-Rendered Table Primitive** that enhances standard, pre-populated HTML tables in-place. It parses existing DOM `<tbody>` elements once on load and layers ultra-fast, client-side in-memory sorting, column filtering, text searches, and scroll virtualization on top of pre-rendered markup.
+A zero-dependency, high-performance table presenter component that supports both Server-Rendered (SSR) Mode and Data-Driven Mode in `ln-ashlar`.
 
 ---
 
-## 🧭 Philosophy & Architecture
+## 🧭 Philosophical Modes
 
-1. **`ln-table` vs `ln-data-table`:**
-   - Use `ln-table` when rows are already printed in `<tbody>` by your backend server on page load. It parses existing elements and manipulates visibility in-place.
-   - Use `ln-data-table` when your data source is an active JS array (such as an `ln-store` IndexedDB cache or REST fetch API) and needs to clone structural templates.
-2. **Platform-First Search Indexing:** Search and column filters scan the visible display texts of cells, whereas sorting reads numeric or date values defined in `data-ln-value` overrides.
-3. **Actions Column Exclusivity:** The last cell (`<td>`) of each row is automatically ignored during search indexes. This prevents buttons (e.g. Edit / Delete) from polluting search results.
+1. **Server-Rendered (SSR) Mode**:
+   Hydrates standard, backend-printed HTML tables in-place. Reads the existing `<tbody>` rows once on load and layers sorting, filtering, text searches, and scroll virtualization on top of pre-rendered markup.
+2. **Data-Driven Mode**:
+   Operates as a dynamic presenter engine. Clones templates, interpolates double-curly braces (`{{ field }}`), manages checkbox selection lists, updates footers, and coordinates dataset requests via AJAX coordinators.
 
 ---
 
 ## 📦 Minimal Blueprint
 
+### 1. SSR / Markup Mode
 ```html
 <div id="employees-table" data-ln-table>
-  <!-- Empty State Template -->
   <template data-ln-table-empty>
     <article class="ln-table__empty-state">
       <h3>No matches found</h3>
@@ -43,59 +42,67 @@ A zero-dependency, high-performance **Server-Rendered Table Primitive** that enh
 </div>
 ```
 
+### 2. Data-Driven Mode
+```html
+<section data-ln-table="products" data-ln-table-source="products" id="products-table">
+  <table>
+    <thead>
+      <tr>
+        <th data-ln-col="name">Product Name</th>
+        <th data-ln-col="category">Category</th>
+      </tr>
+    </thead>
+    <tbody data-ln-table-body></tbody>
+  </table>
+
+  <!-- Row Template -->
+  <template data-ln-template="products-row">
+    <tr data-ln-row>
+      <td>{{ name }}</td>
+      <td>{{ category }}</td>
+    </tr>
+  </template>
+</section>
+```
+
 ---
 
-## 🛠️ Declarative API Contract
-
-### HTML Attributes
+## 🛠️ Attributes Reference
 
 | Attribute | Elements | Description |
 | :--- | :--- | :--- |
-| `data-ln-table` | `<div>` wrapper | Root marker. Target must carry a unique `id`. |
-| `data-ln-sort="type"` | `<th>` | Marks column sortable. Values: `string`, `number`, `date`. |
-| `data-ln-value="raw"` | `<td>` | Raw value used exclusively by sort comparators. |
-| `data-ln-filter-col="key"` | `<th>` | Maps the column to an active `ln-filter` key. |
-| `data-ln-table-clear` | `<button>` | Click delegate. Instantly clears search query and active filters. |
-
-### JS API
-
-Access the parsed database model directly via the `lnTable` property on the wrapper element:
-
-```javascript
-const table = document.getElementById('employees-table');
-
-// 1. Inspect parsed arrays
-const cachedRows = table.lnTable._data;         // All parsed DOM rows
-const visibleRows = table.lnTable._filteredData; // Current matches
-
-// 2. Tear down listeners and unlock column widths
-table.lnTable.destroy();
-```
+| `data-ln-table` | Root wrapper | Component identifier. Target must carry a unique `id`. |
+| `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
+| `data-ln-table-selectable` | Root wrapper | Enables checkbox-based row selections. |
+| `data-ln-table-search` | `<input>` | Search query input target. |
+| `data-ln-col="field"` | `<th>` | Maps column header to data object field keys. |
+| `data-ln-col-sort` | `<button>` | Column sorting trigger button. |
+| `data-ln-col-filter` | `<button>` | Column filter dropdown trigger. |
+| `data-ln-col-select` | `<th>` | Header checkbox column selector. |
+| `data-ln-row` | `<tr>` | Target row container in row templates. |
+| `data-ln-row-select` | `<input>` | Selection checkbox in row templates. |
+| `data-ln-row-action="name"`| `<button>` | Action button trigger in row templates. |
 
 ---
 
 ## ⚡ DOM Events
 
-### Emitted
+### Emitted Events
 
-| Event | Payload | Description |
-| :--- | :--- | :--- |
-| `ln-table:ready` | `{ total }` | Dispatched after the initial DOM parse is complete. |
-| `ln-table:filter` | `{ term, matched, total }` | Dispatched after any search or filter state updates. |
-| `ln-table:sorted` | `{ column, direction }` | Dispatched after sorting is recalculated in-place. |
+- **`ln-table:ready`** `{ total }`  
+  Fired after the initial DOM rows are parsed.
+- **`ln-table:request-data`** `{ table, sort, filters, search }`  
+  Requests a fresh dataset when sort, filter, or search is changed.
+- **`ln-table:rendered`** `{ table, total, visible }`  
+  Fired after a dynamic template render finishes drawing.
+- **`ln-table:row-click`** `{ table, id, record }`  
+  Fired when clicking on row contents.
+- **`ln-table:row-action`** `{ table, id, action, record }`  
+  Fired when clicking row buttons.
 
-### Received
+### Received Events
 
-`ln-table` coordinates with sibling UI primitives through standard DOM event channels:
-
-- **Listens to `ln-search:change`:** Updates text queries and filters the DOM.
-- **Listens to `ln-table:sort`:** Triggers structural sorting in-place.
-- **Listens to `ln-filter:changed`:** Triggers column filters and highlights headers.
-
----
-
-## ⚠️ Common Pitfalls
-
-- **Bypassing the ID Requirement:** Sibling search controls (`ln-search`) target wrappers by calling `getElementById(targetId)`. The table wrapper **must** carry a unique `id`.
-- **Dynamic Row Replacements:** Modifying cell values after initial paint using `innerHTML` will be lost. The script caches rows as static strings on page load. Use `ln-data-table` instead for dynamic writes.
-- **Scroll Container Wrapping:** Do not wrap tables in scroll trapping boxes (`overflow-y: auto`). Scroll virtualization and sticky headers automatically bind to the outer window scroll bounds.
+- **`ln-table:set-data`** `{ data, total, filtered, filterOptions }`  
+  Applies the payload array and triggers rendering.
+- **`ln-table:set-loading`** `{ loading }`  
+  Toggles the visual loading dimmed state overlay.

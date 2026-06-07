@@ -70,6 +70,8 @@
 
 @mixin ln-table-toolbar {
 	@include panel-header;
+	justify-content: flex-start;
+	gap: var(--size-md);
 	position: sticky;
 	top: 0;
 	z-index: var(--z-sticky);
@@ -103,6 +105,8 @@
 
 	> div {
 		@include panel-header;
+		justify-content: flex-start;
+		gap: var(--size-md);
 	}
 }
 
@@ -149,6 +153,9 @@
 	@include text-sm;
 	--color-fg: var(--fg-muted);
 	color: var(--color-fg);
+	position: sticky;
+	bottom: 0;
+	z-index: var(--z-sticky);
 
 	strong {
 		color: var(--color-fg);
