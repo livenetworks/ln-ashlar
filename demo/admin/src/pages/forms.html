@@ -1181,13 +1181,13 @@ input[data-ln-number] {
 	// Pattern 2 — event-based coordinator
 	// Listener simulates the form coordinator: catches a synthetic table row-click
 	// and routes the record into the form via lnForm.fill().
-	document.addEventListener('ln-data-table:row-click', function (e) {
+	document.addEventListener('ln-table:row-click', function (e) {
 		liveForm.lnForm.fill(e.detail.record);
 	});
 
 	document.getElementById('demo-fill-coordinator-btn').addEventListener('click', function (e) {
 		// Dispatch from the button itself — no synthetic table needed for the demo.
-		e.currentTarget.dispatchEvent(new CustomEvent('ln-data-table:row-click', {
+		e.currentTarget.dispatchEvent(new CustomEvent('ln-table:row-click', {
 			bubbles: true,
 			detail: { record: sampleData }
 		}));

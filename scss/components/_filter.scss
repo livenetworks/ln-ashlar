@@ -4,16 +4,16 @@
 // the data-ln-filter-reset "All" sentinel is the reset affordance).
 // Floating shell is supplied separately:
 //   • popover-driven (ln-filter static): @mixin popover on the [data-ln-popover] wrapper
-//   • ln-data-table dynamic clone: floating-panel + box below
+// ln-table dynamic clone: floating-panel + box below
 .column-filter-dropdown {
 	@include filter-dropdown;
 }
 
-// ln-data-table appends its cloned dropdown directly into the <th> and
+// ln-table appends its cloned dropdown directly into the <th> and
 // manages its own open/close — it does NOT route through ln-popover, so it
 // needs the floating shell applied here (the popover path gets it from
 // @mixin popover instead).
-[data-ln-data-table] .column-filter-dropdown {
+[data-ln-table] .column-filter-dropdown {
 	@include floating-panel;
 	position: absolute;
 	top: 100%;

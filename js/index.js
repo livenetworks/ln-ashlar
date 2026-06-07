@@ -36,6 +36,5 @@ import './ln-data-store/src/ln-data-store.js';
 import './ln-api-connector/src/ln-api-connector.js';
 import './ln-couchdb-connector/src/ln-couchdb-connector.js';
 import './ln-data-coordinator/src/ln-data-coordinator.js';
-import './ln-data-table/src/ln-data-table.js';
 import './ln-icons/src/ln-icons.js';
 

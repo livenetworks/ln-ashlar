@@ -8,7 +8,7 @@
 [data-ln-table] thead > tr:first-child:has(> th[colspan]) > th {
 	@include ln-table-thead-toolbar;
 }
-
+[data-ln-table] > header,
 .ln-table__toolbar {
 	@include ln-table-toolbar;
 }
@@ -24,7 +24,7 @@
 .table-container {
 	@include ln-table-card-mode;
 }
-
+[data-ln-table] > footer,
 .ln-table__footer {
 	@include ln-table-footer;
 }
@@ -56,4 +56,10 @@
 .ln-table__spacer {
 	@include ln-table-spacer-row;
 }
+
+.ln-table--loading tbody {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
 

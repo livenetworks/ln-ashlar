@@ -211,6 +211,7 @@
 		padding: var(--size-xs) var(--size-sm);   // icon provides its own row spacing
 		--color-fg: var(--fg-subtle);
 		color: var(--color-fg);
+		box-sizing: content-box;
 	}
 
 	> input,

@@ -67,7 +67,7 @@ th:hover .table-filter { opacity: 0.7; }
 }
 
 // Virtual-scroll spacer
-.ln-data-table__spacer {
+.ln-table__spacer {
 	@include table-spacer-row;
 }
 
