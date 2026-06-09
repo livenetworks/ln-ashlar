@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Diagnostics & Linter — ln-ashlar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header class="app-header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Diagnostics (DOM Linter)</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+						</ul>
+					</div>
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
+						<span>Test Toast</span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<main class="app-main">
+		<!-- Sidebar -->
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
+				<label class="search sidebar-search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html" aria-current="page"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>ashlar-gui v1.2.0</small>
+			</footer>
+		</aside>
+		<div class="app-scrim"></div>
+
+		<!-- Content -->
+		<section>
+			<div class="app-content-wrapper">
+<h1>Diagnostics &amp; DOM Linter</h1>
+<p>Visual, CSS-based linter that runs only during local development. It flags integration mistakes, missing attributes, and DOM layout errors instantly in the browser without any runtime performance overhead.</p>
+
+<div class="alert warning">
+	<h5>Development-Only Warning</h5>
+	<p>These warnings are powered by the <code>ln-ashlar-dev.css</code> stylesheet. In production environments, this stylesheet is excluded, guaranteeing zero layout overrides and zero performance penalty.</p>
+</div>
+
+<hr class="my-lg">
+
+<!-- Case 1: Missing Sort Button Warning -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>1. Missing Sort Button Warning</h3>
+		<p>Flags a <code>th[data-ln-table-sort]</code> that is configured to be sortable but is missing the required <code>&lt;button data-ln-table-col-sort&gt;</code> trigger.</p>
+	</header>
+	<main>
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<!-- ERROR: data-ln-table-sort is set, but no data-ln-table-col-sort button exists -->
+						<th data-ln-table-sort="string">
+							Username
+						</th>
+						<th>Email</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>petar_p</td>
+						<td>petar@example.com</td>
+					</tr>
+					<tr>
+						<td>marija_s</td>
+						<td>marija@example.com</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-inline-error:
+th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
+    @include dev-inline-error("missing sort button");
+}
+	</script>
+</section>
+
+<!-- Case 2: Missing Wrapper ID Warning -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>2. Missing Table Wrapper ID Warning</h3>
+		<p>Flags interactive table wrappers <code>[data-ln-table]</code> that are missing a unique <code>id</code> attribute (which is required for mapping search and column filters correctly).</p>
+	</header>
+	<main>
+		<!-- ERROR: data-ln-table is present, but no 'id' attribute is defined -->
+		<div data-ln-table>
+			<div class="table-container">
+				<table>
+					<thead>
+						<tr>
+							<th>Title</th>
+							<th>Category</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Strategic Plan.pdf</td>
+							<td>Planning</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-dom-error:
+[data-ln-table]:not([id]) {
+    @include dev-dom-error("[data-ln-table] is missing a required 'id' attribute for filter mapping.");
+}
+	</script>
+</section>
+
+<!-- Case 3: Modal Trigger Missing Target Warning -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>3. Modal Trigger Missing Target Warning</h3>
+		<p>Flags a modal trigger <code>[data-ln-modal-for]</code> that is declared with an empty value, so it has no target modal <code>id</code> to open.</p>
+	</header>
+	<main>
+		<!-- ERROR: data-ln-modal-for is present but empty — no target modal id -->
+		<button type="button" class="btn" data-ln-modal-for="">Open Settings</button>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-inline-error:
+[data-ln-modal-for=""] {
+    @include dev-inline-error("data-ln-modal-for is missing a target modal id");
+}
+	</script>
+</section>
+
+<!-- Case 4: Image Missing Alt Attribute -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>4. Image Missing Alt Attribute</h3>
+		<p>Flags an <code>&lt;img&gt;</code> that has no <code>alt</code> attribute at all. An empty <code>alt=""</code> is intentionally allowed — it is the valid, WCAG-endorsed pattern for purely decorative images, so it is never flagged.</p>
+	</header>
+	<main>
+		<!-- ERROR: img has no alt attribute -->
+		<img src="ln-ashlar-logo.png">
+	</main>
+	<script type="text/plain" data-demo-scss>
+// Replaced elements can't show ::after labels, so this uses dev-replaced-error:
+img:not([alt]) {
+    @include dev-replaced-error;
+}
+	</script>
+</section>
+
+<!-- Case 5: Abbr Missing Title -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>5. Abbr Missing Title</h3>
+		<p>Flags an <code>&lt;abbr&gt;</code> that is missing its <code>title</code> attribute. Without a title the abbreviation has no expansion and is meaningless to readers and assistive tech.</p>
+	</header>
+	<main>
+		<!-- ERROR: abbr has no title attribute -->
+		<p>The agency known as <abbr>NASA</abbr> was founded in 1958.</p>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-inline-error:
+abbr:not([title]) {
+    @include dev-inline-error("abbr is missing a title attribute");
+}
+	</script>
+</section>
+
+<!-- Case 6: Empty Tooltip (No Title Fallback) -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>6. Empty Tooltip (No Title Fallback)</h3>
+		<p>Flags a <code>[data-ln-tooltip]</code> declared with an empty value and no native <code>title</code> fallback, so it would render an empty bubble. An empty <code>data-ln-tooltip</code> with a <code>title</code> present is valid (it falls back to the title) and is not flagged.</p>
+	</header>
+	<main>
+		<!-- ERROR: data-ln-tooltip is empty and has no title fallback -->
+		<button type="button" class="btn" data-ln-tooltip="">Hover me</button>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// The CSS validation selector is fully DRY and uses dev-inline-error:
+[data-ln-tooltip=""]:not([title]) {
+    @include dev-inline-error("data-ln-tooltip is empty and has no title fallback");
+}
+	</script>
+</section>
+
+<!-- Case 3: Correct Implementation -->
+<section class="section-card" data-demo-html>
+	<header>
+		<h3>7. Correct Implementation (No Errors)</h3>
+		<p>When the HTML structure and attributes are fully correct, no diagnostics warnings are shown.</p>
+	</header>
+	<main>
+		<!-- CORRECT: wrapper has an id -->
+		<div data-ln-table id="correct-demo-table">
+			<div class="table-container">
+				<table>
+					<thead>
+						<tr>
+							<!-- CORRECT: sortable header contains the correct button -->
+							<th data-ln-table-sort="string">
+								System Service
+								<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+									<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+									<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+									<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								</button>
+							</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Web Server (Nginx)</td>
+							<td><span class="badge success">Active</span></td>
+						</tr>
+						<tr>
+							<td>Database Server (MariaDB)</td>
+							<td><span class="badge success">Active</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</main>
+</section>
+
+<!-- Section 4: Writing Custom Diagnostics -->
+<section class="section-card">
+	<header>
+		<h3>Writing Your Own Diagnostic Rules</h3>
+		<p>You can easily extend the linter by writing your own CSS selectors in <code>scss/ln-ashlar-dev.scss</code> and using the shared DRY mixins.</p>
+	</header>
+	<main>
+		<p>The system provides two shared mixins in <code>config/mixins/_diagnostics.scss</code>:</p>
+		<ul>
+			<li><strong><code>@include dev-dom-error($message)</code></strong>: Best for wrapping block elements with a dashed red border and a warning header.</li>
+			<li><strong><code>@include dev-inline-error($message)</code></strong>: Best for injecting red text warning labels next to small elements or headers.</li>
+		</ul>
+		
+		<h5 class="my-sm">Example: Flagging form elements missing name attributes</h5>
+		<pre><code class="language-scss">// Warns if any text input inside a validation form is missing its name attribute
+[data-ln-validate] input[type="text"]:not([name]) {
+    @include dev-dom-error("Input is missing a 'name' attribute, which prevents serialization.");
+}</code></pre>
+	</main>
+</section>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="app-footer">
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
+		</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
+</body>
+</html>

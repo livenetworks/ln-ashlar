@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>API Connector — ln-ashlar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header class="app-header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>API Connector</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+						</ul>
+					</div>
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
+						<span>Test Toast</span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<main class="app-main">
+		<!-- Sidebar -->
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
+				<label class="search sidebar-search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html" aria-current="page"><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>ashlar-gui v1.2.0</small>
+			</footer>
+		</aside>
+		<div class="app-scrim"></div>
+
+		<!-- Content -->
+		<section>
+			<div class="app-content-wrapper">
+<section class="section-card">
+	<header><h3>Overview &amp; Architecture</h3></header>
+	<main>
+		<p>In the decoupled 3-tier data lifecycle of <code>ln-ashlar</code>, the <strong>Transport Gateway</strong> (<code>data-ln-api-connector</code>) owns all credentials, base URLs, resource paths, and headers. It is completely blind to database caches and schemas. UI widgets and Cache stores talk to it solely via CustomEvent channels or JS-level promise APIs.</p>
+
+		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+				Dynamic Configuration Synchronization
+			</h4>
+			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+				Mutating <code>data-ln-api-base-url</code>, <code>data-ln-api-path</code>, or <code>data-ln-api-headers</code> directly on the DOM element at runtime will instantly re-evaluate the instance configuration and dispatch <code>ln-api-connector:config-changed</code>.
+			</p>
+		</div>
+	</main>
+</section>
+
+<!-- Declarative Component Markup Section with auto-code extraction -->
+<section class="section-card" data-demo-html>
+	<header><h3>Declarative Markup (Copy/Paste)</h3></header>
+	<main>
+		<!-- Active Component Element pointing to real JSONPlaceholder sandbox API -->
+		<div data-ln-api-connector
+		     data-ln-api-base-url="https://jsonplaceholder.typicode.com"
+		     data-ln-api-path="/posts"
+		     data-ln-api-headers='{"X-Test-Header": "ln-ashlar-telemetry"}'
+		     id="demo-api-connector"></div>
+	</main>
+</section>
+
+<!-- Live Interactive Playground -->
+<section class="section-card">
+	<header><h3>Interactive Playground &amp; Telemetry</h3></header>
+	<main>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<!-- Configuration Attributes Panel -->
+			<div>
+				<h4>1. Mutation Observer (Dynamic Attributes)</h4>
+				<p class="text-sm text-sunken">Change these attributes in real-time to watch the MutationObserver hot-reload the connector configuration instantly.</p>
+				<form id="config-form" style="display: flex; flex-direction: column; gap: var(--size-sm); margin-top: var(--size-sm);">
+					<div class="form-element">
+						<label for="cfg-base-url">Base URL</label>
+						<input type="text" id="cfg-base-url" value="https://jsonplaceholder.typicode.com">
+					</div>
+					<div class="form-element">
+						<label for="cfg-path">Path</label>
+						<input type="text" id="cfg-path" value="/posts">
+					</div>
+					<div class="form-element">
+						<label for="cfg-headers">Headers (JSON String)</label>
+						<textarea id="cfg-headers" style="font-family: monospace; min-height: 80px;">{"X-Test-Header": "ln-ashlar-telemetry"}</textarea>
+					</div>
+					<button type="submit" class="btn" style="align-self: flex-start;">Apply DOM Attribute Mutations</button>
+				</form>
+			</div>
+
+			<!-- Dynamic Event Triggers -->
+			<div>
+				<h4>2. Event Trigger Panel &amp; Methods</h4>
+				<p class="text-sm text-sunken">Dispatch CustomEvents to trigger REST requests or use the programmatic JS API directly.</p>
+				
+				<div style="display: flex; flex-direction: column; gap: var(--size-sm); margin-top: var(--size-md);">
+					<div>
+						<h5>Delta Fetch (GET)</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<input type="number" id="trig-since" placeholder="Since (timestamp, optional)" style="flex: 1;">
+							<button type="button" id="btn-fetch" class="btn">Dispatch Request Event</button>
+						</div>
+					</div>
+
+					<div>
+						<h5>Create Record (POST)</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<input type="text" id="trig-create-title" placeholder="Document title" style="flex: 1;" value="ISO 27001 Manual">
+							<button type="button" id="btn-create" class="btn">Dispatch Request Event</button>
+						</div>
+					</div>
+
+					<div>
+						<h5>Update Record (PUT)</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<input type="number" id="trig-update-id" placeholder="ID" style="width: 70px;" value="42">
+							<input type="text" id="trig-update-title" placeholder="New Title" style="flex: 1;" value="ISO 27001 v2 (edited)">
+							<button type="button" id="btn-update" class="btn">Dispatch Request Event</button>
+						</div>
+					</div>
+
+					<div>
+						<h5>Delete Record (DELETE)</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<input type="number" id="trig-delete-id" placeholder="ID" style="width: 70px;" value="42">
+							<button type="button" id="btn-delete" class="btn">Dispatch Request Event</button>
+						</div>
+					</div>
+
+					<div>
+						<h5>Bulk Delete (DELETE)</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<input type="text" id="trig-bulk-ids" placeholder="IDs (comma-separated)" style="flex: 1;" value="17, 23, 45">
+							<button type="button" id="btn-bulk" class="btn">Dispatch Request Event</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Telemetry Logs Console -->
+		<div style="margin-top: var(--size-lg);">
+			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--size-xs);">
+				<h4 style="margin: 0;">3. Live Event Telemetry Stream (100% Real Network Wire calls)</h4>
+				<button type="button" id="btn-clear-log" class="btn" style="--size-padding: var(--size-xs) var(--size-sm); font-size: 0.8rem;">Clear Telemetry</button>
+			</div>
+			<pre id="api-event-log" style="background: var(--bg-sunken); padding: var(--size-md); border-radius: var(--radius-md); font-family: monospace; font-size: 0.85rem; height: 350px; overflow-y: auto; border: 1px solid var(--border-muted); line-height: 1.6;"></pre>
+		</div>
+	</main>
+</section>
+
+<!-- Telemetry Event Hook Setup -->
+<script>
+(function() {
+	const logConsole = document.getElementById('api-event-log');
+	function formatTime() {
+		const d = new Date();
+		return d.toLocaleTimeString() + '.' + String(d.getMilliseconds()).padStart(3, '0');
+	}
+
+	function writeTelemetry(direction, message, meta) {
+		const prefix = direction === 'IN' ? '📥 [EVENT IN] ' : direction === 'OUT' ? '📤 [EVENT OUT] ' : '🌐 [NETWORK]  ';
+		let line = '[' + formatTime() + '] ' + prefix + message;
+		if (meta) {
+			line += ' ' + JSON.stringify(meta);
+		}
+		const span = document.createElement('span');
+		span.textContent = line + '\n';
+		if (direction === 'IN') span.style.color = '#38bdf8'; // Blue
+		else if (direction === 'OUT') span.style.color = '#34d399'; // Green
+		else span.style.color = '#f59e0b'; // Amber
+
+		logConsole.appendChild(span);
+		logConsole.scrollTop = logConsole.scrollHeight;
+	}
+
+	document.getElementById('btn-clear-log').addEventListener('click', function() {
+		logConsole.replaceChildren();
+	});
+
+	// DOM Events Wiring and Logging
+	const connectorEl = document.getElementById('demo-api-connector');
+
+	// Log configuration mutations
+	connectorEl.addEventListener('ln-api-connector:config-changed', function(e) {
+		writeTelemetry('OUT', 'ln-api-connector:config-changed', e.detail);
+	});
+
+	// Log incoming requests and outgoing confirmations/errors
+	const eventsToLog = [
+		'fetched', 'created', 'updated', 'deleted', 'bulk-deleted', 'error'
+	];
+	eventsToLog.forEach(function(evName) {
+		connectorEl.addEventListener('ln-api-connector:' + evName, function(e) {
+			writeTelemetry('OUT', 'ln-api-connector:' + evName, e.detail);
+		});
+	});
+
+	// Handle Form configuration change
+	const configForm = document.getElementById('config-form');
+	configForm.addEventListener('submit', function(e) {
+		e.preventDefault();
+		const baseUrl = document.getElementById('cfg-base-url').value;
+		const path = document.getElementById('cfg-path').value;
+		const headers = document.getElementById('cfg-headers').value;
+
+		writeTelemetry('IN', 'Mutating DOM attributes recursively to trigger MutationObserver');
+		connectorEl.setAttribute('data-ln-api-base-url', baseUrl);
+		connectorEl.setAttribute('data-ln-api-path', path);
+		connectorEl.setAttribute('data-ln-api-headers', headers);
+	});
+
+	// Interactive triggers dispatching CustomEvents to connector element
+	document.getElementById('btn-fetch').addEventListener('click', function() {
+		const since = document.getElementById('trig-since').value;
+		const detail = since ? { since: Number(since) } : {};
+		writeTelemetry('IN', 'ln-api-connector:request-sync', detail);
+		connectorEl.dispatchEvent(new CustomEvent('ln-api-connector:request-sync', { detail: detail }));
+	});
+
+	document.getElementById('btn-create').addEventListener('click', function() {
+		const title = document.getElementById('trig-create-title').value;
+		const detail = { data: { title: title, body: 'ln-ashlar local-first payload', userId: 1 }, tempId: 'temp_12345' };
+		writeTelemetry('IN', 'ln-api-connector:request-create', detail);
+		connectorEl.dispatchEvent(new CustomEvent('ln-api-connector:request-create', { detail: detail }));
+	});
+
+	document.getElementById('btn-update').addEventListener('click', function() {
+		const id = document.getElementById('trig-update-id').value;
+		const title = document.getElementById('trig-update-title').value;
+		const detail = { id: Number(id), data: { title: title, body: 'updated body content' }, expected_version: 1 };
+		writeTelemetry('IN', 'ln-api-connector:request-update', detail);
+		connectorEl.dispatchEvent(new CustomEvent('ln-api-connector:request-update', { detail: detail }));
+	});
+
+	document.getElementById('btn-delete').addEventListener('click', function() {
+		const id = document.getElementById('trig-delete-id').value;
+		const detail = { id: Number(id) };
+		writeTelemetry('IN', 'ln-api-connector:request-delete', detail);
+		connectorEl.dispatchEvent(new CustomEvent('ln-api-connector:request-delete', { detail: detail }));
+	});
+
+	document.getElementById('btn-bulk').addEventListener('click', function() {
+		const idsStr = document.getElementById('trig-bulk-ids').value;
+		const ids = idsStr.split(',').map(s => Number(s.trim())).filter(Boolean);
+		const detail = { ids: ids };
+		writeTelemetry('IN', 'ln-api-connector:request-bulk-delete', detail);
+		connectorEl.dispatchEvent(new CustomEvent('ln-api-connector:request-bulk-delete', { detail: detail }));
+	});
+
+	// Log initial load
+	writeTelemetry('NET', 'Component loaded. Instance registered. MutationObserver armed.');
+})();
+</script>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="app-footer">
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
+		</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
+</body>
+</html>
