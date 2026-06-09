@@ -1,3 +1,24 @@
+// ─── Global Console Warning Interceptor (Production Mode) ──
+if (typeof window !== 'undefined') {
+	const originalWarn = console.warn;
+	console.warn = function (...args) {
+		const isLibraryWarning = typeof args[0] === 'string' &&
+			(args[0].startsWith('[ln-') || args[0].startsWith('[lnCore'));
+
+		if (isLibraryWarning) {
+			const isDebug =
+				document.documentElement.hasAttribute('data-ln-debug') ||
+				(document.body && document.body.hasAttribute('data-ln-debug')) ||
+				window.lnDebug === true;
+
+			if (!isDebug) {
+				return;
+			}
+		}
+		originalWarn.apply(console, args);
+	};
+}
+
 // ─── Template Cache ────────────────────────────────────────
 const _tmplCache = {};
 

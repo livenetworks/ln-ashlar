@@ -39,4 +39,5 @@ import './ln-api-connector/src/ln-api-connector.js';
 import './ln-couchdb-connector/src/ln-couchdb-connector.js';
 import './ln-data-coordinator/src/ln-data-coordinator.js';
 import './ln-icons/src/ln-icons.js';
+import './ln-debug/src/ln-debug.js';
 
