@@ -88,6 +88,7 @@ Two files per component:
 | Confirm | `data-ln-confirm` | [js/ln-confirm/README.md](../js/ln-confirm/README.md) | [confirm.md](js/confirm.md) |
 | Upload | `data-ln-upload` | [js/ln-upload/README.md](../js/ln-upload/README.md) | [upload.md](js/upload.md) |
 | AJAX | `data-ln-ajax` | [js/ln-ajax/README.md](../js/ln-ajax/README.md) | [ajax.md](js/ajax.md) |
+| Router | `data-ln-route` | [js/ln-router/README.md](../js/ln-router/README.md) | [router.md](js/router.md) |
 | HTTP | — | [js/ln-http/README.md](../js/ln-http/README.md) | [http.md](js/http.md) |
 | Store | `data-ln-store` | [js/ln-store/README.md](../js/ln-store/README.md) | [store.md](js/store.md) |
 | Form | `data-ln-form` | [js/ln-form/README.md](../js/ln-form/README.md) | [form.md](js/form.md) |

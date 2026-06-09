@@ -1,4 +1,4 @@
-import { guardBody, dispatch, dispatchCancelable } from '../../ln-core';
+import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-ajax';
@@ -27,7 +27,7 @@ import { guardBody, dispatch, dispatchCancelable } from '../../ln-core';
 			if (href && href.includes('#')) continue;
 
 			const handler = function (e) {
-				if (e.ctrlKey || e.metaKey || e.button === 1) return;
+				if (!shouldInterceptLink(e, link)) return;
 
 				e.preventDefault();
 				const url = link.getAttribute('href');

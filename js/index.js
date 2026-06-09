@@ -4,6 +4,7 @@ import '../scss/ln-ashlar.scss';
 // JS Components
 import './ln-http/src/ln-http.js';
 import './ln-ajax/src/ln-ajax.js';
+import './ln-router/src/ln-router.js';
 import './ln-modal/src/ln-modal.js';
 import './ln-number/src/ln-number.js';
 import './ln-date/src/ln-date.js';

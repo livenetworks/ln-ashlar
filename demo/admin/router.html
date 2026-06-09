@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Router — ln-ashlar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header class="app-header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Router</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+						</ul>
+					</div>
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
+						<span>Test Toast</span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<main class="app-main">
+		<!-- Sidebar -->
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
+				<label class="search sidebar-search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>ashlar-gui v1.2.0</small>
+			</footer>
+		</aside>
+		<div class="app-scrim"></div>
+
+		<!-- Content -->
+		<section>
+			<div class="app-content-wrapper">
+<h1>Router</h1>
+
+<section class="section-card">
+	<header><h3>Overview &amp; Philosophy</h3></header>
+	<main>
+		<p>The <code>ln-router</code> component is a zero-dependency, **template-only** client-side router for <code>ln-ashlar</code>. It maps the URL to a <code>&lt;template data-ln-route="..."&gt;</code>, clones it into a target element, and lets existing component MutationObservers auto-initialize the injected DOM.</p>
+		
+		<p>In accordance with project doctrine, the router does **not** fetch data, sanitise templates, or run data-binding logic. Instead, the router mounts the view, and the **page coordinator** listens for navigation events to populate the templates using the static text interpolation helper <code>fillTemplate</code>.</p>
+	</main>
+</section>
+
+<!-- Route Templates -->
+<template data-ln-route="/">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>🏠 Dashboard View</h4>
+		<p>Welcome to the Router Home Page! This is a static route mapped to <code>/</code>.</p>
+	</div>
+</template>
+
+<template data-ln-route="/profile" data-ln-route-title="Profile — ln-router">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>👤 User Profile View</h4>
+		<p>This is the profile page at static route <code>/profile</code>.</p>
+	</div>
+</template>
+
+<template data-ln-route="/users/:id" data-ln-route-title="User Details">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>👤 User Details View (Route: /users/:id)</h4>
+		<p>Displaying user with ID: <strong>{{id}}</strong></p>
+		<p>Query parameters: <code id="user-query-log">None</code></p>
+	</div>
+</template>
+
+<template data-ln-route="/users/:id/logs" data-ln-route-target="detail-pane" data-ln-route-title="User Logs">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--color-warning-muted); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h5>📑 Logs for User #{{id}}</h5>
+		<ul style="margin: var(--size-xs) 0; padding-left: var(--size-md);">
+			<li>User logged in at 10:00 AM</li>
+			<li>Updated profile at 10:15 AM</li>
+			<li>Viewed settings at 10:30 AM</li>
+		</ul>
+	</div>
+</template>
+
+<template data-ln-route="*">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--color-danger-muted); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>⚠️ 404 - Page Not Found</h4>
+		<p>The path you navigated to does not exist. Handled by the catch-all wildcard route <code>*</code>.</p>
+	</div>
+</template>
+
+<!-- Interactive Live Demo Playground -->
+<section class="section-card">
+	<header><h3>Live Router Playground</h3></header>
+	<main>
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--size-lg);">
+			
+			<!-- Navigation Controls -->
+			<div>
+				<h4>1. In-App Navigation Links</h4>
+				<ul style="display: flex; flex-direction: column; gap: var(--size-xs); padding: 0; list-style: none;">
+					<li><a href="/" style="color: var(--color-primary); text-decoration: underline;">Dashboard (/)</a></li>
+					<li><a href="/profile" style="color: var(--color-primary); text-decoration: underline;">Profile (/profile)</a></li>
+					<li><a href="/users/42" style="color: var(--color-primary); text-decoration: underline;">User #42 (/users/42)</a></li>
+					<li><a href="/users/99?tab=settings&theme=dark" style="color: var(--color-primary); text-decoration: underline;">User #99 with Query Params (/users/99?tab=settings&amp;theme=dark)</a></li>
+					<li><a href="/users/42/logs" style="color: var(--color-primary); text-decoration: underline;">User #42 Logs - Target: detail-pane (/users/42/logs)</a></li>
+					<li><a href="/non-existent-page" style="color: var(--color-primary); text-decoration: underline;">Test 404 Wildcard Route (/non-existent-page)</a></li>
+				</ul>
+
+				<h4 style="margin-top: var(--size-md);">2. Programmatic Navigation API</h4>
+				<div style="display: flex; gap: var(--size-xs); margin-bottom: var(--size-sm);">
+					<button id="btn-nav-dashboard" class="btn btn-secondary btn-sm">router.navigate('/')</button>
+					<button id="btn-nav-user" class="btn btn-secondary btn-sm">router.navigate('/users/88')</button>
+					<button id="btn-replace" class="btn btn-secondary btn-sm">router.replace('/profile')</button>
+				</div>
+
+				<h4 style="margin-top: var(--size-md);">3. Link Interception Safety Guards</h4>
+				<ul style="display: flex; flex-direction: column; gap: var(--size-xs); padding: 0; list-style: none;">
+					<li><a href="https://google.com" target="_blank" style="color: var(--color-primary); text-decoration: underline;">External Link (Google.com - target="_blank")</a></li>
+					<li><a href="/profile" download style="color: var(--color-primary); text-decoration: underline;">Download Attribute link</a></li>
+					<li><a href="#test-anchor" style="color: var(--color-primary); text-decoration: underline;">Internal Page Hash Link (#test-anchor)</a></li>
+				</ul>
+
+				<div style="margin-top: var(--size-md); display: flex; align-items: center; gap: var(--size-xs);">
+					<input type="checkbox" id="block-navigation">
+					<label for="block-navigation" style="font-weight: bold; color: var(--color-danger);">Block next navigation (ln-router:before-navigate preventDefault)</label>
+				</div>
+			</div>
+
+			<!-- Routing Outlets and Logs -->
+			<div>
+				<h4>Default Outlet</h4>
+				<div data-ln-outlet style="padding: var(--size-sm); border: 2px dashed var(--border-color); border-radius: var(--radius-sm); min-height: 120px; background: var(--bg-sunken); margin-bottom: var(--size-md);">
+					<!-- SSR Hydration Test placeholder -->
+					<div data-ln-router-hydrate="true">
+						<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+							<h4>🏠 SSR Server-Rendered View</h4>
+							<p>This is pre-rendered SSR content. Click a link above to test routing.</p>
+						</div>
+					</div>
+				</div>
+
+				<h4>Target Region: detail-pane</h4>
+				<div id="detail-pane" style="padding: var(--size-sm); border: 2px dashed var(--border-color); border-radius: var(--radius-sm); min-height: 100px; background: var(--bg-sunken); margin-bottom: var(--size-md);">
+					<p style="color: var(--text-color-muted); text-align: center; line-height: 100px; margin: 0;">Logs will render here...</p>
+				</div>
+
+				<h4>Diagnostics Console</h4>
+				<div style="background: #1e1e1e; color: #a9b7c6; font-family: monospace; font-size: var(--font-size-sm); padding: var(--size-sm); border-radius: var(--radius-sm); max-height: 200px; overflow-y: auto;">
+					<div id="diagnostics-log" style="white-space: pre-wrap;">[Console initialized. Awaiting events...]</div>
+				</div>
+			</div>
+
+		</div>
+	</main>
+</section>
+
+<!-- Coordinator script binding to router events -->
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const logEl = document.getElementById('diagnostics-log');
+		const blockNavCheckbox = document.getElementById('block-navigation');
+
+		function log(msg) {
+			const time = new Date().toLocaleTimeString();
+			logEl.textContent = `[${time}] ${msg}\n` + logEl.textContent;
+		}
+
+		// ─── Programmatic Buttons ──────────────────────────────
+
+		document.getElementById('btn-nav-dashboard').addEventListener('click', () => {
+			window.lnRouter.navigate('/');
+		});
+
+		document.getElementById('btn-nav-user').addEventListener('click', () => {
+			window.lnRouter.navigate('/users/88?src=api');
+		});
+
+		document.getElementById('btn-replace').addEventListener('click', () => {
+			window.lnRouter.replace('/profile');
+		});
+
+		// ─── Router Events ─────────────────────────────────────
+
+		// PreventDefault cancellation test
+		document.addEventListener('ln-router:before-navigate', function(e) {
+			log(`ln-router:before-navigate from "${e.detail.from}" to "${e.detail.to}"`);
+			if (blockNavCheckbox.checked) {
+				e.preventDefault();
+				log(`🔴 Navigation BLOCKED via preventDefault()`);
+				
+				// Optional: push notification
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: {
+						type: 'error',
+						title: 'Blocked!',
+						message: 'Navigation was cancelled by before-navigate listener.'
+					}
+				}));
+			}
+		});
+
+		// Navigated: coordinator data binding
+		document.addEventListener('ln-router:navigated', function(e) {
+			const detail = e.detail;
+			log(`🟢 ln-router:navigated to "${detail.path}"`);
+
+			// Perform text interpolation using the core fillTemplate helper (double-braces)
+			if (detail.route.pattern === '/users/:id') {
+				// fillTemplate will substitute {{id}} in the target outlet clone
+				window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
+
+				// Log query parameters
+				const queryLog = detail.target.querySelector('#user-query-log');
+				if (queryLog) {
+					queryLog.textContent = JSON.stringify(detail.query);
+				}
+			} else if (detail.route.pattern === '/users/:id/logs') {
+				window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
+			}
+
+			// Push a success toast
+			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+				detail: {
+					type: 'success',
+					title: 'Navigated',
+					message: `Loaded view for pattern: ${detail.route.pattern}`
+				}
+			}));
+		});
+
+		// Not Found
+		document.addEventListener('ln-router:not-found', function(e) {
+			log(`⚠️ ln-router:not-found path: "${e.detail.path}"`);
+			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+				detail: {
+					type: 'warn',
+					title: 'Not Found',
+					message: `No route matching: ${e.detail.path}`
+				}
+			}));
+		});
+	});
+</script>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="app-footer">
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
+		</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
+</body>
+</html>
