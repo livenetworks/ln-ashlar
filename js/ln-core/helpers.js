@@ -322,6 +322,19 @@ export function getLocale(el) {
 	return (langEl ? langEl.lang : null) || navigator.language;
 }
 
+// ─── Raw Value Read ───────────────────────────────────────
+
+/**
+ * Read the raw machine value behind a formatted cell/item display.
+ * Returns the `data-ln-value` attribute if present, else trimmed textContent.
+ * Single read path for value-based sort/filter across components.
+ */
+export function readValue(el) {
+	return el.hasAttribute('data-ln-value')
+		? el.getAttribute('data-ln-value')
+		: el.textContent.trim();
+}
+
 // ─── Value Property Interception ───────────────────────────
 
 /**

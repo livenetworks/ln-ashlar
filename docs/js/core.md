@@ -258,6 +258,20 @@ const locale = getLocale(this.dom); // 'mk', 'en-US', ...
 - Walks via `el.closest('[lang]')` — first ancestor with a `lang`
   attribute wins.
 
+### readValue(el)
+
+Read the raw machine value behind a formatted cell/item display. The single
+read path for value-based sort/filter across components.
+
+```js
+const raw = readValue(td); // '1250.50' from data-ln-value, else trimmed text
+```
+
+- Returns `data-ln-value` attribute value if the element has it.
+- Otherwise returns `el.textContent.trim()`.
+- Used by `ln-table` for sort/filter; future collection components
+  (`ln-list`) read the same attribute through this helper.
+
 ### registerComponent(selector, attribute, ComponentFn, componentTag, options)
 
 End-to-end component registration. Replaces the hand-rolled IIFE
@@ -638,3 +652,59 @@ import { dispatch, dispatchCancelable, guardBody, findElements, deepReactive, cr
     window[DOM_ATTRIBUTE] = constructor;
 })();
 ```
+
+---
+
+## The `data-ln-value` Primitive
+
+A locale-formatted cell/item shows a human-readable string; the raw machine
+value lives in `data-ln-value`. Sort and filter operate on the raw value —
+**never** on the formatted text.
+
+```html
+<td data-ln-value="1250.50">$1,250.50</td>
+<td data-ln-value="1700000000">15 Nov 2023</td>
+```
+
+### Raw format
+
+- **Amounts** — plain number, dot decimal, NO thousands grouping: `1250.50`.
+- **Dates** — numeric Unix timestamp, consistent per column (demo uses seconds,
+  e.g. `1700000000`).
+
+### Why (the gotcha)
+
+Sort coerces with `parseFloat(raw) || 0`. Formatted display text breaks it:
+
+| Formatted text | `parseFloat` sees | Correct raw |
+|----------------|-------------------|-------------|
+| `1.250` (EU grouping) | `1.25` ❌ | `1250` |
+| `15.11.2023` | `15.11` ❌ | `1700000000` (timestamp) |
+| `2026-04-12` | `2026` ❌ | timestamp |
+
+### The split
+
+- `data-ln-value` — the VALUE. Universal. Read by `ln-core.readValue`.
+- `data-ln-table-sort` — the BEHAVIOR/type (`string|number|date`).
+  Component-scoped (lives on `<th>`). A future `data-ln-list-sort` would be its
+  list-scoped sibling. Never universalize behavior; never scope the value.
+
+### The reader
+
+`ln-core.readValue(el)` is the single extraction path — that is what makes the
+attribute cross-component. `ln-table` reads through it today; `ln-list` and any
+future value-sorting component go through the same helper.
+
+### Formatting responsibility
+
+The client never re-formats — it only reorders/filters by raw. Formatting is
+the server's job: Blade/PHP in SSR mode, or the API payload in data-driven mode.
+`<html lang>` drives `Intl.Collator` for string sort.
+
+### Per mode
+
+- **SSR** — the raw value lives in `data-ln-value` on the element. `readValue`
+  pulls it during `_parseRows`.
+- **Data-driven** — the raw value lives in the record field (API payload); the
+  rendered element may also carry `data-ln-value`. Sorting runs on the record
+  field. Never sort formatted text.

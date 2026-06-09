@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
@@ -510,7 +510,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			for (let j = 0; j < tr.cells.length; j++) {
 				const td = tr.cells[j];
 				const text = td.textContent.trim();
-				const raw = td.hasAttribute('data-ln-table-value') ? td.getAttribute('data-ln-table-value') : text;
+				const raw = readValue(td);
 				const type = sortTypes[j];
 
 				rawTexts[j] = text.toLowerCase();
@@ -538,8 +538,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 						const cellIndex = j;
 						if (cellIndex < tr.cells.length) {
 							const td = tr.cells[cellIndex];
-							const text = td.textContent.trim();
-							record[field] = td.hasAttribute('data-ln-table-value') ? td.getAttribute('data-ln-table-value') : text;
+							record[field] = readValue(td);
 						}
 					}
 				}

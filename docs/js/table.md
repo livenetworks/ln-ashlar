@@ -57,6 +57,7 @@ this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 | `data-ln-table-selectable` | Wrapper | Enable checkboxes and row selection. |
 | ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` in both modes. |
 | `data-ln-table-col="field"` | `<th>` | Maps header column to a data record field. |
+| `data-ln-value` | `<td>` / item | Raw machine value for sort/filter (read by `ln-core.readValue`). Server-formatted display stays in the element body. See [Core → data-ln-value](core.md#the-data-ln-value-primitive). |
 | `data-ln-table-col-sort` | Button | Triggers three-state column sorting. |
 | `data-ln-table-col-filter` | Button | Triggers filter dropdown populating. |
 | `data-ln-table-col-select` | `<th>` | Header select-all checkbox column. |
