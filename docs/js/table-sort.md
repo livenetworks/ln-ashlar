@@ -51,6 +51,25 @@ Auto-initialized for any `<table>` containing `th[data-ln-table-sort]` headers. 
 | `data-ln-table-col-sort` | `<button>` inside `<th>` | Click target for sort. Required — JS binds to this button. |
 | `data-ln-table-col-sort-icon="none\|asc\|desc"` | `<svg>` inside the button | Sort direction indicator. CSS controls visibility via `.ln-sort-asc` / `.ln-sort-desc` on the `<th>`. |
 
+## Sort Value Source
+
+`data-ln-table-sort` declares the column's sort *type*; the *value* sorted is
+read by `ln-core.readValue` from each cell's `data-ln-value`
+(see [Core → The `data-ln-value` Primitive](core.md#the-data-ln-value-primitive)).
+Formatted display text is never sorted directly.
+
+```html
+<!-- number column: raw amount, dot decimal, no grouping -->
+<th data-ln-table-sort="number">Salary <button data-ln-table-col-sort ...></button></th>
+...
+<td data-ln-value="120000">$120,000.00</td>
+
+<!-- date column: raw Unix timestamp -->
+<th data-ln-table-sort="date">Created <button data-ln-table-col-sort ...></button></th>
+...
+<td data-ln-value="1700000000">15 Nov 2023</td>
+```
+
 ## Events
 
 | Event | Bubbles | Cancelable | `detail` |
