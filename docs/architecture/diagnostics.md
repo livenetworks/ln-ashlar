@@ -39,7 +39,7 @@ Best for block elements or component wrappers. It applies a prominent red dashed
 Best for inline elements, labels, or inline warnings. It appends a clean red text label with a warning icon adjacent to the target element.
 *   **SCSS Usage:**
     ```scss
-    th[data-ln-sort]:not(:has([data-ln-table-sort])) {
+    th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
         @include dev-inline-error("missing sort button");
     }
     ```
@@ -53,12 +53,12 @@ Below is the list of active validation rules implemented in the framework, group
 ### 1. Tables (`ln-table`)
 
 #### A. Missing Sort Buttons
-A sortable table header `th[data-ln-sort]` expects a `<button data-ln-table-sort>` inside it to capture sort clicks correctly.
-*   **Trigger:** A `<th>` has `data-ln-sort` but is missing a child button with the `data-ln-table-sort` attribute.
+A sortable table header `th[data-ln-table-sort]` expects a `<button data-ln-table-col-sort>` inside it to capture sort clicks correctly.
+*   **Trigger:** A `<th>` has `data-ln-table-sort` but is missing a child button with the `data-ln-table-col-sort` attribute.
 *   **Result:** A red warning label is rendered dynamically on screen: `⚠ missing sort button`.
 *   **Target SCSS Usage:**
     ```scss
-    th[data-ln-sort]:not(:has([data-ln-table-sort])) {
+    th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
         @include dev-inline-error("missing sort button");
     }
     ```

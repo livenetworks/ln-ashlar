@@ -997,8 +997,8 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-search | Instance | `data-ln-search` | Generic search (textContent filter) |
 | ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
 | ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll) |
-| ln-table-sort | Instance | `data-ln-sort` | Sort header handler (companion to ln-table) |
-| ln-sortable | Instance | `data-ln-sortable` | Drag & drop reorder |
+| ln-table-sort | Instance | `data-ln-table-sort` | Sort header handler (companion to ln-table) |
+| ln-sortable | Instance | `data-ln-table-sortable` | Drag & drop reorder |
 | ln-dropdown | Instance | `data-ln-dropdown` | Positioned dropdown menu (wraps ln-toggle) |
 | ln-popover | Instance | `data-ln-popover` | Rich popover with viewport-aware positioning and ESC-stack management |
 | ln-link | Instance | `data-ln-link` | Clickable rows/containers |

@@ -80,6 +80,9 @@ label:not(:has(> input)) {
 	@include pill-switch;
 }
 
+.search {
+	@include search;
+}
 
 .form-actions {
 	@include form-actions;

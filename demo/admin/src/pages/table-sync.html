@@ -72,45 +72,43 @@
 								<div>
 									<h3>Documents Manager</h3>
 								</div>
-								<form role="search" onsubmit="return false;">
-									<label data-ln-search="hybrid-table">
-										<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-										<input type="search" placeholder="Search cache or server..." data-ln-table-search>
-										<button type="button" data-ln-search-clear aria-label="Clear search">
-											<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
-										</button>
-									</label>
-								</form>
+								<label class="search" data-ln-search="hybrid-table">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+									<input type="search" placeholder="Search cache or server...">
+									<button type="button" data-ln-search-clear aria-label="Clear search">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									</button>
+								</label>
 							</div>
 						</th>
 					</tr>
 					<tr>
-						<th data-ln-col-select></th>
-						<th data-ln-col="title">
+						<th data-ln-table-col-select></th>
+						<th data-ln-table-col="title">
 							Title
-							<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 						</th>
-						<th data-ln-col="department">
+						<th data-ln-table-col="department">
 							Department
-							<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
-							<button type="button" class="table-filter" data-ln-col-filter aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
+							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+							<button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 						</th>
-						<th data-ln-col="status">
+						<th data-ln-table-col="status">
 							Status
-							<button type="button" class="table-filter" data-ln-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
+							<button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 						</th>
-						<th data-ln-col="priority">
+						<th data-ln-table-col="priority">
 							Priority
-							<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 						</th>
-						<th data-ln-col="owner">
+						<th data-ln-table-col="owner">
 							Owner
-							<button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
+							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 						</th>
-						<th data-ln-col="file_size">
+						<th data-ln-table-col="file_size">
 							Size
 						</th>
-						<th data-ln-col="updated_at">
+						<th data-ln-table-col="updated_at">
 							Updated
 						</th>
 					</tr>
@@ -118,8 +116,8 @@
 				
 				<!-- SSR Pre-rendered Rows (First 10 records printed by server) -->
 				<tbody data-ln-table-body>
-					<tr data-ln-row data-ln-row-id="1">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="1">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Security Policy #1</td>
 						<td>Operations</td>
 						<td>Approved</td>
@@ -128,8 +126,8 @@
 						<td>10.9 KB</td>
 						<td>2026-04-12</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="2">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="2">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Privacy Plan #2</td>
 						<td>Operations</td>
 						<td>Approved</td>
@@ -138,8 +136,8 @@
 						<td>39.9 KB</td>
 						<td>2025-04-24</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="3">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="3">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Compliance Roadmap #3</td>
 						<td>Legal</td>
 						<td>Draft</td>
@@ -148,8 +146,8 @@
 						<td>33.6 KB</td>
 						<td>2026-03-28</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="4">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="4">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Risk Specification #4</td>
 						<td>IT</td>
 						<td>Archived</td>
@@ -158,8 +156,8 @@
 						<td>1.1 KB</td>
 						<td>2026-03-21</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="5">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="5">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Audit Assessment #5</td>
 						<td>Operations</td>
 						<td>Rejected</td>
@@ -168,8 +166,8 @@
 						<td>41.5 KB</td>
 						<td>2026-05-04</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="6">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="6">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Operations Guide #6</td>
 						<td>Finance</td>
 						<td>Pending</td>
@@ -178,8 +176,8 @@
 						<td>15.1 KB</td>
 						<td>2026-04-18</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="7">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="7">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Finance Memo #7</td>
 						<td>Legal</td>
 						<td>Approved</td>
@@ -188,8 +186,8 @@
 						<td>8.7 KB</td>
 						<td>2026-04-08</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="8">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="8">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>HR Report #8</td>
 						<td>IT</td>
 						<td>Rejected</td>
@@ -198,8 +196,8 @@
 						<td>39.3 KB</td>
 						<td>2025-10-04</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="9">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="9">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Legal Review #9</td>
 						<td>Sales</td>
 						<td>Rejected</td>
@@ -208,8 +206,8 @@
 						<td>25.3 KB</td>
 						<td>2025-05-16</td>
 					</tr>
-					<tr data-ln-row data-ln-row-id="10">
-						<td><input type="checkbox" data-ln-row-select></td>
+					<tr data-ln-table-row data-ln-table-row-id="10">
+						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Marketing Charter #10</td>
 						<td>Operations</td>
 						<td>Archived</td>
@@ -229,8 +227,8 @@
 
 			<!-- Dynamic Row Template for background load -->
 			<template data-ln-template="hybrid-docs-row">
-				<tr data-ln-row>
-					<td><input type="checkbox" data-ln-row-select></td>
+				<tr data-ln-table-row>
+					<td><input type="checkbox" data-ln-table-row-select></td>
 					<td>{{ title }}</td>
 					<td>{{ department }}</td>
 					<td>{{ status }}</td>

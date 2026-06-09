@@ -75,7 +75,7 @@
 
 		// Search field drops to a full-width second row below the
 		// brand triad (enabled by `flex-wrap` above).
-		> [data-ln-search] {
+		> .sidebar-search {
 			@include w-full;
 			--margin-block: var(--size-xs);
 			@include mt(var(--margin-block));

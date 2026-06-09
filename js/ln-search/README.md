@@ -29,16 +29,21 @@ Bind the search input to a list `id` via `data-ln-search`.
 ```
 
 ### Premium Icon Wrapper with Clear Button
-When placed on a wrapper container, the component automatically resolves the nested input.
+The canonical input-host form places `data-ln-search` directly on the `<input>`
+and uses `class="search"` for the compact icon-group chrome (leading magnifier,
+recessed fill, clear button):
 ```html
-<label data-ln-search="countries-list">
-  <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-  <input type="search" placeholder="Search countries...">
-  <button type="button" data-ln-search-clear aria-label="Clear search">
-    <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
-  </button>
+<label class="search">
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+	<input type="search" placeholder="Search countries..." data-ln-search="countries-list">
+	<button type="button" data-ln-search-clear aria-label="Clear search">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+	</button>
 </label>
 ```
+`class="search"` binds `@include search` (library `scss/components/_form.scss`).
+Wrapper-host (`data-ln-search` on the `<label>`) remains supported for backward
+compatibility, but input-host is the recommended canonical form.
 
 ---
 
@@ -48,7 +53,7 @@ When placed on a wrapper container, the component automatically resolves the nes
 
 | Attribute | Elements | Description |
 | :--- | :--- | :--- |
-| `data-ln-search` | `<input>`, `<label>` | Component root and namespace. Value is the `id` of the target to filter. |
+| `data-ln-search` | `<input>` (canonical); `<label>`/wrapper (backward-compat) | Component root and namespace. Value is the `id` of the target to filter. |
 | `data-ln-search-items` | Same as root | Opt-in. Deep CSS selector (e.g. `tbody tr`) to query deep matching elements instead of direct children. |
 | `data-ln-search-clear` | `<button>` | Identifies the clear button. Click clears input and triggers synchronous search reset. |
 | `data-ln-search-hide` | Children of target | *State*. Automatically toggled on non-matching elements (`display: none !important`). |
@@ -74,7 +79,7 @@ Dispatched on the **target** element whenever the search term changes.
 
 ## ⚠️ Common Pitfalls
 
-- **Confusing with `ln-table` Search:** `ln-table` manages its own internal search input via `data-ln-table-search` to join sorting and pagination into unified API request arrays. Do not place `ln-search` in front of `ln-table`.
+- **Driving an `ln-table` search box:** `ln-table` **does** consume `ln-search:change` in both SSR and data-driven modes — placing `data-ln-search="<tableId>"` on the search input (or its label wrapper) is the sole supported pattern. The search term is joined with sort and column filters into the `ln-table:request-data` payload. Note: `data-ln-table-search` has been removed — use `data-ln-search="<tableId>"` instead.
 - **Bypassing Debounce via Native Input Listeners:** Listening to native `input` events directly will bypass the 150ms debounce and execute expensive logic on every single keystroke. Always listen to `ln-search:change`.
 - **Programmatic Value Mutations:** Assigning `input.value = "text"` programmatically does not trigger search. You must manually dispatch an `input` event:
   ```javascript

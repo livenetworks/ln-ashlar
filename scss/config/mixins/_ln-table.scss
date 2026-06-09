@@ -112,6 +112,7 @@
 
 @mixin ln-table-toolbar-search {
 	--padding-y: var(--size-2xs);   // lowers panel-header min-height floor for this label
+	width: auto;                    // hug the 10rem input; cancel .search's 20rem label cap inside toolbars
 
 	> .ln-icon {
 		padding-top: var(--size-2xs);     // tighten leading icon vertical padding (was var(--size-xs))

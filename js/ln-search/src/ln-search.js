@@ -48,8 +48,11 @@ import { dispatchCancelable, registerComponent } from '../../ln-core';
 		if (!this.input) return;
 		const self = this;
 
-		// Clear button inside the wrapper
-		this._clearBtn = this.dom.querySelector('[data-ln-search-clear]');
+		// Clear button: when data-ln-search is on the input itself, the clear button
+		// lives in the input's immediate wrapper (inputs have no element children).
+		// Otherwise (wrapper-host) scope is dom — unchanged behavior.
+		const scope = (this.dom === this.input) ? this.input.parentElement : this.dom;
+		this._clearBtn = scope ? scope.querySelector('[data-ln-search-clear]') : null;
 		if (this._clearBtn) {
 			this._onClear = function () {
 				self.input.value = '';

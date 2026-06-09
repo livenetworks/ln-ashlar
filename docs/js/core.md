@@ -9,7 +9,7 @@ MutationObserver. Source: `js/ln-core/`.
 ln-core exposes helpers in these categories:
 
 - **Templates** — clone and populate `<template>` fragments
-- **Events** — dispatch standard and cancelable CustomEvents
+- **Events** — dispatch standard and cancelable CustomEvents; shared data-request cycle for collection components (`requestData`)
 - **DOM binding** — declarative data-attribute-driven rendering (`fill`, `renderList`, `fillTemplate`)
 - **Forms** — serialize/populate by field `name`
 - **Dictionaries** — extract i18n strings from hidden elements
@@ -60,6 +60,21 @@ if (before.defaultPrevented) return;
 
 - `bubbles: true`, `cancelable: true`
 - `detail` defaults to `{}` if omitted
+
+### requestData(component, eventName, keyName)
+
+Shared data-request cycle for collection components (`ln-table`, `ln-list`). Runs the local render pass over the hydrated rows, then dispatches a `*:request-data` event so the coordinator can fetch the authoritative dataset.
+
+```js
+requestData(this, 'ln-list:request-data', 'list');    // inside ln-list
+requestData(this, 'ln-table:request-data', 'table');  // inside ln-table
+```
+
+- Render order: `_applyFilterAndSort()` → reset `_vStart`/`_vEnd` to `-1` → `_render()` → `_updateFooter()` → `dispatch`.
+- `eventName` — the `*:request-data` event the component emits.
+- `keyName` — the payload property carrying the component name (`'list'` / `'table'`). The dispatched `detail` is always `{ sort, filters, search, [keyName]: component.name }` — same shape, only the identifier key varies per component.
+- **Instance contract:** `component` must expose `_applyFilterAndSort()`, `_render()`, `_updateFooter()`, `_vStart`, `_vEnd`, `dom`, `name`, `currentSort`, `currentFilters`, `currentSearch`. Both `ln-table` and `ln-list` satisfy it; each defines its own one-line `_requestData` wrapper around this helper.
+- Dispatches via `dispatch` — the emitted event bubbles and is non-cancelable.
 
 ### fill(root, data)
 

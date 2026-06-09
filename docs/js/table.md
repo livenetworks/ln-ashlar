@@ -42,7 +42,7 @@ this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 - Listens to `ln-table:set-data` and `ln-table:set-loading` events.
 - Sorts and filters the dynamic records cache client-side.
 - Clones and interpolates `<template data-ln-template="{name}-row">` for rendering.
-- Manages row selection checkboxes (`data-ln-row-select`), select-all checkbox (`data-ln-col-select`), and footer counters (`data-ln-table-total`, `data-ln-table-filtered`, `data-ln-table-selected`).
+- Manages row selection checkboxes (`data-ln-table-row-select`), select-all checkbox (`data-ln-table-col-select`), and footer counters (`data-ln-table-total`, `data-ln-table-filtered`, `data-ln-table-selected`).
 - Intercepts keyboard navigation (arrow keys, Enter to click, Space to select, `/` to focus search).
 - Dispatches `ln-table:request-data` on load, sort, filter, search, and clear-all events.
 
@@ -55,14 +55,14 @@ this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 | `data-ln-table` | Wrapper | Table name. Serves as component root identifier. |
 | `data-ln-table-source` | Wrapper | Opt-in marker for Data-Driven Mode. |
 | `data-ln-table-selectable` | Wrapper | Enable checkboxes and row selection. |
-| `data-ln-table-search` | Input | Form search input field target. |
-| `data-ln-col="field"` | `<th>` | Maps header column to a data record field. |
-| `data-ln-col-sort` | Button | Triggers three-state column sorting. |
-| `data-ln-col-filter` | Button | Triggers filter dropdown populating. |
-| `data-ln-col-select` | `<th>` | Header select-all checkbox column. |
-| `data-ln-row` | `<tr>` | Render template row container click target. |
-| `data-ln-row-select` | Input | Row selection checkbox target. |
-| `data-ln-row-action="name"` | Button | Row action triggers (edit, delete). |
+| ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` in both modes. |
+| `data-ln-table-col="field"` | `<th>` | Maps header column to a data record field. |
+| `data-ln-table-col-sort` | Button | Triggers three-state column sorting. |
+| `data-ln-table-col-filter` | Button | Triggers filter dropdown populating. |
+| `data-ln-table-col-select` | `<th>` | Header select-all checkbox column. |
+| `data-ln-table-row` | `<tr>` | Render template row container click target. |
+| `data-ln-table-row-select` | Input | Row selection checkbox target. |
+| `data-ln-table-row-action="name"` | Button | Row action triggers (edit, delete). |
 | `data-ln-table-clear-all` | Button | Resets search query and filters. |
 
 ---

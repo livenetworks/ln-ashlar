@@ -71,10 +71,10 @@
 				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
-				<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
-					<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Filter menu…">
-					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<label class="search sidebar-search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 				</label>
 			</header>
 
@@ -180,46 +180,46 @@
 								<tr>
 									<th colspan="5">
 										<div>
-											<label data-ln-search="employee-table">
-												<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-												<input type="search" placeholder="Search employees...">
-												<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+											<label class="search">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+												<input type="search" placeholder="Search employees..." data-ln-search="employee-table">
+												<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 											</label>
 										</div>
 									</th>
 								</tr>
 								<tr>
-									<th data-ln-sort="string">
+									<th data-ln-table-sort="string">
 										Name
-										<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-											<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+										<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+											<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 										</button>
 									</th>
-									<th data-ln-sort="string" data-ln-filter-col="dept">
+									<th data-ln-table-sort="string" data-ln-table-filter-col="dept">
 										Department
 										<button class="table-filter" type="button" data-ln-popover-for="filter-dept" aria-label="Filter department">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
 										</button>
-										<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-											<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+										<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+											<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 										</button>
 									</th>
-									<th data-ln-sort="string" data-ln-filter-col="role">
+									<th data-ln-table-sort="string" data-ln-table-filter-col="role">
 										Role
 										<button class="table-filter" type="button" data-ln-popover-for="filter-role" aria-label="Filter role">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
 										</button>
-										<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-											<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+										<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+											<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 										</button>
 									</th>
-									<th data-ln-sort="string" data-ln-filter-col="status">
+									<th data-ln-table-sort="string" data-ln-table-filter-col="status">
 										Status
 										<div data-ln-dropdown>
 											<button class="table-filter" type="button" data-ln-toggle-for="filter-status" aria-label="Filter status">
@@ -236,18 +236,18 @@
 												</li>
 											</ul>
 										</div>
-										<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-											<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+										<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+											<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 										</button>
 									</th>
-									<th data-ln-sort="string">
+									<th data-ln-table-sort="string">
 										Location
-										<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-											<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-											<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+										<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+											<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+											<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 										</button>
 									</th>
 								</tr>
@@ -437,10 +437,10 @@
 					<main>
 						<ul>
 							<li><strong>Global search</strong> — <code>ln-search</code> dispatches <code>ln-search:change</code> events on the <code>data-ln-table</code> wrapper. <code>ln-table</code> intercepts the event and filters rows in-memory — no custom script needed.</li>
-							<li><strong>Per-column filters</strong> — <code>ln-filter</code> dispatches <code>ln-filter:changed</code> events on the table wrapper. <code>ln-table</code> maps filter keys to columns via <code>data-ln-filter-col</code> on <code>&lt;th&gt;</code> elements. Multiple columns combine with AND logic; within a column, checked values use OR logic. When a filter is active, <code>ln-table</code> sets <code>data-ln-filter-active</code> on the <code>&lt;th&gt;</code> — the filter icon turns primary color.</li>
+							<li><strong>Per-column filters</strong> — <code>ln-filter</code> dispatches <code>ln-filter:changed</code> events on the table wrapper. <code>ln-table</code> maps filter keys to columns via <code>data-ln-table-filter-col</code> on <code>&lt;th&gt;</code> elements. Multiple columns combine with AND logic; within a column, checked values use OR logic. When a filter is active, <code>ln-table</code> sets <code>data-ln-table-filter-active</code> on the <code>&lt;th&gt;</code> — the filter icon turns primary color.</li>
 							<li><strong>Popover pattern</strong> — Department and Role use <code>ln-popover</code> with hardcoded checkboxes. Each popover's <code>data-ln-filter</code> targets the <code>data-ln-table</code> wrapper ID.</li>
 							<li><strong>Dropdown pattern</strong> — Status uses <code>ln-dropdown</code> with hardcoded checkboxes embedded in the <code>&lt;th&gt;</code>.</li>
-							<li><strong>Sort</strong> — <code>ln-table-sort</code> via <code>data-ln-sort</code> on <code>&lt;th&gt;</code> elements. Click header to cycle: ascending → descending → unsorted.</li>
+							<li><strong>Sort</strong> — <code>ln-table-sort</code> via <code>data-ln-table-sort</code> on <code>&lt;th&gt;</code> elements. Click header to cycle: ascending → descending → unsorted.</li>
 						</ul>
 					</main>
 				</section>
@@ -449,14 +449,14 @@
 				<section class="section-card">
 					<header><h3>Popover Pattern</h3></header>
 					<main>
-						<p>Filter trigger in <code>&lt;th&gt;</code>, popover with hardcoded checkboxes. The <code>data-ln-filter</code> targets the <code>data-ln-table</code> wrapper ID. The <code>&lt;th&gt;</code> needs <code>data-ln-filter-col</code> set to the filter key so <code>ln-table</code> can map it to the column index.</p>
+						<p>Filter trigger in <code>&lt;th&gt;</code>, popover with hardcoded checkboxes. The <code>data-ln-filter</code> targets the <code>data-ln-table</code> wrapper ID. The <code>&lt;th&gt;</code> needs <code>data-ln-table-filter-col</code> set to the filter key so <code>ln-table</code> can map it to the column index.</p>
 						<pre><code>&lt;!-- Wrapper --&gt;
 &lt;div data-ln-table id="my-table"&gt;
     &lt;table&gt;
         &lt;thead&gt;
             &lt;tr&gt;
-                &lt;th data-ln-sort="string"&gt;Name&lt;/th&gt;
-                &lt;th data-ln-sort="string" data-ln-filter-col="dept"&gt;
+                &lt;th data-ln-table-sort="string"&gt;Name&lt;/th&gt;
+                &lt;th data-ln-table-sort="string" data-ln-table-filter-col="dept"&gt;
                     Department
                     &lt;button class="filter" type="button" data-ln-popover-for="filter-dept" aria-label="Filter department"&gt;
                         &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;
@@ -483,8 +483,8 @@
 				<section class="section-card">
 					<header><h3>Dropdown Pattern (Inline in TH)</h3></header>
 					<main>
-						<p>For columns with few known values. The dropdown and filter live inside the <code>&lt;th&gt;</code>. The <code>&lt;th&gt;</code> needs <code>data-ln-filter-col</code> set to the filter key.</p>
-						<pre><code>&lt;th data-ln-sort="string" data-ln-filter-col="status"&gt;
+						<p>For columns with few known values. The dropdown and filter live inside the <code>&lt;th&gt;</code>. The <code>&lt;th&gt;</code> needs <code>data-ln-table-filter-col</code> set to the filter key.</p>
+						<pre><code>&lt;th data-ln-table-sort="string" data-ln-table-filter-col="status"&gt;
     Status
     &lt;div data-ln-dropdown&gt;
         &lt;button class="filter" type="button" data-ln-toggle-for="filter-status" aria-label="Filter status"&gt;
