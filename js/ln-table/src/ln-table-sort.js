@@ -3,8 +3,8 @@ import { persistGet, persistSet } from '../../ln-core';
 
 (function () {
 	const DOM_ATTRIBUTE = 'lnTableSort';
-	const SORT_ATTR = 'data-ln-sort';
-	const BUTTON_HOOK = 'data-ln-table-sort';
+	const SORT_ATTR = 'data-ln-table-sort';
+	const BUTTON_HOOK = 'data-ln-table-col-sort';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 

@@ -10,7 +10,9 @@ A unified, structure-agnostic, and local-first **Data Presenter Component** desi
 For a server-rendered list where the backend outputs `<li>` elements directly:
 
 ```html
-<input type="search" data-ln-search="documents-list" placeholder="Search...">
+<form role="search" onsubmit="return false;">
+    <input type="search" data-ln-search="documents-list" placeholder="Search...">
+</form>
 
 <ul id="documents-list" data-ln-list="documents">
     <li data-ln-item-id="1">Document A</li>
@@ -22,7 +24,9 @@ For a server-rendered list where the backend outputs `<li>` elements directly:
 Opted-in by adding the `data-ln-list-source` attribute. It clones and renders the specified `<template>`:
 
 ```html
-<input type="search" data-ln-search="documents-grid" placeholder="Search...">
+<form role="search" onsubmit="return false;">
+    <input type="search" data-ln-search="documents-grid" placeholder="Search...">
+</form>
 
 <section id="documents-grid" 
          data-ln-list="documents" 
@@ -67,7 +71,7 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 
 ### Emitted Events
 
-* `ln-list:request-data` `{ table, search, sort, filters }`: Requests data query from the Coordinator.
+* `ln-list:request-data` `{ list, search, sort, filters }`: Requests data query from the Coordinator.
 * `ln-list:ready` `{ total }`: Fired when initial markup parsing completes.
 * `ln-list:rendered` `{ list, total, visible }`: Fired after items have been drawn to DOM.
 * `ln-list:item-click` `{ list, id, record }`: Fired when clicking item body (excluding buttons, anchors, inputs).

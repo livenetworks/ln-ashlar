@@ -1,16 +1,16 @@
-import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
 	const DOM_ATTRIBUTE = 'lnList';
 	const EMPTY_TEMPLATE = 'data-ln-list-empty';
 	const VIRTUAL_THRESHOLD = 200;
-	const BUFFER_ITEMS = 15;
+	const BUFFER_ROWS = 15;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	function _findScrollContainer(el) {
-		let p = el.parentElement;
+		let p = el;
 		while (p && p !== document.body && p !== document.documentElement) {
 			const cs = getComputedStyle(p);
 			const oy = cs.overflowY;
@@ -18,6 +18,14 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			p = p.parentElement;
 		}
 		return null;
+	}
+
+	function _getOuterHeight(el) {
+		if (!el) return 0;
+		const cs = getComputedStyle(el);
+		const mt = parseFloat(cs.marginTop) || 0;
+		const mb = parseFloat(cs.marginBottom) || 0;
+		return el.offsetHeight + mt + mb;
 	}
 
 	// ─── Component ─────────────────────────────────────────────
@@ -41,6 +49,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		this._vEnd = -1;
 		this._rafId = null;
 		this._scrollHandler = null;
+		this._resizeHandler = null;
 		this._scrollContainer = null;
 		this.isUl = this.tbody.tagName === 'UL' || this.tbody.tagName === 'OL';
 
@@ -188,7 +197,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 
 			// Initial request-data
 			dispatch(dom, 'ln-list:request-data', {
-				table: this.name,
+				list: this.name,
 				sort: this.currentSort,
 				filters: this.currentFilters,
 				search: this.currentSearch
@@ -259,7 +268,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		const children = Array.from(this.tbody.children).filter(el => !el.classList.contains('ln-list__spacer'));
 		this._data = [];
 
-		if (children.length > 0) this._itemHeight = children[0].offsetHeight || 50;
+		if (children.length > 0) this._itemHeight = _getOuterHeight(children[0]) || 50;
 
 		for (let i = 0; i < children.length; i++) {
 			const el = children[i];
@@ -271,10 +280,10 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 				record = {};
 				if (id != null) record.id = id;
 
-				const fields = el.querySelectorAll('[data-ln-field]');
+				const fields = el.querySelectorAll('[data-ln-list-field]');
 				for (let j = 0; j < fields.length; j++) {
 					const f = fields[j];
-					const prop = f.getAttribute('data-ln-field');
+					const prop = f.getAttribute('data-ln-list-field');
 					if (prop) {
 						record[prop] = f.textContent.trim();
 					}
@@ -442,6 +451,37 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 
 	// ─── Virtual scroll ────────────────────────────────────────
 
+	_component.prototype._readGridLayout = function () {
+		const cs = getComputedStyle(this.tbody);
+		const tracks = cs.gridTemplateColumns;
+		let columns = 1;
+		if (tracks && tracks !== 'none') {
+			const parts = tracks.trim().split(/\s+/).filter(Boolean);
+			if (parts.length > 0) columns = parts.length;
+		}
+		const rowGap = parseFloat(cs.rowGap);
+		return { columns: columns, rowGap: isNaN(rowGap) ? 0 : rowGap };
+	};
+
+	_component.prototype._measureItemHeight = function () {
+		if (this.isDataDriven) {
+			if (this._data.length > 0) {
+				const el = this._buildItem(this._data[0]);
+				if (el) {
+					this.tbody.textContent = '';
+					this.tbody.appendChild(el);
+					this._itemHeight = _getOuterHeight(el) || 50;
+					this.tbody.textContent = '';
+				}
+			}
+		} else {
+			const children = this.tbody.children;
+			if (children.length > 0) {
+				this._itemHeight = _getOuterHeight(children[0]) || 50;
+			}
+		}
+	};
+
 	_component.prototype._enableVirtualScroll = function () {
 		if (this._virtual) return;
 		this._virtual = true;
@@ -450,22 +490,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		const self = this;
 
 		if (!this._itemHeight) {
-			if (this.isDataDriven) {
-				if (this._data.length > 0) {
-					const el = this._buildItem(this._data[0]);
-					if (el) {
-						this.tbody.textContent = '';
-						this.tbody.appendChild(el);
-						this._itemHeight = el.offsetHeight || 50;
-						this.tbody.textContent = '';
-					}
-				}
-			} else {
-				const children = this.tbody.children;
-				if (children.length > 0) {
-					this._itemHeight = children[0].offsetHeight || 50;
-				}
-			}
+			this._measureItemHeight();
 		}
 
 		this._scrollContainer = _findScrollContainer(this.dom);
@@ -480,8 +505,16 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			}
 		};
 
+		this._resizeHandler = function () {
+			self._itemHeight = 0;
+			self._measureItemHeight();
+			self._vStart = -1;
+			self._vEnd = -1;
+			self._renderVirtual();
+		};
+
 		container.addEventListener('scroll', this._scrollHandler, { passive: true });
-		window.addEventListener('resize', this._scrollHandler, { passive: true });
+		window.addEventListener('resize', this._resizeHandler, { passive: true });
 	};
 
 	_component.prototype._disableVirtualScroll = function () {
@@ -491,8 +524,11 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		if (this._scrollHandler) {
 			const container = this._scrollContainer || window;
 			container.removeEventListener('scroll', this._scrollHandler);
-			window.removeEventListener('resize', this._scrollHandler);
 			this._scrollHandler = null;
+		}
+		if (this._resizeHandler) {
+			window.removeEventListener('resize', this._resizeHandler);
+			this._resizeHandler = null;
 		}
 		this._scrollContainer = null;
 
@@ -516,7 +552,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		if (container) {
 			const rect = this.tbody.getBoundingClientRect();
 			const containerRect = container.getBoundingClientRect();
-			const relativeTop = rect.top - containerRect.top + container.scrollTop;
+			const relativeTop = (container === this.tbody) ? 0 : (rect.top - containerRect.top + container.scrollTop);
 			scrollTop = container.scrollTop - relativeTop;
 			viewportHeight = container.clientHeight;
 		} else {
@@ -526,17 +562,27 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			viewportHeight = window.innerHeight;
 		}
 
-		let start = Math.max(0, Math.floor(scrollTop / itemHeight) - BUFFER_ITEMS);
-		start = Math.min(start, count);
-		const end = Math.min(start + Math.ceil(viewportHeight / itemHeight) + BUFFER_ITEMS * 2, count);
+		const layout = this._readGridLayout();
+		const columns = layout.columns;
+		const rowGap = layout.rowGap;
+		const rowHeight = itemHeight + rowGap;
+		const totalRows = Math.ceil(count / columns);
+
+		let firstRow = Math.max(0, Math.floor(scrollTop / rowHeight) - BUFFER_ROWS);
+		firstRow = Math.min(firstRow, totalRows);
+		const visibleRows = Math.ceil(viewportHeight / rowHeight) + BUFFER_ROWS * 2;
+		const lastRow = Math.min(firstRow + visibleRows, totalRows);
+
+		const start = Math.min(firstRow * columns, count);
+		const end = Math.min(lastRow * columns, count);
 
 		if (start === this._vStart && end === this._vEnd) return;
 
 		this._vStart = start;
 		this._vEnd = end;
 
-		const topSpacerHeight = start * itemHeight;
-		const bottomSpacerHeight = (count - end) * itemHeight;
+		const topSpacerHeight = firstRow * rowHeight;
+		const bottomSpacerHeight = (totalRows - lastRow) * rowHeight;
 
 		if (this.isDataDriven) {
 			const frag = document.createDocumentFragment();
@@ -726,6 +772,10 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			}
 		}
 		this._selectAllCheckbox.checked = allSelected;
+	};
+
+	_component.prototype._requestData = function () {
+		requestData(this, 'ln-list:request-data', 'list');
 	};
 
 	_component.prototype._updateFooter = function () {

@@ -28,15 +28,15 @@ Used when the backend server prints standard `<tr>` rows directly into the HTML 
                 </th>
             </tr>
             <tr>
-                <th data-ln-sort="string">
+                <th data-ln-table-sort="string">
                     Name
-                    <button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
-                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
-                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
+                    <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
                     </button>
                 </th>
-                <th data-ln-sort="string" data-ln-filter-col="dept">
+                <th data-ln-table-sort="string" data-ln-table-filter-col="dept">
                     Department
                     <button type="button" class="table-filter" aria-label="Filter" data-ln-popover-for="filter-dept">
                         <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
@@ -85,25 +85,25 @@ Opted in by specifying the `data-ln-table-source` attribute. Rows are dynamicall
                         <form role="search" onsubmit="return false;">
                             <label>
                                 <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-                                <input type="search" placeholder="Search..." data-ln-table-search>
+                                <input type="search" placeholder="Search..." data-ln-search="products-table">
                             </label>
                         </form>
                     </div>
                 </th>
             </tr>
             <tr>
-                <th data-ln-col-select></th>
-                <th data-ln-col="name">
+                <th data-ln-table-col-select></th>
+                <th data-ln-table-col="name">
                     Product Name
-                    <button type="button" class="table-sort" data-ln-col-sort aria-label="Sort">
-                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
-                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
-                        <svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
+                    <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
                     </button>
                 </th>
-                <th data-ln-col="category">
+                <th data-ln-table-col="category">
                     Category
-                    <button type="button" class="table-filter" data-ln-col-filter aria-label="Filter">
+                    <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter">
                         <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
                     </button>
                 </th>
@@ -120,8 +120,8 @@ Opted in by specifying the `data-ln-table-source` attribute. Rows are dynamicall
 
     <!-- Row Template -->
     <template data-ln-template="products-row">
-        <tr data-ln-row>
-            <td><input type="checkbox" data-ln-row-select></td>
+        <tr data-ln-table-row>
+            <td><input type="checkbox" data-ln-table-row-select></td>
             <td>{{ name }}</td>
             <td>{{ category }}</td>
         </tr>

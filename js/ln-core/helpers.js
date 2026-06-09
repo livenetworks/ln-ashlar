@@ -36,6 +36,40 @@ export function dispatchCancelable(element, eventName, detail) {
 	return event;
 }
 
+/**
+ * Re-filter / re-sort / re-render a data-driven list-like component, then
+ * notify the coordinator that fresh data is requested.
+ *
+ * Shared by ln-list and ln-table. The passed `component` MUST expose this
+ * instance contract:
+ *   - _applyFilterAndSort()  method
+ *   - _render()              method
+ *   - _updateFooter()        method
+ *   - _vStart, _vEnd         number (reset to -1 to force a full re-render)
+ *   - dom                    the component root element (dispatch target)
+ *   - name                   the component's name (becomes detail[keyName])
+ *   - currentSort, currentFilters, currentSearch
+ *
+ * @param {Object} component  component instance satisfying the contract above
+ * @param {string} eventName  e.g. 'ln-table:request-data' / 'ln-list:request-data'
+ * @param {string} keyName    payload key for the name, e.g. 'table' / 'list'
+ */
+export function requestData(component, eventName, keyName) {
+	component._applyFilterAndSort();
+	component._vStart = -1;
+	component._vEnd = -1;
+	component._render();
+	component._updateFooter();
+
+	const detail = {
+		sort: component.currentSort,
+		filters: component.currentFilters,
+		search: component.currentSearch
+	};
+	detail[keyName] = component.name;
+	dispatch(component.dom, eventName, detail);
+}
+
 // ─── Declarative DOM Binding ───────────────────────────────
 
 export function fill(root, data) {

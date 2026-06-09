@@ -1,37 +1,37 @@
 # Table Sort
 
-Sort header handler for tables. Companion to `ln-table` — detects `th[data-ln-sort]` headers and dispatches sort events on click. File: `js/ln-table/ln-table-sort.js`.
+Sort header handler for tables. Companion to `ln-table` — detects `th[data-ln-table-sort]` headers and dispatches sort events on click. File: `js/ln-table/ln-table-sort.js`.
 
 ## HTML
 
-Each sortable `<th>` **must** contain a `<button data-ln-table-sort>` — the JS click handler binds to the button, not the `<th>`. Without the button, sort silently no-ops (a CSS dev affordance flags the omission).
+Each sortable `<th>` **must** contain a `<button data-ln-table-col-sort>` — the JS click handler binds to the button, not the `<th>`. Without the button, sort silently no-ops (a CSS dev affordance flags the omission).
 
 ```html
 <table data-ln-table>
     <thead>
         <tr>
-            <th data-ln-sort="string">
+            <th data-ln-table-sort="string">
                 Name
-                <button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-                    <svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                    <svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                    <svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
                 </button>
             </th>
-            <th data-ln-sort="number">
+            <th data-ln-table-sort="number">
                 Age
-                <button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-                    <svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                    <svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                    <svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
                 </button>
             </th>
-            <th data-ln-sort="date">
+            <th data-ln-table-sort="date">
                 Created
-                <button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-                    <svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                    <svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                    <svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+                <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+                    <svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
                 </button>
             </th>
             <th>Actions</th> <!-- not sortable -->
@@ -41,15 +41,15 @@ Each sortable `<th>` **must** contain a `<button data-ln-table-sort>` — the JS
 </table>
 ```
 
-Auto-initialized for any `<table>` containing `th[data-ln-sort]` headers. Each sortable `<th>` **requires** a `<button data-ln-table-sort>` child — the sort button is the JS click target.
+Auto-initialized for any `<table>` containing `th[data-ln-table-sort]` headers. Each sortable `<th>` **requires** a `<button data-ln-table-col-sort>` child — the sort button is the JS click target.
 
 ## Attributes
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
-| `data-ln-sort="type"` | `<th>` | Enables sorting. Type: `string`, `number`, or `date` |
-| `data-ln-table-sort` | `<button>` inside `<th>` | Click target for sort. Required — JS binds to this button. |
-| `data-ln-sort-icon="none\|asc\|desc"` | `<svg>` inside the button | Sort direction indicator. CSS controls visibility via `.ln-sort-asc` / `.ln-sort-desc` on the `<th>`. |
+| `data-ln-table-sort="type"` | `<th>` | Enables sorting. Type: `string`, `number`, or `date` |
+| `data-ln-table-col-sort` | `<button>` inside `<th>` | Click target for sort. Required — JS binds to this button. |
+| `data-ln-table-col-sort-icon="none\|asc\|desc"` | `<svg>` inside the button | Sort direction indicator. CSS controls visibility via `.ln-sort-asc` / `.ln-sort-desc` on the `<th>`. |
 
 ## Events
 
@@ -58,7 +58,7 @@ Auto-initialized for any `<table>` containing `th[data-ln-sort]` headers. Each s
 | `ln-table:sort` | yes | no | `{ column, sortType, direction }` |
 
 - `column`: zero-based column index
-- `sortType`: the `data-ln-sort` value (`string`, `number`, `date`)
+- `sortType`: the `data-ln-table-sort` value (`string`, `number`, `date`)
 - `direction`: `'asc'`, `'desc'`, or `null` (unsorted)
 
 ## Click Cycle
@@ -75,20 +75,20 @@ Clicking a different column resets the previous column and starts at `asc`.
 
 - Adds `.ln-sort-asc` or `.ln-sort-desc` class to the active `<th>` — use these for CSS arrows
 - Removes `.ln-sort-asc` / `.ln-sort-desc` from all other headers when a new column is clicked
-- Toggles visibility of `[data-ln-sort-icon]` elements inside the sort button to show the correct direction icon (CSS owns visibility via the `.ln-sort-asc` / `.ln-sort-desc` state classes)
+- Toggles visibility of `[data-ln-table-col-sort-icon]` elements inside the sort button to show the correct direction icon (CSS owns visibility via the `.ln-sort-asc` / `.ln-sort-desc` state classes)
 - The event is consumed by `ln-table` (if present) which performs the actual sort on its in-memory data
 - Can also be used standalone — listen for `ln-table:sort` on the table and implement your own sorting
 
 ## CSS Styling
 
 ```scss
-th[data-ln-sort] {
+th[data-ln-table-sort] {
     cursor: pointer;
     user-select: none;
 }
 
 // Icons controlled via state classes on the th — CSS owns visibility.
-// .ln-sort-asc / .ln-sort-desc on <th> selects the matching [data-ln-sort-icon] svg.
+// .ln-sort-asc / .ln-sort-desc on <th> selects the matching [data-ln-table-col-sort-icon] svg.
 ```
 
 ---
@@ -109,7 +109,7 @@ Each table gets a `_component` instance stored at `table.lnTableSort`. Instance 
 ### Click Handler
 
 ```
-click on button[data-ln-table-sort] inside th[data-ln-sort]
+click on button[data-ln-table-col-sort] inside th[data-ln-table-sort]
     |
     v
 _handleClick(colIndex, th):
@@ -153,7 +153,7 @@ Each `<th>` gets a `lnTableSortBound = true` property to prevent duplicate click
 A single global observer watches `document.body` for:
 
 - **`childList`** (subtree): new elements → scan for tables with sortable headers
-- **`attributes`** (`data-ln-sort`): attribute added to existing `<th>` → re-scan parent table
+- **`attributes`** (`data-ln-table-sort`): attribute added to existing `<th>` → re-scan parent table
 
 ---
 
@@ -162,7 +162,7 @@ A single global observer watches `document.body` for:
 To prevent silent failures during local integration (such as designating a column sortable but forgetting the required sort button), `ln-ashlar` ships with a dedicated development validation stylesheet: `demo/dist/ln-ashlar-dev.css`.
 
 ### Missing Sort Button Detection
-If a `<th>` is marked sortable (`data-ln-sort`) but does not contain a `<button data-ln-table-sort>`, `ln-ashlar-dev.css` will automatically render a warning text adjacent to the header:
+If a `<th>` is marked sortable (`data-ln-table-sort`) but does not contain a `<button data-ln-table-col-sort>`, `ln-ashlar-dev.css` will automatically render a warning text adjacent to the header:
 ```
 ⚠ missing sort button
 ```

@@ -1,9 +1,9 @@
-import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
 	const DOM_ATTRIBUTE = 'lnTable';
-	const SORT_ATTR = 'data-ln-sort';        // read-only: column type metadata (number/date/string) used when parsing rows
+	const SORT_ATTR = 'data-ln-table-sort';
 	const EMPTY_TEMPLATE = 'data-ln-table-empty';
 	// Tuning constant — duplicated in ln-data-table for component independence
 	const VIRTUAL_THRESHOLD = 200;
@@ -84,9 +84,9 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			this._filterOptions = {};
 			this._filterableFields = this.ths
 				.filter(function (th) {
-					return th.getAttribute('data-ln-col') && th.querySelector('[data-ln-col-filter]');
+					return th.getAttribute('data-ln-table-col') && th.querySelector('[data-ln-table-col-filter]');
 				})
-				.map(function (th) { return th.getAttribute('data-ln-col'); });
+				.map(function (th) { return th.getAttribute('data-ln-table-col'); });
 
 			// Footer elements
 			this._totalSpan = dom.querySelector('[data-ln-table-total]');
@@ -144,11 +144,11 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 
 			// --- Sort Click ---
 			this._onSortClick = function (e) {
-				const btn = e.target.closest('[data-ln-col-sort]');
+				const btn = e.target.closest('[data-ln-table-col-sort]');
 				if (!btn) return;
 				const th = btn.closest('th');
 				if (!th) return;
-				const field = th.getAttribute('data-ln-col');
+				const field = th.getAttribute('data-ln-table-col');
 				if (!field) return;
 				self._handleSort(field, th);
 			};
@@ -159,12 +159,12 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			// --- Filter Click ---
 			this._activeDropdown = null;
 			this._onFilterClick = function (e) {
-				const btn = e.target.closest('[data-ln-col-filter]');
+				const btn = e.target.closest('[data-ln-table-col-filter]');
 				if (!btn) return;
 				e.stopPropagation();
 				const th = btn.closest('th');
 				if (!th) return;
-				const field = th.getAttribute('data-ln-col');
+				const field = th.getAttribute('data-ln-table-col');
 				if (!field) return;
 
 				if (self._activeDropdown && self._activeDropdown.field === field) {
@@ -202,15 +202,15 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 
 			// --- Row Click & Actions ---
 			this._onRowClick = function (e) {
-				if (e.target.closest('[data-ln-row-select]')) return;
-				if (e.target.closest('[data-ln-row-action]')) return;
+				if (e.target.closest('[data-ln-table-row-select]')) return;
+				if (e.target.closest('[data-ln-table-row-action]')) return;
 				if (e.target.closest('a') || e.target.closest('button')) return;
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
 
-				const tr = e.target.closest('[data-ln-row]');
+				const tr = e.target.closest('[data-ln-table-row]');
 				if (!tr) return;
 
-				const id = tr.getAttribute('data-ln-row-id');
+				const id = tr.getAttribute('data-ln-table-row-id');
 				const record = tr._lnRecord || {};
 
 				dispatch(dom, 'ln-table:row-click', {
@@ -222,15 +222,15 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			if (this.tbody) this.tbody.addEventListener('click', this._onRowClick);
 
 			this._onRowAction = function (e) {
-				const btn = e.target.closest('[data-ln-row-action]');
+				const btn = e.target.closest('[data-ln-table-row-action]');
 				if (!btn) return;
 
 				e.stopPropagation();
-				const tr = btn.closest('[data-ln-row]');
+				const tr = btn.closest('[data-ln-table-row]');
 				if (!tr) return;
 
-				const action = btn.getAttribute('data-ln-row-action');
-				const id = tr.getAttribute('data-ln-row-id');
+				const action = btn.getAttribute('data-ln-table-row-action');
+				const id = tr.getAttribute('data-ln-table-row-id');
 				const record = tr._lnRecord || {};
 
 				dispatch(dom, 'ln-table:row-action', {
@@ -242,23 +242,20 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			};
 			if (this.tbody) this.tbody.addEventListener('click', this._onRowAction);
 
-			// --- Search Input ---
-			this._searchInput = dom.querySelector('[data-ln-table-search]');
-			if (this._searchInput) {
-				const isManagedByLnSearch = this._searchInput.closest('[data-ln-search]') ||
-					document.querySelector(`[data-ln-search="${dom.id}"]`);
-
-				if (!isManagedByLnSearch) {
-					this._onSearchInput = function () {
-						self.currentSearch = self._searchInput.value;
-						dispatch(dom, 'ln-table:search', {
-							table: self.name,
-							query: self.currentSearch
-						});
-						self._requestData();
-					};
-					this._searchInput.addEventListener('input', this._onSearchInput);
-				}
+			// --- Search Input (resolved from the ln-search host that drives this table) ---
+			// ln-table is driven by ln-search:change. We re-source _searchInput from the
+			// ln-search host purely to support the value-mirror (_onSearchChange) and the
+			// '/'-key focus shortcut — never as an independent search driver.
+			const searchHost = document.querySelector('[data-ln-search="' + dom.id + '"]');
+			if (searchHost) {
+				const hostTag = searchHost.tagName;
+				this._searchInput = (hostTag === 'INPUT' || hostTag === 'TEXTAREA')
+					? searchHost
+					: searchHost.querySelector('input[type="search"]')
+						|| searchHost.querySelector('input[type="text"]')
+						|| searchHost.querySelector('input');
+			} else {
+				this._searchInput = null;
 			}
 
 			this._onSearchChange = function (e) {
@@ -289,7 +286,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 					return;
 				}
 
-				const rows = self.tbody ? Array.from(self.tbody.querySelectorAll('[data-ln-row]')) : [];
+				const rows = self.tbody ? Array.from(self.tbody.querySelectorAll('[data-ln-table-row]')) : [];
 				if (!rows.length) return;
 
 				switch (e.key) {
@@ -319,7 +316,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 							const tr = rows[self._focusedRowIndex];
 							dispatch(dom, 'ln-table:row-click', {
 								table: self.name,
-								id: tr.getAttribute('data-ln-row-id'),
+								id: tr.getAttribute('data-ln-table-row-id'),
 								record: tr._lnRecord || {}
 							});
 						}
@@ -327,7 +324,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 					case ' ':
 						if (self._selectable && self._focusedRowIndex >= 0 && self._focusedRowIndex < rows.length) {
 							e.preventDefault();
-							const cb = rows[self._focusedRowIndex].querySelector('[data-ln-row-select]');
+							const cb = rows[self._focusedRowIndex].querySelector('[data-ln-table-row-select]');
 							if (cb) {
 								cb.checked = !cb.checked;
 								cb.dispatchEvent(new Event('change', { bubbles: true }));
@@ -409,7 +406,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 				const key = e.detail.key;
 				let hasMappedColumn = false;
 				for (let i = 0; i < self.ths.length; i++) {
-					if (self.ths[i].getAttribute('data-ln-filter-col') === key) {
+					if (self.ths[i].getAttribute('data-ln-table-filter-col') === key) {
 						hasMappedColumn = true;
 						break;
 					}
@@ -427,12 +424,12 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 					self._columnFilters[key] = lower;
 				}
 
-				const th = self.dom.querySelector('th[data-ln-filter-col="' + key + '"]');
+				const th = self.dom.querySelector('th[data-ln-table-filter-col="' + key + '"]');
 				if (th) {
 					if (values && values.length > 0) {
-						th.setAttribute('data-ln-filter-active', '');
+						th.setAttribute('data-ln-table-filter-active', '');
 					} else {
-						th.removeAttribute('data-ln-filter-active');
+						th.removeAttribute('data-ln-table-filter-active');
 					}
 				}
 
@@ -461,7 +458,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 
 				self._columnFilters = {};
 				for (let i = 0; i < self.ths.length; i++) {
-					self.ths[i].removeAttribute('data-ln-filter-active');
+					self.ths[i].removeAttribute('data-ln-table-filter-active');
 				}
 
 				const filters = document.querySelectorAll('[data-ln-filter="' + dom.id + '"]');
@@ -513,7 +510,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			for (let j = 0; j < tr.cells.length; j++) {
 				const td = tr.cells[j];
 				const text = td.textContent.trim();
-				const raw = td.hasAttribute('data-ln-value') ? td.getAttribute('data-ln-value') : text;
+				const raw = td.hasAttribute('data-ln-table-value') ? td.getAttribute('data-ln-table-value') : text;
 				const type = sortTypes[j];
 
 				rawTexts[j] = text.toLowerCase();
@@ -532,17 +529,17 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			let record = null;
 			if (this.isDataDriven) {
 				record = {};
-				const id = tr.getAttribute('data-ln-row-id');
+				const id = tr.getAttribute('data-ln-table-row-id');
 				if (id != null) record.id = id;
 				
 				for (let j = 0; j < ths.length; j++) {
-					const field = ths[j].getAttribute('data-ln-col');
+					const field = ths[j].getAttribute('data-ln-table-col');
 					if (field) {
 						const cellIndex = j;
 						if (cellIndex < tr.cells.length) {
 							const td = tr.cells[cellIndex];
 							const text = td.textContent.trim();
-							record[field] = td.hasAttribute('data-ln-value') ? td.getAttribute('data-ln-value') : text;
+							record[field] = td.hasAttribute('data-ln-table-value') ? td.getAttribute('data-ln-table-value') : text;
 						}
 					}
 				}
@@ -623,7 +620,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			let sortType = null;
 			if (this.ths) {
 				for (let i = 0; i < this.ths.length; i++) {
-					if (this.ths[i].getAttribute('data-ln-col') === field) {
+					if (this.ths[i].getAttribute('data-ln-table-col') === field) {
 						sortType = this.ths[i].getAttribute(SORT_ATTR);
 						break;
 					}
@@ -662,7 +659,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			const colIndexByKey = {};
 			if (hasColFilters) {
 				for (let i = 0; i < ths.length; i++) {
-					const filterKey = ths[i].getAttribute('data-ln-filter-col');
+					const filterKey = ths[i].getAttribute('data-ln-table-filter-col');
 					if (filterKey) colIndexByKey[filterKey] = i;
 				}
 			}
@@ -957,10 +954,10 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			clone = cloneTemplateScoped(this.dom, templateName, 'ln-table');
 
 			if (!clone) {
-				const genericTpl = this.dom.querySelector('template[data-ln-empty]');
+				const genericTpl = this.dom.querySelector('template[data-ln-table-empty]');
 				if (genericTpl) {
 					const whenVal = isFiltered ? 'search' : 'initial';
-					const subEl = genericTpl.content.querySelector('[data-ln-empty-when="' + whenVal + '"]')
+					const subEl = genericTpl.content.querySelector('[data-ln-table-empty-when="' + whenVal + '"]')
 						|| genericTpl.content.firstElementChild;
 					if (subEl) {
 						clone = document.importNode(subEl, true);
@@ -1004,10 +1001,10 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 	_component.prototype._fillRow = function (tr, record) {
 		fillTemplate(tr, record);
 
-		const cellAttrs = tr.querySelectorAll('[data-ln-cell-attr]');
+		const cellAttrs = tr.querySelectorAll('[data-ln-table-cell-attr]');
 		for (let i = 0; i < cellAttrs.length; i++) {
 			const el = cellAttrs[i];
-			const pairs = el.getAttribute('data-ln-cell-attr').split(',');
+			const pairs = el.getAttribute('data-ln-table-cell-attr').split(',');
 			for (let j = 0; j < pairs.length; j++) {
 				const parts = pairs[j].trim().split(':');
 				if (parts.length !== 2) continue;
@@ -1024,19 +1021,19 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		const clone = cloneTemplateScoped(this.dom, this.name + '-row', 'ln-table');
 		if (!clone) return null;
 
-		const tr = clone.querySelector('[data-ln-row]') || clone.firstElementChild;
+		const tr = clone.querySelector('[data-ln-table-row]') || clone.firstElementChild;
 		if (!tr) return null;
 
 		this._fillRow(tr, record);
 
 		tr._lnRecord = record;
 		if (record.id != null) {
-			tr.setAttribute('data-ln-row-id', record.id);
+			tr.setAttribute('data-ln-table-row-id', record.id);
 		}
 
 		if (this._selectable && record.id != null && this.selectedIds.has(String(record.id))) {
 			tr.classList.add('ln-row-selected');
-			const rowCb = tr.querySelector('[data-ln-row-select]');
+			const rowCb = tr.querySelector('[data-ln-table-row-select]');
 			if (rowCb) rowCb.checked = true;
 		}
 
@@ -1089,9 +1086,9 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		const ths = this.ths;
 		for (let i = 0; i < ths.length; i++) {
 			const th = ths[i];
-			const field = th.getAttribute('data-ln-col');
+			const field = th.getAttribute('data-ln-table-col');
 			if (!field) continue;
-			const btn = th.querySelector('[data-ln-col-filter]');
+			const btn = th.querySelector('[data-ln-table-col-filter]');
 			if (!btn) continue;
 			const hasFilter = this.currentFilters[field] && this.currentFilters[field].length > 0;
 			btn.classList.toggle('ln-filter-active', !!hasFilter);
@@ -1255,28 +1252,17 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 	};
 
 	_component.prototype._requestData = function () {
-		this._applyFilterAndSort();
-		this._vStart = -1;
-		this._vEnd = -1;
-		this._render();
-		this._updateFooter();
-
-		dispatch(this.dom, 'ln-table:request-data', {
-			table: this.name,
-			sort: this.currentSort,
-			filters: this.currentFilters,
-			search: this.currentSearch
-		});
+		requestData(this, 'ln-table:request-data', 'table');
 	};
 
 	// ─── Selection Helpers ─────────────────────────────────────
 
 	_component.prototype._updateSelectAll = function () {
 		if (!this._selectAllCheckbox || !this.tbody) return;
-		const rows = this.tbody.querySelectorAll('[data-ln-row]');
+		const rows = this.tbody.querySelectorAll('[data-ln-table-row]');
 		let allSelected = rows.length > 0;
 		for (let i = 0; i < rows.length; i++) {
-			const id = rows[i].getAttribute('data-ln-row-id');
+			const id = rows[i].getAttribute('data-ln-table-row-id');
 			if (id != null && !this.selectedIds.has(id)) {
 				allSelected = false;
 				break;
@@ -1296,11 +1282,11 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 
 		const self = this;
 		this._onSelectionChange = function (e) {
-			const checkbox = e.target.closest('[data-ln-row-select]');
+			const checkbox = e.target.closest('[data-ln-table-row-select]');
 			if (!checkbox) return;
-			const tr = checkbox.closest('[data-ln-row]');
+			const tr = checkbox.closest('[data-ln-table-row]');
 			if (!tr) return;
-			const id = tr.getAttribute('data-ln-row-id');
+			const id = tr.getAttribute('data-ln-table-row-id');
 			if (id == null) return;
 
 			if (checkbox.checked) {
@@ -1323,8 +1309,8 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		};
 		if (this.tbody) this.tbody.addEventListener('change', this._onSelectionChange);
 
-		this._selectAllCheckbox = this.dom.querySelector('[data-ln-col-select] input[type="checkbox"]')
-			|| this.dom.querySelector('[data-ln-col-select]');
+		this._selectAllCheckbox = this.dom.querySelector('[data-ln-table-col-select] input[type="checkbox"]')
+			|| this.dom.querySelector('[data-ln-table-col-select]');
 		if (this._selectAllCheckbox && this._selectAllCheckbox.tagName === 'TH') {
 			const cb = document.createElement('input');
 			cb.type = 'checkbox';
@@ -1336,11 +1322,11 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		if (this._selectAllCheckbox) {
 			this._onSelectAll = function () {
 				const checked = self._selectAllCheckbox.checked;
-				const rows = self.tbody ? self.tbody.querySelectorAll('[data-ln-row]') : [];
+				const rows = self.tbody ? self.tbody.querySelectorAll('[data-ln-table-row]') : [];
 
 				for (let i = 0; i < rows.length; i++) {
-					const id = rows[i].getAttribute('data-ln-row-id');
-					const rowCb = rows[i].querySelector('[data-ln-row-select]');
+					const id = rows[i].getAttribute('data-ln-table-row-id');
+					const rowCb = rows[i].querySelector('[data-ln-table-row-select]');
 					if (id == null) continue;
 
 					if (checked) {
@@ -1369,10 +1355,10 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		}
 
 		if (this.tbody) {
-			const rows = this.tbody.querySelectorAll('[data-ln-row]');
+			const rows = this.tbody.querySelectorAll('[data-ln-table-row]');
 			for (let i = 0; i < rows.length; i++) {
-				const cb = rows[i].querySelector('[data-ln-row-select]');
-				const id = rows[i].getAttribute('data-ln-row-id');
+				const cb = rows[i].querySelector('[data-ln-table-row-select]');
+				const id = rows[i].getAttribute('data-ln-table-row-id');
 				if (cb && cb.checked && id != null) {
 					this.selectedIds.add(id);
 					rows[i].classList.add('ln-row-selected');
@@ -1394,7 +1380,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 		}
 
-		const th = this.dom.querySelector('[data-ln-col-select]');
+		const th = this.dom.querySelector('[data-ln-table-col-select]');
 		if (th) {
 			const cb = th.querySelector('input[type="checkbox"]');
 			if (cb) {
@@ -1407,10 +1393,10 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 		this.selectedCount = 0;
 
 		if (this.tbody) {
-			const rows = this.tbody.querySelectorAll('[data-ln-row]');
+			const rows = this.tbody.querySelectorAll('[data-ln-table-row]');
 			for (let i = 0; i < rows.length; i++) {
 				rows[i].classList.remove('ln-row-selected');
-				const cb = rows[i].querySelector('[data-ln-row-select]');
+				const cb = rows[i].querySelector('[data-ln-table-row-select]');
 				if (cb) cb.checked = false;
 			}
 		}
@@ -1479,8 +1465,7 @@ import { cloneTemplateScoped, dispatch, fill, fillTemplate, registerComponent } 
 			}
 			document.removeEventListener('click', this._onDocClick);
 			document.removeEventListener('keydown', this._onKeydown);
-			if (this._searchInput) this._searchInput.removeEventListener('input', this._onSearchInput);
-			if (this._onSearchChange) this.dom.removeEventListener('ln-search:change', this._onSearchChange);
+if (this._onSearchChange) this.dom.removeEventListener('ln-search:change', this._onSearchChange);
 			if (this.tbody) {
 				this.tbody.removeEventListener('click', this._onRowClick);
 				this.tbody.removeEventListener('click', this._onRowAction);

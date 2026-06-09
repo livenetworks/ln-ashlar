@@ -24,6 +24,25 @@ wrapper owns border, padding, and focus ring.
 Applied via `@include form-input-icon-group` on a semantic selector — no
 class needed on the `<label>`.
 
+For a compact search field — capped width, recessed fill, white clear-button
+hover, tighter padding, 1rem icons — use `class="search"`:
+
+```html
+<label class="search">
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+	<input type="search" placeholder="Search…" data-ln-search="my-list">
+	<button type="button" data-ln-search-clear aria-label="Clear search">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+	</button>
+</label>
+```
+
+`class="search"` is a library component (`scss/components/_form.scss`:
+`.search { @include search; }`) — a delta-only variant of `@include
+form-input-icon-group`: capped width, recessed fill, white clear-button hover,
+1rem icons. The base icon-group chrome still comes from the global auto-bind, so
+the label must wrap an icon + search input.
+
 ### Vertical rhythm decision
 
 Icon-group inputs use a tighter line-height than a standalone

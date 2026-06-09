@@ -238,30 +238,28 @@
 					</button>
 					</span>
 				</div>
-				<form role="search" onsubmit="return false;">
-					<label data-ln-search="documents-table">
-						<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-						<input type="search" placeholder="Search…" data-ln-table-search>
-						<button type="button" data-ln-search-clear aria-label="Clear search">
-							<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
-						</button>
-					</label>
-					<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
-						New
+				<label class="search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Search…" data-ln-search="documents-table">
+					<button type="button" data-ln-search-clear aria-label="Clear search">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
-				</form>
+				</label>
+				<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+					New
+				</button>
 			</header>
 
 			<table>
 				<thead>
 					<tr>
-						<th data-ln-col-select></th>
-						<th data-ln-col="title">Title <button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-						<th data-ln-col="department">Department <button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button type="button" class="table-filter" data-ln-col-filter aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
-						<th data-ln-col="status">Status <button type="button" class="table-filter" data-ln-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
-						<th data-ln-col="file_size">Size <button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-						<th data-ln-col="updated_at">Updated <button type="button" class="table-sort" data-ln-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col-select></th>
+						<th data-ln-table-col="title">Title <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="file_size">Size <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="updated_at">Updated <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -273,8 +271,8 @@
 			</footer>
 
 			<template data-ln-template="documents-row">
-				<tr data-ln-row>
-					<td><input type="checkbox" data-ln-row-select></td>
+				<tr data-ln-table-row>
+					<td><input type="checkbox" data-ln-table-row-select></td>
 					<td>{{ title }}</td>
 					<td>{{ department }}</td>
 					<td>{{ status }}</td>
@@ -282,8 +280,8 @@
 					<td>{{ updated_display }}</td>
 					<td>
 						<ul class="row-actions">
-							<li><button data-ln-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-							<li><button data-ln-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+							<li><button data-ln-table-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+							<li><button data-ln-table-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 						</ul>
 					</td>
 				</tr>

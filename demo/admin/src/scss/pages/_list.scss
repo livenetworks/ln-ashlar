@@ -1,0 +1,159 @@
+@use '../../../../../scss/config/mixins' as *;
+
+// Demo-local tile recipe — surface + border + radius + flex-col layout ONLY.
+// Deliberately NOT @mixin card: card binds panel-header/footer chrome to
+// > header / > footer, which a flat tile must not inherit. Kept demo-scoped
+// (NOT added to scss/config/mixins/) — it must not pollute the library set.
+@mixin doc-tile {
+	--color-bg: var(--bg-base);
+	background: var(--color-bg);
+	@include border; // reads --color-border (= --border-subtle)
+	@include rounded-md;
+	@include flex-col;
+	gap: var(--size-2xs);
+	padding: var(--size-md);
+	overflow: hidden;
+}
+
+// ─── Integration log terminal ───────────────────────────
+// Demo log viewport — fixed height is intentional (scrollable console).
+#hybrid-log {
+	background: var(--bg-recessed);
+	padding: var(--size-md);
+	border: 1px solid var(--border-subtle);
+	border-radius: var(--radius-md);
+	font-family: var(--font-mono);
+	font-size: var(--text-body-sm);
+	line-height: var(--lh-body-md);
+	height: 160px;
+	overflow-y: auto;
+}
+
+// ─── Sandbox controls ───────────────────────────────────
+.demo-sandbox-controls { @include row(var(--size-md)); @include flex-wrap; margin-block-end: var(--size-md); }
+.demo-sandbox-label    { @include row(var(--size-xs)); }
+
+// ─── Stats footer ───────────────────────────────────────
+.demo-controls {
+	@include row(var(--size-xs));
+	@include flex-wrap;
+	margin-block-end: var(--size-md);
+}
+.demo-stats-footer {
+	margin-block-start: var(--size-xs);
+	font-size: var(--text-body-sm);
+	color: var(--fg-muted);
+}
+
+// ─── Empty state (demo-scoped — consumers name their own) ─
+#hybrid-list .demo-list-empty {
+	grid-column: 1 / -1;
+	padding: var(--size-lg);
+	text-align: center;
+	color: var(--fg-muted);
+}
+
+// ─── List body: grid + scroll container (contract #1) ───
+#hybrid-list {
+	height: 400px;
+	overflow-y: auto;
+	border: 1px solid var(--border-subtle);
+	padding: var(--size-md);
+	background: var(--bg-recessed);
+	list-style: none;
+	border-radius: var(--radius-lg);
+	margin-block: var(--size-md);
+
+	display: grid;
+	// DELIBERATE literal track function — do NOT convert to a cq-/mq- mixin.
+	// auto-fill (not auto-fit) is required so the column-aware ln-list JS reads
+	// the true resolved track count; auto-fit collapses empty tracks and
+	// desyncs the virtual-scroll window math. See Locked Decisions #1.
+	grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+	gap: var(--size-md); // row-gap = inter-row spacing, the ONLY vertical spacing
+	align-content: start; // prevent track stretching from inflating measured row height
+}
+
+// ─── Card tile: fixed-height flat tile (contract #2) ────
+#hybrid-list > li {
+	@include doc-tile;
+	height: 9rem; // FIXED — contract #2, locked placeholder value
+	margin-block: 0; // contract #2 — vertical spacing via grid gap only
+
+	> header.card-tile-top { @include row-between(var(--size-sm)); }
+	> footer.card-tile-actions {
+		margin-top: auto; // pin delete to tile bottom
+		justify-content: flex-end;
+		// Red delete action — token-driven, no btn--danger class.
+		button { --color-primary: var(--color-error); }
+	}
+
+	.card-tile-title {
+		@include truncate; // ellipsis — contract #2
+		@include font-semibold;
+		font-size: var(--text-body-md);
+		color: var(--fg-default);
+	}
+	.card-tile-author {
+		font-size: var(--text-body-sm);
+		color: var(--fg-muted);
+	}
+}
+
+// ─── Selection highlight (department-tinted) ─────────────
+// Visual driven by :has([data-ln-item-select]:checked) so the whole card adopts
+// its department nijansa when checked. The library .ln-item-selected class is NOT
+// used for the visual here (it is left intact for the library's own select
+// event/count logic) — we read native checkbox :checked state instead.
+// --color-accent is the department hue (set in the colour-cascade block) and is
+// already a full color, so it is used bare — NOT re-wrapped as hsl(...).
+#hybrid-list > li:has([data-ln-item-select]:checked) {
+	border-color: var(--color-accent);
+	background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+}
+
+// ─── Spacer chrome neutralization (contract #3) ─────────
+// grid-column: 1 / -1 lives in the LIBRARY (js/ln-list/ln-list.scss).
+// Only the chrome reset is demo-scoped so the library-injected spacer <li>
+// does not inherit the tile's padding/border/background. The .ln-list__spacer
+// class out-specifies the `> li` element selector — doc-tile applies, this wins.
+#hybrid-list .ln-list__spacer {
+	padding: 0;
+	border: none;
+	margin: 0;
+	background: none;
+	box-shadow: none;
+	height: auto; // JS sets inline height; do not fight it
+}
+
+// ─── Department colour cascade (map + @each) ─────────────
+// The per-department hue lives on the card <li> as --color-primary, NOT on the
+// badge. From the <li> it cascades down:
+//   • badge      → @mixin badge / tinted-surface reads --color-primary (bg/text/dot)
+//   • selection  → :has(:checked) rule below reads --color-accent (set just below)
+//   • checkbox   → @mixin form-check reads --color-accent for the checked fill
+// --color-primary is keyed off the contained badge's [data-dept] via :has() so
+// both SSR (literal data-dept) and synced rows (data-ln-attr-filled data-dept)
+// resolve identically. The `i` flag matches "Operations" vs "operations".
+//
+// --color-accent is set ONCE (department-independent expression — only
+// --color-primary varies per dept), bringing the department hue to the checkbox
+// checked-fill and the selection highlight. This REVERSES the previous note that
+// --color-accent was intentionally unset here.
+//
+// Delete button stays red WITHOUT an override: it is class="btn" → @mixin btn
+// re-declares --color-accent: hsl(var(--color-primary)) on the button itself from
+// its OWN local --color-primary: var(--color-error) (set above). The button's
+// locally-declared --color-accent out-resolves the inherited one, so it ignores
+// the <li>'s --color-accent entirely.
+//
+// Hook boundary: reading [data-dept] (pure data attr) and
+// [data-ln-item-select]:checked (native form state) in :has() for visual state is
+// acceptable — neither styles THROUGH a data-ln-* JS hook as the primary contract,
+// and the library .ln-item-selected class is left intact for its own select logic.
+#hybrid-list > li { --color-accent: hsl(var(--color-primary)); }
+
+$departments: (operations: 260, legal: 35, it: 200, finance: 145, sales: 340);
+@each $name, $hue in $departments {
+	#hybrid-list > li:has([data-dept="#{$name}" i]) { --color-primary: #{$hue} 85% 42%; }
+}

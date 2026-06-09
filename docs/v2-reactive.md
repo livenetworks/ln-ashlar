@@ -89,6 +89,10 @@ fill(containerEl, {
 
 Sets `el.textContent = data[prop]`. Skips if `data[prop]` is `null` or `undefined`.
 
+> [!IMPORTANT]
+> **`data-ln-field` is NOT a Custom Component**
+> There is no custom HTML element or component named `<ln-field>`. The `data-ln-field` attribute is a decorative binding instruction read and processed by the `fill(root, data)` utility function in `ln-core`. It should be applied to standard HTML tags (like `<h3>`, `<p>`, `<span>`, etc.).
+
 ---
 
 **`data-ln-attr="attr:prop, attr:prop"` → `setAttribute`**

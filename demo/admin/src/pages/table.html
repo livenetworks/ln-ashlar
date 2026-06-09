@@ -55,9 +55,9 @@
 									<tr><td data-label="Attribute"><code>data-ln-table</code></td><td data-label="On element">wrapper (needs <code>id</code>)</td><td data-label="Description">Component root. Parses rows, listens for events.</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-search="tableId"</code></td><td data-label="On element"><code>&lt;input&gt;</code> or wrapper</td><td data-label="Description">Standard <code>ln-search</code>. <code>ln-table</code> intercepts the event for in-memory filtering.</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-table-clear</code></td><td data-label="On element"><code>&lt;button&gt;</code></td><td data-label="Description">Clears search input.</td></tr>
-									<tr><td data-label="Attribute"><code>th[data-ln-sort="type"]</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Sortable column. Values: <code>string</code>, <code>number</code>, <code>date</code>.</td></tr>
-									<tr><td data-label="Attribute"><code>td[data-ln-value]</code></td><td data-label="On element"><code>&lt;td&gt;</code></td><td data-label="Description">Raw sort value when display text differs.</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-filter-col="key"</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Maps column to a filter key (used by <code>ln-filter</code>).</td></tr>
+									<tr><td data-label="Attribute"><code>th[data-ln-table-sort="type"]</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Sortable column. Values: <code>string</code>, <code>number</code>, <code>date</code>.</td></tr>
+									<tr><td data-label="Attribute"><code>td[data-ln-table-value]</code></td><td data-label="On element"><code>&lt;td&gt;</code></td><td data-label="Description">Raw sort value when display text differs.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-table-filter-col="key"</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Maps column to a filter key (used by <code>ln-filter</code>).</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-table-empty</code></td><td data-label="On element"><code>&lt;template&gt;</code></td><td data-label="Description">Content shown when filter returns 0 results.</td></tr>
 								</tbody>
 							</table>
@@ -85,34 +85,35 @@
 											<th colspan="6">
 												<div>
 													<h3>Products</h3>
-													<form role="search" onsubmit="return false;">
-														<label>
-															<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
-															<input type="search" placeholder="Search products..." data-ln-search="demo-table">
-														</label>
-														<span class="ln-table__count" id="demo-count"></span>
-													</form>
+													<label class="search">
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+														<input type="search" placeholder="Search products..." data-ln-search="demo-table">
+														<button type="button" data-ln-search-clear aria-label="Clear search">
+															<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+														</button>
+													</label>
+													<span class="ln-table__count" id="demo-count"></span>
 												</div>
 											</th>
 										</tr>
 										<tr>
-											<th data-ln-sort="number">
+											<th data-ln-table-sort="number">
 												#
-												<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 												</button>
 											</th>
-											<th data-ln-sort="string">
+											<th data-ln-table-sort="string">
 												Product
-												<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 												</button>
 											</th>
-											<th data-ln-sort="string" data-ln-filter-col="category">
+											<th data-ln-table-sort="string" data-ln-table-filter-col="category">
 												Category
 												<button type="button" class="table-filter" data-ln-popover-for="filter-category" aria-label="Filter category">
 													<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
@@ -128,29 +129,29 @@
 														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Components"> Components</label></li>
 													</ul>
 												</div>
-												<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 												</button>
 											</th>
-											<th data-ln-sort="number" class="numeric">
+											<th data-ln-table-sort="number" class="numeric">
 												Price
-												<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 												</button>
 											</th>
-											<th data-ln-sort="number" class="numeric">
+											<th data-ln-table-sort="number" class="numeric">
 												Stock
-												<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 												</button>
 											</th>
-											<th data-ln-sort="string" data-ln-filter-col="status">
+											<th data-ln-table-sort="string" data-ln-table-filter-col="status">
 												Status
 												<button type="button" class="table-filter" data-ln-popover-for="filter-status" aria-label="Filter status">
 													<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
@@ -163,10 +164,10 @@
 														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Out of Stock"> Out of Stock</label></li>
 													</ul>
 												</div>
-												<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 												</button>
 											</th>
 										</tr>
@@ -217,19 +218,19 @@ table.addEventListener('ln-table:filter', function (e) {
 						</main>
 					</section>
 
-					<!-- data-ln-value -->
+					<!-- data-ln-table-value -->
 					<section class="section-card">
-						<header><h3>data-ln-value — sort raw value</h3></header>
+						<header><h3>data-ln-table-value — sort raw value</h3></header>
 						<main>
 							<p>When display text differs from the sort key:</p>
 							<pre><code>&lt;!-- Without: sorts by "1.250" (string) --&gt;
 &lt;td&gt;1.250&lt;/td&gt;
-
+ 
 &lt;!-- With: sorts by 1250 (number) --&gt;
-&lt;td data-ln-value="1250"&gt;1.250&lt;/td&gt;
-
+&lt;td data-ln-table-value="1250"&gt;1.250&lt;/td&gt;
+ 
 &lt;!-- Date: sorts by Unix timestamp --&gt;
-&lt;td data-ln-value="1700000000"&gt;15.11.2023&lt;/td&gt;</code></pre>
+&lt;td data-ln-table-value="1700000000"&gt;15.11.2023&lt;/td&gt;</code></pre>
 						</main>
 					</section>
 
@@ -330,8 +331,8 @@ el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code>
 			'<td>' + (i + 1) + '</td>' +
 			'<td>' + name + '</td>' +
 			'<td>' + cat + '</td>' +
-			'<td data-ln-value="' + price + '" class="numeric">' + formatPrice(price) + '</td>' +
-			'<td data-ln-value="' + stock + '" class="numeric">' + stock + '</td>' +
+			'<td data-ln-table-value="' + price + '" class="numeric">' + formatPrice(price) + '</td>' +
+			'<td data-ln-table-value="' + stock + '" class="numeric">' + stock + '</td>' +
 			'<td>' + status + '</td>' +
 			'</tr>'
 		);

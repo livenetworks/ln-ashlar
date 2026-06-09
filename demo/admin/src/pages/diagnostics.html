@@ -14,15 +14,15 @@
 <section class="section-card" data-demo-html>
 	<header>
 		<h3>1. Missing Sort Button Warning</h3>
-		<p>Flags a <code>th[data-ln-sort]</code> that is configured to be sortable but is missing the required <code>&lt;button data-ln-table-sort&gt;</code> trigger.</p>
+		<p>Flags a <code>th[data-ln-table-sort]</code> that is configured to be sortable but is missing the required <code>&lt;button data-ln-table-col-sort&gt;</code> trigger.</p>
 	</header>
 	<main>
 		<div class="table-container">
 			<table>
 				<thead>
 					<tr>
-						<!-- ERROR: data-ln-sort is set, but no data-ln-table-sort button exists -->
-						<th data-ln-sort="string">
+						<!-- ERROR: data-ln-table-sort is set, but no data-ln-table-col-sort button exists -->
+						<th data-ln-table-sort="string">
 							Username
 						</th>
 						<th>Email</th>
@@ -43,7 +43,7 @@
 	</main>
 	<script type="text/plain" data-demo-scss>
 // The CSS validation selector is fully DRY and uses dev-inline-error:
-th[data-ln-sort]:not(:has([data-ln-table-sort])) {
+th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
     @include dev-inline-error("missing sort button");
 }
 	</script>
@@ -170,12 +170,12 @@ abbr:not([title]) {
 					<thead>
 						<tr>
 							<!-- CORRECT: sortable header contains the correct button -->
-							<th data-ln-sort="string">
+							<th data-ln-table-sort="string">
 								System Service
-								<button type="button" class="table-sort" data-ln-table-sort aria-label="Sort">
-									<svg class="ln-icon" data-ln-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-									<svg class="ln-icon" data-ln-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-									<svg class="ln-icon" data-ln-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+								<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+									<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
+									<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
+									<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
 								</button>
 							</th>
 							<th>Status</th>

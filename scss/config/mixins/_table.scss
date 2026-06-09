@@ -296,8 +296,8 @@
 	@include _table-header-btn-base;
 	vertical-align: middle;
 
-	[data-ln-sort-icon="asc"],
-	[data-ln-sort-icon="desc"] {
+	[data-ln-table-col-sort-icon="asc"],
+	[data-ln-table-col-sort-icon="desc"] {
 		display: none;
 	}
 }

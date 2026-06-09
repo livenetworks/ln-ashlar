@@ -22,12 +22,12 @@ no Proxy or reactive layer.
 
 | Property | Type | Lifetime | Description |
 |---|---|---|---|
-| `dom` | `HTMLElement` | Whole instance | The element carrying `data-ln-search` — the input itself, or the wrapper |
+| `dom` | `HTMLElement` | Whole instance | The element carrying `data-ln-search`. Canonically the `<input>` itself (input-host); may also be a wrapper element (wrapper-host, backward-compat) |
 | `targetId` | `string` | Captured at construction | Value of `data-ln-search` attribute. Resolved via `document.getElementById` on every `_search` call (no cached target reference — supports targets that get re-mounted) |
-| `input` | `HTMLInputElement \| HTMLTextAreaElement \| null` | Captured at construction | The actual input element. Equal to `dom` when `data-ln-search` is on an input directly. Resolved via priority order `[name="search"]`, `input[type="search"]`, `input[type="text"]` when on a wrapper. |
+| `input` | `HTMLInputElement \| HTMLTextAreaElement \| null` | Captured at construction | The actual input element. Equal to `dom` when `data-ln-search` is on an input directly (canonical). Resolved via priority order `[name="search"]`, `input[type="search"]`, `input[type="text"]` when on a wrapper. |
 | `itemsSelector` | `string \| null` | Captured at construction | Value of `data-ln-search-items`, or `null`. When set, replaces `target.children` with `target.querySelectorAll(selector)` |
 | `_debounceTimer` | `number \| null` | Cycle-scoped | Active `setTimeout` handle for the 150ms debounce. Cleared on every new keystroke and on `destroy()` |
-| `_clearBtn` | `HTMLButtonElement \| null` | Captured at construction | Located via `dom.querySelector('[data-ln-search-clear]')`. If missing at construct time, no clear behavior is wired — see "Common mistakes" item 6 in README |
+| `_clearBtn` | `HTMLButtonElement \| null` | Captured at construction | Located via `scope.querySelector('[data-ln-search-clear]')` where `scope = dom === input ? input.parentElement : dom`. When input-host, the clear button must be a sibling within the input's immediate wrapper; when wrapper-host, scope is `dom` (unchanged). Null-guarded for a detached input. If missing at construct time, no clear behavior is wired. |
 | `_onInput` | `Function` | Whole instance | Bound handler for the debounced input listener. Held as a reference so `destroy()` can `removeEventListener` symmetrically |
 | `_onClear` | `Function \| undefined` | Set only when `_clearBtn` exists | Bound handler for the clear button click |
 
@@ -44,8 +44,8 @@ the standard scaffolding:
 1. The shared `MutationObserver` watches `document.body` for new `[data-ln-search]` elements and for the attribute landing on existing elements.
 2. Each match runs `new _component(el)`.
 3. The constructor short-circuits on `dom.hasAttribute(INIT_ATTR)` — a defensive guard; `registerComponent`'s own re-init check via `el.lnSearch` already covers the same case.
-4. Input resolution runs the priority chain (own tag → `[name="search"]` → `input[type="search"]` → `input[type="text"]`).
-5. `_attachHandler` wires the input listener and (if found) the clear-button listener.
+4. Input resolution runs the priority chain (own tag → `[name="search"]` → `input[type="search"]` → `input[type="text"]`). When `data-ln-search` is on the `<input>` (canonical input-host), `dom === input` at this point.
+5. `_attachHandler` wires the input listener and (if found) the clear-button listener. Clear button scope: `dom === input ? input.parentElement : dom` — when input-host, the clear button must be a sibling within the input's immediate wrapper.
 6. **Browser form-restore detection.** If the input has a non-empty `value` at construction, `queueMicrotask` schedules `_search(value)` for the next microtask. The deferral matters: the constructor runs during the DOMContentLoaded chain, so other components (notably `ln-table`) may not yet have attached their `ln-search:change` listener on the target. The microtask waits for the current task to drain, by which time every other component has constructed.
 7. `INIT_ATTR` is set on the element to gate future re-runs.
 
@@ -112,7 +112,7 @@ lives in the consumer.
 | Construct | `registerComponent` observer fires on attribute landing or DOM insertion | Constructor body — input resolution, listener wire-up, microtask-deferred initial dispatch if pre-filled |
 | Search | `input` event on the input element | `_onInput` clears the previous debounce timer and starts a new 150ms one |
 | Fire | Debounce timer expires | `_search(term)` dispatches the event and (if not prevented) walks `target.children` |
-| Clear | Click on `[data-ln-search-clear]` | `_onClear` empties the input value, calls `_search('')` synchronously, refocuses the input |
+| Clear | Click on `[data-ln-search-clear]` | `_onClear` empties the input value, calls `_search('')` synchronously, refocuses the input. The clear button is resolved from `input.parentElement` when input-host, or from `dom` when wrapper-host — it must be a sibling within the input's immediate wrapper in the input-host case. |
 | Destroy | `el.lnSearch.destroy()` | Cancels active debounce timer, removes input + clear listeners, removes `data-ln-search-initialized`, deletes `el.lnSearch`. Does NOT clean up `data-ln-search-hide` on the target. |
 
 `destroy()` does NOT walk the target to remove `data-ln-search-hide`. Past

@@ -9,8 +9,8 @@
 @use 'config/mixins' as *;
 
 // 1. Table Sort: missing sort button warning
-// Detects when a th[data-ln-sort] is sortable but doesn't contain a <button data-ln-table-sort>
-th[data-ln-sort]:not(:has([data-ln-table-sort])) {
+// Detects when a th[data-ln-table-sort] is sortable but doesn't contain a <button data-ln-table-col-sort>
+th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
 	@include dev-inline-error("missing sort button");
 }
 

@@ -203,6 +203,7 @@ the scope:
 | Responsive 1→2 column grid | `@include grid-2` |
 | Responsive 1→2→4 column grid | `@include grid-4` |
 | 6-column form layout | `@include form-grid` |
+| Compact search field (capped width, recessed fill, 1rem icons) | `@include search` |
 | Vertical flex with gap | `@include stack` or `@include stack(0.5rem)` |
 | Horizontal flex row, items-center | `@include row` or `@include row(1rem)` |
 | Horizontal flex row, justify-between | `@include row-between` |

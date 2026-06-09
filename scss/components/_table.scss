@@ -22,7 +22,7 @@ table {
 // hook. .table-sort / .table-filter are thin bindings that mirror the mixins; a consumer
 // may instead @include table-sort / table-filter on their own selector (the class is a
 // convenience, not a mandate — see "Naming & class architecture"). Behavior hooks
-// (data-ln-col-sort / data-ln-table-sort / data-ln-popover-for / data-ln-col-filter) are
+// (data-ln-table-col-sort / data-ln-popover-for / data-ln-table-col-filter) are
 // the per-system functional layer and intentionally differ.
 
 .table-sort { @include table-sort; }
@@ -33,12 +33,12 @@ th:hover .table-sort { opacity: 0.7; }
 .ln-sort-desc .table-sort { @include table-sort-active; }
 
 .ln-sort-asc .table-sort {
-	[data-ln-sort-icon="none"] { display: none; }
-	[data-ln-sort-icon="asc"]  { display: inline-block; }
+	[data-ln-table-col-sort-icon="none"] { display: none; }
+	[data-ln-table-col-sort-icon="asc"]  { display: inline-block; }
 }
 .ln-sort-desc .table-sort {
-	[data-ln-sort-icon="none"] { display: none; }
-	[data-ln-sort-icon="desc"] { display: inline-block; }
+	[data-ln-table-col-sort-icon="none"] { display: none; }
+	[data-ln-table-col-sort-icon="desc"] { display: inline-block; }
 }
 
 .table-filter { @include table-filter; }

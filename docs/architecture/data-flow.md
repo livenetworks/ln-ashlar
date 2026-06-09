@@ -66,7 +66,7 @@ intent is a UI concern, execution is a data concern.
 ### 2.2 Render — `ln-table` and other renderers
 
 **Owns.** Cloning a `<template>` per record and filling it via
-`data-ln-cell-attr` and `{{ field }}` text-node substitution — see §5.
+`data-ln-table-cell-attr` and `{{ field }}` text-node substitution — see §5.
 Virtual scrolling for large sets. Empty,
 loading, and error templates. Translation of UI events (column click
 → sort intent, search input → search intent) into payloads the data
@@ -321,7 +321,7 @@ behaviour) and can't be reflected in the submit-button gating that
 
 ---
 
-## 5. Template syntax — `{{ }}` vs `data-ln-cell-attr`
+## 5. Template syntax — `{{ }}` vs `data-ln-table-cell-attr`
 
 ln-ashlar has two complementary text-substitution patterns, shared
 across renderers (`ln-table`, `ln-upload`, `ln-filter`,
@@ -343,14 +343,14 @@ For substitution that lives **inside text content**. Implemented in `ln-core/hel
 
 Use for all standard text content interpolation inside table cells or other templates.
 
-### 5.2 `data-ln-cell-attr="field:attr"` — attribute mapping
+### 5.2 `data-ln-table-cell-attr="field:attr"` — attribute mapping
 
 For setting an element's attribute from the record data (e.g. href, src, id, etc.). Implemented in renderer components.
 
 ```html
 <template data-ln-template="row">
     <tr>
-        <td><a data-ln-cell-attr="id:href">{{ title }}</a></td>
+        <td><a data-ln-table-cell-attr="id:href">{{ title }}</a></td>
     </tr>
 </template>
 ```
@@ -362,7 +362,7 @@ Use when an element needs to receive attributes dynamically mapped from the reco
 | Need                                          | Use                              |
 |-----------------------------------------------|----------------------------------|
 | Value is text content of an element or inline | `{{ field }}` in text node       |
-| Value drives an element attribute             | `data-ln-cell-attr="field:attr"` |
+| Value drives an element attribute             | `data-ln-table-cell-attr="field:attr"` |
 
 ---
 
