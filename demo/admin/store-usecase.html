@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Store — Usecase | ln-ashlar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header class="app-header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Store — Usecase</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+						</ul>
+					</div>
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
+						<span>Test Toast</span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<main class="app-main">
+		<!-- Sidebar -->
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
+				<label class="search sidebar-search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html" aria-current="page"><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>ashlar-gui v1.2.0</small>
+			</footer>
+		</aside>
+		<div class="app-scrim"></div>
+
+		<!-- Content -->
+		<section>
+			<div class="app-content-wrapper">
+<h1>Store — Usecase</h1>
+
+					<!-- Overview / philosophy -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p>Understanding local-first architecture in isolation is difficult. True appreciation comes from seeing a fully-wired CRUD application working flawlessly in real-world scenarios: syncing data instantly across tabs, queuing actions while offline, and automatically resolving server version conflicts (409) without freezing the UI.</p>
+
+							<p>This demo page illustrates the ultimate **Local-First CRUD Pipeline** in <code>ln-ashlar</code>, orchestrating five independent, highly-specialized components through standard DOM event channels:</p>
+
+							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									The Multi-Tab Coherence
+								</h4>
+								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+									Open this page in a second browser window side-by-side. Make a change in one window—it saves locally, pushes to the backend mock, and immediately broadcasts to the other window using delta events. The other tab’s data table repaints itself instantly. <strong>No manual polling or web socket servers needed.</strong>
+								</p>
+							</div>
+
+							<h4>Five Interlocking Primitive Players</h4>
+							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
+								<li>
+									<strong>The Cache Store (<code>ln-store</code>):</strong> Renders nothing. Manages local IndexedDB storage, outbox write queues, delta sync loops, and optimistic states.
+								</li>
+								<li>
+									<strong>The Presenter (<code>ln-table</code>):</strong> Displays the records. It triggers query fetches, processes local column filters/sorting, renders templates, and captures selection events.
+								</li>
+								<li>
+									<strong>The Form Gate (<code>ln-form</code>):</strong> Manages inputs. It handles native validation, block submissions, bulk-fills from row selections, and serializes updates.
+								</li>
+								<li>
+									<strong>The Focus Gate (<code>ln-modal</code>):</strong> Houses the editor form. It keeps focus trapped, responds to escape cancellations, and opens or closes on demand.
+								</li>
+								<li>
+									<strong>The Safety Gate (<code>ln-confirm</code>):</strong> Prevents accidental row deletions. It gates trash clicks in-place, arming and releasing actions cleanly.
+								</li>
+							</ol>
+
+							<h4>Telemetry and Tele-Coordinating</h4>
+							<p>All operations are mediated by a single, lightweight coordinator script at the bottom of the page. The coordinator coordinates queries, intercepts store mutations to refresh tables, handles toast notifications, and resolves complex 409 server conflicts dynamically by feeding merged payloads back into form fields.</p>
+						</main>
+					</section>
+
+<!-- (a) Mock backend MUST install before any [data-ln-store] element is parsed below. -->
+<script>
+(function () {
+	const STORAGE_KEY = 'ln-mock-documents';
+	const ENDPOINT = '/api/documents';
+	const realFetch = window.fetch.bind(window);
+
+	const departments = ['IT', 'Finance', 'Legal', 'Marketing', 'HR', 'Operations'];
+	const statuses    = ['Draft', 'Pending', 'Approved', 'Archived'];
+
+	function nowSec() { return Math.floor(Date.now() / 1000); }
+	function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+	function load() {
+		try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || []; }
+		catch (_) { return []; }
+	}
+	function save(records) { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+	function nextId(records) {
+		let max = 0;
+		for (let i = 0; i < records.length; i++) if (records[i].id > max) max = records[i].id;
+		return max + 1;
+	}
+
+	// Seed pulled once from the shared 10k-record fixture. Cached as a
+	// promise so concurrent in-flight handle() calls all await the same
+	// fetch and only save once.
+	let seedPromise = null;
+	function loadSeed() {
+		if (!seedPromise) {
+			seedPromise = realFetch('./data/documents.json')
+				.then((res) => res.json())
+				.then((payload) => {
+					save(payload.data);
+					return payload.data;
+				});
+		}
+		return seedPromise;
+	}
+
+	async function getRecords() {
+		let r = load();
+		if (r.length === 0) r = await loadSeed();
+		return r;
+	}
+
+	// Toggle state — read live from DOM each call so user can flip mid-session
+	function $sim(id) { const el = document.getElementById(id); return el && el.checked; }
+
+	function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+	function jsonResponse(body, status) {
+		return new Response(JSON.stringify(body), {
+			status: status || 200,
+			headers: { 'Content-Type': 'application/json' }
+		});
+	}
+
+	async function handle(input, init) {
+		// Optional latency
+		if ($sim('sim-latency')) await delay(600);
+
+		const url = typeof input === 'string' ? input : input.url;
+		const u = new URL(url, window.location.origin);
+		const method = (init && init.method) || (typeof input !== 'string' && input.method) || 'GET';
+		const path = u.pathname;
+		const records = await getRecords();
+
+		// GET /api/documents (full or delta)
+		if (path === ENDPOINT && method === 'GET') {
+			const since = u.searchParams.get('since');
+			if (since != null) {
+				const sinceN = Number(since);
+				const upserted = records.filter((r) => r.updated_at > sinceN);
+				return jsonResponse({ data: upserted, deleted: [], synced_at: nowSec() });
+			}
+			return jsonResponse({ data: records, synced_at: nowSec() });
+		}
+
+		// POST /api/documents (create)
+		if (path === ENDPOINT && method === 'POST') {
+			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
+			const data = JSON.parse(init.body || '{}');
+			const t = nowSec();
+			const rec = Object.assign(
+				{ file_size: 10 + Math.floor(Math.random() * 49990) },
+				data,
+				{
+					id: nextId(records),
+					created_at: t,
+					updated_at: t
+				}
+			);
+			records.push(rec);
+			save(records);
+			return jsonResponse(rec); // BARE record — store reads response.json() directly
+		}
+
+		// PUT /api/documents/:id (update)
+		const putMatch = path.match(/^\/api\/documents\/(\d+)$/);
+		if (putMatch && method === 'PUT') {
+			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
+			const id = Number(putMatch[1]);
+			const idx = records.findIndex((r) => r.id === id);
+			if (idx === -1) return jsonResponse({ error: 'not found' }, 404);
+			const body = JSON.parse(init.body || '{}');
+			const expected = body.expected_version;
+			delete body.expected_version;
+			const stored = records[idx];
+
+			// Conflict check — only if caller passed expected_version AND sim-conflict on
+			if (expected != null && $sim('sim-conflict') && Math.random() < 0.10) {
+				// Bump stored.updated_at to simulate that someone else edited it,
+				// then return 409 with current
+				stored.updated_at = nowSec();
+				save(records);
+				return jsonResponse({ current: stored }, 409); // store reads conflict.current
+			}
+
+			const updated = Object.assign({}, stored, body, { updated_at: nowSec() });
+			records[idx] = updated;
+			save(records);
+			return jsonResponse(updated); // BARE record
+		}
+
+		// DELETE /api/documents/:id
+		const delMatch = path.match(/^\/api\/documents\/(\d+)$/);
+		if (delMatch && method === 'DELETE') {
+			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
+			const id = Number(delMatch[1]);
+			const filtered = records.filter((r) => r.id !== id);
+			save(filtered);
+			return jsonResponse({ ok: true });
+		}
+
+		// DELETE /api/documents/bulk-delete
+		if (path === ENDPOINT + '/bulk-delete' && method === 'DELETE') {
+			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
+			const body = JSON.parse(init.body || '{}');
+			const ids = (body.ids || []).map(Number);
+			const filtered = records.filter((r) => ids.indexOf(r.id) === -1);
+			save(filtered);
+			return jsonResponse({ ok: true });
+		}
+
+		// Fall through to real fetch for any other URL
+		return realFetch(input, init);
+	}
+
+	window.fetch = function (input, init) {
+		const url = typeof input === 'string' ? input : input.url;
+		// Only intercept our endpoint
+		if (url && url.indexOf(ENDPOINT) !== -1) return handle(input, init);
+		return realFetch(input, init);
+	};
+})();
+</script>
+
+<!-- 1. Store (renders nothing) -->
+<div data-ln-data-store="documents"
+     data-ln-store-endpoint="/api/documents"
+     data-ln-store-stale="60"
+     data-ln-store-indexes="department,status,priority,updated_at"
+     data-ln-store-search-fields="title,department,owner"
+     id="documents-store"></div>
+
+<!-- 2. Mock backend toggles -->
+<section class="section-card">
+	<header><h3>Mock backend behavior</h3></header>
+	<main>
+		<ul>
+			<li><label><input type="checkbox" id="sim-latency"> Simulate 600 ms latency on every request</label></li>
+			<li><label><input type="checkbox" id="sim-failure"> ~15% of mutations fail (drives <code>ln-store:reverted</code>)</label></li>
+			<li><label><input type="checkbox" id="sim-conflict"> ~10% of updates return 409 (drives <code>ln-store:conflict</code>)</label></li>
+		</ul>
+		<p><button id="reset-data">Reset seed data</button> — wipes localStorage + IndexedDB + reloads.</p>
+	</main>
+</section>
+
+<!-- 3. Data table -->
+<section class="section-card" data-demo-html>
+	<header><h3>Live Usecase Demo — Documents Manager</h3></header>
+	<main>
+		<section data-ln-table="documents" data-ln-table-source="documents" data-ln-table-selectable id="documents-table" class="data-table-demo">
+			<header class="ln-table__toolbar">
+				<div>
+					<h3>Documents</h3>
+					<span data-ln-table-selected-wrap class="hidden">
+						<button id="bulk-delete-btn" class="btn" style="--color-primary: var(--color-error)">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+						Delete selected (<span data-ln-table-selected></span>)
+					</button>
+					</span>
+				</div>
+				<label class="search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Search…" data-ln-search="documents-table">
+					<button type="button" data-ln-search-clear aria-label="Clear search">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					</button>
+				</label>
+				<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+					New
+				</button>
+			</header>
+
+			<table>
+				<thead>
+					<tr>
+						<th data-ln-table-col-select></th>
+						<th data-ln-table-col="title">Title <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="file_size">Size <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="updated_at">Updated <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+			<footer class="ln-table__footer">
+				<span data-ln-table-total></span> items
+				<span data-ln-table-filtered-wrap> · <span data-ln-table-filtered></span> filtered</span>
+			</footer>
+
+			<template data-ln-template="documents-row">
+				<tr data-ln-table-row>
+					<td><input type="checkbox" data-ln-table-row-select></td>
+					<td>{{ title }}</td>
+					<td>{{ department }}</td>
+					<td>{{ status }}</td>
+					<td>{{ size_display }}</td>
+					<td>{{ updated_display }}</td>
+					<td>
+						<ul class="row-actions">
+							<li><button data-ln-table-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+							<li><button data-ln-table-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+						</ul>
+					</td>
+				</tr>
+			</template>
+
+			<template data-ln-template="documents-empty">
+				<tr><td colspan="99">
+					<article class="ln-table__empty-state">
+						<h3>No documents yet</h3>
+						<p>Click <strong>New</strong> to create one.</p>
+					</article>
+				</td></tr>
+			</template>
+
+			<template data-ln-template="documents-empty-filtered">
+				<tr><td colspan="99">
+					<article class="ln-table__empty-state">
+						<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+						<h3>No results</h3>
+						<p>Try adjusting your search or filters.</p>
+						<button data-ln-table-clear-all class="btn">Clear all filters</button>
+					</article>
+				</td></tr>
+			</template>
+
+			<template data-ln-template="column-filter">
+				<div class="column-filter-dropdown">
+					<input type="search" data-ln-filter-search placeholder="Search…">
+					<ul data-ln-filter-options>
+						<li>
+							<label>
+								<input type="checkbox" data-ln-filter-reset>
+								All
+							</label>
+						</li>
+						<template data-ln-template="column-filter-item">
+							<li>
+								<label>
+									<input type="checkbox" data-ln-attr="value:value">
+									<span data-ln-field="value"></span>
+								</label>
+							</li>
+						</template>
+					</ul>
+				</div>
+			</template>
+		</section>
+	</main>
+</section>
+
+<!-- 4. Create / Edit modal -->
+<div class="ln-modal" data-ln-modal id="document-modal">
+	<form data-ln-form="document-form" id="document-form">
+		<header>
+			<h3 id="document-modal-title">New document</h3>
+			<button type="button" aria-label="Close" data-ln-modal-close>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<input type="hidden" name="id">
+			<input type="hidden" name="updated_at">
+			<div class="form-element">
+				<label for="doc-title">Title</label>
+				<input id="doc-title" name="title" required autofocus>
+			</div>
+			<div class="form-element">
+				<label for="doc-department">Department</label>
+				<select id="doc-department" name="department" required>
+					<option value="">—</option>
+					<option>IT</option><option>Finance</option><option>Legal</option>
+					<option>Marketing</option><option>HR</option><option>Sales</option><option>Operations</option>
+				</select>
+			</div>
+			<div class="form-element">
+				<label for="doc-status">Status</label>
+				<select id="doc-status" name="status" required>
+					<option value="Draft">Draft</option>
+					<option value="Pending">Pending</option>
+					<option value="Approved">Approved</option>
+					<option value="Rejected">Rejected</option>
+					<option value="Archived">Archived</option>
+				</select>
+			</div>
+		</main>
+		<footer class="form-actions">
+			<button type="button" data-ln-modal-close>Cancel</button>
+			<button type="submit">Save</button>
+		</footer>
+	</form>
+</div>
+
+<!-- 5. Confirm-delete modal -->
+<div class="ln-modal" data-ln-modal id="confirm-delete-modal">
+	<form id="confirm-delete-form">
+		<header>
+			<h3>Delete document?</h3>
+			<button type="button" aria-label="Close" data-ln-modal-close>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<p id="confirm-delete-message">This action cannot be undone.</p>
+		</main>
+		<footer class="form-actions">
+			<button type="button" data-ln-modal-close>Cancel</button>
+			<button type="submit" id="confirm-delete-btn" style="--color-primary: var(--color-error)">Delete</button>
+		</footer>
+	</form>
+</div>
+
+<script>
+(function () {
+	const storeEl = document.querySelector('[data-ln-data-store="documents"]');
+	const tableEl = document.querySelector('[data-ln-table="documents"]');
+	const formEl  = document.querySelector('[data-ln-form="document-form"]');
+
+	let lastQuery = { sort: null, filters: {}, search: '' }, pendingDelete = null, editMode = false;
+
+	const filterOptions = {
+		department: ['Finance', 'HR', 'IT', 'Legal', 'Marketing', 'Operations'],
+		status:     ['Approved', 'Archived', 'Draft', 'Pending']
+	};
+
+	const decorate = r => Object.assign({}, r, {
+		updated_display: new Date(r.updated_at * 1000).toLocaleString(),
+		size_display: r.file_size >= 1024 ? (r.file_size / 1024).toFixed(1) + ' MB' : (r.file_size || 0) + ' KB'
+	});
+
+	const refresh = () => storeEl.lnDataStore?.getAll(lastQuery).then(r => {
+		tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
+			bubbles: true,
+			detail: { data: r.data.map(decorate), total: r.total, filtered: r.filtered, filterOptions }
+		}));
+	});
+
+	// Store Listeners
+	['ready', 'loaded', 'created', 'updated', 'deleted', 'confirmed', 'reverted'].forEach(ev => 
+		storeEl.addEventListener(`ln-store:${ev}`, refresh)
+	);
+	storeEl.addEventListener('ln-store:synced', e => e.detail.changed && refresh());
+
+	// Table Listeners
+	document.addEventListener('ln-table:request-data', e => {
+		if (e.detail.table === 'documents') {
+			lastQuery = { sort: e.detail.sort, filters: e.detail.filters, search: e.detail.search };
+			refresh();
+		}
+	});
+
+	document.addEventListener('ln-table:row-action', e => {
+		if (e.detail.table !== 'documents') return;
+		const modal = formEl.closest('.ln-modal');
+		if (e.detail.action === 'edit') {
+			editMode = true;
+			formEl.lnForm.fill(e.detail.record);
+			modal.querySelector('h3').textContent = 'Edit document';
+			modal.setAttribute('data-ln-modal', 'open');
+		} else {
+			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', { detail: { id: Number(e.detail.id) } }));
+		}
+	});
+
+	// Form & Modal Reset Listeners
+	formEl.closest('.ln-modal').addEventListener('ln-modal:before-open', e => {
+		if (!editMode) {
+			formEl.lnForm.reset();
+			e.target.closest('.ln-modal').querySelector('h3').textContent = 'New document';
+		}
+		editMode = false;
+	});
+
+	formEl.addEventListener('ln-form:submit', e => {
+		const data = Object.assign({}, e.detail.data), id = data.id, ev = data.updated_at ? Number(data.updated_at) : undefined;
+		delete data.id; delete data.updated_at;
+		const eventName = id ? 'ln-store:request-update' : 'ln-store:request-create';
+		const detail = id ? { id: Number(id), data, expected_version: ev } : { data };
+		storeEl.dispatchEvent(new CustomEvent(eventName, { detail }));
+		formEl.closest('.ln-modal').setAttribute('data-ln-modal', 'close');
+	});
+
+	// Bulk Delete & Reset Data (Event Delegation)
+	document.addEventListener('click', e => {
+		const btn = e.target.closest('#bulk-delete-btn, #reset-data');
+		if (!btn) return;
+		if (btn.id === 'bulk-delete-btn') {
+			const ids = Array.from(tableEl.lnTable.selectedIds).map(Number);
+			if (!ids.length) return;
+			pendingDelete = { ids };
+			const confirmForm = document.querySelector('#confirm-delete-form');
+			if (confirmForm) {
+				const confirmModal = confirmForm.closest('.ln-modal');
+				confirmModal.querySelector('p').textContent = `Delete ${ids.length} document${ids.length > 1 ? 's' : ''}?`;
+				confirmModal.setAttribute('data-ln-modal', 'open');
+			}
+		} else {
+			localStorage.removeItem('ln-mock-documents');
+			window.lnDataStore.clearAll().then(() => location.reload());
+		}
+	});
+
+	document.querySelector('#confirm-delete-form')?.addEventListener('submit', e => {
+		e.preventDefault();
+		if (!pendingDelete) return;
+		const ids = pendingDelete.ids;
+		const eventName = ids.length === 1 ? 'ln-store:request-delete' : 'ln-store:request-bulk-delete';
+		const detail = ids.length === 1 ? { id: ids[0] } : { ids };
+		storeEl.dispatchEvent(new CustomEvent(eventName, { detail }));
+		pendingDelete = null;
+		e.target.closest('.ln-modal').setAttribute('data-ln-modal', 'close');
+	});
+
+	// Toasts & Telemetry
+	const toast = (type, title, message) => window.dispatchEvent(new CustomEvent('ln-toast:enqueue', { detail: { type, title, message } }));
+	storeEl.addEventListener('ln-store:confirmed', e => toast('success', 'Saved', `${e.detail.action} confirmed by server`));
+	storeEl.addEventListener('ln-store:reverted', e => toast('error', 'Reverted', e.detail.error || 'Server rejected the change'));
+	storeEl.addEventListener('ln-store:offline', () => toast('warning', 'Offline', 'Server unreachable — changes queued'));
+	storeEl.addEventListener('ln-store:conflict', e => {
+		toast('warning', 'Conflict', 'Document was modified elsewhere — reloaded latest version');
+		const idField = formEl.querySelector('[name="id"]');
+		if (idField && idField.value && Number(idField.value) === e.detail.local.id) {
+			editMode = true;
+			formEl.lnForm.fill(e.detail.remote);
+		}
+	});
+})();
+</script>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="app-footer">
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
+		</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
+</body>
+</html>
