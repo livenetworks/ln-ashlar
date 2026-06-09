@@ -86,6 +86,7 @@ Two files per component:
 | Circular Progress | `data-ln-circular-progress` | [js/ln-circular-progress/README.md](../js/ln-circular-progress/README.md) | [circular-progress.md](js/circular-progress.md) |
 | Link | `data-ln-link` | [js/ln-link/README.md](../js/ln-link/README.md) | [link.md](js/link.md) |
 | Confirm | `data-ln-confirm` | [js/ln-confirm/README.md](../js/ln-confirm/README.md) | [confirm.md](js/confirm.md) |
+| Debug | `data-ln-debug` | [js/ln-debug/README.md](../js/ln-debug/README.md) | (via Core) |
 | Upload | `data-ln-upload` | [js/ln-upload/README.md](../js/ln-upload/README.md) | [upload.md](js/upload.md) |
 | AJAX | `data-ln-ajax` | [js/ln-ajax/README.md](../js/ln-ajax/README.md) | [ajax.md](js/ajax.md) |
 | Router | `data-ln-route` | [js/ln-router/README.md](../js/ln-router/README.md) | [router.md](js/router.md) |
