@@ -1,7 +1,7 @@
 if (typeof window < "u") {
   const h = console.warn;
   console.warn = function(...c) {
-    typeof c[0] == "string" && (c[0].startsWith("[ln-") || c[0].startsWith("[lnCore")) && !(document.documentElement.hasAttribute("data-ln-debug") || document.body && document.body.hasAttribute("data-ln-debug") || window.lnDebug === !0) || h.apply(console, c);
+    typeof c[0] == "string" && (c[0].startsWith("[ln-") || c[0].startsWith("[lnCore")) && !(document.documentElement.hasAttribute("data-ln-debug") || document.body && document.body.hasAttribute("data-ln-debug")) || h.apply(console, c);
   };
 }
 const Ct = {};
@@ -5429,9 +5429,9 @@ const me = `<li class="ln-toast__item">\r
   const h = "data-ln-debug", c = "lnDebug";
   if (window[c] !== void 0) return;
   function b(p) {
-    return this.dom = p, window.lnDebug = !0, this;
+    return this.dom = p, this;
   }
   b.prototype.destroy = function() {
-    window.lnDebug = !1, delete this.dom[c];
+    delete this.dom[c];
   }, B(h, c, b, "ln-debug");
 })();

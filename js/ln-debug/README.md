@@ -32,14 +32,27 @@ Add the `data-ln-debug` attribute to either the `<html>` or `<body>` element (or
 
 ---
 
-## 3. The JS State API
+## 3. DOM & State Management
 
-You can programmatically query or set the debug state:
+This component lives entirely at the level of the DOM. The single source of truth is the presence of the `data-ln-debug` attribute on `<html>` or `<body>`.
+
+### Checking the State via JS
+
+To check if debug mode is active in your scripts, query the DOM directly:
 
 ```javascript
-// Query if debug mode is active
-const isDebugActive = window.lnDebug; // true/false
+const isDebug = document.documentElement.hasAttribute('data-ln-debug') || 
+                (document.body && document.body.hasAttribute('data-ln-debug'));
+```
 
-// Enable debug mode programmatically
-window.lnDebug = true;
+### Toggling the State
+
+To toggle debug mode at runtime, add or remove the attribute from the DOM:
+
+```javascript
+// Enable
+document.documentElement.setAttribute('data-ln-debug', '');
+
+// Disable
+document.documentElement.removeAttribute('data-ln-debug');
 ```
