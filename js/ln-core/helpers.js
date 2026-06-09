@@ -525,6 +525,9 @@ if (typeof window !== 'undefined') {
 	window.lnCore = window.lnCore || {};
 	window.lnCore.registerDataMapper = registerDataMapper;
 	window.lnCore.getDataMapper = getDataMapper;
+	window.lnCore.fillTemplate = fillTemplate;
+	window.lnCore.fill = fill;
+	window.lnCore.renderList = renderList;
 }
 
 
