@@ -8,12 +8,10 @@ import { registerComponent } from '../../ln-core';
 
 	function _component(dom) {
 		this.dom = dom;
-		window.lnDebug = true;
 		return this;
 	}
 
 	_component.prototype.destroy = function () {
-		window.lnDebug = false;
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

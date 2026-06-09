@@ -8,8 +8,7 @@ if (typeof window !== 'undefined') {
 		if (isLibraryWarning) {
 			const isDebug =
 				document.documentElement.hasAttribute('data-ln-debug') ||
-				(document.body && document.body.hasAttribute('data-ln-debug')) ||
-				window.lnDebug === true;
+				(document.body && document.body.hasAttribute('data-ln-debug'));
 
 			if (!isDebug) {
 				return;
