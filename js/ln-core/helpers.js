@@ -455,6 +455,30 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 // ─── HTTP / URL Helpers ────────────────────────────────────
 
 /**
+ * Check if a click event on a link should be intercepted by an in-app navigator.
+ * Intercept only left clicks, same-origin, not target="_blank", no download,
+ * not mailto/tel, and not pure hash/empty.
+ *
+ * @param {MouseEvent} event
+ * @param {HTMLAnchorElement} anchor
+ * @returns {boolean}
+ */
+export function shouldInterceptLink(event, anchor) {
+	if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) {
+		return false;
+	}
+	if (!anchor) return false;
+	const href = anchor.getAttribute('href');
+	if (!href) return false;
+	if (anchor.getAttribute('target') === '_blank') return false;
+	if (anchor.hasAttribute('download')) return false;
+	if (href.startsWith('mailto:') || href.startsWith('tel:')) return false;
+	if (href === '#' || href.startsWith('#')) return false;
+	if (anchor.hostname && anchor.hostname !== window.location.hostname) return false;
+	return true;
+}
+
+/**
  * Build a URL from segments, stripping duplicate slashes.
  */
 export function buildUrl(...segments) {

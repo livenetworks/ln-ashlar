@@ -1,0 +1,207 @@
+<!-- ln-page: title="Router — ln-ashlar" h1="Router" -->
+
+<h1>Router</h1>
+
+<section class="section-card">
+	<header><h3>Overview &amp; Philosophy</h3></header>
+	<main>
+		<p>The <code>ln-router</code> component is a zero-dependency, **template-only** client-side router for <code>ln-ashlar</code>. It maps the URL to a <code>&lt;template data-ln-route="..."&gt;</code>, clones it into a target element, and lets existing component MutationObservers auto-initialize the injected DOM.</p>
+		
+		<p>In accordance with project doctrine, the router does **not** fetch data, sanitise templates, or run data-binding logic. Instead, the router mounts the view, and the **page coordinator** listens for navigation events to populate the templates using the static text interpolation helper <code>fillTemplate</code>.</p>
+	</main>
+</section>
+
+<!-- Route Templates -->
+<template data-ln-route="/">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>🏠 Dashboard View</h4>
+		<p>Welcome to the Router Home Page! This is a static route mapped to <code>/</code>.</p>
+	</div>
+</template>
+
+<template data-ln-route="/profile" data-ln-route-title="Profile — ln-router">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>👤 User Profile View</h4>
+		<p>This is the profile page at static route <code>/profile</code>.</p>
+	</div>
+</template>
+
+<template data-ln-route="/users/:id" data-ln-route-title="User Details">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>👤 User Details View (Route: /users/:id)</h4>
+		<p>Displaying user with ID: <strong>{{id}}</strong></p>
+		<p>Query parameters: <code id="user-query-log">None</code></p>
+	</div>
+</template>
+
+<template data-ln-route="/users/:id/logs" data-ln-route-target="detail-pane" data-ln-route-title="User Logs">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--color-warning-muted); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h5>📑 Logs for User #{{id}}</h5>
+		<ul style="margin: var(--size-xs) 0; padding-left: var(--size-md);">
+			<li>User logged in at 10:00 AM</li>
+			<li>Updated profile at 10:15 AM</li>
+			<li>Viewed settings at 10:30 AM</li>
+		</ul>
+	</div>
+</template>
+
+<template data-ln-route="*">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--color-danger-muted); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>⚠️ 404 - Page Not Found</h4>
+		<p>The path you navigated to does not exist. Handled by the catch-all wildcard route <code>*</code>.</p>
+	</div>
+</template>
+
+<!-- Interactive Live Demo Playground -->
+<section class="section-card">
+	<header><h3>Live Router Playground</h3></header>
+	<main>
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--size-lg);">
+			
+			<!-- Navigation Controls -->
+			<div>
+				<h4>1. In-App Navigation Links</h4>
+				<ul style="display: flex; flex-direction: column; gap: var(--size-xs); padding: 0; list-style: none;">
+					<li><a href="/" style="color: var(--color-primary); text-decoration: underline;">Dashboard (/)</a></li>
+					<li><a href="/profile" style="color: var(--color-primary); text-decoration: underline;">Profile (/profile)</a></li>
+					<li><a href="/users/42" style="color: var(--color-primary); text-decoration: underline;">User #42 (/users/42)</a></li>
+					<li><a href="/users/99?tab=settings&theme=dark" style="color: var(--color-primary); text-decoration: underline;">User #99 with Query Params (/users/99?tab=settings&amp;theme=dark)</a></li>
+					<li><a href="/users/42/logs" style="color: var(--color-primary); text-decoration: underline;">User #42 Logs - Target: detail-pane (/users/42/logs)</a></li>
+					<li><a href="/non-existent-page" style="color: var(--color-primary); text-decoration: underline;">Test 404 Wildcard Route (/non-existent-page)</a></li>
+				</ul>
+
+				<h4 style="margin-top: var(--size-md);">2. Programmatic Navigation API</h4>
+				<div style="display: flex; gap: var(--size-xs); margin-bottom: var(--size-sm);">
+					<button id="btn-nav-dashboard" class="btn btn-secondary btn-sm">router.navigate('/')</button>
+					<button id="btn-nav-user" class="btn btn-secondary btn-sm">router.navigate('/users/88')</button>
+					<button id="btn-replace" class="btn btn-secondary btn-sm">router.replace('/profile')</button>
+				</div>
+
+				<h4 style="margin-top: var(--size-md);">3. Link Interception Safety Guards</h4>
+				<ul style="display: flex; flex-direction: column; gap: var(--size-xs); padding: 0; list-style: none;">
+					<li><a href="https://google.com" target="_blank" style="color: var(--color-primary); text-decoration: underline;">External Link (Google.com - target="_blank")</a></li>
+					<li><a href="/profile" download style="color: var(--color-primary); text-decoration: underline;">Download Attribute link</a></li>
+					<li><a href="#test-anchor" style="color: var(--color-primary); text-decoration: underline;">Internal Page Hash Link (#test-anchor)</a></li>
+				</ul>
+
+				<div style="margin-top: var(--size-md); display: flex; align-items: center; gap: var(--size-xs);">
+					<input type="checkbox" id="block-navigation">
+					<label for="block-navigation" style="font-weight: bold; color: var(--color-danger);">Block next navigation (ln-router:before-navigate preventDefault)</label>
+				</div>
+			</div>
+
+			<!-- Routing Outlets and Logs -->
+			<div>
+				<h4>Default Outlet</h4>
+				<div data-ln-outlet style="padding: var(--size-sm); border: 2px dashed var(--border-color); border-radius: var(--radius-sm); min-height: 120px; background: var(--bg-sunken); margin-bottom: var(--size-md);">
+					<!-- SSR Hydration Test placeholder -->
+					<div data-ln-router-hydrate="true">
+						<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+							<h4>🏠 SSR Server-Rendered View</h4>
+							<p>This is pre-rendered SSR content. Click a link above to test routing.</p>
+						</div>
+					</div>
+				</div>
+
+				<h4>Target Region: detail-pane</h4>
+				<div id="detail-pane" style="padding: var(--size-sm); border: 2px dashed var(--border-color); border-radius: var(--radius-sm); min-height: 100px; background: var(--bg-sunken); margin-bottom: var(--size-md);">
+					<p style="color: var(--text-color-muted); text-align: center; line-height: 100px; margin: 0;">Logs will render here...</p>
+				</div>
+
+				<h4>Diagnostics Console</h4>
+				<div style="background: #1e1e1e; color: #a9b7c6; font-family: monospace; font-size: var(--font-size-sm); padding: var(--size-sm); border-radius: var(--radius-sm); max-height: 200px; overflow-y: auto;">
+					<div id="diagnostics-log" style="white-space: pre-wrap;">[Console initialized. Awaiting events...]</div>
+				</div>
+			</div>
+
+		</div>
+	</main>
+</section>
+
+<!-- Coordinator script binding to router events -->
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const logEl = document.getElementById('diagnostics-log');
+		const blockNavCheckbox = document.getElementById('block-navigation');
+
+		function log(msg) {
+			const time = new Date().toLocaleTimeString();
+			logEl.textContent = `[${time}] ${msg}\n` + logEl.textContent;
+		}
+
+		// ─── Programmatic Buttons ──────────────────────────────
+
+		document.getElementById('btn-nav-dashboard').addEventListener('click', () => {
+			window.lnRouter.navigate('/');
+		});
+
+		document.getElementById('btn-nav-user').addEventListener('click', () => {
+			window.lnRouter.navigate('/users/88?src=api');
+		});
+
+		document.getElementById('btn-replace').addEventListener('click', () => {
+			window.lnRouter.replace('/profile');
+		});
+
+		// ─── Router Events ─────────────────────────────────────
+
+		// PreventDefault cancellation test
+		document.addEventListener('ln-router:before-navigate', function(e) {
+			log(`ln-router:before-navigate from "${e.detail.from}" to "${e.detail.to}"`);
+			if (blockNavCheckbox.checked) {
+				e.preventDefault();
+				log(`🔴 Navigation BLOCKED via preventDefault()`);
+				
+				// Optional: push notification
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: {
+						type: 'error',
+						title: 'Blocked!',
+						message: 'Navigation was cancelled by before-navigate listener.'
+					}
+				}));
+			}
+		});
+
+		// Navigated: coordinator data binding
+		document.addEventListener('ln-router:navigated', function(e) {
+			const detail = e.detail;
+			log(`🟢 ln-router:navigated to "${detail.path}"`);
+
+			// Perform text interpolation using the core fillTemplate helper (double-braces)
+			if (detail.route.pattern === '/users/:id') {
+				// fillTemplate will substitute {{id}} in the target outlet clone
+				window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
+
+				// Log query parameters
+				const queryLog = detail.target.querySelector('#user-query-log');
+				if (queryLog) {
+					queryLog.textContent = JSON.stringify(detail.query);
+				}
+			} else if (detail.route.pattern === '/users/:id/logs') {
+				window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
+			}
+
+			// Push a success toast
+			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+				detail: {
+					type: 'success',
+					title: 'Navigated',
+					message: `Loaded view for pattern: ${detail.route.pattern}`
+				}
+			}));
+		});
+
+		// Not Found
+		document.addEventListener('ln-router:not-found', function(e) {
+			log(`⚠️ ln-router:not-found path: "${e.detail.path}"`);
+			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+				detail: {
+					type: 'warn',
+					title: 'Not Found',
+					message: `No route matching: ${e.detail.path}`
+				}
+			}));
+		});
+	});
+</script>
