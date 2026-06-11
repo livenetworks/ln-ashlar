@@ -163,10 +163,11 @@ textarea.ln-validate-valid {
 						<main>
 							<div class="form-element">
 								<label for="demo-email">Email Address</label>
-								<input type="email" id="demo-email" name="email" required minlength="5" data-ln-validate placeholder="Try 'abc' or 'test@'…">
+								<input type="email" id="demo-email" name="email" required minlength="5" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" data-ln-validate placeholder="Try 'abc' or 'test@'…">
 								<ul data-ln-validate-errors>
 									<li class="hidden" data-ln-validate-error="required">Email is required</li>
 									<li class="hidden" data-ln-validate-error="typeMismatch">Invalid email format</li>
+									<li class="hidden" data-ln-validate-error="patternMismatch">Invalid email format (missing top-level domain)</li>
 									<li class="hidden" data-ln-validate-error="tooShort">Must be at least 5 characters</li>
 								</ul>
 							</div>

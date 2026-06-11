@@ -712,4 +712,15 @@
 	font-size: var(--text-caption);
 	line-height: var(--lh-caption);
 	color: hsl(var(--color-error));
+	min-height: 1.25rem; // Reserves space to prevent form layout shifts when errors appear
+	list-style: none;
+	padding: 0;
+	margin-bottom: 0;
+
+	li {
+		margin: 0;
+		&.hidden {
+			display: none;
+		}
+	}
 }
