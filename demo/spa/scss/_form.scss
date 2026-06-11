@@ -1,0 +1,62 @@
+@use '../../../scss/config/mixins' as *;
+
+// ─── Package modal ──────────────────────────────────────────────────
+.ln-modal#package-modal > form { @include modal-md; }
+
+// ─── Shared form layout (modal + tenant editor) ─────────────────────
+#package-form,
+#tenant-editor form {
+	fieldset {
+		border: none;
+		margin: 0 0 var(--size-lg);
+		padding: 0;
+	}
+
+	legend {
+		@include text-sm;
+		@include font-semibold;
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--fg-muted);
+		padding: 0;
+		margin-bottom: var(--size-sm);
+	}
+
+	.form-grid { @include form-grid; }
+
+	.hint {
+		display: block;
+		@include text-xs;
+		color: var(--fg-subtle);
+		margin-top: var(--size-3xs);
+	}
+
+	// Toggle-switch rows — checkbox labels host the switch
+	.form-element > label:has(> input[type="checkbox"]) {
+		@include flex;
+		@include items-center;
+		gap: var(--size-sm);
+		cursor: pointer;
+
+		input[type="checkbox"] { @include toggle-switch; }
+	}
+}
+
+// ─── Tenant editor specifics ────────────────────────────────────────
+#tenant-editor form {
+	// Identity: name spans the full row; slug + domain share it
+	.form-element:has([name="name"]) { grid-column: 1 / -1; }
+
+	footer { @include form-actions; }
+}
+
+// Colour pickers sit side by side at natural width
+#tenant-editor input[type="color"] {
+	inline-size: 4rem;
+	block-size: 2.5rem;
+	padding: var(--size-3xs);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius);
+	background: var(--color-bg);
+	cursor: pointer;
+}

@@ -35,7 +35,13 @@
 	--radius: var(--radius-lg);
 	border-radius: var(--radius);
 	background: var(--color-bg);
-	overflow: clip;
+	overflow-x: auto;
+	max-width: 100%;
+	-webkit-overflow-scrolling: touch;
+
+	colgroup {
+		display: none !important;
+	}
 
 	// Table overrides inside component
 	table {
@@ -44,6 +50,8 @@
 		border-spacing: 0;
 		border-radius: 0;
 		box-shadow: none;
+		table-layout: auto !important;
+		min-width: var(--table-min-width, 768px);
 	}
 
 	// Whole thead sticky as one unit (toolbar row + column-headers row).

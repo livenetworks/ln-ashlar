@@ -1,0 +1,116 @@
+{
+    "packages": [
+        {
+            "id": 1,
+            "name": "Starter",
+            "max_users": 5,
+            "max_guests": 2,
+            "max_standards": 1,
+            "max_documents": 100,
+            "max_storage": 5,
+            "active": true
+        },
+        {
+            "id": 2,
+            "name": "Professional",
+            "max_users": 25,
+            "max_guests": 10,
+            "max_standards": 5,
+            "max_documents": 1000,
+            "max_storage": 50,
+            "active": true
+        },
+        {
+            "id": 3,
+            "name": "Enterprise",
+            "max_users": 0,
+            "max_guests": 100,
+            "max_standards": 50,
+            "max_documents": 100000,
+            "max_storage": 500,
+            "active": true
+        },
+        {
+            "id": 4,
+            "name": "Legacy",
+            "max_users": 10,
+            "max_guests": 0,
+            "max_standards": 2,
+            "max_documents": 250,
+            "max_storage": 10,
+            "active": false
+        },
+        {
+            "id": 5,
+            "name": "\u0442\u0435\u0441\u0442",
+            "max_users": 1200,
+            "max_guests": 1,
+            "max_standards": 0,
+            "max_documents": 0,
+            "max_storage": 0,
+            "active": true
+        }
+    ],
+    "tenants": [
+        {
+            "id": 1,
+            "name": "Acme Corp",
+            "slug": "acme",
+            "custom_domain": "",
+            "package_id": 1,
+            "auth_method": "Local",
+            "doc_numbering_scheme": "{TYPE}-{SEQ:4}",
+            "review_interval": 365,
+            "brand_primary": "#2563eb",
+            "brand_secondary": "#1e40af",
+            "read_confirmation": true,
+            "active": true
+        },
+        {
+            "id": 3,
+            "name": "Initech",
+            "slug": "initech",
+            "custom_domain": "",
+            "package_id": 2,
+            "auth_method": "Local",
+            "doc_numbering_scheme": "{TYPE}-{SEQ:4}",
+            "review_interval": 365,
+            "brand_primary": "#dc2626",
+            "brand_secondary": "#b91c1c",
+            "read_confirmation": true,
+            "active": true
+        },
+        {
+            "id": 4,
+            "name": "Umbrella",
+            "slug": "umbrella",
+            "custom_domain": "umbrella.example.com",
+            "package_id": 2,
+            "auth_method": "LDAP",
+            "doc_numbering_scheme": "{TYPE}-{SEQ:4}",
+            "review_interval": 365,
+            "brand_primary": "#7c3aed",
+            "brand_secondary": "#6d28d9",
+            "read_confirmation": false,
+            "active": true
+        },
+        {
+            "id": 5,
+            "name": "Wayne Enterprises",
+            "slug": "wayne",
+            "custom_domain": "",
+            "package_id": 3,
+            "auth_method": "Local",
+            "doc_numbering_scheme": "{TYPE}-{SEQ:4}",
+            "review_interval": 365,
+            "brand_primary": "#0f172a",
+            "brand_secondary": "#1e293b",
+            "read_confirmation": true,
+            "active": true
+        }
+    ],
+    "next_id": {
+        "packages": 6,
+        "tenants": 6
+    }
+}

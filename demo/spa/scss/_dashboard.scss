@@ -1,0 +1,84 @@
+@use '../../../scss/config/mixins' as *;
+
+// ─── Dashboard ──────────────────────────────────────────────────────
+#dashboard {
+	container-type: inline-size;
+	container-name: dashboard;
+}
+
+// Stat-card links grid: 1 → 2 → 4 columns
+#dashboard > .stat-grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--size-md);
+
+	> li > a {
+		@include stat-card;
+		display: flex;
+		text-decoration: none;
+		color: var(--color-fg);
+
+		&:hover { box-shadow: var(--shadow-floating); }
+	}
+}
+
+@container dashboard (min-width: 480px) {
+	#dashboard > .stat-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@container dashboard (min-width: 880px) {
+	#dashboard > .stat-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+// Shimmer on stat values while stores load
+@keyframes spa-stat-shimmer {
+	0%   { opacity: 1; }
+	50%  { opacity: 0.35; }
+	100% { opacity: 1; }
+}
+
+#dashboard.is-loading [data-ln-stat-value] {
+	color: var(--fg-subtle);
+
+	@include motion-safe {
+		animation: spa-stat-shimmer 1.2s ease-in-out infinite;
+	}
+}
+
+// ─── Tenants per package ────────────────────────────────────────────
+#pkg-usage [data-pkg-usage] {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	@include stack(var(--size-sm));
+
+	> li > a {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: var(--size-2xs) var(--size-sm);
+		align-items: center;
+		text-decoration: none;
+		color: var(--color-fg);
+		padding: var(--size-xs) var(--size-sm);
+		border-radius: var(--radius);
+		@include transition-colors;
+
+		&:hover { background: var(--bg-recessed); }
+	}
+
+	.pkg-usage-name { @include font-medium; }
+
+	.pkg-usage-count {
+		@include text-sm;
+		color: var(--fg-muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.progress {
+		@include progress;
+		grid-column: 1 / -1;
+	}
+}

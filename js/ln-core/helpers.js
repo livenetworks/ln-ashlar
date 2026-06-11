@@ -338,8 +338,10 @@ export function populateForm(form, data) {
 // ─── Locale Detection ─────────────────────────────────────
 
 export function getLocale(el) {
-	const langEl = el.closest('[lang]');
-	return (langEl ? langEl.lang : null) || navigator.language;
+	const langEl = el ? el.closest('[lang]') : null;
+	return (langEl ? langEl.lang : null)
+		|| (document.documentElement ? document.documentElement.lang : null)
+		|| navigator.language;
 }
 
 // ─── Raw Value Read ───────────────────────────────────────
