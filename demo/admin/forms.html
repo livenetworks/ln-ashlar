@@ -283,10 +283,11 @@
 							</div>
 							<div class="form-element">
 								<label for="demo-email">Email</label>
-								<input type="email" id="demo-email" name="email" required minlength="5" placeholder="email@example.com" data-ln-validate>
+								<input type="email" id="demo-email" name="email" required minlength="5" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" placeholder="email@example.com" data-ln-validate>
 								<ul data-ln-validate-errors>
 									<li class="hidden" data-ln-validate-error="required">Email is required</li>
 									<li class="hidden" data-ln-validate-error="typeMismatch">Invalid email format</li>
+									<li class="hidden" data-ln-validate-error="patternMismatch">Invalid email format (missing top-level domain)</li>
 									<li class="hidden" data-ln-validate-error="tooShort">Must be at least 5 characters</li>
 								</ul>
 							</div>
