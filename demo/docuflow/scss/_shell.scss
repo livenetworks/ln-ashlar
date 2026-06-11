@@ -1,0 +1,125 @@
+@use '../../../scss/config/mixins' as *;
+@use '../../../scss/config/_breakpoints' as bp;
+
+// ─── App grid ─────────────────────────────────────────────────
+$sidebar-w: 220px;
+
+#app {
+	display: grid;
+	grid-template-columns: #{$sidebar-w} 1fr;
+	grid-template-rows: auto 1fr;
+	min-height: 100dvh;
+}
+
+// ─── Header ────────────────────────────────────────────────────
+#app-header {
+	grid-column: 1 / -1;
+	display: flex;
+	align-items: center;
+	gap: var(--size-3);
+	@include px(1.5rem);
+	@include py(0.75rem);
+	background: hsl(var(--color-surface));
+	border-bottom: 1px solid hsl(var(--color-border));
+	z-index: 10;
+}
+
+#app-brand {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2);
+	@include font-semibold;
+	color: hsl(var(--color-text));
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+#app-search {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2);
+	flex: 1;
+	max-width: 28rem;
+	margin-inline-start: auto;
+	background: hsl(var(--color-surface-raised));
+	border: 1px solid hsl(var(--color-border));
+	border-radius: var(--radius-md);
+	@include px(0.75rem);
+	@include py(0.4rem);
+
+	input {
+		border: none;
+		background: transparent;
+		outline: none;
+		width: 100%;
+		@include text-sm;
+	}
+}
+
+// ─── Sidebar ───────────────────────────────────────────────────
+#app-sidebar {
+	background: hsl(var(--color-surface));
+	border-right: 1px solid hsl(var(--color-border));
+	overflow-y: auto;
+	@include py(1rem);
+}
+
+#app-sidebar nav ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-1);
+	@include px(0.75rem);
+}
+
+#app-sidebar nav li a {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2);
+	@include px(0.75rem);
+	@include py(0.5rem);
+	border-radius: var(--radius-md);
+	color: hsl(var(--color-text-muted));
+	text-decoration: none;
+	@include text-sm;
+	@include font-medium;
+
+	&:hover {
+		background: hsl(var(--color-surface-raised));
+		color: hsl(var(--color-text));
+	}
+
+	&[aria-current="page"] {
+		background: hsl(var(--color-primary) / 0.12);
+		color: hsl(var(--color-primary));
+	}
+}
+
+// ─── Content ───────────────────────────────────────────────────
+#app-content {
+	@include p(1.5rem);
+	overflow-y: auto;
+	min-height: 0;
+	background: hsl(var(--color-bg));
+}
+
+// ─── Responsive: collapse sidebar below md ─────────────────────
+@media (max-width: bp.$bp-md - 1px) {
+	#app {
+		grid-template-columns: 1fr;
+		grid-template-rows: auto auto 1fr;
+	}
+
+	#app-sidebar {
+		border-right: none;
+		border-bottom: 1px solid hsl(var(--color-border));
+		@include py(0.5rem);
+	}
+
+	#app-sidebar nav ul {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+}

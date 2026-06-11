@@ -173,8 +173,8 @@ function Ht(h, c) {
   return p;
 }
 function J(h) {
-  const c = h.closest("[lang]");
-  return (c ? c.lang : null) || navigator.language;
+  const c = h ? h.closest("[lang]") : null;
+  return (c ? c.lang : null) || (document.documentElement ? document.documentElement.lang : null) || navigator.language;
 }
 function qt(h) {
   return h.hasAttribute("data-ln-value") ? h.getAttribute("data-ln-value") : h.textContent.trim();
@@ -346,7 +346,7 @@ function Tt(h) {
   return c.visibility = b, c.display = p, c.position = g, { width: _, height: i };
 }
 let ot = null;
-async function Ft(h) {
+async function Mt(h) {
   if (!h) {
     ot = null;
     return;
@@ -651,7 +651,7 @@ const ae = {
 }, xt = "data-ln-route", Gt = "lnRoute";
 typeof window < "u" && (window.lnRouter = ae);
 const lt = /* @__PURE__ */ new Map();
-let Ot = [], Mt = !1, kt = null, $t = {}, Yt = {}, Dt = null;
+let Ot = [], Ft = !1, kt = null, $t = {}, Yt = {}, Dt = null;
 function Et(h) {
   let [c] = h.split("#"), [b, p] = c.split("?");
   const g = {};
@@ -787,7 +787,7 @@ function ue() {
   p ? St(p.route, p.params, b, h, { historyAction: "skip" }) : w(document.body, "ln-router:not-found", { path: c });
 }
 function he() {
-  Mt || (Mt = !0, W(function() {
+  Ft || (Ft = !0, W(function() {
     document.addEventListener("click", de), window.addEventListener("popstate", ue);
     const h = window.location.pathname + window.location.search, { path: c, query: b } = Et(h), p = At(c);
     if (p) {
@@ -1111,11 +1111,44 @@ B(xt, Gt, Jt, "ln-router", {
     return !r || r === "" ? { dateStyle: "medium" } : r.match(_) ? i[r] : null;
   }
   function t(r, d, f) {
-    const a = r.getDate(), m = r.getMonth(), y = r.getFullYear(), A = r.getHours(), E = r.getMinutes(), S = {
+    const a = r.getDate(), m = r.getMonth(), y = r.getFullYear(), A = r.getHours(), E = r.getMinutes();
+    let S, L;
+    if (f.startsWith("mk") && !g(f, { month: "long" }).resolvedOptions().locale.startsWith("mk")) {
+      const I = [
+        "јануари",
+        "февруари",
+        "март",
+        "април",
+        "мај",
+        "јуни",
+        "јули",
+        "август",
+        "септември",
+        "октомври",
+        "ноември",
+        "декември"
+      ], N = [
+        "јан",
+        "фев",
+        "мар",
+        "апр",
+        "мај",
+        "јун",
+        "јул",
+        "авг",
+        "септ",
+        "окт",
+        "ноем",
+        "дек"
+      ];
+      S = I[m], L = N[m];
+    }
+    S === void 0 && (S = g(f, { month: "long" }).format(r)), L === void 0 && (L = g(f, { month: "short" }).format(r));
+    const D = {
       yyyy: String(y),
       yy: String(y).slice(-2),
-      MMMM: g(f, { month: "long" }).format(r),
-      MMM: g(f, { month: "short" }).format(r),
+      MMMM: S,
+      MMM: L,
       MM: String(m + 1).padStart(2, "0"),
       M: String(m + 1),
       dd: String(a).padStart(2, "0"),
@@ -1123,13 +1156,17 @@ B(xt, Gt, Jt, "ln-router", {
       HH: String(A).padStart(2, "0"),
       mm: String(E).padStart(2, "0")
     };
-    return d.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d|HH|mm/g, function(L) {
-      return S[L];
+    return d.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d|HH|mm/g, function(O) {
+      return D[O];
     });
   }
   function o(r, d, f) {
     const a = l(d);
-    return a ? g(f, a).format(r) : t(r, d, f);
+    if (a) {
+      const m = g(f, a), y = m.resolvedOptions().locale;
+      return f.startsWith("mk") && !y.startsWith("mk") ? t(r, "dd.MM.yyyy", f) : m.format(r);
+    }
+    return t(r, d, f);
   }
   function e(r) {
     if (r.tagName !== "INPUT")
@@ -1302,7 +1339,15 @@ B(xt, Gt, Jt, "ln-router", {
     p.set.call(this._hidden, r);
   }, e.prototype._displayFormatted = function(r) {
     const d = this.dom.getAttribute(h) || "", f = J(this.dom);
-    this._isFormatting = !0, this.dom.value = o(r, d, f), this._isFormatting = !1;
+    console.log("[ln-date] _displayFormatted:", {
+      date: r,
+      format: d,
+      locale: f,
+      dom: this.dom,
+      closestLang: this.dom.closest("[lang]"),
+      htmlLang: document.documentElement ? document.documentElement.lang : null,
+      formatted: o(r, d, f)
+    }), this._isFormatting = !0, this.dom.value = o(r, d, f), this._isFormatting = !1;
   }, Object.defineProperty(e.prototype, "value", {
     get: function() {
       return p.get.call(this._hidden);
@@ -4555,11 +4600,11 @@ const me = `<li class="ln-toast__item">\r
       k.onerror = () => {
         console.warn("[ln-data-store] IndexedDB open failed — falling back to in-memory store"), v(null);
       }, k.onsuccess = (R) => {
-        const F = R.target.result, M = Array.from(F.objectStoreNames);
-        if (!(!M.includes(p) || T.some((ft) => !M.includes(ft))))
-          return u(F), _ = F, v(F);
-        const X = F.version;
-        F.close();
+        const M = R.target.result, F = Array.from(M.objectStoreNames);
+        if (!(!F.includes(p) || T.some((ft) => !F.includes(ft))))
+          return u(M), _ = M, v(M);
+        const X = M.version;
+        M.close();
         const nt = indexedDB.open(b, X + 1);
         nt.onblocked = () => {
           console.warn("[ln-data-store] Database upgrade blocked — waiting for other tabs to close connection");
@@ -4642,9 +4687,9 @@ const me = `<li class="ln-toast__item">\r
     y(v._name, C).then((R) => {
       if (!R) throw new Error(`Record not found: ${C}`);
       v._pendingSnapshots[C] = { ...R };
-      const F = { ...R, ...T, _pending: !0 };
-      return A(v._name, F).then(() => {
-        w(v.dom, "ln-store:updated", { store: v._name, record: F, previous: v._pendingSnapshots[C] }), w(v.dom, "ln-store:request-remote-update", { id: C, data: T, expected_version: k });
+      const M = { ...R, ...T, _pending: !0 };
+      return A(v._name, M).then(() => {
+        w(v.dom, "ln-store:updated", { store: v._name, record: M, previous: v._pendingSnapshots[C] }), w(v.dom, "ln-store:request-remote-update", { id: C, data: T, expected_version: k });
       });
     }).catch((R) => console.error("[ln-data-store] Optimistic update failed:", R));
   }
@@ -4658,7 +4703,7 @@ const me = `<li class="ln-toast__item">\r
   }
   function tt(v, { ids: C = [] } = {}) {
     C.length && Promise.all(C.map((T) => y(v._name, T))).then((T) => {
-      const k = T.filter(Boolean), R = k.map((F) => F.id);
+      const k = T.filter(Boolean), R = k.map((M) => M.id);
       return v._pendingSnapshots[R.join(",")] = k, q(v._name, R).then(() => {
         v.totalCount -= R.length, w(v.dom, "ln-store:deleted", { store: v._name, ids: R }), w(v.dom, "ln-store:request-remote-bulk-delete", { ids: R });
       });
@@ -4676,10 +4721,10 @@ const me = `<li class="ln-toast__item">\r
     v.isSyncing = !0, w(v.dom, "ln-store:request-remote-sync", { since: v.lastSyncedAt });
   }
   function ct(v, C) {
-    return s().then((T) => T ? (pt() ? Promise.all(C.map((R) => r(R))) : Promise.resolve(C)).then((R) => new Promise((F, M) => {
+    return s().then((T) => T ? (pt() ? Promise.all(C.map((R) => r(R))) : Promise.resolve(C)).then((R) => new Promise((M, F) => {
       const U = T.transaction(v, "readwrite"), X = U.objectStore(v);
-      R.forEach((nt) => X.put(nt)), U.oncomplete = () => F(), U.onerror = () => {
-        o(U.error), M(U.error);
+      R.forEach((nt) => X.put(nt)), U.oncomplete = () => M(), U.onerror = () => {
+        o(U.error), F(U.error);
       };
     })) : void 0);
   }
@@ -4687,8 +4732,8 @@ const me = `<li class="ln-toast__item">\r
     return s().then((T) => {
       if (T)
         return new Promise((k, R) => {
-          const F = T.transaction(v, "readwrite"), M = F.objectStore(v);
-          C.forEach((U) => M.delete(U)), F.oncomplete = () => k(), F.onerror = () => R(F.error);
+          const M = T.transaction(v, "readwrite"), F = M.objectStore(v);
+          C.forEach((U) => F.delete(U)), M.oncomplete = () => k(), M.onerror = () => R(M.error);
         });
     });
   }
@@ -4702,8 +4747,8 @@ const me = `<li class="ln-toast__item">\r
   function rt(v, C) {
     if (!C || !C.field) return v;
     const { field: T, direction: k } = C, R = k === "desc";
-    return [...v].sort((F, M) => {
-      const U = F[T], X = M[T];
+    return [...v].sort((M, F) => {
+      const U = M[T], X = F[T];
       if (U == null && X == null) return 0;
       if (U == null) return R ? 1 : -1;
       if (X == null) return R ? -1 : 1;
@@ -4722,16 +4767,16 @@ const me = `<li class="ln-toast__item">\r
     if (!C || !T || !T.length) return v;
     const k = C.toLowerCase();
     return v.filter(
-      (R) => T.some((F) => {
-        const M = R[F];
-        return M != null && String(M).toLowerCase().includes(k);
+      (R) => T.some((M) => {
+        const F = R[M];
+        return F != null && String(F).toLowerCase().includes(k);
       })
     );
   }
   function ut(v, C, T) {
     if (!v.length) return 0;
     if (T === "count") return v.length;
-    const k = v.map((F) => parseFloat(F[C])).filter((F) => !isNaN(F)), R = k.reduce((F, M) => F + M, 0);
+    const k = v.map((M) => parseFloat(M[C])).filter((M) => !isNaN(M)), R = k.reduce((M, F) => M + F, 0);
     return T === "sum" ? R : T === "avg" && k.length ? R / k.length : 0;
   }
   function et(v, C) {
@@ -4739,11 +4784,11 @@ const me = `<li class="ln-toast__item">\r
     const T = v.presenters.computed;
     return C.map((k) => {
       const R = { ...k };
-      for (const [F, M] of Object.entries(T))
+      for (const [M, F] of Object.entries(T))
         try {
-          R[F] = M(k);
+          R[M] = F(k);
         } catch (U) {
-          console.error(`[ln-data-store] Decorator computed field failed for ${F}`, U);
+          console.error(`[ln-data-store] Decorator computed field failed for ${M}`, U);
         }
       return R;
     });
@@ -4755,8 +4800,8 @@ const me = `<li class="ln-toast__item">\r
       v.filters && (T = dt(T, v.filters)), v.search && (T = G(T, v.search, C._searchFields));
       const R = T.length;
       if (v.sort && (T = rt(T, v.sort)), v.offset || v.limit) {
-        const F = v.offset || 0, M = v.limit || T.length;
-        T = T.slice(F, F + M);
+        const M = v.offset || 0, F = v.limit || T.length;
+        T = T.slice(M, M + F);
       }
       return {
         data: et(C, T),
@@ -4774,21 +4819,21 @@ const me = `<li class="ln-toast__item">\r
     this.presenters = v;
   }, x.prototype.applySync = function(v, C, T) {
     const k = this, R = v.length > 0 || C.length > 0;
-    let F = Promise.resolve();
-    return v.length > 0 && (F = F.then(() => ct(k._name, v))), C.length > 0 && (F = F.then(() => q(k._name, C))), F.then(() => L(k._name)).then((M) => (k.totalCount = M, O(k._name, {
+    let M = Promise.resolve();
+    return v.length > 0 && (M = M.then(() => ct(k._name, v))), C.length > 0 && (M = M.then(() => q(k._name, C))), M.then(() => L(k._name)).then((F) => (k.totalCount = F, O(k._name, {
       schema_version: g,
       last_synced_at: T,
-      record_count: M
+      record_count: F
     }))).then(() => {
-      const M = !k.isLoaded;
-      k.isLoaded = !0, k.isSyncing = !1, k.lastSyncedAt = T, M ? (w(k.dom, "ln-store:loaded", { store: k._name, count: k.totalCount }), w(k.dom, "ln-store:ready", { store: k._name, count: k.totalCount, source: "server" })) : w(k.dom, "ln-store:synced", {
+      const F = !k.isLoaded;
+      k.isLoaded = !0, k.isSyncing = !1, k.lastSyncedAt = T, F ? (w(k.dom, "ln-store:loaded", { store: k._name, count: k.totalCount }), w(k.dom, "ln-store:ready", { store: k._name, count: k.totalCount, source: "server" })) : w(k.dom, "ln-store:synced", {
         store: k._name,
         added: v.length,
         deleted: C.length,
         changed: R
       });
-    }).catch((M) => {
-      k.isSyncing = !1, console.error("[ln-data-store] applySync failed:", M);
+    }).catch((F) => {
+      k.isSyncing = !1, console.error("[ln-data-store] applySync failed:", F);
     });
   }, x.prototype.confirmMutation = function(v, C, T) {
     const k = this, R = {
@@ -4803,30 +4848,30 @@ const me = `<li class="ln-toast__item">\r
     };
     return R[T] ? R[T]() : Promise.resolve();
   }, x.prototype.revertMutation = function(v, C, T) {
-    const k = this, R = T || `Server rejected ${C}`, F = {
+    const k = this, R = T || `Server rejected ${C}`, M = {
       create: () => E(k._name, v).then(() => {
         k.totalCount--, delete k._pendingSnapshots[v], w(k.dom, "ln-store:reverted", { store: k._name, record: null, action: "create", error: R });
       }),
       update: () => {
-        const M = k._pendingSnapshots[v];
-        return M ? A(k._name, M).then(() => {
-          delete k._pendingSnapshots[v], w(k.dom, "ln-store:reverted", { store: k._name, record: M, action: "update", error: R });
+        const F = k._pendingSnapshots[v];
+        return F ? A(k._name, F).then(() => {
+          delete k._pendingSnapshots[v], w(k.dom, "ln-store:reverted", { store: k._name, record: F, action: "update", error: R });
         }) : Promise.resolve();
       },
       delete: () => {
-        const M = k._pendingSnapshots[v];
-        return M ? A(k._name, M).then(() => {
-          k.totalCount++, delete k._pendingSnapshots[v], w(k.dom, "ln-store:reverted", { store: k._name, record: M, action: "delete", error: R });
+        const F = k._pendingSnapshots[v];
+        return F ? A(k._name, F).then(() => {
+          k.totalCount++, delete k._pendingSnapshots[v], w(k.dom, "ln-store:reverted", { store: k._name, record: F, action: "delete", error: R });
         }) : Promise.resolve();
       },
       "bulk-delete": () => {
-        const M = k._pendingSnapshots[v];
-        return !M || !M.length ? Promise.resolve() : ct(k._name, M).then(() => {
-          k.totalCount += M.length, delete k._pendingSnapshots[v], w(k.dom, "ln-store:reverted", { store: k._name, record: null, ids: v.split(","), action: "bulk-delete", error: R });
+        const F = k._pendingSnapshots[v];
+        return !F || !F.length ? Promise.resolve() : ct(k._name, F).then(() => {
+          k.totalCount += F.length, delete k._pendingSnapshots[v], w(k.dom, "ln-store:reverted", { store: k._name, record: null, ids: v.split(","), action: "bulk-delete", error: R });
         });
       }
     };
-    return F[C] ? F[C]() : Promise.resolve();
+    return M[C] ? M[C]() : Promise.resolve();
   }, x.prototype.resolveConflict = function(v, C, T) {
     const k = this._pendingSnapshots[v];
     return k ? A(this._name, k).then(() => {
@@ -4858,7 +4903,7 @@ const me = `<li class="ln-toast__item">\r
       const C = Array.from(v.objectStoreNames);
       return new Promise((T, k) => {
         const R = v.transaction(C, "readwrite");
-        C.forEach((F) => R.objectStore(F).clear()), R.oncomplete = () => T(), R.onerror = () => k(R.error);
+        C.forEach((M) => R.objectStore(M).clear()), R.oncomplete = () => T(), R.onerror = () => k(R.error);
       });
     }).then(() => {
       Object.values(l).forEach((v) => {
@@ -4866,7 +4911,7 @@ const me = `<li class="ln-toast__item">\r
       });
     });
   }
-  B(h, c, x, "ln-data-store"), window[c].clearAll = ht, window[c].init = window[c], window[c].setStorageKey = Ft, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.setStorageKey = Ft);
+  B(h, c, x, "ln-data-store"), window[c].clearAll = ht, window[c].init = window[c], window[c].setStorageKey = Mt, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.setStorageKey = Mt);
 })();
 (function() {
   const h = "data-ln-api-connector", c = "lnApiConnector", b = "lnConnector";

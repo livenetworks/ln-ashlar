@@ -50,11 +50,36 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		const hours = date.getHours();
 		const minutes = date.getMinutes();
 
+		let mmmmVal, mmmVal;
+		if (locale.startsWith('mk')) {
+			const formatter = _getFormatter(locale, { month: 'long' });
+			const resolvedLocale = formatter.resolvedOptions().locale;
+			if (!resolvedLocale.startsWith('mk')) {
+				const mkMonthsLong = [
+					'јануари', 'февруари', 'март', 'април', 'мај', 'јуни',
+					'јули', 'август', 'септември', 'октомври', 'ноември', 'декември'
+				];
+				const mkMonthsShort = [
+					'јан', 'фев', 'мар', 'апр', 'мај', 'јун',
+					'јул', 'авг', 'септ', 'окт', 'ноем', 'дек'
+				];
+				mmmmVal = mkMonthsLong[month];
+				mmmVal = mkMonthsShort[month];
+			}
+		}
+
+		if (mmmmVal === undefined) {
+			mmmmVal = _getFormatter(locale, { month: 'long' }).format(date);
+		}
+		if (mmmVal === undefined) {
+			mmmVal = _getFormatter(locale, { month: 'short' }).format(date);
+		}
+
 		const tokens = {
 			'yyyy': String(year),
 			'yy':   String(year).slice(-2),
-			'MMMM': _getFormatter(locale, { month: 'long' }).format(date),
-			'MMM':  _getFormatter(locale, { month: 'short' }).format(date),
+			'MMMM': mmmmVal,
+			'MMM':  mmmVal,
 			'MM':   String(month + 1).padStart(2, '0'),
 			'M':    String(month + 1),
 			'dd':   String(day).padStart(2, '0'),
@@ -71,7 +96,12 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 	function _formatDate(date, format, locale) {
 		const intlOptions = _getIntlOptions(format);
 		if (intlOptions) {
-			return _getFormatter(locale, intlOptions).format(date);
+			const formatter = _getFormatter(locale, intlOptions);
+			const resolvedLocale = formatter.resolvedOptions().locale;
+			if (locale.startsWith('mk') && !resolvedLocale.startsWith('mk')) {
+				return _formatCustom(date, 'dd.MM.yyyy', locale);
+			}
+			return formatter.format(date);
 		}
 		return _formatCustom(date, format, locale);
 	}
@@ -442,6 +472,15 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 	_component.prototype._displayFormatted = function (date) {
 		const format = this.dom.getAttribute(DOM_SELECTOR) || '';
 		const locale = getLocale(this.dom);
+		console.log('[ln-date] _displayFormatted:', {
+			date: date,
+			format: format,
+			locale: locale,
+			dom: this.dom,
+			closestLang: this.dom.closest('[lang]'),
+			htmlLang: document.documentElement ? document.documentElement.lang : null,
+			formatted: _formatDate(date, format, locale)
+		});
 		this._isFormatting = true;
 		this.dom.value = _formatDate(date, format, locale);
 		this._isFormatting = false;

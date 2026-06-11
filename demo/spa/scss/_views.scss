@@ -1,0 +1,64 @@
+@use '../../../scss/config/mixins' as *;
+
+// ─── Table cards ────────────────────────────────────────────────────
+// section-card surface on the table roots (semantic selectors, no
+// extra class in markup — the roots already carry data-ln-table).
+#packages-table,
+#tenants-table {
+	@include section-card;
+}
+
+// ─── Package chip / status badge colors ─────────────────────────────
+// .badge + .ln-chip vocabulary classes are library-shipped — no binds.
+
+// ─── Row actions ────────────────────────────────────────────────────
+// No `row-actions` mixin exists — bind the per-button mixins.
+.row-actions {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: inline-flex;
+	gap: var(--size-2xs);
+	align-items: center;
+
+	li button { @include table-row-action; }
+
+	li button[data-ln-table-row-action="delete"] {
+		@include table-row-action-delete;
+	}
+}
+
+// ─── Bulk delete (danger rebind — never inline) ─────────────────────
+#bulk-delete-tenants {
+	@include semantic-color(error);
+}
+
+// ─── Per-view error regions ─────────────────────────────────────────
+[data-view-error] {
+	@include flex-col;
+	@include items-center;
+	@include justify-center;
+	gap: var(--size-sm);
+	padding: var(--size-2xl) var(--size-lg);
+	text-align: center;
+	color: var(--fg-muted);
+
+	> .ln-icon { color: hsl(var(--color-error)); }
+
+	h3 {
+		@include text-lg;
+		@include font-semibold;
+		color: hsl(var(--color-error));
+		margin: 0;
+	}
+
+	p { margin: 0; }
+}
+
+// Author display would otherwise beat the UA [hidden] rule
+[data-view-error][hidden] { display: none; }
+
+// ─── 404 ────────────────────────────────────────────────────────────
+#not-found .not-found-state {
+	@include empty-state;
+}

@@ -1,5 +1,5 @@
 // ==========================================================================
-// DocuFlow Demo — Bundled build
+// DocuFlow SPA Demo — Bundled build
 // ==========================================================================
 
 // Framework (includes full ln-ashlar CSS)
@@ -11,3 +11,4 @@
 // Views
 @use 'scss/dashboard';
 @use 'scss/views';
+@use 'scss/form';

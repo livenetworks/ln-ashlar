@@ -1,0 +1,78 @@
+@use '../../../scss/config/mixins' as *;
+
+// ─── Modal sizing ───────────────────────────────────────────────
+.ln-modal#tenant-modal > form  { @include modal-lg; }
+.ln-modal#package-modal > form { @include modal-md; }
+
+// Tenant form: 6-col grid in modal main
+#tenant-modal > form > main {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: var(--size-3);
+
+	// Default: full-width
+	.form-element { grid-column: 1 / -1; }
+
+	// Narrower fields
+	.form-element:has([name="slug"]),
+	.form-element:has([name="custom_domain"]) { grid-column: span 3; }
+
+	// Colour pickers
+	.form-element:has([name="brand_primary"]),
+	.form-element:has([name="brand_secondary"]) { grid-column: span 2; }
+
+	// Checkboxes
+	.form-element:has([type="checkbox"]) { grid-column: span 3; }
+}
+
+// ─── Toolbar ────────────────────────────────────────────────────
+.ln-table__toolbar {
+	display: flex;
+	align-items: center;
+	gap: var(--size-3);
+	flex-wrap: wrap;
+	@include py(0.75rem);
+
+	h2 {
+		@include text-lg;
+		@include font-semibold;
+		margin: 0;
+	}
+
+	// Push search + new button to the right
+	> div { flex: 1; }
+}
+
+// ─── Row actions ────────────────────────────────────────────────
+// <ul class="row-actions"> wraps icon buttons in each row
+.row-actions {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: inline-flex;
+	gap: var(--size-1);
+	align-items: center;
+}
+
+// ─── Error state region ─────────────────────────────────────────
+[data-view-error] {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--size-3);
+	padding: var(--size-8) var(--size-4);
+	text-align: center;
+	color: hsl(var(--color-text-muted));
+
+	.ln-icon { color: hsl(var(--color-error)); }
+
+	h3 {
+		@include text-lg;
+		@include font-semibold;
+		color: hsl(var(--color-error));
+		margin: 0;
+	}
+
+	p { margin: 0; }
+}
