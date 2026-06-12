@@ -22,9 +22,7 @@ imperative branch that aborts the open early.
 
 1. Store `dom` reference, read initial `isOpen` from attribute.
 2. Bind `_onEscape` and `_onFocusTrap` handlers (closures capturing
-   `self`). `_onClose` is also bound but never attached — vestigial,
-   superseded by the document-level click delegation (see flagged
-   bugs).
+   `self`).
 3. If `isOpen` (boot-time `data-ln-modal="open"`), apply open-state
    side effects: set `aria-modal`, `role="dialog"`, add
    `body.ln-modal-open`, attach ESC + focus-trap listeners. Note: this
@@ -73,7 +71,9 @@ Same trigger:
 1. Bail if no instance.
 2. If currently open: remove `aria-modal`, detach ESC + focus-trap
    listeners, null `_returnFocusEl`, remove body scroll-lock class
-   (gated on no other open modal).
+   (gated on no other open modal — the check is self-excluding, so a
+   still-attached modal whose attribute still reads `"open"` does not
+   keep the lock alive during its own destroy).
 3. Dispatch `ln-modal:destroyed`.
 4. `delete this.dom.lnModal`.
 
@@ -94,7 +94,6 @@ Each `[data-ln-modal]` element gets an instance at `element.lnModal`:
 | `isOpen`        | boolean  | Mirrors `data-ln-modal === "open"`. Updated by `_syncAttribute` only.        |
 | `_onEscape`     | Function | Bound ESC keydown handler. Attached on open, detached on close.              |
 | `_onFocusTrap`  | Function | Bound Tab keydown handler. Attached on open, detached on close.              |
-| `_onClose`      | Function | Bound in constructor but never attached — dead code superseded by the document-level click delegation. |
 | `_returnFocusEl`| Element/null | Set on open: `document.activeElement` before auto-focus runs (if not `<body>`). Read on close: re-focused if still in DOM. Nulled after restore. |
 
 The instance has **no observable callbacks**. State sync is driven

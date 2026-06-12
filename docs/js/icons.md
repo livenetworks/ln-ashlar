@@ -111,6 +111,8 @@ Full list of available Tabler icon names: `scss/tabler-icons.txt`
 
 Size variants live in `scss/config/_icons.scss` — `.ln-icon--sm` (1rem), default (1.25rem), `.ln-icon--lg` (1.5rem), `.ln-icon--xl` (4rem). The `.ln-icon` element inherits `currentColor` from its parent.
 
+*Note: There are no SVG data-URIs or icon variables in this file. It is strictly a CSS definition file for base sizing and layout of the injected inline SVG elements.*
+
 ## Build Output
 
 `vite.config.js` copies `js/ln-icons/icons/*.svg` → `dist/icons/` on build. Upload these to `window.LN_ICONS_CUSTOM_CDN`.
@@ -145,4 +147,10 @@ Works inside accordion items AND for standalone toggles — anywhere the trigger
 
 ## Dependencies
 
-None. Works in any environment that supports `fetch` and `MutationObserver`.
+While the package has zero npm runtime dependencies, `ln-icons` relies on a runtime network connection to fetch SVG icons from a CDN (such as jsDelivr for Tabler Icons, or a configured `LN_ICONS_CUSTOM_CDN`).
+
+### Offline & Caching Behavior
+
+To support offline environments and optimize loading times, successfully fetched SVGs are cached in `localStorage` under keys prefixed with `lni:`. Subsequent page loads resolve these icons synchronously from the local cache.
+
+However, if a page is loaded offline, any uncached icons (not present in `localStorage`) will fail to load. The network fetch will fail silently (`.catch()`), and the icon will remain blank in the UI. For full offline environments, you should self-host the SVG assets on a local asset server and point `window.LN_ICONS_CDN` to that server before the library initializes.

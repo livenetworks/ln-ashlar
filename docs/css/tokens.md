@@ -64,7 +64,7 @@ Hover and focus states are derived at consumer scope via CSS relative color synt
 
 ### Status color overrides
 
-To change a component's status color, prefer the library helper classes (`.success`, `.warning`, `.error`, `.info`) — they rebind `--color-primary` plus its `-light` / `-lighter` companions on the scope. Hover and focus surfaces are derived from `--color-primary` at consumer scope via CSS relative color syntax (`hsl(from var(--color-accent) h s calc(l ± 8))`), so a single `--color-primary` override propagates to the full state machine. If you override `--color-primary` directly on a selector and need the tint surfaces to follow, also override `-light` and `-lighter`.
+To change a component's status color, prefer the library helper classes (`.success`, `.warning`, `.error`, `.info`) — they rebind `--color-primary` plus its `-light` / `-lighter` companions on the scope. Hover and focus states are dynamically derived from `--color-primary` at consumer scope via CSS relative color syntax (`hsl(from var(--color-accent) h s calc(l - 8))`), so they propagate to hover/focus states automatically. However, the tint surfaces (`-light` and `-lighter` tokens) are static HSL triplets defined at `:root` and do NOT propagate automatically; if you override `--color-primary` directly on a selector, you must also override its `-light` and `-lighter` companion tokens if you want the tint surfaces to follow.
 
 ### Neutral scale (v1.1)
 
@@ -125,8 +125,7 @@ vocabulary at theme `:root`.
 
 ### Primitives — what mixins read
 
-Mixins read ONLY these single primitives. The primitive defaults wire
-to the vocabulary. Components rebind the primitive on their own scope.
+Mixins read ONLY these single primitives. The primitive defaults wire to the vocabulary. Components rebind the primitive on their own scope.
 
 | Primitive | Default (wires to vocabulary) | What reads it |
 |---|---|---|
@@ -134,6 +133,20 @@ to the vocabulary. Components rebind the primitive on their own scope.
 | `--color-fg` | `var(--fg-default)` | Text color |
 | `--color-border` | `var(--border-subtle)` | Border color |
 | `--shadow` | `var(--shadow-resting)` | Box shadow |
+| `--color-scrim` | `hsl(var(--color-neutral-900) / 0.5)` | Modal overlay backdrop background |
+| `--color-accent` | `hsl(var(--color-primary))` | Primary solid accent color (buttons, active indicators) |
+| `--color-accent-fg` | `hsl(var(--color-white))` | Text color on solid accent background |
+| `--color-accent-tint` | `hsl(var(--color-primary-lighter))` | Light accent wash (checked pills, active nav item background) |
+| `--color-accent-tint-strong` | `hsl(var(--color-primary-light))` | Stronger light accent wash (focus halos, upload active zones) |
+| `--font-size` | `var(--text-body-md)` | Base font size |
+| `--line-height` | `var(--lh-body-md)` | Base line height |
+| `--transition` | `var(--transition-base)` | Standard transition timing/curve |
+| `--margin-block` | *None (soft primitive)* | Vertical spacing / rhythm (margin-bottom/top) |
+| `--margin-inline` | *None (soft primitive)* | Horizontal spacing / rhythm (margin-left/right) |
+| `--border-block-start` | *None (soft primitive)* | Top border override (joining elements) |
+| `--border-block-end` | *None (soft primitive)* | Bottom border override |
+| `--border-inline-start` | *None (soft primitive)* | Left border override |
+| `--border-inline-end` | *None (soft primitive)* | Right border override |
 
 **Rebind pattern — picking a different vocabulary value:**
 
@@ -215,37 +228,23 @@ to the vocabulary. Components rebind the primitive on their own scope.
 
 ## Shadows
 
-| Token | Value |
-|-------|-------|
-| `--shadow-none` | none |
-| `--shadow-xs` | `0 1px 2px 0 rgba(0,0,0,0.05)` |
-| `--shadow-sm` | `0 1px 3px 0 …, 0 1px 2px -1px …` |
-| `--shadow-md` | `0 4px 6px -1px …, 0 2px 4px -2px …` |
-| `--shadow-lg` | `0 10px 15px -3px …, 0 4px 6px -4px …` |
-| `--shadow-xl` | `0 20px 25px -5px …, 0 8px 10px -6px …` |
-| `--shadow-primary` | `0 0 20px hsl(var(--color-primary) / 0.2)` |
+All shadows use a cool-tinted base `hsl(220 40% 15% / alpha)` giving a modern, premium appearance.
 
-### Shadow scale (v1.1)
+| Token | Layers | Value in SCSS | Use |
+|---|---|---|---|
+| `--shadow-none` | — | `none` | Reset / disable shadows |
+| `--shadow-xs` | 1 | `0 1px 2px 0 hsl(220 40% 15% / 0.04)` | Hairline lift (subtle cards) |
+| `--shadow-sm` | 2 | `0 1px 3px 0 hsl(... / 0.08), 0 1px 2px -1px hsl(... / 0.04)` | Cards, dropdowns |
+| `--shadow-md` | 2 | `0 4px 12px -2px hsl(... / 0.10), 0 2px 4px -2px hsl(... / 0.06)` | Floating panels, popovers, toast |
+| `--shadow-lg` | 2 | `0 12px 24px -6px hsl(... / 0.12), 0 8px 12px -4px hsl(... / 0.08)` | Large floating panels |
+| `--shadow-xl` | 2 | `0 24px 48px -12px hsl(... / 0.16), 0 12px 24px -6px hsl(... / 0.10)` | Modals, full-screen overlays |
+| `--shadow-2xl` | 2 | `0 36px 72px -18px hsl(... / 0.20), 0 18px 36px -9px hsl(... / 0.12)` | Hero elevation |
+| `--shadow-inner` | 1 | `inset 0 2px 4px 0 hsl(... / 0.06)` | Depressed / active state |
+| `--shadow-primary` | 1 | `0 8px 24px -6px hsl(var(--color-primary) / 0.28)` | Primary-tinted glow (CTA emphasis) |
+| `--shadow-success` | 1 | `0 8px 24px -6px hsl(var(--color-success) / 0.28)` | Success-tinted glow |
+| `--shadow-error` | 1 | `0 8px 24px -6px hsl(var(--color-error) / 0.28)` | Error-tinted glow |
 
-All shadows use `hsl(220 40% 15% / alpha)` as the base — gives a faint
-cool tint that reads as modern/expensive on daylight backgrounds.
-
-| Token | Layers | Use |
-|---|---|---|
-| `--shadow-none` | — | Reset |
-| `--shadow-xs` | 1 | Hairline lift (subtle cards) |
-| `--shadow-sm` | 2 | Cards, dropdowns |
-| `--shadow-md` | 2 | Floating panels, popovers |
-| `--shadow-lg` | 2 | Modals, toast |
-| `--shadow-xl` | 2 | Full-screen overlays |
-| `--shadow-2xl` | 2 | Hero elevation |
-| `--shadow-inner` | 1 | Depressed state (active, selected) |
-| `--shadow-primary` | 1 | Primary-tinted glow (CTA emphasis, focus halo) |
-| `--shadow-success` | 1 | Success-tinted glow |
-| `--shadow-error` | 1 | Error-tinted glow |
-
-**Do not use hover shadows on buttons.** Buttons change colour only
-(`CLAUDE.md` § Button Architecture).
+**Do not use hover shadows on buttons.** Buttons change colour only (`docs/architecture/reference.md` § Button Architecture).
 
 ### Focus ring (v1.1)
 
@@ -313,6 +312,12 @@ toast (50) > modal (40) > overlay (30) > dropdown (20) > sticky (10)
 | `--z-modal` | 40 |
 | `--z-toast` | 50 |
 
+### Stacking Context & Teleportation Strategy
+
+Components like dropdowns and popovers are teleported to `<body>` to prevent parent `overflow: hidden` clipping. However, because their base z-index is `--z-dropdown` (20), opening them inside a modal (`--z-modal` which is 40) would place them underneath the modal backdrop.
+
+To resolve this, the framework uses a CSS `:has()` selector on `<body>` to automatically elevate teleported dropdowns and popovers to `z-index: 50` (modal z-index + 10) when a modal is active. Tooltips in JS portal mode are placed at `z-index: 50` (`--z-toast`) by default, so they automatically render above modals.
+
 ---
 
 ## Naming convention
@@ -321,11 +326,11 @@ Token names are always **semantic** (by function), never by color:
 
 ```css
 /* Correct */
---color-primary: 232 75% 52%;
+--color-primary: 216 95% 42%;
 --color-error:   0 84% 50%;
 
 /* Wrong */
---color-blue: 232 75% 52%;
+--color-blue: 216 95% 42%;
 --color-red:  0 84% 50%;
 ```
 
