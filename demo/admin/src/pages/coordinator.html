@@ -131,8 +131,8 @@
 				<thead>
 					<tr>
 						<th data-ln-table-col="title">Title <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-						<th data-ln-table-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
-						<th data-ln-table-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="department" data-ln-table-filter-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="status" data-ln-table-filter-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-demo-table-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
 						<th data-ln-table-col="file_size">Size</th>
 						<th data-ln-table-col="author_name">Author</th>
 						<th data-ln-table-col="updated_at">Last Updated <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
@@ -186,31 +186,35 @@
 				</td></tr>
 			</template>
 
-			<!-- Filter Dropdown Template -->
-			<template data-ln-template="column-filter">
-				<div class="column-filter-dropdown">
-					<input type="search" data-ln-filter-search placeholder="Search options…">
-					<ul data-ln-filter-options>
-						<li>
-							<label>
-								<input type="checkbox" data-ln-filter-reset>
-								All
-							</label>
-						</li>
-						<template data-ln-template="column-filter-item">
-							<li>
-								<label>
-									<input type="checkbox" data-ln-attr="value:value">
-									<span data-ln-field="value"></span>
-								</label>
-							</li>
-						</template>
-					</ul>
-				</div>
-			</template>
 		</section>
 	</main>
 </section>
+
+<!-- Department filter popover -->
+<div data-ln-popover id="filter-demo-table-dept">
+	<input type="search" placeholder="Search..." data-ln-search="filter-demo-table-dept-list" data-ln-search-items="label">
+	<ul id="filter-demo-table-dept-list" data-ln-filter="demo-table">
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="HR"> HR</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="IT"> IT</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal"> Legal</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Marketing"> Marketing</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Operations"> Operations</label></li>
+	</ul>
+</div>
+
+<!-- Status filter popover -->
+<div data-ln-popover id="filter-demo-table-status">
+	<ul id="filter-demo-table-status-list" data-ln-filter="demo-table">
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Approved"> Approved</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Archived"> Archived</label></li>
+	</ul>
+</div>
 
 <!-- Modal Document Form -->
 <div class="ln-modal" data-ln-modal id="doc-modal">

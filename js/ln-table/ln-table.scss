@@ -1,6 +1,6 @@
 // ── JS state: ln-table structural/state overrides ──
 
-// Fix: .content overflow blocks sticky positioning
+// gls compat — remove when gls migrates to ln-popover filter pattern
 .content:has([data-ln-table]) {
 	overflow: visible;
 }

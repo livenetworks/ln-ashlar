@@ -373,7 +373,7 @@
 							<th data-ln-table-col="max_users">Max users <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 							<th data-ln-table-col="max_documents">Documents <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 							<th data-ln-table-col="max_storage">Storage <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-							<th data-ln-table-col="active" data-ln-table-filter-options='[{"value":"true","label":"Active"},{"value":"false","label":"Inactive"}]'>Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+							<th data-ln-table-col="active" data-ln-table-filter-col="active">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-packages-active" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
 							<th>Actions</th>
 						</tr>
 					</thead>
@@ -422,28 +422,16 @@
 					</article>
 				</template>
 
-				<template data-ln-template="column-filter">
-					<div class="column-filter-dropdown">
-						<input type="search" data-ln-filter-search placeholder="Search…">
-						<ul data-ln-filter-options>
-							<li>
-								<label>
-									<input type="checkbox" data-ln-filter-reset>
-									All
-								</label>
-							</li>
-							<template data-ln-template="column-filter-item">
-								<li>
-									<label>
-										<input type="checkbox" data-ln-attr="value:value">
-										<span data-ln-field="value"></span>
-									</label>
-								</li>
-							</template>
-						</ul>
-					</div>
-				</template>
 			</section>
+
+			<!-- Packages table: status filter popover -->
+			<div data-ln-popover id="filter-packages-active">
+				<ul data-ln-filter="packages-table">
+					<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
+					<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
+					<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>
+				</ul>
+			</div>
 
 			<article data-view-error hidden>
 				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
@@ -495,8 +483,8 @@
 							<th data-ln-table-col="slug">Slug <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 							<th data-ln-table-col="custom_domain">Domain</th>
 							<th data-ln-table-col="package_name">Package</th>
-							<th data-ln-table-col="auth_method">Auth <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter auth method"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
-							<th data-ln-table-col="active" data-ln-table-filter-options='[{"value":"true","label":"Active"},{"value":"false","label":"Inactive"}]'>Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+							<th data-ln-table-col="auth_method" data-ln-table-filter-col="auth_method">Auth <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-auth" aria-label="Filter auth method"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+							<th data-ln-table-col="active" data-ln-table-filter-col="active">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-active" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
 							<th>Actions</th>
 						</tr>
 					</thead>
@@ -547,28 +535,25 @@
 					</article>
 				</template>
 
-				<template data-ln-template="column-filter">
-					<div class="column-filter-dropdown">
-						<input type="search" data-ln-filter-search placeholder="Search…">
-						<ul data-ln-filter-options>
-							<li>
-								<label>
-									<input type="checkbox" data-ln-filter-reset>
-									All
-								</label>
-							</li>
-							<template data-ln-template="column-filter-item">
-								<li>
-									<label>
-										<input type="checkbox" data-ln-attr="value:value">
-										<span data-ln-field="value"></span>
-									</label>
-								</li>
-							</template>
-						</ul>
-					</div>
-				</template>
 			</section>
+
+			<!-- Tenants table: auth method filter popover -->
+			<div data-ln-popover id="filter-tenants-auth">
+				<ul data-ln-filter="tenants-table">
+					<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-reset checked> All</label></li>
+					<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="Local"> Local</label></li>
+					<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="LDAP"> LDAP</label></li>
+				</ul>
+			</div>
+
+			<!-- Tenants table: status filter popover -->
+			<div data-ln-popover id="filter-tenants-active">
+				<ul data-ln-filter="tenants-table">
+					<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
+					<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
+					<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>
+				</ul>
+			</div>
 
 			<article data-view-error hidden>
 				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>

@@ -93,6 +93,13 @@ Sets `el.textContent = data[prop]`. Skips if `data[prop]` is `null` or `undefine
 > **`data-ln-field` is NOT a Custom Component**
 > There is no custom HTML element or component named `<ln-field>`. The `data-ln-field` attribute is a decorative binding instruction read and processed by the `fill(root, data)` utility function in `ln-core`. It should be applied to standard HTML tags (like `<h3>`, `<p>`, `<span>`, etc.).
 
+> [!WARNING]
+> **`data-ln-field` works only where `fill()` runs — and nothing calls `fill()` automatically.**
+> A component must call `fill(root, data)` explicitly, and re-call it to update. Template
+> render pipelines never do: `ln-table` row templates and `renderList`'s clone pass process
+> `{{ field }}` text placeholders instead, so a `data-ln-field` inside such a `<template>`
+> is silently ignored. Decision matrix: `docs/architecture/data-flow.md` §5.
+
 ---
 
 **`data-ln-attr="attr:prop, attr:prop"` → `setAttribute`**

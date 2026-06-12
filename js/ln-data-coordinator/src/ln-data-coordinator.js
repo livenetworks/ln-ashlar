@@ -239,24 +239,6 @@ import { registerComponent, dispatch } from '../../ln-core';
 		return !!(children.store && children.store._name === name && name);
 	};
 
-	_component.prototype._harvestFilterOptions = function (tableEl) {
-		const result = {};
-		const ths = tableEl.querySelectorAll('th[data-ln-table-col]');
-		for (let i = 0; i < ths.length; i++) {
-			const th = ths[i];
-			if (!th.querySelector('[data-ln-table-col-filter]')) continue;
-			const raw = th.getAttribute('data-ln-table-filter-options');
-			if (!raw) continue;
-			const field = th.getAttribute('data-ln-table-col');
-			try {
-				result[field] = JSON.parse(raw);
-			} catch (_) {
-				console.warn('[ln-data-coordinator] bad filter-options JSON on column "' + field + '"');
-			}
-		}
-		return result;
-	};
-
 	_component.prototype._serveData = function (e, kind) {
 		const el = e.target;
 		const attrName = kind === 'table' ? 'data-ln-table-store' : 'data-ln-list-store';
@@ -278,10 +260,8 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 		const self = this;
 		const query = { sort: e.detail.sort, filters: e.detail.filters, search: e.detail.search };
-		const filterOptions = kind === 'table' ? self._harvestFilterOptions(el) : undefined;
 		store.getAll(query).then(function (r) {
 			const detail = { data: r.data, total: r.total, filtered: r.filtered };
-			if (filterOptions) detail.filterOptions = filterOptions;
 			dispatch(el, 'ln-' + kind + ':set-data', detail);
 			self._boundDelivered.set(el, true);
 		});
@@ -337,15 +317,13 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 			if (kind === 'table' || kind === 'list') {
 				const cached = self._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
-				const filterOptions = kind === 'table' ? self._harvestFilterOptions(el) : undefined;
-				(function (capturedEl, capturedKind, capturedFilterOptions) {
+				(function (capturedEl, capturedKind) {
 					store.getAll(cached).then(function (r) {
 						const detail = { data: r.data, total: r.total, filtered: r.filtered };
-						if (capturedFilterOptions) detail.filterOptions = capturedFilterOptions;
 						dispatch(capturedEl, 'ln-' + capturedKind + ':set-data', detail);
 						self._boundDelivered.set(capturedEl, true);
 					});
-				})(el, kind, filterOptions);
+				})(el, kind);
 			} else if (kind === 'options') {
 				(function (capturedEl) {
 					store.getAll({}).then(function (r) {
