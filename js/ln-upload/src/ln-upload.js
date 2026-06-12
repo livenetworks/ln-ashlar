@@ -87,7 +87,9 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../..
 			container.appendChild(input);
 		}
 		const uploadUrl = container.getAttribute(DOM_SELECTOR) || '/files/upload';
-		const uploadContext = container.getAttribute(CONTEXT_ATTR) || '';
+		const uploadContextFallback = container.getAttribute(CONTEXT_ATTR) || '';
+		const deleteUrlPattern = container.getAttribute('data-ln-upload-delete') || 
+			(uploadUrl.includes('/upload') ? uploadUrl.replace(/\/upload\/?$/, '/{id}') : uploadUrl + '/{id}');
 
 		const uploadedFiles = new Map();
 		let fileIdCounter = 0;
@@ -142,7 +144,21 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../..
 
 			const formData = new FormData();
 			formData.append('file', file);
-			formData.append('context', uploadContext);
+
+			const gatheredNames = new Set();
+			container.querySelectorAll('input, select, textarea').forEach(function (el) {
+				if (el.name && el.name !== 'file_ids[]' && el.type !== 'file') {
+					if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) {
+						return;
+					}
+					formData.append(el.name, el.value);
+					gatheredNames.add(el.name);
+				}
+			});
+
+			if (!gatheredNames.has('context') && uploadContextFallback) {
+				formData.append('context', uploadContextFallback);
+			}
 
 			const xhr = new XMLHttpRequest();
 
@@ -244,7 +260,8 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../..
 
 			if (item) fill(item, { deleting: true });
 
-			fetch('/files/' + fileData.serverId, {
+			const deleteUrl = deleteUrlPattern.replace('{id}', fileData.serverId);
+			fetch(deleteUrl, {
 				method: 'DELETE',
 				headers: {
 					'X-CSRF-TOKEN': getCsrfToken(),
@@ -322,7 +339,8 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../..
 			clear: function () {
 				for (const [, fileData] of uploadedFiles) {
 					if (fileData.serverId) {
-						fetch('/files/' + fileData.serverId, {
+						const deleteUrl = deleteUrlPattern.replace('{id}', fileData.serverId);
+						fetch(deleteUrl, {
 							method: 'DELETE',
 							headers: {
 								'X-CSRF-TOKEN': getCsrfToken(),

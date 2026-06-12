@@ -1,6 +1,6 @@
 # Modal — internal architecture
 
-Source: `js/ln-modal/ln-modal.js`. This document is for library
+Source: `js/ln-modal/src/ln-modal.js`. This document is for library
 maintainers — for usage, see `js/ln-modal/README.md`.
 
 ## Single source of truth
@@ -21,18 +21,16 @@ imperative branch that aborts the open early.
 ### Init (`_component(dom)`)
 
 1. Store `dom` reference, read initial `isOpen` from attribute.
-2. Bind `_onEscape`, `_onFocusTrap`, `_onClose` handlers (closures
-   capturing `self`).
-3. Wire close buttons via `_attachCloseButtons(this)` — every
-   `[data-ln-modal-close]` inside the modal gets a click handler;
-   guard flag stored as `btn.lnModalClose` to prevent double-wire on
-   re-init.
-4. If `isOpen` (boot-time `data-ln-modal="open"`), apply open-state
+2. Bind `_onEscape` and `_onFocusTrap` handlers (closures capturing
+   `self`). `_onClose` is also bound but never attached — vestigial,
+   superseded by the document-level click delegation (see flagged
+   bugs).
+3. If `isOpen` (boot-time `data-ln-modal="open"`), apply open-state
    side effects: set `aria-modal`, `role="dialog"`, add
    `body.ln-modal-open`, attach ESC + focus-trap listeners. Note: this
    path **does not dispatch `ln-modal:before-open` or `ln-modal:open`**
    — it is the boot-time-already-open shortcut, not a state transition.
-5. Return `this`.
+4. Return `this`.
 
 ### Open (`_syncAttribute` with `shouldBeOpen === true`)
 
@@ -74,16 +72,14 @@ Same trigger:
 
 1. Bail if no instance.
 2. If currently open: remove `aria-modal`, detach ESC + focus-trap
-   listeners, remove body scroll-lock class (gated on no other open
-   modal).
-3. For every `[data-ln-modal-close]` inside, remove the click
-   handler stored at `btn.lnModalClose`, delete the flag.
-4. For every `[data-ln-modal-for="<id>"]` in the document, remove
-   the click handler stored at `btn.lnModalTrigger`, delete the
-   flag. (Note: trigger lookup is by exact id match —
-   `document.querySelectorAll('[data-ln-modal-for="<id>"]')`.)
-5. Dispatch `ln-modal:destroyed`.
-6. `delete this.dom.lnModal`.
+   listeners, null `_returnFocusEl`, remove body scroll-lock class
+   (gated on no other open modal).
+3. Dispatch `ln-modal:destroyed`.
+4. `delete this.dom.lnModal`.
+
+No click handlers are removed — trigger and close-button clicks go
+through a single permanent document-level delegated listener (see
+§Trigger and close button wiring) that survives destroy.
 
 There is no `ln-modal:before-destroy` event. Destroy is teardown,
 not a state transition.
@@ -98,34 +94,31 @@ Each `[data-ln-modal]` element gets an instance at `element.lnModal`:
 | `isOpen`        | boolean  | Mirrors `data-ln-modal === "open"`. Updated by `_syncAttribute` only.        |
 | `_onEscape`     | Function | Bound ESC keydown handler. Attached on open, detached on close.              |
 | `_onFocusTrap`  | Function | Bound Tab keydown handler. Attached on open, detached on close.              |
-| `_onClose`      | Function | Bound click handler shared by every `[data-ln-modal-close]` in this modal.   |
+| `_onClose`      | Function | Bound in constructor but never attached — dead code superseded by the document-level click delegation. |
 | `_returnFocusEl`| Element/null | Set on open: `document.activeElement` before auto-focus runs (if not `<body>`). Read on close: re-focused if still in DOM. Nulled after restore. |
 
 The instance has **no observable callbacks**. State sync is driven
 entirely by the MutationObserver (set up by `registerComponent` in
 `ln-core/helpers.js`). Mutations to `data-ln-modal` route through
-`_syncAttribute`; mutations to `data-ln-modal-for` re-init the
-trigger.
+`_syncAttribute`. Trigger and close-button clicks never touch the
+instance — they go through the document-level click delegation.
 
 ## MutationObserver
 
 A single global observer is set up by `registerComponent` (in
 `ln-core/helpers.js`). It watches `document.body` with:
 
-- `childList: true, subtree: true` → new modal elements get
-  `_findModals` + `_attachTriggers` via `findElements`.
-- `attributes: true, attributeFilter: ['data-ln-modal', 'data-ln-modal-for']`
-  → narrow filter, no fan-out on unrelated attribute changes.
+- `childList: true, subtree: true` → new `[data-ln-modal]` elements
+  get instances via `findElements`.
+- `attributes: true, attributeFilter: ['data-ln-modal']` → narrow
+  filter, no fan-out on unrelated attribute changes.
+  `data-ln-modal-for` is NOT observed — triggers need no per-element
+  wiring (see §Trigger and close button wiring).
 
 When the changed attribute is `data-ln-modal` and the target has
 an instance (`mutation.target[DOM_ATTRIBUTE]`), `_syncAttribute`
-fires. Otherwise (e.g. `data-ln-modal-for` toggled, or
-`data-ln-modal` added to a fresh element), the observer routes
-through `findElements` + `onInit` to attach the trigger or
-construct the instance.
-
-The trigger attacher (`_attachTriggers`) accepts both subtree and
-self — an element can be the trigger or contain triggers.
+fires. Otherwise (`data-ln-modal` added to a fresh element), the
+observer routes through `findElements` to construct the instance.
 
 ## ESC listener lifecycle
 
@@ -133,8 +126,7 @@ Each open modal attaches its own `_onEscape` handler to
 `document.keydown`. There is no global open-stack; one ESC press fires
 every open modal's handler concurrently, each setting
 `data-ln-modal="close"` on its own modal via `setAttribute`. This is
-intentional — the library does not recommend stacking modals (see
-README §What it does NOT do).
+intentional — the library does not recommend stacking modals.
 
 ## Focus management
 
@@ -209,28 +201,30 @@ page jumps. Fixing this would require a `getComputedStyle` /
 
 ## Trigger and close button wiring
 
-`[data-ln-modal-for="<id>"]` triggers are attached by `_attachTriggers`
-on init and on observer-detected DOM additions. Click handler:
+A single module-scope click listener on `document`, registered once at
+script load (outside the component), delegates all trigger and close
+clicks. It is permanent — never detached, not removed by `destroy()`.
+
+Handler flow:
 
 - Bails on `ctrlKey || metaKey || button === 1` so middle-click and
   Ctrl/Cmd+click pass through.
-- Otherwise `preventDefault()` then `target.setAttribute('data-ln-modal', current === 'open' ? 'close' : 'open')`.
-- If `document.getElementById(modalId)` returns null at click time,
-  emits a `console.warn` and bails.
-- If the element exists but has no instance yet, bails silently
-  (legitimate race during async DOM init).
-- Re-init guard: `btn.lnModalTrigger` flag stores the handler
-  reference; cleanup removes it in `destroy()`.
+- `e.target.closest('[data-ln-modal-for]')` → trigger path. Looks up
+  `document.getElementById(modalId)` at click time; if the modal
+  exists AND has an instance, `preventDefault()` then toggles:
+  `target.setAttribute('data-ln-modal', current === 'open' ? 'close' : 'open')`.
+  Missing modal or missing instance → bails silently (legitimate race
+  during async DOM init). The trigger
+  branch returns either way, so the close path below is not evaluated
+  when a trigger ancestor matched.
+- Otherwise `e.target.closest('[data-ln-modal-close]')` → close path.
+  Resolves the enclosing `[data-ln-modal]` via `closest()`; if it has
+  an instance, `preventDefault()` then sets `data-ln-modal="close"`.
 
-The trigger lookup happens at click time, not at attach time —
-modals loaded after the trigger still wire correctly.
-
-`[data-ln-modal-close]` buttons inside the modal are wired during
-construction by `_attachCloseButtons(instance)`. Click →
-`instance._onClose(e)` → `e.preventDefault(); self.dom.setAttribute('data-ln-modal', 'close')`. Re-init
-guard: `btn.lnModalClose` flag. The handler is shared across every
-close button in the modal — same function reference, attached once
-per button.
+Because lookup happens at click time, modals loaded after the trigger
+still wire correctly, and dynamically added triggers / close buttons
+need no attachment step. There are no per-button handlers, no guard
+flags, and nothing for `destroy()` to unwire.
 
 ## Event detail wrapping
 
@@ -254,6 +248,7 @@ attribute (`data-ln-modal`):
 | `body.ln-modal-open` class                    | Any open            | Yes if last close  |
 | `document.keydown` ESC listener               | Open                | Yes                |
 | `document.keydown` focus-trap listener        | Open                | Yes                |
+| `document.click` delegated listener (module-scope) | Script load | No (permanent — survives close and destroy) |
 | `[autofocus]` or first-input element focused  | Open                | Yes — focus restored to pre-open `document.activeElement` |
 
 The component does **not**:
