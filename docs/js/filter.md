@@ -26,6 +26,18 @@ diffing in `_afterRender` — used only to decide whether to fire
 `ln-filter:changed`. It is a cache, not a source of truth; throwing it away
 mid-flight would over-fire events but never produce incorrect visibility.
 
+## Sentinel rules
+
+Three invariants enforced synchronously in `_lnFilterChange` before `queueRender()`:
+
+1. **Check sentinel** — uncheck all non-reset inputs; force sentinel to checked.
+2. **Uncheck last value** — when no non-reset input remains checked, check all
+   sentinel inputs.
+3. **Check all values** — when a value input is checked and all non-reset inputs
+   are now checked, collapse to sentinel: uncheck all values, check sentinel(s).
+   Guard: skip if no sentinel exists in the list (lists that have no "All" option
+   should not auto-collapse).
+
 ## Render pipeline
 
 ```
@@ -197,6 +209,8 @@ a render.
 - Non-reset input checked: force every reset sentinel to `checked = false`.
 - Non-reset input unchecked: if no other non-reset input is still checked, force
   every reset sentinel to `checked = true`.
+- Non-reset input checked and all non-reset inputs are now checked: collapse to
+  sentinel — uncheck all value inputs, force every reset sentinel to `checked = true`.
 
 The handler does not dispatch events directly. It schedules a render;
 `_afterRender` is the single dispatch site.

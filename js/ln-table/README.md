@@ -65,6 +65,11 @@ A zero-dependency, high-performance table presenter component that supports both
 </section>
 ```
 
+> Row templates support `{{ field }}` (text) and
+> `data-ln-table-cell-attr="field:attr"` (attributes) only — both stamped once
+> at clone time. `data-ln-field` is **not** processed in rows (the row
+> pipeline never calls `fill()`); it would sit inert in the DOM.
+
 ---
 
 ## 🛠️ Attributes Reference
@@ -78,7 +83,7 @@ A zero-dependency, high-performance table presenter component that supports both
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
 | `data-ln-table-col-sort` | `<button>` | Column sorting trigger button. |
-| `data-ln-table-col-filter` | `<button>` | Column filter dropdown trigger. |
+| `data-ln-table-col-filter` | `<button>` | JS id hook — identifies the filter button in a `<th>`. Pair with `data-ln-popover-for` to open the filter popover. |
 | `data-ln-table-col-select` | `<th>` | Header checkbox column selector. |
 | `data-ln-table-row` | `<tr>` | Target row container in row templates. |
 | `data-ln-table-row-select` | `<input>` | Selection checkbox in row templates. |
@@ -110,36 +115,54 @@ A zero-dependency, high-performance table presenter component that supports both
 
 ---
 
-## Filter Options — `{value, label}` Shape
+## Column Filters
 
-The `filterOptions` payload in `ln-table:set-data` supports two entry shapes per field:
+Column filters use static authored markup — a `[data-ln-popover]` block containing `[data-ln-filter]` checkboxes. `ln-table` consumes one event: `ln-filter:changed`.
 
-- **Plain string** (existing): `['Draft', 'Approved', 'Pending']` — the string is both the filter value and the dropdown label.
-- **Object** (new): `[{value: 'true', label: 'Active'}, {value: 'false', label: 'Inactive'}]` — the `label` is shown in the dropdown; `value` (raw) is echoed in the `ln-table:request-data` filters and passed to the store as-is. Both shapes may coexist in the same field array.
+### What ln-table does
 
-Example:
-```js
-// set-data payload
-filterOptions: {
-  status: [
-    { value: 'approved', label: 'Approved' },
-    { value: 'draft',    label: 'Draft' }
-  ]
-}
-```
+1. Receives `ln-filter:changed` on the table element.
+2. Maps `e.detail.key` to a column via `data-ln-table-filter-col` on `<th>`.
+3. Stores active filter values in `_columnFilters`.
+4. **SSR mode**: runs `_applyFilterAndSort()` + `_render()` in-memory.
+5. **Data-driven mode**: calls `_requestData()` — the coordinator handles fetching.
+6. Toggles `.ln-filter-active` on the funnel `<button>` (the dot indicator).
+7. Dispatches `ln-table:filter`.
 
-### Raw Key / Presented Label Recipe
+### What ln-table does NOT do
 
-A column's `data-ln-table-col` attribute drives sort and filter — it is the **raw field key** used in requests. The row template `{{ field }}` placeholders are independent and can reference a **different, computed display field** without affecting filter behaviour.
+- Does not generate filter dropdown markup.
+- Does not track which options exist in the dataset.
+- Does not handle mutual exclusion of checkboxes (`ln-filter` owns that).
 
-Example: filter on raw `active` (boolean string), display a human label from a presenter:
+### Markup contract
+
 ```html
-<th data-ln-table-col="active">
-  Status <button data-ln-table-col-filter …></button>
+<!-- th attribute maps filter key → column -->
+<th data-ln-table-filter-col="department">
+	Department
+	<button class="table-filter" type="button"
+	        data-ln-table-col-filter
+	        data-ln-popover-for="filter-dept"
+	        aria-label="Filter department">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+	</button>
 </th>
+
+<!-- Popover: sibling to [data-ln-table], not inside it -->
+<div data-ln-popover id="filter-dept">
+	<input type="search" data-ln-search="filter-dept-list" data-ln-search-items="label" placeholder="Search...">
+	<ul id="filter-dept-list" data-ln-filter="my-table">
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
+	</ul>
+</div>
 ```
-```html
-<!-- row template cell -->
-<td>{{ status_display }}</td>
-```
-`data-ln-table-col="active"` → filter key; `{{ status_display }}` → presented cell (filled by a `setPresenters` computed field or app decorator). The column key only drives sort/filter; cell rendering comes exclusively from the row template.
+
+Options come from the domain (backend enum or lookup), never derived from the dataset. Include options that may have zero matches — they represent valid domain states.
+
+### Clear-all
+
+**SSR mode:** `data-ln-table-clear` on a button inside the table wrapper. Clears search term and all `[data-ln-filter]` containers targeting this table.
+
+**Data-driven mode:** `data-ln-table-clear-all` on a button. Resets `currentFilters`, clears visual indicators on all filter buttons, and calls `_requestData()`.

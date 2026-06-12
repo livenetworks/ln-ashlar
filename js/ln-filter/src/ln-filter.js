@@ -190,6 +190,27 @@ import { persistGet, persistSet } from '../../ln-core';
 					for (let i = 0; i < self.inputs.length; i++) {
 						if (_isReset(self.inputs[i])) self.inputs[i].checked = false;
 					}
+					// If all non-reset inputs are now checked → collapse to sentinel
+					// (only when a reset sentinel exists; lists without one skip this)
+					let hasReset = false;
+					for (let ri = 0; ri < self.inputs.length; ri++) {
+						if (_isReset(self.inputs[ri])) { hasReset = true; break; }
+					}
+					if (hasReset) {
+						let allChecked = true;
+						for (let ci = 0; ci < self.inputs.length; ci++) {
+							if (!_isReset(self.inputs[ci]) && !self.inputs[ci].checked) {
+								allChecked = false;
+								break;
+							}
+						}
+						if (allChecked) {
+							for (let mi = 0; mi < self.inputs.length; mi++) {
+								if (_isReset(self.inputs[mi])) self.inputs[mi].checked = true;
+								else self.inputs[mi].checked = false;
+							}
+						}
+					}
 				} else {
 					// If no non-reset values remain checked, fall back to reset
 					let anyChecked = false;

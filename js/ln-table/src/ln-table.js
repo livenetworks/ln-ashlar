@@ -70,6 +70,55 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 		const self = this;
 
+		// Unified column filter handler — shared by both SSR and data-driven branches
+		this._onColumnFilter = function (e) {
+			const key = e.detail.key;
+			let matchedTh = null;
+			for (let i = 0; i < self.ths.length; i++) {
+				if (self.ths[i].getAttribute('data-ln-table-filter-col') === key) {
+					matchedTh = self.ths[i];
+					break;
+				}
+			}
+			if (!matchedTh) return;
+
+			const values = e.detail.values;
+
+			// Indicator: toggle .ln-filter-active on the funnel <button>
+			const btn = matchedTh.querySelector('[data-ln-table-col-filter]');
+			if (btn) {
+				btn.classList.toggle('ln-filter-active', !!(values && values.length > 0));
+			}
+
+			if (self.isDataDriven) {
+				if (!values || values.length === 0) {
+					delete self.currentFilters[key];
+				} else {
+					self.currentFilters[key] = values;
+				}
+				self._requestData();
+			} else {
+				if (!values || values.length === 0) {
+					delete self._columnFilters[key];
+				} else {
+					const lower = [];
+					for (let i = 0; i < values.length; i++) {
+						lower.push(values[i].toLowerCase());
+					}
+					self._columnFilters[key] = lower;
+				}
+				self._applyFilterAndSort();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._render();
+				dispatch(dom, 'ln-table:filter', {
+					term: self._searchTerm,
+					matched: self._filteredData.length,
+					total: self._data.length
+				});
+			}
+		};
+
 		if (this.isDataDriven) {
 			this.isLoaded = false;
 			this.totalCount = 0;
@@ -81,12 +130,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
-			this._filterOptions = {};
-			this._filterableFields = this.ths
-				.filter(function (th) {
-					return th.getAttribute('data-ln-table-col') && th.querySelector('[data-ln-table-col-filter]');
-				})
-				.map(function (th) { return th.getAttribute('data-ln-table-col'); });
 
 			// Footer elements
 			this._totalSpan = dom.querySelector('[data-ln-table-total]');
@@ -115,8 +158,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				self.isLoaded = true;
 
 				dom.classList.remove('ln-table--loading');
-
-				self._updateFilterOptions(detail.filterOptions);
 
 				self._vStart = -1;
 				self._vEnd = -1;
@@ -156,38 +197,19 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				this.thead.addEventListener('click', this._onSortClick);
 			}
 
-			// --- Filter Click ---
-			this._activeDropdown = null;
-			this._onFilterClick = function (e) {
-				const btn = e.target.closest('[data-ln-table-col-filter]');
-				if (!btn) return;
-				e.stopPropagation();
-				const th = btn.closest('th');
-				if (!th) return;
-				const field = th.getAttribute('data-ln-table-col');
-				if (!field) return;
-
-				if (self._activeDropdown && self._activeDropdown.field === field) {
-					self._closeFilterDropdown();
-					return;
-				}
-				self._openFilterDropdown(field, th, btn);
-			};
-			if (this.thead) {
-				this.thead.addEventListener('click', this._onFilterClick);
-			}
-
-			this._onDocClick = function () {
-				if (self._activeDropdown) self._closeFilterDropdown();
-			};
-			document.addEventListener('click', this._onDocClick);
+			// --- Column Filter (unified with SSR via shared closure defined below) ---
+			dom.addEventListener('ln-filter:changed', this._onColumnFilter);
 
 			// Clear all filters button
 			this._onClearAll = function (e) {
 				const btn = e.target.closest('[data-ln-table-clear-all]') || e.target.closest('[data-ln-data-table-clear-all]');
 				if (!btn) return;
 				self.currentFilters = {};
-				self._updateFilterIndicators();
+				// Clear visual indicators on all filter buttons
+				for (let i = 0; i < self.ths.length; i++) {
+					const filterBtn = self.ths[i].querySelector('[data-ln-table-col-filter]');
+					if (filterBtn) filterBtn.classList.remove('ln-filter-active');
+				}
 				dispatch(dom, 'ln-table:clear-filters', { table: self.name });
 				self._requestData();
 			};
@@ -331,11 +353,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 							}
 						}
 						break;
-					case 'Escape':
-						if (self._activeDropdown) {
-							self._closeFilterDropdown();
-						}
-						break;
 				}
 			};
 			document.addEventListener('keydown', this._onKeydown);
@@ -402,47 +419,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			};
 			dom.addEventListener('ln-table:sort', this._onSort);
 
-			this._onColumnFilter = function (e) {
-				const key = e.detail.key;
-				let hasMappedColumn = false;
-				for (let i = 0; i < self.ths.length; i++) {
-					if (self.ths[i].getAttribute('data-ln-table-filter-col') === key) {
-						hasMappedColumn = true;
-						break;
-					}
-				}
-				if (!hasMappedColumn) return;
-
-				const values = e.detail.values;
-				if (!values || values.length === 0) {
-					delete self._columnFilters[key];
-				} else {
-					const lower = [];
-					for (let i = 0; i < values.length; i++) {
-						lower.push(values[i].toLowerCase());
-					}
-					self._columnFilters[key] = lower;
-				}
-
-				const th = self.dom.querySelector('th[data-ln-table-filter-col="' + key + '"]');
-				if (th) {
-					if (values && values.length > 0) {
-						th.setAttribute('data-ln-table-filter-active', '');
-					} else {
-						th.removeAttribute('data-ln-table-filter-active');
-					}
-				}
-
-				self._applyFilterAndSort();
-				self._vStart = -1;
-				self._vEnd = -1;
-				self._render();
-				dispatch(dom, 'ln-table:filter', {
-					term: self._searchTerm,
-					matched: self._filteredData.length,
-					total: self._data.length
-				});
-			};
 			dom.addEventListener('ln-filter:changed', this._onColumnFilter);
 
 			this._onClear = function (e) {
@@ -458,7 +434,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 				self._columnFilters = {};
 				for (let i = 0; i < self.ths.length; i++) {
-					self.ths[i].removeAttribute('data-ln-table-filter-active');
+					const filterBtn = self.ths[i].querySelector('[data-ln-table-col-filter]');
+					if (filterBtn) filterBtn.classList.remove('ln-filter-active');
 				}
 
 				const filters = document.querySelectorAll('[data-ln-filter="' + dom.id + '"]');
@@ -1039,199 +1016,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		return tr;
 	};
 
-	// ─── Filter Helpers ────────────────────────────────────────
-
-	_component.prototype._updateFilterOptions = function (authoritative) {
-		if (authoritative !== null && typeof authoritative === 'object' && !Array.isArray(authoritative)) {
-			const keys = Object.keys(authoritative);
-			for (let i = 0; i < keys.length; i++) {
-				const field = keys[i];
-				const vals = authoritative[field];
-				if (!Array.isArray(vals)) continue;
-				const seen = {};
-				const unique = [];
-				for (let j = 0; j < vals.length; j++) {
-					const entry = vals[j];
-					if (entry !== null && typeof entry === 'object' && 'value' in entry) {
-						// {value, label} object — preserve as-is, dedup by String(value)
-						const key = String(entry.value);
-						if (!seen[key]) { seen[key] = true; unique.push(entry); }
-					} else {
-						// plain string (existing behavior)
-						const s = String(entry);
-						if (!seen[s]) { seen[s] = true; unique.push(s); }
-					}
-				}
-				unique.sort(function (a, b) {
-					const la = (a !== null && typeof a === 'object') ? (a.label != null ? a.label : String(a.value)) : a;
-					const lb = (b !== null && typeof b === 'object') ? (b.label != null ? b.label : String(b.value)) : b;
-					return la < lb ? -1 : la > lb ? 1 : 0;
-				});
-				this._filterOptions[field] = unique;
-			}
-		} else {
-			const fields = this._filterableFields;
-			const data = this._data;
-			for (let fi = 0; fi < fields.length; fi++) {
-				const field = fields[fi];
-				if (!this._filterOptions[field]) this._filterOptions[field] = [];
-				const existing = this._filterOptions[field];
-				const seen = {};
-				for (let k = 0; k < existing.length; k++) { seen[existing[k]] = true; }
-				for (let i = 0; i < data.length; i++) {
-					const val = data[i][field];
-					if (val != null) {
-						const s = String(val);
-						if (!seen[s]) { seen[s] = true; existing.push(s); }
-					}
-				}
-				existing.sort();
-			}
-		}
-	};
-
-	_component.prototype._getUniqueValues = function (field) {
-		return (this._filterOptions[field] || []).slice();
-	};
-
-	_component.prototype._updateFilterIndicators = function () {
-		const ths = this.ths;
-		for (let i = 0; i < ths.length; i++) {
-			const th = ths[i];
-			const field = th.getAttribute('data-ln-table-col');
-			if (!field) continue;
-			const btn = th.querySelector('[data-ln-table-col-filter]');
-			if (!btn) continue;
-			const hasFilter = this.currentFilters[field] && this.currentFilters[field].length > 0;
-			btn.classList.toggle('ln-filter-active', !!hasFilter);
-		}
-	};
-
-	_component.prototype._applyFilterMutualExclusion = function (cb, optionsList) {
-		const isReset = cb.hasAttribute('data-ln-filter-reset');
-		const resetCb = optionsList.querySelector('[data-ln-filter-reset]');
-		const valueCbs = optionsList.querySelectorAll('input[type="checkbox"]:not([data-ln-filter-reset])');
-
-		if (isReset) {
-			cb.checked = true;
-			for (let i = 0; i < valueCbs.length; i++) valueCbs[i].checked = false;
-		} else if (cb.checked) {
-			if (resetCb) resetCb.checked = false;
-		} else {
-			let any = false;
-			for (let i = 0; i < valueCbs.length; i++) {
-				if (valueCbs[i].checked) { any = true; break; }
-			}
-			if (!any && resetCb) resetCb.checked = true;
-		}
-	};
-
-	_component.prototype._onFilterChange = function (field, optionsList) {
-		const resetCb = optionsList.querySelector('[data-ln-filter-reset]');
-		const valueCbs = optionsList.querySelectorAll('input[type="checkbox"]:not([data-ln-filter-reset])');
-		const checked = [];
-
-		for (let i = 0; i < valueCbs.length; i++) {
-			if (valueCbs[i].checked) checked.push(valueCbs[i].value);
-		}
-
-		const isReset = (resetCb && resetCb.checked) || checked.length === 0;
-		if (isReset) {
-			delete this.currentFilters[field];
-		} else {
-			this.currentFilters[field] = checked;
-		}
-
-		this._updateFilterIndicators();
-
-		dispatch(this.dom, 'ln-table:filter', {
-			table: this.name,
-			field: field,
-			values: isReset ? [] : checked
-		});
-
-		this._requestData();
-	};
-
-	_component.prototype._openFilterDropdown = function (field, th, btn) {
-		this._closeFilterDropdown();
-
-		const clone = cloneTemplateScoped(this.dom, this.name + '-column-filter', 'ln-table')
-			|| cloneTemplateScoped(this.dom, 'column-filter', 'ln-table');
-		if (!clone) return;
-
-		const dropdown = clone.firstElementChild;
-		if (!dropdown) return;
-
-		const uniqueValues = this._getUniqueValues(field);
-		const optionsList = dropdown.querySelector('[data-ln-filter-options]');
-		const searchInput = dropdown.querySelector('[data-ln-filter-search]');
-		const activeValues = this.currentFilters[field] || [];
-		const self = this;
-
-		if (searchInput && uniqueValues.length <= 8) {
-			searchInput.classList.add('hidden');
-		}
-
-		if (optionsList) {
-			const resetCheckbox = optionsList.querySelector('[data-ln-filter-reset]');
-			if (resetCheckbox) {
-				resetCheckbox.checked = activeValues.length === 0;
-			}
-
-			const itemTmpl = cloneTemplateScoped(dropdown, this.name + '-column-filter-item', 'ln-table')
-				|| cloneTemplateScoped(dropdown, 'column-filter-item', 'ln-table');
-
-			if (itemTmpl) {
-				for (let i = 0; i < uniqueValues.length; i++) {
-					const entry = uniqueValues[i];
-					const optVal = (entry !== null && typeof entry === 'object') ? entry.value : entry;
-					const optLabel = (entry !== null && typeof entry === 'object') ? (entry.label != null ? entry.label : String(entry.value)) : entry;
-					const itemClone = itemTmpl.cloneNode(true);
-					fill(itemClone, { value: optLabel });
-
-					const checkbox = itemClone.querySelector('input[type="checkbox"]');
-					if (checkbox) {
-						checkbox.value = String(optVal);
-						checkbox.checked = activeValues.length > 0 && activeValues.indexOf(String(optVal)) !== -1;
-					}
-					optionsList.appendChild(itemClone);
-				}
-			}
-
-			optionsList.addEventListener('change', function (e) {
-				if (e.target.type !== 'checkbox') return;
-				self._applyFilterMutualExclusion(e.target, optionsList);
-				self._onFilterChange(field, optionsList);
-			});
-		}
-
-		if (searchInput) {
-			searchInput.addEventListener('input', function () {
-				const term = searchInput.value.toLowerCase();
-				const items = optionsList.querySelectorAll('li');
-				for (let i = 0; i < items.length; i++) {
-					const text = items[i].textContent.toLowerCase();
-					items[i].classList.toggle('hidden', term && text.indexOf(term) === -1);
-				}
-			});
-		}
-
-		th.appendChild(dropdown);
-
-		this._activeDropdown = { field: field, th: th, el: dropdown };
-
-		dropdown.addEventListener('click', function (e) { e.stopPropagation(); });
-	};
-
-	_component.prototype._closeFilterDropdown = function () {
-		if (!this._activeDropdown) return;
-		if (this._activeDropdown.el && this._activeDropdown.el.parentNode) {
-			this._activeDropdown.el.parentNode.removeChild(this._activeDropdown.el);
-		}
-		this._activeDropdown = null;
-	};
-
 	// ─── Sort Helpers ──────────────────────────────────────────
 
 	_component.prototype._handleSort = function (field, th) {
@@ -1475,11 +1259,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this.dom.removeEventListener('ln-table:set-loading', this._onSetLoading);
 			if (this.thead) {
 				this.thead.removeEventListener('click', this._onSortClick);
-				this.thead.removeEventListener('click', this._onFilterClick);
 			}
-			document.removeEventListener('click', this._onDocClick);
 			document.removeEventListener('keydown', this._onKeydown);
-if (this._onSearchChange) this.dom.removeEventListener('ln-search:change', this._onSearchChange);
+			if (this._onSearchChange) this.dom.removeEventListener('ln-search:change', this._onSearchChange);
 			if (this.tbody) {
 				this.tbody.removeEventListener('click', this._onRowClick);
 				this.tbody.removeEventListener('click', this._onRowAction);
@@ -1487,8 +1269,7 @@ if (this._onSearchChange) this.dom.removeEventListener('ln-search:change', this.
 			if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);
 			if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 			this.dom.removeEventListener('click', this._onClearAll);
-
-			this._closeFilterDropdown();
+			this.dom.removeEventListener('ln-filter:changed', this._onColumnFilter);
 		} else {
 			if (this._emptyTbodyObserver) {
 				this._emptyTbodyObserver.disconnect();

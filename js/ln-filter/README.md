@@ -9,7 +9,12 @@ It filters target elements either by comparing child dataset attributes (for cus
 ## 🧭 Philosophy & Architecture
 
 1. **Declarative State Model:** The component has no custom imperative state-change methods. Filter state is driven entirely by native checkboxes. External scripts update selections by writing `input.checked = true` and dispatching a standard bubbled `change` event.
-2. **Sentinel Mutual Exclusion:** The `data-ln-filter-reset` ("All") checkbox is kept in sync automatically: checking any value checkbox unchecks the reset sentinel; checking the sentinel unchecks all value inputs; unchecking all value inputs re-checks the sentinel.
+2. **Sentinel Rules:** The `data-ln-filter-reset` ("All") checkbox is kept in sync
+   automatically through three rules:
+   - **Check sentinel** → unchecks all value inputs (resets to All).
+   - **Uncheck last value** → re-checks the sentinel (never allows empty selection).
+   - **Check all values** → collapses to sentinel: unchecks all values, re-checks
+     sentinel. Guard: only applies when a reset sentinel exists in the list.
 3. **Table Column & Auto-Population Mode:** By defining `data-ln-filter-col="N"`, the component filters plain HTML `<table>` rows by column cell text. When a `<template>` tag is nested inside, the component automatically populates value checkboxes from the column's unique values on page load.
 4. **Local State Persistence:** Adding the `data-ln-persist` attribute saves active filter selections to `localStorage` under `lnf:{id}`, ensuring filter states survive page reloads and browser transitions.
 
@@ -88,6 +93,54 @@ Fired when the reset sentinel is activated.
 
 ---
 
+---
+
+## Table Column Filter with Popover
+
+The canonical composition for `ln-table` per-column filters. `ln-filter` handles mutual exclusion and dispatches to the table by id — DOM position is irrelevant because dispatch uses `getElementById`.
+
+```html
+<!-- th: data-ln-table-filter-col maps the filter key to this column -->
+<th data-ln-table-sort="string" data-ln-table-filter-col="department">
+	Department
+	<button class="table-filter" type="button"
+	        data-ln-table-col-filter
+	        data-ln-popover-for="filter-my-table-dept"
+	        aria-label="Filter department">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+	</button>
+</th>
+
+<!-- Popover: sibling to [data-ln-table], NOT inside it -->
+<!-- ln-popover teleports this to <body> on open — no overflow clipping -->
+<div data-ln-popover id="filter-my-table-dept">
+	<!-- search targets the OPTIONS UL id, not the table id -->
+	<input type="search" placeholder="Search..."
+	       data-ln-search="filter-my-table-dept-list"
+	       data-ln-search-items="label">
+	<ul id="filter-my-table-dept-list" data-ln-filter="my-table">
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal"> Legal</label></li>
+	</ul>
+</div>
+```
+
+### Attribute roles in this composition
+
+| Attribute | Where | Purpose |
+|---|---|---|
+| `data-ln-filter-key="department"` | `<input type="checkbox">` | Column field name — must match `data-ln-table-filter-col` on `<th>` |
+| `data-ln-filter-value="Engineering"` | `<input type="checkbox">` | Raw machine value — must match `data-ln-value` in the corresponding `<td>` |
+| `data-ln-filter-reset` | `<input type="checkbox">` | Marks the "All" sentinel; checking it unchecks all value inputs |
+| `data-ln-filter="my-table"` | `<ul>` | Targets the TABLE wrapper id — not the popover id |
+
+### How dispatch reaches ln-table
+
+`ln-filter` fires `ln-filter:changed` on both the filter container and on `getElementById(tableId)` (see `_dispatchOnBoth` in `js/ln-filter/src/ln-filter.js:293`). `ln-table` receives the event directly on its root element regardless of where in the DOM the filter markup lives.
+
+---
+
 ## ⚠️ Common Pitfalls
 
 - **Driving State Programmatically Without Events:** Changing `input.checked = true` using JavaScript does not trigger browser `change` listeners. You must explicitly dispatch the event:
@@ -96,4 +149,4 @@ Fired when the reset sentinel is activated.
   input.dispatchEvent(new Event('change', { bubbles: true }));
   ```
 - **Missing `id` on Persisted Filters:** The `data-ln-persist` storage key relies on the filter element's ID (e.g. `<nav id="my-filter" data-ln-persist>`). If the ID is missing, the component will fail to initialize persistence.
-- **Filtering Coordinated Tables:** `ln-filter` is designed for static lists or plain native tables. Do not target virtualised components like `ln-table`, which manages its own column filters internally.
+- **Using `data-ln-filter-col` for ln-table column filters:** The `data-ln-filter-col` attribute (0-based column index for plain table row filtering) is for standalone `ln-filter` targeting a plain `<table>` — not for the `ln-table` component. When composing with `ln-table`, use `data-ln-filter="<tableId>"` on the `<ul>` and `data-ln-table-filter-col="<fieldName>"` on the `<th>`. `ln-table` receives `ln-filter:changed` and maps keys to columns via `data-ln-table-filter-col`.

@@ -708,3 +708,87 @@ To host custom icons in production:
 ## Reactive Architecture
 
 See [docs/js/core.md](docs/js/core.md) for the reactive rendering layer: ln-core shared helpers, Proxy-based state, fill/renderList, attribute bridge pattern.
+
+---
+
+## Column Filter Architecture
+
+### Canonical Markup Schema
+
+```html
+<!-- th: data-ln-table-filter-col maps the filter key to this column         -->
+<!-- button: data-ln-popover-for opens the popover                           -->
+<!--         data-ln-table-col-filter is a JS id hook — never a CSS selector -->
+<!-- .ln-filter-active on button = filter is active (JS-toggled; SCSS dot)   -->
+<th data-ln-table-sort="string" data-ln-table-filter-col="department">
+	Department
+	<button class="table-filter" type="button"
+	        data-ln-table-col-filter
+	        data-ln-popover-for="filter-my-table-dept"
+	        aria-label="Filter department">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+	</button>
+</th>
+
+<!-- Popover: placed as a sibling to [data-ln-table], NOT inside it          -->
+<!-- ln-popover teleports this to <body> on open — escapes overflow clipping -->
+<div data-ln-popover id="filter-my-table-dept">
+	<!-- Optional: search input targets the OPTIONS UL id, NOT the table id  -->
+	<!-- A data-ln-search targeting the table id triggers whole-table search  -->
+	<input type="search" placeholder="Search..."
+	       data-ln-search="filter-my-table-dept-list"
+	       data-ln-search-items="label">
+	<ul id="filter-my-table-dept-list" data-ln-filter="my-table">
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
+		<!-- Domain enum options — include zero-record options -->
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal"> Legal</label></li>
+	</ul>
+</div>
+```
+
+### Event Flow
+
+```
+User checks a checkbox
+  → ln-filter handles mutual exclusion (all ↔ values)
+  → ln-filter dispatches ln-filter:changed on the [data-ln-filter] container
+  → ln-filter._dispatchOnBoth (js/ln-filter/src/ln-filter.js:293):
+      also dispatches on getElementById(tableId)
+  → ln-table._onColumnFilter receives the event
+  → updates _columnFilters, toggles .ln-filter-active on the button
+  → SSR: _applyFilterAndSort() + _render()
+  → data-driven: _requestData() → coordinator handles data fetch
+  → ln-table dispatches ln-table:filter
+```
+
+### Teleport Safety
+
+`ln-popover` teleports the entire popover block to `<body>` on open (`js/ln-popover/src/ln-popover.js:91`). The search input and options `<ul>` travel together, so all `id` references remain valid. `ln-filter` binds `change` directly on inputs at init time — post-teleport DOM position does not affect event wiring. `ln-filter` dispatches on `getElementById(targetId)`, a document-global lookup, not a relative DOM traversal. Teleport is transparent to the event flow.
+
+### The Two Distinct `ln-search` Targets
+
+These must never share the same target id:
+
+- `data-ln-search="my-table-id"` on a global search input → triggers whole-table text search via `ln-table._onSearch`. Intentional table-wide behavior.
+- `data-ln-search="filter-options-ul-id"` on the search input inside a filter popover → filters which checkboxes are visible in the option list. Targets the `<ul>` of options, not the table.
+
+### Indicator Convention
+
+`.ln-filter-active` class on the filter `<button>` (the element with `data-ln-table-col-filter`). `@mixin table-filter-active` in `scss/config/mixins/_table.scss` styles the button: accent color + `::after` dot. JS toggles the class; SCSS owns the visual output.
+
+`[data-ln-table-col-filter]` may remain as a JS identification hook for finding the button. It must never be used as a CSS styling selector (CSS/JS hook boundary doctrine).
+
+**Option rendering:** Filter options inside `[data-ln-popover]` render as filled accent pills via `@mixin pill` scoped to popover `> ul li label`. The checkbox input is visually hidden (clip-path pattern) but remains keyboard-focusable; `label:has(> input:checked)` delivers the accent fill; `label:has(> input:focus-visible)` delivers the focus ring.
+
+**Sentinel auto-collapse:** When all available value checkboxes are checked, `ln-filter` automatically collapses the selection to the reset sentinel (unchecks all values, checks All). This only fires when the list contains a reset sentinel; lists without one are unaffected.
+
+### Deprecated (gls-era)
+
+| Attribute / Pattern | Replacement |
+|---|---|
+| `data-ln-table-filter-active` on `<th>` | `.ln-filter-active` on the `<button>` |
+| `data-ln-table-col-filter` as dropdown trigger | JS id hook only — pairs with `data-ln-popover-for` |
+| `data-ln-table-filter-options` JSON attribute | Removed — options are authored static HTML |
+| `<template data-ln-template="column-filter">` | Removed — markup is static |
+| `.content:has([data-ln-table]) { overflow: visible }` in `ln-table.scss` | Kept with deprecation comment until gls migrates to ln-popover pattern |

@@ -321,48 +321,81 @@ behaviour) and can't be reflected in the submit-button gating that
 
 ---
 
-## 5. Template syntax — `{{ }}` vs `data-ln-table-cell-attr`
+## 5. Template syntax — `{{ }}` vs `data-ln-table-cell-attr` vs `data-ln-field`
 
-ln-ashlar has two complementary text-substitution patterns, shared
-across renderers (`ln-table`, `ln-upload`, `ln-filter`,
-`ln-translations`, future list / card renderers). Pick by location and
-lifecycle.
+ln-ashlar has three data-to-DOM mechanisms. They look similar in markup but
+belong to **two different systems with different owners and lifecycles** —
+mixing them up produces silent no-ops, not errors. The deciding question is
+never *"text or element?"* — it is:
 
-### 5.1 `{{ field }}` — text-node placeholder
+> **Who fills this element, and when?**
 
-For substitution that lives **inside text content**. Implemented in `ln-core/helpers.js` via `fillTemplate(clone, data)`. Walks text nodes and applies the regex to replace `{{ field }}` with `record[field]`.
+- **A renderer fills it once, at clone time** (`ln-table` rows, `renderList`'s
+  clone pass) → `{{ field }}` for text, `data-ln-table-cell-attr` for
+  attributes.
+- **Your component code fills it, on every update** (an explicit
+  `fill(root, data)` call) → `data-ln-field` / `data-ln-attr` /
+  `data-ln-show` / `data-ln-class`.
+
+### 5.1 `{{ field }}` — one-shot text stamp at clone time
+
+Processed by `fillTemplate(clone, data)` (`ln-core/helpers.js`). Walks text
+nodes, replaces `{{ field }}` with `record[field]`, and **consumes the
+placeholder** — the element can never re-update from data afterwards. Runs at
+clone time inside renderer pipelines (`ln-table` rows, `renderList`'s clone
+pass); never runs on live DOM updates.
+
+Use for all static text content inside cloned templates.
+
+### 5.2 `data-ln-table-cell-attr="field:attr"` — one-shot attribute stamp
+
+Processed by the renderer (`ln-table` `_fillRow`) once per cloned row. Sets
+`el.setAttribute(attr, record[field])`. The attribute-mapping twin of `{{ }}`
+— same owner, same lifecycle.
+
+### 5.3 `data-ln-field` — re-runnable binding, requires an explicit `fill()` caller
+
+**Not a template syntax.** `data-ln-field` (with `data-ln-attr`,
+`data-ln-show`, `data-ln-class`) is processed only by `fill(root, data)` —
+and nothing calls `fill()` automatically. It works exactly where component
+code explicitly calls `fill()` and re-calls it on updates (e.g. `ln-filter`,
+`ln-options`, a `renderList` `fillFn`, modal prefill).
+
+The render pipelines that process `{{ }}` **never call `fill()`**: a
+`data-ln-field` inside an `ln-table` row template is inert — present in the
+DOM, read by nobody, silently ignored.
+
+### 5.4 Decision matrix
+
+| Need | Use | Processed by | Lifecycle |
+| --- | --- | --- | --- |
+| Text content inside a cloned template (table row, list item) | `{{ field }}` | `fillTemplate()` | once, at clone |
+| Attribute on an element inside a cloned row | `data-ln-table-cell-attr="field:attr"` | renderer (`_fillRow`) | once, at clone |
+| Text / attribute / visibility on an element your code re-fills on updates | `data-ln-field` (+ `data-ln-attr` / `data-ln-show` / `data-ln-class`) with an explicit `fill()` call | `fill()` | every `fill()` call |
+
+### 5.5 The trap — `data-ln-field` inside a row template
 
 ```html
-<template data-ln-template="row">
-    <tr>
-        <td>{{ title }}</td>
-        <td>Created {{ created_at }} by {{ author }}</td>
-    </tr>
+<!-- ❌ WRONG — inert. ln-table runs fillTemplate() + cell-attr only;
+     fill() never runs here, so data-ln-field is read by nobody. -->
+<template data-ln-template="products-row">
+	<tr data-ln-table-row>
+		<td data-ln-field="title"></td>   <!-- stays empty, no error -->
+	</tr>
+</template>
+
+<!-- ✅ RIGHT -->
+<template data-ln-template="products-row">
+	<tr data-ln-table-row>
+		<td>{{ title }}</td>
+		<td><a data-ln-table-cell-attr="url:href">{{ name }}</a></td>
+	</tr>
 </template>
 ```
 
-Use for all standard text content interpolation inside table cells or other templates.
-
-### 5.2 `data-ln-table-cell-attr="field:attr"` — attribute mapping
-
-For setting an element's attribute from the record data (e.g. href, src, id, etc.). Implemented in renderer components.
-
-```html
-<template data-ln-template="row">
-    <tr>
-        <td><a data-ln-table-cell-attr="id:href">{{ title }}</a></td>
-    </tr>
-</template>
-```
-
-Use when an element needs to receive attributes dynamically mapped from the record.
-
-### 5.3 Decision matrix
-
-| Need                                          | Use                              |
-|-----------------------------------------------|----------------------------------|
-| Value is text content of an element or inline | `{{ field }}` in text node       |
-| Value drives an element attribute             | `data-ln-table-cell-attr="field:attr"` |
+Litmus test: *is this element born from a `<template>` clone filled by a
+renderer?* → `{{ }}` / `data-ln-table-cell-attr`. *Does my own code call
+`fill()` on it?* → `data-ln-field`.
 
 ---
 

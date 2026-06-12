@@ -93,6 +93,7 @@ fill(li, { number: 1, title: 'Track', artist: 'Artist', isPlaying: true });
 
 - Returns `root` for chaining
 - Skips `null`/`undefined` values (existing content preserved)
+- Nothing calls `fill()` automatically — a component must call it explicitly, and re-call it to update. Renderer pipelines that clone templates (`ln-table` rows, `renderList`'s clone pass) do not call `fill()`; inside those templates use `{{ field }}` instead. `fill()` does not process `{{ }}` placeholders.
 
 ### fillTemplate(clone, data)
 
@@ -114,8 +115,9 @@ fillTemplate(frag, { text: 'Engineering' });
 - Missing keys produce empty string
 - No-op when no `{{` found in any text node
 - Returns `clone` for chaining
-- Coexists with `fill()` — `{{ key }}` for inline text, `data-ln-field` for element content. Both patterns are valid and can be mixed in the same template
-- Called automatically by `renderList` after cloning — templates can use `{{ key }}` text nodes alongside `data-ln-field` elements without extra code
+- **Different system from `fill()` — not interchangeable.** `fillTemplate` consumes `{{ key }}` placeholders once, at clone time; after that the text is plain and never updates. `data-ln-field` is read only by `fill()`, and `fill()` runs only where a component explicitly calls it. Neither function processes the other's syntax.
+- Called automatically by `renderList` on freshly cloned elements only — on keyed re-renders the placeholders are already consumed, so `{{ key }}` values never update. Values that must update on re-render belong in your `fillFn` (e.g. `fill()` + `data-ln-field`).
+- **`ln-table` row templates never call `fill()`** — rows support `{{ field }}` and `data-ln-table-cell-attr` only; a `data-ln-field` inside a row template is silently ignored. Decision matrix: `docs/architecture/data-flow.md` §5.
 
 ### renderList(container, items, templateName, keyFn, fillFn, componentTag)
 

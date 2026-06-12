@@ -248,14 +248,14 @@
 							Title
 							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
 						</th>
-						<th data-ln-table-col="department">
+						<th data-ln-table-col="department" data-ln-table-filter-col="department">
 							Department
 							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
-							<button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
+							<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 						</th>
-						<th data-ln-table-col="status">
+						<th data-ln-table-col="status" data-ln-table-filter-col="status">
 							Status
-							<button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
+							<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
 						</th>
 						<th data-ln-table-col="priority">
 							Priority
@@ -412,31 +412,35 @@
 				</section>
 			</template>
 
-			<!-- Dynamic Column Filter Template -->
-			<template data-ln-template="column-filter">
-				<div class="column-filter-dropdown">
-					<input type="search" data-ln-filter-search placeholder="Search...">
-					<ul data-ln-filter-options>
-						<li>
-							<label>
-								<input type="checkbox" data-ln-filter-reset>
-								All
-							</label>
-						</li>
-						<template data-ln-template="column-filter-item">
-							<li>
-								<label>
-									<input type="checkbox" data-ln-attr="value:value">
-									<span data-ln-field="value"></span>
-								</label>
-							</li>
-						</template>
-					</ul>
-				</div>
-			</template>
 		</section>
 	</main>
 </section>
+
+<!-- Department filter popover -->
+<div data-ln-popover id="filter-hybrid-dept">
+	<input type="search" placeholder="Search..." data-ln-search="filter-hybrid-dept-list" data-ln-search-items="label">
+	<ul id="filter-hybrid-dept-list" data-ln-filter="hybrid-table">
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="HR"> HR</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="IT"> IT</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal"> Legal</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Marketing"> Marketing</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Operations"> Operations</label></li>
+	</ul>
+</div>
+
+<!-- Status filter popover -->
+<div data-ln-popover id="filter-hybrid-status">
+	<ul id="filter-hybrid-status-list" data-ln-filter="hybrid-table">
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Approved"> Approved</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>
+		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Archived"> Archived</label></li>
+	</ul>
+</div>
 
 <script>
 (function () {

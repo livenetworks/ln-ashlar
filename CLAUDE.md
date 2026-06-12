@@ -45,10 +45,12 @@ Before recommending an architecture, refactor, or claiming that a behavior/metho
 
 | Concern | Source / Documentation |
 |---|---|
+| **Library Mindset / Doctrine (READ FIRST)** | [docs/architecture/mindset.md](docs/architecture/mindset.md) |
 | **Buttons / Mixins** | [docs/architecture/reference.md#button-architecture](docs/architecture/reference.md#button-architecture) |
 | **Modals** | [docs/architecture/reference.md#modal-architecture](docs/architecture/reference.md#modal-architecture) |
 | **Pills / Button Groups** | [docs/architecture/reference.md#button-groups-vs-pill-groups](docs/architecture/reference.md#button-groups-vs-pill-groups) |
 | **SCSS Architecture / Layers** | [docs/architecture/reference.md#scss-architecture-two-layers](docs/architecture/reference.md#scss-architecture-two-layers) |
+| **Template syntax: `{{ }}` vs `data-ln-field` (decision matrix)** | [docs/architecture/data-flow.md](docs/architecture/data-flow.md) §5 |
 | **Adding SCSS Mixins / Components** | [docs/architecture/reference.md#adding-a-new-scss-mixin-component](docs/architecture/reference.md#adding-a-new-scss-mixin-component) |
 | **Adding JS Components** | [docs/architecture/reference.md#adding-a-new-js-component](docs/architecture/reference.md#adding-a-new-js-component) |
 | **Override & Theme Architecture** | [docs/architecture/reference.md#override-architecture](docs/architecture/reference.md#override-architecture) |

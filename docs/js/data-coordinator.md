@@ -29,20 +29,11 @@ A page may have multiple coordinators. Each serves only its own child store — 
 
 `<storeName>` must match the `data-ln-data-store` attribute value of the coordinator's child store element.
 
-### `data-ln-table-filter-options` (declarative filter labels, D3)
+### ~~`data-ln-table-filter-options`~~ — Removed
 
-Add this JSON attribute to a `<th>` that has a `[data-ln-table-col-filter]` button to supply human-readable labels for raw filter values:
+This attribute and the `_harvestFilterOptions` / auto-accumulate path that read it have been removed. Filter options are now static authored markup inside `[data-ln-popover]` blocks — the domain owner (backend enum or lookup) determines the option list, not the dataset.
 
-```html
-<th data-ln-table-col="status"
-    data-ln-table-filter-options='[{"value":"approved","label":"Approved"},{"value":"draft","label":"Draft"}]'>
-  Status <button data-ln-table-col-filter …></button>
-</th>
-```
-
-The coordinator parses these once per request (via `_harvestFilterOptions`) and includes them in `ln-table:set-data`'s `filterOptions` payload. The dropdown shows human labels; `checkbox.value` carries the raw value; the request echoes raw — no app-side translation needed.
-
-Columns without this attribute fall back to auto-accumulate (distinct string values from the data), exactly as before.
+See [docs/architecture/reference.md#column-filter-architecture](../architecture/reference.md#column-filter-architecture) for the current canonical markup pattern.
 
 ---
 
@@ -75,9 +66,9 @@ page load
   → coordinator _serveData: _ownsStore("tenants")? yes
       store not loaded → dispatch ln-table:set-loading {loading:true}; cache query; wait
   → ln-data-store finishes sync → dispatches ln-store:ready ── bubbles ──▶ coordinator.dom
-  → _refreshAll: getAll(cached query) + _harvestFilterOptions
-      → dispatch ln-table:set-data {data, total, filtered, filterOptions}
-  → ln-table renders rows + filter dropdown shows labels
+  → _refreshAll: getAll(cached query)
+      → dispatch ln-table:set-data {data, total, filtered}
+  → ln-table renders rows
 
 user picks filter value
   → ln-table dispatches ln-table:request-data {filters:{status:['approved']}}

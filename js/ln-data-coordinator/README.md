@@ -19,21 +19,6 @@ Add these attributes to view elements to bind them to this coordinator's child s
 
 `<storeName>` = the value of `data-ln-data-store` on the coordinator's child store. Multiple coordinators on one page each serve only their own store — isolated by the `_ownsStore(name)` guard.
 
-### `data-ln-table-filter-options` (declarative filter labels)
-
-Add this JSON attribute to a `<th>` that has `[data-ln-table-col-filter]` to supply human-readable labels for raw filter values:
-
-```html
-<th data-ln-table-col="status"
-    data-ln-table-filter-options='[{"value":"approved","label":"Approved"},{"value":"draft","label":"Draft"}]'>
-  Status <button data-ln-table-col-filter aria-label="Filter status">…</button>
-</th>
-```
-
-The coordinator reads this attribute, parses JSON once per request, and feeds it into `ln-table:set-data`'s `filterOptions`. The dropdown shows human labels; `checkbox.value` carries the raw value; the request echoes raw — no app-side label↔value translation needed.
-
-Columns without this attribute fall back to auto-accumulate (distinct string values from data).
-
 ### Presenter / Binder Split
 
 - **Presenters** (`store.setPresenters({computed})`) — registered on the store; computed display fields flow through `getAll → set-data` automatically.
@@ -60,10 +45,7 @@ The coordinator listens on `this.dom` for `ln-store:ready`, `loaded`, `created`,
     <thead>
       <tr>
         <th data-ln-table-col="name">Name <button data-ln-table-col-sort …></button></th>
-        <th data-ln-table-col="status"
-            data-ln-table-filter-options='[{"value":"active","label":"Active"},{"value":"inactive","label":"Inactive"}]'>
-          Status <button data-ln-table-col-filter …></button>
-        </th>
+        <th data-ln-table-col="status">Status <button data-ln-table-col-filter …></button></th>
       </tr>
     </thead>
     <tbody data-ln-table-body></tbody>

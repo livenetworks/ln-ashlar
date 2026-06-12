@@ -1,7 +1,7 @@
 <!-- ln-page: title="Table Filter — ln-ashlar" h1="Table Filter" -->
 
 <h1>Table Filter</h1>
-				<p>Complete table filtering pattern — global search, per-column filters (popover + dropdown), and sort. Combines <code>ln-filter</code> (table column extension), <code>ln-dropdown</code>, <code>ln-popover</code>, and <code>ln-table-sort</code>.</p>
+				<p>Complete table filtering pattern — global search, per-column filters (popover), and sort. Combines <code>ln-filter</code>, <code>ln-popover</code>, and <code>ln-table-sort</code>.</p>
 
 				<!-- Employee table demo -->
 				<section class="section-card" data-demo-html>
@@ -40,7 +40,7 @@
 									</th>
 									<th data-ln-table-sort="string" data-ln-table-filter-col="dept">
 										Department
-										<button class="table-filter" type="button" data-ln-popover-for="filter-dept" aria-label="Filter department">
+										<button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-dept" aria-label="Filter department">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
 										</button>
 										<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
@@ -51,7 +51,7 @@
 									</th>
 									<th data-ln-table-sort="string" data-ln-table-filter-col="role">
 										Role
-										<button class="table-filter" type="button" data-ln-popover-for="filter-role" aria-label="Filter role">
+										<button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-role" aria-label="Filter role">
 											<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
 										</button>
 										<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
@@ -62,21 +62,9 @@
 									</th>
 									<th data-ln-table-sort="string" data-ln-table-filter-col="status">
 										Status
-										<div data-ln-dropdown>
-											<button class="table-filter" type="button" data-ln-toggle-for="filter-status" aria-label="Filter status">
-												<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
-											</button>
-											<ul id="filter-status" data-ln-toggle>
-												<li>
-													<nav data-ln-filter="employee-table">
-														<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label>
-														<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"> Active</label>
-														<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Inactive"> Inactive</label>
-														<label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="On Leave"> On Leave</label>
-													</nav>
-												</li>
-											</ul>
-										</div>
+										<button class="table-filter" type="button" data-ln-table-col-filter data-ln-popover-for="filter-status" aria-label="Filter status">
+											<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+										</button>
 										<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
 											<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
 											<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
@@ -227,41 +215,52 @@
 						<!-- Department popover -->
 						<div data-ln-popover id="filter-dept">
 							<input type="search" placeholder="Search..." data-ln-search="filter-dept-list" data-ln-search-items="label">
-							<nav id="filter-dept-list" data-ln-filter="employee-table">
-								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
-								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label>
-								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label>
-								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Finance"> Finance</label>
-								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="HR"> HR</label>
-								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Marketing"> Marketing</label>
-								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="QA"> QA</label>
-							</nav>
+							<ul id="filter-dept-list" data-ln-filter="employee-table">
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Finance"> Finance</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="HR"> HR</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Marketing"> Marketing</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Product"> Product</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="QA"> QA</label></li>
+							</ul>
 						</div>
 
 						<!-- Role popover -->
 						<div data-ln-popover id="filter-role">
 							<input type="search" placeholder="Search..." data-ln-search="filter-role-list" data-ln-search-items="label">
-							<nav id="filter-role-list" data-ln-filter="employee-table">
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-reset checked> All</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Accountant"> Accountant</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Backend Developer"> Backend Developer</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Budget Analyst"> Budget Analyst</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Content Lead"> Content Lead</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="DevOps Engineer"> DevOps Engineer</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Financial Analyst"> Financial Analyst</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Frontend Developer"> Frontend Developer</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="HR Manager"> HR Manager</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="HR Specialist"> HR Specialist</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Motion Designer"> Motion Designer</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="QA Engineer"> QA Engineer</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="QA Lead"> QA Lead</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="SEO Specialist"> SEO Specialist</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Security Engineer"> Security Engineer</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Senior Developer"> Senior Developer</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="System Admin"> System Admin</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="UI Designer"> UI Designer</label>
-								<label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="UX Researcher"> UX Researcher</label>
-							</nav>
+							<ul id="filter-role-list" data-ln-filter="employee-table">
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-reset checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Accountant"> Accountant</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Backend Developer"> Backend Developer</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Budget Analyst"> Budget Analyst</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Content Lead"> Content Lead</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="DevOps Engineer"> DevOps Engineer</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Financial Analyst"> Financial Analyst</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Frontend Developer"> Frontend Developer</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="HR Manager"> HR Manager</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="HR Specialist"> HR Specialist</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Motion Designer"> Motion Designer</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="QA Engineer"> QA Engineer</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="QA Lead"> QA Lead</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="SEO Specialist"> SEO Specialist</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Security Engineer"> Security Engineer</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Senior Developer"> Senior Developer</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="System Admin"> System Admin</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="UI Designer"> UI Designer</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="UX Researcher"> UX Researcher</label></li>
+							</ul>
+						</div>
+
+						<!-- Status popover -->
+						<div data-ln-popover id="filter-status">
+							<ul id="filter-status-list" data-ln-filter="employee-table">
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"> Active</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Inactive"> Inactive</label></li>
+								<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="On Leave"> On Leave</label></li>
+							</ul>
 						</div>
 					</main>
 					<script type="text/plain" data-demo-scss>
@@ -277,71 +276,53 @@
 					<header><h3>How It Works</h3></header>
 					<main>
 						<ul>
-							<li><strong>Global search</strong> — <code>ln-search</code> dispatches <code>ln-search:change</code> events on the <code>data-ln-table</code> wrapper. <code>ln-table</code> intercepts the event and filters rows in-memory — no custom script needed.</li>
-							<li><strong>Per-column filters</strong> — <code>ln-filter</code> dispatches <code>ln-filter:changed</code> events on the table wrapper. <code>ln-table</code> maps filter keys to columns via <code>data-ln-table-filter-col</code> on <code>&lt;th&gt;</code> elements. Multiple columns combine with AND logic; within a column, checked values use OR logic. When a filter is active, <code>ln-table</code> sets <code>data-ln-table-filter-active</code> on the <code>&lt;th&gt;</code> — the filter icon turns primary color.</li>
-							<li><strong>Popover pattern</strong> — Department and Role use <code>ln-popover</code> with hardcoded checkboxes. Each popover's <code>data-ln-filter</code> targets the <code>data-ln-table</code> wrapper ID.</li>
-							<li><strong>Dropdown pattern</strong> — Status uses <code>ln-dropdown</code> with hardcoded checkboxes embedded in the <code>&lt;th&gt;</code>.</li>
-							<li><strong>Sort</strong> — <code>ln-table-sort</code> via <code>data-ln-table-sort</code> on <code>&lt;th&gt;</code> elements. Click header to cycle: ascending → descending → unsorted.</li>
+							<li><strong>Global search</strong> — <code>ln-search</code> dispatches <code>ln-search:change</code> on the <code>data-ln-table</code> wrapper. <code>ln-table</code> intercepts and filters rows in-memory — no custom script needed.</li>
+							<li><strong>Per-column filters</strong> — <code>ln-filter</code> dispatches <code>ln-filter:changed</code> on the table wrapper. <code>ln-table</code> maps filter keys to columns via <code>data-ln-table-filter-col</code> on <code>&lt;th&gt;</code>. Multiple columns combine with AND; within a column, values use OR. When active, <code>.ln-filter-active</code> is toggled on the filter <code>&lt;button&gt;</code> — the funnel icon turns accent color.</li>
+							<li><strong>Popover pattern (canonical)</strong> — All columns use <code>ln-popover</code> with static authored checkboxes in <code>&lt;ul&gt;/&lt;li&gt;</code>. Each popover's <code>data-ln-filter</code> targets the table wrapper ID. Options come from the domain enum — including zero-record options like "Product".</li>
+							<li><strong>Sort</strong> — via <code>data-ln-table-sort</code> on <code>&lt;th&gt;</code>. Click header to cycle: ascending → descending → unsorted.</li>
 						</ul>
 					</main>
 				</section>
 
-				<!-- Code: Popover Pattern -->
+				<!-- Code: Popover Pattern (canonical) -->
 				<section class="section-card">
 					<header><h3>Popover Pattern</h3></header>
 					<main>
-						<p>Filter trigger in <code>&lt;th&gt;</code>, popover with hardcoded checkboxes. The <code>data-ln-filter</code> targets the <code>data-ln-table</code> wrapper ID. The <code>&lt;th&gt;</code> needs <code>data-ln-table-filter-col</code> set to the filter key so <code>ln-table</code> can map it to the column index.</p>
-						<pre><code>&lt;!-- Wrapper --&gt;
-&lt;div data-ln-table id="my-table"&gt;
-    &lt;table&gt;
-        &lt;thead&gt;
-            &lt;tr&gt;
-                &lt;th data-ln-table-sort="string"&gt;Name&lt;/th&gt;
-                &lt;th data-ln-table-sort="string" data-ln-table-filter-col="dept"&gt;
-                    Department
-                    &lt;button class="filter" type="button" data-ln-popover-for="filter-dept" aria-label="Filter department"&gt;
-                        &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;
-                    &lt;/button&gt;
-                &lt;/th&gt;
-            &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody&gt;...&lt;/tbody&gt;
-    &lt;/table&gt;
-&lt;/div&gt;
+						<p>Filter trigger in <code>&lt;th&gt;</code>, popover with static authored checkboxes in <code>&lt;ul&gt;/&lt;li&gt;</code>. The <code>data-ln-filter</code> on the <code>&lt;ul&gt;</code> targets the table wrapper ID. The <code>&lt;th&gt;</code> needs <code>data-ln-table-filter-col</code> so <code>ln-table</code> maps the filter key to the column. Options come from the domain enum — not derived from the visible dataset.</p>
+						<pre><code>&lt;!-- th: data-ln-table-filter-col maps the filter key to this column --&gt;
+&lt;th data-ln-table-sort="string" data-ln-table-filter-col="dept"&gt;
+    Department
+    &lt;button class="table-filter" type="button"
+            data-ln-table-col-filter
+            data-ln-popover-for="filter-dept"
+            aria-label="Filter department"&gt;
+        &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/button&gt;
+&lt;/th&gt;
 
-&lt;!-- Popover (teleported to body on open) --&gt;
+&lt;!-- Popover: sibling to [data-ln-table], NOT inside it --&gt;
+&lt;!-- ln-popover teleports this to body on open — escapes overflow clipping --&gt;
 &lt;div data-ln-popover id="filter-dept"&gt;
-    &lt;nav data-ln-filter="my-table"&gt;
-        &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked&gt; All&lt;/label&gt;
-        &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="IT"&gt; IT&lt;/label&gt;
-        &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="HR"&gt; HR&lt;/label&gt;
-    &lt;/nav&gt;
+    &lt;!-- Optional search targets the OPTIONS UL id, never the table id --&gt;
+    &lt;input type="search" placeholder="Search..."
+           data-ln-search="filter-dept-list"
+           data-ln-search-items="label"&gt;
+    &lt;ul id="filter-dept-list" data-ln-filter="my-table"&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked&gt; All&lt;/label&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="IT"&gt; IT&lt;/label&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="HR"&gt; HR&lt;/label&gt;&lt;/li&gt;
+        &lt;!-- Domain enum options — include zero-record options (e.g. Legal if no Legal rows exist) --&gt;
+        &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Legal"&gt; Legal&lt;/label&gt;&lt;/li&gt;
+    &lt;/ul&gt;
 &lt;/div&gt;</code></pre>
 					</main>
 				</section>
 
-				<!-- Code: Dropdown Pattern -->
+				<!-- Note: ln-dropdown inside th is deprecated for filter use -->
 				<section class="section-card">
-					<header><h3>Dropdown Pattern (Inline in TH)</h3></header>
+					<header><h3>Deprecated: Inline Dropdown Pattern</h3></header>
 					<main>
-						<p>For columns with few known values. The dropdown and filter live inside the <code>&lt;th&gt;</code>. The <code>&lt;th&gt;</code> needs <code>data-ln-table-filter-col</code> set to the filter key.</p>
-						<pre><code>&lt;th data-ln-table-sort="string" data-ln-table-filter-col="status"&gt;
-    Status
-    &lt;div data-ln-dropdown&gt;
-        &lt;button class="filter" type="button" data-ln-toggle-for="filter-status" aria-label="Filter status"&gt;
-            &lt;svg class="ln-icon ln-icon--sm" aria-hidden="true"&gt;&lt;use href="#ln-filter"&gt;&lt;/use&gt;&lt;/svg&gt;
-        &lt;/button&gt;
-        &lt;ul id="filter-status" data-ln-toggle&gt;
-            &lt;li&gt;
-                &lt;nav data-ln-filter="my-table"&gt;
-                    &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked&gt; All&lt;/label&gt;
-                    &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"&gt; Active&lt;/label&gt;
-                    &lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Inactive"&gt; Inactive&lt;/label&gt;
-                &lt;/nav&gt;
-            &lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/div&gt;
-&lt;/th&gt;</code></pre>
+						<p>The previous pattern using <code>ln-dropdown</code> embedded inside a <code>&lt;th&gt;</code> is deprecated. It caused clipping issues due to <code>overflow: hidden</code> on the table's parent container. Use the popover pattern above for all column filters.</p>
 					</main>
 				</section>
 

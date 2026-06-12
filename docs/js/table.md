@@ -20,6 +20,12 @@ Helpers imported from `ln-core`:
 - `fillTemplate(el, data)` — handles `{{ double-curly }}` replacements.
 - `registerComponent(selector, attribute, ComponentFn, componentTag)` — global registration.
 
+Row templates support exactly two substitution syntaxes: `{{ field }}` (text,
+one-shot at clone) and `data-ln-table-cell-attr="field:attr"` (attributes,
+one-shot at clone). The row pipeline never calls `fill()`, so `data-ln-field`
+inside a row template is silently ignored — that binding is for explicitly
+`fill()`-driven regions, not for rows. See `docs/architecture/data-flow.md` §5.
+
 ---
 
 ## Execution Modes
@@ -59,7 +65,7 @@ this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 | `data-ln-table-col="field"` | `<th>` | Maps header column to a data record field. |
 | `data-ln-value` | `<td>` / item | Raw machine value for sort/filter (read by `ln-core.readValue`). Server-formatted display stays in the element body. See [Core → data-ln-value](core.md#the-data-ln-value-primitive). |
 | `data-ln-table-col-sort` | Button | Triggers three-state column sorting. |
-| `data-ln-table-col-filter` | Button | Triggers filter dropdown populating. |
+| `data-ln-table-col-filter` | Button | JS id hook — identifies the filter button in a `<th>`. Pair with `data-ln-popover-for` to open a `[data-ln-popover]` filter block; `data-ln-table-filter-col` on the `<th>` maps the filter key to this column. |
 | `data-ln-table-col-select` | `<th>` | Header select-all checkbox column. |
 | `data-ln-table-row` | `<tr>` | Render template row container click target. |
 | `data-ln-table-row-select` | Input | Row selection checkbox target. |
