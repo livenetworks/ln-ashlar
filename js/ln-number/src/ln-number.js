@@ -68,18 +68,13 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 				return _inputValueDesc.get.call(hidden);
 			},
 			set: function (val) {
-				_inputValueDesc.set.call(hidden, val);
-				// If set programmatically (e.g., populateForm), update display
+				_inputValueDesc.set.call(hidden, val);                      // store raw natively
 				if (val !== '' && !isNaN(parseFloat(val))) {
-					const num = parseFloat(val);
-					self._displayFormatted(num);
-					dispatch(self.dom, 'ln-number:input', { value: num, formatted: self.dom.value });
-					self.dom.dispatchEvent(new Event('input', { bubbles: true }));
-				} else if (val === '') {
-					self.dom.value = '';
-					dispatch(self.dom, 'ln-number:input', { value: NaN, formatted: '' });
-					self.dom.dispatchEvent(new Event('input', { bubbles: true }));
+					self._setDisplayRaw(_formatNum(getLocale(self.dom), parseFloat(val), self.dom.getAttribute('data-ln-number-decimals')));
+				} else {
+					self._setDisplayRaw('');
 				}
+				self.dom.dispatchEvent(new Event('input', { bubbles: true })); // single ecosystem signal → _handleInput emits ln-number:input
 			}
 		});
 
@@ -88,32 +83,22 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 			get: function () {
 				return _inputValueDesc.get.call(dom);
 			},
-			set: function (val, originalSet) {
-				if (self._isFormatting) {
-					originalSet(val);
-					return;
-				}
+			set: function (val) {
 				if (val === '') {
-					originalSet('');
+					self._setDisplayRaw('');
 					self._setHiddenRaw('');
-					dispatch(dom, 'ln-number:input', { value: NaN, formatted: '' });
 					dom.dispatchEvent(new Event('input', { bubbles: true }));
 					return;
 				}
-				// Parse and format
-				let num = typeof val === 'number' ? val : parseFloat(String(val).replace(/[^\d.-]/g, ''));
+				const num = typeof val === 'number' ? val : parseFloat(String(val).replace(/[^\d.-]/g, ''));
 				if (isNaN(num)) {
-					originalSet(String(val));
+					self._setDisplayRaw(String(val));
 					self._setHiddenRaw('');
-					dispatch(dom, 'ln-number:input', { value: NaN, formatted: String(val) });
-					dom.dispatchEvent(new Event('input', { bubbles: true }));
 				} else {
 					self._setHiddenRaw(num);
-					const formatted = _formatNum(getLocale(dom), num, dom.getAttribute('data-ln-number-decimals'));
-					originalSet(formatted);
-					dispatch(dom, 'ln-number:input', { value: num, formatted: formatted });
-					dom.dispatchEvent(new Event('input', { bubbles: true }));
+					self._setDisplayRaw(_formatNum(getLocale(dom), num, dom.getAttribute('data-ln-number-decimals')));
 				}
+				dom.dispatchEvent(new Event('input', { bubbles: true }));
 			}
 		});
 
@@ -140,12 +125,7 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 				cleaned = cleaned.replace(info.decimalSep, '.');
 			}
 			const num = parseFloat(cleaned);
-			if (!isNaN(num)) {
-				self.value = num;
-			} else {
-				dom.value = '';
-				self._hidden.value = '';
-			}
+			self.value = isNaN(num) ? NaN : num;
 		};
 		dom.addEventListener('paste', this._onPaste);
 
@@ -154,9 +134,8 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		if (initial !== '') {
 			const num = parseFloat(initial);
 			if (!isNaN(num)) {
-				this._displayFormatted(num);
-				_inputValueDesc.set.call(hidden, String(num));
-				dispatch(dom, 'ln-number:input', { value: num, formatted: dom.value });
+				this._setHiddenRaw(num);
+				this._setDisplayRaw(_formatNum(getLocale(dom), num, dom.getAttribute('data-ln-number-decimals')));
 				dom.dispatchEvent(new Event('input', { bubbles: true }));
 			}
 		}
@@ -167,18 +146,18 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 	_component.prototype._handleInput = function () {
 		const dom = this.dom;
 		const info = _getFormatter(getLocale(dom));
-		const raw = dom.value;
+		const raw = _inputValueDesc.get.call(dom);
 
 		// Edge case: empty
 		if (raw === '') {
-			this._hidden.value = '';
+			this._setHiddenRaw('');
 			dispatch(dom, 'ln-number:input', { value: NaN, formatted: '' });
 			return;
 		}
 
 		// Edge case: just minus sign
 		if (raw === '-') {
-			this._hidden.value = '';
+			this._setHiddenRaw('');
 			return;
 		}
 
@@ -256,7 +235,7 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 			}
 		}
 
-		dom.value = formatted;
+		this._setDisplayRaw(formatted);
 
 		// Restore cursor position
 		let targetDigits = digitsBeforeCursor;
@@ -275,43 +254,41 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		dispatch(dom, 'ln-number:input', { value: num, formatted: formatted });
 	};
 
-	_component.prototype._setHiddenRaw = function (num) {
-		_inputValueDesc.set.call(this._hidden, String(num));
+	_component.prototype._setHiddenRaw = function (val) {
+		_inputValueDesc.set.call(this._hidden, String(val));
+	};
+
+	_component.prototype._setDisplayRaw = function (str) {
+		_inputValueDesc.set.call(this.dom, String(str));
 	};
 
 	_component.prototype._displayFormatted = function (num) {
-		this._isFormatting = true;
-		this.dom.value = _formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals'));
-		this._isFormatting = false;
+		this._setDisplayRaw(_formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals')));
 	};
 
 	// ─── Public API ───────────────────────────────────────────
 
 	Object.defineProperty(_component.prototype, 'value', {
 		get: function () {
-			const raw = this._hidden.value;
+			const raw = _inputValueDesc.get.call(this._hidden);
 			return raw === '' ? NaN : parseFloat(raw);
 		},
 		set: function (num) {
 			if (typeof num !== 'number' || isNaN(num)) {
-				this.dom.value = '';
+				this._setDisplayRaw('');
 				this._setHiddenRaw('');
 				this.dom.dispatchEvent(new Event('input', { bubbles: true }));
 				return;
 			}
-			this._displayFormatted(num);
 			this._setHiddenRaw(num);
-			dispatch(this.dom, 'ln-number:input', {
-				value: num,
-				formatted: this.dom.value
-			});
+			this._setDisplayRaw(_formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals')));
 			this.dom.dispatchEvent(new Event('input', { bubbles: true }));
 		}
 	});
 
 	Object.defineProperty(_component.prototype, 'formatted', {
 		get: function () {
-			return this.dom.value;
+			return _inputValueDesc.get.call(this.dom);
 		}
 	});
 
