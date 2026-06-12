@@ -8,7 +8,7 @@
 
 In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating a heavy component that bundles form handlers, visual layouts, focus traps, backdrop styling, and dimensions, `ln-modal` splits them cleanly:
 
-1. **State & Accessibility (JavaScript)**: The `ln-modal` script (145 lines) only manages binary `open` / `close` state, suppresses parent `<body>` scrolling, intercepts tab navigation to trap focus inside the modal, closes topmost modals on ESC key, and restores focus back to the trigger on close.
+1. **State & Accessibility (JavaScript)**: The `ln-modal` script only manages binary `open` / `close` state, suppresses `<body>` scrolling (the `ln-modal-open` class on `<body>` — style or detect the lock via that class), intercepts tab navigation to trap focus inside the modal, closes open modals on ESC key, and restores focus on close to the element that was focused before opening (usually the trigger).
 2. **The Content Root (HTML)**: The modal content root is ALWAYS a `<form>`. The form IS the panel — there are no redundant BEM wrappers like `.ln-modal__content`. Cancel and submit buttons live directly inside the form.
 3. **Visual Presentation & Sizing (CSS)**: Overlay backdrops, Sticky headers/footers, and scrollable body areas are styled using Vanilla CSS. Sizing variants (`modal-sm|md|lg|xl`) are applied via SCSS mixins on `> form`, keeping markup completely clean.
 
@@ -51,7 +51,7 @@ Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `da
 - **The Overlay (`data-ln-modal`)**: Driven by the value `"open"` (open) and `"close"` or empty (closed).
 - **The Trigger (`data-ln-modal-for="id"`)**: Placed on buttons/links to toggle modal display.
 - **The Dismiss button (`data-ln-modal-close`)**: Placed on cancel or close buttons. Always needs `type="button"` inside a form.
-- **Focus Override (`autofocus`)**: Place on any form field to override the default behavior of focusing the first input on open.
+- **Focus Override (`autofocus`)**: Place on any form field to override the default behavior of focusing the first input (or, when the modal has no inputs, the first link or enabled button) on open.
 
 ---
 
@@ -59,7 +59,7 @@ Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `da
 
 There are no imperative JavaScript methods (like `open()` or `close()`) on the component instance. **The HTML attribute is the sole contract.** 
 
-Triggers, backdrop dismissals, ESC handlers, and custom scripts all change state by writing the active attribute on the modal element:
+Triggers, close buttons, ESC handlers, and custom scripts all change state by writing the active attribute on the modal element:
 
 ```js
 const modal = document.getElementById('user-modal');
@@ -91,6 +91,7 @@ All events bubble. The dispatch target is the overlay element. Every event's `de
 | **`ln-modal:open`** | No | After modal is active, body scroll locked, and focus trapped. |
 | **`ln-modal:before-close`** | **Yes** | Before closing. Calling `event.preventDefault()` cancels the close and reverts the attribute. |
 | **`ln-modal:close`** | No | After modal is closed, scroll locks released, and focus restored. |
+| **`ln-modal:destroyed`** | No | After `destroy()` teardown — instance removed from the element. |
 
 ```js
 // Example: Block close transition if form is dirty (unsaved changes)
