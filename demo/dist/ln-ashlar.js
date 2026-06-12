@@ -846,12 +846,22 @@ B(xt, Gt, Jt, "ln-router", {
       if (a.length === 0) return;
       const t = a[0], i = a[a.length - 1];
       o.shiftKey ? document.activeElement === t && (o.preventDefault(), i.focus()) : document.activeElement === i && (o.preventDefault(), t.focus());
-    }, this._onClose = function(o) {
-      o.preventDefault(), f.dom.setAttribute(h, "close");
     }, this.isOpen && (this.dom.setAttribute("aria-modal", "true"), this.dom.setAttribute("role", "dialog"), document.body.classList.add("ln-modal-open"), document.addEventListener("keydown", this._onEscape), document.addEventListener("keydown", this._onFocusTrap)), this;
   }
   b.prototype.destroy = function() {
-    this.dom[d] && (this.isOpen && (this.dom.removeAttribute("aria-modal"), document.removeEventListener("keydown", this._onEscape), document.removeEventListener("keydown", this._onFocusTrap), this._returnFocusEl = null, document.querySelector("[" + h + '="open"]') || document.body.classList.remove("ln-modal-open")), w(this.dom, "ln-modal:destroyed", { modalId: this.dom.id, target: this.dom }), delete this.dom[d]);
+    if (this.dom[d]) {
+      if (this.isOpen) {
+        this.dom.removeAttribute("aria-modal"), document.removeEventListener("keydown", this._onEscape), document.removeEventListener("keydown", this._onFocusTrap), this._returnFocusEl = null;
+        const m = this.dom;
+        Array.prototype.some.call(
+          document.querySelectorAll("[" + h + '="open"]'),
+          function(o) {
+            return o !== m;
+          }
+        ) || document.body.classList.remove("ln-modal-open");
+      }
+      w(this.dom, "ln-modal:destroyed", { modalId: this.dom.id, target: this.dom }), delete this.dom[d];
+    }
   };
   function g(m) {
     const f = m[d];
