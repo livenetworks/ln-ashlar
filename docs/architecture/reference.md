@@ -394,7 +394,7 @@ that re-bind the primitives.
 
 **When you need a new spacing value — extend, don't silo.** Extend
 `--size-*`. Never create a component-scoped token. Use the t-shirt
-naming convention with `-up` / `-down` suffixes for intermediate steps:
+naming convention with `-up` suffixes for intermediate steps:
 
 `0 < 2xs < xs < xs-up < sm < sm-up < md < md-up < lg < xl < 2xl < 3xl`
 
@@ -437,20 +437,9 @@ breaks any component that uses both.
   label-width inside a stacked cell). Component design, not
   rhythm. Comment required.
 
-**Color and shadow primitives.** Mixins read four single primitives for
-color and shadow. Components rebind these on their own scope to select
-a different vocabulary value:
+For the complete list of color, shadow, typography, border, and spacing primitives, see the [Design Tokens](../css/tokens.md) documentation.
 
-- `--color-bg` — element surface (default: `var(--bg-base)`)
-- `--color-fg` — text color (default: `var(--fg-default)`)
-- `--color-border` — border color (default: `var(--border-subtle)`)
-- `--shadow` — box shadow (default: `var(--shadow-resting)`)
-- `--color-scrim` — modal overlay (kept as-is — single purpose primitive)
-- `--color-accent-tint` / `--color-accent-tint-strong` — accent wash vocabulary (upload, active nav)
-
-Every mixin read must go through the primitive layer, not a scale token
-directly. Components rebind primitives on their own scope; themes rebind
-vocabulary at theme `:root`.
+Every mixin read must go through the primitive layer, not a scale token directly. Components rebind primitives on their own scope; themes rebind vocabulary at theme `:root`.
 
 ---
 
