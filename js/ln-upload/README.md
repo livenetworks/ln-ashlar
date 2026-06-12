@@ -2,13 +2,28 @@
 
 File upload component — drag-and-drop zone with XHR progress, client-side validation, and auto-rendered hidden inputs for form submit.
 
+## Rationale & Mindset
+
+Historically, the component used custom attributes like `data-ln-upload-context` to pass extra parameters (such as the context category `lecture`, `email_logo`, etc.) to the upload endpoint. This created a **tight coupling** between the generic frontend library component and specific project-level backend parameter names.
+
+To make the component truly generic and declarative, it follows a **native-HTML form design mindset**:
+* **Inputs as Parameters**: Any parameter or metadata that needs to be sent alongside the uploaded file is defined using standard HTML form inputs (e.g. `<input type="hidden">`, `<select>`, `<textarea>`) nested directly inside the `.ln-upload` container.
+* **Dynamic Gathering**: When a file is dropped or selected, the component dynamically serializes all nested inputs and appends them to the `FormData` request.
+* **Separation of Concerns**: The frontend library does not need to know about specific keys (like `context` or `entity_id`). It simply forwards whatever form inputs you declare.
+
+### Benefits
+1. **Zero Configuration for Backend Keys**: No need to rewrite the JS component if the backend changes a parameter name from `context` to `type` or requires extra fields.
+2. **Dynamic Values**: If an input's value is modified by other scripts on the page prior to upload (e.g., dynamically setting an `entity_id` based on selection), the upload request will automatically receive the latest value at the moment of file dispatch.
+3. **Decoupled Delete Routes**: The component derives the `DELETE` endpoint dynamically by replacing `/upload` in the upload URL with the file ID, or you can specify a custom delete pattern using `data-ln-upload-delete="/my-api/{id}"`.
+
 ## Attributes
 
 | Attribute | On | Description |
 |-----------|-----|-------------|
 | `data-ln-upload="/files/upload"` | container | Upload URL (default: `/files/upload`) |
 | `data-ln-upload-accept=".pdf,.doc,.docx"` | container | Allowed extensions (comma-separated) |
-| `data-ln-upload-context="documents"` | container | Context string sent with upload (FormData `context` field) |
+| `data-ln-upload-delete="/files/{id}"` | container | Optional custom delete URL pattern containing `{id}` (default: derived dynamically by replacing `/upload` with the file ID) |
+| `data-ln-upload-context="documents"` | container | **[DEPRECATED]** Legacy context string sent as `context` fallback if no `<input name="context">` is nested. |
 | `data-ln-upload-dict="key"` | hidden element | I18n dictionary for messages (see below) |
 
 ## Dictionary (i18n)
@@ -129,14 +144,33 @@ Expected status: `200`
 
 ## HTML Structure
 
+### Recommended (New Declarative Approach)
+
+Place nested hidden inputs (or any form fields) representing your upload metadata inside the container:
+
 ```html
-<div data-ln-upload="/files/upload" data-ln-upload-accept=".pdf,.doc,.docx" data-ln-upload-context="documents">
+<div class="ln-upload" data-ln-upload="/files/upload" data-ln-upload-accept=".pdf,.doc,.docx">
+    <!-- Extra parameters sent dynamically to the POST endpoint -->
+    <input type="hidden" name="context" value="documents">
+    <input type="hidden" name="entity_id" value="123">
+
     <div class="ln-upload__zone">
         <p>Drag files here or click to browse</p>
     </div>
     <ul class="ln-upload__list"></ul>
 
     <!-- Dictionary (optional) — see "Dictionary (i18n)" section above -->
+</div>
+```
+
+### Legacy (Attribute-Based Approach)
+
+```html
+<div class="ln-upload" data-ln-upload="/files/upload" data-ln-upload-accept=".pdf,.doc,.docx" data-ln-upload-context="documents">
+    <div class="ln-upload__zone">
+        <p>Drag files here or click to browse</p>
+    </div>
+    <ul class="ln-upload__list"></ul>
 </div>
 ```
 

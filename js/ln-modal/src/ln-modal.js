@@ -7,30 +7,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 
-	function _attachTriggers(root) {
-		const triggers = Array.from(root.querySelectorAll('[data-ln-modal-for]'));
-		if (root.hasAttribute && root.hasAttribute('data-ln-modal-for')) {
-			triggers.push(root);
-		}
-		for (const btn of triggers) {
-			if (btn[DOM_ATTRIBUTE + 'Trigger']) continue;
-			const handler = function (e) {
-				if (e.ctrlKey || e.metaKey || e.button === 1) return;
-				e.preventDefault();
-				const modalId = btn.getAttribute('data-ln-modal-for');
-				const target = document.getElementById(modalId);
-				if (!target) {
-					console.warn('[ln-modal] No modal found for data-ln-modal-for="' + modalId + '"');
-					return;
-				}
-				if (!target[DOM_ATTRIBUTE]) return;
-				const current = target.getAttribute(DOM_SELECTOR);
-				target.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
-			};
-			btn.addEventListener('click', handler);
-			btn[DOM_ATTRIBUTE + 'Trigger'] = handler;
-		}
-	}
+
 
 	// ─── Component ─────────────────────────────────────────────
 
@@ -66,7 +43,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			self.dom.setAttribute(DOM_SELECTOR, 'close');
 		};
 
-		_attachCloseButtons(this);
+
 
 		// Apply initial state if open
 		if (this.isOpen) {
@@ -90,22 +67,6 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			this._returnFocusEl = null;
 			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
 				document.body.classList.remove('ln-modal-open');
-			}
-		}
-
-		const closeButtons = this.dom.querySelectorAll('[data-ln-modal-close]');
-		for (const btn of closeButtons) {
-			if (btn[DOM_ATTRIBUTE + 'Close']) {
-				btn.removeEventListener('click', btn[DOM_ATTRIBUTE + 'Close']);
-				delete btn[DOM_ATTRIBUTE + 'Close'];
-			}
-		}
-
-		const triggers = document.querySelectorAll('[data-ln-modal-for="' + this.dom.id + '"]');
-		for (const btn of triggers) {
-			if (btn[DOM_ATTRIBUTE + 'Trigger']) {
-				btn.removeEventListener('click', btn[DOM_ATTRIBUTE + 'Trigger']);
-				delete btn[DOM_ATTRIBUTE + 'Trigger'];
 			}
 		}
 
@@ -180,22 +141,38 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 		}
 	}
 
-	// ─── Helpers ───────────────────────────────────────────────
+	// ─── Event Delegation ──────────────────────────────────────
 
-	function _attachCloseButtons(instance) {
-		const closeButtons = instance.dom.querySelectorAll('[data-ln-modal-close]');
-		for (const btn of closeButtons) {
-			if (btn[DOM_ATTRIBUTE + 'Close']) continue;
-			btn.addEventListener('click', instance._onClose);
-			btn[DOM_ATTRIBUTE + 'Close'] = instance._onClose;
+	document.addEventListener('click', function (e) {
+		if (e.ctrlKey || e.metaKey || e.button === 1) return;
+
+		// Handle trigger click [data-ln-modal-for]
+		const trigger = e.target.closest('[data-ln-modal-for]');
+		if (trigger) {
+			const modalId = trigger.getAttribute('data-ln-modal-for');
+			const target = document.getElementById(modalId);
+			if (target && target[DOM_ATTRIBUTE]) {
+				e.preventDefault();
+				const current = target.getAttribute(DOM_SELECTOR);
+				target.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
+			}
+			return;
 		}
-	}
+
+		// Handle close button click [data-ln-modal-close]
+		const closeBtn = e.target.closest('[data-ln-modal-close]');
+		if (closeBtn) {
+			const modal = closeBtn.closest('[' + DOM_SELECTOR + ']');
+			if (modal && modal[DOM_ATTRIBUTE]) {
+				e.preventDefault();
+				modal.setAttribute(DOM_SELECTOR, 'close');
+			}
+		}
+	});
 
 	// ─── Init ──────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-modal', {
-		extraAttributes: ['data-ln-modal-for'],
-		onAttributeChange: _syncAttribute,
-		onInit: _attachTriggers
+		onAttributeChange: _syncAttribute
 	});
 })();

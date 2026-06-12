@@ -14,6 +14,22 @@ table {
 
 	@container table (max-width: 640px) {
 		table { @include table-responsive; }
+
+		.table-row-actions {
+			position: static !important;
+			opacity: 1 !important;
+			visibility: visible !important;
+			pointer-events: auto !important;
+			transform: none !important;
+			background: transparent !important;
+			padding-left: 0 !important;
+			justify-content: flex-end;
+			margin-top: var(--size-xs);
+
+			&::before {
+				display: none !important;
+			}
+		}
 	}
 }
 
@@ -69,5 +85,20 @@ th:hover .table-filter { opacity: 0.7; }
 // Virtual-scroll spacer
 .ln-table__spacer {
 	@include table-spacer-row;
+}
+
+// ─── Table Row Actions ──────────────────────────────────────────
+td:has(.table-row-actions) {
+	position: relative;
+}
+
+.table-row-actions {
+	@include table-row-actions;
+}
+
+tr:hover .table-row-actions {
+	opacity: 1;
+	pointer-events: auto;
+	visibility: visible;
 }
 

@@ -381,3 +381,44 @@
 	}
 }
 
+@mixin table-row-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--size-xs);
+	position: absolute;
+	right: var(--padding-x, 1rem);
+	top: 50%;
+	transform: translateY(-50%);
+	opacity: 0;
+	pointer-events: none;
+	visibility: hidden;
+	transition: opacity var(--transition-fast, 0.15s) ease-in-out, visibility var(--transition-fast, 0.15s);
+	background: var(--bg-row-hover, var(--color-bg));
+	padding-left: var(--size-md);
+	margin: 0;
+	list-style: none;
+	z-index: 2;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: -2rem;
+		width: 2rem;
+		background: linear-gradient(to right, transparent, var(--bg-row-hover, var(--color-bg)));
+		pointer-events: none;
+	}
+
+	li {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	form {
+		display: inline-flex;
+		margin: 0;
+	}
+}
+
+
