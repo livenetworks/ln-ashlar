@@ -106,6 +106,31 @@ nav a {
 						</main>
 					</section>
 
+					<!-- Exact matching -->
+					<section class="section-card">
+						<header><h3>Exact matching — <code>data-ln-nav-exact</code></h3></header>
+						<main>
+							<p>By default, <code>ln-nav</code> uses prefix matching: <code>/users</code> activates on <code>/users/42</code>. Add <code>data-ln-nav-exact</code> to require a strict URL match only.</p>
+							<p>Active links also receive <code>aria-current="page"</code> automatically (removed from inactive links).</p>
+							<article class="demo-nav-example">
+								<h5>Default (prefix matching) — <code>/users</code> activates on <code>/users/42</code></h5>
+								<nav data-ln-nav="active">
+									<a href="nav.html">Nav (current)</a>
+									<a href="/users">Users</a>
+									<a href="/settings">Settings</a>
+								</nav>
+							</article>
+							<article class="demo-nav-example">
+								<h5>Exact only — <code>data-ln-nav-exact</code> — <code>/users</code> does NOT activate on <code>/users/42</code></h5>
+								<nav data-ln-nav="active" data-ln-nav-exact>
+									<a href="nav.html">Nav (current)</a>
+									<a href="/users">Users</a>
+									<a href="/settings">Settings</a>
+								</nav>
+							</article>
+						</main>
+					</section>
+
 					<!-- API -->
 					<section class="section-card">
 						<header><h3>API</h3></header>

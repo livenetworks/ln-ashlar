@@ -26,9 +26,21 @@ A separate `MutationObserver` on `document.body` (set up via `guardBody` from `l
 Both `link.href` and `window.location.pathname` go through the same normalization: `new URL(href, location.href)`, then strip a trailing slash, falling back to `/` for root. The match rule then is:
 
 - **Exact**: `normalizedHref === normalizedCurrent`
-- **Parent**: `normalizedHref !== '/' && normalizedCurrent.startsWith(normalizedHref + '/')`
+- **Parent** (default): `!exact && normalizedHref !== '/' && normalizedCurrent.startsWith(normalizedHref + '/')`
 
 Root (`/`) is excluded from the parent rule so it does not match every URL. A trailing-slash-only `href` is treated identically to the slash-less form.
+
+## Active state
+
+When a link matches (exact or parent), `_updateActiveState` applies:
+1. `link.classList.add(activeClass)` — the configured CSS class.
+2. `link.setAttribute('aria-current', 'page')` — accessibility marker.
+
+When a link does not match: class is removed and `link.removeAttribute('aria-current')` is called explicitly (clearing any stale value from a previous navigation).
+
+## Exact opt-out (`data-ln-nav-exact`)
+
+`_initializeNav` reads `navElement.hasAttribute('data-ln-nav-exact')` once at construction and closes over the boolean `exact`. Every `_updateActiveState` call receives `exact`; when true, the `isParent` branch is bypassed (only `isExact` matches). The attribute is read once — changing it after init has no effect until the nav element is destroyed and re-initialized.
 
 ## Destroy
 

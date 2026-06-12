@@ -107,3 +107,39 @@ A zero-dependency, high-performance table presenter component that supports both
   Applies the payload array and triggers rendering.
 - **`ln-table:set-loading`** `{ loading }`  
   Toggles the visual loading dimmed state overlay.
+
+---
+
+## Filter Options — `{value, label}` Shape
+
+The `filterOptions` payload in `ln-table:set-data` supports two entry shapes per field:
+
+- **Plain string** (existing): `['Draft', 'Approved', 'Pending']` — the string is both the filter value and the dropdown label.
+- **Object** (new): `[{value: 'true', label: 'Active'}, {value: 'false', label: 'Inactive'}]` — the `label` is shown in the dropdown; `value` (raw) is echoed in the `ln-table:request-data` filters and passed to the store as-is. Both shapes may coexist in the same field array.
+
+Example:
+```js
+// set-data payload
+filterOptions: {
+  status: [
+    { value: 'approved', label: 'Approved' },
+    { value: 'draft',    label: 'Draft' }
+  ]
+}
+```
+
+### Raw Key / Presented Label Recipe
+
+A column's `data-ln-table-col` attribute drives sort and filter — it is the **raw field key** used in requests. The row template `{{ field }}` placeholders are independent and can reference a **different, computed display field** without affecting filter behaviour.
+
+Example: filter on raw `active` (boolean string), display a human label from a presenter:
+```html
+<th data-ln-table-col="active">
+  Status <button data-ln-table-col-filter …></button>
+</th>
+```
+```html
+<!-- row template cell -->
+<td>{{ status_display }}</td>
+```
+`data-ln-table-col="active"` → filter key; `{{ status_display }}` → presented cell (filled by a `setPresenters` computed field or app decorator). The column key only drives sort/filter; cell rendering comes exclusively from the row template.

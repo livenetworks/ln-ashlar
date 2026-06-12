@@ -32,6 +32,14 @@ Init:
 Visibility change (tab returns):
   → delta sync all stores if stale
 
+Online (reconnect):
+  → dispatch ln-store:online on document
+  → for each _stores instance: if isLoaded && !isSyncing && !_noAutosync → _triggerRemoteSync
+  → isSyncing guard prevents double request alongside manual forceSync()
+
+Offline:
+  → dispatch ln-store:offline on document
+
 Delta sync:
   1. GET {endpoint}?since={last_synced_at}
   2. Upsert data[], delete deleted[]
@@ -82,6 +90,10 @@ Delete:
 | `_dbReady` | Promise — resolves when `_db` is ready or null (no IDB) |
 | `_stores` | `{ name: instance }` — global registry, drives visibility-change sync |
 | `_visibilityHandler` | Listener attached only while `_stores` non-empty |
+| `_onlineHandler` | `window 'online'` listener — dispatches `ln-store:online`, triggers resync |
+| `_offlineNotify` | `window 'offline'` listener — dispatches `ln-store:offline` |
+
+Per-instance opt-out flag: `inst._noAutosync` — set when `data-ln-data-store-no-autosync` or `data-ln-store-no-autosync` is present on the store element. Stores with this flag are skipped by `_onlineHandler` (but `ln-store:online`/`ln-store:offline` still fire).
 
 The page holds **one** IDBDatabase connection shared by all store
 instances (multiple `data-ln-store` elements). Stores share the

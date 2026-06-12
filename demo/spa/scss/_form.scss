@@ -2,9 +2,14 @@
 
 // ─── Package modal ──────────────────────────────────────────────────
 .ln-modal#package-modal > form { @include modal-md; }
+#package-form .form-grid .form-element { grid-column: span 3; }
+
+// ─── Tenant create modal ────────────────────────────────────────────
+.ln-modal#tenant-modal > form { @include modal-lg; }
 
 // ─── Shared form layout (modal + tenant editor) ─────────────────────
 #package-form,
+#tenant-create-form,
 #tenant-editor form {
 	fieldset {
 		border: none;
@@ -50,8 +55,17 @@
 	footer { @include form-actions; }
 }
 
+// ─── Tenant create modal field spans ────────────────────────────────
+#tenant-create-form {
+	.form-grid .form-element { grid-column: span 3; }            // two per row
+	.form-element:has([name="name"]) { grid-column: 1 / -1; }   // name full row
+	.form-element:has([name="doc_numbering_scheme"]) { grid-column: 1 / -1; }
+	footer { @include form-actions; }
+}
+
 // Colour pickers sit side by side at natural width
-#tenant-editor input[type="color"] {
+#tenant-editor input[type="color"],
+#tenant-create-form input[type="color"] {
 	inline-size: 4rem;
 	block-size: 2.5rem;
 	padding: var(--size-3xs);

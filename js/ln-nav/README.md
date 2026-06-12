@@ -28,11 +28,14 @@ If you only need the active link highlighter component, load the compiled zero-d
 | Attribute | On | Description |
 |-----------|-----|-------------|
 | `data-ln-nav="className"` | `<nav>` element | CSS class to apply to the active link (any class name) |
+| `data-ln-nav-exact` | `<nav>` element | Opt out of parent-prefix matching — only exact URL matches activate a link. Read at init; adding it after initialization requires re-init. |
 
 ## Behavior
 
 - Compares each `<a href>` inside the nav against `window.location.pathname`.
-- **Match rule**: exact match (`/users` == `/users`) OR parent-prefix match (`/users` matches `/users/42`). Root (`/`) is exact-only — it never matches as a parent. Trailing slashes are normalized (`/users/` == `/users`).
+- **Match rule (default)**: exact match (`/users` == `/users`) OR parent-prefix match (`/users` matches `/users/42`). Root (`/`) is exact-only — it never matches as a parent. Trailing slashes are normalized (`/users/` == `/users`).
+- **Exact-only mode** (`data-ln-nav-exact`): only strict URL equality activates a link. Parent-prefix matching is disabled.
+- Active links receive both the CSS class AND `aria-current="page"` (accessibility). Inactive links have `aria-current` removed.
 - Re-runs on `popstate` (browser back/forward) and on `history.pushState` (ln-ajax navigation) automatically — no configuration.
 - New `<a>` elements added under the nav after init are scored immediately (per-instance MutationObserver).
 

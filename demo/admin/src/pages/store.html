@@ -368,6 +368,16 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 		logEl.replaceChildren();
 	});
 
+	// Reconnect indicator — listens for ln-store:online / ln-store:offline
+	document.addEventListener('ln-store:online', function () {
+		document.getElementById('store-online-indicator').classList.remove('hidden');
+		document.getElementById('store-offline-indicator').classList.add('hidden');
+	});
+	document.addEventListener('ln-store:offline', function () {
+		document.getElementById('store-offline-indicator').classList.remove('hidden');
+		document.getElementById('store-online-indicator').classList.add('hidden');
+	});
+
 	// Initial mock load
 	state.isSyncing = true;
 	renderState();
@@ -390,3 +400,18 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 	}, 400);
 })();
 </script>
+
+<!-- ==========================================
+     RECONNECT AUTO-SYNC
+     ========================================== -->
+<section class="section-card">
+	<header><h3>Reconnect auto-resync</h3></header>
+	<main>
+		<p>When the browser goes back online, <code>ln-data-store</code> automatically triggers a remote sync for all loaded stores — <strong>default on, no wiring required.</strong> The <code>isSyncing</code> guard makes it idempotent alongside manual <code>forceSync()</code> calls.</p>
+		<p>Opt out per store: <code>&lt;div data-ln-data-store="chat" data-ln-data-store-no-autosync&gt;&lt;/div&gt;</code></p>
+		<p>Connectivity indicator (listens to <code>ln-store:online</code> / <code>ln-store:offline</code> on <code>document</code>):</p>
+		<p id="store-online-indicator" class="hidden">Online — resync triggered.</p>
+		<p id="store-offline-indicator" class="hidden">Offline — cached data still available.</p>
+		<p><em>Toggle your network connection to see the indicator update.</em></p>
+	</main>
+</section>

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Nav — ln-ashlar</title>
+	<title>ln-slug — ln-ashlar</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
@@ -39,7 +39,7 @@
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
-				<h1>Nav</h1>
+				<h1>ln-slug</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
@@ -121,7 +121,7 @@
 						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
-						<li><a href="nav.html" aria-current="page"><span class="nav-label">Nav</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
 						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
 						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
 						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
@@ -160,149 +160,92 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Nav</h1>
-					<p>Active link highlighter — automatically marks the active link in navigation based on the current URL. Works with pushState (AJAX) and popstate (browser back/forward).</p>
+<h1>ln-slug</h1>
+				<p>Auto-slug micro-component — mirrors a slugified version of a source field into a slug field while the slug is pristine. Stops when the user types directly into the slug field; resumes if cleared.</p>
 
-					<!-- Basics -->
-					<section class="section-card">
-						<header><h3>Basics</h3></header>
-						<main>
-							<div class="table-container">
-							<table>
-								<thead><tr><th>Attribute</th><th>On element</th><th>Value</th><th>Description</th></tr></thead>
-								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-nav</code></td><td data-label="On element">&lt;nav&gt;</td><td data-label="Description">CSS class</td><td>Activates nav highlighter</td></tr>
-								</tbody>
-							</table>
+				<!-- Overview -->
+				<section class="section-card">
+					<header><h3>Overview</h3></header>
+					<main>
+						<p>Add <code>data-ln-slug-from="sourceName"</code> to a slug <code>&lt;input&gt;</code> inside a <code>&lt;form&gt;</code>. The component watches the source field and mirrors <code>slugify(source.value)</code> into the slug field as long as it is pristine (empty or not yet edited by the user).</p>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+							<tbody>
+								<tr><td><code>data-ln-slug-from="name"</code></td><td><code>&lt;input&gt;</code></td><td>Activates slug mirroring from the named source field in the same form</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Live mirroring -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example — Live mirroring (empty slug = pristine)</h3></header>
+					<main>
+						<p>Type in the <strong>Name</strong> field. The <strong>Slug</strong> updates automatically. Type directly into <strong>Slug</strong> to stop mirroring; clear it to resume.</p>
+						<form id="slug-demo-form" data-ln-form onsubmit="return false;">
+							<div class="form-element">
+								<label for="slug-name">Name</label>
+								<input type="text" id="slug-name" name="name" placeholder="e.g. My Article Title">
 							</div>
-							<p><strong>Example:</strong> <code>data-ln-nav="active"</code> — the link receives class <code>.active</code> when it is active.</p>
-						</main>
-					</section>
+							<div class="form-element">
+								<label for="slug-slug">Slug</label>
+								<input type="text" id="slug-slug" name="slug" data-ln-slug-from="name" placeholder="auto-generated">
+							</div>
+						</form>
+					</main>
+				</section>
 
-					<!-- Behavior -->
-					<section class="section-card">
-						<header><h3>Behavior and Match Rules</h3></header>
-						<main>
-							<article>
-								<h4>How does it work?</h4>
-								<ol>
-									<li>On init, it scans all <code>&lt;a&gt;</code> elements inside <code>&lt;nav&gt;</code></li>
-									<li>It compares the <code>href</code> of each link with <code>window.location.pathname</code></li>
-									<li>Adds a CSS class to matching links</li>
-								</ol>
-							</article>
-							<article>
-								<h4>Match Rules</h4>
-								<div class="table-container">
-								<table>
-									<thead><tr><th>Rule</th><th>Example</th><th>Result</th></tr></thead>
-									<tbody>
-										<tr><td><strong>Exact match</strong></td><td><code>/users</code> on <code>/users</code></td><td>✓ Match</td></tr>
-										<tr><td><strong>Parent match</strong></td><td><code>/users</code> on <code>/users/123</code></td><td>✓ Match</td></tr>
-										<tr><td><strong>Root special</strong></td><td><code>/</code> only on <code>/</code></td><td>✓ Exact only</td></tr>
-										<tr><td><strong>Trailing slash</strong></td><td><code>/users/</code> == <code>/users</code></td><td>✓ Normalized</td></tr>
-									</tbody>
-								</table>
-								</div>
-							</article>
-						</main>
-					</section>
+				<!-- Pre-filled slug — NOT overwritten -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example — Pre-filled slug is NOT overwritten</h3></header>
+					<main>
+						<p>When the slug field already has a value at page load (e.g. from a server-rendered edit form), it starts NON-pristine. Typing in the name field does NOT overwrite the existing slug.</p>
+						<form id="slug-prefill-form" data-ln-form onsubmit="return false;">
+							<div class="form-element">
+								<label for="slug-pf-name">Name</label>
+								<input type="text" id="slug-pf-name" name="name" value="My Article Title">
+							</div>
+							<div class="form-element">
+								<label for="slug-pf-slug">Slug (pre-filled — will NOT be overwritten)</label>
+								<input type="text" id="slug-pf-slug" name="slug" value="my-custom-slug" data-ln-slug-from="name">
+							</div>
+						</form>
+					</main>
+				</section>
 
-					
-					<!-- Example with multiple navigations -->
-					<section class="section-card" data-demo-html>
-						<header><h3>Example — Multiple Navigations</h3></header>
-						<main>
-							<article class="demo-nav-example">
-								<h5>Top Navigation</h5>
-								<nav data-ln-nav="active">
-									<a href="nav.html" aria-current="page">Nav (current)</a>
-									<a href="/users">Users</a>
-									<a href="/reports">Reports</a>
-								</nav>
-							</article>
-							<article class="demo-nav-example">
-								<h5>Side Navigation</h5>
-								<nav data-ln-nav="active">
-									<a href="nav.html" aria-current="page">Nav (current)</a>
-									<a href="/settings/profile">Profile</a>
-									<a href="/settings/security">Security</a>
-								</nav>
-							</article>
-						</main>
-						<script type="text/plain" data-demo-scss>
-// Navigation item styling in SCSS:
-nav a {
-    color: var(--fg-muted);
-    @include transition;
+				<!-- Pristine rules -->
+				<section class="section-card">
+					<header><h3>Pristine rules</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Situation</th><th>Result</th></tr></thead>
+							<tbody>
+								<tr><td>Slug field empty at init</td><td>Pristine — mirroring active</td></tr>
+								<tr><td>Slug field non-empty at init (server-rendered)</td><td>Not pristine — never overwrite</td></tr>
+								<tr><td>User types non-empty into slug</td><td>Not pristine — mirroring stops</td></tr>
+								<tr><td>User clears slug to empty</td><td>Pristine — mirroring resumes</td></tr>
+								<tr><td>lnForm.fill sets non-empty slug</td><td>Not pristine — loaded slug preserved</td></tr>
+								<tr><td>Form reset clears slug to empty</td><td>Pristine — mirroring resumes</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
 
-    &.active {
-        @include text-primary;
-        @include font-bold;
-        background-color: var(--bg-elevated);
-        @include px(0.75rem);
-        @include rounded-md;
-    }
-}
-						</script>
-					</section>
-
-					<!-- Reactivity -->
-					<section class="section-card">
-						<header><h3>Reactivity with AJAX and Browser History</h3></header>
-						<main>
-							<article>
-								<h4>pushState (AJAX navigation)</h4>
-								<p>When ln-ajax changes the URL via <code>pushState</code>, ln-nav automatically updates the active classes.</p>
-							</article>
-							<article>
-								<h4>popstate (browser back/forward)</h4>
-								<p>On browser back/forward, ln-nav listens to the <code>popstate</code> event and updates the active classes.</p>
-							</article>
-							<article>
-								<h4>Dynamically added links</h4>
-								<p>New links added via JavaScript (MutationObserver) are automatically processed.</p>
-							</article>
-						</main>
-					</section>
-
-					<!-- Exact matching -->
-					<section class="section-card">
-						<header><h3>Exact matching — <code>data-ln-nav-exact</code></h3></header>
-						<main>
-							<p>By default, <code>ln-nav</code> uses prefix matching: <code>/users</code> activates on <code>/users/42</code>. Add <code>data-ln-nav-exact</code> to require a strict URL match only.</p>
-							<p>Active links also receive <code>aria-current="page"</code> automatically (removed from inactive links).</p>
-							<article class="demo-nav-example">
-								<h5>Default (prefix matching) — <code>/users</code> activates on <code>/users/42</code></h5>
-								<nav data-ln-nav="active">
-									<a href="nav.html" aria-current="page">Nav (current)</a>
-									<a href="/users">Users</a>
-									<a href="/settings">Settings</a>
-								</nav>
-							</article>
-							<article class="demo-nav-example">
-								<h5>Exact only — <code>data-ln-nav-exact</code> — <code>/users</code> does NOT activate on <code>/users/42</code></h5>
-								<nav data-ln-nav="active" data-ln-nav-exact>
-									<a href="nav.html" aria-current="page">Nav (current)</a>
-									<a href="/users">Users</a>
-									<a href="/settings">Settings</a>
-								</nav>
-							</article>
-						</main>
-					</section>
-
-					<!-- API -->
-					<section class="section-card">
-						<header><h3>API</h3></header>
-						<main>
-							<pre><code>// Manual initialization
-window.lnNav.init(navElement);
-
-// Manually update active links
-// (usually not needed — works automatically)
-window.lnNav.updateActive();</code></pre>
-						</main>
-					</section>
+				<!-- Limitations -->
+				<section class="section-card">
+					<header><h3>Limitations (v1)</h3></header>
+					<main>
+						<ul>
+							<li><strong>ASCII-only:</strong> Cyrillic, Macedonian, accented characters, and other non-ASCII input are stripped entirely (become <code>-</code>). No transliteration in v1.</li>
+							<li><strong>Source read at init:</strong> The source field is resolved once at construction. Dynamically added source fields require re-initialization.</li>
+							<li><strong>Single source field:</strong> If multiple fields share the same name (RadioNodeList), the component warns and bails. One text input → one slug.</li>
+						</ul>
+					</main>
+				</section>
 			</div>
 		</section>
 

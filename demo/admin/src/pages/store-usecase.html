@@ -509,3 +509,124 @@
 	});
 })();
 </script>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     Zero-JS Declarative Binding Demo
+     A second self-contained coordinator tree wired against the same
+     /api/documents mock (same localStorage seed). The table, select, and
+     stat below need ZERO application JavaScript — the coordinator binder
+     handles all data delivery and refresh.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="section-card" data-demo-html>
+	<header><h3>Zero-JS Declarative Binding</h3></header>
+	<main>
+		<p>The table, select, and stat counter below are wired purely via HTML attributes. No <code>&lt;script&gt;</code> block drives them — <code>ln-data-coordinator</code> binder handles initial load, filter delivery, and store-mutation refresh automatically.</p>
+
+		<!-- Coordinator tree wraps store + connector -->
+		<div data-ln-data-coordinator>
+			<div data-ln-data-store="people"
+			     data-ln-store-endpoint="/api/documents"
+			     data-ln-store-stale="60"
+			     data-ln-store-indexes="department,status,updated_at"
+			     data-ln-store-search-fields="title,department,owner"
+			     data-ln-store-notify
+			     data-ln-store-notify-saved="Saved"
+			     data-ln-store-notify-deleted="Deleted"
+			     data-ln-store-notify-failed="Not saved"></div>
+			<div data-ln-api-connector
+			     data-ln-api-endpoint="/api/documents"></div>
+		</div>
+
+		<!-- Bound select — populated by ln-options -->
+		<div class="form-element" style="max-width: 20rem; margin-bottom: var(--size-md);">
+			<label for="people-select">Filter by record (ln-options demo)</label>
+			<select id="people-select"
+			        data-ln-options="people"
+			        data-ln-options-value="id"
+			        data-ln-options-label="title">
+				<option value="">All documents</option>
+			</select>
+		</div>
+
+		<!-- Bound stat counters — populated by ln-stat -->
+		<p>
+			Total: <strong data-ln-stat="people"></strong> &nbsp;|&nbsp;
+			Approved: <strong data-ln-stat="people" data-ln-stat-filter="status:Approved" class="is-loading"></strong>
+		</p>
+
+		<!-- Bound table — data-ln-table-store wires it to the binder -->
+		<section data-ln-table="people"
+		         data-ln-table-source="people"
+		         data-ln-table-store="people"
+		         class="data-table-demo">
+			<header class="ln-table__toolbar">
+				<h3>Documents (declarative binding)</h3>
+			</header>
+			<table>
+				<thead>
+					<tr>
+						<th data-ln-table-col="title">Title <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button> <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter department"
+						         data-ln-table-filter-options='[{"value":"Finance","label":"Finance"},{"value":"HR","label":"HR"},{"value":"IT","label":"IT"},{"value":"Legal","label":"Legal"},{"value":"Marketing","label":"Marketing"},{"value":"Operations","label":"Operations"}]'><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="status">Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"
+						         data-ln-table-filter-options='[{"value":"Draft","label":"Draft"},{"value":"Pending","label":"Pending"},{"value":"Approved","label":"Approved"},{"value":"Archived","label":"Archived"}]'><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="updated_at">Updated <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+			<footer class="ln-table__footer">
+				<span data-ln-table-total></span> items
+				<span data-ln-table-filtered-wrap> · <span data-ln-table-filtered></span> filtered</span>
+			</footer>
+
+			<template data-ln-template="people-row">
+				<tr data-ln-table-row>
+					<td>{{ title }}</td>
+					<td>{{ department }}</td>
+					<td>{{ status }}</td>
+					<td>{{ updated_at }}</td>
+				</tr>
+			</template>
+
+			<template data-ln-template="people-empty">
+				<tr><td colspan="99">
+					<article class="ln-table__empty-state">
+						<h3>No records</h3>
+					</article>
+				</td></tr>
+			</template>
+
+			<template data-ln-template="people-empty-filtered">
+				<tr><td colspan="99">
+					<article class="ln-table__empty-state">
+						<h3>No results</h3>
+						<button data-ln-table-clear-all class="btn">Clear all filters</button>
+					</article>
+				</td></tr>
+			</template>
+
+			<template data-ln-template="column-filter">
+				<div class="column-filter-dropdown">
+					<input type="search" data-ln-filter-search placeholder="Search…">
+					<ul data-ln-filter-options>
+						<li>
+							<label>
+								<input type="checkbox" data-ln-filter-reset>
+								All
+							</label>
+						</li>
+						<template data-ln-template="column-filter-item">
+							<li>
+								<label>
+									<input type="checkbox" data-ln-attr="value:value">
+									<span data-ln-field="value"></span>
+								</label>
+							</li>
+						</template>
+					</ul>
+				</div>
+			</template>
+		</section>
+	</main>
+</section>

@@ -277,17 +277,34 @@ export function isVisible(el) {
 
 // ─── Form Serialization ───────────────────────────────────
 
-export function serializeForm(form) {
+export function serializeForm(form, opts) {
+	const typed = !!(opts && opts.typed);
 	const data = {};
 	const elements = form.elements;
+
+	// Pre-count checkbox names in typed mode to distinguish single-checkbox
+	// (→ boolean) from same-name checkbox groups (→ array of checked values).
+	const checkboxCounts = {};
+	if (typed) {
+		for (let i = 0; i < elements.length; i++) {
+			const el = elements[i];
+			if (el.name && el.type === 'checkbox' && !el.disabled) {
+				checkboxCounts[el.name] = (checkboxCounts[el.name] || 0) + 1;
+			}
+		}
+	}
 
 	for (let i = 0; i < elements.length; i++) {
 		const el = elements[i];
 		if (!el.name || el.disabled || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
 
 		if (el.type === 'checkbox') {
-			if (!data[el.name]) data[el.name] = [];
-			if (el.checked) data[el.name].push(el.value);
+			if (typed && checkboxCounts[el.name] === 1) {
+				data[el.name] = el.checked;                          // single checkbox → boolean
+			} else {
+				if (!data[el.name]) data[el.name] = [];
+				if (el.checked) data[el.name].push(el.value);        // group → array (unchanged)
+			}
 		} else if (el.type === 'radio') {
 			if (el.checked) data[el.name] = el.value;
 		} else if (el.type === 'select-multiple') {
@@ -295,6 +312,11 @@ export function serializeForm(form) {
 			for (let j = 0; j < el.options.length; j++) {
 				if (el.options[j].selected) data[el.name].push(el.options[j].value);
 			}
+		} else if (typed && el.type === 'hidden') {
+			data[el.name] = el.value;                               // hidden → always string (never coerce)
+		} else if (typed && (el.type === 'number' || el.type === 'range')) {
+			const n = Number(el.value);
+			data[el.name] = (el.value === '' || isNaN(n)) ? null : n; // number/range → Number | null
 		} else {
 			data[el.name] = el.value;
 		}

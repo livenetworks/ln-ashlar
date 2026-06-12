@@ -1051,10 +1051,23 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				const seen = {};
 				const unique = [];
 				for (let j = 0; j < vals.length; j++) {
-					const s = String(vals[j]);
-					if (!seen[s]) { seen[s] = true; unique.push(s); }
+					const entry = vals[j];
+					if (entry !== null && typeof entry === 'object' && 'value' in entry) {
+						// {value, label} object — preserve as-is, dedup by String(value)
+						const key = String(entry.value);
+						if (!seen[key]) { seen[key] = true; unique.push(entry); }
+					} else {
+						// plain string (existing behavior)
+						const s = String(entry);
+						if (!seen[s]) { seen[s] = true; unique.push(s); }
+					}
 				}
-				this._filterOptions[field] = unique.sort();
+				unique.sort(function (a, b) {
+					const la = (a !== null && typeof a === 'object') ? (a.label != null ? a.label : String(a.value)) : a;
+					const lb = (b !== null && typeof b === 'object') ? (b.label != null ? b.label : String(b.value)) : b;
+					return la < lb ? -1 : la > lb ? 1 : 0;
+				});
+				this._filterOptions[field] = unique;
 			}
 		} else {
 			const fields = this._filterableFields;
@@ -1078,7 +1091,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._getUniqueValues = function (field) {
-		return (this._filterOptions[field] || []).slice().sort();
+		return (this._filterOptions[field] || []).slice();
 	};
 
 	_component.prototype._updateFilterIndicators = function () {
@@ -1171,14 +1184,16 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			if (itemTmpl) {
 				for (let i = 0; i < uniqueValues.length; i++) {
-					const val = uniqueValues[i];
+					const entry = uniqueValues[i];
+					const optVal = (entry !== null && typeof entry === 'object') ? entry.value : entry;
+					const optLabel = (entry !== null && typeof entry === 'object') ? (entry.label != null ? entry.label : String(entry.value)) : entry;
 					const itemClone = itemTmpl.cloneNode(true);
-					fill(itemClone, { value: val });
+					fill(itemClone, { value: optLabel });
 
 					const checkbox = itemClone.querySelector('input[type="checkbox"]');
 					if (checkbox) {
-						checkbox.value = val;
-						checkbox.checked = activeValues.length > 0 && activeValues.indexOf(val) !== -1;
+						checkbox.value = String(optVal);
+						checkbox.checked = activeValues.length > 0 && activeValues.indexOf(String(optVal)) !== -1;
 					}
 					optionsList.appendChild(itemClone);
 				}

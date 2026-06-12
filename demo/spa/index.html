@@ -31,7 +31,7 @@
 					</button>
 				</header>
 				<main>
-					<nav aria-label="Main navigation">
+					<nav aria-label="Main navigation" data-ln-nav="active">
 						<ul>
 							<li>
 								<a href="/demo/spa">
@@ -93,7 +93,11 @@
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="package_id,auth_method,active"
 		     data-ln-data-store-search-fields="name,slug,custom_domain"
-		     id="tenants-store"></div>
+		     id="tenants-store"
+		     data-ln-store-notify
+		     data-ln-store-notify-saved="Saved"
+		     data-ln-store-notify-deleted="Deleted"
+		     data-ln-store-notify-failed="Not saved"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"
 		     data-ln-api-path="/tenants"></div>
@@ -101,7 +105,7 @@
 
 	<!-- ── Package modal (persistent, outside outlet) ───────────── -->
 	<div class="ln-modal" data-ln-modal id="package-modal">
-		<form data-ln-form="package-form" id="package-form">
+		<form data-ln-form="package-form" id="package-form" data-ln-form-typed>
 			<header>
 				<h3 id="package-modal-title" data-title-new="New package" data-title-edit="Edit package">New package</h3>
 				<button type="button" aria-label="Close" data-ln-modal-close>
@@ -124,24 +128,29 @@
 					<div class="form-grid">
 						<div class="form-element">
 							<label for="pkg-max-users">Max users</label>
-							<input id="pkg-max-users" name="max_users" type="number" min="0" value="0">
+							<input id="pkg-max-users" name="max_users" type="number" min="0" value="0"
+							       data-ln-number data-ln-number-min="0">
 							<small class="hint">0 = unlimited</small>
 						</div>
 						<div class="form-element">
 							<label for="pkg-max-guests">Max guests</label>
-							<input id="pkg-max-guests" name="max_guests" type="number" min="0" value="0">
+							<input id="pkg-max-guests" name="max_guests" type="number" min="0" value="0"
+							       data-ln-number data-ln-number-min="0">
 						</div>
 						<div class="form-element">
 							<label for="pkg-max-standards">Max standards</label>
-							<input id="pkg-max-standards" name="max_standards" type="number" min="0" value="0">
+							<input id="pkg-max-standards" name="max_standards" type="number" min="0" value="0"
+							       data-ln-number data-ln-number-min="0">
 						</div>
 						<div class="form-element">
 							<label for="pkg-max-documents">Max documents</label>
-							<input id="pkg-max-documents" name="max_documents" type="number" min="0" value="0">
+							<input id="pkg-max-documents" name="max_documents" type="number" min="0" value="0"
+							       data-ln-number data-ln-number-min="0">
 						</div>
 						<div class="form-element">
 							<label for="pkg-max-storage">Max storage (GB)</label>
-							<input id="pkg-max-storage" name="max_storage" type="number" min="0" value="0">
+							<input id="pkg-max-storage" name="max_storage" type="number" min="0" value="0"
+							       data-ln-number data-ln-number-min="0">
 						</div>
 					</div>
 				</fieldset>
@@ -159,33 +168,115 @@
 		</form>
 	</div>
 
+	<!-- ── Tenant create modal (persistent, outside outlet) ─────── -->
+	<div class="ln-modal" data-ln-modal id="tenant-modal">
+		<form data-ln-form="tenant-create" id="tenant-create-form" data-ln-form-typed>
+			<header>
+				<h3 id="tenant-modal-title">New tenant</h3>
+				<button type="button" aria-label="Close" data-ln-modal-close>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+				</button>
+			</header>
+			<main>
+				<fieldset>
+					<legend>Identity</legend>
+					<div class="form-grid">
+						<div class="form-element">
+							<label for="tc-tenant-name">Name</label>
+							<input id="tc-tenant-name" name="name" required data-ln-validate>
+							<ul data-ln-validate-errors>
+								<li class="hidden" data-ln-validate-error="required">Name is required.</li>
+							</ul>
+						</div>
+						<div class="form-element">
+							<label for="tc-tenant-slug">Slug</label>
+							<input id="tc-tenant-slug" name="slug" required pattern="[a-z0-9\-]+" data-ln-validate data-ln-slug-from="name">
+							<small class="hint">Lowercase letters, numbers and dashes only.</small>
+							<ul data-ln-validate-errors>
+								<li class="hidden" data-ln-validate-error="required">Slug is required.</li>
+								<li class="hidden" data-ln-validate-error="patternMismatch">Only lowercase letters, numbers and dashes.</li>
+							</ul>
+						</div>
+						<div class="form-element">
+							<label for="tc-tenant-custom-domain">Custom domain</label>
+							<input id="tc-tenant-custom-domain" name="custom_domain">
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Plan &amp; access</legend>
+					<div class="form-grid">
+						<div class="form-element">
+							<label for="tc-tenant-package-id">Package</label>
+							<select id="tc-tenant-package-id" name="package_id" required data-ln-validate data-ln-options="packages" data-ln-options-value="id" data-ln-options-label="name">
+								<option value="">Select a package…</option>
+							</select>
+							<ul data-ln-validate-errors>
+								<li class="hidden" data-ln-validate-error="required">Choose a package.</li>
+							</ul>
+						</div>
+						<div class="form-element">
+							<label for="tc-tenant-auth-method">Auth method</label>
+							<select id="tc-tenant-auth-method" name="auth_method">
+								<option value="Local">Local</option>
+								<option value="LDAP">LDAP</option>
+							</select>
+						</div>
+						<div class="form-element">
+							<label>
+								<input name="active" type="checkbox" value="1" checked>
+								Active
+							</label>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Document policy</legend>
+					<div class="form-grid">
+						<div class="form-element">
+							<label for="tc-tenant-doc-numbering">Doc numbering scheme</label>
+							<input id="tc-tenant-doc-numbering" name="doc_numbering_scheme" value="{TYPE}-{SEQ:4}">
+							<small class="hint">{TYPE} = document type, {SEQ:4} = zero-padded sequence.</small>
+						</div>
+						<div class="form-element">
+							<label for="tc-tenant-review-interval">Review interval (days)</label>
+							<input id="tc-tenant-review-interval" name="review_interval" type="number" min="1" value="365"
+							       data-ln-number data-ln-number-min="1" data-ln-validate>
+							<ul data-ln-validate-errors>
+								<li class="hidden" data-ln-validate-error="rangeUnderflow">Must be at least 1 day.</li>
+							</ul>
+						</div>
+						<div class="form-element">
+							<label>
+								<input name="read_confirmation" type="checkbox" value="1">
+								Read confirmation required
+							</label>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Branding</legend>
+					<div class="form-grid">
+						<div class="form-element">
+							<label for="tc-tenant-brand-primary">Brand primary colour</label>
+							<input id="tc-tenant-brand-primary" name="brand_primary" type="color" value="#2563eb">
+						</div>
+						<div class="form-element">
+							<label for="tc-tenant-brand-secondary">Brand secondary colour</label>
+							<input id="tc-tenant-brand-secondary" name="brand_secondary" type="color" value="#1e40af">
+						</div>
+					</div>
+				</fieldset>
+			</main>
+			<footer class="form-actions">
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit" class="btn">Save</button>
+			</footer>
+		</form>
+	</div>
+
 	<!-- ── Toasts ───────────────────────────────────────────────── -->
 	<ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
-
-	<!-- ── Dictionary (user-facing strings consumed by app.js) ──── -->
-	<ul hidden id="spa-dict">
-		<li data-spa-dict="unlimited">Unlimited</li>
-		<li data-spa-dict="status-active">Active</li>
-		<li data-spa-dict="status-inactive">Inactive</li>
-		<li data-spa-dict="saved-title">Saved</li>
-		<li data-spa-dict="saved-create">{name} created</li>
-		<li data-spa-dict="saved-update">{name} updated</li>
-		<li data-spa-dict="deleted-title">Deleted</li>
-		<li data-spa-dict="deleted">Record removed</li>
-		<li data-spa-dict="bulk-deleted">{count} tenants deleted</li>
-		<li data-spa-dict="reverted-title">Not saved</li>
-		<li data-spa-dict="reverted">Change was rolled back — {error}</li>
-		<li data-spa-dict="reverted-unknown">server rejected the change</li>
-		<li data-spa-dict="blocked-title">Blocked</li>
-		<li data-spa-dict="blocked">{count} tenant(s) use this package</li>
-		<li data-spa-dict="blocked-server">Tenants still use this package</li>
-		<li data-spa-dict="reset-title">Demo data</li>
-		<li data-spa-dict="reset-done">Demo data has been reset</li>
-		<li data-spa-dict="reset-failed">Could not reset demo data</li>
-		<li data-spa-dict="unknown-tenant-title">Not found</li>
-		<li data-spa-dict="unknown-tenant">That tenant does not exist</li>
-		<li data-spa-dict="no-package">—</li>
-	</ul>
 
 	<!-- ── Route templates ──────────────────────────────────────── -->
 
@@ -202,25 +293,25 @@
 				<li>
 					<a href="/demo/spa/packages">
 						<span data-ln-stat-label>Packages</span>
-						<strong data-ln-stat-value data-stat="packages">—</strong>
+						<strong data-ln-stat-value data-ln-stat="packages" class="is-loading">—</strong>
 					</a>
 				</li>
 				<li>
 					<a href="/demo/spa/tenants">
 						<span data-ln-stat-label>Tenants</span>
-						<strong data-ln-stat-value data-stat="tenants">—</strong>
+						<strong data-ln-stat-value data-ln-stat="tenants" class="is-loading">—</strong>
 					</a>
 				</li>
 				<li>
 					<a href="/demo/spa/tenants">
 						<span data-ln-stat-label>Active tenants</span>
-						<strong data-ln-stat-value data-stat="tenants-active">—</strong>
+						<strong data-ln-stat-value data-ln-stat="tenants" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 					</a>
 				</li>
 				<li>
 					<a href="/demo/spa/packages">
 						<span data-ln-stat-label>Active packages</span>
-						<strong data-ln-stat-value data-stat="packages-active">—</strong>
+						<strong data-ln-stat-value data-ln-stat="packages" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 					</a>
 				</li>
 			</ul>
@@ -254,7 +345,7 @@
 			<header class="page-header">
 				<div class="page-title">
 					<h1>Packages</h1>
-					<p><span data-count-packages>—</span> packages defined</p>
+					<p><span data-ln-stat="packages">—</span> packages defined</p>
 				</div>
 				<div class="page-actions">
 					<button type="button" id="new-package" class="btn">
@@ -264,7 +355,7 @@
 				</div>
 			</header>
 
-			<section data-ln-table="packages" data-ln-table-source="packages" id="packages-table">
+			<section data-ln-table="packages" data-ln-table-source="packages" data-ln-table-store="packages" id="packages-table">
 				<header class="ln-table__toolbar">
 					<label class="search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
@@ -282,7 +373,7 @@
 							<th data-ln-table-col="max_users">Max users <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 							<th data-ln-table-col="max_documents">Documents <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
 							<th data-ln-table-col="max_storage">Storage <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-							<th data-ln-table-col="status_display">Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+							<th data-ln-table-col="active" data-ln-table-filter-options='[{"value":"true","label":"Active"},{"value":"false","label":"Inactive"}]'>Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
 							<th>Actions</th>
 						</tr>
 					</thead>
@@ -369,17 +460,17 @@
 			<header class="page-header">
 				<div class="page-title">
 					<h1>Tenants</h1>
-					<p><span data-count-tenants>—</span> tenants registered</p>
+					<p><span data-ln-stat="tenants">—</span> tenants registered</p>
 				</div>
 				<div class="page-actions">
-					<a href="/demo/spa/tenants/new" class="btn">
+					<button type="button" id="new-tenant" class="btn" data-ln-modal-for="tenant-modal">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 						New tenant
-					</a>
+					</button>
 				</div>
 			</header>
 
-			<section data-ln-table="tenants" data-ln-table-source="tenants" data-ln-table-selectable id="tenants-table">
+			<section data-ln-table="tenants" data-ln-table-source="tenants" data-ln-table-store="tenants" data-ln-table-selectable id="tenants-table">
 				<header class="ln-table__toolbar">
 					<label class="search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
@@ -405,7 +496,7 @@
 							<th data-ln-table-col="custom_domain">Domain</th>
 							<th data-ln-table-col="package_name">Package</th>
 							<th data-ln-table-col="auth_method">Auth <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter auth method"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
-							<th data-ln-table-col="status_display">Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+							<th data-ln-table-col="active" data-ln-table-filter-options='[{"value":"true","label":"Active"},{"value":"false","label":"Inactive"}]'>Status <button type="button" class="table-filter" data-ln-table-col-filter aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
 							<th>Actions</th>
 						</tr>
 					</thead>
@@ -440,10 +531,10 @@
 						<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-building"></use></svg>
 						<h3>No tenants yet</h3>
 						<p>Register your first tenant to get started.</p>
-						<a href="/demo/spa/tenants/new" class="btn">
+						<button type="button" data-spa-empty-new-tenant class="btn" data-ln-modal-for="tenant-modal">
 							<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 							New tenant
-						</a>
+						</button>
 					</article>
 				</template>
 
@@ -488,124 +579,6 @@
 		</section>
 	</template>
 
-	<!-- Tenant editor — new -->
-	<template data-ln-route="/demo/spa/tenants/new" data-ln-route-title="New tenant — DocuFlow">
-		<section id="tenant-editor">
-			<header class="page-header">
-				<nav aria-label="Breadcrumb">
-					<ol>
-						<li><a href="/demo/spa/tenants">Tenants</a></li>
-						<li aria-current="page">New tenant</li>
-					</ol>
-				</nav>
-				<div class="page-title">
-					<h1 data-tenant-title>New tenant</h1>
-				</div>
-			</header>
-			<section class="section-card">
-				<main>
-					<form data-ln-form="tenant-form">
-						<fieldset>
-							<legend>Identity</legend>
-							<div class="form-grid">
-								<div class="form-element">
-									<label for="tenant-name">Name</label>
-									<input id="tenant-name" name="name" required data-ln-validate>
-									<ul data-ln-validate-errors>
-										<li class="hidden" data-ln-validate-error="required">Name is required.</li>
-									</ul>
-								</div>
-								<div class="form-element">
-									<label for="tenant-slug">Slug</label>
-									<input id="tenant-slug" name="slug" required pattern="[a-z0-9\-]+" data-ln-validate>
-									<small class="hint">Lowercase letters, numbers and dashes only.</small>
-									<ul data-ln-validate-errors>
-										<li class="hidden" data-ln-validate-error="required">Slug is required.</li>
-										<li class="hidden" data-ln-validate-error="patternMismatch">Only lowercase letters, numbers and dashes.</li>
-									</ul>
-								</div>
-								<div class="form-element">
-									<label for="tenant-custom-domain">Custom domain</label>
-									<input id="tenant-custom-domain" name="custom_domain">
-								</div>
-							</div>
-						</fieldset>
-						<fieldset>
-							<legend>Plan &amp; access</legend>
-							<div class="form-grid">
-								<div class="form-element">
-									<label for="tenant-package-id">Package</label>
-									<select id="tenant-package-id" name="package_id" required data-ln-validate>
-										<option value="">Select a package…</option>
-									</select>
-									<template data-ln-template="package-option">
-										<option data-ln-attr="value:id" data-ln-field="name"></option>
-									</template>
-									<ul data-ln-validate-errors>
-										<li class="hidden" data-ln-validate-error="required">Choose a package.</li>
-									</ul>
-								</div>
-								<div class="form-element">
-									<label for="tenant-auth-method">Auth method</label>
-									<select id="tenant-auth-method" name="auth_method">
-										<option value="Local">Local</option>
-										<option value="LDAP">LDAP</option>
-									</select>
-								</div>
-								<div class="form-element">
-									<label>
-										<input name="active" type="checkbox" value="1" checked>
-										Active
-									</label>
-								</div>
-							</div>
-						</fieldset>
-						<fieldset>
-							<legend>Document policy</legend>
-							<div class="form-grid">
-								<div class="form-element">
-									<label for="tenant-doc-numbering">Doc numbering scheme</label>
-									<input id="tenant-doc-numbering" name="doc_numbering_scheme" value="{TYPE}-{SEQ:4}">
-									<small class="hint">{TYPE} = document type, {SEQ:4} = zero-padded sequence.</small>
-								</div>
-								<div class="form-element">
-									<label for="tenant-review-interval">Review interval (days)</label>
-									<input id="tenant-review-interval" name="review_interval" type="number" min="1" value="365" data-ln-validate>
-									<ul data-ln-validate-errors>
-										<li class="hidden" data-ln-validate-error="rangeUnderflow">Must be at least 1 day.</li>
-									</ul>
-								</div>
-								<div class="form-element">
-									<label>
-										<input name="read_confirmation" type="checkbox" value="1">
-										Read confirmation required
-									</label>
-								</div>
-							</div>
-						</fieldset>
-						<fieldset>
-							<legend>Branding</legend>
-							<div class="form-grid">
-								<div class="form-element">
-									<label for="tenant-brand-primary">Brand primary colour</label>
-									<input id="tenant-brand-primary" name="brand_primary" type="color" value="#2563eb">
-								</div>
-								<div class="form-element">
-									<label for="tenant-brand-secondary">Brand secondary colour</label>
-									<input id="tenant-brand-secondary" name="brand_secondary" type="color" value="#1e40af">
-								</div>
-							</div>
-						</fieldset>
-						<footer class="form-actions">
-							<a href="/demo/spa/tenants" class="btn">Cancel</a>
-							<button type="submit" class="btn">Save</button>
-						</footer>
-					</form>
-				</main>
-			</section>
-		</section>
-	</template>
-
 	<!-- Tenant editor — edit -->
 	<template data-ln-route="/demo/spa/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
 		<section id="tenant-editor">
@@ -622,7 +595,7 @@
 			</header>
 			<section class="section-card">
 				<main>
-					<form data-ln-form="tenant-form">
+					<form data-ln-form="tenant-form" data-ln-form-typed>
 						<fieldset>
 							<legend>Identity</legend>
 							<div class="form-grid">
@@ -635,7 +608,7 @@
 								</div>
 								<div class="form-element">
 									<label for="tenant-slug">Slug</label>
-									<input id="tenant-slug" name="slug" required pattern="[a-z0-9\-]+" data-ln-validate>
+									<input id="tenant-slug" name="slug" required pattern="[a-z0-9\-]+" data-ln-validate data-ln-slug-from="name">
 									<small class="hint">Lowercase letters, numbers and dashes only.</small>
 									<ul data-ln-validate-errors>
 										<li class="hidden" data-ln-validate-error="required">Slug is required.</li>
@@ -653,12 +626,9 @@
 							<div class="form-grid">
 								<div class="form-element">
 									<label for="tenant-package-id">Package</label>
-									<select id="tenant-package-id" name="package_id" required data-ln-validate>
+									<select id="tenant-package-id" name="package_id" required data-ln-validate data-ln-options="packages" data-ln-options-value="id" data-ln-options-label="name">
 										<option value="">Select a package…</option>
 									</select>
-									<template data-ln-template="package-option">
-										<option data-ln-attr="value:id" data-ln-field="name"></option>
-									</template>
 									<ul data-ln-validate-errors>
 										<li class="hidden" data-ln-validate-error="required">Choose a package.</li>
 									</ul>
