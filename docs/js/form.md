@@ -37,9 +37,10 @@ For consumer-facing usage see
 | `data-ln-form` | `<form>` | Creates a form coordinator instance |
 | `data-ln-form-auto` | `<form>` | Auto-submit on any `input` or `change` event |
 | `data-ln-form-debounce="300"` | `<form>` | Debounce delay in ms before auto-submit fires |
+| `data-ln-form-typed` | `<form>` | Opt-in typed serialization (see below) |
 
-All three attributes are read once at init. Changing them on a live form
-has no effect.
+All four attributes are read once at init. Changing them on a live form
+has no effect (except `data-ln-form-typed` which is read at submit time).
 
 ---
 
@@ -130,7 +131,9 @@ automatically — there is no registration step.
 1. Query all [data-ln-validate] fields
 2. For each: instance.validate()  ← force-validates even untouched fields
 3. If any returned false → abort (do not serialize or dispatch)
-4. serializeForm(form) → data object
+4. serializeForm(form, { typed: form.hasAttribute('data-ln-form-typed') }) → data object
+   - typed=false (default): all values are strings (native form behavior)
+   - typed=true: checkbox single → boolean, number/range → Number|null, hidden → string
 5. dispatch(form, 'ln-form:submit', { data })
 ```
 

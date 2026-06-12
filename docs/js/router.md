@@ -17,7 +17,7 @@ Steps performed on each navigation request (both click-interception and programm
 7. **Document Title** — apply `data-ln-route-title` value to `document.title` if present on the matched template.
 8. **Accessibility & UX** — shift focus to the target outlet (with `tabindex="-1"`) or its first heading element for screen-reader continuity. Scroll the target element into view (`scrollIntoView` at start).
 9. **Component Auto-init** — the browser triggers MutationObserver callbacks registered via `registerComponent`. Component descendants inside the newly mounted view auto-initialize themselves; the router does not perform manual constructor calls.
-10. **`ln-router:navigated` dispatch** — dispatch non-cancelable event on target element with `{ path, params, query, route, target }` detail.
+10. **`ln-router:navigated` dispatch** — dispatch non-cancelable event on target element with `{ path, params, query, route, target }` detail. On the boot path this dispatch is deferred one microtask (see Boot timing below).
 
 ## Registry & Specificity matching rules
 
@@ -48,6 +48,14 @@ To prevent layout flashes on first load of server-rendered pages:
 2. If present, the router skips the initial clone swap (`replaceChildren`) to preserve SSR markup.
 3. It registers all link click and popstate listeners.
 4. It sets the active routing state and dispatches `ln-router:navigated` so the page coordinator can immediately bind/fill the SSR'd content.
+
+## Boot timing — `_booting` flag & `_dispatchMaybeDeferred`
+
+The module-level `_booting` flag is set to `true` immediately before the initial `_matchRoute` call inside `_boot()` and reset to `false` immediately after. During this window, any call to `_dispatchMaybeDeferred` queues the underlying `dispatch()` call through `queueMicrotask` instead of invoking it synchronously.
+
+This guarantees that `ln-router:navigated` (matched boot route) and `ln-router:not-found` (unmatched boot route) are always delivered **after** the current synchronous task completes — including all `DOMContentLoaded` callbacks that register listeners in the same script-loading burst. Subsequent navigations set `_booting = false` and call `_dispatchMaybeDeferred` with it false, so their dispatches remain synchronous.
+
+Callers that are definitively NOT on the boot path (`_onClick`, `_onPopState`, `_navigate`) continue to call plain `dispatch` directly — this documents the contract explicitly and avoids any latency on interactive navigations.
 
 ## progressive enhancement
 

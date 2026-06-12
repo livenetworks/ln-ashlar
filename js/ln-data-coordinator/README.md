@@ -1,8 +1,89 @@
 # `data-ln-data-coordinator`
 
-A zero-dependency, Local-First **Data Coordinator** component that acts as the orchestrating brain of the 3-Tier Data Layer in `ln-ashlar`.
+A zero-dependency, Local-First **Data Coordinator** component that orchestrates the full 3-Tier Data Layer in `ln-ashlar`: it bridges the local cache store to remote connectors **and** delivers live data to bound view components (tables, lists, selects, stat counters) with zero application JavaScript.
 
-This component monitors its DOM subtree, intercepts events, and coordinates the life cycle between a **Local Storage Cache** (`data-ln-data-store`) and any **Transport Gateway** (`data-ln-*-connector`). By orchestrating the flow using event bubbling and a robust Promise-driven chain, it implements the decoupled coordinator pattern, making caching and networking completely agnostic of each other.
+This component monitors its DOM subtree, intercepts events, and coordinates the lifecycle between a **Local Storage Cache** (`data-ln-data-store`) and any **Transport Gateway** (`data-ln-*-connector`). It also listens on `document` for view-binding requests and refreshes all bound view elements on every store mutation.
+
+---
+
+## Declarative View Binding
+
+Add these attributes to view elements to bind them to this coordinator's child store. No app JS needed.
+
+| Attribute | Applied To | Description |
+|---|---|---|
+| `data-ln-table-store="<storeName>"` | `[data-ln-table]` | Binds a table — receives `ln-table:set-data` automatically. |
+| `data-ln-list-store="<storeName>"` | `[data-ln-list]` | Binds a list — receives `ln-list:set-data` automatically. |
+| `data-ln-options="<storeName>"` | `<select>` | Populated by `ln-options` via `ln-options:set-data`. |
+| `data-ln-stat="<storeName>"` | Inline element | Receives count via `ln-stat:set-count`. |
+
+`<storeName>` = the value of `data-ln-data-store` on the coordinator's child store. Multiple coordinators on one page each serve only their own store — isolated by the `_ownsStore(name)` guard.
+
+### `data-ln-table-filter-options` (declarative filter labels)
+
+Add this JSON attribute to a `<th>` that has `[data-ln-table-col-filter]` to supply human-readable labels for raw filter values:
+
+```html
+<th data-ln-table-col="status"
+    data-ln-table-filter-options='[{"value":"approved","label":"Approved"},{"value":"draft","label":"Draft"}]'>
+  Status <button data-ln-table-col-filter aria-label="Filter status">…</button>
+</th>
+```
+
+The coordinator reads this attribute, parses JSON once per request, and feeds it into `ln-table:set-data`'s `filterOptions`. The dropdown shows human labels; `checkbox.value` carries the raw value; the request echoes raw — no app-side label↔value translation needed.
+
+Columns without this attribute fall back to auto-accumulate (distinct string values from data).
+
+### Presenter / Binder Split
+
+- **Presenters** (`store.setPresenters({computed})`) — registered on the store; computed display fields flow through `getAll → set-data` automatically.
+- **Binder** (this coordinator) — delivers already-decorated records without knowing their shape.
+
+Use `setPresenters` for fields like `updated_display`, `size_display`, `status_label`. The binder delivers them as-is.
+
+### Store-Change Refresh
+
+The coordinator listens on `this.dom` for `ln-store:ready`, `loaded`, `created`, `updated`, `deleted`, and `synced` (only when `changed`). On any of these, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
+
+### Zero-JS Example
+
+```html
+<div data-ln-data-coordinator>
+  <div data-ln-data-store="people" data-ln-store-endpoint="/api/people"></div>
+  <div data-ln-api-connector data-ln-api-endpoint="/api/people"></div>
+</div>
+
+<section data-ln-table="people"
+         data-ln-table-source="people"
+         data-ln-table-store="people">
+  <table>
+    <thead>
+      <tr>
+        <th data-ln-table-col="name">Name <button data-ln-table-col-sort …></button></th>
+        <th data-ln-table-col="status"
+            data-ln-table-filter-options='[{"value":"active","label":"Active"},{"value":"inactive","label":"Inactive"}]'>
+          Status <button data-ln-table-col-filter …></button>
+        </th>
+      </tr>
+    </thead>
+    <tbody data-ln-table-body></tbody>
+  </table>
+  <template data-ln-template="people-row">
+    <tr data-ln-table-row>
+      <td>{{ name }}</td>
+      <td>{{ status_display }}</td>
+    </tr>
+  </template>
+</section>
+
+<select data-ln-options="people" data-ln-options-value="id" data-ln-options-label="name">
+  <option value="">All</option>
+</select>
+
+<strong data-ln-stat="people" data-ln-stat-filter="status:active"></strong> active
+```
+
+No `<script>` block needed. The coordinator wires everything.
 
 ---
 

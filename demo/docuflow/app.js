@@ -27,29 +27,7 @@
 	function rebuildPkgMap() {
 		packagesStoreEl.lnDataStore?.getAll({}).then(r => {
 			pkgNameById = new Map(r.data.map(p => [p.id, p.name]));
-			// Rebuild tenant package select options
-			rebuildPackageSelect();
-		});
-	}
-
-	function rebuildPackageSelect() {
-		const select = document.getElementById('tenant-package-id');
-		if (!select) return;
-		// Keep placeholder option, remove the rest
-		while (select.options.length > 1) select.remove(1);
-		const tmpl = document.querySelector('[data-template="package-option"]');
-		packagesStoreEl.lnDataStore?.getAll({}).then(r => {
-			r.data.forEach(pkg => {
-				let opt;
-				if (tmpl) {
-					opt = tmpl.content.cloneNode(true).querySelector('option');
-				} else {
-					opt = document.createElement('option');
-				}
-				opt.value = pkg.id;
-				opt.textContent = pkg.name;
-				select.appendChild(opt);
-			});
+			// ln-options owns the package select — no manual select rebuild needed
 		});
 	}
 
@@ -159,13 +137,7 @@
 			modalEl.setAttribute('data-ln-modal', 'open');
 		});
 
-		// Toast events for this store
-		storeEl.addEventListener('ln-store:confirmed', e =>
-			toast('success', 'Saved', `${e.detail?.action || 'Change'} confirmed`)
-		);
-		storeEl.addEventListener('ln-store:reverted', e =>
-			toast('error', 'Reverted', e.detail?.error || 'Server rejected the change')
-		);
+		// Offline toast (ln-store-notify covers confirmed/reverted; keep offline separately)
 		storeEl.addEventListener('ln-store:offline', () =>
 			toast('warning', 'Offline', 'Server unreachable — changes queued')
 		);
@@ -229,17 +201,7 @@
 		})
 		: { refresh: () => {} };
 
-	// ── Active nav ─────────────────────────────────────────────────────
-	function setActiveNav(path) {
-		document.querySelectorAll('#app-sidebar nav a').forEach(a => {
-			const href = a.getAttribute('href');
-			if (href === path) {
-				a.setAttribute('aria-current', 'page');
-			} else {
-				a.removeAttribute('aria-current');
-			}
-		});
-	}
+	// ── Active nav — handled by data-ln-nav="active" on the <nav> element
 
 	// ── Dashboard fill ─────────────────────────────────────────────────
 	function fillDashboard(target) {
@@ -262,26 +224,16 @@
 	}
 
 	// ── C1: redirect to dashboard when path matches no known route ────
-	// Catches subdir initial load (not-found fires at boot) and any
-	// runtime unmatched path. Guard against infinite loop with path check.
 	document.body.addEventListener('ln-router:not-found', e => {
 		if (e.detail?.path !== '/') {
 			window.lnRouter.replace('/');
 		}
 	});
 
-	// Boot-safety: if the router already finished boot before our listener
-	// attached (defer ordering), current() is null on a no-match → redirect.
-	window.addEventListener('load', () => {
-		if (!window.lnRouter.current()) {
-			window.lnRouter.replace('/');
-		}
-	});
+	// Boot-safety window-load fallback removed — ln-router deferred boot dispatch
+	// makes it obsolete (boot event fires reliably via queueMicrotask/VT callback).
 
 	// ── W2: re-fill dashboard after stores finish loading/syncing ──────
-	// fillDashboard reads count() from the live cache; on first load the
-	// sync is still in flight when navigated fires → counts are 0.
-	// Re-run once either store finishes, but only while dashboard is mounted.
 	function refreshDashboardIfMounted() {
 		const dashEl = document.getElementById('dashboard');
 		if (dashEl) fillDashboard(dashEl);
@@ -297,9 +249,8 @@
 	// ── Router: navigated ──────────────────────────────────────────────
 	document.addEventListener('ln-router:navigated', e => {
 		const pattern = e.detail.route?.pattern;
-		const path    = e.detail.path;
 
-		setActiveNav(path);
+		// ln-nav owns active state — no manual nav update needed
 
 		if (pattern === '/packages') {
 			packagesView.refresh();
@@ -315,8 +266,6 @@
 		const msg    = e.detail?.error  || 'Unknown error';
 		const status = e.detail?.status || '';
 
-		// Only the mounted route's error region exists in live DOM
-		// (the others are inside inert <template> nodes)
 		const errorRegion = document.querySelector('[data-view-error]');
 		if (errorRegion) {
 			const msgEl = errorRegion.querySelector('[data-view-error-msg]');
@@ -325,7 +274,7 @@
 		}
 	});
 
-	// Single delegated retry handler — bound once, never stacks
+	// Single delegated retry handler
 	document.addEventListener('click', e => {
 		const btn = e.target.closest('[data-view-retry]');
 		if (!btn) return;
@@ -333,7 +282,6 @@
 		const errorRegion = btn.closest('[data-view-error]');
 		if (errorRegion) errorRegion.setAttribute('hidden', '');
 
-		// Determine which store to retry from the current route pattern
 		const pattern = window.lnRouter.current()?.route?.pattern;
 		const storeToRetry = pattern === '/tenants' ? tenantsStoreEl : packagesStoreEl;
 		storeToRetry.lnDataStore?.forceSync();

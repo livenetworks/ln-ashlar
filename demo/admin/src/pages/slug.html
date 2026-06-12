@@ -1,0 +1,88 @@
+<!-- ln-page: title="ln-slug — ln-ashlar" h1="ln-slug" -->
+
+<h1>ln-slug</h1>
+				<p>Auto-slug micro-component — mirrors a slugified version of a source field into a slug field while the slug is pristine. Stops when the user types directly into the slug field; resumes if cleared.</p>
+
+				<!-- Overview -->
+				<section class="section-card">
+					<header><h3>Overview</h3></header>
+					<main>
+						<p>Add <code>data-ln-slug-from="sourceName"</code> to a slug <code>&lt;input&gt;</code> inside a <code>&lt;form&gt;</code>. The component watches the source field and mirrors <code>slugify(source.value)</code> into the slug field as long as it is pristine (empty or not yet edited by the user).</p>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
+							<tbody>
+								<tr><td><code>data-ln-slug-from="name"</code></td><td><code>&lt;input&gt;</code></td><td>Activates slug mirroring from the named source field in the same form</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Live mirroring -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example — Live mirroring (empty slug = pristine)</h3></header>
+					<main>
+						<p>Type in the <strong>Name</strong> field. The <strong>Slug</strong> updates automatically. Type directly into <strong>Slug</strong> to stop mirroring; clear it to resume.</p>
+						<form id="slug-demo-form" data-ln-form onsubmit="return false;">
+							<div class="form-element">
+								<label for="slug-name">Name</label>
+								<input type="text" id="slug-name" name="name" placeholder="e.g. My Article Title">
+							</div>
+							<div class="form-element">
+								<label for="slug-slug">Slug</label>
+								<input type="text" id="slug-slug" name="slug" data-ln-slug-from="name" placeholder="auto-generated">
+							</div>
+						</form>
+					</main>
+				</section>
+
+				<!-- Pre-filled slug — NOT overwritten -->
+				<section class="section-card" data-demo-html>
+					<header><h3>Example — Pre-filled slug is NOT overwritten</h3></header>
+					<main>
+						<p>When the slug field already has a value at page load (e.g. from a server-rendered edit form), it starts NON-pristine. Typing in the name field does NOT overwrite the existing slug.</p>
+						<form id="slug-prefill-form" data-ln-form onsubmit="return false;">
+							<div class="form-element">
+								<label for="slug-pf-name">Name</label>
+								<input type="text" id="slug-pf-name" name="name" value="My Article Title">
+							</div>
+							<div class="form-element">
+								<label for="slug-pf-slug">Slug (pre-filled — will NOT be overwritten)</label>
+								<input type="text" id="slug-pf-slug" name="slug" value="my-custom-slug" data-ln-slug-from="name">
+							</div>
+						</form>
+					</main>
+				</section>
+
+				<!-- Pristine rules -->
+				<section class="section-card">
+					<header><h3>Pristine rules</h3></header>
+					<main>
+						<div class="table-container">
+						<table>
+							<thead><tr><th>Situation</th><th>Result</th></tr></thead>
+							<tbody>
+								<tr><td>Slug field empty at init</td><td>Pristine — mirroring active</td></tr>
+								<tr><td>Slug field non-empty at init (server-rendered)</td><td>Not pristine — never overwrite</td></tr>
+								<tr><td>User types non-empty into slug</td><td>Not pristine — mirroring stops</td></tr>
+								<tr><td>User clears slug to empty</td><td>Pristine — mirroring resumes</td></tr>
+								<tr><td>lnForm.fill sets non-empty slug</td><td>Not pristine — loaded slug preserved</td></tr>
+								<tr><td>Form reset clears slug to empty</td><td>Pristine — mirroring resumes</td></tr>
+							</tbody>
+						</table>
+						</div>
+					</main>
+				</section>
+
+				<!-- Limitations -->
+				<section class="section-card">
+					<header><h3>Limitations (v1)</h3></header>
+					<main>
+						<ul>
+							<li><strong>ASCII-only:</strong> Cyrillic, Macedonian, accented characters, and other non-ASCII input are stripped entirely (become <code>-</code>). No transliteration in v1.</li>
+							<li><strong>Source read at init:</strong> The source field is resolved once at construction. Dynamically added source fields require re-initialization.</li>
+							<li><strong>Single source field:</strong> If multiple fields share the same name (RadioNodeList), the component warns and bails. One text input → one slug.</li>
+						</ul>
+					</main>
+				</section>

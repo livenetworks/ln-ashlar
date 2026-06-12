@@ -211,13 +211,17 @@ if (!isVisible(panel)) return;
 - Returns `false` for elements with `display: none`, detached nodes,
   and zero-sized elements.
 
-### serializeForm(form)
+### serializeForm(form, opts?)
 
 Walk `form.elements`, return a plain object keyed by element `name`.
 
 ```js
 const data = serializeForm(this.dom);
 // { username: 'alice', roles: ['admin', 'editor'], country: 'mk' }
+
+// Opt-in typed coercion:
+const typed = serializeForm(this.dom, { typed: true });
+// { active: true, count: 5, range: null }
 ```
 
 - Skips disabled fields, file inputs, submit / button inputs, and
@@ -226,6 +230,20 @@ const data = serializeForm(this.dom);
 - Radios collect as a single `string` (winning value).
 - `<select multiple>` collects as `string[]`.
 - Everything else collects as the raw `el.value`.
+
+**`opts.typed = true` — typed coercion rules:**
+
+| Input type | Default (no opts) | With `typed: true` |
+|---|---|---|
+| Single checkbox (unique name in form) | `[]` / `['on']` | `true` / `false` |
+| Checkbox group (multiple same name) | array of checked values | array of checked values |
+| `type="number"` / `type="range"` | `"42"` (string) | `42` (Number), or `null` if empty / NaN |
+| `type="hidden"` | string | string — **never coerced** |
+| Everything else | string | string (unchanged) |
+
+The `hidden` branch is explicit to protect `ln-number`'s raw-value
+contract: `ln-number` writes the numeric string to a hidden input, and
+typed mode must not convert it silently.
 
 ### populateForm(form, data)
 

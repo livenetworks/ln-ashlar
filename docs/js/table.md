@@ -86,6 +86,33 @@ this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 
 ---
 
+## filterOptions — `{value, label}` Shape
+
+`filterOptions` in `ln-table:set-data` accepts per-field arrays of either plain strings (existing) or `{value, label}` objects (new, additive):
+
+- **Plain string**: `'Draft'` — both the raw filter value and the dropdown label.
+- **Object**: `{ value: 'true', label: 'Active' }` — `label` renders in the dropdown; `value` (raw) is echoed verbatim in `ln-table:request-data` filters.
+
+Both shapes may coexist in the same field array.
+
+### Raw Key / Presented Label Recipe
+
+`data-ln-table-col` on a `<th>` declares the **raw sort/filter key** only — it does not control what renders in the cell. Cell content comes exclusively from the row template `{{ field }}` placeholder. This allows a column to filter on a raw boolean/enum field while displaying a human-readable computed field:
+
+```html
+<!-- TH: raw key for sort + filter -->
+<th data-ln-table-col="active">
+  Status <button data-ln-table-col-filter …></button>
+</th>
+
+<!-- row template cell: presented display field -->
+<td>{{ status_display }}</td>
+```
+
+`filterOptions.active = [{value:'true',label:'Active'},{value:'false',label:'Inactive'}]` — the dropdown shows "Active"/"Inactive"; selecting "Active" puts `'true'` into `currentFilters.active`; the request echoes `'true'`; the store filters raw. No app-side label↔value translation needed.
+
+---
+
 ## Lifecycle Diagram
 
 ```mermaid

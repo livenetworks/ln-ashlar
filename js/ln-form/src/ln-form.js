@@ -5,6 +5,7 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 	const DOM_ATTRIBUTE = 'lnForm';
 	const AUTO_ATTR = 'data-ln-form-auto';
 	const DEBOUNCE_ATTR = 'data-ln-form-debounce';
+	const TYPED_ATTR = 'data-ln-form-typed';
 	const VALIDATE_SELECTOR = 'data-ln-validate';
 	const VALIDATE_ATTRIBUTE = 'lnValidate';
 
@@ -123,7 +124,7 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 
 		if (!allValid) return;
 
-		const data = serializeForm(this.dom);
+		const data = serializeForm(this.dom, { typed: this.dom.hasAttribute(TYPED_ATTR) });
 		dispatch(this.dom, 'ln-form:submit', { data: data });
 	};
 

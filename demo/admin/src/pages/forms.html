@@ -1247,3 +1247,41 @@ input[data-ln-number] {
 })();
 </script>
 
+<!-- ==========================================
+     TYPED SERIALIZATION
+     ========================================== -->
+<section class="section-card" data-demo-html>
+	<header><h3>Typed serialization — <code>data-ln-form-typed</code></h3></header>
+	<main>
+		<p>Add <code>data-ln-form-typed</code> to opt in to native-type coercion on submit: a single checkbox becomes a boolean, <code>type="number"</code> becomes a Number (or <code>null</code> when empty), and checkbox groups remain string arrays.</p>
+		<form id="typed-demo-form" data-ln-form data-ln-form-typed onsubmit="return false;">
+			<div class="form-element">
+				<label for="typed-active">Active (single checkbox → boolean)</label>
+				<input type="checkbox" id="typed-active" name="active" value="1">
+			</div>
+			<fieldset>
+				<legend>Roles (group → array)</legend>
+				<div class="form-element">
+					<label><input type="checkbox" name="roles" value="admin"> Admin</label>
+				</div>
+				<div class="form-element">
+					<label><input type="checkbox" name="roles" value="editor"> Editor</label>
+				</div>
+			</fieldset>
+			<div class="form-element">
+				<label for="typed-count">Count (number → Number | null)</label>
+				<input type="number" id="typed-count" name="count" placeholder="e.g. 5">
+			</div>
+			<ul class="form-actions">
+				<li><button type="submit">Serialize (typed)</button></li>
+			</ul>
+		</form>
+		<pre id="typed-demo-output" style="margin-top:var(--size-sm)">(submit to see typed output)</pre>
+		<script>
+		document.getElementById('typed-demo-form').addEventListener('ln-form:submit', function (e) {
+			document.getElementById('typed-demo-output').textContent = JSON.stringify(e.detail.data, null, 2);
+		});
+		</script>
+	</main>
+</section>
+

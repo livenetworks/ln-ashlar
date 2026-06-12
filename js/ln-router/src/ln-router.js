@@ -37,6 +37,21 @@ let currentPath = null;
 let currentParams = {};
 let currentQuery = {};
 let currentRoute = null;
+let _booting = false;
+
+/**
+ * Dispatch an event immediately, or defer one microtask when called from the boot path.
+ * Boot-path dispatches are deferred so listeners registered in the same DOMContentLoaded
+ * burst (i.e. after the <script> that loaded this bundle) always receive the event.
+ * All subsequent (click/popstate/programmatic) navigations dispatch synchronously.
+ */
+function _dispatchMaybeDeferred(target, name, detail) {
+	if (_booting) {
+		queueMicrotask(function () { dispatch(target, name, detail); });
+	} else {
+		dispatch(target, name, detail);
+	}
+}
 
 /**
  * Normalize path: collapse trailing slash, strip query/hash, parse query.
@@ -271,7 +286,7 @@ function _render(route, params, query, targetPath, opts = {}) {
 		currentRoute = route;
 
 		// Dispatch navigated event
-		dispatch(targetEl, 'ln-router:navigated', {
+		_dispatchMaybeDeferred(targetEl, 'ln-router:navigated', {
 			path: targetPath,
 			params,
 			query,
@@ -340,6 +355,9 @@ function _boot() {
 		window.addEventListener('popstate', _onPopState);
 
 		// Trigger initial path resolution
+		// _booting = true defers both navigated and not-found dispatches one microtask,
+		// so listeners registered in the same DOMContentLoaded burst always receive them.
+		_booting = true;
 		const fullPath = window.location.pathname + window.location.search;
 		const { path, query } = _normalizePath(fullPath);
 		const match = _matchRoute(path);
@@ -352,8 +370,9 @@ function _boot() {
 				isHydration
 			});
 		} else {
-			dispatch(document.body, 'ln-router:not-found', { path });
+			_dispatchMaybeDeferred(document.body, 'ln-router:not-found', { path });
 		}
+		_booting = false;
 	}, 'ln-router');
 }
 

@@ -97,6 +97,24 @@ All events bubble from the target outlet element.
 | **`ln-router:navigated`** | No | `{ path, params, query, route, target }` | After the new view clone is mounted in the DOM. |
 | **`ln-router:not-found`** | No | `{ path }` | When a path fails to match any route (and no `*` catch-all exists). DOM is left untouched. |
 
+### Timing guarantee
+
+The initial `ln-router:navigated` (on a matched route) and boot-path `ln-router:not-found` (on no match) dispatches are **deferred one microtask** via `queueMicrotask`. This ensures that listeners registered during the same `DOMContentLoaded` burst — i.e. in a `<script defer>` tag that appears after the router bundle — always receive the boot event. When the View Transitions API is available, the deferral is handled via the VT callback rather than literally `queueMicrotask`, but the guarantee is identical — listeners in a later `defer` script still receive the boot event.
+
+All subsequent navigations (link clicks, `popstate`, programmatic `router.navigate()`/`router.replace()`) dispatch **synchronously**; no deferral applies once the boot phase is complete.
+
+**Consumers no longer need a `current()` boot-replay block.** The pattern:
+
+```js
+// OBSOLETE — no longer needed
+const booted = window.lnRouter && window.lnRouter.current();
+if (booted && !navigatedFired) {
+    mountRoute(booted);
+}
+```
+
+can be replaced by simply attaching a `ln-router:navigated` listener — it will fire even if the router booted before the listener was added.
+
 ```js
 // Example: Block navigation out of unsaved forms
 document.addEventListener('ln-router:before-navigate', (e) => {

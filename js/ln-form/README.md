@@ -49,6 +49,7 @@ It delegates per-field validation rules to the `ln-validate` primitive and visua
 | `data-ln-form` | `<form>` | Initializes the coordinator. Evaluates initial button states. |
 | `data-ln-form-auto` | `<form>` | Automatically submits the form on any user value change. |
 | `data-ln-form-debounce="ms"` | `<form>` | Debounce duration in milliseconds before auto-submitting. |
+| `data-ln-form-typed` | `<form>` | Opt-in typed serialization — see "Typed serialization" below. |
 
 ### JS API
 
@@ -93,6 +94,35 @@ form.lnForm.destroy();
 | `ln-form:reset` | None | Triggers form reset. (Prefer direct `form.lnForm.reset()` API). |
 
 ---
+
+## Typed serialization
+
+By default, `ln-form` serializes all values as strings (native form behavior). Adding `data-ln-form-typed` opts in to typed coercion — the `ln-form:submit` `data` payload then carries native JS types:
+
+| Field type | Default (string) | Typed (`data-ln-form-typed`) |
+|---|---|---|
+| Single checkbox (`name` unique in form) | `[]` or `['on']` | `true` / `false` |
+| Checkbox group (multiple same `name`) | array of checked values | array of checked values (unchanged) |
+| `type="number"` / `type="range"` | `"42"` | `42` (Number) or `null` if empty / NaN |
+| `type="hidden"` | `"value"` | `"value"` — **always string, never coerced** |
+| Everything else | string | string (unchanged) |
+
+The `type="hidden"` rule preserves the `ln-number` composition contract: `ln-number` stores the raw numeric string in a hidden input, and the form coordinator must not silently convert it to a Number.
+
+```html
+<form data-ln-form data-ln-form-typed>
+  <input type="checkbox" name="active">
+  <input type="number" name="count">
+  <button type="submit">Save</button>
+</form>
+
+<script>
+  form.addEventListener('ln-form:submit', e => {
+    // { active: true, count: 5 }  (typed)
+    console.log(e.detail.data);
+  });
+</script>
+```
 
 ## ⚠️ Common Pitfalls
 

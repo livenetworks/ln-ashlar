@@ -211,6 +211,9 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		const searchAttr = dom.getAttribute('data-ln-data-store-search-fields') || dom.getAttribute('data-ln-store-search-fields') || '';
 		this._searchFields = searchAttr.split(',').map(s => s.trim()).filter(Boolean);
 
+		this._noAutosync = dom.hasAttribute('data-ln-data-store-no-autosync')
+			|| dom.hasAttribute('data-ln-store-no-autosync');
+
 		this._handlers = null;
 		this._pendingSnapshots = {};
 
@@ -384,6 +387,25 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		});
 	};
 	document.addEventListener('visibilitychange', _visibilityHandler);
+
+	// ─── Reconnect Auto-Sync ───────────────────────────────
+
+	// Default-on: when the browser goes back online, trigger a remote sync
+	// for all loaded stores that are not already syncing and have not opted out.
+	// The isSyncing guard makes this idempotent alongside manual forceSync calls.
+	let _onlineHandler = () => {
+		dispatch(document, 'ln-store:online', {});
+		Object.values(_stores).forEach(inst => {
+			if (inst._noAutosync) return;
+			if (inst.isLoaded && !inst.isSyncing) {
+				_triggerRemoteSync(inst);
+			}
+		});
+	};
+	window.addEventListener('online', _onlineHandler);
+
+	let _offlineNotify = () => { dispatch(document, 'ln-store:offline', {}); };
+	window.addEventListener('offline', _offlineNotify);
 
 	// ─── Query Engine (In-Memory over Cache) ───────────────
 
@@ -653,9 +675,19 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 		delete _stores[this._name];
 
-		if (Object.keys(_stores).length === 0 && _visibilityHandler) {
-			document.removeEventListener('visibilitychange', _visibilityHandler);
-			_visibilityHandler = null;
+		if (Object.keys(_stores).length === 0) {
+			if (_visibilityHandler) {
+				document.removeEventListener('visibilitychange', _visibilityHandler);
+				_visibilityHandler = null;
+			}
+			if (_onlineHandler) {
+				window.removeEventListener('online', _onlineHandler);
+				_onlineHandler = null;
+			}
+			if (_offlineNotify) {
+				window.removeEventListener('offline', _offlineNotify);
+				_offlineNotify = null;
+			}
 		}
 
 		delete this.dom[DOM_ATTRIBUTE];

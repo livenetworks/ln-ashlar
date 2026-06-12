@@ -22,7 +22,7 @@
 			</label>
 		</header>
 		<aside id="app-sidebar">
-			<nav aria-label="Main navigation">
+			<nav aria-label="Main navigation" data-ln-nav="active">
 				<ul>
 					<li>
 						<a href="/">
@@ -269,7 +269,11 @@
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="active"
 		     data-ln-data-store-search-fields="name"
-		     id="packages-store"></div>
+		     id="packages-store"
+		     data-ln-store-notify
+		     data-ln-store-notify-saved="Saved"
+		     data-ln-store-notify-deleted="Deleted"
+		     data-ln-store-notify-failed="Reverted"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"
 		     data-ln-api-path="/packages"></div>
@@ -281,7 +285,11 @@
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="package_id,auth_method,active"
 		     data-ln-data-store-search-fields="name,slug,custom_domain"
-		     id="tenants-store"></div>
+		     id="tenants-store"
+		     data-ln-store-notify
+		     data-ln-store-notify-saved="Saved"
+		     data-ln-store-notify-deleted="Deleted"
+		     data-ln-store-notify-failed="Reverted"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"
 		     data-ln-api-path="/tenants"></div>
@@ -296,7 +304,7 @@
 
 	<!-- Package modal -->
 	<div class="ln-modal" data-ln-modal id="package-modal">
-		<form data-ln-form="package-form" id="package-form">
+		<form data-ln-form="package-form" id="package-form" data-ln-form-typed>
 			<header>
 				<h3 id="package-modal-title">New package</h3>
 				<button type="button" aria-label="Close" data-ln-modal-close>
@@ -345,7 +353,7 @@
 
 	<!-- Tenant modal -->
 	<div class="ln-modal" data-ln-modal id="tenant-modal">
-		<form data-ln-form="tenant-form" id="tenant-form">
+		<form data-ln-form="tenant-form" id="tenant-form" data-ln-form-typed>
 			<header>
 				<h3 id="tenant-modal-title">New tenant</h3>
 				<button type="button" aria-label="Close" data-ln-modal-close>
@@ -368,12 +376,9 @@
 				</div>
 				<div class="form-element">
 					<label for="tenant-package-id">Package</label>
-					<select id="tenant-package-id" name="package_id" required>
+					<select id="tenant-package-id" name="package_id" required data-ln-options="packages" data-ln-options-value="id" data-ln-options-label="name">
 						<option value="">—</option>
 					</select>
-					<template data-template="package-option">
-						<option></option>
-					</template>
 				</div>
 				<div class="form-element">
 					<label for="tenant-auth-method">Auth method</label>

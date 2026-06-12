@@ -35,13 +35,14 @@ import { guardBody } from '../../ln-core';
 	}
 
 	function _initializeNav(navElement, activeClass) {
+		const exact = navElement.hasAttribute('data-ln-nav-exact');
 		let links = Array.from(navElement.querySelectorAll('a'));
 
-		_updateActiveState(links, activeClass, window.location.pathname);
+		_updateActiveState(links, activeClass, window.location.pathname, exact);
 
 		const updateHandler = function () {
 			links = Array.from(navElement.querySelectorAll('a'));
-			_updateActiveState(links, activeClass, window.location.pathname);
+			_updateActiveState(links, activeClass, window.location.pathname, exact);
 		};
 
 		window.addEventListener('popstate', updateHandler);
@@ -54,11 +55,11 @@ import { guardBody } from '../../ln-core';
 						if (node.nodeType === 1) {
 							if (node.tagName === 'A') {
 								links.push(node);
-								_updateActiveState([node], activeClass, window.location.pathname);
+								_updateActiveState([node], activeClass, window.location.pathname, exact);
 							} else if (node.querySelectorAll) {
 								const newLinks = Array.from(node.querySelectorAll('a'));
 								links = links.concat(newLinks);
-								_updateActiveState(newLinks, activeClass, window.location.pathname);
+								_updateActiveState(newLinks, activeClass, window.location.pathname, exact);
 							}
 						}
 					}
@@ -106,7 +107,7 @@ import { guardBody } from '../../ln-core';
 		}
 	}
 
-	function _updateActiveState(links, activeClass, currentPath) {
+	function _updateActiveState(links, activeClass, currentPath, exact) {
 		const normalizedCurrent = _normalizeUrl(currentPath);
 
 		for (const link of links) {
@@ -118,10 +119,13 @@ import { guardBody } from '../../ln-core';
 			link.classList.remove(activeClass);
 
 			const isExact = normalizedHref === normalizedCurrent;
-			const isParent = normalizedHref !== '/' && normalizedCurrent.startsWith(normalizedHref + '/');
+			const isParent = !exact && normalizedHref !== '/' && normalizedCurrent.startsWith(normalizedHref + '/');
 
 			if (isExact || isParent) {
 				link.classList.add(activeClass);
+				link.setAttribute('aria-current', 'page');
+			} else {
+				link.removeAttribute('aria-current');
 			}
 		}
 	}
