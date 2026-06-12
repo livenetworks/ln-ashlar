@@ -158,3 +158,57 @@ Dynamic HTML injections via `innerHTML` are a classic vector for DOM-based XSS. 
    - Dangerous schemes (e.g., `javascript:`, `data:`)
 
 This ensures that even if developers load third-party server components with unsanitized values, the client-side framework actively prevents malicious script execution.
+
+---
+
+## 6. Safe DOM Interpolation & Reflected XSS Prevention
+
+A primary security threat in single-page applications is **reflected Cross-Site Scripting (XSS)**. This occurs when untrusted user input—such as path parameters or query string variables parsed from the URL—is written directly into the DOM without sanitization.
+
+### Safe Core Helpers
+
+`ln-ashlar` enforces security by separating route mounting from data binding. The framework provides two core helpers (`fillTemplate` and `fill`) designed specifically to make dynamic text and data injections safe by default.
+
+#### 1. `fillTemplate(clone, data)` (Text-Node Substitution)
+For substitutions that live inside inline template text nodes (e.g. `<h1>Profile: {{username}}</h1>`), `fillTemplate` walks only text nodes in the cloned template using the browser's native `TreeWalker(clone, NodeFilter.SHOW_TEXT)`.
+
+Because it modifies `node.textContent` directly, any HTML injected into the `data` object is treated strictly as a raw string value. For example, if `params.username` contains `<img onerror="alert(1)">`, the DOM is updated to display that exact text, and the script does not execute.
+
+```javascript
+// SECURE: fillTemplate safely writes to textContent
+import { fillTemplate } from '../ln-core';
+
+document.addEventListener('ln-router:navigated', (e) => {
+    // E.g., URL = /profile/%3Cimg%20onerror%3Dalert(1)%3E
+    const username = e.detail.params.username;
+    fillTemplate(e.detail.target, { username: username });
+});
+```
+
+#### 2. `fill(root, data)` (Attribute-Driven Binding)
+`fill` populates the DOM by scanning elements for specific `data-ln-*` attributes. 
+- For `data-ln-field="prop"`, it updates the element using `el.textContent = data[prop]`.
+- For `data-ln-attr="attr:prop"`, it uses `el.setAttribute(attr, data[prop])`.
+
+Both operations are immune to markup injection XSS because they do not invoke the browser's HTML parser.
+
+### Avoid Unsafe Interpolation Patterns
+
+Route coordinators should never write untrusted input directly using `innerHTML` or `outerHTML`. If a coordinator must render raw HTML dynamically:
+1. Validate and sanitize it client-side using `DOMPurify` before insertion.
+2. Or let `ln-ajax` handle the injection, as it automatically applies the framework's [AJAX Injection Sanitization Filter](#5-ajax-injection-sanitization-filter).
+
+```javascript
+// DANGEROUS: Reflected XSS Vulnerability
+document.addEventListener('ln-router:navigated', (e) => {
+    const search = e.detail.query.q;
+    // If query.q contains a script tag, it will execute in the browser!
+    e.detail.target.querySelector('#search-query').innerHTML = `Results for: ${search}`; 
+});
+
+// SECURE: Use textContent or fillTemplate
+document.addEventListener('ln-router:navigated', (e) => {
+    const search = e.detail.query.q;
+    e.detail.target.querySelector('#search-query').textContent = `Results for: ${search}`;
+});
+```
