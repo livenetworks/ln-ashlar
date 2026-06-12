@@ -13,7 +13,10 @@ Instead of downloading megabytes of JavaScript, compiling in runtime, and displa
 1. **Server-Rendered HTML**: Your backend (Laravel, Go, Rails, etc.) delivers complete, semantic, indexable HTML. Fast to paint, SEO-friendly, and accessible in milliseconds.
 2. **Zero-Initialization JS**: Modular interactivity is driven by standard HTML attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-store`). A native `MutationObserver` registers and activates components automatically. No `new Component()` or `init()` boilerplate required.
 3. **Pure SCSS Styling via `@include`**: HTML remains semantic, describing *what* the element is. SCSS mixins describe *how* it looks. Visual styling is fully decoupled from markup.
-4. **Zero Dependencies**: 100% immune to npm supply chain attacks and package obsolescence. Built exclusively on eternal, backward-compatible W3C web standards.
+4. **Zero Dependencies**: 100% immune to npm supply chain attacks and package obsolescence. Built exclusively on eternal, backward-compatible W3C web standards (see note below on runtime icon CDN caching).
+
+> [!NOTE]
+> **Runtime Icon CDN Dependency:** While `ln-ashlar` has zero runtime npm package dependencies, the `ln-icons` component fetches SVG icons dynamically from jsDelivr (Tabler Icons) or a custom CDN URL. Once fetched, they are stored in `localStorage` so subsequent page views load instantly and work offline. If the client is offline and `localStorage` is empty, icon requests will fail silently and not display.
 
 > [!TIP]
 > 📖 **Read the complete engineering manifesto!**  
@@ -51,16 +54,16 @@ Four strict principles drive every technical decision in this library:
 
 ### 1. Install via npm
 ```bash
-npm install ln-ashlar
+npm install @livenetworks/ashlar
 ```
 
 Import source files into your main entries:
 ```js
 // main.scss - Import SCSS tokens, mixins, and defaults
-@use 'ln-ashlar/scss/ln-ashlar.scss';
+@use '@livenetworks/ashlar/scss/ln-ashlar.scss';
 
 // main.js - Import and auto-initialize JS components
-import 'ln-ashlar/js/index.js';
+import '@livenetworks/ashlar/js/index.js';
 ```
 
 ### 2. Install as a Git Submodule (Alternative)
