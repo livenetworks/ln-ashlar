@@ -467,7 +467,8 @@ try {
 - [ ] Shared interval checks `document.body.contains()` on tick (orphan cleanup)
 - [ ] Formatter/template caches at module level
 - [ ] `destroy()` method: removes from pools, disconnects observers, deletes DOM reference
-- [ ] `destroy()` removes ALL `addEventListener` listeners added during init — not just observers and pool references
+- [ ] `destroy()` removes ALL `addEventListener` listeners added during any lifecycle phase (init, open/show) — not just observers and pool references
+- [ ] Overlay components only: document-level listeners are paired with open/close (added on open, removed on close) — see the JS skill §Overlay Components
 - [ ] Trigger re-init guard: `btn[DOM_ATTRIBUTE + 'Trigger'] = true` before `addEventListener` (prevents duplicate listeners when MutationObserver re-fires on existing triggers)
 - [ ] All warnings prefixed with `[ln-{component}]`
 - [ ] Dict pattern with try/catch and fallback defaults
