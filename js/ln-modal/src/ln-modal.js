@@ -38,13 +38,6 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			}
 		};
 
-		this._onClose = function (e) {
-			e.preventDefault();
-			self.dom.setAttribute(DOM_SELECTOR, 'close');
-		};
-
-
-
 		// Apply initial state if open
 		if (this.isOpen) {
 			this.dom.setAttribute('aria-modal', 'true');
@@ -65,7 +58,14 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			document.removeEventListener('keydown', this._onEscape);
 			document.removeEventListener('keydown', this._onFocusTrap);
 			this._returnFocusEl = null;
-			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
+			// Self-excluding: a still-attached modal reads "open" during its own destroy.
+			// No attribute write here — it would race the observer into re-creating an instance.
+			const dom = this.dom;
+			const otherOpen = Array.prototype.some.call(
+				document.querySelectorAll('[' + DOM_SELECTOR + '="open"]'),
+				function (el) { return el !== dom; }
+			);
+			if (!otherOpen) {
 				document.body.classList.remove('ln-modal-open');
 			}
 		}
