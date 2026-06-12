@@ -181,7 +181,7 @@
 		<h4>Decoupled Setup Advantages</h4>
 		<ul style="margin-bottom: var(--size-md); line-height: 1.7;">
 			<li><strong>Zero-Coupling Code:</strong> You can completely swap the transport network layer (e.g. from REST API to CouchDB or WebSockets) without touching a single line of your database cache, forms, or data table markup.</li>
-			<li><strong>Declarative JS Mappers:</strong> Support inline `<script type="application/javascript" data-ln-mapper>` tags directly inside the HTML markup to map, flatten, or transform server schemas to clean local database schemas on the fly.</li>
+			<li><strong>Secure JS Mappers:</strong> Register mappers securely via <code>window.lnCore.registerDataMapper()</code> to map, flatten, or transform server schemas to clean local database schemas on the fly, keeping markup 100% CSP-compliant.</li>
 		</ul>
 	</main>
 </section>

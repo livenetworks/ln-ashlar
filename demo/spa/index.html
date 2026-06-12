@@ -333,7 +333,7 @@
 			<article data-view-error hidden>
 				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
 				<h3>Failed to load stats</h3>
-				<p>The server did not respond. Changes are not saved while it is unreachable.</p>
+				<p data-view-error-msg>The server did not respond. Changes are not saved while it is unreachable.</p>
 				<button type="button" class="btn" data-view-retry>Retry</button>
 			</article>
 		</section>
@@ -436,7 +436,7 @@
 			<article data-view-error hidden>
 				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
 				<h3>Failed to load packages</h3>
-				<p>The server did not respond. Changes are not saved while it is unreachable.</p>
+				<p data-view-error-msg>The server did not respond. Changes are not saved while it is unreachable.</p>
 				<button type="button" class="btn" data-view-retry>Retry</button>
 			</article>
 		</section>
@@ -558,7 +558,7 @@
 			<article data-view-error hidden>
 				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
 				<h3>Failed to load tenants</h3>
-				<p>The server did not respond. Changes are not saved while it is unreachable.</p>
+				<p data-view-error-msg>The server did not respond. Changes are not saved while it is unreachable.</p>
 				<button type="button" class="btn" data-view-retry>Retry</button>
 			</article>
 		</section>
@@ -643,7 +643,8 @@
 								</div>
 								<div class="form-element">
 									<label for="tenant-review-interval">Review interval (days)</label>
-									<input id="tenant-review-interval" name="review_interval" type="number" min="1" value="365" data-ln-validate>
+									<input id="tenant-review-interval" name="review_interval" type="number" min="1" value="365"
+									       data-ln-number data-ln-number-min="1" data-ln-validate>
 									<ul data-ln-validate-errors>
 										<li class="hidden" data-ln-validate-error="rangeUnderflow">Must be at least 1 day.</li>
 									</ul>

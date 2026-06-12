@@ -8,56 +8,55 @@
 
 ## Component Skeleton
 
-Every ln-ashlar component uses `findElements` from `ln-core` instead of raw MutationObserver setup:
+Every ln-ashlar component uses `registerComponent` from `ln-core` to manage end-to-end component registration, auto-initialization via MutationObserver, and lifecycle binding:
 
 ```javascript
-import { findElements } from '../ln-core'
+import { registerComponent } from '../ln-core';
 
-;(function () {
-    const DOM_SELECTOR = 'data-ln-{name}'
-    const DOM_ATTRIBUTE = 'ln{Name}'
+(function () {
+	const DOM_SELECTOR = 'data-ln-{name}';
+	const DOM_ATTRIBUTE = 'ln{Name}';
 
-    if (window[DOM_ATTRIBUTE] !== undefined) return
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-    // --- Module-level state (shared across all instances) ---
-    const _cache = {}
+	// --- Module-level state (shared across all instances) ---
+	const _cache = {};
 
-    // --- Constructor ---
-    function _constructor(dom) {
-        this.dom = dom
-        // init logic here
-    }
+	// --- Constructor ---
+	function _component(dom) {
+		this.dom = dom;
+		// init logic here
+	}
 
-    // --- Instance methods (on prototype) ---
-    _constructor.prototype.render = function () { /* ... */ }
-    _constructor.prototype.destroy = function () {
-        // cleanup: remove from pools, cancel timers, delete dom ref
-        delete this.dom[DOM_ATTRIBUTE]
-    }
+	// --- Instance methods (on prototype) ---
+	_component.prototype.render = function () { /* ... */ };
+	_component.prototype.destroy = function () {
+		// cleanup: remove from pools, cancel timers, delete dom ref
+		delete this.dom[DOM_ATTRIBUTE];
+	};
 
-    // --- Private helpers ---
-    function _helper() { /* ... */ }
+	// --- Private helpers ---
+	function _helper() { /* ... */ }
 
-    // --- Boot ---
-    function constructor(domRoot) {
-        findElements(domRoot, DOM_SELECTOR, DOM_ATTRIBUTE, _constructor)
-    }
-
-    window[DOM_ATTRIBUTE] = constructor
-    constructor(document)
-})()
+	// --- Boot via Core Registration ---
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-{name}', {
+		// Optional hooks:
+		// extraAttributes: ['data-ln-{name}-state'],
+		// onAttributeChange: function (target, name) { ... },
+		// onInit: function (root) { ... }
+	});
+})();
 ```
 
-### What `findElements` Does
+### What `registerComponent` Does
 
-`findElements(root, selector, attribute, Constructor)` from `ln-core`:
+`registerComponent(selector, attribute, ComponentFn, componentTag, options)` from `ln-core`:
 
-1. Finds all `[data-ln-{name}]` elements under `root`
-2. Skips already-initialized (checks `element[DOM_ATTRIBUTE]`)
-3. Creates instance: `element[DOM_ATTRIBUTE] = new Constructor(element)`
-4. Handles the initialization guard (no double-init)
-
-You provide the constructor. `findElements` handles discovery and guarding. MutationObserver is set up separately in `_domObserver` — it calls `findElements` on newly added nodes and attribute-changed targets.
+1. Walks the document (and subsequent AJAX injections via MutationObserver) to find matching elements.
+2. Guards against double-initialization by checking `element[DOM_ATTRIBUTE]`.
+3. Instantiates the component: `element[DOM_ATTRIBUTE] = new ComponentFn(element)`.
+4. Binds dynamic attribute updates to `onAttributeChange` hooks and subtree insertions to `onInit` hooks.
+5. Exposes the constructor at `window[DOM_ATTRIBUTE]`.
 
 ### Four Conventions Every Skeleton Encodes
 

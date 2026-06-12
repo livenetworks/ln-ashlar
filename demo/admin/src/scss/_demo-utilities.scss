@@ -1,3 +1,5 @@
+@use '../../../../scss/config/mixins' as *;
+
 // Demo-only utility classes — pull inline styles out of demo HTML.
 // Tokens-only; no raw literals.
 
@@ -40,5 +42,13 @@
 // ─── Forms demo nav spacing ────────────────────────────
 .demo-actions--spaced {
 	margin-top: var(--size-md);
+}
+
+.text-sm {
+	@include text-sm;
+}
+
+.text-sunken {
+	color: var(--fg-muted);
 }
 
