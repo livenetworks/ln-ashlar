@@ -1,0 +1,11 @@
+{
+  "name": "ln-ashlar-spa-starter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Module-per-folder authoring scaffold for SPAs built on ln-ashlar + ln-router.",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch"
+  }
+}

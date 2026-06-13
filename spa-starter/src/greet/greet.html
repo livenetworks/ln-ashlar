@@ -1,0 +1,18 @@
+<!-- @zone routes -->
+<template data-ln-route="/spa-starter/hello/:name" data-ln-route-title="Greeting — Ashlar SPA">
+	<section id="greet">
+		<header class="page-header">
+			<nav aria-label="Breadcrumb">
+				<ol>
+					<li><a href="/spa-starter">Home</a></li>
+					<li aria-current="page">Greeting</li>
+				</ol>
+			</nav>
+		</header>
+		<p class="greet-message">Hello, <strong>{{ name }}</strong>!</p>
+		<p class="greet-note">
+			That name came from the URL and was injected with
+			<code>fillTemplate</code> — text nodes only, so it is safe from reflected XSS.
+		</p>
+	</section>
+</template>

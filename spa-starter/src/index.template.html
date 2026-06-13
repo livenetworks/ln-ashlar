@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ln-ashlar SPA starter</title>
+	<link rel="icon" href="data:,">
+
+	<!-- App styles: the full framework + every module's SCSS, compiled to one sheet. -->
+	<link rel="stylesheet" href="/spa-starter/dist/app.css">
+
+	<!-- ln-ashlar components bundle. Build the library first from the repo root:
+	     `npm run build` (produces demo/dist/ln-ashlar.iife.js). In a real product
+	     you would instead bundle ln-ashlar from source via your own pipeline. -->
+	<script src="/demo/dist/ln-ashlar.iife.js" defer></script>
+
+	<!-- The concatenated application (runtime + every module/*.js). -->
+	<script src="/spa-starter/dist/app.js" defer></script>
+</head>
+<body>
+	<!-- Persistent app chrome: header, sidebar, and the routing outlet. -->
+	<!-- @inject shell -->
+
+	<!-- Persistent, out-of-outlet infrastructure: modals, stores, toasts, banners. -->
+	<!-- @inject persistent -->
+
+	<!-- Route templates, swapped into the outlet by ln-router. -->
+	<!-- @inject routes -->
+</body>
+</html>
