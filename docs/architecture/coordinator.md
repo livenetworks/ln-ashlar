@@ -214,6 +214,39 @@ import { registerComponent, dispatch } from '../ln-core';
 
 ---
 
+## Normalize Reused Surfaces at the Open Boundary
+
+A modal, drawer, or inline editor persists in the DOM and is reused across many records. Unlike a per-render row it accumulates residual state. Re-establish a known state every time it's shown — at the **open boundary**, never on the cancelable close.
+
+**Pattern:** on `ln-modal:before-open`, call `lnForm.reset()` ALWAYS, then `lnForm.fill(record)` only if editing.
+
+Reset-first is load-bearing: `populateForm` skips keys absent from the record, so without it a prior record's fields linger (field-leak).
+
+**State placement:**
+
+- **Mode → DOM** (`data-ln-modal-mode` attribute). DOM is the single source of truth per the coordinator doctrine.
+- **Record → JS** (`pendingRecord` variable). Consume-once: read into a local, null it immediately in the `before-open` handler.
+- **No `editMode` boolean** — the record's presence IS the mode.
+
+```js
+modalEl.addEventListener('ln-modal:before-open', () => {
+	const record = pendingRecord;
+	pendingRecord = null;
+
+	formEl.lnForm.reset();
+	modalEl.dataset.lnModalMode = record ? 'edit' : 'new';
+
+	if (record) {
+		formEl.lnForm.fill(record);
+		window.lnCore.fill(titleEl, record);
+	}
+});
+```
+
+See the mode-toggle markup and coordinator wiring in [`js/ln-modal/README.md §7`](../../js/ln-modal/README.md).
+
+---
+
 ## 📝 Best Practices Checklist for Coordinators
 
 When writing your own custom coordinators, adhere to this checklist to ensure stability and compatibility:

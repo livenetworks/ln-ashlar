@@ -148,6 +148,62 @@ Do not use visual layout utility classes in your markup. Apply structural sizing
 
 ---
 
+## 7. New / Edit Mode Toggle
+
+An opt-in convention for modals that serve both create and edit flows without duplicating markup. Modals without these attributes are unaffected.
+
+### How it works
+
+`data-ln-modal-mode="new|edit"` is an app/coordinator-written state attribute on the modal element. The co-located `js/ln-modal/ln-modal.scss` primitive toggles descendants:
+
+```css
+[data-ln-modal-when]               { display: none; }
+[data-ln-modal-mode="new"]  [data-ln-modal-when="new"]  { display: inline; }
+[data-ln-modal-mode="edit"] [data-ln-modal-when="edit"] { display: inline; }
+```
+
+Set `data-ln-modal-mode="new"` as the HTML default so the correct title renders on first paint without JS.
+
+### Markup
+
+```html
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
+	<form>
+		<header>
+			<h3 id="package-modal-title">
+				<span data-ln-modal-when="new">New package</span>
+				<span data-ln-modal-when="edit">Edit package — <span data-ln-field="name"></span></span>
+			</h3>
+		</header>
+	</form>
+</div>
+```
+
+`data-ln-field="name"` inside the edit span is filled by `lnCore.fill(h3, record)` — NOT `{{ name }}`, which is inert in live DOM (only `fillTemplate()` at clone time processes `{{ }}`). See [`docs/architecture/data-flow.md §5`](../../docs/architecture/data-flow.md).
+
+### Coordinator pattern
+
+```js
+let pendingRecord = null; // consume-once var scoped to this entity view
+
+modalEl.addEventListener('ln-modal:before-open', () => {
+	const record = pendingRecord;
+	pendingRecord = null; // consume immediately
+
+	formEl.lnForm.reset();          // ALWAYS — prevents field-leak from prior record
+	modalEl.dataset.lnModalMode = record ? 'edit' : 'new';
+
+	if (record) {
+		formEl.lnForm.fill(record);
+		window.lnCore.fill(titleEl, record);
+	}
+});
+```
+
+Reset-first is load-bearing: `lnForm.fill` skips keys absent from the record, so without it a prior record's fields linger. Mode is DOM state on `dataset.lnModalMode`; the record is data-in-flight with consume-once semantics. No `editMode` boolean — the record's presence is the mode.
+
+---
+
 ## Related
 - **[`ln-confirm`](../ln-confirm/README.md)** — Two-click inline confirm actions (lightweight alternative to modals).
 - **[`ln-form`](../ln-form/README.md)** — Form serialization and success/error cascades.

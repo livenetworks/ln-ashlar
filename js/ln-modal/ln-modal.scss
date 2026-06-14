@@ -9,3 +9,13 @@
 body.ln-modal-open {
 	overflow: hidden;
 }
+
+// Mode-conditional title variants: shown only when ancestor modal matches the mode
+[data-ln-modal-when] {
+	display: none;
+}
+
+[data-ln-modal-mode="new"] [data-ln-modal-when="new"],
+[data-ln-modal-mode="edit"] [data-ln-modal-when="edit"] {
+	display: inline;
+}

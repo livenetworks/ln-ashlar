@@ -41,9 +41,9 @@
 	);
 
 	// ── Entity view factory ────────────────────────────────────────────
-	function makeEntityView({ name, storeEl, tableId, formEl, modalEl, modalTitleEl, decorate, newBtnId }) {
+	function makeEntityView({ name, storeEl, tableId, formEl, modalEl, decorate, newBtnId }) {
 		let lastQuery = { sort: null, filters: {}, search: '' };
-		let editMode = false;
+		let pendingRecord = null;
 
 		function getTableEl() {
 			return document.getElementById(tableId);
@@ -77,9 +77,7 @@
 		document.addEventListener('ln-table:row-action', e => {
 			if (e.detail.table !== name) return;
 			if (e.detail.action === 'edit') {
-				editMode = true;
-				formEl.lnForm.fill(e.detail.record);
-				if (modalTitleEl) modalTitleEl.textContent = `Edit ${name.slice(0, -1)}`;
+				pendingRecord = e.detail.record;
 				modalEl.setAttribute('data-ln-modal', 'open');
 			} else if (e.detail.action === 'delete') {
 				handleDelete(e.detail);
@@ -105,13 +103,16 @@
 			}
 		}
 
-		// Modal before-open: reset form when not in edit mode
+		// Modal before-open: always reset, then fill if editing (R1)
 		modalEl.addEventListener('ln-modal:before-open', () => {
-			if (!editMode) {
-				formEl.lnForm.reset();
-				if (modalTitleEl) modalTitleEl.textContent = `New ${name.slice(0, -1)}`;
+			const record = pendingRecord;
+			pendingRecord = null;
+			formEl.lnForm.reset();
+			modalEl.dataset.lnModalMode = record ? 'edit' : 'new';
+			if (record) {
+				formEl.lnForm.fill(record);
+				window.lnCore.fill(modalEl.querySelector('h3'), record);
 			}
-			editMode = false;
 		});
 
 		// Form submit → create or update
@@ -127,13 +128,10 @@
 			modalEl.setAttribute('data-ln-modal', 'close');
 		});
 
-		// New button: reset form first, then open
+		// New button: open modal (before-open handles reset + mode)
 		document.addEventListener('click', e => {
 			const btn = e.target.closest(`#${newBtnId}`);
 			if (!btn) return;
-			editMode = false;
-			formEl.lnForm.reset();
-			if (modalTitleEl) modalTitleEl.textContent = `New ${name.slice(0, -1)}`;
 			modalEl.setAttribute('data-ln-modal', 'open');
 		});
 
@@ -160,7 +158,6 @@
 	// ── Package view ───────────────────────────────────────────────────
 	const packageFormEl   = document.getElementById('package-form');
 	const packageModalEl  = document.getElementById('package-modal');
-	const packageTitleEl  = document.getElementById('package-modal-title');
 
 	if (!packageFormEl || !packageModalEl) {
 		console.warn('[docuflow] Missing package modal/form elements');
@@ -173,7 +170,6 @@
 			tableId:      'packages-table',
 			formEl:       packageFormEl,
 			modalEl:      packageModalEl,
-			modalTitleEl: packageTitleEl,
 			decorate:     decoratePackage,
 			newBtnId:     'new-package'
 		})
@@ -182,7 +178,6 @@
 	// ── Tenant view ────────────────────────────────────────────────────
 	const tenantFormEl   = document.getElementById('tenant-form');
 	const tenantModalEl  = document.getElementById('tenant-modal');
-	const tenantTitleEl  = document.getElementById('tenant-modal-title');
 
 	if (!tenantFormEl || !tenantModalEl) {
 		console.warn('[docuflow] Missing tenant modal/form elements');
@@ -195,7 +190,6 @@
 			tableId:      'tenants-table',
 			formEl:       tenantFormEl,
 			modalEl:      tenantModalEl,
-			modalTitleEl: tenantTitleEl,
 			decorate:     decorateTenant,
 			newBtnId:     'new-tenant'
 		})

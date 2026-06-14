@@ -189,6 +189,19 @@ ALWAYS belongs in the two-layer architecture:
 If a JS component needs visual styling, extract it into a mixin + component.
 The co-located SCSS should be minimal or empty.
 
+### CSS/JS Hook Boundary
+
+Three tiers:
+
+1. **Decorating via a hook's bare presence is forbidden.**
+   `[data-ln-modal] { padding: ... }` — the attribute is a JS init target, not a CSS selector.
+
+2. **A component styling its OWN state expressed as `data-ln-x="value"` in its OWN co-located `js/ln-x/ln-x.scss` is sanctioned** — the dominant library pattern. The component owns both sides of the contract. Examples: `[data-ln-modal="open"] { display: flex }`, `[data-ln-popover="open"] { display: block }`, `[data-ln-filter-hide="true"] { display: none }`. These are attribute-value selectors (state encoded in the value), not presence selectors.
+
+3. **Consumer/app/cross-component CSS reaching through a foreign `data-ln-*` hook is forbidden.** Use a `.ln-*` state class (JS toggles, SCSS styles) or a plain app-owned `data-*`. App state must not enter the `data-ln-*` namespace.
+
+Practical test: *who owns this state, and where does the rule live?* Component's own state → `data-ln-x="value"` styled in co-located SCSS. App/coordinator state → app-owned `data-*` or `.ln-*` class, styled in app SCSS.
+
 ---
 
 ## Adding a New SCSS Mixin + Component
