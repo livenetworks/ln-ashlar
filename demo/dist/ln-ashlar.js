@@ -403,15 +403,15 @@ function Tt(h) {
   const g = h.offsetWidth, n = h.offsetHeight;
   return d.visibility = b, d.display = p, d.position = f, { width: g, height: n };
 }
-let rt = null;
+let ot = null;
 async function Mt(h) {
   if (!h) {
-    rt = null;
+    ot = null;
     return;
   }
   try {
     const d = new TextEncoder(), b = await crypto.subtle.digest("SHA-256", d.encode(h));
-    rt = await crypto.subtle.importKey(
+    ot = await crypto.subtle.importKey(
       "raw",
       b,
       { name: "AES-GCM" },
@@ -419,14 +419,14 @@ async function Mt(h) {
       ["encrypt", "decrypt"]
     );
   } catch (d) {
-    console.error("[ln-core/crypto] Key derivation failed:", d), rt = null;
+    console.error("[ln-core/crypto] Key derivation failed:", d), ot = null;
   }
 }
 function mt() {
-  return rt;
+  return ot;
 }
-async function he(h, d = rt) {
-  const b = d || rt;
+async function he(h, d = ot) {
+  const b = d || ot;
   if (!b || h === void 0 || h === null) return h;
   try {
     const p = new TextEncoder(), f = crypto.getRandomValues(new Uint8Array(12)), g = typeof h == "string" ? h : JSON.stringify(h), n = await crypto.subtle.encrypt(
@@ -443,8 +443,8 @@ async function he(h, d = rt) {
     return console.error("[ln-core/crypto] Encryption failed:", p), h;
   }
 }
-async function fe(h, d = rt) {
-  const b = d || rt;
+async function fe(h, d = ot) {
+  const b = d || ot;
   if (!h || !h.encrypted || !b) return h;
   try {
     const p = new TextDecoder(), f = Uint8Array.from(atob(h.iv), (t) => t.charCodeAt(0)), g = Uint8Array.from(atob(h.data), (t) => t.charCodeAt(0)), n = await crypto.subtle.decrypt(
@@ -709,7 +709,7 @@ const pe = {
   }
 }, Rt = "data-ln-route", $t = "lnRoute";
 typeof window < "u" && (window.lnRouter = pe);
-const ot = /* @__PURE__ */ new Map(), Nt = /* @__PURE__ */ new WeakMap();
+const et = /* @__PURE__ */ new Map(), Nt = /* @__PURE__ */ new WeakMap();
 let Yt = /* @__PURE__ */ new Map(), Ft = !1, kt = null, Xt = {}, Jt = {}, Dt = null, xt = !1;
 function Bt(h, d, b) {
   xt ? queueMicrotask(function() {
@@ -808,9 +808,9 @@ function me(h) {
 }
 function _t(h, d = {}) {
   const { path: b, query: p } = Qt(h), f = /* @__PURE__ */ new Map();
-  for (const [e, r] of ot)
+  for (const [e, r] of et)
     f.set(e, te(b, r.sorted));
-  const g = ot.has("__primary__"), n = f.get("__primary__");
+  const g = et.has("__primary__"), n = f.get("__primary__");
   if (g && !n) {
     Bt(document.body, "ln-router:not-found", { path: b });
     return;
@@ -861,7 +861,7 @@ function _t(h, d = {}) {
 function ge(h) {
   const d = h.target.closest("a");
   if (!d || !zt(h, d)) return;
-  const b = d.getAttribute("href"), { path: p } = Qt(b), f = ot.get("__primary__");
+  const b = d.getAttribute("href"), { path: p } = Qt(b), f = et.get("__primary__");
   if (!f) return;
   te(p, f.sorted) && (h.preventDefault(), _t(b, { historyAction: "push" }));
 }
@@ -885,8 +885,8 @@ function ve(h) {
     return;
   }
   const p = b || "__primary__";
-  ot.has(p) || ot.set(p, { routes: /* @__PURE__ */ new Map(), sorted: [] });
-  const f = ot.get(p);
+  et.has(p) || et.set(p, { routes: /* @__PURE__ */ new Map(), sorted: [] });
+  const f = et.get(p);
   if (f.routes.has(d)) {
     console.warn(`[ln-router] Duplicate route pattern registered: "${d}" in region "${p}"`);
     return;
@@ -898,13 +898,13 @@ function ve(h) {
     title: g,
     templateNode: h
   }, t = Ot(p, s);
-  t && t.contains(h) && console.warn(`[ln-router] Route template with pattern "${d}" is declared inside its own outlet element:`, h), f.routes.set(d, s), f.sorted = Array.from(f.routes.values()).sort(Zt), be();
+  t && t.contains(h) && console.warn(`[ln-router] Route template with pattern "${d}" is declared inside its own outlet element:`, h), f.routes.set(d, s), f.sorted = Array.from(f.routes.values()).sort(Zt);
 }
 function ye(h) {
   const d = h.getAttribute(Rt);
   if (!d) return;
-  const p = h.getAttribute("data-ln-route-target") || null || "__primary__", f = ot.get(p);
-  f && (f.routes.delete(d), f.sorted = Array.from(f.routes.values()).sort(Zt), f.routes.size === 0 && ot.delete(p));
+  const p = h.getAttribute("data-ln-route-target") || null || "__primary__", f = et.get(p);
+  f && (f.routes.delete(d), f.sorted = Array.from(f.routes.values()).sort(Zt), f.routes.size === 0 && et.delete(p));
 }
 function ee(h) {
   return this.dom = h, ve(h), this;
@@ -913,7 +913,10 @@ ee.prototype.destroy = function() {
   ye(this.dom), delete this.dom[$t];
 };
 B(Rt, $t, ee, "ln-router", {
-  extraAttributes: ["data-ln-route-target", "data-ln-route-title"]
+  extraAttributes: ["data-ln-route-target", "data-ln-route-title"],
+  onInit: function() {
+    et.size > 0 && be();
+  }
 });
 (function() {
   const h = "data-ln-modal", d = "lnModal";
@@ -2183,9 +2186,9 @@ const Ee = `<li class="ln-toast__item">\r
         });
         return;
       }
-      const H = "file-" + ++D, P = t(q.name), ht = i(P), et = lt(o, "ln-upload-item", "ln-upload");
-      if (!et) return;
-      const G = et.firstElementChild;
+      const H = "file-" + ++D, P = t(q.name), ht = i(P), nt = lt(o, "ln-upload-item", "ln-upload");
+      if (!nt) return;
+      const G = nt.firstElementChild;
       if (!G) return;
       G.setAttribute("data-file-id", H), X(G, {
         name: q.name,
@@ -2196,8 +2199,8 @@ const Ee = `<li class="ln-toast__item">\r
         error: !1,
         deleting: !1
       });
-      const ft = G.querySelector(".ln-upload__progress-bar"), nt = G.querySelector('[data-ln-upload-action="remove"]');
-      nt && (nt.disabled = !0), l.appendChild(G);
+      const ft = G.querySelector(".ln-upload__progress-bar"), it = G.querySelector('[data-ln-upload-action="remove"]');
+      it && (it.disabled = !0), l.appendChild(G);
       const st = new FormData();
       st.append("file", q);
       const yt = /* @__PURE__ */ new Set();
@@ -2223,7 +2226,7 @@ const Ee = `<li class="ln-toast__item">\r
             L("Invalid response");
             return;
           }
-          X(G, { sizeText: s(T.size || q.size), uploading: !1 }), nt && (nt.disabled = !1), C.set(H, {
+          X(G, { sizeText: s(T.size || q.size), uploading: !1 }), it && (it.disabled = !1), C.set(H, {
             serverId: T.id,
             name: T.name,
             size: T.size
@@ -2244,7 +2247,7 @@ const Ee = `<li class="ln-toast__item">\r
         L(c["network-error"] || "Network error");
       });
       function L(T) {
-        ft && (ft.style.width = "100%"), X(G, { sizeText: c.error || "Error", uploading: !1, error: !0 }), nt && (nt.disabled = !1), S(o, "ln-upload:error", {
+        ft && (ft.style.width = "100%"), X(G, { sizeText: c.error || "Error", uploading: !1, error: !0 }), it && (it.disabled = !1), S(o, "ln-upload:error", {
           file: q,
           message: T
         }), S(window, "ln-toast:enqueue", {
@@ -2277,8 +2280,8 @@ const Ee = `<li class="ln-toast__item">\r
           "X-CSRF-TOKEN": R(),
           Accept: "application/json"
         }
-      }).then(function(et) {
-        et.status === 200 ? (P && P.remove(), C.delete(q), O(), S(o, "ln-upload:removed", {
+      }).then(function(nt) {
+        nt.status === 200 ? (P && P.remove(), C.delete(q), O(), S(o, "ln-upload:removed", {
           localId: q,
           serverId: H.serverId
         })) : (P && X(P, { deleting: !1 }), S(window, "ln-toast:enqueue", {
@@ -2286,8 +2289,8 @@ const Ee = `<li class="ln-toast__item">\r
           title: c["delete-title"] || "Error",
           message: c["delete-error"] || "Failed to delete file"
         }));
-      }).catch(function(et) {
-        console.warn("[ln-upload] Delete error:", et), P && X(P, { deleting: !1 }), S(window, "ln-toast:enqueue", {
+      }).catch(function(nt) {
+        console.warn("[ln-upload] Delete error:", nt), P && X(P, { deleting: !1 }), S(window, "ln-toast:enqueue", {
           type: "error",
           title: c["network-error"] || "Network error",
           message: c["connection-error"] || "Could not connect to server"
@@ -4925,17 +4928,17 @@ const Ee = `<li class="ln-toast__item">\r
         }, tt.onerror = () => {
           console.warn("[ln-data-store] Database upgrade failed"), y(null);
         }, tt.onupgradeneeded = (pt) => {
-          const it = pt.target.result;
-          it.objectStoreNames.contains(p) || it.createObjectStore(p, { keyPath: "key" });
+          const rt = pt.target.result;
+          rt.objectStoreNames.contains(p) || rt.createObjectStore(p, { keyPath: "key" });
           for (const St of T)
-            if (!it.objectStoreNames.contains(St)) {
-              const ne = it.createObjectStore(St, { keyPath: "id" });
+            if (!rt.objectStoreNames.contains(St)) {
+              const ne = rt.createObjectStore(St, { keyPath: "id" });
               for (const It of L[St].indexes)
                 ne.createIndex(It, It, { unique: !1 });
             }
         }, tt.onsuccess = (pt) => {
-          const it = pt.target.result;
-          u(it), g = it, y(it);
+          const rt = pt.target.result;
+          u(rt), g = rt, y(rt);
         };
       };
     }), n);
@@ -5068,7 +5071,7 @@ const Ee = `<li class="ln-toast__item">\r
   };
   window.addEventListener("offline", P);
   const ht = new Intl.Collator(void 0, { numeric: !0, sensitivity: "base" });
-  function et(y, L) {
+  function nt(y, L) {
     if (!L || !L.field) return y;
     const { field: T, direction: k } = L, I = k === "desc";
     return [...y].sort((M, N) => {
@@ -5097,7 +5100,7 @@ const Ee = `<li class="ln-toast__item">\r
       })
     );
   }
-  function nt(y, L, T) {
+  function it(y, L, T) {
     if (!y.length) return 0;
     if (T === "count") return y.length;
     const k = y.map((M) => parseFloat(M[L])).filter((M) => !isNaN(M)), I = k.reduce((M, N) => M + N, 0);
@@ -5123,7 +5126,7 @@ const Ee = `<li class="ln-toast__item">\r
       const k = T.length;
       y.filters && (T = G(T, y.filters)), y.search && (T = ft(T, y.search, L._searchFields));
       const I = T.length;
-      if (y.sort && (T = et(T, y.sort)), y.offset || y.limit) {
+      if (y.sort && (T = nt(T, y.sort)), y.offset || y.limit) {
         const M = y.offset || 0, N = y.limit || T.length;
         T = T.slice(M, M + N);
       }
@@ -5138,7 +5141,7 @@ const Ee = `<li class="ln-toast__item">\r
   }, x.prototype.count = function(y) {
     return y ? _(this._name).then((L) => G(L, y).length) : C(this._name);
   }, x.prototype.aggregate = function(y, L) {
-    return _(this._name).then((T) => nt(T, y, L));
+    return _(this._name).then((T) => it(T, y, L));
   }, x.prototype.setPresenters = function(y) {
     this.presenters = y;
   }, x.prototype.applySync = function(y, L, T) {
