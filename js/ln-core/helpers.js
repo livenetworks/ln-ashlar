@@ -403,6 +403,19 @@ export function populateForm(form, data) {
 	const elements = form.elements;
 	const filled = [];
 
+	// Pre-count checkbox names to distinguish single-checkbox (→ bool)
+	// from same-name checkbox groups (→ comma-separated list membership).
+	// NOTE: unlike serializeForm, populateForm fills disabled elements too,
+	// so the count must include disabled members (no !el.disabled guard) —
+	// otherwise a group with a disabled box reverts to single-checkbox coercion.
+	const checkboxCounts = {};
+	for (let i = 0; i < elements.length; i++) {
+		const el = elements[i];
+		if (el.name && el.type === 'checkbox') {
+			checkboxCounts[el.name] = (checkboxCounts[el.name] || 0) + 1;
+		}
+	}
+
 	for (let i = 0; i < elements.length; i++) {
 		const el = elements[i];
 		if (el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
@@ -415,11 +428,19 @@ export function populateForm(form, data) {
 		const value = data[matchKey];
 
 		if (el.type === 'checkbox') {
-			// Array: same-name checkbox group membership check.
-			// Non-array: coerce to bool — string "false"/"0"/"off"/"no" → unchecked.
-			el.checked = Array.isArray(value)
-				? value.indexOf(el.value) !== -1
-				: _coerceBool(value);
+			if (Array.isArray(value)) {
+				// Programmatic array path — membership check.
+				el.checked = value.indexOf(el.value) !== -1;
+			} else if (checkboxCounts[el.name] > 1) {
+				// Same-name checkbox group + scalar: treat as comma-separated list.
+				// "admin,editor" → ['admin','editor'] → membership check.
+				const list = String(value).split(',').map(function (s) { return s.trim(); });
+				el.checked = list.indexOf(el.value) !== -1;
+			} else {
+				// Single checkbox — boolean coercion.
+				// "false"/"0"/"off"/"no"/"" → unchecked; anything else → checked.
+				el.checked = _coerceBool(value);
+			}
 			filled.push(el);
 		} else if (el.type === 'radio') {
 			el.checked = el.value === String(value);
