@@ -290,14 +290,15 @@ populated.forEach(function (el) { dispatch(el, 'input'); });
 - **Decoupled fill key (`data-ln-fill-as`)** — match key for the fill direction is
   `el.getAttribute('data-ln-fill-as') || el.name`. When `data-ln-fill-as` is set,
   the record key is the fill-as value and `name` stays as the form submission key.
-  Source: `js/ln-core/helpers.js` L412.
+  Source: `populateForm` in `js/ln-core/helpers.js`.
 - **Checkbox string coercion** — a single checkbox (one element with that `name` in
   the form) whose fill value is a string is coerced via `_coerceBool`: `"false"`,
   `"0"`, `""`, `"off"`, `"no"` (case-insensitive, trimmed) → unchecked; anything
   else → checked. This handles `data-ln-fill-*` values which always arrive as
-  strings. Source: `js/ln-core/helpers.js` L396–400, L420.
-- Checkbox + array value → `checked` if value is in the array.
-- Checkbox + scalar value → `checked = !!value`.
+  strings. Source: `_coerceBool` + `populateForm` in `js/ln-core/helpers.js`.
+- Checkbox + array → `checked` if `el.value` is in the array.
+- Checkbox group (same `name`, 2+ elements) + scalar → treated as comma-separated list (`"admin,editor"` → membership check).
+- Single checkbox + scalar → boolean coercion: `"false"/"0"/"off"/"no"/""` → unchecked; anything else → checked.
 - Radio → `checked` if value matches.
 - `<select multiple>` + array → marks matching options selected.
 
