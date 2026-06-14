@@ -410,6 +410,165 @@ Custom controls participate transparently: `ln-number` and `ln-date` move `name`
 - **`ln-editor`** (contenteditable) — `lnForm.fill` sets the backing textarea, not the surface. Dispatch `ln-editor:set-content` after fill to sync the visual editor.
 - **`ln-options`** (async select) — value is lost if options arrive after fill. Restore on `ln-options:set-data`.
 
+### 5.7 `lnFill` — event-driven region fill
+
+**When to use.** A modal (or any reused surface) contains both a `[data-ln-form]`
+and display-only elements with `[data-ln-fillable]` (e.g. a title heading). The
+default is the **declarative trigger** (`data-ln-fill-form` + `data-ln-fill-*`)
+for click-driven fills. Use `window.lnCore.lnFill(container, record)` directly
+only for programmatic / store-driven fills that are not click-triggered.
+
+#### Helper
+
+```js
+window.lnCore.lnFill(container, record)
+// Dispatches `ln-fill` at the container itself when it matches
+// [data-ln-form] or [data-ln-fillable], then at every such descendant.
+// record = null → fillables reset/clear themselves.
+```
+
+Source: `js/ln-core/helpers.js` L159–172.
+
+#### Event
+
+`ln-fill` — `CustomEvent`, `detail = record | null`, `bubbles: true`. Fillables
+self-handle; nothing else needs to listen.
+
+#### Two fillable kinds (this release)
+
+| Element | Attribute | On `ln-fill` | Guarded? |
+|---|---|---|---|
+| `<form>` | `data-ln-form` | `detail ? this.fill(detail) : this.reset()` | Yes — `if (e.target !== self.dom) return` |
+| Any display element | `data-ln-fillable` | `detail ? fill(el, detail) : clear [data-ln-field] textContent` | Delegated document listener — matches by `e.target` |
+
+#### Container-self inclusion
+
+`lnFill(formEl, record)` also dispatches `ln-fill` at `formEl` itself when it
+matches `[data-ln-form]` or `[data-ln-fillable]`. This means passing the form
+element directly (as `ln-fill` declarative trigger does) works correctly — the
+form's own `ln-fill` handler fires. Source: `js/ln-core/helpers.js` L164–165.
+
+#### Guard rule (important for future fillable authors)
+
+A fillable that listens for `ln-fill` on its **own** element AND can contain
+nested fillables MUST guard `if (e.target !== self) return;` — otherwise a
+bubbled `ln-fill` from a descendant fillable double-triggers it. This is why
+`ln-form` has the guard when `[data-ln-fillable]` lives inside `<form data-ln-form>`.
+
+#### Declarative trigger layer (`ln-fill` module)
+
+The `ln-fill` module (`js/ln-fill/`) adds a document-level click listener. On
+click of `[data-ln-fill-form="<id>"]`, it:
+
+1. Reads all `data-ln-fill-<key>` attributes from the trigger's `dataset`.
+   The browser camelCases them: `data-ln-fill-event-id` → key `eventId`.
+2. Strips the reserved suffixes `form` and `store`.
+3. Calls `window.lnCore.lnFill(form, record)` — or `lnFill(form, null)` when
+   no payload keys are present.
+4. Does NOT call `e.preventDefault()` — coexists with `data-ln-modal-for` on
+   the same button.
+
+Source: `js/ln-fill/src/ln-fill.js`.
+
+Declarative trigger is the **default** for click-triggered fills, including
+ln-table row templates — `fillTemplate()` now interpolates `{{ key }}` in
+attribute values, so `data-ln-fill-event-id="{{ id }}"` stamps correctly at
+clone time.
+
+#### When to use which layer
+
+| Situation | Use |
+|---|---|
+| Click-triggered fill (table row, inline button) | `data-ln-fill-form` + `data-ln-fill-*` |
+| Programmatic / store-event-driven fill | `window.lnCore.lnFill(container, record)` in coordinator |
+| Fill a form + display regions in one call | `lnFill(container, record)` (either layer) |
+| Fill only a form programmatically | `form.lnForm.fill(record)` / `form.lnForm.reset()` |
+| Fill only a display region | `fill(el, record)` (§5.3) |
+| Table row at clone time | `{{ field }}` (§5.1) |
+
+#### Back-compat
+
+`ln-form:fill` and `ln-form:reset` events still work (aliases). `ln-fill` is
+the canonical convention for new code.
+
+#### Canonical example — declarative trigger (ln-table row)
+
+```html
+<template data-ln-template="events-row">
+    <tr data-ln-table-row>
+        <td>{{ title }}</td>
+        <td>
+            <ul>
+                <li>
+                    <button
+                        data-ln-modal-for="event-modal"
+                        data-ln-fill-form="event-form"
+                        data-ln-fill-event-id="{{ id }}"
+                        data-ln-fill-title="{{ title }}"
+                        aria-label="Edit"
+                    >
+                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+                    </button>
+                </li>
+            </ul>
+        </td>
+    </tr>
+</template>
+
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new"
+     id="event-modal" aria-labelledby="event-modal-title">
+    <form id="event-form" data-ln-form>
+        <header>
+            <h3 id="event-modal-title" data-ln-fillable>
+                <span data-ln-modal-when="new">New event</span>
+                <span data-ln-modal-when="edit">Edit — <span data-ln-field="title"></span></span>
+            </h3>
+            <button type="button" data-ln-modal-close aria-label="Close">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+            </button>
+        </header>
+        <main>
+            <input type="hidden" name="eventId">
+            <div class="form-element">
+                <label for="title">Title</label>
+                <input id="title" name="title">
+            </div>
+        </main>
+        <footer>
+            <button type="button" data-ln-modal-close>Cancel</button>
+            <button type="submit">Save</button>
+        </footer>
+    </form>
+</div>
+```
+
+No coordinator JS needed. The button click is handled by two independent
+document listeners: `ln-modal` opens the modal and sets `data-ln-modal-mode`;
+`ln-fill` fills the form.
+
+#### Canonical example — coordinator (programmatic / store-driven)
+
+```js
+// Used when the fill is NOT click-triggered (e.g. store conflict resolution,
+// import workflow, deep-link pre-fill). Source pattern: demo/admin/.../store-usecase.html
+let pendingRecord = null;
+
+document.addEventListener('ln-table:row-action', function (e) {
+    if (e.detail.table !== 'events' || e.detail.action !== 'edit') return;
+    pendingRecord = e.detail.record;
+    modalEl.setAttribute('data-ln-modal', 'open');
+});
+
+modalEl.addEventListener('ln-modal:before-open', function () {
+    const record = pendingRecord;
+    pendingRecord = null; // consume-once
+
+    // lnFill fans out: null → form resets + fillables clear; record → fill all.
+    window.lnCore.lnFill(modalEl, record);
+    modalEl.dataset.lnModalMode = record ? 'edit' : 'new';
+});
+```
+
 ---
 
 ## 6. The MutationObserver discipline

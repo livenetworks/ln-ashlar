@@ -153,6 +153,39 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			const target = document.getElementById(modalId);
 			if (target && target[DOM_ATTRIBUTE]) {
 				e.preventDefault();
+
+				// Build display record from data-ln-modal-* dataset keys (excluding reserved).
+				const MODAL_RESERVED = { lnModalFor: true, lnModalClose: true, lnModalMode: true };
+				const record = {};
+				const ds = trigger.dataset;
+				for (const key in ds) {
+					if (!key.startsWith('lnModal')) continue;
+					if (MODAL_RESERVED[key]) continue;
+					const suffix = key.slice(7); // strip 'lnModal'
+					if (!suffix) continue;
+					record[suffix.charAt(0).toLowerCase() + suffix.slice(1)] = ds[key];
+				}
+
+				const hasRecord = Object.keys(record).length > 0;
+
+				// Fill display fields or clear them.
+				if (hasRecord) {
+					window.lnCore.fill(target, record);
+				} else {
+					const fields = target.querySelectorAll('[data-ln-field]');
+					for (let i = 0; i < fields.length; i++) {
+						fields[i].textContent = '';
+					}
+				}
+
+				// Set modal mode: explicit trigger attribute wins; else infer from record.
+				// Composes with [data-ln-modal-when]/[data-ln-modal-mode] SCSS toggle.
+				if (trigger.hasAttribute('data-ln-modal-mode')) {
+					target.dataset.lnModalMode = trigger.getAttribute('data-ln-modal-mode');
+				} else {
+					target.dataset.lnModalMode = hasRecord ? 'edit' : 'new';
+				}
+
 				const current = target.getAttribute(DOM_SELECTOR);
 				target.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
 			}

@@ -95,6 +95,28 @@ fill(li, { number: 1, title: 'Track', artist: 'Artist', isPlaying: true });
 - Skips `null`/`undefined` values (existing content preserved)
 - Nothing calls `fill()` automatically — a component must call it explicitly, and re-call it to update. Renderer pipelines that clone templates (`ln-table` rows, `renderList`'s clone pass) do not call `fill()`; inside those templates use `{{ field }}` instead. `fill()` does not process `{{ }}` placeholders.
 
+### lnFill(container, record)
+
+Fan-out helper — dispatches `ln-fill` at every `[data-ln-form]` and
+`[data-ln-fillable]` descendant. Each fillable self-handles: a form fills
+or resets; a display region fills or clears its `[data-ln-field]` elements.
+`record = null` triggers a reset/clear on all targets.
+
+```js
+// At the modal open boundary — form fills, title heading fills, one call
+window.lnCore.lnFill(modalEl, record);   // record → fill; null → reset/clear
+```
+
+- Also dispatches `ln-fill` at `container` itself when it matches
+  `[data-ln-form]` or `[data-ln-fillable]` — so `lnFill(formEl, record)` works
+  when called directly on a form element. Source: `js/ln-core/helpers.js` L164–165.
+- `container` — any element; scans its entire subtree.
+- `record` — plain object or `null`.
+- Dispatches `ln-fill` (`bubbles: true`, `detail = record ?? null`) at each target.
+- Returns `container` for chaining.
+- Exported from `js/ln-core/index.js`; available at `window.lnCore.lnFill`.
+- Back-compat: `ln-form` also still accepts `ln-form:fill` / `ln-form:reset` (aliases).
+
 ### fillTemplate(clone, data)
 
 Replace `{{ key }}` text-node placeholders in a cloned template fragment with values from `data`. Flat keys only (no nested `{{ item.text }}`).
@@ -110,12 +132,17 @@ fillTemplate(frag, { text: 'Engineering' });
 </template>
 ```
 
-- Walks text nodes via `TreeWalker(clone, NodeFilter.SHOW_TEXT)`
-- Replaces `{{ key }}` with `data[key]` (whitespace inside braces is flexible)
-- Missing keys produce empty string
-- No-op when no `{{` found in any text node
+- Walks text nodes via `TreeWalker(clone, NodeFilter.SHOW_TEXT)` (pass 1)
+- In pass 1: replaces `{{ key }}` with `data[key]` (whitespace inside braces is flexible)
+- **Pass 2: element attributes** — iterates every element in the clone (including the
+  root element itself when it is an `Element`, since `querySelectorAll` does not include
+  root). For each attribute whose value contains `{{`, replaces tokens via
+  `el.setAttribute(attr.name, resolved)`. Uses `setAttribute` — never `innerHTML` —
+  so injection risk is the same as `data-ln-attr`. Source: `js/ln-core/helpers.js` L197–233.
+- Missing keys produce empty string in both passes
+- No-op in either pass when no `{{` is present
 - Returns `clone` for chaining
-- **Different system from `fill()` — not interchangeable.** `fillTemplate` consumes `{{ key }}` placeholders once, at clone time; after that the text is plain and never updates. `data-ln-field` is read only by `fill()`, and `fill()` runs only where a component explicitly calls it. Neither function processes the other's syntax.
+- **Different system from `fill()` — not interchangeable.** `fillTemplate` consumes `{{ key }}` placeholders once, at clone time (in both text nodes and element attribute values); after that the content is plain and never updates. `data-ln-field` is read only by `fill()`, and `fill()` runs only where a component explicitly calls it. Neither function processes the other's syntax.
 - Called automatically by `renderList` on freshly cloned elements only — on keyed re-renders the placeholders are already consumed, so `{{ key }}` values never update. Values that must update on re-render belong in your `fillFn` (e.g. `fill()` + `data-ln-field`).
 - **`ln-table` row templates never call `fill()`** — rows support `{{ field }}` and `data-ln-table-cell-attr` only; a `data-ln-field` inside a row template is silently ignored. Decision matrix: `docs/architecture/data-flow.md` §5.
 
@@ -260,6 +287,15 @@ populated.forEach(function (el) { dispatch(el, 'input'); });
 
 - Skips elements not present as keys in `data`, file inputs, submit /
   button inputs.
+- **Decoupled fill key (`data-ln-fill-as`)** — match key for the fill direction is
+  `el.getAttribute('data-ln-fill-as') || el.name`. When `data-ln-fill-as` is set,
+  the record key is the fill-as value and `name` stays as the form submission key.
+  Source: `js/ln-core/helpers.js` L412.
+- **Checkbox string coercion** — a single checkbox (one element with that `name` in
+  the form) whose fill value is a string is coerced via `_coerceBool`: `"false"`,
+  `"0"`, `""`, `"off"`, `"no"` (case-insensitive, trimmed) → unchecked; anything
+  else → checked. This handles `data-ln-fill-*` values which always arrive as
+  strings. Source: `js/ln-core/helpers.js` L396–400, L420.
 - Checkbox + array value → `checked` if value is in the array.
 - Checkbox + scalar value → `checked = !!value`.
 - Radio → `checked` if value matches.

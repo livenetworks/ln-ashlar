@@ -36,6 +36,14 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 			if (e.detail) self.fill(e.detail);
 		};
 
+		this._onLnFill = function (e) {
+			// Guard: only handle direct dispatches at this form, not bubbled
+			// events from [data-ln-fillable] children inside the form.
+			if (e.target !== self.dom) return;
+			if (e.detail) self.fill(e.detail);
+			else self.reset();
+		};
+
 		this._onFormReset = function () {
 			self.reset();
 		};
@@ -49,6 +57,7 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 		form.addEventListener('submit', this._onSubmit);
 		form.addEventListener('ln-form:fill', this._onFill);
 		form.addEventListener('ln-form:reset', this._onFormReset);
+		form.addEventListener('ln-fill', this._onLnFill);
 		form.addEventListener('reset', this._onNativeReset);
 
 		// Auto-submit
@@ -184,6 +193,7 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 		this.dom.removeEventListener('submit', this._onSubmit);
 		this.dom.removeEventListener('ln-form:fill', this._onFill);
 		this.dom.removeEventListener('ln-form:reset', this._onFormReset);
+		this.dom.removeEventListener('ln-fill', this._onLnFill);
 		this.dom.removeEventListener('reset', this._onNativeReset);
 		if (this._onAutoInput) {
 			this.dom.removeEventListener('input', this._onAutoInput);

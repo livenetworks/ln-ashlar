@@ -50,6 +50,7 @@ It delegates per-field validation rules to the `ln-validate` primitive and visua
 | `data-ln-form-auto` | `<form>` | Automatically submits the form on any user value change. |
 | `data-ln-form-debounce="ms"` | `<form>` | Debounce duration in milliseconds before auto-submitting. |
 | `data-ln-form-typed` | `<form>` | Opt-in typed serialization — see "Typed serialization" below. |
+| `data-ln-fill-as="<key>"` | `<input>`, `<select>`, `<textarea>` | Decoupled fill key. When present, `populateForm` matches on this key instead of `name` for the fill direction; `name` continues to be the form submission key. `ln-number` and `ln-date` copy this attribute to their hidden input automatically. |
 
 ### JS API
 
@@ -90,8 +91,9 @@ form.lnForm.destroy();
 
 | Event | Payload | Description |
 | :--- | :--- | :--- |
-| `ln-form:fill` | `{ key: value }` | Triggers form population. (Prefer direct `form.lnForm.fill()` API). |
-| `ln-form:reset` | None | Triggers form reset. (Prefer direct `form.lnForm.reset()` API). |
+| `ln-fill` | `record \| null` | Canonical fan-out fill. `detail` → `this.fill(detail)`; `null` → `this.reset()`. Guarded: only handled when `e.target === self.dom`. |
+| `ln-form:fill` | `{ key: value }` | Alias (back-compat). Prefer `ln-fill` for new code. |
+| `ln-form:reset` | None | Alias (back-compat). Prefer `ln-fill` with `null` detail for new code. |
 
 ---
 

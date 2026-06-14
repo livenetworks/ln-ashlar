@@ -6,7 +6,6 @@
 	const tenantsStoreEl = document.getElementById('tenants-store');
 	const packageModal = document.getElementById('package-modal');
 	const packageForm = document.getElementById('package-form');
-	const packageTitle = document.getElementById('package-modal-title');
 	const tenantModal = document.getElementById('tenant-modal');
 	const tenantCreateForm = document.getElementById('tenant-create-form');
 	const offlineBanner = document.getElementById('offline-banner');
@@ -64,13 +63,7 @@
 	document.addEventListener('ln-table:row-action', function (e) {
 		const d = e.detail;
 		if (d.table === 'packages') {
-			if (d.action === 'edit') {
-				pkgEditMode = true;
-				pkgEditingId = Number(d.record.id);
-				packageModal.setAttribute('data-ln-modal', 'open');
-				packageForm.lnForm.fill(d.record);
-				packageTitle.textContent = packageTitle.dataset.titleEdit + ' — ' + d.record.name;
-			} else if (d.action === 'delete') {
+			if (d.action === 'delete') {
 				const tStore = tenantsStoreEl.lnDataStore;
 				tStore.count({ package_id: [String(d.record.id)] }).then(function (n) {
 					if (n > 0) { toast('warn', 'Blocked', n + ' tenant(s) use this package'); return; }
@@ -89,25 +82,13 @@
 	});
 
 	// ─── 5. Packages view (modal editor) ────────────────────────────────
-	let pkgEditMode = false;
-	let pkgEditingId = null;
-
-	packageModal.addEventListener('ln-modal:before-open', function () {
-		if (!pkgEditMode) {
-			pkgEditingId = null;
-			packageForm.lnForm.reset();
-			packageTitle.textContent = packageTitle.dataset.titleNew;
-		}
-		pkgEditMode = false;
-	});
-
 	packageForm.addEventListener('ln-form:submit', function (e) {
 		const data = Object.assign({}, e.detail.data);
+		const id = data.id;
 		delete data.id;
-		// Note: data.active is boolean (ln-form-typed handles checkbox coercion)
-		if (pkgEditingId != null) {
+		if (id) {
 			packagesStoreEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
-				detail: { id: pkgEditingId, data: data }
+				detail: { id: Number(id), data: data }
 			}));
 		} else {
 			packagesStoreEl.dispatchEvent(new CustomEvent('ln-store:request-create', {
@@ -115,14 +96,6 @@
 			}));
 		}
 		packageModal.setAttribute('data-ln-modal', 'close');
-	});
-
-	// New-package buttons (tenant buttons now handled by data-ln-modal-for)
-	document.addEventListener('click', function (e) {
-		if (e.target.closest('#new-package, [data-spa-empty-new]')) {
-			pkgEditMode = false;
-			packageModal.setAttribute('data-ln-modal', 'open');
-		}
 	});
 
 	// ─── 6. Bulk delete (tenants) ───────────────────────────────────────
@@ -138,14 +111,7 @@
 		}));
 	});
 
-	// Tenant create modal — before-open + submit
-	if (tenantModal && tenantCreateForm) {
-		tenantModal.addEventListener('ln-modal:before-open', function () {
-			tenantCreateForm.lnForm.reset();
-			// ln-slug owns pristine state; ln-options owns package select options
-		});
-	}
-
+	// Tenant create modal — submit
 	if (tenantCreateForm) {
 		tenantCreateForm.addEventListener('ln-form:submit', function (e) {
 			const data = Object.assign({}, e.detail.data);
@@ -187,7 +153,7 @@
 		tenantsStoreEl.lnDataStore.getById(id).then(function (record) {
 			if (record) {
 				pendingFillId = null;
-				form.lnForm.fill(record);
+				window.lnCore.lnFill(form, record);
 				const titleEl = document.querySelector('[data-tenant-title]');
 				if (titleEl) titleEl.textContent = record.name;
 				document.title = record.name + ' — DocuFlow';
@@ -207,7 +173,7 @@
 		pendingFillId = null;
 		if (id == null || id === 'new') {
 			tenantEditingId = null;
-			form.lnForm.reset();
+			window.lnCore.lnFill(form, null);
 		} else {
 			tenantEditingId = Number(id);
 			fillTenant(form, Number(id));

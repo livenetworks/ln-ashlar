@@ -170,7 +170,7 @@ Set `data-ln-modal-mode="new"` as the HTML default so the correct title renders 
 <div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
 	<form>
 		<header>
-			<h3 id="package-modal-title">
+			<h3 id="package-modal-title" data-ln-fillable>
 				<span data-ln-modal-when="new">New package</span>
 				<span data-ln-modal-when="edit">Edit package — <span data-ln-field="name"></span></span>
 			</h3>
@@ -190,17 +190,108 @@ modalEl.addEventListener('ln-modal:before-open', () => {
 	const record = pendingRecord;
 	pendingRecord = null; // consume immediately
 
-	formEl.lnForm.reset();          // ALWAYS — prevents field-leak from prior record
+	// lnFill fans out: null → form resets + fillables clear; record → fill all.
+	window.lnCore.lnFill(modalEl, record);
 	modalEl.dataset.lnModalMode = record ? 'edit' : 'new';
-
-	if (record) {
-		formEl.lnForm.fill(record);
-		window.lnCore.fill(titleEl, record);
-	}
 });
 ```
 
-Reset-first is load-bearing: `lnForm.fill` skips keys absent from the record, so without it a prior record's fields linger. Mode is DOM state on `dataset.lnModalMode`; the record is data-in-flight with consume-once semantics. No `editMode` boolean — the record's presence is the mode.
+`lnFill` with `null` is the reset — `ln-form`'s handler calls `this.reset()` when
+`detail` is `null`, preventing field-leak from prior records. With a record it calls
+`this.fill(record)`; `[data-ln-fillable]` elements fill via the delegated document
+listener. Mode is DOM state on `dataset.lnModalMode`; the record is data-in-flight
+with consume-once semantics. No `editMode` boolean — the record's presence is the mode.
+
+---
+
+## 8. Declarative trigger namespace (`data-ln-modal-*`)
+
+When a trigger carries `data-ln-modal-for`, `ln-modal`'s click listener also
+reads `data-ln-modal-<key>` attributes and fills the modal's `[data-ln-field]`
+display elements. This is the **modal display namespace** — separate from the
+`data-ln-fill-*` form-fill namespace.
+
+### How it works
+
+The trigger click handler (source: `js/ln-modal/src/ln-modal.js` L146–203):
+
+1. Builds a display record from all `data-ln-modal-<key>` attributes on the
+   trigger's `dataset`, stripping the reserved suffixes `for`, `close`, `mode`.
+   Kebab-case is camelCased by the dataset API: `data-ln-modal-user-name` →
+   key `userName`.
+2. If the record is non-empty: calls `window.lnCore.fill(target, record)` —
+   fills `[data-ln-field]` elements inside the modal.
+3. If no payload: clears all `[data-ln-field]` elements (`textContent = ''`).
+4. Sets `data-ln-modal-mode`:
+   - Explicit `data-ln-modal-mode` on the trigger → wins.
+   - Otherwise: `"edit"` if record is non-empty, `"new"` if empty.
+
+### Markup example
+
+```html
+<!-- Trigger — display namespace fills modal header; fill namespace fills form -->
+<button
+    data-ln-modal-for="event-modal"
+    data-ln-modal-title="Annual Conference"
+    data-ln-fill-form="event-form"
+    data-ln-fill-event-id="42"
+    data-ln-fill-title="Annual Conference"
+>Edit</button>
+
+<!-- Modal -->
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new"
+     id="event-modal" aria-labelledby="event-modal-title">
+    <form id="event-form" data-ln-form>
+        <header>
+            <h3 id="event-modal-title" data-ln-fillable>
+                <span data-ln-modal-when="new">New event</span>
+                <span data-ln-modal-when="edit">Edit — <span data-ln-field="title"></span></span>
+            </h3>
+        </header>
+        <!-- … fields … -->
+    </form>
+</div>
+```
+
+### Two namespaces, two targets
+
+| Namespace | Attribute prefix | Filled by | Target |
+|---|---|---|---|
+| Modal display | `data-ln-modal-*` | `window.lnCore.fill(modal, record)` | `[data-ln-field]` inside the modal |
+| Form fill | `data-ln-fill-*` | `window.lnCore.lnFill(form, record)` | `[data-ln-form]` (fills fields) + `[data-ln-fillable]` |
+
+Both can appear on the same trigger — they fire independently from their
+respective document click listeners. A plain trigger with no `data-ln-modal-*`
+payload clears modal `[data-ln-field]` elements and sets mode `"new"`.
+
+### In ln-table row templates
+
+Because `fillTemplate()` now stamps `{{ key }}` in attribute values at clone
+time, both namespaces work in row templates:
+
+```html
+<template data-ln-template="events-row">
+    <tr data-ln-table-row>
+        <td>{{ title }}</td>
+        <td>
+            <ul>
+                <li>
+                    <button
+                        data-ln-modal-for="event-modal"
+                        data-ln-modal-title="{{ title }}"
+                        data-ln-fill-form="event-form"
+                        data-ln-fill-event-id="{{ id }}"
+                        data-ln-fill-title="{{ title }}"
+                        aria-label="Edit"
+                    >
+                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+                    </button>
+                </li>
+            </ul>
+        </td>
+    </tr>
+</template>
+```
 
 ---
 

@@ -150,10 +150,54 @@ export function fill(root, data) {
 	return root;
 }
 
+// ─── Event-driven fill fan-out ─────────────────────────────
+
+/**
+ * Dispatch `ln-fill` at every [data-ln-form] and [data-ln-fillable]
+ * descendant of `container`. Fillables self-handle; null → clear/reset.
+ */
+export function lnFill(container, record) {
+	// Dispatch at container itself when it is a form or fillable.
+	// Enables lnFill(formEl, record) to reach ln-form's listener, which
+	// guards e.target === self.dom. Modal callers (lnFill(modalEl, …)
+	// where modalEl is [data-ln-modal]) do not match, so they are unaffected.
+	if (container.matches && container.matches('[data-ln-form], [data-ln-fillable]')) {
+		container.dispatchEvent(new CustomEvent('ln-fill', { detail: record ?? null, bubbles: true }));
+	}
+	const targets = container.querySelectorAll('[data-ln-form], [data-ln-fillable]');
+	for (let i = 0; i < targets.length; i++) {
+		targets[i].dispatchEvent(new CustomEvent('ln-fill', { detail: record ?? null, bubbles: true }));
+	}
+	return container;
+}
+
+// Delegated display-fillable handler — installed once per page (idempotent
+// across standalone component bundles that each inline ln-core helpers).
+// Forms are NOT [data-ln-fillable]; ln-form's own listener handles them.
+if (typeof window !== 'undefined') {
+	window.lnCore = window.lnCore || {};
+	if (!window.lnCore._fillBound) {
+		window.lnCore._fillBound = true;
+		document.addEventListener('ln-fill', function (e) {
+			if (!e.target.matches || !e.target.matches('[data-ln-fillable]')) return;
+			if (e.detail) {
+				fill(e.target, e.detail);
+			} else {
+				const fields = e.target.querySelectorAll('[data-ln-field]');
+				for (let i = 0; i < fields.length; i++) {
+					fields[i].textContent = '';
+				}
+			}
+		});
+	}
+}
+
 // ─── Template Text-Node Placeholders ──────────────────────
 
 export function fillTemplate(clone, data) {
 	if (!clone || !data) return clone;
+
+	// ── Pass 1: text nodes ──────────────────────────────────
 	const walker = document.createTreeWalker(clone, NodeFilter.SHOW_TEXT);
 	while (walker.nextNode()) {
 		const node = walker.currentNode;
@@ -164,6 +208,27 @@ export function fillTemplate(clone, data) {
 			);
 		}
 	}
+
+	// ── Pass 2: element attributes ──────────────────────────
+	// Uses setAttribute — never innerHTML — so injection risk is the same
+	// as data-ln-attr (the existing declarative attribute-fill mechanism).
+	// Complements data-ln-table-cell-attr (field→attr stamping); both coexist.
+	const _replaceTokens = function (_, key) { return data[key] !== undefined ? data[key] : ''; };
+	const elements = Array.from(clone.querySelectorAll('*'));
+	// Include the root itself when clone is an Element (e.g. a <tr> passed
+	// directly by ln-table._fillRow) — querySelectorAll does not include root.
+	if (clone.nodeType === 1) elements.push(clone);
+	for (let i = 0; i < elements.length; i++) {
+		const el = elements[i];
+		const attrs = el.attributes;
+		for (let j = 0; j < attrs.length; j++) {
+			const attr = attrs[j];
+			if (attr.value.indexOf('{{') !== -1) {
+				el.setAttribute(attr.name, attr.value.replace(/\{\{\s*(\w+)\s*\}\}/g, _replaceTokens));
+			}
+		}
+	}
+
 	return clone;
 }
 
@@ -325,18 +390,36 @@ export function serializeForm(form, opts) {
 	return data;
 }
 
+// Coerce a value to boolean for single-checkbox fill.
+// Flat data-* values arrive as strings; "false", "0", "", "off", "no"
+// (case-insensitive, trimmed) are treated as unchecked.
+function _coerceBool(value) {
+	if (typeof value !== 'string') return !!value;
+	const v = value.trim().toLowerCase();
+	return v !== 'false' && v !== '0' && v !== '' && v !== 'off' && v !== 'no';
+}
+
 export function populateForm(form, data) {
 	const elements = form.elements;
 	const filled = [];
 
 	for (let i = 0; i < elements.length; i++) {
 		const el = elements[i];
-		if (!el.name || !(el.name in data) || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
+		if (el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
 
-		const value = data[el.name];
+		// Decoupled-key fill: data-ln-fill-as wins over name for record matching.
+		// Write (fill) path only — serializeForm stays name-based.
+		const matchKey = el.getAttribute('data-ln-fill-as') || el.name;
+		if (!matchKey || !(matchKey in data)) continue;
+
+		const value = data[matchKey];
 
 		if (el.type === 'checkbox') {
-			el.checked = Array.isArray(value) ? value.indexOf(el.value) !== -1 : !!value;
+			// Array: same-name checkbox group membership check.
+			// Non-array: coerce to bool — string "false"/"0"/"off"/"no" → unchecked.
+			el.checked = Array.isArray(value)
+				? value.indexOf(el.value) !== -1
+				: _coerceBool(value);
 			filled.push(el);
 		} else if (el.type === 'radio') {
 			el.checked = el.value === String(value);
@@ -571,6 +654,7 @@ if (typeof window !== 'undefined') {
 	window.lnCore.getDataMapper = getDataMapper;
 	window.lnCore.fillTemplate = fillTemplate;
 	window.lnCore.fill = fill;
+	window.lnCore.lnFill = lnFill;
 	window.lnCore.renderList = renderList;
 }
 

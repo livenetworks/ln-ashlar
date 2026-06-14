@@ -104,7 +104,9 @@
 							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 						</button>
 					</label>
-					<button type="button" id="new-package" class="btn">
+					<button type="button" id="new-package" class="btn"
+						data-ln-modal-for="package-modal"
+						data-ln-fill-form="package-form">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 						New
 					</button>
@@ -138,7 +140,19 @@
 						<td>{{ status_display }}</td>
 						<td>
 							<ul class="row-actions">
-								<li><button type="button" data-ln-table-row-action="edit" aria-label="Edit package"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+								<li><button type="button" data-ln-table-row-action="edit" aria-label="Edit package"
+						data-ln-modal-for="package-modal"
+						data-ln-fill-form="package-form"
+						data-ln-fill-id="{{ id }}"
+						data-ln-fill-name="{{ name }}"
+						data-ln-fill-max-users="{{ max_users }}"
+						data-ln-fill-max-guests="{{ max_guests }}"
+						data-ln-fill-max-standards="{{ max_standards }}"
+						data-ln-fill-max-documents="{{ max_documents }}"
+						data-ln-fill-max-storage="{{ max_storage }}"
+						data-ln-fill-active="{{ active }}"
+						data-ln-modal-name="{{ name }}"
+					><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
 								<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete package" data-ln-confirm="Delete package?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 							</ul>
 						</td>
@@ -190,7 +204,9 @@
 							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 						</button>
 					</label>
-					<button type="button" id="new-tenant" class="btn">
+					<button type="button" id="new-tenant" class="btn"
+						data-ln-modal-for="tenant-modal"
+						data-ln-fill-form="tenant-form">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 						New
 					</button>
@@ -224,7 +240,23 @@
 						<td>{{ status_display }}</td>
 						<td>
 							<ul class="row-actions">
-								<li><button type="button" data-ln-table-row-action="edit" aria-label="Edit tenant"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+								<li><button type="button" data-ln-table-row-action="edit" aria-label="Edit tenant"
+						data-ln-modal-for="tenant-modal"
+						data-ln-fill-form="tenant-form"
+						data-ln-fill-id="{{ id }}"
+						data-ln-fill-name="{{ name }}"
+						data-ln-fill-slug="{{ slug }}"
+						data-ln-fill-custom-domain="{{ custom_domain }}"
+						data-ln-fill-package-id="{{ package_id }}"
+						data-ln-fill-auth-method="{{ auth_method }}"
+						data-ln-fill-doc-numbering-scheme="{{ doc_numbering_scheme }}"
+						data-ln-fill-review-interval="{{ review_interval }}"
+						data-ln-fill-brand-primary="{{ brand_primary }}"
+						data-ln-fill-brand-secondary="{{ brand_secondary }}"
+						data-ln-fill-read-confirmation="{{ read_confirmation }}"
+						data-ln-fill-active="{{ active }}"
+						data-ln-modal-name="{{ name }}"
+					><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
 								<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete tenant" data-ln-confirm="Delete tenant?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 							</ul>
 						</td>
@@ -306,7 +338,7 @@
 	<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
 		<form data-ln-form="package-form" id="package-form" data-ln-form-typed>
 			<header>
-				<h3 id="package-modal-title">
+				<h3 id="package-modal-title" data-ln-fillable>
 					<span data-ln-modal-when="new">New package</span>
 					<span data-ln-modal-when="edit">Edit package — <span data-ln-field="name"></span></span>
 				</h3>
@@ -322,23 +354,23 @@
 				</div>
 				<div class="form-element">
 					<label for="pkg-max-users">Max users <small>(0 = unlimited)</small></label>
-					<input id="pkg-max-users" name="max_users" type="number" min="0" value="0">
+					<input id="pkg-max-users" name="max_users" type="number" min="0" value="0" data-ln-fill-as="maxUsers">
 				</div>
 				<div class="form-element">
 					<label for="pkg-max-guests">Max guests</label>
-					<input id="pkg-max-guests" name="max_guests" type="number" min="0" value="0">
+					<input id="pkg-max-guests" name="max_guests" type="number" min="0" value="0" data-ln-fill-as="maxGuests">
 				</div>
 				<div class="form-element">
 					<label for="pkg-max-standards">Max standards</label>
-					<input id="pkg-max-standards" name="max_standards" type="number" min="0" value="0">
+					<input id="pkg-max-standards" name="max_standards" type="number" min="0" value="0" data-ln-fill-as="maxStandards">
 				</div>
 				<div class="form-element">
 					<label for="pkg-max-documents">Max documents</label>
-					<input id="pkg-max-documents" name="max_documents" type="number" min="0" value="0">
+					<input id="pkg-max-documents" name="max_documents" type="number" min="0" value="0" data-ln-fill-as="maxDocuments">
 				</div>
 				<div class="form-element">
 					<label for="pkg-max-storage">Max storage (GB)</label>
-					<input id="pkg-max-storage" name="max_storage" type="number" min="0" value="0">
+					<input id="pkg-max-storage" name="max_storage" type="number" min="0" value="0" data-ln-fill-as="maxStorage">
 				</div>
 				<div class="form-element">
 					<label>
@@ -358,7 +390,7 @@
 	<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal" aria-labelledby="tenant-modal-title">
 		<form data-ln-form="tenant-form" id="tenant-form" data-ln-form-typed>
 			<header>
-				<h3 id="tenant-modal-title">
+				<h3 id="tenant-modal-title" data-ln-fillable>
 					<span data-ln-modal-when="new">New tenant</span>
 					<span data-ln-modal-when="edit">Edit tenant — <span data-ln-field="name"></span></span>
 				</h3>
@@ -378,40 +410,40 @@
 				</div>
 				<div class="form-element">
 					<label for="tenant-custom-domain">Custom domain</label>
-					<input id="tenant-custom-domain" name="custom_domain">
+					<input id="tenant-custom-domain" name="custom_domain" data-ln-fill-as="customDomain">
 				</div>
 				<div class="form-element">
 					<label for="tenant-package-id">Package</label>
-					<select id="tenant-package-id" name="package_id" required data-ln-options="packages" data-ln-options-value="id" data-ln-options-label="name">
+					<select id="tenant-package-id" name="package_id" required data-ln-options="packages" data-ln-options-value="id" data-ln-options-label="name" data-ln-fill-as="packageId">
 						<option value="">—</option>
 					</select>
 				</div>
 				<div class="form-element">
 					<label for="tenant-auth-method">Auth method</label>
-					<select id="tenant-auth-method" name="auth_method">
+					<select id="tenant-auth-method" name="auth_method" data-ln-fill-as="authMethod">
 						<option value="Local">Local</option>
 						<option value="LDAP">LDAP</option>
 					</select>
 				</div>
 				<div class="form-element">
 					<label for="tenant-doc-numbering">Doc numbering scheme</label>
-					<input id="tenant-doc-numbering" name="doc_numbering_scheme" value="{TYPE}-{SEQ:4}">
+					<input id="tenant-doc-numbering" name="doc_numbering_scheme" value="{TYPE}-{SEQ:4}" data-ln-fill-as="docNumberingScheme">
 				</div>
 				<div class="form-element">
 					<label for="tenant-review-interval">Review interval (days)</label>
-					<input id="tenant-review-interval" name="review_interval" type="number" min="1" value="365">
+					<input id="tenant-review-interval" name="review_interval" type="number" min="1" value="365" data-ln-fill-as="reviewInterval">
 				</div>
 				<div class="form-element">
 					<label for="tenant-brand-primary">Brand primary colour</label>
-					<input id="tenant-brand-primary" name="brand_primary" type="color" value="#2563eb">
+					<input id="tenant-brand-primary" name="brand_primary" type="color" value="#2563eb" data-ln-fill-as="brandPrimary">
 				</div>
 				<div class="form-element">
 					<label for="tenant-brand-secondary">Brand secondary colour</label>
-					<input id="tenant-brand-secondary" name="brand_secondary" type="color" value="#1e40af">
+					<input id="tenant-brand-secondary" name="brand_secondary" type="color" value="#1e40af" data-ln-fill-as="brandSecondary">
 				</div>
 				<div class="form-element">
 					<label>
-						<input name="read_confirmation" type="checkbox" value="true">
+						<input name="read_confirmation" type="checkbox" value="true" data-ln-fill-as="readConfirmation">
 						Read confirmation required
 					</label>
 				</div>
