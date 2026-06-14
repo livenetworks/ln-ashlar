@@ -16,7 +16,8 @@ export const router = {
 			path: currentPath,
 			params: currentParams,
 			query: currentQuery,
-			route: currentRoute
+			route: currentRoute,
+			regions: currentRegions
 		};
 	}
 };
@@ -28,10 +29,16 @@ if (typeof window !== 'undefined') {
 	window.lnRouter = router;
 }
 
-// Registry Map of routes: pattern -> route metadata
-const registry = new Map();
-// Cache sorted route objects for matching
-let sortedRoutes = [];
+// Per-region registry: Map<regionKey, { routes: Map<pattern, routeMetadata>, sorted: routeMetadata[] }>
+// regionKey = data-ln-route-target id, or '__primary__' for the default outlet
+const regionRegistry = new Map();
+
+// Tracks which template is currently mounted in each keep-region target element
+const mountedTemplates = new WeakMap();
+
+// Per-region state snapshot (updated after each navigation)
+let currentRegions = new Map();
+
 let booted = false;
 let currentPath = null;
 let currentParams = {};
@@ -109,9 +116,10 @@ function _compareSpecificity(a, b) {
 }
 
 /**
- * Match path to a route in the sorted registry.
+ * Match path to a route in the provided sorted routes array.
+ * Per-region: accepts the region's own sorted array rather than a module-level variable.
  */
-function _matchRoute(path) {
+function _matchRouteInRegion(path, sortedRoutes) {
 	const pathSegs = path.split('/').filter(Boolean);
 
 	for (const route of sortedRoutes) {
@@ -163,17 +171,18 @@ function _matchRoute(path) {
 }
 
 /**
- * Resolve target DOM element (explicit target or default outlet).
+ * Resolve target DOM element for a region.
+ * Primary region (__primary__) uses the default outlet fallback chain.
+ * Auxiliary regions resolve by element id (route.target).
  */
-function _resolveTarget(route) {
-	if (route.target) {
+function _resolveRegionTarget(regionKey, route) {
+	if (regionKey !== '__primary__') {
 		const el = document.getElementById(route.target);
 		if (!el) {
 			console.warn(`[ln-router] Explicit target element #${route.target} not found in DOM`);
 		}
 		return el;
 	}
-
 	const defaultOutlet = document.querySelector('[data-ln-outlet]') || document.querySelector('main');
 	if (!defaultOutlet) {
 		console.warn('[ln-router] Default outlet (element with [data-ln-outlet] or <main>) not found in DOM');
@@ -218,101 +227,141 @@ function _teardownOutlet(target) {
 }
 
 /**
- * Execute navigation render pipeline.
- */
-function _render(route, params, query, targetPath, opts = {}) {
-	const targetEl = _resolveTarget(route);
-	if (!targetEl) return;
-
-	// Fire before-navigate (cancelable)
-	const from = currentPath;
-	const to = targetPath;
-	const beforeEvent = dispatchCancelable(targetEl, 'ln-router:before-navigate', {
-		from,
-		to,
-		params,
-		query
-	});
-
-	if (beforeEvent.defaultPrevented) {
-		return;
-	}
-
-	// Manage history state
-	if (opts.historyAction === 'push') {
-		window.history.pushState(null, '', targetPath);
-	} else if (opts.historyAction === 'replace') {
-		window.history.replaceState(null, '', targetPath);
-	}
-
-	const executeSwap = () => {
-		// Teardown the outgoing view
-		if (!opts.isHydration) {
-			_teardownOutlet(targetEl);
-		}
-
-		// Perform swap if not hydrating
-		if (!opts.isHydration) {
-			const clone = route.templateNode.content.cloneNode(true);
-			targetEl.replaceChildren(clone);
-		}
-
-		// Apply title
-		if (route.title) {
-			document.title = route.title;
-		}
-
-		// Accessibility and UX focus shift
-		if (!opts.isHydration) {
-			if (!targetEl.hasAttribute('tabindex')) {
-				targetEl.setAttribute('tabindex', '-1');
-			}
-			const firstHeading = targetEl.querySelector('h1, h2, h3, h4, h5, h6');
-			if (firstHeading) {
-				firstHeading.setAttribute('tabindex', '-1');
-				firstHeading.focus();
-			} else {
-				targetEl.focus();
-			}
-
-			// Scroll to top
-			targetEl.scrollIntoView({ block: 'start', behavior: 'instant' });
-		}
-
-		// Update current router state
-		currentPath = targetPath;
-		currentParams = params;
-		currentQuery = query;
-		currentRoute = route;
-
-		// Dispatch navigated event
-		_dispatchMaybeDeferred(targetEl, 'ln-router:navigated', {
-			path: targetPath,
-			params,
-			query,
-			route,
-			target: targetEl
-		});
-	};
-
-	// Progressive enhancement: view transitions
-	if (document.startViewTransition && !opts.isHydration) {
-		document.startViewTransition(executeSwap);
-	} else {
-		executeSwap();
-	}
-}
-
-/**
- * Handle navigation trigger.
+ * Multi-region navigation pipeline.
+ * Matches path against every region's route table, computes which regions swap,
+ * fires one cancelable before-navigate on the primary outlet, then atomically
+ * swaps all regions that need it inside a single view transition.
  */
 function _navigate(fullPath, opts = {}) {
 	const { path, query } = _normalizePath(fullPath);
-	const match = _matchRoute(path);
-	if (match) {
-		_render(match.route, match.params, query, fullPath, opts);
+
+	// 1. Per-region match
+	const regionMatches = new Map();
+	for (const [regionKey, regionData] of regionRegistry) {
+		regionMatches.set(regionKey, _matchRouteInRegion(path, regionData.sorted));
+	}
+
+	const hasPrimaryRegion = regionRegistry.has('__primary__');
+	const primaryMatch = regionMatches.get('__primary__'); // undefined if no primary region
+
+	// 2. Not-found — ONLY when a primary region exists but did not match.
+	//    Auxiliary-only pages (no '__primary__' region) skip not-found and
+	//    proceed to paint their auxiliary regions. Use _dispatchMaybeDeferred
+	//    so the boot path defers exactly like the legacy code did.
+	if (hasPrimaryRegion && !primaryMatch) {
+		_dispatchMaybeDeferred(document.body, 'ln-router:not-found', { path });
+		return;
+	}
+
+	// 3 + 4. Resolve primary outlet and fire the single cancelable
+	//        before-navigate — both conditional on a primary MATCH.
+	let primaryTarget = null;
+	if (primaryMatch) {
+		primaryTarget = _resolveRegionTarget('__primary__', primaryMatch.route);
+		if (!primaryTarget) return; // warn already emitted in _resolveRegionTarget
+
+		const beforeEvent = dispatchCancelable(primaryTarget, 'ln-router:before-navigate', {
+			from: currentPath,
+			to: fullPath,
+			params: primaryMatch.params,
+			query
+		});
+		if (beforeEvent.defaultPrevented) return; // aborts ALL regions + history
+	}
+
+	// 5. Compute swap plans — which regions will actually change DOM
+	const swapPlans = [];
+	for (const [regionKey, match] of regionMatches) {
+		if (!match) continue;
+		const targetEl = _resolveRegionTarget(regionKey, match.route);
+		if (!targetEl) continue;
+
+		// Keep-skip applies to AUXILIARY regions only — primary is always active.
+		if (regionKey !== '__primary__' && targetEl.hasAttribute('data-ln-route-keep')) {
+			const currentTmpl = mountedTemplates.get(targetEl);
+			if (currentTmpl === match.route.templateNode) {
+				// Same template — skip (keep-region state survival)
+				continue;
+			}
+		}
+		swapPlans.push({ regionKey, match, targetEl });
+	}
+
+	// 6. History update (once per navigation)
+	if (opts.historyAction === 'push') {
+		window.history.pushState(null, '', fullPath);
+	} else if (opts.historyAction === 'replace') {
+		window.history.replaceState(null, '', fullPath);
+	}
+
+	// 7. Atomic swap — one view transition wraps all region swaps
+	const executeSwaps = function () {
+		for (const { regionKey, match, targetEl } of swapPlans) {
+			// Per-region hydration check
+			const isRegionHydration = opts.isHydration
+				&& targetEl.hasAttribute('data-ln-router-hydrate')
+				&& targetEl.children.length > 0;
+
+			if (!isRegionHydration) {
+				_teardownOutlet(targetEl);
+				const clone = match.route.templateNode.content.cloneNode(true);
+				targetEl.replaceChildren(clone);
+			}
+
+			// Track mounted template for keep-region logic — recorded even on
+			// hydration so the keep diff has a baseline after boot.
+			mountedTemplates.set(targetEl, match.route.templateNode);
+
+			// Focus, scroll, and title — primary region only
+			if (regionKey === '__primary__') {
+				if (match.route.title) {
+					document.title = match.route.title;
+				}
+				if (!isRegionHydration) {
+					if (!targetEl.hasAttribute('tabindex')) {
+						targetEl.setAttribute('tabindex', '-1');
+					}
+					const firstHeading = targetEl.querySelector('h1, h2, h3, h4, h5, h6');
+					if (firstHeading) {
+						firstHeading.setAttribute('tabindex', '-1');
+						firstHeading.focus();
+					} else {
+						targetEl.focus();
+					}
+					targetEl.scrollIntoView({ block: 'start', behavior: 'instant' });
+				}
+			}
+
+			// Dispatch navigated per swapped region
+			_dispatchMaybeDeferred(targetEl, 'ln-router:navigated', {
+				path: fullPath,
+				params: match.params,
+				query,
+				route: match.route,
+				target: targetEl,
+				region: regionKey
+			});
+		}
+
+		// Update global primary state — only when a primary match exists.
+		// On auxiliary-only pages currentRoute stays null (current() returns null).
+		if (primaryMatch) {
+			currentPath = fullPath;
+			currentParams = primaryMatch.params;
+			currentQuery = query;
+			currentRoute = primaryMatch.route;
+		}
+		// currentRegions reflects every region's match (null when unmatched).
+		// Built from regionMatches — never from the loop variable `match`.
+		currentRegions = new Map(
+			Array.from(regionMatches.entries()).map(([k, m]) => [k, m ? { route: m.route, params: m.params } : null])
+		);
+	};
+
+	if (document.startViewTransition && !opts.isHydration) {
+		document.startViewTransition(executeSwaps);
 	} else {
-		dispatch(document.body, 'ln-router:not-found', { path });
+		executeSwaps();
 	}
 }
 
@@ -323,25 +372,21 @@ function _onClick(e) {
 	if (!anchor || !shouldInterceptLink(e, anchor)) return;
 
 	const fullPath = anchor.getAttribute('href');
-	const { path, query } = _normalizePath(fullPath);
-	const match = _matchRoute(path);
+	const { path } = _normalizePath(fullPath);
 
+	// Intercept only if primary region has a match (auxiliary-only matches don't drive SPA nav)
+	const primaryData = regionRegistry.get('__primary__');
+	if (!primaryData) return;
+	const match = _matchRouteInRegion(path, primaryData.sorted);
 	if (match) {
 		e.preventDefault();
-		_render(match.route, match.params, query, fullPath, { historyAction: 'push' });
+		_navigate(fullPath, { historyAction: 'push' });
 	}
 }
 
 function _onPopState() {
 	const fullPath = window.location.pathname + window.location.search;
-	const { path, query } = _normalizePath(fullPath);
-	const match = _matchRoute(path);
-
-	if (match) {
-		_render(match.route, match.params, query, fullPath, { historyAction: 'skip' });
-	} else {
-		dispatch(document.body, 'ln-router:not-found', { path });
-	}
+	_navigate(fullPath, { historyAction: 'skip' });
 }
 
 // ─── Boot & Initial Render ─────────────────────────────────
@@ -354,24 +399,11 @@ function _boot() {
 		document.addEventListener('click', _onClick);
 		window.addEventListener('popstate', _onPopState);
 
-		// Trigger initial path resolution
-		// _booting = true defers both navigated and not-found dispatches one microtask,
-		// so listeners registered in the same DOMContentLoaded burst always receive them.
+		// _booting = true defers navigated/not-found one microtask so listeners
+		// registered in the same DOMContentLoaded burst still receive boot events.
 		_booting = true;
 		const fullPath = window.location.pathname + window.location.search;
-		const { path, query } = _normalizePath(fullPath);
-		const match = _matchRoute(path);
-
-		if (match) {
-			const targetEl = _resolveTarget(match.route);
-			const isHydration = targetEl && targetEl.hasAttribute('data-ln-router-hydrate') && targetEl.children.length > 0;
-			_render(match.route, match.params, query, fullPath, {
-				historyAction: 'replace',
-				isHydration
-			});
-		} else {
-			_dispatchMaybeDeferred(document.body, 'ln-router:not-found', { path });
-		}
+		_navigate(fullPath, { historyAction: 'replace', isHydration: true });
 		_booting = false;
 	}, 'ln-router');
 }
@@ -382,12 +414,29 @@ function _registerRoute(tmpl) {
 	const pattern = tmpl.getAttribute(DOM_SELECTOR);
 	if (!pattern) return;
 
-	if (registry.has(pattern)) {
-		console.warn(`[ln-router] Duplicate route pattern registered: "${pattern}"`);
+	const targetId = tmpl.getAttribute('data-ln-route-target') || null;
+
+	// Reserved-word guard: '__primary__' is the internal sentinel for the
+	// default outlet. A template targeting an element with this id would
+	// collide and silently render into the default outlet. Reject + warn.
+	if (targetId === '__primary__') {
+		console.warn(`[ln-router] "__primary__" is a reserved region key and cannot be used as data-ln-route-target. Route "${pattern}" rejected.`);
 		return;
 	}
 
-	const targetId = tmpl.getAttribute('data-ln-route-target');
+	const regionKey = targetId || '__primary__';
+
+	if (!regionRegistry.has(regionKey)) {
+		regionRegistry.set(regionKey, { routes: new Map(), sorted: [] });
+	}
+	const region = regionRegistry.get(regionKey);
+
+	// Duplicate guard is now per (pattern, regionKey) pair
+	if (region.routes.has(pattern)) {
+		console.warn(`[ln-router] Duplicate route pattern registered: "${pattern}" in region "${regionKey}"`);
+		return;
+	}
+
 	const title = tmpl.getAttribute('data-ln-route-title');
 	const segments = pattern.split('/').filter(Boolean);
 
@@ -399,25 +448,29 @@ function _registerRoute(tmpl) {
 		templateNode: tmpl
 	};
 
-	// Check container at registration time if possible
-	const resolvedTarget = _resolveTarget(routeMetadata);
+	// Warn if template is declared inside its own outlet
+	const resolvedTarget = _resolveRegionTarget(regionKey, routeMetadata);
 	if (resolvedTarget && resolvedTarget.contains(tmpl)) {
 		console.warn(`[ln-router] Route template with pattern "${pattern}" is declared inside its own outlet element:`, tmpl);
 	}
 
-	registry.set(pattern, routeMetadata);
-
-	// Re-sort routes by specificity
-	sortedRoutes = Array.from(registry.values()).sort(_compareSpecificity);
+	region.routes.set(pattern, routeMetadata);
+	region.sorted = Array.from(region.routes.values()).sort(_compareSpecificity);
 
 	_boot();
 }
 
 function _unregisterRoute(tmpl) {
 	const pattern = tmpl.getAttribute(DOM_SELECTOR);
-	if (pattern && registry.has(pattern)) {
-		registry.delete(pattern);
-		sortedRoutes = Array.from(registry.values()).sort(_compareSpecificity);
+	if (!pattern) return;
+	const targetId = tmpl.getAttribute('data-ln-route-target') || null;
+	const regionKey = targetId || '__primary__';
+	const region = regionRegistry.get(regionKey);
+	if (!region) return;
+	region.routes.delete(pattern);
+	region.sorted = Array.from(region.routes.values()).sort(_compareSpecificity);
+	if (region.routes.size === 0) {
+		regionRegistry.delete(regionKey);
 	}
 }
 

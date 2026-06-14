@@ -6,7 +6,7 @@
 	<header><h3>Overview &amp; Philosophy</h3></header>
 	<main>
 		<p>The <code>ln-router</code> component is a zero-dependency, **template-only** client-side router for <code>ln-ashlar</code>. It maps the URL to a <code>&lt;template data-ln-route="..."&gt;</code>, clones it into a target element, and lets existing component MutationObservers auto-initialize the injected DOM.</p>
-		
+
 		<p>In accordance with project doctrine, the router does **not** fetch data, sanitise templates, or run data-binding logic. Instead, the router mounts the view, and the **page coordinator** listens for navigation events to populate the templates using the static text interpolation helper <code>fillTemplate</code>.</p>
 	</main>
 </section>
@@ -34,6 +34,15 @@
 	</div>
 </template>
 
+<!-- Primary template for /users/:id/logs — required in multi-region model so the
+     primary outlet shows meaningful content when the logs auxiliary region also renders. -->
+<template data-ln-route="/users/:id/logs" data-ln-route-title="User Logs">
+	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
+		<h4>📑 User #{{id}} — Log View (Primary)</h4>
+		<p>The primary outlet shows the log context. The <code>detail-pane</code> auxiliary region renders the actual log entries below.</p>
+	</div>
+</template>
+
 <template data-ln-route="/users/:id/logs" data-ln-route-target="detail-pane" data-ln-route-title="User Logs">
 	<div class="card" style="padding: var(--size-md); border: 1px solid var(--color-warning-muted); border-radius: var(--radius-md); background: var(--bg-surface);">
 		<h5>📑 Logs for User #{{id}}</h5>
@@ -52,12 +61,36 @@
 	</div>
 </template>
 
+<!-- Sidebar templates — target: demo-sidebar -->
+<template data-ln-route="/users/:id" data-ln-route-target="demo-sidebar">
+	<section>
+		<h5>Sidebar — User <strong>{{id}}</strong></h5>
+		<p style="font-size: var(--font-size-sm); color: var(--text-color-muted);">Type something — this input survives param-only changes:</p>
+		<input type="text" id="sidebar-input" placeholder="Type here..." style="width: 100%; padding: var(--size-xs); margin-bottom: var(--size-xs);">
+		<p style="font-size: var(--font-size-xs); color: var(--text-color-muted);">Navigate /users/42 → /users/43 to see state survival.</p>
+	</section>
+</template>
+
+<template data-ln-route="/profile" data-ln-route-target="demo-sidebar">
+	<section>
+		<h5>Sidebar — Profile Mode</h5>
+		<p style="font-size: var(--font-size-sm); color: var(--text-color-muted);">This is a DIFFERENT sidebar template. The sidebar was swapped (keep-region template-change).</p>
+	</section>
+</template>
+
+<template data-ln-route="*" data-ln-route-target="demo-sidebar">
+	<section>
+		<h5>Sidebar — Default</h5>
+		<p style="font-size: var(--font-size-sm); color: var(--text-color-muted);">No user selected. Navigate to /users/:id to see the persistent sidebar.</p>
+	</section>
+</template>
+
 <!-- Interactive Live Demo Playground -->
 <section class="section-card">
 	<header><h3>Live Router Playground</h3></header>
 	<main>
 		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--size-lg);">
-			
+
 			<!-- Navigation Controls -->
 			<div>
 				<h4>1. In-App Navigation Links</h4>
@@ -68,6 +101,13 @@
 					<li><a href="/users/99?tab=settings&theme=dark" style="color: var(--color-primary); text-decoration: underline;">User #99 with Query Params (/users/99?tab=settings&amp;theme=dark)</a></li>
 					<li><a href="/users/42/logs" style="color: var(--color-primary); text-decoration: underline;">User #42 Logs - Target: detail-pane (/users/42/logs)</a></li>
 					<li><a href="/non-existent-page" style="color: var(--color-primary); text-decoration: underline;">Test 404 Wildcard Route (/non-existent-page)</a></li>
+				</ul>
+
+				<h4 style="margin-top: var(--size-md);">Multi-Region Demo</h4>
+				<ul style="display: flex; flex-direction: column; gap: var(--size-xs); padding: 0; list-style: none;">
+					<li><a href="/users/42" style="color: var(--color-primary); text-decoration: underline;">Multi-region: User #42 (sidebar renders)</a></li>
+					<li><a href="/users/43" style="color: var(--color-primary); text-decoration: underline;">Param change: User #43 (sidebar SURVIVES if keep)</a></li>
+					<li><a href="/profile" style="color: var(--color-primary); text-decoration: underline;">Profile (sidebar swaps to different template)</a></li>
 				</ul>
 
 				<h4 style="margin-top: var(--size-md);">2. Programmatic Navigation API</h4>
@@ -107,6 +147,11 @@
 				<div id="detail-pane" style="padding: var(--size-sm); border: 2px dashed var(--border-color); border-radius: var(--radius-sm); min-height: 100px; background: var(--bg-sunken); margin-bottom: var(--size-md);">
 					<p style="color: var(--text-color-muted); text-align: center; line-height: 100px; margin: 0;">Logs will render here...</p>
 				</div>
+
+				<h4>Persistent Sidebar Region (<code>data-ln-route-keep</code>)</h4>
+				<aside id="demo-sidebar" data-ln-route-keep style="padding: var(--size-sm); border: 2px dashed var(--color-primary); border-radius: var(--radius-sm); min-height: 100px; background: var(--bg-sunken); margin-bottom: var(--size-md);">
+					<p style="color: var(--text-color-muted); text-align: center; margin: 0;">Sidebar region — will render on first navigation.</p>
+				</aside>
 
 				<h4>Diagnostics Console</h4>
 				<div style="background: #1e1e1e; color: #a9b7c6; font-family: monospace; font-size: var(--font-size-sm); padding: var(--size-sm); border-radius: var(--radius-sm); max-height: 200px; overflow-y: auto;">
@@ -151,7 +196,7 @@
 			if (blockNavCheckbox.checked) {
 				e.preventDefault();
 				log(`🔴 Navigation BLOCKED via preventDefault()`);
-				
+
 				// Optional: push notification
 				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 					detail: {
@@ -163,33 +208,42 @@
 			}
 		});
 
-		// Navigated: coordinator data binding
+		// Navigated: coordinator data binding — multi-region aware
+		// Each navigated event carries a `region` key identifying which region swapped.
+		// Primary outlet binding is guarded by `detail.region === '__primary__'`.
+		// Auxiliary region binding is guarded by the region id string.
 		document.addEventListener('ln-router:navigated', function(e) {
 			const detail = e.detail;
-			log(`🟢 ln-router:navigated to "${detail.path}"`);
+			log(`ln-router:navigated — region: "${detail.region}", path: "${detail.path}"`);
 
-			// Perform text interpolation using the core fillTemplate helper (double-braces)
-			if (detail.route.pattern === '/users/:id') {
-				// fillTemplate will substitute {{id}} in the target outlet clone
-				window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
+			// Primary outlet data binding
+			if (detail.region === '__primary__') {
+				if (detail.route.pattern === '/users/:id') {
+					// fillTemplate will substitute {{id}} in the target outlet clone
+					window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
 
-				// Log query parameters
-				const queryLog = detail.target.querySelector('#user-query-log');
-				if (queryLog) {
-					queryLog.textContent = JSON.stringify(detail.query);
+					// Log query parameters
+					const queryLog = detail.target.querySelector('#user-query-log');
+					if (queryLog) {
+						queryLog.textContent = JSON.stringify(detail.query);
+					}
+				} else if (detail.route.pattern === '/users/:id/logs') {
+					window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
 				}
-			} else if (detail.route.pattern === '/users/:id/logs') {
-				window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
+
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: {
+						type: 'success',
+						title: 'Navigated',
+						message: `Loaded view for pattern: ${detail.route.pattern}`
+					}
+				}));
 			}
 
-			// Push a success toast
-			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-				detail: {
-					type: 'success',
-					title: 'Navigated',
-					message: `Loaded view for pattern: ${detail.route.pattern}`
-				}
-			}));
+			// Sidebar region data binding — runs only when the sidebar actually swapped
+			if (detail.region === 'demo-sidebar' && detail.params.id) {
+				window.lnCore.fillTemplate(detail.target, { id: detail.params.id });
+			}
 		});
 
 		// Not Found

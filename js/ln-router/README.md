@@ -57,6 +57,29 @@ Route templates and outlets are declared in HTML. Triggers are plain same-origin
 </template>
 ```
 
+### Multi-Region Blueprint
+
+```html
+<!-- Primary outlet -->
+<main data-ln-outlet></main>
+
+<!-- Persistent sidebar — keeps state on param-only changes -->
+<aside id="side" data-ln-route-keep></aside>
+
+<!-- Primary region templates -->
+<template data-ln-route="/users/:id">
+    <article><h1>User {{id}}</h1></article>
+</template>
+
+<!-- Sidebar templates -->
+<template data-ln-route="/users/:id" data-ln-route-target="side">
+    <section>
+        <h2>Sidebar: User {{id}}</h2>
+        <input type="text" placeholder="Type something — survives param changes">
+    </section>
+</template>
+```
+
 ---
 
 ## 3. The Declarative API & State Contract
@@ -77,13 +100,17 @@ const current = router.current();
 // Returns:
 // {
 //   path: '/users/42?tab=profile',
-//   params: { id: '42' },
+//   params: { id: '42' },          // primary region params
 //   query: { tab: 'profile' },
 //   route: { 
 //     pattern: '/users/:id', 
 //     target: null, // The string ID of the custom target outlet, or null if using default
 //     title: 'User Details', 
 //     templateNode: HTMLTemplateElement 
+//   },
+//   regions: Map {                  // NEW — per-region snapshot
+//     '__primary__' => { route: {...}, params: { id: '42' } },
+//     'side'        => { route: {...}, params: { id: '42' } } | null
 //   }
 // }
 ```
@@ -94,14 +121,15 @@ When a route matches, the router resolves the target DOM element to render into 
 2. A default outlet element marked with the `data-ln-outlet` attribute.
 3. The first `<main>` element found in the document.
 
-If no matching target element can be resolved in the DOM, the router logs a `console.warn` and aborts navigation, leaving the current page state intact.
+If the **primary** outlet cannot be resolved, the router logs a `console.warn` and aborts the navigation, leaving the current page state intact. If an **auxiliary** region's target element cannot be resolved, the router warns and skips only that region — the remaining regions still render.
 
 ### Attributes
 - `data-ln-route="pattern"`: Declares a route on a `<template>`. Supports static segments (`/users`), parameters (`/users/:id`), and wildcards (`*`).
-- `data-ln-route-target="id"`: Sets an explicit element ID to render this route into (overrides the default outlet).
-- `data-ln-route-title="text"`: Sets `document.title` on successful navigation.
+- `data-ln-route-target="id"`: Sets an explicit element ID to render this route into. Templates with no `data-ln-route-target` belong to the **primary region** (default outlet).
+- `data-ln-route-title="text"`: Sets `document.title` on successful navigation (primary region only).
 - `data-ln-outlet`: Marks the default outlet element (falls back to the first `<main>` element if omitted).
 - `data-ln-router-hydrate`: Placed on the outlet element to signal that initial SSR (Server-Side Rendered) content is already present, letting the router skip the initial clone and register events cleanly.
+- `data-ln-route-keep`: Placed on a **target element** (not a template). When present, the router skips teardown and DOM swap for that region if the matched template is the same as the one currently mounted — surviving param-only URL changes while preserving DOM state (inputs, scroll, open panels). When the matched template changes, teardown and swap proceed normally. Ignored on the primary outlet (the primary always re-renders).
 
 ---
 
@@ -111,9 +139,9 @@ All events bubble from the target outlet element.
 
 | Event | Cancelable | Detail | Dispatched When |
 |---|---|---|---|
-| **`ln-router:before-navigate`** | **Yes** | `{ from, to, params, query }` | After pattern matches, before view swap. Calling `event.preventDefault()` aborts navigation. |
-| **`ln-router:navigated`** | No | `{ path, params, query, route, target }` | After the new view clone is mounted in the DOM. |
-| **`ln-router:not-found`** | No | `{ path }` | When a path fails to match any route (and no `*` catch-all exists). DOM is left untouched. |
+| **`ln-router:before-navigate`** | **Yes** | `{ from, to, params, query }` | Fired **once per navigation** on the primary outlet before any region swap. `preventDefault()` aborts the entire navigation (no history update, no region swaps). |
+| **`ln-router:navigated`** | No | `{ path, params, query, route, target, region }` | Fired **per region that actually swapped**. `region` is `'__primary__'` for the default outlet, or the target element's id string for auxiliary regions. All existing keys (`path, params, query, route, target`) remain present for backward compatibility. |
+| **`ln-router:not-found`** | No | `{ path }` | When the primary region has no match (and no catch-all `*` exists). DOM is left untouched. Not fired on auxiliary-only pages. |
 
 ### Timing guarantee
 
@@ -179,10 +207,13 @@ If your app references assets using relative paths, deep paths will attempt to l
 
 ---
 
-## 7. Limitations & Nested Routing
+## 7. Routing Model — Parallel Regions, Not Nested Routes
 
 > [!NOTE]
-> **No Nested Routing**: `ln-router` supports a flat routing table only. There is no support for nested outlets or child routes (e.g. rendering a nested sub-view within an already routed parent view). All routes are defined flat in the template list and swapped into their designated target elements.
+> **No Nested Routing**: `ln-router` does not support nested outlets or child routes (rendering a sub-view inside an already-routed parent). All routes are flat.
+
+> [!NOTE]
+> **Multi-region routing is PARALLEL (sibling), not nested.** When a single URL simultaneously paints a sidebar region and a main region, both regions are siblings at the page level — neither is a child of the other's outlet. The "No Nested Routing" doctrine applies: there is no concept of a parent route whose outlet contains another router outlet.
 
 ---
 
@@ -228,3 +259,113 @@ document.addEventListener('ln-router:navigated', function (e) {
   ```
 - **Development Demo**:
   The compiled build in `demo/dist/ln-ashlar.iife.js` exists solely for running the local repository demo environment and should not be referenced in production consumer applications.
+
+---
+
+## 10. Multi-Region Routing
+
+One URL can simultaneously paint multiple sibling regions. Each region independently maintains its own route table and matches the current URL.
+
+### Declaring regions
+
+Regions are ordinary DOM elements. Each is identified by an `id`. Route templates target a region via `data-ln-route-target="<id>"`. Templates with no `data-ln-route-target` belong to the **primary region** (the default outlet).
+
+```html
+<!-- Primary outlet (default region) -->
+<main data-ln-outlet></main>
+
+<!-- Auxiliary region: sidebar -->
+<aside id="side" data-ln-route-keep></aside>
+
+<!-- Primary templates -->
+<template data-ln-route="/users/:id" data-ln-route-title="User Details">
+    <article><h1>User {{id}}</h1></article>
+</template>
+
+<!-- Sidebar templates — same or different patterns -->
+<template data-ln-route="/users/:id" data-ln-route-target="side">
+    <section><h2>Sidebar for User {{id}}</h2></section>
+</template>
+
+<!-- Sidebar catch-all — shown on all other routes -->
+<template data-ln-route="*" data-ln-route-target="side">
+    <section><p>Select a user to see details.</p></section>
+</template>
+```
+
+### The primary region
+
+The primary region is the default outlet (`[data-ln-outlet]` or first `<main>`). It is authoritative for:
+- The single cancelable `ln-router:before-navigate` event (fires once per navigation)
+- `document.title` updates
+- Focus shifting and scroll management
+- `ln-router:not-found` (when the primary has no match)
+- `router.current()` return value
+
+`data-ln-route-keep` is ignored on the primary region: the primary always tears down and re-renders on every matched navigation.
+
+> [!IMPORTANT]
+> **Each region matches the URL independently.** A route targeting an
+> auxiliary region (`data-ln-route-target="…"`) no longer competes with primary
+> routes for a single "best match" — every region runs its own match. If you
+> have a route like `/users/:id/logs` that targets only an auxiliary region,
+> the primary region will independently try to match `/users/42/logs` against
+> its own templates and fall back to its `*` catch-all (or fire `not-found`) if
+> it has no template for that path. Author a primary template for such paths if
+> you want the main outlet to show meaningful content alongside the auxiliary
+> region. This is a deliberate consequence of the parallel-regions model.
+
+### `data-ln-route-keep` — persistent regions
+
+Add `data-ln-route-keep` to any target element to make it a **keep region**.
+
+```html
+<aside id="side" data-ln-route-keep></aside>
+```
+
+Keep-region logic:
+- **Same template matches again** (e.g. param-only change `/users/42` → `/users/43`): the region is left completely untouched. No teardown, no DOM swap, no `ln-router:navigated` event. Input values, scroll position, and open panels survive.
+- **Different template matches** (e.g. navigating to a route that has a different sidebar template): normal teardown + DOM swap + `ln-router:navigated` event.
+- **No match for this URL**: the region is left as-is (untouched content persists). To clear a keep region on certain routes, declare an explicit empty `<template>` for those patterns.
+
+Keep is a property of the **region target element**, not of the template.
+
+### `navigated` event — per swapped region
+
+`ln-router:navigated` fires once per region that actually swapped. The `region` key identifies which region fired:
+
+```js
+document.addEventListener('ln-router:navigated', function (e) {
+    const { path, params, query, route, target, region } = e.detail;
+
+    if (region === '__primary__') {
+        // Primary outlet navigated
+    } else if (region === 'side') {
+        // Sidebar region swapped
+    }
+});
+```
+
+The `region` value is `'__primary__'` for the default outlet, or the target element's `id` string for auxiliary regions.
+
+**Backward compatibility:** all existing keys (`path, params, query, route, target`) remain in the event detail unchanged. Single-outlet pages continue to receive one `navigated` event with the same payload they always have.
+
+### `router.current()` — multi-region state
+
+```js
+const state = router.current();
+// {
+//   path: '/users/42',
+//   params: { id: '42' },       // primary region params
+//   query: {},
+//   route: { ... },             // primary region matched route
+//   regions: Map {
+//     '__primary__' => { route: {...}, params: { id: '42' } },
+//     'side'        => { route: {...}, params: { id: '42' } },
+//   }
+// }
+```
+
+### Atomicity
+
+All region swaps for a single navigation are wrapped in a single `document.startViewTransition` call. History push/replace happens once. `before-navigate` fires once.

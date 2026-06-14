@@ -39,7 +39,7 @@ These are fundamentally different attribute contracts:
 | Attribute | `data-ln-toggle` | `data-ln-tabs-active` |
 | Value space | `{"open", "close"}` (closed CSS-class set) | open string set, validated against `mapPanels` keys |
 | ARIA flag | `aria-expanded` (disclosure) | `aria-selected` (tablist), `aria-hidden` (panels) |
-| Persistence | `localStorage` per-element | URL hash (namespaced) OR `localStorage` (mutually exclusive) |
+| Persistence | `localStorage` per-element | URL hash (anchor triggers) OR `localStorage` (button triggers) |
 | Sibling coordination | external (`ln-accordion`) | internal (one attribute, all siblings react) |
 
 Trying to subtype tabs out of toggle would force toggle's value space open,
@@ -49,24 +49,33 @@ semantics differ from disclosure), and add a separate hash sync layer that
 re-implements key-namespace parsing. The net result is more code than
 `ln-toggle` + `ln-tabs` combined, with a worse contract.
 
-## Why hash sync is opt-in
+## Why the trigger type selects the mode
 
 Hash deep-linking is genuinely useful (a bookmarkable URL the user can share)
 but it has one global side effect: clicking a tab modifies `window.location`.
 A tabbed widget inside a modal or a dismissible card should not leave a
-dangling `#some-tabs:something` in the URL bar.
+dangling `#some-tabs:something` in the URL bar — though a top-level settings
+page might want exactly that.
 
-`ln-tabs` makes hash sync **opt-in by presence of a namespace** — the wrapper
-either declares an `id` (which doubles as the namespace) or
-`data-ln-tabs-key="<name>"` (when `id` is unsuitable, e.g. multiple instances
-from the same template). No namespace, no hash writes; the component falls back
-to writing only `data-ln-tabs-active`, which is invisible to the URL bar but
-still flows through the same `_applyActive` codepath.
+So the **trigger element declares the intent**, because the trigger tag already
+carries that meaning in HTML:
 
-This is also why `data-ln-persist` and hash sync are mutually exclusive. Both
-want to own the "where does the active key persist?" question. If both are
-present, the URL takes precedence — URLs are user-visible and shareable, and
-`localStorage` is the silent fallback when no URL anchor is desired.
+- `<a href="#…">` is, by definition, navigation to a URL fragment. Anchor
+  triggers run the group in **hash mode** — and need a namespace (`id` or
+  `data-ln-tabs-key`) to scope the fragment.
+- `<button>` is a scripted action with no URL semantics. Button triggers run the
+  group in **persist mode**: state lives in `data-ln-tabs-active` (invisible to
+  the URL bar) and, if `data-ln-persist` is present, in `localStorage`.
+
+This decouples two axes that used to collide on `id`. Previously `hashEnabled`
+was `!!nsKey`, so any `id` forced hash mode and silently disabled
+`data-ln-persist`. Now `id` / `data-ln-tabs-key` only *namespace* the hash, and
+`data-ln-persist` only names the storage key — neither selects the mode. A
+button group with an `id` persists; an anchor group hashes. Mixed triggers in
+one group fall back to persist with a `console.warn` rather than guessing.
+
+This is also why `data-ln-persist` and hash sync never run together: a group is
+either anchor-driven (hash) or button-driven (persist), never both.
 
 ## Internal state
 
@@ -82,8 +91,8 @@ Each instance is the object created by `_component(dom)` and stored as
 | `mapPanels` | `Object<key, HTMLElement>` | `_init` | `_applyActive` (iterate to toggle `.hidden`); validity guard; `_hashHandler` namespace lookup; persistence restore |
 | `defaultKey` | `string` | `_init` — `data-ln-tabs-default`, falls back to first key in `mapTabs` | validity guard in `_applyActive`; `_hashHandler` fallback |
 | `autoFocus` | `boolean` | `_init` — `data-ln-tabs-focus !== "false"` | `_applyActive` focus gate |
-| `nsKey` | `string` | `_init` — `data-ln-tabs-key` or `dom.id`, lowercase-trimmed | derives `hashEnabled`; click handler hash write; `_hashHandler` read |
-| `hashEnabled` | `boolean` | `_init` — `!!nsKey` | click handler fork; `_hashHandler` guard; persistence restore gate; `_applyActive` persistence write gate; `destroy` listener removal gate |
+| `nsKey` | `string` | `_init` — `data-ln-tabs-key` or `dom.id`, lowercase-trimmed | namespaces the hash; click handler hash write; `_hashHandler` read |
+| `hashEnabled` | `boolean` | `_init` — every trigger is `<a href="#…">` AND `nsKey` is non-empty | click handler fork; `_hashHandler` guard; persistence restore gate; `_applyActive` persistence write gate; `destroy` listener removal gate |
 | `_clickHandlers` | `Array<{el, handler}>` | `_init` | `destroy` — `removeEventListener` |
 | `_hashHandler` | `Function` | `_init` | `_init` — `addEventListener('hashchange', ...)`; `destroy` — `removeEventListener` |
 
@@ -98,7 +107,7 @@ runtime lookups O(1).
 2. **Initial scan.** `registerComponent` walks `document.body`, finds every `[data-ln-tabs]`, constructs `_component(el)` for each.
 3. **Constructor → `_init`.** For each instance:
    1. Cache `tabs[]` and `panels[]` (deep query rooted at the wrapper).
-   2. Resolve `nsKey` and `hashEnabled` BEFORE `mapTabs` build — anchor key derivation in `_keyFromTrigger` needs `nsKey` to pick the right fragment.
+   2. Detect the mode from the trigger tags (all `<a href="#…">` → hash, else persist) and resolve `nsKey` / `hashEnabled` BEFORE `mapTabs` build — anchor key derivation in `_keyFromTrigger` needs `nsKey` to pick the right fragment.
    3. Build `mapTabs` and `mapPanels` keyed by lowercase-trimmed values.
    4. Resolve `defaultKey` (explicit attribute, else first tab key, else empty).
    5. Read `autoFocus` (`data-ln-tabs-focus !== "false"`, defaulting to `true`).
@@ -224,8 +233,10 @@ The save runs after dispatch — listener exceptions are reported by the user
 agent and do not unwind into `_applyActive`.
 
 The hash-precedence guard (`!this.hashEnabled`) appears in both restore and save
-paths. Without it, a wrapper with both `id` and `data-ln-persist` would write to
-`localStorage` AND respond to hash changes — two sources of truth, drifting apart.
+paths. Because hash mode requires anchor triggers, it only engages for an
+anchor-driven group that also carries `data-ln-persist`; the guard keeps that
+group from writing to `localStorage` AND responding to hash changes — two
+sources of truth, drifting apart.
 
 `persistGet` / `persistSet` resolve the storage key as
 `ln:tabs:<location.pathname>:<persist-value-or-id>`. Path-scoping is a feature:

@@ -35,6 +35,22 @@
 	}
 }
 
+// Default internal spacing for EVERY collapsible panel — plain toggle and
+// accordion alike — so no consumer has to re-solve it.
+//
+// Spacing lives on the body's CHILDREN, never on .collapsible-body itself:
+// that element is the overflow:hidden grid-track child, so any padding/border
+// on it feeds its automatic min-height and stops the panel collapsing to 0px
+// (a sliver of the first line leaks through when "closed"). Padding the
+// children — and zeroing their margins — keeps .collapsible-body's own min
+// at 0. Rebind --padding-x / --padding-y on the body to retune per context.
+.collapsible-body > * {
+	--padding-y: var(--size-sm-up);
+	--padding-x: var(--size-md);
+	padding: var(--padding-y) var(--padding-x);
+	margin: 0;
+}
+
 // ──────────────────────────────────────────────────────────────────────
 // Chevron — generic toggle behavior
 // ──────────────────────────────────────────────────────────────────────

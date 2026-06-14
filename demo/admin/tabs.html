@@ -221,7 +221,7 @@
 							<h4>The panels — <code>[data-ln-panel="key"]</code></h4>
 							<p>Each panel matches a tab by key. Inactive panels MUST be shipped with <code>class="hidden"</code> so they start hidden — without it, the user sees a flash of all-panels-stacked before the component initializes and collapses to one.</p>
 
-							<p>Triggers may be <code>&lt;button&gt;</code> or <code>&lt;a href="#nsKey:key"&gt;</code>. Anchor triggers produce shareable URLs (right-click → copy link, middle-click → open in new tab) — the click handler calls <code>event.preventDefault()</code> so the browser's default navigation does not race with the JS state write. Use the boolean form (<code>data-ln-tab</code> with no value) on anchors so the key only appears in <code>href</code>; explicit <code>data-ln-tab="key"</code> works too if you prefer the redundancy. See the live demo below.</p>
+							<p><strong>The trigger type selects the mode.</strong> <code>&lt;a href="#nsKey:key"&gt;</code> triggers run the group in <strong>URL hash</strong> mode (shareable, back/forward aware); <code>&lt;button&gt;</code> triggers run it in <strong>localStorage persist</strong> mode (opt-in via <code>data-ln-persist</code>, URL untouched). Don't mix the two in one group — that falls back to persist with a console warning. Anchor triggers produce shareable URLs (right-click → copy link, middle-click → open in new tab) — the click handler calls <code>event.preventDefault()</code> so the browser's default navigation does not race with the JS state write. Use the boolean form (<code>data-ln-tab</code> with no value) on anchors so the key only appears in <code>href</code>; explicit <code>data-ln-tab="key"</code> works too if you prefer the redundancy. See the live demos below.</p>
 
 							<h4>What state goes where</h4>
 							<p>"Which tab is active?" lives in <code>data-ln-tabs-active</code> on the wrapper. "Is this tab visually selected?" lives in <code>data-active</code> + <code>aria-selected</code> on the button (synced from the wrapper's attribute). "Is this panel visible?" lives in the <code>.hidden</code> class + <code>aria-hidden</code> on the panel (also synced). The component instance carries caches (<code>mapTabs</code>, <code>mapPanels</code>) and configuration (<code>defaultKey</code>, <code>nsKey</code>, <code>autoFocus</code>), but every observable piece of state is on the DOM.</p>
@@ -256,11 +256,11 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 									<tr><td><code>data-ln-tabs-active</code></td><td>wrapper</td><td>Currently active key. <strong>Written by the component</strong>; watched by the observer.</td></tr>
 									<tr><td><code>data-ln-tabs-default="key"</code></td><td>wrapper</td><td>Default key. Falls back to first <code>[data-ln-tab]</code> if absent.</td></tr>
 									<tr><td><code>data-ln-tabs-focus="false"</code></td><td>wrapper</td><td>Opt out of auto-focus on the panel's first focusable element. Default: enabled.</td></tr>
-									<tr><td><code>data-ln-tabs-key="name"</code></td><td>wrapper</td><td>Hash namespace, when <code>id</code> is unsuitable. Falls back to <code>id</code>.</td></tr>
-									<tr><td><code>id="name"</code></td><td>wrapper</td><td>Doubles as hash namespace if <code>data-ln-tabs-key</code> is absent. Enables hash sync.</td></tr>
+									<tr><td><code>data-ln-tabs-key="name"</code></td><td>wrapper</td><td>Hash namespace for <strong>anchor-trigger</strong> groups, when <code>id</code> is unsuitable. Falls back to <code>id</code>.</td></tr>
+									<tr><td><code>id="name"</code></td><td>wrapper</td><td>Doubles as the hash namespace for <strong>anchor-trigger</strong> groups if <code>data-ln-tabs-key</code> is absent. Does <strong>not</strong> select the mode — the trigger type does.</td></tr>
 									<tr><td><code>data-ln-tab="key"</code></td><td>tab button</td><td>Marks the button as a tab. Key is normalized lowercase.</td></tr>
 									<tr><td><code>data-ln-panel="key"</code></td><td>panel</td><td>Matches against <code>data-ln-tab</code> by key.</td></tr>
-									<tr><td><code>data-ln-persist</code></td><td>wrapper</td><td>Opt in to <code>localStorage</code>. Boolean form requires <code>id</code>; explicit form is <code>data-ln-persist="custom-key"</code>. <strong>Mutually exclusive with hash sync</strong> — ignored when <code>id</code> or <code>data-ln-tabs-key</code> is present.</td></tr>
+									<tr><td><code>data-ln-persist</code></td><td>wrapper</td><td>Opt in to <code>localStorage</code> for <strong>button-trigger</strong> groups. Boolean form keys off <code>id</code>; explicit form is <code>data-ln-persist="custom-key"</code>. No effect on anchor-trigger (hash) groups.</td></tr>
 								</tbody>
 							</table>
 						</main>
@@ -316,13 +316,13 @@ location.hash = 'user-tabs:settings&project-tabs:members';</code></pre>
 					<section class="section-card" data-demo-html>
 						<header><h3>Live demo — hash-deep-linkable tabs</h3></header>
 						<main>
-							<p>The wrapper has <code>id="user-tabs"</code>, which doubles as the hash namespace. Click a tab and the URL updates: <code>#user-tabs:settings</code>. Bookmark, share, hit the back button — all the URL-as-state benefits.</p>
+							<p>Hash sync is driven by <strong>anchor triggers</strong>. The wrapper's <code>id="user-tabs"</code> is the hash namespace; each <code>&lt;a href="#user-tabs:key"&gt;</code> writes the URL on click: <code>#user-tabs:settings</code>. Bookmark, share, hit the back button — all the URL-as-state benefits. (Plain <code>&lt;button&gt;</code> triggers never touch the URL — they use localStorage persist instead.)</p>
 
 							<section id="user-tabs" data-ln-tabs data-ln-tabs-default="info">
 								<nav>
-									<button type="button" data-ln-tab="info">Information</button>
-									<button type="button" data-ln-tab="settings">Settings</button>
-									<button type="button" data-ln-tab="history">History</button>
+									<a href="#user-tabs:info" data-ln-tab>Information</a>
+									<a href="#user-tabs:settings" data-ln-tab>Settings</a>
+									<a href="#user-tabs:history" data-ln-tab>History</a>
 								</nav>
 
 								<section data-ln-panel="info">

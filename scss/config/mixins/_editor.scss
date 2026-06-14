@@ -96,6 +96,13 @@
 		outline: none;
 		cursor: text;
 
+		// Counter the global reset (`ul li, ol li { list-style: none }`).
+		// The reset kills markers on <li> directly; prose only sets
+		// list-style on the <ul>/<ol> container. Restore inheritance
+		// so the container's disc/decimal flows through to each item.
+		ul li { list-style: disc; }
+		ol li { list-style: decimal; }
+
 		// Empty placeholder via CSS
 		&:empty::before {
 			content: attr(data-placeholder);
