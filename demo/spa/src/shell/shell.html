@@ -1,0 +1,67 @@
+<!-- @zone shell -->
+<div class="app-wrapper">
+	<header class="app-header">
+		<div class="header-left">
+			<button type="button" class="menu-toggle" data-ln-toggle-for="app-sidebar" aria-label="Open menu">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+			</button>
+			<a class="app-brand" href="/demo/spa">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-files"></use></svg>
+				<span>DocuFlow</span>
+			</a>
+		</div>
+	</header>
+	<main class="app-main">
+		<aside class="app-sidebar" id="app-sidebar" data-ln-toggle="open">
+			<header>
+				<span class="app-name">DocuFlow</span>
+				<button type="button" data-ln-toggle-for="app-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+				</button>
+			</header>
+			<main>
+				<nav aria-label="Main navigation" data-ln-nav="active">
+					<ul>
+						<li>
+							<a href="/demo/spa">
+								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-layout-dashboard"></use></svg>
+								<span class="nav-label">Dashboard</span>
+							</a>
+						</li>
+						<li>
+							<a href="/demo/spa/packages">
+								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-package"></use></svg>
+								<span class="nav-label">Packages</span>
+							</a>
+						</li>
+						<li>
+							<a href="/demo/spa/tenants">
+								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-building"></use></svg>
+								<span class="nav-label">Tenants</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</main>
+			<footer>
+				<button type="button" id="reset-demo" class="btn">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg>
+					Reset demo data
+				</button>
+				<p class="sidebar-caption">Demo data — resets on demand</p>
+			</footer>
+		</aside>
+		<section id="app-view" data-ln-outlet></section>
+		<div class="app-scrim" data-ln-toggle-for="app-sidebar" data-ln-toggle-action="close" aria-hidden="true"></div>
+	</main>
+</div>
+
+<!-- @zone persistent -->
+<!-- Offline banner (persistent, hidden until window offline) -->
+<aside id="offline-banner" class="hidden" role="alert">
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-wifi-off"></use></svg>
+	<p>Server unreachable — changes are not saved.</p>
+</aside>
+
+<!-- Toasts -->
+<ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>

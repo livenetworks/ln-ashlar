@@ -1,0 +1,32 @@
+<!-- @zone persistent -->
+<!-- Packages data layer -->
+<div data-ln-data-coordinator="packages" data-ln-data-mapper="packages" hidden>
+	<div data-ln-data-store="packages"
+	     data-ln-data-store-stale="-1"
+	     data-ln-data-store-indexes="active"
+	     data-ln-data-store-search-fields="name"
+	     id="packages-store"
+	     data-ln-store-notify
+	     data-ln-store-notify-saved="Saved"
+	     data-ln-store-notify-deleted="Deleted"
+	     data-ln-store-notify-failed="Not saved"></div>
+	<div data-ln-api-connector
+	     data-ln-api-base-url="/demo/docuflow/api"
+	     data-ln-api-path="/packages"></div>
+</div>
+
+<!-- Tenants data layer -->
+<div data-ln-data-coordinator="tenants" data-ln-data-mapper="tenants" hidden>
+	<div data-ln-data-store="tenants"
+	     data-ln-data-store-stale="-1"
+	     data-ln-data-store-indexes="package_id,auth_method,active"
+	     data-ln-data-store-search-fields="name,slug,custom_domain"
+	     id="tenants-store"
+	     data-ln-store-notify
+	     data-ln-store-notify-saved="Saved"
+	     data-ln-store-notify-deleted="Deleted"
+	     data-ln-store-notify-failed="Not saved"></div>
+	<div data-ln-api-connector
+	     data-ln-api-base-url="/demo/docuflow/api"
+	     data-ln-api-path="/tenants"></div>
+</div>

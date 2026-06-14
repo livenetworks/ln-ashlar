@@ -1,0 +1,9 @@
+@use '../../../../scss/config/mixins' as *;
+
+// ─── Tenant editor specifics ────────────────────────────────────────
+#tenant-editor form {
+	// Identity: name spans the full row; slug + domain share it
+	.form-element:has([name="name"]) { grid-column: 1 / -1; }
+
+	footer { @include form-actions; }
+}

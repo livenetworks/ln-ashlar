@@ -1,3 +1,5 @@
+# Deep-link fallback: serve the SPA shell for any path that is not a real file
+# or directory, so ln-router can boot and resolve the client-side route.
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

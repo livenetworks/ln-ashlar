@@ -199,7 +199,13 @@
 			<main>
 				<nav class="demo-actions">
 					<button data-ln-modal-for="demo-basic" class="btn">Basic Modal</button>
-					<button data-ln-modal-for="demo-form" class="btn">Form Modal</button>
+					<button data-ln-modal-for="demo-form" class="btn">Form Modal (New)</button>
+					<button data-ln-modal-for="demo-form"
+					        data-ln-fill-form="demo-form-el"
+					        data-ln-fill-name="Dalibor Sojic"
+					        data-ln-fill-email="dalibor@example.com"
+					        data-ln-fill-role="Administrator"
+					        class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg> Form Modal (Edit - Prefilled)</button>
 					<button data-ln-modal-for="demo-large" class="btn">Large Modal</button>
 					<button data-ln-modal-for="demo-tall" class="btn">Tall Content (scroll test)</button>
 				</nav>
@@ -223,7 +229,7 @@
 
 				<!-- Form Modal -->
 				<div class="ln-modal" data-ln-modal id="demo-form">
-					<form>
+					<form id="demo-form-el" data-ln-form>
 						<header>
 							<h3>Add User</h3>
 							<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
@@ -231,15 +237,15 @@
 						<main>
 							<div class="form-element">
 								<label for="modal-name">Name</label>
-								<input type="text" id="modal-name" placeholder="Enter name...">
+								<input type="text" id="modal-name" name="name" placeholder="Enter name...">
 							</div>
 							<div class="form-element">
 								<label for="modal-email">Email</label>
-								<input type="email" id="modal-email" placeholder="email@example.com">
+								<input type="email" id="modal-email" name="email" placeholder="email@example.com">
 							</div>
 							<div class="form-element">
 								<label for="modal-role">Role</label>
-								<select id="modal-role">
+								<select id="modal-role" name="role">
 									<option>User</option>
 									<option>Administrator</option>
 									<option>Moderator</option>
@@ -586,7 +592,7 @@ document.addEventListener('ln-modal:close', function(e) {
 	</div>
 
 	<div class="ln-modal" data-ln-modal id="demo-form">
-		<form>
+		<form id="demo-form-el" data-ln-form>
 			<header>
 				<h3>Add User</h3>
 				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
@@ -594,15 +600,15 @@ document.addEventListener('ln-modal:close', function(e) {
 			<main>
 				<div class="form-element">
 					<label for="modal-name">Name</label>
-					<input type="text" id="modal-name" placeholder="Enter name...">
+					<input type="text" id="modal-name" name="name" placeholder="Enter name...">
 				</div>
 				<div class="form-element">
 					<label for="modal-email">Email</label>
-					<input type="email" id="modal-email" placeholder="email@example.com">
+					<input type="email" id="modal-email" name="email" placeholder="email@example.com">
 				</div>
 				<div class="form-element">
 					<label for="modal-role">Role</label>
-					<select id="modal-role">
+					<select id="modal-role" name="role">
 						<option>User</option>
 						<option>Administrator</option>
 						<option>Moderator</option>

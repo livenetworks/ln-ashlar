@@ -1,0 +1,116 @@
+<!-- @zone routes -->
+<template data-ln-route="/demo/spa/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
+	<section id="tenant-editor">
+		<header class="page-header">
+			<nav aria-label="Breadcrumb">
+				<ol>
+					<li><a href="/demo/spa/tenants">Tenants</a></li>
+					<li aria-current="page">Tenant</li>
+				</ol>
+			</nav>
+			<div class="page-title">
+				<h1 data-tenant-title>Tenant</h1>
+			</div>
+		</header>
+		<section class="section-card">
+			<main>
+				<form data-ln-form="tenant-form" id="tenant-form" data-ln-form-typed>
+					<input type="hidden" name="id">
+					<fieldset>
+						<legend>Identity</legend>
+						<div class="form-grid">
+							<div class="form-element">
+								<label for="tenant-name">Name</label>
+								<input id="tenant-name" name="name" required data-ln-validate>
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="required">Name is required.</li>
+								</ul>
+							</div>
+							<div class="form-element">
+								<label for="tenant-slug">Slug</label>
+								<input id="tenant-slug" name="slug" required pattern="[a-z0-9\-]+" data-ln-validate data-ln-slug-from="name">
+								<small class="hint">Lowercase letters, numbers and dashes only.</small>
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="required">Slug is required.</li>
+									<li class="hidden" data-ln-validate-error="patternMismatch">Only lowercase letters, numbers and dashes.</li>
+								</ul>
+							</div>
+							<div class="form-element">
+								<label for="tenant-custom-domain">Custom domain</label>
+								<input id="tenant-custom-domain" name="custom_domain">
+							</div>
+						</div>
+					</fieldset>
+					<fieldset>
+						<legend>Plan &amp; access</legend>
+						<div class="form-grid">
+							<div class="form-element">
+								<label for="tenant-package-id">Package</label>
+								<select id="tenant-package-id" name="package_id" required data-ln-validate data-ln-options="packages" data-ln-options-value="id" data-ln-options-label="name">
+									<option value="">Select a package…</option>
+								</select>
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="required">Choose a package.</li>
+								</ul>
+							</div>
+							<div class="form-element">
+								<label for="tenant-auth-method">Auth method</label>
+								<select id="tenant-auth-method" name="auth_method">
+									<option value="Local">Local</option>
+									<option value="LDAP">LDAP</option>
+								</select>
+							</div>
+							<div class="form-element">
+								<label>
+									<input name="active" type="checkbox" value="1" checked>
+									Active
+								</label>
+							</div>
+						</div>
+					</fieldset>
+					<fieldset>
+						<legend>Document policy</legend>
+						<div class="form-grid">
+							<div class="form-element">
+								<label for="tenant-doc-numbering">Doc numbering scheme</label>
+								<input id="tenant-doc-numbering" name="doc_numbering_scheme" value="{TYPE}-{SEQ:4}">
+								<small class="hint">{TYPE} = document type, {SEQ:4} = zero-padded sequence.</small>
+							</div>
+							<div class="form-element">
+								<label for="tenant-review-interval">Review interval (days)</label>
+								<input id="tenant-review-interval" name="review_interval" type="number" min="1" value="365"
+								       data-ln-number data-ln-number-min="1" data-ln-validate>
+								<ul data-ln-validate-errors>
+									<li class="hidden" data-ln-validate-error="rangeUnderflow">Must be at least 1 day.</li>
+								</ul>
+							</div>
+							<div class="form-element">
+								<label>
+									<input name="read_confirmation" type="checkbox" value="1">
+									Read confirmation required
+								</label>
+							</div>
+						</div>
+					</fieldset>
+					<fieldset>
+						<legend>Branding</legend>
+						<div class="form-grid">
+							<div class="form-element">
+								<label for="tenant-brand-primary">Brand primary colour</label>
+								<input id="tenant-brand-primary" name="brand_primary" type="color" value="#2563eb">
+							</div>
+							<div class="form-element">
+								<label for="tenant-brand-secondary">Brand secondary colour</label>
+								<input id="tenant-brand-secondary" name="brand_secondary" type="color" value="#1e40af">
+							</div>
+						</div>
+					</fieldset>
+					<footer class="form-actions">
+						<a href="/demo/spa/tenants" class="btn">Cancel</a>
+						<button type="submit" class="btn">Save</button>
+					</footer>
+				</form>
+			</main>
+		</section>
+	</section>
+</template>

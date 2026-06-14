@@ -1,0 +1,244 @@
+<!-- @zone routes -->
+<template data-ln-route="/demo/spa/tenants" data-ln-route-title="Tenants — DocuFlow">
+	<section id="tenants-view">
+		<header class="page-header">
+			<div class="page-title">
+				<h1>Tenants</h1>
+				<p><span data-ln-stat="tenants">—</span> tenants registered</p>
+			</div>
+			<div class="page-actions">
+				<button type="button" id="new-tenant" class="btn" data-ln-modal-for="tenant-modal" data-ln-fill-form="tenant-create-form">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+					New tenant
+				</button>
+			</div>
+		</header>
+
+		<section data-ln-table="tenants" data-ln-table-source="tenants" data-ln-table-store="tenants" data-ln-table-selectable id="tenants-table">
+			<header class="ln-table__toolbar">
+				<label class="search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Search tenants…" data-ln-search="tenants-table">
+					<button type="button" data-ln-search-clear aria-label="Clear search">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					</button>
+				</label>
+				<span data-ln-table-selected-wrap class="hidden">
+					<button type="button" id="bulk-delete-tenants" class="btn" data-ln-confirm="Delete selected tenants?">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+						Delete selected (<span data-ln-table-selected></span>)
+					</button>
+				</span>
+			</header>
+
+			<table>
+				<thead>
+					<tr>
+						<th data-ln-table-col-select></th>
+						<th data-ln-table-col="name">Name <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="slug">Slug <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="custom_domain">Domain</th>
+						<th data-ln-table-col="package_name">Package</th>
+						<th data-ln-table-col="auth_method" data-ln-table-filter-col="auth_method">Auth <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-auth" aria-label="Filter auth method"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th data-ln-table-col="active" data-ln-table-filter-col="active">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-tenants-active" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+
+			<footer class="ln-table__footer">
+				<span data-ln-table-total></span> items
+				<span data-ln-table-filtered-wrap class="hidden"> · <span data-ln-table-filtered></span> filtered</span>
+			</footer>
+
+			<template data-ln-template="tenants-row">
+				<tr data-ln-table-row>
+					<td><input type="checkbox" data-ln-table-row-select></td>
+					<td>{{ name }}</td>
+					<td>{{ slug }}</td>
+					<td>{{ custom_domain }}</td>
+					<td><span class="ln-chip">{{ package_name }}</span></td>
+					<td>{{ auth_method }}</td>
+					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
+					<td>
+						<ul class="row-actions">
+							<li><a href="/demo/spa/tenants/{{ id }}"
+								data-ln-fill-form="tenant-form"
+								data-ln-fill-id="{{ id }}"
+								data-ln-fill-name="{{ name }}"
+								data-ln-fill-slug="{{ slug }}"
+								data-ln-fill-custom-domain="{{ custom_domain }}"
+								data-ln-fill-package-id="{{ package_id }}"
+								data-ln-fill-auth-method="{{ auth_method }}"
+								data-ln-fill-active="{{ active }}"
+								data-ln-fill-doc-numbering-scheme="{{ doc_numbering_scheme }}"
+								data-ln-fill-review-interval="{{ review_interval }}"
+								data-ln-fill-read-confirmation="{{ read_confirmation }}"
+								data-ln-fill-brand-primary="{{ brand_primary }}"
+								data-ln-fill-brand-secondary="{{ brand_secondary }}"
+								aria-label="Edit tenant" data-ln-tooltip="Edit"
+							><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></a></li>
+							<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete tenant" data-ln-tooltip="Delete" data-ln-confirm="Delete tenant?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+						</ul>
+					</td>
+				</tr>
+			</template>
+
+			<template data-ln-template="tenants-empty">
+				<article class="ln-table__empty-state">
+					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-building"></use></svg>
+					<h3>No tenants yet</h3>
+					<p>Register your first tenant to get started.</p>
+					<button type="button" data-spa-empty-new-tenant class="btn" data-ln-modal-for="tenant-modal" data-ln-fill-form="tenant-create-form">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+						New tenant
+					</button>
+				</article>
+			</template>
+
+			<template data-ln-template="tenants-empty-filtered">
+				<article class="ln-table__empty-state">
+					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<h3>No results</h3>
+					<p>Try adjusting your search or filters.</p>
+					<button type="button" data-ln-table-clear-all class="btn">Clear all filters</button>
+				</article>
+			</template>
+
+		</section>
+
+		<!-- Tenants table: auth method filter popover -->
+		<div data-ln-popover id="filter-tenants-auth">
+			<ul data-ln-filter="tenants-table">
+				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-reset checked> All</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="Local"> Local</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="LDAP"> LDAP</label></li>
+			</ul>
+		</div>
+
+		<!-- Tenants table: status filter popover -->
+		<div data-ln-popover id="filter-tenants-active">
+			<ul data-ln-filter="tenants-table">
+				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>
+			</ul>
+		</div>
+
+		<article data-view-error hidden>
+			<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+			<h3>Failed to load tenants</h3>
+			<p data-view-error-msg>The server did not respond. Changes are not saved while it is unreachable.</p>
+			<button type="button" class="btn" data-view-retry>Retry</button>
+		</article>
+	</section>
+</template>
+
+<!-- @zone persistent -->
+<!-- Tenant create modal -->
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal">
+	<form data-ln-form="tenant-create" id="tenant-create-form" data-ln-form-typed>
+		<header>
+			<h3 id="tenant-modal-title">New tenant</h3>
+			<button type="button" aria-label="Close" data-ln-modal-close>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<fieldset>
+				<legend>Identity</legend>
+				<div class="form-grid">
+					<div class="form-element">
+						<label for="tc-tenant-name">Name</label>
+						<input id="tc-tenant-name" name="name" required data-ln-validate>
+						<ul data-ln-validate-errors>
+							<li class="hidden" data-ln-validate-error="required">Name is required.</li>
+						</ul>
+					</div>
+					<div class="form-element">
+						<label for="tc-tenant-slug">Slug</label>
+						<input id="tc-tenant-slug" name="slug" required pattern="[a-z0-9\-]+" data-ln-validate data-ln-slug-from="name">
+						<small class="hint">Lowercase letters, numbers and dashes only.</small>
+						<ul data-ln-validate-errors>
+							<li class="hidden" data-ln-validate-error="required">Slug is required.</li>
+							<li class="hidden" data-ln-validate-error="patternMismatch">Only lowercase letters, numbers and dashes.</li>
+						</ul>
+					</div>
+					<div class="form-element">
+						<label for="tc-tenant-custom-domain">Custom domain</label>
+						<input id="tc-tenant-custom-domain" name="custom_domain">
+					</div>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Plan &amp; access</legend>
+				<div class="form-grid">
+					<div class="form-element">
+						<label for="tc-tenant-package-id">Package</label>
+						<select id="tc-tenant-package-id" name="package_id" required data-ln-validate data-ln-options="packages" data-ln-options-value="id" data-ln-options-label="name">
+							<option value="">Select a package…</option>
+						</select>
+						<ul data-ln-validate-errors>
+							<li class="hidden" data-ln-validate-error="required">Choose a package.</li>
+						</ul>
+					</div>
+					<div class="form-element">
+						<label for="tc-tenant-auth-method">Auth method</label>
+						<select id="tc-tenant-auth-method" name="auth_method">
+							<option value="Local">Local</option>
+							<option value="LDAP">LDAP</option>
+						</select>
+					</div>
+					<div class="form-element">
+						<label>
+							<input name="active" type="checkbox" value="1" checked>
+							Active
+						</label>
+					</div>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Document policy</legend>
+				<div class="form-grid">
+					<div class="form-element">
+						<label for="tc-tenant-doc-numbering">Doc numbering scheme</label>
+						<input id="tc-tenant-doc-numbering" name="doc_numbering_scheme" value="{TYPE}-{SEQ:4}">
+						<small class="hint">{TYPE} = document type, {SEQ:4} = zero-padded sequence.</small>
+					</div>
+					<div class="form-element">
+						<label for="tc-tenant-review-interval">Review interval (days)</label>
+						<input id="tc-tenant-review-interval" name="review_interval" type="number" min="1" value="365"
+						       data-ln-number data-ln-number-min="1" data-ln-validate>
+						<ul data-ln-validate-errors>
+							<li class="hidden" data-ln-validate-error="rangeUnderflow">Must be at least 1 day.</li>
+						</ul>
+					</div>
+					<div class="form-element">
+						<label>
+							<input name="read_confirmation" type="checkbox" value="1">
+							Read confirmation required
+						</label>
+					</div>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Branding</legend>
+				<div class="form-grid">
+					<div class="form-element">
+						<label for="tc-tenant-brand-primary">Brand primary colour</label>
+						<input id="tc-tenant-brand-primary" name="brand_primary" type="color" value="#2563eb">
+					</div>
+					<div class="form-element">
+						<label for="tc-tenant-brand-secondary">Brand secondary colour</label>
+						<input id="tc-tenant-brand-secondary" name="brand_secondary" type="color" value="#1e40af">
+					</div>
+				</div>
+			</fieldset>
+		</main>
+		<footer class="form-actions">
+			<button type="button" data-ln-modal-close>Cancel</button>
+			<button type="submit" class="btn">Save</button>
+		</footer>
+	</form>
+</div>

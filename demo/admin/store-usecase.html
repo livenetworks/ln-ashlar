@@ -206,162 +206,7 @@
 					</section>
 
 <!-- (a) Mock backend MUST install before any [data-ln-store] element is parsed below. -->
-<script>
-(function () {
-	const STORAGE_KEY = 'ln-mock-documents';
-	const ENDPOINT = '/api/documents';
-	const realFetch = window.fetch.bind(window);
-
-	const departments = ['IT', 'Finance', 'Legal', 'Marketing', 'HR', 'Operations'];
-	const statuses    = ['Draft', 'Pending', 'Approved', 'Archived'];
-
-	function nowSec() { return Math.floor(Date.now() / 1000); }
-	function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-	function load() {
-		try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || []; }
-		catch (_) { return []; }
-	}
-	function save(records) { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
-	function nextId(records) {
-		let max = 0;
-		for (let i = 0; i < records.length; i++) if (records[i].id > max) max = records[i].id;
-		return max + 1;
-	}
-
-	// Seed pulled once from the shared 10k-record fixture. Cached as a
-	// promise so concurrent in-flight handle() calls all await the same
-	// fetch and only save once.
-	let seedPromise = null;
-	function loadSeed() {
-		if (!seedPromise) {
-			seedPromise = realFetch('./data/documents.json')
-				.then((res) => res.json())
-				.then((payload) => {
-					save(payload.data);
-					return payload.data;
-				});
-		}
-		return seedPromise;
-	}
-
-	async function getRecords() {
-		let r = load();
-		if (r.length === 0) r = await loadSeed();
-		return r;
-	}
-
-	// Toggle state — read live from DOM each call so user can flip mid-session
-	function $sim(id) { const el = document.getElementById(id); return el && el.checked; }
-
-	function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
-
-	function jsonResponse(body, status) {
-		return new Response(JSON.stringify(body), {
-			status: status || 200,
-			headers: { 'Content-Type': 'application/json' }
-		});
-	}
-
-	async function handle(input, init) {
-		// Optional latency
-		if ($sim('sim-latency')) await delay(600);
-
-		const url = typeof input === 'string' ? input : input.url;
-		const u = new URL(url, window.location.origin);
-		const method = (init && init.method) || (typeof input !== 'string' && input.method) || 'GET';
-		const path = u.pathname;
-		const records = await getRecords();
-
-		// GET /api/documents (full or delta)
-		if (path === ENDPOINT && method === 'GET') {
-			const since = u.searchParams.get('since');
-			if (since != null) {
-				const sinceN = Number(since);
-				const upserted = records.filter((r) => r.updated_at > sinceN);
-				return jsonResponse({ data: upserted, deleted: [], synced_at: nowSec() });
-			}
-			return jsonResponse({ data: records, synced_at: nowSec() });
-		}
-
-		// POST /api/documents (create)
-		if (path === ENDPOINT && method === 'POST') {
-			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
-			const data = JSON.parse(init.body || '{}');
-			const t = nowSec();
-			const rec = Object.assign(
-				{ file_size: 10 + Math.floor(Math.random() * 49990) },
-				data,
-				{
-					id: nextId(records),
-					created_at: t,
-					updated_at: t
-				}
-			);
-			records.push(rec);
-			save(records);
-			return jsonResponse(rec); // BARE record — store reads response.json() directly
-		}
-
-		// PUT /api/documents/:id (update)
-		const putMatch = path.match(/^\/api\/documents\/(\d+)$/);
-		if (putMatch && method === 'PUT') {
-			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
-			const id = Number(putMatch[1]);
-			const idx = records.findIndex((r) => r.id === id);
-			if (idx === -1) return jsonResponse({ error: 'not found' }, 404);
-			const body = JSON.parse(init.body || '{}');
-			const expected = body.expected_version;
-			delete body.expected_version;
-			const stored = records[idx];
-
-			// Conflict check — only if caller passed expected_version AND sim-conflict on
-			if (expected != null && $sim('sim-conflict') && Math.random() < 0.10) {
-				// Bump stored.updated_at to simulate that someone else edited it,
-				// then return 409 with current
-				stored.updated_at = nowSec();
-				save(records);
-				return jsonResponse({ current: stored }, 409); // store reads conflict.current
-			}
-
-			const updated = Object.assign({}, stored, body, { updated_at: nowSec() });
-			records[idx] = updated;
-			save(records);
-			return jsonResponse(updated); // BARE record
-		}
-
-		// DELETE /api/documents/:id
-		const delMatch = path.match(/^\/api\/documents\/(\d+)$/);
-		if (delMatch && method === 'DELETE') {
-			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
-			const id = Number(delMatch[1]);
-			const filtered = records.filter((r) => r.id !== id);
-			save(filtered);
-			return jsonResponse({ ok: true });
-		}
-
-		// DELETE /api/documents/bulk-delete
-		if (path === ENDPOINT + '/bulk-delete' && method === 'DELETE') {
-			if ($sim('sim-failure') && Math.random() < 0.15) return jsonResponse({ error: 'simulated failure' }, 500);
-			const body = JSON.parse(init.body || '{}');
-			const ids = (body.ids || []).map(Number);
-			const filtered = records.filter((r) => ids.indexOf(r.id) === -1);
-			save(filtered);
-			return jsonResponse({ ok: true });
-		}
-
-		// Fall through to real fetch for any other URL
-		return realFetch(input, init);
-	}
-
-	window.fetch = function (input, init) {
-		const url = typeof input === 'string' ? input : input.url;
-		// Only intercept our endpoint
-		if (url && url.indexOf(ENDPOINT) !== -1) return handle(input, init);
-		return realFetch(input, init);
-	};
-})();
-</script>
+<script class="mock-related" src="dist/mock-store-usecase.js" defer></script>
 
 <!-- 1. Store (renders nothing) -->
 <div data-ln-data-store="documents"
@@ -571,7 +416,7 @@
 	</form>
 </div>
 
-<script>
+<script class="demo-coordinator">
 (function () {
 	const storeEl = document.querySelector('[data-ln-data-store="documents"]');
 	const tableEl = document.querySelector('[data-ln-table="documents"]');
@@ -627,23 +472,18 @@
 		formEl.closest('.ln-modal').setAttribute('data-ln-modal', 'close');
 	});
 
-	// Bulk Delete & Reset Data (Event Delegation)
+	// Bulk Delete (Event Delegation)
 	document.addEventListener('click', e => {
-		const btn = e.target.closest('#bulk-delete-btn, #reset-data');
+		const btn = e.target.closest('#bulk-delete-btn');
 		if (!btn) return;
-		if (btn.id === 'bulk-delete-btn') {
-			const ids = Array.from(tableEl.lnTable.selectedIds).map(Number);
-			if (!ids.length) return;
-			pendingDelete = { ids };
-			const confirmForm = document.querySelector('#confirm-delete-form');
-			if (confirmForm) {
-				const confirmModal = confirmForm.closest('.ln-modal');
-				confirmModal.querySelector('p').textContent = `Delete ${ids.length} document${ids.length > 1 ? 's' : ''}?`;
-				confirmModal.setAttribute('data-ln-modal', 'open');
-			}
-		} else {
-			localStorage.removeItem('ln-mock-documents');
-			window.lnDataStore.clearAll().then(() => location.reload());
+		const ids = Array.from(tableEl.lnTable.selectedIds).map(Number);
+		if (!ids.length) return;
+		pendingDelete = { ids };
+		const confirmForm = document.querySelector('#confirm-delete-form');
+		if (confirmForm) {
+			const confirmModal = confirmForm.closest('.ln-modal');
+			confirmModal.querySelector('p').textContent = `Delete ${ids.length} document${ids.length > 1 ? 's' : ''}?`;
+			confirmModal.setAttribute('data-ln-modal', 'open');
 		}
 	});
 
@@ -826,7 +666,7 @@
 	</div>
 
 	<div class="ln-modal" data-ln-modal id="demo-form">
-		<form>
+		<form id="demo-form-el" data-ln-form>
 			<header>
 				<h3>Add User</h3>
 				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
@@ -834,15 +674,15 @@
 			<main>
 				<div class="form-element">
 					<label for="modal-name">Name</label>
-					<input type="text" id="modal-name" placeholder="Enter name...">
+					<input type="text" id="modal-name" name="name" placeholder="Enter name...">
 				</div>
 				<div class="form-element">
 					<label for="modal-email">Email</label>
-					<input type="email" id="modal-email" placeholder="email@example.com">
+					<input type="email" id="modal-email" name="email" placeholder="email@example.com">
 				</div>
 				<div class="form-element">
 					<label for="modal-role">Role</label>
-					<select id="modal-role">
+					<select id="modal-role" name="role">
 						<option>User</option>
 						<option>Administrator</option>
 						<option>Moderator</option>

@@ -1,0 +1,188 @@
+<!-- @zone routes -->
+<template data-ln-route="/demo/spa/packages" data-ln-route-title="Packages — DocuFlow">
+	<section id="packages-view">
+		<header class="page-header">
+			<div class="page-title">
+				<h1>Packages</h1>
+				<p><span data-ln-stat="packages">—</span> packages defined</p>
+			</div>
+			<div class="page-actions">
+				<button type="button" id="new-package" class="btn"
+					data-ln-modal-for="package-modal"
+					data-ln-fill-form="package-form">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+					New package
+				</button>
+			</div>
+		</header>
+
+		<section data-ln-table="packages" data-ln-table-source="packages" data-ln-table-store="packages" id="packages-table">
+			<header class="ln-table__toolbar">
+				<label class="search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Search packages…" data-ln-search="packages-table">
+					<button type="button" data-ln-search-clear aria-label="Clear search">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					</button>
+				</label>
+			</header>
+
+			<table>
+				<thead>
+					<tr>
+						<th data-ln-table-col="name">Name <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="max_users">Max users <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="max_documents">Documents <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="max_storage">Storage <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="active" data-ln-table-filter-col="active">Status <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-packages-active" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button></th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+
+			<footer class="ln-table__footer">
+				<span data-ln-table-total></span> items
+				<span data-ln-table-filtered-wrap class="hidden"> · <span data-ln-table-filtered></span> filtered</span>
+			</footer>
+
+			<template data-ln-template="packages-row">
+				<tr data-ln-table-row>
+					<td>{{ name }}</td>
+					<td data-ln-table-cell-attr="max_users:data-ln-value">{{ max_users_display }}</td>
+					<td>{{ max_documents }}</td>
+					<td data-ln-table-cell-attr="max_storage:data-ln-value">{{ max_storage }} GB</td>
+					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
+					<td>
+						<ul class="row-actions">
+							<li><button type="button" aria-label="Edit package" data-ln-tooltip="Edit"
+								data-ln-modal-for="package-modal"
+								data-ln-fill-form="package-form"
+								data-ln-fill-id="{{ id }}"
+								data-ln-fill-name="{{ name }}"
+								data-ln-fill-max-users="{{ max_users }}"
+								data-ln-fill-max-guests="{{ max_guests }}"
+								data-ln-fill-max-standards="{{ max_standards }}"
+								data-ln-fill-max-documents="{{ max_documents }}"
+								data-ln-fill-max-storage="{{ max_storage }}"
+								data-ln-fill-active="{{ active }}"
+								data-ln-modal-name="{{ name }}"
+							><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+							<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete package" data-ln-tooltip="Delete" data-ln-confirm="Delete package?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+						</ul>
+					</td>
+				</tr>
+			</template>
+
+			<template data-ln-template="packages-empty">
+				<article class="ln-table__empty-state">
+					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-package"></use></svg>
+					<h3>No packages yet</h3>
+					<p>Create your first package to define tenant limits.</p>
+					<button type="button" class="btn" data-spa-empty-new
+						data-ln-modal-for="package-modal"
+						data-ln-fill-form="package-form">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+						New package
+					</button>
+				</article>
+			</template>
+
+			<template data-ln-template="packages-empty-filtered">
+				<article class="ln-table__empty-state">
+					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<h3>No results</h3>
+					<p>Try adjusting your search or filters.</p>
+					<button type="button" data-ln-table-clear-all class="btn">Clear all filters</button>
+				</article>
+			</template>
+
+		</section>
+
+		<!-- Packages table: status filter popover -->
+		<div data-ln-popover id="filter-packages-active">
+			<ul data-ln-filter="packages-table">
+				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
+				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>
+			</ul>
+		</div>
+
+		<article data-view-error hidden>
+			<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+			<h3>Failed to load packages</h3>
+			<p data-view-error-msg>The server did not respond. Changes are not saved while it is unreachable.</p>
+			<button type="button" class="btn" data-view-retry>Retry</button>
+		</article>
+	</section>
+</template>
+
+<!-- @zone persistent -->
+<!-- Package modal -->
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal">
+	<form data-ln-form="package-form" id="package-form" data-ln-form-typed>
+		<header>
+			<h3 id="package-modal-title" data-ln-fillable>
+				<span data-ln-modal-when="new">New package</span>
+				<span data-ln-modal-when="edit">Edit package — <span data-ln-field="name"></span></span>
+			</h3>
+			<button type="button" aria-label="Close" data-ln-modal-close>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<input type="hidden" name="id">
+			<fieldset>
+				<legend>Identity</legend>
+				<div class="form-element">
+					<label for="pkg-name">Name</label>
+					<input id="pkg-name" name="name" required data-ln-validate>
+					<ul data-ln-validate-errors>
+						<li class="hidden" data-ln-validate-error="required">Name is required.</li>
+					</ul>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Limits</legend>
+				<div class="form-grid">
+					<div class="form-element">
+						<label for="pkg-max-users">Max users</label>
+						<input id="pkg-max-users" name="max_users" type="number" min="0" value="0"
+						       data-ln-number data-ln-number-min="0" data-ln-fill-as="maxUsers">
+						<small class="hint">0 = unlimited</small>
+					</div>
+					<div class="form-element">
+						<label for="pkg-max-guests">Max guests</label>
+						<input id="pkg-max-guests" name="max_guests" type="number" min="0" value="0"
+						       data-ln-number data-ln-number-min="0" data-ln-fill-as="maxGuests">
+					</div>
+					<div class="form-element">
+						<label for="pkg-max-standards">Max standards</label>
+						<input id="pkg-max-standards" name="max_standards" type="number" min="0" value="0"
+						       data-ln-number data-ln-number-min="0" data-ln-fill-as="maxStandards">
+					</div>
+					<div class="form-element">
+						<label for="pkg-max-documents">Max documents</label>
+						<input id="pkg-max-documents" name="max_documents" type="number" min="0" value="0"
+						       data-ln-number data-ln-number-min="0" data-ln-fill-as="maxDocuments">
+					</div>
+					<div class="form-element">
+						<label for="pkg-max-storage">Max storage (GB)</label>
+						<input id="pkg-max-storage" name="max_storage" type="number" min="0" value="0"
+						       data-ln-number data-ln-number-min="0" data-ln-fill-as="maxStorage">
+					</div>
+				</div>
+			</fieldset>
+			<div class="form-element">
+				<label>
+					<input name="active" type="checkbox" value="1" checked>
+					Active
+				</label>
+			</div>
+		</main>
+		<footer class="form-actions">
+			<button type="button" data-ln-modal-close>Cancel</button>
+			<button type="submit" class="btn">Save</button>
+		</footer>
+	</form>
+</div>
