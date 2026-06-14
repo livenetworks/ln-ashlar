@@ -1,6 +1,6 @@
 # ln-ashlar Operational Mindset
 
-> Complements `docs/architecture/philosophy.md` — that document covers the strategic *why* (historical cycles, SPA vs SSR, security, longevity). This document is the operational doctrine for contributors and AI agents: ten concrete principles that explain how the library behaves and why decisions are made the way they are.
+> Complements `docs/architecture/philosophy.md` — that document covers the strategic *why* (historical cycles, SPA vs SSR, security, longevity). This document is the operational doctrine for contributors and AI agents: eleven concrete principles that explain how the library behaves and why decisions are made the way they are.
 
 ---
 
@@ -136,7 +136,47 @@ No `console.warn`. No thrown error. The developer sees the warning on the page.
 
 ---
 
-## 10. Case Study — The Filter-Clipping Saga
+## 10. Declarative Wiring Over Coordinators
+
+**Mainstream way:** "Edit this row → open a modal → fill the form" is hand-wired in JS — a click handler stashes the record in a variable, opens the modal, a second handler copies fields into inputs. What a button does is invisible in the markup; you must read the JS to know.
+
+**Ashlar way:** The trigger *declares* the whole flow in attributes — `data-ln-modal-for` opens, `data-ln-fill-form` + `data-ln-fill-*` fill the form, `data-ln-modal-*` set the title. No coordinator. The record rides in the DOM, visible in DevTools. JS is reserved for what the platform genuinely cannot express — submit-to-store, conflict resolution, programmatic fills.
+
+**Why:** Declared behavior has nothing to maintain, is inspectable, and is teleport-safe. A coordinator for the common case is code you read, test, and keep in sync. Deleting it is not losing a feature — it is the feature done right.
+
+**Concrete example:**
+
+```js
+// BEFORE — coordinator JS, re-written on every CRUD page
+let pendingRecord = null;
+table.addEventListener('ln-table:row-action', e => {
+	if (e.detail.action !== 'edit') return;
+	pendingRecord = e.detail.record;
+	modal.setAttribute('data-ln-modal', 'open');
+});
+modal.addEventListener('ln-modal:before-open', () => {
+	window.lnCore.lnFill(modal, pendingRecord);
+	modal.dataset.lnModalMode = pendingRecord ? 'edit' : 'new';
+	pendingRecord = null;
+});
+```
+```html
+<!-- AFTER — zero coordinator JS. The row template stamps per-row values. -->
+<button data-ln-table-row-action="edit"
+		data-ln-modal-for="pkg-modal" data-ln-modal-name="{{ name }}"
+		data-ln-fill-form="pkg-form"
+		data-ln-fill-id="{{ id }}" data-ln-fill-name="{{ name }}">Edit</button>
+```
+
+The four CRUD demos shed ~60 lines of identical coordinator JS this way (see `js/ln-fill/README.md`). A field whose `name` is the backend column (`max_users`) carries `data-ln-fill-as="maxUsers"` to match the camelCased trigger key — `name` stays the wire, the fill key is decoupled.
+
+**Where the coordinator still earns its place:** when the fill is *not* a user click — store conflict resolution, an import workflow, a deep-link pre-fill. Then `window.lnCore.lnFill(el, record)` dispatched from an event handler is correct. The rule: **click-triggered → declarative; programmatic → coordinator.**
+
+**Corollary — reach for the platform first.** This layer invents nothing: `data-*` read via `dataset` (camelCased for free), attribute writes via `setAttribute`, native `form.reset()`. Before building a bespoke mechanism, check whether the browser already is one. "Don't reinvent hot water."
+
+---
+
+## 11. Case Study — The Filter-Clipping Saga
 
 ### Symptom
 
