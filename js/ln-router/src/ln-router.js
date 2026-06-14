@@ -317,7 +317,7 @@ function _navigate(fullPath, opts = {}) {
 				if (match.route.title) {
 					document.title = match.route.title;
 				}
-				if (!isRegionHydration) {
+				if (!opts.isHydration) {
 					if (!targetEl.hasAttribute('tabindex')) {
 						targetEl.setAttribute('tabindex', '-1');
 					}

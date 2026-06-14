@@ -832,13 +832,12 @@ function _t(h, d = {}) {
   d.historyAction === "push" ? window.history.pushState(null, "", h) : d.historyAction === "replace" && window.history.replaceState(null, "", h);
   const i = function() {
     for (const { regionKey: e, match: r, targetEl: u } of t) {
-      const a = d.isHydration && u.hasAttribute("data-ln-router-hydrate") && u.children.length > 0;
-      if (!a) {
+      if (!(d.isHydration && u.hasAttribute("data-ln-router-hydrate") && u.children.length > 0)) {
         me(u);
         const o = r.route.templateNode.content.cloneNode(!0);
         u.replaceChildren(o);
       }
-      if (Nt.set(u, r.route.templateNode), e === "__primary__" && (r.route.title && (document.title = r.route.title), !a)) {
+      if (Nt.set(u, r.route.templateNode), e === "__primary__" && (r.route.title && (document.title = r.route.title), !d.isHydration)) {
         u.hasAttribute("tabindex") || u.setAttribute("tabindex", "-1");
         const o = u.querySelector("h1, h2, h3, h4, h5, h6");
         o ? (o.setAttribute("tabindex", "-1"), o.focus()) : u.focus(), u.scrollIntoView({ block: "start", behavior: "instant" });

@@ -173,10 +173,10 @@ document.addEventListener('ln-router:before-navigate', (e) => {
 
 ## 5. Accessibility & Screen Reader Continuity
 
-`ln-router` shifts focus automatically on each successful navigation to ensure compatibility with assistive technologies (screen readers):
-1. **Focus Shifting**: The router looks for the first heading element (`h1` through `h6`) in the newly mounted template. If found, it dynamically assigns `tabindex="-1"` and calls `.focus()` on it. If no heading element is present, focus is shifted to the outlet container itself.
+`ln-router` shifts focus automatically on each user-initiated navigation (click or popstate back/forward) to ensure compatibility with assistive technologies (screen readers). Focus is **not** shifted on the initial page load (boot render) to avoid an unexpected visible focus ring without user action.
+1. **Focus Shifting** (user navigation only): The router looks for the first heading element (`h1` through `h6`) in the newly mounted template. If found, it dynamically assigns `tabindex="-1"` and calls `.focus()` on it. If no heading element is present, focus is shifted to the outlet container itself.
 2. **Title Updates**: When `data-ln-route-title` is defined, the router updates `document.title`, which is announced by screen readers upon focus shifting.
-3. **Scroll Management**: The router automatically scrolls the target element into view via `.scrollIntoView({ block: 'start', behavior: 'instant' })` to reset the viewport for the new content.
+3. **Scroll Management** (user navigation only): The router automatically scrolls the target element into view via `.scrollIntoView({ block: 'start', behavior: 'instant' })` to reset the viewport for the new content.
 
 ---
 
