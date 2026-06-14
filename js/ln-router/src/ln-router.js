@@ -456,8 +456,6 @@ function _registerRoute(tmpl) {
 
 	region.routes.set(pattern, routeMetadata);
 	region.sorted = Array.from(region.routes.values()).sort(_compareSpecificity);
-
-	_boot();
 }
 
 function _unregisterRoute(tmpl) {
@@ -489,5 +487,6 @@ _component.prototype.destroy = function () {
 
 // registerComponent feeds registerRoute via onInit
 registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-router', {
-	extraAttributes: ['data-ln-route-target', 'data-ln-route-title']
+	extraAttributes: ['data-ln-route-target', 'data-ln-route-title'],
+	onInit: function () { if (regionRegistry.size > 0) _boot(); }
 });

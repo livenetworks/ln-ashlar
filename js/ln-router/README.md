@@ -145,6 +145,7 @@ All events bubble from the target outlet element.
 
 ### Timing guarantee
 
+The initial render runs after the full route scan completes — all `<template data-ln-route>` elements in the document are registered before the first navigation fires.
 The initial `ln-router:navigated` (on a matched route) and boot-path `ln-router:not-found` (on no match) dispatches are **deferred one microtask** via `queueMicrotask`. This ensures that listeners registered during the same `DOMContentLoaded` burst — i.e. in a `<script defer>` tag that appears after the router bundle — always receive the boot event. When the View Transitions API is available, the deferral is handled via the VT callback rather than literally `queueMicrotask`, but the guarantee is identical — listeners in a later `defer` script still receive the boot event.
 
 All subsequent navigations (link clicks, `popstate`, programmatic `router.navigate()`/`router.replace()`) dispatch **synchronously**; no deferral applies once the boot phase is complete.
