@@ -138,13 +138,13 @@
 						</article>
 
 						<article>
-							<h4>Hash tabs — URL sync takes precedence</h4>
-							<p><code>id="hash-tabs-demo"</code> — hash sync is active. <code>data-ln-persist</code> would be ignored even if added.</p>
+							<h4>Hash tabs — anchor triggers sync to the URL</h4>
+							<p><strong>Anchor triggers</strong> (<code>&lt;a href="#…"&gt;</code>) switch the group to hash mode. <code>id="hash-tabs-demo"</code> is the URL namespace; no localStorage is written. (Button triggers, by contrast, would persist — see above.)</p>
 							<section id="hash-tabs-demo" data-ln-tabs data-ln-tabs-default="alpha">
 								<nav>
-									<button data-ln-tab="alpha">Alpha</button>
-									<button data-ln-tab="beta">Beta</button>
-									<button data-ln-tab="gamma">Gamma</button>
+									<a href="#hash-tabs-demo:alpha" data-ln-tab>Alpha</a>
+									<a href="#hash-tabs-demo:beta" data-ln-tab>Beta</a>
+									<a href="#hash-tabs-demo:gamma" data-ln-tab>Gamma</a>
 								</nav>
 								<section data-ln-panel="alpha">
 									<h4>Alpha</h4>

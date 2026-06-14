@@ -1,0 +1,117 @@
+@use 'spacing' as *;
+@use 'display' as *;
+@use 'typography' as *;
+@use 'colors' as *;
+@use 'borders' as *;
+@use 'transitions' as *;
+@use 'motion' as *;
+@use 'focus' as *;
+@use 'prose' as *;
+
+// ─── Editor ────────────────────────────────────────────────────
+// Lightweight WYSIWYG editor wrapper: toolbar + contentEditable
+// surface. The editing surface reuses @include prose for content
+// formatting so authored content matches rendered output.
+//
+// Structure:
+//   [data-ln-editor]
+//     > nav                    toolbar
+//       > ul > li > button     formatting actions (grouped)
+//     > .ln-editor__surface    contentEditable div (JS-created)
+//     > textarea               hidden source (form submission)
+
+@mixin editor {
+	@include border;
+	border-radius: var(--radius);
+	overflow: hidden;
+	--color-bg: var(--bg-base);
+	background: var(--color-bg);
+
+	// ─── Toolbar ───────────────────────────────────────────────
+	> nav {
+		@include flex;
+		@include flex-wrap;
+		@include items-center;
+		--gap: var(--size-2xs);
+		gap: var(--gap);
+		--padding-y: var(--size-xs);
+		--padding-x: var(--size-sm);
+		padding: var(--padding-y) var(--padding-x);
+		--color-bg: var(--bg-sunken);
+		background: var(--color-bg);
+		border-bottom: var(--border-width) solid var(--color-border);
+
+		// Button groups — each <ul> is a visual group
+		> ul {
+			@include flex;
+			@include items-center;
+			--gap: var(--size-2xs);
+			gap: var(--gap);
+			list-style: none;
+			padding: 0;
+			margin: 0;
+
+			// Visual separator between groups (not on last)
+			&:not(:last-child) {
+				--padding-x: var(--size-xs);
+				padding-right: var(--padding-x);
+				border-right: var(--border-width) solid var(--color-border);
+				--margin-inline: var(--size-xs);
+				margin-right: var(--margin-inline);
+			}
+		}
+
+		// Toolbar buttons — compact, neutral
+		button {
+			--padding-y: var(--size-2xs);
+			--padding-x: var(--size-xs);
+			padding: var(--padding-y) var(--padding-x);
+			border-radius: var(--radius-sm);
+			background: transparent;
+			color: var(--color-fg);
+			@include transition-colors;
+
+			&:hover {
+				--color-bg: var(--bg-base);
+				background: var(--color-bg);
+			}
+
+			// Active formatting state (JS toggles this class)
+			&.ln-editor-active {
+				--color-bg: var(--bg-base);
+				background: var(--color-bg);
+				color: var(--color-accent);
+			}
+		}
+	}
+
+	// ─── Editing Surface ───────────────────────────────────────
+	> .ln-editor__surface {
+		@include prose;
+		max-width: none; // Override prose's max-width constraint
+		--padding-y: var(--size-md);
+		--padding-x: var(--size-md);
+		padding: var(--padding-y) var(--padding-x);
+		min-height: 8rem;
+		outline: none;
+		cursor: text;
+
+		// Empty placeholder via CSS
+		&:empty::before {
+			content: attr(data-placeholder);
+			--color-fg: var(--fg-subtle);
+			color: var(--color-fg);
+			pointer-events: none;
+		}
+	}
+
+	// Focus state on the whole editor when editing
+	&:focus-within {
+		border-color: var(--color-accent);
+	}
+
+	// ─── Hidden textarea (source for form submission) ──────────
+	> textarea[data-ln-editor-source] {
+		display: none;
+	}
+}

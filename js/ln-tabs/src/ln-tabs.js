@@ -48,11 +48,27 @@ import { persistGet, persistSet } from '../../ln-core';
 		this.tabs   = Array.from(this.dom.querySelectorAll("[data-ln-tab]"));
 		this.panels = Array.from(this.dom.querySelectorAll("[data-ln-panel]"));
 
-		// nsKey/hashEnabled resolved BEFORE mapTabs build — anchor key
-		// derivation in _keyFromTrigger needs nsKey to pick the right
-		// fragment.
+		// Mode is declared by the TRIGGER TYPE, not by presence of an id:
+		//   <a href="#…">  → URL hash sync (shareable, back/forward aware)
+		//   <button>       → localStorage persist (opt-in via data-ln-persist)
+		// This decouples the two axes that used to collide on `id`: now
+		// `id`/`data-ln-tabs-key` only NAMESPACE the hash, and
+		// `data-ln-persist` only names the storage key — neither selects the
+		// mode. The markup does. Mixed triggers almost always signal a markup
+		// mistake, so we fall back to persist and warn rather than guess.
+		//
+		// nsKey resolved BEFORE mapTabs build — anchor key derivation in
+		// _keyFromTrigger needs nsKey to pick the right fragment.
+		const anchorTabs = this.tabs.filter(t => t.tagName === "A" && (t.getAttribute("href") || "").startsWith("#"));
+		const allAnchors = anchorTabs.length > 0 && anchorTabs.length === this.tabs.length;
 		this.nsKey       = (this.dom.getAttribute("data-ln-tabs-key") || this.dom.id || "").toLowerCase().trim();
-		this.hashEnabled = !!this.nsKey;
+		this.hashEnabled = allAnchors && !!this.nsKey;
+
+		if (anchorTabs.length > 0 && anchorTabs.length !== this.tabs.length) {
+			console.warn('[ln-tabs] Mixed <a href="#…"> and <button> triggers in one group — using persist mode. Pick one: anchors for URL hash, buttons for localStorage persist.', this.dom);
+		} else if (allAnchors && !this.nsKey) {
+			console.warn('[ln-tabs] Anchor triggers need a hash namespace — add id or data-ln-tabs-key to the wrapper. Falling back to non-hash mode.', this.dom);
+		}
 
 		this.mapTabs = {};
 		this.mapPanels = {};

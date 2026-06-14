@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" data-ln-debug>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Editor — ln-ashlar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-theme';
+		var VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<link rel="stylesheet" href="dist/admin.css">
+	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
+	<script src="../dist/ln-ashlar.iife.js" defer></script>
+	<script src="dist/demo.js" defer></script>
+</head>
+<body>
+	<!-- Toast container -->
+	<ul data-ln-toast></ul>
+
+	<div class="app-wrapper">
+		<!-- Header -->
+		<header class="app-header">
+			<div class="header-left">
+				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+				</button>
+				<h1>Editor</h1>
+			</div>
+			<div class="header-right">
+				<div class="header-actions">
+					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+					</button>
+					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
+						<ul>
+							<li><button type="button" data-demo-theme="light"><span class="demo-theme-swatch" data-preset="light"></span>Light</button></li>
+							<li><button type="button" data-demo-theme="dark"><span class="demo-theme-swatch" data-preset="dark"></span>Dark</button></li>
+							<li><button type="button" data-demo-theme="ocean"><span class="demo-theme-swatch" data-preset="ocean"></span>Ocean</button></li>
+							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
+							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
+							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+						</ul>
+					</div>
+					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
+						<span>Test Toast</span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- App Body -->
+		<main class="app-main">
+		<!-- Sidebar -->
+		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
+			<header>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
+				<span class="app-name">ashlar-gui</span>
+				<label class="search sidebar-search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</label>
+			</header>
+
+			<main>
+				<nav class="nav" id="demo-nav" data-ln-nav="active">
+					<ul>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">CSS Components</h6>
+					<ul>
+						<li><a href="typography.html"><span class="nav-label">Typography</span></a></li>
+						<li><a href="cards.html"><span class="nav-label">Cards</span></a></li>
+						<li><a href="chip.html"><span class="nav-label">Chip</span></a></li>
+						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
+						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
+						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
+						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
+						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
+						<li><a href="utilities.html"><span class="nav-label">Utilities</span></a></li>
+						<li><a href="mixins.html"><span class="nav-label">Mixins Reference</span></a></li>
+						<li><a href="page-header.html"><span class="nav-label">Page Header</span></a></li>
+						<li><a href="prose.html"><span class="nav-label">Prose</span></a></li>
+						<li><a href="stat-card.html"><span class="nav-label">Stat Card</span></a></li>
+						<li><a href="status-badge.html"><span class="nav-label">Status Badge</span></a></li>
+						<li><a href="stepper.html"><span class="nav-label">Stepper</span></a></li>
+						<li><a href="timeline.html"><span class="nav-label">Timeline</span></a></li>
+						<li><a href="empty-state.html"><span class="nav-label">Empty State</span></a></li>
+					</ul>
+
+					<h6 class="nav-section">JS Components</h6>
+					<ul>
+						<li><a href="accordion.html"><span class="nav-label">Accordion</span></a></li>
+						<li><a href="ajax.html"><span class="nav-label">AJAX</span></a></li>
+						<li><a href="autoresize.html"><span class="nav-label">Autoresize</span></a></li>
+						<li><a href="autosave.html"><span class="nav-label">Autosave</span></a></li>
+						<li><a href="circular-progress.html"><span class="nav-label">Circular Progress</span></a></li>
+						<li><a href="confirm.html"><span class="nav-label">Confirm</span></a></li>
+						<li><a href="dropdown.html"><span class="nav-label">Dropdown</span></a></li>
+						<li><a href="editor.html" aria-current="page"><span class="nav-label">Editor</span></a></li>
+						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
+						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
+						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
+						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
+						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
+						<li><a href="persist.html"><span class="nav-label">Persist</span></a></li>
+						<li><a href="popover.html"><span class="nav-label">Popover</span></a></li>
+						<li><a href="progress.html"><span class="nav-label">Progress</span></a></li>
+						<li><a href="router.html"><span class="nav-label">Router</span></a></li>
+						<li><a href="search.html"><span class="nav-label">Search</span></a></li>
+						<li><a href="select.html"><span class="nav-label">Select</span></a></li>
+						<li><a href="sortable.html"><span class="nav-label">Sortable</span></a></li>
+						<li><a href="store.html"><span class="nav-label">Store</span></a></li>
+						<li><a href="store-usecase.html"><span class="nav-label">Store — Usecase</span></a></li>
+						<li><a href="list.html"><span class="nav-label">List &amp; Card Grid</span></a></li>
+						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
+						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
+						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
+						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
+						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
+						<li><a href="tabs.html"><span class="nav-label">Tabs</span></a></li>
+						<li><a href="time.html"><span class="nav-label">Time</span></a></li>
+						<li><a href="toast.html"><span class="nav-label">Toast</span></a></li>
+						<li><a href="toggle.html"><span class="nav-label">Toggle</span></a></li>
+						<li><a href="tooltip.html"><span class="nav-label">Tooltip</span></a></li>
+						<li><a href="translations.html"><span class="nav-label">Translations</span></a></li>
+						<li><a href="upload.html"><span class="nav-label">Upload</span></a></li>
+						<li><a href="validate.html"><span class="nav-label">Validate</span></a></li>
+						<li><a href="diagnostics.html"><span class="nav-label">Diagnostics (DOM Linter)</span></a></li>
+					</ul>
+				</nav>
+			</main>
+
+			<footer>
+				<small>ashlar-gui v1.2.0</small>
+			</footer>
+		</aside>
+		<div class="app-scrim"></div>
+
+		<!-- Content -->
+		<section>
+			<div class="app-content-wrapper">
+<!-- Overview -->
+					<section class="section-card">
+						<header><h3>Overview &amp; Philosophy</h3></header>
+						<main>
+							<p><code>ln-editor</code> is a lightweight WYSIWYG rich text editor that follows ln-ashlar's progressive enhancement doctrine. It enhances a standard <code>&lt;textarea&gt;</code> into a <code>contentEditable</code> editing surface with a toolbar. Without JavaScript, the textarea works as a plain text input — zero functionality is lost.</p>
+
+							<p>The toolbar is <strong>authored HTML</strong>, not generated by JS. The consumer controls which formatting buttons appear, their order, and their labels. This follows Mindset §1: "Markup Is the Application." The editing surface uses <code>@include prose</code> so content looks identical to how it will render in a <code>.prose</code> display container.</p>
+
+							<h4>How it works</h4>
+							<ol>
+								<li>JS finds the <code>&lt;textarea&gt;</code> inside <code>[data-ln-editor]</code></li>
+								<li>Creates a <code>&lt;div contenteditable&gt;</code> editing surface</li>
+								<li>Hides the textarea (CSS, via <code>data-ln-editor-source</code>)</li>
+								<li>On every content change, syncs <code>surface.innerHTML → textarea.value</code></li>
+								<li>On form submit, the textarea already has the current HTML — the server receives it</li>
+							</ol>
+
+							<p>For full documentation see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-editor/README.md"><code>ln-editor</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/editor.md">architecture reference</a>.</p>
+						</main>
+					</section>
+
+					<!-- Anatomy -->
+					<section class="section-card">
+						<header><h3>Anatomy</h3></header>
+						<main>
+							<p>The minimal markup contract:</p>
+<pre><code>&lt;div data-ln-editor&gt;
+    &lt;nav&gt;
+        &lt;ul&gt;
+            &lt;li&gt;&lt;button type="button" data-ln-editor-action="bold" aria-label="Bold"&gt;
+                &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-bold"&gt;&lt;/use&gt;&lt;/svg&gt;
+            &lt;/button&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;button type="button" data-ln-editor-action="italic" aria-label="Italic"&gt;
+                &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-italic"&gt;&lt;/use&gt;&lt;/svg&gt;
+            &lt;/button&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/nav&gt;
+    &lt;textarea name="content" placeholder="Write something..."&gt;&lt;/textarea&gt;
+&lt;/div&gt;</code></pre>
+
+							<h4>Toolbar structure</h4>
+							<p><code>&lt;nav&gt;</code> wraps the toolbar. Each <code>&lt;ul&gt;</code> is a visual button group — multiple <code>&lt;ul&gt;</code> elements create separator lines between groups. <code>&lt;button data-ln-editor-action="..."&gt;</code> binds each formatting action. The consumer decides which actions to include.</p>
+
+							<h4>Attributes reference</h4>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Attribute</th><th>On element</th><th>Owned by</th><th>Description</th></tr></thead>
+								<tbody>
+									<tr><td><code>data-ln-editor</code></td><td>Container <code>&lt;div&gt;</code></td><td><code>ln-editor</code></td><td>Marks the container as an editor instance</td></tr>
+									<tr><td><code>data-ln-editor-action</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-editor</code></td><td>Formatting action to execute on click</td></tr>
+									<tr><td><code>data-ln-editor-source</code></td><td><code>&lt;textarea&gt;</code></td><td><code>ln-editor</code> (auto)</td><td>JS sets this to hide the textarea via CSS. Removed on <code>destroy()</code></td></tr>
+								</tbody>
+							</table>
+							</div>
+
+							<h4>Progressive enhancement</h4>
+							<p>Without JS, the <code>&lt;nav&gt;</code> toolbar is inert and the <code>&lt;textarea&gt;</code> is a normal text input. With JS, the textarea is hidden and the contentEditable surface takes over.</p>
+						</main>
+					</section>
+
+					<!-- Full Toolbar Example -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Full toolbar</h3></header>
+						<main>
+							<p>All available formatting actions. Active buttons are highlighted with the accent color as you move the cursor through formatted content.</p>
+
+							<div class="form-element">
+								<label for="demo-full">Article body</label>
+								<div data-ln-editor>
+									<nav>
+										<ul>
+											<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="italic" aria-label="Italic">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="underline" aria-label="Underline">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-underline"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="strikethrough" aria-label="Strikethrough">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-strikethrough"></use></svg>
+											</button></li>
+										</ul>
+										<ul>
+											<li><button type="button" data-ln-editor-action="heading-2" aria-label="Heading 2">H2</button></li>
+											<li><button type="button" data-ln-editor-action="heading-3" aria-label="Heading 3">H3</button></li>
+											<li><button type="button" data-ln-editor-action="heading-4" aria-label="Heading 4">H4</button></li>
+										</ul>
+										<ul>
+											<li><button type="button" data-ln-editor-action="unordered-list" aria-label="Bullet list">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-list"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="ordered-list" aria-label="Numbered list">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-list-numbers"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="blockquote" aria-label="Blockquote">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-blockquote"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="code" aria-label="Code block">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-code"></use></svg>
+											</button></li>
+										</ul>
+										<ul>
+											<li><button type="button" data-ln-editor-action="link" aria-label="Insert link">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="unlink" aria-label="Remove link">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-unlink"></use></svg>
+											</button></li>
+										</ul>
+										<ul>
+											<li><button type="button" data-ln-editor-action="clear" aria-label="Clear formatting">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-clear-formatting"></use></svg>
+											</button></li>
+										</ul>
+									</nav>
+									<textarea id="demo-full" name="body" placeholder="Write your article..."></textarea>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- Minimal Toolbar Example -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Minimal toolbar</h3></header>
+						<main>
+							<p>Only bold, italic, and link — suitable for comments or short descriptions. The toolbar is authored HTML — include only what you need.</p>
+
+							<div class="form-element">
+								<label for="demo-minimal">Comment</label>
+								<div data-ln-editor>
+									<nav>
+										<ul>
+											<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="italic" aria-label="Italic">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="link" aria-label="Insert link">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
+											</button></li>
+										</ul>
+									</nav>
+									<textarea id="demo-minimal" name="comment" placeholder="Write a comment..."></textarea>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- Pre-filled Content Example -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Pre-filled content</h3></header>
+						<main>
+							<p>Server-rendered HTML in the textarea is used as initial editor content. The editing surface renders it with <code>@include prose</code> styling.</p>
+
+							<div class="form-element">
+								<label for="demo-prefilled">Bio</label>
+								<div data-ln-editor>
+									<nav>
+										<ul>
+											<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="italic" aria-label="Italic">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="link" aria-label="Link">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
+											</button></li>
+										</ul>
+										<ul>
+											<li><button type="button" data-ln-editor-action="unordered-list" aria-label="Bullet list">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-list"></use></svg>
+											</button></li>
+										</ul>
+									</nav>
+									<textarea id="demo-prefilled" name="bio"><p>Ana Kovachevska is a <strong>Senior Software Engineer</strong> at LiveNetworks with expertise in <em>distributed systems</em> and <em>real-time collaboration</em>.</p><h3>Key achievements</h3><ul><li>Led the migration to microservices architecture</li><li>Reduced API response times by 40%</li><li>Mentored 5 junior developers</li></ul><blockquote>Building software that makes people's lives easier is what drives me every day.</blockquote><p>Connect with Ana on <a href="https://linkedin.com">LinkedIn</a> or <a href="https://github.com">GitHub</a>.</p></textarea>
+								</div>
+							</div>
+						</main>
+					</section>
+
+					<!-- Form Integration Example -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Form integration</h3></header>
+						<main>
+							<p>The editor syncs content to the hidden <code>&lt;textarea&gt;</code> on every change. Click <strong>Save</strong> to see the raw HTML that would be submitted.</p>
+
+							<form id="demo-editor-form" data-ln-form>
+								<div class="form-element">
+									<label for="demo-title">Title</label>
+									<input type="text" id="demo-title" name="title" placeholder="Article title..." value="My First Article">
+								</div>
+								<div class="form-element">
+									<label for="demo-form-editor">Content</label>
+									<div data-ln-editor>
+										<nav>
+											<ul>
+												<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
+												</button></li>
+												<li><button type="button" data-ln-editor-action="italic" aria-label="Italic">
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
+												</button></li>
+												<li><button type="button" data-ln-editor-action="underline" aria-label="Underline">
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-underline"></use></svg>
+												</button></li>
+											</ul>
+											<ul>
+												<li><button type="button" data-ln-editor-action="heading-2" aria-label="Heading 2">H2</button></li>
+												<li><button type="button" data-ln-editor-action="heading-3" aria-label="Heading 3">H3</button></li>
+											</ul>
+											<ul>
+												<li><button type="button" data-ln-editor-action="unordered-list" aria-label="Bullet list">
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-list"></use></svg>
+												</button></li>
+												<li><button type="button" data-ln-editor-action="ordered-list" aria-label="Numbered list">
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-list-numbers"></use></svg>
+												</button></li>
+											</ul>
+											<ul>
+												<li><button type="button" data-ln-editor-action="link" aria-label="Link">
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
+												</button></li>
+											</ul>
+										</nav>
+										<textarea id="demo-form-editor" name="content" placeholder="Write your content..."></textarea>
+									</div>
+								</div>
+								<div class="form-actions">
+									<button type="button" id="demo-form-reset">Reset</button>
+									<button type="submit">Save</button>
+								</div>
+							</form>
+							<pre id="demo-form-output" hidden></pre>
+						</main>
+					</section>
+
+					<!-- Keyboard Shortcuts -->
+					<section class="section-card">
+						<header><h3>Keyboard shortcuts</h3></header>
+						<main>
+							<p>Standard keyboard shortcuts work inside the editing surface:</p>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+								<tbody>
+									<tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>Toggle bold</td></tr>
+									<tr><td><kbd>Ctrl</kbd>+<kbd>I</kbd></td><td>Toggle italic</td></tr>
+									<tr><td><kbd>Ctrl</kbd>+<kbd>U</kbd></td><td>Toggle underline</td></tr>
+									<tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Insert / edit link</td></tr>
+								</tbody>
+							</table>
+							</div>
+							<p>On macOS, use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</p>
+						</main>
+					</section>
+
+					<!-- Toolbar Actions Reference -->
+					<section class="section-card">
+						<header><h3>Toolbar actions reference</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th><code>data-ln-editor-action</code></th><th>Effect</th><th>Shortcut</th></tr></thead>
+								<tbody>
+									<tr><td><code>bold</code></td><td>Toggle bold</td><td>Ctrl+B</td></tr>
+									<tr><td><code>italic</code></td><td>Toggle italic</td><td>Ctrl+I</td></tr>
+									<tr><td><code>underline</code></td><td>Toggle underline</td><td>Ctrl+U</td></tr>
+									<tr><td><code>strikethrough</code></td><td>Toggle strikethrough</td><td>—</td></tr>
+									<tr><td><code>heading-2</code></td><td>Toggle H2</td><td>—</td></tr>
+									<tr><td><code>heading-3</code></td><td>Toggle H3</td><td>—</td></tr>
+									<tr><td><code>heading-4</code></td><td>Toggle H4</td><td>—</td></tr>
+									<tr><td><code>blockquote</code></td><td>Toggle blockquote</td><td>—</td></tr>
+									<tr><td><code>code</code></td><td>Toggle code block</td><td>—</td></tr>
+									<tr><td><code>ordered-list</code></td><td>Toggle numbered list</td><td>—</td></tr>
+									<tr><td><code>unordered-list</code></td><td>Toggle bullet list</td><td>—</td></tr>
+									<tr><td><code>link</code></td><td>Insert/edit link</td><td>Ctrl+K</td></tr>
+									<tr><td><code>unlink</code></td><td>Remove link</td><td>—</td></tr>
+									<tr><td><code>clear</code></td><td>Remove all formatting</td><td>—</td></tr>
+									<tr><td><code>paragraph</code></td><td>Reset to paragraph</td><td>—</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+					<!-- API -->
+					<section class="section-card">
+						<header><h3>API</h3></header>
+						<main>
+<pre><code>const el = document.querySelector('[data-ln-editor]');
+
+// Read current HTML content
+el.lnEditor.getHTML();
+
+// Set content programmatically
+el.lnEditor.setHTML('&lt;p&gt;New content&lt;/p&gt;');
+
+// Or via request event (coordinator pattern)
+el.dispatchEvent(new CustomEvent('ln-editor:set-content', {
+    detail: { html: '&lt;p&gt;Content via event&lt;/p&gt;' }
+}));
+
+// Destroy — restores textarea visibility
+el.lnEditor.destroy();</code></pre>
+						</main>
+					</section>
+
+					<!-- Programmatic API Demo -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Programmatic control</h3></header>
+						<main>
+							<p>Use the buttons to set content or destroy/recreate the editor instance.</p>
+
+							<div class="form-element">
+								<label for="demo-prog">Managed editor</label>
+								<div id="demo-prog-editor" data-ln-editor>
+									<nav>
+										<ul>
+											<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
+											</button></li>
+											<li><button type="button" data-ln-editor-action="italic" aria-label="Italic">
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
+											</button></li>
+										</ul>
+									</nav>
+									<textarea id="demo-prog" name="managed" placeholder="Programmatic content..."></textarea>
+								</div>
+							</div>
+							<nav class="demo-actions">
+								<button type="button" id="demo-prog-set">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+									Set content
+								</button>
+								<button type="button" id="demo-prog-read">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-eye"></use></svg>
+									Read HTML
+								</button>
+								<button type="button" id="demo-prog-destroy">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+									Destroy
+								</button>
+								<button type="button" id="demo-prog-reinit">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg>
+									Re-init
+								</button>
+							</nav>
+							<pre id="demo-prog-output" hidden></pre>
+						</main>
+					</section>
+
+					<!-- Events -->
+					<section class="section-card">
+						<header><h3>Events reference</h3></header>
+						<main>
+							<div class="table-container">
+							<table>
+								<thead><tr><th>Event</th><th>Type</th><th>Detail</th><th>When</th></tr></thead>
+								<tbody>
+									<tr><td><code>ln-editor:changed</code></td><td>Notification</td><td><code>{ html, target }</code></td><td>Content changed</td></tr>
+									<tr><td><code>ln-editor:before-change</code></td><td>Lifecycle (cancelable)</td><td><code>{ action, target }</code></td><td>Before formatting command</td></tr>
+									<tr><td><code>ln-editor:focus</code></td><td>Notification</td><td><code>{ target }</code></td><td>Surface focused</td></tr>
+									<tr><td><code>ln-editor:blur</code></td><td>Notification</td><td><code>{ target }</code></td><td>Surface blurred</td></tr>
+									<tr><td><code>ln-editor:set-content</code></td><td>Request</td><td><code>{ html }</code></td><td>Set content programmatically</td></tr>
+									<tr><td><code>ln-editor:destroyed</code></td><td>Notification</td><td><code>{ target }</code></td><td>Instance destroyed</td></tr>
+								</tbody>
+							</table>
+							</div>
+						</main>
+					</section>
+
+<script>
+	(function () {
+		// ─── Form integration demo ─────────────────────────────
+		var formEl = document.getElementById('demo-editor-form');
+		var formOutput = document.getElementById('demo-form-output');
+		var resetBtn = document.getElementById('demo-form-reset');
+
+		if (formEl) {
+			formEl.addEventListener('submit', function (e) {
+				e.preventDefault();
+				var data = new FormData(formEl);
+				var result = {};
+				data.forEach(function (value, key) { result[key] = value; });
+				if (formOutput) {
+					formOutput.textContent = JSON.stringify(result, null, 2);
+					formOutput.removeAttribute('hidden');
+				}
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: { type: 'success', title: 'Saved', message: 'Form data captured — see raw output below.' }
+				}));
+			});
+		}
+
+		if (resetBtn && formEl) {
+			resetBtn.addEventListener('click', function () {
+				if (formEl.lnForm) formEl.lnForm.reset();
+				var editor = formEl.querySelector('[data-ln-editor]');
+				if (editor) {
+					editor.dispatchEvent(new CustomEvent('ln-editor:set-content', {
+						detail: { html: '' }
+					}));
+				}
+				if (formOutput) formOutput.setAttribute('hidden', '');
+			});
+		}
+
+		// ─── Programmatic demo ──────────────────────────────────
+		var progEditor = document.getElementById('demo-prog-editor');
+		var progOutput = document.getElementById('demo-prog-output');
+
+		var setBtn = document.getElementById('demo-prog-set');
+		var readBtn = document.getElementById('demo-prog-read');
+		var destroyBtn = document.getElementById('demo-prog-destroy');
+		var reinitBtn = document.getElementById('demo-prog-reinit');
+
+		if (setBtn && progEditor) {
+			setBtn.addEventListener('click', function () {
+				progEditor.dispatchEvent(new CustomEvent('ln-editor:set-content', {
+					detail: {
+						html: '<h2>Programmatic Content</h2><p>This content was set via <code>ln-editor:set-content</code> request event.</p><ul><li>First item</li><li>Second item</li><li>Third item</li></ul><p>The <strong>textarea value</strong> is synced automatically.</p>'
+					}
+				}));
+			});
+		}
+
+		if (readBtn && progEditor && progOutput) {
+			readBtn.addEventListener('click', function () {
+				if (progEditor.lnEditor) {
+					progOutput.textContent = progEditor.lnEditor.getHTML();
+					progOutput.removeAttribute('hidden');
+				}
+			});
+		}
+
+		if (destroyBtn && progEditor) {
+			destroyBtn.addEventListener('click', function () {
+				if (progEditor.lnEditor) {
+					progEditor.lnEditor.destroy();
+					window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+						detail: { type: 'info', title: 'Destroyed', message: 'Editor instance destroyed. Textarea is visible again.' }
+					}));
+				}
+			});
+		}
+
+		if (reinitBtn && progEditor) {
+			reinitBtn.addEventListener('click', function () {
+				if (!progEditor.lnEditor && window.lnEditor) {
+					window.lnEditor(progEditor);
+					window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+						detail: { type: 'success', title: 'Re-initialized', message: 'Editor instance re-created.' }
+					}));
+				}
+			});
+		}
+	})();
+</script>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="app-footer">
+			<span>ashlar-gui &copy; 2026 LiveNetworks</span>
+			<span>ln-ashlar v1.2.0</span>
+		</footer>
+		</main>
+	</div><!-- /.app-wrapper -->
+
+	<!-- Modals (outside app-wrapper) -->
+	<div class="ln-modal" data-ln-modal id="demo-basic">
+		<form>
+			<header>
+				<h3>Basic Modal</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<p>This is a basic modal with a title and content.</p>
+				<p>Press ESC or click close.</p>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Close</button>
+			</footer>
+		</form>
+	</div>
+
+	<div class="ln-modal" data-ln-modal id="demo-form">
+		<form>
+			<header>
+				<h3>Add User</h3>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main>
+				<div class="form-element">
+					<label for="modal-name">Name</label>
+					<input type="text" id="modal-name" placeholder="Enter name...">
+				</div>
+				<div class="form-element">
+					<label for="modal-email">Email</label>
+					<input type="email" id="modal-email" placeholder="email@example.com">
+				</div>
+				<div class="form-element">
+					<label for="modal-role">Role</label>
+					<select id="modal-role">
+						<option>User</option>
+						<option>Administrator</option>
+						<option>Moderator</option>
+					</select>
+				</div>
+			</main>
+			<footer>
+				<button type="button" data-ln-modal-close>Cancel</button>
+				<button type="submit">Save</button>
+			</footer>
+		</form>
+	</div>
+
+	<script>
+	(function () {
+		const KEY = 'ln-demo-theme';
+		const VALID = ['light', 'dark', 'ocean', 'sunset', 'midnight', 'glass'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-theme') || 'light';
+			document.querySelectorAll('[data-demo-theme]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-theme') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-theme]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-theme');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-theme', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+	</script>
+</body>
+</html>

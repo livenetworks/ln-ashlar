@@ -31,6 +31,7 @@ import './ln-confirm/src/ln-confirm.js';
 import './ln-translations/src/ln-translations.js';
 import './ln-autosave/src/ln-autosave.js';
 import './ln-autoresize/src/ln-autoresize.js';
+import './ln-editor/src/ln-editor.js';
 import './ln-validate/src/ln-validate.js';
 import './ln-form/src/ln-form.js';
 import './ln-slug/src/ln-slug.js';
