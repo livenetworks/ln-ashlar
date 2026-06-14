@@ -303,10 +303,13 @@
 	<!-- ── Modals (persistent, outside outlet) ──────────────────── -->
 
 	<!-- Package modal -->
-	<div class="ln-modal" data-ln-modal id="package-modal">
+	<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
 		<form data-ln-form="package-form" id="package-form" data-ln-form-typed>
 			<header>
-				<h3 id="package-modal-title">New package</h3>
+				<h3 id="package-modal-title">
+					<span data-ln-modal-when="new">New package</span>
+					<span data-ln-modal-when="edit">Edit package — <span data-ln-field="name"></span></span>
+				</h3>
 				<button type="button" aria-label="Close" data-ln-modal-close>
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 				</button>
@@ -352,10 +355,13 @@
 	</div>
 
 	<!-- Tenant modal -->
-	<div class="ln-modal" data-ln-modal id="tenant-modal">
+	<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal" aria-labelledby="tenant-modal-title">
 		<form data-ln-form="tenant-form" id="tenant-form" data-ln-form-typed>
 			<header>
-				<h3 id="tenant-modal-title">New tenant</h3>
+				<h3 id="tenant-modal-title">
+					<span data-ln-modal-when="new">New tenant</span>
+					<span data-ln-modal-when="edit">Edit tenant — <span data-ln-field="name"></span></span>
+				</h3>
 				<button type="button" aria-label="Close" data-ln-modal-close>
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 				</button>

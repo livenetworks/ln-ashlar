@@ -397,6 +397,19 @@ Litmus test: *is this element born from a `<template>` clone filled by a
 renderer?* → `{{ }}` / `data-ln-table-cell-attr`. *Does my own code call
 `fill()` on it?* → `data-ln-field`.
 
+### 5.6 The `name` attribute — bidirectional form-binding key
+
+For form data the `name` attribute binds both directions: `serializeForm` reads **out**, `populateForm`/`lnForm.fill` write **in**. Matching is strictly flat — `el.name === top-level record key`, no nested paths. Extra record keys are ignored; missing keys are NOT cleared (hence reset-before-fill — see [coordinator doctrine](coordinator.md)).
+
+Shape adaptation (nested server responses, renamed fields, ISO dates) happens **once at the store boundary** via `registerDataMapper(name, { ingress, egress })` on `ln-data-coordinator` — never at the fill call-site.
+
+Custom controls participate transparently: `ln-number` and `ln-date` move `name` to a hidden input and intercept its `.value`.
+
+**Exceptions:**
+
+- **`ln-editor`** (contenteditable) — `lnForm.fill` sets the backing textarea, not the surface. Dispatch `ln-editor:set-content` after fill to sync the visual editor.
+- **`ln-options`** (async select) — value is lost if options arrive after fill. Restore on `ln-options:set-data`.
+
 ---
 
 ## 6. The MutationObserver discipline
