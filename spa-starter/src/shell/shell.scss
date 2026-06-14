@@ -1,0 +1,31 @@
+@use '../../../scss/config/mixins' as *;
+
+// App frame — composed from the framework's app-shell mixin contract.
+.app-wrapper { @include app-wrapper; }
+.app-header  { @include app-header; }
+.app-main    { @include app-main; }
+
+#app-sidebar {
+	@include sidebar;
+	@include sidebar-drawer; // drawer behaviour layered on top of sidebar
+}
+
+.app-scrim { @include app-scrim; }
+
+.app-header > .header-left { @include app-header-left; }
+
+// Hamburger is a mobile-drawer control only.
+.menu-toggle {
+	@include mq-up(md) { display: none; }
+}
+
+.app-brand {
+	@include flex;
+	@include items-center;
+	gap: var(--size-sm);
+	@include font-semibold;
+	color: var(--color-fg);
+	text-decoration: none;
+}
+
+#app-view { padding: var(--size-xl); }
