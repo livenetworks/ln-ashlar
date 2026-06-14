@@ -1,0 +1,42 @@
+// ln-editor co-located styles — JS-state-driven CSS only.
+// Visual styling lives in scss/config/mixins/_editor.scss.
+
+// ─── Link popover (JS-created element) ────────────────────────
+// Inline URL input that appears below the toolbar when inserting
+// or editing a link. Created/removed by JS, not authored HTML.
+
+.ln-editor__link-popover {
+	display: flex;
+	align-items: center;
+	gap: var(--size-xs);
+	padding: var(--size-xs) var(--size-sm);
+	background: var(--bg-sunken);
+	border-bottom: var(--border-width) solid var(--color-border);
+
+	> input {
+		flex: 1;
+		min-width: 0;
+		padding: var(--size-2xs) var(--size-sm);
+		font-size: var(--text-body-sm);
+		line-height: var(--lh-body-sm);
+		background: var(--bg-base);
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-sm);
+		color: var(--color-fg);
+		outline: none;
+
+		&:focus-visible {
+			border-color: var(--color-accent);
+		}
+	}
+
+	> button {
+		padding: var(--size-2xs);
+		border-radius: var(--radius-sm);
+		background: transparent;
+
+		&:hover {
+			background: var(--bg-base);
+		}
+	}
+}

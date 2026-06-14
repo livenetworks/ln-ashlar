@@ -31,6 +31,7 @@
 @use 'components/timeline';
 @use 'components/stat-card';
 @use 'components/prose';
+@use 'components/editor';
 @use 'components/scrollbar';
 @use 'components/tooltip';
 @use 'components/popover';
@@ -61,4 +62,5 @@
 @use '../js/ln-search/ln-search';
 @use '../js/ln-table/ln-table' as ln-table-state;
 @use '../js/ln-list/ln-list';
+@use '../js/ln-editor/ln-editor';
 
