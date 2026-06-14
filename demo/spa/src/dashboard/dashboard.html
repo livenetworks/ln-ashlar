@@ -1,0 +1,58 @@
+<!-- @zone routes -->
+<template data-ln-route="/demo/spa" data-ln-route-title="Dashboard — DocuFlow">
+	<section id="dashboard" class="is-loading">
+		<header class="page-header">
+			<div class="page-title">
+				<h1>Dashboard</h1>
+				<p>Packages and tenants at a glance</p>
+			</div>
+		</header>
+		<ul class="stat-grid">
+			<li>
+				<a href="/demo/spa/packages">
+					<span data-ln-stat-label>Packages</span>
+					<strong data-ln-stat-value data-ln-stat="packages" class="is-loading">—</strong>
+				</a>
+			</li>
+			<li>
+				<a href="/demo/spa/tenants">
+					<span data-ln-stat-label>Tenants</span>
+					<strong data-ln-stat-value data-ln-stat="tenants" class="is-loading">—</strong>
+				</a>
+			</li>
+			<li>
+				<a href="/demo/spa/tenants">
+					<span data-ln-stat-label>Active tenants</span>
+					<strong data-ln-stat-value data-ln-stat="tenants" data-ln-stat-filter="active:true" class="is-loading">—</strong>
+				</a>
+			</li>
+			<li>
+				<a href="/demo/spa/packages">
+					<span data-ln-stat-label>Active packages</span>
+					<strong data-ln-stat-value data-ln-stat="packages" data-ln-stat-filter="active:true" class="is-loading">—</strong>
+				</a>
+			</li>
+		</ul>
+		<section class="section-card" id="pkg-usage">
+			<header><h3>Tenants per package</h3></header>
+			<main>
+				<ul data-pkg-usage></ul>
+				<template data-ln-template="pkg-usage-item">
+					<li>
+						<a href="/demo/spa/tenants">
+							<span class="pkg-usage-name" data-pkg-usage-name></span>
+							<span class="pkg-usage-count" data-pkg-usage-count></span>
+							<span class="progress"><span data-ln-progress="0"></span></span>
+						</a>
+					</li>
+				</template>
+			</main>
+		</section>
+		<article data-view-error hidden>
+			<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+			<h3>Failed to load stats</h3>
+			<p data-view-error-msg>The server did not respond. Changes are not saved while it is unreachable.</p>
+			<button type="button" class="btn" data-view-retry>Retry</button>
+		</article>
+	</section>
+</template>

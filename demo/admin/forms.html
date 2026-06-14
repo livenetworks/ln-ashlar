@@ -409,10 +409,20 @@ document.addEventListener('ln-form:submit', function (e) {
 				<section class="section-card">
 					<header><h3>Fill — edit mode</h3></header>
 					<main>
-						<p>Populate form fields programmatically. Two patterns:</p>
+						<p>Populate form fields programmatically or declaratively. Three patterns:</p>
 						<nav class="demo-actions">
 							<button type="button" class="btn" id="demo-fill-api-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg> Fill (API)</button>
-							<button type="button" id="demo-fill-coordinator-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg> Fill (Coordinator)</button>
+							<button type="button" class="btn" id="demo-fill-coordinator-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg> Fill (Coordinator)</button>
+							<button type="button" class="btn"
+							        data-ln-fill-form="demo-form-grid"
+							        data-ln-fill-fname="Dalibor"
+							        data-ln-fill-lname="Sojic"
+							        data-ln-fill-email="dalibor@example.com"
+							        data-ln-fill-phone="+389 70 123 456"
+							        data-ln-fill-city="Skopje"
+							        data-ln-fill-zip="1000"
+							        data-ln-fill-country="Germany"
+							        data-ln-fill-message="Filled declaratively via ln-fill!"><svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg> Fill (Declarative ln-fill)</button>
 							<button type="button" id="demo-reset-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg> Reset</button>
 						</nav>
 						<h4>Code</h4>
@@ -425,6 +435,15 @@ form.lnForm.fill({ fname: 'Dalibor', email: 'd@test.com' });
 table.addEventListener('ln-table:row-click', function (e) {
     form.lnForm.fill(e.detail.record);
 });
+
+// Pattern 3: Declarative (HTML only) — using data-ln-fill-form and data-ln-fill-*
+// Trigger:
+&lt;button type="button"
+        data-ln-fill-form="my-form"
+        data-ln-fill-fname="Dalibor"
+        data-ln-fill-email="d@test.com"&gt;
+    Fill Form
+&lt;/button&gt;
 
 // Reset
 form.lnForm.reset();</code></pre>
@@ -1475,7 +1494,7 @@ input[data-ln-number] {
 	</div>
 
 	<div class="ln-modal" data-ln-modal id="demo-form">
-		<form>
+		<form id="demo-form-el" data-ln-form>
 			<header>
 				<h3>Add User</h3>
 				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
@@ -1483,15 +1502,15 @@ input[data-ln-number] {
 			<main>
 				<div class="form-element">
 					<label for="modal-name">Name</label>
-					<input type="text" id="modal-name" placeholder="Enter name...">
+					<input type="text" id="modal-name" name="name" placeholder="Enter name...">
 				</div>
 				<div class="form-element">
 					<label for="modal-email">Email</label>
-					<input type="email" id="modal-email" placeholder="email@example.com">
+					<input type="email" id="modal-email" name="email" placeholder="email@example.com">
 				</div>
 				<div class="form-element">
 					<label for="modal-role">Role</label>
-					<select id="modal-role">
+					<select id="modal-role" name="role">
 						<option>User</option>
 						<option>Administrator</option>
 						<option>Moderator</option>

@@ -1,0 +1,17 @@
+@use '../../../../scss/config/mixins' as *;
+
+// ─── Tenant create modal ────────────────────────────────────────────
+.ln-modal#tenant-modal > form { @include modal-lg; }
+
+// ─── Tenant create modal field spans ────────────────────────────────
+#tenant-create-form {
+	.form-grid .form-element { grid-column: span 3; }            // two per row
+	.form-element:has([name="name"]) { grid-column: 1 / -1; }   // name full row
+	.form-element:has([name="doc_numbering_scheme"]) { grid-column: 1 / -1; }
+	footer { @include form-actions; }
+}
+
+// ─── Bulk delete (danger color) ─────────────────────────────────────
+#bulk-delete-tenants {
+	@include semantic-color(error);
+}

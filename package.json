@@ -38,7 +38,7 @@
     "build:demo-index": "sass demo/index.scss demo/index.css --no-source-map --style=compressed",
     "build:demo-admin": "sass demo/admin/src/admin.scss demo/admin/dist/admin.css --no-source-map --style=compressed && cp demo/admin/src/demo.js demo/admin/dist/demo.js && node demo/admin/src/build-pages.mjs",
     "build:demo-docuflow": "sass demo/docuflow/docuflow.scss demo/docuflow/dist/docuflow.css --no-source-map --style=compressed",
-    "build:demo-spa": "sass demo/spa/spa.scss demo/spa/dist/spa.css --no-source-map --style=compressed"
+    "build:demo-spa": "node demo/spa/build.mjs"
   },
   "devDependencies": {
     "@tabler/icons": "^3.41.1",

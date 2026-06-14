@@ -1,0 +1,174 @@
+@use '../../../../scss/config/mixins' as *;
+
+// ─── App frame (shell mixin contract — _app-shell.scss) ───────────
+.app-wrapper { @include app-wrapper; }
+.app-header  { @include app-header; }
+.app-main    { @include app-main; }
+
+#app-sidebar {
+	@include sidebar;
+	@include sidebar-drawer; // drawer AFTER sidebar
+}
+
+.app-scrim { @include app-scrim; }
+
+// ─── Header ────────────────────────────────────────────────────────
+.app-header > .header-left { @include app-header-left; }
+
+// Hamburger is a mobile-drawer control only
+.menu-toggle {
+	@include mq-up(md) {
+		display: none;
+	}
+}
+
+.app-brand {
+	@include flex;
+	@include items-center;
+	gap: var(--size-sm);
+	@include font-semibold;
+	color: var(--color-fg);
+	text-decoration: none;
+	white-space: nowrap;
+
+	.ln-icon { color: var(--color-accent); }
+}
+
+// ─── Sidebar nav ───────────────────────────────────────────────────
+#app-sidebar nav {
+	@include nav;
+	@include nav-links-rounded;
+}
+
+// Hand-rolled active state — aria-current, not ln-nav's .active
+#app-sidebar nav a[aria-current="page"] {
+	color: var(--color-accent);
+	background-color: var(--color-accent-tint);
+	@include font-semibold;
+}
+
+// ─── Sidebar footer ────────────────────────────────────────────────
+#app-sidebar > footer {
+	#reset-demo { @include w-full; }
+
+	.sidebar-caption {
+		@include text-xs;
+		color: var(--fg-subtle);
+		text-align: center;
+		margin: var(--size-xs) 0 0;
+	}
+}
+
+// ─── Offline banner ────────────────────────────────────────────────
+// Fixed strip below the app header; JS only toggles .hidden.
+#offline-banner {
+	@include alert;
+	@include alert-banner;
+	@include semantic-color(error);
+	@include fixed;
+	top: var(--app-header-height);
+	left: 0;
+	right: 0;
+	z-index: var(--z-sticky);
+}
+
+#offline-banner.hidden { display: none; }
+
+
+// ─── Shared patterns: tables and row-actions ───────────────────────
+#packages-table,
+#tenants-table {
+	@include section-card;
+}
+
+.row-actions {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: inline-flex;
+	gap: var(--size-2xs);
+	align-items: center;
+
+	li button { @include table-row-action; }
+
+	li button[data-ln-table-row-action="delete"] {
+		@include table-row-action-delete;
+	}
+}
+
+
+// ─── Shared patterns: forms ────────────────────────────────────────
+#package-form,
+#tenant-create-form,
+#tenant-editor form {
+	fieldset {
+		border: none;
+		margin: 0 0 var(--size-lg);
+		padding: 0;
+	}
+
+	legend {
+		@include text-sm;
+		@include font-semibold;
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--fg-muted);
+		padding: 0;
+		margin-bottom: var(--size-sm);
+	}
+
+	.form-grid { @include form-grid; }
+
+	.hint {
+		display: block;
+		@include text-xs;
+		color: var(--fg-subtle);
+		margin-top: var(--size-3xs);
+	}
+
+	// Toggle-switch rows — checkbox labels host the switch
+	.form-element > label:has(> input[type="checkbox"]) {
+		@include flex;
+		@include items-center;
+		gap: var(--size-sm);
+		cursor: pointer;
+
+		input[type="checkbox"] { @include toggle-switch; }
+	}
+}
+
+#tenant-editor input[type="color"],
+#tenant-create-form input[type="color"] {
+	inline-size: 4rem;
+	block-size: 2.5rem;
+	padding: var(--size-3xs);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius);
+	background: var(--color-bg);
+	cursor: pointer;
+}
+
+
+// ─── Shared patterns: per-view error regions ───────────────────────
+[data-view-error] {
+	@include flex-col;
+	@include items-center;
+	@include justify-center;
+	gap: var(--size-sm);
+	padding: var(--size-2xl) var(--size-lg);
+	text-align: center;
+	color: var(--fg-muted);
+
+	> .ln-icon { color: hsl(var(--color-error)); }
+
+	h3 {
+		@include text-lg;
+		@include font-semibold;
+		color: hsl(var(--color-error));
+		margin: 0;
+	}
+
+	p { margin: 0; }
+}
+
+[data-view-error][hidden] { display: none; }

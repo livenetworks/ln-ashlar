@@ -15,6 +15,18 @@ function escapeRegex(str) {
 try {
 	const shell = await readFile(shellPath, 'utf8');
 
+	// Copy mock scripts to dist directory
+	const mockScripts = ['mock-related.js', 'mock-store-usecase.js', 'mock-http.js', 'mock-couchdb-connector.js'];
+	for (const script of mockScripts) {
+		try {
+			const mockSrc = await readFile(join(__dir, script), 'utf8');
+			await writeFile(join(__dir, '..', 'dist', script), mockSrc, 'utf8');
+			console.log(`  copied ${script} to dist/`);
+		} catch (err) {
+			console.warn(`[build-pages] Could not copy ${script}:`, err.message);
+		}
+	}
+
 	const entries = await readdir(pagesDir);
 	const pages = entries.filter(f => f.endsWith('.html'));
 

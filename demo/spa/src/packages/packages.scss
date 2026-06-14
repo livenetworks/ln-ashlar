@@ -1,0 +1,5 @@
+@use '../../../../scss/config/mixins' as *;
+
+// ─── Package modal ──────────────────────────────────────────────────
+.ln-modal#package-modal > form { @include modal-md; }
+#package-form .form-grid .form-element { grid-column: span 3; }

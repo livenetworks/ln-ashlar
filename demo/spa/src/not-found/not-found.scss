@@ -1,0 +1,6 @@
+@use '../../../../scss/config/mixins' as *;
+
+// ─── 404 ────────────────────────────────────────────────────────────
+#not-found .not-found-state {
+	@include empty-state;
+}
