@@ -136,6 +136,9 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		hidden.type = 'hidden';
 		hidden.name = name;
 		dom.removeAttribute('name');
+		if (dom.hasAttribute('data-ln-fill-as')) {
+			hidden.setAttribute('data-ln-fill-as', dom.getAttribute('data-ln-fill-as'));
+		}
 		dom.insertAdjacentElement('afterend', hidden);
 		this._hidden = hidden;
 

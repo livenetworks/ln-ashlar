@@ -218,9 +218,20 @@ import { registerComponent, dispatch } from '../ln-core';
 
 A modal, drawer, or inline editor persists in the DOM and is reused across many records. Unlike a per-render row it accumulates residual state. Re-establish a known state every time it's shown — at the **open boundary**, never on the cancelable close.
 
-**Pattern:** on `ln-modal:before-open`, call `lnForm.reset()` ALWAYS, then `lnForm.fill(record)` only if editing.
+**Default: declarative trigger** — for click-triggered fills from table rows or
+inline buttons, `data-ln-fill-form` + `data-ln-fill-*` attributes on the trigger
+require no coordinator at all (see [`js/ln-fill/README.md`](../../js/ln-fill/README.md)).
 
-Reset-first is load-bearing: `populateForm` skips keys absent from the record, so without it a prior record's fields linger (field-leak).
+**Coordinator pattern** — use `ln-modal:before-open` + `lnFill` when the fill is
+programmatic and not click-triggered (e.g. a store conflict handler, an import
+workflow, or a deep-link pre-fill). Pattern: on `ln-modal:before-open`, call
+`window.lnCore.lnFill(modalEl, record)`.
+Pass `record` to fill; pass `null` to reset. The helper fans out to all `[data-ln-form]`
+and `[data-ln-fillable]` descendants — coordinator never calls `lnForm.reset()` /
+`lnForm.fill()` directly.
+
+Reset-first is load-bearing: `ln-form`'s `ln-fill` handler calls `this.reset()` when
+`detail` is `null`, so without a null call a prior record's fields linger (field-leak).
 
 **State placement:**
 
@@ -233,13 +244,10 @@ modalEl.addEventListener('ln-modal:before-open', () => {
 	const record = pendingRecord;
 	pendingRecord = null;
 
-	formEl.lnForm.reset();
+	// lnFill fans out to all [data-ln-form] and [data-ln-fillable] descendants.
+	// null → reset/clear; record → fill. Coordinator never calls form methods directly.
+	window.lnCore.lnFill(modalEl, record);
 	modalEl.dataset.lnModalMode = record ? 'edit' : 'new';
-
-	if (record) {
-		formEl.lnForm.fill(record);
-		window.lnCore.fill(titleEl, record);
-	}
 });
 ```
 

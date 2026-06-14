@@ -245,7 +245,7 @@
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
 				</label>
-				<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal">
+				<button type="button" id="create-document" class="btn" data-ln-modal-for="document-modal" data-ln-fill-form="document-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 					New
 				</button>
@@ -280,7 +280,16 @@
 					<td>{{ updated_display }}</td>
 					<td>
 						<ul class="row-actions">
-							<li><button data-ln-table-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+							<li><button data-ln-table-row-action="edit" aria-label="Edit"
+								data-ln-modal-for="document-modal"
+								data-ln-fill-form="document-form"
+								data-ln-fill-id="{{ id }}"
+								data-ln-fill-updated-at="{{ updated_at }}"
+								data-ln-fill-title="{{ title }}"
+								data-ln-fill-department="{{ department }}"
+								data-ln-fill-status="{{ status }}"
+								data-ln-modal-mode="edit"
+							><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
 							<li><button data-ln-table-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 						</ul>
 					</td>
@@ -338,17 +347,20 @@
 </div>
 
 <!-- 4. Create / Edit modal -->
-<div class="ln-modal" data-ln-modal id="document-modal">
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="document-modal">
 	<form data-ln-form="document-form" id="document-form">
 		<header>
-			<h3 id="document-modal-title">New document</h3>
+			<h3 id="document-modal-title">
+				<span data-ln-modal-when="new">New document</span>
+				<span data-ln-modal-when="edit">Edit document</span>
+			</h3>
 			<button type="button" aria-label="Close" data-ln-modal-close>
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 			</button>
 		</header>
 		<main>
 			<input type="hidden" name="id">
-			<input type="hidden" name="updated_at">
+			<input type="hidden" name="updated_at" data-ln-fill-as="updatedAt">
 			<div class="form-element">
 				<label for="doc-title">Title</label>
 				<input id="doc-title" name="title" required autofocus>
@@ -403,8 +415,9 @@
 	const storeEl = document.querySelector('[data-ln-data-store="documents"]');
 	const tableEl = document.querySelector('[data-ln-table="documents"]');
 	const formEl  = document.querySelector('[data-ln-form="document-form"]');
+	const documentModal = document.getElementById('document-modal');
 
-	let lastQuery = { sort: null, filters: {}, search: '' }, pendingDelete = null, editMode = false;
+	let lastQuery = { sort: null, filters: {}, search: '' }, pendingDelete = null;
 
 	const filterOptions = {
 		department: ['Finance', 'HR', 'IT', 'Legal', 'Marketing', 'Operations'],
@@ -439,24 +452,9 @@
 
 	document.addEventListener('ln-table:row-action', e => {
 		if (e.detail.table !== 'documents') return;
-		const modal = formEl.closest('.ln-modal');
-		if (e.detail.action === 'edit') {
-			editMode = true;
-			formEl.lnForm.fill(e.detail.record);
-			modal.querySelector('h3').textContent = 'Edit document';
-			modal.setAttribute('data-ln-modal', 'open');
-		} else {
+		if (e.detail.action === 'delete') {
 			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', { detail: { id: Number(e.detail.id) } }));
 		}
-	});
-
-	// Form & Modal Reset Listeners
-	formEl.closest('.ln-modal').addEventListener('ln-modal:before-open', e => {
-		if (!editMode) {
-			formEl.lnForm.reset();
-			e.target.closest('.ln-modal').querySelector('h3').textContent = 'New document';
-		}
-		editMode = false;
 	});
 
 	formEl.addEventListener('ln-form:submit', e => {
@@ -508,8 +506,7 @@
 		toast('warning', 'Conflict', 'Document was modified elsewhere — reloaded latest version');
 		const idField = formEl.querySelector('[name="id"]');
 		if (idField && idField.value && Number(idField.value) === e.detail.local.id) {
-			editMode = true;
-			formEl.lnForm.fill(e.detail.remote);
+			window.lnCore.lnFill(documentModal, e.detail.remote);
 		}
 	});
 })();

@@ -56,6 +56,9 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		hidden.type = 'hidden';
 		hidden.name = dom.name;
 		dom.removeAttribute('name');
+		if (dom.hasAttribute('data-ln-fill-as')) {
+			hidden.setAttribute('data-ln-fill-as', dom.getAttribute('data-ln-fill-as'));
+		}
 		dom.type = 'text';
 		dom.setAttribute('inputmode', 'decimal');
 		dom.insertAdjacentElement('afterend', hidden);

@@ -41,9 +41,8 @@
 	);
 
 	// ── Entity view factory ────────────────────────────────────────────
-	function makeEntityView({ name, storeEl, tableId, formEl, modalEl, decorate, newBtnId }) {
+	function makeEntityView({ name, storeEl, tableId, formEl, modalEl, decorate }) {
 		let lastQuery = { sort: null, filters: {}, search: '' };
-		let pendingRecord = null;
 
 		function getTableEl() {
 			return document.getElementById(tableId);
@@ -76,10 +75,7 @@
 		// Row actions
 		document.addEventListener('ln-table:row-action', e => {
 			if (e.detail.table !== name) return;
-			if (e.detail.action === 'edit') {
-				pendingRecord = e.detail.record;
-				modalEl.setAttribute('data-ln-modal', 'open');
-			} else if (e.detail.action === 'delete') {
+			if (e.detail.action === 'delete') {
 				handleDelete(e.detail);
 			}
 		});
@@ -103,18 +99,6 @@
 			}
 		}
 
-		// Modal before-open: always reset, then fill if editing (R1)
-		modalEl.addEventListener('ln-modal:before-open', () => {
-			const record = pendingRecord;
-			pendingRecord = null;
-			formEl.lnForm.reset();
-			modalEl.dataset.lnModalMode = record ? 'edit' : 'new';
-			if (record) {
-				formEl.lnForm.fill(record);
-				window.lnCore.fill(modalEl.querySelector('h3'), record);
-			}
-		});
-
 		// Form submit → create or update
 		formEl.addEventListener('ln-form:submit', e => {
 			const data = Object.assign({}, e.detail.data);
@@ -126,13 +110,6 @@
 				: new CustomEvent(eventName, { detail: { data } });
 			storeEl.dispatchEvent(evt);
 			modalEl.setAttribute('data-ln-modal', 'close');
-		});
-
-		// New button: open modal (before-open handles reset + mode)
-		document.addEventListener('click', e => {
-			const btn = e.target.closest(`#${newBtnId}`);
-			if (!btn) return;
-			modalEl.setAttribute('data-ln-modal', 'open');
 		});
 
 		// Offline toast (ln-store-notify covers confirmed/reverted; keep offline separately)
@@ -170,8 +147,7 @@
 			tableId:      'packages-table',
 			formEl:       packageFormEl,
 			modalEl:      packageModalEl,
-			decorate:     decoratePackage,
-			newBtnId:     'new-package'
+			decorate:     decoratePackage
 		})
 		: { refresh: () => {} };
 
@@ -190,8 +166,7 @@
 			tableId:      'tenants-table',
 			formEl:       tenantFormEl,
 			modalEl:      tenantModalEl,
-			decorate:     decorateTenant,
-			newBtnId:     'new-tenant'
+			decorate:     decorateTenant
 		})
 		: { refresh: () => {} };
 

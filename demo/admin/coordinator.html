@@ -282,7 +282,7 @@
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
 				</label>
-				<button type="button" id="open-modal-btn" class="btn" data-ln-modal-for="doc-modal">
+				<button type="button" id="open-modal-btn" class="btn" data-ln-modal-for="doc-modal" data-ln-fill-form="doc-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 					New Document
 				</button>
@@ -318,7 +318,16 @@
 					<td>{{ updated_display }}</td>
 					<td>
 						<ul class="row-actions">
-							<li><button data-ln-table-row-action="edit" aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+							<li><button data-ln-table-row-action="edit" aria-label="Edit"
+						data-ln-modal-for="doc-modal"
+						data-ln-fill-form="doc-form"
+						data-ln-fill-id="{{ id }}"
+						data-ln-fill-title="{{ title }}"
+						data-ln-fill-department="{{ department }}"
+						data-ln-fill-status="{{ status }}"
+						data-ln-fill-author-name="{{ author_name }}"
+						data-ln-modal-mode="edit"
+					><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
 							<li><button data-ln-table-row-action="delete" aria-label="Delete" data-ln-confirm="Delete?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 						</ul>
 					</td>
@@ -378,10 +387,13 @@
 </div>
 
 <!-- Modal Document Form -->
-<div class="ln-modal" data-ln-modal id="doc-modal">
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="doc-modal">
 	<form data-ln-form="doc-form" id="doc-form">
 		<header>
-			<h3 id="modal-title">New Document</h3>
+			<h3 id="modal-title">
+				<span data-ln-modal-when="new">New Document</span>
+				<span data-ln-modal-when="edit">Edit Document</span>
+			</h3>
 			<button type="button" aria-label="Close" data-ln-modal-close>
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 			</button>
@@ -413,7 +425,7 @@
 			</div>
 			<div class="form-element">
 				<label for="frm-author">Author</label>
-				<input id="frm-author" name="author_name" required placeholder="e.g. Dalibor Sojic">
+				<input id="frm-author" name="author_name" required placeholder="e.g. Dalibor Sojic" data-ln-fill-as="authorName">
 			</div>
 		</main>
 		<footer class="form-actions">
@@ -646,10 +658,8 @@
 	const tableEl = document.getElementById('demo-table');
 	const formEl = document.getElementById('doc-form');
 	const modalEl = document.getElementById('doc-modal');
-	const modalTitleEl = document.getElementById('modal-title');
 	const resetBtn = document.getElementById('reset-db');
 
-	let editMode = false;
 	let lastQuery = { sort: null, filters: {}, search: '' };
 
 	// ─── Telemetry Console Logging ───────────────────────────
@@ -804,24 +814,10 @@
 
 	// ─── CRUD User Interactions ──────────────────────────────
 
-	// Reset form when launching document modal
-	modalEl.addEventListener('ln-modal:before-open', function() {
-		if (!editMode) {
-			formEl.lnForm.reset();
-			modalTitleEl.textContent = 'New Document';
-		}
-		editMode = false;
-	});
-
-	// Capture edit/delete clicks in table
+	// Capture delete clicks in table
 	document.addEventListener('ln-table:row-action', function(e) {
 		if (e.detail.table !== 'demo-docs') return;
-		if (e.detail.action === 'edit') {
-			editMode = true;
-			formEl.lnForm.fill(e.detail.record);
-			modalTitleEl.textContent = 'Edit Document';
-			modalEl.setAttribute('data-ln-modal', 'open');
-		} else if (e.detail.action === 'delete') {
+		if (e.detail.action === 'delete') {
 			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
 				detail: { id: Number(e.detail.id) }
 			}));
