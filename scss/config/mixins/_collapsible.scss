@@ -21,4 +21,7 @@
 
 @mixin collapsible-content {
 	overflow: hidden;
+	// Pair with overflow:hidden so the grid item's automatic minimum resolves
+	// to 0 (not min-content) and the 0fr track can collapse fully.
+	min-height: 0;
 }

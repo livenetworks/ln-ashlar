@@ -986,7 +986,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-core | Shared module | — | cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, fill, fillTemplate, renderList, buildDict, guardBody, findElements, reactiveState, deepReactive, createBatcher |
 | ln-toggle | Instance | `data-ln-toggle` | Generic toggle (sidebar, collapse) |
 | ln-accordion | Instance | `data-ln-accordion` | Wrapper — only one toggle open at a time |
-| ln-tabs | Instance | `data-ln-tabs` | Hash-aware tab navigation |
+| ln-tabs | Instance | `data-ln-tabs` | Tab navigation — URL hash (anchor triggers) or localStorage persist (button triggers) |
 | ln-nav | Instance | `data-ln-nav` | Active link highlighter |
 | ln-modal | Instance | `data-ln-modal` | Modal dialog |
 | ln-toast | Functional | `data-ln-toast` | Toast notifications |

@@ -41,12 +41,7 @@
 			@include cursor-pointer;
 		}
 
-		// Content body padding — on children, not the overflow:hidden wrapper
-		.collapsible-body > * {
-			--padding-y: var(--size-sm-up);
-			--padding-x: var(--size-md);
-			padding: var(--padding-y) var(--padding-x);
-			margin: 0;
-		}
+		// Body spacing now comes from the universal `.collapsible-body > *`
+		// rule in components/_toggle.scss (applies to every collapsible).
 	}
 }
