@@ -1,117 +1,191 @@
 // ==========================================================================
-// Density — ln-ashlar v1.2
+// Density — ln-ashlar v2.0
 // ==========================================================================
-// Global spacing compression toggle. Flip one class, the entire UI
-// tightens. Tables show more rows, forms pack denser, cards shrink
-// padding, headings scale down. Same components, same markup, same
-// selectors — the `.density-compact` class re-tunes base design tokens
-// (spacing, typography) and every consumer reacts via the cascade.
-//
-// This file contains NO parallel `--density-*` token scale. Density
-// is an override of base tokens at a region root, exactly like theme
-// colors. Read `docs/css/density.md` for the full spec and rationale.
+// Inverted density system. The :root default is DENSE (DocuFlow scale:
+// 14px body, 52px header, 232px sidebar). Density goes UP via the
+// [data-density] attribute, mirroring how [data-theme] works.
 //
 // Activation:
-//   <html class="density-compact">       ← global
-//   <main class="density-compact">       ← scoped to a region
+//   <html>                              ← default: dense (DocuFlow look)
+//   <html data-density="compact">       ← explicit dense handle (same as base)
+//   <html data-density="comfortable">   ← pre-v2 default (16px / roomier)
+//   <html data-density="spacious">      ← large type, generous padding
+//   <main data-density="compact">       ← scope dense within comfortable page
 //
-// Density is an explicit user choice (consumer's settings toggle).
+// Density is an explicit user choice (settings toggle).
 // It is NEVER auto-switched by viewport — viewport breakpoints handle
 // layout, density handles information density inside that layout.
 //
-// What reacts: everything that reads `--size-*`, `--text-body-*`,
-// `--text-label-*`, `--text-title-*`, `--text-heading-*`,
-// `--text-display-sm`, or `--density-row-h`. That is the majority of
-// the library (tables, forms, cards, stat-card, nav, breadcrumbs,
-// alerts, banners, tabs, prose, headings, page content).
+// What reacts: everything reading --padding-y, --gap, --text-body-*,
+// --text-label-*, --text-title-*, --text-heading-*, --text-display-sm,
+// --lh-*, --app-header-height, --app-sidebar-width, --density-row-h,
+// --btn-padding-y, --input-padding-y.
 //
-// What does NOT react: buttons and pill-controls — their padding and
-// font are hardcoded rem/raw-scale values in `_btn.scss`, `_form.scss`
-// (pill), and `_global.scss` (native <button>). This is deliberate —
-// WCAG 2.5.5 hit-target size floor (~44px) must not be shrunk by a
-// visual density toggle.
+// Interactive controls (buttons, inputs, pills): density-reactive UPWARD.
+// Base (~38px) = WCAG AA. Comfortable (≥46px) and Spacious (≥54px) = AAA.
+// Controls rebind --btn-padding-y and --input-padding-y in up-tier scopes.
+// See docs/css/density.md §wcag for the height math.
+//
+// No parallel --density-* token scale. Density overrides existing base
+// tokens at the scope root, exactly like theme color overrides.
 // ==========================================================================
 
 :root {
 
 	// -----------------------------------------------------------------------
 	// Density — Row height
-	// Minimum row height for table rows. Padding alone determines visual
-	// height in comfortable mode; compact uses this as a min-height floor
-	// so rows stay scannable when content is short. Kept density-named
+	// Minimum row height for table rows and data lists. Kept density-named
 	// because it has no analogue in the base token scale.
 	// -----------------------------------------------------------------------
-	--density-row-h:    2.75rem;  // 44px — comfortable input/row min
+	--density-row-h:    2.25rem;  // 36px — dense base
 }
 
 // ---------------------------------------------------------------------------
-// Compact override
-// Activated by the `.density-compact` class. Re-tunes base spacing and
-// typography tokens to tighter values. The cascade does the rest — every
-// component referencing these tokens shrinks automatically.
+// [data-density="compact"] — explicit handle for the dense base.
 //
-// Anti-pattern this avoids: writing
-//   .density-compact table td { padding: ...; }
-// for every component. That explodes specificity and duplicates
-// rules. The token-override route keeps the compact surface to one
-// place — this block.
+// Identical to :root. Exists so:
+//   (a) a switcher can write a single attribute across all tiers including
+//       returning to base (rather than removing the attribute)
+//   (b) a region inside a comfortable page can be scoped dense:
+//       <table data-density="compact">
+//
+// Rebinds --density-row-h so a compact-scoped region keeps the dense row
+// floor inside a comfortable/spacious page. NOTE: only row-h is restored —
+// full dense region-scoping (type, padding) would re-declare the base
+// surface; deferred. The global switcher returns to base via :root (dense).
 // ---------------------------------------------------------------------------
-.density-compact {
+[data-density="compact"] {
+	--density-row-h:    2.25rem;  // 36px — restore dense base in scoped context
+}
 
-	// -- Spacing — structural compression ---------------------------------
-	--padding-y:    var(--size-xs-up);  // 4px (compact) — was 12px (normal)
-	--size-xs:      0.125rem;   // 2px
-	--size-xs-up:   0.25rem;    // 4px
-	--size-sm:      0.375rem;   // 6px
-	--size-sm-up:   0.5rem;     // 8px
-	--size-md:      0.625rem;   // 10px
-	--size-md-up:   0.8125rem;  // 13px
-	--size-lg:      1rem;       // 16px
+// ---------------------------------------------------------------------------
+// [data-density="comfortable"] — pre-v2 default, now an explicit opt-in.
+//
+// Restores the roomy 16px / lh 1.6 scale that was the :root default before
+// design-v2. WCAG 2.5.5 AAA: buttons 46px, inputs/pills ≥44px.
+//
+// <html data-density="comfortable">   ← global comfortable
+// <aside data-density="comfortable">  ← scoped comfortable sidebar
+// ---------------------------------------------------------------------------
+[data-density="comfortable"] {
 
-	// -- Body text --------------------------------------------------------
-	--text-body-md: 0.875rem;
-	--lh-body-md:   1.5;
+	// -- Logical rhythm --------------------------------------------------
+	--padding-y:          var(--size-sm);       // 8px (was dense 6px)
+	--gap:                var(--size-sm);       // 8px (was dense 6px)
 
-	--text-body-sm: 0.8125rem;
-	--lh-body-sm:   1.45;
+	// -- Body text (restore 16px / 1.6 scale) ----------------------------
+	--text-body-md:       1rem;
+	--lh-body-md:         1.6;
 
-	// Explicit rebind — `--font-size` is defined at `:root` as
-	// `var(--text-body-md)`. Lazy resolution SHOULD cascade, but
-	// form inputs (font-size: var(--font-size)) don't shrink in
-	// practice. Explicit rebind here forces the compact value to
-	// reach every consumer of --font-size.
-	--font-size:    var(--text-body-md);
-	--line-height:  var(--lh-body-md);
+	--text-body-sm:       0.875rem;
+	--lh-body-sm:         1.5;
 
-	// -- Labels -----------------------------------------------------------
-	--text-label-md: 0.8125rem;
-	--lh-label-md:   1.4;
+	// Explicit rebind — form inputs consume --font-size and don't always
+	// cascade lazy var(--text-body-md) resolutions under a scope.
+	--font-size:          var(--text-body-md);
+	--line-height:        var(--lh-body-md);
 
-	--text-label-sm: 0.6875rem;
-	--lh-label-sm:   1.4;
+	// -- Labels ----------------------------------------------------------
+	--text-label-md:      0.875rem;
+	--lh-label-md:        1.4;
 
-	// -- Titles -----------------------------------------------------------
-	--text-title-md: 1rem;
-	--lh-title-md:   1.3;
+	// -- Titles ----------------------------------------------------------
+	--text-title-md:      1.125rem;
+	--lh-title-md:        1.4;
 
-	--text-title-sm: 0.875rem;
-	--lh-title-sm:   1.3;
+	--text-title-sm:      1rem;
+	--lh-title-sm:        1.4;
 
-	// -- Headings — user opted in; see docs/css/density.md §stat-card ----
-	// heading-lg is the stat-card value. Intentionally a GENTLE reduction
-	// (1.875rem → 1.75rem, only 0.125rem) so the "big number" stays
-	// visually dominant — 2x body text, 0.5rem above heading-md.
-	// See plan D1 for the hierarchy math and rejected alternatives.
-	--text-heading-sm: 1.125rem;  --lh-heading-sm: 1.25;
-	--text-heading-md: 1.25rem;   --lh-heading-md: 1.2;
-	--text-heading-lg: 1.75rem;   --lh-heading-lg: 1.15;
+	// -- Headings --------------------------------------------------------
+	--text-heading-sm:    1.25rem;   --lh-heading-sm:  1.3;
+	--text-heading-md:    1.5rem;    --lh-heading-md:  1.25;
+	--text-heading-lg:    1.875rem;  --lh-heading-lg:  1.2;
 
 	// -- Display ---------------------------------------------------------
-	// Only display-sm shrinks — that's what page h1 uses. lg/md kept
-	// at their comfortable values because they're marketing-page scale
-	// that shouldn't appear in dense data contexts anyway.
-	--text-display-sm: 1.875rem;  --lh-display-sm: 1.1;
+	--text-display-sm:    2.25rem;   --lh-display-sm:  1.15;
 
-	// -- Row height — density-specific (no base-token analogue) ---------
-	--density-row-h:    2.25rem;
+	// -- App shell -------------------------------------------------------
+	--app-header-height:  3.5rem;    // 56px (was dense 3.25rem)
+	--app-sidebar-width:  16rem;     // 256px (was dense 14.5rem)
+
+	// -- Row height ------------------------------------------------------
+	--density-row-h:      2.75rem;   // 44px (was dense 2.25rem)
+
+	// -- Interactive controls — WCAG 2.5.5 AAA ≥44px --------------------
+	// btn-padding-y: 2×12px + 20px line-height + 2px borders = 46px
+	// input-padding-y: indirection token read by form-input + pill-outline
+	--btn-padding-y:      var(--size-sm-up);    // 12px → buttons 46px
+	--btn-padding-x:      var(--size-md);       // 16px — restore roomy width
+	--input-padding-y:    var(--size-sm-up);    // 12px → inputs/pills ≥44px
+
+	// -- Card and table padding — roomier at comfortable/spacious --------
+	--card-padding-y:        var(--size-md);       // 16px
+	--card-padding-x:        var(--size-lg);       // 24px
+	--table-cell-padding-y:  var(--size-sm-up);    // 12px
+	--table-cell-padding-x:  var(--size-lg);       // 24px
+}
+
+// ---------------------------------------------------------------------------
+// [data-density="spacious"] — NEW tier above comfortable.
+//
+// For low-vision, touch-primary, or presentation contexts.
+// Body 18px, generous padding, larger shell. WCAG 2.5.5 AAA:
+// buttons 54px, inputs/pills ≥48px.
+//
+// <html data-density="spacious">
+// ---------------------------------------------------------------------------
+[data-density="spacious"] {
+
+	// -- Logical rhythm --------------------------------------------------
+	--padding-y:          var(--size-md);       // 16px
+	--gap:                var(--size-md);       // 16px
+
+	// -- Body text -------------------------------------------------------
+	--text-body-md:       1.125rem;             // 18px
+	--lh-body-md:         1.75;
+
+	--text-body-sm:       1rem;
+	--lh-body-sm:         1.6;
+
+	--font-size:          var(--text-body-md);
+	--line-height:        var(--lh-body-md);
+
+	// -- Labels ----------------------------------------------------------
+	--text-label-md:      1rem;
+	--lh-label-md:        1.5;
+
+	// -- Titles ----------------------------------------------------------
+	--text-title-md:      1.25rem;
+	--lh-title-md:        1.5;
+
+	--text-title-sm:      1.125rem;
+	--lh-title-sm:        1.45;
+
+	// -- Headings --------------------------------------------------------
+	--text-heading-sm:    1.5rem;    --lh-heading-sm:  1.35;
+	--text-heading-md:    1.875rem;  --lh-heading-md:  1.3;
+	--text-heading-lg:    2.25rem;   --lh-heading-lg:  1.25;
+
+	// -- Display ---------------------------------------------------------
+	--text-display-sm:    2.75rem;   --lh-display-sm:  1.2;
+
+	// -- App shell -------------------------------------------------------
+	--app-header-height:  4rem;      // 64px
+	--app-sidebar-width:  17.5rem;   // 280px
+
+	// -- Row height ------------------------------------------------------
+	--density-row-h:      3rem;      // 48px
+
+	// -- Interactive controls — WCAG 2.5.5 AAA ≥48px --------------------
+	// btn-padding-y: 2×16px + 20px line-height + 2px borders = 54px
+	// input-padding-y: indirection token read by form-input + pill-outline
+	--btn-padding-y:      var(--size-md);       // 16px → buttons 54px
+	--btn-padding-x:      var(--size-lg);       // 24px — spacious width
+	--input-padding-y:    var(--size-md);       // 16px → inputs/pills ≥48px
+
+	// -- Card and table padding ------------------------------------------
+	--card-padding-y:        var(--size-lg);       // 24px
+	--card-padding-x:        var(--size-xl);       // 32px
+	--table-cell-padding-y:  var(--size-md);       // 16px
+	--table-cell-padding-x:  var(--size-xl);       // 32px
 }

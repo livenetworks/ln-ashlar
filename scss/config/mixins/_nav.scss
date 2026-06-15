@@ -97,7 +97,7 @@
 		}
 
 		&.active {
-			color: var(--color-accent);
+			color: var(--color-accent-hover);
 			border-color: var(--nav-link-border-color-active, transparent);
 			@include font-semibold;
 		}
@@ -135,7 +135,7 @@
 		&.active {
 			// accent wash vocabulary (CLAUDE.md L532) — was reaching
 			// through to --color-primary-lighter scale.
-			background-color: var(--color-accent-tint);
+			background-color: var(--color-accent-tint-strong);
 		}
 	}
 }
