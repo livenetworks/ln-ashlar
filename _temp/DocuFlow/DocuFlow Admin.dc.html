@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/ln-acme-design-system-6a75e3b5-ad71-4d1c-b780-dc0a10f91d9a/colors_and_type.css">
+<style>
+  html,body{margin:0;padding:0;height:100%;}
+  *{box-sizing:border-box;}
+  @keyframes adm-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes adm-veil{from{opacity:0}to{opacity:1}}
+  @keyframes adm-toast{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:hsl(var(--color-neutral-300));border-radius:5px;border:2px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-track{background:transparent}
+  [data-theme="light"]{
+    --color-neutral-50:220 20% 98%;--color-neutral-100:220 16% 96%;--color-neutral-150:220 14% 93%;
+    --color-neutral-200:220 13% 91%;--color-neutral-300:220 13% 83%;--color-neutral-400:218 11% 65%;
+    --color-neutral-500:220 9% 46%;--color-neutral-600:220 11% 34%;--color-neutral-700:220 14% 24%;
+    --color-neutral-800:220 20% 15%;--color-neutral-900:221 39% 11%;
+    --color-bg-body:var(--color-neutral-100);--color-bg-primary:var(--color-white);--color-bg-secondary:var(--color-neutral-50);
+    --color-border-light:var(--color-neutral-100);--color-bg-error:0 86% 97%;
+    --color-primary-light:232 75% 93%;--color-primary-lighter:232 75% 97%;
+    --color-success-light:142 76% 93%;--color-success-lighter:142 76% 97%;
+    --color-warning-light:32 95% 93%;--color-warning-lighter:32 95% 97%;
+    --color-info-light:217 91% 93%;--color-info-lighter:217 91% 97%;
+    --color-error-light:0 84% 93%;--color-error-lighter:0 84% 97%;
+    --color-secondary-light:160 76% 93%;--color-secondary-lighter:160 76% 97%;
+  }
+  [data-theme="light"],[data-theme="dark"]{
+    --color-text-primary:var(--color-neutral-900);
+    --color-text-secondary:var(--color-neutral-500);
+    --color-text-muted:var(--color-neutral-400);
+    --color-border:var(--color-neutral-200);
+    --color-table-header-bg:var(--color-neutral-200);
+    --color-table-header-text:var(--color-neutral-900);
+    --color-table-section-bg:var(--color-neutral-150);
+  }
+</style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="a-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
+  <symbol id="a-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21v-16a1 1 0 0 1 1 -1h8a1 1 0 0 1 1 1v16"/><path d="M15 9h3a1 1 0 0 1 1 1v11"/><path d="M9 8h2M9 12h2M9 16h2"/></symbol>
+  <symbol id="a-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9l-8 4.5l-8 -4.5v-9z"/><path d="M12 12l8 -4.5M12 12v9M12 12l-8 -4.5"/></symbol>
+  <symbol id="a-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><path d="M3 21v-1a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v1"/><path d="M16 4a3 3 0 0 1 0 6M21 21v-1a4 4 0 0 0 -3 -3.85"/></symbol>
+  <symbol id="a-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h2"/></symbol>
+  <symbol id="a-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="a-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M21 21l-6 -6"/></symbol>
+  <symbol id="a-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="a-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></symbol>
+  <symbol id="a-dots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="18" r="1"/></symbol>
+  <symbol id="a-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12M6 6l12 12"/></symbol>
+  <symbol id="a-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></symbol>
+  <symbol id="a-chev-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6 -6"/></symbol>
+  <symbol id="a-chev-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></symbol>
+  <symbol id="a-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/></symbol>
+  <symbol id="a-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M3 12h1M20 12h1M12 3v1M12 20v1M5.6 5.6l.7 .7M17.7 17.7l.7 .7M18.4 5.6l-.7 .7M6.3 17.7l-.7 .7"/></symbol>
+  <symbol id="a-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></symbol>
+  <symbol id="a-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></symbol>
+  <symbol id="a-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></symbol>
+  <symbol id="a-certificate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="5"/><path d="M5.5 13l-1.5 5l3 -1.5l2 1.5l-1.5 -5"/><path d="M16 5h4M16 9h4M16 13h2"/></symbol>
+  <symbol id="a-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="8" rx="2"/><rect x="3" y="12" width="18" height="8" rx="2"/><path d="M7 8v.01M7 16v.01"/></symbol>
+  <symbol id="a-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21c.5 -4.5 2.5 -8 7 -10"/><path d="M9 18c6.218 0 10.5 -3.288 11 -12c-11.5 0 -14.376 5.585 -11 12"/></symbol>
+  <symbol id="a-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/></symbol>
+  <symbol id="a-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></symbol>
+  <symbol id="a-users-group" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M6 21v-1a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v1"/></symbol>
+  <symbol id="a-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/></symbol>
+  <symbol id="a-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></symbol>
+  <symbol id="a-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/><path d="M21 12h-13l3 -3M11 15l-3 -3"/></symbol>
+</svg>
+
+<div data-theme="{{ theme }}" style="height:100vh;display:grid;grid-template-columns:248px 1fr;font-family:var(--font-sans);font-size:14px;background:hsl(var(--color-bg-body));color:hsl(var(--color-text-primary));overflow:hidden;position:relative;">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside style="background:hsl(var(--color-bg-primary));border-right:1px solid hsl(var(--color-border));display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;align-items:center;gap:10px;padding:15px 16px 13px;border-bottom:1px solid hsl(var(--color-border-light));">
+      <span style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,hsl(211 62% 50%),hsl(262 55% 54%));color:#fff;font-weight:800;font-size:13px;display:inline-flex;align-items:center;justify-content:center;letter-spacing:-.02em;">DF</span>
+      <span style="font-weight:700;font-size:15px;letter-spacing:-.02em;">DocuFlow</span>
+      <span style="margin-left:auto;font-size:9.5px;font-weight:700;letter-spacing:.08em;color:hsl(var(--color-primary-hover));background:hsl(var(--color-primary-light));border-radius:var(--radius-full);padding:2px 7px;">ADMIN</span>
+    </div>
+
+    <div style="padding:12px 12px 4px;">
+      <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--radius-md);background:hsl(var(--color-bg-secondary));border:1px solid hsl(var(--color-border-light));">
+        <span style="width:26px;height:26px;border-radius:7px;background:hsl(262 55% 54%);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:15px;height:15px;"><use href="#a-shield"></use></svg></span>
+        <span style="flex:1;min-width:0;line-height:1.2;">
+          <span style="display:block;font-size:12.5px;font-weight:600;">Platform Console</span>
+          <span style="display:block;font-size:10.5px;color:hsl(var(--color-text-muted));">LiveNetworks · provider</span>
+        </span>
+      </div>
+    </div>
+
+    <nav style="flex:1;overflow-y:auto;padding:8px 8px 14px;">
+      <p style="font-size:10px;font-weight:700;color:hsl(var(--color-text-muted));text-transform:uppercase;letter-spacing:.1em;padding:8px 10px 4px;margin:0;">Manage</p>
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+        <button onClick="{{ n.go }}" style="{{ n.style }}">
+          <svg style="width:17px;height:17px;"><use href="{{ n.icon }}"></use></svg>
+          <span style="flex:1;text-align:left;">{{ n.label }}</span>
+          <sc-if value="{{ n.count }}" hint-placeholder-val="{{ true }}"><span style="{{ n.countStyle }}">{{ n.count }}</span></sc-if>
+        </button>
+      </sc-for>
+
+      <p style="font-size:10px;font-weight:700;color:hsl(var(--color-text-muted));text-transform:uppercase;letter-spacing:.1em;padding:16px 10px 4px;margin:0;">System</p>
+      <sc-for list="{{ navSystem }}" as="n" hint-placeholder-count="2">
+        <button onClick="{{ n.go }}" style="{{ n.style }}">
+          <svg style="width:17px;height:17px;"><use href="{{ n.icon }}"></use></svg>
+          <span style="flex:1;text-align:left;">{{ n.label }}</span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="border-top:1px solid hsl(var(--color-border-light));padding:10px 12px;display:flex;align-items:center;gap:10px;">
+      <span style="width:30px;height:30px;border-radius:50%;background:hsl(155 50% 38%);color:#fff;font-weight:700;font-size:11px;display:inline-flex;align-items:center;justify-content:center;">DS</span>
+      <span style="flex:1;min-width:0;line-height:1.25;">
+        <span style="display:block;font-size:12.5px;font-weight:600;">Dragan S.</span>
+        <span style="display:block;font-size:11px;color:hsl(var(--color-text-muted));">Platform admin</span>
+      </span>
+      <svg style="width:16px;height:16px;color:hsl(var(--color-text-muted));"><use href="#a-dots"></use></svg>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div style="display:flex;flex-direction:column;min-width:0;overflow:hidden;">
+    <header style="height:52px;border-bottom:1px solid hsl(var(--color-border));background:hsl(var(--color-bg-primary));display:flex;align-items:center;gap:14px;padding:0 20px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:hsl(var(--color-text-secondary));">
+        <span>Platform</span>
+        <svg style="width:14px;height:14px;color:hsl(var(--color-text-muted));"><use href="#a-chev-right"></use></svg>
+        <span style="color:hsl(var(--color-text-primary));font-weight:600;">{{ crumb }}</span>
+      </div>
+      <div style="flex:1;"></div>
+      <div style="position:relative;width:260px;max-width:30vw;">
+        <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:hsl(var(--color-text-muted));"><use href="#a-search"></use></svg>
+        <input placeholder="Search tenants, packages…" style="width:100%;padding:7px 10px 7px 32px;border:1px solid hsl(var(--color-border));border-radius:var(--radius-md);background:hsl(var(--color-bg-secondary));font-size:12.5px;outline:none;color:inherit;" style-focus="border-color:hsl(var(--color-primary));background:hsl(var(--color-bg-primary));box-shadow:0 0 0 3px hsl(var(--color-primary) / .15);"/>
+      </div>
+      <button onClick="{{ toggleTheme }}" title="Toggle theme" style="width:32px;height:32px;border-radius:var(--radius-md);border:1px solid hsl(var(--color-border));background:hsl(var(--color-bg-primary));color:hsl(var(--color-text-secondary));display:inline-flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:hsl(var(--color-bg-secondary));color:hsl(var(--color-text-primary));">
+        <svg style="width:17px;height:17px;"><use href="{{ themeIcon }}"></use></svg>
+      </button>
+      <button style="position:relative;width:32px;height:32px;border-radius:var(--radius-md);border:1px solid hsl(var(--color-border));background:hsl(var(--color-bg-primary));color:hsl(var(--color-text-secondary));display:inline-flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:hsl(var(--color-bg-secondary));color:hsl(var(--color-text-primary));">
+        <svg style="width:17px;height:17px;"><use href="#a-bell"></use></svg>
+      </button>
+    </header>
+
+    <div style="flex:1;overflow-y:auto;">
+
+      <!-- ===== TENANTS ===== -->
+      <sc-if value="{{ isTenants }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:24px 28px 48px;max-width:1180px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;">
+          <div>
+            <h1 style="font-size:24px;margin:0 0 3px;letter-spacing:-.02em;">Tenants</h1>
+            <p style="font-size:13.5px;color:hsl(var(--color-text-secondary));margin:0;">Client organisations provisioned on the platform.</p>
+          </div>
+          <button onClick="{{ openCreateTenant }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-md);background:hsl(var(--color-primary));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;" style-hover="background:hsl(var(--color-primary-hover));"><svg style="width:16px;height:16px;"><use href="#a-plus"></use></svg>New tenant</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+          <sc-for list="{{ tenantStats }}" as="s" hint-placeholder-count="4">
+            <div style="background:hsl(var(--color-bg-primary));border:1px solid hsl(var(--color-border));border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:14px 16px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="width:26px;height:26px;border-radius:7px;background:hsl({{ s.color }} / .13);color:hsl({{ s.color }});display:inline-flex;align-items:center;justify-content:center;"><svg style="width:15px;height:15px;"><use href="{{ s.icon }}"></use></svg></span><span style="font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));">{{ s.label }}</span></div>
+              <p style="font-size:26px;font-weight:700;margin:0;letter-spacing:-.02em;font-variant-numeric:tabular-nums;">{{ s.value }}</p>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- filter chips -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <sc-for list="{{ tenantFilters }}" as="f" hint-placeholder-count="4">
+            <button onClick="{{ f.set }}" style="{{ f.style }}"><sc-if value="{{ f.dot }}" hint-placeholder-val="{{ true }}"><span style="width:6px;height:6px;border-radius:50%;background:hsl({{ f.dot }});"></span></sc-if>{{ f.label }} <span style="opacity:.6;font-variant-numeric:tabular-nums;">{{ f.count }}</span></button>
+          </sc-for>
+        </div>
+
+        <div style="background:hsl(var(--color-bg-primary));border:1px solid hsl(var(--color-border));border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1.6fr 1.1fr 80px 90px 110px 84px;gap:14px;padding:10px 18px;background:hsl(var(--color-bg-secondary));border-bottom:1px solid hsl(var(--color-border));font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:hsl(var(--color-text-secondary));">
+            <span>Organisation</span><span>Package</span><span style="text-align:right;">Users</span><span style="text-align:right;">Docs</span><span>Status</span><span style="text-align:right;">Actions</span>
+          </div>
+          <sc-for list="{{ tenants }}" as="t" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:1.6fr 1.1fr 80px 90px 110px 84px;gap:14px;padding:12px 18px;border-bottom:1px solid hsl(var(--color-border-light));align-items:center;">
+              <div style="display:flex;align-items:center;gap:11px;min-width:0;">
+                <span style="width:34px;height:34px;border-radius:8px;background:hsl({{ t.color }});color:#fff;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">{{ t.mono }}</span>
+                <div style="min-width:0;"><p style="font-size:13.5px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ t.name }}</p><p style="font-size:11px;color:hsl(var(--color-text-muted));margin:1px 0 0;font-family:var(--font-mono);">{{ t.slug }}</p></div>
+              </div>
+              <div style="min-width:0;"><p style="font-size:12.5px;font-weight:500;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ t.package }}</p><p style="font-size:11px;color:hsl(var(--color-text-muted));margin:1px 0 0;">{{ t.plan }}</p></div>
+              <span style="font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums;color:hsl(var(--color-text-secondary));">{{ t.users }}</span>
+              <span style="font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums;color:hsl(var(--color-text-secondary));">{{ t.docs }}</span>
+              <span style="{{ t.statusStyle }}"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>{{ t.status }}</span>
+              <div style="display:flex;gap:3px;justify-content:flex-end;">
+                <button onClick="{{ t.impersonate }}" title="Open as tenant" style="width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid hsl(var(--color-border));background:hsl(var(--color-bg-primary));color:hsl(var(--color-text-muted));display:inline-flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:hsl(var(--color-bg-secondary));color:hsl(var(--color-text-primary));"><svg style="width:15px;height:15px;"><use href="#a-login"></use></svg></button>
+                <button onClick="{{ t.edit }}" title="Edit" style="width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid hsl(var(--color-border));background:hsl(var(--color-bg-primary));color:hsl(var(--color-text-muted));display:inline-flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:hsl(var(--color-primary-light));color:hsl(var(--color-primary-hover));border-color:hsl(var(--color-primary) / .4);"><svg style="width:15px;height:15px;"><use href="#a-edit"></use></svg></button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== PACKAGES ===== -->
+      <sc-if value="{{ isPackages }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:24px 28px 48px;max-width:1180px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;">
+          <div>
+            <h1 style="font-size:24px;margin:0 0 3px;letter-spacing:-.02em;">Packages</h1>
+            <p style="font-size:13.5px;color:hsl(var(--color-text-secondary));margin:0;">Documentation bundles — standards &amp; template sets you provision to tenants.</p>
+          </div>
+          <button onClick="{{ openCreatePackage }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-md);background:hsl(var(--color-primary));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;" style-hover="background:hsl(var(--color-primary-hover));"><svg style="width:16px;height:16px;"><use href="#a-plus"></use></svg>New package</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(304px,1fr));gap:15px;">
+          <sc-for list="{{ packages }}" as="p" hint-placeholder-count="4">
+            <div style="background:hsl(var(--color-bg-primary));border:1px solid hsl(var(--color-border));border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;">
+              <div style="padding:16px 18px 14px;border-bottom:1px solid hsl(var(--color-border-light));">
+                <div style="display:flex;align-items:flex-start;gap:11px;">
+                  <span style="width:38px;height:38px;border-radius:9px;background:hsl(var(--color-primary-light));color:hsl(var(--color-primary-hover));display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:21px;height:21px;"><use href="#a-box"></use></svg></span>
+                  <div style="flex:1;min-width:0;">
+                    <p style="font-size:15px;font-weight:700;margin:0 0 1px;letter-spacing:-.01em;">{{ p.name }}</p>
+                    <p style="font-size:11.5px;color:hsl(var(--color-text-muted));margin:0;font-family:var(--font-mono);">{{ p.code }} · v{{ p.version }}</p>
+                  </div>
+                  <span style="{{ p.statusStyle }}">{{ p.status }}</span>
+                </div>
+                <p style="font-size:12.5px;color:hsl(var(--color-text-secondary));margin:11px 0 0;line-height:1.5;">{{ p.desc }}</p>
+              </div>
+              <div style="padding:12px 18px;display:flex;flex-direction:column;gap:9px;flex:1;">
+                <div>
+                  <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:hsl(var(--color-text-muted));margin:0 0 6px;">Standards included</p>
+                  <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                    <sc-for list="{{ p.standards }}" as="s" hint-placeholder-count="3">
+                      <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:var(--radius-full);background:hsl({{ s.color }} / .12);color:hsl({{ s.color }});font-size:11px;font-weight:600;"><span style="width:6px;height:6px;border-radius:2px;background:currentColor;"></span>{{ s.code }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+              <div style="padding:11px 18px;border-top:1px solid hsl(var(--color-border-light));display:flex;align-items:center;gap:14px;background:hsl(var(--color-bg-secondary));">
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:hsl(var(--color-text-secondary));"><svg style="width:14px;height:14px;color:hsl(var(--color-text-muted));"><use href="#a-file"></use></svg><strong style="color:hsl(var(--color-text-primary));font-variant-numeric:tabular-nums;">{{ p.templates }}</strong> templates</span>
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:hsl(var(--color-text-secondary));"><svg style="width:14px;height:14px;color:hsl(var(--color-text-muted));"><use href="#a-building"></use></svg><strong style="color:hsl(var(--color-text-primary));font-variant-numeric:tabular-nums;">{{ p.tenants }}</strong> tenants</span>
+                <button onClick="{{ p.edit }}" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--radius-md);border:1px solid hsl(var(--color-border));background:hsl(var(--color-bg-primary));font-size:12px;font-weight:500;color:hsl(var(--color-text-secondary));cursor:pointer;font-family:inherit;" style-hover="background:hsl(var(--color-primary-light));color:hsl(var(--color-primary-hover));border-color:hsl(var(--color-primary) / .4);"><svg style="width:14px;height:14px;"><use href="#a-edit"></use></svg>Edit</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== PLACEHOLDER SCREENS ===== -->
+      <sc-if value="{{ isOther }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:60px 28px;max-width:560px;margin:0 auto;text-align:center;">
+        <span style="width:52px;height:52px;border-radius:13px;background:hsl(var(--color-bg-secondary));border:1px solid hsl(var(--color-border));color:hsl(var(--color-text-muted));display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;"><svg style="width:26px;height:26px;"><use href="{{ otherIcon }}"></use></svg></span>
+        <h1 style="font-size:21px;margin:0 0 6px;letter-spacing:-.02em;">{{ crumb }}</h1>
+        <p style="font-size:13.5px;color:hsl(var(--color-text-secondary));margin:0;line-height:1.6;">This section is part of the console scope. The focus of this proposal is <strong>Tenants</strong> and <strong>Packages</strong> — open either from the sidebar.</p>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- ============ MODAL ============ -->
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ true }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:60;background:hsl(221 39% 11% / .5);display:flex;align-items:flex-start;justify-content:center;padding:48px 24px;overflow-y:auto;animation:adm-veil .15s ease;">
+    <div onClick="{{ stop }}" style="width:100%;max-width:{{ modalWidth }};background:hsl(var(--color-bg-primary));border:1px solid hsl(var(--color-border));border-radius:var(--radius-xl);box-shadow:var(--shadow-2xl);overflow:hidden;animation:adm-in .2s cubic-bezier(.34,1.2,.64,1);margin:auto 0;">
+      <!-- modal head -->
+      <div style="display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid hsl(var(--color-border-light));">
+        <span style="width:36px;height:36px;border-radius:9px;background:hsl(var(--color-primary-light));color:hsl(var(--color-primary-hover));display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:20px;height:20px;"><use href="{{ modalIcon }}"></use></svg></span>
+        <div style="flex:1;min-width:0;">
+          <h2 style="font-size:16.5px;margin:0;letter-spacing:-.01em;">{{ modalTitle }}</h2>
+          <p style="font-size:12px;color:hsl(var(--color-text-muted));margin:1px 0 0;">{{ modalSubtitle }}</p>
+        </div>
+        <button onClick="{{ closeModal }}" style="width:30px;height:30px;border-radius:var(--radius-md);border:none;background:none;color:hsl(var(--color-text-muted));display:inline-flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:hsl(var(--color-bg-secondary));color:hsl(var(--color-text-primary));"><svg style="width:18px;height:18px;"><use href="#a-x"></use></svg></button>
+      </div>
+
+      <!-- modal body -->
+      <div style="padding:20px 22px;max-height:calc(100vh - 240px);overflow-y:auto;">
+
+        <!-- TENANT FORM -->
+        <sc-if value="{{ isTenantModal }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <label style="display:block;">
+              <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">Organisation name</span>
+              <input defaultValue="{{ form.name }}" placeholder="Acme Corporation" style="{{ inputStyle }}" style-focus="border-color:hsl(var(--color-primary));box-shadow:0 0 0 3px hsl(var(--color-primary) / .15);"/>
+            </label>
+            <label style="display:block;">
+              <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">URL slug</span>
+              <div style="display:flex;align-items:center;border:1px solid hsl(var(--color-border));border-radius:var(--radius-md);background:hsl(var(--color-bg-secondary));overflow:hidden;" style-focus-within="border-color:hsl(var(--color-primary));box-shadow:0 0 0 3px hsl(var(--color-primary) / .15);">
+                <span style="font-size:12.5px;color:hsl(var(--color-text-muted));padding:0 2px 0 11px;font-family:var(--font-mono);">df.io/</span>
+                <input defaultValue="{{ form.slug }}" placeholder="acme" style="flex:1;border:none;background:transparent;padding:8px 11px 8px 2px;font-size:13px;outline:none;color:inherit;font-family:var(--font-mono);"/>
+              </div>
+            </label>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <label style="display:block;">
+              <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">Package</span>
+              <div style="position:relative;">
+                <select defaultValue="{{ form.package }}" style="{{ inputStyle }};appearance:none;cursor:pointer;padding-right:32px;" style-focus="border-color:hsl(var(--color-primary));box-shadow:0 0 0 3px hsl(var(--color-primary) / .15);">
+                  <option>ISMS Essentials</option>
+                  <option>Integrated MS Suite</option>
+                  <option>Quality Core</option>
+                  <option>ITSM Pack</option>
+                </select>
+                <svg style="position:absolute;right:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:hsl(var(--color-text-muted));pointer-events:none;"><use href="#a-chev-down"></use></svg>
+              </div>
+            </label>
+            <label style="display:block;">
+              <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">Primary contact</span>
+              <input defaultValue="{{ form.contact }}" placeholder="admin@acme.com" style="{{ inputStyle }}" style-focus="border-color:hsl(var(--color-primary));box-shadow:0 0 0 3px hsl(var(--color-primary) / .15);"/>
+            </label>
+          </div>
+
+          <div>
+            <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:7px;">Plan</span>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+              <sc-for list="{{ planOptions }}" as="o" hint-placeholder-count="3">
+                <label style="{{ o.style }}">
+                  <input type="radio" name="plan" defaultChecked="{{ o.checked }}" style="accent-color:hsl(var(--color-primary));"/>
+                  <span style="flex:1;"><span style="display:block;font-size:13px;font-weight:600;">{{ o.label }}</span><span style="display:block;font-size:11px;color:hsl(var(--color-text-muted));">{{ o.meta }}</span></span>
+                </label>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:7px;">Status</span>
+            <div style="display:inline-flex;background:hsl(var(--color-bg-secondary));border:1px solid hsl(var(--color-border));border-radius:var(--radius-md);padding:3px;gap:2px;">
+              <sc-for list="{{ statusOptions }}" as="o" hint-placeholder-count="3">
+                <label style="{{ o.style }}"><input type="radio" name="tstatus" defaultChecked="{{ o.checked }}" style="display:none;"/>{{ o.label }}</label>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- PACKAGE FORM -->
+        <sc-if value="{{ isPackageModal }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;">
+            <label style="display:block;">
+              <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">Package name</span>
+              <input defaultValue="{{ form.name }}" placeholder="ISMS Essentials" style="{{ inputStyle }}" style-focus="border-color:hsl(var(--color-primary));box-shadow:0 0 0 3px hsl(var(--color-primary) / .15);"/>
+            </label>
+            <label style="display:block;">
+              <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">Code</span>
+              <input defaultValue="{{ form.code }}" placeholder="PKG-ISMS" style="{{ inputStyle }};font-family:var(--font-mono);" style-focus="border-color:hsl(var(--color-primary));box-shadow:0 0 0 3px hsl(var(--color-primary) / .15);"/>
+            </label>
+          </div>
+
+          <label style="display:block;">
+            <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">Description</span>
+            <textarea placeholder="What this package provisions for a tenant…" style="{{ inputStyle }};min-height:64px;resize:vertical;line-height:1.5;">{{ form.desc }}</textarea>
+          </label>
+
+          <div>
+            <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:7px;">Standards included</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <sc-for list="{{ standardChecks }}" as="s" hint-placeholder-count="6">
+                <label style="{{ s.style }}">
+                  <input type="checkbox" defaultChecked="{{ s.checked }}" style="accent-color:hsl(var(--color-primary));flex-shrink:0;"/>
+                  <span style="width:8px;height:8px;border-radius:2px;background:hsl({{ s.color }});flex-shrink:0;"></span>
+                  <span style="flex:1;min-width:0;"><span style="font-size:12.5px;font-weight:600;">{{ s.code }}</span> <span style="font-size:11.5px;color:hsl(var(--color-text-muted));">{{ s.short }}</span></span>
+                </label>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <label style="display:block;">
+              <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">Template documents</span>
+              <input type="number" defaultValue="{{ form.templates }}" placeholder="24" style="{{ inputStyle }};font-variant-numeric:tabular-nums;" style-focus="border-color:hsl(var(--color-primary));box-shadow:0 0 0 3px hsl(var(--color-primary) / .15);"/>
+            </label>
+            <div>
+              <span style="display:block;font-size:11.5px;font-weight:600;color:hsl(var(--color-text-secondary));margin-bottom:5px;">Visibility</span>
+              <div style="display:inline-flex;width:100%;background:hsl(var(--color-bg-secondary));border:1px solid hsl(var(--color-border));border-radius:var(--radius-md);padding:3px;gap:2px;">
+                <sc-for list="{{ visOptions }}" as="o" hint-placeholder-count="2">
+                  <label style="{{ o.style }}"><input type="radio" name="vis" defaultChecked="{{ o.checked }}" style="display:none;"/>{{ o.label }}</label>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+
+      <!-- modal foot -->
+      <div style="display:flex;align-items:center;gap:10px;padding:15px 22px;border-top:1px solid hsl(var(--color-border-light));background:hsl(var(--color-bg-secondary));">
+        <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ closeModal }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:var(--radius-md);border:1px solid hsl(var(--color-error) / .4);background:hsl(var(--color-bg-primary));font-size:12.5px;font-weight:500;color:hsl(var(--color-error-hover));cursor:pointer;font-family:inherit;" style-hover="background:hsl(var(--color-error-light));"><svg style="width:15px;height:15px;"><use href="#a-trash"></use></svg>Delete</button>
+        </sc-if>
+        <div style="flex:1;"></div>
+        <button onClick="{{ closeModal }}" style="padding:8px 16px;border-radius:var(--radius-md);border:1px solid hsl(var(--color-border));background:hsl(var(--color-bg-primary));font-size:13px;font-weight:500;color:hsl(var(--color-text-secondary));cursor:pointer;font-family:inherit;" style-hover="background:hsl(var(--color-bg-secondary));color:hsl(var(--color-text-primary));">Cancel</button>
+        <button onClick="{{ save }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius-md);background:hsl(var(--color-primary));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;" style-hover="background:hsl(var(--color-primary-hover));"><svg style="width:16px;height:16px;"><use href="#a-check"></use></svg>{{ saveLabel }}</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ TOAST ============ -->
+  <sc-if value="{{ toastShown }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;right:22px;bottom:22px;z-index:80;display:flex;align-items:center;gap:11px;padding:13px 16px;background:hsl(var(--color-bg-primary));border:1px solid hsl(var(--color-border));border-left:3px solid hsl(var(--color-success));border-radius:var(--radius-lg);box-shadow:var(--shadow-xl);animation:adm-toast .25s cubic-bezier(.34,1.2,.64,1);min-width:260px;">
+    <span style="width:28px;height:28px;border-radius:50%;background:hsl(var(--color-success-light));color:hsl(var(--color-success-hover));display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg style="width:16px;height:16px;"><use href="#a-check"></use></svg></span>
+    <div style="flex:1;"><p style="font-size:13px;font-weight:600;margin:0;">{{ toastTitle }}</p><p style="font-size:11.5px;color:hsl(var(--color-text-muted));margin:1px 0 0;">{{ toastMsg }}</p></div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:860}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'tenants', theme: 'light',
+    tenantFilter: 'all',
+    modal: null,        // { kind:'tenant'|'package', mode:'create'|'edit', data:{} }
+    toast: null
+  };
+
+  _stdMap() {
+    return {
+      iso27001: { code:'ISO 27001', short:'InfoSec', color:'262 55% 54%' },
+      iso9001:  { code:'ISO 9001',  short:'Quality', color:'211 62% 50%' },
+      iso20000: { code:'ISO 20000', short:'ITSM',    color:'190 70% 40%' },
+      iso14001: { code:'ISO 14001', short:'Env',     color:'155 50% 38%' },
+      iso45001: { code:'ISO 45001', short:'OH&S',    color:'340 70% 50%' },
+      iso22301: { code:'ISO 22301', short:'BCM',     color:'38 88% 48%' }
+    };
+  }
+
+  _tenants() {
+    return [
+      { mono:'AK', name:'Akrion Group', slug:'akrion', color:'7 72% 52%', package:'Integrated MS Suite', plan:'Enterprise', users:48, docs:103, status:'active', standards:['iso27001','iso9001','iso20000'] },
+      { mono:'NV', name:'Novalink Telecom', slug:'novalink', color:'211 62% 50%', package:'ITSM Pack', plan:'Standard', users:21, docs:42, status:'active', standards:['iso20000','iso27001'] },
+      { mono:'ME', name:'Meridian Bank', slug:'meridian', color:'155 50% 38%', package:'ISMS Essentials', plan:'Enterprise', users:67, docs:58, status:'active', standards:['iso27001'] },
+      { mono:'VR', name:'Verda Foods', slug:'verda', color:'38 88% 48%', package:'Quality Core', plan:'Standard', users:14, docs:31, status:'trial', standards:['iso9001','iso14001'] },
+      { mono:'HX', name:'Helix Pharma', slug:'helix', color:'262 55% 54%', package:'Integrated MS Suite', plan:'Enterprise', users:39, docs:76, status:'active', standards:['iso27001','iso9001','iso45001'] },
+      { mono:'OR', name:'Orbit Logistics', slug:'orbit', color:'190 70% 40%', package:'Quality Core', plan:'Standard', users:9, docs:18, status:'suspended', standards:['iso9001'] }
+    ];
+  }
+
+  _packages() {
+    return [
+      { name:'ISMS Essentials', code:'PKG-ISMS', version:'2.1', status:'published', desc:'Core information-security management set for ISO 27001 certification readiness.', standards:['iso27001'], templates:24, tenants:2 },
+      { name:'Integrated MS Suite', code:'PKG-IMS', version:'3.0', status:'published', desc:'Combined QMS + ISMS + service management for multi-standard organisations.', standards:['iso27001','iso9001','iso20000'], templates:71, tenants:2 },
+      { name:'Quality Core', code:'PKG-QMS', version:'1.4', status:'published', desc:'ISO 9001 quality management foundation with environmental add-on.', standards:['iso9001','iso14001'], templates:43, tenants:2 },
+      { name:'ITSM Pack', code:'PKG-ITSM', version:'1.0', status:'draft', desc:'IT service management documentation aligned to ISO/IEC 20000-1.', standards:['iso20000','iso27001'], templates:16, tenants:1 }
+    ];
+  }
+
+  _statusChip(status) {
+    const map = {
+      active:    ['var(--color-success-light)', 'var(--color-success-hover)'],
+      published: ['var(--color-success-light)', 'var(--color-success-hover)'],
+      trial:     ['var(--color-info-light)',    'var(--color-info-hover)'],
+      draft:     ['var(--color-neutral-150)',   'var(--color-neutral-700)'],
+      suspended: ['var(--color-error-light)',   'var(--color-error-hover)']
+    };
+    const c = map[status] || map.draft;
+    return 'display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:var(--radius-full);font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;background:hsl(' + c[0] + ');color:hsl(' + c[1] + ');width:fit-content;';
+  }
+
+  _showToast(title, msg) {
+    if (this._toastTimer) clearTimeout(this._toastTimer);
+    this.setState({ toast: { title, msg } });
+    this._toastTimer = setTimeout(() => this.setState({ toast: null }), 3200);
+  }
+
+  componentDidMount() {
+    this._onKey = (e) => { if (e.key === 'Escape' && this.state.modal) this.setState({ modal: null }); };
+    window.addEventListener('keydown', this._onKey);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._onKey);
+    if (this._toastTimer) clearTimeout(this._toastTimer);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const stds = this._stdMap();
+
+    const navItem = (active) =>
+      'display:flex;align-items:center;gap:10px;width:100%;padding:7px 10px;margin:1px 0;border:none;border-radius:var(--radius-md);font-size:13px;font-weight:' + (active?'600':'500') + ';cursor:pointer;background:' + (active?'hsl(var(--color-primary-light))':'transparent') + ';color:' + (active?'hsl(var(--color-primary-hover))':'hsl(var(--color-text-secondary))') + ';font-family:inherit;';
+    const countStyle = 'font-size:11px;font-weight:600;color:hsl(var(--color-text-muted));background:hsl(var(--color-bg-secondary));padding:1px 7px;border-radius:var(--radius-full);font-variant-numeric:tabular-nums;';
+
+    const nav = [
+      { key:'overview', label:'Overview', icon:'#a-home', count:null },
+      { key:'tenants', label:'Tenants', icon:'#a-building', count:'6' },
+      { key:'packages', label:'Packages', icon:'#a-box', count:'4' },
+      { key:'users', label:'Users', icon:'#a-users', count:null },
+      { key:'billing', label:'Billing', icon:'#a-card', count:null }
+    ].map(n => ({ ...n, style: navItem(st.screen === n.key), countStyle, go: () => this.setState({ screen: n.key }) }));
+    const navSystem = [
+      { key:'audit', label:'Audit log', icon:'#a-clock' },
+      { key:'settings', label:'Settings', icon:'#a-settings' }
+    ].map(n => ({ ...n, style: navItem(st.screen === n.key), go: () => this.setState({ screen: n.key }) }));
+
+    const crumbMap = { overview:'Overview', tenants:'Tenants', packages:'Packages', users:'Users', billing:'Billing', audit:'Audit log', settings:'Settings' };
+
+    // tenants
+    const allTenants = this._tenants();
+    const tCounts = { all: allTenants.length, active:0, trial:0, suspended:0 };
+    allTenants.forEach(t => { tCounts[t.status] = (tCounts[t.status]||0) + 1; });
+    const filteredTenants = st.tenantFilter === 'all' ? allTenants : allTenants.filter(t => t.status === st.tenantFilter);
+    const tenants = filteredTenants.map(t => ({
+      ...t, statusStyle: this._statusChip(t.status),
+      edit: () => this.openEdit('tenant', t),
+      impersonate: () => this._showToast('Opening tenant workspace', 'Signed in as ' + t.name + ' (read-only).')
+    }));
+
+    const tenantStats = [
+      { label:'Total tenants', value:'6', icon:'#a-building', color:'232 75% 52%' },
+      { label:'Active', value:'4', icon:'#a-check', color:'142 76% 36%' },
+      { label:'On trial', value:'1', icon:'#a-clock', color:'217 91% 50%' },
+      { label:'Total seats', value:'198', icon:'#a-users-group', color:'262 55% 54%' }
+    ];
+
+    const chip = (active) => 'display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--radius-full);border:1px solid ' + (active?'transparent':'hsl(var(--color-border))') + ';background:' + (active?'hsl(var(--color-primary-light))':'hsl(var(--color-bg-primary))') + ';color:' + (active?'hsl(var(--color-primary-hover))':'hsl(var(--color-text-secondary))') + ';font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap;';
+    const tenantFilters = [
+      { key:'all', label:'All', dot:null, count:tCounts.all },
+      { key:'active', label:'Active', dot:'var(--color-success)', count:tCounts.active },
+      { key:'trial', label:'Trial', dot:'var(--color-info)', count:tCounts.trial },
+      { key:'suspended', label:'Suspended', dot:'var(--color-error)', count:tCounts.suspended }
+    ].map(f => ({ ...f, style: chip(st.tenantFilter === f.key), set: () => this.setState({ tenantFilter: f.key }) }));
+
+    // packages
+    const packages = this._packages().map(p => ({
+      ...p,
+      statusStyle: this._statusChip(p.status),
+      standards: p.standards.map(id => ({ code: stds[id].code, color: stds[id].color })),
+      edit: () => this.openEdit('package', p)
+    }));
+
+    // ---------- modal ----------
+    const m = st.modal;
+    const isTenantModal = !!m && m.kind === 'tenant';
+    const isPackageModal = !!m && m.kind === 'package';
+    const isEdit = !!m && m.mode === 'edit';
+    const form = (m && m.data) || {};
+
+    const inputStyle = 'width:100%;padding:8px 11px;border:1px solid hsl(var(--color-border));border-radius:var(--radius-md);background:hsl(var(--color-bg-secondary));font-size:13px;outline:none;color:inherit;font-family:inherit;';
+
+    const radioCard = (active) => 'display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid ' + (active?'hsl(var(--color-primary))':'hsl(var(--color-border))') + ';border-radius:var(--radius-md);background:' + (active?'hsl(var(--color-primary-lighter))':'hsl(var(--color-bg-primary))') + ';cursor:pointer;';
+    const planOptions = [
+      { key:'Trial', label:'Trial', meta:'30 days' },
+      { key:'Standard', label:'Standard', meta:'up to 25 seats' },
+      { key:'Enterprise', label:'Enterprise', meta:'unlimited' }
+    ].map(o => { const checked = (form.plan || 'Standard') === o.key; return { ...o, checked, style: radioCard(checked) }; });
+
+    const seg = (active) => 'padding:6px 14px;border-radius:5px;font-size:12.5px;font-weight:' + (active?'600':'500') + ';cursor:pointer;color:' + (active?'hsl(var(--color-primary-hover))':'hsl(var(--color-text-secondary))') + ';background:' + (active?'hsl(var(--color-bg-primary))':'transparent') + ';box-shadow:' + (active?'var(--shadow-xs)':'none') + ';';
+    const statusOptions = [
+      { key:'active', label:'Active' }, { key:'trial', label:'Trial' }, { key:'suspended', label:'Suspended' }
+    ].map(o => { const checked = (form.status || 'active') === o.key; return { ...o, checked, style: seg(checked) }; });
+
+    const checkCard = (active) => 'display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid ' + (active?'hsl(var(--color-primary) / .5)':'hsl(var(--color-border))') + ';border-radius:var(--radius-md);background:' + (active?'hsl(var(--color-primary-lighter))':'hsl(var(--color-bg-primary))') + ';cursor:pointer;';
+    const formStds = form.standards || [];
+    const standardChecks = Object.keys(stds).map(id => {
+      const checked = formStds.indexOf(id) >= 0;
+      return { code: stds[id].code, short: stds[id].short, color: stds[id].color, checked, style: checkCard(checked) };
+    });
+
+    const visOptions = [
+      { key:'private', label:'Private' }, { key:'catalog', label:'In catalog' }
+    ].map(o => { const checked = (form.visibility || 'catalog') === o.key; return { ...o, checked, style: 'flex:1;text-align:center;' + seg(checked) }; });
+
+    return {
+      theme: st.theme,
+      themeIcon: st.theme === 'dark' ? '#a-sun' : '#a-moon',
+      toggleTheme: () => this.setState({ theme: st.theme === 'dark' ? 'light' : 'dark' }),
+      stop: (e) => { e.stopPropagation(); },
+
+      nav, navSystem,
+      crumb: crumbMap[st.screen] || 'Overview',
+      isTenants: st.screen === 'tenants',
+      isPackages: st.screen === 'packages',
+      isOther: ['overview','users','billing','audit','settings'].indexOf(st.screen) >= 0,
+      otherIcon: (nav.concat(navSystem).find(n => n.key === st.screen) || {}).icon || '#a-home',
+
+      tenants, tenantStats, tenantFilters,
+      packages,
+
+      openCreateTenant: () => this.setState({ modal: { kind:'tenant', mode:'create', data:{ plan:'Standard', status:'active' } } }),
+      openCreatePackage: () => this.setState({ modal: { kind:'package', mode:'create', data:{ visibility:'catalog', standards:[] } } }),
+      closeModal: () => this.setState({ modal: null }),
+      save: () => {
+        const kind = m.kind, mode = m.mode;
+        this.setState({ modal: null });
+        const noun = kind === 'tenant' ? 'Tenant' : 'Package';
+        this._showToast(noun + (mode === 'edit' ? ' updated' : ' created'), mode === 'edit' ? 'Your changes have been saved.' : 'The ' + kind + ' has been provisioned.');
+      },
+
+      modalOpen: !!m,
+      isTenantModal, isPackageModal, isEdit,
+      modalWidth: isPackageModal ? '600px' : '560px',
+      modalIcon: isTenantModal ? '#a-building' : '#a-box',
+      modalTitle: (isEdit ? 'Edit ' : 'New ') + (isTenantModal ? 'tenant' : 'package'),
+      modalSubtitle: isTenantModal ? 'Client organisation on the platform' : 'Documentation bundle for tenants',
+      saveLabel: isEdit ? 'Save changes' : (isTenantModal ? 'Create tenant' : 'Create package'),
+      form,
+      inputStyle,
+      planOptions, statusOptions, standardChecks, visOptions,
+
+      toastShown: !!st.toast,
+      toastTitle: (st.toast || {}).title || '',
+      toastMsg: (st.toast || {}).msg || ''
+    };
+  }
+
+  openEdit(kind, row) {
+    this.setState({ modal: { kind, mode:'edit', data: { ...row } } });
+  }
+}
+</script>
+</body>
+</html>

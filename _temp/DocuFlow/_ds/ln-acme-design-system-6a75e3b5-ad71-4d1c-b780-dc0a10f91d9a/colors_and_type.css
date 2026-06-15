@@ -1,0 +1,340 @@
+/* ==========================================================================
+   ln-acme — colors & type tokens (portable CSS)
+   --------------------------------------------------------------------------
+   Flattened / copy-pasteable subset of scss/config/_tokens.scss for use in
+   design artifacts (slides, mocks, HTML). Same variable names, same HSL
+   triplet convention, so anything built on top stays in sync with the
+   real library.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+	/* ── Colors · Primary ─────────────────────────────────────────── */
+	--color-primary:          232 75% 52%;
+	--color-primary-hover:    232 75% 42%;
+	--color-primary-focus:    232 75% 60%;
+	--color-primary-light:    232 75% 93%;
+	--color-primary-lighter:  232 75% 97%;
+
+	/* ── Colors · Secondary (brand accent green) ──────────────────── */
+	--color-secondary:         160 76% 40%;
+	--color-secondary-hover:   162 93% 31%;
+	--color-secondary-focus:   160 76% 48%;
+	--color-secondary-light:   160 76% 93%;
+	--color-secondary-lighter: 160 76% 97%;
+
+	/* ── Colors · Status ──────────────────────────────────────────── */
+	--color-success:         142 76% 36%;
+	--color-success-hover:   142 76% 26%;
+	--color-success-focus:   142 76% 44%;
+	--color-success-light:   142 76% 93%;
+	--color-success-lighter: 142 76% 97%;
+
+	--color-error:           0 84% 50%;
+	--color-error-hover:     0 74% 42%;
+	--color-error-focus:     0 84% 58%;
+	--color-error-light:     0 84% 93%;
+	--color-error-lighter:   0 84% 97%;
+
+	--color-warning:         32 95% 44%;
+	--color-warning-hover:   32 95% 34%;
+	--color-warning-focus:   32 95% 52%;
+	--color-warning-light:   32 95% 93%;
+	--color-warning-lighter: 32 95% 97%;
+
+	--color-info:            217 91% 60%;
+	--color-info-hover:      217 91% 50%;
+	--color-info-focus:      217 91% 68%;
+	--color-info-light:      217 91% 93%;
+	--color-info-lighter:    217 91% 97%;
+
+	/* ── Colors · Neutral scale (canonical greys) ─────────────────── */
+	--color-neutral-50:  220 20% 98%;
+	--color-neutral-100: 220 16% 96%;
+	--color-neutral-150: 220 14% 93%;
+	--color-neutral-200: 220 13% 91%;
+	--color-neutral-300: 220 13% 83%;
+	--color-neutral-400: 218 11% 65%;
+	--color-neutral-500: 220  9% 46%;
+	--color-neutral-600: 220 11% 34%;
+	--color-neutral-700: 220 14% 24%;
+	--color-neutral-800: 220 20% 15%;
+	--color-neutral-900: 221 39% 11%;
+
+	/* ── Colors · Semantic (text / bg / border) ───────────────────── */
+	--color-text-primary:   var(--color-neutral-900);
+	--color-text-secondary: var(--color-neutral-500);
+	--color-text-muted:     var(--color-neutral-400);
+
+	--color-white:        0 0% 100%;
+	--color-bg-primary:   var(--color-white);
+	--color-bg-secondary: var(--color-neutral-50);
+	--color-bg-body:      var(--color-neutral-100);
+	--color-bg-error:     0 86% 97%;
+
+	--color-border:       var(--color-neutral-200);
+	--color-border-light: var(--color-neutral-100);
+
+	--color-table-header-bg:   var(--color-neutral-200);
+	--color-table-header-text: var(--color-neutral-900);
+	--color-table-section-bg:  var(--color-neutral-150);
+
+	/* ── Spacing ──────────────────────────────────────────────────── */
+	--spacing-2xs: 0.125rem;
+	--spacing-xs:  0.25rem;
+	--spacing-sm:  0.5rem;
+	--spacing-md:  1rem;
+	--spacing-lg:  1.5rem;
+	--spacing-xl:  2rem;
+	--spacing-2xl: 3rem;
+	--spacing-3xl: 4rem;
+	--spacing-4xl: 6rem;
+	--spacing-5xl: 8rem;
+
+	/* ── Border width & radius ────────────────────────────────────── */
+	--border-width: 1px;
+	--border-width-strong: 2px;
+
+	--radius-sm: 0.25rem;
+	--radius-md: 0.5rem;
+	--radius-lg: 0.75rem;
+	--radius-xl: 1rem;
+	--radius-full: 9999px;
+
+	/* ── Content widths ───────────────────────────────────────────── */
+	--max-w-prose:     65ch;
+	--max-w-form:      32rem;
+	--max-w-content:   48rem;
+	--max-w-container: 80rem;
+
+	/* ── Shadows (cool-tinted, dual-layer) ────────────────────────── */
+	--shadow-none: none;
+	--shadow-xs:  0 1px 2px 0 hsl(220 40% 15% / 0.04);
+	--shadow-sm:  0 1px 3px 0 hsl(220 40% 15% / 0.08),
+	              0 1px 2px -1px hsl(220 40% 15% / 0.04);
+	--shadow-md:  0 4px 12px -2px hsl(220 40% 15% / 0.10),
+	              0 2px 4px -2px hsl(220 40% 15% / 0.06);
+	--shadow-lg:  0 12px 24px -6px hsl(220 40% 15% / 0.12),
+	              0 8px 12px -4px hsl(220 40% 15% / 0.08);
+	--shadow-xl:  0 24px 48px -12px hsl(220 40% 15% / 0.16),
+	              0 12px 24px -6px hsl(220 40% 15% / 0.10);
+	--shadow-2xl: 0 36px 72px -18px hsl(220 40% 15% / 0.20),
+	              0 18px 36px -9px hsl(220 40% 15% / 0.12);
+	--shadow-inner: inset 0 2px 4px 0 hsl(220 40% 15% / 0.06);
+
+	--shadow-primary: 0 8px 24px -6px hsl(var(--color-primary) / 0.28);
+	--shadow-success: 0 8px 24px -6px hsl(var(--color-success) / 0.28);
+	--shadow-error:   0 8px 24px -6px hsl(var(--color-error)   / 0.28);
+
+	/* ── Motion ───────────────────────────────────────────────────── */
+	--transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+	--easing-standard:   cubic-bezier(0.4, 0, 0.2, 1);
+	--easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+	--easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+	--easing-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	/* ── Typography · families ────────────────────────────────────── */
+	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+
+	/* ── Typography · primitives (intent: "14px text") ────────────── */
+	--text-xs:   0.75rem;
+	--text-sm:   0.875rem;
+	--text-base: 1rem;
+	--text-lg:   1.125rem;
+	--text-xl:   1.25rem;
+	--text-2xl:  1.5rem;
+
+	/* ── Typography · semantic roles (intent: "page title") ───────── */
+	--text-display-lg: 3.75rem;  --lh-display-lg: 1.1;
+	--text-display-md: 3rem;     --lh-display-md: 1.1;
+	--text-display-sm: 2.25rem;  --lh-display-sm: 1.15;
+
+	--text-heading-lg: 1.875rem; --lh-heading-lg: 1.2;
+	--text-heading-md: 1.5rem;   --lh-heading-md: 1.25;
+	--text-heading-sm: 1.25rem;  --lh-heading-sm: 1.3;
+
+	--text-title-md: 1.125rem;   --lh-title-md: 1.4;
+	--text-title-sm: 1rem;       --lh-title-sm: 1.4;
+
+	--text-body-lg: 1.125rem;    --lh-body-lg: 1.6;
+	--text-body-md: 1rem;        --lh-body-md: 1.6;
+	--text-body-sm: 0.875rem;    --lh-body-sm: 1.5;
+
+	--text-label-md: 0.875rem;   --lh-label-md: 1.4;
+	--text-label-sm: 0.75rem;    --lh-label-sm: 1.4;
+
+	--text-caption:  0.75rem;    --lh-caption:  1.4;
+
+	--tracking-tight:  -0.025em;
+	--tracking-normal: 0;
+	--tracking-wide:    0.025em;
+
+	--font-normal:   400;
+	--font-medium:   500;
+	--font-semibold: 600;
+	--font-bold:     700;
+
+	/* ── Z-index ──────────────────────────────────────────────────── */
+	--z-sticky:   10;
+	--z-dropdown: 20;
+	--z-overlay:  30;
+	--z-modal:    40;
+	--z-toast:    50;
+}
+
+/* ==========================================================================
+   Semantic element defaults — mirror scss/base/_typography.scss
+   ========================================================================== */
+html, body {
+	font-family: var(--font-sans);
+	color: hsl(var(--color-text-primary));
+	background: hsl(var(--color-bg-body));
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: hsl(var(--color-text-primary));
+	font-weight: var(--font-bold);
+	margin: 0 0 1rem;
+}
+
+h1 { font-size: var(--text-display-sm); line-height: var(--lh-display-sm); letter-spacing: var(--tracking-tight); }
+h2 { font-size: var(--text-heading-md); line-height: var(--lh-heading-md); letter-spacing: var(--tracking-tight); }
+h3 { font-size: var(--text-heading-sm); line-height: var(--lh-heading-sm); font-weight: var(--font-semibold); margin-bottom: 0.75rem; }
+h4 { font-size: var(--text-title-md);   line-height: var(--lh-title-md);   font-weight: var(--font-semibold); margin-bottom: 0.5rem; }
+h5 { font-size: var(--text-title-sm);   line-height: var(--lh-title-sm);   font-weight: var(--font-semibold); margin-bottom: 0.5rem; }
+h6 { font-size: var(--text-label-md);   line-height: var(--lh-label-md);   font-weight: var(--font-semibold); margin-bottom: 0.25rem; }
+
+p {
+	font-size: var(--text-body-md);
+	line-height: var(--lh-body-md);
+	color: hsl(var(--color-text-primary));
+	margin: 0 0 1rem;
+}
+p:last-child { margin-bottom: 0; }
+
+strong, b { font-weight: var(--font-semibold); }
+em, i     { font-style: italic; }
+
+small {
+	font-size: var(--text-sm);
+	color: hsl(var(--color-text-secondary));
+}
+
+code {
+	font-family: var(--font-mono);
+	font-size: var(--text-sm);
+	background: hsl(var(--color-bg-body));
+	padding: 0.125rem 0.25rem;
+	border-radius: var(--radius-sm);
+}
+
+pre {
+	font-family: var(--font-mono);
+	font-size: var(--text-sm);
+	background: hsl(var(--color-bg-body));
+	padding: 1rem;
+	border-radius: var(--radius-md);
+	border: var(--border-width) solid hsl(var(--color-border));
+	overflow-x: auto;
+}
+
+blockquote {
+	border-left: 3px solid hsl(var(--color-primary));
+	background: hsl(var(--color-bg-secondary));
+	padding: 1rem;
+	border-radius: var(--radius-sm);
+	color: hsl(var(--color-text-secondary));
+	font-style: italic;
+	margin: 0 0 1rem;
+}
+
+a {
+	color: hsl(var(--color-primary));
+	text-decoration: none;
+	transition: color var(--transition-base);
+}
+a:hover { color: hsl(var(--color-primary-hover)); }
+
+::selection {
+	background: hsl(var(--color-primary) / 0.2);
+	color: hsl(var(--color-text-primary));
+}
+
+/* ==========================================================================
+   Dark mode — mirrors scss/config/_theme.scss
+   Activate with <html data-theme="dark"> or prefers-color-scheme: dark.
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--color-neutral-50:  220 20%  8%;
+		--color-neutral-100: 220 16% 12%;
+		--color-neutral-150: 220 14% 18%;
+		--color-neutral-200: 220 13% 24%;
+		--color-neutral-300: 220 13% 36%;
+		--color-neutral-400: 218 11% 52%;
+		--color-neutral-500: 220  9% 60%;
+		--color-neutral-600: 220 11% 72%;
+		--color-neutral-700: 220 14% 82%;
+		--color-neutral-800: 220 20% 90%;
+		--color-neutral-900: 221 30% 97%;
+
+		--color-bg-body:      220 16%  9%;
+		--color-bg-primary:   220 16% 13%;
+		--color-bg-secondary: 220 16% 17%;
+		--color-border-light: 220 14% 20%;
+
+		--color-primary-light:   232 60% 22%;
+		--color-primary-lighter: 232 50% 15%;
+		--color-success-light:   142 50% 18%;
+		--color-success-lighter: 142 40% 13%;
+		--color-warning-light:   32 55% 20%;
+		--color-warning-lighter: 32 45% 14%;
+		--color-info-light:      217 55% 22%;
+		--color-info-lighter:    217 45% 15%;
+		--color-error-light:     0 50% 20%;
+		--color-error-lighter:   0 40% 14%;
+		--color-secondary-light:   160 55% 20%;
+		--color-secondary-lighter: 160 45% 14%;
+		--color-bg-error: 0 40% 15%;
+	}
+}
+
+[data-theme="dark"] {
+	--color-neutral-50:  220 20%  8%;
+	--color-neutral-100: 220 16% 12%;
+	--color-neutral-150: 220 14% 18%;
+	--color-neutral-200: 220 13% 24%;
+	--color-neutral-300: 220 13% 36%;
+	--color-neutral-400: 218 11% 52%;
+	--color-neutral-500: 220  9% 60%;
+	--color-neutral-600: 220 11% 72%;
+	--color-neutral-700: 220 14% 82%;
+	--color-neutral-800: 220 20% 90%;
+	--color-neutral-900: 221 30% 97%;
+
+	--color-bg-body:      220 16%  9%;
+	--color-bg-primary:   220 16% 13%;
+	--color-bg-secondary: 220 16% 17%;
+	--color-border-light: 220 14% 20%;
+
+	--color-primary-light:   232 60% 22%;
+	--color-primary-lighter: 232 50% 15%;
+	--color-success-light:   142 50% 18%;
+	--color-success-lighter: 142 40% 13%;
+	--color-warning-light:   32 55% 20%;
+	--color-warning-lighter: 32 45% 14%;
+	--color-info-light:      217 55% 22%;
+	--color-info-lighter:    217 45% 15%;
+	--color-error-light:     0 50% 20%;
+	--color-error-lighter:   0 40% 14%;
+	--color-secondary-light:   160 55% 20%;
+	--color-secondary-lighter: 160 45% 14%;
+	--color-bg-error: 0 40% 15%;
+}

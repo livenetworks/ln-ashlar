@@ -24,7 +24,7 @@
 	box-shadow: var(--shadow);
 
 	&:hover {
-		--color-border: var(--border-strong);
+		--color-border: color-mix(in srgb, var(--color-accent) 35%, transparent);
 		--shadow: var(--nested-card-shadow-hover, var(--shadow-floating));
 	}
 
@@ -92,7 +92,7 @@
 	@include flex;
 	@include items-center;
 	@include justify-between;
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--card-padding-y) var(--card-padding-x);
 	@include border-b;
 	--color-bg: var(--bg-sunken);
 	background: var(--color-bg);
@@ -139,7 +139,7 @@
 }
 
 @mixin panel-body {
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--card-padding-y) var(--card-padding-x);
 
 	&:has(> table),
 	&:has(> .table-container),
@@ -178,8 +178,10 @@
 }
 
 @mixin panel-footer {
-	padding: var(--padding-y) var(--padding-x);
+	padding: var(--card-padding-y) var(--card-padding-x);
 	@include border-t;
+	--color-bg: var(--bg-sunken);
+	background: var(--color-bg);
 	@include flex;
 	@include justify-end;
 	gap: var(--gap);

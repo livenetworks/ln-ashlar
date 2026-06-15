@@ -54,7 +54,7 @@ h6 {
 p {
 	font-size: var(--text-body-md);
 	color: var(--color-fg);
-	line-height: 1.75;
+	line-height: var(--lh-body-md);
 	margin-bottom: var(--size-md);
 
 	&:last-child {

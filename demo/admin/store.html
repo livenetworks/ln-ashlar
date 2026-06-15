@@ -6,7 +6,7 @@
 	<title>Store — ln-ashlar</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 	<!-- Theme bootstrap — runs before first paint to prevent FOUC.
 	     Uses var/indexOf for maximum compat; no bundler on this path. -->
 	<script>
@@ -17,6 +17,20 @@
 			var stored = localStorage.getItem(KEY);
 			if (stored && VALID.indexOf(stored) !== -1) {
 				document.documentElement.setAttribute('data-theme', stored);
+			}
+		} catch (e) { /* localStorage unavailable — fall through */ }
+	})();
+	</script>
+	<!-- Density bootstrap — runs before first paint to prevent FOUC.
+	     Uses var/indexOf for maximum compat; no bundler on this path. -->
+	<script>
+	(function () {
+		var KEY = 'ln-demo-density';
+		var VALID = ['compact', 'comfortable', 'spacious'];
+		try {
+			var stored = localStorage.getItem(KEY);
+			if (stored && VALID.indexOf(stored) !== -1) {
+				document.documentElement.setAttribute('data-density', stored);
 			}
 		} catch (e) { /* localStorage unavailable — fall through */ }
 	})();
@@ -54,6 +68,16 @@
 							<li><button type="button" data-demo-theme="sunset"><span class="demo-theme-swatch" data-preset="sunset"></span>Sunset</button></li>
 							<li><button type="button" data-demo-theme="midnight"><span class="demo-theme-swatch" data-preset="midnight"></span>Midnight</button></li>
 							<li><button type="button" data-demo-theme="glass"><span class="demo-theme-swatch" data-preset="glass"></span>Glass</button></li>
+						</ul>
+					</div>
+					<button type="button" id="demo-density-trigger" data-ln-popover-for="demo-density-picker" aria-label="Choose density">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-adjustments-horizontal"></use></svg>
+					</button>
+					<div class="demo-density-picker" data-ln-popover id="demo-density-picker">
+						<ul>
+							<li><button type="button" data-demo-density="compact">Compact</button></li>
+							<li><button type="button" data-demo-density="comfortable">Comfortable</button></li>
+							<li><button type="button" data-demo-density="spacious">Spacious</button></li>
 						</ul>
 					</div>
 					<button type="button" onclick="window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {detail:{type:'info', title:'Info', message:'This is a demo notification.'}}))">
@@ -607,8 +631,14 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 	<div class="ln-modal" data-ln-modal id="demo-form">
 		<form id="demo-form-el" data-ln-form>
 			<header>
-				<h3>Add User</h3>
-				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<span class="icon">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-user"></use></svg>
+				</span>
+				<hgroup>
+					<h3>Edit User</h3>
+					<p>Update the user's details below.</p>
+				</hgroup>
+				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
 			</header>
 			<main>
 				<div class="form-element">
@@ -629,6 +659,10 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 				</div>
 			</main>
 			<footer>
+				<button type="button" class="delete-action">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+					Delete
+				</button>
 				<button type="button" data-ln-modal-close>Cancel</button>
 				<button type="submit">Save</button>
 			</footer>
@@ -661,6 +695,40 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
 			markActive();
 			const popover = document.getElementById('demo-theme-picker');
+			if (popover && popover.lnPopover && popover.lnPopover.close) {
+				popover.lnPopover.close();
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', markActive);
+		if (document.readyState !== 'loading') markActive();
+	})();
+
+	(function () {
+		const KEY = 'ln-demo-density';
+		const VALID = ['compact', 'comfortable', 'spacious'];
+		const root = document.documentElement;
+
+		function markActive() {
+			const current = root.getAttribute('data-density') || 'compact';
+			document.querySelectorAll('[data-demo-density]').forEach(function (btn) {
+				if (btn.getAttribute('data-demo-density') === current) {
+					btn.setAttribute('aria-current', 'true');
+				} else {
+					btn.removeAttribute('aria-current');
+				}
+			});
+		}
+
+		document.addEventListener('click', function (e) {
+			const btn = e.target.closest('[data-demo-density]');
+			if (!btn) return;
+			const value = btn.getAttribute('data-demo-density');
+			if (VALID.indexOf(value) === -1) return;
+			root.setAttribute('data-density', value);
+			try { localStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
+			markActive();
+			const popover = document.getElementById('demo-density-picker');
 			if (popover && popover.lnPopover && popover.lnPopover.close) {
 				popover.lnPopover.close();
 			}

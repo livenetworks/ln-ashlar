@@ -20,9 +20,9 @@
 	// -----------------------------------------------------------------------
 	// Colors — Primary
 	// -----------------------------------------------------------------------
-	--color-primary: 216 95% 42%;
-	--color-primary-light: 216 95% 93%;
-	--color-primary-lighter: 216 95% 97%;
+	--color-primary: 232 75% 52%;
+	--color-primary-light: 232 75% 93%;
+	--color-primary-lighter: 232 75% 97%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Secondary (brand accent — surface/element color, NOT text)
@@ -59,17 +59,17 @@
 	// during dark-mode audits -- semantic tokens inherit dark adjustments
 	// automatically, direct-neutral references do not.
 	//
-	--color-neutral-50:  215 20% 98%;
-	--color-neutral-100: 215 16% 96%;
-	--color-neutral-150: 215 14% 93%;
-	--color-neutral-200: 215 13% 91%;
-	--color-neutral-300: 215 13% 83%;
-	--color-neutral-400: 215 11% 65%;
-	--color-neutral-500: 215  9% 46%;
-	--color-neutral-600: 215 11% 34%;
-	--color-neutral-700: 215 14% 24%;
-	--color-neutral-800: 215 20% 15%;
-	--color-neutral-900: 215 39% 11%;
+	--color-neutral-50:  220 20% 98%;
+	--color-neutral-100: 220 16% 96%;
+	--color-neutral-150: 220 14% 93%;
+	--color-neutral-200: 220 13% 91%;
+	--color-neutral-300: 220 13% 83%;
+	--color-neutral-400: 218 11% 65%;
+	--color-neutral-500: 220  9% 46%;
+	--color-neutral-600: 220 11% 34%;
+	--color-neutral-700: 220 14% 24%;
+	--color-neutral-800: 220 20% 15%;
+	--color-neutral-900: 221 39% 11%;
 
 	// -----------------------------------------------------------------------
 	// Colors — Backgrounds
@@ -100,6 +100,8 @@
 	--size-xl:     2rem;       // 32px
 	--size-2xl:    3rem;       // 48px
 	--size-3xl:    4rem;       // 64px
+	--size-4xl:    6rem;
+	--size-5xl:    8rem;
 
 	// -----------------------------------------------------------------------
 	// Border Width
@@ -184,7 +186,7 @@
 	// Typography
 	// -----------------------------------------------------------------------
 	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-	--font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+	--font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
 
 	--text-xs: 0.75rem;      // 12px
 	--text-sm: 0.875rem;     // 14px
@@ -199,20 +201,20 @@
 	// Public API surface — full scale exposed; internal usage may skip levels.
 	--text-display-lg: 3.75rem;   --lh-display-lg: 1.1;
 	--text-display-md: 3rem;      --lh-display-md: 1.1;
-	--text-display-sm: 2.25rem;   --lh-display-sm: 1.15;
+	--text-display-sm: 1.875rem;  --lh-display-sm: 1.1;
 
-	--text-heading-lg: 1.875rem;  --lh-heading-lg: 1.2;
-	--text-heading-md: 1.5rem;    --lh-heading-md: 1.25;
-	--text-heading-sm: 1.25rem;   --lh-heading-sm: 1.3;
+	--text-heading-lg: 1.75rem;   --lh-heading-lg: 1.15;
+	--text-heading-md: 1.25rem;   --lh-heading-md: 1.2;
+	--text-heading-sm: 1.125rem;  --lh-heading-sm: 1.25;
 
-	--text-title-md:   1.125rem;  --lh-title-md:   1.4;
-	--text-title-sm:   1rem;      --lh-title-sm:   1.4;
+	--text-title-md:   1rem;      --lh-title-md:   1.3;
+	--text-title-sm:   0.875rem;  --lh-title-sm:   1.3;
 
 	--text-body-lg:    1.125rem;  --lh-body-lg:    1.6;
-	--text-body-md:    1rem;      --lh-body-md:    1.6;
-	--text-body-sm:    0.875rem;  --lh-body-sm:    1.5;
+	--text-body-md:    0.875rem;  --lh-body-md:    1.5;   // 14px / 1.5 — DocuFlow body
+	--text-body-sm:    0.8125rem; --lh-body-sm:    1.45;  // 13px
 
-	--text-label-md:   0.875rem;  --lh-label-md:   1.4;
+	--text-label-md:   0.8125rem; --lh-label-md:   1.4;   // 13px
 	--text-label-sm:   0.75rem;   --lh-label-sm:   1.4;
 
 	--text-caption:    0.75rem;   --lh-caption:    1.4;
@@ -241,8 +243,8 @@
 	// -----------------------------------------------------------------------
 	// App shell — intrinsic dimensions (not spacing rhythm)
 	// -----------------------------------------------------------------------
-	--app-header-height: 3.5rem;
-	--app-sidebar-width: 16rem;
+	--app-header-height: 3.25rem;   // 52px — DocuFlow topbar height
+	--app-sidebar-width: 14.5rem;   // 232px — DocuFlow sidebar width
 	--app-scrim-bg: hsl(var(--color-neutral-900) / 0.4);
 
 	// -----------------------------------------------------------------------
@@ -260,8 +262,8 @@
 
 	// -- Structure & rhythm -----------------------------------------------
 	--padding-x:       var(--size-sm-up);
-	--padding-y:       var(--size-sm);
-	--gap:             var(--size-sm);
+	--padding-y:       var(--size-xs-up);   // 6px — dense base (DocuFlow 7px rounds to 6px)
+	--gap:             var(--size-xs-up);   // 6px — dense base
 	--radius:          var(--radius-md);
 
 	// -----------------------------------------------------------------------
@@ -350,8 +352,16 @@
 	--btn-border-hover: var(--border-strong-hover);
 
 	// Button padding tokens
-	--btn-padding-x:    var(--size-md);
-	--btn-padding-y:    var(--size-sm);
+	--btn-padding-x:    var(--size-sm-up);
+	--btn-padding-y:    var(--size-xs-up);
+
+	// Card padding tokens — roomier than base rhythm; density-reactive via _density.scss
+	--card-padding-y:        var(--size-sm-up);    // 12px dense base
+	--card-padding-x:        var(--size-md);       // 16px dense base
+
+	// Table cell padding tokens — roomier than base rhythm; density-reactive via _density.scss
+	--table-cell-padding-y:  var(--size-sm);       // 8px dense base (DocuFlow th: 9px / td: 10px)
+	--table-cell-padding-x:  var(--size-md);       // 16px dense base
 
 	// -- Typography ------------------------------------------------------
 	--font-size:    var(--text-body-md);
@@ -389,10 +399,10 @@
 	//       margin-bottom: var(--margin-block);
 	//   }
 	//
-	// Density-compact reacts automatically: density-compact rebinds
-	// the underlying --size-* scale, and the consumer's
-	// `--margin-block: var(--size-md)` re-resolves at the consumer
-	// element under the compact scope.
+	// NOTE: [data-density] scopes rebind type roles, logical
+	// --padding-y/--gap, and control sizing — NOT the --size-* scale.
+	// So --margin-block (reading --size-*) is constant across density
+	// tiers for now; making structural margins reactive is a Phase 3 item.
 	//
 	// --margin-inline is the horizontal companion. Used for
 	// element-pushing structural offsets (icon→text gap inside a
@@ -402,18 +412,17 @@
 
 // ---------------------------------------------------------------------------
 // Mobile rhythm — logical tokens tighten at ≤ md viewport.
-// Not the same as `.density-compact` (that's a user opt-in).
+// Not the same as `[data-density]` (that's a user opt-in).
 // This is viewport-driven structural compression: content dominates chrome
 // at narrow widths. Components reading --padding-x/--padding-y/--gap
 // react via the cascade.
 //
-// Interaction with .density-compact: stacks. Compact user + mobile viewport =
-// both apply; the underlying --size-* scale is already tighter in
-// .density-compact so logical tokens resolve to the tightest value.
+// Interaction with [data-density]: stacks. Compact density + mobile viewport =
+// both apply; the underlying --padding-y tightens further from the mobile rebind.
 // ---------------------------------------------------------------------------
 @include mq-down(md) {
 	:root {
-		--padding-y: var(--size-xs);     // 12px → 4px
-		--gap:       var(--size-xs-up);  // 8px → 6px
+		--padding-y: var(--size-xs);     // 6px → 4px
+		--gap:       var(--size-xs-up);  // 6px → 6px (already tight)
 	}
 }

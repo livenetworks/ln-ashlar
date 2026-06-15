@@ -1,0 +1,8 @@
+@use '../../../../scss/config/mixins' as *;
+
+.demo-density-picker {
+	ul {
+		@include menu-items;
+		min-width: 10rem;
+	}
+}

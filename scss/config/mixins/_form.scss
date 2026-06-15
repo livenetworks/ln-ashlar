@@ -91,12 +91,13 @@
 
 @mixin form-input {
 	@include w-full;
-	--padding-y: var(--size-sm);
+	--padding-y: var(--input-padding-y, var(--size-sm));
 	--padding-x: var(--size-md);
 	padding: var(--padding-y) var(--padding-x);
 	font-size: var(--font-size);
 	line-height: var(--line-height);
 	color: var(--color-fg);
+	--color-bg: var(--input-bg, var(--bg-recessed));
 	background: var(--color-bg);
 	@include border;
 	border-radius: var(--radius);
@@ -336,8 +337,8 @@
 	--color-bg: var(--bg-recessed);   // recessed fill so the white clear-hover reads
 	--btn-bg-hover: var(--bg-base);   // clear button highlights white on hover (token rebind, no specificity override)
 
-	// Density-immune: pin to the compact scale so the field is one size
-	// everywhere, regardless of ambient .density-compact. Mirror the values
+	// Density-immune: pin to the dense base scale so the field is one size
+	// everywhere, regardless of ambient [data-density]. Mirror the values
 	// in config/_density.scss — keep in sync.
 	--size-xs: 0.125rem;
 	--size-sm: 0.375rem;
@@ -416,7 +417,7 @@
 	@include flex;
 	@include items-center;
 	gap: var(--gap);
-	--padding-y: var(--size-sm);
+	--padding-y: var(--input-padding-y, var(--size-sm));
 	--padding-x: var(--size-md);
 	padding: var(--padding-y) var(--padding-x);
 	@include cursor-pointer;
