@@ -1,6 +1,5 @@
 # Build output
 /index.html
-/dist/
 
 # Auto-generated SCSS aggregation
 /src/_modules.generated.scss
