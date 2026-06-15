@@ -7,13 +7,13 @@
 	<link rel="icon" href="data:,">
 
 	<!-- App styles: compiled framework + modules SCSS -->
-	<link rel="stylesheet" href="/demo/spa/dist/app.css">
+	<link rel="stylesheet" href="/spa/dist/app.css">
 
 	<!-- ln-ashlar components bundle -->
-	<script src="/demo/dist/ln-ashlar.iife.js" defer></script>
+	<script src="/dist/ln-ashlar.iife.js" defer></script>
 
 	<!-- The concatenated application (runtime + modules JS) -->
-	<script src="/demo/spa/dist/app.js" defer></script>
+	<script src="/spa/dist/app.js" defer></script>
 </head>
 <body>
 	<!-- Persistent app chrome: header, sidebar, and the routing outlet. -->
@@ -25,7 +25,7 @@
 			<button type="button" class="menu-toggle" data-ln-toggle-for="app-sidebar" aria-label="Open menu">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 			</button>
-			<a class="app-brand" href="/demo/spa">
+			<a class="app-brand" href="/spa">
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-files"></use></svg>
 				<span>DocuFlow</span>
 			</a>
@@ -43,19 +43,19 @@
 				<nav aria-label="Main navigation" data-ln-nav="active">
 					<ul>
 						<li>
-							<a href="/demo/spa">
+							<a href="/spa">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-layout-dashboard"></use></svg>
 								<span class="nav-label">Dashboard</span>
 							</a>
 						</li>
 						<li>
-							<a href="/demo/spa/packages">
+							<a href="/spa/packages">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-package"></use></svg>
 								<span class="nav-label">Packages</span>
 							</a>
 						</li>
 						<li>
-							<a href="/demo/spa/tenants">
+							<a href="/spa/tenants">
 								<svg class="ln-icon nav-icon" aria-hidden="true"><use href="#ln-building"></use></svg>
 								<span class="nav-label">Tenants</span>
 							</a>
@@ -302,7 +302,7 @@
 	<!-- Route templates, swapped into the outlet by ln-router. -->
 	
 		<!-- dashboard/dashboard.html -->
-		<template data-ln-route="/demo/spa" data-ln-route-title="Dashboard — DocuFlow">
+		<template data-ln-route="/spa" data-ln-route-title="Dashboard — DocuFlow">
 	<section id="dashboard" class="is-loading">
 		<header class="page-header">
 			<div class="page-title">
@@ -312,25 +312,25 @@
 		</header>
 		<ul class="stat-grid">
 			<li>
-				<a href="/demo/spa/packages">
+				<a href="/spa/packages">
 					<span data-ln-stat-label>Packages</span>
 					<strong data-ln-stat-value data-ln-stat="packages" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/tenants">
+				<a href="/spa/tenants">
 					<span data-ln-stat-label>Tenants</span>
 					<strong data-ln-stat-value data-ln-stat="tenants" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/tenants">
+				<a href="/spa/tenants">
 					<span data-ln-stat-label>Active tenants</span>
 					<strong data-ln-stat-value data-ln-stat="tenants" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 				</a>
 			</li>
 			<li>
-				<a href="/demo/spa/packages">
+				<a href="/spa/packages">
 					<span data-ln-stat-label>Active packages</span>
 					<strong data-ln-stat-value data-ln-stat="packages" data-ln-stat-filter="active:true" class="is-loading">—</strong>
 				</a>
@@ -342,7 +342,7 @@
 				<ul data-pkg-usage></ul>
 				<template data-ln-template="pkg-usage-item">
 					<li>
-						<a href="/demo/spa/tenants">
+						<a href="/spa/tenants">
 							<span class="pkg-usage-name" data-pkg-usage-name></span>
 							<span class="pkg-usage-count" data-pkg-usage-count></span>
 							<span class="progress"><span data-ln-progress="0"></span></span>
@@ -361,19 +361,19 @@
 </template>
 
 		<!-- not-found/not-found.html -->
-		<template data-ln-route="/demo/spa/*" data-ln-route-title="Not found — DocuFlow">
+		<template data-ln-route="/spa/*" data-ln-route-title="Not found — DocuFlow">
 	<section id="not-found">
 		<article class="not-found-state">
 			<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-error-404"></use></svg>
 			<h1>Page not found</h1>
 			<p>The page you are looking for does not exist.</p>
-			<a href="/demo/spa" class="btn">Back to dashboard</a>
+			<a href="/spa" class="btn">Back to dashboard</a>
 		</article>
 	</section>
 </template>
 
 		<!-- packages/packages.html -->
-		<template data-ln-route="/demo/spa/packages" data-ln-route-title="Packages — DocuFlow">
+		<template data-ln-route="/spa/packages" data-ln-route-title="Packages — DocuFlow">
 	<section id="packages-view">
 		<header class="page-header">
 			<div class="page-title">
@@ -492,12 +492,12 @@
 </template>
 
 		<!-- tenant-editor/tenant-editor.html -->
-		<template data-ln-route="/demo/spa/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
+		<template data-ln-route="/spa/tenants/:id" data-ln-route-title="Tenant — DocuFlow">
 	<section id="tenant-editor">
 		<header class="page-header">
 			<nav aria-label="Breadcrumb">
 				<ol>
-					<li><a href="/demo/spa/tenants">Tenants</a></li>
+					<li><a href="/spa/tenants">Tenants</a></li>
 					<li aria-current="page">Tenant</li>
 				</ol>
 			</nav>
@@ -599,7 +599,7 @@
 						</div>
 					</fieldset>
 					<footer class="form-actions">
-						<a href="/demo/spa/tenants" class="btn">Cancel</a>
+						<a href="/spa/tenants" class="btn">Cancel</a>
 						<button type="submit" class="btn">Save</button>
 					</footer>
 				</form>
@@ -609,7 +609,7 @@
 </template>
 
 		<!-- tenants/tenants.html -->
-		<template data-ln-route="/demo/spa/tenants" data-ln-route-title="Tenants — DocuFlow">
+		<template data-ln-route="/spa/tenants" data-ln-route-title="Tenants — DocuFlow">
 	<section id="tenants-view">
 		<header class="page-header">
 			<div class="page-title">
@@ -673,7 +673,7 @@
 					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
 					<td>
 						<ul class="row-actions">
-							<li><a href="/demo/spa/tenants/{{ id }}"
+							<li><a href="/spa/tenants/{{ id }}"
 								data-ln-fill-form="tenant-form"
 								data-ln-fill-id="{{ id }}"
 								data-ln-fill-name="{{ name }}"
