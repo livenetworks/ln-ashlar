@@ -58,7 +58,7 @@
 		}
 	}
 
-	App.defineView('/demo/spa', {
+	App.defineView('/spa', {
 		mount: function () {
 			refreshDashboardUsageIfMounted();
 		},

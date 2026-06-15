@@ -71,7 +71,7 @@ What `build.mjs` does:
 | `dist/app.css` | Generates a `@use` list of all module `.scss`, then compiles `app.scss` (framework + modules) with Dart Sass. |
 
 Serve the repo over a server with an SPA fallback (an `.htaccess` is included
-for Apache) and open `/demo/spa`.
+for Apache) and open `/spa`.
 
 ---
 
@@ -112,7 +112,7 @@ App.defineModule(function () {
 ### View module
 
 ```js
-App.defineView('/demo/spa/hello/:name', {
+App.defineView('/spa/hello/:name', {
   mount: function (ctx) {
     // ctx = { target, params, query, path }
     // `target` is the freshly-mounted view root inside the outlet
@@ -168,7 +168,7 @@ URL/user data:
 
    ```html
    <!-- @zone routes -->
-   <template data-ln-route="/demo/spa/reports" data-ln-route-title="Reports">
+   <template data-ln-route="/spa/reports" data-ln-route-title="Reports">
      <section id="reports"><h1>Reports</h1><ul data-list></ul></section>
    </template>
    ```
@@ -177,7 +177,7 @@ URL/user data:
    ```js
    (function () {
      'use strict';
-     App.defineView('/demo/spa/reports', {
+     App.defineView('/spa/reports', {
        mount: function (ctx) { /* fetch + lnCore.renderList(...) */ }
      });
    })();

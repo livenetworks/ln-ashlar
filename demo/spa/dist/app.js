@@ -140,7 +140,7 @@
 		}
 	}
 
-	App.defineView('/demo/spa', {
+	App.defineView('/spa', {
 		mount: function () {
 			refreshDashboardUsageIfMounted();
 		},
@@ -371,7 +371,7 @@
 				detail: { data: data }
 			}));
 		}
-		window.lnRouter.navigate('/demo/spa/tenants');
+		window.lnRouter.navigate('/spa/tenants');
 	});
 })();
 
