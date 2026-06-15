@@ -304,7 +304,7 @@
 		document.addEventListener('click', function (e) {
 			const btn = e.target.closest('#reset-demo');
 			if (!btn) return;
-			fetch('/demo/docuflow/api/reset').then(function (r) {
+			fetch('/docuflow/api/reset').then(function (r) {
 				if (!r.ok) throw new Error('HTTP ' + r.status);
 				forceSyncBoth();
 				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
