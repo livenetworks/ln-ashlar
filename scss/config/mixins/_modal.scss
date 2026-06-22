@@ -3,6 +3,7 @@
 @use 'position' as *;
 @use 'motion' as *;
 @use 'card' as *;
+@use 'typography' as *;
 
 // Modal size mixins
 // Usage: #my-modal > form { @include modal-lg; }
@@ -30,6 +31,59 @@
 	opacity: 0;
 	@include motion-safe {
 		transition: opacity var(--transition);
+	}
+}
+
+// ─── Modal header ──────────────────────────────────────
+// Rich modal header recipe: optional tinted icon square + title/subtitle
+// hgroup + close-button reset. Applied by modal-panel to its > header.
+@mixin modal-header {
+	// Modal-specific: white bg overrides section-card's gray panel-header.
+	// Section-cards and cards are unaffected (this is modal-panel scope only).
+	--color-bg: var(--bg-base);
+	gap: var(--size-sm-up);
+
+	:is(h1, h2, h3, h4, h5, h6) {
+		@include typography(heading-sm);
+		font-weight: var(--font-semibold);
+	}
+
+	button[data-ln-modal-close] {
+		--btn-bg: transparent;
+		--btn-border: transparent;
+	}
+
+	// Optional icon square — tinted rounded square with primary-colored icon.
+	// Usage: <span class="icon"><svg class="ln-icon" aria-hidden="true">…</svg></span>
+	.icon {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: var(--radius);
+		background: var(--color-accent-tint);
+
+		.ln-icon {
+			color: var(--color-accent);
+		}
+	}
+
+	// Optional title+subtitle group — <hgroup><h3>…</h3><p>…</p></hgroup>.
+	hgroup {
+		display: flex;
+		flex-direction: column;
+		gap: var(--size-xs);
+		flex: 1;
+		min-width: 0;
+		margin: 0;
+
+		p {
+			margin: 0;
+			@include typography(caption);
+			color: var(--fg-muted);
+		}
 	}
 }
 
@@ -81,54 +135,6 @@
 	}
 
 	> header {
-		// Modal-specific: white bg overrides section-card's gray panel-header.
-		// Section-cards and cards are unaffected (this is modal-panel scope only).
-		--color-bg: var(--bg-base);
-		gap: var(--size-sm-up);
-
-		:is(h1, h2, h3, h4, h5, h6) {
-			font-size: var(--text-heading-sm);
-			line-height: var(--lh-heading-sm);
-			font-weight: var(--font-semibold);
-		}
-
-		button[data-ln-modal-close] {
-			--btn-bg: transparent;
-			--btn-border: transparent;
-		}
-
-		// Optional icon square — tinted rounded square with primary-colored icon.
-		// Usage: <span class="icon"><svg class="ln-icon" aria-hidden="true">…</svg></span>
-		.icon {
-			flex-shrink: 0;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			width: 2rem;
-			height: 2rem;
-			border-radius: var(--radius);
-			background: var(--color-accent-tint);
-
-			.ln-icon {
-				color: var(--color-accent);
-			}
-		}
-
-		// Optional title+subtitle group — <hgroup><h3>…</h3><p>…</p></hgroup>.
-		hgroup {
-			display: flex;
-			flex-direction: column;
-			gap: var(--size-xs);
-			flex: 1;
-			min-width: 0;
-			margin: 0;
-
-			p {
-				margin: 0;
-				font-size: var(--text-caption);
-				line-height: var(--lh-caption);
-				color: var(--fg-muted);
-			}
-		}
+		@include modal-header;
 	}
 }

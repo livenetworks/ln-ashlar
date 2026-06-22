@@ -61,8 +61,7 @@
 		@include text-left;
 		padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
 		@include font-semibold;
-		font-size: var(--text-label-sm);
-		line-height: var(--line-height);
+		@include typography(label-sm);
 		letter-spacing: 0.06em;
 		@include uppercase;
 		color: var(--color-fg);
@@ -163,7 +162,7 @@
 			background: var(--color-bg);
 			--color-fg: var(--fg-muted);
 			color: var(--color-fg);
-			font-size: var(--text-body-sm);
+			@include typography(body-sm);
 			position: sticky;
 			z-index: var(--z-sticky);
 		}

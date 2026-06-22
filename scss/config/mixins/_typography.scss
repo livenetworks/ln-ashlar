@@ -49,8 +49,10 @@
 		@error "typography(): unknown role '#{$role}'. Valid roles: #{$valid-roles}";
 	}
 
-	font-size:   var(--text-#{$role});
-	line-height: var(--lh-#{$role});
+	--font-size:   var(--text-#{$role});
+	font-size:     var(--font-size);
+	--line-height: var(--lh-#{$role});
+	line-height:   var(--line-height);
 }
 
 @mixin tracking-tight  { letter-spacing: var(--tracking-tight); }

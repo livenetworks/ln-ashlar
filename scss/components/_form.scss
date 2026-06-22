@@ -68,6 +68,10 @@ label:not(:has(> input)) {
 	@include pills-switch;
 }
 
+.pills-segmented {
+	@include pills-segmented;
+}
+
 .pill {
 	@include pill;
 }

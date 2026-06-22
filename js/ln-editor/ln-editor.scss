@@ -1,3 +1,5 @@
+@use '../../scss/config/mixins' as *;
+
 // ln-editor co-located styles — JS-state-driven CSS only.
 // Visual styling lives in scss/config/mixins/_editor.scss.
 
@@ -17,8 +19,7 @@
 		flex: 1;
 		min-width: 0;
 		padding: var(--size-2xs) var(--size-sm);
-		font-size: var(--text-body-sm);
-		line-height: var(--lh-body-sm);
+		@include typography(body-sm);
 		background: var(--bg-base);
 		border: var(--border-width) solid var(--color-border);
 		border-radius: var(--radius-sm);
