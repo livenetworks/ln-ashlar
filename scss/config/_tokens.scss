@@ -196,9 +196,12 @@
 	--text-2xl: 1.5rem;      // 24px
 
 	// -----------------------------------------------------------------------
-	// Typography — semantic role tokens (v1.1)
+	// Typography — semantic role tokens (v1.1) — VOCABULARY
 	// -----------------------------------------------------------------------
 	// Public API surface — full scale exposed; internal usage may skip levels.
+	// Vocabulary: density + themes rebind these; mixins read the
+	// --font-size/--line-height primitives via @include typography(role),
+	// never these tokens directly.
 	--text-display-lg: 3.75rem;   --lh-display-lg: 1.1;
 	--text-display-md: 3rem;      --lh-display-md: 1.1;
 	--text-display-sm: 1.875rem;  --lh-display-sm: 1.1;
@@ -250,10 +253,14 @@
 	// -----------------------------------------------------------------------
 	// Logical tokens — the public contract mixins read
 	// -----------------------------------------------------------------------
-	// Rule: mixin bodies reference ONLY these tokens (and --text-*/--lh-*/
-	// --radius-*/--shadow-*/--transition-*/--easing-* role scales). Back-end
-	// scales (--size-*, --color-neutral-*) are re-bound here and in context
-	// scopes (density, theme, region overrides) — never read directly
+	// Rule: mixin bodies reference ONLY these tokens. Typography mixins read
+	// --font-size/--line-height ONLY (via @include typography(role), which
+	// rebinds the primitive per role on the consuming element's scope).
+	// --text-*/--lh-* role scale is VOCABULARY: density + themes rebind it,
+	// mixins never read it directly. --radius-*/--shadow-*/--transition-*/
+	// --easing-* role scales remain directly readable (not yet primitived).
+	// Back-end scales (--size-*, --color-neutral-*) are re-bound here and in
+	// context scopes (density, theme, region overrides) — never read directly
 	// inside a component mixin.
 	//
 	// See .claude/plans/refactor-logical-tokens-architecture.md for the
@@ -363,7 +370,13 @@
 	--table-cell-padding-y:  var(--size-sm);       // 8px dense base (DocuFlow th: 9px / td: 10px)
 	--table-cell-padding-x:  var(--size-md);       // 16px dense base
 
-	// -- Typography ------------------------------------------------------
+	// -- Typography — primitives -----------------------------------------
+	// Mixins read these two primitives ONLY (via @include typography(role),
+	// which rebinds them per role on the consuming element's scope — mirror
+	// of how @mixin card rebinds --color-bg). The --text-{role}/--lh-{role}
+	// role scale (lines ~202-220) is VOCABULARY: density + themes rebind it,
+	// mixins never read it directly. These :root values are the default for
+	// text that does not pass through a typography mixin.
 	--font-size:    var(--text-body-md);
 	--line-height:  var(--lh-body-md);
 

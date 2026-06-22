@@ -2,12 +2,14 @@
 
 File: `scss/config/mixins/_form.scss` + `scss/components/_form.scss`
 
-`ln-ashlar` offers three distinct visual treatments for native checkboxes (`<input type="checkbox">`) and radio buttons (`<input type="radio">`):
+`ln-ashlar` offers four distinct visual treatments for native checkboxes (`<input type="checkbox">`) and radio buttons (`<input type="radio">`):
 1. **Filled Pills**: Gray-background, horizontal joined button segmented control.
 2. **Outline Pills**: Transparent-background, horizontal joined outline control showing checkboxes/radio buttons inside a clean border.
-3. **Switch Pills**: iOS-style sliding switches for immediate on/off preferences.
+3. **Segmented Pills**: iOS/macOS-style segmented control container track with floating base-colored active choices.
+4. **Switch Pills**: iOS-style sliding switches for immediate on/off preferences.
 
-All three variants share the **exact same** clean, symmetric HTML markup structure. The visual presentation is driven entirely by the class applied to the outer `<ul>` element.
+All four variants share the **exact same** clean, symmetric HTML markup structure. The visual presentation is driven entirely by the class applied to the outer `<ul>` element.
+
 
 ---
 
@@ -104,7 +106,38 @@ Used for grouped horizontal outline segmented controls or as standalone option c
 
 ---
 
-## 3. Switch Pills (iOS Toggle Switches)
+## 3. Segmented Pills (Track-based Segmented Control)
+
+Used for grouped choice selectors (e.g. Auth Method, View Mode). It lays out as a unified full-width track where the selected choice floats with a soft shadow.
+
+### HTML Structure
+```html
+<ul class="pills-segmented">
+	<li>
+		<label>
+			<input type="radio" name="auth_method" value="Local" checked>
+			Local
+		</label>
+	</li>
+	<li>
+		<label>
+			<input type="radio" name="auth_method" value="LDAP">
+			LDAP
+		</label>
+	</li>
+</ul>
+```
+
+### SCSS Mixin
+```scss
+.my-segmented-group {
+	@include pills-segmented;
+}
+```
+
+---
+
+## 4. Switch Pills (iOS Toggle Switches)
 
 Used for immediate on/off preferences. When grouped within a `<ul>` stack, it automatically lays out as a vertical stack of sliding switches.
 
@@ -154,4 +187,4 @@ Used for immediate on/off preferences. When grouped within a `<ul>` stack, it au
 > [!WARNING]
 > Do NOT use custom `data-` attributes (e.g., `data-demo-settings-form`) for layouts or styles. Custom data attributes are reserved **exclusively** for JavaScript component bindings. All layout, spacing, and styling should be implemented using semantic classes and applied via SCSS mixins at the stylesheet layer.
 > 
-> Furthermore, styling is driven entirely via the class names (`.pills`, `.pills-outline`, `.pills-switch`) on the container `<ul>` element. Do not use `<fieldset>` dependency selectors to style lists as pills.
+> Furthermore, styling is driven entirely via the class names (`.pills`, `.pills-outline`, `.pills-segmented`, `.pills-switch`) on the container `<ul>` element. Do not use `<fieldset>` dependency selectors to style lists as pills.

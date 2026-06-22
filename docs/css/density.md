@@ -57,8 +57,9 @@ form — comfortable IS the default `:root` state (values live in
 | `--text-body-md`, `--lh-body-md` | yes | Body paragraphs, table cells, form inputs, nav link text |
 | `--font-size`, `--line-height` (explicit rebind) | yes | Logical font tokens — mirrored from `--text-body-md` / `--lh-body-md` so form inputs and any mixin reading `var(--font-size)` shrink reliably. See §"Explicit `--font-size` rebind" below. |
 | `--text-body-sm`, `--lh-body-sm` | yes | Small body text, breadcrumbs, nav links |
-| `--text-label-md`, `--lh-label-md` | yes | Form labels, h6 |
-| `--text-label-sm`, `--lh-label-sm` | yes | Table column headers (`th`) |
+| `--text-label-md`, `--lh-label-md` | yes | Form labels (comfortable/spacious), h6 |
+| `--text-label-sm`, `--lh-label-sm` | yes (comfortable + spacious up-tiers only) | Form labels (`form-label`), table column headers (`th`) — dense base inherits `:root` values |
+| `--text-caption`, `--lh-caption` | yes (comfortable + spacious up-tiers only) | Modal subtitle `p`, validation error lists — dense base inherits `:root` values |
 | `--text-title-md/sm`, `--lh-title-md/sm` | yes | h4, h5, panel header h3 |
 | `--text-heading-sm/md/lg`, `--lh-heading-*` | yes | h3, h2, stat-card value |
 | `--text-display-sm`, `--lh-display-sm` | yes | h1, page-header title |
@@ -93,11 +94,19 @@ the logical layer follows." Every other logical token (`--padding-*`,
 font-size / line-height pair needs the explicit nudge.
 
 Consumers do NOT need to replicate this rebind — it's handled inside
-`_density.scss`. This subsection exists so the pattern is visible
-when debugging "why is this input still at comfortable size inside
-density-compact?" — the answer is always: the mixin is NOT reading
-`var(--font-size)` at all (it's hardcoded), or the re-bind did not
-reach the consumer's scope.
+`_density.scss`. This rebind is the default for non-mixin text (e.g.
+bare form inputs reading `var(--font-size)` directly). Mixins that use
+`@include typography(role)` now react via a different path: they rebind
+`--font-size`/`--line-height` at the consuming element's own scope
+(lazy resolution under whatever density scope is active), so the
+vocabulary token `--text-{role}` resolves to the density-rebound value.
+
+When debugging "why is this element still at dense size inside a
+comfortable/spacious page?": a mixin using `@include typography(role)`
+DOES react (the primitive is rebound on its scope). A hardcoded
+`@include text-sm` or a literal `font-size: 0.75rem` does NOT react.
+The old answer — "the mixin is NOT reading `var(--font-size)`" — still
+applies to any mixin that bypasses `@include typography(role)`.
 
 ## What reacts to density
 
@@ -191,12 +200,15 @@ in both comfortable and compact modes.
 ## Adding a new component to density
 
 1. Use `var(--size-*)` for padding and gap instead of hardcoded rem.
-2. For content text, use EITHER
-   `font-size: var(--text-body-md); line-height: var(--lh-body-md);`
-   (direct scale token — most explicit) OR
+2. For content text with a semantic role, use `@include typography(role)`
+   (e.g. `@include typography(body-sm)`). This rebinds `--font-size` and
+   `--line-height` at the consuming element's scope so the lazy var()
+   resolves under the active density scope — the correct doctrine. The
+   direct `font-size: var(--text-body-md)` form is discouraged inside
+   mixins because it reads vocabulary directly (frozen until density
+   rebinds that token, which is not guaranteed for all roles). Only use
    `font-size: var(--font-size); line-height: var(--line-height);`
-   (logical-token flavor — composes with any region scope that
-   re-binds `--font-size`). Both react to `.density-compact`. Never
+   for the body baseline (non-mixin text, e.g. bare inputs). Never
    use raw `@include text-base` for content text.
 3. Leave structural chrome hardcoded.
 

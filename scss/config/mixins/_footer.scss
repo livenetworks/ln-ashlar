@@ -25,8 +25,7 @@
 	padding: var(--padding-y) var(--padding-x);
 	border-block-start: var(--border-block-start, var(--border-width) solid var(--color-border));
 	background: var(--color-bg);
-	font-size: var(--text-body-sm);
-	line-height: var(--lh-body-sm);
+	@include typography(body-sm);
 	color: var(--color-fg);
 	@include flex;
 	@include items-center;

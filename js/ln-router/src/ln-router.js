@@ -64,6 +64,15 @@ function _dispatchMaybeDeferred(target, name, detail) {
  * Normalize path: collapse trailing slash, strip query/hash, parse query.
  */
 function _normalizePath(fullPath) {
+	// Absolute same-origin URLs (route() helpers, anchor.href) → reduce to
+	// path+query+hash. new URL() handles both absolute (http://host/a/b) and
+	// already-relative (/a/b) inputs identically. Leave fullPath unchanged if
+	// it is not a parseable URL.
+	try {
+		const u = new URL(fullPath, window.location.origin);
+		fullPath = u.pathname + u.search + u.hash;
+	} catch (e) { /* not a parseable URL — use fullPath as-is */ }
+
 	let [pathAndQuery] = fullPath.split('#');
 	let [path, queryString] = pathAndQuery.split('?');
 

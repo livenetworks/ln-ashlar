@@ -52,9 +52,8 @@ h6 {
 }
 
 p {
-	font-size: var(--text-body-md);
+	@include typography(body-md);
 	color: var(--color-fg);
-	line-height: var(--lh-body-md);
 	margin-bottom: var(--size-md);
 
 	&:last-child {

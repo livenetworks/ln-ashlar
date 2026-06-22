@@ -11,7 +11,7 @@
 // Card & Section — composite mixins
 
 @mixin card {
-	--color-bg: var(--nested-card-bg, var(--bg-surface));
+	--color-bg: var(--nested-card-bg, var(--bg-base));
 	--shadow:   var(--nested-card-shadow, var(--shadow-resting));
 
 	background: var(--color-bg);
@@ -81,7 +81,7 @@
 	// without a <header> wrapper, the global h3 cascade (heading-sm)
 	// is too large for tile context. Tighten to tile-title sizing.
 	> main h3 {
-		font-size: var(--text-body-sm);
+		@include typography(body-sm);
 		@include font-semibold;
 		color: inherit;
 		margin: 0;
@@ -100,8 +100,7 @@
 	margin-bottom: 0;
 
 	:is(h1, h2, h3, h4, h5, h6) {
-		font-size: var(--text-body-sm);
-		line-height: var(--lh-body-sm);
+		@include typography(body-sm);
 		@include font-medium;
 		color: var(--color-fg);
 		margin: 0;

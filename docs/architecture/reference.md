@@ -479,6 +479,12 @@ The following rules govern how these tokens are applied and overridden within th
 	transition: var(--transition);
 }
 
+// RIGHT — typography via @include typography(role) (rebinds --font-size/--line-height)
+@mixin form-label {
+	@include typography(label-sm);   // rebinds --font-size + --line-height at this scope
+	@include font-semibold;
+}
+
 // WRONG — mixin body reaches through to scale or old logical tokens
 @mixin card {
 	padding: var(--size-xs-up) var(--size-md-up);                // scale
@@ -486,7 +492,14 @@ The following rules govern how these tokens are applied and overridden within th
 	border: 1px solid hsl(var(--color-neutral-200));              // scale + literal
 	box-shadow: var(--shadow-sm);                                  // scale
 }
+
+// WRONG — mixin reads vocabulary role token directly (bypasses primitive rebind)
+@mixin form-label {
+	font-size: var(--text-label-sm);   // vocabulary direct-read — frozen under density
+}
 ```
+
+Typography follows the same primitive/vocabulary split as color. The `--text-{role}`/`--lh-{role}` scale is vocabulary (density + themes rebind it). Mixins read the `--font-size`/`--line-height` primitives, and the canonical rebind path is `@include typography(role)`, which rebinds the primitive per role on the consuming element's scope — mirroring how `@mixin card` rebinds `--color-bg` then reads it.
 
 ### Rule — context overrides rebind the primitive
 
@@ -512,6 +525,9 @@ The `:root` block in `_tokens.scss` wires each primitive to its vocabulary defau
 	--color-fg:     var(--fg-default);
 	--color-border: var(--border-subtle);
 	--shadow:       var(--shadow-resting);
+	// typography primitives — mixins rebind these via @include typography(role)
+	--font-size:    var(--text-body-md);
+	--line-height:  var(--lh-body-md);
 }
 ```
 

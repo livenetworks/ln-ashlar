@@ -17,9 +17,8 @@
 
 @mixin form-label {
 	@include block;
-	font-size: var(--text-label-md);
-	line-height: var(--lh-label-md);
-	@include font-medium;
+	@include typography(label-sm);
+	@include font-semibold;
 	color: var(--color-fg);
 	// Structural label-to-input gap (not shell rhythm).
 	--margin-block: var(--size-xs);
@@ -584,6 +583,71 @@
 	}
 }
 
+// Segmented track control pills
+@mixin pills-segmented {
+	@include inline-flex;
+	@include items-center;
+	list-style: none;
+	padding: 2px;
+	margin: 0;
+	background-color: var(--bg-recessed);
+	border-radius: var(--radius);
+	border: var(--border-width) solid var(--color-border);
+	width: 100%;
+
+	> li {
+		flex: 1 1 0%;
+		margin: 0;
+		padding: 0;
+		display: block;
+	}
+
+	> li > label:has(> input[type="checkbox"]),
+	> li > label:has(> input[type="radio"]) {
+		@include flex;
+		@include items-center;
+		@include justify-center;
+		padding: var(--size-xs) var(--size-md);
+		border-radius: calc(var(--radius) - 2px);
+		@include cursor-pointer;
+		@include text-sm;
+		@include font-medium;
+		color: var(--fg-muted);
+		@include transition;
+		user-select: none;
+		margin: 0;
+		text-align: center;
+		border: none;
+		background: transparent;
+
+		> input {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			border: 0;
+		}
+
+		&:hover {
+			color: var(--color-fg);
+		}
+
+		&:has(> input:checked) {
+			background-color: var(--bg-base);
+			color: var(--color-fg);
+			@include font-semibold;
+			box-shadow: var(--shadow-resting);
+		}
+
+		&:has(> input:focus-visible) {
+			@include focus-ring;
+		}
+	}
+}
+
 @mixin toggle-switch {
 	appearance: none;
 	position: relative;
@@ -710,8 +774,7 @@
 	// Structural error-list margin (not shell rhythm).
 	--margin-block: var(--size-xs);
 	margin-top: var(--margin-block);
-	font-size: var(--text-caption);
-	line-height: var(--lh-caption);
+	@include typography(caption);
 	color: hsl(var(--color-error));
 	min-height: 1.25rem; // Reserves space to prevent form layout shifts when errors appear
 	list-style: none;

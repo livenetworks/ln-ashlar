@@ -6,14 +6,21 @@
 @use 'motion' as *;
 
 // Shared dark-bubble chrome for ::after pseudo-tooltips (tooltip, confirm)
-// and JS-portal tooltip-element. Semantic token pair — in dark mode the
-// neutral scale inversion naturally flips the bubble to light-on-dark.
+// and JS-portal tooltip-element. Reads the theme-root token pair
+// (--fg-default / --bg-base) NOT the rebindable --color-fg / --color-bg:
+// the ::after inherits custom properties from its trigger, and many
+// components locally rebind --color-fg/--color-bg (btn, accordion,
+// avatar, app-shell, …). Reading those would make the bubble's text
+// inherit a context-specific value — e.g. dark-on-dark = invisible.
+// --fg-default / --bg-base are only ever set at :root (and flipped at
+// the dark-theme :root), so the dark-mode inversion still works while
+// the bubble stays immune to component-scope rebinds.
 @mixin tooltip-bubble {
 	--padding-y: var(--size-xs);
 	--padding-x: var(--size-sm);
 	padding: var(--padding-y) var(--padding-x);
-	background: var(--color-fg);
-	color: var(--color-bg);
+	background: var(--fg-default);
+	color: var(--bg-base);
 	@include typography(caption);
 	--radius: var(--radius-sm);
 	border-radius: var(--radius);

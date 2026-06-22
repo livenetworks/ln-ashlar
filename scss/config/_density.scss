@@ -89,6 +89,13 @@
 	--text-label-md:      0.875rem;
 	--lh-label-md:        1.4;
 
+	--text-label-sm:      0.8125rem;   // 13px (was dense 12px) — form-label, table th
+	--lh-label-sm:        1.4;
+
+	// -- Caption ---------------------------------------------------------
+	--text-caption:       0.8125rem;   // 13px — modal subtitle, validation errors
+	--lh-caption:         1.4;
+
 	// -- Titles ----------------------------------------------------------
 	--text-title-md:      1.125rem;
 	--lh-title-md:        1.4;
@@ -153,6 +160,13 @@
 	// -- Labels ----------------------------------------------------------
 	--text-label-md:      1rem;
 	--lh-label-md:        1.5;
+
+	--text-label-sm:      0.9375rem;   // 15px (was dense 12px) — form-label, table th
+	--lh-label-sm:        1.45;
+
+	// -- Caption ---------------------------------------------------------
+	--text-caption:       0.9375rem;   // 15px — modal subtitle, validation errors
+	--lh-caption:         1.45;
 
 	// -- Titles ----------------------------------------------------------
 	--text-title-md:      1.25rem;
