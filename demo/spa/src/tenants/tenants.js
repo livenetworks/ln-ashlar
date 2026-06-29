@@ -9,10 +9,17 @@
 		if (!tenantsStoreEl) return;
 
 		const data = Object.assign({}, e.detail.data);
+		const id = data.id;
 		delete data.id;
-		tenantsStoreEl.dispatchEvent(new CustomEvent('ln-store:request-create', {
-			detail: { data: data }
-		}));
+		if (id) {
+			tenantsStoreEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
+				detail: { id: Number(id), data: data }
+			}));
+		} else {
+			tenantsStoreEl.dispatchEvent(new CustomEvent('ln-store:request-create', {
+				detail: { data: data }
+			}));
+		}
 		const tenantModal = document.getElementById('tenant-modal');
 		if (tenantModal) tenantModal.setAttribute('data-ln-modal', 'close');
 	});

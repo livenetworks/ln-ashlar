@@ -336,7 +336,7 @@ reacts to the resulting `hashchange`. Modifier / middle / shift-clicks fall
 through to native navigation (open-in-new-tab). `data-ln-modal-for` buttons
 remain a programmatic opener (they write a bare `#id`, always new mode). The
 param lives in the hash segment, read by the OPEN branch — not on the trigger
-element. `hash segment param` no longer exists.
+element. `data-ln-modal-param` no longer exists.
 
 ### Open path additions (hash-bound modals)
 
