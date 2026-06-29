@@ -272,6 +272,108 @@ The modal sits between overlay and toast — toasts intentionally
 appear on top of modals (so a "Saved" confirmation is visible
 even if the user is still looking at the form).
 
+## Hash addressing (universal, by `id`)
+
+> See also: [Hash-state doctrine](../architecture/hash-state.md) — cross-cutting rules for namespace ownership, foreign-segment preservation, and anchor interception that this feature implements.
+
+An automatic feature that binds a modal's open/close state to a URL fragment
+segment using the shared ln-core hash codec. Any modal **with an `id`** is
+hash-bound; modals without an `id` are completely unaffected.
+
+### Component state additions
+
+The constructor stores two additional properties for hash-bound modals
+(those with a non-empty `dom.id`):
+
+| Property | Type | Description |
+|---|---|---|
+| `_hashNs` | `string \| null` | The modal's `id`, or `null` if the modal has no `id` |
+| `_onHashChange` | Function | `hashchange` listener (registered on window at init, removed at destroy) |
+
+Source (constructor, `js/ln-modal/src/ln-modal.js`):
+```js
+this._hashNs = dom.id || null;
+```
+
+### Init for hash-bound modals
+
+After the standard init, if `_hashNs` is non-null:
+
+1. `window.addEventListener('hashchange', this._onHashChange)`.
+2. If `hashGet(id) !== null` (segment already in the URL), immediately
+   set `data-ln-modal="open"` — the standard `_syncAttribute` open path runs.
+   This is the deep-link bootstrap.
+
+### `_onHashChange` handler
+
+```
+hashchange fires
+  → _onHashChange reads present = (hashGet(id) !== null)
+  → if (present && !self.isOpen)  → setAttribute('open')   → _syncAttribute opens
+  → if (!present && self.isOpen)  → setAttribute('close')  → _syncAttribute closes
+  → otherwise: no-op
+```
+
+### Triggers (hash anchors)
+
+Canonical triggers are plain hash anchors:
+
+```html
+<!-- New mode (bare #id) -->
+<a href="#modal-id">New record</a>
+
+<!-- Edit mode (param in fragment) -->
+<a href="#modal-id:42" data-ln-fill-id="42" data-ln-fill-form="my-form">Edit #42</a>
+```
+
+Anchor clicks are intercepted by ln-modal's document-level click delegation:
+when the fragment namespace resolves to a `[data-ln-modal]` id, it calls
+`e.preventDefault()` (via the shared `lnCore.hashLinkClick` guard, also used by
+ln-tabs) and writes with `hashSet(id, param)`, so the modal segment MERGES and
+foreign hash segments (e.g. an `ln-tabs` segment) are preserved — native anchor
+navigation would replace the whole fragment and wipe them. `_onHashChange` then
+reacts to the resulting `hashchange`. Modifier / middle / shift-clicks fall
+through to native navigation (open-in-new-tab). `data-ln-modal-for` buttons
+remain a programmatic opener (they write a bare `#id`, always new mode). The
+param lives in the hash segment, read by the OPEN branch — not on the trigger
+element. `hash segment param` no longer exists.
+
+### Open path additions (hash-bound modals)
+
+After the standard open steps (aria, body class, focus), the `shouldBeOpen`
+branch additionally:
+
+1. Writes `hashSet(id, '')` if the segment is absent (a programmatic
+   `setAttribute('open')`, e.g. from `data-ln-modal-for`, would not have set
+   the hash — this ensures the URL always reflects open state).
+2. Reads `rawParam = hashGet(id)`. `''` (new mode, bare `#id`) → `null`.
+3. Sets `el.dataset.lnModalMode = param ? 'edit' : 'new'`.
+4. Dispatches `ln-modal:open` with enriched detail
+   `{ modalId, target, hashNs, param }`.
+
+Form fill on open is handled by the `ln-modal-fill` coordinator
+(`docs/js/modal-fill.md`), not by ln-modal itself.
+
+### Close path additions (hash-bound modals)
+
+After the standard close steps, calls `hashSet(id, null)` to remove the
+segment. If Back-button navigation already removed the segment before the
+close path runs, `hashSet(id, null)` is a no-op (identical value → no write).
+
+### Prevented-open cleanup
+
+If `ln-modal:before-open` is prevented, the `before.defaultPrevented` branch
+calls `if (instance._hashNs) hashSet(instance._hashNs, null)` before
+resetting the attribute to `close`. This prevents a stale segment from
+blocking re-triggering.
+
+### Echo-safety
+
+`hashSet(id, null)` when the segment is present removes it → fires one
+`hashchange` → `_onHashChange` reads `present = false`, `isOpen = false` →
+neither branch triggers → no-op. No loop. The attribute revert to `close`
+likewise lands in the `shouldBeOpen === isOpen` (both `false`) early-return.
+
 ## Boot-time-already-open shortcut
 
 If the modal mounts with `data-ln-modal="open"` already set, the

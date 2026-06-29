@@ -1,6 +1,7 @@
 /* Live Networks - lnTabs (hash-aware tabs — supports <button> and <a href="#nsKey:key"> triggers) */
 import { registerComponent, dispatch } from '../../ln-core';
 import { persistGet, persistSet } from '../../ln-core';
+import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-tabs";
@@ -8,17 +9,6 @@ import { persistGet, persistSet } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined && window[DOM_ATTRIBUTE] !== null) return;
 
-
-	function _parseHash() {
-		const h = (location.hash || "").replace("#", "");
-		const map = {};
-		if (!h) return map;
-		for (const part of h.split("&")) {
-			const sep = part.indexOf(":");
-			if (sep > 0) map[part.slice(0, sep)] = part.slice(sep + 1);
-		}
-		return map;
-	}
 
 	function _keyFromTrigger(t, nsKey) {
 		const explicit = (t.getAttribute("data-ln-tab") || "").toLowerCase().trim();
@@ -94,16 +84,18 @@ import { persistGet, persistSet } from '../../ln-core';
 		for (const t of this.tabs) {
 			if (t[DOM_ATTRIBUTE + 'Trigger']) continue;
 			const handler = function (e) {
-				if (e.ctrlKey || e.metaKey || e.button === 1) return;
+				const isAnchor = t.tagName === "A";
+				// Buttons keep their plain modifier/middle-click guard. Anchor
+				// triggers route through the shared core hash-link helper, which
+				// owns the guard (incl. shiftKey) AND the preventDefault — the
+				// same path ln-modal uses, so anchor click handling is unified.
+				if (!isAnchor && (e.ctrlKey || e.metaKey || e.button === 1)) return;
 				const key = _keyFromTrigger(t, self.nsKey);
 				if (!key) return;
-				if (t.tagName === "A") e.preventDefault();
+				if (isAnchor && !hashLinkClick(e)) return;
 				if (self.hashEnabled) {
-					const map = _parseHash();
-					map[self.nsKey] = key;
-					const newHash = Object.keys(map).map(function (k) { return k + ":" + map[k]; }).join("&");
-					if (location.hash === "#" + newHash) self.dom.setAttribute('data-ln-tabs-active', key);
-					else location.hash = newHash;
+					if (hashGet(self.nsKey) === key) self.dom.setAttribute('data-ln-tabs-active', key);
+					else hashSet(self.nsKey, key);
 				} else {
 					self.dom.setAttribute('data-ln-tabs-active', key);
 				}
@@ -115,8 +107,8 @@ import { persistGet, persistSet } from '../../ln-core';
 
 		this._hashHandler = function () {
 			if (!self.hashEnabled) return;
-			const map = _parseHash();
-			self.dom.setAttribute('data-ln-tabs-active', self.nsKey in map ? map[self.nsKey] : self.defaultKey);
+			const val = hashGet(self.nsKey);
+			self.dom.setAttribute('data-ln-tabs-active', val !== null ? val : self.defaultKey);
 		};
 
 		if (this.hashEnabled) {

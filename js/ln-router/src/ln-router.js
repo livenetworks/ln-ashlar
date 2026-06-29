@@ -393,8 +393,36 @@ function _onClick(e) {
 	}
 }
 
+function _queryEqual(a, b) {
+	const ak = Object.keys(a);
+	const bk = Object.keys(b);
+	if (ak.length !== bk.length) return false;
+	for (let i = 0; i < ak.length; i++) {
+		const k = ak[i];
+		if (a[k] !== b[k]) return false;
+	}
+	return true;
+}
+
 function _onPopState() {
 	const fullPath = window.location.pathname + window.location.search;
+	// Fragment-only popstate guard: when Back/Forward changes ONLY the hash
+	// (path + query identical to the current SPA state), skip navigation so the
+	// primary outlet is not torn down and re-cloned. Hash-bound components
+	// (e.g. ln-modal) react to the accompanying hashchange independently.
+	//
+	// cur.query is the authoritative already-parsed query for the active route
+	// (currentQuery), so compare target.query against it directly. cur.path is
+	// the raw fullPath (retains the query string), so normalize it for the
+	// pathname comparison only — do NOT re-parse it for the query.
+	const cur = router.current();
+	if (cur && cur.path != null) {
+		const target = _normalizePath(fullPath);
+		const currentPathNorm = _normalizePath(cur.path).path;
+		if (currentPathNorm === target.path && _queryEqual(cur.query, target.query)) {
+			return;
+		}
+	}
 	_navigate(fullPath, { historyAction: 'skip' });
 }
 

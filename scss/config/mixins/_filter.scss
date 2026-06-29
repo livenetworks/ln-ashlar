@@ -20,7 +20,6 @@
 // Tunables (consumer-overridable via --var with sane defaults):
 //   --filter-dropdown-max-height  (default 20rem)
 //   --filter-dropdown-overflow-y  (default auto)
-//   --filter-dropdown-text        (default var(--text-xs))   ← sm density
 //   --filter-dropdown-item-pad-y  (default var(--size-3xs))
 //
 // Usage:
@@ -41,8 +40,7 @@
 	}
 
 	[data-ln-filter-options] {
-		@include check-list;
-		font-size: var(--filter-dropdown-text, var(--text-xs));
+		@include check-list-nav;
 
 		li { padding: var(--filter-dropdown-item-pad-y, var(--size-3xs)) 0; }
 	}

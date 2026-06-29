@@ -9,3 +9,5 @@ js/ln-*/*.js
 !js/ln-*/**/*.scss
 !js/ln-*/**/*.md
 !js/ln-*/src/**/*.js
+# ln-core has no compiled bundle — all its .js are sources, keep them tracked
+!js/ln-core/*.js

@@ -264,6 +264,14 @@ Both can appear on the same trigger — they fire independently from their
 respective document click listeners. A plain trigger with no `data-ln-modal-*`
 payload clears modal `[data-ln-field]` elements and sets mode `"new"`.
 
+### Hash-param modals (§9) supersede the mode write
+
+For modals with an `id` that are opened via a hash param (`#id:5`), the OPEN
+branch writes `data-ln-modal-mode` from the hash param — this **overwrites** any
+mode set by the `data-ln-modal-for` trigger click. A `data-ln-modal-for` button
+always opens in **new** mode (it writes a bare `#id`). Use a hash anchor
+`<a href="#id:param">` (or a programmatic `hashSet`) for edit mode. See §9.
+
 ### In ln-table row templates
 
 Because `fillTemplate()` now stamps `{{ key }}` in attribute values at clone
@@ -294,6 +302,130 @@ time, both namespaces work in row templates:
 ```
 
 ---
+
+## 9. Hash addressing (universal, by `id`)
+
+Any modal with an `id` is automatically hash-addressable. Opening the modal
+writes `#<id>` to the URL; pressing Back closes it; reloading or deep-linking
+restores it. A modal **without** an `id` does not participate and cannot be
+targeted by `data-ln-modal-for` via hash — open it programmatically via
+`setAttribute('data-ln-modal', 'open')`.
+
+> **Behavior change:** this replaces the previous opt-in `data-ln-modal-hash`
+> attribute, which no longer exists. Any modal with an `id` now writes the
+> hash on open and closes on Back. This aligns with `ln-tabs`, which already
+> namespaces its hash by `id`.
+
+### Triggers are hash anchors
+
+Canonical triggers:
+
+```html
+<!-- New mode (bare #id) -->
+<a href="#edit-modal">New record</a>
+
+<!-- Edit mode (param in fragment) -->
+<a href="#edit-modal:42"
+   data-ln-fill-id="42"
+   data-ln-fill-form="edit-form"
+   data-ln-fill-title="Annual report">Edit #42</a>
+```
+
+Anchor clicks are **intercepted** by ln-modal's document-level click
+delegation: when the fragment namespace resolves to a `[data-ln-modal]`
+element by `id`, it calls `e.preventDefault()` (via the shared
+`lnCore.hashLinkClick` guard) and routes the write through `hashSet(id,
+param)`. This MERGES the modal segment into the URL fragment, preserving any
+foreign segments (e.g. an `ln-tabs` segment) — native anchor navigation would
+replace the whole fragment and wipe them. The resulting `hashchange` then
+drives `_onHashChange`, which opens the modal via
+`setAttribute('data-ln-modal', 'open')`. Modifier / middle / shift-clicks
+fall through to native navigation so open-in-new-tab still works.
+
+`data-ln-modal-for` buttons remain a programmatic opener — they write a
+bare `#id` and always open in **new** mode. `data-ln-modal-param` no longer
+exists.
+
+### Fragment → mode/param table
+
+| Fragment | Modal state | Param | Mode |
+|---|---|---|---|
+| `#id:42` | open | `"42"` | `edit` |
+| `#id` (bare) | open | `null` | `new` |
+| absent | closed | — | — |
+
+### Fill is a coordinator's job
+
+ln-modal is GENERIC — it does not know your data model. When a hash-bound
+modal opens it dispatches `ln-modal:open` with an enriched `detail` and
+leaves the fill step to the **`ln-modal-fill`** coordinator (see
+[`js/ln-modal-fill/README.md`](../ln-modal-fill/README.md)):
+
+- The anchor trigger doubles as the fill source (`data-ln-fill-id` +
+  `data-ln-fill-*` on the same element).
+- On click, `ln-fill` fills the form immediately.
+- On reload / deep-link / Back-Forward (no click), `ln-modal-fill` fills
+  from the `[data-ln-fill-id="<param>"]` source via
+  `window.lnCore.lnFill(modal, record)`.
+
+### Blueprint
+
+```html
+<!-- Source = anchor trigger + fill source -->
+<a href="#user-modal:42"
+   data-ln-fill-id="42"
+   data-ln-fill-form="user-form"
+   data-ln-fill-name="Ada Lovelace">Edit Ada</a>
+
+<!-- Hash-bound modal (id IS the namespace) -->
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
+    <form id="user-form" data-ln-form>
+        <header>
+            <h3 data-ln-fillable>
+                <span data-ln-modal-when="new">New user</span>
+                <span data-ln-modal-when="edit">Edit user #<span data-ln-field="id"></span></span>
+            </h3>
+            <button type="button" data-ln-modal-close aria-label="Close">
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+            </button>
+        </header>
+        <main>
+            <label>Name <input name="name"></label>
+        </main>
+        <footer>
+            <button type="button" data-ln-modal-close>Cancel</button>
+            <button type="submit">Save</button>
+        </footer>
+    </form>
+</div>
+```
+
+### Updated lifecycle events table
+
+| Event | Cancelable | `detail` (no-id modal) | `detail` (id modal, hash-bound) |
+|---|:---:|---|---|
+| **`ln-modal:before-open`** | **Yes** | `{ modalId, target }` | `{ modalId, target }` |
+| **`ln-modal:open`** | No | `{ modalId, target }` | `{ modalId, target, hashNs, param }` |
+| **`ln-modal:before-close`** | **Yes** | `{ modalId, target }` | `{ modalId, target }` |
+| **`ln-modal:close`** | No | `{ modalId, target }` | `{ modalId, target }` |
+| **`ln-modal:destroyed`** | No | `{ modalId, target }` | `{ modalId, target }` |
+
+`hashNs` — the modal's `id`. `param` — the decoded fragment value (`null`
+when the fragment was bare `#id`, i.e. new mode).
+
+### Close clears the hash
+
+Closing (ESC / backdrop / close-button / Back button) calls
+`hashSet(id, null)` which removes the fragment segment. Other components'
+segments are left intact (codec isolation).
+
+### Prevented-open cleanup
+
+If a `ln-modal:before-open` listener calls `e.preventDefault()`, the
+cancellation branch also calls `hashSet(id, null)` to remove any stale
+segment. Without this cleanup, the hash would stay set but no `hashchange`
+would fire on a re-click (same value → no-op), leaving the modal
+un-reopenable.
 
 ## Related
 - **[`ln-confirm`](../ln-confirm/README.md)** — Two-click inline confirm actions (lightweight alternative to modals).

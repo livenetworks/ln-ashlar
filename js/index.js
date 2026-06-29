@@ -35,6 +35,7 @@ import './ln-editor/src/ln-editor.js';
 import './ln-validate/src/ln-validate.js';
 import './ln-form/src/ln-form.js';
 import './ln-fill/src/ln-fill.js';
+import './ln-modal-fill/src/ln-modal-fill.js';
 import './ln-slug/src/ln-slug.js';
 import './ln-time/src/ln-time.js';
 import './ln-data-store/src/ln-data-store.js';

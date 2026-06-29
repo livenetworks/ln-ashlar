@@ -49,12 +49,6 @@ td .actions {
 #filter-status {
 	@include popover;
 	padding: var(--size-sm);
-
-	> ul { @include check-list; }
-
-	label {
-		@include pill;
-	}
 }
 
 th [data-ln-popover-for] {

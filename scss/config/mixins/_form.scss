@@ -748,6 +748,50 @@
 	li label { @include pill; }
 }
 
+// ─── Check list nav — filter list styled with the nav-link vocabulary ──
+// Same checkbox-filter list as check-list, but the selected item uses the
+// sidebar nav-link active treatment (accent-tint wash + accent text +
+// semibold) instead of the solid-accent pill fill. Shared by the filter
+// popover (@mixin popover) and the ln-table column-filter dropdown
+// (@mixin filter-dropdown) so every filter list matches the sidebar nav
+// (nav-links-rounded). Extends check-list to keep the hidden-input filled
+// structure; overrides only color, weight and size. Consumers that need
+// the checkbox kept keyboard-focusable (popover a11y) re-reveal the input
+// themselves after including this.
+@mixin check-list-nav {
+	@include check-list;
+
+	li label {
+		// Smaller — match the nav link (13px).
+		@include typography(body-sm);
+		// Muted idle text, transparent surface (nav idle).
+		--color-fg: var(--fg-muted);
+		color: var(--color-fg);
+		background: transparent;
+		border: none;
+		// Tighter vertical padding — match nav link height (~31px).
+		--padding-y: var(--size-xs-up);
+		padding: var(--padding-y) var(--padding-x);
+
+		// Hover (unchecked) — subtle accent wash (nav hover).
+		&:hover:not(:has(> input:checked)) {
+			background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
+		}
+
+		// Selected — nav active vocabulary (replaces solid-accent + white).
+		&:has(> input:checked) {
+			background-color: var(--color-accent-tint-strong);
+			color: var(--color-accent);
+			@include font-semibold;
+		}
+
+		// Selected + hover — keep the wash, don't darken (nav has no darken).
+		&:hover:has(> input:checked) {
+			background-color: var(--color-accent-tint-strong);
+		}
+	}
+}
+
 // ─── Validation states ─────────────────────────────────────────
 // Status colors (error/success) stay raw — no logical --color-status
 // token in scope (see parent plan §6.2).
