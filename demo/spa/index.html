@@ -196,12 +196,16 @@
 <div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal">
 	<form data-ln-form="tenant-create" id="tenant-create-form" data-ln-form-typed>
 		<header>
-			<h3 id="tenant-modal-title">New tenant</h3>
+			<h3 id="tenant-modal-title" data-ln-fillable>
+				<span data-ln-modal-when="new">New tenant</span>
+				<span data-ln-modal-when="edit">Edit tenant — <span data-ln-field="name"></span></span>
+			</h3>
 			<button type="button" aria-label="Close" data-ln-modal-close>
 				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 			</button>
 		</header>
 		<main>
+			<input type="hidden" name="id">
 			<fieldset>
 				<legend>Identity</legend>
 				<div class="form-grid">
@@ -381,12 +385,11 @@
 				<p><span data-ln-stat="packages">—</span> packages defined</p>
 			</div>
 			<div class="page-actions">
-				<button type="button" id="new-package" class="btn"
-					data-ln-modal-for="package-modal"
+				<a href="#package-modal" id="new-package" class="btn"
 					data-ln-fill-form="package-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 					New package
-				</button>
+				</a>
 			</div>
 		</header>
 
@@ -429,8 +432,7 @@
 					<td><span data-ln-table-cell-attr="status_class:class">{{ status_display }}</span></td>
 					<td>
 						<ul class="row-actions">
-							<li><button type="button" aria-label="Edit package" data-ln-tooltip="Edit"
-								data-ln-modal-for="package-modal"
+							<li><a href="#package-modal:{{ id }}" aria-label="Edit package" data-ln-tooltip="Edit"
 								data-ln-fill-form="package-form"
 								data-ln-fill-id="{{ id }}"
 								data-ln-fill-name="{{ name }}"
@@ -441,7 +443,7 @@
 								data-ln-fill-max-storage="{{ max_storage }}"
 								data-ln-fill-active="{{ active }}"
 								data-ln-modal-name="{{ name }}"
-							><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
+							><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></a></li>
 							<li><button type="button" data-ln-table-row-action="delete" aria-label="Delete package" data-ln-tooltip="Delete" data-ln-confirm="Delete package?"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
 						</ul>
 					</td>
@@ -453,12 +455,11 @@
 					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-package"></use></svg>
 					<h3>No packages yet</h3>
 					<p>Create your first package to define tenant limits.</p>
-					<button type="button" class="btn" data-spa-empty-new
-						data-ln-modal-for="package-modal"
+					<a href="#package-modal" class="btn" data-spa-empty-new
 						data-ln-fill-form="package-form">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 						New package
-					</button>
+					</a>
 				</article>
 			</template>
 
@@ -617,10 +618,10 @@
 				<p><span data-ln-stat="tenants">—</span> tenants registered</p>
 			</div>
 			<div class="page-actions">
-				<button type="button" id="new-tenant" class="btn" data-ln-modal-for="tenant-modal" data-ln-fill-form="tenant-create-form">
+				<a href="#tenant-modal" id="new-tenant" class="btn" data-ln-fill-form="tenant-create-form">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 					New tenant
-				</button>
+				</a>
 				<a href="#tenant-modal:1" class="btn">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
 					Edit tenant #1 (hash)
@@ -704,10 +705,10 @@
 					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-building"></use></svg>
 					<h3>No tenants yet</h3>
 					<p>Register your first tenant to get started.</p>
-					<button type="button" data-spa-empty-new-tenant class="btn" data-ln-modal-for="tenant-modal" data-ln-fill-form="tenant-create-form">
+					<a href="#tenant-modal" data-spa-empty-new-tenant class="btn" data-ln-fill-form="tenant-create-form">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
 						New tenant
-					</button>
+					</a>
 				</article>
 			</template>
 
