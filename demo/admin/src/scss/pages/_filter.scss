@@ -46,24 +46,6 @@
 	@include items-center;
 	@include gap(var(--size-md));
 	@include mb(var(--size-md));
-
-	> label {
-		@include flex;
-		@include items-center;
-		@include gap(var(--size-sm));
-		@include border;
-		@include rounded-md;
-		@include px(var(--size-sm-up));
-		@include py(var(--size-xs-up));
-		@include bg-primary;
-
-		input {
-			border: none;
-			background: none;
-			outline: none;
-			width: 14rem;
-		}
-	}
 }
 
 #api-demo-actions {

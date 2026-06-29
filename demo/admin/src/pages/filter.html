@@ -151,9 +151,12 @@ nav[data-ln-filter] {
 									<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="finance"> Finance</label></li>
 								</ul>
 							</nav>
-							<label>
-								<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-filter"></use></svg>
+							<label class="search">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
 								<input type="search" placeholder="Search name..." data-ln-search="combo-list">
+								<button type="button" data-ln-search-clear aria-label="Clear search">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
 							</label>
 						</div>
 
@@ -343,7 +346,13 @@ table {
 						<p>Filter values auto-populated from column 2 text. Search input filters the checkbox list.</p>
 
 						<div>
-							<input type="search" placeholder="Search departments..." data-ln-search="filter-dept-list-3" data-ln-search-items="label">
+							<label class="search">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+								<input type="search" placeholder="Search departments..." data-ln-search="filter-dept-list-3" data-ln-search-items="label">
+								<button type="button" data-ln-search-clear aria-label="Clear search">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</label>
 							<nav id="filter-dept-list-3" data-ln-filter="demo-table-3" data-ln-filter-col="2">
 								<label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label>
 								<template>

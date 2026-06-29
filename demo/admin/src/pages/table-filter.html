@@ -214,7 +214,13 @@
 
 						<!-- Department popover -->
 						<div data-ln-popover id="filter-dept">
-							<input type="search" placeholder="Search..." data-ln-search="filter-dept-list" data-ln-search-items="label">
+							<label class="search">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+								<input type="search" placeholder="Search..." data-ln-search="filter-dept-list" data-ln-search-items="label">
+								<button type="button" data-ln-search-clear aria-label="Clear search">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</label>
 							<ul id="filter-dept-list" data-ln-filter="employee-table">
 								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label></li>
@@ -229,7 +235,13 @@
 
 						<!-- Role popover -->
 						<div data-ln-popover id="filter-role">
-							<input type="search" placeholder="Search..." data-ln-search="filter-role-list" data-ln-search-items="label">
+							<label class="search">
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+								<input type="search" placeholder="Search..." data-ln-search="filter-role-list" data-ln-search-items="label">
+								<button type="button" data-ln-search-clear aria-label="Clear search">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+								</button>
+							</label>
 							<ul id="filter-role-list" data-ln-filter="employee-table">
 								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-reset checked> All</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Accountant"> Accountant</label></li>

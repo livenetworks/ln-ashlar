@@ -20,23 +20,11 @@
 #filter-dept,
 #filter-role {
 	@include popover;
-	> input[data-ln-search] {
-		@include w-full;
-		@include px(var(--size-sm));
-		@include py(var(--size-xs));
-		@include text-sm;
-		background: none;
-		border: none;
-		@include border-b;
-		border-radius: 0;
-		outline: none;
-		@include mb(var(--size-xs));
-		margin-top: calc(var(--size-sm) * -1);
 
-		&:focus-visible {
-			@include focus-background-shift;
-			border-color: hsl(var(--color-primary));
-		}
+	// Search uses the full .search chrome (global auto-bind + .search
+	// component). Only delta: separate it from the list below.
+	> label.search {
+		@include mb(var(--size-sm));
 	}
 
 	nav {
