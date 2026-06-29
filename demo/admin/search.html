@@ -245,11 +245,19 @@
 						</main>
 					</section>
 
+					<!-- Hard rule callout -->
+					<section class="section-card">
+						<header><h3>Authoring Rule — Required Chrome</h3></header>
+						<main>
+							<p><strong>Every search/filter input MUST use the full <code>.search</code> chrome (icon + clear button).</strong> The minimal-markup examples further down on this page isolate specific JS behaviors and are NOT authoring templates.</p>
+						</main>
+					</section>
+
 					<!-- Anatomy -->
 					<section class="section-card">
 						<header><h3>Anatomy</h3></header>
 						<main>
-							<p>The canonical (recommended) form places <code>data-ln-search</code> directly on the <code>&lt;input&gt;</code> and uses <code>class="search"</code> for the compact icon-group chrome:</p>
+							<p>The canonical (required) form places <code>data-ln-search</code> directly on the <code>&lt;input&gt;</code> and uses <code>class="search"</code> for the compact icon-group chrome:</p>
 <pre><code>&lt;label class="search"&gt;
   &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
   &lt;input type="search" placeholder="Search..." data-ln-search="my-list"&gt;
@@ -263,7 +271,7 @@
     &lt;li&gt;Brazil&lt;/li&gt;
 &lt;/ul&gt;</code></pre>
 
-							<p>Wrapper-host (backward-compat) — places the attribute on a <code>&lt;label&gt;</code> and lets the component find the input inside. Still supported but not recommended for new markup:</p>
+							<p>Wrapper-host (backward-compat only — do NOT use for new markup) — places the attribute on a <code>&lt;label&gt;</code> and lets the component find the input inside. Retained so existing markup keeps working; input-host above is required for all new code:</p>
 <pre><code>&lt;label class="search" data-ln-search="my-list"&gt;
     &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
     &lt;input type="search" placeholder="Search..."&gt;
@@ -362,6 +370,9 @@ label:has(input[type="search"]) {
 }
 						</script>
 					</section>
+
+					<!-- Capability-isolation note -->
+					<p><strong>Note:</strong> The examples below use intentionally minimal markup to isolate specific JS behaviors. They are NOT authoring templates — always author the full <code>.search</code> chrome in real pages.</p>
 
 					<!-- Demo: input-direct (no wrapper) -->
 					<section class="section-card" data-demo-html>

@@ -6,6 +6,41 @@ It acts as an intent announcer. It does not own data filtering directly; instead
 
 ---
 
+## ✅ Canonical Markup — Copy This (REQUIRED)
+
+**Hard rule — non-negotiable.** Every search or filter text input MUST use the
+full `.search` chrome below: the leading magnifier icon **and** the clear
+("x") button. This applies everywhere — toolbars, table headers, **and
+popovers/dropdowns**. The previously-accepted "lightweight" bare
+`<input data-ln-search>` (no icon, no clear button) is **no longer acceptable
+for authoring**.
+
+Copy this block. Change only the `placeholder`, the
+`data-ln-search="<targetId>"`, and the `aria-label`. If a field needs a
+page-specific tweak, add one extra class beside `search`
+(`class="search my-extra"`) — never alter the structure, the icons, or the
+clear button.
+
+```html
+<label class="search">
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+	<input type="search" placeholder="Search …" data-ln-search="<targetId>">
+	<button type="button" data-ln-search-clear aria-label="Clear search">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+	</button>
+</label>
+```
+
+For deep targeting (e.g. checkbox lists inside a popover) add
+`data-ln-search-items="<selector>"` to the **same `<input>`** — the chrome is
+identical:
+
+```html
+<input type="search" placeholder="Search …" data-ln-search="<targetId>" data-ln-search-items="label">
+```
+
+---
+
 ## 🧭 Philosophy & Architecture
 
 1. **Decoupled Search Intent:** The component does not manipulate collections directly. It debounces keystrokes (150ms trailing-edge) and dispatches a cancelable `ln-search:change` custom event on the **target** element (not the input).
@@ -18,6 +53,11 @@ It acts as an intent announcer. It does not own data filtering directly; instead
 
 ### Standard List Filtering (Zero-JS Fallback)
 Bind the search input to a list `id` via `data-ln-search`.
+
+> ⚠️ **Not an authoring pattern.** The component still *accepts* a bare input
+> (backward-compat / JS-internal fallback), but you must always author the full
+> `.search` chrome shown in [Canonical Markup](#-canonical-markup--copy-this-required).
+
 ```html
 <input type="search" placeholder="Search..." data-ln-search="countries-list">
 
@@ -42,8 +82,8 @@ recessed fill, clear button):
 </label>
 ```
 `class="search"` binds `@include search` (library `scss/components/_form.scss`).
-Wrapper-host (`data-ln-search` on the `<label>`) remains supported for backward
-compatibility, but input-host is the recommended canonical form.
+Wrapper-host (`data-ln-search` on the `<label>`) is retained only so existing
+markup keeps working — input-host is **required** for all new code.
 
 ---
 

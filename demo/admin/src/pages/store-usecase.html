@@ -167,7 +167,13 @@
 
 <!-- Documents table: department filter popover -->
 <div data-ln-popover id="filter-documents-table-dept">
-	<input type="search" placeholder="Search..." data-ln-search="filter-documents-table-dept-list" data-ln-search-items="label">
+	<label class="search">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+		<input type="search" placeholder="Search..." data-ln-search="filter-documents-table-dept-list" data-ln-search-items="label">
+		<button type="button" data-ln-search-clear aria-label="Clear search">
+			<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		</button>
+	</label>
 	<ul id="filter-documents-table-dept-list" data-ln-filter="documents-table">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
@@ -453,7 +459,13 @@
 
 <!-- People table: department filter popover -->
 <div data-ln-popover id="filter-people-dept">
-	<input type="search" placeholder="Search..." data-ln-search="filter-people-dept-list" data-ln-search-items="label">
+	<label class="search">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+		<input type="search" placeholder="Search..." data-ln-search="filter-people-dept-list" data-ln-search-items="label">
+		<button type="button" data-ln-search-clear aria-label="Clear search">
+			<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		</button>
+	</label>
 	<ul id="filter-people-dept-list" data-ln-filter="people">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>

@@ -4,6 +4,15 @@
 > lives in [`js/ln-search/README.md`](../../js/ln-search/README.md);
 > this document is the why-behind-the-how, not a re-statement of usage.
 
+## Authoring rule (hard requirement)
+
+Every search/filter text input authored against `ln-search` MUST use the full
+`.search` chrome — leading `#ln-search` icon **and** the
+`data-ln-search-clear` button — including inside popovers and dropdowns. The
+bare `<input data-ln-search>` form is a JS-internal fallback the component
+still *accepts*, never a markup you write. The canonical copy-paste block lives
+in [`js/ln-search/README.md`](../../js/ln-search/README.md#-canonical-markup--copy-this-required).
+
 File: `js/ln-search/ln-search.js` (114 lines).
 
 The architectural pivot: the dispatched event is **cancelable**, with the

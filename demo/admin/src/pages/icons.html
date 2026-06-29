@@ -53,9 +53,6 @@
 						margin-left: auto;
 					}
 
-					.icon-toolbar > label input[type="search"] {
-						width: 14rem;
-					}
 				</style>
 
 				<div class="icon-toolbar">
@@ -71,11 +68,14 @@
 							<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="file-types"> File Types</label></li>
 						</ul>
 					</nav>
-					<label>
-						<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<label class="search">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
 						<input type="search" placeholder="Filter icons…"
 							   data-ln-search="icon-categories"
 							   data-ln-search-items=".icon-cell">
+						<button type="button" data-ln-search-clear aria-label="Clear search">
+							<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+						</button>
 					</label>
 				</div>
 

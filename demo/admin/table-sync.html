@@ -257,9 +257,9 @@
 								<div>
 									<h3>Documents Manager</h3>
 								</div>
-								<label class="search" data-ln-search="hybrid-table">
+								<label class="search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-									<input type="search" placeholder="Search cache or server...">
+									<input type="search" placeholder="Search cache or server..." data-ln-search="hybrid-table">
 									<button type="button" data-ln-search-clear aria-label="Clear search">
 										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 									</button>
@@ -443,7 +443,13 @@
 
 <!-- Department filter popover -->
 <div data-ln-popover id="filter-hybrid-dept">
-	<input type="search" placeholder="Search..." data-ln-search="filter-hybrid-dept-list" data-ln-search-items="label">
+	<label class="search">
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+		<input type="search" placeholder="Search..." data-ln-search="filter-hybrid-dept-list" data-ln-search-items="label">
+		<button type="button" data-ln-search-clear aria-label="Clear search">
+			<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		</button>
+	</label>
 	<ul id="filter-hybrid-dept-list" data-ln-filter="hybrid-table">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
