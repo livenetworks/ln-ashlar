@@ -152,6 +152,22 @@ Use **button triggers** and add `data-ln-persist="key"` to remember the active t
 
 ---
 
+## Hash codec (ln-core shared)
+
+ln-tabs uses the shared ln-core hash codec (`hashGet` / `hashSet` /
+`hashParse` from `js/ln-core/hash.js`) instead of a private parser. The
+grammar and behaviour are unchanged — anchor-trigger groups still produce
+`#nsKey:activeKey` fragments, still respond to `hashchange`, and still
+support back/forward navigation.
+
+**Foreign-segment preservation.** Because `hashSet` is a
+read-modify-write that updates only the tabs namespace, switching a tab
+now preserves any hash segment written by another component. For example,
+if a hash-bound modal is open (`#demo-edit:5`), switching a tab produces
+`#demo-edit:5&demo-tab:members` — the modal segment is not cleared.
+
+No markup or API change — this is an internal implementation improvement.
+
 ## Related
 - **[`ln-toggle`](../ln-toggle/README.md)** — Binary disclosure state primitive.
 - **[`ln-accordion`](../ln-accordion/README.md)** — Single-open coordinator built on `ln-toggle`.

@@ -82,6 +82,38 @@ The module-level `_booting` flag is set to `true` immediately before the initial
 
 This guarantees that `ln-router:navigated` (matched boot route) and `ln-router:not-found` (unmatched boot route) are always delivered **after** the current synchronous task completes — including all `DOMContentLoaded` callbacks that register listeners in the same script-loading burst. Subsequent navigations set `_booting = false` and call `_dispatchMaybeDeferred` with it false, so their dispatches remain synchronous.
 
+## Fragment-only popstate guard
+
+> See also: [Hash-state doctrine](../architecture/hash-state.md) §3 Rule 5 — explains why this guard is load-bearing for hash-bound overlays (modals, tabs) and how it interacts with `hashchange`-driven components.
+
+A `popstate` event whose new URL differs from the current SPA state **only in
+the fragment** (path and query are identical) is **skipped** — no navigation,
+no outlet teardown, no `ln-router:navigated` fires.
+
+The guard is implemented by `_queryEqual` (a utility that compares the path +
+query portion of two URLs, ignoring the fragment). On every `popstate`:
+
+```
+popstate fires
+  → extract newPath (strip hash) from event.state or location.href
+  → if _queryEqual(newPath, currentPath):
+      → skip navigation entirely
+      → hashchange fires independently → ln-modal / ln-tabs handle it
+  → else:
+      → normal navigation pipeline (per-region match, swap, history, events)
+```
+
+**Why this matters for hash-bound overlays.** When a user presses Back while
+a hash-bound modal is open, the browser fires `popstate` to the URL before
+the modal's hash segment was added. If path + query are the same as the
+current SPA state, the router skips the swap — the under-modal view (table,
+scroll position, filter state) is completely preserved. `hashchange` then
+fires, and ln-modal's `_onHashChange` closes the modal.
+
+Real path/query Back/Forward navigations and `router.navigate()` calls are
+completely unaffected. The `router.current()` return value is left coherent
+(unchanged) on a skipped fragment popstate.
+
 ## Accessibility & Focus Shifting
 
 For screen readers, client-side route changes do not automatically trigger a page reload announcement. To resolve this, `ln-router` implements programmatic focus shifting (primary region only):

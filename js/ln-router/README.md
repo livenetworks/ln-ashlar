@@ -171,7 +171,31 @@ document.addEventListener('ln-router:before-navigate', (e) => {
 });
 ```
 
-## 5. Accessibility & Screen Reader Continuity
+## 5. Fragment-only popstate guard
+
+A `popstate` event whose new URL differs from the current SPA state **only in
+the fragment** (path and query are identical) is **skipped** — no navigation,
+no outlet teardown, no `ln-router:navigated` event fires.
+
+This is what makes hash-bound overlays (like `ln-modal`, which uses its
+element `id` as the hash namespace) work cleanly with Back/Forward:
+
+1. User opens a hash-bound modal → URL gets `#id:value`.
+2. User presses **Back** → browser fires `popstate` to the URL without the
+   fragment.
+3. ln-router detects path + query are identical → **skips navigation** → the
+   under-modal view (table, scroll position, search/filter state) is
+   completely preserved.
+4. `hashchange` fires → ln-modal's `_onHashChange` sees the segment is gone
+   → `data-ln-modal="close"` → modal closes cleanly.
+
+Real path/query Back/Forward navigations and link clicks are unaffected. The
+`router.current()` return value is left coherent (unchanged) on a skipped
+fragment popstate — no stale state is introduced.
+
+This guard is implemented via `_queryEqual` in the router source.
+
+## 6. Accessibility & Screen Reader Continuity
 
 `ln-router` shifts focus automatically on each user-initiated navigation (click or popstate back/forward) to ensure compatibility with assistive technologies (screen readers). Focus is **not** shifted on the initial page load (boot render) to avoid an unexpected visible focus ring without user action.
 1. **Focus Shifting** (user navigation only): The router looks for the first heading element (`h1` through `h6`) in the newly mounted template. If found, it dynamically assigns `tabindex="-1"` and calls `.focus()` on it. If no heading element is present, focus is shifted to the outlet container itself.
@@ -180,7 +204,7 @@ document.addEventListener('ln-router:before-navigate', (e) => {
 
 ---
 
-## 6. Server Integration & Deep Links
+## 7. Server Integration & Deep Links
 
 Since `ln-router` operates client-side using history `pushState`, direct access or page refresh on a deep path (e.g., direct opening of `/users/42`) will bypass the client-side router and hit the web server directly. This results in a server 404 error if not configured correctly.
 
@@ -208,7 +232,7 @@ If your app references assets using relative paths, deep paths will attempt to l
 
 ---
 
-## 7. Routing Model — Parallel Regions, Not Nested Routes
+## 8. Routing Model — Parallel Regions, Not Nested Routes
 
 > [!NOTE]
 > **No Nested Routing**: `ln-router` does not support nested outlets or child routes (rendering a sub-view inside an already-routed parent). All routes are flat.
@@ -218,7 +242,7 @@ If your app references assets using relative paths, deep paths will attempt to l
 
 ---
 
-## 8. Integration Patterns
+## 9. Integration Patterns
 
 ### Coordinator Data Binding (Secure Interpolation)
 Coordinators listen to `ln-router:navigated`, fetch data, and populate the view. Use `fillTemplate` for safe `{{ placeholder }}` text-node substitutions:
@@ -246,7 +270,7 @@ document.addEventListener('ln-router:navigated', function (e) {
 
 ---
 
-## 9. Integration & Source Files
+## 10. Integration & Source Files
 
 `ln-ashlar` is a source-only package. Products should bundle it from source using their asset compilation pipelines (Vite, Laravel Mix, Webpack, etc.):
 
@@ -263,7 +287,7 @@ document.addEventListener('ln-router:navigated', function (e) {
 
 ---
 
-## 10. Multi-Region Routing
+## 11. Multi-Region Routing
 
 One URL can simultaneously paint multiple sibling regions. Each region independently maintains its own route table and matches the current URL.
 

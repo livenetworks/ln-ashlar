@@ -1,4 +1,5 @@
 import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../../ln-core';
+import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-modal';
@@ -16,6 +17,15 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 		this.isOpen = dom.getAttribute(DOM_SELECTOR) === 'open';
 
 		const self = this;
+
+		this._hashNs = dom.id || null;
+
+		this._onHashChange = function () {
+			if (!self._hashNs) return;
+			const present = hashGet(self._hashNs) !== null;
+			if (present && !self.isOpen) self.dom.setAttribute(DOM_SELECTOR, 'open');
+			else if (!present && self.isOpen) self.dom.setAttribute(DOM_SELECTOR, 'close');
+		};
 
 		this._onEscape = function (e) {
 			if (e.key === 'Escape') self.dom.setAttribute(DOM_SELECTOR, 'close');
@@ -47,6 +57,13 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			document.addEventListener('keydown', this._onFocusTrap);
 		}
 
+		if (this._hashNs) {
+			window.addEventListener('hashchange', this._onHashChange);
+			if (hashGet(this._hashNs) !== null && !this.isOpen) {
+				this.dom.setAttribute(DOM_SELECTOR, 'open');
+			}
+		}
+
 		return this;
 	}
 
@@ -70,6 +87,10 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			}
 		}
 
+		if (this._hashNs) {
+			window.removeEventListener('hashchange', this._onHashChange);
+		}
+
 		dispatch(this.dom, 'ln-modal:destroyed', { modalId: this.dom.id, target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
@@ -88,6 +109,11 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 		if (shouldBeOpen) {
 			const before = dispatchCancelable(el, 'ln-modal:before-open', { modalId: el.id, target: el });
 			if (before.defaultPrevented) {
+				// A prevented open must not leave a stale hash segment behind.
+				// The 'close' reset below early-returns on its own sync
+				// (shouldBeOpen === isOpen, both false), so the CLOSE-branch
+				// hashSet(ns, null) never runs — clear the segment here.
+				if (instance._hashNs) hashSet(instance._hashNs, null);
 				el.setAttribute(DOM_SELECTOR, 'close');
 				return;
 			}
@@ -115,7 +141,15 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 				}
 			}
 
-			dispatch(el, 'ln-modal:open', { modalId: el.id, target: el });
+			if (instance._hashNs) {
+				if (hashGet(instance._hashNs) === null) hashSet(instance._hashNs, '');
+				const rawParam = hashGet(instance._hashNs);
+				const param = rawParam ? rawParam : null; // '' (new) → null
+				el.dataset.lnModalMode = param ? 'edit' : 'new';
+				dispatch(el, 'ln-modal:open', { modalId: el.id, target: el, hashNs: instance._hashNs, param: param });
+			} else {
+				dispatch(el, 'ln-modal:open', { modalId: el.id, target: el });
+			}
 		} else {
 			const before = dispatchCancelable(el, 'ln-modal:before-close', { modalId: el.id, target: el });
 			if (before.defaultPrevented) {
@@ -127,6 +161,7 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 			document.removeEventListener('keydown', instance._onEscape);
 			document.removeEventListener('keydown', instance._onFocusTrap);
 			dispatch(el, 'ln-modal:close', { modalId: el.id, target: el });
+			if (instance._hashNs) hashSet(instance._hashNs, null);
 
 			if (instance._returnFocusEl
 				&& document.contains(instance._returnFocusEl)
@@ -190,6 +225,35 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 				target.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
 			}
 			return;
+		}
+
+		// Handle hash-anchor click <a href="#modalId"> / <a href="#modalId:param">
+		// Per-component interception: modal anchors are NOT scoped to a wrapper
+		// (they live in table rows, page headers, anywhere), so resolve them at
+		// document level by checking whether the fragment namespace maps to a
+		// live [data-ln-modal] element by id. Route the write through hashSet
+		// (merge-preserving) instead of native fragment replacement, which would
+		// wipe foreign segments (e.g. an ln-tabs segment). The guard +
+		// preventDefault is shared with ln-tabs via the core hashLinkClick helper.
+		const hashAnchor = e.target.closest('a[href^="#"]');
+		if (hashAnchor) {
+			const map = hashParse(hashAnchor.getAttribute('href'));
+			for (const ns in map) {
+				const el = document.getElementById(ns);
+				if (el && el[DOM_ATTRIBUTE]) {
+					// ns resolves to a live modal — own this click.
+					// hashLinkClick: false → modifier/middle/shift → let native
+					// open-in-new-tab/window happen; true → preventDefault done.
+					if (!hashLinkClick(e)) return;
+					// map[ns]: '' for bare #id (new) or the param (edit).
+					hashSet(ns, map[ns]);
+					return;
+				}
+			}
+			// No segment maps to a modal — fall through. Plain #section scroll
+			// anchors and ln-tabs anchors stay unaffected (ln-tabs handles its
+			// own; the close branch below still gets a chance for the edge case
+			// of data-ln-modal-close on an anchor).
 		}
 
 		// Handle close button click [data-ln-modal-close]

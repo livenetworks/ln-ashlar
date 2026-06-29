@@ -39,9 +39,9 @@
 		max-height: var(--filter-options-max-height, 15rem);
 		overflow-y: auto;
 
-		// Filled pill treatment for filter options (filled accent on checked).
-		// Visually-hidden input keeps checkbox keyboard-focusable (a11y).
-		> li > label { @include pill; }
+		// Nav-link treatment for filter options (accent-tint wash on checked).
+		// Visually-hidden input (below) keeps the checkbox keyboard-focusable.
+		@include check-list-nav;
 
 		> li > label > input {
 			// Override pill's display:none — keep in focus order for keyboard nav

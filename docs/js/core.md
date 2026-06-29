@@ -17,6 +17,7 @@ ln-core exposes helpers in these categories:
 - **Reactivity** — `reactiveState`, `deepReactive`, `createBatcher`
 - **Layout** — viewport-aware positioning, teleport, measurement
 - **Persistence** — localStorage wrappers with `ln:` prefix
+- **Hash codec** — namespaced URL fragment state (`hashParse`, `hashGet`, `hashSet`)
 - **Cryptography** — high-performance Web Crypto helpers for encryption at rest (`crypto.js`)
 
 Source of truth: `js/ln-core/helpers.js`, `js/ln-core/reactive.js`, and `js/ln-core/crypto.js`. Import from `'../ln-core'` (barrel).
@@ -603,6 +604,62 @@ ln-table-sort, ln-filter).
 - localStorage full → silent no-op on write, existing data preserved
 - Stale data (panel removed from DOM, column index out of range) → orphan key ignored gracefully
 - Missing `id` + no explicit key → `console.warn` once, persistence skipped for that element
+
+---
+
+## hash.js
+
+Shared URL-fragment codec imported by ln-tabs and ln-modal. All three
+functions are exposed at `window.lnCore.{hashParse, hashGet, hashSet}` for
+coordinators.
+
+### Grammar
+
+Fragments use the format `#nsA:valA&nsB:valB` — one namespace per component
+instance, `&`-separated. Foreign segments (belonging to other components) are
+preserved on every write. A bare `#ns` (no `:`) encodes an empty value.
+
+### hashParse(str = location.hash) → { ns: value }
+
+Parse a hash string into a plain object of `{ namespace: value }` pairs.
+
+- Strips the leading `#` before processing.
+- Tolerates empty or malformed input (returns `{}`).
+- Each value is `decodeURIComponent`-decoded.
+- Bare `#ns` (no `:`) → `{ ns: '' }` (empty string, not `null`).
+
+### hashGet(ns) → string | null
+
+Read the current value for a namespace from `location.hash`. Returns the
+decoded string value if the segment is present (including `''` for bare `#ns`),
+or `null` if the namespace is absent.
+
+### hashSet(ns, value)
+
+Read-modify-write `location.hash`, updating ONLY `ns` and preserving all other
+segments. Uses `location.hash =` (not `pushState`) so the browser adds a history
+entry and fires `hashchange`.
+
+THREE-STATE write:
+
+| `value` | Effect |
+|---|---|
+| `null` | Removes the `ns` segment entirely |
+| `''` (empty string) | Writes a bare `#ns` (no `:`) |
+| any other string | Writes `#ns:encodeURIComponent(value)` |
+
+**Identical value is a no-op** — if the resulting hash string equals the
+current `location.hash`, the assignment is skipped. This prevents spurious
+`hashchange` events and the loops they could cause.
+
+### Usage note
+
+Both ln-tabs (anchor-trigger groups) and ln-modal (hash-bound modals) use this
+codec. Because `hashSet` is a read-modify-write that preserves foreign segments,
+switching a tab never clobbers an open modal's hash segment and vice versa —
+codec isolation is guaranteed by design.
+
+See also: [Hash-state doctrine](../architecture/hash-state.md) — the five rules governing namespace ownership, foreign-segment preservation, anchor interception, coordinator wiring, and the router fragment guard.
 
 ---
 

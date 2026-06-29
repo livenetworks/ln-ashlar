@@ -302,9 +302,28 @@ The validity guard makes every call self-correcting — even rapidly toggled inv
 
 - **Init.** O(T + P) where T = tab button count, P = panel count. One `querySelectorAll` per wrapper (rooted at wrapper, not document). Click handler attachment is O(T).
 - **`_applyActive`.** O(T + P) — iterates `mapTabs` and `mapPanels`.
-- **`_hashHandler`.** O(N) where N = `&`-separated fragment count in the hash. `_parseHash` builds a fresh map each call.
+- **`_hashHandler`.** O(N) where N = `&`-separated fragment count in the hash. The shared ln-core codec (`hashGet`/`hashParse`) builds a fresh map each call.
 - **Persistence.** `persistGet` is one `localStorage.getItem` + `JSON.parse`; `persistSet` is one `JSON.stringify` + `localStorage.setItem`.
 - **Memory.** Per instance: `tabs[]`, `panels[]`, `mapTabs`, `mapPanels`, `_clickHandlers` (one `{el, handler}` pair per trigger), one bound `_hashHandler`. No timers, no intervals, no `ResizeObserver`.
+
+## Hash codec migration
+
+> See also: [Hash-state doctrine](../architecture/hash-state.md) — the five rules (namespace ownership, foreign-segment preservation, anchor interception, coordinator separation, router fragment guard) that govern how `ln-tabs` and all other hash-state components coexist.
+
+ln-tabs no longer contains a private `_parseHash` function. Hash parsing and
+writing are now delegated to the shared ln-core hash codec
+(`hashGet` / `hashSet` / `hashParse` from `js/ln-core/hash.js`). The
+grammar (`#ns:value&ns2:value2`) and all behaviour are unchanged from the
+consumer's perspective.
+
+**Foreign-segment preservation.** Because `hashSet` is a read-modify-write
+that updates only the tabs namespace, switching a tab now leaves any other
+component's hash segment intact. For example, switching a tab while a
+hash-bound `ln-modal` is open produces a compound hash like
+`#demo-tab:members&demo-edit:5` — the modal segment is not cleared. Likewise,
+opening a modal does not affect the tab segment.
+
+No markup or API change — this is an internal implementation improvement only.
 
 ## Read further
 

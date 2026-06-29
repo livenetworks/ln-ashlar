@@ -442,6 +442,101 @@
 			</script>
 		</section>
 
+		<!-- Hash addressing & coexistence -->
+		<section class="section-card">
+			<header><h3>Hash addressing &amp; coexistence</h3></header>
+			<main>
+				<p>Demonstrates codec isolation: ln-tabs and ln-modal share the same URL hash using the ln-core hash codec. Each component reads and writes ONLY its own namespace segment — foreign segments are preserved on every write. The modal's namespace is its <code>id</code> (<code>demo-hash-modal</code>).</p>
+
+				<p><strong>Manual tests:</strong></p>
+				<ol>
+					<li>Click <em>Edit #5</em>, switch to the <em>Members</em> tab. The URL becomes <code>#demo-hash-modal:5&amp;demo-tab:members</code>, the modal STAYS open, and the <strong>Title</strong> field is filled by the <code>ln-modal-fill</code> coordinator.</li>
+					<li><strong>Reverse order (regression direction):</strong> switch to the <em>Members</em> tab FIRST, then click <em>Edit #5</em>. The URL becomes <code>#demo-tab:members&amp;demo-hash-modal:5</code> and the tab STAYS on <em>Members</em> — the modal anchor click MERGES its segment instead of replacing the whole fragment.</li>
+					<li>Reload with <code>#demo-tab:members&amp;demo-hash-modal:42</code> in the URL. The <em>Members</em> tab should be active AND the modal open with Title "Internal audit log" filled (deep-link, no click — the coordinator did the fill).</li>
+					<li>With the modal open, press Back → modal closes, tab state intact.</li>
+				</ol>
+
+				<!-- Hash tabset -->
+				<div data-ln-tabs id="demo-tab" data-ln-tabs-default="overview">
+					<nav>
+						<a href="#demo-tab:overview" data-ln-tab>Overview</a>
+						<a href="#demo-tab:members" data-ln-tab>Members</a>
+					</nav>
+					<section data-ln-panel="overview">
+						<p>Overview panel content. Switch tabs to see the modal hash segment preserved.</p>
+					</section>
+					<section data-ln-panel="members" class="hidden">
+						<p>Members panel content. Switch tabs to see the modal hash segment preserved.</p>
+					</section>
+				</div>
+
+				<!-- Hash-bound modal triggers (anchors double as fill sources) -->
+				<nav class="demo-actions" style="margin-top: var(--size-md);">
+					<a class="btn" href="#demo-hash-modal" data-ln-fill-form="demo-hash-form">New (no param)</a>
+					<a class="btn" href="#demo-hash-modal:5"
+					   data-ln-fill-id="5" data-ln-fill-form="demo-hash-form"
+					   data-ln-fill-title="Annual ISO report">Edit #5</a>
+					<a class="btn" href="#demo-hash-modal:42"
+					   data-ln-fill-id="42" data-ln-fill-form="demo-hash-form"
+					   data-ln-fill-title="Internal audit log">Edit #42</a>
+				</nav>
+
+				<!-- Hash event log -->
+				<output id="hash-demo-log" style="display: block; margin-top: var(--size-md);">No events yet.</output>
+			</main>
+		</section>
+
+		<!-- Hash-bound modal (id IS the hash namespace; id="demo-hash-modal" → namespace "demo-hash-modal") -->
+		<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-hash-modal">
+			<form id="demo-hash-form" data-ln-form>
+				<header>
+					<h3 data-ln-fillable>
+						<span data-ln-modal-when="new">New record</span>
+						<span data-ln-modal-when="edit">Edit record #<span data-ln-field="id"></span></span>
+					</h3>
+					<button type="button" data-ln-modal-close aria-label="Close">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					</button>
+				</header>
+				<main>
+					<div class="form-element">
+						<label for="demo-hash-title">Title</label>
+						<input id="demo-hash-title" name="title" type="text">
+					</div>
+				</main>
+				<footer>
+					<button type="button" data-ln-modal-close>Close</button>
+					<button type="submit">Save</button>
+				</footer>
+			</form>
+		</div>
+
+		<script>
+		(function () {
+			const modal = document.getElementById('demo-hash-modal');
+			const log = document.getElementById('hash-demo-log');
+			if (!modal || !log) return;
+
+			const events = [];
+			function record(msg) {
+				events.push(msg);
+				if (events.length > 8) events.splice(0, events.length - 8);
+				log.textContent = events.join('\n');
+			}
+
+			modal.addEventListener('ln-modal:open', function (e) {
+				const param = e.detail && e.detail.param != null ? e.detail.param : null;
+				record('open  param=' + (param !== null ? param : '(none)') + '  hash=' + location.hash);
+			});
+			modal.addEventListener('ln-modal:close', function () {
+				record('close  hash=' + location.hash);
+			});
+			window.addEventListener('hashchange', function () {
+				record('hashchange → ' + location.hash);
+			});
+		})();
+		</script>
+
 		<!-- Events -->
 		<section class="section-card">
 			<header><h3>Events</h3></header>
@@ -453,7 +548,7 @@
 						<thead><tr><th>Event</th><th>Cancelable</th><th>When</th><th><code>detail</code></th></tr></thead>
 						<tbody>
 							<tr><td><code>ln-modal:before-open</code></td><td>✅</td><td>Before opening</td><td><code>{ modalId, target }</code></td></tr>
-							<tr><td><code>ln-modal:open</code></td><td>❌</td><td>Modal opened</td><td><code>{ modalId, target }</code></td></tr>
+							<tr><td><code>ln-modal:open</code></td><td>❌</td><td>Modal opened</td><td><code>{ modalId, target, hashNs, param }</code> (id modal) / <code>{ modalId, target }</code> (no-id modal)</td></tr>
 							<tr><td><code>ln-modal:before-close</code></td><td>✅</td><td>Before closing</td><td><code>{ modalId, target }</code></td></tr>
 							<tr><td><code>ln-modal:close</code></td><td>❌</td><td>Modal closed</td><td><code>{ modalId, target }</code></td></tr>
 							<tr><td><code>ln-modal:destroyed</code></td><td>❌</td><td>Instance destroyed</td><td><code>{ modalId, target }</code></td></tr>
