@@ -8,6 +8,8 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 	const TYPED_ATTR = 'data-ln-form-typed';
 	const VALIDATE_SELECTOR = 'data-ln-validate';
 	const VALIDATE_ATTRIBUTE = 'lnValidate';
+	const ACTION_EDIT_ATTR   = 'data-ln-form-action-edit';
+	const ACTION_METHOD_ATTR = 'data-ln-form-action-method';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -16,6 +18,7 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 	function _component(form) {
 		this.dom = form;
 		this._debounceTimer = null;
+		this._baseAction = form.getAttribute('action') || '';
 
 		const self = this;
 
@@ -42,6 +45,7 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 			if (e.target !== self.dom) return;
 			if (e.detail) self.fill(e.detail);
 			else self.reset();
+			self._applyActionMode(e.detail);
 		};
 
 		this._onFormReset = function () {
@@ -185,6 +189,38 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 			return true;
 		}
 	});
+
+	_component.prototype._ensureMethodInput = function () {
+		let input = this.dom.querySelector('input[name="_method"]');
+		if (!input) {
+			input = document.createElement('input');
+			input.type  = 'hidden';
+			input.name  = '_method';
+			input.value = '';
+			this.dom.appendChild(input);
+		}
+		return input;
+	};
+
+	_component.prototype._applyActionMode = function (record) {
+		if (!this.dom.hasAttribute(ACTION_EDIT_ATTR)) return;
+
+		const id = record && record.id != null && record.id !== '' ? record.id : null;
+		const methodInput = this._ensureMethodInput();
+
+		if (id !== null) {
+			const template = this.dom.getAttribute(ACTION_EDIT_ATTR);
+			if (template) {
+				this.dom.setAttribute('action', template.replace(':id', encodeURIComponent(id)));
+			} else {
+				this.dom.setAttribute('action', this._baseAction.replace(/\/$/, '') + '/' + encodeURIComponent(id));
+			}
+			methodInput.value = this.dom.getAttribute(ACTION_METHOD_ATTR) || 'PUT';
+		} else {
+			this.dom.setAttribute('action', this._baseAction);
+			methodInput.value = '';
+		}
+	};
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;

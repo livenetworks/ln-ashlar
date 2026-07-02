@@ -51,6 +51,8 @@ It delegates per-field validation rules to the `ln-validate` primitive and visua
 | `data-ln-form-debounce="ms"` | `<form>` | Debounce duration in milliseconds before auto-submitting. |
 | `data-ln-form-typed` | `<form>` | Opt-in typed serialization — see "Typed serialization" below. |
 | `data-ln-fill-as="<key>"` | `<input>`, `<select>`, `<textarea>` | Decoupled fill key. When present, `populateForm` matches on this key instead of `name` for the fill direction; `name` continues to be the form submission key. `ln-number` and `ln-date` copy this attribute to their hidden input automatically. |
+| `data-ln-form-action-edit` | `<form>` | Opt-in RESTful action routing. See "RESTful action routing" section. |
+| `data-ln-form-action-method="PUT"` | `<form>` | Override verb for `_method` (default `PUT`). Requires `data-ln-form-action-edit`. |
 
 ### JS API
 
@@ -125,6 +127,53 @@ The `type="hidden"` rule preserves the `ln-number` composition contract: `ln-num
   });
 </script>
 ```
+
+## RESTful action routing (create vs. edit)
+
+For Laravel REST backends, `ln-form` can rewrite `form.action` and inject a
+hidden `_method` input driven off the fill record — no coordinator JS, no second
+click listener.
+
+**Opt-in:** add `data-ln-form-action-edit` to the `<form>`. Forms without this
+attribute are completely inert — this feature does not exist for them.
+
+### Attributes
+
+| Attribute | On | Description |
+| :--- | :--- | :--- |
+| `data-ln-form-action-edit` | `<form>` | Opt-in. Empty value = RESTful default (`baseAction + '/' + id`). Non-empty value = template with `:id` placeholder. |
+| `data-ln-form-action-edit="/path/:id"` | `<form>` | Template variant — `:id` is replaced with `encodeURIComponent(record.id)`. |
+| `data-ln-form-action-method="PUT"` | `<form>` | HTTP verb written into `_method` on edit. Default: `PUT`. |
+
+> The `<input name="_method">` is auto-ensured — do not author it manually.
+> `ln-form` creates it on first fill if absent, or reuses the existing one.
+
+### Behavior
+
+| Fill state | `form.action` | `<input name="_method">` |
+| :--- | :--- | :--- |
+| Edit (record with `id`) | Rewritten to edit URL | `PUT` (or custom verb) |
+| New (`null` detail or no `id`) | Restored to base action | `''` (empty — Laravel ignores) |
+
+### Examples
+
+```html
+<!-- Minimal: baseAction + '/' + id -->
+<form data-ln-form action="/packages" data-ln-form-action-edit>
+
+<!-- Custom template -->
+<form data-ln-form action="/packages" data-ln-form-action-edit="/packages/:id">
+
+<!-- Custom verb -->
+<form data-ln-form action="/packages"
+      data-ln-form-action-edit="/packages/:id"
+      data-ln-form-action-method="PATCH">
+```
+
+> [!NOTE]
+> This feature requires `ln-ajax` for the actual HTTP request. `ln-ajax` reads
+> `form.method` (always POST) and `form.action`; `_method` rides in `FormData`
+> automatically. No `ln-ajax` configuration is needed.
 
 ## ⚠️ Common Pitfalls
 

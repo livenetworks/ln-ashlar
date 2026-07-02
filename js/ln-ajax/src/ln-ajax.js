@@ -152,17 +152,7 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '..
 						for (const targetId in data.content) {
 							const targetElement = document.getElementById(targetId);
 							if (targetElement) {
-								let htmlContent = data.content[targetId];
-								// Defense-in-depth: sanitize if DOMPurify is available globally, otherwise use native mitigation
-								if (window.DOMPurify && typeof window.DOMPurify.sanitize === 'function') {
-									htmlContent = window.DOMPurify.sanitize(htmlContent);
-								} else {
-									// Safe fallback: strip inline script tags and inline events (on*) to prevent basic XSS
-									htmlContent = htmlContent
-										.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-										.replace(/on\w+\s*=\s*(['"][^'"]*['"]|[^\s>]+)/gi, '');
-								}
-								targetElement.innerHTML = htmlContent;
+								targetElement.innerHTML = data.content[targetId];
 							}
 						}
 					}
