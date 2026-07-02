@@ -8,9 +8,18 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	function _log(...args) {
+		const isDebug = document.documentElement.hasAttribute('data-ln-debug') ||
+			(document.body && document.body.hasAttribute('data-ln-debug'));
+		if (isDebug) {
+			console.warn('[ln-confirm]', ...args);
+		}
+	}
+
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
+		_log('constructor called on', dom);
 		this.dom = dom;
 		this.confirming = false;
 		this.originalText = dom.textContent.trim();
@@ -20,6 +29,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 		const self = this;
 		this._onClick = function (e) {
+			_log('click handler, confirming:', self.confirming, 'submitted:', self._submitted, 'target:', e.target);
 			if (!self.confirming) {
 				e.preventDefault();
 				e.stopImmediatePropagation();
@@ -119,6 +129,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 	};
 
 	_component.prototype.destroy = function () {
+		_log('destroy called on', this.dom);
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._reset();
 		this.dom.removeEventListener('click', this._onClick);

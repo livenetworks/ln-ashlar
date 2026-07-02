@@ -14,6 +14,12 @@ Steps performed on each request, in order:
 4. **Spinner mount** — `.ln-ajax--loading` added to trigger; `<span class="ln-ajax-spinner">` appended as a child of the trigger. Form buttons are disabled.
 5. **`ln-ajax:start` dispatch** — non-cancelable; signals that fetch is about to begin.
 6. **`fetch()` call** — request built from element attributes (`href` / `action`, `method`, `FormData`). Headers always include `X-Requested-With`, `Accept: application/json`, and `X-CSRF-TOKEN` from the page meta tag.
+
+   When a form carries `<input name="_method">` (auto-ensured by `ln-form`'s
+   RESTful action mode), that field rides in `FormData` transparently — ln-ajax
+   reads `form.method` for the HTTP verb (always POST) while `_method` is
+   included in the request body. No ln-ajax configuration is required.
+
 7. **Response handling**:
    - HTTP error (`!response.ok`): parse body as JSON, dispatch `ln-ajax:error` with `{ method, url, status, data }` shape, auto-dispatch `ln-toast:enqueue` if `data.message` present.
    - Fetch rejection (network error, JSON parse failure): dispatch `ln-ajax:error` with `{ method, url, error }` shape.
@@ -56,17 +62,13 @@ When `data-ln-ajax` is set programmatically on an element that was already in th
 
 The source uses a local `findElements` function rather than the `ln-core` helper of the same name. The divergence is intentional: `findElements` in ln-core returns a flat list of elements for iteration, while ln-ajax needs a `{ links, forms }` partition so it can attach different listeners to each group (`click` on links, `submit` on forms) in a single pass. A comment in source explains the reasoning. The two implementations should not be merged without updating all call sites.
 
-## Trust boundary & HTML Sanitization Filter
+## Trust boundary & HTML Sanitization
 
-To mitigate DOM-based Cross-Site Scripting (XSS) during `innerHTML` swaps, `ln-ajax.js` automatically applies a defense-in-depth HTML sanitization filter on all dynamic content:
+`ln-ajax` operates under a trusted trust boundary model. Since it only intercepts and routes AJAX requests to the same origin, it expects all returned HTML fragments in the JSON response to be safe and trusted.
 
-1. **DOMPurify Integration (Recommended)**: If the `DOMPurify` library is globally imported on the page, `ln-ajax` routes all HTML response fragments through `DOMPurify.sanitize()` prior to DOM insertion.
-2. **Safe Fallback Sanitizer**: If DOMPurify is not available, the framework runs a strict regex-based fallback filter that automatically parses and strips:
-   - `<script>` blocks
-   - Inline event handlers (such as `onload`, `onerror`, `onclick`, `onmouseover`, etc.)
-   - Dangerous URI schemes (such as `javascript:`, `data:`, `vbscript:`)
+It **does not** perform client-side HTML sanitization or regular expression-based event/script filtering. Any necessary sanitization of user-submitted HTML must be performed on the backend before the fragment is rendered and returned. 
 
-This ensures that any HTML injected via AJAX is secure by default, even in the absence of a global sanitization library. For full context on the framework's security model, see [Security Architecture & Best Practices](../architecture/security.md).
+This architectural decision avoids fragile client-side regex parsing of HTML, which can introduce security gaps or break valid client-side enhancements (for example, stripping or corrupting attributes like `data-ln-confirm` that contain event-like substrings).
 
 ## Error detail shape divergence
 

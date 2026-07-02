@@ -439,7 +439,14 @@ function _boot() {
 		// _booting = true defers navigated/not-found one microtask so listeners
 		// registered in the same DOMContentLoaded burst still receive boot events.
 		_booting = true;
-		const fullPath = window.location.pathname + window.location.search;
+		// Include the fragment so deep-link hash state survives boot. _navigate's
+		// own replaceState would otherwise rewrite the URL without it, silently
+		// dropping the fragment on every initial load. Hash-addressable
+		// components (e.g. ln-modal #id:param deep links) depend on the fragment
+		// being intact at boot to open in edit mode and fill from the matching
+		// source. _normalizePath strips the fragment before route matching and
+		// query parse, so this changes ONLY the preserved replaceState URL.
+		const fullPath = window.location.pathname + window.location.search + window.location.hash;
 		_navigate(fullPath, { historyAction: 'replace', isHydration: true });
 		_booting = false;
 	}, 'ln-router');

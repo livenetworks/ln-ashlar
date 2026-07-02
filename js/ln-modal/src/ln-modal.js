@@ -47,6 +47,11 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 				if (document.activeElement === last) { e.preventDefault(); first.focus(); }
 			}
 		};
+		this._onAjaxSuccess = function () {
+			if (self.isOpen) {
+				self.dom.setAttribute(DOM_SELECTOR, 'close');
+			}
+		};
 
 		// Apply initial state if open
 		if (this.isOpen) {
@@ -64,11 +69,15 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 			}
 		}
 
+		this.dom.addEventListener('ln-ajax:success', this._onAjaxSuccess);
+
 		return this;
 	}
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+
+		this.dom.removeEventListener('ln-ajax:success', this._onAjaxSuccess);
 
 		if (this.isOpen) {
 			this.dom.removeAttribute('aria-modal');

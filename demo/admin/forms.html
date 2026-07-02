@@ -1489,6 +1489,151 @@ input[data-ln-number] {
 		</script>
 	</main>
 </section>
+
+<!-- ==========================================
+     RESTFUL ACTION ROUTING DEMO
+     ========================================== -->
+<section class="section-card" data-demo-html>
+	<header><h3>RESTful action routing — create vs. edit</h3></header>
+	<main>
+		<p>Add <code>data-ln-form-action-edit</code> to opt in. On fill with a record that has an <code>id</code>, <code>ln-form</code> rewrites <code>form.action</code> to the per-record URL and injects a hidden <code>&lt;input name="_method"&gt;</code>. On new (no <code>id</code>), it restores the base action and clears <code>_method</code>. No coordinator JS required.</p>
+
+		<nav class="demo-actions">
+			<button type="button" class="btn"
+			        data-ln-modal-for="demo-rest-modal"
+			        data-ln-fill-form="demo-rest-form">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+				New package
+			</button>
+			<button type="button" class="btn"
+			        data-ln-modal-for="demo-rest-modal"
+			        data-ln-fill-form="demo-rest-form"
+			        data-ln-fill-id="7"
+			        data-ln-fill-name="Starter"
+			        data-ln-fill-max-users="5">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+				Edit #7
+			</button>
+			<button type="button" class="btn"
+			        data-ln-modal-for="demo-rest-modal"
+			        data-ln-fill-form="demo-rest-form"
+			        data-ln-fill-id="42"
+			        data-ln-fill-name="Enterprise"
+			        data-ln-fill-max-users="500">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+				Edit #42
+			</button>
+		</nav>
+
+		<h4>Live action readout</h4>
+		<output id="rest-action-readout">Click a trigger to see the DOM rewrite.</output>
+
+		<h4>Event log</h4>
+		<pre id="rest-event-log"></pre>
+
+		<script>
+		(function () {
+			const modal  = document.getElementById('demo-rest-modal');
+			const form   = document.getElementById('demo-rest-form');
+			const readout = document.getElementById('rest-action-readout');
+			const log    = document.getElementById('rest-event-log');
+			if (!modal || !form || !readout || !log) return;
+
+			const ts = function () {
+				const d = new Date();
+				const pad = function (n) { return String(n).padStart(2, '0'); };
+				return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+			};
+
+			const appendLog = function (line) {
+				log.textContent += (log.textContent ? '\n' : '') + line;
+				log.scrollTop = log.scrollHeight;
+			};
+
+			const updateReadout = function () {
+				const methodInput = form.querySelector('input[name="_method"]');
+				const method = methodInput ? methodInput.value : '(none)';
+				readout.textContent = 'action: ' + form.getAttribute('action') + '\n_method: ' + method;
+			};
+
+			// ln-form rewrites action during the ln-fill event.
+			// Read on the next tick so we observe the post-rewrite state.
+			form.addEventListener('ln-fill', function () {
+				setTimeout(updateReadout, 0);
+			});
+
+			// Also update when the modal opens (covers all open paths).
+			modal.addEventListener('ln-modal:open', function () {
+				updateReadout();
+			});
+
+			// Intercept ln-ajax:before-start to prevent the 404
+			// (cancelable — see docs/js/ajax.md step 3).
+			form.addEventListener('ln-ajax:before-start', function (e) {
+				e.preventDefault();
+				const methodInput = form.querySelector('input[name="_method"]');
+				const verb = (methodInput && methodInput.value) ? methodInput.value : 'POST';
+				const action = form.getAttribute('action');
+				appendLog('[' + ts() + '] → would ' + verb + ' ' + action + ' (demo: no backend)');
+				modal.setAttribute('data-ln-modal', 'close');
+			});
+		})();
+		</script>
+	</main>
+	<script type="text/plain" data-demo-scss>
+// RESTful action routing demo modal
+.ln-modal {
+	&#demo-rest-modal > form {
+		@include modal-panel;
+		@include modal-sm;
+	}
+}
+	</script>
+</section>
+
+<!-- REST action-routing demo modal (outside section — document-level overlay) -->
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-rest-modal">
+	<form id="demo-rest-form"
+	      data-ln-form
+	      data-ln-ajax
+	      action="/api/packages"
+	      data-ln-form-action-edit="/api/packages/:id"
+	      data-ln-form-action-method="PUT">
+		<header>
+			<h3 data-ln-fillable>
+				<span data-ln-modal-when="new">New package</span>
+				<span data-ln-modal-when="edit">Edit package #<span data-ln-field="id"></span></span>
+			</h3>
+			<button type="button" data-ln-modal-close aria-label="Close">
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<div class="form-element">
+				<label for="rest-name">Package name</label>
+				<input type="text" id="rest-name" name="name" required
+				       placeholder="e.g. Starter" data-ln-validate>
+				<ul data-ln-validate-errors>
+					<li class="hidden" data-ln-validate-error="required">Name is required</li>
+				</ul>
+			</div>
+			<div class="form-element">
+				<label for="rest-max-users">Max users</label>
+				<input type="number" id="rest-max-users" name="max_users" required
+				       min="1" placeholder="e.g. 50" data-ln-validate
+				       data-ln-fill-as="maxUsers">
+				<ul data-ln-validate-errors>
+					<li class="hidden" data-ln-validate-error="required">Max users is required</li>
+					<li class="hidden" data-ln-validate-error="rangeUnderflow">Must be at least 1</li>
+				</ul>
+			</div>
+		</main>
+		<footer>
+			<button type="button" data-ln-modal-close>Cancel</button>
+			<button type="submit">Save</button>
+		</footer>
+	</form>
+</div>
 			</div>
 		</section>
 

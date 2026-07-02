@@ -38,6 +38,8 @@ For consumer-facing usage see
 | `data-ln-form-auto` | `<form>` | Auto-submit on any `input` or `change` event |
 | `data-ln-form-debounce="300"` | `<form>` | Debounce delay in ms before auto-submit fires |
 | `data-ln-form-typed` | `<form>` | Opt-in typed serialization (see below) |
+| `data-ln-form-action-edit` | `<form>` | Opt-in RESTful action routing. Empty value = `baseAction/{id}`; non-empty value = template with `:id`. |
+| `data-ln-form-action-method="PUT"` | `<form>` | HTTP verb written to `_method` on edit. Default `PUT`. Requires `data-ln-form-action-edit`. |
 
 All four attributes are read once at init. Changing them on a live form
 has no effect (except `data-ln-form-typed` which is read at submit time).
@@ -268,6 +270,18 @@ with `ln-validate` through three touch points:
 3. **Direct API (down on reset)** — `lnForm.reset()` calls
    `instance.reset()` on every `[data-ln-validate]` field, and reads
    `instance._touched` inside `_updateSubmitButton()`.
+
+---
+
+### RESTful action mode (opt-in)
+
+When `data-ln-form-action-edit` is present, `_onLnFill` calls
+`_applyActionMode(record)` after fill/reset. On edit (record with a usable
+`id`): rewrites `form.action` and auto-ensures `<input name="_method">` with
+the configured verb. On new (null detail or no `id`): restores
+`this._baseAction` and sets `_method` to `''`. The guard on the first line
+of `_applyActionMode` ensures forms without `data-ln-form-action-edit` exit
+immediately — the store/SPA path is completely unaffected.
 
 ---
 
