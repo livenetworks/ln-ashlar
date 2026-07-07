@@ -44,7 +44,27 @@
 </head>
 <body>
 	<!-- Toast container -->
-	<ul data-ln-toast></ul>
+	<ul data-ln-toast>
+		<template data-ln-template="ln-toast-item">
+		<li data-ln-toast-item data-ln-attr="class:type">
+			<div class="icon">
+				<ul>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+				</ul>
+			</div>
+			<section class="content">
+				<header>
+					<strong class="title" data-ln-field="title"></strong>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</header>
+				<main class="body" data-ln-field="message"></main>
+			</section>
+		</li>
+		</template>
+	</ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
@@ -160,6 +180,7 @@
 						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
 						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
 						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="api-queue.html"><span class="nav-label">API Queue</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
 						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
 						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
@@ -185,7 +206,17 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<!-- Overview / philosophy -->
+<style>
+	#demo-ssr-toast {
+		position: static;
+		display: flex;
+		flex-direction: column;
+		gap: var(--size-md);
+		margin-top: var(--size-md);
+	}
+</style>
+
+					<!-- Overview / philosophy -->
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
@@ -227,26 +258,23 @@
 							</nav>
 						</main>
 						<script type="text/plain" data-demo-scss>
-// Toast notifications container and card elements
 [data-ln-toast] {
     @include toast-container;
 }
-.ln-toast__card {
+[data-ln-toast] > li {
+    @include toast-item;
     @include toast-card;
 }
-.ln-toast__side {
-    @include toast-side;
+[data-ln-toast] .icon {
+    @include toast-icon;
 }
-.ln-toast__content {
+[data-ln-toast] .content {
     @include toast-content;
 }
-.ln-toast__head {
-    @include toast-head;
-}
-.ln-toast__title {
+[data-ln-toast] .title {
     @include toast-title;
 }
-.ln-toast__body {
+[data-ln-toast] .body {
     @include toast-body;
 }
 						</script>
@@ -261,10 +289,45 @@
 						</main>
 						<script type="text/plain" data-demo-scss>
 // The body styles automatically adjust for nested bulleted lists:
-.ln-toast__body {
+[data-ln-toast] .body {
     @include toast-body;
 }
 						</script>
+					</section>
+
+					<!-- SSR-authored flash messages -->
+					<section class="section-card" data-demo-html>
+						<header><h3>SSR-authored flash messages (no JS render)</h3></header>
+						<main>
+							<p>Server-rendered flash messages are authored as complete markup — icon, title, body, and close button are all real HTML written by the backend template. <code>ln-toast</code> only binds behavior on load: it starts the auto-dismiss timer and wires the close button. This markup is fully readable even before JS executes.</p>
+							<p>An optional per-item <code>data-ln-toast-timeout</code> overrides the container default — use <code>0</code> for a persistent toast such as a blocking error.</p>
+							<ul id="demo-ssr-toast" data-ln-toast data-ln-toast-timeout="0" aria-live="polite" aria-atomic="false">
+								<li data-ln-toast-item class="success">
+									<div class="icon">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg>
+									</div>
+									<section class="content">
+										<header>
+											<strong class="title">Saved</strong>
+											<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+										</header>
+										<main class="body"><p>Changes have been saved successfully.</p></main>
+									</section>
+								</li>
+								<li data-ln-toast-item data-ln-toast-timeout="8000" class="error">
+									<div class="icon">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg>
+									</div>
+									<section class="content">
+										<header>
+											<strong class="title">Session Expired</strong>
+											<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+										</header>
+										<main class="body"><p>This toast overrides the container default and auto-dismisses after 8 seconds.</p></main>
+									</section>
+								</li>
+							</ul>
+						</main>
 					</section>
 			</div>
 		</section>

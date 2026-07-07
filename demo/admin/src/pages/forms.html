@@ -1131,6 +1131,15 @@ input[data-ln-number] {
 								<input type="date" id="demo-prefilled-date" name="prefilled" value="2024-03-15" data-ln-date>
 								<output id="demo-prefilled-date-raw"></output>
 							</div>
+
+							<div class="form-element" lang="mk">
+								<label for="demo-dict-date">Declarative HTML Locale Dictionary (mk fallback via buildDict)</label>
+								<ul hidden data-ln-date-dict="mk">
+									<li data-ln-date-dict-key="months-long">јануари, февруари, март, април, мај, јуни, јули, август, септември, октомври, ноември, декември</li>
+									<li data-ln-date-dict-key="months-short">јан, фев, мар, апр, мај, јун, јул, авг, септ, окт, ноем, дек</li>
+								</ul>
+								<input type="date" id="demo-dict-date" name="dict_date" value="2026-04-19" data-ln-date="MMMM yyyy">
+							</div>
 						</form>
 					</main>
 					<script type="text/plain" data-demo-scss>

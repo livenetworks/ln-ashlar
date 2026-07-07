@@ -44,7 +44,27 @@
 </head>
 <body>
 	<!-- Toast container -->
-	<ul data-ln-toast></ul>
+	<ul data-ln-toast>
+		<template data-ln-template="ln-toast-item">
+		<li data-ln-toast-item data-ln-attr="class:type">
+			<div class="icon">
+				<ul>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+				</ul>
+			</div>
+			<section class="content">
+				<header>
+					<strong class="title" data-ln-field="title"></strong>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</header>
+				<main class="body" data-ln-field="message"></main>
+			</section>
+		</li>
+		</template>
+	</ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
@@ -160,6 +180,7 @@
 						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
 						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
 						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="api-queue.html"><span class="nav-label">API Queue</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
 						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
 						<li><a href="table-sync.html" aria-current="page"><span class="nav-label">Table — Data Sync</span></a></li>

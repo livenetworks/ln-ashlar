@@ -1,14 +1,18 @@
-<li class="ln-toast__item">
-	<div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
-		<div class="ln-toast__side">
-			<svg class="ln-icon" aria-hidden="true"><use href=""></use></svg>
-		</div>
-		<div class="ln-toast__content">
-			<div class="ln-toast__head">
-				<strong class="ln-toast__title" data-ln-field="title"></strong>
-			</div>
-			<button type="button" class="ln-toast__close" aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-			<div class="ln-toast__body" data-ln-show="hasBody"></div>
-		</div>
+<!-- Developer example — copy into your page markup inside <template data-ln-template="ln-toast-item">. Not a runtime artifact. -->
+<li data-ln-toast-item data-ln-attr="class:type">
+	<div class="icon">
+		<ul>
+			<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
+			<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
+			<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
+			<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+		</ul>
 	</div>
+	<section class="content">
+		<header>
+			<strong class="title" data-ln-field="title"></strong>
+			<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+		</header>
+		<main class="body" data-ln-field="message"></main>
+	</section>
 </li>
