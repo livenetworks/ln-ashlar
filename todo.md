@@ -13,6 +13,7 @@
 
 ## Router Follow-ups & Future Scope
 
+- [x] **ln-persist documentation** — create detailed documentation for `ln-persist` in `architecture_docs_draft/components/ln-persist.md` with concrete coordination examples and API specifications.
 - [x] **Delimiter docs update** — update `docs/js/core.md` to consistently reference double-braces `{{key}}` instead of single braces `{key}` for `fillTemplate`.
 - [ ] **View Caching / Keep-alive** — allow re-attaching a previously mounted view instead of re-cloning.
 - [ ] **Nested Routers** — support outlets inside route views with scoped sub-path matching.

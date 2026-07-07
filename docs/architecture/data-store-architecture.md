@@ -38,6 +38,17 @@ Below is the visual structure representing how elements are nested in the DOM, i
 │     └────────────────────────────────────────────────────────────┘     │
 │                                                                        │
 │     ┌────────────────────────────────────────────────────────────┐     │
+│     │  DOM: <div data-ln-api-queue>  (OPTIONAL Child 3)          │     │
+│     │                                                            │     │
+│     │  [OFFLINE OUTBOX (Child 3, optional)]                      │     │
+│     │  - Own IndexedDB database (ln_api_queue), separate from    │     │
+│     │    the store's cache DB                                    │     │
+│     │  - FIFO-per-chain persistence, backoff, auth-pause          │     │
+│     │  - Connector- and id-blind — the coordinator executes       │     │
+│     │    transport on its ln-api-queue:send command               │     │
+│     └────────────────────────────────────────────────────────────┘     │
+│                                                                        │
+│     ┌────────────────────────────────────────────────────────────┐     │
 │     │  JS REGISTRY: window.lnCore.getDataMapper('documents')     │     │
 │     │                                                            │     │
 │     │  [JS MAPPER LOGIC (Secure Compiled Registry Mapper)]       │     │
@@ -149,6 +160,36 @@ All transport-specific connection properties (base URLs, endpoints, and path con
 </div>
 ```
 
+### Scenario D: REST Coordinator with an offline outbox (optional Child 3)
+
+Add `data-ln-api-queue` alongside the store and connector to get persistent,
+FIFO-per-chain offline queuing with backoff and auth-pause. When this child
+is present the coordinator routes writes through it instead of calling the
+connector directly; when it is absent, the coordinator's queue-absent path
+(direct connector call) behaves exactly as in Scenarios A-C.
+
+```html
+<div data-ln-data-coordinator="documents" data-ln-data-mapper="documents">
+
+    <!-- Child 1: Storage Cache -->
+    <div data-ln-data-store
+         data-ln-store-indexes="department,status,updated_at">
+    </div>
+
+    <!-- Child 2: Transport Gateway -->
+    <div data-ln-api-connector
+         data-ln-api-base-url="/api"
+         data-ln-api-path="/documents">
+    </div>
+
+    <!-- Child 3 (optional): Offline outbox — own IndexedDB, FIFO per chain -->
+    <div data-ln-api-queue></div>
+</div>
+```
+
+See [ln-api-queue README](../../js/ln-api-queue/README.md) for the full
+attribute, event, and schema reference.
+
 ---
 
 ## 3. Ingress & Egress Data Restructuring (Secure Mapper)
@@ -208,12 +249,24 @@ This mapper is then bound cleanly and safely in HTML via a reference attribute:
 // Inside ln-data-coordinator initialization:
 function _initCoordinator(self) {
   const storeEl = self.dom.querySelector('[data-ln-data-store]');
-  const transportEl = self.dom.querySelector('[data-ln-rest-connector], [data-ln-websocket-connector], [data-ln-couchdb-connector]');
-  
+  const transportEl = self.dom.querySelector('[data-ln-rest-connector], [data-ln-websocket-connector], [data-ln-couchdb-connector], [data-ln-api-connector]');
+  const queueEl = self.dom.querySelector('[data-ln-api-queue]'); // optional Child 3
+
   if (!storeEl || !transportEl) return;
 
   // Resolve the mapper (either inline from script or registered external mapper)
   const mapper = _resolveMapper(self);
+
+  // ─── 0. Sync ownership — the coordinator decides WHEN to sync, not the store ───
+  // ln-store:initialized fires once _initStore finishes (cache hit or miss).
+  // A module-level singleton also wires one shared 'online'/'offline'/
+  // 'visibilitychange' listener set across all coordinator instances, honoring
+  // data-ln-data-coordinator-stale / -no-autosync (falling back to the store's
+  // own data-ln-data-store-stale / -no-autosync attributes).
+  storeEl.addEventListener('ln-store:initialized', function(e) {
+    if (!e.detail.hasCache) { storeEl.lnDataStore.forceSync(); return; }
+    if (self._isStale()) storeEl.lnDataStore.forceSync();
+  });
 
   // ─── 1. Intercept Delta Sync Triggers ───
   storeEl.addEventListener('ln-store:request-sync', function(e) {
@@ -230,24 +283,57 @@ function _initCoordinator(self) {
     });
   });
 
-  // ─── 2. Intercept Optimistic Mutations (Write Egress) ───
+  // ─── 2. Intercept Optimistic Mutations (Write Egress) — queue routing ───
   storeEl.addEventListener('ln-store:optimistic-created', function(e) {
     const localRecord = e.detail.record;
-    
-    // Apply EGRESS transformation before sending to server
-    const serverPayload = mapper.egress(localRecord);
+    const serverPayload = mapper.egress(localRecord); // Apply EGRESS before sending
 
-    transportEl.lnConnector.create(serverPayload)
+    if (!queueEl) {
+      // Queue-absent path (unchanged): call the connector directly.
+      transportEl.lnConnector.create(serverPayload)
+        .then(function(serverRawResponse) {
+          const confirmedLocalRecord = mapper.ingress(serverRawResponse);
+          storeEl.lnStore.confirmMutation(e.detail.tempId, confirmedLocalRecord, 'create');
+        })
+        .catch(function(err) {
+          storeEl.lnStore.revertMutation(e.detail.tempId, 'create', err);
+        });
+      return;
+    }
+
+    // Queue-present path: enqueue instead of hitting the connector immediately.
+    queueEl.dispatchEvent(new CustomEvent('ln-api-queue:request-enqueue', {
+      detail: {
+        chainKey: e.detail.tempId, op: 'create', targetId: null,
+        payload: serverPayload, expectedVersion: null,
+        meta: { tempId: e.detail.tempId }
+      }
+    }));
+  });
+
+  // ─── 3. Transport executor — the queue commands the coordinator to send ───
+  queueEl && queueEl.addEventListener('ln-api-queue:send', function(e) {
+    const { entryId, chainKey, op, targetId, payload, meta } = e.detail;
+    // Map op -> connector method, same egress/ingress flow as the direct path.
+    transportEl.lnConnector.create(payload) // op-specific dispatch in real code
       .then(function(serverRawResponse) {
-        // Run Ingress on the confirmed server response
-        const confirmedLocalRecord = mapper.ingress(serverRawResponse);
-        
-        // Confirm write back in store's database cache
-        storeEl.lnStore.confirmMutation(e.detail.tempId, confirmedLocalRecord, 'create');
+        const record = mapper.ingress(serverRawResponse);
+        storeEl.lnStore.confirmMutation(meta.tempId, record, 'create');
+        // Remap BEFORE ack so a queued sibling update re-targets the real id
+        // before its chain advances.
+        queueEl.dispatchEvent(new CustomEvent('ln-api-queue:request-remap', {
+          detail: { oldKey: meta.tempId, newId: record.id }
+        }));
+        queueEl.dispatchEvent(new CustomEvent('ln-api-queue:ack', { detail: { entryId } }));
       })
       .catch(function(err) {
-        // Revert write back in store
-        storeEl.lnStore.revertMutation(e.detail.tempId, 'create', err);
+        if (err.status === 401 || err.status === 419) {
+          queueEl.dispatchEvent(new CustomEvent('ln-api-queue:nack', { detail: { entryId, reason: 'auth' } }));
+        } else if (err.status >= 500 || !err.status) {
+          queueEl.dispatchEvent(new CustomEvent('ln-api-queue:nack', { detail: { entryId, reason: 'retry' } }));
+        } else {
+          queueEl.dispatchEvent(new CustomEvent('ln-api-queue:nack', { detail: { entryId, reason: 'drop' } }));
+        }
       });
   });
 }

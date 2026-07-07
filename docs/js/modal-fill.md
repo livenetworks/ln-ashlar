@@ -50,23 +50,32 @@ Every `ln-modal:open` event is handled fresh from the event's own `detail`.
 
 ```
 ln-modal:open fires (bubbles to document)
-  → detail.param null?  → no-op (new mode or plain modal)
-  → detail.target null? → no-op (guard)
-  → _findSource(modal, param)
-       · querySelectorAll('[data-ln-fill-id="<param>"]')
-       · none found? → no-op (deep-link to record not in DOM)
-       · prefer source whose data-ln-fill-form → form inside modal
-       · fallback: candidates[0]
-  → _recordFrom(source)
-       · iterate source.dataset
-       · keep keys starting with 'lnFill', skip RESERVED {lnFillForm, lnFillStore}
-       · strip 'lnFill' prefix, lowercase first char → record key
-  → window.lnCore.lnFill(modal, record)
-       · dispatches ln-fill CustomEvent to modal itself (if [data-ln-form]/[data-ln-fillable])
-         AND every such descendant
-       · ln-form's listener calls this.fill(record)
-       · [data-ln-fillable] elements updated by the delegated document handler
-       · NO attribute write, NO hash write, NO click
+  → 'param' key absent?  → no-op (plain non-hash modal — opt out, no fill)
+  → detail.target null?  → no-op (guard)
+  → param === null (key present)?
+       → window.lnCore.lnFill(modal, null)
+            · dispatches ln-fill CustomEvent with null detail to [data-ln-form]/[data-ln-fillable]
+            · ln-form _onLnFill: e.detail falsy → reset() + _applyActionMode(null)
+                 → action restored to base URL, _method cleared, fields empty
+            · [data-ln-fillable] display elements cleared
+            · NO attribute write, NO hash write, NO click
+       → return (no source lookup)
+  → param truthy (edit mode)?
+       → _findSource(modal, param)
+            · querySelectorAll('[data-ln-fill-id="<param>"]')
+            · none found? → no-op (deep-link to record not in DOM)
+            · prefer source whose data-ln-fill-form → form inside modal
+            · fallback: candidates[0]
+       → _recordFrom(source)
+            · iterate source.dataset
+            · keep keys starting with 'lnFill', skip RESERVED {lnFillForm, lnFillStore}
+            · strip 'lnFill' prefix, lowercase first char → record key
+       → window.lnCore.lnFill(modal, record)
+            · dispatches ln-fill CustomEvent to modal itself (if [data-ln-form]/[data-ln-fillable])
+              AND every such descendant
+            · ln-form's listener calls this.fill(record)
+            · [data-ln-fillable] elements updated by the delegated document handler
+            · NO attribute write, NO hash write, NO click
 ```
 
 ### Source disambiguation
@@ -89,18 +98,21 @@ is `candidates[0]` — correct for single-modal pages and for sources whose
 ### Outbound — what the coordinator causes
 
 The coordinator dispatches nothing directly. Its only outbound side-effect is
-`window.lnCore.lnFill(modal, record)`, which in turn dispatches `ln-fill`
-CustomEvents to `[data-ln-form]` and `[data-ln-fillable]` descendants of the
-modal. No attribute is written to the modal or the source; the URL hash is
-untouched.
+`window.lnCore.lnFill(modal, record)` (edit mode) or
+`window.lnCore.lnFill(modal, null)` (new mode), which in turn dispatches
+`ln-fill` CustomEvents to `[data-ln-form]` and `[data-ln-fillable]`
+descendants of the modal. In new mode the null fill drives `ln-form`'s
+`reset()` + `_applyActionMode(null)` (RESTful action routing: restore base
+action, clear `_method`) and clears display fillables. No attribute is written
+to the modal or the source; the URL hash is untouched.
 
 ## Coordinator / cross-component contract
 
 | Side | Contract |
 |---|---|
-| **Input** | `ln-modal:open` with `detail = { target, param, hashNs, modalId }` from `ln-modal` |
-| **Input** | `data-ln-fill-*` attributes on source `[data-ln-fill-id]` elements |
-| **Output** | `window.lnCore.lnFill(modal, record)` → `ln-fill` events to `[data-ln-form]` / `[data-ln-fillable]` descendants |
+| **Input** | `ln-modal:open` with `detail = { target, param, hashNs, modalId }` from `ln-modal` (hash modals carry `param` key; plain non-hash modals omit it) |
+| **Input** | `data-ln-fill-*` attributes on source `[data-ln-fill-id]` elements (edit mode only) |
+| **Output** | `window.lnCore.lnFill(modal, record)` (edit) or `window.lnCore.lnFill(modal, null)` (new) → `ln-fill` events to `[data-ln-form]` / `[data-ln-fillable]` descendants |
 
 This is the coordinator pattern from
 [`docs/architecture/coordinator.md`](../architecture/coordinator.md): the
@@ -133,7 +145,11 @@ and no `.click(`.
 
 | Condition | Result |
 |---|---|
-| `detail.param` is `null` | No-op — new mode; nothing to fill |
+| `'param'` key absent in detail (plain non-hash modal) | No-op — opt out; no fill dispatched |
 | `detail.target` is absent | No-op — guard |
 | No `[data-ln-fill-id="<param>"]` found in DOM | Graceful no-op — deep-link to a record not currently rendered |
-| Modal without an `id` (no `hashNs`, no `param` in detail) | No-op — first guard catches it |
+| Modal without an `id` (no `hashNs`) | No-op — `'param' in detail` guard catches it (no key in detail) |
+
+**Note:** hash new-mode (`param === null`, key present) is **not** a no-op. It
+dispatches `lnFill(modal, null)`, which drives `ln-form`'s `reset()` +
+`_applyActionMode(null)` (RESTful action routing) and clears display fillables.

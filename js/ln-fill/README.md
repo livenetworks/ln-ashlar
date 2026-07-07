@@ -18,6 +18,34 @@ dispatches `ln-fill` at every `[data-ln-form]` and `[data-ln-fillable]`
 descendant. `ln-fill` is the module that wraps a click listener around that
 primitive so you can drive it entirely from HTML.
 
+### Why a dispatcher function, not a document broadcast
+
+`ln-fill` events are addressed by **dispatch target**, not by payload
+filtering. The DOM has no multicast — an event must be born at one node — so
+there are two possible addressing models:
+
+1. **Broadcast**: dispatch once at `document` with the target id in `detail`,
+   and every consumer subscribes globally and filters "is this for me?".
+2. **Targeted dispatch** (ours): dispatch the event directly at the addressed
+   element — the DOM tree is the routing infrastructure, `e.target` IS the
+   address.
+
+Targeted dispatch wins on three counts. Scaling cost is inverted: with
+broadcast every fillable on the page pays a global filter on every fill
+anywhere; with targeted dispatch only the addressed element's listener runs,
+and its "digest only if addressed to me" guard is an identity check
+(`e.target === self.dom` in ln-form), not a string comparison. Containment
+addressing: `lnFill(modalEl, record)` fills everything *inside* the modal —
+form plus display fillables — without the producer knowing a single id, which
+a flat id-addressed broadcast cannot express. Single payload contract: the
+`record ?? null` normalization (null = reset) and `bubbles: true` are defined
+in one place, shared by every producer (the declarative click trigger,
+`ln-modal-fill`, store-sync coordinators).
+
+So `lnFill()` is not an imperative bypass of the event model — it IS the
+event dispatcher. The targeted fan-out loop and the payload contract have to
+live somewhere; the helper is that single canonical place.
+
 ---
 
 ## 2. Minimal Blueprint

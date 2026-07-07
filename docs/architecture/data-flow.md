@@ -49,9 +49,12 @@ What this rules out:
 the configured endpoint. Query engine — `getAll(options)`, `getById`,
 `count`, `aggregate` — with sort / filter / search / limit applied
 **client-side over the cache**. Optimistic write pipeline (cache mutate
-with `_pending: true`, network attempt, reconcile or revert or queue).
-FIFO-per-record pending queue with exponential backoff. Fan-out of
-`ln-store:change` to registered renderers.
+with `_pending: true`, network attempt, reconcile or revert). Fan-out of
+`ln-store:change` to registered renderers. The store itself holds **no**
+persistent write queue — it is a pure cache. When a write can't reach the
+server, the offline outbox is owned by the standalone `ln-api-queue`
+component (its own IndexedDB database), and `ln-data-coordinator` drives the
+FIFO-per-chain drain with exponential backoff (see §3).
 
 **Does NOT own.** DOM presentation. Form serialization. User-facing
 toasts or modals. The UI controls that produce sort/filter inputs.
@@ -126,12 +129,12 @@ stateDiagram-v2
     Optimistic --> CacheWritten: _putRecord with _pending:true
     CacheWritten --> FanOut: dispatch ln-store:change<br/>source='create'|'update'|'delete'
     FanOut --> FormSuccess: dispatch ln-form:success<br/>(modal closes)
-    FormSuccess --> NetworkAttempt: navigator.onLine?
+    FormSuccess --> CoordRoute: coordinator routes write
 
-    NetworkAttempt --> Online: yes
-    NetworkAttempt --> Queued: no
+    CoordRoute --> QueueAbsent: no ln-api-queue child
+    CoordRoute --> QueueEnqueue: ln-api-queue child present
 
-    Online --> Fetch
+    QueueAbsent --> Fetch: connector.create/update/delete
     Fetch --> 2xx: response.status < 400
     Fetch --> 4xx: 400 <= status < 500
     Fetch --> 5xx: status >= 500
@@ -145,44 +148,61 @@ stateDiagram-v2
     Revert --> RevertFanOut: dispatch ln-form:error<br/>+ ln-store:change source='revert'
     RevertFanOut --> [*]
 
-    5xx --> Queued
-    NetworkErr --> Queued
-    Queued --> PendingCount: dispatch<br/>ln-store:pending-count-change
+    5xx --> QueueAbsentReverted: revert (no queue to fall back to)
+    NetworkErr --> QueueAbsentReverted
+    QueueAbsentReverted --> [*]
 
-    PendingCount --> [*]: wait for online
+    QueueEnqueue --> Persisted: ln-api-queue:request-enqueue<br/>(entryId+seq, FIFO per chainKey)
+    Persisted --> PendingCount: dispatch<br/>ln-api-queue:pending-count
+    PendingCount --> [*]: wait for drain
 
-    [*] --> Drain: window 'online' event
-    Drain --> ReplayChain: per recordId, FIFO
-    ReplayChain --> Replay2xx: success
-    ReplayChain --> Replay4xx: conflict
-    ReplayChain --> Replay5xx: retry
-    Replay2xx --> Reconcile
-    Replay4xx --> Conflict: dispatch ln-store:sync-conflict<br/>(form is gone; consumer chooses UX)
-    Replay5xx --> Backoff: 2s, 5s, 15s, 1min, 5min
-    Backoff --> ReplayChain: attempts++
-    Backoff --> Exhausted: attempts >= MAX
-    Exhausted --> SyncFailed: dispatch ln-store:sync-failed
+    [*] --> Drain: ln-api-queue:send<br/>(head of chain, one inflight per chain)
+    Drain --> CoordExec: coordinator executes transport
+    CoordExec --> DrainOk: 2xx
+    CoordExec --> DrainConflict: 409 (update)
+    CoordExec --> DrainAuth: 401 / 419
+    CoordExec --> DrainRetry: 5xx / network (status 0)
+    CoordExec --> DrainDrop: other 4xx
+
+    DrainOk --> Reconcile: confirmMutation<br/>+ remap-before-ack (create)<br/>+ ln-api-queue:ack
+    DrainConflict --> Conflict: store.resolveConflict<br/>+ ln-api-queue:nack(drop)
+    DrainAuth --> AuthPause: ln-api-queue:nack(auth)<br/>pauses scope, emits auth-required
+    AuthPause --> Drain: consumer re-authenticates<br/>dispatches request-resume
+    DrainDrop --> Conflict2: ln-store:sync-conflict<br/>+ revertMutation + forceSync<br/>+ ln-api-queue:nack(drop)
+    DrainRetry --> Backoff: ln-api-queue:nack(retry)
+    Backoff --> Drain: 2s, 5s, 15s, 60s, 5min
+    Backoff --> Exhausted: attempts >= 8
+    Exhausted --> SyncFailed: ln-api-queue:failed<br/>(entry retained, manual request-drain)
 ```
 
 **Happy path.** Form submits. `ln-form` validates and dispatches
 `ln-form:submit`. Store writes to cache with `_pending: true` and fans
-out to renderers immediately. Store calls `fetch`. 2xx reconciles —
+out to renderers immediately. The coordinator routes the write: if no
+`ln-api-queue` child exists it calls the connector directly (queue-absent
+path, unchanged from before the queue existed); if a queue child exists it
+enqueues instead of calling the connector immediately. 2xx reconciles —
 server response overrides the optimistic record, `_pending` flips to
 `false`, a `tmp_<uuid>` swaps for the real server id. Fan out again.
 Form-side success fires.
 
-**Initial 4xx (form still open).** Server returns an error map. Store
-reverts the cache from the pre-write snapshot. Store dispatches
-`ln-form:error` on the form element. `ln-validate` paints field-level
-errors. User fixes and resubmits.
+**Initial 4xx (form still open, queue-absent path).** Server returns an
+error map. Store reverts the cache from the pre-write snapshot. Store
+dispatches `ln-form:error` on the form element. `ln-validate` paints
+field-level errors. User fixes and resubmits.
 
-**Offline / 5xx (queue).** Store enqueues into the pending-writes
-IndexedDB store with FIFO-per-record ordering. Cache stays optimistic
-— the user sees their write. On the `online` event, store drains the
-queue with exponential backoff. 2xx reconciles. 4xx during drain
-becomes `ln-store:sync-conflict` (the form is gone — the consumer
-chooses the UX: re-open prefilled, toast, hard-revert). Retries
-exhausted on 5xx becomes `ln-store:sync-failed`.
+**Offline / 5xx (queue present).** The coordinator enqueues into
+`ln-api-queue`'s own IndexedDB outbox (`ln_api_queue`), FIFO per
+`(scope, chainKey)`, one inflight entry per chain. Cache stays optimistic
+— the user sees their write. The queue emits `ln-api-queue:send` for the
+head entry; the coordinator executes the transport. 2xx reconciles and the
+coordinator dispatches `request-remap` **before** `ack` on a create success
+(so a queued sibling update re-targets the real id before its chain
+advances). A 409 on update resolves the conflict then drops the entry. A
+401/419 pauses the scope (`auth-required`) until the consumer dispatches
+`request-resume` — it does not revert the optimistic write. Other 4xx
+reverts, re-syncs, and drops the entry (`ln-store:sync-conflict`). 5xx /
+network errors retry with backoff `2s, 5s, 15s, 60s, 5min`; after 8 attempts
+the entry is marked `failed` and retained for manual `request-drain`.
 
 The user-facing UI never blocks waiting for the network. Optimistic
 writes render immediately; the queue is the safety net for offline
@@ -190,7 +210,9 @@ writes; the form-side error event is the safety net for 4xx during
 initial submit.
 
 For exact event names, payload shapes, and timing, see the
-[ln-store README](../../js/ln-store/README.md).
+[ln-data-store README](../../js/ln-data-store/README.md),
+[ln-data-coordinator README](../../js/ln-data-coordinator/README.md), and
+[ln-api-queue README](../../js/ln-api-queue/README.md).
 
 ---
 
@@ -629,15 +651,16 @@ _scan(document.body);  // init
 | Term | Definition |
 |------|------------|
 | **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`). For details, see the [Coordinator Doctrine](coordinator.md). |
-| **Store** | An `ln-store` instance bound to a single resource. One element, one cache, one queue. |
+| **Store** | An `ln-data-store` instance bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own. |
 | **Renderer** | Any element with `data-ln-store-source="<storeName>"`. Receives `ln-store:change` events. |
 | **Form binding** | `data-ln-store-form="<storeName>"` on a `<form>` routes its `ln-form:submit` to the named store. |
 | **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-table-sort`, `ln-filter`, `ln-search`; consumed by the store via `getAll()` options. |
 | **Optimistic upsert** | Writing to the local cache before the server confirms. The record carries `_pending: true` until reconcile. |
-| **Reconcile** | Replacing an optimistic record with the server's authoritative response. For POST, swaps `tmp_<uuid>` for the server id. |
-| **Revert** | Restoring the cache from the pre-write snapshot when the server rejects (4xx during initial submit). |
-| **Queue** | The pending-writes IndexedDB store holding entries that couldn't reach the server (offline / 5xx). |
-| **Drain** | Replaying queue entries in FIFO order per record when connectivity returns. |
-| **Conflict** | A 4xx response **during queue drain** (vs initial submit). The form is gone; the store dispatches `ln-store:sync-conflict` and the consumer chooses the UX. |
+| **Reconcile** | Replacing an optimistic record with the server's authoritative response. For POST, swaps `tmp_<uuid>` for the server id via a coordinator-driven `ln-api-queue:request-remap` (queued path) or direct `confirmMutation` (queue-absent path). |
+| **Revert** | Restoring the cache from the pre-write snapshot when the server rejects (4xx during initial submit, or a non-409/non-auth 4xx during queued drain). |
+| **Queue** | The standalone `ln-api-queue` component — its own IndexedDB database (`ln_api_queue`), separate from the store's cache. Holds entries that couldn't reach the server (offline / 5xx), FIFO per `(scope, chainKey)`, one inflight per chain. The coordinator executes transport on its `ln-api-queue:send` command and drives ack/nack. |
+| **Drain** | The queue replaying its head entry per chain (`ln-api-queue:send`) when idle and not paused; the coordinator executes the actual transport call. |
+| **Auth pause** | A 401/419 response during queue drain pauses that scope (`ln-api-queue:paused` + `auth-required`) without reverting the optimistic write. Resumes only on an explicit `ln-api-queue:request-resume` dispatch after the consumer re-authenticates. |
+| **Conflict** | A 4xx response **during queue drain** (vs initial submit). The form is gone; for a 409 on update the store resolves the conflict via `resolveConflict`, for other 4xx it reverts and re-syncs via `forceSync`; either way the store dispatches `ln-store:sync-conflict` and the consumer chooses the UX. |
 | **Primitive cell** | A record field whose value is a string, number, or date (rendered as-is). |
 | **Labelled cell** | A record field with shape `{ value, label }`. Renderer displays `.label`; submit serializes `.value`. |

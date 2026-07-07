@@ -342,7 +342,7 @@ in the consumer mixin. Do not escalate specificity.
 	--color-accent-bg-hover: hsl(var(--color-primary) / 0.3);
 	--color-accent-bg-fg:    hsl(var(--color-primary));
 	// --color-accent-fg stays at :root default (white) — solid-accent
-	// surfaces (toast-side, pill-checked, stepper-active) keep white
+	// surfaces (toast-icon, pill-checked, stepper-active) keep white
 	// text on solid primary fill.
 }
 ```
@@ -351,7 +351,7 @@ in the consumer mixin. Do not escalate specificity.
 `--color-accent-*` family distinguishes two flavors of accent surface:
 
 - **Solid** (`--color-accent` + `--color-accent-fg`) — used by
-  `@mixin toast-side`, `@mixin pill` (checked state), stepper active /
+  `@mixin toast-icon`, `@mixin pill` (checked state), stepper active /
   complete, and `@mixin btn` under default theme. fg = white.
 - **Translucent** (`--color-accent-bg` + `--color-accent-bg-fg`) — only
   used by `@mixin btn` under themes that opt in (Glass). fg flips to

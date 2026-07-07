@@ -26,29 +26,44 @@ It possesses no visual interface and is **completely blind to the network** (no 
 | `data-ln-data-store-stale="N"` | Seconds before cache is considered stale (default 300, `-1` = never) |
 | `data-ln-data-store-indexes="…"` | Comma-separated IDB index fields |
 | `data-ln-data-store-search-fields="…"` | Comma-separated text-search fields |
-| `data-ln-data-store-no-autosync` | Opt out of automatic reconnect resync (see below) |
+| `data-ln-data-store-no-autosync` | Back-compat fallback only — see below. Prefer `data-ln-data-coordinator-no-autosync` on the coordinator. |
 
 ---
 
-## 🔄 Automatic Reconnect Resync
+## 🔄 Sync Ownership Moved to the Coordinator
 
-When the browser goes back online, `ln-data-store` automatically triggers a remote sync for all loaded stores — **default on, no wiring required.**
+`ln-data-store` no longer decides WHEN to sync. It is a **pure cache**: no
+self-sync on init, no `visibilitychange` listener, no `window 'online'` /
+`'offline'` listener of its own. All of that now lives in
+`ln-data-coordinator` — see its
+[README](../ln-data-coordinator/README.md#sync-ownership).
 
-**How it works:**
-- `window 'online'` fires → the store iterates all registered instances.
-- For each: if `isLoaded && !isSyncing`, dispatch `ln-store:request-remote-sync`.
-- The `isSyncing` guard makes this idempotent — if a manual `forceSync()` call is already in flight, the automatic trigger is skipped with no double request.
+**What the store still does:** at the end of `_initStore` it emits
+`ln-store:initialized { store, hasCache, lastSyncedAt, count }` — in every
+branch (cache present, empty, schema-mismatch-after-clear) — and stops
+there. It reports its cache state; it does not act on it.
 
-**Opt out** per store with the presence attribute:
+**Two breaking changes from earlier releases:**
+
+1. **The store no longer auto-syncs on init, visibility change, or
+   reconnect.** A store used WITHOUT a coordinator on the page no longer
+   performs any of these (previously it dispatched a `request-remote-sync`
+   event that, without a coordinator, nobody handled anyway — so this is not
+   a functional regression for the 3-tier setup). With a coordinator
+   present, the coordinator drives initial load, staleness, and
+   reconnect sync via `store.forceSync()`.
+2. **`ln-store:online` / `ln-store:offline` now require a coordinator on
+   the page.** These events are dispatched by `ln-data-coordinator`, not by
+   the store. A store with no coordinator will never emit them.
+
+**Opt-out** moved to the coordinator too:
 ```html
-<div data-ln-data-store="chat" data-ln-data-store-no-autosync></div>
+<div data-ln-data-coordinator="chat" data-ln-data-coordinator-no-autosync>
+  <div data-ln-data-store="chat"></div>
+</div>
 ```
-
-**Lifecycle events** dispatched on `document` (regardless of opt-out):
-- `ln-store:online` — fired when the browser goes online
-- `ln-store:offline` — fired when the browser goes offline
-
-Use these to show/hide a connectivity banner without your own `window` listeners.
+The coordinator also honors the store's own `data-ln-data-store-no-autosync`
+/ `data-ln-store-no-autosync` attribute as a fallback for back-compat.
 
 ---
 
@@ -106,6 +121,10 @@ store.dispatchEvent(new CustomEvent('ln-store:request-update', {
 * `ln-store:request-remote-update` (detail: `{ id, data, expected_version }`)
 * `ln-store:request-remote-delete` (detail: `{ id }`)
 * `ln-store:request-remote-bulk-delete` (detail: `{ ids }`)
+
+### Lifecycle Notification
+
+* `ln-store:initialized` (detail: `{ store, hasCache, lastSyncedAt, count }`) — emitted once at the end of `_initStore`, in every branch (cache present, empty, schema-mismatch-after-clear). This is how a coordinator decides whether to perform an initial `forceSync()` — the store itself never decides.
 
 ---
 

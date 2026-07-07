@@ -195,3 +195,16 @@ The three divergent code paths collapsed into one authored HTML pattern. ~145 li
 ### Lesson
 
 When a feature requires fighting the DOM (overflow hacks, `z-index` wars, `position: fixed` workarounds), question whether the feature belongs where it is. The DOM is not an obstacle — the architecture is wrong.
+
+---
+
+## 12. Templates Are Authored Markup
+
+**Mainstream way:** A component ships a default template as a string constant (or a `?raw` import injected via `innerHTML`) so it works "out of the box" with zero markup. Overriding it means fighting a buried default.
+
+**Ashlar way:** A `<template>` is markup, and markup is authored — never generated or injected by the library. If a JS component clones a template for runtime data, the PAGE provides it: nested inside the component's container (primary — `cloneTemplateScoped` resolves container-local templates first) or at the bottom of the page markup (global fallback). The library never ships a hidden runtime default. `js/ln-{name}/template.html` files are developer examples to copy, not runtime artifacts. A missing template fails loudly (a console warning at clone time), never a silent fallback.
+
+**Why:** A `?raw` import injected via `innerHTML` is JS-generated markup in disguise — it violates Principle 1 (Markup Is the Application) exactly like server-side hydration replacement violates Principle 2. The page markup is the single source of truth; developers customize by editing their authored template, not by overriding a buried library default.
+
+**Concrete example:**
+`js/ln-toast/src/ln-toast.js` clones `<template data-ln-template="ln-toast-item">` via `cloneTemplateScoped` — the page authors this template nested inside `[data-ln-toast]` (see `demo/admin/src/shell.html`). `js/ln-toast/template.html` is the copyable starting point; nothing imports it. If no matching `<template>` exists anywhere, the clone fails loudly with `console.warn('[ln-toast] Template "ln-toast-item" not found')`.
