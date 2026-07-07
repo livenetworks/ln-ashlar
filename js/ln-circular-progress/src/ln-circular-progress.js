@@ -37,6 +37,11 @@ import { dispatch, registerComponent } from '../../ln-core';
 			this.labelEl.remove();
 		}
 		this.dom.removeAttribute('data-ln-circular-progress-initialized');
+		this.dom.removeAttribute('role');
+		this.dom.removeAttribute('aria-valuemin');
+		this.dom.removeAttribute('aria-valuemax');
+		this.dom.removeAttribute('aria-valuenow');
+		this.dom.removeAttribute('aria-valuetext');
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -91,7 +96,8 @@ import { dispatch, registerComponent } from '../../ln-core';
 		const observer = new MutationObserver(function (mutations) {
 			for (const mutation of mutations) {
 				if (mutation.attributeName === 'data-ln-circular-progress' ||
-					mutation.attributeName === 'data-ln-circular-progress-max') {
+					mutation.attributeName === 'data-ln-circular-progress-max' ||
+					mutation.attributeName === 'data-ln-circular-progress-label') {
 					_render.call(self);
 				}
 			}
@@ -99,7 +105,7 @@ import { dispatch, registerComponent } from '../../ln-core';
 
 		observer.observe(this.dom, {
 			attributes: true,
-			attributeFilter: ['data-ln-circular-progress', 'data-ln-circular-progress-max']
+			attributeFilter: ['data-ln-circular-progress', 'data-ln-circular-progress-max', 'data-ln-circular-progress-label']
 		});
 
 		this._attrObserver = observer;
@@ -117,7 +123,16 @@ import { dispatch, registerComponent } from '../../ln-core';
 		this.progressCircle.setAttribute('stroke-dashoffset', offset);
 
 		const label = this.dom.getAttribute('data-ln-circular-progress-label');
-		this.labelEl.textContent = label !== null ? label : Math.round(percentage) + '%';
+		const labelText = label !== null ? label : Math.round(percentage) + '%';
+		this.labelEl.textContent = labelText;
+
+		// Sync ARIA properties
+		this.dom.setAttribute('role', 'progressbar');
+		this.dom.setAttribute('aria-valuemin', '0');
+		this.dom.setAttribute('aria-valuemax', String(max));
+		const clampedValue = Math.max(0, Math.min(value, max));
+		this.dom.setAttribute('aria-valuenow', String(clampedValue));
+		this.dom.setAttribute('aria-valuetext', labelText);
 
 		dispatch(this.dom, 'ln-circular-progress:change', {
 			target: this.dom,
