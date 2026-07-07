@@ -1,0 +1,13 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Toggle Panel Missing ID: panels controlled by data-ln-toggle must have an id for triggering/ARIA linking
+	[data-ln-toggle]:not([id]) {
+		@include dev-dom-error("[data-ln-toggle] is missing a required 'id' attribute for trigger linking.");
+	}
+
+	// 2. Toggle Trigger Empty ID: trigger elements must point to a target panel ID
+	[data-ln-toggle-for=""] {
+		@include dev-inline-error("data-ln-toggle-for target ID cannot be empty");
+	}
+}

@@ -1,0 +1,8 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Search Trigger Check: data-ln-search must target a component ID and cannot be empty
+	[data-ln-search=""] {
+		@include dev-inline-error("data-ln-search target is empty");
+	}
+}

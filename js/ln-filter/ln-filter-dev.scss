@@ -1,0 +1,8 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Filter Trigger Check: data-ln-filter must target a component ID and cannot be empty
+	[data-ln-filter=""] {
+		@include dev-inline-error("data-ln-filter target is empty");
+	}
+}

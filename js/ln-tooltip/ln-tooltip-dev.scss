@@ -1,0 +1,9 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Empty Tooltip: accessibility warning
+	// Flags a [data-ln-tooltip] declared empty with no native title fallback (renders an empty bubble); :not([title]) honors the documented title fallback
+	[data-ln-tooltip=""]:not([title]) {
+		@include dev-inline-error("data-ln-tooltip is empty and has no title fallback");
+	}
+}

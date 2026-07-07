@@ -1,0 +1,8 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Modal Trigger Check: [data-ln-modal-for] cannot have an empty target ID
+	[data-ln-modal-for=""] {
+		@include dev-inline-error("data-ln-modal-for is missing a target modal id");
+	}
+}

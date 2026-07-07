@@ -1,0 +1,13 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Date element misuse: data-ln-date belongs on <input> only
+	[data-ln-date]:not(input) {
+		@include dev-inline-error("data-ln-date belongs on <input>");
+	}
+
+	// 2. Date input missing ID: input[data-ln-date] must have an id for proper labeling/association
+	input[data-ln-date]:not([id]) {
+		@include dev-inline-error("data-ln-date is missing required 'id' attribute");
+	}
+}
