@@ -41,16 +41,30 @@ import { } from '../../ln-core';
 		return candidates[0];
 	}
 
-	// Coordinator: when a hash-bound modal opens with a param, fill its form from
-	// the matching [data-ln-fill-id] source. Bridges the ln-modal:open event
-	// contract to the ln-fill attribute contract — no component import.
+	// Coordinator: bridges the ln-modal:open event contract to the ln-fill
+	// attribute contract — no component import. On an EDIT-mode open (param
+	// present) it fills the form from the matching [data-ln-fill-id] source;
+	// on a NEW-mode open it dispatches a null fill so ln-form resets.
 	document.addEventListener('ln-modal:open', function (e) {
 		const detail = e.detail;
 		if (!detail) return;
-		const param = detail.param;
-		if (param == null) return;          // new mode, or plain (no-id) modal → nothing to fill
+		// Only HASH modals carry a `param` key (null → new mode, value → edit).
+		// Plain non-hash (no-id) modals omit the key entirely → opt out, no fill.
+		if (!('param' in detail)) return;
 		const modal = detail.target;
 		if (!modal) return;
+
+		const param = detail.param;
+		if (param == null) {
+			// New mode (bare #modal-id, param === null): dispatch a null fill so
+			// ln-form runs reset() + _applyActionMode(null) — restore its base
+			// action and clear _method (RESTful action routing) — and display
+			// fillables clear. Without this, stale fields from a prior edit-mode
+			// open would linger. lnFill(modal, null) reaches ln-form's ln-fill
+			// listener with a null detail; no attribute or hash write.
+			window.lnCore.lnFill(modal, null);
+			return;
+		}
 
 		const source = _findSource(modal, param);
 		if (!source) return;                // deep-link to a record not in the DOM → graceful no-op
