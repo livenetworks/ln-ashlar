@@ -108,6 +108,7 @@ The coordinator is built to be highly dynamic, reacting to runtime modifications
 1. **Child Discovery**: The coordinator automatically locates its child components by querying its DOM subtree:
    * **Store Cache**: Looks for `[data-ln-data-store]` and accesses `el.lnDataStore || el.lnStore`.
    * **Transport Connector**: Looks for any connector selector (`[data-ln-api-connector]`, `[data-ln-couchdb-connector]`, `[data-ln-websocket-connector]`, `[data-ln-rest-connector]`) and accesses the universal alias `el.lnConnector`.
+   * **Offline Outbox (optional Child 3)**: Looks for `[data-ln-api-queue]` and accesses `el.lnApiQueue`. When present, write routing (below) enqueues instead of calling the connector directly. When absent, behavior is byte-for-byte the direct-connector path described in this document.
 
 2. **Mapper Resolution**: The coordinator resolves mapping functions using two strategies:
    * **Inline Script (Highly Encapsulated)**: Looks for a nested `<script type="application/javascript" data-ln-mapper>` tag in its subtree:
@@ -210,6 +211,86 @@ Triggered when records are deleted in-memory:
 
 ---
 
+## 📥 Offline Outbox Write Routing (optional `ln-api-queue` child)
+
+When a `[data-ln-api-queue]` child is present, every mutation handler
+(`create`/`update`/`delete`/`bulk-delete`) is routed through it instead of
+calling the connector immediately. When it is absent, the direct-connector
+flows above apply unchanged.
+
+**Queue-present enqueue payloads:**
+
+| op | `ln-api-queue:request-enqueue` detail |
+|---|---|
+| create | `{ chainKey: tempId, op:'create', targetId:null, payload: egress(data), expectedVersion:null, meta:{ tempId } }` |
+| update | `{ chainKey: id, op:'update', targetId: id, payload: egress(cleanRecord), expectedVersion, meta:{ id } }` (merged record still fetched via `store.getById(id)` first) |
+| delete | `{ chainKey: id, op:'delete', targetId: id, payload:null, expectedVersion:null, meta:{ id } }` |
+| bulk-delete | `{ chainKey: bulkKey, op:'bulk-delete', targetId:null, payload:{ ids }, expectedVersion:null, meta:{ bulkKey, ids } }` |
+
+The store is **not** reconciled at enqueue time — reconciliation happens
+only when the queue later commands the coordinator to send.
+
+### Transport executor — `ln-api-queue:send`
+
+The coordinator listens for `ln-api-queue:send` on the queue element. It
+maps `op` to the matching connector method (same egress/ingress flow as the
+direct path) and, on resolution, drives both the store and the queue:
+
+| op | success → store | success → queue command |
+|---|---|---|
+| create | `confirmMutation(meta.tempId, ingress(record), 'create')` | `request-remap {oldKey:meta.tempId, newId:ingress(record).id}` **then** `ack {entryId}` |
+| update | `confirmMutation(meta.id, ingress(record), 'update')` | `ack {entryId}` |
+| delete | `confirmMutation(meta.id, null, 'delete')` | `ack {entryId}` |
+| bulk-delete | `confirmMutation(meta.bulkKey, null, 'bulk-delete')` | `ack {entryId}` |
+
+Remap is dispatched **before** ack on create success — a queued sibling
+update targeting the temp id re-targets the real server id before its own
+chain entry advances (both dispatches are synchronous).
+
+**On error** (reads `err.status` / `err.data` from the connector's unified
+error shape):
+
+| Condition | Coordinator action |
+|---|---|
+| `401` / `419` | `nack {entryId, reason:'auth'}` — does **not** revert; keeps the optimistic write. The queue pauses that scope and emits `auth-required`; the consumer re-authenticates then dispatches `ln-api-queue:request-resume`. |
+| `409` (update) | `store.resolveConflict(meta.id, ingress(err.data.remote), err.data.field_diffs)`, then `nack {entryId, reason:'drop'}`. |
+| other `4xx` | `ln-store:sync-conflict` dispatched, `store.revertMutation(...)`, `nack {entryId, reason:'drop'}`, then `store.forceSync()` as a reconciliation backstop (covers the case where the optimistic snapshot was lost to a page reload). |
+| `5xx` / network (`status:0`) | `nack {entryId, reason:'retry'}` — keeps the optimistic write; the queue backs off and retries. |
+
+### Sync ownership
+
+The coordinator — not the store — decides WHEN to sync:
+
+* Listens for `ln-store:initialized` on its store child: if
+  `!detail.hasCache` → `store.forceSync()` (initial load); else if the
+  store is stale → `store.forceSync()`.
+* **Race guard.** `ln-store:initialized` can fire before the coordinator
+  finishes binding (async `_initStore`, SPA-injected subtree). When
+  children resolve, if `store.isLoaded` is already true, the coordinator
+  evaluates the same condition directly from instance state instead of
+  relying on the event alone.
+* A module-level singleton wires **one shared** `window 'online'`,
+  `window 'offline'`, and `document 'visibilitychange'` listener set across
+  every coordinator instance on the page (not one per instance). On
+  `online`, dispatches `ln-store:online` on `document` once, then for each
+  coordinator with a loaded, non-syncing store: `store.forceSync()`. On
+  `offline`, dispatches `ln-store:offline` on `document` once. On
+  `visibilitychange` (tab visible again), for each coordinator whose store
+  is stale: `store.forceSync()`.
+
+**New attributes:**
+
+| Attribute | Description |
+|---|---|
+| `data-ln-data-coordinator-stale` | Seconds threshold before the store is considered stale; falls back to the store's own `data-ln-data-store-stale` / `data-ln-store-stale`; default 300; `-1` / `never` = never stale. |
+| `data-ln-data-coordinator-no-autosync` | Presence opts the coordinator out of online/visibility auto-sync; falls back to the store's own `data-ln-data-store-no-autosync` / `data-ln-store-no-autosync`. |
+
+`ln-store:online` / `ln-store:offline` now require a coordinator on the
+page — the store itself no longer dispatches them (see the
+[ln-data-store README](../ln-data-store/README.md)).
+
+---
+
 ## 💡 JS API (On the element)
 
 Access the coordinator instance programmatically via the `lnDataCoordinator` or `lnCoordinator` properties:
@@ -220,8 +301,8 @@ const coordinator = document.querySelector('[data-ln-data-coordinator="documents
 // Force a remote configuration refresh
 coordinator.refreshConfig();
 
-// Retrieve children objects
-const { store, connector } = coordinator.findChildren();
+// Retrieve children objects (queue is null when no [data-ln-api-queue] child exists)
+const { store, connector, queue } = coordinator.findChildren();
 
 // Fetch currently resolved mapper functions
 const { ingress, egress } = coordinator.mapper;

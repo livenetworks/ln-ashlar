@@ -6,6 +6,39 @@ This component encapsulates all connection parameters (base URLs, auth tokens, h
 
 ---
 
+## 🔒 Forced `X-LN-Response: data` Header
+
+Every request (`fetchDelta`, `create`, `update`, `delete`, `bulkDelete`) sends
+`X-LN-Response: data` in addition to any configured `data-ln-api-headers`.
+This header is **forced** — it rides on all five verbs via a single internal
+helper and cannot be removed or overridden by consumer-supplied headers. The
+backend uses it to select a JSON "data" response mode; it doubles as a CSRF
+guard.
+
+## ⚠️ Unified 4xx / 5xx Body Parsing
+
+Every non-2xx response (not just 409) has its JSON body parsed best-effort
+and attached to the rejected error as `err.data` (`null` if the body isn't
+parseable JSON), alongside `err.status`. This means server validation
+messages (422, etc.) survive on every verb, not just conflict responses.
+
+## `update(id, payload, expectedVersion)` — optional third argument
+
+`update` accepts an optional third argument. When provided (not `null`/
+`undefined`), the connector merges it into the outgoing PUT body as
+`expected_version`: `payload = Object.assign({}, payload, { expected_version: expectedVersion })`.
+This is a single merge point — the `ln-api-connector:request-update` event
+path passes `detail.expected_version` straight through to it, so there is
+no second place version-locking logic lives.
+
+```javascript
+// Programmatic call with version lock
+connector.update(42, { title: 'Updated title' }, 3)
+    .then(record => console.log('Updated record:', record));
+```
+
+---
+
 ## Declarative DOM Setup
 
 Place the connector inside your parent coordinator element alongside your store:

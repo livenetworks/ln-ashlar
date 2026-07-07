@@ -20,13 +20,14 @@ To enable toasts, simply place a single container `<ul>` in your HTML layout (ty
 
 ```html
 <!-- The Central Toast Container -->
-<ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
+<ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5" aria-live="polite" aria-atomic="false"></ul>
 ```
 
 ### Key Anatomy Rules
 - **The Container (`data-ln-toast`)**: Creates the toast listener service.
 - **Auto-Dismiss Timeout (`data-ln-toast-timeout="6000"`)**: Default dismissal duration in milliseconds. Use `0` for persistent notifications.
 - **Max Stack size (`data-ln-toast-max="5"`)**: Evicts the oldest toast when the count exceeds the threshold.
+- **ARIA (`aria-live`/`aria-atomic`)**: authored once on the container — the live region announces every appended/hydrated toast. Individual toast items never carry `role` or `aria-live`.
 
 ---
 
@@ -50,7 +51,7 @@ Pass options inside the event's `detail` object:
 
 | Field | Type | Description |
 |---|---|---|
-| `type` | `success\|error\|warn\|info` | Toast category. Drives accents, aria-live roles, and default titles. |
+| `type` | `success\|error\|warn\|info` | Toast category. Becomes the `<li>` class verbatim (`success`/`error`/`warn`/`info`); unrecognized or absent values render with no icon and neutral tone (documented degradation, not an error). |
 | `title` | string | Optional card title. |
 | `message` | string \| string[] | Card body content. Pass an array of strings to render a bulleted validation error list. |
 | `timeout` | number | Dismissal timeout in ms. Use `0` to make it persistent. |
@@ -63,30 +64,42 @@ window.dispatchEvent(new CustomEvent('ln-toast:clear'));
 
 ---
 
-## 4. Toast Types & Default Accessibility
+## 4. Toast Types & Tone
 
-ARIA roles and accessibility live-regions are injected automatically by the component depending on the category:
+`type` drives CSS tone and icon selection only — nothing else. Recognized
+values: `success`, `error`, `warn`, `info`. Each becomes the class on the
+toast `<li>` (the card itself — no nested wrapper): the SSR path authors
+`class="success"`, the dynamic path fills it via `data-ln-attr="class:type"`.
+The SCSS maps the type class → color family (`.warn` → the `warning` family)
+and shows the matching icon from the authored 4-icon list. An unrecognized or
+omitted `type` renders with no icon and neutral tone — no JS whitelist.
 
-| Category | Default Title | `aria-live` | `role` |
-|---|---|---|---|
-| `success` | Success | `polite` | `status` |
-| `error` | Error | `assertive` | `alert` |
-| `warn` | Warning | `polite` | `status` |
-| `info` | Information | `polite` | `status` |
+There are no default titles. If `title` is omitted, the title element stays
+empty and collapses (`:empty`) — the same rule applies to `message`.
 
 ---
 
 ## 5. Integration Patterns
 
 ### A. SSR-Rendered Flash Messages (Hydration)
-For server-side frameworks (like Laravel, Rails, or ASP.NET), you can place initial toast cards inside the container. The component will hydrate and auto-dismiss them on load:
+For server-side frameworks (like Laravel, Rails, or ASP.NET), the server authors the full toast markup — icon, title, body, and close button are real HTML written by the backend template. `ln-toast` only binds behavior on load: it wires the close button and starts the auto-dismiss timer. There is no template clone and no DOM replacement — the authored `<li>` is never touched, only queried:
 ```html
-<ul data-ln-toast>
-    <li data-ln-toast-item data-type="success" data-title="Saved">
-        Changes have been saved successfully.
-    </li>
+<ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5" aria-live="polite" aria-atomic="false">
+	<li data-ln-toast-item class="success">
+		<div class="icon">
+			<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg>
+		</div>
+		<section class="content">
+			<header>
+				<strong class="title">Saved</strong>
+				<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+			</header>
+			<main class="body"><p>Changes have been saved successfully.</p></main>
+		</section>
+	</li>
 </ul>
 ```
+An optional per-item `data-ln-toast-timeout` overrides the container's default timeout (`0` = persistent — e.g. a blocking error the user must dismiss manually).
 
 ### B. Bulleted Validation Error Maps
 To display a list of form validation errors inside a single toast, pass an array of strings to `message`:
@@ -99,6 +112,24 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
     }
 }));
 ```
+
+### C. The Dynamic Template Is Authored Markup
+The `ln-toast:enqueue` path renders from a `<template data-ln-template="ln-toast-item">`
+that the page provides. `ln-toast` ships no hidden runtime default — the
+library never generates or injects this markup. Nest the `<template>` inside
+your `[data-ln-toast]` container for scoped lookup (`cloneTemplateScoped`
+resolves container-local templates first — the recommended placement), or
+place it anywhere else in the document body for a global fallback. Copy
+[`js/ln-toast/template.html`](template.html) as your starting point — it is a
+developer example to adapt, not a runtime artifact. Binding contract: the
+root `<li>` carries `data-ln-toast-item` (eviction, clear, and hydration
+address items by it; the JS stamps it defensively if omitted) plus
+`data-ln-attr="class:type"` and NO static class (fill
+sets the class via setAttribute, which would clobber an authored one);
+`data-ln-field="title"` / `data-ln-field="message"` for text; a
+`data-ln-toast-when="{type}"` icon list if you want per-type icons. A missing
+template fails loudly — `console.warn('[ln-toast] Template "ln-toast-item"
+not found')` at clone time, no silent fallback.
 
 ---
 

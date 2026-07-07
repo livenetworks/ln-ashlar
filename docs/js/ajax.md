@@ -89,3 +89,12 @@ This architectural decision avoids fragile client-side regex parsing of HTML, wh
 A consumer writing a single `ln-ajax:error` listener must guard with `'status' in e.detail` before reading `status`, and `'error' in e.detail` before reading `error`.
 
 **Known divergence — flagged for follow-up.** The two shapes are a source-level contract inconsistency introduced by separate error-path implementations. This file documents the current behavior accurately. A follow-up task should unify the error detail shape (e.g. always include `status` and `error`, with `null` for whichever does not apply) to make single-listener code reliable.
+
+**Related — `ln-api-connector` already unified.** `ln-api-connector` (the
+transport tier of the 3-tier data layer) now emits a single
+`ln-api-connector:error` detail shape on every failure —
+`{ action, error, status, data }`, with `data` = the parsed 4xx/5xx body or
+`null` and a `conflictData` alias when `status === 409` — for all five verbs.
+This is the recommended target shape. `ln-ajax`'s own two-shape divergence
+documented above remains open as a separate follow-up; see
+[`js/ln-api-connector/README.md`](../../js/ln-api-connector/README.md).

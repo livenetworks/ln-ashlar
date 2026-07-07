@@ -4,7 +4,7 @@
 > mutation flow, error / state machine. For consumer docs (attributes,
 > events, API), see [README](../../js/ln-store/README.md).
 
-Source: `js/ln-store/ln-store.js`
+Source: `js/ln-data-store/ln-data-store.js`
 
 ## HTML
 
@@ -25,26 +25,26 @@ same store via events.
 ```
 Init:
   1. Open IndexedDB → read _meta
-  2. Schema mismatch? → clear, full load
-  3. Has cache? → emit ready (source: 'cache'), delta sync if stale
-  4. No cache? → full load → emit loaded, ready (source: 'server')
-
-Visibility change (tab returns):
-  → delta sync all stores if stale
-
-Online (reconnect):
-  → dispatch ln-store:online on document
-  → for each _stores instance: if isLoaded && !isSyncing && !_noAutosync → _triggerRemoteSync
-  → isSyncing guard prevents double request alongside manual forceSync()
-
-Offline:
-  → dispatch ln-store:offline on document
+  2. Schema mismatch? → clear, reset meta
+  3. Has cache? → emit ready (source: 'cache')
+  4. Emit ln-store:initialized { store, hasCache, lastSyncedAt, count } — in EVERY branch
+     (cache, empty, schema-mismatch-after-clear)
 
 Delta sync:
   1. GET {endpoint}?since={last_synced_at}
   2. Upsert data[], delete deleted[]
   3. Emit synced
 ```
+
+The store no longer decides WHEN to sync. `_initStore` never triggers a
+remote sync itself — it only emits `ln-store:initialized` and lets the
+consumer (normally `ln-data-coordinator`) decide. There is no visibility-change
+or online-reconnect self-sync inside the store anymore; both moved to
+`ln-data-coordinator`, which listens for `ln-store:initialized` (plus its own
+`window 'online'` / `document 'visibilitychange'` listeners) and calls
+`store.forceSync()` when appropriate. A store used without a coordinator on
+the page simply never syncs beyond its initial cache read — see
+[README](../../js/ln-data-store/README.md).
 
 ## Optimistic Mutation Flow
 
@@ -88,12 +88,17 @@ Delete:
 |-------|---------|
 | `_db` | Open IDBDatabase connection (one per page) |
 | `_dbReady` | Promise — resolves when `_db` is ready or null (no IDB) |
-| `_stores` | `{ name: instance }` — global registry, drives visibility-change sync |
-| `_visibilityHandler` | Listener attached only while `_stores` non-empty |
-| `_onlineHandler` | `window 'online'` listener — dispatches `ln-store:online`, triggers resync |
-| `_offlineNotify` | `window 'offline'` listener — dispatches `ln-store:offline` |
+| `_stores` | `{ name: instance }` — global registry (lookup only; no longer drives any self-sync) |
 
-Per-instance opt-out flag: `inst._noAutosync` — set when `data-ln-data-store-no-autosync` or `data-ln-store-no-autosync` is present on the store element. Stores with this flag are skipped by `_onlineHandler` (but `ln-store:online`/`ln-store:offline` still fire).
+There is no module-level visibility/online/offline handling left in the
+store — `_visibilityHandler`, `_onlineHandler`, and `_offlineNotify` were
+removed along with their listeners. That responsibility (and the
+`ln-store:online`/`ln-store:offline` document dispatch) now lives in
+`ln-data-coordinator`. The per-instance `_noAutosync` opt-out flag was
+removed too — the opt-out is now read by the coordinator (as
+`data-ln-data-coordinator-no-autosync`, falling back to the store's own
+`data-ln-data-store-no-autosync` / `data-ln-store-no-autosync` attribute for
+back-compat).
 
 The page holds **one** IDBDatabase connection shared by all store
 instances (multiple `data-ln-store` elements). Stores share the
@@ -101,15 +106,32 @@ connection via `_getDb()`; transactions are scoped per store name.
 
 ## Event surface
 
-See [README §Events — Commands](../../js/ln-store/README.md#events--commands-dispatched-to-the-store)
-and [§Events — Notifications](../../js/ln-store/README.md#events--notifications-emitted-by-the-store)
+See [README §Events — Commands](../../js/ln-data-store/README.md#events--commands-dispatched-to-the-store)
+and [§Events — Notifications](../../js/ln-data-store/README.md#events--notifications-emitted-by-the-store)
 for the full table of dispatched events. This document covers WHEN
 each event fires within the lifecycle / mutation flow above.
 
+`ln-store:initialized` is emitted once at the end of `_initStore`, in every
+branch (cache present, empty, schema-mismatch-after-clear). It replaces the
+store's old self-sync trigger — the store no longer decides to sync on init;
+it only reports its cache state and lets the coordinator decide.
+
 ## API surface
 
-See [README §API](../../js/ln-store/README.md#api-instance-on-dom-element)
+See [README §API](../../js/ln-data-store/README.md#api-instance-on-dom-element)
 for the full API + query options + global methods.
+
+The store has **no persistent write queue of its own**. There is no
+FIFO-per-record pending-writes IndexedDB store inside `ln-data-store` — the
+offline outbox is the standalone `ln-api-queue` component (its own IndexedDB
+database, `ln_api_queue`). `ln-data-store` only holds the record cache plus
+the `lastSyncedAt` watermark.
+
+`_triggerRemoteSync` (the internal call that dispatches
+`ln-store:request-remote-sync`) is never invoked by the store's own
+lifecycle. It is reachable ONLY via the two explicit public commands
+`forceSync()` and `fullReload()` — always consumer/coordinator initiated,
+never a self-sync.
 
 ## Error Handling
 
@@ -153,8 +175,6 @@ For detailed security guidelines, see [Security Architecture & Best Practices](.
 The store renders nothing. The only DOM-side effects are:
 
 - attaches `request-*` listeners on the store element
-- attaches one `visibilitychange` listener on `document` (shared
-  across all store instances; removed when last store is destroyed)
 - writes `dom.lnStore = instance` on the store element
 - dispatches `ln-store:*` events on the store element
   (`quota-exceeded` dispatches on `document`)
