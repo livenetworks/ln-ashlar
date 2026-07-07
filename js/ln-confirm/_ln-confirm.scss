@@ -11,3 +11,14 @@
 [data-ln-table]:has([data-confirming]) {
 	overflow: visible;
 }
+
+// ── Show/hide for two-element mode ──
+[data-ln-confirm] {
+	&:not([data-confirming="true"]) [data-ln-confirm-active] {
+		display: none !important;
+	}
+	&[data-confirming="true"] [data-ln-confirm-idle] {
+		display: none !important;
+	}
+}
+
