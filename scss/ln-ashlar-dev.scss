@@ -8,40 +8,29 @@
 
 @use 'config/mixins' as *;
 
+// --- Modular Component Diagnostics ---
+@use '../js/ln-toggle/ln-toggle-dev';
+@use '../js/ln-table/ln-table-dev';
+@use '../js/ln-modal/ln-modal-dev';
+@use '../js/ln-validate/ln-validate-dev';
+@use '../js/ln-date/ln-date-dev';
+@use '../js/ln-tabs/ln-tabs-dev';
+@use '../js/ln-search/ln-search-dev';
+@use '../js/ln-filter/ln-filter-dev';
+@use '../js/ln-tooltip/ln-tooltip-dev';
+
+// --- General HTML/Accessibility Diagnostics ---
 [data-ln-debug] {
-	// 1. Table Sort: missing sort button warning
-	// Detects when a th[data-ln-table-sort] is sortable but doesn't contain a <button data-ln-table-col-sort>
-	th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
-		@include dev-inline-error("missing sort button");
-	}
-
-	// 2. Table Integration: missing ID warning
-	// Warns if a table wrapper [data-ln-table] is missing an ID, which breaks search/filter integration
-	[data-ln-table]:not([id]) {
-		@include dev-dom-error("[data-ln-table] is missing a required 'id' attribute for filter mapping.");
-	}
-
-	// 3. Modal Trigger: missing target id warning
-	// Warns if a modal trigger [data-ln-modal-for] has an empty value (no modal id to open)
-	[data-ln-modal-for=""] {
-		@include dev-inline-error("data-ln-modal-for is missing a target modal id");
-	}
-
-	// 4. Image Missing Alt: accessibility warning
+	// 1. Image Missing Alt: accessibility warning
 	// Flags an <img> with NO alt attribute (empty alt="" is the valid decorative pattern and is intentionally NOT flagged)
 	img:not([alt]) {
 		@include dev-replaced-error;
 	}
 
-	// 5. Abbr Missing Title: accessibility warning
+	// 2. Abbr Missing Title: accessibility warning
 	// Flags an <abbr> with no title — the abbreviation has no expansion and is meaningless to readers
 	abbr:not([title]) {
 		@include dev-inline-error("abbr is missing a title attribute");
 	}
-
-	// 6. Empty Tooltip: accessibility warning
-	// Flags a [data-ln-tooltip] declared empty with no native title fallback (renders an empty bubble); :not([title]) honors the documented title fallback
-	[data-ln-tooltip=""]:not([title]) {
-		@include dev-inline-error("data-ln-tooltip is empty and has no title fallback");
-	}
 }
+

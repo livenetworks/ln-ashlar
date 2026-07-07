@@ -1,0 +1,18 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Tabs Configuration Check: [data-ln-tabs] must have an id or data-ln-tabs-key
+	[data-ln-tabs]:not([id]):not([data-ln-tabs-key]) {
+		@include dev-dom-error("[data-ln-tabs] must have an 'id' or 'data-ln-tabs-key' for state tracking.");
+	}
+
+	// 2. Tab Trigger Type: triggers inside forms must be explicitly type="button" to prevent submit events
+	form [data-ln-tabs-for]:not([type="button"]) {
+		@include dev-inline-error("tab trigger within form must have type='button'");
+	}
+
+	// 3. Tab Trigger Nesting Check: [data-ln-tabs-for] must be nested inside a [data-ln-tabs] parent container
+	[data-ln-tabs-for]:not([data-ln-tabs] *) {
+		@include dev-inline-error("[data-ln-tabs-for] is orphaned (not inside a [data-ln-tabs] container)");
+	}
+}

@@ -1,0 +1,15 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Validation Input Missing ID: input, select, textarea elements utilizing data-ln-validate must have an ID
+	input[data-ln-validate]:not([id]),
+	select[data-ln-validate]:not([id]),
+	textarea[data-ln-validate]:not([id]) {
+		@include dev-inline-error("data-ln-validate element is missing required 'id' attribute");
+	}
+
+	// 2. Validation Nesting check: data-ln-validate must be wrapped inside .form-element or data-ln-form
+	[data-ln-validate]:not(.form-element [data-ln-validate]):not([data-ln-form] [data-ln-validate]) {
+		@include dev-dom-error("data-ln-validate must be a child of .form-element or data-ln-form wrapper");
+	}
+}
