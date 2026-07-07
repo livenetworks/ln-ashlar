@@ -70,6 +70,7 @@
 									<tr><td><code>data-ln-autosave</code></td><td><code>&lt;form&gt;</code></td><td>Marks the form as autosaved. Empty value uses <code>form.id</code> as the storage identifier; non-empty value uses the attribute value instead. If neither resolves, the constructor logs a warning and exits.</td></tr>
 									<tr><td><code>data-ln-autosave-clear</code></td><td>any descendant button</td><td>Click delegate marker. Removes the localStorage entry on click. Does NOT reset form values. Typical use: a "Cancel" button that closes a modal AND discards the draft (combine with <code>data-ln-modal-close</code>).</td></tr>
 									<tr><td><code>data-ln-autosave-debounce-input</code></td><td><code>&lt;form&gt;</code></td><td>Opt-in. Attaches a debounced <code>input</code> listener. Value is milliseconds (e.g. <code>"500"</code>); empty attribute defaults to 1000 ms. Useful for compose-style textareas where the user never blurs.</td></tr>
+									<tr><td><code>data-ln-autosave-exclude</code></td><td>input / select / textarea</td><td>Opt-out. Excludes the individual input element from serialization and storage (used for sensitive fields like passwords, credit cards, national IDs).</td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -94,6 +95,10 @@
 								<div class="form-element">
 									<label for="as-phone">Phone</label>
 									<input type="tel" id="as-phone" name="phone" placeholder="+1 555 ...">
+								</div>
+								<div class="form-element">
+									<label for="as-sensitive">Sensitive Field (PIN / Credit Card)</label>
+									<input type="password" id="as-sensitive" name="sensitive" placeholder="••••••••" data-ln-autosave-exclude>
 								</div>
 								<div class="form-element">
 									<label for="as-country">Country</label>
