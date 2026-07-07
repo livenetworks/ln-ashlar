@@ -49,6 +49,7 @@ The hidden input holds the ISO date string (YYYY-MM-DD) for form submission.
 | Attribute | On | Description |
 |-----------|-----|-------------|
 | `data-ln-date` | `<input>` | Enables date formatting. Value = format (keyword or pattern). Default: `medium` |
+| `data-ln-date-label` | `<input>` | Optional. Translated `aria-label` for the injected calendar button. Default: `Open date picker` (dev fallback only). |
 
 ### Format Keywords (locale-aware via Intl.DateTimeFormat)
 

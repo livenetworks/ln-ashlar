@@ -1,4 +1,4 @@
-import { dispatch, getLocale, registerComponent, interceptValueProperty } from '../../ln-core';
+import { dispatch, getLocale, registerComponent, interceptValueProperty, getLocaleFallback, registerLocaleFallback, buildDict } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-date';
@@ -51,27 +51,21 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		const minutes = date.getMinutes();
 
 		let mmmmVal, mmmVal;
-		if (locale.startsWith('mk')) {
-			const formatter = _getFormatter(locale, { month: 'long' });
-			const resolvedLocale = formatter.resolvedOptions().locale;
-			if (!resolvedLocale.startsWith('mk')) {
-				const mkMonthsLong = [
-					'јануари', 'февруари', 'март', 'април', 'мај', 'јуни',
-					'јули', 'август', 'септември', 'октомври', 'ноември', 'декември'
-				];
-				const mkMonthsShort = [
-					'јан', 'фев', 'мар', 'апр', 'мај', 'јун',
-					'јул', 'авг', 'септ', 'окт', 'ноем', 'дек'
-				];
-				mmmmVal = mkMonthsLong[month];
-				mmmVal = mkMonthsShort[month];
-			}
-		}
+		const fallback = getLocaleFallback(locale);
+		const langPrefix = (locale || '').toLowerCase().split('-')[0];
+		const formatter = _getFormatter(locale, { month: 'long' });
+		const resolvedLocale = formatter.resolvedOptions().locale.toLowerCase().split('-')[0];
+		const isFallbackNeeded = fallback && resolvedLocale !== langPrefix;
 
-		if (mmmmVal === undefined) {
+		if (isFallbackNeeded && fallback.monthsLong) {
+			mmmmVal = fallback.monthsLong[month];
+		} else {
 			mmmmVal = _getFormatter(locale, { month: 'long' }).format(date);
 		}
-		if (mmmVal === undefined) {
+
+		if (isFallbackNeeded && fallback.monthsShort) {
+			mmmVal = fallback.monthsShort[month];
+		} else {
 			mmmVal = _getFormatter(locale, { month: 'short' }).format(date);
 		}
 
@@ -97,8 +91,11 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		const intlOptions = _getIntlOptions(format);
 		if (intlOptions) {
 			const formatter = _getFormatter(locale, intlOptions);
-			const resolvedLocale = formatter.resolvedOptions().locale;
-			if (locale.startsWith('mk') && !resolvedLocale.startsWith('mk')) {
+			const langPrefix = (locale || '').toLowerCase().split('-')[0];
+			const resolvedLocale = formatter.resolvedOptions().locale.toLowerCase().split('-')[0];
+			const fallback = getLocaleFallback(locale);
+
+			if (fallback && resolvedLocale !== langPrefix) {
 				return _formatCustom(date, 'dd.MM.yyyy', locale);
 			}
 			return formatter.format(date);
@@ -106,11 +103,53 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		return _formatCustom(date, format, locale);
 	}
 
+	// ─── Component Helpers ────────────────────────────────────
+
+	function _toISO(date) {
+		if (!date) return '';
+		const y = date.getFullYear();
+		const m = String(date.getMonth() + 1).padStart(2, '0');
+		const d = String(date.getDate()).padStart(2, '0');
+		return y + '-' + m + '-' + d;
+	}
+
+	function _notifyChange(self, iso, date) {
+		dispatch(self.dom, 'ln-date:change', {
+			value: iso,
+			formatted: self.dom.value,
+			date: date
+		});
+		self.dom.dispatchEvent(new Event('change', { bubbles: true }));
+	}
+
+	function _updateState(self, iso, date, formattedText) {
+		self._setHiddenRaw(iso);
+		_inputValueDesc.set.call(self._picker, iso);
+		self._lastISO = iso;
+		if (formattedText !== undefined) {
+			self._isFormatting = true;
+			self.dom.value = formattedText;
+			self._isFormatting = false;
+		} else if (date) {
+			self._displayFormatted(date);
+		}
+		_notifyChange(self, iso, date);
+	}
+
+	function _clearState(self) {
+		self._setHiddenRaw('');
+		_inputValueDesc.set.call(self._picker, '');
+		self._isFormatting = true;
+		self.dom.value = '';
+		self._isFormatting = false;
+		self._lastISO = '';
+		_notifyChange(self, '', null);
+	}
+
 	// ─── Component ────────────────────────────────────────────
 
 	function _component(dom) {
 		if (dom.tagName !== 'INPUT') {
-			console.warn('[ln-date] Can only be applied to <input>, got:', dom.tagName);
 			return this;
 		}
 
@@ -121,8 +160,25 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		const self = this;
 
 		// ── Read initial state ──────────────────────────────
-		const initialValue = dom.value; // ISO string (YYYY-MM-DD) or empty
+		const initialValue = dom.value;
 		const name = dom.name;
+
+		// Check for declarative HTML dictionary nearby
+		const container = dom.closest('.form-element, form') || dom.parentNode;
+		const dictEls = container.querySelectorAll('[data-ln-date-dict]');
+		for (let i = 0; i < dictEls.length; i++) {
+			const lang = dictEls[i].getAttribute('data-ln-date-dict');
+			if (lang) {
+				const dictData = buildDict(dictEls[i], 'data-ln-date-dict-key');
+				if (dictData['months-long']) {
+					dictData.monthsLong = dictData['months-long'].split(',').map(s => s.trim());
+				}
+				if (dictData['months-short']) {
+					dictData.monthsShort = dictData['months-short'].split(',').map(s => s.trim());
+				}
+				registerLocaleFallback(lang, dictData);
+			}
+		}
 
 		// ── Wrap field: replace dom with <span data-ln-date-field> and move dom inside ──
 		const wrapper = document.createElement('span');
@@ -156,13 +212,13 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		// ── Create calendar button ──────────────────────────
 		const btn = document.createElement('button');
 		btn.type = 'button';
-		btn.setAttribute('aria-label', 'Open date picker');
+		btn.setAttribute('aria-label', dom.getAttribute('data-ln-date-label') || 'Open date picker');
 		btn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>';
 		picker.insertAdjacentElement('afterend', btn);
 		this._btn = btn;
 		this._lastISO = '';
 
-		// ── Intercept programmatic value sets on hidden input
+		// ── Intercept programmatic value sets on hidden input ──
 		Object.defineProperty(hidden, 'value', {
 			get: function () {
 				return _inputValueDesc.get.call(hidden);
@@ -171,27 +227,9 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 				_inputValueDesc.set.call(hidden, val);
 				if (val && val !== '') {
 					const date = _parseISO(val);
-					if (date) {
-						self._displayFormatted(date);
-						_inputValueDesc.set.call(picker, val);
-						self._lastISO = val;
-						dispatch(self.dom, 'ln-date:change', {
-							value: val,
-							formatted: self.dom.value,
-							date: date
-						});
-						self.dom.dispatchEvent(new Event('change', { bubbles: true }));
-					}
+					if (date) _updateState(self, val, date);
 				} else if (val === '') {
-					self.dom.value = '';
-					_inputValueDesc.set.call(picker, '');
-					self._lastISO = '';
-					dispatch(self.dom, 'ln-date:change', {
-						value: '',
-						formatted: '',
-						date: null
-					});
-					self.dom.dispatchEvent(new Event('change', { bubbles: true }));
+					_clearState(self);
 				}
 			}
 		});
@@ -208,84 +246,34 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 				}
 				if (!val || val === '') {
 					originalSet('');
-					self._setHiddenRaw('');
-					_inputValueDesc.set.call(self._picker, '');
-					self._lastISO = '';
-					dispatch(dom, 'ln-date:change', {
-						value: '',
-						formatted: '',
-						date: null
-					});
-					dom.dispatchEvent(new Event('change', { bubbles: true }));
+					_clearState(self);
 					return;
 				}
 
-				// Programmatic value could be an ISO string (YYYY-MM-DD) or a formatted date string
-				let date = _parseISO(val);
-				if (!date) {
-					date = _parseTyped(val);
-				}
+				const date = _parseISO(val) || _parseTyped(val);
 
 				if (date) {
-					const y = date.getFullYear();
-					const m = String(date.getMonth() + 1).padStart(2, '0');
-					const d = String(date.getDate()).padStart(2, '0');
-					const iso = y + '-' + m + '-' + d;
-
-					self._setHiddenRaw(iso);
-					_inputValueDesc.set.call(self._picker, iso);
-					self._lastISO = iso;
-
+					const iso = _toISO(date);
 					const format = dom.getAttribute(DOM_SELECTOR) || '';
 					const locale = getLocale(dom);
 					const formatted = _formatDate(date, format, locale);
 					originalSet(formatted);
-
-					dispatch(dom, 'ln-date:change', {
-						value: iso,
-						formatted: formatted,
-						date: date
-					});
-					dom.dispatchEvent(new Event('change', { bubbles: true }));
+					_updateState(self, iso, date, formatted);
 				} else {
 					originalSet(String(val));
-					self._setHiddenRaw('');
-					_inputValueDesc.set.call(self._picker, '');
-					self._lastISO = '';
-					dispatch(dom, 'ln-date:change', {
-						value: '',
-						formatted: String(val),
-						date: null
-					});
-					dom.dispatchEvent(new Event('change', { bubbles: true }));
+					_clearState(self);
 				}
 			}
 		});
 
 		// ── Bind events ─────────────────────────────────────
 		this._onPickerChange = function () {
-			const val = picker.value; // ISO YYYY-MM-DD
+			const val = picker.value;
 			if (val) {
 				const date = _parseISO(val);
-				if (date) {
-					self._setHiddenRaw(val);
-					self._displayFormatted(date);
-					self._lastISO = val;
-					dispatch(self.dom, 'ln-date:change', {
-						value: val,
-						formatted: self.dom.value,
-						date: date
-					});
-				}
+				if (date) _updateState(self, val, date);
 			} else {
-				self._setHiddenRaw('');
-				self.dom.value = '';
-				self._lastISO = '';
-				dispatch(self.dom, 'ln-date:change', {
-					value: '',
-					formatted: '',
-					date: null
-				});
+				_clearState(self);
 			}
 		};
 		picker.addEventListener('change', this._onPickerChange);
@@ -293,51 +281,25 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		this._onBlur = function () {
 			const typed = self.dom.value.trim();
 
-			// Empty input — clear if there was a value
 			if (typed === '') {
-				if (self._lastISO !== '') {
-					self._setHiddenRaw('');
-					_inputValueDesc.set.call(self._picker, '');
-					self.dom.value = '';
-					self._lastISO = '';
-					dispatch(self.dom, 'ln-date:change', {
-						value: '',
-						formatted: '',
-						date: null
-					});
-				}
+				if (self._lastISO !== '') _clearState(self);
 				return;
 			}
 
-			// Check if text is unchanged from current formatted display
 			if (self._lastISO) {
 				const currentDate = _parseISO(self._lastISO);
 				if (currentDate) {
 					const format = self.dom.getAttribute(DOM_SELECTOR) || '';
 					const locale = getLocale(self.dom);
-					const currentFormatted = _formatDate(currentDate, format, locale);
-					if (typed === currentFormatted) return;
+					if (typed === _formatDate(currentDate, format, locale)) return;
 				}
 			}
 
-			// Try to parse the typed value
 			const parsed = _parseTyped(typed);
 			if (parsed) {
-				const y = parsed.getFullYear();
-				const m = String(parsed.getMonth() + 1).padStart(2, '0');
-				const d = String(parsed.getDate()).padStart(2, '0');
-				const iso = y + '-' + m + '-' + d;
-				self._setHiddenRaw(iso);
-				_inputValueDesc.set.call(self._picker, iso);
-				self._displayFormatted(parsed);
-				self._lastISO = iso;
-				dispatch(self.dom, 'ln-date:change', {
-					value: iso,
-					formatted: self.dom.value,
-					date: parsed
-				});
+				const iso = _toISO(parsed);
+				_updateState(self, iso, parsed);
 			} else {
-				// Invalid input — revert to previous display
 				if (self._lastISO) {
 					const prevDate = _parseISO(self._lastISO);
 					if (prevDate) self._displayFormatted(prevDate);
@@ -356,27 +318,15 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		// ── Handle pre-filled value ─────────────────────────
 		if (initialValue && initialValue !== '') {
 			const date = _parseISO(initialValue);
-			if (date) {
-				this._setHiddenRaw(initialValue);
-				_inputValueDesc.set.call(picker, initialValue);
-				this._displayFormatted(date);
-				this._lastISO = initialValue;
-				dispatch(dom, 'ln-date:change', {
-					value: initialValue,
-					formatted: dom.value,
-					date: date
-				});
-				dom.dispatchEvent(new Event('change', { bubbles: true }));
-			}
+			if (date) _updateState(self, initialValue, date);
 		}
 
 		return this;
 	}
 
-	// ─── Helpers ──────────────────────────────────────────────
+	// ─── Parsing Helpers ──────────────────────────────────────
 
 	function _parseISO(str) {
-		// Parse YYYY-MM-DD (and optionally YYYY-MM-DDTHH:mm)
 		if (!str || typeof str !== 'string') return null;
 		const parts = str.split('T');
 		const dateParts = parts[0].split('-');
@@ -392,7 +342,6 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 			min = parseInt(timeParts[1], 10) || 0;
 		}
 		const date = new Date(y, m, d, h, min);
-		// Validate the date is real (e.g., Feb 30 would roll over)
 		if (date.getFullYear() !== y || date.getMonth() !== m || date.getDate() !== d) return null;
 		return date;
 	}
@@ -400,19 +349,15 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 	function _parseTyped(str) {
 		if (!str || typeof str !== 'string') return null;
 		str = str.trim();
-		if (str.length < 6) return null; // minimum: d.M.yy
+		if (str.length < 6) return null;
 
-		// Detect separator
 		let sep, parts;
 		if (str.indexOf('.') !== -1) {
-			sep = '.';
-			parts = str.split('.');
+			sep = '.'; parts = str.split('.');
 		} else if (str.indexOf('/') !== -1) {
-			sep = '/';
-			parts = str.split('/');
+			sep = '/'; parts = str.split('/');
 		} else if (str.indexOf('-') !== -1) {
-			sep = '-';
-			parts = str.split('-');
+			sep = '-'; parts = str.split('-');
 		} else {
 			return null;
 		}
@@ -426,15 +371,11 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		}
 
 		let day, month, year;
-
 		if (sep === '.') {
-			// dd.MM.yyyy (European)
 			day = nums[0]; month = nums[1]; year = nums[2];
 		} else if (sep === '/') {
-			// MM/dd/yyyy (US)
 			month = nums[0]; day = nums[1]; year = nums[2];
 		} else {
-			// dash: yyyy-MM-dd if first part is 4 digits, else dd-MM-yyyy
 			if (parts[0].length === 4) {
 				year = nums[0]; month = nums[1]; day = nums[2];
 			} else {
@@ -442,12 +383,10 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 			}
 		}
 
-		// Two-digit year pivot
 		if (year < 100) {
 			year += (year < 50) ? 2000 : 1900;
 		}
 
-		// Validate via Date constructor roundtrip
 		const date = new Date(year, month - 1, day);
 		if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
 			return null;
@@ -460,7 +399,6 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 			try {
 				this._picker.showPicker();
 			} catch (e) {
-				// showPicker() can throw if not triggered by user gesture
 				this._picker.click();
 			}
 		} else {
@@ -475,15 +413,6 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 	_component.prototype._displayFormatted = function (date) {
 		const format = this.dom.getAttribute(DOM_SELECTOR) || '';
 		const locale = getLocale(this.dom);
-		console.log('[ln-date] _displayFormatted:', {
-			date: date,
-			format: format,
-			locale: locale,
-			dom: this.dom,
-			closestLang: this.dom.closest('[lang]'),
-			htmlLang: document.documentElement ? document.documentElement.lang : null,
-			formatted: _formatDate(date, format, locale)
-		});
 		this._isFormatting = true;
 		this.dom.value = _formatDate(date, format, locale);
 		this._isFormatting = false;
@@ -497,23 +426,12 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		},
 		set: function (isoStr) {
 			if (!isoStr || isoStr === '') {
-				this._setHiddenRaw('');
-				_inputValueDesc.set.call(this._picker, '');
-				this.dom.value = '';
-				this._lastISO = '';
+				_clearState(this);
 				return;
 			}
 			const date = _parseISO(isoStr);
 			if (!date) return;
-			this._setHiddenRaw(isoStr);
-			_inputValueDesc.set.call(this._picker, isoStr);
-			this._displayFormatted(date);
-			this._lastISO = isoStr;
-			dispatch(this.dom, 'ln-date:change', {
-				value: isoStr,
-				formatted: this.dom.value,
-				date: date
-			});
+			_updateState(this, isoStr, date);
 		}
 	});
 
@@ -528,10 +446,7 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 				this.value = '';
 				return;
 			}
-			const y = dateObj.getFullYear();
-			const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-			const d = String(dateObj.getDate()).padStart(2, '0');
-			this.value = y + '-' + m + '-' + d;
+			this.value = _toISO(dateObj);
 		}
 	});
 
@@ -546,20 +461,17 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		this._picker.removeEventListener('change', this._onPickerChange);
 		this.dom.removeEventListener('blur', this._onBlur);
 		this._btn.removeEventListener('click', this._onBtnClick);
-		// Restore original input
-		this.dom.name = this._hidden.name;
-		this.dom.type = 'date';
 		const isoVal = this.value;
-		// Remove created elements
 		this._hidden.remove();
 		this._picker.remove();
 		this._btn.remove();
-		// Unwrap: move dom back out and drop the wrapper
 		if (this._wrapper && this._wrapper.parentNode) {
 			this._wrapper.parentNode.insertBefore(this.dom, this._wrapper);
 			this._wrapper.remove();
 		}
-		// Restore value
+		delete this.dom.value;
+		this.dom.name = this._hidden.name;
+		this.dom.type = 'date';
 		if (isoVal) this.dom.value = isoVal;
 		dispatch(this.dom, 'ln-date:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
