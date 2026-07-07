@@ -14,6 +14,7 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 	let activeTooltipNode = null;
 	let activeTrigger = null;
 	let activeStashedTitle = null;
+	let activeStashedDescribedBy = null;
 	let escListener = null;
 
 	function _ensurePortal() {
@@ -59,6 +60,14 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 			trigger.removeAttribute('title');
 		}
 
+		// Stash pre-existing aria-describedby
+		const existingDescribedBy = trigger.getAttribute('aria-describedby');
+		if (existingDescribedBy) {
+			activeStashedDescribedBy = existingDescribedBy;
+		} else {
+			activeStashedDescribedBy = null;
+		}
+
 		const node = document.createElement('div');
 		node.className = 'ln-tooltip';
 		node.textContent = text;
@@ -85,7 +94,11 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 		node.style.left = placement.left + 'px';
 		node.setAttribute('data-ln-tooltip-placement', placement.placement);
 
-		trigger.setAttribute('aria-describedby', node.id);
+		if (activeStashedDescribedBy) {
+			trigger.setAttribute('aria-describedby', activeStashedDescribedBy + ' ' + node.id);
+		} else {
+			trigger.setAttribute('aria-describedby', node.id);
+		}
 
 		activeTooltipNode = node;
 		activeTrigger = trigger;
@@ -98,7 +111,13 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 			return;
 		}
 		if (activeTrigger) {
-			activeTrigger.removeAttribute('aria-describedby');
+			if (activeStashedDescribedBy !== null) {
+				activeTrigger.setAttribute('aria-describedby', activeStashedDescribedBy);
+			} else {
+				activeTrigger.removeAttribute('aria-describedby');
+			}
+			activeStashedDescribedBy = null;
+
 			if (activeStashedTitle !== null) {
 				activeTrigger.setAttribute('title', activeStashedTitle);
 			}
@@ -124,14 +143,13 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 			this._addedEnhancedAttr = true;
 		}
 
-		const self = this;
 		this._onEnter = function () { _show(el); };
 		this._onLeave = function () {
-			if (activeTrigger === el) _hide();
+			if (activeTrigger === el && !el.contains(document.activeElement)) _hide();
 		};
 		this._onFocus = function () { _show(el); };
 		this._onBlur = function () {
-			if (activeTrigger === el) _hide();
+			if (activeTrigger === el && !el.matches(':hover')) _hide();
 		};
 
 		el.addEventListener('mouseenter', this._onEnter);
@@ -160,7 +178,7 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 	// ─── Registration ──────────────────────────────────────────
 
 	registerComponent(
-		'[' + TRIGGER_SELECTOR + '], [' + TEXT_ATTR + '][title]',
+		'[' + TRIGGER_SELECTOR + '], [data-ln-tooltip-enhanced], [' + TEXT_ATTR + '][title]',
 		DOM_ATTRIBUTE,
 		_component,
 		'ln-tooltip'
