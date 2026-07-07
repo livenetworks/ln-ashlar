@@ -22,7 +22,7 @@ The host element must be empty at init — the constructor `appendChild`s the SV
 |---|---|---|
 | `data-ln-circular-progress="N"` | host element | Current value. Creates the instance. Number; negative or above-max values are allowed — the rendered percentage clamps to 0–100, but the attribute is left as-written. Empty / non-numeric strings render as 0%. |
 | `data-ln-circular-progress-max="N"` | host element | Maximum value. Default `100`. Used as denominator in `(value / max) × 100`. `max="0"` forces 0% (avoids divide-by-zero). |
-| `data-ln-circular-progress-label="text"` | host element | Custom centre label, replaces the auto-computed percentage. Read inside `_render`, but **NOT in the MutationObserver filter** — mutating this attribute alone does not trigger a re-render. Update the label alongside a value or max write. |
+| `data-ln-circular-progress-label="text"` | host element | Custom centre label, replaces the auto-computed percentage. Fully observed and reactive — mutating this attribute alone triggers an immediate re-render and updates the centre text and `aria-valuetext`. |
 
 `data-ln-circular-progress-initialized=""` is set by the constructor and removed by `destroy()`. It is an internal marker — do not read it from project code; use `el.lnCircularProgress` instead.
 
@@ -53,20 +53,14 @@ The event fires on the initial render at construction, as well as on every subse
 
 ## Accessibility
 
-The component sets `aria-hidden="true"` on the constructed `<svg>` — screen readers skip the SVG element. The component does **not** write `role`, `aria-valuenow`, `aria-valuemin`, or `aria-valuemax` on the host. Consumer owns the accessibility tree:
+The component sets `aria-hidden="true"` on the constructed `<svg>` — screen readers skip the SVG element. The component automatically maps and synchronizes ARIA progressbar attributes on the host element (`role="progressbar"`, `aria-valuemin="0"`, `aria-valuemax`, `aria-valuenow` clamped, and `aria-valuetext`). For proper context, screen reader users should be provided with a descriptive label on the host:
 
 ```html
 <div data-ln-circular-progress="75"
-     role="progressbar"
-     aria-valuenow="75"
-     aria-valuemin="0"
-     aria-valuemax="100"
      aria-label="Upload progress"
      class="success">
 </div>
 ```
-
-Keep `aria-valuenow` in sync when writing `data-ln-circular-progress` — the component does not do this automatically.
 
 ## API
 
@@ -127,7 +121,6 @@ transition animates the arc from the previous offset to the new one.
 ## What it does NOT do
 
 - No indeterminate / spinner mode. An empty value renders 0% (empty track). For an indeterminate spinner use `@mixin loader`.
-- No automatic ARIA. Consumer adds `role="progressbar"` and keeps `aria-valuenow` in sync.
 - No debounce on rapid attribute writes — each write triggers a synchronous render and a `:change` event.
 - No `setValue()` / `setMax()` / imperative API. `el.setAttribute('data-ln-circular-progress', n)` is the canonical update path.
 

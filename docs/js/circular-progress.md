@@ -11,9 +11,9 @@ File: `js/ln-circular-progress/ln-circular-progress.js`.
 `ln-circular-progress` is a **passive renderer** in the architecture
 described in [`docs/architecture/data-flow.md`](../architecture/data-flow.md).
 It owns no data, no transport, no command surface — it derives a
-single visual (an SVG ring with a label) from two attributes
-(`data-ln-circular-progress` and `data-ln-circular-progress-max`)
-plus an optional label override. Every state change comes from
+single visual (an SVG ring with a label) from three attributes
+(`data-ln-circular-progress`, `data-ln-circular-progress-max`, and
+`data-ln-circular-progress-label`). Every state change comes from
 outside the component; every internal reaction is a re-read of the attributes.
 
 The dispatched `:change` event is non-cancelable — the rendering IS the contract; there is no default behaviour for a consumer to override.
@@ -31,7 +31,7 @@ the constructed DOM and the observer; nothing else.
 | `trackCircle` | `SVGCircleElement` | Built in `_buildSvg` | The grey background circle, stroke = `var(--color-border)` |
 | `progressCircle` | `SVGCircleElement` | Built in `_buildSvg` | The fill circle whose `stroke-dashoffset` carries the progress, stroke = `var(--color-accent)` |
 | `labelEl` | `HTMLElement` | Built in `_buildSvg` | The `<strong class="ln-circular-progress__label">` element |
-| `_attrObserver` | `MutationObserver` | Built in `_listenValues` | Watches the host's value and max attributes; fires `_render` on change |
+| `_attrObserver` | `MutationObserver` | Built in `_listenValues` | Watches the host's value, max, and label attributes; fires `_render` on change |
 
 There is no JS-side cached value property. `_render` reads the attribute fresh on every call — the DOM is the source of truth. `_buildSvg` is non-idempotent: it appends new DOM nodes each time it runs. The `registerComponent` re-init guard via `el.lnCircularProgress` prevents accidental double-build.
 
@@ -43,8 +43,8 @@ at line 132 wires the standard scaffolding:
 1. **Selector + attribute** registers the element type with ln-core's shared MutationObserver.
 2. The shared observer watches `document.body` for new `[data-ln-circular-progress]` elements and for the attribute landing on existing elements. New matches run `new _constructor(el)`.
 3. The constructor sets `this.dom = dom`, then immediately calls `_buildSvg.call(this)` to create and append the SVG and label.
-4. `_render.call(this)` runs to compute the initial arc offset from the current attribute values and dispatch the first `ln-circular-progress:change` event.
-5. `_listenValues.call(this)` registers the per-instance MutationObserver that watches the host's value and max attributes for subsequent changes.
+4. `_render.call(this)` runs to compute the initial arc offset from the current attribute values, write the initial ARIA attributes, and dispatch the first `ln-circular-progress:change` event.
+5. `_listenValues.call(this)` registers the per-instance MutationObserver that watches the host's value, max, and label attributes for subsequent changes.
 6. `dom.setAttribute('data-ln-circular-progress-initialized', '')` marks the element as initialised.
 
 The instance is returned and assigned to `el.lnCircularProgress` by `registerComponent`'s standard wiring.
@@ -81,31 +81,32 @@ Three implementation choices worth flagging:
 
 2. **`max > 0` guard.** Avoids divide-by-zero and divide-by-negative. If max is 0 or negative, percentage is forced to 0%.
 
-3. **Clamping at the percentage level, not the attribute level.** The clamp runs on the computed percentage (lines 113–114), not on the input value. The attribute is left as-written, so `e.detail.value` carries the raw value and `e.detail.percentage` carries the clamped result. Consumers detecting overshoot read `e.detail.value`; consumers reading the visible bar use `e.detail.percentage`.
+3. **Clamping at the percentage level, not the attribute level.** The clamp runs on the computed percentage, not on the input value. The attribute is left as-written, so `e.detail.value` carries the raw value and `e.detail.percentage` carries the clamped result. Consumers detecting overshoot read `e.detail.value`; consumers reading the visible bar use `e.detail.percentage`.
+
+4. **Native ARIA reflection.** The component automatically updates ARIA properties (`role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`) on the host element. `aria-valuenow` receives the safely clamped progress value, and `aria-valuetext` receives the resolved text label.
 
 ## MutationObserver — what triggers a re-render
 
 `_listenValues` registers a per-instance `MutationObserver` watching
 the host element with `attributeFilter: ['data-ln-circular-progress',
-'data-ln-circular-progress-max']` (line 102). On any mutation
-matching either name, `_render` runs.
+'data-ln-circular-progress-max', 'data-ln-circular-progress-label']`.
+On any mutation matching these names, `_render` runs.
 
-Two things NOT in the filter, deliberately:
+Only one thing is NOT in the filter, deliberately:
 
-1. **`data-ln-circular-progress-label`** — the label attribute is read inside `_render` but is not a trigger. Mutating it alone does not update the displayed label. Labels are a display concern; values and max are state. Adding the label to the filter would re-render the arc on every label write, wasted work for the common case where label is set once alongside a value.
-
-2. **`class`** — colour and size variants are class-driven. The visual change happens via plain CSS; no JS reaction is needed because nothing about the SVG geometry depends on the class.
+1. **`class`** — colour and size variants are class-driven. The visual change happens via plain CSS; no JS reaction is needed because nothing about the SVG geometry depends on the class.
 
 The observer is per-instance, which is acceptable because there is no shared state to coordinate. The shared observer in `registerComponent` watches for new elements appearing in the DOM; the per-instance observer watches an already-instantiated host for value changes. They cover different concerns.
 
 ## Cleanup
 
-`destroy()` (lines 28–41) does four things:
+`destroy()` does five things:
 
 1. Disconnects the per-instance attribute observer.
 2. Removes the SVG element from the DOM.
 3. Removes the label element from the DOM.
 4. Removes `data-ln-circular-progress-initialized` and deletes the `el.lnCircularProgress` reference.
+5. Removes the dynamically added ARIA attributes (`role`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext`) from the host element.
 
 What it does NOT do:
 
@@ -124,9 +125,9 @@ The shipped colour variants (`.success`, `.error`, `.warning`) override `stroke`
 |---|---|
 | Construction | O(1) per instance — three DOM nodes (SVG + 2 circles + 1 label), one MutationObserver. Multiple instances scale linearly. |
 | Attribute write (value or max) | O(1) — one MutationObserver fire, one `_render` call, one `stroke-dashoffset` write, one `textContent` write, one event dispatch. |
-| Attribute write (label only) | O(0) — observer does not fire; nothing happens until the next value/max write. |
+| Attribute write (label only) | O(1) — observer fires, runs `_render` and updates the text content and `aria-valuetext`. |
 | Class change | O(0) on the JS side — CSS re-matches automatically; no JS reaction. |
 | Initial render at construction | Same as a value write — one `_render` call. |
-| Destroy | O(1) — one MutationObserver disconnect, two DOM removals. |
+| Destroy | O(1) — one MutationObserver disconnect, two DOM removals, and clean up of ARIA attributes. |
 
 The component's runtime cost is dominated by the CSS transition (GPU compositing of the `stroke-dashoffset` change), not by the JS.
