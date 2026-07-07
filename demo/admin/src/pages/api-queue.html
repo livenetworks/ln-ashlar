@@ -1,0 +1,305 @@
+<!-- ln-page: title="API Queue — ln-ashlar" h1="API Queue (Offline Outbox)" -->
+
+<section class="section-card">
+	<header><h3>Overview &amp; Architecture</h3></header>
+	<main>
+		<p>The <strong>API Queue</strong> (<code>data-ln-api-queue</code>) is a connector- and id-blind offline outbox that sits between the <strong>Data Coordinator</strong> and the <strong>API Connector</strong>. It persists prepared write requests to its own IndexedDB database, replays them FIFO per record-chain with exponential backoff once connectivity returns, pauses on auth failure, and hands temp-id remapping back to the coordinator on a successful create.</p>
+
+		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
+			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
+				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+				Simulated Offline Mode
+			</h4>
+			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
+				This playground never touches real network state. "Going offline" simply toggles <code>data-ln-api-queue-online="false"</code> on the queue element, which makes its internal drain guard skip network sends — exactly the override the component supports for tests.
+			</p>
+		</div>
+	</main>
+</section>
+
+<!-- Declarative Component Markup Section with auto-code extraction -->
+<section class="section-card" data-demo-html>
+	<header><h3>Declarative 3-Tier + Queue Markup (Copy/Paste)</h3></header>
+	<main>
+		<!-- 3-Tier Data Layer + Outbox: Coordinator encloses store cache, REST connector, and offline queue -->
+		<div data-ln-data-coordinator="queue-demo" id="demo-queue-coordinator">
+
+			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
+			<div data-ln-data-store="tasks" id="demo-queue-store"></div>
+
+			<!-- Tier 2: Transport Gateway (mocked REST endpoint, see mock-api-queue.js) -->
+			<div data-ln-api-connector
+			     data-ln-api-base-url="/api"
+			     data-ln-api-path="/queue-tasks"
+			     id="demo-queue-connector"></div>
+
+			<!-- Outbox: Offline Queue (own IndexedDB DB, FIFO-per-chain + backoff) -->
+			<div data-ln-api-queue="queue-demo" id="demo-queue"></div>
+		</div>
+	</main>
+</section>
+
+<!-- Live Interactive Playground -->
+<section class="section-card">
+	<header><h3>Interactive Playground &amp; Telemetry</h3></header>
+	<main>
+		<div class="demo-grid-2">
+			<!-- Connectivity + Mock Backend Mode -->
+			<div>
+				<h4>1. Connectivity &amp; Mock Backend Mode</h4>
+				<p class="text-sm text-sunken">Toggle simulated offline mode and pick how the mocked backend responds to writes.</p>
+
+				<p style="display: flex; align-items: center; gap: var(--size-sm); margin-top: var(--size-sm);">
+					<button type="button" id="btn-toggle-offline" class="btn">Simulate Offline</button>
+					<span id="connectivity-state" class="badge">Online</span>
+				</p>
+
+				<fieldset style="margin-top: var(--size-sm); border: 1px solid var(--border-muted); border-radius: var(--radius-sm); padding: var(--size-sm);">
+					<legend>Mock backend response mode</legend>
+					<label style="display: block;"><input type="radio" name="queue-demo-mode" value="success" checked> Success (create returns real id — demonstrates remap)</label>
+					<label style="display: block;"><input type="radio" name="queue-demo-mode" value="auth"> Auth failure (401 — pauses queue)</label>
+					<label style="display: block;"><input type="radio" name="queue-demo-mode" value="server"> Server error (500 — backoff retry)</label>
+				</fieldset>
+
+				<div id="auth-banner" class="alert-box" style="display: none; margin-top: var(--size-sm); padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-error); border-radius: var(--radius-sm);">
+					<p style="margin: 0 0 var(--size-sm) 0; font-size: var(--font-size-sm);">Queue paused — authentication required (401/419 received during drain).</p>
+					<button type="button" id="btn-resume" class="btn">Resume Queue</button>
+				</div>
+			</div>
+
+			<!-- Outbox Actions + Pending Count -->
+			<div>
+				<h4>2. Outbox Actions</h4>
+				<p class="text-sm text-sunken">Dispatch the real optimistic store events. With the queue present, writes are routed through the outbox instead of hitting the connector directly.</p>
+
+				<p style="display: flex; align-items: center; gap: var(--size-sm);">
+					<span>Pending outbox entries:</span>
+					<span id="pending-count-badge" class="badge">0</span>
+				</p>
+
+				<div style="display: flex; flex-direction: column; gap: var(--size-sm); margin-top: var(--size-md);">
+					<div>
+						<h5>Create Task</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<input type="text" id="trig-create-title" placeholder="Task title" style="flex: 1;" value="Draft ISO 9001 Procedure">
+							<button type="button" id="btn-create" class="btn">Dispatch Request Event</button>
+						</div>
+					</div>
+
+					<div>
+						<h5>Update Last Task</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<input type="text" id="trig-update-title" placeholder="New title" style="flex: 1;" value="Draft ISO 9001 Procedure (revised)">
+							<button type="button" id="btn-update" class="btn">Dispatch Request Event</button>
+						</div>
+					</div>
+
+					<div>
+						<h5>Delete Last Task</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<button type="button" id="btn-delete" class="btn">Dispatch Request Event</button>
+						</div>
+					</div>
+
+					<div>
+						<h5>Manual Outbox Controls</h5>
+						<div style="display: flex; gap: var(--size-xs); margin-top: var(--size-xs);">
+							<button type="button" id="btn-drain" class="btn">Force Drain</button>
+							<button type="button" id="btn-clear" class="btn">Clear Outbox</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Telemetry Logs Console -->
+		<div style="margin-top: var(--size-lg);">
+			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--size-xs);">
+				<h4 style="margin: 0;">3. Live Event Telemetry Stream</h4>
+				<button type="button" id="btn-clear-log" class="btn" style="--size-padding: var(--size-xs) var(--size-sm); font-size: 0.8rem;">Clear Telemetry</button>
+			</div>
+			<pre id="api-event-log" style="background: var(--bg-sunken); padding: var(--size-md); border-radius: var(--radius-md); font-family: monospace; font-size: 0.85rem; height: 350px; overflow-y: auto; border: 1px solid var(--border-muted); line-height: 1.6;"></pre>
+		</div>
+	</main>
+</section>
+
+<!-- Mocked Backend Interceptor -->
+<script class="mock-related" src="dist/mock-api-queue.js" defer></script>
+
+<!-- Telemetry Event Hook + Playground Wiring -->
+<script>
+(function () {
+	const logConsole = document.getElementById('api-event-log');
+	function formatTime() {
+		const d = new Date();
+		return d.toLocaleTimeString() + '.' + String(d.getMilliseconds()).padStart(3, '0');
+	}
+
+	function writeTelemetry(direction, message, meta) {
+		const prefix = direction === 'IN' ? '📥 [EVENT IN] ' : direction === 'OUT' ? '📤 [EVENT OUT] ' : '🌐 [NETWORK]  ';
+		let line = '[' + formatTime() + '] ' + prefix + message;
+		if (meta) {
+			line += ' ' + JSON.stringify(meta);
+		}
+		const span = document.createElement('span');
+		span.textContent = line + '\n';
+		if (direction === 'IN') span.style.color = '#38bdf8'; // Blue
+		else if (direction === 'OUT') span.style.color = '#34d399'; // Green
+		else span.style.color = '#f59e0b'; // Amber
+
+		logConsole.appendChild(span);
+		logConsole.scrollTop = logConsole.scrollHeight;
+	}
+
+	document.getElementById('btn-clear-log').addEventListener('click', function () {
+		logConsole.replaceChildren();
+	});
+
+	// DOM Events Wiring and Logging
+	const coordEl = document.getElementById('demo-queue-coordinator');
+	const storeEl = document.getElementById('demo-queue-store');
+	const connectorEl = document.getElementById('demo-queue-connector');
+	const queueEl = document.getElementById('demo-queue');
+
+	let lastTaskId = null;
+
+	// ─── Telemetry: mirror all queue/store/connector events ─────────
+
+	const queueEvents = [
+		'send', 'enqueued', 'pending-count', 'auth-required', 'paused',
+		'resumed', 'failed', 'drained', 'destroyed'
+	];
+	queueEvents.forEach(function (evName) {
+		queueEl.addEventListener('ln-api-queue:' + evName, function (e) {
+			writeTelemetry('OUT', 'ln-api-queue:' + evName, e.detail);
+		});
+	});
+
+	const storeEvents = [
+		'created', 'updated', 'deleted', 'confirmed', 'reverted',
+		'request-remote-create', 'request-remote-update', 'request-remote-delete'
+	];
+	storeEvents.forEach(function (evName) {
+		storeEl.addEventListener('ln-store:' + evName, function (e) {
+			writeTelemetry('OUT', 'ln-store:' + evName, e.detail);
+		});
+	});
+
+	connectorEl.addEventListener('ln-api-connector:error', function (e) {
+		writeTelemetry('OUT', 'ln-api-connector:error', e.detail);
+	});
+
+	// ─── Pending Count Badge ──────────────────────────────────────
+
+	const pendingBadge = document.getElementById('pending-count-badge');
+	queueEl.addEventListener('ln-api-queue:pending-count', function (e) {
+		pendingBadge.textContent = String(e.detail.count);
+	});
+
+	// ─── Auth Banner ──────────────────────────────────────────────
+
+	const authBanner = document.getElementById('auth-banner');
+	queueEl.addEventListener('ln-api-queue:auth-required', function () {
+		authBanner.style.display = 'block';
+	});
+	queueEl.addEventListener('ln-api-queue:resumed', function () {
+		authBanner.style.display = 'none';
+	});
+	document.getElementById('btn-resume').addEventListener('click', function () {
+		writeTelemetry('IN', 'ln-api-queue:request-resume', {});
+		queueEl.dispatchEvent(new CustomEvent('ln-api-queue:request-resume', { detail: {} }));
+	});
+
+	// ─── Track last created/confirmed task id ────────────────────
+
+	storeEl.addEventListener('ln-store:created', function (e) {
+		lastTaskId = e.detail.tempId;
+	});
+	storeEl.addEventListener('ln-store:confirmed', function (e) {
+		if (e.detail.action === 'create' && e.detail.record) {
+			lastTaskId = e.detail.record.id;
+		}
+		if (e.detail.action === 'delete') {
+			lastTaskId = null;
+		}
+	});
+
+	// ─── Offline Toggle (data-ln-api-queue-online) ───────────────
+
+	const btnToggleOffline = document.getElementById('btn-toggle-offline');
+	const connectivityState = document.getElementById('connectivity-state');
+	let simulatedOffline = false;
+
+	btnToggleOffline.addEventListener('click', function () {
+		simulatedOffline = !simulatedOffline;
+		if (simulatedOffline) {
+			queueEl.setAttribute('data-ln-api-queue-online', 'false');
+			connectivityState.textContent = 'Offline (simulated)';
+			btnToggleOffline.textContent = 'Simulate Online';
+			writeTelemetry('IN', 'Simulating offline: data-ln-api-queue-online="false"');
+		} else {
+			queueEl.setAttribute('data-ln-api-queue-online', 'true');
+			connectivityState.textContent = 'Online';
+			btnToggleOffline.textContent = 'Simulate Offline';
+			writeTelemetry('IN', 'Simulating online: data-ln-api-queue-online="true"');
+		}
+	});
+
+	// ─── Mock Backend Mode Radios ─────────────────────────────────
+
+	document.querySelectorAll('input[name="queue-demo-mode"]').forEach(function (radio) {
+		radio.addEventListener('change', function () {
+			if (radio.checked) {
+				window.__queueDemoMode = radio.value;
+				writeTelemetry('IN', 'Mock backend mode set to: ' + radio.value);
+			}
+		});
+	});
+	window.__queueDemoMode = 'success';
+
+	// ─── CRUD Buttons (dispatch on the store — the real optimistic path) ──
+
+	document.getElementById('btn-create').addEventListener('click', function () {
+		const title = document.getElementById('trig-create-title').value;
+		const detail = { data: { title: title, status: 'Draft' } };
+		writeTelemetry('IN', 'ln-store:request-create', detail);
+		storeEl.dispatchEvent(new CustomEvent('ln-store:request-create', { detail: detail }));
+	});
+
+	document.getElementById('btn-update').addEventListener('click', function () {
+		if (lastTaskId === null) {
+			writeTelemetry('IN', 'No task created yet — create one first.');
+			return;
+		}
+		const title = document.getElementById('trig-update-title').value;
+		const detail = { id: lastTaskId, data: { title: title } };
+		writeTelemetry('IN', 'ln-store:request-update', detail);
+		storeEl.dispatchEvent(new CustomEvent('ln-store:request-update', { detail: detail }));
+	});
+
+	document.getElementById('btn-delete').addEventListener('click', function () {
+		if (lastTaskId === null) {
+			writeTelemetry('IN', 'No task created yet — create one first.');
+			return;
+		}
+		const detail = { id: lastTaskId };
+		writeTelemetry('IN', 'ln-store:request-delete', detail);
+		storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', { detail: detail }));
+	});
+
+	// ─── Manual Outbox Controls ────────────────────────────────────
+
+	document.getElementById('btn-drain').addEventListener('click', function () {
+		writeTelemetry('IN', 'ln-api-queue:request-drain', {});
+		queueEl.dispatchEvent(new CustomEvent('ln-api-queue:request-drain', { detail: {} }));
+	});
+
+	document.getElementById('btn-clear').addEventListener('click', function () {
+		writeTelemetry('IN', 'ln-api-queue:request-clear', {});
+		queueEl.dispatchEvent(new CustomEvent('ln-api-queue:request-clear', { detail: {} }));
+	});
+
+	// Log initial load
+	writeTelemetry('NET', 'Component loaded. Coordinator/Store/Connector/Queue registered.');
+})();
+</script>
