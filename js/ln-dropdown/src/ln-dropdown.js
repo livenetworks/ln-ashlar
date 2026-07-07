@@ -39,7 +39,7 @@ import { dispatch, computePlacement, teleportToBody, measureHidden, registerComp
 		const self = this;
 
 		this._onToggleOpen = function (e) {
-			if (e.detail.target !== self.toggleEl) return;
+			if (!e.detail || e.detail.target !== self.toggleEl) return;
 			if (self.triggerBtn) self.triggerBtn.setAttribute('aria-expanded', 'true');
 			self._teleportRestore = teleportToBody(self.toggleEl);
 			self.toggleEl.style.position = 'fixed';
@@ -52,7 +52,7 @@ import { dispatch, computePlacement, teleportToBody, measureHidden, registerComp
 		};
 
 		this._onToggleClose = function (e) {
-			if (e.detail.target !== self.toggleEl) return;
+			if (!e.detail || e.detail.target !== self.toggleEl) return;
 			if (self.triggerBtn) self.triggerBtn.setAttribute('aria-expanded', 'false');
 			self._removeOutsideClickListener();
 			self._removeScrollRepositionListener();

@@ -362,12 +362,12 @@ instance.destroy();
 sequenceDiagram
     autonumber
     actor Корисник
-    participant Trigger as Активатор [data-ln-toggle-for]
-    participant Toggle as Мени [data-ln-toggle]
-    participant Coordinator as Координатор [data-ln-dropdown]
+    participant Trigger as "Активатор [data-ln-toggle-for]"
+    participant Toggle as "Мени [data-ln-toggle]"
+    participant Coordinator as "Координатор [data-ln-dropdown]"
     participant Body as document.body
     
-    Note over Coordinator: При иницијализација поставува role="menu",<br/>role="menuitem" на децата и aria-haspopup="menu"
+    Note over Coordinator: При иницијализација поставува role="menu", role="menuitem" на децата и aria-haspopup="menu"
     
     Корисник->>Trigger: Клик на активатор
     Trigger->>Toggle: Го отвора менито (data-ln-toggle="open")
