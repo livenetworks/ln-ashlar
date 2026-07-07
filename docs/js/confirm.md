@@ -43,6 +43,11 @@ attributes — it does not import or reference them in code:
   `@mixin confirm-tooltip` is a thin wrapper that adds positioning and
   the `attr(data-tooltip-text)` content read.
 
+### UI/UX Restriction: Single-Element Actions Only
+
+`ln-confirm` is strictly reserved for single-element, low-impact actions (e.g., deleting a single table row, archiving a single document). It must never be used for bulk actions (e.g., bulk deleting selected tenants, batch status updates) or high-impact/destructive operations. For bulk or high-risk operations, a proper confirmation modal (`ln-modal`) must be used instead, clearly listing the affected resources and offering explicit "Confirm" and "Cancel" buttons.
+
+
 ## State
 
 Each `[data-ln-confirm]` button gets a `_component` instance stored at
@@ -80,7 +85,21 @@ on first click. This handles the common case where an icon is
 async-rendered into the button after construction (e.g., a Lit/Vue
 slot that fills late, or `ln-icons` finishing its sprite injection).
 
+## Two-Element Mode vs. Legacy Mode
+
+`ln-confirm` supports two modes of operation, determined at construction time:
+
+1. **Two-Element Mode (Recommended):**
+   This mode is triggered if the component detects child elements matching `[data-ln-confirm-idle]` and `[data-ln-confirm-active]` inside the button. 
+   - Instead of mutating the DOM (which wipes out inner SVGs or selection count spans), the component simply toggles the `hidden` attribute on the idle and active child elements.
+   - All text and markup live natively in the HTML, complying with the "Zero Display Text in JS" doctrine.
+   - Visual styling of the active state is handled entirely via CSS using the `[data-confirming="true"]` hook.
+
+2. **Legacy Mode (Fallback):**
+   If no child elements are found, the component falls back to the original in-place text-replacement (where `textContent` is overridden with `confirmText` and restored on reset) or icon-only tooltip morphing mode. This ensures 100% backward compatibility for simpler buttons.
+
 ## Two-click flow — the canonical sequence
+
 
 The component intercepts every click on its button. The `_onClick`
 handler branches on `this.confirming`:

@@ -30,20 +30,41 @@ On click, the text replaces with the confirmation prompt in-place, and the butto
 </button>
 ```
 
-On click, the trash icon swaps to `#ln-check`, a tooltip bubble is displayed above, and the prompt is announced for screen-readers.
+### Two-Element Mode (Recommended for rich content)
+
+```html
+<button class="btn btn-danger" data-ln-confirm>
+  <!-- Idle state -->
+  <span data-ln-confirm-idle>
+    <svg class="ln-icon"><use href="#ln-trash"></use></svg>
+    Delete Selected (<span data-ln-table-selected></span>)
+  </span>
+  <!-- Active (Confirming) state -->
+  <span data-ln-confirm-active hidden>
+    Are you sure?
+  </span>
+</button>
+```
+
+On click, the idle content hides and the active content unhides, without mutating or destroying the button's internal DOM nodes (such as the icon or selection span).
 
 ---
 
 ## 🛠️ Declarative API Contract
 
+
 ### HTML Attributes
 
 | Attribute | Elements | Description |
 | :--- | :--- | :--- |
-| `data-ln-confirm="Prompt"` | `<button>`, `<a>` | Action gate marker. Empty value defaults to `"Confirm?"`. |
+| `data-ln-confirm="Prompt"` | `<button>`, `<a>` | Action gate marker. Empty value defaults to `"Confirm?"` (in legacy mode). If using Two-Element Mode, this value is left blank. |
 | `data-ln-confirm-timeout="3"` | `<button>`, `<a>` | Auto-revert delay in seconds (default `3`). |
 | `data-confirming="true"` | `<button>` (auto) | Managed state. Set during active confirmation; acts as public CSS hook. |
-| `data-tooltip-text="Prompt"` | `<button>` (auto) | Managed state. Displays tooltip bubble in icon-only mode. |
+| `data-tooltip-text="Prompt"` | `<button>` (auto) | Managed state. Displays tooltip bubble in legacy icon-only mode. |
+| `data-ln-confirm-idle` | Any child | Defines the idle state layout/content (button icon/text) in Two-Element Mode. |
+| `data-ln-confirm-active` | Any child | Defines the confirmation prompt content in Two-Element Mode. |
+
+---
 
 ### JS API
 
@@ -84,3 +105,4 @@ button.lnConfirm.destroy();
   ```
 - **GET Request Navigation (`<a>`):** While the script works on links, performing destructive actions via HTTP GET is a security risk (crawlers and pre-fetchers can trigger deletes). Always use `<form method="POST">` with submit buttons instead.
 - **Attachment Order:** `ln-confirm` intercepts first clicks via `stopImmediatePropagation()`. If custom click handlers are bound *before* the bundle loads, they will run on the first click anyway. Ensure scripts are defer-loaded.
+- **Bulk Actions & High-Impact Operations:** `ln-confirm` is strictly designed for **single-element, low-impact actions** (e.g. deleting a single table row). Using it for bulk operations (e.g., "Delete selected users") is an anti-pattern. High-impact operations must always use a proper confirmation modal (`ln-modal`) to list affected resources and provide explicit "Confirm" and "Cancel" buttons.

@@ -44,7 +44,27 @@
 </head>
 <body>
 	<!-- Toast container -->
-	<ul data-ln-toast></ul>
+	<ul data-ln-toast>
+		<template data-ln-template="ln-toast-item">
+		<li data-ln-toast-item data-ln-attr="class:type">
+			<div class="icon">
+				<ul>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+				</ul>
+			</div>
+			<section class="content">
+				<header>
+					<strong class="title" data-ln-field="title"></strong>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</header>
+				<main class="body" data-ln-field="message"></main>
+			</section>
+		</li>
+		</template>
+	</ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
@@ -160,6 +180,7 @@
 						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
 						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
 						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="api-queue.html"><span class="nav-label">API Queue</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
 						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
 						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
@@ -280,6 +301,40 @@
 						</main>
 						<script type="text/plain" data-demo-scss>
 // Gated buttons have data-ln-confirm:
+button[data-ln-confirm] {
+    transition: all var(--transition-base);
+}
+						</script>
+					</section>
+
+					<!-- Two-Element Example -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Two-Element Mode (Recommended)</h3></header>
+						<main>
+							<p>Two-element mode isolates the idle content (text, icons, selection counters) from the confirm state content, ensuring no DOM elements are destroyed on first click. Defining both states in the HTML also ensures 100% translatable text with no JS hardcoding.</p>
+							<div class="demo-actions">
+								<button class="btn btn-danger" data-ln-confirm>
+									<span data-ln-confirm-idle>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+										Delete selected (<span style="color: var(--color-on-error); font-weight: bold;">3</span>)
+									</span>
+									<span data-ln-confirm-active hidden>
+										Are you sure?
+									</span>
+								</button>
+								<button class="btn btn-secondary" data-ln-confirm data-ln-confirm-timeout="5">
+									<span data-ln-confirm-idle>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg>
+										Reset defaults
+									</span>
+									<span data-ln-confirm-active hidden>
+										Reset settings?
+									</span>
+								</button>
+							</div>
+						</main>
+						<script type="text/plain" data-demo-scss>
+// Two-element mode supports complex layout:
 button[data-ln-confirm] {
     transition: all var(--transition-base);
 }
