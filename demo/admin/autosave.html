@@ -44,7 +44,27 @@
 </head>
 <body>
 	<!-- Toast container -->
-	<ul data-ln-toast></ul>
+	<ul data-ln-toast>
+		<template data-ln-template="ln-toast-item">
+		<li data-ln-toast-item data-ln-attr="class:type">
+			<div class="icon">
+				<ul>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+				</ul>
+			</div>
+			<section class="content">
+				<header>
+					<strong class="title" data-ln-field="title"></strong>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</header>
+				<main class="body" data-ln-field="message"></main>
+			</section>
+		</li>
+		</template>
+	</ul>
 
 	<div class="app-wrapper">
 		<!-- Header -->
@@ -160,6 +180,7 @@
 						<li><a href="coordinator.html"><span class="nav-label">Data Coordinator</span></a></li>
 						<li><a href="api-connector.html"><span class="nav-label">API Connector</span></a></li>
 						<li><a href="couchdb-connector.html"><span class="nav-label">CouchDB Connector</span></a></li>
+						<li><a href="api-queue.html"><span class="nav-label">API Queue</span></a></li>
 						<li><a href="table.html"><span class="nav-label">Table</span></a></li>
 						<li><a href="table-filter.html"><span class="nav-label">Table — Filtering</span></a></li>
 						<li><a href="table-sync.html"><span class="nav-label">Table — Data Sync</span></a></li>
@@ -255,6 +276,7 @@
 									<tr><td><code>data-ln-autosave</code></td><td><code>&lt;form&gt;</code></td><td>Marks the form as autosaved. Empty value uses <code>form.id</code> as the storage identifier; non-empty value uses the attribute value instead. If neither resolves, the constructor logs a warning and exits.</td></tr>
 									<tr><td><code>data-ln-autosave-clear</code></td><td>any descendant button</td><td>Click delegate marker. Removes the localStorage entry on click. Does NOT reset form values. Typical use: a "Cancel" button that closes a modal AND discards the draft (combine with <code>data-ln-modal-close</code>).</td></tr>
 									<tr><td><code>data-ln-autosave-debounce-input</code></td><td><code>&lt;form&gt;</code></td><td>Opt-in. Attaches a debounced <code>input</code> listener. Value is milliseconds (e.g. <code>"500"</code>); empty attribute defaults to 1000 ms. Useful for compose-style textareas where the user never blurs.</td></tr>
+									<tr><td><code>data-ln-autosave-exclude</code></td><td>input / select / textarea</td><td>Opt-out. Excludes the individual input element from serialization and storage (used for sensitive fields like passwords, credit cards, national IDs).</td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -279,6 +301,10 @@
 								<div class="form-element">
 									<label for="as-phone">Phone</label>
 									<input type="tel" id="as-phone" name="phone" placeholder="+1 555 ...">
+								</div>
+								<div class="form-element">
+									<label for="as-sensitive">Sensitive Field (PIN / Credit Card)</label>
+									<input type="password" id="as-sensitive" name="sensitive" placeholder="••••••••" data-ln-autosave-exclude>
 								</div>
 								<div class="form-element">
 									<label for="as-country">Country</label>

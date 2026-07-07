@@ -344,6 +344,7 @@ export function isVisible(el) {
 
 export function serializeForm(form, opts) {
 	const typed = !!(opts && opts.typed);
+	const exclude = opts && opts.exclude;
 	const data = {};
 	const elements = form.elements;
 
@@ -362,6 +363,7 @@ export function serializeForm(form, opts) {
 	for (let i = 0; i < elements.length; i++) {
 		const el = elements[i];
 		if (!el.name || el.disabled || el.type === 'file' || el.type === 'submit' || el.type === 'button') continue;
+		if (exclude && el.matches && el.matches(exclude)) continue;
 
 		if (el.type === 'checkbox') {
 			if (typed && checkboxCounts[el.name] === 1) {
@@ -669,10 +671,45 @@ export function getDataMapper(name) {
 	return _dataMappers[name] || { ingress: r => r, egress: r => r };
 }
 
+// ─── Locale Fallback Registry ───────────────────────────────
+const _localeFallbacks = {};
+
+export function registerLocaleFallback(langPrefix, dictionary) {
+	if (!langPrefix || typeof dictionary !== 'object') return;
+	const prefix = langPrefix.toLowerCase().split('-')[0];
+	_localeFallbacks[prefix] = dictionary;
+}
+
+export function getLocaleFallback(lang) {
+	if (!lang) return null;
+	const prefix = lang.toLowerCase().split('-')[0];
+	return _localeFallbacks[prefix] || null;
+}
+
+// Default Macedonian locale fallback registration
+registerLocaleFallback('mk', {
+	monthsLong: [
+		'јануари', 'февруари', 'март', 'април', 'мај', 'јуни',
+		'јули', 'август', 'септември', 'октомври', 'ноември', 'декември'
+	],
+	monthsShort: [
+		'јан', 'фев', 'мар', 'апр', 'мај', 'јун',
+		'јул', 'авг', 'септ', 'окт', 'ноем', 'дек'
+	],
+	daysLong: [
+		'недела', 'понеделник', 'вторник', 'среда', 'четврток', 'петок', 'сабота'
+	],
+	daysShort: [
+		'нед', 'пон', 'вт', 'ср', 'чет', 'пет', 'саб'
+	]
+});
+
 if (typeof window !== 'undefined') {
 	window.lnCore = window.lnCore || {};
 	window.lnCore.registerDataMapper = registerDataMapper;
 	window.lnCore.getDataMapper = getDataMapper;
+	window.lnCore.registerLocaleFallback = registerLocaleFallback;
+	window.lnCore.getLocaleFallback = getLocaleFallback;
 	window.lnCore.fillTemplate = fillTemplate;
 	window.lnCore.fill = fill;
 	window.lnCore.lnFill = lnFill;

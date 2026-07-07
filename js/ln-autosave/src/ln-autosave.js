@@ -26,7 +26,7 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 
 		// Closure-scoped helpers (NOT on prototype — internal only)
 		function _save() {
-			const data = serializeForm(form);
+			const data = serializeForm(form, { exclude: '[data-ln-autosave-exclude]' });
 			try { localStorage.setItem(key, JSON.stringify(data)); }
 			catch (e) { return; }
 			dispatch(form, 'ln-autosave:saved', { target: form, data: data });
@@ -56,12 +56,12 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 		// Listener handlers (held on `this` for symmetric removal in destroy)
 		this._onFocusout = function (e) {
 			const el = e.target;
-			if (_isFormField(el) && el.name) _save();
+			if (_isFormField(el) && el.name && !el.hasAttribute('data-ln-autosave-exclude')) _save();
 		};
 
 		this._onChange = function (e) {
 			const el = e.target;
-			if (_isFormField(el) && el.name) _save();
+			if (_isFormField(el) && el.name && !el.hasAttribute('data-ln-autosave-exclude')) _save();
 		};
 
 		this._onSubmit = function () { _clear(); };
@@ -84,7 +84,7 @@ import { dispatch, dispatchCancelable, serializeForm, populateForm, registerComp
 		if (debounceMs > 0) {
 			this._onInput = function (e) {
 				const el = e.target;
-				if (!_isFormField(el) || !el.name) return;
+				if (!_isFormField(el) || !el.name || el.hasAttribute('data-ln-autosave-exclude')) return;
 				if (inputTimer !== null) clearTimeout(inputTimer);
 				inputTimer = setTimeout(_save, debounceMs);
 			};
