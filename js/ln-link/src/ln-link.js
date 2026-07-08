@@ -66,9 +66,11 @@ import { dispatchCancelable, guardBody } from '../../ln-core';
 
 	function _initRow(row) {
 		if (row[DOM_ATTRIBUTE + 'Row']) return;
-		row[DOM_ATTRIBUTE + 'Row'] = true;
 
-		if (!row.querySelector('a')) return;
+		const link = row.querySelector('a');
+		if (!link) return;
+
+		row[DOM_ATTRIBUTE + 'Row'] = true;
 
 		row._lnLinkClick = function (e) {
 			_handleClick(row, e);
@@ -151,14 +153,28 @@ import { dispatchCancelable, guardBody } from '../../ln-core';
 							if (node.nodeType === 1) {
 								findElements(node);
 
-								if (node.tagName === 'TR') {
-									const parent = node.closest('[' + DOM_SELECTOR + ']');
-									if (parent) _initRow(node);
+								const parent = node.closest('[' + DOM_SELECTOR + ']');
+								if (parent) {
+									if (node.tagName === 'TR') {
+										_initRow(node);
+									} else {
+										const tag = parent.tagName;
+										if (tag === 'TABLE' || tag === 'TBODY') {
+											const rows = node.querySelectorAll ? node.querySelectorAll('tr') : [];
+											for (const r of rows) {
+												_initRow(r);
+											}
+										}
+									}
 								}
 							}
 						}
 					} else if (mutation.type === 'attributes') {
-						findElements(mutation.target);
+						if (mutation.target.hasAttribute && mutation.target.hasAttribute(DOM_SELECTOR)) {
+							findElements(mutation.target);
+						} else {
+							_destroyContainer(mutation.target);
+						}
 					}
 				}
 			});
