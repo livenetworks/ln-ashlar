@@ -1,30 +1,13 @@
 /* Live Networks — ln-toast (side-accent with icons) */
 import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
-import DEFAULT_TEMPLATE_HTML from '../template.html?raw';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-toast";
 	const DOM_ATTRIBUTE = "lnToast";
 	const TEMPLATE_NAME = "ln-toast-item";
 
-	const TYPE_ICON = { success: 'circle-check', error: 'circle-x', warn: 'alert-triangle', info: 'info-circle' };
-
-	const STATUS_CLASS = { success: 'success', error: 'error', warn: 'warning', info: 'info' };
-
-	const DEFAULT_TITLES = { success: 'Success', error: 'Error', warn: 'Warning', info: 'Information' };
-
 	if (window.__lnToastLoaded) return;
 	window.__lnToastLoaded = true;
-
-	function _ensureTemplate() {
-		if (document.querySelector('[data-ln-template="ln-toast-item"]')) return;
-		if (!document.body) return;
-		const tmpl = document.createElement('template');
-		// Trust boundary: DEFAULT_TEMPLATE_HTML is a hardcoded library constant resolved at build time via ?raw import.
-		tmpl.setAttribute('data-ln-template', 'ln-toast-item');
-		tmpl.innerHTML = DEFAULT_TEMPLATE_HTML;
-		document.body.appendChild(tmpl);
-	}
 
 	function _findContainers(root) {
 		if (!root || root.nodeType !== 1) return;
@@ -41,72 +24,72 @@ import DEFAULT_TEMPLATE_HTML from '../template.html?raw';
 		this.timeoutDefault = parseInt(dom.getAttribute("data-ln-toast-timeout") || "6000", 10);
 		this.max = parseInt(dom.getAttribute("data-ln-toast-max") || "5", 10);
 
-		for (const li of Array.from(dom.querySelectorAll("[data-ln-toast-item]"))) {
-			_hydrateLI(li, dom);
-		}
+		const items = Array.from(dom.querySelectorAll("[data-ln-toast-item]"));
+		while (items.length > this.max) dom.removeChild(items.shift());
+		for (const li of items) _hydrateLI(li, this);
+
 		return this;
 	}
 
 	_Component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		for (const li of Array.from(this.dom.children)) {
+		for (const li of Array.from(this.dom.querySelectorAll("[data-ln-toast-item]"))) {
 			_dismiss(li);
 		}
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
 	function _buildItem(opts, container) {
-		const type = ((opts.type || "info") + "").toLowerCase();
+		const type = ((opts.type || "") + "").trim().toLowerCase();
 		const fragment = cloneTemplateScoped(container, TEMPLATE_NAME, 'ln-toast');
 		if (!fragment) {
 			console.warn('[ln-toast] Template "' + TEMPLATE_NAME + '" not found');
 			return null;
 		}
+
+		// fill() runs on the DocumentFragment, BEFORE extracting the <li>.
+		// data-ln-attr="class:type" sits on the template root <li>; fill()'s
+		// querySelectorAll never matches its own root, and here the fragment is
+		// the root, so the <li> (its child) is a matched descendant and gets
+		// class="{type}". title/message data-ln-field targets are descendants
+		// too, so one call resolves all three. See plan Finding: fill-on-fragment.
+		fill(fragment, {
+			type: type,
+			title: opts.title,
+			message: typeof opts.message === 'string' ? opts.message : undefined
+		});
+
 		const li = fragment.firstElementChild;
 		if (!li) return null;
 
-		const hasBody = !!(opts.message || (opts.data && opts.data.errors));
+		// Items are addressed by [data-ln-toast-item] everywhere (eviction / clear / destroy / hydration) — stamp it if the consumer template omitted it.
+		if (!li.hasAttribute('data-ln-toast-item')) li.setAttribute('data-ln-toast-item', '');
 
-		fill(li, {
-			title: opts.title || DEFAULT_TITLES[type] || DEFAULT_TITLES.info,
-			role: type === 'error' ? 'alert' : 'status',
-			ariaLive: type === 'error' ? 'assertive' : 'polite',
-			hasBody: hasBody
-		});
+		// ORDERING: classList.add MUST follow fill(). fill set class via
+		// setAttribute('class', type), which clobbers the whole attribute — a
+		// pre-added .ln-enter would be wiped. Add the transient enter flag now.
+		li.classList.add('ln-enter');
 
-		const card = li.querySelector('.ln-toast__card');
-		if (card) card.classList.add(STATUS_CLASS[type] || 'info');
+		const bodyEl = li.querySelector('.body');
+		if (bodyEl) _renderBody(bodyEl, opts);
 
-		const side = li.querySelector('.ln-toast__side');
-		if (side) {
-			const useEl = side.querySelector('use');
-			if (useEl) useEl.setAttribute('href', '#ln-' + (TYPE_ICON[type] || TYPE_ICON.info));
-		}
-
-		const bodyEl = li.querySelector('.ln-toast__body');
-		if (bodyEl && hasBody) _renderBody(bodyEl, opts);
-
-		const closeBtn = li.querySelector('.ln-toast__close');
+		const closeBtn = li.querySelector('[data-ln-toast-close]');
 		if (closeBtn) closeBtn.addEventListener('click', function () { _dismiss(li); });
 
 		return li;
 	}
 
+	// Runtime DATA rendering only (arrays / error maps) — plain string
+	// messages are already handled by fill()'s data-ln-field above.
 	function _renderBody(bodyEl, opts) {
-		if (opts.message) {
-			if (Array.isArray(opts.message)) {
-				const ul = document.createElement("ul");
-				for (const msg of opts.message) {
-					const lie = document.createElement("li");
-					lie.textContent = msg;
-					ul.appendChild(lie);
-				}
-				bodyEl.appendChild(ul);
-			} else {
-				const p = document.createElement("p");
-				p.textContent = opts.message;
-				bodyEl.appendChild(p);
+		if (Array.isArray(opts.message)) {
+			const ul = document.createElement("ul");
+			for (const msg of opts.message) {
+				const lie = document.createElement("li");
+				lie.textContent = msg;
+				ul.appendChild(lie);
 			}
+			bodyEl.appendChild(ul);
 		}
 		if (opts.data && opts.data.errors) {
 			const ul = document.createElement("ul");
@@ -120,16 +103,18 @@ import DEFAULT_TEMPLATE_HTML from '../template.html?raw';
 	}
 
 	function _append(cmp, li) {
-		while (cmp.dom.children.length >= cmp.max) cmp.dom.removeChild(cmp.dom.firstElementChild);
+		// Evict by [data-ln-toast-item] — raw children include the nested <template> (recommended placement).
+		const items = Array.from(cmp.dom.querySelectorAll("[data-ln-toast-item]"));
+		while (items.length >= cmp.max && items.length > 0) cmp.dom.removeChild(items.shift());
 		cmp.dom.appendChild(li);
-		requestAnimationFrame(() => li.classList.add("ln-toast__item--in"));
+		requestAnimationFrame(() => li.classList.remove("ln-enter"));
 	}
 
 	function _dismiss(li) {
 		if (!li || !li.parentNode) return;
 		clearTimeout(li._timer);
-		li.classList.remove("ln-toast__item--in");
-		li.classList.add("ln-toast__item--out");
+		li.classList.remove("ln-enter");
+		li.classList.add("ln-out");
 		setTimeout(() => { li.parentNode && li.parentNode.removeChild(li); }, 200);
 	}
 
@@ -142,21 +127,17 @@ import DEFAULT_TEMPLATE_HTML from '../template.html?raw';
 		return container || null;
 	}
 
-	function _hydrateLI(li, container) {
-		const type = ((li.getAttribute("data-type") || "info") + "").toLowerCase();
-		const titleA = li.getAttribute("data-title");
-		const msgText = (li.innerText || li.textContent || "").trim();
+	function _hydrateLI(li, cmp) {
+		if (li._lnToastHydrated) return;
+		li._lnToastHydrated = true;
 
-		const built = _buildItem({
-			type: type,
-			title: titleA,
-			message: msgText || undefined
-		}, container);
+		const closeBtn = li.querySelector('[data-ln-toast-close]');
+		if (closeBtn) closeBtn.addEventListener('click', function () { _dismiss(li); });
 
-		if (!built) return;
-
-		li.parentNode && li.parentNode.replaceChild(built, li);
-		requestAnimationFrame(() => built.classList.add("ln-toast__item--in"));
+		const raw = li.getAttribute('data-ln-toast-timeout');
+		const parsed = raw !== null ? parseInt(raw, 10) : NaN;
+		const timeout = Number.isFinite(parsed) ? parsed : cmp.timeoutDefault;
+		if (timeout > 0) li._timer = setTimeout(function () { _dismiss(li); }, timeout);
 	}
 
 	function _onEnqueue(e) {
@@ -179,19 +160,17 @@ import DEFAULT_TEMPLATE_HTML from '../template.html?raw';
 		if (detail.container) {
 			const el = _resolveContainer(detail);
 			if (el) {
-				for (const child of Array.from(el.children)) _dismiss(child);
+				for (const child of Array.from(el.querySelectorAll("[data-ln-toast-item]"))) _dismiss(child);
 			}
 		} else {
 			const containers = document.querySelectorAll("[" + DOM_SELECTOR + "]");
 			for (const el of Array.from(containers)) {
-				for (const child of Array.from(el.children)) _dismiss(child);
+				for (const child of Array.from(el.querySelectorAll("[data-ln-toast-item]"))) _dismiss(child);
 			}
 		}
 	}
 
 	guardBody(function () {
-		_ensureTemplate();
-
 		window.addEventListener('ln-toast:enqueue', _onEnqueue);
 		window.addEventListener('ln-toast:clear', _onClear);
 
