@@ -234,24 +234,37 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				});
 			};
 			dom.addEventListener('ln-search:change', this._onSearch);
+		}
 
-			this._onClear = function (e) {
-				const btn = e.target.closest('[data-ln-list-clear]');
-				if (!btn) return;
+		this._onClear = function (e) {
+			const btn = e.target.closest('[data-ln-list-clear]');
+			if (!btn) return;
 
-				const before = dispatchCancelable(dom, 'ln-list:before-clear-search', { list: self.name });
-				if (before.defaultPrevented) return;
+			const before = dispatchCancelable(dom, 'ln-list:before-clear-search', { list: self.name });
+			if (before.defaultPrevented) return;
 
+			if (self.isDataDriven) {
+				self.currentSearch = '';
+			} else {
 				self._searchTerm = '';
-				const searchEl = document.querySelector('[data-ln-search="' + dom.id + '"]');
-				if (searchEl) {
-					const input = searchEl.tagName === 'INPUT' ? searchEl : searchEl.querySelector('input');
-					if (input) {
-						input.value = '';
-						input.dispatchEvent(new Event('input', { bubbles: true }));
-					}
-				}
+			}
 
+			const searchEl = document.querySelector('[data-ln-search="' + dom.id + '"]');
+			if (searchEl) {
+				const input = searchEl.tagName === 'INPUT' ? searchEl : searchEl.querySelector('input');
+				if (input) {
+					input.value = '';
+					input.dispatchEvent(new Event('input', { bubbles: true }));
+				}
+			}
+
+			if (self.isDataDriven) {
+				dispatch(dom, 'ln-list:search', {
+					list: self.name,
+					query: ''
+				});
+				self._requestData();
+			} else {
 				self._applyFilterAndSort();
 				self._vStart = -1;
 				self._vEnd = -1;
@@ -261,9 +274,9 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 					matched: self._filteredData.length,
 					total: self._data.length
 				});
-			};
-			dom.addEventListener('click', this._onClear);
-		}
+			}
+		};
+		dom.addEventListener('click', this._onClear);
 
 		return this;
 	}
@@ -832,6 +845,9 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				this._emptyObserver = null;
 			}
 			this.dom.removeEventListener('ln-search:change', this._onSearch);
+		}
+
+		if (this._onClear) {
 			this.dom.removeEventListener('click', this._onClear);
 		}
 
