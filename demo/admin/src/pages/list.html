@@ -192,14 +192,20 @@
 
 							<!-- Empty States -->
 							<template data-ln-template="hybrid-docs-empty">
-								<li class="demo-list-empty">No documents available.</li>
+								<div data-ln-empty-state="no-data">
+									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-folder"></use></svg>
+									<h3>No documents yet</h3>
+									<p>Sync background data or add your first file.</p>
+								</div>
 							</template>
 
 							<template data-ln-template="hybrid-docs-empty-filtered">
-								<li class="demo-list-empty">
-									No matching documents found.
-									<button type="button" data-ln-list-clear class="btn btn--sm" style="margin-left: 8px; padding: 2px 8px; font-size: 0.85em;">Clear Search</button>
-								</li>
+								<div data-ln-empty-state="no-results">
+									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+									<h3>No matches found</h3>
+									<p>Try a different search query or clear your filters.</p>
+									<button type="button" data-ln-list-clear class="btn">Clear Search</button>
+								</div>
 							</template>
 						</main>
 					</section>
