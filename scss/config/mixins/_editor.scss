@@ -15,7 +15,7 @@
 //
 // Structure:
 //   [data-ln-editor]
-//     > nav                    toolbar
+//     > [role="toolbar"]       toolbar (authored container)
 //       > ul > li > button     formatting actions (grouped)
 //     > .ln-editor__surface    contentEditable div (JS-created)
 //     > textarea               hidden source (form submission)
@@ -28,7 +28,7 @@
 	background: var(--color-bg);
 
 	// ─── Toolbar ───────────────────────────────────────────────
-	> nav {
+	> [role="toolbar"] {
 		@include flex;
 		@include flex-wrap;
 		@include items-center;
