@@ -3607,20 +3607,23 @@ H(Nt, ie, ce, "ln-router", {
         matched: e._filteredData.length,
         total: e._data.length
       });
-    }, t.addEventListener("ln-search:change", this._onSearch), this._onClear = function(r) {
+    }, t.addEventListener("ln-search:change", this._onSearch)), this._onClear = function(r) {
       if (!r.target.closest("[data-ln-list-clear]") || V(t, "ln-list:before-clear-search", { list: e.name }).defaultPrevented) return;
-      e._searchTerm = "";
+      e.isDataDriven ? e.currentSearch = "" : e._searchTerm = "";
       const d = document.querySelector('[data-ln-search="' + t.id + '"]');
       if (d) {
         const h = d.tagName === "INPUT" ? d : d.querySelector("input");
         h && (h.value = "", h.dispatchEvent(new Event("input", { bubbles: !0 })));
       }
-      e._applyFilterAndSort(), e._vStart = -1, e._vEnd = -1, e._render(), L(t, "ln-list:filter", {
+      e.isDataDriven ? (L(t, "ln-list:search", {
+        list: e.name,
+        query: ""
+      }), e._requestData()) : (e._applyFilterAndSort(), e._vStart = -1, e._vEnd = -1, e._render(), L(t, "ln-list:filter", {
         term: "",
         matched: e._filteredData.length,
         total: e._data.length
-      });
-    }, t.addEventListener("click", this._onClear)), this;
+      }));
+    }, t.addEventListener("click", this._onClear), this;
   }
   s.prototype._parseChildren = function() {
     const t = Array.from(this.tbody.children).filter((e) => !e.classList.contains("ln-list__spacer"));
@@ -3874,7 +3877,7 @@ H(Nt, ie, ce, "ln-router", {
       this._selectedSpan.textContent = i > 0 ? i : "", this._selectedWrap && this._selectedWrap.classList.toggle("hidden", i === 0);
     }
   }, s.prototype.destroy = function() {
-    this.dom[c] && (this._disableVirtualScroll(), this.isDataDriven ? (this.dom.removeEventListener("ln-list:set-data", this._onSetData), this.dom.removeEventListener("ln-list:set-loading", this._onSetLoading), this.dom.removeEventListener("click", this._onClearAll), this.tbody && (this.tbody.removeEventListener("click", this._onItemClick), this.tbody.removeEventListener("click", this._onItemAction)), this._onSelectionChange && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._onSelectAll && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this.dom.removeEventListener("ln-search:change", this._onSearchChange)) : (this._emptyObserver && (this._emptyObserver.disconnect(), this._emptyObserver = null), this.dom.removeEventListener("ln-search:change", this._onSearch), this.dom.removeEventListener("click", this._onClear)), this._data = [], this._filteredData = [], delete this.dom[c]);
+    this.dom[c] && (this._disableVirtualScroll(), this.isDataDriven ? (this.dom.removeEventListener("ln-list:set-data", this._onSetData), this.dom.removeEventListener("ln-list:set-loading", this._onSetLoading), this.dom.removeEventListener("click", this._onClearAll), this.tbody && (this.tbody.removeEventListener("click", this._onItemClick), this.tbody.removeEventListener("click", this._onItemAction)), this._onSelectionChange && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._onSelectAll && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this.dom.removeEventListener("ln-search:change", this._onSearchChange)) : (this._emptyObserver && (this._emptyObserver.disconnect(), this._emptyObserver = null), this.dom.removeEventListener("ln-search:change", this._onSearch)), this._onClear && this.dom.removeEventListener("click", this._onClear), this._data = [], this._filteredData = [], delete this.dom[c]);
   }, H(f, c, s, "ln-list");
 })();
 (function() {
