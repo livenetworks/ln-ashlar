@@ -96,11 +96,16 @@ import { dispatch } from '../../ln-core';
 		// Combine consumer signal with wrapper controller.
 		const controller = new AbortController();
 		const consumerSignal = options.signal;
+		let abortHandler = null;
 		if (consumerSignal) {
-			if (consumerSignal.aborted) controller.abort(consumerSignal.reason);
-			else consumerSignal.addEventListener('abort', function () {
+			if (consumerSignal.aborted) {
 				controller.abort(consumerSignal.reason);
-			}, { once: true });
+			} else {
+				abortHandler = function () {
+					controller.abort(consumerSignal.reason);
+				};
+				consumerSignal.addEventListener('abort', abortHandler, { once: true });
+			}
 		}
 
 		const merged = Object.assign({}, options, { signal: controller.signal });
@@ -108,6 +113,10 @@ import { dispatch } from '../../ln-core';
 		_inflight.set(key, controller);
 
 		return _origFetch(resource, merged).finally(function () {
+			// Clean up listener to prevent memory leak
+			if (consumerSignal && abortHandler) {
+				consumerSignal.removeEventListener('abort', abortHandler);
+			}
 			// Only clear if THIS controller is still the one in the map.
 			if (_inflight.get(key) === controller) _inflight.delete(key);
 		});
@@ -119,12 +128,11 @@ import { dispatch } from '../../ln-core';
 	// ─── Path B: ln-http:request event listener ───────────────────
 
 	function _onRequest(e) {
-		const opts = e.detail || {};
-		if (!opts.url) return;
+		if (!e.detail || !e.detail.url) return;
 
 		const target = e.target;
-		const method = (opts.method || (opts.body ? 'POST' : 'GET')).toUpperCase();
-		const userKey = opts.key;
+		const method = (e.detail.method || (e.detail.body ? 'POST' : 'GET')).toUpperCase();
+		const userKey = e.detail.key;
 
 		// Explicit-key dedup — abort previous on same key, any method.
 		if (userKey && _keyed.has(userKey)) {
@@ -134,24 +142,32 @@ import { dispatch } from '../../ln-core';
 
 		// Combine consumer signal (if any) with our own controller.
 		const controller = new AbortController();
-		const consumerSignal = opts.signal;
+		const consumerSignal = e.detail.signal;
+		let abortHandler = null;
 		if (consumerSignal) {
-			if (consumerSignal.aborted) controller.abort(consumerSignal.reason);
-			else consumerSignal.addEventListener('abort', function () {
+			if (consumerSignal.aborted) {
 				controller.abort(consumerSignal.reason);
-			}, { once: true });
+			} else {
+				abortHandler = function () {
+					controller.abort(consumerSignal.reason);
+				};
+				consumerSignal.addEventListener('abort', abortHandler, { once: true });
+			}
 		}
 
 		if (userKey) _keyed.set(userKey, controller);
 
 		const fetchOptions = { method: method, signal: controller.signal };
-		if (opts.body !== undefined) fetchOptions.body = opts.body;
+		if (e.detail.body !== undefined) fetchOptions.body = e.detail.body;
 
 		// fetch() here IS the wrapped fetch — Path A still applies
 		// for GET/HEAD on top of Path B's explicit-key dedup. Aborts
 		// from either side are idempotent.
-		window.fetch(opts.url, fetchOptions)
+		window.fetch(e.detail.url, fetchOptions)
 			.then(function (response) {
+				if (consumerSignal && abortHandler) {
+					consumerSignal.removeEventListener('abort', abortHandler);
+				}
 				if (userKey && _keyed.get(userKey) === controller) _keyed.delete(userKey);
 				dispatch(target, 'ln-http:response', {
 					ok: response.ok,
@@ -160,6 +176,9 @@ import { dispatch } from '../../ln-core';
 				});
 			})
 			.catch(function (err) {
+				if (consumerSignal && abortHandler) {
+					consumerSignal.removeEventListener('abort', abortHandler);
+				}
 				if (userKey && _keyed.get(userKey) === controller) _keyed.delete(userKey);
 				if (err && err.name === 'AbortError') return; // silent on abort
 				dispatch(target, 'ln-http:error', {
