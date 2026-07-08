@@ -27,7 +27,7 @@
 						<main>
 							<p>The minimal markup contract:</p>
 <pre><code>&lt;div data-ln-editor&gt;
-    &lt;nav&gt;
+    &lt;div role="toolbar" aria-label="Text formatting"&gt;
         &lt;ul&gt;
             &lt;li&gt;&lt;button type="button" data-ln-editor-action="bold" aria-label="Bold"&gt;
                 &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-bold"&gt;&lt;/use&gt;&lt;/svg&gt;
@@ -36,12 +36,12 @@
                 &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-italic"&gt;&lt;/use&gt;&lt;/svg&gt;
             &lt;/button&gt;&lt;/li&gt;
         &lt;/ul&gt;
-    &lt;/nav&gt;
+    &lt;/div&gt;
     &lt;textarea name="content" placeholder="Write something..."&gt;&lt;/textarea&gt;
 &lt;/div&gt;</code></pre>
 
 							<h4>Toolbar structure</h4>
-							<p><code>&lt;nav&gt;</code> wraps the toolbar. Each <code>&lt;ul&gt;</code> is a visual button group — multiple <code>&lt;ul&gt;</code> elements create separator lines between groups. <code>&lt;button data-ln-editor-action="..."&gt;</code> binds each formatting action. The consumer decides which actions to include.</p>
+							<p>A container with <code>role="toolbar"</code> wraps the toolbar. Each <code>&lt;ul&gt;</code> is a visual button group — multiple <code>&lt;ul&gt;</code> elements create separator lines between groups. <code>&lt;button data-ln-editor-action="..."&gt;</code> binds each formatting action. The consumer decides which actions to include.</p>
 
 							<h4>Attributes reference</h4>
 							<div class="table-container">
@@ -56,7 +56,7 @@
 							</div>
 
 							<h4>Progressive enhancement</h4>
-							<p>Without JS, the <code>&lt;nav&gt;</code> toolbar is inert and the <code>&lt;textarea&gt;</code> is a normal text input. With JS, the textarea is hidden and the contentEditable surface takes over.</p>
+							<p>Without JS, the <code>role="toolbar"</code> container is inert and the <code>&lt;textarea&gt;</code> is a normal text input. With JS, the textarea is hidden and the contentEditable surface takes over.</p>
 						</main>
 					</section>
 
@@ -69,7 +69,7 @@
 							<div class="form-element">
 								<label for="demo-full">Article body</label>
 								<div data-ln-editor>
-									<nav>
+									<div role="toolbar" aria-label="Text formatting">
 										<ul>
 											<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
@@ -116,7 +116,7 @@
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-clear-formatting"></use></svg>
 											</button></li>
 										</ul>
-									</nav>
+									</div>
 									<textarea id="demo-full" name="body" placeholder="Write your article..."></textarea>
 								</div>
 							</div>
@@ -132,7 +132,7 @@
 							<div class="form-element">
 								<label for="demo-minimal">Comment</label>
 								<div data-ln-editor>
-									<nav>
+									<div role="toolbar" aria-label="Text formatting">
 										<ul>
 											<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
@@ -144,7 +144,7 @@
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
 											</button></li>
 										</ul>
-									</nav>
+									</div>
 									<textarea id="demo-minimal" name="comment" placeholder="Write a comment..."></textarea>
 								</div>
 							</div>
@@ -160,7 +160,7 @@
 							<div class="form-element">
 								<label for="demo-prefilled">Bio</label>
 								<div data-ln-editor>
-									<nav>
+									<div role="toolbar" aria-label="Text formatting">
 										<ul>
 											<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
@@ -177,7 +177,7 @@
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-list"></use></svg>
 											</button></li>
 										</ul>
-									</nav>
+									</div>
 									<textarea id="demo-prefilled" name="bio"><p>Ana Kovachevska is a <strong>Senior Software Engineer</strong> at LiveNetworks with expertise in <em>distributed systems</em> and <em>real-time collaboration</em>.</p><h3>Key achievements</h3><ul><li>Led the migration to microservices architecture</li><li>Reduced API response times by 40%</li><li>Mentored 5 junior developers</li></ul><blockquote>Building software that makes people's lives easier is what drives me every day.</blockquote><p>Connect with Ana on <a href="https://linkedin.com">LinkedIn</a> or <a href="https://github.com">GitHub</a>.</p></textarea>
 								</div>
 							</div>
@@ -198,7 +198,7 @@
 								<div class="form-element">
 									<label for="demo-form-editor">Content</label>
 									<div data-ln-editor>
-										<nav>
+										<div role="toolbar" aria-label="Text formatting">
 											<ul>
 												<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
 													<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
@@ -227,7 +227,7 @@
 													<svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
 												</button></li>
 											</ul>
-										</nav>
+										</div>
 										<textarea id="demo-form-editor" name="content" placeholder="Write your content..."></textarea>
 									</div>
 								</div>
@@ -320,7 +320,7 @@ el.lnEditor.destroy();</code></pre>
 							<div class="form-element">
 								<label for="demo-prog">Managed editor</label>
 								<div id="demo-prog-editor" data-ln-editor>
-									<nav>
+									<div role="toolbar" aria-label="Text formatting">
 										<ul>
 											<li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
@@ -329,7 +329,7 @@ el.lnEditor.destroy();</code></pre>
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
 											</button></li>
 										</ul>
-									</nav>
+									</div>
 									<textarea id="demo-prog" name="managed" placeholder="Programmatic content..."></textarea>
 								</div>
 							</div>
@@ -375,6 +375,18 @@ el.lnEditor.destroy();</code></pre>
 						</main>
 					</section>
 
+<template data-ln-template="ln-editor-link-popover">
+	<div class="ln-editor__link-popover">
+		<input type="url" placeholder="https://…" />
+		<button type="button" data-ln-editor-action="confirm-link" aria-label="Confirm" title="Confirm">
+			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-check"></use></svg>
+		</button>
+		<button type="button" data-ln-editor-action="cancel-link" aria-label="Cancel" title="Cancel">
+			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+		</button>
+	</div>
+</template>
+
 <script>
 	(function () {
 		// ─── Form integration demo ─────────────────────────────
@@ -400,12 +412,10 @@ el.lnEditor.destroy();</code></pre>
 
 		if (resetBtn && formEl) {
 			resetBtn.addEventListener('click', function () {
-				if (formEl.lnForm) formEl.lnForm.reset();
-				var editor = formEl.querySelector('[data-ln-editor]');
-				if (editor) {
-					editor.dispatchEvent(new CustomEvent('ln-editor:set-content', {
-						detail: { html: '' }
-					}));
+				if (formEl.lnForm) {
+					formEl.lnForm.reset();
+				} else {
+					formEl.reset();
 				}
 				if (formOutput) formOutput.setAttribute('hidden', '');
 			});

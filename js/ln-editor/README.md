@@ -2,11 +2,13 @@
 
 Lightweight WYSIWYG rich text editor. Enhances a `<textarea>` into a `contentEditable` editing surface with a toolbar. Progressive enhancement: without JS, the textarea works as plain text.
 
+> Architecture & internals: [docs/js/editor.md](../../docs/js/editor.md)
+
 ## Quick Start
 
 ```html
 <div data-ln-editor>
-    <nav>
+    <div role="toolbar" aria-label="Text formatting">
         <ul>
             <li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
@@ -15,7 +17,7 @@ Lightweight WYSIWYG rich text editor. Enhances a `<textarea>` into a `contentEdi
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
             </button></li>
         </ul>
-    </nav>
+    </div>
     <textarea name="content" placeholder="Write something..."></textarea>
 </div>
 ```
@@ -46,14 +48,14 @@ Lightweight WYSIWYG rich text editor. Enhances a `<textarea>` into a `contentEdi
 | `link` | Insert/edit link (inline popover) | Ctrl+K |
 | `unlink` | Remove link | — |
 | `clear` | Remove all formatting | — |
-| `paragraph` | Reset to paragraph | — |
+| `paragraph` | Reset block to paragraph — applied internally by `clear`; no default toolbar exposes it as its own button | — |
 
 ## Toolbar Structure
 
 The toolbar is **authored HTML** — the consumer controls which buttons appear, their order, icons, and labels.
 
 ```html
-<nav>
+<div role="toolbar" aria-label="Text formatting">
     <!-- Group 1: Inline formatting -->
     <ul>
         <li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
@@ -89,20 +91,50 @@ The toolbar is **authored HTML** — the consumer controls which buttons appear,
             <svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
         </button></li>
     </ul>
-</nav>
+</div>
 ```
 
 Multiple `<ul>` elements create visual groups with separators between them.
+
+### Accessibility
+
+Mark the toolbar wrapper with `role="toolbar"` and an `aria-label`. The
+component links it to the editing surface via `aria-controls`, and manages
+`aria-pressed` on every toggle-format button (bold, italic, headings,
+lists, link) so assistive technology announces the active state as the
+cursor moves. One-shot actions (`unlink`, `clear`) receive no `aria-pressed`.
+You author the buttons; the component owns the ARIA state. See the
+[sync mechanism in docs/js/editor.md](../../docs/js/editor.md#active-state-tracking).
+
+## Link Popover Template
+
+If you include the `link` action in the toolbar, you must define a `<template data-ln-template="ln-editor-link-popover">` on the page. The editor clones this template to render the inline link input popover.
+
+This authored-markup design keeps the popover structure fully customizable and allows localization directly in the HTML:
+
+```html
+<template data-ln-template="ln-editor-link-popover">
+	<div class="ln-editor__link-popover">
+		<input type="url" placeholder="https://…" />
+		<button type="button" data-ln-editor-action="confirm-link" aria-label="Confirm" title="Confirm">
+			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-check"></use></svg>
+		</button>
+		<button type="button" data-ln-editor-action="cancel-link" aria-label="Cancel" title="Cancel">
+			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+		</button>
+	</div>
+</template>
+```
 
 ## Events
 
 | Event | Type | Detail | When |
 |-------|------|--------|------|
-| `ln-editor:changed` | Notification | `{ html, target }` | Content changed |
+| `ln-editor:changed` | Notification | `{ html, target }` | Fires exactly once per content mutation — typing, paste, formatting, link apply, programmatic `set-content`/`setHTML`, or form reset |
 | `ln-editor:before-change` | Lifecycle (cancelable) | `{ action, target }` | Before a formatting command |
 | `ln-editor:focus` | Notification | `{ target }` | Editing surface focused |
 | `ln-editor:blur` | Notification | `{ target }` | Editing surface blurred |
-| `ln-editor:set-content` | Request | `{ html }` | Set content programmatically |
+| `ln-editor:set-content` | Request | `{ html }` | Set content programmatically — also emits `ln-editor:changed` |
 | `ln-editor:destroyed` | Notification | `{ target }` | Instance destroyed |
 
 ## API
@@ -134,7 +166,7 @@ The editor syncs content to the hidden `<textarea>` on every input, paste, and f
     <div class="form-element">
         <label for="article-body">Content</label>
         <div data-ln-editor>
-            <nav><!-- toolbar --></nav>
+            <div role="toolbar" aria-label="Text formatting"><!-- toolbar --></div>
             <textarea id="article-body" name="body" required></textarea>
         </div>
     </div>
@@ -150,19 +182,14 @@ Server-rendered HTML in the textarea value is used as initial editor content:
 
 ```html
 <div data-ln-editor>
-    <nav><!-- toolbar --></nav>
+    <div role="toolbar" aria-label="Text formatting"><!-- toolbar --></div>
     <textarea name="content"><p>This <strong>pre-filled</strong> content appears in the editor.</p></textarea>
 </div>
 ```
 
 ## Paste Handling
 
-Content pasted from external sources (Word, web pages) is automatically sanitized:
-- Only safe HTML tags are kept: `<p>`, `<strong>`, `<em>`, `<a>`, `<ul>`, `<ol>`, `<li>`, `<h2>`–`<h4>`, `<blockquote>`, `<pre>`, `<code>`
-- All attributes are stripped except `href` on links
-- Links get `rel="noopener noreferrer"` automatically
-- `javascript:` URLs are removed
-- Plain text paste is converted to paragraphs
+Content pasted from external sources (Word, web pages) is sanitized to a safe HTML subset — unsafe tags and attributes are stripped and links are made safe automatically. For the exact tag whitelist and sanitization algorithm see [docs/js/editor.md §Paste Sanitization](../../docs/js/editor.md#paste-sanitization).
 
 ## Minimal Toolbar
 
@@ -170,7 +197,7 @@ Include only the buttons you need:
 
 ```html
 <div data-ln-editor>
-    <nav>
+    <div role="toolbar" aria-label="Text formatting">
         <ul>
             <li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
@@ -182,7 +209,7 @@ Include only the buttons you need:
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
             </button></li>
         </ul>
-    </nav>
+    </div>
     <textarea name="comment" placeholder="Write a comment..."></textarea>
 </div>
 ```
@@ -193,7 +220,7 @@ Visual styling uses the two-layer architecture:
 
 - **Mixin:** `scss/config/mixins/_editor.scss` — `@mixin editor`
 - **Component:** `scss/components/_editor.scss` — applies to `[data-ln-editor]`
-- **Co-located:** `js/ln-editor/ln-editor.scss` — link popover (JS-created element)
+- **Co-located:** `js/ln-editor/ln-editor.scss` — link popover (runtime-cloned from the authored `<template data-ln-template="ln-editor-link-popover">`)
 
 The editing surface uses `@include prose` — content looks identical to how it will render in a `.prose` container.
 

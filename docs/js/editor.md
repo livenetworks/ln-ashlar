@@ -9,7 +9,7 @@
 | Property | Type | Description |
 |----------|------|-------------|
 | `_textarea` | HTMLTextAreaElement | The original textarea (hidden, synced) |
-| `_surface` | HTMLDivElement | The `contentEditable` editing surface (JS-created) |
+| `_surface` | HTMLDivElement | The `contentEditable` editing surface (built at init via `document.createElement`) |
 
 The component stores no formatting state — it queries the browser's `queryCommandState` and DOM ancestry on every `selectionchange` event.
 
@@ -24,13 +24,22 @@ Find <textarea> inside container
   ↓
 Read textarea.value as initial HTML
   ↓
-Create <div contenteditable> (.ln-editor__surface)
+Create <div contenteditable> (.ln-editor__surface); assign a stable id
+  ↓
+Transfer <label for> association to the surface via aria-labelledby (if labeled)
   ↓
 Mark textarea with data-ln-editor-source (CSS hides it)
   ↓
-Insert surface after <nav> toolbar
+Insert surface after [role="toolbar"] (or at container end)
   ↓
-Bind events (input, paste, keydown, selectionchange)
+Wire a11y: toolbar aria-controls → surface id; seed aria-pressed="false"
+           on toggle-format buttons (gated by _isToggleAction)
+  ↓
+Bind surface events: input, paste, keydown, focus, blur
+Bind toolbar events: mousedown, click
+Bind document: selectionchange
+Bind container: ln-editor:set-content (request)
+Bind parent <form>: reset (re-seeds surface from textarea, dispatches changed)
 ```
 
 ### Content Sync
@@ -58,13 +67,12 @@ click: read action from data attribute
   ↓
 dispatch ln-editor:before-change (cancelable)
   ↓
-surface.focus() + document.execCommand('bold')
+surface.focus() + document.execCommand(...)
   ↓
-sync innerHTML → textarea.value
+native 'input' fires → _onInput syncs innerHTML → textarea.value
+  → dispatch ln-editor:changed (exactly once)
   ↓
-update active states on all toolbar buttons
-  ↓
-dispatch ln-editor:changed
+update active states + aria-pressed on all toolbar buttons
 ```
 
 ### Active State Tracking
@@ -77,7 +85,13 @@ On every `selectionchange` event:
    - **Block commands:** walk up from selection anchor to find `<h2>`, `<blockquote>`, etc.
    - **List commands:** `document.queryCommandState('insertOrderedList')` etc.
    - **Link:** check if selection anchor is inside an `<a>` tag
-3. Toggle `.ln-editor-active` class accordingly
+3. Toggle `.ln-editor-active` class accordingly; toggle-format buttons
+   (gated by `_isToggleAction`) also get their `aria-pressed` synced to the
+   active state
+
+The `selectionchange` handler early-returns when `_surface` has been
+detached from the document without `destroy()` (e.g. an SPA subtree swap),
+so a temporarily detached-then-reattached surface keeps working.
 
 ### Paste Sanitization
 
@@ -105,7 +119,25 @@ document.execCommand('insertHTML', false, sanitized)
 
 ### Link Insertion
 
-Uses an inline popover (JS-created `<div>`) instead of `window.prompt`:
+Link support **requires a page-level companion template**. When the toolbar
+includes the `link` action, the page must define this template once (the
+editor never generates popover markup in JS):
+
+```html
+<template data-ln-template="ln-editor-link-popover">
+	<div class="ln-editor__link-popover">
+		<input type="url" placeholder="https://…" />
+		<button type="button" data-ln-editor-action="confirm-link" aria-label="Confirm" title="Confirm">
+			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-check"></use></svg>
+		</button>
+		<button type="button" data-ln-editor-action="cancel-link" aria-label="Cancel" title="Cancel">
+			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+		</button>
+	</div>
+</template>
+```
+
+The editor clones it at runtime via `cloneTemplateScoped`:
 
 ```
 User clicks link button / Ctrl+K
@@ -114,20 +146,23 @@ Save current selection range (.cloneRange())
   ↓
 Check if already inside <a> → pre-fill URL
   ↓
-Create inline popover with <input type="url"> + confirm/cancel
+Clone <template data-ln-template="ln-editor-link-popover"> via cloneTemplateScoped
   ↓
-Insert popover after <nav>
+Insert popover after [role="toolbar"]
   ↓
 User types URL + Enter (or clicks confirm)
   ↓
 Restore saved selection range
   ↓
-document.execCommand('createLink', false, url)
+Existing link → setAttribute('href') → sync → dispatch changed (once)
+New link     → execCommand('createLink') → native input → dispatch changed (once)
+              → add rel="noopener noreferrer"
   ↓
-Add rel="noopener noreferrer" to new link
-  ↓
-Remove popover, sync, dispatch changed
+Remove popover
 ```
+
+If the template is absent, `cloneTemplateScoped` returns `null` and the
+link action is a no-op — no popover appears.
 
 ### Destroy
 
@@ -154,10 +189,10 @@ delete dom[DOM_ATTRIBUTE]
 | Event | Bubbles | Cancelable | Detail | When |
 |-------|---------|------------|--------|------|
 | `ln-editor:before-change` | true | **yes** | `{ action, target }` | Before format command — `preventDefault()` to cancel |
-| `ln-editor:changed` | true | no | `{ html, target }` | After any content change |
+| `ln-editor:changed` | true | no | `{ html, target }` | Fires exactly once per content mutation (typing, paste, formatting, link apply, programmatic `set-content`/`setHTML`, form reset) |
 | `ln-editor:focus` | true | no | `{ target }` | Editing surface focused |
 | `ln-editor:blur` | true | no | `{ target }` | Editing surface blurred |
-| `ln-editor:set-content` | false | no | `{ html }` | Request: set content programmatically |
+| `ln-editor:set-content` | false | no | `{ html }` | Request: set content programmatically — also emits `ln-editor:changed` |
 | `ln-editor:destroyed` | true | no | `{ target }` | Instance destroyed |
 
 ## Dependencies
@@ -171,5 +206,5 @@ delete dom[DOM_ATTRIBUTE]
 - `document.execCommand` is deprecated but functional in all current browsers
 - Browser `contentEditable` implementation varies — cursor positioning edge cases exist
 - No undo/redo stack management — relies on browser native (generally adequate)
-- No table support — use the Tiptap wrapper for that
-- No image/media embed — use the Tiptap wrapper for that
+- No table support
+- No image or media embedding
