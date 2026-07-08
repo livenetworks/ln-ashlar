@@ -76,7 +76,20 @@
 
     <!-- Темплејти за празна состојба -->
     <template data-ln-template="users_list-empty">
-        <div class="empty-state">Нема записи.</div>
+        <div data-ln-empty-state="no-data">
+            <svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-folder"></use></svg>
+            <h3>Нема корисници</h3>
+            <p>Додадете го вашиот прв корисник.</p>
+        </div>
+    </template>
+
+    <template data-ln-template="users_list-empty-filtered">
+        <div data-ln-empty-state="no-results">
+            <svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+            <h3>Нема совпаѓања</h3>
+            <p>Обидете се со поинакво пребарување или исчистете ги филтрите.</p>
+            <button type="button" data-ln-list-clear class="btn">Исчисти пребарување</button>
+        </div>
     </template>
 </div>
 ```
