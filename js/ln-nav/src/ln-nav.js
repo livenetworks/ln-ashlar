@@ -1,12 +1,10 @@
-import { guardBody } from '../../ln-core';
+import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-nav';
 	const DOM_ATTRIBUTE = 'lnNav';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	const navInstances = new WeakMap();
 
 	// ─── pushState singleton patch ──────────────────────────────
 	const _pushStateCallbacks = [];
@@ -20,83 +18,84 @@ import { guardBody } from '../../ln-core';
 		history._lnNavPatched = true;
 	}
 
-	// ─── Constructor ───────────────────────────────────────────
+	// ─── Component ─────────────────────────────────────────────
 
-	function constructor(navElement) {
-		if (!navElement.hasAttribute(DOM_SELECTOR)) return;
-		if (navInstances.has(navElement)) return;
+	function _component(dom) {
+		this.dom = dom;
+		this.activeClass = dom.getAttribute(DOM_SELECTOR) || 'active';
+		this.exact = dom.hasAttribute('data-ln-nav-exact');
 
-		const activeClass = navElement.getAttribute(DOM_SELECTOR);
-		if (!activeClass) return;
+		this.updateHandler = () => this.update();
 
-		const instance = _initializeNav(navElement, activeClass);
-		navInstances.set(navElement, instance);
-		navElement[DOM_ATTRIBUTE] = instance;
+		// Listen to navigation events
+		window.addEventListener('popstate', this.updateHandler);
+		_pushStateCallbacks.push(this.updateHandler);
+
+		// Observe DOM changes inside this nav element
+		this.observer = new MutationObserver(() => this.update());
+		this.observer.observe(dom, { childList: true, subtree: true });
+
+		// Perform initial highlight
+		this.update();
+
+		return this;
 	}
 
-	function _initializeNav(navElement, activeClass) {
-		const exact = navElement.hasAttribute('data-ln-nav-exact');
-		let links = Array.from(navElement.querySelectorAll('a'));
+	_component.prototype.update = function () {
+		if (!this.activeClass) return;
+		const before = dispatchCancelable(this.dom, 'ln-nav:before-update', { target: this.dom });
+		if (before.defaultPrevented) return;
 
-		_updateActiveState(links, activeClass, window.location.pathname, exact);
+		const links = Array.from(this.dom.querySelectorAll('a'));
+		const currentPath = window.location.pathname;
+		const normalizedCurrent = _normalizeUrl(currentPath);
 
-		const updateHandler = function () {
-			links = Array.from(navElement.querySelectorAll('a'));
-			_updateActiveState(links, activeClass, window.location.pathname, exact);
-		};
-
-		window.addEventListener('popstate', updateHandler);
-		_pushStateCallbacks.push(updateHandler);
-
-		const observer = new MutationObserver(function (mutations) {
-			for (const mutation of mutations) {
-				if (mutation.type === 'childList') {
-					for (const node of mutation.addedNodes) {
-						if (node.nodeType === 1) {
-							if (node.tagName === 'A') {
-								links.push(node);
-								_updateActiveState([node], activeClass, window.location.pathname, exact);
-							} else if (node.querySelectorAll) {
-								const newLinks = Array.from(node.querySelectorAll('a'));
-								links = links.concat(newLinks);
-								_updateActiveState(newLinks, activeClass, window.location.pathname, exact);
-							}
-						}
-					}
-
-					for (const node of mutation.removedNodes) {
-						if (node.nodeType === 1) {
-							if (node.tagName === 'A') {
-								links = links.filter(function (link) { return link !== node; });
-							} else if (node.querySelectorAll) {
-								const removedLinks = Array.from(node.querySelectorAll('a'));
-								links = links.filter(function (link) {
-									return !removedLinks.includes(link);
-								});
-							}
-						}
-					}
-				}
+		for (const link of links) {
+			const href = link.getAttribute('href');
+			if (!href || href === '#' || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+				link.classList.remove(this.activeClass);
+				link.removeAttribute('aria-current');
+				continue;
 			}
-		});
 
-		observer.observe(navElement, { childList: true, subtree: true });
-
-		return {
-			navElement: navElement,
-			activeClass: activeClass,
-			observer: observer,
-			updateHandler: updateHandler,
-			destroy: function () {
-				observer.disconnect();
-				window.removeEventListener('popstate', updateHandler);
-				const idx = _pushStateCallbacks.indexOf(updateHandler);
-				if (idx !== -1) _pushStateCallbacks.splice(idx, 1);
-				navInstances.delete(navElement);
-				delete navElement[DOM_ATTRIBUTE];
+			// Exclude external links
+			if (link.hostname && link.hostname !== window.location.hostname) {
+				link.classList.remove(this.activeClass);
+				link.removeAttribute('aria-current');
+				continue;
 			}
-		};
-	}
+
+			const normalizedHref = _normalizeUrl(href);
+			const isExact = normalizedHref === normalizedCurrent;
+			const isParent = !this.exact && normalizedHref !== '/' && normalizedCurrent.startsWith(normalizedHref + '/');
+
+			if (isExact || isParent) {
+				link.classList.add(this.activeClass);
+				link.setAttribute('aria-current', 'page');
+			} else {
+				link.classList.remove(this.activeClass);
+				link.removeAttribute('aria-current');
+			}
+		}
+
+		dispatch(this.dom, 'ln-nav:update', { target: this.dom });
+	};
+
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this.observer) {
+			this.observer.disconnect();
+		}
+		window.removeEventListener('popstate', this.updateHandler);
+		const idx = _pushStateCallbacks.indexOf(this.updateHandler);
+		if (idx !== -1) {
+			_pushStateCallbacks.splice(idx, 1);
+		}
+		dispatch(this.dom, 'ln-nav:destroyed', { target: this.dom });
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
+	// ─── Helper Functions ──────────────────────────────────────
 
 	function _normalizeUrl(url) {
 		try {
@@ -107,75 +106,37 @@ import { guardBody } from '../../ln-core';
 		}
 	}
 
-	function _updateActiveState(links, activeClass, currentPath, exact) {
-		const normalizedCurrent = _normalizeUrl(currentPath);
+	// ─── Attribute Sync ────────────────────────────────────────
 
-		for (const link of links) {
-			const href = link.getAttribute('href');
-			if (!href) continue;
+	function _syncAttribute(el, attrName) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
 
-			const normalizedHref = _normalizeUrl(href);
-
-			link.classList.remove(activeClass);
-
-			const isExact = normalizedHref === normalizedCurrent;
-			const isParent = !exact && normalizedHref !== '/' && normalizedCurrent.startsWith(normalizedHref + '/');
-
-			if (isExact || isParent) {
-				link.classList.add(activeClass);
-				link.setAttribute('aria-current', 'page');
-			} else {
-				link.removeAttribute('aria-current');
+		if (attrName === DOM_SELECTOR) {
+			if (!el.hasAttribute(DOM_SELECTOR)) {
+				instance.destroy();
+				return;
 			}
-		}
-	}
-
-	// ─── Global DOM Observer ───────────────────────────────────
-
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (const mutation of mutations) {
-					if (mutation.type === 'childList') {
-						for (const node of mutation.addedNodes) {
-							if (node.nodeType === 1) {
-								if (node.hasAttribute && node.hasAttribute(DOM_SELECTOR)) {
-									constructor(node);
-								}
-								if (node.querySelectorAll) {
-									for (const el of node.querySelectorAll('[' + DOM_SELECTOR + ']')) {
-										constructor(el);
-									}
-								}
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						if (mutation.target.hasAttribute && mutation.target.hasAttribute(DOM_SELECTOR)) {
-							constructor(mutation.target);
-						}
-					}
+			const oldClass = instance.activeClass;
+			const newClass = el.getAttribute(DOM_SELECTOR) || 'active';
+			if (oldClass !== newClass) {
+				const links = el.querySelectorAll('a');
+				for (const link of links) {
+					if (oldClass) link.classList.remove(oldClass);
 				}
-			});
+				instance.activeClass = newClass;
+			}
+		} else if (attrName === 'data-ln-nav-exact') {
+			instance.exact = el.hasAttribute('data-ln-nav-exact');
+		}
 
-			observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
-		}, 'ln-nav');
+		instance.update();
 	}
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	window[DOM_ATTRIBUTE] = constructor;
-
-	function _initializeAll() {
-		for (const el of document.querySelectorAll('[' + DOM_SELECTOR + ']')) {
-			constructor(el);
-		}
-	}
-
-	_domObserver();
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', _initializeAll);
-	} else {
-		_initializeAll();
-	}
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-nav', {
+		extraAttributes: ['data-ln-nav-exact'],
+		onAttributeChange: _syncAttribute
+	});
 })();
