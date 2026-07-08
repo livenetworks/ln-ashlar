@@ -1,0 +1,160 @@
+<!-- ln-page: title="Write Workflow — ln-ashlar" h1="Write Workflow" -->
+
+<h1>Write Workflow</h1>
+
+<!-- Overview -->
+<section class="section-card">
+	<header><h3>Overview — the form as the universal write-entry</h3></header>
+	<main>
+		<p>This page demonstrates the declarative <strong>form → data-layer write pipeline</strong>: a single <code>&lt;form data-ln-form data-ln-form-scope&gt;</code> is the only write-entry point. No application JavaScript builds <code>ln-store:request-create</code>/<code>request-update</code> events by hand — the form serializes itself and dispatches <code>ln-form:submit-record</code>; here the form carries a <em>named</em> scope (<code>data-ln-form-scope="wwf-documents"</code>) that is matched against the coordinator by name rather than DOM containment, interprets the effective HTTP method (<code>POST</code> → create, <code>PUT</code>/<code>PATCH</code> → update), and routes it through the existing store → connector pipeline. An empty <code>data-ln-form-scope</code> would instead fall back to nearest-ancestor containment.</p>
+		<p class="text-sm text-sunken">The scoped form still carries a real <code>action</code> + <code>method="post"</code> and the <code>data-ln-form-action-edit</code> fallback — without JavaScript, the exact same markup degrades to a native HTML submit.</p>
+	</main>
+</section>
+
+<!-- Declarative markup (headless data layer) -->
+<section class="section-card" data-demo-html>
+	<header><h3>Declarative Data Layer Markup (Copy/Paste)</h3></header>
+	<main>
+		<!-- Coordinator wrapper: headless store + connector children (the scoped form lives outside — matched by name) -->
+		<div data-ln-data-coordinator="wwf-documents" id="wwf-coordinator">
+
+			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
+			<div data-ln-data-store="wwf-documents" id="wwf-store"></div>
+
+			<!-- Tier 2: Transport Gateway — path is read/sync fallback only; mutation URL comes from the form's action -->
+			<div data-ln-api-connector
+			     data-ln-api-base-url=""
+			     data-ln-api-path="/documents"
+			     id="wwf-connector"></div>
+		</div>
+	</main>
+</section>
+
+<!-- Interactive live demo -->
+<section class="section-card">
+	<header><h3>Interactive Documents Manager</h3></header>
+	<main>
+		<section data-ln-table="wwf-documents" data-ln-table-source="wwf-documents" data-ln-table-store="wwf-documents" id="wwf-table" class="data-table-demo">
+			<header class="ln-table__toolbar">
+				<div>
+					<h3>Documents</h3>
+				</div>
+				<button type="button" class="btn" data-ln-modal-for="wwf-modal" data-ln-fill-form="wwf-form">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+					New Document
+				</button>
+			</header>
+
+			<table>
+				<thead>
+					<tr>
+						<th data-ln-table-col="title">Title</th>
+						<th data-ln-table-col="status">Status</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+			<footer class="ln-table__footer">
+				<span data-ln-table-total>0</span> items
+			</footer>
+
+			<template data-ln-template="wwf-documents-row">
+				<tr data-ln-table-row>
+					<td>{{ title }}</td>
+					<td>{{ status }}</td>
+					<td>
+						<ul class="row-actions">
+							<li>
+								<button aria-label="Edit"
+								        data-ln-modal-for="wwf-modal"
+								        data-ln-fill-form="wwf-form"
+								        data-ln-fill-id="{{ id }}"
+								        data-ln-fill-title="{{ title }}"
+								        data-ln-fill-status="{{ status }}"
+								        data-ln-fill-expected-version="{{ expected_version }}"
+								        data-ln-modal-mode="edit">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+								</button>
+							</li>
+							<li>
+								<button data-ln-table-row-action="delete" aria-label="Delete" data-ln-confirm="Delete this document?">
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+								</button>
+							</li>
+						</ul>
+					</td>
+				</tr>
+			</template>
+
+			<template data-ln-template="wwf-documents-empty">
+				<tr><td colspan="99">
+					<article class="ln-table__empty-state">
+						<h3>No documents yet</h3>
+						<p>Click <strong>New Document</strong> to create one.</p>
+					</article>
+				</td></tr>
+			</template>
+		</section>
+	</main>
+</section>
+
+<!-- Create / Edit modal — lives OUTSIDE the coordinator by design (page-level shared modal), so the form uses a NAMED scope matching the coordinator by name instead of DOM containment -->
+<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="wwf-modal">
+	<form id="wwf-form"
+	      data-ln-form
+	      data-ln-form-scope="wwf-documents"
+	      method="post"
+	      action="/documents"
+	      data-ln-form-action-edit>
+		<header>
+			<h3>
+				<span data-ln-modal-when="new">New Document</span>
+				<span data-ln-modal-when="edit">Edit Document</span>
+			</h3>
+			<button type="button" aria-label="Close" data-ln-modal-close>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+			</button>
+		</header>
+		<main>
+			<input type="hidden" name="id">
+			<input type="hidden" name="expected_version" data-ln-fill-as="expectedVersion">
+
+			<div class="form-element">
+				<label for="wwf-title">Title</label>
+				<input id="wwf-title" name="title" type="text" required autofocus>
+			</div>
+
+			<div class="form-element">
+				<label for="wwf-status">Status</label>
+				<select id="wwf-status" name="status">
+					<option value="draft">Draft</option>
+					<option value="published">Published</option>
+				</select>
+			</div>
+		</main>
+		<footer class="form-actions">
+			<button type="button" data-ln-modal-close>Cancel</button>
+			<button type="submit">Save</button>
+		</footer>
+	</form>
+</div>
+
+<!-- Mocked Backend Interceptor (see mock-write-workflow.js) -->
+<script class="mock-related" src="dist/mock-write-workflow.js" defer></script>
+
+<!-- Delete stays event-driven (out of scope for the form write pipeline — see write-workflow-guide.md §3.5) -->
+<script class="demo-wiring">
+(function () {
+	const storeEl = document.getElementById('wwf-store');
+
+	document.addEventListener('ln-table:row-action', function (e) {
+		if (e.detail.table !== 'wwf-documents') return;
+		if (e.detail.action === 'delete') {
+			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+				detail: { id: Number(e.detail.id) }
+			}));
+		}
+	});
+})();
+</script>
