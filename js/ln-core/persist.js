@@ -12,6 +12,24 @@
 
 const PREFIX = 'ln:';
 
+let _isStorageAvailable = null;
+function _checkStorage() {
+	if (_isStorageAvailable !== null) return _isStorageAvailable;
+	try {
+		if (typeof localStorage === 'undefined') {
+			_isStorageAvailable = false;
+			return false;
+		}
+		const testKey = '__ln_test__';
+		localStorage.setItem(testKey, testKey);
+		localStorage.removeItem(testKey);
+		_isStorageAvailable = true;
+	} catch (e) {
+		_isStorageAvailable = false;
+	}
+	return _isStorageAvailable;
+}
+
 function _pageKey() {
 	const path = location.pathname.replace(/\/+$/, '').toLowerCase();
 	return path || '/';
@@ -28,6 +46,7 @@ function _resolveKey(component, el) {
 }
 
 export function persistGet(component, el) {
+	if (!_checkStorage()) return null;
 	const key = _resolveKey(component, el);
 	if (!key) return null;
 	try {
@@ -39,16 +58,22 @@ export function persistGet(component, el) {
 }
 
 export function persistSet(component, el, value) {
+	if (!_checkStorage()) return;
 	const key = _resolveKey(component, el);
 	if (!key) return;
 	try {
-		localStorage.setItem(key, JSON.stringify(value));
+		if (value === null || value === undefined) {
+			localStorage.removeItem(key);
+		} else {
+			localStorage.setItem(key, JSON.stringify(value));
+		}
 	} catch (e) {
-		// localStorage full or disabled — silent
+		// localStorage full — silent
 	}
 }
 
 export function persistRemove(component, el) {
+	if (!_checkStorage()) return;
 	const key = _resolveKey(component, el);
 	if (!key) return;
 	try {
@@ -57,6 +82,7 @@ export function persistRemove(component, el) {
 }
 
 export function persistClear(component) {
+	if (!_checkStorage()) return;
 	try {
 		const prefix = PREFIX + component + ':';
 		const toRemove = [];
