@@ -3,7 +3,7 @@
 > A passive linear-progress renderer. Author writes
 > `data-ln-progress="42"` on a bar element; the component picks up the
 > change via MutationObserver and writes the new `width` as a
-> percentage. 145 lines of JS.
+> percentage. Around 85 lines of JS.
 
 ## Integration
 
@@ -83,7 +83,7 @@ One event, bubbles, not cancelable.
 
 | Event | `detail` | Dispatched on | Dispatched when |
 |---|---|---|---|
-| `ln-progress:change` | `{ target: HTMLElement, value: number, max: number, percentage: number }` | the bar element | every `_render` call: at construction, on every value or max attribute change (bar's own value, bar's own max, or parent track's max if observed) |
+| `ln-progress:change` | `{ target: HTMLElement, value: number, max: number, percentage: number }` | the bar element | every `_render` call: at construction, on every value or max attribute change (bar's own value, bar's own max, or parent track's max) |
 
 `detail.value` is the raw `parseFloat` of the value attribute —
 unclamped. `detail.max` is the resolved max (parent's first, then
@@ -96,13 +96,13 @@ twice. The CSS transition smooths the visual to a single sweep, but
 the event count is per-write.
 
 There is no `:initialized` and no `:destroyed` event. The first
-`:change` fires inside `_render` during construction and serves as
+`ln-progress:change` fires inside `_render` during construction and serves as
 the init signal for any consumer listening at the document level.
 
 ## API
 
 `window.lnProgress(root)` re-runs the init scan over `root`. The
-document-level observer already covers AJAX inserts and
+document-level observer managed by `registerComponent` covers AJAX inserts and
 `data-ln-progress` attribute additions; call this manually only when
 you inject markup into a Shadow DOM root or another document context
 the observer cannot see.
@@ -113,7 +113,7 @@ the observer cannot see.
 |---|---|---|
 | `dom` | `HTMLElement` | back-reference to the bar element |
 | `_attrObserver` | `MutationObserver` | watches the bar's own `data-ln-progress` and `data-ln-progress-max` |
-| `_parentObserver` | `MutationObserver \| null` | watches the parent track's `data-ln-progress-max` if the parent had that attribute at construction; `null` otherwise |
+| `_parentObserver` | `MutationObserver \| null` | watches the parent track's `data-ln-progress-max` |
 | `destroy()` | method | disconnects both observers, deletes `el.lnProgress`. Does NOT remove `data-ln-progress` itself, the colour class, or the inline `style.width`. |
 
 There is no `setValue(n)`, `setMax(n)`, `update()`, or `redraw()`
@@ -230,9 +230,7 @@ summing to 100%.
 
 Changing the parent's max at runtime
 (`track.setAttribute('data-ln-progress-max', '10')`) re-renders each
-child via the per-bar `_parentObserver` — but only for bars that
-were constructed when the parent already had the attribute. See
-"Common mistakes" item 4.
+child via the per-bar `_parentObserver`.
 
 ### Upload progress — driving from XHR
 
@@ -304,11 +302,6 @@ CSS rules in `scss/components/_progress.scss`.
 
 ## What `ln-progress` does NOT do
 
-- **Does NOT watch the parent for late-added max.** `_listenParent`
-  runs once at construction and bails immediately if the parent does
-  not currently have `data-ln-progress-max`. If the parent gains the
-  max later, the bar will not re-render in response. See "Common
-  mistakes" item 4.
 - **Does NOT clamp the input attribute.** It clamps the *computed
   percentage* between 0 and 100 before writing the width. The
   attribute can hold any number; reading
@@ -351,10 +344,10 @@ not `style.width`.
 ```
 
 This renders 50/500 = 10% of the track, probably not what the author
-meant. The component does not interpret the value as a percentage; it
-treats it as a count against the max. Either write the absolute count
-(`250` for "50% of 500") or drop the max and use the default of 100
-with the percentage as the value.
+    meant. The component does not interpret the value as a percentage; it
+  treats it as a count against the max. Either write the absolute count
+  (`250` for "50% of 500") or drop the max and use the default of 100
+  with the percentage as the value.
 
 ### 3. Multiple bars sharing a parent without declaring parent-max
 
@@ -368,7 +361,7 @@ with the percentage as the value.
 ```
 
 If the intent was "4 + 2 + 1 = 7 items, all visible proportionally,"
-declare the parent's max:
+  declare the parent's max:
 
 ```html
 <!-- RIGHT -->
@@ -380,48 +373,9 @@ declare the parent's max:
 ```
 
 Each bar reads parent max (`7`) as the denominator, and 4/7 + 2/7 +
-1/7 fills the track exactly.
+  1/7 fills the track exactly.
 
-### 4. Setting `data-ln-progress-max` on the parent AFTER construction
-
-```js
-// WRONG — bars constructed without parent max, _listenParent never attached
-const track = document.getElementById('my-track');
-track.setAttribute('data-ln-progress-max', '7');
-// → bars do not re-render in response to this write
-```
-
-`_listenParent` runs once at construction and bails immediately if
-the parent did not declare `data-ln-progress-max` at that moment.
-The parent observer is conditional, not lazy. If the parent gains
-the attribute later, no per-bar observer exists to catch it.
-
-Three resolutions:
-
-```js
-// Option A — declare parent max in markup so it exists at construction
-<div class="progress" data-ln-progress-max="7"> ... </div>
-
-// Option B — after setting the parent max, force each bar to re-render by
-//            rewriting one of its own observed attributes
-track.setAttribute('data-ln-progress-max', '7');
-track.querySelectorAll('[data-ln-progress]').forEach(function (bar) {
-    bar.setAttribute('data-ln-progress', bar.getAttribute('data-ln-progress'));
-    // → bar's own _attrObserver fires → _render re-resolves max from scratch
-});
-
-// Option C — destroy and re-init
-track.querySelectorAll('[data-ln-progress]').forEach(function (bar) {
-    if (bar.lnProgress) bar.lnProgress.destroy();
-});
-window.lnProgress(track);
-```
-
-Option A is canonical. Option B is the right runtime workaround when
-the markup was static-with-default-max and you need to switch to
-shared-max dynamically.
-
-### 5. Forgetting `class="progress"` on the track wrapper
+### 4. Forgetting `class="progress"` on the track wrapper
 
 Without the class, the wrapper has no styling — no recessed
 background, no rounded edges, no overflow clip. The bar still
@@ -438,5 +392,5 @@ renders correctly but visually escapes its track.
   `.progress` and applies the `.success` / `.warning` /
   `.error` colour variants.
 - **Architecture deep-dive:** [`docs/js/progress.md`](../../docs/js/progress.md)
-  for the construction flow, the three observers, the max-priority
-  resolution, and the late-parent-max edge case.
+  for the construction flow, the observers, and the max-priority
+  resolution.
