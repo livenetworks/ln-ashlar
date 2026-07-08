@@ -3806,13 +3806,10 @@ H(Nt, ie, ce, "ln-router", {
       const e = this.dom.querySelector(`template[${E}]`);
       e && (t = document.importNode(e.content, !0));
     }
-    if (t)
-      if (t.tagName === "LI" || t.tagName === "TR")
-        this.tbody.appendChild(t);
-      else {
-        const e = document.createElement(this.isUl ? "li" : "div");
-        e.appendChild(t), this.tbody.appendChild(e);
-      }
+    if (t) {
+      let e;
+      t.tagName === "LI" || t.tagName === "TR" ? e = t : (e = document.createElement(this.isUl ? "li" : "div"), e.appendChild(t)), e.classList.add("ln-list__empty-wrapper"), this.tbody.appendChild(e);
+    }
     L(this.dom, "ln-list:empty", {
       term: this.isDataDriven ? this.currentSearch : this._searchTerm,
       total: this.isDataDriven ? this._lastTotal != null ? this._lastTotal : this._data.length : this._data.length
