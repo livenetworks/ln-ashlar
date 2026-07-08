@@ -349,6 +349,10 @@
 		selectedWrap.classList.toggle('hidden', e.detail.count === 0);
 	});
 
+	listEl.addEventListener('ln-list:clear-filters', function(e) {
+		log(`Component emitted 'ln-list:clear-filters' (filters cleared).`, '#fbbf24');
+	});
+
 	triggerBtn.addEventListener('click', function() {
 		isSynced = false;
 		fetchBackgroundData(listEl.lnList.currentSearch || '');
