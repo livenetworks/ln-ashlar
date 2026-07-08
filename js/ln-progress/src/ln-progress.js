@@ -1,32 +1,10 @@
-import { dispatch, guardBody } from '../../ln-core';
+import { dispatch, registerComponent } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = '[data-ln-progress]';
 	const DOM_ATTRIBUTE = 'lnProgress';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	function constructor(domRoot) {
-		findElements(domRoot);
-	}
-
-	// Local findElements — intentional divergence from ln-core helper:
-	// inlines selector + constructor (no ComponentClass parameter) and
-	// includes a domRoot self-match branch so the childList re-init
-	// path picks up the inserted root itself.
-	function findElements(domRoot) {
-		const items = Array.from(domRoot.querySelectorAll(DOM_SELECTOR));
-
-		for (const item of items) {
-			if (!item[DOM_ATTRIBUTE]) {
-				item[DOM_ATTRIBUTE] = new _constructor(item);
-			}
-		}
-
-		if (domRoot.hasAttribute && domRoot.hasAttribute('data-ln-progress') && !domRoot[DOM_ATTRIBUTE]) {
-			domRoot[DOM_ATTRIBUTE] = new _constructor(domRoot);
-		}
-	}
 
 	function _constructor(dom) {
 		this.dom = dom;
@@ -49,33 +27,6 @@ import { dispatch, guardBody } from '../../ln-core';
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	function _domObserver() {
-		guardBody(function () {
-			const observer = new MutationObserver(function (mutations) {
-				for (const mutation of mutations) {
-					if (mutation.type === "childList") {
-						for (const item of mutation.addedNodes) {
-							if (item.nodeType === 1) {
-								findElements(item);
-							}
-						}
-					} else if (mutation.type === 'attributes') {
-						findElements(mutation.target);
-					}
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: ['data-ln-progress']
-			});
-		}, 'ln-progress');
-	}
-
-	_domObserver();
-
 	function _listenValues() {
 		const self = this;
 		const observer = new MutationObserver(function (mutations) {
@@ -97,7 +48,7 @@ import { dispatch, guardBody } from '../../ln-core';
 	function _listenParent() {
 		const self = this;
 		const parent = this.dom.parentElement;
-		if (!parent || !parent.hasAttribute('data-ln-progress-max')) return;
+		if (!parent) return;
 
 		const observer = new MutationObserver(function (mutations) {
 			for (const mutation of mutations) {
@@ -138,13 +89,10 @@ import { dispatch, guardBody } from '../../ln-core';
 		dispatch(this.dom, 'ln-progress:change', { target: this.dom, value: value, max: max, percentage: percentage });
 	}
 
-	window[DOM_ATTRIBUTE] = constructor;
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			constructor(document.body);
-		});
-	} else {
-		constructor(document.body);
-	}
+	registerComponent(
+		DOM_SELECTOR,
+		DOM_ATTRIBUTE,
+		_constructor,
+		'ln-progress'
+	);
 })();
