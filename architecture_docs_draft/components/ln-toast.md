@@ -4,217 +4,110 @@
 
 ---
 
-## 1. Декларативна & SSR Употреба, HTML Маркап и Шаблон (Template)
-
-За разлика од сложените JS компоненти, `ln-toast` започнува со едноставна и чиста HTML структура. Најпрво ќе ја разгледаме **декларативната SSR примена** каде што маркапот е директно видлив, а потоа HTML шаблонот од кој динамички се штанпаат нотификациите.
-
-### А. Статичен / SSR Маркап (Server-Side Rendered Flash Messages)
-
-Кога бекендот (Laravel, Rails, ASP.NET и сл.) генерира флеш пораки при вчитување на страницата, нотификациите се запишуваат како обични `<li>` елементи со атрибутот `data-ln-toast-item` внатре во контејнерот `[data-ln-toast]`:
-
-```html
-<!-- Глобален контејнер со статични SSR тостерчиња -->
-<ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5">
-    <!-- Успешна SSR нотификација -->
-    <li data-ln-toast-item data-type="success" data-title="Зачувано">
-        Промените беа успешно зачувани во базата.
-    </li>
-
-    <!-- Серверска опомена -->
-    <li data-ln-toast-item data-type="warn" data-title="Внимание">
-        Вашата претплата истекува за 3 дена.
-    </li>
-</ul>
-```
-
-> **Како функционира хидратацијата:** При стартување, JavaScript моторот ([js/ln-toast/src/ln-toast.js:L145](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js#L145)) ги наоѓа овие `[data-ln-toast-item]` елементи, ги чита атрибутите `data-type` и `data-title`, автоматски ги трансформира во целосни визуелни картички со икони и затворач, и го покренува автоматскиот тајмер за нивно исчезнување.
+## 1. Заднинско дејство и одговорност
+- **Краток опис:** Глобален сервис за приказ на статус нотификации (toasts) во реално време, кој функционира преку глобален систем за размена на настани (Event Bus) и овозможува асинхроно и неблокирачко прикажување на информации.
+- **Ортогоналност (Што компонентата НЕ прави):**
+  - Не комуницира со бекенд API-ја и не прави AJAX барања за добивање пораки.
+  - Не содржи тврдо-кодиран јазичен превод или текст (целиот текст се обезбедува динамички).
+  - Не прикажува интерактивни дијалози со барање за потврда (за тоа се користат [ln-confirm](./ln-confirm.md) или [ln-modal](./ln-modal.md)).
+  - Не гради DOM структури директно во JavaScript за примарниот лејаут (користи наменски HTML шаблони).
+  - Не одлучува кога треба да се прикаже нотификација (тоа го прави координатор или форма преку настани).
 
 ---
 
-### Б. Внатрешен HTML Шаблон на Тостерчето (`template.html`)
+## 2. Минимален HTML Маркап и Варијанти на Употреба
 
-За динамички генерираните нотификации, `ln-toast` користи стандарден HTML5 `<template>` елемент со име `ln-toast-item`. Овој шаблон или е дефиниран во самиот HTML документ, или моторот автоматски го внесува во `<body>` ([template.html](file:///c:/laragon/www/ln-ashlar/js/ln-toast/template.html)):
-
-```html
-<!-- HTML Шаблон за штанпање картички (data-ln-template="ln-toast-item") -->
-<template data-ln-template="ln-toast-item">
-    <li class="ln-toast__item">
-        <div class="ln-toast__card" data-ln-attr="role:role, aria-live:ariaLive">
-            <!-- Лева колона со динамичка SVG икона -->
-            <div class="ln-toast__side">
-                <svg class="ln-icon" aria-hidden="true">
-                    <use href=""></use>
-                </svg>
-            </div>
-            
-            <!-- Содржина: наслов, копче за затворање и тело -->
-            <div class="ln-toast__content">
-                <div class="ln-toast__head">
-                    <strong class="ln-toast__title" data-ln-field="title"></strong>
-                </div>
-                <button type="button" class="ln-toast__close" aria-label="Close">
-                    <svg class="ln-icon" aria-hidden="true">
-                        <use href="#ln-x"></use>
-                    </svg>
-                </button>
-                <div class="ln-toast__body" data-ln-show="hasBody"></div>
-            </div>
-        </div>
-    </li>
-</template>
-```
-
----
-
-### В. Финален Генериран DOM Маркап (Rendered Card Output)
-
-Откако моторот ќе го клонира шаблонот и ќе ги пополни податоците преку `ln-core` функциите `cloneTemplateScoped` и `fill`, во DOM дрвото се добива следната целосна визуелна структура:
-
-```html
-<ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5">
-    <li class="ln-toast__item ln-toast__item--in">
-        <div class="ln-toast__card success" role="status" aria-live="polite">
-            <div class="ln-toast__side">
-                <svg class="ln-icon" aria-hidden="true">
-                    <use href="#ln-circle-check"></use>
-                </svg>
-            </div>
-            <div class="ln-toast__content">
-                <div class="ln-toast__head">
-                    <strong class="ln-toast__title">Зачувано</strong>
-                </div>
-                <button type="button" class="ln-toast__close" aria-label="Close">
-                    <svg class="ln-icon" aria-hidden="true">
-                        <use href="#ln-x"></use>
-                    </svg>
-                </button>
-                <div class="ln-toast__body">
-                    <p>Промените беа успешно зачувани во базата.</p>
-                </div>
-            </div>
-        </div>
-    </li>
-</ul>
-```
-
----
-
-## 2. Динамична Апстракција со JavaScript (Window Event Bus)
-
-Откако го видовме конкретниот HTML маркап и шаблонот, преоѓаме кон поапстрактниот слој — **динамично управување преку JavaScript**.
-
-Согласно **Simple Components vs. Coordinators Doctrine** во `ln-ashlar`:
-* Компонентите и скриптите во апликацијата **никогаш не повикуваат методи за цртање** ниту директно креираат DOM елементи за нотификации.
-* За да се прикаже тостерче, скриптата едноставно емитува асинхрон настан `ln-toast:enqueue` до глобалниот `window` објект.
-* `ln-toast` сервисот го слуша овој настан, го користи горенаведениот HTML шаблон, извршува XSS безбедно пополнување и управува со анимациите.
-
-### Примарна JavaScript Апстракција (`window.dispatchEvent`)
-
-```javascript
-// Апстрактен повик — без допир со DOM или класи
-window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-    detail: {
-        type: 'success', // 'success' | 'error' | 'warn' | 'info'
-        title: 'Успешна операција',
-        message: 'Податоците се успешно зачувани.'
-    }
-}));
-```
-
----
-
-### Поврзување во Координациски Сценарија (`ln-form` + `app-coordinator`)
-
-Во реална апликација, проектниот координатор (напр. `app-coordinator.js`) го пресретнува исходот од формата или AJAX мрежниот повик и го испраќа тостерчето:
-
-```javascript
-// app-coordinator.js
-document.addEventListener('DOMContentLoaded', () => {
-    const profileForm = document.getElementById('user-profile-form');
-
-    // Успешно испратена форма -> Тостерче за успех
-    profileForm?.addEventListener('ln-form:success', (e) => {
-        window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-            detail: {
-                type: 'success',
-                title: 'Профилот е ажуриран',
-                message: 'Сите промени беа успешно зачувани.'
-            }
-        }));
-    });
-
-    // Грешка при испраќање -> Тостерче за грешка со листа
-    profileForm?.addEventListener('ln-form:error', (e) => {
-        window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-            detail: {
-                type: 'error',
-                title: 'Грешка при валидација',
-                message: e.detail?.errors || ['Ве молиме проверете ги внесените податоци.']
-            }
-        }));
-    });
-});
-```
-
----
-
-## 3. Минимален HTML Маркап и Варијанти на Употреба
-
-Со цел да се испочитува принципот на **Separation of Concerns**, сите визуелни стилови (аценти, бои, картички, позиционирање) се дефинирани во CSS/SCSS преку соодветните миксини, додека JavaScript логиката реагира исклучиво на `data-ln-toast` атрибутите и глобалните настани.
-
----
-
-### Варијанта 1: Стандарден сервисен контејнер (Viewport Blueprint)
-
-Потребно е да се дефинира само еден глобален HTML контејнер `<ul>`, најчесто поставен на дното на лејаутот пред `</body>` ознаката.
-
-#### HTML Маркап
+### А. Базен HTML контејнер
+За овозможување на сервисот, во главниот лејаут на апликацијата (најчесто пред `</body>`) се поставува само еден контејнер:
 ```html
 <ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5"></ul>
 ```
 
-#### Иницирање преку JavaScript (Window Event)
+### Б. Дефолтен HTML Шаблон (template.html)
+Доколку нема дефинирано специфичен шаблон во контејнерот, моторот автоматски го бара или вметнува следниот шаблон:
+```html
+<template data-ln-template="ln-toast-item">
+    <li data-ln-toast-item data-ln-attr="class:type">
+        <div class="icon">
+            <ul>
+                <li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
+                <li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
+                <li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
+                <li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+            </ul>
+        </div>
+        <section class="content">
+            <header>
+                <strong class="title" data-ln-field="title"></strong>
+                <button type="button" data-ln-toast-close aria-label="Close">
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                </button>
+            </header>
+            <main class="body" data-ln-field="message"></main>
+        </section>
+    </li>
+</template>
+```
+
+### В. Варијанти на употреба
+
+#### Варијанта 1: Статичен / SSR Маркап (Hydration)
+Бекендот може директно да испрати готови `<li>` елементи во рамките на контејнерот. Скриптата ги наоѓа и ги хидрира без рендирање на шаблон:
+```html
+<ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5">
+    <li data-ln-toast-item class="success">
+        <div class="icon">
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg>
+        </div>
+        <section class="content">
+            <header>
+                <strong class="title">Зачувано</strong>
+                <button type="button" data-ln-toast-close aria-label="Close">
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                </button>
+            </header>
+            <main class="body"><p>Податоците се успешно снимени во базата.</p></main>
+        </section>
+    </li>
+</ul>
+```
+
+#### Варијанта 2: Динамично испраќање нотификација преку JavaScript
+Секој координатор или форма може да испрати глобален настан до `window` за да прикаже нотификација:
 ```javascript
 window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
     detail: {
-        type: 'info',
-        title: 'Системско известување',
-        message: 'Имате нова порака во вашето сандаче.'
+        type: 'success', // success | error | warn | info
+        title: 'Успешна операција',
+        message: 'Податоците се снимени.'
     }
 }));
 ```
 
----
-
-### Варијанта 2: Приказ на мапа од валидациски грешки (Validation Error List)
-
-Кога се пренесуваат повеќе пораки одеднаш (на пример, од серверска валидација на форма), својството `message` прифаќа низа од стрингови, или објектот `data.errors` пренесува мапа од грешки. Картичката автоматски генерира подредена `<ul>` листа со заштита од XSS.
-
-#### Иницирање со низа од пораки
+#### Варијанта 3: Рендирање на листа од грешки (Validation Errors)
+Кога својството `message` прифаќа низа од стрингови или кога се испраќа мапа на грешки преку `data.errors`, моторот ги рендира безбедно како `<ul>` листа:
 ```javascript
+// Со низа на пораки
 window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
     detail: {
         type: 'error',
-        title: 'Неуспешна валидација',
+        title: 'Грешка при валидација',
         message: [
-            'Е-поштата е задолжително поле.',
-            'Лозинката мора да содржи најмалку 8 карактери.',
-            'Полето за потврда на условите е задолжително.'
+            'Полето име е задолжително.',
+            'Е-поштата не е во валиден формат.'
         ]
     }
 }));
-```
 
-#### Иницирање со серверски `data.errors` објект (напр. Laravel API)
-```javascript
+// Со серверска мапа на грешки (пр. од Laravel)
 window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
     detail: {
         type: 'error',
-        title: 'Валидацијата не успеа',
+        title: 'Грешка при валидација',
         data: {
             errors: {
-                email: ['Е-поштата веќе постои во системот.'],
-                phone: ['Неважечки формат на телефонски број.']
+                username: ['Името веќе постои'],
+                password: ['Лозинката е премногу кратка']
             }
         }
     }
@@ -223,251 +116,105 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 
 ---
 
-### Варијанта 3: Глобално чистење на нотификациите (`ln-toast:clear`)
+## 3. Декларативен API Договор (Атрибути и Настани)
 
-Доколку е потребно сите моментално прикажани нотификации на екранот веднаш да се затворат (на пример, при промена на рута или ресетирање на состојба), се испраќа настанот `ln-toast:clear`.
+### А. Функционални Атрибути
 
-```javascript
-// Затворање на сите toasts во сите контејнери
-window.dispatchEvent(new CustomEvent('ln-toast:clear'));
-
-// Затворање на toasts само во специфичен контејнер
-window.dispatchEvent(new CustomEvent('ln-toast:clear', {
-    detail: { container: '#custom-toast-container' }
-}));
-```
-
----
-
-### Варијанта 4: SCSS Стилизација и Архитектура на Миксини
-
-Стилирањето се врши преку наменските SCSS миксини во [scss/config/mixins/_toast.scss](file:///c:/laragon/www/ln-ashlar/scss/config/mixins/_toast.scss) и компонентата во [scss/components/_toast.scss](file:///c:/laragon/www/ln-ashlar/scss/components/_toast.scss).
-
-#### Примарни SCSS Миксини
-
-```scss
-/* scss/config/mixins/_toast.scss */
-
-// Контејнер позициониран фиксно на долу-десно од екранот
-@mixin toast-container {
-    @include fixed;
-    @include z-toast; // Висок z-index слој
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    pointer-events: none; // Овозможува кликовите да минуваат низ празниот простор
-    right: var(--size-lg);
-    bottom: var(--size-lg);
-    display: flex;
-    flex-direction: column-reverse; // Новите нотификации се појавуваат на дното
-}
-
-// Поединечен toast елемент со анимациска поддршка
-@mixin toast-item {
-    list-style: none;
-    opacity: 0;
-    pointer-events: auto; // Овозможува интеракција со самата картичка
-    @include motion-safe {
-        transform: translateX(30px);
-        transition: all var(--transition-base) var(--easing-standard);
-    }
-}
-
-// Визуелна флуидна картичка со страничен акцент за боја
-@mixin toast-card {
-    @include floating-panel;
-    @include flex;
-    min-width: 320px;
-    max-width: 450px;
-    @include overflow-hidden;
-}
-```
-
----
-
-## 4. Функционални и ARIA Атрибути
-
-Компонентата користи збир од функционални атрибути за конфигурација и автоматски внесува пристапни ARIA својства во согласност со WAI-ARIA стандардите.
-
-| Атрибут | Тип | Задолжително | Опис |
-|---|---|---|---|
-| `data-ln-toast` | Идентификатор | **Да** | Го означува `<ul>` елементот како глобален сервисен контејнер за toasts. |
-| `data-ln-toast-timeout` | Број (ms) | Не (Дефолт: `6000`) | Време во милисекунди пред нотификацијата автоматски да се затвори. Користете `0` за трајни нотификации. |
-| `data-ln-toast-max` | Број | Не (Дефолт: `5`) | Максимален број на истовремено прикажани нотификации во стек-от. Постарите нотификации се отстрануваат според FIFO ред. |
-| `data-ln-toast-item` | Идентификатор | Не | Се користи кај SSR елементи за хидратација на статичен `<li>` нотификациски елемент. |
-| `data-type` | Стринг | Не | Категорија на SSR нотификација: `success`, `error`, `warn`, `info`. |
-| `data-title` | Стринг | Не | Наслов за SSR нотификација. |
-
-### Динамички ARIA атрибути (Автоматски поставени од JS моторот)
-
-Во зависност од категоријата (`type`), моторот [ln-toast.js](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js#L72-L73) автоматски ги доделува соодветните ARIA улоги за читачите на екран:
-
-| Категорија (`type`) | `role` | `aria-live` | Дефолтен Наслов | Икона |
+| Атрибут | Опсег | Тип | Стандардна вредност | Опис |
 |---|---|---|---|---|
-| `success` | `status` | `polite` | `Success` | `#ln-circle-check` |
-| `error` | `alert` | `assertive` | `Error` | `#ln-circle-x` |
-| `warn` | `status` | `polite` | `Warning` | `#ln-alert-triangle` |
-| `info` | `status` | `polite` | `Information` | `#ln-info-circle` |
+| `data-ln-toast` | Контејнер | Идентификатор | - | Го означува `<ul>` елементот како контејнер за toasts. |
+| `data-ln-toast-timeout` | Контејнер | Број (ms) | `6000` | Стандардно време на траење на секоја нотификација. Вредност `0` ги прави трајни. |
+| `data-ln-toast-max` | Контејнер | Број | `5` | Максимален број на активни нотификации во стек (FIFO). |
+| `data-ln-toast-item` | Тостер картичка | Идентификатор | - | Го означува елементот како toast картичка за хидратација/бришење. |
+| `data-ln-toast-close` | Тостер картичка | Идентификатор | - | Атрибут за копчето за затворање. |
+| `data-ln-toast-when` | Шаблон икони | Стринг | - | Го поврзува соодветниот `<li>` за икона со типот на картичката. |
+
+### Б. Глобални Настани (Events API)
+
+Компонентата реагира на следните настани испратени до `window`:
+
+- **`ln-toast:enqueue`**
+  Додава нова картичка во стек. Параметрите во `event.detail` се:
+  - `type` (стринг, опционално): `success` | `error` | `warn` | `info`
+  - `title` (стринг, опционално): Наслов на картичката.
+  - `message` (стринг или низа од стрингови, опционално): Содржина.
+  - `data.errors` (мапа, опционално): Серверски грешки.
+  - `timeout` (број во ms, опционално): Специфичен тајмаут за оваа картичка.
+  - `container` (стринг селектор, опционално): Идентификатор на специфичен контејнер.
+
+- **`ln-toast:clear`**
+  Ги отстранува сите активни картички. Доколку во `detail.container` е проследен CSS селектор, го чисти само тој контејнер.
 
 ---
 
-## 5. Емитувани и Примени Настани (Events API)
+## 4. CSS Стилизирање и Поведенски Концепт
 
-`ln-toast` функционира исклучиво преку примање на глобални CustomEvents испратени до `window` објектот.
+### А. Изворни SCSS Миксини
+Стилизирањето и структурата се дефинирани во [scss/config/mixins/_toast.scss](../../scss/config/mixins/_toast.scss) и се применуваат преку [scss/components/_toast.scss](../../scss/components/_toast.scss):
 
-### Примени Настани (Window Event Listeners)
+- `@mixin toast-container`: Позиционирање на контејнерот фиксно во долниот десен агол, притоа овозможувајќи ги кликовите да минуваат околу нотификациите (`pointer-events: none`).
+- `@mixin toast-item`: Базна структура на `<li>` картичките (ресетирање на `pointer-events: auto`).
+- `@mixin toast-item-enter`: Состојба кога картичката се монтира (`opacity: 0`, `translateX(30px)`) преку класата `.ln-enter`.
+- `@mixin toast-item-out`: Состојба кога картичката излегува (`opacity: 0`, `scale(0.95)`) преку класата `.ln-out`.
+- `@mixin toast-card`: Панел со сенки и заоблени рабови.
+- `@mixin toast-icon`: Стилизирање на левата лента со SVG икона во соодветната боја на категоријата.
+- `@mixin toast-icon-list`: Овозможува приказ само на иконата која одговара на типот на картичката.
 
-#### 1. `ln-toast:enqueue`
-Додава нова нотификациска картичка во контејнерот.
-
-```javascript
-window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-    detail: {
-        type: 'success',           // 'success' | 'error' | 'warn' | 'info'
-        title: 'Успешна операција', // Опционален наслов
-        message: 'Податоците се зачувани.', // Стринг или Низа од стрингови
-        timeout: 4000,             // Опционално преклопување на тајмерот (ms)
-        container: '#my-toasts'    // Опционален CSS селектор за контејнер
-    }
-}));
-```
-
-#### 2. `ln-toast:clear`
-Ги отстранува сите моментално активни нотификациски картички.
-
-```javascript
-window.dispatchEvent(new CustomEvent('ln-toast:clear', {
-    detail: {
-        container: '#my-toasts' // Опционално: расчистува само одреден контејнер
-    }
-}));
-```
+### Б. Поведенски Концепти
+- **Анимациски тајминг**: Картичката користи двофазна CSS транзиција. При рачно или автоматско затворање, JS ја додава класата `.ln-out` и по 200ms (колку што трае транзицијата) елементот физички се отстранува од DOM преку `removeChild()`.
+- **Флексибилни димензии**: Картичките имаат дефинирано минимална ширина од `320px` и максимална ширина од `450px`, со автоматско собирање на празниот простор во насловот и телото со помош на CSS `:empty { display: none; }` правила.
+- **Поддршка за Reduced Motion**: Сите транзиции се спакувани во `@include motion-safe` блокови, спречувајќи ги анимациите кај корисници кои ги имаат исклучено во нивниот систем.
 
 ---
 
-## 6. Архитектура на JavaScript Моторот (JS Engine Internal Architecture)
+## 5. Пристапност (ARIA) и Чести Грешки
 
-Изворниот код на моторот е сместен во [js/ln-toast/src/ln-toast.js](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js). Тој користи IIFE заштитен модул со поддршка за безбедно извршување во DOM средина.
+### А. WAI-ARIA Спецификации
+- **Контејнер за нотификации (`[data-ln-toast]`)**: Задолжително содржи `aria-live="polite"` (или `assertive` за грешки) и `aria-atomic="false"` за да може корисниците со асистивна технологија веднаш да ја чујат секоја нова нотификација без прекинување на нивната тековна акција.
+- **Изолација на картичките**: Самите `<li>` картички немаат сопствени `role` и `aria-live` атрибути, со што се спречува несакано дуплирање на гласовните известувања.
+- **Копче за затворање**: Копчето мора да содржи јасен `aria-label="Close"` или превод.
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           window (Global Bus)                           │
-└─────────────────────────────────────────────────────────────────────────┘
-        │                                             │
-        │ Event: 'ln-toast:enqueue'                   │ Event: 'ln-toast:clear'
-        ▼                                             ▼
-┌──────────────────────────────┐              ┌──────────────────────────┐
-│   _onEnqueue(e) Handler      │              │    _onClear(e) Handler   │
-└──────────────────────────────┘              └──────────────────────────┘
-        │                                             │
-        ▼                                             ▼
-┌──────────────────────────────┐              ┌──────────────────────────┐
-│   _resolveContainer(detail)  │              │  Dismiss all cards from  │
-└──────────────────────────────┘              │  matched containers      │
-        │                                     └──────────────────────────┘
-        ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│   _Component Instance (attached via dom['lnToast'])                    │
-│   • timeoutDefault: parseInt(data-ln-toast-timeout) || 6000             │
-│   • max: parseInt(data-ln-toast-max) || 5                               │
-└─────────────────────────────────────────────────────────────────────────┘
-        │
-        ├─► _buildItem(opts, container)
-        │     ├─► Clones template: cloneTemplateScoped(container, 'ln-toast-item')
-        │     ├─► Populates text: fill(li, { title, role, ariaLive, hasBody })
-        │     ├─► Sets SVG icon: <use href="#ln-circle-check">
-        │     └─► Attaches close listener: _dismiss(li)
-        │
-        ├─► _append(cmp, li)
-        │     ├─► Evicts oldest items if children.length >= cmp.max
-        │     └─► Triggers entry animation: requestAnimationFrame(() => li.classList.add('ln-toast__item--in'))
-        │
-        └─► Auto-Dismiss Timer Setup
-              └─► li._timer = setTimeout(() => _dismiss(li), timeout)
-```
-
-### Клучни фази на моторот:
-
-1. **Автоматска иницијализација на HTML шаблонот (`_ensureTemplate`)**:
-   Доколку во документот не постои `template[data-ln-template="ln-toast-item"]`, моторот автоматски креира и го додава стандардниот HTML шаблон ([template.html](file:///c:/laragon/www/ln-ashlar/js/ln-toast/template.html)) во `document.body` при стартувањето ([js/ln-toast/src/ln-toast.js:L19-L27](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js#L19-L27)).
-
-2. **Детекција со MutationObserver (`_findContainers`)**:
-   Моторот користи `MutationObserver` кој го надгледува целиот `document.body` за динамички додадени `[data-ln-toast]` контејнери или елементи, автоматизирајќи ја инстанцијацијата на компонентниот објект.
-
-3. **Лимит на максимален стек (`_append`)**:
-   Пред да се додаде новата картичка во контејнерот, моторот го проверува атрибутот `data-ln-toast-max`. Доколку броот на активни деца го надмине лимитот, најстариот елемент (првото дете) веднаш се отстранува од DOM ([js/ln-toast/src/ln-toast.js:L122-L126](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js#L122-L126)).
-
-4. **Двофазни CSS Анимации (`_dismiss`)**:
-   Затворањето не го брише елементот инстантно. Најпрво се прекинува тајмерот `clearTimeout(li._timer)`, се отстранува класата `.ln-toast__item--in` и се додава `.ln-toast__item--out`. По 200ms (времетраење на CSS транзицијата), елементот целосно се отстранува од DOM дрвото ([js/ln-toast/src/ln-toast.js:L128-L134](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js#L128-L134)).
+### Б. Чести Грешки и Анти-патерни
+- **Директен JS пристап**: Повикување на `container.lnToast._append()` или слични методи за рачно градење елементи е строго забрането. Користете го настанскиот систем со `ln-toast:enqueue`.
+- **Селекторски конфликти (BEM класи)**: Користење на измислени BEM класи како `.ln-toast__item` или `.ln-toast__card` кои не се користат во нашиот CSS систем. Стилизирањето се потпира на атрибутот `[data-ln-toast] > li`.
+- **HTML во JS пораки**: Внесување на HTML во својството `message`. Моторот за заштита користи `textContent` (како и `fill` алатката) и директно ги неутрализира сите XSS обиди. За прикажување структурирани грешки, секогаш испраќајте ги како низа.
 
 ---
 
-## 7. Безбедносни мерки, Принципи и Edge-Cases
-
-### 1. Безбедност од XSS напади (Safe Body Rendering)
-При прикажување на динамички пораки или мапи со серверски грешки, моторот не користи `innerHTML`. Во функцијата `_renderBody` ([js/ln-toast/src/ln-toast.js:L95-L120](file:///c:/laragon/www/ln-ashlar/js/ln-toast/src/ln-toast.js#L95-L120)), пораките се креираат исклучиво преку `document.createElement('p')` / `document.createElement('li')` и се доделуваат со `textContent`. Со ова целосно се спречува можноста за Script Injection преку грешки внесени од корисникот.
-
-### 2. Изолација на pointer-events (Viewport Non-Blocking)
-Глобалниот контејнер `[data-ln-toast]` користи `pointer-events: none` во SCSS миксинот [@mixin toast-container](file:///c:/laragon/www/ln-ashlar/scss/config/mixins/_toast.scss#L23). Ова гарантира дека празниот простор околу нотификациите не ги блокира кликовите на корисникот кон веб страницата под него. Самите картички ресетираат `pointer-events: auto` со цел да овозможат клик на копчето за затворање.
-
-### 3. Респектирање на кориснички преференци за движење (`motion-safe`)
-Анимациите за лизгање и транзиција се обвиткани во `@include motion-safe` миксин. Доколку корисникот има овозможено `prefers-reduced-motion` во оперативниот систем, нотификациите ќе се појавуваат и исчезнуваат веднаш без да предизвикуваат моторички пречки.
-
----
-
-## 8. Системски Дијаграми
-
-### Секуенцен дијаграм (Window Event Dispatch -> Render -> Exit)
+## 6. Дијаграм на Текот и Животен Циклус
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Корисник / API
-    participant Coord as App Coordinator
-    participant Win as window (Global Bus)
+    actor User as Корисник / Апликација
+    participant Coord as UI Coordinator
+    participant Win as window (Event Bus)
     participant Engine as ln-toast Engine
     participant DOM as DOM Container ([data-ln-toast])
 
-    User->>Coord: Испраќа форма / Серверски одговор
+    User->>Coord: Извршува акција (зачувување форма)
     Coord->>Win: dispatchEvent('ln-toast:enqueue', detail)
-    Win->>Engine: Пресретнување преку _onEnqueue
-    Engine->>Engine: _resolveContainer & _buildItem (Clone template & set ARIA)
-    Engine->>DOM: _append (Додава во DOM & применува ln-toast__item--in)
+    Win->>Engine: Пресретнува настан преку _onEnqueue(e)
+    Engine->>Engine: _resolveContainer & _buildItem (шаблон и fill())
+    Engine->>DOM: _append() (додава во DOM со .ln-enter)
+    Note over DOM: Се отстранува .ln-enter во следен frame
     
     alt Рачно затворање
-        User->>DOM: Клик на .ln-toast__close
+        User->>DOM: Клик на [data-ln-toast-close]
         DOM->>Engine: _dismiss(li)
     else Автоматско затворање (Timeout)
-        Engine->>Engine: Истекување на setTimeout(6000ms)
+        Engine->>Engine: Изминува data-ln-toast-timeout (6000ms)
         Engine->>DOM: _dismiss(li)
     end
 
-    Engine->>DOM: Додава ln-toast__item--out & чека 200ms
-    Engine->>DOM: removeChild(li) - Целосно отстранување
+    Engine->>DOM: Додава .ln-out класа
+    Note over DOM: Чека 200ms транзиција
+    Engine->>DOM: removeChild(li)
 ```
 
 ---
 
-### Дијаграм на состојби на нотификациска картичка (Card Lifecycle)
-
-```mermaid
-stateDiagram-v2
-    [*] --> Unregistered : Специфициран во HTML или испратен преку Event
-
-    state "Подготовка" as Prep {
-        Unregistered --> TemplateCloned : cloneTemplateScoped()
-        TemplateCloned --> PropsHydrated : fill() title, role, aria-live
-    }
-
-    state "Активна состојба" as Active {
-        PropsHydrated --> AnimatedIn : appendChild() + .ln-toast__item--in
-        AnimatedIn --> WaitingTimeout : стартува setTimeout()
-    }
-
-    state "Уништување" as Exit {
-        WaitingTimeout --> AnimatedOut : _dismiss() + .ln-toast__item--out
-        AnimatedOut --> RemovedFromDOM : removeChild() по 200ms
-    }
-
-    RemovedFromDOM --> [*]
-```
+## 7. Поврзани Компоненти
+- [ln-core](../../js/ln-core/index.js) — Заеднички функции за шаблонирање и манипулација со DOM.
+- [ln-form](./ln-form.md) — Испраќач на податоци кој емитува настани за успех/грешка уловени од координаторите.
+- [ln-validate](./ln-validate.md) — Компонента за клиентска валидација која може да иницира приказ на грешки.
