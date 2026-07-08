@@ -54,6 +54,7 @@ import { dispatch, registerComponent } from '../../ln-core';
 			}
 			dom.classList.remove(CSS_VALID);
 			dom.classList.add(CSS_INVALID);
+			dom.setAttribute('aria-invalid', 'true');
 		};
 
 		this._onClearCustom = function (e) {
@@ -85,6 +86,14 @@ import { dispatch, registerComponent } from '../../ln-core';
 		dom.addEventListener('change', this._onChange);
 		dom.addEventListener('ln-validate:set-custom', this._onSetCustom);
 		dom.addEventListener('ln-validate:clear-custom', this._onClearCustom);
+
+		const form = dom.form;
+		if (form) {
+			this._onFormReset = function () {
+				self.reset();
+			};
+			form.addEventListener('reset', this._onFormReset);
+		}
 
 		return this;
 	}
@@ -118,6 +127,9 @@ import { dispatch, registerComponent } from '../../ln-core';
 		dom.classList.toggle(CSS_VALID, isValid);
 		dom.classList.toggle(CSS_INVALID, !isValid);
 
+		// Manage ARIA invalid attribute
+		dom.setAttribute('aria-invalid', isValid ? 'false' : 'true');
+
 		// Emit event
 		const eventName = isValid ? 'ln-validate:valid' : 'ln-validate:invalid';
 		dispatch(dom, eventName, { target: dom, field: dom.name });
@@ -129,6 +141,7 @@ import { dispatch, registerComponent } from '../../ln-core';
 		this._touched = false;
 		this._customErrors.clear();
 		this.dom.classList.remove(CSS_VALID, CSS_INVALID);
+		this.dom.removeAttribute('aria-invalid');
 
 		const parent = this.dom.closest('.form-element');
 		if (parent) {
@@ -149,7 +162,14 @@ import { dispatch, registerComponent } from '../../ln-core';
 		this.dom.removeEventListener('change', this._onChange);
 		this.dom.removeEventListener('ln-validate:set-custom', this._onSetCustom);
 		this.dom.removeEventListener('ln-validate:clear-custom', this._onClearCustom);
+
+		const form = this.dom.form;
+		if (form && this._onFormReset) {
+			form.removeEventListener('reset', this._onFormReset);
+		}
+
 		this.dom.classList.remove(CSS_VALID, CSS_INVALID);
+		this.dom.removeAttribute('aria-invalid');
 		dispatch(this.dom, 'ln-validate:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
