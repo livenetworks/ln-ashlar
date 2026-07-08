@@ -25,6 +25,11 @@ import { dispatchCancelable, registerComponent } from '../../ln-core';
 			|| dom.querySelector('input[type="text"]');
 
 		this.itemsSelector = dom.getAttribute('data-ln-search-items') || null;
+
+		const debounceVal = dom.getAttribute('data-ln-search-debounce');
+		this.debounceTime = debounceVal !== null ? parseInt(debounceVal, 10) : DEBOUNCE_MS;
+		if (isNaN(this.debounceTime)) this.debounceTime = DEBOUNCE_MS;
+
 		this._debounceTimer = null;
 
 		this._attachHandler();
@@ -66,7 +71,7 @@ import { dispatchCancelable, registerComponent } from '../../ln-core';
 			clearTimeout(self._debounceTimer);
 			self._debounceTimer = setTimeout(function () {
 				self._search(self.input.value.trim().toLowerCase());
-			}, DEBOUNCE_MS);
+			}, self.debounceTime);
 		};
 
 		this.input.addEventListener('input', this._onInput);

@@ -224,8 +224,11 @@
   input.value = 'Скопје';
   input.dispatchEvent(new Event('input', { bubbles: true }));
   ```
+- **Празна вредност за `data-ln-search`:**
+  Доколку го оставите атрибутот `data-ln-search=""` празен, визуелниот CSS линтер (доколку е овозможен `data-ln-debug` на `html` или `body`) ќе прикаже развојна inline грешка: *"data-ln-search target is empty"*.
 
 ---
+
 
 ## 6. Дијаграм на Текот и Животен Циклус
 
