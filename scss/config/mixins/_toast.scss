@@ -13,12 +13,16 @@
 @use 'card' as *;
 
 // Toast notification -- side-accent card with icon, title, body, close button.
+// The <li> IS the card; the type IS its class (.success/.error/.warn/.info).
 //
 // Usage:
-//   [data-ln-toast] { @include toast-container; }
-//   .ln-toast__card { @include toast-card; }
+//   [data-ln-toast]      { @include toast-container; }
+//   [data-ln-toast] > li { @include toast-item; @include toast-card; }
 //
-// Color: attach .success/.error/.warning/.info utility class on the card to cascade --color-accent.
+// Tone: the type class on the <li> rebinds --color-primary/--color-accent via
+// semantic-color() — see components/_toast.scss. SSR authors the class; the
+// dynamic path fills it (data-ln-attr="class:type"). warn maps to the warning
+// family in that binding.
 
 @mixin toast-container {
 	@include fixed;
@@ -35,12 +39,15 @@
 	flex-direction: column-reverse;
 }
 
+// Base = final visible resting state, so SSR-authored <li> render with
+// zero JS. .ln-enter (below) is a transient pre-mount override applied
+// only to JS-created items — see ln-toast.js _buildItem/_append.
 @mixin toast-item {
 	list-style: none;
-	opacity: 0;
 	pointer-events: auto;
+	opacity: 1;
 	@include motion-safe {
-		transform: translateX(30px);
+		transform: translateX(0);
 		transition: all var(--transition-base) var(--easing-standard);
 	}
 
@@ -50,10 +57,10 @@
 	}
 }
 
-@mixin toast-item-in {
-	opacity: 1;
+@mixin toast-item-enter {
+	opacity: 0;
 	@include motion-safe {
-		transform: translateX(0);
+		transform: translateX(30px);
 	}
 }
 
@@ -73,7 +80,7 @@
 	@include overflow-hidden;
 }
 
-@mixin toast-side {
+@mixin toast-icon {
 	--color-accent:    hsl(var(--color-primary));
 	--color-accent-fg: hsl(var(--color-white));
 	flex: 0 0 44px;
@@ -91,6 +98,16 @@
 	}
 }
 
+// The icon variant list — 4 authored icons, CSS shows the one matching the
+// card's type class (see components/_toast.scss for the when-toggle).
+// display:contents dissolves the <ul> box so the visible <li> becomes a direct
+// flex child of .icon (parity with the SSR path's direct <svg> child).
+@mixin toast-icon-list {
+	display: contents;
+
+	> li { @include hidden; }
+}
+
 @mixin toast-content {
 	@include flex-1;
 	--padding-y: var(--size-md);
@@ -98,7 +115,7 @@
 	padding: var(--padding-y) var(--padding-x) var(--padding-y) var(--size-sm);  // 4th arm: icon-side gutter, component-design intrinsic.
 	@include relative;
 
-	.ln-toast__close {
+	button[data-ln-toast-close] {
 		--btn-padding-y: var(--size-2xs);
 		--btn-padding-x: var(--size-2xs);
 		@include absolute;
@@ -108,24 +125,12 @@
 	}
 }
 
-// ─── Header & close ────────────────────────────────────
-
-@mixin toast-head {
-	@include flex;
-	align-items: flex-start;
-	@include justify-between;
-	--gap: var(--size-md);
-	gap: var(--gap);
-}
-
 @mixin toast-title {
 	@include font-bold;
 	@include text-base;
 	color: var(--color-fg);
 	line-height: 1.25;
 }
-
-// ─── Body ──────────────────────────────────────────────
 
 @mixin toast-body {
 	--color-fg: var(--fg-muted);

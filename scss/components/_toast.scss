@@ -4,38 +4,65 @@
 	@include toast-container;
 }
 
-[data-ln-toast] > .ln-toast__item {
+// The <li> IS the card: structural (item) + visual (card) styling both bind
+// here, contextually — the <li> carries no static class (no-BEM), only the
+// filled/authored type class.
+[data-ln-toast] > li {
 	@include toast-item;
-}
-
-[data-ln-toast] > .ln-toast__item--in {
-	@include toast-item-in;
-}
-
-.ln-toast__item--out {
-	@include toast-item-out;
-}
-
-.ln-toast__card {
 	@include toast-card;
 }
 
-.ln-toast__side {
-	@include toast-side;
+[data-ln-toast] > li.ln-enter {
+	@include toast-item-enter;
 }
 
-.ln-toast__content {
+[data-ln-toast] > li.ln-out {
+	@include toast-item-out;
+}
+
+// Type → tone. The status→tone map lives here (one place): warn maps to the
+// warning family. SSR authors the class; the dynamic path fills it verbatim.
+[data-ln-toast] > li.success { @include semantic-color(success); }
+[data-ln-toast] > li.error   { @include semantic-color(error); }
+[data-ln-toast] > li.warn    { @include semantic-color(warning); }
+[data-ln-toast] > li.info    { @include semantic-color(info); }
+
+[data-ln-toast] .icon {
+	@include toast-icon;
+}
+
+[data-ln-toast] .icon ul {
+	@include toast-icon-list;
+}
+
+// When-toggle — dynamic template ships all 4 icon variants; CSS shows the
+// one matching the card's type class. Unknown/absent type → no matching
+// class → no icon (documented degradation, see docs/js/toast.md).
+[data-ln-toast] > li.success .icon li[data-ln-toast-when="success"],
+[data-ln-toast] > li.error .icon li[data-ln-toast-when="error"],
+[data-ln-toast] > li.warn .icon li[data-ln-toast-when="warn"],
+[data-ln-toast] > li.info .icon li[data-ln-toast-when="info"] {
+	@include block;
+}
+
+[data-ln-toast] .content {
 	@include toast-content;
 }
 
-.ln-toast__head {
-	@include toast-head;
-}
-
-.ln-toast__title {
+[data-ln-toast] .title {
 	@include toast-title;
 }
 
-.ln-toast__body {
+// No default titles are ever filled by JS — an empty title collapses.
+[data-ln-toast] .title:empty {
+	@include hidden;
+}
+
+[data-ln-toast] .body {
 	@include toast-body;
+}
+
+// No hasBody flag — an unfilled body collapses via :empty.
+[data-ln-toast] .body:empty {
+	@include hidden;
 }
