@@ -671,13 +671,15 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		}
 
 		if (el) {
+			let containerEl;
 			if (el.tagName === 'LI' || el.tagName === 'TR') {
-				this.tbody.appendChild(el);
+				containerEl = el;
 			} else {
-				const item = document.createElement(this.isUl ? 'li' : 'div');
-				item.appendChild(el);
-				this.tbody.appendChild(item);
+				containerEl = document.createElement(this.isUl ? 'li' : 'div');
+				containerEl.appendChild(el);
 			}
+			containerEl.classList.add('ln-list__empty-wrapper');
+			this.tbody.appendChild(containerEl);
 		}
 
 		dispatch(this.dom, 'ln-list:empty', {
