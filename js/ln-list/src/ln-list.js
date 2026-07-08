@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
@@ -181,7 +181,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			// --- Search Change ---
 			this._onSearchChange = function (e) {
 				e.preventDefault();
-				self.currentSearch = e.detail.term;
+				self.currentSearch = (e.detail && e.detail.term) || '';
 				dispatch(dom, 'ln-list:search', {
 					list: self.name,
 					query: self.currentSearch
@@ -222,7 +222,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			this._onSearch = function (e) {
 				e.preventDefault();
-				self._searchTerm = e.detail.term;
+				self._searchTerm = (e.detail && e.detail.term) || '';
 				self._applyFilterAndSort();
 				self._vStart = -1;
 				self._vEnd = -1;
@@ -239,11 +239,17 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				const btn = e.target.closest('[data-ln-list-clear]');
 				if (!btn) return;
 
+				const before = dispatchCancelable(dom, 'ln-list:before-clear-search', { list: self.name });
+				if (before.defaultPrevented) return;
+
 				self._searchTerm = '';
 				const searchEl = document.querySelector('[data-ln-search="' + dom.id + '"]');
 				if (searchEl) {
 					const input = searchEl.tagName === 'INPUT' ? searchEl : searchEl.querySelector('input');
-					if (input) input.value = '';
+					if (input) {
+						input.value = '';
+						input.dispatchEvent(new Event('input', { bubbles: true }));
+					}
 				}
 
 				self._applyFilterAndSort();
