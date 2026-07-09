@@ -263,9 +263,9 @@
 	document.addEventListener('ln-table:row-action', function (e) {
 		const d = e.detail;
 		if (d.table === 'packages' && d.action === 'delete') {
-			const packagesStoreEl = document.getElementById('packages-store');
-			if (!packagesStoreEl) return;
-			packagesStoreEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+			const packagesCoordEl = document.querySelector('[data-ln-data-coordinator="packages"]');
+			if (!packagesCoordEl) return;
+			packagesCoordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
 				detail: { id: Number(d.record.id) }
 			}));
 		}
@@ -406,9 +406,9 @@
 	document.addEventListener('ln-table:row-action', function (e) {
 		const d = e.detail;
 		if (d.table === 'tenants' && d.action === 'delete') {
-			const tenantsStoreEl = document.getElementById('tenants-store');
-			if (!tenantsStoreEl) return;
-			tenantsStoreEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+			const tenantsCoordEl = document.querySelector('[data-ln-data-coordinator="tenants"]');
+			if (!tenantsCoordEl) return;
+			tenantsCoordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
 				detail: { id: Number(d.record.id) }
 			}));
 		}
@@ -422,9 +422,9 @@
 		if (!table || !table.lnTable) return;
 		const ids = Array.from(table.lnTable.selectedIds).map(Number);
 		if (!ids.length) return;
-		const tenantsStoreEl = document.getElementById('tenants-store');
-		if (!tenantsStoreEl) return;
-		tenantsStoreEl.dispatchEvent(new CustomEvent('ln-store:request-bulk-delete', {
+		const tenantsCoordEl = document.querySelector('[data-ln-data-coordinator="tenants"]');
+		if (!tenantsCoordEl) return;
+		tenantsCoordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-bulk-delete', {
 			detail: { ids: ids }
 		}));
 	});

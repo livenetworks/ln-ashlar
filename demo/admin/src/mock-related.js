@@ -99,7 +99,7 @@
 			window.dispatchEvent(new CustomEvent('demo-telemetry-net', {
 				detail: { message: `POST /api/documents -> Created doc_id #${newRecord.doc_id}`, payload: newRecord }
 			}));
-			return jsonResponse(newRecord);
+			return jsonResponse({ message: { type: 'success', title: 'Saved', body: 'Document created' }, content: newRecord });
 		}
 
 		// PUT /api/documents/:id (update)
@@ -127,7 +127,7 @@
 			window.dispatchEvent(new CustomEvent('demo-telemetry-net', {
 				detail: { message: `PUT /api/documents/${id} -> Confirmed update`, payload: updated }
 			}));
-			return jsonResponse(updated);
+			return jsonResponse({ message: { type: 'success', title: 'Saved', body: 'Document updated' }, content: updated });
 		}
 
 		// DELETE /api/documents/:id (delete)
@@ -147,7 +147,7 @@
 			window.dispatchEvent(new CustomEvent('demo-telemetry-net', {
 				detail: { message: `DELETE /api/documents/${id} -> Confirmed deletion` }
 			}));
-			return jsonResponse({ ok: true });
+			return jsonResponse({ message: { type: 'success', title: 'Deleted', body: 'Document deleted' }, content: null });
 		}
 
 		return realFetch(url, init);
@@ -252,7 +252,6 @@
 						if (storeEl.lnDataStore) {
 							storeEl.lnDataStore.getById(e.detail.id).then(function(localRecord) {
 								const clean = Object.assign({}, localRecord);
-								delete clean._pending;
 								const serverPayload = mapper.egress(clean);
 								logTelemetry('mapper', `egress() mapped Flat Local Cache Record -> Nested Server JSON PUT payload`, { local: clean, serverRaw: serverPayload });
 							});

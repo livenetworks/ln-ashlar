@@ -104,7 +104,8 @@ A zero-dependency, high-performance table presenter component that supports both
 - **`ln-table:row-click`** `{ table, id, record }`  
   Fired when clicking on row contents.
 - **`ln-table:row-action`** `{ table, id, action, record }`  
-  Fired when clicking row buttons.
+  Fired when clicking row buttons.  
+  Note: the row-action click handler calls `e.stopPropagation()`, so a `data-ln-table-row-action` button cannot be combined with document-delegated triggers like `data-ln-modal-for` or `data-ln-fill-*` on the same button — the click never reaches those listeners. Pick one mechanism per button.
 
 ### Received Events
 

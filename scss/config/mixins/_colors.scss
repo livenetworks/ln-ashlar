@@ -19,7 +19,7 @@
 // --color-accent vocabulary to a status family (success / warning /
 // error / info / secondary). Used by .success / .warning / .error /
 // .info / .secondary classes in _utilities.scss. Cascading both families
-// ensures every downstream consumer (btn, toast-side, card-accent,
+// ensures every downstream consumer (btn, toast-icon, card-accent,
 // alert, badge, etc.) picks up the status color through inherited
 // custom-property values — no per-mixin redeclare required.
 @mixin semantic-color($family) {

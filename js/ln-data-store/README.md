@@ -1,6 +1,6 @@
 # ln-data-store
 
-A zero-dependency, local-first **Database Cache Store** backed by standard browser `IndexedDB`. It acts as a pure client-side database cache, maintaining records locally, executing high-performance querying in-memory, and managing optimistic mutations with automatic snapshots for transaction safety.
+A zero-dependency, local-first **Database Cache Store** backed by standard browser `IndexedDB`. It acts as a pure client-side database cache, maintaining records locally, executing high-performance querying in-memory, and applying optimistic mutations directly — a record is a record, with no pending state, snapshots, or rollback machinery.
 
 It possesses no visual interface and is **completely blind to the network** (no fetch, status codes, paths, or urls). Instead, it communicates strictly via custom DOM events, allowing the parent **Data Coordinator** to orchestrate syncs and mutations.
 
@@ -98,29 +98,40 @@ store.lnDataStore.setPresenters({
 
 ### Commands (Dispatched TO the store)
 
-*Never invoke write methods directly.* Route all mutations through DOM commands:
+*Never invoke write methods directly.* Route all mutations through DOM commands. The
+**caller supplies `tempId`** on create — the store has no fallback ID generator; a
+parent coordinator (or any other caller) is responsible for minting one (e.g.
+`'_temp_' + crypto.randomUUID()`):
 
 ```javascript
-// Create optimistically
+// Create optimistically — caller-supplied tempId is required
 store.dispatchEvent(new CustomEvent('ln-store:request-create', {
-  detail: { data: { title: 'New Document', status: 'Draft' } }
+  detail: { tempId: '_temp_abc123', data: { title: 'New Document', status: 'Draft' } }
 }));
 
-// Update with version locks
+// Update — an id-swap happens automatically when data.id differs from the current id
+// (this is how a server-confirmed create is applied: request-update with the temp id
+// as the target and the server record — including its real id — as data)
 store.dispatchEvent(new CustomEvent('ln-store:request-update', {
-  detail: { id: 42, data: { title: 'Updated title' }, expected_version: 3 }
+  detail: { id: 42, data: { title: 'Updated title' } }
 }));
 ```
 
-### Remote Request Events (Bubbles UP to the Coordinator)
+There is no `expected_version` handling at the store layer — version locks are a
+connector/coordinator transport concern (`ln-api-connector:request-update`'s
+`expected_version` field), not a local-cache one.
 
-*The Coordinator catches these events to run transport sync and mutations:*
+### Sync Request (Bubbles UP to the Coordinator)
+
+*The Coordinator catches this event to run transport sync:*
 
 * `ln-store:request-remote-sync` (detail: `{ since }`)
-* `ln-store:request-remote-create` (detail: `{ tempId, data }`)
-* `ln-store:request-remote-update` (detail: `{ id, data, expected_version }`)
-* `ln-store:request-remote-delete` (detail: `{ id }`)
-* `ln-store:request-remote-bulk-delete` (detail: `{ ids }`)
+
+There are no `request-remote-create` / `-update` / `-delete` / `-bulk-delete`
+events. Remote transport is fanned out in parallel by the coordinator directly
+from its own intake events — see the
+[ln-data-coordinator README](../ln-data-coordinator/README.md) — not chained off
+store confirmation.
 
 ### Lifecycle Notification
 
@@ -130,18 +141,19 @@ store.dispatchEvent(new CustomEvent('ln-store:request-update', {
 
 ## 🚀 Public Synchronization APIs (Invoked by the Coordinator)
 
-Once the network connector returns backend payloads, the Coordinator feeds the results back to the store using these public methods:
+Once the network connector returns backend payloads, the Coordinator feeds the results back to the store using this public method:
 
 ```javascript
 // Feed delta updates or initial load data
 store.lnDataStore.applySync(upsertedRecords, deletedIds, syncedAt);
-
-// Confirm an optimistic transaction (swaps temp IDs, clears pending flag)
-store.lnDataStore.confirmMutation(tempIdOrId, serverRecord, action);
-
-// Revert an optimistic transaction (restores snapshot on error)
-store.lnDataStore.revertMutation(tempIdOrId, action, errorMessage);
-
-// Trigger conflict merge flow
-store.lnDataStore.resolveConflict(id, remoteRecord, fieldDiffs);
 ```
+
+**No `confirmMutation`, `revertMutation`, or `resolveConflict`.** A record is a
+record — there is no `_pending` flag, no per-mutation snapshot, and no rollback.
+Server confirmation of a create/update is just an ordinary
+`ln-store:request-update` dispatched by the coordinator (id-swap handled
+automatically when the incoming `data.id` differs from the target `id`). The
+only marker of an unsynced record is its `_temp_`-prefixed id — there is no
+separate `synced` flag. If a create is ultimately rejected by the server, the
+coordinator issues an ordinary `ln-store:request-delete` for that temp id;
+there is no automatic revert-to-previous-snapshot behavior.

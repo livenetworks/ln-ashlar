@@ -1,15 +1,11 @@
-import { dispatch, serializeForm, populateForm, registerComponent } from '../../ln-core';
+import { populateForm, dispatch, registerComponent, serializeForm } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-form';
 	const DOM_ATTRIBUTE = 'lnForm';
-	const AUTO_ATTR = 'data-ln-form-auto';
-	const DEBOUNCE_ATTR = 'data-ln-form-debounce';
-	const TYPED_ATTR = 'data-ln-form-typed';
-	const VALIDATE_SELECTOR = 'data-ln-validate';
-	const VALIDATE_ATTRIBUTE = 'lnValidate';
 	const ACTION_EDIT_ATTR   = 'data-ln-form-action-edit';
 	const ACTION_METHOD_ATTR = 'data-ln-form-action-method';
+	const SCOPE_ATTR = 'data-ln-form-scope';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -17,178 +13,80 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 
 	function _component(form) {
 		this.dom = form;
-		this._debounceTimer = null;
 		this._baseAction = form.getAttribute('action') || '';
 
 		const self = this;
-
-		this._onValid = function () {
-			self._updateSubmitButton();
-		};
-
-		this._onInvalid = function () {
-			self._updateSubmitButton();
-		};
-
-		this._onSubmit = function (e) {
-			e.preventDefault();
-			self.submit();
-		};
-
-		this._onFill = function (e) {
-			if (e.detail) self.fill(e.detail);
-		};
 
 		this._onLnFill = function (e) {
 			// Guard: only handle direct dispatches at this form, not bubbled
 			// events from [data-ln-fillable] children inside the form.
 			if (e.target !== self.dom) return;
-			if (e.detail) self.fill(e.detail);
-			else self.reset();
-			self._applyActionMode(e.detail);
+			if (e.detail) {
+				self.fill(e.detail);
+				self._applyActionMode(e.detail);
+			} else {
+				// Null record = "new" mode. Native reset fires the 'reset'
+				// event, which restores the base action below.
+				self.dom.reset();
+			}
 		};
 
-		this._onFormReset = function () {
-			self.reset();
+		this._onReset = function () {
+			self._applyActionMode(null);
 		};
 
-		this._onNativeReset = function () {
-			setTimeout(function () { self._resetValidation(); }, 0);
-		};
+		this._onSubmit = function (e) {
+			if (!self.dom.hasAttribute(SCOPE_ATTR)) return; // not opted in — native submit or ln-ajax handles it
 
-		form.addEventListener('ln-validate:valid', this._onValid);
-		form.addEventListener('ln-validate:invalid', this._onInvalid);
-		form.addEventListener('submit', this._onSubmit);
-		form.addEventListener('ln-form:fill', this._onFill);
-		form.addEventListener('ln-form:reset', this._onFormReset);
-		form.addEventListener('ln-fill', this._onLnFill);
-		form.addEventListener('reset', this._onNativeReset);
+			const methodInputVal = self.dom.querySelector('input[name="_method"]');
+			let method = (methodInputVal && methodInputVal.value !== '') ? methodInputVal.value.toUpperCase() : self.dom.method.toUpperCase();
 
-		// Auto-submit
-		this._onAutoInput = null;
-		if (form.hasAttribute(AUTO_ATTR)) {
-			const debounceMs = parseInt(form.getAttribute(DEBOUNCE_ATTR)) || 0;
-			this._onAutoInput = function () {
-				if (debounceMs > 0) {
-					clearTimeout(self._debounceTimer);
-					self._debounceTimer = setTimeout(function () { self.submit(); }, debounceMs);
-				} else {
-					self.submit();
-				}
+			if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return; // native submit proceeds untouched (e.g. GET search forms)
+
+			e.preventDefault();
+
+			const raw = serializeForm(self.dom);
+			const scopeVal = self.dom.getAttribute(SCOPE_ATTR);
+
+			delete raw._method;
+			delete raw._token;
+
+			const detail = {
+				scope: scopeVal ? scopeVal : null,
+				action: self._baseAction,
+				actionResolved: self.dom.getAttribute('action') || '',
+				method: method,
+				data: raw,
+				form: self.dom,
+				claimed: false
 			};
-			form.addEventListener('input', this._onAutoInput);
-			form.addEventListener('change', this._onAutoInput);
-		}
 
-		// Initial submit button state
-		this._updateSubmitButton();
+			dispatch(self.dom, 'ln-form:submit-record', detail);
+
+			if (!detail.claimed) {
+				console.warn('[ln-form] ln-form:submit-record was not claimed. Check the data-ln-form-scope name, or make sure this form is nested inside a [data-ln-data-coordinator] element.');
+			}
+		};
+
+		form.addEventListener('ln-fill', this._onLnFill);
+		form.addEventListener('reset', this._onReset);
+		form.addEventListener('submit', this._onSubmit);
 
 		return this;
 	}
 
-	_component.prototype._updateSubmitButton = function () {
-		const buttons = this.dom.querySelectorAll('button[type="submit"], input[type="submit"]');
-		if (!buttons.length) return;
-
-		const fields = this.dom.querySelectorAll('[' + VALIDATE_SELECTOR + ']');
-		let shouldDisable = false;
-
-		if (fields.length > 0) {
-			// Disable if any field is invalid OR if no fields have been touched yet
-			let anyTouched = false;
-			let anyInvalid = false;
-			for (let i = 0; i < fields.length; i++) {
-				const instance = fields[i][VALIDATE_ATTRIBUTE];
-				if (instance && instance._touched) anyTouched = true;
-				if (!fields[i].checkValidity()) anyInvalid = true;
-			}
-			shouldDisable = anyInvalid || !anyTouched;
-		}
-
-		for (let j = 0; j < buttons.length; j++) {
-			buttons[j].disabled = shouldDisable;
-		}
-	};
-
 	_component.prototype.fill = function (data) {
 		const filled = populateForm(this.dom, data);
 
-		// Trigger events so ln-validate picks up the changes.
-		// Mirror the same isChangeBased logic as ln-validate:
-		// SELECT/checkbox/radio -> 'change', everything else -> 'input'
+		// Trigger events so reactive consumers (ln-validate, ln-autoresize)
+		// pick up the changes. SELECT/checkbox/radio -> 'change',
+		// everything else -> 'input'.
 		for (let k = 0; k < filled.length; k++) {
 			const el = filled[k];
 			const isChangeBased = el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio';
 			el.dispatchEvent(new Event(isChangeBased ? 'change' : 'input', { bubbles: true }));
 		}
 	};
-
-	_component.prototype.submit = function () {
-		// Force-validate all fields
-		const fields = this.dom.querySelectorAll('[' + VALIDATE_SELECTOR + ']');
-		let allValid = true;
-
-		for (let i = 0; i < fields.length; i++) {
-			const instance = fields[i][VALIDATE_ATTRIBUTE];
-			if (instance) {
-				if (!instance.validate()) allValid = false;
-			}
-		}
-
-		if (!allValid) return;
-
-		const data = serializeForm(this.dom, { typed: this.dom.hasAttribute(TYPED_ATTR) });
-		dispatch(this.dom, 'ln-form:submit', { data: data });
-	};
-
-	_component.prototype.reset = function () {
-		this.dom.reset();
-
-		// Mirror fill() — dispatch input/change so reactive consumers
-		// (ln-autoresize, ln-validate, custom listeners) re-react to the
-		// cleared values. dom.reset() clears .value but does NOT fire
-		// input/change events; without these dispatches, ln-autoresize
-		// keeps its previous height, etc.
-		//
-		// Order matters: this loop MUST run BEFORE _resetValidation().
-		// ln-validate's input handler will mark default-empty required
-		// fields as invalid (touched + validate); _resetValidation()
-		// below clears that transient state. Moving _resetValidation
-		// above the dispatch loop would leave fields visibly invalid.
-		const fields = this.dom.querySelectorAll('input, textarea, select');
-		for (let k = 0; k < fields.length; k++) {
-			const el = fields[k];
-			const isChangeBased = el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio';
-			el.dispatchEvent(new Event(isChangeBased ? 'change' : 'input', { bubbles: true }));
-		}
-
-		this._resetValidation();
-
-		// Notify high-level subscribers (custom controls that hold their
-		// own value and cannot be reset via input/change). Distinct from
-		// the incoming 'ln-form:reset' request event to avoid a loop.
-		dispatch(this.dom, 'ln-form:reset-complete', { target: this.dom });
-	};
-
-	_component.prototype._resetValidation = function () {
-		const fields = this.dom.querySelectorAll('[' + VALIDATE_SELECTOR + ']');
-		for (let i = 0; i < fields.length; i++) {
-			const instance = fields[i][VALIDATE_ATTRIBUTE];
-			if (instance) instance.reset();
-		}
-
-		this._updateSubmitButton();
-	};
-
-	Object.defineProperty(_component.prototype, 'isValid', {
-		get: function () {
-			const fields = this.dom.querySelectorAll('[' + VALIDATE_SELECTOR + ']');
-			for (let i = 0; i < fields.length; i++) {
-				if (!fields[i].checkValidity()) return false;
-			}
-			return true;
-		}
-	});
 
 	_component.prototype._ensureMethodInput = function () {
 		let input = this.dom.querySelector('input[name="_method"]');
@@ -224,18 +122,9 @@ import { dispatch, serializeForm, populateForm, registerComponent } from '../../
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		this.dom.removeEventListener('ln-validate:valid', this._onValid);
-		this.dom.removeEventListener('ln-validate:invalid', this._onInvalid);
-		this.dom.removeEventListener('submit', this._onSubmit);
-		this.dom.removeEventListener('ln-form:fill', this._onFill);
-		this.dom.removeEventListener('ln-form:reset', this._onFormReset);
 		this.dom.removeEventListener('ln-fill', this._onLnFill);
-		this.dom.removeEventListener('reset', this._onNativeReset);
-		if (this._onAutoInput) {
-			this.dom.removeEventListener('input', this._onAutoInput);
-			this.dom.removeEventListener('change', this._onAutoInput);
-		}
-		clearTimeout(this._debounceTimer);
+		this.dom.removeEventListener('reset', this._onReset);
+		this.dom.removeEventListener('submit', this._onSubmit);
 		dispatch(this.dom, 'ln-form:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};

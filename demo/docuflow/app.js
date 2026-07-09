@@ -43,6 +43,7 @@
 	// ── Entity view factory ────────────────────────────────────────────
 	function makeEntityView({ name, storeEl, tableId, formEl, modalEl, decorate }) {
 		let lastQuery = { sort: null, filters: {}, search: '' };
+		const coordEl = document.querySelector('[data-ln-data-coordinator="' + name + '"]');
 
 		function getTableEl() {
 			return document.getElementById(tableId);
@@ -88,12 +89,12 @@
 						toast('warning', 'Blocked', `${n} tenant${n !== 1 ? 's' : ''} use this package`);
 						return;
 					}
-					storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+					coordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
 						detail: { id: Number(detail.id) }
 					}));
 				});
 			} else {
-				storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+				coordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
 					detail: { id: Number(detail.id) }
 				}));
 			}

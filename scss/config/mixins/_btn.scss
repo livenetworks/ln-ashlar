@@ -48,7 +48,7 @@
 // --color-accent / --color-accent-fg) sidestep that: the default
 // theme leaves them unset (mixin falls back to solid + white), Glass
 // rebinds them at theme :root to flip the accent button to
-// translucent. Solid-accent consumers (toast-side, pill-checked,
+// translucent. Solid-accent consumers (toast-icon, pill-checked,
 // stepper active/complete) read --color-accent / --color-accent-fg
 // directly and are unaffected by Glass's rebind because Glass leaves
 // --color-accent-fg alone. See CLAUDE.md ## Theme Architecture for

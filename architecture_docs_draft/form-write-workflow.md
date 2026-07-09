@@ -1,5 +1,5 @@
 # 📝 Form Write Workflow — „како треба да работи"
-> **Статус:** 🟡 ПРЕДЛОГ (нацрт за консензус — ништо од ова не е имплементирано)
+> **Статус:** ✅ ИМПЛЕМЕНТИРАНО (2026-07-08) — компонентниот рефактор е завршен; демо-режирањето (§9 чекор 5) е одложено за втор бран. Потрошувачки водич: [write-workflow-guide.md](write-workflow-guide.md)
 > **Опфат:** `ln-form`, `ln-data-coordinator`, `ln-ajax` (мал guard), демо-страници
 > **Датум:** 2026-07-07
 
@@ -48,7 +48,7 @@
 
 При submit на форма со scope атрибут, `ln-form`:
 
-1.  Повикува `preventDefault()` на нативниот submit.
+1.  Го чита ефективниот метод (`_method` ако постои, инаку `method` атрибутот). Ако не е `POST`/`PUT`/`PATCH` — **не прави ништо**: нативниот submit си тече (пр. комплексна search форма со GET, макар и внатре во координатор). Инаку повикува `preventDefault()`.
 2.  Го нормализира payload-от (FormData → плитко JSON). Без интерпретација: `_method` се промовира во `method` полето на detail-от, `_token` се трга (транспортна грижа) — сè друго оди сурово.
 3.  Емитува **bubbling** `ln-form:submit-record` на самата форма:
 
@@ -79,7 +79,7 @@ detail: {
 
 При преземање: поставува `detail.claimed = true` (dispatch е синхрон), **го толкува** суровиот detail и го преведува во постоечкиот влез на store детето:
 
-*   **Режим:** `method` е `POST` → `ln-store:request-create`; `PUT`/`PATCH` → `ln-store:request-update`. (Сигналот веќе го одржува постоечкиот fill/reset примитив: `lnFill` на edit запис поставува `_method` + препишан action; reset го враќа create обликот.)
+*   **Режим:** буквално читање, без претпоставки — `POST` → `ln-store:request-create`; `PUT`/`PATCH` → `ln-store:request-update`. Сигналот го одржува постоечкиот fill/reset примитив: `lnFill` на edit запис поставува `_method` + препишан action; reset го враќа create обликот (`_method` се празни, останува `method="post"` од маркапот).
 *   **Идентитет:** `id` и `expected_version` ги вади од `data` (координаторска конвенција, не формина).
 *   **URL:** проследениот `action` е **изворот на вистина за мутацискиот endpoint** (HTML-first — истиот URL на кој формата би направила нативен submit без JS). Координаторот го персистира во queue entry-то (`meta.action` — queue-от останува blind, `meta` е opaque како и досега), а во send мигот конекторот извршува кон `action` (create) односно `action + '/' + targetId` (update/delete), со `X-LN-Response: data`. **Клучно:** се персистира ресурсниот URL, без id во него — резолвиран per-record URL со temp id внатре би останал stale по remap; id-то се дошива при send од моменталниот `targetId`. Конекторската `data-ln-api-path` конфигурација останува само за read/sync.
 
@@ -190,7 +190,7 @@ Offline сценариото не е посебен режим: submit-от се
 	<!-- Модал-форма: остана потомок на координаторот (containment) -->
 	<dialog data-ln-modal="document-edit">
 		<form data-ln-form data-ln-form-scope
-		      action="/documents" data-ln-form-action-edit>
+		      action="/documents" method="post" data-ln-form-action-edit>
 			<input type="hidden" name="id">
 			<input type="hidden" name="expected_version">
 			<!-- полиња -->

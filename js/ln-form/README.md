@@ -3,7 +3,8 @@
 A minimal **form manipulation** primitive. `ln-form` does exactly two
 things to a native `<form>`: populate it when an `ln-fill` event delivers
 a record, and rewrite `action` / `_method` for RESTful edit routing.
-Submit is native HTML — `ln-form` never touches it.
+Submit is native HTML — `ln-form` never touches it, unless
+`data-ln-form-scope` is present (see §5b).
 
 ---
 
@@ -17,7 +18,8 @@ Submit is native HTML — `ln-form` never touches it.
    `method` in HTML. Without JavaScript they do a normal native submit.
    PUT/DELETE ride on POST via an auto-ensured hidden `_method` input
    (Laravel method spoofing) — `ln-form` never intercepts `submit`,
-   never serializes data, never dispatches a submit event.
+   never serializes data, never dispatches a submit event, unless
+   `data-ln-form-scope` is present (see §5b).
 3. **Transport is someone else's job.** Ajax interception (if wanted) is
    a separate component's concern — it listens to the native `submit`
    event itself. Validation is owned by the browser's constraint
@@ -60,6 +62,7 @@ Submit is native HTML — `ln-form` never touches it.
 | `data-ln-form` | `<form>` | Initializes the coordinator. |
 | `data-ln-form-action-edit` | `<form>` | Opt-in RESTful action routing. See below. |
 | `data-ln-form-action-method="PUT"` | `<form>` | Override verb for `_method` (default `PUT`). Requires `data-ln-form-action-edit`. |
+| `data-ln-form-scope` | `<form>` | Opt-in local-first write path. Empty = nearest ancestor `[data-ln-data-coordinator]`. Named = explicit coordinator override. Intercepts submit; incompatible with native/ajax submit on the same form. |
 
 ### JS API
 
@@ -85,6 +88,7 @@ form.lnForm.destroy();
 | Event | Bubbles | Payload | Description |
 | :--- | :--- | :--- | :--- |
 | `ln-form:destroyed` | Yes | `{ target: HTMLElement }` | Dispatched when the coordinator is torn down. |
+| `ln-form:submit-record` | Yes | `{ scope, action, actionResolved, method, data, form, claimed }` | Only dispatched on forms carrying `data-ln-form-scope`. `claimed` is set synchronously by the owning `ln-data-coordinator`; if still `false` after dispatch, `ln-form` logs a console warning — no silent fallback. |
 
 ### Received
 
@@ -150,13 +154,44 @@ them.
   native HTML; ajax interception (if desired) belongs to a separate
   component that listens to the native `submit` event.
 - **No serialization.** There is no `serializeForm` call, no
-  `ln-form:submit` event, no JSON payload.
+  `ln-form:submit` event, no JSON payload. (unscoped forms only — scoped
+  forms use `serializeForm` internally, see §5b).
 - **No validation orchestration.** Constraint validation is the
   browser's job (no `novalidate` in this library); field-level error
   display is `ln-validate`'s job. `ln-form` does not gate submit buttons
   and does not force-validate fields.
-- **No submit interception.** `ln-form` never listens to `submit` and
-  never calls `preventDefault()`.
+- **No submit interception** unless `data-ln-form-scope` is present (see
+  §5b below). `ln-form` never listens to `submit` and never calls
+  `preventDefault()` on unscoped forms.
+
+---
+
+## 5b. Local-first write routing (`data-ln-form-scope`)
+
+A form carrying `data-ln-form-scope` becomes the universal write entry
+point for local-first/SPA pages. The `submit` event is intercepted at
+three possible rungs, and whichever rung claims it decides the archetype:
+
+1. **Nobody** — native browser submit to `action` (+ `_method`), SSR.
+2. **`ln-ajax`** — fetch to `action`, page stays put (progressive
+   enhancement). `ln-ajax` explicitly skips forms carrying
+   `data-ln-form-scope` (see the `ln-ajax` README).
+3. **`ln-data-coordinator`** — a form with `data-ln-form-scope` has its
+   submit normalized (`serializeForm`, no interpretation) and dispatched
+   as `ln-form:submit-record`. The nearest ancestor
+   `[data-ln-data-coordinator]` (or the named coordinator, if
+   `data-ln-form-scope="name"`) claims it and routes it through the
+   store → queue → connector write pipeline.
+
+Interception is a literal read of the effective method (`_method` input
+if present and non-empty, else the form's `method` attribute): `POST` →
+create, `PUT`/`PATCH` → update. Any other effective method (`GET`, or a
+scoped form with no method set) is **never intercepted** — the native
+submit proceeds untouched, so a GET search form nested inside a
+coordinator keeps working exactly as before. `ln-form` itself stays
+coordinator-blind; it only serializes and dispatches. See
+[`docs/js/form.md`](../../docs/js/form.md) for a fuller write-up
+(follow-up doc task).
 
 ---
 

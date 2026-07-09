@@ -7,6 +7,18 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Response Resolver ──────────────────────────────────
+
+	function _resolve(res) {
+		if (res.ok) return res.status === 204 ? null : res.json();
+		return res.json().catch(() => null).then(body => {
+			const err = new Error('HTTP ' + res.status + ': ' + res.statusText);
+			err.status = res.status;
+			err.data = body;
+			throw err;
+		});
+	}
+
 	// ─── Component Constructor ─────────────────────────────
 
 	function _component(dom) {
@@ -44,6 +56,12 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		});
 	};
 
+	// ─── Request Headers (forces X-LN-Response) ─────────────
+
+	_component.prototype._reqHeaders = function () {
+		return Object.assign({}, getHeaders(this.headers), { 'X-LN-Response': 'data' });
+	};
+
 	// ─── JS API Methods (Promises) ──────────────────────────
 
 	_component.prototype.fetchDelta = function (since) {
@@ -54,72 +72,54 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			url += (url.indexOf('?') !== -1 ? '&' : '?') + 'since=' + encodeURIComponent(since);
 		}
 
-		return window.fetch(url, { method: 'GET', headers: getHeaders(self.headers), credentials: self.credentials })
-			.then(res => {
-				if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-				return res.json();
-			});
+		return window.fetch(url, { method: 'GET', headers: self._reqHeaders(), credentials: self.credentials })
+			.then(_resolve);
 	};
 
-	_component.prototype.create = function (payload) {
+	_component.prototype.create = function (payload, url) {
 		const self = this;
-		return window.fetch(buildUrl(self.baseUrl, self.path), {
+		return window.fetch(buildUrl(self.baseUrl, url || self.path), {
 			method: 'POST',
-			headers: getHeaders(self.headers),
+			headers: self._reqHeaders(),
 			credentials: self.credentials,
 			body: JSON.stringify(payload)
 		})
-		.then(res => {
-			if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-			return res.json();
-		});
+		.then(_resolve);
 	};
 
-	_component.prototype.update = function (id, payload) {
+	_component.prototype.update = function (id, payload, expectedVersion, url) {
 		const self = this;
-		return window.fetch(buildUrl(self.baseUrl, self.path, id), {
+		if (expectedVersion !== undefined && expectedVersion !== null) {
+			payload = Object.assign({}, payload, { expected_version: expectedVersion });
+		}
+		return window.fetch(buildUrl(self.baseUrl, url || self.path, id), {
 			method: 'PUT',
-			headers: getHeaders(self.headers),
+			headers: self._reqHeaders(),
 			credentials: self.credentials,
 			body: JSON.stringify(payload)
 		})
-		.then(res => {
-			if (res.ok) return res.json();
-			if (res.status === 409) return res.json().then(data => {
-				const err = new Error('Conflict');
-				err.status = 409;
-				err.data = data;
-				throw err;
-			});
-			throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-		});
+		.then(_resolve);
 	};
 
-	_component.prototype.delete = function (id) {
+	_component.prototype.delete = function (id, url) {
 		const self = this;
-		return window.fetch(buildUrl(self.baseUrl, self.path, id), {
+		return window.fetch(buildUrl(self.baseUrl, url || self.path, id), {
 			method: 'DELETE',
-			headers: getHeaders(self.headers),
+			headers: self._reqHeaders(),
 			credentials: self.credentials
 		})
-		.then(res => {
-			if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-			return res.json();
-		});
+		.then(_resolve);
 	};
 
-	_component.prototype.bulkDelete = function (ids) {
+	_component.prototype.bulkDelete = function (ids, url) {
 		const self = this;
-		return window.fetch(buildUrl(self.baseUrl, self.path) + '/bulk-delete', {
+		return window.fetch(buildUrl(self.baseUrl, url || self.path) + '/bulk-delete', {
 			method: 'DELETE',
-			headers: getHeaders(self.headers),
+			headers: self._reqHeaders(),
 			credentials: self.credentials,
 			body: JSON.stringify({ ids: ids })
 		})
-		.then(res => {
-			if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-			return res.json();
-		});
+		.then(_resolve);
 	};
 
 	// ─── DOM Event Routing ────────────────────────────────────
@@ -130,80 +130,91 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				const detail = e.detail || {};
 				self.fetchDelta(detail.since)
 					.then(function (data) {
-						dispatch(self.dom, 'ln-api-connector:fetched', { data: data, since: detail.since });
+						dispatch(self.dom, 'ln-api-connector:fetched', { data: data, since: detail.since, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'sync',
 							error: err.message,
 							status: err.status || 0,
-							since: detail.since
+							data: err.data || null,
+							since: detail.since,
+							meta: detail.meta || null
 						});
 					});
 			},
 			create: function (e) {
 				const detail = e.detail || {};
-				self.create(detail.data)
-					.then(function (record) {
-						dispatch(self.dom, 'ln-api-connector:created', { record: record, tempId: detail.tempId });
+				self.create(detail.data, detail.url)
+					.then(function (body) {
+						const record  = (body && body.content !== undefined) ? body.content : body;
+						const message = (body && body.message) ? body.message : null;
+						dispatch(self.dom, 'ln-api-connector:created', { record: record, tempId: detail.tempId, message: message, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'create',
 							error: err.message,
 							status: err.status || 0,
-							tempId: detail.tempId
+							data: err.data || null,
+							tempId: detail.tempId,
+							meta: detail.meta || null
 						});
 					});
 			},
 			update: function (e) {
 				const detail = e.detail || {};
-				// Merge expected_version into payload for conflict checking
-				const payload = Object.assign({}, detail.data);
-				if (detail.expected_version !== undefined) {
-					payload.expected_version = detail.expected_version;
-				}
-				self.update(detail.id, payload)
-					.then(function (record) {
-						dispatch(self.dom, 'ln-api-connector:updated', { record: record, id: detail.id });
+				self.update(detail.id, detail.data, detail.expected_version, detail.url)
+					.then(function (body) {
+						const record  = (body && body.content !== undefined) ? body.content : body;
+						const message = (body && body.message) ? body.message : null;
+						dispatch(self.dom, 'ln-api-connector:updated', { record: record, id: detail.id, message: message, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'update',
 							error: err.message,
 							status: err.status || 0,
+							data: err.data || null,
 							id: detail.id,
-							conflictData: err.status === 409 ? err.data : null
+							conflictData: err.status === 409 ? err.data : null,
+							meta: detail.meta || null
 						});
 					});
 			},
 			delete: function (e) {
 				const detail = e.detail || {};
-				self.delete(detail.id)
-					.then(function (res) {
-						dispatch(self.dom, 'ln-api-connector:deleted', { response: res, id: detail.id });
+				self.delete(detail.id, detail.url)
+					.then(function (body) {
+						const message = (body && body.message) ? body.message : null;
+						dispatch(self.dom, 'ln-api-connector:deleted', { response: body, id: detail.id, message: message, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'delete',
 							error: err.message,
 							status: err.status || 0,
-							id: detail.id
+							data: err.data || null,
+							id: detail.id,
+							meta: detail.meta || null
 						});
 					});
 			},
 			bulkDelete: function (e) {
 				const detail = e.detail || {};
-				self.bulkDelete(detail.ids)
-					.then(function (res) {
-						dispatch(self.dom, 'ln-api-connector:bulk-deleted', { response: res, ids: detail.ids });
+				self.bulkDelete(detail.ids, detail.url)
+					.then(function (body) {
+						const message = (body && body.message) ? body.message : null;
+						dispatch(self.dom, 'ln-api-connector:bulk-deleted', { response: body, ids: detail.ids, message: message, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'bulk-delete',
 							error: err.message,
 							status: err.status || 0,
-							ids: detail.ids
+							data: err.data || null,
+							ids: detail.ids,
+							meta: detail.meta || null
 						});
 					});
 			}

@@ -28,9 +28,9 @@
 	document.addEventListener('ln-table:row-action', function (e) {
 		const d = e.detail;
 		if (d.table === 'packages' && d.action === 'delete') {
-			const packagesStoreEl = document.getElementById('packages-store');
-			if (!packagesStoreEl) return;
-			packagesStoreEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+			const packagesCoordEl = document.querySelector('[data-ln-data-coordinator="packages"]');
+			if (!packagesCoordEl) return;
+			packagesCoordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
 				detail: { id: Number(d.record.id) }
 			}));
 		}

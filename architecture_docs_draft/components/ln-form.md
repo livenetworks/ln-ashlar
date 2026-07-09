@@ -14,9 +14,10 @@
 
 > [!IMPORTANT]
 > **Што `ln-form` НЕ прави (Orthogonality Doctrine):**
-> * **НЕ пресретнува `submit` настан** — Субмитот останува 100% нативен HTML. `ln-form` никогаш не слуша на `submit` и никогаш не повикува `preventDefault()`. Доколку се бара AJAX пресретнување при испраќање, тоа е работа на посебна транспортна компонента (како [`ln-ajax`](../../js/ln-ajax/README.md)) која самата се закачува на `submit`.
-> * **НЕ серијализира податоци** — Не содржи логика за собирање вредности во JSON/FormData, ниту диспачира `ln-form:submit` настани.
+> * **НЕ пресретнува `submit` настан, освен ако формата носи `data-ln-form-scope`** — Без овој атрибут, субмитот останува 100% нативен HTML: `ln-form` не слуша `submit` и не повикува `preventDefault()`. Доколку се бара AJAX пресретнување при испраќање, тоа е работа на посебна транспортна компонента (како [`ln-ajax`](../../js/ln-ajax/README.md)) која самата се закачува на `submit`. Со `data-ln-form-scope` присутен, `ln-form` **условно** пресретнува — само за POST/PUT/PATCH, никогаш за GET (види §3, „Local-first write рутирање“ подолу).
+> * **НЕ серијализира податоци, освен за scoped форми** — Без `data-ln-form-scope` нема логика за собирање вредности во JSON/FormData, ниту `ln-form:submit-record` настан. Со атрибутот присутен, се користи постоечкиот `serializeForm()` од `ln-core` — суров, плиток JSON, без интерпретација.
 > * **НЕ води валидациска состојба** — Валидацијата е одговорност на прелистувачот (HTML5 Constraint Validation) и компонентата [`ln-validate`](./ln-validate.md) за приказ на грешки. `ln-form` не ги оневозможува submit копчињата и не ги форсира грешките.
+> * **НЕ одредува режим на мутација (create/update)** — Дури и во scoped режим, `ln-form` не толкува дали станува збор за создавање или измена на запис. Само го чита ефективниот HTTP метод и го проследува сурово; толкувањето е одговорност на приемачот (`ln-data-coordinator`). `ln-form` останува целосно „coordinator-blind" — не бара, не именува и не повикува координатор.
 
 ---
 
@@ -150,6 +151,21 @@
 | `data-ln-form-action-edit` | `<form>` | `string` (опционален) | — | Овозможува RESTful рутирање. Доколку е празен, креира URL `baseAction + '/' + encodeURIComponent(id)`. Доколку содржи вредност, го заменува шаблонот `:id` со `encodeURIComponent(id)`. |
 | `data-ln-form-action-method` | `<form>` | `string` | `"PUT"` | Декларира HTTP верб за скриеното `<input name="_method">` поле во режим на измена (на пр. `PUT`, `PATCH`, `DELETE`). Бара `data-ln-form-action-edit`. |
 | `data-ln-fill-as` | Контроли (`input`, `select`, `textarea`) | `string` | — | Опционално премостување на клучот за мапирање од `record` доколку `name` атрибутот се разликува од името на својството во податоците. |
+| `data-ln-form-scope` | `<form>` | `string` (опционален) | — | Опт-ин за local-first write рутирање (види подолу). Празна вредност = формата ѝ припаѓа на **најблиската предок** `[data-ln-data-coordinator]` (containment преку `closest()`). Именувана вредност (`data-ln-form-scope="documents"`) = експлицитен override — формата ѝ припаѓа на именуваниот координатор без разлика каде е во DOM. |
+
+---
+
+### Local-first Write Рутирање (`data-ln-form-scope`)
+
+Форма со `data-ln-form-scope` станува декларативен влез во write pipeline-от на `ln-data-coordinator` (store → queue → connector), наместо чист нативен submit.
+
+**Литерален "method gate"** — при секој `submit`, `ln-form` прво го пресметува ефективниот метод, **без никаков fallback освен читање на она што реално стои во DOM**:
+1. Ако постои `<input name="_method">` со непразна вредност → тој метод (uppercased) е ефективен.
+2. Инаку → атрибутот `method` на самата форма (uppercased).
+
+Само доколку ефективниот метод е точно `POST`, `PUT` или `PATCH`, `ln-form` продолжува: повикува `preventDefault()`, го серијализира формата преку `serializeForm()` (плитко, сурово JSON — без интерпретација), го отстранува `_method` и `_token` од резултатот (транспортни детали, не се дел од записот), и диспачира `ln-form:submit-record`. **За секој друг ефективен метод (пр. `GET`, или форма без експлицитен `method` кај некои прелистувачи) — нема пресретнување, нема `preventDefault()`, ништо не се емитува; нативниот submit тече непроменето.** Ова е свесна одлука: GET-форма за пребарување вгнездена во координаторски subtree мора да продолжи да работи нативно.
+
+Create наспроти update **не** го одредува `ln-form` — само го проследува методот сурово; толкувањето е на `ln-data-coordinator` (POST → create, PUT/PATCH → update, види [`ln-data-coordinator.md`](./ln-data-coordinator.md) §3).
 
 ---
 
@@ -169,6 +185,10 @@
 | `input` | Да (`true`) | — | Диспачиран на секое пополнето текст поле, `textarea` или hidden input по извршување на `fill()`. |
 | `change` | Да (`true`) | — | Диспачиран на секој пополнет `<select>`, `checkbox` или `radio` по извршување на `fill()`. |
 | `ln-form:destroyed` | Да (`true`) | `{ target: HTMLElement }` | Се емитува кога формата се отстранува од DOM или се повикува `.destroy()`. |
+| `ln-form:submit-record` | Да (`true`) | `{ scope, action, actionResolved, method, data, form, claimed }` | Диспачиран **само** на форми со `data-ln-form-scope`, единствено кога ефективниот метод е `POST`/`PUT`/`PATCH` (види §3). `scope`: вредноста на `data-ln-form-scope` или `null`. `action`: базниот ресурсен URL (`_baseAction` — истиот што `ln-form` веќе го чува за reset; single source of truth за мутацискиот endpoint). `actionResolved`: моменталниот `action` атрибут при submit (по евентуален `_applyActionMode` rewrite). `method`: ефективниот метод (uppercased). `data`: сурово нормализиран payload од `serializeForm()`, со `_method`/`_token` веќе отстранети. `form`: референца до `<form>` елементот. `claimed`: почнува `false`; приемачот (координаторот) го поставува на `true` **синхроно** во истиот dispatch циклус. |
+
+> [!WARNING]
+> **Незапросен настан — гласна грешка, не тивок fallback.** Веднаш по `dispatch()`, `ln-form` проверува дали `detail.claimed` е сè уште `false`. Ако е — испишува `console.warn('[ln-form] ln-form:submit-record was not claimed. ...')`. Нема повторен обид, нема тивко враќање на нативен submit — типично значи погрешно име во `data-ln-form-scope` или формата не е потомок на `[data-ln-data-coordinator]`.
 
 ---
 
@@ -332,3 +352,4 @@ sequenceDiagram
 * [`ln-modal`](./ln-modal.md) — Модални дијалози во кои најчесто се сместени формите управувани од `ln-form`.
 * [`ln-table`](./ln-table.md) — Табели со податоци чии редови и акциски копчиња емитуваат `ln-fill` кон `ln-form`.
 * [`ln-fill`](../ln-fill/README.md) — Декларативен механизам за собирање податоци од `data-ln-fill-*` атрибути и диспачирање на `ln-fill` CustomEvent.
+* [`ln-data-coordinator`](./ln-data-coordinator.md) — Приемникот на `ln-form:submit-record` за scoped форми; ги толкува `method`/`data` и ги рутира низ store → queue → connector write pipeline-от.

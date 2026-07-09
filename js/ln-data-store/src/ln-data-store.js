@@ -14,16 +14,6 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 	let _dbReady = null;
 	const _stores = {};
 
-	function _uuid() {
-		try { return crypto.randomUUID(); }
-		catch (_) {
-			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-				const r = Math.random() * 16 | 0;
-				return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-			});
-		}
-	}
-
 	function _checkQuota(err) {
 		if (err && err.name === 'QuotaExceededError') {
 			dispatch(document, 'ln-store:quota-exceeded', { error: err });
@@ -138,7 +128,6 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		// Isolate ID and metadata we want in plain text for IndexedDB queries
 		const plainRecord = { ...record };
 		const recordId = plainRecord.id;
-		const pending = plainRecord._pending;
 
 		// Encrypt payload using core helper
 		const encryptedPayload = await encryptData(plainRecord);
@@ -146,7 +135,6 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 		return {
 			id: recordId,
-			_pending: pending,
 			encrypted: true,
 			iv: encryptedPayload.iv,
 			data: encryptedPayload.data
@@ -211,11 +199,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		const searchAttr = dom.getAttribute('data-ln-data-store-search-fields') || dom.getAttribute('data-ln-store-search-fields') || '';
 		this._searchFields = searchAttr.split(',').map(s => s.trim()).filter(Boolean);
 
-		this._noAutosync = dom.hasAttribute('data-ln-data-store-no-autosync')
-			|| dom.hasAttribute('data-ln-store-no-autosync');
-
 		this._handlers = null;
-		this._pendingSnapshots = {};
 
 		this.isLoaded = false;
 		this.isSyncing = false;
@@ -246,27 +230,29 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 	// ─── Optimistic Writing Pipeline ─────────────────────────
 
-	function _handleCreateRequest(self, { data = {} } = {}) {
-		const tempId = `_temp_${_uuid()}`;
-		const record = { ...data, id: tempId, _pending: true };
+	function _handleCreateRequest(self, { tempId, data = {} } = {}) {
+		const record = { ...data, id: tempId };
 
 		_putRecord(self._name, record).then(() => {
 			self.totalCount++;
 			dispatch(self.dom, 'ln-store:created', { store: self._name, record, tempId });
-			dispatch(self.dom, 'ln-store:request-remote-create', { tempId, data });
 		});
 	}
 
-	function _handleUpdateRequest(self, { id, data = {}, expected_version } = {}) {
+	function _handleUpdateRequest(self, { id, data = {} } = {}) {
 		_getRecord(self._name, id).then(existing => {
 			if (!existing) throw new Error(`Record not found: ${id}`);
 
-			self._pendingSnapshots[id] = { ...existing };
-			const updated = { ...existing, ...data, _pending: true };
+			const updated = { ...existing, ...data };
+			const newId = data.id;
+			const isRekey = newId !== undefined && newId !== id;
 
-			return _putRecord(self._name, updated).then(() => {
-				dispatch(self.dom, 'ln-store:updated', { store: self._name, record: updated, previous: self._pendingSnapshots[id] });
-				dispatch(self.dom, 'ln-store:request-remote-update', { id, data, expected_version });
+			const write = isRekey
+				? _rekeyRecord(self._name, id, updated)
+				: _putRecord(self._name, updated);
+
+			return write.then(() => {
+				dispatch(self.dom, 'ln-store:updated', { store: self._name, record: updated, previous: existing });
 			});
 		}).catch(err => console.error('[ln-data-store] Optimistic update failed:', err));
 	}
@@ -275,12 +261,9 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		_getRecord(self._name, id).then(existing => {
 			if (!existing) return;
 
-			self._pendingSnapshots[id] = { ...existing };
-
 			return _deleteRecord(self._name, id).then(() => {
 				self.totalCount--;
 				dispatch(self.dom, 'ln-store:deleted', { store: self._name, id });
-				dispatch(self.dom, 'ln-store:request-remote-delete', { id });
 			});
 		}).catch(err => console.error('[ln-data-store] Optimistic delete failed:', err));
 	}
@@ -289,15 +272,11 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		if (!ids.length) return;
 
 		Promise.all(ids.map(id => _getRecord(self._name, id))).then(records => {
-			const savedRecords = records.filter(Boolean);
-			const savedIds = savedRecords.map(r => r.id);
-
-			self._pendingSnapshots[savedIds.join(',')] = savedRecords;
+			const savedIds = records.filter(Boolean).map(r => r.id);
 
 			return _deleteBulk(self._name, savedIds).then(() => {
 				self.totalCount -= savedIds.length;
 				dispatch(self.dom, 'ln-store:deleted', { store: self._name, ids: savedIds });
-				dispatch(self.dom, 'ln-store:request-remote-bulk-delete', { ids: savedIds });
 			});
 		}).catch(err => console.error('[ln-data-store] Optimistic bulk delete failed:', err));
 	}
@@ -313,24 +292,17 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 				if (self.totalCount > 0) {
 					self.isLoaded = true;
 					dispatch(self.dom, 'ln-store:ready', { store: self._name, count: self.totalCount, source: 'cache' });
-					if (_isStale(self)) _triggerRemoteSync(self);
-				} else {
-					_triggerRemoteSync(self);
 				}
+
+				dispatch(self.dom, 'ln-store:initialized', { store: self._name, hasCache: self.totalCount > 0, lastSyncedAt: self.lastSyncedAt, count: self.totalCount });
 			} else if (meta && meta.schema_version !== SCHEMA_VERSION) {
 				_clearStore(self._name)
 					.then(() => _setMeta(self._name, { schema_version: SCHEMA_VERSION, last_synced_at: null, record_count: 0 }))
-					.then(() => _triggerRemoteSync(self));
+					.then(() => dispatch(self.dom, 'ln-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 }));
 			} else {
-				_triggerRemoteSync(self);
+				dispatch(self.dom, 'ln-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 });
 			}
 		});
-	}
-
-	function _isStale(self) {
-		if (self._staleThreshold === -1) return false;
-		if (!self.lastSyncedAt) return true;
-		return (Math.floor(Date.now() / 1000) - self.lastSyncedAt) > self._staleThreshold;
 	}
 
 	function _triggerRemoteSync(self) {
@@ -376,36 +348,20 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		});
 	}
 
-	// ─── Visibility Auto-Sync check ───
-
-	let _visibilityHandler = () => {
-		if (document.visibilityState !== 'visible') return;
-		Object.values(_stores).forEach(inst => {
-			if (inst.isLoaded && !inst.isSyncing && _isStale(inst)) {
-				_triggerRemoteSync(inst);
-			}
-		});
-	};
-	document.addEventListener('visibilitychange', _visibilityHandler);
-
-	// ─── Reconnect Auto-Sync ───────────────────────────────
-
-	// Default-on: when the browser goes back online, trigger a remote sync
-	// for all loaded stores that are not already syncing and have not opted out.
-	// The isSyncing guard makes this idempotent alongside manual forceSync calls.
-	let _onlineHandler = () => {
-		dispatch(document, 'ln-store:online', {});
-		Object.values(_stores).forEach(inst => {
-			if (inst._noAutosync) return;
-			if (inst.isLoaded && !inst.isSyncing) {
-				_triggerRemoteSync(inst);
-			}
-		});
-	};
-	window.addEventListener('online', _onlineHandler);
-
-	let _offlineNotify = () => { dispatch(document, 'ln-store:offline', {}); };
-	window.addEventListener('offline', _offlineNotify);
+	function _rekeyRecord(storeName, oldId, newRecord) {
+		const prepPromise = getCryptoKey() ? _encryptRecord(newRecord) : Promise.resolve(newRecord);
+		return prepPromise.then(prepped => _getDb().then(db => {
+			if (!db) return;
+			return new Promise((resolve, reject) => {
+				const tx = db.transaction(storeName, 'readwrite');
+				const store = tx.objectStore(storeName);
+				store.put(prepped);
+				store.delete(oldId);
+				tx.oncomplete = () => resolve();
+				tx.onerror = () => { _checkQuota(tx.error); reject(tx.error); };
+			});
+		}));
+	}
 
 	// ─── Query Engine (In-Memory over Cache) ───────────────
 
@@ -567,88 +523,6 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		});
 	};
 
-	_component.prototype.confirmMutation = function (tempIdOrId, serverRecord, action) {
-		const self = this;
-		const handlers = {
-			create: () => _deleteRecord(self._name, tempIdOrId)
-				.then(() => _putRecord(self._name, serverRecord))
-				.then(() => {
-					delete self._pendingSnapshots[tempIdOrId];
-					dispatch(self.dom, 'ln-store:confirmed', { store: self._name, record: serverRecord, tempId: tempIdOrId, action: 'create' });
-				}),
-			update: () => _putRecord(self._name, serverRecord).then(() => {
-				delete self._pendingSnapshots[tempIdOrId];
-				dispatch(self.dom, 'ln-store:confirmed', { store: self._name, record: serverRecord, action: 'update' });
-			}),
-			delete: () => {
-				delete self._pendingSnapshots[tempIdOrId];
-				dispatch(self.dom, 'ln-store:confirmed', { store: self._name, record: null, action: 'delete' });
-				return Promise.resolve();
-			},
-			'bulk-delete': () => {
-				delete self._pendingSnapshots[tempIdOrId];
-				dispatch(self.dom, 'ln-store:confirmed', { store: self._name, record: null, ids: tempIdOrId.split(','), action: 'bulk-delete' });
-				return Promise.resolve();
-			}
-		};
-		return handlers[action] ? handlers[action]() : Promise.resolve();
-	};
-
-	_component.prototype.revertMutation = function (tempIdOrId, action, error) {
-		const self = this;
-		const fallbackErr = error || `Server rejected ${action}`;
-
-		const handlers = {
-			create: () => _deleteRecord(self._name, tempIdOrId).then(() => {
-				self.totalCount--;
-				delete self._pendingSnapshots[tempIdOrId];
-				dispatch(self.dom, 'ln-store:reverted', { store: self._name, record: null, action: 'create', error: fallbackErr });
-			}),
-			update: () => {
-				const previous = self._pendingSnapshots[tempIdOrId];
-				if (!previous) return Promise.resolve();
-				return _putRecord(self._name, previous).then(() => {
-					delete self._pendingSnapshots[tempIdOrId];
-					dispatch(self.dom, 'ln-store:reverted', { store: self._name, record: previous, action: 'update', error: fallbackErr });
-				});
-			},
-			delete: () => {
-				const saved = self._pendingSnapshots[tempIdOrId];
-				if (!saved) return Promise.resolve();
-				return _putRecord(self._name, saved).then(() => {
-					self.totalCount++;
-					delete self._pendingSnapshots[tempIdOrId];
-					dispatch(self.dom, 'ln-store:reverted', { store: self._name, record: saved, action: 'delete', error: fallbackErr });
-				});
-			},
-			'bulk-delete': () => {
-				const savedRecords = self._pendingSnapshots[tempIdOrId];
-				if (!savedRecords || !savedRecords.length) return Promise.resolve();
-				return _putBulk(self._name, savedRecords).then(() => {
-					self.totalCount += savedRecords.length;
-					delete self._pendingSnapshots[tempIdOrId];
-					dispatch(self.dom, 'ln-store:reverted', { store: self._name, record: null, ids: tempIdOrId.split(','), action: 'bulk-delete', error: fallbackErr });
-				});
-			}
-		};
-		return handlers[action] ? handlers[action]() : Promise.resolve();
-	};
-
-	_component.prototype.resolveConflict = function (id, remoteRecord, fieldDiffs) {
-		const previous = this._pendingSnapshots[id];
-		if (!previous) return Promise.resolve();
-
-		return _putRecord(this._name, previous).then(() => {
-			delete this._pendingSnapshots[id];
-			dispatch(this.dom, 'ln-store:conflict', {
-				store: this._name,
-				local: previous,
-				remote: remoteRecord,
-				field_diffs: fieldDiffs || null
-			});
-		});
-	};
-
 	// ─── Manual Triggers & Cleanup ─────────────────────────
 
 	_component.prototype.forceSync = function () {
@@ -674,21 +548,6 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		}
 
 		delete _stores[this._name];
-
-		if (Object.keys(_stores).length === 0) {
-			if (_visibilityHandler) {
-				document.removeEventListener('visibilitychange', _visibilityHandler);
-				_visibilityHandler = null;
-			}
-			if (_onlineHandler) {
-				window.removeEventListener('online', _onlineHandler);
-				_onlineHandler = null;
-			}
-			if (_offlineNotify) {
-				window.removeEventListener('offline', _offlineNotify);
-				_offlineNotify = null;
-			}
-		}
 
 		delete this.dom[DOM_ATTRIBUTE];
 		dispatch(this.dom, 'ln-store:destroyed', { store: this._name });

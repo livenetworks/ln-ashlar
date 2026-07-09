@@ -12,25 +12,25 @@
 - [x] ln-date
 - [x] ln-debug
 - [x] ln-dropdown
-- [ ] ln-editor
-- [ ] ln-external-links
+- [x] ln-editor
+- [x] ln-external-links
 - [x] ln-fill
 - [x] ln-filter
 - [x] ln-form
-- [ ] ln-http
+- [x] ln-http
 - [x] ln-icons
-- [ ] ln-link
-- [ ] ln-list
+- [x] ln-link
+- [ ] ln-list - Да се дотера empty state со клаудија
 - [x] ln-modal
 - [x] ln-modal-fill
 - [x] ln-nav
 - [x] ln-number
 - [ ] ln-options
 - [x] ln-popover
-- [ ] ln-progress
-- [ ] ln-router
+- [x] ln-progress
+- [x] ln-router
 - [x] ln-search
-- [ ] ln-slug
+- [x] ln-slug
 - [x] ln-sortable
 - [ ] ln-stat
 - [ ] ln-store-notify

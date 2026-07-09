@@ -141,8 +141,85 @@ The coordinator is built to be highly dynamic, reacting to runtime modifications
 
 Because all events dispatched by the child components bubble up, the coordinator listens directly on its own DOM boundary. It manages the following flows seamlessly:
 
-### 1. Delta & Full Sync (`ln-store:request-remote-sync`)
-Triggered when the store cache boots up or detects stale data:
+### 0. Form Write Intake (`ln-form:submit-record`)
+
+The coordinator listens for `ln-form:submit-record` on `document` (forms
+can live outside the coordinator's own subtree via a named
+`data-ln-form-scope`). It claims the event if either holds:
+
+* `detail.scope === this._name` (named override), **or**
+* `detail.scope` is empty and `detail.form.closest('[data-ln-data-coordinator]') === this.dom` (containment).
+
+On claim it sets `detail.claimed = true` synchronously, then translates
+the raw `{ action, method, data }` straight into a fan-out call — a literal
+read of `method`, no fallback: `POST` → `_fanOutCreate`; `PUT`/`PATCH` →
+`_fanOutUpdate` (reading `id`/`expected_version` off `data`); anything else
+is ignored (this only happens for scoped forms whose effective method
+wasn't POST/PUT/PATCH, which `ln-form` itself never dispatches — see the
+`ln-form` README §5b). The coordinator generates the `tempId` itself for a
+create (no correlation map needed — see Fan-Out below). The form's resource
+`action` rides straight through as an argument, attached to the mutation's
+transport `url` once the write reaches the connector — no `WeakMap`/`Map`
+bookkeeping.
+
+### Coordinator-Namespaced Intake Events
+
+The same fan-out is reachable directly (no form involved) via four
+events dispatched on the coordinator's own element:
+
+| Event | `detail` | 
+|---|---|
+| `ln-data-coordinator:request-create` | `{ data, action? }` |
+| `ln-data-coordinator:request-update` | `{ id, data, expected_version?, action? }` |
+| `ln-data-coordinator:request-delete` | `{ id }` |
+| `ln-data-coordinator:request-bulk-delete` | `{ ids }` |
+
+These are intentionally namespaced under the coordinator (not
+`ln-store:request-*`) so there is no naming collision with the events the
+store dispatches — no loop-guard logic is needed.
+
+### 1. Parallel Fan-Out — the core write model
+
+Every write intake (form or coordinator-namespaced event) reaches one of
+four `_fanOut*` methods. Each one does **two things from the same
+synchronous handler**, independently — the local store write is never
+gated on the remote call succeeding, and vice versa:
+
+```mermaid
+sequenceDiagram
+    participant Intake as ln-form / ln-data-coordinator:request-*
+    participant Coord as data-ln-data-coordinator
+    participant Store as data-ln-data-store
+    participant Gateway as data-ln-*-connector / ln-api-queue
+
+    Intake->>Coord: _fanOutCreate(children, data, action)
+    par Local (always)
+        Coord->>Store: Event: ln-store:request-create { tempId, data }
+        Store-->>Coord: Event: ln-store:created (bubbles, refreshes bound views)
+    and Remote (only if connector or queue child present)
+        alt queue present
+            Coord->>Gateway: Event: ln-api-queue:request-enqueue { chainKey:tempId, op:'create', payload:egress(data), meta:{tempId,action} }
+        else connector present, no queue
+            Coord->>Gateway: Event: ln-api-connector:request-create { data:egress(data), url:action, meta:{tempId} }
+        end
+    end
+```
+
+The only guard on all four write paths is `!children.storeEl` (console
+warning + no-op). There is no `!children.connector` guard — **a
+store-only coordinator (no connector, no queue child) is a valid,
+supported offline-only setup**: the fan-out dispatches the local
+`ln-store:request-*` event and stops there. No remote call, no toast; the
+record simply keeps its `_temp_`-prefixed id until a connector is added
+later.
+
+### 2. Sync (`ln-store:request-remote-sync`) — unchanged
+
+Triggered when the store cache boots up or detects stale data. This is
+the one `request-remote-*` event that still exists — sync has no
+per-record reconciliation, so it was never part of the fan-out/no-pending
+refactor:
+
 ```mermaid
 sequenceDiagram
     participant Store as data-ln-data-store
@@ -150,80 +227,54 @@ sequenceDiagram
     participant Gateway as data-ln-*-connector
     
     Store->>Coord: Event: ln-store:request-remote-sync (since)
-    Coord->>Gateway: JS API: connector.fetchDelta(since)
-    Gateway-->>Coord: Promise: returns serverRawResponse
+    Coord->>Gateway: Event: ln-api-connector:request-sync { since, meta }
+    Gateway-->>Coord: Event: ln-api-connector:fetched { data, meta }
     Note over Coord: Applies Ingress Mapper:<br/>mapper.ingress(serverRawRecord)
     Coord->>Store: JS API: store.applySync(normalizedData, deletedIds, syncedAt)
 ```
 
-### 2. Optimistic Creation (`ln-store:request-remote-create`)
-Triggered when a form submits a new record to the local cache:
+### 3. Server Confirmation — ordinary update, id-swap on create
+
+There is no `confirmMutation`/`revertMutation`/`resolveConflict` anymore.
+A server response is reconciled with **an ordinary
+`ln-store:request-update`** — for a create, the target `id` is the
+`tempId` and the incoming `data.id` is the real server id, which the store
+detects as an id-swap (rekey) automatically:
+
 ```mermaid
 sequenceDiagram
-    participant Store as data-ln-data-store
-    participant Coord as data-ln-data-coordinator
     participant Gateway as data-ln-*-connector
-    
-    Store->>Coord: Event: ln-store:request-remote-create (tempId, data)
-    Note over Coord: Applies Egress Mapper:<br/>mapper.egress(localRecord)
-    Coord->>Gateway: JS API: connector.create(serverPayload)
-    alt Server Success
-        Gateway-->>Coord: Promise: returns serverRawResponse
-        Note over Coord: Applies Ingress Mapper:<br/>mapper.ingress(serverRaw)
-        Coord->>Store: JS API: store.confirmMutation(tempId, confirmedLocalRecord, 'create')
-    else Server Failure
-        Gateway-->>Coord: Promise: Rejects
-        Coord->>Store: JS API: store.revertMutation(tempId, 'create', errorMessage)
-    end
+    participant Coord as data-ln-data-coordinator
+    participant Store as data-ln-data-store
+
+    Gateway-->>Coord: Event: ln-api-connector:created { record, message, meta:{tempId} }
+    Note over Coord: mapper.ingress(record)
+    Coord->>Store: Event: ln-store:request-update { id: meta.tempId, data: serverRecord }
+    Note over Store: data.id !== tempId -> rekey (id-swap), fires ln-store:updated
+    Coord->>Coord: _toastFromMessage(message) — success toast if the server sent one
 ```
 
-### 3. Optimistic Updates (`ln-store:request-remote-update`)
-Triggered when a record is updated locally. The coordinator pulls the complete merged record from the database to support standard REST `PUT` schemas:
-```mermaid
-sequenceDiagram
-    participant Store as data-ln-data-store
-    participant Coord as data-ln-data-coordinator
-    participant Gateway as data-ln-*-connector
-    
-    Store->>Coord: Event: ln-store:request-remote-update (id, expected_version)
-    Coord->>Store: JS API: store.getById(id)
-    Store-->>Coord: Returns local record
-    Note over Coord: Applies Egress Mapper:<br/>mapper.egress(cleanRecord)
-    Coord->>Gateway: JS API: connector.update(id, serverPayload, expected_version)
-    alt Server Success
-        Gateway-->>Coord: Promise: returns serverRawResponse
-        Note over Coord: Applies Ingress Mapper:<br/>mapper.ingress(serverRaw)
-        Coord->>Store: JS API: store.confirmMutation(id, confirmedLocalRecord, 'update')
-    else Conflict (409)
-        Gateway-->>Coord: Promise: Rejects with 409
-        Note over Coord: Applies Ingress Mapper:<br/>mapper.ingress(remoteRecord)
-        Coord->>Store: JS API: store.resolveConflict(id, remoteRecord, fieldDiffs)
-    else Other Failure
-        Gateway-->>Coord: Promise: Rejects
-        Coord->>Store: JS API: store.revertMutation(id, 'update', errorMessage)
-    end
-```
-
-### 4. Deletions (`ln-store:request-remote-delete` & `bulk-delete`)
-Triggered when records are deleted in-memory:
-* **Single Delete**: Calls `connector.delete(id)` $\rightarrow$ calls `store.confirmMutation(id, null, 'delete')` (or `revertMutation` on failure).
-* **Bulk Delete**: Calls `connector.bulkDelete(ids)` $\rightarrow$ calls `store.confirmMutation(ids.join(','), null, 'bulk-delete')` (or `revertMutation` on failure).
+Update/delete/bulk-delete confirmations follow the same shape (ordinary
+`ln-store:request-update`/no reconciliation needed for delete since the
+optimistic delete already applied) — see "Error reconciliation policy"
+below for what happens when the server instead responds with an error.
 
 ---
 
 ## 📥 Offline Outbox Write Routing (optional `ln-api-queue` child)
 
-When a `[data-ln-api-queue]` child is present, every mutation handler
+When a `[data-ln-api-queue]` child is present, every fan-out write
 (`create`/`update`/`delete`/`bulk-delete`) is routed through it instead of
-calling the connector immediately. When it is absent, the direct-connector
-flows above apply unchanged.
+calling the connector directly. When it is absent, the direct-connector
+flow above applies unchanged. Presence is evaluated per-write inside each
+`_fanOut*` method (`children.queue` takes priority over `children.connector`).
 
 **Queue-present enqueue payloads:**
 
 | op | `ln-api-queue:request-enqueue` detail |
 |---|---|
-| create | `{ chainKey: tempId, op:'create', targetId:null, payload: egress(data), expectedVersion:null, meta:{ tempId } }` |
-| update | `{ chainKey: id, op:'update', targetId: id, payload: egress(cleanRecord), expectedVersion, meta:{ id } }` (merged record still fetched via `store.getById(id)` first) |
+| create | `{ chainKey: tempId, op:'create', targetId:null, payload: egress(data), expectedVersion:null, meta:{ tempId, action } }` |
+| update | `{ chainKey: id, op:'update', targetId: id, payload: egress(data), expectedVersion, meta:{ id, action } }` |
 | delete | `{ chainKey: id, op:'delete', targetId: id, payload:null, expectedVersion:null, meta:{ id } }` |
 | bulk-delete | `{ chainKey: bulkKey, op:'bulk-delete', targetId:null, payload:{ ids }, expectedVersion:null, meta:{ bulkKey, ids } }` |
 
@@ -232,30 +283,124 @@ only when the queue later commands the coordinator to send.
 
 ### Transport executor — `ln-api-queue:send`
 
+The queue entry's opaque `meta.action` (the form's resource URL,
+persisted across sessions) now rides into the connector request's `url`
+field at send time; the connector executes the write against it, joined
+with `data-ln-api-base-url` exactly like the `path` fallback.
+
 The coordinator listens for `ln-api-queue:send` on the queue element. It
-maps `op` to the matching connector method (same egress/ingress flow as the
-direct path) and, on resolution, drives both the store and the queue:
+maps `op` to the matching connector `:request-*` event (same egress/ingress flow as the
+direct path) and, on resolution, drives both the store and the queue via the
+ordinary `ln-store:request-update`/`ln-store:request-delete` reconciliation
+described above (no `confirmMutation`):
 
 | op | success → store | success → queue command |
 |---|---|---|
-| create | `confirmMutation(meta.tempId, ingress(record), 'create')` | `request-remap {oldKey:meta.tempId, newId:ingress(record).id}` **then** `ack {entryId}` |
-| update | `confirmMutation(meta.id, ingress(record), 'update')` | `ack {entryId}` |
-| delete | `confirmMutation(meta.id, null, 'delete')` | `ack {entryId}` |
-| bulk-delete | `confirmMutation(meta.bulkKey, null, 'bulk-delete')` | `ack {entryId}` |
+| create | `ln-store:request-update { id: meta.tempId, data: ingress(record) }` (id-swap) | `request-remap {oldKey:meta.tempId, newId:record.id}` **then** `ack {entryId}` |
+| update | `ln-store:request-update { id: meta.id, data: ingress(record) }` | `ack {entryId}` |
+| delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
+| bulk-delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
+
+Every success path also calls `_toastFromMessage(e.detail.message)` — see
+Toasts below.
 
 Remap is dispatched **before** ack on create success — a queued sibling
 update targeting the temp id re-targets the real server id before its own
 chain entry advances (both dispatches are synchronous).
 
-**On error** (reads `err.status` / `err.data` from the connector's unified
-error shape):
+**On error**, see "Error reconciliation policy" below — the determinism
+classification (auth / transient / deterministic) applies identically on
+the queued and non-queued paths; only the queue command (`nack` reason)
+differs.
 
-| Condition | Coordinator action |
-|---|---|
-| `401` / `419` | `nack {entryId, reason:'auth'}` — does **not** revert; keeps the optimistic write. The queue pauses that scope and emits `auth-required`; the consumer re-authenticates then dispatches `ln-api-queue:request-resume`. |
-| `409` (update) | `store.resolveConflict(meta.id, ingress(err.data.remote), err.data.field_diffs)`, then `nack {entryId, reason:'drop'}`. |
-| other `4xx` | `ln-store:sync-conflict` dispatched, `store.revertMutation(...)`, `nack {entryId, reason:'drop'}`, then `store.forceSync()` as a reconciliation backstop (covers the case where the optimistic snapshot was lost to a page reload). |
-| `5xx` / network (`status:0`) | `nack {entryId, reason:'retry'}` — keeps the optimistic write; the queue backs off and retries. |
+---
+
+## 🧭 Local-only mode (no connector child)
+
+A coordinator wrapping **only** a `[data-ln-data-store]` child — no
+connector, no queue — is a first-class, supported configuration, not a
+degraded fallback:
+
+```html
+<div data-ln-data-coordinator="drafts">
+  <div data-ln-data-store="drafts"></div>
+</div>
+```
+
+Every `_fanOut*` method checks `children.queue` then `children.connector`
+and simply **stops after the local dispatch** if neither exists. Writes
+still go through the coordinator's intake (form or
+`ln-data-coordinator:request-*`), still hit `ln-store:request-create`/
+`request-update`/`request-delete`/`request-bulk-delete`, and still refresh
+bound views — there is just no outbound network call and no toast. This is
+the same code path a connector-equipped coordinator uses; adding a
+connector later requires no change to the write intake side.
+
+---
+
+## ⚠️ Error reconciliation policy
+
+`connError` classifies every non-2xx connector response into exactly one
+of three buckets by `detail.status` (never a fourth "unknown" bucket —
+`status === 0` is treated as transient, the same as a 5xx):
+
+| Bucket | Status | Store action | Queue action (if queued) | Toast |
+|---|---|---|---|---|
+| **Auth** | `401` / `419` | none — optimistic write stays | `nack {reason:'auth'}` (pauses that scope) | `auth` dict key |
+| **Transient** | `0` (network) / `5xx` | none — optimistic write stays; never deleted | `nack {reason:'retry'}` (backoff ladder) | none immediately; on **terminal** failure (`ln-api-queue:failed`) → `network` dict key. Non-queued: `network` dict key fires immediately (single attempt already spent). |
+| **Deterministic** | `409` (update) / other `4xx` / `3xx` | `409` update: ordinary `ln-store:request-update` with the server's `remote` record (server wins). `create`: `ln-store:request-delete` for the temp id (server rejected it outright). Other 4xx update/delete/bulk: left as-is, next sync reconciles. | `nack {reason:'drop'}` (never retried) | `conflict` (409 update) or `rejected` (everything else deterministic) |
+
+**Never retried** = deterministic errors always `nack 'drop'` on the queued
+path — a 4xx is never re-attempted, only sync eventually catches up.
+**Never silently discards a local write on a transient/network failure** —
+that is the core "no-pending" invariant: an optimistic write is only ever
+removed by an explicit server rejection (create 4xx) or a genuine local
+`ln-store:request-delete`, never by a retry-exhausted network error.
+
+There is no `ln-store:sync-conflict` event and no `forceSync()` error
+backstop — both were removed as part of this refactor (no grep-verified
+consumer existed for either).
+
+---
+
+## 🔔 Toasts
+
+The `ln-store-notify` component has been removed. Toasts now come from two
+independent sources, both funneled through the standard `ln-toast:enqueue`
+window event (consumed by `ln-toast` if present on the page, silently
+ignored otherwise):
+
+1. **Success — from the server's response envelope.** When a connector
+   mutation response includes a `message` (see the
+   [ln-api-connector README](../ln-api-connector/README.md) → Mutation
+   Response Envelope), the coordinator's `_toastFromMessage(message)`
+   enqueues it verbatim (`type`/`title`/`body` from the server, defaulting
+   `type` to `'success'`). **No `message` → no toast.** This mirrors
+   `ln-ajax`'s existing `data.message` → `ln-toast:enqueue` precedent
+   exactly.
+2. **Error — from a coordinator markup dictionary.** Error text is never
+   hardcoded in JS. It is authored once per coordinator instance via
+   `data-ln-data-coordinator-dict` child elements (parsed with the same
+   `buildDict()` helper `ln-upload` uses for its dictionary):
+
+   ```html
+   <div data-ln-data-coordinator="documents">
+     <div data-ln-data-store="documents"></div>
+     <div data-ln-api-connector data-ln-api-base-url="/api" data-ln-api-path="/documents"></div>
+
+     <!-- consumed once at init, then removed from the DOM -->
+     <span data-ln-data-coordinator-dict="auth" hidden>Your session expired — please sign in again.</span>
+     <span data-ln-data-coordinator-dict="network" hidden>Could not reach the server — your change is saved locally and will retry.</span>
+     <span data-ln-data-coordinator-dict="conflict" hidden>Someone else updated this record — showing their version.</span>
+     <span data-ln-data-coordinator-dict="rejected" hidden>The server rejected that change.</span>
+   </div>
+   ```
+
+   Keys are exactly the four buckets from the error reconciliation table:
+   `auth`, `network`, `conflict`, `rejected`. **A missing key is silent —
+   no fallback string is ever synthesized.** If the coordinator has no
+   dictionary at all, `this._dict` is `{}` and every `_toastFromDict` call
+   is a no-op.
 
 ### Sync ownership
 
