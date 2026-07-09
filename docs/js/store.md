@@ -139,11 +139,11 @@ never a self-sync.
 |-----------|----------|
 | Server unreachable (initial load) | Emit `ln-store:error`, no cached data |
 | Server unreachable (delta sync) | Emit `ln-store:offline`, cached data still usable |
-| Server 4xx/5xx on mutation | Revert optimistic update, emit `ln-store:reverted` |
-| Server 409 on update | Revert, emit `ln-store:conflict` with both versions |
 | IndexedDB quota exceeded | Dispatch `ln-store:quota-exceeded` on `document` (write fails, in-memory fallback) |
 | IndexedDB unavailable | Fall back to in-memory, warn via console |
 | Schema version mismatch | Clear all stores, full reload |
+
+> Server-side mutation errors (4xx/5xx/409) are NOT handled by `ln-data-store` — the store has no concept of "confirm" or "revert." A `ln-store:request-update`/`request-delete` is applied unconditionally to the local cache. Reconciling server errors (retry, drop, conflict server-wins, auth-pause) is the coordinator's job — see [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) §Error reconciliation policy.
 
 ## Database Encryption at Rest
 
@@ -152,11 +152,11 @@ To protect local cache data on client devices, `ln-data-store` features transpar
 ### The Encryption Pipeline
 
 When a database key is active (via `window.lnCore.setStorageKey`):
-1. **Write Intervention (`_putRecord` / `_putBulk`)**: 
-   The framework extracts the record `id` and the sync marker `_pending` to keep them in plaintext. The remaining record payload is encrypted using a unique, random 12-byte IV.
+1. **Write Intervention (`_putRecord` / `_putBulk`)**:
+   The framework extracts the record `id` to keep it in plaintext (IndexedDB keys/indexes must stay queryable). The remaining record payload is encrypted using a unique, random 12-byte IV. There is no separate pending/sync-state marker field — an unsynced record is identified solely by its `_temp_`-prefixed `id`, which is itself plaintext.
    ```
-   Plaintext:  { id: 'usr_1', name: 'Alice', role: 'admin', _pending: true }
-   Encrypted:  { id: 'usr_1', encrypted: true, iv: '...', data: '...', _pending: true }
+   Plaintext:  { id: 'usr_1', name: 'Alice', role: 'admin' }
+   Encrypted:  { id: 'usr_1', encrypted: true, iv: '...', data: '...' }
    ```
    This ensures that IndexedDB store keys and indexes can be searched natively by the browser without reading/writing the decrypted data to disk.
 2. **Read Intervention (`_getAllRecords` / `_getRecord`)**: 

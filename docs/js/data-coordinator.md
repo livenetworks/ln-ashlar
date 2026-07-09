@@ -8,7 +8,7 @@
 
 ## Role Summary
 
-- Listens on its subtree (`this.dom`) for `ln-store:request-remote-*` events → delegates to the child connector.
+- Listens on its subtree (`this.dom`) for `ln-data-coordinator:request-create/update/delete/bulk-delete` (and `ln-form:submit-record` on `document`) → fans out in parallel to the local store AND the remote connector/queue. Listens for `ln-store:request-remote-sync` → delegates to the child connector. See [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) for the full write pipeline (this document covers the VIEW-BINDING role only).
 - Listens on `document` for view-binding request events → resolves its own child store → delivers data back to the requesting element.
 - Listens on its subtree for store-change events → refreshes all bound view elements automatically.
 
@@ -93,5 +93,5 @@ Every document-level handler calls this first. A coordinator only responds to re
 ## Backward Compatibility
 
 - Coordinators with no bound elements (`data-ln-table-store` etc.) behave exactly as before — the new document listeners fire but find no matching binding attribute and return immediately.
-- The existing `ln-store:request-remote-*` mutation handling is unchanged.
+- The write-pipeline fan-out (parallel local + remote dispatch, no pending/confirm/revert machinery) is documented separately in `js/ln-data-coordinator/README.md` — out of scope for this view-binding document.
 - `store-usecase.html`'s hand-wired section has no coordinator — untouched.

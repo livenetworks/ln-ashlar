@@ -7,6 +7,16 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
+	// ─── Response Envelope Unwrap (presence-checked `{message, content}`) ──
+	// Raw CouchDB never sends this envelope (content=body, message=null — no-op).
+	// A proxy/gateway in front of CouchDB may wrap responses; this makes that
+	// transparent without requiring it. Mirrors ln-api-connector.js's unwrap.
+	function _unwrapEnvelope(body) {
+		const content = (body && body.content !== undefined) ? body.content : body;
+		const message = (body && body.message) ? body.message : null;
+		return { content: content, message: message };
+	}
+
 	// ─── Component Constructor ─────────────────────────────
 
 	function _component(dom) {
@@ -80,8 +90,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	 * Create a document in CouchDB.
 	 * Sends POST /{db}
 	 */
-	_component.prototype.create = function (payload) {
-		const self = this;
+	function _rawCreate(self, payload) {
 		const doc = Object.assign({ _id: payload.id }, payload);
 		if (!doc._id) delete doc._id;
 
@@ -95,7 +104,16 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 			return res.json();
 		})
-		.then(resData => Object.assign({}, doc, { id: resData.id, _id: resData.id, _rev: resData.rev }));
+		.then(body => {
+			const unwrapped = _unwrapEnvelope(body);
+			const resData = unwrapped.content;
+			const record = Object.assign({}, doc, { id: resData.id, _id: resData.id, _rev: resData.rev });
+			return { record: record, message: unwrapped.message };
+		});
+	}
+
+	_component.prototype.create = function (payload) {
+		return _rawCreate(this, payload).then(r => r.record);
 	};
 
 	/**
@@ -103,12 +121,11 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	 * Sends PUT /{db}/{id}
 	 * Handles revision checks and automatic revision fetching if rev is missing.
 	 */
-	_component.prototype.update = function (id, payload) {
-		const self = this;
+	function _rawUpdate(self, id, payload) {
 		const doc = Object.assign({ id: String(id), _id: String(id) }, payload);
 		const rev = doc._rev || doc.rev;
 
-		const getRevPromise = rev ? Promise.resolve(rev) : 
+		const getRevPromise = rev ? Promise.resolve(rev) :
 			window.fetch(buildUrl(self.url, self.db, null, id), { method: 'GET', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
 				.then(res => {
 					if (!res.ok) throw new Error('Could not retrieve document for revision mapping');
@@ -127,7 +144,11 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				body: JSON.stringify(finalDoc)
 			})
 			.then(res => {
-				if (res.ok) return res.json().then(data => Object.assign({}, finalDoc, { _rev: data.rev }));
+				if (res.ok) return res.json().then(body => {
+					const unwrapped = _unwrapEnvelope(body);
+					const record = Object.assign({}, finalDoc, { _rev: unwrapped.content.rev });
+					return { record: record, message: unwrapped.message };
+				});
 				if (res.status === 409) return res.json().then(data => {
 					const err = new Error('Conflict');
 					err.status = 409;
@@ -137,15 +158,18 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 			});
 		});
+	}
+
+	_component.prototype.update = function (id, payload) {
+		return _rawUpdate(this, id, payload).then(r => r.record);
 	};
 
 	/**
 	 * Delete a document in CouchDB.
 	 * Sends DELETE /{db}/{id}?rev={rev}
 	 */
-	_component.prototype.delete = function (id, rev) {
-		const self = this;
-		const getRevPromise = rev ? Promise.resolve(rev) : 
+	function _rawDelete(self, id, rev) {
+		const getRevPromise = rev ? Promise.resolve(rev) :
 			window.fetch(buildUrl(self.url, self.db, null, id), { method: 'GET', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
 				.then(res => {
 					if (!res.ok) throw new Error('Could not retrieve document for revision delete');
@@ -158,17 +182,24 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				.then(res => {
 					if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 					return res.json();
+				})
+				.then(body => {
+					const unwrapped = _unwrapEnvelope(body);
+					return { response: unwrapped.content, message: unwrapped.message };
 				});
 		});
+	}
+
+	_component.prototype.delete = function (id, rev) {
+		return _rawDelete(this, id, rev).then(r => r.response);
 	};
 
 	/**
 	 * Bulk delete documents in CouchDB.
 	 * Sends POST /{db}/_bulk_docs with {"docs": [{"_id": "...", "_rev": "...", "_deleted": true}]}
 	 */
-	_component.prototype.bulkDelete = function (ids) {
-		const self = this;
-		if (!ids || ids.length === 0) return Promise.resolve({ ok: true, deletedCount: 0 });
+	function _rawBulkDelete(self, ids) {
+		if (!ids || ids.length === 0) return Promise.resolve({ response: { ok: true, deletedCount: 0 }, message: null });
 
 		return window.fetch(buildUrl(self.url, self.db, '_all_docs'), {
 			method: 'POST',
@@ -186,7 +217,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				.filter(r => !r.error && r.value && r.value.rev)
 				.map(r => ({ _id: r.id, _rev: r.value.rev, _deleted: true }));
 
-			if (docsToDelete.length === 0) return { ok: true, deletedCount: 0 };
+			if (docsToDelete.length === 0) return { response: { ok: true, deletedCount: 0 }, message: null };
 
 			return window.fetch(buildUrl(self.url, self.db, '_bulk_docs'), {
 				method: 'POST',
@@ -198,8 +229,15 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 				return res.json();
 			})
-			.then(bulkData => ({ ok: true, results: bulkData, deletedCount: docsToDelete.length }));
+			.then(body => {
+				const unwrapped = _unwrapEnvelope(body);
+				return { response: { ok: true, results: unwrapped.content, deletedCount: docsToDelete.length }, message: unwrapped.message };
+			});
 		});
+	}
+
+	_component.prototype.bulkDelete = function (ids) {
+		return _rawBulkDelete(this, ids).then(r => r.response);
 	};
 
 	// ─── DOM Event Routing ────────────────────────────────────
@@ -210,44 +248,46 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 				const detail = e.detail || {};
 				self.fetchDelta(detail.since)
 					.then(function (data) {
-						dispatch(self.dom, 'ln-couchdb-connector:fetched', { data: data, since: detail.since });
+						dispatch(self.dom, 'ln-couchdb-connector:fetched', { data: data, since: detail.since, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-couchdb-connector:error', {
 							action: 'sync',
 							error: err.message,
 							status: err.status || 0,
-							since: detail.since
+							since: detail.since,
+							meta: detail.meta || null
 						});
 					});
 			},
 			create: function (e) {
 				const detail = e.detail || {};
-				self.create(detail.data)
-					.then(function (record) {
-						dispatch(self.dom, 'ln-couchdb-connector:created', { record: record, tempId: detail.tempId });
+				_rawCreate(self, detail.data)
+					.then(function (r) {
+						dispatch(self.dom, 'ln-couchdb-connector:created', { record: r.record, tempId: detail.tempId, message: r.message, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-couchdb-connector:error', {
 							action: 'create',
 							error: err.message,
 							status: err.status || 0,
-							tempId: detail.tempId
+							tempId: detail.tempId,
+							meta: detail.meta || null
 						});
 					});
 			},
 			update: function (e) {
 				const detail = e.detail || {};
 				const payload = Object.assign({}, detail.data);
-				
+
 				// Handle expected revision details
 				if (detail.expected_version !== undefined) {
 					payload._rev = detail.expected_version;
 				}
 
-				self.update(detail.id, payload)
-					.then(function (record) {
-						dispatch(self.dom, 'ln-couchdb-connector:updated', { record: record, id: detail.id });
+				_rawUpdate(self, detail.id, payload)
+					.then(function (r) {
+						dispatch(self.dom, 'ln-couchdb-connector:updated', { record: r.record, id: detail.id, message: r.message, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-couchdb-connector:error', {
@@ -255,37 +295,41 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 							error: err.message,
 							status: err.status || 0,
 							id: detail.id,
-							conflictData: err.status === 409 ? err.data : null
+							data: err.status === 409 ? err.data : null,
+							conflictData: err.status === 409 ? err.data : null,
+							meta: detail.meta || null
 						});
 					});
 			},
 			delete: function (e) {
 				const detail = e.detail || {};
-				self.delete(detail.id, detail.rev)
-					.then(function (res) {
-						dispatch(self.dom, 'ln-couchdb-connector:deleted', { response: res, id: detail.id });
+				_rawDelete(self, detail.id, detail.rev)
+					.then(function (r) {
+						dispatch(self.dom, 'ln-couchdb-connector:deleted', { response: r.response, id: detail.id, message: r.message, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-couchdb-connector:error', {
 							action: 'delete',
 							error: err.message,
 							status: err.status || 0,
-							id: detail.id
+							id: detail.id,
+							meta: detail.meta || null
 						});
 					});
 			},
 			bulkDelete: function (e) {
 				const detail = e.detail || {};
-				self.bulkDelete(detail.ids)
-					.then(function (res) {
-						dispatch(self.dom, 'ln-couchdb-connector:bulk-deleted', { response: res, ids: detail.ids });
+				_rawBulkDelete(self, detail.ids)
+					.then(function (r) {
+						dispatch(self.dom, 'ln-couchdb-connector:bulk-deleted', { response: r.response, ids: detail.ids, message: r.message, meta: detail.meta || null });
 					})
 					.catch(function (err) {
 						dispatch(self.dom, 'ln-couchdb-connector:error', {
 							action: 'bulk-delete',
 							error: err.message,
 							status: err.status || 0,
-							ids: detail.ids
+							ids: detail.ids,
+							meta: detail.meta || null
 						});
 					});
 			}
