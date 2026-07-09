@@ -98,12 +98,24 @@ The connector dispatches bubbles-enabled events to notify parent coordinators of
 | Event | `detail` Payload | Description |
 |-------|------------------|-------------|
 | `ln-couchdb-connector:fetched` | `{ data, since }` | Dispatched upon successful fetch completion. |
-| `ln-couchdb-connector:created` | `{ record, tempId }` | Dispatched upon successful server record confirmation. |
-| `ln-couchdb-connector:updated` | `{ record, id }` | Dispatched upon successful server update confirmation. |
-| `ln-couchdb-connector:deleted` | `{ response, id }` | Dispatched upon successful server deletion. |
-| `ln-couchdb-connector:bulk-deleted`| `{ response, ids }` | Dispatched upon successful server bulk deletion. |
-| `ln-couchdb-connector:error` | `{ action, error, status, ... }` | Dispatched on failures. Includes `conflictData` if status is 409. |
+| `ln-couchdb-connector:created` | `{ record, tempId, message, meta }` | Dispatched upon successful server record confirmation. `message` opaque from the response envelope (null if absent). `meta` echoes the request's `meta` unchanged. |
+| `ln-couchdb-connector:updated` | `{ record, id, message, meta }` | Dispatched upon successful server update confirmation. |
+| `ln-couchdb-connector:deleted` | `{ response, id, message, meta }` | Dispatched upon successful server deletion. |
+| `ln-couchdb-connector:bulk-deleted`| `{ response, ids, message, meta }` | Dispatched upon successful server bulk deletion. |
+| `ln-couchdb-connector:error` | `{ action, error, status, meta, ... }` | Dispatched on failures. Update errors additionally include `data`/`conflictData` (same value) if status is 409. `meta` echoes the request's `meta` unchanged — required for coordinator-side queue ack/nack and id-swap reconciliation. |
 | `ln-couchdb-connector:config-changed` | `{ url, db, auth, headers }` | Dispatched when configuration attributes are mutated. |
+
+---
+
+## Mutation Response Envelope
+
+`create`/`update`/`delete`/`bulkDelete` presence-check the parsed JSON body for an optional `{ message, content }` envelope, mirroring `ln-api-connector`'s contract:
+
+- `content` present → used as the CouchDB response body (`{id, rev}` etc.) in place of the bare body.
+- `message` present → passed opaquely on the `:created`/`:updated`/`:deleted`/`:bulk-deleted` event detail; a coordinator surfaces it as a success toast. Absent → `message: null`, no toast.
+- Raw CouchDB never sends this envelope — `content` falls back to the bare body, `message` is always `null`, so a direct CouchDB backend never produces a toast. A proxy/gateway placed in front of CouchDB (e.g. to add cross-cutting audit messages) can opt in by wrapping its response in `{ message, content }`.
+- `fetchDelta` (sync) is NOT part of this envelope — sync keeps its own `{ data, deleted, synced_at }` collection-delta shape.
+- The JS API methods (`create`, `update`, `delete`, `bulkDelete`) resolve to the SAME shape as before this change (record / record / response / response) — the envelope unwrap is internal; direct JS callers are unaffected. `message` is only surfaced via the DOM-event path (`:created`/`:updated`/`:deleted`/`:bulk-deleted` `detail.message`).
 
 ---
 
@@ -111,46 +123,26 @@ The connector dispatches bubbles-enabled events to notify parent coordinators of
 
 Here is how a parent Coordinator links a Cache Store and the CouchDB Connector using standard DOM events:
 
-```javascript
+```js
 (function () {
     const parent = document.querySelector('[data-ln-data-coordinator="tasks"]');
-    const storeEl = parent.querySelector('[data-ln-data-store]');
-    const connectorEl = parent.querySelector('[data-ln-couchdb-connector]');
+    // ln-data-coordinator wires store <-> connector automatically once both
+    // are present in its subtree — no hand-written glue is needed for the
+    // write pipeline. This snippet only illustrates what the coordinator
+    // does internally; in a real page, just declare the markup (see
+    // "Declarative DOM Setup" above) and let ln-data-coordinator do the rest.
 
-    if (!storeEl || !connectorEl) return;
-
-    // 1. Storage needs remote sync -> forward request to CouchDB Connector
-    storeEl.addEventListener('ln-store:request-remote-sync', function (e) {
-        connectorEl.dispatchEvent(new CustomEvent('ln-couchdb-connector:request-sync', {
-            detail: { since: e.detail.since }
-        }));
-    });
-
-    // 2. CouchDB Connector finishes changes feed sync -> feed delta back to Storage
-    connectorEl.addEventListener('ln-couchdb-connector:fetched', function (e) {
-        const payload = e.detail.data;
-        // payload: { data: Array, deleted: Array, synced_at: String }
-        storeEl.lnStore.applySync(payload.data, payload.deleted || [], payload.synced_at);
-    });
-
-    // 3. Storage requests remote creation -> forward payload to CouchDB Connector
-    storeEl.addEventListener('ln-store:request-remote-create', function (e) {
-        connectorEl.dispatchEvent(new CustomEvent('ln-couchdb-connector:request-create', {
-            detail: { data: e.detail.data, tempId: e.detail.tempId }
-        }));
-    });
-
-    // 4. CouchDB Connector confirms creation -> swap optimistic temp records in Storage
-    connectorEl.addEventListener('ln-couchdb-connector:created', function (e) {
-        storeEl.lnStore.confirmMutation(e.detail.tempId, e.detail.record, 'create');
-    });
-
-    // 5. In case of network errors -> trigger rollback in Cache Store
-    connectorEl.addEventListener('ln-couchdb-connector:error', function (e) {
-        if (e.detail.action === 'create') {
-            storeEl.lnStore.revertMutation(e.detail.tempId, 'create', e.detail.error);
-        }
-        // ... handle updates and deletions similarly
-    });
+    // Server confirmation reconciles via an ORDINARY store update (id-swap),
+    // not a special confirm/revert method:
+    //   connectorEl.addEventListener('ln-couchdb-connector:created', function (e) {
+    //       const meta = e.detail.meta || {};
+    //       storeEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
+    //           detail: { id: meta.tempId, data: e.detail.record }
+    //       }));
+    //   });
+    //
+    // See js/ln-data-coordinator/README.md for the full fan-out + error
+    // reconciliation policy (auth/transient/deterministic) that ships with
+    // the coordinator — this connector never needs to be wired by hand.
 })();
 ```

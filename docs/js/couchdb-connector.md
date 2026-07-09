@@ -24,9 +24,9 @@ sequenceDiagram
     Connector->>Coordinator: Event: ln-couchdb-connector:fetched (data: { data, deleted, synced_at })
     Coordinator->>Store: applySync(data, deleted, synced_at)
 
-    %% OPTIMISTIC UPDATE
-    Store->>Coordinator: Event: ln-store:request-remote-update (id: doc1, data: {...})
-    Coordinator->>Connector: Event: ln-couchdb-connector:request-update (id: doc1, data: {...})
+    %% OPTIMISTIC UPDATE (parallel fan-out — coordinator dispatches to store AND connector in the same handler)
+    Coordinator->>Store: Event: ln-store:request-update (id: doc1, data: {...}) [optimistic, local]
+    Coordinator->>Connector: Event: ln-couchdb-connector:request-update (id: doc1, data: {...}, meta)
     alt Has revision in memory
         Connector->>CouchDB: PUT /{db}/doc1 with If-Match (revision)
     else Revision missing in memory
@@ -35,9 +35,9 @@ sequenceDiagram
         Connector->>CouchDB: PUT /{db}/doc1 with If-Match (fetched revision)
     end
     CouchDB-->>Connector: JSON confirmation (ok: true, rev: "2-xyz...")
-    Note over Connector: Merge _rev back into local record
-    Connector->>Coordinator: Event: ln-couchdb-connector:updated (record)
-    Coordinator->>Store: confirmMutation(doc1, record, 'update')
+    Note over Connector: Merge _rev back into local record; presence-check {message,content} envelope
+    Connector->>Coordinator: Event: ln-couchdb-connector:updated (record, message, meta)
+    Coordinator->>Store: Event: ln-store:request-update (id: doc1, data: record) [ordinary update, reconciles the optimistic write]
 ```
 
 ---
@@ -48,7 +48,7 @@ sequenceDiagram
 CouchDB requires the active revision string `_rev` for document modifications and deletions to prevent data overwrites. To make integrations friction-free, the connector:
 - Inspects the update payload for `_rev` or `rev`.
 - If absent, it proactively fetches the current document state via a fast HTTP `GET` query to resolve the revision before proceeding with the `PUT` or `DELETE` mutation.
-- When conflicts (`409 Conflict`) occur on CouchDB, the connector captures the standard error, constructs a `conflictData` payload, and dispatches `ln-couchdb-connector:error` with status `409` to prompt coordinate-level conflict merges.
+- When conflicts (`409 Conflict`) occur on CouchDB, the connector captures the standard error, dispatches `ln-couchdb-connector:error` with status `409` and both `data`/`conflictData` set to CouchDB's raw conflict body (`{error, reason}`). Unlike a REST backend that can return the winning document under `data.remote`, **CouchDB's 409 body carries no document snapshot** — the coordinator's server-wins reconciliation is a no-op on this path (only the error toast fires); the local optimistic write is left in place until the next sync reconciles it. See wave-2 plan OQ1 for the open question this raises.
 
 ### 2. Standard ID Translation
 CouchDB utilizes `_id` as the primary key. In `ln-ashlar` cache-store databases, records are accessed via the standard `id` field. The CouchDB connector solves this mapping mismatch transparently:

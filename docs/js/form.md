@@ -1,9 +1,13 @@
 # Form — architecture
 
 Form manipulation only: populates the form on `ln-fill`, rewrites
-`action`/`_method` for RESTful edit routing. Submit is native HTML —
-`ln-form` never intercepts it, never serializes data, never dispatches a
-submit event. Source: [`js/ln-form/ln-form.js`](../../js/ln-form/ln-form.js).
+`action`/`_method` for RESTful edit routing. Submit is native HTML by
+default — without `data-ln-form-scope`, `ln-form` never intercepts it,
+never serializes data, never dispatches a submit event. Adding
+`data-ln-form-scope` opts the form into the declarative write pipeline
+(see §Write Intake below), where `ln-form` intercepts `POST`/`PUT`/`PATCH`
+submits and dispatches `ln-form:submit-record` instead.
+Source: [`js/ln-form/ln-form.js`](../../js/ln-form/ln-form.js).
 
 For consumer-facing usage see
 [`js/ln-form/README.md`](../../js/ln-form/README.md).
@@ -40,6 +44,32 @@ For consumer-facing usage see
 
 Both attributes are read once at init. Changing them on a live form has
 no effect.
+
+---
+
+## Write Intake (`data-ln-form-scope`)
+
+Opting a form into the declarative write pipeline (form → `ln-data-coordinator` → `ln-data-store`/connector) requires the `data-ln-form-scope` attribute. Without it, `ln-form` never intercepts `submit` — native HTML submission (or `ln-ajax`) proceeds untouched.
+
+| Attribute | On | Description |
+|---|---|---|
+| `data-ln-form-scope` | `<form data-ln-form>` | Opts the form into write intake. Value = **named scope**, matched against a coordinator by its `data-ln-data-coordinator="<name>"` value — the form does NOT need to be a DOM descendant of the coordinator. **Empty value** (`data-ln-form-scope=""` or bare `data-ln-form-scope`) falls back to **nearest-ancestor containment**: the form must be inside a `[data-ln-data-coordinator]` element. |
+
+### Behavior
+
+On `submit`, if `data-ln-form-scope` is present and the effective HTTP method is `POST`/`PUT`/`PATCH` (read from `<form method>` or a hidden `_method` input), `ln-form`:
+
+1. Prevents the native submit.
+2. Serializes the form (`serializeForm`), stripping `_method`/`_token`.
+3. Dispatches `ln-form:submit-record` (bubbles, on `self.dom`) with:
+   `{ scope, action, actionResolved, method, data, form, claimed: false }`
+   — `action` is the form's original `action` attribute (single source of truth for the mutation endpoint); `actionResolved` is the current (possibly `data-ln-form-action-edit`-rewritten) `action`.
+4. A `ln-data-coordinator` listening on `document` claims the event (`detail.claimed = true`, synchronously) if its own name matches `detail.scope`, OR (when `scope` is empty) if the form is a DOM descendant of its subtree.
+5. If nothing claims the event, `console.warn('[ln-form] ln-form:submit-record was not claimed. Check the data-ln-form-scope name, or make sure this form is nested inside a [data-ln-data-coordinator] element.')` fires.
+
+Methods other than `POST`/`PUT`/`PATCH` (e.g. a `GET` search form) are left untouched — `ln-form` never intercepts them.
+
+See [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) for the coordinator-side fan-out this event triggers.
 
 ---
 

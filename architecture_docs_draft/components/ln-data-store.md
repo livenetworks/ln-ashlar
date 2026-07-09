@@ -8,8 +8,8 @@
 
 *   **Примарна Улога:** Обезбедува моќна офлајн поддршка и инстантни (оптимистички) UI мутации за апликацијата. Содржи in-memory query мотор за сортирање, филтрирање и полнотекстуално пребарување на податоците локално.
 *   **Слепа за Мрежа (Network-Blind):** Има строга поделба на одговорностите. Оваа компонента не прави HTTP повици и не знае API рути. Врската со серверот се остварува исклучиво преку проектен координатор (најчесто `ln-data-coordinator`), со кој комуницира преку CustomEvents.
-*   **Оптимистичко Зачувување (Optimistic Pipeline):** При налог за креирање, менување или бришење податоци, веднаш ја ажурира локалната IndexedDB база (користејќи генерирани `_temp_uuid` клучеви за нови записи и маркер `_pending: true`). Веднаш емитува настан кон UI-от (на пр. `ln-table`) за да се ажурира екранот инстантно, а потоа испраќа барање (`request-remote-...`) до координаторот за мрежна синхронизација во позадина.
-*   **Rollback и Conflict Resolution:** Доколку мрежната синхронизација пропадне (пр. корисникот е офлајн или серверот враќа грешка), има вградени механизми за враќање на претходната состојба (`revertMutation`) со што се поништуваат промените.
+*   **Оптимистичко Зачувување (Optimistic Pipeline):** При налог за креирање, менување или бришење податоци, веднаш ја ажурира локалната IndexedDB база (користејќи caller-supplied `tempId`, обично `_temp_` + UUID). Веднаш емитува настан кон UI-от (на пр. `ln-table`) за да се ажурира екранот инстантно. Складот НЕ иницира сопствена мрежна синхронизација на мутации — тоа е исклучиво одговорност на координаторот (паралелен fan-out, види `ln-data-coordinator`).
+*   **Без Rollback механизам:** Складот нема концепт на "confirm" или "revert" на мутации — секое `ln-store:request-update`/`request-delete` се применува безусловно на локалниот кеш. Реконсилијацијата на серверски грешки (retry, drop, server-wins на конфликт) е исклучиво одговорност на координаторот.
 *   **Енкрипција:** Поддржува криптографска енкрипција на податоците во мирување, искористувајќи го `ln-core` модулот.
 
 ---
@@ -64,23 +64,18 @@
 | `ln-store:updated` | `{ store, record, previous }` | Локално изменет запис. |
 | `ln-store:deleted` | `{ store, id \| ids }` | Локално избришан запис/и. |
 | `ln-store:synced` | `{ store, added, deleted, changed }` | Серверска синхронизација успешно применета. |
-| `ln-store:reverted` | `{ store, action, record, error }` | Откажана оптимистичка мутација бидејќи мрежата пропадна. |
 
-### Настани кон Координаторот (Емитува - Network Requests)
+### Настани кон Координаторот
 *Овие ги слуша само координаторот (`ln-data-coordinator`).*
 | Настан | Payload `e.detail` | Опис |
 | :--- | :--- | :--- |
-| `ln-store:request-remote-create` | `{ tempId, data }` | Барање да се HTTP POST-ира `data` и да се разреши `tempId`. |
-| `ln-store:request-remote-update` | `{ id, data, expected_version }` | Барање за HTTP PATCH/PUT. |
-| `ln-store:request-remote-delete` | `{ id }` | Барање за HTTP DELETE. |
-| `ln-store:request-remote-sync` | `{ since: Timestamp }` | Барање за Delta Sync на промените од серверот. |
+| `ln-store:request-remote-sync` | `{ since: Timestamp }` | Барање за Delta Sync на промените од серверот. Единствениот преостанат `request-remote-*` настан — `create`/`update`/`delete` варијантите се избришани. Мутациите кон серверот ги иницира ИСКЛУЧИВО координаторот (паралелен fan-out), не складот. |
 
 ### Јавен JS API (преку `el.lnDataStore`)
 *   **`getAll(options)`**: Враќа Promise со податоци `({ data, total, filtered })`. Поддржува `filters`, `search`, `sort`, `offset`, `limit` опции изведени преку in-memory query engine.
 *   **`getById(id)`**: Враќа еден запис.
 *   **`applySync(upsertedRecords, deletedIds, syncedAt)`**: Прима серверски payload и го рефлектира во базата.
-*   **`confirmMutation(tempIdOrId, serverRecord, action)`**: Заменува привремен `_temp_uuid` со вистински серверски запис при успешна акција.
-*   **`revertMutation(tempIdOrId, action, error)`**: Го поништува оптимистичкиот настан ако серверот одбие.
+*   Нема `confirmMutation`/`revertMutation` API — избришани во wave-1 рефакторот. Реконсилијацијата на серверски одговор е обична `ln-store:request-update` (со id-swap ако `data.id !== id`) или `ln-store:request-delete`, дишпачирана од координаторот.
 
 ---
 
@@ -92,7 +87,7 @@
 ## 5. Пристапност (ARIA) и Чести Грешки
 *   **Пристапност:** Нема визуелна репрезентација, па соодветно не бара ARIA атрибути освен што треба да е скриена со `aria-hidden="true"` или `.hidden` за да не биде присутна во фокус редоследот.
 *   **Честа грешка 1:** Непоставување на `data-ln-data-store-search-fields`. Без овој атрибут, in-memory `getAll({ search: 'query' })` моторот нема да знае низ кои полиња да пребарува и секогаш ќе враќа празни резултати.
-*   **Честа грешка 2:** Очекување дека компонентата сама ќе комуницира со API. Ако немате закачен координатор (`ln-data-coordinator`) кој ги слуша мрежните барања, податоците ќе останат исклучиво во локалната база со маркер `_pending: true` и никогаш нема да стигнат до серверот.
+*   **Честа грешка 2:** Очекување дека компонентата сама ќе комуницира со API. Ако немате закачен координатор (`ln-data-coordinator`), податоците ќе останат исклучиво во локалната база (со `_temp_`-префиксиран id ако се создадени преку `ln-store:request-create`) и никогаш нема да стигнат до серверот.
 *   **Честа грешка 3:** `QuotaExceededError`. Се случува ако се обидувате да складирате масивни фајлови (пр. Base64 слики) во складот. Препорачана пракса е складот да се користи само за мета-податоци (JSON), а фајловите да имаат одвоена URL патека.
 
 ---
@@ -102,34 +97,33 @@
 ```mermaid
 sequenceDiagram
     participant UI as UI (ln-form/button)
-    participant Store as ln-data-store (IndexedDB)
     participant Coord as ln-data-coordinator
+    participant Store as ln-data-store (IndexedDB)
     participant Server as Server/API
 
-    UI->>Store: dispatch ln-store:request-create { data }
-    Store->>Store: Generate _temp_uuid
-    Store->>Store: IndexedDB put({ id: temp_uuid, _pending: true })
-    Store->>UI: emit ln-store:created (UI draws new row instantly)
-    
-    Store->>Coord: emit ln-store:request-remote-create { temp_uuid, data }
-    Coord->>Server: HTTP POST /api/resource { data }
-    
+    UI->>Coord: ln-form:submit-record { method:'POST', data }
+    par Локален запис (веднаш)
+        Coord->>Store: dispatch ln-store:request-create { tempId, data }
+        Store->>Store: IndexedDB put({ id: tempId })
+        Store->>UI: emit ln-store:created (UI ја црта новата редица инстантно)
+    and Оддалечен повик (паралелно)
+        Coord->>Server: HTTP POST /api/resource { data } (преку конектор)
+    end
+
     alt HTTP Success (200/201)
         Server-->>Coord: HTTP 201 Created { id: 55, ... }
-        Coord->>Store: store.confirmMutation(temp_uuid, serverRecord, 'create')
-        Store->>Store: IndexedDB delete(temp_uuid)
-        Store->>Store: IndexedDB put(serverRecord)
-        Store->>UI: emit ln-store:confirmed (UI replaces temp_uuid with 55)
+        Coord->>Store: dispatch ln-store:request-update { id: tempId, data: serverRecord }
+        Store->>Store: id-swap транзакција (put нов запис + delete tempId, атомски)
+        Store->>UI: emit ln-store:updated (UI го заменува tempId со 55)
     else HTTP Error (400/500)
         Server-->>Coord: HTTP Error
-        Coord->>Store: store.revertMutation(temp_uuid, 'create', 'Server error')
-        Store->>Store: IndexedDB delete(temp_uuid)
-        Store->>UI: emit ln-store:reverted (UI removes row, displays toast)
+        Coord->>Coord: класификација на грешка (auth/transient/deterministic)
+        Note over Coord: create-reject (deterministic 4xx) → dispatch ln-store:request-delete { id: tempId }
     end
 ```
 
 ---
 
 ## 7. Поврзани Компоненти
-*   **`ln-data-coordinator`**: Layer 2 медијатор кој го "оживува" складот поврзувајќи го со REST API. Ги пресретнува `ln-store:request-remote-*` настаните и ги преведува во HTTP повици.
+*   **`ln-data-coordinator`**: Layer 2 медијатор кој го "оживува" складот поврзувајќи го со REST API. Прима `ln-form:submit-record` / `ln-data-coordinator:request-*` и во ист синхрон handler дишпачира и локален store запис и оддалечен connector/queue повик (паралелен fan-out) — не чека одговор пред да ја ажурира локалната состојба.
 *   **`ln-table` / `ln-list`**: Визуелни консументи. Ги читаат податоците од складот преку `store.getAll()` и ги набљудуваат локалните `ln-store:created/updated/deleted` настани за динамички да се прецртаат без да бараат целосно освежување на страницата.
