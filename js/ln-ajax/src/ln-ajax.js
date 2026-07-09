@@ -3,6 +3,7 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '..
 (function () {
 	const DOM_SELECTOR = 'data-ln-ajax';
 	const DOM_ATTRIBUTE = 'lnAjax';
+	const SCOPE_ATTR = 'data-ln-form-scope';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -44,6 +45,14 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '..
 	function _attachFormsAjax(forms) {
 		for (const form of forms) {
 			if (form[DOM_ATTRIBUTE + 'Trigger']) continue;
+
+			if (form.hasAttribute(SCOPE_ATTR)) {
+				if (!form[DOM_ATTRIBUTE + 'ScopeWarned']) {
+					form[DOM_ATTRIBUTE + 'ScopeWarned'] = true;
+					console.warn('[ln-ajax] Form has data-ln-form-scope — the ln-data-coordinator write pipeline takes precedence; skipping ajax interception for this form.');
+				}
+				continue;
+			}
 
 			const handler = function (e) {
 				e.preventDefault();

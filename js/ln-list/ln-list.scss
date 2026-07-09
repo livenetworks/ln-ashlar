@@ -8,13 +8,6 @@
 // The virtual-scroll spacer is library-injected. In a grid list body it must
 // span the full row so it occupies whole-row height, not a single track.
 // Harmless in plain single-column list mode (1 / -1 spans the lone column).
-.ln-list__spacer,
-.ln-list__empty-wrapper {
+.ln-list__spacer {
 	grid-column: 1 / -1;
-	width: 100%;
-}
-
-.ln-list__empty-wrapper {
-	height: auto !important;
-	min-height: auto !important;
 }

@@ -28,3 +28,10 @@
 		margin-top: var(--margin-block);
 	}
 }
+
+@mixin empty-state-span {
+	grid-column: 1 / -1;
+	width: 100%;
+	height: auto !important;
+	min-height: auto !important;
+}

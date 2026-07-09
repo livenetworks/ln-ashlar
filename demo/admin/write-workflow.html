@@ -353,12 +353,12 @@
 <!-- Delete stays event-driven (out of scope for the form write pipeline — see write-workflow-guide.md §3.5) -->
 <script class="demo-wiring">
 (function () {
-	const storeEl = document.getElementById('wwf-store');
+	const coordEl = document.getElementById('wwf-coordinator');
 
 	document.addEventListener('ln-table:row-action', function (e) {
 		if (e.detail.table !== 'wwf-documents') return;
 		if (e.detail.action === 'delete') {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+			coordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
 				detail: { id: Number(e.detail.id) }
 			}));
 		}

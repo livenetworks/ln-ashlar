@@ -47,29 +47,35 @@
 
 **Жива реконфигурација:** сите три конфигурациски атрибути (`base-url`, `path`, `headers`) се набљудуваат во живо — промена на атрибутот во DOM автоматски повикува `refreshConfig()` и емитува `ln-api-connector:config-changed`. Корисно за менување на base URL при login или tenant switch, без реиницијализација.
 
-**JS API:** инстанцата е достапна на елементот како `el.lnApiConnector` (алијас `el.lnConnector`) и ги нуди истите операции како Promise методи: `fetchDelta(since)`, `create(payload)`, `update(id, payload, expectedVersion)`, `delete(id)`, `bulkDelete(ids)`, плус `refreshConfig()` и `destroy()`. Настанскиот API подолу е тенка обвивка околу нив.
+**JS API:** инстанцата е достапна на елементот како `el.lnApiConnector` (алијас `el.lnConnector`) и ги нуди истите операции како Promise методи: `fetchDelta(since)`, `create(payload, url)`, `update(id, payload, expectedVersion, url)`, `delete(id, url)`, `bulkDelete(ids, url)`, плус `refreshConfig()` и `destroy()`. Секој мутациски метод (сите освен `fetchDelta`) сега прима и опционален трејлинг аргумент `url` — кога е присутен (непразен стринг), го заменува `self.path` во внатрешниот `buildUrl(baseUrl, path, ...)` повик за тој конкретен повик; кога е отсутен/`undefined`, однесувањето е 100% непроменето (`buildUrl(baseUrl, self.path, ...)`). `fetchDelta` останува без `url` параметар — read/sync секогаш оди преку конфигурираниот `data-ln-api-path`. Настанскиот API подолу е тенка обвивка околу нив.
 
 ### DOM Барања кон Конекторот (Слуша)
 *За компатибилност, компонентата реагира на настани испратени со префикси `ln-api-connector:...` и `ln-rest-connector:...`*
 | Настан | Payload `e.detail` | Опис |
 | :--- | :--- | :--- |
-| `:request-sync` / `:request-fetch` | `{ since?: Timestamp }` | Барање за вчитување на промените од одреден маркер; без `since` се влече сè. |
-| `:request-create` | `{ data: Object, tempId: String }` | Барање за креирање нов запис. |
-| `:request-update` | `{ id: ID, data: Object, expected_version: Int }` | Барање за измена на запис со одредена верзија. |
-| `:request-delete` | `{ id: ID }` | Барање за бришење поединечен запис. |
-| `:request-bulk-delete` | `{ ids: Array }` | Барање за масовно бришење. |
+| `:request-sync` / `:request-fetch` | `{ since?: Timestamp, meta?: Object }` | Барање за вчитување на промените од одреден маркер; без `since` се влече сè. |
+| `:request-create` | `{ data: Object, tempId: String, url?: String, meta?: Object }` | Барање за креирање нов запис. |
+| `:request-update` | `{ id: ID, data: Object, expected_version: Int, url?: String, meta?: Object }` | Барање за измена на запис со одредена верзија. |
+| `:request-delete` | `{ id: ID, url?: String, meta?: Object }` | Барање за бришење поединечен запис. |
+| `:request-bulk-delete` | `{ ids: Array, url?: String, meta?: Object }` | Барање за масовно бришење. |
+
+`url` (опционален, стринг): кога е присутен, го **заменува** `data-ln-api-path` внатре во `buildUrl()` join-от за тој конкретен повик — `data-ln-api-base-url` секогаш сепак се препишува пред него. Кога е отсутен/празен, важи стандардното `path` однесување. Ова постои затоа што мутацискиот endpoint потекнува од HTML `action` на формата (преку `ln-data-coordinator`), додека `data-ln-api-path` останува конфигурација само за read/sync fallback.
+
+`meta` (опционален, `Object`, опаque за конекторот — не се толкува, само се echo-ира): default `null` ако не е даден; се враќа непроменет во соодветниот одговор-настан. Овозможува корелација без Promise за приемачот (типично `ln-data-coordinator`, кој внатре го носи `entryId` за queue ack/nack).
 
 ### Одговори кон DOM (Емитува)
 | Настан | Payload `e.detail` | Опис |
 | :--- | :--- | :--- |
-| `ln-api-connector:fetched` | `{ data, since }` | Вратени податоци од делта синхронизација. |
-| `ln-api-connector:created` | `{ record, tempId }` | Успешно креиран запис, го враќа серверот заедно со привременото ID. |
-| `ln-api-connector:updated` | `{ record, id }` | Успешно ажуриран запис. |
-| `ln-api-connector:deleted` | `{ response, id }` | Успешно избришан запис на серверот. |
-| `ln-api-connector:bulk-deleted` | `{ response, ids }` | Успешно избришани низа на записи. |
-| `ln-api-connector:error` | `{ action, error, status, data, ...контекст }` | Грешка при комуникација со серверот (детали подолу). |
+| `ln-api-connector:fetched` | `{ data, since, meta }` | Вратени податоци од делта синхронизација. |
+| `ln-api-connector:created` | `{ record, tempId, meta }` | Успешно креиран запис, го враќа серверот заедно со привременото ID. |
+| `ln-api-connector:updated` | `{ record, id, meta }` | Успешно ажуриран запис. |
+| `ln-api-connector:deleted` | `{ response, id, meta }` | Успешно избришан запис на серверот. |
+| `ln-api-connector:bulk-deleted` | `{ response, ids, meta }` | Успешно избришани низа на записи. |
+| `ln-api-connector:error` | `{ action, error, status, data, meta, ...контекст }` | Грешка при комуникација со серверот (детали подолу). |
 | `ln-api-connector:config-changed` | `{ baseUrl, path, headers }` | Емитуван при секој `refreshConfig()` — иницијално и при жива промена на атрибут. |
 | `ln-api-connector:destroyed` | `{ target }` | Емитуван при `destroy()` на инстанцата. |
+
+Секое поле `meta` во одговорите е точна ехо-копија на `detail.meta` од барањето што го предизвикало одговорот, `null` ако не бил проследен.
 
 **Структура на `:error`:** покрај заедничките полиња `action`, `error` (порака), `status` и `data` (JSON телото на грешката, ако постои), payload-от носи **контекстуално поле за корелација, зависно од акцијата**: `since` (sync), `tempId` (create), `id` (update и delete), `ids` (bulk-delete). Полето `conflictData` постои **само за `update`** и е не-null единствено при HTTP 409 — тогаш ја содржи моменталната серверска верзија на записот. Мрежна грешка без HTTP одговор (fetch reject) дава `status: 0`.
 
@@ -124,5 +130,6 @@ sequenceDiagram
 ---
 
 ## 7. Поврзани Компоненти
-*   **`ln-data-coordinator`**: Главниот Layer 2 медијатор кој слуша промени од локалниот IndexedDB склад и ги проследува во конекторот за испраќање кон серверот.
+*   **`ln-data-coordinator`**: Главниот Layer 2 медијатор кој слуша промени од локалниот IndexedDB склад и ги проследува во конекторот за испраќање кон серверот — исклучиво преку `:request-*` / одговор настани, никогаш преку директни методски повици.
 *   **`ln-http`**: Доколку `ln-http` е вчитан на страницата, тој глобално го обвиткува `window.fetch`, па и повиците на конекторот минуваат низ неговиот заштитен и дедупликациски слој. Без вчитан `ln-http`, конекторот работи со чист нативен `fetch` — обвивката не е задолжителна зависност.
+*   **`ln-form`**: Индиректен извор на мутацискиот `url` — HTML `action` атрибутот на scoped форма (`data-ln-form-scope`) е single source of truth за ресурсниот endpoint и патува до конекторот (преку координаторот) како `detail.url` во `:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete`, наместо конекторот сам да го гради од `data-ln-api-path`.

@@ -42,9 +42,9 @@ import './ln-data-store/src/ln-data-store.js';
 import './ln-api-connector/src/ln-api-connector.js';
 import './ln-couchdb-connector/src/ln-couchdb-connector.js';
 import './ln-data-coordinator/src/ln-data-coordinator.js';
+import './ln-api-queue/src/ln-api-queue.js';
 import './ln-options/src/ln-options.js';
 import './ln-stat/src/ln-stat.js';
-import './ln-store-notify/src/ln-store-notify.js';
 import './ln-icons/src/ln-icons.js';
 import './ln-debug/src/ln-debug.js';
 

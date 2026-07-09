@@ -1,4 +1,4 @@
-import { registerComponent } from '../../ln-core';
+import { registerComponent, getLocale, getLocaleFallback } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-time';
@@ -10,10 +10,8 @@ import { registerComponent } from '../../ln-core';
 	const _formatters = {};
 	const _relativeFormatters = {};
 
-	function _getLocale(el) {
-		return el.getAttribute('data-ln-time-locale')
-			|| document.documentElement.lang
-			|| undefined;
+	function _resolveLocale(el) {
+		return el.getAttribute('data-ln-time-locale') || getLocale(el);
 	}
 
 	function _getFormatter(locale, options) {
@@ -37,8 +35,7 @@ import { registerComponent } from '../../ln-core';
 	let _intervalId = null;
 
 	function _startInterval() {
-		if (_intervalId) return;
-		_intervalId = setInterval(_tickRelative, 60000);
+		if (!_intervalId) _intervalId = setInterval(_tickRelative, 60000);
 	}
 
 	function _stopInterval() {
@@ -61,7 +58,20 @@ import { registerComponent } from '../../ln-core';
 
 	// ─── Formatting ───────────────────────────────────────────
 	function _formatFull(date, locale) {
-		return _getFormatter(locale, { dateStyle: 'long', timeStyle: 'short' }).format(date);
+		const fallback = getLocaleFallback(locale);
+		const langPrefix = (locale || '').toLowerCase().split('-')[0];
+		const formatter = _getFormatter(locale, { dateStyle: 'long', timeStyle: 'short' });
+		const resolvedLocale = formatter.resolvedOptions().locale.toLowerCase().split('-')[0];
+
+		if (fallback && resolvedLocale !== langPrefix && fallback.monthsLong) {
+			const month = fallback.monthsLong[date.getMonth()];
+			const day = date.getDate();
+			const year = date.getFullYear();
+			const hours = String(date.getHours()).padStart(2, '0');
+			const mins = String(date.getMinutes()).padStart(2, '0');
+			return `${day} ${month} ${year} во ${hours}:${mins}`;
+		}
+		return formatter.format(date);
 	}
 
 	function _formatShort(date, locale) {
@@ -70,7 +80,18 @@ import { registerComponent } from '../../ln-core';
 		if (date.getFullYear() !== now.getFullYear()) {
 			options.year = 'numeric';
 		}
-		return _getFormatter(locale, options).format(date);
+		const fallback = getLocaleFallback(locale);
+		const langPrefix = (locale || '').toLowerCase().split('-')[0];
+		const formatter = _getFormatter(locale, options);
+		const resolvedLocale = formatter.resolvedOptions().locale.toLowerCase().split('-')[0];
+
+		if (fallback && resolvedLocale !== langPrefix && fallback.monthsShort) {
+			const month = fallback.monthsShort[date.getMonth()];
+			const day = date.getDate();
+			const year = date.getFullYear() !== now.getFullYear() ? ' ' + date.getFullYear() : '';
+			return `${day} ${month}${year}`;
+		}
+		return formatter.format(date);
 	}
 
 	function _formatDate(date, locale) {
@@ -117,7 +138,7 @@ import { registerComponent } from '../../ln-core';
 
 		const date = new Date(timestamp * 1000);
 		const mode = instance.dom.getAttribute(DOM_SELECTOR) || 'short';
-		const locale = _getLocale(instance.dom);
+		const locale = _resolveLocale(instance.dom);
 		let text;
 
 		switch (mode) {
@@ -158,7 +179,6 @@ import { registerComponent } from '../../ln-core';
 	};
 
 	// ─── Attribute / Mutation Hooks ───────────────────────────
-
 	function _onAttributeChange(el) {
 		const instance = el[DOM_ATTRIBUTE];
 		if (!instance) return;
@@ -174,8 +194,6 @@ import { registerComponent } from '../../ln-core';
 	}
 
 	function _onInit(node) {
-		// Re-render any data-ln-time element in the mutation target subtree.
-		// Covers `datetime` extra-attribute changes (extras don't fire onAttributeChange).
 		if (node.nodeType !== 1) return;
 		if (node.hasAttribute && node.hasAttribute(DOM_SELECTOR) && node[DOM_ATTRIBUTE]) {
 			_render(node[DOM_ATTRIBUTE]);
@@ -183,7 +201,6 @@ import { registerComponent } from '../../ln-core';
 	}
 
 	// ─── Registration ─────────────────────────────────────────
-
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-time', {
 		extraAttributes: ['datetime'],
 		onAttributeChange: _onAttributeChange,

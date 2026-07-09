@@ -399,20 +399,24 @@
 
 							<!-- Empty States -->
 							<template data-ln-template="hybrid-docs-empty">
-								<div data-ln-empty-state="no-data">
-									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-folder"></use></svg>
-									<h3>No documents yet</h3>
-									<p>Sync background data or add your first file.</p>
-								</div>
+								<li class="demo-list-empty">
+									<div data-ln-empty-state="no-data">
+										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-folder"></use></svg>
+										<h3>No documents yet</h3>
+										<p>Sync background data or add your first file.</p>
+									</div>
+								</li>
 							</template>
 
 							<template data-ln-template="hybrid-docs-empty-filtered">
-								<div data-ln-empty-state="no-results">
-									<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
-									<h3>No matches found</h3>
-									<p>Try a different search query or clear your filters.</p>
-									<button type="button" data-ln-list-clear class="btn">Clear Search</button>
-								</div>
+								<li class="demo-list-empty">
+									<div data-ln-empty-state="no-results">
+										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+										<h3>No matches found</h3>
+										<p>Try a different search query or clear your filters.</p>
+										<button type="button" data-ln-list-clear class="btn">Clear Search</button>
+									</div>
+								</li>
 							</template>
 						</main>
 					</section>

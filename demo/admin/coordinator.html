@@ -611,7 +611,7 @@
 	document.addEventListener('ln-table:row-action', function(e) {
 		if (e.detail.table !== 'demo-docs') return;
 		if (e.detail.action === 'delete') {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+			coordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', {
 				detail: { id: Number(e.detail.id) }
 			}));
 		}

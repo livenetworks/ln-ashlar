@@ -47,10 +47,7 @@
 
 // ─── Empty state (demo-scoped — consumers name their own) ─
 #hybrid-list .demo-list-empty {
-	grid-column: 1 / -1;
-	padding: var(--size-lg);
-	text-align: center;
-	color: var(--fg-muted);
+	@include empty-state-span;
 }
 
 // ─── List body: grid + scroll container (contract #1) ───

@@ -45,7 +45,7 @@ A zero-dependency, localStorage-backed **Draft Buffer Primitive** that prevents 
 
 ### JS API
 
-Access the persistence instance directly via the `lnAutoresize` property on the form element:
+Access the persistence instance directly via the `lnAutosave` property on the form element:
 
 ```javascript
 const form = document.getElementById('profile-edit');
