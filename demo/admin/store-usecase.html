@@ -254,13 +254,23 @@
 <!-- (a) Mock backend MUST install before any [data-ln-store] element is parsed below. -->
 <script class="mock-related" src="dist/mock-store-usecase.js" defer></script>
 
-<!-- 1. Store (renders nothing) -->
-<div data-ln-data-store="documents"
-     data-ln-store-endpoint="/api/documents"
-     data-ln-store-stale="60"
-     data-ln-store-indexes="department,status,priority,updated_at"
-     data-ln-store-search-fields="title,department,owner"
-     id="documents-store"></div>
+<!-- 1. Coordinator Tree (wraps Store + Connector) -->
+<div data-ln-data-coordinator="documents" id="documents-coordinator">
+	<div data-ln-data-store="documents"
+	     data-ln-store-stale="60"
+	     data-ln-store-indexes="department,status,priority,updated_at"
+	     data-ln-store-search-fields="title,department,owner"
+	     id="documents-store"></div>
+	<div data-ln-api-connector
+	     data-ln-api-base-url=""
+	     data-ln-api-path="/api/documents"></div>
+	<ul hidden data-ln-data-coordinator-dict>
+		<li data-ln-data-coordinator-dict="auth">Session expired. Please log in again.</li>
+		<li data-ln-data-coordinator-dict="network">Network error. Changes saved locally.</li>
+		<li data-ln-data-coordinator-dict="conflict">Document was modified elsewhere — reloaded latest version.</li>
+		<li data-ln-data-coordinator-dict="rejected">Server rejected the change.</li>
+	</ul>
+</div>
 
 <!-- 2. Mock backend toggles -->
 <section class="section-card">
@@ -268,7 +278,7 @@
 	<main>
 		<ul>
 			<li><label><input type="checkbox" id="sim-latency"> Simulate 600 ms latency on every request</label></li>
-			<li><label><input type="checkbox" id="sim-failure"> ~15% of mutations fail (drives <code>ln-store:reverted</code>)</label></li>
+			<li><label><input type="checkbox" id="sim-failure"> ~15% of mutations fail (drives the coordinator's server-reject path)</label></li>
 			<li><label><input type="checkbox" id="sim-conflict"> ~10% of updates return 409 (drives <code>ln-store:conflict</code>)</label></li>
 		</ul>
 		<p><button id="reset-data">Reset seed data</button> — wipes localStorage + IndexedDB + reloads.</p>
@@ -336,7 +346,7 @@
 								data-ln-modal-for="document-modal"
 								data-ln-fill-form="document-form"
 								data-ln-fill-id="{{ id }}"
-								data-ln-fill-updated-at="{{ updated_at }}"
+								data-ln-fill-expected-version="{{ updated_at }}"
 								data-ln-fill-title="{{ title }}"
 								data-ln-fill-department="{{ department }}"
 								data-ln-fill-status="{{ status }}"
@@ -406,7 +416,12 @@
 
 <!-- 4. Create / Edit modal -->
 <div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="document-modal">
-	<form data-ln-form="document-form" id="document-form">
+	<form data-ln-form="document-form"
+	      id="document-form"
+	      data-ln-form-scope="documents"
+	      method="post"
+	      action="/api/documents"
+	      data-ln-form-action-edit>
 		<header>
 			<h3 id="document-modal-title">
 				<span data-ln-modal-when="new">New document</span>
@@ -418,7 +433,7 @@
 		</header>
 		<main>
 			<input type="hidden" name="id">
-			<input type="hidden" name="updated_at" data-ln-fill-as="updatedAt">
+			<input type="hidden" name="expected_version" data-ln-fill-as="expectedVersion">
 			<div class="form-element">
 				<label for="doc-title">Title</label>
 				<input id="doc-title" name="title" required autofocus>
@@ -470,6 +485,7 @@
 
 <script class="demo-coordinator">
 (function () {
+	const coordEl = document.getElementById('documents-coordinator');
 	const storeEl = document.querySelector('[data-ln-data-store="documents"]');
 	const tableEl = document.querySelector('[data-ln-table="documents"]');
 	const formEl  = document.querySelector('[data-ln-form="document-form"]');
@@ -495,7 +511,7 @@
 	});
 
 	// Store Listeners
-	['ready', 'loaded', 'created', 'updated', 'deleted', 'confirmed', 'reverted'].forEach(ev => 
+	['ready', 'loaded', 'created', 'updated', 'deleted'].forEach(ev =>
 		storeEl.addEventListener(`ln-store:${ev}`, refresh)
 	);
 	storeEl.addEventListener('ln-store:synced', e => e.detail.changed && refresh());
@@ -511,17 +527,15 @@
 	document.addEventListener('ln-table:row-action', e => {
 		if (e.detail.table !== 'documents') return;
 		if (e.detail.action === 'delete') {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', { detail: { id: Number(e.detail.id) } }));
+			coordEl.dispatchEvent(new CustomEvent('ln-data-coordinator:request-delete', { detail: { id: Number(e.detail.id) } }));
 		}
 	});
 
-	formEl.addEventListener('ln-form:submit', e => {
-		const data = Object.assign({}, e.detail.data), id = data.id, ev = data.updated_at ? Number(data.updated_at) : undefined;
-		delete data.id; delete data.updated_at;
-		const eventName = id ? 'ln-store:request-update' : 'ln-store:request-create';
-		const detail = id ? { id: Number(id), data, expected_version: ev } : { data };
-		storeEl.dispatchEvent(new CustomEvent(eventName, { detail }));
-		formEl.closest('.ln-modal').setAttribute('data-ln-modal', 'close');
+	// Write path is now declarative (data-ln-form-scope on #document-form) —
+	// the coordinator claims ln-form:submit-record itself. This demo JS only
+	// closes the modal once the record has been handed off.
+	formEl.addEventListener('ln-form:submit-record', () => {
+		documentModal.setAttribute('data-ln-modal', 'close');
 	});
 
 	// Bulk Delete (Event Delegation)
@@ -543,23 +557,24 @@
 		e.preventDefault();
 		if (!pendingDelete) return;
 		const ids = pendingDelete.ids;
-		const eventName = ids.length === 1 ? 'ln-store:request-delete' : 'ln-store:request-bulk-delete';
+		const eventName = ids.length === 1 ? 'ln-data-coordinator:request-delete' : 'ln-data-coordinator:request-bulk-delete';
 		const detail = ids.length === 1 ? { id: ids[0] } : { ids };
-		storeEl.dispatchEvent(new CustomEvent(eventName, { detail }));
+		coordEl.dispatchEvent(new CustomEvent(eventName, { detail }));
 		pendingDelete = null;
 		e.target.closest('.ln-modal').setAttribute('data-ln-modal', 'close');
 	});
 
 	// Toasts & Telemetry
 	const toast = (type, title, message) => window.dispatchEvent(new CustomEvent('ln-toast:enqueue', { detail: { type, title, message } }));
-	storeEl.addEventListener('ln-store:confirmed', e => toast('success', 'Saved', `${e.detail.action} confirmed by server`));
-	storeEl.addEventListener('ln-store:reverted', e => toast('error', 'Reverted', e.detail.error || 'Server rejected the change'));
-	storeEl.addEventListener('ln-store:offline', () => toast('warning', 'Offline', 'Server unreachable — changes queued'));
-	storeEl.addEventListener('ln-store:conflict', e => {
-		toast('warning', 'Conflict', 'Document was modified elsewhere — reloaded latest version');
-		const idField = formEl.querySelector('[name="id"]');
-		if (idField && idField.value && Number(idField.value) === e.detail.local.id) {
-			window.lnCore.lnFill(documentModal, e.detail.remote);
+
+	// Refill form on 409 conflict
+	document.addEventListener('ln-api-connector:error', e => {
+		if (e.detail.status === 409) {
+			const idField = formEl.querySelector('[name="id"]');
+			const remote = e.detail.conflictData && e.detail.conflictData.remote;
+			if (remote && idField && idField.value && Number(idField.value) === e.detail.id) {
+				window.lnCore.lnFill(documentModal, remote);
+			}
 		}
 	});
 })();

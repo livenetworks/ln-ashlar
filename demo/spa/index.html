@@ -106,7 +106,11 @@
 		<!-- packages/packages.html -->
 		<!-- Package modal -->
 <div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal">
-	<form data-ln-form="package-form" id="package-form" data-ln-form-typed>
+	<form data-ln-form="package-form" id="package-form" data-ln-form-typed
+	      data-ln-form-scope="packages"
+	      method="post"
+	      action="/packages"
+	      data-ln-form-action-edit>
 		<header>
 			<h3 id="package-modal-title" data-ln-fillable>
 				<span data-ln-modal-when="new">New package</span>
@@ -186,7 +190,10 @@
 		<!-- tenants/tenants.html -->
 		<!-- Tenant create modal -->
 <div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal">
-	<form data-ln-form="tenant-create" id="tenant-create-form" data-ln-form-typed>
+	<form data-ln-form="tenant-create" id="tenant-create-form" data-ln-form-typed
+	      data-ln-form-scope="tenants"
+	      method="post"
+	      action="/tenants">
 		<header>
 			<h3 id="tenant-modal-title" data-ln-fillable>
 				<span data-ln-modal-when="new">New tenant</span>
@@ -500,7 +507,11 @@
 		</header>
 		<section class="section-card">
 			<main>
-				<form data-ln-form="tenant-form" id="tenant-form" data-ln-form-typed>
+				<form data-ln-form="tenant-form" id="tenant-form" data-ln-form-typed
+				      data-ln-form-scope="tenants"
+				      method="post"
+				      action="/tenants"
+				      data-ln-form-action-edit>
 					<input type="hidden" name="id">
 					<fieldset>
 						<legend>Identity</legend>

@@ -1,25 +1,10 @@
 (function () {
 	'use strict';
 
-	// Package modal form submit handler
-	document.addEventListener('ln-form:submit', function (e) {
-		const form = e.target.closest && e.target.closest('[data-ln-form="package-form"]');
-		if (!form) return;
-		const packagesStoreEl = document.getElementById('packages-store');
-		if (!packagesStoreEl) return;
-
-		const data = Object.assign({}, e.detail.data);
-		const id = data.id;
-		delete data.id;
-		if (id) {
-			packagesStoreEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
-				detail: { id: Number(id), data: data }
-			}));
-		} else {
-			packagesStoreEl.dispatchEvent(new CustomEvent('ln-store:request-create', {
-				detail: { data: data }
-			}));
-		}
+	// Write path is now declarative (data-ln-form-scope="packages" on
+	// #package-form) — the coordinator claims ln-form:submit-record itself.
+	document.addEventListener('ln-form:submit-record', function (e) {
+		if (e.detail.scope !== 'packages' || e.target.id !== 'package-form') return;
 		const packageModal = document.getElementById('package-modal');
 		if (packageModal) packageModal.setAttribute('data-ln-modal', 'close');
 	});

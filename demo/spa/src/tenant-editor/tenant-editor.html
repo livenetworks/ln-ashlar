@@ -14,7 +14,11 @@
 		</header>
 		<section class="section-card">
 			<main>
-				<form data-ln-form="tenant-form" id="tenant-form" data-ln-form-typed>
+				<form data-ln-form="tenant-form" id="tenant-form" data-ln-form-typed
+				      data-ln-form-scope="tenants"
+				      method="post"
+				      action="/tenants"
+				      data-ln-form-action-edit>
 					<input type="hidden" name="id">
 					<fieldset>
 						<legend>Identity</legend>

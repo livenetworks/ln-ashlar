@@ -100,23 +100,11 @@
 			}
 		}
 
-		// Form submit → create or update
-		formEl.addEventListener('ln-form:submit', e => {
-			const data = Object.assign({}, e.detail.data);
-			const id = data.id;
-			delete data.id;
-			const eventName = id ? 'ln-store:request-update' : 'ln-store:request-create';
-			const evt = id
-				? new CustomEvent(eventName, { detail: { id: Number(id), data } })
-				: new CustomEvent(eventName, { detail: { data } });
-			storeEl.dispatchEvent(evt);
+		// Write path is now declarative (data-ln-form-scope on package-form/tenant-form)
+		// — the coordinator claims ln-form:submit-record itself.
+		formEl.addEventListener('ln-form:submit-record', () => {
 			modalEl.setAttribute('data-ln-modal', 'close');
 		});
-
-		// Offline toast (ln-store-notify covers confirmed/reverted; keep offline separately)
-		storeEl.addEventListener('ln-store:offline', () =>
-			toast('warning', 'Offline', 'Server unreachable — changes queued')
-		);
 
 		return { refresh };
 	}
@@ -170,6 +158,12 @@
 			decorate:     decorateTenant
 		})
 		: { refresh: () => {} };
+
+	// Single global offline toast — ln-data-coordinator dispatches
+	// ln-store:offline on `document`, not on individual store elements.
+	document.addEventListener('ln-store:offline', () =>
+		toast('warning', 'Offline', 'Server unreachable — changes queued')
+	);
 
 	// ── Active nav — handled by data-ln-nav="active" on the <nav> element
 
