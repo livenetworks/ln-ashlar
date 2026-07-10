@@ -653,20 +653,10 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
             }
         });
 
-        // 2. Form submit → request event
-        document.addEventListener('ln-form:submit', function (e) {
-            if (e.target.getAttribute('data-ln-form') !== 'new-profile') return;
-            const input = document.querySelector('[data-ln-field="new-profile-name"]');
-            const name = input ? input.value.trim() : '';
-            if (!name) return;
-
-            const nav = _getNav();
-            if (nav) {
-                nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
-                    detail: { name: name }
-                }));
-            }
-            input.value = '';
+        // 2. Local-first write form → coordinator claims it automatically
+        // <form data-ln-form data-ln-form-scope="profiles" method="post" action="/api/profiles">
+        document.addEventListener('ln-form:submit-record', function (e) {
+            if (e.detail.scope !== 'profiles') return;
             document.getElementById('modal-new-profile').setAttribute('data-ln-modal', 'close');
         });
 

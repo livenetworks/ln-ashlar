@@ -29,7 +29,7 @@
 								<strong>The Validity Primitive (<code>ln-validate</code>):</strong> Each input, select, or textarea is a standalone validation primitive. It wraps the browser's native <code>ValidityState</code>, controls when to surface errors visually (only after the field is touched), and manages custom/server-side errors via the <code>ln-validate:set-custom</code> event channel.
 							</li>
 							<li>
-								<strong>The Form Coordinator (<code>ln-form</code>):</strong> This is the coordinator. It sits on the root <code>&lt;form&gt;</code> element and intercepts interactions. It automatically disables the submit button if any field is invalid, blocks invalid submissions, serializes form data into clean JSON objects on <code>ln-form:submit</code>, and handles bulk fills or resets.
+								<strong>The Form Coordinator (<code>ln-form</code>):</strong> This is the coordinator. It sits on the root <code>&lt;form&gt;</code> element and manages fill/reset and, for local-first write pages, the submit intake (<code>data-ln-form-scope</code> → <code>ln-form:submit-record</code>). Field-level validation state is <code>ln-validate</code>'s job.
 							</li>
 						</ol>
 
@@ -38,7 +38,7 @@
 						<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
 							<li>The user types in a field. The field's <code>ln-validate</code> primitive catches the <code>input</code> or <code>change</code> event, marks the field as touched, evaluates validity using <code>dom.checkValidity()</code>, updates the input's visual classes (<code>.ln-validate-valid</code> / <code>.ln-validate-invalid</code>), toggles the matching error in the error list, and dispatches a bubbled <code>ln-validate:valid</code> or <code>ln-validate:invalid</code> CustomEvent.</li>
 							<li>The event bubbles up to the root <code>[data-ln-form]</code>. The coordinator intercepts it, scans the active fields, and re-calculates the submit button's <code>disabled</code> state.</li>
-							<li>When the user submits the form, the coordinator intercepts the submit event, force-validates all fields to ensure no untouched invalid inputs are missed, serializes all values into a key-value object, and dispatches an <code>ln-form:submit</code> event.</li>
+							<li>Without <code>data-ln-form-scope</code>, submit is left entirely native — the browser submits to <code>action</code>/<code>method</code> as usual, or a separate ajax component may intercept the native <code>submit</code> event. With <code>data-ln-form-scope</code>, <code>ln-form</code> serializes the form and dispatches <code>ln-form:submit-record</code>, claimed by the matching <code>ln-data-coordinator</code>.</li>
 						</ol>
 
 						<h4>Why This Decoupled Approach is Superior</h4>
@@ -197,49 +197,6 @@ textarea {
     @include form-actions;
 }
 					</script>
-				</section>
-
-				<!-- ==========================================
-				     AUTO-SUBMIT DEMO
-				     ========================================== -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Auto-submit — search/filter forms</h3></header>
-					<main>
-						<p><code>data-ln-form-auto</code> submits on any input change. <code>data-ln-form-debounce="300"</code> waits 300ms after last change.</p>
-
-						<form id="demo-auto-submit" data-ln-form data-ln-form-auto data-ln-form-debounce="300">
-							<div class="form-element">
-								<label for="demo-search-q">Search</label>
-								<input type="search" id="demo-search-q" name="q" placeholder="Type to search...">
-							</div>
-							<div class="form-element">
-								<label for="demo-search-role">Role</label>
-								<select id="demo-search-role" name="role">
-									<option value="">All roles</option>
-									<option value="admin">Admin</option>
-									<option value="editor">Editor</option>
-									<option value="viewer">Viewer</option>
-								</select>
-							</div>
-						</form>
-
-						<h4>Event log</h4>
-						<pre id="auto-submit-log"></pre>
-
-						<h4>Code</h4>
-						<pre><code>&lt;form data-ln-form data-ln-form-auto data-ln-form-debounce="300"&gt;
-    &lt;input name="q" type="search" placeholder="Search..."&gt;
-    &lt;select name="role"&gt;
-        &lt;option value=""&gt;All roles&lt;/option&gt;
-        &lt;option value="admin"&gt;Admin&lt;/option&gt;
-    &lt;/select&gt;
-&lt;/form&gt;
-
-// Coordinator listens for auto-submit
-document.addEventListener('ln-form:submit', function (e) {
-    console.log('Search:', e.detail.data);
-});</code></pre>
-					</main>
 				</section>
 
 				<!-- ==========================================
@@ -796,19 +753,16 @@ button.btn-icon {
   .form-actions { grid-column: span 6; }
 }</code></pre>
 
-						<h4>Coordinator</h4>
-						<pre><code>document.addEventListener('ln-form:submit', function (e) {
-    if (e.target.id !== 'my-form') return;
+						<h4>Coordinator (local-first write pages)</h4>
+						<pre><code>&lt;form id="my-form" data-ln-form data-ln-form-scope="my-resource"
+      method="post" action="/api/resource" data-ln-form-action-edit&gt;
 
-    fetch('/api/resource', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(e.detail.data)
-    })
-    .then(function (res) { return res.json(); })
-    .then(function () {
-        window.dispatchEvent(new CustomEvent('ln-toast:enqueue', { detail: { type: 'success', title: 'Saved' } }));
-    });
+// The nearest (or named) [data-ln-data-coordinator="my-resource"] claims
+// ln-form:submit-record automatically — no application JS needed to
+// build request-create/request-update events by hand.
+document.addEventListener('ln-form:submit-record', function (e) {
+    if (e.detail.scope !== 'my-resource') return;
+    document.getElementById('my-modal').setAttribute('data-ln-modal', 'close');
 });</code></pre>
 					</main>
 				</section>
@@ -1172,21 +1126,16 @@ input[data-ln-number] {
 	};
 
 	// ─── 1A — Live demo event log ──────────────────────────────
+	// demo-form-grid has no data-ln-form-scope, so ln-form never intercepts
+	// submit (see js/ln-form/README.md §6) — listen to the native event and
+	// serialize with FormData, exactly as an unscoped-form consumer would.
 	const liveForm = document.getElementById('demo-form-grid');
 	const liveLog = document.getElementById('form-log');
-	liveForm.addEventListener('ln-form:submit', function (e) {
+	liveForm.addEventListener('submit', function (e) {
 		e.preventDefault();
-		const json = truncate(JSON.stringify(e.detail.data), 200);
-		appendLog(liveLog, '[' + ts() + '] ln-form:submit  data=' + json);
-	});
-
-	// ─── 1B — Auto-submit log ──────────────────────────────────
-	const autoForm = document.getElementById('demo-auto-submit');
-	const autoLog = document.getElementById('auto-submit-log');
-	autoForm.addEventListener('ln-form:submit', function (e) {
-		e.preventDefault();
-		const json = truncate(JSON.stringify(e.detail.data), 200);
-		appendLog(autoLog, '[' + ts() + '] ln-form:submit  data=' + json);
+		const data = Object.fromEntries(new FormData(liveForm).entries());
+		const json = truncate(JSON.stringify(data), 200);
+		appendLog(liveLog, '[' + ts() + '] submit  data=' + json);
 	});
 
 	// ─── 1C — Fill demo ────────────────────────────────────────
@@ -1275,44 +1224,6 @@ input[data-ln-number] {
 	});
 })();
 </script>
-
-<!-- ==========================================
-     TYPED SERIALIZATION
-     ========================================== -->
-<section class="section-card" data-demo-html>
-	<header><h3>Typed serialization — <code>data-ln-form-typed</code></h3></header>
-	<main>
-		<p>Add <code>data-ln-form-typed</code> to opt in to native-type coercion on submit: a single checkbox becomes a boolean, <code>type="number"</code> becomes a Number (or <code>null</code> when empty), and checkbox groups remain string arrays.</p>
-		<form id="typed-demo-form" data-ln-form data-ln-form-typed onsubmit="return false;">
-			<div class="form-element">
-				<label for="typed-active">Active (single checkbox → boolean)</label>
-				<input type="checkbox" id="typed-active" name="active" value="1">
-			</div>
-			<fieldset>
-				<legend>Roles (group → array)</legend>
-				<div class="form-element">
-					<label><input type="checkbox" name="roles" value="admin"> Admin</label>
-				</div>
-				<div class="form-element">
-					<label><input type="checkbox" name="roles" value="editor"> Editor</label>
-				</div>
-			</fieldset>
-			<div class="form-element">
-				<label for="typed-count">Count (number → Number | null)</label>
-				<input type="number" id="typed-count" name="count" placeholder="e.g. 5">
-			</div>
-			<ul class="form-actions">
-				<li><button type="submit">Serialize (typed)</button></li>
-			</ul>
-		</form>
-		<pre id="typed-demo-output" style="margin-top:var(--size-sm)">(submit to see typed output)</pre>
-		<script>
-		document.getElementById('typed-demo-form').addEventListener('ln-form:submit', function (e) {
-			document.getElementById('typed-demo-output').textContent = JSON.stringify(e.detail.data, null, 2);
-		});
-		</script>
-	</main>
-</section>
 
 <!-- ==========================================
      RESTFUL ACTION ROUTING DEMO

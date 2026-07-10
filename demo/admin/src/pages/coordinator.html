@@ -233,7 +233,12 @@
 
 <!-- Modal Document Form -->
 <div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="doc-modal">
-	<form data-ln-form="doc-form" id="doc-form">
+	<form data-ln-form="doc-form"
+	      id="doc-form"
+	      data-ln-form-scope="demo-docs"
+	      method="post"
+	      action="/documents"
+	      data-ln-form-action-edit>
 		<header>
 			<h3 id="modal-title">
 				<span data-ln-modal-when="new">New Document</span>
@@ -395,8 +400,6 @@
 	storeEl.addEventListener('ln-store:created', refreshTable);
 	storeEl.addEventListener('ln-store:updated', refreshTable);
 	storeEl.addEventListener('ln-store:deleted', refreshTable);
-	storeEl.addEventListener('ln-store:confirmed', refreshTable);
-	storeEl.addEventListener('ln-store:reverted', refreshTable);
 
 	// ─── CRUD User Interactions ──────────────────────────────
 
@@ -410,22 +413,9 @@
 		}
 	});
 
-	// Form Submission Dispatch
-	formEl.addEventListener('ln-form:submit', function(e) {
-		const data = Object.assign({}, e.detail.data);
-		const id = data.id;
-		delete data.id;
-
-		if (id) {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
-				detail: { id: Number(id), data: data }
-			}));
-		} else {
-			storeEl.dispatchEvent(new CustomEvent('ln-store:request-create', {
-				detail: { data: data }
-			}));
-		}
-
+	// Write path is now declarative (data-ln-form-scope on #doc-form) — the
+	// coordinator claims ln-form:submit-record itself.
+	formEl.addEventListener('ln-form:submit-record', function () {
 		modalEl.setAttribute('data-ln-modal', 'close');
 	});
 })();

@@ -1,25 +1,10 @@
 (function () {
 	'use strict';
 
-	// Tenant creation modal submit handler
-	document.addEventListener('ln-form:submit', function (e) {
-		const form = e.target.closest && e.target.closest('[data-ln-form="tenant-create"]');
-		if (!form) return;
-		const tenantsStoreEl = document.getElementById('tenants-store');
-		if (!tenantsStoreEl) return;
-
-		const data = Object.assign({}, e.detail.data);
-		const id = data.id;
-		delete data.id;
-		if (id) {
-			tenantsStoreEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
-				detail: { id: Number(id), data: data }
-			}));
-		} else {
-			tenantsStoreEl.dispatchEvent(new CustomEvent('ln-store:request-create', {
-				detail: { data: data }
-			}));
-		}
+	// Write path is now declarative (data-ln-form-scope="tenants" on
+	// #tenant-create-form) — the coordinator claims ln-form:submit-record itself.
+	document.addEventListener('ln-form:submit-record', function (e) {
+		if (e.detail.scope !== 'tenants' || e.target.id !== 'tenant-create-form') return;
 		const tenantModal = document.getElementById('tenant-modal');
 		if (tenantModal) tenantModal.setAttribute('data-ln-modal', 'close');
 	});

@@ -142,7 +142,10 @@
 <!-- @zone persistent -->
 <!-- Tenant create modal -->
 <div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal">
-	<form data-ln-form="tenant-create" id="tenant-create-form" data-ln-form-typed>
+	<form data-ln-form="tenant-create" id="tenant-create-form" data-ln-form-typed
+	      data-ln-form-scope="tenants"
+	      method="post"
+	      action="/tenants">
 		<header>
 			<h3 id="tenant-modal-title" data-ln-fillable>
 				<span data-ln-modal-when="new">New tenant</span>

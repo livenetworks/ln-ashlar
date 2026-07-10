@@ -88,7 +88,7 @@
 			);
 			records.push(rec);
 			save(records);
-			return jsonResponse(rec); // BARE record — store reads response.json() directly
+			return jsonResponse({ message: { type: 'success', title: 'Saved', body: 'Document created' }, content: rec }, 201);
 		}
 
 		// PUT /api/documents/:id (update)
@@ -109,13 +109,13 @@
 				// then return 409 with current
 				stored.updated_at = nowSec();
 				save(records);
-				return jsonResponse({ current: stored }, 409); // store reads conflict.current
+				return jsonResponse({ remote: stored }, 409);
 			}
 
 			const updated = Object.assign({}, stored, body, { updated_at: nowSec() });
 			records[idx] = updated;
 			save(records);
-			return jsonResponse(updated); // BARE record
+			return jsonResponse({ message: { type: 'success', title: 'Saved', body: 'Document updated' }, content: updated }, 200);
 		}
 
 		// DELETE /api/documents/:id
@@ -125,7 +125,7 @@
 			const id = Number(delMatch[1]);
 			const filtered = records.filter((r) => r.id !== id);
 			save(filtered);
-			return jsonResponse({ ok: true });
+			return jsonResponse({ message: { type: 'success', title: 'Deleted', body: 'Document deleted' }, content: null }, 200);
 		}
 
 		// DELETE /api/documents/bulk-delete
@@ -135,7 +135,7 @@
 			const ids = (body.ids || []).map(Number);
 			const filtered = records.filter((r) => ids.indexOf(r.id) === -1);
 			save(filtered);
-			return jsonResponse({ ok: true });
+			return jsonResponse({ message: { type: 'success', title: 'Deleted', body: 'Documents deleted' }, content: null }, 200);
 		}
 
 		// Fall through to real fetch for any other URL
