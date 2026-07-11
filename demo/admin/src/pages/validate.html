@@ -77,8 +77,8 @@
 						<header><h3>The <code>_touched</code> gate — silent until first interaction</h3></header>
 						<main>
 							<p>The single most consequential UX decision in the component. Validation runs silently until the field has fired its first <code>input</code> or <code>change</code> event. Without this, every page load would render a wall of "this field is required" messages on every empty form. With it, errors appear only after the user has actually engaged with the field.</p>
-							<p>The flag is forward-only during normal flow — once <code>true</code>, stays <code>true</code> until <code>reset()</code>. Note that <code>validate()</code> itself does NOT check <code>_touched</code>; force-validating an untouched field renders errors immediately. That is intentional — <code>lnForm.submit()</code> calls <code>instance.validate()</code> on every field exactly to catch untouched required fields and prevent submission.</p>
-							<p>The flag is read by <code>ln-form._updateSubmitButton</code>, which disables the submit button if NO field has been touched yet (in addition to the standard "any field invalid" check). This implements "you can't submit a form you haven't started yet."</p>
+							<p>The flag is forward-only during normal flow — once <code>true</code>, stays <code>true</code> until <code>reset()</code>. Note that <code>validate()</code> itself does NOT check <code>_touched</code>; force-validating an untouched field renders errors immediately. That is intentional — on form submit (for scoped mutation forms), <code>ln-form</code> dispatches the <code>ln-validate:request-validate</code> event on the form. Each field component catches it, runs <code>validate()</code> (which updates visual error states regardless of touched status), and reports back if it is invalid.</p>
+							<p>The submit button remains enabled at all times, preventing the confusing "disabled-until-valid" anti-pattern. If validation fails, submission is blocked, inline errors are shown, and focus shifts to the first invalid field.</p>
 						</main>
 					</section>
 
@@ -228,7 +228,7 @@ textarea.ln-validate-valid {
 						<header><h3>Demo — Custom validation (password confirmation)</h3></header>
 						<main>
 							<p>Custom errors that native HTML cannot express. The coordinator compares values cross-field and dispatches <code>ln-validate:set-custom</code> when they mismatch, <code>ln-validate:clear-custom</code> when they match. The <code>passwordMismatch</code> key is NOT in <code>ERROR_MAP</code> — its <code>&lt;li&gt;</code> is invisible to the native validation loop and only toggles via the event handlers.</p>
-							<form id="demo-custom-form">
+							<form id="demo-custom-form" novalidate>
 								<div class="form-element">
 									<label for="demo-pass">Password</label>
 									<input type="password" id="demo-pass" name="password" required minlength="8" data-ln-validate placeholder="Min 8 characters">
@@ -340,7 +340,7 @@ input.lnValidate.destroy();    // Detach listeners, dispatch :destroyed</code></
 							<table>
 								<thead><tr><th>Component</th><th>Coordination</th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-form</code></td><td>Listens for bubbled <code>:valid</code> / <code>:invalid</code>, re-evaluates submit-button state by re-querying <code>[data-ln-validate]</code> fields and calling <code>checkValidity()</code> on each. On <code>lnForm.submit()</code>, force-validates every field. On <code>lnForm.reset()</code>, dispatches synthetic <code>input</code>/<code>change</code> first, then calls <code>instance.reset()</code> on every validate field — order matters.</td></tr>
+									<tr><td><code>ln-form</code></td><td>On submit (for scoped mutation paths), dispatches the synchronous <code>ln-validate:request-validate</code> event on the form. Field validators catch it, run <code>validate()</code>, and report back if invalid. If any are invalid, it intercepts the submit and focuses the first invalid field. On form <code>reset</code>, it resets the fields. Scoped forms require the <code>novalidate</code> attribute on the form markup.</td></tr>
 									<tr><td><code>ln-autosave</code></td><td>None directly. Restores values via <code>populateForm()</code>, dispatches synthetic <code>input</code>/<code>change</code>. ln-validate's listeners catch them and validate. Pure platform event flow.</td></tr>
 									<tr><td><code>ln-confirm</code></td><td>Independent. Confirm gates the click on a destructive button; validate operates on form fields. Different elements, different event channels.</td></tr>
 									<tr><td><code>ln-store</code></td><td>None directly. ln-store dispatches <code>ln-form:error</code> on the form for 4xx server responses. ln-validate does NOT subscribe — the application or a future form-coordinator translates server errors into <code>ln-validate:set-custom</code> dispatches. The injection point is <code>set-custom</code>; the producer is consumer code.</td></tr>

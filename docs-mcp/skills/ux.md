@@ -101,14 +101,14 @@ Design ALL FOUR states for every view. If you only design the OK state, the feat
 
 ### Toast Rules
 
-- Position: top-right (desktop), top-center (mobile)
+- Position: bottom-right (desktop), full-width anchored to the bottom edge (mobile) — rationale in [`./ui-visual-language.md`](./ui-visual-language.md) § 14
 - **Success/info:** auto-dismiss
 - **Warning:** auto-dismiss, longer duration
 - **Error:** persists until user dismisses
 - Content: short, specific, past tense ("Employee saved", "3 items deleted")
 - Never show technical details in toasts
 
-`ln-toast` exists in the library ([`../components/ln-toast.md`](../components/ln-toast.md), dangling until authored); toast positioning above reflects this skill's rule, not the library's current default — verify against the component doc once it lands.
+`ln-toast` exists in the library ([`../components/ln-toast.md`](../components/ln-toast.md), dangling until authored); the desktop bottom-right position and mobile full-width bottom position match the library defaults (`scss/config/mixins/_toast.scss`).
 
 ---
 
@@ -327,7 +327,7 @@ Animation is communication — it tells the user what happened and where to look
 - Destructive action without "where do I go after"
 
 ### Forms
-- Submit button enabled when form is invalid — submit is disabled until all fields valid
+- Submit button disabled until all fields valid — keep the button enabled; an invalid submit is intercepted and answered with inline errors, focus moving to the first invalid field (see [`./ui-visual-language.md`](./ui-visual-language.md) § 11); disabled is for processing only
 - Validation only on blur (too late — should be on keyup from first keystroke)
 - Required fields not visible until error
 - Untouched required fields shown as errors on load

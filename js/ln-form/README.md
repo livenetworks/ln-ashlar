@@ -23,8 +23,8 @@ Submit is native HTML — `ln-form` never touches it, unless
 3. **Transport is someone else's job.** Ajax interception (if wanted) is
    a separate component's concern — it listens to the native `submit`
    event itself. Validation is owned by the browser's constraint
-   validation (no form in this library uses `novalidate`) plus
-   `ln-validate` for field error display.
+    validation (scoped validation forms MUST carry `novalidate` in the HTML markup to enable submit interception) plus
+    `ln-validate` for field error display.
 
 ---
 
@@ -156,10 +156,7 @@ them.
 - **No serialization.** There is no `serializeForm` call, no
   `ln-form:submit` event, no JSON payload. (unscoped forms only — scoped
   forms use `serializeForm` internally, see §5b).
-- **No validation orchestration.** Constraint validation is the
-  browser's job (no `novalidate` in this library); field-level error
-  display is `ln-validate`'s job. `ln-form` does not gate submit buttons
-  and does not force-validate fields.
+- **No validation orchestration (unscoped forms only).** Constraint validation for unscoped forms is the browser's job; field-level error display is `ln-validate`'s job. Scoped mutation forms, however, trigger full validation on submit via the `ln-validate:request-validate` event, block submit if invalid, focus the first invalid field, and require `novalidate` in the HTML markup.
 - **No submit interception** unless `data-ln-form-scope` is present (see
   §5b below). `ln-form` never listens to `submit` and never calls
   `preventDefault()` on unscoped forms.

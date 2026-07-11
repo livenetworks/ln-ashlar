@@ -192,7 +192,7 @@ Each component has a detailed spec in `../components/` (planned; most are dangli
 | Component | Spec File | Key Features That Must Be Present |
 |-----------|-----------|----------------------------------|
 | Data Table | [`../components/ln-table.md`](../components/ln-table.md) | Client-side cache, virtual scroll (grounded — `VIRTUAL_THRESHOLD` in `js/ln-table/src/ln-table.js`), sticky header/footer, sort toggle per column, filter dropdown per column, search, row selection, delta sync (grounded — `js/ln-data-store/src/ln-data-store.js` `_triggerRemoteSync`/`applySync`) |
-| Form | [`../components/ln-form.md`](../components/ln-form.md) | per-field validation (keyup) via [`../components/ln-validate.md`](../components/ln-validate.md) (grounded — `js/ln-validate/`) + form coordinator, reserved error space (grounded — `form-validate-errors` mixin, `scss/config/mixins/_form.scss`), submit disabled until valid, fill for edit mode, auto-submit for search/filter forms *(aspirational — no auto-submit behavior found in `js/ln-form/` or `js/ln-search/`)* |
+| Form | [`../components/ln-form.md`](../components/ln-form.md) | per-field validation (keyup) via [`../components/ln-validate.md`](../components/ln-validate.md) (grounded — `js/ln-validate/`) + form coordinator, reserved error space (grounded — `form-validate-errors` mixin, `scss/config/mixins/_form.scss`), submit stays enabled — invalid submit is blocked with inline errors (grounded — `js/ln-form/src/ln-form.js:46`, `js/ln-validate/src/ln-validate.js:97`), fill for edit mode, auto-submit for search/filter forms *(aspirational — no auto-submit behavior found in `js/ln-form/` or `js/ln-search/`)* |
 | Modal | [`../components/ln-modal.md`](../components/ln-modal.md) | Four sizes (sm/md/lg/xl), `<form>` root, focus trap (grounded — manual `keydown` trap in `js/ln-modal/src/ln-modal.js`, current DOM-based implementation; native `<dialog>` migration is a future refactor, see [`../refactor-todo.md`](../refactor-todo.md) §5), ESC close (grounded — same file), backdrop does NOT close, no nested modals |
 | Tabs | [`../components/ln-tabs.md`](../components/ln-tabs.md) | URL hash sync (grounded — `js/ln-tabs/`, namespace-scoped hash deep-linking), multiple groups per page via namespace, badge counts *(aspirational — not found in `js/ln-tabs/`)*, content in DOM from start (no lazy load) |
 | Search | [`../components/ln-search.md`](../components/ln-search.md) | Client-side = instant keyup DOM filtering (grounded — `js/ln-search/`). Server-side = form auto-submit + AJAX *(aspirational — no auto-submit found)* |
@@ -353,7 +353,7 @@ A page is not done until all these are addressed.
 - [ ] Required fields marked (CSS-driven, not manual asterisks)
 - [ ] Related fields grouped (visual sections via grid spans)
 - [ ] `data-ln-validate` on inputs (grounded — `js/ln-validate/`), reserved error space below each field
-- [ ] Submit button disabled until form valid, loading state on submit
+- [ ] Submit button stays enabled — invalid submit shows inline errors and focuses the first invalid field; disable only while processing (loading state on submit)
 - [ ] Cancel button that navigates back
 - [ ] Sensible defaults pre-filled
 

@@ -11,6 +11,7 @@
 @use 'motion' as *;
 @use 'btn' as *;
 @use 'card' as *;
+@use 'breakpoints' as *;
 
 // Toast notification -- side-accent card with icon, title, body, close button.
 // The <li> IS the card; the type IS its class (.success/.error/.warn/.info).
@@ -37,6 +38,12 @@
 	bottom: var(--size-lg);
 	display: flex;
 	flex-direction: column-reverse;
+
+	@include mq-down(md) {
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
 }
 
 // Base = final visible resting state, so SSR-authored <li> render with
@@ -78,6 +85,15 @@
 	min-width: 320px;
 	max-width: 450px;
 	@include overflow-hidden;
+
+	@include mq-down(md) {
+		min-width: 0;
+		max-width: none;
+		width: 100%;
+		border-radius: 0;
+		border-inline: 0;
+		border-block-end: 0;
+	}
 }
 
 @mixin toast-icon {

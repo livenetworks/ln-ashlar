@@ -193,29 +193,25 @@ _applyActionMode(record):
 
 ## What ln-form does NOT do
 
-- No `submit` listener, no `preventDefault()`.
-- No `serializeForm` call, no `ln-form:submit` event, no JSON payload.
+- Intercepts submit only on scoped mutation paths (`data-ln-form-scope` + POST/PUT/PATCH method) via `preventDefault()`, serializes, and dispatches `ln-form:submit-record`.
+- Performs full-form validation orchestration on scoped submit: dispatches `ln-validate:request-validate` on the form, and if any fields fail validation, prevents submission, sorts the invalid fields by document position, and focuses the first invalid one.
 - No auto-submit (`data-ln-form-auto` / `data-ln-form-debounce` removed).
 - No typed serialization (`data-ln-form-typed` removed).
-- No validation orchestration — no submit-button disable logic, no
-  `_updateSubmitButton`, no `isValid` getter, no `_resetValidation`.
-- No `ln-form:fill` / `ln-form:reset` command events, no
-  `ln-form:reset-complete`.
+- No submit-button disabling logic (submit button stays active; invalid submit displays inline errors).
+- No `ln-form:fill` / `ln-form:reset` command events, no `ln-form:reset-complete`.
 
-Ajax interception (if a project wants it) is a separate component's
-concern — it listens to the native `submit` event itself. Validation
-remains the browser's job (constraint validation; no form in this
-library uses `novalidate`) plus `ln-validate` for field error display.
+Ajax interception for non-scoped forms (if a project wants it) is a separate component's concern — it listens to the native `submit` event itself.
 
 ---
 
 ## Relation to ln-validate
 
-`ln-form` no longer integrates with `ln-validate` — there are no shared
-touch points. `ln-validate` currently relies on the form's `reset` event
-to clear field error state; since `ln-form` no longer runs a validation
-reset step, that responsibility currently has no owner (known follow-up
-for `ln-validate`, tracked separately).
+`ln-form` integrates with `ln-validate` on submit for scoped mutation forms:
+- On submit, `ln-form` dispatches the synchronous custom event `ln-validate:request-validate` on the form with a collector array `invalidFields` in the event detail.
+- Each `ln-validate` field instance listens to this event on its parent form. If invalid, it pushes its input element to `detail.invalidFields`.
+- If the collector array contains any items, `ln-form` halts submission and focuses the first invalid element in document order.
+- To support this inline validation gate, any form using scoped submit-records **MUST** have the `novalidate` attribute set on the `<form>` markup to bypass native browser bubbles.
+- `ln-validate` also listens to the native `reset` event on the form to clear field error classes and reset its internal `_touched` state.
 
 ---
 
