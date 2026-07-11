@@ -186,10 +186,10 @@
 
 ### Јадро (прво — претежно код-агностични, брза добивка)
 
-- [ ] **ux** — извор: `.claude/skills/ux/SKILL.md` (action-feedback loop, четирите состојби, feedback стратегија, destructive flows, multi-step, error recovery, edge cases, motion)
-- [ ] **ux-interaction-patterns** — извор: `.claude/skills/ux/interaction-patterns.md` — ⚠ непрегледан извор, оди со ревју
-- [ ] **ui** — извор: `.claude/skills/ui/SKILL.md` (design-first процес, data priority, layout одлуки, component selection, completeness, density, page checklists)
-- [ ] **ui-visual-language** — извор: `.claude/skills/ui/visual-language.md`
+- [x] **ux** — извор: `.claude/skills/ux/SKILL.md` (action-feedback loop, четирите состојби, feedback стратегија, destructive flows, multi-step, error recovery, edge cases, motion)
+- [x] **ux-interaction-patterns** — извор: `.claude/skills/ux/interaction-patterns.md` — ⚠ непрегледан извор, оди со ревју
+- [x] **ui** — извор: `.claude/skills/ui/SKILL.md` (design-first процес, data priority, layout одлуки, component selection, completeness, density, page checklists)
+- [x] **ui-visual-language** — извор: `.claude/skills/ui/visual-language.md`
 
 ### Component-completeness спецификации (инкрементално, СПАРЕНИ со Фаза 3/4)
 
@@ -243,5 +243,5 @@
 | components — позадински (3Б) | 9 | 0 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
-| skills | 13 | 0 |
-| **Вкупно** | **108** | **12** |
+| skills | 13 | 4 |
+| **Вкупно** | **108** | **16** |
