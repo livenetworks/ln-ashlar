@@ -1,55 +1,56 @@
 ---
-name: ime
+name: name
 classification: css
 status: draft
-summary: Една реченица за визуелната компонента / миксинот.
-source: scss/components/_ime.scss
+domain: frontend
+summary: One sentence about the visual component / mixin.
+source: scss/components/_name.scss
 tags: []
 ---
 
-# [емоџи] ime
+# [emoji] name
 
 ---
 
-## 1. Заднинско дејство и одговорност
+## 1. Core Behavior & Responsibility
 
-- Улогата на визуелната компонента и кој слој ја носи (mixin layer / component binding).
+- The role of the visual component and which layer owns it (mixin layer / component binding).
 
 ---
 
-## 2. Минимален HTML Маркап и Варијанти на Употреба
+## 2. Minimal HTML Markup & Usage Variants
 
-### Базен HTML Маркап
+### Base HTML Markup
 
 ```html
-<!-- Комплетен, copy-paste функционален пример -->
+<!-- Complete, copy-paste functional example -->
 ```
 
-### Варијанта 1: [Име]
+### Variant 1: [Name]
 
-#### HTML Маркап
+#### HTML Markup
 ```html
 <!-- ... -->
 ```
 
 ---
 
-## 3. SCSS API (Миксини, Класи и Токени)
+## 3. SCSS API (Mixins, Classes & Tokens)
 
-| Име | Вид | Параметри / Вредности | Опис |
+| Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 | `card` | mixin | — | ... |
-| `--card-bg` | токен | боја | ... |
+| `--card-bg` | token | color | ... |
 
 ---
 
-## 4. Пристапност и Чести Грешки
+## 4. Accessibility & Common Pitfalls
 
 > [!CAUTION]
-> 1. **[Грешка]:** објаснување.
+> 1. **[Pitfall]:** explanation.
 
 ---
 
-## 5. Поврзани Документи
+## 5. Related Documents
 
-- [`tokens`](./tokens.md) — зошто.
+- [`tokens`](./tokens.md) — why.

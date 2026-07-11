@@ -1,60 +1,61 @@
 ---
-name: ime-na-pattern
+name: pattern-name
 classification: pattern
 status: draft
-summary: Една реченица — кој UI проблем го решава рецептот.
-source: demo/admin/primer.html
+domain: frontend
+summary: One sentence — which UI problem the recipe solves.
+source: demo/admin/example.html
 tags: []
 ---
 
-# [емоџи] Име на патернот
+# [emoji] Pattern Name
 
 ---
 
-## 1. Проблем и Контекст
+## 1. Problem & Context
 
-Кога се користи овој патерн, за каков тип содржина/интеракција.
+When to use this pattern, for what kind of content/interaction.
 
 ---
 
-## 2. Комплетен HTML Маркап
+## 2. Complete HTML Markup
 
-### Базен HTML Маркап
+### Base HTML Markup
 
 ```html
-<!-- Целиот композитен рецепт — copy-paste функционален -->
+<!-- The full composite recipe — copy-paste functional -->
 ```
 
-### Варијанта 1: [Име]
+### Variant 1: [Name]
 
-#### HTML Маркап
+#### HTML Markup
 ```html
 <!-- ... -->
 ```
 
 ---
 
-## 3. Вклучени Компоненти
+## 3. Included Components
 
-| Компонента | Улога во патернот |
+| Component | Role in the Pattern |
 |---|---|
 | [`ln-table`](../components/ln-table.md) | ... |
 
 ---
 
-## 4. Тек на Податоци
+## 4. Data Flow
 
-Како течат настаните/податоците низ компонентите (опционално Mermaid).
+How events/data flow through the components (optional Mermaid).
 
 ---
 
-## 5. Чести Грешки
+## 5. Common Pitfalls
 
 > [!CAUTION]
-> 1. **[Грешка]:** објаснување.
+> 1. **[Pitfall]:** explanation.
 
 ---
 
-## 6. Поврзани Патерни и Компоненти
+## 6. Related Patterns & Components
 
-- [`drug-pattern`](./drug-pattern.md) — зошто.
+- [`other-pattern`](./other-pattern.md) — why.

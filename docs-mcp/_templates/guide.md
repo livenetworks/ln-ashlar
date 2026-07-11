@@ -1,20 +1,21 @@
 ---
-name: ime-na-vodic
+name: guide-name
 classification: guide
 status: draft
-summary: Една реченица — што покрива водичот.
+domain: frontend
+summary: One sentence — what the guide covers.
 source:
 tags: []
 ---
 
-# [емоџи] Наслов на водичот
+# [emoji] Guide Title
 
-## Резиме
+## Summary
 
-2-3 реченици — за кого е и што ќе научи.
+2-3 sentences — who it is for and what they will learn.
 
 ---
 
-Слободна форма. Задолжително: frontmatter, `## Резиме` како прва секција,
-релативни линкови кон компоненти/патерни за крос-референтниот граф.
-За `doctrine/` документи важи истиот калап со `classification: doctrine`.
+Free form. Mandatory: frontmatter, `## Summary` as the first section,
+relative links to components/patterns for the cross-reference graph.
+For `doctrine/` documents the same template applies with `classification: doctrine`.

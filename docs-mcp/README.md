@@ -1,112 +1,115 @@
-# docs-mcp — Кориснички документациски корпус на ln-ashlar
+# docs-mcp — User Documentation Corpus for ln-ashlar
 
-Овој фолдер е **единствениот извор** што MCP серверот на ln-ashlar го индексира и сервира.
-Целта: сите агенти, вработени и корисници на библиотеката да имаат ист „mindset“ —
-кои атрибути постојат, какви вредности примаат, кои настани се емитираат, и готови
-markup темплејти за копирање.
+This directory is the **sole source** indexed and served by the `ln-ashlar` MCP server.
+The goal: ensure all agents, developers, and library users share the exact same mindset—specifically, which attributes exist, what values they accept, which events are emitted, alongside ready-to-copy HTML markup templates.
 
-## Публика и слоеви
+## Audience and Layers
 
-| Слој | Локација | Публика |
+| Layer | Location | Audience |
 |---|---|---|
-| Low-level (внатрешности) | `js/ln-*/README.md` покрај кодот | Развивачи НА библиотеката |
-| **Кориснички корпус (овој фолдер)** | `docs-mcp/` | Корисници на библиотеката, AI агенти преку MCP |
-| In-context skills | `.claude/skills/` (посебно repo) | Claude Code сесии |
+| Low-level (Internals) | `js/ln-*/README.md` alongside code | Core library developers |
+| **User Corpus (this folder)** | `docs-mcp/` | Library users, AI agents via MCP |
+| In-context skills | `.claude/skills/` (separate repo) | Claude Code sessions |
 
-## Структура на фолдерот
+## Directory Structure
 
 ```
 docs-mcp/
-  README.md          ← овој фајл (НЕ се индексира)
-  _templates/        ← темплејти за авторирање (НЕ се индексира)
-  components/        ← JS компоненти, еден фајл по компонента: ln-<име>.md
-  css/               ← SCSS компоненти/миксини/токени: <име>.md
-  patterns/          ← композитни рецепти (табела+sort+filter, modal-fill CRUD...): <кебаб-име>.md
-  guides/            ← workflow водичи (write-workflow...)
-  doctrine/          ← mindset, правила, доктрина
+  README.md          ← this file (NOT indexed)
+  _templates/        ← authoring templates (NOT indexed)
+  components/        ← JS components, one file per component: ln-<name>.md
+  css/               ← SCSS components/mixins/tokens: <name>.md
+  patterns/          ← composite recipes (table+sort+filter, modal-fill CRUD...): <kebab-name>.md
+  guides/            ← workflow guides (write-workflow...)
+  doctrine/          ← mindset, rules, doctrines
+  skills/            ← design decision rules (UI/UX) for designer agents: <kebab-name>.md
 ```
 
-MCP индексерот чита САМО од `components/`, `css/`, `patterns/`, `guides/`, `doctrine/`.
-Сè што почнува со `_` или е `README.md` се игнорира.
+The MCP indexer reads ONLY from `components/`, `css/`, `patterns/`, `guides/`, `doctrine/`, and `skills/`.
+Files starting with `_` or named `README.md` are ignored.
 
-## Frontmatter (задолжителен за секој документ)
+## Frontmatter (Mandatory for every document)
 
 ```yaml
 ---
-name: ln-toggle              # slug — МОРА да е еднаков со името на фајлот (без .md)
-classification: simple       # види дозволени вредности подолу
+name: ln-toggle              # slug — MUST equal the filename (without .md)
+classification: simple       # see allowed classifications below
 status: draft                # draft | stable
-summary: Една реченица — се прикажува во list/search резултати.
-source: js/ln-toggle/src/ln-toggle.js   # главни изворни фајлови (може листа)
+domain: frontend             # frontend | backend | process — corpus domain (absent = frontend)
+context: app                 # app | web | wordpress — product context, skills only (absent = app)
+summary: One-sentence summary shown in list/search results.
+source: js/ln-toggle/src/ln-toggle.js   # main source files (supports arrays)
 tags: [state, collapsible]
 ---
 ```
 
-Дозволени `classification` вредности по фолдер:
+Allowed `classification` values by folder:
 
-| Фолдер | classification |
+| Folder | classification |
 |---|---|
 | `components/` | `simple` \| `coordinator` \| `service` |
 | `css/` | `css` |
 | `patterns/` | `pattern` |
 | `guides/` | `guide` |
 | `doctrine/` | `doctrine` |
+| `skills/` | `skill` |
 
-## Нормативни наслови (parsing contract)
+## Prescribed Headings (Parsing Contract)
 
-MCP парсерот се закачува на ТОЧНИТЕ наслови. Не менувај формулација, редослед или нумерација.
-Темплејтите во `_templates/` се единствениот дозволен калап:
+The MCP parser binds directly to EXACT headings. Do not modify wording, order, or numbering.
+The templates in `_templates/` are the only allowed structures:
 
-- `_templates/component.md` → за `components/`
-- `_templates/css.md` → за `css/`
-- `_templates/pattern.md` → за `patterns/`
-- `_templates/guide.md` → за `guides/` и `doctrine/`
+- `_templates/component.md` → for `components/`
+- `_templates/css.md` → for `css/`
+- `_templates/pattern.md` → for `patterns/`
+- `_templates/guide.md` → for `guides/` and `doctrine/`
+- `_templates/skill.md` → for `skills/` (prescriptive decision rules; persona prompting lives on the MCP server, never in the document)
 
-## Нормативни табели
+**Language:** All content in indexed documents is in **English** (prose, headings, tables). 
 
-**Атрибути** (компоненти, §3 под `### Табела со Атрибути`):
+## Normative Tables
 
-| Атрибут | Елемент | Тип / Вредности | Стандардна вредност | Опис |
+**Attributes** (components, §3 under `### Attributes Table`):
+
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 
-**Настани** (компоненти, §3 под `### Настани (Events API)`):
+**Events** (components, §3 under `### Events API`):
 
-| Настан | Насока | Cancelable | Опис | `detail` Објект |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 
-`Насока` е `Емитува` или `Слуша`.
+`Direction` is either `Emits` or `Listens`.
 
-**SCSS API** (css документи, §3):
+**SCSS API** (CSS documents, §3):
 
-| Име | Вид | Параметри / Вредности | Опис |
+| Name | Kind | Parameters / Values | Description |
 |---|---|---|---|
 
-`Вид` е `mixin` \| `класа` \| `токен` \| `атрибут`.
+`Kind` is one of `mixin` \| `class` \| `token` \| `attribute`.
 
-**Вклучени компоненти** (patterns, §3):
+**Included Components** (patterns, §3):
 
-| Компонента | Улога во патернот |
+| Component | Role in the Pattern |
 |---|---|
 
-## Markup темплејти (за `get_markup` tool)
+## Markup Templates (for `get_markup` tool)
 
-Во §2, секој ```` ```html ```` блок под `### Базен HTML Маркап` е стандардниот темплејт,
-а секој под `### Варијанта N: <име>` е именувана варијанта. MCP ги извлекува директно —
-markup-от МОРА да е комплетен и copy-paste функционален, без халуцинирани атрибути.
+In §2, each ```` ```html ```` block under `### Base HTML Markup` is the default template, and each block under `### Variant N: <name>` is a named variant. The MCP extracts these directly; the markup MUST be complete and functional out of the box, with no hallucinated attributes.
 
-## Крос-референци
+**Exception for `classification: service`:** Background APIs have no markup; §2 contains ```` ```js ```` blocks (import + call) instead of ```` ```html ````. `get_markup` returns these with their language tag; if no blocks are present, it returns an empty result referencing the §3 API table rather than throwing an error.
 
-Врски меѓу документи се пишуваат како релативни markdown линкови:
+## Cross-References
+
+Links between documents must be authored as relative markdown links:
 `[ln-accordion](./ln-accordion.md)`, `[tables](../css/tables.md)`.
-MCP го гради крос-референтниот граф од овие линкови — нема посебно поле за одржување.
+The MCP builds the cross-reference graph from these links automatically—no separate graph file is needed.
 
-## Животен циклус
+## Lifecycle
 
-Нов документ се раѓа со `status: draft`. Откако е спроверен наспроти изворниот код
-(атрибути, вредности, events, markup), преминува во `status: stable`.
-Документ се менува во ИСТИОТ commit со промената на кодот што го опишува.
+A new document begins as `status: draft`. Once it has been validated against the source code (attributes, values, events, markup), it moves to `status: stable`.
+Documents should be updated in the SAME commit as the code changes they describe.
 
-## Валидација
+## Validation
 
-Контрактот е имплементиран НА ЕДНО МЕСТО — во MCP серверот (`validate_docs` tool /
-CLI lint режим). Пред commit на нов/изменет документ, пушти ја валидацијата таму.
+The parsing contract is validated in ONE place: the MCP server (`validate_docs` tool / CLI linter). Run validation there before committing any new or modified document.

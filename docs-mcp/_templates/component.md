@@ -1,94 +1,95 @@
 ---
-name: ln-ime
+name: ln-name
 classification: simple
 status: draft
-summary: Една реченица за улогата на компонентата.
-source: js/ln-ime/src/ln-ime.js
+domain: frontend
+summary: One sentence describing the component's role.
+source: js/ln-name/src/ln-name.js
 tags: []
 ---
 
-# [емоџи] ln-ime
+# [emoji] ln-name
 
-> **Класификација:** 🟢 Едноставна компонента / Координатор / Сервис
+> **Classification:** 🟢 Simple component / Coordinator / Service
 
 ---
 
-## 1. Заднинско дејство и одговорност
+## 1. Core Behavior & Responsibility
 
-- Концизно објаснување на основната улога (bullet листа со **задебелени** клучни одговорности).
-- Линк кон изворниот фајл во првиот пасус.
+- Concise explanation of the core role (bullet list with **bold** key responsibilities).
+- Link to the source file in the first paragraph.
 
 > [!IMPORTANT]
-> **Што компонентата НЕ прави (Orthogonality Doctrine):**
-> - Експлицитна листа на одговорности што ѝ припаѓаат на друга компонента, со линк кон неа.
+> **What the component does NOT do (Orthogonality Doctrine):**
+> - Explicit list of responsibilities that belong to another component, with a link to it.
 
 ---
 
-## 2. Минимален HTML Маркап и Варијанти на Употреба
+## 2. Minimal HTML Markup & Usage Variants
 
-### Базен HTML Маркап
+### Base HTML Markup
 
 ```html
-<!-- Наједноставниот комплетен, copy-paste функционален пример -->
+<!-- The simplest complete, copy-paste functional example -->
 ```
 
-### Варијанта 1: [Име на варијантата]
+### Variant 1: [Variant name]
 
-Кратко објаснување кога се користи.
+Short explanation of when to use it.
 
-#### HTML Маркап
+#### HTML Markup
 ```html
-<!-- Комплетен пример за варијантата -->
+<!-- Complete example for the variant -->
 ```
 
 ---
 
-## 3. Декларативен API Договор (Атрибути и Настани)
+## 3. Declarative API Contract (Attributes & Events)
 
-### Табела со Атрибути
+### Attributes Table
 
-| Атрибут | Елемент | Тип / Вредности | Стандардна вредност | Опис |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-ime` | Панел | `"a"` \| `"b"` | `"a"` | ... |
+| `data-ln-name` | Panel | `"a"` \| `"b"` | `"a"` | ... |
 
-### Настани (Events API)
+### Events API
 
-| Настан | Насока | Cancelable | Опис | `detail` Објект |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-ime:open` | Емитува | Не | ... | `{ target: HTMLElement }` |
+| `ln-name:open` | Emits | No | ... | `{ target: HTMLElement }` |
 
 ---
 
-## 4. CSS Стилизирање и Поведенски Концепт
+## 4. CSS Styling & Behavioral Concept
 
-SCSS миксини, класи и поведенски концепти (порталирање, позиционирање, анимации),
-со линкови кон изворните `.scss` фајлови и кратки изворни извадоци.
+SCSS mixins, classes and behavioral concepts (teleporting, positioning, animations),
+with links to the source `.scss` files and short source excerpts.
 
 ---
 
-## 5. Пристапност (ARIA) и Чести Грешки
+## 5. Accessibility (ARIA) & Common Pitfalls
 
-### ARIA & Тастатура
+### ARIA & Keyboard
 
-- ARIA улоги, поврзувања и тастатурна навигација.
+- ARIA roles, relationships and keyboard navigation.
 
-### Чести Грешки и Анти-патерни (Common Pitfalls)
+### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **[Грешка]:** објаснување и последица.
+> 1. **[Pitfall]:** explanation and consequence.
 
 ---
 
-## 6. Дијаграм на Текот и Животен Циклус
+## 6. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
 	autonumber
-	actor Корисник
+	actor User
 ```
 
 ---
 
-## 7. Поврзани Компоненти
+## 7. Related Components
 
-- [`ln-drugo`](./ln-drugo.md) — зошто е поврзана.
+- [`ln-other`](./ln-other.md) — why it is related.
