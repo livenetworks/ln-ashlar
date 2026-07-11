@@ -43,6 +43,18 @@ import { populateForm, dispatch, registerComponent, serializeForm } from '../../
 
 			if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return; // native submit proceeds untouched (e.g. GET search forms)
 
+			const validationDetail = { invalidFields: [] };
+			dispatch(self.dom, 'ln-validate:request-validate', validationDetail);
+
+			if (validationDetail.invalidFields.length > 0) {
+				e.preventDefault();
+				validationDetail.invalidFields.sort((a, b) => {
+					return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_PRECEDING ? -1 : 1;
+				});
+				validationDetail.invalidFields[0].focus();
+				return;
+			}
+
 			e.preventDefault();
 
 			const raw = serializeForm(self.dom);

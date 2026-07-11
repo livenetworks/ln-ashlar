@@ -327,7 +327,7 @@ function me(h) {
   return Xt[h] || { ingress: (u) => u, egress: (u) => u };
 }
 const Jt = {};
-function Mt(h, u) {
+function Nt(h, u) {
   if (!h || typeof u != "object") return;
   const E = h.toLowerCase().split("-")[0];
   Jt[E] = u;
@@ -337,7 +337,7 @@ function gt(h) {
   const u = h.toLowerCase().split("-")[0];
   return Jt[u] || null;
 }
-Mt("mk", {
+Nt("mk", {
   monthsLong: [
     "јануари",
     "февруари",
@@ -385,7 +385,7 @@ Mt("mk", {
     "саб"
   ]
 });
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = pe, window.lnCore.getDataMapper = me, window.lnCore.registerLocaleFallback = Mt, window.lnCore.getLocaleFallback = gt, window.lnCore.fillTemplate = bt, window.lnCore.fill = Q, window.lnCore.lnFill = ue, window.lnCore.renderList = he);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = pe, window.lnCore.getDataMapper = me, window.lnCore.registerLocaleFallback = Nt, window.lnCore.getLocaleFallback = gt, window.lnCore.fillTemplate = bt, window.lnCore.fill = Q, window.lnCore.lnFill = ue, window.lnCore.renderList = he);
 function ge(h, u) {
   let E = !1;
   return function() {
@@ -470,10 +470,10 @@ function ht(h, u) {
   }).join("&");
   te(location.hash) !== g && (location.hash = g);
 }
-function Nt(h) {
+function Mt(h) {
   return h.button === 1 || h.ctrlKey || h.metaKey || h.shiftKey ? !1 : (h.preventDefault(), !0);
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = Lt, window.lnCore.hashGet = at, window.lnCore.hashSet = ht, window.lnCore.hashLinkClick = Nt);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = Lt, window.lnCore.hashGet = at, window.lnCore.hashSet = ht, window.lnCore.hashLinkClick = Mt);
 function At(h, u, E, v) {
   const g = typeof v == "number" ? v : 4, m = window.innerWidth, p = window.innerHeight, d = u.width, t = u.height, o = (E || "bottom").split("-"), c = o[0], e = o[1] === "start" || o[1] === "end" ? o[1] : "center", f = {
     top: ["top", "bottom", "right", "left"],
@@ -1162,7 +1162,7 @@ H(Ft, ie, ce, "ln-router", {
       for (const o in t) {
         const c = document.getElementById(o);
         if (c && c[u]) {
-          if (!Nt(g)) return;
+          if (!Mt(g)) return;
           ht(o, t[o]);
           return;
         }
@@ -1405,7 +1405,7 @@ H(Ft, ie, ce, "ln-router", {
       const P = w[O].getAttribute("data-ln-date-dict");
       if (P) {
         const B = Rt(w[O], "data-ln-date-dict-key");
-        B["months-long"] && (B.monthsLong = B["months-long"].split(",").map((K) => K.trim())), B["months-short"] && (B.monthsShort = B["months-short"].split(",").map((K) => K.trim())), Mt(P, B);
+        B["months-long"] && (B.monthsLong = B["months-long"].split(",").map((K) => K.trim())), B["months-short"] && (B.monthsShort = B["months-short"].split(",").map((K) => K.trim())), Nt(P, B);
       }
     }
     const T = document.createElement("span");
@@ -1695,7 +1695,7 @@ H(Ft, ie, ce, "ln-router", {
         const e = t.tagName === "A";
         if (!e && (c.ctrlKey || c.metaKey || c.button === 1)) return;
         const f = E(t, d.nsKey);
-        f && (e && !Nt(c) || (d.hashEnabled ? at(d.nsKey) === f ? d.dom.setAttribute("data-ln-tabs-active", f) : ht(d.nsKey, f) : d.dom.setAttribute("data-ln-tabs-active", f)));
+        f && (e && !Mt(c) || (d.hashEnabled ? at(d.nsKey) === f ? d.dom.setAttribute("data-ln-tabs-active", f) : ht(d.nsKey, f) : d.dom.setAttribute("data-ln-tabs-active", f)));
       };
       t.addEventListener("click", o), t[u + "Trigger"] = o, d._clickHandlers.push({ el: t, handler: o });
     }
@@ -2186,20 +2186,20 @@ H(Ft, ie, ce, "ln-router", {
       return;
     }
     let y = l.querySelector('input[type="file"]');
-    y || (y = document.createElement("input"), y.type = "file", y.multiple = !0, y.classList.add("hidden"), r && (y.accept = r.split(",").map(function(N) {
-      return N = N.trim(), N.startsWith(".") ? N : "." + N;
+    y || (y = document.createElement("input"), y.type = "file", y.multiple = !0, y.classList.add("hidden"), r && (y.accept = r.split(",").map(function(M) {
+      return M = M.trim(), M.startsWith(".") ? M : "." + M;
     }).join(",")), l.appendChild(y));
     const _ = l.getAttribute(h) || "/files/upload", b = l.getAttribute(g) || "", A = l.getAttribute("data-ln-upload-delete") || (_.includes("/upload") ? _.replace(/\/upload\/?$/, "/{id}") : _ + "/{id}"), w = /* @__PURE__ */ new Map();
     let T = 0;
     function C() {
-      const N = document.querySelector('meta[name="csrf-token"]');
-      return N ? N.getAttribute("content") : "";
+      const M = document.querySelector('meta[name="csrf-token"]');
+      return M ? M.getAttribute("content") : "";
     }
-    function x(N) {
-      if (!c(N, r)) {
+    function x(M) {
+      if (!c(M, r)) {
         const R = n["invalid-type"];
         S(l, "ln-upload:invalid", {
-          file: N,
+          file: M,
           message: R
         }), S(window, "ln-toast:enqueue", {
           type: "error",
@@ -2208,12 +2208,12 @@ H(Ft, ie, ce, "ln-router", {
         });
         return;
       }
-      const j = "file-" + ++T, z = t(N.name), ft = o(z), et = lt(l, "ln-upload-item", "ln-upload");
+      const j = "file-" + ++T, z = t(M.name), ft = o(z), et = lt(l, "ln-upload-item", "ln-upload");
       if (!et) return;
       const J = et.firstElementChild;
       if (!J) return;
       J.setAttribute("data-file-id", j), Q(J, {
-        name: N.name,
+        name: M.name,
         sizeText: "0%",
         iconHref: "#" + ft,
         removeLabel: n.remove || "Remove",
@@ -2224,7 +2224,7 @@ H(Ft, ie, ce, "ln-router", {
       const L = J.querySelector(".ln-upload__progress-bar"), k = J.querySelector('[data-ln-upload-action="remove"]');
       k && (k.disabled = !0), a.appendChild(J);
       const D = new FormData();
-      D.append("file", N);
+      D.append("file", M);
       const I = /* @__PURE__ */ new Set();
       l.querySelectorAll("input, select, textarea").forEach(function(R) {
         if (R.name && R.name !== "file_ids[]" && R.type !== "file") {
@@ -2233,22 +2233,22 @@ H(Ft, ie, ce, "ln-router", {
           D.append(R.name, R.value), I.add(R.name);
         }
       }), !I.has("context") && b && D.append("context", b);
-      const M = new XMLHttpRequest();
-      M.upload.addEventListener("progress", function(R) {
+      const N = new XMLHttpRequest();
+      N.upload.addEventListener("progress", function(R) {
         if (R.lengthComputable) {
           const U = Math.round(R.loaded / R.total * 100);
           L.style.width = U + "%", Q(J, { sizeText: U + "%" });
         }
-      }), M.addEventListener("load", function() {
-        if (M.status >= 200 && M.status < 300) {
+      }), N.addEventListener("load", function() {
+        if (N.status >= 200 && N.status < 300) {
           let R;
           try {
-            R = JSON.parse(M.responseText);
+            R = JSON.parse(N.responseText);
           } catch {
             F("Invalid response");
             return;
           }
-          Q(J, { sizeText: d(R.size || N.size), uploading: !1 }), k && (k.disabled = !1), w.set(j, {
+          Q(J, { sizeText: d(R.size || M.size), uploading: !1 }), k && (k.disabled = !1), w.set(j, {
             serverId: R.id,
             name: R.name,
             size: R.size
@@ -2260,17 +2260,17 @@ H(Ft, ie, ce, "ln-router", {
         } else {
           let R = n["upload-failed"] || "Upload failed";
           try {
-            R = JSON.parse(M.responseText).message || R;
+            R = JSON.parse(N.responseText).message || R;
           } catch {
           }
           F(R);
         }
-      }), M.addEventListener("error", function() {
+      }), N.addEventListener("error", function() {
         F(n["network-error"] || "Network error");
       });
       function F(R) {
         L && (L.style.width = "100%"), Q(J, { sizeText: n.error || "Error", uploading: !1, error: !0 }), k && (k.disabled = !1), S(l, "ln-upload:error", {
-          file: N,
+          file: M,
           message: R
         }), S(window, "ln-toast:enqueue", {
           type: "error",
@@ -2278,20 +2278,20 @@ H(Ft, ie, ce, "ln-router", {
           message: R || n["upload-failed"] || "Failed to upload file"
         });
       }
-      M.open("POST", _), M.setRequestHeader("X-CSRF-TOKEN", C()), M.setRequestHeader("Accept", "application/json"), M.send(D);
+      N.open("POST", _), N.setRequestHeader("X-CSRF-TOKEN", C()), N.setRequestHeader("Accept", "application/json"), N.send(D);
     }
     function q() {
-      for (const N of l.querySelectorAll('input[name="file_ids[]"]'))
-        N.remove();
-      for (const [, N] of w) {
+      for (const M of l.querySelectorAll('input[name="file_ids[]"]'))
+        M.remove();
+      for (const [, M] of w) {
         const j = document.createElement("input");
-        j.type = "hidden", j.name = "file_ids[]", j.value = N.serverId, l.appendChild(j);
+        j.type = "hidden", j.name = "file_ids[]", j.value = M.serverId, l.appendChild(j);
       }
     }
-    function O(N) {
-      const j = w.get(N), z = a.querySelector('[data-file-id="' + N + '"]');
+    function O(M) {
+      const j = w.get(M), z = a.querySelector('[data-file-id="' + M + '"]');
       if (!j || !j.serverId) {
-        z && z.remove(), w.delete(N), q();
+        z && z.remove(), w.delete(M), q();
         return;
       }
       z && Q(z, { deleting: !0 });
@@ -2303,8 +2303,8 @@ H(Ft, ie, ce, "ln-router", {
           Accept: "application/json"
         }
       }).then(function(et) {
-        et.status === 200 ? (z && z.remove(), w.delete(N), q(), S(l, "ln-upload:removed", {
-          localId: N,
+        et.status === 200 ? (z && z.remove(), w.delete(M), q(), S(l, "ln-upload:removed", {
+          localId: M,
           serverId: j.serverId
         })) : (z && Q(z, { deleting: !1 }), S(window, "ln-toast:enqueue", {
           type: "error",
@@ -2319,8 +2319,8 @@ H(Ft, ie, ce, "ln-router", {
         });
       });
     }
-    function P(N) {
-      for (const j of N)
+    function P(M) {
+      for (const j of M)
         x(j);
       y.value = "";
     }
@@ -2328,33 +2328,33 @@ H(Ft, ie, ce, "ln-router", {
       y.click();
     }, K = function() {
       P(this.files);
-    }, $ = function(N) {
-      N.preventDefault(), N.stopPropagation(), i.classList.add("ln-upload__zone--dragover");
-    }, rt = function(N) {
-      N.preventDefault(), N.stopPropagation(), i.classList.add("ln-upload__zone--dragover");
-    }, Z = function(N) {
-      N.preventDefault(), N.stopPropagation(), i.classList.remove("ln-upload__zone--dragover");
-    }, yt = function(N) {
-      N.preventDefault(), N.stopPropagation(), i.classList.remove("ln-upload__zone--dragover"), P(N.dataTransfer.files);
-    }, vt = function(N) {
-      const j = N.target.closest('[data-ln-upload-action="remove"]');
+    }, $ = function(M) {
+      M.preventDefault(), M.stopPropagation(), i.classList.add("ln-upload__zone--dragover");
+    }, rt = function(M) {
+      M.preventDefault(), M.stopPropagation(), i.classList.add("ln-upload__zone--dragover");
+    }, Z = function(M) {
+      M.preventDefault(), M.stopPropagation(), i.classList.remove("ln-upload__zone--dragover");
+    }, yt = function(M) {
+      M.preventDefault(), M.stopPropagation(), i.classList.remove("ln-upload__zone--dragover"), P(M.dataTransfer.files);
+    }, vt = function(M) {
+      const j = M.target.closest('[data-ln-upload-action="remove"]');
       if (!j || !a.contains(j) || j.disabled) return;
       const z = j.closest(".ln-upload__item");
       z && O(z.getAttribute("data-file-id"));
     };
     i.addEventListener("click", B), y.addEventListener("change", K), i.addEventListener("dragenter", $), i.addEventListener("dragover", rt), i.addEventListener("dragleave", Z), i.addEventListener("drop", yt), a.addEventListener("click", vt), l.lnUploadAPI = {
       getFileIds: function() {
-        return Array.from(w.values()).map(function(N) {
-          return N.serverId;
+        return Array.from(w.values()).map(function(M) {
+          return M.serverId;
         });
       },
       getFiles: function() {
         return Array.from(w.values());
       },
       clear: function() {
-        for (const [, N] of w)
-          if (N.serverId) {
-            const j = A.replace("{id}", N.serverId);
+        for (const [, M] of w)
+          if (M.serverId) {
+            const j = A.replace("{id}", M.serverId);
             fetch(j, {
               method: "DELETE",
               headers: {
@@ -4647,7 +4647,9 @@ H(Ft, ie, ce, "ln-router", {
     const s = t.form;
     return s && (this._onFormReset = function() {
       o.reset();
-    }, s.addEventListener("reset", this._onFormReset)), this;
+    }, this._onValidateRequest = function(l) {
+      o._touched = !0, !o.validate() && l.detail && l.detail.invalidFields && l.detail.invalidFields.push(o.dom);
+    }, s.addEventListener("reset", this._onFormReset), s.addEventListener("ln-validate:request-validate", this._onValidateRequest)), this;
   }
   d.prototype.validate = function() {
     const t = this.dom, o = t.validity, e = t.checkValidity() && this._customErrors.size === 0, f = t.closest(".form-element");
@@ -4678,7 +4680,7 @@ H(Ft, ie, ce, "ln-router", {
     if (!this.dom[u]) return;
     this.dom.removeEventListener("input", this._onInput), this.dom.removeEventListener("change", this._onChange), this.dom.removeEventListener("ln-validate:set-custom", this._onSetCustom), this.dom.removeEventListener("ln-validate:clear-custom", this._onClearCustom);
     const t = this.dom.form;
-    t && this._onFormReset && t.removeEventListener("reset", this._onFormReset), this.dom.classList.remove(g, m), this.dom.removeAttribute("aria-invalid"), S(this.dom, "ln-validate:destroyed", { target: this.dom }), delete this.dom[u];
+    t && (this._onFormReset && t.removeEventListener("reset", this._onFormReset), this._onValidateRequest && t.removeEventListener("ln-validate:request-validate", this._onValidateRequest)), this.dom.classList.remove(g, m), this.dom.removeAttribute("aria-invalid"), S(this.dom, "ln-validate:destroyed", { target: this.dom }), delete this.dom[u];
   }, H(h, u, d, "ln-validate");
 })();
 (function() {
@@ -4696,19 +4698,24 @@ H(Ft, ie, ce, "ln-router", {
       const o = d.dom.querySelector('input[name="_method"]');
       let c = o && o.value !== "" ? o.value.toUpperCase() : d.dom.method.toUpperCase();
       if (c !== "POST" && c !== "PUT" && c !== "PATCH") return;
+      const e = { invalidFields: [] };
+      if (S(d.dom, "ln-validate:request-validate", e), e.invalidFields.length > 0) {
+        t.preventDefault(), e.invalidFields.sort((n, i) => n.compareDocumentPosition(i) & Node.DOCUMENT_POSITION_PRECEDING ? -1 : 1), e.invalidFields[0].focus();
+        return;
+      }
       t.preventDefault();
-      const e = Vt(d.dom), f = d.dom.getAttribute(g);
-      delete e._method, delete e._token;
-      const s = {
-        scope: f || null,
+      const f = Vt(d.dom), s = d.dom.getAttribute(g);
+      delete f._method, delete f._token;
+      const l = {
+        scope: s || null,
         action: d._baseAction,
         actionResolved: d.dom.getAttribute("action") || "",
         method: c,
-        data: e,
+        data: f,
         form: d.dom,
         claimed: !1
       };
-      S(d.dom, "ln-form:submit-record", s), s.claimed || console.warn("[ln-form] ln-form:submit-record was not claimed. Check the data-ln-form-scope name, or make sure this form is nested inside a [data-ln-data-coordinator] element.");
+      S(d.dom, "ln-form:submit-record", l), l.claimed || console.warn("[ln-form] ln-form:submit-record was not claimed. Check the data-ln-form-scope name, or make sure this form is nested inside a [data-ln-data-coordinator] element.");
     }, p.addEventListener("ln-fill", this._onLnFill), p.addEventListener("reset", this._onReset), p.addEventListener("submit", this._onSubmit), this;
   }
   m.prototype.fill = function(p) {
@@ -4963,7 +4970,7 @@ H(Ft, ie, ce, "ln-router", {
       if (D) {
         const I = k.getAttribute("data-ln-data-store-indexes") || k.getAttribute("data-ln-store-indexes") || "";
         L[D] = {
-          indexes: I.split(",").map((M) => M.trim()).filter(Boolean)
+          indexes: I.split(",").map((N) => N.trim()).filter(Boolean)
         };
       }
     }
@@ -4976,8 +4983,8 @@ H(Ft, ie, ce, "ln-router", {
       const k = o(), D = Object.keys(k), I = indexedDB.open(E);
       I.onerror = () => {
         console.warn("[ln-data-store] IndexedDB open failed — falling back to in-memory store"), L(null);
-      }, I.onsuccess = (M) => {
-        const F = M.target.result, R = Array.from(F.objectStoreNames);
+      }, I.onsuccess = (N) => {
+        const F = N.target.result, R = Array.from(F.objectStoreNames);
         if (!(!R.includes(v) || D.some((pt) => !R.includes(pt))))
           return e(F), m = F, L(F);
         const W = F.version;
@@ -5032,7 +5039,7 @@ H(Ft, ie, ce, "ln-router", {
       };
     });
   }
-  const a = (L) => n(L, "readonly").then((k) => k ? i(k.getAll()) : []).then((k) => ut() ? Promise.all(k.map((D) => l(D))) : k), r = (L, k) => n(L, "readonly").then((D) => D ? i(D.get(k)) : null).then((D) => D ? l(D) : null), y = (L, k) => (ut() ? s(k) : Promise.resolve(k)).then((I) => n(L, "readwrite").then((M) => M ? i(M.put(I)) : null)), _ = (L, k) => n(L, "readwrite").then((D) => D ? i(D.delete(k)) : null), b = (L) => n(L, "readwrite").then((k) => k ? i(k.clear()) : null), A = (L) => n(L, "readonly").then((k) => k ? i(k.count()) : 0), w = (L) => n(v, "readonly").then((k) => k ? i(k.get(L)) : null), T = (L, k) => n(v, "readwrite").then((D) => {
+  const a = (L) => n(L, "readonly").then((k) => k ? i(k.getAll()) : []).then((k) => ut() ? Promise.all(k.map((D) => l(D))) : k), r = (L, k) => n(L, "readonly").then((D) => D ? i(D.get(k)) : null).then((D) => D ? l(D) : null), y = (L, k) => (ut() ? s(k) : Promise.resolve(k)).then((I) => n(L, "readwrite").then((N) => N ? i(N.put(I)) : null)), _ = (L, k) => n(L, "readwrite").then((D) => D ? i(D.delete(k)) : null), b = (L) => n(L, "readwrite").then((k) => k ? i(k.clear()) : null), A = (L) => n(L, "readonly").then((k) => k ? i(k.count()) : 0), w = (L) => n(v, "readonly").then((k) => k ? i(k.get(L)) : null), T = (L, k) => n(v, "readwrite").then((D) => {
     if (D)
       return k.key = L, i(D.put(k));
   });
@@ -5041,7 +5048,7 @@ H(Ft, ie, ce, "ln-router", {
     const k = L.getAttribute("data-ln-data-store-stale") || L.getAttribute("data-ln-store-stale"), D = parseInt(k, 10);
     this._staleThreshold = k === "never" || k === "-1" ? -1 : isNaN(D) ? 300 : D;
     const I = L.getAttribute("data-ln-data-store-search-fields") || L.getAttribute("data-ln-store-search-fields") || "";
-    return this._searchFields = I.split(",").map((M) => M.trim()).filter(Boolean), this._handlers = null, this.isLoaded = !1, this.isSyncing = !1, this.lastSyncedAt = null, this.totalCount = 0, this.presenters = null, d[this._name] = this, x(this), K(this), this;
+    return this._searchFields = I.split(",").map((N) => N.trim()).filter(Boolean), this._handlers = null, this.isLoaded = !1, this.isSyncing = !1, this.lastSyncedAt = null, this.totalCount = 0, this.presenters = null, d[this._name] = this, x(this), K(this), this;
   }
   function x(L) {
     L._handlers = {
@@ -5062,9 +5069,9 @@ H(Ft, ie, ce, "ln-router", {
   function O(L, { id: k, data: D = {} } = {}) {
     r(L._name, k).then((I) => {
       if (!I) throw new Error(`Record not found: ${k}`);
-      const M = { ...I, ...D }, F = D.id;
-      return (F !== void 0 && F !== k ? yt(L._name, k, M) : y(L._name, M)).then(() => {
-        S(L.dom, "ln-store:updated", { store: L._name, record: M, previous: I });
+      const N = { ...I, ...D }, F = D.id;
+      return (F !== void 0 && F !== k ? yt(L._name, k, N) : y(L._name, N)).then(() => {
+        S(L.dom, "ln-store:updated", { store: L._name, record: N, previous: I });
       });
     }).catch((I) => console.error("[ln-data-store] Optimistic update failed:", I));
   }
@@ -5078,7 +5085,7 @@ H(Ft, ie, ce, "ln-router", {
   }
   function B(L, { ids: k = [] } = {}) {
     k.length && Promise.all(k.map((D) => r(L._name, D))).then((D) => {
-      const I = D.filter(Boolean).map((M) => M.id);
+      const I = D.filter(Boolean).map((N) => N.id);
       return Z(L._name, I).then(() => {
         L.totalCount -= I.length, S(L.dom, "ln-store:deleted", { store: L._name, ids: I });
       });
@@ -5093,9 +5100,9 @@ H(Ft, ie, ce, "ln-router", {
     L.isSyncing = !0, S(L.dom, "ln-store:request-remote-sync", { since: L.lastSyncedAt });
   }
   function rt(L, k) {
-    return f().then((D) => D ? (ut() ? Promise.all(k.map((M) => s(M))) : Promise.resolve(k)).then((M) => new Promise((F, R) => {
+    return f().then((D) => D ? (ut() ? Promise.all(k.map((N) => s(N))) : Promise.resolve(k)).then((N) => new Promise((F, R) => {
       const U = D.transaction(L, "readwrite"), W = U.objectStore(L);
-      M.forEach((X) => W.put(X)), U.oncomplete = () => F(), U.onerror = () => {
+      N.forEach((X) => W.put(X)), U.oncomplete = () => F(), U.onerror = () => {
         t(U.error), R(U.error);
       };
     })) : void 0);
@@ -5103,49 +5110,49 @@ H(Ft, ie, ce, "ln-router", {
   function Z(L, k) {
     return f().then((D) => {
       if (D)
-        return new Promise((I, M) => {
+        return new Promise((I, N) => {
           const F = D.transaction(L, "readwrite"), R = F.objectStore(L);
-          k.forEach((U) => R.delete(U)), F.oncomplete = () => I(), F.onerror = () => M(F.error);
+          k.forEach((U) => R.delete(U)), F.oncomplete = () => I(), F.onerror = () => N(F.error);
         });
     });
   }
   function yt(L, k, D) {
-    return (ut() ? s(D) : Promise.resolve(D)).then((M) => f().then((F) => {
+    return (ut() ? s(D) : Promise.resolve(D)).then((N) => f().then((F) => {
       if (F)
         return new Promise((R, U) => {
           const W = F.transaction(L, "readwrite"), X = W.objectStore(L);
-          X.put(M), X.delete(k), W.oncomplete = () => R(), W.onerror = () => {
+          X.put(N), X.delete(k), W.oncomplete = () => R(), W.onerror = () => {
             t(W.error), U(W.error);
           };
         });
     }));
   }
   const vt = new Intl.Collator(void 0, { numeric: !0, sensitivity: "base" });
-  function N(L, k) {
+  function M(L, k) {
     if (!k || !k.field) return L;
-    const { field: D, direction: I } = k, M = I === "desc";
+    const { field: D, direction: I } = k, N = I === "desc";
     return [...L].sort((F, R) => {
       const U = F[D], W = R[D];
       if (U == null && W == null) return 0;
-      if (U == null) return M ? 1 : -1;
-      if (W == null) return M ? -1 : 1;
+      if (U == null) return N ? 1 : -1;
+      if (W == null) return N ? -1 : 1;
       const X = typeof U == "string" && typeof W == "string" ? vt.compare(U, W) : U < W ? -1 : U > W ? 1 : 0;
-      return M ? -X : X;
+      return N ? -X : X;
     });
   }
   function j(L, k) {
     if (!k) return L;
     const D = Object.keys(k).filter((I) => Array.isArray(k[I]) && k[I].length > 0);
     return D.length ? L.filter(
-      (I) => D.every((M) => k[M].map(String).includes(String(I[M])))
+      (I) => D.every((N) => k[N].map(String).includes(String(I[N])))
     ) : L;
   }
   function z(L, k, D) {
     if (!k || !D || !D.length) return L;
     const I = k.toLowerCase();
     return L.filter(
-      (M) => D.some((F) => {
-        const R = M[F];
+      (N) => D.some((F) => {
+        const R = N[F];
         return R != null && String(R).toLowerCase().includes(I);
       })
     );
@@ -5153,21 +5160,21 @@ H(Ft, ie, ce, "ln-router", {
   function ft(L, k, D) {
     if (!L.length) return 0;
     if (D === "count") return L.length;
-    const I = L.map((F) => parseFloat(F[k])).filter((F) => !isNaN(F)), M = I.reduce((F, R) => F + R, 0);
-    return D === "sum" ? M : D === "avg" && I.length ? M / I.length : 0;
+    const I = L.map((F) => parseFloat(F[k])).filter((F) => !isNaN(F)), N = I.reduce((F, R) => F + R, 0);
+    return D === "sum" ? N : D === "avg" && I.length ? N / I.length : 0;
   }
   function et(L, k) {
     if (!L.presenters || !L.presenters.computed) return k;
     const D = L.presenters.computed;
     return k.map((I) => {
-      const M = { ...I };
+      const N = { ...I };
       for (const [F, R] of Object.entries(D))
         try {
-          M[F] = R(I);
+          N[F] = R(I);
         } catch (U) {
           console.error(`[ln-data-store] Decorator computed field failed for ${F}`, U);
         }
-      return M;
+      return N;
     });
   }
   C.prototype.getAll = function(L = {}) {
@@ -5175,15 +5182,15 @@ H(Ft, ie, ce, "ln-router", {
     return a(k._name).then((D) => {
       const I = D.length;
       L.filters && (D = j(D, L.filters)), L.search && (D = z(D, L.search, k._searchFields));
-      const M = D.length;
-      if (L.sort && (D = N(D, L.sort)), L.offset || L.limit) {
+      const N = D.length;
+      if (L.sort && (D = M(D, L.sort)), L.offset || L.limit) {
         const F = L.offset || 0, R = L.limit || D.length;
         D = D.slice(F, F + R);
       }
       return {
         data: et(k, D),
         total: I,
-        filtered: M
+        filtered: N
       };
     });
   }, C.prototype.getById = function(L) {
@@ -5195,7 +5202,7 @@ H(Ft, ie, ce, "ln-router", {
   }, C.prototype.setPresenters = function(L) {
     this.presenters = L;
   }, C.prototype.applySync = function(L, k, D) {
-    const I = this, M = L.length > 0 || k.length > 0;
+    const I = this, N = L.length > 0 || k.length > 0;
     let F = Promise.resolve();
     return L.length > 0 && (F = F.then(() => rt(I._name, L))), k.length > 0 && (F = F.then(() => Z(I._name, k))), F.then(() => A(I._name)).then((R) => (I.totalCount = R, T(I._name, {
       schema_version: g,
@@ -5207,7 +5214,7 @@ H(Ft, ie, ce, "ln-router", {
         store: I._name,
         added: L.length,
         deleted: k.length,
-        changed: M
+        changed: N
       });
     }).catch((R) => {
       I.isSyncing = !1, console.error("[ln-data-store] applySync failed:", R);
@@ -5232,8 +5239,8 @@ H(Ft, ie, ce, "ln-router", {
       if (!L) return;
       const k = Array.from(L.objectStoreNames);
       return new Promise((D, I) => {
-        const M = L.transaction(k, "readwrite");
-        k.forEach((F) => M.objectStore(F).clear()), M.oncomplete = () => D(), M.onerror = () => I(M.error);
+        const N = L.transaction(k, "readwrite");
+        k.forEach((F) => N.objectStore(F).clear()), N.oncomplete = () => D(), N.onerror = () => I(N.error);
       });
     }).then(() => {
       Object.values(d).forEach((L) => {

@@ -524,7 +524,7 @@ Visual consistency on disabled state matters because the user needs to recognize
 
 Disabled is correct for states outside the user's control: loading in progress, insufficient permissions, feature unavailable in the current plan. It is not a substitute for validation feedback.
 
-> **Review note — contradicts [`./ux.md`](./ux.md) § 11 and [`./ui.md`](./ui.md) Form Page Checklist:** both of those documents state "submit is disabled until all fields valid" as the correct pattern (inherited verbatim from `.claude/skills/ux/SKILL.md` and `.claude/skills/ui/SKILL.md`). This document's source (`.claude/skills/ui/visual-language.md`) states the opposite ("the disabled anti-pattern"). Both source files predate this port and were never reconciled — this port preserves both positions verbatim per the no-silent-deletion rule and surfaces the conflict here rather than resolving it unilaterally. See the execution report for this task.
+**Novalidate markup rule:** To support inline error interception on scoped validation forms (`data-ln-form-scope`), the `<form>` element **must** carry the `novalidate` attribute in its HTML markup. Without `novalidate`, browser constraint validation will intercept the submit event before the coordinator's custom gate runs, surfacing native browser bubbles instead of our inline error styles.
 
 ---
 
@@ -753,8 +753,6 @@ Every feedback element has two properties: how long it stays, and where it appea
 **The core rule:** Success is transient. Error is persistent. Never reversed.
 
 A success message that requires dismiss is noise. An error that auto-disappears is dangerous — the user may not see it. This rule is non-negotiable.
-
-> **Review note — position conflict with [`./ux.md`](./ux.md) § 3:** this section (below) specifies toast position as bottom-right; `ux.md`'s Toast Rules (ported verbatim from `.claude/skills/ux/SKILL.md`) specify top-right (desktop) / top-center (mobile). The two source files disagree on toast position and were never reconciled prior to this port. Preserved verbatim in both documents per the no-silent-deletion rule; see the execution report.
 
 ---
 

@@ -98,6 +98,7 @@ input.lnValidate.destroy();
 | :--- | :--- | :--- |
 | `ln-validate:set-custom` | `{ error: String }` | Injects a custom error key, highlights the field as invalid. |
 | `ln-validate:clear-custom` | `{ error: String }` / `{}` | Clears a specific custom error, or all custom errors at once. |
+| `ln-validate:request-validate` | `{ invalidFields: Array }` | Dispatched by `ln-form` on form submit. Forces validation (sets `_touched = true`, calls `validate()`) and pushes the field element to the `invalidFields` array if invalid. |
 
 ---
 

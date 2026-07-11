@@ -263,17 +263,21 @@ errors. Until then, the field is silent.
 The flag is forward-only during normal user flow — once `true`,
 stays `true` until `reset()`. The `validate()` method does not
 read `_touched`; force-validating an untouched field renders
-errors immediately. That is intentional — `lnForm.submit()`
-needs to catch untouched required fields, and the natural way is
-to call `validate()` on every `[data-ln-validate]` field
-regardless of touched state.
+errors immediately. That is intentional — on submit, `ln-form`
+dispatches the `ln-validate:request-validate` event on the form.
+This catches untouched required fields, triggers their validation,
+adds them to the invalid fields list, and blocks invalid form submission.
 
-The flag is read by exactly one external consumer:
-`ln-form._updateSubmitButton`. It iterates every `[data-ln-validate]`
-field, reads `fields[i][VALIDATE_ATTRIBUTE]._touched`, and disables the
-submit button if NO field has been touched (in addition to the standard
-"any field invalid" check). This implements "you can't submit a
-form you haven't started yet."
+The flag is read during the `ln-validate:request-validate` event handler
+to set `_touched = true`, ensuring that subsequent inputs on previously
+untouched fields will continue to validate on keyup/change.
+
+The submit button stays active, and any invalid submit is intercepted to
+surface inline errors and focus the first invalid field.
+
+To prevent browser bubbles from preempting the custom validation logic,
+forms that use scoped validation/submit coordination (carrying `data-ln-form-scope`)
+**MUST** carry the `novalidate` attribute in their HTML markup.
 
 ## The `isValid` getter
 

@@ -625,6 +625,17 @@ nav.dispatchEvent(new CustomEvent('ln-profile:request-create', {
 | **Command** (changes state) | request event | `nav.dispatchEvent(new CustomEvent('ln-profile:request-remove', { detail: { id } }))` |
 | **Query** (reads state) | direct access | `nav.lnProfile.currentId`, `sidebar.lnPlaylist.getTrack(idx)` |
 
+### Request-Reply / Collector Pattern (Sync Gathering)
+
+For commands that require synchronous feedback or list gathering (such as batch validation before submit):
+- **Format:** `ln-{name}:request-{action}` with `e.detail` containing a mutable data structure (like an array).
+- **Example:** `ln-validate:request-validate` with `detail: { invalidFields: [] }`.
+- **Mechanism:** The caller dispatches the event on a common ancestor (like `<form>`). Listeners catch it synchronously, evaluate their state, and push results/references directly to the mutable array in `e.detail`.
+- **Bubbling:** `true` (to allow components/listeners attached to form or ancestor nodes to catch it).
+
+### Form Scoping and Validation Rules
+- **Novalidate:** Any `<form>` element that opts into scoped validation/submit coordination (carrying `data-ln-form-scope`) **MUST** carry the `novalidate` attribute in its HTML markup. This disables native browser bubble behaviors, allowing `ln-form` and `ln-validate` to intercept invalid submissions, surface inline error lists, and focus the first invalid field.
+
 ---
 
 ## Coordinator — Full Example

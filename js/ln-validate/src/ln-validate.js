@@ -92,7 +92,15 @@ import { dispatch, registerComponent } from '../../ln-core';
 			this._onFormReset = function () {
 				self.reset();
 			};
+			this._onValidateRequest = function (e) {
+				self._touched = true;
+				const isValid = self.validate();
+				if (!isValid && e.detail && e.detail.invalidFields) {
+					e.detail.invalidFields.push(self.dom);
+				}
+			};
 			form.addEventListener('reset', this._onFormReset);
+			form.addEventListener('ln-validate:request-validate', this._onValidateRequest);
 		}
 
 		return this;
@@ -164,8 +172,9 @@ import { dispatch, registerComponent } from '../../ln-core';
 		this.dom.removeEventListener('ln-validate:clear-custom', this._onClearCustom);
 
 		const form = this.dom.form;
-		if (form && this._onFormReset) {
-			form.removeEventListener('reset', this._onFormReset);
+		if (form) {
+			if (this._onFormReset) form.removeEventListener('reset', this._onFormReset);
+			if (this._onValidateRequest) form.removeEventListener('ln-validate:request-validate', this._onValidateRequest);
 		}
 
 		this.dom.classList.remove(CSS_VALID, CSS_INVALID);
