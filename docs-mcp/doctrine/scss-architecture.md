@@ -133,12 +133,16 @@ Because component mixins read primitives like `--color-bg` (which default to `--
 
 ## 6. Z-Index and Stacking Contexts
 
-Z-indices are defined globally using semantic z-index variables:
+Z-indices are defined globally using semantic z-index variables, for ordinary (non-top-layer) elements:
 ```
 toast (50) > modal (40) > overlay (30) > dropdown (20) > sticky (10)
 ```
 
-### Teleportation Stacking Resolution
-When overlays (dropdowns, popovers) are nested inside elements with clipping rules (like tables with `overflow: auto`), they are teleported to the `<body>` to prevent truncation. 
-
-However, since a modal's z-index is `--z-modal` (40) and a dropdown's base z-index is `--z-dropdown` (20), teleported dropdowns would render behind active modals. `ln-ashlar` solves this using a body-level CSS `:has()` selector that elevates teleported dropdowns to `calc(var(--z-modal) + 10)` (i.e. `50`) when a modal is active.
+### Top-Layer Stacking
+Modals (`<dialog>` + `showModal()`), dropdown menus, and popovers (Popover API,
+`popover="manual"` + `showPopover()`/`hidePopover()`) are promoted to the browser's top layer —
+a rendering layer above the entire document, immune to any ancestor `overflow`/`z-index`/`transform`
+stacking context. Top-layer elements stack in most-recently-shown order, not by the `z-index`
+property — opening a dropdown from inside an open modal always renders the dropdown above the modal,
+with no CSS coordination required. The `--z-*` token scale above governs only elements that never
+enter the top layer (sticky headers, toasts, the tooltip portal).

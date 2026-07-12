@@ -786,7 +786,7 @@ As a core rule: **Write standard CSS for single-line declarations, and reserve `
 `<form>` is always the content root. Cancel (`type="button"`) → neutral. Save (`type="submit"`) → primary. Both styled automatically from `_global.scss`.
 
 ```html
-<div class="ln-modal" data-ln-modal id="edit-user">
+<dialog class="ln-modal" data-ln-modal id="edit-user">
     <form>
         <header>
             <h3>Edit User</h3>
@@ -805,7 +805,7 @@ As a core rule: **Write standard CSS for single-line declarations, and reserve `
             <button type="submit">Save</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 ```scss
 #edit-user > form { @include modal-lg; }

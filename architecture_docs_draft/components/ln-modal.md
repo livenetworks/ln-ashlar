@@ -9,7 +9,7 @@
   - **НЕ се позиционира или анимира преку JS** — се потпира исклучиво на CSS транзиции и анимацијата `ln-modal-slideIn`.
   - **НЕ управува со бизнис логика** — не знае која форма е внатре, како се праќаат или зачувуваат податоците.
   - **НЕ се меша во валидацијата** — формата внатре користи `ln-validate` за проверка на внесот.
-  - **НЕ бара дополнителни wrapper класи** — формата (`<form>`) е директно дете на модалниот контејнер `<div class="ln-modal" data-ln-modal>`.
+  - **НЕ бара дополнителни wrapper класи** — формата (`<form>`) е директно дете на модалниот контејнер `<dialog class="ln-modal" data-ln-modal>`.
 
 ---
 
@@ -19,7 +19,7 @@
 Наједноставен приказ на модал за развивачите:
 
 ```html
-<div class="ln-modal" data-ln-modal id="simple-modal">
+<dialog class="ln-modal" data-ln-modal id="simple-modal">
     <form>
         <header>
             <h3>Наслов на модалот</h3>
@@ -32,7 +32,7 @@
             <button type="button" data-ln-modal-close>Затвори</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 ---
@@ -65,7 +65,7 @@
 </a>
 
 <!-- Хеш-врзан модал -->
-<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
     <form id="user-form" data-ln-form>
         <header>
             <h3 data-ln-fillable>
@@ -89,7 +89,7 @@
             <button type="submit">Зачувај</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 ---
@@ -106,7 +106,7 @@
 </button>
 
 <!-- Едноставен инфо модал -->
-<div class="ln-modal" data-ln-modal id="info-modal">
+<dialog class="ln-modal" data-ln-modal id="info-modal">
     <form>
         <header>
             <!-- Ова поле ќе се пополни со вредноста од data-ln-modal-title -->
@@ -121,7 +121,7 @@
             <button type="button" data-ln-modal-close>Затвори</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 > [!NOTE]
@@ -133,7 +133,7 @@
 Ако формата во модалот користи `data-ln-ajax` за испраќање на податоците, по успешно завршување на барањето се емитува настанот `ln-ajax:success`. Бидејќи овој настан меури нагоре низ DOM дрвото, `ln-modal` го пресретнува и автоматски ја затвора формата без потреба од дополнителен JS код во вашиот проект.
 
 ```html
-<div class="ln-modal" data-ln-modal id="ajax-user-modal">
+<dialog class="ln-modal" data-ln-modal id="ajax-user-modal">
     <!-- Имплементирана AJAX форма -->
     <form action="/api/users" method="POST" data-ln-ajax>
         <header>
@@ -148,7 +148,7 @@
             <button type="submit">Испрати</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 ---

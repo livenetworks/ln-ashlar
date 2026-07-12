@@ -8,7 +8,7 @@
 
 In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating a heavy component that bundles state, positioning algorithms, LIFO click stacks, and styles, `ln-popover` splits them cleanly:
 
-1. **State & Positioning (JavaScript)**: The `ln-popover` script handles binary `open` / `closed` states in the DOM, manages view-port boundaries to flip placement as needed, restores keyboard focus gracefully, and coordinates LIFO (Last-In, First-Out) keyboard ESC dismissal stacks.
+1. **State & Positioning (JavaScript + native Popover API)**: The `ln-popover` script handles binary `open` / `closed` states in the DOM, bridged to the native Popover API (`popover="manual"`, `showPopover()`/`hidePopover()`) purely for top-layer rendering — no ancestor `overflow`/`z-index` can clip or bury it. Because `manual` mode has no native light-dismiss, the script still owns 100% of the behavior: viewport-boundary flip placement, keyboard focus save/restore, and the LIFO (Last-In, First-Out) ESC dismissal stack.
 2. **Visual Presentation (CSS)**: Visual layouts, background shadows, and borders are handled in Vanilla CSS. The library ships a premium `@mixin popover` to style popover cards.
 3. **Trigger decoupling (HTML)**: Triggers (`data-ln-popover-for="popoverId"`) and popover containers (`id="popoverId"`) are bound purely by ID, allowing the trigger button and the popup card to live anywhere in the document.
 
@@ -22,7 +22,7 @@ Triggers and popovers are paired by ID. Wrap content in a `div` carrying the `da
 <!-- Trigger anywhere -->
 <button data-ln-popover-for="account-menu">Account</button>
 
-<!-- Popover anywhere — role="dialog" and tabindex="-1" are injected automatically -->
+<!-- Popover anywhere — role="dialog", tabindex="-1", and popover="manual" are injected automatically -->
 <div data-ln-popover id="account-menu">
     <p><strong>user@example.com</strong></p>
     <nav>
@@ -122,6 +122,6 @@ Opening B from inside A leaves A open. Pressing `ESC` once closes B first, and t
 ---
 
 ## Related
-- **[`ln-dropdown`](../ln-dropdown/README.md)** — Menu wrapper adding click-outside/teleportation.
+- **[`ln-dropdown`](../ln-dropdown/README.md)** — Menu wrapper adding click-outside/top-layer promotion.
 - **[`ln-toggle`](../ln-toggle/README.md)** — Binary disclosure state primitive.
 - **Architecture deep-dive** — [`docs/js/popover.md`](../../docs/js/popover.md).

@@ -221,7 +221,10 @@ function _teardownOutlet(target) {
 		}
 	}
 
-	// 2. Clear out open popovers teleported to <body> that were triggered by descendants of the target
+	// 2. Close open popovers whose trigger lived inside the torn-down target. Popovers authored
+	//    inside the outlet are already caught by the generic ln* destroy loop above (step 1) once
+	//    they are real descendants again (no more DOM move on open); this second pass only matters for
+	//    popovers authored outside the outlet (e.g. shell-level) but opened by a trigger inside it.
 	const popovers = document.querySelectorAll('[data-ln-popover="open"]');
 	for (const popover of popovers) {
 		const inst = popover.lnPopover;
@@ -229,7 +232,7 @@ function _teardownOutlet(target) {
 			try {
 				inst.destroy();
 			} catch (e) {
-				console.error('[ln-router] Error destroying open teleported popover:', e);
+				console.error('[ln-router] Error destroying open popover:', e);
 			}
 		}
 	}

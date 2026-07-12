@@ -73,8 +73,7 @@ _component.prototype.open = function () {
 Using hidden checkboxes (`<input type="checkbox">`) to toggle styling state is strictly forbidden. 
 1. Setting `.checked = true` programmatically in JS does **not** trigger native browser `input`/`change` events, nor does it fire `MutationObserver` attribute watches.
 2. It breaks encapsulation by exposing internal inputs to external controllers.
-3. It fails when elements are teleported (e.g. modals moved to `<body>`).
-4. It violates semantic accessibility (ARIA) standards.
+3. It violates semantic accessibility (ARIA) standards.
 
 ---
 

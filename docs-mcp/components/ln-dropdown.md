@@ -3,7 +3,7 @@ name: ln-dropdown
 classification: coordinator
 status: draft
 domain: frontend
-summary: A DOM coordinator that manages positioning, teleportation, accessibility, and dismissal of dropdown overlay menus.
+summary: A DOM coordinator that manages positioning, top-layer promotion, accessibility, and dismissal of dropdown overlay menus.
 source: js/ln-dropdown/src/ln-dropdown.js
 tags: [dropdown, overlay, positioning, coordinator]
 ---
@@ -16,15 +16,14 @@ tags: [dropdown, overlay, positioning, coordinator]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-dropdown` component is a DOM coordinator that manages dropdown menus. It attaches to a wrapper DOM element declared with the `data-ln-dropdown` attribute. Its responsibility is to monitor the visibility state of its internal toggle menu ([`ln-toggle`](./ln-toggle.md)) and dynamically orchestrate its viewport teleportation, placement relative to the trigger button, accessibility semantics, and cleanup behavior (dismissing on click-outside, page scroll, or window resize).
+The `ln-dropdown` component is a DOM coordinator that manages dropdown menus. It attaches to a wrapper DOM element declared with the `data-ln-dropdown` attribute. Its responsibility is to monitor the visibility state of its internal toggle menu ([`ln-toggle`](./ln-toggle.md)) and dynamically orchestrate its top-layer promotion, placement relative to the trigger button, accessibility semantics, and cleanup behavior (dismissing on click-outside, page scroll, or window resize).
 
 The JavaScript source is located at [ln-dropdown.js](../../js/ln-dropdown/src/ln-dropdown.js).
 
 Key responsibilities include:
-- **Teleportation:** Temporarily moving the active menu to the end of `<body>` when opened to prevent clipping by parents with `overflow: hidden` or `z-index` stacking context rules.
+- **Top-Layer Promotion:** Promoting the active menu into the browser's top layer via the native Popover API (`popover="manual"`, `showPopover()`) when opened to prevent clipping by parents with `overflow: hidden` or `z-index` stacking context rules.
 - **Dynamic Positioning:** Computing exact absolute coordinates to align the menu beneath the trigger button using the system helpers `computePlacement` and `measureHidden`.
 - **Event Listeners Coordination:** Registering event listeners for click-outside dismissal, resize dismissal, and scroll-repositioning, and removing them on close.
-- **DOM Context Restoration:** Restoring the menu to its original markup container when closed using a temporary comment marker (`<!-- ln-teleport -->`).
 - **ARIA Enrichment:** Automatically setting screen-reader semantic roles and attributes on initialization and state changes.
 
 > [!IMPORTANT]
@@ -133,14 +132,14 @@ The initialized instance is exposed on the wrapper element via the property `dom
 | Property / Method | Type | Description |
 |---|---|---|
 | `dom.lnDropdown` | `Object` | The coordinator component instance attached to the DOM element. |
-| `dom.lnDropdown.destroy()` | `Function` | Cleans up the event listeners, restores any active teleportation, and deletes the instance. |
+| `dom.lnDropdown.destroy()` | `Function` | Cleans up the event listeners, hides any open popover, and deletes the instance. |
 
 #### Controlling Dropdown States programmatically:
 ```javascript
 const dropdown = document.querySelector('[data-ln-dropdown]');
 const menu = dropdown.querySelector('[data-ln-toggle]');
 
-// Open the menu (coordinator will automatically teleport and position it)
+// Open the menu (coordinator will automatically promote it to the top layer and position it)
 menu.setAttribute('data-ln-toggle', 'open');
 
 // Close the menu
@@ -153,15 +152,15 @@ All coordinator events are dispatched from the **main wrapper element (`[data-ln
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-dropdown:open` | Emits | No | Fires after the menu is teleported, positioned, and visually opened. | `{ target: HTMLElement }` |
-| `ln-dropdown:close` | Emits | No | Fires after the menu is closed, restored to its original location, and listeners cleaned. | `{ target: HTMLElement }` |
+| `ln-dropdown:open` | Emits | No | Fires after the menu is promoted to the top layer, positioned, and visually opened. | `{ target: HTMLElement }` |
+| `ln-dropdown:close` | Emits | No | Fires after the menu is closed, exits the top layer, and listeners cleaned. | `{ target: HTMLElement }` |
 | `ln-dropdown:destroyed` | Emits | No | Fires when the coordinator's `destroy()` method is executed. | `{ target: HTMLElement }` |
 
 #### Subscribed Events
 
 The coordinator listens to the following bubbling events emitted by the inner `ln-toggle` menu:
-- `ln-toggle:open` — Triggers teleportation, placement calculations, ARIA updates, and window event listeners binding.
-- `ln-toggle:close` — Triggers listeners cleanup, positioning styles removal, and restoration to original DOM location.
+- `ln-toggle:open` — Triggers top-layer promotion (`showPopover()`), placement calculations, ARIA updates, and window event listeners binding.
+- `ln-toggle:close` — Triggers listeners cleanup, positioning styles removal, and `hidePopover()`.
 
 ---
 
@@ -250,11 +249,9 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 
 @mixin dropdown-menu {
 	@include floating-panel;
-	@include absolute;
-	right: 0;
-	top: 100%;
-	--margin-block: var(--size-xs);
-	margin-top: var(--margin-block);
+	@include fixed;
+	inset: auto;
+	margin: 0;
 	--padding-y: var(--size-xs);
 	padding-block: var(--padding-y);
 	min-width: 10rem;
@@ -274,16 +271,6 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 
 [data-ln-dropdown-menu] {
 	@include dropdown-menu;
-
-	// Reset right alignment when teleported to body to prevent 100% stretch
-	body > & {
-		right: auto;
-	}
-
-	// Elevate z-index when open inside an active modal
-	body:has(.ln-modal[data-ln-modal="open"]) > & {
-		z-index: calc(var(--z-modal) + 10);
-	}
 }
 
 @keyframes ln-dropdown-in {
@@ -300,8 +287,8 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 
 ### Behavioral Concept
 
-1. **Teleportation (`teleportToBody`):** To avoid parent clipping problems (such as `overflow: hidden` on a table cell or card container), the coordinator teleports the menu element to the end of `<body>` on open. It uses a placeholder comment (`<!-- ln-teleport -->`) to restore the original DOM tree upon closing.
-2. **Fixed Positioning (`computePlacement`):** When open, the menu gets `position: fixed`. The coordinator queries the trigger button dimensions using `getBoundingClientRect()` and measures the hidden menu via `measureHidden`. It then computes position offset utilizing `computePlacement` from `ln-core`, defaulting to `bottom-end` placement.
+1. **Top-Layer Promotion (`showPopover()`):** To avoid parent clipping problems (such as `overflow: hidden` on a table cell or card container), the coordinator promotes the menu into the browser's top layer on open via the native Popover API (`popover="manual"`). No DOM move happens — the element stays exactly where it was authored.
+2. **Fixed Positioning (`computePlacement`):** When open, the menu gets `position: fixed` via the `dropdown-menu` mixin's `@include fixed;`. The coordinator queries the trigger button dimensions using `getBoundingClientRect()` and measures the hidden menu via `measureHidden`. It then computes position offset utilizing `computePlacement` from `ln-core`, defaulting to `bottom-end` placement.
 3. **Gap Resolution:** The offset gap is parsed dynamically from the document's `--size-xs` CSS variable (converted to px), falling back to `4px` if not found.
 4. **Transition Animations:** Visibility is handled via `display: none` by default. When the `.open` class is appended by `ln-toggle`, the styles turn into `display: block` and run a subtle keyframe animation `ln-dropdown-in` (translate Y, scale, and opacity).
 
@@ -327,7 +314,7 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 ### Common Pitfalls & Anti-patterns
 
 > [!CAUTION]
-> 1. **Missing Coordinator Wrapper:** Forgetting `data-ln-dropdown` on the wrapper container. The menu will still open using `ln-toggle`, but features like teleportation, automatic alignment, scroll positioning, and click-outside dismissal will fail.
+> 1. **Missing Coordinator Wrapper:** Forgetting `data-ln-dropdown` on the wrapper container. The menu will still open using `ln-toggle`, but features like top-layer promotion, automatic alignment, scroll positioning, and click-outside dismissal will fail.
 > 2. **Hardcoded HTML Styles:** Manually applying inline positioning (`position: fixed`, `top`, `left`) in markup. The coordinator controls these dynamically during viewport placement.
 > 3. **Improper Component Mapping:** Using `ln-dropdown` for dialogs with heavy forms, interactive inputs, or focus traps. Use [`ln-popover`](./ln-popover.md) or [`ln-modal`](./ln-modal.md) for complex overlay interactions.
 > 4. **Invoking Imperative JS APIs:** Attempting to run `.open()` or `.close()` methods on the coordinator instance. All state transitions must be done declaratively by changing `data-ln-toggle` attribute to `"open"` or `"close"`.
@@ -345,9 +332,8 @@ sequenceDiagram
     participant Trigger as Trigger [data-ln-toggle-for]
     participant Toggle as Menu [data-ln-toggle]
     participant Coordinator as Coordinator [data-ln-dropdown]
-    participant Body as document.body
     
-    Note over Coordinator: Init sets role="menu", role="menuitem", aria-haspopup="menu"
+    Note over Coordinator: Init sets role="menu", role="menuitem", aria-haspopup="menu", popover="manual"
     
     User->>Trigger: Click Trigger
     Trigger->>Toggle: Open Menu (set data-ln-toggle="open")
@@ -355,8 +341,8 @@ sequenceDiagram
     
     Note over Coordinator: Coordinator intercepts ln-toggle:open (bubbles up)
     Coordinator->>Trigger: Set aria-expanded="true"
-    Coordinator->>Body: Teleport menu to the end of body
-    Coordinator->>Toggle: Set position: fixed and measure dimensions
+    Coordinator->>Toggle: Call showPopover() to promote menu to the top layer
+    Coordinator->>Toggle: Measure dimensions
     Coordinator->>Toggle: Compute and apply top/left coordinates relative to trigger
     Note over Coordinator: Register event listeners for scroll, resize, and click-outside
     Coordinator->>Coordinator: Emit ln-dropdown:open (from wrapper)
@@ -374,7 +360,7 @@ sequenceDiagram
     Coordinator->>Trigger: Set aria-expanded="false"
     Coordinator->>Coordinator: Unbind scroll, resize, and click-outside listeners
     Coordinator->>Toggle: Reset positioning inline styles
-    Coordinator->>Body: Restore menu to original DOM location
+    Coordinator->>Toggle: Call hidePopover() to exit the top layer
     Coordinator->>Coordinator: Emit ln-dropdown:close (from wrapper)
 ```
 

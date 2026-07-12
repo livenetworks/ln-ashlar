@@ -1,4 +1,4 @@
-import { dispatch, computePlacement, teleportToBody, measureHidden, registerComponent } from '../../ln-core';
+import { dispatch, computePlacement, measureHidden, registerComponent } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-dropdown';
@@ -11,7 +11,6 @@ import { dispatch, computePlacement, teleportToBody, measureHidden, registerComp
 	function _component(dom) {
 		this.dom = dom;
 		this.toggleEl = dom.querySelector('[data-ln-toggle]');
-		this._teleportRestore = null;
 		this._boundDocClick = null;
 		this._docClickTimeout = null;
 		this._boundScrollReposition = null;
@@ -20,6 +19,7 @@ import { dispatch, computePlacement, teleportToBody, measureHidden, registerComp
 		if (this.toggleEl) {
 			this.toggleEl.setAttribute('data-ln-dropdown-menu', '');
 			this.toggleEl.setAttribute('role', 'menu');
+			this.toggleEl.setAttribute('popover', 'manual');
 		}
 
 		// ARIA on trigger button
@@ -41,9 +41,7 @@ import { dispatch, computePlacement, teleportToBody, measureHidden, registerComp
 		this._onToggleOpen = function (e) {
 			if (!e.detail || e.detail.target !== self.toggleEl) return;
 			if (self.triggerBtn) self.triggerBtn.setAttribute('aria-expanded', 'true');
-			self._teleportRestore = teleportToBody(self.toggleEl);
-			self.toggleEl.style.position = 'fixed';
-			self.toggleEl.style.right = 'auto';
+			if (typeof self.toggleEl.showPopover === 'function') self.toggleEl.showPopover();
 			self._reposition();
 			self._addOutsideClickListener();
 			self._addScrollRepositionListener();
@@ -57,13 +55,10 @@ import { dispatch, computePlacement, teleportToBody, measureHidden, registerComp
 			self._removeOutsideClickListener();
 			self._removeScrollRepositionListener();
 			self._removeResizeCloseListener();
-			self.toggleEl.style.position = '';
 			self.toggleEl.style.top = '';
 			self.toggleEl.style.left = '';
-			self.toggleEl.style.right = '';
-			self.toggleEl.style.transform = '';
-			self.toggleEl.style.margin = '';
-			if (self._teleportRestore) { self._teleportRestore(); self._teleportRestore = null; }
+			// :popover-open guard — a boot-opened menu (persist/static "open") was never shown via showPopover()
+			if (typeof self.toggleEl.hidePopover === 'function' && self.toggleEl.matches(':popover-open')) self.toggleEl.hidePopover();
 			dispatch(dom, 'ln-dropdown:close', { target: e.detail.target });
 		};
 
@@ -159,7 +154,9 @@ import { dispatch, computePlacement, teleportToBody, measureHidden, registerComp
 		this._removeOutsideClickListener();
 		this._removeScrollRepositionListener();
 		this._removeResizeCloseListener();
-		if (this._teleportRestore) { this._teleportRestore(); this._teleportRestore = null; }
+		if (this.toggleEl && typeof this.toggleEl.hidePopover === 'function' && this.toggleEl.matches(':popover-open')) {
+			this.toggleEl.hidePopover();
+		}
 		if (this.toggleEl) {
 			this.toggleEl.removeEventListener('ln-toggle:open', this._onToggleOpen);
 			this.toggleEl.removeEventListener('ln-toggle:close', this._onToggleClose);

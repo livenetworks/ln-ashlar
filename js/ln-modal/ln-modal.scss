@@ -1,8 +1,22 @@
 // ── JS state: modal open/close ──
-// data-ln-modal attribute drives visibility. JS sets "open"/"close".
-[data-ln-modal="open"] {
-	display: flex;
-	opacity: 1;
+// data-ln-modal attribute drives visibility. JS calls native showModal()/close();
+// this attribute is the CSS surface — reset native <dialog> UA styles and drive
+// the flex-centering layout on top.
+[data-ln-modal] {
+	background: transparent;
+	border: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	color: inherit;
+	overflow: visible;
+
+	&[data-ln-modal="open"] {
+		display: flex;
+	}
 }
 
 // Prevent body scroll when modal is open

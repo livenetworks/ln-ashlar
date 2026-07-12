@@ -29,7 +29,7 @@ This guide details the mandatory HTML conventions and structure doctrines within
 
 #### Correct Modal Markup:
 ```html
-<div class="ln-modal" data-ln-modal id="user-modal">
+<dialog class="ln-modal" data-ln-modal id="user-modal">
     <form>
         <header>
             <h3>Edit User</h3>
@@ -46,7 +46,7 @@ This guide details the mandatory HTML conventions and structure doctrines within
             <button type="submit">Save Changes</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 ---

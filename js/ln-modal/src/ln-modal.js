@@ -27,39 +27,27 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 			else if (!present && self.isOpen) self.dom.setAttribute(DOM_SELECTOR, 'close');
 		};
 
-		this._onEscape = function (e) {
-			if (e.key === 'Escape') self.dom.setAttribute(DOM_SELECTOR, 'close');
+		this._onCancel = function (e) {
+			// Native ESC on an open <dialog> fires cancelable 'cancel' then 'close'.
+			// Prevent the browser's own auto-close and route through the attribute
+			// instead, so before-close/hash-cleanup/native close() all run through
+			// the single _syncAttribute path — never a parallel native-only close.
+			e.preventDefault();
+			self.dom.setAttribute(DOM_SELECTOR, 'close');
 		};
 
-		this._onFocusTrap = function (e) {
-			if (e.key !== 'Tab') return;
-			// Focuses in DOM order — positive tabindex not supported (anti-pattern per WCAG)
-			const focusable = Array.prototype.filter.call(
-				self.dom.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'),
-				isVisible
-			);
-			if (focusable.length === 0) return;
-			const first = focusable[0];
-			const last = focusable[focusable.length - 1];
-			if (e.shiftKey) {
-				if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-			} else {
-				if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-			}
-		};
 		this._onAjaxSuccess = function () {
 			if (self.isOpen) {
 				self.dom.setAttribute(DOM_SELECTOR, 'close');
 			}
 		};
 
+		this.dom.addEventListener('cancel', this._onCancel);
+
 		// Apply initial state if open
 		if (this.isOpen) {
-			this.dom.setAttribute('aria-modal', 'true');
-			this.dom.setAttribute('role', 'dialog');
+			if (typeof this.dom.showModal === 'function') this.dom.showModal();
 			document.body.classList.add('ln-modal-open');
-			document.addEventListener('keydown', this._onEscape);
-			document.addEventListener('keydown', this._onFocusTrap);
 		}
 
 		if (this._hashNs) {
@@ -78,12 +66,9 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
 		this.dom.removeEventListener('ln-ajax:success', this._onAjaxSuccess);
+		this.dom.removeEventListener('cancel', this._onCancel);
 
 		if (this.isOpen) {
-			this.dom.removeAttribute('aria-modal');
-			document.removeEventListener('keydown', this._onEscape);
-			document.removeEventListener('keydown', this._onFocusTrap);
-			this._returnFocusEl = null;
 			// Self-excluding: a still-attached modal reads "open" during its own destroy.
 			// No attribute write here — it would race the observer into re-creating an instance.
 			const dom = this.dom;
@@ -127,14 +112,8 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 				return;
 			}
 			instance.isOpen = true;
-			el.setAttribute('aria-modal', 'true');
-			el.setAttribute('role', 'dialog');
 			document.body.classList.add('ln-modal-open');
-			document.addEventListener('keydown', instance._onEscape);
-			document.addEventListener('keydown', instance._onFocusTrap);
-
-			const previouslyFocused = document.activeElement;
-			instance._returnFocusEl = (previouslyFocused && previouslyFocused !== document.body) ? previouslyFocused : null;
+			if (typeof el.showModal === 'function') el.showModal();
 
 			const autoFocusEl = el.querySelector('[autofocus]');
 			if (autoFocusEl && isVisible(autoFocusEl)) {
@@ -166,18 +145,10 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 				return;
 			}
 			instance.isOpen = false;
-			el.removeAttribute('aria-modal');
-			document.removeEventListener('keydown', instance._onEscape);
-			document.removeEventListener('keydown', instance._onFocusTrap);
 			dispatch(el, 'ln-modal:close', { modalId: el.id, target: el });
 			if (instance._hashNs) hashSet(instance._hashNs, null);
 
-			if (instance._returnFocusEl
-				&& document.contains(instance._returnFocusEl)
-				&& typeof instance._returnFocusEl.focus === 'function') {
-				instance._returnFocusEl.focus();
-			}
-			instance._returnFocusEl = null;
+			if (typeof el.close === 'function') el.close();
 
 			if (!document.querySelector('[' + DOM_SELECTOR + '="open"]')) {
 				document.body.classList.remove('ln-modal-open');

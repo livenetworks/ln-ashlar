@@ -2,11 +2,6 @@
 
 [data-ln-popover] {
 	@include popover;
-
-	// Elevate z-index when opened inside a modal context (teleported to body level)
-	body:has(.ln-modal[data-ln-modal="open"]) > & {
-		z-index: calc(var(--z-modal) + 10);
-	}
 }
 
 @keyframes ln-popover-fade {

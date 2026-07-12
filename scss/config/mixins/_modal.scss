@@ -22,15 +22,24 @@
 	display: none;
 	@include fixed;
 	@include inset-0;
-	background-color: var(--color-scrim);
-	backdrop-filter: blur(4px);
-	-webkit-backdrop-filter: blur(4px);
 	z-index: var(--z-modal);
 	@include items-center;
 	@include justify-center;
-	opacity: 0;
-	@include motion-safe {
-		transition: opacity var(--transition);
+
+	&::backdrop {
+		background-color: var(--color-scrim);
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		opacity: 1;
+
+		@include motion-safe {
+			transition: opacity var(--transition);
+			transition-behavior: allow-discrete;
+		}
+
+		@starting-style {
+			opacity: 0;
+		}
 	}
 }
 

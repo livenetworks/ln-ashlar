@@ -112,7 +112,7 @@ The canonical composition for `ln-table` per-column filters. `ln-filter` handles
 </th>
 
 <!-- Popover: sibling to [data-ln-table], NOT inside it -->
-<!-- ln-popover teleports this to <body> on open — no overflow clipping -->
+<!-- ln-popover promotes this to the top layer via showPopover() on open — no overflow clipping -->
 <div data-ln-popover id="filter-my-table-dept">
 	<!-- search targets the OPTIONS UL id, not the table id -->
 	<input type="search" placeholder="Search..."

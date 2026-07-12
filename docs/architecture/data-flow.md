@@ -537,7 +537,7 @@ the canonical convention for new code.
     </tr>
 </template>
 
-<div class="ln-modal" data-ln-modal data-ln-modal-mode="new"
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new"
      id="event-modal" aria-labelledby="event-modal-title">
     <form id="event-form" data-ln-form>
         <header>
@@ -561,7 +561,7 @@ the canonical convention for new code.
             <button type="submit">Save</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 No coordinator JS needed. The button click is handled by two independent

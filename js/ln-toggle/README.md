@@ -133,5 +133,5 @@ Combine the alert card with `data-ln-persist` so that once the user closes the a
 
 ## Related
 - **[`ln-accordion`](../ln-accordion/README.md)** — Single-open coordinator for toggle panels.
-- **[`ln-dropdown`](../ln-dropdown/README.md)** — Menu wrapper adding click-outside/teleportation.
+- **[`ln-dropdown`](../ln-dropdown/README.md)** — Menu wrapper adding click-outside/top-layer promotion.
 - **Architecture deep-dive** — [`docs/js/toggle.md`](../../docs/js/toggle.md).
