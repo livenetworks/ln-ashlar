@@ -324,12 +324,12 @@
 		}
 	});
 
-	// Write path is now declarative (data-ln-form-scope on #document-form) —
-	// the coordinator claims ln-form:submit-record itself. This demo JS only
-	// closes the modal once the record has been handed off.
-	formEl.addEventListener('ln-form:submit-record', () => {
+	// Write path is native-first (data-ln-form-scope on #document-form) —
+	// react to the store outcome instead of a form-level event. This demo JS
+	// only closes the modal once the record has been handed off.
+	['ln-store:created', 'ln-store:updated'].forEach(ev => storeEl.addEventListener(ev, () => {
 		documentModal.setAttribute('data-ln-modal', 'close');
-	});
+	}));
 
 	// Bulk Delete (Event Delegation)
 	document.addEventListener('click', e => {

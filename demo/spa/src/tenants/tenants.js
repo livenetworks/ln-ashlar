@@ -1,10 +1,11 @@
 (function () {
 	'use strict';
 
-	// Write path is now declarative (data-ln-form-scope="tenants" on
-	// #tenant-create-form) — the coordinator claims ln-form:submit-record itself.
-	document.addEventListener('ln-form:submit-record', function (e) {
-		if (e.detail.scope !== 'tenants' || e.target.id !== 'tenant-create-form') return;
+	// Write path is native-first (data-ln-form-scope="tenants" on
+	// #tenant-create-form) — ln-data-coordinator claims the native submit;
+	// react to the store outcome instead of a form-level event.
+	document.addEventListener('ln-store:created', function (e) {
+		if (e.detail.store !== 'tenants') return;
 		const tenantModal = document.getElementById('tenant-modal');
 		if (tenantModal) tenantModal.setAttribute('data-ln-modal', 'close');
 	});

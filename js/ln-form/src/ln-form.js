@@ -1,4 +1,4 @@
-import { populateForm, dispatch, registerComponent, serializeForm } from '../../ln-core';
+import { populateForm, dispatch, registerComponent, resolveFormMethod } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-form';
@@ -38,8 +38,7 @@ import { populateForm, dispatch, registerComponent, serializeForm } from '../../
 		this._onSubmit = function (e) {
 			if (!self.dom.hasAttribute(SCOPE_ATTR)) return; // not opted in — native submit or ln-ajax handles it
 
-			const methodInputVal = self.dom.querySelector('input[name="_method"]');
-			let method = (methodInputVal && methodInputVal.value !== '') ? methodInputVal.value.toUpperCase() : self.dom.method.toUpperCase();
+			const method = resolveFormMethod(self.dom);
 
 			if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return; // native submit proceeds untouched (e.g. GET search forms)
 
@@ -55,29 +54,12 @@ import { populateForm, dispatch, registerComponent, serializeForm } from '../../
 				return;
 			}
 
-			e.preventDefault();
-
-			const raw = serializeForm(self.dom);
-			const scopeVal = self.dom.getAttribute(SCOPE_ATTR);
-
-			delete raw._method;
-			delete raw._token;
-
-			const detail = {
-				scope: scopeVal ? scopeVal : null,
-				action: self._baseAction,
-				actionResolved: self.dom.getAttribute('action') || '',
-				method: method,
-				data: raw,
-				form: self.dom,
-				claimed: false
-			};
-
-			dispatch(self.dom, 'ln-form:submit-record', detail);
-
-			if (!detail.claimed) {
-				console.warn('[ln-form] ln-form:submit-record was not claimed. Check the data-ln-form-scope name, or make sure this form is nested inside a [data-ln-data-coordinator] element.');
-			}
+			// Valid — nothing left to do. Let the native submit continue.
+			// A [data-ln-data-coordinator] listening for the native `submit` on
+			// document (bubble phase) claims it via preventDefault() if this
+			// form's scope/containment matches one of its stores; if nothing
+			// claims it, the native submit proceeds untouched (progressive
+			// enhancement fallback — no console warning, no silent JS shortcut).
 		};
 
 		form.addEventListener('ln-fill', this._onLnFill);

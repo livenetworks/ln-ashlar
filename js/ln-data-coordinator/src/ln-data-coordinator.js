@@ -1,9 +1,10 @@
-import { registerComponent, dispatch, buildDict } from '../../ln-core';
+import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-coordinator';
 	const DOM_ATTRIBUTE = 'lnDataCoordinator';
 	const DOM_ALIAS = 'lnCoordinator';
+	const SCOPE_ATTR = 'data-ln-form-scope';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -200,12 +201,12 @@ import { registerComponent, dispatch, buildDict } from '../../ln-core';
 		};
 	};
 
-	// ─── Form Write Intake (ln-form:submit-record) ───────────
+	// ─── Form Write Intake (native submit, claimed via preventDefault) ──
 
 	_component.prototype._handleSubmitRecord = function (detail) {
 		const children = this.findChildren();
 		if (!children.storeEl) {
-			console.warn('[ln-data-coordinator] ln-form:submit-record claimed but no [data-ln-data-store] child found in "' + (this._name || '') + '"');
+			console.warn('[ln-data-coordinator] form submit claimed but no [data-ln-data-store] child found in "' + (this._name || '') + '"');
 			return;
 		}
 
@@ -402,21 +403,32 @@ import { registerComponent, dispatch, buildDict } from '../../ln-core';
 				}
 			},
 
-			// ─── Form Write Intake ─────────────────────────────────
-			formSubmitRecord: function (e) {
-				const detail = e.detail;
-				if (!detail || detail.claimed || !detail.form) return;
+			// ─── Form Write Intake — native submit, bubble phase ──────
+			formSubmit: function (e) {
+				const form = e.target;
+				if (e.defaultPrevented) return; // ln-form's validation gate blocked it, or another coordinator already claimed it
+
+				const scopeAttr = form.hasAttribute(SCOPE_ATTR) ? form.getAttribute(SCOPE_ATTR) : null;
+				if (scopeAttr === null) return; // form never opted in — leave native submit alone
 
 				let isMine;
-				if (detail.scope) {
-					isMine = (detail.scope === self._name);
+				if (scopeAttr) {
+					isMine = (scopeAttr === self._name);
 				} else {
-					isMine = (detail.form.closest('[data-ln-data-coordinator]') === self.dom);
+					isMine = (form.closest('[data-ln-data-coordinator]') === self.dom);
 				}
 				if (!isMine) return;
 
-				detail.claimed = true;
-				self._handleSubmitRecord(detail);
+				const method = resolveFormMethod(form);
+				if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return;
+
+				e.preventDefault(); // claim
+
+				const raw = serializeForm(form);
+				delete raw._method;
+				delete raw._token;
+
+				self._handleSubmitRecord({ data: raw, method: method, action: form.getAttribute('action') || '' });
 			},
 
 			// ─── Connector Response Handlers (direct + queued paths) ──
@@ -588,8 +600,9 @@ import { registerComponent, dispatch, buildDict } from '../../ln-core';
 		// Sync ownership — store initialization
 		self.dom.addEventListener('ln-store:initialized', self._handlers.storeInitialized);
 
-		// Form write intake — document-level, claim by scope name or containment
-		document.addEventListener('ln-form:submit-record', self._handlers.formSubmitRecord);
+		// Form write intake — native submit, document-level, bubble phase (never
+		// capture: ln-form's own validation gate on the form must run first)
+		document.addEventListener('submit', self._handlers.formSubmit);
 
 		// Connector responses — generalized across concrete connector implementations
 		CONNECTOR_RESPONSE_NAMESPACES.forEach(function (ns) {
@@ -753,7 +766,7 @@ import { registerComponent, dispatch, buildDict } from '../../ln-core';
 			self.dom.removeEventListener('ln-api-queue:failed', self._handlers.queueFailed);
 			self.dom.removeEventListener('ln-store:initialized', self._handlers.storeInitialized);
 
-			document.removeEventListener('ln-form:submit-record', self._handlers.formSubmitRecord);
+			document.removeEventListener('submit', self._handlers.formSubmit);
 
 			CONNECTOR_RESPONSE_NAMESPACES.forEach(function (ns) {
 				self.dom.removeEventListener(ns + ':fetched', self._handlers.connFetched);

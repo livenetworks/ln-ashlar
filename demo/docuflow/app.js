@@ -100,11 +100,12 @@
 			}
 		}
 
-		// Write path is now declarative (data-ln-form-scope on package-form/tenant-form)
-		// — the coordinator claims ln-form:submit-record itself.
-		formEl.addEventListener('ln-form:submit-record', () => {
+		// Write path is native-first (data-ln-form-scope on package-form/tenant-form)
+		// — react to the store outcome instead of a form-level event. storeEl is
+		// already scoped to this entity, no e.detail.store filter needed.
+		['ln-store:created', 'ln-store:updated'].forEach(ev => storeEl.addEventListener(ev, () => {
 			modalEl.setAttribute('data-ln-modal', 'close');
-		});
+		}));
 
 		return { refresh };
 	}
