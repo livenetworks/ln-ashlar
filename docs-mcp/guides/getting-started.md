@@ -26,10 +26,12 @@ Add the package as a runtime dependency:
 npm install @livenetworks/ashlar
 ```
 
-### Option B: Precompiled Assets (For direct script inclusion)
-If you prefer not to use a build system, copy the production-ready assets directly from the package's `dist/` directory into your project's public assets folder:
-- `dist/ln-ashlar.css` — contains all layout grid, typography, tokens, variables, and component styles.
-- `dist/ln-ashlar.js` — contains the compiled, zero-dependency, self-initializing JavaScript component library.
+### Option B: Precompiled Assets (Local Build)
+If you prefer not to use a build system pipeline during application runtime, clone the repository and compile the assets locally using the build scripts:
+1. Run `npm run build` in the repository root directory.
+2. Copy the resulting production-ready assets from the generated `demo/dist/` (or package output) directories into your project's public assets folder:
+   - `ln-ashlar.css` — contains all layout grid, typography, tokens, variables, and component styles.
+   - `ln-ashlar.iife.js` — contains the compiled, zero-dependency, self-initializing JavaScript component library.
 
 ---
 
@@ -58,7 +60,7 @@ Make sure to set the `lang` attribute on the `<html>` element so that number, da
     </main>
 
     <!-- Load the progressive self-initializing component bundle -->
-    <script src="/dist/ln-ashlar.js" defer></script>
+    <script src="/dist/ln-ashlar.iife.js" defer></script>
 </body>
 </html>
 ```

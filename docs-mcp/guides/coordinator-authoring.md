@@ -39,7 +39,7 @@ A coordinator manages exactly four types of operations:
 
 To prevent tight coupling between coordinators and components, coordinators must adhere to CQS rules:
 
-- **Commands (Mutations):** A coordinator must **never** call state-mutation prototype methods directly (e.g. executing `sidebarEl.lnToggle.open()` is forbidden). It must instead dispatch custom request events (`ln-toggle:request-open`) or write attributes directly (`sidebarEl.setAttribute('data-ln-toggle', 'open')`).
+- **Commands (Mutations):** A coordinator must **never** call state-mutation prototype methods directly (e.g. executing `sidebarEl.lnToggle.open()` is forbidden). It must instead dispatch custom request events (e.g., `ln-profile:request-create`) or write attributes directly (`sidebarEl.setAttribute('data-ln-toggle', 'open')`).
 - **Queries (Reading):** A coordinator is permitted to read public instance properties directly to inspect state (e.g. checking `if (sidebarEl.lnToggle.isOpen)`).
 
 ---
@@ -58,7 +58,7 @@ When writing a coordinator, follow these strict development guidelines:
 Because panels, drawers, and modals persist in the DOM and are reused across different records, they accumulate residual states. 
 
 Coordinators must reset and normalize reusable surfaces at the **open boundary** (before opening) rather than on close:
-- **Clear lingures:** Execute a null-fill `window.lnCore.lnFill(modal, null)` to clear lingering inputs from prior records.
+- **Clear lingering values:** Execute a null-fill `window.lnCore.lnFill(modal, null)` to clear lingering inputs from prior records.
 - **Mode Tracking:** Write the current mode directly to a DOM attribute (e.g. `modal.setAttribute('data-ln-modal-mode', 'edit')`).
 - **Single Use:** Keep records inside JavaScript in a temporary variable and nullify them immediately after filling.
 

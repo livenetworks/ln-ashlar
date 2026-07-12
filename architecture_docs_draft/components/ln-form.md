@@ -42,18 +42,10 @@
 ### Варијанти на Употреба
 
 #### Пример 1: Чисто пополнување на форма (Populate Only)
-Кога надворешен елемент диспачира `ln-fill` CustomEvent настан со податоци кон формата, `ln-form` ги разнесува податоците низ полињата. Без `data-ln-form-action-edit`, `action` and `method` на формата не се менуваат.
+Кога надворешен елемент диспачира `ln-fill` CustomEvent настан со податоци кон формата, `ln-form` ги разнесува податоците низ полињата. Тригерот (декларативно `data-ln-fill-*` копче, ред во табела...) е API на [`ln-fill`](./ln-fill.md) и се документира таму. Без `data-ln-form-action-edit`, `action` и `method` на формата не се менуваат.
 
 ```html
-<!-- Копче-тригер: диспачира ln-fill со { id: "42", username: "dalibor" } -->
-<button type="button" 
-        data-ln-fill-form="user-form"
-        data-ln-fill-id="42"
-        data-ln-fill-username="dalibor">
-    Прикажи корисник
-</button>
-
-<!-- Форма за пополнување -->
+<!-- Надворешен ln-fill тригер диспачира ln-fill со { id: "42", username: "dalibor" } -->
 <form id="user-form" data-ln-form action="/admin/users" method="POST">
     <input type="hidden" name="id" />
     <label for="username">Корисничко име</label>

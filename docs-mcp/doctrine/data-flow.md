@@ -34,17 +34,24 @@ This document explains how data flows unidirectionally through `ln-ashlar` acros
 Data moves strictly in predictable, asynchronous loops:
 
 ### A. The Read Loop
-1. The **Data Store** (`ln-data-store`) loads records from its local cache or syncs them from the server.
-2. The store dispatches an `ln-store:change` event containing the records.
-3. Subscribed **Renderers** (`ln-table` or `ln-list`) listen to the change event and redraw themselves dynamically. Renderers are reactive stream consumers; they do not pull state.
+1. The **Data Store** (`ln-data-store`) loads records from its local IndexedDB cache or syncs them from the server.
+2. The store dispatches an `ln-store:ready` or `ln-store:loaded` event.
+3. The **Coordinator** (`ln-data-coordinator`) queries the store (e.g. `store.getAll()`) and dispatches `ln-table:set-data` or `ln-list:set-data` to the bound view components.
+4. Bound **Renderers** (`ln-table` or `ln-list`) listen to these `set-data` events and redraw themselves dynamically.
 
 ### B. The Write Loop
-1. The user fills a form and triggers submit.
-2. `ln-form` intercepts the event, triggers validation via `ln-validate`, and if valid, dispatches `ln-form:submit`.
-3. The store captures the payload, performs an **optimistic write** (updates the local cache with `_pending: true`), and immediately dispatches `ln-store:change` to update the visual renderers.
-4. The coordinator/queue pushes the payload to the server.
-5. On a `2xx` success response, the store **reconciles** the data (overwrites local temporary IDs with server-assigned IDs, sets `_pending: false`) and dispatches `ln-store:change` with a `"reconcile"` source type.
-6. On a `4xx`/`5xx` error response, the store **reverts** the write, restores the cache to the pre-submit snapshot, and dispatches `ln-store:change` with a `"revert"` source type to restore the old UI.
+1. The user submits a form.
+2. `ln-form` intercepts the submission to validate fields via `ln-validate`. If all fields are valid, the native submit bubbles up.
+3. The **Coordinator** catches the native submit at the document level (bubble phase), prevents the default browser reload, serializes inputs, and triggers a **parallel fan-out**:
+   - **Local Cache:** Dispatches `ln-store:request-create` (or `request-update`/`request-delete`) to the store, which immediately updates IndexedDB and emits a state-changed event (`ln-store:created` / `updated` / `deleted`) to refresh the view.
+   - **Outbox/Transport:** Enqueues the payload in `ln-api-queue` (if present) or dispatches it directly via `ln-api-connector`.
+4. Upon server confirmation (`2xx` success):
+   - **Create:** The coordinator dispatches `ln-store:request-update` to the store to execute an **id-swap (rekey)**, replacing the temporary ID (`_temp_<uuid>`) with the server ID.
+   - **Update:** The coordinator dispatches `ln-store:request-update` with the confirmed server record to sync the cache.
+5. Upon server rejection (`4xx`/`5xx` error):
+   - **Create Rejection (4xx):** The coordinator dispatches `ln-store:request-delete` to discard the temporary record.
+   - **Conflict (409 on Update):** Server wins; the coordinator dispatches `ln-store:request-update` carrying the server's remote record.
+   - **Transient Error (Network/5xx):** The optimistic write remains in the local cache, and the queue retries transport draining when connectivity is restored.
 
 ---
 

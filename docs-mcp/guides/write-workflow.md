@@ -52,12 +52,12 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 2. **Intake:** `ln-form` intercepts the submission only to validate; `ln-data-coordinator` claims the native submit and serializes the fields itself.
 3. **Claim:** The coordinator checks the event scope, claims it (`claimed = true`), and generates a temporary ID with a `_temp_` prefix (e.g. `_temp_df88b0...`).
 4. **Parallel Fan-Out:** The coordinator triggers two independent branches synchronously:
-   - **Local Cache:** Dispatches `ln-store:request-create` with the `tempId` and data. `ln-store` writes to IndexedDB with a `_pending: true` flag, instantly updating bound UI tables.
+   - **Local Cache:** Dispatches `ln-store:request-create` with the `tempId` and data. `ln-store` writes the record to IndexedDB, instantly updating bound UI tables via state notifications (`ln-store:created`).
    - **Outbox Queue:** If a queue child is present, it enqueues the payload with `meta: { tempId, action }`.
 5. **API Transport:** The queue processes the item and tells the coordinator to send. The coordinator directs the connector to POST to the resource URL.
 6. **Server Response:** The server processes the request and responds with a `{ message, content }` envelope (see Section 5).
 7. **Reconciliation:** The connector unwraps the record and dispatches it back. The coordinator dispatches an ordinary `ln-store:request-update` targeting `id: tempId` with the server's payload (`data: record`). 
-   Because the incoming server ID differs from the `tempId`, the store executes an **id-swap (rekey)**, stripping the `_pending` flag and updating the primary key in IndexedDB.
+   Because the incoming server ID differs from the `tempId`, the store executes an **id-swap (rekey)**, updating the primary key in IndexedDB.
 8. **Outbox Completion:** The coordinator dispatches `request-remap` to the queue to update subsequent queued updates targeting the old `tempId` with the new server ID, then issues `ack` to remove the completed create entry from the queue.
 
 ---
@@ -69,7 +69,7 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 4. **Intake:** The coordinator intercepts the event and executes `_fanOutUpdate`:
    - **Local Cache:** Writes the changes to the store immediately.
    - **Outbox Queue:** Enqueues the update payload (with `expected_version` for conflict checks).
-5. **Reconciliation:** Once the server confirms the update, the store updates the cache with the server's record, clears the pending state, and the queue entry is acknowledged.
+5. **Reconciliation:** Once the server confirms the update, the store updates the cache with the server's record, and the queue entry is acknowledged.
 
 ---
 
@@ -81,7 +81,7 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 ---
 
 ### Scenario 4: Handling 409 Conflicts
-1. **Conflict Response:** If another user updated the record in the meantime, the server rejects the write with `409 Conflict`, returning the `remote` server record and a `field_diffs` log.
+1. **Conflict Response:** If another user updated the record in the meantime, the server rejects the write with `409 Conflict`, returning the `remote` server record.
 2. **Intake:** The connector intercepts the 409 status and dispatches an error event.
 3. **Resolution (Server Wins):** The coordinator classifies the 409 error as deterministic. It forces the server's version into the local cache by dispatching `ln-store:request-update` carrying the `remote` record. The UI updates to show the server's data.
 4. **Outbox Drop:** The coordinator issues `nack { reason: 'drop' }` to remove the conflicting update from the outbox queue, preventing endless retries.
@@ -102,13 +102,13 @@ sequenceDiagram
     participant Server as REST API
 
     User->>Form: Submit Form
-    Form->>Form: Block native submit & serialize JSON
+    Form->>Form: Validation gate (preventDefault only if invalid)
     Form-->>Coord: native submit bubbles (unclaimed by ln-form's gate)
     Coord->>Coord: preventDefault() — claim
     
     par Optimistic UI Write
         Coord->>Store: Event: ln-store:request-create (tempId)
-        Store->>Store: Write optimistic record (_pending = true)
+        Store->>Store: Write optimistic record
     and Outbox Enqueue
         Coord->>Queue: Event: ln-api-queue:request-enqueue
         Queue->>Queue: Persist to IndexedDB outbox
@@ -121,7 +121,7 @@ sequenceDiagram
     Conn->>Coord: Event: ln-api-connector:created (record = content)
     
     Coord->>Store: Event: ln-store:request-update (swap tempId for real ID)
-    Store->>Store: Replace tempId, set _pending = false
+    Store->>Store: Replace tempId (rekey)
     Coord->>Queue: Event: ln-api-queue:request-remap (update child entries)
     Coord->>Queue: Event: ln-api-queue:ack (remove entry)
 ```
