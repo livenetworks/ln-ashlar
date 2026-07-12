@@ -24,7 +24,7 @@ When a user submits a form, the action boundary determines which layer intercept
 |---|---|---|---|
 | **1. Native Browser** | None | Traditional browser page reload. Submits data to `action` endpoint using `method` (and Laravel-style spoofed `_method`). | Standard Server-Side Rendered (SSR) pages (e.g. Laravel Blade templates). |
 | **2. Progressive AJAX** | `data-ln-ajax` | Intercepts click/submit, executes `fetch()` asynchronously, prevents page reload, and expects a structured JSON fragment response. | SSR pages with progressive enhancement (updating partial page regions without complete reloads). |
-| **3. Scoped Local-First** | `data-ln-form-scope` | Leaves the submit native (after the validation gate). `ln-data-coordinator` claims it via `preventDefault()` on `document`, serializes it itself, writing instantly to `ln-store` (IndexedDB) and queuing for server synchronization. | Local-First and Single-Page Applications (SPA) where the local database is the immediate source of truth. |
+| **3. Scoped Local-First** | `data-ln-form-scope` | Leaves the submit native (after the validation gate). `ln-data-coordinator` claims it via `preventDefault()` on `document`, serializes it itself, writing instantly to `ln-data-store` (IndexedDB) and queuing for server synchronization. | Local-First and Single-Page Applications (SPA) where the local database is the immediate source of truth. |
 
 > [!IMPORTANT]
 > **Priority Rule:** `data-ln-form-scope` always takes priority over `data-ln-ajax`. A form cannot be both AJAX-driven and database-scoped; mixing these on a single form will log a development warning.
@@ -38,7 +38,7 @@ When a user submits a form, the action boundary determines which layer intercept
 During a local-first write operation, responsibilities are cleanly isolated among components:
 
 - **Form ([`ln-form`](../components/ln-form.md)):** Acts as the canonical source of truth for the resource `action` and `method` attributes. It runs a validation gate only (preventDefault solely on invalid submit) — it never serializes inputs and never dispatches a custom event. It is unaware of database stores or network transport configurations.
-- **Store (`ln-store`):** Manages the local IndexedDB database cache. It applies optimistic mutations immediately to the local cache and fires database change notifications. It is blind to REST URLs and HTTP headers.
+- **Store (`ln-data-store`):** Manages the local IndexedDB database cache. It applies optimistic mutations immediately to the local cache and fires database change notifications. It is blind to REST URLs and HTTP headers.
 - **Queue (`ln-api-queue`):** Persists transaction payloads in order (FIFO per record chain) to survive browser restarts. It dispatches a `send` command when it is ready to sync, but does not perform network calls.
 - **Connector (`ln-*-connector`):** Executes the physical network fetch. It accepts abstract payload requests, translates them into REST or socket payloads, and returns the server's response.
 - **Coordinator ([`ln-data-coordinator`](../components/ln-data-coordinator.md)):** Serves as the mediator. It claims the form's native submit event (preventDefault, document, bubble phase), serializes it, maps payloads (Ingress/Egress), and triggers store writes and remote queue uploads in parallel. It handles server updates by dispatching ordinary store updates (triggering rekeys or reverts).
@@ -52,7 +52,7 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 2. **Intake:** `ln-form` intercepts the submission only to validate; `ln-data-coordinator` claims the native submit and serializes the fields itself.
 3. **Claim:** The coordinator checks the event scope, claims it (`claimed = true`), and generates a temporary ID with a `_temp_` prefix (e.g. `_temp_df88b0...`).
 4. **Parallel Fan-Out:** The coordinator triggers two independent branches synchronously:
-   - **Local Cache:** Dispatches `ln-store:request-create` with the `tempId` and data. `ln-store` writes the record to IndexedDB, instantly updating bound UI tables via state notifications (`ln-store:created`).
+   - **Local Cache:** Dispatches `ln-store:request-create` with the `tempId` and data. `ln-data-store` writes the record to IndexedDB, instantly updating bound UI tables via state notifications (`ln-store:created`).
    - **Outbox Queue:** If a queue child is present, it enqueues the payload with `meta: { tempId, action }`.
 5. **API Transport:** The queue processes the item and tells the coordinator to send. The coordinator directs the connector to POST to the resource URL.
 6. **Server Response:** The server processes the request and responds with a `{ message, content }` envelope (see Section 5).

@@ -38,7 +38,7 @@
 							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
 								<li>The UI dispatches an event (e.g. <code>ln-store:request-create</code>) with the form payload.</li>
 								<li>The component assigns a temporary ID, saves the record locally, and instantly dispatches <code>ln-store:created</code>. Sibling tables receive the event and display the new record immediately.</li>
-								<li>In the background, the sync outbox pushes a POST request. If the server confirms, it responds with the permanent ID and version, triggering <code>ln-store:confirmed</code>. If it fails or conflicts, the store dispatches <code>ln-store:reverted</code> or <code>ln-store:conflict</code>, letting the UI rollback safely.</li>
+								<li>In the background, the sync outbox pushes a POST request. If the server confirms, it responds with the permanent ID and version, triggering <code>ln-store:confirmed</code>. If it fails or conflicts, the store dispatches <code>ln-store:reverted</code>, letting the UI rollback safely.</li>
 							</ol>
 
 							<p>For a detailed breakdown of local-first patterns, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-store/README.md"><code>ln-store</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/store.md">architecture reference</a>.</p>
@@ -143,7 +143,6 @@
 									<tr><td><code>ln-store:deleted</code></td><td>Optimistic delete</td><td><code>{ store, id }</code> or <code>{ store, ids }</code></td></tr>
 									<tr><td><code>ln-store:confirmed</code></td><td>Server confirmed</td><td><code>{ store, record, action }</code></td></tr>
 									<tr><td><code>ln-store:reverted</code></td><td>Mutation failed</td><td><code>{ store, record, action, error }</code></td></tr>
-									<tr><td><code>ln-store:conflict</code></td><td>Update conflict (409)</td><td><code>{ store, local, remote, field_diffs }</code></td></tr>
 								</tbody>
 							</table>
 							</div>

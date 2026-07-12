@@ -279,7 +279,7 @@
 		<ul>
 			<li><label><input type="checkbox" id="sim-latency"> Simulate 600 ms latency on every request</label></li>
 			<li><label><input type="checkbox" id="sim-failure"> ~15% of mutations fail (drives the coordinator's server-reject path)</label></li>
-			<li><label><input type="checkbox" id="sim-conflict"> ~10% of updates return 409 (drives <code>ln-store:conflict</code>)</label></li>
+			<li><label><input type="checkbox" id="sim-conflict"> ~10% of updates return 409 (drives the coordinator's conflict-revert path)</label></li>
 		</ul>
 		<p><button id="reset-data">Reset seed data</button> — wipes localStorage + IndexedDB + reloads.</p>
 	</main>

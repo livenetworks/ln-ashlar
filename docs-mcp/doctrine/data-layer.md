@@ -109,7 +109,7 @@ Submit Form ──> Document-level Native Submit Intercept (preventDefault)
 ```
 
 ### A. Direct Pipeline (Queue Absent)
-1. **Submit Intake:** `ln-data-coordinator` claims the native submit (bubble phase) at the document level via `preventDefault()`, serializes inputs, and applies egress mapping.
+1. **Submit Intake:** `ln-data-coordinator` claims the native submit of forms opted in via `data-ln-form-scope` (bubble phase, document level, `preventDefault()`), serializes inputs, and applies egress mapping.
 2. **Optimistic Mutation:** The coordinator dispatches `ln-store:request-create` (or `request-update`/`request-delete`) to the store. The store updates IndexedDB with a temporary ID (`_temp_<uuid>`). Bound view components refresh instantly.
 3. **API Submission:** The coordinator dispatches `ln-api-connector:request-create` directly to the connector carrying the payload.
 4. **Reconciliation (2xx/409):** 

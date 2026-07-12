@@ -3,27 +3,7 @@
 > Работен фајл — НЕ се индексира (надвор од петте индексирани фолдери).
 > За посебна сесија. Се брише кога сè е решено.
 
-## 1. `doctrine/data-flow.md` — препишување на §2 „The Write Loop" (pre-v2 → v2)
-
-Погрешно сега / вистина во кодот:
-
-- `ln-form:submit` → нема таков настан НИТИ `ln-form:submit-record` (пресудено 2026-07-12 — native-first); валиден submit останува нативен, `ln-data-coordinator` го презема преку native submit + `preventDefault()` на `document`.
-- `_pending: true/false` — НЕ постои; v2 нема pending machinery (ruling 2026-07-09)
-- настан `ln-store:change` (+ source `reconcile`/`revert`) — НЕ постои; реални настани: `ln-store:created` / `updated` / `deleted` / `loaded` / `synced` / `ready` / `initialized`
-- „revert на pre-submit снимка" — реалната error-политика е диференцирана по HTTP статус (`js/ln-data-coordinator/src/ln-data-coordinator.js`, `connError` handler): 401/419 → auth-pause; 5xx/network → retry/queue; 409 update → замена со remote; 4xx create → бришење на локалниот запис; други 4xx → остава локално
-
-Извор на вистина: `js/ln-data-coordinator/src/`, `js/ln-form/src/`, `js/ln-couchdb-connector/src/` —
-НЕ `docs/architecture/data-flow.md` (тој е застарен, самиот го носи pre-v2 наративот).
-
-## 2. `doctrine/data-layer.md` — препишување на §3.A „Direct Pipeline" + v2 котви
-
-- истите pre-v2 грешки како точка 1, плус: tempId форматот е **`_temp_<uuid>`**, не `tmp_<uuid>` (`ln-data-coordinator.js`, `_uuid()`)
-- недостасуваат мандаторните v2 котви:
-  - toast envelope **`{message, content}`** (`ln-couchdb-connector.js` + `_toastFromMessage` во координаторот)
-  - **`data-ln-form-scope`** write intake
-  - **паралелен fan-out** (`_fanOutCreate` / `_fanOutUpdate` / `_fanOutDelete` — двоен dispatch кон store + connector/queue, без snapshot/pending книговодство)
-
-## 3. MCP парсер (Проект 2) — синхронизација со англискиот контракт
+## 1. MCP парсер (Проект 2) — синхронизација со англискиот контракт
 
 Нормативните наслови се сега англиски (одлука 2026-07-11):
 
@@ -46,30 +26,7 @@
 - **Еден сервер, N корпуси (одлука 2026-07-11):** НЕ се прават одвоени MCP сервери по стек (ashlar / laravel / node / wordpress) — сепарацијата ја носат `domain:`/`context:` оските и config-низата корени. Кога ќе се појави потреба (тим што работи само еден стек), сервирањето добива per-client/per-project профили (scoping по domain/context). Профилот НЕ го укинува тврдото правило: никогаш два context-а во еден сервиран сет.
 - **Отворено (серверска одлука):** политика за колизија на `name:` меѓу корени/фолдери (пр. две `getting-started` во frontend и backend корпус) — клучирање по патека+domain или глобална уникатност.
 
-## 4. guides/ — критични наоди од ревјуто на Фаза 2 (2026-07-11)
-
-Средните/ситните наоди се поправени истиот ден; овде се само критичните.
-
-### 4.1 `guides/write-workflow.md` — иста pre-v2 нарација како точки 1-2 (да се работат ЗАЕДНО)
-
-- линии ~54, 59, 110, 123 (+ mermaid дијаграмот): `_pending: true` машинерија — НЕ постои; store директно запишува (`js/ln-data-store/src/ln-data-store.js:233-257`; README на store-от: „нема `_pending`, нема rollback"). Rekey = id-swap без флег.
-- линија ~43: „reverts" — revert не постои; вистинската error-политика е во точка 1 (диференцирана по HTTP статус).
-- линија ~83: `field_diffs` — нула појави во `js/`; 409 враќа само `remote` (`ln-data-coordinator.js:534`). Да се избрише, или експлицитно да се означи како хипотетичко серверско поле, не системско однесување.
-- Остатокот од документот е проверен и ТОЧЕН (native-submit intake, scope, `_temp_`, fan-out, `{message,content}` envelope) — поправката е хируршка, не препишување.
-
-### 4.2 `guides/getting-started.md` — Option B ветува `dist/` од npm пакетот
-
-`package.json` → `"files": ["scss/", "js/"]` — објавениот пакет НЕ содржи `dist/` (потврдено со `npm pack --dry-run`); `dist/` е build излез (`vite.config.js` → `outDir: 'demo/dist'`). Option B да се препише: dist артефактите се добиваат со `npm run build` локално (или иден Release/CDN артефакт ако се воведе).
-
-### 4.3 `guides/coordinator-authoring.md` (~линија 41) — халуциниран настан `ln-toggle:request-open`
-
-Нула појави во `js/`. `ln-toggle` е канонски attribute-bridge-only — НЕМА request-event површина (`js/COMPONENTS.md`). Да се замени примерот: или компонента со реална request-event површина, или да остане само `setAttribute` варијантата.
-
-### 4.4 Успатен наод — stale демо документација за `ln-store:conflict`
-
-`demo/admin/store.html:353` и `demo/admin/src/pages/store.html:146` документираат настан `ln-store:conflict` со `field_diffs` — настанот НЕ постои во `js/`. Да се исчисти во истата сесија (изворот е `src/pages/store.html`; компајлираната се регенерира со build).
-
-## 5. Native `<dialog>` миграција за `ln-modal` (архитектурска одлука 2026-07-11)
+## 2. Native `<dialog>` миграција за `ln-modal` (архитектурска одлука 2026-07-11)
 
 **Одлука (корисник):** `<dialog>` е семантичкиот таргет — кодот се крева до markup-от, не обратно. `doctrine/html-markup-rules.md` §6 (~линија 149) веќе го учи `<dialog id="..." data-ln-modal>` примерот; тој е aspirational додека овој рефактор не слета.
 
