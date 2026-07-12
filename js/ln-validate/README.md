@@ -11,6 +11,15 @@ It maintains no custom rules in JavaScript; instead, it relies fully on native H
 1. **Platform First:** Browsers compile and execute rules in native C++ instantly. `ln-validate` simply acts as a visual layer: translating native `ValidityState` properties into visible HTML elements on demand.
 2. **The Touch Gate:** To prevent annoying page-load errors, validation is completely visual-silent until a field receives its first user interaction (`input` or `change`), setting its internal state `_touched = true`.
 3. **The Custom Escape Hatch:** Validation rules the browser cannot express (such as checking if an email is taken via a server lookup, or confirming passwords match) are routed through asynchronous `set-custom` / `clear-custom` events.
+4. **Owns Browser Validation:** The moment a form contains at least one
+   `data-ln-validate` field, that field's constructor injects
+   `novalidate` on the host `<form>` (via `field.form`, so `form="id"`
+   attribute association works too). Authors never write `novalidate`
+   by hand. A form with zero `data-ln-validate` fields is untouched and
+   keeps native browser validation as the default. The injection is
+   idempotent and one-way — it is never removed on field `destroy()`,
+   since other validated fields on the same form may still own the
+   gate.
 
 ---
 
@@ -107,3 +116,7 @@ input.lnValidate.destroy();
 - **Skipping the `.form-element` wrapper:** `ln-validate` locates sibling error elements relative to the closest `.form-element` ancestor. If you omit the wrapper class, no error lists will be toggled.
 - **Relying on Native browser CSS (`:invalid`):** The browser applies `:invalid` to empty required fields on page load. **Always** use our custom classes `.ln-validate-valid` and `.ln-validate-invalid` for visual borders and focus states.
 - **Injecting custom errors without validating:** Dispatching `ln-validate:set-custom` updates visual classes, but it **does not** bubble an `:invalid` event. If you need form-level coordinators (`ln-form`) to react immediately, call `input.lnValidate.validate()` right after injecting.
+- **Expecting `novalidate` in your own markup:** Don't write it by hand
+  — `ln-validate` injects it on the host form as soon as one field
+  initializes. Writing it yourself is harmless (the injection checks
+  `hasAttribute` first) but unnecessary.

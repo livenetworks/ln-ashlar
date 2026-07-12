@@ -24,8 +24,10 @@ is always left native.
 3. **Transport is someone else's job.** Ajax interception (if wanted) is
    a separate component's concern — it listens to the native `submit`
    event itself. Validation is owned by the browser's constraint
-    validation (any form using `ln-form` for `POST`/`PUT`/`PATCH` MUST carry `novalidate` in the HTML markup to enable submit interception) plus
-    `ln-validate` for field error display.
+   validation plus `ln-validate` for field error display — a form with
+   at least one `data-ln-validate` field gets `novalidate` injected
+   automatically by `ln-validate`; a form with none keeps native
+   validation as the default.
 
 ---
 
@@ -157,7 +159,7 @@ them.
   `ln-form`, no `ln-form:submit-record` event, no JSON payload — scoped
   forms are serialized by the claiming `ln-data-coordinator`, not by
   `ln-form`.
-- **No validation orchestration beyond the gate.** Constraint validation display is `ln-validate`'s job. `ln-form` triggers full validation on submit (any method other than `GET`) via the `ln-validate:request-validate` event, blocks submit if invalid, focuses the first invalid field, and requires `novalidate` in the HTML markup.
+- **No validation orchestration beyond the gate.** Constraint validation display is `ln-validate`'s job. `ln-form` triggers full validation on submit (any method other than `GET`) via the `ln-validate:request-validate` event, blocks submit if invalid, and focuses the first invalid field. `ln-form` never touches `novalidate` itself — `ln-validate` injects it automatically wherever it owns a field.
 - **Submit interception is validation-only.** `ln-form` calls
   `preventDefault()` solely to block an invalid submit (focus first
   invalid field) — a valid submit is left alone entirely. Claiming a

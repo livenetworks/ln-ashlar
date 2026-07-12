@@ -276,8 +276,12 @@ The submit button stays active, and any invalid submit is intercepted to
 surface inline errors and focus the first invalid field.
 
 To prevent browser bubbles from preempting the custom validation logic,
-forms that use scoped validation/submit coordination (carrying `data-ln-form-scope`)
-**MUST** carry the `novalidate` attribute in their HTML markup.
+`ln-validate` injects `novalidate` on `field.form` the first time a
+field initializes — one field is enough to own the whole form's gate.
+Authors never write `novalidate` by hand. A form with zero
+`data-ln-validate` fields keeps native browser validation as the
+default, and the attribute is never removed on field `destroy()`
+(other fields on the same form may still own the gate).
 
 ## The `isValid` getter
 

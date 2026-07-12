@@ -89,6 +89,12 @@ import { dispatch, registerComponent } from '../../ln-core';
 
 		const form = dom.form;
 		if (form) {
+			// One validated field is enough to own the form's gate —
+			// browser bubbles must yield to ln-validate's own error display.
+			if (!form.hasAttribute('novalidate')) {
+				form.setAttribute('novalidate', '');
+			}
+
 			this._onFormReset = function () {
 				self.reset();
 			};
