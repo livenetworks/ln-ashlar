@@ -89,14 +89,14 @@ Binding is declared in HTML using the mapping reference (where the coordinator i
 
 ## 3. The Optimistic & Offline Write Pipeline
 
-When a user submits a mutation (Create, Update, Delete), `ln-ashlar` routes the write transaction through an offline-first pipeline:
+When a user submits a mutation (Create, Update, Delete), `ln-ashlar` routes the transaction through a parallel fan-out pipeline:
 
 ```
-Submit Form ──> Optimistic Cache Write (with _pending: true)
+Submit Form ──> Document-level Native Submit Intercept (preventDefault)
                       │
-                      ├──> Update UI Tables / Grids (Instant)
+                      ├──> Optimistic Cache Write (IndexedDB) ──> Update UI (Instant)
                       │
-             Route Transaction
+             Parallel Outbound Path
                       │
            ┌──────────┴──────────┐
            ▼                     ▼
@@ -105,21 +105,23 @@ Submit Form ──> Optimistic Cache Write (with _pending: true)
            │                     │
      REST Request          Enqueue in Outbox DB
            │                     │
-     Reconcile or Revert   Drain Head in FIFO order
+     Reconcile (2xx/409)   Drain Head in FIFO order
 ```
 
 ### A. Direct Pipeline (Queue Absent)
-1. **Form Submit:** Form fires `ln-form:submit`.
-2. **Optimistic Mutation:** Store puts the record in the cache database with `_pending: true` and a temporary ID (e.g. `tmp_<uuid>`). Renderers redraw instantly.
-3. **API Submission:** Coordinator sends the payload (transformed via Egress) directly via the connector.
-4. **Reconciliation (2xx):** The server response is mapped (Ingress) and replaces the temporary ID with the permanent database ID, setting `_pending: false`.
-5. **Reversion (4xx):** On rejection, the transaction is discarded. The cache is reverted to the pre-mutation snapshot, and field-level validation errors are returned to the form.
+1. **Submit Intake:** `ln-data-coordinator` claims the native submit (bubble phase) at the document level via `preventDefault()`, serializes inputs, and applies egress mapping.
+2. **Optimistic Mutation:** The coordinator dispatches `ln-store:request-create` (or `request-update`/`request-delete`) to the store. The store updates IndexedDB with a temporary ID (`_temp_<uuid>`). Bound view components refresh instantly.
+3. **API Submission:** The coordinator dispatches `ln-api-connector:request-create` directly to the connector carrying the payload.
+4. **Reconciliation (2xx/409):** 
+   - On success (`2xx`), the connector returns the server record. The coordinator dispatches `ln-store:request-update` to swap the temporary ID with the permanent database ID.
+   - On conflict (`409` on update), the server wins; the coordinator forces the server's remote record into the cache.
+   - On rejection (deterministic `4xx` on create), the coordinator dispatches `ln-store:request-delete` to discard the temporary record.
 
 ### B. Persistent Offline Pipeline (Queue Present)
 If the optional `data-ln-api-queue` element is present:
-1. **Enqueue:** The coordinator serializes the optimistic transaction into the queue database.
-2. **FIFO Chains:** Operations are queued in FIFO order per record chain (based on primary key).
-3. **API Drain:** While online, the coordinator processes the queue's head items.
-4. **Id Remapping:** On successful creation, the coordinator fires `ln-api-queue:request-remap` to update the ID of subsequent queued updates targeting that temporary ID *before* confirming and advancing the chain queue (`ack`).
+1. **Enqueue:** Instead of calling the connector directly, the coordinator serializes the mutation into the outbox database (`ln_api_queue`) carrying the base resource URL in its metadata.
+2. **FIFO Chains:** Operations are queued in FIFO order per record chain (based on primary key or temporary ID).
+3. **API Drain:** While online, the queue dispatches `ln-api-queue:send` for head items. The coordinator intercepts this and directs the connector to perform the REST request.
+4. **Id Remapping:** On successful creation, the coordinator dispatches `ln-api-queue:request-remap` to update subsequent queued updates targeting that temporary ID *before* acknowledging the completed entry (`ack`).
 5. **Retries:** Network/5xx failures retry using exponential backoffs (`2s, 5s, 15s, 60s, 300s`). After 8 failures, the queue pauses and flags the item for manual correction.
 6. **Authentication Pauses:** A `401`/`419` response pauses the queue and emits `auth-required`. The user's optimistic writes remain visible in the UI while they re-authenticate, after which the coordinator resumes the queue via `request-resume`.
