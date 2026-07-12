@@ -208,7 +208,7 @@
 </div>
 
 <!-- 4. Create / Edit modal -->
-<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="document-modal">
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="document-modal">
 	<form data-ln-form="document-form" novalidate
 	      id="document-form"
 	      data-ln-form-scope="documents"
@@ -255,10 +255,10 @@
 			<button type="submit">Save</button>
 		</footer>
 	</form>
-</div>
+</dialog>
 
 <!-- 5. Confirm-delete modal -->
-<div class="ln-modal" data-ln-modal id="confirm-delete-modal">
+<dialog class="ln-modal" data-ln-modal id="confirm-delete-modal">
 	<form id="confirm-delete-form">
 		<header>
 			<h3>Delete document?</h3>
@@ -274,7 +274,7 @@
 			<button type="submit" id="confirm-delete-btn" style="--color-primary: var(--color-error)">Delete</button>
 		</footer>
 	</form>
-</div>
+</dialog>
 
 <script class="demo-coordinator">
 (function () {

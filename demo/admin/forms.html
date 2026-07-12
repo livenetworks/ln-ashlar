@@ -1535,7 +1535,7 @@ input[data-ln-number] {
 </section>
 
 <!-- REST action-routing demo modal (outside section — document-level overlay) -->
-<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-rest-modal">
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-rest-modal">
 	<form id="demo-rest-form"
 	      data-ln-form
 	      data-ln-ajax
@@ -1576,7 +1576,7 @@ input[data-ln-number] {
 			<button type="submit">Save</button>
 		</footer>
 	</form>
-</div>
+</dialog>
 			</div>
 		</section>
 
@@ -1589,7 +1589,7 @@ input[data-ln-number] {
 	</div><!-- /.app-wrapper -->
 
 	<!-- Modals (outside app-wrapper) -->
-	<div class="ln-modal" data-ln-modal id="demo-basic">
+	<dialog class="ln-modal" data-ln-modal id="demo-basic">
 		<form>
 			<header>
 				<h3>Basic Modal</h3>
@@ -1603,9 +1603,9 @@ input[data-ln-number] {
 				<button type="button" data-ln-modal-close>Close</button>
 			</footer>
 		</form>
-	</div>
+	</dialog>
 
-	<div class="ln-modal" data-ln-modal id="demo-form">
+	<dialog class="ln-modal" data-ln-modal id="demo-form">
 		<form id="demo-form-el" data-ln-form>
 			<header>
 				<span class="icon">
@@ -1644,7 +1644,7 @@ input[data-ln-number] {
 				<button type="submit">Save</button>
 			</footer>
 		</form>
-	</div>
+	</dialog>
 
 	<script>
 	(function () {

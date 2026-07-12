@@ -330,7 +330,7 @@
 	<!-- ── Modals (persistent, outside outlet) ──────────────────── -->
 
 	<!-- Package modal -->
-	<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
+	<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
 		<form data-ln-form="package-form" id="package-form" novalidate
 		      data-ln-form-scope="packages"
 		      method="post"
@@ -383,10 +383,10 @@
 				<button type="submit">Save</button>
 			</footer>
 		</form>
-	</div>
+	</dialog>
 
 	<!-- Tenant modal -->
-	<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal" aria-labelledby="tenant-modal-title">
+	<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal" aria-labelledby="tenant-modal-title">
 		<form data-ln-form="tenant-form" id="tenant-form" novalidate
 		      data-ln-form-scope="tenants"
 		      method="post"
@@ -462,7 +462,7 @@
 				<button type="submit">Save</button>
 			</footer>
 		</form>
-	</div>
+	</dialog>
 
 </body>
 </html>

@@ -2,8 +2,7 @@
 //
 // Pure helpers for floating UI (popovers, tooltips, dropdowns).
 // No DOM side effects in computePlacement — it takes a rect and
-// returns coordinates. teleportToBody and measureHidden touch DOM
-// because they have to.
+// returns coordinates. measureHidden touches DOM because it has to.
 
 /**
  * Compute viewport coordinates for a floating element relative to an
@@ -136,39 +135,6 @@ export function computePlacement(anchorRect, floatingSize, preferred, offset) {
 	}
 
 	return { top: top, left: left, placement: chosen.side };
-}
-
-/**
- * Move an element into <body>, leaving a placeholder comment so
- * teleportBack can put it back exactly where it was. Returns a
- * cleanup function — call it to restore the element to its origin.
- *
- * The element receives `position: fixed` style automatically (the
- * caller is responsible for top/left). To avoid violating the
- * "no inline styles" rule, the caller should set position via a
- * CSS rule on its component selector (e.g. [data-ln-popover]
- * already has position: fixed in its co-located scss). teleportToBody
- * itself does NOT set any inline styles.
- *
- * @param {HTMLElement} el
- * @returns {Function} cleanup — restores el to its original parent.
- */
-export function teleportToBody(el) {
-	if (!el || el.parentNode === document.body) {
-		// Already in body or no element — return a no-op cleanup.
-		return function () {};
-	}
-
-	const originalParent = el.parentNode;
-	const placeholder = document.createComment('ln-teleport');
-	originalParent.insertBefore(placeholder, el);
-	document.body.appendChild(el);
-
-	return function restore() {
-		if (!placeholder.parentNode) return;
-		placeholder.parentNode.insertBefore(el, placeholder);
-		placeholder.parentNode.removeChild(placeholder);
-	};
 }
 
 /**

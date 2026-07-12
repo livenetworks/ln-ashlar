@@ -428,7 +428,7 @@ window.lnAutosave(container);</code></pre>
 						<header><h3>Modal forms — close-and-discard</h3></header>
 						<main>
 							<p>Inside a modal, combine <code>data-ln-modal-close</code> with <code>data-ln-autosave-clear</code> on the same button:</p>
-<pre><code>&lt;div id="invoice-modal" class="ln-modal" data-ln-modal&gt;
+<pre><code>&lt;dialog id="invoice-modal" class="ln-modal" data-ln-modal&gt;
     &lt;form id="invoice" data-ln-autosave action="/invoices" method="POST"&gt;
         &lt;header&gt;
             &lt;h3&gt;New Invoice&lt;/h3&gt;
@@ -446,7 +446,7 @@ window.lnAutosave(container);</code></pre>
             &lt;button type="submit"&gt;Create&lt;/button&gt;
         &lt;/footer&gt;
     &lt;/form&gt;
-&lt;/div&gt;</code></pre>
+&lt;/dialog&gt;</code></pre>
 							<p><strong>Note:</strong> if the user dismisses via ESC (which <code>ln-modal</code> handles natively), the draft is NOT cleared — ESC does not fire <code>submit</code>, <code>reset</code>, or click any clear button. To wire ESC-discard, listen for the modal's close event and remove the entry directly:</p>
 <pre><code>modalEl.addEventListener('ln-modal:closed', function () {
     localStorage.removeItem(formEl.lnAutosave.key);
@@ -538,7 +538,7 @@ window.lnAutosave(container);</code></pre>
 	</div><!-- /.app-wrapper -->
 
 	<!-- Modals (outside app-wrapper) -->
-	<div class="ln-modal" data-ln-modal id="demo-basic">
+	<dialog class="ln-modal" data-ln-modal id="demo-basic">
 		<form>
 			<header>
 				<h3>Basic Modal</h3>
@@ -552,9 +552,9 @@ window.lnAutosave(container);</code></pre>
 				<button type="button" data-ln-modal-close>Close</button>
 			</footer>
 		</form>
-	</div>
+	</dialog>
 
-	<div class="ln-modal" data-ln-modal id="demo-form">
+	<dialog class="ln-modal" data-ln-modal id="demo-form">
 		<form id="demo-form-el" data-ln-form>
 			<header>
 				<span class="icon">
@@ -593,7 +593,7 @@ window.lnAutosave(container);</code></pre>
 				<button type="submit">Save</button>
 			</footer>
 		</form>
-	</div>
+	</dialog>
 
 	<script>
 	(function () {

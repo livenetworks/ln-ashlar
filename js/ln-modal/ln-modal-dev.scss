@@ -5,4 +5,9 @@
 	[data-ln-modal-for=""] {
 		@include dev-inline-error("data-ln-modal-for is missing a target modal id");
 	}
+
+	// 2. Non-dialog modal: data-ln-modal must be on a <dialog> element (native showModal/close)
+	[data-ln-modal]:not(dialog) {
+		@include dev-inline-error("data-ln-modal must be on a <dialog> element");
+	}
 }

@@ -1,15 +1,15 @@
 # ln-dropdown
 
-> A menu-grade coordinator that adds click-outside, body teleportation, and automatic positioning on top of `ln-toggle`.
+> A menu-grade coordinator that adds click-outside, top-layer promotion, and automatic positioning on top of `ln-toggle`.
 
 ---
 
 ## 1. Philosophy & The Dropdown Mindset
 
-In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating a heavy component that bundles state, LIFO click stacks, teleportation contexts, and styles, `ln-dropdown` splits them cleanly:
+In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating a heavy component that bundles state, LIFO click stacks, top-layer contexts, and styles, `ln-dropdown` splits them cleanly:
 
 1. **State Primitive (`ln-toggle`)**: Open/close state lives entirely on the inner `data-ln-toggle` attribute on the menu. `ln-dropdown` does not re-implement state; it is a thin behavior layer on top.
-2. **Behavior & Positioning (JavaScript)**: The `ln-dropdown` coordinator handles click-outside detection, viewport resize closures (which makes absolute positioning unreliable), layout teleportation to `<body>` to escape parent `overflow: hidden` clips, and scroll position tracking.
+2. **Behavior & Positioning (JavaScript)**: The `ln-dropdown` coordinator handles click-outside detection, viewport resize closures (which makes absolute positioning unreliable), top-layer promotion via the native Popover API (`popover="manual"`) to escape parent `overflow: hidden` clips and stacking contexts, and scroll position tracking.
 3. **Visual Presentation (CSS)**: Visual layouts, background shadows, and borders are handled in Vanilla CSS. The library ships mixins like `@include dropdown` and `@include dropdown-menu` to style the wrapper and popup elements.
 
 ---
@@ -51,7 +51,7 @@ Outside clicks, window resizes, triggers, and custom scripts all change state by
 const wrapper = document.querySelector('[data-ln-dropdown]');
 const menu = wrapper.querySelector('[data-ln-toggle]');
 
-// Open the menu (dropdown teleports and positions it automatically)
+// Open the menu (dropdown promotes it to the top layer and positions it automatically)
 menu.setAttribute('data-ln-toggle', 'open');
 
 // Close the menu
@@ -74,8 +74,8 @@ All events bubble. The dispatch target is the inner menu element (except `:destr
 
 | Event | Bubbles | Detail | Dispatched When |
 |---|---|---|---|
-| **`ln-dropdown:open`** | Yes | `{ target: menuElement }` | After teleportation and positioning are complete. |
-| **`ln-dropdown:close`** | Yes | `{ target: menuElement }` | After menu is closed, teleported back, and outside listeners removed. |
+| **`ln-dropdown:open`** | Yes | `{ target: menuElement }` | After top-layer promotion and positioning are complete. |
+| **`ln-dropdown:close`** | Yes | `{ target: menuElement }` | After menu is closed, exits the top layer, and outside listeners removed. |
 | **`ln-dropdown:destroyed`** | Yes | `{ target: wrapperElement }` | Inside `destroy()`, after removing listeners. |
 
 *Note*: Open/close state is managed by `ln-toggle`. Use `ln-toggle:before-open` / `ln-toggle:before-close` to cancel transitions.
@@ -91,7 +91,7 @@ document.addEventListener('ln-dropdown:open', (e) => {
 
 ## 5. Behavior & Integration
 
-- **Teleportation**: On open, the menu is moved to `<body>` so it escapes ancestor `overflow: hidden` clipping and parent stacking contexts. On close, it returns to its original position in the DOM.
+- **Top-Layer Promotion**: On open, the menu is shown via the native Popover API (`showPopover()`), which renders it in the browser's top layer — escaping ancestor `overflow: hidden` clipping and stacking contexts without moving it in the DOM. `popover="manual"` keeps dismissal entirely under `ln-dropdown`'s own control (no native light-dismiss).
 - **Positioning**: The menu opens below the trigger, right-aligned to it. It automatically flips above if there is no vertical space below, and left-aligned if there is no horizontal space on the right.
 - **Scroll & Resize Tracking**: Repositions automatically on every scroll to track the trigger. A window viewport resize closes the menu to prevent layout misalignments.
 

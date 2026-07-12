@@ -8,7 +8,7 @@
 
 In `ln-ashlar`, the core design principle is **orthogonality**. Rather than creating a heavy component that bundles form handlers, visual layouts, focus traps, backdrop styling, and dimensions, `ln-modal` splits them cleanly:
 
-1. **State & Accessibility (JavaScript)**: The `ln-modal` script only manages binary `open` / `close` state, suppresses `<body>` scrolling (the `ln-modal-open` class on `<body>` — style or detect the lock via that class), intercepts tab navigation to trap focus inside the modal, closes open modals on ESC key, and restores focus on close to the element that was focused before opening (usually the trigger).
+1. **State & Accessibility (JavaScript + native `<dialog>`)**: The `ln-modal` script manages the binary `open` / `close` attribute contract and suppresses `<body>` scrolling (the `ln-modal-open` class on `<body>`). Focus trapping, ESC dismissal, and focus restoration on close are delegated to the native `<dialog>` element via `showModal()`/`close()` — the script intercepts the native `cancel` event only to route ESC through the same attribute-driven `_syncAttribute` path as every other close.
 2. **The Content Root (HTML)**: The modal content root is ALWAYS a `<form>`. The form IS the panel — there are no redundant BEM wrappers like `.ln-modal__content`. Cancel and submit buttons live directly inside the form.
 3. **Visual Presentation & Sizing (CSS)**: Overlay backdrops, Sticky headers/footers, and scrollable body areas are styled using Vanilla CSS. Sizing variants (`modal-sm|md|lg|xl`) are applied via SCSS mixins on `> form`, keeping markup completely clean.
 
@@ -23,7 +23,7 @@ Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `da
 <button data-ln-modal-for="user-modal">Add User</button>
 
 <!-- Modal overlay -->
-<div class="ln-modal" data-ln-modal id="user-modal">
+<dialog class="ln-modal" data-ln-modal id="user-modal">
     <form>
         <!-- Header -->
         <header>
@@ -44,7 +44,7 @@ Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `da
             <button type="submit">Save</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 ### Key Anatomy Rules
@@ -167,7 +167,7 @@ Set `data-ln-modal-mode="new"` as the HTML default so the correct title renders 
 ### Markup
 
 ```html
-<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal" aria-labelledby="package-modal-title">
 	<form>
 		<header>
 			<h3 id="package-modal-title" data-ln-fillable>
@@ -176,7 +176,7 @@ Set `data-ln-modal-mode="new"` as the HTML default so the correct title renders 
 			</h3>
 		</header>
 	</form>
-</div>
+</dialog>
 ```
 
 `data-ln-field="name"` inside the edit span is filled by `lnCore.fill(h3, record)` — NOT `{{ name }}`, which is inert in live DOM (only `fillTemplate()` at clone time processes `{{ }}`). See [`docs/architecture/data-flow.md §5`](../../docs/architecture/data-flow.md).
@@ -239,7 +239,7 @@ The trigger click handler (source: `js/ln-modal/src/ln-modal.js` L146–203):
 >Edit</button>
 
 <!-- Modal -->
-<div class="ln-modal" data-ln-modal data-ln-modal-mode="new"
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new"
      id="event-modal" aria-labelledby="event-modal-title">
     <form id="event-form" data-ln-form>
         <header>
@@ -250,7 +250,7 @@ The trigger click handler (source: `js/ln-modal/src/ln-modal.js` L146–203):
         </header>
         <!-- … fields … -->
     </form>
-</div>
+</dialog>
 ```
 
 ### Two namespaces, two targets
@@ -378,7 +378,7 @@ leaves the fill step to the **`ln-modal-fill`** coordinator (see
    data-ln-fill-name="Ada Lovelace">Edit Ada</a>
 
 <!-- Hash-bound modal (id IS the namespace) -->
-<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
     <form id="user-form" data-ln-form>
         <header>
             <h3 data-ln-fillable>
@@ -397,7 +397,7 @@ leaves the fill step to the **`ln-modal-fill`** coordinator (see
             <button type="submit">Save</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 ### Updated lifecycle events table

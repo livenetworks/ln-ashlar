@@ -88,13 +88,13 @@ Resolve Path ──> Match Regions ──> Intercept ──> Swap Views ──> 
 
 ---
 
-## 5. View Teardown and Teleport Cleanup
+## 5. View Teardown and Open-Overlay Cleanup
 
-When a region is swapped out, simply throwing away elements would leave active event listeners and orphaned teleported elements (such as open popover panels inside `<body>`) floating in memory.
+When a region is swapped out, simply throwing away elements would leave active event listeners and orphaned open overlays (such as popovers left showing in the top layer) floating in memory.
 
 To prevent memory leaks:
 1. **Component Teardown:** The router queries the exiting DOM tree for any elements carrying active component instances (objects on the element starting with the `ln` prefix) and calls `destroy()` on them.
-2. **Teleport Cleanup:** The router queries the document for open popovers (`[data-ln-popover="open"]`). If a popover's trigger button is inside the exiting region, the router destroys the popover, restoring the element to its origin and tearing it down cleanly.
+2. **Overlay Cleanup:** The router queries the document for open popovers (`[data-ln-popover="open"]`). If a popover's trigger button is inside the exiting region, the router destroys the popover, closing it and tearing it down cleanly.
 
 ---
 

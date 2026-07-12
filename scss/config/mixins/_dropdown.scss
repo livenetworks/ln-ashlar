@@ -130,11 +130,9 @@
 
 @mixin dropdown-menu {
 	@include floating-panel;
-	@include absolute;
-	right: 0;
-	top: 100%;
-	--margin-block: var(--size-xs);
-	margin-top: var(--margin-block);
+	@include fixed;
+	inset: auto;
+	margin: 0;
 	--padding-y: var(--size-xs);
 	padding-block: var(--padding-y);
 	min-width: 10rem;

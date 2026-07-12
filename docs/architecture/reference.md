@@ -85,7 +85,7 @@ Redefining the customization hooks (`--btn-padding-x` and `--btn-padding-y`) loc
 ```html
 <button data-ln-modal-for="my-modal">Open</button>
 
-<div class="ln-modal" data-ln-modal id="my-modal">
+<dialog class="ln-modal" data-ln-modal id="my-modal">
     <form>
         <header><h3>Title</h3><button type="button" aria-label="Close" data-ln-modal-close><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button></header>
         <main>...</main>
@@ -94,7 +94,7 @@ Redefining the customization hooks (`--btn-padding-x` and `--btn-padding-y`) loc
             <button type="submit">Save</button>
         </footer>
     </form>
-</div>
+</dialog>
 ```
 
 - **`data-ln-modal`** on modal element = creates instance, value = state ("open"/"close")

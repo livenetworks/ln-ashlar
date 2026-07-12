@@ -83,12 +83,12 @@ is untouched — re-open is impossible by construction.
    data-ln-fill-form="user-form"
    data-ln-fill-name="Ada Lovelace">Edit Ada</a>
 
-<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
+<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
     <form id="user-form" data-ln-form>
         <input name="name">
         …
     </form>
-</div>
+</dialog>
 ```
 
 - The `<a>` anchor is both the trigger and the fill source.

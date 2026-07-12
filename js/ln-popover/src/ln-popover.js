@@ -1,4 +1,4 @@
-import { dispatch, dispatchCancelable, computePlacement, teleportToBody, measureHidden, isVisible, registerComponent } from '../../ln-core';
+import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisible, registerComponent } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-popover';
@@ -37,7 +37,6 @@ import { dispatch, dispatchCancelable, computePlacement, teleportToBody, measure
 		this.dom = dom;
 		this.isOpen = dom.getAttribute(DOM_SELECTOR) === 'open';
 		this.trigger = null;
-		this._teleportRestore = null;
 		this._previousFocus = null;
 		this._boundDocClick = null;
 		this._docClickTimeout = null;
@@ -50,6 +49,11 @@ import { dispatch, dispatchCancelable, computePlacement, teleportToBody, measure
 		}
 		if (!dom.hasAttribute('role')) {
 			dom.setAttribute('role', 'dialog');
+		}
+		// Popover API gives no implicit ARIA role and no focus management —
+		// unlike <dialog>, everything above/below this line stays manual.
+		if (!dom.hasAttribute('popover')) {
+			dom.setAttribute('popover', 'manual');
 		}
 
 		// If the markup says open at boot, sync immediately.
@@ -86,9 +90,9 @@ import { dispatch, dispatchCancelable, computePlacement, teleportToBody, measure
 		if (trigger) this.trigger = trigger;
 		this._previousFocus = document.activeElement;
 
-		// Teleport into <body> so position:fixed coordinates are reliable
-		// regardless of any ancestor with `transform` or `contain`.
-		this._teleportRestore = teleportToBody(this.dom);
+		// Promote to the top layer so position:fixed coordinates are reliable
+		// regardless of any ancestor with `transform`, `contain`, or `overflow: hidden`.
+		if (typeof this.dom.showPopover === 'function') this.dom.showPopover();
 
 		// Measure (works even though it just got `display: block` by the
 		// attribute switch — measureHidden is safe either way).
@@ -180,10 +184,9 @@ import { dispatch, dispatchCancelable, computePlacement, teleportToBody, measure
 			this.trigger.setAttribute('aria-expanded', 'false');
 		}
 
-		// Restore teleport.
-		if (this._teleportRestore) {
-			this._teleportRestore();
-			this._teleportRestore = null;
+		// Exit the top layer.
+		if (typeof this.dom.hidePopover === 'function' && this.dom.matches(':popover-open')) {
+			this.dom.hidePopover();
 		}
 
 		// Remove from open stack.

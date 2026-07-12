@@ -257,7 +257,7 @@
 				</nav>
 
 				<!-- Large Modal -->
-				<div class="ln-modal" data-ln-modal id="demo-large">
+				<dialog class="ln-modal" data-ln-modal id="demo-large">
 					<form>
 						<header>
 							<h3>Large Modal</h3>
@@ -280,10 +280,10 @@
 							<button type="button" data-ln-modal-close>Close</button>
 						</footer>
 					</form>
-				</div>
+				</dialog>
 
 				<!-- Tall Content (scroll test) -->
-				<div class="ln-modal" data-ln-modal id="demo-tall">
+				<dialog class="ln-modal" data-ln-modal id="demo-tall">
 					<form>
 						<header>
 							<h3>Tall Content — Scroll Test</h3>
@@ -353,7 +353,7 @@
 							<button type="submit">Save</button>
 						</footer>
 					</form>
-				</div>
+				</dialog>
 			</main>
 			<script type="text/plain" data-demo-scss>
 			// Main Modal structure
@@ -381,7 +381,7 @@
 					<button data-ln-modal-for="demo-destructive" class="btn">Delete Membership</button>
 				</nav>
 
-				<div class="ln-modal" data-ln-modal id="demo-destructive">
+				<dialog class="ln-modal" data-ln-modal id="demo-destructive">
 					<form>
 						<header>
 							<h3>Delete membership record</h3>
@@ -395,7 +395,7 @@
 							<button type="submit">Delete</button>
 						</footer>
 					</form>
-				</div>
+				</dialog>
 			</main>
 			<script type="text/plain" data-demo-scss>
 			// Destruction confirmation modal variant
@@ -509,7 +509,7 @@
 		</section>
 
 		<!-- Hash-bound modal (id IS the hash namespace; id="demo-hash-modal" → namespace "demo-hash-modal") -->
-		<div class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-hash-modal">
+		<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-hash-modal">
 			<form id="demo-hash-form" data-ln-form>
 				<header>
 					<h3 data-ln-fillable>
@@ -531,7 +531,7 @@
 					<button type="submit">Save</button>
 				</footer>
 			</form>
-		</div>
+		</dialog>
 
 		<script>
 		(function () {
@@ -615,7 +615,7 @@ document.addEventListener('ln-modal:close', function(e) {
 		</section>
 
 		<!-- Events demo modal -->
-		<div class="ln-modal" data-ln-modal id="demo-events">
+		<dialog class="ln-modal" data-ln-modal id="demo-events">
 			<form>
 				<header>
 					<h3>Events Demo</h3>
@@ -628,7 +628,7 @@ document.addEventListener('ln-modal:close', function(e) {
 					<button type="button" data-ln-modal-close>Close</button>
 				</footer>
 			</form>
-		</div>
+		</dialog>
 
 <script>
 	(function () {
@@ -667,7 +667,7 @@ document.addEventListener('ln-modal:close', function(e) {
 	</div><!-- /.app-wrapper -->
 
 	<!-- Modals (outside app-wrapper) -->
-	<div class="ln-modal" data-ln-modal id="demo-basic">
+	<dialog class="ln-modal" data-ln-modal id="demo-basic">
 		<form>
 			<header>
 				<h3>Basic Modal</h3>
@@ -681,9 +681,9 @@ document.addEventListener('ln-modal:close', function(e) {
 				<button type="button" data-ln-modal-close>Close</button>
 			</footer>
 		</form>
-	</div>
+	</dialog>
 
-	<div class="ln-modal" data-ln-modal id="demo-form">
+	<dialog class="ln-modal" data-ln-modal id="demo-form">
 		<form id="demo-form-el" data-ln-form>
 			<header>
 				<span class="icon">
@@ -722,7 +722,7 @@ document.addEventListener('ln-modal:close', function(e) {
 				<button type="submit">Save</button>
 			</footer>
 		</form>
-	</div>
+	</dialog>
 
 	<script>
 	(function () {

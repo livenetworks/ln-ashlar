@@ -2,5 +2,5 @@ export { cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, reque
 export { reactiveState, deepReactive, createBatcher } from './reactive.js';
 export { persistGet, persistSet, persistRemove, persistClear } from './persist.js';
 export { hashParse, hashGet, hashSet, hashLinkClick } from './hash.js';
-export { computePlacement, teleportToBody, measureHidden } from './positioning.js';
+export { computePlacement, measureHidden } from './positioning.js';
 export { setCryptoKey, getCryptoKey, encryptData, decryptData } from './crypto.js';

@@ -73,7 +73,7 @@ The HTML structure is authored, complete, and semantic. JavaScript never dynamic
 The same HTML structure is used whether pages are server-rendered (e.g., Laravel Blade templates) or data-driven. The structure remains identical; only the data-binding source differs. This ensures zero hydration mismatch and progressive enhancement out of the box.
 
 ### 3. Behavior Is Attached, Not Owned
-Components are self-initializing IIFE modules that attach behavior via `data-ln-*` attributes. They monitor changes using `MutationObserver` and communicate globally via `CustomEvent` flows addressed by target element IDs. Components are completely decoupled from their position in the DOM tree, ensuring they are teleport-safe.
+Components are self-initializing IIFE modules that attach behavior via `data-ln-*` attributes. They monitor changes using `MutationObserver` and communicate globally via `CustomEvent` flows addressed by target element IDs. Components are completely decoupled from their position in the DOM tree, so behavior never depends on where an element happens to live in the markup.
 
 ### 4. CSS Owns All Presentation and State
 JavaScript toggles state classes (`.ln-state-name`) or semantic attributes, while CSS manages visual changes. JavaScript must never write inline styles for visual states. `data-ln-*` attributes are strictly for behavioral configuration, not CSS selection.
