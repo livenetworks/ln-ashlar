@@ -14,7 +14,7 @@
 | :--- | :--- | :--- | :--- |
 | **1. Никој** | — | Нативен browser submit кон `action` (+ `_method` за method spoofing), сервер враќа HTML одговор. | SSR страници (Laravel Blade и слично) — форма без никаков опт-ин атрибут. |
 | **2. `ln-ajax`** | Контејнер со `data-ln-ajax` | `fetch()` кон `action`, страницата останува иста, серверот враќа структуриран JSON (`title`/`content`/`message`). | SSR + progressive enhancement — сакаш да избегнеш целосно превчитување, но серверот сепак е тој што ја компајлира HTML содржината. |
-| **3. `data-ln-form-scope`** | Најблискиот предок `[data-ln-data-coordinator]` (или именуван, преку вредноста на атрибутот) | Формата се сериjaлизира сурово и се дистачира `ln-form:submit-record`; координаторот го презема и го рутира низ **store → queue → connector** write pipeline-от. | Local-first / SPA страници — податоците живеат прво во IndexedDB, серверот е конечна дестинација, не единствен извор. |
+| **3. `data-ln-form-scope`** | Најблискиот предок `[data-ln-data-coordinator]` (или именуван, преку вредноста на атрибутот) | Валиден submit останува нативен; координаторот го презема преку native submit + `preventDefault()`, самиот ја сериjaлизира формата и го рутира низ **store → queue → connector** write pipeline-от. | Local-first / SPA страници — податоците живеат прво во IndexedDB, серверот е конечна дестинација, не единствен извор. |
 
 **Правило на предност:** `data-ln-form-scope` победува секогаш. `ln-ajax` активно ги прескокнува ваквите форми (со еднократен `console.warn`). Формата не може истовремено да биде и ајакс и scoped — тоа е противречност во намера, не поддржана комбинација.
 
@@ -28,11 +28,11 @@
 
 | Слој | Одговорност | НЕ прави |
 | :--- | :--- | :--- |
-| **Форма** (`ln-form` + `data-ln-form-scope`) | **Извор на вистина за мутацискиот endpoint.** HTML `action` атрибутот е канонски — истиот што би се употребил за нативен submit без JS (HTML-first). Само нормализира (сурово JSON, без интерпретација) и диспачира. | Не одредува create/update режим, не вади `id`/`expected_version`, не праќа мрежен повик. |
+| **Форма** (`ln-form` + `data-ln-form-scope`) | **Извор на вистина за мутацискиот endpoint.** HTML `action` атрибутот е канонски — истиот што би се употребил за нативен submit без JS (HTML-first). Само гејтира валидност (`preventDefault` единствено при invalid); никогаш не серијализира и никогаш не диспачира custom настан. | Не одредува create/update режим, не вади `id`/`expected_version`, не праќа мрежен повик. |
 | **Store** (`ln-data-store`) | Оптимистички кеш во IndexedDB. Веднаш го запишува рекордот локално (UI-видливо мигновено), потоа сигнализира дека треба remote синхронизација. | Не знае за HTTP, не знае за форми, storage-blind. |
 | **Queue** (`ln-api-queue`, опционален) | Редослед и персистенција на пратките (FIFO по chain key), temp-id remap, retry/backoff. Опстојува низ рестарт на табот (drain-on-init). | **Никогаш не праќа сама** — само сигнализира кога е ред некој запис да замине (`ln-api-queue:send`), а извршувањето е туѓа работа. |
 | **Connector** (`ln-api-connector` / `ln-couchdb-connector`) | Единствениот извршител на вистински HTTP/мрежен повик. Прима `:request-*` настан со `url`/`meta`, прави `fetch()`, го echo-ира `meta` назад на одговорот. | Не знае за store, queue, ниту за форма — чист транспортен драјвер. |
-| **Координатор** (`ln-data-coordinator`) | Лепило меѓу горните — **само настани**, никогаш директни методски повици кон конекторот. Го толкува `ln-form:submit-record` (и своите сопствени `ln-data-coordinator:request-*` настани) и **паралелно** го праќа записот и кон store-от и кон queue/connector-от од истиот синхрон handler (fan-out) — нема повеќе correlation мапи. Одговорите ги толкува назад како обични `ln-store:request-update`/`request-delete` настани (id-swap за create), никогаш преку `confirmMutation`/`revertMutation`/`resolveConflict` (отстранети). | Не серијализира форма, не гради HTTP барања сам, не одлучува транспорт. |
+| **Координатор** (`ln-data-coordinator`) | Лепило меѓу горните — **само настани**, никогаш директни методски повици кон конекторот. Го презема native submit-от (`preventDefault`) и го толкува (и своите сопствени `ln-data-coordinator:request-*` настани) и **паралелно** го праќа записот и кон store-от и кон queue/connector-от од истиот синхрон handler (fan-out) — нема повеќе correlation мапи. Одговорите ги толкува назад како обични `ln-store:request-update`/`request-delete` настани (id-swap за create), никогаш преку `confirmMutation`/`revertMutation`/`resolveConflict` (отстранети). | Не серијализира форма, не гради HTTP барања сам, не одлучува транспорт. |
 
 ---
 
@@ -41,18 +41,18 @@
 Целосен маркап за local-first CRUD страница со табела, модал за create/edit, и офлајн queue:
 
 ```html
-<section data-ln-data-coordinator="documents" class="crud-page">
+<section class="crud-page">
 
 	<!-- Data слој (headless деца — невидливи, само конфигурација) -->
-	<div data-ln-data-store="documents" data-ln-store-indexes="status,updated_at"></div>
-
-	<!-- path = само read/sync fallback; мутацискиот URL доаѓа од формата -->
-	<div data-ln-api-connector="documents"
-	     data-ln-api-base-url=""
-	     data-ln-api-path="/documents"></div>
-
-	<!-- Офлајн outbox (опционално) -->
-	<div data-ln-api-queue="documents"></div>
+	<ul data-ln-data-coordinator="documents" hidden>
+		<li data-ln-data-store="documents" data-ln-store-indexes="status,updated_at"></li>
+		<!-- path = само read/sync fallback; мутацискиот URL доаѓа од формата -->
+		<li data-ln-api-connector="documents"
+		    data-ln-api-base-url=""
+		    data-ln-api-path="/documents"></li>
+		<!-- Офлајн outbox (опционално) -->
+		<li data-ln-api-queue="documents"></li>
+	</ul>
 
 	<!-- Render слој -->
 	<header class="page-header">
@@ -93,11 +93,11 @@
 		</tr>
 	</template>
 
-	<!-- Модал-форма: остана DOM потомок на координаторот (containment) -->
+	<!-- Модал-форма: го користи соодветниот именуван scope -->
 	<dialog data-ln-modal="document-edit">
 		<form id="document-form"
 		      data-ln-form
-		      data-ln-form-scope
+		      data-ln-form-scope="documents"
 		      method="post"
 		      action="/documents"
 		      data-ln-form-action-edit>
@@ -138,8 +138,8 @@
 
 1. Корисникот го отвора модалот преку „Нов документ" (форма е во create облик — нема `id`, `_method` е празно).
 2. Пополнува „Наслов" и „Статус", кликнува „Зачувај".
-3. `ln-form._onSubmit`: ефективен метод = `POST` (нема `_method` вредност) → gate поминува. `preventDefault()`, `serializeForm()`, диспачира `ln-form:submit-record { scope: null, action: '/documents', method: 'POST', data: { title, status }, claimed: false }`.
-4. `ln-data-coordinator` (containment match) → `detail.claimed = true` → `_handleSubmitRecord`: `method === 'POST'` → повикува `_fanOutCreate(children, data, action)`. Координаторот сам го генерира `tempId`-от (`'_temp_' + crypto.randomUUID()`) — нема повеќе `WeakMap` за паметење на `action`, тој едноставно патува како аргумент.
+3. `ln-form._onSubmit`: ефективен метод = `POST` (нема `_method` вредност) → validation gate поминува (нема невалидни полиња) → `ln-form` не прави ништо повеќе, submit-от продолжува нативно.
+4. `ln-data-coordinator` слуша native `submit` на `document` (bubble фаза): `e.defaultPrevented` е `false` (гејтот поминал) → containment match → сам го чита ефективниот метод (`POST`) → `preventDefault()` (ова е преземањето) → `serializeForm()` → `_handleSubmitRecord`: `method === 'POST'` → повикува `_fanOutCreate(children, data, action)`. Координаторот сам го генерира `tempId`-от (`'_temp_' + crypto.randomUUID()`) — нема повеќе `WeakMap` за паметење на `action`, тој едноставно патува како аргумент.
 5. `_fanOutCreate` **паралелно**, од истиот синхрон повик: (a) `dispatch(storeEl, 'ln-store:request-create', { tempId, data })` → `ln-data-store` веднаш го запишува оптимистички во IndexedDB (UI-видливо мигновено — табелата се освежува преку `ln-store:created`); (b) ако **има** queue: `dispatch(queueEl, 'ln-api-queue:request-enqueue', { chainKey: tempId, op: 'create', payload: egress(data), meta: { tempId, action } })`. И двете гранки се независни — локалниот запис не чека на мрежниот исход.
 6. Queue-от подоцна сам одлучува кога е ред и диспачира `ln-api-queue:send`. Координаторовиот `queueSend` слушател: чита `meta.action`, диспачира `ln-api-connector:request-create { data: payload, url: action, meta: { entryId, queued: true, op: 'create', tempId } }`.
 7. Конекторот прави `POST` кон `buildUrl(baseUrl, url)` (не `data-ln-api-path` — `url` победува). При успех: серверот одговара со `{ message, content }` обвивка (види §7 подолу); конекторот ја „одмотува" во `dispatch(connectorEl, 'ln-api-connector:created', { record: content, message, meta })`.
@@ -192,10 +192,10 @@ sequenceDiagram
     participant API as Backend
 
     User->>Form: submit (edit модал, пополнет преку lnFill)
-    Form->>Form: методски gate: _method="PUT" → преминува
-    Form->>Form: preventDefault() + serializeForm() (сурово)
-    Form->>Coord: ln-form:submit-record { scope, action:'/documents', method:'PUT', data, claimed:false } (document ниво)
-    Coord->>Coord: detail.claimed = true (синхроно)
+    Form->>Form: validation gate: сите полиња валидни → нема preventDefault
+    Form-->>Coord: native submit bubbles (unclaimed by ln-form gate) (document ниво)
+    Coord->>Coord: методски read: _method="PUT" → preventDefault() — claim
+    Coord->>Coord: serializeForm() (сурово)
     Coord->>Coord: _handleSubmitRecord: PUT → вади id/expected_version → _fanOutUpdate(children, id, data, expected_version, action)
     par Локално (секогаш)
         Coord->>Store: ln-store:request-update { id, data }
@@ -235,7 +235,7 @@ sequenceDiagram
 | Грешка | Симптом | Решение |
 | :--- | :--- | :--- |
 | Scoped форма без `method="post"` | Нема пресретнување воопшто — нативен GET submit, полето `data` во query стрингот, страницата се превчитува. Гласен симптом (навигацијата е очигледна), не тивок бug. | Секогаш експлицитен `method="post"` на секоја форма со `data-ln-form-scope` — задолжително и за no-JS резервата. |
-| Погрешно име во `data-ln-form-scope` | `console.warn('[ln-form] ln-form:submit-record was not claimed...')` — записот никогаш не стигнува до координаторот. | Проверете дека вредноста на `data-ln-form-scope="име"` точно се совпаѓа со вредноста на `data-ln-data-coordinator="име"`, или отстранете ја вредноста (празно) за containment-базирано совпаѓање. |
+| Погрешно име во `data-ln-form-scope` | Нема console warning — записот никогаш не стигнува до координаторот, native submit-от поминува непреземено (progressive-enhancement fallback). | Проверете дека вредноста на `data-ln-form-scope="име"` точно се совпаѓа со вредноста на `data-ln-data-coordinator="име"`, или отстранете ја вредноста (празно) за containment-базирано совпаѓање. |
 | Form `action` и connector `data-ln-api-path` покажуваат кон различен ресурс | Delta sync (`fetchDelta` преку `data-ln-api-path`) никогаш не ги гледа записите создадени/изменети преку формата — двата патишта мора да покажуваат кон истиот ресурс, инаку идниот `sync` не ги препознава сопствените write-ови. | Усогласете ги: `data-ln-api-path="/documents"` и формината `action="/documents"` мора да упатуваат кон истиот ресурс. |
 | Cross-origin base URL + очекувани session колачиња | Конекторот испраќа барања со `credentials: 'same-origin'` (не е конфигурабилно) — колачиња не патуваат кон друг origin, авторизацијата тивко пропаѓа. | Види [`ln-api-connector.md`](./components/ln-api-connector.md) §5 „Честа грешка 3" — користете Backend Proxy Gateway на сопствениот origin наместо директен cross-origin `data-ln-api-base-url`. |
 | `data-ln-table-row-action` + `data-ln-modal-for` на исто копче | Кликот не го отвора модалот — `ln-table` прави `e.stopPropagation()` на tbody ниво, па document-ниво слушателите на `ln-modal` и `ln-fill` никогаш не го гледаат кликот. | Едно копче = еден механизам. `row-action` е за page-wired акции (пр. delete); за отворање модал + fill користи `data-ln-modal-for` + `data-ln-fill-*` без `row-action`. |

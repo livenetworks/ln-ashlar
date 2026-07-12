@@ -8,7 +8,7 @@
 
 ## Role Summary
 
-- Listens on its subtree (`this.dom`) for `ln-data-coordinator:request-create/update/delete/bulk-delete` (and `ln-form:submit-record` on `document`) → fans out in parallel to the local store AND the remote connector/queue. Listens for `ln-store:request-remote-sync` → delegates to the child connector. See [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) for the full write pipeline (this document covers the VIEW-BINDING role only).
+- Listens on its subtree (`this.dom`) for `ln-data-coordinator:request-create/update/delete/bulk-delete` (and the native `submit` event on `document`, bubble phase, claimed via `preventDefault()`) → fans out in parallel to the local store AND the remote connector/queue. Listens for `ln-store:request-remote-sync` → delegates to the child connector. See [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) for the full write pipeline (this document covers the VIEW-BINDING role only).
 - Listens on `document` for view-binding request events → resolves its own child store → delivers data back to the requesting element.
 - Listens on its subtree for store-change events → refreshes all bound view elements automatically.
 

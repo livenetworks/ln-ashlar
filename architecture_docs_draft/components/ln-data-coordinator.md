@@ -7,7 +7,7 @@
 ## 1. Заднинско дејство и одговорност
 
 - **Краток опис:**
-  `ln-data-coordinator` е централниот координатор дефиниран во модулот [`js/ln-data-coordinator/src/ln-data-coordinator.js`](../../js/ln-data-coordinator/src/ln-data-coordinator.js) задужен за оркестрирање на податочниот слој (Local-First Architecture). Тој нема сопствено локално складиште и не иницира мрежни повици независно; неговата одговорност е **да ги набљудува, поврзува и оркестрира податочните слоеви во сопствениот DOM подграф** (`ln-data-store`, `ln-api-connector` / `ln-couchdb-connector` / `ln-websocket-connector` / `ln-rest-connector`, `ln-api-queue`) и да опслужува view компоненти кои можат да бидат било каде во документот (на пр. `ln-table`, `ln-list`, `ln-stat`, `ln-options`), слушајќи ги нивните барања на document ниво. На `document` ниво слуша и `ln-form:submit-record` — декларативниот write-влез од scoped форми (`data-ln-form-scope`), кои можат исто така да бидат било каде во DOM-от (види §3).
+  `ln-data-coordinator` е централниот координатор дефиниран во модулот [`js/ln-data-coordinator/src/ln-data-coordinator.js`](../../js/ln-data-coordinator/src/ln-data-coordinator.js) задужен за оркестрирање на податочниот слој (Local-First Architecture). Тој нема сопствено локално складиште и не иницира мрежни повици независно; неговата одговорност е **да ги набљудува, поврзува и оркестрира податочните слоеви во сопствениот DOM подграф** (`ln-data-store`, `ln-api-connector` / `ln-couchdb-connector` / `ln-websocket-connector` / `ln-rest-connector`, `ln-api-queue`) и да опслужува view компоненти кои можат да бидат било каде во документот (на пр. `ln-table`, `ln-list`, `ln-stat`, `ln-options`), слушајќи ги нивните барања на document ниво. На `document` ниво слуша и native `submit` (bubble фаза, преземено преку `preventDefault()`) — декларативниот write-влез од scoped форми (`data-ln-form-scope`), кои можат исто така да бидат било каде во DOM-от (види §3).
 
 - **Ортогоналност (Што компонентата НЕ прави):**
   - **НЕ складира податоци во меморија или IndexedDB:** За зачувување на податоците е одговорен `ln-data-store`.
@@ -20,16 +20,16 @@
 
 ### Базен HTML Маркап (Local-First Data Subtree)
 ```html
-<div data-ln-data-coordinator="users" id="users-coordinator">
+<ul data-ln-data-coordinator="users" id="users-coordinator" hidden>
     <!-- Локална база (IndexedDB) -->
-    <div data-ln-data-store="users" id="users-store"></div>
+    <li data-ln-data-store="users" id="users-store"></li>
     
     <!-- Мрежен транспорт (REST API) -->
-    <div data-ln-api-connector="/api/users" id="users-connector"></div>
+    <li data-ln-api-connector="/api/users" id="users-connector"></li>
     
     <!-- Офлајн редица (опционално) -->
-    <div data-ln-api-queue id="users-queue"></div>
-</div>
+    <li data-ln-api-queue id="users-queue"></li>
+</ul>
 ```
 
 ### Варијанти на употреба
@@ -37,10 +37,10 @@
 #### Пример 1: Обичен Податочен Координатор
 Оркестрира автоматска синхронизација меѓу IndexedDB складиштето и REST API конекторот:
 ```html
-<div data-ln-data-coordinator="products">
-    <div data-ln-data-store="products"></div>
-    <div data-ln-api-connector="/api/v1/products"></div>
-</div>
+<ul data-ln-data-coordinator="products" hidden>
+    <li data-ln-data-store="products"></li>
+    <li data-ln-api-connector="/api/v1/products"></li>
+</ul>
 ```
 
 #### Пример 2: Поврзување со надворешни View компоненти
@@ -48,10 +48,10 @@ View компонентите (како `ln-table`, `ln-list`, `ln-stat`) мож
 
 ```html
 <!-- Data Layer: Координатор -->
-<div data-ln-data-coordinator="users">
-    <div data-ln-data-store="users"></div>
-    <div data-ln-api-connector="/api/users"></div>
-</div>
+<ul data-ln-data-coordinator="users" hidden>
+    <li data-ln-data-store="users"></li>
+    <li data-ln-api-connector="/api/users"></li>
+</ul>
 
 <!-- View Layer: Компоненти кои го конзумираат "users" складиштето -->
 <label class="search">
@@ -91,11 +91,11 @@ View компонентите (како `ln-table`, `ln-list`, `ln-stat`) мож
 #### Примени настани (Слуша од децата и од document ниво)
 - `ln-store:initialized` — Иницијализација на складиштето (ако кешот е празен или застарен, прави `forceSync`).
 - `ln-store:request-remote-sync` — Барање за delta sync кон серверот (единствениот преостанат `request-remote-*` настан; `create`/`update`/`delete`/`bulk-delete` варијантите се избришани во wave-1 — заменети со `ln-data-coordinator:request-*` intake настани, види подолу).
-- `ln-data-coordinator:request-create` `{ data, action }` / `:request-update` `{ id, data, expected_version, action }` / `:request-delete` `{ id }` / `:request-bulk-delete` `{ ids }` — **(на `this.dom`)** Јавни intake настани за паралелен fan-out (локален store запис + оддалечен connector/queue повик во ист синхрон handler). Алтернатива на `ln-form:submit-record` за не-форма извори (пр. row-action копче во табела).
+- `ln-data-coordinator:request-create` `{ data, action }` / `:request-update` `{ id, data, expected_version, action }` / `:request-delete` `{ id }` / `:request-bulk-delete` `{ ids }` — **(на `this.dom`)** Јавни intake настани за паралелен fan-out (локален store запис + оддалечен connector/queue повик во ист синхрон handler). Алтернатива на native-submit intake-от за не-форма извори (пр. row-action копче во табела).
 - `ln-store:ready` / `loaded` / `created` / `updated` / `deleted` / `synced` — Тригери за освежување на view компонентите (за `synced` само ако `detail.changed` е true).
 - `ln-api-queue:send` — Извршување на барање од офлајн редицата.
 - `ln-table:request-data`, `ln-list:request-data`, `ln-options:request-data`, `ln-stat:request-count` — Барања од view компоненти (на ниво на `document`). Се совпаѓаат преку атрибути како `data-ln-table-store`.
-- `ln-form:submit-record` — **(document ниво)** Декларативен write-влез од scoped форми (`data-ln-form-scope`). Види „Form Write Intake" подолу.
+- native `submit` (document ниво, bubble фаза, преземено преку `preventDefault()`) — Декларативен write-влез од scoped форми (`data-ln-form-scope`). Види „Form Write Intake" подолу.
 - `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` (исто и под `ln-couchdb-connector:*` namespace) — Одговори од конекторот на претходно испратени `:request-*` барања (види „Транспортна врска" подолу).
 
 #### Диспачирани настани
@@ -109,33 +109,41 @@ View компонентите (како `ln-table`, `ln-list`, `ln-stat`) мож
 
 ---
 
-### Form Write Intake (`ln-form:submit-record`)
+### Form Write Intake (native `submit`, преземен преку `preventDefault()`)
 
-Координаторот слуша `ln-form:submit-record` на `document` ниво (бидејќи scoped форми можат да живеат било каде во DOM-от, надвор од сопствениот подграф). Настанот го презема (claim) доколку важи еден од двата услова:
+Координаторот слуша native `submit` на `document` ниво (bubble фаза — никогаш capture, за validation gate-от на `ln-form` секогаш прво да заврши). На секој submit што минува преку bubble:
 
-* `detail.scope === this._name` (именуван override), **или**
-* `detail.scope` е празно И `detail.form.closest('[data-ln-data-coordinator]') === this.dom` (containment — формата е DOM потомок на овој координатор).
-
-При преземање, координаторот **синхроно** поставува `detail.claimed = true` (истиот dispatch циклус — `ln-form` веднаш по враќање од `dispatch()` го чита овој флаг). Потоа литерално ги толкува `detail.method` / `detail.data`, без fallback:
-
-| `detail.method` | Дејство |
-| :--- | :--- |
-| `POST` | `id`/`expected_version` се вадат од `data` (и се бришат од проследениот payload); `action`-от се памети во `WeakMap` клучуван по референцата на `data` објектот; се диспачира `ln-store:request-create { data }`. |
-| `PUT` / `PATCH` | `id`/`expected_version` се вадат од `data`; `action`-от се памети во `Map` клучуван по `id`; се диспачира `ln-store:request-update { id, data, expected_version }`. |
-| Било кој друг (пр. `GET`) | **Игнорира се — нема дејство.** (Во пракса `ln-form` никогаш не диспачира `ln-form:submit-record` со друг метод — методскиот gate е нејзина одговорност, види [`ln-form.md`](./ln-form.md) §3.) |
+1. `if (e.defaultPrevented) return` — или `ln-form`-от го блокирал невалидниот submit, или веќе постои друг координатор што го презел.
+2. Го чита `data-ln-form-scope` од `e.target` (формата). Отсутен → формата никогаш не се пријавила; native submit-от продолжува непроменето.
+3. Го презема доколку важи еден од двата услова: `detail.scope === this._name` (именуван override), **или** scope е празно И формата е DOM потомок на овој координатор (containment) — идентични правила како порано.
+4. Сам го чита ефективниот метод (hidden `_method` input ако присутен и непразен, инаку `form.method`) — литерално читање, без fallback, идентично со гејтот на `ln-form`.
+5. Метод различен од `POST`/`PUT`/`PATCH` се остава непроменет — native submit-от продолжува (пр. `GET` форма за пребарување вгнездена во координаторот).
+6. Дури сега повикува `e.preventDefault()` — ова Е преземањето, нема посебен `claimed` флаг.
+7. Сам ја серијализира формата (`serializeForm`, отстранувајќи `_method`/`_token`) и го толкува суровиот `{ action, method, data }` идентично како порано: `id`/`expected_version` се вадат од `data`, `action`-от (моменталниот HTML `action` атрибут, `form.getAttribute('action')`) патува директно како аргумент до fan-out повикот — нема повеќе `WeakMap`/`Map` книговодство.
 
 Ако форма е преземена, но подграфот на координаторот нема `[data-ln-data-store]` дете, се испишува `console.warn` и настанот не произведува дејство.
 
-Запаметениот `action` (формата на ресурсот, HTML `action` атрибутот — единствен извор на вистина за мутацискиот endpoint) подоцна се прикачува како `url` во барањето кон конекторот, откако мутацијата ќе стигне таму (директно или преку queue, каде патува во опаque-то поле `meta.action` на queue записот).
+**Непреземени scoped форми** (погрешно име на scope, или не се содржани во никаков координатор) поминуваат како обичен native submit — нема console warning, нема тивко JS пресретнување. Ова е progressive-enhancement fallback-от.
 
 ---
 
 ## 4. CSS Стилизирање и Поведенски Концепт
 
-- `ln-data-coordinator` е чист логички координатор кој НЕ инјектира и НЕ бара специфични CSS класи за сопствениот DOM обвивач.
-- **Транспортна врска = исклучиво настани, не методи.** Кон конекторот (`data-ln-api-connector` / `ln-couchdb-connector` / итн.) координаторот **никогаш** не повикува JS методи (`connector.create()`, `connector.update()`...) — секое барање е `dispatch()` на `ln-api-connector:request-*` настан, а секој одговор се консумира преку `ln-api-connector:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` / `:fetched` (генерализирано и под `ln-couchdb-connector:*` namespace). Ова прави го конекторот заменлив — секој елемент што го зборува истиот евент вокабулар може да биде транспорт.
-- Кон **складиштето** (`ln-data-store`), мутациите ТИЕ ИСТО патуваат исклучиво преку настани (`ln-store:request-create/update/delete/bulk-delete`) — нема директни повици на методи за мутација. Останатите директни повици на `store.*` се резервирани за READ и sync операции кои не се дел од мутацискиот договор: `store.getAll()`/`store.count()` (читање за view-компоненти), `store.applySync()` (примена на delta sync резултат) и `store.forceSync()` (иницирање на sync). Методите `confirmMutation`, `revertMutation`, `resolveConflict` и `getById` (pre-egress) се ИЗБРИШАНИ во wave-1 рефакторот — веќе не постојат.
-- Корелација без Promise: секое `:request-*` барање кон конекторот носи opaque `meta` поле (содржи `entryId`, `queued: true/false`, `op`, и `tempId`/`id`/`bulkKey` зависно од операцијата); одговорот го echo-ира истото `meta` непроменето. `meta.queued` разликува дали одговорот треба да заврши со `ack`/`nack` кон редицата (queue-присутен пат) или со обична `ln-store:request-update`/`request-delete` реконсилијација (queue-отсутен пат — id-swap за create, server-wins за 409 update).
+### SCSS Миксини & Класи
+- **Невизуелен елемент:** Бидејќи `ln-data-coordinator` е исклучиво логички (headless) координатор со `hidden` атрибут во DOM, тој **нема визуелен слој и нема никаков соодветен SCSS или CSS стил**.
+
+### Поведенски Концепти
+
+- **Комуникација базирана на настани (Event-Driven Architecture):**
+  Координаторот не повикува директно JavaScript методи на складиштата или конекторите. Сите мутации на податоци се одвиваат преку стандардни DOM настани:
+  - **Кон конекторот:** Мутациите патуваат како `ln-api-connector:request-*` настани, а конекторот враќа соодветни `:created`, `:updated`, `:deleted` одговори. Ова го прави транспортот лесно заменлив (REST API, CouchDB, WebSockets итн.).
+  - **Кон складиштето (IndexedDB):** Мутациите се праќаат преку `ln-store:request-*` настани. Директните повици кон `store` објектот се користат само за не-мутациски операции (пр. `store.getAll()`, `store.count()`).
+
+- **Асинхрона корелација без Promise:**
+  Наместо Promise објекти, координаторот користи **корелација преку метаподатоци (`meta`)**:
+  - Секое `:request-*` барање кон конекторот содржи `meta` поле (со `tempId`, `entryId`, `op`).
+  - Конекторот го враќа истиот `meta` објект непроменет во својот одговор.
+  - Ова му овозможува на координаторот да ја поврзе реакцијата со соодветното локално барање (на пр. за замена на локален `tempId` со серверскиот ID во складиштето или за `ack`/`nack` сигналот кон офлајн редицата).
 
 ### Вградени Политики на Однесување (Behaviors)
 - **Иницијална Синхронизација:** Координаторот извршува `forceSync` доколку при `ln-store:initialized` кешот е празен ИЛИ застарен.
@@ -182,8 +190,9 @@ sequenceDiagram
 
     Note over Dev, Conn: Сценарио: Form Write Intake → Паралелен Fan-Out
     Dev->>Form: submit (data-ln-form-scope, method effektivno POST)
-    Form->>Coord: Event: ln-form:submit-record { scope, action, method:'POST', data, claimed:false } (document ниво)
-    Coord->>Coord: detail.claimed = true (синхроно)
+    Form-->>Coord: native submit bubbles (unclaimed by ln-form gate)
+    Coord->>Coord: preventDefault() — claim
+    Coord->>Coord: serializeForm() + resolveFormMethod()
     par Локален запис (веднаш, оптимистички)
         Coord->>Store: Event: ln-store:request-create { tempId, data }
         Store->>Store: IndexedDB put (нема _pending маркер — _temp_ префикс на id е единствениот сигнал)
@@ -209,4 +218,4 @@ sequenceDiagram
 - [`ln-list.md`](./ln-list.md) — View компонента за листи; истиот договор како табелата (`ln-list:*`).
 - [`ln-search.md`](./ln-search.md) — Влез за пребарување поврзан со табела; параметрите за пребарување патуваат во `request-data` барањата.
 - [`ln-filter.md`](./ln-filter.md) — Компонента за филтрирање која испраќа барања до податочниот координатор.
-- [`ln-form.md`](./ln-form.md) — Извор на `ln-form:submit-record` за scoped форми (`data-ln-form-scope`); координаторот е приемникот што го толкува суровиот payload и го рутира низ write pipeline-от.
+- [`ln-form.md`](./ln-form.md) — Гејтира валидност на scoped форми (`data-ln-form-scope`); координаторот го презема нативниот `submit` (preventDefault), сам го серијализира и го рутира низ write pipeline-от.

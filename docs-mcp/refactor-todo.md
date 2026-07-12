@@ -7,7 +7,7 @@
 
 Погрешно сега / вистина во кодот:
 
-- `ln-form:submit` → реалниот настан е **`ln-form:submit-record`** (`js/ln-form/src/ln-form.js:64`); формата бара claim преку `data-ln-form-scope`, инаку `console.warn`
+- `ln-form:submit` → нема таков настан НИТИ `ln-form:submit-record` (пресудено 2026-07-12 — native-first); валиден submit останува нативен, `ln-data-coordinator` го презема преку native submit + `preventDefault()` на `document`.
 - `_pending: true/false` — НЕ постои; v2 нема pending machinery (ruling 2026-07-09)
 - настан `ln-store:change` (+ source `reconcile`/`revert`) — НЕ постои; реални настани: `ln-store:created` / `updated` / `deleted` / `loaded` / `synced` / `ready` / `initialized`
 - „revert на pre-submit снимка" — реалната error-политика е диференцирана по HTTP статус (`js/ln-data-coordinator/src/ln-data-coordinator.js`, `connError` handler): 401/419 → auth-pause; 5xx/network → retry/queue; 409 update → замена со remote; 4xx create → бришење на локалниот запис; други 4xx → остава локално
@@ -55,7 +55,7 @@
 - линии ~54, 59, 110, 123 (+ mermaid дијаграмот): `_pending: true` машинерија — НЕ постои; store директно запишува (`js/ln-data-store/src/ln-data-store.js:233-257`; README на store-от: „нема `_pending`, нема rollback"). Rekey = id-swap без флег.
 - линија ~43: „reverts" — revert не постои; вистинската error-политика е во точка 1 (диференцирана по HTTP статус).
 - линија ~83: `field_diffs` — нула појави во `js/`; 409 враќа само `remote` (`ln-data-coordinator.js:534`). Да се избрише, или експлицитно да се означи како хипотетичко серверско поле, не системско однесување.
-- Остатокот од документот е проверен и ТОЧЕН (submit-record, scope, `_temp_`, fan-out, `{message,content}` envelope) — поправката е хируршка, не препишување.
+- Остатокот од документот е проверен и ТОЧЕН (native-submit intake, scope, `_temp_`, fan-out, `{message,content}` envelope) — поправката е хируршка, не препишување.
 
 ### 4.2 `guides/getting-started.md` — Option B ветува `dist/` од npm пакетот
 

@@ -664,10 +664,11 @@ For commands that require synchronous feedback or list gathering (such as batch 
             }
         });
 
-        // 2. Local-first write form → coordinator claims it automatically
+        // 2. Local-first write form → ln-data-coordinator claims the native
+        // submit (preventDefault); react to the store outcome instead.
         // <form data-ln-form data-ln-form-scope="profiles" method="post" action="/api/profiles">
-        document.addEventListener('ln-form:submit-record', function (e) {
-            if (e.detail.scope !== 'profiles') return;
+        document.addEventListener('ln-store:created', function (e) {
+            if (e.detail.store !== 'profiles') return;
             document.getElementById('modal-new-profile').setAttribute('data-ln-modal', 'close');
         });
 

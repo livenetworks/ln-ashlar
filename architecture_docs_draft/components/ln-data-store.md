@@ -19,21 +19,22 @@
 Се поставува како невидлив елемент (`display: none;` или `.hidden`) во HTML-от. Може да постојат повеќе складови (табели) на една страница.
 
 ```html
-<!-- Конфигурација на податочен склад за Продукти -->
-<div data-ln-data-store="products" 
-     data-ln-data-store-indexes="status,category" 
-     data-ln-data-store-search-fields="title,description,sku"
-     data-ln-data-store-stale="300"
-     id="products-store"
-     class="hidden">
-</div>
+<!-- Координатор со деца за складирање податоци (производи и корисници) -->
+<ul data-ln-data-coordinator="products" hidden>
+    <li data-ln-data-store="products" 
+        data-ln-data-store-indexes="status,category" 
+        data-ln-data-store-search-fields="title,description,sku"
+        data-ln-data-store-stale="300"
+        id="products-store">
+    </li>
+</ul>
 
-<!-- Втор склад за Корисници -->
-<div data-ln-data-store="users" 
-     data-ln-data-store-search-fields="first_name,last_name,email"
-     id="users-store"
-     class="hidden">
-</div>
+<ul data-ln-data-coordinator="users" hidden>
+    <li data-ln-data-store="users" 
+        data-ln-data-store-search-fields="first_name,last_name,email"
+        id="users-store">
+    </li>
+</ul>
 ```
 
 ---
@@ -92,7 +93,7 @@
 
 ---
 
-## 6. Дијаграм на Текот и Животен Циклус (Оптимистичко Креирање)
+## 6. Дијаграм на Текот и Животен Циклус
 
 ```mermaid
 sequenceDiagram
@@ -101,7 +102,7 @@ sequenceDiagram
     participant Store as ln-data-store (IndexedDB)
     participant Server as Server/API
 
-    UI->>Coord: ln-form:submit-record { method:'POST', data }
+    UI->>Coord: native submit (claimed via preventDefault, then serialized) { method:'POST', data }
     par Локален запис (веднаш)
         Coord->>Store: dispatch ln-store:request-create { tempId, data }
         Store->>Store: IndexedDB put({ id: tempId })
@@ -125,5 +126,5 @@ sequenceDiagram
 ---
 
 ## 7. Поврзани Компоненти
-*   **`ln-data-coordinator`**: Layer 2 медијатор кој го "оживува" складот поврзувајќи го со REST API. Прима `ln-form:submit-record` / `ln-data-coordinator:request-*` и во ист синхрон handler дишпачира и локален store запис и оддалечен connector/queue повик (паралелен fan-out) — не чека одговор пред да ја ажурира локалната состојба.
+*   **`ln-data-coordinator`**: Layer 2 медијатор кој го "оживува" складот поврзувајќи го со REST API. Прима native submit (preventDefault-claimed) / `ln-data-coordinator:request-*` и во ист синхрон handler дишпачира и локален store запис и оддалечен connector/queue повик (паралелен fan-out) — не чека одговор пред да ја ажурира локалната состојба.
 *   **`ln-table` / `ln-list`**: Визуелни консументи. Ги читаат податоците од складот преку `store.getAll()` и ги набљудуваат локалните `ln-store:created/updated/deleted` настани за динамички да се прецртаат без да бараат целосно освежување на страницата.

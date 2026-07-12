@@ -11,21 +11,21 @@ This component persists pending mutations to its own `IndexedDB` database and re
 Place the queue inside your parent coordinator element alongside your store and connector — it is an **optional** third child:
 
 ```html
-<div data-ln-data-coordinator="documents">
+<ul data-ln-data-coordinator="documents" hidden>
     <!-- Storage Layer Cache (Blind to networking) -->
-    <div data-ln-data-store
-         data-ln-store-indexes="status,updated_at">
-    </div>
+    <li data-ln-data-store
+        data-ln-store-indexes="status,updated_at">
+    </li>
 
     <!-- Transport Gateway (REST / API Connector) -->
-    <div data-ln-api-connector
-         data-ln-api-base-url="https://api.livenetworks.com/v1"
-         data-ln-api-path="/documents">
-    </div>
+    <li data-ln-api-connector
+        data-ln-api-base-url="https://api.livenetworks.com/v1"
+        data-ln-api-path="/documents">
+    </li>
 
     <!-- Offline Outbox (optional Child 3) -->
-    <div data-ln-api-queue></div>
-</div>
+    <li data-ln-api-queue></li>
+</ul>
 ```
 
 When this child is absent, the coordinator's write handlers call the connector directly (unchanged, queue-absent path). When present, every mutation is routed through the queue instead.
@@ -79,7 +79,7 @@ const queue = queueEl.lnApiQueue;
 | `ln-api-queue:request-enqueue` | `{ chainKey, op, targetId, payload, expectedVersion, meta }` | Assigns `entryId` + `seq`, persists the entry, emits `enqueued` + `pending-count`, then attempts a drain. |
 | `ln-api-queue:ack` | `{ entryId }` | Deletes the entry, emits `pending-count`, advances that chain (drain). |
 | `ln-api-queue:nack` | `{ entryId, reason }` — `reason` is `'retry'`, `'drop'`, or `'auth'` | `retry` → schedules backoff and re-sends later; `drop` → deletes the entry and advances the chain; `auth` → pauses the scope and emits `auth-required`. |
-| `ln-api-queue:request-remap` | `{ oldKey, newId }` | For pending entries whose chain is `oldKey`: any entry with `targetId === oldKey` gets `targetId = newId`; the chain itself is re-keyed from `oldKey` to `newId`. |
+| `ln-api-queue:request-remap` | `{ oldKey, newId }` | For pending entries whose chain is `oldKey`: any entry with `targetId === oldKey` gets `targetId = newId`; the chain itself is re-keyed from `oldKey` to `newId`; if `meta.action` contains `oldKey` as a substring, it is string-replaced with `newId` too (keeps a persisted per-record URL in sync after a create resolves). |
 | `ln-api-queue:request-resume` | `{}` | Clears the pause on this scope and resumes draining. |
 | `ln-api-queue:request-drain` | `{}` | Manually triggers a drain attempt (e.g. to retry `failed` entries). |
 | `ln-api-queue:request-clear` | `{}` | Deletes all entries for this scope (e.g. on logout). |
