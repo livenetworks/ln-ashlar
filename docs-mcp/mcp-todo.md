@@ -10,7 +10,7 @@
 3. **Frontmatter:** `name` == име на фајлот, `classification` според фолдерот, се раѓа со `status: draft`.
 4. **Валидација:** `validate_docs` на MCP серверот пред commit.
 5. **Stable:** `status: stable` дури откако атрибути, вредности, настани и markup се спроверени наспроти изворниот код.
-6. По v2 write-pipeline (2026-07-09): секој документ што допира форми/податочен слој се проверува за `{message,content}` envelope, `data-ln-form-scope`, `ln-form:submit-record` — draft-овите се постари од овие одлуки.
+6. По v2 write-pipeline (2026-07-09): секој документ што допира форми/податочен слој се проверува за `{message,content}` envelope, `data-ln-form-scope`, native-submit intake (no custom event) — draft-овите се постари од овие одлуки.
 7. **Јазик:** содржината на документот е на АНГЛИСКИ (проза, наслови, табели) — насловите се англиски и се parsing contract. Meta/работните фајлови остануваат на македонски.
 
 ---
@@ -59,7 +59,7 @@
 
 #### Форми и внес
 
-- [ ] **ln-form** — ⚠ v2 проверка (scope, submit-record)
+- [ ] **ln-form** — ⚠ v2 проверка (scope, native-submit intake)
 - [ ] **ln-validate**
 - [ ] **ln-options**
 - [ ] **ln-date**

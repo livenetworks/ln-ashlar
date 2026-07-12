@@ -33,10 +33,10 @@ The coordinator listens on `this.dom` for `ln-store:ready`, `loaded`, `created`,
 ### Zero-JS Example
 
 ```html
-<div data-ln-data-coordinator>
-  <div data-ln-data-store="people" data-ln-store-endpoint="/api/people"></div>
-  <div data-ln-api-connector data-ln-api-endpoint="/api/people"></div>
-</div>
+<ul data-ln-data-coordinator hidden>
+  <li data-ln-data-store="people" data-ln-store-endpoint="/api/people"></li>
+  <li data-ln-api-connector data-ln-api-endpoint="/api/people"></li>
+</ul>
 
 <section data-ln-table="people"
          data-ln-table-source="people"
@@ -74,20 +74,20 @@ No `<script>` block needed. The coordinator wires everything.
 The coordinator acts as a parent wrapper enclosing the database cache and transport connector:
 
 ```html
-<div data-ln-data-coordinator="documents"
-     data-ln-data-mapper="documents">
+<ul data-ln-data-coordinator="documents"
+    data-ln-data-mapper="documents" hidden>
      
     <!-- Tier 1: Local Cache Database (IndexedDB - pure and network-blind) -->
-    <div data-ln-data-store 
-         data-ln-store-indexes="status,updated_at">
-    </div>
+    <li data-ln-data-store 
+        data-ln-store-indexes="status,updated_at">
+    </li>
 
     <!-- Tier 2: Transport Gateway (API / REST Connector) -->
-    <div data-ln-api-connector 
-         data-ln-api-base-url="https://api.livenetworks.com/v1"
-         data-ln-api-path="/documents">
-    </div>
-</div>
+    <li data-ln-api-connector 
+        data-ln-api-base-url="https://api.livenetworks.com/v1"
+        data-ln-api-path="/documents">
+    </li>
+</ul>
 ```
 
 ---
@@ -141,26 +141,40 @@ The coordinator is built to be highly dynamic, reacting to runtime modifications
 
 Because all events dispatched by the child components bubble up, the coordinator listens directly on its own DOM boundary. It manages the following flows seamlessly:
 
-### 0. Form Write Intake (`ln-form:submit-record`)
+### 0. Form Write Intake (native `submit`, claimed via `preventDefault()`)
 
-The coordinator listens for `ln-form:submit-record` on `document` (forms
-can live outside the coordinator's own subtree via a named
-`data-ln-form-scope`). It claims the event if either holds:
+The coordinator listens for the native `submit` event on `document`
+(bubble phase — never capture, so `ln-form`'s own validation gate on the
+form itself always runs first). On every submit bubbling through:
 
-* `detail.scope === this._name` (named override), **or**
-* `detail.scope` is empty and `detail.form.closest('[data-ln-data-coordinator]') === this.dom` (containment).
+1. `if (e.defaultPrevented) return` — either `ln-form`'s validation gate
+   blocked an invalid submit, or another coordinator already claimed it.
+2. Reads `data-ln-form-scope` off `e.target` (the form). Absent → the
+   form never opted in; leave the native submit alone.
+3. Claims it if either holds: scope value `=== this._name` (named
+   override), or the scope is empty and the form is a DOM descendant of
+   this coordinator (containment) — identical matching rules as before.
+4. Resolves the effective method itself (hidden `_method` input if
+   present and non-empty, else `form.method`) — a literal read, no
+   fallback, mirroring `ln-form`'s own gate exactly.
+5. Methods other than `POST`/`PUT`/`PATCH` are left untouched — the
+   native submit proceeds (e.g. a `GET` search form nested in the
+   coordinator).
+6. Only now does it call `e.preventDefault()` — this IS the claim, there
+   is no separate `claimed` flag to set.
+7. Serializes the form itself (`serializeForm`, stripping `_method`/`_token`)
+   and translates the raw `{ action, method, data }` into the same
+   fan-out call as before — `POST` → `_fanOutCreate`; `PUT`/`PATCH` →
+   `_fanOutUpdate` (reading `id`/`expected_version` off `data`). The
+   coordinator generates the `tempId` itself for a create (no correlation
+   map needed — see Fan-Out below). The form's current `action` attribute
+   (`form.getAttribute('action')`) rides straight through as the
+   mutation's transport `url` — no base/resolved distinction.
 
-On claim it sets `detail.claimed = true` synchronously, then translates
-the raw `{ action, method, data }` straight into a fan-out call — a literal
-read of `method`, no fallback: `POST` → `_fanOutCreate`; `PUT`/`PATCH` →
-`_fanOutUpdate` (reading `id`/`expected_version` off `data`); anything else
-is ignored (this only happens for scoped forms whose effective method
-wasn't POST/PUT/PATCH, which `ln-form` itself never dispatches — see the
-`ln-form` README §5b). The coordinator generates the `tempId` itself for a
-create (no correlation map needed — see Fan-Out below). The form's resource
-`action` rides straight through as an argument, attached to the mutation's
-transport `url` once the write reaches the connector — no `WeakMap`/`Map`
-bookkeeping.
+**Unclaimed scoped forms** (wrong scope name, or not contained in any
+coordinator) fall through as an ordinary native submit — no console
+warning, no silent JS interception. This is the progressive-enhancement
+fallback.
 
 ### Coordinator-Namespaced Intake Events
 
@@ -301,6 +315,10 @@ described above (no `confirmMutation`):
 | delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
 | bulk-delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
 
+> Remap also rewrites `meta.action` if it contains the old key as a
+> substring (string replace) — keeps a persisted per-record URL in sync
+> after a create resolves. See `js/ln-api-queue/README.md`.
+
 Every success path also calls `_toastFromMessage(e.detail.message)` — see
 Toasts below.
 
@@ -322,9 +340,9 @@ connector, no queue — is a first-class, supported configuration, not a
 degraded fallback:
 
 ```html
-<div data-ln-data-coordinator="drafts">
-  <div data-ln-data-store="drafts"></div>
-</div>
+<ul data-ln-data-coordinator="drafts" hidden>
+  <li data-ln-data-store="drafts"></li>
+</ul>
 ```
 
 Every `_fanOut*` method checks `children.queue` then `children.connector`
@@ -384,16 +402,16 @@ ignored otherwise):
    `buildDict()` helper `ln-upload` uses for its dictionary):
 
    ```html
-   <div data-ln-data-coordinator="documents">
-     <div data-ln-data-store="documents"></div>
-     <div data-ln-api-connector data-ln-api-base-url="/api" data-ln-api-path="/documents"></div>
+   <ul data-ln-data-coordinator="documents" hidden>
+     <li data-ln-data-store="documents"></li>
+     <li data-ln-api-connector data-ln-api-base-url="/api" data-ln-api-path="/documents"></li>
 
      <!-- consumed once at init, then removed from the DOM -->
      <span data-ln-data-coordinator-dict="auth" hidden>Your session expired — please sign in again.</span>
      <span data-ln-data-coordinator-dict="network" hidden>Could not reach the server — your change is saved locally and will retry.</span>
      <span data-ln-data-coordinator-dict="conflict" hidden>Someone else updated this record — showing their version.</span>
      <span data-ln-data-coordinator-dict="rejected" hidden>The server rejected that change.</span>
-   </div>
+   </ul>
    ```
 
    Keys are exactly the four buckets from the error reconciliation table:

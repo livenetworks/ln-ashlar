@@ -3,10 +3,13 @@
 Form manipulation only: populates the form on `ln-fill`, rewrites
 `action`/`_method` for RESTful edit routing. Submit is native HTML by
 default — without `data-ln-form-scope`, `ln-form` never intercepts it,
-never serializes data, never dispatches a submit event. Adding
+never serializes data, never dispatches a custom event. Adding
 `data-ln-form-scope` opts the form into the declarative write pipeline
-(see §Write Intake below), where `ln-form` intercepts `POST`/`PUT`/`PATCH`
-submits and dispatches `ln-form:submit-record` instead.
+(see §Write Intake below): `ln-form` intercepts `POST`/`PUT`/`PATCH`
+submits only to run a validation gate, calling `preventDefault()` solely
+when a field is invalid. A valid submit is left native — `ln-data-coordinator`
+claims it via its own `preventDefault()` on a document-level `submit`
+listener (bubble phase).
 Source: [`js/ln-form/ln-form.js`](../../js/ln-form/ln-form.js).
 
 For consumer-facing usage see
@@ -57,19 +60,18 @@ Opting a form into the declarative write pipeline (form → `ln-data-coordinator
 
 ### Behavior
 
-On `submit`, if `data-ln-form-scope` is present and the effective HTTP method is `POST`/`PUT`/`PATCH` (read from `<form method>` or a hidden `_method` input), `ln-form`:
+On `submit`, if `data-ln-form-scope` is present and the effective HTTP method is `POST`/`PUT`/`PATCH` (read from `<form method>` or a hidden `_method` input), `ln-form` runs the validation gate:
 
-1. Prevents the native submit.
-2. Serializes the form (`serializeForm`), stripping `_method`/`_token`.
-3. Dispatches `ln-form:submit-record` (bubbles, on `self.dom`) with:
-   `{ scope, action, actionResolved, method, data, form, claimed: false }`
-   — `action` is the form's original `action` attribute (single source of truth for the mutation endpoint); `actionResolved` is the current (possibly `data-ln-form-action-edit`-rewritten) `action`.
-4. A `ln-data-coordinator` listening on `document` claims the event (`detail.claimed = true`, synchronously) if its own name matches `detail.scope`, OR (when `scope` is empty) if the form is a DOM descendant of its subtree.
-5. If nothing claims the event, `console.warn('[ln-form] ln-form:submit-record was not claimed. Check the data-ln-form-scope name, or make sure this form is nested inside a [data-ln-data-coordinator] element.')` fires.
+1. Dispatches `ln-validate:request-validate` on the form (collector `{ invalidFields: [] }`).
+2. If any field is invalid: prevents the native submit, sorts invalid fields by document position, focuses the first one, and returns.
+3. If every field is valid: does nothing further. `ln-form` never serializes, never dispatches a custom event, never calls `preventDefault()` — the native submit proceeds.
+4. A `ln-data-coordinator` listening for the native `submit` on `document` (bubble phase) checks `e.defaultPrevented` first (skips if the gate above already blocked it, or another coordinator already claimed it), matches `data-ln-form-scope`/containment, resolves the effective method itself, and — only then — calls `preventDefault()` to claim the write. It serializes the form and routes the record through the store → queue → connector pipeline.
 
-Methods other than `POST`/`PUT`/`PATCH` (e.g. a `GET` search form) are left untouched — `ln-form` never intercepts them.
+Methods other than `POST`/`PUT`/`PATCH` (e.g. a `GET` search form) skip the validation gate entirely, and `ln-data-coordinator` never claims them either.
 
-See [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) for the coordinator-side fan-out this event triggers.
+A scoped form with no matching coordinator (wrong scope name, or not contained in any) falls through as an ordinary native submit — no console warning, no claim. This is the progressive-enhancement fallback.
+
+See [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) for the coordinator-side native-submit intake this enables.
 
 ---
 
@@ -193,7 +195,7 @@ _applyActionMode(record):
 
 ## What ln-form does NOT do
 
-- Intercepts submit only on scoped mutation paths (`data-ln-form-scope` + POST/PUT/PATCH method) via `preventDefault()`, serializes, and dispatches `ln-form:submit-record`.
+- Intercepts submit only to run the validation gate on scoped mutation paths (`data-ln-form-scope` + POST/PUT/PATCH method); `preventDefault()` is called only when validation fails. It never serializes and never dispatches a custom submit event — see `js/ln-data-coordinator/README.md` for what claims a valid submit.
 - Performs full-form validation orchestration on scoped submit: dispatches `ln-validate:request-validate` on the form, and if any fields fail validation, prevents submission, sorts the invalid fields by document position, and focuses the first invalid one.
 - No auto-submit (`data-ln-form-auto` / `data-ln-form-debounce` removed).
 - No typed serialization (`data-ln-form-typed` removed).
@@ -210,7 +212,7 @@ Ajax interception for non-scoped forms (if a project wants it) is a separate com
 - On submit, `ln-form` dispatches the synchronous custom event `ln-validate:request-validate` on the form with a collector array `invalidFields` in the event detail.
 - Each `ln-validate` field instance listens to this event on its parent form. If invalid, it pushes its input element to `detail.invalidFields`.
 - If the collector array contains any items, `ln-form` halts submission and focuses the first invalid element in document order.
-- To support this inline validation gate, any form using scoped submit-records **MUST** have the `novalidate` attribute set on the `<form>` markup to bypass native browser bubbles.
+- To support this inline validation gate, any form using scoped submits **MUST** have the `novalidate` attribute set on the `<form>` markup to bypass native browser bubbles.
 - `ln-validate` also listens to the native `reset` event on the form to clear field error classes and reset its internal `_touched` state.
 
 ---

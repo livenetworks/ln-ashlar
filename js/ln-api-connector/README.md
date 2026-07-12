@@ -30,7 +30,10 @@ messages (422, etc.) survive on every verb, not just conflict responses.
 This is a single merge point — the `ln-api-connector:request-update` event
 path passes `detail.expected_version` straight through to it, so there is
 no second place version-locking logic lives. The optional fourth argument,
-`url`, replaces the connector's own `path` for that call when present.
+`url`, when present, is treated as the COMPLETE resource URL for that call
+— it already carries the record id (e.g. a form's resolved `action`
+`/documents/42`), so `update()` does NOT append the id again (symmetric
+with `create()`). Only the `path` fallback (no `url` given) appends the id.
 
 ```javascript
 // Programmatic call with version lock
@@ -45,19 +48,19 @@ connector.update(42, { title: 'Updated title' }, 3)
 Place the connector inside your parent coordinator element alongside your store:
 
 ```html
-<div data-ln-data-coordinator="documents">
+<ul data-ln-data-coordinator="documents" hidden>
     <!-- Storage Layer Cache (Blind to networking) -->
-    <div data-ln-data-store 
-         data-ln-store-indexes="status,updated_at">
-    </div>
+    <li data-ln-data-store 
+        data-ln-store-indexes="status,updated_at">
+    </li>
 
     <!-- Transport Gateway (REST / API Connector) -->
-    <div data-ln-api-connector
+    <li data-ln-api-connector
          data-ln-api-base-url="https://api.livenetworks.com/v1"
          data-ln-api-path="/documents"
          data-ln-api-headers='{"Authorization": "Bearer tok_123"}'>
-    </div>
-</div>
+    </li>
+</ul>
 ```
 
 ---
@@ -121,7 +124,11 @@ You can trigger mutations and fetches asynchronously by dispatching standard eve
 | `ln-api-connector:request-bulk-delete` | `{ ids, url, meta }` | Triggers a bulk-deletion request. |
 
 `url` is optional — when present, it replaces the connector's own `path`
-for that call (still joined with `data-ln-api-base-url`). `meta` is
+for that call (still joined with `data-ln-api-base-url`). For `update`,
+`delete`, and `bulk-delete`, a supplied `url` is the complete resource URL
+already carrying the id — the connector does not append the id a second
+time (create has no id to append; delete/bulk-delete currently receive no
+url in practice). `meta` is
 opaque, default `null`, echoed untouched on the response.
 
 `url` is same-origin-relative by convention (it originates from a form's

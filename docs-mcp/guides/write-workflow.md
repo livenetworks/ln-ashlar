@@ -3,7 +3,7 @@ name: write-workflow
 classification: guide
 status: draft
 domain: frontend
-summary: Progressive write pipeline in ln-ashlar - form scopes, submit-record flow, optimistic writes, offline queue, and server confirmation loops.
+summary: Progressive write pipeline in ln-ashlar - form scopes, native-submit intake, optimistic writes, offline queue, and server confirmation loops.
 source: architecture_docs_draft/write-workflow-guide.md, architecture_docs_draft/form-write-workflow.md
 tags: [form, write, workflow, database, coordinator, sync]
 ---
@@ -24,7 +24,7 @@ When a user submits a form, the action boundary determines which layer intercept
 |---|---|---|---|
 | **1. Native Browser** | None | Traditional browser page reload. Submits data to `action` endpoint using `method` (and Laravel-style spoofed `_method`). | Standard Server-Side Rendered (SSR) pages (e.g. Laravel Blade templates). |
 | **2. Progressive AJAX** | `data-ln-ajax` | Intercepts click/submit, executes `fetch()` asynchronously, prevents page reload, and expects a structured JSON fragment response. | SSR pages with progressive enhancement (updating partial page regions without complete reloads). |
-| **3. Scoped Local-First** | `data-ln-form-scope` | Serializes input data and dispatches `ln-form:submit-record`. The coordinator intercepts it, writing instantly to `ln-store` (IndexedDB) and queuing for server synchronization. | Local-First and Single-Page Applications (SPA) where the local database is the immediate source of truth. |
+| **3. Scoped Local-First** | `data-ln-form-scope` | Leaves the submit native (after the validation gate). `ln-data-coordinator` claims it via `preventDefault()` on `document`, serializes it itself, writing instantly to `ln-store` (IndexedDB) and queuing for server synchronization. | Local-First and Single-Page Applications (SPA) where the local database is the immediate source of truth. |
 
 > [!IMPORTANT]
 > **Priority Rule:** `data-ln-form-scope` always takes priority over `data-ln-ajax`. A form cannot be both AJAX-driven and database-scoped; mixing these on a single form will log a development warning.
@@ -37,11 +37,11 @@ When a user submits a form, the action boundary determines which layer intercept
 
 During a local-first write operation, responsibilities are cleanly isolated among components:
 
-- **Form ([`ln-form`](../components/ln-form.md)):** Acts as the canonical source of truth for the resource `action` and `method` attributes. It serializes inputs (shallow JSON, ignoring CSRF `_token` and `_method` transport keys) and dispatches `ln-form:submit-record`. It is unaware of database stores or network transport configurations.
+- **Form ([`ln-form`](../components/ln-form.md)):** Acts as the canonical source of truth for the resource `action` and `method` attributes. It runs a validation gate only (preventDefault solely on invalid submit) — it never serializes inputs and never dispatches a custom event. It is unaware of database stores or network transport configurations.
 - **Store (`ln-store`):** Manages the local IndexedDB database cache. It applies optimistic mutations immediately to the local cache and fires database change notifications. It is blind to REST URLs and HTTP headers.
 - **Queue (`ln-api-queue`):** Persists transaction payloads in order (FIFO per record chain) to survive browser restarts. It dispatches a `send` command when it is ready to sync, but does not perform network calls.
 - **Connector (`ln-*-connector`):** Executes the physical network fetch. It accepts abstract payload requests, translates them into REST or socket payloads, and returns the server's response.
-- **Coordinator ([`ln-data-coordinator`](../components/ln-data-coordinator.md)):** Serves as the mediator. It claims the form's `submit-record` event, maps payloads (Ingress/Egress), and triggers store writes and remote queue uploads in parallel. It handles server updates by dispatching ordinary store updates (triggering rekeys or reverts).
+- **Coordinator ([`ln-data-coordinator`](../components/ln-data-coordinator.md)):** Serves as the mediator. It claims the form's native submit event (preventDefault, document, bubble phase), serializes it, maps payloads (Ingress/Egress), and triggers store writes and remote queue uploads in parallel. It handles server updates by dispatching ordinary store updates (triggering rekeys or reverts).
 
 ---
 
@@ -49,7 +49,7 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 
 ### Scenario 1: Creating a Record (POST)
 1. **Submit:** The user submits a form configured with `data-ln-form-scope` and `method="POST"`.
-2. **Intake:** `ln-form` intercepts the submission, serializes the fields, and dispatches the bubbling `ln-form:submit-record` event.
+2. **Intake:** `ln-form` intercepts the submission only to validate; `ln-data-coordinator` claims the native submit and serializes the fields itself.
 3. **Claim:** The coordinator checks the event scope, claims it (`claimed = true`), and generates a temporary ID with a `_temp_` prefix (e.g. `_temp_df88b0...`).
 4. **Parallel Fan-Out:** The coordinator triggers two independent branches synchronously:
    - **Local Cache:** Dispatches `ln-store:request-create` with the `tempId` and data. `ln-store` writes to IndexedDB with a `_pending: true` flag, instantly updating bound UI tables.
@@ -65,7 +65,7 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 ### Scenario 2: Editing a Record via `lnFill` (PUT/PATCH)
 1. **Form Fill:** Clicking the edit button triggers `lnFill` on the form container, populating inputs with the record's values (including hidden `id` and `expected_version` inputs).
 2. **Action Rewrite:** Since `data-ln-form-action-edit` is present, the form rewrites its `action` attribute to `/documents/{id}` and injects a hidden `_method` input valued `PUT`.
-3. **Submit:** The user saves the changes. `ln-form` detects the effective `PUT` method via the `_method` input, intercepts the submission, and dispatches `ln-form:submit-record` carrying the serialized ID and payload.
+3. **Submit:** The user saves the changes. `ln-data-coordinator` detects the effective `PUT` method via the `_method` input (identical read to `ln-form`'s own gate), claims the native submission, and serializes the ID and payload itself.
 4. **Intake:** The coordinator intercepts the event and executes `_fanOutUpdate`:
    - **Local Cache:** Writes the changes to the store immediately.
    - **Outbox Queue:** Enqueues the update payload (with `expected_version` for conflict checks).
@@ -103,8 +103,8 @@ sequenceDiagram
 
     User->>Form: Submit Form
     Form->>Form: Block native submit & serialize JSON
-    Form->>Coord: Event: ln-form:submit-record
-    Coord->>Coord: Claim event (detail.claimed = true)
+    Form-->>Coord: native submit bubbles (unclaimed by ln-form's gate)
+    Coord->>Coord: preventDefault() — claim
     
     par Optimistic UI Write
         Coord->>Store: Event: ln-store:request-create (tempId)
@@ -155,7 +155,7 @@ To standardise successes and dispatch notifications automatically, all write ope
 ## 6. Common Pitfalls and Developer Errors
 
 - **Missing `method="post"` on Scoped Forms:** If `method` is omitted, some browsers default to `GET`. The `ln-form` component will ignore `GET` forms, causing the browser to execute a native page reload and append inputs as a query string. Always declare `method="post"` explicitly on scoped forms.
-- **Mismatched Scope Names:** If `data-ln-form-scope="name"` does not match the parent's `data-ln-data-coordinator="name"`, the coordinator will ignore the event. This triggers a console warning that the `submit-record` event was not claimed.
+- **Mismatched Scope Names:** If `data-ln-form-scope="name"` does not match the parent's `data-ln-data-coordinator="name"`, the coordinator will ignore the submit — no console warning, the native submit proceeds untouched (progressive-enhancement fallback).
 - **Base URL and HTTP Session Cookies:** The `ln-*-connector` components submit requests with `credentials: 'same-origin'` to safeguard against CSRF attacks. If you define a cross-origin `data-ln-api-base-url` targeting an external domain, cookies will not be sent. Use a same-origin backend proxy gateway instead.
 
 ---

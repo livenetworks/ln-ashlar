@@ -44,7 +44,13 @@
 
 > Containment е одржлив default: `ln-modal` **не** преместува елементи во DOM (проверено — само `body` класа), па модал авториран внатре во координаторот останува негов потомок.
 
-### 3.2 Нов настан: `ln-form:submit-record` (име отворено за дискусија)
+### 3.2 [СУПЕРСЕДИРАНО 2026-07-12] Нов настан: `ln-form:submit-record` — заменето со native submit intake
+
+> **Оваа секција е историски запис.** Одлука 2026-07-12: `ln-form:submit-record`
+> е избришан. `ln-form` задржува само validation gate-от (§3.1 подолу останува
+> точен); `ln-data-coordinator` сега слуша native `submit` на `document`
+> (bubble фаза) и презема со `preventDefault()` наместо да чека
+> `detail.claimed`. Деталите се во `js/ln-data-coordinator/README.md` §0.
 
 При submit на форма со scope атрибут, `ln-form`:
 
@@ -177,19 +183,21 @@ Offline сценариото не е посебен режим: submit-от се
 
 ### 7.2 Local-first CRUD страница (скалило 3)
 ```html
-<section data-ln-data-coordinator="documents" class="crud-page">
-	<!-- Data слој (headless деца) -->
-	<div data-ln-data-store data-ln-store-indexes="status,updated_at"></div>
-	<!-- path = само read/sync; мутацискиот URL доаѓа од формата -->
-	<div data-ln-api-connector data-ln-api-base-url="" data-ln-api-path="/documents"></div>
-	<div data-ln-api-queue></div>
+<section class="crud-page">
+	<!-- Data слој (headless координатор со деца) -->
+	<ul data-ln-data-coordinator="documents" hidden>
+		<li data-ln-data-store data-ln-store-indexes="status,updated_at"></li>
+		<!-- path = само read/sync; мутацискиот URL доаѓа од формата -->
+		<li data-ln-api-connector data-ln-api-base-url="" data-ln-api-path="/documents"></li>
+		<li data-ln-api-queue></li>
+	</ul>
 
 	<!-- Render слој -->
 	<table data-ln-table><!-- ... --></table>
 
-	<!-- Модал-форма: остана потомок на координаторот (containment) -->
+	<!-- Модал-форма: го користи соодветниот именуван scope -->
 	<dialog data-ln-modal="document-edit">
-		<form data-ln-form data-ln-form-scope
+		<form data-ln-form data-ln-form-scope="documents"
 		      action="/documents" method="post" data-ln-form-action-edit>
 			<input type="hidden" name="id">
 			<input type="hidden" name="expected_version">
@@ -212,7 +220,7 @@ Offline сценариото не е посебен режим: submit-от се
 
 ## 8. Отворени точки за консензус
 
-1.  **Име на настанот** — `ln-form:submit-record`? (`:record-submit`, `:mutate`?)
+1.  ~~**Име на настанот** — `ln-form:submit-record`? (`:record-submit`, `:mutate`?)~~ — пресудено 2026-07-12: нема custom настан; native submit + preventDefault() claim.
 2.  **Име на атрибутот** — `data-ln-form-scope`? (наспроти `data-ln-form-store`, `data-ln-form-coordinator`)
 3.  **Полиња-конвенција (координаторска)** — координаторот чита `id` / `expected_version` од `data`: фиксни имиња или конфигурабилни? (Формина грижа веќе не е — таа праќа сурово.)
 4.  **Delete патот** — HTML-first кандидат: delete како мини-форма (`action` + `_method=DELETE`) низ истиот submit-record пат. Отворено: delete формата типично носи резолвиран `action="/documents/5"` — како entry-то го добива ресурсниот облик (сплит од `data.id`? посебен атрибут?).

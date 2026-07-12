@@ -88,7 +88,6 @@ form.lnForm.destroy();
 | Event | Bubbles | Payload | Description |
 | :--- | :--- | :--- | :--- |
 | `ln-form:destroyed` | Yes | `{ target: HTMLElement }` | Dispatched when the coordinator is torn down. |
-| `ln-form:submit-record` | Yes | `{ scope, action, actionResolved, method, data, form, claimed }` | Only dispatched on forms carrying `data-ln-form-scope`. `claimed` is set synchronously by the owning `ln-data-coordinator`; if still `false` after dispatch, `ln-form` logs a console warning — no silent fallback. |
 
 ### Received
 
@@ -153,13 +152,18 @@ them.
 - **No transport.** It does not make XHR/fetch requests. Submit is
   native HTML; ajax interception (if desired) belongs to a separate
   component that listens to the native `submit` event.
-- **No serialization.** There is no `serializeForm` call, no
-  `ln-form:submit` event, no JSON payload. (unscoped forms only — scoped
-  forms use `serializeForm` internally, see §5b).
+- **No serialization, ever.** There is no `serializeForm` call inside
+  `ln-form`, no `ln-form:submit-record` event, no JSON payload — scoped
+  forms are serialized by the claiming `ln-data-coordinator`, not by
+  `ln-form`.
 - **No validation orchestration (unscoped forms only).** Constraint validation for unscoped forms is the browser's job; field-level error display is `ln-validate`'s job. Scoped mutation forms, however, trigger full validation on submit via the `ln-validate:request-validate` event, block submit if invalid, focus the first invalid field, and require `novalidate` in the HTML markup.
-- **No submit interception** unless `data-ln-form-scope` is present (see
-  §5b below). `ln-form` never listens to `submit` and never calls
-  `preventDefault()` on unscoped forms.
+- **Submit interception is validation-only, even on scoped forms.**
+  `ln-form` calls `preventDefault()` solely to block an invalid submit
+  (focus first invalid field) — a valid submit is left alone entirely.
+  Claiming a valid submit for the write pipeline is
+  `ln-data-coordinator`'s job (native `submit`, bubble phase, its own
+  `preventDefault()`). `ln-form` never listens to `submit` at all on
+  unscoped forms.
 
 ---
 
@@ -174,21 +178,25 @@ three possible rungs, and whichever rung claims it decides the archetype:
    enhancement). `ln-ajax` explicitly skips forms carrying
    `data-ln-form-scope` (see the `ln-ajax` README).
 3. **`ln-data-coordinator`** — a form with `data-ln-form-scope` has its
-   submit normalized (`serializeForm`, no interpretation) and dispatched
-   as `ln-form:submit-record`. The nearest ancestor
+   valid submit left native; `ln-form` never intercepts it beyond the
+   validation gate (§7 below). The nearest ancestor
    `[data-ln-data-coordinator]` (or the named coordinator, if
-   `data-ln-form-scope="name"`) claims it and routes it through the
-   store → queue → connector write pipeline.
+   `data-ln-form-scope="name"`) listens for the native `submit` on
+   `document` (bubble phase), claims it with `preventDefault()` once its
+   own scope/containment matches, serializes the form itself, and routes
+   it through the store → queue → connector write pipeline. See the
+   `ln-data-coordinator` README for the intake contract.
 
-Interception is a literal read of the effective method (`_method` input
-if present and non-empty, else the form's `method` attribute): `POST` →
-create, `PUT`/`PATCH` → update. Any other effective method (`GET`, or a
-scoped form with no method set) is **never intercepted** — the native
-submit proceeds untouched, so a GET search form nested inside a
-coordinator keeps working exactly as before. `ln-form` itself stays
-coordinator-blind; it only serializes and dispatches. See
-[`docs/js/form.md`](../../docs/js/form.md) for a fuller write-up
-(follow-up doc task).
+`ln-form`'s own validation gate reads the effective method (`_method`
+input if present and non-empty, else the form's `method` attribute) purely
+to decide whether to run `ln-validate:request-validate` at all — `GET` (or
+a scoped form with no method set) skips the gate entirely, so a search
+form nested inside a coordinator keeps working exactly as before.
+`ln-data-coordinator` performs the identical effective-method read
+independently, to decide whether to claim the native submit for the write
+pipeline (`POST` → create, `PUT`/`PATCH` → update). `ln-form` itself stays
+coordinator-blind and never serializes or dispatches a custom event — see
+[`docs/js/form.md`](../../docs/js/form.md) for a fuller write-up.
 
 ---
 
@@ -199,8 +207,9 @@ coordinator-blind; it only serializes and dispatches. See
   the change. **Always** use `form.lnForm.fill()` or manually dispatch an
   `input`/`change` event.
 - **Expecting a submit event:** `ln-form` never dispatches anything on
-  submit — there is no `ln-form:submit`. Listen to the form's native
-  `submit` event instead.
+  submit — there is no `ln-form:submit` and no `ln-form:submit-record`
+  either. Listen to the form's native `submit` event, or the resulting
+  `ln-store:created`/`ln-store:updated` outcome, instead.
 
 ---
 
