@@ -321,7 +321,9 @@
 	border-inline-end:   var(--border-inline-end,   var(--border-width) solid var(--color-border));
 	border-radius: var(--radius);
 	box-shadow: var(--shadow);
-	z-index: var(--z-dropdown);
+	// z-index is the caller's responsibility: top-layer consumers (dropdown,
+	// popover, tooltip portal) don't need one; standalone consumers do —
+	// see [data-ln-table] .column-filter-dropdown in components/_filter.scss.
 }
 
 // ─── Card field list (label/value rows) ────────────────

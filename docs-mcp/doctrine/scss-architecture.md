@@ -139,10 +139,10 @@ toast (50) > modal (40) > overlay (30) > dropdown (20) > sticky (10)
 ```
 
 ### Top-Layer Stacking
-Modals (`<dialog>` + `showModal()`), dropdown menus, and popovers (Popover API,
-`popover="manual"` + `showPopover()`/`hidePopover()`) are promoted to the browser's top layer —
+Modals (`<dialog>` + `showModal()`), dropdown menus, popovers, and JS-enhanced tooltips (Popover
+API, `popover="manual"` + `showPopover()`/`hidePopover()`) are promoted to the browser's top layer —
 a rendering layer above the entire document, immune to any ancestor `overflow`/`z-index`/`transform`
 stacking context. Top-layer elements stack in most-recently-shown order, not by the `z-index`
 property — opening a dropdown from inside an open modal always renders the dropdown above the modal,
 with no CSS coordination required. The `--z-*` token scale above governs only elements that never
-enter the top layer (sticky headers, toasts, the tooltip portal).
+enter the top layer (sticky headers, toasts).

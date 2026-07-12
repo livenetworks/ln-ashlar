@@ -2,14 +2,14 @@
 
 A zero-dependency, progressively enhanced **Dual-Layer Tooltip Primitive** that displays lightweight contextual descriptions on hover and focus.
 
-It supports two levels of execution: a **pure CSS baseline** (zero JS footprint, utilizing pseudo-elements) and a **JS progressive enhancement layer** (portaled to the body to escape parent clipping, viewport-aware auto-flipping, and automated `aria-describedby` wiring).
+It supports two levels of execution: a **pure CSS baseline** (zero JS footprint, utilizing pseudo-elements) and a **JS progressive enhancement layer** (top-layer promoted via the native Popover API to escape parent clipping, viewport-aware auto-flipping, and automated `aria-describedby` wiring).
 
 ---
 
 ## 🧭 Philosophy & Architecture
 
 1. **CSS-First Baseline (Zero-JS):** Every element carrying `data-ln-tooltip="text"` immediately receives a beautiful hover/focus visual tooltip via pure CSS `::after` pseudo-elements.
-2. **JS Portaled Enhancement (`data-ln-tooltip-enhance`):** Opt-in to activate JS features. The component detaches the tooltip from the trigger and mounts it in a global `<body>` portal (`#ln-tooltip-portal`), avoiding parent `overflow: hidden` clipping, wrapping long texts safely, and auto-flipping the bubble if it hits viewport boundaries.
+2. **JS Top-Layer Enhancement (`data-ln-tooltip-enhance`):** Opt-in to activate JS features. The component detaches the tooltip from the trigger and mounts it in a shared `<body>` container (`#ln-tooltip-portal`) promoted to the browser's top layer via the native Popover API (`popover="manual"`, `showPopover()`/`hidePopover()`), avoiding parent `overflow: hidden` clipping and any ancestor stacking context, wrapping long texts safely, and auto-flipping the bubble if it hits viewport boundaries.
 3. **Automated `<abbr>` Semantic Integration:** Elements containing both `data-ln-tooltip` and a native `title` attribute (such as standard `<abbr>` elements) auto-enhance without requiring the `-enhance` flag. The JS layer intercepts the native browser hover tooltip and replaces it dynamically to avoid double tooltips.
 
 ---
@@ -23,7 +23,7 @@ It supports two levels of execution: a **pure CSS baseline** (zero JS footprint,
 </button>
 ```
 
-### JS Progressive Enhancement (Viewport-Aware & Portaled)
+### JS Progressive Enhancement (Viewport-Aware & Top-Layer Promoted)
 Add `data-ln-tooltip-enhance` to activate advanced positioning and accessibility wiring.
 ```html
 <button type="button" 
@@ -45,7 +45,7 @@ Add `data-ln-tooltip-enhance` to activate advanced positioning and accessibility
 | :--- | :--- | :--- |
 | `data-ln-tooltip="text"` | Trigger element | Tooltip text. Required. If empty, falls back to the native `title` attribute. |
 | `data-ln-tooltip-position` | Trigger element | Preferred placement side: `top` (default), `bottom`, `left`, `right`. |
-| `data-ln-tooltip-enhance` | Trigger element | Opt-in. Activates JS portaling, edge auto-flipping, and accessibility descriptions. |
+| `data-ln-tooltip-enhance` | Trigger element | Opt-in. Activates top-layer promotion, edge auto-flipping, and accessibility descriptions. |
 | `title` | Trigger element | When present alongside `data-ln-tooltip`, forces auto-enhance to suppress native tooltips. |
 | `aria-describedby` | Trigger element | *State*. Automatically wired by the JS layer at runtime to point to the portal bubble ID. |
 

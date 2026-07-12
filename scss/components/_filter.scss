@@ -16,6 +16,7 @@
 [data-ln-table] .column-filter-dropdown {
 	@include floating-panel;
 	position: absolute;
+	z-index: var(--z-dropdown);
 	top: 100%;
 	right: 0;
 	left: auto;
