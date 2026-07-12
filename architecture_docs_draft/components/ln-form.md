@@ -7,12 +7,13 @@
 ## 1. Заднинско дејство и одговорност
 
 - **Краток опис:**
-  `ln-form` е лесна примитива дефинирана во [`js/ln-form/src/ln-form.js`](../../js/ln-form/src/ln-form.js) (~100 линии) наменета за автоматизирање на HTML форми (`<form>`). Нејзината примарна улога е да овозможи лесно автоматско пополнување на полињата (Form Population) и RESTful рутирање при креирање или измена на записи (method spoofing).
+  `ln-form` е лесна примитива дефинирана во [`js/ln-form/src/ln-form.js`](../../js/ln-form/src/ln-form.js) (~100 линии) наменета за автоматизирање на HTML форми (`<form>`). Нејзината примарна улога е да овозможи лесно автоматско пополнување на полињата (Form Population) и RESTful рутирање при креирање или измена на записи (Rails-style method spoofing).
+
+  Стилизирањето на формите е одвоена SCSS грижа (mixins во `scss/components/_form.scss`) — `ln-form` не стилизира ништо и не е во релација со form SCSS-от.
 
 - **Ортогоналност (Што компонентата НЕ прави):**
-  - **НЕ стилизира елементи:** Изгледот на формите е одвоена грижа на SCSS (`scss/components/_form.scss`).
-  - **НЕ контролира поднесување (Submit) по дифолт:** Нативниот submit тек останува непроменет, освен при користење на `data-ln-form-scope`, каде [`ln-data-coordinator`](./ln-data-coordinator.md) го презема асинхрониот тек на обработка.
-  - **НЕ менаџира валидациска состојба:** За тоа е одговорен прелистувачот и компонентата [`ln-validate`](./ln-validate.md).
+  - **Submit е нативен.** Без `data-ln-form-scope` формата е 100% нативна (за AJAX постои [`ln-ajax`](../../js/ln-ajax/README.md)). Со scope, `ln-form` е само validation gate — `preventDefault()` единствено при невалидна форма; серијализацијата, транспортот и create/update толкувањето се на [`ln-data-coordinator`](./ln-data-coordinator.md).
+  - **Не води валидациска состојба** — тоа е работа на прелистувачот и [`ln-validate`](./ln-validate.md).
 
 ---
 
@@ -34,6 +35,9 @@
     </ul>
 </form>
 ```
+
+> [!WARNING]
+> Копчињата за откажување/затворање мора да имаат експлицитен `type="button"` — без него прелистувачот ги третира како `type="submit"` и предизвикува непожелно поднесување на формата.
 
 ### Варијанти на Употреба
 
@@ -100,6 +104,9 @@
 2. Инаку → се користи вредноста на `method` атрибутот на формата.
 3. Доколку методот е `POST`, `PUT` или `PATCH`, формата ја пренесува контролата кон `ln-data-coordinator` за асинхроно поднесување.
 
+> [!NOTE]
+> При claim, координаторот испраќа **вистински** `PUT`/`PATCH` преку `fetch` и го отстранува `_method` од payload-от. `_method` стигнува до серверот единствено во progressive-enhancement fallback-от (unclaimed scoped форма → нативен POST) — само тогаш backend-от мора да ја поддржува конвенцијата (Rails/Laravel/Symfony/Express преку middleware; Next.js и .NET немаат вградена body поддршка, таму fallback-от пристига како обичен POST).
+
 ---
 
 ### Настани (Events API)
@@ -127,12 +134,7 @@ form.lnForm.destroy();
 
 ---
 
-## 4. CSS Стилизирање и Поведенски Концепт
-
-### SCSS Миксини & Класи
-- **Невизуелна компонента:** `ln-form` е чиста логичка примитива. Таа **не поседува сопствени SCSS миксини или класи**. Сите стилови за формите (layouts, inputs, spacing) се дефинирани одделно во глобалниот стилски систем (`scss/components/_form.scss`).
-
-### Поведенски Концепт
+## 4. Алгоритам за пополнување (populateForm)
 
 - **Алгоритам за автоматско пополнување (`populateForm`):**
   При повикување на `.fill(data)`, се скенираат сите елементи со `name` или `data-ln-fill-as` и се применуваат следниве правила:
@@ -148,55 +150,19 @@ form.lnForm.destroy();
 
 ---
 
-## 5. Пристапност (ARIA) и Чести Грешки
-
-### 5.1 Пристапност (ARIA)
-Бидејќи `ln-form` се потпира на стандардни HTML елементи, се препорачуваат следниве HTML5 / ARIA практики:
-- Секогаш поврзувајте ги контролите со соодветни лејбли користејќи ги атрибутите `for` на `<label>` и `id` на внесот.
-- Користете `aria-describedby` за поврзување на полињата со нивните грешки или помошни пораки генерирани од [`ln-validate`](./ln-validate.md).
-
-### 5.2 Чести Грешки (Anti-Patterns)
+## 5. Чести Грешки (Anti-Patterns)
 
 > [!WARNING]
 > **1. Рачно менување на вредноста (`input.value`) без тригерирање на настани**
 > Ако вредноста се смени директно во JS (`el.value = 'норма'`), реактивните компоненти (како `ln-validate`) нема да ја забележат промената. Секогаш користете ја функцијата `form.lnForm.fill(data)` или рачно диспачирајте соодветен `input`/`change` настан.
 
-> [!WARNING]
-> **2. Копчиња без експлицитен `type`**
-> Секогаш поставувајте `type="button"` на копчињата наменети за откажување или затворање. Доколку нема експлицитен тип, прелистувачот ги третира како `type="submit"` што предизвикува непожелно поднесување на формата.
-
 > [!NOTE]
-> **3. Рачно внесување на `<input name="_method">` во HTML**
+> **2. Рачно внесување на `<input name="_method">` во HTML**
 > Нема потреба од рачно додавање на ова скриено поле. `ln-form` автоматски го креира, ажурира и празни во зависност од состојбата (Edit vs Create).
 
 ---
 
-## 6. Дијаграм на Текот и Животен Циклус
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Корисник / Тригер
-    participant Form as ln-form
-    participant Input as Form Input/Select
-    participant Coord as ln-data-coordinator
-
-    Note over User, Form: Сценарио 1: Автоматско пополнување (Edit Mode)
-    User->>Form: Event: ln-fill { record: { id: 42, username: 'dalibor' } }
-    Form->>Form: Замена на action (/users/:id -> /users/42)
-    Form->>Form: Креирање / ажурирање на <input name="_method" value="PUT">
-    Form->>Input: Пополнување вредности во соодветни имиња
-    Form->>Input: Диспачирање синтетички change/input настан
-
-    Note over User, Form: Сценарио 2: Ресетирање (Create Mode)
-    User->>Form: Клик на Reset / Event: ln-fill { null }
-    Form->>Form: Враќање на базен action (/users)
-    Form->>Form: Празнење на <input name="_method" value="">
-```
-
----
-
-## 7. Поврзани Компоненти
+## 6. Поврзани Компоненти
 
 - [`ln-validate.md`](./ln-validate.md) — Додава реактивна валидација на полињата во форма.
 - [`ln-data-coordinator.md`](./ln-data-coordinator.md) — Асинхроно го презема submit-от кај scoped формите.
