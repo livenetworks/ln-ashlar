@@ -90,3 +90,6 @@ All events are dispatched on the initiating element (`<a>` or `<form>`) and bubb
 - **Forgetting CSRF Meta:** `ln-ajax` automatically reads `<meta name="csrf-token" content="...">` to inject the `X-CSRF-TOKEN` header on non-GET calls. If this meta tag is missing, POST/PUT requests may fail authentication.
 - **Breaking External Links:** Links with different hostnames are ignored automatically, but absolute paths on the same host are captured. Ensure assets/downloads use `data-ln-ajax="false"`.
 - **Forms carrying `data-ln-form-scope` are skipped entirely** (one-time `console.warn`) — the `ln-data-coordinator` write pipeline takes precedence over ajax progressive enhancement.
+- **Respects `e.defaultPrevented`.** If a prior `submit` listener on the
+  same form (e.g. a validation gate) already called `preventDefault()`,
+  `ln-ajax` does nothing — no fetch, no loader class.

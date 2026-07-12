@@ -55,6 +55,7 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '..
 			}
 
 			const handler = function (e) {
+				if (e.defaultPrevented) return; // a prior handler (e.g. a validation gate) already blocked this submit
 				e.preventDefault();
 				const method = form.method.toUpperCase();
 				const action = form.action;
