@@ -5,7 +5,6 @@ import { populateForm, dispatch, registerComponent, resolveFormMethod } from '..
 	const DOM_ATTRIBUTE = 'lnForm';
 	const ACTION_EDIT_ATTR   = 'data-ln-form-action-edit';
 	const ACTION_METHOD_ATTR = 'data-ln-form-action-method';
-	const SCOPE_ATTR = 'data-ln-form-scope';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -36,8 +35,6 @@ import { populateForm, dispatch, registerComponent, resolveFormMethod } from '..
 		};
 
 		this._onSubmit = function (e) {
-			if (!self.dom.hasAttribute(SCOPE_ATTR)) return; // not opted in — native submit or ln-ajax handles it
-
 			const method = resolveFormMethod(self.dom);
 
 			if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return; // native submit proceeds untouched (e.g. GET search forms)

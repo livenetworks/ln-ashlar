@@ -3,8 +3,9 @@
 A minimal **form manipulation** primitive. `ln-form` does exactly two
 things to a native `<form>`: populate it when an `ln-fill` event delivers
 a record, and rewrite `action` / `_method` for RESTful edit routing.
-Submit is native HTML — `ln-form` never touches it, unless
-`data-ln-form-scope` is present (see §5b).
+Submit is native HTML — `ln-form` only ever intercepts it to run a
+validation gate on `POST`/`PUT`/`PATCH` forms (see §7); a valid submit
+is always left native.
 
 ---
 
@@ -17,13 +18,13 @@ Submit is native HTML — `ln-form` never touches it, unless
 2. **Native submit, always.** Forms MUST carry a real `action` and
    `method` in HTML. Without JavaScript they do a normal native submit.
    PUT/DELETE ride on POST via an auto-ensured hidden `_method` input
-   (Laravel method spoofing) — `ln-form` never intercepts `submit`,
-   never serializes data, never dispatches a submit event, unless
-   `data-ln-form-scope` is present (see §5b).
+   (Laravel method spoofing) — `ln-form` never serializes data and
+   never dispatches a submit event. It intercepts `submit` only to run
+   the validation gate; a valid submit always proceeds natively.
 3. **Transport is someone else's job.** Ajax interception (if wanted) is
    a separate component's concern — it listens to the native `submit`
    event itself. Validation is owned by the browser's constraint
-    validation (scoped validation forms MUST carry `novalidate` in the HTML markup to enable submit interception) plus
+    validation (any form using `ln-form` for `POST`/`PUT`/`PATCH` MUST carry `novalidate` in the HTML markup to enable submit interception) plus
     `ln-validate` for field error display.
 
 ---
@@ -156,14 +157,13 @@ them.
   `ln-form`, no `ln-form:submit-record` event, no JSON payload — scoped
   forms are serialized by the claiming `ln-data-coordinator`, not by
   `ln-form`.
-- **No validation orchestration (unscoped forms only).** Constraint validation for unscoped forms is the browser's job; field-level error display is `ln-validate`'s job. Scoped mutation forms, however, trigger full validation on submit via the `ln-validate:request-validate` event, block submit if invalid, focus the first invalid field, and require `novalidate` in the HTML markup.
-- **Submit interception is validation-only, even on scoped forms.**
-  `ln-form` calls `preventDefault()` solely to block an invalid submit
-  (focus first invalid field) — a valid submit is left alone entirely.
-  Claiming a valid submit for the write pipeline is
+- **No validation orchestration beyond the gate.** Constraint validation display is `ln-validate`'s job. `ln-form` triggers full validation on submit (any method other than `GET`) via the `ln-validate:request-validate` event, blocks submit if invalid, focuses the first invalid field, and requires `novalidate` in the HTML markup.
+- **Submit interception is validation-only.** `ln-form` calls
+  `preventDefault()` solely to block an invalid submit (focus first
+  invalid field) — a valid submit is left alone entirely. Claiming a
+  valid submit for the write pipeline (scoped forms only) is
   `ln-data-coordinator`'s job (native `submit`, bubble phase, its own
-  `preventDefault()`). `ln-form` never listens to `submit` at all on
-  unscoped forms.
+  `preventDefault()`).
 
 ---
 
