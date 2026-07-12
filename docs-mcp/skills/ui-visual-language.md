@@ -524,7 +524,7 @@ Visual consistency on disabled state matters because the user needs to recognize
 
 Disabled is correct for states outside the user's control: loading in progress, insufficient permissions, feature unavailable in the current plan. It is not a substitute for validation feedback.
 
-**Novalidate markup rule:** To support inline error interception on scoped validation forms (`data-ln-form-scope`), the `<form>` element **must** carry the `novalidate` attribute in its HTML markup. Without `novalidate`, browser constraint validation will intercept the submit event before the coordinator's custom gate runs, surfacing native browser bubbles instead of our inline error styles.
+**Novalidate is automatic.** `ln-validate` injects `novalidate` on its host `<form>` per validated field — no manual markup needed.
 
 ---
 

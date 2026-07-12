@@ -4670,7 +4670,7 @@ H(Ft, ie, ce, "ln-router", {
       s._touched && s.validate();
     }, h || t.addEventListener("input", this._onInput), t.addEventListener("change", this._onChange), t.addEventListener("ln-validate:set-custom", this._onSetCustom), t.addEventListener("ln-validate:clear-custom", this._onClearCustom);
     const o = t.form;
-    return o && (this._onFormReset = function() {
+    return o && (o.hasAttribute("novalidate") || o.setAttribute("novalidate", ""), this._onFormReset = function() {
       s.reset();
     }, this._onValidateRequest = function(a) {
       s._touched = !0, !s.validate() && a.detail && a.detail.invalidFields && a.detail.invalidFields.push(s.dom);

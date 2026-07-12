@@ -211,7 +211,7 @@ Ajax interception for non-scoped forms (if a project wants it) is a separate com
 - On submit, `ln-form` dispatches the synchronous custom event `ln-validate:request-validate` on the form with a collector array `invalidFields` in the event detail.
 - Each `ln-validate` field instance listens to this event on its parent form. If invalid, it pushes its input element to `detail.invalidFields`.
 - If the collector array contains any items, `ln-form` halts submission and focuses the first invalid element in document order.
-- To support this inline validation gate, any form using `ln-form` for `POST`/`PUT`/`PATCH` submission **MUST** have the `novalidate` attribute set on the `<form>` markup to bypass native browser bubbles.
+- Native browser bubbles are bypassed automatically: `ln-validate` injects `novalidate` on the host `<form>` the moment one of its fields initializes — authors never write `novalidate` by hand. A form with zero `data-ln-validate` fields keeps native browser validation as the default.
 - `ln-validate` also listens to the native `reset` event on the form to clear field error classes and reset its internal `_touched` state.
 
 ---

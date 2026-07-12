@@ -633,7 +633,7 @@ For commands that require synchronous feedback or list gathering (such as batch 
 - **Bubbling:** `true` (to allow components/listeners attached to form or ancestor nodes to catch it).
 
 ### Form Scoping and Validation Rules
-- **Novalidate:** Any `<form data-ln-form>` used for `POST`/`PUT`/`PATCH` submission **MUST** carry the `novalidate` attribute in its HTML markup. This disables native browser bubble behaviors, allowing `ln-form` and `ln-validate` to intercept invalid submissions, surface inline error lists, and focus the first invalid field.
+- **Novalidate:** `ln-validate` injects `novalidate` on its host `<form>` automatically — the moment a form contains at least one `data-ln-validate` field, native browser bubbles are silenced in favor of inline error lists. Authors never write `novalidate` by hand; a form with zero `data-ln-validate` fields keeps native browser validation as the default.
 
 ---
 

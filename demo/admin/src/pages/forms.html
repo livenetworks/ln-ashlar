@@ -29,7 +29,7 @@
 								<strong>The Validity Primitive (<code>ln-validate</code>):</strong> Each input, select, or textarea is a standalone validation primitive. It wraps the browser's native <code>ValidityState</code>, controls when to surface errors visually (only after the field is touched), and manages custom/server-side errors via the <code>ln-validate:set-custom</code> event channel.
 							</li>
 							<li>
-								<strong>The Form Coordinator (<code>ln-form</code>):</strong> This is the coordinator. It sits on the root <code>&lt;form&gt;</code> element and manages fill/reset and, for local-first write pages, the submit validation gate (<code>data-ln-form-scope</code> requires <code>novalidate</code> + blocks invalid submits). Field-level validation state is <code>ln-validate</code>'s job; a valid submit is claimed by <code>ln-data-coordinator</code>, not dispatched by <code>ln-form</code>.
+								<strong>The Form Coordinator (<code>ln-form</code>):</strong> This is the coordinator. It sits on the root <code>&lt;form&gt;</code> element and manages fill/reset and, for local-first write pages, the submit validation gate (blocks invalid <code>POST</code>/<code>PUT</code>/<code>PATCH</code> submits on any <code>data-ln-form</code> form; <code>novalidate</code> is injected automatically by <code>ln-validate</code> wherever a field needs it). Field-level validation state is <code>ln-validate</code>'s job; a valid submit is claimed by <code>ln-data-coordinator</code>, not dispatched by <code>ln-form</code>.
 							</li>
 						</ol>
 
