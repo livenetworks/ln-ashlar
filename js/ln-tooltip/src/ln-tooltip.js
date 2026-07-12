@@ -25,6 +25,13 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 			portal.id = PORTAL_ID;
 			document.body.appendChild(portal);
 		}
+		// Popover API gives top-layer promotion for free — no ancestor
+		// overflow/z-index/transform can clip or bury the portal. `manual`
+		// keeps show/hide entirely under this file's control (no native
+		// light-dismiss), same convention as ln-dropdown/ln-popover.
+		if (!portal.hasAttribute('popover')) {
+			portal.setAttribute('popover', 'manual');
+		}
 		return portal;
 	}
 
@@ -52,6 +59,15 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 		if (!text) return;
 
 		_ensurePortal();
+
+		// Promote before measuring: a manual popover is `display: none` (UA
+		// default) until shown, and a hidden ancestor collapses the whole
+		// subtree's layout box regardless of the child's own display —
+		// so offsetWidth/offsetHeight below would read 0 if this ran later.
+		// _hide() above already guarantees the portal is closed, so no
+		// InvalidStateError risk here (matches ln-dropdown/ln-popover: bare
+		// feature-detect on show, guarded feature-detect on hide).
+		if (typeof portal.showPopover === 'function') portal.showPopover();
 
 		// Stash + strip `title` while our tooltip is visible so the browser's
 		// native title tooltip does not appear alongside it. Restored on hide.
@@ -128,6 +144,11 @@ import { computePlacement, dispatch, registerComponent } from '../../ln-core';
 		}
 		activeTooltipNode = null;
 		activeTrigger = null;
+		// Exit the top layer — guard required: hidePopover() throws
+		// InvalidStateError if called while not currently showing.
+		if (portal && typeof portal.hidePopover === 'function' && portal.matches(':popover-open')) {
+			portal.hidePopover();
+		}
 		_removeEscListener();
 	}
 

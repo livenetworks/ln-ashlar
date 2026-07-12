@@ -96,15 +96,18 @@
 }
 
 // ─── JS Portal (real DOM tooltip) ──────────────────────
-// When JS enhance is active, tooltips render as positioned
-// DOM elements inside #ln-tooltip-portal instead of ::after.
+// When JS enhance is active, tooltips render as positioned DOM elements
+// inside #ln-tooltip-portal, a shared popover="manual" container promoted
+// to the browser's top layer (showPopover()/hidePopover() in ln-tooltip.js)
+// instead of ::after.
 
 @mixin tooltip-portal {
 	position: fixed;
+	inset: auto;
+	margin: 0;
 	top: 0;
 	left: 0;
 	pointer-events: none;
-	z-index: var(--z-toast);
 }
 
 @mixin tooltip-element {
