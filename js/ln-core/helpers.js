@@ -342,6 +342,16 @@ export function isVisible(el) {
 
 // ─── Form Serialization ───────────────────────────────────
 
+// Effective HTTP method for a form: hidden _method input (non-empty) wins,
+// else the form's own `method` attribute. Shared by ln-form's submit gate
+// and ln-data-coordinator's native-submit claim so both read the identical
+// literal DOM state — no drift between the two independent checks.
+export function resolveFormMethod(form) {
+	const methodInput = form.querySelector('input[name="_method"]');
+	const raw = (methodInput && methodInput.value !== '') ? methodInput.value : form.method;
+	return (raw || '').toUpperCase();
+}
+
 export function serializeForm(form, opts) {
 	const typed = !!(opts && opts.typed);
 	const exclude = opts && opts.exclude;

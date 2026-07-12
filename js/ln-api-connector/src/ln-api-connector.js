@@ -92,7 +92,11 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		if (expectedVersion !== undefined && expectedVersion !== null) {
 			payload = Object.assign({}, payload, { expected_version: expectedVersion });
 		}
-		return window.fetch(buildUrl(self.baseUrl, url || self.path, id), {
+		// An explicit `url` is the COMPLETE resource URL — it already carries the
+		// id (e.g. the form's resolved action `/documents/42`). Do NOT re-append
+		// id, symmetric with create(). Only the path fallback needs id appended.
+		const target = url ? buildUrl(self.baseUrl, url) : buildUrl(self.baseUrl, self.path, id);
+		return window.fetch(target, {
 			method: 'PUT',
 			headers: self._reqHeaders(),
 			credentials: self.credentials,

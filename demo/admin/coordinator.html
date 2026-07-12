@@ -620,10 +620,12 @@
 		}
 	});
 
-	// Write path is now declarative (data-ln-form-scope on #doc-form) — the
-	// coordinator claims ln-form:submit-record itself.
-	formEl.addEventListener('ln-form:submit-record', function () {
-		modalEl.setAttribute('data-ln-modal', 'close');
+	// Write path is native-first (data-ln-form-scope on #doc-form) — react
+	// to the store outcome instead of a form-level event.
+	['ln-store:created', 'ln-store:updated'].forEach(function (ev) {
+		storeEl.addEventListener(ev, function () {
+			modalEl.setAttribute('data-ln-modal', 'close');
+		});
 	});
 })();
 </script>

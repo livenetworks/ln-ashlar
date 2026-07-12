@@ -321,6 +321,9 @@ import { registerComponent, dispatch } from '../../ln-core';
 			const targets = entries.filter(en => en.chainKey === oldKey && en.status !== 'failed');
 			return Promise.all(targets.map(entry => {
 				if (entry.targetId === oldKey) entry.targetId = newId;
+				if (entry.meta && typeof entry.meta.action === 'string' && entry.meta.action.indexOf(oldKey) !== -1) {
+					entry.meta.action = entry.meta.action.split(oldKey).join(newId); // keep a persisted per-record URL in sync after the create resolves
+				}
 				entry.chainKey = newId;
 				return _putEntry(entry);
 			}));

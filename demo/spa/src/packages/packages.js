@@ -1,12 +1,15 @@
 (function () {
 	'use strict';
 
-	// Write path is now declarative (data-ln-form-scope="packages" on
-	// #package-form) — the coordinator claims ln-form:submit-record itself.
-	document.addEventListener('ln-form:submit-record', function (e) {
-		if (e.detail.scope !== 'packages' || e.target.id !== 'package-form') return;
-		const packageModal = document.getElementById('package-modal');
-		if (packageModal) packageModal.setAttribute('data-ln-modal', 'close');
+	// Write path is native-first (data-ln-form-scope="packages" on
+	// #package-form, which serves both create and edit via modal-mode) —
+	// react to either store outcome by closing the modal.
+	['ln-store:created', 'ln-store:updated'].forEach(function (ev) {
+		document.addEventListener(ev, function (e) {
+			if (e.detail.store !== 'packages') return;
+			const packageModal = document.getElementById('package-modal');
+			if (packageModal) packageModal.setAttribute('data-ln-modal', 'close');
+		});
 	});
 
 	// Listen to packages table row action (specifically 'delete')
