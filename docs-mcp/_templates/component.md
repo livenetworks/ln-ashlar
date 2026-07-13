@@ -52,6 +52,19 @@ Short explanation of when to use it.
 |---|---|---|---|---|
 | `data-ln-name` | Panel | `"a"` \| `"b"` | `"a"` | ... |
 
+### Programmatic JS API
+
+<!-- OPTIONAL SUB-SECTION — include only when the component exposes a global
+     surface (window.lnCore.*, window.lnHttp, …) or an instance API
+     (dom.lnName), typically Coordinator or Service classification. If there
+     is no such surface, OMIT this sub-section entirely (no empty heading).
+     Document ONLY helpers that exist in the source file — never invent
+     methods. -->
+
+| Helper | Signature | Returns | Description |
+|---|---|---|---|
+| `window.lnCore.lnName` | `(container: HTMLElement, record: Object)` | `void` | ... |
+
 ### Events API
 
 | Event | Direction | Cancelable | Description | `detail` Object |
@@ -60,22 +73,7 @@ Short explanation of when to use it.
 
 ---
 
-## 4. Programmatic API
-
-<!-- OPTIONAL SECTION — include only when the component exposes a global
-     surface (window.lnCore.*, window.lnHttp, …), typically Coordinator or
-     Service classification. If there is no global surface, OMIT this
-     section entirely (no empty heading) and renumber the remaining
-     sections sequentially. Document ONLY helpers that exist in the source
-     file — never invent methods. -->
-
-| Helper | Signature | Returns | Description |
-|---|---|---|---|
-| `window.lnCore.lnName` | `(container: HTMLElement, record: Object)` | `void` | ... |
-
----
-
-## 5. State & Persistence
+## 4. State & Persistence
 
 <!-- OPTIONAL SECTION — include only when the component persists state
      (localStorage / sessionStorage / URL hash), e.g. via data-ln-persist.
@@ -89,14 +87,14 @@ Short explanation of when to use it.
 
 ---
 
-## 6. CSS Styling & Behavioral Concept
+## 5. CSS Styling & Behavioral Concept
 
 SCSS mixins, classes and behavioral concepts (teleporting, positioning, animations),
 with links to the source `.scss` files and short source excerpts.
 
 ---
 
-## 7. Accessibility (ARIA) & Common Pitfalls
+## 6. Accessibility (ARIA) & Common Pitfalls
 
 ### ARIA & Keyboard
 
@@ -109,7 +107,7 @@ with links to the source `.scss` files and short source excerpts.
 
 ---
 
-## 8. Flow Diagram & Lifecycle
+## 7. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -119,6 +117,6 @@ sequenceDiagram
 
 ---
 
-## 9. Related Components
+## 8. Related Components
 
 - [`ln-other`](./ln-other.md) — why it is related.

@@ -145,7 +145,7 @@ To allow multiple panels to be open simultaneously without closing siblings, sim
 |---|---|---|---|---|
 | `data-ln-accordion` | Wrapper (`<ul>` \| `<div>`) | Presence | Absent | Initializes the `ln-accordion` coordinator on the wrapper element. |
 
-### Programmatic API
+### Programmatic JS API
 
 The initialized coordinator instance is exposed on the wrapper element via the property `dom.lnAccordion`.
 

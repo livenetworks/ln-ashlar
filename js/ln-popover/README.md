@@ -41,7 +41,7 @@ Triggers and popovers are paired by ID. Wrap content in a `div` carrying the `da
 
 ## 3. Declarative API & State Contract
 
-There are no imperative JavaScript methods (like `open()` or `close()`) on the component instance. **The HTML attribute is the sole contract.** 
+The initialized instance is exposed as `dom.lnPopover`, with `open(trigger)`, `close()`, `toggle(trigger)`, and `destroy()` methods, plus `isOpen` and `trigger` properties. **The HTML attribute remains the primary contract** — the instance methods are thin wrappers that ultimately write the same attribute.
 
 Triggers, LIFO click outside handlers, viewport edge flips, and custom scripts all change state by writing the active attribute on the popover element:
 
@@ -53,6 +53,10 @@ popover.setAttribute('data-ln-popover', 'open');
 
 // Close the popover
 popover.setAttribute('data-ln-popover', 'closed');
+
+// Equivalent imperative calls via the instance
+popover.lnPopover.open();
+popover.lnPopover.close();
 
 // Read-only state query
 popover.lnPopover.isOpen; // Returns true/false

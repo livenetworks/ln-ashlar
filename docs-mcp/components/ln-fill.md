@@ -88,16 +88,7 @@ When using a hash-bound trigger, `ln-fill` skips direct click population and del
 | `data-ln-fill-id` | Trigger | `String` | - | Unique record identifier, matched against `ln-fill:request` parameters. |
 | `data-ln-fill-*` | Trigger | `String` | - | Form values. Keys are converted to camelCase (e.g. `data-ln-fill-user-name` → `userName`). |
 
-### Events API
-
-| Event | Direction | Cancelable | Description | `detail` Object |
-|---|---|---|---|---|
-| `ln-fill:request` | Listens | No | Dispatched by coordinators to initiate DOM population. | `{ id: String\|null }` |
-| `ln-fill` | Emits | No | Dispatched on target forms to prompt input filling. | `Record\|null` |
-
----
-
-## 4. Programmatic API
+### Programmatic JS API
 
 `window.lnCore.lnFill` is the actual population routine. Both the click-triggered path and the `ln-fill:request` event path resolve a record and hand off to this helper — it is the single fan-out point that performs the DOM population.
 
@@ -107,15 +98,22 @@ When using a hash-bound trigger, `ln-fill` skips direct click population and del
 
 Coordinators (e.g. [`ln-modal-fill`](./ln-modal-fill.md)) call `window.lnCore.lnFill` directly when they already hold a resolved record and need to bypass the click/attribute parsing steps. Authors relying purely on declarative markup never call it directly — `data-ln-fill-form` triggers and `ln-fill:request` events cover the common cases and call the helper internally.
 
+### Events API
+
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-fill:request` | Listens | No | Dispatched by coordinators to initiate DOM population. | `{ id: String\|null }` |
+| `ln-fill` | Emits | No | Dispatched on target forms to prompt input filling. | `Record\|null` |
+
 ---
 
-## 5. CSS Styling & Behavioral Concept
+## 4. CSS Styling & Behavioral Concept
 
 `ln-fill` is a functional component with no visual styles or SCSS mixins of its own.
 
 ---
 
-## 6. Accessibility (ARIA) & Common Pitfalls
+## 5. Accessibility (ARIA) & Common Pitfalls
 
 ### ARIA & Keyboard
 
@@ -129,7 +127,7 @@ Coordinators (e.g. [`ln-modal-fill`](./ln-modal-fill.md)) call `window.lnCore.ln
 
 ---
 
-## 7. Flow Diagram & Lifecycle
+## 6. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -162,7 +160,7 @@ sequenceDiagram
 
 ---
 
-## 8. Related Components
+## 7. Related Components
 
 - [`ln-form`](./ln-form.md) — the primary target for form filling.
 - [`ln-modal-fill`](./ln-modal-fill.md) — coordinator bridging hash modal opens to `ln-fill` requests.

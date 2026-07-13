@@ -58,7 +58,7 @@ Below is a standard copy-paste template for an actions dropdown:
         <li><hr></li>
         <li>
             <form action="/logout" method="POST">
-                <button type="submit" class="text-danger">Sign Out</button>
+                <button type="submit">Sign Out</button>
             </form>
         </li>
     </ul>
@@ -99,7 +99,7 @@ The dropdown menu can accommodate avatars, dividers (`<hr>`), and complex action
         <li><hr></li>
         <li>
             <form action="/logout" method="POST">
-                <button type="submit" class="text-danger">Log Out</button>
+                <button type="submit">Log Out</button>
             </form>
         </li>
     </ul>
