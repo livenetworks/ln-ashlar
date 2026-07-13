@@ -67,6 +67,10 @@ Short explanation of when to use it.
 
 ### Events API
 
+<!-- The Events table is a full protocol inventory: every event the component
+     emits or listens to — including lifecycle events (`:destroyed`,
+     `:config-changed`) and inter-component wiring — must have a row. -->
+
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-name:open` | Emits | No | ... | `{ target: HTMLElement }` |

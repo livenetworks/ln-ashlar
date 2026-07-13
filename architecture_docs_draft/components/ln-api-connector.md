@@ -4,101 +4,88 @@
 ---
 
 ## 1. Заднинско дејство и одговорност
-`ln-api-connector` (со соодветен алијас `lnConnector`) е раздвоена инфраструктурна компонента одговорна за извршување на стандардни RESTful барања кон бекенд сервери преку мрежа.
+`ln-api-connector` (со соодветен алијас `lnConnector`) е раздвоена инфраструктурна компонента дефинирана во [`js/ln-api-connector/src/ln-api-connector.js`](../../js/ln-api-connector/src/ln-api-connector.js) одговорна за извршување на стандардни RESTful барања кон бекенд сервери преку мрежа.
 
-*   **Главна Одговорност:** Како изолиран мрежен драјвер (REST Client), компонентата нема сопствено познавање за состојбата на формата, табелата или локалниот IndexedDB кеш. Нејзината единствена задача е да прими насочен CustomEvent за мрежна операција, да ја преточи во соодветен `fetch()` повик со правилни параметри и на крај да го емитува одговорот или грешката назад во DOM стеблото.
+*   **Главна Одговорност:** Како изолиран мрежен драјвер (REST Client), компонентата нема сопствено познавање за состојбата на формата, табелата или локалниот IndexedDB кеш. Неа единствена задача е да прими CustomEvent за мрежна операција, да ја изврши преку `fetch()` и да го врати одговорот или грешката во DOM-от.
 *   **RESTful операциски стандард:** Поддржува 5 примарни мрежни дејства:
-    *   **Sync / FetchDelta:** Преземање разлика на податоци (`GET` со параметар `since` за делта синхронизација; `since` е опционален — без него се влече целиот сет).
+    *   **Sync / FetchDelta:** Преземање разлика на податоци (`GET` со параметар `since`).
     *   **Create:** Креирање нов запис (`POST`).
-    *   **Update:** Измена на постоечки запис (`PUT` со поддршка за верзионирање `expected_version`).
+    *   **Update:** Измена на запис (`PUT` со `expected_version`).
     *   **Delete:** Бришење запис (`DELETE`).
-    *   **Bulk Delete:** Масовно бришење на низа записи (`DELETE` до `/bulk-delete` патека).
-*   **Заглавија (Headers):** Секое барање автоматски носи `Content-Type: application/json`, `Accept: application/json` и специјалното заглавие `X-LN-Response: data` — сигнал до бекендот дека се очекува чист JSON одговор без HTML декор. Врз нив се спојуваат заглавијата од `data-ln-api-headers`. Компонентата **не** додава CSRF токен ниту авторизациско заглавие сама од себе — авторизацијата е одговорност на развивачот (најдобро преку `HttpOnly` колачиња, види §5). Ако во `data-ln-api-headers` се детектира `Authorization` / `Bearer` / `Basic`, компонентата емитува `console.warn` безбедносно предупредување.
-*   **Credentials:** `fetch()` повиците се хардкодирани на `credentials: 'same-origin'` и тоа не е конфигурабилно. Колачињата се испраќаат само кон истиот origin — cookie-базирана авторизација **не работи** кон cross-origin API (види §5, честа грешка 3).
+    *   **Bulk Delete:** Масовно бришење (`DELETE` до `/bulk-delete` патека).
+*   **Заглавија (Headers):** Секое барање носи `Content-Type: application/json`, `Accept: application/json` и `X-LN-Response: data` — сигнал до бекендот за чист JSON одговор.
+
+> [!IMPORTANT]
+> **Што `ln-api-connector` НЕ прави (Orthogonality Doctrine):**
+> * **НЕ чува локална состојба или податоци** — тоа е одговорност на `ln-data-store`.
+> * **НЕ управува со кориснички сесии или CSRF** — се потпира на browser-managed HttpOnly cookies.
 
 ---
 
 ## 2. Минимален HTML Маркап и Варијанти на Употреба
 
-Се поставува како невидлив елемент во рамките на страницата и ги дефинира своите мрежни патеки во DOM атрибутите.
-
+### Базен HTML Маркап
 ```html
-<!-- Конфигурација за мрежен конектор на Продукти (same-origin API) -->
 <div data-ln-api-connector="products"
      data-ln-api-base-url=""
      data-ln-api-path="/api/v1/products"
-     data-ln-api-headers="X-Client-Type: Web, Accept-Language: mk"
      id="products-connector">
 </div>
 ```
-
-> Празен `data-ln-api-base-url` значи барања кон сопствениот origin. Cross-origin base URL (на пр. `https://api.site.com`) е возможен, но тогаш cookie авторизацијата отпаѓа поради `credentials: 'same-origin'` (§1).
 
 ---
 
 ## 3. Декларативен API Договор (Атрибути и Настани)
 
+### HTML Атрибути
 | Атрибут | Тип | Опис |
 | :--- | :--- | :--- |
 | `data-ln-api-connector` | `String` | Го активира компонентот и го дефинира името на инстанцата. |
 | `data-ln-api-base-url` | `String` | Основната URL адреса на бекендот. Празна вредност = сопствениот origin. |
 | `data-ln-api-path` | `String` | Рутата на ресурсот на серверот (на пр. `/v1/users`). |
-| `data-ln-api-headers` | `String` | Листа на дополнителни HTTP заглавија во формат `Клуч:Вредност, Клуч2:Вредност2`. |
-
-**Жива реконфигурација:** сите три конфигурациски атрибути (`base-url`, `path`, `headers`) се набљудуваат во живо — промена на атрибутот во DOM автоматски повикува `refreshConfig()` и емитува `ln-api-connector:config-changed`. Корисно за менување на base URL при login или tenant switch, без реиницијализација.
-
-**JS API:** инстанцата е достапна на елементот како `el.lnApiConnector` (алијас `el.lnConnector`) и ги нуди истите операции како Promise методи: `fetchDelta(since)`, `create(payload, url)`, `update(id, payload, expectedVersion, url)`, `delete(id, url)`, `bulkDelete(ids, url)`, плус `refreshConfig()` и `destroy()`. Секој мутациски метод (сите освен `fetchDelta`) сега прима и опционален трејлинг аргумент `url` — кога е присутен (непразен стринг), го заменува `self.path` во внатрешниот `buildUrl(baseUrl, path, ...)` повик за тој конкретен повик; кога е отсутен/`undefined`, однесувањето е 100% непроменето (`buildUrl(baseUrl, self.path, ...)`). `fetchDelta` останува без `url` параметар — read/sync секогаш оди преку конфигурираниот `data-ln-api-path`. Настанскиот API подолу е тенка обвивка околу нив.
+| `data-ln-api-headers` | `String` | Дополнителни HTTP заглавија во формат `Key:Value, Key2:Value2`. |
 
 ### DOM Барања кон Конекторот (Слуша)
-*За компатибилност, компонентата реагира на настани испратени со префикси `ln-api-connector:...` и `ln-rest-connector:...`*
+*Слуша настани со префикси `ln-api-connector:...` и `ln-rest-connector:...`*
 | Настан | Payload `e.detail` | Опис |
 | :--- | :--- | :--- |
-| `:request-sync` / `:request-fetch` | `{ since?: Timestamp, meta?: Object }` | Барање за вчитување на промените од одреден маркер; без `since` се влече сè. |
+| `:request-sync` / `:request-fetch` | `{ since?: String, meta?: Object }` | Барање за делта синхронизација. |
 | `:request-create` | `{ data: Object, tempId: String, url?: String, meta?: Object }` | Барање за креирање нов запис. |
-| `:request-update` | `{ id: ID, data: Object, expected_version: Int, url?: String, meta?: Object }` | Барање за измена на запис со одредена верзија. |
+| `:request-update` | `{ id: ID, data: Object, expected_version: Int, url?: String, meta?: Object }` | Барање за измена на запис. |
 | `:request-delete` | `{ id: ID, url?: String, meta?: Object }` | Барање за бришење поединечен запис. |
 | `:request-bulk-delete` | `{ ids: Array, url?: String, meta?: Object }` | Барање за масовно бришење. |
-
-`url` (опционален, стринг): кога е присутен, го **заменува** `data-ln-api-path` внатре во `buildUrl()` join-от за тој конкретен повик — `data-ln-api-base-url` секогаш сепак се препишува пред него. Кога е отсутен/празен, важи стандардното `path` однесување. Ова постои затоа што мутацискиот endpoint потекнува од HTML `action` на формата (преку `ln-data-coordinator`), додека `data-ln-api-path` останува конфигурација само за read/sync fallback.
-
-`meta` (опционален, `Object`, опаque за конекторот — не се толкува, само се echo-ира): default `null` ако не е даден; се враќа непроменет во соодветниот одговор-настан. Овозможува корелација без Promise за приемачот (типично `ln-data-coordinator`, кој внатре го носи `entryId` за queue ack/nack).
 
 ### Одговори кон DOM (Емитува)
 | Настан | Payload `e.detail` | Опис |
 | :--- | :--- | :--- |
 | `ln-api-connector:fetched` | `{ data, since, meta }` | Вратени податоци од делта синхронизација. |
-| `ln-api-connector:created` | `{ record, tempId, meta }` | Успешно креиран запис, го враќа серверот заедно со привременото ID. |
-| `ln-api-connector:updated` | `{ record, id, meta }` | Успешно ажуриран запис. |
-| `ln-api-connector:deleted` | `{ response, id, meta }` | Успешно избришан запис на серверот. |
-| `ln-api-connector:bulk-deleted` | `{ response, ids, meta }` | Успешно избришани низа на записи. |
-| `ln-api-connector:error` | `{ action, error, status, data, meta, ...контекст }` | Грешка при комуникација со серверот (детали подолу). |
-| `ln-api-connector:config-changed` | `{ baseUrl, path, headers }` | Емитуван при секој `refreshConfig()` — иницијално и при жива промена на атрибут. |
-| `ln-api-connector:destroyed` | `{ target }` | Емитуван при `destroy()` на инстанцата. |
-
-Секое поле `meta` во одговорите е точна ехо-копија на `detail.meta` од барањето што го предизвикало одговорот, `null` ако не бил проследен.
-
-**Структура на `:error`:** покрај заедничките полиња `action`, `error` (порака), `status` и `data` (JSON телото на грешката, ако постои), payload-от носи **контекстуално поле за корелација, зависно од акцијата**: `since` (sync), `tempId` (create), `id` (update и delete), `ids` (bulk-delete). Полето `conflictData` постои **само за `update`** и е не-null единствено при HTTP 409 — тогаш ја содржи моменталната серверска верзија на записот. Мрежна грешка без HTTP одговор (fetch reject) дава `status: 0`.
-
-**Успешни одговори:** HTTP 204 (No Content) се разрешува како `null` — при бришење `response` ќе биде `null` ако серверот не враќа тело.
+| `ln-api-connector:created` | `{ record, tempId, message, meta }` | Успешно креиран запис на серверот. |
+| `ln-api-connector:updated` | `{ record, id, message, meta }` | Успешно ажуриран запис. |
+| `ln-api-connector:deleted` | `{ response, id, message, meta }` | Успешно избришан запис на серверот. |
+| `ln-api-connector:bulk-deleted` | `{ response, ids, message, meta }` | Успешно избришани низа записи. |
+| `ln-api-connector:error` | `{ action, error, status, data, conflictData, meta, ...контекст }` | Грешка при комуникација со серверот. |
 
 ---
 
 ## 4. CSS Стилизирање и Поведенски Концепт
-Како логичка компонента без кориснички интерфејс (headless component), `ln-api-connector` нема визуелни стилови.
+Како чисто логичка компонента без визуелен кориснички интерфејс (headless component), `ln-api-connector` нема свои CSS класи или стилови.
 
 ---
 
 ## 5. Пристапност (ARIA) и Чести Грешки
-*   **Пристапност:** Бидејќи нема директна интеракција со корисникот и нема визуелен приказ, ARIA улогите и фокусот не се применуваат.
-*   **Честа грешка 1 (Security Hazard):** Складирање на Bearer авторизациски токени директно во `data-ln-api-headers` атрибутот во HTML. Доколку се направи ова, секоја XSS ранливост на страницата ќе овозможи кражба на токенот. Секогаш претпочитајте авторизација со `HttpOnly` колачиња (cookies) или користење на Backend Proxy Gateway. Компонентата ова активно го детектира и предупредува во конзола.
-*   **Честа грешка 2 (Неисправен HTTP 409 третман):** Игнорирање на `conflictData` при грешки за измени. За правилно разрешување на конфликти при истовремено пишување на двајца корисници, серверот мора да врати статус 409 и моменталната верзија на објектот, за конекторот да може правилно да ја проследи назад во системот.
-*   **Честа грешка 3 (Cross-origin + cookie auth):** Насочување на `data-ln-api-base-url` кон друг origin со очекување дека сесиските колачиња ќе патуваат. Нема да патуваат — `credentials` е фиксирано на `same-origin`. За cross-origin API користете Backend Proxy Gateway на сопствениот origin.
+- **Пристапност:** Бидејќи нема директна интеракција со корисникот и нема визуелен приказ, ARIA улогите и фокусот не се применуваат.
+- **Анти-патерни:**
+  > [!WARNING]
+  > **1. Складирање токени во HTML:**
+  > Чување на Bearer или API токени во `data-ln-api-headers` е безбедносен ризик (ранливост на XSS). Секогаш претпочитајте HttpOnly cookies.
+  
+  > [!WARNING]
+  > **2. Сесиски колачиња со Cross-Origin:**
+  > Бидејќи `credentials` е фиксирано на `same-origin`, сесиските колачиња нема да се праќаат кон надворешни домени. Секогаш користете Backend Proxy за cross-origin потреби.
 
 ---
 
 ## 6. Дијаграм на Текот и Животен Циклус
-
-Овој дијаграм го илустрира циклусот на обработка на барање за измена во базата.
 
 ```mermaid
 sequenceDiagram
@@ -120,16 +107,11 @@ sequenceDiagram
         Server-->>Fetch: Return conflict JSON { current_version: 3, ... }
         Fetch-->>Connector: Reject with error info
         Connector->>Coordinator: dispatch ln-api-connector:error { action: 'update', status: 409, conflictData }
-    else HTTP Error (500)
-        Server-->>Fetch: Internal error
-        Fetch-->>Connector: Reject
-        Connector->>Coordinator: dispatch ln-api-connector:error { action: 'update', status: 500 }
     end
 ```
 
 ---
 
 ## 7. Поврзани Компоненти
-*   **`ln-data-coordinator`**: Главниот Layer 2 медијатор кој слуша промени од локалниот IndexedDB склад и ги проследува во конекторот за испраќање кон серверот — исклучиво преку `:request-*` / одговор настани, никогаш преку директни методски повици.
-*   **`ln-http`**: Доколку `ln-http` е вчитан на страницата, тој глобално го обвиткува `window.fetch`, па и повиците на конекторот минуваат низ неговиот заштитен и дедупликациски слој. Без вчитан `ln-http`, конекторот работи со чист нативен `fetch` — обвивката не е задолжителна зависност.
-*   **`ln-form`**: Индиректен извор на мутацискиот `url` — HTML `action` атрибутот на scoped форма (`data-ln-form-scope`) е single source of truth за ресурсниот endpoint и патува до конекторот (преку координаторот) како `detail.url` во `:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete`, наместо конекторот сам да го гради од `data-ln-api-path`.
+- [`ln-data-coordinator.md`](./ln-data-coordinator.md) — Главниот координатор кој ги поврзува складиштето и конекторот.
+- [`ln-form.md`](./ln-form.md) — Овозможува RESTful action преку scoped форми.
