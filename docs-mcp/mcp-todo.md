@@ -59,8 +59,8 @@
 
 #### Форми и внес
 
-- [ ] **ln-form** — ⚠ v2 проверка (scope, native-submit intake)
-- [ ] **ln-validate**
+- [x] **ln-form** — ⚠ v2 проверка (scope, native-submit intake)
+- [x] **ln-validate**
 - [ ] **ln-options**
 - [ ] **ln-date**
 - [ ] **ln-time**
@@ -72,7 +72,7 @@
 - [ ] **ln-autosave**
 - [ ] **ln-fill**
 - [x] **ln-modal-fill**
-- [ ] **ln-confirm**
+- [x] **ln-confirm**
 
 #### Overlay и интеракција
 
@@ -87,10 +87,10 @@
 #### Податочен слој (декларативно wiring — store/coordinator/конектори)
 
 - [ ] **ln-data-store**
-- [ ] **ln-data-coordinator** — ⚠ v2 проверка (паралелен fan-out, без pending)
-- [ ] **ln-couchdb-connector** — ⚠ draft-от е ДОКАЖАНО застарен (нема `{message,content}` envelope, уште `{record, tempId}`) — `docs/js/couchdb-connector.md` е поточен
-- [ ] **ln-api-connector**
-- [ ] **ln-api-queue**
+- [x] **ln-data-coordinator** — ⚠ v2 проверка (паралелен fan-out, без pending)
+- [x] **ln-couchdb-connector** — ⚠ draft-от е ДОКАЖАНО застарен (нема `{message,content}` envelope, уште `{record, tempId}`) — `docs/js/couchdb-connector.md` е поточен
+- [x] **ln-api-connector**
+- [x] **ln-api-queue**
 
 #### Навигација
 
@@ -243,9 +243,9 @@
 |---|---|---|
 | doctrine | 6 | 6 |
 | guides | 5 | 5 |
-| components — употребливи (3А) | 42 | 7 |
+| components — употребливи (3А) | 42 | 14 |
 | components — позадински (3Б) | 9 | 1 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
 | skills | 13 | 4 |
-| **Вкупно** | **108** | **23** |
+| **Вкупно** | **108** | **30** |
