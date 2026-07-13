@@ -70,7 +70,7 @@
 - [ ] **ln-slug**
 - [ ] **ln-autoresize**
 - [ ] **ln-autosave**
-- [ ] **ln-fill**
+- [x] **ln-fill**
 - [x] **ln-modal-fill**
 - [x] **ln-confirm**
 
@@ -243,9 +243,9 @@
 |---|---|---|
 | doctrine | 6 | 6 |
 | guides | 5 | 5 |
-| components — употребливи (3А) | 42 | 14 |
+| components — употребливи (3А) | 42 | 15 |
 | components — позадински (3Б) | 9 | 1 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
 | skills | 13 | 4 |
-| **Вкупно** | **108** | **30** |
+| **Вкупно** | **108** | **31** |

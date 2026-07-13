@@ -1,7 +1,7 @@
 ---
 name: ln-toggle
 classification: simple
-status: draft
+status: stable
 domain: frontend
 summary: A lightweight binary state toggler for collapsibles, drawers, and banners in the DOM.
 source: js/ln-toggle/src/ln-toggle.js
