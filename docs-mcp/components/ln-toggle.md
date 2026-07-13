@@ -104,7 +104,7 @@ Includes a trigger that opens the drawer, and a separate close-only button insid
 | `data-ln-toggle` | Panel | `"open"` \| `"close"` | `"close"` | The primary state indicator. Set to `"open"` to show the panel, any other value closes it. |
 | `data-ln-toggle-for` | Trigger | Panel Element `id` | Required | Binds a trigger to a target panel by its HTML ID. |
 | `data-ln-toggle-action` | Trigger | `"open"` \| `"close"` \| `"toggle"` | `"toggle"` | Restricts trigger click behavior to only open, only close, or toggle the target. |
-| `data-ln-persist` | Panel | Presence \| `String` (key) | Absent | Enables state persistence. See [State & Persistence](#4-state--persistence) for the key format. |
+| `data-ln-persist` | Panel | Presence | Absent | Saves the open/closed state in `localStorage` under the key `ln:toggle:{pagePath}:{id}`. |
 
 ### Events API
 
@@ -120,16 +120,7 @@ All events bubble up from the target panel element.
 
 ---
 
-## 4. State & Persistence
-
-- **Storage:** `localStorage`
-- **Key format:** `ln:toggle:{pagePath}:{id}` — `pagePath` is `location.pathname` with trailing slashes stripped and lowercased (falls back to `/`). `id` is the value of `data-ln-persist="key"` when non-empty, otherwise the panel element's own `id` attribute.
-- **Written when:** the panel's open/close state actually changes (in `_syncAttribute`, right after the corresponding `ln-toggle:open` / `ln-toggle:close` event dispatches), and only when the panel carries `data-ln-persist`. **Cleared when:** never automatically — `ln-toggle` only ever writes `"open"` or `"close"` strings; entries are overwritten on the next state change but not removed.
-- **Invalidation / versioning:** none. There is no cache-version flush or stale-entry handling; a saved value is read back verbatim on the next page load via `persistGet` and re-applied to `data-ln-toggle` before the initial open state is computed.
-
----
-
-## 5. CSS Styling & Behavioral Concept
+## 4. CSS Styling & Behavioral Concept
 
 The visual expansion transition is powered by CSS Grid track sizing. The panel is styled using two key mixins defined in [scss/config/mixins/_collapsible.scss](../../scss/config/mixins/_collapsible.scss):
 
@@ -150,7 +141,7 @@ The visual expansion transition is powered by CSS Grid track sizing. The panel i
 
 ---
 
-## 6. Accessibility (ARIA) & Common Pitfalls
+## 5. Accessibility (ARIA) & Common Pitfalls
 
 ### ARIA & Keyboard
 - **`aria-expanded` Sync:** All triggers configured with `data-ln-toggle-for` automatically receive `aria-expanded="true"` or `"false"` in sync with the target panel state.
@@ -161,11 +152,10 @@ The visual expansion transition is powered by CSS Grid track sizing. The panel i
 > [!CAUTION]
 > 1. **Padding on Collapsible Panels:** Never apply padding directly to a container styled with `@mixin collapsible`. Padding is not affected by `grid-template-rows: 0fr`, which prevents the panel from collapsing fully, leaving a visual box. Always apply padding to the inner `.collapsible-body` instead.
 > 2. **Missing ID on Target Panel:** The panel element must carry a unique `id` attribute. Triggers match target elements by ID, and diagnostic styles (in dev mode) will highlight panels lacking an ID.
-> 3. **Persist Without an ID or Key:** If a panel has `data-ln-persist` but no `id` attribute and no `data-ln-persist="key"` value, the persistence key cannot be resolved. `persistGet`/`persistSet` log a console warning and silently no-op — the state simply never persists.
 
 ---
 
-## 7. Flow Diagram & Lifecycle
+## 6. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -194,7 +184,7 @@ sequenceDiagram
 
 ---
 
-## 8. Related Components
+## 7. Related Components
 
 - [`ln-accordion`](./ln-accordion.md) — Single-open coordinator that orchestrates multiple `ln-toggle` panels.
 - [`ln-dropdown`](./ln-dropdown.md) — Overlay menu wrapper that uses toggle state combined with click-outside dismissal.

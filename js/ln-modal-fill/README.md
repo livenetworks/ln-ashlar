@@ -8,13 +8,14 @@
 ## Philosophy
 
 `ln-modal-fill` is a zero-config coordinator. It listens for `ln-modal:open`
-events on `document` and dispatches an `ln-fill:request` event on the target modal,
-delegating the search and form filling to the `ln-fill` global behavior.
-There is no markup attribute of its own — a single global document listener
-serves every hash-bound modal on the page.
+events on `document` and, when a param is present, finds the matching
+`[data-ln-fill-id]` source and fills the modal's form via
+`window.lnCore.lnFill`. There is no markup attribute of its own — a single
+global document listener serves every hash-bound modal on the page.
 
 The coordinator pattern: knows two contracts (the `ln-modal:open` event and
-the `ln-fill:request` event) but imports no component source.
+the `data-ln-fill-*` attribute contract) but imports no component source.
+Events in, helper-driven fill out.
 
 ---
 
@@ -24,18 +25,28 @@ the `ln-fill:request` event) but imports no component source.
    Back-Forward) and bubbles `ln-modal:open` with `{ target, param }`.
 2. `ln-modal-fill` catches it on `document`. Hash modals always carry a
    `param` key (null → new mode, a value → edit mode). Plain non-hash
-   modals omit the key entirely — these opt out with no request dispatched.
-3. The coordinator dispatches an `ln-fill:request` CustomEvent directly on the
-   target modal with `{ id: param }` in `e.detail`.
-4. `ln-fill` catches `ln-fill:request` on `document`:
-   - **New mode** (`param === null`): dispatches `window.lnCore.lnFill(modal, null)`,
-     which drives `ln-form`'s `reset()` and `_applyActionMode(null)` (RESTful action routing:
+   modals omit the key entirely — these opt out with no fill dispatched.
+   - **New mode** (hash modal, `param === null`): dispatches
+     `window.lnCore.lnFill(modal, null)`, which drives `ln-form`'s
+     `reset()` and `_applyActionMode(null)` (RESTful action routing:
      restores the base action URL and clears `_method`), and clears
-     `[data-ln-fillable]` display elements.
-   - **Edit mode** (`param` truthy): searches the DOM for `[data-ln-fill-id="<param>"]`
-     (preferring a source whose `data-ln-fill-form` is inside the modal), builds the fill
-     record from the source's `data-ln-fill-*` dataset attributes, and dispatches the fill
-     via `window.lnCore.lnFill(modal, record)`.
+     `[data-ln-fillable]` display elements. Then returns — no source
+     lookup needed.
+   - **Edit mode** (hash modal, `param` truthy): falls through to the
+     source lookup below.
+3. It searches the DOM for `[data-ln-fill-id="<param>"]`:
+   - Prefers a source whose `data-ln-fill-form` resolves to a `<form>` that
+     is INSIDE the opened modal. This disambiguates pages with several modals
+     or tables that share param values.
+   - Falls back to the first matching element.
+4. It builds a fill record from the source's `data-ln-fill-*` dataset attributes
+   using the same rules as `ln-fill`: strip the `lnFill` prefix, lowercase the
+   first character. `data-ln-fill-form` and `data-ln-fill-store` are reserved
+   and excluded. `data-ln-fill-id` is NOT reserved — it becomes `record.id`.
+5. It calls `window.lnCore.lnFill(modal, record)`, which dispatches `ln-fill`
+   CustomEvents to every `[data-ln-form]` and `[data-ln-fillable]` descendant
+   of the modal, reaching `ln-form`'s `fill(record)` and the fillable display
+   handler.
 
 ---
 

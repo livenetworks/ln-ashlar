@@ -54,6 +54,3 @@
 - **Single-Element Actions (`ln-confirm`):** The `ln-confirm` component (in-place two-click confirmation) is strictly reserved for **single-element, low-impact actions** (e.g., deleting a single table row, archiving a single document). It must never be used for complex or high-risk actions.
 - **Bulk Actions & High-Impact Operations (`ln-modal`):** For actions that affect multiple items simultaneously (e.g., bulk deleting selected tenants, batch status updates) or actions with major side effects, using in-place `ln-confirm` is strictly forbidden. Instead, a confirmation modal (`ln-modal`) MUST be shown. The modal must clearly list the affected resources, show the impact summary, and offer explicit, separate "Confirm" and "Cancel" buttons.
 
-## 6. Global Restrictions
-- **No Browser Checking**: Do not use the browser tool or spawn browser subagents to verify layouts, pages, or functional behaviors. Rely on manual verification instructions, code inspection, and project build verification instead.
-

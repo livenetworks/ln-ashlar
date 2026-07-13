@@ -4,12 +4,16 @@
 ---
 
 ## 1. Заднинско дејство и одговорност
-`ln-fill` не е класична изолирана DOM компонента, туку претставува декларативно глобално однесување (event delegation behavior) за брзо пополнување и чистење на форми.
+`ln-fill` не е класична изолирана DOM компонента, туку претставува декларативно глобално однесување (event delegation behavior) за брзо пополнување и чистење на форми и прикажувачки контејнери (`[data-ln-fillable]`).
 
-*   **Главна Одговорност:** Слуша кликови на елементи со `data-ln-fill-form="formId"`, ги собира нивните `data-ln-fill-*` атрибути, ги мапира во camelCase објект (рекорд) и го испраќа тој рекорд до целната форма преку CustomEvent-от `ln-fill`.
+*   **Главна Одговорност:** Слуша кликови на елементи со `data-ln-fill-form="formId"`, ги собира нивните `data-ln-fill-*` атрибути, ги мапира во camelCase објект (рекорд) и го испраќа тој рекорд до целната форма или контејнер преку CustomEvent-от `ln-fill`.
 *   **Слободен проток на кликови:** Компонентата намерно НЕ извршува `e.preventDefault()`. Ова овозможува истата интеракција (клик) истовремено да отвори дијалог (преку `data-ln-modal-for` од `ln-modal`) и да го пополни со податоци во еден чекор. Кликовите со `Ctrl`/`Meta` модификатор и средното глувче се игнорираат (резервирани за нативно однесување на прелистувачот).
-*   **Исклучок за хаш-линкови (Превенција од двојно пополнување):** Ако кликнатиот елемент е линк со хаш дестинација (на пр. `href="#user-modal:142"`), `ln-fill` намерно го игнорира пополнувањето при клик. Наместо тоа, пополнувањето се делегира на `ln-modal-fill` координаторот кој по промената на URL-то ќе прати настан `ln-fill:request` кон соодветниот модал.
-*   **Емитент кон Форми:** `ln-fill` го повикува `window.lnCore.lnFill(container, record)`, кој пак испраќа CustomEvent `ln-fill` до самата цел и сите нејзини потомци што соодветствуваат на `[data-ln-form]`.
+*   **Емитент кон Форми и Прикази:** `ln-fill` го повикува `window.lnCore.lnFill(container, record)`, кој пак испраќа CustomEvent `ln-fill` до самата цел и сите нејзини потомци што соодветствуваат на `[data-ln-form]` или `[data-ln-fillable]`.
+*   **Декларативни Сврзувања (Bindings):** За прегледи (кои не се форми), постои вграден глобален слушател кој при примен `ln-fill` настан автоматски го повикува `fill()` помошникот:
+    *   `data-ln-field="prop"`: Го пополнува `textContent` со вредноста од рекордот.
+    *   `data-ln-attr="attr:prop, attr2:prop2"`: Го ажурира соодветниот HTML атрибут (`setAttribute`).
+    *   `data-ln-show="prop"`: Ја контролира видливоста преку класата `hidden` (`classList.toggle('hidden', !value)`).
+    *   `data-ln-class="className:prop"`: Додава/вади CSS класи во зависност од вистинитоста на вредноста во објектот.
 
 ---
 
@@ -37,29 +41,44 @@
     </select>
 </form>
 ```
+
+```html
+<!-- Пополнување на обичен информативен контејнер (Display Fillable) -->
+<div id="user-profile-preview" data-ln-fillable>
+    <!-- data-ln-field го презема textContent -->
+    <h3 data-ln-field="name">--</h3>
+    
+    <!-- data-ln-attr за динамички атрибути (пр. src за слика) -->
+    <img data-ln-attr="src:avatarUrl, alt:name" src="" alt="" />
+    
+    <!-- data-ln-show за контролирање на приказ -->
+    <span class="badge" data-ln-show="isActive">Активен</span>
+</div>
+```
+
+---
+
 ## 3. Декларативен API Договор (Атрибути и Настани)
 
 | Атрибут | Тип | Опис |
 | :--- | :--- | :--- |
-| `data-ln-fill-form` | `String` | ID на целната форма што ќе биде пополнета при клик. |
-| `data-ln-fill-id` | `String` | Уникатен идентификатор на записот нанесен на тригерот. Се користи при `ln-fill:request` настан за пронаоѓање на соодветниот извор на податоци во DOM. |
+| `data-ln-fill-form` | `String` | ID на целната форма или контејнер што ќе биде пополнет при клик. |
 | `data-ln-fill-*` | `String` | Било кој атрибут со овој префикс (пр. `data-ln-fill-first-name`) ќе биде изваден и испратен како својство на рекордот во camelCase формат (пр. `firstName`). |
+| `data-ln-fillable` | `Flag` | Го означува контејнерот како цел за приказ на податоци. Го слуша глобалниот `ln-fill` настан. |
+| `data-ln-field` | `String` | Се користи внатре во `data-ln-fillable` за мапирање на текстуална содржина. |
+| `data-ln-attr` | `String` | Формат `attr:prop, attr2:prop2` за мапирање вредности во HTML атрибути. |
+| `data-ln-show` | `String` | Својство од рекордот; се применува само ако клучот постои во рекордот — falsy вредност додава класа `hidden`, truthy ја вади. Клуч што фали во рекордот го остава елементот недопрен. |
+| `data-ln-class` | `String` | Формат `className:prop` за динамичко активирање класи врз основа на вредност. |
 
 ### DOM Барања и Настани (Слуша и Емитува)
-
-| Настан | Насока | Payload `e.detail` | Опис |
-| :--- | :--- | :--- | :--- |
-| `ln-fill:request` | Слуша | `{ id: String\|null }` | Се слуша на `document`. Емитуван од координатори за тригерирање на пополнување (со вредност за `id`) или празнење/ресетирање (со `null`). |
-| `ln-fill` | Емитува | `Record\|null` | Се испраќа кон целната форма. Payload-от содржи објект со вредности; `null` вредност предизвикува ресетирање. |
-
-#### Специфични однесувања:
-*   **Ресетирање (`detail = null`):** Формата се ресетира нативно (`form.reset()`).
-*   **Прескокнување на вредности:** При пополнување, `null` или `undefined` вредности во рекордот се прескокнуваат (постојната содржина на тоа поле се зачувува).
+*   **`ln-fill`** (CustomEvent): Се емитува од `lnFill` функцијата кон целниот елемент (ако одговара на `[data-ln-form]` или `[data-ln-fillable]`) и кон сите такви потомци. Неговиот `event.detail` го содржи рекордот со податоци.
+*   **`detail = null`** (празен тригер, без `data-ln-fill-*` вредности): формата се ресетира нативно (`form.reset()`), а кај display контејнерите се празни само `textContent` на `[data-ln-field]` полињата — `data-ln-attr`, `data-ln-show` и `data-ln-class` состојбите остануваат недопрени.
+*   **Прескокнување на вредности:** При пополнување со рекорд, `null`/`undefined` вредности за поединечни својства се прескокнуваат — постојната содржина на тоа поле се зачувува.
 
 ---
 
 ## 4. CSS Стилизирање и Поведенски Концепт
-Како логичко однесување, `ln-fill` не носи свои визуелни стилови и не се потпира на сопствени CSS класи.
+Како логичко однесување, `ln-fill` не носи свои визуелни стилови. Единствениот CSS концепт на кој се потпира е класата **`.hidden`** (`display: none;`), која ја вклучува/исклучува кај елементите означени со `data-ln-show`. Кај `data-ln-class` се вклучуваат/исклучуваат произволни класи наведени во самиот атрибут (форматот `className:prop`), не `.hidden`.
 
 ---
 
@@ -77,29 +96,26 @@
 sequenceDiagram
     participant User
     participant Trigger as Button[data-ln-fill-form]
-    participant Coordinator as Coordinator (ln-modal-fill)
     participant FillJS as ln-fill Global listener
-    participant DOM as document DOM
     participant Form as Form[id="formId"]
     participant Core as ln-core (helpers)
 
-    alt Патека А: Клик на обичен/не-хаш тригер
-        User->>Trigger: Click
-        Trigger->>FillJS: Click event bubbles to document
-        Note over FillJS: Read data-ln-fill-* attributes
-        FillJS->>FillJS: Construct camelCased record
-        FillJS->>Core: call window.lnCore.lnFill(Form, record)
-    else Патека Б: Барање за пополнување (настан)
-        Coordinator->>FillJS: dispatch ln-fill:request { id: '142' } (bubbles)
-        FillJS->>DOM: Search for element with data-ln-fill-id="142"
-        DOM-->>FillJS: Return source element
-        Note over FillJS: Read data-ln-fill-* attributes from source
-        FillJS->>FillJS: Construct camelCased record
-        FillJS->>Core: call window.lnCore.lnFill(Form, record)
-    end
+    User->>Trigger: Click
+    Trigger->>FillJS: Click event bubbles to document
+    
+    Note over FillJS: Read data-ln-fill-* attributes
+    FillJS->>FillJS: Construct camelCased record object
+    
+    FillJS->>Core: call window.lnCore.lnFill(Form, record)
     
     Core->>Form: dispatch CustomEvent('ln-fill', { detail: record })
-    Form->>Form: populate form fields with values
+    
+    alt Form handles ln-fill
+        Form->>Form: populate form fields with values
+    else Target is data-ln-fillable display container
+        Core->>Form: fill(target, record)
+        Note over Form: Update data-ln-field textContent,<br/>update data-ln-attr attributes,<br/>toggle data-ln-show visibility
+    end
 ```
 
 ---
