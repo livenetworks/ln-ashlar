@@ -60,14 +60,43 @@ Short explanation of when to use it.
 
 ---
 
-## 4. CSS Styling & Behavioral Concept
+## 4. Programmatic API
+
+<!-- OPTIONAL SECTION — include only when the component exposes a global
+     surface (window.lnCore.*, window.lnHttp, …), typically Coordinator or
+     Service classification. If there is no global surface, OMIT this
+     section entirely (no empty heading) and renumber the remaining
+     sections sequentially. Document ONLY helpers that exist in the source
+     file — never invent methods. -->
+
+| Helper | Signature | Returns | Description |
+|---|---|---|---|
+| `window.lnCore.lnName` | `(container: HTMLElement, record: Object)` | `void` | ... |
+
+---
+
+## 5. State & Persistence
+
+<!-- OPTIONAL SECTION — include only when the component persists state
+     (localStorage / sessionStorage / URL hash), e.g. via data-ln-persist.
+     If the component persists nothing, OMIT this section entirely (no
+     empty heading) and renumber the remaining sections sequentially. -->
+
+- **Storage:** `localStorage` | `sessionStorage` | URL hash
+- **Key format:** `ln:name:{...}` — how the key is generated.
+- **Written when:** ... **Cleared when:** ...
+- **Invalidation / versioning:** cache-version flush, stale-entry behavior.
+
+---
+
+## 6. CSS Styling & Behavioral Concept
 
 SCSS mixins, classes and behavioral concepts (teleporting, positioning, animations),
 with links to the source `.scss` files and short source excerpts.
 
 ---
 
-## 5. Accessibility (ARIA) & Common Pitfalls
+## 7. Accessibility (ARIA) & Common Pitfalls
 
 ### ARIA & Keyboard
 
@@ -80,7 +109,7 @@ with links to the source `.scss` files and short source excerpts.
 
 ---
 
-## 6. Flow Diagram & Lifecycle
+## 8. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -90,6 +119,6 @@ sequenceDiagram
 
 ---
 
-## 7. Related Components
+## 9. Related Components
 
 - [`ln-other`](./ln-other.md) — why it is related.
