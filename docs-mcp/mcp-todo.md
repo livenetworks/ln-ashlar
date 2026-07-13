@@ -51,24 +51,24 @@
 #### Табели и листи
 
 - [ ] **ln-table**
-- [ ] **ln-sortable**
+- [x] **ln-sortable**
 - [ ] **ln-filter**
 - [ ] **ln-search**
 - [ ] **ln-list**
-- [ ] **ln-stat**
+- [x] **ln-stat**
 
 #### Форми и внес
 
 - [x] **ln-form** — ⚠ v2 проверка (scope, native-submit intake)
 - [x] **ln-validate**
-- [ ] **ln-options**
+- [x] **ln-options**
 - [ ] **ln-date**
-- [ ] **ln-time**
-- [ ] **ln-number**
+- [x] **ln-time**
+- [x] **ln-number**
 - [ ] **ln-upload**
-- [ ] **ln-editor**
-- [ ] **ln-slug**
-- [ ] **ln-autoresize**
+- [x] **ln-editor**
+- [x] **ln-slug**
+- [x] **ln-autoresize**
 - [ ] **ln-autosave**
 - [x] **ln-fill**
 - [x] **ln-modal-fill**
