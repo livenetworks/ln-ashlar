@@ -177,6 +177,7 @@ All events bubble up (`bubbles: true`) and contain the target details in `event.
 | `ln-modal:before-close` | Emits | **Yes** | Fires upon request to close, allowing the application to prevent closing via `e.preventDefault()`. | `{ modalId: String, target: HTMLElement }` |
 | `ln-modal:close` | Emits | No | Fires after the modal closes, before the hash is cleared and focus restored. | `{ modalId: String, target: HTMLElement }` |
 | `ln-modal:destroyed` | Emits | No | Fires when the modal instance is destroyed. | `{ modalId: String, target: HTMLElement }` |
+| `ln-ajax:success` | Listens | No | Listened for on the dialog element itself; automatically closes the modal when a form submission inside it succeeds. | `{ method: String, url: String, data: Object }` |
 
 ---
 
