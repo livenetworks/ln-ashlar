@@ -112,7 +112,8 @@
 | `data-ln-dropdown` | Родителски обвивач (`<div>`) | Празна вредност | Ја иницијализира инстанцата на координаторот на тој елемент. |
 | `data-ln-toggle-for` | Копче-активатор (`<button>`) | `ID на менито` | Го означува целниот елемент што ќе го контролира копчето. |
 | `data-ln-toggle` | Мени елемент (`<ul>`) | `"open"` \| `"close"` (или празно) | Го контролира статусот на отвореност на менито. |
-| `data-ln-dropdown-menu` | Мени елемент (`<ul>`) | Автоматски додаден од JS | Применува CSS правила за `display: none / block` и заштита од истегнување при телепортација. |
+| `popover` | Мени елемент (`<ul>`) | `"manual"` (автоматски од JS) | Го означува елементот како мануелен popover за нативна промоција во Top Layer. |
+| `data-ln-dropdown-menu` | Мени елемент (`<ul>`) | Автоматски додаден од JS | Применува соодветни CSS селектори на менито. |
 | `role="menu"` | Мени елемент (`<ul>`) | Автоматски додаден од JS | Поставува соодветна ARIA улога за пристапност на менито. |
 | `role="menuitem"` | Директни деца на менито (`<li>`) | Автоматски додаден од JS | Поставува ARIA улога за секој елемент во менито. |
 | `aria-haspopup` | Копче-активатор | `"menu"` (автоматски од JS) | Информира корисници на читачи на екран дека копчето отвора мени. |
@@ -126,15 +127,15 @@
 
 | Настан | Откажување (`Cancelable`) | Податоци во `event.detail` | Опис |
 |---|:---:|---|---|
-| `ln-dropdown:open` | Не | `{ target: menuElement }` | Се диспачира откако менито е успешно телепортирано во `<body>`, позиционирано и прикажано. |
-| `ln-dropdown:close` | Не | `{ target: menuElement }` | Се диспачира откако менито е затворено, вратено во оригиналниот DOM родител и сите слушатели се исчистени. |
+| `ln-dropdown:open` | Не | `{ target: menuElement }` | Се диспачира откако менито е промовирано во Top Layer преку `showPopover()`, позиционирано и прикажано. |
+| `ln-dropdown:close` | Не | `{ target: menuElement }` | Се диспачира откако менито е сокриено преку `hidePopover()`, исчистено и сите слушатели се отстранети. |
 | `ln-dropdown:destroyed` | Не | `{ target: wrapperElement }` | Се диспачира кога се повикува `.destroy()` методот на инстанцата за чистење на меморијата. |
 
 #### Слушани настани (Incoming Events)
 
 Координаторот ги прислушува следните настани кои меурат од внатрешниот `ln-toggle` мени елемент:
-* `ln-toggle:open` — Покренува телепортација, позиционирање, ARIA ажурирање и додавање слушатели.
-* `ln-toggle:close` — Покренува отстранување на слушателите, ресетирање стилови и де-телепортација (враќање во DOM родител).
+* `ln-toggle:open` — Покренува нативно прикажување преку `showPopover()`, позиционирање, ARIA ажурирање и додавање слушатели.
+* `ln-toggle:close` — Покренува сокривање преку `hidePopover()`, отстранување на слушателите и ресетирање на inline стилови за позиционирање.
 
 ---
 
@@ -280,16 +281,6 @@ instance.destroy();
 
 [data-ln-dropdown-menu] {
 	@include dropdown-menu;
-
-	// Ресетирање на десното порамнување кога е телепортирано во body за да се спречи 100% истегнување
-	body > & {
-		right: auto;
-	}
-
-	// Издигнување на z-index кога се отвора во контекст на активен модал
-	body:has(.ln-modal[data-ln-modal="open"]) > & {
-		z-index: calc(var(--z-modal) + 10);
-	}
 }
 
 @keyframes ln-dropdown-in {
@@ -306,9 +297,9 @@ instance.destroy();
 
 ---
 
-### 4.2. Поведенски концепт: Телепортација, Пресметка на позиција и Анимации
+### 4.2. Поведенски концепт: Top Layer промоција, Пресметка на позиција и Анимации
 
-* **Телепортација (`teleportToBody`)**: Со цел да се надминат ограничувањата на `overflow: hidden` кај родителите и stacking context проблеми, отвореното мени се телепортира на крајот од `<body>`. При затворање, се враќа во неговата првобитна локација, каде во меѓувреме е оставен коментар-маркер (`<!-- ln-teleport -->`).
+* **Top Layer промоција (Popover API)**: Со цел да се надминат ограничувањата на `overflow: hidden` кај родителите и проблеми со stacking контекст, менито се промовира во Top Layer преку нативното Popover API со атрибутот `popover="manual"`. Ова гарантира дека менито секогаш ќе се исцрта над секој друг елемент на страницата без да се напушти оригиналната DOM локација на елементот.
 * **Динамичко позиционирање (`computePlacement`)**: Координаторот ги зема димензиите на копчето-активатор преку `getBoundingClientRect()` и на скриеното мени преку `measureHidden`, па ја пресметува позицијата преку помошникот `computePlacement` од [ln-core](../../js/ln-core/index.js). Претпочитаната позиција е `bottom-end` (позиционирано долу, десно порамнето со активаторот).
 * **Растојание (Gap)**: Растојанието помеѓу менито и активаторот се чита динамички од CSS променливата `--size-xs` на `document.documentElement` (претворена во пиксели, односно `* 16`), со дифолт вредност од `4px` доколку променливата не е дефинирана.
 * **Анимација и Состојби (`[data-ln-dropdown-menu]`)**:
@@ -362,12 +353,12 @@ instance.destroy();
 sequenceDiagram
     autonumber
     actor Корисник
-    participant Trigger as "Активатор [data-ln-toggle-for]"
-    participant Toggle as "Мени [data-ln-toggle]"
-    participant Coordinator as "Координатор [data-ln-dropdown]"
-    participant Body as document.body
+    participant Trigger as Активатор [data-ln-toggle-for]
+    participant Toggle as Мени [data-ln-toggle]
+    participant Coordinator as Координатор [data-ln-dropdown]
+    participant Browser as Browser (Popover API)
     
-    Note over Coordinator: При иницијализација поставува role="menu", role="menuitem" на децата и aria-haspopup="menu"
+    Note over Coordinator: При иницијализација поставува popover="manual", role="menu", role="menuitem" и aria-haspopup="menu"
     
     Корисник->>Trigger: Клик на активатор
     Trigger->>Toggle: Го отвора менито (data-ln-toggle="open")
@@ -375,7 +366,7 @@ sequenceDiagram
     
     Note over Coordinator: Го слуша 'ln-toggle:open' (меури нагоре)
     Coordinator->>Trigger: Поставува aria-expanded="true"
-    Coordinator->>Body: Го телепортира менито на крајот од body
+    Coordinator->>Browser: Повикува native showPopover() за Top Layer промоција
     Coordinator->>Toggle: Поставува position: fixed и ги мери димензиите
     Coordinator->>Toggle: Го пресметува и поставува top/left во однос на тригерот
     Note over Coordinator: Активира слушатели за scroll, resize и клик надвор од менито
@@ -394,7 +385,7 @@ sequenceDiagram
     Coordinator->>Trigger: Поставува aria-expanded="false"
     Coordinator->>Coordinator: Ги отстранува слушателите за scroll, resize, click
     Coordinator->>Toggle: Ги ресетира inline стиловите за позиционирање
-    Coordinator->>Body: Го враќа менито на оригиналната DOM локација
+    Coordinator->>Browser: Повикува native hidePopover() за излез од Top Layer
     Coordinator->>Coordinator: Диспачира 'ln-dropdown:close' (од обвивачот)
 ```
 
