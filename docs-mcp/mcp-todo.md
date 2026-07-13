@@ -71,15 +71,15 @@
 - [ ] **ln-autoresize**
 - [ ] **ln-autosave**
 - [ ] **ln-fill**
-- [ ] **ln-modal-fill**
+- [x] **ln-modal-fill**
 - [ ] **ln-confirm**
 
 #### Overlay и интеракција
 
-- [ ] **ln-modal**
-- [ ] **ln-popover**
+- [x] **ln-modal**
+- [x] **ln-popover**
 - [x] **ln-dropdown**
-- [ ] **ln-tooltip**
+- [x] **ln-tooltip**
 - [x] **ln-accordion**
 - [ ] **ln-tabs**
 - [ ] **ln-toast**
@@ -116,7 +116,7 @@
 - [ ] **ln-core** — прегледен документ на споделениот модул: `findElements`, `dispatch`/`dispatchCancelable`, `cloneTemplate`/`cloneTemplateScoped`, `fill`/`fillTemplate`, `buildDict`, `renderList`, `reactiveState`/`deepReactive`/`createBatcher` + мапа кон модулските документи подолу — извори: `js/ln-core/index.js`, `js/ln-core/helpers.js`, `js/COMPONENTS.md` (⚠ нов документ, нема draft)
 - [ ] **ln-helpers** — извор: `js/ln-core/helpers.js` — ⚠ отворена одлука при пишување: дали се спојува во **ln-core** (преклоп)
 - [ ] **ln-reactive** — `reactiveState`/`deepReactive`/`createBatcher` — извори: `js/ln-core/reactive.js`, `docs/js/core.md`
-- [ ] **positioning** — споделено viewport-aware позиционирање (dropdown/popover/tooltip) — извор: `js/ln-core/positioning.js`
+- [x] **positioning** — споделено viewport-aware позиционирање (dropdown/popover/tooltip) — извор: `js/ln-core/positioning.js`
 - [ ] **ln-hash** — hash state примитив — извор: `js/ln-core/hash.js` (го користат ln-router, ln-tabs)
 - [ ] **ln-persist** — localStorage persistence примитив — извор: `js/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-table-sort)
 - [ ] **ln-crypto** — извор: `js/ln-core/crypto.js`
@@ -243,9 +243,9 @@
 |---|---|---|
 | doctrine | 6 | 6 |
 | guides | 5 | 5 |
-| components — употребливи (3А) | 42 | 1 |
-| components — позадински (3Б) | 9 | 0 |
+| components — употребливи (3А) | 42 | 7 |
+| components — позадински (3Б) | 9 | 1 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
 | skills | 13 | 4 |
-| **Вкупно** | **108** | **16** |
+| **Вкупно** | **108** | **23** |
