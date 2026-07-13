@@ -1,7 +1,7 @@
 ---
 name: ln-modal
 classification: simple
-status: draft
+status: stable
 domain: frontend
 summary: A native dialog modal component that manages overlay panels, native focus trapping, hash deep-linking, and cancel event synchronization.
 source: js/ln-modal/src/ln-modal.js

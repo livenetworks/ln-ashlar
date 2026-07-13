@@ -1,7 +1,7 @@
 ---
 name: ln-modal-fill
 classification: coordinator
-status: draft
+status: stable
 domain: frontend
 summary: A project coordinator that bridges modal opening events with form filling requests.
 source: js/ln-modal-fill/src/ln-modal-fill.js

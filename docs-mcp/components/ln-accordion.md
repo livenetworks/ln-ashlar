@@ -1,7 +1,7 @@
 ---
 name: ln-accordion
 classification: coordinator
-status: draft
+status: stable
 domain: frontend
 summary: A DOM coordinator that enforces mutual exclusivity (single-open behavior) among a group of ln-toggle panels.
 source: js/ln-accordion/src/ln-accordion.js

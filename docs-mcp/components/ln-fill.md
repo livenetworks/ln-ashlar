@@ -1,7 +1,7 @@
 ---
 name: ln-fill
 classification: simple
-status: draft
+status: stable
 domain: frontend
 summary: A declarative form and display populator driven by click triggers or custom events.
 source: js/ln-fill/src/ln-fill.js
@@ -60,8 +60,6 @@ Below is a typical button that pre-fills a form directly on click:
 </form>
 ```
 
-### Variant 1: Display Fillable (Read-Only Container)
-
 ### Variant 1: Hash-Bound Modal Trigger (Delegated Fill)
 
 When using a hash-bound trigger, `ln-fill` skips direct click population and delegates it to the coordinator and request events:
@@ -87,6 +85,7 @@ When using a hash-bound trigger, `ln-fill` skips direct click population and del
 | `data-ln-fill-form` | Trigger | `String` (ID) | - | Target form ID to populate. |
 | `data-ln-fill-id` | Trigger | `String` | - | Unique record identifier, matched against `ln-fill:request` parameters. |
 | `data-ln-fill-*` | Trigger | `String` | - | Form values. Keys are converted to camelCase (e.g. `data-ln-fill-user-name` → `userName`). |
+| `data-ln-fillable` | Display container | Boolean (presence) | - | Marks a read-only display container as a fill target. A delegated `ln-core` listener populates its `[data-ln-field]` descendants from the record (`lnCore.fill`), or clears their text content when the record is `null`. Never used on forms — `data-ln-form` targets handle the `ln-fill` event themselves. |
 
 ### Programmatic JS API
 
@@ -103,7 +102,7 @@ Coordinators (e.g. [`ln-modal-fill`](./ln-modal-fill.md)) call `window.lnCore.ln
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-fill:request` | Listens | No | Dispatched by coordinators to initiate DOM population. | `{ id: String\|null }` |
-| `ln-fill` | Emits | No | Dispatched on target forms to prompt input filling. | `Record\|null` |
+| `ln-fill` | Emits | No | Dispatched at every target form and fillable container to prompt population. | `Record\|null` |
 
 ---
 

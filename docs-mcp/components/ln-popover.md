@@ -1,7 +1,7 @@
 ---
 name: ln-popover
 classification: simple
-status: draft
+status: stable
 domain: frontend
 summary: A lightweight popover overlay component that leverages the native Popover API for top-layer promotion and placement positioning.
 source: js/ln-popover/src/ln-popover.js

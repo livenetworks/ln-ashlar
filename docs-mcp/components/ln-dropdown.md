@@ -1,7 +1,7 @@
 ---
 name: ln-dropdown
 classification: coordinator
-status: draft
+status: stable
 domain: frontend
 summary: A DOM coordinator that manages positioning, top-layer promotion, accessibility, and dismissal of dropdown overlay menus.
 source: js/ln-dropdown/src/ln-dropdown.js

@@ -1,7 +1,7 @@
 ---
 name: ln-tooltip
 classification: simple
-status: draft
+status: stable
 domain: frontend
 summary: A progressive enhancement tooltip component that utilizes CSS for local elements and JavaScript with popover="manual" portals for clipping-free top-layer tooltips.
 source: js/ln-tooltip/src/ln-tooltip.js

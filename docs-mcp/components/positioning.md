@@ -1,7 +1,7 @@
 ---
 name: positioning
 classification: service
-status: draft
+status: stable
 domain: frontend
 summary: Viewport-aware mathematical and measurement positioning utilities for floating UI components.
 source: js/ln-core/positioning.js
