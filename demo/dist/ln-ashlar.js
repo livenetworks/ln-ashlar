@@ -4707,26 +4707,6 @@ H(Ft, ne, le, "ln-router", {
   const u = "lnFill";
   if (window[u] !== void 0) return;
   const c = { lnFillForm: !0, lnFillStore: !0 };
-  document.addEventListener("click", function(E) {
-    if (E.ctrlKey || E.metaKey || E.button === 1) return;
-    const v = E.target.closest("[data-ln-fill-form]");
-    if (!v) return;
-    const g = v.getAttribute("data-ln-fill-form"), p = document.getElementById(g);
-    if (!p) return;
-    const f = {}, d = v.dataset;
-    for (const s in d) {
-      if (!s.startsWith("lnFill") || c[s]) continue;
-      const l = s.slice(6);
-      l && (f[l.charAt(0).toLowerCase() + l.slice(1)] = d[s]);
-    }
-    const t = Object.keys(f).length > 0;
-    window.lnCore.lnFill(p, t ? f : null);
-  }), window[u] = !0;
-})();
-(function() {
-  const u = "lnModalFill";
-  if (window[u] !== void 0) return;
-  const c = { lnFillForm: !0, lnFillStore: !0 };
   function E(g) {
     const p = {}, f = g.dataset;
     for (const d in f) {
@@ -4748,12 +4728,20 @@ H(Ft, ne, le, "ln-router", {
     }
     return d[0];
   }
-  document.addEventListener("ln-modal:open", function(g) {
+  document.addEventListener("click", function(g) {
+    if (g.ctrlKey || g.metaKey || g.button === 1) return;
+    const p = g.target.closest("[data-ln-fill-form]");
+    if (!p) return;
+    const f = p.getAttribute("href");
+    if (f && f.indexOf("#") !== -1) return;
+    const d = p.getAttribute("data-ln-fill-form"), t = document.getElementById(d);
+    if (!t) return;
+    const s = E(p), l = Object.keys(s).length > 0;
+    window.lnCore.lnFill(t, l ? s : null);
+  }), document.addEventListener("ln-fill:request", function(g) {
     const p = g.detail;
-    if (!p || !("param" in p)) return;
-    const f = p.target;
-    if (!f) return;
-    const d = p.param;
+    if (!p) return;
+    const f = g.target, d = p.id;
     if (d == null) {
       window.lnCore.lnFill(f, null);
       return;
@@ -4763,6 +4751,18 @@ H(Ft, ne, le, "ln-router", {
     const s = E(t);
     window.lnCore.lnFill(f, s);
   }), window[u] = !0;
+})();
+(function() {
+  const u = "lnModalFill";
+  window[u] === void 0 && (document.addEventListener("ln-modal:open", function(c) {
+    const E = c.detail;
+    if (!E || !("param" in E)) return;
+    const v = E.target;
+    v && v.dispatchEvent(new CustomEvent("ln-fill:request", {
+      bubbles: !0,
+      detail: { id: E.param }
+    }));
+  }), window[u] = !0);
 })();
 (function() {
   const u = "data-ln-slug-from", c = "lnSlug";
