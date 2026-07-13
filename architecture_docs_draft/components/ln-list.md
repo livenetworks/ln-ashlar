@@ -19,7 +19,7 @@
 ## 2. Минимален HTML Маркап и Варијанти на Употреба
 
 ### Базен HTML маркап (SSR Мод)
-Се користи кога серверот директно го испорачува крајниот HTML маркап за елементите:
+Се користи кога серверот директно го испорачува крајниот HTML маркап за елементите. Во овој мод може да се користи `data-ln-list-field` за локално филтрирање и пребарување, како и fallback темплејт `template[data-ln-list-empty]` за празна состојба:
 
 ```html
 <form role="search" onsubmit="return false;">
@@ -27,13 +27,22 @@
 </form>
 
 <ul id="ssr-documents-list" data-ln-list="ssr-documents">
-    <li data-ln-item data-ln-item-id="1">Документ А</li>
-    <li data-ln-item data-ln-item-id="2">Документ Б</li>
+    <li data-ln-item data-ln-item-id="1">
+        <span data-ln-list-field="title">Документ А</span>
+    </li>
+    <li data-ln-item data-ln-item-id="2">
+        <span data-ln-list-field="title">Документ Б</span>
+    </li>
 </ul>
+
+<!-- Темплејт за празна состојба во SSR мод -->
+<template data-ln-list-empty>
+    <li class="empty-state">Листата е празна.</li>
+</template>
 ```
 
 ### Варијанти на употреба (Data-Driven со виртуелен скрол и селекција)
-Се користи за динамично рендерирање на JSON податоци преку HTML темплејти:
+Се користи за динамично рендерирање на JSON податоци преку HTML темплејти. Прикажана е употребата на глобален селектор (`data-ln-list-select-all`) и два начина за дефинирање на празна состојба:
 
 ```html
 <div data-ln-list="users_list" 
@@ -42,6 +51,9 @@
      
     <!-- Алатки за пребарување и статистика -->
     <div class="list-controls">
+        <!-- Глобален чекбокс за селекција на сите редови -->
+        <input type="checkbox" data-ln-list-select-all />
+        
         <input type="text" data-ln-search="users_list" placeholder="Пребарај..." />
         
         <!-- Спанови за статистика -->
@@ -67,14 +79,14 @@
         <!-- Коренот мора да има data-ln-item -->
         <li class="user-card" data-ln-item>
             <input type="checkbox" data-ln-item-select />
-            <strong data-ln-fill="name"></strong>
-            <span data-ln-fill="email"></span>
+            <strong data-ln-fill="name" data-ln-list-field="name"></strong>
+            <span data-ln-fill="email" data-ln-list-field="email"></span>
             
             <button type="button" data-ln-item-action="delete">Избриши</button>
         </li>
     </template>
 
-    <!-- Темплејти за празна состојба -->
+    <!-- Опција А: Специфични темплејти по име за празна состојба во Data-Driven мод -->
     <template data-ln-template="users_list-empty">
         <div data-ln-empty-state="no-data">
             <svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-folder"></use></svg>
@@ -91,6 +103,22 @@
             <button type="button" data-ln-list-clear class="btn">Исчисти пребарување</button>
         </div>
     </template>
+
+    <!-- Опција Б: Универзален fallback темплејт со data-ln-empty и data-ln-empty-when -->
+    <!--
+    <template data-ln-empty>
+        <div>
+            <div data-ln-empty-when="initial" class="empty-state">
+                <h3>Нема податоци</h3>
+                <p>Внесете ги вашите први податоци.</p>
+            </div>
+            <div data-ln-empty-when="search" class="empty-state">
+                <h3>Нема резултати од пребарувањето</h3>
+                <p>Обидете се со други клучни зборови.</p>
+            </div>
+        </div>
+    </template>
+    -->
 </div>
 ```
 
@@ -107,10 +135,15 @@
 | `data-ln-item` | `Flag` | `/` | Го означува самиот ред/картичка во рамки на темплејтот. |
 | `data-ln-item-id` | `String` | `/` | ID на редот (се мапира автоматски од податоците во Data-driven). |
 | `data-ln-item-select` | `Flag` | `/` | Checkbox лоциран во редот за означување на селекција. |
+| `data-ln-list-select-all` | `Flag` | `/` | Глобален чекбокс лоциран во заглавието на листата за селекција на сите ставки одеднаш. |
+| `data-ln-list-field` | `String` | `/` | Се поставува на внатрешен елемент во ред (како `<span>` или `<strong>`) за да го мапира неговиот текст во соодветното својство во во-меморискиот рекорд. Ова овозможува локално филтрирање, сортирање и пребарување врз хидрираните податоци. |
 | `data-ln-item-action` | `String` | `/` | Вредноста го дефинира името на акцијата што се испраќа во настан. |
 | `data-ln-list-total` | `Flag` | `/` | Елемент кој се ажурира со вкупниот број на елементи во листата. |
 | `data-ln-list-filtered` | `Flag` | `/` | Елемент кој ја прикажува бројката на филтрирани/видливи елементи. |
 | `data-ln-list-selected` | `Flag` | `/` | Елемент кој се ажурира со бројот на моментално селектирани елементи. |
+| `data-ln-list-empty` | `Flag` | `/` | Ја означува `template[data-ln-list-empty]` за празна состојба во SSR мод. |
+| `data-ln-empty` | `Flag` | `/` | Ја означува универзалната `template[data-ln-empty]` за празна состојба во Data-driven мод. |
+| `data-ln-empty-when` | `String` | `/` | Се поставува на контејнери во `template[data-ln-empty]` со вредности `initial` или `search` за динамичен приказ соодветно на состојбата. |
 
 ### DOM Барања кон Листата (Слуша)
 
@@ -131,6 +164,7 @@
 | `ln-list:item-action` | `{ list, id, action, record }` | Се емитува при клик на акциско копче со `data-ln-item-action`. |
 | `ln-list:select` | `{ list, selectedIds: Set, count: Int }` | Се емитува при промена во селекцијата. |
 | `ln-list:select-all` | `{ list, selected: Boolean }` | Се емитува кога ќе се смени глобалниот селектор (Select All). |
+| `ln-list:search` | `{ list, query: String }` | Се емитува кога ќе се промени или изврши пребарување во листата. |
 | `ln-list:empty` | `{ term: String, total: Int }` | Се емитува кога ќе се активира и рендерира празна состојба. |
 | `ln-list:filter` | `{ term: String, matched: Int, total: Int }` | Се емитува при филтрирање во SSR мод. |
 | `ln-list:clear-filters` | `{ list }` | Се емитува кога ќе се кликне копче за целосно бришење на филтри. |
