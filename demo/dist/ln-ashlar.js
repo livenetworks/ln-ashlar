@@ -3088,7 +3088,7 @@ H(Ft, ne, le, "ln-router", {
         });
       }
     }, this.isDataDriven) {
-      this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._lastTotal = 0, this._lastFiltered = 0, this._totalSpan = e.querySelector("[data-ln-table-total]"), this._filteredSpan = e.querySelector("[data-ln-table-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== e ? this._filteredSpan.closest("[data-ln-table-filtered-wrap]") || this._filteredSpan.parentNode : null), this._selectedSpan = e.querySelector("[data-ln-table-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== e ? this._selectedSpan.closest("[data-ln-table-selected-wrap]") || this._selectedSpan.parentNode : null), this._onSetData = function(m) {
+      this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._lastTotal = 0, this._lastFiltered = 0, this._totalSpan = e.querySelector("[data-ln-table-total]"), this._filteredSpan = e.querySelector("[data-ln-table-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== e ? this._filteredSpan.parentElement : null), this._selectedSpan = e.querySelector("[data-ln-table-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== e ? this._selectedSpan.parentElement : null), this._onSetData = function(m) {
         const n = m.detail || {};
         o._data = n.data || [], o._lastTotal = n.total != null ? n.total : o._data.length, o._lastFiltered = n.filtered != null ? n.filtered : o._data.length, o.totalCount = o._lastTotal, o.visibleCount = o._lastFiltered, o.isLoaded = !0, e.classList.remove("ln-table--loading"), o._vStart = -1, o._vEnd = -1, o._applyFilterAndSort(), o._render(), o._updateFooter(), S(e, "ln-table:rendered", {
           table: o.name,
@@ -3106,7 +3106,7 @@ H(Ft, ne, le, "ln-router", {
         const i = r.getAttribute("data-ln-table-col");
         i && o._handleSort(i, r);
       }, this.thead && this.thead.addEventListener("click", this._onSortClick), e.addEventListener("ln-filter:changed", this._onColumnFilter), this._onClearAll = function(m) {
-        if (m.target.closest("[data-ln-table-clear-all]") || m.target.closest("[data-ln-data-table-clear-all]")) {
+        if (m.target.closest("[data-ln-table-clear-all]")) {
           o.currentFilters = {};
           for (let r = 0; r < o.ths.length; r++) {
             const i = o.ths[r].querySelector("[data-ln-table-col-filter]");
@@ -3634,7 +3634,7 @@ H(Ft, ne, le, "ln-router", {
   function d(t) {
     this.dom = t, this.tbody = t.querySelector("[data-ln-list-body]") || t, this.isDataDriven = t.hasAttribute("data-ln-list-source"), this.name = t.getAttribute(u) || "", this.source = t.getAttribute("data-ln-list-source") || "", this._data = [], this._filteredData = [], this._searchTerm = "", this._columnFilters = {}, this._virtual = !1, this._itemHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._resizeHandler = null, this._scrollContainer = null, this.isUl = this.tbody.tagName === "UL" || this.tbody.tagName === "OL";
     const s = this;
-    return this.isDataDriven ? (this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._lastTotal = 0, this._lastFiltered = 0, this._totalSpan = t.querySelector("[data-ln-list-total]"), this._filteredSpan = t.querySelector("[data-ln-list-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentNode && this._filteredSpan.parentNode !== t ? this._filteredSpan.closest("[data-ln-list-filtered-wrap]") || this._filteredSpan.parentNode : null), this._selectedSpan = t.querySelector("[data-ln-list-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentNode && this._selectedSpan.parentNode !== t ? this._selectedSpan.closest("[data-ln-list-selected-wrap]") || this._selectedSpan.parentNode : null), this._onSetData = function(l) {
+    return this.isDataDriven ? (this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._lastTotal = 0, this._lastFiltered = 0, this._totalSpan = t.querySelector("[data-ln-list-total]"), this._filteredSpan = t.querySelector("[data-ln-list-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== t ? this._filteredSpan.parentElement : null), this._selectedSpan = t.querySelector("[data-ln-list-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== t ? this._selectedSpan.parentElement : null), this._onSetData = function(l) {
       const e = l.detail || {};
       s._data = e.data || [], s._lastTotal = e.total != null ? e.total : s._data.length, s._lastFiltered = e.filtered != null ? e.filtered : s._data.length, s.totalCount = s._lastTotal, s.visibleCount = s._lastFiltered, s.isLoaded = !0, t.classList.remove("ln-list--loading"), s._vStart = -1, s._vEnd = -1, s._applyFilterAndSort(), s._render(), s._updateFooter(), S(t, "ln-list:rendered", {
         list: s.name,
@@ -3645,7 +3645,7 @@ H(Ft, ne, le, "ln-router", {
       const e = l.detail && l.detail.loading;
       t.classList.toggle("ln-list--loading", !!e), e && (s.isLoaded = !1);
     }, t.addEventListener("ln-list:set-loading", this._onSetLoading), this._onClearAll = function(l) {
-      (l.target.closest("[data-ln-list-clear-all]") || l.target.closest("[data-ln-data-list-clear-all]")) && (s.currentFilters = {}, S(t, "ln-list:clear-filters", { list: s.name }), s._requestData());
+      l.target.closest("[data-ln-list-clear-all]") && (s.currentFilters = {}, S(t, "ln-list:clear-filters", { list: s.name }), s._requestData());
     }, t.addEventListener("click", this._onClearAll), this._selectable = t.hasAttribute("data-ln-list-selectable"), this._selectableActive = !1, this._selectable && this._enableSelection(), this._onItemClick = function(l) {
       if (l.target.closest("[data-ln-item-select]") || l.target.closest("[data-ln-item-action]") || l.target.closest("a") || l.target.closest("button") || l.ctrlKey || l.metaKey || l.button === 1) return;
       const e = l.target.closest("[data-ln-item]");

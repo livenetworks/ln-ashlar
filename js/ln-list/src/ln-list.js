@@ -71,14 +71,14 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this._totalSpan = dom.querySelector('[data-ln-list-total]');
 			this._filteredSpan = dom.querySelector('[data-ln-list-filtered]');
 			if (this._filteredSpan) {
-				this._filteredWrap = this._filteredSpan.parentNode && this._filteredSpan.parentNode !== dom
-					? this._filteredSpan.closest('[data-ln-list-filtered-wrap]') || this._filteredSpan.parentNode
+				this._filteredWrap = this._filteredSpan.parentElement !== dom
+					? this._filteredSpan.parentElement
 					: null;
 			}
 			this._selectedSpan = dom.querySelector('[data-ln-list-selected]');
 			if (this._selectedSpan) {
-				this._selectedWrap = this._selectedSpan.parentNode && this._selectedSpan.parentNode !== dom
-					? this._selectedSpan.closest('[data-ln-list-selected-wrap]') || this._selectedSpan.parentNode
+				this._selectedWrap = this._selectedSpan.parentElement !== dom
+					? this._selectedSpan.parentElement
 					: null;
 			}
 
@@ -121,7 +121,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 
 			// Clear all
 			this._onClearAll = function (e) {
-				const btn = e.target.closest('[data-ln-list-clear-all]') || e.target.closest('[data-ln-data-list-clear-all]');
+				const btn = e.target.closest('[data-ln-list-clear-all]');
 				if (!btn) return;
 				self.currentFilters = {};
 				dispatch(dom, 'ln-list:clear-filters', { list: self.name });
