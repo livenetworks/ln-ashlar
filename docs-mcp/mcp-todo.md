@@ -62,7 +62,7 @@
 - [x] **ln-form** — ⚠ v2 проверка (scope, native-submit intake)
 - [x] **ln-validate**
 - [x] **ln-options**
-- [ ] **ln-date**
+- [x] **ln-date**
 - [x] **ln-time**
 - [x] **ln-number**
 - [ ] **ln-upload**

@@ -1294,6 +1294,12 @@ input[data-ln-number] {
 								<output id="demo-prefilled-date-raw"></output>
 							</div>
 
+							<div class="form-element">
+								<label for="demo-custom-label">Custom Label &amp; Fill Target (data-ln-date-label, data-ln-fill-as)</label>
+								<input type="date" id="demo-custom-label" name="custom_label" data-ln-date-label="Избери датум од календар" data-ln-fill-as="formatted_date" data-ln-date>
+								<output id="demo-custom-label-raw"></output>
+							</div>
+
 							<div class="form-element" lang="mk">
 								<label for="demo-dict-date">Declarative HTML Locale Dictionary (mk fallback via buildDict)</label>
 								<ul hidden data-ln-date-dict="mk">
@@ -1415,7 +1421,8 @@ input[data-ln-number] {
 		{ inputId: 'demo-due',            outputId: 'demo-due-raw' },
 		{ inputId: 'demo-event',          outputId: 'demo-event-raw' },
 		{ inputId: 'demo-custom-date',    outputId: 'demo-custom-date-raw' },
-		{ inputId: 'demo-prefilled-date', outputId: 'demo-prefilled-date-raw' }
+		{ inputId: 'demo-prefilled-date', outputId: 'demo-prefilled-date-raw' },
+		{ inputId: 'demo-custom-label',   outputId: 'demo-custom-label-raw' }
 	];
 
 	const writeDateRaw = function (input, output) {
