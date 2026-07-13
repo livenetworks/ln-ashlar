@@ -179,10 +179,12 @@
 
 ## Фаза 6 — skills/ (порт од `.claude/skills/` — дизајнерски одлучувачки правила)
 
-Публика: дизајнер-агенти (UI/UX) преку MCP серверот. `classification: skill`, `domain: frontend`, `context: app`, темплејт `_templates/skill.md`.
-⚠ При порт се ЗАЧУВУВААТ scope-квалификаторите („never **in data tools**" останува scoped, не се генерализира во „never") — идните `context: web` skills носат спротивни правила по дизајн.
+Публика: дизајнер-агенти (UI/UX) преку MCP серверот. `classification: skill`, `domain: frontend`, темплејт `_templates/skill.md`.
+
+**Одлука 2026-07-13 — skills се standalone:** фолдер = context (`skills/app/` сега, `web/`/`wordpress/` идни); `context:`/`source:` излегуваат надвор од frontmatter (context се изведува од патеката); правилата се библиотечно-неутрални — без grounding линкови/ознаки (`grounded`/`dangling`/`aspirational`) кон компоненти, миксини или изворни патеки. Порт = селекција + адаптација, БЕЗ grounding-верификација наспроти кодот.
+
+⚠ При порт се ЗАЧУВУВААТ scope-квалификаторите („never **in data tools**" останува scoped, не се генерализира во „never") — идните `web/`/`wordpress/` фолдери носат спротивни правила по дизајн.
 Персоната („ти си сениор дизајнер...") живее во промптот на MCP серверот — документите носат САМО нормативни правила; `## Identity` секциите од изворите СЕ ОТСТРАНУВААТ при порт.
-Порт = селекција + адаптација + grounding верификација наспроти кодот, НЕ blind copy — изворите носат непроверени тврдења (`ln-validate`, focus-trap/ESC во modal, virtual scroll, delta sync, „reserved error space" во форми...).
 
 ### Јадро (прво — претежно код-агностични, брза добивка)
 
@@ -193,7 +195,7 @@
 
 ### Component-completeness спецификации (инкрементално, СПАРЕНИ со Фаза 3/4)
 
-Секоја се портира и верификува ЗАЕДНО со соодветниот компонентен/css док (еднократна верификација, природни крос-линкови: skills кажува КОГА и ШТО-е-целосно → components/css кажува КАКО).
+9-те completeness skills се пишуваат standalone во `skills/app/`, без спарување/верификација со компонентните докови (изворите од `.claude/skills/ui/components/` остануваат каменолом).
 
 - [ ] **ui-data-table** — извор: `ui/components/data-table.md` — со **ln-table** (3А)
 - [ ] **ui-form** — извор: `ui/components/form.md` — со **ln-form** (3А) — ⚠ „reserved error space": да се провери дали form микс-ините резервираат простор; ако не → aspirational ознака
@@ -226,6 +228,8 @@
 - **process** — код-неврзани процедури (git конвенции, code-review правила, ISO); централен — „само документација" репо е безбедно САМО овде, зашто нема код од кој да дрифтува; каменолом: `.claude/skills/iso-ai-assistant/`, `doc-discipline/`.
 
 **Context оска (одлука 2026-07-11):** сегашните ux/ui skills се `context: app` (апликациски, data-dense дизајн). Доаѓаат посебни сетови: **web (презентациски)** — спротивни правила (density/motion/декорација се флипуваат; `frontend-design/` изворот станува делумен каменолом тука) и **WordPress** — локација по федерираното правило (со кодот ако има LN theme/plugin репо, инаку централно). Серверот НИКОГАШ не меша два context-а во еден сервиран сет.
+
+Реализирано 2026-07-13 преку subfolders (`skills/app/`); context се изведува од патека, не од frontmatter.
 
 **Крајна насока:** Lovable-тип платформа за генерирање апликации/сајтови со LN стил — корпусот е style-engine-от: skills = КОГА/ШТО, patterns = готов верификуван markup, doctrine = ограничувања, components = API вистина. За генерација patterns/ станува најносечката категорија — идно проширување кон page-level patterns (цела CRUD страница, dashboard, login, settings...).
 

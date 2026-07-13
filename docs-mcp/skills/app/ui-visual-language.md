@@ -3,9 +3,7 @@ name: ui-visual-language
 classification: skill
 status: draft
 domain: frontend
-context: app
 summary: System-wide visual consistency rules — radius/spacing, shadow vs border, color meaning, forms, buttons, tables, modals, feedback, responsive behavior, and typography for business UI.
-source: .claude/skills/ui/visual-language.md
 tags: [ui, visual-language, radius, color, forms, buttons, tables, modals, feedback, responsive, typography]
 ---
 
@@ -15,7 +13,6 @@ tags: [ui, visual-language, radius, color, forms, buttons, tables, modals, feedb
 
 This skill defines HOW the design system must behave consistently across every component — not which component to use (see [`./ui.md`](./ui.md)) but the shared visual grammar: radius/spacing pairing, shadow-vs-border, color-as-state, form/button/table/modal visual states, feedback persistence and position, responsive container-query behavior, and typography rules. Consult it before styling any component to keep it consistent with the rest of the system.
 
-> For package-specific implementation (concrete token values, mixin names) → [`../doctrine/scss-architecture.md`](../doctrine/scss-architecture.md)
 > For component selection and layout decisions → [`./ui.md`](./ui.md)
 > For interaction flow (how components behave, not how they look) → [`./ux.md`](./ux.md)
 
@@ -85,7 +82,7 @@ All icons in a UI must come from the **same set** and **same weight**.
 - Never mix outline and filled variants of the same set
 - If a needed icon doesn't exist in the chosen set, pick the closest equivalent — do not import a single icon from another set
 
-ln-ashlar standardizes on Tabler outline icons — see [`../doctrine/html-markup-rules.md`](../doctrine/html-markup-rules.md) for the icon-usage convention.
+Standardize on a single icon family with one stroke weight — mixing families or weights reads as broken.
 
 ---
 
@@ -266,7 +263,7 @@ Hover: text color shifts to primary at slightly lower opacity. Active: full prim
 | Main sidebar, dark/colored bg | Bar indicator | Tint fill disappears on dark bg; bar remains visible |
 | Top navigation bar | Bar indicator (bottom, center-sweep) | Horizontal axis, directional |
 | Tab row within content | Bar indicator (bottom, merged) | Connects tab to its panel |
-| Settings sub-nav | Color-only | Low hierarchy, already contextually grounded |
+| Settings sub-nav | Color-only | Low hierarchy, already contextually anchored |
 | Mode/workspace switcher | Background fill (chip) | Selection metaphor, not just location |
 
 **Never mix types within the same interface.** All nav elements at the same level must use the same indicator type. Mixing (e.g. bar on one nav, fill on another) fragments the visual grammar.
@@ -332,11 +329,11 @@ Forms are the highest-density interaction surface in business UI. Every visual d
 
 ### Focus indicator types
 
-Focus is a design choice with six valid approaches, organized by where the signal lives. ln-ashlar ships all five style presets as SCSS mixins in `scss/config/mixins/_focus.scss` (`focus-ring`, `focus-border-thicken`, `focus-combination`, `focus-background-shift`, `focus-accent-line` — grounded).
+Focus is a design choice with six valid approaches, organized by where the signal lives.
 
 **Outer signals** — the effect extends beyond the field boundary:
 
-*Ring (outer glow)* — border stays unchanged, a soft `box-shadow` ring appears outside the field. No layout shift. Non-invasive, universally compatible. The Tailwind / Vercel / shadcn convention. Current ln-ashlar default (grounded — `focus-ring` mixin, `scss/config/mixins/_focus.scss`).
+*Ring (outer glow)* — border stays unchanged, a soft `box-shadow` ring appears outside the field. No layout shift. Non-invasive, universally compatible. The Tailwind / Vercel / shadcn convention.
 
 *Border thicken* — border grows from 1px to 2px in primary color. No glow. Sharp, structural, precise. Material Design convention. Risk: 1px border growth causes layout shift unless implemented with `outline` or inset border techniques.
 
@@ -383,7 +380,7 @@ The message goes below the field, always. A message above the field is read befo
 
 **Reserved** — a fixed-height area below each field is always present, empty until an error fills it. No layout shift. Correct for dense business UI, inline forms, or any context where sudden layout movement breaks the user's visual tracking.
 
-For business UI, reserved space is the better default. A form that jumps on submit feels unstable. ln-ashlar implements this as the `form-validate-errors` mixin (`min-height: 1.25rem`, grounded — `scss/config/mixins/_form.scss`), consumed by [`../components/ln-validate.md`](../components/ln-validate.md) error lists.
+For business UI, reserved space is the better default. A form that jumps on submit feels unstable.
 
 ---
 
@@ -524,15 +521,11 @@ Visual consistency on disabled state matters because the user needs to recognize
 
 Disabled is correct for states outside the user's control: loading in progress, insufficient permissions, feature unavailable in the current plan. It is not a substitute for validation feedback.
 
-**Novalidate is automatic.** `ln-validate` injects `novalidate` on its host `<form>` per validated field — no manual markup needed.
-
 ---
 
 ## 12. Tables and Data Display
 
 Tables are the most frequent data surface in business UI. Three orthogonal state dimensions must be visually distinct and non-conflicting: row state, column sort state, and selection state.
-
-Table anatomy → [`../components/ln-table.md`](../components/ln-table.md) (dangling — planned; grounded via `js/ln-table/`, `scss/config/mixins/_ln-table.scss`).
 
 ---
 
@@ -639,8 +632,6 @@ This is an application of § 2: when elements overlap due to scroll, a shadow or
 
 ## 13. Modals / Dialogs
 
-Modal anatomy → [`../components/ln-modal.md`](../components/ln-modal.md) (dangling — planned; grounded via `js/ln-modal/src/ln-modal.js`, which is currently a `div`-based implementation with manual focus-trap and ESC-close `keydown` handlers. A native `<dialog>`/`showModal()` migration is a planned future refactor — see [`../refactor-todo.md`](../refactor-todo.md) §5 — and is NOT the current behavior).
-
 ### Overlay
 
 A modal exists on two visual layers simultaneously: the **backdrop** and the **modal surface**. Both must be present and must work together.
@@ -690,7 +681,7 @@ A confirm dialog for a destructive action has its own visual grammar, distinct f
 
 ### Inline confirmation — alternative to a modal
 
-A confirm modal for a single button action is often architectural overhead. The same intent can be achieved inline, at lower cognitive cost. ln-ashlar ships [`../components/ln-confirm.md`](../components/ln-confirm.md) (dangling — planned) for this pattern.
+A confirm modal for a single button action is often architectural overhead. The same intent can be achieved inline, at lower cognitive cost.
 
 **The pattern:** First click transforms the button into confirm state in place. Second click executes. The button reverts automatically after a timeout if unconfirmed.
 
@@ -727,8 +718,6 @@ Modal width is a content decision: a short confirmation uses the smallest size; 
 ## 14. Feedback / System Responses
 
 Feedback is a response, not decoration. Every feedback element answers a specific action or state. If no action caused it — no feedback element.
-
-Toast anatomy → [`../components/ln-toast.md`](../components/ln-toast.md) (dangling — planned; component exists at `js/ln-toast/`).
 
 ### Two axes
 
@@ -906,8 +895,6 @@ Neither is universally correct. The choice depends on how the data is used:
 
 **Default view must be set.** The user sees data immediately, not a choice. Card view is the safer default — it requires no horizontal interaction. The toggle offers the alternative for users who need it.
 
-*(aspirational — no `sm`-breakpoint card-view/horizontal-scroll toggle found in `js/ln-table/` or `scss/config/mixins/_ln-table.scss`; this is a design requirement for a future responsive pass, not current behavior.)*
-
 #### Form
 
 | Level | Behavior |
@@ -953,8 +940,6 @@ Horizontal scroll is acceptable for navigation at `sm` only if the number of ite
 The threshold is practical: five tabs fit comfortably in a scrollable row and the user can discover them with a swipe. Beyond five, the scroll distance becomes long enough that a dropdown is faster — the user sees all options at once instead of scrolling to find them.
 
 When tabs collapse to a dropdown, the active tab label becomes the dropdown's displayed value. The indicator type (bar, fill) disappears — the dropdown's own selected state replaces it.
-
-*(aspirational — no dropdown-collapse behavior found in `js/ln-tabs/`; the current component does URL-hash-synced tab switching without a responsive collapse mode.)*
 
 #### Modal
 
@@ -1040,7 +1025,7 @@ When the structural level and the desired visual size do not match, CSS resolves
 <h2>Card Title</h2>
 ```
 
-Heading levels must descend sequentially in the DOM — no skipping from `<h2>` to `<h4>`. Screen readers navigate by heading level, not visual size. A broken heading sequence is an accessibility failure, regardless of how it looks. See [`../doctrine/html-markup-rules.md`](../doctrine/html-markup-rules.md) for the markup-level rule.
+Heading levels must descend sequentially in the DOM — no skipping from `<h2>` to `<h4>`. Screen readers navigate by heading level, not visual size. A broken heading sequence is an accessibility failure, regardless of how it looks.
 
 ---
 

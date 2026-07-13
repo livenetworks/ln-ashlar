@@ -3,9 +3,7 @@ name: ui
 classification: skill
 status: draft
 domain: frontend
-context: app
 summary: Decision rules for visual layout and information presentation — what to show, where to place it, which component to pick, and what makes a component or page complete.
-source: .claude/skills/ui/SKILL.md
 tags: [ui, layout, components, density, hierarchy, completeness]
 ---
 
@@ -17,7 +15,6 @@ This skill governs WHAT to show and WHERE to place it, before any code is writte
 
 > For interaction flows (how things behave) → [`./ux.md`](./ux.md)
 > For visual-system rules (radius, shadow, color, motion, typography) → [`./ui-visual-language.md`](./ui-visual-language.md)
-> For implementation: HTML structure → [`../doctrine/html-markup-rules.md`](../doctrine/html-markup-rules.md), styling → [`../doctrine/scss-architecture.md`](../doctrine/scss-architecture.md), behavior → [`../doctrine/js-component-model.md`](../doctrine/js-component-model.md)
 
 ---
 
@@ -116,7 +113,7 @@ User opens Document Dashboard:
 - Search = toolbar, above the table
 - Filters = per-column dropdowns in header (not toolbar)
 - Sort = per-column toggle button in header (one click, no dropdown)
-- Virtual scroll = all data in IndexedDB, sort/filter/search client-side (grounded — see § 6 Data Table row)
+- Virtual scroll = all data cached client-side, sort/filter/search client-side (see § 6 Data Table row)
 - Sticky footer = total count, filtered count
 
 ### Detail Page Layout
@@ -187,21 +184,19 @@ Default to **table** for business data. Cards are for entity summaries, not data
 
 **A component is not done until it has all its standard features.** This is not optional — an incomplete component is a broken component.
 
-Each component has a detailed spec in `../components/` (planned; most are dangling links until authored). Read the relevant spec BEFORE building.
+**Every feature in the right column is mandatory** — anatomy, behavior, states, and responsive rules must all be designed before the component is built.
 
-| Component | Spec File | Key Features That Must Be Present |
-|-----------|-----------|----------------------------------|
-| Data Table | [`../components/ln-table.md`](../components/ln-table.md) | Client-side cache, virtual scroll (grounded — `VIRTUAL_THRESHOLD` in `js/ln-table/src/ln-table.js`), sticky header/footer, sort toggle per column, filter dropdown per column, search, row selection, delta sync (grounded — `js/ln-data-store/src/ln-data-store.js` `_triggerRemoteSync`/`applySync`) |
-| Form | [`../components/ln-form.md`](../components/ln-form.md) | per-field validation (keyup) via [`../components/ln-validate.md`](../components/ln-validate.md) (grounded — `js/ln-validate/`) + form coordinator, reserved error space (grounded — `form-validate-errors` mixin, `scss/config/mixins/_form.scss`), submit stays enabled — invalid submit is blocked with inline errors (grounded — `js/ln-form/src/ln-form.js:45`, `js/ln-validate/src/ln-validate.js:97`), fill for edit mode, auto-submit for search/filter forms *(aspirational — no auto-submit behavior found in `js/ln-form/` or `js/ln-search/`)*; styling comes from the form SCSS mixins — unrelated to the ln-form JS component |
-| Modal | [`../components/ln-modal.md`](../components/ln-modal.md) | Four sizes (sm/md/lg/xl), `<form>` root, focus trap (grounded — manual `keydown` trap in `js/ln-modal/src/ln-modal.js`, current DOM-based implementation; native `<dialog>` migration is a future refactor, see [`../refactor-todo.md`](../refactor-todo.md) §5), ESC close (grounded — same file), backdrop does NOT close, no nested modals |
-| Tabs | [`../components/ln-tabs.md`](../components/ln-tabs.md) | URL hash sync (grounded — `js/ln-tabs/`, namespace-scoped hash deep-linking), multiple groups per page via namespace, badge counts *(aspirational — not found in `js/ln-tabs/`)*, content in DOM from start (no lazy load) |
-| Search | [`../components/ln-search.md`](../components/ln-search.md) | Client-side = instant keyup DOM filtering (grounded — `js/ln-search/`). Server-side = form auto-submit + AJAX *(aspirational — no auto-submit found)* |
-| Status Badge | `../css/status-badge.md` (dangling; grounded — `scss/config/mixins/_status-badge.scss`) | Dot + text + tinted background, never color-only, 5 semantic categories, actionable variant via [`../components/ln-confirm.md`](../components/ln-confirm.md)/[`../components/ln-dropdown.md`](../components/ln-dropdown.md) |
-| Empty State | `../css/empty-state.md` (dangling; grounded — `scss/config/mixins/_empty-state.scss`, `scss/components/_empty-state.scss`) | Two distinct types: "no data exists" (onboarding) vs "filter returned zero" (adjust) |
-| Loading State | `../css/loader.md` (dangling; grounded — `scss/config/mixins/_loader.scss`) | Button spinner for actions, shimmer for content areas, always scoped — never full-page |
-| KPI Card | `../css/stat-card.md` (dangling; grounded — `scss/config/mixins/_stat-card.scss` + [`../components/ln-stat.md`](../components/ln-stat.md), `js/ln-stat/`) | One metric per card, clickable to list/detail, trend indicator, 3-5 per dashboard max |
-
-**Before building ANY of these components, read the spec file.** The specs contain anatomy, behavior, states, responsive rules, and anti-patterns.
+| Component | Key Features That Must Be Present |
+|-----------|----------------------------------|
+| Data Table | Client-side cache, virtual scroll, sticky header/footer, sort toggle per column, filter dropdown per column, search, row selection, delta sync |
+| Form | per-field validation (keyup), reserved error space, submit stays enabled — invalid submit is blocked with inline errors, fill for edit mode, auto-submit for search/filter forms |
+| Modal | Four sizes (sm/md/lg/xl), `<form>` root, focus trap, ESC close, backdrop does NOT close, no nested modals |
+| Tabs | URL hash sync, multiple groups per page via namespace, badge counts, content in DOM from start (no lazy load) |
+| Search | Client-side = instant keyup DOM filtering. Server-side = form auto-submit + AJAX |
+| Status Badge | Dot + text + tinted background, never color-only, 5 semantic categories, actionable variant via confirm/dropdown |
+| Empty State | Two distinct types: "no data exists" (onboarding) vs "filter returned zero" (adjust) |
+| Loading State | Button spinner for actions, shimmer for content areas, always scoped — never full-page |
+| KPI Card | One metric per card, clickable to list/detail, trend indicator, 3-5 per dashboard max |
 
 ### Visual States — Every Component Must Address
 
@@ -352,7 +347,7 @@ A page is not done until all these are addressed.
 - [ ] All fields have visible labels (`<label for>` + `<input id>`)
 - [ ] Required fields marked (CSS-driven, not manual asterisks)
 - [ ] Related fields grouped (visual sections via grid spans)
-- [ ] `data-ln-validate` on inputs (grounded — `js/ln-validate/`), reserved error space below each field
+- [ ] Validation wired on inputs, reserved error space below each field
 - [ ] Submit button stays enabled — invalid submit shows inline errors and focuses the first invalid field; disable only while processing (loading state on submit)
 - [ ] Cancel button that navigates back
 - [ ] Sensible defaults pre-filled
@@ -372,11 +367,11 @@ Before implementing any styled component, follow these system-wide rules — ful
 
 - **Radius + spacing** — rounded elements must float (have `mx`), flush elements must be sharp
 - **Shadow vs border** — pick one as the primary signal; don't stack both
-- **Icon consistency** — Tabler outline only, no mixing sets or weights
+- **Icon consistency** — one icon set, one weight, no mixing
 - **Spacing scale** — token values only, never invent custom values
 - **Color = state** — never decorative, only semantic
 - **Hover = color change only** — no transforms, no shadow appearance
-- **Radius scale** — `rounded-md` throughout, `rounded-full` for pills only
+- **Radius scale** — one standard radius throughout, full rounding for pills only
 
 ---
 
@@ -409,3 +404,4 @@ Before implementing any styled component, follow these system-wide rules — ful
 - Pagination instead of virtual scroll (users work with data, not "pages")
 - Search without a "no results" state
 - Picking components before understanding data priority
+</content>

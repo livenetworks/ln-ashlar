@@ -3,9 +3,7 @@ name: ux
 classification: skill
 status: draft
 domain: frontend
-context: app
 summary: Decision rules for interaction flow — action-feedback loops, state machines, feedback channels, navigation, destructive-action confirmation, and error recovery for data-driven business UI.
-source: .claude/skills/ux/SKILL.md
 tags: [ux, interaction, feedback, states, navigation, forms, error-recovery]
 ---
 
@@ -19,7 +17,6 @@ This skill governs HOW an interface behaves — what happens after a user acts, 
 
 > For visual layout and component anatomy → [`./ui.md`](./ui.md)
 > For concrete interaction flows (search, sort, filter, bulk actions) → [`./ux-interaction-patterns.md`](./ux-interaction-patterns.md)
-> For implementation: HTML → [`../doctrine/html-markup-rules.md`](../doctrine/html-markup-rules.md), CSS → [`../doctrine/scss-architecture.md`](../doctrine/scss-architecture.md), JS → [`../doctrine/js-component-model.md`](../doctrine/js-component-model.md)
 
 ---
 
@@ -92,12 +89,12 @@ Design ALL FOUR states for every view. If you only design the OK state, the feat
 
 | Channel | Use For | Duration |
 |---------|---------|----------|
-| **Toast** ([`../components/ln-toast.md`](../components/ln-toast.md)) | Transient confirmations after actions | Auto-dismiss (success), persist (error) |
+| **Toast** | Transient confirmations after actions | Auto-dismiss (success), persist (error) |
 | **Inline message** | Field-specific errors, contextual help | Until resolved |
 | **Button state** | Loading/processing indication | During action |
 | **Visual change** | Direct manipulation result | Permanent |
 | **Page/section error** | Cannot load/display content | Until retry succeeds |
-| **Modal** ([`../components/ln-modal.md`](../components/ln-modal.md)) | Requires user decision before proceeding | Until dismissed |
+| **Modal** | Requires user decision before proceeding | Until dismissed |
 
 ### Toast Rules
 
@@ -108,7 +105,7 @@ Design ALL FOUR states for every view. If you only design the OK state, the feat
 - Content: short, specific, past tense ("Employee saved", "3 items deleted")
 - Never show technical details in toasts
 
-`ln-toast` exists in the library ([`../components/ln-toast.md`](../components/ln-toast.md), dangling until authored); the desktop bottom-right position and mobile full-width bottom position match the library defaults (`scss/config/mixins/_toast.scss`).
+Toasts appear bottom-right on desktop and full-width at the bottom on mobile.
 
 ---
 
@@ -146,8 +143,6 @@ Dashboard → Section:     Dashboard > Section Name
 
 ## 5. Form Flow Design
 
-> Full spec → [`../components/ln-form.md`](../components/ln-form.md) (dangling — planned; see [`../guides/write-workflow.md`](../guides/write-workflow.md) for the current write-pipeline behavior)
-
 ---
 
 ## 6. Destructive Action Flow
@@ -178,10 +173,7 @@ Toggle off    Remove tag    Delete item    Delete account
 - Auto-reverts after a few seconds if user doesn't confirm
 - Fast, doesn't break flow for lists where you delete often
 
-The library ships [`ln-confirm`](../components/ln-confirm.md) (dangling — planned) for this pattern.
-
 **Modal confirm** — for irreversible, high-impact, or cascading actions.
-Full modal spec (sizes, anatomy, confirmation pattern) → [`../components/ln-modal.md`](../components/ln-modal.md) (dangling — planned)
 
 ### When to Use Which
 
@@ -241,8 +233,6 @@ Full modal spec (sizes, anatomy, confirmation pattern) → [`../components/ln-mo
 | Conflict | Inline: "Email already taken" | Change value and resubmit |
 | Timeout | Toast: "Request timed out" | Retry |
 
-Client-side validation is grounded via [`../components/ln-validate.md`](../components/ln-validate.md) (dangling — planned; component exists at `js/ln-validate/`).
-
 ### Recovery Rules
 
 - **Always offer a next step** — never leave the user at a dead end
@@ -261,7 +251,7 @@ Every feature should have answers for these:
 |-----------|---------------|
 | First use (no data) | Empty state with guidance |
 | One item | Works without looking broken |
-| 1000+ items | Virtual scroll ([`../components/ln-table.md`](../components/ln-table.md), dangling — planned) or progressive loading |
+| 1000+ items | Virtual scroll or progressive loading |
 | Very long text | Truncate with full text accessible |
 | Very long name/title | Truncate, don't break layout |
 | Slow network | Loading state visible promptly |
@@ -271,8 +261,6 @@ Every feature should have answers for these:
 | Refresh mid-form | Data preserved (optional: localStorage) |
 | Mobile screen | Responsive layout, touch-friendly targets |
 | Concurrent edit | Last write wins with conflict indication |
-
-Virtual scroll is grounded: `js/ln-table/src/ln-table.js` implements a `VIRTUAL_THRESHOLD` (200 rows) with `_enableVirtualScroll`/`_renderVirtual`; `js/ln-list/` implements the same pattern for lists.
 
 ---
 
@@ -298,8 +286,6 @@ Animation is communication — it tells the user what happened and where to look
 - **Functional, not decorative** — every animation answers "what did this tell the user?"
 - **No blocking** — animation never prevents the user from acting
 - **Respect preferences** — honor `prefers-reduced-motion`
-
-> For motion implementation (durations, easing functions, CSS specifics) → [`../doctrine/scss-architecture.md`](../doctrine/scss-architecture.md)
 
 ---
 
@@ -338,3 +324,4 @@ Animation is communication — it tells the user what happened and where to look
 - Animation that blocks user interaction
 - Scroll-triggered animations in data tools
 - Animations without `prefers-reduced-motion` support
+</content>
