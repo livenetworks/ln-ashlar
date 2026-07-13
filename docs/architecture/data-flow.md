@@ -15,8 +15,8 @@ Components separate by concern:
 |---|----------|---------------------------------------------|--------------------------------------------|
 | 1 | Data     | `ln-store`                                  | Local cache, query engine, sync state      |
 | 2 | Render   | `ln-table`, `ln-upload`, future renderers | Visual presentation of records          |
-| 3 | Submit   | `ln-form`, `ln-confirm`, `ln-http`          | Form serialization, validation gate, transport |
-| 4 | Validate | `ln-validate`                               | Field-level validity + error display       |
+| 3 | Submit   | `ln-form`, `ln-confirm`, `ln-http`          | Form serialization, transport              |
+| 4 | Validate | `ln-validate`                               | Field-level validity + error display + submit gate |
 
 **The rule.** Each concern owns its scope. Other concerns ask via events,
 never reach in.

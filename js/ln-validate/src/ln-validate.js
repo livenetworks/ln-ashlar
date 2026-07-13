@@ -107,6 +107,35 @@ import { dispatch, registerComponent } from '../../ln-core';
 			};
 			form.addEventListener('reset', this._onFormReset);
 			form.addEventListener('ln-validate:request-validate', this._onValidateRequest);
+
+			// Submit gate — attached once per form, by whichever validated
+			// field initializes first (marker lives on the form itself,
+			// same one-shot-guard shape as ln-fill's _fillBound). Runs on
+			// every method, GET included — this is a straight replacement
+			// for the native browser validation `novalidate` just silenced
+			// above, and native validation never had a method condition
+			// either. ln-data-coordinator's own POST/PUT/PATCH method gate
+			// for the write pipeline is a separate, later decision — it
+			// reads e.defaultPrevented first, so it never claims a submit
+			// this gate already blocked.
+			if (!form._lnValidateGateBound) {
+				form._lnValidateGateBound = true;
+				form.addEventListener('submit', function (e) {
+					const validationDetail = { invalidFields: [] };
+					dispatch(form, 'ln-validate:request-validate', validationDetail);
+
+					if (validationDetail.invalidFields.length > 0) {
+						e.preventDefault();
+						validationDetail.invalidFields.sort((a, b) => {
+							return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_PRECEDING ? -1 : 1;
+						});
+						validationDetail.invalidFields[0].focus();
+					}
+					// Valid — nothing left to do. Native submit continues;
+					// ln-data-coordinator (document, bubble phase) or plain
+					// HTML/ln-ajax decides what happens to it next.
+				});
+			}
 		}
 
 		return this;

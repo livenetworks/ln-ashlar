@@ -1,4 +1,4 @@
-import { populateForm, dispatch, registerComponent, resolveFormMethod } from '../../ln-core';
+import { populateForm, dispatch, registerComponent } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-form';
@@ -34,34 +34,8 @@ import { populateForm, dispatch, registerComponent, resolveFormMethod } from '..
 			self._applyActionMode(null);
 		};
 
-		this._onSubmit = function (e) {
-			const method = resolveFormMethod(self.dom);
-
-			if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return; // native submit proceeds untouched (e.g. GET search forms)
-
-			const validationDetail = { invalidFields: [] };
-			dispatch(self.dom, 'ln-validate:request-validate', validationDetail);
-
-			if (validationDetail.invalidFields.length > 0) {
-				e.preventDefault();
-				validationDetail.invalidFields.sort((a, b) => {
-					return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_PRECEDING ? -1 : 1;
-				});
-				validationDetail.invalidFields[0].focus();
-				return;
-			}
-
-			// Valid — nothing left to do. Let the native submit continue.
-			// A [data-ln-data-coordinator] listening for the native `submit` on
-			// document (bubble phase) claims it via preventDefault() if this
-			// form's scope/containment matches one of its stores; if nothing
-			// claims it, the native submit proceeds untouched (progressive
-			// enhancement fallback — no console warning, no silent JS shortcut).
-		};
-
 		form.addEventListener('ln-fill', this._onLnFill);
 		form.addEventListener('reset', this._onReset);
-		form.addEventListener('submit', this._onSubmit);
 
 		return this;
 	}
@@ -115,7 +89,6 @@ import { populateForm, dispatch, registerComponent, resolveFormMethod } from '..
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('ln-fill', this._onLnFill);
 		this.dom.removeEventListener('reset', this._onReset);
-		this.dom.removeEventListener('submit', this._onSubmit);
 		dispatch(this.dom, 'ln-form:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};

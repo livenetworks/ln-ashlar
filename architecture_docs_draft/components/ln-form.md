@@ -12,7 +12,7 @@
   Стилизирањето на формите е одвоена SCSS грижа (mixins во `scss/components/_form.scss`) — `ln-form` не стилизира ништо и не е во релација со form SCSS-от.
 
 - **Ортогоналност (Што компонентата НЕ прави):**
-  - **Submit е нативен, но валидиран.** За секоја `data-ln-form` форма со ефективен метод `POST`/`PUT`/`PATCH`, `ln-form` е validation gate — `preventDefault()` единствено при невалидна форма. `novalidate` не се пишува рачно: `ln-validate` сам го инјектира на матичната форма штом иницира барем едно `data-ln-validate` поле; форма без такви полиња ја задржува нативната валидација. Валидна форма продолжува нативно; серијализацијата и create/update толкувањето се на [`ln-data-coordinator`](./ln-data-coordinator.md) единствено кога формата носи `data-ln-form-scope` — инаку продолжува кон native submit или [`ln-ajax`](../../js/ln-ajax/README.md).
+  - **Submit е целосно нативен.** `ln-form` воопшто не слуша `submit` — нема validation gate, нема `preventDefault()` од негова страна. Гејтот (валидација при поднесување, без method услов — секој метод, GET вклучително) е исклучиво на [`ln-validate`](./ln-validate.md): штом формата содржи барем едно `data-ln-validate` поле, `novalidate` се инјектира автоматски и submit-от се блокира само при невалидни полиња. Валидна форма продолжува нативно; серијализацијата и create/update толкувањето се на [`ln-data-coordinator`](./ln-data-coordinator.md) единствено кога формата носи `data-ln-form-scope` — инаку продолжува кон native submit или [`ln-ajax`](../../js/ln-ajax/README.md).
   - **Не води валидациска состојба** — тоа е работа на прелистувачот и [`ln-validate`](./ln-validate.md).
 
 ---

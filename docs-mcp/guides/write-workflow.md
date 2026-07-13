@@ -37,7 +37,8 @@ When a user submits a form, the action boundary determines which layer intercept
 
 During a local-first write operation, responsibilities are cleanly isolated among components:
 
-- **Form ([`ln-form`](../components/ln-form.md)):** Acts as the canonical source of truth for the resource `action` and `method` attributes. It runs a validation gate only (preventDefault solely on invalid submit) — it never serializes inputs and never dispatches a custom event. It is unaware of database stores or network transport configurations.
+- **Form ([`ln-form`](../components/ln-form.md)):** Acts as the canonical source of truth for the resource `action` and `method` attributes. It populates fields on `ln-fill` and rewrites `action`/`_method` for RESTful edit routing — it never serializes inputs, never dispatches a custom event, and runs no validation gate of its own. It is unaware of database stores or network transport configurations.
+- **Validate ([`ln-validate`](../components/ln-validate.md)):** Owns the submit gate. The first `data-ln-validate` field to initialize on a form injects `novalidate` and attaches the form-level `submit` listener: on submit (any method — GET included, mirroring the native browser validation it replaces) it dispatches `ln-validate:request-validate` to collect invalid fields, and if any exist, calls `preventDefault()`, sorts them by document position, and focuses the first one. A valid submit is left native for `ln-data-coordinator` (or plain HTML) to claim next.
 - **Store (`ln-data-store`):** Manages the local IndexedDB database cache. It applies optimistic mutations immediately to the local cache and fires database change notifications. It is blind to REST URLs and HTTP headers.
 - **Queue (`ln-api-queue`):** Persists transaction payloads in order (FIFO per record chain) to survive browser restarts. It dispatches a `send` command when it is ready to sync, but does not perform network calls.
 - **Connector (`ln-*-connector`):** Executes the physical network fetch. It accepts abstract payload requests, translates them into REST or socket payloads, and returns the server's response.
@@ -95,6 +96,7 @@ sequenceDiagram
     autonumber
     actor User as User Click
     participant Form as ln-form (scoped)
+    participant Validate as ln-validate
     participant Coord as ln-data-coordinator
     participant Store as ln-data-store
     participant Queue as ln-api-queue
@@ -102,8 +104,9 @@ sequenceDiagram
     participant Server as REST API
 
     User->>Form: Submit Form
-    Form->>Form: Validation gate (preventDefault only if invalid)
-    Form-->>Coord: native submit bubbles (unclaimed by ln-form's gate)
+    Form-->>Validate: native submit (ln-validate's own gate, any method)
+    Validate->>Validate: Validation gate (preventDefault only if invalid)
+    Validate-->>Coord: native submit bubbles (unclaimed by ln-validate's gate)
     Coord->>Coord: preventDefault() — claim
     
     par Optimistic UI Write
@@ -154,7 +157,7 @@ To standardise successes and dispatch notifications automatically, all write ope
 
 ## 6. Common Pitfalls and Developer Errors
 
-- **Missing `method="post"` on Scoped Forms:** If `method` is omitted, some browsers default to `GET`. The `ln-form` component will ignore `GET` forms, causing the browser to execute a native page reload and append inputs as a query string. Always declare `method="post"` explicitly on scoped forms.
+- **Missing `method="post"` on Scoped Forms:** If `method` is omitted, some browsers default to `GET`. `ln-data-coordinator` only claims `POST`/`PUT`/`PATCH` submits for the write pipeline — a `GET` form is never claimed, regardless of field validity. If every field is valid, the browser executes a native page reload and appends inputs as a query string; `ln-validate`'s submit gate still blocks the reload if fields are invalid (it runs on every method), but a validation pass on an accidentally-`GET` form still bypasses the write pipeline entirely. Always declare `method="post"` explicitly on scoped forms.
 - **Mismatched Scope Names:** If `data-ln-form-scope="name"` does not match the parent's `data-ln-data-coordinator="name"`, the coordinator will ignore the submit — no console warning, the native submit proceeds untouched (progressive-enhancement fallback).
 - **Base URL and HTTP Session Cookies:** The `ln-*-connector` components submit requests with `credentials: 'same-origin'` to safeguard against CSRF attacks. If you define a cross-origin `data-ln-api-base-url` targeting an external domain, cookies will not be sent. Use a same-origin backend proxy gateway instead.
 

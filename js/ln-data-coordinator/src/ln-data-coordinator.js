@@ -406,7 +406,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 			// ─── Form Write Intake — native submit, bubble phase ──────
 			formSubmit: function (e) {
 				const form = e.target;
-				if (e.defaultPrevented) return; // ln-form's validation gate blocked it, or another coordinator already claimed it
+				if (e.defaultPrevented) return; // ln-validate's submit gate blocked it, or another coordinator already claimed it
 
 				const scopeAttr = form.hasAttribute(SCOPE_ATTR) ? form.getAttribute(SCOPE_ATTR) : null;
 				if (scopeAttr === null) return; // form never opted in — leave native submit alone
@@ -601,7 +601,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		self.dom.addEventListener('ln-store:initialized', self._handlers.storeInitialized);
 
 		// Form write intake — native submit, document-level, bubble phase (never
-		// capture: ln-form's own validation gate on the form must run first)
+		// capture: ln-validate's own submit gate on the form must run first)
 		document.addEventListener('submit', self._handlers.formSubmit);
 
 		// Connector responses — generalized across concrete connector implementations
