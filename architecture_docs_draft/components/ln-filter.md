@@ -251,32 +251,20 @@
 sequenceDiagram
     autonumber
     actor User as Корисник
-    participant Input as Checkbox Input
-    participant Filter as ln-filter Component
-    participant Storage as localStorage (ln-persist)
-    participant Target as Target (List/Table/ln-table)
+    participant Filter as ln-filter компонента
+    participant Target as Целен елемент (List/Table/ln-table)
 
-    User->>Input: Кликнува на чекбокс (на пр. "Design")
-    Input->>Filter: Активира DOM 'change' event
-    Note over Filter: _attachHandlers() обработува Sentinel логика<br/>(дечекира Sentinel "Сите" доколку е избрана вредност)
-    Filter->>Filter: Закажува микрозадача за рендерирање (_queueRender)
+    User->>Filter: Кликнува на филтер чекбокс
+    Note over Filter: Обработува Sentinel ("Сите") логика и<br/>закажува асинхроно рендерирање (_queueRender)
     
-    rect rgb(240, 240, 240)
-        Note over Filter: Асинхроно извршување во _render()
-        alt Стандардно DOM филтрирање
-            Filter->>Target: Го поставува/отстранува data-ln-filter-hide="true" на децата
-        else Филтрирање на обична табела (_filterTableRows)
-            Filter->>Target: Го ажурира HIDE_ATTR на редовите во <tbody>
-        end
+    alt Стандардно филтрирање (обична листа/табела)
+        Filter->>Target: Го ажурира атрибутот data-ln-filter-hide="true" на децата/редовите
+    else Интеграција со ln-table (со детектиран data-ln-table)
+        Note over Filter: Го прескокнува директното DOM менување (Guard)
     end
 
-    rect rgb(230, 245, 230)
-        Note over Filter: Извршување на _afterRender()
-        Filter->>Storage: Запишува активна состојба (доколку data-ln-persist е активен)
-        Filter->>Filter: Проверува разлика со _lastSnapshot
-        Filter->>Input: Диспачира ln-filter:changed на филтер контејнерот
-        Filter->>Target: Диспачира ln-filter:changed на целниот елемент (Dual Dispatch)
-    end
+    Filter->>Target: Емитува настан ln-filter:changed (Dual Dispatch)
+    Note over Target: ln-table го слуша настанот и самата се филтрира/ажурира
 ```
 
 ---

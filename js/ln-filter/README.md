@@ -17,6 +17,7 @@ It filters target elements either by comparing child dataset attributes (for cus
      sentinel. Guard: only applies when a reset sentinel exists in the list.
 3. **Table Column & Auto-Population Mode:** By defining `data-ln-filter-col="N"`, the component filters plain HTML `<table>` rows by column cell text. When a `<template>` tag is nested inside, the component automatically populates value checkboxes from the column's unique values on page load.
 4. **Local State Persistence:** Adding the `data-ln-persist` attribute saves active filter selections to `localStorage` under `lnf:{id}`, ensuring filter states survive page reloads and browser transitions.
+5. **Decoupled `ln-table` Integration (Guard & Event Pattern):** When targeting an `ln-table` component (identified by the `data-ln-table` attribute on the target container), `ln-filter` acts purely as an event emitter. It detects the attribute and bypasses local DOM-based column option generation (`_populateFromColumn`) and DOM-based row hiding (`_filterTableRows`). This avoids interfering with `ln-table`'s internal rendering lifecycle, delegating all rendering and filtering to `ln-table` via the `ln-filter:changed` event.
 
 ---
 
@@ -137,7 +138,13 @@ The canonical composition for `ln-table` per-column filters. `ln-filter` handles
 
 ### How dispatch reaches ln-table
 
-`ln-filter` fires `ln-filter:changed` on both the filter container and on `getElementById(tableId)` (see `_dispatchOnBoth` in `js/ln-filter/src/ln-filter.js:293`). `ln-table` receives the event directly on its root element regardless of where in the DOM the filter markup lives.
+`ln-filter` fires `ln-filter:changed` on both the filter container and on `getElementById(tableId)` (see `_dispatchOnBoth` in [ln-filter.js](file:///c:/laragon/www/ln-ashlar/js/ln-filter/src/ln-filter.js#L314-L320)). `ln-table` receives the event directly on its root element regardless of where in the DOM the filter markup lives.
+
+Because `ln-filter` detects the `data-ln-table` attribute on the target container, it activates its internal safety guards to avoid conflicting with the table's state management:
+- **`_populateFromColumn` (Option Generation):** Skips dynamically parsing HTML cells to generate checkbox options, as `ln-table` governs its own data columns.
+- **`_filterTableRows` (Row Hiding):** Skips setting `data-ln-filter-hide="true"` on rows, avoiding collisions with `ln-table`'s rendering lifecycle (like pagination and virtual scrolling).
+
+Instead, `ln-table` itself listens for the `ln-filter:changed` event on its root element (e.g., `dom.addEventListener('ln-filter:changed', this._onColumnFilter)`) and handles the actual filtration and display logic internally.
 
 ---
 
