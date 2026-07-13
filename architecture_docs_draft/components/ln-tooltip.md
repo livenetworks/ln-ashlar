@@ -11,8 +11,8 @@
 Компонентата е дизајнирана според принципот на **прогресивно подобрување (Progressive Enhancement)** и се состои од два комплементарни слоја:
 
 * **Слој 1: Чист CSS базна линија (Zero-JS Baseline)**: Секој HTML елемент што содржи атрибут `data-ln-tooltip="Текст"` веднаш добива визуелно подобрен tooltip преку CSS `::after` псевдо-елемент. Овој слој работи без ниту еден ред JavaScript, нуди моментален одзив и нулта потрошувачка на меморија.
-* **Слој 2: JS прогресивно подобрување (Portaled JS Enhancement)**: Кога на елементот ќе се додаде атрибутот `data-ln-tooltip-enhance` (или при авто-детекција на семантички `<abbr>` со `title`), JavaScript моторот го презема приказот. Тој го користи глобалниот портал контејнер (`#ln-tooltip-portal`) промовиран нативно во Top Layer преку Popover API (`popover="manual"`), што спречува какво било скратување од `overflow: hidden` кај родителите, овозможува прецизно auto-flip позиционирање и го поврзува атрибутот `aria-describedby`.
-* **Автоматско потиснување на нативниот `title` (Native Tooltip Stripping)**: Кај елементи со нативен `title` атрибут (на пример `<abbr data-ln-tooltip title="...">`), JS слојот привремено го отстранува `title` за време на приказот за да спречи дуплирање со системското жолто балонче.
+* **Слој 2: JS прогресивно подобрување (Portaled JS Enhancement)**: Кога на елементот ќе се додаде атрибутот `data-ln-tooltip-enhance` (или при авто-детекција на семантички `<abbr>` со `title`), JavaScript моторот го презема приказот. Внатрешното балонче се закачува во глобален портал контејнер (`#ln-tooltip-portal`) на ниво на `<body>`, спречува исекување од `overflow: hidden`, овозможува автоматско превртување (auto-flip) и го поврзува атрибутот `aria-describedby`.
+* **Автоматско потиснување на нативниот `title` (Native Tooltip Stripping)**: Кај елементи со нативен `title` атрибут (на пример `<abbr data-ln-tooltip title="...">`), JS слојот привремено го отстранува `title` за време на приказот за да спречи грозно дуплирање со системското жолто балонче.
 
 > [!IMPORTANT]
 > **Што `ln-tooltip` НЕ прави (Orthogonality Doctrine):**
@@ -123,7 +123,7 @@
 ```
 
 ### Поведенски Концепти:
-* **Глобално Порталирање во Top Layer (`#ln-tooltip-portal`)**: Наместо само додаден `div`, порталот користи `popover="manual"`. Со повикување на `showPopover()` на порталот пред секое мерење и приказ, тој се промовира во Top Layer на прелистувачот, со што се елиминираат сите `overflow` и `z-index` ограничувања.
+* **Глобално Порталирање (`#ln-tooltip-portal`)**: Се креира фиксиран контејнер на ниво на `<body>` со `z-index: var(--z-toast)` за да се избегне исекување од родителски `overflow: hidden`.
 * **Потиснување на Двојно Рендерирање**: Кога JS слојот е активен (`data-ln-tooltip-enhance` или `[title]`), CSS моторот го поставува псевдо-елементот на `content: none !important` за да спречи дуплирање на балончето.
 
 ---
@@ -159,8 +159,7 @@ sequenceDiagram
     actor User as Корисник (Hover / Focus)
     participant Trigger as DOM Тригер
     participant JS as ln-tooltip Engine
-    participant Portal as Portal (#ln-tooltip-portal)
-    participant Browser as Browser (Top Layer)
+    participant Portal as Portal (body)
     participant ScreenReader as Читач на екран (ARIA)
 
     User->>Trigger: Постанува во focus / hover (mouseenter / focus)
@@ -168,13 +167,12 @@ sequenceDiagram
     alt Претходен tooltip е активен
         JS->>Portal: Избриши го претходниот активен балон
     end
-    JS->>Browser: Повикува portal.showPopover()
     alt Има нативен title атрибут
         JS->>Trigger: Складирај и отстрани title атрибут
     end
-    JS->>Portal: Креирај и закачи нов tooltip балон
+    JS->>Portal: Креирај нов tooltip балон во порталот
     JS->>JS: Пресметај координати со computePlacement()
-    JS->>Portal: Постави физички инлајн координати на балонот (top, left)
+    JS->>Portal: Постави физички инлајн координати (top, left)
     JS->>Trigger: Постави aria-describedby
     ScreenReader->>Trigger: Ги чита името и описаната порака
     JS->>JS: Овозможи глобален ESC слушател
@@ -186,8 +184,7 @@ sequenceDiagram
         alt Имаше складирано title
             JS->>Trigger: Врати го нативниот title атрибут
         end
-        JS->>Portal: Отстрани го tooltip балонот од порталот
-        JS->>Browser: Повикува portal.hidePopover() за излез од Top Layer
+        JS->>Portal: Отстрани го tooltip балонот од DOM
         JS->>JS: Отстрани го глобалниот ESC слушател
     end
 ```

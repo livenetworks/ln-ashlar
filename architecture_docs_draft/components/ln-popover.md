@@ -8,14 +8,13 @@
 
 `ln-popover` е лесна лебдечка компонента наменета за приказ на богати, контекстуални содржини (како кориснички менија, брзи форми за внес, помошни текстуални картички или филтри за колони во табели) позиционирани во однос на активаторот (тригерот). Компонентата е изградена врз принципот на **ортогоналност**, делејќи ги јасно своите одговорности:
 
-* **Состојба и позиционирање (JavaScript)**: Управува со бинарната состојба (`open` / `closed`) преку HTML атрибутот `data-ln-popover`. На почеток автоматски доделува `popover="manual"`. Се грижи за нативна промоција во Top Layer преку `showPopover()` и `hidePopover()`, динамичко пресметување на позицијата (`position: fixed`) на екранот, автоматски ја превртува насоката (auto-flip) ако нема простор во претпочитаниот правец, управува со почетниот фокус и ги затвора отворените поповери преку `ESC` клучот следејќи го LIFO (Last-In, First-Out) редоследот во меморија.
+* **Состојба и позиционирање (JavaScript)**: Управува со бинарната состојба (`open` / `closed`) преку HTML атрибутот `data-ln-popover`. Се грижи за динамичко пресметување на позицијата (`position: fixed`) на екранот, автоматски ја превртува насоката (auto-flip) ако нема простор во претпочитаниот правец, управува со фокусот и ги затвора отворените поповери преку `ESC` клучот следејќи го LIFO (Last-In, First-Out) редоследот.
 * **Структура и поврзување (HTML)**: Поврзувањето меѓу активаторот (`data-ln-popover-for="ID"`) и самиот поповер (`id="ID"`) се врши чисто декларативно преку DOM идентификатори. Ова овозможува тригерот и поповерот да живеат на сосем различни места во DOM дрвото пред да бидат иницијализирани.
 * **Визуелен изглед и анимации (CSS/SCSS)**: Самиот поповер не содржи хардкодирани визуелни стилови. Целосниот изглед (сенки, рамки, фонтови) и транзицијата на појавување се дефинирани во CSS преку наменскиот SCSS миксин `@mixin popover` и анимацијата `ln-popover-fade`.
 
 > [!IMPORTANT]
 > **Што `ln-popover` НЕ прави (Orthogonality Doctrine):**
-> * **НЕ го заробува фокусот (Focus Trap)** — за разлика од модалот, поповерот е disclosure патент. Притискање на `Tab` овозможува навигацијата да продолжува надвор од поповерот кон следниот интерактивен елемент на страницата.
-> * **НЕ користи DOM телепортација во `<body>`** — благодарение на нативното Popover API, елементот останува на својата локација во DOM-от додека истовремено се промовира во Top Layer од прелистувачот.
+> * **НЕ го заробува фокусот (Focus Trap)** — за разлика од модалот, поповерот е disclosure патент. Притискање на `Tab` овозможува навигацијата да продолжи надвор од поповерот кон следниот интерактивен елемент на страницата.
 > * **НЕ управува со бизнис логика** — не знае каква форма или филтри има внатре и не ги обработува нивните податоци.
 > * **НЕ содржи инлајн стилови за изглед** — користи инлајн стилови исклучиво за физичките координати на позиционирање (`top` и `left`), додека секој друг визуелен параметар се дефинира преку SCSS.
 
@@ -105,7 +104,6 @@
 | Атрибут | Каде се поставува | Вредност / Тип | Опис |
 |---|---|---|---|
 | `data-ln-popover` | Поповер контејнер | `"open"` \| `"closed"` (или празно) | Главен атрибут за контрола на состојбата на отвореност. |
-| `popover` | Поповер контејнер | `"manual"` (автоматски од JS) | Го означува поповерот за мануелно менаџирање преку Popover API на прелистувачот. |
 | `data-ln-popover-for` | Активатор | `ID на поповерот` | Го мапира активаторот со соодветниот поповер за негово отворање или затворање (toggle однесување). |
 | `data-ln-popover-position` | Поповер контејнер | `"top"` \| `"bottom"` \| `"left"` \| `"right"` (и суфикси `-start` / `-end`) | Претпочитана позиција за приказ во однос на активаторот (дифолт: `"bottom"`). |
 | `data-ln-popover-placement` | Поповер контејнер | `"top"` \| `"bottom"` \| `"left"` \| `"right"` | Се поставува автоматски од страна на JS по пресметка на прелевањето и извршениот auto-flip, означувајќи ја чистата насока на тековниот приказ (без суфикс). |
@@ -118,10 +116,10 @@
 
 | Настан | Откажување (`Cancelable`) | Податоци во `event.detail` | Опис |
 |---|:---:|---|---|
-| `ln-popover:before-open` | **Да** | `{ popoverId, target, trigger }` | Се активира веднаш по промената во `"open"`, пред нативното отворање и позиционирањето. `event.preventDefault()` го откажува отворањето. |
-| `ln-popover:open` | Не | `{ popoverId, target, trigger }` | Се активира откако поповерот е промовиран во Top Layer преку `showPopover()`, позициониран и фокусот е пренесен во него. |
+| `ln-popover:before-open` | **Да** | `{ popoverId, target, trigger }` | Се активира веднаш по промената во `"open"`, пред телепортацијата и позиционирањето. `event.preventDefault()` го откажува отворањето. |
+| `ln-popover:open` | Не | `{ popoverId, target, trigger }` | Се активира откако поповерот е позициониран, телепортиран и фокусот е пренесен внатре во него. |
 | `ln-popover:before-close` | **Да** | `{ popoverId, target, trigger }` | Се активира пред почетокот на процесот на затворање. `event.preventDefault()` го спречува затворањето. |
-| `ln-popover:close` | Не | `{ popoverId, target, trigger }` | Се диспачира откако поповерот е сокриен преку `hidePopover()` и фокусот е вратен на активаторот. |
+| `ln-popover:close` | Не | `{ popoverId, target, trigger }` | Се диспачира откако поповерот е целосно затворен, вратен на почетна DOM позиција и фокусот е вратен на активаторот. |
 | `ln-popover:destroyed` | Не | `{ popoverId, target }` | Се диспачира при деструктуирање на поповерот и чистење на неговите инстанци. |
 
 ---
@@ -167,6 +165,11 @@ popover.lnPopover.destroy();
 /* scss/components/_popover.scss */
 [data-ln-popover] {
     @include popover;
+
+    // Издигнување на z-index кога се отвора од внатрешноста на модал
+    body:has(.ln-modal[data-ln-modal="open"]) > & {
+        z-index: calc(var(--z-modal) + 10);
+    }
 }
 ```
 
@@ -194,11 +197,11 @@ popover.lnPopover.destroy();
 
 ---
 
-### 4.2. Поведенски Концепт: Top Layer промоција (Popover API)
-За да се спречи сечење (clipping) на поповерот од страна на родителски контејнери кои имаат `overflow: hidden`, `position: relative`, или специфични `z-index` и `transform` вредности, `ln-popover` користи нативно **Popover API**:
-1. На отворање, со повикување на `showPopover()`, елементот се промовира во Top Layer на прелистувачот.
-2. Со ова, тој се исцртува во посебен слој над целиот документ (вклучувајќи ги и модалите).
-3. Нема физичко преместување (телепортирање) на елементот во DOM-от, што го прави однесувањето многу постабилно и го зачувува редоследот во DOM стеблото.
+### 4.2. Поведенски Концепт: Телепортација во `<body>` (Escape Clipping)
+За да се спречи сечење (clipping) на поповерот од страна на родителски контејнери кои имаат `overflow: hidden`, `position: relative`, или специфични `z-index` и `transform` вредности, `ln-popover` користи механизам на **телепортација**:
+1. На отворање, елементот физички се отстранува од својата тековна DOM локација и се прикачува на самиот крај на `<body>`.
+2. На местото на оригиналната локација се остава коментар како маркер (`<!-- ln-teleport -->`).
+3. При затворање, поповерот автоматски се враќа на својата првобитна локација во DOM дрвото.
 
 ---
 
@@ -248,46 +251,48 @@ sequenceDiagram
     autonumber
     actor Корисник
     participant Trigger as Активатор [data-ln-popover-for]
+    participant Del as Event Delegation (MutationObserver)
     participant Popover as Поповер [data-ln-popover]
-    participant Browser as Browser (Popover API)
+    participant Body as document.body
     
     Корисник->>Trigger: Клик на активатор
-    Trigger->>Popover: Твикува data-ln-popover="open" (преку JS инстанца/тригер)
+    Trigger->>Popover: Toggles data-ln-popover="open"
     
-    Note over Popover: MutationObserver детектира промена во "open"
-    Popover->>Popover: Диспачира 'ln-popover:before-open' (Cancelable)
+    Note over Del: Открива промена на data-ln-popover во "open"
+    Del->>Popover: Диспачира 'ln-popover:before-open' (Cancelable)
     
     alt Отворањето е откажано со preventDefault()
         Popover->>Popover: Враќа во "closed"
     else Отворањето е дозволено
-        Popover->>Popover: Снима моментален фокус (activeElement)
-        Popover->>Browser: Повикува native showPopover() за Top Layer промоција
-        Popover->>Popover: Ги мери димензиите на поповерот (measureHidden)
-        Popover->>Popover: Ја пресметува позицијата (computePlacement со auto-flip)
+        Del->>Popover: Снима моментален фокус (activeElement)
+        Del->>Body: Го телепортира поповерот на крајот од body
+        Del->>Popover: Ги мери димензиите на поповерот
+        Del->>Popover: Ја пресметува позицијата (спречува прелевање / auto-flip)
         Popover->>Popover: Ги поставува inline top/left и data-ln-popover-placement
         Popover->>Trigger: Поставува aria-expanded="true"
         Popover->>Popover: Го фокусира првиот внатрешен елемент / контејнер
-        Note over Popover: Активира слушатели за scroll, resize, document click и ESC стек
+        Note over Popover: Активира слушатели за scroll, resize, document click и ESC
         Popover->>Popover: Диспачира 'ln-popover:open'
     end
 
     Корисник->>Popover: Интеракција со содржината
     
     alt Корисникот притиска ESC / кликнува надвор од поповерот
-        Корисник->>Popover: Иницира затворање (ESC / Click outside)
-        Popover->>Popover: Сетува data-ln-popover="closed"
+        Корисник->>Popover: Иницира затворање
+    else Програмско затворање
+        Note over Popover: data-ln-popover се поставува во "closed"
     end
 
-    Popover->>Popover: Диспачира 'ln-popover:before-close' (Cancelable)
+    Del->>Popover: Диспачира 'ln-popover:before-close' (Cancelable)
     
     alt Затворањето е откажано
         Popover->>Popover: Враќа во "open"
     else Затворањето е дозволено
-        Note over Popover: Се тргаат слушателите за scroll, resize, click и ESC стек
-        Popover->>Browser: Повикува native hidePopover() за излез од Top Layer
+        Note over Popover: Се тргаат слушателите за scroll, resize, click и ESC
+        Del->>Body: Го де-телепортира поповерот на оригиналната DOM позиција
         Popover->>Popover: Ги чисти inline стиловите и data-ln-popover-placement
         Popover->>Trigger: Поставува aria-expanded="false"
-        Popover->>Trigger: Го враќа фокусот на активаторот (условно)
+        Popover->>Trigger: Го враќа фокусот на активаторот (ако е ESC или претходен фокус)
         Popover->>Popover: Диспачира 'ln-popover:close'
     end
 ```
