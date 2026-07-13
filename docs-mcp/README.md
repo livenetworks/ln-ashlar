@@ -22,10 +22,14 @@ docs-mcp/
   patterns/          ← composite recipes (table+sort+filter, modal-fill CRUD...): <kebab-name>.md
   guides/            ← workflow guides (write-workflow...)
   doctrine/          ← mindset, rules, doctrines
-  skills/            ← design decision rules (UI/UX) for designer agents: <kebab-name>.md
+  skills/            ← standalone design decision rules; one subfolder per product context:
+    app/             ←   data-dense business applications
+    web/             ←   presentational sites (opposite rules by design)
+    wordpress/       ←   WordPress builds
 ```
 
 The MCP indexer reads ONLY from `components/`, `css/`, `patterns/`, `guides/`, `doctrine/`, and `skills/`.
+`skills/` is read **recursively** — the subfolder name is the skill's `context`; no other indexed folder has subfolders.
 Files starting with `_` or named `README.md` are ignored.
 
 ## Frontmatter (Mandatory for every document)
@@ -36,12 +40,13 @@ name: ln-toggle              # slug — MUST equal the filename (without .md)
 classification: simple       # see allowed classifications below
 status: draft                # draft | stable
 domain: frontend             # frontend | backend | process — corpus domain (absent = frontend)
-context: app                 # app | web | wordpress — product context, skills only (absent = app)
 summary: One-sentence summary shown in list/search results.
 source: js/ln-toggle/src/ln-toggle.js   # main source files (supports arrays)
 tags: [state, collapsible]
 ---
 ```
+
+`context` is not frontmatter — for skills it is derived from the subfolder (`app` | `web` | `wordpress`). Skill documents also omit `source:` (standalone — no code source).
 
 Allowed `classification` values by folder:
 
@@ -53,6 +58,10 @@ Allowed `classification` values by folder:
 | `guides/` | `guide` |
 | `doctrine/` | `doctrine` |
 | `skills/` | `skill` |
+
+## Skills Are Standalone
+
+Skills are library-agnostic decision doctrine — they never reference components, mixins, source paths, or any concrete library. They link only to sibling skills within the same context subfolder. The WHEN/WHAT (skills) ↔ HOW (components/css/patterns) join happens at serving time, not through authored links. Contexts carry opposite rules by design; the server never mixes two contexts in one served set.
 
 ## Prescribed Headings (Parsing Contract)
 
@@ -104,6 +113,7 @@ In §2, each ```` ```html ```` block under `### Base HTML Markup` is the default
 Links between documents must be authored as relative markdown links:
 `[ln-accordion](./ln-accordion.md)`, `[tables](../css/tables.md)`.
 The MCP builds the cross-reference graph from these links automatically—no separate graph file is needed.
+Skills are the exception: no outward links — only `./` links to sibling skills in the same context subfolder.
 
 ## Lifecycle
 

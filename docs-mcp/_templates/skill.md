@@ -3,9 +3,7 @@ name: skill-name
 classification: skill
 status: draft
 domain: frontend
-context: app
 summary: One sentence — which design/process decisions the skill governs.
-source:
 tags: []
 ---
 
@@ -18,7 +16,7 @@ tags: []
 ---
 
 Free form. Mandatory: frontmatter, `## Summary` as the first section,
-relative links to components/css/patterns/doctrine for the cross-reference graph.
+relative links only to sibling skills in the same context subfolder (`./ux.md`).
 
 Skills are prescriptive decision rules — WHEN/WHETHER something must exist —
 not implementation reference. Conventions:
@@ -28,13 +26,17 @@ not implementation reference. Conventions:
 - **Decision tables over prose.** Applies-when conditions and enumerated
   exceptions — "except in some situations" without the actual list is forbidden.
   Anti-pattern lists are encouraged.
-- **Ground every claim.** A rule that names a component, attribute, or event
-  must link to the real implementation (`../components/ln-*.md`,
-  `../patterns/*.md`). A rule the library cannot fulfil yet is explicitly
-  marked as aspirational.
+- **Standalone.** Skills are library-agnostic — naming a concrete component,
+  attribute, event, mixin, or source path of any library is forbidden. Rules
+  must hold outside ln-ashlar. No aspirational markers — a rule is stated
+  normatively or not at all.
 - `domain:` is `frontend` | `backend` | `process` (absent = `frontend`).
-- `context:` is `app` | `web` | `wordpress` — the product type the rules target
-  (absent = `app`). Contexts carry OPPOSITE rules by design (density, motion,
-  decoration flip between apps and presentational sites) — so a ban scoped to
-  one context must say so explicitly ("never in data tools", not "never"), and
-  the server never mixes two contexts in one served set.
+- `context` is not frontmatter — it is the subfolder the file lives in
+  (`app/` | `web/` | `wordpress/`). Contexts carry OPPOSITE rules by design
+  (density, motion, decoration flip between apps and presentational sites) —
+  a ban scoped to one context must say so explicitly ("never in data tools",
+  not "never"); the server never mixes two contexts in one served set.
+- Links: only to sibling skills in the same context subfolder (`./ux.md`);
+  links to `components/`, `css/`, `patterns/`, `doctrine/`, `guides/` are
+  forbidden.
+</content>
