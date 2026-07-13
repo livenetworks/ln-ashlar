@@ -4,9 +4,11 @@
 ---
 
 ## 1. Заднинско дејство и одговорност
-- **Краток опис:** `ln-modal` е компонента за контрола на модални прозорци (dialog overlays) кои го блокираат визуелниот приказ и интеракцијата со остатокот од страницата. Таа управува исклучиво со бинарната состојба (`open` / `close`), фокусот и пристапноста.
+- **Краток опис:** `ln-modal` е компонента за контрола на модални прозорци која се потпира на нативниот HTML `<dialog>` елемент. Таа управува со бинарната состојба (`open` / `close`) преку синхронизација на атрибути, иницирање на нативните `showModal()` и `close()` методи, фокус менаџмент и пристапност.
 - **Ортогоналност (Што компонентата НЕ прави):**
-  - **НЕ се позиционира или анимира преку JS** — се потпира исклучиво на CSS транзиции и анимацијата `ln-modal-slideIn`.
+  - **НЕ се позиционира или анимира преку JS** — се потпира на нативните механизми на прелистувачот и CSS транзиции (како анимацијата `ln-modal-slideIn` на формата и транзицијата на нативниот `::backdrop`).
+  - **НЕ користи сопствен (рачен) focus trap во JS** — нативниот `<dialog>` кога се отвара со `showModal()` автоматски и нативно го заробува фокусот во рамките на дијалогот.
+  - **НЕ имплементира сопствени ESC клуч слушатели за затворање** — прелистувачот нативно реагира на ESC и испраќа настан `cancel` кој компонентата само го пресретнува за правилна синхронизација.
   - **НЕ управува со бизнис логика** — не знае која форма е внатре, како се праќаат или зачувуваат податоците.
   - **НЕ се меша во валидацијата** — формата внатре користи `ln-validate` за проверка на внесот.
   - **НЕ бара дополнителни wrapper класи** — формата (`<form>`) е директно дете на модалниот контејнер `<dialog class="ln-modal" data-ln-modal>`.
@@ -218,13 +220,25 @@
 ## 4. CSS Стилизирање и Поведенски Концепт
 
 ### 4.1. Драјвер правила во SCSS
-Визуелниот приказ и сокривањето на модалот се овозможени преку правила во [js/ln-modal/ln-modal.scss](../../js/ln-modal/ln-modal.scss):
+Визуелниот приказ, ресетирањето на UA стиловите на `<dialog>` и сокривањето/прикажувањето на модалот се управувани во [js/ln-modal/ln-modal.scss](../../js/ln-modal/ln-modal.scss):
 
 ```scss
 /* js/ln-modal/ln-modal.scss */
-[data-ln-modal="open"] {
-	display: flex;
-	opacity: 1;
+[data-ln-modal] {
+	background: transparent;
+	border: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	color: inherit;
+	overflow: visible;
+
+	&[data-ln-modal="open"] {
+		display: flex;
+	}
 }
 
 body.ln-modal-open {
@@ -248,7 +262,7 @@ body.ln-modal-open {
 
 | Mixin | Максимална ширина / Опис | Препорачана намена |
 |---|---|---|
-| `@include modal-overlay;` | `fixed`, `inset-0`, scrim color, blur backdrop-filter | Го дефинира затемнувањето на позадината |
+| `@include modal-overlay;` | Позиционирање во viewport и стилизирање на нативниот `::backdrop` со scrim боја и заматување | Го дефинира затемнувањето на позадината |
 | `@include modal-panel;` | Grid (`auto 1fr auto`), max `600px`, `90vh`, shadow `var(--shadow-xl)` | Ги дефинира сенките, заобленоста и анимацијата `ln-modal-slideIn` |
 | `@include modal-sm;` | `28rem` (~448px) | Едноставни потврди, кратки прашања |
 | `@include modal-md;` | `32rem` (~512px) | Стандардни форми со 2-4 полиња |
@@ -277,26 +291,27 @@ body.ln-modal-open {
 ## 5. Пристапност (ARIA) и Чести Грешки
 
 ### 5.1. ARIA и Управување со Фокусот
-Имплементацијата во [js/ln-modal/src/ln-modal.js](../../js/ln-modal/src/ln-modal.js) ги следи WCAG насоките за пристапност:
+Управувањето со пристапноста ги следи нативните WCAG насоки овозможени од HTML5 `<dialog>` спецификацијата:
 
-1. **Семантички атрибути**: При отворање, компонентата автоматски поставува `role="dialog"` и `aria-modal="true"`.
-2. **Пребарување на приоритет за фокус**:
+1. **Семантичка улога**: Прелистувачот нативно му доделува соодветни дијалог карактеристики на елементот `<dialog>`. За постара компатибилност, препорачливо е маркапот да содржи `role="dialog"` и `aria-modal="true"`.
+2. **Пребарување на приоритет за фокус при отворање (JS инициран)**:
+   При отворање, `ln-modal` го бара првиот соодветен елемент за фокус:
    - Прво го насочува фокусот кон елементот со атрибут `autofocus`.
    - Доколку таков не постои, го фокусира првото видливо внесно поле (`input:not([disabled]):not([type="hidden"])`, `textarea`, `select`).
    - Доколку нема внесни полиња, го фокусира првото овозможено копче или линк (`a[href]`, `button:not([disabled])`).
-3. **Focus Trap (`Tab` / `Shift+Tab`)**:
-   - Со притискање на `Tab` или `Shift+Tab`, фокусот циклично се движи исклучиво помеѓу видливите интерактивни елементи во модалот, спречувајќи го корисникот да пристапи до елементите во позадина.
-4. **Затворање со `Escape` клуч**:
-   - Секој отворен модал слуша за `Escape` клучот и се затвора автоматски.
+3. **Нативен Focus Trap**:
+   - Бидејќи модалот се отвора со нативниот метод `showModal()`, прелистувачот **нативно го заробува фокусот**. Притискање на `Tab` или `Shift+Tab` циклично го движи фокусот само низ интерактивните елементи во дијалогот. Корисникот не може да пристапи до елементите во позадина.
+4. **Нативно затворање со `Escape` клуч (`cancel` настан)**:
+   - Прелистувачот нативно реагира на притискање на `Escape` и испраќа настан `cancel` до `<dialog>`. Компонентата го пресретнува овој настан преку `e.preventDefault()` за да спречи нативното затворање да ја заобиколи JS синхронизацијата на состојбите. Наместо тоа, го пренасочува затворањето преку поставување на `data-ln-modal="close"`, што гарантира уредно повикување на `before-close` настаните и чистење на URL хешот.
 5. **Враќање на фокусот**:
-   - По затворање, фокусот автоматски се враќа на копчето/линкот (`_returnFocusEl`) што го иницирал отворањето.
+   - По затворање, прелистувачот нативно го враќа фокусот на елементот што го иницирал отворањето на дијалогот.
 
 ---
 
 ### 5.2. Чести Грешки (Anti-Patterns)
 
 > [!CAUTION]
-> 1. **Не користи позитивни `tabindex` вредности (на пр. `tabindex="1"`)**: Component-от ги филтрира елементите според нивниот природен DOM редослед. Позитивните `tabindex` вредности го нарушуваат редоследот на фокусот и се сметаат за анти-патерн во WCAG.
+> 1. **Не користи позитивни `tabindex` вредности (на пр. `tabindex="1"`)**: Позитивните `tabindex` вредности го нарушуваат редоследот на фокусот и се сметаат за анти-патерн во WCAG.
 > 2. **Не додавај непотребни BEM обвивки во HTML**: Не креирај `.ln-modal__content` или `.ln-modal__dialog`. Формата (`<form>`) е директно дете на `.ln-modal` и ја добива целата стилизација преку `@include modal-panel;`.
 > 3. **Не поставувај широчини или анимации во inline JS**: Сите димензии и транзиции треба да се дефинираат во SCSS преку миксините (`modal-md`, `modal-lg` итн.).
 > 4. **Не ги мешај `data-ln-modal-*` и `data-ln-fill-*` атрибутите**: `data-ln-modal-*` служат за статичен текстуален приказ (`[data-ln-field]`), додека `data-ln-fill-*` се за пополнување интерактивни внесни полиња во форма (`[data-ln-form]`).
@@ -313,8 +328,9 @@ sequenceDiagram
     actor Корисник
     participant Trigger as Активатор [data-ln-modal-for] / Хеш линк
     participant Del as Event Delegation (document)
-    participant Modal as Модал [data-ln-modal]
-    participant CSS as CSS Ефекти (.ln-modal-open / slideIn)
+    participant Modal as Модал <dialog data-ln-modal>
+    participant Browser as Browser (Native Dialog Engine)
+    participant CSS as CSS Ефекти (.ln-modal-open / backdrop / slideIn)
 
     Корисник->>Trigger: Клик на тригерот
     Trigger->>Del: Клик настан (bubble)
@@ -326,15 +342,16 @@ sequenceDiagram
         Del->>Modal: Ги празни сите [data-ln-field]
     end
 
-    Del->>Modal: Сетува атрибут data-ln-modal="open" (или "close" при toggle затворање)
+    Del->>Modal: Сетува атрибут data-ln-modal="open"
     
-    Note over Modal: Промена на атрибут во "open"
+    Note over Modal: MutationObserver детектира промена на атрибутот во "open"
     Modal->>Modal: Диспачира 'ln-modal:before-open' (Cancelable)
     
     alt Отворањето е дозволено (не е превенирано)
-        Modal->>CSS: Додава .ln-modal-open на <body> и стартува анимација
-        Note over Modal: Се активираат Focus Trap и ESC слушатели
-        Modal->>Modal: Го пресметува првиот елемент и поставува фокус
+        Modal->>Browser: Повикува native showModal()
+        Browser->>CSS: Додава .ln-modal-open на <body> и го прикажува ::backdrop
+        Note over Browser: Нативно го заробува фокусот (Native Focus Trap)
+        Modal->>Modal: Го пресметува првиот соодветен елемент за почетен фокус
         Modal->>Modal: Диспачира 'ln-modal:open'
     else Отворањето е откажано со event.preventDefault()
         Modal->>Modal: Го враќа атрибутот во "close"
@@ -343,8 +360,14 @@ sequenceDiagram
 
     Корисник->>Modal: Интеракција и пополнување
     
-    alt Корисникот притиска ESC / кликнува [data-ln-modal-close]
-        Корисник->>Modal: Затворање на модалот
+    alt Корисникот притиска ESC
+        Корисник->>Browser: Притиска ESC
+        Browser->>Modal: Диспачира нативен cancel настан
+        Modal->>Browser: e.preventDefault() (пресретнува нативно затворање)
+        Modal->>Modal: Сетува атрибут data-ln-modal="close"
+    else Корисникот кликнува [data-ln-modal-close]
+        Корисник->>Modal: Клик
+        Modal->>Modal: Сетува атрибут data-ln-modal="close"
     else Корисникот кликнува на тригерот [data-ln-modal-for] додека е отворен
         Корисник->>Trigger: Клик
         Trigger->>Del: Клик настан (bubble)
@@ -354,15 +377,15 @@ sequenceDiagram
         Modal->>Modal: Сетува атрибут data-ln-modal="close"
     end
 
-    Note over Modal: Промена на атрибут во "close"
+    Note over Modal: MutationObserver детектира промена на атрибутот во "close"
     Modal->>Modal: Диспачира 'ln-modal:before-close' (Cancelable)
 
     alt Затворањето е дозволено
-        Note over Modal: Се исклучуваат ESC и Focus Trap слушатели
         Modal->>Modal: Диспачира 'ln-modal:close'
         Modal->>Trigger: Го чисти соодветниот хеш од URL-то (hashSet)
-        Modal->>Trigger: Го враќа фокусот на оригиналниот активатор
-        Note over CSS: Се трга .ln-modal-open од <body> (условно, ако нема други отворени модали)
+        Modal->>Browser: Повикува native close()
+        Browser->>Trigger: Нативно го враќа фокусот на оригиналниот активатор
+        Note over CSS: Се трга .ln-modal-open од <body> (условно)
     else Затворањето е откажано (спречено преку event.preventDefault())
         Modal->>Modal: Го враќа атрибутот во "open"
     end
