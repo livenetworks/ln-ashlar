@@ -69,7 +69,7 @@
 - [x] **ln-editor**
 - [x] **ln-slug**
 - [x] **ln-autoresize**
-- [ ] **ln-autosave**
+- [x] **ln-autosave**
 - [x] **ln-fill**
 - [x] **ln-modal-fill**
 - [x] **ln-confirm**
