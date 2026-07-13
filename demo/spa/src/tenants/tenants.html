@@ -27,12 +27,10 @@
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
 				</label>
-				<span data-ln-table-selected-wrap class="hidden">
-					<button type="button" id="bulk-delete-tenants" class="btn" data-ln-confirm="Delete selected tenants?">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
-						Delete selected (<span data-ln-table-selected></span>)
-					</button>
-				</span>
+				<button type="button" id="bulk-delete-tenants" class="btn hidden" data-ln-confirm="Delete selected tenants?">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+					Delete selected (<span data-ln-table-selected></span>)
+				</button>
 			</header>
 
 			<table>
@@ -53,7 +51,7 @@
 
 			<footer class="ln-table__footer">
 				<span data-ln-table-total></span> items
-				<span data-ln-table-filtered-wrap class="hidden"> · <span data-ln-table-filtered></span> filtered</span>
+				<span class="hidden"> · <span data-ln-table-filtered></span> filtered</span>
 			</footer>
 
 			<template data-ln-template="tenants-row">

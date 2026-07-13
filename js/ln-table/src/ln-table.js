@@ -136,13 +136,13 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this._filteredSpan = dom.querySelector('[data-ln-table-filtered]');
 			if (this._filteredSpan) {
 				this._filteredWrap = this._filteredSpan.parentElement !== dom
-					? this._filteredSpan.closest('[data-ln-table-filtered-wrap]') || this._filteredSpan.parentNode
+					? this._filteredSpan.parentElement
 					: null;
 			}
 			this._selectedSpan = dom.querySelector('[data-ln-table-selected]');
 			if (this._selectedSpan) {
 				this._selectedWrap = this._selectedSpan.parentElement !== dom
-					? this._selectedSpan.closest('[data-ln-table-selected-wrap]') || this._selectedSpan.parentNode
+					? this._selectedSpan.parentElement
 					: null;
 			}
 
@@ -202,7 +202,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			// Clear all filters button
 			this._onClearAll = function (e) {
-				const btn = e.target.closest('[data-ln-table-clear-all]') || e.target.closest('[data-ln-data-table-clear-all]');
+				const btn = e.target.closest('[data-ln-table-clear-all]');
 				if (!btn) return;
 				self.currentFilters = {};
 				// Clear visual indicators on all filter buttons

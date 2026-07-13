@@ -114,8 +114,8 @@ Opted in by specifying the `data-ln-table-source` attribute. Rows are dynamicall
 
     <footer class="ln-table__footer">
         <span data-ln-table-total></span> items
-        <span data-ln-table-filtered-wrap> · <span data-ln-table-filtered></span> filtered</span>
-        <span data-ln-table-selected-wrap class="hidden"> · <span data-ln-table-selected></span> selected</span>
+        <span> · <span data-ln-table-filtered></span> filtered</span>
+        <span class="hidden"> · <span data-ln-table-selected></span> selected</span>
     </footer>
 
     <!-- Row Template -->

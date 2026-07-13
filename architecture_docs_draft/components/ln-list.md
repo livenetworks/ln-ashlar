@@ -47,10 +47,10 @@
         <!-- Спанови за статистика -->
         <div>
             Вкупно: <span data-ln-list-total></span>
-            <span data-ln-list-filtered-wrap class="hidden">
+            <span class="hidden">
                 (Прикажани: <span data-ln-list-filtered></span>)
             </span>
-            <span data-ln-list-selected-wrap class="hidden">
+            <span class="hidden">
                 (Селектирани: <span data-ln-list-selected></span>)
             </span>
         </div>
@@ -110,9 +110,7 @@
 | `data-ln-item-action` | `String` | `/` | Вредноста го дефинира името на акцијата што се испраќа во настан. |
 | `data-ln-list-total` | `Flag` | `/` | Елемент кој се ажурира со вкупниот број на елементи во листата. |
 | `data-ln-list-filtered` | `Flag` | `/` | Елемент кој ја прикажува бројката на филтрирани/видливи елементи. |
-| `data-ln-list-filtered-wrap` | `Flag` | `/` | Се крие (`.hidden`) кога нема активни филтри/пребарувања. |
 | `data-ln-list-selected` | `Flag` | `/` | Елемент кој се ажурира со бројот на моментално селектирани елементи. |
-| `data-ln-list-selected-wrap` | `Flag` | `/` | Се крие (`.hidden`) кога бројот на селектирани елементи е 0. |
 
 ### DOM Барања кон Листата (Слуша)
 

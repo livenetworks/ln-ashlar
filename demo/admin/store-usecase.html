@@ -293,12 +293,10 @@
 			<header class="ln-table__toolbar">
 				<div>
 					<h3>Documents</h3>
-					<span data-ln-table-selected-wrap class="hidden">
-						<button id="bulk-delete-btn" class="btn" style="--color-primary: var(--color-error)">
+					<button id="bulk-delete-btn" class="btn hidden" style="--color-primary: var(--color-error)">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
 						Delete selected (<span data-ln-table-selected></span>)
 					</button>
-					</span>
 				</div>
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
@@ -329,7 +327,7 @@
 			</table>
 			<footer class="ln-table__footer">
 				<span data-ln-table-total></span> items
-				<span data-ln-table-filtered-wrap> · <span data-ln-table-filtered></span> filtered</span>
+				<span> · <span data-ln-table-filtered></span> filtered</span>
 			</footer>
 
 			<template data-ln-template="documents-row">
@@ -642,7 +640,7 @@
 			</table>
 			<footer class="ln-table__footer">
 				<span data-ln-table-total></span> items
-				<span data-ln-table-filtered-wrap> · <span data-ln-table-filtered></span> filtered</span>
+				<span> · <span data-ln-table-filtered></span> filtered</span>
 			</footer>
 
 			<template data-ln-template="people-row">
