@@ -20,6 +20,13 @@ It maintains no custom rules in JavaScript; instead, it relies fully on native H
    idempotent and one-way — it is never removed on field `destroy()`,
    since other validated fields on the same form may still own the
    gate.
+5. **Owns the Submit Gate:** The same field that injects `novalidate`
+   also attaches (once per form) a `submit` listener: on submit, it
+   dispatches `ln-validate:request-validate` to collect invalid fields;
+   if any exist, it calls `preventDefault()`, sorts them by document
+   position, and focuses the first one. Runs on every HTTP method — GET
+   included, exactly like the native validation it replaces. `ln-form`
+   has no role in this at all.
 
 ---
 
@@ -107,7 +114,7 @@ input.lnValidate.destroy();
 | :--- | :--- | :--- |
 | `ln-validate:set-custom` | `{ error: String }` | Injects a custom error key, highlights the field as invalid. |
 | `ln-validate:clear-custom` | `{ error: String }` / `{}` | Clears a specific custom error, or all custom errors at once. |
-| `ln-validate:request-validate` | `{ invalidFields: Array }` | Dispatched by `ln-form` on form submit. Forces validation (sets `_touched = true`, calls `validate()`) and pushes the field element to the `invalidFields` array if invalid. |
+| `ln-validate:request-validate` | `{ invalidFields: Array }` | Dispatched by `ln-validate`'s own submit gate (see Philosophy §5). Forces validation (sets `_touched = true`, calls `validate()`) and pushes the field element to the `invalidFields` array if invalid. |
 
 ---
 

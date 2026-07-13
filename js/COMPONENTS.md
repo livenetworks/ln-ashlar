@@ -1050,19 +1050,24 @@ own attribute (`data-ln-modal`, `data-ln-popover`, `data-ln-tabs-active`).
 The "attribute is the single source of truth" pattern is shared; the
 specific attribute is not.
 
-### Form family — ln-form coordinates siblings
+### Form family — ln-validate owns the submit gate
 
 ```
-ln-form  (catches submit, reads ln-validate events)
-  ├── ln-validate   dispatches ln-validate:valid / ln-validate:invalid,
-  │                 which ln-form listens for
-  └── ln-autosave   stores form state in localStorage; writes on blur/change
-                    independently of ln-form
+ln-validate  (first field per form attaches the submit gate;
+              every field self-registers its own request-validate
+              listener)
+
+ln-form      (populate + RESTful action routing only — no submit
+              listener, no validation awareness)
+
+ln-autosave  stores form state in localStorage; writes on blur/change,
+             independently of both ln-form and ln-validate
 ```
 
-ln-form never calls `lnValidate.isValid()` or reads TomSelect state
-directly. It listens to the validation events and lets each sibling
-manage its own internals.
+None of the three import each other or call cross-instance methods.
+`ln-form.fill()` dispatches synthetic `input`/`change` on populated
+fields; `ln-validate`'s own field listeners react to those exactly as
+they would to real user input. `ln-autosave` does the same on restore.
 
 ### Data family — ln-table ↔ ln-store through the coordinator
 

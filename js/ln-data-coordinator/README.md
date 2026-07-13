@@ -144,11 +144,11 @@ Because all events dispatched by the child components bubble up, the coordinator
 ### 0. Form Write Intake (native `submit`, claimed via `preventDefault()`)
 
 The coordinator listens for the native `submit` event on `document`
-(bubble phase — never capture, so `ln-form`'s own validation gate on the
-form itself always runs first). On every submit bubbling through:
+(bubble phase — never capture, so `ln-validate`'s own validation gate on
+the form itself always runs first). On every submit bubbling through:
 
-1. `if (e.defaultPrevented) return` — either `ln-form`'s validation gate
-   blocked an invalid submit, or another coordinator already claimed it.
+1. `if (e.defaultPrevented) return` — either `ln-validate`'s validation
+   gate blocked an invalid submit, or another coordinator already claimed it.
 2. Reads `data-ln-form-scope` off `e.target` (the form). Absent → the
    form never opted in; leave the native submit alone.
 3. Claims it if either holds: scope value `=== this._name` (named
@@ -156,7 +156,7 @@ form itself always runs first). On every submit bubbling through:
    this coordinator (containment) — identical matching rules as before.
 4. Resolves the effective method itself (hidden `_method` input if
    present and non-empty, else `form.method`) — a literal read, no
-   fallback, mirroring `ln-form`'s own gate exactly.
+   fallback, mirroring `ln-validate`'s own gate exactly.
 5. Methods other than `POST`/`PUT`/`PATCH` are left untouched — the
    native submit proceeds (e.g. a `GET` search form nested in the
    coordinator).

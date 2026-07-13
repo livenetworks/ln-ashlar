@@ -3,9 +3,9 @@
 A minimal **form manipulation** primitive. `ln-form` does exactly two
 things to a native `<form>`: populate it when an `ln-fill` event delivers
 a record, and rewrite `action` / `_method` for RESTful edit routing.
-Submit is native HTML — `ln-form` only ever intercepts it to run a
-validation gate on `POST`/`PUT`/`PATCH` forms (see §7); a valid submit
-is always left native.
+Submit is entirely native HTML — `ln-form` does not listen for `submit`
+at all. Validation display and the submit gate are owned entirely by
+[`ln-validate`](../ln-validate/README.md).
 
 ---
 
@@ -18,16 +18,16 @@ is always left native.
 2. **Native submit, always.** Forms MUST carry a real `action` and
    `method` in HTML. Without JavaScript they do a normal native submit.
    PUT/DELETE ride on POST via an auto-ensured hidden `_method` input
-   (Laravel method spoofing) — `ln-form` never serializes data and
-   never dispatches a submit event. It intercepts `submit` only to run
-   the validation gate; a valid submit always proceeds natively.
+   (Laravel method spoofing) — `ln-form` never serializes data, never
+   dispatches a submit event, and never listens for `submit` at all.
 3. **Transport is someone else's job.** Ajax interception (if wanted) is
    a separate component's concern — it listens to the native `submit`
    event itself. Validation is owned by the browser's constraint
-   validation plus `ln-validate` for field error display — a form with
-   at least one `data-ln-validate` field gets `novalidate` injected
-   automatically by `ln-validate`; a form with none keeps native
-   validation as the default.
+   validation plus `ln-validate` for field error display and the submit
+   gate — a form with at least one `data-ln-validate` field gets
+   `novalidate` injected automatically and the first such field attaches
+   the form's submit gate; a form with none keeps native validation as
+   the default.
 
 ---
 
@@ -159,13 +159,14 @@ them.
   `ln-form`, no `ln-form:submit-record` event, no JSON payload — scoped
   forms are serialized by the claiming `ln-data-coordinator`, not by
   `ln-form`.
-- **No validation orchestration beyond the gate.** Constraint validation display is `ln-validate`'s job. `ln-form` triggers full validation on submit (any method other than `GET`) via the `ln-validate:request-validate` event, blocks submit if invalid, and focuses the first invalid field. `ln-form` never touches `novalidate` itself — `ln-validate` injects it automatically wherever it owns a field.
-- **Submit interception is validation-only.** `ln-form` calls
-  `preventDefault()` solely to block an invalid submit (focus first
-  invalid field) — a valid submit is left alone entirely. Claiming a
-  valid submit for the write pipeline (scoped forms only) is
-  `ln-data-coordinator`'s job (native `submit`, bubble phase, its own
-  `preventDefault()`).
+- **No validation orchestration, no submit listener at all.** `ln-form`
+  never dispatches `ln-validate:request-validate`, never calls
+  `preventDefault()`, and never touches `novalidate` — all of that is
+  entirely [`ln-validate`](../ln-validate/README.md)'s job (see its
+  README §Philosophy). Claiming a valid submit for the write pipeline
+  (scoped forms only) is `ln-data-coordinator`'s job (native `submit`,
+  bubble phase, its own `preventDefault()`) — `ln-form` plays no role in
+  that decision either.
 
 ---
 
@@ -189,15 +190,17 @@ three possible rungs, and whichever rung claims it decides the archetype:
    it through the store → queue → connector write pipeline. See the
    `ln-data-coordinator` README for the intake contract.
 
-`ln-form`'s own validation gate reads the effective method (`_method`
-input if present and non-empty, else the form's `method` attribute) purely
-to decide whether to run `ln-validate:request-validate` at all — `GET` (or
-a scoped form with no method set) skips the gate entirely, so a search
-form nested inside a coordinator keeps working exactly as before.
-`ln-data-coordinator` performs the identical effective-method read
-independently, to decide whether to claim the native submit for the write
-pipeline (`POST` → create, `PUT`/`PATCH` → update). `ln-form` itself stays
-coordinator-blind and never serializes or dispatches a custom event — see
+`ln-validate`'s submit gate runs on every method — GET included, exactly
+like the native browser validation it replaces. A search form nested
+inside a coordinator with invalid `data-ln-validate` fields is blocked
+the same as any other form; a form with no `data-ln-validate` fields has
+no gate at all. `ln-data-coordinator` reads the effective method
+(`_method` input if present and non-empty, else the form's `method`
+attribute) independently, purely to decide whether to claim the native
+submit for the write pipeline (`POST` → create, `PUT`/`PATCH` → update) —
+a `GET` form is never claimed, regardless of validity. `ln-form` itself
+stays coordinator-blind and validation-blind: it never serializes, never
+dispatches a custom event, and never listens for `submit` — see
 [`docs/js/form.md`](../../docs/js/form.md) for a fuller write-up.
 
 ---

@@ -20,9 +20,10 @@ consumer-facing usage see
 Its scope is field-level: one instance per `[data-ln-validate]`
 input, owning that field's `_touched` flag, its custom-error set, and
 the rendering of error messages inside the field's `.form-element`
-wrapper. It does NOT own:
+wrapper. The one exception to field-scoping is the submit gate (see
+§The submit gate below) — a single form-level `submit` listener, attached
+once by whichever field initializes first. Beyond that, it does NOT own:
 
-- The form-level submit gate (`ln-form` consumes the bubbling events).
 - Form serialization (`ln-core/serializeForm`).
 - Server-side error injection (the application subscribes to whatever
   event its consumer code dispatches after a 4xx, then dispatches
@@ -257,16 +258,17 @@ errors. Until then, the field is silent.
 | `_onChange` (change event) | yes | yes |
 | `_onSetCustom` (custom error injected) | yes | no |
 | `_onClearCustom` (custom error cleared) | no | conditional on existing `_touched` |
-| `validate()` direct call (e.g. `lnForm.submit()`) | no | (this IS the call) |
+| `validate()` direct call (via `_onValidateRequest`, triggered by the form's own submit gate — see §The submit gate) | no | (this IS the call) |
 | `reset()` | sets back to `false` | no |
 
 The flag is forward-only during normal user flow — once `true`,
 stays `true` until `reset()`. The `validate()` method does not
 read `_touched`; force-validating an untouched field renders
-errors immediately. That is intentional — on submit, `ln-form`
-dispatches the `ln-validate:request-validate` event on the form.
-This catches untouched required fields, triggers their validation,
-adds them to the invalid fields list, and blocks invalid form submission.
+errors immediately. That is intentional — on submit, `ln-validate`'s
+own gate (see below) dispatches the `ln-validate:request-validate` event
+on the form. This catches untouched required fields, triggers their
+validation, adds them to the invalid fields list, and blocks invalid
+form submission.
 
 The flag is read during the `ln-validate:request-validate` event handler
 to set `_touched = true`, ensuring that subsequent inputs on previously
@@ -282,6 +284,48 @@ Authors never write `novalidate` by hand. A form with zero
 `data-ln-validate` fields keeps native browser validation as the
 default, and the attribute is never removed on field `destroy()`
 (other fields on the same form may still own the gate).
+
+## The submit gate
+
+The only form-level (not field-level) behavior in the component. The
+first `data-ln-validate` field to initialize on a given form attaches
+one `submit` listener directly to `form` — guarded by a
+`form._lnValidateGateBound` marker so a form with N validated fields
+gets exactly one listener, never N.
+
+```
+1. On 'submit': dispatch 'ln-validate:request-validate' on the form,
+   detail = { invalidFields: [] }
+2. Every field's own request-validate handler (_onValidateRequest,
+   attached per-field in the constructor's `if (form)` block) sets
+   _touched = true, calls validate(), and — if invalid — pushes its
+   dom into invalidFields.
+3. If invalidFields.length > 0:
+     e.preventDefault()
+     sort invalidFields by document position
+     focus invalidFields[0]
+4. Else: do nothing further — the native submit proceeds.
+```
+
+Runs on every method — GET included, exactly like the native browser
+validation it replaces. There is no method check: a form either has at
+least one `data-ln-validate` field (gate exists, runs unconditionally on
+every submit) or none (gate doesn't exist — `novalidate` was never
+injected either, so native browser validation is the default).
+`ln-data-coordinator`'s own method gate (`POST`/`PUT`/`PATCH` only, for
+the write pipeline) is a separate, later decision made by a separate
+component — it reads `e.defaultPrevented` first, so it never claims a
+submit this gate already blocked.
+
+The listener is never removed — not on field `destroy()`, not ever. Each
+field's own `_onValidateRequest` listener IS removed on that field's
+`destroy()` (existing behavior, unchanged). If every validated field on a
+form is destroyed, the gate still fires on submit, dispatches to zero
+listeners, `invalidFields` stays empty, and the gate is a no-op. Same
+one-way lifecycle as the `novalidate` injection.
+
+`ln-form` has no involvement anywhere in this flow — it does not listen
+for `submit`.
 
 ## The `isValid` getter
 

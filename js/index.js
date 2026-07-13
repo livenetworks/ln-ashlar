@@ -3,11 +3,15 @@ import '../scss/ln-ashlar.scss';
 
 // JS Components
 import './ln-http/src/ln-http.js';
-// ln-form must attach its submit listener before ln-ajax's: a <form>
-// can carry both data-ln-form and data-ln-ajax, and same-target
-// same-event listeners fire in registration order. ln-form's
-// validation gate has to run first so ln-ajax can see e.defaultPrevented.
 import './ln-form/src/ln-form.js';
+// ln-validate must attach its submit listener before ln-ajax's: a <form>
+// can carry both data-ln-validate fields and data-ln-ajax, and
+// same-target same-event listeners fire in registration order.
+// ln-validate's validation gate has to run first so ln-ajax can see
+// e.defaultPrevented. ln-data-coordinator's own write-claim listener is
+// unaffected by this ordering — it lives on `document` (bubble phase),
+// strictly after every listener registered directly on the form itself.
+import './ln-validate/src/ln-validate.js';
 import './ln-ajax/src/ln-ajax.js';
 import './ln-router/src/ln-router.js';
 import './ln-modal/src/ln-modal.js';
@@ -37,7 +41,6 @@ import './ln-translations/src/ln-translations.js';
 import './ln-autosave/src/ln-autosave.js';
 import './ln-autoresize/src/ln-autoresize.js';
 import './ln-editor/src/ln-editor.js';
-import './ln-validate/src/ln-validate.js';
 import './ln-fill/src/ln-fill.js';
 import './ln-modal-fill/src/ln-modal-fill.js';
 import './ln-slug/src/ln-slug.js';
