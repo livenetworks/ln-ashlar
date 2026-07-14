@@ -2,7 +2,7 @@
 
 A zero-dependency, local-first **Database Cache Store** backed by standard browser `IndexedDB`. It acts as a pure client-side database cache, maintaining records locally, executing high-performance querying in-memory, and applying optimistic mutations directly — a record is a record, with no pending state, snapshots, or rollback machinery.
 
-It possesses no visual interface and is **completely blind to the network** (no fetch, status codes, paths, or urls). Instead, it communicates strictly via custom DOM events, allowing the parent **Data Coordinator** to orchestrate syncs and mutations.
+It possesses no visual interface and is **completely blind to the network** (no fetch, status codes, paths, or URLs). Instead, it communicates strictly via custom DOM events, allowing the parent **Data Coordinator** to orchestrate syncs and mutations.
 
 ---
 
@@ -20,140 +20,154 @@ It possesses no visual interface and is **completely blind to the network** (no 
 
 ## 🌐 Declarative Attributes
 
-| Attribute | Description |
-|---|---|
-| `data-ln-data-store="name"` | Declares the store (also `data-ln-store="name"`) |
-| `data-ln-data-store-stale="N"` | Seconds before cache is considered stale (default 300, `-1` = never) |
-| `data-ln-data-store-indexes="…"` | Comma-separated IDB index fields |
-| `data-ln-data-store-search-fields="…"` | Comma-separated text-search fields |
-| `data-ln-data-store-no-autosync` | Back-compat fallback only — see below. Prefer `data-ln-data-coordinator-no-autosync` on the coordinator. |
+| Attribute | Description | Default |
+|---|---|---|
+| `data-ln-data-store="name"` | Declares the store name (also accepts `data-ln-store="name"`). | *Required* |
+| `data-ln-data-store-stale="N"` | Seconds before cache is considered stale (also accepts `data-ln-store-stale`). Set to `never` or `-1` to disable staleness. | `300` |
+| `data-ln-data-store-indexes="…"` | Comma-separated list of IndexedDB index fields (also accepts `data-ln-store-indexes`). | `""` |
+| `data-ln-data-store-search-fields="…"` | Comma-separated list of text-search fields for local query search matching (also accepts `data-ln-store-search-fields`). | `""` |
 
 ---
 
-## 🔄 Sync Ownership Moved to the Coordinator
+## 🗄️ Dynamic IndexedDB Schema Management
 
-`ln-data-store` no longer decides WHEN to sync. It is a **pure cache**: no
-self-sync on init, no `visibilitychange` listener, no `window 'online'` /
-`'offline'` listener of its own. All of that now lives in
-`ln-data-coordinator` — see its
-[README](../ln-data-coordinator/README.md#sync-ownership).
+`ln-data-store` registers and operates on a single IndexedDB database named `ln_app_cache`. 
 
-**What the store still does:** at the end of `_initStore` it emits
-`ln-store:initialized { store, hasCache, lastSyncedAt, count }` — in every
-branch (cache present, empty, schema-mismatch-after-clear) — and stops
-there. It reports its cache state; it does not act on it.
-
-**Two breaking changes from earlier releases:**
-
-1. **The store no longer auto-syncs on init, visibility change, or
-   reconnect.** A store used WITHOUT a coordinator on the page no longer
-   performs any of these (previously it dispatched a `request-remote-sync`
-   event that, without a coordinator, nobody handled anyway — so this is not
-   a functional regression for the 3-tier setup). With a coordinator
-   present, the coordinator drives initial load, staleness, and
-   reconnect sync via `store.forceSync()`.
-2. **`ln-store:online` / `ln-store:offline` now require a coordinator on
-   the page.** These events are dispatched by `ln-data-coordinator`, not by
-   the store. A store with no coordinator will never emit them.
-
-**Opt-out** moved to the coordinator too:
-```html
-<div data-ln-data-coordinator="chat" data-ln-data-coordinator-no-autosync>
-  <div data-ln-data-store="chat"></div>
-</div>
-```
-The coordinator also honors the store's own `data-ln-data-store-no-autosync`
-/ `data-ln-store-no-autosync` attribute as a fallback for back-compat.
+- **Dynamic Schema Discovery:** Upon initialization, the component scans the document for all `[data-ln-data-store]` elements. It collects their store names and index definitions.
+- **Auto Upgrade:** If new stores or indexes are declared in the HTML markup, the component closes the active connection, increments the database version, and dynamically creates the missing stores and indexes in `onupgradeneeded`.
+- **Memory Fallback:** If the browser does not support IndexedDB, or if database open/upgrade operations fail/are blocked, the component transparently falls back to an in-memory data store.
 
 ---
 
-## 🛠️ JS API (On the element)
+## 🔒 At-Rest AES-GCM Encryption
 
-Access the database layer directly via the `lnDataStore` property on the store container:
+The store supports local record encryption to secure cached data in IndexedDB:
+
+- **Activation:** Set a storage key by calling `window.lnCore.setStorageKey(key)` or `window.lnDataStore.setStorageKey(key)`. The key is derived using a SHA-256 hash of the input string.
+- **Indexable Payload:** Only the data properties of the record are encrypted using `AES-GCM` (using helper methods from `ln-core`). The record's primary identifier `id` is preserved in plain text to allow IndexedDB index lookups and queries.
+- **Automatic Decryption:** All queries and retrievals automatically decrypt records if a storage key is active.
+
+---
+
+## 🛠️ JS API (Access via `el.lnDataStore`)
+
+Access the database layer directly via the `lnDataStore` property on the store container element:
 
 ```javascript
-const store = document.querySelector('[data-ln-data-store="documents"]');
+const storeEl = document.querySelector('[data-ln-data-store="documents"]');
+const store = storeEl.lnDataStore;
+```
 
-// 1. Queries (returns Promise)
-const { data, total, filtered } = await store.lnDataStore.getAll({
+### 1. In-Memory Query Engine
+
+Queries execute against in-memory copies of the IndexedDB records for near-zero latency:
+
+```javascript
+const { data, total, filtered } = await store.getAll({
   sort: { field: 'updated_at', direction: 'desc' },
-  filters: { status: ['Approved'] },
+  filters: { status: ['Approved', 'Pending'] },
   search: 'ISO 27001',
+  offset: 0,
   limit: 50
 });
+```
 
-const doc = await store.lnDataStore.getById(42);
+- **Natural Sorting:** Sorting uses `Intl.Collator` configured with `{ numeric: true, sensitivity: 'base' }` for natural alphabetical/numeric ordering. `null` and `undefined` values are correctly sorted to the end of the collection (or the beginning if sorting descending).
+- **Filtering:** Filters perform exact string matches against arrays of values.
+- **Text Search:** Compares the lowercase query string against the lowercase values of fields declared under `data-ln-data-store-search-fields`.
 
-// 2. Decorators / Computed Fields Configuration
-store.lnDataStore.setPresenters({
+### 2. Presenters / Decorators
+
+Configure computed virtual fields that are dynamically appended to records when queried:
+
+```javascript
+store.setPresenters({
   computed: {
-    size_display: record => (record.file_size / 1024).toFixed(1) + ' MB'
+    size_display: record => (record.file_size / 1024).toFixed(1) + ' MB',
+    full_name: record => `${record.first_name} ${record.last_name}`
   }
 });
 ```
+
+### 3. Public Methods
+
+| Method | Return Type | Description |
+|---|---|---|
+| `getAll(options)` | `Promise<Object>` | Retrieves records. Options support `sort` (`{ field, direction }`), `filters` (`{ field: Array }`), `search` (`String`), `offset`, `limit`. Returns `{ data, total, filtered }`. |
+| `getById(id)` | `Promise<Object\|null>` | Returns a single record (decorated with presenters) or `null`. |
+| `count(filters)` | `Promise<Number>` | Returns the total count of records. If filters are provided, returns the filtered count. |
+| `aggregate(field, fn)` | `Promise<Number>` | Performs aggregation. `fn` must be `'count'`, `'sum'`, or `'avg'`. |
+| `setPresenters(presenters)` | `void` | Registers presenters (decorators) for computed fields. |
+| `applySync(upserted, deleted, syncedAt)` | `Promise<void>` | Feeds synchronization delta updates into the cache. |
+| `forceSync()` | `void` | Dispatches `ln-store:request-remote-sync` with the current last sync timestamp. |
+| `fullReload()` | `Promise<void>` | Clears the IndexedDB store, resets sync metadata, and triggers a sync. |
+| `destroy()` | `void` | Cleans up the instance, removes event listeners, and deletes the DOM reference. |
 
 ---
 
 ## ⚡ DOM Events
 
-### Commands (Dispatched TO the store)
+### Commands (Listened to by the Store)
 
-*Never invoke write methods directly.* Route all mutations through DOM commands. The
-**caller supplies `tempId`** on create — the store has no fallback ID generator; a
-parent coordinator (or any other caller) is responsible for minting one (e.g.
-`'_temp_' + crypto.randomUUID()`):
+All mutations must be routed via DOM events. **Never invoke write methods directly.** The caller is responsible for supplying a `tempId` (e.g. `'_temp_' + crypto.randomUUID()`) when creating records:
 
 ```javascript
-// Create optimistically — caller-supplied tempId is required
+// Create record optimistically
 store.dispatchEvent(new CustomEvent('ln-store:request-create', {
-  detail: { tempId: '_temp_abc123', data: { title: 'New Document', status: 'Draft' } }
+  detail: { 
+    tempId: '_temp_abc123', 
+    data: { title: 'New Document', status: 'Draft' } 
+  }
 }));
 
-// Update — an id-swap happens automatically when data.id differs from the current id
-// (this is how a server-confirmed create is applied: request-update with the temp id
-// as the target and the server record — including its real id — as data)
+// Update record optimistically
+// Note: If data.id is different from the target id, the store performs an atomic id-swap (rekey)
 store.dispatchEvent(new CustomEvent('ln-store:request-update', {
-  detail: { id: 42, data: { title: 'Updated title' } }
+  detail: { 
+    id: '_temp_abc123', 
+    data: { id: 42, title: 'Server Confirmed Document' } 
+  }
+}));
+
+// Delete record optimistically
+store.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+  detail: { id: 42 }
+}));
+
+// Bulk delete records optimistically
+store.dispatchEvent(new CustomEvent('ln-store:request-bulk-delete', {
+  detail: { ids: [42, 43, 44] }
 }));
 ```
-
-There is no `expected_version` handling at the store layer — version locks are a
-connector/coordinator transport concern (`ln-api-connector:request-update`'s
-`expected_version` field), not a local-cache one.
-
-### Sync Request (Bubbles UP to the Coordinator)
-
-*The Coordinator catches this event to run transport sync:*
-
-* `ln-store:request-remote-sync` (detail: `{ since }`)
-
-There are no `request-remote-create` / `-update` / `-delete` / `-bulk-delete`
-events. Remote transport is fanned out in parallel by the coordinator directly
-from its own intake events — see the
-[ln-data-coordinator README](../ln-data-coordinator/README.md) — not chained off
-store confirmation.
-
-### Lifecycle Notification
-
-* `ln-store:initialized` (detail: `{ store, hasCache, lastSyncedAt, count }`) — emitted once at the end of `_initStore`, in every branch (cache present, empty, schema-mismatch-after-clear). This is how a coordinator decides whether to perform an initial `forceSync()` — the store itself never decides.
 
 ---
 
-## 🚀 Public Synchronization APIs (Invoked by the Coordinator)
+### Notifications (Emitted by the Store)
 
-Once the network connector returns backend payloads, the Coordinator feeds the results back to the store using this public method:
+These events bubble up and can be listened to by coordinators or rendering views (`ln-table` / `ln-list`):
 
-```javascript
-// Feed delta updates or initial load data
-store.lnDataStore.applySync(upsertedRecords, deletedIds, syncedAt);
-```
+| Event | `e.detail` payload | Description |
+|---|---|---|
+| `ln-store:initialized` | `{ store, hasCache, lastSyncedAt, count }` | Emitted once after IndexedDB connection opens. |
+| `ln-store:ready` | `{ store, count, source }` | Emitted when data is ready. `source` is `'cache'` (init) or `'server'` (first sync). |
+| `ln-store:loaded` | `{ store, count }` | Emitted on initial load sync completion (first sync). |
+| `ln-store:created` | `{ store, record, tempId }` | Emitted after optimistic creation. |
+| `ln-store:updated` | `{ store, record, previous }` | Emitted after optimistic update or id-swap rekey. |
+| `ln-store:deleted` | `{ store, id \| ids }` | Emitted after optimistic delete or bulk delete. |
+| `ln-store:synced` | `{ store, added, deleted, changed }` | Emitted after subsequent delta sync merges. |
+| `ln-store:destroyed` | `{ store }` | Emitted when the store instance is destroyed. |
 
-**No `confirmMutation`, `revertMutation`, or `resolveConflict`.** A record is a
-record — there is no `_pending` flag, no per-mutation snapshot, and no rollback.
-Server confirmation of a create/update is just an ordinary
-`ln-store:request-update` dispatched by the coordinator (id-swap handled
-automatically when the incoming `data.id` differs from the target `id`). The
-only marker of an unsynced record is its `_temp_`-prefixed id — there is no
-separate `synced` flag. If a create is ultimately rejected by the server, the
-coordinator issues an ordinary `ln-store:request-delete` for that temp id;
-there is no automatic revert-to-previous-snapshot behavior.
+### Global System Events
+
+| Event | Target | `e.detail` payload | Description |
+|---|---|---|---|
+| `ln-store:quota-exceeded` | `document` | `{ error }` | Emitted globally on `document` if database storage exceeds browser quotas. |
+
+---
+
+## 🌐 Global API (On `window.lnDataStore`)
+
+| Static Method | Description |
+|---|---|
+| `window.lnDataStore.clearAll()` | Clears all records and metadata from all stores in the IndexedDB database. |
+| `window.lnDataStore.setStorageKey(key)` | Sets the global cryptographic key for record encryption. |

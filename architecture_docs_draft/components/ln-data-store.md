@@ -4,35 +4,46 @@
 ---
 
 ## 1. Заднинско дејство и одговорност
-`ln-data-store` е компонента која делува како локална база на податоци (Local Database Cache), изградена врз нативната `IndexedDB` технологија. 
-
-*   **Примарна Улога:** Обезбедува моќна офлајн поддршка и инстантни (оптимистички) UI мутации за апликацијата. Содржи in-memory query мотор за сортирање, филтрирање и полнотекстуално пребарување на податоците локално.
-*   **Слепа за Мрежа (Network-Blind):** Има строга поделба на одговорностите. Оваа компонента не прави HTTP повици и не знае API рути. Врската со серверот се остварува исклучиво преку проектен координатор (најчесто `ln-data-coordinator`), со кој комуницира преку CustomEvents.
-*   **Оптимистичко Зачувување (Optimistic Pipeline):** При налог за креирање, менување или бришење податоци, веднаш ја ажурира локалната IndexedDB база (користејќи caller-supplied `tempId`, обично `_temp_` + UUID). Веднаш емитува настан кон UI-от (на пр. `ln-table`) за да се ажурира екранот инстантно. Складот НЕ иницира сопствена мрежна синхронизација на мутации — тоа е исклучиво одговорност на координаторот (паралелен fan-out, види `ln-data-coordinator`).
-*   **Без Rollback механизам:** Складот нема концепт на "confirm" или "revert" на мутации — секое `ln-store:request-update`/`request-delete` се применува безусловно на локалниот кеш. Реконсилијацијата на серверски грешки (retry, drop, server-wins на конфликт) е исклучиво одговорност на координаторот.
-*   **Енкрипција:** Поддржува криптографска енкрипција на податоците во мирување, искористувајќи го `ln-core` модулот.
+- **Краток опис:** `ln-data-store` е логичка (headless) компонента која служи како локална база на податоци (Database Cache Store) изградена врз стандардниот прелистувачки `IndexedDB`. Таа претставува чист клиентски кеш кој одржува записи локално, овозможува брзи in-memory пребарувања, филтрирања и сортирања, и поддржува оптимистички мутации на податоците во реално време.
+- **Ортогоналност (Што компонентата НЕ прави):**
+  - **Без мрежна комуникација:** Компонентата е целосно слепа за мрежата. Не содржи `fetch` логика, не разбира HTTP статусни кодови, рути или авторизациски токени. Сите мрежни активности се одговорност на `[ln-data-coordinator](./ln-data-coordinator.md)`.
+  - **Без автоматско генерирање ID:** Компонентата не генерира привремени или дефинитивни идентификатори при создавање на нови записи. Создавачот на настанот за креирање е должен да обезбеди привремен идентификатор (`tempId`).
+  - **Без визуелен интерфејс:** Таа не рендира никаков DOM маркап за корисникот и не управува со визуелен приказ.
 
 ---
 
 ## 2. Минимален HTML Маркап и Варијанти на Употреба
 
-Се поставува како невидлив елемент (`display: none;` или `.hidden`) во HTML-от. Може да постојат повеќе складови (табели) на една страница.
+### Базен HTML маркап
+Се дефинира како невизуелен локален склад за зачувување податоци:
 
 ```html
-<!-- Координатор со деца за складирање податоци (производи и корисници) -->
-<ul data-ln-data-coordinator="products" hidden>
-    <li data-ln-data-store="products" 
-        data-ln-data-store-indexes="status,category" 
-        data-ln-data-store-search-fields="title,description,sku"
-        data-ln-data-store-stale="300"
-        id="products-store">
-    </li>
-</ul>
+<div data-ln-data-store="documents"
+     data-ln-data-store-indexes="status,department,updated_at"
+     data-ln-data-store-search-fields="title,owner"
+     data-ln-data-store-stale="300">
+</div>
+```
 
-<ul data-ln-data-coordinator="users" hidden>
-    <li data-ln-data-store="users" 
-        data-ln-data-store-search-fields="first_name,last_name,email"
-        id="users-store">
+### Варијанти на употреба
+
+#### Варијант 1: Склад со исклучено застарување (Cache Never Stale)
+```html
+<div data-ln-data-store="settings" data-ln-data-store-stale="never"></div>
+```
+
+#### Варијант 2: Заднински склад со координатор и конектор (Комплетна 3-Tier конфигурација)
+```html
+<ul data-ln-data-coordinator="tasks" hidden>
+    <!-- Локален склад -->
+    <li data-ln-data-store="tasks" 
+        data-ln-data-store-indexes="due_date,priority"
+        data-ln-data-store-search-fields="title,description">
+    </li>
+    <!-- Бекенд Конектор -->
+    <li data-ln-api-connector 
+        data-ln-api-base-url="/api" 
+        data-ln-api-path="/tasks">
     </li>
 </ul>
 ```
@@ -41,55 +52,65 @@
 
 ## 3. Декларативен API Договор (Атрибути и Настани)
 
-| Атрибут | Тип | Опис |
-| :--- | :--- | :--- |
-| `data-ln-data-store` | `String` | Го иницира компонентот и го дефинира името на складот (Object Store-от во IndexedDB). |
-| `data-ln-data-store-indexes` | `String` | Запирка-одделена листа на полиња врз кои треба да се креираат IndexedDB индекси при upgrade на шемата. |
-| `data-ln-data-store-search-fields` | `String` | Запирка-одделена листа на текстуални полиња кои ќе бидат пребарувани при in-memory `getAll({ search: 'query' })`. |
-| `data-ln-data-store-stale` | `Integer\|never` | Време во секунди пред податоците во складот да се сметаат за застарени (default 300) и да бараат background sync од координаторот. |
+### Атрибути
 
-### DOM Барања кон Складот (Слуша)
-*Обично овие се пуштаат од други UI компоненти како `ln-form` или `ln-table` (ако поддржува inline editing).*
-| Настан | Payload `e.detail` | Опис |
-| :--- | :--- | :--- |
-| `ln-store:request-create` | `{ data: Object }` | Инструкција за оптимистичко креирање. Генерира temp UUID, зачувува локално и пушта remote-create. |
-| `ln-store:request-update` | `{ id: ID, data: Object, expected_version: Int }` | Инструкција за оптимистичка измена. |
-| `ln-store:request-delete` | `{ id: ID }` | Инструкција за оптимистичко бришење. |
-| `ln-store:request-bulk-delete` | `{ ids: [ID] }` | Инструкција за масовно бришење. |
+| Атрибут | Елемент | Тип / Вредности | Стандардно | Опис |
+|---|---|---|---|---|
+| `data-ln-data-store` | `div`/`li` | `String` | *Задолжително* | Името на складот во IndexedDB (алтернативно прифаќа и `data-ln-store`). |
+| `data-ln-data-store-stale` | `div`/`li` | `Integer \| never \| -1` | `300` | Време во секунди пред податоците во складот да се сметаат за застарени (алтернативно `data-ln-store-stale`). |
+| `data-ln-data-store-indexes` | `div`/`li` | `String` | `""` | Кома-одделена листа на IndexedDB индекси (алтернативно `data-ln-store-indexes`). |
+| `data-ln-data-store-search-fields` | `div`/`li` | `String` | `""` | Кома-одделена листа на полиња во кои се пребарува преку in-memory query engine-от (алтернативно `data-ln-store-search-fields`). |
 
-### Настани кон UI (Емитува - State Changed)
-*Овие се набљудуваат од визуелните компоненти за реактивно прецртување.*
-| Настан | Payload `e.detail` | Опис |
-| :--- | :--- | :--- |
-| `ln-store:created` | `{ store, record, tempId }` | Локално зачуван нов запис. |
-| `ln-store:updated` | `{ store, record, previous }` | Локално изменет запис. |
-| `ln-store:deleted` | `{ store, id \| ids }` | Локално избришан запис/и. |
-| `ln-store:synced` | `{ store, added, deleted, changed }` | Серверска синхронизација успешно применета. |
+---
 
-### Настани кон Координаторот
-*Овие ги слуша само координаторот (`ln-data-coordinator`).*
-| Настан | Payload `e.detail` | Опис |
-| :--- | :--- | :--- |
-| `ln-store:request-remote-sync` | `{ since: Timestamp }` | Барање за Delta Sync на промените од серверот. Единствениот преостанат `request-remote-*` настан — `create`/`update`/`delete` варијантите се избришани. Мутациите кон серверот ги иницира ИСКЛУЧИВО координаторот (паралелен fan-out), не складот. |
+### Настани (Events API)
 
-### Јавен JS API (преку `el.lnDataStore`)
-*   **`getAll(options)`**: Враќа Promise со податоци `({ data, total, filtered })`. Поддржува `filters`, `search`, `sort`, `offset`, `limit` опции изведени преку in-memory query engine.
-*   **`getById(id)`**: Враќа еден запис.
-*   **`applySync(upsertedRecords, deletedIds, syncedAt)`**: Прима серверски payload и го рефлектира во базата.
-*   Нема `confirmMutation`/`revertMutation` API — избришани во wave-1 рефакторот. Реконсилијацијата на серверски одговор е обична `ln-store:request-update` (со id-swap ако `data.id !== id`) или `ln-store:request-delete`, дишпачирана од координаторот.
+| Настан | Насока | Откажлив | Опис | `detail` Објект |
+|---|---|---|---|---|
+| `ln-store:request-create` | Слуша | Не | Оптимистичко создавање на запис. | `{ tempId: String, data: Object }` |
+| `ln-store:request-update` | Слуша | Не | Оптимистичко ажурирање или замена на ID (rekey). | `{ id: ID, data: Object }` |
+| `ln-store:request-delete` | Слуша | Не | Оптимистичко бришење на запис. | `{ id: ID }` |
+| `ln-store:request-bulk-delete` | Слуша | Не | Оптимистичко масовно бришење на записи. | `{ ids: Array }` |
+| `ln-store:initialized` | Емитува | Не | Сигнализира дека IndexedDB врската е воспоставена. | `{ store: String, hasCache: Boolean, lastSyncedAt: Number\|null, count: Number }` |
+| `ln-store:ready` | Емитува | Не | Се емитува кога складот е подготвен со локални записи. | `{ store: String, count: Number, source: 'cache'\|'server' }` |
+| `ln-store:loaded` | Емитува | Не | Се емитува по завршување на првата успешна синхронизација. | `{ store: String, count: Number }` |
+| `ln-store:created` | Емитува | Не | Локално зачуван нов оптимистички запис. | `{ store: String, record: Object, tempId: String }` |
+| `ln-store:updated` | Емитува | Не | Локално изменет запис (или извршена замена на ID). | `{ store: String, record: Object, previous: Object }` |
+| `ln-store:deleted` | Емитува | Не | Бришење на запис или записи од складот. | `{ store: String, id: ID }` или `{ store: String, ids: Array }` |
+| `ln-store:synced` | Емитува | Не | Успешно применети серверски делта промени. | `{ store: String, added: Number, deleted: Number, changed: Boolean }` |
+| `ln-store:destroyed` | Емитува | Не | Складот е уништен и расчистен од DOM. | `{ store: String }` |
+| `ln-store:quota-exceeded` | Емитува | Не | *Се диспачира на `document`* при надминување на квотата во базата. | `{ error: Error }` |
+
+---
+
+### Јавен JS API (достапен на `el.lnDataStore`)
+- **`getAll(options)`**: Враќа `Promise` со објект `{ data, total, filtered }`. Пребарува in-memory со поддршка за `sort` (`{ field, direction }`), `filters` (`{ field: Array }`), `search` (`String`), `offset` и `limit`. Сортирањето користи `Intl.Collator` со `{ numeric: true, sensitivity: 'base' }` и ги позиционира `null`/`undefined` вредностите на крајот (или почетокот при опаѓачко).
+- **`getById(id)`**: Враќа `Promise` со единечен запис (украсен со presenters) или `null`.
+- **`count(filters)`**: Враќа `Promise` со бројот на записи (филтрирани или вкупни).
+- **`aggregate(field, fn)`**: Извршува агрегација (`'count'`, `'sum'`, или `'avg'`).
+- **`setPresenters(presenters)`**: Регистрира декоратори за виртуелни пресметани полиња (на пр. `{ computed: { display_name: r => r.first_name + ' ' + r.last_name } }`).
+- **`applySync(upsertedRecords, deletedIds, syncedAt)`**: Применува серверски промени и ги зачувува мета-податоците.
+- **`forceSync()`**: Диспачира `ln-store:request-remote-sync` за рачна синхронизација.
+- **`fullReload()`**: Расчистува сè од IndexedDB складот и започнува нова синхронизација.
+- **`destroy()`**: Извршува комплетно расчистување на слушателите и меморијата.
+
+#### Глобални методи (на `window.lnDataStore`):
+- **`window.lnDataStore.clearAll()`**: Ги расчистува сите регистрирани IndexedDB складови во `ln_app_cache`.
+- **`window.lnDataStore.setStorageKey(key)`**: Ја поставува лозинката за рекордно шифрирање.
 
 ---
 
 ## 4. CSS Стилизирање и Поведенски Концепт
-Ова е логичка (headless) компонента и нема визуелен приказ ниту CSS класи, освен примена на `.hidden` (или `display: none`) на родителскиот елемент, кој се користи исклучиво како Event Bus точка во DOM стеблото.
+Како headless/логичка компонента, `ln-data-store` нема своја визуелна репрезентација и соодветно нема SCSS/CSS класи за стилизирање. Конструкцијата се користи чисто како Event Bus во DOM структурата. Примарниот HTML елемент се скрива со `display: none` или `.hidden` / `aria-hidden="true"`.
 
 ---
 
 ## 5. Пристапност (ARIA) и Чести Грешки
-*   **Пристапност:** Нема визуелна репрезентација, па соодветно не бара ARIA атрибути освен што треба да е скриена со `aria-hidden="true"` или `.hidden` за да не биде присутна во фокус редоследот.
-*   **Честа грешка 1:** Непоставување на `data-ln-data-store-search-fields`. Без овој атрибут, in-memory `getAll({ search: 'query' })` моторот нема да знае низ кои полиња да пребарува и секогаш ќе враќа празни резултати.
-*   **Честа грешка 2:** Очекување дека компонентата сама ќе комуницира со API. Ако немате закачен координатор (`ln-data-coordinator`), податоците ќе останат исклучиво во локалната база (со `_temp_`-префиксиран id ако се создадени преку `ln-store:request-create`) и никогаш нема да стигнат до серверот.
-*   **Честа грешка 3:** `QuotaExceededError`. Се случува ако се обидувате да складирате масивни фајлови (пр. Base64 слики) во складот. Препорачана пракса е складот да се користи само за мета-податоци (JSON), а фајловите да имаат одвоена URL патека.
+- **Пристапност:** Бидејќи елементот нема визуелна улога, тој мора секогаш да биде скриен за читачите на екран користејќи `aria-hidden="true"` или `hidden` атрибут, за да не учествува во навигацискиот фокус.
+- **Честа грешка 1 (Недефинирани полиња за пребарување):** Пребарувањето локално со `getAll({ search: '...' })` ќе врати празни резултати ако не е дефиниран атрибутот `data-ln-data-store-search-fields`.
+- **Честа грешка 2 (Необезбеден `tempId` при креирање):** Диспачирање на `ln-store:request-create` без привремен `tempId` во `e.detail`. Складот не го генерира сам; тој е одговорност на креаторот (на пр. координаторот).
+- **Честа грешка 3 (Очекување на авто-rollback):** `ln-data-store` нема rollback логика. Секоја оптимистичка трансакција се запишува трајно во IndexedDB. Доколку серверскиот повик пропадне, координаторот е тој што мора да испрати обратно `request-delete` за да го избрише записот.
+- **Честа грешка 4 (Енкрипција):** Кога се користи шифрирање преку `window.lnCore.setStorageKey(...)`, примарното клуч-поле `id` останува отворено во IndexedDB за да може базата да индексира и пребарува. Никогаш не смее да се ставаат сензитивни податоци директно во `id`.
 
 ---
 
@@ -97,34 +118,40 @@
 
 ```mermaid
 sequenceDiagram
-    participant UI as UI (ln-form/button)
+    participant UI as "UI (ln-form/ln-table)"
     participant Coord as ln-data-coordinator
-    participant Store as ln-data-store (IndexedDB)
-    participant Server as Server/API
+    participant Store as "ln-data-store (IndexedDB)"
+    participant Server as Server API
 
-    UI->>Coord: native submit (claimed via preventDefault, then serialized) { method:'POST', data }
-    par Локален запис (веднаш)
+    Note over Store: Иницијализација на складот и отворање ln_app_cache
+    Store-->>UI: emit ln-store:initialized (известува за кеш состојбата)
+
+    UI->>Coord: поднесување на форма (интерцептиран submit)
+    par Оптимистичко Локално Запишување
         Coord->>Store: dispatch ln-store:request-create { tempId, data }
-        Store->>Store: IndexedDB put({ id: tempId })
-        Store->>UI: emit ln-store:created (UI ја црта новата редица инстантно)
-    and Оддалечен повик (паралелно)
-        Coord->>Server: HTTP POST /api/resource { data } (преку конектор)
+        Store->>Store: Енкрипција на телото (ако има клуч) + запис во IDB
+        Store-->>UI: emit ln-store:created (UI веднаш рендира со привременото ID)
+    and Испраќање на Сервер (преку Connector)
+        Coord->>Server: HTTP POST /api/resources { data }
     end
 
-    alt HTTP Success (200/201)
-        Server-->>Coord: HTTP 201 Created { id: 55, ... }
+    alt Успешен Серверски Одговор (2xx)
+        Server-->>Coord: враќа потврден објект { id: 101, ... }
         Coord->>Store: dispatch ln-store:request-update { id: tempId, data: serverRecord }
-        Store->>Store: id-swap транзакција (put нов запис + delete tempId, атомски)
-        Store->>UI: emit ln-store:updated (UI го заменува tempId со 55)
-    else HTTP Error (400/500)
-        Server-->>Coord: HTTP Error
-        Coord->>Coord: класификација на грешка (auth/transient/deterministic)
-        Note over Coord: create-reject (deterministic 4xx) → dispatch ln-store:request-delete { id: tempId }
+        Store->>Store: ИД-Замена (брише tempId, внесува 101)
+        Store-->>UI: emit ln-store:updated (UI го заменува tempId со 101)
+    else Одбивање од Сервер (4xx)
+        Server-->>Coord: грешка 400 Bad Request
+        Coord->>Store: dispatch ln-store:request-delete { id: tempId }
+        Store->>Store: Бришење на привремениот запис од IDB
+        Store-->>UI: emit ln-store:deleted (UI го трга записот од екранот)
     end
 ```
 
 ---
 
 ## 7. Поврзани Компоненти
-*   **`ln-data-coordinator`**: Layer 2 медијатор кој го "оживува" складот поврзувајќи го со REST API. Прима native submit (preventDefault-claimed) / `ln-data-coordinator:request-*` и во ист синхрон handler дишпачира и локален store запис и оддалечен connector/queue повик (паралелен fan-out) — не чека одговор пред да ја ажурира локалната состојба.
-*   **`ln-table` / `ln-list`**: Визуелни консументи. Ги читаат податоците од складот преку `store.getAll()` и ги набљудуваат локалните `ln-store:created/updated/deleted` настани за динамички да се прецртаат без да бараат целосно освежување на страницата.
+- **`[ln-data-coordinator](./ln-data-coordinator.md)`**: Layer 2 медијатор кој го оркестрира текот на податоците помеѓу складот, конекторите и надворешните API повици.
+- **`[ln-table](./ln-table.md)` / `[ln-list](./ln-list.md)`**: Визуелни компоненти што рендираат комплети со податоци и реагираат на локалните store промени за инстантно прецртување.
+- **`[ln-form](./ln-form.md)`**: Претставува интерфејс кој испраќа промени во податоците кои ги слуша координаторот.
+- **ln-core**: Локална збирка на помошни логики (како криптографски функции за енкрипција).
