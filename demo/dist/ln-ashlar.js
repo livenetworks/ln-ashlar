@@ -442,7 +442,7 @@ function ct(u, c, E) {
 function te(u) {
   return (u || "").replace(/^#/, "");
 }
-function Ct(u) {
+function Lt(u) {
   const c = u === void 0 ? location.hash : u, E = {}, v = te(c);
   if (!v) return E;
   const g = v.split("&");
@@ -461,12 +461,12 @@ function Ct(u) {
 }
 function at(u) {
   if (!u) return null;
-  const c = Ct();
+  const c = Lt();
   return u in c ? c[u] : null;
 }
 function ht(u, c) {
   if (!u) return;
-  const E = Ct();
+  const E = Lt();
   c == null ? delete E[u] : E[u] = String(c);
   const g = Object.keys(E).map(function(p) {
     const f = E[p];
@@ -477,7 +477,7 @@ function ht(u, c) {
 function Nt(u) {
   return u.button === 1 || u.ctrlKey || u.metaKey || u.shiftKey ? !1 : (u.preventDefault(), !0);
 }
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = Ct, window.lnCore.hashGet = at, window.lnCore.hashSet = ht, window.lnCore.hashLinkClick = Nt);
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.hashParse = Lt, window.lnCore.hashGet = at, window.lnCore.hashSet = ht, window.lnCore.hashLinkClick = Nt);
 function At(u, c, E, v) {
   const g = typeof v == "number" ? v : 4, p = window.innerWidth, f = window.innerHeight, d = c.width, t = c.height, s = (E || "bottom").split("-"), l = s[0], e = s[1] === "start" || s[1] === "end" ? s[1] : "center", h = {
     top: ["top", "bottom", "right", "left"],
@@ -854,31 +854,31 @@ async function ve(u, c = st) {
     } else e !== "GET" && o && (A.body = o);
     fetch(_, A).then(function(w) {
       const T = w.ok;
-      return w.json().then(function(L) {
-        return { ok: T, status: w.status, data: L };
+      return w.json().then(function(C) {
+        return { ok: T, status: w.status, data: C };
       });
     }).then(function(w) {
       const T = w.data;
       if (w.ok) {
         if (T.title && (document.title = T.title), T.content)
-          for (const L in T.content) {
-            const x = document.getElementById(L);
-            x && (x.innerHTML = T.content[L]);
+          for (const C in T.content) {
+            const x = document.getElementById(C);
+            x && (x.innerHTML = T.content[C]);
           }
         if (a.tagName === "A") {
-          const L = a.getAttribute("href");
-          L && window.history.pushState({ ajax: !0 }, "", L);
+          const C = a.getAttribute("href");
+          C && window.history.pushState({ ajax: !0 }, "", C);
         } else a.tagName === "FORM" && a.method.toUpperCase() === "GET" && window.history.pushState({ ajax: !0 }, "", _);
         S(a, "ln-ajax:success", { method: e, url: _, data: T });
       } else
         S(a, "ln-ajax:error", { method: e, url: _, status: w.status, data: T });
       if (T.message) {
-        const L = T.message;
+        const C = T.message;
         window.dispatchEvent(new CustomEvent("ln-toast:enqueue", {
           detail: {
-            type: L.type || (w.ok ? "success" : "error"),
-            title: L.title || "",
-            message: L.body || ""
+            type: C.type || (w.ok ? "success" : "error"),
+            title: C.title || "",
+            message: C.body || ""
           }
         }));
       }
@@ -929,18 +929,18 @@ const ee = {
     gt(u, { historyAction: "replace" });
   },
   current: function() {
-    return qt ? {
-      path: Dt,
+    return Dt ? {
+      path: qt,
       params: re,
       query: oe,
-      route: qt,
+      route: Dt,
       regions: ie
     } : null;
   }
 }, Ft = "data-ln-route", ne = "lnRoute";
 typeof window < "u" && (window.lnRouter = ee);
 const it = /* @__PURE__ */ new Map(), Ut = /* @__PURE__ */ new WeakMap();
-let ie = /* @__PURE__ */ new Map(), jt = !1, Dt = null, re = {}, oe = {}, qt = null, It = !1;
+let ie = /* @__PURE__ */ new Map(), jt = !1, qt = null, re = {}, oe = {}, Dt = null, It = !1;
 function Kt(u, c, E) {
   It ? queueMicrotask(function() {
     S(u, c, E);
@@ -1052,7 +1052,7 @@ function gt(u, c = {}) {
   }
   let d = null;
   if (f && (d = Ot("__primary__", f.route), !d || V(d, "ln-router:before-navigate", {
-    from: Dt,
+    from: qt,
     to: u,
     params: f.params,
     query: v
@@ -1086,7 +1086,7 @@ function gt(u, c = {}) {
         region: l
       });
     }
-    f && (Dt = u, re = f.params, oe = v, qt = f.route), ie = new Map(
+    f && (qt = u, re = f.params, oe = v, Dt = f.route), ie = new Map(
       Array.from(g.entries()).map(([l, e]) => [l, e ? { route: e.route, params: e.params } : null])
     );
   };
@@ -1117,14 +1117,14 @@ function Se() {
   }
   gt(u, { historyAction: "skip" });
 }
-function Ce() {
+function Le() {
   jt || (jt = !0, tt(function() {
     document.addEventListener("click", Ae), window.addEventListener("popstate", Se), It = !0;
     const u = window.location.pathname + window.location.search + window.location.hash;
     gt(u, { historyAction: "replace", isHydration: !0 }), It = !1;
   }, "ln-router"));
 }
-function Le(u) {
+function Ce(u) {
   const c = u.getAttribute(Ft);
   if (!c) return;
   const E = u.getAttribute("data-ln-route-target") || null;
@@ -1155,7 +1155,7 @@ function Te(u) {
   g && (g.routes.delete(c), g.sorted = Array.from(g.routes.values()).sort(se), g.routes.size === 0 && it.delete(v));
 }
 function le(u) {
-  return this.dom = u, Le(u), this;
+  return this.dom = u, Ce(u), this;
 }
 le.prototype.destroy = function() {
   Te(this.dom), delete this.dom[ne];
@@ -1163,7 +1163,7 @@ le.prototype.destroy = function() {
 H(Ft, ne, le, "ln-router", {
   extraAttributes: ["data-ln-route-target", "data-ln-route-title"],
   onInit: function() {
-    it.size > 0 && Ce();
+    it.size > 0 && Le();
   }
 });
 (function() {
@@ -1261,7 +1261,7 @@ H(Ft, ne, le, "ln-router", {
     }
     const f = g.target.closest('a[href^="#"]');
     if (f) {
-      const t = Ct(f.getAttribute("href"));
+      const t = Lt(f.getAttribute("href"));
       for (const s in t) {
         const l = document.getElementById(s);
         if (l && l[c]) {
@@ -1452,21 +1452,21 @@ H(Ft, ne, le, "ln-router", {
     return !i || i === "" ? { dateStyle: "medium" } : i.match(p) ? f[i] : null;
   }
   function t(i, _, y) {
-    const b = i.getDate(), A = i.getMonth(), w = i.getFullYear(), T = i.getHours(), L = i.getMinutes();
-    let x, D;
+    const b = i.getDate(), A = i.getMonth(), w = i.getFullYear(), T = i.getHours(), C = i.getMinutes();
+    let x, q;
     const O = mt(y), P = (y || "").toLowerCase().split("-")[0], K = g(y, { month: "long" }).resolvedOptions().locale.toLowerCase().split("-")[0], G = O && K !== P;
-    G && O.monthsLong ? x = O.monthsLong[A] : x = g(y, { month: "long" }).format(i), G && O.monthsShort ? D = O.monthsShort[A] : D = g(y, { month: "short" }).format(i);
+    G && O.monthsLong ? x = O.monthsLong[A] : x = g(y, { month: "long" }).format(i), G && O.monthsShort ? q = O.monthsShort[A] : q = g(y, { month: "short" }).format(i);
     const rt = {
       yyyy: String(w),
       yy: String(w).slice(-2),
       MMMM: x,
-      MMM: D,
+      MMM: q,
       MM: String(A + 1).padStart(2, "0"),
       M: String(A + 1),
       dd: String(b).padStart(2, "0"),
       d: String(b),
       HH: String(T).padStart(2, "0"),
-      mm: String(L).padStart(2, "0")
+      mm: String(C).padStart(2, "0")
     };
     return _.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d|HH|mm/g, function(Z) {
       return rt[Z];
@@ -1513,17 +1513,17 @@ H(Ft, ne, le, "ln-router", {
     }
     const T = document.createElement("span");
     T.setAttribute("data-ln-date-field", ""), i.parentNode.insertBefore(T, i), T.appendChild(i), this._wrapper = T;
-    const L = document.createElement("input");
-    L.type = "hidden", L.name = b, i.removeAttribute("name"), i.hasAttribute("data-ln-fill-as") && L.setAttribute("data-ln-fill-as", i.getAttribute("data-ln-fill-as")), i.insertAdjacentElement("afterend", L), this._hidden = L;
+    const C = document.createElement("input");
+    C.type = "hidden", C.name = b, i.removeAttribute("name"), i.hasAttribute("data-ln-fill-as") && C.setAttribute("data-ln-fill-as", i.getAttribute("data-ln-fill-as")), i.insertAdjacentElement("afterend", C), this._hidden = C;
     const x = document.createElement("input");
-    x.type = "date", x.tabIndex = -1, x.style.cssText = "position:absolute;opacity:0;width:0;height:0;overflow:hidden;pointer-events:none", L.insertAdjacentElement("afterend", x), this._picker = x, i.type = "text";
-    const D = document.createElement("button");
-    if (D.type = "button", D.setAttribute("aria-label", i.getAttribute("data-ln-date-label") || "Open date picker"), D.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>', x.insertAdjacentElement("afterend", D), this._btn = D, this._lastISO = "", Object.defineProperty(L, "value", {
+    x.type = "date", x.tabIndex = -1, x.style.cssText = "position:absolute;opacity:0;width:0;height:0;overflow:hidden;pointer-events:none", C.insertAdjacentElement("afterend", x), this._picker = x, i.type = "text";
+    const q = document.createElement("button");
+    if (q.type = "button", q.setAttribute("aria-label", i.getAttribute("data-ln-date-label") || "Open date picker"), q.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>', x.insertAdjacentElement("afterend", q), this._btn = q, this._lastISO = "", Object.defineProperty(C, "value", {
       get: function() {
-        return v.get.call(L);
+        return v.get.call(C);
       },
       set: function(O) {
-        if (v.set.call(L, O), O && O !== "") {
+        if (v.set.call(C, O), O && O !== "") {
           const P = m(O);
           P && h(_, O, P);
         } else O === "" && o(_);
@@ -1579,7 +1579,7 @@ H(Ft, ne, le, "ln-router", {
         _.dom.value = "";
     }, i.addEventListener("blur", this._onBlur), this._onBtnClick = function() {
       _._openPicker();
-    }, D.addEventListener("click", this._onBtnClick), y && y !== "") {
+    }, q.addEventListener("click", this._onBtnClick), y && y !== "") {
       const O = m(y);
       O && h(_, y, O);
     }
@@ -1591,12 +1591,12 @@ H(Ft, ne, le, "ln-router", {
     if (y.length < 3) return null;
     const b = parseInt(y[0], 10), A = parseInt(y[1], 10) - 1, w = parseInt(y[2], 10);
     if (isNaN(b) || isNaN(A) || isNaN(w)) return null;
-    let T = 0, L = 0;
+    let T = 0, C = 0;
     if (_[1]) {
-      const D = _[1].split(":");
-      T = parseInt(D[0], 10) || 0, L = parseInt(D[1], 10) || 0;
+      const q = _[1].split(":");
+      T = parseInt(q[0], 10) || 0, C = parseInt(q[1], 10) || 0;
     }
-    const x = new Date(b, A, w, T, L);
+    const x = new Date(b, A, w, T, C);
     return x.getFullYear() !== b || x.getMonth() !== A || x.getDate() !== w ? null : x;
   }
   function n(i) {
@@ -1613,14 +1613,14 @@ H(Ft, ne, le, "ln-router", {
     if (y.length !== 3) return null;
     const b = [];
     for (let x = 0; x < 3; x++) {
-      const D = parseInt(y[x], 10);
-      if (isNaN(D)) return null;
-      b.push(D);
+      const q = parseInt(y[x], 10);
+      if (isNaN(q)) return null;
+      b.push(q);
     }
     let A, w, T;
     _ === "." ? (A = b[0], w = b[1], T = b[2]) : _ === "/" ? (w = b[0], A = b[1], T = b[2]) : y[0].length === 4 ? (T = b[0], w = b[1], A = b[2]) : (A = b[0], w = b[1], T = b[2]), T < 100 && (T += T < 50 ? 2e3 : 1900);
-    const L = new Date(T, w - 1, A);
-    return L.getFullYear() !== T || L.getMonth() !== w - 1 || L.getDate() !== A ? null : L;
+    const C = new Date(T, w - 1, A);
+    return C.getFullYear() !== T || C.getMonth() !== w - 1 || C.getDate() !== A ? null : C;
   }
   a.prototype._openPicker = function() {
     if (typeof this._picker.showPicker == "function")
@@ -2097,7 +2097,7 @@ H(Ft, ne, le, "ln-router", {
     y ? l = y : l = null;
     const b = document.createElement("div");
     b.className = "ln-tooltip", b.textContent = _, i[v + "Uid"] || (p += 1, i[v + "Uid"] = "ln-tooltip-" + p), b.id = i[v + "Uid"], f.appendChild(b);
-    const A = b.offsetWidth, w = b.offsetHeight, T = i.getBoundingClientRect(), L = i.getAttribute(E) || "top", x = At(T, { width: A, height: w }, L, 6);
+    const A = b.offsetWidth, w = b.offsetHeight, T = i.getBoundingClientRect(), C = i.getAttribute(E) || "top", x = At(T, { width: A, height: w }, C, 6);
     b.style.top = x.top + "px", b.style.left = x.left + "px", b.setAttribute("data-ln-tooltip-placement", x.placement), l ? i.setAttribute("aria-describedby", l + " " + b.id) : i.setAttribute("aria-describedby", b.id), d = b, t = i, o();
   }
   function n() {
@@ -2294,7 +2294,7 @@ H(Ft, ne, le, "ln-router", {
     }).join(",")), a.appendChild(_));
     const y = a.getAttribute(u) || "/files/upload", b = a.getAttribute(g) || "", A = a.getAttribute("data-ln-upload-delete") || (y.includes("/upload") ? y.replace(/\/upload\/?$/, "/{id}") : y + "/{id}"), w = /* @__PURE__ */ new Map();
     let T = 0;
-    function L() {
+    function C() {
       const N = document.querySelector('meta[name="csrf-token"]');
       return N ? N.getAttribute("content") : "";
     }
@@ -2324,23 +2324,23 @@ H(Ft, ne, le, "ln-router", {
         error: !1,
         deleting: !1
       });
-      const C = J.querySelector(".ln-upload__progress-bar"), k = J.querySelector('[data-ln-upload-action="remove"]');
+      const L = J.querySelector(".ln-upload__progress-bar"), k = J.querySelector('[data-ln-upload-action="remove"]');
       k && (k.disabled = !0), r.appendChild(J);
-      const q = new FormData();
-      q.append("file", N);
+      const D = new FormData();
+      D.append("file", N);
       const I = /* @__PURE__ */ new Set();
       a.querySelectorAll("input, select, textarea").forEach(function(R) {
         if (R.name && R.name !== "file_ids[]" && R.type !== "file") {
           if ((R.type === "checkbox" || R.type === "radio") && !R.checked)
             return;
-          q.append(R.name, R.value), I.add(R.name);
+          D.append(R.name, R.value), I.add(R.name);
         }
-      }), !I.has("context") && b && q.append("context", b);
+      }), !I.has("context") && b && D.append("context", b);
       const M = new XMLHttpRequest();
       M.upload.addEventListener("progress", function(R) {
         if (R.lengthComputable) {
           const U = Math.round(R.loaded / R.total * 100);
-          C.style.width = U + "%", Q(J, { sizeText: U + "%" });
+          L.style.width = U + "%", Q(J, { sizeText: U + "%" });
         }
       }), M.addEventListener("load", function() {
         if (M.status >= 200 && M.status < 300) {
@@ -2355,7 +2355,7 @@ H(Ft, ne, le, "ln-router", {
             serverId: R.id,
             name: R.name,
             size: R.size
-          }), D(), S(a, "ln-upload:uploaded", {
+          }), q(), S(a, "ln-upload:uploaded", {
             localId: j,
             serverId: R.id,
             name: R.name
@@ -2372,7 +2372,7 @@ H(Ft, ne, le, "ln-router", {
         F(m["network-error"] || "Network error");
       });
       function F(R) {
-        C && (C.style.width = "100%"), Q(J, { sizeText: m.error || "Error", uploading: !1, error: !0 }), k && (k.disabled = !1), S(a, "ln-upload:error", {
+        L && (L.style.width = "100%"), Q(J, { sizeText: m.error || "Error", uploading: !1, error: !0 }), k && (k.disabled = !1), S(a, "ln-upload:error", {
           file: N,
           message: R
         }), S(window, "ln-toast:enqueue", {
@@ -2381,9 +2381,9 @@ H(Ft, ne, le, "ln-router", {
           message: R || m["upload-failed"] || "Failed to upload file"
         });
       }
-      M.open("POST", y), M.setRequestHeader("X-CSRF-TOKEN", L()), M.setRequestHeader("Accept", "application/json"), M.send(q);
+      M.open("POST", y), M.setRequestHeader("X-CSRF-TOKEN", C()), M.setRequestHeader("Accept", "application/json"), M.send(D);
     }
-    function D() {
+    function q() {
       for (const N of a.querySelectorAll('input[name="file_ids[]"]'))
         N.remove();
       for (const [, N] of w) {
@@ -2394,7 +2394,7 @@ H(Ft, ne, le, "ln-router", {
     function O(N) {
       const j = w.get(N), z = r.querySelector('[data-file-id="' + N + '"]');
       if (!j || !j.serverId) {
-        z && z.remove(), w.delete(N), D();
+        z && z.remove(), w.delete(N), q();
         return;
       }
       z && Q(z, { deleting: !0 });
@@ -2402,11 +2402,11 @@ H(Ft, ne, le, "ln-router", {
       fetch(ft, {
         method: "DELETE",
         headers: {
-          "X-CSRF-TOKEN": L(),
+          "X-CSRF-TOKEN": C(),
           Accept: "application/json"
         }
       }).then(function(et) {
-        et.status === 200 ? (z && z.remove(), w.delete(N), D(), S(a, "ln-upload:removed", {
+        et.status === 200 ? (z && z.remove(), w.delete(N), q(), S(a, "ln-upload:removed", {
           localId: N,
           serverId: j.serverId
         })) : (z && Q(z, { deleting: !1 }), S(window, "ln-toast:enqueue", {
@@ -2461,15 +2461,15 @@ H(Ft, ne, le, "ln-router", {
             fetch(j, {
               method: "DELETE",
               headers: {
-                "X-CSRF-TOKEN": L(),
+                "X-CSRF-TOKEN": C(),
                 Accept: "application/json"
               }
             });
           }
-        w.clear(), r.innerHTML = "", D(), S(a, "ln-upload:cleared", {});
+        w.clear(), r.innerHTML = "", q(), S(a, "ln-upload:cleared", {});
       },
       destroy: function() {
-        n.removeEventListener("click", B), _.removeEventListener("change", K), n.removeEventListener("dragenter", G), n.removeEventListener("dragover", rt), n.removeEventListener("dragleave", Z), n.removeEventListener("drop", bt), r.removeEventListener("click", yt), w.clear(), r.innerHTML = "", D(), a.removeAttribute("data-ln-upload-initialized"), delete a.lnUploadAPI;
+        n.removeEventListener("click", B), _.removeEventListener("change", K), n.removeEventListener("dragenter", G), n.removeEventListener("dragover", rt), n.removeEventListener("dragleave", Z), n.removeEventListener("drop", bt), r.removeEventListener("click", yt), w.clear(), r.innerHTML = "", q(), a.removeAttribute("data-ln-upload-initialized"), delete a.lnUploadAPI;
       }
     };
   }
@@ -2755,20 +2755,20 @@ H(Ft, ne, le, "ln-router", {
     const _ = i.tagName === "TABLE" ? i : i.querySelector("table");
     if (!_ || i.hasAttribute("data-ln-table")) return;
     const y = {}, b = [], A = _.tBodies;
-    for (let L = 0; L < A.length; L++) {
-      const x = A[L].rows;
-      for (let D = 0; D < x.length; D++) {
-        const O = x[D].cells[n], P = O ? O.textContent.trim() : "";
+    for (let C = 0; C < A.length; C++) {
+      const x = A[C].rows;
+      for (let q = 0; q < x.length; q++) {
+        const O = x[q].cells[n], P = O ? O.textContent.trim() : "";
         P && !y[P] && (y[P] = !0, b.push(P));
       }
     }
-    b.sort(function(L, x) {
-      return L.localeCompare(x);
+    b.sort(function(C, x) {
+      return C.localeCompare(x);
     });
     const w = m.querySelector("[" + v + "]"), T = w ? w.getAttribute(v) : m.getAttribute("data-ln-filter-key") || "col" + n;
-    for (let L = 0; L < b.length; L++) {
-      const x = r.content.cloneNode(!0), D = x.querySelector("input");
-      D && (D.setAttribute(v, T), D.setAttribute(g, b[L]), _t(x, { text: b[L] }), m.appendChild(x));
+    for (let C = 0; C < b.length; C++) {
+      const x = r.content.cloneNode(!0), q = x.querySelector("input");
+      q && (q.setAttribute(v, T), q.setAttribute(g, b[C]), _t(x, { text: b[C] }), m.appendChild(x));
     }
   }
   function o(a) {
@@ -2901,21 +2901,21 @@ H(Ft, ne, le, "ln-router", {
     const y = Object.keys(_), b = y.length > 0, A = n.tBodies;
     for (let w = 0; w < A.length; w++) {
       const T = A[w].rows;
-      for (let L = 0; L < T.length; L++) {
-        const x = T[L];
+      for (let C = 0; C < T.length; C++) {
+        const x = T[C];
         if (!b) {
           x.removeAttribute(p);
           continue;
         }
-        let D = !0;
+        let q = !0;
         for (let O = 0; O < y.length; O++) {
           const P = _[y[O]], B = x.cells[P.col], K = B ? B.textContent.trim().toLowerCase() : "";
           if (P.values.indexOf(K) === -1) {
-            D = !1;
+            q = !1;
             break;
           }
         }
-        D ? x.removeAttribute(p) : x.setAttribute(p, "true");
+        q ? x.removeAttribute(p) : x.setAttribute(p, "true");
       }
     }
   }, o.prototype.destroy = function() {
@@ -3003,19 +3003,21 @@ H(Ft, ne, le, "ln-router", {
     const l = d.closest("[data-ln-table][data-ln-persist]");
     if (l) {
       const e = St("table-sort", l);
-      e && e.dir && e.col >= 0 && e.col < t.length && (this._handleClick(e.col, t[e.col]), e.dir === "desc" && this._handleClick(e.col, t[e.col]));
+      e && e.dir && e.col >= 0 && e.col < t.length && this._applySort(e.col, t[e.col], e.dir);
     }
     return this;
   }
-  p.prototype._handleClick = function(d, t) {
-    let s;
-    this._col !== d ? s = "asc" : this._dir === "asc" ? s = "desc" : this._dir === "desc" ? s = null : s = "asc", this.ths.forEach(function(e) {
-      e.classList.remove("ln-sort-asc", "ln-sort-desc");
+  p.prototype._applySort = function(d, t, s) {
+    this.ths.forEach(function(l) {
+      l.classList.remove("ln-sort-asc", "ln-sort-desc");
     }), s === null ? (this._col = -1, this._dir = null) : (this._col = d, this._dir = s, t.classList.add(s === "asc" ? "ln-sort-asc" : "ln-sort-desc")), S(this.table, "ln-table:sort", {
       column: d,
       sortType: t.getAttribute(c),
       direction: s
     });
+  }, p.prototype._handleClick = function(d, t) {
+    let s;
+    this._col !== d ? s = "asc" : this._dir === "asc" ? s = "desc" : this._dir === "desc" ? s = null : s = "asc", this._applySort(d, t, s);
     const l = this.table.closest("[data-ln-table][data-ln-persist]");
     l && (s === null ? ct("table-sort", l, null) : ct("table-sort", l, { col: d, dir: s }));
   }, p.prototype.destroy = function() {
@@ -3316,8 +3318,8 @@ H(Ft, ne, le, "ln-router", {
       this._filteredData.sort(function(_, y) {
         const b = _[a], A = y[a];
         if (r === "number" || r === "date") {
-          const L = parseFloat(b) || 0, x = parseFloat(A) || 0;
-          return (L - x) * n;
+          const C = parseFloat(b) || 0, x = parseFloat(A) || 0;
+          return (C - x) * n;
         }
         if (typeof b == "number" && typeof A == "number")
           return (b - A) * n;
@@ -3416,11 +3418,11 @@ H(Ft, ne, le, "ln-router", {
     const a = this.thead ? this.thead.offsetHeight : 0, m = this._scrollContainer;
     let n, r;
     if (m) {
-      const w = this.table.getBoundingClientRect(), T = m.getBoundingClientRect(), L = w.top - T.top + m.scrollTop + a;
-      n = m.scrollTop - L, r = m.clientHeight;
+      const w = this.table.getBoundingClientRect(), T = m.getBoundingClientRect(), C = w.top - T.top + m.scrollTop + a;
+      n = m.scrollTop - C, r = m.clientHeight;
     } else {
-      const L = this.table.getBoundingClientRect().top + window.scrollY + a;
-      n = window.scrollY - L, r = window.innerHeight;
+      const C = this.table.getBoundingClientRect().top + window.scrollY + a;
+      n = window.scrollY - C, r = window.innerHeight;
     }
     let i = Math.max(0, Math.floor(n / o) - 15);
     i = Math.min(i, h);
@@ -3433,18 +3435,18 @@ H(Ft, ne, le, "ln-router", {
       if (b > 0) {
         const T = document.createElement("tr");
         T.className = "ln-table__spacer", T.setAttribute("aria-hidden", "true");
-        const L = document.createElement("td");
-        L.setAttribute("colspan", y), L.style.height = b + "px", T.appendChild(L), w.appendChild(T);
+        const C = document.createElement("td");
+        C.setAttribute("colspan", y), C.style.height = b + "px", T.appendChild(C), w.appendChild(T);
       }
       for (let T = i; T < _; T++) {
-        const L = this._buildRow(e[T]);
-        L && w.appendChild(L);
+        const C = this._buildRow(e[T]);
+        C && w.appendChild(C);
       }
       if (A > 0) {
         const T = document.createElement("tr");
         T.className = "ln-table__spacer", T.setAttribute("aria-hidden", "true");
-        const L = document.createElement("td");
-        L.setAttribute("colspan", y), L.style.height = A + "px", T.appendChild(L), w.appendChild(T);
+        const C = document.createElement("td");
+        C.setAttribute("colspan", y), C.style.height = A + "px", T.appendChild(C), w.appendChild(T);
       }
       this.tbody.textContent = "", this.tbody.appendChild(w), this._selectable && this._updateSelectAll();
     } else {
@@ -3835,11 +3837,11 @@ H(Ft, ne, le, "ln-router", {
     const e = this._scrollContainer;
     let h, o;
     if (e) {
-      const x = this.tbody.getBoundingClientRect(), D = e.getBoundingClientRect(), O = e === this.tbody ? 0 : x.top - D.top + e.scrollTop;
+      const x = this.tbody.getBoundingClientRect(), q = e.getBoundingClientRect(), O = e === this.tbody ? 0 : x.top - q.top + e.scrollTop;
       h = e.scrollTop - O, o = e.clientHeight;
     } else {
-      const D = this.tbody.getBoundingClientRect().top + window.scrollY;
-      h = window.scrollY - D, o = window.innerHeight;
+      const q = this.tbody.getBoundingClientRect().top + window.scrollY;
+      h = window.scrollY - q, o = window.innerHeight;
     }
     const a = this._readGridLayout(), m = a.columns, n = a.rowGap, r = l + n, i = Math.ceil(s / m);
     let _ = Math.max(0, Math.floor(h / r) - 15);
@@ -3847,28 +3849,28 @@ H(Ft, ne, le, "ln-router", {
     const y = Math.ceil(o / r) + 30, b = Math.min(_ + y, i), A = Math.min(_ * m, s), w = Math.min(b * m, s);
     if (A === this._vStart && w === this._vEnd) return;
     this._vStart = A, this._vEnd = w;
-    const T = _ * r, L = (i - b) * r;
+    const T = _ * r, C = (i - b) * r;
     if (this.isDataDriven) {
       const x = document.createDocumentFragment();
       if (T > 0) {
-        const D = document.createElement(this.isUl ? "li" : "div");
-        D.className = "ln-list__spacer", D.style.height = T + "px", x.appendChild(D);
+        const q = document.createElement(this.isUl ? "li" : "div");
+        q.className = "ln-list__spacer", q.style.height = T + "px", x.appendChild(q);
       }
-      for (let D = A; D < w; D++) {
-        const O = this._buildItem(t[D]);
+      for (let q = A; q < w; q++) {
+        const O = this._buildItem(t[q]);
         O && x.appendChild(O);
       }
-      if (L > 0) {
-        const D = document.createElement(this.isUl ? "li" : "div");
-        D.className = "ln-list__spacer", D.style.height = L + "px", x.appendChild(D);
+      if (C > 0) {
+        const q = document.createElement(this.isUl ? "li" : "div");
+        q.className = "ln-list__spacer", q.style.height = C + "px", x.appendChild(q);
       }
       this.tbody.textContent = "", this.tbody.appendChild(x), this._selectable && this._updateSelectAll();
     } else {
       let x = "";
       T > 0 && (x += `<${this.isUl ? "li" : "div"} class="ln-list__spacer" style="height:${T}px;padding:0;border:none"></${this.isUl ? "li" : "div"}>`);
-      for (let D = A; D < w; D++)
-        x += t[D].html;
-      L > 0 && (x += `<${this.isUl ? "li" : "div"} class="ln-list__spacer" style="height:${L}px;padding:0;border:none"></${this.isUl ? "li" : "div"}>`), this.tbody.innerHTML = x;
+      for (let q = A; q < w; q++)
+        x += t[q].html;
+      C > 0 && (x += `<${this.isUl ? "li" : "div"} class="ln-list__spacer" style="height:${C}px;padding:0;border:none"></${this.isUl ? "li" : "div"}>`), this.tbody.innerHTML = x;
     }
   }, d.prototype._showEmptyState = function() {
     this.tbody.textContent = "";
@@ -4472,8 +4474,8 @@ H(Ft, ne, le, "ln-router", {
       b.setAttribute("aria-controls", this._surface.id);
       const w = b.querySelectorAll("[data-ln-editor-action]");
       for (let T = 0; T < w.length; T++) {
-        const L = w[T].getAttribute("data-ln-editor-action");
-        d(L) && w[T].setAttribute("aria-pressed", "false");
+        const C = w[T].getAttribute("data-ln-editor-action");
+        d(C) && w[T].setAttribute("aria-pressed", "false");
       }
     }
     this._onInput = function() {
@@ -4486,8 +4488,8 @@ H(Ft, ne, le, "ln-router", {
     }, this._onClickToolbar = function(w) {
       const T = w.target.closest("[data-ln-editor-action]");
       if (!T) return;
-      const L = T.getAttribute("data-ln-editor-action");
-      r._execAction(L);
+      const C = T.getAttribute("data-ln-editor-action");
+      r._execAction(C);
     }, this._onPaste = function(w) {
       e(r, w);
     }, this._onKeydown = function(w) {
@@ -4668,17 +4670,17 @@ H(Ft, ne, le, "ln-router", {
     if (!b) return;
     const A = b.firstElementChild;
     if (!A) return;
-    const w = A.querySelector('input[type="url"]'), T = A.querySelector('[data-ln-editor-action="confirm-link"]'), L = A.querySelector('[data-ln-editor-action="cancel-link"]');
+    const w = A.querySelector('input[type="url"]'), T = A.querySelector('[data-ln-editor-action="confirm-link"]'), C = A.querySelector('[data-ln-editor-action="cancel-link"]');
     i && (w.value = i.getAttribute("href") || "");
     const x = n.dom.querySelector('[role="toolbar"]');
     x ? x.after(A) : n.dom.insertBefore(A, n._surface), w.focus();
-    function D() {
+    function q() {
       const B = window.getSelection();
       B.removeAllRanges(), B.addRange(_);
     }
     function O() {
       const B = w.value.trim();
-      if (A.remove(), D(), n._surface.focus(), B)
+      if (A.remove(), q(), n._surface.focus(), B)
         if (i)
           i.setAttribute("href", B), i.setAttribute("rel", "noopener noreferrer"), n._syncToTextarea(), S(n.dom, "ln-editor:changed", {
             html: n._textarea.value,
@@ -4695,9 +4697,9 @@ H(Ft, ne, le, "ln-router", {
       else i && document.execCommand("unlink", !1, null);
     }
     function P() {
-      A.remove(), D(), n._surface.focus();
+      A.remove(), q(), n._surface.focus();
     }
-    T.addEventListener("click", O), L.addEventListener("click", P), w.addEventListener("keydown", function(B) {
+    T.addEventListener("click", O), C.addEventListener("click", P), w.addEventListener("keydown", function(B) {
       B.key === "Enter" ? (B.preventDefault(), O()) : B.key === "Escape" && (B.preventDefault(), P());
     });
   }
@@ -4829,22 +4831,22 @@ H(Ft, ne, le, "ln-router", {
     d.size === 0 && l();
   }
   function h(b, A) {
-    const w = mt(A), T = (A || "").toLowerCase().split("-")[0], L = p(A, { dateStyle: "long", timeStyle: "short" }), x = L.resolvedOptions().locale.toLowerCase().split("-")[0];
+    const w = mt(A), T = (A || "").toLowerCase().split("-")[0], C = p(A, { dateStyle: "long", timeStyle: "short" }), x = C.resolvedOptions().locale.toLowerCase().split("-")[0];
     if (w && x !== T && w.monthsLong) {
-      const D = w.monthsLong[b.getMonth()], O = b.getDate(), P = b.getFullYear(), B = String(b.getHours()).padStart(2, "0"), K = String(b.getMinutes()).padStart(2, "0");
-      return `${O} ${D} ${P} во ${B}:${K}`;
+      const q = w.monthsLong[b.getMonth()], O = b.getDate(), P = b.getFullYear(), B = String(b.getHours()).padStart(2, "0"), K = String(b.getMinutes()).padStart(2, "0");
+      return `${O} ${q} ${P} во ${B}:${K}`;
     }
-    return L.format(b);
+    return C.format(b);
   }
   function o(b, A) {
     const w = /* @__PURE__ */ new Date(), T = { month: "short", day: "numeric" };
     b.getFullYear() !== w.getFullYear() && (T.year = "numeric");
-    const L = mt(A), x = (A || "").toLowerCase().split("-")[0], D = p(A, T), O = D.resolvedOptions().locale.toLowerCase().split("-")[0];
-    if (L && O !== x && L.monthsShort) {
-      const P = L.monthsShort[b.getMonth()], B = b.getDate(), K = b.getFullYear() !== w.getFullYear() ? " " + b.getFullYear() : "";
+    const C = mt(A), x = (A || "").toLowerCase().split("-")[0], q = p(A, T), O = q.resolvedOptions().locale.toLowerCase().split("-")[0];
+    if (C && O !== x && C.monthsShort) {
+      const P = C.monthsShort[b.getMonth()], B = b.getDate(), K = b.getFullYear() !== w.getFullYear() ? " " + b.getFullYear() : "";
       return `${B} ${P}${K}`;
     }
-    return D.format(b);
+    return q.format(b);
   }
   function a(b, A) {
     return p(A, { dateStyle: "medium" }).format(b);
@@ -4853,48 +4855,48 @@ H(Ft, ne, le, "ln-router", {
     return p(A, { timeStyle: "short" }).format(b);
   }
   function n(b, A) {
-    const w = Math.floor(Date.now() / 1e3), L = Math.floor(b.getTime() / 1e3) - w, x = Math.abs(L);
+    const w = Math.floor(Date.now() / 1e3), C = Math.floor(b.getTime() / 1e3) - w, x = Math.abs(C);
     if (x < 10) return f(A).format(0, "second");
-    let D, O;
+    let q, O;
     if (x < 60)
-      D = "second", O = L;
+      q = "second", O = C;
     else if (x < 3600)
-      D = "minute", O = Math.round(L / 60);
+      q = "minute", O = Math.round(C / 60);
     else if (x < 86400)
-      D = "hour", O = Math.round(L / 3600);
+      q = "hour", O = Math.round(C / 3600);
     else if (x < 604800)
-      D = "day", O = Math.round(L / 86400);
+      q = "day", O = Math.round(C / 86400);
     else if (x < 2592e3)
-      D = "week", O = Math.round(L / 604800);
+      q = "week", O = Math.round(C / 604800);
     else
       return o(b, A);
-    return f(A).format(O, D);
+    return f(A).format(O, q);
   }
   function r(b) {
     const A = b.dom.getAttribute("datetime");
     if (!A) return;
     const w = Number(A);
     if (isNaN(w)) return;
-    const T = new Date(w * 1e3), L = b.dom.getAttribute(u) || "short", x = g(b.dom);
-    let D;
-    switch (L) {
+    const T = new Date(w * 1e3), C = b.dom.getAttribute(u) || "short", x = g(b.dom);
+    let q;
+    switch (C) {
       case "relative":
-        D = n(T, x);
+        q = n(T, x);
         break;
       case "full":
-        D = h(T, x);
+        q = h(T, x);
         break;
       case "date":
-        D = a(T, x);
+        q = a(T, x);
         break;
       case "time":
-        D = m(T, x);
+        q = m(T, x);
         break;
       default:
-        D = o(T, x);
+        q = o(T, x);
         break;
     }
-    b.dom.textContent = D, L !== "full" && (b.dom.title = h(T, x));
+    b.dom.textContent = q, C !== "full" && (b.dom.title = h(T, x));
   }
   function i(b) {
     return this.dom = b, r(this), b.getAttribute(u) === "relative" && (d.add(this), s()), this;
@@ -4924,167 +4926,167 @@ H(Ft, ne, le, "ln-router", {
   const E = "ln_app_cache", v = "_meta", g = "1.0";
   let p = null, f = null;
   const d = {};
-  function t(C) {
-    C && C.name === "QuotaExceededError" && S(document, "ln-store:quota-exceeded", { error: C });
+  function t(L) {
+    L && L.name === "QuotaExceededError" && S(document, "ln-store:quota-exceeded", { error: L });
   }
   function s() {
-    const C = {};
+    const L = {};
     for (const k of document.querySelectorAll(`[${u}]`)) {
-      const q = k.getAttribute(u);
-      if (q) {
+      const D = k.getAttribute(u);
+      if (D) {
         const I = k.getAttribute("data-ln-data-store-indexes") || k.getAttribute("data-ln-store-indexes") || "";
-        C[q] = {
+        L[D] = {
           indexes: I.split(",").map((M) => M.trim()).filter(Boolean)
         };
       }
     }
-    return C;
+    return L;
   }
   function l() {
-    return f || (f = new Promise((C) => {
+    return f || (f = new Promise((L) => {
       if (typeof indexedDB > "u")
-        return console.warn("[ln-data-store] IndexedDB not available — falling back to in-memory store"), C(null);
-      const k = s(), q = Object.keys(k), I = indexedDB.open(E);
+        return console.warn("[ln-data-store] IndexedDB not available — falling back to in-memory store"), L(null);
+      const k = s(), D = Object.keys(k), I = indexedDB.open(E);
       I.onerror = () => {
-        console.warn("[ln-data-store] IndexedDB open failed — falling back to in-memory store"), C(null);
+        console.warn("[ln-data-store] IndexedDB open failed — falling back to in-memory store"), L(null);
       }, I.onsuccess = (M) => {
         const F = M.target.result, R = Array.from(F.objectStoreNames);
-        if (!(!R.includes(v) || q.some((pt) => !R.includes(pt))))
-          return e(F), p = F, C(F);
+        if (!(!R.includes(v) || D.some((pt) => !R.includes(pt))))
+          return e(F), p = F, L(F);
         const W = F.version;
         F.close();
         const X = indexedDB.open(E, W + 1);
         X.onblocked = () => {
           console.warn("[ln-data-store] Database upgrade blocked — waiting for other tabs to close connection");
         }, X.onerror = () => {
-          console.warn("[ln-data-store] Database upgrade failed"), C(null);
+          console.warn("[ln-data-store] Database upgrade failed"), L(null);
         }, X.onupgradeneeded = (pt) => {
           const ot = pt.target.result;
           ot.objectStoreNames.contains(v) || ot.createObjectStore(v, { keyPath: "key" });
-          for (const Lt of q)
-            if (!ot.objectStoreNames.contains(Lt)) {
-              const ce = ot.createObjectStore(Lt, { keyPath: "id" });
-              for (const Bt of k[Lt].indexes)
+          for (const Ct of D)
+            if (!ot.objectStoreNames.contains(Ct)) {
+              const ce = ot.createObjectStore(Ct, { keyPath: "id" });
+              for (const Bt of k[Ct].indexes)
                 ce.createIndex(Bt, Bt, { unique: !1 });
             }
         }, X.onsuccess = (pt) => {
           const ot = pt.target.result;
-          e(ot), p = ot, C(ot);
+          e(ot), p = ot, L(ot);
         };
       };
     }), f);
   }
-  function e(C) {
-    C.onversionchange = () => {
-      C.close(), p = null, f = null;
+  function e(L) {
+    L.onversionchange = () => {
+      L.close(), p = null, f = null;
     };
   }
   function h() {
     return p ? Promise.resolve(p) : (f = null, l());
   }
-  async function o(C) {
-    if (!ut() || !C) return C;
-    const k = { ...C }, q = k.id, I = await ye(k);
-    return !I || !I.encrypted ? C : {
-      id: q,
+  async function o(L) {
+    if (!ut() || !L) return L;
+    const k = { ...L }, D = k.id, I = await ye(k);
+    return !I || !I.encrypted ? L : {
+      id: D,
       encrypted: !0,
       iv: I.iv,
       data: I.data
     };
   }
-  async function a(C) {
-    return !C || !C.encrypted || !ut() ? C : ve(C);
+  async function a(L) {
+    return !L || !L.encrypted || !ut() ? L : ve(L);
   }
-  const m = (C, k) => h().then((q) => q ? q.transaction(C, k).objectStore(C) : null);
-  function n(C) {
-    return new Promise((k, q) => {
-      C.onsuccess = () => k(C.result), C.onerror = () => {
-        t(C.error), q(C.error);
+  const m = (L, k) => h().then((D) => D ? D.transaction(L, k).objectStore(L) : null);
+  function n(L) {
+    return new Promise((k, D) => {
+      L.onsuccess = () => k(L.result), L.onerror = () => {
+        t(L.error), D(L.error);
       };
     });
   }
-  const r = (C) => m(C, "readonly").then((k) => k ? n(k.getAll()) : []).then((k) => ut() ? Promise.all(k.map((q) => a(q))) : k), i = (C, k) => m(C, "readonly").then((q) => q ? n(q.get(k)) : null).then((q) => q ? a(q) : null), _ = (C, k) => (ut() ? o(k) : Promise.resolve(k)).then((I) => m(C, "readwrite").then((M) => M ? n(M.put(I)) : null)), y = (C, k) => m(C, "readwrite").then((q) => q ? n(q.delete(k)) : null), b = (C) => m(C, "readwrite").then((k) => k ? n(k.clear()) : null), A = (C) => m(C, "readonly").then((k) => k ? n(k.count()) : 0), w = (C) => m(v, "readonly").then((k) => k ? n(k.get(C)) : null), T = (C, k) => m(v, "readwrite").then((q) => {
-    if (q)
-      return k.key = C, n(q.put(k));
+  const r = (L) => m(L, "readonly").then((k) => k ? n(k.getAll()) : []).then((k) => ut() ? Promise.all(k.map((D) => a(D))) : k), i = (L, k) => m(L, "readonly").then((D) => D ? n(D.get(k)) : null).then((D) => D ? a(D) : null), _ = (L, k) => (ut() ? o(k) : Promise.resolve(k)).then((I) => m(L, "readwrite").then((M) => M ? n(M.put(I)) : null)), y = (L, k) => m(L, "readwrite").then((D) => D ? n(D.delete(k)) : null), b = (L) => m(L, "readwrite").then((k) => k ? n(k.clear()) : null), A = (L) => m(L, "readonly").then((k) => k ? n(k.count()) : 0), w = (L) => m(v, "readonly").then((k) => k ? n(k.get(L)) : null), T = (L, k) => m(v, "readwrite").then((D) => {
+    if (D)
+      return k.key = L, n(D.put(k));
   });
-  function L(C) {
-    this.dom = C, this._name = C.getAttribute(u);
-    const k = C.getAttribute("data-ln-data-store-stale") || C.getAttribute("data-ln-store-stale"), q = parseInt(k, 10);
-    this._staleThreshold = k === "never" || k === "-1" ? -1 : isNaN(q) ? 300 : q;
-    const I = C.getAttribute("data-ln-data-store-search-fields") || C.getAttribute("data-ln-store-search-fields") || "";
+  function C(L) {
+    this.dom = L, this._name = L.getAttribute(u);
+    const k = L.getAttribute("data-ln-data-store-stale") || L.getAttribute("data-ln-store-stale"), D = parseInt(k, 10);
+    this._staleThreshold = k === "never" || k === "-1" ? -1 : isNaN(D) ? 300 : D;
+    const I = L.getAttribute("data-ln-data-store-search-fields") || L.getAttribute("data-ln-store-search-fields") || "";
     return this._searchFields = I.split(",").map((M) => M.trim()).filter(Boolean), this._handlers = null, this.isLoaded = !1, this.isSyncing = !1, this.lastSyncedAt = null, this.totalCount = 0, this.presenters = null, d[this._name] = this, x(this), K(this), this;
   }
-  function x(C) {
-    C._handlers = {
-      create: (k) => D(C, k.detail),
-      update: (k) => O(C, k.detail),
-      delete: (k) => P(C, k.detail),
-      "bulk-delete": (k) => B(C, k.detail)
+  function x(L) {
+    L._handlers = {
+      create: (k) => q(L, k.detail),
+      update: (k) => O(L, k.detail),
+      delete: (k) => P(L, k.detail),
+      "bulk-delete": (k) => B(L, k.detail)
     };
-    for (const [k, q] of Object.entries(C._handlers))
-      C.dom.addEventListener(`ln-store:request-${k}`, q);
+    for (const [k, D] of Object.entries(L._handlers))
+      L.dom.addEventListener(`ln-store:request-${k}`, D);
   }
-  function D(C, { tempId: k, data: q = {} } = {}) {
-    const I = { ...q, id: k };
-    _(C._name, I).then(() => {
-      C.totalCount++, S(C.dom, "ln-store:created", { store: C._name, record: I, tempId: k });
+  function q(L, { tempId: k, data: D = {} } = {}) {
+    const I = { ...D, id: k };
+    _(L._name, I).then(() => {
+      L.totalCount++, S(L.dom, "ln-store:created", { store: L._name, record: I, tempId: k });
     });
   }
-  function O(C, { id: k, data: q = {} } = {}) {
-    i(C._name, k).then((I) => {
+  function O(L, { id: k, data: D = {} } = {}) {
+    i(L._name, k).then((I) => {
       if (!I) throw new Error(`Record not found: ${k}`);
-      const M = { ...I, ...q }, F = q.id;
-      return (F !== void 0 && F !== k ? bt(C._name, k, M) : _(C._name, M)).then(() => {
-        S(C.dom, "ln-store:updated", { store: C._name, record: M, previous: I });
+      const M = { ...I, ...D }, F = D.id;
+      return (F !== void 0 && F !== k ? bt(L._name, k, M) : _(L._name, M)).then(() => {
+        S(L.dom, "ln-store:updated", { store: L._name, record: M, previous: I });
       });
     }).catch((I) => console.error("[ln-data-store] Optimistic update failed:", I));
   }
-  function P(C, { id: k } = {}) {
-    i(C._name, k).then((q) => {
-      if (q)
-        return y(C._name, k).then(() => {
-          C.totalCount--, S(C.dom, "ln-store:deleted", { store: C._name, id: k });
+  function P(L, { id: k } = {}) {
+    i(L._name, k).then((D) => {
+      if (D)
+        return y(L._name, k).then(() => {
+          L.totalCount--, S(L.dom, "ln-store:deleted", { store: L._name, id: k });
         });
-    }).catch((q) => console.error("[ln-data-store] Optimistic delete failed:", q));
+    }).catch((D) => console.error("[ln-data-store] Optimistic delete failed:", D));
   }
-  function B(C, { ids: k = [] } = {}) {
-    k.length && Promise.all(k.map((q) => i(C._name, q))).then((q) => {
-      const I = q.filter(Boolean).map((M) => M.id);
-      return Z(C._name, I).then(() => {
-        C.totalCount -= I.length, S(C.dom, "ln-store:deleted", { store: C._name, ids: I });
+  function B(L, { ids: k = [] } = {}) {
+    k.length && Promise.all(k.map((D) => i(L._name, D))).then((D) => {
+      const I = D.filter(Boolean).map((M) => M.id);
+      return Z(L._name, I).then(() => {
+        L.totalCount -= I.length, S(L.dom, "ln-store:deleted", { store: L._name, ids: I });
       });
-    }).catch((q) => console.error("[ln-data-store] Optimistic bulk delete failed:", q));
+    }).catch((D) => console.error("[ln-data-store] Optimistic bulk delete failed:", D));
   }
-  function K(C) {
-    l().then(() => w(C._name)).then((k) => {
-      k && k.schema_version === g ? (C.lastSyncedAt = k.last_synced_at || null, C.totalCount = k.record_count || 0, C.totalCount > 0 && (C.isLoaded = !0, S(C.dom, "ln-store:ready", { store: C._name, count: C.totalCount, source: "cache" })), S(C.dom, "ln-store:initialized", { store: C._name, hasCache: C.totalCount > 0, lastSyncedAt: C.lastSyncedAt, count: C.totalCount })) : k && k.schema_version !== g ? b(C._name).then(() => T(C._name, { schema_version: g, last_synced_at: null, record_count: 0 })).then(() => S(C.dom, "ln-store:initialized", { store: C._name, hasCache: !1, lastSyncedAt: null, count: 0 })) : S(C.dom, "ln-store:initialized", { store: C._name, hasCache: !1, lastSyncedAt: null, count: 0 });
+  function K(L) {
+    l().then(() => w(L._name)).then((k) => {
+      k && k.schema_version === g ? (L.lastSyncedAt = k.last_synced_at || null, L.totalCount = k.record_count || 0, L.totalCount > 0 && (L.isLoaded = !0, S(L.dom, "ln-store:ready", { store: L._name, count: L.totalCount, source: "cache" })), S(L.dom, "ln-store:initialized", { store: L._name, hasCache: L.totalCount > 0, lastSyncedAt: L.lastSyncedAt, count: L.totalCount })) : k && k.schema_version !== g ? b(L._name).then(() => T(L._name, { schema_version: g, last_synced_at: null, record_count: 0 })).then(() => S(L.dom, "ln-store:initialized", { store: L._name, hasCache: !1, lastSyncedAt: null, count: 0 })) : S(L.dom, "ln-store:initialized", { store: L._name, hasCache: !1, lastSyncedAt: null, count: 0 });
     });
   }
-  function G(C) {
-    C.isSyncing = !0, S(C.dom, "ln-store:request-remote-sync", { since: C.lastSyncedAt });
+  function G(L) {
+    L.isSyncing = !0, S(L.dom, "ln-store:request-remote-sync", { since: L.lastSyncedAt });
   }
-  function rt(C, k) {
-    return h().then((q) => q ? (ut() ? Promise.all(k.map((M) => o(M))) : Promise.resolve(k)).then((M) => new Promise((F, R) => {
-      const U = q.transaction(C, "readwrite"), W = U.objectStore(C);
+  function rt(L, k) {
+    return h().then((D) => D ? (ut() ? Promise.all(k.map((M) => o(M))) : Promise.resolve(k)).then((M) => new Promise((F, R) => {
+      const U = D.transaction(L, "readwrite"), W = U.objectStore(L);
       M.forEach((X) => W.put(X)), U.oncomplete = () => F(), U.onerror = () => {
         t(U.error), R(U.error);
       };
     })) : void 0);
   }
-  function Z(C, k) {
-    return h().then((q) => {
-      if (q)
+  function Z(L, k) {
+    return h().then((D) => {
+      if (D)
         return new Promise((I, M) => {
-          const F = q.transaction(C, "readwrite"), R = F.objectStore(C);
+          const F = D.transaction(L, "readwrite"), R = F.objectStore(L);
           k.forEach((U) => R.delete(U)), F.oncomplete = () => I(), F.onerror = () => M(F.error);
         });
     });
   }
-  function bt(C, k, q) {
-    return (ut() ? o(q) : Promise.resolve(q)).then((M) => h().then((F) => {
+  function bt(L, k, D) {
+    return (ut() ? o(D) : Promise.resolve(D)).then((M) => h().then((F) => {
       if (F)
         return new Promise((R, U) => {
-          const W = F.transaction(C, "readwrite"), X = W.objectStore(C);
+          const W = F.transaction(L, "readwrite"), X = W.objectStore(L);
           X.put(M), X.delete(k), W.oncomplete = () => R(), W.onerror = () => {
             t(W.error), U(W.error);
           };
@@ -5092,11 +5094,11 @@ H(Ft, ne, le, "ln-router", {
     }));
   }
   const yt = new Intl.Collator(void 0, { numeric: !0, sensitivity: "base" });
-  function N(C, k) {
-    if (!k || !k.field) return C;
-    const { field: q, direction: I } = k, M = I === "desc";
-    return [...C].sort((F, R) => {
-      const U = F[q], W = R[q];
+  function N(L, k) {
+    if (!k || !k.field) return L;
+    const { field: D, direction: I } = k, M = I === "desc";
+    return [...L].sort((F, R) => {
+      const U = F[D], W = R[D];
       if (U == null && W == null) return 0;
       if (U == null) return M ? 1 : -1;
       if (W == null) return M ? -1 : 1;
@@ -5104,35 +5106,35 @@ H(Ft, ne, le, "ln-router", {
       return M ? -X : X;
     });
   }
-  function j(C, k) {
-    if (!k) return C;
-    const q = Object.keys(k).filter((I) => Array.isArray(k[I]) && k[I].length > 0);
-    return q.length ? C.filter(
-      (I) => q.every((M) => k[M].map(String).includes(String(I[M])))
-    ) : C;
+  function j(L, k) {
+    if (!k) return L;
+    const D = Object.keys(k).filter((I) => Array.isArray(k[I]) && k[I].length > 0);
+    return D.length ? L.filter(
+      (I) => D.every((M) => k[M].map(String).includes(String(I[M])))
+    ) : L;
   }
-  function z(C, k, q) {
-    if (!k || !q || !q.length) return C;
+  function z(L, k, D) {
+    if (!k || !D || !D.length) return L;
     const I = k.toLowerCase();
-    return C.filter(
-      (M) => q.some((F) => {
+    return L.filter(
+      (M) => D.some((F) => {
         const R = M[F];
         return R != null && String(R).toLowerCase().includes(I);
       })
     );
   }
-  function ft(C, k, q) {
-    if (!C.length) return 0;
-    if (q === "count") return C.length;
-    const I = C.map((F) => parseFloat(F[k])).filter((F) => !isNaN(F)), M = I.reduce((F, R) => F + R, 0);
-    return q === "sum" ? M : q === "avg" && I.length ? M / I.length : 0;
+  function ft(L, k, D) {
+    if (!L.length) return 0;
+    if (D === "count") return L.length;
+    const I = L.map((F) => parseFloat(F[k])).filter((F) => !isNaN(F)), M = I.reduce((F, R) => F + R, 0);
+    return D === "sum" ? M : D === "avg" && I.length ? M / I.length : 0;
   }
-  function et(C, k) {
-    if (!C.presenters || !C.presenters.computed) return k;
-    const q = C.presenters.computed;
+  function et(L, k) {
+    if (!L.presenters || !L.presenters.computed) return k;
+    const D = L.presenters.computed;
     return k.map((I) => {
       const M = { ...I };
-      for (const [F, R] of Object.entries(q))
+      for (const [F, R] of Object.entries(D))
         try {
           M[F] = R(I);
         } catch (U) {
@@ -5141,78 +5143,78 @@ H(Ft, ne, le, "ln-router", {
       return M;
     });
   }
-  L.prototype.getAll = function(C = {}) {
+  C.prototype.getAll = function(L = {}) {
     const k = this;
-    return r(k._name).then((q) => {
-      const I = q.length;
-      C.filters && (q = j(q, C.filters)), C.search && (q = z(q, C.search, k._searchFields));
-      const M = q.length;
-      if (C.sort && (q = N(q, C.sort)), C.offset || C.limit) {
-        const F = C.offset || 0, R = C.limit || q.length;
-        q = q.slice(F, F + R);
+    return r(k._name).then((D) => {
+      const I = D.length;
+      L.filters && (D = j(D, L.filters)), L.search && (D = z(D, L.search, k._searchFields));
+      const M = D.length;
+      if (L.sort && (D = N(D, L.sort)), L.offset || L.limit) {
+        const F = L.offset || 0, R = L.limit || D.length;
+        D = D.slice(F, F + R);
       }
       return {
-        data: et(k, q),
+        data: et(k, D),
         total: I,
         filtered: M
       };
     });
-  }, L.prototype.getById = function(C) {
-    return i(this._name, C).then((k) => k ? et(this, [k])[0] : null);
-  }, L.prototype.count = function(C) {
-    return C ? r(this._name).then((k) => j(k, C).length) : A(this._name);
-  }, L.prototype.aggregate = function(C, k) {
-    return r(this._name).then((q) => ft(q, C, k));
-  }, L.prototype.setPresenters = function(C) {
-    this.presenters = C;
-  }, L.prototype.applySync = function(C, k, q) {
-    const I = this, M = C.length > 0 || k.length > 0;
+  }, C.prototype.getById = function(L) {
+    return i(this._name, L).then((k) => k ? et(this, [k])[0] : null);
+  }, C.prototype.count = function(L) {
+    return L ? r(this._name).then((k) => j(k, L).length) : A(this._name);
+  }, C.prototype.aggregate = function(L, k) {
+    return r(this._name).then((D) => ft(D, L, k));
+  }, C.prototype.setPresenters = function(L) {
+    this.presenters = L;
+  }, C.prototype.applySync = function(L, k, D) {
+    const I = this, M = L.length > 0 || k.length > 0;
     let F = Promise.resolve();
-    return C.length > 0 && (F = F.then(() => rt(I._name, C))), k.length > 0 && (F = F.then(() => Z(I._name, k))), F.then(() => A(I._name)).then((R) => (I.totalCount = R, T(I._name, {
+    return L.length > 0 && (F = F.then(() => rt(I._name, L))), k.length > 0 && (F = F.then(() => Z(I._name, k))), F.then(() => A(I._name)).then((R) => (I.totalCount = R, T(I._name, {
       schema_version: g,
-      last_synced_at: q,
+      last_synced_at: D,
       record_count: R
     }))).then(() => {
       const R = !I.isLoaded;
-      I.isLoaded = !0, I.isSyncing = !1, I.lastSyncedAt = q, R ? (S(I.dom, "ln-store:loaded", { store: I._name, count: I.totalCount }), S(I.dom, "ln-store:ready", { store: I._name, count: I.totalCount, source: "server" })) : S(I.dom, "ln-store:synced", {
+      I.isLoaded = !0, I.isSyncing = !1, I.lastSyncedAt = D, R ? (S(I.dom, "ln-store:loaded", { store: I._name, count: I.totalCount }), S(I.dom, "ln-store:ready", { store: I._name, count: I.totalCount, source: "server" })) : S(I.dom, "ln-store:synced", {
         store: I._name,
-        added: C.length,
+        added: L.length,
         deleted: k.length,
         changed: M
       });
     }).catch((R) => {
       I.isSyncing = !1, console.error("[ln-data-store] applySync failed:", R);
     });
-  }, L.prototype.forceSync = function() {
+  }, C.prototype.forceSync = function() {
     G(this);
-  }, L.prototype.fullReload = function() {
-    const C = this;
-    return b(C._name).then(() => {
-      C.isLoaded = !1, C.lastSyncedAt = null, C.totalCount = 0, G(C);
+  }, C.prototype.fullReload = function() {
+    const L = this;
+    return b(L._name).then(() => {
+      L.isLoaded = !1, L.lastSyncedAt = null, L.totalCount = 0, G(L);
     });
-  }, L.prototype.destroy = function() {
+  }, C.prototype.destroy = function() {
     if (this._handlers) {
-      for (const [C, k] of Object.entries(this._handlers))
-        this.dom.removeEventListener(`ln-store:request-${C}`, k);
+      for (const [L, k] of Object.entries(this._handlers))
+        this.dom.removeEventListener(`ln-store:request-${L}`, k);
       this._handlers = null;
     }
     delete d[this._name], delete this.dom[c], S(this.dom, "ln-store:destroyed", { store: this._name });
   };
   function J() {
-    return h().then((C) => {
-      if (!C) return;
-      const k = Array.from(C.objectStoreNames);
-      return new Promise((q, I) => {
-        const M = C.transaction(k, "readwrite");
-        k.forEach((F) => M.objectStore(F).clear()), M.oncomplete = () => q(), M.onerror = () => I(M.error);
+    return h().then((L) => {
+      if (!L) return;
+      const k = Array.from(L.objectStoreNames);
+      return new Promise((D, I) => {
+        const M = L.transaction(k, "readwrite");
+        k.forEach((F) => M.objectStore(F).clear()), M.oncomplete = () => D(), M.onerror = () => I(M.error);
       });
     }).then(() => {
-      Object.values(d).forEach((C) => {
-        C.isLoaded = !1, C.isSyncing = !1, C.lastSyncedAt = null, C.totalCount = 0;
+      Object.values(d).forEach((L) => {
+        L.isLoaded = !1, L.isSyncing = !1, L.lastSyncedAt = null, L.totalCount = 0;
       });
     });
   }
-  H(u, c, L, "ln-data-store"), window[c].clearAll = J, window[c].init = window[c], window[c].setStorageKey = Ht, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.setStorageKey = Ht);
+  H(u, c, C, "ln-data-store"), window[c].clearAll = J, window[c].init = window[c], window[c].setStorageKey = Ht, typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.setStorageKey = Ht);
 })();
 (function() {
   const u = "data-ln-api-connector", c = "lnApiConnector", E = "lnConnector";
@@ -5794,23 +5796,23 @@ H(Ft, ne, le, "ln-router", {
         n.refreshMapper();
         const i = n.findChildren();
         if (!i.store || !i.connector || !i.queue) return;
-        const _ = r.detail || {}, y = _.entryId, b = _.op, A = _.targetId, w = _.payload, T = _.expectedVersion, L = _.meta || {}, x = L.action || null;
+        const _ = r.detail || {}, y = _.entryId, b = _.op, A = _.targetId, w = _.payload, T = _.expectedVersion, C = _.meta || {}, x = C.action || null;
         b === "create" ? S(i.connectorEl, "ln-api-connector:request-create", {
           data: w,
           url: x,
-          meta: { entryId: y, queued: !0, op: "create", tempId: L.tempId }
+          meta: { entryId: y, queued: !0, op: "create", tempId: C.tempId }
         }) : b === "update" ? S(i.connectorEl, "ln-api-connector:request-update", {
           id: A,
           data: w,
           expected_version: T,
           url: x,
-          meta: { entryId: y, queued: !0, op: "update", id: L.id !== void 0 ? L.id : A }
+          meta: { entryId: y, queued: !0, op: "update", id: C.id !== void 0 ? C.id : A }
         }) : b === "delete" ? S(i.connectorEl, "ln-api-connector:request-delete", {
           id: A,
-          meta: { entryId: y, queued: !0, op: "delete", id: L.id !== void 0 ? L.id : A }
+          meta: { entryId: y, queued: !0, op: "delete", id: C.id !== void 0 ? C.id : A }
         }) : b === "bulk-delete" ? S(i.connectorEl, "ln-api-connector:request-bulk-delete", {
           ids: w && w.ids ? w.ids : [],
-          meta: { entryId: y, queued: !0, op: "bulk-delete", bulkKey: L.bulkKey }
+          meta: { entryId: y, queued: !0, op: "bulk-delete", bulkKey: C.bulkKey }
         }) : console.warn("[ln-data-coordinator] Unknown queue op:", b);
       },
       // ─── Form Write Intake — native submit, bubble phase ──────
@@ -5869,7 +5871,7 @@ H(Ft, ne, le, "ln-router", {
         }
         const A = n.findChildren();
         if (!A.storeEl) return;
-        const w = b === 401 || b === 419, T = b === 0 || b >= 500, L = b === 409;
+        const w = b === 401 || b === 419, T = b === 0 || b >= 500, C = b === 409;
         if (w) {
           n._toastFromDict("auth"), _.queued && A.queue && S(A.queueEl, "ln-api-queue:nack", { entryId: _.entryId, reason: "auth" });
           return;
@@ -5878,7 +5880,7 @@ H(Ft, ne, le, "ln-router", {
           _.queued && A.queue ? S(A.queueEl, "ln-api-queue:nack", { entryId: _.entryId, reason: "retry" }) : n._toastFromDict("network");
           return;
         }
-        if (L && y === "update") {
+        if (C && y === "update") {
           const x = i.data && i.data.remote ? n.mapper.ingress(i.data.remote) : null;
           x && S(A.storeEl, "ln-store:request-update", { id: _.id, data: x }), n._toastFromDict("conflict");
         } else y === "create" && S(A.storeEl, "ln-store:request-delete", { id: _.tempId }), n._toastFromDict("rejected");
@@ -5931,8 +5933,8 @@ H(Ft, ne, le, "ln-router", {
     }
     const A = this, w = { sort: n.detail.sort, filters: n.detail.filters, search: n.detail.search };
     b.getAll(w).then(function(T) {
-      const L = { data: T.data, total: T.total, filtered: T.filtered };
-      S(i, "ln-" + r + ":set-data", L), A._boundDelivered.set(i, !0);
+      const C = { data: T.data, total: T.total, filtered: T.filtered };
+      S(i, "ln-" + r + ":set-data", C), A._boundDelivered.set(i, !0);
     });
   }, o.prototype._serveOptions = function(n) {
     const r = n.target, i = r.getAttribute("data-ln-options");
@@ -5956,10 +5958,10 @@ H(Ft, ne, le, "ln-router", {
       const A = this.findChildren().store;
       if (b === "table" || b === "list") {
         const w = n._boundQueries.get(_) || { sort: null, filters: {}, search: "" };
-        (function(T, L) {
+        (function(T, C) {
           A.getAll(w).then(function(x) {
-            const D = { data: x.data, total: x.total, filtered: x.filtered };
-            S(T, "ln-" + L + ":set-data", D), n._boundDelivered.set(T, !0);
+            const q = { data: x.data, total: x.total, filtered: x.filtered };
+            S(T, "ln-" + C + ":set-data", q), n._boundDelivered.set(T, !0);
           });
         })(_, b);
       } else if (b === "options")
@@ -5972,15 +5974,15 @@ H(Ft, ne, le, "ln-router", {
         const w = _.getAttribute("data-ln-stat-filter");
         let T = null;
         if (w) {
-          const L = w.indexOf(":");
-          if (L !== -1) {
-            const x = w.slice(0, L), D = w.slice(L + 1);
-            T = {}, T[x] = [D];
+          const C = w.indexOf(":");
+          if (C !== -1) {
+            const x = w.slice(0, C), q = w.slice(C + 1);
+            T = {}, T[x] = [q];
           }
         }
-        (function(L, x) {
-          A.count(x).then(function(D) {
-            S(L, "ln-stat:set-count", { count: D });
+        (function(C, x) {
+          A.count(x).then(function(q) {
+            S(C, "ln-stat:set-count", { count: q });
           });
         })(_, T);
       }
@@ -6102,23 +6104,23 @@ H(Ft, ne, le, "ln-router", {
         for (const w of b)
           A.has(w.chainKey) || A.set(w.chainKey, []), A.get(w.chainKey).push(w);
         A.forEach((w, T) => {
-          w.sort((D, O) => D.seq - O.seq);
-          const L = w.find((D) => D.status !== "failed");
-          if (!L || L.status === "inflight") return;
+          w.sort((q, O) => q.seq - O.seq);
+          const C = w.find((q) => q.status !== "failed");
+          if (!C || C.status === "inflight") return;
           const x = Date.now();
-          if (L.nextAttemptAt > x) {
-            y._scheduleTimer(T, L.nextAttemptAt - x);
+          if (C.nextAttemptAt > x) {
+            y._scheduleTimer(T, C.nextAttemptAt - x);
             return;
           }
-          y._clearTimer(T), L.status = "inflight", a(L).then(() => {
+          y._clearTimer(T), C.status = "inflight", a(C).then(() => {
             S(y.dom, "ln-api-queue:send", {
-              entryId: L.entryId,
-              chainKey: L.chainKey,
-              op: L.op,
-              targetId: L.targetId,
-              payload: L.payload,
-              expectedVersion: L.expectedVersion,
-              meta: L.meta
+              entryId: C.entryId,
+              chainKey: C.chainKey,
+              op: C.op,
+              targetId: C.targetId,
+              payload: C.payload,
+              expectedVersion: C.expectedVersion,
+              meta: C.meta
             });
           });
         });
@@ -6140,8 +6142,8 @@ H(Ft, ne, le, "ln-router", {
         nextAttemptAt: 0,
         status: "pending"
       };
-      return a(T).then(() => n(b.scope)).then((L) => {
-        S(b.dom, "ln-api-queue:enqueued", { entryId: T.entryId, chainKey: T.chainKey, count: L.length }), S(b.dom, "ln-api-queue:pending-count", { count: L.length, scope: b.scope }), b._drain();
+      return a(T).then(() => n(b.scope)).then((C) => {
+        S(b.dom, "ln-api-queue:enqueued", { entryId: T.entryId, chainKey: T.chainKey, count: C.length }), S(b.dom, "ln-api-queue:pending-count", { count: C.length, scope: b.scope }), b._drain();
       });
     });
   }, i.prototype._onAck = function(y) {
@@ -6152,29 +6154,29 @@ H(Ft, ne, le, "ln-router", {
   }, i.prototype._onNack = function(y) {
     const b = this, A = y.detail || {}, w = A.reason;
     return n(b.scope).then((T) => {
-      const L = T.find((x) => x.entryId === A.entryId);
-      if (L) {
+      const C = T.find((x) => x.entryId === A.entryId);
+      if (C) {
         if (w === "retry")
-          return L.attempts = (L.attempts || 0) + 1, L.attempts >= f ? (L.status = "failed", a(L).then(() => (S(b.dom, "ln-api-queue:failed", { entryId: L.entryId, chainKey: L.chainKey, attempts: L.attempts }), n(b.scope))).then((x) => {
+          return C.attempts = (C.attempts || 0) + 1, C.attempts >= f ? (C.status = "failed", a(C).then(() => (S(b.dom, "ln-api-queue:failed", { entryId: C.entryId, chainKey: C.chainKey, attempts: C.attempts }), n(b.scope))).then((x) => {
             S(b.dom, "ln-api-queue:pending-count", { count: x.length, scope: b.scope });
-          })) : (L.nextAttemptAt = Date.now() + p[Math.min(L.attempts - 1, p.length - 1)], L.status = "pending", a(L).then(() => (b._scheduleTimer(L.chainKey, L.nextAttemptAt - Date.now()), n(b.scope))).then((x) => {
+          })) : (C.nextAttemptAt = Date.now() + p[Math.min(C.attempts - 1, p.length - 1)], C.status = "pending", a(C).then(() => (b._scheduleTimer(C.chainKey, C.nextAttemptAt - Date.now()), n(b.scope))).then((x) => {
             S(b.dom, "ln-api-queue:pending-count", { count: x.length, scope: b.scope });
           }));
         if (w === "drop")
-          return m(L.entryId).then(() => n(b.scope)).then((x) => {
+          return m(C.entryId).then(() => n(b.scope)).then((x) => {
             S(b.dom, "ln-api-queue:pending-count", { count: x.length, scope: b.scope }), x.length === 0 && S(b.dom, "ln-api-queue:drained", { scope: b.scope }), b._drain();
           });
         if (w === "auth")
-          return L.status = "pending", a(L).then(() => {
-            b._paused = !0, S(b.dom, "ln-api-queue:paused", { reason: "auth" }), S(b.dom, "ln-api-queue:auth-required", { entryId: L.entryId, chainKey: L.chainKey });
+          return C.status = "pending", a(C).then(() => {
+            b._paused = !0, S(b.dom, "ln-api-queue:paused", { reason: "auth" }), S(b.dom, "ln-api-queue:auth-required", { entryId: C.entryId, chainKey: C.chainKey });
           });
       }
     });
   }, i.prototype._onRemap = function(y) {
     const b = this, A = y.detail || {}, w = A.oldKey, T = A.newId;
-    return n(b.scope).then((L) => {
-      const x = L.filter((D) => D.chainKey === w && D.status !== "failed");
-      return Promise.all(x.map((D) => (D.targetId === w && (D.targetId = T), D.meta && typeof D.meta.action == "string" && D.meta.action.indexOf(w) !== -1 && (D.meta.action = D.meta.action.split(w).join(T)), D.chainKey = T, a(D))));
+    return n(b.scope).then((C) => {
+      const x = C.filter((q) => q.chainKey === w && q.status !== "failed");
+      return Promise.all(x.map((q) => (q.targetId === w && (q.targetId = T), q.meta && typeof q.meta.action == "string" && q.meta.action.indexOf(w) !== -1 && (q.meta.action = q.meta.action.split(w).join(T)), q.chainKey = T, a(q))));
     });
   }, i.prototype._onResume = function() {
     this._paused = !1, S(this.dom, "ln-api-queue:resumed", {}), this._drain();
@@ -6284,10 +6286,10 @@ H(Ft, ne, le, "ln-router", {
     return i.indexOf(E) === 0 ? d + "/" + i.slice(E.length) + ".svg" : f + "/" + i.slice(c.length) + ".svg";
   }
   function a(i, _) {
-    const y = _.match(/viewBox="([^"]+)"/), b = y ? y[1] : "0 0 24 24", A = _.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i), w = A ? A[1].trim() : "", T = _.match(/<svg([^>]*)>/i), L = T ? T[1] : "", x = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
-    x.id = i, x.setAttribute("viewBox", b), ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin"].forEach(function(D) {
-      const O = L.match(new RegExp(D + '="([^"]*)"'));
-      O && x.setAttribute(D, O[1]);
+    const y = _.match(/viewBox="([^"]+)"/), b = y ? y[1] : "0 0 24 24", A = _.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i), w = A ? A[1].trim() : "", T = _.match(/<svg([^>]*)>/i), C = T ? T[1] : "", x = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
+    x.id = i, x.setAttribute("viewBox", b), ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin"].forEach(function(q) {
+      const O = C.match(new RegExp(q + '="([^"]*)"'));
+      O && x.setAttribute(q, O[1]);
     }), x.innerHTML = w, h().querySelector("defs").appendChild(x);
   }
   function m(i) {
