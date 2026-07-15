@@ -56,30 +56,15 @@ import { persistGet, persistSet } from '../../ln-core';
 		if (persistRoot) {
 			const saved = persistGet('table-sort', persistRoot);
 			if (saved && saved.dir && saved.col >= 0 && saved.col < ths.length) {
-				// Programmatically trigger the saved sort
-				this._handleClick(saved.col, ths[saved.col]);
-				if (saved.dir === 'desc') {
-					this._handleClick(saved.col, ths[saved.col]);
-				}
+				// Apply directly — single dispatch, no re-persist of the value we just read.
+				this._applySort(saved.col, ths[saved.col], saved.dir);
 			}
 		}
 
 		return this;
 	}
 
-	_component.prototype._handleClick = function (colIndex, th) {
-		let newDir;
-
-		if (this._col !== colIndex) {
-			newDir = 'asc';
-		} else if (this._dir === 'asc') {
-			newDir = 'desc';
-		} else if (this._dir === 'desc') {
-			newDir = null;
-		} else {
-			newDir = 'asc';
-		}
-
+	_component.prototype._applySort = function (colIndex, th, newDir) {
 		// JS-2: use state classes on <th>; CSS owns icon visibility.
 		this.ths.forEach(function (t) {
 			t.classList.remove('ln-sort-asc', 'ln-sort-desc');
@@ -99,6 +84,23 @@ import { persistGet, persistSet } from '../../ln-core';
 			sortType: th.getAttribute(SORT_ATTR),
 			direction: newDir
 		});
+	};
+
+	_component.prototype._handleClick = function (colIndex, th) {
+		let newDir;
+
+		if (this._col !== colIndex) {
+			newDir = 'asc';
+		} else if (this._dir === 'asc') {
+			newDir = 'desc';
+		} else if (this._dir === 'desc') {
+			newDir = null;
+		} else {
+			newDir = 'asc';
+		}
+
+		this._applySort(colIndex, th, newDir);
+
 		const persistRoot = this.table.closest('[data-ln-table][data-ln-persist]');
 		if (persistRoot) {
 			if (newDir === null) {
