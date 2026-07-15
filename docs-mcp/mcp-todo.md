@@ -96,20 +96,20 @@
 
 - [ ] **ln-nav**
 - [ ] **ln-router**
-- [ ] **ln-link**
+- [x] **ln-link**
 - [ ] **ln-external-links**
-- [ ] **ln-ajax** — AJAX навигација (`data-ln-ajax`)
+- [x] **ln-ajax** — AJAX навигација (`data-ln-ajax`)
 
 #### Сервиси со markup контакт
 
-- [ ] **ln-icons** — се врзува за `<use href>`, не за `data-ln-*` — API-то е markup конвенција
+- [x] **ln-icons** — се врзува за `<use href>`, не за `data-ln-*` — API-то е markup конвенција
 - [ ] **ln-translations**
 - [ ] **ln-progress**
-- [ ] **ln-circular-progress**
+- [x] **ln-circular-progress**
 
 ### 3Б. Позадински API — за развивачи на свои компоненти/координатори (9)
 
-Публика: некој што гради СВОЈА компонента/координатор врз библиотеката.
+Публика: некој што гради СВОја компонента/координатор врз библиотеката.
 `classification: service`. Овие немаат markup темплејти — §2 покажува JS употреба
 (import + повик), §3 е API табела. Сите линкаат назад кон `guides/component-authoring`.
 
@@ -117,10 +117,10 @@
 - [ ] **ln-helpers** — извор: `js/ln-core/helpers.js` — ⚠ отворена одлука при пишување: дали се спојува во **ln-core** (преклоп)
 - [ ] **ln-reactive** — `reactiveState`/`deepReactive`/`createBatcher` — извори: `js/ln-core/reactive.js`, `docs/js/core.md`
 - [x] **positioning** — споделено viewport-aware позиционирање (dropdown/popover/tooltip) — извор: `js/ln-core/positioning.js`
-- [ ] **ln-hash** — hash state примитив — извор: `js/ln-core/hash.js` (го користат ln-router, ln-tabs)
+- [x] **ln-hash** — hash state примитив — извор: `js/ln-core/hash.js` (го користат ln-router, ln-tabs)
 - [ ] **ln-persist** — localStorage persistence примитив — извор: `js/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-table-sort)
-- [ ] **ln-crypto** — извор: `js/ln-core/crypto.js`
-- [ ] **ln-http** — event-driven JSON fetch со abort — извори: `js/ln-http/`, `docs/js/http.md`
+- [x] **ln-crypto** — извор: `js/ln-core/crypto.js`
+- [x] **ln-http** — event-driven JSON fetch со abort — извори: `js/ln-http/`, `docs/js/http.md`
 - [ ] **ln-debug** — dev дијагностика (не е за production употреба) — извор: `js/ln-debug/`
 
 ---
