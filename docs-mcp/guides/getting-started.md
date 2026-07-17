@@ -3,41 +3,98 @@ name: getting-started
 classification: guide
 status: draft
 domain: frontend
-summary: Quickstart guide to install ln-ashlar, link precompiled assets, and build your first progressive interface.
+summary: Quickstart guide covering every way to install ln-ashlar — CDN, npm, self-hosted build, and git submodule — then building your first progressive DOM-First interface.
 source:
-tags: [installation, setup, quickstart, html]
+tags: [installation, setup, quickstart, cdn, npm, submodule, html]
 ---
 
 # 🚀 Getting Started
 
 ## Summary
 
-This guide walks you through installing `ln-ashlar` in your project, referencing the precompiled distribution assets (`dist/`), and building your first fully-functional, progressive DOM-First interface with zero application JavaScript.
+This guide walks you through the four supported ways to bring `ln-ashlar` into any project — from a zero-build static HTML page to a bundler-driven application — then building your first fully-functional, progressive DOM-First interface with zero application JavaScript. Pick the installation path that matches your project's needs; they all end at the same two assets referenced from your HTML shell.
 
 ---
 
 ## 1. Installation
 
-`ln-ashlar` is designed to be easily integrated into any web application framework (such as Laravel, Go, Rails, or Node) or dropped directly into static HTML files.
+`ln-ashlar` distributes two forms of the library:
 
-### Option A: Install via NPM (For build pipelines)
+- **Compiled drop-in assets** — `ln-ashlar.css` and `ln-ashlar.iife.js` (zero-dependency, self-initializing). Just link them; no build needed.
+- **SCSS / JS source** — `scss/` partials and `js/` ES modules, for projects that compile ashlar inside their own build pipeline.
+
+Choose the path that fits your project. Every path finishes at the same two references in your HTML shell (§2).
+
+| Your project | Use path |
+|---|---|
+| Static HTML, prototype, no build step | **A — CDN** |
+| App with a bundler (Vite, webpack, Laravel Mix, …) | **B — npm + your build** |
+| Self-hosted compiled assets, no runtime build | **C — Precompiled, self-hosted** |
+| Monorepo / vendored dependency pinned to a commit | **D — Git submodule** |
+
+### Path A: CDN (no build, fastest)
+
+Reference the precompiled bundle straight from jsDelivr, pinned to a published release tag. Nothing to install:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/livenetworks/ln-ashlar@1.5.3/demo/dist/ln-ashlar.css">
+<script src="https://cdn.jsdelivr.net/gh/livenetworks/ln-ashlar@1.5.3/demo/dist/ln-ashlar.iife.js" defer></script>
+```
+
+Always pin to a released tag (e.g. `@1.5.3`) — never a moving branch — so production builds stay reproducible.
+
+### Path B: npm (you have a build pipeline)
+
 Add the package as a runtime dependency:
+
 ```bash
 npm install @livenetworks/ashlar
 ```
 
-### Option B: Precompiled Assets (Local Build)
-If you prefer not to use a build system pipeline during application runtime, clone the repository and compile the assets locally using the build scripts:
-1. Run `npm run build` in the repository root directory.
-2. Copy the resulting production-ready assets from the generated `demo/dist/` (or package output) directories into your project's public assets folder:
-   - `ln-ashlar.css` — contains all layout grid, typography, tokens, variables, and component styles.
-   - `ln-ashlar.iife.js` — contains the compiled, zero-dependency, self-initializing JavaScript component library.
+The npm package ships **source, not a prebuilt bundle** — `scss/` partials and `js/` ES modules. Import them into your own build so your bundler compiles ashlar alongside your application code:
+
+```scss
+// your app's main stylesheet
+@use "@livenetworks/ashlar/scss/ln-ashlar";
+```
+
+```js
+// your app's main script — the library self-initializes on import
+import "@livenetworks/ashlar/js/index.js";
+```
+
+There is no `dist/` folder inside `node_modules`. If you want ready-made compiled files instead of building them yourself, use Path A, C, or D.
+
+### Path C: Precompiled, self-hosted
+
+For consumers who want the compiled files on their own server with no runtime build step. The compiled bundle is committed in the repository under `demo/dist/`, so a clone gives you working assets immediately:
+
+```bash
+git clone https://github.com/livenetworks/ln-ashlar.git
+cd ln-ashlar
+npm install && npm run build   # optional — demo/dist/ is already committed; rebuild only to pick up latest source
+```
+
+Copy these two files into your project's public assets folder and reference them with local paths in §2:
+
+- `demo/dist/ln-ashlar.css` — all layout grid, typography, tokens, variables, and component styles.
+- `demo/dist/ln-ashlar.iife.js` — the compiled, zero-dependency, self-initializing component library.
+
+### Path D: Git submodule
+
+For monorepos or projects that vendor dependencies pinned to an exact commit:
+
+```bash
+git submodule add https://github.com/livenetworks/ln-ashlar.git vendor/ln-ashlar
+```
+
+Because the compiled bundle is committed, reference `vendor/ln-ashlar/demo/dist/ln-ashlar.css` and `vendor/ln-ashlar/demo/dist/ln-ashlar.iife.js` directly — no build required. Run `npm install && npm run build` inside `vendor/ln-ashlar/` only if you modify the source and need to recompile.
 
 ---
 
 ## 2. Setting Up the HTML Shell
 
-To begin using the library, reference the stylesheet in the `<head>` and load the JavaScript bundle at the bottom of your HTML document. 
+Reference the stylesheet in the `<head>` and load the JavaScript bundle at the bottom of your HTML document. Point both at wherever your chosen Path (§1) placed the assets — the example below uses a self-hosted `/dist/` location; for **Path A** paste the jsDelivr URLs directly.
 
 Make sure to set the `lang` attribute on the `<html>` element so that number, date, and time components auto-localize to the correct language using browser `Intl` APIs.
 
@@ -48,7 +105,7 @@ Make sure to set the `lang` attribute on the `<html>` element so that number, da
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My First Ashlar App</title>
-    
+
     <!-- Link the base design system & components style -->
     <link rel="stylesheet" href="/dist/ln-ashlar.css">
 </head>
