@@ -28,7 +28,7 @@ Discussion happens in main chat, execution in separate chats.
 ## 4. ln-acme Documentation Refactor (DONE)
 - [x] COMPONENTS.md — findElements in ln-core table + instance pattern updated
 - [x] component-guide.md — trigger re-init guard + destroy() cleanup in checklist
-- [x] v2-reactive.md — translate + rewrite as reference doc (pattern now in COMPONENTS.md)
+- [x] reactive.md — translate + rewrite as reference doc (pattern now in COMPONENTS.md)
 
 ## 5. ln-acme Component Refactor (DONE except new features)
 - [x] Phase A — _findElements → findElements in 4 files (ln-ajax, ln-link, ln-progress, ln-table-sort)

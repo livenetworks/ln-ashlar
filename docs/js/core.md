@@ -92,6 +92,9 @@ fill(li, { number: 1, title: 'Track', artist: 'Artist', isPlaying: true });
 | `data-ln-show="prop"` | `el.classList.toggle('hidden', !data[prop])` | `<span data-ln-show="hasError">` |
 | `data-ln-class="cls:prop"` | `el.classList.toggle(cls, !!data[prop])` | `<li data-ln-class="active:isPlaying">` |
 
+> [!IMPORTANT]
+> These four are `fill()` **binding attributes, not components** — there is no `ln-field`, `ln-attr`, `ln-show`, or `ln-class` element. They apply only where a component calls `fill()`.
+
 - Returns `root` for chaining
 - Skips `null`/`undefined` values (existing content preserved)
 - Nothing calls `fill()` automatically — a component must call it explicitly, and re-call it to update. Renderer pipelines that clone templates (`ln-table` rows, `renderList`'s clone pass) do not call `fill()`; inside those templates use `{{ field }}` instead. `fill()` does not process `{{ }}` placeholders.

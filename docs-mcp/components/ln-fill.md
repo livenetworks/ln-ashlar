@@ -87,6 +87,19 @@ When using a hash-bound trigger, `ln-fill` skips direct click population and del
 | `data-ln-fill-*` | Trigger | `String` | - | Form values. Keys are converted to camelCase (e.g. `data-ln-fill-user-name` → `userName`). |
 | `data-ln-fillable` | Display container | Boolean (presence) | - | Marks a read-only display container as a fill target. A delegated `ln-core` listener populates its `[data-ln-field]` descendants from the record (`lnCore.fill`), or clears their text content when the record is `null`. Never used on forms — `data-ln-form` targets handle the `ln-fill` event themselves. |
 
+### Display Fill Vocabulary — `fill()` bindings (not components)
+
+When `lnCore.lnFill` populates a `[data-ln-fillable]` container — or a component calls `lnCore.fill(root, data)` directly — it reads four **binding attributes** off the container's descendants. These are declarative instructions consumed by the `fill()` helper in `ln-core`, **not** custom elements or auto-initializing components: there is no `ln-field`, `ln-attr`, `ln-show`, or `ln-class`. They do nothing on their own and take effect only where `fill()` runs. Apply them to standard HTML tags.
+
+| Attribute | Element | Applies | Description |
+|---|---|---|---|
+| `data-ln-field` | Display node | `el.textContent = data[prop]` | Binds one record property to text content. |
+| `data-ln-attr` | Display node | `el.setAttribute(attr, data[prop])` | Comma-separated `attr:prop` pairs, e.g. `src:avatar, alt:name`. |
+| `data-ln-show` | Display node | `el.classList.toggle('hidden', !data[prop])` | Shows the node when the bound property is truthy. |
+| `data-ln-class` | Display node | `el.classList.toggle(cls, !!data[prop])` | Comma-separated `cls:prop` pairs, e.g. `active:isSelected`. |
+
+All four skip `null`/`undefined` values, preserving existing content. Source: `js/ln-core/helpers.js` (`fill`).
+
 ### Programmatic JS API
 
 `window.lnCore.lnFill` is the actual population routine. Both the click-triggered path and the `ln-fill:request` event path resolve a record and hand off to this helper — it is the single fan-out point that performs the DOM population.
