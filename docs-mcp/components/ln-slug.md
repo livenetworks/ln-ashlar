@@ -67,7 +67,7 @@ Standard copy-paste implementation showing a slug input linked to an article tit
 
 ### Events API
 
-`ln-slug` does not emit custom events. To support coordination with validation helpers, it dispatches native **`input`** events (`{ bubbles: true }`) to the target input upon every auto-filled update.
+This component emits and listens to no custom ln-* events.
 
 ---
 

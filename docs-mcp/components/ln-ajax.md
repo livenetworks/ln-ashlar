@@ -92,10 +92,10 @@ Excludes specific nested elements (links/forms) from being intercepted inside an
 
 ### Attributes Table
 
-| Attribute | Element | Type / Values | Description |
-|---|---|---|---|
-| `data-ln-ajax` | Container/Form/Link | *none* (empty attribute) | Enables AJAX routing for the container and its descendants (or the specific form/link). Acts as a boolean flag. |
-| `data-ln-ajax="false"` | Link/Form | `"false"` | **The only supported value.** Exempts/excludes the specific link or form from AJAX interception. |
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-ajax` | Container/Form/Link | *none* (empty attribute) | — | Enables AJAX routing for the container and its descendants (or the specific form/link). Acts as a boolean flag. |
+| `data-ln-ajax="false"` | Link/Form | `"false"` | — | **The only supported value.** Exempts/excludes the specific link or form from AJAX interception. |
 
 > [!IMPORTANT]
 > **Attribute Value Restriction:** The `data-ln-ajax` attribute operates as a presence-based trigger (like a boolean flag). 

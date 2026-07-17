@@ -68,7 +68,7 @@ When data is loaded dynamically or rendered by the server, the component automat
 
 ### Events API
 
-`ln-autoresize` does not emit custom events. It functions entirely by listening to native **`input`** events on target `<textarea>` nodes.
+This component emits and listens to no custom ln-* events.
 
 ---
 

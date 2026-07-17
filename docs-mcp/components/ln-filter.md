@@ -142,26 +142,29 @@ The canonical composition for `ln-table` per-column filters. `ln-filter` dispatc
 
 ## 3. Declarative API Contract (Attributes & Events)
 
-### HTML Attributes
+### Attributes Table
 
-| Attribute | Element | Type | Default | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `data-ln-filter` | Container root | `String` | *(Required)* | Target container `id` (list, table, or `ln-table`) whose elements are filtered. |
-| `data-ln-filter-key` | `<input type="checkbox">` | `String` | `null` | The field name/key to match (corresponds to `data-[key]` on children, or column field name). |
-| `data-ln-filter-value` | `<input type="checkbox">` | `String` | `""` | Value to match. Active inputs keep matching items visible. |
-| `data-ln-filter-reset` | `<input type="checkbox">` | `Flag` | `false` | Marks the reset sentinel input ("All"). Unchecks all value inputs when checked. |
-| `data-ln-filter-col` | Container root | `Number` | `null` | 0-based column index to filter rows in a plain HTML `<table>` by cell content. |
-| `data-ln-persist` | Container root | `Flag`/`String` | `false` | Enables state persistence in `localStorage` using the element's `id` or given key. |
-| `data-ln-filter-hide` | Target children | `Boolean` | `false` | *State attribute* applied as `data-ln-filter-hide="true"` on elements that do not match the active filters. |
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-filter` | Container root (`<ul>` / `<table>` / filter wrapper) | `String` | — *(required)* | Target container `id` (list, plain table, or `ln-table`) whose elements are filtered. |
+| `data-ln-filter-key` | `<input type="checkbox">` | `String` | — | Field name/key to match (corresponds to `data-[key]` on target children, or the filter key for table column filtering). |
+| `data-ln-filter-value` | `<input type="checkbox">` | `String` | `""` | Value to match. Checked inputs keep matching items visible (OR logic within the same key). |
+| `data-ln-filter-reset` | `<input type="checkbox">` | Flag | — | Marks the reset sentinel input ("All"). Checking it unchecks every value input in the group. |
+| `data-ln-filter-col` | Container root | `Number` | — | 0-based column index to filter rows in a plain HTML `<table>` by cell content. |
+| `data-ln-persist` | Container root | Flag \| `String` | — | Enables `localStorage` persistence of the active filter state, keyed by the container's `id` or by the attribute's string value. |
+| `data-ln-filter-hide` | Target children / rows | `"true"` | — | Written by the component on elements that fail the active filters. |
 
-### DOM Events (Events API)
+> [!NOTE]
+> `data-ln-filter-hide` is a component-written **state marker**, not a consumer configuration attribute — never author it in markup. It is listed here only to document the DOM the component produces.
+
+### Events API
 
 `ln-filter` dispatches events on both the filter container (`this.dom`) and the target element (`document.getElementById(targetId)`) simultaneously (Dual Dispatch).
 
-| Event | Target | Detail (`event.detail`) | Description |
-| :--- | :--- | :--- | :--- |
-| `ln-filter:changed` | Filter Root + Target | `{ key: string, values: string[] }` | Fired on any change in the selected filter values. |
-| `ln-filter:reset` | Filter Root + Target | `{}` | Fired only when transitioning from an active state back to the reset sentinel ("All"). |
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-filter:changed` | Emits | No | Fired on the filter root and the target element whenever the active filter selection changes. | `{ key: String, values: String[] }` |
+| `ln-filter:reset` | Emits | No | Fired on the filter root and the target element only when transitioning from an active filter state back to the reset sentinel ("All"). | `{}` |
 
 ---
 

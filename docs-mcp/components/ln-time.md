@@ -126,7 +126,7 @@ Instance interfaces accessed via `element.lnTime`:
 
 ### Events API
 
-To maintain peak rendering performance, `ln-time` is a presentation-only component and **emits no custom DOM events**. It reacts to attribute changes dynamically via the central `MutationObserver` in `ln-core`.
+This component emits and listens to no custom ln-* events.
 
 ---
 
