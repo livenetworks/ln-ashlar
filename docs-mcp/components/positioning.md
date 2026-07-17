@@ -32,7 +32,7 @@ Key responsibilities include:
 
 ---
 
-## 2. Programmatic JavaScript Usage
+## 2. Minimal HTML Markup & Usage Variants
 
 Since `positioning` is an infrastructure JS utility, it is imported and invoked directly within component and coordinator scripts:
 
@@ -56,7 +56,7 @@ popup.style.left = coords.left + 'px';
 
 ---
 
-## 3. API Reference (Functions & Signatures)
+## 3. Declarative API Contract (Attributes & Events)
 
 The module exports the following functions:
 
