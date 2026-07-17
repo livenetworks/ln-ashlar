@@ -83,9 +83,11 @@ In SSR mode, the table is functional immediately with the server-rendered markup
 
 ---
 
-### Data-Driven Mode Setup
+### Variant 1: Data-Driven Mode
 
-In Data-Driven mode, the table queries the store and connects through a coordinator:
+Use when the table queries a store and connects through a coordinator rather than hydrating static SSR markup.
+
+#### HTML Markup
 
 ```html
 <div data-ln-data-coordinator="products" id="products-coordinator">
@@ -131,9 +133,9 @@ In Data-Driven mode, the table queries the store and connects through a coordina
 
 ## 3. Declarative API Contract (Attributes & Events)
 
-### Configuration Attributes
+### Attributes Table
 
-| Attribute | Element | Type | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-table` | Root container | `String` | - | Identifies the table. The value names generated events. Must have a unique `id`. |
 | `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the data source name. |
@@ -163,22 +165,26 @@ In Data-Driven mode, the table queries the store and connects through a coordina
 
 ### Events API
 
-#### Subscribed Events (Listeners)
-* **`ln-table:set-data`:** Populates table with a raw dataset. `detail: { data: Array, total: Number, filtered: Number }`
-* **`ln-table:set-loading`:** Displays loading spinner overlay. `detail: { loading: Boolean }`
-* **`ln-search:change`:** Triggers local/server-side search matching. `detail: { term: String }`
-* **`ln-filter:changed`:** Triggers column filtering. `detail: { key: String, values: Array }`
-* **`ln-table:sort` (SSR Mode):** Dispatched by `ln-table-sort.js` to execute local row re-ordering. `detail: { column: Number, direction: String, sortType: String }`
-
-#### Dispatched Events
-* **`ln-table:ready`:** Fired on initial hydrate/parse. `detail: { total: Number }`
-* **`ln-table:request-data`:** Requests new data due to sort/filter/search in Data-Driven mode. `detail: { table: String, sort: Object, filters: Object, search: String }`
-* **`ln-table:sort` (Data-Driven Mode):** Emitted on header sort click. `detail: { table: String, field: String, direction: String|null }`
-* **`ln-table:search`:** Emitted when receiving search inputs. `detail: { table: String, query: String }`
-* **`ln-table:clear-filters`:** Emitted on clear-all click. `detail: { table: String }`
-* **`ln-table:row-click`:** Emitted on standard row row left-click. `detail: { table: String, id: String, record: Object }`
-* **`ln-table:row-action`:** Emitted on row action button click. `detail: { table: String, id: String, action: String, record: Object }`
-* **`ln-table:select`:** Emitted on row select toggle. `detail: { table: String, selectedIds: Set, count: Number }`
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). | `{ data: Array, total: Number, filtered: Number }` |
+| `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` overlay class (Data-Driven mode). | `{ loading: Boolean }` |
+| `ln-search:change` | Listens | No | Triggers local (SSR) or server-side (Data-Driven) search matching. | `{ term: String }` |
+| `ln-filter:changed` | Listens | No | Applies column filter values in both SSR and Data-Driven modes. | `{ key: String, values: Array }` |
+| `ln-table:sort` | Listens | No | SSR mode only — dispatched externally by `ln-table-sort.js` to execute local row re-ordering. | `{ column: Number, direction: String\|null, sortType: String }` |
+| `ln-table:ready` | Emits | No | Fired once after initial row hydration/parsing completes (SSR and Data-Driven modes). | `{ total: Number }` |
+| `ln-table:rendered` | Emits | No | Fired after `ln-table:set-data` finishes rendering (Data-Driven mode). | `{ table: String, total: Number, visible: Number }` |
+| `ln-table:request-data` | Emits | No | Requests a new data page from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). | `{ table: String, sort: Object\|null, filters: Object, search: String }` |
+| `ln-table:sort` | Emits | No | Emitted on column header sort click (Data-Driven mode). | `{ table: String, field: String, direction: String\|null }` |
+| `ln-table:sorted` | Emits | No | Emitted after applying a local sort (SSR mode). | `{ column: Number, direction: String\|null, matched: Number, total: Number }` |
+| `ln-table:filter` | Emits | No | Emitted after applying search, column filter, or clear actions locally (SSR mode). | `{ term: String, matched: Number, total: Number }` |
+| `ln-table:search` | Emits | No | Emitted when receiving an `ln-search:change` term, before requesting fresh data (Data-Driven mode). | `{ table: String, query: String }` |
+| `ln-table:clear-filters` | Emits | No | Emitted on clear-all button click, before requesting fresh data (Data-Driven mode). | `{ table: String }` |
+| `ln-table:row-click` | Emits | No | Emitted on row left-click or `Enter` keypress (Data-Driven mode). | `{ table: String, id: String, record: Object }` |
+| `ln-table:row-action` | Emits | No | Emitted on a row action button click (Data-Driven mode). | `{ table: String, id: String, action: String, record: Object }` |
+| `ln-table:select` | Emits | No | Emitted on individual row selection toggle and after select-all (Data-Driven mode). | `{ table: String, selectedIds: Set, count: Number }` |
+| `ln-table:select-all` | Emits | No | Emitted when the header "select all" checkbox is toggled (Data-Driven mode). | `{ table: String, selected: Boolean }` |
+| `ln-table:empty` | Emits | No | Emitted when the empty-state template is rendered (SSR and Data-Driven modes). | `{ term: String, total: Number }` |
 
 ---
 

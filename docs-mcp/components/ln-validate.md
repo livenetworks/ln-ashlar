@@ -128,7 +128,8 @@ To support validation errors returned from the backend (e.g. "username taken").
 | `ln-validate:destroyed` | Emits | No | Dispatched when the component is destroyed. | `{ target: HTMLElement }` |
 | `ln-validate:set-custom` | Listens | No | Sets a manual custom error key on the input. | `{ error: String }` |
 | `ln-validate:clear-custom` | Listens | No | Clears a custom error key. | `{ error?: String }` |
-| `ln-validate:request-validate` | Emits (form) / Listens (field) | No | The submit gate: the first `data-ln-validate` field to initialize on a form injects `novalidate` and attaches a form-level `submit` listener that dispatches this event on the form to collect invalid fields; every field instance listens for it on the form and pushes itself into `invalidFields` if invalid. | `{ invalidFields: Array<HTMLElement> }` |
+| `ln-validate:request-validate` | Emits | No | The submit gate — the first `data-ln-validate` field to initialize on a form injects `novalidate` and attaches a form-level `submit` listener that dispatches this event on the form to collect invalid fields before allowing submission. | `{ invalidFields: Array<HTMLElement> }` |
+| `ln-validate:request-validate` | Listens | No | Every `data-ln-validate` field instance listens for this event on its parent form; when received, it marks itself touched, runs `validate()`, and pushes itself into `invalidFields` if invalid. | `{ invalidFields: Array<HTMLElement> }` |
 
 ---
 

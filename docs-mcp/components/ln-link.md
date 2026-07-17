@@ -78,9 +78,9 @@ Used inside grids to navigate to a record detail view when clicking anywhere on 
 
 ### Attributes Table
 
-| Attribute | Element | Type / Values | Description |
-|---|---|---|---|
-| `data-ln-link` | Container | `Flag` | Activates link behavior on containers (`<div>`, `<article>`, `<table>`, `<tbody>`, etc.). |
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-link` | Container | `Flag` | — | Activates link behavior on containers (`<div>`, `<article>`, `<table>`, `<tbody>`, etc.). |
 
 ### Events API
 

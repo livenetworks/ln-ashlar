@@ -48,6 +48,8 @@ Short explanation of when to use it.
 
 ### Attributes Table
 
+<!-- If the component has no attributes, replace this table with the canonical none-declaration sentence — see README §Normative Tables. -->
+
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-name` | Panel | `"a"` \| `"b"` | `"a"` | ... |
@@ -66,6 +68,8 @@ Short explanation of when to use it.
 | `window.lnCore.lnName` | `(container: HTMLElement, record: Object)` | `void` | ... |
 
 ### Events API
+
+<!-- If the component has no custom events, replace this table with the canonical none-declaration sentence — see README §Normative Tables. -->
 
 <!-- The Events table is a full protocol inventory: every event the component
      emits or listens to — including lifecycle events (`:destroyed`,

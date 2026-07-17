@@ -90,6 +90,12 @@ The templates in `_templates/` are the only allowed structures:
 
 `Direction` is either `Emits` or `Listens`.
 
+**Empty sub-sections — explicit none-declaration.** In `simple` and `coordinator` documents, §3 always contains BOTH `### Attributes Table` and `### Events API`. When a component has no configuration attributes (or no custom events), the sub-section is NOT omitted or left blank — it holds a single explicit sentence:
+- Attributes: `This component reads no data-ln-* configuration attributes.`
+- Events: `This component emits and listens to no custom ln-* events.`
+
+A component with any custom event — in either direction — documents it in the Events table (the `Direction` column distinguishes emit vs listen); the events none-declaration is used only when the component has no custom events at all. `service` documents are exempt (their §3 is a functions API).
+
 **SCSS API** (CSS documents, §3):
 
 | Name | Kind | Parameters / Values | Description |

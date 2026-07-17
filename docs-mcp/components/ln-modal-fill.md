@@ -67,7 +67,7 @@ Below is a typical setup showing a link opening an edit modal and the coordinato
 
 ### Attributes Table
 
-`ln-modal-fill` is a stateless coordinator and has no HTML markup attributes of its own.
+This component reads no data-ln-* configuration attributes.
 
 ### Events API
 
