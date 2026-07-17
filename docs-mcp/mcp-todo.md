@@ -26,7 +26,7 @@
 
 ## Фаза 2 — guides/
 
-- [x] **getting-started** — инсталација, dist/, прв markup — ⚠ нема извор, се пишува одново — ⚠ критичен наод (dist/ не се шипува преку npm) → `refactor-todo.md` §4.2
+- [x] **getting-started** — инсталација, dist/, прв markup — ⚠ нема извор, се пишува одново — ✔ dist/-не-се-шипува-преку-npm наодот РЕШЕН на doc-слој (2026-07-17): §1 сега документира сите 4 патишта (A CDN преку jsDelivr@gh/demo/dist, B npm=извор+сопствен build, C precompiled self-host clone, D git submodule); npm-патот повеќе не праќа на непостоечки node_modules/dist. Отворено (packaging одлука кај корисникот, НЕ doc): дали воопшто да се шипува вистински `dist/` на npm
 - [x] **write-workflow** — форма → scope → coordinator → конектор → toast — извори: `architecture_docs_draft/write-workflow-guide.md`, `architecture_docs_draft/form-write-workflow.md` ⚠ двата draft-а се пред v2 rulings — задолжителна проверка наспроти кодот — ⚠ критични наоди (pre-v2 `_pending`/reverts/`field_diffs`) → `refactor-todo.md` §4.1
 - [x] **spa-routing** — hash state + router — извори: `docs/architecture/hash-state.md`, `docs/js/router.md`
 - [x] **component-authoring** — како се прави СВОЈА компонента: IIFE, attribute bridge (setAttribute = single source of truth), MutationObserver (childList + attributes), lifecycle events (`before-*` cancelable + post), template систем (`cloneTemplate`/`cloneTemplateScoped` + `fill`), dict pattern (i18n), co-located SCSS, API export патерни — извори: `js/COMPONENTS.md` (главна библија, интерна, англиски), `docs/js/component-guide.md`, `docs/architecture/reference.md#adding-a-new-js-component`
