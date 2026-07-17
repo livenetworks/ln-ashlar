@@ -80,6 +80,15 @@ fill(containerEl, {
 
 ### Bindings
 
+> [!IMPORTANT]
+> **These are `fill()` bindings — NOT components.**
+> `data-ln-field`, `data-ln-attr`, `data-ln-show`, and `data-ln-class` are the four
+> binding instructions the `fill(root, data)` helper reads from `ln-core`. None is a
+> custom element or auto-initializing component — there is no `ln-field`, `ln-attr`,
+> `ln-show`, or `ln-class`. They do nothing on their own and take effect only where a
+> component explicitly calls `fill()`. Apply them to standard HTML tags (`<h3>`, `<img>`,
+> `<span>`, …).
+
 **`data-ln-field="prop"` → `textContent`**
 
 ```html
@@ -88,10 +97,6 @@ fill(containerEl, {
 ```
 
 Sets `el.textContent = data[prop]`. Skips if `data[prop]` is `null` or `undefined`.
-
-> [!IMPORTANT]
-> **`data-ln-field` is NOT a Custom Component**
-> There is no custom HTML element or component named `<ln-field>`. The `data-ln-field` attribute is a decorative binding instruction read and processed by the `fill(root, data)` utility function in `ln-core`. It should be applied to standard HTML tags (like `<h3>`, `<p>`, `<span>`, etc.).
 
 > [!WARNING]
 > **`data-ln-field` works only where `fill()` runs — and nothing calls `fill()` automatically.**
