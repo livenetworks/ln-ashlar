@@ -40,10 +40,15 @@ Wrap interactive elements or entire layouts with the `data-ln-ajax` selector.
 
 ### HTML Attributes
 
-| Attribute | Elements | Description |
-| :--- | :--- | :--- |
-| `data-ln-ajax` | Container, `<a>`, `<form>` | Activates AJAX capture on the element and its descendants. |
-| `data-ln-ajax="false"` | `<a>`, `<form>` | Excludes the specific link or form from AJAX interception. |
+| Attribute | Elements | Values | Description |
+| :--- | :--- | :--- | :--- |
+| `data-ln-ajax` | Container, `<a>`, `<form>` | *none* (empty attribute) | Activates AJAX capture on the element and its descendants. Acts as a boolean flag. |
+| `data-ln-ajax="false"` | `<a>`, `<form>` | `"false"` | **The only supported value.** Excludes the specific link or form from AJAX interception. |
+
+> [!IMPORTANT]
+> **Attribute Value Restriction:** The `data-ln-ajax` attribute operates as a presence-based trigger (like a boolean flag). 
+> * **The only valid and supported value is `"false"`**, which is used to exclude/opt-out specific elements inside an AJAX-enabled container.
+> * **Do not use custom values** (e.g., `data-ln-ajax="loginform"` or `data-ln-ajax="my-widget"`). The component does **not** accept, process, or assign behavior based on other string values. Using custom values will simply activate normal AJAX routing (acting the same as an empty attribute) but is a major anti-pattern that confuses both developers and AI agents.
 
 ### Server Response Protocol
 
