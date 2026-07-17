@@ -76,24 +76,21 @@ triggerEl.addEventListener('ln-http:error', function(e) {
 
 ### Events API
 
-`ln-http` listens to events on the `document` level and emits response details directly back to the event trigger element (`e.target`).
+`ln-http` listens for `ln-http:request` on `document` and emits response/error events on the triggering element.
 
-#### Custom Event: `ln-http:request` (Listened to at `document` level)
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-http:request` | Listens | No | Dispatched by a consumer (must `bubble` to `document`) to run a deduplicated request; response/error fire back on the dispatching element. | `{ url, method?, body?, key?, signal? }` |
+| `ln-http:response` | Emits | No | Fired on the triggering element when a request completes (any HTTP status, e.g. 200/404/500). | `{ ok: Boolean, status: Number, response: Response }` |
+| `ln-http:error` | Emits | No | Fired on the triggering element on network failure (DNS/CORS/loss); never fires on manual or automatic abort. | `{ ok: false, status: 0, error: Error }` |
 
-| `detail` Attribute | Type | Default | Description |
-|---|---|---|---|
-| `url` | `String` | *Required* | The target URL of the request. |
-| `method` | `String` | `'GET'` (or `'POST'` if body is present) | The HTTP method (GET, POST, PUT, DELETE, etc.). Uppercased automatically. |
-| `body` | `any` | `undefined` | The body payload of the request. |
-| `key` | `String` | `undefined` | Optional deduplication key for Path B. |
-| `signal` | `AbortSignal` | `undefined` | External AbortSignal to combine with the internal AbortController. |
+The `ln-http:request` `detail` fields:
 
-#### Custom Events Emitted (Fires on the triggering element)
-
-| Event | Cancelable | Description | `detail` Object |
-|---|---|---|---|
-| `ln-http:response` | No | Emitted when a request completes successfully (e.g. 200, 404, 500 status codes). | `{ ok: Boolean, status: Number, response: Response }` |
-| `ln-http:error` | No | Emitted upon network failure (DNS failure, CORS rejection, network loss). Does not fire on manual or automatic abort actions. | `{ ok: false, status: 0, error: Error }` |
+- **`url`** (`String`, required) — the target URL of the request.
+- **`method`** (`String`, default `'GET'`, or `'POST'` when a body is present) — the HTTP method; uppercased automatically.
+- **`body`** (`any`, default `undefined`) — the request body payload.
+- **`key`** (`String`, default `undefined`) — optional deduplication key (Path B); a new request with the same key aborts the previous in-flight one.
+- **`signal`** (`AbortSignal`, default `undefined`) — external AbortSignal combined with the internal controller.
 
 ### Programmatic JS API (via `window.lnHttp`)
 
