@@ -43,7 +43,7 @@ LInks inside the container are loaded via fetch, and targets are updated based o
 
 ```html
 <!-- Container where all child link navigations are handled via AJAX -->
-<div data-ln-ajax="dashboard" id="main-content">
+<div data-ln-ajax id="main-content">
     <nav>
         <a href="/dashboard/analytics">Analytics</a>
         <!-- This link navigates normally (no AJAX) -->
@@ -62,10 +62,28 @@ Submits form data asynchronously and receives updating DOM fragments.
 
 #### HTML Markup
 ```html
-<form action="/api/posts/save" method="POST" data-ln-ajax="form-post">
+<form action="/api/posts/save" method="POST" data-ln-ajax>
     <input type="text" name="title" required />
     <button type="submit">Save Post</button>
 </form>
+```
+
+### Variant 2: AJAX Container with Excluded Elements
+
+Excludes specific nested elements (links/forms) from being intercepted inside an AJAX-enabled container by using `data-ln-ajax="false"`.
+
+#### HTML Markup
+```html
+<!-- Container triggers AJAX routing for all descendants -->
+<div data-ln-ajax id="app-container">
+    <!-- These will use AJAX -->
+    <a href="/dashboard">Dashboard</a>
+    <form action="/update-settings" method="POST"> ... </form>
+
+    <!-- Excluded: These will perform native browser navigation / submission -->
+    <a href="/download-pdf" data-ln-ajax="false">Download PDF</a>
+    <form action="/legacy-logout" method="POST" data-ln-ajax="false"> ... </form>
+</div>
 ```
 
 ---
@@ -76,8 +94,13 @@ Submits form data asynchronously and receives updating DOM fragments.
 
 | Attribute | Element | Type / Values | Description |
 |---|---|---|---|
-| `data-ln-ajax` | Container/Form | `String` | Enables AJAX routing and names the active instance. |
-| `data-ln-ajax="false"` | Link/Form | `String` | Exempts the specific link or form from AJAX interception. |
+| `data-ln-ajax` | Container/Form/Link | *none* (empty attribute) | Enables AJAX routing for the container and its descendants (or the specific form/link). Acts as a boolean flag. |
+| `data-ln-ajax="false"` | Link/Form | `"false"` | **The only supported value.** Exempts/excludes the specific link or form from AJAX interception. |
+
+> [!IMPORTANT]
+> **Attribute Value Restriction:** The `data-ln-ajax` attribute operates as a presence-based trigger (like a boolean flag). 
+> * **The only valid and supported value is `"false"`**, which is used to exclude/opt-out specific elements inside an AJAX-enabled container.
+> * **Do not use custom values** (e.g., `data-ln-ajax="loginform"` or `data-ln-ajax="my-widget"`). The component does **not** accept, process, or assign behavior based on other string values. Using custom values will simply activate normal AJAX routing (acting the same as an empty attribute) but is a major anti-pattern that confuses both developers and AI agents.
 
 ### Events API
 
