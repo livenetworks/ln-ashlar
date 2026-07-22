@@ -1,10 +1,10 @@
-# MCP Parser Change Spec — Explicit None-Declaration for §3 Sub-sections
+# MCP Parser Change Spec — §3 None-Declaration + Optional §4
 
 > **Audience:** maintainer of the `ln-ashlar` MCP server parser
 > (`validate_docs` tool / `tools/ashlar/lint-cli.js`), which lives in the
 > **server package** (`/home/mcp/server/...`), NOT in the ln-ashlar repo.
 > This file is co-located with the docs corpus (underscore prefix → not
-> indexed) purely as the change brief. Apply the two rule changes below to
+> indexed) purely as the change brief. Apply the three rule changes below to
 > the server-side parser so the corpus convention validates.
 
 ## Why
@@ -50,6 +50,34 @@ For documents with `classification: simple` or `coordinator`:
 API of a different shape. Do not apply the table/none logic to a `service`
 doc's §3.
 
+## Rule 3 — RELAXATION (required): optional `## 4. State & Persistence`
+
+The validator currently requires **exactly 7** numbered top-level `##`
+sections in simple/coordinator docs. The template
+(`_templates/component.md`) declares an OPTIONAL `## 4. State & Persistence`
+section for components that persist state (localStorage / sessionStorage /
+URL hash), with the remaining sections renumbered. Template and validator
+contradict each other; ruling 2026-07-22: **the template wins** — docs keep
+their §4.
+
+Change — accept BOTH skeletons:
+
+- **7 sections** (no persistence, unchanged from today):
+  `1. Core Behavior & Responsibility` · `2. Minimal HTML Markup & Usage
+  Variants` · `3. Declarative API Contract (Attributes & Events)` ·
+  `4. CSS Styling & Behavioral Concept` · `5. Accessibility (ARIA) & Common
+  Pitfalls` · `6. Flow Diagram & Lifecycle` · `7. Related Components`
+- **8 sections** (persistence): same sequence with `4. State & Persistence`
+  inserted at position 4 and the remainder renumbered 5–8.
+
+The ONLY legal 8th section is `State & Persistence`, and ONLY at position 4.
+Any other extra, missing, or reordered section remains an error, same as
+today.
+
+Corpus docs that carry §4 today: `ln-toggle`, `ln-autosave`,
+`ln-data-store`, `ln-api-queue` — currently failing the exactly-7 check;
+they become PASS with Rule 3 and need no repo edits.
+
 ## Sequencing (important)
 
 Rule 2 makes any currently-valid simple/coordinator doc that omits a
@@ -57,6 +85,9 @@ sub-section newly-INVALID. The docs-mcp corpus sweep that adds the missing
 sub-sections must be committed and re-pulled by the server **before or
 together with** enabling Rule 2, otherwise those docs will fail. Rule 1 is
 safe to enable at any time.
+
+Rule 3 is a pure relaxation — safe to enable at any time; no corpus sweep
+required (the four affected docs already carry §4).
 
 ## Canonical none-declaration sentences (authoring convention, NOT parser-enforced)
 
@@ -72,3 +103,5 @@ safe to enable at any time.
 | `### Attributes Table` + empty body | FAIL ("missing table") | FAIL ("present but empty") |
 | simple doc missing `### Events API` entirely | PASS | **FAIL** (Rule 2) |
 | `service` doc (e.g. positioning) §3 = functions table, no Attr/Events headings | PASS | PASS (exempt) |
+| 8-section doc: `## 4. State & Persistence` at position 4, remainder renumbered 5–8 | FAIL (exactly-7) | **PASS** (Rule 3) |
+| 8-section doc: extra section other than `State & Persistence` | FAIL | FAIL |

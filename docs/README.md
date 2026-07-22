@@ -91,7 +91,7 @@ Two files per component:
 | AJAX | `data-ln-ajax` | [js/ln-ajax/README.md](../js/ln-ajax/README.md) | [ajax.md](js/ajax.md) |
 | Router | `data-ln-route` | [js/ln-router/README.md](../js/ln-router/README.md) | [router.md](js/router.md) |
 | HTTP | — | [js/ln-http/README.md](../js/ln-http/README.md) | [http.md](js/http.md) |
-| Store | `data-ln-store` | [js/ln-store/README.md](../js/ln-store/README.md) | [store.md](js/store.md) |
+| Store | `data-ln-data-store` | [js/ln-store/README.md](../js/ln-store/README.md) | [store.md](js/store.md) |
 | Form | `data-ln-form` | [js/ln-form/README.md](../js/ln-form/README.md) | [form.md](js/form.md) |
 | Validate | `data-ln-validate` | [js/ln-validate/README.md](../js/ln-validate/README.md) | [validate.md](js/validate.md) |
 | Time | `data-ln-time` | [js/ln-time/README.md](../js/ln-time/README.md) | [time.md](js/time.md) |

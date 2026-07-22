@@ -86,7 +86,7 @@
 
 #### Податочен слој (декларативно wiring — store/coordinator/конектори)
 
-- [ ] **ln-data-store**
+- [x] **ln-data-store**
 - [x] **ln-data-coordinator** — ⚠ v2 проверка (паралелен fan-out, без pending)
 - [x] **ln-couchdb-connector** — ⚠ draft-от е ДОКАЖАНО застарен (нема `{message,content}` envelope, уште `{record, tempId}`) — `docs/js/couchdb-connector.md` е поточен
 - [x] **ln-api-connector**
