@@ -11,7 +11,7 @@ Modern web development has fallen into a trap of excessive complexity. **`ln-ash
 Instead of downloading megabytes of JavaScript, compiling in runtime, and displaying empty "skeleton screens" while waiting for cascading API waterfalls, `ln-ashlar` champions a **DOM-First, progressive, and local-first** approach:
 
 1. **Server-Rendered HTML**: Your backend (Laravel, Go, Rails, etc.) delivers complete, semantic, indexable HTML. Fast to paint, SEO-friendly, and accessible in milliseconds.
-2. **Zero-Initialization JS**: Modular interactivity is driven by standard HTML attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-store`). A native `MutationObserver` registers and activates components automatically. No `new Component()` or `init()` boilerplate required.
+2. **Zero-Initialization JS**: Modular interactivity is driven by standard HTML attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-data-store`). A native `MutationObserver` registers and activates components automatically. No `new Component()` or `init()` boilerplate required.
 3. **Pure SCSS Styling via `@include`**: HTML remains semantic, describing *what* the element is. SCSS mixins describe *how* it looks. Visual styling is fully decoupled from markup.
 4. **Zero Dependencies**: 100% immune to npm supply chain attacks and package obsolescence. Built exclusively on eternal, backward-compatible W3C web standards (see note below on runtime icon CDN caching).
 
@@ -96,7 +96,7 @@ Deep architectural blueprints detailing the engine driving `ln-ashlar`.
 | Specification | Contents |
 |:---|:---|
 | 📖 **[Architecture Philosophy](docs/architecture/philosophy.md)** | The DOM-First engineering manifesto detailing computing cycles, framework EOL risks, and performance. |
-| 🔄 **[Data Flow Architecture](docs/architecture/data-flow.md)** | Rules governing how data moves. Splits responsibilities into **four isolated concerns**: Data (`ln-store`), Render (`ln-table`), Submit (`ln-form`), and Validate (`ln-validate`). Details the **optimistic and offline write pipeline** with a comprehensive Mermaid flow diagram. |
+| 🔄 **[Data Flow Architecture](docs/architecture/data-flow.md)** | Rules governing how data moves. Splits responsibilities into **four isolated concerns**: Data (`ln-data-store` + `ln-data-coordinator`), Render (`ln-table`), Submit (`ln-form`), and Validate (`ln-validate`). Details the **parallel fan-out write pipeline** (optimistic cache write + offline queue) with a comprehensive Mermaid flow diagram. |
 | 🧭 **[3-Tier Local-First Storage Specs](docs/architecture/data-store-architecture.md)** | Technical reference for decoupling storage caches (`ln-data-store`), network gateways (`ln-*-connector`), and data transformations (`ln-mapper`) under a single parent **Data Coordinator** (`ln-data-coordinator`). |
 | ⚡ **[Reactive Architecture Reference](docs/reactive.md)** | Blueprint on how components manage internal state using Proxy traps (`reactiveState` and `deepReactive`), batched microtask rendering, DOM bindings (`fill`, `renderList`), and attribute-to-state bridges. |
 | 📐 **[Design System Specifications](docs/architecture/reference.md)** | Complete styling specs covering CSS Custom Properties, layout grids, buttons, responsive breakpoints, typography hierarchies, dark mode theming, and icons. |
@@ -154,7 +154,7 @@ For detailed manual instructions, properties, attributes, and events of individu
 | **Upload** | 📤 **[ln-upload docs](js/ln-upload/README.md)** | 📄 **[upload architecture](docs/js/upload.md)** |
 | **AJAX** | 🔄 **[ln-ajax docs](js/ln-ajax/README.md)** | 📄 **[ajax architecture](docs/js/ajax.md)** |
 | **HTTP** | — | 📄 **[http service architecture](docs/js/http.md)** |
-| **Store** | 🗄️ **[ln-store docs](js/ln-store/README.md)** | 📄 **[store cache architecture](docs/js/store.md)** |
+| **Store** | 🗄️ **[ln-data-store docs](js/ln-data-store/README.md)** | 📄 **[store cache architecture](docs/js/store.md)** |
 | **API Connector** | 🔌 **[ln-api-connector docs](js/ln-api-connector/README.md)** | — |
 | **CouchDB Connector** | 🔌 **[ln-couchdb-connector docs](js/ln-couchdb-connector/README.md)** | 📄 **[couchdb-connector architecture](docs/js/couchdb-connector.md)** |
 | **Form** | 📝 **[ln-form docs](js/ln-form/README.md)** | 📄 **[form lifecycle architecture](docs/js/form.md)** |
