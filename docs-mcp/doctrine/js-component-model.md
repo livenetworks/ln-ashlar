@@ -134,6 +134,6 @@ All naming must follow strict, predictable conventions:
 | JS Instance | `el.ln{Name}` | `el.lnModal` |
 | Before Event (cancelable) | `ln-{name}:before-{action}` | `ln-modal:before-close` |
 | After Event (notification) | `ln-{name}:{action}` | `ln-modal:close` |
-| Request Event (mutation) | `ln-{name}:request-{action}` | `ln-store:request-create` |
+| Request Event (mutation) | `ln-{name}:request-{action}` | `ln-data-store:request-create` |
 | Dictionary Attribute | `data-ln-{name}-dict` | `data-ln-upload-dict` |
 | Template Identifier | `data-ln-template="{tmpl}"` | `data-ln-template="row"` |

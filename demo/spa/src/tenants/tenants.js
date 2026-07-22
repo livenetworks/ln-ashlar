@@ -4,7 +4,7 @@
 	// Write path is native-first (data-ln-form-scope="tenants" on
 	// #tenant-create-form) — ln-data-coordinator claims the native submit;
 	// react to the store outcome instead of a form-level event.
-	document.addEventListener('ln-store:created', function (e) {
+	document.addEventListener('ln-data-store:created', function (e) {
 		if (e.detail.store !== 'tenants') return;
 		const tenantModal = document.getElementById('tenant-modal');
 		if (tenantModal) tenantModal.setAttribute('data-ln-modal', 'close');

@@ -27,7 +27,11 @@ Init:
   1. Open IndexedDB → read _meta
   2. Schema mismatch? → clear, reset meta
   3. Has cache? → emit ready (source: 'cache')
-  4. Emit ln-store:initialized { store, hasCache, lastSyncedAt, count } — in EVERY branch
+Init:
+  1. Open IndexedDB → read _meta
+  2. Schema mismatch? → clear, reset meta
+  3. Has cache? → emit ready (source: 'cache')
+  4. Emit ln-data-store:initialized { store, hasCache, lastSyncedAt, count } — in EVERY branch
      (cache, empty, schema-mismatch-after-clear)
 
 Delta sync:
@@ -37,10 +41,10 @@ Delta sync:
 ```
 
 The store no longer decides WHEN to sync. `_initStore` never triggers a
-remote sync itself — it only emits `ln-store:initialized` and lets the
+remote sync itself — it only emits `ln-data-store:initialized` and lets the
 consumer (normally `ln-data-coordinator`) decide. There is no visibility-change
 or online-reconnect self-sync inside the store anymore; both moved to
-`ln-data-coordinator`, which listens for `ln-store:initialized` (plus its own
+`ln-data-coordinator`, which listens for `ln-data-store:initialized` (plus its own
 `window 'online'` / `document 'visibilitychange'` listeners) and calls
 `store.forceSync()` when appropriate. A store used without a coordinator on
 the page simply never syncs beyond its initial cache read — see
@@ -93,7 +97,7 @@ Delete:
 There is no module-level visibility/online/offline handling left in the
 store — `_visibilityHandler`, `_onlineHandler`, and `_offlineNotify` were
 removed along with their listeners. That responsibility (and the
-`ln-store:online`/`ln-store:offline` document dispatch) now lives in
+`ln-data-store:online`/`ln-data-store:offline` document dispatch) now lives in
 `ln-data-coordinator`. The per-instance `_noAutosync` opt-out flag was
 removed too — the opt-out is now read by the coordinator (as
 `data-ln-data-coordinator-no-autosync`, falling back to the store's own
@@ -111,7 +115,7 @@ and [§Events — Notifications](../../js/ln-data-store/README.md#events--notifi
 for the full table of dispatched events. This document covers WHEN
 each event fires within the lifecycle / mutation flow above.
 
-`ln-store:initialized` is emitted once at the end of `_initStore`, in every
+`ln-data-store:initialized` is emitted once at the end of `_initStore`, in every
 branch (cache present, empty, schema-mismatch-after-clear). It replaces the
 store's old self-sync trigger — the store no longer decides to sync on init;
 it only reports its cache state and lets the coordinator decide.
@@ -128,7 +132,7 @@ database, `ln_api_queue`). `ln-data-store` only holds the record cache plus
 the `lastSyncedAt` watermark.
 
 `_triggerRemoteSync` (the internal call that dispatches
-`ln-store:request-remote-sync`) is never invoked by the store's own
+`ln-data-store:request-remote-sync`) is never invoked by the store's own
 lifecycle. It is reachable ONLY via the two explicit public commands
 `forceSync()` and `fullReload()` — always consumer/coordinator initiated,
 never a self-sync.
@@ -137,13 +141,13 @@ never a self-sync.
 
 | Situation | Behavior |
 |-----------|----------|
-| Server unreachable (initial load) | Emit `ln-store:error`, no cached data |
-| Server unreachable (delta sync) | Emit `ln-store:offline`, cached data still usable |
-| IndexedDB quota exceeded | Dispatch `ln-store:quota-exceeded` on `document` (write fails, in-memory fallback) |
+| Server unreachable (initial load) | Emit `ln-data-store:error`, no cached data |
+| Server unreachable (delta sync) | Emit `ln-data-store:offline`, cached data still usable |
+| IndexedDB quota exceeded | Dispatch `ln-data-store:quota-exceeded` on `document` (write fails, in-memory fallback) |
 | IndexedDB unavailable | Fall back to in-memory, warn via console |
 | Schema version mismatch | Clear all stores, full reload |
 
-> Server-side mutation errors (4xx/5xx/409) are NOT handled by `ln-data-store` — the store has no concept of "confirm" or "revert." A `ln-store:request-update`/`request-delete` is applied unconditionally to the local cache. Reconciling server errors (retry, drop, conflict server-wins, auth-pause) is the coordinator's job — see [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) §Error reconciliation policy.
+> Server-side mutation errors (4xx/5xx/409) are NOT handled by `ln-data-store` — the store has no concept of "confirm" or "revert." A `ln-data-store:request-update`/`request-delete` is applied unconditionally to the local cache. Reconciling server errors (retry, drop, conflict server-wins, auth-pause) is the coordinator's job — see [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) §Error reconciliation policy.
 
 ## Database Encryption at Rest
 
@@ -176,5 +180,5 @@ The store renders nothing. The only DOM-side effects are:
 
 - attaches `request-*` listeners on the store element
 - writes `dom.lnStore = instance` on the store element
-- dispatches `ln-store:*` events on the store element
+- dispatches `ln-data-store:*` events on the store element
   (`quota-exceeded` dispatches on `document`)

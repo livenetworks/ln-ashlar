@@ -14,7 +14,7 @@ Place the queue inside your parent coordinator element alongside your store and 
 <ul data-ln-data-coordinator="documents" hidden>
     <!-- Storage Layer Cache (Blind to networking) -->
     <li data-ln-data-store
-        data-ln-store-indexes="status,updated_at">
+        data-ln-data-store-indexes="status,updated_at">
     </li>
 
     <!-- Transport Gateway (REST / API Connector) -->

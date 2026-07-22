@@ -35,7 +35,7 @@ Data moves strictly in predictable, asynchronous loops:
 
 ### A. The Read Loop
 1. The **Data Store** (`ln-data-store`) loads records from its local IndexedDB cache or syncs them from the server.
-2. The store dispatches an `ln-store:ready` or `ln-store:loaded` event.
+2. The store dispatches an `ln-data-store:ready` or `ln-data-store:loaded` event.
 3. The **Coordinator** (`ln-data-coordinator`) queries the store (e.g. `store.getAll()`) and dispatches `ln-table:set-data` or `ln-list:set-data` to the bound view components.
 4. Bound **Renderers** (`ln-table` or `ln-list`) listen to these `set-data` events and redraw themselves dynamically.
 
@@ -43,14 +43,14 @@ Data moves strictly in predictable, asynchronous loops:
 1. The user submits a form.
 2. `ln-form` intercepts the submission to validate fields via `ln-validate`. If all fields are valid, the native submit bubbles up.
 3. The **Coordinator** catches the native submit at the document level (bubble phase), prevents the default browser reload, serializes inputs, and triggers a **parallel fan-out**:
-   - **Local Cache:** Dispatches `ln-store:request-create` (or `request-update`/`request-delete`) to the store, which immediately updates IndexedDB and emits a state-changed event (`ln-store:created` / `updated` / `deleted`) to refresh the view.
+   - **Local Cache:** Dispatches `ln-data-store:request-create` (or `request-update`/`request-delete`) to the store, which immediately updates IndexedDB and emits a state-changed event (`ln-data-store:created` / `updated` / `deleted`) to refresh the view.
    - **Outbox/Transport:** Enqueues the payload in `ln-api-queue` (if present) or dispatches it directly via `ln-api-connector`.
 4. Upon server confirmation (`2xx` success):
-   - **Create:** The coordinator dispatches `ln-store:request-update` to the store to execute an **id-swap (rekey)**, replacing the temporary ID (`_temp_<uuid>`) with the server ID.
-   - **Update:** The coordinator dispatches `ln-store:request-update` with the confirmed server record to sync the cache.
+   - **Create:** The coordinator dispatches `ln-data-store:request-update` to the store to execute an **id-swap (rekey)**, replacing the temporary ID (`_temp_<uuid>`) with the server ID.
+   - **Update:** The coordinator dispatches `ln-data-store:request-update` with the confirmed server record to sync the cache.
 5. Upon server rejection (`4xx`/`5xx` error):
-   - **Create Rejection (4xx):** The coordinator dispatches `ln-store:request-delete` to discard the temporary record.
-   - **Conflict (409 on Update):** Server wins; the coordinator dispatches `ln-store:request-update` carrying the server's remote record.
+   - **Create Rejection (4xx):** The coordinator dispatches `ln-data-store:request-delete` to discard the temporary record.
+   - **Conflict (409 on Update):** Server wins; the coordinator dispatches `ln-data-store:request-update` carrying the server's remote record.
    - **Transient Error (Network/5xx):** The optimistic write remains in the local cache, and the queue retries transport draining when connectivity is restored.
 
 ---

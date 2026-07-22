@@ -33,7 +33,7 @@
 
 	// Rebuild on packages store events
 	['loaded', 'confirmed', 'synced'].forEach(ev =>
-		packagesStoreEl.addEventListener(`ln-store:${ev}`, e => {
+		packagesStoreEl.addEventListener(`ln-data-store:${ev}`, e => {
 			// 'synced' only if changed
 			if (ev === 'synced' && !e.detail?.changed) return;
 			rebuildPkgMap();
@@ -62,9 +62,9 @@
 
 		// Store events → refresh
 		['ready', 'loaded', 'created', 'updated', 'deleted', 'confirmed', 'reverted'].forEach(ev =>
-			storeEl.addEventListener(`ln-store:${ev}`, refresh)
+			storeEl.addEventListener(`ln-data-store:${ev}`, refresh)
 		);
-		storeEl.addEventListener('ln-store:synced', e => e.detail?.changed && refresh());
+		storeEl.addEventListener('ln-data-store:synced', e => e.detail?.changed && refresh());
 
 		// Table request-data
 		document.addEventListener('ln-table:request-data', e => {
@@ -103,7 +103,7 @@
 		// Write path is native-first (data-ln-form-scope on package-form/tenant-form)
 		// — react to the store outcome instead of a form-level event. storeEl is
 		// already scoped to this entity, no e.detail.store filter needed.
-		['ln-store:created', 'ln-store:updated'].forEach(ev => storeEl.addEventListener(ev, () => {
+		['ln-data-store:created', 'ln-data-store:updated'].forEach(ev => storeEl.addEventListener(ev, () => {
 			modalEl.setAttribute('data-ln-modal', 'close');
 		}));
 
@@ -161,8 +161,8 @@
 		: { refresh: () => {} };
 
 	// Single global offline toast — ln-data-coordinator dispatches
-	// ln-store:offline on `document`, not on individual store elements.
-	document.addEventListener('ln-store:offline', () =>
+	// ln-data-store:offline on `document`, not on individual store elements.
+	document.addEventListener('ln-data-store:offline', () =>
 		toast('warning', 'Offline', 'Server unreachable — changes queued')
 	);
 
@@ -205,8 +205,8 @@
 	}
 
 	[packagesStoreEl, tenantsStoreEl].forEach(storeEl => {
-		storeEl.addEventListener('ln-store:loaded', refreshDashboardIfMounted);
-		storeEl.addEventListener('ln-store:synced', e => {
+		storeEl.addEventListener('ln-data-store:loaded', refreshDashboardIfMounted);
+		storeEl.addEventListener('ln-data-store:synced', e => {
 			if (e.detail?.changed) refreshDashboardIfMounted();
 		});
 	});

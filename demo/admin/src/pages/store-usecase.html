@@ -44,15 +44,15 @@
 						</main>
 					</section>
 
-<!-- (a) Mock backend MUST install before any [data-ln-store] element is parsed below. -->
+<!-- (a) Mock backend MUST install before any [data-ln-data-store] element is parsed below. -->
 <script class="mock-related" src="dist/mock-store-usecase.js" defer></script>
 
 <!-- 1. Coordinator Tree (wraps Store + Connector) -->
 <div data-ln-data-coordinator="documents" id="documents-coordinator">
 	<div data-ln-data-store="documents"
-	     data-ln-store-stale="60"
-	     data-ln-store-indexes="department,status,priority,updated_at"
-	     data-ln-store-search-fields="title,department,owner"
+	     data-ln-data-store-stale="60"
+	     data-ln-data-store-indexes="department,status,priority,updated_at"
+	     data-ln-data-store-search-fields="title,department,owner"
 	     id="documents-store"></div>
 	<div data-ln-api-connector
 	     data-ln-api-base-url=""
@@ -303,9 +303,9 @@
 
 	// Store Listeners
 	['ready', 'loaded', 'created', 'updated', 'deleted'].forEach(ev =>
-		storeEl.addEventListener(`ln-store:${ev}`, refresh)
+		storeEl.addEventListener(`ln-data-store:${ev}`, refresh)
 	);
-	storeEl.addEventListener('ln-store:synced', e => e.detail.changed && refresh());
+	storeEl.addEventListener('ln-data-store:synced', e => e.detail.changed && refresh());
 
 	// Table Listeners
 	document.addEventListener('ln-table:request-data', e => {
@@ -325,7 +325,7 @@
 	// Write path is native-first (data-ln-form-scope on #document-form) —
 	// react to the store outcome instead of a form-level event. This demo JS
 	// only closes the modal once the record has been handed off.
-	['ln-store:created', 'ln-store:updated'].forEach(ev => storeEl.addEventListener(ev, () => {
+	['ln-data-store:created', 'ln-data-store:updated'].forEach(ev => storeEl.addEventListener(ev, () => {
 		documentModal.setAttribute('data-ln-modal', 'close');
 	}));
 
@@ -386,10 +386,9 @@
 		<!-- Coordinator tree wraps store + connector -->
 		<div data-ln-data-coordinator>
 			<div data-ln-data-store="people"
-			     data-ln-store-endpoint="/api/documents"
-			     data-ln-store-stale="60"
-			     data-ln-store-indexes="department,status,updated_at"
-			     data-ln-store-search-fields="title,department,owner"></div>
+			     data-ln-data-store-stale="60"
+			     data-ln-data-store-indexes="department,status,updated_at"
+			     data-ln-data-store-search-fields="title,department,owner"></div>
 			<div data-ln-api-connector
 			     data-ln-api-endpoint="/api/documents"></div>
 		</div>

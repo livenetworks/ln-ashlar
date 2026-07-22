@@ -8,7 +8,7 @@
 
 ## Role Summary
 
-- Listens on its subtree (`this.dom`) for `ln-data-coordinator:request-create/update/delete/bulk-delete` (and the native `submit` event on `document`, bubble phase, claimed via `preventDefault()`) → fans out in parallel to the local store AND the remote connector/queue. Listens for `ln-store:request-remote-sync` → delegates to the child connector. See [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) for the full write pipeline (this document covers the VIEW-BINDING role only).
+- Listens on its subtree (`this.dom`) for `ln-data-coordinator:request-create/update/delete/bulk-delete` (and the native `submit` event on `document`, bubble phase, claimed via `preventDefault()`) → fans out in parallel to the local store AND the remote connector/queue. Listens for `ln-data-store:request-remote-sync` → delegates to the child connector. See [`js/ln-data-coordinator/README.md`](../../js/ln-data-coordinator/README.md) for the full write pipeline (this document covers the VIEW-BINDING role only).
 - Listens on `document` for view-binding request events → resolves its own child store → delivers data back to the requesting element.
 - Listens on its subtree for store-change events → refreshes all bound view elements automatically.
 
@@ -40,9 +40,9 @@ See [docs/architecture/reference.md#column-filter-architecture](../architecture/
 ## Store-Change Refresh
 
 The coordinator listens on `this.dom` for:
-- `ln-store:ready`, `ln-store:loaded` — initial data available
-- `ln-store:created`, `ln-store:updated`, `ln-store:deleted` — mutations confirmed
-- `ln-store:synced` (only when `e.detail.changed`) — delta sync with changes
+- `ln-data-store:ready`, `ln-data-store:loaded` — initial data available
+- `ln-data-store:created`, `ln-data-store:updated`, `ln-data-store:deleted` — mutations confirmed
+- `ln-data-store:synced` (only when `e.detail.changed`) — delta sync with changes
 
 On any of these, `_refreshAll()` re-queries all bound view elements for this coordinator's store using the last cached query parameters (or defaults).
 
@@ -65,7 +65,7 @@ page load
       ln-table:request-data {sort, filters, search}  ── bubbles ──▶ document
   → coordinator _serveData: _ownsStore("tenants")? yes
       store not loaded → dispatch ln-table:set-loading {loading:true}; cache query; wait
-  → ln-data-store finishes sync → dispatches ln-store:ready ── bubbles ──▶ coordinator.dom
+  → ln-data-store finishes sync → dispatches ln-data-store:ready ── bubbles ──▶ coordinator.dom
   → _refreshAll: getAll(cached query)
       → dispatch ln-table:set-data {data, total, filtered}
   → ln-table renders rows

@@ -34,7 +34,7 @@ The coordinator's `_serveOptions` method handles `ln-options:request-data`:
 3. Calls `store.getAll({})` (all records, no sort/filter/pagination).
 4. Dispatches `ln-options:set-data { data }` back on the element.
 
-On every store mutation (`ln-store:ready`, `created`, `updated`, `deleted`, `synced`), the coordinator calls `_refreshAll()` which re-serves all bound options elements.
+On every store mutation (`ln-data-store:ready`, `created`, `updated`, `deleted`, `synced`), the coordinator calls `_refreshAll()` which re-serves all bound options elements.
 
 ---
 
@@ -48,7 +48,7 @@ On every store mutation (`ln-store:ready`, `created`, `updated`, `deleted`, `syn
 
 ```html
 <div data-ln-data-coordinator>
-  <div data-ln-data-store="tenants" data-ln-store-endpoint="/api/tenants"></div>
+  <div data-ln-data-store="tenants"></div>
   <div data-ln-api-connector data-ln-api-endpoint="/api/tenants"></div>
 
   <select data-ln-options="tenants"

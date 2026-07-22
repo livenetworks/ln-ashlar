@@ -11,203 +11,271 @@
 
 Components separate by concern:
 
-| # | Concern  | Component(s)                                | Owns                                       |
-|---|----------|---------------------------------------------|--------------------------------------------|
-| 1 | Data     | `ln-store`                                  | Local cache, query engine, sync state      |
-| 2 | Render   | `ln-table`, `ln-upload`, future renderers | Visual presentation of records          |
-| 3 | Submit   | `ln-form`, `ln-confirm`, `ln-http`          | Form serialization, transport              |
-| 4 | Validate | `ln-validate`                               | Field-level validity + error display + submit gate |
+| # | Concern  | Component(s)                                                                        | Owns                                                                                                             |
+|---|----------|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| 1 | Data     | `ln-data-store`, `ln-data-coordinator`, `ln-*-connector`, `ln-api-queue` (optional)   | Local cache, query engine, remote sync, and the write fan-out that dispatches to cache + transport in parallel   |
+| 2 | Render   | `ln-table`, `ln-list`, other renderers                                               | Visual presentation of records, bound to a store via the coordinator's view-binder attributes                    |
+| 3 | Submit   | `ln-form`, `ln-confirm`, `ln-http`                                                    | Form population, RESTful action rewriting, native serialization contract, HTTP transport service, two-click confirm |
+| 4 | Validate | `ln-validate`                                                                         | Field-level validity + error display + submit gate                                                                |
 
 **The rule.** Each concern owns its scope. Other concerns ask via events,
 never reach in.
 
 Two flows cross the concerns:
 
-- **Read.** Store loads from cache or syncs from server, fans out
-  `ln-store:change` to subscribed renderers. The renderer draws.
-- **Write.** Form serializes and dispatches `ln-form:submit`. Store
-  applies optimistic write, fans out, posts to server. Server confirms
-  (reconcile) or rejects (revert + form-side error).
+- **Read.** A renderer binds to a store by name (`data-ln-table-store`,
+  `data-ln-list-store`, `data-ln-options`, `data-ln-stat`) and dispatches its
+  own `request-data` intent. The coordinator that owns the matching store
+  resolves it against the store's query engine and delivers
+  `ln-{kind}:set-data`. The renderer draws.
+- **Write.** A scoped form (`data-ln-form-scope`) — or a coordinator-
+  namespaced `request-create`/`-update`/`-delete`/`-bulk-delete` event for
+  non-form writes — reaches `ln-data-coordinator`, which claims it,
+  serializes it, and fans out in parallel: an optimistic write to the store,
+  and, independently, a transport call to the connector or the offline
+  queue. The server's response reconciles the cache with an ordinary update
+  event — there is no separate confirm/revert step.
 
 What this rules out:
 
-- A renderer talking to `fetch` directly (transport is the submit
-  concern).
-- A form writing to IndexedDB (cache is the data concern).
-- A coordinator running `Array.prototype.sort` over records (the
-  query engine is the data concern — see §2.1).
-- A component re-querying the DOM at runtime to find subscribers
-  (the registry is the discovery concern — see §6).
+- A renderer talking to `fetch` directly (transport is the coordinator/
+  connector's job).
+- A form serializing itself or writing to the cache (claiming and
+  dispatching the write is `ln-data-coordinator`'s job — see §4.5).
+- Application code running `Array.prototype.sort` over records fetched from
+  a store (the query engine is the data concern — see §2.1).
+- The store scanning the DOM at runtime to find its renderers (it only fans
+  out on its own element — see §4.3 for what the coordinator's view-binder
+  does instead).
 
 ---
 
 ## 2. Concern responsibilities
 
-### 2.1 Data — `ln-store`
+### 2.1 Data — `ln-data-store` + `ln-data-coordinator`
 
-**Owns.** IndexedDB-backed local cache. Full-load and delta sync from
-the configured endpoint. Query engine — `getAll(options)`, `getById`,
-`count`, `aggregate` — with sort / filter / search / limit applied
-**client-side over the cache**. Optimistic write pipeline (cache mutate
-with `_pending: true`, network attempt, reconcile or revert). Fan-out of
-`ln-store:change` to registered renderers. The store itself holds **no**
-persistent write queue — it is a pure cache. When a write can't reach the
-server, the offline outbox is owned by the standalone `ln-api-queue`
-component (its own IndexedDB database), and `ln-data-coordinator` drives the
-FIFO-per-chain drain with exponential backoff (see §3).
+**Owns.** `ln-data-store`: an IndexedDB-backed local cache per resource,
+declared with `data-ln-data-store="<name>"`. Query engine — `getAll(options)`,
+`getById`, `count`, `aggregate` — with sort / filter / search / limit applied
+**client-side over the cache**. Optimistic writes on
+`ln-data-store:request-create` / `-update` / `-delete` / `-bulk-delete` — the
+record lands in IndexedDB immediately and the store fans out
+`ln-data-store:created` / `-updated` / `-deleted` on its own element (no DOM scan
+— see §4.3). A pending create carries only a `_temp_<uuid>` id; there is no
+`_pending` flag.
 
-**Does NOT own.** DOM presentation. Form serialization. User-facing
-toasts or modals. The UI controls that produce sort/filter inputs.
+`ln-data-coordinator`: the mediator. Claims scoped form submits
+(`data-ln-form-scope`) or coordinator-namespaced request events, serializes
+and maps the payload, and fans out from one synchronous handler to the store
+(local write) and, independently, to the transport layer (`ln-*-connector`
+directly, or `ln-api-queue`'s outbox when present). Reconciles server
+responses with an ordinary `ln-data-store:request-update` (id-swap on create — no
+separate confirm/revert method). Delivers live data to bound view components
+— see §2.2.
 
-**Intent vs execution.** UI components like `ln-table-sort`,
-`ln-filter`, and `ln-search` produce **intent** — which column to sort
-by, which filter to apply, what to search for. They do not compute
-over records. The store consumes the intent via `getAll()` options
-and runs the actual query against the cache. The split is general:
-intent is a UI concern, execution is a data concern.
+**Does NOT own.** DOM presentation. Form serialization shape decisions
+beyond the native `action`/`method` contract. The UI controls that produce
+sort/filter/search input (intent).
 
-### 2.2 Render — `ln-table` and other renderers
+**Intent vs execution.** UI components like `ln-table-sort`, `ln-filter`,
+and `ln-search` produce **intent** — which column to sort by, which filter
+to apply, what to search for — via `ln-table:request-data` /
+`ln-list:request-data`. The coordinator resolves the request against its
+owned store's `getAll()` and delivers the result; the store runs the actual
+query against the cache. The split is general: intent is a UI concern,
+execution is a data concern.
+
+### 2.2 Render — `ln-table`, `ln-list`, and other renderers
 
 **Owns.** Cloning a `<template>` per record and filling it via
 `data-ln-table-cell-attr` and `{{ field }}` text-node substitution — see §5.
-Virtual scrolling for large sets. Empty,
-loading, and error templates. Translation of UI events (column click
-→ sort intent, search input → search intent) into payloads the data
-layer can consume.
+Virtual scrolling for large sets. Empty, loading, and error templates.
+Translation of UI events (column click → sort intent, search input → search
+intent) into an `ln-table:request-data` / `ln-list:request-data` payload.
 
-**Does NOT own.** The data itself — the renderer is stateless about
-records and receives a fresh array on every `ln-store:change`. The
-query engine. Network calls.
+**Does NOT own.** The data itself — the renderer is stateless about records
+and receives a fresh array on every `ln-{kind}:set-data`. The query engine.
+Network calls.
 
-The renderer subscribes by attribute (`data-ln-store-source="<storeName>"`).
-The store pushes records on subscription, on every mutation, and on
-every sync. **The renderer is reactive to a stream, not a puller of
-state.**
+A renderer binds to a coordinator-owned store by attribute —
+`data-ln-table-store="<storeName>"` on `[data-ln-table]`, or
+`data-ln-list-store="<storeName>"` on `[data-ln-list]`. On mount, and on
+every sort/filter/search change, the renderer dispatches
+`ln-table:request-data` / `ln-list:request-data` at itself; the coordinator
+whose child store matches `<storeName>` (guarded by an ownership check, so
+multiple coordinators on one page never cross-serve) resolves the query and
+dispatches `ln-{kind}:set-data` — or `ln-{kind}:set-loading` while the store
+hasn't finished loading yet. The same binder vocabulary covers
+`data-ln-options="<storeName>"` on a `<select>` (served via
+`ln-options:set-data`) and `data-ln-stat="<storeName>"` on any inline
+element (served via `ln-stat:set-count`). **The renderer is reactive to a
+stream, not a puller of state.**
 
 ### 2.3 Submit — `ln-form`, `ln-confirm`, `ln-http`
 
-**Owns.** Form serialization (via `serializeForm` in `ln-core`).
-Submit gating — `ln-form` blocks submission until every
-`data-ln-validate` field is valid. Native form attributes (`action`,
-`method`) become the request contract — no JS configuration. Two-click
-confirm UX for destructive actions (`ln-confirm` arms on first click,
-executes on second). HTTP transport (`ln-http` is a service-style
-component that consumes `ln-http:request` events and dispatches
-`ln-http:success` / `ln-http:error`).
+**Owns.** Form population (`ln-form.fill` / `.reset`, triggered by `ln-fill`
+— see §5.7). RESTful action rewriting for edit mode
+(`data-ln-form-action-edit`, `_method` spoofing). Native form attributes
+(`action`, `method`) are the request contract — no JS configuration.
+Two-click confirm UX for destructive actions (`ln-confirm` arms on first
+click, executes on second). HTTP transport as a standalone service
+(`ln-http` consumes `ln-http:request` events and dispatches
+`ln-http:success` / `ln-http:error` — independent of the data-layer
+connectors in §2.1).
 
-**Does NOT own.** Local cache state. Optimistic record application —
-the form fires `ln-form:submit`; the data layer decides what to do
-with the payload. Sort / filter / search input interpretation — auto-
-submitting forms serialize and dispatch; the consuming component
-interprets the payload.
+**Does NOT own.** Local cache state. Serialization or dispatch of the write
+— `ln-form` never intercepts submit and never calls `serializeForm`; that is
+`ln-data-coordinator`'s job once a valid submit bubbles to it (`ln-validate`
+owns blocking the invalid case — see §2.4). Sort / filter / search input
+interpretation.
 
 ### 2.4 Validate — `ln-validate`
 
-**Owns.** Field-level validity tracking via the native Constraint
-Validation API plus custom rules. `ln-validate:valid` /
-`ln-validate:invalid` events for submit-button gating. Field-level
-error message display. Custom error injection from server responses
-via `ln-validate:set-custom`.
+**Owns.** Field-level validity tracking via the native Constraint Validation
+API (`required`, `pattern`, `minlength`, etc.) plus custom server-error
+injection via `ln-validate:set-custom`. The submit gate: the first
+`data-ln-validate` field on a form injects `novalidate` and attaches the
+form's own `submit` listener — on every method, GET included — which
+dispatches `ln-validate:request-validate` to collect invalid fields; if any
+exist it blocks submission and focuses the first one. A valid submit is left
+native for `ln-data-coordinator` (or plain HTML) to claim next. Field-level
+error message display (`data-ln-validate-errors` / `data-ln-validate-error`).
 
-**Does NOT own.** Form submission, serialization, transport. Knowledge
-of records or stores.
+**Does NOT own.** Form submission claiming, serialization, transport.
+Knowledge of records or stores.
 
 ---
 
-## 3. The optimistic + offline write pipeline
+## 3. The write pipeline
 
-This is the heart of the data layer. It is what makes ln-ashlar
-local-first.
+Every write reaches `ln-data-coordinator`, which fans it out to the local
+cache and the transport layer **in parallel from one synchronous handler** —
+neither branch is gated on the other. This is the heart of the data layer:
+it is what makes ln-ashlar local-first.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> FormSubmit: user clicks Save
-    FormSubmit --> Validate: ln-form intercepts
-    Validate --> [*]: invalid (block, show errors)
-    Validate --> Optimistic: valid
+    [*] --> Submit: user submits (data-ln-form-scope)
+    Submit --> ValidateGate: ln-validate's own submit listener
+    ValidateGate --> [*]: invalid (block, focus first field)
+    ValidateGate --> Claim: valid, submit left native
 
-    Optimistic --> CacheWritten: _putRecord with _pending:true
-    CacheWritten --> FanOut: dispatch ln-store:change<br/>source='create'|'update'|'delete'
-    FanOut --> FormSuccess: dispatch ln-form:success<br/>(modal closes)
-    FormSuccess --> CoordRoute: coordinator routes write
+    Claim --> FanOut: ln-data-coordinator preventDefault()<br/>+ serializeForm()
+    FanOut --> StoreWrite: ln-data-store:request-create/-update/-delete/-bulk-delete
+    StoreWrite --> ViewRefresh: store fans out ln-data-store:created/-updated/-deleted<br/>coordinator re-serves bound views
 
-    CoordRoute --> QueueAbsent: no ln-api-queue child
-    CoordRoute --> QueueEnqueue: ln-api-queue child present
+    FanOut --> QueueAbsent: no ln-api-queue child
+    FanOut --> QueueEnqueue: ln-api-queue child present
 
-    QueueAbsent --> Fetch: connector.create/update/delete
-    Fetch --> 2xx: response.status < 400
-    Fetch --> 4xx: 400 <= status < 500
-    Fetch --> 5xx: status >= 500
-    Fetch --> NetworkErr: fetch reject
+    QueueAbsent --> Connector: ln-api-connector:request-create/-update/-delete
+    Connector --> Success2xx: 2xx
+    Connector --> ErrorAuth: 401 / 419
+    Connector --> ErrorTransient: 0 (network) / 5xx
+    Connector --> ErrorDeterministic: 409 (update) / other 4xx / 3xx
 
-    2xx --> Reconcile: server overrides<br/>swap tmp_id → real id<br/>_pending=false
-    Reconcile --> ReconcileFanOut: dispatch ln-store:reconciled<br/>+ ln-store:synced<br/>+ ln-store:change source='reconcile'
-    ReconcileFanOut --> [*]
+    Success2xx --> Reconcile: ln-data-store:request-update<br/>(id-swap on create: tempId → server id)
+    Reconcile --> Toast: message present → ln-toast:enqueue
+    Toast --> [*]
 
-    4xx --> Revert: restore from snapshot
-    Revert --> RevertFanOut: dispatch ln-form:error<br/>+ ln-store:change source='revert'
-    RevertFanOut --> [*]
+    ErrorAuth --> AuthKept: optimistic write stays<br/>dict 'auth' toast
+    AuthKept --> [*]
 
-    5xx --> QueueAbsentReverted: revert (no queue to fall back to)
-    NetworkErr --> QueueAbsentReverted
-    QueueAbsentReverted --> [*]
+    ErrorTransient --> TransientKept: optimistic write stays, never deleted<br/>dict 'network' toast (immediate, non-queued path)
+    TransientKept --> [*]
+
+    ErrorDeterministic --> DetCreate: create → ln-data-store:request-delete (tempId)
+    ErrorDeterministic --> DetUpdate409: 409 update → ln-data-store:request-update<br/>(server's remote record wins)
+    ErrorDeterministic --> DetOther: other update/delete/bulk → left as-is,<br/>next sync reconciles
+    DetCreate --> DetToast: dict 'rejected' toast
+    DetUpdate409 --> DetToast2: dict 'conflict' toast
+    DetOther --> DetToast: dict 'rejected' toast
+    DetToast --> [*]
+    DetToast2 --> [*]
 
     QueueEnqueue --> Persisted: ln-api-queue:request-enqueue<br/>(entryId+seq, FIFO per chainKey)
-    Persisted --> PendingCount: dispatch<br/>ln-api-queue:pending-count
-    PendingCount --> [*]: wait for drain
+    Persisted --> [*]: wait for drain
 
-    [*] --> Drain: ln-api-queue:send<br/>(head of chain, one inflight per chain)
-    Drain --> CoordExec: coordinator executes transport
-    CoordExec --> DrainOk: 2xx
-    CoordExec --> DrainConflict: 409 (update)
-    CoordExec --> DrainAuth: 401 / 419
-    CoordExec --> DrainRetry: 5xx / network (status 0)
-    CoordExec --> DrainDrop: other 4xx
+    [*] --> Drain: ln-api-queue:send (head of chain)
+    Drain --> CoordExec: coordinator executes transport via connector
+    CoordExec --> DrainAuth: 401/419 → nack(auth), pause scope, auth-required
+    CoordExec --> DrainRetry: 0/5xx → nack(retry)
+    CoordExec --> DrainDrop: 409/other 4xx/3xx → nack(drop)<br/>same store action as ErrorDeterministic
+    CoordExec --> DrainOk: 2xx → reconcile
 
-    DrainOk --> Reconcile: confirmMutation<br/>+ remap-before-ack (create)<br/>+ ln-api-queue:ack
-    DrainConflict --> Conflict: store.resolveConflict<br/>+ ln-api-queue:nack(drop)
-    DrainAuth --> AuthPause: ln-api-queue:nack(auth)<br/>pauses scope, emits auth-required
-    AuthPause --> Drain: consumer re-authenticates<br/>dispatches request-resume
-    DrainDrop --> Conflict2: ln-store:sync-conflict<br/>+ revertMutation + forceSync<br/>+ ln-api-queue:nack(drop)
-    DrainRetry --> Backoff: ln-api-queue:nack(retry)
-    Backoff --> Drain: 2s, 5s, 15s, 60s, 5min
+    DrainOk --> RemapAck: create → request-remap (tempId → real id) then ack<br/>update/delete → ack only
+    RemapAck --> [*]
+
+    DrainAuth --> Drain: consumer re-authenticates,<br/>dispatches request-resume
+    DrainRetry --> Backoff: 2s, 5s, 15s, 60s, 5min
+    Backoff --> Drain
     Backoff --> Exhausted: attempts >= 8
-    Exhausted --> SyncFailed: ln-api-queue:failed<br/>(entry retained, manual request-drain)
+    Exhausted --> Failed: ln-api-queue:failed<br/>(entry retained, manual request-drain)
+    Failed --> [*]
+
+    DrainDrop --> [*]
 ```
 
-**Happy path.** Form submits. `ln-form` validates and dispatches
-`ln-form:submit`. Store writes to cache with `_pending: true` and fans
-out to renderers immediately. The coordinator routes the write: if no
-`ln-api-queue` child exists it calls the connector directly (queue-absent
-path, unchanged from before the queue existed); if a queue child exists it
-enqueues instead of calling the connector immediately. 2xx reconciles —
-server response overrides the optimistic record, `_pending` flips to
-`false`, a `tmp_<uuid>` swaps for the real server id. Fan out again.
-Form-side success fires.
+**Happy path.** A scoped form submits (`data-ln-form-scope`, method `POST` /
+`PUT` / `PATCH`). `ln-validate`'s own submit listener runs first and blocks
+only if a field is invalid; a valid submit is left native and bubbles to
+`document`, where `ln-data-coordinator` claims it with `preventDefault()`,
+resolves the effective method, and serializes the form itself. The
+coordinator fans out from one synchronous handler: it dispatches
+`ln-data-store:request-create` (or `-update` / `-delete` / `-bulk-delete`) to its
+child store — the record is written to IndexedDB immediately and the store
+fans out `ln-data-store:created` on its own element, refreshing every bound view
+— and, independently, routes the payload to the transport layer: directly
+to the connector (`ln-api-connector:request-create`) if no `ln-api-queue`
+child exists, or into the queue's outbox (`ln-api-queue:request-enqueue`) if
+one does.
 
-**Initial 4xx (form still open, queue-absent path).** Server returns an
-error map. Store reverts the cache from the pre-write snapshot. Store
-dispatches `ln-form:error` on the form element. `ln-validate` paints
-field-level errors. User fixes and resubmits.
+On a 2xx response the coordinator reconciles with an **ordinary**
+`ln-data-store:request-update` — for a create, the target `id` is the `tempId`
+and the incoming `data.id` is the real server id, which the store detects as
+an id-swap and rekeys automatically. There is no separate confirm/reconcile
+method. If the server's response envelope carries a `message`, the
+coordinator enqueues it verbatim via `ln-toast:enqueue`; no `message` means
+no toast.
 
-**Offline / 5xx (queue present).** The coordinator enqueues into
-`ln-api-queue`'s own IndexedDB outbox (`ln_api_queue`), FIFO per
-`(scope, chainKey)`, one inflight entry per chain. Cache stays optimistic
-— the user sees their write. The queue emits `ln-api-queue:send` for the
-head entry; the coordinator executes the transport. 2xx reconciles and the
-coordinator dispatches `request-remap` **before** `ack` on a create success
-(so a queued sibling update re-targets the real id before its chain
-advances). A 409 on update resolves the conflict then drops the entry. A
-401/419 pauses the scope (`auth-required`) until the consumer dispatches
-`request-resume` — it does not revert the optimistic write. Other 4xx
-reverts, re-syncs, and drops the entry (`ln-store:sync-conflict`). 5xx /
-network errors retry with backoff `2s, 5s, 15s, 60s, 5min`; after 8 attempts
-the entry is marked `failed` and retained for manual `request-drain`.
+**A store-only coordinator** (no connector, no queue child) is a first-class
+configuration: the fan-out stops after the local dispatch, no network call
+is made, and the record simply keeps its `_temp_`-prefixed id until a
+connector is added.
 
-The user-facing UI never blocks waiting for the network. Optimistic
-writes render immediately; the queue is the safety net for offline
-writes; the form-side error event is the safety net for 4xx during
-initial submit.
+**Error reconciliation.** Every non-2xx connector response is classified
+into exactly one of three buckets by status — never a fourth "unknown"
+bucket:
+
+| Bucket | Status | Store action | Toast |
+|---|---|---|---|
+| Auth | 401 / 419 | none — optimistic write stays | dictionary `auth` key |
+| Transient | 0 (network) / 5xx | none — optimistic write stays, never deleted | dictionary `network` key (queued: only after retries exhaust; non-queued: immediately) |
+| Deterministic | 409 (update) / other 4xx / 3xx | 409 update: ordinary `ln-data-store:request-update` with the server's `remote` record (server wins). Create: `ln-data-store:request-delete` for the temp id. Other update/delete/bulk: left as-is, next sync reconciles. | dictionary `conflict` (409 update) or `rejected` (everything else) key |
+
+An optimistic write is only ever removed by an explicit server rejection
+(create 4xx) or a genuine `ln-data-store:request-delete` — never by a
+retry-exhausted network error. There is no `ln-data-store:sync-conflict` event
+and no `forceSync()` error backstop.
+
+**Offline / queued path.** When a `[data-ln-api-queue]` child is present,
+every fan-out write routes through it instead of calling the connector
+directly. Entries drain FIFO per `(scope, chainKey)`, one inflight entry per
+chain. The queue emits `ln-api-queue:send` for the head entry; the
+coordinator executes the transport and reports the outcome back via
+`ack` / `nack`. On a create success the coordinator dispatches
+`ln-api-queue:request-remap` (tempId → real id) **before** `ack`, so a
+queued sibling update re-targets the real id before its own chain entry
+advances. A `401` / `419` pauses the scope (`nack {reason:'auth'}`,
+`auth-required`) without touching the optimistic write, resuming only on an
+explicit `ln-api-queue:request-resume`. Transient errors retry with backoff
+`2s, 5s, 15s, 60s, 5min`; after 8 attempts the entry is marked `failed` and
+retained for a manual `ln-api-queue:request-drain`. Deterministic errors
+always `nack {reason:'drop'}` — never retried.
+
+The user-facing UI never blocks waiting for the network. Every error toast
+is authored once per coordinator instance as a markup dictionary
+(`data-ln-data-coordinator-dict`) — text is never hardcoded in JS; a missing
+key is silent.
 
 For exact event names, payload shapes, and timing, see the
 [ln-data-store README](../../js/ln-data-store/README.md),
@@ -225,14 +293,14 @@ already lived with the alternative.
 
 ```js
 // REJECTED
-const records  = storeEl.lnStore.getAll();
-const sorted   = records.sort((a, b) => a.created_at < b.created_at ? 1 : -1);
+const records  = await storeEl.lnDataStore.getAll();
+const sorted   = records.data.sort((a, b) => a.created_at < b.created_at ? 1 : -1);
 const filtered = sorted.filter(r => r.status === 'published');
 tableEl.dispatchEvent(new CustomEvent('ln-table:set-data',
-    { detail: { records: filtered } }));
+    { detail: { data: filtered } }));
 ```
 
-The query engine in `ln-store` runs sort / filter / search efficiently
+The query engine in `ln-data-store` runs sort / filter / search efficiently
 over the cache. UI components produce **intent** (which column, what
 filter); the store does the **execution**. Anyone running
 `Array.prototype.sort` or `.filter` over records is reaching across
@@ -240,63 +308,77 @@ the boundary.
 
 ```html
 <!-- ACCEPTED -->
-<table data-ln-store-source="documents"
-       data-ln-store-source-options='{"sort":{"field":"created_at","direction":"desc"},"filter":{"status":"published"}}'>
-</table>
+<section data-ln-table="documents" data-ln-table-store="documents">
+	<!-- data-ln-table-col-sort / data-ln-filter / data-ln-search on the
+	     toolbar controls produce the intent; ln-table dispatches
+	     ln-table:request-data with { sort, filters, search } and the
+	     owning ln-data-coordinator resolves it via store.getAll(options). -->
+</section>
 ```
 
 ### 4.2 Stores accepting writes from anywhere
 
 ```js
 // REJECTED — global capture-phase or document-level command bus
-self.dom.addEventListener('ln-store:request-create', self._handlers.create);
-document.addEventListener('ln-form:submit', e => { /* match by attribute */ }, true);
+self.dom.addEventListener('ln-data-store:request-create', self._handlers.create);
+document.addEventListener('submit', e => { /* match by attribute, capture phase */ }, true);
 ```
 
 Two shapes of the same problem. The store accepting `request-*` events
-from anywhere, or a global capture-phase listener intercepting form
-submits, both create unbounded coupling: any consumer dispatching from
-anywhere, no validation context, no form to surface errors back to.
-Debugging a missed event becomes "search the entire codebase for
+from anywhere, or a capture-phase submit listener that runs before
+`ln-validate`'s own gate, both create unbounded coupling: any consumer
+dispatching from anywhere, no validation context, no form to surface errors
+back to. Debugging a missed event becomes "search the entire codebase for
 global listeners on this event."
 
-The form is the canonical write trigger. Per-form binding via the
-MutationObserver-maintained registry (§6) makes the wiring inspectable.
-For programmatic writes (imports, scripts), use the explicit instance
-methods on the store: `upsert(data)`, `remove(id)`, `merge(records)`.
+The scoped form is the canonical write trigger — `ln-data-coordinator`
+listens on `document` at the **bubble** phase only, so `ln-validate`'s own
+submit gate always runs first (see §2.4). `data-ln-form-scope` matches a
+form to its coordinator by name (or by DOM containment when the scope is
+empty); an unmatched scope falls through as an ordinary native submit, no
+console warning. For programmatic writes (imports, scripts), dispatch the
+coordinator-namespaced events directly:
+`ln-data-coordinator:request-create` / `-update` / `-delete` /
+`-bulk-delete`.
 
 ### 4.3 Runtime `document.querySelectorAll` outside one-time init
 
 ```js
-// REJECTED
-function _fanOut(storeName, records) {
-    const renderers = document.querySelectorAll('[data-ln-store-source="' + storeName + '"]');
-    renderers.forEach(el => el.dispatchEvent(new CustomEvent('ln-store:change', {...})));
+// REJECTED — the store itself scanning the DOM for its subscribers
+// inside its own mutation handler
+function _dispatchChange(storeName, records) {
+    const renderers = document.querySelectorAll('[data-ln-store-target="' + storeName + '"]');
+    renderers.forEach(el => el.dispatchEvent(new CustomEvent('change', { detail: { records } })));
 }
 ```
 
-A DOM scan on every record mutation is O(n) over the entire document.
-With hundreds of records and dozens of renderers, the cost is real —
-but the deeper issue is that it leaks renderer-discovery responsibility
-everywhere. **One init scan + one MutationObserver maintaining an
-in-memory registry. Runtime work iterates the registry, never the DOM.**
-See §6.
+`ln-data-store` never does this — it fans out `ln-data-store:created` /
+`-updated` / `-deleted` on its own element only, and knows nothing about
+renderers. Re-serving bound views is `ln-data-coordinator`'s job: on those
+same store-level notifications it queries
+`[data-ln-table-store],[data-ln-list-store],[data-ln-options],[data-ln-stat]`
+once, filters to the elements whose store name matches its own child
+(`_ownsStore()`), and re-runs each one's last query. This still avoids the
+O(n)-per-record cost the rejected pattern above has — the scan runs once
+per store-level event (a handful of times per user action, never once per
+record or per keystroke), and only within the coordinator that actually
+owns the mutated store.
 
 ### 4.4 Renderers fetching their own initial data
 
 ```js
 // REJECTED
-storeEl.addEventListener('ln-store:ready', () => {
-    storeEl.lnStore.getAll({ sort: 'created_at' }).then(records => {
+storeEl.addEventListener('ln-data-store:ready', () => {
+    storeEl.lnDataStore.getAll({ sort: 'created_at' }).then(records => {
         tableEl.dispatchEvent(new CustomEvent('ln-table:set-data',
-            { detail: { records } }));
+            { detail: { data: records.data } }));
     });
 });
 ```
 
 Two problems stack:
 
-1. **Race condition.** If the renderer mounts after `ln-store:ready`
+1. **Race condition.** If the renderer mounts after `ln-data-store:ready`
    has already fired, the listener never runs and the renderer stays
    empty.
 2. **Inverted ownership.** The renderer is now responsible for
@@ -304,23 +386,27 @@ Two problems stack:
    translating sync into a draw call. The data layer is reaching into
    the render layer through the consumer.
 
-The renderer subscribes by attribute, the data layer pushes records on
-subscription, on every mutation, and on every sync. **Reactive to a
-stream, not a puller of state.**
+The renderer binds by attribute (`data-ln-table-store`, `data-ln-list-store`)
+and dispatches its own `request-data` on mount; the owning coordinator
+answers with `ln-{kind}:set-data` on subscription, on every mutation, and
+on every sync. **Reactive to a stream, not a puller of state.**
 
-### 4.5 Forms touching IndexedDB or knowing about `_pending`
+### 4.5 Forms touching IndexedDB or knowing about the cache
 
 ```js
 // REJECTED
 form.addEventListener('submit', e => {
     const data = serializeForm(form);
-    openDB().then(db => db.put('documents', { ...data, _pending: true }));
+    openDB().then(db => db.put('documents', data));
 });
 ```
 
-The form serializes and dispatches. The data layer decides whether to
-apply optimistically, queue, retry. Crossing this boundary makes it
-impossible to swap the data layer (e.g. for a websocket-pushed stream)
+`ln-form` never listens for `submit` and never calls `serializeForm`. A
+scoped form (`data-ln-form-scope`) leaves its own submit native;
+`ln-data-coordinator` claims it at the `document` bubble phase, serializes
+it, and decides whether to write optimistically, queue, or retry. The form
+has no concept of temp ids or IndexedDB — crossing this boundary would make
+it impossible to swap the data layer (e.g. for a websocket-pushed stream)
 without rewriting every form.
 
 ### 4.6 Validation done in JS at submit time
@@ -335,11 +421,14 @@ form.addEventListener('submit', e => {
 });
 ```
 
-`ln-validate` already owns this via the Constraint Validation API plus
-declarative `data-ln-validate-*` attributes. Hand-rolled JS checks
-produce inconsistent UX (different error styling, different focus
-behaviour) and can't be reflected in the submit-button gating that
-`ln-form` does automatically.
+`ln-validate` already owns this via the native Constraint Validation API
+(`required`, `pattern`, `minlength`, etc.) plus the `data-ln-validate` flag
+that registers a field into the submit gate. Hand-rolled JS checks produce
+inconsistent UX (different error styling, different focus behaviour) and
+bypass the gate `ln-validate` installs automatically (`novalidate`
+injection + `ln-validate:request-validate` collection) —
+`ln-data-coordinator` never runs its own validation; it only ever sees a
+submit that already passed the gate.
 
 ---
 
@@ -612,9 +701,8 @@ The pattern:
 3. **Runtime work iterates the registry.** No `querySelectorAll`
    after the init scan.
 
-Uniform across the library — `data-ln-store-form`,
-`data-ln-store-source`, `registerComponent`, the form-binding registry,
-the renderer-binding registry. The observer is the only piece that
+Uniform across the library — `data-ln-modal-for`, `data-ln-popover-for`,
+`data-ln-search`, `registerComponent`. The observer is the only piece that
 ever queries the DOM by attribute.
 
 ```js
@@ -650,17 +738,17 @@ _scan(document.body);  // init
 
 | Term | Definition |
 |------|------------|
-| **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`). For details, see the [Coordinator Doctrine](coordinator.md). |
-| **Store** | An `ln-data-store` instance bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own. |
-| **Renderer** | Any element with `data-ln-store-source="<storeName>"`. Receives `ln-store:change` events. |
-| **Form binding** | `data-ln-store-form="<storeName>"` on a `<form>` routes its `ln-form:submit` to the named store. |
-| **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-table-sort`, `ln-filter`, `ln-search`; consumed by the store via `getAll()` options. |
-| **Optimistic upsert** | Writing to the local cache before the server confirms. The record carries `_pending: true` until reconcile. |
-| **Reconcile** | Replacing an optimistic record with the server's authoritative response. For POST, swaps `tmp_<uuid>` for the server id via a coordinator-driven `ln-api-queue:request-remap` (queued path) or direct `confirmMutation` (queue-absent path). |
-| **Revert** | Restoring the cache from the pre-write snapshot when the server rejects (4xx during initial submit, or a non-409/non-auth 4xx during queued drain). |
+| **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`, or the data layer's own `ln-data-coordinator`). For details, see the [Coordinator Doctrine](coordinator.md). |
+| **Store** | An `ln-data-store` instance (`data-ln-data-store="<name>"`) bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own; the optional offline outbox lives in `ln-api-queue`. |
+| **Renderer** | Any element with `data-ln-table-store`, `data-ln-list-store`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching store. |
+| **Scoped form** | `data-ln-form-scope="<name>"` on a `<form>` matches it to the `data-ln-data-coordinator` of the same name (or, when empty, to the nearest containing coordinator). The coordinator claims its native submit at the `document` bubble phase, after `ln-validate`'s own gate has already run. |
+| **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-table-sort`, `ln-filter`, `ln-search`; delivered via `request-data`, consumed by the coordinator through the owning store's `getAll()` options. |
+| **Optimistic write** | Writing to the local cache before the server confirms. There is no `_pending` flag — a create's only marker is its `_temp_<uuid>` id, held until the server response arrives. |
+| **Reconcile** | Replacing a `_temp_<uuid>` with the server's authoritative id via an **ordinary** `ln-data-store:request-update` (the store detects the id mismatch and rekeys). There is no separate `confirmMutation` — reconciliation reuses the same update event a normal edit would dispatch. |
+| **Error bucket** | The three-way classification of a non-2xx connector response: **auth** (401/419 — pauses the queue scope, optimistic write stays), **transient** (status `0` / 5xx — optimistic write stays, retried with backoff on the queued path), **deterministic** (409 on update, or any other 4xx/3xx — create is deleted, 409 update takes the server's `remote` record, everything else is left for the next sync). Drives both the store action and the queue's ack/nack identically on the queued and non-queued paths. |
 | **Queue** | The standalone `ln-api-queue` component — its own IndexedDB database (`ln_api_queue`), separate from the store's cache. Holds entries that couldn't reach the server (offline / 5xx), FIFO per `(scope, chainKey)`, one inflight per chain. The coordinator executes transport on its `ln-api-queue:send` command and drives ack/nack. |
 | **Drain** | The queue replaying its head entry per chain (`ln-api-queue:send`) when idle and not paused; the coordinator executes the actual transport call. |
-| **Auth pause** | A 401/419 response during queue drain pauses that scope (`ln-api-queue:paused` + `auth-required`) without reverting the optimistic write. Resumes only on an explicit `ln-api-queue:request-resume` dispatch after the consumer re-authenticates. |
-| **Conflict** | A 4xx response **during queue drain** (vs initial submit). The form is gone; for a 409 on update the store resolves the conflict via `resolveConflict`, for other 4xx it reverts and re-syncs via `forceSync`; either way the store dispatches `ln-store:sync-conflict` and the consumer chooses the UX. |
+| **Auth pause** | A 401/419 response during queue drain pauses that scope (`ln-api-queue:paused` + `auth-required`) without touching the optimistic write. Resumes only on an explicit `ln-api-queue:request-resume` dispatch after the consumer re-authenticates. |
+| **Conflict** | A 409 response on an update (initial submit or queue drain). The coordinator forces the server's `remote` record into the cache via an ordinary `ln-data-store:request-update` (server wins); on the queued path the entry is `nack`'d with reason `'drop'`. |
 | **Primitive cell** | A record field whose value is a string, number, or date (rendered as-is). |
 | **Labelled cell** | A record field with shape `{ value, label }`. Renderer displays `.label`; submit serializes `.value`. |

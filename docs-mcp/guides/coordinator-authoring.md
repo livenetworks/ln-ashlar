@@ -28,9 +28,9 @@ A **Coordinator** is a component or script that acts as the decoupled "brain" (t
 
 A coordinator manages exactly four types of operations:
 
-1. **UI Trigger ──> Request Event:** Captures user actions (e.g., clicking a button or submitting a custom control) and dispatches a request event targeting the appropriate component (e.g., `ln-store:request-create`).
+1. **UI Trigger ──> Request Event:** Captures user actions (e.g., clicking a button or submitting a custom control) and dispatches a request event targeting the appropriate component (e.g., `ln-data-store:request-create`).
 2. **Form Handling:** Intercepts form submissions, serializes inputs using core helpers, handles optimistic state submissions, and manages server replies.
-3. **Notification ──> UI Feedback:** Listens for component status changes (e.g. `ln-store:created`) and provides UI feedback (e.g. displaying success toast messages or closing modals).
+3. **Notification ──> UI Feedback:** Listens for component status changes (e.g. `ln-data-store:created`) and provides UI feedback (e.g. displaying success toast messages or closing modals).
 4. **Bridge Component A ──> Component B:** Bridges states across different components (e.g. listening to a record selection event in a table and updating attributes to fill and open an edit form).
 
 ---

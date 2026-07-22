@@ -16,7 +16,7 @@ sequenceDiagram
     participant CouchDB as CouchDB Sync Gateway
 
     %% INITIAL LOAD / DELTA FETCH
-    Store->>Coordinator: Event: ln-store:request-remote-sync (since: "1-g1A...")
+    Store->>Coordinator: Event: ln-data-store:request-remote-sync (since: "1-g1A...")
     Coordinator->>Connector: Event: ln-couchdb-connector:request-sync (since: "1-g1A...")
     Connector->>CouchDB: GET /{db}/_changes?include_docs=true&since=1-g1A...
     CouchDB-->>Connector: JSON changes feed (results, last_seq)
@@ -25,7 +25,7 @@ sequenceDiagram
     Coordinator->>Store: applySync(data, deleted, synced_at)
 
     %% OPTIMISTIC UPDATE (parallel fan-out — coordinator dispatches to store AND connector in the same handler)
-    Coordinator->>Store: Event: ln-store:request-update (id: doc1, data: {...}) [optimistic, local]
+    Coordinator->>Store: Event: ln-data-store:request-update (id: doc1, data: {...}) [optimistic, local]
     Coordinator->>Connector: Event: ln-couchdb-connector:request-update (id: doc1, data: {...}, meta)
     alt Has revision in memory
         Connector->>CouchDB: PUT /{db}/doc1 with If-Match (revision)
@@ -37,7 +37,7 @@ sequenceDiagram
     CouchDB-->>Connector: JSON confirmation (ok: true, rev: "2-xyz...")
     Note over Connector: Merge _rev back into local record; presence-check {message,content} envelope
     Connector->>Coordinator: Event: ln-couchdb-connector:updated (record, message, meta)
-    Coordinator->>Store: Event: ln-store:request-update (id: doc1, data: record) [ordinary update, reconciles the optimistic write]
+    Coordinator->>Store: Event: ln-data-store:request-update (id: doc1, data: record) [ordinary update, reconciles the optimistic write]
 ```
 
 ---

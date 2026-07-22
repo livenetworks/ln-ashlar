@@ -7,7 +7,7 @@
 
 ## 1. Проблемот што го решаваме
 
-Денес библиотеката има чисти слоеви за data workflow-от — store (оптимистички кеш), queue (offline outbox), connector (транспорт), координатор (медијатор кој сето тоа веќе го оркестрира интернално) — но **влезната точка на мутациите не е декларативна**. Секоја CRUD демо-страница рачно гради `ln-store:request-create/update/delete` настани од form payload со inline JS (api-queue.html, coordinator.html, store-usecase.html...). Тоа значи:
+Денес библиотеката има чисти слоеви за data workflow-от — store (оптимистички кеш), queue (offline outbox), connector (транспорт), координатор (медијатор кој сето тоа веќе го оркестрира интернално) — но **влезната точка на мутациите не е декларативна**. Секоја CRUD демо-страница рачно гради `ln-data-store:request-create/update/delete` настани од form payload со inline JS (api-queue.html, coordinator.html, store-usecase.html...). Тоа значи:
 
 *   Секој потрошувач ја препишува истата жица (FormData → detail објект → dispatch).
 *   Формата и data слојот немаат договор — врската е ад-хок.
@@ -85,7 +85,7 @@ detail: {
 
 При преземање: поставува `detail.claimed = true` (dispatch е синхрон), **го толкува** суровиот detail и го преведува во постоечкиот влез на store детето:
 
-*   **Режим:** буквално читање, без претпоставки — `POST` → `ln-store:request-create`; `PUT`/`PATCH` → `ln-store:request-update`. Сигналот го одржува постоечкиот fill/reset примитив: `lnFill` на edit запис поставува `_method` + препишан action; reset го враќа create обликот (`_method` се празни, останува `method="post"` од маркапот).
+*   **Режим:** буквално читање, без претпоставки — `POST` → `ln-data-store:request-create`; `PUT`/`PATCH` → `ln-data-store:request-update`. Сигналот го одржува постоечкиот fill/reset примитив: `lnFill` на edit запис поставува `_method` + препишан action; reset го враќа create обликот (`_method` се празни, останува `method="post"` од маркапот).
 *   **Идентитет:** `id` и `expected_version` ги вади од `data` (координаторска конвенција, не формина).
 *   **URL:** проследениот `action` е **изворот на вистина за мутацискиот endpoint** (HTML-first — истиот URL на кој формата би направила нативен submit без JS). Координаторот го персистира во queue entry-то (`meta.action` — queue-от останува blind, `meta` е opaque како и досега), а во send мигот конекторот извршува кон `action` (create) односно `action + '/' + targetId` (update/delete), со `X-LN-Response: data`. **Клучно:** се персистира ресурсниот URL, без id во него — резолвиран per-record URL со temp id внатре би останал stale по remap; id-то се дошива при send од моменталниот `targetId`. Конекторската `data-ln-api-path` конфигурација останува само за read/sync.
 
@@ -101,7 +101,7 @@ detail: {
 
 ### 3.5 Delete (отворена точка)
 
-Формите се за create/update. Delete останува како денес — dispatch на `ln-store:request-delete` (копче + confirm). Идна опција: декларативен атрибут за delete копче врзано за scope, но тоа е надвор од овој опфат.
+Формите се за create/update. Delete останува како денес — dispatch на `ln-data-store:request-delete` (копче + confirm). Идна опција: декларативен атрибут за delete копче врзано за scope, но тоа е надвор од овој опфат.
 
 ---
 
@@ -111,7 +111,7 @@ detail: {
 *   **`ln-api-queue` останува connector-blind и transport-blind.** Single source of truth за *pending* writes (веќе е — ништо не се праќа освен од негов drain), но извршувањето останува делегирано преку координаторот.
 *   **`ln-data-store` останува storage-blind.** Не пресретнува DOM/form настани — data/render разделбата важи.
 *   **SSR патот (`action` + `data-ln-form-action-edit`) останува недопрен.**
-*   **Постоечкиот event влез (`ln-store:request-*`) останува јавен** — формата е удобниот влез, не единствениот (bulk акции, sortable reorder, autosave и понатаму дишат директно).
+*   **Постоечкиот event влез (`ln-data-store:request-*`) останува јавен** — формата е удобниот влез, не единствениот (bulk акции, sortable reorder, autosave и понатаму дишат директно).
 
 ---
 
@@ -131,7 +131,7 @@ sequenceDiagram
     Form->>Form: preventDefault() + нормализирај FormData (сурово)
     Form->>Coord: ln-form:submit-record { action:'/documents', method:'PUT', data } (bubble/претплата на document)
     Coord->>Coord: claimed = true — толкува PUT → update, id/expected_version од data
-    Coord->>Store: ln-store:request-update (оптимистички, веднаш во UI)
+    Coord->>Store: ln-data-store:request-update (оптимистички, веднаш во UI)
     Coord->>Queue: ln-api-queue:request-enqueue { chainKey:5, op:'update', meta:{ action:'/documents' }, ... }
     Queue->>Coord: ln-api-queue:send { entryId, targetId:5, meta, ... }
     Coord->>Conn: ln-api-connector:request-update { url:'/documents', id:5, data, expected_version:2, meta:{ entryId } }
@@ -145,7 +145,7 @@ sequenceDiagram
     else 409 Conflict
         API-->>Conn: conflict body
         Conn->>Coord: ln-api-connector:error { status 409, conflictData, meta }
-        Coord->>Store: ln-store:sync-conflict
+        Coord->>Store: ln-data-store:sync-conflict
         Coord->>Queue: nack { reason:'drop' }
     else Offline / 5xx
         Conn->>Coord: ln-api-connector:error { status 0/5xx, meta }

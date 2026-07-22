@@ -74,12 +74,12 @@
 
 		[packagesStoreEl, tenantsStoreEl].forEach(function (storeEl) {
 			['ready', 'loaded', 'confirmed'].forEach(function (ev) {
-				storeEl.addEventListener('ln-store:' + ev, refreshDashboardUsageIfMounted);
+				storeEl.addEventListener('ln-data-store:' + ev, refreshDashboardUsageIfMounted);
 			});
-			storeEl.addEventListener('ln-store:synced', function (e) {
+			storeEl.addEventListener('ln-data-store:synced', function (e) {
 				if (e.detail && e.detail.changed) refreshDashboardUsageIfMounted();
 			});
-			storeEl.addEventListener('ln-store:loaded', onDashStoreLoaded, { once: true });
+			storeEl.addEventListener('ln-data-store:loaded', onDashStoreLoaded, { once: true });
 		});
 
 		window.addEventListener('app:packages-rebuild', refreshDashboardUsageIfMounted);

@@ -230,16 +230,16 @@
 		// Store Event Telemetry
 		const storeEvents = ['ready', 'loaded', 'synced', 'created', 'updated', 'deleted', 'confirmed', 'reverted', 'conflict'];
 		storeEvents.forEach(ev => {
-			storeEl.addEventListener('ln-store:' + ev, function(e) {
-				logTelemetry('store-in', `ln-store:${ev} was captured by UI Presenter`, e.detail);
+			storeEl.addEventListener('ln-data-store:' + ev, function(e) {
+				logTelemetry('store-in', `ln-data-store:${ev} was captured by UI Presenter`, e.detail);
 			});
 		});
 
 		// Store request events caught by parent coordinator
 		const coordinatorIntercepts = ['request-remote-sync', 'request-remote-create', 'request-remote-update', 'request-remote-delete', 'request-remote-bulk-delete'];
 		coordinatorIntercepts.forEach(ev => {
-			storeEl.addEventListener('ln-store:' + ev, function(e) {
-				logTelemetry('store-out', `ln-store:${ev} bubbled UP to Parent Coordinator`, e.detail);
+			storeEl.addEventListener('ln-data-store:' + ev, function(e) {
+				logTelemetry('store-out', `ln-data-store:${ev} bubbled UP to Parent Coordinator`, e.detail);
 				
 				// Show mapping telemetry in action!
 				const mapper = coordEl.lnDataCoordinator ? coordEl.lnDataCoordinator.mapper : null;

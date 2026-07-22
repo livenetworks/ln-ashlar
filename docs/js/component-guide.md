@@ -112,7 +112,7 @@ All display text comes from outside the component:
 **What IS allowed in JS:**
 - Console messages: `console.warn('[ln-time] Missing datetime')` — developer-only, not user-facing
 - Attribute values: `'true'`, `'false'`, class names — technical, not display
-- Event names: `'ln-store:request-create'` — internal, not display
+- Event names: `'ln-data-store:request-create'` — internal, not display
 
 ```javascript
 // WRONG — hardcoded display text
@@ -379,7 +379,7 @@ document.addEventListener('ln-{component}:request-data', function (e) {
 })
 
 // Coordinator re-feeds data when store syncs
-document.addEventListener('ln-store:synced', function (e) {
+document.addEventListener('ln-data-store:synced', function (e) {
     // Re-query with component's current state
     storeEl.lnStore.getAll({
         sort: componentEl.lnComponent.currentSort,
@@ -397,7 +397,7 @@ document.addEventListener('ln-store:synced', function (e) {
 - Component NEVER imports or references store directly
 - Component requests data via event, receives via event
 - Coordinator is the ONLY bridge between component and store
-- Re-feed data on `ln-store:synced` to pick up background changes
+- Re-feed data on `ln-data-store:synced` to pick up background changes
 
 ---
 
@@ -447,7 +447,7 @@ try {
 | Window API | `window.ln{Component}` | `window.lnTime` |
 | DOM instance | `el.ln{Component}` | `el.lnTime` |
 | Event (notification) | `ln-{component}:{action}` | `ln-time:rendered` |
-| Event (request) | `ln-{component}:request-{action}` | `ln-store:request-create` |
+| Event (request) | `ln-{component}:request-{action}` | `ln-data-store:request-create` |
 | Event (before, cancelable) | `ln-{component}:before-{action}` | `ln-modal:before-close` |
 | Dictionary attribute | `data-ln-{component}-dict` | `data-ln-toast-dict` |
 | Template | `data-ln-template="{name}"` | `data-ln-template="row"` |

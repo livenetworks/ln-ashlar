@@ -968,7 +968,7 @@ button.btn-icon {
 // the native submit automatically (preventDefault) — no application JS
 // needed to build request-create/request-update events by hand. React to
 // the store outcome instead of a form-level event:
-document.addEventListener('ln-store:created', function (e) {
+document.addEventListener('ln-data-store:created', function (e) {
     if (e.detail.store !== 'my-resource') return;
     document.getElementById('my-modal').setAttribute('data-ln-modal', 'close');
 });</code></pre>

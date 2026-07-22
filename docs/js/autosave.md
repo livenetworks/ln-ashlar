@@ -91,7 +91,7 @@ The closure-scoped `_save()` helper (defined inside the constructor):
 
 The `try/catch` swallows all errors silently — `QuotaExceededError`,
 localStorage-disabled, `SecurityError`. If the write fails, no event fires.
-There is no `:save-failed` event (unlike `ln-store:quota-exceeded`).
+There is no `:save-failed` event (unlike `ln-data-store:quota-exceeded`).
 
 `:saved` fires AFTER the write succeeds. There is no cancelable `:before-save`.
 
@@ -221,7 +221,7 @@ used for Shadow DOM contexts the shared observer cannot see.
 ## Future work
 
 - **No quota-exceeded event** — silent failure on writes past ~5MB. Add
-  `ln-autosave:quota-exceeded` paralleling `ln-store:quota-exceeded`.
+  `ln-autosave:quota-exceeded` paralleling `ln-data-store:quota-exceeded`.
 - **No before-save cancelable event** — consumers cannot filter the data before
   it lands in localStorage. The workaround (rewrite in `:saved` listener) is
   wasteful.

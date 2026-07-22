@@ -41,7 +41,7 @@ On store mutations, `_refreshAll()` re-parses `data-ln-stat-filter` from each st
 
 ```html
 <div data-ln-data-coordinator>
-  <div data-ln-data-store="packages" data-ln-store-endpoint="/api/packages"></div>
+  <div data-ln-data-store="packages"></div>
   <div data-ln-api-connector data-ln-api-endpoint="/api/packages"></div>
 
   <p>
@@ -53,4 +53,4 @@ On store mutations, `_refreshAll()` re-parses `data-ln-stat-filter` from each st
 </div>
 ```
 
-The `is-loading` class is removed on first delivery. v1 supports one `field:value` pair per element; for complex multi-field counts, listen to `ln-store:ready` + `ln-store:synced` and call `store.count()` directly.
+The `is-loading` class is removed on first delivery. v1 supports one `field:value` pair per element; for complex multi-field counts, listen to `ln-data-store:ready` + `ln-data-store:synced` and call `store.count()` directly.

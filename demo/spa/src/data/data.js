@@ -40,7 +40,7 @@
 		// Register store computed presenters
 		registerPresenters();
 		[packagesStoreEl, tenantsStoreEl].forEach(function (storeEl) {
-			storeEl.addEventListener('ln-store:ready', function () {
+			storeEl.addEventListener('ln-data-store:ready', function () {
 				if (!presentersRegistered) registerPresenters();
 			}, { once: true });
 		});
@@ -53,9 +53,9 @@
 		}
 
 		['ready', 'loaded', 'confirmed'].forEach(function (ev) {
-			packagesStoreEl.addEventListener('ln-store:' + ev, onPackagesChanged);
+			packagesStoreEl.addEventListener('ln-data-store:' + ev, onPackagesChanged);
 		});
-		packagesStoreEl.addEventListener('ln-store:synced', function (e) {
+		packagesStoreEl.addEventListener('ln-data-store:synced', function (e) {
 			if (e.detail && e.detail.changed) onPackagesChanged();
 		});
 	});

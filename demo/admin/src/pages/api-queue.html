@@ -179,8 +179,8 @@
 		'created', 'updated', 'deleted'
 	];
 	storeEvents.forEach(function (evName) {
-		storeEl.addEventListener('ln-store:' + evName, function (e) {
-			writeTelemetry('OUT', 'ln-store:' + evName, e.detail);
+		storeEl.addEventListener('ln-data-store:' + evName, function (e) {
+			writeTelemetry('OUT', 'ln-data-store:' + evName, e.detail);
 		});
 	});
 
@@ -211,11 +211,11 @@
 
 	// ─── Track last created/confirmed task id ────────────────────
 
-	storeEl.addEventListener('ln-store:created', function (e) { lastTaskId = e.detail.tempId; });
-	storeEl.addEventListener('ln-store:updated', function (e) {
+	storeEl.addEventListener('ln-data-store:created', function (e) { lastTaskId = e.detail.tempId; });
+	storeEl.addEventListener('ln-data-store:updated', function (e) {
 		if (e.detail.record && e.detail.record.id !== undefined) lastTaskId = e.detail.record.id;
 	});
-	storeEl.addEventListener('ln-store:deleted', function () { lastTaskId = null; });
+	storeEl.addEventListener('ln-data-store:deleted', function () { lastTaskId = null; });
 
 	// ─── Offline Toggle (data-ln-api-queue-online) ───────────────
 

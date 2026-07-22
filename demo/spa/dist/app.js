@@ -156,12 +156,12 @@
 
 		[packagesStoreEl, tenantsStoreEl].forEach(function (storeEl) {
 			['ready', 'loaded', 'confirmed'].forEach(function (ev) {
-				storeEl.addEventListener('ln-store:' + ev, refreshDashboardUsageIfMounted);
+				storeEl.addEventListener('ln-data-store:' + ev, refreshDashboardUsageIfMounted);
 			});
-			storeEl.addEventListener('ln-store:synced', function (e) {
+			storeEl.addEventListener('ln-data-store:synced', function (e) {
 				if (e.detail && e.detail.changed) refreshDashboardUsageIfMounted();
 			});
-			storeEl.addEventListener('ln-store:loaded', onDashStoreLoaded, { once: true });
+			storeEl.addEventListener('ln-data-store:loaded', onDashStoreLoaded, { once: true });
 		});
 
 		window.addEventListener('app:packages-rebuild', refreshDashboardUsageIfMounted);
@@ -211,7 +211,7 @@
 		// Register store computed presenters
 		registerPresenters();
 		[packagesStoreEl, tenantsStoreEl].forEach(function (storeEl) {
-			storeEl.addEventListener('ln-store:ready', function () {
+			storeEl.addEventListener('ln-data-store:ready', function () {
 				if (!presentersRegistered) registerPresenters();
 			}, { once: true });
 		});
@@ -224,9 +224,9 @@
 		}
 
 		['ready', 'loaded', 'confirmed'].forEach(function (ev) {
-			packagesStoreEl.addEventListener('ln-store:' + ev, onPackagesChanged);
+			packagesStoreEl.addEventListener('ln-data-store:' + ev, onPackagesChanged);
 		});
-		packagesStoreEl.addEventListener('ln-store:synced', function (e) {
+		packagesStoreEl.addEventListener('ln-data-store:synced', function (e) {
 			if (e.detail && e.detail.changed) onPackagesChanged();
 		});
 	});
@@ -239,7 +239,7 @@
 	// Write path is native-first (data-ln-form-scope="packages" on
 	// #package-form, which serves both create and edit via modal-mode) —
 	// react to either store outcome by closing the modal.
-	['ln-store:created', 'ln-store:updated'].forEach(function (ev) {
+	['ln-data-store:created', 'ln-data-store:updated'].forEach(function (ev) {
 		document.addEventListener(ev, function (e) {
 			if (e.detail.store !== 'packages') return;
 			const packageModal = document.getElementById('package-modal');
@@ -306,10 +306,10 @@
 		});
 
 		// Offline banner logic wired to store offline/online events
-		document.addEventListener('ln-store:offline', function () {
+		document.addEventListener('ln-data-store:offline', function () {
 			if (offlineBanner) offlineBanner.classList.remove('hidden');
 		});
-		document.addEventListener('ln-store:online', function () {
+		document.addEventListener('ln-data-store:online', function () {
 			if (offlineBanner) offlineBanner.classList.add('hidden');
 		});
 
@@ -342,7 +342,7 @@
 
 	// Write path is native-first (data-ln-form-scope="tenants" on
 	// #tenant-form) — react to the store outcome instead of a form-level event.
-	document.addEventListener('ln-store:updated', function (e) {
+	document.addEventListener('ln-data-store:updated', function (e) {
 		if (e.detail.store !== 'tenants') return;
 		window.lnRouter.navigate('/spa/tenants');
 	});
@@ -355,7 +355,7 @@
 	// Write path is native-first (data-ln-form-scope="tenants" on
 	// #tenant-create-form) — ln-data-coordinator claims the native submit;
 	// react to the store outcome instead of a form-level event.
-	document.addEventListener('ln-store:created', function (e) {
+	document.addEventListener('ln-data-store:created', function (e) {
 		if (e.detail.store !== 'tenants') return;
 		const tenantModal = document.getElementById('tenant-modal');
 		if (tenantModal) tenantModal.setAttribute('data-ln-modal', 'close');

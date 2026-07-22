@@ -28,13 +28,13 @@ Use `setPresenters` for fields like `updated_display`, `size_display`, `status_l
 
 ### Store-Change Refresh
 
-The coordinator listens on `this.dom` for `ln-store:ready`, `loaded`, `created`, `updated`, `deleted`, and `synced` (only when `changed`). On any of these, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
+The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `created`, `updated`, `deleted`, and `synced` (only when `changed`). On any of these, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
 
 ### Zero-JS Example
 
 ```html
 <ul data-ln-data-coordinator hidden>
-  <li data-ln-data-store="people" data-ln-store-endpoint="/api/people"></li>
+  <li data-ln-data-store="people"></li>
   <li data-ln-api-connector data-ln-api-endpoint="/api/people"></li>
 </ul>
 
@@ -79,7 +79,7 @@ The coordinator acts as a parent wrapper enclosing the database cache and transp
      
     <!-- Tier 1: Local Cache Database (IndexedDB - pure and network-blind) -->
     <li data-ln-data-store 
-        data-ln-store-indexes="status,updated_at">
+        data-ln-data-store-indexes="status,updated_at">
     </li>
 
     <!-- Tier 2: Transport Gateway (API / REST Connector) -->
@@ -189,7 +189,7 @@ events dispatched on the coordinator's own element:
 | `ln-data-coordinator:request-bulk-delete` | `{ ids }` |
 
 These are intentionally namespaced under the coordinator (not
-`ln-store:request-*`) so there is no naming collision with the events the
+`ln-data-store:request-*`) so there is no naming collision with the events the
 store dispatches — no loop-guard logic is needed.
 
 ### 1. Parallel Fan-Out — the core write model
@@ -208,8 +208,8 @@ sequenceDiagram
 
     Intake->>Coord: _fanOutCreate(children, data, action)
     par Local (always)
-        Coord->>Store: Event: ln-store:request-create { tempId, data }
-        Store-->>Coord: Event: ln-store:created (bubbles, refreshes bound views)
+        Coord->>Store: Event: ln-data-store:request-create { tempId, data }
+        Store-->>Coord: Event: ln-data-store:created (bubbles, refreshes bound views)
     and Remote (only if connector or queue child present)
         alt queue present
             Coord->>Gateway: Event: ln-api-queue:request-enqueue { chainKey:tempId, op:'create', payload:egress(data), meta:{tempId,action} }
@@ -223,11 +223,11 @@ The only guard on all four write paths is `!children.storeEl` (console
 warning + no-op). There is no `!children.connector` guard — **a
 store-only coordinator (no connector, no queue child) is a valid,
 supported offline-only setup**: the fan-out dispatches the local
-`ln-store:request-*` event and stops there. No remote call, no toast; the
+`ln-data-store:request-*` event and stops there. No remote call, no toast; the
 record simply keeps its `_temp_`-prefixed id until a connector is added
 later.
 
-### 2. Sync (`ln-store:request-remote-sync`) — unchanged
+### 2. Sync (`ln-data-store:request-remote-sync`) — unchanged
 
 Triggered when the store cache boots up or detects stale data. This is
 the one `request-remote-*` event that still exists — sync has no
@@ -240,7 +240,7 @@ sequenceDiagram
     participant Coord as data-ln-data-coordinator
     participant Gateway as data-ln-*-connector
     
-    Store->>Coord: Event: ln-store:request-remote-sync (since)
+    Store->>Coord: Event: ln-data-store:request-remote-sync (since)
     Coord->>Gateway: Event: ln-api-connector:request-sync { since, meta }
     Gateway-->>Coord: Event: ln-api-connector:fetched { data, meta }
     Note over Coord: Applies Ingress Mapper:<br/>mapper.ingress(serverRawRecord)
@@ -251,7 +251,7 @@ sequenceDiagram
 
 There is no `confirmMutation`/`revertMutation`/`resolveConflict` anymore.
 A server response is reconciled with **an ordinary
-`ln-store:request-update`** — for a create, the target `id` is the
+`ln-data-store:request-update`** — for a create, the target `id` is the
 `tempId` and the incoming `data.id` is the real server id, which the store
 detects as an id-swap (rekey) automatically:
 
@@ -263,13 +263,13 @@ sequenceDiagram
 
     Gateway-->>Coord: Event: ln-api-connector:created { record, message, meta:{tempId} }
     Note over Coord: mapper.ingress(record)
-    Coord->>Store: Event: ln-store:request-update { id: meta.tempId, data: serverRecord }
-    Note over Store: data.id !== tempId -> rekey (id-swap), fires ln-store:updated
+    Coord->>Store: Event: ln-data-store:request-update { id: meta.tempId, data: serverRecord }
+    Note over Store: data.id !== tempId -> rekey (id-swap), fires ln-data-store:updated
     Coord->>Coord: _toastFromMessage(message) — success toast if the server sent one
 ```
 
 Update/delete/bulk-delete confirmations follow the same shape (ordinary
-`ln-store:request-update`/no reconciliation needed for delete since the
+`ln-data-store:request-update`/no reconciliation needed for delete since the
 optimistic delete already applied) — see "Error reconciliation policy"
 below for what happens when the server instead responds with an error.
 
@@ -305,13 +305,13 @@ with `data-ln-api-base-url` exactly like the `path` fallback.
 The coordinator listens for `ln-api-queue:send` on the queue element. It
 maps `op` to the matching connector `:request-*` event (same egress/ingress flow as the
 direct path) and, on resolution, drives both the store and the queue via the
-ordinary `ln-store:request-update`/`ln-store:request-delete` reconciliation
+ordinary `ln-data-store:request-update`/`ln-data-store:request-delete` reconciliation
 described above (no `confirmMutation`):
 
 | op | success → store | success → queue command |
 |---|---|---|
-| create | `ln-store:request-update { id: meta.tempId, data: ingress(record) }` (id-swap) | `request-remap {oldKey:meta.tempId, newId:record.id}` **then** `ack {entryId}` |
-| update | `ln-store:request-update { id: meta.id, data: ingress(record) }` | `ack {entryId}` |
+| create | `ln-data-store:request-update { id: meta.tempId, data: ingress(record) }` (id-swap) | `request-remap {oldKey:meta.tempId, newId:record.id}` **then** `ack {entryId}` |
+| update | `ln-data-store:request-update { id: meta.id, data: ingress(record) }` | `ack {entryId}` |
 | delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
 | bulk-delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
 
@@ -348,7 +348,7 @@ degraded fallback:
 Every `_fanOut*` method checks `children.queue` then `children.connector`
 and simply **stops after the local dispatch** if neither exists. Writes
 still go through the coordinator's intake (form or
-`ln-data-coordinator:request-*`), still hit `ln-store:request-create`/
+`ln-data-coordinator:request-*`), still hit `ln-data-store:request-create`/
 `request-update`/`request-delete`/`request-bulk-delete`, and still refresh
 bound views — there is just no outbound network call and no toast. This is
 the same code path a connector-equipped coordinator uses; adding a
@@ -366,16 +366,16 @@ of three buckets by `detail.status` (never a fourth "unknown" bucket —
 |---|---|---|---|---|
 | **Auth** | `401` / `419` | none — optimistic write stays | `nack {reason:'auth'}` (pauses that scope) | `auth` dict key |
 | **Transient** | `0` (network) / `5xx` | none — optimistic write stays; never deleted | `nack {reason:'retry'}` (backoff ladder) | none immediately; on **terminal** failure (`ln-api-queue:failed`) → `network` dict key. Non-queued: `network` dict key fires immediately (single attempt already spent). |
-| **Deterministic** | `409` (update) / other `4xx` / `3xx` | `409` update: ordinary `ln-store:request-update` with the server's `remote` record (server wins). `create`: `ln-store:request-delete` for the temp id (server rejected it outright). Other 4xx update/delete/bulk: left as-is, next sync reconciles. | `nack {reason:'drop'}` (never retried) | `conflict` (409 update) or `rejected` (everything else deterministic) |
+| **Deterministic** | `409` (update) / other `4xx` / `3xx` | `409` update: ordinary `ln-data-store:request-update` with the server's `remote` record (server wins). `create`: `ln-data-store:request-delete` for the temp id (server rejected it outright). Other 4xx update/delete/bulk: left as-is, next sync reconciles. | `nack {reason:'drop'}` (never retried) | `conflict` (409 update) or `rejected` (everything else deterministic) |
 
 **Never retried** = deterministic errors always `nack 'drop'` on the queued
 path — a 4xx is never re-attempted, only sync eventually catches up.
 **Never silently discards a local write on a transient/network failure** —
 that is the core "no-pending" invariant: an optimistic write is only ever
 removed by an explicit server rejection (create 4xx) or a genuine local
-`ln-store:request-delete`, never by a retry-exhausted network error.
+`ln-data-store:request-delete`, never by a retry-exhausted network error.
 
-There is no `ln-store:sync-conflict` event and no `forceSync()` error
+There is no `ln-data-store:sync-conflict` event and no `forceSync()` error
 backstop — both were removed as part of this refactor (no grep-verified
 consumer existed for either).
 
@@ -424,10 +424,10 @@ ignored otherwise):
 
 The coordinator — not the store — decides WHEN to sync:
 
-* Listens for `ln-store:initialized` on its store child: if
+* Listens for `ln-data-store:initialized` on its store child: if
   `!detail.hasCache` → `store.forceSync()` (initial load); else if the
   store is stale → `store.forceSync()`.
-* **Race guard.** `ln-store:initialized` can fire before the coordinator
+* **Race guard.** `ln-data-store:initialized` can fire before the coordinator
   finishes binding (async `_initStore`, SPA-injected subtree). When
   children resolve, if `store.isLoaded` is already true, the coordinator
   evaluates the same condition directly from instance state instead of
@@ -435,9 +435,9 @@ The coordinator — not the store — decides WHEN to sync:
 * A module-level singleton wires **one shared** `window 'online'`,
   `window 'offline'`, and `document 'visibilitychange'` listener set across
   every coordinator instance on the page (not one per instance). On
-  `online`, dispatches `ln-store:online` on `document` once, then for each
+  `online`, dispatches `ln-data-store:online` on `document` once, then for each
   coordinator with a loaded, non-syncing store: `store.forceSync()`. On
-  `offline`, dispatches `ln-store:offline` on `document` once. On
+  `offline`, dispatches `ln-data-store:offline` on `document` once. On
   `visibilitychange` (tab visible again), for each coordinator whose store
   is stale: `store.forceSync()`.
 
@@ -445,10 +445,10 @@ The coordinator — not the store — decides WHEN to sync:
 
 | Attribute | Description |
 |---|---|
-| `data-ln-data-coordinator-stale` | Seconds threshold before the store is considered stale; falls back to the store's own `data-ln-data-store-stale` / `data-ln-store-stale`; default 300; `-1` / `never` = never stale. |
-| `data-ln-data-coordinator-no-autosync` | Presence opts the coordinator out of online/visibility auto-sync; falls back to the store's own `data-ln-data-store-no-autosync` / `data-ln-store-no-autosync`. |
+| `data-ln-data-coordinator-stale` | Seconds threshold before the store is considered stale; falls back to the store's own `data-ln-data-store-stale`; default 300; `-1` / `never` = never stale. |
+| `data-ln-data-coordinator-no-autosync` | Presence opts the coordinator out of online/visibility auto-sync; falls back to the store's own `data-ln-data-store-no-autosync`. |
 
-`ln-store:online` / `ln-store:offline` now require a coordinator on the
+`ln-data-store:online` / `ln-data-store:offline` now require a coordinator on the
 page — the store itself no longer dispatches them (see the
 [ln-data-store README](../ln-data-store/README.md)).
 

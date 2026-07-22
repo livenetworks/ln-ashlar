@@ -16,7 +16,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 	function _checkQuota(err) {
 		if (err && err.name === 'QuotaExceededError') {
-			dispatch(document, 'ln-store:quota-exceeded', { error: err });
+			dispatch(document, 'ln-data-store:quota-exceeded', { error: err });
 		}
 	}
 
@@ -27,7 +27,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		for (const el of document.querySelectorAll(`[${DOM_SELECTOR}]`)) {
 			const name = el.getAttribute(DOM_SELECTOR);
 			if (name) {
-				const indexAttr = el.getAttribute('data-ln-data-store-indexes') || el.getAttribute('data-ln-store-indexes') || '';
+				const indexAttr = el.getAttribute('data-ln-data-store-indexes') || '';
 				required[name] = {
 					indexes: indexAttr.split(',').map(s => s.trim()).filter(Boolean)
 				};
@@ -192,11 +192,11 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		this.dom = dom;
 		this._name = dom.getAttribute(DOM_SELECTOR);
 
-		const staleAttr = dom.getAttribute('data-ln-data-store-stale') || dom.getAttribute('data-ln-store-stale');
+		const staleAttr = dom.getAttribute('data-ln-data-store-stale');
 		const _parsed = parseInt(staleAttr, 10);
 		this._staleThreshold = (staleAttr === 'never' || staleAttr === '-1') ? -1 : (isNaN(_parsed) ? 300 : _parsed);
 
-		const searchAttr = dom.getAttribute('data-ln-data-store-search-fields') || dom.getAttribute('data-ln-store-search-fields') || '';
+		const searchAttr = dom.getAttribute('data-ln-data-store-search-fields') || '';
 		this._searchFields = searchAttr.split(',').map(s => s.trim()).filter(Boolean);
 
 		this._handlers = null;
@@ -224,7 +224,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 			'bulk-delete': e => _handleBulkDeleteRequest(self, e.detail)
 		};
 		for (const [event, fn] of Object.entries(self._handlers)) {
-			self.dom.addEventListener(`ln-store:request-${event}`, fn);
+			self.dom.addEventListener(`ln-data-store:request-${event}`, fn);
 		}
 	}
 
@@ -235,7 +235,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 		_putRecord(self._name, record).then(() => {
 			self.totalCount++;
-			dispatch(self.dom, 'ln-store:created', { store: self._name, record, tempId });
+			dispatch(self.dom, 'ln-data-store:created', { store: self._name, record, tempId });
 		});
 	}
 
@@ -252,7 +252,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 				: _putRecord(self._name, updated);
 
 			return write.then(() => {
-				dispatch(self.dom, 'ln-store:updated', { store: self._name, record: updated, previous: existing });
+				dispatch(self.dom, 'ln-data-store:updated', { store: self._name, record: updated, previous: existing });
 			});
 		}).catch(err => console.error('[ln-data-store] Optimistic update failed:', err));
 	}
@@ -263,7 +263,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 			return _deleteRecord(self._name, id).then(() => {
 				self.totalCount--;
-				dispatch(self.dom, 'ln-store:deleted', { store: self._name, id });
+				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, id });
 			});
 		}).catch(err => console.error('[ln-data-store] Optimistic delete failed:', err));
 	}
@@ -276,7 +276,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 			return _deleteBulk(self._name, savedIds).then(() => {
 				self.totalCount -= savedIds.length;
-				dispatch(self.dom, 'ln-store:deleted', { store: self._name, ids: savedIds });
+				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, ids: savedIds });
 			});
 		}).catch(err => console.error('[ln-data-store] Optimistic bulk delete failed:', err));
 	}
@@ -291,23 +291,23 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 				if (self.totalCount > 0) {
 					self.isLoaded = true;
-					dispatch(self.dom, 'ln-store:ready', { store: self._name, count: self.totalCount, source: 'cache' });
+					dispatch(self.dom, 'ln-data-store:ready', { store: self._name, count: self.totalCount, source: 'cache' });
 				}
 
-				dispatch(self.dom, 'ln-store:initialized', { store: self._name, hasCache: self.totalCount > 0, lastSyncedAt: self.lastSyncedAt, count: self.totalCount });
+				dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: self.totalCount > 0, lastSyncedAt: self.lastSyncedAt, count: self.totalCount });
 			} else if (meta && meta.schema_version !== SCHEMA_VERSION) {
 				_clearStore(self._name)
 					.then(() => _setMeta(self._name, { schema_version: SCHEMA_VERSION, last_synced_at: null, record_count: 0 }))
-					.then(() => dispatch(self.dom, 'ln-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 }));
+					.then(() => dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 }));
 			} else {
-				dispatch(self.dom, 'ln-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 });
+				dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 });
 			}
 		});
 	}
 
 	function _triggerRemoteSync(self) {
 		self.isSyncing = true;
-		dispatch(self.dom, 'ln-store:request-remote-sync', { since: self.lastSyncedAt });
+		dispatch(self.dom, 'ln-data-store:request-remote-sync', { since: self.lastSyncedAt });
 	}
 
 	// ─── Bulk IndexedDB Operations ─────────────────────────
@@ -507,10 +507,10 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 			self.lastSyncedAt = syncedAt;
 
 			if (isInitialLoad) {
-				dispatch(self.dom, 'ln-store:loaded', { store: self._name, count: self.totalCount });
-				dispatch(self.dom, 'ln-store:ready', { store: self._name, count: self.totalCount, source: 'server' });
+				dispatch(self.dom, 'ln-data-store:loaded', { store: self._name, count: self.totalCount });
+				dispatch(self.dom, 'ln-data-store:ready', { store: self._name, count: self.totalCount, source: 'server' });
 			} else {
-				dispatch(self.dom, 'ln-store:synced', {
+				dispatch(self.dom, 'ln-data-store:synced', {
 					store: self._name,
 					added: upsertedRecords.length,
 					deleted: deletedIds.length,
@@ -542,7 +542,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 	_component.prototype.destroy = function () {
 		if (this._handlers) {
 			for (const [event, fn] of Object.entries(this._handlers)) {
-				this.dom.removeEventListener(`ln-store:request-${event}`, fn);
+				this.dom.removeEventListener(`ln-data-store:request-${event}`, fn);
 			}
 			this._handlers = null;
 		}
@@ -550,7 +550,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		delete _stores[this._name];
 
 		delete this.dom[DOM_ATTRIBUTE];
-		dispatch(this.dom, 'ln-store:destroyed', { store: this._name });
+		dispatch(this.dom, 'ln-data-store:destroyed', { store: this._name });
 	};
 
 	// ─── clearAll (global) ─────────────────────────────────

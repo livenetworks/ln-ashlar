@@ -4927,14 +4927,14 @@ H(Ft, ne, le, "ln-router", {
   let p = null, f = null;
   const d = {};
   function t(L) {
-    L && L.name === "QuotaExceededError" && S(document, "ln-store:quota-exceeded", { error: L });
+    L && L.name === "QuotaExceededError" && S(document, "ln-data-store:quota-exceeded", { error: L });
   }
   function s() {
     const L = {};
     for (const k of document.querySelectorAll(`[${u}]`)) {
       const D = k.getAttribute(u);
       if (D) {
-        const I = k.getAttribute("data-ln-data-store-indexes") || k.getAttribute("data-ln-store-indexes") || "";
+        const I = k.getAttribute("data-ln-data-store-indexes") || "";
         L[D] = {
           indexes: I.split(",").map((M) => M.trim()).filter(Boolean)
         };
@@ -5011,9 +5011,9 @@ H(Ft, ne, le, "ln-router", {
   });
   function C(L) {
     this.dom = L, this._name = L.getAttribute(u);
-    const k = L.getAttribute("data-ln-data-store-stale") || L.getAttribute("data-ln-store-stale"), D = parseInt(k, 10);
+    const k = L.getAttribute("data-ln-data-store-stale"), D = parseInt(k, 10);
     this._staleThreshold = k === "never" || k === "-1" ? -1 : isNaN(D) ? 300 : D;
-    const I = L.getAttribute("data-ln-data-store-search-fields") || L.getAttribute("data-ln-store-search-fields") || "";
+    const I = L.getAttribute("data-ln-data-store-search-fields") || "";
     return this._searchFields = I.split(",").map((M) => M.trim()).filter(Boolean), this._handlers = null, this.isLoaded = !1, this.isSyncing = !1, this.lastSyncedAt = null, this.totalCount = 0, this.presenters = null, d[this._name] = this, x(this), K(this), this;
   }
   function x(L) {
@@ -5024,12 +5024,12 @@ H(Ft, ne, le, "ln-router", {
       "bulk-delete": (k) => B(L, k.detail)
     };
     for (const [k, D] of Object.entries(L._handlers))
-      L.dom.addEventListener(`ln-store:request-${k}`, D);
+      L.dom.addEventListener(`ln-data-store:request-${k}`, D);
   }
   function q(L, { tempId: k, data: D = {} } = {}) {
     const I = { ...D, id: k };
     _(L._name, I).then(() => {
-      L.totalCount++, S(L.dom, "ln-store:created", { store: L._name, record: I, tempId: k });
+      L.totalCount++, S(L.dom, "ln-data-store:created", { store: L._name, record: I, tempId: k });
     });
   }
   function O(L, { id: k, data: D = {} } = {}) {
@@ -5037,7 +5037,7 @@ H(Ft, ne, le, "ln-router", {
       if (!I) throw new Error(`Record not found: ${k}`);
       const M = { ...I, ...D }, F = D.id;
       return (F !== void 0 && F !== k ? bt(L._name, k, M) : _(L._name, M)).then(() => {
-        S(L.dom, "ln-store:updated", { store: L._name, record: M, previous: I });
+        S(L.dom, "ln-data-store:updated", { store: L._name, record: M, previous: I });
       });
     }).catch((I) => console.error("[ln-data-store] Optimistic update failed:", I));
   }
@@ -5045,7 +5045,7 @@ H(Ft, ne, le, "ln-router", {
     i(L._name, k).then((D) => {
       if (D)
         return y(L._name, k).then(() => {
-          L.totalCount--, S(L.dom, "ln-store:deleted", { store: L._name, id: k });
+          L.totalCount--, S(L.dom, "ln-data-store:deleted", { store: L._name, id: k });
         });
     }).catch((D) => console.error("[ln-data-store] Optimistic delete failed:", D));
   }
@@ -5053,17 +5053,17 @@ H(Ft, ne, le, "ln-router", {
     k.length && Promise.all(k.map((D) => i(L._name, D))).then((D) => {
       const I = D.filter(Boolean).map((M) => M.id);
       return Z(L._name, I).then(() => {
-        L.totalCount -= I.length, S(L.dom, "ln-store:deleted", { store: L._name, ids: I });
+        L.totalCount -= I.length, S(L.dom, "ln-data-store:deleted", { store: L._name, ids: I });
       });
     }).catch((D) => console.error("[ln-data-store] Optimistic bulk delete failed:", D));
   }
   function K(L) {
     l().then(() => w(L._name)).then((k) => {
-      k && k.schema_version === g ? (L.lastSyncedAt = k.last_synced_at || null, L.totalCount = k.record_count || 0, L.totalCount > 0 && (L.isLoaded = !0, S(L.dom, "ln-store:ready", { store: L._name, count: L.totalCount, source: "cache" })), S(L.dom, "ln-store:initialized", { store: L._name, hasCache: L.totalCount > 0, lastSyncedAt: L.lastSyncedAt, count: L.totalCount })) : k && k.schema_version !== g ? b(L._name).then(() => T(L._name, { schema_version: g, last_synced_at: null, record_count: 0 })).then(() => S(L.dom, "ln-store:initialized", { store: L._name, hasCache: !1, lastSyncedAt: null, count: 0 })) : S(L.dom, "ln-store:initialized", { store: L._name, hasCache: !1, lastSyncedAt: null, count: 0 });
+      k && k.schema_version === g ? (L.lastSyncedAt = k.last_synced_at || null, L.totalCount = k.record_count || 0, L.totalCount > 0 && (L.isLoaded = !0, S(L.dom, "ln-data-store:ready", { store: L._name, count: L.totalCount, source: "cache" })), S(L.dom, "ln-data-store:initialized", { store: L._name, hasCache: L.totalCount > 0, lastSyncedAt: L.lastSyncedAt, count: L.totalCount })) : k && k.schema_version !== g ? b(L._name).then(() => T(L._name, { schema_version: g, last_synced_at: null, record_count: 0 })).then(() => S(L.dom, "ln-data-store:initialized", { store: L._name, hasCache: !1, lastSyncedAt: null, count: 0 })) : S(L.dom, "ln-data-store:initialized", { store: L._name, hasCache: !1, lastSyncedAt: null, count: 0 });
     });
   }
   function G(L) {
-    L.isSyncing = !0, S(L.dom, "ln-store:request-remote-sync", { since: L.lastSyncedAt });
+    L.isSyncing = !0, S(L.dom, "ln-data-store:request-remote-sync", { since: L.lastSyncedAt });
   }
   function rt(L, k) {
     return h().then((D) => D ? (ut() ? Promise.all(k.map((M) => o(M))) : Promise.resolve(k)).then((M) => new Promise((F, R) => {
@@ -5176,7 +5176,7 @@ H(Ft, ne, le, "ln-router", {
       record_count: R
     }))).then(() => {
       const R = !I.isLoaded;
-      I.isLoaded = !0, I.isSyncing = !1, I.lastSyncedAt = D, R ? (S(I.dom, "ln-store:loaded", { store: I._name, count: I.totalCount }), S(I.dom, "ln-store:ready", { store: I._name, count: I.totalCount, source: "server" })) : S(I.dom, "ln-store:synced", {
+      I.isLoaded = !0, I.isSyncing = !1, I.lastSyncedAt = D, R ? (S(I.dom, "ln-data-store:loaded", { store: I._name, count: I.totalCount }), S(I.dom, "ln-data-store:ready", { store: I._name, count: I.totalCount, source: "server" })) : S(I.dom, "ln-data-store:synced", {
         store: I._name,
         added: L.length,
         deleted: k.length,
@@ -5195,10 +5195,10 @@ H(Ft, ne, le, "ln-router", {
   }, C.prototype.destroy = function() {
     if (this._handlers) {
       for (const [L, k] of Object.entries(this._handlers))
-        this.dom.removeEventListener(`ln-store:request-${L}`, k);
+        this.dom.removeEventListener(`ln-data-store:request-${L}`, k);
       this._handlers = null;
     }
-    delete d[this._name], delete this.dom[c], S(this.dom, "ln-store:destroyed", { store: this._name });
+    delete d[this._name], delete this.dom[c], S(this.dom, "ln-data-store:destroyed", { store: this._name });
   };
   function J() {
     return h().then((L) => {
@@ -5619,11 +5619,11 @@ H(Ft, ne, le, "ln-router", {
   let p = !1, f = null, d = null, t = null;
   function s() {
     p || (p = !0, f = function() {
-      S(document, "ln-store:online", {}), g.forEach(function(n) {
+      S(document, "ln-data-store:online", {}), g.forEach(function(n) {
         n._maybeSync();
       });
     }, d = function() {
-      S(document, "ln-store:offline", {});
+      S(document, "ln-data-store:offline", {});
     }, t = function() {
       document.visibilityState === "visible" && g.forEach(function(n) {
         const i = n.findChildren().store;
@@ -5649,9 +5649,9 @@ H(Ft, ne, le, "ln-router", {
     return this.dom = n, this._name = n.getAttribute(u), n[c] = this, n[E] = this, this.mapper = null, this._handlers = null, this._boundQueries = /* @__PURE__ */ new WeakMap(), this._boundDelivered = /* @__PURE__ */ new WeakMap(), this._dict = Rt(n, "data-ln-data-coordinator-dict"), this._parseStaleAttributes(), this.refreshMapper(), a(this), g.add(this), s(), this._checkInitialSync(), this;
   }
   o.prototype._parseStaleAttributes = function() {
-    const r = this.findChildren().storeEl, i = this.dom.getAttribute("data-ln-data-coordinator-stale") || (r ? r.getAttribute("data-ln-data-store-stale") || r.getAttribute("data-ln-store-stale") : null), _ = parseInt(i, 10);
+    const r = this.findChildren().storeEl, i = this.dom.getAttribute("data-ln-data-coordinator-stale") || (r ? r.getAttribute("data-ln-data-store-stale") : null), _ = parseInt(i, 10);
     this._staleThreshold = i === "never" || i === "-1" ? -1 : isNaN(_) ? 300 : _;
-    const y = this.dom.hasAttribute("data-ln-data-coordinator-no-autosync") || (r ? r.hasAttribute("data-ln-data-store-no-autosync") || r.hasAttribute("data-ln-store-no-autosync") : !1);
+    const y = this.dom.hasAttribute("data-ln-data-coordinator-no-autosync") || (r ? r.hasAttribute("data-ln-data-store-no-autosync") : !1);
     this._noAutosync = !!y;
   }, o.prototype._isStale = function() {
     if (this._staleThreshold === -1) return !1;
@@ -5694,7 +5694,7 @@ H(Ft, ne, le, "ln-router", {
   }, o.prototype._fanOutCreate = function(n, r, i) {
     this.refreshMapper();
     const _ = "_temp_" + e();
-    S(n.storeEl, "ln-store:request-create", { tempId: _, data: r }), n.queue ? S(n.queueEl, "ln-api-queue:request-enqueue", {
+    S(n.storeEl, "ln-data-store:request-create", { tempId: _, data: r }), n.queue ? S(n.queueEl, "ln-api-queue:request-enqueue", {
       chainKey: _,
       op: "create",
       targetId: null,
@@ -5707,7 +5707,7 @@ H(Ft, ne, le, "ln-router", {
       meta: { entryId: e(), queued: !1, op: "create", tempId: _ }
     });
   }, o.prototype._fanOutUpdate = function(n, r, i, _, y) {
-    this.refreshMapper(), S(n.storeEl, "ln-store:request-update", { id: r, data: i }), n.queue ? S(n.queueEl, "ln-api-queue:request-enqueue", {
+    this.refreshMapper(), S(n.storeEl, "ln-data-store:request-update", { id: r, data: i }), n.queue ? S(n.queueEl, "ln-api-queue:request-enqueue", {
       chainKey: r,
       op: "update",
       targetId: r,
@@ -5722,7 +5722,7 @@ H(Ft, ne, le, "ln-router", {
       meta: { entryId: e(), queued: !1, op: "update", id: r }
     });
   }, o.prototype._fanOutDelete = function(n, r) {
-    this.refreshMapper(), S(n.storeEl, "ln-store:request-delete", { id: r }), n.queue ? S(n.queueEl, "ln-api-queue:request-enqueue", {
+    this.refreshMapper(), S(n.storeEl, "ln-data-store:request-delete", { id: r }), n.queue ? S(n.queueEl, "ln-api-queue:request-enqueue", {
       chainKey: r,
       op: "delete",
       targetId: r,
@@ -5736,7 +5736,7 @@ H(Ft, ne, le, "ln-router", {
   }, o.prototype._fanOutBulkDelete = function(n, r) {
     this.refreshMapper();
     const i = r.join(",");
-    S(n.storeEl, "ln-store:request-bulk-delete", { ids: r }), n.queue ? S(n.queueEl, "ln-api-queue:request-enqueue", {
+    S(n.storeEl, "ln-data-store:request-bulk-delete", { ids: r }), n.queue ? S(n.queueEl, "ln-api-queue:request-enqueue", {
       chainKey: i,
       op: "bulk-delete",
       targetId: null,
@@ -5843,13 +5843,13 @@ H(Ft, ne, le, "ln-router", {
         const i = n.findChildren();
         if (!i.storeEl) return;
         const _ = r.detail.meta || {}, y = n.mapper.ingress(r.detail.record);
-        S(i.storeEl, "ln-store:request-update", { id: _.tempId, data: y }), n._toastFromMessage(r.detail.message), _.queued && i.queue && (S(i.queueEl, "ln-api-queue:request-remap", { oldKey: _.tempId, newId: y.id }), S(i.queueEl, "ln-api-queue:ack", { entryId: _.entryId }));
+        S(i.storeEl, "ln-data-store:request-update", { id: _.tempId, data: y }), n._toastFromMessage(r.detail.message), _.queued && i.queue && (S(i.queueEl, "ln-api-queue:request-remap", { oldKey: _.tempId, newId: y.id }), S(i.queueEl, "ln-api-queue:ack", { entryId: _.entryId }));
       },
       connUpdated: function(r) {
         const i = n.findChildren();
         if (!i.storeEl) return;
         const _ = r.detail.meta || {}, y = n.mapper.ingress(r.detail.record);
-        S(i.storeEl, "ln-store:request-update", { id: _.id, data: y }), n._toastFromMessage(r.detail.message), _.queued && i.queue && S(i.queueEl, "ln-api-queue:ack", { entryId: _.entryId });
+        S(i.storeEl, "ln-data-store:request-update", { id: _.id, data: y }), n._toastFromMessage(r.detail.message), _.queued && i.queue && S(i.queueEl, "ln-api-queue:ack", { entryId: _.entryId });
       },
       connDeleted: function(r) {
         const i = n.findChildren();
@@ -5882,8 +5882,8 @@ H(Ft, ne, le, "ln-router", {
         }
         if (C && y === "update") {
           const x = i.data && i.data.remote ? n.mapper.ingress(i.data.remote) : null;
-          x && S(A.storeEl, "ln-store:request-update", { id: _.id, data: x }), n._toastFromDict("conflict");
-        } else y === "create" && S(A.storeEl, "ln-store:request-delete", { id: _.tempId }), n._toastFromDict("rejected");
+          x && S(A.storeEl, "ln-data-store:request-update", { id: _.id, data: x }), n._toastFromDict("conflict");
+        } else y === "create" && S(A.storeEl, "ln-data-store:request-delete", { id: _.tempId }), n._toastFromDict("rejected");
         _.queued && A.queue && S(A.queueEl, "ln-api-queue:nack", { entryId: _.entryId, reason: "drop" });
       },
       // ─── Store Initialized (Sync Ownership) ───────────────
@@ -5911,9 +5911,9 @@ H(Ft, ne, le, "ln-router", {
       refreshSynced: function(r) {
         r.detail && r.detail.changed && n._refreshAll();
       }
-    }, n.dom.addEventListener("ln-store:request-remote-sync", n._handlers.sync), n.dom.addEventListener("ln-data-coordinator:request-create", n._handlers.reqCreate), n.dom.addEventListener("ln-data-coordinator:request-update", n._handlers.reqUpdate), n.dom.addEventListener("ln-data-coordinator:request-delete", n._handlers.reqDelete), n.dom.addEventListener("ln-data-coordinator:request-bulk-delete", n._handlers.reqBulkDelete), n.dom.addEventListener("ln-api-queue:send", n._handlers.queueSend), n.dom.addEventListener("ln-api-queue:failed", n._handlers.queueFailed), n.dom.addEventListener("ln-store:initialized", n._handlers.storeInitialized), document.addEventListener("submit", n._handlers.formSubmit), h.forEach(function(r) {
+    }, n.dom.addEventListener("ln-data-store:request-remote-sync", n._handlers.sync), n.dom.addEventListener("ln-data-coordinator:request-create", n._handlers.reqCreate), n.dom.addEventListener("ln-data-coordinator:request-update", n._handlers.reqUpdate), n.dom.addEventListener("ln-data-coordinator:request-delete", n._handlers.reqDelete), n.dom.addEventListener("ln-data-coordinator:request-bulk-delete", n._handlers.reqBulkDelete), n.dom.addEventListener("ln-api-queue:send", n._handlers.queueSend), n.dom.addEventListener("ln-api-queue:failed", n._handlers.queueFailed), n.dom.addEventListener("ln-data-store:initialized", n._handlers.storeInitialized), document.addEventListener("submit", n._handlers.formSubmit), h.forEach(function(r) {
       n.dom.addEventListener(r + ":fetched", n._handlers.connFetched), n.dom.addEventListener(r + ":created", n._handlers.connCreated), n.dom.addEventListener(r + ":updated", n._handlers.connUpdated), n.dom.addEventListener(r + ":deleted", n._handlers.connDeleted), n.dom.addEventListener(r + ":bulk-deleted", n._handlers.connBulkDeleted), n.dom.addEventListener(r + ":error", n._handlers.connError);
-    }), document.addEventListener("ln-table:request-data", n._handlers.reqTableData), document.addEventListener("ln-list:request-data", n._handlers.reqListData), document.addEventListener("ln-options:request-data", n._handlers.reqOptions), document.addEventListener("ln-stat:request-count", n._handlers.reqStat), n.dom.addEventListener("ln-store:ready", n._handlers.refresh), n.dom.addEventListener("ln-store:loaded", n._handlers.refresh), n.dom.addEventListener("ln-store:created", n._handlers.refresh), n.dom.addEventListener("ln-store:updated", n._handlers.refresh), n.dom.addEventListener("ln-store:deleted", n._handlers.refresh), n.dom.addEventListener("ln-store:synced", n._handlers.refreshSynced);
+    }), document.addEventListener("ln-table:request-data", n._handlers.reqTableData), document.addEventListener("ln-list:request-data", n._handlers.reqListData), document.addEventListener("ln-options:request-data", n._handlers.reqOptions), document.addEventListener("ln-stat:request-count", n._handlers.reqStat), n.dom.addEventListener("ln-data-store:ready", n._handlers.refresh), n.dom.addEventListener("ln-data-store:loaded", n._handlers.refresh), n.dom.addEventListener("ln-data-store:created", n._handlers.refresh), n.dom.addEventListener("ln-data-store:updated", n._handlers.refresh), n.dom.addEventListener("ln-data-store:deleted", n._handlers.refresh), n.dom.addEventListener("ln-data-store:synced", n._handlers.refreshSynced);
   }
   o.prototype._ownsStore = function(n) {
     const r = this.findChildren();
@@ -5990,9 +5990,9 @@ H(Ft, ne, le, "ln-router", {
   }, o.prototype.destroy = function() {
     if (!this.dom[c]) return;
     const n = this;
-    n._handlers && (n.dom.removeEventListener("ln-store:request-remote-sync", n._handlers.sync), n.dom.removeEventListener("ln-data-coordinator:request-create", n._handlers.reqCreate), n.dom.removeEventListener("ln-data-coordinator:request-update", n._handlers.reqUpdate), n.dom.removeEventListener("ln-data-coordinator:request-delete", n._handlers.reqDelete), n.dom.removeEventListener("ln-data-coordinator:request-bulk-delete", n._handlers.reqBulkDelete), n.dom.removeEventListener("ln-api-queue:send", n._handlers.queueSend), n.dom.removeEventListener("ln-api-queue:failed", n._handlers.queueFailed), n.dom.removeEventListener("ln-store:initialized", n._handlers.storeInitialized), document.removeEventListener("submit", n._handlers.formSubmit), h.forEach(function(r) {
+    n._handlers && (n.dom.removeEventListener("ln-data-store:request-remote-sync", n._handlers.sync), n.dom.removeEventListener("ln-data-coordinator:request-create", n._handlers.reqCreate), n.dom.removeEventListener("ln-data-coordinator:request-update", n._handlers.reqUpdate), n.dom.removeEventListener("ln-data-coordinator:request-delete", n._handlers.reqDelete), n.dom.removeEventListener("ln-data-coordinator:request-bulk-delete", n._handlers.reqBulkDelete), n.dom.removeEventListener("ln-api-queue:send", n._handlers.queueSend), n.dom.removeEventListener("ln-api-queue:failed", n._handlers.queueFailed), n.dom.removeEventListener("ln-data-store:initialized", n._handlers.storeInitialized), document.removeEventListener("submit", n._handlers.formSubmit), h.forEach(function(r) {
       n.dom.removeEventListener(r + ":fetched", n._handlers.connFetched), n.dom.removeEventListener(r + ":created", n._handlers.connCreated), n.dom.removeEventListener(r + ":updated", n._handlers.connUpdated), n.dom.removeEventListener(r + ":deleted", n._handlers.connDeleted), n.dom.removeEventListener(r + ":bulk-deleted", n._handlers.connBulkDeleted), n.dom.removeEventListener(r + ":error", n._handlers.connError);
-    }), document.removeEventListener("ln-table:request-data", n._handlers.reqTableData), document.removeEventListener("ln-list:request-data", n._handlers.reqListData), document.removeEventListener("ln-options:request-data", n._handlers.reqOptions), document.removeEventListener("ln-stat:request-count", n._handlers.reqStat), n.dom.removeEventListener("ln-store:ready", n._handlers.refresh), n.dom.removeEventListener("ln-store:loaded", n._handlers.refresh), n.dom.removeEventListener("ln-store:created", n._handlers.refresh), n.dom.removeEventListener("ln-store:updated", n._handlers.refresh), n.dom.removeEventListener("ln-store:deleted", n._handlers.refresh), n.dom.removeEventListener("ln-store:synced", n._handlers.refreshSynced), n._handlers = null), n._boundQueries = null, n._boundDelivered = null, g.delete(this), l(), delete this.dom[c], delete this.dom[E];
+    }), document.removeEventListener("ln-table:request-data", n._handlers.reqTableData), document.removeEventListener("ln-list:request-data", n._handlers.reqListData), document.removeEventListener("ln-options:request-data", n._handlers.reqOptions), document.removeEventListener("ln-stat:request-count", n._handlers.reqStat), n.dom.removeEventListener("ln-data-store:ready", n._handlers.refresh), n.dom.removeEventListener("ln-data-store:loaded", n._handlers.refresh), n.dom.removeEventListener("ln-data-store:created", n._handlers.refresh), n.dom.removeEventListener("ln-data-store:updated", n._handlers.refresh), n.dom.removeEventListener("ln-data-store:deleted", n._handlers.refresh), n.dom.removeEventListener("ln-data-store:synced", n._handlers.refreshSynced), n._handlers = null), n._boundQueries = null, n._boundDelivered = null, g.delete(this), l(), delete this.dom[c], delete this.dom[E];
   };
   function m(n, r) {
     const i = n[c];

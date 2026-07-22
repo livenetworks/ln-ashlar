@@ -21,14 +21,14 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		_globalSyncInstalled = true;
 
 		_onlineHandler = function () {
-			dispatch(document, 'ln-store:online', {});
+			dispatch(document, 'ln-data-store:online', {});
 			_coordinators.forEach(function (coord) {
 				coord._maybeSync();
 			});
 		};
 
 		_offlineHandler = function () {
-			dispatch(document, 'ln-store:offline', {});
+			dispatch(document, 'ln-data-store:offline', {});
 		};
 
 		_visibilityHandler = function () {
@@ -112,12 +112,12 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		const storeEl = children.storeEl;
 
 		const staleAttr = this.dom.getAttribute('data-ln-data-coordinator-stale')
-			|| (storeEl ? (storeEl.getAttribute('data-ln-data-store-stale') || storeEl.getAttribute('data-ln-store-stale')) : null);
+			|| (storeEl ? storeEl.getAttribute('data-ln-data-store-stale') : null);
 		const parsed = parseInt(staleAttr, 10);
 		this._staleThreshold = (staleAttr === 'never' || staleAttr === '-1') ? -1 : (isNaN(parsed) ? 300 : parsed);
 
 		const noAutosyncAttr = this.dom.hasAttribute('data-ln-data-coordinator-no-autosync')
-			|| (storeEl ? (storeEl.hasAttribute('data-ln-data-store-no-autosync') || storeEl.hasAttribute('data-ln-store-no-autosync')) : false);
+			|| (storeEl ? storeEl.hasAttribute('data-ln-data-store-no-autosync') : false);
 		this._noAutosync = !!noAutosyncAttr;
 	};
 
@@ -232,7 +232,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		this.refreshMapper();
 		const tempId = '_temp_' + _uuid();
 
-		dispatch(children.storeEl, 'ln-store:request-create', { tempId: tempId, data: data });
+		dispatch(children.storeEl, 'ln-data-store:request-create', { tempId: tempId, data: data });
 
 		if (children.queue) {
 			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
@@ -251,7 +251,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 	_component.prototype._fanOutUpdate = function (children, id, data, expectedVersion, action) {
 		this.refreshMapper();
 
-		dispatch(children.storeEl, 'ln-store:request-update', { id: id, data: data });
+		dispatch(children.storeEl, 'ln-data-store:request-update', { id: id, data: data });
 
 		if (children.queue) {
 			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
@@ -270,7 +270,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 	_component.prototype._fanOutDelete = function (children, id) {
 		this.refreshMapper();
 
-		dispatch(children.storeEl, 'ln-store:request-delete', { id: id });
+		dispatch(children.storeEl, 'ln-data-store:request-delete', { id: id });
 
 		if (children.queue) {
 			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
@@ -287,7 +287,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		this.refreshMapper();
 		const bulkKey = ids.join(',');
 
-		dispatch(children.storeEl, 'ln-store:request-bulk-delete', { ids: ids });
+		dispatch(children.storeEl, 'ln-data-store:request-bulk-delete', { ids: ids });
 
 		if (children.queue) {
 			dispatch(children.queueEl, 'ln-api-queue:request-enqueue', {
@@ -458,7 +458,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				const meta = e.detail.meta || {};
 				const serverRecord = self.mapper.ingress(e.detail.record);
 
-				dispatch(children.storeEl, 'ln-store:request-update', { id: meta.tempId, data: serverRecord });
+				dispatch(children.storeEl, 'ln-data-store:request-update', { id: meta.tempId, data: serverRecord });
 				self._toastFromMessage(e.detail.message);
 
 				if (meta.queued && children.queue) {
@@ -473,7 +473,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				const meta = e.detail.meta || {};
 				const serverRecord = self.mapper.ingress(e.detail.record);
 
-				dispatch(children.storeEl, 'ln-store:request-update', { id: meta.id, data: serverRecord });
+				dispatch(children.storeEl, 'ln-data-store:request-update', { id: meta.id, data: serverRecord });
 				self._toastFromMessage(e.detail.message);
 
 				if (meta.queued && children.queue) {
@@ -545,11 +545,11 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				if (isConflict && op === 'update') {
 					const remote = detail.data && detail.data.remote ? self.mapper.ingress(detail.data.remote) : null;
 					if (remote) {
-						dispatch(children.storeEl, 'ln-store:request-update', { id: meta.id, data: remote });
+						dispatch(children.storeEl, 'ln-data-store:request-update', { id: meta.id, data: remote });
 					}
 					self._toastFromDict('conflict');
 				} else if (op === 'create') {
-					dispatch(children.storeEl, 'ln-store:request-delete', { id: meta.tempId });
+					dispatch(children.storeEl, 'ln-data-store:request-delete', { id: meta.tempId });
 					self._toastFromDict('rejected');
 				} else {
 					// update/delete/bulk generic 4xx (incl. 404): leave local, next sync reconciles
@@ -585,7 +585,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		};
 
 		// Sync request bubbling up from the child store
-		self.dom.addEventListener('ln-store:request-remote-sync', self._handlers.sync);
+		self.dom.addEventListener('ln-data-store:request-remote-sync', self._handlers.sync);
 
 		// Coordinator-namespaced intake events (parallel fan-out)
 		self.dom.addEventListener('ln-data-coordinator:request-create', self._handlers.reqCreate);
@@ -598,7 +598,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		self.dom.addEventListener('ln-api-queue:failed', self._handlers.queueFailed);
 
 		// Sync ownership — store initialization
-		self.dom.addEventListener('ln-store:initialized', self._handlers.storeInitialized);
+		self.dom.addEventListener('ln-data-store:initialized', self._handlers.storeInitialized);
 
 		// Form write intake — native submit, document-level, bubble phase (never
 		// capture: ln-validate's own submit gate on the form must run first)
@@ -621,12 +621,12 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		document.addEventListener('ln-stat:request-count',  self._handlers.reqStat);
 
 		// Store-change refresh — attach to self.dom so bubbling store events are caught
-		self.dom.addEventListener('ln-store:ready',   self._handlers.refresh);
-		self.dom.addEventListener('ln-store:loaded',  self._handlers.refresh);
-		self.dom.addEventListener('ln-store:created', self._handlers.refresh);
-		self.dom.addEventListener('ln-store:updated', self._handlers.refresh);
-		self.dom.addEventListener('ln-store:deleted', self._handlers.refresh);
-		self.dom.addEventListener('ln-store:synced',  self._handlers.refreshSynced);
+		self.dom.addEventListener('ln-data-store:ready',   self._handlers.refresh);
+		self.dom.addEventListener('ln-data-store:loaded',  self._handlers.refresh);
+		self.dom.addEventListener('ln-data-store:created', self._handlers.refresh);
+		self.dom.addEventListener('ln-data-store:updated', self._handlers.refresh);
+		self.dom.addEventListener('ln-data-store:deleted', self._handlers.refresh);
+		self.dom.addEventListener('ln-data-store:synced',  self._handlers.refreshSynced);
 	}
 
 	// ─── Store↔View Binder ───────────────────────────────────
@@ -755,7 +755,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 
 		const self = this;
 		if (self._handlers) {
-			self.dom.removeEventListener('ln-store:request-remote-sync', self._handlers.sync);
+			self.dom.removeEventListener('ln-data-store:request-remote-sync', self._handlers.sync);
 
 			self.dom.removeEventListener('ln-data-coordinator:request-create', self._handlers.reqCreate);
 			self.dom.removeEventListener('ln-data-coordinator:request-update', self._handlers.reqUpdate);
@@ -764,7 +764,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 
 			self.dom.removeEventListener('ln-api-queue:send', self._handlers.queueSend);
 			self.dom.removeEventListener('ln-api-queue:failed', self._handlers.queueFailed);
-			self.dom.removeEventListener('ln-store:initialized', self._handlers.storeInitialized);
+			self.dom.removeEventListener('ln-data-store:initialized', self._handlers.storeInitialized);
 
 			document.removeEventListener('submit', self._handlers.formSubmit);
 
@@ -784,12 +784,12 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 			document.removeEventListener('ln-stat:request-count',  self._handlers.reqStat);
 
 			// Store-change listeners
-			self.dom.removeEventListener('ln-store:ready',   self._handlers.refresh);
-			self.dom.removeEventListener('ln-store:loaded',  self._handlers.refresh);
-			self.dom.removeEventListener('ln-store:created', self._handlers.refresh);
-			self.dom.removeEventListener('ln-store:updated', self._handlers.refresh);
-			self.dom.removeEventListener('ln-store:deleted', self._handlers.refresh);
-			self.dom.removeEventListener('ln-store:synced',  self._handlers.refreshSynced);
+			self.dom.removeEventListener('ln-data-store:ready',   self._handlers.refresh);
+			self.dom.removeEventListener('ln-data-store:loaded',  self._handlers.refresh);
+			self.dom.removeEventListener('ln-data-store:created', self._handlers.refresh);
+			self.dom.removeEventListener('ln-data-store:updated', self._handlers.refresh);
+			self.dom.removeEventListener('ln-data-store:deleted', self._handlers.refresh);
+			self.dom.removeEventListener('ln-data-store:synced',  self._handlers.refreshSynced);
 
 			self._handlers = null;
 		}

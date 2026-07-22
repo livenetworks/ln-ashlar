@@ -4,7 +4,7 @@
 	// Write path is native-first (data-ln-form-scope="packages" on
 	// #package-form, which serves both create and edit via modal-mode) —
 	// react to either store outcome by closing the modal.
-	['ln-store:created', 'ln-store:updated'].forEach(function (ev) {
+	['ln-data-store:created', 'ln-data-store:updated'].forEach(function (ev) {
 		document.addEventListener(ev, function (e) {
 			if (e.detail.store !== 'packages') return;
 			const packageModal = document.getElementById('package-modal');

@@ -95,8 +95,8 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere
 | `ln-data-coordinator:request-update` | Listens | No | Intake event to update a record via fan-out. | `{ id: ID, data: Object, expected_version?: String }` |
 | `ln-data-coordinator:request-delete` | Listens | No | Intake event to delete a record. | `{ id: ID }` |
 | `ln-data-coordinator:request-bulk-delete` | Listens | No | Intake event to delete multiple records. | `{ ids: Array }` |
-| `ln-store:initialized` | Listens | No | Triggers sync if cache is empty or stale. | `{ target: HTMLElement }` |
-| `ln-store:request-remote-sync` | Listens | No | Requests remote delta synchronization. | `{ since: String }` |
+| `ln-data-store:initialized` | Listens | No | Triggers sync if cache is empty or stale. | `{ target: HTMLElement }` |
+| `ln-data-store:request-remote-sync` | Listens | No | Requests remote delta synchronization. | `{ since: String }` |
 | `ln-api-queue:send` | Listens | No | Processes outbound offline queue writes. | `{ entryId: ID, op: String, payload: Object }` |
 | `ln-table:request-data` | Listens | No | Query from a table to fetch items. | `{ target: HTMLElement }` |
 | `ln-api-queue:request-enqueue` | Emits | No | Enqueues a transaction if offline. | `{ chainKey: String, op: String, payload: Object }` |
@@ -114,16 +114,16 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere
 | `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: true }` |
 | `ln-options:set-data` | Emits | No | Delivers all records to a bound options binder. | `{ data: Array }` |
 | `ln-stat:set-count` | Emits | No | Delivers the resolved count to a bound stat binder. | `{ count: Number }` |
-| `ln-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all bound view elements using their last cached query. | *(handler-internal; no detail consumed)* |
-| `ln-store:synced` | Listens | No | Same re-serve as above, but only when `detail.changed` is true. | `{ changed: Boolean }` |
+| `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all bound view elements using their last cached query. | *(handler-internal; no detail consumed)* |
+| `ln-data-store:synced` | Listens | No | Same re-serve as above, but only when `detail.changed` is true. | `{ changed: Boolean }` |
 
 **Write-Pipeline / Infrastructure Wiring**
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-store:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete` | Emits | No | Dispatched to the store child as the local-write half of the parallel fan-out. | `{ tempId?, id?, ids?, data? }` (shape per op) |
+| `ln-data-store:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete` | Emits | No | Dispatched to the store child as the local-write half of the parallel fan-out. | `{ tempId?, id?, ids?, data? }` (shape per op) |
 | `ln-api-connector:request-create` / `:request-update` / `:request-delete` / `:request-bulk-delete` | Emits | No | Dispatched to the connector child — direct path (no queue) or the queued-transport path via `ln-api-queue:send`. | `{ data?, id?, ids?, url?, meta: Object }` |
-| `ln-api-connector:request-sync` | Emits | No | Dispatched to the connector on `ln-store:request-remote-sync`, to trigger the delta fetch. | `{ since: String, meta: Object }` |
+| `ln-api-connector:request-sync` | Emits | No | Dispatched to the connector on `ln-data-store:request-remote-sync`, to trigger the delta fetch. | `{ since: String, meta: Object }` |
 | `ln-api-queue:request-remap` | Emits | No | Re-keys a queued chain from a temp ID to the server-issued ID once a create resolves. | `{ oldKey: String, newId: ID }` |
 | `ln-api-queue:failed` | Listens | No | Terminal retry-exhaustion notification from the queue — surfaces a `network` toast via the dict. | `{ entryId: ID, chainKey: String, attempts: Number }` |
 | `ln-api-connector:fetched` / `:created` / `:updated` / `:deleted` / `:bulk-deleted` / `:error` | Listens | No | Connector response handling (also namespaced under `ln-couchdb-connector:...` — generalized across concrete connector implementations). Reconciles the store, fires toasts, and drives queue ack/nack. | *(shape per response — see [`ln-api-connector.md`](./ln-api-connector.md) Events API)* |
@@ -177,14 +177,14 @@ sequenceDiagram
     Coord->>Coord: preventDefault() — claim
     Coord->>Coord: serializeForm() + resolveFormMethod()
     par Local Write (instant, optimistic)
-        Coord->>Store: Event: ln-store:request-create { tempId, data }
+        Coord->>Store: Event: ln-data-store:request-create { tempId, data }
         Store->>Store: IndexedDB put (no pending marker — _temp_ prefix is the only marker)
     and Remote Request (parallel, async)
         Coord->>Conn: Event: ln-api-connector:request-create { data: egressData, url: action, meta }
     end
     alt HTTP 200/201 OK
         Conn-->>Coord: Event: ln-api-connector:created { record, message, meta }
-        Coord->>Store: Event: ln-store:request-update { id: meta.tempId, data: record } (id-swap reconciliation)
+        Coord->>Store: Event: ln-data-store:request-update { id: meta.tempId, data: record } (id-swap reconciliation)
         Coord->>Coord: _toastFromMessage(message) → window "ln-toast:enqueue"
     else HTTP Error / Offline
         Conn-->>Coord: Event: ln-api-connector:error { status, meta }
