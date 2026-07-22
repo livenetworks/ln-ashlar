@@ -236,19 +236,19 @@
 									<strong>The Sync Engine (Delta Protocol):</strong> A background service that communicates with server API endpoints. It tracks timestamps, fetches only records changed since the last sync (delta arrays), processes conflict resolutions, and maintains outbox write queues.
 								</li>
 								<li>
-									<strong>The Presentation Layer (UI Elements):</strong> Data tables (<code>ln-table</code>) and select controls render data directly from local IndexedDB queries. They listen to bubbled store events (like <code>ln-store:created</code>, <code>ln-store:updated</code>) to update lists in real-time.
+									<strong>The Presentation Layer (UI Elements):</strong> Data tables (<code>ln-table</code>) and select controls render data directly from local IndexedDB queries. They listen to bubbled store events (like <code>ln-data-store:created</code>, <code>ln-data-store:updated</code>) to update lists in real-time.
 								</li>
 							</ol>
 
 							<h4>How the Data Flow Coherence Works</h4>
 							<p>When a record is created or mutated by the user:</p>
 							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
-								<li>The UI dispatches an event (e.g. <code>ln-store:request-create</code>) with the form payload.</li>
-								<li>The component assigns a temporary ID, saves the record locally, and instantly dispatches <code>ln-store:created</code>. Sibling tables receive the event and display the new record immediately.</li>
-								<li>In the background, the sync outbox pushes a POST request. If the server confirms, it responds with the permanent ID and version, triggering <code>ln-store:confirmed</code>. If it fails or conflicts, the store dispatches <code>ln-store:reverted</code>, letting the UI rollback safely.</li>
+								<li>The coordinator claims the form submit and dispatches a local write event (e.g. <code>ln-data-store:request-create</code>) with the form payload and a temporary ID.</li>
+								<li>The store saves the record locally and instantly dispatches <code>ln-data-store:created</code>. Sibling views receive the event and display the new record immediately.</li>
+								<li>In the background, the coordinator pushes the network request via the connector or outbox queue. On server confirmation, the coordinator dispatches an ordinary <code>ln-data-store:request-update</code> to rekey the temporary ID to the server ID (emitting <code>ln-data-store:updated</code>). On a 4xx create rejection, it dispatches <code>ln-data-store:request-delete</code> (emitting <code>ln-data-store:deleted</code>).</li>
 							</ol>
 
-							<p>For a detailed breakdown of local-first patterns, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-store/README.md"><code>ln-store</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/store.md">architecture reference</a>.</p>
+							<p>For a detailed breakdown of local-first patterns, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-data-store/README.md"><code>ln-data-store</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/store.md">architecture reference</a>.</p>
 						</main>
 					</section>
 
@@ -260,11 +260,10 @@
 							<table>
 								<thead><tr><th>Attribute</th><th>Required</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-store</code></td><td data-label="On element">yes</td><td data-label="Description">Store name (IndexedDB object store name, event namespace)</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-store-endpoint</code></td><td data-label="On element">yes</td><td data-label="Description">Server API base URL for this resource</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-store-stale</code></td><td data-label="On element">no</td><td data-label="Description">Staleness threshold in seconds (default: 300). <code>"0"</code> = always stale (syncs on every mount). <code>"-1"</code> or <code>"never"</code> = never auto-sync (only <code>forceSync()</code>)</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-store-indexes</code></td><td data-label="On element">no</td><td data-label="Description">Comma-separated fields to index</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-store-search-fields</code></td><td data-label="On element">no</td><td data-label="Description">Comma-separated fields for text search</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-data-store</code></td><td data-label="On element">yes</td><td data-label="Description">Store name (IndexedDB object store name, event namespace)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-data-store-stale</code></td><td data-label="On element">no</td><td data-label="Description">Staleness threshold in seconds (default: 300). <code>"0"</code> = always stale (syncs on every mount). <code>"-1"</code> or <code>"never"</code> = never auto-sync (only <code>forceSync()</code>)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-data-store-indexes</code></td><td data-label="On element">no</td><td data-label="Description">Comma-separated fields to index</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-data-store-search-fields</code></td><td data-label="On element">no</td><td data-label="Description">Comma-separated fields for text search</td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -314,10 +313,10 @@
 							<table>
 								<thead><tr><th>Event</th><th><code>detail</code></th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-store:request-create</code></td><td><code>{ data }</code></td><td>Create record (optimistic with temp ID)</td></tr>
-									<tr><td><code>ln-store:request-update</code></td><td><code>{ id, data, expected_version }</code></td><td>Update record (optimistic, conflict detection)</td></tr>
-									<tr><td><code>ln-store:request-delete</code></td><td><code>{ id }</code></td><td>Delete record (optimistic)</td></tr>
-									<tr><td><code>ln-store:request-bulk-delete</code></td><td><code>{ ids }</code></td><td>Delete multiple records (optimistic)</td></tr>
+									<tr><td><code>ln-data-store:request-create</code></td><td><code>{ data }</code></td><td>Create record (optimistic with temp ID)</td></tr>
+									<tr><td><code>ln-data-store:request-update</code></td><td><code>{ id, data, expected_version }</code></td><td>Update record (optimistic, conflict detection)</td></tr>
+									<tr><td><code>ln-data-store:request-delete</code></td><td><code>{ id }</code></td><td>Delete record (optimistic)</td></tr>
+									<tr><td><code>ln-data-store:request-bulk-delete</code></td><td><code>{ ids }</code></td><td>Delete multiple records (optimistic)</td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -333,9 +332,9 @@
 							<table>
 								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-store:ready</code></td><td>Data available</td><td><code>{ store, count, source }</code></td></tr>
-									<tr><td><code>ln-store:loaded</code></td><td>Initial full load</td><td><code>{ store, count }</code></td></tr>
-									<tr><td><code>ln-store:synced</code></td><td>Delta sync complete</td><td><code>{ store, added, deleted, changed: bool }</code></td></tr>
+									<tr><td><code>ln-data-store:ready</code></td><td>Data available</td><td><code>{ store, count, source }</code></td></tr>
+									<tr><td><code>ln-data-store:loaded</code></td><td>Initial full load</td><td><code>{ store, count }</code></td></tr>
+									<tr><td><code>ln-data-store:synced</code></td><td>Delta sync complete</td><td><code>{ store, added, deleted, changed: bool }</code></td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -345,11 +344,11 @@
 							<table>
 								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-store:created</code></td><td>Optimistic create</td><td><code>{ store, record, tempId }</code></td></tr>
-									<tr><td><code>ln-store:updated</code></td><td>Optimistic update</td><td><code>{ store, record, previous }</code></td></tr>
-									<tr><td><code>ln-store:deleted</code></td><td>Optimistic delete</td><td><code>{ store, id }</code> or <code>{ store, ids }</code></td></tr>
-									<tr><td><code>ln-store:confirmed</code></td><td>Server confirmed</td><td><code>{ store, record, action }</code></td></tr>
-									<tr><td><code>ln-store:reverted</code></td><td>Mutation failed</td><td><code>{ store, record, action, error }</code></td></tr>
+									<tr><td><code>ln-data-store:created</code></td><td>Optimistic create</td><td><code>{ store, record, tempId }</code></td></tr>
+									<tr><td><code>ln-data-store:updated</code></td><td>Optimistic update</td><td><code>{ store, record, previous }</code></td></tr>
+									<tr><td><code>ln-data-store:deleted</code></td><td>Optimistic delete</td><td><code>{ store, id }</code> or <code>{ store, ids }</code></td></tr>
+									<tr><td><code>ln-data-store:confirmed</code></td><td>Server confirmed</td><td><code>{ store, record, action }</code></td></tr>
+									<tr><td><code>ln-data-store:reverted</code></td><td>Mutation failed</td><td><code>{ store, record, action, error }</code></td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -359,9 +358,9 @@
 							<table>
 								<thead><tr><th>Event</th><th>When</th><th><code>detail</code></th></tr></thead>
 								<tbody>
-									<tr><td><code>ln-store:error</code></td><td>Initial load failed</td><td><code>{ store, action, error, status }</code></td></tr>
-									<tr><td><code>ln-store:offline</code></td><td>Server unreachable</td><td><code>{ store }</code></td></tr>
-									<tr><td><code>ln-store:destroyed</code></td><td>Instance destroyed</td><td><code>{ store }</code></td></tr>
+									<tr><td><code>ln-data-store:error</code></td><td>Initial load failed</td><td><code>{ store, action, error, status }</code></td></tr>
+									<tr><td><code>ln-data-store:offline</code></td><td>Server unreachable</td><td><code>{ store }</code></td></tr>
+									<tr><td><code>ln-data-store:destroyed</code></td><td>Instance destroyed</td><td><code>{ store }</code></td></tr>
 								</tbody>
 							</table>
 							</div>
@@ -532,11 +531,11 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 		const id = state.nextId++;
 		const record = { id: id, title: 'New record #' + id, status: 'Draft', version: 1 };
 		state.records.push(record);
-		dispatchMock('ln-store:created', { tempId: id, record: record });
+		dispatchMock('ln-data-store:created', { tempId: id, record: record });
 		renderRecords();
 		renderState();
 		setTimeout(function() {
-			dispatchMock('ln-store:confirmed', { record: record, action: 'create' });
+			dispatchMock('ln-data-store:confirmed', { record: record, action: 'create' });
 		}, 300);
 	});
 
@@ -549,10 +548,10 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 		const previous = { id: record.id, title: record.title, status: record.status, version: record.version };
 		record.version += 1;
 		record.title += ' (edited)';
-		dispatchMock('ln-store:updated', { record: record, previous: previous });
+		dispatchMock('ln-data-store:updated', { record: record, previous: previous });
 		renderRecords();
 		setTimeout(function() {
-			dispatchMock('ln-store:confirmed', { record: record, action: 'update' });
+			dispatchMock('ln-data-store:confirmed', { record: record, action: 'update' });
 		}, 300);
 	});
 
@@ -562,11 +561,11 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 			return;
 		}
 		const removed = state.records.shift();
-		dispatchMock('ln-store:deleted', { id: removed.id });
+		dispatchMock('ln-data-store:deleted', { id: removed.id });
 		renderRecords();
 		renderState();
 		setTimeout(function() {
-			dispatchMock('ln-store:confirmed', { id: removed.id, action: 'delete' });
+			dispatchMock('ln-data-store:confirmed', { id: removed.id, action: 'delete' });
 		}, 300);
 	});
 
@@ -574,12 +573,12 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 		logEl.replaceChildren();
 	});
 
-	// Reconnect indicator — listens for ln-store:online / ln-store:offline
-	document.addEventListener('ln-store:online', function () {
+	// Reconnect indicator — listens for ln-data-store:online / ln-data-store:offline
+	document.addEventListener('ln-data-store:online', function () {
 		document.getElementById('store-online-indicator').classList.remove('hidden');
 		document.getElementById('store-offline-indicator').classList.add('hidden');
 	});
-	document.addEventListener('ln-store:offline', function () {
+	document.addEventListener('ln-data-store:offline', function () {
 		document.getElementById('store-offline-indicator').classList.remove('hidden');
 		document.getElementById('store-online-indicator').classList.add('hidden');
 	});
@@ -588,7 +587,7 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 	state.isSyncing = true;
 	renderState();
 	renderRecords();
-	dispatchMock('ln-store:syncing', { store: 'demo' });
+	dispatchMock('ln-data-store:syncing', { store: 'demo' });
 
 	setTimeout(function() {
 		const seed = [
@@ -599,8 +598,8 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 		state.records = seed;
 		state.isLoaded = true;
 		state.isSyncing = false;
-		dispatchMock('ln-store:loaded', { count: seed.length });
-		dispatchMock('ln-store:ready', { count: seed.length, source: 'server' });
+		dispatchMock('ln-data-store:loaded', { count: seed.length });
+		dispatchMock('ln-data-store:ready', { count: seed.length, source: 'server' });
 		renderRecords();
 		renderState();
 	}, 400);
@@ -615,7 +614,7 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 	<main>
 		<p>When the browser goes back online, <code>ln-data-store</code> automatically triggers a remote sync for all loaded stores — <strong>default on, no wiring required.</strong> The <code>isSyncing</code> guard makes it idempotent alongside manual <code>forceSync()</code> calls.</p>
 		<p>Opt out per store: <code>&lt;div data-ln-data-store="chat" data-ln-data-store-no-autosync&gt;&lt;/div&gt;</code></p>
-		<p>Connectivity indicator (listens to <code>ln-store:online</code> / <code>ln-store:offline</code> on <code>document</code>):</p>
+		<p>Connectivity indicator (listens to <code>ln-data-store:online</code> / <code>ln-data-store:offline</code> on <code>document</code>):</p>
 		<p id="store-online-indicator" class="hidden">Online — resync triggered.</p>
 		<p id="store-offline-indicator" class="hidden">Offline — cached data still available.</p>
 		<p><em>Toggle your network connection to see the indicator update.</em></p>

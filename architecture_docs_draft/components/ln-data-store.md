@@ -67,19 +67,19 @@
 
 | Настан | Насока | Откажлив | Опис | `detail` Објект |
 |---|---|---|---|---|
-| `ln-store:request-create` | Слуша | Не | Оптимистичко создавање на запис. | `{ tempId: String, data: Object }` |
-| `ln-store:request-update` | Слуша | Не | Оптимистичко ажурирање или замена на ID (rekey). | `{ id: ID, data: Object }` |
-| `ln-store:request-delete` | Слуша | Не | Оптимистичко бришење на запис. | `{ id: ID }` |
-| `ln-store:request-bulk-delete` | Слуша | Не | Оптимистичко масовно бришење на записи. | `{ ids: Array }` |
-| `ln-store:initialized` | Емитува | Не | Сигнализира дека IndexedDB врската е воспоставена. | `{ store: String, hasCache: Boolean, lastSyncedAt: Number\|null, count: Number }` |
-| `ln-store:ready` | Емитува | Не | Се емитува кога складот е подготвен со локални записи. | `{ store: String, count: Number, source: 'cache'\|'server' }` |
-| `ln-store:loaded` | Емитува | Не | Се емитува по завршување на првата успешна синхронизација. | `{ store: String, count: Number }` |
-| `ln-store:created` | Емитува | Не | Локално зачуван нов оптимистички запис. | `{ store: String, record: Object, tempId: String }` |
-| `ln-store:updated` | Емитува | Не | Локално изменет запис (или извршена замена на ID). | `{ store: String, record: Object, previous: Object }` |
-| `ln-store:deleted` | Емитува | Не | Бришење на запис или записи од складот. | `{ store: String, id: ID }` или `{ store: String, ids: Array }` |
-| `ln-store:synced` | Емитува | Не | Успешно применети серверски делта промени. | `{ store: String, added: Number, deleted: Number, changed: Boolean }` |
-| `ln-store:destroyed` | Емитува | Не | Складот е уништен и расчистен од DOM. | `{ store: String }` |
-| `ln-store:quota-exceeded` | Емитува | Не | *Се диспачира на `document`* при надминување на квотата во базата. | `{ error: Error }` |
+| `ln-data-store:request-create` | Слуша | Не | Оптимистичко создавање на запис. | `{ tempId: String, data: Object }` |
+| `ln-data-store:request-update` | Слуша | Не | Оптимистичко ажурирање или замена на ID (rekey). | `{ id: ID, data: Object }` |
+| `ln-data-store:request-delete` | Слуша | Не | Оптимистичко бришење на запис. | `{ id: ID }` |
+| `ln-data-store:request-bulk-delete` | Слуша | Не | Оптимистичко масовно бришење на записи. | `{ ids: Array }` |
+| `ln-data-store:initialized` | Емитува | Не | Сигнализира дека IndexedDB врската е воспоставена. | `{ store: String, hasCache: Boolean, lastSyncedAt: Number\|null, count: Number }` |
+| `ln-data-store:ready` | Емитува | Не | Се емитува кога складот е подготвен со локални записи. | `{ store: String, count: Number, source: 'cache'\|'server' }` |
+| `ln-data-store:loaded` | Емитува | Не | Се емитува по завршување на првата успешна синхронизација. | `{ store: String, count: Number }` |
+| `ln-data-store:created` | Емитува | Не | Локално зачуван нов оптимистички запис. | `{ store: String, record: Object, tempId: String }` |
+| `ln-data-store:updated` | Емитува | Не | Локално изменет запис (или извршена замена на ID). | `{ store: String, record: Object, previous: Object }` |
+| `ln-data-store:deleted` | Емитува | Не | Бришење на запис или записи од складот. | `{ store: String, id: ID }` или `{ store: String, ids: Array }` |
+| `ln-data-store:synced` | Емитува | Не | Успешно применети серверски делта промени. | `{ store: String, added: Number, deleted: Number, changed: Boolean }` |
+| `ln-data-store:destroyed` | Емитува | Не | Складот е уништен и расчистен од DOM. | `{ store: String }` |
+| `ln-data-store:quota-exceeded` | Емитува | Не | *Се диспачира на `document`* при надминување на квотата во базата. | `{ error: Error }` |
 
 ---
 
@@ -90,7 +90,7 @@
 - **`aggregate(field, fn)`**: Извршува агрегација (`'count'`, `'sum'`, или `'avg'`).
 - **`setPresenters(presenters)`**: Регистрира декоратори за виртуелни пресметани полиња (на пр. `{ computed: { display_name: r => r.first_name + ' ' + r.last_name } }`).
 - **`applySync(upsertedRecords, deletedIds, syncedAt)`**: Применува серверски промени и ги зачувува мета-податоците.
-- **`forceSync()`**: Диспачира `ln-store:request-remote-sync` за рачна синхронизација.
+- **`forceSync()`**: Диспачира `ln-data-store:request-remote-sync` за рачна синхронизација.
 - **`fullReload()`**: Расчистува сè од IndexedDB складот и започнува нова синхронизација.
 - **`destroy()`**: Извршува комплетно расчистување на слушателите и меморијата.
 
@@ -108,7 +108,7 @@
 ## 5. Пристапност (ARIA) и Чести Грешки
 - **Пристапност:** Бидејќи елементот нема визуелна улога, тој мора секогаш да биде скриен за читачите на екран користејќи `aria-hidden="true"` или `hidden` атрибут, за да не учествува во навигацискиот фокус.
 - **Честа грешка 1 (Недефинирани полиња за пребарување):** Пребарувањето локално со `getAll({ search: '...' })` ќе врати празни резултати ако не е дефиниран атрибутот `data-ln-data-store-search-fields`.
-- **Честа грешка 2 (Необезбеден `tempId` при креирање):** Диспачирање на `ln-store:request-create` без привремен `tempId` во `e.detail`. Складот не го генерира сам; тој е одговорност на креаторот (на пр. координаторот).
+- **Честа грешка 2 (Необезбеден `tempId` при креирање):** Диспачирање на `ln-data-store:request-create` без привремен `tempId` во `e.detail`. Складот не го генерира сам; тој е одговорност на креаторот (на пр. координаторот).
 - **Честа грешка 3 (Очекување на авто-rollback):** `ln-data-store` нема rollback логика. Секоја оптимистичка трансакција се запишува трајно во IndexedDB. Доколку серверскиот повик пропадне, координаторот е тој што мора да испрати обратно `request-delete` за да го избрише записот.
 - **Честа грешка 4 (Енкрипција):** Кога се користи шифрирање преку `window.lnCore.setStorageKey(...)`, примарното клуч-поле `id` останува отворено во IndexedDB за да може базата да индексира и пребарува. Никогаш не смее да се ставаат сензитивни податоци директно во `id`.
 
@@ -124,27 +124,27 @@ sequenceDiagram
     participant Server as Server API
 
     Note over Store: Иницијализација на складот и отворање ln_app_cache
-    Store-->>UI: emit ln-store:initialized (известува за кеш состојбата)
+    Store-->>UI: emit ln-data-store:initialized (известува за кеш состојбата)
 
     UI->>Coord: поднесување на форма (интерцептиран submit)
     par Оптимистичко Локално Запишување
-        Coord->>Store: dispatch ln-store:request-create { tempId, data }
+        Coord->>Store: dispatch ln-data-store:request-create { tempId, data }
         Store->>Store: Енкрипција на телото (ако има клуч) + запис во IDB
-        Store-->>UI: emit ln-store:created (UI веднаш рендира со привременото ID)
+        Store-->>UI: emit ln-data-store:created (UI веднаш рендира со привременото ID)
     and Испраќање на Сервер (преку Connector)
         Coord->>Server: HTTP POST /api/resources { data }
     end
 
     alt Успешен Серверски Одговор (2xx)
         Server-->>Coord: враќа потврден објект { id: 101, ... }
-        Coord->>Store: dispatch ln-store:request-update { id: tempId, data: serverRecord }
+        Coord->>Store: dispatch ln-data-store:request-update { id: tempId, data: serverRecord }
         Store->>Store: ИД-Замена (брише tempId, внесува 101)
-        Store-->>UI: emit ln-store:updated (UI го заменува tempId со 101)
+        Store-->>UI: emit ln-data-store:updated (UI го заменува tempId со 101)
     else Одбивање од Сервер (4xx)
         Server-->>Coord: грешка 400 Bad Request
-        Coord->>Store: dispatch ln-store:request-delete { id: tempId }
+        Coord->>Store: dispatch ln-data-store:request-delete { id: tempId }
         Store->>Store: Бришење на привремениот запис од IDB
-        Store-->>UI: emit ln-store:deleted (UI го трга записот од екранот)
+        Store-->>UI: emit ln-data-store:deleted (UI го трга записот од екранот)
     end
 ```
 

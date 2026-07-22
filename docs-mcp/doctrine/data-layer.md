@@ -110,12 +110,12 @@ Submit Form ──> Document-level Native Submit Intercept (preventDefault)
 
 ### A. Direct Pipeline (Queue Absent)
 1. **Submit Intake:** `ln-data-coordinator` claims the native submit of forms opted in via `data-ln-form-scope` (bubble phase, document level, `preventDefault()`), serializes inputs, and applies egress mapping.
-2. **Optimistic Mutation:** The coordinator dispatches `ln-store:request-create` (or `request-update`/`request-delete`) to the store. The store updates IndexedDB with a temporary ID (`_temp_<uuid>`). Bound view components refresh instantly.
+2. **Optimistic Mutation:** The coordinator dispatches `ln-data-store:request-create` (or `request-update`/`request-delete`) to the store. The store updates IndexedDB with a temporary ID (`_temp_<uuid>`). Bound view components refresh instantly.
 3. **API Submission:** The coordinator dispatches `ln-api-connector:request-create` directly to the connector carrying the payload.
 4. **Reconciliation (2xx/409):** 
-   - On success (`2xx`), the connector returns the server record. The coordinator dispatches `ln-store:request-update` to swap the temporary ID with the permanent database ID.
+   - On success (`2xx`), the connector returns the server record. The coordinator dispatches `ln-data-store:request-update` to swap the temporary ID with the permanent database ID.
    - On conflict (`409` on update), the server wins; the coordinator forces the server's remote record into the cache.
-   - On rejection (deterministic `4xx` on create), the coordinator dispatches `ln-store:request-delete` to discard the temporary record.
+   - On rejection (deterministic `4xx` on create), the coordinator dispatches `ln-data-store:request-delete` to discard the temporary record.
 
 ### B. Persistent Offline Pipeline (Queue Present)
 If the optional `data-ln-api-queue` element is present:

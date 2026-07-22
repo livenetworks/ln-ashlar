@@ -27,7 +27,7 @@ Displays a live count from an `ln-data-store` via the `ln-data-coordinator` bind
 
 ```html
 <div data-ln-data-coordinator>
-  <div data-ln-data-store="tenants" data-ln-store-endpoint="/api/tenants"></div>
+  <div data-ln-data-store="tenants"></div>
   <div data-ln-api-connector data-ln-api-endpoint="/api/tenants"></div>
 
   <!-- Total count -->

@@ -51,7 +51,7 @@ Place the connector inside your parent coordinator element alongside your store:
 <ul data-ln-data-coordinator="documents" hidden>
     <!-- Storage Layer Cache (Blind to networking) -->
     <li data-ln-data-store 
-        data-ln-store-indexes="status,updated_at">
+        data-ln-data-store-indexes="status,updated_at">
     </li>
 
     <!-- Transport Gateway (REST / API Connector) -->
@@ -210,7 +210,7 @@ success toasts riding the envelope's `message`:
     if (!storeEl || !connectorEl) return;
 
     // 1. Storage needs remote sync -> forward request to Connector
-    storeEl.addEventListener('ln-store:request-remote-sync', function (e) {
+    storeEl.addEventListener('ln-data-store:request-remote-sync', function (e) {
         connectorEl.dispatchEvent(new CustomEvent('ln-api-connector:request-sync', {
             detail: { since: e.detail.since }
         }));
@@ -225,14 +225,14 @@ success toasts riding the envelope's `message`:
     // 3. Intake fans out in parallel: local optimistic write AND remote call,
     //    from the same handler — not chained off each other.
     const tempId = '_temp_' + crypto.randomUUID();
-    storeEl.dispatchEvent(new CustomEvent('ln-store:request-create', { detail: { tempId, data: { title: 'New Document' } } }));
+    storeEl.dispatchEvent(new CustomEvent('ln-data-store:request-create', { detail: { tempId, data: { title: 'New Document' } } }));
     connectorEl.dispatchEvent(new CustomEvent('ln-api-connector:request-create', {
         detail: { data: { title: 'New Document' }, tempId: tempId }
     }));
 
     // 4. Connector confirms creation -> ordinary id-swap update (no confirmMutation)
     connectorEl.addEventListener('ln-api-connector:created', function (e) {
-        storeEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
+        storeEl.dispatchEvent(new CustomEvent('ln-data-store:request-update', {
             detail: { id: e.detail.tempId, data: e.detail.record }
         }));
         // Success toast rides the envelope's message — no hardcoded string.
@@ -248,7 +248,7 @@ success toasts riding the envelope's `message`:
     //    status 401/419 -> auth (pause queue); status 409/4xx -> deterministic (never retry).
     connectorEl.addEventListener('ln-api-connector:error', function (e) {
         if (e.detail.action === 'create' && e.detail.status >= 400 && e.detail.status < 500) {
-            storeEl.dispatchEvent(new CustomEvent('ln-store:request-delete', { detail: { id: e.detail.tempId } }));
+            storeEl.dispatchEvent(new CustomEvent('ln-data-store:request-delete', { detail: { id: e.detail.tempId } }));
         }
         // ... see ln-data-coordinator README's "Error reconciliation policy" for the full table
     });

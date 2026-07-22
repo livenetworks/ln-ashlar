@@ -115,7 +115,7 @@ All transport-specific connection properties (base URLs, endpoints, and path con
      
     <!-- Child 1: Storage Layer (IndexedDB Database Cache - pure and blind) -->
     <div data-ln-data-store 
-         data-ln-store-indexes="department,status,updated_at">
+         data-ln-data-store-indexes="department,status,updated_at">
     </div>
 
     <!-- Child 2: Transport Gateway (REST Connector - owns path and base URL) -->
@@ -132,7 +132,7 @@ All transport-specific connection properties (base URLs, endpoints, and path con
 
     <!-- Child 1: Storage Cache -->
     <div data-ln-data-store 
-         data-ln-store-indexes="timestamp">
+         data-ln-data-store-indexes="timestamp">
     </div>
 
     <!-- Child 2: Transport Gateway (WebSocket Connector - owns ws URL and channel) -->
@@ -149,7 +149,7 @@ All transport-specific connection properties (base URLs, endpoints, and path con
 
     <!-- Child 1: Storage Cache -->
     <div data-ln-data-store 
-         data-ln-store-indexes="due_date,priority">
+         data-ln-data-store-indexes="due_date,priority">
     </div>
 
     <!-- Child 2: Transport Gateway (CouchDB Sync Connector - owns db details and local sync endpoint) -->
@@ -173,7 +173,7 @@ connector directly; when it is absent, the coordinator's queue-absent path
 
     <!-- Child 1: Storage Cache -->
     <div data-ln-data-store
-         data-ln-store-indexes="department,status,updated_at">
+         data-ln-data-store-indexes="department,status,updated_at">
     </div>
 
     <!-- Child 2: Transport Gateway -->
@@ -232,7 +232,7 @@ This mapper is then bound cleanly and safely in HTML via a reference attribute:
 ```html
 <div data-ln-data-coordinator="documents" data-ln-data-mapper="documents">
     <!-- Child 1: Database Store Cache -->
-    <div data-ln-data-store data-ln-store-indexes="department,status"></div>
+    <div data-ln-data-store data-ln-data-store-indexes="department,status"></div>
 
     <!-- Child 2: Transport Connector Gateway -->
     <div data-ln-rest-connector data-ln-rest-base-url="/api" data-ln-rest-path="/documents"></div>
@@ -258,18 +258,18 @@ function _initCoordinator(self) {
   const mapper = _resolveMapper(self);
 
   // ─── 0. Sync ownership — the coordinator decides WHEN to sync, not the store ───
-  // ln-store:initialized fires once _initStore finishes (cache hit or miss).
+  // ln-data-store:initialized fires once _initStore finishes (cache hit or miss).
   // A module-level singleton also wires one shared 'online'/'offline'/
   // 'visibilitychange' listener set across all coordinator instances, honoring
   // data-ln-data-coordinator-stale / -no-autosync (falling back to the store's
   // own data-ln-data-store-stale / -no-autosync attributes).
-  storeEl.addEventListener('ln-store:initialized', function(e) {
+  storeEl.addEventListener('ln-data-store:initialized', function(e) {
     if (!e.detail.hasCache) { storeEl.lnDataStore.forceSync(); return; }
     if (self._isStale()) storeEl.lnDataStore.forceSync();
   });
 
   // ─── 1. Intercept Delta Sync Triggers ───
-  storeEl.addEventListener('ln-store:request-sync', function(e) {
+  storeEl.addEventListener('ln-data-store:request-remote-sync', function(e) {
     const since = e.detail.since;
     
     // Coordinator asks transport to fetch raw delta data
@@ -284,7 +284,7 @@ function _initCoordinator(self) {
   });
 
   // ─── 2. Intercept Optimistic Mutations (Write Egress) — queue routing ───
-  storeEl.addEventListener('ln-store:optimistic-created', function(e) {
+  storeEl.addEventListener('ln-data-store:created', function(e) {
     const localRecord = e.detail.record;
     const serverPayload = mapper.egress(localRecord); // Apply EGRESS before sending
 

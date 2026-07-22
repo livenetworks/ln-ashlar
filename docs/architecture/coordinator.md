@@ -91,10 +91,10 @@ These are non-visual components designed to decouple client-side local database 
 * **Children:** A local IndexedDB cache database (`data-ln-data-store`) and a transport gateway connector (`data-ln-rest-connector` or `data-ln-websocket-connector`).
 * **The Rule:** Decouple schema cache from endpoints.
 * **Flow:**
-  1. The UI form dispatches `ln-form:submit` to the local cache database.
-  2. The local cache performs an **optimistic write** and fans out immediate changes to the tables, then dispatches an `ln-store:optimistic-created` event.
-  3. The parent `data-ln-data-coordinator` intercepts this event, passes the local record through an Ingress/Egress data mapper (to sanitize and shape the payload), and invokes the transport connector to write to the server.
-  4. Once resolved, the coordinator feeds the server's authoritative response back to the local database to confirm or revert the mutation.
+  1. `ln-data-coordinator` claims the native form submission (or coordinator request event).
+  2. The coordinator performs an **optimistic write** to the store (`ln-data-store:request-create`), which fans out `ln-data-store:created` to immediate table views.
+  3. The parent `data-ln-data-coordinator` passes the local record through an Ingress/Egress data mapper (to sanitize and shape the payload), and invokes the transport connector to write to the server.
+  4. Once resolved, the coordinator feeds the server's authoritative response back to the local database via `ln-data-store:request-update` (rekey).
 
 ---
 

@@ -35,8 +35,8 @@
 			
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
 			<div data-ln-data-store="demo-docs"
-			     data-ln-store-indexes="status,department,updated_at"
-			     data-ln-store-search-fields="title,department,owner">
+			     data-ln-data-store-indexes="status,department,updated_at"
+			     data-ln-data-store-search-fields="title,department,owner">
 			</div>
 
 			<!-- Tier 2: Transport Gateway (REST Connector pointing to mocked server endpoints) -->
@@ -394,12 +394,12 @@
 	});
 
 	// Dynamic store cache change listeners to refresh UI Presenter
-	storeEl.addEventListener('ln-store:ready', refreshTable);
-	storeEl.addEventListener('ln-store:loaded', refreshTable);
-	storeEl.addEventListener('ln-store:synced', function(e) { if (e.detail.changed) refreshTable(); });
-	storeEl.addEventListener('ln-store:created', refreshTable);
-	storeEl.addEventListener('ln-store:updated', refreshTable);
-	storeEl.addEventListener('ln-store:deleted', refreshTable);
+	storeEl.addEventListener('ln-data-store:ready', refreshTable);
+	storeEl.addEventListener('ln-data-store:loaded', refreshTable);
+	storeEl.addEventListener('ln-data-store:synced', function(e) { if (e.detail.changed) refreshTable(); });
+	storeEl.addEventListener('ln-data-store:created', refreshTable);
+	storeEl.addEventListener('ln-data-store:updated', refreshTable);
+	storeEl.addEventListener('ln-data-store:deleted', refreshTable);
 
 	// ─── CRUD User Interactions ──────────────────────────────
 
@@ -415,7 +415,7 @@
 
 	// Write path is native-first (data-ln-form-scope on #doc-form) — react
 	// to the store outcome instead of a form-level event.
-	['ln-store:created', 'ln-store:updated'].forEach(function (ev) {
+	['ln-data-store:created', 'ln-data-store:updated'].forEach(function (ev) {
 		storeEl.addEventListener(ev, function () {
 			modalEl.setAttribute('data-ln-modal', 'close');
 		});

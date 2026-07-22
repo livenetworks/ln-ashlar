@@ -14,7 +14,7 @@ Place the connector inside your parent coordinator element alongside your store:
 <div data-ln-data-coordinator="tasks">
     <!-- Storage Layer Cache (Blind to networking) -->
     <div data-ln-data-store 
-         data-ln-store-indexes="due_date,priority">
+         data-ln-data-store-indexes="due_date,priority">
     </div>
 
     <!-- Transport Gateway (CouchDB Connector) -->
@@ -136,7 +136,7 @@ Here is how a parent Coordinator links a Cache Store and the CouchDB Connector u
     // not a special confirm/revert method:
     //   connectorEl.addEventListener('ln-couchdb-connector:created', function (e) {
     //       const meta = e.detail.meta || {};
-    //       storeEl.dispatchEvent(new CustomEvent('ln-store:request-update', {
+    //       storeEl.dispatchEvent(new CustomEvent('ln-data-store:request-update', {
     //           detail: { id: meta.tempId, data: e.detail.record }
     //       }));
     //   });

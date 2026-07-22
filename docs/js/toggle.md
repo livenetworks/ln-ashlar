@@ -128,7 +128,7 @@ No `:open` event fires during init, even if the panel is
 server-rendered open. That is intentional — the
 attribute is **already** in its final state at init; there has
 been no transition. Consumers that want to react to "the page just
-loaded with this panel open" should listen for `ln-store:ready` (if
+loaded with this panel open" should listen for `ln-data-store:ready` (if
 they care about data being present) or scan `[data-ln-toggle="open"]`
 themselves.
 

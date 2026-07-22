@@ -89,10 +89,10 @@ View компонентите (како `ln-table`, `ln-list`, `ln-stat`) мож
 ### Настани (Events API)
 
 #### Примени настани (Слуша од децата и од document ниво)
-- `ln-store:initialized` — Иницијализација на складиштето (ако кешот е празен или застарен, прави `forceSync`).
-- `ln-store:request-remote-sync` — Барање за delta sync кон серверот (единствениот преостанат `request-remote-*` настан; `create`/`update`/`delete`/`bulk-delete` варијантите се избришани во wave-1 — заменети со `ln-data-coordinator:request-*` intake настани, види подолу).
+- `ln-data-store:initialized` — Иницијализација на складиштето (ако кешот е празен или застарен, прави `forceSync`).
+- `ln-data-store:request-remote-sync` — Барање за delta sync кон серверот (единствениот преостанат `request-remote-*` настан; `create`/`update`/`delete`/`bulk-delete` варијантите се избришани во wave-1 — заменети со `ln-data-coordinator:request-*` intake настани, види подолу).
 - `ln-data-coordinator:request-create` `{ data, action }` / `:request-update` `{ id, data, expected_version, action }` / `:request-delete` `{ id }` / `:request-bulk-delete` `{ ids }` — **(на `this.dom`)** Јавни intake настани за паралелен fan-out (локален store запис + оддалечен connector/queue повик во ист синхрон handler). Алтернатива на native-submit intake-от за не-форма извори (пр. row-action копче во табела).
-- `ln-store:ready` / `loaded` / `created` / `updated` / `deleted` / `synced` — Тригери за освежување на view компонентите (за `synced` само ако `detail.changed` е true).
+- `ln-data-store:ready` / `loaded` / `created` / `updated` / `deleted` / `synced` — Тригери за освежување на view компонентите (за `synced` само ако `detail.changed` е true).
 - `ln-api-queue:send` — Извршување на барање од офлајн редицата.
 - `ln-table:request-data`, `ln-list:request-data`, `ln-options:request-data`, `ln-stat:request-count` — Барања од view компоненти (на ниво на `document`). Се совпаѓаат преку атрибути како `data-ln-table-store`.
 - native `submit` (document ниво, bubble фаза, преземено преку `preventDefault()`) — Декларативен write-влез од scoped форми (`data-ln-form-scope`). Види „Form Write Intake" подолу.
@@ -101,11 +101,11 @@ View компонентите (како `ln-table`, `ln-list`, `ln-stat`) мож
 #### Диспачирани настани
 - `ln-table:set-data`, `ln-list:set-data`, `ln-options:set-data`, `ln-stat:set-count` — Испраќање податоци/бројачи кон view компонентите.
 - `ln-table:set-loading` — Диспачиран кога податоците се бараат, но store уште не е вчитан.
-- `ln-store:request-create`, `ln-store:request-update`, `ln-store:request-delete`, `ln-store:request-bulk-delete` — Кон складиштето (`storeEl`), при секој fan-out (form intake, `ln-data-coordinator:request-*`, ИЛИ server-response реконсилијација — id-swap на create, server-wins на 409 update).
+- `ln-data-store:request-create`, `ln-data-store:request-update`, `ln-data-store:request-delete`, `ln-data-store:request-bulk-delete` — Кон складиштето (`storeEl`), при секој fan-out (form intake, `ln-data-coordinator:request-*`, ИЛИ server-response реконсилијација — id-swap на create, server-wins на 409 update).
 - `ln-api-connector:request-sync`, `:request-create`, `:request-update`, `:request-delete`, `:request-bulk-delete` — Кон конекторот (`connectorEl`, генерализирано и под `ln-couchdb-connector:*`), секогаш со опционален `url` и опаque `meta` (види „Транспортна врска" подолу). Единствен канал за иницирање мрежни операции — нема директни `connector.<method>()` повици.
 - `ln-api-queue:request-enqueue`, `ln-api-queue:ack`, `ln-api-queue:nack`, `ln-api-queue:request-remap` — Сигнали кон офлајн редицата (на пр. `request-remap` при `create` низ редицата за менување од `tempId` во серверски id). Единствениот настан во обратната насока е `ln-api-queue:send` (види Примени настани).
-- `ln-toast:enqueue` (на `window`) — Success toast од серверскиот `{message, content}` envelope (преку `_toastFromMessage`); error toast од `data-ln-data-coordinator-dict` (клучеви: `auth`, `network`, `conflict`, `rejected`, преку `_toastFromDict`). `ln-store:sync-conflict` е ИЗБРИШАН во wave-1 — веќе не постои.
-- `ln-store:online`, `ln-store:offline` — Сигнали за мрежната состојба.
+- `ln-toast:enqueue` (на `window`) — Success toast од серверскиот `{message, content}` envelope (преку `_toastFromMessage`); error toast од `data-ln-data-coordinator-dict` (клучеви: `auth`, `network`, `conflict`, `rejected`, преку `_toastFromDict`). `ln-data-store:sync-conflict` е ИЗБРИШАН во wave-1 — веќе не постои.
+- `ln-data-store:online`, `ln-data-store:offline` — Сигнали за мрежната состојба.
 
 ---
 
@@ -137,7 +137,7 @@ View компонентите (како `ln-table`, `ln-list`, `ln-stat`) мож
 - **Комуникација базирана на настани (Event-Driven Architecture):**
   Координаторот не повикува директно JavaScript методи на складиштата или конекторите. Сите мутации на податоци се одвиваат преку стандардни DOM настани:
   - **Кон конекторот:** Мутациите патуваат како `ln-api-connector:request-*` настани, а конекторот враќа соодветни `:created`, `:updated`, `:deleted` одговори. Ова го прави транспортот лесно заменлив (REST API, CouchDB, WebSockets итн.).
-  - **Кон складиштето (IndexedDB):** Мутациите се праќаат преку `ln-store:request-*` настани. Директните повици кон `store` објектот се користат само за не-мутациски операции (пр. `store.getAll()`, `store.count()`).
+  - **Кон складиштето (IndexedDB):** Мутациите се праќаат преку `ln-data-store:request-*` настани. Директните повици кон `store` објектот се користат само за не-мутациски операции (пр. `store.getAll()`, `store.count()`).
 
 - **Асинхрона корелација без Promise:**
   Наместо Promise објекти, координаторот користи **корелација преку метаподатоци (`meta`)**:
@@ -146,12 +146,12 @@ View компонентите (како `ln-table`, `ln-list`, `ln-stat`) мож
   - Ова му овозможува на координаторот да ја поврзе реакцијата со соодветното локално барање (на пр. за замена на локален `tempId` со серверскиот ID во складиштето или за `ack`/`nack` сигналот кон офлајн редицата).
 
 ### Вградени Политики на Однесување (Behaviors)
-- **Иницијална Синхронизација:** Координаторот извршува `forceSync` доколку при `ln-store:initialized` кешот е празен ИЛИ застарен.
+- **Иницијална Синхронизација:** Координаторот извршува `forceSync` доколку при `ln-data-store:initialized` кешот е празен ИЛИ застарен.
 - **Autosync:** Автоматски се извршува синхронизација на `visibilitychange` на документот (доколку табот стане видлив и кешот е застарен) како и при враќање `online`.
 - **Офлајн Queue и Таксономија на Грешки:**
   - `401` / `419` (Auth) → `nack` со reason `auth` (паузирање на редицата) + toast од dict (клуч `auth`).
-  - `409` (Conflict при update) → server-wins: обична `ln-store:request-update` со серверскиот запис (ако одговорот носи `data.remote`), барањето се отфрла (drop) + toast од dict (клуч `conflict`). Нема `resolveConflict` — методот е избришан во wave-1.
-  - Останати `4xx` (детерминистички) → никогаш retry: create-reject прави обична `ln-store:request-delete` на `tempId`; останатите остануваат локални до следен sync; drop + toast од dict (клуч `rejected`). Нема `ln-store:sync-conflict`, нема реверт, нема автоматски `forceSync`.
+  - `409` (Conflict при update) → server-wins: обична `ln-data-store:request-update` со серверскиот запис (ако одговорот носи `data.remote`), барањето се отфрла (drop) + toast од dict (клуч `conflict`). Нема `resolveConflict` — методот е избришан во wave-1.
+  - Останати `4xx` (детерминистички) → никогаш retry: create-reject прави обична `ln-data-store:request-delete` на `tempId`; останатите остануваат локални до следен sync; drop + toast од dict (клуч `rejected`). Нема `ln-data-store:sync-conflict`, нема реверт, нема автоматски `forceSync`.
   - `5xx` / Мрежна грешка (транзиентни) → `nack` со reason `retry` (backoff ladder во `ln-api-queue`); локалните податоци НИКОГАШ не се бришат; toast (dict клуч `network`) само при терминален `ln-api-queue:failed`.
 
 ---
@@ -173,7 +173,7 @@ View компонентите (како `ln-table`, `ln-list`, `ln-stat`) мож
 
 > [!TIP]
 > **3. Автоматска класификација на грешки (Determinism Policy)**
-> `ln-data-coordinator` ги класифицира серверските грешки по `status`: **auth** (401/419) → toast + queue pause; **transient** (0/5xx) → queue retry (ladder), toast само на терминален неуспех (`ln-api-queue:failed`); **deterministic** (4xx/409) → никогаш retry — 409 на update прави server-wins `ln-store:request-update` (ако одговорот носи `data.remote`), create-reject прави `ln-store:request-delete` на `tempId`, останатите 4xx остануваат локални до следен sync. Секоја гранка завршува со `_toastFromDict(key)` (клучеви: `auth`/`network`/`conflict`/`rejected`). Нема повеќе `revertMutation()`/`resolveConflict()` — тие методи се избришани.
+> `ln-data-coordinator` ги класифицира серверските грешки по `status`: **auth** (401/419) → toast + queue pause; **transient** (0/5xx) → queue retry (ladder), toast само на терминален неуспех (`ln-api-queue:failed`); **deterministic** (4xx/409) → никогаш retry — 409 на update прави server-wins `ln-data-store:request-update` (ако одговорот носи `data.remote`), create-reject прави `ln-data-store:request-delete` на `tempId`, останатите 4xx остануваат локални до следен sync. Секоја гранка завршува со `_toastFromDict(key)` (клучеви: `auth`/`network`/`conflict`/`rejected`). Нема повеќе `revertMutation()`/`resolveConflict()` — тие методи се избришани.
 
 ---
 
@@ -194,14 +194,14 @@ sequenceDiagram
     Coord->>Coord: preventDefault() — claim
     Coord->>Coord: serializeForm() + resolveFormMethod()
     par Локален запис (веднаш, оптимистички)
-        Coord->>Store: Event: ln-store:request-create { tempId, data }
+        Coord->>Store: Event: ln-data-store:request-create { tempId, data }
         Store->>Store: IndexedDB put (нема _pending маркер — _temp_ префикс на id е единствениот сигнал)
     and Оддалечен повик (паралелно, не блокира)
         Coord->>Conn: Event: ln-api-connector:request-create { data: egressData, url: action, meta }
     end
     alt HTTP 200/201 OK
         Conn-->>Coord: Event: ln-api-connector:created { record, message, meta }
-        Coord->>Store: Event: ln-store:request-update { id: meta.tempId, data: record } (id-swap реконсилијација)
+        Coord->>Store: Event: ln-data-store:request-update { id: meta.tempId, data: record } (id-swap реконсилијација)
         Coord->>Coord: _toastFromMessage(message) → window "ln-toast:enqueue" (ако message е присутен)
     else HTTP Error / Offline
         Conn-->>Coord: Event: ln-api-connector:error { status, meta }

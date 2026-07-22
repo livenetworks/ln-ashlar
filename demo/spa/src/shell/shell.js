@@ -43,10 +43,10 @@
 		});
 
 		// Offline banner logic wired to store offline/online events
-		document.addEventListener('ln-store:offline', function () {
+		document.addEventListener('ln-data-store:offline', function () {
 			if (offlineBanner) offlineBanner.classList.remove('hidden');
 		});
-		document.addEventListener('ln-store:online', function () {
+		document.addEventListener('ln-data-store:online', function () {
 			if (offlineBanner) offlineBanner.classList.add('hidden');
 		});
 

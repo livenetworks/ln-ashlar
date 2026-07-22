@@ -161,7 +161,7 @@ record into the form:
 
 ```js
 // Coordinator — store-driven fill after sync conflict
-storeEl.addEventListener('ln-store:sync-conflict', function (e) {
+storeEl.addEventListener('ln-data-store:sync-conflict', function (e) {
     window.lnCore.lnFill(modalEl, e.detail.serverRecord);
     modalEl.dataset.lnModalMode = 'edit';
     modalEl.setAttribute('data-ln-modal', 'open');

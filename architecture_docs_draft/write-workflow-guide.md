@@ -32,7 +32,7 @@
 | **Store** (`ln-data-store`) | Оптимистички кеш во IndexedDB. Веднаш го запишува рекордот локално (UI-видливо мигновено), потоа сигнализира дека треба remote синхронизација. | Не знае за HTTP, не знае за форми, storage-blind. |
 | **Queue** (`ln-api-queue`, опционален) | Редослед и персистенција на пратките (FIFO по chain key), temp-id remap, retry/backoff. Опстојува низ рестарт на табот (drain-on-init). | **Никогаш не праќа сама** — само сигнализира кога е ред некој запис да замине (`ln-api-queue:send`), а извршувањето е туѓа работа. |
 | **Connector** (`ln-api-connector` / `ln-couchdb-connector`) | Единствениот извршител на вистински HTTP/мрежен повик. Прима `:request-*` настан со `url`/`meta`, прави `fetch()`, го echo-ира `meta` назад на одговорот. | Не знае за store, queue, ниту за форма — чист транспортен драјвер. |
-| **Координатор** (`ln-data-coordinator`) | Лепило меѓу горните — **само настани**, никогаш директни методски повици кон конекторот. Го презема native submit-от (`preventDefault`) и го толкува (и своите сопствени `ln-data-coordinator:request-*` настани) и **паралелно** го праќа записот и кон store-от и кон queue/connector-от од истиот синхрон handler (fan-out) — нема повеќе correlation мапи. Одговорите ги толкува назад како обични `ln-store:request-update`/`request-delete` настани (id-swap за create), никогаш преку `confirmMutation`/`revertMutation`/`resolveConflict` (отстранети). | Не серијализира форма, не гради HTTP барања сам, не одлучува транспорт. |
+| **Координатор** (`ln-data-coordinator`) | Лепило меѓу горните — **само настани**, никогаш директни методски повици кон конекторот. Го презема native submit-от (`preventDefault`) и го толкува (и своите сопствени `ln-data-coordinator:request-*` настани) и **паралелно** го праќа записот и кон store-от и кон queue/connector-от од истиот синхрон handler (fan-out) — нема повеќе correlation мапи. Одговорите ги толкува назад како обични `ln-data-store:request-update`/`request-delete` настани (id-swap за create), никогаш преку `confirmMutation`/`revertMutation`/`resolveConflict` (отстранети). | Не серијализира форма, не гради HTTP барања сам, не одлучува транспорт. |
 
 ---
 
@@ -140,10 +140,10 @@
 2. Пополнува „Наслов" и „Статус", кликнува „Зачувај".
 3. `ln-form._onSubmit`: ефективен метод = `POST` (нема `_method` вредност) → validation gate поминува (нема невалидни полиња) → `ln-form` не прави ништо повеќе, submit-от продолжува нативно.
 4. `ln-data-coordinator` слуша native `submit` на `document` (bubble фаза): `e.defaultPrevented` е `false` (гејтот поминал) → containment match → сам го чита ефективниот метод (`POST`) → `preventDefault()` (ова е преземањето) → `serializeForm()` → `_handleSubmitRecord`: `method === 'POST'` → повикува `_fanOutCreate(children, data, action)`. Координаторот сам го генерира `tempId`-от (`'_temp_' + crypto.randomUUID()`) — нема повеќе `WeakMap` за паметење на `action`, тој едноставно патува како аргумент.
-5. `_fanOutCreate` **паралелно**, од истиот синхрон повик: (a) `dispatch(storeEl, 'ln-store:request-create', { tempId, data })` → `ln-data-store` веднаш го запишува оптимистички во IndexedDB (UI-видливо мигновено — табелата се освежува преку `ln-store:created`); (b) ако **има** queue: `dispatch(queueEl, 'ln-api-queue:request-enqueue', { chainKey: tempId, op: 'create', payload: egress(data), meta: { tempId, action } })`. И двете гранки се независни — локалниот запис не чека на мрежниот исход.
+5. `_fanOutCreate` **паралелно**, од истиот синхрон повик: (a) `dispatch(storeEl, 'ln-data-store:request-create', { tempId, data })` → `ln-data-store` веднаш го запишува оптимистички во IndexedDB (UI-видливо мигновено — табелата се освежува преку `ln-data-store:created`); (b) ако **има** queue: `dispatch(queueEl, 'ln-api-queue:request-enqueue', { chainKey: tempId, op: 'create', payload: egress(data), meta: { tempId, action } })`. И двете гранки се независни — локалниот запис не чека на мрежниот исход.
 6. Queue-от подоцна сам одлучува кога е ред и диспачира `ln-api-queue:send`. Координаторовиот `queueSend` слушател: чита `meta.action`, диспачира `ln-api-connector:request-create { data: payload, url: action, meta: { entryId, queued: true, op: 'create', tempId } }`.
 7. Конекторот прави `POST` кон `buildUrl(baseUrl, url)` (не `data-ln-api-path` — `url` победува). При успех: серверот одговара со `{ message, content }` обвивка (види §7 подолу); конекторот ја „одмотува" во `dispatch(connectorEl, 'ln-api-connector:created', { record: content, message, meta })`.
-8. Координаторовиот `connCreated` слушател: **обичен** `dispatch(storeEl, 'ln-store:request-update', { id: meta.tempId, data: ingress(record) })` — store-от детектира дека `data.id !== tempId` и прави id-swap (rekey), а не `confirmMutation`. Потоа `_toastFromMessage(message)` — ако серверот испратил `message`, се диспачира `ln-toast:enqueue`; ако не, нема toast. Потоа, **бидејќи `meta.queued === true`**: `dispatch(queueEl, 'ln-api-queue:request-remap', { oldKey: tempId, newId: record.id })` **пред** `dispatch(queueEl, 'ln-api-queue:ack', { entryId })`.
+8. Координаторовиот `connCreated` слушател: **обичен** `dispatch(storeEl, 'ln-data-store:request-update', { id: meta.tempId, data: ingress(record) })` — store-от детектира дека `data.id !== tempId` и прави id-swap (rekey), а не `confirmMutation`. Потоа `_toastFromMessage(message)` — ако серверот испратил `message`, се диспачира `ln-toast:enqueue`; ако не, нема toast. Потоа, **бидејќи `meta.queued === true`**: `dispatch(queueEl, 'ln-api-queue:request-remap', { oldKey: tempId, newId: record.id })` **пред** `dispatch(queueEl, 'ln-api-queue:ack', { entryId })`.
 
 Ако **нема** queue: чекор 6 отпаѓа — координаторот директно диспачира `ln-api-connector:request-create` со `meta.queued: false` веднаш во `_fanOutCreate`, а `connCreated` го прескокнува remap/ack чекорот.
 
@@ -156,8 +156,8 @@
 3. Корисникот кликнува „Зачувај". `ln-form._onSubmit`: ефективен метод сега = `PUT` (чита го `_method` input-от, не `method` атрибутот) → gate поминува.
 4. `serializeForm()` го зема **целото** сурово `data`, вклучувајќи `id` и `expected_version` (полиња во формата). `_method`/`_token` се бришат од `data`, но `method: 'PUT'` е веќе поставено во detail-от.
 5. `ln-data-coordinator._handleSubmitRecord`: `method === 'PUT'` → вади `id`/`expected_version` од `data` → повикува `_fanOutUpdate(children, id, data, expectedVersion, action)`. Нема повеќе `Map` за паметење на `action`.
-6. `_fanOutUpdate` паралелно: (a) `dispatch(storeEl, 'ln-store:request-update', { id, data })` — веднаш го применува измененото локално (нема повеќе `store.getById(id)` пред-читање од страна на координаторот — payload-от за egress е директно `data`-та од формата); (b) или директно `ln-api-connector:request-update`, или queue-иран `ln-api-queue:request-enqueue` со `meta: { id, action }`.
-7. Одговорот се толкува исто како во Сценарио 1 чекор 8: обичен `ln-store:request-update` (без id-swap овојпат — `id`-то не се менува), `_toastFromMessage(message)`.
+6. `_fanOutUpdate` паралелно: (a) `dispatch(storeEl, 'ln-data-store:request-update', { id, data })` — веднаш го применува измененото локално (нема повеќе `store.getById(id)` пред-читање од страна на координаторот — payload-от за egress е директно `data`-та од формата); (b) или директно `ln-api-connector:request-update`, или queue-иран `ln-api-queue:request-enqueue` со `meta: { id, action }`.
+7. Одговорот се толкува исто како во Сценарио 1 чекор 8: обичен `ln-data-store:request-update` (без id-swap овојпат — `id`-то не се менува), `_toastFromMessage(message)`.
 
 ### Сценарио 3: Офлајн edit
 
@@ -172,7 +172,7 @@
 1. Друг корисник веќе го изменил истиот запис со поновa `expected_version` пред нашиот `PUT` да стигне.
 2. Серверот враќа `409 Conflict` со тело што содржи `remote` (моменталната серверска верзија) и `field_diffs`.
 3. Конекторот: `dispatch(connectorEl, 'ln-api-connector:error', { action: 'update', status: 409, data: { remote, field_diffs }, meta })`.
-4. Координаторовиот `connError` слушател класифицира по `status` — `409` е **deterministic** (никогаш retry): ако `detail.data.remote` постои → обичен `dispatch(storeEl, 'ln-store:request-update', { id: meta.id, data: mapper.ingress(remote) })` (серверот победува, никаков `resolveConflict`/snapshot) → `_toastFromDict('conflict')` (текстот доаѓа од `data-ln-data-coordinator-dict="conflict"`, никогаш hardcoded). Ако е queue-иран пат: потоа `dispatch(queueEl, 'ln-api-queue:nack', { entryId, reason: 'drop' })` — записот се отфрла од редицата, нема повторен обид.
+4. Координаторовиот `connError` слушател класифицира по `status` — `409` е **deterministic** (никогаш retry): ако `detail.data.remote` постои → обичен `dispatch(storeEl, 'ln-data-store:request-update', { id: meta.id, data: mapper.ingress(remote) })` (серверот победува, никаков `resolveConflict`/snapshot) → `_toastFromDict('conflict')` (текстот доаѓа од `data-ln-data-coordinator-dict="conflict"`, никогаш hardcoded). Ако е queue-иран пат: потоа `dispatch(queueEl, 'ln-api-queue:nack', { entryId, reason: 'drop' })` — записот се отфрла од редицата, нема повторен обид.
 5. Ако патот е **директен** (нема queue): истата гранка (server-wins update + `conflict` toast), само без queue nack.
 
 ---
@@ -198,7 +198,7 @@ sequenceDiagram
     Coord->>Coord: serializeForm() (сурово)
     Coord->>Coord: _handleSubmitRecord: PUT → вади id/expected_version → _fanOutUpdate(children, id, data, expected_version, action)
     par Локално (секогаш)
-        Coord->>Store: ln-store:request-update { id, data }
+        Coord->>Store: ln-data-store:request-update { id, data }
         Store->>Store: оптимистички запис (веднаш во UI)
     and Далечински (само ако queue/connector постои)
         Coord->>Queue: ln-api-queue:request-enqueue { chainKey:id, op:'update', payload:egress(data), meta:{ id, action } }
@@ -210,13 +210,13 @@ sequenceDiagram
     alt 200 OK
         API-->>Conn: { message, content } обвивка
         Conn->>Coord: ln-api-connector:updated { record:content, message, meta }
-        Coord->>Store: ln-store:request-update { id:meta.id, data:ingress(record) } (обичен update, не confirmMutation)
+        Coord->>Store: ln-data-store:request-update { id:meta.id, data:ingress(record) } (обичен update, не confirmMutation)
         Coord->>Coord: _toastFromMessage(message) → ln-toast:enqueue (само ако message постои)
         Coord->>Queue: ln-api-queue:ack { entryId }
     else 409 Conflict (deterministic — никогаш retry)
         API-->>Conn: conflict body { remote, field_diffs }
         Conn->>Coord: ln-api-connector:error { status:409, data, meta }
-        Coord->>Store: ln-store:request-update { id:meta.id, data:ingress(remote) } (серверот победува)
+        Coord->>Store: ln-data-store:request-update { id:meta.id, data:ingress(remote) } (серверот победува)
         Coord->>Coord: _toastFromDict('conflict')
         Coord->>Queue: ln-api-queue:nack { entryId, reason:'drop' }
     else Offline / 5xx (transient — никогаш не брише локален запис)

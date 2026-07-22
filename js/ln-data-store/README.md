@@ -22,10 +22,10 @@ It possesses no visual interface and is **completely blind to the network** (no 
 
 | Attribute | Description | Default |
 |---|---|---|
-| `data-ln-data-store="name"` | Declares the store name (also accepts `data-ln-store="name"`). | *Required* |
-| `data-ln-data-store-stale="N"` | Seconds before cache is considered stale (also accepts `data-ln-store-stale`). Set to `never` or `-1` to disable staleness. | `300` |
-| `data-ln-data-store-indexes="…"` | Comma-separated list of IndexedDB index fields (also accepts `data-ln-store-indexes`). | `""` |
-| `data-ln-data-store-search-fields="…"` | Comma-separated list of text-search fields for local query search matching (also accepts `data-ln-store-search-fields`). | `""` |
+| `data-ln-data-store="name"` | Declares the store name. | *Required* |
+| `data-ln-data-store-stale="N"` | Seconds before cache is considered stale. Set to `never` or `-1` to disable staleness. | `300` |
+| `data-ln-data-store-indexes="…"` | Comma-separated list of IndexedDB index fields. | `""` |
+| `data-ln-data-store-search-fields="…"` | Comma-separated list of text-search fields for local query search matching. | `""` |
 
 ---
 
@@ -99,7 +99,7 @@ store.setPresenters({
 | `aggregate(field, fn)` | `Promise<Number>` | Performs aggregation. `fn` must be `'count'`, `'sum'`, or `'avg'`. |
 | `setPresenters(presenters)` | `void` | Registers presenters (decorators) for computed fields. |
 | `applySync(upserted, deleted, syncedAt)` | `Promise<void>` | Feeds synchronization delta updates into the cache. |
-| `forceSync()` | `void` | Dispatches `ln-store:request-remote-sync` with the current last sync timestamp. |
+| `forceSync()` | `void` | Dispatches `ln-data-store:request-remote-sync` with the current last sync timestamp. |
 | `fullReload()` | `Promise<void>` | Clears the IndexedDB store, resets sync metadata, and triggers a sync. |
 | `destroy()` | `void` | Cleans up the instance, removes event listeners, and deletes the DOM reference. |
 
@@ -113,7 +113,7 @@ All mutations must be routed via DOM events. **Never invoke write methods direct
 
 ```javascript
 // Create record optimistically
-store.dispatchEvent(new CustomEvent('ln-store:request-create', {
+store.dispatchEvent(new CustomEvent('ln-data-store:request-create', {
   detail: { 
     tempId: '_temp_abc123', 
     data: { title: 'New Document', status: 'Draft' } 
@@ -122,7 +122,7 @@ store.dispatchEvent(new CustomEvent('ln-store:request-create', {
 
 // Update record optimistically
 // Note: If data.id is different from the target id, the store performs an atomic id-swap (rekey)
-store.dispatchEvent(new CustomEvent('ln-store:request-update', {
+store.dispatchEvent(new CustomEvent('ln-data-store:request-update', {
   detail: { 
     id: '_temp_abc123', 
     data: { id: 42, title: 'Server Confirmed Document' } 
@@ -130,12 +130,12 @@ store.dispatchEvent(new CustomEvent('ln-store:request-update', {
 }));
 
 // Delete record optimistically
-store.dispatchEvent(new CustomEvent('ln-store:request-delete', {
+store.dispatchEvent(new CustomEvent('ln-data-store:request-delete', {
   detail: { id: 42 }
 }));
 
 // Bulk delete records optimistically
-store.dispatchEvent(new CustomEvent('ln-store:request-bulk-delete', {
+store.dispatchEvent(new CustomEvent('ln-data-store:request-bulk-delete', {
   detail: { ids: [42, 43, 44] }
 }));
 ```
@@ -148,20 +148,20 @@ These events bubble up and can be listened to by coordinators or rendering views
 
 | Event | `e.detail` payload | Description |
 |---|---|---|
-| `ln-store:initialized` | `{ store, hasCache, lastSyncedAt, count }` | Emitted once after IndexedDB connection opens. |
-| `ln-store:ready` | `{ store, count, source }` | Emitted when data is ready. `source` is `'cache'` (init) or `'server'` (first sync). |
-| `ln-store:loaded` | `{ store, count }` | Emitted on initial load sync completion (first sync). |
-| `ln-store:created` | `{ store, record, tempId }` | Emitted after optimistic creation. |
-| `ln-store:updated` | `{ store, record, previous }` | Emitted after optimistic update or id-swap rekey. |
-| `ln-store:deleted` | `{ store, id \| ids }` | Emitted after optimistic delete or bulk delete. |
-| `ln-store:synced` | `{ store, added, deleted, changed }` | Emitted after subsequent delta sync merges. |
-| `ln-store:destroyed` | `{ store }` | Emitted when the store instance is destroyed. |
+| `ln-data-store:initialized` | `{ store, hasCache, lastSyncedAt, count }` | Emitted once after IndexedDB connection opens. |
+| `ln-data-store:ready` | `{ store, count, source }` | Emitted when data is ready. `source` is `'cache'` (init) or `'server'` (first sync). |
+| `ln-data-store:loaded` | `{ store, count }` | Emitted on initial load sync completion (first sync). |
+| `ln-data-store:created` | `{ store, record, tempId }` | Emitted after optimistic creation. |
+| `ln-data-store:updated` | `{ store, record, previous }` | Emitted after optimistic update or id-swap rekey. |
+| `ln-data-store:deleted` | `{ store, id \| ids }` | Emitted after optimistic delete or bulk delete. |
+| `ln-data-store:synced` | `{ store, added, deleted, changed }` | Emitted after subsequent delta sync merges. |
+| `ln-data-store:destroyed` | `{ store }` | Emitted when the store instance is destroyed. |
 
 ### Global System Events
 
 | Event | Target | `e.detail` payload | Description |
 |---|---|---|---|
-| `ln-store:quota-exceeded` | `document` | `{ error }` | Emitted globally on `document` if database storage exceeds browser quotas. |
+| `ln-data-store:quota-exceeded` | `document` | `{ error }` | Emitted globally on `document` if database storage exceeds browser quotas. |
 
 ---
 

@@ -214,7 +214,7 @@ dispatches a custom event, and never listens for `submit` — see
 - **Expecting a submit event:** `ln-form` never dispatches anything on
   submit — there is no `ln-form:submit` and no `ln-form:submit-record`
   either. Listen to the form's native `submit` event, or the resulting
-  `ln-store:created`/`ln-store:updated` outcome, instead.
+  `ln-data-store:created`/`ln-data-store:updated` outcome, instead.
 
 ---
 

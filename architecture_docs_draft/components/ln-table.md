@@ -100,7 +100,7 @@ sequenceDiagram
 Доколку `<tbody>` веќе содржи серверски рендерирани редови, табелата прво ги хидрира локално (progressive enhancement): записите се реконструираат од ќелиите преку мапирањето `data-ln-table-col` + `data-ln-value`, па дури потоа се емитува првичното `ln-table:request-data`.
 
 > [!NOTE]
-> **Не се пишува custom координатор по проект.** [ln-data-coordinator](./ln-data-coordinator.md) е генеричка библиотечна компонента — целото поврзување е чисто декларативно, со нула проектен JavaScript. „Врзувањето“ е самото DOM гнездење под заедничкиот координатор-елемент: складот **не се врзува директно** на конекторот, туку емитува `ln-store:request-remote-*` настани кои се креваат (bubble) нагоре, а координаторот ги фаќа и го повикува конекторот. Затоа конекторот е слободно заменлив (`data-ln-api-connector`, `data-ln-couchdb-connector`, `data-ln-websocket-connector`, `data-ln-rest-connector`) без складот да знае кој транспорт седи до него. Единствена проектно-специфична точка на проширување е опционалниот ingress/egress mapper регистриран преку `window.lnCore.registerDataMapper()` — стандардно е identity, па за чист 1:1 API не се пишува ништо.
+> **Не се пишува custom координатор по проект.** [ln-data-coordinator](./ln-data-coordinator.md) е генеричка библиотечна компонента — целото поврзување е чисто декларативно, со нула проектен JavaScript. „Врзувањето“ е самото DOM гнездење под заедничкиот координатор-елемент: складот **не се врзува директно** на конекторот, туку емитува `ln-data-store:request-remote-*` настани кои се креваат (bubble) нагоре, а координаторот ги фаќа и го повикува конекторот. Затоа конекторот е слободно заменлив (`data-ln-api-connector`, `data-ln-couchdb-connector`, `data-ln-websocket-connector`, `data-ln-rest-connector`) без складот да знае кој транспорт седи до него. Единствена проектно-специфична точка на проширување е опционалниот ingress/egress mapper регистриран преку `window.lnCore.registerDataMapper()` — стандардно е identity, па за чист 1:1 API не се пишува ништо.
 >
 > ```html
 > <!-- Минимален пример: цела Data-Driven табела без ниту еден ред проектен JS -->
@@ -177,7 +177,7 @@ sequenceDiagram
     Coord->>Server: HTTP GET /api/products (Преку конекторот)
     Server-->>Coord: JSON одговор со низа продукти
     Coord->>Store: Локално зачувување на продуктите
-    Store-->>Coord: Емитува 'ln-store:change'
+    Store-->>Coord: Емитува 'ln-data-store:ready'
     Coord->>Table: Емитува 'ln-table:set-data' со низата од податоци
     Table->>Table: _buildRow() (Клонира шаблон & XSS-безбедно пополнува {{ field }})
     Table->>Table: _render() (Ги исцртува редовите во DOM во tbody)

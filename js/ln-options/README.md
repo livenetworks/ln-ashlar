@@ -30,7 +30,7 @@ No `<template>` needed — ln-options writes `<option>` elements directly (value
 
 ```html
 <div data-ln-data-coordinator>
-  <div data-ln-data-store="tenants" data-ln-store-endpoint="/api/tenants"></div>
+  <div data-ln-data-store="tenants"></div>
   <div data-ln-api-connector data-ln-api-endpoint="/api/tenants"></div>
 
   <select data-ln-options="tenants"
@@ -48,5 +48,5 @@ The placeholder `<option value="">` is preserved across refreshes. The previous 
 ## Notes
 
 - ln-options never imports or reads `ln-data-store` directly — it is a pure event client.
-- The coordinator re-serves `ln-options:set-data` on every store mutation (`ln-store:ready`, `created`, `updated`, `deleted`, `synced`).
+- The coordinator re-serves `ln-options:set-data` on every store mutation (`ln-data-store:ready`, `created`, `updated`, `deleted`, `synced`).
 - `data-ln-options-label` may reference a presenter-computed field (e.g. `full_name`) because the coordinator delivers already-decorated records from `store.getAll({})`.

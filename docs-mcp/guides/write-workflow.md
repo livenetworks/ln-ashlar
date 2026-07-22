@@ -53,11 +53,11 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 2. **Intake:** `ln-form` intercepts the submission only to validate; `ln-data-coordinator` claims the native submit and serializes the fields itself.
 3. **Claim:** The coordinator checks the event scope, claims it (`claimed = true`), and generates a temporary ID with a `_temp_` prefix (e.g. `_temp_df88b0...`).
 4. **Parallel Fan-Out:** The coordinator triggers two independent branches synchronously:
-   - **Local Cache:** Dispatches `ln-store:request-create` with the `tempId` and data. `ln-data-store` writes the record to IndexedDB, instantly updating bound UI tables via state notifications (`ln-store:created`).
+   - **Local Cache:** Dispatches `ln-data-store:request-create` with the `tempId` and data. `ln-data-store` writes the record to IndexedDB, instantly updating bound UI tables via state notifications (`ln-data-store:created`).
    - **Outbox Queue:** If a queue child is present, it enqueues the payload with `meta: { tempId, action }`.
 5. **API Transport:** The queue processes the item and tells the coordinator to send. The coordinator directs the connector to POST to the resource URL.
 6. **Server Response:** The server processes the request and responds with a `{ message, content }` envelope (see Section 5).
-7. **Reconciliation:** The connector unwraps the record and dispatches it back. The coordinator dispatches an ordinary `ln-store:request-update` targeting `id: tempId` with the server's payload (`data: record`). 
+7. **Reconciliation:** The connector unwraps the record and dispatches it back. The coordinator dispatches an ordinary `ln-data-store:request-update` targeting `id: tempId` with the server's payload (`data: record`). 
    Because the incoming server ID differs from the `tempId`, the store executes an **id-swap (rekey)**, updating the primary key in IndexedDB.
 8. **Outbox Completion:** The coordinator dispatches `request-remap` to the queue to update subsequent queued updates targeting the old `tempId` with the new server ID, then issues `ack` to remove the completed create entry from the queue.
 
@@ -84,7 +84,7 @@ During a local-first write operation, responsibilities are cleanly isolated amon
 ### Scenario 4: Handling 409 Conflicts
 1. **Conflict Response:** If another user updated the record in the meantime, the server rejects the write with `409 Conflict`, returning the `remote` server record.
 2. **Intake:** The connector intercepts the 409 status and dispatches an error event.
-3. **Resolution (Server Wins):** The coordinator classifies the 409 error as deterministic. It forces the server's version into the local cache by dispatching `ln-store:request-update` carrying the `remote` record. The UI updates to show the server's data.
+3. **Resolution (Server Wins):** The coordinator classifies the 409 error as deterministic. It forces the server's version into the local cache by dispatching `ln-data-store:request-update` carrying the `remote` record. The UI updates to show the server's data.
 4. **Outbox Drop:** The coordinator issues `nack { reason: 'drop' }` to remove the conflicting update from the outbox queue, preventing endless retries.
 
 ---
@@ -110,7 +110,7 @@ sequenceDiagram
     Coord->>Coord: preventDefault() — claim
     
     par Optimistic UI Write
-        Coord->>Store: Event: ln-store:request-create (tempId)
+        Coord->>Store: Event: ln-data-store:request-create (tempId)
         Store->>Store: Write optimistic record
     and Outbox Enqueue
         Coord->>Queue: Event: ln-api-queue:request-enqueue
@@ -123,7 +123,7 @@ sequenceDiagram
     Server-->>Conn: HTTP 200 { message, content }
     Conn->>Coord: Event: ln-api-connector:created (record = content)
     
-    Coord->>Store: Event: ln-store:request-update (swap tempId for real ID)
+    Coord->>Store: Event: ln-data-store:request-update (swap tempId for real ID)
     Store->>Store: Replace tempId (rekey)
     Coord->>Queue: Event: ln-api-queue:request-remap (update child entries)
     Coord->>Queue: Event: ln-api-queue:ack (remove entry)
