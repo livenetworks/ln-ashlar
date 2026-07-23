@@ -13,6 +13,7 @@ if (!file_exists($jsonFile)) {
 $rawJson = file_get_contents($jsonFile);
 $data = json_decode($rawJson, true);
 $records = isset($data['data']) ? $data['data'] : [];
+$grandTotal = count($records);
 
 // Support query parameter 'search' or 'q'
 $search = isset($_GET['search']) ? trim($_GET['search']) : (isset($_GET['q']) ? trim($_GET['q']) : '');
@@ -107,6 +108,6 @@ if ($limit > 0) {
 
 echo json_encode([
 	'data' => $records,
-	'total' => $totalCount,
+	'total' => $grandTotal,
 	'filtered' => $totalCount
 ]);

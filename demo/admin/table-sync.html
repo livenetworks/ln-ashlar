@@ -268,6 +268,7 @@
 		<section data-ln-table="hybrid-docs"
 		         data-ln-table-source="hybrid-docs"
 		         data-ln-table-selectable
+		         data-ln-table-window="1000"
 		         id="hybrid-table"
 		         class="data-table-demo">
 
@@ -427,9 +428,7 @@
 			</table>
 
 			<footer class="ln-table__footer">
-				<span data-ln-table-total>10</span> items
-				<span class="hidden"> · <span data-ln-table-filtered></span> filtered</span>
-				<span class="hidden"> · <span data-ln-table-selected></span> selected</span>
+				<p><span class="hidden"><span data-ln-table-filtered></span> / </span><span data-ln-table-total>10</span> items<span class="hidden"> · <span data-ln-table-selected></span> selected</span></p>
 			</footer>
 
 			<!-- Dynamic Row Template for background load -->
@@ -504,6 +503,7 @@
 
 	let isSynced = false;
 	let currentAbortController = null;
+	let lastRequest = null;
 
 	function log(msg, color = 'var(--fg-muted)') {
 		const time = new Date().toLocaleTimeString() + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
@@ -536,8 +536,12 @@
 		});
 	}
 
-	// Trigger API fetch
-	async function fetchBackgroundData(searchQuery = '', filters = {}) {
+	// Trigger a windowed page fetch from the request-data detail
+	async function fetchWindow(req) {
+		req = req || {};
+		const searchQuery = req.search || '';
+		const filters = req.filters || {};
+
 		if (currentAbortController) {
 			currentAbortController.abort();
 			log("Previous background sync request aborted.", '#ef4444');
@@ -546,8 +550,8 @@
 		currentAbortController = new AbortController();
 		const signal = currentAbortController.signal;
 
-		log(`Starting background sync from PHP API... (search: "${searchQuery}")`, '#38bdf8');
-		
+		log(`Starting background sync from PHP API... (search: "${searchQuery}", offset: ${req.offset || 0})`, '#38bdf8');
+
 		tableEl.dispatchEvent(new CustomEvent('ln-table:set-loading', {
 			detail: { loading: true }
 		}));
@@ -576,10 +580,18 @@
 			}
 		}
 
+		if (req.sort && req.sort.field && req.sort.direction) {
+			params.append('sort_field', req.sort.field);
+			params.append('sort_dir', req.sort.direction);
+		}
+
+		if (req.offset != null) params.append('offset', req.offset);
+		if (req.limit != null) params.append('limit', req.limit);
+
 		try {
 			const res = await fetch('data/api.php?' + params.toString(), { signal });
 			const payload = await res.json();
-			
+
 			if (payload.error) {
 				throw new Error(payload.error);
 			}
@@ -592,10 +604,8 @@
 					data: decoratedData,
 					total: payload.total,
 					filtered: payload.filtered,
-					filterOptions: {
-						department: ['IT', 'Finance', 'Legal', 'Marketing', 'HR', 'Operations'],
-						status: ['Approved', 'Archived', 'Draft', 'Pending', 'Rejected']
-					}
+					offset: req.offset,
+					queryGen: req.queryGen
 				}
 			}));
 
@@ -625,12 +635,13 @@
 
 	tableEl.addEventListener('ln-table:request-data', function (e) {
 		log(`Component emitted 'ln-table:request-data' due to query change.`, '#fbbf24');
-		fetchBackgroundData(e.detail.search, e.detail.filters);
+		lastRequest = e.detail;
+		fetchWindow(e.detail);
 	});
 
 	triggerBtn.addEventListener('click', function() {
 		isSynced = false;
-		fetchBackgroundData(tableEl.lnTable.currentSearch || '', tableEl.lnTable.currentFilters || {});
+		if (lastRequest) fetchWindow(lastRequest);
 	});
 })();
 </script>
