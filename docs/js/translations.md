@@ -18,6 +18,8 @@ Each `[data-ln-translations]` form gets a `_component` instance stored at `eleme
 | `locales` | object | Available locales map (`{ code: name }`) |
 | `badgesEl` | Element | Container for language badges (`<ul data-ln-translations-active>`) |
 | `menuEl` | Element | The dropdown toggle menu |
+| `placeholderLabel` | string | Placeholder template (`{lang}` token), from `data-ln-translations-placeholder`. Default: `"{lang} translation"` |
+| `removeLabel` | string | Remove-button `aria-label` template (`{lang}` token), from `data-ln-translations-remove-label`. Default: `"Remove {lang}"` |
 
 ### Add Language Flow
 
@@ -30,9 +32,9 @@ addLanguage(lang, values)
 3. Add lang to activeLanguages Set
 4. For each [data-ln-translatable] wrapper:
    a. Find original input (default lang or first unnamed)
-   b. Clone input (cloneNode(false)); badge/menu items via cloneTemplate() from ln-core
+   b. Clone input (cloneNode — deep for <select> to preserve <option>s, shallow for input/textarea); badge/menu items via cloneTemplate() from ln-core
    c. Set name: prefix[trans][lang][field] or trans[lang][field]
-   d. Clear id, set placeholder, set data-ln-translatable-lang
+   d. Clear id, set placeholder (if 'placeholder' in clone) from placeholderLabel template, set data-ln-translatable-lang
    e. Insert after last translation input for this field
 5. _updateDropdown() — rebuild menu items (only languages not yet active)
 6. _updateBadges() — rebuild badge pills

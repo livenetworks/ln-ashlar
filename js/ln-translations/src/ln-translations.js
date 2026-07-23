@@ -20,6 +20,8 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 		this.dom = dom;
 		this.activeLanguages = new Set();
 		this.defaultLang = dom.getAttribute(DOM_SELECTOR + '-default') || '';
+		this.placeholderLabel = dom.getAttribute(DOM_SELECTOR + '-placeholder') || '{lang} translation';
+		this.removeLabel = dom.getAttribute(DOM_SELECTOR + '-remove-label') || 'Remove {lang}';
 		this.badgesEl = dom.querySelector('[' + DOM_SELECTOR + '-active]');
 		this.menuEl = dom.querySelector('[data-ln-dropdown] > [data-ln-toggle]');
 
@@ -121,7 +123,7 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 		// Hide trigger if no languages available
 		const triggerBtn = this.dom.querySelector('[' + DOM_SELECTOR + '-add]');
 		if (triggerBtn) {
-			triggerBtn.style.display = availableCount === 0 ? 'none' : '';
+			triggerBtn.hidden = availableCount === 0;
 		}
 	};
 
@@ -143,7 +145,8 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 			label.textContent = self.locales[lang] || lang.toUpperCase();
 
 			const closeBtn = p.querySelector('button');
-			closeBtn.setAttribute('aria-label', 'Remove ' + (self.locales[lang] || lang.toUpperCase()));
+			const removeLangName = self.locales[lang] || lang.toUpperCase();
+			closeBtn.setAttribute('aria-label', self.removeLabel.replace('{lang}', removeLangName));
 
 			closeBtn.addEventListener('click', function (e) {
 				if (e.ctrlKey || e.metaKey || e.button === 1) return;
@@ -184,7 +187,7 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 			);
 			if (!original) continue;
 
-			const clone = original.cloneNode(false);
+			const clone = original.cloneNode(original.tagName === 'SELECT');
 
 			// Set name
 			if (prefix) {
@@ -199,8 +202,10 @@ import { cloneTemplate, dispatch, dispatchCancelable, registerComponent } from '
 			// Remove id to avoid duplicates
 			clone.removeAttribute('id');
 
-			// Set placeholder
-			clone.placeholder = langName + ' translation';
+			// Set placeholder (selects have no placeholder property)
+			if ('placeholder' in clone) {
+				clone.placeholder = this.placeholderLabel.replace('{lang}', langName);
+			}
 
 			// Mark with language attribute
 			clone.setAttribute('data-ln-translatable-lang', lang);
