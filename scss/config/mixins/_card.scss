@@ -141,11 +141,17 @@
 	padding: var(--card-padding-y) var(--card-padding-x);
 
 	&:has(> table),
-	&:has(> .table-container),
-	&:has(> [data-ln-table]) {
+	&:has(> .table-container) {
 		overflow-x: auto;
 		max-width: 100%;
 		-webkit-overflow-scrolling: touch;
+	}
+
+	// ln-table brings its own chrome and sticky thead/footer — `clip` keeps
+	// this cell from becoming the scroll container that would trap them.
+	&:has(> [data-ln-table]) {
+		overflow-x: clip;
+		max-width: 100%;
 	}
 
 	table {

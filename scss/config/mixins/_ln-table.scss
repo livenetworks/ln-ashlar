@@ -35,9 +35,11 @@
 	--radius: var(--radius-lg);
 	border-radius: var(--radius);
 	background: var(--color-bg);
-	overflow-x: auto;
+	// `clip` not `auto` — no scroll container, so the sticky thead/footer
+	// bind to the outer .app-main > section scroll surface (same doctrine
+	// as @mixin section-card).
+	overflow-x: clip;
 	max-width: 100%;
-	-webkit-overflow-scrolling: touch;
 
 	colgroup {
 		display: none !important;
