@@ -192,20 +192,21 @@
 - [x] **ux-interaction-patterns** — извор: `.claude/skills/ux/interaction-patterns.md` — ⚠ непрегледан извор, оди со ревју
 - [x] **ui** — извор: `.claude/skills/ui/SKILL.md` (design-first процес, data priority, layout одлуки, component selection, completeness, density, page checklists)
 - [x] **ui-visual-language** — извор: `.claude/skills/ui/visual-language.md`
+- [x] **ui-coordination** — правила за одлучување за проект-координатор (Mediator), CQS и изолација
 
 ### Component-completeness спецификации (инкрементално, СПАРЕНИ со Фаза 3/4)
 
 9-те completeness skills се пишуваат standalone во `skills/app/`, без спарување/верификација со компонентните докови (изворите од `.claude/skills/ui/components/` остануваат каменолом).
 
-- [ ] **ui-data-table** — извор: `ui/components/data-table.md` — со **ln-table** (3А)
-- [ ] **ui-form** — извор: `ui/components/form.md` — со **ln-form** (3А) — ⚠ „reserved error space": да се провери дали form микс-ините резервираат простор; ако не → aspirational ознака
-- [ ] **ui-modal** — извор: `ui/components/modal.md` — со **ln-modal** (3А) — ⚠ усогласување со native `<dialog>` одлуката (`refactor-todo.md` §5)
-- [ ] **ui-search** — извор: `ui/components/search.md` — со **ln-search** (3А)
-- [ ] **ui-tabs** — извор: `ui/components/tabs.md` — со **ln-tabs** (3А)
-- [ ] **ui-empty-state** — извор: `ui/components/empty-state.md` — со **empty-state** (Фаза 4)
-- [ ] **ui-loading-state** — извор: `ui/components/loading-state.md` — со **loader** (Фаза 4)
-- [ ] **ui-kpi-card** — извор: `ui/components/kpi-card.md` — со **ln-stat** (3А) / **stat-card** (Фаза 4)
-- [ ] **ui-status-badge** — извор: `ui/components/status-badge.md` — со **status-badge** (Фаза 4)
+- [x] **ui-data-table** — извор: `ui/components/data-table.md` — со **ln-table** (3А)
+- [x] **ui-form** — извор: `ui/components/form.md` — со **ln-form** (3А)
+- [x] **ui-modal** — извор: `ui/components/modal.md` — со **ln-modal** (3А)
+- [x] **ui-search** — извор: `ui/components/search.md` — со **ln-search** (3А)
+- [x] **ui-tabs** — извор: `ui/components/tabs.md` — со **ln-tabs** (3А)
+- [x] **ui-empty-state** — извор: `ui/components/empty-state.md` — со **empty-state** (Фаза 4)
+- [x] **ui-loading-state** — извор: `ui/components/loading-state.md` — со **loader** (Фаза 4)
+- [x] **ui-kpi-card** — извор: `ui/components/kpi-card.md` — со **ln-stat** (3А) / **stat-card** (Фаза 4)
+- [x] **ui-status-badge** — извор: `ui/components/status-badge.md` — со **status-badge** (Фаза 4)
 
 ### НЕ се портира (одлука 2026-07-11)
 
@@ -247,5 +248,5 @@
 | components — позадински (3Б) | 9 | 4 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
-| skills | 13 | 4 |
-| **Вкупно** | **108** | **60** |
+| skills | 14 | 14 |
+| **Вкупно** | **109** | **70** |

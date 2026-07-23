@@ -35,6 +35,12 @@ Component Layer (Binding)   ->  scss/components/_table.scss      → table { @in
 - Generates the final compiled CSS output.
 - Custom consumer components apply these mixins directly in their local selectors (e.g., `#audit-log-table { @include table-base; }`) rather than copy-pasting styling rules.
 
+### One Component, One Definition
+A recipe is applied to ONE shared selector; markup consumes that class. Never re-apply `@include badge` across bespoke selectors — parallel definitions drift apart over time. Duplication is earned only by a real semantic boundary.
+
+### Delta-Only Inheritance
+Derived mixins add only what differs from the base. Test: if the base changes a color, does the variant get it automatically? If not, you're duplicating instead of inheriting. Container/layout mixins handle structure only — element styling lives on the element's own mixin.
+
 ---
 
 ## 2. Co-located JS Styles vs. Global Styles
@@ -43,6 +49,9 @@ Each functional JavaScript component folder (e.g., `js/ln-toggle/`, see [`ln-tog
 
 - **Co-located SCSS (State only):** Used *only* to govern active functional state styling controlled by JS (e.g., `[data-ln-toggle-hide] { display: none !important; }` or timing transitions).
 - **Global Mixins/Components (Visual chrome):** All visual design details (padding, font sizes, borders, colors, shadow values) must live under the main SCSS directories (`scss/config/mixins/` or `scss/components/`).
+
+### Helper-Class Convention
+Unprefixed helper classes are thin mixin bindings (`.search { @include search; }`) — visual, static presentation. The `ln-` prefix is reserved for JS-state classes exclusively; never mix the two roles on the same class.
 
 ---
 
@@ -146,3 +155,20 @@ stacking context. Top-layer elements stack in most-recently-shown order, not by 
 property — opening a dropdown from inside an open modal always renders the dropdown above the modal,
 with no CSS coordination required. The `--z-*` token scale above governs only elements that never
 enter the top layer (sticky headers, toasts).
+
+---
+
+## 7. Visual Defaults
+
+Certain visual behaviors are fixed library-wide defaults, not per-component choices:
+
+- **Buttons:** Every `<button>` is styled globally; `type="submit"` gets primary fill automatically. Color variants are token overrides on the local scope (e.g. `#delete-user { --color-primary: var(--color-error); }`), never variant classes.
+- **Hover:** Subtle color change only — no transforms, no appearing shadows, no `::before` bars.
+- **Collapse animation:** `grid-template-rows: 0fr/1fr`, never `max-height`.
+- **Required indicator:** CSS-driven from `[required]` via `:has()` — never a manual `*` character authored in HTML.
+
+---
+
+## 8. Responsive Strategy
+
+`@container` queries style components (the parent declares `container-type`, the child queries it — never the same element); `@media` is reserved for the layout shell only. Container breakpoints are content-driven, not predetermined by viewport size.

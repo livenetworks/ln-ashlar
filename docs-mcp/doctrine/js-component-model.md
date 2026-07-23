@@ -40,6 +40,9 @@ This document describes the JavaScript component architecture of `ln-ashlar`. It
 - **Commands (Mutations):** A coordinator must **never** call state-mutation prototype methods directly (e.g., `el.lnProfile.create()` is forbidden). It must instead dispatch a custom request event (`ln-profile:request-create`).
 - **Queries (Reading):** A coordinator is allowed to query a component's current state properties directly (e.g., reading `el.lnProfile.currentId`).
 
+### Overlay Exception
+Overlay components (modal, dropdown, popover, tooltip) get exactly three document-level touchpoints, paired to the open/close lifecycle: dismissal listeners (Escape/outside-click), focus management, and one `.ln-*` body state class. Listeners attach on open, detach on close — they remain sensors that funnel into the component's own attribute state machine, never actuators on foreign DOM. Prefer native top-layer primitives (`<dialog>.showModal()`, Popover API) over hand-rolled stacking.
+
 ---
 
 ## 2. Component Structure and IIFE Encapsulation
@@ -50,6 +53,9 @@ Every component is written as an Immediately Invoked Function Expression (IIFE) 
 1. **Paired Selectors:** The HTML hook `data-ln-{name}` corresponds directly to the JavaScript instance identifier `el.ln{Name}` (e.g., `data-ln-modal` maps to `el.lnModal`).
 2. **DOM-Bound Instances:** Component instances reside directly on the DOM element (`el.ln{Name}`), not in a global JavaScript registry. Multiple instances coexist safely on the same page.
 3. **The `destroy()` Contract:** Every component must implement a prototype `destroy()` method to clean up memory. It must disconnect observers, remove all event listeners added to parent elements or document hooks, remove shared pool memberships, and delete the DOM element reference.
+
+### Global Service Variant
+A component with no own DOM — no instances, no observer — is a document-level listener that any element dispatches to (`window` registration = `true`, in place of an instance constructor).
 
 ---
 
@@ -75,6 +81,9 @@ Using hidden checkboxes (`<input type="checkbox">`) to toggle styling state is s
 2. It breaks encapsulation by exposing internal inputs to external controllers.
 3. It violates semantic accessibility (ARIA) standards.
 
+### No Inline Styling from JS
+Consistent with the Attribute Bridge, JS never sets styles directly (`el.style.*`) — it toggles classes/attributes and lets SCSS style the resulting state. (Accepted exception on record: `ln-date`'s hidden native picker.) Dev-misuse warnings surface via a CSS `::after` affordance, not `console.warn`. Recoverable runtime issues use a `[component-name]`-prefixed `console.warn` + bail — never throw across handlers, never `alert`/`confirm`/`prompt`.
+
 ---
 
 ## 4. MutationObserver and Auto-Initialization
@@ -85,6 +94,9 @@ Dynamic HTML injected into the page (via AJAX, router transitions, or raw `inner
 - The observer filters on target attributes via `attributeFilter` to ensure performance is not degraded by unrelated class or style mutations.
 - Double-initialization is prevented by checking the presence of the instance property (e.g., `if (el.lnName) return`).
 - **Instant Inspector Activation:** Because the observer tracks target attribute additions globally across the document tree, a developer can dynamically add a component selector (e.g. `data-ln-toggle="close"`) to any element directly inside the browser's developer tools inspector, and the framework will instantly bootstrap the component instance without requiring a page refresh.
+
+### Hydration Polarity (SSR)
+Server-rendered content is authored as full markup; JS hydration adds behavior only. `<template>` + fill is reserved for runtime data — not for content that already exists in the server-rendered page. Content is visible without JS; transient enter-states (`.ln-enter`) are the exception, not the default.
 
 ---
 
