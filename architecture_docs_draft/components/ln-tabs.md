@@ -1,6 +1,7 @@
 # 📂 ln-tabs
 
-> **Класификација:** 🧩 Едноставна Компонента (Simple Component / Primitive)
+> **Класификација:** 🟢 Едноставна компонента / UI Примитива (Layer 1 - State Manager)  
+> **Изворен код:** [`js/ln-tabs/src/ln-tabs.js`](../../js/ln-tabs/src/ln-tabs.js)
 
 ---
 

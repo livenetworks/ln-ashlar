@@ -53,7 +53,7 @@
 - [ ] **ln-table**
 - [x] **ln-sortable**
 - [ ] **ln-filter**
-- [ ] **ln-search**
+- [x] **ln-search**
 - [ ] **ln-list**
 - [x] **ln-stat**
 
@@ -81,8 +81,8 @@
 - [x] **ln-dropdown**
 - [x] **ln-tooltip**
 - [x] **ln-accordion**
-- [ ] **ln-tabs**
-- [ ] **ln-toast**
+- [x] **ln-tabs**
+- [x] **ln-toast**
 
 #### Податочен слој (декларативно wiring — store/coordinator/конектори)
 
@@ -94,17 +94,17 @@
 
 #### Навигација
 
-- [ ] **ln-nav**
-- [ ] **ln-router**
+- [x] **ln-nav**
+- [x] **ln-router**
 - [x] **ln-link**
-- [ ] **ln-external-links**
+- [x] **ln-external-links**
 - [x] **ln-ajax** — AJAX навигација (`data-ln-ajax`)
 
 #### Сервиси со markup контакт
 
 - [x] **ln-icons** — се врзува за `<use href>`, не за `data-ln-*` — API-то е markup конвенција
 - [ ] **ln-translations**
-- [ ] **ln-progress**
+- [x] **ln-progress**
 - [x] **ln-circular-progress**
 
 ### 3Б. Позадински API — за развивачи на свои компоненти/координатори (9)
