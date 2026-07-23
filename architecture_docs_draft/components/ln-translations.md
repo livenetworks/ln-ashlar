@@ -1,52 +1,59 @@
 # 🔤 ln-translations
-> **Класификација:** 🟢 Едноставна компонента (Layer 1 - i18n Form Manager)
+
+> **Класификација:** 🟢 Едноставна компонента (Layer 1 - i18n Form Manager)  
+> **Изворна датотека:** [ln-translations.js](../../js/ln-translations/src/ln-translations.js)
 
 ---
 
 ## 1. Заднинско дејство и одговорност
-`ln-translations` е помошна компонента наменета за динамичко управување со повеќејазични полиња во рамките на веб формите. Овозможува корисникот во реално време да додава и отстранува преводи за конкретни внесови (на пр. име на производ на македонски, англиски и албански јазик).
 
-*   **Главна Одговорност:** Ги набљудува обвиткувачите на повеќејазични полиња (`data-ln-translatable`), динамички клонира инпути за новоизбраните јазици, правилно ги именува полињата во низа формат (пр. `trans[en][title]`) за соодветно испраќање на серверот и овозможува бришење на преводите заедно со нивните контроли од DOM-от.
-*   **Детекција на Серверски Преводи (Hydration):** При иницијализација, компонентата автоматски го скенира DOM дрвото за да открие дали веќе постојат претходно изрендерирани полиња за превод од серверот (означени со `data-ln-translatable-lang`) и соодветно ги гради активните јазични значки во UI.
-*   **Клонирање и Сигурност:** Клонирањето на инпутите се врши со исклучување на нивните уникатни `id` атрибути со цел спречување на дуплицирање на идентификатори во DOM-от, со што се чува структурата валидна.
-*   **Локализиран избор:** Секоја инстанца може да дефинира сопствен сет на дозволени јазици преку JSON формат во соодветен атрибут.
+`ln-translations` е помошна компонента наменета за динамичко управување со повеќејазични полиња во рамките на веб формите. Овозможува корисникот во реално време да додава и отстранува преводи за конкретни внесови (на пр. име на производ на македонски, англиски, албански или српски јазик).
+
+*   **Главна одговорност:** При секое повикување на `addLanguage`, повторно ги пребарува обвиткувачите на повеќејазични полиња (`data-ln-translatable`) во DOM (нема постојан observer врз нив), динамички ги клонира внесните контроли за новоизбраните јазици, ги форматира имињата на полињата во низа формат (пр. `trans[en][title]` или `product[trans][en][title]`) за серверот и управува со отстранувањето на преводите и нивните значки.
+*   **Детекција на серверски преводи (Hydration):** При иницијализација, компонентата ги скенира постоечките полиња за превод генерирани од серверот (означени со `data-ln-translatable-lang`) и соодветно ги гради активните јазични значки и менито за избор.
+*   **Спречување на ID дуплирање:** При клонирање на инпутите, оригиналните `id` атрибути се отстрануваат за да се одржи DOM валидноста и ARIA пристапноста.
+*   **Ортогоналност (Што НЕ прави):**
+    *   **НЕ врши AJAX испраќање:** Не комуницира директно со бекендот; се потпира на нативниот `form` или [`ln-form`](./ln-form.md).
+    *   **UI текстот е конфигурабилен:** Placeholder-от и `aria-label` за копчето за бришење се читаат преку `data-ln-translations-placeholder` / `data-ln-translations-remove-label` (со англиски стандардни вредности), а не се хардкодирани во кодот.
+    *   **НЕ отвора сопствени модали/дијалози:** Се однесува исклучиво внатре во својот DOM контејнер.
 
 ---
 
 ## 2. Минимален HTML Маркап и Варијанти на Употреба
 
-За правилна работа, компонентата бара дефинирање темплејти за значката за јазик (`ln-translations-badge`) и за ставките во менито за избор (`ln-translations-menu-item`).
+### 2.1 Базен HTML Маркап
+За правилна работа, компонентата бара глобални HTML темплејти за значката за јазик (`ln-translations-badge`) и за ставката во менито (`ln-translations-menu-item`).
 
 ```html
 <div data-ln-translations 
      data-ln-translations-default="mk"
-     data-ln-translations-locales='{"en": "Англиски", "sq": "Албански", "de": "Германски"}'>
+     data-ln-translations-locales='{"en": "English", "sq": "Shqip", "sr": "Srpski"}'>
      
-    <!-- Дел каде ќе се прикажуваат значките за активни јазици -->
+    <!-- Контејнер за активни јазични значки -->
     <div data-ln-translations-active class="language-badges"></div>
 
     <!-- Избор на нов јазик преку Dropdown -->
     <div data-ln-dropdown class="dropdown">
         <button type="button" data-ln-translations-add class="btn">Додади превод</button>
         <div data-ln-toggle="close" class="dropdown-menu">
-            <!-- Тука ln-translations динамички ќе ги истури достапните јазици -->
+            <!-- Dynamic dropdown items generated from template -->
         </div>
     </div>
 
-    <!-- Обвиткувачи на повеќејазични полиња во формата -->
+    <!-- Повеќејазично поле во формата -->
     <div class="form-element" data-ln-translatable="title" data-ln-translations-prefix="product">
-        <label for="product-title">Наслов на македонски (дефолт):</label>
+        <label for="product-title">Наслов (Стандарден):</label>
         <input type="text" id="product-title" name="product[title]" required />
-        <!-- Генерираните преводи ќе бидат инјектирани тука -->
+        <!-- Генерираните клонови за преводи се инјектираат тука -->
     </div>
 
     <!-- ────────────────────────────────────────── -->
-    <!-- Темплејти потребни за приказ -->
+    <!-- Темплејти потребни за компонентата -->
     
     <!-- Темплејт за јазична значка (Badge) -->
     <template data-ln-template="ln-translations-badge">
         <span class="badge" data-ln-translations-lang>
-            <span></span> <!-- име на јазикот -->
+            <span></span>
             <button type="button" class="btn-close" aria-label="Remove">&times;</button>
         </span>
     </template>
@@ -62,53 +69,77 @@
 
 ## 3. Декларативен API Договор (Атрибути и Настани)
 
-| Атрибут | Тип | Опис |
-| :--- | :--- | :--- |
-| `data-ln-translations` | `Flag` | Го активира компонентот. |
-| `data-ln-translations-default` | `String` | Ознака за стандардниот јазик (default: празно, оригиналното поле нема префикс во името). |
-| `data-ln-translations-locales` | `JSON` | Листа на дозволени јазици во JSON формат (пр. `{"en": "English"}`). |
-| `data-ln-translations-active` | `Flag` | Се поставува на контејнерот каде ќе се рендерираат активните јазични значки. |
-| `data-ln-translations-add` | `Flag` | Го означува копчето за активирање на изборот за нов јазик. |
-| `data-ln-translatable` | `String` | Го означува обвиткувачот на полето кое поддржува превод. Вредноста е името на полето (пр. `title`). |
-| `data-ln-translations-prefix` | `String` | Опционален префикс за името на формата (на пр. `product` ќе генерира `product[trans][en][title]`). |
+### 3.1 Табела со атрибути
 
-### DOM Сигнали (Слуша)
+| Атрибут | Применлив елемент | Тип | Стандардна вредност | Опис |
+| :--- | :--- | :--- | :--- | :--- |
+| `data-ln-translations` | Контејнер / `<form>` | `Flag` | — | Ознака за иницијализација на компонентата. |
+| `data-ln-translations-default` | Контејнер | `String` | `""` | Стандарден јазик (на пр. `mk`). Поставува `data-ln-translatable-lang` на оригиналните полиња. |
+| `data-ln-translations-locales` | Контејнер | `JSON` | `{en: "English", sq: "Shqip", sr: "Srpski"}` | JSON мапирање на овозможени јазици со нивните лабели. |
+| `data-ln-translations-active` | Контејнер | `Flag` | — | DOM контејнер за рендерирање на значките за активни јазици. |
+| `data-ln-translations-add` | Копче | `Flag` | — | Копче за активирање на менито за додавање јазик (се крие кога сите јазици се додадени). |
+| `data-ln-translations-placeholder` | Контејнер | `String` | `{lang} translation` | Темплејт за placeholder на клонираните полиња; `{lang}` се заменува со името на јазикот. |
+| `data-ln-translations-remove-label` | Контејнер | `String` | `Remove {lang}` | Темплејт за `aria-label` на копчето за бришење значка; `{lang}` се заменува со името на јазикот. |
+| `data-ln-translatable` | Обвиткувач | `String` | — | Име на полето за превод (на пр. `title`, `description`). |
+| `data-ln-translations-prefix` | Обвиткувач | `String` | `""` | Опционален префикс во името на инпутот (на пр. `product` ќе генерира `product[trans][en][title]`). |
+| `data-ln-translatable-lang` | `<input>`, `<textarea>`, `<select>` | `String` | — | Означува клон или претходно изрендерирано поле за одреден јазик. |
+| `data-ln-translations-lang` | Внатре во `<template>` (`ln-translations-badge` и `ln-translations-menu-item`) | `Flag` (атрибут-договор) | — | Задолжителен во двата темплејта — кодот бара `frag.querySelector('[data-ln-translations-lang]')` и не рендерира ништо без него. |
+
+### 3.2 DOM Настани (Events API)
+
+#### Барања од надворешни координатори (Слуша)
 | Настан | Payload `e.detail` | Опис |
 | :--- | :--- | :--- |
-| `ln-translations:request-add` | `{ lang: String }` | Инструкција за активирање и клонирање на полиња за одреден јазик. |
-| `ln-translations:request-remove` | `{ lang: String }` | Инструкција за деактивирање и чистење на полињата за одреден јазик. |
+| `ln-translations:request-add` | `{ lang: String }` | Бара додавање и клонирање на полиња за наведениот јазик. |
+| `ln-translations:request-remove` | `{ lang: String }` | Бара отстранување на полињата за наведениот јазик. |
 
-### Настани кон формите (Емитува)
-| Настан | Payload `e.detail` | Опис |
-| :--- | :--- | :--- |
-| `ln-translations:before-add` | `{ target, lang, langName }` | Се емитува пред клонирање. Може да биде откажан со `e.preventDefault()`. |
-| `ln-translations:added` | `{ target, lang, langName }` | Се емитува откако сите полиња се клонирани и додадени во DOM. |
-| `ln-translations:before-remove`| `{ target, lang }` | Се емитува пред бришење на преводите. Може да биде откажан. |
-| `ln-translations:removed` | `{ target, lang }` | Се емитува по успешно отстранување на клоновите од DOM-от. |
+Слушателите за овие настани се врзани директно на контејнерот (елементот со `data-ln-translations`), не на `document`. Dispatch-от мора да се изврши на самиот контејнер или на негов потомок со `bubbles: true` — dispatch на `document` не стигнува до компонентата.
 
-### Јавен JS API (преку `el.lnTranslations`)
-*   **`addLanguage(lang, values)`**: Додава нов јазик и опционално ги пополнува клонираните полиња со почетни вредности.
-*   **`removeLanguage(lang)`**: Го отстранува јазикот и ги брише сите негови клонови.
-*   **`getActiveLanguages()`**: Враќа `Set` од моментално активните јазици.
-*   **`hasLanguage(lang)`**: Проверува дали одреден јазик е веќе активен.
+#### Животен циклус на компонентата (Емитува)
+| Настан | Откажлив | Payload `e.detail` | Опис |
+| :--- | :--- | :--- | :--- |
+| `ln-translations:before-add` | Да (`preventDefault()`) | `{ target: HTMLElement, lang: String, langName: String }` | Се емитува пред клонирање на полињата. |
+| `ln-translations:added` | Не | `{ target: HTMLElement, lang: String, langName: String }` | Се емитува откако полињата и значките се инјектирани. |
+| `ln-translations:before-remove` | Да (`preventDefault()`) | `{ target: HTMLElement, lang: String }` | Се емитува пред отстранување на клоновите. |
+| `ln-translations:removed` | Не | `{ target: HTMLElement, lang: String }` | Се емитува откако клоновите се избришани од DOM. |
+
+### 3.3 Јавен JS API (преку `el.lnTranslations`)
+
+```javascript
+// Додавање на нов јазик со опционални почетни вредности за полињата
+el.lnTranslations.addLanguage('en', { title: 'Product Title', description: 'Product Desc' });
+
+// Отстранување на јазик
+el.lnTranslations.removeLanguage('en');
+
+// Проверка на активен јазик
+const isEnglishActive = el.lnTranslations.hasLanguage('en');
+
+// Земање на сите активни јазици (Set)
+const activeLangs = el.lnTranslations.getActiveLanguages();
+
+// Уништување на инстанцата и чистење на емитувачите
+el.lnTranslations.destroy();
+```
 
 ---
 
 ## 4. CSS Стилизирање и Поведенски Концепт
-Клонираните инпути се редат еден под друг внатре во обвиткувачот. Се препорачува соодветно визуелно одвојување за корисникот да ги препознае како преводи:
+
+### 4.1 SCSS Стилизирање
+За подобра прегледност, клонираните полиња се стилизираат со визуелна индикација (на пр. лева маргина и различна позадина):
 
 ```scss
-// SCSS стилизирање за повеќејазични полиња
 [data-ln-translatable] {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 
-    // Клонираните полиња за превод добиваат помошен стил
+    // Стил за клонирани полиња
     input[data-ln-translatable-lang], 
     textarea[data-ln-translatable-lang] {
-        border-left: 3px solid var(--color-primary-light, #93c5fd);
-        background-color: var(--color-gray-lightest, #f8fafc);
+        border-left: 3px solid hsl(var(--color-primary-light));
+        background-color: hsl(var(--color-neutral-100));
         
         &::placeholder {
             font-style: italic;
@@ -116,18 +147,18 @@
     }
 }
 
-// Значки за јазици
 .language-badges {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1rem;
     
     .badge {
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
+        gap: 0.35rem;
         padding: 0.25rem 0.5rem;
-        background-color: var(--color-gray-light, #e2e8f0);
+        background-color: hsl(var(--color-neutral-200));
         border-radius: 4px;
         font-size: 0.85rem;
         
@@ -136,49 +167,63 @@
             border: none;
             cursor: pointer;
             font-weight: bold;
+            line-height: 1;
         }
     }
 }
 ```
 
+### 4.2 Поведенски концепти
+1. **DOM Клонирање:** `cloneNode()` никогаш не копира event listeners (тие не се "отстрануваат" — едноставно не постојат на клонот). `id` атрибутот СЕ копира и потоа експлицитно се отстранува (`removeAttribute('id')`) за да се спречи дуплирање. За `<select>` елементи клонирањето е длабоко (`cloneNode(true)`) за да се зачуваат `<option>` децата; за `<input>`/`<textarea>` клонирањето е плитко (`cloneNode(false)`).
+2. **Нумерирање на вредности:** Вредноста на името на клонот користи стандардизирана синтакса за низи:
+   - Без префикс: `trans[lang][field_name]`
+   - Со префикс: `prefix[trans][lang][field_name]`
+3. **Автоматско криење на копчето за додавање:** Кога сите овозможени јазици ќе се додадат, `data-ln-translations-add` автоматски добива нативниот `hidden` атрибут.
+
 ---
 
 ## 5. Пристапност (ARIA) и Чести Грешки
-*   **Пристапност:** Клонираните полиња за превод немаат сопствени етикети (labels), туку секој клон добива генериран `placeholder` во формат `[Јазик] translation` (на пр. `English translation`). Ова им овозможува на корисниците со екрански читачи веднаш да ја разберат наменетоста на полето при фокус. Копчињата за затворање во значките мора да содржат `aria-label="Remove [Language]"` за тастатурна навигација.
-*   **Честа грешка 1:** Неисправен JSON во `data-ln-translations-locales`. Форматот бара користење на двојни наводници за клучевите и вредностите. Единечните наводници ќе предизвикаат неуспешно парсирање и компонентата ќе се врати на дефолтните јазици (English, Shqip, Srpski).
-*   **Честа грешка 2:** Дуплирање на уникатни `id` атрибути во клонираните полиња. `ln-translations` нативно го отстранува `id` од клонираните инпути, но развивачите понекогаш се обидуваат рачно да додадат `id` преку JS дејства со што ги кршат ARIA правилата.
-*   **Честа грешка 3:** Изоставување на `data-ln-translatable` атрибутот кај обвиткувачите на инпутите, што резултира со неклонирање на полињата при додавање нов јазик.
+
+### 5.1 ARIA & Тастатурна пристапност
+- **Конфигурабилен Placeholder:** Секој клон добива placeholder преку `data-ln-translations-placeholder` (стандардно `"{lang} translation"`, со `{lang}` заменето со името на јазикот), што обезбедува контекст за пристапност и корисници со читачи на екран.
+- **Интерактивни копчиња:** Копчето за бришење на значката добива `aria-label` преку `data-ln-translations-remove-label` (стандардно `"Remove {lang}"`).
+- **Тастатура:** Копчињата за избор на јазик и за бришење реагираат на стандардни клик дејства и тастатурна навигација (Enter / Space).
+
+### 5.2 Чести грешки (Anti-patterns)
+- ❌ **Невалиден JSON во `data-ln-translations-locales`:** Користење на единечни наводници наместо валиден JSON со двојни наводници предизвикува грешка во парсирањето и враќање на стандардните јазици (`en`, `sq`, `sr`).
+- ❌ **Рачно додавање на `id` на клонирани полиња:** Повторното додавање на `id` атрибути во клоновите ги крши ARIA спецификациите за уникатни ID-а во HTML документот.
+- ❌ **Изоставување на темплејтите `ln-translations-badge` или `ln-translations-menu-item`:** Придонесува компонентата да не може да го изрендерира менито за избор или значките.
 
 ---
 
-## 6. Дијаграм на Текот и Животен Циклус (Додавање нов јазик)
+## 6. Дијаграм на Текот и Животен Циклус
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Menu as Dropdown Menu
+    participant User as Корисник
+    participant Menu as Dropdown Мени
     participant Translations as ln-translations JS
-    participant Wrapper as div[data-ln-translatable="title"]
+    participant Wrapper as div[data-ln-translatable]
     participant Badges as div[data-ln-translations-active]
 
-    User->>Menu: Selects 'English' (en)
-    Menu->>Translations: Click event (triggers addLanguage('en'))
+    User->>Menu: Избира јазик (на пр. 'en')
+    Menu->>Translations: Клик на ставка (addLanguage('en'))
     
     Translations->>Translations: dispatch ln-translations:before-add
-    Note over Translations: Check if preventDefault() is called
+    Note over Translations: Проверка дали е повикан preventDefault()
     
-    Translations->>Translations: Add 'en' to activeLanguages Set
+    Translations->>Translations: Додади 'en' во activeLanguages Set
     
-    loop for each [data-ln-translatable] wrapper
-        Translations->>Wrapper: Find original input
-        Translations->>Translations: Clone node (removeAttribute id)
-        Translations->>Translations: Set name = "product[trans][en][title]"
-        Translations->>Translations: Set placeholder = "English translation"
-        Translations->>Wrapper: Insert clone after last translation input
+    loop За секој [data-ln-translatable] обвиткувач
+        Translations->>Wrapper: Најди оригинален input/textarea
+        Translations->>Translations: cloneNode(false) & removeAttribute('id')
+        Translations->>Translations: Постави name = "product[trans][en][title]"
+        Translations->>Translations: Постави placeholder = "English translation"
+        Translations->>Wrapper: Инјектирај клон во DOM
     end
 
-    Translations->>Badges: Clone badge template & append 'en' badge to DOM
-    Translations->>Menu: Re-render dropdown items (hide 'en' option)
+    Translations->>Menu: Обнови мени (сокриј 'en' од достапни)
+    Translations->>Badges: Рендерирај значка за 'en' од template
     
     Translations->>Translations: dispatch ln-translations:added
 ```
@@ -186,6 +231,8 @@ sequenceDiagram
 ---
 
 ## 7. Поврзани Компоненти
-*   **`ln-form`**: Ја обвиткува целата структура. При испраќање на податоците, таа ги собира сите генерирани `trans[lang][field]` полиња како структурирана низа кон серверот.
-*   **`ln-dropdown`**: Често се користи како контролен механизам за менито за избор на нов јазик за превод.
-*   **`ln-validate`**: Врши валидација на вредностите во клонираните полиња во согласност со правилата на формата.
+
+*   [`ln-form`](./ln-form.md) — Обвиткувачка форма која ги собира и испраќа генерираните преводи какo структурирани податоци.
+*   [`ln-dropdown`](./ln-dropdown.md) — Се користи за преклопното мени за избор на достапни јазици.
+*   [`ln-toggle`](./ln-toggle.md) — Се користи за управување со состојбата (close/open) на менито при избор на јазик.
+*   [`ln-validate`](./ln-validate.md) — Врши валидација на внесените вредности и во клонираните полиња за превод.

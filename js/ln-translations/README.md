@@ -8,7 +8,7 @@ Instead of writing custom layout handlers to manage multi-language fields, this 
 
 ## 🧭 Philosophy & Architecture
 
-1. **Inline Field Cloning:** Translatable containers carrying `data-ln-translatable="field"` are treated as templates. When a language is activated, the coordinator clones the inner input/textarea, binds the target language value, and appends it beneath the original.
+1. **Inline Field Cloning:** Translatable containers carrying `data-ln-translatable="field"` are treated as templates. When a language is activated, the coordinator clones the inner input/textarea/select, binds the target language value, and appends it beneath the original.
 2. **Deterministic Name Generation:** To support clean form submission, cloned inputs automatically update their name attribute following standard nested arrays:
    - **Default Name**: `scope` becomes `trans[en][scope]` for English.
    - **Nested Name**: `items[5][title]` with prefix `items[5]` becomes `items[5][trans][en][title]`.
@@ -69,9 +69,11 @@ Instead of writing custom layout handlers to manage multi-language fields, this 
 | `data-ln-translations-locales` | `<form>` | Opt-in. Custom locales JSON list (e.g. `'{"en":"English", "de":"German"}'`). |
 | `data-ln-translations-add` | `<button>` | Trigger button inside `data-ln-dropdown` to open language menu. |
 | `data-ln-translations-active` | `<ul>` | Mount container where active language badges will be rendered. |
+| `data-ln-translations-placeholder` | `<form>` | Opt-in. Placeholder template for cloned inputs, e.g. `"{lang} translation"`. `{lang}` is replaced with the language display name. Default: `"{lang} translation"`. |
+| `data-ln-translations-remove-label` | `<form>` | Opt-in. `aria-label` template for the badge remove button, e.g. `"Remove {lang}"`. `{lang}` is replaced with the language display name. Default: `"Remove {lang}"`. |
 | `data-ln-translatable="field"` | Form field wrapper | Marks a translatable group. Value is the entity's field name. |
 | `data-ln-translations-prefix` | Form field wrapper | Opt-in. Naming prefix (e.g. `"items[1]"`) for nested form layouts. |
-| `data-ln-translatable-lang` | `<input>`, `<textarea>` | Language code identifying a cloned or pre-rendered translation input. |
+| `data-ln-translatable-lang` | `<input>`, `<textarea>`, `<select>` | Language code identifying a cloned or pre-rendered translation input. |
 
 ---
 
