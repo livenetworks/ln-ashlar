@@ -1,5 +1,7 @@
 # 🔍 ln-search
-> **Класификација:** 🟢 Едноставна компонента (Simple Component)
+
+> **Класификација:** 🟢 Едноставна компонента / Пребарувач и Филтер (Layer 1 - DOM Search & Debounced Filter)  
+> **Изворен код:** [`js/ln-search/src/ln-search.js`](../../js/ln-search/src/ln-search.js)
 
 ---
 
@@ -85,7 +87,7 @@
     </thead>
     <tbody>
         <tr>
-            <td>Далибор Сојиќ</td>
+            <td>Џон До</td>
             <td>Администратор</td>
         </tr>
         <tr>

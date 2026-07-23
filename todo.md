@@ -1,14 +1,14 @@
 - [x] ln-accordion
 - [x] ln-ajax
-- [ ] ln-api-connector
-- [ ] ln-api-queue
+- [x] ln-api-connector
+- [x] ln-api-queue
 - [x] ln-autoresize
 - [x] ln-autosave
 - [x] ln-circular-progress
 - [x] ln-confirm
-- [ ] ln-couchdb-connector
-- [ ] ln-data-coordinator
-- [ ] ln-data-store
+- [x] ln-couchdb-connector
+- [x] ln-data-coordinator
+- [x] ln-data-store
 - [x] ln-date
 - [x] ln-debug
 - [x] ln-dropdown
@@ -20,21 +20,21 @@
 - [x] ln-http
 - [x] ln-icons
 - [x] ln-link
-- [ ] ln-list - Да се дотера empty state со клаудија
+- [x] ln-list
 - [x] ln-modal
 - [x] ln-modal-fill
 - [x] ln-nav
 - [x] ln-number
-- [ ] ln-options
+- [x] ln-options
 - [x] ln-popover
 - [x] ln-progress
 - [x] ln-router
 - [x] ln-search
 - [x] ln-slug
 - [x] ln-sortable
-- [ ] ln-stat
+- [x] ln-stat
 - [ ] ln-store-notify
-- [ ] ln-table
+- [x] ln-table
 - [x] ln-tabs
 - [x] ln-time
 - [x] ln-toast

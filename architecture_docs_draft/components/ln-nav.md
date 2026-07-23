@@ -1,6 +1,7 @@
 # 🧭 ln-nav
 
-> **Класификација:** 🟢 Едноставна компонента (Layer 1 - UI Navigation)
+> **Класификација:** 🟢 Едноставна компонента / UI Навигација (Layer 1 - UI Navigation)  
+> **Изворен код:** [`js/ln-nav/src/ln-nav.js`](../../js/ln-nav/src/ln-nav.js)
 
 ---
 
