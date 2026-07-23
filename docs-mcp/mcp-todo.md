@@ -50,11 +50,11 @@
 
 #### Табели и листи
 
-- [ ] **ln-table**
+- [x] **ln-table**
 - [x] **ln-sortable**
-- [ ] **ln-filter**
+- [x] **ln-filter**
 - [x] **ln-search**
-- [ ] **ln-list**
+- [x] **ln-list**
 - [x] **ln-stat**
 
 #### Форми и внес
