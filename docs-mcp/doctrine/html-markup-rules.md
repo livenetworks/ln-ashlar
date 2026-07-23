@@ -49,6 +49,19 @@ This guide details the mandatory HTML conventions and structure doctrines within
 </dialog>
 ```
 
+### Heading Hierarchy
+Headings name content — they are not a visual size utility.
+
+- Exactly one `<h1>` per page.
+- Heading levels are never skipped (an `<h2>` cannot jump straight to `<h4>`).
+- Numbers and metrics are **not** headings — use `<strong>` or `<data>` to mark up values (e.g. `<data value="1247">1,247</data>`), never wrap a KPI number in an `<h2>`.
+- Every `<section>` is named by a heading, even if visually hidden.
+
+### Additional Semantic Elements
+- **Date/Time:** Always use `<time datetime="2026-07-23">` instead of a bare `<span>` for timestamps.
+- **Separators:** Use `<hr>` for a thematic break instead of `<div class="divider">`.
+- **Numeric Values:** Use `<data value="…">` or `<strong>` for numeric values — never a heading.
+
 ---
 
 ## 2. Interactive Elements (Clickables)
@@ -60,6 +73,17 @@ Every element that performs an action upon interaction must use the correct inte
 - **Anchors for Navigation:** Only use `<a>` (with a valid `href`) for actions that navigate to another page or route.
 - **No Div/Span Click Handlers:** Never bind click listeners to `<div>`, `<span>`, `<li>`, or `<td>` elements. This bypasses native keyboard navigation, breaks screen readers (ARIA), and requires custom focus management.
 - **Explicit Button Types:** Always specify `type="button"` on non-submit buttons (such as cancel or close triggers) inside form scopes. If omitted, the browser defaults to `type="submit"`, causing unintended form submissions.
+
+### Icon Accessibility
+- Decorative icons carry `aria-hidden="true"` — screen readers must skip them.
+- Icon-only buttons (no visible text) require an explicit `aria-label` describing the action.
+- When text sits beside the icon, no additional `aria-label` is needed — the visible text already labels the control.
+
+```html
+<button aria-label="Close">
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+</button>
+```
 
 ---
 
@@ -124,6 +148,9 @@ Class names in `ln-ashlar` must represent the semantic purpose of the element, n
 ### Naming Conventions:
 - **General Elements:** Use clean, generic semantic class names (e.g., `class="modal"`, `class="toggle"`, `class="nav"`, `class="sidebar"`, `class="dropdown"`).
 - **Specific Components / IDs:** For distinct page components, you do not need to use classes at all; you may style elements directly by their HTML `id` (e.g., `id="user-edit-modal"`, `id="packages-filter-drawer"`, `id="main-navigation"`).
+
+### State and Variant Naming
+State/variant classes name the DOMAIN (`active`, `suspended`), never the tone (`success`, `error`) — the status→tone map lives in SCSS, not in the class name.
 
 ### SCSS Mixin Binding Pattern:
 Instead of defining reusable visual layout classes, bind generic SCSS mixin recipes directly to your semantic class or ID selectors. Grouping shared mixins and overriding padding or color styles must be handled strictly in your SCSS files. For the complete grouping, token re-binding, and primitive overriding guidelines, see [SCSS Architecture](./scss-architecture.md#c-mixin-inclusion-grouping-and-overrides).
