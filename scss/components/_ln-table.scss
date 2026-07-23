@@ -57,6 +57,10 @@
 	@include ln-table-spacer-row;
 }
 
+.ln-table__placeholder {
+	@include ln-table-placeholder-row;
+}
+
 .ln-table--loading tbody {
 	opacity: 0.5;
 	pointer-events: none;

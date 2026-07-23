@@ -364,4 +364,12 @@
 	}
 }
 
+// Windowed-virtualization placeholder row — blank, row-height chrome only (D2).
+@mixin ln-table-placeholder-row {
+	td {
+		padding: 0 !important;
+		border: none !important;
+	}
+}
+
 

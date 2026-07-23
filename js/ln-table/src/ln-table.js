@@ -8,6 +8,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	// Tuning constant — duplicated in ln-data-table for component independence
 	const VIRTUAL_THRESHOLD = 200;
 	const BUFFER_ROWS = 15;
+	const WINDOW_DEFAULT = 1000;
+	const WINDOW_PAGE = 200;
+	const FETCH_DEBOUNCE = 120;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -131,6 +134,20 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
 
+			// Windowed (sliding-window) server-side virtualization — opt-in
+			this._windowed = this.isDataDriven && dom.hasAttribute('data-ln-table-window');
+			if (this._windowed) {
+				const winAttr = parseInt(dom.getAttribute('data-ln-table-window'), 10);
+				this._windowSize = winAttr > 0 ? winAttr : WINDOW_DEFAULT;
+				this._rowMap = new Map();
+				this._logicalTotal = 0;
+				this._grandTotal = 0;
+				this._queryGen = 0;
+				this._inflight = new Set();
+				this._fetchDebounceId = null;
+				this._lastViewportMid = 0;
+			}
+
 			// Footer elements
 			this._totalSpan = dom.querySelector('[data-ln-table-total]');
 			this._filteredSpan = dom.querySelector('[data-ln-table-filtered]');
@@ -149,6 +166,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			// --- Event listeners ---
 			this._onSetData = function (e) {
 				const detail = e.detail || {};
+				if (self._windowed) { self._onWindowData(detail); return; }
 				self._data = detail.data || [];
 				self._lastTotal = detail.total != null ? detail.total : self._data.length;
 				self._lastFiltered = detail.filtered != null ? detail.filtered : self._data.length;
@@ -220,6 +238,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this._selectableActive = false;
 			if (this._selectable) {
 				this._enableSelection();
+			}
+			// D4 — windowed tables cannot select rows they have never fetched
+			if (this._windowed && this._selectable && this._selectAllCheckbox) {
+				this._selectAllCheckbox.classList.add('hidden');
 			}
 
 			// --- Row Click & Actions ---
@@ -363,12 +385,24 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 
 			// Initial request-data
-			dispatch(dom, 'ln-table:request-data', {
-				table: this.name,
-				sort: this.currentSort,
-				filters: this.currentFilters,
-				search: this.currentSearch
-			});
+			if (this._windowed) {
+				dispatch(dom, 'ln-table:request-data', {
+					table: this.name,
+					sort: this.currentSort,
+					filters: this.currentFilters,
+					search: this.currentSearch,
+					offset: 0,
+					limit: WINDOW_PAGE,
+					queryGen: this._queryGen
+				});
+			} else {
+				dispatch(dom, 'ln-table:request-data', {
+					table: this.name,
+					sort: this.currentSort,
+					filters: this.currentFilters,
+					search: this.currentSearch
+				});
+			}
 
 		} else {
 			// SSR Mode
@@ -698,6 +732,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (!this.tbody) return;
 
 		if (this.isDataDriven) {
+			if (this._windowed) { this._renderWindowed(); return; }
 			const total = this._lastTotal;
 			const filtered = this.visibleCount;
 
@@ -769,7 +804,20 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		const self = this;
 
 		if (!this._rowHeight) {
-			if (this.isDataDriven) {
+			if (this._windowed) {
+				let tempRow = null;
+				if (this._rowMap.size > 0) {
+					tempRow = this._buildRow(this._rowMap.values().next().value);
+				} else {
+					tempRow = this._buildPlaceholderRow();
+				}
+				if (tempRow) {
+					this.tbody.textContent = '';
+					this.tbody.appendChild(tempRow);
+					this._rowHeight = tempRow.offsetHeight || 40;
+					this.tbody.textContent = '';
+				}
+			} else if (this.isDataDriven) {
 				if (this._data.length > 0) {
 					const tempRow = this._buildRow(this._data[0]);
 					if (tempRow) {
@@ -798,7 +846,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			if (self._rafId) return;
 			self._rafId = requestAnimationFrame(function () {
 				self._rafId = null;
-				self._renderVirtual();
+				self._windowed ? self._renderWindowed() : self._renderVirtual();
 			});
 		};
 
@@ -911,6 +959,199 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			this.tbody.innerHTML = html;
 		}
+	};
+
+	// ─── Windowed virtualization (opt-in sliding window) ───────
+
+	_component.prototype._buildPlaceholderRow = function () {
+		const tr = document.createElement('tr');
+		tr.className = 'ln-table__placeholder';
+		tr.setAttribute('aria-hidden', 'true');
+		const td = document.createElement('td');
+		td.setAttribute('colspan', this.ths.length || 1);
+		td.style.height = this._rowHeight + 'px';
+		tr.appendChild(td);
+		return tr;
+	};
+
+	_component.prototype._renderWindowed = function () {
+		if (this.isLoaded && this._logicalTotal === 0) {
+			this._disableVirtualScroll();
+			this._showEmptyState();
+			return;
+		}
+
+		if (!this._virtual) this._enableVirtualScroll();
+
+		const rowH = this._rowHeight;
+		if (!rowH) return;
+
+		const total = this._logicalTotal;
+		const theadH = this.thead ? this.thead.offsetHeight : 0;
+		const sc = this._scrollContainer;
+		let scrollIntoData;
+		let viewportH;
+
+		if (sc) {
+			const tableRect = this.table.getBoundingClientRect();
+			const scRect = sc.getBoundingClientRect();
+			const dataStartInContainer = (tableRect.top - scRect.top) + sc.scrollTop + theadH;
+			scrollIntoData = sc.scrollTop - dataStartInContainer;
+			viewportH = sc.clientHeight;
+		} else {
+			const tableRect = this.table.getBoundingClientRect();
+			const tableTopInPage = tableRect.top + window.scrollY;
+			const dataStartInPage = tableTopInPage + theadH;
+			scrollIntoData = window.scrollY - dataStartInPage;
+			viewportH = window.innerHeight;
+		}
+
+		let startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
+		startRow = Math.min(startRow, total);
+		const endRow = Math.min(startRow + Math.ceil(viewportH / rowH) + (BUFFER_ROWS * 2), total);
+
+		this._lastViewportMid = Math.floor((startRow + endRow) / 2);
+
+		const colSpan = this.ths.length || 1;
+		const topH = startRow * rowH;
+		const bottomH = (total - endRow) * rowH;
+
+		const frag = document.createDocumentFragment();
+
+		if (topH > 0) {
+			const topSpacer = document.createElement('tr');
+			topSpacer.className = 'ln-table__spacer';
+			topSpacer.setAttribute('aria-hidden', 'true');
+			const topTd = document.createElement('td');
+			topTd.setAttribute('colspan', colSpan);
+			topTd.style.height = topH + 'px';
+			topSpacer.appendChild(topTd);
+			frag.appendChild(topSpacer);
+		}
+
+		for (let i = startRow; i < endRow; i++) {
+			if (this._rowMap.has(i)) {
+				const tr = this._buildRow(this._rowMap.get(i));
+				if (tr) frag.appendChild(tr);
+			} else {
+				frag.appendChild(this._buildPlaceholderRow());
+			}
+		}
+
+		if (bottomH > 0) {
+			const bottomSpacer = document.createElement('tr');
+			bottomSpacer.className = 'ln-table__spacer';
+			bottomSpacer.setAttribute('aria-hidden', 'true');
+			const bottomTd = document.createElement('td');
+			bottomTd.setAttribute('colspan', colSpan);
+			bottomTd.style.height = bottomH + 'px';
+			bottomSpacer.appendChild(bottomTd);
+			frag.appendChild(bottomSpacer);
+		}
+
+		this.tbody.textContent = '';
+		this.tbody.appendChild(frag);
+
+		// Select-all is disabled in windowed mode (D4) — no _updateSelectAll() call.
+		this._vStart = startRow;
+		this._vEnd = endRow;
+
+		this._ensureWindow(startRow, endRow);
+	};
+
+	_component.prototype._ensureWindow = function (startRow, endRow) {
+		let missing = -1;
+		for (let i = startRow; i < endRow; i++) {
+			if (!this._rowMap.has(i)) { missing = i; break; }
+		}
+		if (missing === -1) return;
+
+		const fetchOffset = Math.max(0, startRow - BUFFER_ROWS);
+		const fetchLimit = Math.min(
+			Math.max(WINDOW_PAGE, (endRow - fetchOffset) + BUFFER_ROWS),
+			this._logicalTotal - fetchOffset
+		);
+
+		if (this._inflight.has(fetchOffset)) return;
+
+		clearTimeout(this._fetchDebounceId);
+		const self = this;
+		this._fetchDebounceId = setTimeout(function () {
+			self._requestWindow(fetchOffset, fetchLimit);
+		}, FETCH_DEBOUNCE);
+	};
+
+	_component.prototype._requestWindow = function (offset, limit) {
+		this._inflight.add(offset);
+		dispatch(this.dom, 'ln-table:request-data', {
+			table: this.name,
+			sort: this.currentSort,
+			filters: this.currentFilters,
+			search: this.currentSearch,
+			offset: offset,
+			limit: limit,
+			queryGen: this._queryGen
+		});
+	};
+
+	_component.prototype._onWindowData = function (detail) {
+		if (detail.queryGen != null && detail.queryGen !== this._queryGen) return;
+
+		this._grandTotal = detail.total != null ? detail.total : this._grandTotal;
+		this._logicalTotal = detail.filtered != null ? detail.filtered : (detail.data ? detail.data.length : this._logicalTotal);
+
+		this._lastTotal = this._grandTotal;
+		this.totalCount = this._grandTotal;
+		this.visibleCount = this._logicalTotal;
+		this.isLoaded = true;
+
+		const offset = detail.offset || 0;
+		const rows = detail.data || [];
+		for (let i = 0; i < rows.length; i++) {
+			this._rowMap.set(offset + i, rows[i]);
+		}
+		this._inflight.delete(offset);
+
+		this.dom.classList.remove('ln-table--loading');
+
+		this._evictOutsideWindow();
+
+		this._vStart = -1;
+		this._vEnd = -1;
+		this._render();
+		this._updateFooter();
+
+		dispatch(this.dom, 'ln-table:rendered', {
+			table: this.name,
+			total: this.totalCount,
+			visible: this.visibleCount
+		});
+	};
+
+	_component.prototype._evictOutsideWindow = function () {
+		if (this._rowMap.size <= this._windowSize) return;
+		const mid = this._lastViewportMid;
+		const keys = Array.from(this._rowMap.keys()).sort(function (a, b) {
+			return Math.abs(b - mid) - Math.abs(a - mid);
+		});
+		let i = 0;
+		while (this._rowMap.size > this._windowSize && i < keys.length) {
+			this._rowMap.delete(keys[i]);
+			i++;
+		}
+	};
+
+	_component.prototype._invalidateWindow = function () {
+		this._queryGen++;
+		this._rowMap.clear();
+		this._inflight.clear();
+		clearTimeout(this._fetchDebounceId);
+		this._vStart = -1;
+		this._vEnd = -1;
+
+		this.dom.classList.add('ln-table--loading');
+		this._requestWindow(0, WINDOW_PAGE);
+		this._render();
 	};
 
 	// ─── Empty state ───────────────────────────────────────────
@@ -1050,6 +1291,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._requestData = function () {
+		if (this._windowed) { this._invalidateWindow(); return; }
 		requestData(this, 'ln-table:request-data', 'table');
 	};
 
@@ -1270,6 +1512,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 			this.dom.removeEventListener('click', this._onClearAll);
 			this.dom.removeEventListener('ln-filter:changed', this._onColumnFilter);
+			clearTimeout(this._fetchDebounceId);
+			if (this._rowMap) this._rowMap.clear();
 		} else {
 			if (this._emptyTbodyObserver) {
 				this._emptyTbodyObserver.disconnect();
