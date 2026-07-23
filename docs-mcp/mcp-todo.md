@@ -103,7 +103,7 @@
 #### Сервиси со markup контакт
 
 - [x] **ln-icons** — се врзува за `<use href>`, не за `data-ln-*` — API-то е markup конвенција
-- [ ] **ln-translations**
+- [x] **ln-translations**
 - [x] **ln-progress**
 - [x] **ln-circular-progress**
 
@@ -243,9 +243,9 @@
 |---|---|---|
 | doctrine | 6 | 6 |
 | guides | 5 | 5 |
-| components — употребливи (3А) | 42 | 15 |
-| components — позадински (3Б) | 9 | 1 |
+| components — употребливи (3А) | 42 | 41 |
+| components — позадински (3Б) | 9 | 4 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
 | skills | 13 | 4 |
-| **Вкупно** | **108** | **31** |
+| **Вкупно** | **108** | **60** |
