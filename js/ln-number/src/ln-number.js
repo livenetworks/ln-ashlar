@@ -40,16 +40,18 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 
 	// ─── Component ─────────────────────────────────────────────
 
-	function _component(dom) {
-		if (dom.tagName !== 'INPUT') {
-			console.warn('[ln-number] Can only be applied to <input>, got:', dom.tagName);
-			return this;
-		}
+	// ─── Component ─────────────────────────────────────────────
 
+	function _component(dom) {
 		if (dom[DOM_ATTRIBUTE]) return dom[DOM_ATTRIBUTE];
 		dom[DOM_ATTRIBUTE] = this;
-
 		this.dom = dom;
+
+		if (dom.tagName !== 'INPUT') {
+			this.isTextElement = true;
+			this._initTextElement();
+			return this;
+		}
 
 		// ── Create hidden input ─────────────────────────────
 		const hidden = document.createElement('input');
@@ -145,6 +147,34 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 
 		return this;
 	}
+
+	_component.prototype._initTextElement = function () {
+		const dom = this.dom;
+		let rawAttr = dom.getAttribute('data-ln-value');
+		if (rawAttr === null) {
+			rawAttr = dom.getAttribute('data-ln-number');
+		}
+		const textContent = dom.textContent.trim();
+		const candidate = (rawAttr !== null && rawAttr !== '') ? rawAttr : textContent;
+
+		const num = parseFloat(candidate.replace(/[^\d.-]/g, ''));
+		if (!isNaN(num)) {
+			this._rawValue = num;
+			if (!dom.hasAttribute('data-ln-value')) {
+				dom.setAttribute('data-ln-value', String(num));
+			}
+			this._formatTextContent();
+		} else {
+			this._rawValue = null;
+		}
+	};
+
+	_component.prototype._formatTextContent = function () {
+		if (this._rawValue !== null && !isNaN(this._rawValue)) {
+			const decimals = this.dom.getAttribute('data-ln-number-decimals');
+			this.dom.textContent = _formatNum(getLocale(this.dom), this._rawValue, decimals);
+		}
+	};
 
 	_component.prototype._handleInput = function () {
 		const dom = this.dom;
@@ -258,25 +288,50 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 	};
 
 	_component.prototype._setHiddenRaw = function (val) {
-		_inputValueDesc.set.call(this._hidden, String(val));
+		if (this._hidden) {
+			_inputValueDesc.set.call(this._hidden, String(val));
+		}
 	};
 
 	_component.prototype._setDisplayRaw = function (str) {
-		_inputValueDesc.set.call(this.dom, String(str));
+		if (this.isTextElement) {
+			this.dom.textContent = String(str);
+		} else {
+			_inputValueDesc.set.call(this.dom, String(str));
+		}
 	};
 
 	_component.prototype._displayFormatted = function (num) {
-		this._setDisplayRaw(_formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals')));
+		if (this.isTextElement) {
+			this._formatTextContent();
+		} else {
+			this._setDisplayRaw(_formatNum(getLocale(this.dom), num, this.dom.getAttribute('data-ln-number-decimals')));
+		}
 	};
 
 	// ─── Public API ───────────────────────────────────────────
 
 	Object.defineProperty(_component.prototype, 'value', {
 		get: function () {
+			if (this.isTextElement) {
+				return this._rawValue;
+			}
 			const raw = _inputValueDesc.get.call(this._hidden);
 			return raw === '' ? NaN : parseFloat(raw);
 		},
 		set: function (num) {
+			if (this.isTextElement) {
+				if (typeof num !== 'number' || isNaN(num)) {
+					this._rawValue = null;
+					this.dom.textContent = '';
+				} else {
+					this._rawValue = num;
+					this.dom.setAttribute('data-ln-value', String(num));
+					this._formatTextContent();
+				}
+				return;
+			}
+
 			if (typeof num !== 'number' || isNaN(num)) {
 				this._setDisplayRaw('');
 				this._setHiddenRaw('');
@@ -291,20 +346,25 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 
 	Object.defineProperty(_component.prototype, 'formatted', {
 		get: function () {
+			if (this.isTextElement) {
+				return this.dom.textContent;
+			}
 			return _inputValueDesc.get.call(this.dom);
 		}
 	});
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		this.dom.removeEventListener('input', this._onInput);
-		this.dom.removeEventListener('paste', this._onPaste);
-		// Restore name to visible input
-		this.dom.name = this._hidden.name;
-		this.dom.type = 'number';
-		this.dom.removeAttribute('inputmode');
-		// Remove hidden input
-		this._hidden.remove();
+		if (!this.isTextElement) {
+			this.dom.removeEventListener('input', this._onInput);
+			this.dom.removeEventListener('paste', this._onPaste);
+			if (this._hidden) {
+				this.dom.name = this._hidden.name;
+				this._hidden.remove();
+			}
+			this.dom.type = 'number';
+			this.dom.removeAttribute('inputmode');
+		}
 		dispatch(this.dom, 'ln-number:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
@@ -316,11 +376,15 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 			const els = document.querySelectorAll('[' + DOM_SELECTOR + ']');
 			for (let i = 0; i < els.length; i++) {
 				const inst = els[i][DOM_ATTRIBUTE];
-				if (inst && !isNaN(inst.value)) {
-					inst._displayFormatted(inst.value);
+				if (inst) {
+					if (inst.isTextElement) {
+						inst._formatTextContent();
+					} else if (!isNaN(inst.value)) {
+						inst._displayFormatted(inst.value);
+					}
 				}
 			}
-		}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+		}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'], subtree: true });
 	}
 
 	// ─── Init ──────────────────────────────────────────────────

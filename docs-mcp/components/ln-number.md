@@ -56,6 +56,27 @@ An input field configured for basic real-time formatting:
 
 ---
 
+### Variant: Formatting Non-Input Text Elements (`<span>`, `<td>`, `<div>`)
+
+`ln-number` can also be applied directly to inline or block text elements (such as `<span>`, `<td>`, `<div>`, `<p>`). It parses the raw numeric value from `data-ln-value`, `data-ln-number`, or inner `textContent`, and formats `textContent` automatically according to the active locale.
+
+#### HTML Markup
+
+```html
+<!-- Text content formatting -->
+<span data-ln-number>1234567.89</span>
+<!-- Output in mk/de: 1.234.567,89 | Output in en-US: 1,234,567.89 -->
+
+<!-- Explicit value & decimals configuration -->
+<td data-ln-number="5000" data-ln-number-decimals="2">5000</td>
+<!-- Output in mk/de: 5.000,00 | Output in en-US: 5,000.00 -->
+```
+
+> [!NOTE]
+> When applied to text elements, `ln-number` does NOT create hidden inputs. It updates `textContent` in-place and preserves the unformatted raw number in `data-ln-value`. Whenever the parent `lang` attribute changes, all `data-ln-number` text elements re-format instantly.
+
+---
+
 ### Variant 1: Decimal Place Restrictions
 
 Locks the maximum number of decimal places permitted:

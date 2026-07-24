@@ -16,7 +16,7 @@ function C(u, c, E) {
     detail: E || {}
   }));
 }
-function W(u, c, E) {
+function G(u, c, E) {
   const v = new CustomEvent(c, {
     bubbles: !0,
     cancelable: !0,
@@ -234,7 +234,7 @@ function Gt(u, c) {
   }
   return v;
 }
-function $(u) {
+function W(u) {
   const c = u ? u.closest("[lang]") : null;
   return (c ? c.lang : null) || (document.documentElement ? document.documentElement.lang : null) || navigator.language;
 }
@@ -331,7 +331,7 @@ function _e(u) {
   return Jt[u] || { ingress: (c) => c, egress: (c) => c };
 }
 const Qt = {};
-function Mt(u, c) {
+function Nt(u, c) {
   if (!u || typeof c != "object") return;
   const E = u.toLowerCase().split("-")[0];
   Qt[E] = c;
@@ -341,7 +341,7 @@ function mt(u) {
   const c = u.toLowerCase().split("-")[0];
   return Qt[c] || null;
 }
-Mt("mk", {
+Nt("mk", {
   monthsLong: [
     "јануари",
     "февруари",
@@ -389,8 +389,8 @@ Mt("mk", {
     "саб"
   ]
 });
-typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = ge, window.lnCore.getDataMapper = _e, window.lnCore.registerLocaleFallback = Mt, window.lnCore.getLocaleFallback = mt, window.lnCore.fillTemplate = _t, window.lnCore.fill = Q, window.lnCore.lnFill = he, window.lnCore.renderList = fe);
-function Nt(u, c) {
+typeof window < "u" && (window.lnCore = window.lnCore || {}, window.lnCore.registerDataMapper = ge, window.lnCore.getDataMapper = _e, window.lnCore.registerLocaleFallback = Nt, window.lnCore.getLocaleFallback = mt, window.lnCore.fillTemplate = _t, window.lnCore.fill = Q, window.lnCore.lnFill = he, window.lnCore.renderList = fe);
+function Mt(u, c) {
   let E = !1;
   return function() {
     E || (E = !0, queueMicrotask(function() {
@@ -922,7 +922,7 @@ async function Ee(u, c = st) {
     delete d[c];
   }
   function a(d, l, e, r, o) {
-    if (W(r, "ln-ajax:before-start", { method: d, url: l }).defaultPrevented) return;
+    if (G(r, "ln-ajax:before-start", { method: d, url: l }).defaultPrevented) return;
     C(r, "ln-ajax:start", { method: d, url: l }), r.classList.add("ln-ajax--loading");
     const i = document.createElement("span");
     i.className = "ln-ajax-spinner", r.appendChild(i);
@@ -1144,7 +1144,7 @@ function gt(u, c = {}) {
     return;
   }
   let a = null;
-  if (m && (a = Ot("__primary__", m.route), !a || W(a, "ln-router:before-navigate", {
+  if (m && (a = Ot("__primary__", m.route), !a || G(a, "ln-router:before-navigate", {
     from: qt,
     to: u,
     params: m.params,
@@ -1295,7 +1295,7 @@ U(Bt, re, de, "ln-router", {
     const a = y.getAttribute(u) === "open";
     if (a !== _.isOpen)
       if (a) {
-        if (W(y, "ln-modal:before-open", { modalId: y.id, target: y }).defaultPrevented) {
+        if (G(y, "ln-modal:before-open", { modalId: y.id, target: y }).defaultPrevented) {
           _._hashNs && ht(_._hashNs, null), y.setAttribute(u, "close");
           return;
         }
@@ -1318,7 +1318,7 @@ U(Bt, re, de, "ln-router", {
         } else
           C(y, "ln-modal:open", { modalId: y.id, target: y });
       } else {
-        if (W(y, "ln-modal:before-close", { modalId: y.id, target: y }).defaultPrevented) {
+        if (G(y, "ln-modal:before-close", { modalId: y.id, target: y }).defaultPrevented) {
           y.setAttribute(u, "open");
           return;
         }
@@ -1395,10 +1395,9 @@ U(Bt, re, de, "ln-router", {
     return y(s).fmt.format(p);
   }
   function m(s) {
-    if (s.tagName !== "INPUT")
-      return console.warn("[ln-number] Can only be applied to <input>, got:", s.tagName), this;
     if (s[c]) return s[c];
-    s[c] = this, this.dom = s;
+    if (s[c] = this, this.dom = s, s.tagName !== "INPUT")
+      return this.isTextElement = !0, this._initTextElement(), this;
     const p = document.createElement("input");
     p.type = "hidden", p.name = s.name, s.removeAttribute("name"), s.hasAttribute("data-ln-fill-as") && p.setAttribute("data-ln-fill-as", s.getAttribute("data-ln-fill-as")), s.type = "text", s.setAttribute("inputmode", "decimal"), s.insertAdjacentElement("afterend", p), this._hidden = p;
     const b = this;
@@ -1407,7 +1406,7 @@ U(Bt, re, de, "ln-router", {
         return v.get.call(p);
       },
       set: function(l) {
-        v.set.call(p, l), l !== "" && !isNaN(parseFloat(l)) ? b._setDisplayRaw(_($(b.dom), parseFloat(l), b.dom.getAttribute("data-ln-number-decimals"))) : b._setDisplayRaw(""), b.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
+        v.set.call(p, l), l !== "" && !isNaN(parseFloat(l)) ? b._setDisplayRaw(_(W(b.dom), parseFloat(l), b.dom.getAttribute("data-ln-number-decimals"))) : b._setDisplayRaw(""), b.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
       }
     }), $t(s, v, {
       get: function() {
@@ -1419,13 +1418,13 @@ U(Bt, re, de, "ln-router", {
           return;
         }
         const e = typeof l == "number" ? l : parseFloat(String(l).replace(/[^\d.-]/g, ""));
-        isNaN(e) ? (b._setDisplayRaw(String(l)), b._setHiddenRaw("")) : (b._setHiddenRaw(e), b._setDisplayRaw(_($(s), e, s.getAttribute("data-ln-number-decimals")))), s.dispatchEvent(new Event("input", { bubbles: !0 }));
+        isNaN(e) ? (b._setDisplayRaw(String(l)), b._setHiddenRaw("")) : (b._setHiddenRaw(e), b._setDisplayRaw(_(W(s), e, s.getAttribute("data-ln-number-decimals")))), s.dispatchEvent(new Event("input", { bubbles: !0 }));
       }
     }), this._onInput = function() {
       b._handleInput();
     }, s.addEventListener("input", this._onInput), this._onPaste = function(l) {
       l.preventDefault();
-      const e = (l.clipboardData || window.clipboardData).getData("text"), r = y($(s)), o = r.decimalSep.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const e = (l.clipboardData || window.clipboardData).getData("text"), r = y(W(s)), o = r.decimalSep.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       let t = e.replace(new RegExp("[^0-9\\-" + o + ".]", "g"), "");
       r.groupSep && (t = t.split(r.groupSep).join("")), r.decimalSep !== "." && (t = t.replace(r.decimalSep, "."));
       const i = parseFloat(t);
@@ -1434,12 +1433,23 @@ U(Bt, re, de, "ln-router", {
     const d = s.value;
     if (d !== "") {
       const l = parseFloat(d);
-      isNaN(l) || (this._setHiddenRaw(l), this._setDisplayRaw(_($(s), l, s.getAttribute("data-ln-number-decimals"))), s.dispatchEvent(new Event("input", { bubbles: !0 })));
+      isNaN(l) || (this._setHiddenRaw(l), this._setDisplayRaw(_(W(s), l, s.getAttribute("data-ln-number-decimals"))), s.dispatchEvent(new Event("input", { bubbles: !0 })));
     }
     return this;
   }
-  m.prototype._handleInput = function() {
-    const s = this.dom, p = y($(s)), b = v.get.call(s);
+  m.prototype._initTextElement = function() {
+    const s = this.dom;
+    let p = s.getAttribute("data-ln-value");
+    p === null && (p = s.getAttribute("data-ln-number"));
+    const b = s.textContent.trim(), l = parseFloat((p !== null && p !== "" ? p : b).replace(/[^\d.-]/g, ""));
+    isNaN(l) ? this._rawValue = null : (this._rawValue = l, s.hasAttribute("data-ln-value") || s.setAttribute("data-ln-value", String(l)), this._formatTextContent());
+  }, m.prototype._formatTextContent = function() {
+    if (this._rawValue !== null && !isNaN(this._rawValue)) {
+      const s = this.dom.getAttribute("data-ln-number-decimals");
+      this.dom.textContent = _(W(this.dom), this._rawValue, s);
+    }
+  }, m.prototype._handleInput = function() {
+    const s = this.dom, p = y(W(s)), b = v.get.call(s);
     if (b === "") {
       this._setHiddenRaw(""), C(s, "ln-number:input", { value: NaN, formatted: "" });
       return;
@@ -1475,12 +1485,12 @@ U(Bt, re, de, "ln-router", {
     if (i !== null && t < parseFloat(i) || n !== null && t > parseFloat(n)) return;
     let h;
     if (o !== null)
-      h = _($(s), t, o);
+      h = _(W(s), t, o);
     else {
       const w = r !== -1 ? e.slice(r + 1).length : 0;
       if (w > 0) {
-        const A = $(s) + "|u" + w;
-        E[A] || (E[A] = new Intl.NumberFormat($(s), { useGrouping: !0, minimumFractionDigits: w, maximumFractionDigits: w })), h = E[A].format(t);
+        const A = W(s) + "|u" + w;
+        E[A] || (E[A] = new Intl.NumberFormat(W(s), { useGrouping: !0, minimumFractionDigits: w, maximumFractionDigits: w })), h = E[A].format(t);
       } else
         h = p.fmt.format(t);
     }
@@ -1490,38 +1500,44 @@ U(Bt, re, de, "ln-router", {
       g = w + 1, /[0-9]/.test(h[w]) && f--;
     f > 0 && (g = h.length), s.setSelectionRange(g, g), this._setHiddenRaw(t), C(s, "ln-number:input", { value: t, formatted: h });
   }, m.prototype._setHiddenRaw = function(s) {
-    v.set.call(this._hidden, String(s));
+    this._hidden && v.set.call(this._hidden, String(s));
   }, m.prototype._setDisplayRaw = function(s) {
-    v.set.call(this.dom, String(s));
+    this.isTextElement ? this.dom.textContent = String(s) : v.set.call(this.dom, String(s));
   }, m.prototype._displayFormatted = function(s) {
-    this._setDisplayRaw(_($(this.dom), s, this.dom.getAttribute("data-ln-number-decimals")));
+    this.isTextElement ? this._formatTextContent() : this._setDisplayRaw(_(W(this.dom), s, this.dom.getAttribute("data-ln-number-decimals")));
   }, Object.defineProperty(m.prototype, "value", {
     get: function() {
+      if (this.isTextElement)
+        return this._rawValue;
       const s = v.get.call(this._hidden);
       return s === "" ? NaN : parseFloat(s);
     },
     set: function(s) {
+      if (this.isTextElement) {
+        typeof s != "number" || isNaN(s) ? (this._rawValue = null, this.dom.textContent = "") : (this._rawValue = s, this.dom.setAttribute("data-ln-value", String(s)), this._formatTextContent());
+        return;
+      }
       if (typeof s != "number" || isNaN(s)) {
         this._setDisplayRaw(""), this._setHiddenRaw(""), this.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
         return;
       }
-      this._setHiddenRaw(s), this._setDisplayRaw(_($(this.dom), s, this.dom.getAttribute("data-ln-number-decimals"))), this.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
+      this._setHiddenRaw(s), this._setDisplayRaw(_(W(this.dom), s, this.dom.getAttribute("data-ln-number-decimals"))), this.dom.dispatchEvent(new Event("input", { bubbles: !0 }));
     }
   }), Object.defineProperty(m.prototype, "formatted", {
     get: function() {
-      return v.get.call(this.dom);
+      return this.isTextElement ? this.dom.textContent : v.get.call(this.dom);
     }
   }), m.prototype.destroy = function() {
-    this.dom[c] && (this.dom.removeEventListener("input", this._onInput), this.dom.removeEventListener("paste", this._onPaste), this.dom.name = this._hidden.name, this.dom.type = "number", this.dom.removeAttribute("inputmode"), this._hidden.remove(), C(this.dom, "ln-number:destroyed", { target: this.dom }), delete this.dom[c]);
+    this.dom[c] && (this.isTextElement || (this.dom.removeEventListener("input", this._onInput), this.dom.removeEventListener("paste", this._onPaste), this._hidden && (this.dom.name = this._hidden.name, this._hidden.remove()), this.dom.type = "number", this.dom.removeAttribute("inputmode")), C(this.dom, "ln-number:destroyed", { target: this.dom }), delete this.dom[c]);
   };
   function a() {
     new MutationObserver(function() {
       const s = document.querySelectorAll("[" + u + "]");
       for (let p = 0; p < s.length; p++) {
         const b = s[p][c];
-        b && !isNaN(b.value) && b._displayFormatted(b.value);
+        b && (b.isTextElement ? b._formatTextContent() : isNaN(b.value) || b._displayFormatted(b.value));
       }
-    }).observe(document.documentElement, { attributes: !0, attributeFilter: ["lang"] });
+    }).observe(document.documentElement, { attributes: !0, attributeFilter: ["lang"], subtree: !0 });
   }
   U(u, c, m, "ln-number"), a();
 })();
@@ -1601,7 +1617,7 @@ U(Bt, re, de, "ln-router", {
       const B = A[I].getAttribute("data-ln-date-dict");
       if (B) {
         const O = Rt(A[I], "data-ln-date-dict-key");
-        O["months-long"] && (O.monthsLong = O["months-long"].split(",").map((F) => F.trim())), O["months-short"] && (O.monthsShort = O["months-short"].split(",").map((F) => F.trim())), Mt(B, O);
+        O["months-long"] && (O.monthsLong = O["months-long"].split(",").map((F) => F.trim())), O["months-short"] && (O.monthsShort = O["months-short"].split(",").map((F) => F.trim())), Nt(B, O);
       }
     }
     const T = document.createElement("span");
@@ -1636,7 +1652,7 @@ U(Bt, re, de, "ln-router", {
         }
         const O = o(I) || t(I);
         if (O) {
-          const F = b(O), z = n.getAttribute(u) || "", rt = $(n), Z = p(O, z, rt);
+          const F = b(O), z = n.getAttribute(u) || "", rt = W(n), Z = p(O, z, rt);
           B(Z), l(h, F, O, Z);
         } else
           B(String(I)), e(h);
@@ -1657,7 +1673,7 @@ U(Bt, re, de, "ln-router", {
       if (h._lastISO) {
         const O = o(h._lastISO);
         if (O) {
-          const F = h.dom.getAttribute(u) || "", z = $(h.dom);
+          const F = h.dom.getAttribute(u) || "", z = W(h.dom);
           if (I === p(O, F, z)) return;
         }
       }
@@ -1727,7 +1743,7 @@ U(Bt, re, de, "ln-router", {
   }, r.prototype._setHiddenRaw = function(n) {
     v.set.call(this._hidden, n);
   }, r.prototype._displayFormatted = function(n) {
-    const h = this.dom.getAttribute(u) || "", f = $(this.dom);
+    const h = this.dom.getAttribute(u) || "", f = W(this.dom);
     this._isFormatting = !0, this.dom.value = p(n, h, f), this._isFormatting = !1;
   }, Object.defineProperty(r.prototype, "value", {
     get: function() {
@@ -1793,7 +1809,7 @@ U(Bt, re, de, "ln-router", {
     return this.dom = m, this.activeClass = m.getAttribute(u) || "active", this.exact = m.hasAttribute("data-ln-nav-exact"), this.updateHandler = () => this.update(), window.addEventListener("popstate", this.updateHandler), E.push(this.updateHandler), this.observer = new MutationObserver(() => this.update()), this.observer.observe(m, { childList: !0, subtree: !0 }), this.update(), this;
   }
   v.prototype.update = function() {
-    if (!this.activeClass || W(this.dom, "ln-nav:before-update", { target: this.dom }).defaultPrevented) return;
+    if (!this.activeClass || G(this.dom, "ln-nav:before-update", { target: this.dom }).defaultPrevented) return;
     const a = Array.from(this.dom.querySelectorAll("a")), s = window.location.pathname, p = y(s);
     for (const b of a) {
       const d = b.getAttribute("href");
@@ -1966,13 +1982,13 @@ U(Bt, re, de, "ln-router", {
     const s = _.getAttribute(u) === "open";
     if (s !== m.isOpen)
       if (s) {
-        if (W(_, "ln-toggle:before-open", { target: _ }).defaultPrevented) {
+        if (G(_, "ln-toggle:before-open", { target: _ }).defaultPrevented) {
           _.setAttribute(u, "close");
           return;
         }
         m.isOpen = !0, _.classList.add("open"), E(_, !0), C(_, "ln-toggle:open", { target: _ }), _.hasAttribute("data-ln-persist") && ct("toggle", _, "open");
       } else {
-        if (W(_, "ln-toggle:before-close", { target: _ }).defaultPrevented) {
+        if (G(_, "ln-toggle:before-close", { target: _ }).defaultPrevented) {
           _.setAttribute(u, "open");
           return;
         }
@@ -2142,7 +2158,7 @@ U(Bt, re, de, "ln-router", {
       const e = b.getAttribute(u) === "open";
       if (e !== d.isOpen)
         if (e) {
-          if (W(b, "ln-popover:before-open", {
+          if (G(b, "ln-popover:before-open", {
             popoverId: b.id,
             target: b,
             trigger: d.trigger
@@ -2152,7 +2168,7 @@ U(Bt, re, de, "ln-router", {
           }
           d._applyOpen(d.trigger);
         } else {
-          if (W(b, "ln-popover:before-close", {
+          if (G(b, "ln-popover:before-close", {
             popoverId: b.id,
             target: b,
             trigger: d.trigger
@@ -2393,14 +2409,14 @@ U(Bt, re, de, "ln-router", {
     }
     function k(P) {
       if (!b(P, n)) {
-        const N = o["invalid-type"];
+        const M = o["invalid-type"];
         C(r, "ln-upload:invalid", {
           file: P,
-          message: N
+          message: M
         }), C(window, "ln-toast:enqueue", {
           type: "error",
           title: o["invalid-title"] || "Invalid File",
-          message: N || o["invalid-type"] || "This file type is not allowed"
+          message: M || o["invalid-type"] || "This file type is not allowed"
         });
         return;
       }
@@ -2421,57 +2437,57 @@ U(Bt, re, de, "ln-router", {
       x && (x.disabled = !0), i.appendChild(J);
       const D = new FormData();
       D.append("file", P);
-      const M = /* @__PURE__ */ new Set();
-      r.querySelectorAll("input, select, textarea").forEach(function(N) {
-        if (N.name && N.name !== "file_ids[]" && N.type !== "file") {
-          if ((N.type === "checkbox" || N.type === "radio") && !N.checked)
+      const N = /* @__PURE__ */ new Set();
+      r.querySelectorAll("input, select, textarea").forEach(function(M) {
+        if (M.name && M.name !== "file_ids[]" && M.type !== "file") {
+          if ((M.type === "checkbox" || M.type === "radio") && !M.checked)
             return;
-          D.append(N.name, N.value), M.add(N.name);
+          D.append(M.name, M.value), N.add(M.name);
         }
-      }), !M.has("context") && g && D.append("context", g);
+      }), !N.has("context") && g && D.append("context", g);
       const R = new XMLHttpRequest();
-      R.upload.addEventListener("progress", function(N) {
-        if (N.lengthComputable) {
-          const j = Math.round(N.loaded / N.total * 100);
+      R.upload.addEventListener("progress", function(M) {
+        if (M.lengthComputable) {
+          const j = Math.round(M.loaded / M.total * 100);
           L.style.width = j + "%", Q(J, { sizeText: j + "%" });
         }
       }), R.addEventListener("load", function() {
         if (R.status >= 200 && R.status < 300) {
-          let N;
+          let M;
           try {
-            N = JSON.parse(R.responseText);
+            M = JSON.parse(R.responseText);
           } catch {
             H("Invalid response");
             return;
           }
-          Q(J, { sizeText: a(N.size || P.size), uploading: !1 }), x && (x.disabled = !1), A.set(K, {
-            serverId: N.id,
-            name: N.name,
-            size: N.size
+          Q(J, { sizeText: a(M.size || P.size), uploading: !1 }), x && (x.disabled = !1), A.set(K, {
+            serverId: M.id,
+            name: M.name,
+            size: M.size
           }), q(), C(r, "ln-upload:uploaded", {
             localId: K,
-            serverId: N.id,
-            name: N.name
+            serverId: M.id,
+            name: M.name
           });
         } else {
-          let N = o["upload-failed"] || "Upload failed";
+          let M = o["upload-failed"] || "Upload failed";
           try {
-            N = JSON.parse(R.responseText).message || N;
+            M = JSON.parse(R.responseText).message || M;
           } catch {
           }
-          H(N);
+          H(M);
         }
       }), R.addEventListener("error", function() {
         H(o["network-error"] || "Network error");
       });
-      function H(N) {
+      function H(M) {
         L && (L.style.width = "100%"), Q(J, { sizeText: o.error || "Error", uploading: !1, error: !0 }), x && (x.disabled = !1), C(r, "ln-upload:error", {
           file: P,
-          message: N
+          message: M
         }), C(window, "ln-toast:enqueue", {
           type: "error",
           title: o["error-title"] || "Upload Error",
-          message: N || o["upload-failed"] || "Failed to upload file"
+          message: M || o["upload-failed"] || "Failed to upload file"
         });
       }
       R.open("POST", f), R.setRequestHeader("X-CSRF-TOKEN", S()), R.setRequestHeader("Accept", "application/json"), R.send(D);
@@ -2684,7 +2700,7 @@ U(Bt, re, de, "ln-router", {
       window.open(f, "_blank");
       return;
     }
-    W(i, "ln-link:navigate", { target: i, href: f, link: h }).defaultPrevented || h.click();
+    G(i, "ln-link:navigate", { target: i, href: f, link: h }).defaultPrevented || h.click();
   }
   function a(i) {
     const n = i.querySelector("a");
@@ -2869,7 +2885,7 @@ U(Bt, re, de, "ln-router", {
     this.dom = r, this.targetId = r.getAttribute(u);
     const o = r.getAttribute(a);
     this.colIndex = o !== null ? parseInt(o, 10) : null, l(this), this.inputs = Array.from(r.querySelectorAll("[" + v + "]")), this._filterKey = this.inputs.length > 0 ? this.inputs[0].getAttribute(v) : null, this._lastSnapshot = null;
-    const t = this, i = Nt(
+    const t = this, i = Mt(
       function() {
         t._render();
       },
@@ -3058,7 +3074,7 @@ U(Bt, re, de, "ln-router", {
     }, this.input.addEventListener("input", this._onInput);
   }, _.prototype._search = function(m) {
     const a = document.getElementById(this.targetId);
-    if (!a || W(a, "ln-search:change", { term: m, targetId: this.targetId }).defaultPrevented) return;
+    if (!a || G(a, "ln-search:change", { term: m, targetId: this.targetId }).defaultPrevented) return;
     const p = this.itemsSelector ? a.querySelectorAll(this.itemsSelector) : a.children;
     for (let b = 0; b < p.length; b++) {
       const d = p[b];
@@ -3141,7 +3157,7 @@ U(Bt, re, de, "ln-router", {
   function b(e, r) {
     if (e == null || isNaN(e)) return "";
     try {
-      return new Intl.NumberFormat($(r)).format(e);
+      return new Intl.NumberFormat(W(r)).format(e);
     } catch {
       return String(e);
     }
@@ -3196,7 +3212,7 @@ U(Bt, re, de, "ln-router", {
             total: o.totalCount,
             visible: o.visibleCount
           });
-        }, this._renderBatch = Nt(this._onCacheChange), this._cache = Zt({
+        }, this._renderBatch = Mt(this._onCacheChange), this._cache = Zt({
           windowSize: i > 0 ? i : 1e3,
           pageSize: n > 0 ? n : 200,
           threshold: h >= 0 ? h : 25,
@@ -3833,7 +3849,7 @@ U(Bt, re, de, "ln-router", {
   function s(l, e) {
     if (l == null || isNaN(l)) return "";
     try {
-      return new Intl.NumberFormat($(e)).format(l);
+      return new Intl.NumberFormat(W(e)).format(l);
     } catch {
       return String(l);
     }
@@ -3864,7 +3880,7 @@ U(Bt, re, de, "ln-router", {
             total: e.totalCount,
             visible: e.visibleCount
           });
-        }, this._renderBatch = Nt(this._onCacheChange), this._cache = Zt({
+        }, this._renderBatch = Mt(this._onCacheChange), this._cache = Zt({
           windowSize: r > 0 ? r : 1e3,
           pageSize: o > 0 ? o : 200,
           threshold: t >= 0 ? t : 25,
@@ -3960,7 +3976,7 @@ U(Bt, re, de, "ln-router", {
         });
       }, l.addEventListener("ln-search:change", this._onSearch);
     return this._onClear = function(r) {
-      if (!r.target.closest("[data-ln-list-clear]") || W(l, "ln-list:before-clear-search", { list: e.name }).defaultPrevented) return;
+      if (!r.target.closest("[data-ln-list-clear]") || G(l, "ln-list:before-clear-search", { list: e.name }).defaultPrevented) return;
       e.isDataDriven ? e.currentSearch = "" : e._searchTerm = "";
       const i = document.querySelector('[data-ln-search="' + l.id + '"]');
       if (i) {
@@ -4383,7 +4399,7 @@ U(Bt, re, de, "ln-router", {
       m = a;
     }
     const p = Array.from(this.dom.children).indexOf(a);
-    if (W(this.dom, "ln-sortable:before-drag", {
+    if (G(this.dom, "ln-sortable:before-drag", {
       item: a,
       index: p
     }).defaultPrevented) return;
@@ -4576,7 +4592,7 @@ U(Bt, re, de, "ln-router", {
   }, v.prototype.addLanguage = function(y, _) {
     if (this.activeLanguages.has(y)) return;
     const m = this.locales[y] || y;
-    if (W(this.dom, "ln-translations:before-add", {
+    if (G(this.dom, "ln-translations:before-add", {
       target: this.dom,
       lang: y,
       langName: m
@@ -4599,7 +4615,7 @@ U(Bt, re, de, "ln-router", {
       langName: m
     });
   }, v.prototype.removeLanguage = function(y) {
-    if (!this.activeLanguages.has(y) || W(this.dom, "ln-translations:before-remove", {
+    if (!this.activeLanguages.has(y) || G(this.dom, "ln-translations:before-remove", {
       target: this.dom,
       lang: y
     }).defaultPrevented) return;
@@ -4656,7 +4672,7 @@ U(Bt, re, de, "ln-router", {
       } catch {
         return;
       }
-      if (W(b, "ln-autosave:before-restore", { target: b, data: n }).defaultPrevented) return;
+      if (G(b, "ln-autosave:before-restore", { target: b, data: n }).defaultPrevented) return;
       const f = Gt(b, n);
       for (let g = 0; g < f.length; g++)
         f[g].dispatchEvent(new Event("input", { bubbles: !0 })), f[g].dispatchEvent(new Event("change", { bubbles: !0 }));
@@ -4845,7 +4861,7 @@ U(Bt, re, de, "ln-router", {
   s.prototype._syncToTextarea = function() {
     this._textarea && (this._textarea.value = this._surface.innerHTML);
   }, s.prototype._execAction = function(t) {
-    if (!(!t || W(this.dom, "ln-editor:before-change", {
+    if (!(!t || G(this.dom, "ln-editor:before-change", {
       action: t,
       target: this.dom
     }).defaultPrevented)) {
@@ -5127,7 +5143,7 @@ U(Bt, re, de, "ln-router", {
   if (window[c] !== void 0) return;
   const E = {}, v = {};
   function y(g) {
-    return g.getAttribute("data-ln-time-locale") || $(g);
+    return g.getAttribute("data-ln-time-locale") || W(g);
   }
   function _(g, w) {
     const A = (g || "") + "|" + JSON.stringify(w);
@@ -5259,9 +5275,9 @@ U(Bt, re, de, "ln-router", {
     for (const x of document.querySelectorAll(`[${u}]`)) {
       const D = x.getAttribute(u);
       if (D) {
-        const M = x.getAttribute("data-ln-data-store-indexes") || "";
+        const N = x.getAttribute("data-ln-data-store-indexes") || "";
         L[D] = {
-          indexes: M.split(",").map((R) => R.trim()).filter(Boolean)
+          indexes: N.split(",").map((R) => R.trim()).filter(Boolean)
         };
       }
     }
@@ -5271,16 +5287,16 @@ U(Bt, re, de, "ln-router", {
     return m || (m = new Promise((L) => {
       if (typeof indexedDB > "u")
         return console.warn("[ln-data-store] IndexedDB not available — falling back to in-memory store"), L(null);
-      const x = p(), D = Object.keys(x), M = indexedDB.open(E);
-      M.onerror = () => {
+      const x = p(), D = Object.keys(x), N = indexedDB.open(E);
+      N.onerror = () => {
         console.warn("[ln-data-store] IndexedDB open failed — falling back to in-memory store"), L(null);
-      }, M.onsuccess = (R) => {
-        const H = R.target.result, N = Array.from(H.objectStoreNames);
-        if (!(!N.includes(v) || D.some((pt) => !N.includes(pt))))
+      }, N.onsuccess = (R) => {
+        const H = R.target.result, M = Array.from(H.objectStoreNames);
+        if (!(!M.includes(v) || D.some((pt) => !M.includes(pt))))
           return d(H), _ = H, L(H);
-        const G = H.version;
+        const $ = H.version;
         H.close();
-        const X = indexedDB.open(E, G + 1);
+        const X = indexedDB.open(E, $ + 1);
         X.onblocked = () => {
           console.warn("[ln-data-store] Database upgrade blocked — waiting for other tabs to close connection");
         }, X.onerror = () => {
@@ -5311,12 +5327,12 @@ U(Bt, re, de, "ln-router", {
   }
   async function e(L) {
     if (!ut() || !L) return L;
-    const x = { ...L }, D = x.id, M = await ve(x);
-    return !M || !M.encrypted ? L : {
+    const x = { ...L }, D = x.id, N = await ve(x);
+    return !N || !N.encrypted ? L : {
       id: D,
       encrypted: !0,
-      iv: M.iv,
-      data: M.data
+      iv: N.iv,
+      data: N.data
     };
   }
   async function r(L) {
@@ -5330,7 +5346,7 @@ U(Bt, re, de, "ln-router", {
       };
     });
   }
-  const i = (L) => o(L, "readonly").then((x) => x ? t(x.getAll()) : []).then((x) => ut() ? Promise.all(x.map((D) => r(D))) : x), n = (L, x) => o(L, "readonly").then((D) => D ? t(D.get(x)) : null).then((D) => D ? r(D) : null), h = (L, x) => (ut() ? e(x) : Promise.resolve(x)).then((M) => o(L, "readwrite").then((R) => R ? t(R.put(M)) : null)), f = (L, x) => o(L, "readwrite").then((D) => D ? t(D.delete(x)) : null), g = (L) => o(L, "readwrite").then((x) => x ? t(x.clear()) : null), w = (L) => o(L, "readonly").then((x) => x ? t(x.count()) : 0), A = (L) => o(v, "readonly").then((x) => x ? t(x.get(L)) : null), T = (L, x) => o(v, "readwrite").then((D) => {
+  const i = (L) => o(L, "readonly").then((x) => x ? t(x.getAll()) : []).then((x) => ut() ? Promise.all(x.map((D) => r(D))) : x), n = (L, x) => o(L, "readonly").then((D) => D ? t(D.get(x)) : null).then((D) => D ? r(D) : null), h = (L, x) => (ut() ? e(x) : Promise.resolve(x)).then((N) => o(L, "readwrite").then((R) => R ? t(R.put(N)) : null)), f = (L, x) => o(L, "readwrite").then((D) => D ? t(D.delete(x)) : null), g = (L) => o(L, "readwrite").then((x) => x ? t(x.clear()) : null), w = (L) => o(L, "readonly").then((x) => x ? t(x.count()) : 0), A = (L) => o(v, "readonly").then((x) => x ? t(x.get(L)) : null), T = (L, x) => o(v, "readwrite").then((D) => {
     if (D)
       return x.key = L, t(D.put(x));
   });
@@ -5338,8 +5354,8 @@ U(Bt, re, de, "ln-router", {
     this.dom = L, this._name = L.getAttribute(u);
     const x = L.getAttribute("data-ln-data-store-stale"), D = parseInt(x, 10);
     this._staleThreshold = x === "never" || x === "-1" ? -1 : isNaN(D) ? 300 : D;
-    const M = L.getAttribute("data-ln-data-store-search-fields") || "";
-    return this._searchFields = M.split(",").map((R) => R.trim()).filter(Boolean), this._handlers = null, this.isLoaded = !1, this.isSyncing = !1, this.lastSyncedAt = null, this.totalCount = 0, this.presenters = null, a[this._name] = this, k(this), F(this), this;
+    const N = L.getAttribute("data-ln-data-store-search-fields") || "";
+    return this._searchFields = N.split(",").map((R) => R.trim()).filter(Boolean), this._handlers = null, this.isLoaded = !1, this.isSyncing = !1, this.lastSyncedAt = null, this.totalCount = 0, this.presenters = null, a[this._name] = this, k(this), F(this), this;
   }
   function k(L) {
     L._handlers = {
@@ -5352,19 +5368,19 @@ U(Bt, re, de, "ln-router", {
       L.dom.addEventListener(`ln-data-store:request-${x}`, D);
   }
   function q(L, { tempId: x, data: D = {} } = {}) {
-    const M = { ...D, id: x };
-    h(L._name, M).then(() => {
-      L.totalCount++, C(L.dom, "ln-data-store:created", { store: L._name, record: M, tempId: x });
+    const N = { ...D, id: x };
+    h(L._name, N).then(() => {
+      L.totalCount++, C(L.dom, "ln-data-store:created", { store: L._name, record: N, tempId: x });
     });
   }
   function I(L, { id: x, data: D = {} } = {}) {
-    n(L._name, x).then((M) => {
-      if (!M) throw new Error(`Record not found: ${x}`);
-      const R = { ...M, ...D }, H = D.id;
+    n(L._name, x).then((N) => {
+      if (!N) throw new Error(`Record not found: ${x}`);
+      const R = { ...N, ...D }, H = D.id;
       return (H !== void 0 && H !== x ? bt(L._name, x, R) : h(L._name, R)).then(() => {
-        C(L.dom, "ln-data-store:updated", { store: L._name, record: R, previous: M });
+        C(L.dom, "ln-data-store:updated", { store: L._name, record: R, previous: N });
       });
-    }).catch((M) => console.error("[ln-data-store] Optimistic update failed:", M));
+    }).catch((N) => console.error("[ln-data-store] Optimistic update failed:", N));
   }
   function B(L, { id: x } = {}) {
     n(L._name, x).then((D) => {
@@ -5376,9 +5392,9 @@ U(Bt, re, de, "ln-router", {
   }
   function O(L, { ids: x = [] } = {}) {
     x.length && Promise.all(x.map((D) => n(L._name, D))).then((D) => {
-      const M = D.filter(Boolean).map((R) => R.id);
-      return Z(L._name, M).then(() => {
-        L.totalCount -= M.length, C(L.dom, "ln-data-store:deleted", { store: L._name, ids: M });
+      const N = D.filter(Boolean).map((R) => R.id);
+      return Z(L._name, N).then(() => {
+        L.totalCount -= N.length, C(L.dom, "ln-data-store:deleted", { store: L._name, ids: N });
       });
     }).catch((D) => console.error("[ln-data-store] Optimistic bulk delete failed:", D));
   }
@@ -5391,29 +5407,29 @@ U(Bt, re, de, "ln-router", {
     L.isSyncing = !0, C(L.dom, "ln-data-store:request-remote-sync", { since: L.lastSyncedAt });
   }
   function rt(L, x) {
-    return l().then((D) => D ? (ut() ? Promise.all(x.map((R) => e(R))) : Promise.resolve(x)).then((R) => new Promise((H, N) => {
-      const j = D.transaction(L, "readwrite"), G = j.objectStore(L);
-      R.forEach((X) => G.put(X)), j.oncomplete = () => H(), j.onerror = () => {
-        s(j.error), N(j.error);
+    return l().then((D) => D ? (ut() ? Promise.all(x.map((R) => e(R))) : Promise.resolve(x)).then((R) => new Promise((H, M) => {
+      const j = D.transaction(L, "readwrite"), $ = j.objectStore(L);
+      R.forEach((X) => $.put(X)), j.oncomplete = () => H(), j.onerror = () => {
+        s(j.error), M(j.error);
       };
     })) : void 0);
   }
   function Z(L, x) {
     return l().then((D) => {
       if (D)
-        return new Promise((M, R) => {
-          const H = D.transaction(L, "readwrite"), N = H.objectStore(L);
-          x.forEach((j) => N.delete(j)), H.oncomplete = () => M(), H.onerror = () => R(H.error);
+        return new Promise((N, R) => {
+          const H = D.transaction(L, "readwrite"), M = H.objectStore(L);
+          x.forEach((j) => M.delete(j)), H.oncomplete = () => N(), H.onerror = () => R(H.error);
         });
     });
   }
   function bt(L, x, D) {
     return (ut() ? e(D) : Promise.resolve(D)).then((R) => l().then((H) => {
       if (H)
-        return new Promise((N, j) => {
-          const G = H.transaction(L, "readwrite"), X = G.objectStore(L);
-          X.put(R), X.delete(x), G.oncomplete = () => N(), G.onerror = () => {
-            s(G.error), j(G.error);
+        return new Promise((M, j) => {
+          const $ = H.transaction(L, "readwrite"), X = $.objectStore(L);
+          X.put(R), X.delete(x), $.oncomplete = () => M(), $.onerror = () => {
+            s($.error), j($.error);
           };
         });
     }));
@@ -5421,47 +5437,47 @@ U(Bt, re, de, "ln-router", {
   const yt = new Intl.Collator(void 0, { numeric: !0, sensitivity: "base" });
   function P(L, x) {
     if (!x || !x.field) return L;
-    const { field: D, direction: M } = x, R = M === "desc";
-    return [...L].sort((H, N) => {
-      const j = H[D], G = N[D];
-      if (j == null && G == null) return 0;
+    const { field: D, direction: N } = x, R = N === "desc";
+    return [...L].sort((H, M) => {
+      const j = H[D], $ = M[D];
+      if (j == null && $ == null) return 0;
       if (j == null) return R ? 1 : -1;
-      if (G == null) return R ? -1 : 1;
-      const X = typeof j == "string" && typeof G == "string" ? yt.compare(j, G) : j < G ? -1 : j > G ? 1 : 0;
+      if ($ == null) return R ? -1 : 1;
+      const X = typeof j == "string" && typeof $ == "string" ? yt.compare(j, $) : j < $ ? -1 : j > $ ? 1 : 0;
       return R ? -X : X;
     });
   }
   function K(L, x) {
     if (!x) return L;
-    const D = Object.keys(x).filter((M) => Array.isArray(x[M]) && x[M].length > 0);
+    const D = Object.keys(x).filter((N) => Array.isArray(x[N]) && x[N].length > 0);
     return D.length ? L.filter(
-      (M) => D.every((R) => x[R].map(String).includes(String(M[R])))
+      (N) => D.every((R) => x[R].map(String).includes(String(N[R])))
     ) : L;
   }
   function V(L, x, D) {
     if (!x || !D || !D.length) return L;
-    const M = x.toLowerCase();
+    const N = x.toLowerCase();
     return L.filter(
       (R) => D.some((H) => {
-        const N = R[H];
-        return N != null && String(N).toLowerCase().includes(M);
+        const M = R[H];
+        return M != null && String(M).toLowerCase().includes(N);
       })
     );
   }
   function ft(L, x, D) {
     if (!L.length) return 0;
     if (D === "count") return L.length;
-    const M = L.map((H) => parseFloat(H[x])).filter((H) => !isNaN(H)), R = M.reduce((H, N) => H + N, 0);
-    return D === "sum" ? R : D === "avg" && M.length ? R / M.length : 0;
+    const N = L.map((H) => parseFloat(H[x])).filter((H) => !isNaN(H)), R = N.reduce((H, M) => H + M, 0);
+    return D === "sum" ? R : D === "avg" && N.length ? R / N.length : 0;
   }
   function et(L, x) {
     if (!L.presenters || !L.presenters.computed) return x;
     const D = L.presenters.computed;
-    return x.map((M) => {
-      const R = { ...M };
-      for (const [H, N] of Object.entries(D))
+    return x.map((N) => {
+      const R = { ...N };
+      for (const [H, M] of Object.entries(D))
         try {
-          R[H] = N(M);
+          R[H] = M(N);
         } catch (j) {
           console.error(`[ln-data-store] Decorator computed field failed for ${H}`, j);
         }
@@ -5471,16 +5487,16 @@ U(Bt, re, de, "ln-router", {
   S.prototype.getAll = function(L = {}) {
     const x = this;
     return i(x._name).then((D) => {
-      const M = D.length;
+      const N = D.length;
       L.filters && (D = K(D, L.filters)), L.search && (D = V(D, L.search, x._searchFields));
       const R = D.length;
       if (L.sort && (D = P(D, L.sort)), L.offset || L.limit) {
-        const H = L.offset || 0, N = L.limit || D.length;
-        D = D.slice(H, H + N);
+        const H = L.offset || 0, M = L.limit || D.length;
+        D = D.slice(H, H + M);
       }
       return {
         data: et(x, D),
-        total: M,
+        total: N,
         filtered: R
       };
     });
@@ -5492,26 +5508,26 @@ U(Bt, re, de, "ln-router", {
     return i(this._name).then((D) => ft(D, L, x));
   }, S.prototype.setPresenters = function(L) {
     this.presenters = L;
-  }, S.prototype.applySync = function(L, x, D, M) {
-    M = M || {};
+  }, S.prototype.applySync = function(L, x, D, N) {
+    N = N || {};
     const R = this;
     L.length > 0 || x.length > 0;
     let H = Promise.resolve();
-    return L.length > 0 && (H = H.then(() => rt(R._name, L))), x.length > 0 && (H = H.then(() => Z(R._name, x))), H.then(() => w(R._name)).then((N) => (R.totalCount = M.total !== void 0 ? M.total : N, T(R._name, {
+    return L.length > 0 && (H = H.then(() => rt(R._name, L))), x.length > 0 && (H = H.then(() => Z(R._name, x))), H.then(() => w(R._name)).then((M) => (R.totalCount = N.total !== void 0 ? N.total : M, T(R._name, {
       schema_version: y,
       last_synced_at: D,
       record_count: R.totalCount
     }))).then(() => {
-      const N = !R.isLoaded;
-      R.isLoaded = !0, R.isSyncing = !1, R.lastSyncedAt = D, N ? (C(R.dom, "ln-data-store:loaded", { store: R._name, count: R.totalCount, meta: M }), C(R.dom, "ln-data-store:ready", { store: R._name, count: R.totalCount, source: "server", meta: M })) : C(R.dom, "ln-data-store:synced", {
+      const M = !R.isLoaded;
+      R.isLoaded = !0, R.isSyncing = !1, R.lastSyncedAt = D, M ? (C(R.dom, "ln-data-store:loaded", { store: R._name, count: R.totalCount, meta: N }), C(R.dom, "ln-data-store:ready", { store: R._name, count: R.totalCount, source: "server", meta: N })) : C(R.dom, "ln-data-store:synced", {
         store: R._name,
         added: L.length,
         deleted: x.length,
         changed: !0,
-        meta: M
+        meta: N
       });
-    }).catch((N) => {
-      R.isSyncing = !1, console.error("[ln-data-store] applySync failed:", N);
+    }).catch((M) => {
+      R.isSyncing = !1, console.error("[ln-data-store] applySync failed:", M);
     });
   }, S.prototype.forceSync = function() {
     z(this);
@@ -5532,9 +5548,9 @@ U(Bt, re, de, "ln-router", {
     return l().then((L) => {
       if (!L) return;
       const x = Array.from(L.objectStoreNames);
-      return new Promise((D, M) => {
+      return new Promise((D, N) => {
         const R = L.transaction(x, "readwrite");
-        x.forEach((H) => R.objectStore(H).clear()), R.oncomplete = () => D(), R.onerror = () => M(R.error);
+        x.forEach((H) => R.objectStore(H).clear()), R.oncomplete = () => D(), R.onerror = () => N(R.error);
       });
     }).then(() => {
       Object.values(a).forEach((L) => {
