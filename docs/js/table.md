@@ -61,6 +61,7 @@ this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 | `data-ln-table` | Wrapper | Table name. Serves as component root identifier. |
 | `data-ln-table-source` | Wrapper | Opt-in marker for Data-Driven Mode. |
 | `data-ln-table-selectable` | Wrapper | Enable checkboxes and row selection. |
+| `data-ln-table-window="N"` | Wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-row cap (`windowSize`, default 1000). Requires Data-Driven Mode. Delegates to `ln-core.createWindowCache`. |
 | ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` in both modes. |
 | `data-ln-table-col="field"` | `<th>` | Maps header column to a data record field. |
 | `data-ln-value` | `<td>` / item | Raw machine value for sort/filter (read by `ln-core.readValue`). Server-formatted display stays in the element body. See [Core → data-ln-value](core.md#the-data-ln-value-primitive). |
@@ -79,7 +80,7 @@ this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 ### Emitted Events
 - `ln-table:ready` `{ total }` — Dispatched after initial parse.
 - `ln-table:rendered` `{ table, total, visible }` — Dispatched after rows are drawn.
-- `ln-table:request-data` `{ table, sort, filters, search }` — Requests dataset from coordinator.
+- `ln-table:request-data` `{ table, sort, filters, search }` — Requests dataset from coordinator. Windowed mode (`data-ln-table-window`) adds `{ offset, limit, queryGen }`.
 - `ln-table:row-click` `{ table, id, record }` — Fired when clicking row body.
 - `ln-table:row-action` `{ table, id, action, record }` — Fired when clicking row actions.
 - `ln-table:select` `{ table, selectedIds, count }` — Fired when row selection updates.
@@ -87,7 +88,7 @@ this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 - `ln-table:empty` `{ term, total }` — Fired when empty state is displayed.
 
 ### Listened Events
-- `ln-table:set-data` `{ data, total, filtered, filterOptions }` — Feeds dataset to table.
+- `ln-table:set-data` `{ data, total, filtered, filterOptions }` — Feeds dataset to table. Windowed mode echoes `{ offset, queryGen }` back so `createWindowCache.ingest()` can splice the page and drop stale responses.
 - `ln-table:set-loading` `{ loading }` — Toggles loading state overlay classes.
 
 ---
@@ -153,3 +154,6 @@ When a sync event begins, the coordinator dispatches `ln-table:set-loading` with
 
 ### 3. Sticky Header/Footer Styling Mixins
 To pin headers and footers flush at screen bounds during infinite scroll, styling includes fallback rules targeting direct children (`[data-ln-table] > header` and `[data-ln-table] > footer`). Maintainers can apply standard mixins `@include ln-table-toolbar` and `@include ln-table-footer` inside `scss/components/_ln-table.scss`.
+
+### 4. Windowed (Sliding-Window) Virtualization
+Opt-in via `data-ln-table-window="N"` on a Data-Driven Mode table. The component owns a `ln-core.createWindowCache` instance (`N` sets `windowSize`, default 1000) rather than caching the full dataset. `requestPage` dispatches `ln-table:request-data` with `{ offset, limit, queryGen }`; the coordinator responds with `ln-table:set-data` carrying `{ offset, queryGen }`, which routes straight into `cache.ingest()`. Rows outside the resident window render as blank placeholder `<tr>`s (no shimmer) until their page arrives; `_renderWindowed()` calls `cache.ensure(startRow, endRow)` on every scroll pass to fetch what's missing. Eviction is LRU by touch-recency, not viewport distance. A response whose `queryGen` doesn't match the cache's current generation is dropped — the guard against a stale sort/filter/search response landing after a newer query has already superseded it. D4: `data-ln-table-selectable` tables hide the select-all checkbox in windowed mode — a windowed table cannot select rows it has never fetched; per-row selection still works and survives eviction.

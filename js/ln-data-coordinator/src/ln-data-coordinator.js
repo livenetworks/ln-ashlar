@@ -433,23 +433,35 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 
 			// ─── Connector Response Handlers (direct + queued paths) ──
 			connFetched: function (e) {
+				const meta = e.detail.meta || {};
 				const children = self.findChildren();
-				if (!children.store) return;
 
+				self.refreshMapper();
 				const rawResponse = e.detail.data;
-				let rawRecords = [], deletedIds = [], syncedAt = null;
+				let fetchedRecords = [], deletedIds = [], syncedAt = null;
 
-				if (rawResponse && Array.isArray(rawResponse)) {
-					rawRecords = rawResponse;
+				if (Array.isArray(rawResponse)) {
+					fetchedRecords = rawResponse;
 					syncedAt = Math.floor(Date.now() / 1000);
 				} else if (rawResponse) {
-					rawRecords = Array.isArray(rawResponse.data) ? rawResponse.data : [];
+					fetchedRecords = Array.isArray(rawResponse.data) ? rawResponse.data : [];
 					deletedIds = Array.isArray(rawResponse.deleted) ? rawResponse.deleted : [];
 					syncedAt = rawResponse.synced_at !== undefined ? rawResponse.synced_at : (rawResponse.since !== undefined ? rawResponse.since : null);
 				}
 
-				const normalizedData = rawRecords.map(r => self.mapper.ingress(r));
-				children.store.applySync(normalizedData, deletedIds, syncedAt);
+				const normalizedData = fetchedRecords.map(r => self.mapper.ingress(r));
+
+				// 1. Pass fetched remote data strictly to ln-data-store (Single Source of Truth)
+				if (children.store) {
+					children.store.applySync(normalizedData, deletedIds, syncedAt || Math.floor(Date.now() / 1000), {
+						total: e.detail.total,
+						filtered: e.detail.filtered,
+						offset: e.detail.offset,
+						queryGen: e.detail.queryGen,
+						targetEl: meta.targetEl,
+						kind: meta.kind
+					});
+				}
 			},
 
 			connCreated: function (e) {
@@ -581,7 +593,9 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 			reqOptions:   function (e) { self._serveOptions(e); },
 			reqStat:      function (e) { self._serveStat(e); },
 			refresh:      function ()  { self._refreshAll(); },
-			refreshSynced: function (e) { if (e.detail && e.detail.changed) self._refreshAll(); }
+			refreshSynced: function (e) {
+				if (e.detail && e.detail.changed) self._refreshAll(e.detail.meta);
+			}
 		};
 
 		// Sync request bubbling up from the child store
@@ -633,35 +647,64 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 
 	_component.prototype._ownsStore = function (name) {
 		const children = this.findChildren();
-		return !!(children.store && children.store._name === name && name);
+		if (children.store && children.store._name === name && name) return true;
+		if (this._name === name && name) return true;
+		return false;
 	};
 
 	_component.prototype._serveData = function (e, kind) {
 		const el = e.target;
 		const attrName = kind === 'table' ? 'data-ln-table-store' : 'data-ln-list-store';
-		const storeName = el.getAttribute(attrName);
+		const storeName = el.getAttribute(attrName) || el.getAttribute('data-ln-table-source') || el.getAttribute('data-ln-list-source');
 		if (!storeName) return;
 		if (!this._ownsStore(storeName)) return;
 
 		this._boundQueries.set(el, {
 			sort: e.detail.sort,
 			filters: e.detail.filters,
-			search: e.detail.search
+			search: e.detail.search,
+			offset: e.detail.offset,
+			limit: e.detail.limit,
+			queryGen: e.detail.queryGen
 		});
 
-		const store = this.findChildren().store;
-		if (!store.isLoaded) {
+		const children = this.findChildren();
+		const query = {
+			sort: e.detail.sort,
+			filters: e.detail.filters,
+			search: e.detail.search,
+			offset: e.detail.offset,
+			limit: e.detail.limit,
+			queryGen: e.detail.queryGen
+		};
+
+		const self = this;
+		const isWindowed = e.detail.offset != null;
+
+		// If there is an API connector and this is a windowed remote query (or store is absent/not loaded),
+		// route directly to ln-api-connector to execute network fetch!
+		if (children.connector && (isWindowed || !children.store || !children.store.isLoaded)) {
 			dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
+			dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+				query: query,
+				meta: { targetEl: el, kind: kind }
+			});
 			return;
 		}
 
-		const self = this;
-		const query = { sort: e.detail.sort, filters: e.detail.filters, search: e.detail.search };
-		store.getAll(query).then(function (r) {
-			const detail = { data: r.data, total: r.total, filtered: r.filtered };
-			dispatch(el, 'ln-' + kind + ':set-data', detail);
-			self._boundDelivered.set(el, true);
-		});
+		if (children.store && children.store.isLoaded) {
+			store.getAll(query).then(function (r) {
+				const detail = {
+					data: r.data,
+					total: r.total,
+					filtered: r.filtered,
+					offset: e.detail.offset !== undefined ? e.detail.offset : r.offset,
+					queryGen: e.detail.queryGen !== undefined ? e.detail.queryGen : r.queryGen
+				};
+				dispatch(el, 'ln-' + kind + ':set-data', detail);
+				self._boundDelivered.set(el, true);
+			});
+		}
 	};
 
 	_component.prototype._serveOptions = function (e) {
@@ -687,7 +730,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		});
 	};
 
-	_component.prototype._refreshAll = function () {
+	_component.prototype._refreshAll = function (syncMeta) {
 		const self = this;
 		const allBound = document.querySelectorAll('[data-ln-table-store],[data-ln-list-store],[data-ln-options],[data-ln-stat]');
 		for (let i = 0; i < allBound.length; i++) {
@@ -716,7 +759,14 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				const cached = self._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
 				(function (capturedEl, capturedKind) {
 					store.getAll(cached).then(function (r) {
-						const detail = { data: r.data, total: r.total, filtered: r.filtered };
+						const detail = {
+							data: r.data,
+							total: (syncMeta && syncMeta.total !== undefined) ? syncMeta.total : r.total,
+							filtered: (syncMeta && syncMeta.filtered !== undefined) ? syncMeta.filtered : r.filtered,
+							offset: (syncMeta && syncMeta.offset !== undefined) ? syncMeta.offset : cached.offset,
+							queryGen: (syncMeta && syncMeta.queryGen !== undefined) ? syncMeta.queryGen : cached.queryGen
+						};
+						dispatch(capturedEl, 'ln-' + capturedKind + ':set-loading', { loading: false });
 						dispatch(capturedEl, 'ln-' + capturedKind + ':set-data', detail);
 						self._boundDelivered.set(capturedEl, true);
 					});

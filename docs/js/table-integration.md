@@ -204,3 +204,83 @@ Opted in by specifying the `data-ln-table-source` attribute. Rows are dynamicall
     });
 })();
 ```
+
+---
+
+## 3. Windowed Mode (Server-Side Sliding Window)
+
+Opted in by adding `data-ln-table-window="N"` alongside `data-ln-table-source`. The table owns a bounded `ln-core.createWindowCache` (resident-row cap `N`, default 1000) instead of caching the full dataset client-side — a viewport into datasets too large to hold entirely in memory.
+
+### HTML Blueprint
+```html
+<section data-ln-table="documents" data-ln-table-source="documents" data-ln-table-window="1000" data-ln-table-selectable id="documents-table">
+    <table>
+        <thead>
+            <tr>
+                <th data-ln-table-col-select></th>
+                <th data-ln-table-col="title">
+                    Title
+                    <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
+                    </button>
+                </th>
+                <th data-ln-table-col="department">Department</th>
+            </tr>
+        </thead>
+        <tbody data-ln-table-body></tbody>
+    </table>
+
+    <footer class="ln-table__footer">
+        <span data-ln-table-total></span> items
+    </footer>
+
+    <template data-ln-template="documents-row">
+        <tr data-ln-table-row>
+            <td><input type="checkbox" data-ln-table-row-select></td>
+            <td>{{ title }}</td>
+            <td>{{ department }}</td>
+        </tr>
+    </template>
+</section>
+```
+
+> Select-all is hidden automatically when `data-ln-table-selectable` and `data-ln-table-window` are both present — a windowed table cannot select rows it has never fetched. Per-row selection still works and survives eviction.
+
+### JS Coordinator Example
+```javascript
+(function () {
+    const tableEl = document.getElementById('documents-table');
+    if (!tableEl) return;
+
+    tableEl.addEventListener('ln-table:request-data', function (e) {
+        if (e.detail.table !== 'documents') return;
+
+        const params = new URLSearchParams();
+        if (e.detail.search) params.append('search', e.detail.search);
+        if (e.detail.sort) {
+            params.append('sort_field', e.detail.sort.field);
+            params.append('sort_dir', e.detail.sort.direction);
+        }
+        params.append('offset', e.detail.offset);
+        params.append('limit', e.detail.limit);
+
+        fetch('/api/documents?' + params.toString())
+            .then(res => res.json())
+            .then(payload => {
+                tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
+                    detail: {
+                        data: payload.data,
+                        total: payload.total,
+                        filtered: payload.filtered,
+                        offset: e.detail.offset,
+                        queryGen: e.detail.queryGen
+                    }
+                }));
+            });
+    });
+})();
+```
+
+The `offset`/`limit` pair addresses the page to fetch; `queryGen` is echoed back verbatim so `ln-table` can drop a response superseded by a newer sort/filter/search before it lands.

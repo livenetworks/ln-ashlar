@@ -211,11 +211,11 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Architecture</h3></header>
 						<main>
-							<p>For applications where fast initial paint is critical but huge background datasets (10,000+ rows) are needed for offline usage or responsive scrolling, <code>ln-list</code> provides a high-performance **SSR Hydration &amp; Data Sync** pipeline matching the <code>ln-table</code> synchronization protocol.</p>
+							<p>For datasets too large to cache entirely client-side, <code>ln-list</code> provides a high-performance **SSR Hydration &amp; Windowed Sync** pipeline matching the <code>ln-table</code> synchronization protocol: an instant paint from server-rendered items, followed by a bounded sliding-window cache that fetches pages from the server as the user scrolls.</p>
 
 							<div class="alert" role="alert">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
-								<p><strong>Lifecycle Mechanics.</strong> 1. Instant SSR paint: the list loads a fast pre-rendered subset (e.g. 10 items printed by the server). 2. Local hydration: the JS layer parses those items on load, enabling immediate client-side search. 3. Background sync: the coordinator fetches the full 10,000 records from the PHP API. 4. Smooth virtualization upgrade: when the API completes, the list merges the dataset, upgrades to virtual scroll, and updates page counters.</p>
+								<p><strong>Lifecycle Mechanics.</strong> 1. Instant SSR paint: the list loads a fast pre-rendered subset (e.g. 100 items printed by the server, matching the server-declared <code>data-ln-list-count</code> grand total). 2. Local hydration: the JS layer parses those items on load, enabling immediate client-side search over the hydrated subset. 3. Windowed sync: <code>data-ln-list-window="1000"</code> caps the resident cache at 1,000 items — as the user scrolls, the list requests pages from the PHP backend API and LRU-evicts the least-recently-touched items to stay under the cap; the full 10,000-record dataset never loads client-side. No fetch fires on load: the first 100 SSR items seed the resident window directly; the backend is queried only once scrolling moves past the seeded items, or a sort/search/filter changes the query. 4. Continuous scroll: items outside the resident window render as blank placeholders until their page arrives — there are no pagination controls, scrolling stays continuous over the full server-side dataset.</p>
 							</div>
 
 							<h4>Remote Full-Text Search Integration</h4>
@@ -228,11 +228,6 @@
 						<header><h3>Sandbox Controls</h3></header>
 						<main>
 							<div class="demo-sandbox-controls">
-								<label class="demo-sandbox-label">
-									<input type="checkbox" id="hybrid-latency" checked>
-									Simulate 2000ms network latency on background fetches (so you can test local searching on the initial items)
-								</label>
-								<button type="button" id="trigger-sync-btn" class="btn">Force Background Re-Sync</button>
 								<button type="button" id="btn-clear-selection" class="btn">Clear Selection</button>
 								<button type="button" id="btn-clear-log" class="btn">Clear Log</button>
 							</div>
@@ -241,6 +236,18 @@
 							<pre id="hybrid-log"></pre>
 						</main>
 					</section>
+
+					<!-- Declarative 3-Tier Data Layer -->
+					<div data-ln-data-coordinator="hybrid-docs" id="hybrid-list-coordinator">
+						<div data-ln-data-store="hybrid-docs"
+						     data-ln-data-store-indexes="department,status,priority,updated_at"
+						     data-ln-data-store-search-fields="title,department,owner"
+						     id="hybrid-list-store"></div>
+						<div data-ln-api-connector
+						     data-ln-api-base-url="data"
+						     data-ln-api-path="/api.php"
+						     id="hybrid-list-connector"></div>
+					</div>
 
 					<!-- Active List Component -->
 					<section class="section-card" data-demo-html>
@@ -258,11 +265,16 @@
 							<!-- Scrollable Container with data-ln-list-body -->
 							<ul id="hybrid-list"
 							    data-ln-list="hybrid-docs"
+							    data-ln-list-store="hybrid-docs"
 							    data-ln-list-source="hybrid-docs"
 							    data-ln-list-selectable
+							    data-ln-list-window="1000"
+							    data-ln-list-window-page="200"
+							    data-ln-list-window-threshold="25"
+							    data-ln-list-count="10000"
 							    data-ln-list-body>
 
-								<!-- First 10 SSR Pre-rendered Items -->
+								<!-- First 100 SSR Pre-rendered Items -->
 								<li data-ln-item data-ln-item-id="1">
 									<header class="card-tile-top">
 										<input type="checkbox" data-ln-item-select aria-label="Select item">
@@ -373,11 +385,1001 @@
 										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
 									</footer>
 								</li>
+								<li data-ln-item data-ln-item-id="11">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Sales Agreement #11</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Mila Jovanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="12">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Engineering Strategy #12</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Anna Wilson</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="13">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Quality Procedure #13</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Marko Brown</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="14">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Vendor Analysis #14</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Maria Jovanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="15">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Customer Manual #15</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Elena Davis</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="16">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Product Notice #16</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Brown</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="17">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Security Policy #17</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Goran Martinez</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="18">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Privacy Plan #18</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Lena Risteska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="19">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Compliance Roadmap #19</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Garcia</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="20">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Risk Specification #20</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Maria Williams</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="21">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Audit Assessment #21</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Ana Tomić</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="22">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Operations Guide #22</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Elena Garcia</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="23">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Finance Memo #23</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Marko Garcia</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="24">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">HR Report #24</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Petrović</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="25">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Legal Review #25</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Ana Smith</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="26">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Marketing Charter #26</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sara Jovanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="27">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Sales Agreement #27</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Maria Stojanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="28">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Engineering Strategy #28</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sara Jovanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="29">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Quality Procedure #29</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Anna Williams</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="30">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Vendor Analysis #30</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Mila Jones</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="31">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Customer Manual #31</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Vera Miller</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="32">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Product Notice #32</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Marko Davis</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="33">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Security Policy #33</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Petra Ilieva</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="34">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Privacy Plan #34</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sara Smith</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="35">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Compliance Roadmap #35</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Lena Johnson</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="36">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Risk Specification #36</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Petra Petrović</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="37">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Audit Assessment #37</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Mila Đorđevska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="38">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Operations Guide #38</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Igor Stanković</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="39">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Finance Memo #39</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Alex Vukomanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="40">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">HR Report #40</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Ana Risteska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="41">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Legal Review #41</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sara Petrović</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="42">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Marketing Charter #42</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Stefan Vukomanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="43">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Sales Agreement #43</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Ana Jones</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="44">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Engineering Strategy #44</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Anna Tomić</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="45">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Quality Procedure #45</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Igor Ilieva</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="46">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Vendor Analysis #46</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Petra Risteska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="47">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Customer Manual #47</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Maria Jovanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="48">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Product Notice #48</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Nikola Stojanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="49">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Security Policy #49</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Boris Jovanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="50">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Privacy Plan #50</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sofia Petrović</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="51">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Compliance Roadmap #51</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sara Vukomanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="52">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Risk Specification #52</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Maria Jones</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="53">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Audit Assessment #53</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Igor Vukomanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="54">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Operations Guide #54</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Mila Davis</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="55">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Finance Memo #55</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sara Garcia</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="56">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">HR Report #56</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Marko Brown</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="57">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Legal Review #57</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Alex Davis</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="58">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Marketing Charter #58</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Mitrovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="59">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Sales Agreement #59</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Vera Stojanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="60">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Engineering Strategy #60</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Goran Stojanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="61">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Quality Procedure #61</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sofia Mitrovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="62">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Vendor Analysis #62</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Miller</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="63">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Customer Manual #63</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Nikola Martinez</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="64">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Product Notice #64</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Boris Smith</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="65">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Security Policy #65</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Ana Johnson</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="66">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Privacy Plan #66</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">John Mitrovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="67">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Compliance Roadmap #67</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Ana Mitrovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="68">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Risk Specification #68</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Marko Tomić</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="69">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Audit Assessment #69</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Ilieva</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="70">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Operations Guide #70</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Elena Brown</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="71">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Finance Memo #71</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Marko Jones</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="72">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">HR Report #72</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sara Stojanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="73">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Legal Review #73</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Anna Stojanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="74">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Marketing Charter #74</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Lena Mitrovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="75">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Sales Agreement #75</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Ana Stanković</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="76">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Engineering Strategy #76</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sofia Jones</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="77">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Quality Procedure #77</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Petra Tomić</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="78">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Vendor Analysis #78</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Maria Miller</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="79">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Customer Manual #79</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Mila Tomić</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="80">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Product Notice #80</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Garcia</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="81">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Security Policy #81</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Maria Mitrovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="82">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Privacy Plan #82</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Lena Vukomanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="83">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Compliance Roadmap #83</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Alex Đorđevska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="84">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Marketing" data-ln-list-field="department">Marketing</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Risk Specification #84</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Johnson</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="85">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Operations" data-ln-list-field="department">Operations</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Audit Assessment #85</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Lena Petrović</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="86">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Operations Guide #86</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Petra Davis</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="87">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Finance Memo #87</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Petra Đorđevska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="88">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">HR Report #88</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">John Miller</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="89">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Legal Review #89</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Goran Jovanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="90">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Legal" data-ln-list-field="department">Legal</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Marketing Charter #90</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Vera Stojanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="91">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Sales Agreement #91</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Ana Miller</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="92">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Engineering Strategy #92</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">John Vukomanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="93">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Sales" data-ln-list-field="department">Sales</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Quality Procedure #93</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Anna Williams</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="94">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Vendor Analysis #94</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Marko Martinez</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="95">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Customer Manual #95</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Dejan Jones</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="96">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Product Notice #96</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Anna Martinez</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="97">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Security Policy #97</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">David Ilieva</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="98">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="IT" data-ln-list-field="department">IT</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Privacy Plan #98</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Elena Jones</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="99">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="Finance" data-ln-list-field="department">Finance</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Compliance Roadmap #99</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Alex Risteska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
+								<li data-ln-item data-ln-item-id="100">
+									<header class="card-tile-top">
+										<input type="checkbox" data-ln-item-select aria-label="Select item">
+										<span class="badge" data-dept="HR" data-ln-list-field="department">HR</span>
+									</header>
+									<strong class="card-tile-title" data-ln-list-field="title">Risk Specification #100</strong>
+									<span class="card-tile-author">By <span data-ln-list-field="owner">Sara Jovanovska</span></span>
+									<footer class="card-tile-actions">
+										<button type="button" data-ln-item-action="delete" class="btn">Delete</button>
+									</footer>
+								</li>
 							</ul>
 
 							<!-- Stats Footer -->
 							<div class="demo-controls demo-stats-footer">
-								<span>Total: <strong id="lbl-total">10</strong> items</span>
+								<span>Total: <strong id="lbl-total">10000</strong> items</span>
 								<span id="lbl-filtered-wrap" class="hidden"> · Filtered: <strong id="lbl-filtered">0</strong></span>
 								<span id="lbl-selected-wrap" class="hidden"> · Selected: <strong id="lbl-selected">0</strong></span>
 							</div>
@@ -422,19 +1424,14 @@
 					</section>
 
 <script>
-(function() {
+(function () {
 	const logConsole = document.getElementById('hybrid-log');
 	const listEl = document.getElementById('hybrid-list');
-	const triggerBtn = document.getElementById('trigger-sync-btn');
-	const latencyCheckbox = document.getElementById('hybrid-latency');
 	const totalLbl = document.getElementById('lbl-total');
 	const filteredLbl = document.getElementById('lbl-filtered');
 	const filteredWrap = document.getElementById('lbl-filtered-wrap');
 	const selectedLbl = document.getElementById('lbl-selected');
 	const selectedWrap = document.getElementById('lbl-selected-wrap');
-
-	let isSynced = false;
-	let currentAbortController = null;
 
 	function log(msg, color = 'var(--fg-muted)') {
 		const time = new Date().toLocaleTimeString() + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
@@ -445,97 +1442,13 @@
 		logConsole.scrollTop = logConsole.scrollHeight;
 	}
 
-	function formatSize(bytes) {
-		if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
-		return bytes + ' B';
-	}
-
-	function formatDate(ts) {
-		const d = new Date(ts * 1000);
-		return d.toISOString().split('T')[0];
-	}
-
-	function delay(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
-	}
-
-	// Trigger API fetch
-	async function fetchBackgroundData(searchQuery = '') {
-		if (currentAbortController) {
-			currentAbortController.abort();
-			log("Previous background sync request aborted.", '#ef4444');
-		}
-
-		currentAbortController = new AbortController();
-		const signal = currentAbortController.signal;
-
-		log(`Starting background sync from PHP API... (search: "${searchQuery}")`, '#38bdf8');
-
-		listEl.dispatchEvent(new CustomEvent('ln-list:set-loading', {
-			detail: { loading: true }
-		}));
-
-		if (latencyCheckbox.checked) {
-			log("Simulating 2000ms network latency...", '#a1a1aa');
-			try {
-				await delay(2000);
-				if (signal.aborted) return;
-			} catch (e) {
-				return;
-			}
-		}
-
-		const params = new URLSearchParams();
-		if (searchQuery) {
-			params.append('search', searchQuery);
-		}
-
-		try {
-			const res = await fetch('data/api.php?' + params.toString(), { signal });
-			const payload = await res.json();
-
-			if (payload.error) {
-				throw new Error(payload.error);
-			}
-
-			const data = payload.data || [];
-			log(`Received ${data.length} records from PHP API. Setting data...`, '#34d399');
-
-			listEl.dispatchEvent(new CustomEvent('ln-list:set-data', {
-				detail: {
-					data: data,
-					total: payload.total,
-					filtered: payload.filtered
-				}
-			}));
-
-			isSynced = true;
-			log("Background synchronization complete. Virtual Scroll upgraded.", '#c084fc');
-		} catch (err) {
-			if (err.name === 'AbortError') {
-				return;
-			}
-			log(`Fetch failed: ${err.message}`, 'var(--color-error)');
-			listEl.dispatchEvent(new CustomEvent('ln-list:set-loading', {
-				detail: { loading: false }
-			}));
-		} finally {
-			if (currentAbortController && currentAbortController.signal === signal) {
-				currentAbortController = null;
-			}
-		}
-	}
-
-	// ─── Component Events Integration ──────────────────────────
-
 	document.addEventListener('DOMContentLoaded', function() {
-		log("Page loaded. 10 SSR pre-rendered items visible in the list.", 'var(--color-primary)');
-		log("Unified ln-list parsed SSR items synchronously during initialization.", 'var(--color-primary)');
+		log("Page loaded. 100 SSR pre-rendered items visible in list.", 'var(--color-primary)');
+		log("Declarative 3-Tier architecture active: data-ln-data-coordinator <-> data-ln-api-connector <-> data-ln-list-store.", 'var(--color-primary)');
 	});
 
 	listEl.addEventListener('ln-list:request-data', function (e) {
-		log(`Component emitted 'ln-list:request-data' due to query change.`, '#fbbf24');
-		fetchBackgroundData(e.detail.search);
+		log(`Component emitted 'ln-list:request-data' (offset: ${e.detail.offset || 0}, limit: ${e.detail.limit || 200})`, '#fbbf24');
 	});
 
 	listEl.addEventListener('ln-list:ready', function(e) {
@@ -543,51 +1456,43 @@
 	});
 
 	listEl.addEventListener('ln-list:rendered', function(e) {
-		log(`Component emitted 'ln-list:rendered' (Visible: ${e.detail.visible}, Total: ${e.detail.total}).`, 'var(--color-primary)');
+		log(`Component emitted 'ln-list:rendered' (Visible: ${e.detail.visible}, Total: ${e.detail.total}).`, '#34d399');
 
-		// Update footer counts
-		totalLbl.textContent = e.detail.total;
-		filteredLbl.textContent = e.detail.visible;
-		filteredWrap.classList.toggle('hidden', e.detail.visible === e.detail.total);
+		if (totalLbl) totalLbl.textContent = e.detail.total;
+		if (filteredLbl) filteredLbl.textContent = e.detail.visible;
+		if (filteredWrap) filteredWrap.classList.toggle('hidden', e.detail.visible === e.detail.total);
 	});
 
 	listEl.addEventListener('ln-list:item-click', function(e) {
-		log(`Item clicked: "${e.detail.record.title}" (ID: ${e.detail.id})`, '#38bdf8');
+		log(`Item clicked: "${e.detail.record ? e.detail.record.title : ''}" (ID: ${e.detail.id})`, '#38bdf8');
 	});
 
 	listEl.addEventListener('ln-list:item-action', function(e) {
 		log(`Item action: [${e.detail.action}] clicked for ID: ${e.detail.id}`, '#f43f5e');
-		if (e.detail.action === 'delete') {
-			log(`Deleting item ID ${e.detail.id} optimistically.`, '#ef4444');
-			// In a real coordinator, this would emit delete event to Store
-		}
 	});
 
 	listEl.addEventListener('ln-list:select', function(e) {
 		log(`Selection updated. Count: ${e.detail.count}`, '#fbbf24');
-		selectedLbl.textContent = e.detail.count;
-		selectedWrap.classList.toggle('hidden', e.detail.count === 0);
+		if (selectedLbl) selectedLbl.textContent = e.detail.count;
+		if (selectedWrap) selectedWrap.classList.toggle('hidden', e.detail.count === 0);
 	});
 
-	listEl.addEventListener('ln-list:clear-filters', function(e) {
-		log(`Component emitted 'ln-list:clear-filters' (filters cleared).`, '#fbbf24');
-	});
+	const clearBtn = document.getElementById('btn-clear-selection');
+	if (clearBtn) {
+		clearBtn.addEventListener('click', function() {
+			if (listEl.lnList && typeof listEl.lnList._disableSelection === 'function') {
+				listEl.lnList._disableSelection();
+				listEl.lnList._enableSelection();
+			}
+		});
+	}
 
-	triggerBtn.addEventListener('click', function() {
-		isSynced = false;
-		fetchBackgroundData(listEl.lnList.currentSearch || '');
-	});
-
-	document.getElementById('btn-clear-selection').addEventListener('click', function() {
-		if (listEl.lnList && typeof listEl.lnList._disableSelection === 'function') {
-			listEl.lnList._disableSelection();
-			listEl.lnList._enableSelection();
-		}
-	});
-
-	document.getElementById('btn-clear-log').addEventListener('click', function() {
-		logConsole.textContent = '';
-	});
+	const clearLogBtn = document.getElementById('btn-clear-log');
+	if (clearLogBtn) {
+		clearLogBtn.addEventListener('click', function() {
+			logConsole.textContent = '';
+		});
+	}
 })();
 </script>
 			</div>

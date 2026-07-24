@@ -16,6 +16,9 @@ Virtual scrolling in `ln-list` handles two modes of HTML structural validation a
 ### 2. Composition Over Monolith
 `ln-list` communicates strictly using CustomEvents (`ln-list:request-data` and `ln-list:set-data`). This allows the project-specific Coordinator to link it to `ln-data-store` or a standard AJAX endpoint without changes to the presenter script.
 
+### 3. Windowed Server-Side Virtualization
+Opt-in via `data-ln-list-window="N"` on a Data-Driven Mode list — mirrors `ln-table`'s windowed path bit-for-bit. The component owns a `ln-core.createWindowCache` instance (`N` sets `windowSize`, default 1000) instead of caching the full dataset. `ln-list:request-data` gains `{ offset, limit, queryGen }`; `ln-list:set-data` echoes `{ offset, queryGen }` back into `cache.ingest()`. Select-all is hidden when `data-ln-list-selectable` and windowed mode are both active — a windowed list cannot select items it has never fetched.
+
 ---
 
 ## ⚡ Lifecycle Diagram
@@ -48,3 +51,8 @@ sequenceDiagram
 - Determines the active viewport based on the nearest scrollable parent.
 - Calculates `start` and `end` indices using item height.
 - Mounts top/bottom spacers and clones the template for visible rows using `fillTemplate` and `fill`.
+
+### `_renderWindowed()`
+- Renders the resident window instead of `this._data` — items outside the cache resolve to blank placeholder spacer elements (no shimmer) until their page arrives.
+- Calls `this._cache.ensure(startRow, endRow)` every pass to trigger a debounced fetch for missing rows.
+- Mirrors `_renderVirtual()`'s spacer/viewport math; the only difference is the row source (`this._cache.get(i)` vs `this._data[i]`).

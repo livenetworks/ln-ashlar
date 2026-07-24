@@ -130,6 +130,8 @@ When filters produce zero results:
 - Sorting and filtering work on the **full dataset**, not one page at a time
 - Virtual scroll gives the user the feeling of having all data available while rendering only what's visible
 
+> **Windowed exception.** For datasets too large to cache entirely client-side, `ln-core.createWindowCache` (opt-in via `data-ln-table-window` / `data-ln-list-window`) replaces the full client-side dataset with a bounded resident window that round-trips pages to the server as the user scrolls. The feel is unchanged — continuous scroll, no pagination controls — only the implementation trades a full local cache for a server-backed sliding window.
+
 ### Flow
 
 ```

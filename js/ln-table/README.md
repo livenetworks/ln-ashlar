@@ -79,6 +79,7 @@ A zero-dependency, high-performance table presenter component that supports both
 | `data-ln-table` | Root wrapper | Component identifier. Target must carry a unique `id`. |
 | `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
 | `data-ln-table-selectable` | Root wrapper | Enables checkbox-based row selections. |
+| `data-ln-table-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-row cap (default 1000). Requires Data-Driven Mode. |
 | ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` in both modes. |
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
@@ -98,7 +99,7 @@ A zero-dependency, high-performance table presenter component that supports both
 - **`ln-table:ready`** `{ total }`  
   Fired after the initial DOM rows are parsed.
 - **`ln-table:request-data`** `{ table, sort, filters, search }`  
-  Requests a fresh dataset when sort, filter, or search is changed.
+  Requests a fresh dataset when sort, filter, or search is changed. Windowed mode (`data-ln-table-window`) adds `{ offset, limit, queryGen }`.
 - **`ln-table:rendered`** `{ table, total, visible }`  
   Fired after a dynamic template render finishes drawing.
 - **`ln-table:row-click`** `{ table, id, record }`  
@@ -110,7 +111,7 @@ A zero-dependency, high-performance table presenter component that supports both
 ### Received Events
 
 - **`ln-table:set-data`** `{ data, total, filtered, filterOptions }`  
-  Applies the payload array and triggers rendering.
+  Applies the payload array and triggers rendering. Windowed mode expects `{ offset, queryGen }` echoed back — routed straight into the internal window cache.
 - **`ln-table:set-loading`** `{ loading }`  
   Toggles the visual loading dimmed state overlay.
 
@@ -167,3 +168,31 @@ Options come from the domain (backend enum or lookup), never derived from the da
 **SSR mode:** `data-ln-table-clear` on a button inside the table wrapper. Clears search term and all `[data-ln-filter]` containers targeting this table.
 
 **Data-driven mode:** `data-ln-table-clear-all` on a button. Resets `currentFilters`, clears visual indicators on all filter buttons, and calls `_requestData()`.
+
+---
+
+## Windowed Mode
+
+Opt-in server-side sliding-window virtualization for datasets too large to cache client-side. Add `data-ln-table-window="N"` to a Data-Driven Mode table; the component owns a bounded `ln-core.createWindowCache` instance instead of the full dataset.
+
+### What it does
+
+1. Caches at most `N` rows (default 1000), LRU-evicting the least-recently-touched rows once the cap is exceeded.
+2. Extends `ln-table:request-data` with `{ offset, limit, queryGen }` on every scroll pass that needs new rows.
+3. Reads `{ offset, queryGen }` off `ln-table:set-data` and routes it into the window cache, dropping the response if `queryGen` no longer matches the current query.
+4. Renders blank placeholder rows (no shimmer) for logical rows not yet resident.
+5. Hides the select-all checkbox (D4) — per-row selection still works and survives eviction.
+
+### What it does NOT do
+
+- Does not cache the full dataset client-side — that's the non-windowed Data-Driven path.
+- Does not paginate — scrolling stays continuous; `offset`/`limit` address server-side pages, not user-facing "Page 2" navigation.
+- Does not retry a dropped stale response — the next `ensure()` pass re-requests it under the current `queryGen`.
+
+### Markup contract
+
+```html
+<section data-ln-table="documents" data-ln-table-source="documents" data-ln-table-window="1000" id="documents-table">
+    ...
+</section>
+```

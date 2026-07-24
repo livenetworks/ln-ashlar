@@ -984,7 +984,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 
 | Component | Pattern | Data Attr | Description |
 |-----------|---------|-----------|------|
-| ln-core | Shared module | — | cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, fill, fillTemplate, renderList, buildDict, guardBody, findElements, reactiveState, deepReactive, createBatcher |
+| ln-core | Shared module | — | cloneTemplate, cloneTemplateScoped, dispatch, dispatchCancelable, fill, fillTemplate, renderList, buildDict, guardBody, findElements, reactiveState, deepReactive, createBatcher, createWindowCache |
 | ln-toggle | Instance | `data-ln-toggle` | Generic toggle (sidebar, collapse) |
 | ln-accordion | Instance | `data-ln-accordion` | Wrapper — only one toggle open at a time |
 | ln-tabs | Instance | `data-ln-tabs` | Tab navigation — URL hash (anchor triggers) or localStorage persist (button triggers) |
@@ -997,7 +997,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-circular-progress | Instance | `data-ln-circular-progress` | Circular (ring) progress indicator |
 | ln-search | Instance | `data-ln-search` | Generic search (textContent filter) |
 | ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
-| ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll) |
+| ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll; opt-in server-side windowed virtualization via `data-ln-table-window`) |
 | ln-table-sort | Instance | `data-ln-table-sort` | Sort header handler (companion to ln-table) |
 | ln-sortable | Instance | `data-ln-table-sortable` | Drag & drop reorder |
 | ln-dropdown | Instance | `data-ln-dropdown` | Positioned dropdown menu (wraps ln-toggle) |

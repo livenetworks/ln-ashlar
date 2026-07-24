@@ -172,11 +172,32 @@
 											</th>
 										</tr>
 									</thead>
-									<tbody id="demo-tbody"></tbody>
+									<tbody id="demo-tbody">
+										<tr><td>1</td><td>Laptop Pro 15</td><td>Electronics</td><td data-ln-value="1499" class="numeric">1.499</td><td data-ln-value="120" class="numeric">120</td><td>In Stock</td></tr>
+										<tr><td>2</td><td>Wireless Mouse M1</td><td>Peripherals</td><td data-ln-value="29" class="numeric">29</td><td data-ln-value="450" class="numeric">450</td><td>In Stock</td></tr>
+										<tr><td>3</td><td>USB-C Hub Multiport</td><td>Peripherals</td><td data-ln-value="59" class="numeric">59</td><td data-ln-value="85" class="numeric">85</td><td>In Stock</td></tr>
+										<tr><td>4</td><td>Mechanical Keyboard RGB</td><td>Peripherals</td><td data-ln-value="129" class="numeric">129</td><td data-ln-value="40" class="numeric">40</td><td>Low Stock</td></tr>
+										<tr><td>5</td><td>Monitor 27" 4K UHD</td><td>Electronics</td><td data-ln-value="499" class="numeric">499</td><td data-ln-value="15" class="numeric">15</td><td>Low Stock</td></tr>
+										<tr><td>6</td><td>Webcam HD 1080p</td><td>Peripherals</td><td data-ln-value="79" class="numeric">79</td><td data-ln-value="0" class="numeric">0</td><td>Out of Stock</td></tr>
+										<tr><td>7</td><td>Headset Pro Wireless</td><td>Accessories</td><td data-ln-value="199" class="numeric">199</td><td data-ln-value="210" class="numeric">210</td><td>In Stock</td></tr>
+										<tr><td>8</td><td>Docking Station Dual 4K</td><td>Accessories</td><td data-ln-value="249" class="numeric">249</td><td data-ln-value="60" class="numeric">60</td><td>In Stock</td></tr>
+										<tr><td>9</td><td>SSD 1TB NVMe PCIe4</td><td>Storage</td><td data-ln-value="119" class="numeric">119</td><td data-ln-value="310" class="numeric">310</td><td>In Stock</td></tr>
+										<tr><td>10</td><td>RAM 32GB DDR5 Kit</td><td>Components</td><td data-ln-value="159" class="numeric">159</td><td data-ln-value="95" class="numeric">95</td><td>In Stock</td></tr>
+										<tr><td>11</td><td>GPU Card RTX 4070</td><td>Components</td><td data-ln-value="699" class="numeric">699</td><td data-ln-value="8" class="numeric">8</td><td>Low Stock</td></tr>
+										<tr><td>12</td><td>Network Switch 24-Port</td><td>Networking</td><td data-ln-value="299" class="numeric">299</td><td data-ln-value="22" class="numeric">22</td><td>Low Stock</td></tr>
+										<tr><td>13</td><td>Power Supply 850W Gold</td><td>Components</td><td data-ln-value="139" class="numeric">139</td><td data-ln-value="140" class="numeric">140</td><td>In Stock</td></tr>
+										<tr><td>14</td><td>Cable Kit Modular sleeve</td><td>Accessories</td><td data-ln-value="39" class="numeric">39</td><td data-ln-value="500" class="numeric">500</td><td>In Stock</td></tr>
+										<tr><td>15</td><td>Mouse Pad XL Desk Mat</td><td>Accessories</td><td data-ln-value="19" class="numeric">19</td><td data-ln-value="0" class="numeric">0</td><td>Out of Stock</td></tr>
+										<tr><td>16</td><td>Screen Protector 27"</td><td>Accessories</td><td data-ln-value="25" class="numeric">25</td><td data-ln-value="180" class="numeric">180</td><td>In Stock</td></tr>
+										<tr><td>17</td><td>Router Wi-Fi 6E Pro</td><td>Networking</td><td data-ln-value="229" class="numeric">229</td><td data-ln-value="45" class="numeric">45</td><td>Low Stock</td></tr>
+										<tr><td>18</td><td>External HDD 4TB USB3</td><td>Storage</td><td data-ln-value="99" class="numeric">99</td><td data-ln-value="120" class="numeric">120</td><td>In Stock</td></tr>
+										<tr><td>19</td><td>Microphone USB Studio</td><td>Accessories</td><td data-ln-value="149" class="numeric">149</td><td data-ln-value="75" class="numeric">75</td><td>In Stock</td></tr>
+										<tr><td>20</td><td>Ergonomic Office Chair</td><td>Accessories</td><td data-ln-value="349" class="numeric">349</td><td data-ln-value="12" class="numeric">12</td><td>Low Stock</td></tr>
+									</tbody>
 								</table>
 
 								<footer class="ln-table__footer">
-									<span>Total: <strong id="demo-total"></strong></span>
+									<span>Total Products: <strong>20</strong></span>
 								</footer>
 							</div>
 						</main>
@@ -204,17 +225,6 @@
 								</tbody>
 							</table>
 							</div>
-							<pre><code>var table = document.getElementById('demo-table');
-
-table.addEventListener('ln-table:ready', function (e) {
-    countEl.textContent = e.detail.total.toLocaleString() + ' products';
-});
-
-table.addEventListener('ln-table:filter', function (e) {
-    countEl.textContent = e.detail.matched < e.detail.total
-        ? e.detail.matched.toLocaleString() + ' / ' + e.detail.total.toLocaleString()
-        : e.detail.total.toLocaleString() + ' products';
-});</code></pre>
 						</main>
 					</section>
 
@@ -247,12 +257,8 @@ table.addEventListener('ln-table:filter', function (e) {
 						<header><h3>Dynamic Rows (AJAX)</h3></header>
 						<main>
 							<p>If <code>&lt;tbody&gt;</code> is empty at init, a MutationObserver waits for rows to appear and parses them automatically.</p>
-							<pre><code>// Set innerHTML directly — ln-table detects it
-document.querySelector('#products tbody').innerHTML = generatedHtml;</code></pre>
 						</main>
 					</section>
-
-
 
 					<!-- API -->
 					<section class="section-card">
@@ -266,78 +272,3 @@ var el = document.querySelector('[data-ln-table]');
 el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code></pre>
 						</main>
 					</section>
-
-<script>
-(function () {
-	var TOTAL = 500;
-	var tableEl = document.getElementById('demo-table');
-	var tbody = document.getElementById('demo-tbody');
-	var countEl = document.getElementById('demo-count');
-	var totalEl = document.getElementById('demo-total');
-	if (!tableEl || !tbody) return;
-
-	// Wire up events
-	tableEl.addEventListener('ln-table:ready', function (e) {
-		var n = e.detail.total.toLocaleString();
-		if (countEl) countEl.textContent = n + ' products';
-		if (totalEl) totalEl.textContent = n;
-	});
-
-	tableEl.addEventListener('ln-table:filter', function (e) {
-		var matched = e.detail.matched;
-		var total = e.detail.total;
-		if (countEl) {
-			countEl.textContent = matched < total
-				? matched.toLocaleString() + ' / ' + total.toLocaleString()
-				: total.toLocaleString() + ' products';
-		}
-		if (totalEl) totalEl.textContent = matched.toLocaleString();
-	});
-
-	tableEl.addEventListener('ln-table:sorted', function (e) {
-		if (totalEl) totalEl.textContent = e.detail.matched.toLocaleString();
-	});
-
-	// Data
-	var products = [
-		'Laptop Pro', 'Wireless Mouse', 'USB-C Hub', 'Mechanical Keyboard',
-		'Monitor 27"', 'Webcam HD', 'Headset Pro', 'Docking Station',
-		'SSD 1TB', 'RAM 32GB', 'GPU Card', 'Network Switch',
-		'Power Supply', 'Cable Kit', 'Mouse Pad', 'Screen Protector'
-	];
-	var categories = ['Electronics', 'Peripherals', 'Storage', 'Networking', 'Accessories', 'Components'];
-
-	function formatPrice(n) {
-		return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-	}
-
-	function statusFor(stock) {
-		if (stock === 0) return 'Out of Stock';
-		if (stock < 50) return 'Low Stock';
-		return 'In Stock';
-	}
-
-	// Generate rows
-	var html = [];
-	for (var i = 0; i < TOTAL; i++) {
-		var name = products[i % products.length];
-		var cat = categories[i % categories.length];
-		var price = 50 + Math.floor(Math.random() * 2000);
-		var stock = Math.floor(Math.random() * 500);
-		var status = statusFor(stock);
-
-		html.push(
-			'<tr>' +
-			'<td>' + (i + 1) + '</td>' +
-			'<td>' + name + '</td>' +
-			'<td>' + cat + '</td>' +
-			'<td data-ln-value="' + price + '" class="numeric">' + formatPrice(price) + '</td>' +
-			'<td data-ln-value="' + stock + '" class="numeric">' + stock + '</td>' +
-			'<td>' + status + '</td>' +
-			'</tr>'
-		);
-	}
-
-	tbody.innerHTML = html.join('');
-})();
-</script>

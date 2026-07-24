@@ -160,7 +160,30 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere
 
 ---
 
-## 6. Flow Diagram & Lifecycle
+## 6. Дијаграм на Текот и Животен Циклус
+
+### A. View Query & Remote Sync Cycle (Read Flow)
+
+```mermaid
+sequenceDiagram
+    participant Table as ln-table
+    participant Store as ln-data-store
+    participant Coord as ln-data-coordinator
+    participant Conn as ln-api-connector
+    participant API as Backend PHP API
+
+    Note over Table, API: Single Source of Truth: Table binds strictly to ln-data-store
+    Table->>Store: Query request (data-ln-table-store="name")
+    Store->>Coord: Event: ln-data-store:request-remote-sync
+    Coord->>Conn: Event: ln-api-connector:request-query
+    Conn->>API: window.fetch(url) (Network Tab)
+    API-->>Conn: HTTP 200 OK (JSON Data)
+    Conn-->>Coord: Event: ln-api-connector:fetched
+    Coord->>Store: store.applySync(normalizedData) (Single Source of Truth)
+    Store-->>Table: Event: ln-table:set-data (Delivered directly from Store)
+```
+
+### B. Form Write Intake & Parallel Fan-Out Cycle (Write Flow)
 
 ```mermaid
 sequenceDiagram

@@ -1,37 +1,12 @@
-<!-- ln-page: title="SSR Table & Data Sync — ln-ashlar" h1="SSR Table & Data Sync" -->
-
-<style>
-	#hybrid-log {
-		background: var(--bg-sunken);
-		padding: var(--size-md);
-		border-radius: var(--radius-md);
-		font-family: var(--font-mono);
-		font-size: 0.85rem;
-		height: 160px;
-		overflow-y: auto;
-		border: 1px solid var(--border-muted);
-		line-height: 1.6;
-	}
-</style>
-
-<section class="section-card">
-	<header><h3>Overview & Architecture</h3></header>
-	<main>
-		<p>For applications where fast initial paint is critical but huge background datasets (10,000+ rows) are needed for offline usage or responsive scrolling, <code>ln-table</code> provides a high-performance **SSR Hydration & Data Sync** pipeline.</p>
-
-		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
-			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
-				Lifecycle Mechanics
-			</h4>
-			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
-				1. **Instant SSR Paint**: The table loads with a fast pre-rendered subset of rows (e.g. 10 rows printed inside <code>&lt;tbody&gt;</code> by the server).  
-				2. **Local Hydration**: The JS layer instantly parses these pre-rendered rows on load, enabling immediate client-side sort and search.  
-				3. **Background Sync**: Simultaneously, the coordinator fetches the complete 10,000 records from the PHP backend API.  
-				4. **Smooth Virtualization Upgrade**: When the API completes, the table merges the dataset, upgrades to Virtual Scroll, and updates page counters.
+<!-- ln-page: title="SSR Table & Data Sync — ln-ashlar" h1="SSR Table & Data Sync" --><style>	#hybrid-log {		background: var(--bg-sunken);		padding: var(--size-md);		border-radius: var(--radius-md);		font-family: var(--font-mono);		font-size: 0.85rem;		height: 160px;		overflow-y: auto;		border: 1px solid var(--border-muted);		line-height: 1.6;	}</style><section class="section-card">	<header><h3>Overview & Architecture</h3></header>	<main>		<p>For datasets too large to cache entirely client-side, <code>ln-table</code> provides a high-performance **SSR Hydration & Windowed Sync** pipeline: an instant paint from server-rendered rows, followed by a bounded sliding-window cache that fetches pages from the server as the user scrolls.</p>		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>				Lifecycle Mechanics			</h4>			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">				1. **Instant SSR Paint**: The table loads with a fast pre-rendered subset of rows (e.g. 100 rows printed inside <code>&lt;tbody&gt;</code> by the server, matching the server-declared <code>data-ln-table-count</code> grand total).  				2. **Local Hydration**: The JS layer instantly parses these pre-rendered rows on load, enabling immediate client-side sort and search over the hydrated subset.  				3. **Windowed Sync Configuration**:
+				   - <code>data-ln-table-window="1000"</code>: Caps resident cache memory at 1,000 rows.
+				   - <code>data-ln-table-window-page="200"</code>: Configures page/chunk fetch size (`limit=200`).
+				   - <code>data-ln-table-window-threshold="25"</code>: Configures prefetch trigger margin (`25` rows before reaching unloaded page boundary).
+				   - <code>data-ln-table-count="10000"</code>: Declares the server grand total.
+				   As the user scrolls, the table requests page-aligned chunks from the PHP backend API (e.g. `offset=200&limit=200`) and evicts LRU rows to stay under the cap. No initial fetch on load: the first 100 SSR rows seed the resident window directly.
+				4. **Continuous Scroll**: Rows outside the resident window render as blank placeholders until their page arrives; there are no pagination controls — scrolling stays continuous over the full server-side dataset.
 			</p>
 		</div>
-
 		<h4>Remote Full-Text Search Integration</h4>
 		<p>When searching, the table first filters local cached items for instant visual response, and then dispatches the search term to the PHP backend. The PHP API runs a full-text search across <code>title</code>, <code>department</code>, <code>owner</code>, and <code>tags</code> properties, returning matches from the entire 10k database.</p>
 	</main>
@@ -39,84 +14,45 @@
 
 <!-- Live Control Panel -->
 <section class="section-card">
-	<header><h3>Sandbox Controls</h3></header>
+	<header><h3>Integration Log Terminal</h3></header>
 	<main>
-		<div style="display: flex; gap: var(--size-md); flex-wrap: wrap; margin-bottom: var(--size-md);">
-			<label style="display: flex; align-items: center; gap: var(--size-xs);">
-				<input type="checkbox" id="hybrid-latency" checked> 
-				Simulate 2000ms network latency on background fetches (so you can test local sorting/searching on the initial rows)
-			</label>
-			<button type="button" id="trigger-sync-btn" class="btn">Force Background Re-Sync</button>
-		</div>
-		
-		<h4>Integration Log Terminal</h4>
 		<pre id="hybrid-log"></pre>
 	</main>
 </section>
+
+<!-- Declarative 3-Tier Data Layer -->
+<div data-ln-data-coordinator="hybrid-docs" id="hybrid-coordinator">
+	<div data-ln-data-store="hybrid-docs"
+	     data-ln-data-store-indexes="department,status,priority,updated_at"
+	     data-ln-data-store-search-fields="title,department,owner"
+	     id="hybrid-store"></div>
+	<div data-ln-api-connector
+	     data-ln-api-base-url="data"
+	     data-ln-api-path="/api.php"
+	     data-ln-api-param-offset="offset"
+	     data-ln-api-param-limit="limit"
+	     data-ln-api-param-search="search"
+	     data-ln-api-param-sort-field="sort_field"
+	     data-ln-api-param-sort-dir="sort_dir"
+	     id="hybrid-connector"></div>
+</div>
 
 <!-- Active Table Component -->
 <section class="section-card" data-demo-html>
 	<header><h3>Interactive Table Demo</h3></header>
 	<main>
 		<section data-ln-table="hybrid-docs"
+		         data-ln-table-store="hybrid-docs"
 		         data-ln-table-source="hybrid-docs"
 		         data-ln-table-selectable
 		         data-ln-table-window="1000"
+		         data-ln-table-window-page="200"
+		         data-ln-table-window-threshold="25"
+		         data-ln-table-count="10000"
 		         id="hybrid-table"
 		         class="data-table-demo">
-
-			<table>
-				<thead>
-					<tr>
-						<th colspan="9">
-							<div class="ln-table__toolbar">
-								<div>
-									<h3>Documents Manager</h3>
-								</div>
-								<label class="search">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-									<input type="search" placeholder="Search cache or server..." data-ln-search="hybrid-table">
-									<button type="button" data-ln-search-clear aria-label="Clear search">
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-									</button>
-								</label>
-							</div>
-						</th>
-					</tr>
-					<tr>
-						<th data-ln-table-col-select></th>
-						<th data-ln-table-col="title">
-							Title
-							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
-						</th>
-						<th data-ln-table-col="department" data-ln-table-filter-col="department">
-							Department
-							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
-							<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
-						</th>
-						<th data-ln-table-col="status" data-ln-table-filter-col="status">
-							Status
-							<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>
-						</th>
-						<th data-ln-table-col="priority">
-							Priority
-							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
-						</th>
-						<th data-ln-table-col="owner">
-							Owner
-							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>
-						</th>
-						<th data-ln-table-col="file_size">
-							Size
-						</th>
-						<th data-ln-table-col="updated_at">
-							Updated
-						</th>
-					</tr>
-				</thead>
-				
-				<!-- SSR Pre-rendered Rows (First 10 records printed by server) -->
-				<tbody data-ln-table-body>
+			<table>				<thead>					<tr>						<th colspan="9">							<div class="ln-table__toolbar">								<div>									<h3>Documents Manager</h3>								</div>								<label class="search">									<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>									<input type="search" placeholder="Search cache or server..." data-ln-search="hybrid-table">									<button type="button" data-ln-search-clear aria-label="Clear search">										<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>									</button>								</label>							</div>						</th>					</tr>					<tr>						<th data-ln-table-col-select></th>						<th data-ln-table-col="title">							Title							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>						</th>						<th data-ln-table-col="department" data-ln-table-filter-col="department">							Department							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>							<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-dept" aria-label="Filter department"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>						</th>						<th data-ln-table-col="status" data-ln-table-filter-col="status">							Status							<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-status" aria-label="Filter status"><svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg></button>						</th>						<th data-ln-table-col="priority">							Priority							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>						</th>						<th data-ln-table-col="owner">							Owner							<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button>						</th>						<th data-ln-table-col="file_size">							Size						</th>						<th data-ln-table-col="updated_at">							Updated						</th>					</tr>				</thead>								<!-- SSR Pre-rendered Rows (First 100 records printed by server, matching data-ln-table-count) -->
+			<tbody data-ln-table-body>
 					<tr data-ln-table-row data-ln-table-row-id="1">
 						<td><input type="checkbox" data-ln-table-row-select></td>
 						<td>Security Policy #1</td>
@@ -125,7 +61,7 @@
 						<td>Low</td>
 						<td>Sofia Risteska</td>
 						<td>10.9 KB</td>
-						<td>2026-04-12</td>
+						<td>2026-04-16</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="2">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -135,7 +71,7 @@
 						<td>Low</td>
 						<td>Igor Jones</td>
 						<td>39.9 KB</td>
-						<td>2025-04-24</td>
+						<td>2025-04-11</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="3">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -145,7 +81,7 @@
 						<td>High</td>
 						<td>Sofia Vukomanovska</td>
 						<td>33.6 KB</td>
-						<td>2026-03-28</td>
+						<td>2026-04-01</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="4">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -155,7 +91,7 @@
 						<td>Medium</td>
 						<td>Igor Miller</td>
 						<td>1.1 KB</td>
-						<td>2026-03-21</td>
+						<td>2026-03-25</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="5">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -165,7 +101,7 @@
 						<td>Low</td>
 						<td>Nikola Jovanovska</td>
 						<td>41.5 KB</td>
-						<td>2026-05-04</td>
+						<td>2026-05-08</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="6">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -175,7 +111,7 @@
 						<td>Low</td>
 						<td>Petra Smith</td>
 						<td>15.1 KB</td>
-						<td>2026-04-18</td>
+						<td>2026-04-22</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="7">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -185,7 +121,7 @@
 						<td>Low</td>
 						<td>Marko Tomić</td>
 						<td>8.7 KB</td>
-						<td>2026-04-08</td>
+						<td>2026-04-12</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="8">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -195,7 +131,7 @@
 						<td>Medium</td>
 						<td>Lena Wilson</td>
 						<td>39.3 KB</td>
-						<td>2025-10-04</td>
+						<td>2025-09-20</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="9">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -205,7 +141,7 @@
 						<td>High</td>
 						<td>Petra Ilieva</td>
 						<td>25.3 KB</td>
-						<td>2025-05-16</td>
+						<td>2025-05-03</td>
 					</tr>
 					<tr data-ln-table-row data-ln-table-row-id="10">
 						<td><input type="checkbox" data-ln-table-row-select></td>
@@ -215,75 +151,909 @@
 						<td>High</td>
 						<td>Elena Vukomanovska</td>
 						<td>25.4 KB</td>
-						<td>2026-04-13</td>
+						<td>2026-04-17</td>
 					</tr>
-				</tbody>
-			</table>
-
-			<footer class="ln-table__footer">
-				<p><span class="hidden"><span data-ln-table-filtered></span> / </span><span data-ln-table-total>10</span> items<span class="hidden"> · <span data-ln-table-selected></span> selected</span></p>
-			</footer>
-
-			<!-- Dynamic Row Template for background load -->
-			<template data-ln-template="hybrid-docs-row">
-				<tr data-ln-table-row>
-					<td><input type="checkbox" data-ln-table-row-select></td>
-					<td>{{ title }}</td>
-					<td>{{ department }}</td>
-					<td>{{ status }}</td>
-					<td>{{ priority }}</td>
-					<td>{{ owner }}</td>
-					<td>{{ file_size_display }}</td>
-					<td>{{ updated_display }}</td>
-				</tr>
-			</template>
-
-			<!-- Empty State templates -->
-			<template data-ln-empty>
-				<section data-ln-empty-when="initial" data-ln-empty-state="no-data">
-					<h3>No documents found</h3>
-				</section>
-				<section data-ln-empty-when="search" data-ln-empty-state="no-results">
-					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<h3>No results found</h3>
-					<p>Try refining your search terms.</p>
-					<button type="button" data-ln-table-clear-all class="btn">Clear Filters</button>
-				</section>
-			</template>
-
-		</section>
-	</main>
-</section>
-
-<!-- Department filter popover -->
-<div data-ln-popover id="filter-hybrid-dept">
-	<label class="search">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-		<input type="search" placeholder="Search..." data-ln-search="filter-hybrid-dept-list" data-ln-search-items="label">
-		<button type="button" data-ln-search-clear aria-label="Clear search">
-			<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-		</button>
-	</label>
-	<ul id="filter-hybrid-dept-list" data-ln-filter="hybrid-table">
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="HR"> HR</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="IT"> IT</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal"> Legal</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Marketing"> Marketing</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Operations"> Operations</label></li>
-	</ul>
-</div>
-
-<!-- Status filter popover -->
-<div data-ln-popover id="filter-hybrid-status">
-	<ul id="filter-hybrid-status-list" data-ln-filter="hybrid-table">
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Approved"> Approved</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>
-		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Archived"> Archived</label></li>
+					<tr data-ln-table-row data-ln-table-row-id="11">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Sales Agreement #11</td>
+						<td>Finance</td>
+						<td>Rejected</td>
+						<td>Critical</td>
+						<td>Mila Jovanovska</td>
+						<td>20.7 KB</td>
+						<td>2026-04-14</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="12">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Engineering Strategy #12</td>
+						<td>Sales</td>
+						<td>Archived</td>
+						<td>Critical</td>
+						<td>Anna Wilson</td>
+						<td>8.8 KB</td>
+						<td>2026-04-15</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="13">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Quality Procedure #13</td>
+						<td>Finance</td>
+						<td>Draft</td>
+						<td>Critical</td>
+						<td>Marko Brown</td>
+						<td>39.9 KB</td>
+						<td>2025-12-19</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="14">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Vendor Analysis #14</td>
+						<td>Finance</td>
+						<td>Pending</td>
+						<td>Low</td>
+						<td>Maria Jovanovska</td>
+						<td>6.0 KB</td>
+						<td>2025-07-25</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="15">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Customer Manual #15</td>
+						<td>HR</td>
+						<td>Archived</td>
+						<td>Medium</td>
+						<td>Elena Davis</td>
+						<td>43.9 KB</td>
+						<td>2025-11-29</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="16">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Product Notice #16</td>
+						<td>IT</td>
+						<td>Draft</td>
+						<td>Critical</td>
+						<td>David Brown</td>
+						<td>16.3 KB</td>
+						<td>2025-09-30</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="17">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Security Policy #17</td>
+						<td>Marketing</td>
+						<td>Archived</td>
+						<td>Medium</td>
+						<td>Goran Martinez</td>
+						<td>10.5 KB</td>
+						<td>2026-01-20</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="18">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Privacy Plan #18</td>
+						<td>Legal</td>
+						<td>Pending</td>
+						<td>Low</td>
+						<td>Lena Risteska</td>
+						<td>3.8 KB</td>
+						<td>2026-02-20</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="19">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Compliance Roadmap #19</td>
+						<td>IT</td>
+						<td>Pending</td>
+						<td>Critical</td>
+						<td>David Garcia</td>
+						<td>7.5 KB</td>
+						<td>2025-08-07</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="20">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Risk Specification #20</td>
+						<td>IT</td>
+						<td>Draft</td>
+						<td>Medium</td>
+						<td>Maria Williams</td>
+						<td>11.5 KB</td>
+						<td>2026-03-13</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="21">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Audit Assessment #21</td>
+						<td>Sales</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Ana Tomić</td>
+						<td>26.4 KB</td>
+						<td>2026-02-18</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="22">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Operations Guide #22</td>
+						<td>Operations</td>
+						<td>Pending</td>
+						<td>Medium</td>
+						<td>Elena Garcia</td>
+						<td>16.4 KB</td>
+						<td>2025-10-12</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="23">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Finance Memo #23</td>
+						<td>Sales</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Marko Garcia</td>
+						<td>42.3 KB</td>
+						<td>2025-02-28</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="24">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>HR Report #24</td>
+						<td>HR</td>
+						<td>Approved</td>
+						<td>Low</td>
+						<td>David Petrović</td>
+						<td>39.9 KB</td>
+						<td>2025-11-16</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="25">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Legal Review #25</td>
+						<td>Operations</td>
+						<td>Pending</td>
+						<td>Medium</td>
+						<td>Ana Smith</td>
+						<td>8.6 KB</td>
+						<td>2026-04-01</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="26">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Marketing Charter #26</td>
+						<td>Marketing</td>
+						<td>Archived</td>
+						<td>Critical</td>
+						<td>Sara Jovanovska</td>
+						<td>9.0 KB</td>
+						<td>2026-04-19</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="27">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Sales Agreement #27</td>
+						<td>HR</td>
+						<td>Draft</td>
+						<td>High</td>
+						<td>Maria Stojanovska</td>
+						<td>20.0 KB</td>
+						<td>2026-03-02</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="28">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Engineering Strategy #28</td>
+						<td>Marketing</td>
+						<td>Approved</td>
+						<td>Low</td>
+						<td>Sara Jovanovska</td>
+						<td>263 B</td>
+						<td>2025-09-29</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="29">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Quality Procedure #29</td>
+						<td>Finance</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Anna Williams</td>
+						<td>47.1 KB</td>
+						<td>2026-05-11</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="30">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Vendor Analysis #30</td>
+						<td>Legal</td>
+						<td>Pending</td>
+						<td>Critical</td>
+						<td>Mila Jones</td>
+						<td>7.8 KB</td>
+						<td>2026-03-11</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="31">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Customer Manual #31</td>
+						<td>IT</td>
+						<td>Rejected</td>
+						<td>High</td>
+						<td>Vera Miller</td>
+						<td>28.8 KB</td>
+						<td>2025-11-05</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="32">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Product Notice #32</td>
+						<td>Sales</td>
+						<td>Approved</td>
+						<td>Medium</td>
+						<td>Marko Davis</td>
+						<td>2.1 KB</td>
+						<td>2025-04-04</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="33">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Security Policy #33</td>
+						<td>Finance</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Petra Ilieva</td>
+						<td>37.4 KB</td>
+						<td>2025-08-20</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="34">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Privacy Plan #34</td>
+						<td>IT</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Sara Smith</td>
+						<td>45.3 KB</td>
+						<td>2026-03-22</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="35">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Compliance Roadmap #35</td>
+						<td>IT</td>
+						<td>Pending</td>
+						<td>Low</td>
+						<td>Lena Johnson</td>
+						<td>34.6 KB</td>
+						<td>2025-11-24</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="36">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Risk Specification #36</td>
+						<td>Marketing</td>
+						<td>Archived</td>
+						<td>Medium</td>
+						<td>Petra Petrović</td>
+						<td>12.3 KB</td>
+						<td>2026-04-21</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="37">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Audit Assessment #37</td>
+						<td>Marketing</td>
+						<td>Pending</td>
+						<td>Critical</td>
+						<td>Mila Đorđevska</td>
+						<td>13.3 KB</td>
+						<td>2026-04-30</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="38">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Operations Guide #38</td>
+						<td>Sales</td>
+						<td>Archived</td>
+						<td>Critical</td>
+						<td>Igor Stanković</td>
+						<td>5.1 KB</td>
+						<td>2025-10-16</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="39">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Finance Memo #39</td>
+						<td>IT</td>
+						<td>Archived</td>
+						<td>Medium</td>
+						<td>Alex Vukomanovska</td>
+						<td>12.7 KB</td>
+						<td>2025-11-21</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="40">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>HR Report #40</td>
+						<td>HR</td>
+						<td>Pending</td>
+						<td>High</td>
+						<td>Ana Risteska</td>
+						<td>13.5 KB</td>
+						<td>2025-05-24</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="41">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Legal Review #41</td>
+						<td>HR</td>
+						<td>Archived</td>
+						<td>Critical</td>
+						<td>Sara Petrović</td>
+						<td>36.7 KB</td>
+						<td>2026-04-20</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="42">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Marketing Charter #42</td>
+						<td>Marketing</td>
+						<td>Draft</td>
+						<td>High</td>
+						<td>Stefan Vukomanovska</td>
+						<td>46.6 KB</td>
+						<td>2026-03-17</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="43">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Sales Agreement #43</td>
+						<td>Legal</td>
+						<td>Draft</td>
+						<td>Medium</td>
+						<td>Ana Jones</td>
+						<td>42.4 KB</td>
+						<td>2026-04-04</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="44">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Engineering Strategy #44</td>
+						<td>Legal</td>
+						<td>Archived</td>
+						<td>Critical</td>
+						<td>Anna Tomić</td>
+						<td>26.2 KB</td>
+						<td>2025-08-26</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="45">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Quality Procedure #45</td>
+						<td>IT</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Igor Ilieva</td>
+						<td>40.6 KB</td>
+						<td>2025-04-06</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="46">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Vendor Analysis #46</td>
+						<td>Marketing</td>
+						<td>Pending</td>
+						<td>High</td>
+						<td>Petra Risteska</td>
+						<td>42.2 KB</td>
+						<td>2025-08-10</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="47">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Customer Manual #47</td>
+						<td>Marketing</td>
+						<td>Archived</td>
+						<td>Low</td>
+						<td>Maria Jovanovska</td>
+						<td>12.6 KB</td>
+						<td>2026-03-27</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="48">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Product Notice #48</td>
+						<td>Operations</td>
+						<td>Draft</td>
+						<td>Low</td>
+						<td>Nikola Stojanovska</td>
+						<td>13.4 KB</td>
+						<td>2026-05-06</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="49">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Security Policy #49</td>
+						<td>Finance</td>
+						<td>Draft</td>
+						<td>Medium</td>
+						<td>Boris Jovanovska</td>
+						<td>18.8 KB</td>
+						<td>2025-03-14</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="50">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Privacy Plan #50</td>
+						<td>Legal</td>
+						<td>Pending</td>
+						<td>High</td>
+						<td>Sofia Petrović</td>
+						<td>21.8 KB</td>
+						<td>2025-12-29</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="51">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Compliance Roadmap #51</td>
+						<td>Legal</td>
+						<td>Draft</td>
+						<td>Medium</td>
+						<td>Sara Vukomanovska</td>
+						<td>36.0 KB</td>
+						<td>2025-11-09</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="52">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Risk Specification #52</td>
+						<td>HR</td>
+						<td>Rejected</td>
+						<td>High</td>
+						<td>Maria Jones</td>
+						<td>33.9 KB</td>
+						<td>2026-01-30</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="53">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Audit Assessment #53</td>
+						<td>Operations</td>
+						<td>Draft</td>
+						<td>High</td>
+						<td>Igor Vukomanovska</td>
+						<td>12.0 KB</td>
+						<td>2024-11-22</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="54">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Operations Guide #54</td>
+						<td>Sales</td>
+						<td>Archived</td>
+						<td>High</td>
+						<td>Mila Davis</td>
+						<td>41.1 KB</td>
+						<td>2024-07-12</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="55">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Finance Memo #55</td>
+						<td>IT</td>
+						<td>Pending</td>
+						<td>High</td>
+						<td>Sara Garcia</td>
+						<td>33.6 KB</td>
+						<td>2026-04-28</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="56">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>HR Report #56</td>
+						<td>Operations</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Marko Brown</td>
+						<td>4.1 KB</td>
+						<td>2025-09-23</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="57">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Legal Review #57</td>
+						<td>HR</td>
+						<td>Rejected</td>
+						<td>Low</td>
+						<td>Alex Davis</td>
+						<td>5.4 KB</td>
+						<td>2025-09-27</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="58">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Marketing Charter #58</td>
+						<td>IT</td>
+						<td>Rejected</td>
+						<td>High</td>
+						<td>David Mitrovska</td>
+						<td>15.3 KB</td>
+						<td>2026-04-27</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="59">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Sales Agreement #59</td>
+						<td>Legal</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Vera Stojanovska</td>
+						<td>38.1 KB</td>
+						<td>2025-07-07</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="60">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Engineering Strategy #60</td>
+						<td>Operations</td>
+						<td>Archived</td>
+						<td>High</td>
+						<td>Goran Stojanovska</td>
+						<td>27.0 KB</td>
+						<td>2025-08-10</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="61">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Quality Procedure #61</td>
+						<td>Sales</td>
+						<td>Draft</td>
+						<td>Low</td>
+						<td>Sofia Mitrovska</td>
+						<td>20.4 KB</td>
+						<td>2026-03-31</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="62">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Vendor Analysis #62</td>
+						<td>Sales</td>
+						<td>Approved</td>
+						<td>Low</td>
+						<td>David Miller</td>
+						<td>46.8 KB</td>
+						<td>2026-04-16</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="63">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Customer Manual #63</td>
+						<td>Operations</td>
+						<td>Pending</td>
+						<td>Low</td>
+						<td>Nikola Martinez</td>
+						<td>30.7 KB</td>
+						<td>2024-12-08</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="64">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Product Notice #64</td>
+						<td>HR</td>
+						<td>Rejected</td>
+						<td>Low</td>
+						<td>Boris Smith</td>
+						<td>46.2 KB</td>
+						<td>2026-02-23</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="65">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Security Policy #65</td>
+						<td>Finance</td>
+						<td>Archived</td>
+						<td>Low</td>
+						<td>Ana Johnson</td>
+						<td>28.1 KB</td>
+						<td>2026-04-18</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="66">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Privacy Plan #66</td>
+						<td>Legal</td>
+						<td>Approved</td>
+						<td>High</td>
+						<td>John Mitrovska</td>
+						<td>34.0 KB</td>
+						<td>2026-02-23</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="67">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Compliance Roadmap #67</td>
+						<td>Finance</td>
+						<td>Approved</td>
+						<td>High</td>
+						<td>Ana Mitrovska</td>
+						<td>45.9 KB</td>
+						<td>2026-04-23</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="68">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Risk Specification #68</td>
+						<td>IT</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Marko Tomić</td>
+						<td>44.8 KB</td>
+						<td>2025-05-29</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="69">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Audit Assessment #69</td>
+						<td>Marketing</td>
+						<td>Archived</td>
+						<td>Low</td>
+						<td>David Ilieva</td>
+						<td>18.7 KB</td>
+						<td>2026-03-26</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="70">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Operations Guide #70</td>
+						<td>Operations</td>
+						<td>Approved</td>
+						<td>Critical</td>
+						<td>Elena Brown</td>
+						<td>14.4 KB</td>
+						<td>2025-01-30</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="71">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Finance Memo #71</td>
+						<td>Sales</td>
+						<td>Draft</td>
+						<td>High</td>
+						<td>Marko Jones</td>
+						<td>47.5 KB</td>
+						<td>2025-12-14</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="72">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>HR Report #72</td>
+						<td>IT</td>
+						<td>Draft</td>
+						<td>High</td>
+						<td>Sara Stojanovska</td>
+						<td>44.8 KB</td>
+						<td>2025-11-19</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="73">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Legal Review #73</td>
+						<td>Legal</td>
+						<td>Archived</td>
+						<td>Medium</td>
+						<td>Anna Stojanovska</td>
+						<td>3.9 KB</td>
+						<td>2026-01-22</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="74">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Marketing Charter #74</td>
+						<td>Marketing</td>
+						<td>Archived</td>
+						<td>Medium</td>
+						<td>Lena Mitrovska</td>
+						<td>30.2 KB</td>
+						<td>2025-12-10</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="75">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Sales Agreement #75</td>
+						<td>Operations</td>
+						<td>Pending</td>
+						<td>Medium</td>
+						<td>Ana Stanković</td>
+						<td>18.5 KB</td>
+						<td>2024-12-18</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="76">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Engineering Strategy #76</td>
+						<td>Finance</td>
+						<td>Approved</td>
+						<td>High</td>
+						<td>Sofia Jones</td>
+						<td>27.3 KB</td>
+						<td>2025-11-02</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="77">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Quality Procedure #77</td>
+						<td>HR</td>
+						<td>Draft</td>
+						<td>Medium</td>
+						<td>Petra Tomić</td>
+						<td>45.7 KB</td>
+						<td>2025-11-08</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="78">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Vendor Analysis #78</td>
+						<td>HR</td>
+						<td>Rejected</td>
+						<td>High</td>
+						<td>Maria Miller</td>
+						<td>6.7 KB</td>
+						<td>2025-02-26</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="79">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Customer Manual #79</td>
+						<td>Marketing</td>
+						<td>Draft</td>
+						<td>Low</td>
+						<td>Mila Tomić</td>
+						<td>1.2 KB</td>
+						<td>2026-03-25</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="80">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Product Notice #80</td>
+						<td>Finance</td>
+						<td>Approved</td>
+						<td>Critical</td>
+						<td>David Garcia</td>
+						<td>38.9 KB</td>
+						<td>2025-04-11</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="81">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Security Policy #81</td>
+						<td>Marketing</td>
+						<td>Draft</td>
+						<td>Low</td>
+						<td>Maria Mitrovska</td>
+						<td>44.4 KB</td>
+						<td>2025-02-22</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="82">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Privacy Plan #82</td>
+						<td>Finance</td>
+						<td>Draft</td>
+						<td>High</td>
+						<td>Lena Vukomanovska</td>
+						<td>18.0 KB</td>
+						<td>2025-02-11</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="83">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Compliance Roadmap #83</td>
+						<td>HR</td>
+						<td>Approved</td>
+						<td>Critical</td>
+						<td>Alex Đorđevska</td>
+						<td>31.7 KB</td>
+						<td>2026-03-15</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="84">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Risk Specification #84</td>
+						<td>Marketing</td>
+						<td>Draft</td>
+						<td>High</td>
+						<td>David Johnson</td>
+						<td>12.1 KB</td>
+						<td>2026-02-26</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="85">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Audit Assessment #85</td>
+						<td>Operations</td>
+						<td>Archived</td>
+						<td>Low</td>
+						<td>Lena Petrović</td>
+						<td>20.7 KB</td>
+						<td>2025-09-06</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="86">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Operations Guide #86</td>
+						<td>Sales</td>
+						<td>Rejected</td>
+						<td>Medium</td>
+						<td>Petra Davis</td>
+						<td>22.5 KB</td>
+						<td>2026-01-05</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="87">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Finance Memo #87</td>
+						<td>Finance</td>
+						<td>Approved</td>
+						<td>High</td>
+						<td>Petra Đorđevska</td>
+						<td>46.1 KB</td>
+						<td>2025-11-27</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="88">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>HR Report #88</td>
+						<td>Finance</td>
+						<td>Draft</td>
+						<td>Low</td>
+						<td>John Miller</td>
+						<td>5.5 KB</td>
+						<td>2025-12-06</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="89">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Legal Review #89</td>
+						<td>Sales</td>
+						<td>Archived</td>
+						<td>Medium</td>
+						<td>Goran Jovanovska</td>
+						<td>972 B</td>
+						<td>2025-11-14</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="90">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Marketing Charter #90</td>
+						<td>Legal</td>
+						<td>Archived</td>
+						<td>High</td>
+						<td>Vera Stojanovska</td>
+						<td>20.7 KB</td>
+						<td>2025-01-30</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="91">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Sales Agreement #91</td>
+						<td>HR</td>
+						<td>Rejected</td>
+						<td>Critical</td>
+						<td>Ana Miller</td>
+						<td>20.1 KB</td>
+						<td>2026-02-09</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="92">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Engineering Strategy #92</td>
+						<td>IT</td>
+						<td>Approved</td>
+						<td>Critical</td>
+						<td>John Vukomanovska</td>
+						<td>38.4 KB</td>
+						<td>2026-04-29</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="93">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Quality Procedure #93</td>
+						<td>Sales</td>
+						<td>Draft</td>
+						<td>High</td>
+						<td>Anna Williams</td>
+						<td>29.4 KB</td>
+						<td>2026-02-24</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="94">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Vendor Analysis #94</td>
+						<td>IT</td>
+						<td>Archived</td>
+						<td>Low</td>
+						<td>Marko Martinez</td>
+						<td>5.3 KB</td>
+						<td>2026-02-28</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="95">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Customer Manual #95</td>
+						<td>IT</td>
+						<td>Archived</td>
+						<td>High</td>
+						<td>Dejan Jones</td>
+						<td>24.2 KB</td>
+						<td>2026-02-12</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="96">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Product Notice #96</td>
+						<td>HR</td>
+						<td>Approved</td>
+						<td>High</td>
+						<td>Anna Martinez</td>
+						<td>12.4 KB</td>
+						<td>2025-10-24</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="97">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Security Policy #97</td>
+						<td>Finance</td>
+						<td>Approved</td>
+						<td>Critical</td>
+						<td>David Ilieva</td>
+						<td>26.3 KB</td>
+						<td>2025-04-08</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="98">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Privacy Plan #98</td>
+						<td>IT</td>
+						<td>Approved</td>
+						<td>Low</td>
+						<td>Elena Jones</td>
+						<td>37.3 KB</td>
+						<td>2026-03-25</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="99">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Compliance Roadmap #99</td>
+						<td>Finance</td>
+						<td>Approved</td>
+						<td>Medium</td>
+						<td>Alex Risteska</td>
+						<td>48.2 KB</td>
+						<td>2026-04-28</td>
+					</tr>
+					<tr data-ln-table-row data-ln-table-row-id="100">
+						<td><input type="checkbox" data-ln-table-row-select></td>
+						<td>Risk Specification #100</td>
+						<td>HR</td>
+						<td>Approved</td>
+						<td>Critical</td>
+						<td>Sara Jovanovska</td>
+						<td>22.2 KB</td>
+						<td>2025-11-28</td>
+					</tr>
+			</tbody>			</table>			<footer class="ln-table__footer">				<p><span class="hidden"><span data-ln-table-filtered></span> / </span><span data-ln-table-total>10000</span> items<span class="hidden"> · <span data-ln-table-selected></span> selected</span></p>			</footer>			<!-- Dynamic Row Template for background load -->			<template data-ln-template="hybrid-docs-row">				<tr data-ln-table-row>					<td><input type="checkbox" data-ln-table-row-select></td>					<td>{{ title }}</td>					<td>{{ department }}</td>					<td>{{ status }}</td>					<td>{{ priority }}</td>					<td>{{ owner }}</td>					<td>{{ file_size_display }}</td>					<td>{{ updated_display }}</td>				</tr>			</template>			<!-- Empty State templates -->			<template data-ln-empty>				<section data-ln-empty-when="initial" data-ln-empty-state="no-data">					<h3>No documents found</h3>				</section>				<section data-ln-empty-when="search" data-ln-empty-state="no-results">					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>					<h3>No results found</h3>					<p>Try refining your search terms.</p>					<button type="button" data-ln-table-clear-all class="btn">Clear Filters</button>				</section>			</template>		</section>	</main></section><!-- Department filter popover --><div data-ln-popover id="filter-hybrid-dept">	<label class="search">		<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>		<input type="search" placeholder="Search..." data-ln-search="filter-hybrid-dept-list" data-ln-search-items="label">		<button type="button" data-ln-search-clear aria-label="Clear search">			<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>		</button>	</label>	<ul id="filter-hybrid-dept-list" data-ln-filter="hybrid-table">		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="HR"> HR</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="IT"> IT</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal"> Legal</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Marketing"> Marketing</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Operations"> Operations</label></li>	</ul></div><!-- Status filter popover --><div data-ln-popover id="filter-hybrid-status">	<ul id="filter-hybrid-status-list" data-ln-filter="hybrid-table">		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Approved"> Approved</label></li>		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Archived"> Archived</label></li>
 	</ul>
 </div>
 
@@ -291,12 +1061,6 @@
 (function () {
 	const logConsole = document.getElementById('hybrid-log');
 	const tableEl = document.getElementById('hybrid-table');
-	const triggerBtn = document.getElementById('trigger-sync-btn');
-	const latencyCheckbox = document.getElementById('hybrid-latency');
-
-	let isSynced = false;
-	let currentAbortController = null;
-	let lastRequest = null;
 
 	function log(msg, color = 'var(--fg-muted)') {
 		const time = new Date().toLocaleTimeString() + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
@@ -307,134 +1071,17 @@
 		logConsole.scrollTop = logConsole.scrollHeight;
 	}
 
-	function formatSize(bytes) {
-		if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
-		return bytes + ' B';
-	}
-
-	function formatDate(ts) {
-		const d = new Date(ts * 1000);
-		return d.toISOString().split('T')[0];
-	}
-
-	function delay(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
-	}
-
-	// Dynamic values formatting
-	function decorate(r) {
-		return Object.assign({}, r, {
-			file_size_display: formatSize(r.file_size),
-			updated_display: formatDate(r.updated_at)
-		});
-	}
-
-	// Trigger a windowed page fetch from the request-data detail
-	async function fetchWindow(req) {
-		req = req || {};
-		const searchQuery = req.search || '';
-		const filters = req.filters || {};
-
-		if (currentAbortController) {
-			currentAbortController.abort();
-			log("Previous background sync request aborted.", '#ef4444');
-		}
-
-		currentAbortController = new AbortController();
-		const signal = currentAbortController.signal;
-
-		log(`Starting background sync from PHP API... (search: "${searchQuery}", offset: ${req.offset || 0})`, '#38bdf8');
-
-		tableEl.dispatchEvent(new CustomEvent('ln-table:set-loading', {
-			detail: { loading: true }
-		}));
-
-		if (latencyCheckbox.checked) {
-			log("Simulating 2000ms network latency...", '#a1a1aa');
-			try {
-				await delay(2000);
-				if (signal.aborted) return;
-			} catch (e) {
-				return;
-			}
-		}
-
-		const params = new URLSearchParams();
-		if (searchQuery) {
-			params.append('search', searchQuery);
-		}
-
-		if (filters) {
-			if (filters.department && filters.department.length > 0) {
-				params.append('department', filters.department.join(','));
-			}
-			if (filters.status && filters.status.length > 0) {
-				params.append('status', filters.status.join(','));
-			}
-		}
-
-		if (req.sort && req.sort.field && req.sort.direction) {
-			params.append('sort_field', req.sort.field);
-			params.append('sort_dir', req.sort.direction);
-		}
-
-		if (req.offset != null) params.append('offset', req.offset);
-		if (req.limit != null) params.append('limit', req.limit);
-
-		try {
-			const res = await fetch('data/api.php?' + params.toString(), { signal });
-			const payload = await res.json();
-
-			if (payload.error) {
-				throw new Error(payload.error);
-			}
-
-			const decoratedData = (payload.data || []).map(decorate);
-			log(`Received ${decoratedData.length} records from PHP API. Setting data...`, '#34d399');
-
-			tableEl.dispatchEvent(new CustomEvent('ln-table:set-data', {
-				detail: {
-					data: decoratedData,
-					total: payload.total,
-					filtered: payload.filtered,
-					offset: req.offset,
-					queryGen: req.queryGen
-				}
-			}));
-
-			isSynced = true;
-			log("Background synchronization complete. Virtual Scroll upgraded.", '#c084fc');
-		} catch (err) {
-			if (err.name === 'AbortError') {
-				return;
-			}
-			log(`Fetch failed: ${err.message}`, 'var(--color-error)');
-			tableEl.dispatchEvent(new CustomEvent('ln-table:set-loading', {
-				detail: { loading: false }
-			}));
-		} finally {
-			if (currentAbortController && currentAbortController.signal === signal) {
-				currentAbortController = null;
-			}
-		}
-	}
-
-	// ─── Component Events Integration ──────────────────────────
-
 	document.addEventListener('DOMContentLoaded', function() {
-		log("Page loaded. 10 SSR pre-rendered rows visible in the table.", 'var(--color-primary)');
-		log("Unified ln-table parsed SSR rows synchronously during initialization.", 'var(--color-primary)');
+		log("Page loaded. 100 SSR pre-rendered rows visible in table.", 'var(--color-primary)');
+		log("Declarative 3-Tier architecture active: data-ln-data-coordinator <-> data-ln-api-connector <-> data-ln-table-store.", 'var(--color-primary)');
 	});
 
 	tableEl.addEventListener('ln-table:request-data', function (e) {
-		log(`Component emitted 'ln-table:request-data' due to query change.`, '#fbbf24');
-		lastRequest = e.detail;
-		fetchWindow(e.detail);
+		log(`Component emitted 'ln-table:request-data' (offset: ${e.detail.offset || 0}, limit: ${e.detail.limit || 200})`, '#fbbf24');
 	});
 
-	triggerBtn.addEventListener('click', function() {
-		isSynced = false;
-		if (lastRequest) fetchWindow(lastRequest);
+	tableEl.addEventListener('ln-table:rendered', function (e) {
+		log(`ln-table:rendered -> ${e.detail.visible} / ${e.detail.total} items rendered`, '#34d399');
 	});
 })();
 </script>

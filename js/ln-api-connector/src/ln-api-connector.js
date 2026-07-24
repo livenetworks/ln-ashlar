@@ -42,6 +42,14 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		this.path = dom.getAttribute('data-ln-api-path') || '';
 		this.credentials = 'same-origin';
 
+		this.paramKeys = {
+			offset: dom.getAttribute('data-ln-api-param-offset') || 'offset',
+			limit: dom.getAttribute('data-ln-api-param-limit') || 'limit',
+			search: dom.getAttribute('data-ln-api-param-search') || 'search',
+			sortField: dom.getAttribute('data-ln-api-param-sort-field') || 'sort_field',
+			sortDir: dom.getAttribute('data-ln-api-param-sort-dir') || 'sort_dir'
+		};
+
 		const rawHeaders = dom.getAttribute('data-ln-api-headers') || '';
 		this.headers = parseHeaders(rawHeaders, 'ln-api-connector');
 
@@ -52,7 +60,8 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		dispatch(dom, 'ln-api-connector:config-changed', {
 			baseUrl: this.baseUrl,
 			path: this.path,
-			headers: this.headers
+			headers: this.headers,
+			paramKeys: this.paramKeys
 		});
 	};
 
@@ -70,6 +79,51 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 		if (since !== undefined && since !== null && since !== '') {
 			url += (url.indexOf('?') !== -1 ? '&' : '?') + 'since=' + encodeURIComponent(since);
+		}
+
+		return window.fetch(url, { method: 'GET', headers: self._reqHeaders(), credentials: self.credentials })
+			.then(_resolve);
+	};
+
+	_component.prototype.query = function (queryParams) {
+		const self = this;
+		queryParams = queryParams || {};
+		let url = buildUrl(self.baseUrl, self.path);
+
+		const keys = self.paramKeys || {
+			offset: 'offset',
+			limit: 'limit',
+			search: 'search',
+			sortField: 'sort_field',
+			sortDir: 'sort_dir'
+		};
+
+		const searchParams = new URLSearchParams();
+		if (queryParams.search) {
+			searchParams.append(keys.search, queryParams.search);
+		}
+		if (queryParams.offset != null) {
+			searchParams.append(keys.offset, queryParams.offset);
+		}
+		if (queryParams.limit != null) {
+			searchParams.append(keys.limit, queryParams.limit);
+		}
+		if (queryParams.sort && queryParams.sort.field && queryParams.sort.direction) {
+			searchParams.append(keys.sortField, queryParams.sort.field);
+			searchParams.append(keys.sortDir, queryParams.sort.direction);
+		}
+		if (queryParams.filters && typeof queryParams.filters === 'object') {
+			Object.keys(queryParams.filters).forEach(key => {
+				const vals = queryParams.filters[key];
+				if (Array.isArray(vals) && vals.length > 0) {
+					searchParams.append(key, vals.join(','));
+				}
+			});
+		}
+
+		const qs = searchParams.toString();
+		if (qs) {
+			url += (url.indexOf('?') !== -1 ? '&' : '?') + qs;
 		}
 
 		return window.fetch(url, { method: 'GET', headers: self._reqHeaders(), credentials: self.credentials })
@@ -143,6 +197,31 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 							status: err.status || 0,
 							data: err.data || null,
 							since: detail.since,
+							meta: detail.meta || null
+						});
+					});
+			},
+			query: function (e) {
+				const detail = e.detail || {};
+				const queryParams = detail.query || detail;
+				self.query(queryParams)
+					.then(function (res) {
+						const payload = res || {};
+						dispatch(self.dom, 'ln-api-connector:fetched', {
+							data: payload.data || (Array.isArray(payload) ? payload : []),
+							total: payload.total,
+							filtered: payload.filtered,
+							offset: queryParams.offset,
+							queryGen: queryParams.queryGen,
+							meta: detail.meta || null
+						});
+					})
+					.catch(function (err) {
+						dispatch(self.dom, 'ln-api-connector:error', {
+							action: 'query',
+							error: err.message,
+							status: err.status || 0,
+							data: err.data || null,
 							meta: detail.meta || null
 						});
 					});
@@ -228,7 +307,8 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		const namespaces = ['ln-api-connector', 'ln-rest-connector'];
 		namespaces.forEach(function (ns) {
 			self.dom.addEventListener(ns + ':request-sync', self._handlers.sync);
-			self.dom.addEventListener(ns + ':request-fetch', self._handlers.sync);
+			self.dom.addEventListener(ns + ':request-query', self._handlers.query);
+			self.dom.addEventListener(ns + ':request-fetch', self._handlers.query);
 			self.dom.addEventListener(ns + ':request-create', self._handlers.create);
 			self.dom.addEventListener(ns + ':request-update', self._handlers.update);
 			self.dom.addEventListener(ns + ':request-delete', self._handlers.delete);
@@ -244,7 +324,8 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			const namespaces = ['ln-api-connector', 'ln-rest-connector'];
 			namespaces.forEach(function (ns) {
 				self.dom.removeEventListener(ns + ':request-sync', self._handlers.sync);
-				self.dom.removeEventListener(ns + ':request-fetch', self._handlers.sync);
+				self.dom.removeEventListener(ns + ':request-query', self._handlers.query);
+				self.dom.removeEventListener(ns + ':request-fetch', self._handlers.query);
 				self.dom.removeEventListener(ns + ':request-create', self._handlers.create);
 				self.dom.removeEventListener(ns + ':request-update', self._handlers.update);
 				self.dom.removeEventListener(ns + ':request-delete', self._handlers.delete);
@@ -273,7 +354,12 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		extraAttributes: [
 			'data-ln-api-base-url',
 			'data-ln-api-path',
-			'data-ln-api-headers'
+			'data-ln-api-headers',
+			'data-ln-api-param-offset',
+			'data-ln-api-param-limit',
+			'data-ln-api-param-search',
+			'data-ln-api-param-sort-field',
+			'data-ln-api-param-sort-dir'
 		],
 		onAttributeChange: _syncAttribute
 	});

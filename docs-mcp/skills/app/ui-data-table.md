@@ -22,6 +22,8 @@ This skill governs the specification and completeness requirements for Data Tabl
 
 A data table is a **VIEWPORT into a dataset** — not a paginated slice. Users work with their entire dataset through a scrollable window. Data resides in a client-side cache, sort/filter/search operate synchronously, and the system syncs with the server in the background.
 
+> **Windowed exception.** For datasets too large to cache entirely client-side, the viewport principle holds but the implementation relaxes: instead of a full client-side cache with synchronous ops, the table holds a bounded sliding window (`ln-core.createWindowCache`, opt-in via `data-ln-table-window`) and round-trips queries to the server as the user scrolls. Sort/filter/search still resolve correctly over the full dataset — computed server-side rather than in a local cache. Default remains full-client-cache virtual scroll; windowed mode is opt-in for very large datasets.
+
 ---
 
 ## 2. Standard Anatomy
@@ -92,3 +94,5 @@ A data table is a **VIEWPORT into a dataset** — not a paginated slice. Users w
 - Rendering animated placeholder/shimmer rows for non-existent data.
 - Hiding row action buttons behind hover states (breaks touch accessibility).
 - Showing the same empty state for "no data exists" and "search returned zero results".
+
+> Server-windowed continuous scroll (`data-ln-table-window`) is not the pagination anti-pattern above — there are no page-number controls and the scrollbar spans the full dataset; only the resident cache is bounded and fetched in pages behind the scenes.

@@ -485,7 +485,8 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 	// ─── Public Remote Response Synchronization Methods ────
 
-	_component.prototype.applySync = function (upsertedRecords, deletedIds, syncedAt) {
+	_component.prototype.applySync = function (upsertedRecords, deletedIds, syncedAt, meta) {
+		meta = meta || {};
 		const self = this;
 		const hasChanges = upsertedRecords.length > 0 || deletedIds.length > 0;
 
@@ -494,11 +495,11 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		if (deletedIds.length > 0) chain = chain.then(() => _deleteBulk(self._name, deletedIds));
 
 		return chain.then(() => _countRecords(self._name)).then(count => {
-			self.totalCount = count;
+			self.totalCount = meta.total !== undefined ? meta.total : count;
 			return _setMeta(self._name, {
 				schema_version: SCHEMA_VERSION,
 				last_synced_at: syncedAt,
-				record_count: count
+				record_count: self.totalCount
 			});
 		}).then(() => {
 			const isInitialLoad = !self.isLoaded;
@@ -507,14 +508,15 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 			self.lastSyncedAt = syncedAt;
 
 			if (isInitialLoad) {
-				dispatch(self.dom, 'ln-data-store:loaded', { store: self._name, count: self.totalCount });
-				dispatch(self.dom, 'ln-data-store:ready', { store: self._name, count: self.totalCount, source: 'server' });
+				dispatch(self.dom, 'ln-data-store:loaded', { store: self._name, count: self.totalCount, meta: meta });
+				dispatch(self.dom, 'ln-data-store:ready', { store: self._name, count: self.totalCount, source: 'server', meta: meta });
 			} else {
 				dispatch(self.dom, 'ln-data-store:synced', {
 					store: self._name,
 					added: upsertedRecords.length,
 					deleted: deletedIds.length,
-					changed: hasChanges
+					changed: true,
+					meta: meta
 				});
 			}
 		}).catch(err => {

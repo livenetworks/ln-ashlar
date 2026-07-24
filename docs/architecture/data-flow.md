@@ -97,6 +97,16 @@ intent) into an `ln-table:request-data` / `ln-list:request-data` payload.
 and receives a fresh array on every `ln-{kind}:set-data`. The query engine.
 Network calls.
 
+> **Windowed exception.** In windowed mode (`data-ln-table-window` /
+> `data-ln-list-window`), the renderer does own a bounded cache — an
+> `ln-core.createWindowCache` instance holding at most the configured
+> `windowSize` resident rows. `ln-{kind}:set-data` still delivers one
+> fetched page at a time rather than the full array; the cache splices
+> each page in and evicts by LRU. This is the sole exception to "renderer
+> is stateless about records" — the cache exists because the full dataset
+> is too large to hold client-side, not because the renderer resumed
+> owning data by default.
+
 A renderer binds to a coordinator-owned store by attribute —
 `data-ln-table-store="<storeName>"` on `[data-ln-table]`, or
 `data-ln-list-store="<storeName>"` on `[data-ln-list]`. On mount, and on

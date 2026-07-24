@@ -141,6 +141,9 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the data source name. |
 | `data-ln-table-store` | Root container | `String` | - | Target data store name to connect with via `ln-data-coordinator`. |
 | `data-ln-table-selectable` | Root container | `Boolean` | `false` | Enables row multi-selection and checkboxes. |
+| `data-ln-table-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-row cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. |
+| `data-ln-table-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. |
+| `data-ln-table-window-threshold` | Root container | `Number` | `25` | Prefetch margin threshold in rows before reaching unloaded page boundaries. |
 | `data-ln-table-col` | `<th>` | `String` | - | Maps a table header to a JSON payload field. |
 | `data-ln-table-sort` | `<th>` | `string`\|`number`\|`date` | - | Enables client-side/server-side sorting on this column. |
 | `data-ln-value` | `<td>` | `String` | - | Raw computer-readable sorting value, ignoring HTML formatting. *(Processed externally via `ln-core.js` / `fill()`)* |
@@ -167,14 +170,14 @@ Use when the table queries a store and connects through a coordinator rather tha
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). | `{ data: Array, total: Number, filtered: Number }` |
+| `ln-table:set-data` | Listens | No | Populates the table with a raw dataset (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
 | `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` overlay class (Data-Driven mode). | `{ loading: Boolean }` |
 | `ln-search:change` | Listens | No | Triggers local (SSR) or server-side (Data-Driven) search matching. | `{ term: String }` |
 | `ln-filter:changed` | Listens | No | Applies column filter values in both SSR and Data-Driven modes. | `{ key: String, values: Array }` |
 | `ln-table:sort` | Listens | No | SSR mode only — dispatched externally by `ln-table-sort.js` to execute local row re-ordering. | `{ column: Number, direction: String\|null, sortType: String }` |
 | `ln-table:ready` | Emits | No | Fired once after initial row hydration/parsing completes (SSR and Data-Driven modes). | `{ total: Number }` |
 | `ln-table:rendered` | Emits | No | Fired after `ln-table:set-data` finishes rendering (Data-Driven mode). | `{ table: String, total: Number, visible: Number }` |
-| `ln-table:request-data` | Emits | No | Requests a new data page from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). | `{ table: String, sort: Object\|null, filters: Object, search: String }` |
+| `ln-table:request-data` | Emits | No | Requests a new data page from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally emits `offset`/`limit`/`queryGen`. | `{ table: String, sort: Object\|null, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }` |
 | `ln-table:sort` | Emits | No | Emitted on column header sort click (Data-Driven mode). | `{ table: String, field: String, direction: String\|null }` |
 | `ln-table:sorted` | Emits | No | Emitted after applying a local sort (SSR mode). | `{ column: Number, direction: String\|null, matched: Number, total: Number }` |
 | `ln-table:filter` | Emits | No | Emitted after applying search, column filter, or clear actions locally (SSR mode). | `{ term: String, matched: Number, total: Number }` |
@@ -260,6 +263,7 @@ Text comparisons utilize `Intl.Collator` read from the document `<html lang>` ta
 
 > [!CAUTION]
 > 4. **Search Debounce Throttling:** Remote searches targeting APIs must configure `data-ln-search-debounce` on search inputs with a throttle value (at least `150`ms, recommended `250`ms) to prevent server overload. Instant filtering (`0`ms) is restricted to local SSR markup.
+> 5. **Windowed Select-All:** When `data-ln-table-window` is active, the header "select all" checkbox (`data-ln-table-col-select`) is automatically hidden — a windowed table cannot select rows it has never fetched. Per-row selection (`data-ln-table-row-select`) still works and survives LRU eviction.
 
 ---
 
@@ -294,6 +298,30 @@ sequenceDiagram
 
     User->>DOM: Press ArrowDown key
     Table->>DOM: Toggle .ln-row-focused style class on adjacent row
+```
+
+### Lifecycle Sequence (Windowed Mode)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as User / Scroll
+    participant Table as ln-table Component
+    participant Cache as createWindowCache
+    participant Coord as App Coordinator
+
+    User->>Table: Scroll viewport
+    Table->>Cache: ensure(startRow, endRow)
+    Cache->>Cache: Stamp resident rows, compute missing range
+    Cache->>Coord: requestPage → emit 'ln-table:request-data' { offset, limit, queryGen }
+    Coord-->>Table: Emit 'ln-table:set-data' { data, offset, queryGen }
+    Table->>Cache: ingest(detail)
+    alt queryGen matches current generation
+        Cache->>Cache: Splice page at offset, LRU-evict if over windowSize
+        Cache->>Table: onChange → repaint
+    else queryGen stale
+        Cache->>Cache: Drop response
+    end
 ```
 
 ---

@@ -15,6 +15,7 @@ ln-core exposes helpers in these categories:
 - **Dictionaries** — extract i18n strings from hidden elements
 - **Discovery** — `registerComponent` for MutationObserver-backed auto-init
 - **Reactivity** — `reactiveState`, `deepReactive`, `createBatcher`
+- **Windowing** — sliding-window sparse cache for server-side virtualization (`createWindowCache`)
 - **Layout** — viewport-aware positioning, teleport, measurement
 - **Persistence** — localStorage wrappers with `ln:` prefix
 - **Hash codec** — namespaced URL fragment state (`hashParse`, `hashGet`, `hashSet`)
@@ -447,6 +448,66 @@ the DOM will thrash.
 For the full decision matrix (`reactiveState` vs `deepReactive`, when
 to use this pattern at all, anti-patterns), see
 [Reactive Rendering Pattern in js/COMPONENTS.md](../../js/COMPONENTS.md#reactive-rendering-pattern).
+
+---
+
+## window-cache.js
+
+### createWindowCache(config)
+
+DOM-agnostic sliding-window data engine for server-side virtualization. Owns a sparse cache keyed by logical index, logical/grand totals, request dedup, a stale-response guard (`queryGen`), LRU eviction to a bounded cap, and a debounced fetch trigger.
+
+```js
+const cache = createWindowCache({
+	windowSize: 1000,
+	pageSize: 200,
+	fetchDebounce: 120,
+	overscan: 15,
+	requestPage: function (query, offset, limit) {
+		dispatch(dom, 'ln-table:request-data', {
+			table: self.name, sort: query.sort, filters: query.filters,
+			search: query.search, offset: offset, limit: limit,
+			queryGen: cache.queryGen
+		});
+	},
+	onChange: function () { self._render(); }
+});
+
+cache.requestInitial({ sort: null, filters: {}, search: '' });
+```
+
+**Config:**
+
+| Key | Default | Purpose |
+|---|---|---|
+| `windowSize` | `1000` | Resident-row cap. LRU-evicted once exceeded. |
+| `pageSize` | `200` | Rows fetched per page. |
+| `fetchDebounce` | `120` | Milliseconds to coalesce `ensure()` calls before firing a fetch. |
+| `overscan` | `15` | Rows padded onto the fetch range (not the render range) on either side. |
+| `requestPage(query, offset, limit)` | no-op | Callback — kick a fetch over any transport. |
+| `onChange()` | no-op | Callback — cache mutated, re-render. |
+
+**Returns:**
+
+| Method | Signature | Purpose |
+|---|---|---|
+| `get` | `(i) → record \| undefined` | Read a resident row by logical index. |
+| `has` | `(i) → Boolean` | Whether a logical index is resident. |
+| `peek` | `() → record \| undefined` | Any one resident record — lets the render client measure row height before geometry is known. |
+| `logicalTotal` *(getter)* | `Number` | Filtered/queried row count — spacer geometry basis. |
+| `grandTotal` *(getter)* | `Number` | Unfiltered dataset count. |
+| `queryGen` *(getter)* | `Number` | Current query generation — bumped by `invalidate()`. |
+| `size` *(getter)* | `Number` | Resident row count. |
+| `ensure` | `(startRow, endRow)` | Render client hands its visible logical range; stamps in-range resident rows as freshly touched, debounce-fires a fetch for whatever is missing (padded by `overscan`). |
+| `ingest` | `(detail)` | Splice a fetched page into the cache. Drops responses whose `detail.queryGen` doesn't match the current generation. Triggers `onChange()`. |
+| `requestInitial` | `(query)` | First load — fetches page 0 at the current generation (no bump). |
+| `invalidate` | `(query)` | Query change — bumps `queryGen`, clears the cache, refetches page 0, fires `onChange()` for an immediate all-placeholder repaint. |
+| `destroy` | `()` | Clears timers and cache contents. |
+
+- LRU eviction drops the least-recently-touched rows first once `map.size` exceeds `windowSize` — a pure data policy, not a viewport-distance heuristic.
+- `queryGen` is the stale-response guard: `ingest()` silently drops any page whose `detail.queryGen` doesn't match the cache's current generation, so an out-of-order response from a superseded query never corrupts the window.
+- Pages splice at their own `offset`, so out-of-order arrivals are safe — order is irrelevant.
+- Pure function core, no DOM — shared by the `ln-table` and `ln-list` windowed paths. A future `ln-data-store` windowed mode plugs in by making `requestPage` resolve `getAll({ offset, limit })` then call `ingest()`.
 
 ---
 

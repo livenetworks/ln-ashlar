@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent, createWindowCache, createBatcher, getLocale } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
@@ -6,8 +6,20 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 	const EMPTY_TEMPLATE = 'data-ln-list-empty';
 	const VIRTUAL_THRESHOLD = 200;
 	const BUFFER_ROWS = 15;
+	const WINDOW_DEFAULT = 1000;
+	const WINDOW_PAGE = 200;
+	const FETCH_DEBOUNCE = 120;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	function _formatNum(n, dom) {
+		if (n == null || isNaN(n)) return '';
+		try {
+			return new Intl.NumberFormat(getLocale(dom)).format(n);
+		} catch (e) {
+			return String(n);
+		}
+	}
 
 	function _findScrollContainer(el) {
 		let p = el;
@@ -64,6 +76,49 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this.currentSearch = '';
 			this.selectedIds = new Set();
 
+			this._windowed = this.isDataDriven && dom.hasAttribute('data-ln-list-window');
+			if (this._windowed) {
+				const winAttr = parseInt(dom.getAttribute('data-ln-list-window'), 10);
+				const pageAttr = parseInt(dom.getAttribute('data-ln-list-window-page'), 10);
+				const threshAttr = parseInt(dom.getAttribute('data-ln-list-window-threshold'), 10);
+
+				this._onCacheChange = function () {
+					self.totalCount = self._cache.grandTotal;
+					self.visibleCount = self._cache.logicalTotal;
+					self._lastTotal = self._cache.grandTotal;
+					self.isLoaded = true;
+					self._vStart = -1;
+					self._vEnd = -1;
+					self._render();
+					self._updateFooter();
+					dispatch(dom, 'ln-list:rendered', {
+						list: self.name,
+						total: self.totalCount,
+						visible: self.visibleCount
+					});
+				};
+				this._renderBatch = createBatcher(this._onCacheChange);
+
+				this._cache = createWindowCache({
+					windowSize: winAttr > 0 ? winAttr : WINDOW_DEFAULT,
+					pageSize: pageAttr > 0 ? pageAttr : WINDOW_PAGE,
+					threshold: threshAttr >= 0 ? threshAttr : 25,
+					fetchDebounce: FETCH_DEBOUNCE,
+					requestPage: function (query, offset, limit) {
+						dispatch(dom, 'ln-list:request-data', {
+							list: self.name,
+							sort: query.sort,
+							filters: query.filters,
+							search: query.search,
+							offset: offset,
+							limit: limit,
+							queryGen: self._cache.queryGen
+						});
+					},
+					onChange: this._renderBatch
+				});
+			}
+
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
 
@@ -85,6 +140,11 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			// --- Event listeners ---
 			this._onSetData = function (e) {
 				const detail = e.detail || {};
+				if (self._windowed) {
+					dom.classList.remove('ln-list--loading');
+					self._cache.ingest(detail);
+					return;
+				}
 				self._data = detail.data || [];
 				self._lastTotal = detail.total != null ? detail.total : self._data.length;
 				self._lastFiltered = detail.filtered != null ? detail.filtered : self._data.length;
@@ -134,6 +194,9 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this._selectableActive = false;
 			if (this._selectable) {
 				this._enableSelection();
+			}
+			if (this._windowed && this._selectable && this._selectAllCheckbox) {
+				this._selectAllCheckbox.classList.add('hidden');
 			}
 
 			// --- Item Click & Actions ---
@@ -196,12 +259,34 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			}
 
 			// Initial request-data
-			dispatch(dom, 'ln-list:request-data', {
-				list: this.name,
-				sort: this.currentSort,
-				filters: this.currentFilters,
-				search: this.currentSearch
-			});
+			if (this._windowed) {
+				if (this._data.length > 0) {
+					// SSR-seeded: page 0 is already resident, the grand total
+					// is declared in markup — no initial fetch needed. No
+					// queryGen on the seed — it must never be dropped as stale.
+					const declaredTotal = parseInt(dom.getAttribute('data-ln-list-count'), 10);
+					const seedTotal = declaredTotal > 0 ? declaredTotal : this._data.length;
+					this._cache.ingest({
+						data: this._data,
+						offset: 0,
+						total: seedTotal,
+						filtered: seedTotal
+					});
+				} else {
+					this._cache.requestInitial({
+						sort: this.currentSort,
+						filters: this.currentFilters,
+						search: this.currentSearch
+					});
+				}
+			} else {
+				dispatch(dom, 'ln-list:request-data', {
+					list: this.name,
+					sort: this.currentSort,
+					filters: this.currentFilters,
+					search: this.currentSearch
+				});
+			}
 
 		} else {
 			// SSR Mode
@@ -413,6 +498,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (!this.tbody) return;
 
 		if (this.isDataDriven) {
+			if (this._windowed) { this._renderWindowed(); return; }
 			const total = this._lastTotal;
 			const filtered = this.visibleCount;
 
@@ -483,7 +569,16 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 	};
 
 	_component.prototype._measureItemHeight = function () {
-		if (this.isDataDriven) {
+		if (this._windowed) {
+			const sample = this._cache.peek();
+			const el = sample ? this._buildItem(sample) : this._buildPlaceholderItem();
+			if (el) {
+				this.tbody.textContent = '';
+				this.tbody.appendChild(el);
+				this._itemHeight = _getOuterHeight(el) || 50;
+				this.tbody.textContent = '';
+			}
+		} else if (this.isDataDriven) {
 			if (this._data.length > 0) {
 				const el = this._buildItem(this._data[0]);
 				if (el) {
@@ -519,7 +614,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (!self._rafId) {
 				self._rafId = requestAnimationFrame(function () {
 					self._rafId = null;
-					self._renderVirtual();
+					self._windowed ? self._renderWindowed() : self._renderVirtual();
 				});
 			}
 		};
@@ -529,7 +624,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			self._measureItemHeight();
 			self._vStart = -1;
 			self._vEnd = -1;
-			self._renderVirtual();
+			self._windowed ? self._renderWindowed() : self._renderVirtual();
 		};
 
 		container.addEventListener('scroll', this._scrollHandler, { passive: true });
@@ -642,6 +737,93 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			}
 			this.tbody.innerHTML = html;
 		}
+	};
+
+	_component.prototype._buildPlaceholderItem = function () {
+		const el = document.createElement(this.isUl ? 'li' : 'div');
+		el.className = 'ln-list__placeholder';
+		el.setAttribute('aria-hidden', 'true');
+		el.style.height = this._itemHeight + 'px';
+		return el;
+	};
+
+	_component.prototype._renderWindowed = function () {
+		if (this.isLoaded && this._cache.logicalTotal === 0) {
+			this._disableVirtualScroll();
+			this._showEmptyState();
+			return;
+		}
+		if (!this._virtual) this._enableVirtualScroll();
+
+		const itemHeight = this._itemHeight;
+		if (!itemHeight) return;
+
+		const container = this._scrollContainer;
+		let scrollTop, viewportHeight;
+		if (container) {
+			const rect = this.tbody.getBoundingClientRect();
+			const containerRect = container.getBoundingClientRect();
+			const relativeTop = (container === this.tbody) ? 0 : (rect.top - containerRect.top + container.scrollTop);
+			scrollTop = container.scrollTop - relativeTop;
+			viewportHeight = container.clientHeight;
+		} else {
+			const rect = this.tbody.getBoundingClientRect();
+			const absoluteTop = rect.top + window.scrollY;
+			scrollTop = window.scrollY - absoluteTop;
+			viewportHeight = window.innerHeight;
+		}
+
+		const layout = this._readGridLayout();
+		const columns = layout.columns;
+		const rowGap = layout.rowGap;
+		const rowHeight = itemHeight + rowGap;
+		const total = this._cache.logicalTotal;
+		const totalRows = Math.ceil(total / columns);
+
+		let firstRow = Math.max(0, Math.floor(scrollTop / rowHeight) - BUFFER_ROWS);
+		firstRow = Math.min(firstRow, totalRows);
+		const visibleRows = Math.ceil(viewportHeight / rowHeight) + BUFFER_ROWS * 2;
+		const lastRow = Math.min(firstRow + visibleRows, totalRows);
+
+		const start = Math.min(firstRow * columns, total);
+		const end = Math.min(lastRow * columns, total);
+
+		// No start===_vStart early-return: windowed must re-render when a page
+		// splices in even if the range is unchanged.
+
+		const topSpacerHeight = firstRow * rowHeight;
+		const bottomSpacerHeight = (totalRows - lastRow) * rowHeight;
+
+		const frag = document.createDocumentFragment();
+		if (topSpacerHeight > 0) {
+			const topSpacer = document.createElement(this.isUl ? 'li' : 'div');
+			topSpacer.className = 'ln-list__spacer';
+			topSpacer.style.height = topSpacerHeight + 'px';
+			frag.appendChild(topSpacer);
+		}
+		for (let i = start; i < end; i++) {
+			if (this._cache.has(i)) {
+				const el = this._buildItem(this._cache.get(i));
+				if (el) frag.appendChild(el);
+			} else {
+				frag.appendChild(this._buildPlaceholderItem());
+			}
+		}
+		if (bottomSpacerHeight > 0) {
+			const bottomSpacer = document.createElement(this.isUl ? 'li' : 'div');
+			bottomSpacer.className = 'ln-list__spacer';
+			bottomSpacer.style.height = bottomSpacerHeight + 'px';
+			frag.appendChild(bottomSpacer);
+		}
+
+		this.tbody.textContent = '';
+		this.tbody.appendChild(frag);
+
+		// Select-all disabled in windowed mode — no _updateSelectAll().
+		this._vStart = start;
+		this._vEnd = end;
+
+		this._cache.ensure(start, end);
 	};
 
 	_component.prototype._showEmptyState = function () {
@@ -794,22 +976,39 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 	};
 
 	_component.prototype._requestData = function () {
+		if (this._windowed) {
+			this.dom.classList.add('ln-list--loading');
+			this._cache.invalidate({
+				sort: this.currentSort,
+				filters: this.currentFilters,
+				search: this.currentSearch
+			});
+			return;
+		}
 		requestData(this, 'ln-list:request-data', 'list');
 	};
 
 	_component.prototype._updateFooter = function () {
-		if (!this.isDataDriven) return;
-		const total = this._lastTotal != null ? this._lastTotal : this._data.length;
-		const filtered = this.visibleCount;
+		let total = 0;
+		let filtered = 0;
+
+		if (this.isDataDriven) {
+			total = this._lastTotal != null ? this._lastTotal : this._data.length;
+			filtered = this.visibleCount;
+		} else {
+			total = this._data.length;
+			filtered = this._filteredData.length;
+		}
+
 		const hasActiveFilter = filtered < total;
 
-		if (this._totalSpan) this._totalSpan.textContent = total;
-		if (this._filteredSpan) this._filteredSpan.textContent = hasActiveFilter ? filtered : '';
+		if (this._totalSpan) this._totalSpan.textContent = _formatNum(total, this.dom);
+		if (this._filteredSpan) this._filteredSpan.textContent = hasActiveFilter ? _formatNum(filtered, this.dom) : '';
 		if (this._filteredWrap) this._filteredWrap.classList.toggle('hidden', !hasActiveFilter);
 
 		if (this._selectedSpan) {
-			const selected = this.selectedIds.size;
-			this._selectedSpan.textContent = selected > 0 ? selected : '';
+			const selected = this.selectedIds ? this.selectedIds.size : 0;
+			this._selectedSpan.textContent = selected > 0 ? _formatNum(selected, this.dom) : '';
 			if (this._selectedWrap) {
 				this._selectedWrap.classList.toggle('hidden', selected === 0);
 			}
@@ -822,6 +1021,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		this._disableVirtualScroll();
 
 		if (this.isDataDriven) {
+			if (this._cache) this._cache.destroy();
 			this.dom.removeEventListener('ln-list:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-list:set-loading', this._onSetLoading);
 			this.dom.removeEventListener('click', this._onClearAll);

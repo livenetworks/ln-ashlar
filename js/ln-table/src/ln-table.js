@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
@@ -19,12 +19,13 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		? new Intl.Collator(document.documentElement.lang || undefined, { sensitivity: 'base' })
 		: null;
 
-	const _numFmt = typeof Intl !== 'undefined'
-		? new Intl.NumberFormat(document.documentElement.lang || undefined)
-		: null;
-
-	function _formatNum(n) {
-		return _numFmt ? _numFmt.format(n) : String(n);
+	function _formatNum(n, dom) {
+		if (n == null || isNaN(n)) return '';
+		try {
+			return new Intl.NumberFormat(getLocale(dom)).format(n);
+		} catch (e) {
+			return String(n);
+		}
 	}
 
 	function _findScrollContainer(el) {
@@ -138,14 +139,45 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this._windowed = this.isDataDriven && dom.hasAttribute('data-ln-table-window');
 			if (this._windowed) {
 				const winAttr = parseInt(dom.getAttribute('data-ln-table-window'), 10);
-				this._windowSize = winAttr > 0 ? winAttr : WINDOW_DEFAULT;
-				this._rowMap = new Map();
-				this._logicalTotal = 0;
-				this._grandTotal = 0;
-				this._queryGen = 0;
-				this._inflight = new Set();
-				this._fetchDebounceId = null;
-				this._lastViewportMid = 0;
+				const pageAttr = parseInt(dom.getAttribute('data-ln-table-window-page'), 10);
+				const threshAttr = parseInt(dom.getAttribute('data-ln-table-window-threshold'), 10);
+
+				// Cache change → sync totals off the cache, re-render (pull), notify.
+				this._onCacheChange = function () {
+					self.totalCount = self._cache.grandTotal;
+					self.visibleCount = self._cache.logicalTotal;
+					self._lastTotal = self._cache.grandTotal;
+					self.isLoaded = true;
+					self._vStart = -1;
+					self._vEnd = -1;
+					self._render();
+					self._updateFooter();
+					dispatch(dom, 'ln-table:rendered', {
+						table: self.name,
+						total: self.totalCount,
+						visible: self.visibleCount
+					});
+				};
+				this._renderBatch = createBatcher(this._onCacheChange);
+
+				this._cache = createWindowCache({
+					windowSize: winAttr > 0 ? winAttr : WINDOW_DEFAULT,
+					pageSize: pageAttr > 0 ? pageAttr : WINDOW_PAGE,
+					threshold: threshAttr >= 0 ? threshAttr : 25,
+					fetchDebounce: FETCH_DEBOUNCE,
+					requestPage: function (query, offset, limit) {
+						dispatch(dom, 'ln-table:request-data', {
+							table: self.name,
+							sort: query.sort,
+							filters: query.filters,
+							search: query.search,
+							offset: offset,
+							limit: limit,
+							queryGen: self._cache.queryGen
+						});
+					},
+					onChange: this._renderBatch
+				});
 			}
 
 			// Footer elements
@@ -166,7 +198,11 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			// --- Event listeners ---
 			this._onSetData = function (e) {
 				const detail = e.detail || {};
-				if (self._windowed) { self._onWindowData(detail); return; }
+				if (self._windowed) {
+					dom.classList.remove('ln-table--loading');
+					self._cache.ingest(detail);
+					return;
+				}
 				self._data = detail.data || [];
 				self._lastTotal = detail.total != null ? detail.total : self._data.length;
 				self._lastFiltered = detail.filtered != null ? detail.filtered : self._data.length;
@@ -386,15 +422,29 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			// Initial request-data
 			if (this._windowed) {
-				dispatch(dom, 'ln-table:request-data', {
-					table: this.name,
-					sort: this.currentSort,
-					filters: this.currentFilters,
-					search: this.currentSearch,
-					offset: 0,
-					limit: WINDOW_PAGE,
-					queryGen: this._queryGen
-				});
+				if (this._data.length > 0) {
+					// SSR-seeded: page 0 is already resident, the grand total
+					// is declared in markup — no initial fetch needed. No
+					// queryGen on the seed — it must never be dropped as stale.
+					let declaredTotal = parseInt(dom.getAttribute('data-ln-table-count'), 10);
+					if (isNaN(declaredTotal) && this._totalSpan) {
+						const spanText = this._totalSpan.textContent.replace(/[^\d]/g, '');
+						if (spanText) declaredTotal = parseInt(spanText, 10);
+					}
+					const seedTotal = (declaredTotal > 0) ? declaredTotal : this._data.length;
+					this._cache.ingest({
+						data: this._data,
+						offset: 0,
+						total: seedTotal,
+						filtered: seedTotal
+					});
+				} else {
+					this._cache.requestInitial({
+						sort: this.currentSort,
+						filters: this.currentFilters,
+						search: this.currentSearch
+					});
+				}
 			} else {
 				dispatch(dom, 'ln-table:request-data', {
 					table: this.name,
@@ -428,6 +478,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				self._vStart = -1;
 				self._vEnd = -1;
 				self._render();
+				self._updateFooter();
 				dispatch(dom, 'ln-table:filter', {
 					term: self._searchTerm,
 					matched: self._filteredData.length,
@@ -806,8 +857,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (!this._rowHeight) {
 			if (this._windowed) {
 				let tempRow = null;
-				if (this._rowMap.size > 0) {
-					tempRow = this._buildRow(this._rowMap.values().next().value);
+				const sample = this._cache.peek();
+				if (sample) {
+					tempRow = this._buildRow(sample);
 				} else {
 					tempRow = this._buildPlaceholderRow();
 				}
@@ -975,7 +1027,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._renderWindowed = function () {
-		if (this.isLoaded && this._logicalTotal === 0) {
+		if (this.isLoaded && this._cache.logicalTotal === 0) {
 			this._disableVirtualScroll();
 			this._showEmptyState();
 			return;
@@ -986,7 +1038,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		const rowH = this._rowHeight;
 		if (!rowH) return;
 
-		const total = this._logicalTotal;
+		const total = this._cache.logicalTotal;
 		const theadH = this.thead ? this.thead.offsetHeight : 0;
 		const sc = this._scrollContainer;
 		let scrollIntoData;
@@ -1010,8 +1062,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		startRow = Math.min(startRow, total);
 		const endRow = Math.min(startRow + Math.ceil(viewportH / rowH) + (BUFFER_ROWS * 2), total);
 
-		this._lastViewportMid = Math.floor((startRow + endRow) / 2);
-
 		const colSpan = this.ths.length || 1;
 		const topH = startRow * rowH;
 		const bottomH = (total - endRow) * rowH;
@@ -1030,8 +1080,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		}
 
 		for (let i = startRow; i < endRow; i++) {
-			if (this._rowMap.has(i)) {
-				const tr = this._buildRow(this._rowMap.get(i));
+			if (this._cache.has(i)) {
+				const tr = this._buildRow(this._cache.get(i));
 				if (tr) frag.appendChild(tr);
 			} else {
 				frag.appendChild(this._buildPlaceholderRow());
@@ -1056,102 +1106,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		this._vStart = startRow;
 		this._vEnd = endRow;
 
-		this._ensureWindow(startRow, endRow);
-	};
-
-	_component.prototype._ensureWindow = function (startRow, endRow) {
-		let missing = -1;
-		for (let i = startRow; i < endRow; i++) {
-			if (!this._rowMap.has(i)) { missing = i; break; }
-		}
-		if (missing === -1) return;
-
-		const fetchOffset = Math.max(0, startRow - BUFFER_ROWS);
-		const fetchLimit = Math.min(
-			Math.max(WINDOW_PAGE, (endRow - fetchOffset) + BUFFER_ROWS),
-			this._logicalTotal - fetchOffset
-		);
-
-		if (this._inflight.has(fetchOffset)) return;
-
-		clearTimeout(this._fetchDebounceId);
-		const self = this;
-		this._fetchDebounceId = setTimeout(function () {
-			self._requestWindow(fetchOffset, fetchLimit);
-		}, FETCH_DEBOUNCE);
-	};
-
-	_component.prototype._requestWindow = function (offset, limit) {
-		this._inflight.add(offset);
-		dispatch(this.dom, 'ln-table:request-data', {
-			table: this.name,
-			sort: this.currentSort,
-			filters: this.currentFilters,
-			search: this.currentSearch,
-			offset: offset,
-			limit: limit,
-			queryGen: this._queryGen
-		});
-	};
-
-	_component.prototype._onWindowData = function (detail) {
-		if (detail.queryGen != null && detail.queryGen !== this._queryGen) return;
-
-		this._grandTotal = detail.total != null ? detail.total : this._grandTotal;
-		this._logicalTotal = detail.filtered != null ? detail.filtered : (detail.data ? detail.data.length : this._logicalTotal);
-
-		this._lastTotal = this._grandTotal;
-		this.totalCount = this._grandTotal;
-		this.visibleCount = this._logicalTotal;
-		this.isLoaded = true;
-
-		const offset = detail.offset || 0;
-		const rows = detail.data || [];
-		for (let i = 0; i < rows.length; i++) {
-			this._rowMap.set(offset + i, rows[i]);
-		}
-		this._inflight.delete(offset);
-
-		this.dom.classList.remove('ln-table--loading');
-
-		this._evictOutsideWindow();
-
-		this._vStart = -1;
-		this._vEnd = -1;
-		this._render();
-		this._updateFooter();
-
-		dispatch(this.dom, 'ln-table:rendered', {
-			table: this.name,
-			total: this.totalCount,
-			visible: this.visibleCount
-		});
-	};
-
-	_component.prototype._evictOutsideWindow = function () {
-		if (this._rowMap.size <= this._windowSize) return;
-		const mid = this._lastViewportMid;
-		const keys = Array.from(this._rowMap.keys()).sort(function (a, b) {
-			return Math.abs(b - mid) - Math.abs(a - mid);
-		});
-		let i = 0;
-		while (this._rowMap.size > this._windowSize && i < keys.length) {
-			this._rowMap.delete(keys[i]);
-			i++;
-		}
-	};
-
-	_component.prototype._invalidateWindow = function () {
-		this._queryGen++;
-		this._rowMap.clear();
-		this._inflight.clear();
-		clearTimeout(this._fetchDebounceId);
-		this._vStart = -1;
-		this._vEnd = -1;
-
-		this.dom.classList.add('ln-table--loading');
-		this._requestWindow(0, WINDOW_PAGE);
-		this._render();
+		this._cache.ensure(startRow, endRow);
 	};
 
 	// ─── Empty state ───────────────────────────────────────────
@@ -1291,7 +1246,15 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._requestData = function () {
-		if (this._windowed) { this._invalidateWindow(); return; }
+		if (this._windowed) {
+			this.dom.classList.add('ln-table--loading');
+			this._cache.invalidate({
+				sort: this.currentSort,
+				filters: this.currentFilters,
+				search: this.currentSearch
+			});
+			return;
+		}
 		requestData(this, 'ln-table:request-data', 'table');
 	};
 
@@ -1447,17 +1410,25 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	// ─── Footer Helpers ────────────────────────────────────────
 
 	_component.prototype._updateFooter = function () {
-		if (!this.isDataDriven) return;
-		const total = this._lastTotal != null ? this._lastTotal : this._data.length;
-		const filtered = this.visibleCount;
+		let total = 0;
+		let filtered = 0;
+
+		if (this.isDataDriven) {
+			total = this._lastTotal != null ? this._lastTotal : this._data.length;
+			filtered = this.visibleCount;
+		} else {
+			total = this._data.length;
+			filtered = this._filteredData.length;
+		}
+
 		const isFiltered = filtered < total;
 
 		if (this._totalSpan) {
-			this._totalSpan.textContent = _formatNum(total);
+			this._totalSpan.textContent = _formatNum(total, this.dom);
 		}
 
 		if (this._filteredSpan) {
-			this._filteredSpan.textContent = isFiltered ? _formatNum(filtered) : '';
+			this._filteredSpan.textContent = isFiltered ? _formatNum(filtered, this.dom) : '';
 		}
 
 		if (this._filteredWrap) {
@@ -1465,8 +1436,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		}
 
 		if (this._selectedSpan) {
-			const count = this.selectedIds.size;
-			this._selectedSpan.textContent = count > 0 ? _formatNum(count) : '';
+			const count = this.selectedIds ? this.selectedIds.size : 0;
+			this._selectedSpan.textContent = count > 0 ? _formatNum(count, this.dom) : '';
 			if (this._selectedWrap) {
 				this._selectedWrap.classList.toggle('hidden', count === 0);
 			}
@@ -1512,8 +1483,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 			this.dom.removeEventListener('click', this._onClearAll);
 			this.dom.removeEventListener('ln-filter:changed', this._onColumnFilter);
-			clearTimeout(this._fetchDebounceId);
-			if (this._rowMap) this._rowMap.clear();
+			if (this._cache) this._cache.destroy();
 		} else {
 			if (this._emptyTbodyObserver) {
 				this._emptyTbodyObserver.disconnect();

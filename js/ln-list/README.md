@@ -61,17 +61,28 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 
 ---
 
+## 🛠️ Attributes Reference
+
+| Attribute | Elements | Description |
+| :--- | :--- | :--- |
+| `data-ln-list` | Root wrapper | Component identifier. Target must carry a unique `id`. |
+| `data-ln-list-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
+| `data-ln-list-selectable` | Root wrapper | Enables checkbox-based item selections. |
+| `data-ln-list-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-item cap (default 1000). Requires Data-Driven Mode. |
+
+---
+
 ## ⚡ DOM Events
 
 ### Listened Events
 
-* `ln-list:set-data` `{ data, total, filtered }`: Hydrates/renders the items.
+* `ln-list:set-data` `{ data, total, filtered }`: Hydrates/renders the items. Windowed mode expects `{ offset, queryGen }` echoed back — routed into the internal window cache.
 * `ln-list:set-loading` `{ loading: true|false }`: Toggles the loading dimming overlay class (`.ln-list--loading`).
 * `ln-search:change` `{ term }`: Captures search query from `data-ln-search` inputs.
 
 ### Emitted Events
 
-* `ln-list:request-data` `{ list, search, sort, filters }`: Requests data query from the Coordinator.
+* `ln-list:request-data` `{ list, search, sort, filters }`: Requests data query from the Coordinator. Windowed mode (`data-ln-list-window`) adds `{ offset, limit, queryGen }`.
 * `ln-list:ready` `{ total }`: Fired when initial markup parsing completes.
 * `ln-list:rendered` `{ list, total, visible }`: Fired after items have been drawn to DOM.
 * `ln-list:item-click` `{ list, id, record }`: Fired when clicking item body (excluding buttons, anchors, inputs).

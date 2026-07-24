@@ -24,6 +24,7 @@ Name ⇅ │ Status ▾ ⇅ │ Date ↑              ← sticky header: sort + 
 
 - Filters live in column headers, never in a sidebar.
 - Virtual scroll, never pagination — sort/filter/search operate on the full dataset.
+- **Windowed exception** — for datasets too large to cache entirely client-side, a bounded sliding-window cache (`ln-core.createWindowCache`, opt-in via `data-ln-table-window` / `data-ln-list-window`) replaces the full client-side cache. Scrolling stays continuous (no pagination buttons) and sort/filter/search still resolve against the full dataset — computed server-side instead of in the client cache. Default remains the full client-side cache; windowed mode is opt-in for very large datasets.
 - Shimmer on first load; consistent row heights; scroll position preserved on back-navigation.
 
 ## Table vs cards

@@ -148,6 +148,9 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `data-ln-list` | Root container | `String` | - | Identifies the list component and names the generated events. |
 | `data-ln-list-source` | Root container | `String` | - | Enables Data-Driven mode. Specifies a key or API endpoint to request data. |
 | `data-ln-list-selectable` | Root container | `Flag` | - | Enables selection logic and row select checkbox listeners. |
+| `data-ln-list-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-item cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. |
+| `data-ln-list-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. |
+| `data-ln-list-window-threshold` | Root container | `Number` | `25` | Prefetch margin threshold in items before reaching unloaded page boundaries. |
 | `data-ln-list-body` | Root container | `Flag` | - | Designates the target container where list rows are appended. Falls back to root. |
 | `data-ln-item` | Template element | `Flag` | - | Identifies a row/card element inside a template or hydrated list. |
 | `data-ln-item-id` | `[data-ln-item]` | `String` | - | Unique ID of the row item (mapped from the data record). |
@@ -168,10 +171,10 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-list:set-data` | Listens | No | Populates the list with a dataset, removes loading overlays, and triggers render. | `{ data: Array, total: Number, filtered: Number }` |
+| `ln-list:set-data` | Listens | No | Populates the list with a dataset, removes loading overlays, and triggers render. Windowed mode (`data-ln-list-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
 | `ln-list:set-loading` | Listens | No | Controls the visual loading state of the list. | `{ loading: Boolean }` |
 | `ln-search:change` | Listens | No | Received from `ln-search` inputs, triggering local filtering or a new fetch request. | `{ term: String }` |
-| `ln-list:request-data` | Emits | No | Dispatched on initialization or parameter changes (sort, search, filter) to request data. | `{ list: String, sort: Object, filters: Object, search: String }` |
+| `ln-list:request-data` | Emits | No | Dispatched on initialization or parameter changes (sort, search, filter) to request data. Windowed mode (`data-ln-list-window`) additionally emits `offset`/`limit`/`queryGen`. | `{ list: String, sort: Object, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }` |
 | `ln-list:ready` | Emits | No | Dispatched after hydration or initial SSR item parsing completes. | `{ total: Number }` |
 | `ln-list:rendered` | Emits | No | Dispatched after items are appended/redrawn in the DOM. | `{ list: String, total: Number, visible: Number }` |
 | `ln-list:item-click` | Emits | No | Dispatched on item click (ignoring action button, checkbox, and link clicks). | `{ list: String, id: String, record: Object }` |
@@ -231,6 +234,7 @@ To support virtual scrolling correctly, items must have a predictable height. If
 > 1. **Hidden Parent Dimension Zeroing:** If the list initializes inside a collapsed tab, details accordion, or dropdown, its height reads as `0`. The virtual scroll mechanism will fall back to a default row height of `50px`, causing layout issues.
 >    * **Fix:** When changing the parent wrapper's visibility, trigger `window.dispatchEvent(new Event('resize'))` to force dimensions recalculation.
 > 2. **Bulk Actions Confirmation Gating:** Gating high-impact or bulk operations (e.g. deleting all selected items via `selectedIds`) with a simple in-place `ln-confirm` is forbidden. High-risk bulk operations MUST invoke an explicit [`ln-modal`](./ln-modal.md) listing the affected items and requiring positive button confirmation.
+> 3. **Windowed Select-All:** When `data-ln-list-window` is active, the global "select all" checkbox (`data-ln-list-select-all`) is automatically hidden — a windowed list cannot select items it has never fetched. Per-item selection (`data-ln-item-select`) still works and survives LRU eviction.
 
 ---
 
@@ -259,6 +263,30 @@ sequenceDiagram
     
     User->>DOM: Click action button inside row
     List->>Coord: Emit ln-list:item-action { list, id, action: 'delete', record }
+```
+
+### Lifecycle Sequence (Windowed Mode)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as User / Scroll
+    participant List as ln-list Component
+    participant Cache as createWindowCache
+    participant Coord as App Coordinator
+
+    User->>List: Scroll viewport
+    List->>Cache: ensure(startRow, endRow)
+    Cache->>Cache: Stamp resident items, compute missing range
+    Cache->>Coord: requestPage → emit 'ln-list:request-data' { offset, limit, queryGen }
+    Coord-->>List: Emit 'ln-list:set-data' { data, offset, queryGen }
+    List->>Cache: ingest(detail)
+    alt queryGen matches current generation
+        Cache->>Cache: Splice page at offset, LRU-evict if over windowSize
+        Cache->>List: onChange → repaint
+    else queryGen stale
+        Cache->>Cache: Drop response
+    end
 ```
 
 ---
