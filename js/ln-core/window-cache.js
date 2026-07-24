@@ -12,10 +12,10 @@
 
 export function createWindowCache(config) {
 	config = config || {};
-	const windowSize = config.windowSize > 0 ? config.windowSize : 1000;
-	const pageSize = config.pageSize > 0 ? config.pageSize : 200;
-	const threshold = config.threshold != null ? config.threshold : 25;
-	const fetchDebounce = config.fetchDebounce != null ? config.fetchDebounce : 120;
+	let windowSize = config.windowSize > 0 ? config.windowSize : 1000;
+	let pageSize = config.pageSize > 0 ? config.pageSize : 200;
+	let threshold = config.threshold != null ? config.threshold : 25;
+	let fetchDebounce = config.fetchDebounce != null ? config.fetchDebounce : 120;
 	const requestPage = typeof config.requestPage === 'function' ? config.requestPage : function () {};
 	const onChange = typeof config.onChange === 'function' ? config.onChange : function () {};
 
@@ -30,6 +30,10 @@ export function createWindowCache(config) {
 	let seq = 0;
 
 	function stamp(i) { touch.set(i, ++seq); }
+
+	function hasActiveQuery() {
+		return !!(query && (query.search || (query.filters && Object.keys(query.filters).length)));
+	}
 
 	function evict() {
 		if (map.size <= windowSize) return;
@@ -151,6 +155,28 @@ export function createWindowCache(config) {
 			map.clear();
 			touch.clear();
 			inflight.clear();
+		},
+
+		configure: function (partial) {
+			partial = partial || {};
+			let geometryChanged = false;
+			if (partial.windowSize != null && partial.windowSize > 0 && partial.windowSize !== windowSize) {
+				const shrank = partial.windowSize < windowSize;
+				windowSize = partial.windowSize;
+				if (shrank) evict();
+				geometryChanged = true;
+			}
+			if (partial.pageSize != null && partial.pageSize > 0) pageSize = partial.pageSize;
+			if (partial.threshold != null && partial.threshold >= 0) threshold = partial.threshold;
+			if (partial.fetchDebounce != null && partial.fetchDebounce >= 0) fetchDebounce = partial.fetchDebounce;
+			if (geometryChanged) onChange();
+		},
+
+		setGrandTotal: function (n) {
+			if (n == null || isNaN(n) || n < 0) return;
+			grandTotal = n;
+			if (!hasActiveQuery()) logicalTotal = n;
+			onChange();
 		}
 	};
 }

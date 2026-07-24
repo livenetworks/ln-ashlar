@@ -141,9 +141,10 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the data source name. |
 | `data-ln-table-store` | Root container | `String` | - | Target data store name to connect with via `ln-data-coordinator`. |
 | `data-ln-table-selectable` | Root container | `Boolean` | `false` | Enables row multi-selection and checkboxes. |
-| `data-ln-table-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-row cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. |
-| `data-ln-table-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. |
-| `data-ln-table-window-threshold` | Root container | `Number` | `25` | Prefetch margin threshold in rows before reaching unloaded page boundaries. |
+| `data-ln-table-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-row cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. Observable — adding/removing it toggles windowed mode ON/OFF live, no re-init; changing the value while windowed reconfigures the live cache. |
+| `data-ln-table-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. Observable — applies to the live cache without re-init. |
+| `data-ln-table-window-threshold` | Root container | `Number` | `25` | Prefetch margin threshold in rows before reaching unloaded page boundaries. Observable — applies to the live cache without re-init. |
+| `data-ln-table-count` | Root container | `Number` | - | Declares the unfiltered grand total (windowed mode). Observable — applies to the live cache via `setGrandTotal()` without re-init. |
 | `data-ln-table-col` | `<th>` | `String` | - | Maps a table header to a JSON payload field. |
 | `data-ln-table-sort` | `<th>` | `string`\|`number`\|`date` | - | Enables client-side/server-side sorting on this column. |
 | `data-ln-value` | `<td>` | `String` | - | Raw computer-readable sorting value, ignoring HTML formatting. *(Processed externally via `ln-core.js` / `fill()`)* |

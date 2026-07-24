@@ -284,3 +284,7 @@ Opted in by adding `data-ln-table-window="N"` alongside `data-ln-table-source`. 
 ```
 
 The `offset`/`limit` pair addresses the page to fetch; `queryGen` is echoed back verbatim so `ln-table` can drop a response superseded by a newer sort/filter/search before it lands.
+
+### Live observability
+
+`data-ln-table-window`, `data-ln-table-window-page`, `data-ln-table-window-threshold`, and `data-ln-table-count` are all observed; mutating any of them applies to the live cache without re-init. Windowed mode itself is observable too: adding `data-ln-table-window` to an initialized, non-windowed, data-driven table enables windowing live (seeding from resident rows and honoring `data-ln-table-count` if present); removing it disables windowing live and issues a fresh full `ln-table:request-data` (no `offset`/`limit`) to repopulate the complete dataset before rendering non-windowed again.

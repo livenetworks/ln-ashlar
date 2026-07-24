@@ -123,6 +123,8 @@ In `ln-ashlar`, `windowSize`, `pageSize` (`window-page`), and `threshold` (`wind
 | `ingest` | `(detail: Object)` | `void` | Splices a fetched page (`detail.data` at `detail.offset`) into the cache, updates totals from `detail.total`/`detail.filtered`, evicts over-cap rows, fires `onChange()`. Drops the response if `detail.queryGen` doesn't match the current generation. |
 | `requestInitial` | `(query: Object)` | `void` | First load — stores `query`, fetches page 0 at the current generation (no bump). |
 | `invalidate` | `(query: Object)` | `void` | Query change — bumps `queryGen`, clears the cache, stores the new `query`, refetches page 0, fires `onChange()` for an immediate all-placeholder repaint. |
+| `configure` | `(partial: Object)` | `void` | Live-mutates any subset of `{windowSize, pageSize, threshold, fetchDebounce}`. Shrinking `windowSize` runs `evict()` before firing `onChange()`; `pageSize`/`threshold`/`fetchDebounce` apply to the next `ensure()` call with no immediate repaint. This is what makes `data-ln-{table\|list}-window-page`/`-window-threshold`/`-window` observable without re-init. |
+| `setGrandTotal` | `(n: Number)` | `void` | Sets `grandTotal`; also moves `logicalTotal` to `n`, but only when the stored `query` has no active `search`/`filters` — a filtered total stays server-owned via `ingest()`. Fires `onChange()`. Backs the observable `data-ln-{table\|list}-count` attribute. |
 | `destroy` | `()` | `void` | Clears the debounce timer and cache contents. |
 
 ---

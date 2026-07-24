@@ -148,17 +148,49 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 		return this;
 	}
 
+	function _parseRawNumber(val) {
+		if (typeof val === 'number') return isNaN(val) ? null : val;
+		if (!val || typeof val !== 'string') return null;
+		let str = val.trim();
+		if (str === '') return null;
+		// Remove spaces/non-breaking spaces/currency symbols
+		str = str.replace(/[\s\u00A0$€£]/g, '');
+
+		// Handle "1.234,56" (DE/MK) vs "1,234.56" (EN)
+		if (str.indexOf(',') !== -1 && str.indexOf('.') !== -1) {
+			if (str.indexOf('.') < str.indexOf(',')) {
+				// DE/MK style: 1.234,56 -> 1234.56
+				str = str.replace(/\./g, '').replace(',', '.');
+			} else {
+				// EN style: 1,234.56 -> 1234.56
+				str = str.replace(/,/g, '');
+			}
+		} else if (str.indexOf(',') !== -1) {
+			// Only comma e.g. "1499,50" -> 1499.50
+			str = str.replace(',', '.');
+		}
+		// Strip any remaining invalid chars
+		str = str.replace(/[^\d.-]/g, '');
+		const num = parseFloat(str);
+		return isNaN(num) ? null : num;
+	}
+
 	_component.prototype._initTextElement = function () {
 		const dom = this.dom;
-		let rawAttr = dom.getAttribute('data-ln-value');
-		if (rawAttr === null) {
-			rawAttr = dom.getAttribute('data-ln-number');
-		}
-		const textContent = dom.textContent.trim();
-		const candidate = (rawAttr !== null && rawAttr !== '') ? rawAttr : textContent;
+		let valAttr = dom.getAttribute('data-ln-value');
+		let numAttr = dom.getAttribute('data-ln-number');
 
-		const num = parseFloat(candidate.replace(/[^\d.-]/g, ''));
-		if (!isNaN(num)) {
+		let candidate = null;
+		if (valAttr !== null && valAttr !== '') {
+			candidate = valAttr;
+		} else if (numAttr !== null && numAttr !== '' && numAttr !== 'true') {
+			candidate = numAttr;
+		} else {
+			candidate = dom.textContent.trim();
+		}
+
+		const num = _parseRawNumber(candidate);
+		if (num !== null) {
 			this._rawValue = num;
 			if (!dom.hasAttribute('data-ln-value')) {
 				dom.setAttribute('data-ln-value', String(num));
@@ -389,6 +421,23 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty } from '
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-number');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-number', {
+		extraAttributes: [
+			'data-ln-value',
+			'data-ln-number-decimals',
+			'data-ln-number-min',
+			'data-ln-number-max',
+			'lang'
+		],
+		onAttributeChange: function (el) {
+			const inst = el[DOM_ATTRIBUTE];
+			if (!inst) return;
+			if (inst.isTextElement) {
+				inst._initTextElement();
+			} else if (!isNaN(inst.value)) {
+				inst._displayFormatted(inst.value);
+			}
+		}
+	});
 	_localeObserver();
 })();

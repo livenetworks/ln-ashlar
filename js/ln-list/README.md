@@ -68,7 +68,7 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 | `data-ln-list` | Root wrapper | Component identifier. Target must carry a unique `id`. |
 | `data-ln-list-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
 | `data-ln-list-selectable` | Root wrapper | Enables checkbox-based item selections. |
-| `data-ln-list-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-item cap (default 1000). Requires Data-Driven Mode. |
+| `data-ln-list-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-item cap (default 1000). Requires Data-Driven Mode. Observable: add/remove toggles windowed mode ON/OFF live; changing `N` while windowed reconfigures the live cache. `data-ln-list-window-page`, `data-ln-list-window-threshold`, and `data-ln-list-count` are likewise observable. |
 
 ---
 
@@ -82,7 +82,7 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 
 ### Emitted Events
 
-* `ln-list:request-data` `{ list, search, sort, filters }`: Requests data query from the Coordinator. Windowed mode (`data-ln-list-window`) adds `{ offset, limit, queryGen }`.
+* `ln-list:request-data` `{ list, search, sort, filters }`: Requests data query from the Coordinator. Windowed mode (`data-ln-list-window`) adds `{ offset, limit, queryGen }`. Disabling windowed mode live issues a fresh full `ln-list:request-data` (no `offset`/`limit`) to repopulate the complete dataset.
 * `ln-list:ready` `{ total }`: Fired when initial markup parsing completes.
 * `ln-list:rendered` `{ list, total, visible }`: Fired after items have been drawn to DOM.
 * `ln-list:item-click` `{ list, id, record }`: Fired when clicking item body (excluding buttons, anchors, inputs).

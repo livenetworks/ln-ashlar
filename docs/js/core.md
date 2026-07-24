@@ -502,12 +502,15 @@ cache.requestInitial({ sort: null, filters: {}, search: '' });
 | `ingest` | `(detail)` | Splice a fetched page into the cache. Drops responses whose `detail.queryGen` doesn't match the current generation. Triggers `onChange()`. |
 | `requestInitial` | `(query)` | First load — fetches page 0 at the current generation (no bump). |
 | `invalidate` | `(query)` | Query change — bumps `queryGen`, clears the cache, refetches page 0, fires `onChange()` for an immediate all-placeholder repaint. |
+| `configure` | `(partial)` | Live-mutate any subset of `{windowSize, pageSize, threshold, fetchDebounce}`. Shrinking `windowSize` runs `evict()` then `onChange()`; `pageSize`/`threshold`/`fetchDebounce` apply to the next `ensure()` with no immediate render. |
+| `setGrandTotal` | `(n)` | Sets `grandTotal`; moves `logicalTotal` to `n` too, but only when no `search`/`filters` are active on the current query (a filtered total is server-owned via `ingest`). Fires `onChange()`. |
 | `destroy` | `()` | Clears timers and cache contents. |
 
 - LRU eviction drops the least-recently-touched rows first once `map.size` exceeds `windowSize` — a pure data policy, not a viewport-distance heuristic.
 - `queryGen` is the stale-response guard: `ingest()` silently drops any page whose `detail.queryGen` doesn't match the cache's current generation, so an out-of-order response from a superseded query never corrupts the window.
 - Pages splice at their own `offset`, so out-of-order arrivals are safe — order is irrelevant.
 - Pure function core, no DOM — shared by the `ln-table` and `ln-list` windowed paths. A future `ln-data-store` windowed mode plugs in by making `requestPage` resolve `getAll({ offset, limit })` then call `ingest()`.
+- `configure`/`setGrandTotal` make the cache's own config live-observable; the owning component (`ln-table`/`ln-list`) wires them to `data-ln-*-window-page` / `-window-threshold` / `-count` attribute changes so no re-init is required.
 
 ---
 

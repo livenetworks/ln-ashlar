@@ -148,15 +148,69 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 
 	// ─── Component ────────────────────────────────────────────
 
-	function _component(dom) {
-		if (dom.tagName !== 'INPUT') {
-			return this;
+	// ─── Component ────────────────────────────────────────────
+
+	_component.prototype._initTextElement = function () {
+		const dom = this.dom;
+		let valAttr = dom.getAttribute('data-ln-value');
+		let dateAttr = dom.getAttribute('data-ln-date');
+		let datetimeAttr = dom.getAttribute('datetime');
+
+		let candidate = null;
+		if (valAttr !== null && valAttr !== '') {
+			candidate = valAttr;
+		} else if (datetimeAttr !== null && datetimeAttr !== '') {
+			candidate = datetimeAttr;
+		} else if (dateAttr !== null && dateAttr !== '' && dateAttr !== 'true' && !KEYWORD_RE.test(dateAttr)) {
+			candidate = dateAttr;
+		} else {
+			candidate = dom.textContent.trim();
 		}
 
+		const date = _parseISO(candidate) || _parseTyped(candidate) || (candidate ? new Date(candidate) : null);
+		if (date && !isNaN(date.getTime())) {
+			const iso = _toISO(date);
+			this._rawValue = iso;
+			if (!dom.hasAttribute('data-ln-value')) {
+				dom.setAttribute('data-ln-value', iso);
+			}
+			this._formatTextContent();
+		} else {
+			this._rawValue = null;
+		}
+	};
+
+	_component.prototype._formatTextContent = function () {
+		if (this._rawValue) {
+			const date = _parseISO(this._rawValue);
+			if (date) {
+				const formatAttr = this.dom.getAttribute('data-ln-date-format');
+				let format = formatAttr;
+				if (!format) {
+					const dateAttr = this.dom.getAttribute('data-ln-date');
+					if (dateAttr && KEYWORD_RE.test(dateAttr)) {
+						format = dateAttr;
+					}
+				}
+				const locale = getLocale(this.dom);
+				this.dom.textContent = _formatDate(date, format || 'medium', locale);
+			}
+		}
+	};
+
+	function _component(dom) {
 		if (dom[DOM_ATTRIBUTE]) return dom[DOM_ATTRIBUTE];
 		dom[DOM_ATTRIBUTE] = this;
 
 		this.dom = dom;
+
+		if (dom.tagName !== 'INPUT') {
+			this.isTextElement = true;
+			this._initTextElement();
+			return this;
+		}
+
+		this.isTextElement = false;
 		const self = this;
 
 		// ── Read initial state ──────────────────────────────
@@ -422,9 +476,27 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 
 	Object.defineProperty(_component.prototype, 'value', {
 		get: function () {
+			if (this.isTextElement) {
+				return this._rawValue || '';
+			}
 			return _inputValueDesc.get.call(this._hidden);
 		},
 		set: function (isoStr) {
+			if (this.isTextElement) {
+				if (!isoStr || isoStr === '') {
+					this._rawValue = null;
+					this.dom.removeAttribute('data-ln-value');
+					this.dom.textContent = '';
+					return;
+				}
+				const date = _parseISO(isoStr) || _parseTyped(isoStr);
+				if (!date) return;
+				const iso = _toISO(date);
+				this._rawValue = iso;
+				this.dom.setAttribute('data-ln-value', iso);
+				this._formatTextContent();
+				return;
+			}
 			if (!isoStr || isoStr === '') {
 				_clearState(this);
 				return;
@@ -452,12 +524,20 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 
 	Object.defineProperty(_component.prototype, 'formatted', {
 		get: function () {
+			if (this.isTextElement) {
+				return this.dom.textContent;
+			}
 			return this.dom.value;
 		}
 	});
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		if (this.isTextElement) {
+			dispatch(this.dom, 'ln-date:destroyed', { target: this.dom });
+			delete this.dom[DOM_ATTRIBUTE];
+			return;
+		}
 		this._picker.removeEventListener('change', this._onPickerChange);
 		this.dom.removeEventListener('blur', this._onBlur);
 		this._btn.removeEventListener('click', this._onBtnClick);
@@ -484,16 +564,32 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 			const els = document.querySelectorAll('[' + DOM_SELECTOR + ']');
 			for (let i = 0; i < els.length; i++) {
 				const inst = els[i][DOM_ATTRIBUTE];
-				if (inst && inst.value) {
-					const date = _parseISO(inst.value);
-					if (date) inst._displayFormatted(date);
+				if (inst) {
+					if (inst.isTextElement) {
+						inst._formatTextContent();
+					} else if (inst.value) {
+						const date = _parseISO(inst.value);
+						if (date) inst._displayFormatted(date);
+					}
 				}
 			}
-		}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+		}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'], subtree: true });
 	}
 
 	// ─── Init ─────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-date');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-date', {
+		extraAttributes: ['data-ln-date-format', 'data-ln-date-locale', 'data-ln-value', 'lang'],
+		onAttributeChange: function (el) {
+			const inst = el[DOM_ATTRIBUTE];
+			if (!inst) return;
+			if (inst.isTextElement) {
+				inst._initTextElement();
+			} else if (inst.value) {
+				const date = _parseISO(inst.value);
+				if (date) inst._displayFormatted(date);
+			}
+		}
+	});
 	_localeObserver();
 })();

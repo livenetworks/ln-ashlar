@@ -475,11 +475,34 @@ export function populateForm(form, data) {
 
 // ─── Locale Detection ─────────────────────────────────────
 
+const _standardTerritories = {
+	mk: 'mk-MK',
+	de: 'de-DE',
+	fr: 'fr-FR',
+	es: 'es-ES',
+	it: 'it-IT',
+	nl: 'nl-NL',
+	pt: 'pt-PT',
+	ru: 'ru-RU',
+	bg: 'bg-BG',
+	hr: 'hr-HR',
+	sr: 'sr-RS',
+	sq: 'sq-AL',
+	el: 'el-GR',
+	en: 'en-US'
+};
+
 export function getLocale(el) {
 	const langEl = el ? el.closest('[lang]') : null;
-	return (langEl ? langEl.lang : null)
-		|| (document.documentElement ? document.documentElement.lang : null)
+	const raw = (langEl ? (langEl.getAttribute('lang') || langEl.lang) : null)
+		|| (document.documentElement ? (document.documentElement.getAttribute('lang') || document.documentElement.lang) : null)
 		|| navigator.language;
+	if (!raw) return 'en-US';
+	const lower = raw.trim().toLowerCase();
+	if (lower.indexOf('-') === -1 && _standardTerritories[lower]) {
+		return _standardTerritories[lower];
+	}
+	return raw;
 }
 
 // ─── Raw Value Read ───────────────────────────────────────

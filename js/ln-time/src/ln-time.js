@@ -200,10 +200,24 @@ import { registerComponent, getLocale, getLocaleFallback } from '../../ln-core';
 		}
 	}
 
+	// ─── Locale Observer ──────────────────────────────────────
+	function _localeObserver() {
+		new MutationObserver(function () {
+			const els = document.querySelectorAll('[' + DOM_SELECTOR + ']');
+			for (let i = 0; i < els.length; i++) {
+				const inst = els[i][DOM_ATTRIBUTE];
+				if (inst) {
+					_render(inst);
+				}
+			}
+		}).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'], subtree: true });
+	}
+
 	// ─── Registration ─────────────────────────────────────────
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _constructor, 'ln-time', {
-		extraAttributes: ['datetime'],
+		extraAttributes: ['datetime', 'data-ln-time-locale', 'lang'],
 		onAttributeChange: _onAttributeChange,
 		onInit: _onInit
 	});
+	_localeObserver();
 })();

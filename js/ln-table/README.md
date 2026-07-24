@@ -79,7 +79,7 @@ A zero-dependency, high-performance table presenter component that supports both
 | `data-ln-table` | Root wrapper | Component identifier. Target must carry a unique `id`. |
 | `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
 | `data-ln-table-selectable` | Root wrapper | Enables checkbox-based row selections. |
-| `data-ln-table-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-row cap (default 1000). Requires Data-Driven Mode. |
+| `data-ln-table-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-row cap (default 1000). Requires Data-Driven Mode. Observable: add/remove toggles windowed mode ON/OFF live; changing `N` while windowed reconfigures the live cache. |
 | ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` in both modes. |
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
@@ -182,6 +182,10 @@ Opt-in server-side sliding-window virtualization for datasets too large to cache
 3. Reads `{ offset, queryGen }` off `ln-table:set-data` and routes it into the window cache, dropping the response if `queryGen` no longer matches the current query.
 4. Renders blank placeholder rows (no shimmer) for logical rows not yet resident.
 5. Hides the select-all checkbox (D4) — per-row selection still works and survives eviction.
+
+### Live observability
+
+`data-ln-table-window`, `data-ln-table-window-page`, `data-ln-table-window-threshold`, and `data-ln-table-count` are all observed and apply live, without re-init. Adding `data-ln-table-window` to an initialized, non-windowed, data-driven table enables windowing live — the cache seeds from resident rows, honoring `data-ln-table-count` if present. Removing it disables windowing live: the cache is destroyed and the table issues a fresh full `ln-table:request-data` (no `offset`/`limit`) to repopulate the complete dataset before rendering non-windowed again.
 
 ### What it does NOT do
 

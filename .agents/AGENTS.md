@@ -22,6 +22,12 @@
 ### D. HTML Template System & Zero JS Display Text
 - **HTML-First DOM Structure**: Component DOM structures belong in `<template data-ln-template="...">` in HTML, cloned via `cloneTemplate()` and populated via `fill()`. Never build DOM trees via `createElement` chains in JS.
 - **Zero Display Text in JS**: Hardcoded UI text/labels in JS are strictly forbidden. Translatable text lives in `<ul hidden><li data-{component}-dict="key">...</li></ul>` (read via `buildDict`) or relies on browser `Intl` APIs (`Intl.DateTimeFormat`, `Intl.NumberFormat`).
+- **Semantic HTML5 & Accessibility First**:
+  - Always use semantic HTML5 elements for data presentation instead of generic `<div>` or `<span>` containers:
+    - **Dates & Times**: MUST use `<time datetime="...">` with `data-ln-date` or `data-ln-time` (e.g. `<time datetime="2026-07-25" data-ln-date="long">2026-07-25</time>`).
+    - **Numbers & Totals**: MUST use semantic inline tags (`<strong>`, `<b>`, `<data value="...">`, `<td>`) with `data-ln-number`.
+    - **Controls & Actions**: MUST use `<button type="button">` / `<button type="submit">`, `<label>`, `<fieldset>`, `<legend>`.
+  - Machine-readable attributes (`datetime`, `data-ln-value`) MUST be preserved for screen readers and ARIA accessibility while the visible text content is formatted dynamically according to locale.
 
 ### E. Lifecycle Events & Detail Guards
 - **Paired Events**: Components emit `ln-{name}:before-{action}` (cancelable) before state changes, and `ln-{name}:{action}` (post-fact, bubbling) after state changes.

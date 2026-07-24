@@ -136,49 +136,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this._lastFiltered = 0;
 
 			// Windowed (sliding-window) server-side virtualization — opt-in
-			this._windowed = this.isDataDriven && dom.hasAttribute('data-ln-table-window');
-			if (this._windowed) {
-				const winAttr = parseInt(dom.getAttribute('data-ln-table-window'), 10);
-				const pageAttr = parseInt(dom.getAttribute('data-ln-table-window-page'), 10);
-				const threshAttr = parseInt(dom.getAttribute('data-ln-table-window-threshold'), 10);
-
-				// Cache change → sync totals off the cache, re-render (pull), notify.
-				this._onCacheChange = function () {
-					self.totalCount = self._cache.grandTotal;
-					self.visibleCount = self._cache.logicalTotal;
-					self._lastTotal = self._cache.grandTotal;
-					self.isLoaded = true;
-					self._vStart = -1;
-					self._vEnd = -1;
-					self._render();
-					self._updateFooter();
-					dispatch(dom, 'ln-table:rendered', {
-						table: self.name,
-						total: self.totalCount,
-						visible: self.visibleCount
-					});
-				};
-				this._renderBatch = createBatcher(this._onCacheChange);
-
-				this._cache = createWindowCache({
-					windowSize: winAttr > 0 ? winAttr : WINDOW_DEFAULT,
-					pageSize: pageAttr > 0 ? pageAttr : WINDOW_PAGE,
-					threshold: threshAttr >= 0 ? threshAttr : 25,
-					fetchDebounce: FETCH_DEBOUNCE,
-					requestPage: function (query, offset, limit) {
-						dispatch(dom, 'ln-table:request-data', {
-							table: self.name,
-							sort: query.sort,
-							filters: query.filters,
-							search: query.search,
-							offset: offset,
-							limit: limit,
-							queryGen: self._cache.queryGen
-						});
-					},
-					onChange: this._renderBatch
-				});
-			}
+			this._windowed = false;
+			this._cache = null;
+			if (this.isDataDriven && dom.hasAttribute('data-ln-table-window')) this._enterWindowedMode();
 
 			// Footer elements
 			this._totalSpan = dom.querySelector('[data-ln-table-total]');
@@ -422,29 +382,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			// Initial request-data
 			if (this._windowed) {
-				if (this._data.length > 0) {
-					// SSR-seeded: page 0 is already resident, the grand total
-					// is declared in markup — no initial fetch needed. No
-					// queryGen on the seed — it must never be dropped as stale.
-					let declaredTotal = parseInt(dom.getAttribute('data-ln-table-count'), 10);
-					if (isNaN(declaredTotal) && this._totalSpan) {
-						const spanText = this._totalSpan.textContent.replace(/[^\d]/g, '');
-						if (spanText) declaredTotal = parseInt(spanText, 10);
-					}
-					const seedTotal = (declaredTotal > 0) ? declaredTotal : this._data.length;
-					this._cache.ingest({
-						data: this._data,
-						offset: 0,
-						total: seedTotal,
-						filtered: seedTotal
-					});
-				} else {
-					this._cache.requestInitial({
-						sort: this.currentSort,
-						filters: this.currentFilters,
-						search: this.currentSearch
-					});
-				}
+				this._kickWindowInitial();
 			} else {
 				dispatch(dom, 'ln-table:request-data', {
 					table: this.name,
@@ -1258,6 +1196,107 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		requestData(this, 'ln-table:request-data', 'table');
 	};
 
+	// ─── Windowed Mode — enter/exit/seed (live toggle) ──────────
+
+	_component.prototype._enterWindowedMode = function () {
+		const self = this;
+		const dom = this.dom;
+		const winAttr = parseInt(dom.getAttribute('data-ln-table-window'), 10);
+		const pageAttr = parseInt(dom.getAttribute('data-ln-table-window-page'), 10);
+		const threshAttr = parseInt(dom.getAttribute('data-ln-table-window-threshold'), 10);
+
+		// Cache change → sync totals off the cache, re-render (pull), notify.
+		this._onCacheChange = function () {
+			if (!self._windowed || !self._cache) return;
+			self.totalCount = self._cache.grandTotal;
+			self.visibleCount = self._cache.logicalTotal;
+			self._lastTotal = self._cache.grandTotal;
+			self.isLoaded = true;
+			self._vStart = -1;
+			self._vEnd = -1;
+			self._render();
+			self._updateFooter();
+			dispatch(dom, 'ln-table:rendered', {
+				table: self.name,
+				total: self.totalCount,
+				visible: self.visibleCount
+			});
+		};
+		this._renderBatch = createBatcher(this._onCacheChange);
+
+		this._cache = createWindowCache({
+			windowSize: winAttr > 0 ? winAttr : WINDOW_DEFAULT,
+			pageSize: pageAttr > 0 ? pageAttr : WINDOW_PAGE,
+			threshold: threshAttr >= 0 ? threshAttr : 25,
+			fetchDebounce: FETCH_DEBOUNCE,
+			requestPage: function (query, offset, limit) {
+				dispatch(dom, 'ln-table:request-data', {
+					table: self.name,
+					sort: query.sort,
+					filters: query.filters,
+					search: query.search,
+					offset: offset,
+					limit: limit,
+					queryGen: self._cache.queryGen
+				});
+			},
+			onChange: this._renderBatch
+		});
+
+		this._windowed = true;
+
+		// D4 — windowed tables cannot select rows they have never fetched
+		if (this._selectable && this._selectAllCheckbox) {
+			this._selectAllCheckbox.classList.add('hidden');
+		}
+	};
+
+	_component.prototype._kickWindowInitial = function () {
+		if (this._data.length > 0) {
+			// SSR-seeded / warm-seeded: page 0 is already resident, the grand
+			// total is declared in markup — no initial fetch needed. No
+			// queryGen on the seed — it must never be dropped as stale.
+			let declaredTotal = parseInt(this.dom.getAttribute('data-ln-table-count'), 10);
+			if (isNaN(declaredTotal) && this._totalSpan) {
+				const spanText = this._totalSpan.textContent.replace(/[^\d]/g, '');
+				if (spanText) declaredTotal = parseInt(spanText, 10);
+			}
+			const seedTotal = (declaredTotal > 0) ? declaredTotal : this._data.length;
+			this._cache.ingest({
+				data: this._data,
+				offset: 0,
+				total: seedTotal,
+				filtered: seedTotal
+			});
+		} else {
+			this.dom.classList.add('ln-table--loading');
+			this._cache.requestInitial({
+				sort: this.currentSort,
+				filters: this.currentFilters,
+				search: this.currentSearch
+			});
+		}
+	};
+
+	_component.prototype._exitWindowedMode = function () {
+		this._disableVirtualScroll();
+		if (this._cache) this._cache.destroy();
+		this._cache = null;
+		this._windowed = false;
+		this._renderBatch = null;
+		this._onCacheChange = null;
+		if (this._selectAllCheckbox) {
+			this._selectAllCheckbox.classList.remove('hidden');
+		}
+		this._rowHeight = 0;
+		this._vStart = -1;
+		this._vEnd = -1;
+		this._data = [];
+		this._filteredData = [];
+		this.dom.classList.add('ln-table--loading');
+		this._requestData();
+	};
+
 	// ─── Selection Helpers ─────────────────────────────────────
 
 	_component.prototype._updateSelectAll = function () {
@@ -1507,5 +1546,42 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-table');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-table', {
+		extraAttributes: [
+			'data-ln-table-window',
+			'data-ln-table-window-page',
+			'data-ln-table-window-threshold',
+			'data-ln-table-count'
+		],
+		onAttributeChange: function (el, attrName) {
+			const inst = el[DOM_ATTRIBUTE];
+			if (!inst || !inst.isDataDriven) return;
+
+			if (attrName === 'data-ln-table-window') {
+				const present = el.hasAttribute('data-ln-table-window');
+				if (present && !inst._windowed) {
+					inst._enterWindowedMode();
+					inst._kickWindowInitial();
+				} else if (!present && inst._windowed) {
+					inst._exitWindowedMode();
+				} else if (present && inst._windowed) {
+					const v = parseInt(el.getAttribute('data-ln-table-window'), 10);
+					if (v > 0) inst._cache.configure({ windowSize: v });
+				}
+				return;
+			}
+
+			if (!inst._windowed || !inst._cache) return;
+			if (attrName === 'data-ln-table-window-page') {
+				const v = parseInt(el.getAttribute('data-ln-table-window-page'), 10);
+				if (v > 0) inst._cache.configure({ pageSize: v });
+			} else if (attrName === 'data-ln-table-window-threshold') {
+				const v = parseInt(el.getAttribute('data-ln-table-window-threshold'), 10);
+				if (v >= 0) inst._cache.configure({ threshold: v });
+			} else if (attrName === 'data-ln-table-count') {
+				const v = parseInt(el.getAttribute('data-ln-table-count'), 10);
+				if (v >= 0) inst._cache.setGrandTotal(v);
+			}
+		}
+	});
 })();

@@ -1246,6 +1246,21 @@ input:focus-visible {
 								<output id="demo-qty-raw"></output>
 							</div>
 						</form>
+
+						<h4 style="margin-top: var(--size-lg);">Non-Input Text Element Formatting (<code>&lt;span&gt;</code>, <code>&lt;td&gt;</code>)</h4>
+						<p class="text-sm text-sunken"><code>ln-number</code> can also format static or dynamic text elements directly in HTML according to the active locale.</p>
+						
+						<div style="display: flex; gap: var(--size-md); flex-wrap: wrap; margin-top: var(--size-sm);">
+							<div class="card" style="padding: var(--size-sm) var(--size-md);">
+								<small class="text-sunken">Raw Text standard: <code>1234567.89</code></small>
+								<div>Result: <strong data-ln-number>1234567.89</strong></div>
+							</div>
+
+							<div class="card" style="padding: var(--size-sm) var(--size-md);">
+								<small class="text-sunken">Attribute value + 2 decimals: <code>5000</code></small>
+								<div>Result: €<strong data-ln-number="5000" data-ln-number-decimals="2">5000</strong></div>
+							</div>
+						</div>
 					</main>
 					<script type="text/plain" data-demo-scss>
 // Text fields and formatted numbers use form-input mixin:
@@ -1309,6 +1324,26 @@ input[data-ln-number] {
 								<input type="date" id="demo-dict-date" name="dict_date" value="2026-04-19" data-ln-date="MMMM yyyy">
 							</div>
 						</form>
+
+						<h4 style="margin-top: var(--size-lg);">Semantic Text Element Formatting (<code>&lt;time&gt;</code>, <code>&lt;td&gt;</code>)</h4>
+						<p class="text-sm text-sunken">For semantic HTML5 accessibility, use <code>&lt;time datetime="..."&gt;</code> elements with <code>data-ln-date</code>.</p>
+						
+						<div style="display: flex; gap: var(--size-md); flex-wrap: wrap; margin-top: var(--size-sm);">
+							<div class="card" style="padding: var(--size-sm) var(--size-md);">
+								<small class="text-sunken">Medium format: <code>&lt;time datetime="2026-07-25"&gt;</code></small>
+								<div>Result: <time datetime="2026-07-25" data-ln-date="medium">2026-07-25</time></div>
+							</div>
+
+							<div class="card" style="padding: var(--size-sm) var(--size-md);">
+								<small class="text-sunken">Long format: <code>&lt;time datetime="2026-07-25"&gt;</code></small>
+								<div>Result: <time datetime="2026-07-25" data-ln-date="long">2026-07-25</time></div>
+							</div>
+
+							<div class="card" style="padding: var(--size-sm) var(--size-md);">
+								<small class="text-sunken">Custom pattern: <code>dd.MM.yyyy</code></small>
+								<div>Result: <time datetime="2026-07-25" data-ln-date="dd.MM.yyyy">2026-07-25</time></div>
+							</div>
+						</div>
 					</main>
 					<script type="text/plain" data-demo-scss>
 // ln-date wraps its controls in a merged field shell.

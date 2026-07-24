@@ -88,6 +88,29 @@ Registers custom translation strings for Macedonian locale to act as fallback tr
 
 ---
 
+### Variant 4: Formatting Semantic Non-Input Text Elements (`<time>`, `<td>`)
+
+`ln-date` can also be applied directly to semantic non-input text elements like `<time datetime="...">` or `<td>`. It parses the ISO date from `datetime`, `data-ln-value`, `data-ln-date`, or inner text, and formats `textContent` automatically according to the active locale without wrapping or injecting hidden inputs.
+
+```html
+<!-- Semantic HTML5 time element with datetime attribute -->
+<time datetime="2026-07-25" data-ln-date="medium">2026-07-25</time>
+<!-- Output in mk/de: 25 јул 2026 / 25.07.2026 | Output in en-US: Jul 25, 2026 -->
+
+<!-- Long format with explicit data-ln-value -->
+<time data-ln-value="2026-07-25" data-ln-date="long">2026-07-25</time>
+<!-- Output in mk: 25 јули 2026 | Output in en-US: July 25, 2026 -->
+
+<!-- Custom pattern on table cell -->
+<td data-ln-value="2026-07-25" data-ln-date="dd.MM.yyyy">2026-07-25</td>
+<!-- Output: 25.07.2026 -->
+```
+
+> [!NOTE]
+> For screen readers and HTML5 accessibility, always prefer `<time datetime="YYYY-MM-DD">` elements over generic `<span>` tags. Whenever the parent `lang` attribute changes, all `data-ln-date` text elements re-format instantly in real time.
+
+---
+
 ## 3. Declarative API Contract (Attributes & Events)
 
 ### Attributes Table

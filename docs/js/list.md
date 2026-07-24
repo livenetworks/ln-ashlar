@@ -19,6 +19,8 @@ Virtual scrolling in `ln-list` handles two modes of HTML structural validation a
 ### 3. Windowed Server-Side Virtualization
 Opt-in via `data-ln-list-window="N"` on a Data-Driven Mode list — mirrors `ln-table`'s windowed path bit-for-bit. The component owns a `ln-core.createWindowCache` instance (`N` sets `windowSize`, default 1000) instead of caching the full dataset. `ln-list:request-data` gains `{ offset, limit, queryGen }`; `ln-list:set-data` echoes `{ offset, queryGen }` back into `cache.ingest()`. Select-all is hidden when `data-ln-list-selectable` and windowed mode are both active — a windowed list cannot select items it has never fetched.
 
+The windowing attributes and windowed mode itself are both live-observable — no re-init required. Mutating `data-ln-list-window-page`, `data-ln-list-window-threshold`, or `data-ln-list-count` reconfigures the live cache via `configure()`/`setGrandTotal()`. Adding `data-ln-list-window` to an initialized, non-windowed, data-driven list enables windowing live, seeding the cache from resident items (honoring `data-ln-list-count` if present, else the resident item count). Removing `data-ln-list-window` disables windowing live: the cache is destroyed and the list issues a fresh full `ln-list:request-data` (no `offset`/`limit`) to repopulate the complete dataset before rendering non-windowed again.
+
 ---
 
 ## ⚡ Lifecycle Diagram
