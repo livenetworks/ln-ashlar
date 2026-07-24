@@ -1666,7 +1666,14 @@ U(Bt, re, ue, "ln-router", {
     const n = this.dom;
     let m = n.getAttribute("data-ln-value"), c = n.getAttribute("data-ln-date"), y = n.getAttribute("datetime"), w = null;
     m !== null && m !== "" ? w = m : y !== null && y !== "" ? w = y : c !== null && c !== "" && c !== "true" && !g.test(c) ? w = c : w = n.textContent.trim();
-    const A = r(w) || t(w) || (w ? new Date(w) : null);
+    let A = r(w) || t(w);
+    if (!A && w)
+      if (isNaN(w))
+        A = new Date(w);
+      else {
+        const L = Number(w);
+        A = new Date(L > 1e11 ? L : L * 1e3);
+      }
     if (A && !isNaN(A.getTime())) {
       const L = p(A);
       this._rawValue = L, n.hasAttribute("data-ln-value") || n.setAttribute("data-ln-value", L), this._formatTextContent();

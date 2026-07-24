@@ -167,7 +167,15 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 			candidate = dom.textContent.trim();
 		}
 
-		const date = _parseISO(candidate) || _parseTyped(candidate) || (candidate ? new Date(candidate) : null);
+		let date = _parseISO(candidate) || _parseTyped(candidate);
+		if (!date && candidate) {
+			if (!isNaN(candidate)) {
+				const num = Number(candidate);
+				date = new Date(num > 1e11 ? num : num * 1000);
+			} else {
+				date = new Date(candidate);
+			}
+		}
 		if (date && !isNaN(date.getTime())) {
 			const iso = _toISO(date);
 			this._rawValue = iso;

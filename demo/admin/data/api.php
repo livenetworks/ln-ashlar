@@ -106,6 +106,17 @@ if ($limit > 0) {
 	$records = array_slice($records, $offset, $limit);
 }
 
+foreach ($records as &$rec) {
+	if (!isset($rec['file_size_display']) && isset($rec['file_size'])) {
+		$b = $rec['file_size'];
+		$rec['file_size_display'] = $b >= 1048576 ? round($b / 1048576, 1) . ' MB' : round($b / 1024, 1) . ' KB';
+	}
+	if (!isset($rec['updated_display']) && isset($rec['updated_at'])) {
+		$rec['updated_display'] = date('Y-m-d', $rec['updated_at']);
+	}
+}
+unset($rec);
+
 echo json_encode([
 	'data' => $records,
 	'total' => $grandTotal,
