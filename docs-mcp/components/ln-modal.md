@@ -341,9 +341,13 @@ sequenceDiagram
     else User clicks [data-ln-modal-close]
         User->>Modal: Click Close
         Modal->>Modal: Set attribute data-ln-modal="close"
-    else Form submitted successfully (ln-ajax:success)
+    else Form submitted successfully (ln-form:success / ln-ajax:success)
         Modal->>Modal: Form success bubbles up
         Modal->>Modal: Set attribute data-ln-modal="close"
+    else Native non-AJAX submit (full reload)
+        Modal->>Browser: Native POST submit + record pending flag in sessionStorage & draft in ln-autosave
+        Browser->>Modal: Page reloads (HTTP 200 OK)
+        Modal->>Modal: Detects pending flag + 200 OK -> clears flag, draft, hash & sets data-ln-modal="close"
     end
 
     Note over Modal: MutationObserver detects data-ln-modal="close"
@@ -362,6 +366,23 @@ sequenceDiagram
 
 ---
 
+## 6.1. Form Submission & Auto-Closing Protocol
+
+`ln-modal` provides a universal, zero-config completion protocol for forms contained inside dialog overlays:
+
+### Single-Page / AJAX Saves (`ln-form:success`)
+- **Event Contract:** On successful save, the form layer dispatches `ln-form:success` (or `ln-ajax:success`).
+- **Auto-Close:** `ln-modal` listens to `ln-form:success` bubbling up from child forms and sets `data-ln-modal="close"`. This removes the URL hash segment via `hashSet(modalId, null)` and releases focus/scroll locks.
+- **Error Handling:** On HTTP 400/422 validation errors, `ln-form:error` or `ln-ajax:error` is dispatched instead. `ln-form:success` is NOT emitted, so the modal remains open displaying errors.
+
+### Native Non-AJAX Submits (Page Refresh & Draft Recovery)
+- **Submit Intake:** On native form submission (`submit` event), `ln-modal` sets a pending flag `sessionStorage.setItem('ln-modal-pending:' + modalId, 'true')` while `ln-autosave` saves typed input fields to `localStorage`.
+- **Reload on HTTP 200 OK (Success):** On page load, `ln-modal` detects the pending flag and absence of server errors -> clears the `sessionStorage` flag, clears the `ln-autosave` draft, clears the URL hash (`hashSet(modalId, null)`), and sets `data-ln-modal="close"`.
+- **Reload on HTTP Error (Failure):** On page load with server errors -> clears the `sessionStorage` flag, retains `data-ln-modal="open"`, and `ln-autosave` restores typed values.
+- **Direct Deep-Link Access:** On direct URL navigation (`#user-modal:42`), no `sessionStorage` flag is present, so the modal opens and remains open normally.
+
+---
+
 ## 7. Related Components
 
 - [`ln-modal-fill`](./ln-modal-fill.md) — Coordinates form population inside hash-addressable modals.
@@ -369,3 +390,4 @@ sequenceDiagram
 - [`ln-form`](./ln-form.md) — Handles submission and reset flows for inner forms.
 - [`ln-validate`](./ln-validate.md) — Standard form validation wrapper.
 - [`ln-confirm`](./ln-confirm.md) — Modal-less variant for low-risk actions.
+

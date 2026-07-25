@@ -36,13 +36,24 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 			self.dom.setAttribute(DOM_SELECTOR, 'close');
 		};
 
-		this._onAjaxSuccess = function () {
+		this._onFormSuccess = function () {
 			if (self.isOpen) {
 				self.dom.setAttribute(DOM_SELECTOR, 'close');
 			}
 		};
 
+		this._onSubmit = function (e) {
+			if (!e.defaultPrevented && self._hashNs) {
+				try {
+					sessionStorage.setItem('ln-modal-pending:' + self._hashNs, 'true');
+				} catch (err) {}
+			}
+		};
+
 		this.dom.addEventListener('cancel', this._onCancel);
+		this.dom.addEventListener('ln-form:success', this._onFormSuccess);
+		this.dom.addEventListener('ln-ajax:success', this._onFormSuccess);
+		this.dom.addEventListener('submit', this._onSubmit);
 
 		// Apply initial state if open
 		if (this.isOpen) {
@@ -52,12 +63,37 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 
 		if (this._hashNs) {
 			window.addEventListener('hashchange', this._onHashChange);
-			if (hashGet(this._hashNs) !== null && !this.isOpen) {
+
+			const pendingKey = 'ln-modal-pending:' + this._hashNs;
+			let isPending = false;
+			try {
+				isPending = sessionStorage.getItem(pendingKey) === 'true';
+			} catch (err) {}
+
+			if (isPending) {
+				try {
+					sessionStorage.removeItem(pendingKey);
+				} catch (err) {}
+
+				const hasErrors = !!(
+					document.querySelector('.has-error, [data-ln-validate-error], .form-error, .alert-danger') ||
+					self.dom.querySelector('.has-error, [data-ln-validate-error], .form-error, .alert-danger')
+				);
+
+				if (!hasErrors) {
+					hashSet(self._hashNs, null);
+					if (self.isOpen) {
+						self.dom.setAttribute(DOM_SELECTOR, 'close');
+					}
+				} else {
+					if (!self.isOpen) {
+						self.dom.setAttribute(DOM_SELECTOR, 'open');
+					}
+				}
+			} else if (hashGet(this._hashNs) !== null && !this.isOpen) {
 				this.dom.setAttribute(DOM_SELECTOR, 'open');
 			}
 		}
-
-		this.dom.addEventListener('ln-ajax:success', this._onAjaxSuccess);
 
 		return this;
 	}
@@ -65,7 +101,9 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
-		this.dom.removeEventListener('ln-ajax:success', this._onAjaxSuccess);
+		this.dom.removeEventListener('ln-form:success', this._onFormSuccess);
+		this.dom.removeEventListener('ln-ajax:success', this._onFormSuccess);
+		this.dom.removeEventListener('submit', this._onSubmit);
 		this.dom.removeEventListener('cancel', this._onCancel);
 
 		if (this.isOpen) {
