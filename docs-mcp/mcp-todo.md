@@ -121,7 +121,7 @@
 - [ ] **ln-persist** — localStorage persistence примитив — извор: `js/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-table-sort)
 - [x] **ln-crypto** — извор: `js/ln-core/crypto.js`
 - [x] **ln-http** — event-driven JSON fetch со abort — извори: `js/ln-http/`, `docs/js/http.md`
-- [ ] **ln-debug** — dev дијагностика (не е за production употреба) — извор: `js/ln-debug/`
+- [x] **ln-debug** — dev дијагностика (не е за production употреба) — извор: `js/ln-debug/`
 
 ---
 

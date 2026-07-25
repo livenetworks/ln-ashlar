@@ -136,6 +136,7 @@ sequenceDiagram
   - [ln-modal-dev.scss](../../js/ln-modal/ln-modal-dev.scss)
   - [ln-validate-dev.scss](../../js/ln-validate/ln-validate-dev.scss)
   - [ln-date-dev.scss](../../js/ln-date/ln-date-dev.scss)
+  - [ln-number-dev.scss](../../js/ln-number/ln-number-dev.scss)
   - [ln-tabs-dev.scss](../../js/ln-tabs/ln-tabs-dev.scss)
   - [ln-search-dev.scss](../../js/ln-search/ln-search-dev.scss)
   - [ln-filter-dev.scss](../../js/ln-filter/ln-filter-dev.scss)
