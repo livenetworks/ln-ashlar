@@ -44,12 +44,18 @@
 | `data-ln-api-base-url` | `String` | Основната URL адреса на бекендот. Празна вредност = сопствениот origin. |
 | `data-ln-api-path` | `String` | Рутата на ресурсот на серверот (на пр. `/v1/users`). |
 | `data-ln-api-headers` | `String` | Дополнителни HTTP заглавија во формат `Key:Value, Key2:Value2`. |
+| `data-ln-api-param-offset` | `String` | Го дефинира параметрот за офсет при пагинација (подразбирано: `"offset"`). |
+| `data-ln-api-param-limit` | `String` | Го дефинира параметрот за лимит при пагинација (подразбирано: `"limit"`). |
+| `data-ln-api-param-search` | `String` | Го дефинира параметрот за пребарување (подразбирано: `"search"`). |
+| `data-ln-api-param-sort-field` | `String` | Го дефинира параметрот за поле по кое се сортира (подразбирано: `"sort_field"`). |
+| `data-ln-api-param-sort-dir` | `String` | Го дефинира параметрот за насока на сортирање (подразбирано: `"sort_dir"`). |
 
 ### DOM Барања кон Конекторот (Слуша)
 *Слуша настани со префикси `ln-api-connector:...` и `ln-rest-connector:...`*
 | Настан | Payload `e.detail` | Опис |
 | :--- | :--- | :--- |
-| `:request-sync` / `:request-fetch` | `{ since?: String, meta?: Object }` | Барање за делта синхронизација. |
+| `:request-query` / `:request-fetch` | `{ query?: Object, offset?: Number, limit?: Number, search?: String, sort?: Object, filters?: Object, meta?: Object }` | Динамичко пребарување и пагинација со конфигурибилни URL параметри. |
+| `:request-sync` | `{ since?: String, meta?: Object }` | Барање за делта синхронизација. |
 | `:request-create` | `{ data: Object, tempId: String, url?: String, meta?: Object }` | Барање за креирање нов запис. |
 | `:request-update` | `{ id: ID, data: Object, expected_version: Int, url?: String, meta?: Object }` | Барање за измена на запис. |
 | `:request-delete` | `{ id: ID, url?: String, meta?: Object }` | Барање за бришење поединечен запис. |
@@ -58,7 +64,7 @@
 ### Одговори кон DOM (Емитува)
 | Настан | Payload `e.detail` | Опис |
 | :--- | :--- | :--- |
-| `ln-api-connector:fetched` | `{ data, since, meta }` | Вратени податоци од делта синхронизација. |
+| `ln-api-connector:fetched` | `{ data, total, filtered, offset, queryGen, since, meta }` | Вратени податоци од динамички query/делта барања. |
 | `ln-api-connector:created` | `{ record, tempId, message, meta }` | Успешно креиран запис на серверот. |
 | `ln-api-connector:updated` | `{ record, id, message, meta }` | Успешно ажуриран запис. |
 | `ln-api-connector:deleted` | `{ response, id, message, meta }` | Успешно избришан запис на серверот. |
