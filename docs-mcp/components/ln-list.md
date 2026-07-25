@@ -148,9 +148,10 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `data-ln-list` | Root container | `String` | - | Identifies the list component and names the generated events. |
 | `data-ln-list-source` | Root container | `String` | - | Enables Data-Driven mode. Specifies a key or API endpoint to request data. |
 | `data-ln-list-selectable` | Root container | `Flag` | - | Enables selection logic and row select checkbox listeners. |
-| `data-ln-list-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-item cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. |
-| `data-ln-list-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. |
-| `data-ln-list-window-threshold` | Root container | `Number` | `25` | Prefetch margin threshold in items before reaching unloaded page boundaries. |
+| `data-ln-list-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-item cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. Observable — adding/removing it toggles windowed mode ON/OFF live, no re-init; changing the value while windowed reconfigures the live cache. |
+| `data-ln-list-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. Observable — applies to the live cache without re-init. |
+| `data-ln-list-window-threshold` | Root container | `Number` | `25` | Prefetch margin threshold in items before reaching unloaded page boundaries. Observable — applies to the live cache without re-init. |
+| `data-ln-list-count` | Root container | `Number` | - | Declares the unfiltered grand total (windowed mode). Observable — applies to the live cache via `setGrandTotal()` without re-init. |
 | `data-ln-list-body` | Root container | `Flag` | - | Designates the target container where list rows are appended. Falls back to root. |
 | `data-ln-item` | Template element | `Flag` | - | Identifies a row/card element inside a template or hydrated list. |
 | `data-ln-item-id` | `[data-ln-item]` | `String` | - | Unique ID of the row item (mapped from the data record). |

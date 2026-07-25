@@ -113,12 +113,12 @@
 `classification: service`. Овие немаат markup темплејти — §2 покажува JS употреба
 (import + повик), §3 е API табела. Сите линкаат назад кон `guides/component-authoring`.
 
-- [ ] **ln-core** — прегледен документ на споделениот модул: `findElements`, `dispatch`/`dispatchCancelable`, `cloneTemplate`/`cloneTemplateScoped`, `fill`/`fillTemplate`, `buildDict`, `renderList`, `reactiveState`/`deepReactive`/`createBatcher` + мапа кон модулските документи подолу — извори: `js/ln-core/index.js`, `js/ln-core/helpers.js`, `js/COMPONENTS.md` (⚠ нов документ, нема draft)
-- [ ] **ln-helpers** — извор: `js/ln-core/helpers.js` — ⚠ отворена одлука при пишување: дали се спојува во **ln-core** (преклоп)
-- [ ] **ln-reactive** — `reactiveState`/`deepReactive`/`createBatcher` — извори: `js/ln-core/reactive.js`, `docs/js/core.md`
+- [x] **ln-core** — прегледен документ на споделениот модул: `findElements`, `dispatch`/`dispatchCancelable`, `cloneTemplate`/`cloneTemplateScoped`, `fill`/`fillTemplate`, `buildDict`, `renderList`, `reactiveState`/`deepReactive`/`createBatcher` + мапа кон модулските документи подолу — извори: `js/ln-core/index.js`, `js/ln-core/helpers.js`, `js/COMPONENTS.md`
+- [x] **ln-helpers** — извор: `js/ln-core/helpers.js`
+- [x] **ln-reactive** — `reactiveState`/`deepReactive`/`createBatcher` — извори: `js/ln-core/reactive.js`, `docs/js/core.md`
 - [x] **positioning** — споделено viewport-aware позиционирање (dropdown/popover/tooltip) — извор: `js/ln-core/positioning.js`
 - [x] **ln-hash** — hash state примитив — извор: `js/ln-core/hash.js` (го користат ln-router, ln-tabs)
-- [ ] **ln-persist** — localStorage persistence примитив — извор: `js/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-table-sort)
+- [x] **ln-persist** — localStorage persistence примитив — извор: `js/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-table-sort)
 - [x] **ln-crypto** — извор: `js/ln-core/crypto.js`
 - [x] **ln-http** — event-driven JSON fetch со abort — извори: `js/ln-http/`, `docs/js/http.md`
 - [x] **ln-debug** — dev дијагностика (не е за production употреба) — извор: `js/ln-debug/`
@@ -245,8 +245,8 @@
 | doctrine | 6 | 6 |
 | guides | 5 | 5 |
 | components — употребливи (3А) | 42 | 41 |
-| components — позадински (3Б) | 9 | 4 |
+| components — позадински (3Б) | 9 | 9 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
 | skills | 14 | 14 |
-| **Вкупно** | **109** | **70** |
+| **Вкупно** | **109** | **74** |
