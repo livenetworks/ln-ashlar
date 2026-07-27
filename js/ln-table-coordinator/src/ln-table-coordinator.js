@@ -1,11 +1,12 @@
-import { dispatch } from '../../ln-core';
+import { registerComponent, dispatch } from '../../ln-core';
 
 (function () {
+	const DOM_SELECTOR = 'data-ln-table-coordinator';
 	const DOM_ATTRIBUTE = 'lnTableCoordinator';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// ─── Helper: Resolve Target Table from Host/Attribute ───
+	// ─── Helper: Resolve Target Table from Host/Attribute/Wrapper ───
 
 	function _findTargetTable(triggerEl, explicitId) {
 		if (explicitId) {
@@ -20,8 +21,15 @@ import { dispatch } from '../../ln-core';
 				if (el) return el;
 			}
 
-			const closest = triggerEl.closest('[data-ln-table]');
-			if (closest) return closest;
+			// Look up for closest [data-ln-table-coordinator] wrapper
+			const coordinatorWrapper = triggerEl.closest('[' + DOM_SELECTOR + ']');
+			if (coordinatorWrapper) {
+				const table = coordinatorWrapper.querySelector('[data-ln-table]');
+				if (table) return table;
+			}
+
+			const closestTable = triggerEl.closest('[data-ln-table]');
+			if (closestTable) return closestTable;
 		}
 
 		return document.querySelector('[data-ln-table]');
@@ -100,25 +108,29 @@ import { dispatch } from '../../ln-core';
 			if (filterBtn) filterBtn.classList.remove('ln-filter-active');
 		}
 
-		// 2. Clear linked search input
+		// 2. Clear linked search input inside wrapper/scope or document
+		const wrapper = clearBtn.closest('[' + DOM_SELECTOR + ']');
+		const scopeRoot = wrapper || document;
 		const tableId = table.id;
-		if (tableId) {
-			const searchEl = document.querySelector('[data-ln-search="' + tableId + '"]');
-			if (searchEl) {
-				const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
-					? searchEl
-					: searchEl.querySelector('input');
-				if (input) input.value = '';
-			}
 
-			// 3. Clear linked filter popover / form reset inputs
-			const filters = document.querySelectorAll('[data-ln-filter="' + tableId + '"]');
-			for (let i = 0; i < filters.length; i++) {
-				const resetInput = filters[i].querySelector('[data-ln-filter-reset]');
-				if (resetInput) {
-					resetInput.checked = true;
-					resetInput.dispatchEvent(new Event('change', { bubbles: true }));
-				}
+		const searchEl = (tableId && scopeRoot.querySelector('[data-ln-search="' + tableId + '"]'))
+			|| scopeRoot.querySelector('[data-ln-search]');
+
+		if (searchEl) {
+			const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
+				? searchEl
+				: searchEl.querySelector('input');
+			if (input) input.value = '';
+		}
+
+		// 3. Clear linked filter popovers / form reset inputs
+		const filters = (tableId && scopeRoot.querySelectorAll('[data-ln-filter="' + tableId + '"]'))
+			|| scopeRoot.querySelectorAll('[data-ln-filter]');
+		for (let i = 0; i < filters.length; i++) {
+			const resetInput = filters[i].querySelector('[data-ln-filter-reset]');
+			if (resetInput) {
+				resetInput.checked = true;
+				resetInput.dispatchEvent(new Event('change', { bubbles: true }));
 			}
 		}
 
@@ -135,8 +147,8 @@ import { dispatch } from '../../ln-core';
 		if (e.defaultPrevented) return;
 		if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
 
-		// Resolve search input for visible table
-		const searchHost = document.querySelector('[data-ln-search]');
+		// Resolve search input inside active coordinator wrapper or first visible search
+		const searchHost = document.querySelector('[' + DOM_SELECTOR + '] [data-ln-search]') || document.querySelector('[data-ln-search]');
 		if (!searchHost) return;
 
 		const input = (searchHost.tagName === 'INPUT' || searchHost.tagName === 'TEXTAREA')
@@ -149,5 +161,17 @@ import { dispatch } from '../../ln-core';
 		}
 	});
 
-	window[DOM_ATTRIBUTE] = true;
+	// ─── Component Constructor & Registration ────────────
+
+	function _component(dom) {
+		this.dom = dom;
+		return this;
+	}
+
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-table-coordinator');
 })();

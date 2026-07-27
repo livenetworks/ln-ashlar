@@ -24,6 +24,21 @@ import { persistGet, persistSet } from '../../ln-core';
 	function _component(dom) {
 		this.dom = dom;
 
+		const self = this;
+		this._onRequestOpen = function () {
+			self.open();
+		};
+		this._onRequestClose = function () {
+			self.close();
+		};
+		this._onRequestToggle = function () {
+			self.toggle();
+		};
+
+		this.dom.addEventListener('ln-toggle:request-open', this._onRequestOpen);
+		this.dom.addEventListener('ln-toggle:request-close', this._onRequestClose);
+		this.dom.addEventListener('ln-toggle:request-toggle', this._onRequestToggle);
+
 		// ─── Restore persisted state ──────────────────────────────
 		if (dom.hasAttribute('data-ln-persist')) {
 			const saved = persistGet('toggle', dom);
@@ -43,8 +58,24 @@ import { persistGet, persistSet } from '../../ln-core';
 		return this;
 	}
 
+	_component.prototype.open = function () {
+		this.dom.setAttribute(DOM_SELECTOR, 'open');
+	};
+
+	_component.prototype.close = function () {
+		this.dom.setAttribute(DOM_SELECTOR, 'close');
+	};
+
+	_component.prototype.toggle = function () {
+		const current = this.dom.getAttribute(DOM_SELECTOR);
+		this.dom.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
+	};
+
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this.dom.removeEventListener('ln-toggle:request-open', this._onRequestOpen);
+		this.dom.removeEventListener('ln-toggle:request-close', this._onRequestClose);
+		this.dom.removeEventListener('ln-toggle:request-toggle', this._onRequestToggle);
 		dispatch(this.dom, 'ln-toggle:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};

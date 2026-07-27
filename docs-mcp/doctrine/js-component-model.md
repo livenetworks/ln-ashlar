@@ -40,6 +40,12 @@ This document describes the JavaScript component architecture of `ln-ashlar`. It
 - **Commands (Mutations):** A coordinator must **never** call state-mutation prototype methods directly (e.g., `el.lnProfile.create()` is forbidden). It must instead dispatch a custom request event (`ln-profile:request-create`).
 - **Queries (Reading):** A coordinator is allowed to query a component's current state properties directly (e.g., reading `el.lnProfile.currentId`).
 
+### Coordinator Mindset: Wrapper-Level Scoping & Child Component Orchestration
+- **Wrapper Encapsulation:** A Coordinator component resides on a parent container element (e.g. `<div data-ln-table-coordinator>`, `<div data-ln-accordion>`, `<section data-ln-data-coordinator>`) and orchestrates child components within its DOM subtree.
+- **Role-Based Definition (Naming Convention):** A coordinator is defined by its architectural role (wrapper-level mediator orchestrating child components), not by a mandatory `-coordinator` suffix. While complex system mediators use explicit `-coordinator` suffixes (e.g., `data-ln-table-coordinator`, `data-ln-data-coordinator`, `data-ln-modal-coordinator`), structural UI coordinators use natural component names (e.g., `data-ln-accordion` coordinating child `ln-toggle` items, `data-ln-tabs`).
+- **Unscoped Coexistence:** Coordinators operate at the wrapper level without requiring explicit scope names or target ID linkages. This allows multiple coordinator blocks (e.g., multiple table/filter sections or multiple accordions) to run concurrently on the same page without ID collisions or cross-component interference.
+- **Child Orchestration:** The coordinator listens to events from child components (`ln-search`, `ln-filter`, `ln-toggle`, `ln-form`) inside its wrapper and bridges commands directly to sibling child primitives (`ln-table`, `ln-data-store`).
+
 ### Overlay Exception
 Overlay components (modal, dropdown, popover, tooltip) get exactly three document-level touchpoints, paired to the open/close lifecycle: dismissal listeners (Escape/outside-click), focus management, and one `.ln-*` body state class. Listeners attach on open, detach on close — they remain sensors that funnel into the component's own attribute state machine, never actuators on foreign DOM. Prefer native top-layer primitives (`<dialog>.showModal()`, Popover API) over hand-rolled stacking.
 

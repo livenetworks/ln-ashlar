@@ -42,6 +42,23 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 		this._docClickTimeout = null;
 		this._boundReposition = null;
 
+		const self = this;
+		this._onRequestOpen = function (e) {
+			const trigger = e.detail && e.detail.trigger ? e.detail.trigger : null;
+			self.open(trigger);
+		};
+		this._onRequestClose = function () {
+			self.close();
+		};
+		this._onRequestToggle = function (e) {
+			const trigger = e.detail && e.detail.trigger ? e.detail.trigger : null;
+			self.toggle(trigger);
+		};
+
+		dom.addEventListener('ln-popover:request-open', this._onRequestOpen);
+		dom.addEventListener('ln-popover:request-close', this._onRequestClose);
+		dom.addEventListener('ln-popover:request-toggle', this._onRequestToggle);
+
 		// Make the popover container itself programmatically focusable
 		// as a fallback when it has no focusable children.
 		if (!dom.hasAttribute('tabindex')) {
@@ -214,6 +231,9 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this.dom.removeEventListener('ln-popover:request-open', this._onRequestOpen);
+		this.dom.removeEventListener('ln-popover:request-close', this._onRequestClose);
+		this.dom.removeEventListener('ln-popover:request-toggle', this._onRequestToggle);
 		if (this.isOpen) this._applyClose();
 		delete this.dom[DOM_ATTRIBUTE];
 		dispatch(this.dom, 'ln-popover:destroyed', {
@@ -236,8 +256,12 @@ import { dispatch, dispatchCancelable, computePlacement, measureHidden, isVisibl
 			if (e.ctrlKey || e.metaKey || e.button === 1) return;
 			e.preventDefault();
 			const target = document.getElementById(popoverId);
-			if (!target || !target[DOM_ATTRIBUTE]) return;
-			target[DOM_ATTRIBUTE].toggle(dom);
+			if (!target) return;
+			if (target[DOM_ATTRIBUTE]) {
+				target[DOM_ATTRIBUTE].trigger = dom;
+			}
+			const current = target.getAttribute(DOM_SELECTOR);
+			target.setAttribute(DOM_SELECTOR, current === 'open' ? 'closed' : 'open');
 		};
 		dom.addEventListener('click', this._onClick);
 		return this;

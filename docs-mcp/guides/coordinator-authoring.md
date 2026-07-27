@@ -44,11 +44,13 @@ To prevent tight coupling between coordinators and components, coordinators must
 
 ---
 
-## 4. Component Isolation Rules
+## 4. Component Isolation & Wrapper-Level Scoping Rules
 
-When writing a coordinator, follow these strict development guidelines:
+When writing a coordinator, follow these strict architectural guidelines:
+- **Wrapper-Level Encapsulation & Role Definition:** A coordinator operates on a parent wrapper container (e.g. `data-ln-table-coordinator`, `data-ln-accordion`, `data-acme-wizard`). A component is a coordinator based on its **role** (mediating child elements), not by a mandatory `-coordinator` suffix. Complex system mediators use explicit `-coordinator` suffixes, whereas structural UI coordinators use natural component names. It encapsulates child primitives (`ln-search`, `ln-filter`, `ln-table`, `ln-toggle`) within its DOM subtree, orchestrating them without requiring named scopes or explicit target ID linkages.
+- **Child Component Orchestration:** The coordinator listens to CustomEvents emitted by child components inside its wrapper and dispatches command events or updates attributes on sibling child elements inside that same wrapper.
 - **No Imports:** A coordinator must never import or require the JavaScript files of the components it coordinates. Communication is 100% event-driven.
-- **Local DOM Scoping:** Never query the global document (e.g. `document.querySelectorAll` is forbidden). Always scope selectors to the coordinator's local DOM subtree (e.g. `this.dom.querySelectorAll`) to ensure multiple instances of the coordinator can run concurrently on a single page without resource collisions.
+- **Local DOM Scoping:** Never query the global document (e.g. `document.querySelectorAll` is forbidden). Always scope selectors to the coordinator's local DOM subtree (e.g. `this.dom.querySelectorAll`) so multiple instances of the coordinator can run concurrently on a single page without resource or ID collisions.
 - **Teardown Cleanup:** The `destroy()` method must cleanly remove all event listeners added to global surfaces (such as `window` or `document`) and delete the instance DOM references.
 
 ---

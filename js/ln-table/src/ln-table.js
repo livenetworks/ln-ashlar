@@ -1280,7 +1280,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (this._selectAllCheckbox && this._selectAllCheckbox.tagName === 'TH') {
 			const cb = document.createElement('input');
 			cb.type = 'checkbox';
-			cb.setAttribute('aria-label', 'Select all');
+			const dictEl = self.dom.querySelector('[data-ln-table-dict="select-all"]');
+			const label = self.dom.getAttribute('data-ln-table-select-all-label') || (dictEl ? dictEl.textContent.trim() : null) || 'Select all';
+			cb.setAttribute('aria-label', label);
 			this._selectAllCheckbox.appendChild(cb);
 			this._selectAllCheckbox = cb;
 		}

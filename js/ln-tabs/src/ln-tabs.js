@@ -105,6 +105,13 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 			self._clickHandlers.push({ el: t, handler: handler });
 		}
 
+		this._onRequestSelect = function (e) {
+			const key = e.detail && (e.detail.key || e.detail.tab);
+			if (key) self.dom.setAttribute('data-ln-tabs-active', (key + '').toLowerCase().trim());
+		};
+		this.dom.addEventListener('ln-tabs:request-select', this._onRequestSelect);
+		this.dom.addEventListener('ln-tabs:request-activate', this._onRequestSelect);
+
 		this._hashHandler = function () {
 			if (!self.hashEnabled) return;
 			const val = hashGet(self.nsKey);
@@ -156,6 +163,8 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this.dom.removeEventListener('ln-tabs:request-select', this._onRequestSelect);
+		this.dom.removeEventListener('ln-tabs:request-activate', this._onRequestSelect);
 		for (const { el, handler } of this._clickHandlers) {
 			el.removeEventListener("click", handler);
 			delete el[DOM_ATTRIBUTE + 'Trigger'];

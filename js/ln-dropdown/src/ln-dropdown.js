@@ -38,6 +38,23 @@ import { dispatch, computePlacement, measureHidden, registerComponent } from '..
 
 		const self = this;
 
+		this._onRequestOpen = function () {
+			if (self.toggleEl) self.toggleEl.setAttribute('data-ln-toggle', 'open');
+		};
+		this._onRequestClose = function () {
+			if (self.toggleEl) self.toggleEl.setAttribute('data-ln-toggle', 'close');
+		};
+		this._onRequestToggle = function () {
+			if (self.toggleEl) {
+				const current = self.toggleEl.getAttribute('data-ln-toggle');
+				self.toggleEl.setAttribute('data-ln-toggle', current === 'open' ? 'close' : 'open');
+			}
+		};
+
+		this.dom.addEventListener('ln-dropdown:request-open', this._onRequestOpen);
+		this.dom.addEventListener('ln-dropdown:request-close', this._onRequestClose);
+		this.dom.addEventListener('ln-dropdown:request-toggle', this._onRequestToggle);
+
 		this._onToggleOpen = function (e) {
 			if (!e.detail || e.detail.target !== self.toggleEl) return;
 			if (self.triggerBtn) self.triggerBtn.setAttribute('aria-expanded', 'true');
@@ -151,6 +168,9 @@ import { dispatch, computePlacement, measureHidden, registerComponent } from '..
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this.dom.removeEventListener('ln-dropdown:request-open', this._onRequestOpen);
+		this.dom.removeEventListener('ln-dropdown:request-close', this._onRequestClose);
+		this.dom.removeEventListener('ln-dropdown:request-toggle', this._onRequestToggle);
 		this._removeOutsideClickListener();
 		this._removeScrollRepositionListener();
 		this._removeResizeCloseListener();

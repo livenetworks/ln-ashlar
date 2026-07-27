@@ -51,6 +51,7 @@
 #### Табели и листи
 
 - [x] **ln-table**
+- [x] **ln-table-coordinator**
 - [x] **ln-sortable**
 - [x] **ln-filter**
 - [x] **ln-search**
@@ -65,7 +66,7 @@
 - [x] **ln-date**
 - [x] **ln-time**
 - [x] **ln-number**
-- [ ] **ln-upload**
+- [x] **ln-upload**
 - [x] **ln-editor**
 - [x] **ln-slug**
 - [x] **ln-autoresize**
@@ -244,9 +245,9 @@
 |---|---|---|
 | doctrine | 6 | 6 |
 | guides | 5 | 5 |
-| components — употребливи (3А) | 41 | 40 |
+| components — употребливи (3А) | 42 | 42 |
 | components — позадински (3Б) | 9 | 9 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
 | skills | 14 | 14 |
-| **Вкупно** | **108** | **73** |
+| **Вкупно** | **109** | **75** |
