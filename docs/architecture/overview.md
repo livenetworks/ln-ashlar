@@ -108,7 +108,7 @@ Here is the inventory of our zero-dependency vanilla JS components:
 | **ln-link** | `data-ln-link` | Dynamic navigation links that intercept routing for single-page style feel. |
 | **ln-confirm** | `data-ln-confirm` | Gated confirmation triggers (two-click arm/execute for dangerous acts). |
 | **ln-upload** | `data-ln-upload` | File dropzones and uploader widgets with progress telemetry. |
-| **ln-ajax** | `data-ln-ajax` | Fragment injection. Fetches HTML snippets, sanitizes, and renders. |
+| **ln-ajax** | `data-ln-ajax` | Fragment injection. Fetches and renders trusted same-origin HTML snippets. |
 | **ln-http** | *(Service-style)* | CustomEvent-driven gateway for standard fetch requests. |
 | **ln-data-coordinator**| `data-ln-data-coordinator`| Decouples storage (`ln-data-store`) and gateways (`ln-*-connector`). |
 | **ln-data-store** | `data-ln-data-store` | IndexedDB database cache. Pure, blind local query and write pipeline. |

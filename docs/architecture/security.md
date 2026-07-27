@@ -147,17 +147,18 @@ Exposing API tokens, basic auth passphrases, or custom header credentials inside
 
 ---
 
-## 5. AJAX Injection Sanitization Filter
+## 5. AJAX Fragment Trust Boundary
 
-Dynamic HTML injections via `innerHTML` are a classic vector for DOM-based XSS. `ln-ajax.js` includes a defense-in-depth sanitization pipeline applied to all incoming markup fragments:
+`ln-ajax` swaps server-returned HTML fragments into the DOM via `innerHTML`. It performs **no client-side sanitization** — no DOMPurify pass, no regex script/attribute stripping — and that is deliberate.
 
-1. **DOMPurify Integration (Recommended)**: If the standard `DOMPurify` library is imported on the page, the framework automatically intercepts and sanitizes the HTML fragment using DOMPurify's robust parsing engine before injecting it.
-2. **Secure Fallback Parser**: If DOMPurify is absent, `ln-ajax` utilizes a strict secondary fallback that automatically parses and strips:
-   - `<script>` blocks
-   - Inline event handlers (e.g., `onload`, `onerror`, `onclick`, `onmouseover`)
-   - Dangerous schemes (e.g., `javascript:`, `data:`)
+The trust model is same-origin and first-party: `ln-ajax` only routes requests to **our own** backend, and every fragment in the JSON response is markup our server chose to emit. Sanitizing untrusted *user* input is the server's job, done before the fragment is rendered and returned — the boundary where the full request context actually lives.
 
-This ensures that even if developers load third-party server components with unsanitized values, the client-side framework actively prevents malicious script execution.
+Running a client-side sanitizer here would be actively harmful, not defensive:
+
+* **It would break returned components.** A fragment may legitimately carry `data-ln-*` hooks or whole `ln-*` components meant to hydrate on insertion. A generic stripper corrupts exactly these — e.g. an attribute like `data-ln-confirm` holds event-like substrings that a naive filter mistakes for an inline handler and removes, silently breaking the component.
+* **It offers no real protection.** Regex HTML parsing on the client is fragile and bypassable; it cannot outperform the server, which already owns the output and has the context to encode it correctly.
+
+Push HTML encoding and sanitization to the server. The client trusts what its own origin returns.
 
 ---
 
@@ -194,9 +195,9 @@ Both operations are immune to markup injection XSS because they do not invoke th
 
 ### Avoid Unsafe Interpolation Patterns
 
-Route coordinators should never write untrusted input directly using `innerHTML` or `outerHTML`. If a coordinator must render raw HTML dynamically:
-1. Validate and sanitize it client-side using `DOMPurify` before insertion.
-2. Or let `ln-ajax` handle the injection, as it automatically applies the framework's [AJAX Injection Sanitization Filter](#5-ajax-injection-sanitization-filter).
+Route coordinators should never write untrusted input (query strings, path params, user-submitted values) directly using `innerHTML` or `outerHTML`. Instead:
+1. Bind it through `fill` / `fillTemplate`, which write via `textContent` / `setAttribute` and never invoke the browser's HTML parser (see above).
+2. If it genuinely must become markup, encode and sanitize it **on the server** and deliver it as a trusted `ln-ajax` fragment (see the [AJAX Fragment Trust Boundary](#5-ajax-fragment-trust-boundary)). The client does not sanitize.
 
 ```javascript
 // DANGEROUS: Reflected XSS Vulnerability
