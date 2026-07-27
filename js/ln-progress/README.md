@@ -381,6 +381,26 @@ Without the class, the wrapper has no styling — no recessed
 background, no rounded edges, no overflow clip. The bar still
 renders correctly but visually escapes its track.
 
+## 🔧 Internals
+
+Source: `js/ln-progress/src/ln-progress.js` (~85 lines). Passive renderer — `_render` re-reads all three attributes fresh on every call; there is no cached value or max on the instance.
+
+### Three observers, three concerns
+
+1. `registerComponent`'s shared document-level observer instantiates new bars.
+2. `_attrObserver` (per bar) watches the bar's own `data-ln-progress`/`-max`.
+3. `_parentObserver` (per bar, always registered when a parent exists) watches the parent track's `data-ln-progress-max` — this is what makes a runtime change to the shared max re-render every child bar without any bar-side wiring.
+
+### Construction order
+
+`_render` runs once immediately (dispatching the first `:change` before either observer is even wired), so a document-level listener attached before the bundle loads sees an event for every bar during the initial `DOMContentLoaded` scan; the two observers are attached after.
+
+### Render writes
+
+Every `_render` call writes `style.width` and all four ARIA attributes (`role`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`) together, in the same pass that dispatches `:change` — there is no separate ARIA-sync step to keep in sync.
+
+---
+
 ## Related
 
 - **`@mixin progress`** (`scss/config/mixins/_progress.scss`) — the
@@ -391,6 +411,3 @@ renders correctly but visually escapes its track.
 - **`scss/components/_progress.scss`** — applies the base mixin to
   `.progress` and applies the `.success` / `.warning` /
   `.error` colour variants.
-- **Architecture deep-dive:** [`docs/js/progress.md`](../../docs/js/progress.md)
-  for the construction flow, the observers, and the max-priority
-  resolution.

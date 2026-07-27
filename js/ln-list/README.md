@@ -89,3 +89,27 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 * `ln-list:item-action` `{ list, id, action, record }`: Fired when clicking `[data-ln-item-action]`.
 * `ln-list:select` `{ list, selectedIds, count }`: Fired when selection updates.
 * `ln-list:select-all` `{ list, selected: true|false }`: Fired when select-all triggers.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-list/src/ln-list.js`.
+
+### Spacer element matches container semantics
+
+Virtual scroll (both plain and windowed) needs top/bottom spacer elements to preserve scroll height without rendering off-screen rows. If `[data-ln-list-body]` is a `<ul>`/`<ol>`, spacers are `<li class="ln-list__spacer">` to stay HTML5-valid; any other container gets `<div class="ln-list__spacer">`.
+
+### `_renderVirtual()` vs `_renderWindowed()`
+
+Both compute the visible `start`/`end` index range from the measured first-child height and the nearest scrollable ancestor's viewport, then mount spacers and clone the row template for the visible slice via `fillTemplate`/`fill`. They differ only in row source: `_renderVirtual()` reads `this._data[i]` (the full parsed/fetched dataset); `_renderWindowed()` reads `this._cache.get(i)` (the resident sliding window) and renders a blank placeholder spacer — no shimmer — for indices outside the cache, calling `this._cache.ensure(startRow, endRow)` every pass to debounce-fetch missing rows.
+
+### Windowed mode (`data-ln-list-window="N"`)
+
+Owns an `ln-core.createWindowCache` instance (`N` = resident cap, default 1000) instead of the full dataset. `ln-list:request-data` gains `{offset, limit, queryGen}`; `ln-list:set-data` echoes `{offset, queryGen}` back into `cache.ingest()`. Select-all is hidden under `data-ln-list-selectable` + windowed mode together — a windowed list can't select rows it hasn't fetched.
+
+Every windowing attribute is live-observable, no re-init required: `data-ln-list-window-page`/`-threshold`/`data-ln-list-count` reconfigure the cache via `configure()`/`setGrandTotal()`. Adding `data-ln-list-window` to an already-initialized, non-windowed, data-driven list seeds the cache from resident items and enables windowing live. Removing it destroys the cache and issues one full (no `offset`/`limit`) `ln-list:request-data` to repopulate before rendering non-windowed again.
+
+### `_parseChildren()`
+
+Parses static children inside `[data-ln-list-body]` into `this._data` at mount (excluding existing spacers), and measures the first child's height for `this._itemHeight`.

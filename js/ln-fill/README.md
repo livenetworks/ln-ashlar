@@ -40,7 +40,7 @@ form plus display fillables — without the producer knowing a single id, which
 a flat id-addressed broadcast cannot express. Single payload contract: the
 `record ?? null` normalization (null = reset) and `bubbles: true` are defined
 in one place, shared by every producer (the declarative click trigger,
-`ln-modal-fill`, store-sync coordinators).
+`ln-modal-coordinator`, store-sync coordinators).
 
 So `lnFill()` is not an imperative bypass of the event model — it IS the
 event dispatcher. The targeted fan-out loop and the payload contract have to
@@ -112,7 +112,7 @@ Order of side-effects per click (both listeners are on `document`):
 2. `ln-fill` click listener → fills form via `lnFill(form, record)`.
 
 ### Double-Fill Prevention for Hash-Bound triggers
-If a clickable trigger is an anchor link that points to a hash segment (i.e., its `href` attribute contains `#`, such as `<a href="#event-modal:42" ...>`), `ln-fill`'s click listener will **ignore** the click. The fill process is instead delegated entirely to the `ln-modal-fill` coordinator, which will map the resulting hash change and `ln-modal:open` event to an `ln-fill:request` event. This prevents redundant, parallel form-filling operations.
+If a clickable trigger is an anchor link that points to a hash segment (i.e., its `href` attribute contains `#`, such as `<a href="#event-modal:42" ...>`), `ln-fill`'s click listener will **ignore** the click. The fill process is instead delegated entirely to the `ln-modal-coordinator`, which will map the resulting hash change and `ln-modal:open` event to an `ln-fill:request` event. This prevents redundant, parallel form-filling operations.
 
 ---
 
@@ -196,4 +196,4 @@ Decision rule:
 - **[`ln-form`](../ln-form/README.md)** — the fill target; `data-ln-fill-as` decoupled key.
 - **[`ln-modal`](../ln-modal/README.md)** — `data-ln-modal-*` display namespace fill.
 - **[`docs/architecture/data-flow.md §5.7`](../../docs/architecture/data-flow.md)** — `lnFill` primitive reference.
-- **[`docs/js/core.md`](../../docs/js/core.md)** — `lnFill`, `fillTemplate`, `populateForm` helpers.
+- **[`js/ln-core/README.md`](../ln-core/README.md)** — `lnFill`, `fillTemplate`, `populateForm` helpers.

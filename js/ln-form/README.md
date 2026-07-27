@@ -200,8 +200,7 @@ attribute) independently, purely to decide whether to claim the native
 submit for the write pipeline (`POST` → create, `PUT`/`PATCH` → update) —
 a `GET` form is never claimed, regardless of validity. `ln-form` itself
 stays coordinator-blind and validation-blind: it never serializes, never
-dispatches a custom event, and never listens for `submit` — see
-[`docs/js/form.md`](../../docs/js/form.md) for a fuller write-up.
+dispatches a custom event, and never listens for `submit`.
 
 ---
 
@@ -234,7 +233,32 @@ dispatches a custom event, and never listens for `submit` — see
 
 ---
 
+## 🔧 Internals
+
+Source: `js/ln-form/ln-form.js`. Instance state is minimal: `dom` (the form) and `_baseAction` (the `action` attribute captured once at init, restored on "new" mode). No validation index, no debounce, no submit-button bookkeeping — `ln-form` does not orchestrate submission.
+
+### `fill(data)`
+
+Iterates `form.elements` writing by `name`: checkboxes get `.checked = Boolean(value)`, radios match `el.value === String(value)`, `select-multiple` sets `options[n].selected`, everything else sets `.value`. Each written element then dispatches exactly one synthetic event — `change` for `SELECT`/checkbox/radio, `input` otherwise (the `isChangeBased` discriminator). This mirrors the same discriminator `ln-validate` and `ln-autoresize` use for their own listener registration, so every field fires the event those consumers actually listen for — no double fires, no missed reactions.
+
+### `ln-fill` handling
+
+Guarded to `e.target === self.dom` (ignores bubbled `ln-fill` from nested `[data-ln-fillable]` children). A record calls `fill()` then `_applyActionMode(record)`; `null` calls `form.reset()` — the native `reset` event that fires from that call is what actually restores the base action (see below), not the `ln-fill` handler directly.
+
+### Reset routing
+
+The native `reset` event — whether from `form.reset()` above, a `<button type="reset">`, or any other trigger — always runs `_applyActionMode(null)`, restoring `_baseAction` and clearing `_method`. There is no synthetic input/change replay on reset and no `ln-form:reset-complete` event.
+
+### Action-mode guard
+
+`_applyActionMode` exits immediately on forms without `data-ln-form-action-edit` — unrelated forms are untouched by the reset/fill listeners' side effects.
+
+### Relation to ln-validate
+
+Independent siblings, no imports between them. `ln-validate` injects `novalidate` the moment its first field initializes (authors never write it by hand); a form with zero `data-ln-validate` fields keeps native validation as the default. `ln-validate` has its own separate `reset` listener (clears field error classes / `_touched` state) — unrelated to `ln-form`'s reset listener, which only handles action/`_method`.
+
+---
+
 ## Related
 - **[`ln-validate`](../ln-validate/README.md)** — Field-level validation and error display.
 - **[`ln-fill`](../ln-fill/README.md)** — Fan-out fill event source.
-- **Architecture deep-dive** — [`docs/js/form.md`](../../docs/js/form.md).

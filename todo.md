@@ -22,7 +22,6 @@
 - [x] ln-link
 - [x] ln-list
 - [x] ln-modal
-- [x] ln-modal-fill
 - [x] ln-nav
 - [x] ln-number
 - [x] ln-options

@@ -128,4 +128,35 @@ Opening B from inside A leaves A open. Pressing `ESC` once closes B first, and t
 ## Related
 - **[`ln-dropdown`](../ln-dropdown/README.md)** — Menu wrapper adding click-outside/top-layer promotion.
 - **[`ln-toggle`](../ln-toggle/README.md)** — Binary disclosure state primitive.
-- **Architecture deep-dive** — [`docs/js/popover.md`](../../docs/js/popover.md).
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-popover/ln-popover.js`.
+
+### Open-stack
+
+A module-level `openStack` array tracks all currently-open instances. It drives two behaviors: a single `document` `keydown` listener, registered only while the stack is non-empty, pops the top entry and calls `.close()` on it (LIFO Escape); and nested popovers stay independent because each owns its own outside-click listener scoped to its own subtree.
+
+### `_applyOpen(trigger)` — after the cancelable `before-open` passes
+
+Set `isOpen = true`, store `trigger` (`null` if opened via direct attribute mutation) and `document.activeElement` (for focus restore) → `teleportToBody(dom)` (moves the element to end of `<body>`, storing a restore function, so `position: fixed` coordinates are reliable regardless of ancestor `transform`/`contain`) → `measureHidden(dom)` for dimensions even if `display: none` → `computePlacement(triggerRect, size, preferred, 8)` writes `top`/`left` inline (unavoidable for floating UI) and `data-ln-popover-placement` → `aria-expanded="true"` on trigger → focus the first focusable child, or the container itself → outside-click listener registered one tick later via `setTimeout` (so the opening click itself doesn't immediately close it) → scroll/resize listeners for repositioning while open → push onto `openStack`, ensure ESC listener → dispatch `ln-popover:open`.
+
+### `_applyClose()` — mirror of `_applyOpen`
+
+Clears `isOpen`, removes the outside-click/scroll/resize listeners, clears inline `top`/`left` and the placement attribute, sets `aria-expanded="false"`, runs the teleport-restore function, splices itself from `openStack` (removing the ESC listener if the stack is now empty), then restores focus to the trigger **only if** the trigger was the previously-focused element (click→Escape, click→programmatic close) or `activeElement === document.body` (Escape from inside the popover, outside-click on inert whitespace) — an outside-click landing on another focusable element keeps that element's focus. Dispatches `ln-popover:close`.
+
+### Focus management
+
+A disclosure pattern, not a modal — no Tab trap. Because the popover is teleported to the end of `<body>`, Tab exits it into whatever follows in body order. `tabindex="-1"` and `role="dialog"` are set automatically at construction so the container itself is a valid focus target when there's no focusable child.
+
+### Nested popovers
+
+Outside-click tests `self.dom.contains(e.target)`, so a click inside A's subtree (including a button that opens B) never triggers A's close path. Both popovers land on `openStack`; LIFO Escape closes B first, then A on the next press. There is no "close all."
+
+### Observer & registration
+
+Single observer on `document.body` (`subtree`/`childList`/`attributes`, filtered to `data-ln-popover`/`data-ln-popover-for`): childList additions re-run `_findPopovers`/`_attachTriggers`; attribute mutations dispatch to `_syncAttribute` for existing instances or re-run discovery for new ones. Two separate `registerComponent` calls wire popover elements (`el.lnPopover`) and trigger elements (`el.lnPopoverTrigger`) independently — trigger init sets `aria-haspopup="dialog"`, `aria-expanded="false"`, `aria-controls`, once, on attach.
+
+`destroy()` on a popover instance closes it if open, removes its listeners, splices it from `openStack`, and dispatches `ln-popover:destroyed`. Trigger `destroy` is independent and only removes the trigger's click handler.

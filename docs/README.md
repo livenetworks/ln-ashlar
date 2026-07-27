@@ -9,8 +9,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | `CLAUDE.md` (root) | Project AI Core Rules & Pre-Code Checklist | AI — loaded every session |
 | `docs/README.md` | This file — documentation index | Humans |
 | `docs/css/*.md` | CSS architecture per topic (tokens, mixins, cards, forms, etc.) | Humans + AI on-demand |
-| `docs/js/*.md` | JS component architecture (internal state, render flow, design decisions) | Humans + AI on-demand |
-| `js/ln-*/README.md` | Per-component usage guide (attributes, API, HTML, events) | Humans |
+| `js/ln-*/README.md` | Per-component usage guide (attributes, API, HTML, events) plus architecture reference (internal state, render flow, design decisions) | Humans |
 
 ---
 
@@ -60,45 +59,44 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 
 ## JS Components
 
-Two files per component:
-- **`js/ln-{name}/README.md`** — usage guide (attributes, API, HTML, events) — read this first
-- **`docs/js/{name}.md`** — architecture reference (internal state, render flow, design decisions)
+Each component ships one file — usage guide plus architecture reference
+(internal state, render flow, design decisions) in the same document:
 
-| Component | Attribute | Usage guide | Architecture |
-|-----------|-----------|-------------|--------------|
-| Core helpers | — | — | [core.md](js/core.md) |
-| Icons | (auto-init) | [js/ln-icons/README.md](../js/ln-icons/README.md) | [icons.md](js/icons.md) |
-| Toggle | `data-ln-toggle` | [js/ln-toggle/README.md](../js/ln-toggle/README.md) | [toggle.md](js/toggle.md) |
-| Accordion | `data-ln-accordion` | [js/ln-accordion/README.md](../js/ln-accordion/README.md) | [accordion.md](js/accordion.md) |
-| Modal | `data-ln-modal` | [js/ln-modal/README.md](../js/ln-modal/README.md) | [modal.md](js/modal.md) |
-| Tabs | `data-ln-tabs` | [js/ln-tabs/README.md](../js/ln-tabs/README.md) | [tabs.md](js/tabs.md) |
-| Toast | `data-ln-toast` | [js/ln-toast/README.md](../js/ln-toast/README.md) | [toast.md](js/toast.md) |
-| Dropdown | `data-ln-dropdown` | [js/ln-dropdown/README.md](../js/ln-dropdown/README.md) | [dropdown.md](js/dropdown.md) |
-| Popover | `data-ln-popover` | [js/ln-popover/README.md](../js/ln-popover/README.md) | [popover.md](js/popover.md) |
-| Tooltip (JS) | `data-ln-tooltip-enhance` | [js/ln-tooltip/README.md](../js/ln-tooltip/README.md) | [tooltip.md](js/tooltip.md) |
-| Nav | `data-ln-nav` | [js/ln-nav/README.md](../js/ln-nav/README.md) | [nav.md](js/nav.md) |
-| Filter | `data-ln-filter` | [js/ln-filter/README.md](../js/ln-filter/README.md) | [filter.md](js/filter.md) |
-| Search | `data-ln-search` | [js/ln-search/README.md](../js/ln-search/README.md) | [search.md](js/search.md) |
-| Table | `data-ln-table` | [js/ln-table/README.md](../js/ln-table/README.md) | [table.md](js/table.md), [table-integration.md](js/table-integration.md) |
-| Table Sort | `data-ln-table-sort` | [js/ln-table/README.md](../js/ln-table/README.md) | [table-sort.md](js/table-sort.md) |
-| Sortable | `data-ln-table-sortable` | [js/ln-sortable/README.md](../js/ln-sortable/README.md) | [sortable.md](js/sortable.md) |
-| Progress | `data-ln-progress` | [js/ln-progress/README.md](../js/ln-progress/README.md) | [progress.md](js/progress.md) |
-| Circular Progress | `data-ln-circular-progress` | [js/ln-circular-progress/README.md](../js/ln-circular-progress/README.md) | [circular-progress.md](js/circular-progress.md) |
-| Link | `data-ln-link` | [js/ln-link/README.md](../js/ln-link/README.md) | [link.md](js/link.md) |
-| Confirm | `data-ln-confirm` | [js/ln-confirm/README.md](../js/ln-confirm/README.md) | [confirm.md](js/confirm.md) |
-| Debug | `data-ln-debug` | [js/ln-debug/README.md](../js/ln-debug/README.md) | (via Core) |
-| Upload | `data-ln-upload` | [js/ln-upload/README.md](../js/ln-upload/README.md) | [upload.md](js/upload.md) |
-| AJAX | `data-ln-ajax` | [js/ln-ajax/README.md](../js/ln-ajax/README.md) | [ajax.md](js/ajax.md) |
-| Router | `data-ln-route` | [js/ln-router/README.md](../js/ln-router/README.md) | [router.md](js/router.md) |
-| HTTP | — | [js/ln-http/README.md](../js/ln-http/README.md) | [http.md](js/http.md) |
-| Store | `data-ln-data-store` | [js/ln-store/README.md](../js/ln-store/README.md) | [store.md](js/store.md) |
-| Form | `data-ln-form` | [js/ln-form/README.md](../js/ln-form/README.md) | [form.md](js/form.md) |
-| Validate | `data-ln-validate` | [js/ln-validate/README.md](../js/ln-validate/README.md) | [validate.md](js/validate.md) |
-| Time | `data-ln-time` | [js/ln-time/README.md](../js/ln-time/README.md) | [time.md](js/time.md) |
-| Autosave | `data-ln-autosave` | [js/ln-autosave/README.md](../js/ln-autosave/README.md) | [autosave.md](js/autosave.md) |
-| Autoresize | `data-ln-autoresize` | [js/ln-autoresize/README.md](../js/ln-autoresize/README.md) | [autoresize.md](js/autoresize.md) |
-| Translations | `data-ln-translations` | [js/ln-translations/README.md](../js/ln-translations/README.md) | [translations.md](js/translations.md) |
-| External Links | (automatic) | [js/ln-external-links/README.md](../js/ln-external-links/README.md) | [external-links.md](js/external-links.md) |
+| Component | Attribute | README |
+|-----------|-----------|--------|
+| Core helpers | — | [js/ln-core/README.md](../js/ln-core/README.md) |
+| Icons | (auto-init) | [js/ln-icons/README.md](../js/ln-icons/README.md) |
+| Toggle | `data-ln-toggle` | [js/ln-toggle/README.md](../js/ln-toggle/README.md) |
+| Accordion | `data-ln-accordion` | [js/ln-accordion/README.md](../js/ln-accordion/README.md) |
+| Modal | `data-ln-modal` | [js/ln-modal/README.md](../js/ln-modal/README.md) |
+| Tabs | `data-ln-tabs` | [js/ln-tabs/README.md](../js/ln-tabs/README.md) |
+| Toast | `data-ln-toast` | [js/ln-toast/README.md](../js/ln-toast/README.md) |
+| Dropdown | `data-ln-dropdown` | [js/ln-dropdown/README.md](../js/ln-dropdown/README.md) |
+| Popover | `data-ln-popover` | [js/ln-popover/README.md](../js/ln-popover/README.md) |
+| Tooltip (JS) | `data-ln-tooltip-enhance` | [js/ln-tooltip/README.md](../js/ln-tooltip/README.md) |
+| Nav | `data-ln-nav` | [js/ln-nav/README.md](../js/ln-nav/README.md) |
+| Filter | `data-ln-filter` | [js/ln-filter/README.md](../js/ln-filter/README.md) |
+| Search | `data-ln-search` | [js/ln-search/README.md](../js/ln-search/README.md) |
+| Table | `data-ln-table` | [js/ln-table/README.md](../js/ln-table/README.md) |
+| Table Sort | `data-ln-table-sort` | [js/ln-table/README.md](../js/ln-table/README.md) |
+| Sortable | `data-ln-table-sortable` | [js/ln-sortable/README.md](../js/ln-sortable/README.md) |
+| Progress | `data-ln-progress` | [js/ln-progress/README.md](../js/ln-progress/README.md) |
+| Circular Progress | `data-ln-circular-progress` | [js/ln-circular-progress/README.md](../js/ln-circular-progress/README.md) |
+| Link | `data-ln-link` | [js/ln-link/README.md](../js/ln-link/README.md) |
+| Confirm | `data-ln-confirm` | [js/ln-confirm/README.md](../js/ln-confirm/README.md) |
+| Debug | `data-ln-debug` | [js/ln-debug/README.md](../js/ln-debug/README.md) |
+| Upload | `data-ln-upload` | [js/ln-upload/README.md](../js/ln-upload/README.md) |
+| AJAX | `data-ln-ajax` | [js/ln-ajax/README.md](../js/ln-ajax/README.md) |
+| Router | `data-ln-route` | [js/ln-router/README.md](../js/ln-router/README.md) |
+| HTTP | — | [js/ln-http/README.md](../js/ln-http/README.md) |
+| Store | `data-ln-data-store` | [js/ln-data-store/README.md](../js/ln-data-store/README.md) |
+| Form | `data-ln-form` | [js/ln-form/README.md](../js/ln-form/README.md) |
+| Validate | `data-ln-validate` | [js/ln-validate/README.md](../js/ln-validate/README.md) |
+| Time | `data-ln-time` | [js/ln-time/README.md](../js/ln-time/README.md) |
+| Autosave | `data-ln-autosave` | [js/ln-autosave/README.md](../js/ln-autosave/README.md) |
+| Autoresize | `data-ln-autoresize` | [js/ln-autoresize/README.md](../js/ln-autoresize/README.md) |
+| Translations | `data-ln-translations` | [js/ln-translations/README.md](../js/ln-translations/README.md) |
+| External Links | (automatic) | [js/ln-external-links/README.md](../js/ln-external-links/README.md) |
 
 ---
 
@@ -107,7 +105,7 @@ Two files per component:
 | Topic | File |
 |-------|------|
 | Master Architect Overview | [architecture/overview.md](architecture/overview.md) |
-| JS Component Patterns | [js/component-guide.md](js/component-guide.md) |
+| JS Component Patterns | [architecture/component-guide.md](architecture/component-guide.md) |
 | Reactive Architecture | [reactive.md](reactive.md) |
 | Container Queries | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |
 | Core Component & Styling Specs | [architecture/reference.md](architecture/reference.md) |

@@ -168,7 +168,54 @@ if a hash-bound modal is open (`#demo-edit:5`), switching a tab produces
 
 No markup or API change — this is an internal implementation improvement.
 
+---
+
+## 🔧 Internals
+
+Source: `js/ln-tabs/ln-tabs.js`. Zero cross-component imports — only `ln-core/helpers.js` (`registerComponent`, `dispatch`) and `ln-core/persist.js`.
+
+### State
+
+Each instance caches `tabs[]`/`panels[]` and derived `mapTabs`/`mapPanels` (keyed by lowercase-trimmed `data-ln-tab` value, or the resolved hash fragment for boolean anchors) once at init — re-querying happens only through `destroy()` + re-init, never on every activation. `nsKey`/`hashEnabled` are resolved *before* `mapTabs` is built, because anchor key derivation needs the namespace to pick the right hash fragment.
+
+### Init flow
+
+1. `registerComponent` scans for `[data-ln-tabs]`, with `extraAttributes: ['data-ln-tabs-active']` so the shared observer also watches writes to the active-key attribute (the real state channel), not just the marker attribute.
+2. The constructor caches tabs/panels, detects mode, builds the maps, resolves `defaultKey` and `autoFocus`, wires click handlers (guarded against double-attach).
+3. It branches on mode: hash-enabled groups attach `hashchange` and seed from the current URL immediately; persist groups optionally restore from `localStorage` *before* the first attribute write, so there's no flash of default-then-restored.
+4. The resulting `setAttribute('data-ln-tabs-active', …)` is what triggers `_applyActive` through the observer — the write, not a direct call, is the single activation path.
+
+### Activation order (`_applyActive`)
+
+1. An invalid key (typo, removed panel) silently resolves to `defaultKey` — permissive by design, the component is downstream of attribute writes.
+2. Tab buttons flip `data-active`/`aria-selected` first, then panels flip `.hidden`/`aria-hidden` — natural read order for assistive tech.
+3. Auto-focus is deferred one `setTimeout(0)` (the panel was just un-hidden; layout hasn't settled) with `{ preventScroll: true }`.
+4. Event dispatch happens after all DOM/ARIA writes; persistence save happens last, only when `data-ln-persist` is present and hash mode is off.
+
+### The hash round-trip
+
+Clicking an already-active anchor tab does not fire `hashchange` (the browser dedupes identical hash writes), so the click handler special-cases `location.hash === '#' + newHash` and force-writes the attribute directly instead of relying on the event. The same edge applies at boot: `_hashHandler()` is invoked once manually to seed state from a hash already present in the URL.
+
+### Anchor key derivation
+
+A non-empty `data-ln-tab` value wins if present; otherwise the `href` is split on `&`, matched against `nsKey`, and the substring after `:` is used; an anchor with no resolvable key is skipped with `console.warn`.
+
+### Destroy
+
+Idempotent. Detaches every click handler and clears their double-attach guards, detaches `hashchange` only if hash-enabled, dispatches `ln-tabs:destroyed`, deletes `dom.lnTabs`. Does NOT reset visual state (`data-active`/`aria-selected` survive), clear `localStorage`, or remove `data-ln-tabs-active` — a future re-init resumes from whatever is left.
+
+### Failure modes
+
+| Scenario | Behavior |
+|---|---|
+| Active key has no matching panel | Falls back to `defaultKey` silently |
+| Mixed anchor + button triggers in one group | Falls back to persist mode, `console.warn` |
+| `location.hash` references a foreign namespace | Ignored — `_hashHandler` reads only its own `nsKey` |
+| `localStorage` write throws (quota, private mode) | Swallowed in `persistSet`'s `try/catch` |
+| Tab button missing `type="button"` inside a form | Page navigates on click — markup bug, not defendable |
+
+---
+
 ## Related
 - **[`ln-toggle`](../ln-toggle/README.md)** — Binary disclosure state primitive.
 - **[`ln-accordion`](../ln-accordion/README.md)** — Single-open coordinator built on `ln-toggle`.
-- **Architecture deep-dive** — [`docs/js/tabs.md`](../../docs/js/tabs.md).

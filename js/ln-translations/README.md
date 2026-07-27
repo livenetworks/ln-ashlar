@@ -96,3 +96,23 @@ Instead of writing custom layout handlers to manage multi-language fields, this 
 - **Forgetting Global Templates:** The coordinator will fail to render badges or locale dropdowns if `ln-translations-badge` and `ln-translations-menu-item` templates are missing from the page.
 - **Incorrect Translatable Wrappers:** `data-ln-translatable` must sit on the parent container (e.g. `<div data-ln-translatable="title">`) wrapping the default `<input>`/`<label>`, not on the input itself.
 - **Mismatched Prefixes:** When nesting entities (e.g., repeating list items), ensure the translatable wrapper declares the correct scope prefix: `data-ln-translations-prefix="items[index]"` to generate valid submission structures.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-translations/ln-translations.js`. Instance state per `[data-ln-translations]` form (`form.lnTranslations`): `activeLanguages` (Set), `defaultLang`, `locales` map, `badgesEl`/`menuEl` refs, and the `placeholderLabel`/`removeLabel` templates (`{lang}` token).
+
+### Add-language flow
+
+`addLanguage(lang, values)`: cancelable `:before-add` → add to `activeLanguages` → for every `[data-ln-translatable]` wrapper, clone the original input (deep clone for `<select>` to preserve its `<option>`s, shallow otherwise), rename to `prefix[trans][lang][field]` or `trans[lang][field]`, strip `id`, apply the placeholder template, tag `data-ln-translatable-lang`, insert after the last existing translation input for that field → rebuild the dropdown (only unactivated languages) and badges → `:added`.
+
+Original (default-language) inputs are tagged `data-ln-translatable-lang="{defaultLang}"` at init specifically so `removeLanguage` never matches and removes them.
+
+### Remove-language flow
+
+`removeLanguage(lang)`: cancelable `:before-remove` → `querySelectorAll('[data-ln-translatable-lang="{lang}"]')` removed from DOM → delete from `activeLanguages` → rebuild dropdown/badges → `:removed`.
+
+### MutationObserver
+
+A single shared observer (via `registerComponent`) watches `childList` for new `[data-ln-translations]` forms and `attributes` for the attribute landing on an existing element — no per-instance observer.

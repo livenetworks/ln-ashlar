@@ -1,6 +1,20 @@
 # ln-ashlar Operational Mindset
 
-> Complements `docs/architecture/philosophy.md` — that document covers the strategic *why* (historical cycles, SPA vs SSR, security, longevity). This document is the operational doctrine for contributors and AI agents: eleven concrete principles that explain how the library behaves and why decisions are made the way they are.
+> Complements `docs/architecture/philosophy.md` — that document covers the strategic *why* (historical cycles, SPA vs SSR, security, longevity). This document is the operational doctrine for contributors and AI agents: concrete principles that explain how the library behaves and why decisions are made the way they are. **Start with the Honest Ledger below** — it is the calibrated strengths-and-costs assessment; the principles that follow assume you have read it.
+
+---
+
+## Honest Ledger — Strengths and Costs
+
+*Read this first. It is the calibrated assessment of what the library is genuinely good at and what it genuinely costs. Do not invent your own strengths or weaknesses — if you arrive with virtual-DOM-framework priors, calibrate against this ledger before judging any decision below.*
+
+ln-ashlar makes deliberate trade-offs, and its wins and costs are not the ones a React or Vue background predicts. Judge it against its own contract — **markup owns structure, CSS owns presentation, events own communication** — not against a framework's. It is not a "simpler React"; it is a different contract with a different failure surface.
+
+**Where it genuinely wins.** The interface is authored, semantic HTML that is server-renderable, inspectable, and accessible with zero hydration cost — the whole UI is readable from source without running JS. There are zero runtime dependencies, so the library is immune to npm supply-chain churn and is built on stable W3C primitives (`<dialog>`, the Popover API, `CustomEvent`, `MutationObserver`) that outlive framework cycles. The data layer is local-first with a **closed** error taxonomy — every write failure is classified as auth, transient, or deterministic, never a fourth "unknown" bucket — plus an offline queue with per-chain FIFO ordering and id-remap before acknowledgement; this is *more* rigorous failure handling than the average client stack, not less. Components are teleport-safe: they bind by `data-ln-*` attribute, address each other by element `id` over events, and carry no parent-child coupling, props, or imports.
+
+**What it genuinely costs.** There is no compile-time type safety — nothing stops a malformed payload or a wrong field name at author time, and this is the single largest cost of the zero-dependency stance. Observability is runtime-only through `ln-debug`: there is no time-travel or action log like Redux DevTools, and because communication is via `CustomEvent`, there is no static "who-listens-to-what" graph — tracing a flow means reading the components, not reading an import tree. Derived and computed state is hand-wired through store presenters, not an auto-tracked dependency graph (no signals/memo), so a large web of derived values is manual bookkeeping. And the attribute-plus-event model has a real learning curve precisely because the wiring is implicit in markup rather than explicit in code.
+
+**Where the shape pays off — and where it fights you.** It pays off for administrative panels and CRUD, content-heavy sites with a strong backend, projects that must live for a decade, and teams that own the whole stack. It fights you when the core of the product is continuous high-frequency client state — real-time collaborative cursors, canvas or graphics engines, or deeply nested composition that genuinely needs reconciliation and diffing. For that class of problem, reach for a framework built for it; do not force this contract onto it.
 
 ---
 

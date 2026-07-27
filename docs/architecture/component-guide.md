@@ -163,6 +163,8 @@ _constructor.prototype.destroy = function () {
 
 **Use `attributeFilter`** — never observe ALL attributes. List only the ones your component cares about.
 
+And list **all** of them: every self-attribute your `onAttributeChange` handler (or a helper it calls synchronously) reads as a render/derive input must be in the observed set (primary attribute + `extraAttributes`), or a runtime change to it silently no-ops. Behaviour flags read only at a transition (e.g. `data-ln-persist`) are exempt. Cross-check siblings that read the same attribute — `ln-time` observes `datetime`, so `ln-date`'s text mode must too.
+
 ---
 
 ## Shared Resource Pools
@@ -462,6 +464,7 @@ try {
 - [ ] Uses `findElements` from `ln-core` (not custom MutationObserver for init)
 - [ ] **Zero display text in JS** — all user-facing text from templates, dict, or Intl
 - [ ] `attributeFilter` if watching attribute changes (never observe ALL)
+- [ ] every attribute your `onAttributeChange` handler (or its helpers) reads is in the observed set (primary + `extraAttributes`)
 - [ ] Shared resources (intervals, connections) at module level, not per-instance
 - [ ] Shared interval checks `document.body.contains()` on tick (orphan cleanup)
 - [ ] Formatter/template caches at module level
@@ -479,5 +482,4 @@ try {
 
 ### Documentation
 - [ ] `js/ln-{name}/README.md` — usage guide: attributes, events, API, HTML examples
-- [ ] `docs/js/{name}.md` — architecture reference: internal state, render flow, event lifecycle
 - [ ] `demo/admin/{name}.html` — interactive demo with live examples

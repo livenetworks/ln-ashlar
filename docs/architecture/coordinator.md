@@ -64,23 +64,26 @@ sequenceDiagram
   3. It measures the trigger and places the menu right-aligned beneath it.
   4. It listens for viewport resizes and outside clicks to safely write `data-ln-toggle="close"` back to the menu when needed.
 
-#### 3. `ln-modal-fill` (Bridging Hash-Param Opens to Form Fills)
+#### 3. `ln-modal-coordinator` (Bridging Triggers, Hash Navigation, Fill, and Submit)
 * **Children:** none — a global document listener (mirrors `ln-fill`).
-* **The Rule:** when a hash-bound modal opens via a deep-link / Back-Forward (no
-  click), its form must still be filled from the record identified by the hash
-  param.
+* **The Rule:** a modal must open, get its form filled, and auto-close on
+  successful submit — without `ln-modal`, `ln-fill`, or `ln-form` knowing
+  about each other.
 * **Flow:**
-  1. A modal opens and bubbles `ln-modal:open { target, param }`.
-  2. `ln-modal-fill` catches it; if `param` is present it finds the
-     `[data-ln-fill-id="<param>"]` source (preferring one whose
-     `data-ln-fill-form` lives inside the modal).
-  3. It builds a record from the source's `data-ln-fill-*` attributes (same rules
-     as `ln-fill`) and calls `window.lnCore.lnFill(modal, record)`.
-  4. It NEVER clicks the source — `lnFill` only dispatches `ln-fill` events, so
-     the open modal stays open and the URL hash is untouched (no re-open).
-* `param` absent or no matching source → no-op.
+  1. A trigger (`[data-ln-modal-for]` button or `<a href="#modalId:42">` hash
+     anchor) is clicked; the coordinator intercepts it, updates the URL hash
+     via `hashSet` (preserving foreign segments), and determines mode
+     (`new` vs `edit`) from the presence of a hash param.
+  2. It extracts `data-ln-modal-*` / `data-ln-fill-*` payload attributes from
+     the trigger, dispatches `ln-fill:request` to populate the form, and
+     dispatches `ln-modal:request-open` to the target `ln-modal`.
+  3. On `ln-form:success` / `ln-ajax:success` bubbling from the form, it
+     cleans the hash, dispatches `ln-modal:request-close`, and dispatches
+     `ln-form:request-reset`.
+  4. On `ln-form:error` / `ln-ajax:error`, it does nothing — the modal stays
+     open so inline validation errors remain visible.
 
-See also: [Hash-state doctrine](hash-state.md) — the cross-cutting rules for namespace ownership, foreign-segment preservation, and anchor interception that make hash-param coordinators like `ln-modal-fill` safe to compose.
+See also: [Hash-state doctrine](hash-state.md) — the cross-cutting rules for namespace ownership, foreign-segment preservation, and anchor interception that make hash-param coordinators like `ln-modal-coordinator` safe to compose.
 
 ---
 
@@ -244,8 +247,8 @@ require no coordinator at all (see [`js/ln-fill/README.md`](../../js/ln-fill/REA
 programmatic and not click-triggered (e.g. a store conflict handler, an import
 workflow, or a deep-link pre-fill). Pattern: on `ln-modal:before-open`, call
 `window.lnCore.lnFill(modalEl, record)`. For the hash-param deep-link case specifically,
-the shipped generic coordinator `ln-modal-fill` handles this automatically (see
-[`js/ln-modal-fill/README.md`](../../js/ln-modal-fill/README.md)); the manual
+the shipped generic `ln-modal-coordinator` handles this automatically (source:
+`js/ln-modal-coordinator/src/ln-modal-coordinator.js`); the manual
 `before-open` + `lnFill` pattern remains valid for non-hash programmatic fills.
 Pass `record` to fill; pass `null` to reset. The helper fans out to all `[data-ln-form]`
 and `[data-ln-fillable]` descendants — coordinator never calls `lnForm.reset()` /

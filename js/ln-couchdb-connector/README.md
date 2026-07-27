@@ -146,3 +146,32 @@ Here is how a parent Coordinator links a Cache Store and the CouchDB Connector u
     // the coordinator — this connector never needs to be wired by hand.
 })();
 ```
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-couchdb-connector/*`. Bridges CouchDB's revision-based (`_rev`) document protocol and `_changes`/`_bulk_docs` endpoints to the same coordinator-facing event contract as `ln-api-connector`.
+
+### Sync flow
+
+`request-sync {since}` → `GET /{db}/_changes?include_docs=true&since=<since>` → maps `rows.doc` to `{..., id: _id}` and `rows.deleted` to `deletedIds` → `:fetched { data, deleted, synced_at }`. The coordinator hands this straight to `store.applySync`.
+
+### Revision resolution (zero-friction `_rev`)
+
+Every update/delete payload is inspected for `_rev`/`rev`. If present, `PUT`/`DELETE` fires immediately with `If-Match`. If absent, the connector first `GET`s the current document to read `_rev`, then issues the mutation — callers never need to track revisions themselves. A `409 Conflict` fires `:error` with `status: 409` and `data`/`conflictData` set to CouchDB's raw `{error, reason}` body. Unlike a REST backend, CouchDB's 409 carries no document snapshot, so the coordinator's server-wins reconciliation is a no-op on this path — only the error toast fires; the optimistic local write stays in place until the next sync reconciles it.
+
+### ID translation
+
+Ingress: every fetched/created/updated document gets `id = _id` before reaching the coordinator. Egress: `create`/`update` map `id` back to `_id` before the request body is sent. The mapping is entirely internal — JS API callers and DOM-event consumers never see `_id`.
+
+### Bulk delete
+
+1. `POST /{db}/_all_docs` with `{"keys": [...]}` to resolve current `_rev` per id.
+2. Filter out any ids that errored or are missing.
+3. Build `{_id, _rev, _deleted: true}` per surviving doc.
+4. `POST /{db}/_bulk_docs` with the array.
+
+### Envelope unwrap
+
+Same `{message, content}` presence-check as `ln-api-connector` (see its README) — `content` replaces the bare CouchDB body when present, `message` rides opaquely on the `:created`/`:updated`/`:deleted`/`:bulk-deleted` event detail. Raw CouchDB never sends this envelope, so a direct CouchDB backend never toasts; only a proxy/gateway that wraps responses can opt in.

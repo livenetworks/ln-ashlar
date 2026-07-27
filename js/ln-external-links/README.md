@@ -2,8 +2,6 @@
 
 Auto-decorates every cross-host `<a>` and `<area>` on the page with `target="_blank"`, merged `rel="noopener noreferrer"`, and a screen-reader hint span. Runs on page load and on every DOM mutation; no opt-in attribute, no init call, no API surface for consumers to wire.
 
-For the host-comparison decision table, script-load lifecycle, and architecture rationale, see [`docs/js/external-links.md`](../../docs/js/external-links.md).
-
 ## Markup anatomy
 
 There is no markup contract. Every `<a>` and `<area>` on the page
@@ -331,11 +329,52 @@ This self-contained script executes immediately and sets up the necessary hooks 
   `ln-modal` with this component to show a "leaving the site"
   interstitial. The composition is project code, not library code;
   see the "Confirm-before-leaving interstitial" example.
-- **Architecture deep-dive:** [`docs/js/external-links.md`](../../docs/js/external-links.md)
-  for the global-service pattern, the `_isExternalLink` decision
-  table, and the script-load lifecycle.
 - **Cross-component principles:** [`docs/architecture/data-flow.md`](../../docs/architecture/data-flow.md)
   — ln-external-links sits OUTSIDE the four-layer data flow. It is
   not Data, Submit, Render, or Validate. It is a global decorator
   that mutates DOM in response to insertion events; the data flow
   story does not apply.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-external-links/ln-external-links.js`. A **global service** (js skill §10) — no `registerComponent`, no consumer-facing `data-ln-*` opt-in attribute. It loads, runs once, and sets up a click delegate + `MutationObserver` on `document.body`.
+
+### "External" test
+
+The single test: truthy `link.hostname` AND `link.hostname !== window.location.hostname`. The `link.hostname &&` short-circuit is what makes every non-http(s) scheme (`mailto:`, `tel:`, `javascript:`, `data:`) resolve as "internal" — those schemes parse to an empty `hostname`, so the check fails before the comparison runs. A subdomain (`app.example.com` on a page served from `example.com`) counts as external — hostname equality is exact, not suffix-based. Port and scheme differences do not affect `hostname` (it strips both), so `https://host:8443` vs `https://host` counts as the same host.
+
+### Script-load lifecycle
+
+Both the click delegate and the observer are wrapped in `guardBody` (`ln-core/helpers.js`): if `document.body` is `null` at script eval (e.g. loaded in `<head>` without `defer`), setup re-schedules itself for `DOMContentLoaded`. The initial `_processLinks()` scan follows the same `readyState === 'loading'` check. A `window.lnExternalLinks` sentinel guards against double-execution if the script loads twice.
+
+### Processing pipeline
+
+`_processLink(link)`, on every pass (initial scan, observer callback, manual `.process()` call):
+
+1. `data-ln-external-link === 'processed'` → return (idempotency guard, runs first on every pass).
+2. `!_isExternalLink(link)` → return.
+3. `target = '_blank'` (clobbers any pre-existing value).
+4. `rel` tokens merged: `noopener` + `noreferrer` added, existing tokens (`me`, `nofollow`, etc.) survive.
+5. `<span class="sr-only">(opens in new tab)</span>` appended as last child.
+6. `data-ln-external-link="processed"` written (the marker for future passes).
+7. `ln-external-links:processed` dispatched (bubbles, not cancelable).
+
+There is no "before-process" cancelable event — decoration is unconditional once the guards pass.
+
+### MutationObserver scope
+
+Watches `document.body` with `childList: true, subtree: true, attributes: true, attributeFilter: ['href']`. Catches: new `<a>`/`<area>` insertions (direct match and nested via `querySelectorAll`), and `href` mutations on existing anchors (internal→external flips redecorate automatically). Does NOT catch **external→internal href flips on an already-processed link** — the marker guard short-circuits, so the link stays over-decorated (`target="_blank"` on now-internal URL); recovery is consumer-side (clear the marker, strip the written attributes/span manually). Also does not watch `removedNodes` — unnecessary, since all state lives on the element and is removed with it.
+
+### Click delegation
+
+One delegate on `document.body`, resolving `e.target.closest('a, area')`. No `preventDefault()` — the browser's default action and all modifier-key semantics (Ctrl/Cmd/middle/Shift-click) pass through untouched. Firing of `:clicked` is gated on the `processed` marker, **not** a fresh `_isExternalLink` re-check — a link pre-marked `processed` in markup (the opt-out hatch) fires `:clicked` even if it's actually internal. `detail.text` reads `link.textContent`, which includes the appended sr-only span text.
+
+### Accessibility
+
+The sr-only hint has no i18n hook — the string is hard-coded English. Projects needing localization must patch the compiled bundle or pre-mark every link to skip the component.
+
+### Cross-component coordination
+
+Imports only `dispatch` and `guardBody` from `ln-core/helpers.js`. Does not listen for any `ln-*` event and is not signaled by `ln-ajax`/data-loading components when they inject markup — decoration is purely insertion-driven via the shared observer.

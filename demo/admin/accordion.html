@@ -254,7 +254,7 @@
 								<li><strong>Nestable by Nature:</strong> Since ownership is determined purely by DOM ancestry (using <code>.closest('[data-ln-accordion]')</code>), accordions can be nested inside accordions infinitely. The inner coordinator handles its group, the outer coordinator handles its group, and they remain completely oblivious to each other.</li>
 							</ul>
 
-							<p>For a deeper dive into the architectural rationale, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-accordion/README.md"><code>ln-accordion</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/accordion.md">architecture deep-dive</a>.</p>
+							<p>For a deeper dive into the architectural rationale, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-accordion/README.md"><code>ln-accordion</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-accordion/README.md">architecture deep-dive</a>.</p>
 						</main>
 					</section>
 
@@ -606,7 +606,7 @@ acc.lnAccordion.destroy();   // dispatches ln-accordion:destroyed</code></pre>
 								<li><strong><a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-toggle/README.md"><code>ln-toggle</code></a></strong> — every panel in the accordion is an <code>ln-toggle</code> instance. Open/close API, persistence, cancelable events and aria sync all come from there.</li>
 								<li><strong><code>@mixin collapsible</code></strong> — the <code>grid-template-rows</code> animation. <code>.collapsible</code> is the parent (zero padding); <code>.collapsible-body</code> is the padded child.</li>
 								<li><strong><code>@mixin accordion</code></strong> — bordered-card chrome and chevron rotation. Already applied to <code>[data-ln-accordion]</code> by default; re-apply on a custom selector for the look without single-open coordination.</li>
-								<li><strong>Architecture deep-dive:</strong> <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/accordion.md"><code>docs/js/accordion.md</code></a> — internals, lifecycle, design rationale.</li>
+								<li><strong>Architecture deep-dive:</strong> <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-accordion/README.md"><code>js/ln-accordion/README.md</code></a> — internals, lifecycle, design rationale.</li>
 								<li><strong>Cross-component principles:</strong> <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md"><code>docs/architecture/data-flow.md</code></a> — attributes-as-contract, event-driven coordination, MutationObserver discipline.</li>
 							</ul>
 						</main>

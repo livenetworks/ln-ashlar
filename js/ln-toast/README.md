@@ -147,7 +147,32 @@ not found')` at clone time, no silent fallback.
 
 ---
 
+## 🔧 Internals
+
+Source: `js/ln-toast/ln-toast.js`. One `_Component` instance per `[data-ln-toast]` container; no reactive proxy, direct DOM manipulation.
+
+### Build order matters
+
+`_buildItem` calls `fill(fragment, data)` on the raw `DocumentFragment` *before* extracting `firstElementChild` — `fill()`'s `querySelectorAll` excludes its own root, so operating on the fragment (whose child is the `<li>`) is what lets `data-ln-attr="class:type"` land on the `<li>` itself. `classList.add('ln-enter')` must run *after* that `fill()` call, because `setAttribute('class', …)` clobbers the whole class attribute and would wipe a pre-added enter flag.
+
+### Two build paths
+
+`_buildItem` (dynamic, `ln-toast:enqueue`) clones the authored `<template data-ln-template="ln-toast-item">` via `cloneTemplateScoped` (container-local template wins over a document-global one) and runs `fill()`. `_hydrateLI` (SSR path, runs once per existing `[data-ln-toast-item]` at construction) never touches markup — it only queries inside the authored `<li>` to wire the close button and start the timeout. Excess authored items beyond `data-ln-toast-max` are removed (no exit animation) before hydration runs.
+
+### Dismiss
+
+`clearTimeout` → `classList.remove('ln-enter')` (defensive, in case dismissed before the enter animation's `requestAnimationFrame` fired) → `classList.add('ln-out')` → 200ms `setTimeout` → `removeChild`. `.ln-enter` only ever appears on JS-built items; SSR items render in their final state on first paint.
+
+### Why no ARIA on individual items
+
+Live-region semantics (`aria-live`, `aria-atomic`) live once on the container, authored by the consumer. Neither build path ever writes `role` or `aria-live` on an item — toast is a non-blocking surface by design, and a nested independent live region inside an already-live container risks double-announcement.
+
+### Icon selection is pure CSS
+
+The template authors all four icon variants as a `<ul>/<li data-ln-toast-when="...">` list, hidden by default; CSS shows the one matching the card's type class. JS holds no type→icon lookup table and never writes an icon `href`.
+
+---
+
 ## Related
 - **[`ln-modal`](../ln-modal/README.md)** — Viewport-blocking focus-gated dialogs.
 - **[`ln-confirm`](../ln-confirm/README.md)** — Lightweight inline action confirmations.
-- **Architecture deep-dive** — [`docs/js/toast.md`](../../docs/js/toast.md).

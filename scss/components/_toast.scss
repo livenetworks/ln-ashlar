@@ -37,7 +37,7 @@
 
 // When-toggle — dynamic template ships all 4 icon variants; CSS shows the
 // one matching the card's type class. Unknown/absent type → no matching
-// class → no icon (documented degradation, see docs/js/toast.md).
+// class → no icon (documented degradation, see js/ln-toast/README.md).
 [data-ln-toast] > li.success .icon li[data-ln-toast-when="success"],
 [data-ln-toast] > li.error .icon li[data-ln-toast-when="error"],
 [data-ln-toast] > li.warn .icon li[data-ln-toast-when="warn"],

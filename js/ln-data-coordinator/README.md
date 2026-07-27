@@ -470,3 +470,32 @@ const { store, connector, queue } = coordinator.findChildren();
 // Fetch currently resolved mapper functions
 const { ingress, egress } = coordinator.mapper;
 ```
+
+---
+
+## 🔧 Internals — View-Binding Layer
+
+Source: `js/ln-data-coordinator/src/ln-data-coordinator.js`. The write pipeline (fan-out, sync, queue, toasts) is documented above; this section covers the coordinator's second role — serving live data to bound view components with zero application JS.
+
+### Binding attributes
+
+| Attribute | Applied to | Served by |
+|---|---|---|
+| `data-ln-table-store="<name>"` | `[data-ln-table]` | `ln-table:set-data` |
+| `data-ln-list-store="<name>"` | `[data-ln-list]` | `ln-list:set-data` |
+| `data-ln-options="<name>"` | `<select>` | `ln-options:set-data` |
+| `data-ln-stat="<name>"` | inline element | `ln-stat:set-count` |
+
+`<name>` must match the coordinator's own child store's `data-ln-data-store` value. Every document-level handler guards with `_ownsStore(name)` first (`children.store && children.store._name === name`), so multiple coordinators on one page coexist without cross-talk.
+
+### Presenter / binder split
+
+Presenters (`store.setPresenters({computed})`) are registered once per store; computed display fields (`updated_display`, `status_label`, …) flow through `getAll → set-data` automatically. The coordinator is a pure binder — it transports whatever `getAll` produces to the requesting view element without transforming it.
+
+### Refresh trigger
+
+On `ln-data-store:ready`/`loaded`/`created`/`updated`/`deleted`, and `synced` (only when `e.detail.changed`), `_refreshAll()` re-queries every bound view element using its last cached query parameters (or defaults) — so a filter/sort/search a user set on a table survives a background sync.
+
+### `data-ln-table-filter-options` — removed
+
+Filter options are now static authored markup inside `[data-ln-popover]` blocks (domain-owned enum/lookup), not accumulated from the dataset. See `docs/architecture/reference.md#column-filter-architecture`.

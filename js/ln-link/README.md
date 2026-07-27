@@ -188,9 +188,8 @@ window.lnLink.init(root);
 window.lnLink.destroy(container);
 ```
 
-`init` traverses descendants; `destroy` does not. See
-[`docs/js/link.md`](../../docs/js/link.md) for the full mechanics
-behind this asymmetry.
+`init` traverses descendants; `destroy` does not — see
+[Cleanup asymmetry](#cleanup-asymmetry) below.
 
 ## What it does NOT do
 
@@ -297,7 +296,46 @@ If you only need this component and want to avoid loading the full bundle, you c
 
 ## See also
 
-- [`../../docs/js/link.md`](../../docs/js/link.md) — architecture mirror (internal state, observer topology, click-flow, registration pattern)
-- [`../../docs/js/ajax.md`](../../docs/js/ajax.md) — ln-ajax interop details
+- [`../ln-ajax/README.md`](../ln-ajax/README.md) — ln-ajax interop details
 - [`../../scss/config/mixins/_link.scss`](../../scss/config/mixins/_link.scss) — `link-row` and `link-status` mixins
 - [`../../demo/admin/src/pages/link.html`](../../demo/admin/src/pages/link.html) — interactive demo
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-link/ln-link.js`. Imports `dispatchCancelable` and `guardBody` from `../ln-core`.
+
+### State surface
+
+- `_statusEl` — module-level, a single shared `<div class="ln-link-status">` appended to `document.body` once, at first init. Never destroyed, even if all containers are.
+- `container.lnLinkInit` — per-container flag, guards double-init; deleted on destroy.
+- `row.lnLinkRow`, `row._lnLinkClick`, `row._lnLinkEnter` — per-row flag plus stored listener closures, kept so `removeEventListener` gets the exact same reference at destroy time. `_handleMouseLeave` has no closure and is shared across rows.
+- No Proxy, no reactive store — this is a listener-attachment component.
+
+### Local `findElements`
+
+Like `ln-ajax`, `ln-link` keeps a local `findElements` instead of the `ln-core` helper: it must check the root itself for `data-ln-link` AND iterate descendants, both calling `_initContainer` — a dual-path shape the shared helper's signature doesn't fit.
+
+### MutationObserver
+
+Registered inside `guardBody`, watching `document.body` with `childList`/`subtree`/`attributes` (filtered to `data-ln-link`).
+
+- **childList** — `findElements(node)` on every added element. Special-cased for `<tr>`: walks up via `closest('[data-ln-link]')` and calls `_initRow` directly, since a bare `<tr>` isn't itself a `[data-ln-link]` container and `findElements` would miss it — this is what makes `ln-table`'s appended rows wire automatically.
+- **attributes** — re-runs `findElements(mutation.target)` when `data-ln-link` is set/changed programmatically.
+
+### Click handler order
+
+`_handleClick`: interactive-child check (`closest('a, button, input, select, textarea')`) → resolve `row.querySelector('a')` → empty-href guard → modifier/middle-click branch (`window.open`, no event dispatched) → dispatch `ln-link:navigate` → cancel check → `link.click()`.
+
+### Status bar
+
+Created once in `_createStatusBar`, before the observer wires up. `mouseenter` sets `textContent` and adds `.ln-link-status--visible`; `mouseleave` removes the class only (text is left stale, overwritten on the next show). Empty-href rows never trigger it.
+
+### Cleanup asymmetry
+
+`init(root)` traverses descendants; `destroy(container)` operates on the exact element passed only — call it once per container. Always `destroy(container)` **before** replacing `innerHTML`: swapping first detaches the wired `<tr>` elements, so `destroy`'s row loop would walk the *new*, unwired rows and leak the old listeners.
+
+### Registration pattern
+
+Assigns `window.lnLink = { init, destroy }` directly rather than the shared `registerComponent` helper used by newer components — equivalent behavior (double-load guard, observer, DOMContentLoaded wiring), implemented manually.

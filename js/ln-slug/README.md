@@ -2,8 +2,6 @@
 
 Auto-slug micro-component — mirrors a slugified version of a source field into a slug field while the slug field is pristine. Stops mirroring once the user types directly into the slug field; resumes if the slug field is cleared.
 
-For architecture details — instance state, pristine rule, mirror flow — see [`docs/js/slug.md`](../../docs/js/slug.md).
-
 ## Attributes
 
 | Attribute | On | Description |
@@ -67,3 +65,46 @@ Example: `"Hello World!"` → `"hello-world"`, `"  test--value  "` → `"test-va
 ## Events
 
 The component dispatches a synthetic `new Event('input', { bubbles: true })` on the slug field after each mirror. This causes `ln-validate` to re-validate and `ln-form`'s auto-submit debounce to fire. No custom `ln-slug:*` events are emitted.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-slug/ln-slug.js`. Single IIFE, `registerComponent`, per-element instance — same micro-component pattern as `ln-autoresize` (no Proxy/state machine, no templates).
+
+### Instance state
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `dom` | `HTMLInputElement` | The slug input element |
+| `source` | `HTMLInputElement` | The resolved source field (`form.elements[name]`) |
+| `_pristine` | `boolean` | Whether the slug field is pristine (mirroring active) |
+| `_mirroring` | `boolean` | Guard flag — true only while the component is dispatching its own synthetic echo |
+
+### Mirror flow
+
+```
+source field 'input' event (isTrusted)
+  → _onSource: if (!_pristine) return
+  → _mirror():
+      _mirroring = true
+      slug.value = slugify(source.value)
+      slug.dispatchEvent(new Event('input', { bubbles: true }))
+          → _onSlug fires → _mirroring true → early return (echo ignored)
+          → ln-validate / ln-form auto-submit react (bubbled event)
+      _mirroring = false
+```
+
+The `_mirroring` guard is what disambiguates the component's own echo from external programmatic fills — both are `isTrusted === false`, separated only by the flag.
+
+### Initialization guards
+
+The constructor warns and bails (returns `this` without attaching listeners) when:
+- `dom.tagName !== 'INPUT'` — component applied to non-input
+- `dom.form` is null — slug input not inside a `<form>`
+- `form.elements[name]` is falsy — source field not found
+- `typeof source.addEventListener !== 'function'` — source is a RadioNodeList (same-name group)
+
+### Destroy
+
+`destroy()` removes `_onSource` from the source field and `_onSlug` from the slug field, then deletes `dom[DOM_ATTRIBUTE]`. Guarded by `if (!this.dom[DOM_ATTRIBUTE]) return`, making it idempotent.

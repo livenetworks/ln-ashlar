@@ -1346,7 +1346,7 @@ input[data-ln-number] {
 			});
 
 			// Intercept ln-ajax:before-start to prevent the 404
-			// (cancelable — see docs/js/ajax.md step 3).
+			// (cancelable — see js/ln-ajax/README.md step 3).
 			form.addEventListener('ln-ajax:before-start', function (e) {
 				e.preventDefault();
 				const methodInput = form.querySelector('input[name="_method"]');

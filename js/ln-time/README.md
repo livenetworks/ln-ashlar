@@ -79,3 +79,17 @@ Provide a Unix timestamp (in seconds) via `datetime` and specify the formatting 
 - **Passing Millisecond Timestamps:** Standard database fields and JS date objects often return milliseconds (13 digits). `ln-time` maps strictly to Unix seconds (10 digits). Divide milliseconds by `1000` before rendering.
 - **Using ISO Strings:** `datetime="2025-01-15T14:30:00Z"` is not parsed. The component skips non-numeric values, leaving the original fallback text.
 - **Empty `datetime` Attributes:** If the `datetime` attribute is omitted or empty, the component will skip formatting to preserve server fallback strings.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-time/ln-time.js`. Registers via `ln-core`'s `registerComponent` with `extraAttributes: ['datetime']` — the shared observer treats mutations to `datetime` (not just `data-ln-time`) as a re-render trigger, so swapping the timestamp on an existing element re-formats it without a manual re-init call.
+
+### Shared interval
+
+All `relative`-mode elements auto-refresh off a single shared `setInterval` (60s), not one timer per element. The interval starts lazily on the first relative element and stops when the last one is gone; elements removed from the DOM without calling `destroy()` are purged from the pool automatically on the next tick rather than leaking.
+
+### Dependencies
+
+Built entirely on `Intl.DateTimeFormat` and `Intl.RelativeTimeFormat` (both browser built-ins) — no date-parsing library, no polyfill.

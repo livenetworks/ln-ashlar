@@ -47,3 +47,9 @@ The `is-loading` class is removed on first delivery — add it to show a loading
 - ln-stat never imports or reads `ln-data-store` directly — it is a pure event client.
 - The coordinator re-serves `ln-stat:set-count` on every store mutation.
 - `data-ln-stat-filter` supports one `field:value` pair. The value is passed as `[value]` (array) to `store.count(filters)`.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-stat/ln-stat.js`. The coordinator's `_serveStat` method handles `ln-stat:request-count`: reads `data-ln-stat` from the dispatching element, guards with `_ownsStore(name)`, calls `store.count(filters)` (`filters` from `e.detail.filters`), and dispatches `ln-stat:set-count { count }` back on the element. On every store mutation, the coordinator's `_refreshAll()` re-parses `data-ln-stat-filter` from each stat element and re-calls `store.count()` — the component itself holds no count state between deliveries.

@@ -1,4 +1,4 @@
-# Core
+# ln-core
 
 Shared helper module imported by all components — re-exported from
 `js/ln-core/index.js`. No DOM attribute, no constructor, no
@@ -331,8 +331,7 @@ const raw = readValue(td); // '1250.50' from data-ln-value, else trimmed text
 
 - Returns `data-ln-value` attribute value if the element has it.
 - Otherwise returns `el.textContent.trim()`.
-- Used by `ln-table` for sort/filter; future collection components
-  (`ln-list`) read the same attribute through this helper.
+- Used by `ln-table` for sort/filter.
 
 ### registerComponent(selector, attribute, ComponentFn, componentTag, options)
 
@@ -359,6 +358,8 @@ registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
 - `options.extraAttributes` — additional attribute names to include in
   the MutationObserver's `attributeFilter` (e.g. state attributes set
   by coordinator).
+
+  > **Coverage rule:** `extraAttributes` must include every attribute your `onAttributeChange` handler — and any helper it calls synchronously — reads from the element as an input to what it renders or derives. The observed set is *primary attribute + `extraAttributes`*; an attribute read but not observed will not trigger a re-sync when it changes. Behaviour flags checked only at a transition (e.g. `data-ln-persist`, read at open/close to decide a side-effect) are exempt — a mid-life change to them is not meant to re-render.
 - `options.onAttributeChange(target, attrName)` — called when a
   filtered attribute changes on an already-initialized element. The
   attribute → state bridge hook.
@@ -509,7 +510,7 @@ cache.requestInitial({ sort: null, filters: {}, search: '' });
 - LRU eviction drops the least-recently-touched rows first once `map.size` exceeds `windowSize` — a pure data policy, not a viewport-distance heuristic.
 - `queryGen` is the stale-response guard: `ingest()` silently drops any page whose `detail.queryGen` doesn't match the cache's current generation, so an out-of-order response from a superseded query never corrupts the window.
 - Pages splice at their own `offset`, so out-of-order arrivals are safe — order is irrelevant.
-- Pure function core, no DOM — shared by the `ln-table` and `ln-list` windowed paths. A future `ln-data-store` windowed mode plugs in by making `requestPage` resolve `getAll({ offset, limit })` then call `ingest()`.
+- Pure function core, no DOM — shared by the `ln-table` and `ln-list` windowed paths.
 - `configure`/`setGrandTotal` make the cache's own config live-observable; the owning component (`ln-table`/`ln-list`) wires them to `data-ln-*-window-page` / `-window-threshold` / `-count` attribute changes so no re-init is required.
 
 ---
@@ -726,7 +727,7 @@ codec. Because `hashSet` is a read-modify-write that preserves foreign segments,
 switching a tab never clobbers an open modal's hash segment and vice versa —
 codec isolation is guaranteed by design.
 
-See also: [Hash-state doctrine](../architecture/hash-state.md) — the five rules governing namespace ownership, foreign-segment preservation, anchor interception, coordinator wiring, and the router fragment guard.
+See also: [Hash-state doctrine](../../docs/architecture/hash-state.md) — the five rules governing namespace ownership, foreign-segment preservation, anchor interception, coordinator wiring, and the router fragment guard.
 
 ---
 
@@ -867,14 +868,12 @@ Sort coerces with `parseFloat(raw) || 0`. Formatted display text breaks it:
 
 - `data-ln-value` — the VALUE. Universal. Read by `ln-core.readValue`.
 - `data-ln-table-sort` — the BEHAVIOR/type (`string|number|date`).
-  Component-scoped (lives on `<th>`). A future `data-ln-list-sort` would be its
-  list-scoped sibling. Never universalize behavior; never scope the value.
+  Component-scoped (lives on `<th>`). Never universalize behavior; never scope the value.
 
 ### The reader
 
 `ln-core.readValue(el)` is the single extraction path — that is what makes the
-attribute cross-component. `ln-table` reads through it today; `ln-list` and any
-future value-sorting component go through the same helper.
+attribute cross-component. `ln-table` reads through it today.
 
 ### Formatting responsibility
 

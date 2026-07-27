@@ -78,3 +78,50 @@ textarea.lnAutoresize.destroy();
   textarea.lnAutoresize._resize();
   ```
 - **Conflicting manual drag handles:** By default, textareas may have `resize: vertical` applied. This lets users manual resize the input, which is instantly overridden by the script on the next keystroke. Set `resize: none` to clean up the interface.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-autoresize/ln-autoresize.js`. A pure presentation utility — owns no data, emits no custom events, cooperates with no other component outside the `input` platform event.
+
+### Instance state
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `dom` | `HTMLTextAreaElement` | The textarea, constructor argument |
+| `_onInput` | `Function` | Bound `input` handler, kept for `destroy()` unbind |
+
+No cached "current height" — `_resize` always reads `scrollHeight` fresh, so external CSS changes (`max-height`, font-size, padding) are picked up on the next keystroke.
+
+### Resize mechanism
+
+```
+_resize():
+  1. style.height = 'auto'
+  2. read scrollHeight
+  3. style.height = scrollHeight + 'px'
+```
+
+Step 1 is what makes it shrink, not just grow: `scrollHeight` reports the explicit `height` when content fits inside it, so without the reset every measurement would ratchet upward only. The reset + re-read happen synchronously in one tick, so the browser never paints the intermediate `auto` state — no flicker.
+
+The constructor also calls `_resize()` once before returning, to size server-rendered pre-filled values and late-attached fields (`setAttribute` after the fact) on first paint rather than first keystroke. If the textarea is hidden at construction (`display: none` ancestor), `scrollHeight` reads `0` and there's no `ResizeObserver`/`IntersectionObserver` to catch a later reveal — call `_resize()` manually after showing it.
+
+### Tag validation
+
+The constructor checks `dom.tagName !== 'TEXTAREA'` and, if true, warns and returns `this` early with no `dom`/listener. The element is still marked initialized, so re-attaching the attribute after swapping in a real `<textarea>` needs `destroy()` first.
+
+### MutationObserver via `registerComponent`
+
+Standard shared observer on `document.body`: `childList/subtree` catches new `[data-ln-autoresize]` textareas anywhere; `attributes` (filtered to the one attribute) catches late `setAttribute` addition. Only attribute *presence* matters — no `onAttributeChange` callback, so value changes and attribute removal are no-ops.
+
+### Destroy
+
+Idempotent (bails if already torn down). Unbinds `_onInput`, clears `style.height` (reverting to the CSS-driven `rows`-based height), deletes the instance property. Does not remove the `data-ln-autoresize` attribute — the caller owns it, so a later rescan can re-create the instance.
+
+### Cross-component coordination
+
+No ln-prefixed import/listen/dispatch — only the platform `input` event. Two paths feed it synthetic `input` events:
+
+- **`ln-form:fill`** — `ln-form`'s `fill()` writes `.value` then dispatches `input` on each populated field; autoresize catches it and re-measures. Direct `.value =` writes from project code skip this and will not resize.
+- **`lnForm.reset()`** — walks fields dispatching synthetic `input`/`change` after `dom.reset()`, so cleared textareas shrink back. The bare native `<button type="reset">` path does NOT dispatch synthetic `input` (intentionally minimal); wire it manually or use the `lnForm.reset()` API if auto-shrink is needed there.

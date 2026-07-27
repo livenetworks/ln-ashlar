@@ -394,3 +394,39 @@ const state = router.current();
 ### Atomicity
 
 All region swaps for a single navigation are wrapped in a single `document.startViewTransition` call. History push/replace happens once. `before-navigate` fires once.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-router/src/ln-router.js`.
+
+### Navigation pipeline (order matters)
+
+1. Strip hash/query, collapse trailing slashes.
+2. Every region in `regionRegistry` matches independently against its own sorted route list; the primary region's match is authoritative — if it has none (and no catch-all), the router dispatches `ln-router:not-found` and stops. Auxiliary-only pages proceed without firing `not-found`.
+3. `ln-router:before-navigate` fires once on the primary outlet; `preventDefault()` aborts the whole navigation before any region swap or history update.
+4. For each matched region, a keep-region check (`data-ln-route-keep` + same template already mounted) decides whether it enters the swap plan.
+5. History push/replace happens once.
+6. All planned swaps run sequentially inside a single `document.startViewTransition` call — teardown, clone, `replaceChildren`, record in `mountedTemplates`.
+7. `ln-router:navigated` fires per swapped region (`region` key = `'__primary__'` or the target id).
+
+### Registry & specificity
+
+`regionRegistry: Map<regionKey, { routes: Map<pattern, meta>, sorted: meta[] }>` — one route table per region, each independently sorted static > param > wildcard, first-declared wins ties. A duplicate `(pattern, regionKey)` registration is dropped with `console.warn`; the same pattern targeting two different regions is legal.
+
+### Teardown & teleport cleanup
+
+Only regions actually in the swap plan are torn down — a keep-region that skips a swap is never touched. Before `replaceChildren()` clears an outlet, the router walks its descendants for any element carrying an `ln*` property with a `destroy()` method and calls it — this is what prevents leaked window/document listeners and teleported overlay trees (e.g. an open popover in `<body>` whose trigger lived in the outlet) from surviving the swap.
+
+### Per-region persistence (keep regions)
+
+A `WeakMap<Element, HTMLTemplateElement>` (`mountedTemplates`) tracks the currently-mounted template per target. A keep-region skips its swap only when the newly matched template node is the *same* node already mounted there — never for the primary region, which always re-renders.
+
+### SSR hydration
+
+On boot, a region whose target carries `data-ln-router-hydrate` and already has children skips its initial clone swap — the SSR markup is left in place, listeners are wired, and `ln-router:navigated` still fires so a coordinator can bind/fill it.
+
+### Boot timing
+
+A module-level `_booting` flag is true only during the router's own initial `_navigate` call inside `_boot()`. While true, `ln-router:navigated`/`not-found` dispatches are queued via `queueMicrotask` instead of firing synchronously — guaranteeing that listeners registered later in the same `defer`-script burst still receive the boot event. Every subsequent navigation dispatches synchronously.

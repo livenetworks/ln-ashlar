@@ -144,11 +144,34 @@ If you only need circular progress indicators without the rest of the Ashlar lib
 * **Active Development Source**: [js/ln-circular-progress/src/ln-circular-progress.js](file:///c:/laragon/www/ln-ashlar/js/ln-circular-progress/src/ln-circular-progress.js) — The source of truth containing the ES module implementation.
 * **Compiled Standalone Release**: [js/ln-circular-progress/ln-circular-progress.js](file:///c:/laragon/www/ln-ashlar/js/ln-circular-progress/ln-circular-progress.js) — The compiled IIFE distribution file.
 
+## 🔧 Internals
+
+Source: `js/ln-circular-progress/ln-circular-progress.js`. Passive renderer — owns no data; `_render` re-reads all three attributes fresh on every call, no cached value.
+
+### SVG geometry
+
+Fixed module-level constants: `VIEW_SIZE = 36`, `RADIUS = 16`, `CIRCUMFERENCE = 2π·16 ≈ 100.531`. Both circles share `cx=18 cy=18 r=16`, `stroke-width="3"` (1.5 in/out of the radius). The fill circle carries `stroke-dasharray` equal to the full circumference and a `stroke-dashoffset` that shrinks linearly as progress grows (`offset = CIRCUMFERENCE - (pct/100) × CIRCUMFERENCE`), plus `transform="rotate(-90 18 18)"` to start the arc at 12 o'clock instead of 3.
+
+### Render choices
+
+- `parseFloat('') || 0` / `|| 100` — invalid or empty attributes silently fall back to defaults; no warning (consistent with the passive-renderer pattern).
+- Clamping happens at the percentage level, not the attribute level: `detail.value` stays the raw unclamped number, `detail.percentage` is the 0–100 clamp used for the arc — this is how a consumer distinguishes overshoot from the visible fill.
+- ARIA (`role`, `aria-valuemin/max/now`, `aria-valuetext`) is rewritten on every render on the host element itself, not the SVG (which is `aria-hidden`).
+
+### What the per-instance observer watches
+
+`_listenValues` filters to the three state attributes only — deliberately excluding `class`. Colour/size variants are pure CSS; nothing about the SVG geometry depends on the class, so no JS reaction is needed.
+
+### Destroy
+
+Disconnects the attribute observer, removes the SVG and label nodes, removes the ARIA attributes it added, deletes `data-ln-circular-progress-initialized`. Leaves the value attribute and any classes in place — a later write to the value attribute re-triggers `registerComponent`'s shared observer and rebuilds the instance from scratch (`_buildSvg` is not idempotent; it always appends new nodes).
+
+---
+
 ## See also
 
 - `@mixin circular-progress` (`scss/config/mixins/_circular-progress.scss`) — SVG layout, fill/track stroke tokens, motion-safe transition, size variant mixins.
 - `scss/components/_circular-progress.scss` — default selector application and the `.success` / `.warning` / `.error` colour variant rules.
 - [`ln-progress`](../ln-progress/README.md) — linear sibling. Same contract shape (`data-ln-progress` + `-max`); supports parent-track shared max.
-- [`docs/js/circular-progress.md`](../../docs/js/circular-progress.md) — architecture reference: SVG geometry constants, render flow, MutationObserver filter, performance notes.
 - `@mixin loader` (`scss/config/mixins/_loader.scss`) — indeterminate spinner for operations with no known fraction.
 - [`docs/architecture/data-flow.md`](../../docs/architecture/data-flow.md) — passive renderer pattern used by this component.

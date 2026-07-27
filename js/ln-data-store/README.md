@@ -171,3 +171,37 @@ These events bubble up and can be listened to by coordinators or rendering views
 |---|---|
 | `window.lnDataStore.clearAll()` | Clears all records and metadata from all stores in the IndexedDB database. |
 | `window.lnDataStore.setStorageKey(key)` | Sets the global cryptographic key for record encryption. |
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-data-store/ln-data-store.js`.
+
+### Shared IndexedDB connection
+
+The page holds one `IDBDatabase` connection (`ln_app_cache`) shared by every `[data-ln-data-store]` instance; each store scopes its own transactions by name via a shared `_getDb()`. A module-level `_stores` registry (`{name: instance}`) exists purely for lookup — it does not drive any cross-store sync.
+
+### No self-sync
+
+`_initStore` only emits `ln-data-store:initialized` — in every branch (cache present, empty, schema-mismatch-after-clear) — it never triggers a remote sync itself. Deciding WHEN to sync (on init, on `online`, on `visibilitychange`) is entirely `ln-data-coordinator`'s job; the store keeps no visibility/online listeners of its own. `_triggerRemoteSync` (which dispatches `ln-data-store:request-remote-sync`) is reachable only through the two public commands `forceSync()` / `fullReload()` — always consumer-initiated, never automatic.
+
+### Instance state
+
+`storeEl.lnDataStore` carries `isLoaded` (cache populated), `isSyncing` (a delta/full load in flight), `lastSyncedAt` (the unix-ts `?since=` watermark last used), and `totalCount` (cached in `_meta`). An `_abortController` cancels any pending sync on `destroy()`.
+
+### Encryption pipeline
+
+When a storage key is active: `_putRecord`/`_putBulk` keep `id` in plaintext (IndexedDB keys/indexes must stay queryable) and encrypt the rest of the payload with a fresh random 12-byte IV — `{ id, encrypted: true, iv, data }`. An unsynced record is identified solely by its `_temp_`-prefixed `id` (itself plaintext) — there is no separate pending/sync-state marker field. `_getAllRecords`/`_getRecord` decrypt in memory before a record reaches the in-memory sort/filter/search engine, so query behavior is identical whether encryption is active or not.
+
+### DOM mutations
+
+The store renders nothing. Its only DOM-side effects: attaches `request-*` listeners on the store element, writes `dom.lnDataStore = instance`, and dispatches `ln-data-store:*` events on the store element (`quota-exceeded` dispatches on `document` instead).
+
+### Mutation error reconciliation
+
+`ln-data-store` has no concept of "confirm" or "revert" — a `request-update`/`request-delete` is applied unconditionally to the local cache. Reconciling server-side mutation errors (retry, drop, conflict-server-wins, auth-pause) is `ln-data-coordinator`'s job — see [`js/ln-data-coordinator/README.md`](../ln-data-coordinator/README.md) §Error reconciliation policy.
+
+### At-rest encryption reference
+
+For encryption threat model and operational guidance, see [Security Architecture & Best Practices](../../docs/architecture/security.md).

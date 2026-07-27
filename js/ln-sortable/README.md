@@ -93,3 +93,29 @@ Fired when an item drop successfully changes the DOM index order.
     saveNewListOrder(e.target.id, e.detail.oldIndex, e.detail.newIndex);
   });
   ```
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-sortable/ln-sortable.js`. Each `[data-ln-sortable]` container gets a `_component` instance at `element.lnSortable` (`dom`, `isEnabled`, `_dragging` — the child currently being dragged, or `null` — and the bound `pointerdown` handler).
+
+### Handle resolution
+
+On `pointerdown`: if the target (or an ancestor) carries `data-ln-sortable-handle`, walk up from the handle to the direct container child — that's the drag item. If no handle is under the pointer but handles exist elsewhere in the container, abort (click was outside a handle). If no handles exist anywhere in the container, the clicked child itself is the handle. Either way the resolved item is validated as a direct child of the container before drag starts.
+
+### Pointer lifecycle
+
+`pointerdown` → resolve item → dispatch cancelable `ln-sortable:before-drag` (abort on `preventDefault()`, before any class or capture is applied) → `setPointerCapture` on the handle → set `_dragging`, apply `.ln-sortable--active`/`--dragging`, `aria-grabbed` → attach `pointermove`/`pointerup`/`pointercancel` on the handle.
+
+`pointermove` (repeated): clear all `--drop-before`/`--drop-after` classes, then for each sibling (skipping the dragged element) compare `clientY` to the sibling's vertical midpoint — upper half gets `--drop-before`, lower half gets `--drop-after`. Loop breaks after the first match, so only one sibling ever carries a drop indicator.
+
+`pointerup`/`pointercancel`: find the sibling still carrying a drop class, strip all classes + `aria-grabbed`, and if a valid drop target exists, reorder with a single `insertBefore` (`container.insertBefore(item, dropTarget)` for `--drop-before`, or before `dropTarget.nextElementSibling` for `--drop-after`) then dispatch `ln-sortable:reordered`. This is pure DOM manipulation — no data model is touched; the event is the only signal for consumers to persist order.
+
+### Attribute-driven enable/disable
+
+`data-ln-sortable` (absent value) = enabled, `data-ln-sortable="disabled"` = disabled. `enable()`/`disable()` write the attribute; the shared `MutationObserver` picks up the change, updates `isEnabled` inline, and dispatches `ln-sortable:enabled`/`ln-sortable:disabled`. No cancelable before-event for enable/disable — the state change is immediate.
+
+### MutationObserver
+
+One global observer on `document.body`: `childList` (subtree) auto-initializes new `[data-ln-sortable]` containers; `attributes` on `data-ln-sortable` re-syncs `isEnabled` on existing instances.

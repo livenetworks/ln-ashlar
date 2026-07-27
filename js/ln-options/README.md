@@ -50,3 +50,17 @@ The placeholder `<option value="">` is preserved across refreshes. The previous 
 - ln-options never imports or reads `ln-data-store` directly — it is a pure event client.
 - The coordinator re-serves `ln-options:set-data` on every store mutation (`ln-data-store:ready`, `created`, `updated`, `deleted`, `synced`).
 - `data-ln-options-label` may reference a presenter-computed field (e.g. `full_name`) because the coordinator delivers already-decorated records from `store.getAll({})`.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-options/src/ln-options.js`. Pure event client — never imports or reads `ln-data-store` directly.
+
+### Coordinator wiring
+
+The coordinator's `_serveOptions` handles `ln-options:request-data`: reads `data-ln-options` off the dispatching element, guards with `_ownsStore(name)`, calls `store.getAll({})` (no sort/filter/pagination — options always show the full set), and dispatches `ln-options:set-data { data }` back on the element. On every store mutation (`ready`, `created`, `updated`, `deleted`, `synced`), the coordinator's `_refreshAll()` re-serves every bound `<select>`.
+
+### `<option>` creation
+
+The one sanctioned `document.createElement` case in the library (mirrors `ln-table`'s select-all checkbox) — a native `<option>` carries only `value` + text, so a `<template>` would add ceremony for two string assignments.

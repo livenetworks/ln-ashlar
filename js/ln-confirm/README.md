@@ -1,6 +1,6 @@
 # ln-confirm
 
-A zero-dependency, ultra-lightweight **Interaction Gate Primitive** (~109 lines of JavaScript) that creates a self-contained, two-click confirmation checkpoint on standard buttons. It intercepts accidental clicks, morphs in-place to reveal confirmation prompts, and passes the second click directly to native platform events.
+A zero-dependency, ultra-lightweight **Interaction Gate Primitive** (~131 lines of JavaScript) that creates a self-contained, two-click confirmation checkpoint on standard buttons. It intercepts accidental clicks, morphs in-place to reveal confirmation prompts, and passes the second click directly to native platform events.
 
 ---
 
@@ -84,8 +84,6 @@ button.lnConfirm.destroy();
 
 ## ⚡ DOM Events
 
-### Emitted
-
 `ln-confirm` dispatches exactly one event during its lifecycle:
 
 | Event | Bubbles | Payload | Description |
@@ -105,4 +103,60 @@ button.lnConfirm.destroy();
   ```
 - **GET Request Navigation (`<a>`):** While the script works on links, performing destructive actions via HTTP GET is a security risk (crawlers and pre-fetchers can trigger deletes). Always use `<form method="POST">` with submit buttons instead.
 - **Attachment Order:** `ln-confirm` intercepts first clicks via `stopImmediatePropagation()`. If custom click handlers are bound *before* the bundle loads, they will run on the first click anyway. Ensure scripts are defer-loaded.
-- **Bulk Actions & High-Impact Operations:** `ln-confirm` is strictly designed for **single-element, low-impact actions** (e.g. deleting a single table row). Using it for bulk operations (e.g., "Delete selected users") is an anti-pattern. High-impact operations must always use a proper confirmation modal (`ln-modal`) to list affected resources and provide explicit "Confirm" and "Cancel" buttons.
+- **Bulk Actions & High-Impact Operations:** `ln-confirm` is strictly for **single-element, low-impact actions** (e.g. deleting a single table row). Bulk operations (e.g. "Delete selected users") must use a proper confirmation modal (`ln-modal`) that lists affected resources and offers explicit "Confirm" / "Cancel" buttons.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-confirm/ln-confirm.js`. Imports nothing from other components, consumes no `ln-*` event, and emits nothing the library listens to. Its entire contract is the platform `click` sequence on its own button.
+
+### Two-click flow
+
+The click handler branches on `this.confirming`.
+
+**First click** (`confirming === false`) — arm:
+- `preventDefault()` blocks the platform action (submit / navigate).
+- `stopImmediatePropagation()` stops *later* same-element listeners, so a project's own analytics/validation click handler does not fire on the arming click — only on the second, accepting click. Listeners bound *before* ln-confirm still run, which is why the bundle must be defer-loaded.
+- `_enterConfirm()`: set `confirming`, write `data-confirming="true"` (CSS hook), swap the button to its confirm presentation (see Modes), schedule the auto-revert timer, dispatch `ln-confirm:waiting`.
+
+**Second click** (`confirming === true`) — accept:
+- No `preventDefault`, no `stopImmediatePropagation` — the click runs its native default (form submit, link nav, existing handler) unmodified. That is the whole design: insert a checkpoint, then step out.
+- `_reset()` runs **synchronously before the handler returns**, so the button is visually reverted in the same frame the action proceeds — no flash of the armed state. A `_submitted` flag guards against a synthetic re-entrant click inside the same handler.
+
+There is deliberately no `ln-confirm:accept` event and no second-click cancel signal — "accept" is just the native click; listen on the form `submit`, the link, or the button `click`.
+
+### Construction-time snapshot
+
+`originalText` (`dom.textContent.trim()`) and `confirmText` (`data-ln-confirm`, default `"Confirm?"`) are captured **once at construction**, not per click. Mutating the button's text or the attribute afterwards does not propagate to the live instance — the contract is snapshotted once and run on every click. This is intentional: re-reading per confirm would race AJAX-driven content updates and change the button text mid-confirm.
+
+For the same reason the shared observer watches `data-ln-confirm` only, **not** `data-ln-confirm-timeout`. The timeout is read once, at arm time, in `_startTimer` (`parseFloat`, falling back to `3` on `NaN`/`≤0`). Changing it while armed does not affect the running timer — set it before the user arms.
+
+### Modes
+
+- **Two-Element (recommended):** if the button contains `[data-ln-confirm-idle]` and `[data-ln-confirm-active]`, the component only toggles their `hidden` attribute — no DOM mutation, so inner icons / selection-count spans survive and all text stays authored in HTML.
+- **Legacy text:** no child markers → `dom.textContent` is swapped to `confirmText` and restored on revert.
+- **Icon-only:** fires when `originalText === ''` **and** a `svg.ln-icon use` exists at confirm time (checked fresh, to handle async-rendered icons). Swaps `<use href>` to `#ln-check` (ln-icons fetches it on demand), adds `.ln-confirm-tooltip` + `data-tooltip-text`, and handles a11y (below). Everything is restored symmetrically in `_reset`.
+
+### Icon-only accessibility
+
+The tooltip bubble is a CSS `::after` — invisible to AT. So the icon branch also:
+1. swaps `aria-label` to `confirmText` (original captured, restored on reset), and
+2. appends a transient `<span class="sr-only" role="alert">` carrying the prompt — `role="alert"` is announced on insertion, which an `aria-label` change alone is not. Removed on reset.
+
+Text mode needs neither: `textContent` *is* the accessible name.
+
+### CSS hooks
+
+Co-located SCSS is two JS-state rules (the accepted co-located exception):
+
+```scss
+[data-confirming]:not(.ln-confirm-tooltip) { --color-primary: var(--color-error); }
+[data-ln-table]:has([data-confirming])     { overflow: visible; }
+```
+
+The first rebinds `--color-primary` to `--color-error` while armed — the red fill falls out of `@mixin btn` reading the primary token, so theme overrides apply automatically. `:not(.ln-confirm-tooltip)` avoids double-coloring icon mode, where `@mixin confirm-tooltip` owns the color. The second lifts `ln-table`'s `overflow: clip` so the icon tooltip isn't clipped by the row while any confirm in the table is armed; other scrollable containers need their own parallel rule.
+
+### Destroy
+
+`destroy()` is idempotent, calls `_reset()` **first** (so a destroy-while-armed clears the pending timer and visual state), then unbinds the listener and deletes `el.lnConfirm`. It does not remove `data-ln-confirm` — the caller owns the attribute, so a later observer rescan can re-create the instance.

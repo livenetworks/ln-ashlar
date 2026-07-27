@@ -157,3 +157,33 @@ Instead, `ln-table` itself listens for the `ln-filter:changed` event on its root
   ```
 - **Missing `id` on Persisted Filters:** The `data-ln-persist` storage key relies on the filter element's ID (e.g. `<nav id="my-filter" data-ln-persist>`). If the ID is missing, the component will fail to initialize persistence.
 - **Using `data-ln-filter-col` for ln-table column filters:** The `data-ln-filter-col` attribute (0-based column index for plain table row filtering) is for standalone `ln-filter` targeting a plain `<table>` — not for the `ln-table` component. When composing with `ln-table`, use `data-ln-filter="<tableId>"` on the `<ul>` and `data-ln-table-filter-col="<fieldName>"` on the `<th>`. `ln-table` receives `ln-filter:changed` and maps keys to columns via `data-ln-table-filter-col`.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-filter/ln-filter.js`. No JS-side state object — the active filter is derived on demand from checked inputs; `_lastSnapshot` is a diff cache only, used to decide whether to fire `ln-filter:changed`, never a source of truth.
+
+### Render pipeline
+
+change → mutual-exclusion rule (see Sentinel Rules above) → `queueRender()` (batched via `queueMicrotask`, dedupes same-tick calls) → `_render()` (derive + apply visibility) → `_afterRender()` (derive again, diff vs `_lastSnapshot`, dispatch, persist). Splitting render from afterRender keeps rendering free of side effects.
+
+### Table-column filtering
+
+When `data-ln-filter-col` is set (and the target is a plain `<table>`, not `[data-ln-table]`), a module-level `WeakMap<table, {key: {col, values}}>` tracks every active column filter per table — multiple `ln-filter` navs can filter the same table concurrently, each owning one key. Per row: AND across filter keys, OR within a key's values. WeakMap avoids leaks when tables are removed from the DOM.
+
+### Auto-populate from column
+
+Runs once at construction end (before `this.inputs` is collected) when a `<template>` is nested and `data-ln-filter-col` is set: scans the table's column cells, de-duplicates, sorts, clones the template per unique value via `fillTemplate(clone, { text })`, appends. Ordering matters — inputs are collected after population so the new checkboxes are wired.
+
+### Dual dispatch
+
+Every event fires on both the filter nav (`this.dom`) and `document.getElementById(targetId)` via `_dispatchOnBoth`. This is how a filter nested inside a `<th>` reaches `ln-table`'s root listener regardless of DOM position.
+
+### Persistence
+
+`data-ln-persist` stores `{ key, values }` (or `null` on reset) under `ln:filter:{pagePath}:{filterId}` — restored in the constructor *before* the DOM-init scan, so a persisted selection overrides any server-rendered `checked` attributes; the DOM-init render is skipped entirely when persistence restores state.
+
+### Destroy
+
+Removes this filter's key entry from the table-filter WeakMap (deleting the table's map entirely when it empties), removes all `change` listeners and their double-bind guard flags.

@@ -8,7 +8,12 @@ Real-time locale-aware number formatting for input fields.
 <input type="number" name="amount" data-ln-number>
 ```
 
-The component creates a hidden input that holds the raw numeric value for form submission and formats the visible input with locale-aware thousand separators. See [`docs/js/number.md`](../../docs/js/number.md#html) for the resulting DOM.
+The component creates a hidden input that holds the raw numeric value for form submission and formats the visible input with locale-aware thousand separators. After initialization:
+
+```html
+<input type="text" inputmode="decimal" data-ln-number>
+<input type="hidden" name="amount" value="1234567">
+```
 
 ## Loading & Source Files
 
@@ -120,3 +125,25 @@ on the visible input and works as expected:
 Works automatically. `serializeForm()` reads the hidden input (which has the
 `name`). `populateForm()` sets the hidden input's value, which triggers the
 display update.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-number/ln-number.js`. Each `[data-ln-number]` gets a `_component` instance at `element.lnNumber`, holding `dom` (visible input), `_hidden` (hidden input), and bound `_onInput`/`_onPaste` handlers.
+
+### Formatter cache
+
+One `Intl.NumberFormat` instance per unique locale, cached at module level (`_formatters[locale]`), storing the formatter plus `groupSep`/`decimalSep` extracted once via `formatToParts()`. Separate cache keys (`locale + '|d' + max`, `locale + '|u' + n`) exist for decimal-fixed and user-decimal-preserving formatters. Reused across all instances sharing a locale — `Intl.NumberFormat` construction is the expensive part, not the format call.
+
+### Input flow
+
+On every `input` event: empty value clears the hidden input and dispatches; a bare `-` (user starting a negative number) is left alone. Otherwise: cursor position is saved as a digit-count left of `selectionStart` (not a raw index — formatting inserts/removes separators, so digit-count is the only stable anchor). The typed string is parsed (strip `groupSep`, swap `decimalSep` for `.`); a trailing decimal point or trailing zeros after the decimal point short-circuit to a hidden-only update (so `"12."` doesn't get reformatted mid-type and eat the point the user just typed). Otherwise the decimal limit is enforced (truncated, not rounded), the value is formatted via `Intl.NumberFormat`, `dom.value` is set, the cursor is restored by walking the formatted string until the saved digit-count is reached, and `hidden.value` is set to the raw numeric string. `ln-number:input` dispatches last.
+
+### Hidden input value interceptor
+
+`hidden.value` is wrapped via `Object.defineProperty` so programmatic sets (e.g. `populateForm()` writing `hidden.value = "1234"`) route through the same parse → format → display path as user input. Internal code writes through `_setHiddenRaw()`, which calls the prototype's original setter directly — bypassing the custom setter avoids the interceptor re-triggering itself (infinite loop).
+
+### Auto-init
+
+A single `document.body` `MutationObserver` watches `childList` (subtree — new `[data-ln-number]` elements auto-initialize via `findElements`) and `attributes` on `data-ln-number` (attribute added to an existing element initializes it in place).

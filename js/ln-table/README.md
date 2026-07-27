@@ -200,3 +200,56 @@ Opt-in server-side sliding-window virtualization for datasets too large to cache
     ...
 </section>
 ```
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-table/ln-table.js`, `js/ln-table/ln-table-sort.js` (a separate, co-loaded component). Imports from `ln-core`: `cloneTemplateScoped`, `dispatch`, `fill`, `fillTemplate`, `registerComponent`, `createWindowCache`.
+
+### Mode detection & lifecycle
+
+- The constructor branches once, at construction: `this.isDataDriven = dom.hasAttribute('data-ln-table-source')`.
+- **SSR**: reads `<tbody>` rows once at bootstrap, caches them as static HTML strings in `_data`, and re-sorts/filters that in-memory cache on `ln-search:change` / `ln-table:sort` / `ln-filter:changed`.
+- **Data-driven**: `isLoaded = false` until the first `ln-table:set-data`. If `<tbody>` already has rows (hybrid), they're parsed synchronously first — instant local sort/filter/search response before the authoritative dataset arrives. When the background sync lands, `_vStart`/`_vEnd` reset to `-1` and virtual scroll re-initializes against the full dataset.
+- **Loading dimming**: `ln-table:set-loading {loading:true}` adds `.ln-table--loading` to the wrapper; `ln-table:set-data` clears it automatically.
+
+### DOM mutations
+
+| Phase | Mutation |
+|---|---|
+| `set-loading` | `.ln-table--loading` on the wrapper |
+| `set-data` / sort / filter / search | `<tbody>` rows re-rendered (cloned templates in data-driven mode, cached HTML in SSR); footer counters (`data-ln-table-total` / `-filtered` / `-selected`) updated |
+| sort click | `.ln-sort-asc` / `.ln-sort-desc` on the active `<th>`; sort direction icon visibility toggled via those classes |
+| filter change | `.ln-filter-active` toggled on the column's filter button |
+
+### Sort internals (`ln-table-sort.js`)
+
+A separate component instance lives at `table.lnTableSort`, tracking `ths` (all sortable `<th>`), `_col` (active column index, `-1` = none), `_dir` (`'asc'|'desc'|null`).
+
+- Click cycle: `(none) → asc → desc → (none)`; clicking a different column resets and starts at `asc`.
+- Each `<th>` gets `lnTableSortBound = true` to prevent duplicate listeners on MutationObserver re-fires.
+- **Persistence** (opt-in): `data-ln-persist` on the `[data-ln-table]` **wrapper** (not the `<table>`). Key: `ln:table-sort:{pagePath}:{wrapperId}`. Stored value: `{col, dir}` or `null`. Restored in the constructor, after click handlers bind, by replaying `_handleClick` (once for `asc`, twice for `desc`). A stale saved column index (`saved.col >= ths.length`) silently skips restore.
+- A dedicated MutationObserver (separate from `ln-table`'s own) watches for new sortable `<th>` (childList) and `data-ln-table-sort` attribute additions (re-scans the parent table).
+- **Dev diagnostic**: `ln-ashlar-dev.css` (dev-only stylesheet) renders a `⚠ missing sort button` warning next to any `<th data-ln-table-sort>` lacking the required `<button data-ln-table-col-sort>` child — sort silently no-ops without it otherwise.
+
+### MutationObserver flow (`ln-table.js`)
+
+A single observer on `document.body`: new `data-ln-table` root injected → `new lnTable(node)`; elements injected inside a live root → local rescan (no full re-init); `data-ln-table-source`/`-window` attribute set on an existing element → re-evaluated live (see Windowed Mode below).
+
+### Windowed cache mechanics
+
+Backed by `ln-core.createWindowCache` — the table owns the cache instance, not the full dataset:
+
+- LRU eviction by touch-recency (not viewport distance) once resident rows exceed `windowSize`.
+- `_renderWindowed()` calls `cache.ensure(startRow, endRow)` on every scroll pass; unresident logical rows render as blank placeholder `<tr>`s (no shimmer) until their page arrives.
+- `requestPage` dispatches `ln-table:request-data` with `{offset, limit, queryGen}`; `cache.ingest()` consumes the matching `ln-table:set-data {offset, queryGen}` and splices the page in. A response whose `queryGen` doesn't match the cache's current generation is dropped — the guard against a stale sort/filter/search response landing after a newer query superseded it.
+- Live reconfiguration routes through `configure()`/`setGrandTotal()`: enabling `data-ln-table-window` on an initialized non-windowed table seeds the cache from resident rows (honoring `data-ln-table-count` if present, else the resident count); removing it destroys the cache and re-issues a full `ln-table:request-data` (no `offset`/`limit`) to repopulate non-windowed.
+
+### Filter options — `{value, label}` shape
+
+`filterOptions` in `ln-table:set-data` accepts per-field arrays mixing plain strings (`'Draft'` — used as both raw value and label) and `{value, label}` objects (`{value:'true', label:'Active'}` — label renders in the dropdown, raw `value` is echoed verbatim in `ln-table:request-data` filters). This lets a column filter on a raw boolean/enum field (`data-ln-table-col="active"`) while displaying a human-readable computed field in the row template (`{{ status_display }}`) — no app-side label↔value translation needed.
+
+### Sticky header/footer
+
+`@include ln-table-toolbar` / `@include ln-table-footer` mixins (in `scss/components/_ln-table.scss`) pin the header/footer flush at the scroll container's bounds, with fallback rules targeting direct-child `[data-ln-table] > header` / `> footer`.

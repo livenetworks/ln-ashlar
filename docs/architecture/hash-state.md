@@ -173,12 +173,11 @@ and does not fill forms. That cross-component behaviour lives in a
 contract AND the fill attribute contract, but imports neither component's
 source.
 
-`ln-modal-fill` is the canonical example: it listens for `ln-modal:open`,
+`ln-modal-coordinator` is the canonical example: it listens for `ln-modal:open`,
 reads `detail.param`, finds the matching `[data-ln-fill-id]` source, and
 calls `window.lnCore.lnFill(modal, record)`. The modal knows nothing about
 fill; the fill helper knows nothing about hash state. The coordinator bridges
-them. See [Coordinator Doctrine](coordinator.md) and
-[`docs/js/modal-fill.md`](../js/modal-fill.md).
+them. See [Coordinator Doctrine](coordinator.md).
 
 ### Rule 5 — Router fragment guard
 
@@ -349,7 +348,7 @@ _component.prototype._open = function () {
 ```
 
 `ln-modal` emits `ln-modal:open` with `{ param }` in `detail`. The
-`ln-modal-fill` coordinator does the record lookup and `lnFill` call.
+`ln-modal-coordinator` does the record lookup and `lnFill` call.
 The modal remains a generic primitive; the coordinator knows the fill
 contract.
 
@@ -375,7 +374,7 @@ by `ln-router`). User preferences that survive across sessions belong in
 | `ln-modal` | `dom.id` | `<a href="#id">` or `<a href="#id:param">` | `''` = open (new mode); `'42'` = open with param (edit mode) |
 | `ln-tabs` | `data-ln-tabs-key` or `dom.id` | `<a href="#ns:key">` | Tab key (e.g. `'members'`, `'settings'`) |
 
-Both components delegate fill/data logic to coordinators. `ln-modal-fill`
+Both components delegate fill/data logic to coordinators. `ln-modal-coordinator`
 fills the form when `ln-modal:open` carries a `param`. There is no
 equivalent coordinator for tabs (tabs have no record-fill concept).
 
@@ -401,7 +400,7 @@ equivalent coordinator for tabs (tabs have no record-fill concept).
      emits ln-modal:open                emits ln-tabs:change
               │
               ▼
-       ln-modal-fill (coordinator)
+       ln-modal-coordinator
        reads detail.param
        calls lnFill(modal, record)
 ```

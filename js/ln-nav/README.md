@@ -3,8 +3,6 @@
 Active link highlighter — automatically marks the active link in navigation based on the current URL.
 Works with `pushState` (ln-ajax) and `popstate` (browser back/forward).
 
-For internal mechanics — singleton `history.pushState` patch, per-instance MutationObserver, URL normalization — see [`docs/js/nav.md`](../../docs/js/nav.md).
-
 ## Integration
 
 ### In-Bundle (Standard Integration)
@@ -71,3 +69,33 @@ nav a {
 ## API
 
 `data-ln-nav` is the contract — setting the attribute on a connected `<nav>` is sufficient (the document-level MutationObserver picks it up). For custom roots that the observer does not watch (Shadow DOM, iframe), call `window.lnNav(rootElement)` to upgrade manually. Each `[data-ln-nav]` element exposes `element.lnNav.destroy()` for teardown.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-nav/ln-nav.js`. Registered via `registerComponent` with `extraAttributes: ['data-ln-nav-exact']` and an `onAttributeChange` bridge — the shared core handles instantiation, body-guarding, and teardown.
+
+### Singleton `pushState` patch
+
+`history.pushState` is monkey-patched once per page, guarded by `history._lnNavPatched`. Every `[data-ln-nav]` instance pushes its `updateHandler` onto a shared `_pushStateCallbacks` array; the patched `pushState` calls the original, then invokes every registered handler. This is the only mechanism that catches URL changes from `pushState`-based navigation (e.g. `ln-ajax`); `popstate` is wired separately for back/forward.
+
+### Per-instance MutationObserver
+
+Each instance also watches its own container (`childList`/`subtree`) so dynamically inserted/removed anchors (e.g. an AJAX-rendered menu) trigger `update()` without waiting for a URL change.
+
+### URL normalization & matching
+
+Both `link.href` and `location.pathname` go through `new URL(href, location.href)` then a trailing-slash strip (root falls back to `/`). Hash-only links, `mailto:`/`tel:`/`javascript:`, and cross-host links are excluded outright. Match rule: exact equality, or (unless `data-ln-nav-exact`) parent-prefix — `normalizedCurrent.startsWith(normalizedHref + '/')`, with `/` excluded from the parent rule so root doesn't match everything.
+
+### `update()` sequence
+
+Dispatches cancelable `ln-nav:before-update` (a listener calling `preventDefault()` aborts) → adds `activeClass` + `aria-current="page"` to matching links, removes both from non-matching ones → dispatches bubbling `ln-nav:update`.
+
+### Attribute bridge
+
+`_syncAttribute(el, attrName)` runs on `data-ln-nav`/`data-ln-nav-exact` mutation: a class-name change clears the old class from every anchor before caching the new one and re-running `update()`; an exact-mode change updates the flag and re-runs `update()`.
+
+### Teardown
+
+`destroy()` disconnects the local observer, removes the `popstate` listener, splices `updateHandler` out of the global `_pushStateCallbacks` array, and dispatches `ln-nav:destroyed`.

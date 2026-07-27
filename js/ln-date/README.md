@@ -8,7 +8,18 @@ Locale-aware date formatting with native browser picker.
 <input type="date" name="birthday" data-ln-date>
 ```
 
-On initialization, the component wraps the original input in a `<span data-ln-date-field>` container and injects a visible text input, a hidden native date picker, a hidden form-submit input, and a calendar button. See [`docs/js/date.md`](../../docs/js/date.md) for the full DOM transform.
+On initialization, the component wraps the original input in a `<span data-ln-date-field>` container and injects a visible text input, a hidden native date picker, a hidden form-submit input, and a calendar button:
+
+```html
+<span data-ln-date-field>
+    <input type="text" data-ln-date>
+    <input type="date" tabindex="-1" style="position:absolute;opacity:0;width:0;height:0;overflow:hidden;pointer-events:none">
+    <input type="hidden" name="birthday" value="2026-04-19">
+    <button type="button" aria-label="Open date picker">
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>
+    </button>
+</span>
+```
 
 ## Styling
 
@@ -160,3 +171,29 @@ If you only need date-formatting functionality without the rest of the Ashlar li
 ### 3. Source & Reference
 * **Active Development Source**: [js/ln-date/src/ln-date.js](file:///c:/laragon/www/ln-ashlar/js/ln-date/src/ln-date.js) — The source of truth containing the ES module implementation.
 * **Compiled Standalone Release**: [js/ln-date/ln-date.js](file:///c:/laragon/www/ln-ashlar/js/ln-date/ln-date.js) — The compiled IIFE distribution file.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-date/ln-date.js`. Each `[data-ln-date]` gets a `_component` instance at `element.lnDate` (`dom` visible input, `_wrapper`, `_hidden` form input, `_picker` hidden native date input, `_btn` calendar button, `_lastISO` — the last known valid ISO value, used to revert on invalid typed input).
+
+### Format resolution
+
+`data-ln-date`'s value is read once: empty or a keyword match (`short`, `medium`, `long`, and the `datetime` variants) resolves to `Intl.DateTimeFormat`; anything else is treated as a custom ICU-style token pattern with locale-aware month names. Formatters are cached at `_formatters[locale + '|' + JSON.stringify(options)]` — one entry per unique locale+options combo, same caching pattern as `ln-number`/`ln-time`.
+
+### Value flow (picker)
+
+Calendar button click → `picker.showPicker()` (falls back to `picker.click()` if `showPicker()` throws — it requires a user gesture — or isn't supported) → user selects in the native picker → `change` fires on the hidden date input → `picker.value` (ISO) is read, written to the hidden form input directly (bypassing the interceptor, see below), formatted via `Intl`/custom pattern, and the display input + `ln-date:change` follow.
+
+### Programmatic set (interceptor)
+
+`hidden.value` is wrapped via `Object.defineProperty`, same pattern as `ln-number`: a `populateForm()`-style set parses the ISO string, updates the display formatting, and syncs `picker.value` to keep the native picker's own state consistent with a script-driven change.
+
+### Typed input flow
+
+On blur: empty → clear + dispatch; unchanged from the current formatted display → no-op; otherwise `_parseTyped(text)` branches on the separator (`.` → `dd.MM.yyyy`, `/` → `MM/dd/yyyy`, `-` → ISO or `dd-MM-yyyy` depending on which part is 4 digits) and two-digit years resolve 00–49→2000s, 50–99→1900s. A valid parse updates hidden + picker + display and dispatches `ln-date:change`; an invalid parse reverts the display to `_lastISO`'s formatted value.
+
+### Observers
+
+A shared `document.body` `MutationObserver` auto-initializes new `[data-ln-date]` elements (`childList`) and re-initializes on `data-ln-date` attribute addition (`attributes`). A separate observer on `document.documentElement` watches `lang` and re-formats every active instance when it changes.

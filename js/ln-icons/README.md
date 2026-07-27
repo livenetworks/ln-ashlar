@@ -86,3 +86,45 @@ useElement.setAttribute('href', '#ln-check');
 - **Forgetting `ln-icon` Class:** Standard SVGs default to `100%` width/height. Failing to include the `ln-icon` class will cause the icon to blow up to full viewport size.
 - **Incorrect Prefix Configuration:** Forgetting to define `window.LN_ICONS_CUSTOM_CDN` when using `#lnc-` will cause the loader to fail silently with undefined endpoint errors.
 - **Omitting `aria-hidden="true"`:** Screen readers attempt to read SVG nodes. Always decorate decorative icons with `aria-hidden="true"`, or include an `aria-label` on their parent button.
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-icons/ln-icons.js`. Routing is purely prefix-based — no config lists, no runtime mapping. Symbol IDs in the generated sprite mirror the full `href` value minus `#` (e.g. `#lnc-file-pdf` → `<symbol id="lnc-file-pdf">`).
+
+### Scan
+
+`_scan(root)` runs on init (`document`) and on every MutationObserver batch (each added node), matching `use[href^="#ln-"], use[href^="#lnc-"]` — the root node itself is also checked via `matches()` to cover single-node mutations. Each match calls `_load(href)`.
+
+### Dedup + caching
+
+Two in-memory `Set`s (`loaded`, `pending`), keyed by full `href`, prevent duplicate fetches within a page load — `_load` bails immediately if either contains the href. Beyond that, fetched SVG content persists in `localStorage` under `lni:{id}` (plus a `lni:v` version key); `_load` checks the cache before `fetch()`, and a cache hit injects the symbol synchronously with zero network round-trip. Bumping the internal `CACHE_VERSION` clears all `lni:*` keys on next load, forcing a re-fetch. All `localStorage` access is wrapped in `try/catch` for private-browsing/storage-full environments.
+
+### Fetch + symbol injection
+
+On a cache miss: resolve the CDN URL (`lnc-` → `LN_ICONS_CUSTOM_CDN`, `ln-` → `LN_ICONS_CDN`; `lnc-` bails silently if the custom CDN isn't configured), `fetch()`, then parse the raw SVG string — extract `viewBox` (fallback `'0 0 24 24'`), the inner content between the `<svg>` tags, and root presentation attributes (`fill`, `stroke`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`). A `<symbol>` is built from these and appended to the sprite's `<defs>`; the raw SVG is also written back to `localStorage`. Errors delete the `pending` entry silently — the icon stays blank, no retry.
+
+### Sprite element
+
+Created lazily on first icon load, inserted as `document.body`'s first child: `<svg id="ln-icons-sprite" hidden aria-hidden="true"><defs>...</defs></svg>`.
+
+### MutationObserver
+
+Observes `document.body` with `{ childList: true, subtree: true }`, firing `_scan(node)` per added element — covers modals, dynamic lists, and any JS-rendered content (e.g. `ln-ajax`/`ln-store` swaps).
+
+### Color inheritance
+
+Tabler SVGs use `stroke="currentColor"`, so rendered icons inherit the nearest ancestor's CSS `color`. The custom multi-color icons (`lnc-file-pdf`, `lnc-file-doc`, `lnc-file-epub`) embed explicit stroke colors in their source and intentionally do not follow `currentColor`.
+
+### Checkbox exception
+
+`<input type="checkbox">` is a replaced element and cannot contain children, so its checkmark cannot use the sprite — it's a `background-image` data URI in `_form.scss`, the only remaining data URI in the codebase.
+
+### Cross-component icon injection
+
+Several components inject `<use>` elements dynamically rather than authoring them in HTML: `ln-toast` (`#ln-x` dismiss button), `ln-upload` (`#lnc-file[-pdf|-doc|-epub]` per item, `#ln-x` remove button), `ln-confirm` (swaps an existing `<use href>` to `#ln-check` during confirm, restores on reset), `ln-table-sort` (`#ln-arrows-sort` per sortable `th`). All route through the same scan/fetch pipeline — no special-casing needed since detection is attribute-based, not author-time.
+
+### Offline behavior
+
+Uncached icons fail silently (`.catch()`) if the page loads offline — the icon stays blank. For offline-first deployments, self-host the SVG set and point `window.LN_ICONS_CDN` at a local server before the library initializes; `vite.config.js` copies `js/ln-icons/icons/*.svg` → `dist/icons/` at build for this purpose.

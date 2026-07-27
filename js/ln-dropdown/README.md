@@ -114,4 +114,27 @@ document.addEventListener('ln-dropdown:open', (e) => {
 ## Related
 - **[`ln-toggle`](../ln-toggle/README.md)** — Binary disclosure state primitive.
 - **[`ln-popover`](../ln-popover/README.md)** — Viewport-aware click-triggered rich-content overlays.
-- **Architecture deep-dive** — [`docs/js/dropdown.md`](../../docs/js/dropdown.md).
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-dropdown/ln-dropdown.js`. Each `[data-ln-dropdown]` gets a `_component` instance at `element.lnDropdown` (`dom` the wrapper, `toggleEl` the menu, `triggerBtn`, and `_teleportRestore` — the cleanup closure from `teleportToBody()`, or `null` when closed).
+
+### Dependency on ln-toggle
+
+Dropdown does not manage open/close state itself — it listens for `ln-toggle:open`/`ln-toggle:close` on the inner `[data-ln-toggle]` menu and runs teleport/positioning/listener-lifecycle steps in response. This is the library's **Presentation Coordinator** pattern layered on a state primitive; see [Coordinator Doctrine Reference](../../docs/architecture/coordinator.md).
+
+### Teleport + placement (delegated to ln-core)
+
+On `ln-toggle:open`: `teleportToBody(toggleEl)` moves the menu to `<body>` (saving the restore closure), `position: fixed` is applied, then `_reposition()` measures and places it. On `ln-toggle:close`: inline position styles are cleared and `_teleportRestore()` returns the menu to its original DOM position.
+
+`_reposition()` reads the trigger's bounding rect, measures the menu via `measureHidden` (ln-core's hidden-safe dimension read), and calls `computePlacement(rect, size, 'bottom-end', gap)` — `gap` from the `--size-xs` token. `'bottom-end'` means below the trigger, right-aligned; `computePlacement` flips to `'top-end'` if there's no room below (alignment preserved through the flip) and clamps to the viewport.
+
+### Listener lifecycle
+
+`ln-toggle:open`/`ln-toggle:close` are bound at construction and removed at `destroy()`. On open only: an outside-click listener on `document` (deferred one tick via `setTimeout(0)` so the opening click itself doesn't immediately close the menu), a `scroll` listener on `window` (reposition), and a `resize` listener on `window` (close — resize makes fixed-position coordinates stale). All three are removed on close.
+
+### MutationObserver
+
+One global observer on `document.body`: `childList` (subtree) auto-initializes new `[data-ln-dropdown]` wrappers; `attributes` on `data-ln-dropdown` initializes on attribute addition.

@@ -1090,7 +1090,7 @@ ln-table                                   ln-store
 `ln-table` never imports or queries `ln-store`. It emits a request
 event; the project coordinator catches it, calls `storeEl.lnStore.getAll(...)`,
 and dispatches `ln-table:set-data` back. See
-[docs/js/component-guide.md](../docs/js/component-guide.md#data-flow-with-ln-store)
+[docs/architecture/component-guide.md](../docs/architecture/component-guide.md#data-flow-with-ln-store)
 for the full handshake.
 
 ### Rule
@@ -1105,4 +1105,4 @@ whole stack.
 ---
 
 > For the latest component skeleton and checklist →
-> see [docs/js/component-guide.md](../docs/js/component-guide.md)
+> see [docs/architecture/component-guide.md](../docs/architecture/component-guide.md)

@@ -125,7 +125,7 @@ Visual layer implementation using SCSS mixins:
 
 ```scss
 [data-ln-toast] {
-    @include toast-container; // Fixed bottom-right positioning, pointer-events: none
+    @include toast-container; // Fixed bottom-right positioning, pointer-events: none, popover reset
 
     > li {
         @include toast-item; // pointer-events: auto, flex layout
@@ -136,7 +136,8 @@ Visual layer implementation using SCSS mixins:
 }
 ```
 
-*   **`@mixin toast-container`** ([`scss/config/mixins/_toast.scss`](../../scss/config/mixins/_toast.scss)): Positions container at viewport bottom-right with `pointer-events: none` to pass clicks through to page content.
+*   **`@mixin toast-container`** ([`scss/config/mixins/_toast.scss`](../../scss/config/mixins/_toast.scss)): Positions container at viewport bottom-right with `pointer-events: none` to pass clicks through to page content. It resets Popover API default styling (`border: none`, `background: transparent`) and ensures `&:popover-open` maintains `display: flex`.
+*   **Top-Layer Promotion (Popover API):** When active toasts exist, the container is automatically promoted to the browser's **Top Layer** using `popover="manual"` and `showPopover()`. This guarantees toast notifications render **above native `<dialog>` modal backdrops** (`::backdrop`) and other top-layer surfaces. When all toasts dismiss, the container is demoted (`hidePopover()`).
 *   **Two-Phase Animation:** On mount, cards receive `.ln-enter` (removed next frame via `requestAnimationFrame`). On dismissal, cards receive `.ln-out` for 200ms before `removeChild()` is called.
 
 ---

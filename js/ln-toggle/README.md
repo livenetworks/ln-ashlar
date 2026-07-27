@@ -134,4 +134,63 @@ Combine the alert card with `data-ln-persist` so that once the user closes the a
 ## Related
 - **[`ln-accordion`](../ln-accordion/README.md)** — Single-open coordinator for toggle panels.
 - **[`ln-dropdown`](../ln-dropdown/README.md)** — Menu wrapper adding click-outside/top-layer promotion.
-- **Architecture deep-dive** — [`docs/js/toggle.md`](../../docs/js/toggle.md).
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-toggle/ln-toggle.js`. Imports `registerComponent`, `dispatch`, `dispatchCancelable` from `ln-core/helpers.js` and `persistGet`/`persistSet` from `ln-core/persist.js` — no other library component.
+
+### Instance state
+
+| Field | Description |
+|---|---|
+| `dom` | The panel element |
+| `isOpen` | Cache of the attribute, kept current by `_syncAttribute`; used only to skip no-op transitions and as a read-only convenience getter |
+
+No cached trigger list, no saved previous-value for revert, no timer/queue — every attribute change runs the pipeline immediately. Triggers are re-queried document-wide on each state change; cheap because the matching set is typically 1-3 elements.
+
+### Init
+
+`registerComponent` scans for `[data-ln-toggle]`, watches `data-ln-toggle`/`data-ln-toggle-for` mutations, and calls `_attachTriggers(document.body)` on init. `_component(dom)`:
+1. **Persistence restore** — if `data-ln-persist` is present, `persistGet('toggle', dom)`; a saved value is applied via `setAttribute` *inside the constructor*. The observer does fire for that write, but `el[DOM_ATTRIBUTE]` is still `undefined` at that point (assigned only after the constructor returns), so `_syncAttribute`'s instance guard catches it and the pipeline does not run — no spurious `:before-open`/`:open` during restore.
+2. Reads the (possibly restored) attribute into `isOpen`, adds `.open` if true, calls `_syncTriggerAria` for the initial ARIA state.
+
+No `:open`/`:close` event fires at init — the attribute is already in its final state; there's been no transition.
+
+### Trigger attachment
+
+`_attachTriggers(root)` finds every `[data-ln-toggle-for]` under `root` (skipping ones already wired via a stashed-handler guard) and binds `click`: ignores modifier-key clicks, `preventDefault`s, resolves the target by ID, then writes `data-ln-toggle` — `"open"`/`"close"` for an explicit `data-ln-toggle-action`, or the inverse of the current value for the default toggle action. The handler reference is stashed on the trigger for `destroy` to remove later. Newly attached triggers also get their `aria-expanded` set immediately from the target's current state (no waiting for the next transition).
+
+### `_syncAttribute` — the transition pipeline
+
+Runs only when the mutated element already has an `lnToggle` instance (a brand-new element getting the attribute takes the init/upgrade path instead, via `findElements`, not a transition). Order, for the "open" direction (close mirrors it):
+
+1. `dispatchCancelable('ln-toggle:before-open')` — listeners see `isOpen` at its **pre-transition** value.
+2. If canceled: revert the attribute to `'close'` and return. The revert re-fires the observer, but `isOpen` was never changed, so the second pass is a no-op — no loop, no duplicate event.
+3. `isOpen = true`, `.open` class added.
+4. `_syncTriggerAria(el, true)` — before the post-event, so `:open` listeners see settled ARIA.
+5. `dispatch('ln-toggle:open')`.
+6. If `data-ln-persist`: `persistSet('toggle', el, 'open')` — last, so a listener that removes `data-ln-persist` synchronously during `:open` skips the write.
+
+This ordering (cancelable → class → aria → event → persist) is the same shape for every transition in the library that follows the attribute-as-contract pattern.
+
+### `_syncTriggerAria`
+
+Document-scoped `querySelectorAll('[data-ln-toggle-for="<id>"]')`, sets `aria-expanded` on each match — document-scoped because triggers can live anywhere relative to their panel. Drives both screen-reader state and the CSS chevron rotation rule in `scss/components/_toggle.scss`. Called from init, every transition, and `_attachTriggers` (so late-added triggers inherit current state).
+
+### Persistence
+
+Key: `ln:toggle:{pagePath}:{id}` (`_resolveKey` in `ln-core/persist.js`); path-scoped and non-overrideable, so the same panel `id` on two routes stores independently. `persistGet`/`persistSet` wrap `localStorage` in `try/catch` and swallow failures silently (private browsing, quota, disabled storage) — toggle keeps working without persistence, no error surfaces.
+
+### Destroy
+
+Guards double-destroy, dispatches `ln-toggle:destroyed`, removes the click listener from every matching trigger (using the stashed handler ref), deletes the instance. Does **not** remove `data-ln-toggle` or the `.open` class — only the JS coupling is severed; the consumer removes markup state separately if a full teardown is wanted.
+
+### What it deliberately does not do
+
+No keyboard handling (ESC, Space/Enter on the panel), no outside-click, no focus management, no resize listener. Each is a separate concern owned by a wrapping component: `ln-dropdown` (outside-click/resize/teleport), `ln-modal` (focus trap), or project code.
+
+### Cross-component contract
+
+`ln-accordion` and `ln-dropdown` both reach in only through the public contract — listening for `ln-toggle:open`/`:close`, and writing `data-ln-toggle="..."` directly (never an instance method). `ln-accordion` writes `'close'` on siblings from its wrapper listener; `ln-dropdown` listens on its inner toggle and teleports/wires outside-click on `:open`, reverses on `:close`. Because the attribute is the only mutation path, cancelable events and persistence fire identically regardless of which caller changed the state — there is no private mutator to bypass the pipeline.

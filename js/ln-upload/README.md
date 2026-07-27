@@ -212,3 +212,44 @@ For reference, active development, or customization, the component's codebase is
 
 * **Active Development Source (ESM)**: The primary development file where all component features, drag-and-drop mechanics, validation, and XHR progress logic are implemented is [js/ln-upload/src/ln-upload.js](file:///c:/laragon/www/ln-ashlar/js/ln-upload/src/ln-upload.js).
 * **Compiled Standalone (IIFE)**: The built zero-dependency distribution version compiled for browser execution is [js/ln-upload/ln-upload.js](file:///c:/laragon/www/ln-ashlar/js/ln-upload/ln-upload.js).
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-upload/ln-upload.js`. Each container has a closure-scoped `uploadedFiles` Map (`localId → { serverId, name, size }`) — not reactive; DOM is mutated directly as XHR events fire. `fileIdCounter` generates unique `localId` values (`'file-1'`, `'file-2'`, ...).
+
+### Init
+
+`_initUpload(container)`, guarded by `data-ln-upload-initialized` against double-init. `_ensureDefaultItemTemplate()` runs once per init and injects the default `<template>` into `<body>` if no `[data-ln-template="ln-upload-item"]` exists anywhere in the document (see template lookup order above). A hidden `<input type="file" multiple>` is created if none exists inside the container.
+
+### `addFile(file)` flow
+
+1. Validate extension against `data-ln-upload-accept`. Invalid → dispatch `ln-upload:invalid`, enqueue error toast, return.
+2. `cloneTemplateScoped` resolves the template (scoped → global → auto-injected default).
+3. `fill(li, {...})` populates name, `sizeText: '0%'`, icon `href`, `removeLabel`, and the `uploading`/`error`/`deleting` state classes in one pass — the `ln-icons` observer independently picks up the `<use href>` swap and fetches the sprite.
+4. `data-file-id` set (structural, not a `fill` slot); remove button disabled until upload completes.
+5. `<li>` appended to `.ln-upload__list`, XHR POST opened with `FormData` (nested container inputs serialized in).
+6. Progress: `progressBar.style.width` set imperatively + `fill(li, { sizeText: percent + '%' })`.
+7. 2xx: `fill` to final state, remove button re-enabled, entry stored in `uploadedFiles`, hidden inputs rebuilt, `ln-upload:uploaded` dispatched.
+8. Non-2xx / XHR error: progress forced to 100%, `fill(li, { sizeText: dict.error, error: true })`, `ln-upload:error` dispatched, error toast enqueued.
+
+### Remove / delete flow
+
+Remove-button clicks are delegated on `.ln-upload__list`, resolved via `closest('[data-ln-upload-action="remove"]')` (works through nested `svg`/`use`). `removeFile(localId)`: if the file has no `serverId` yet (still uploading), it's removed from DOM + Map directly. If a `serverId` exists, `fill(item, { deleting: true })` then `DELETE /files/{serverId}` — success removes from DOM + Map and dispatches `ln-upload:removed`; failure (non-200 or network catch) reverts `deleting: false` and enqueues an error toast.
+
+### Hidden inputs
+
+`updateHiddenInput()` fully rebuilds `<input type="hidden" name="file_ids[]">` from the current `uploadedFiles` Map after every upload and delete — form submit always reflects the current (not deleted) file set.
+
+### Auto-toast
+
+Errors dispatch `ln-toast:enqueue` on `window`. This is a soft integration — `ln-upload` does not import `ln-toast`; the toast only renders if that component is present.
+
+### `destroy()`
+
+Part of `container.lnUploadAPI`. Removes all listeners (zone, input, list), clears `uploadedFiles`, empties the `<ul>`, removes the init guard, deletes `lnUploadAPI`.
+
+### MutationObserver
+
+Global observer on `document.body` detects `[data-ln-upload]` elements added to the DOM and calls `_initUpload()` on them.

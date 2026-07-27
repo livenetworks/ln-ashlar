@@ -126,3 +126,33 @@ Dispatched on the **target** element whenever the search term changes.
   input.value = 'Argentina';
   input.dispatchEvent(new Event('input', { bubbles: true }));
   ```
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-search/ln-search.js` (114 lines). One instance per `[data-ln-search]`, stored at `element.lnSearch`. `targetId` is captured once at construction; `document.getElementById(targetId)` is re-resolved on every search — cheaper than caching a node across AJAX re-renders.
+
+### Debounce shape
+
+Trailing-edge, 150ms, cancel-and-reschedule per keystroke — no leading-edge fire (would flicker partial filtering mid-type). The clear button bypasses the debounce entirely, calling `_search('')` synchronously.
+
+### Dispatch flow
+
+`_search` resolves the target, dispatches cancelable `ln-search:change` on it (not on the input — so consumers listen on the thing they care about), and only runs the default DOM-walk if `!evt.defaultPrevented`. There is no separate `:before-change` event — the cancelable shape of `:change` IS the before-hook.
+
+### Form-restore detection
+
+If the input already has a value at construction (browser autofill / back-button restore), the initial search is scheduled via `queueMicrotask` rather than fired synchronously — other components (`ln-table`) may not have attached their `ln-search:change` listener yet during the same `DOMContentLoaded` burst; the microtask waits for the current task to drain first.
+
+### Clear-button resolution
+
+Scope for locating `[data-ln-search-clear]` is `input.parentElement` when `data-ln-search` sits on the input (canonical), or `dom` itself in the legacy wrapper-host form. Null-guarded — a missing button just means no clear wiring.
+
+### Cross-component coordination
+
+No imports of other components. `ln-table` consumes `ln-search:change` via `preventDefault()` and runs its own in-memory filter; `ln-filter` runs independently on the same target through a parallel `data-ln-search-hide` / `data-ln-filter-hide` pair — CSS unions both, neither component is aware of the other.
+
+### Destroy
+
+Cancels the pending debounce timer, removes both listeners, removes the init marker. Does NOT walk the target to clear `data-ln-search-hide` — that is a rendering side effect, not the search component's own state.

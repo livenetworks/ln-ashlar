@@ -2,7 +2,7 @@
 
 > Cross-component philosophy for how data moves through ln-ashlar.
 > Component-specific attributes, events, payloads, and APIs live in each
-> component's `README.md` and `docs/js/{component}.md`. This document is
+> component's `js/ln-{component}/README.md`. This document is
 > the rules that span them.
 
 ---

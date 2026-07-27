@@ -133,5 +133,54 @@ Never place `data-ln-toggle` and `data-ln-toggle-for` on the same element. One e
 
 ## Related
 - **[`ln-toggle`](../ln-toggle/README.md)** — Binary state primitive.
-- **Architecture deep-dive** — [`docs/js/accordion.md`](../../docs/js/accordion.md).
 - **Cross-component principles** — [`docs/architecture/data-flow.md`](../../docs/architecture/data-flow.md).
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-accordion/ln-accordion.js`. Does not import or require any other component at runtime — it only needs `ln-toggle` loaded so the events it listens for exist (a consumer-side load-order coupling, not a source dependency).
+
+### Instance state
+
+| Field | Set by | Read by |
+|---|---|---|
+| `dom` | constructor argument | `destroy` (dispatch target, listener detach) |
+| `_onToggleOpen` | constructor | `addEventListener`/`removeEventListener` |
+
+That's the entirety of it — no cached toggle list, no active-panel pointer, no DOM reference cache. `dom.querySelectorAll('[data-ln-toggle]')` is re-run on every `ln-toggle:open` instead of cached, since the DOM is small and the event is user-driven (one per click).
+
+### Init
+
+`registerComponent` scans for `[data-ln-accordion]`, instantiates `_component(el)` per match, and reruns the scan via `MutationObserver` on `childList` add / `data-ln-accordion` attribute mutation. `_component(dom)` stores `dom`, binds `_onToggleOpen`, and listens for `ln-toggle:open` on `dom`. No initial DOM read, no event dispatched at init.
+
+### Reaction to a panel opening
+
+`ln-toggle` dispatches `ln-toggle:open` on the panel, which bubbles to the wrapper:
+
+1. `dom.querySelectorAll('[data-ln-toggle]')` — every toggle in the subtree.
+2. For each toggle that is not the one just opened and is currently `"open"`: `setAttribute('data-ln-toggle', 'close')`.
+3. Each write triggers that toggle's own `MutationObserver`-driven close pipeline (`before-close` cancelable event, class removal, `aria-expanded` sync, persistence write, `ln-toggle:close`) — the accordion never runs this logic itself, it only flips the attribute.
+4. After the loop: dispatch `ln-accordion:change` on the wrapper, `detail.target` = the panel that opened.
+
+The accordion is reactive, not a gate: cancelable toggle events are the toggle's own responsibility, and `:change` fires regardless of whether a `before-close` on a sibling gets cancelled.
+
+### Destroy
+
+Guards double-destroy, removes the `ln-toggle:open` listener, dispatches `ln-accordion:destroyed` (`detail.target` = the wrapper), deletes the instance reference. Child `ln-toggle` instances are untouched and keep working independently.
+
+### Event lifecycle
+
+| Event | Direction | `detail` | Notes |
+|---|---|---|---|
+| `ln-toggle:open` | in (bubble) | — | Only inbound event; `ln-toggle:close` is not listened to |
+| `ln-accordion:change` | out | `{ target }` = opened panel | Fires on every open, even if no sibling needed closing |
+| `ln-accordion:destroyed` | out | `{ target }` = wrapper | Inside `destroy()` |
+
+### Nested accordions
+
+Two `closest('[data-ln-accordion]')` ownership checks in `_onToggleOpen`: an early exit if the bubbled event's nearest accordion isn't `dom` (so an outer wrapper ignores an inner panel's open), and a per-candidate filter in the cascade scan (so nested-accordion toggles are skipped when closing siblings). Ownership is DOM ancestry, not JS bookkeeping — each accordion stays oblivious to any other accordion in the tree, supporting arbitrary nesting depth.
+
+### Why a separate `ln-toggle`
+
+Most toggle use cases (sidebars, dropdowns, expandable cards) aren't accordions. Splitting single-open coordination out keeps `ln-toggle` a pure individual-state primitive and lets `ln-accordion` opt in to the extra behavior at the wrapper level, driven entirely by attribute writes rather than instance method calls.

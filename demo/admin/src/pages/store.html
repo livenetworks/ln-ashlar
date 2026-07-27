@@ -41,7 +41,7 @@
 								<li>In the background, the coordinator pushes the network request via the connector or outbox queue. On server confirmation, the coordinator dispatches an ordinary <code>ln-data-store:request-update</code> to rekey the temporary ID to the server ID (emitting <code>ln-data-store:updated</code>). On a 4xx create rejection, it dispatches <code>ln-data-store:request-delete</code> (emitting <code>ln-data-store:deleted</code>).</li>
 							</ol>
 
-							<p>For a detailed breakdown of local-first patterns, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-data-store/README.md"><code>ln-data-store</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/js/store.md">architecture reference</a>.</p>
+							<p>For a detailed breakdown of local-first patterns, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/docs/architecture/data-flow.md">Data Flow Architecture</a>, the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-data-store/README.md"><code>ln-data-store</code> README</a>, and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-data-store/README.md">architecture reference</a>.</p>
 						</main>
 					</section>
 

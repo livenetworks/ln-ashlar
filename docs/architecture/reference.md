@@ -231,9 +231,8 @@ Practical test: *who owns this state, and where does the rule live?* Component's
 5. Add `import './ln-{name}/ln-{name}.js'` to `js/index.js`
 6. DOM structure → `<template>` elements in HTML
 7. Create `js/ln-{name}/README.md` — usage guide (attributes, events, API, HTML examples)
-8. Create `docs/js/{name}.md` — architecture reference (internal state, render flow, event lifecycle)
-9. Create `demo/admin/{name}.html` — interactive demo page
-10. Detailed architecture: [docs/js/component-guide.md](../js/component-guide.md)
+8. Create `demo/admin/{name}.html` — interactive demo page
+9. Detailed architecture: [docs/architecture/component-guide.md](component-guide.md)
 
 ---
 
@@ -242,8 +241,7 @@ Practical test: *who owns this state, and where does the rule live?* Component's
 When modifying component behavior (attributes, events, API, HTML structure):
 
 1. Update `js/ln-{name}/README.md` — reflect new/changed usage
-2. Update `docs/js/{name}.md` — reflect architectural changes
-3. Update `demo/admin/{name}.html` — add/update interactive examples
+2. Update `demo/admin/{name}.html` — add/update interactive examples
 
 ---
 
@@ -736,7 +734,7 @@ To host custom icons in production:
 
 ## Reactive Architecture
 
-See [docs/js/core.md](docs/js/core.md) for the reactive rendering layer: ln-core shared helpers, Proxy-based state, fill/renderList, attribute bridge pattern.
+See [js/ln-core/README.md](../../js/ln-core/README.md) for the reactive rendering layer: ln-core shared helpers, Proxy-based state, fill/renderList, attribute bridge pattern.
 
 ---
 

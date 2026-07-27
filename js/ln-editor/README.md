@@ -2,8 +2,6 @@
 
 Lightweight WYSIWYG rich text editor. Enhances a `<textarea>` into a `contentEditable` editing surface with a toolbar. Progressive enhancement: without JS, the textarea works as plain text.
 
-> Architecture & internals: [docs/js/editor.md](../../docs/js/editor.md)
-
 ## Quick Start
 
 ```html
@@ -103,8 +101,8 @@ component links it to the editing surface via `aria-controls`, and manages
 `aria-pressed` on every toggle-format button (bold, italic, headings,
 lists, link) so assistive technology announces the active state as the
 cursor moves. One-shot actions (`unlink`, `clear`) receive no `aria-pressed`.
-You author the buttons; the component owns the ARIA state. See the
-[sync mechanism in docs/js/editor.md](../../docs/js/editor.md#active-state-tracking).
+You author the buttons; the component owns the ARIA state. See the sync
+mechanism in [🔧 Internals](#-internals).
 
 ## Link Popover Template
 
@@ -189,7 +187,7 @@ Server-rendered HTML in the textarea value is used as initial editor content:
 
 ## Paste Handling
 
-Content pasted from external sources (Word, web pages) is sanitized to a safe HTML subset — unsafe tags and attributes are stripped and links are made safe automatically. For the exact tag whitelist and sanitization algorithm see [docs/js/editor.md §Paste Sanitization](../../docs/js/editor.md#paste-sanitization).
+Content pasted from external sources (Word, web pages) is sanitized to a safe HTML subset — unsafe tags and attributes are stripped and links are made safe automatically. For the exact tag whitelist and sanitization algorithm see [🔧 Internals — Paste sanitization](#paste-sanitization).
 
 ## Minimal Toolbar
 
@@ -236,3 +234,41 @@ Override with your own selector:
     }
 }
 ```
+
+---
+
+## 🔧 Internals
+
+Source: `js/ln-editor/ln-editor.js`. No cached formatting state — every toolbar sync re-queries `document.queryCommandState` and DOM ancestry on `selectionchange`.
+
+### Construction
+
+Finds the `<textarea>`, reads its value as the initial HTML, builds a `contentEditable` `<div class="ln-editor__surface">` with a stable id, transfers any `<label for>` association via `aria-labelledby`, marks the textarea `data-ln-editor-source` (CSS-hidden), inserts the surface after the toolbar, wires `aria-controls` from toolbar to surface, and seeds `aria-pressed="false"` on toggle-format buttons.
+
+### Content sync
+
+One-way, continuous: every surface `input` event copies `innerHTML` into the textarea's `value` and dispatches `ln-editor:changed`. The textarea is never the source of truth after construction — it is a submit-time mirror.
+
+### Formatting flow
+
+`mousedown` on a toolbar button calls `preventDefault()` first, to preserve the current selection before the surface loses focus; the actual command runs on `click`: dispatch cancelable `ln-editor:before-change` → `surface.focus()` + `document.execCommand(...)` → the resulting native `input` event does the sync and dispatches `ln-editor:changed` exactly once → toolbar active/`aria-pressed` states resync.
+
+### Active state tracking
+
+On every document `selectionchange`: bail if the selection isn't inside the surface, then per toggle button check `queryCommandState` (inline), a block-ancestor walk (headings/blockquote), `queryCommandState('insertOrderedList'/...)` (lists), or anchor ancestry (link). The handler also early-returns if the surface has been detached from the document without `destroy()` (e.g. an SPA subtree swap) — a later reattachment resumes working without re-init.
+
+### Paste sanitization
+
+`e.preventDefault()`, read `clipboardData` HTML (falling back to plain text with `\n` → `<br>`/`<p>`), parse into a detached `<div>`, then a recursive walk: allowed tags keep only `href` (validated against `https?:`/`mailto:`/`/`/`#`) and recurse into children; disallowed tags are unwrapped (replaced by their children) and recursion continues; text nodes pass through untouched. The result is inserted via `execCommand('insertHTML', ...)`. Allowed tags: `P BR STRONG B EM I U S A UL OL LI H2 H3 H4 BLOCKQUOTE PRE CODE DIV`.
+
+### Link insertion
+
+Requires a page-authored `<template data-ln-template="ln-editor-link-popover">` — the editor never generates this markup. Flow: save the current selection range, detect if already inside an `<a>` (pre-fill), clone the template via `cloneTemplateScoped`, insert it after the toolbar; on confirm, restore the saved range and either update the existing link's `href` or run `execCommand('createLink')` (adding `rel="noopener noreferrer"` for new links) — either path dispatches `ln-editor:changed` exactly once. A missing template makes the link action a silent no-op.
+
+### Destroy
+
+Removes all surface/toolbar/document listeners, removes the surface node, restores textarea visibility (removes `data-ln-editor-source`), removes any open link popover, dispatches `ln-editor:destroyed`.
+
+### Permanent constraints
+
+`execCommand` is deprecated but functional across current browsers; no custom undo/redo stack (relies on native); no table or media embedding support.
