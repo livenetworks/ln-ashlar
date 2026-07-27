@@ -1,39 +1,47 @@
 # 🚀 ln-ashlar
 
-> **Unified frontend library for LiveNetworks projects.** Delivering a high-performance harmony between server-rendered HTML, semantic SCSS mixins, and attribute-driven, zero-initialization vanilla JS components. Built with **zero dependencies** for maximum speed, longevity, and security.
+> **Unified, zero-dependency frontend framework for both Server-Rendered (SSR) & Client-Side SPA applications.** Delivering a high-performance harmony between server-rendered HTML or REST/JSON APIs, semantic SCSS mixins, client-side routing, and attribute-driven, zero-initialization vanilla JS components. Built with **zero runtime dependencies** for maximum speed, longevity, and security.
 
 ---
 
-## 🏛️ The DOM-First Paradigm (Why `ln-ashlar`?)
+## 🏛️ The Dual-Core DOM-First Paradigm (SSR + Client-Side SPA)
 
-Modern web development has fallen into a trap of excessive complexity. **`ln-ashlar` is an architectural statement: the browser works with HTML, not a Virtual DOM.**
+`ln-ashlar` is built on a **DOM-First** architecture. The browser works directly with native DOM standards, not a heavy Virtual DOM compilation layer. 
 
-Instead of downloading megabytes of JavaScript, compiling in runtime, and displaying empty "skeleton screens" while waiting for cascading API waterfalls, `ln-ashlar` champions a **DOM-First, progressive, and local-first** approach:
+Whether your architecture relies on **Server-Rendered HTML** (Laravel, Go, Django, Rails) or **Client-Side SPAs consuming REST/JSON APIs**, `ln-ashlar` provides first-class support for both paradigms:
 
-1. **Server-Rendered HTML**: Your backend (Laravel, Go, Rails, etc.) delivers complete, semantic, indexable HTML. Fast to paint, SEO-friendly, and accessible in milliseconds.
-2. **Zero-Initialization JS**: Modular interactivity is driven by standard HTML attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-data-store`). A native `MutationObserver` registers and activates components automatically. No `new Component()` or `init()` boilerplate required.
-3. **Pure SCSS Styling via `@include`**: HTML remains semantic, describing *what* the element is. SCSS mixins describe *how* it looks. Visual styling is fully decoupled from markup.
-4. **Zero Dependencies**: 100% immune to npm supply chain attacks and package obsolescence. Built exclusively on eternal, backward-compatible W3C web standards (see note below on runtime icon CDN caching).
+### 1. 🌐 Server-Rendered HTML (SSR Mode)
+* **Progressive HTML Enhancement:** Your backend delivers complete, semantic, indexable HTML.
+* **Instant First Paint:** Fast to render, SEO-friendly, and accessible in milliseconds.
+* **Zero Boilerplate:** HTML elements auto-activate via attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-data-store`) backed by a native `MutationObserver`.
+
+### 2. ⚡ Client-Side Single-Page Applications (SPA / JSON Mode)
+* **Built-in SPA Router (`ln-router`):** Full client-side routing with dynamic parameters (`/users/:id`), catch-all paths (`*`), atomic region swapping (`replaceChildren`), and cancelable navigation intercepts (`ln-router:before-navigate`).
+* **Compound Hash-State Codec (`hash.js`):** Deep linking and overlay state tracking (`#tab:settings&modal:42`) that preserves browser Back/Forward navigation without page reloads.
+* **JSON API Data Layer (`ln-http`, `ln-api-connector`, `ln-store`):** Native async JSON client with abort control, queueing, and 3-Tier local storage (Memory + IndexedDB/localStorage).
+* **Client-Side Reactive Rendering (`lnCore.renderList` & `reactiveState`):** Declaratively render and bind JSON API payloads into `<template>` nodes with Proxy-backed reactive state updates without Virtual DOM overhead.
+* **Modular Authoring (`spa-starter/`):** Out-of-the-box SPA scaffold supporting co-located view modules (`App.defineView()`) and session-long modules (`App.defineModule()`).
 
 > [!NOTE]
 > **Runtime Icon CDN Dependency:** While `ln-ashlar` has zero runtime npm package dependencies, the `ln-icons` component fetches SVG icons dynamically from jsDelivr (Tabler Icons) or a custom CDN URL. Once fetched, they are stored in `localStorage` so subsequent page views load instantly and work offline. If the client is offline and `localStorage` is empty, icon requests will fail silently and not display.
 
 > [!TIP]
 > 📖 **Read the complete engineering manifesto!**  
-> For a detailed historical analysis of processing cycles, performance (Skeleton Screens vs. IndexedDB cache), the obsolescence issues of SPA frameworks, and security CVE risks with npm, read our complete [Architectural Philosophy](docs/architecture/philosophy.md).
+> For a detailed historical analysis of processing cycles, performance (Skeleton Screens vs. IndexedDB cache), framework EOL risks, and security CVE risks with npm, read our complete [Architectural Philosophy](docs/architecture/philosophy.md).
 
 ---
 
-### JS-First (React / Vue / Angular) vs. DOM-First with `ln-ashlar`
+### Heavy Virtual-DOM (React / Vue / Angular) vs. DOM-First `ln-ashlar`
 
-| Architectural Challenge | Mainstream JS-First (SPA) | DOM-First with `ln-ashlar` |
+| Architectural Dimension | Heavy Virtual-DOM (React / Vue / Angular) | DOM-First `ln-ashlar` (SSR or SPA) |
 | :--- | :--- | :--- |
-| **Primary Rendering** | Client-side via heavy Virtual DOM compilation. | Server-side via standard HTML. |
-| **Binding & Config** | Inside JS files via imports, props, and states. | Directly in HTML via semantic `data-ln` attributes. |
-| **Network Overhead** | Megabytes of JS, hundreds of transitive `npm` packages. | **Zero-Dependency (0 npm packages at runtime)**. |
-| **Security Risks** | High (transitive dependency supply chain vulnerability). | Zero. Native vanilla JS communicating directly with Web APIs. |
-| **Longevity & Support** | EOL cycles every 6-18 months (breaking framework upgrades). | **100% Stable (backed by permanent W3C web standards)**. |
-| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-table` onto any layout. |
+| **Execution Paradigm** | Heavy Virtual DOM compilation layer in memory. | Native W3C DOM APIs (`MutationObserver`, Custom Attributes). |
+| **Application Architecture** | SPA only (requires Next.js/Nuxt for SSR). | **Dual Mode**: Built-in **Client-Side SPA** (`ln-router` + `spa-starter`) AND **SSR Mode**. |
+| **Data Sources** | REST / GraphQL JSON APIs. | **Both REST / JSON APIs** (`ln-http`, `renderList`) AND **Server HTML**. |
+| **Dependencies** | Megabytes of JS, hundreds of npm packages. | **Zero Dependencies** (0 npm packages at runtime). |
+| **Security Risks** | High (transitive dependency supply chain risks). | Zero supply-chain vulnerabilities. |
+| **Longevity & Support** | EOL breaking upgrades every 6-18 months. | **100% Stable** (built on eternal W3C browser standards). |
+| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-table` or `ln-router` onto any page. |
 
 ---
 

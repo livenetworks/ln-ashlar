@@ -3,6 +3,13 @@
 This directory is the **sole source** indexed and served by the `ln-ashlar` MCP server.
 The goal: ensure all agents, developers, and library users share the exact same mindset—specifically, which attributes exist, what values they accept, which events are emitted, alongside ready-to-copy HTML markup templates.
 
+## Architectural Overview: Dual-Core Capabilities (SSR & SPA)
+
+All agents consuming this corpus must understand that `ln-ashlar` supports **two distinct application architectures** on the same DOM-First foundation:
+
+1. **Server-Rendered HTML (SSR Mode):** Progressive enhancement for backend frameworks (Laravel, Go, Django, Rails) where the server delivers HTML and `ln-ashlar` auto-activates interactivity via `data-ln-*` attributes.
+2. **Client-Side Single Page Applications (SPA / JSON Mode):** Pure client-side SPAs consuming REST/JSON APIs powered by `ln-router` (path routing & region swapping), `hash.js` (compound hash state & deep-linking), `ln-http`/`ln-api-connector` (async JSON API client), `lnCore.renderList`/`lnCore.fill` (client-side template binding), and `spa-starter/` (`App.defineView()` / `App.defineModule()`).
+
 ## Audience and Layers
 
 | Layer | Location | Audience |
