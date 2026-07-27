@@ -72,6 +72,18 @@ nav a {
 
 ---
 
+## ⚡ DOM Events
+
+All events bubble from the `<nav>` element.
+
+| Event | Cancelable | Payload (`detail`) | Description |
+|---|---|---|---|
+| `ln-nav:before-update` | Yes | `{ target }` | Fires at the start of every `update()` pass. Call `e.preventDefault()` to skip the highlight recalculation. |
+| `ln-nav:update` | No | `{ target }` | Fires after active classes / `aria-current` have been applied to matching links. |
+| `ln-nav:destroyed` | No | `{ target }` | Fires inside `destroy()`, after listeners/observer are torn down. |
+
+---
+
 ## 🔧 Internals
 
 Source: `js/ln-nav/ln-nav.js`. Registered via `registerComponent` with `extraAttributes: ['data-ln-nav-exact']` and an `onAttributeChange` bridge — the shared core handles instantiation, body-guarding, and teardown.

@@ -78,9 +78,21 @@ Fired when pointer down triggers drag.
 - **Cancelable**: Yes. Call `e.preventDefault()` to cancel the drag action (e.g. list is locked).
 - **Payload (`detail`)**: `{ item: HTMLElement, index: number }`
 
+### `ln-sortable:drag-start`
+Fired right after a drag is committed (after `before-drag` passes, capture is set, and drag classes are applied).
+- **Payload (`detail`)**: `{ item: HTMLElement, index: number }`
+
 ### `ln-sortable:reordered`
 Fired when an item drop successfully changes the DOM index order.
 - **Payload (`detail`)**: `{ item: HTMLElement, oldIndex: number, newIndex: number }`
+
+### `ln-sortable:enabled` / `ln-sortable:disabled`
+Fired when `data-ln-sortable` toggles between enabled and `"disabled"` (via `enable()`/`disable()` or a direct attribute write, picked up by the shared `MutationObserver`).
+- **Payload (`detail`)**: `{ target: HTMLElement }`
+
+### `ln-sortable:destroyed`
+Fired inside `destroy()`, after the `pointerdown` listener is removed.
+- **Payload (`detail`)**: `{ target: HTMLElement }`
 
 ---
 

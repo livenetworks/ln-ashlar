@@ -188,7 +188,7 @@ The page holds one `IDBDatabase` connection (`ln_app_cache`) shared by every `[d
 
 ### Instance state
 
-`storeEl.lnDataStore` carries `isLoaded` (cache populated), `isSyncing` (a delta/full load in flight), `lastSyncedAt` (the unix-ts `?since=` watermark last used), and `totalCount` (cached in `_meta`). An `_abortController` cancels any pending sync on `destroy()`.
+`storeEl.lnDataStore` carries `isLoaded` (cache populated), `isSyncing` (a remote-sync request is outstanding — set when the store emits `ln-data-store:request-remote-sync`, cleared on `applySync`), `lastSyncedAt` (the last sync watermark, passed to the coordinator as the `since` field of that request event — the store itself never fetches), and `totalCount`.
 
 ### Encryption pipeline
 
