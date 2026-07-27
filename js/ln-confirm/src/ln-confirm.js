@@ -66,20 +66,17 @@ import { registerComponent, dispatch } from '../../ln-core';
 		this.confirming = true;
 		this.dom.setAttribute('data-confirming', 'true');
 
+		this.originalAriaLabel = this.dom.getAttribute('aria-label');
+		this.originalAriaLive = this.dom.getAttribute('aria-live');
+
 		if (this.isTwoElementMode) {
 			if (this.idleEl) this.idleEl.setAttribute('hidden', 'true');
 			if (this.activeEl) this.activeEl.removeAttribute('hidden');
 
-			// Screen Reader announcement for Two-Element Mode
-			this.originalAriaLabel = this.dom.getAttribute('aria-label');
 			const promptText = this.activeEl ? this.activeEl.textContent.trim() : '';
 			if (promptText) {
 				this.dom.setAttribute('aria-label', promptText);
-				this.alertNode = document.createElement('span');
-				this.alertNode.className = 'sr-only';
-				this.alertNode.setAttribute('role', 'alert');
-				this.alertNode.textContent = promptText;
-				this.dom.appendChild(this.alertNode);
+				this.dom.setAttribute('aria-live', 'polite');
 			}
 		} else {
 			var iconUse = this.dom.querySelector('svg.ln-icon use');
@@ -89,13 +86,8 @@ import { registerComponent, dispatch } from '../../ln-core';
 				iconUse.setAttribute('href', '#ln-check');
 				this.dom.classList.add('ln-confirm-tooltip');
 				this.dom.setAttribute('data-tooltip-text', this.confirmText);
-				this.originalAriaLabel = this.dom.getAttribute('aria-label');
 				this.dom.setAttribute('aria-label', this.confirmText);
-				this.alertNode = document.createElement('span');
-				this.alertNode.className = 'sr-only';
-				this.alertNode.setAttribute('role', 'alert');
-				this.alertNode.textContent = this.confirmText;
-				this.dom.appendChild(this.alertNode);
+				this.dom.setAttribute('aria-live', 'polite');
 			} else {
 				this.dom.textContent = this.confirmText;
 			}
@@ -125,18 +117,6 @@ import { registerComponent, dispatch } from '../../ln-core';
 		if (this.isTwoElementMode) {
 			if (this.idleEl) this.idleEl.removeAttribute('hidden');
 			if (this.activeEl) this.activeEl.setAttribute('hidden', 'true');
-
-			// Restore Accessibility
-			if (this.originalAriaLabel !== null && this.originalAriaLabel !== undefined) {
-				this.dom.setAttribute('aria-label', this.originalAriaLabel);
-			} else {
-				this.dom.removeAttribute('aria-label');
-			}
-			this.originalAriaLabel = null;
-			if (this.alertNode && this.alertNode.parentNode === this.dom) {
-				this.dom.removeChild(this.alertNode);
-			}
-			this.alertNode = null;
 		} else {
 			if (this.isIconButton) {
 				var iconUse = this.dom.querySelector('svg.ln-icon use');
@@ -145,22 +125,27 @@ import { registerComponent, dispatch } from '../../ln-core';
 				}
 				this.dom.classList.remove('ln-confirm-tooltip');
 				this.dom.removeAttribute('data-tooltip-text');
-				if (this.originalAriaLabel !== null && this.originalAriaLabel !== undefined) {
-					this.dom.setAttribute('aria-label', this.originalAriaLabel);
-				} else {
-					this.dom.removeAttribute('aria-label');
-				}
-				this.originalAriaLabel = null;
-				if (this.alertNode && this.alertNode.parentNode === this.dom) {
-					this.dom.removeChild(this.alertNode);
-				}
-				this.alertNode = null;
 				this.isIconButton = false;
 				this.originalIconHref = null;
 			} else {
 				this.dom.textContent = this.originalText;
 			}
 		}
+
+		// Restore Accessibility Attributes directly on host button
+		if (this.originalAriaLabel !== null && this.originalAriaLabel !== undefined) {
+			this.dom.setAttribute('aria-label', this.originalAriaLabel);
+		} else {
+			this.dom.removeAttribute('aria-label');
+		}
+		this.originalAriaLabel = null;
+
+		if (this.originalAriaLive !== null && this.originalAriaLive !== undefined) {
+			this.dom.setAttribute('aria-live', this.originalAriaLive);
+		} else {
+			this.dom.removeAttribute('aria-live');
+		}
+		this.originalAriaLive = null;
 
 		if (this.revertTimer) {
 			clearTimeout(this.revertTimer);
