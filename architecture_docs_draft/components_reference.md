@@ -37,6 +37,10 @@
   * *Ги слуша `ln-toggle:open` настаните и ги затвора сите останати отворени панели во истата група преку `setAttribute`.*
 * **[ln-dropdown](components/ln-dropdown.md)** — ⚙️ Координатор
   * *Го координира активаторот со неговото `ln-toggle` мени, овозможува промоција на менито во Top Layer преку Popover API и динамички го позиционира на екран.*
+* **[ln-modal-coordinator](components/ln-modal-coordinator.md)** — ⚙️ Координатор
+  * *Централен координатор за модали кој ги поврзува тригерите `[data-ln-modal-for]`, URL hash рутирањето и автоматското затворање при успешно зачувување.*
+* **[ln-table-coordinator](components/ln-table-coordinator.md)** — ⚙️ Координатор
+  * *Централен координатор за табели кој ги поврзува пребарувачите (`ln-search`), поповер филтрите (`ln-filter`), визуелните индикатори и копчињата за чистење филтри.*
 * **[ln-data-coordinator](components/ln-data-coordinator.md)** — ⚙️ Координатор
   * *Централниот координатор на податоци кој ги поврзува локалниот кеш (`ln-data-store`), мрежниот приклучок (`ln-*-connector`) и офлајн редицата (`ln-api-queue`).*
 

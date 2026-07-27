@@ -13,6 +13,17 @@ A zero-dependency, high-performance table presenter component that supports both
 
 ---
 
+## 🏛️ Layer 1 vs Layer 2 Architecture
+
+`ln-table` strictly operates as a **Layer 1 Component** (Data & DOM presenter):
+- Manages internal data arrays, virtual scroll rendering, sliding window cache, row template cloning, cell formatting, and selection state.
+- Responds to command/request events (`ln-table:set-search`, `ln-table:set-filter`, `ln-table:set-data`, `ln-table:set-loading`, `ln-table:request-clear-filters`).
+- Emits lifecycle notifications (`ln-table:ready`, `ln-table:rendered`, `ln-table:filter`, `ln-table:sorted`, `ln-table:select`).
+
+External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear buttons, keyboard focus shortcuts) are orchestrated by **Layer 2 Coordinator** [`ln-table-coordinator`](../ln-table-coordinator/README.md).
+
+---
+
 ## 📦 Minimal Blueprint
 
 ### 1. SSR / Markup Mode

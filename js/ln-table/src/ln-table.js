@@ -74,25 +74,37 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 		const self = this;
 
-		// Unified column filter handler — shared by both SSR and data-driven branches
-		this._onColumnFilter = function (e) {
+		// --- Layer 1 Command / Request Event Handlers ---
+
+		this._onSetSearch = function (e) {
+			const term = (e.detail && e.detail.query != null ? e.detail.query : (e.detail && e.detail.term != null ? e.detail.term : '')).trim();
+			if (self.isDataDriven) {
+				self.currentSearch = term;
+				dispatch(dom, 'ln-table:search', {
+					table: self.name,
+					query: self.currentSearch
+				});
+				self._requestData();
+			} else {
+				self._searchTerm = term.toLowerCase();
+				self._applyFilterAndSort();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._render();
+				self._updateFooter();
+				dispatch(dom, 'ln-table:filter', {
+					term: self._searchTerm,
+					matched: self._filteredData.length,
+					total: self._data.length
+				});
+			}
+		};
+		dom.addEventListener('ln-table:set-search', this._onSetSearch);
+
+		this._onSetFilter = function (e) {
+			if (!e.detail) return;
 			const key = e.detail.key;
-			let matchedTh = null;
-			for (let i = 0; i < self.ths.length; i++) {
-				if (self.ths[i].getAttribute('data-ln-table-filter-col') === key) {
-					matchedTh = self.ths[i];
-					break;
-				}
-			}
-			if (!matchedTh) return;
-
 			const values = e.detail.values;
-
-			// Indicator: toggle .ln-filter-active on the funnel <button>
-			const btn = matchedTh.querySelector('[data-ln-table-col-filter]');
-			if (btn) {
-				btn.classList.toggle('ln-filter-active', !!(values && values.length > 0));
-			}
 
 			if (self.isDataDriven) {
 				if (!values || values.length === 0) {
@@ -122,6 +134,30 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				});
 			}
 		};
+		dom.addEventListener('ln-table:set-filter', this._onSetFilter);
+
+		this._onRequestClearFilters = function () {
+			if (self.isDataDriven) {
+				self.currentFilters = {};
+				self.currentSearch = '';
+				dispatch(dom, 'ln-table:clear-filters', { table: self.name });
+				self._requestData();
+			} else {
+				self._searchTerm = '';
+				self._columnFilters = {};
+				self._applyFilterAndSort();
+				self._vStart = -1;
+				self._vEnd = -1;
+				self._render();
+				self._updateFooter();
+				dispatch(dom, 'ln-table:filter', {
+					term: '',
+					matched: self._filteredData.length,
+					total: self._data.length
+				});
+			}
+		};
+		dom.addEventListener('ln-table:request-clear-filters', this._onRequestClearFilters);
 
 		if (this.isDataDriven) {
 			this.isLoaded = false;
@@ -211,24 +247,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				this.thead.addEventListener('click', this._onSortClick);
 			}
 
-			// --- Column Filter (unified with SSR via shared closure defined below) ---
-			dom.addEventListener('ln-filter:changed', this._onColumnFilter);
-
-			// Clear all filters button
-			this._onClearAll = function (e) {
-				const btn = e.target.closest('[data-ln-table-clear-all]');
-				if (!btn) return;
-				self.currentFilters = {};
-				// Clear visual indicators on all filter buttons
-				for (let i = 0; i < self.ths.length; i++) {
-					const filterBtn = self.ths[i].querySelector('[data-ln-table-col-filter]');
-					if (filterBtn) filterBtn.classList.remove('ln-filter-active');
-				}
-				dispatch(dom, 'ln-table:clear-filters', { table: self.name });
-				self._requestData();
-			};
-			dom.addEventListener('click', this._onClearAll);
-
 			// --- Selection ---
 			this._selectable = dom.hasAttribute('data-ln-table-selectable');
 			this._selectableActive = false;
@@ -282,49 +300,11 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			};
 			if (this.tbody) this.tbody.addEventListener('click', this._onRowAction);
 
-			// --- Search Input (resolved from the ln-search host that drives this table) ---
-			// ln-table is driven by ln-search:change. We re-source _searchInput from the
-			// ln-search host purely to support the value-mirror (_onSearchChange) and the
-			// '/'-key focus shortcut — never as an independent search driver.
-			const searchHost = document.querySelector('[data-ln-search="' + dom.id + '"]');
-			if (searchHost) {
-				const hostTag = searchHost.tagName;
-				this._searchInput = (hostTag === 'INPUT' || hostTag === 'TEXTAREA')
-					? searchHost
-					: searchHost.querySelector('input[type="search"]')
-						|| searchHost.querySelector('input[type="text"]')
-						|| searchHost.querySelector('input');
-			} else {
-				this._searchInput = null;
-			}
-
-			this._onSearchChange = function (e) {
-				e.preventDefault();
-				self.currentSearch = e.detail.term;
-				if (self._searchInput) {
-					self._searchInput.value = e.detail.term;
-				}
-				dispatch(dom, 'ln-table:search', {
-					table: self.name,
-					query: self.currentSearch
-				});
-				self._requestData();
-			};
-			dom.addEventListener('ln-search:change', this._onSearchChange);
-
-			// --- Keyboard navigation ---
+			// --- Keyboard navigation (tbody rows) ---
 			this._focusedRowIndex = -1;
 			this._onKeydown = function (e) {
 				if (!dom.contains(document.activeElement) && document.activeElement !== document.body) return;
 				if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
-
-				if (e.key === '/') {
-					if (self._searchInput) {
-						e.preventDefault();
-						self._searchInput.focus();
-					}
-					return;
-				}
 
 				const rows = self.tbody ? Array.from(self.tbody.querySelectorAll('[data-ln-table-row]')) : [];
 				if (!rows.length) return;
@@ -409,22 +389,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				this._emptyTbodyObserver.observe(this.tbody, { childList: true });
 			}
 
-			this._onSearch = function (e) {
-				e.preventDefault();
-				self._searchTerm = e.detail.term;
-				self._applyFilterAndSort();
-				self._vStart = -1;
-				self._vEnd = -1;
-				self._render();
-				self._updateFooter();
-				dispatch(dom, 'ln-table:filter', {
-					term: self._searchTerm,
-					matched: self._filteredData.length,
-					total: self._data.length
-				});
-			};
-			dom.addEventListener('ln-search:change', this._onSearch);
-
 			this._onSort = function (e) {
 				self._sortCol = e.detail.direction === null ? -1 : e.detail.column;
 				self._sortDir = e.detail.direction;
@@ -441,46 +405,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				});
 			};
 			dom.addEventListener('ln-table:sort', this._onSort);
-
-			dom.addEventListener('ln-filter:changed', this._onColumnFilter);
-
-			this._onClear = function (e) {
-				const btn = e.target.closest('[data-ln-table-clear]');
-				if (!btn) return;
-
-				self._searchTerm = '';
-				const searchEl = document.querySelector('[data-ln-search="' + dom.id + '"]');
-				if (searchEl) {
-					const input = searchEl.tagName === 'INPUT' ? searchEl : searchEl.querySelector('input');
-					if (input) input.value = '';
-				}
-
-				self._columnFilters = {};
-				for (let i = 0; i < self.ths.length; i++) {
-					const filterBtn = self.ths[i].querySelector('[data-ln-table-col-filter]');
-					if (filterBtn) filterBtn.classList.remove('ln-filter-active');
-				}
-
-				const filters = document.querySelectorAll('[data-ln-filter="' + dom.id + '"]');
-				for (let i = 0; i < filters.length; i++) {
-					const resetInput = filters[i].querySelector('[data-ln-filter-reset]');
-					if (resetInput) {
-						resetInput.checked = true;
-						resetInput.dispatchEvent(new Event('change', { bubbles: true }));
-					}
-				}
-
-				self._applyFilterAndSort();
-				self._vStart = -1;
-				self._vEnd = -1;
-				self._render();
-				dispatch(dom, 'ln-table:filter', {
-					term: '',
-					matched: self._filteredData.length,
-					total: self._data.length
-				});
-			};
-			dom.addEventListener('click', this._onClear);
 		}
 
 		return this;
@@ -1506,6 +1430,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._disableVirtualScroll();
 
+		this.dom.removeEventListener('ln-table:set-search', this._onSetSearch);
+		this.dom.removeEventListener('ln-table:set-filter', this._onSetFilter);
+		this.dom.removeEventListener('ln-table:request-clear-filters', this._onRequestClearFilters);
+
 		if (this.isDataDriven) {
 			this.dom.removeEventListener('ln-table:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-table:set-loading', this._onSetLoading);
@@ -1513,25 +1441,19 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				this.thead.removeEventListener('click', this._onSortClick);
 			}
 			document.removeEventListener('keydown', this._onKeydown);
-			if (this._onSearchChange) this.dom.removeEventListener('ln-search:change', this._onSearchChange);
 			if (this.tbody) {
 				this.tbody.removeEventListener('click', this._onRowClick);
 				this.tbody.removeEventListener('click', this._onRowAction);
 			}
 			if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);
 			if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
-			this.dom.removeEventListener('click', this._onClearAll);
-			this.dom.removeEventListener('ln-filter:changed', this._onColumnFilter);
 			if (this._cache) this._cache.destroy();
 		} else {
 			if (this._emptyTbodyObserver) {
 				this._emptyTbodyObserver.disconnect();
 				this._emptyTbodyObserver = null;
 			}
-			this.dom.removeEventListener('ln-search:change', this._onSearch);
 			this.dom.removeEventListener('ln-table:sort', this._onSort);
-			this.dom.removeEventListener('ln-filter:changed', this._onColumnFilter);
-			this.dom.removeEventListener('click', this._onClear);
 		}
 
 		if (this._colgroup) {
