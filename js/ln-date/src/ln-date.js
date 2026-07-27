@@ -587,7 +587,7 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 	// ─── Init ─────────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-date', {
-		extraAttributes: ['data-ln-date-format', 'data-ln-date-locale', 'data-ln-value', 'lang'],
+		extraAttributes: ['data-ln-date-format', 'data-ln-date-locale', 'data-ln-value', 'datetime', 'lang'],
 		onAttributeChange: function (el) {
 			const inst = el[DOM_ATTRIBUTE];
 			if (!inst) return;

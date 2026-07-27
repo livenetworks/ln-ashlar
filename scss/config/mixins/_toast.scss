@@ -28,16 +28,22 @@
 @mixin toast-container {
 	@include fixed;
 	@include z-toast;
+	border: none;
+	background: transparent;
+	inset: auto;
+	right: var(--size-lg);
+	bottom: var(--size-lg);
 	list-style: none;
 	padding: 0;
 	margin: 0;
 	pointer-events: none;
-	// Viewport-edge offsets — toast container distance from viewport,
-	// not shell rhythm.
-	right: var(--size-lg);
-	bottom: var(--size-lg);
 	display: flex;
 	flex-direction: column-reverse;
+	overflow: visible;
+
+	&:popover-open {
+		display: flex;
+	}
 
 	@include mq-down(md) {
 		right: 0;

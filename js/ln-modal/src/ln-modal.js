@@ -1,5 +1,4 @@
 import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../../ln-core';
-import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-modal';
@@ -7,10 +6,7 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-
-
-
-	// ─── Component ─────────────────────────────────────────────
+	// ─── Component Constructor ─────────────────────────────
 
 	function _component(dom) {
 		this.dom = dom;
@@ -18,81 +14,39 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 
 		const self = this;
 
-		this._hashNs = dom.id || null;
-
-		this._onHashChange = function () {
-			if (!self._hashNs) return;
-			const present = hashGet(self._hashNs) !== null;
-			if (present && !self.isOpen) self.dom.setAttribute(DOM_SELECTOR, 'open');
-			else if (!present && self.isOpen) self.dom.setAttribute(DOM_SELECTOR, 'close');
+		// Command listeners for request events
+		this._onRequestOpen = function () {
+			self.dom.setAttribute(DOM_SELECTOR, 'open');
 		};
 
+		this._onRequestClose = function () {
+			self.dom.setAttribute(DOM_SELECTOR, 'close');
+		};
+
+		// Native dialog ESC cancel interception
 		this._onCancel = function (e) {
-			// Native ESC on an open <dialog> fires cancelable 'cancel' then 'close'.
-			// Prevent the browser's own auto-close and route through the attribute
-			// instead, so before-close/hash-cleanup/native close() all run through
-			// the single _syncAttribute path — never a parallel native-only close.
 			e.preventDefault();
 			self.dom.setAttribute(DOM_SELECTOR, 'close');
 		};
 
-		this._onFormSuccess = function () {
-			if (self.isOpen) {
+		// Dismiss trigger buttons inside modal [data-ln-modal-close]
+		this._onClickClose = function (e) {
+			const closeBtn = e.target.closest('[data-ln-modal-close]');
+			if (closeBtn && self.dom.contains(closeBtn)) {
+				e.preventDefault();
 				self.dom.setAttribute(DOM_SELECTOR, 'close');
 			}
 		};
 
-		this._onSubmit = function (e) {
-			if (!e.defaultPrevented && self._hashNs) {
-				try {
-					sessionStorage.setItem('ln-modal-pending:' + self._hashNs, 'true');
-				} catch (err) {}
-			}
-		};
-
+		this.dom.addEventListener('ln-modal:request-open', this._onRequestOpen);
+		this.dom.addEventListener('ln-modal:request-close', this._onRequestClose);
 		this.dom.addEventListener('cancel', this._onCancel);
-		this.dom.addEventListener('ln-form:success', this._onFormSuccess);
-		this.dom.addEventListener('ln-ajax:success', this._onFormSuccess);
-		this.dom.addEventListener('submit', this._onSubmit);
+		this.dom.addEventListener('click', this._onClickClose);
 
-		// Apply initial state if open
+		// Apply initial state if rendered with open attribute
 		if (this.isOpen) {
 			if (typeof this.dom.showModal === 'function') this.dom.showModal();
 			document.body.classList.add('ln-modal-open');
-		}
-
-		if (this._hashNs) {
-			window.addEventListener('hashchange', this._onHashChange);
-
-			const pendingKey = 'ln-modal-pending:' + this._hashNs;
-			let isPending = false;
-			try {
-				isPending = sessionStorage.getItem(pendingKey) === 'true';
-			} catch (err) {}
-
-			if (isPending) {
-				try {
-					sessionStorage.removeItem(pendingKey);
-				} catch (err) {}
-
-				const hasErrors = !!(
-					document.querySelector('.has-error, [data-ln-validate-error], .form-error, .alert-danger') ||
-					self.dom.querySelector('.has-error, [data-ln-validate-error], .form-error, .alert-danger')
-				);
-
-				if (!hasErrors) {
-					hashSet(self._hashNs, null);
-					if (self.isOpen) {
-						self.dom.setAttribute(DOM_SELECTOR, 'close');
-					}
-				} else {
-					if (!self.isOpen) {
-						self.dom.setAttribute(DOM_SELECTOR, 'open');
-					}
-				}
-			} else if (hashGet(this._hashNs) !== null && !this.isOpen) {
-				this.dom.setAttribute(DOM_SELECTOR, 'open');
-			}
 		}
 
 		return this;
@@ -101,14 +55,12 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
-		this.dom.removeEventListener('ln-form:success', this._onFormSuccess);
-		this.dom.removeEventListener('ln-ajax:success', this._onFormSuccess);
-		this.dom.removeEventListener('submit', this._onSubmit);
+		this.dom.removeEventListener('ln-modal:request-open', this._onRequestOpen);
+		this.dom.removeEventListener('ln-modal:request-close', this._onRequestClose);
 		this.dom.removeEventListener('cancel', this._onCancel);
+		this.dom.removeEventListener('click', this._onClickClose);
 
 		if (this.isOpen) {
-			// Self-excluding: a still-attached modal reads "open" during its own destroy.
-			// No attribute write here — it would race the observer into re-creating an instance.
 			const dom = this.dom;
 			const otherOpen = Array.prototype.some.call(
 				document.querySelectorAll('[' + DOM_SELECTOR + '="open"]'),
@@ -119,15 +71,11 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 			}
 		}
 
-		if (this._hashNs) {
-			window.removeEventListener('hashchange', this._onHashChange);
-		}
-
 		dispatch(this.dom, 'ln-modal:destroyed', { modalId: this.dom.id, target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	// ─── Attribute Sync ────────────────────────────────────────
+	// ─── Attribute Sync (Single Source of Truth) ───────────
 
 	function _syncAttribute(el) {
 		const instance = el[DOM_ATTRIBUTE];
@@ -141,11 +89,6 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 		if (shouldBeOpen) {
 			const before = dispatchCancelable(el, 'ln-modal:before-open', { modalId: el.id, target: el });
 			if (before.defaultPrevented) {
-				// A prevented open must not leave a stale hash segment behind.
-				// The 'close' reset below early-returns on its own sync
-				// (shouldBeOpen === isOpen, both false), so the CLOSE-branch
-				// hashSet(ns, null) never runs — clear the segment here.
-				if (instance._hashNs) hashSet(instance._hashNs, null);
 				el.setAttribute(DOM_SELECTOR, 'close');
 				return;
 			}
@@ -153,6 +96,7 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 			document.body.classList.add('ln-modal-open');
 			if (typeof el.showModal === 'function') el.showModal();
 
+			// Focus placement
 			const autoFocusEl = el.querySelector('[autofocus]');
 			if (autoFocusEl && isVisible(autoFocusEl)) {
 				autoFocusEl.focus();
@@ -167,15 +111,7 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 				}
 			}
 
-			if (instance._hashNs) {
-				if (hashGet(instance._hashNs) === null) hashSet(instance._hashNs, '');
-				const rawParam = hashGet(instance._hashNs);
-				const param = rawParam ? rawParam : null; // '' (new) → null
-				el.dataset.lnModalMode = param ? 'edit' : 'new';
-				dispatch(el, 'ln-modal:open', { modalId: el.id, target: el, hashNs: instance._hashNs, param: param });
-			} else {
-				dispatch(el, 'ln-modal:open', { modalId: el.id, target: el });
-			}
+			dispatch(el, 'ln-modal:open', { modalId: el.id, target: el });
 		} else {
 			const before = dispatchCancelable(el, 'ln-modal:before-close', { modalId: el.id, target: el });
 			if (before.defaultPrevented) {
@@ -184,7 +120,6 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 			}
 			instance.isOpen = false;
 			dispatch(el, 'ln-modal:close', { modalId: el.id, target: el });
-			if (instance._hashNs) hashSet(instance._hashNs, null);
 
 			if (typeof el.close === 'function') el.close();
 
@@ -194,98 +129,7 @@ import { hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 		}
 	}
 
-	// ─── Event Delegation ──────────────────────────────────────
-
-	document.addEventListener('click', function (e) {
-		if (e.ctrlKey || e.metaKey || e.button === 1) return;
-
-		// Handle trigger click [data-ln-modal-for]
-		const trigger = e.target.closest('[data-ln-modal-for]');
-		if (trigger) {
-			const modalId = trigger.getAttribute('data-ln-modal-for');
-			const target = document.getElementById(modalId);
-			if (target && target[DOM_ATTRIBUTE]) {
-				e.preventDefault();
-
-				// Build display record from data-ln-modal-* dataset keys (excluding reserved).
-				const MODAL_RESERVED = { lnModalFor: true, lnModalClose: true, lnModalMode: true };
-				const record = {};
-				const ds = trigger.dataset;
-				for (const key in ds) {
-					if (!key.startsWith('lnModal')) continue;
-					if (MODAL_RESERVED[key]) continue;
-					const suffix = key.slice(7); // strip 'lnModal'
-					if (!suffix) continue;
-					record[suffix.charAt(0).toLowerCase() + suffix.slice(1)] = ds[key];
-				}
-
-				const hasRecord = Object.keys(record).length > 0;
-
-				// Fill display fields or clear them.
-				if (hasRecord) {
-					window.lnCore.fill(target, record);
-				} else {
-					const fields = target.querySelectorAll('[data-ln-field]');
-					for (let i = 0; i < fields.length; i++) {
-						fields[i].textContent = '';
-					}
-				}
-
-				// Set modal mode: explicit trigger attribute wins; else infer from record.
-				// Composes with [data-ln-modal-when]/[data-ln-modal-mode] SCSS toggle.
-				if (trigger.hasAttribute('data-ln-modal-mode')) {
-					target.dataset.lnModalMode = trigger.getAttribute('data-ln-modal-mode');
-				} else {
-					target.dataset.lnModalMode = hasRecord ? 'edit' : 'new';
-				}
-
-				const current = target.getAttribute(DOM_SELECTOR);
-				target.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
-			}
-			return;
-		}
-
-		// Handle hash-anchor click <a href="#modalId"> / <a href="#modalId:param">
-		// Per-component interception: modal anchors are NOT scoped to a wrapper
-		// (they live in table rows, page headers, anywhere), so resolve them at
-		// document level by checking whether the fragment namespace maps to a
-		// live [data-ln-modal] element by id. Route the write through hashSet
-		// (merge-preserving) instead of native fragment replacement, which would
-		// wipe foreign segments (e.g. an ln-tabs segment). The guard +
-		// preventDefault is shared with ln-tabs via the core hashLinkClick helper.
-		const hashAnchor = e.target.closest('a[href^="#"]');
-		if (hashAnchor) {
-			const map = hashParse(hashAnchor.getAttribute('href'));
-			for (const ns in map) {
-				const el = document.getElementById(ns);
-				if (el && el[DOM_ATTRIBUTE]) {
-					// ns resolves to a live modal — own this click.
-					// hashLinkClick: false → modifier/middle/shift → let native
-					// open-in-new-tab/window happen; true → preventDefault done.
-					if (!hashLinkClick(e)) return;
-					// map[ns]: '' for bare #id (new) or the param (edit).
-					hashSet(ns, map[ns]);
-					return;
-				}
-			}
-			// No segment maps to a modal — fall through. Plain #section scroll
-			// anchors and ln-tabs anchors stay unaffected (ln-tabs handles its
-			// own; the close branch below still gets a chance for the edge case
-			// of data-ln-modal-close on an anchor).
-		}
-
-		// Handle close button click [data-ln-modal-close]
-		const closeBtn = e.target.closest('[data-ln-modal-close]');
-		if (closeBtn) {
-			const modal = closeBtn.closest('[' + DOM_SELECTOR + ']');
-			if (modal && modal[DOM_ATTRIBUTE]) {
-				e.preventDefault();
-				modal.setAttribute(DOM_SELECTOR, 'close');
-			}
-		}
-	});
-
-	// ─── Init ──────────────────────────────────────────────────
+	// ─── Init ──────────────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-modal', {
 		onAttributeChange: _syncAttribute

@@ -9,6 +9,29 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 	if (window.__lnToastLoaded) return;
 	window.__lnToastLoaded = true;
 
+	function _promoteTopLayer(container) {
+		if (!container || !(container instanceof HTMLElement)) return;
+		if (!container.hasAttribute('popover')) {
+			container.setAttribute('popover', 'manual');
+		}
+		if (typeof container.showPopover === 'function') {
+			if (container.matches(':popover-open')) {
+				try { container.hidePopover(); } catch (_) {}
+			}
+			try { container.showPopover(); } catch (_) {}
+		}
+	}
+
+	function _demoteTopLayerIfEmpty(container) {
+		if (!container || !(container instanceof HTMLElement)) return;
+		const items = container.querySelectorAll("[data-ln-toast-item]");
+		if (items.length === 0) {
+			if (typeof container.hidePopover === 'function' && container.matches(':popover-open')) {
+				try { container.hidePopover(); } catch (_) {}
+			}
+		}
+	}
+
 	function _findContainers(root) {
 		if (!root || root.nodeType !== 1) return;
 		const items = Array.from(root.querySelectorAll("[" + DOM_SELECTOR + "]"));
@@ -28,6 +51,10 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 		while (items.length > this.max) dom.removeChild(items.shift());
 		for (const li of items) _hydrateLI(li, this);
 
+		if (items.length > 0) {
+			_promoteTopLayer(dom);
+		}
+
 		return this;
 	}
 
@@ -36,6 +63,7 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 		for (const li of Array.from(this.dom.querySelectorAll("[data-ln-toast-item]"))) {
 			_dismiss(li);
 		}
+		_demoteTopLayerIfEmpty(this.dom);
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -107,15 +135,22 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 		const items = Array.from(cmp.dom.querySelectorAll("[data-ln-toast-item]"));
 		while (items.length >= cmp.max && items.length > 0) cmp.dom.removeChild(items.shift());
 		cmp.dom.appendChild(li);
+		_promoteTopLayer(cmp.dom);
 		requestAnimationFrame(() => li.classList.remove("ln-enter"));
 	}
 
 	function _dismiss(li) {
 		if (!li || !li.parentNode) return;
+		const container = li.parentNode;
 		clearTimeout(li._timer);
 		li.classList.remove("ln-enter");
 		li.classList.add("ln-out");
-		setTimeout(() => { li.parentNode && li.parentNode.removeChild(li); }, 200);
+		setTimeout(() => {
+			if (li.parentNode) {
+				li.parentNode.removeChild(li);
+				_demoteTopLayerIfEmpty(container);
+			}
+		}, 200);
 	}
 
 	function _resolveContainer(detail) {
@@ -173,6 +208,14 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 	guardBody(function () {
 		window.addEventListener('ln-toast:enqueue', _onEnqueue);
 		window.addEventListener('ln-toast:clear', _onClear);
+		window.addEventListener('ln-modal:open', function () {
+			const containers = document.querySelectorAll("[" + DOM_SELECTOR + "]");
+			for (const container of Array.from(containers)) {
+				if (container.querySelectorAll("[data-ln-toast-item]").length > 0) {
+					_promoteTopLayer(container);
+				}
+			}
+		});
 
 		const observer = new MutationObserver(function (muts) {
 			for (const m of muts) {
