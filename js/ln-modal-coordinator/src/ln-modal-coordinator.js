@@ -1,9 +1,39 @@
-import { dispatch, hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
+import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
 
 (function () {
+	const DOM_SELECTOR = 'data-ln-modal-coordinator';
 	const DOM_ATTRIBUTE = 'lnModalCoordinator';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// Helper to resolve target modal from trigger element / wrapper / ID
+	function _findTargetModal(triggerEl, modalId) {
+		if (modalId) {
+			if (triggerEl) {
+				const wrapper = triggerEl.closest('[' + DOM_SELECTOR + ']');
+				if (wrapper) {
+					if (wrapper.id === modalId && wrapper.hasAttribute('data-ln-modal')) return wrapper;
+					const scoped = wrapper.querySelector('#' + CSS.escape(modalId) + '[data-ln-modal], [data-ln-modal="' + modalId + '"]');
+					if (scoped) return scoped;
+				}
+			}
+			const el = document.getElementById(modalId) || document.querySelector('[data-ln-modal="' + modalId + '"]');
+			if (el) return el;
+		}
+
+		if (triggerEl) {
+			const wrapper = triggerEl.closest('[' + DOM_SELECTOR + ']');
+			if (wrapper) {
+				if (wrapper.hasAttribute('data-ln-modal')) return wrapper;
+				const scoped = wrapper.querySelector('[data-ln-modal]');
+				if (scoped) return scoped;
+			}
+			const closest = triggerEl.closest('[data-ln-modal]');
+			if (closest) return closest;
+		}
+
+		return document.querySelector('[data-ln-modal]');
+	}
 
 	// Helper to reset all forms and display fields inside a modal panel
 	function _resetModalForm(modal) {
@@ -46,7 +76,7 @@ import { dispatch, hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-c
 		const trigger = e.target.closest('[data-ln-modal-for]');
 		if (trigger) {
 			const modalId = trigger.getAttribute('data-ln-modal-for');
-			const target = document.getElementById(modalId);
+			const target = _findTargetModal(trigger, modalId);
 			if (target && target.lnModal) {
 				e.preventDefault();
 
@@ -253,5 +283,17 @@ import { dispatch, hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-c
 		}
 	});
 
-	window[DOM_ATTRIBUTE] = true;
+	// ─── Component Constructor & Registration ────────────
+
+	function _component(dom) {
+		this.dom = dom;
+		return this;
+	}
+
+	_component.prototype.destroy = function () {
+		if (!this.dom[DOM_ATTRIBUTE]) return;
+		delete this.dom[DOM_ATTRIBUTE];
+	};
+
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-modal-coordinator');
 })();

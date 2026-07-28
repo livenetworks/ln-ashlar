@@ -14,7 +14,7 @@
 				The Modal &amp; Coordinator Doctrine
 			</h4>
 			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
-				The contract is absolute: <code>ln-modal</code> manages ONLY the binary state in the <code>data-ln-modal</code> attribute. <code>ln-modal-coordinator</code> handles UI triggers, URL hash management, data populating, and auto-closing on <code>ln-form:success</code> by dispatching command request events (<code>ln-modal:request-open</code> / <code>ln-modal:request-close</code>).
+				The contract is absolute: <code>ln-modal</code> (on <code>&lt;dialog data-ln-modal&gt;</code>) manages ONLY the binary overlay state. <code>ln-modal-coordinator</code> (placed directly on <code>&lt;dialog data-ln-modal-coordinator&gt;</code>) acts as the Layer 2 Coordinator on the dialog itself, orchestrating its inner form (<code>&lt;form data-ln-form&gt;</code>), triggers (<code>data-ln-modal-for</code>), deep links (<code>#modalId:param</code>), and auto-closing on <code>ln-form:success</code>.
 			</p>
 		</div>
 
@@ -50,7 +50,7 @@
 		</nav>
 
 		<!-- Basic Modal -->
-		<dialog class="ln-modal" data-ln-modal id="demo-basic">
+		<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator id="demo-basic">
 			<form>
 				<header>
 					<h3>Basic Modal</h3>
@@ -60,13 +60,13 @@
 					<p>This is a standard basic modal overlay. It traps focus natively, locks background scrolling, and closes on Escape key or backdrop click.</p>
 				</main>
 				<footer>
-					<button type="button" data-ln-modal-close>Close</button>
+					<button type="button" class="btn" data-ln-modal-close>Close</button>
 				</footer>
 			</form>
 		</dialog>
 
 		<!-- Form Modal (New / Edit) -->
-		<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-form">
+		<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator data-ln-modal-mode="new" id="demo-form">
 			<form id="demo-form-el" data-ln-form>
 				<header>
 					<h3 data-ln-fillable>
@@ -94,14 +94,14 @@
 					</div>
 				</main>
 				<footer>
-					<button type="button" data-ln-modal-close>Cancel</button>
-					<button type="submit" class="btn">Save Changes</button>
+					<button type="button" class="btn btn-secondary" data-ln-modal-close>Cancel</button>
+					<button type="submit" class="btn btn-primary">Save Changes</button>
 				</footer>
 			</form>
 		</dialog>
 
 		<!-- Large Modal -->
-		<dialog class="ln-modal" data-ln-modal id="demo-large">
+		<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator id="demo-large">
 			<form>
 				<header>
 					<h3>Large Modal</h3>
@@ -121,13 +121,13 @@
 					</div>
 				</main>
 				<footer>
-					<button type="button" data-ln-modal-close>Close</button>
+					<button type="button" class="btn" data-ln-modal-close>Close</button>
 				</footer>
 			</form>
 		</dialog>
 
 		<!-- Tall Content (scroll test) -->
-		<dialog class="ln-modal" data-ln-modal id="demo-tall">
+		<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator id="demo-tall">
 			<form>
 				<header>
 					<h3>Tall Content — Scroll Test</h3>
@@ -173,8 +173,8 @@
 					</div>
 				</main>
 				<footer>
-					<button type="button" data-ln-modal-close>Cancel</button>
-					<button type="submit">Save</button>
+					<button type="button" class="btn btn-secondary" data-ln-modal-close>Cancel</button>
+					<button type="submit" class="btn btn-primary">Save</button>
 				</footer>
 			</form>
 		</dialog>
@@ -205,7 +205,7 @@
 			<button type="button" data-ln-modal-for="demo-destructive" class="btn">Delete Membership</button>
 		</nav>
 
-		<dialog class="ln-modal" data-ln-modal id="demo-destructive">
+		<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator id="demo-destructive">
 			<form>
 				<header>
 					<h3>Delete membership record</h3>
@@ -215,8 +215,8 @@
 					<p>The membership record and all associated data will be permanently removed. This action cannot be undone.</p>
 				</main>
 				<footer>
-					<button type="button" data-ln-modal-close autofocus>Cancel</button>
-					<button type="submit">Delete</button>
+					<button type="button" class="btn btn-secondary" data-ln-modal-close autofocus>Cancel</button>
+					<button type="submit" class="btn btn-danger">Delete</button>
 				</footer>
 			</form>
 		</dialog>
@@ -271,33 +271,33 @@
 
 		<!-- Hash event log -->
 		<output id="hash-demo-log" style="display: block; margin-top: var(--size-md);">No events yet.</output>
+
+		<!-- Hash-bound modal inside coordinator -->
+		<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator data-ln-modal-mode="new" id="demo-hash-modal">
+			<form id="demo-hash-form" data-ln-form>
+				<header>
+					<h3 data-ln-fillable>
+						<span data-ln-modal-when="new">New record</span>
+						<span data-ln-modal-when="edit">Edit record #<span data-ln-field="id"></span></span>
+					</h3>
+					<button type="button" data-ln-modal-close aria-label="Close">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					</button>
+				</header>
+				<main>
+					<div class="form-element">
+						<label for="demo-hash-title">Title</label>
+						<input id="demo-hash-title" name="title" type="text" placeholder="Record title...">
+					</div>
+				</main>
+				<footer>
+					<button type="button" class="btn btn-secondary" data-ln-modal-close>Close</button>
+					<button type="submit" class="btn btn-primary">Save</button>
+				</footer>
+			</form>
+		</dialog>
 	</main>
 </section>
-
-<!-- Hash-bound modal -->
-<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="demo-hash-modal">
-	<form id="demo-hash-form" data-ln-form>
-		<header>
-			<h3 data-ln-fillable>
-				<span data-ln-modal-when="new">New record</span>
-				<span data-ln-modal-when="edit">Edit record #<span data-ln-field="id"></span></span>
-			</h3>
-			<button type="button" data-ln-modal-close aria-label="Close">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
-			</button>
-		</header>
-		<main>
-			<div class="form-element">
-				<label for="demo-hash-title">Title</label>
-				<input id="demo-hash-title" name="title" type="text">
-			</div>
-		</main>
-		<footer>
-			<button type="button" data-ln-modal-close>Close</button>
-			<button type="submit" class="btn">Save</button>
-		</footer>
-	</form>
-</dialog>
 
 <script>
 (function () {
@@ -351,24 +351,24 @@
 			</nav>
 			<output id="modal-event-log">No events yet.</output>
 		</article>
+
+		<!-- Events demo modal -->
+		<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator id="demo-events">
+			<form>
+				<header>
+					<h3>Events Demo</h3>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				</header>
+				<main>
+					<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and <code>ln-modal:close</code> events.</p>
+				</main>
+				<footer>
+					<button type="button" class="btn" data-ln-modal-close>Close</button>
+				</footer>
+			</form>
+		</dialog>
 	</main>
 </section>
-
-<!-- Events demo modal -->
-<dialog class="ln-modal" data-ln-modal id="demo-events">
-	<form>
-		<header>
-			<h3>Events Demo</h3>
-			<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
-		</header>
-		<main>
-			<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and <code>ln-modal:close</code> events.</p>
-		</main>
-		<footer>
-			<button type="button" data-ln-modal-close>Close</button>
-		</footer>
-	</form>
-</dialog>
 
 <script>
 (function () {

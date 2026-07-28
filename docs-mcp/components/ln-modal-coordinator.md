@@ -38,41 +38,43 @@ Key responsibilities include:
 
 ### Base HTML Markup
 
-`ln-modal-coordinator` works automatically via document-level event delegation for declaratively annotated triggers and forms:
+`ln-modal-coordinator` attaches to a parent wrapper container (`<div data-ln-modal-coordinator>`), coordinating child triggers and modals within its DOM subtree:
 
 ```html
-<!-- Trigger Button for Creating (New mode) -->
-<button type="button" data-ln-modal-for="user-modal">
-    New User
-</button>
+<section data-ln-modal-coordinator>
+    <!-- Trigger Button for Creating (New mode) -->
+    <button type="button" data-ln-modal-for="user-modal">
+        New User
+    </button>
 
-<!-- Trigger Link for Editing (Edit mode + Hash + Fill payload) -->
-<a href="#user-modal:42"
-   data-ln-fill-id="42"
-   data-ln-fill-form="user-form"
-   data-ln-fill-name="Ada Lovelace">
-    Edit User #42
-</a>
+    <!-- Trigger Link for Editing (Edit mode + Hash + Fill payload) -->
+    <a href="#user-modal:42"
+       data-ln-fill-id="42"
+       data-ln-fill-form="user-form"
+       data-ln-fill-name="Ada Lovelace">
+        Edit User #42
+    </a>
 
-<!-- Target Modal Overlay -->
-<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
-    <form id="user-form" data-ln-form>
-        <header>
-            <h3>
-                <span data-ln-modal-when="new">New User</span>
-                <span data-ln-modal-when="edit">Edit User — <span data-ln-field="name"></span></span>
-            </h3>
-            <button type="button" data-ln-modal-close aria-label="Close">&times;</button>
-        </header>
-        <main>
-            <label>Name: <input name="name" type="text" autofocus /></label>
-        </main>
-        <footer>
-            <button type="button" data-ln-modal-close>Cancel</button>
-            <button type="submit">Save</button>
-        </footer>
-    </form>
-</dialog>
+    <!-- Target Modal Overlay -->
+    <dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="user-modal">
+        <form id="user-form" data-ln-form>
+            <header>
+                <h3>
+                    <span data-ln-modal-when="new">New User</span>
+                    <span data-ln-modal-when="edit">Edit User — <span data-ln-field="name"></span></span>
+                </h3>
+                <button type="button" data-ln-modal-close aria-label="Close">&times;</button>
+            </header>
+            <main>
+                <label>Name: <input name="name" type="text" autofocus /></label>
+            </main>
+            <footer>
+                <button type="button" data-ln-modal-close>Cancel</button>
+                <button type="submit">Save</button>
+            </footer>
+        </form>
+    </dialog>
+</section>
 ```
 
 ---

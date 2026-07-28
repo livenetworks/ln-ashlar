@@ -105,7 +105,7 @@
 
 		<!-- packages/packages.html -->
 		<!-- Package modal -->
-<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="package-modal">
+<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator data-ln-modal-mode="new" id="package-modal">
 	<form data-ln-form="package-form" id="package-form"
 	      data-ln-form-scope="packages"
 	      method="post"
@@ -171,8 +171,8 @@
 			</div>
 		</main>
 		<footer class="form-actions">
-			<button type="button" data-ln-modal-close>Cancel</button>
-			<button type="submit" class="btn">Save</button>
+			<button type="button" class="btn btn-secondary" data-ln-modal-close>Cancel</button>
+			<button type="submit" class="btn btn-primary">Save</button>
 		</footer>
 	</form>
 </dialog>
@@ -189,7 +189,7 @@
 
 		<!-- tenants/tenants.html -->
 		<!-- Tenant create modal -->
-<dialog class="ln-modal" data-ln-modal data-ln-modal-mode="new" id="tenant-modal">
+<dialog class="ln-modal" data-ln-modal data-ln-modal-coordinator data-ln-modal-mode="new" id="tenant-modal">
 	<form data-ln-form="tenant-create" id="tenant-create-form"
 	      data-ln-form-scope="tenants"
 	      method="post"
@@ -296,8 +296,8 @@
 			</fieldset>
 		</main>
 		<footer class="form-actions">
-			<button type="button" data-ln-modal-close>Cancel</button>
-			<button type="submit" class="btn">Save</button>
+			<button type="button" class="btn btn-secondary" data-ln-modal-close>Cancel</button>
+			<button type="submit" class="btn btn-primary">Save</button>
 		</footer>
 	</form>
 </dialog>

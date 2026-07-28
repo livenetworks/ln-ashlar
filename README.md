@@ -2,6 +2,8 @@
 
 > **Unified, zero-dependency frontend framework for both Server-Rendered (SSR) & Client-Side SPA applications.** Delivering a high-performance harmony between server-rendered HTML or REST/JSON APIs, semantic SCSS mixins, client-side routing, and attribute-driven, zero-initialization vanilla JS components. Built with **zero runtime dependencies** for maximum speed, longevity, and security.
 
+🌐 **Live Interactive Demo:** [ashlar.live.net.mk](https://ashlar.live.net.mk)
+
 ---
 
 ## 🏛️ The Dual-Core DOM-First Paradigm (SSR + Client-Side SPA)

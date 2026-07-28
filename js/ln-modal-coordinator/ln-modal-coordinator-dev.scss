@@ -1,0 +1,8 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Non-dialog coordinator check: data-ln-modal-coordinator must be on a <dialog> element
+	[data-ln-modal-coordinator]:not(dialog) {
+		@include dev-inline-error("data-ln-modal-coordinator must be on a <dialog> element");
+	}
+}
