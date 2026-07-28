@@ -49,7 +49,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
     <header class="page-header">
         <label class="search">
             <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-            <input type="search" placeholder="Search employees... (Press '/')" data-ln-search data-ln-search-debounce="0">
+            <input type="search" placeholder="Search employees... (Press '/')" data-ln-search="employee-table" data-ln-search-debounce="0">
             <button type="button" data-ln-search-clear aria-label="Clear search">
                 <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
             </button>
@@ -61,7 +61,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
     </header>
 
     <!-- Table Primitive -->
-    <div data-ln-table>
+    <div data-ln-table id="employee-table">
         <!-- Empty State Template -->
         <template data-ln-table-empty>
             <article class="ln-table__empty-state">
@@ -120,7 +120,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
 
     <!-- Filter Popovers nested inside the coordinator wrapper -->
     <div data-ln-popover id="filter-dept-popover">
-        <ul data-ln-filter>
+        <ul data-ln-filter="employee-table">
             <li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All Departments</label></li>
             <li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label></li>
             <li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label></li>
@@ -128,7 +128,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
     </div>
 
     <div data-ln-popover id="filter-status-popover">
-        <ul data-ln-filter>
+        <ul data-ln-filter="employee-table">
             <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All Statuses</label></li>
             <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Active"> Active</label></li>
             <li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="On Leave"> On Leave</label></li>
@@ -147,10 +147,10 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
     <header class="page-header">
         <h2>Active Employees</h2>
         <label class="search">
-            <input type="search" placeholder="Search active..." data-ln-search>
+            <input type="search" placeholder="Search active..." data-ln-search="active-employees-table">
         </label>
     </header>
-    <div data-ln-table>
+    <div data-ln-table id="active-employees-table">
         <!-- Table 1 content -->
     </div>
 </section>
@@ -160,10 +160,10 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
     <header class="page-header">
         <h2>Archived Records</h2>
         <label class="search">
-            <input type="search" placeholder="Search archive..." data-ln-search>
+            <input type="search" placeholder="Search archive..." data-ln-search="archived-records-table">
         </label>
     </header>
-    <div data-ln-table>
+    <div data-ln-table id="archived-records-table">
         <!-- Table 2 content -->
     </div>
 </section>
@@ -178,7 +178,7 @@ Multiple `data-ln-table-coordinator` wrappers can safely exist on the same page.
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-table-coordinator` | Wrapper | Flag | Required | Declares the wrapper container that coordinates child search, filter, and table elements. |
-| `data-ln-search` | Input / Host | Flag / Table ID | — | Search input coordinated by the parent wrapper (or targeted to explicit table ID). |
+| `data-ln-search` | Input / Host | Table ID | Required | Targets the table (by its `id`) whose rows the search filters; the coordinator mediates the resulting event. A bare `data-ln-search` with no target ID emits nothing. |
 | `data-ln-filter` | `<ul>` / Form | Flag / Table ID | — | Filter popover/form coordinated by the parent wrapper (or targeted to explicit table ID). |
 | `data-ln-table-clear` | Button | Flag | — | Button trigger that resets search and filters for the child table inside the wrapper. |
 | `data-ln-table-clear-all` | Button | Flag | — | Button trigger that resets search and filters globally across all tables. |
