@@ -86,10 +86,10 @@ You can trigger mutations and fetches asynchronously by dispatching standard eve
 | Event | `detail` Payload | Description |
 |-------|------------------|-------------|
 | `ln-couchdb-connector:request-sync` | `{ since }` | Triggers a Changes Feed fetch request. |
-| `ln-couchdb-connector:request-create` | `{ data, tempId }` | Triggers a creation request. |
-| `ln-couchdb-connector:request-update` | `{ id, data, expected_version }` | Triggers a PUT update (expected_version maps to CouchDB's revision). |
-| `ln-couchdb-connector:request-delete` | `{ id, rev }` | Triggers a deletion request. |
-| `ln-couchdb-connector:request-bulk-delete` | `{ ids }` | Triggers a bulk-deletion request. |
+| `ln-couchdb-connector:request-create` | `{ data, tempId, idempotencyKey? }` | Triggers a creation request. |
+| `ln-couchdb-connector:request-update` | `{ id, data, expected_version, idempotencyKey? }` | Triggers a PUT update (expected_version maps to CouchDB's revision). |
+| `ln-couchdb-connector:request-delete` | `{ id, rev, idempotencyKey? }` | Triggers a deletion request. |
+| `ln-couchdb-connector:request-bulk-delete` | `{ ids, idempotencyKey? }` | Triggers a bulk-deletion request. |
 
 ### Notifications (Emitted BY the connector)
 

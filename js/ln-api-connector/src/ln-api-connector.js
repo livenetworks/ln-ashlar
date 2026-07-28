@@ -67,8 +67,10 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	// ─── Request Headers (forces X-LN-Response) ─────────────
 
-	_component.prototype._reqHeaders = function () {
-		return Object.assign({}, getHeaders(this.headers), { 'X-LN-Response': 'data' });
+	_component.prototype._reqHeaders = function (idempotencyKey) {
+		const headers = Object.assign({}, getHeaders(this.headers), { 'X-LN-Response': 'data' });
+		if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+		return headers;
 	};
 
 	// ─── JS API Methods (Promises) ──────────────────────────
@@ -130,18 +132,18 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			.then(_resolve);
 	};
 
-	_component.prototype.create = function (payload, url) {
+	_component.prototype.create = function (payload, url, idempotencyKey) {
 		const self = this;
 		return window.fetch(buildUrl(self.baseUrl, url || self.path), {
 			method: 'POST',
-			headers: self._reqHeaders(),
+			headers: self._reqHeaders(idempotencyKey),
 			credentials: self.credentials,
 			body: JSON.stringify(payload)
 		})
 		.then(_resolve);
 	};
 
-	_component.prototype.update = function (id, payload, expectedVersion, url) {
+	_component.prototype.update = function (id, payload, expectedVersion, url, idempotencyKey) {
 		const self = this;
 		if (expectedVersion !== undefined && expectedVersion !== null) {
 			payload = Object.assign({}, payload, { expected_version: expectedVersion });
@@ -152,28 +154,28 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		const target = url ? buildUrl(self.baseUrl, url) : buildUrl(self.baseUrl, self.path, id);
 		return window.fetch(target, {
 			method: 'PUT',
-			headers: self._reqHeaders(),
+			headers: self._reqHeaders(idempotencyKey),
 			credentials: self.credentials,
 			body: JSON.stringify(payload)
 		})
 		.then(_resolve);
 	};
 
-	_component.prototype.delete = function (id, url) {
+	_component.prototype.delete = function (id, url, idempotencyKey) {
 		const self = this;
 		return window.fetch(buildUrl(self.baseUrl, url || self.path, id), {
 			method: 'DELETE',
-			headers: self._reqHeaders(),
+			headers: self._reqHeaders(idempotencyKey),
 			credentials: self.credentials
 		})
 		.then(_resolve);
 	};
 
-	_component.prototype.bulkDelete = function (ids, url) {
+	_component.prototype.bulkDelete = function (ids, url, idempotencyKey) {
 		const self = this;
 		return window.fetch(buildUrl(self.baseUrl, url || self.path) + '/bulk-delete', {
 			method: 'DELETE',
-			headers: self._reqHeaders(),
+			headers: self._reqHeaders(idempotencyKey),
 			credentials: self.credentials,
 			body: JSON.stringify({ ids: ids })
 		})
@@ -228,7 +230,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			},
 			create: function (e) {
 				const detail = e.detail || {};
-				self.create(detail.data, detail.url)
+				self.create(detail.data, detail.url, detail.idempotencyKey)
 					.then(function (body) {
 						const record  = (body && body.content !== undefined) ? body.content : body;
 						const message = (body && body.message) ? body.message : null;
@@ -247,7 +249,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			},
 			update: function (e) {
 				const detail = e.detail || {};
-				self.update(detail.id, detail.data, detail.expected_version, detail.url)
+				self.update(detail.id, detail.data, detail.expected_version, detail.url, detail.idempotencyKey)
 					.then(function (body) {
 						const record  = (body && body.content !== undefined) ? body.content : body;
 						const message = (body && body.message) ? body.message : null;
@@ -267,7 +269,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			},
 			delete: function (e) {
 				const detail = e.detail || {};
-				self.delete(detail.id, detail.url)
+				self.delete(detail.id, detail.url, detail.idempotencyKey)
 					.then(function (body) {
 						const message = (body && body.message) ? body.message : null;
 						dispatch(self.dom, 'ln-api-connector:deleted', { response: body, id: detail.id, message: message, meta: detail.meta || null });
@@ -285,7 +287,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			},
 			bulkDelete: function (e) {
 				const detail = e.detail || {};
-				self.bulkDelete(detail.ids, detail.url)
+				self.bulkDelete(detail.ids, detail.url, detail.idempotencyKey)
 					.then(function (body) {
 						const message = (body && body.message) ? body.message : null;
 						dispatch(self.dom, 'ln-api-connector:bulk-deleted', { response: body, ids: detail.ids, message: message, meta: detail.meta || null });

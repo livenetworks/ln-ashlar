@@ -1,4 +1,5 @@
 import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod } from '../../ln-core';
+import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-coordinator';
@@ -36,7 +37,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 			_coordinators.forEach(function (coord) {
 				const children = coord.findChildren();
 				const store = children.store;
-				if (store && store.isLoaded && !store.isSyncing && !coord._noAutosync && coord._isStale()) {
+				if (store && children.connector && store.isInitialized && !store.isSyncing && !coord._noAutosync && (!store.hasCache || coord._isStale())) {
 					store.forceSync();
 				}
 			});
@@ -133,24 +134,27 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 	_component.prototype._maybeSync = function () {
 		const children = this.findChildren();
 		const store = children.store;
-		if (!store || this._noAutosync) return;
-		if (!(store.isLoaded && !store.isSyncing)) return;
-		store.forceSync();
+		if (!store || !children.connector || this._noAutosync) return;
+		if (!store.isInitialized || store.isSyncing) return;
+		if (!store.hasCache || this._isStale()) store.forceSync();
 	};
 
 	// ─── Race Guard: evaluate initial sync directly at children-resolve ────
 
 	_component.prototype._checkInitialSync = function () {
-		const children = this.findChildren();
-		const store = children.store;
-		if (!store || !store.isLoaded) return;
-		if (this._noAutosync) return;
+		const self = this;
+		const initial = this.findChildren();
+		const store = initial.store;
+		if (!store) return;
 
-		if (store.totalCount === 0) {
-			store.forceSync();
-		} else if (this._isStale()) {
-			store.forceSync();
-		}
+		Promise.resolve(store.ready).then(function () {
+			const children = self.findChildren();
+			const currentStore = children.store;
+			if (!currentStore || !children.connector || self._noAutosync || currentStore.isSyncing) return;
+			if (!currentStore.hasCache || self._isStale()) currentStore.forceSync();
+		}).catch(function (error) {
+			self._reportReconciliationError('store-initialize', error, null);
+		});
 	};
 
 	// ─── Resolve and Refresh Mapper ──────────────────────────
@@ -321,6 +325,57 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		}));
 	};
 
+	_component.prototype._requestStoreMutation = function (children, action, detail) {
+		const storeEl = children.storeEl;
+		if (!storeEl) return Promise.reject(new Error('Store element not found'));
+
+		const requestId = _uuid();
+		const successEvent = action === 'update'
+			? 'ln-data-store:updated'
+			: action === 'create'
+				? 'ln-data-store:created'
+				: 'ln-data-store:deleted';
+
+		return new Promise((resolve, reject) => {
+			let timer = null;
+
+			const cleanup = function () {
+				storeEl.removeEventListener(successEvent, onSuccess);
+				storeEl.removeEventListener('ln-data-store:mutation-error', onError);
+				if (timer) clearTimeout(timer);
+			};
+
+			const onSuccess = function (event) {
+				if (!event.detail || event.detail.requestId !== requestId) return;
+				cleanup();
+				resolve(event.detail);
+			};
+
+			const onError = function (event) {
+				if (!event.detail || event.detail.requestId !== requestId) return;
+				cleanup();
+				reject(event.detail.error || new Error('Store mutation failed'));
+			};
+
+			storeEl.addEventListener(successEvent, onSuccess);
+			storeEl.addEventListener('ln-data-store:mutation-error', onError);
+			timer = setTimeout(function () {
+				cleanup();
+				reject(new Error('Store mutation timed out'));
+			}, 30000);
+
+			dispatch(storeEl, 'ln-data-store:request-' + action, Object.assign({}, detail, { requestId }));
+		});
+	};
+
+	_component.prototype._reportReconciliationError = function (operation, error, meta) {
+		dispatch(this.dom, 'ln-data-coordinator:error', {
+			operation,
+			error,
+			meta: meta || null
+		});
+	};
+
 	// ─── Event Binding ────────────────────────────────────────
 
 	function _bindEvents(self) {
@@ -377,25 +432,27 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				const expectedVersion = detail.expectedVersion;
 				const queueMeta = detail.meta || {};
 				const resourceUrl = queueMeta.action || null;
+				const idempotencyKey = detail.idempotencyKey || entryId;
 
 				if (op === 'create') {
 					dispatch(children.connectorEl, 'ln-api-connector:request-create', {
-						data: payload, url: resourceUrl,
+						data: payload, url: resourceUrl, idempotencyKey: idempotencyKey,
 						meta: { entryId: entryId, queued: true, op: 'create', tempId: queueMeta.tempId }
 					});
 				} else if (op === 'update') {
 					dispatch(children.connectorEl, 'ln-api-connector:request-update', {
-						id: targetId, data: payload, expected_version: expectedVersion, url: resourceUrl,
-						meta: { entryId: entryId, queued: true, op: 'update', id: queueMeta.id !== undefined ? queueMeta.id : targetId }
+						id: targetId, data: payload, expected_version: expectedVersion, url: resourceUrl, idempotencyKey: idempotencyKey,
+						meta: { entryId: entryId, queued: true, op: 'update', id: targetId }
 					});
 				} else if (op === 'delete') {
 					dispatch(children.connectorEl, 'ln-api-connector:request-delete', {
-						id: targetId,
-						meta: { entryId: entryId, queued: true, op: 'delete', id: queueMeta.id !== undefined ? queueMeta.id : targetId }
+						id: targetId, idempotencyKey: idempotencyKey,
+						meta: { entryId: entryId, queued: true, op: 'delete', id: targetId }
 					});
 				} else if (op === 'bulk-delete') {
 					dispatch(children.connectorEl, 'ln-api-connector:request-bulk-delete', {
 						ids: (payload && payload.ids) ? payload.ids : [],
+						idempotencyKey: idempotencyKey,
 						meta: { entryId: entryId, queued: true, op: 'bulk-delete', bulkKey: queueMeta.bulkKey }
 					});
 				} else {
@@ -470,13 +527,20 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				const meta = e.detail.meta || {};
 				const serverRecord = self.mapper.ingress(e.detail.record);
 
-				dispatch(children.storeEl, 'ln-data-store:request-update', { id: meta.tempId, data: serverRecord });
-				self._toastFromMessage(e.detail.message);
-
-				if (meta.queued && children.queue) {
-					dispatch(children.queueEl, 'ln-api-queue:request-remap', { oldKey: meta.tempId, newId: serverRecord.id });
-					dispatch(children.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
-				}
+				self._requestStoreMutation(children, 'update', { id: meta.tempId, data: serverRecord })
+					.then(function () {
+						self._toastFromMessage(e.detail.message);
+						if (meta.queued && children.queue) {
+							dispatch(children.queueEl, 'ln-api-queue:resolve-create', {
+								entryId: meta.entryId,
+								oldKey: meta.tempId,
+								newId: serverRecord.id
+							});
+						}
+					})
+					.catch(function (error) {
+						self._reportReconciliationError('create-reconcile', error, meta);
+					});
 			},
 
 			connUpdated: function (e) {
@@ -485,12 +549,16 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				const meta = e.detail.meta || {};
 				const serverRecord = self.mapper.ingress(e.detail.record);
 
-				dispatch(children.storeEl, 'ln-data-store:request-update', { id: meta.id, data: serverRecord });
-				self._toastFromMessage(e.detail.message);
-
-				if (meta.queued && children.queue) {
-					dispatch(children.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
-				}
+				self._requestStoreMutation(children, 'update', { id: meta.id, data: serverRecord })
+					.then(function () {
+						self._toastFromMessage(e.detail.message);
+						if (meta.queued && children.queue) {
+							dispatch(children.queueEl, 'ln-api-queue:ack', { entryId: meta.entryId });
+						}
+					})
+					.catch(function (error) {
+						self._reportReconciliationError('update-reconcile', error, meta);
+					});
 			},
 
 			connDeleted: function (e) {
@@ -519,13 +587,27 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				const meta = detail.meta || {};
 				const op = meta.op || detail.action;
 				const status = detail.status || 0;
+				const children = self.findChildren();
 
 				if (op === 'sync') {
+					if (children.storeEl) {
+						dispatch(children.storeEl, 'ln-data-store:request-sync-failed', {
+							error: detail.error,
+							status: status
+						});
+					}
 					console.error('[ln-data-coordinator] Sync failed:', detail.error);
 					return;
 				}
 
-				const children = self.findChildren();
+				if (op === 'query') {
+					if (meta.targetEl && meta.kind) {
+						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
+					}
+					self._reportReconciliationError('query', detail.error || detail, meta);
+					return;
+				}
+
 				if (!children.storeEl) return;
 
 				const isAuth      = status === 401 || status === 419;
@@ -554,14 +636,15 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				}
 
 				// ── Deterministic (4xx / 3xx): never retry ──
+				let reconciliation = Promise.resolve();
 				if (isConflict && op === 'update') {
 					const remote = detail.data && detail.data.remote ? self.mapper.ingress(detail.data.remote) : null;
 					if (remote) {
-						dispatch(children.storeEl, 'ln-data-store:request-update', { id: meta.id, data: remote });
+						reconciliation = self._requestStoreMutation(children, 'update', { id: meta.id, data: remote });
 					}
 					self._toastFromDict('conflict');
 				} else if (op === 'create') {
-					dispatch(children.storeEl, 'ln-data-store:request-delete', { id: meta.tempId });
+					reconciliation = self._requestStoreMutation(children, 'delete', { id: meta.tempId });
 					self._toastFromDict('rejected');
 				} else {
 					// update/delete/bulk generic 4xx (incl. 404): leave local, next sync reconciles
@@ -569,7 +652,15 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 				}
 
 				if (meta.queued && children.queue) {
-					dispatch(children.queueEl, 'ln-api-queue:nack', { entryId: meta.entryId, reason: 'drop' });
+					reconciliation.then(function () {
+						dispatch(children.queueEl, 'ln-api-queue:nack', { entryId: meta.entryId, reason: 'drop' });
+					}).catch(function (error) {
+						self._reportReconciliationError('deterministic-reconcile', error, meta);
+					});
+				} else {
+					reconciliation.catch(function (error) {
+						self._reportReconciliationError('deterministic-reconcile', error, meta);
+					});
 				}
 			},
 
@@ -577,7 +668,7 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 			storeInitialized: function (e) {
 				const children = self.findChildren();
 				const store = children.store;
-				if (!store || self._noAutosync) return;
+				if (!store || !children.connector || self._noAutosync || store.isSyncing) return;
 
 				const detail = e.detail || {};
 				if (!detail.hasCache) {
@@ -659,52 +750,53 @@ import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMetho
 		if (!storeName) return;
 		if (!this._ownsStore(storeName)) return;
 
-		this._boundQueries.set(el, {
-			sort: e.detail.sort,
-			filters: e.detail.filters,
-			search: e.detail.search,
-			offset: e.detail.offset,
-			limit: e.detail.limit,
-			queryGen: e.detail.queryGen
-		});
+		const request = e.detail || {};
+		const query = normalizeDataQuery(request);
+		this._boundQueries.set(el, query);
 
 		const children = this.findChildren();
-		const query = {
-			sort: e.detail.sort,
-			filters: e.detail.filters,
-			search: e.detail.search,
-			offset: e.detail.offset,
-			limit: e.detail.limit,
-			queryGen: e.detail.queryGen
-		};
-
 		const self = this;
-		const isWindowed = e.detail.offset != null;
+		const isWindowed = request.offset != null;
+		const store = children.store;
+		const ready = store && store.ready ? store.ready : Promise.resolve();
 
-		// If there is an API connector and this is a windowed remote query (or store is absent/not loaded),
-		// route directly to ln-api-connector to execute network fetch!
-		if (children.connector && (isWindowed || !children.store || !children.store.isLoaded)) {
-			dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
-			dispatch(children.connectorEl, 'ln-api-connector:request-query', {
-				query: query,
-				meta: { targetEl: el, kind: kind }
-			});
-			return;
-		}
+		return ready.then(function () {
+			const source = selectDataSource(store, children.connector, isWindowed);
+			if (source === 'remote') {
+				dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
+				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+					query: query,
+					meta: { targetEl: el, kind: kind }
+				});
+				return;
+			}
 
-		if (children.store && children.store.isLoaded) {
-			store.getAll(query).then(function (r) {
+			if (source !== 'store') {
+				dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
+				return;
+			}
+
+			return store.getAll(query).then(function (r) {
 				const detail = {
 					data: r.data,
 					total: r.total,
 					filtered: r.filtered,
-					offset: e.detail.offset !== undefined ? e.detail.offset : r.offset,
-					queryGen: e.detail.queryGen !== undefined ? e.detail.queryGen : r.queryGen
+					offset: request.offset !== undefined ? request.offset : r.offset,
+					queryGen: request.queryGen !== undefined ? request.queryGen : r.queryGen
 				};
 				dispatch(el, 'ln-' + kind + ':set-data', detail);
 				self._boundDelivered.set(el, true);
 			});
-		}
+		}).catch(function (error) {
+			dispatch(el, 'ln-' + kind + ':set-loading', { loading: false });
+			dispatch(self.dom, 'ln-data-coordinator:error', {
+				operation: 'query',
+				kind: kind,
+				store: storeName,
+				target: el,
+				error: error
+			});
+		});
 	};
 
 	_component.prototype._serveOptions = function (e) {

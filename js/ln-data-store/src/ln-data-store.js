@@ -202,15 +202,18 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		this._handlers = null;
 
 		this.isLoaded = false;
+		this.isInitialized = false;
+		this.hasCache = false;
 		this.isSyncing = false;
 		this.lastSyncedAt = null;
 		this.totalCount = 0;
 		this.presenters = null;
+		this._mutationChain = Promise.resolve();
 
 		_stores[this._name] = this;
 
 		_bindEvents(this);
-		_initStore(this);
+		this.ready = _initStore(this);
 		return this;
 	}
 
@@ -218,29 +221,58 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 	function _bindEvents(self) {
 		self._handlers = {
-			'create': e => _handleCreateRequest(self, e.detail),
-			'update': e => _handleUpdateRequest(self, e.detail),
-			'delete': e => _handleDeleteRequest(self, e.detail),
-			'bulk-delete': e => _handleBulkDeleteRequest(self, e.detail)
+			'create': e => _queueMutation(self, 'create', e.detail, () => _handleCreateRequest(self, e.detail)),
+			'update': e => _queueMutation(self, 'update', e.detail, () => _handleUpdateRequest(self, e.detail)),
+			'delete': e => _queueMutation(self, 'delete', e.detail, () => _handleDeleteRequest(self, e.detail)),
+			'bulk-delete': e => _queueMutation(self, 'bulk-delete', e.detail, () => _handleBulkDeleteRequest(self, e.detail)),
+			'sync-failed': e => {
+				self.isSyncing = false;
+				dispatch(self.dom, 'ln-data-store:sync-error', {
+					store: self._name,
+					error: e.detail && e.detail.error,
+					status: e.detail && e.detail.status
+				});
+			}
 		};
 		for (const [event, fn] of Object.entries(self._handlers)) {
 			self.dom.addEventListener(`ln-data-store:request-${event}`, fn);
 		}
 	}
 
-	// ─── Optimistic Writing Pipeline ─────────────────────────
+	function _queueMutation(self, action, detail, operation) {
+		const requestId = detail && detail.requestId;
+		self._mutationChain = self._mutationChain
+			.then(operation)
+			.catch(error => _mutationError(self, action, requestId, error));
+		return self._mutationChain;
+	}
 
-	function _handleCreateRequest(self, { tempId, data = {} } = {}) {
-		const record = { ...data, id: tempId };
-
-		_putRecord(self._name, record).then(() => {
-			self.totalCount++;
-			dispatch(self.dom, 'ln-data-store:created', { store: self._name, record, tempId });
+	function _persistMutationMeta(self) {
+		return _countRecords(self._name).then(count => {
+			self.totalCount = count;
+			self.hasCache = true;
+			self.isLoaded = true;
+			return _setMeta(self._name, {
+				schema_version: SCHEMA_VERSION,
+				last_synced_at: self.lastSyncedAt,
+				has_cache: true,
+				record_count: count
+			});
 		});
 	}
 
-	function _handleUpdateRequest(self, { id, data = {} } = {}) {
-		_getRecord(self._name, id).then(existing => {
+	// ─── Optimistic Writing Pipeline ─────────────────────────
+
+	function _handleCreateRequest(self, { tempId, data = {}, requestId } = {}) {
+		const record = { ...data, id: tempId };
+
+		return _putRecord(self._name, record).then(() => _persistMutationMeta(self)).then(() => {
+			dispatch(self.dom, 'ln-data-store:created', { store: self._name, record, tempId, requestId });
+		});
+	}
+
+	function _handleUpdateRequest(self, { id, data = {}, requestId } = {}) {
+		return _getRecord(self._name, id).then(existing => {
 			if (!existing) throw new Error(`Record not found: ${id}`);
 
 			const updated = { ...existing, ...data };
@@ -251,57 +283,83 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 				? _rekeyRecord(self._name, id, updated)
 				: _putRecord(self._name, updated);
 
-			return write.then(() => {
-				dispatch(self.dom, 'ln-data-store:updated', { store: self._name, record: updated, previous: existing });
+			return write.then(() => _persistMutationMeta(self)).then(() => {
+				dispatch(self.dom, 'ln-data-store:updated', { store: self._name, record: updated, previous: existing, requestId });
 			});
-		}).catch(err => console.error('[ln-data-store] Optimistic update failed:', err));
+		});
 	}
 
-	function _handleDeleteRequest(self, { id } = {}) {
-		_getRecord(self._name, id).then(existing => {
-			if (!existing) return;
+	function _handleDeleteRequest(self, { id, requestId } = {}) {
+		return _getRecord(self._name, id).then(existing => {
+			if (!existing) {
+				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, id, requestId, missing: true });
+				return;
+			}
 
-			return _deleteRecord(self._name, id).then(() => {
-				self.totalCount--;
-				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, id });
+			return _deleteRecord(self._name, id).then(() => _persistMutationMeta(self)).then(() => {
+				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, id, requestId });
 			});
-		}).catch(err => console.error('[ln-data-store] Optimistic delete failed:', err));
+		});
 	}
 
-	function _handleBulkDeleteRequest(self, { ids = [] } = {}) {
-		if (!ids.length) return;
+	function _handleBulkDeleteRequest(self, { ids = [], requestId } = {}) {
+		if (!ids.length) {
+			dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, ids: [], requestId });
+			return;
+		}
 
-		Promise.all(ids.map(id => _getRecord(self._name, id))).then(records => {
+		return Promise.all(ids.map(id => _getRecord(self._name, id))).then(records => {
 			const savedIds = records.filter(Boolean).map(r => r.id);
 
-			return _deleteBulk(self._name, savedIds).then(() => {
-				self.totalCount -= savedIds.length;
-				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, ids: savedIds });
+			return _deleteBulk(self._name, savedIds).then(() => _persistMutationMeta(self)).then(() => {
+				dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, ids: savedIds, requestId });
 			});
-		}).catch(err => console.error('[ln-data-store] Optimistic bulk delete failed:', err));
+		});
+	}
+
+	function _mutationError(self, action, requestId, error) {
+		console.error('[ln-data-store] ' + action + ' failed:', error);
+		dispatch(self.dom, 'ln-data-store:mutation-error', {
+			store: self._name,
+			action,
+			requestId,
+			error
+		});
 	}
 
 	// ─── Initialization ────────────────────────────────────
 
 	function _initStore(self) {
-		_openDatabase().then(() => _getMeta(self._name)).then(meta => {
+		return _openDatabase().then(() => _getMeta(self._name)).then(meta => {
 			if (meta && meta.schema_version === SCHEMA_VERSION) {
 				self.lastSyncedAt = meta.last_synced_at || null;
 				self.totalCount = meta.record_count || 0;
+				self.hasCache = meta.has_cache === true || self.totalCount > 0;
 
-				if (self.totalCount > 0) {
+				if (self.hasCache) {
 					self.isLoaded = true;
 					dispatch(self.dom, 'ln-data-store:ready', { store: self._name, count: self.totalCount, source: 'cache' });
 				}
 
-				dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: self.totalCount > 0, lastSyncedAt: self.lastSyncedAt, count: self.totalCount });
+				self.isInitialized = true;
+				dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: self.hasCache, lastSyncedAt: self.lastSyncedAt, count: self.totalCount });
 			} else if (meta && meta.schema_version !== SCHEMA_VERSION) {
-				_clearStore(self._name)
-					.then(() => _setMeta(self._name, { schema_version: SCHEMA_VERSION, last_synced_at: null, record_count: 0 }))
-					.then(() => dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 }));
+				return _clearStore(self._name)
+					.then(() => _setMeta(self._name, { schema_version: SCHEMA_VERSION, last_synced_at: null, has_cache: false, record_count: 0 }))
+					.then(() => {
+						self.isInitialized = true;
+						self.hasCache = false;
+						dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 });
+					});
 			} else {
+				self.isInitialized = true;
+				self.hasCache = false;
 				dispatch(self.dom, 'ln-data-store:initialized', { store: self._name, hasCache: false, lastSyncedAt: null, count: 0 });
 			}
+		}).catch(error => {
+			self.isInitialized = true;
+			dispatch(self.dom, 'ln-data-store:initialization-error', { store: self._name, error });
+			throw error;
 		});
 	}
 
@@ -496,9 +554,11 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 		return chain.then(() => _countRecords(self._name)).then(count => {
 			self.totalCount = meta.total !== undefined ? meta.total : count;
+			self.hasCache = true;
 			return _setMeta(self._name, {
 				schema_version: SCHEMA_VERSION,
 				last_synced_at: syncedAt,
+				has_cache: true,
 				record_count: self.totalCount
 			});
 		}).then(() => {
@@ -533,8 +593,14 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 	_component.prototype.fullReload = function () {
 		const self = this;
-		return _clearStore(self._name).then(() => {
+		return _clearStore(self._name).then(() => _setMeta(self._name, {
+			schema_version: SCHEMA_VERSION,
+			last_synced_at: null,
+			has_cache: false,
+			record_count: 0
+		})).then(() => {
 			self.isLoaded = false;
+			self.hasCache = false;
 			self.lastSyncedAt = null;
 			self.totalCount = 0;
 			_triggerRemoteSync(self);
@@ -570,6 +636,8 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		}).then(() => {
 			Object.values(_stores).forEach(inst => {
 				inst.isLoaded = false;
+				inst.isInitialized = false;
+				inst.hasCache = false;
 				inst.isSyncing = false;
 				inst.lastSyncedAt = null;
 				inst.totalCount = 0;

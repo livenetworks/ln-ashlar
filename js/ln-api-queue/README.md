@@ -48,9 +48,13 @@ The queue owns its **own** IndexedDB database, `ln_api_queue` — entirely separ
 | Object store | Key path | Indexes | Purpose |
 |---|---|---|---|
 | `outbox` | `entryId` | `by_scope_chain` (`[scope, chainKey]`), `by_scope_seq` (`[scope, seq]`) | One row per pending mutation. `seq` is a monotonically increasing per-scope counter used to preserve global FIFO ordering within a scope; `by_scope_chain` is used to find the head entry per chain. |
-| `_queue_meta` | scope name | — | Holds the per-scope `seq` counter and pause state. |
+| `_queue_meta` | `key` | — | Holds `seq:<scope>` counters and `paused:<scope>` auth-pause state. |
 
-Each `outbox` entry carries: `entryId`, `scope`, `chainKey`, `seq`, `op`, `targetId`, `payload`, `expectedVersion`, `meta`, `attempts`, `status` (`pending` / `failed`), and timestamps. The queue never inspects `payload` — it passes it through untouched to whatever the coordinator sends on `ln-api-queue:send`.
+Each `outbox` entry carries: `entryId`, `scope`, `chainKey`, `seq`, `op`, `targetId`, `payload`, `expectedVersion`, `meta`, `attempts`, `status` (`pending` / `inflight` / `failed`), `leaseOwner`, `leaseUntil`, and timestamps. The queue never inspects `payload` — it passes it through untouched to whatever the coordinator sends on `ln-api-queue:send`.
+
+Sequence allocation and entry insertion happen in one `readwrite` transaction
+covering both `_queue_meta` and `outbox`. Concurrent enqueues therefore cannot
+receive the same sequence number.
 
 ---
 
@@ -80,6 +84,7 @@ const queue = queueEl.lnApiQueue;
 | `ln-api-queue:ack` | `{ entryId }` | Deletes the entry, emits `pending-count`, advances that chain (drain). |
 | `ln-api-queue:nack` | `{ entryId, reason }` — `reason` is `'retry'`, `'drop'`, or `'auth'` | `retry` → schedules backoff and re-sends later; `drop` → deletes the entry and advances the chain; `auth` → pauses the scope and emits `auth-required`. |
 | `ln-api-queue:request-remap` | `{ oldKey, newId }` | For pending entries whose chain is `oldKey`: any entry with `targetId === oldKey` gets `targetId = newId`; the chain itself is re-keyed from `oldKey` to `newId`; if `meta.action` contains `oldKey` as a substring, it is string-replaced with `newId` too (keeps a persisted per-record URL in sync after a create resolves). |
+| `ln-api-queue:resolve-create` | `{ entryId, oldKey, newId }` | Atomically deletes the acknowledged create and remaps every queued sibling from the temp key to the authoritative id in one transaction, then advances the chain. |
 | `ln-api-queue:request-resume` | `{}` | Clears the pause on this scope and resumes draining. |
 | `ln-api-queue:request-drain` | `{}` | Manually triggers a drain attempt (e.g. to retry `failed` entries). |
 | `ln-api-queue:request-clear` | `{}` | Deletes all entries for this scope (e.g. on logout). |
@@ -88,7 +93,7 @@ const queue = queueEl.lnApiQueue;
 
 | Event | `detail` Payload | Meaning |
 |-------|------------------|---------|
-| `ln-api-queue:send` | `{ entryId, chainKey, op, targetId, payload, expectedVersion, meta }` | **Command to the coordinator** — execute transport for this head-of-chain entry. The queue never calls `fetch` itself. |
+| `ln-api-queue:send` | `{ entryId, chainKey, op, targetId, payload, expectedVersion, idempotencyKey, meta }` | **Command to the coordinator** — execute transport for this head-of-chain entry. `idempotencyKey` is the stable `entryId`. The queue never calls `fetch` itself. |
 | `ln-api-queue:enqueued` | `{ entryId, chainKey, count }` | An entry was persisted. |
 | `ln-api-queue:pending-count` | `{ count, scope }` | Live outbox depth for the scope — the primary UI-facing signal (badge, banner). |
 | `ln-api-queue:auth-required` | `{ entryId, chainKey }` | The scope paused after a `401`/`419` nack. The consumer drives re-authentication, then dispatches `request-resume`. |
@@ -96,21 +101,31 @@ const queue = queueEl.lnApiQueue;
 | `ln-api-queue:resumed` | `{}` | Draining resumed for this scope. |
 | `ln-api-queue:failed` | `{ entryId, chainKey, attempts }` | Retries exhausted (see backoff below); the entry is retained (not deleted) for a manual `request-drain`. |
 | `ln-api-queue:drained` | `{ scope }` | The outbox for this scope is empty. |
+| `ln-api-queue:error` | `{ operation, entryId?, error }` | IndexedDB or queue orchestration failed without silently discarding the entry. |
 | `ln-api-queue:destroyed` | `{ scope }` | The instance was torn down. |
 
 ---
 
 ## FIFO-per-Chain Semantics
 
-Entries are ordered **per `(scope, chainKey)`**, not globally. Each chain drains strictly in the order its entries were enqueued (via the `seq` counter), and the queue keeps **one inflight entry per chain** at a time — it will not dispatch `ln-api-queue:send` for the next entry in a chain until the current head is `ack`'d or `nack`'d with `'drop'`. Different chains drain concurrently and independently of each other.
+Entries are ordered **per `(scope, chainKey)`**, not globally. Each chain drains strictly in the order its entries were enqueued (via the `seq` counter), and the queue keeps **one inflight entry per chain** at a time — it will not dispatch `ln-api-queue:send` for the next entry in a chain until the current head is `ack`'d or `nack`'d with `'drop'`. A `failed` head blocks newer siblings until an explicit `request-drain` resets it. Different chains drain concurrently and independently of each other.
 
 `chainKey` is typically the record id (or temp id, pre-confirmation) — this is what makes a create followed by an update on the same not-yet-confirmed record safe: the update waits behind the create in the same chain, and `request-remap` re-keys the chain once the create resolves.
+
+Claiming is transactional. A ready head is changed from `pending` to
+`inflight` in the same IndexedDB transaction that selects it. The claim carries
+a 60-second lease; another queue instance or a repeated drain sees the lease
+and cannot dispatch the same entry. If a tab crashes, the entry becomes
+claimable again after `leaseUntil`.
 
 ---
 
 ## Drain-on-Init
 
-On construction, the queue reads its persisted entries from `ln_api_queue` and immediately attempts to drain every chain that isn't paused. This means pending writes from a previous page load (browser closed mid-offline-session, tab crashed, etc.) resume automatically without any explicit "resume" call from the consumer.
+On construction, the queue restores the persisted per-scope auth pause and
+attempts to drain every unpaused chain. Pending writes from a previous page
+load resume automatically. A persisted `inflight` entry is not duplicated
+while its lease is active and is recovered when the lease expires.
 
 ---
 
@@ -130,11 +145,13 @@ A `nack {reason:'auth'}` (401/419) pauses the **entire scope** — not just the 
 
 The queue itself has no idea what a "temp id" is — remap is purely a re-keying operation the coordinator asks for. On a successful `create`, the coordinator:
 
-1. Reconciles the store (`confirmMutation`).
-2. Dispatches `ln-api-queue:request-remap { oldKey: tempId, newId: serverId }` — **before** acking.
-3. Dispatches `ln-api-queue:ack { entryId }` for the create entry.
+1. Reconciles the store with an ordinary correlated `request-update`.
+2. Waits for `ln-data-store:updated` to confirm that the id rekey committed.
+3. Dispatches one `ln-api-queue:resolve-create { entryId, oldKey: tempId, newId: serverId }`.
 
-Doing the remap before the ack matters: if a queued `update` for the same not-yet-confirmed record is waiting behind the `create` in the same chain, its `targetId` and the chain's key are both corrected to the real server id before that chain advances to send the update. Both dispatches are synchronous, so there is no window where the update could be sent with the stale temp id.
+The compound command removes the old async remap/ack race: the acknowledged
+create is deleted and every waiting sibling is re-keyed before the transaction
+commits or the chain advances.
 
 ---
 
@@ -156,7 +173,7 @@ The queue never imports or references a connector, never constructs a URL, and n
 
     // The queue commands the coordinator to execute transport for its head entry.
     queueEl.addEventListener('ln-api-queue:send', function (e) {
-        const { entryId, op, targetId, payload, expectedVersion, meta } = e.detail;
+        const { entryId, op, targetId, payload, expectedVersion, idempotencyKey, meta } = e.detail;
 
         const call = op === 'create' ? connectorEl.lnConnector.create(payload)
             : op === 'update' ? connectorEl.lnConnector.update(targetId, payload, expectedVersion)
@@ -164,8 +181,13 @@ The queue never imports or references a connector, never constructs a URL, and n
             : connectorEl.lnConnector.bulkDelete(meta.ids);
 
         call.then(function (record) {
-            // ... confirmMutation on the store, then remap-before-ack on create ...
-            queueEl.dispatchEvent(new CustomEvent('ln-api-queue:ack', { detail: { entryId } }));
+            // For create: wait for the correlated store rekey, then dispatch
+            // resolve-create. Other operations use ack.
+            const eventName = op === 'create' ? 'ln-api-queue:resolve-create' : 'ln-api-queue:ack';
+            const detail = op === 'create'
+                ? { entryId, oldKey: meta.tempId, newId: record.id }
+                : { entryId };
+            queueEl.dispatchEvent(new CustomEvent(eventName, { detail }));
         }).catch(function (err) {
             const reason = (err.status === 401 || err.status === 419) ? 'auth'
                 : (!err.status || err.status >= 500) ? 'retry'

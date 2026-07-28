@@ -310,7 +310,7 @@ described above (no `confirmMutation`):
 
 | op | success → store | success → queue command |
 |---|---|---|
-| create | `ln-data-store:request-update { id: meta.tempId, data: ingress(record) }` (id-swap) | `request-remap {oldKey:meta.tempId, newId:record.id}` **then** `ack {entryId}` |
+| create | Correlated `ln-data-store:request-update { id: meta.tempId, data: ingress(record), requestId }` (id-swap); wait for matching `updated` | `resolve-create {entryId, oldKey:meta.tempId, newId:record.id}` (atomic remap + ack) |
 | update | `ln-data-store:request-update { id: meta.id, data: ingress(record) }` | `ack {entryId}` |
 | delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
 | bulk-delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
@@ -322,9 +322,14 @@ described above (no `confirmMutation`):
 Every success path also calls `_toastFromMessage(e.detail.message)` — see
 Toasts below.
 
-Remap is dispatched **before** ack on create success — a queued sibling
-update targeting the temp id re-targets the real server id before its own
-chain entry advances (both dispatches are synchronous).
+Create resolution waits for the correlated store update before advancing the
+outbox. `resolve-create` then deletes the create entry and remaps all queued
+siblings in one IndexedDB transaction, so no sibling can advance with the
+stale temp id.
+
+Every queued transport request carries `Idempotency-Key: <entryId>` through
+the connector. Delivery remains at-least-once after a crash; a server that
+honours this key can make the mutation effect exactly-once.
 
 **On error**, see "Error reconciliation policy" below — the determinism
 classification (auth / transient / deterministic) applies identically on
@@ -491,6 +496,12 @@ Source: `js/ln-data-coordinator/src/ln-data-coordinator.js`. The write pipeline 
 ### Presenter / binder split
 
 Presenters (`store.setPresenters({computed})`) are registered once per store; computed display fields (`updated_display`, `status_label`, …) flow through `getAll → set-data` automatically. The coordinator is a pure binder — it transports whatever `getAll` produces to the requesting view element without transforming it.
+
+The binder awaits `store.ready` before choosing a source. Loaded non-windowed
+reads use the local store; an empty local-only store is also a valid source and
+returns `[]`. Windowed reads and connector-backed stores without a loaded cache
+route remote. Query failures clear loading and emit
+`ln-data-coordinator:error {operation:'query', kind, store, target, error}`.
 
 ### Refresh trigger
 

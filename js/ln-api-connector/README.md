@@ -15,6 +15,11 @@ helper and cannot be removed or overridden by consumer-supplied headers. The
 backend uses it to select a JSON "data" response mode; it doubles as a CSRF
 guard.
 
+Queued mutation commands may also provide `idempotencyKey`. The connector
+forwards it as `Idempotency-Key`; direct/non-queued calls omit it. Servers
+should persist the first result for a key so lease recovery can safely retry a
+request after a client crash.
+
 ## ⚠️ Unified 4xx / 5xx Body Parsing
 
 Every non-2xx response (not just 409) has its JSON body parsed best-effort
@@ -118,10 +123,10 @@ You can trigger mutations and fetches asynchronously by dispatching standard eve
 | Event | `detail` Payload | Description |
 |-------|------------------|-------------|
 | `ln-api-connector:request-sync` | `{ since, meta }` | Triggers a delta fetch request. |
-| `ln-api-connector:request-create` | `{ data, tempId, url, meta }` | Triggers a creation request. |
-| `ln-api-connector:request-update` | `{ id, data, expected_version, url, meta }` | Triggers a PUT update (supports 409 conflict checks). |
-| `ln-api-connector:request-delete` | `{ id, url, meta }` | Triggers a deletion request. |
-| `ln-api-connector:request-bulk-delete` | `{ ids, url, meta }` | Triggers a bulk-deletion request. |
+| `ln-api-connector:request-create` | `{ data, tempId, url, idempotencyKey?, meta }` | Triggers a creation request. |
+| `ln-api-connector:request-update` | `{ id, data, expected_version, url, idempotencyKey?, meta }` | Triggers a PUT update (supports 409 conflict checks). |
+| `ln-api-connector:request-delete` | `{ id, url, idempotencyKey?, meta }` | Triggers a deletion request. |
+| `ln-api-connector:request-bulk-delete` | `{ ids, url, idempotencyKey?, meta }` | Triggers a bulk-deletion request. |
 
 `url` is optional — when present, it replaces the connector's own `path`
 for that call (still joined with `data-ln-api-base-url`). For `update`,

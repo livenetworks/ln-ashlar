@@ -318,13 +318,11 @@ function _initCoordinator(self) {
     transportEl.lnConnector.create(payload) // op-specific dispatch in real code
       .then(function(serverRawResponse) {
         const record = mapper.ingress(serverRawResponse);
-        storeEl.lnStore.confirmMutation(meta.tempId, record, 'create');
-        // Remap BEFORE ack so a queued sibling update re-targets the real id
-        // before its chain advances.
-        queueEl.dispatchEvent(new CustomEvent('ln-api-queue:request-remap', {
-          detail: { oldKey: meta.tempId, newId: record.id }
+        // Real coordinator dispatches a correlated request-update and waits
+        // for ln-data-store:updated before advancing the chain.
+        queueEl.dispatchEvent(new CustomEvent('ln-api-queue:resolve-create', {
+          detail: { entryId, oldKey: meta.tempId, newId: record.id }
         }));
-        queueEl.dispatchEvent(new CustomEvent('ln-api-queue:ack', { detail: { entryId } }));
       })
       .catch(function(err) {
         if (err.status === 401 || err.status === 419) {

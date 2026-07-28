@@ -148,14 +148,16 @@ These events bubble up and can be listened to by coordinators or rendering views
 
 | Event | `e.detail` payload | Description |
 |---|---|---|
-| `ln-data-store:initialized` | `{ store, hasCache, lastSyncedAt, count }` | Emitted once after IndexedDB connection opens. |
+| `ln-data-store:initialized` | `{ store, hasCache, lastSyncedAt, count }` | Emitted once after IndexedDB connection opens. The instance's `ready` promise resolves after this state is committed. |
 | `ln-data-store:ready` | `{ store, count, source }` | Emitted when data is ready. `source` is `'cache'` (init) or `'server'` (first sync). |
 | `ln-data-store:loaded` | `{ store, count }` | Emitted on initial load sync completion (first sync). |
 | `ln-data-store:created` | `{ store, record, tempId }` | Emitted after optimistic creation. |
 | `ln-data-store:updated` | `{ store, record, previous }` | Emitted after optimistic update or id-swap rekey. |
 | `ln-data-store:deleted` | `{ store, id \| ids }` | Emitted after optimistic delete or bulk delete. |
 | `ln-data-store:synced` | `{ store, added, deleted, changed }` | Emitted after subsequent delta sync merges. |
+| `ln-data-store:sync-error` | `{ store, error, status }` | A connector sync failed; `isSyncing` has been cleared so online/visibility retry can proceed. |
 | `ln-data-store:destroyed` | `{ store }` | Emitted when the store instance is destroyed. |
+| `ln-data-store:mutation-error` | `{ store, action, requestId, error }` | A serialized local mutation failed. `requestId` lets a coordinator correlate reconciliation failures. |
 
 ### Global System Events
 
@@ -188,7 +190,19 @@ The page holds one `IDBDatabase` connection (`ln_app_cache`) shared by every `[d
 
 ### Instance state
 
-`storeEl.lnDataStore` carries `isLoaded` (cache populated), `isSyncing` (a remote-sync request is outstanding — set when the store emits `ln-data-store:request-remote-sync`, cleared on `applySync`), `lastSyncedAt` (the last sync watermark, passed to the coordinator as the `since` field of that request event — the store itself never fetches), and `totalCount`.
+`storeEl.lnDataStore` carries `ready` (initialization promise),
+`isInitialized` (metadata inspection completed), `hasCache` (a local snapshot
+exists, including an intentionally empty snapshot), `isLoaded` (the snapshot
+is queryable), `isSyncing` (a remote-sync request is outstanding — set when
+the store emits `ln-data-store:request-remote-sync`, cleared on `applySync`),
+`lastSyncedAt` (the last sync watermark, passed to the coordinator as the
+`since` field of that request event — the store itself never fetches), and
+`totalCount`.
+
+Local mutations are serialized per store instance. After the record write,
+the store recounts and persists `_meta` before emitting the post-event.
+Reconciliation commands may include a `requestId`; the same id is returned on
+`created`/`updated`/`deleted` or `mutation-error`.
 
 ### Encryption pipeline
 

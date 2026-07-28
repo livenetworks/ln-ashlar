@@ -1,19 +1,14 @@
 import { registerComponent, dispatch } from '../../ln-core';
+import { QueueStorage } from './queue-storage';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-api-queue';
 	const DOM_ATTRIBUTE = 'lnApiQueue';
-
-	if (window[DOM_ATTRIBUTE] !== undefined) return;
-
-	const DB_NAME = 'ln_api_queue';
-	const OUTBOX = 'outbox';
-	const META = '_queue_meta';
 	const BACKOFF_LADDER = [2000, 5000, 15000, 60000, 300000];
 	const MAX_ATTEMPTS = 8;
+	const LEASE_MS = 60000;
 
-	let _db = null;
-	let _dbReady = null;
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	function _uuid() {
 		try { return crypto.randomUUID(); }
@@ -25,94 +20,11 @@ import { registerComponent, dispatch } from '../../ln-core';
 		}
 	}
 
-	// ─── Database ──────────────────────────────────────────
-
-	function _openDb() {
-		if (_dbReady) return _dbReady;
-
-		_dbReady = new Promise(resolve => {
-			if (typeof indexedDB === 'undefined') {
-				console.warn('[ln-api-queue] IndexedDB not available — queue disabled');
-				return resolve(null);
-			}
-
-			const req = indexedDB.open(DB_NAME, 1);
-
-			req.onerror = () => {
-				console.warn('[ln-api-queue] IndexedDB open failed — queue disabled');
-				resolve(null);
-			};
-
-			req.onupgradeneeded = e => {
-				const db = e.target.result;
-				if (!db.objectStoreNames.contains(OUTBOX)) {
-					const store = db.createObjectStore(OUTBOX, { keyPath: 'entryId' });
-					store.createIndex('by_scope_chain', ['scope', 'chainKey'], { unique: false });
-					store.createIndex('by_scope_seq', ['scope', 'seq'], { unique: false });
-				}
-				if (!db.objectStoreNames.contains(META)) {
-					db.createObjectStore(META, { keyPath: 'key' });
-				}
-			};
-
-			req.onsuccess = e => {
-				const db = e.target.result;
-				db.onversionchange = () => {
-					db.close();
-					_db = null;
-					_dbReady = null;
-				};
-				_db = db;
-				resolve(db);
-			};
-		});
-
-		return _dbReady;
-	}
-
-	function _getDb() {
-		if (_db) return Promise.resolve(_db);
-		_dbReady = null;
-		return _openDb();
-	}
-
-	function _idbRequest(request) {
-		return new Promise((resolve, reject) => {
-			request.onsuccess = () => resolve(request.result);
-			request.onerror = () => reject(request.error);
-		});
-	}
-
-	const _tx = (storeName, mode) => _getDb().then(db => db ? db.transaction(storeName, mode).objectStore(storeName) : null);
-
-	function _putEntry(entry) {
-		return _tx(OUTBOX, 'readwrite').then(store => store ? _idbRequest(store.put(entry)) : null);
-	}
-
-	function _deleteEntry(entryId) {
-		return _tx(OUTBOX, 'readwrite').then(store => store ? _idbRequest(store.delete(entryId)) : null);
-	}
-
-	function _allForScope(scope) {
-		return _tx(OUTBOX, 'readonly').then(store => {
-			if (!store) return [];
-			const index = store.index('by_scope_seq');
-			const range = IDBKeyRange.bound([scope, -Infinity], [scope, Infinity]);
-			return _idbRequest(index.getAll(range));
-		});
-	}
-
-	function _nextSeq(scope) {
-		return _tx(META, 'readwrite').then(store => {
-			if (!store) return 0;
-			return _idbRequest(store.get('seq')).then(record => {
-				const next = (record && typeof record.value === 'number' ? record.value : 0) + 1;
-				return _tx(META, 'readwrite').then(s2 => _idbRequest(s2.put({ key: 'seq', value: next }))).then(() => next);
-			});
-		});
-	}
-
-	// ─── Component Constructor ─────────────────────────────
+	const _storage = new QueueStorage({
+		indexedDB: window.indexedDB,
+		IDBKeyRange: window.IDBKeyRange,
+		uuid: _uuid
+	});
 
 	function _component(dom) {
 		this.dom = dom;
@@ -123,16 +35,32 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 		this._paused = false;
 		this._timers = new Map();
+		this._workerId = _uuid();
+		this._drainPromise = null;
 		this._onlineHandler = () => this._drain();
 
 		this._bindEvents();
 		window.addEventListener('online', this._onlineHandler);
 
 		const self = this;
-		_openDb().then(() => {
-			self._emitPendingCount();
-			self._drain();
-		});
+		_storage.open()
+			.then(db => {
+				if (!db) {
+					console.warn('[ln-api-queue] IndexedDB not available — queue disabled');
+					return false;
+				}
+				return _storage.getPaused(self.scope);
+			})
+			.then(paused => {
+				self._paused = !!paused;
+				if (self._paused) dispatch(self.dom, 'ln-api-queue:paused', { reason: 'auth', restored: true });
+				return self._emitPendingCount();
+			})
+			.then(() => self._drain())
+			.catch(error => {
+				console.error('[ln-api-queue] Initialization failed:', error);
+				dispatch(self.dom, 'ln-api-queue:error', { operation: 'initialize', error });
+			});
 
 		return this;
 	}
@@ -144,19 +72,16 @@ import { registerComponent, dispatch } from '../../ln-core';
 		return navigator.onLine;
 	};
 
-	// ─── Pending Count ──────────────────────────────────────
-
 	_component.prototype._emitPendingCount = function () {
 		const self = this;
-		return _allForScope(self.scope).then(entries => {
+		return _storage.allForScope(self.scope).then(entries => {
 			dispatch(self.dom, 'ln-api-queue:pending-count', { count: entries.length, scope: self.scope });
 			if (entries.length === 0) {
 				dispatch(self.dom, 'ln-api-queue:drained', { scope: self.scope });
 			}
+			return entries;
 		});
 	};
-
-	// ─── Drain ──────────────────────────────────────────────
 
 	_component.prototype._clearTimer = function (chainKey) {
 		const timer = this._timers.get(chainKey);
@@ -167,188 +92,176 @@ import { registerComponent, dispatch } from '../../ln-core';
 	};
 
 	_component.prototype._scheduleTimer = function (chainKey, delta) {
-		if (this._timers.has(chainKey)) return;
+		const delay = Math.max(0, delta);
+		const current = this._timers.get(chainKey);
+		if (current) clearTimeout(current);
+
 		const self = this;
 		const timer = setTimeout(() => {
 			self._timers.delete(chainKey);
 			self._drain();
-		}, delta);
+		}, delay);
 		this._timers.set(chainKey, timer);
 	};
 
 	_component.prototype._drain = function () {
 		const self = this;
+		if (self._paused || !self._isOnline()) return Promise.resolve();
+		if (self._drainPromise) return self._drainPromise;
 
-		if (self._paused) return;
-		if (!self._isOnline()) return;
-
-		return _allForScope(self.scope).then(entries => {
-			const groups = new Map();
-			for (const entry of entries) {
-				if (!groups.has(entry.chainKey)) groups.set(entry.chainKey, []);
-				groups.get(entry.chainKey).push(entry);
-			}
-
-			groups.forEach((group, chainKey) => {
-				group.sort((a, b) => a.seq - b.seq);
-				const head = group.find(e => e.status !== 'failed');
-				if (!head || head.status === 'inflight') return;
-
-				const now = Date.now();
-				if (head.nextAttemptAt > now) {
-					self._scheduleTimer(chainKey, head.nextAttemptAt - now);
-					return;
+		self._drainPromise = _storage.claimReady(self.scope, self._workerId, LEASE_MS)
+			.then(result => {
+				for (const wakeup of result.wakeups) {
+					self._scheduleTimer(wakeup.chainKey, wakeup.at - Date.now());
 				}
 
-				self._clearTimer(chainKey);
-				head.status = 'inflight';
-				_putEntry(head).then(() => {
+				for (const entry of result.entries) {
+					self._clearTimer(entry.chainKey);
 					dispatch(self.dom, 'ln-api-queue:send', {
-						entryId: head.entryId,
-						chainKey: head.chainKey,
-						op: head.op,
-						targetId: head.targetId,
-						payload: head.payload,
-						expectedVersion: head.expectedVersion,
-						meta: head.meta
+						entryId: entry.entryId,
+						chainKey: entry.chainKey,
+						op: entry.op,
+						targetId: entry.targetId,
+						payload: entry.payload,
+						expectedVersion: entry.expectedVersion,
+						idempotencyKey: entry.entryId,
+						meta: entry.meta
 					});
-				});
+				}
+			})
+			.catch(error => {
+				console.error('[ln-api-queue] Drain failed:', error);
+				dispatch(self.dom, 'ln-api-queue:error', { operation: 'drain', error });
+			})
+			.finally(() => {
+				self._drainPromise = null;
 			});
-		});
-	};
 
-	// ─── Command Handlers ──────────────────────────────────
+		return self._drainPromise;
+	};
 
 	_component.prototype._onEnqueue = function (e) {
 		const self = this;
-		const detail = e.detail || {};
-
-		return _nextSeq(self.scope).then(seq => {
-			const entry = {
-				entryId: _uuid(),
-				scope: self.scope,
-				chainKey: detail.chainKey,
-				seq: seq,
-				op: detail.op,
-				targetId: detail.targetId !== undefined ? detail.targetId : null,
-				payload: detail.payload,
-				expectedVersion: detail.expectedVersion !== undefined ? detail.expectedVersion : null,
-				meta: detail.meta || {},
-				attempts: 0,
-				nextAttemptAt: 0,
-				status: 'pending'
-			};
-
-			return _putEntry(entry).then(() => _allForScope(self.scope)).then(entries => {
-				dispatch(self.dom, 'ln-api-queue:enqueued', { entryId: entry.entryId, chainKey: entry.chainKey, count: entries.length });
-				dispatch(self.dom, 'ln-api-queue:pending-count', { count: entries.length, scope: self.scope });
-				self._drain();
+		return _storage.enqueue(self.scope, e.detail || {})
+			.then(entry => {
+				if (!entry) return;
+				return self._emitPendingCount().then(entries => {
+					dispatch(self.dom, 'ln-api-queue:enqueued', {
+						entryId: entry.entryId,
+						chainKey: entry.chainKey,
+						count: entries.length
+					});
+					return self._drain();
+				});
+			})
+			.catch(error => {
+				dispatch(self.dom, 'ln-api-queue:error', { operation: 'enqueue', error });
 			});
-		});
 	};
 
 	_component.prototype._onAck = function (e) {
 		const self = this;
 		const detail = e.detail || {};
-
-		return _deleteEntry(detail.entryId).then(() => _allForScope(self.scope)).then(entries => {
-			dispatch(self.dom, 'ln-api-queue:pending-count', { count: entries.length, scope: self.scope });
-			if (entries.length === 0) {
-				dispatch(self.dom, 'ln-api-queue:drained', { scope: self.scope });
-			}
-			self._drain();
-		});
+		return _storage.ack(self.scope, detail.entryId)
+			.then(() => self._emitPendingCount())
+			.then(() => self._drain())
+			.catch(error => {
+				dispatch(self.dom, 'ln-api-queue:error', { operation: 'ack', entryId: detail.entryId, error });
+			});
 	};
 
 	_component.prototype._onNack = function (e) {
 		const self = this;
 		const detail = e.detail || {};
-		const reason = detail.reason;
 
-		return _allForScope(self.scope).then(entries => {
-			const entry = entries.find(en => en.entryId === detail.entryId);
-			if (!entry) return;
+		return _storage.nack(self.scope, detail.entryId, detail.reason, {
+			maxAttempts: MAX_ATTEMPTS,
+			backoff: BACKOFF_LADDER
+		}).then(result => {
+			if (!result) return;
 
-			if (reason === 'retry') {
-				entry.attempts = (entry.attempts || 0) + 1;
-				if (entry.attempts >= MAX_ATTEMPTS) {
-					entry.status = 'failed';
-					return _putEntry(entry).then(() => {
-						dispatch(self.dom, 'ln-api-queue:failed', { entryId: entry.entryId, chainKey: entry.chainKey, attempts: entry.attempts });
-						return _allForScope(self.scope);
-					}).then(all => {
-						dispatch(self.dom, 'ln-api-queue:pending-count', { count: all.length, scope: self.scope });
-					});
-				}
-				entry.nextAttemptAt = Date.now() + BACKOFF_LADDER[Math.min(entry.attempts - 1, BACKOFF_LADDER.length - 1)];
-				entry.status = 'pending';
-				return _putEntry(entry).then(() => {
-					self._scheduleTimer(entry.chainKey, entry.nextAttemptAt - Date.now());
-					return _allForScope(self.scope);
-				}).then(all => {
-					dispatch(self.dom, 'ln-api-queue:pending-count', { count: all.length, scope: self.scope });
+			if (result.status === 'failed') {
+				dispatch(self.dom, 'ln-api-queue:failed', {
+					entryId: result.entry.entryId,
+					chainKey: result.entry.chainKey,
+					attempts: result.entry.attempts
+				});
+			} else if (result.status === 'retry') {
+				self._scheduleTimer(result.entry.chainKey, result.delay);
+			} else if (result.status === 'auth') {
+				self._paused = true;
+				dispatch(self.dom, 'ln-api-queue:paused', { reason: 'auth' });
+				dispatch(self.dom, 'ln-api-queue:auth-required', {
+					entryId: result.entry.entryId,
+					chainKey: result.entry.chainKey
 				});
 			}
 
-			if (reason === 'drop') {
-				return _deleteEntry(entry.entryId).then(() => _allForScope(self.scope)).then(all => {
-					dispatch(self.dom, 'ln-api-queue:pending-count', { count: all.length, scope: self.scope });
-					if (all.length === 0) {
-						dispatch(self.dom, 'ln-api-queue:drained', { scope: self.scope });
-					}
-					self._drain();
-				});
-			}
-
-			if (reason === 'auth') {
-				entry.status = 'pending';
-				return _putEntry(entry).then(() => {
-					self._paused = true;
-					dispatch(self.dom, 'ln-api-queue:paused', { reason: 'auth' });
-					dispatch(self.dom, 'ln-api-queue:auth-required', { entryId: entry.entryId, chainKey: entry.chainKey });
-				});
-			}
+			return self._emitPendingCount().then(() => {
+				if (result.status === 'dropped') return self._drain();
+			});
+		}).catch(error => {
+			dispatch(self.dom, 'ln-api-queue:error', { operation: 'nack', entryId: detail.entryId, error });
 		});
 	};
 
 	_component.prototype._onRemap = function (e) {
 		const self = this;
 		const detail = e.detail || {};
-		const oldKey = detail.oldKey;
-		const newId = detail.newId;
+		return _storage.remap(self.scope, detail.oldKey, detail.newId)
+			.catch(error => {
+				dispatch(self.dom, 'ln-api-queue:error', { operation: 'remap', error });
+			});
+	};
 
-		return _allForScope(self.scope).then(entries => {
-			const targets = entries.filter(en => en.chainKey === oldKey && en.status !== 'failed');
-			return Promise.all(targets.map(entry => {
-				if (entry.targetId === oldKey) entry.targetId = newId;
-				if (entry.meta && typeof entry.meta.action === 'string' && entry.meta.action.indexOf(oldKey) !== -1) {
-					entry.meta.action = entry.meta.action.split(oldKey).join(newId); // keep a persisted per-record URL in sync after the create resolves
-				}
-				entry.chainKey = newId;
-				return _putEntry(entry);
-			}));
-		});
+	_component.prototype._onResolveCreate = function (e) {
+		const self = this;
+		const detail = e.detail || {};
+		return _storage.resolveCreate(self.scope, detail.entryId, detail.oldKey, detail.newId)
+			.then(() => self._emitPendingCount())
+			.then(() => self._drain())
+			.catch(error => {
+				dispatch(self.dom, 'ln-api-queue:error', {
+					operation: 'resolve-create',
+					entryId: detail.entryId,
+					error
+				});
+			});
 	};
 
 	_component.prototype._onResume = function () {
-		this._paused = false;
-		dispatch(this.dom, 'ln-api-queue:resumed', {});
-		this._drain();
+		const self = this;
+		return _storage.setPaused(self.scope, false).then(() => {
+			self._paused = false;
+			dispatch(self.dom, 'ln-api-queue:resumed', {});
+			return self._drain();
+		}).catch(error => {
+			dispatch(self.dom, 'ln-api-queue:error', { operation: 'resume', error });
+		});
 	};
 
 	_component.prototype._onDrain = function () {
-		this._drain();
+		const self = this;
+		return _storage.resetFailed(self.scope).then(() => {
+			const activeDrain = self._drainPromise;
+			return activeDrain ? activeDrain.then(() => self._drain()) : self._drain();
+		}).catch(error => {
+			dispatch(self.dom, 'ln-api-queue:error', { operation: 'manual-drain', error });
+		});
 	};
 
 	_component.prototype._onClear = function () {
 		const self = this;
-		return _allForScope(self.scope).then(entries => Promise.all(entries.map(e => _deleteEntry(e.entryId)))).then(() => {
+		self._timers.forEach(timer => clearTimeout(timer));
+		self._timers.clear();
+		return _storage.clear(self.scope).then(() => {
+			self._paused = false;
 			dispatch(self.dom, 'ln-api-queue:pending-count', { count: 0, scope: self.scope });
 			dispatch(self.dom, 'ln-api-queue:drained', { scope: self.scope });
+		}).catch(error => {
+			dispatch(self.dom, 'ln-api-queue:error', { operation: 'clear', error });
 		});
 	};
-
-	// ─── DOM Event Routing ──────────────────────────────────
 
 	_component.prototype._bindEvents = function () {
 		const self = this;
@@ -357,15 +270,17 @@ import { registerComponent, dispatch } from '../../ln-core';
 			ack: e => self._onAck(e),
 			nack: e => self._onNack(e),
 			remap: e => self._onRemap(e),
-			resume: e => self._onResume(e),
-			drain: e => self._onDrain(e),
-			clear: e => self._onClear(e)
+			resolveCreate: e => self._onResolveCreate(e),
+			resume: () => self._onResume(),
+			drain: () => self._onDrain(),
+			clear: () => self._onClear()
 		};
 
 		self.dom.addEventListener('ln-api-queue:request-enqueue', self._handlers.enqueue);
 		self.dom.addEventListener('ln-api-queue:ack', self._handlers.ack);
 		self.dom.addEventListener('ln-api-queue:nack', self._handlers.nack);
 		self.dom.addEventListener('ln-api-queue:request-remap', self._handlers.remap);
+		self.dom.addEventListener('ln-api-queue:resolve-create', self._handlers.resolveCreate);
 		self.dom.addEventListener('ln-api-queue:request-resume', self._handlers.resume);
 		self.dom.addEventListener('ln-api-queue:request-drain', self._handlers.drain);
 		self.dom.addEventListener('ln-api-queue:request-clear', self._handlers.clear);
@@ -379,6 +294,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 		self.dom.removeEventListener('ln-api-queue:ack', self._handlers.ack);
 		self.dom.removeEventListener('ln-api-queue:nack', self._handlers.nack);
 		self.dom.removeEventListener('ln-api-queue:request-remap', self._handlers.remap);
+		self.dom.removeEventListener('ln-api-queue:resolve-create', self._handlers.resolveCreate);
 		self.dom.removeEventListener('ln-api-queue:request-resume', self._handlers.resume);
 		self.dom.removeEventListener('ln-api-queue:request-drain', self._handlers.drain);
 		self.dom.removeEventListener('ln-api-queue:request-clear', self._handlers.clear);
@@ -388,19 +304,14 @@ import { registerComponent, dispatch } from '../../ln-core';
 		self._timers.clear();
 
 		dispatch(self.dom, 'ln-api-queue:destroyed', { scope: self.scope });
-
 		delete self.dom[DOM_ATTRIBUTE];
 	};
-
-	// ─── Attribute Sync ────────────────────────────────────
 
 	function _syncAttr(el) {
 		const instance = el[DOM_ATTRIBUTE];
 		if (!instance) return;
 		instance._drain();
 	}
-
-	// ─── Registration ──────────────────────────────────────
 
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-api-queue', {
 		extraAttributes: ['data-ln-api-queue-online'],

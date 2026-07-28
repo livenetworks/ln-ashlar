@@ -65,6 +65,12 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	 * Fetch changed records since a sequence.
 	 * Calls CouchDB /{db}/_changes?include_docs=true&since={since}
 	 */
+	function _mutationHeaders(self, idempotencyKey, extra) {
+		const headers = Object.assign({}, getHeaders(self.headers, self.auth), extra || {});
+		if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+		return headers;
+	}
+
 	_component.prototype.fetchDelta = function (since) {
 		const self = this;
 		const params = ['include_docs=true', 'feed=normal'];
@@ -90,13 +96,13 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	 * Create a document in CouchDB.
 	 * Sends POST /{db}
 	 */
-	function _rawCreate(self, payload) {
+	function _rawCreate(self, payload, idempotencyKey) {
 		const doc = Object.assign({ _id: payload.id }, payload);
 		if (!doc._id) delete doc._id;
 
 		return window.fetch(buildUrl(self.url, self.db), {
 			method: 'POST',
-			headers: getHeaders(self.headers, self.auth),
+			headers: _mutationHeaders(self, idempotencyKey),
 			credentials: self.credentials,
 			body: JSON.stringify(doc)
 		})
@@ -112,8 +118,8 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		});
 	}
 
-	_component.prototype.create = function (payload) {
-		return _rawCreate(this, payload).then(r => r.record);
+	_component.prototype.create = function (payload, idempotencyKey) {
+		return _rawCreate(this, payload, idempotencyKey).then(r => r.record);
 	};
 
 	/**
@@ -121,7 +127,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 	 * Sends PUT /{db}/{id}
 	 * Handles revision checks and automatic revision fetching if rev is missing.
 	 */
-	function _rawUpdate(self, id, payload) {
+	function _rawUpdate(self, id, payload, idempotencyKey) {
 		const doc = Object.assign({ id: String(id), _id: String(id) }, payload);
 		const rev = doc._rev || doc.rev;
 
@@ -136,7 +142,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			const finalDoc = Object.assign({}, doc, { _rev: activeRev });
 			delete finalDoc.rev;
 
-			const headers = Object.assign(getHeaders(self.headers, self.auth), { 'If-Match': activeRev });
+			const headers = _mutationHeaders(self, idempotencyKey, { 'If-Match': activeRev });
 			return window.fetch(buildUrl(self.url, self.db, null, id), {
 				method: 'PUT',
 				headers: headers,
@@ -160,15 +166,15 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		});
 	}
 
-	_component.prototype.update = function (id, payload) {
-		return _rawUpdate(this, id, payload).then(r => r.record);
+	_component.prototype.update = function (id, payload, idempotencyKey) {
+		return _rawUpdate(this, id, payload, idempotencyKey).then(r => r.record);
 	};
 
 	/**
 	 * Delete a document in CouchDB.
 	 * Sends DELETE /{db}/{id}?rev={rev}
 	 */
-	function _rawDelete(self, id, rev) {
+	function _rawDelete(self, id, rev, idempotencyKey) {
 		const getRevPromise = rev ? Promise.resolve(rev) :
 			window.fetch(buildUrl(self.url, self.db, null, id), { method: 'GET', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
 				.then(res => {
@@ -178,7 +184,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 		return getRevPromise.then(activeRev => {
 			const deleteUrl = buildUrl(self.url, self.db, null, id) + '?rev=' + encodeURIComponent(activeRev);
-			return window.fetch(deleteUrl, { method: 'DELETE', headers: getHeaders(self.headers, self.auth), credentials: self.credentials })
+			return window.fetch(deleteUrl, { method: 'DELETE', headers: _mutationHeaders(self, idempotencyKey), credentials: self.credentials })
 				.then(res => {
 					if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
 					return res.json();
@@ -190,15 +196,15 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		});
 	}
 
-	_component.prototype.delete = function (id, rev) {
-		return _rawDelete(this, id, rev).then(r => r.response);
+	_component.prototype.delete = function (id, rev, idempotencyKey) {
+		return _rawDelete(this, id, rev, idempotencyKey).then(r => r.response);
 	};
 
 	/**
 	 * Bulk delete documents in CouchDB.
 	 * Sends POST /{db}/_bulk_docs with {"docs": [{"_id": "...", "_rev": "...", "_deleted": true}]}
 	 */
-	function _rawBulkDelete(self, ids) {
+	function _rawBulkDelete(self, ids, idempotencyKey) {
 		if (!ids || ids.length === 0) return Promise.resolve({ response: { ok: true, deletedCount: 0 }, message: null });
 
 		return window.fetch(buildUrl(self.url, self.db, '_all_docs'), {
@@ -221,7 +227,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 			return window.fetch(buildUrl(self.url, self.db, '_bulk_docs'), {
 				method: 'POST',
-				headers: getHeaders(self.headers, self.auth),
+				headers: _mutationHeaders(self, idempotencyKey),
 				credentials: self.credentials,
 				body: JSON.stringify({ docs: docsToDelete })
 			})
@@ -236,8 +242,8 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		});
 	}
 
-	_component.prototype.bulkDelete = function (ids) {
-		return _rawBulkDelete(this, ids).then(r => r.response);
+	_component.prototype.bulkDelete = function (ids, idempotencyKey) {
+		return _rawBulkDelete(this, ids, idempotencyKey).then(r => r.response);
 	};
 
 	// ─── DOM Event Routing ────────────────────────────────────
@@ -262,7 +268,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			},
 			create: function (e) {
 				const detail = e.detail || {};
-				_rawCreate(self, detail.data)
+				_rawCreate(self, detail.data, detail.idempotencyKey)
 					.then(function (r) {
 						dispatch(self.dom, 'ln-couchdb-connector:created', { record: r.record, tempId: detail.tempId, message: r.message, meta: detail.meta || null });
 					})
@@ -285,7 +291,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 					payload._rev = detail.expected_version;
 				}
 
-				_rawUpdate(self, detail.id, payload)
+				_rawUpdate(self, detail.id, payload, detail.idempotencyKey)
 					.then(function (r) {
 						dispatch(self.dom, 'ln-couchdb-connector:updated', { record: r.record, id: detail.id, message: r.message, meta: detail.meta || null });
 					})
@@ -303,7 +309,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			},
 			delete: function (e) {
 				const detail = e.detail || {};
-				_rawDelete(self, detail.id, detail.rev)
+				_rawDelete(self, detail.id, detail.rev, detail.idempotencyKey)
 					.then(function (r) {
 						dispatch(self.dom, 'ln-couchdb-connector:deleted', { response: r.response, id: detail.id, message: r.message, meta: detail.meta || null });
 					})
@@ -319,7 +325,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			},
 			bulkDelete: function (e) {
 				const detail = e.detail || {};
-				_rawBulkDelete(self, detail.ids)
+				_rawBulkDelete(self, detail.ids, detail.idempotencyKey)
 					.then(function (r) {
 						dispatch(self.dom, 'ln-couchdb-connector:bulk-deleted', { response: r.response, ids: detail.ids, message: r.message, meta: detail.meta || null });
 					})

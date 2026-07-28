@@ -212,7 +212,7 @@ stateDiagram-v2
     CoordExec --> DrainDrop: 409/other 4xx/3xx → nack(drop)<br/>same store action as ErrorDeterministic
     CoordExec --> DrainOk: 2xx → reconcile
 
-    DrainOk --> RemapAck: create → request-remap (tempId → real id) then ack<br/>update/delete → ack only
+    DrainOk --> RemapAck: create → wait for store rekey, then resolve-create<br/>(atomic tempId remap + ack); update/delete → ack only
     RemapAck --> [*]
 
     DrainAuth --> Drain: consumer re-authenticates,<br/>dispatches request-resume
@@ -269,13 +269,16 @@ and no `forceSync()` error backstop.
 
 **Offline / queued path.** When a `[data-ln-api-queue]` child is present,
 every fan-out write routes through it instead of calling the connector
-directly. Entries drain FIFO per `(scope, chainKey)`, one inflight entry per
-chain. The queue emits `ln-api-queue:send` for the head entry; the
+directly. Entries drain FIFO per `(scope, chainKey)`, one leased inflight
+entry per chain. The queue emits `ln-api-queue:send` for the transactionally
+claimed head entry; the
 coordinator executes the transport and reports the outcome back via
 `ack` / `nack`. On a create success the coordinator dispatches
-`ln-api-queue:request-remap` (tempId → real id) **before** `ack`, so a
-queued sibling update re-targets the real id before its own chain entry
-advances. A `401` / `419` pauses the scope (`nack {reason:'auth'}`,
+one `ln-api-queue:resolve-create` after the store confirms its correlated
+id-swap. The queue removes the create and remaps every sibling in one
+transaction before the chain advances. Every queued request carries its
+stable `entryId` as an idempotency key. A `401` / `419` persists a scope
+pause (`nack {reason:'auth'}`,
 `auth-required`) without touching the optimistic write, resuming only on an
 explicit `ln-api-queue:request-resume`. Transient errors retry with backoff
 `2s, 5s, 15s, 60s, 5min`; after 8 attempts the entry is marked `failed` and
