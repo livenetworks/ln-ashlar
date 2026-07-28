@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ln-ashlar Declarative Attributes Schema Catalog",
+  "description": "Машински-читлива JSON шема на сите data-ln-* атрибути и компоненти за AI модели.",
+  "components": {
+    "ln-page": {
+      "tag": "body",
+      "attributes": {
+        "data-ln-theme": { "type": "string", "enum": ["light", "dark"], "description": "Почетна визуелна тема" },
+        "data-ln-app": { "type": "string", "enum": ["spa", "data-driven"], "description": "Означува дека апликацијата е SPA или Data-driven" }
+      }
+    },
+    "ln-data-coordinator": {
+      "tag": "ul",
+      "attributes": {
+        "data-ln-data-coordinator": { "type": "string", "description": "Име на ресурсот/ентитетот", "required": true }
+      },
+      "children": {
+        "store": { "tag": "li", "attributes": { "data-ln-data-store": { "type": "string", "required": true }, "data-ln-store-indexes": { "type": "string" } } },
+        "connector": { "tag": "li", "attributes": { "data-ln-api-connector": { "type": "string", "required": true }, "data-ln-api-url": { "type": "string", "required": true } } }
+      }
+    },
+    "ln-modal": {
+      "tag": "dialog",
+      "attributes": {
+        "data-ln-modal": { "type": "boolean", "description": "Маркер за нативен dialog модал", "required": true },
+        "data-ln-modal-mode": { "type": "string", "enum": ["new", "edit"], "default": "new", "description": "Состојба на модалот" },
+        "data-ln-modal-coordinator": { "type": "boolean", "description": "Опционален маркер за Layer 2 координација" }
+      },
+      "inner_elements": {
+        "header_title_new": { "tag": "span", "attributes": { "data-ln-modal-when": { "const": "new" } } },
+        "header_title_edit": { "tag": "span", "attributes": { "data-ln-modal-when": { "const": "edit" } } },
+        "close_trigger": { "tag": "a", "attributes": { "data-ln-modal-close": { "type": "boolean", "required": true } } },
+        "open_trigger": { "tag": "a", "attributes": { "data-ln-modal-for": { "type": "string", "description": "ID на целниот модал", "required": true } } }
+      }
+    },
+    "ln-modal-coordinator": {
+      "tag": "dialog",
+      "attributes": {
+        "data-ln-modal-coordinator": { "type": "boolean", "description": "Layer 2 координатор на ниво на модал кој ракува со data-ln-modal-for тригери, hash навигација, пополнување и ресетирање на форми", "required": false }
+      }
+    },
+    "ln-form": {
+      "tag": "form",
+      "attributes": {
+        "data-ln-form": { "type": "boolean", "description": "Маркер за форма со валидација", "required": true },
+        "data-ln-form-scope": { "type": "string", "description": "Име на ресурсот за координаторот" },
+        "data-ln-form-action-edit": { "type": "boolean", "description": "Овозможува препишување на action за RESTful edit" }
+      },
+      "validation": {
+        "field": { "attributes": { "data-ln-validate": { "type": "boolean" } } },
+        "errors_container": { "attributes": { "data-ln-validate-errors": { "type": "boolean" } } },
+        "error_item": { "attributes": { "data-ln-validate-error": { "type": "string", "enum": ["required", "type", "pattern", "custom"] } } }
+      }
+    },
+    "ln-table": {
+      "tag": "section",
+      "attributes": {
+        "data-ln-table": { "type": "string", "description": "Име на ресурсот за табелата", "required": true },
+        "data-ln-table-source": { "type": "string", "description": "URL патека за REST API" },
+        "data-ln-table-window": { "type": "number", "description": "Виртуелизација на редови" }
+      },
+      "columns": {
+        "sort": { "attributes": { "data-ln-table-col-sort": { "type": "boolean" } } },
+        "filter": { "attributes": { "data-ln-table-filter-col": { "type": "string" }, "data-ln-popover-for": { "type": "string" } } },
+        "select_all": { "attributes": { "data-ln-table-col-select": { "type": "boolean" } } },
+        "select_row": { "attributes": { "data-ln-table-row-select": { "type": "boolean" } } }
+      },
+      "template": { "tag": "template", "attributes": { "data-ln-template": { "type": "string", "description": "Име на шаблонот за редови" } } }
+    },
+    "ln-dictionary": {
+      "tag": "ul",
+      "attributes": {
+        "data-ln-dictionary": { "type": "string", "description": "Име на речникот", "required": true }
+      },
+      "entry": {
+        "tag": "li",
+        "attributes": { "data-ln-dict-key": { "type": "string", "description": "Клуч на преводот/пораката", "required": true } }
+      }
+    },
+    "ln-search": {
+      "tag": "input",
+      "attributes": {
+        "data-ln-search": { "type": "string", "description": "ID на целниот елемент што се пребарува", "required": true },
+        "data-ln-search-items": { "type": "string", "default": "label", "description": "Полиња за пребарување" }
+      }
+    },
+    "ln-popover": {
+      "tag": "div",
+      "attributes": {
+        "data-ln-popover": { "type": "boolean", "description": "Маркер за Поповер контејнер", "required": true }
+      }
+    },
+    "ln-empty-state": {
+      "tag": "div",
+      "attributes": {
+        "data-ln-empty-state": { "type": "boolean", "description": "Маркер за празна состојба", "required": true }
+      }
+    },
+    "ln-stat-card": {
+      "tag": "article",
+      "attributes": {
+        "data-ln-stat-card": { "type": "boolean", "description": "Маркер за метричка картичка", "required": true }
+      }
+    },
+    "ln-stepper": {
+      "tag": "ol",
+      "attributes": {
+        "data-ln-stepper": { "type": "boolean", "description": "Маркер за stepper процес", "required": true }
+      }
+    },
+    "ln-upload": {
+      "tag": "div",
+      "attributes": {
+        "data-ln-upload": { "type": "boolean", "description": "Маркер за upload dropzone", "required": true },
+        "data-ln-upload-accept": { "type": "string", "description": "Дозволени типови фајлови" },
+        "data-ln-upload-max-size": { "type": "string", "description": "Максимална големина (на пр. 10MB)" }
+      }
+    },
+    "ln-timeline": {
+      "tag": "ul",
+      "attributes": {
+        "data-ln-timeline": { "type": "boolean", "description": "Маркер за хронолошка линија", "required": true }
+      }
+    }
+  }
+}
