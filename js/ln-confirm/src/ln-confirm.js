@@ -156,7 +156,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 	_component.prototype.destroy = function () {
 		_log('destroy called on', this.dom);
 		if (!this.dom[DOM_ATTRIBUTE]) return;
-		this._reset();
+		if (this.confirming) this._reset();
 		this.dom.removeEventListener('click', this._onClick);
 		delete this.dom[DOM_ATTRIBUTE];
 	};

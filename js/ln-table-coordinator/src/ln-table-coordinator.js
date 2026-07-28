@@ -44,6 +44,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 		const table = _findTargetTable(searchHost, tableId);
 
 		if (!table || !table.lnTable) return;
+		e.preventDefault();
 
 		// Value-mirror on search input if host contains input
 		const input = (searchHost.tagName === 'INPUT' || searchHost.tagName === 'TEXTAREA')
@@ -68,6 +69,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 		const key = e.detail.key;
 		const values = e.detail.values || [];
 		const filterHost = e.target;
+		if (!filterHost.hasAttribute || !filterHost.hasAttribute('data-ln-filter')) return;
 		const tableId = filterHost.getAttribute ? filterHost.getAttribute('data-ln-filter') : null;
 		const table = _findTargetTable(filterHost, tableId);
 

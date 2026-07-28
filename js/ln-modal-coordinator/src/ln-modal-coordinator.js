@@ -35,6 +35,20 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		return document.querySelector('[data-ln-modal]');
 	}
 
+	// Hash param for a modal open. Edit opens must carry a TRUTHY segment so
+	// foreign hashchanges never route them through the empty-param reset branch
+	// (which would wipe the edit fill). Prefer the real entity id
+	// (data-ln-fill-id) for a bookmarkable URL; fall back to the non-addressable
+	// marker 'edit' when the trigger fills inline with no id. New opens carry ''.
+	function _hashParamForOpen(mode, triggerEl) {
+		if (mode !== 'edit') return '';
+		if (triggerEl) {
+			const fillId = triggerEl.getAttribute('data-ln-fill-id');
+			if (fillId) return fillId;
+		}
+		return 'edit';
+	}
+
 	// Helper to reset all forms and display fields inside a modal panel
 	function _resetModalForm(modal) {
 		if (!modal) return;
@@ -109,6 +123,11 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 				if (current === 'open') {
 					dispatch(target, 'ln-modal:request-close', {});
 				} else {
+					// Restore per-open hash-write (pre-extraction invariant): every
+					// open leaves a URL segment so _syncHashModals never closes it.
+					if (target.id) {
+						hashSet(target.id, _hashParamForOpen(target.dataset.lnModalMode, trigger));
+					}
 					dispatch(target, 'ln-modal:request-open', {});
 				}
 			}
@@ -146,20 +165,27 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 
 	document.addEventListener('ln-modal:open', function (e) {
 		const modal = e.target;
-		if (!modal || !modal.lnModal) return;
+		if (!modal || !modal.lnModal || !modal.id) return;
 
-		if (modal.id) {
-			const param = hashGet(modal.id);
-			if (param) {
-				modal.dataset.lnModalMode = 'edit';
-				modal.dispatchEvent(new CustomEvent('ln-fill:request', {
-					bubbles: true,
-					detail: { id: param }
-				}));
-			} else if (param === '') {
-				modal.dataset.lnModalMode = 'new';
-				_resetModalForm(modal);
-			}
+		let param = hashGet(modal.id);
+
+		// Non-trigger opens (programmatic / SSR-via-mutation) reach here with no
+		// segment — adopt one so foreign hashchanges never close the modal.
+		// Trigger opens already wrote their segment, so this is skipped for them.
+		if (param === null) {
+			param = _hashParamForOpen(modal.dataset.lnModalMode, null);
+			hashSet(modal.id, param);
+		}
+
+		if (param) {
+			modal.dataset.lnModalMode = 'edit';
+			modal.dispatchEvent(new CustomEvent('ln-fill:request', {
+				bubbles: true,
+				detail: { id: param }
+			}));
+		} else {
+			modal.dataset.lnModalMode = 'new';
+			_resetModalForm(modal);
 		}
 	});
 
@@ -233,14 +259,34 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		}
 	}
 
+	// SSR modals authored data-ln-modal="open" never pass through a trigger or
+	// hash anchor, so they carry no URL segment. Adopt them into the hash BEFORE
+	// the first sync, so _syncHashModals sees them present and keeps them open
+	// instead of closing them as a phantom back-navigation. Skips modals that
+	// already have a segment (e.g. an SSR deep-link URL).
+	function _adoptOpenModals() {
+		const openModals = document.querySelectorAll('[data-ln-modal="open"][id]');
+		for (let i = 0; i < openModals.length; i++) {
+			const modal = openModals[i];
+			if (!modal.lnModal) continue;
+			if (hashGet(modal.id) !== null) continue;
+			hashSet(modal.id, _hashParamForOpen(modal.dataset.lnModalMode, null));
+		}
+	}
+
 	window.addEventListener('hashchange', _syncHashModals);
+
+	function _bootSync() {
+		_adoptOpenModals();
+		_syncHashModals();
+	}
 
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', function () {
-			setTimeout(_syncHashModals, 0);
+			setTimeout(_bootSync, 0);
 		});
 	} else {
-		setTimeout(_syncHashModals, 0);
+		setTimeout(_bootSync, 0);
 	}
 
 	// ─── Form Submission Auto-Close Mediation ────────────────
