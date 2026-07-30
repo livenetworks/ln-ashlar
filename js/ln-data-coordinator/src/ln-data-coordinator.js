@@ -1,5 +1,6 @@
 import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod } from '../../ln-core';
 import { normalizeDataQuery, selectDataSource } from './data-read-policy';
+import { MutationReceipts } from './mutation-receipts';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-coordinator';
@@ -37,7 +38,7 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 			_coordinators.forEach(function (coord) {
 				const children = coord.findChildren();
 				const store = children.store;
-				if (store && children.connector && store.isInitialized && !store.isSyncing && !coord._noAutosync && (!store.hasCache || coord._isStale())) {
+				if (store && children.connector && store.isInitialized && !store.initializationError && !store.isSyncing && !coord._noAutosync && (!store.hasCache || coord._isStale())) {
 					store.forceSync();
 				}
 			});
@@ -91,6 +92,7 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 		this._handlers = null;
 		this._boundQueries = new WeakMap();
 		this._boundDelivered = new WeakMap();
+		this._mutationReceipts = new MutationReceipts();
 		this._dict = buildDict(dom, 'data-ln-data-coordinator-dict'); // flat key→string error-toast map; {} if none
 
 		this._parseStaleAttributes();
@@ -134,7 +136,7 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 	_component.prototype._maybeSync = function () {
 		const children = this.findChildren();
 		const store = children.store;
-		if (!store || !children.connector || this._noAutosync) return;
+		if (!store || store.initializationError || !children.connector || this._noAutosync) return;
 		if (!store.isInitialized || store.isSyncing) return;
 		if (!store.hasCache || this._isStale()) store.forceSync();
 	};
@@ -150,6 +152,10 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 		Promise.resolve(store.ready).then(function () {
 			const children = self.findChildren();
 			const currentStore = children.store;
+			if (currentStore && currentStore.initializationError) {
+				self._reportReconciliationError('store-initialize', currentStore.initializationError, null);
+				return;
+			}
 			if (!currentStore || !children.connector || self._noAutosync || currentStore.isSyncing) return;
 			if (!currentStore.hasCache || self._isStale()) currentStore.forceSync();
 		}).catch(function (error) {
@@ -330,42 +336,13 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 		if (!storeEl) return Promise.reject(new Error('Store element not found'));
 
 		const requestId = _uuid();
-		const successEvent = action === 'update'
-			? 'ln-data-store:updated'
-			: action === 'create'
-				? 'ln-data-store:created'
-				: 'ln-data-store:deleted';
-
-		return new Promise((resolve, reject) => {
-			let timer = null;
-
-			const cleanup = function () {
-				storeEl.removeEventListener(successEvent, onSuccess);
-				storeEl.removeEventListener('ln-data-store:mutation-error', onError);
-				if (timer) clearTimeout(timer);
-			};
-
-			const onSuccess = function (event) {
-				if (!event.detail || event.detail.requestId !== requestId) return;
-				cleanup();
-				resolve(event.detail);
-			};
-
-			const onError = function (event) {
-				if (!event.detail || event.detail.requestId !== requestId) return;
-				cleanup();
-				reject(event.detail.error || new Error('Store mutation failed'));
-			};
-
-			storeEl.addEventListener(successEvent, onSuccess);
-			storeEl.addEventListener('ln-data-store:mutation-error', onError);
-			timer = setTimeout(function () {
-				cleanup();
-				reject(new Error('Store mutation timed out'));
-			}, 30000);
-
+		const receipt = this._mutationReceipts.wait(requestId);
+		try {
 			dispatch(storeEl, 'ln-data-store:request-' + action, Object.assign({}, detail, { requestId }));
-		});
+		} catch (error) {
+			this._mutationReceipts.reject({ requestId, error });
+		}
+		return receipt;
 	};
 
 	_component.prototype._reportReconciliationError = function (operation, error, meta) {
@@ -509,7 +486,7 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 				const normalizedData = fetchedRecords.map(r => self.mapper.ingress(r));
 
 				// 1. Pass fetched remote data strictly to ln-data-store (Single Source of Truth)
-				if (children.store) {
+				if (children.store && !children.store.initializationError) {
 					children.store.applySync(normalizedData, deletedIds, syncedAt || Math.floor(Date.now() / 1000), {
 						total: e.detail.total,
 						filtered: e.detail.filtered,
@@ -518,6 +495,25 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 						targetEl: meta.targetEl,
 						kind: meta.kind
 					});
+				} else if (meta.targetEl && meta.kind) {
+					if (meta.kind === 'table' || meta.kind === 'list') {
+						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
+						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', {
+							data: normalizedData,
+							total: e.detail.total !== undefined ? e.detail.total : normalizedData.length,
+							filtered: e.detail.filtered !== undefined ? e.detail.filtered : normalizedData.length,
+							offset: e.detail.offset,
+							queryGen: e.detail.queryGen
+						});
+						self._boundDelivered.set(meta.targetEl, true);
+					} else if (meta.kind === 'options') {
+						dispatch(meta.targetEl, 'ln-options:set-data', { data: normalizedData });
+					} else if (meta.kind === 'stat') {
+						const count = e.detail.filtered !== undefined
+							? e.detail.filtered
+							: (e.detail.total !== undefined ? e.detail.total : normalizedData.length);
+						dispatch(meta.targetEl, 'ln-stat:set-count', { count: count });
+					}
 				}
 			},
 
@@ -668,7 +664,7 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 			storeInitialized: function (e) {
 				const children = self.findChildren();
 				const store = children.store;
-				if (!store || !children.connector || self._noAutosync || store.isSyncing) return;
+				if (!store || store.initializationError || !children.connector || self._noAutosync || store.isSyncing) return;
 
 				const detail = e.detail || {};
 				if (!detail.hasCache) {
@@ -683,7 +679,13 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 			reqListData:  function (e) { self._serveData(e, 'list'); },
 			reqOptions:   function (e) { self._serveOptions(e); },
 			reqStat:      function (e) { self._serveStat(e); },
-			refresh:      function ()  { self._refreshAll(); },
+			refresh: function (e) {
+				self._mutationReceipts.resolve(e.detail);
+				self._refreshAll();
+			},
+			mutationError: function (e) {
+				self._mutationReceipts.reject(e.detail);
+			},
 			refreshSynced: function (e) {
 				if (e.detail && e.detail.changed) self._refreshAll(e.detail.meta);
 			}
@@ -731,6 +733,7 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 		self.dom.addEventListener('ln-data-store:created', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:updated', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:deleted', self._handlers.refresh);
+		self.dom.addEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
 		self.dom.addEventListener('ln-data-store:synced',  self._handlers.refreshSynced);
 	}
 
@@ -804,9 +807,26 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 		const name = el.getAttribute('data-ln-options');
 		if (!this._ownsStore(name)) return;
 
-		const store = this.findChildren().store;
-		store.getAll({}).then(function (r) {
-			dispatch(el, 'ln-options:set-data', { data: r.data });
+		const children = this.findChildren();
+		const store = children.store;
+		const ready = store && store.ready ? store.ready : Promise.resolve();
+		const self = this;
+
+		return ready.then(function () {
+			const source = selectDataSource(store, children.connector, false);
+			if (source === 'remote') {
+				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+					query: {},
+					meta: { targetEl: el, kind: 'options' }
+				});
+				return;
+			}
+			if (source !== 'store') return;
+			return store.getAll({}).then(function (r) {
+				dispatch(el, 'ln-options:set-data', { data: r.data });
+			});
+		}).catch(function (error) {
+			self._reportReconciliationError('options-query', error, { targetEl: el, kind: 'options' });
 		});
 	};
 
@@ -815,10 +835,27 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 		const name = el.getAttribute('data-ln-stat');
 		if (!this._ownsStore(name)) return;
 
-		const filters = e.detail.filters || null;
-		const store = this.findChildren().store;
-		store.count(filters).then(function (n) {
-			dispatch(el, 'ln-stat:set-count', { count: n });
+		const filters = e.detail && e.detail.filters ? e.detail.filters : null;
+		const children = this.findChildren();
+		const store = children.store;
+		const ready = store && store.ready ? store.ready : Promise.resolve();
+		const self = this;
+
+		return ready.then(function () {
+			const source = selectDataSource(store, children.connector, false);
+			if (source === 'remote') {
+				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+					query: { filters: filters },
+					meta: { targetEl: el, kind: 'stat' }
+				});
+				return;
+			}
+			if (source !== 'store') return;
+			return store.count(filters).then(function (n) {
+				dispatch(el, 'ln-stat:set-count', { count: n });
+			});
+		}).catch(function (error) {
+			self._reportReconciliationError('stat-query', error, { targetEl: el, kind: 'stat' });
 		});
 	};
 
@@ -931,6 +968,7 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 			self.dom.removeEventListener('ln-data-store:created', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:updated', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:deleted', self._handlers.refresh);
+			self.dom.removeEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
 			self.dom.removeEventListener('ln-data-store:synced',  self._handlers.refreshSynced);
 
 			self._handlers = null;
@@ -938,6 +976,8 @@ import { normalizeDataQuery, selectDataSource } from './data-read-policy';
 
 		self._boundQueries = null;
 		self._boundDelivered = null;
+		self._mutationReceipts.close(new Error('Data coordinator destroyed'));
+		self._mutationReceipts = null;
 
 		_coordinators.delete(this);
 		_uninstallGlobalSync();

@@ -11,7 +11,8 @@ export function normalizeDataQuery(detail) {
 }
 
 export function selectDataSource(store, connector, isWindowed) {
-	if (connector && (isWindowed || !store || !store.isLoaded)) return 'remote';
-	if (store) return 'store';
+	const storeUnavailable = !store || !!store.initializationError;
+	if (connector && (isWindowed || storeUnavailable || !store.isLoaded)) return 'remote';
+	if (store && !store.initializationError) return 'store';
 	return 'none';
 }

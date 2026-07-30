@@ -203,6 +203,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 		this.isLoaded = false;
 		this.isInitialized = false;
+		this.initializationError = null;
 		this.hasCache = false;
 		this.isSyncing = false;
 		this.lastSyncedAt = null;
@@ -242,7 +243,11 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 	function _queueMutation(self, action, detail, operation) {
 		const requestId = detail && detail.requestId;
 		self._mutationChain = self._mutationChain
-			.then(operation)
+			.then(() => self.ready)
+			.then(() => {
+				if (self.initializationError) throw self.initializationError;
+				return operation();
+			})
 			.catch(error => _mutationError(self, action, requestId, error));
 		return self._mutationChain;
 	}
@@ -305,7 +310,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 	function _handleBulkDeleteRequest(self, { ids = [], requestId } = {}) {
 		if (!ids.length) {
 			dispatch(self.dom, 'ln-data-store:deleted', { store: self._name, ids: [], requestId });
-			return;
+			return Promise.resolve();
 		}
 
 		return Promise.all(ids.map(id => _getRecord(self._name, id))).then(records => {
@@ -330,7 +335,11 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 	// ─── Initialization ────────────────────────────────────
 
 	function _initStore(self) {
-		return _openDatabase().then(() => _getMeta(self._name)).then(meta => {
+		return _openDatabase().then(db => {
+			if (!db) throw new Error('IndexedDB is unavailable');
+			return _getMeta(self._name);
+		}).then(meta => {
+			self.initializationError = null;
 			if (meta && meta.schema_version === SCHEMA_VERSION) {
 				self.lastSyncedAt = meta.last_synced_at || null;
 				self.totalCount = meta.record_count || 0;
@@ -358,8 +367,12 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 			}
 		}).catch(error => {
 			self.isInitialized = true;
+			self.isLoaded = false;
+			self.hasCache = false;
+			self.isSyncing = false;
+			self.initializationError = error;
 			dispatch(self.dom, 'ln-data-store:initialization-error', { store: self._name, error });
-			throw error;
+			return { ok: false, error };
 		});
 	}
 
@@ -637,6 +650,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 			Object.values(_stores).forEach(inst => {
 				inst.isLoaded = false;
 				inst.isInitialized = false;
+				inst.initializationError = null;
 				inst.hasCache = false;
 				inst.isSyncing = false;
 				inst.lastSyncedAt = null;

@@ -118,6 +118,15 @@ a 60-second lease; another queue instance or a repeated drain sees the lease
 and cannot dispatch the same entry. If a tab crashes, the entry becomes
 claimable again after `leaseUntil`.
 
+Claim safety also applies when multiple tabs overlap: IndexedDB read/write
+transactions serialize claims against the shared database, so mutual exclusion
+does not depend on `BroadcastChannel`. `leaseOwner` identifies the queue
+instance that owns the current claim; `leaseUntil` provides crash recovery.
+This is not a cross-tab worker-pool contract: each instance immediately drains
+its own enqueues, while another already-open tab may discover work only on an
+existing drain trigger. Cross-tab messaging may be added later as a discovery
+latency optimization, but it is not the correctness mechanism.
+
 ---
 
 ## Drain-on-Init

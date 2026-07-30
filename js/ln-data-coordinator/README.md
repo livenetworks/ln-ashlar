@@ -311,9 +311,12 @@ described above (no `confirmMutation`):
 | op | success → store | success → queue command |
 |---|---|---|
 | create | Correlated `ln-data-store:request-update { id: meta.tempId, data: ingress(record), requestId }` (id-swap); wait for matching `updated` | `resolve-create {entryId, oldKey:meta.tempId, newId:record.id}` (atomic remap + ack) |
-| update | `ln-data-store:request-update { id: meta.id, data: ingress(record) }` | `ack {entryId}` |
+| update | Correlated `ln-data-store:request-update { id: meta.id, data: ingress(record), requestId }`; wait for matching `updated` | `ack {entryId}` |
 | delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
 | bulk-delete | — (optimistic delete already applied, no reconciliation) | `ack {entryId}` |
+
+After create remap, the queue entry's `targetId` is the authoritative transport
+identity. The coordinator does not fall back to a possibly stale `meta.id`.
 
 > Remap also rewrites `meta.action` if it contains the old key as a
 > substring (string replace) — keeps a persisted per-record URL in sync
@@ -326,6 +329,12 @@ Create resolution waits for the correlated store update before advancing the
 outbox. `resolve-create` then deletes the create entry and remaps all queued
 siblings in one IndexedDB transaction, so no sibling can advance with the
 stale temp id.
+
+Correlated mutations use one coordinator-owned receipt registry keyed by
+`requestId`. Store post-events settle the matching receipt through the normal
+bubbling event protocol. There are no per-request listeners or fixed timeouts:
+a slow but successful IndexedDB transaction can still acknowledge its queue
+entry, while coordinator teardown rejects all outstanding receipts.
 
 Every queued transport request carries `Idempotency-Key: <entryId>` through
 the connector. Delivery remains at-least-once after a crash; a server that
@@ -446,6 +455,10 @@ The coordinator — not the store — decides WHEN to sync:
   `visibilitychange` (tab visible again), for each coordinator whose store
   is stale: `store.forceSync()`.
 
+If IndexedDB initialization fails, the coordinator does not start a cache sync.
+The store exposes the failure as `initializationError`, and connector-backed
+view reads use the remote source directly.
+
 **New attributes:**
 
 | Attribute | Description |
@@ -499,8 +512,11 @@ Presenters (`store.setPresenters({computed})`) are registered once per store; co
 
 The binder awaits `store.ready` before choosing a source. Loaded non-windowed
 reads use the local store; an empty local-only store is also a valid source and
-returns `[]`. Windowed reads and connector-backed stores without a loaded cache
-route remote. Query failures clear loading and emit
+returns `[]`. Windowed reads, connector-backed stores without a loaded cache,
+and stores with `initializationError` route remote. When IndexedDB is
+unavailable, table/list/options/stat responses are delivered directly to the
+requesting view instead of being forced through the failed store. Query
+failures clear loading and emit
 `ln-data-coordinator:error {operation:'query', kind, store, target, error}`.
 
 ### Refresh trigger

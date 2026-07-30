@@ -140,6 +140,16 @@ store.dispatchEvent(new CustomEvent('ln-data-store:request-bulk-delete', {
 }));
 ```
 
+Every mutation command may include an opaque `requestId`. The store serializes
+the write, persists record-count metadata, and then echoes that id on exactly
+one terminal notification: `created` / `updated` / `deleted`, or
+`mutation-error`. The protocol has no wall-clock timeout; lifecycle owners must
+cancel their own pending receipts when they are destroyed.
+
+An empty bulk-delete is an explicit no-op: it returns a resolved mutation,
+emits `deleted {ids: []}`, and does not rewrite record-count metadata because
+no local state changed.
+
 ---
 
 ### Notifications (Emitted by the Store)
@@ -149,11 +159,12 @@ These events bubble up and can be listened to by coordinators or rendering views
 | Event | `e.detail` payload | Description |
 |---|---|---|
 | `ln-data-store:initialized` | `{ store, hasCache, lastSyncedAt, count }` | Emitted once after IndexedDB connection opens. The instance's `ready` promise resolves after this state is committed. |
+| `ln-data-store:initialization-error` | `{ store, error }` | IndexedDB could not be initialized. `ready` still resolves after `initializationError` is set, allowing a coordinator to route reads to its connector. |
 | `ln-data-store:ready` | `{ store, count, source }` | Emitted when data is ready. `source` is `'cache'` (init) or `'server'` (first sync). |
 | `ln-data-store:loaded` | `{ store, count }` | Emitted on initial load sync completion (first sync). |
-| `ln-data-store:created` | `{ store, record, tempId }` | Emitted after optimistic creation. |
-| `ln-data-store:updated` | `{ store, record, previous }` | Emitted after optimistic update or id-swap rekey. |
-| `ln-data-store:deleted` | `{ store, id \| ids }` | Emitted after optimistic delete or bulk delete. |
+| `ln-data-store:created` | `{ store, record, tempId, requestId? }` | Emitted after optimistic creation. |
+| `ln-data-store:updated` | `{ store, record, previous, requestId? }` | Emitted after optimistic update or id-swap rekey. |
+| `ln-data-store:deleted` | `{ store, id \| ids, requestId? }` | Emitted after optimistic delete or bulk delete. |
 | `ln-data-store:synced` | `{ store, added, deleted, changed }` | Emitted after subsequent delta sync merges. |
 | `ln-data-store:sync-error` | `{ store, error, status }` | A connector sync failed; `isSyncing` has been cleared so online/visibility retry can proceed. |
 | `ln-data-store:destroyed` | `{ store }` | Emitted when the store instance is destroyed. |
@@ -191,7 +202,8 @@ The page holds one `IDBDatabase` connection (`ln_app_cache`) shared by every `[d
 ### Instance state
 
 `storeEl.lnDataStore` carries `ready` (initialization promise),
-`isInitialized` (metadata inspection completed), `hasCache` (a local snapshot
+`isInitialized` (metadata inspection completed), `initializationError` (the
+IndexedDB failure, or `null`), `hasCache` (a local snapshot
 exists, including an intentionally empty snapshot), `isLoaded` (the snapshot
 is queryable), `isSyncing` (a remote-sync request is outstanding — set when
 the store emits `ln-data-store:request-remote-sync`, cleared on `applySync`),
@@ -200,9 +212,17 @@ the store emits `ln-data-store:request-remote-sync`, cleared on `applySync`),
 `totalCount`.
 
 Local mutations are serialized per store instance. After the record write,
-the store recounts and persists `_meta` before emitting the post-event.
+the store recounts and persists `_meta` before emitting the post-event. The
+mutation chain waits for `ready`; an unavailable store emits `mutation-error`
+instead of reporting a no-op write as successful.
 Reconciliation commands may include a `requestId`; the same id is returned on
 `created`/`updated`/`deleted` or `mutation-error`.
+
+`hasCache` is deliberately not derived from `record_count`. A synchronized or
+optimistically-mutated snapshot with zero rows is still authoritative local
+state; treating it as "no cache" would allow a remote query to resurrect rows
+that were just deleted. Only initialization without metadata, schema reset,
+`clearAll`, and `fullReload` transition the instance back to no-snapshot state.
 
 ### Encryption pipeline
 
