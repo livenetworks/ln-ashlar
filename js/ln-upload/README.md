@@ -221,7 +221,7 @@ Source: `js/ln-upload/ln-upload.js`. Each container has a closure-scoped `upload
 
 ### Init
 
-`_initUpload(container)`, guarded by `data-ln-upload-initialized` against double-init. `_ensureDefaultItemTemplate()` runs once per init and injects the default `<template>` into `<body>` if no `[data-ln-template="ln-upload-item"]` exists anywhere in the document (see template lookup order above). A hidden `<input type="file" multiple>` is created if none exists inside the container.
+`_initUpload(container)`, guarded by `container.lnUploadAPI` against double-init. `_ensureDefaultItemTemplate()` runs once per init and injects the default `<template>` into `<body>` if no `[data-ln-template="ln-upload-item"]` exists anywhere in the document (see template lookup order above). A hidden `<input type="file" multiple>` is created if none exists inside the container.
 
 ### `addFile(file)` flow
 

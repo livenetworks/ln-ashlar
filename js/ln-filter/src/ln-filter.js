@@ -5,7 +5,6 @@ import { persistGet, persistSet } from '../../ln-core';
 (function () {
 	const DOM_SELECTOR = 'data-ln-filter';
 	const DOM_ATTRIBUTE = 'lnFilter';
-	const INIT_ATTR = 'data-ln-filter-initialized';
 	const KEY_ATTR = 'data-ln-filter-key';
 	const VALUE_ATTR = 'data-ln-filter-value';
 	const HIDE_ATTR = 'data-ln-filter-hide';
@@ -94,8 +93,6 @@ import { persistGet, persistSet } from '../../ln-core';
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
-		if (dom.hasAttribute(INIT_ATTR)) return this;
-
 		this.dom = dom;
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
 
@@ -414,7 +411,6 @@ import { persistGet, persistSet } from '../../ln-core';
 			}
 			delete input[DOM_ATTRIBUTE + 'Bound'];
 		});
-		this.dom.removeAttribute(INIT_ATTR);
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 

@@ -24,8 +24,6 @@ The host element must be empty at init — the constructor `appendChild`s the SV
 | `data-ln-circular-progress-max="N"` | host element | Maximum value. Default `100`. Used as denominator in `(value / max) × 100`. `max="0"` forces 0% (avoids divide-by-zero). |
 | `data-ln-circular-progress-label="text"` | host element | Custom centre label, replaces the auto-computed percentage. Fully observed and reactive — mutating this attribute alone triggers an immediate re-render and updates the centre text and `aria-valuetext`. |
 
-`data-ln-circular-progress-initialized=""` is set by the constructor and removed by `destroy()`. It is an internal marker — do not read it from project code; use `el.lnCircularProgress` instead.
-
 **Size variants** — apply a class to the host: `.sm` (2.5 rem), default (4 rem), `.lg` (6 rem), `.xl` (8 rem). Each rebinds the label font-size.
 
 **Colour variants** — `.success`, `.warning`, `.error` override the fill stroke via `scss/components/_circular-progress.scss`. The default fill reads `--color-accent` and follows the active theme.
@@ -73,7 +71,7 @@ The component sets `aria-hidden="true"` on the constructed `<svg>` — screen re
 | `trackCircle` | `SVGCircleElement` | Background circle (stroke = `--color-border`) |
 | `progressCircle` | `SVGCircleElement` | Fill circle — `stroke-dashoffset` carries the progress |
 | `labelEl` | `HTMLElement` | The `<strong>` element holding the percentage or custom label text |
-| `destroy()` | method | Disconnects the attribute observer, removes the SVG and label from DOM, removes `data-ln-circular-progress-initialized`, deletes `el.lnCircularProgress`. Leaves the value attribute, colour class, and size class in place — setting the value attribute again re-instantiates. |
+| `destroy()` | method | Disconnects the attribute observer, removes the SVG and label from DOM, deletes `el.lnCircularProgress`. Leaves the value attribute, colour class, and size class in place — setting the value attribute again re-instantiates. |
 
 `window.lnCircularProgress(root)` re-runs the init scan over `root`. The shared `registerComponent` observer already covers AJAX inserts; call this manually only for Shadow DOM roots or foreign documents the observer cannot reach.
 
@@ -164,7 +162,7 @@ Fixed module-level constants: `VIEW_SIZE = 36`, `RADIUS = 16`, `CIRCUMFERENCE = 
 
 ### Destroy
 
-Disconnects the attribute observer, removes the SVG and label nodes, removes the ARIA attributes it added, deletes `data-ln-circular-progress-initialized`. Leaves the value attribute and any classes in place — a later write to the value attribute re-triggers `registerComponent`'s shared observer and rebuilds the instance from scratch (`_buildSvg` is not idempotent; it always appends new nodes).
+Disconnects the attribute observer, removes the SVG and label nodes, removes the ARIA attributes it added, deletes `el.lnCircularProgress`. Leaves the value attribute and any classes in place — a later write to the value attribute re-triggers `registerComponent`'s shared observer and rebuilds the instance from scratch (`_buildSvg` is not idempotent; it always appends new nodes).
 
 ---
 

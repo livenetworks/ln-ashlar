@@ -21,7 +21,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 		_buildSvg.call(this);
 		_render.call(this);
 		_listenValues.call(this);
-		dom.setAttribute('data-ln-circular-progress-initialized', '');
 		return this;
 	}
 
@@ -36,7 +35,6 @@ import { dispatch, registerComponent } from '../../ln-core';
 		if (this.labelEl) {
 			this.labelEl.remove();
 		}
-		this.dom.removeAttribute('data-ln-circular-progress-initialized');
 		this.dom.removeAttribute('role');
 		this.dom.removeAttribute('aria-valuemin');
 		this.dom.removeAttribute('aria-valuemax');

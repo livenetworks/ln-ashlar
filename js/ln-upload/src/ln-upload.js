@@ -58,8 +58,7 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../..
 	}
 
 	function _initUpload(container) {
-		if (container.hasAttribute('data-ln-upload-initialized')) return;
-		container.setAttribute('data-ln-upload-initialized', 'true');
+		if (container.lnUploadAPI) return;
 
 		_ensureDefaultItemTemplate();
 		const dict = buildDict(container, DICT_SELECTOR);
@@ -365,7 +364,6 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../..
 				uploadedFiles.clear();
 				list.innerHTML = '';
 				updateHiddenInput();
-				container.removeAttribute('data-ln-upload-initialized');
 				delete container.lnUploadAPI;
 			}
 		};

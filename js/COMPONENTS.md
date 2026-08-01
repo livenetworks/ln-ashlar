@@ -554,7 +554,7 @@ Do NOT standardize to one pattern — each exists for architectural reasons.
 | DOM instance | `element.ln{Name}` | `el.lnToggle` |
 | Custom event | `ln-{name}:{action}` | `ln-toggle:open` |
 | CSS class | `.ln-{name}__{element}` | `.ln-toggle__backdrop` |
-| Initialized flag | `data-ln-{name}-initialized` | `data-ln-toggle-for-initialized` |
+| Initialized flag | `element.ln{Name}` | `el.lnToggle` |
 | Private function | `_functionName` | `_render`, `_attachTriggers` |
 
 ---

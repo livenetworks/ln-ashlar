@@ -1,1955 +1,1922 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "ln-ashlar Declarative Attributes Schema Catalog",
-  "description": "Machine-readable JSON schema catalog of all real data-ln-* attributes across ln-ashlar components for AI models.",
-  "components": {
-    "ln-core": {
-      "element": {
-        "recommended_tag": "any",
-        "tag_enforced": false,
-        "note": "Universal DOM helpers (fill, fillTemplate, renderList, buildDict, debug) consumed globally across components."
-      },
-      "attributes": {
-        "data-ln-field": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Binds DOM textContent to a property key during fill() or fillTemplate() rendering."
-        },
-        "data-ln-attr": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Binds element attributes dynamically during fill() rendering (e.g. 'href:url,title:name')."
-        },
-        "data-ln-show": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Evaluates boolean visibility condition during fill() rendering, showing/hiding element."
-        },
-        "data-ln-class": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Toggles CSS classes dynamically during fill() rendering (e.g. 'active:isActive,hidden:isPending')."
-        },
-        "data-ln-template": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Declares template name on <template> elements for cloneTemplate() instantiation."
-        },
-        "data-ln-value": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Provides raw machine-readable data value for text elements (e.g. unformatted numbers or dates)."
-        },
-        "data-ln-fill-as": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Aliases record field name to match different form input name during fill()."
-        },
-        "data-ln-fillable": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Opt-in marker for elements allowed to receive auto-fill data."
-        },
-        "data-ln-key": {
-          "type": "string",
-          "read_by": "ln-core",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Identifies item key property for DOM element reuse in renderList()."
-        },
-        "data-ln-persist": {
-          "type": "string",
-          "read_by": "ln-persist",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Storage key for persisting state in LocalStorage/SessionStorage."
-        },
-        "data-ln-debug": {
-          "type": "boolean",
-          "read_by": "ln-debug",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Enables verbose console logging for component lifecycle events."
-        }
-      }
-    },
-    "ln-accordion": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "Container for collapsible accordion panels."
-      },
-      "attributes": {
-        "data-ln-accordion": {
-          "type": "string",
-          "read_by": "ln-accordion",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes the accordion container."
-        }
-      }
-    },
-    "ln-ajax": {
-      "element": {
-        "recommended_tag": "form",
-        "tag_enforced": false,
-        "note": "Can be attached to form or container element for async fetch handling."
-      },
-      "attributes": {
-        "data-ln-ajax": {
-          "type": "string",
-          "read_by": "ln-ajax",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Activates AJAX submit interception and response handling."
-        },
-        "data-ln-form-scope": {
-          "type": "string",
-          "read_by": "ln-ajax",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Form resource scope for AJAX submission routing."
-        }
-      }
-    },
-    "ln-api-connector": {
-      "element": {
-        "recommended_tag": "ul",
-        "tag_enforced": false,
-        "note": "Stateless REST API driver. Recommended as hidden <li> inside coordinator <ul>."
-      },
-      "attributes": {
-        "data-ln-api-connector": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Initializes API connector driver; optional value sets resource path directly."
-        },
-        "data-ln-api-base-url": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Base HTTP address of backend API endpoint."
-        },
-        "data-ln-api-path": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Resource endpoint path."
-        },
-        "data-ln-api-headers": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "JSON string of custom HTTP headers for requests."
-        },
-        "data-ln-api-param-offset": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "URL query param key for pagination offset (default: 'offset')."
-        },
-        "data-ln-api-param-limit": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "URL query param key for page size limit (default: 'limit')."
-        },
-        "data-ln-api-param-search": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "URL query param key for search term (default: 'search')."
-        },
-        "data-ln-api-param-sort-field": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "URL query param key for sort field name (default: 'sort_field')."
-        },
-        "data-ln-api-param-sort-dir": {
-          "type": "string",
-          "read_by": "ln-api-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "URL query param key for sort direction (default: 'sort_dir')."
-        }
-      }
-    },
-    "ln-api-queue": {
-      "element": {
-        "recommended_tag": "li",
-        "tag_enforced": false,
-        "note": "Offline write queue child element under ln-data-coordinator."
-      },
-      "attributes": {
-        "data-ln-api-queue": {
-          "type": "string",
-          "read_by": "ln-api-queue",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes offline API queue manager."
-        },
-        "data-ln-api-queue-online": {
-          "type": "string",
-          "enum": [
-            "true",
-            "false"
-          ],
-          "read_by": "ln-api-queue",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "Reflected state attribute set by JS indicating network/queue sync state."
-        }
-      }
-    },
-    "ln-autoresize": {
-      "element": {
-        "recommended_tag": "textarea",
-        "tag_enforced": false,
-        "note": "Applies to textarea elements for dynamic height expansion."
-      },
-      "attributes": {
-        "data-ln-autoresize": {
-          "type": "boolean",
-          "read_by": "ln-autoresize",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Enables auto-resizing height on input."
-        }
-      }
-    },
-    "ln-autosave": {
-      "element": {
-        "recommended_tag": "form",
-        "tag_enforced": false,
-        "note": "Attached to forms or inputs for automated local storage draft saving."
-      },
-      "attributes": {
-        "data-ln-autosave": {
-          "type": "string",
-          "read_by": "ln-autosave",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Initializes form draft auto-saving with given storage key."
-        },
-        "data-ln-autosave-clear": {
-          "type": "boolean",
-          "read_by": "ln-autosave",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Clears saved draft state when clicked."
-        },
-        "data-ln-autosave-debounce-input": {
-          "type": "number",
-          "read_by": "ln-autosave",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Debounce delay in ms for input autosave (default: 500)."
-        },
-        "data-ln-autosave-exclude": {
-          "type": "boolean",
-          "read_by": "ln-autosave",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Excludes specific form input control from draft storage."
-        }
-      }
-    },
-    "ln-circular-progress": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "SVG circular progress indicator."
-      },
-      "attributes": {
-        "data-ln-circular-progress": {
-          "type": "number",
-          "read_by": "ln-circular-progress",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Current numeric value for circular progress rendering."
-        },
-        "data-ln-circular-progress-initialized": {
-          "type": "string",
-          "enum": [
-            "true"
-          ],
-          "read_by": "ln-circular-progress",
-          "consumed_by": "js",
-          "role": "state",
-          "description": "State flag set by JS to prevent double initialization."
-        },
-        "data-ln-circular-progress-max": {
-          "type": "number",
-          "read_by": "ln-circular-progress",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Maximum value scale limit (default: 100)."
-        },
-        "data-ln-circular-progress-label": {
-          "type": "string",
-          "read_by": "ln-circular-progress",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Accessible label or custom format string."
-        }
-      }
-    },
-    "ln-confirm": {
-      "element": {
-        "recommended_tag": "button",
-        "tag_enforced": false,
-        "note": "In-place two-step confirmation button for single low-impact actions."
-      },
-      "attributes": {
-        "data-ln-confirm": {
-          "type": "string",
-          "read_by": "ln-confirm",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Confirmation prompt text displayed on first click."
-        },
-        "data-ln-confirm-timeout": {
-          "type": "number",
-          "read_by": "ln-confirm",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Timeout in ms before active confirmation resets to idle (default: 3000)."
-        },
-        "data-ln-confirm-idle": {
-          "type": "string",
-          "read_by": "ln-confirm",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Original button text restored after timeout."
-        },
-        "data-ln-confirm-active": {
-          "type": "string",
-          "read_by": "ln-confirm",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Confirmation step button label."
-        }
-      }
-    },
-    "ln-couchdb-connector": {
-      "element": {
-        "recommended_tag": "li",
-        "tag_enforced": false,
-        "note": "CouchDB database driver child element under ln-data-coordinator."
-      },
-      "attributes": {
-        "data-ln-couchdb-connector": {
-          "type": "string",
-          "read_by": "ln-couchdb-connector",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes CouchDB connector driver."
-        },
-        "data-ln-couchdb-url": {
-          "type": "string",
-          "read_by": "ln-couchdb-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "CouchDB server base URL."
-        },
-        "data-ln-couchdb-db": {
-          "type": "string",
-          "read_by": "ln-couchdb-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "CouchDB database name."
-        },
-        "data-ln-couchdb-auth": {
-          "type": "string",
-          "read_by": "ln-couchdb-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Authentication mode or basic auth token."
-        },
-        "data-ln-couchdb-headers": {
-          "type": "string",
-          "read_by": "ln-couchdb-connector",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "JSON string of HTTP headers for CouchDB requests."
-        }
-      }
-    },
-    "ln-data-coordinator": {
-      "element": {
-        "recommended_tag": "ul",
-        "tag_enforced": false,
-        "note": "Layer 2 data coordinator parent element binding store, connector, and queue."
-      },
-      "attributes": {
-        "data-ln-data-coordinator": {
-          "type": "string",
-          "read_by": "ln-data-coordinator",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Initializes data coordinator and names entity namespace."
-        },
-        "data-ln-data-coordinator-dict": {
-          "type": "string",
-          "read_by": "ln-data-coordinator",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Selector for hidden i18n error toast message dictionary."
-        },
-        "data-ln-data-coordinator-stale": {
-          "type": "number",
-          "read_by": "ln-data-coordinator",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Stale cache duration threshold in seconds."
-        },
-        "data-ln-data-coordinator-no-autosync": {
-          "type": "boolean",
-          "read_by": "ln-data-coordinator",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Disables automatic background polling and tab visibility sync."
-        },
-        "data-ln-data-mapper": {
-          "type": "string",
-          "read_by": "ln-data-coordinator",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Key name of registered custom data transformation mapper function."
-        }
-      }
-    },
-    "ln-data-store": {
-      "element": {
-        "recommended_tag": "li",
-        "tag_enforced": false,
-        "note": "IndexedDB local store definition child inside coordinator."
-      },
-      "attributes": {
-        "data-ln-data-store": {
-          "type": "string",
-          "read_by": "ln-data-store",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Initializes local IndexedDB store instance for given store name."
-        },
-        "data-ln-data-store-indexes": {
-          "type": "string",
-          "read_by": "ln-data-store",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Comma-separated list of IndexedDB index fields to create."
-        },
-        "data-ln-data-store-stale": {
-          "type": "number",
-          "read_by": "ln-data-store",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Store cache expiration threshold in seconds."
-        },
-        "data-ln-data-store-search-fields": {
-          "type": "string",
-          "read_by": "ln-data-store",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Fields to index for local client-side store search queries."
-        }
-      }
-    },
-    "ln-date": {
-      "element": {
-        "recommended_tag": "time",
-        "tag_enforced": false,
-        "note": "Semantic <time datetime='...'> element for date formatting."
-      },
-      "attributes": {
-        "data-ln-date": {
-          "type": "string",
-          "enum": [
-            "short",
-            "medium",
-            "long",
-            "full",
-            "iso"
-          ],
-          "read_by": "ln-date",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Date formatting preset style using Intl.DateTimeFormat."
-        },
-        "data-ln-date-format": {
-          "type": "string",
-          "read_by": "ln-date",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Custom date format pattern string."
-        },
-        "data-ln-date-dict": {
-          "type": "string",
-          "read_by": "ln-date",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "BCP 47 language code for custom month/day fallback dictionary container."
-        },
-        "data-ln-date-dict-key": {
-          "type": "string",
-          "enum": [
-            "months-long",
-            "months-short",
-            "days-long",
-            "days-short"
-          ],
-          "read_by": "ln-date",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Dictionary key type for date fallback translations."
-        },
-        "data-ln-date-field": {
-          "type": "string",
-          "read_by": "ln-date",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Record field key holding date string."
-        },
-        "data-ln-date-label": {
-          "type": "string",
-          "read_by": "ln-date",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Accessible aria-label prefix for rendered date."
-        },
-        "data-ln-date-locale": {
-          "type": "string",
-          "read_by": "ln-date",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Locale tag override (e.g. 'mk', 'en-US')."
-        }
-      }
-    },
-    "ln-dropdown": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "Dropdown menu wrapper container."
-      },
-      "attributes": {
-        "data-ln-dropdown": {
-          "type": "string",
-          "read_by": "ln-dropdown",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes dropdown container."
-        },
-        "data-ln-dropdown-menu": {
-          "type": "string",
-          "read_by": "ln-dropdown",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Marks dropdown menu list element."
-        }
-      }
-    },
-    "ln-editor": {
-      "element": {
-        "recommended_tag": "textarea",
-        "tag_enforced": false,
-        "note": "Rich/plain text editor enhancement container."
-      },
-      "attributes": {
-        "data-ln-editor": {
-          "type": "string",
-          "read_by": "ln-editor",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes editor instance."
-        },
-        "data-ln-editor-source": {
-          "type": "string",
-          "read_by": "ln-editor",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Source content endpoint or selector."
-        },
-        "data-ln-editor-action": {
-          "type": "string",
-          "read_by": "ln-editor",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Action toolbar button handler tag."
-        }
-      }
-    },
-    "ln-external-links": {
-      "element": {
-        "recommended_tag": "a",
-        "tag_enforced": false,
-        "note": "External anchor link enhancer for security and rel='noopener' attrs."
-      },
-      "attributes": {
-        "data-ln-external-link": {
-          "type": "boolean",
-          "read_by": "ln-external-links",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Marks link to open securely in new tab."
-        }
-      }
-    },
-    "ln-fill": {
-      "element": {
-        "recommended_tag": "any",
-        "tag_enforced": false,
-        "note": "Declarative DOM hydration component."
-      },
-      "attributes": {
-        "data-ln-fill-store": {
-          "type": "string",
-          "read_by": "ln-fill",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Data store name to fetch item record from for filling."
-        },
-        "data-ln-fill-id": {
-          "type": "string",
-          "read_by": "ln-fill",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Item record ID to fill into target container."
-        },
-        "data-ln-fill-form": {
-          "type": "string",
-          "read_by": "ln-fill",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Target form ID to populate."
-        }
-      }
-    },
-    "ln-filter": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "Filter control input or dropdown panel."
-      },
-      "attributes": {
-        "data-ln-filter": {
-          "type": "string",
-          "read_by": "ln-filter",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Initializes filter and sets target table/list ID."
-        },
-        "data-ln-filter-initialized": {
-          "type": "string",
-          "enum": [
-            "true"
-          ],
-          "read_by": "ln-filter",
-          "consumed_by": "js",
-          "role": "state",
-          "description": "State flag set by JS to prevent double init."
-        },
-        "data-ln-filter-key": {
-          "type": "string",
-          "read_by": "ln-filter",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Target payload field key for filtering."
-        },
-        "data-ln-filter-value": {
-          "type": "string",
-          "read_by": "ln-filter",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Filter value to match."
-        },
-        "data-ln-filter-hide": {
-          "type": "string",
-          "enum": [
-            "true"
-          ],
-          "read_by": "ln-filter",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "State attribute set by JS on filtered-out elements."
-        },
-        "data-ln-filter-reset": {
-          "type": "boolean",
-          "read_by": "ln-filter",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Reset trigger button for filter values."
-        },
-        "data-ln-filter-col": {
-          "type": "string",
-          "read_by": "ln-filter",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Maps column index or field name for table column filtering."
-        }
-      }
-    },
-    "ln-form": {
-      "element": {
-        "recommended_tag": "form",
-        "tag_enforced": false,
-        "note": "Standard HTML5 form element."
-      },
-      "attributes": {
-        "data-ln-form": {
-          "type": "boolean",
-          "read_by": "ln-form",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes form population and method spoofing."
-        },
-        "data-ln-form-action-edit": {
-          "type": "string",
-          "read_by": "ln-form",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "URL path template for RESTful edit mode (e.g. '/admin/users/:id')."
-        },
-        "data-ln-form-action-method": {
-          "type": "string",
-          "enum": [
-            "PUT",
-            "PATCH",
-            "POST",
-            "DELETE"
-          ],
-          "read_by": "ln-form",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "HTTP method spoofing value placed in _method hidden field."
-        }
-      }
-    },
-    "ln-link": {
-      "element": {
-        "recommended_tag": "a",
-        "tag_enforced": false,
-        "note": "Anchor link element for progressive navigation."
-      },
-      "attributes": {
-        "data-ln-link": {
-          "type": "string",
-          "read_by": "ln-link",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Activates client-side routing link navigation."
-        }
-      }
-    },
-    "ln-list": {
-      "element": {
-        "recommended_tag": "ul",
-        "tag_enforced": false,
-        "note": "Container for data-driven list rendering."
-      },
-      "attributes": {
-        "data-ln-list": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Initializes list component and sets list ID."
-        },
-        "data-ln-list-empty": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Empty state container selector or message text."
-        },
-        "data-ln-list-body": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Marks internal container element for list item injection."
-        },
-        "data-ln-list-source": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Data store or resource name for list items."
-        },
-        "data-ln-list-window": {
-          "type": "number",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Windowed virtualization item cap size."
-        },
-        "data-ln-list-total": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Target element to render total count."
-        },
-        "data-ln-list-filtered": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Target element to render filtered count."
-        },
-        "data-ln-list-selected": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Target element to render selected count."
-        },
-        "data-ln-list-clear-all": {
-          "type": "boolean",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Button trigger to clear all active list filters."
-        },
-        "data-ln-list-selectable": {
-          "type": "boolean",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Enables multi-item selection mode."
-        },
-        "data-ln-item-select": {
-          "type": "boolean",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Selection checkbox inside list item template."
-        },
-        "data-ln-item-action": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Item action button trigger name."
-        },
-        "data-ln-item": {
-          "type": "boolean",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Marks individual item element inside template."
-        },
-        "data-ln-item-id": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "state",
-          "description": "Rendered record ID on item root element."
-        },
-        "data-ln-list-clear": {
-          "type": "boolean",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Button to clear search term."
-        },
-        "data-ln-list-field": {
-          "type": "string",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Field key mapping for list item binding."
-        },
-        "data-ln-list-select-all": {
-          "type": "boolean",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Global select-all checkbox for list items."
-        },
-        "data-ln-list-window-page": {
-          "type": "number",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Page fetch chunk size for list virtualization."
-        },
-        "data-ln-list-window-threshold": {
-          "type": "number",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Prefetch threshold in items for list virtualization."
-        },
-        "data-ln-list-count": {
-          "type": "number",
-          "read_by": "ln-list",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Grand total item count for virtualization."
-        }
-      }
-    },
-    "ln-modal": {
-      "element": {
-        "recommended_tag": "dialog",
-        "tag_enforced": true,
-        "note": "JS invokes dom.showModal() and listens for native cancel events; must be <dialog>."
-      },
-      "attributes": {
-        "data-ln-modal": {
-          "type": "string",
-          "enum": [
-            "open",
-            "close"
-          ],
-          "read_by": "ln-modal",
-          "consumed_by": "js",
-          "role": "state",
-          "description": "Modal state attribute written by JS to open or close the dialog."
-        },
-        "data-ln-modal-close": {
-          "type": "boolean",
-          "read_by": "ln-modal",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Presence attribute on buttons/links inside modal to trigger close on click."
-        },
-        "data-ln-modal-mode": {
-          "type": "string",
-          "enum": [
-            "new",
-            "edit"
-          ],
-          "read_by": "ln-modal-coordinator",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "Mode state set on dialog by coordinator ('new' vs 'edit')."
-        },
-        "data-ln-modal-when": {
-          "type": "string",
-          "enum": [
-            "new",
-            "edit"
-          ],
-          "read_by": "ln-modal (SCSS)",
-          "consumed_by": "css",
-          "role": "input",
-          "description": "Conditional display attribute on titles inside modal (controlled by SCSS based on modal-mode)."
-        }
-      }
-    },
-    "ln-modal-coordinator": {
-      "element": {
-        "recommended_tag": "dialog",
-        "tag_enforced": true,
-        "note": "Layer 2 coordinator attached to dialog modal for form fill/reset."
-      },
-      "attributes": {
-        "data-ln-modal-coordinator": {
-          "type": "boolean",
-          "read_by": "ln-modal-coordinator",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Activates modal coordinator for hash navigation and form fill."
-        },
-        "data-ln-modal-for": {
-          "type": "string",
-          "read_by": "ln-modal-coordinator",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Binds trigger button to target modal ID."
-        }
-      }
-    },
-    "ln-nav": {
-      "element": {
-        "recommended_tag": "nav",
-        "tag_enforced": false,
-        "note": "Navigation bar active link highlight container."
-      },
-      "attributes": {
-        "data-ln-nav": {
-          "type": "string",
-          "read_by": "ln-nav",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes navigation link active state tracking."
-        },
-        "data-ln-nav-exact": {
-          "type": "boolean",
-          "read_by": "ln-nav",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Requires exact URL path match for active link state."
-        }
-      }
-    },
-    "ln-number": {
-      "element": {
-        "recommended_tag": "strong",
-        "tag_enforced": false,
-        "note": "Semantic inline tag for localized number formatting."
-      },
-      "attributes": {
-        "data-ln-number": {
-          "type": "string",
-          "enum": [
-            "decimal",
-            "currency",
-            "percent"
-          ],
-          "read_by": "ln-number",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Number formatting style using Intl.NumberFormat."
-        },
-        "data-ln-number-decimals": {
-          "type": "number",
-          "read_by": "ln-number",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Fraction digit decimal count."
-        },
-        "data-ln-number-min": {
-          "type": "number",
-          "read_by": "ln-number",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Minimum value constraint."
-        },
-        "data-ln-number-max": {
-          "type": "number",
-          "read_by": "ln-number",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Maximum value constraint."
-        }
-      }
-    },
-    "ln-options": {
-      "element": {
-        "recommended_tag": "select",
-        "tag_enforced": false,
-        "note": "Populates select option elements from data store."
-      },
-      "attributes": {
-        "data-ln-options": {
-          "type": "string",
-          "read_by": "ln-options",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Data store name to fetch select option items from."
-        },
-        "data-ln-options-value": {
-          "type": "string",
-          "read_by": "ln-options",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Record field key to use for option value attribute."
-        },
-        "data-ln-options-label": {
-          "type": "string",
-          "read_by": "ln-options",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Record field key to use for option text label."
-        }
-      }
-    },
-    "ln-popover": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "Popover overlay container."
-      },
-      "attributes": {
-        "data-ln-popover": {
-          "type": "boolean",
-          "read_by": "ln-popover",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes popover overlay container."
-        },
-        "data-ln-popover-for": {
-          "type": "string",
-          "read_by": "ln-popover",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Target popover element ID bound to trigger button."
-        },
-        "data-ln-popover-position": {
-          "type": "string",
-          "enum": [
-            "top",
-            "bottom",
-            "left",
-            "right"
-          ],
-          "read_by": "ln-popover",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Preferred popover placement position."
-        },
-        "data-ln-popover-placement": {
-          "type": "string",
-          "enum": [
-            "top",
-            "bottom",
-            "left",
-            "right"
-          ],
-          "read_by": "ln-popover",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "Computed dynamic placement attribute set by positioning engine."
-        }
-      }
-    },
-    "ln-progress": {
-      "element": {
-        "recommended_tag": "progress",
-        "tag_enforced": false,
-        "note": "Progress bar indicator element."
-      },
-      "attributes": {
-        "data-ln-progress": {
-          "type": "number",
-          "read_by": "ln-progress",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Current progress value."
-        },
-        "data-ln-progress-max": {
-          "type": "number",
-          "read_by": "ln-progress",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Progress maximum value limit."
-        }
-      }
-    },
-    "ln-router": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "Single Page Application client router and viewport outlet."
-      },
-      "attributes": {
-        "data-ln-route": {
-          "type": "string",
-          "read_by": "ln-router",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Route path matching pattern."
-        },
-        "data-ln-route-target": {
-          "type": "string",
-          "read_by": "ln-router",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Target outlet element ID for rendering route content."
-        },
-        "data-ln-outlet": {
-          "type": "string",
-          "read_by": "ln-router",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Marks viewport outlet element for swapped view content."
-        },
-        "data-ln-route-keep": {
-          "type": "boolean",
-          "read_by": "ln-router",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Preserves view state in DOM cache when unmounted."
-        },
-        "data-ln-router-hydrate": {
-          "type": "boolean",
-          "read_by": "ln-router",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Hydrates server-rendered initial markup without re-fetch."
-        },
-        "data-ln-route-title": {
-          "type": "string",
-          "read_by": "ln-router",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Document page title to set when route activates."
-        }
-      }
-    },
-    "ln-search": {
-      "element": {
-        "recommended_tag": "input",
-        "tag_enforced": false,
-        "note": "Search text input control."
-      },
-      "attributes": {
-        "data-ln-search": {
-          "type": "string",
-          "read_by": "ln-search",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "ID of target element/container to filter."
-        },
-        "data-ln-search-initialized": {
-          "type": "string",
-          "enum": [
-            "true"
-          ],
-          "read_by": "ln-search",
-          "consumed_by": "js",
-          "role": "state",
-          "description": "State flag set by JS to prevent double init."
-        },
-        "data-ln-search-hide": {
-          "type": "string",
-          "enum": [
-            "true"
-          ],
-          "read_by": "ln-search",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "State attribute set by JS to hide non-matching items."
-        },
-        "data-ln-search-items": {
-          "type": "string",
-          "read_by": "ln-search",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "CSS selector for target child items inside container (e.g. 'tbody tr')."
-        },
-        "data-ln-search-debounce": {
-          "type": "number",
-          "read_by": "ln-search",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Debounce delay in ms (use 0 for instant local DOM filter, >=150 for API search)."
-        },
-        "data-ln-search-clear": {
-          "type": "boolean",
-          "read_by": "ln-search",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Button trigger to clear search term input."
-        }
-      }
-    },
-    "ln-slug": {
-      "element": {
-        "recommended_tag": "input",
-        "tag_enforced": false,
-        "note": "Slug generator input."
-      },
-      "attributes": {
-        "data-ln-slug-from": {
-          "type": "string",
-          "read_by": "ln-slug",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Source input field name/id to convert into URL slug."
-        }
-      }
-    },
-    "ln-sortable": {
-      "element": {
-        "recommended_tag": "ul",
-        "tag_enforced": false,
-        "note": "Drag-and-drop sortable list container."
-      },
-      "attributes": {
-        "data-ln-sortable": {
-          "type": "boolean",
-          "read_by": "ln-sortable",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Enables drag-and-drop re-ordering on child items."
-        },
-        "data-ln-sortable-handle": {
-          "type": "string",
-          "read_by": "ln-sortable",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "CSS selector for drag handle handle button."
-        }
-      }
-    },
-    "ln-stat": {
-      "element": {
-        "recommended_tag": "strong",
-        "tag_enforced": false,
-        "note": "Inline metric display bound to data store count."
-      },
-      "attributes": {
-        "data-ln-stat": {
-          "type": "string",
-          "read_by": "ln-stat",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Target store name to display live count for."
-        },
-        "data-ln-stat-filter": {
-          "type": "string",
-          "read_by": "ln-stat",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Filter criteria formatted as 'field:value'."
-        }
-      }
-    },
-    "ln-table": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": true,
-        "note": "Data table container. Must wrap a standard <table> with <thead>, <tbody>, <th>, <tr>."
-      },
-      "attributes": {
-        "data-ln-table": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Initializes table component and sets unique table ID."
-        },
-        "data-ln-table-source": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Data store or resource name in Data-Driven mode."
-        },
-        "data-ln-table-col": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Maps <th> header column to record payload field key."
-        },
-        "data-ln-table-sort": {
-          "type": "string",
-          "enum": [
-            "string",
-            "number",
-            "date"
-          ],
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Enables column sorting and specifies sort data type."
-        },
-        "data-ln-table-col-sort": {
-          "type": "boolean",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Sort trigger button inside <th> header."
-        },
-        "data-ln-table-col-filter": {
-          "type": "boolean",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Column filter popover trigger button inside <th>."
-        },
-        "data-ln-table-filter-col": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Maps column header to filter key for column filtering."
-        },
-        "data-ln-table-selectable": {
-          "type": "boolean",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Enables row checkboxes and multi-selection mode."
-        },
-        "data-ln-table-col-select": {
-          "type": "boolean",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Marks <th> header column containing global select-all checkbox."
-        },
-        "data-ln-table-row": {
-          "type": "boolean",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Marks <tr> row element inside row template."
-        },
-        "data-ln-table-row-id": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "state",
-          "description": "Rendered record ID on row element."
-        },
-        "data-ln-table-row-select": {
-          "type": "boolean",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Selection checkbox inside row template."
-        },
-        "data-ln-table-row-action": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Action button trigger name inside row."
-        },
-        "data-ln-table-window": {
-          "type": "number",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Sliding-window virtualization resident-row cap size."
-        },
-        "data-ln-table-window-page": {
-          "type": "number",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Page fetch chunk size for server requests in windowed mode (default: 200)."
-        },
-        "data-ln-table-window-threshold": {
-          "type": "number",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Prefetch margin threshold in rows before page boundaries (default: 25)."
-        },
-        "data-ln-table-count": {
-          "type": "number",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Declares unfiltered grand total for windowed virtualization."
-        },
-        "data-ln-table-total": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Footer element to display total record count."
-        },
-        "data-ln-table-filtered": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Footer element to display filtered count."
-        },
-        "data-ln-table-selected": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Footer element to display selected count."
-        },
-        "data-ln-table-empty": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Empty state container selector or template."
-        },
-        "data-ln-table-empty-when": {
-          "type": "string",
-          "enum": [
-            "initial",
-            "search"
-          ],
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Targets empty state variant based on search vs initial load."
-        },
-        "data-ln-table-cell-attr": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Field-to-attribute interpolation list for cell elements."
-        },
-        "data-ln-table-dict": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Selector for hidden i18n dictionary strings in table."
-        },
-        "data-ln-table-select-all-label": {
-          "type": "string",
-          "read_by": "ln-table",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Accessible aria-label for select-all checkbox."
-        },
-        "data-ln-sort-icon": {
-          "type": "string",
-          "enum": [
-            "none",
-            "asc",
-            "desc"
-          ],
-          "read_by": "ln-table (SCSS)",
-          "consumed_by": "css",
-          "role": "input",
-          "description": "SCSS sort icon state selector inside sortable column headers."
-        }
-      }
-    },
-    "ln-table-coordinator": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "Layer 2 table coordinator binding table, search, filter, and clear triggers."
-      },
-      "attributes": {
-        "data-ln-table-coordinator": {
-          "type": "string",
-          "read_by": "ln-table-coordinator",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes table coordinator."
-        },
-        "data-ln-table-clear-all": {
-          "type": "boolean",
-          "read_by": "ln-table-coordinator",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Button to clear all active search and column filters."
-        },
-        "data-ln-table-clear": {
-          "type": "boolean",
-          "read_by": "ln-table-coordinator",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Button to clear specific table search term."
-        }
-      }
-    },
-    "ln-tabs": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "Tabbed interface container."
-      },
-      "attributes": {
-        "data-ln-tabs": {
-          "type": "string",
-          "read_by": "ln-tabs",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes tabs container."
-        },
-        "data-ln-tab": {
-          "type": "string",
-          "read_by": "ln-tabs",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Tab button activator bound to target panel ID."
-        },
-        "data-ln-panel": {
-          "type": "string",
-          "read_by": "ln-tabs",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Marks tab panel content element."
-        },
-        "data-ln-tabs-key": {
-          "type": "string",
-          "read_by": "ln-tabs",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Storage key for tab persistence."
-        },
-        "data-ln-tabs-default": {
-          "type": "string",
-          "read_by": "ln-tabs",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Default active tab ID on load."
-        },
-        "data-ln-tabs-focus": {
-          "type": "boolean",
-          "read_by": "ln-tabs",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Focuses panel when tab activates."
-        },
-        "data-ln-tabs-active": {
-          "type": "string",
-          "read_by": "ln-tabs",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "State attribute reflecting active tab ID."
-        },
-        "data-ln-tabs-for": {
-          "type": "string",
-          "read_by": "ln-tabs (SCSS)",
-          "consumed_by": "css",
-          "role": "input",
-          "description": "SCSS selector binding tab button to panel."
-        }
-      }
-    },
-    "ln-time": {
-      "element": {
-        "recommended_tag": "time",
-        "tag_enforced": false,
-        "note": "Semantic <time datetime='...'> tag for localized time formatting."
-      },
-      "attributes": {
-        "data-ln-time": {
-          "type": "string",
-          "enum": [
-            "short",
-            "medium",
-            "long",
-            "full"
-          ],
-          "read_by": "ln-time",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Time formatting style preset using Intl.DateTimeFormat."
-        },
-        "data-ln-time-locale": {
-          "type": "string",
-          "read_by": "ln-time",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Locale tag override for time rendering."
-        }
-      }
-    },
-    "ln-toast": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "Toast notification container."
-      },
-      "attributes": {
-        "data-ln-toast": {
-          "type": "string",
-          "read_by": "ln-toast",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes toast notification queue container."
-        },
-        "data-ln-toast-item": {
-          "type": "boolean",
-          "read_by": "ln-toast",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Marks individual toast item element inside template."
-        },
-        "data-ln-toast-timeout": {
-          "type": "number",
-          "read_by": "ln-toast",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Auto-dismiss duration in ms (default: 4000)."
-        },
-        "data-ln-toast-max": {
-          "type": "number",
-          "read_by": "ln-toast",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Maximum number of simultaneous visible toast messages (default: 5)."
-        },
-        "data-ln-toast-close": {
-          "type": "boolean",
-          "read_by": "ln-toast",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Close button trigger inside toast item."
-        }
-      }
-    },
-    "ln-toggle": {
-      "element": {
-        "recommended_tag": "button",
-        "tag_enforced": false,
-        "note": "Toggle trigger or target collapsible panel."
-      },
-      "attributes": {
-        "data-ln-toggle": {
-          "type": "string",
-          "enum": [
-            "open",
-            "closed"
-          ],
-          "read_by": "ln-toggle",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "Visibility state attribute written by JS ('open' or 'closed')."
-        },
-        "data-ln-toggle-for": {
-          "type": "string",
-          "read_by": "ln-toggle",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Binds trigger element to target toggle panel ID."
-        },
-        "data-ln-toggle-action": {
-          "type": "string",
-          "enum": [
-            "open",
-            "close",
-            "toggle"
-          ],
-          "read_by": "ln-toggle",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Action type for trigger click (default: 'toggle')."
-        }
-      }
-    },
-    "ln-tooltip": {
-      "element": {
-        "recommended_tag": "button",
-        "tag_enforced": false,
-        "note": "Tooltip target host element."
-      },
-      "attributes": {
-        "data-ln-tooltip": {
-          "type": "string",
-          "read_by": "ln-tooltip",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Tooltip text content string."
-        },
-        "data-ln-tooltip-enhance": {
-          "type": "boolean",
-          "read_by": "ln-tooltip",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Opt-in trigger to enhance custom tooltip elements."
-        },
-        "data-ln-tooltip-position": {
-          "type": "string",
-          "enum": [
-            "top",
-            "bottom",
-            "left",
-            "right"
-          ],
-          "read_by": "ln-tooltip",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Preferred tooltip position."
-        },
-        "data-ln-tooltip-placement": {
-          "type": "string",
-          "enum": [
-            "top",
-            "bottom",
-            "left",
-            "right"
-          ],
-          "read_by": "ln-tooltip",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "Computed placement attribute set by positioning engine."
-        },
-        "data-ln-tooltip-enhanced": {
-          "type": "string",
-          "read_by": "ln-tooltip",
-          "consumed_by": "both",
-          "role": "state",
-          "description": "State attribute indicating JS positioning engine has activated."
-        }
-      }
-    },
-    "ln-translations": {
-      "element": {
-        "recommended_tag": "form",
-        "tag_enforced": false,
-        "note": "Form translation manager container."
-      },
-      "attributes": {
-        "data-ln-translations": {
-          "type": "string",
-          "read_by": "ln-translations",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Initializes form field translation manager."
-        },
-        "data-ln-translations-locales": {
-          "type": "string",
-          "read_by": "ln-translations",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "JSON string of available language locale configurations."
-        },
-        "data-ln-translatable": {
-          "type": "string",
-          "read_by": "ln-translations",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Marks form field wrapper as translatable across active locales."
-        },
-        "data-ln-translatable-lang": {
-          "type": "string",
-          "read_by": "ln-translations",
-          "consumed_by": "js",
-          "role": "state",
-          "description": "State tag set on cloned input elements for language code."
-        },
-        "data-ln-translations-lang": {
-          "type": "string",
-          "read_by": "ln-translations",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Default active language locale."
-        },
-        "data-ln-translations-prefix": {
-          "type": "string",
-          "read_by": "ln-translations",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Nested object field prefix for cloned inputs (e.g. 'product')."
-        }
-      }
-    },
-    "ln-upload": {
-      "element": {
-        "recommended_tag": "div",
-        "tag_enforced": false,
-        "note": "File upload dropzone container."
-      },
-      "attributes": {
-        "data-ln-upload": {
-          "type": "string",
-          "read_by": "ln-upload",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Initializes file uploader and sets upload endpoint URL."
-        },
-        "data-ln-upload-delete": {
-          "type": "string",
-          "read_by": "ln-upload",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "URL endpoint pattern for file deletion requests."
-        },
-        "data-ln-upload-accept": {
-          "type": "string",
-          "read_by": "ln-upload",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Comma-separated list of allowed file extensions (e.g. '.pdf,.png')."
-        },
-        "data-ln-upload-context": {
-          "type": "string",
-          "read_by": "ln-upload",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Context namespace identifier sent with upload FormData."
-        },
-        "data-ln-upload-dict": {
-          "type": "string",
-          "read_by": "ln-upload",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Selector for hidden i18n message dictionary strings."
-        },
-        "data-ln-upload-action": {
-          "type": "string",
-          "enum": [
-            "remove"
-          ],
-          "read_by": "ln-upload",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Item action button trigger (e.g. 'remove')."
-        },
-        "data-ln-upload-initialized": {
-          "type": "string",
-          "enum": [
-            "true"
-          ],
-          "read_by": "ln-upload",
-          "consumed_by": "js",
-          "role": "state",
-          "description": "State flag set by JS to prevent double init."
-        }
-      }
-    },
-    "ln-validate": {
-      "element": {
-        "recommended_tag": "input",
-        "tag_enforced": false,
-        "note": "Input control field with HTML5 validity validation."
-      },
-      "attributes": {
-        "data-ln-validate": {
-          "type": "boolean",
-          "read_by": "ln-validate",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Enables HTML5 ValidityState field validation."
-        },
-        "data-ln-validate-errors": {
-          "type": "boolean",
-          "read_by": "ln-validate",
-          "consumed_by": "js",
-          "role": "marker",
-          "description": "Container element for validation error message list."
-        },
-        "data-ln-validate-error": {
-          "type": "string",
-          "enum": [
-            "valueMissing",
-            "typeMismatch",
-            "patternMismatch",
-            "tooLong",
-            "tooShort",
-            "rangeUnderflow",
-            "rangeOverflow",
-            "stepMismatch",
-            "badInput",
-            "customError"
-          ],
-          "read_by": "ln-validate",
-          "consumed_by": "js",
-          "role": "input",
-          "description": "Error message item key matching HTML5 ValidityState property or custom backend error key."
-        }
-      }
-    }
-  }
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "ln-ashlar Declarative Attributes Schema Catalog",
+	"description": "Machine-readable JSON schema catalog of all real data-ln-* attributes across ln-ashlar components for AI models.",
+	"components": {
+		"ln-core": {
+			"element": {
+				"recommended_tag": "any",
+				"tag_enforced": false,
+				"note": "Universal DOM helpers (fill, fillTemplate, renderList, buildDict, debug) consumed globally across components."
+			},
+			"attributes": {
+				"data-ln-field": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Binds DOM textContent to a property key during fill() or fillTemplate() rendering."
+				},
+				"data-ln-attr": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Binds element attributes dynamically during fill() rendering (e.g. 'href:url,title:name')."
+				},
+				"data-ln-show": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Evaluates boolean visibility condition during fill() rendering, showing/hiding element."
+				},
+				"data-ln-class": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Toggles CSS classes dynamically during fill() rendering (e.g. 'active:isActive,hidden:isPending')."
+				},
+				"data-ln-template": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Declares template name on <template> elements for cloneTemplate() instantiation."
+				},
+				"data-ln-value": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Provides raw machine-readable data value for text elements (e.g. unformatted numbers or dates)."
+				},
+				"data-ln-fill-as": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Aliases record field name to match different form input name during fill()."
+				},
+				"data-ln-fillable": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in marker for elements allowed to receive auto-fill data."
+				},
+				"data-ln-key": {
+					"type": "string",
+					"read_by": "ln-core",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Identifies item key property for DOM element reuse in renderList()."
+				},
+				"data-ln-persist": {
+					"type": "string",
+					"read_by": "ln-persist",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Storage key for persisting state in LocalStorage/SessionStorage."
+				},
+				"data-ln-debug": {
+					"type": "boolean",
+					"read_by": "ln-debug",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Enables verbose console logging for component lifecycle events."
+				}
+			}
+		},
+		"ln-accordion": {
+			"element": {
+				"recommended_tag": "ul, ol",
+				"tag_enforced": false,
+				"note": "Container for collapsible accordion panels. Recommended markup uses <ul> or <ol> with <li> children for each accordion item."
+			},
+			"attributes": {
+				"data-ln-accordion": {
+					"type": "string",
+					"read_by": "ln-accordion",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes the accordion container."
+				}
+			}
+		},
+		"ln-ajax": {
+			"element": {
+				"recommended_tag": "body, form, div",
+				"tag_enforced": false,
+				"note": "Can be attached to body, parent container, or form element."
+			},
+			"attributes": {
+				"data-ln-ajax": {
+					"type": "boolean",
+					"enum": [
+						"",
+						"false"
+					],
+					"read_by": "ln-ajax",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Boolean flag activating AJAX interception when present or empty. Set to 'false' to explicitly exclude a nested link or form from parent AJAX delegation."
+				},
+				"data-ln-form-scope": {
+					"type": "string",
+					"read_by": "ln-ajax",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Form resource scope for AJAX submission routing."
+				}
+			}
+		},
+		"ln-api-connector": {
+			"element": {
+				"recommended_tag": "li",
+				"tag_enforced": false,
+				"note": "Stateless REST API driver. Recommended as hidden <li> inside coordinator <ul> or <ol>."
+			},
+			"attributes": {
+				"data-ln-api-connector": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Initializes API connector driver; optional value sets resource path directly."
+				},
+				"data-ln-api-base-url": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Base HTTP address of backend API endpoint."
+				},
+				"data-ln-api-path": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Resource endpoint path."
+				},
+				"data-ln-api-headers": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "JSON string of custom HTTP headers for requests."
+				},
+				"data-ln-api-param-offset": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "URL query param key for pagination offset (default: 'offset')."
+				},
+				"data-ln-api-param-limit": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "URL query param key for page size limit (default: 'limit')."
+				},
+				"data-ln-api-param-search": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "URL query param key for search term (default: 'search')."
+				},
+				"data-ln-api-param-sort-field": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "URL query param key for sort field name (default: 'sort_field')."
+				},
+				"data-ln-api-param-sort-dir": {
+					"type": "string",
+					"read_by": "ln-api-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "URL query param key for sort direction (default: 'sort_dir')."
+				}
+			}
+		},
+		"ln-api-queue": {
+			"element": {
+				"recommended_tag": "li",
+				"tag_enforced": false,
+				"note": "Offline write queue child element under ln-data-coordinator."
+			},
+			"attributes": {
+				"data-ln-api-queue": {
+					"type": "string",
+					"read_by": "ln-api-queue",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes offline API queue manager."
+				},
+				"data-ln-api-queue-online": {
+					"type": "string",
+					"enum": [
+						"true",
+						"false"
+					],
+					"read_by": "ln-api-queue",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "Reflected state attribute set by JS indicating network/queue sync state."
+				}
+			}
+		},
+		"ln-autoresize": {
+			"element": {
+				"recommended_tag": "textarea",
+				"tag_enforced": true,
+				"note": "Applies strictly to <textarea> elements for dynamic height expansion; JS enforces dom.tagName === 'TEXTAREA'."
+			},
+			"attributes": {
+				"data-ln-autoresize": {
+					"type": "boolean",
+					"read_by": "ln-autoresize",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Enables auto-resizing height on input."
+				}
+			}
+		},
+		"ln-autosave": {
+			"element": {
+				"recommended_tag": "form, div",
+				"tag_enforced": false,
+				"note": "Attached to forms or inputs for automated local storage draft saving."
+			},
+			"attributes": {
+				"data-ln-autosave": {
+					"type": "string",
+					"read_by": "ln-autosave",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Initializes form draft auto-saving with given storage key."
+				},
+				"data-ln-autosave-clear": {
+					"type": "boolean",
+					"read_by": "ln-autosave",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Clears saved draft state when clicked."
+				},
+				"data-ln-autosave-debounce-input": {
+					"type": "number",
+					"read_by": "ln-autosave",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Debounce delay in ms for input autosave (default: 500)."
+				},
+				"data-ln-autosave-exclude": {
+					"type": "boolean",
+					"read_by": "ln-autosave",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Excludes specific form input control from draft storage."
+				}
+			}
+		},
+		"ln-circular-progress": {
+			"element": {
+				"recommended_tag": "div, span",
+				"tag_enforced": false,
+				"note": "SVG circular progress indicator."
+			},
+			"attributes": {
+				"data-ln-circular-progress": {
+					"type": "number",
+					"read_by": "ln-circular-progress",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Current numeric value for circular progress rendering."
+				},
+				"data-ln-circular-progress-max": {
+					"type": "number",
+					"read_by": "ln-circular-progress",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Maximum value scale limit (default: 100)."
+				},
+				"data-ln-circular-progress-label": {
+					"type": "string",
+					"read_by": "ln-circular-progress",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Accessible label or custom format string."
+				}
+			}
+		},
+		"ln-confirm": {
+			"element": {
+				"recommended_tag": "button",
+				"tag_enforced": false,
+				"note": "In-place two-step confirmation button for single low-impact actions."
+			},
+			"attributes": {
+				"data-ln-confirm": {
+					"type": "string",
+					"read_by": "ln-confirm",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Confirmation prompt text displayed on first click."
+				},
+				"data-ln-confirm-timeout": {
+					"type": "number",
+					"read_by": "ln-confirm",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Timeout in ms before active confirmation resets to idle (default: 3000)."
+				},
+				"data-ln-confirm-idle": {
+					"type": "string",
+					"read_by": "ln-confirm",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Original button text restored after timeout."
+				},
+				"data-ln-confirm-active": {
+					"type": "string",
+					"read_by": "ln-confirm",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Confirmation step button label."
+				}
+			}
+		},
+		"ln-couchdb-connector": {
+			"element": {
+				"recommended_tag": "li",
+				"tag_enforced": false,
+				"note": "CouchDB database driver child element under ln-data-coordinator."
+			},
+			"attributes": {
+				"data-ln-couchdb-connector": {
+					"type": "string",
+					"read_by": "ln-couchdb-connector",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes CouchDB connector driver."
+				},
+				"data-ln-couchdb-url": {
+					"type": "string",
+					"read_by": "ln-couchdb-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "CouchDB server base URL."
+				},
+				"data-ln-couchdb-db": {
+					"type": "string",
+					"read_by": "ln-couchdb-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "CouchDB database name."
+				},
+				"data-ln-couchdb-auth": {
+					"type": "string",
+					"read_by": "ln-couchdb-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Authentication mode or basic auth token."
+				},
+				"data-ln-couchdb-headers": {
+					"type": "string",
+					"read_by": "ln-couchdb-connector",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "JSON string of HTTP headers for CouchDB requests."
+				}
+			}
+		},
+		"ln-data-coordinator": {
+			"element": {
+				"recommended_tag": "ul, ol",
+				"tag_enforced": false,
+				"note": "Layer 2 data coordinator parent list (<ul data-ln-data-coordinator> or <ol>) enclosing store, connector, and queue <li> elements."
+			},
+			"attributes": {
+				"data-ln-data-coordinator": {
+					"type": "string",
+					"read_by": "ln-data-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Initializes data coordinator and names entity namespace."
+				},
+				"data-ln-data-coordinator-dict": {
+					"type": "string",
+					"read_by": "ln-data-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Selector for hidden i18n error toast message dictionary."
+				},
+				"data-ln-data-coordinator-stale": {
+					"type": "number",
+					"read_by": "ln-data-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Stale cache duration threshold in seconds."
+				},
+				"data-ln-data-coordinator-no-autosync": {
+					"type": "boolean",
+					"read_by": "ln-data-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Disables automatic background polling and tab visibility sync."
+				},
+				"data-ln-data-mapper": {
+					"type": "string",
+					"read_by": "ln-data-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Key name of registered custom data transformation mapper function."
+				}
+			}
+		},
+		"ln-data-store": {
+			"element": {
+				"recommended_tag": "li",
+				"tag_enforced": false,
+				"note": "IndexedDB local store definition child inside coordinator."
+			},
+			"attributes": {
+				"data-ln-data-store": {
+					"type": "string",
+					"read_by": "ln-data-store",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Initializes local IndexedDB store instance for given store name."
+				},
+				"data-ln-data-store-indexes": {
+					"type": "string",
+					"read_by": "ln-data-store",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Comma-separated list of IndexedDB index fields to create."
+				},
+				"data-ln-data-store-stale": {
+					"type": "number",
+					"read_by": "ln-data-store",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Store cache expiration threshold in seconds."
+				},
+				"data-ln-data-store-search-fields": {
+					"type": "string",
+					"read_by": "ln-data-store",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Fields to index for local client-side store search queries."
+				}
+			}
+		},
+		"ln-date": {
+			"element": {
+				"recommended_tag": "time, input",
+				"tag_enforced": false,
+				"note": "Date formatting component for <time datetime='...'> elements or form <input type='date'> fields."
+			},
+			"attributes": {
+				"data-ln-date": {
+					"type": "string",
+					"enum": [
+						"short",
+						"medium",
+						"long",
+						"full",
+						"iso"
+					],
+					"read_by": "ln-date",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Date formatting preset style using Intl.DateTimeFormat."
+				},
+				"data-ln-date-format": {
+					"type": "string",
+					"read_by": "ln-date",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Custom date format pattern string."
+				},
+				"data-ln-date-dict": {
+					"type": "string",
+					"read_by": "ln-date",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "BCP 47 language code for custom month/day fallback dictionary container."
+				},
+				"data-ln-date-dict-key": {
+					"type": "string",
+					"enum": [
+						"months-long",
+						"months-short",
+						"days-long",
+						"days-short"
+					],
+					"read_by": "ln-date",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Dictionary key type for date fallback translations."
+				},
+				"data-ln-date-field": {
+					"type": "string",
+					"read_by": "ln-date",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field key holding date string."
+				},
+				"data-ln-date-label": {
+					"type": "string",
+					"read_by": "ln-date",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Accessible aria-label prefix for rendered date."
+				},
+				"data-ln-date-locale": {
+					"type": "string",
+					"read_by": "ln-date",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Locale tag override (e.g. 'mk', 'en-US')."
+				}
+			}
+		},
+		"ln-dropdown": {
+			"element": {
+				"recommended_tag": "div, li, nav",
+				"tag_enforced": false,
+				"note": "Dropdown menu wrapper container (commonly a <div>, <li> inside a navbar <ul>, or <nav> container)."
+			},
+			"attributes": {
+				"data-ln-dropdown": {
+					"type": "string",
+					"read_by": "ln-dropdown",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes dropdown container."
+				},
+				"data-ln-dropdown-menu": {
+					"type": "string",
+					"read_by": "ln-dropdown",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Marks dropdown menu list element."
+				}
+			}
+		},
+		"ln-editor": {
+			"element": {
+				"recommended_tag": "textarea, div",
+				"tag_enforced": false,
+				"note": "WYSIWYG rich text editor attached to <textarea> or container wrapper."
+			},
+			"attributes": {
+				"data-ln-editor": {
+					"type": "string",
+					"read_by": "ln-editor",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes editor instance."
+				},
+				"data-ln-editor-source": {
+					"type": "string",
+					"read_by": "ln-editor",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Source content endpoint or selector."
+				},
+				"data-ln-editor-action": {
+					"type": "string",
+					"read_by": "ln-editor",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Action toolbar button handler tag."
+				}
+			}
+		},
+		"ln-external-links": {
+			"element": {
+				"recommended_tag": "body",
+				"tag_enforced": false,
+				"note": "Automatic global helper running on document.body. Auto-decorates all cross-host <a> and <area> links with target='_blank', rel='noopener noreferrer', and screen-reader accessibility hints."
+			},
+			"attributes": {
+				"data-ln-external-link": {
+					"type": "string",
+					"enum": [
+						"processed"
+					],
+					"read_by": "ln-external-links",
+					"consumed_by": "js",
+					"role": "state",
+					"description": "Internal reflected state attribute set automatically by JS after processing a cross-host link."
+				}
+			}
+		},
+		"ln-fill": {
+			"element": {
+				"recommended_tag": "any",
+				"tag_enforced": false,
+				"note": "Declarative DOM hydration component."
+			},
+			"attributes": {
+				"data-ln-fill-store": {
+					"type": "string",
+					"read_by": "ln-fill",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Data store name to fetch item record from for filling."
+				},
+				"data-ln-fill-id": {
+					"type": "string",
+					"read_by": "ln-fill",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Item record ID to fill into target container."
+				},
+				"data-ln-fill-form": {
+					"type": "string",
+					"read_by": "ln-fill",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Target form ID to populate."
+				}
+			}
+		},
+		"ln-filter": {
+			"element": {
+				"recommended_tag": "ul, ol, div, form, nav",
+				"tag_enforced": false,
+				"note": "Filter control container (commonly <ul> or <ol> with <li> checkbox options, <form>, <nav>, or <div> panel)."
+			},
+			"attributes": {
+				"data-ln-filter": {
+					"type": "string",
+					"read_by": "ln-filter",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Initializes filter and sets target table/list ID."
+				},
+				"data-ln-filter-key": {
+					"type": "string",
+					"read_by": "ln-filter",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Target payload field key for filtering."
+				},
+				"data-ln-filter-value": {
+					"type": "string",
+					"read_by": "ln-filter",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Filter value to match."
+				},
+				"data-ln-filter-hide": {
+					"type": "string",
+					"enum": [
+						"true"
+					],
+					"read_by": "ln-filter",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "State attribute set by JS on filtered-out elements."
+				},
+				"data-ln-filter-reset": {
+					"type": "boolean",
+					"read_by": "ln-filter",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Reset trigger button for filter values."
+				},
+				"data-ln-filter-col": {
+					"type": "string",
+					"read_by": "ln-filter",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Maps column index or field name for table column filtering."
+				}
+			}
+		},
+		"ln-form": {
+			"element": {
+				"recommended_tag": "form",
+				"tag_enforced": false,
+				"note": "Standard HTML5 form element."
+			},
+			"attributes": {
+				"data-ln-form": {
+					"type": "boolean",
+					"read_by": "ln-form",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes form population and method spoofing."
+				},
+				"data-ln-form-action-edit": {
+					"type": "string",
+					"read_by": "ln-form",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "URL path template for RESTful edit mode (e.g. '/admin/users/:id')."
+				},
+				"data-ln-form-action-method": {
+					"type": "string",
+					"enum": [
+						"PUT",
+						"PATCH",
+						"POST",
+						"DELETE"
+					],
+					"read_by": "ln-form",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "HTTP method spoofing value placed in _method hidden field."
+				}
+			}
+		},
+		"ln-link": {
+			"element": {
+				"recommended_tag": "tr, li, article, div",
+				"tag_enforced": false,
+				"note": "Row or card element turned into a click-navigable surface by delegating clicks to its first inner <a> link."
+			},
+			"attributes": {
+				"data-ln-link": {
+					"type": "string",
+					"read_by": "ln-link",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Activates client-side routing link navigation."
+				}
+			}
+		},
+		"ln-list": {
+			"element": {
+				"recommended_tag": "ul, ol",
+				"tag_enforced": false,
+				"note": "Container for data-driven list rendering (<ul data-ln-list> or <ol data-ln-list>)."
+			},
+			"attributes": {
+				"data-ln-list": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Initializes list component and sets list ID."
+				},
+				"data-ln-list-empty": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Empty state container selector or message text."
+				},
+				"data-ln-list-body": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Marks internal container element for list item injection."
+				},
+				"data-ln-list-source": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Data store or resource name for list items."
+				},
+				"data-ln-list-window": {
+					"type": "number",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Windowed virtualization item cap size."
+				},
+				"data-ln-list-total": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Target element to render total count."
+				},
+				"data-ln-list-filtered": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Target element to render filtered count."
+				},
+				"data-ln-list-selected": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Target element to render selected count."
+				},
+				"data-ln-list-clear-all": {
+					"type": "boolean",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Button trigger to clear all active list filters."
+				},
+				"data-ln-list-selectable": {
+					"type": "boolean",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Enables multi-item selection mode."
+				},
+				"data-ln-item-select": {
+					"type": "boolean",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Selection checkbox inside list item template."
+				},
+				"data-ln-item-action": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Item action button trigger name."
+				},
+				"data-ln-item": {
+					"type": "boolean",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Marks individual item element inside template."
+				},
+				"data-ln-item-id": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "state",
+					"description": "Rendered record ID on item root element."
+				},
+				"data-ln-list-clear": {
+					"type": "boolean",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Button to clear search term."
+				},
+				"data-ln-list-field": {
+					"type": "string",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Field key mapping for list item binding."
+				},
+				"data-ln-list-select-all": {
+					"type": "boolean",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Global select-all checkbox for list items."
+				},
+				"data-ln-list-window-page": {
+					"type": "number",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Page fetch chunk size for list virtualization."
+				},
+				"data-ln-list-window-threshold": {
+					"type": "number",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Prefetch threshold in items for list virtualization."
+				},
+				"data-ln-list-count": {
+					"type": "number",
+					"read_by": "ln-list",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Grand total item count for virtualization."
+				}
+			}
+		},
+		"ln-modal": {
+			"element": {
+				"recommended_tag": "dialog",
+				"tag_enforced": true,
+				"note": "JS invokes dom.showModal() and listens for native cancel events; must be <dialog>."
+			},
+			"attributes": {
+				"data-ln-modal": {
+					"type": "string",
+					"enum": [
+						"open",
+						"close"
+					],
+					"read_by": "ln-modal",
+					"consumed_by": "js",
+					"role": "state",
+					"description": "Modal state attribute written by JS to open or close the dialog."
+				},
+				"data-ln-modal-close": {
+					"type": "boolean",
+					"read_by": "ln-modal",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Presence attribute on buttons/links inside modal to trigger close on click."
+				},
+				"data-ln-modal-mode": {
+					"type": "string",
+					"enum": [
+						"new",
+						"edit"
+					],
+					"read_by": "ln-modal-coordinator",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "Mode state set on dialog by coordinator ('new' vs 'edit')."
+				},
+				"data-ln-modal-when": {
+					"type": "string",
+					"enum": [
+						"new",
+						"edit"
+					],
+					"read_by": "ln-modal (SCSS)",
+					"consumed_by": "css",
+					"role": "input",
+					"description": "Conditional display attribute on titles inside modal (controlled by SCSS based on modal-mode)."
+				}
+			}
+		},
+		"ln-modal-coordinator": {
+			"element": {
+				"recommended_tag": "dialog",
+				"tag_enforced": true,
+				"note": "Layer 2 coordinator attached to dialog modal for form fill/reset."
+			},
+			"attributes": {
+				"data-ln-modal-coordinator": {
+					"type": "boolean",
+					"read_by": "ln-modal-coordinator",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Activates modal coordinator for hash navigation and form fill."
+				},
+				"data-ln-modal-for": {
+					"type": "string",
+					"read_by": "ln-modal-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Binds trigger button to target modal ID."
+				}
+			}
+		},
+		"ln-nav": {
+			"element": {
+				"recommended_tag": "nav, ul, ol",
+				"tag_enforced": false,
+				"note": "Navigation bar active link highlight container (<nav>, <ul>, or <ol>)."
+			},
+			"attributes": {
+				"data-ln-nav": {
+					"type": "string",
+					"read_by": "ln-nav",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes navigation link active state tracking."
+				},
+				"data-ln-nav-exact": {
+					"type": "boolean",
+					"read_by": "ln-nav",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Requires exact URL path match for active link state."
+				}
+			}
+		},
+		"ln-number": {
+			"element": {
+				"recommended_tag": "input, data, span, td, strong",
+				"tag_enforced": false,
+				"note": "Number formatting component for form <input> controls or inline display elements (<data>, <span>, <td>, <strong>)."
+			},
+			"attributes": {
+				"data-ln-number": {
+					"type": "string",
+					"enum": [
+						"decimal",
+						"currency",
+						"percent"
+					],
+					"read_by": "ln-number",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Number formatting style using Intl.NumberFormat."
+				},
+				"data-ln-number-decimals": {
+					"type": "number",
+					"read_by": "ln-number",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Fraction digit decimal count."
+				},
+				"data-ln-number-min": {
+					"type": "number",
+					"read_by": "ln-number",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Minimum value constraint."
+				},
+				"data-ln-number-max": {
+					"type": "number",
+					"read_by": "ln-number",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Maximum value constraint."
+				}
+			}
+		},
+		"ln-options": {
+			"element": {
+				"recommended_tag": "select, datalist",
+				"tag_enforced": false,
+				"note": "Populates select or datalist option elements from data store."
+			},
+			"attributes": {
+				"data-ln-options": {
+					"type": "string",
+					"read_by": "ln-options",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Data store name to fetch select option items from."
+				},
+				"data-ln-options-value": {
+					"type": "string",
+					"read_by": "ln-options",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field key to use for option value attribute."
+				},
+				"data-ln-options-label": {
+					"type": "string",
+					"read_by": "ln-options",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field key to use for option text label."
+				}
+			}
+		},
+		"ln-popover": {
+			"element": {
+				"recommended_tag": "div, dialog, section, form",
+				"tag_enforced": false,
+				"note": "Positioned popover container element."
+			},
+			"attributes": {
+				"data-ln-popover": {
+					"type": "boolean",
+					"read_by": "ln-popover",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes popover overlay container."
+				},
+				"data-ln-popover-for": {
+					"type": "string",
+					"read_by": "ln-popover",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Target popover element ID bound to trigger button."
+				},
+				"data-ln-popover-position": {
+					"type": "string",
+					"enum": [
+						"top",
+						"bottom",
+						"left",
+						"right"
+					],
+					"read_by": "ln-popover",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Preferred popover placement position."
+				},
+				"data-ln-popover-placement": {
+					"type": "string",
+					"enum": [
+						"top",
+						"bottom",
+						"left",
+						"right"
+					],
+					"read_by": "ln-popover",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "Computed dynamic placement attribute set by positioning engine."
+				}
+			}
+		},
+		"ln-progress": {
+			"element": {
+				"recommended_tag": "div, span",
+				"tag_enforced": false,
+				"note": "Linear progress bar container (<div data-ln-progress='50'>) whose width percentage and ARIA roles update dynamically."
+			},
+			"attributes": {
+				"data-ln-progress": {
+					"type": "number",
+					"read_by": "ln-progress",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Current progress value."
+				},
+				"data-ln-progress-max": {
+					"type": "number",
+					"read_by": "ln-progress",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Progress maximum value limit."
+				}
+			}
+		},
+		"ln-router": {
+			"element": {
+				"recommended_tag": "main, div, section",
+				"tag_enforced": false,
+				"note": "Single Page Application client router and viewport outlet."
+			},
+			"attributes": {
+				"data-ln-route": {
+					"type": "string",
+					"read_by": "ln-router",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Route path matching pattern."
+				},
+				"data-ln-route-target": {
+					"type": "string",
+					"read_by": "ln-router",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Target outlet element ID for rendering route content."
+				},
+				"data-ln-outlet": {
+					"type": "string",
+					"read_by": "ln-router",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Marks viewport outlet element for swapped view content."
+				},
+				"data-ln-route-keep": {
+					"type": "boolean",
+					"read_by": "ln-router",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Preserves view state in DOM cache when unmounted."
+				},
+				"data-ln-router-hydrate": {
+					"type": "boolean",
+					"read_by": "ln-router",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Hydrates server-rendered initial markup without re-fetch."
+				},
+				"data-ln-route-title": {
+					"type": "string",
+					"read_by": "ln-router",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Document page title to set when route activates."
+				}
+			}
+		},
+		"ln-search": {
+			"element": {
+				"recommended_tag": "input, div, form",
+				"tag_enforced": false,
+				"note": "Search text input control."
+			},
+			"attributes": {
+				"data-ln-search": {
+					"type": "string",
+					"read_by": "ln-search",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "ID of target element/container to filter."
+				},
+				"data-ln-search-hide": {
+					"type": "string",
+					"enum": [
+						"true"
+					],
+					"read_by": "ln-search",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "State attribute set by JS to hide non-matching items."
+				},
+				"data-ln-search-items": {
+					"type": "string",
+					"read_by": "ln-search",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "CSS selector for target child items inside container (e.g. 'tbody tr')."
+				},
+				"data-ln-search-debounce": {
+					"type": "number",
+					"read_by": "ln-search",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Debounce delay in ms (use 0 for instant local DOM filter, >=150 for API search)."
+				},
+				"data-ln-search-clear": {
+					"type": "boolean",
+					"read_by": "ln-search",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Button trigger to clear search term input."
+				}
+			}
+		},
+		"ln-slug": {
+			"element": {
+				"recommended_tag": "input",
+				"tag_enforced": true,
+				"note": "Applies strictly to <input> elements for slug generation; JS enforces dom.tagName === 'INPUT'."
+			},
+			"attributes": {
+				"data-ln-slug-from": {
+					"type": "string",
+					"read_by": "ln-slug",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Source input field name/id to convert into URL slug."
+				}
+			}
+		},
+		"ln-sortable": {
+			"element": {
+				"recommended_tag": "ul, ol",
+				"tag_enforced": false,
+				"note": "Drag-and-drop sortable list container (<ul data-ln-sortable> or <ol data-ln-sortable>)."
+			},
+			"attributes": {
+				"data-ln-sortable": {
+					"type": "boolean",
+					"read_by": "ln-sortable",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Enables drag-and-drop re-ordering on child items."
+				},
+				"data-ln-sortable-handle": {
+					"type": "string",
+					"read_by": "ln-sortable",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "CSS selector for drag handle handle button."
+				}
+			}
+		},
+		"ln-stat": {
+			"element": {
+				"recommended_tag": "strong, span, b, data, div",
+				"tag_enforced": false,
+				"note": "Inline metric display bound to data store count."
+			},
+			"attributes": {
+				"data-ln-stat": {
+					"type": "string",
+					"read_by": "ln-stat",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Target store name to display live count for."
+				},
+				"data-ln-stat-filter": {
+					"type": "string",
+					"read_by": "ln-stat",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Filter criteria formatted as 'field:value'."
+				}
+			}
+		},
+		"ln-table": {
+			"element": {
+				"recommended_tag": "div, section",
+				"tag_enforced": false,
+				"note": "Data table wrapper container enclosing a <table> element."
+			},
+			"attributes": {
+				"data-ln-table": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Initializes table component and sets unique table ID."
+				},
+				"data-ln-table-source": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Data store or resource name in Data-Driven mode."
+				},
+				"data-ln-table-col": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Maps <th> header column to record payload field key."
+				},
+				"data-ln-table-sort": {
+					"type": "string",
+					"enum": [
+						"string",
+						"number",
+						"date"
+					],
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Enables column sorting and specifies sort data type."
+				},
+				"data-ln-table-col-sort": {
+					"type": "boolean",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Sort trigger button inside <th> header."
+				},
+				"data-ln-table-col-filter": {
+					"type": "boolean",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Column filter popover trigger button inside <th>."
+				},
+				"data-ln-table-filter-col": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Maps column header to filter key for column filtering."
+				},
+				"data-ln-table-selectable": {
+					"type": "boolean",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Enables row checkboxes and multi-selection mode."
+				},
+				"data-ln-table-col-select": {
+					"type": "boolean",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Marks <th> header column containing global select-all checkbox."
+				},
+				"data-ln-table-row": {
+					"type": "boolean",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Marks <tr> row element inside row template."
+				},
+				"data-ln-table-row-id": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "state",
+					"description": "Rendered record ID on row element."
+				},
+				"data-ln-table-row-select": {
+					"type": "boolean",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Selection checkbox inside row template."
+				},
+				"data-ln-table-row-action": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Action button trigger name inside row."
+				},
+				"data-ln-table-window": {
+					"type": "number",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Sliding-window virtualization resident-row cap size."
+				},
+				"data-ln-table-window-page": {
+					"type": "number",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Page fetch chunk size for server requests in windowed mode (default: 200)."
+				},
+				"data-ln-table-window-threshold": {
+					"type": "number",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Prefetch margin threshold in rows before page boundaries (default: 25)."
+				},
+				"data-ln-table-count": {
+					"type": "number",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Declares unfiltered grand total for windowed virtualization."
+				},
+				"data-ln-table-total": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Footer element to display total record count."
+				},
+				"data-ln-table-filtered": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Footer element to display filtered count."
+				},
+				"data-ln-table-selected": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Footer element to display selected count."
+				},
+				"data-ln-table-empty": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Empty state container selector or template."
+				},
+				"data-ln-table-empty-when": {
+					"type": "string",
+					"enum": [
+						"initial",
+						"search"
+					],
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Targets empty state variant based on search vs initial load."
+				},
+				"data-ln-table-cell-attr": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Field-to-attribute interpolation list for cell elements."
+				},
+				"data-ln-table-dict": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Selector for hidden i18n dictionary strings in table."
+				},
+				"data-ln-table-select-all-label": {
+					"type": "string",
+					"read_by": "ln-table",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Accessible aria-label for select-all checkbox."
+				},
+				"data-ln-sort-icon": {
+					"type": "string",
+					"enum": [
+						"none",
+						"asc",
+						"desc"
+					],
+					"read_by": "ln-table (SCSS)",
+					"consumed_by": "css",
+					"role": "input",
+					"description": "SCSS sort icon state selector inside sortable column headers."
+				}
+			}
+		},
+		"ln-table-coordinator": {
+			"element": {
+				"recommended_tag": "div, section",
+				"tag_enforced": false,
+				"note": "Layer 2 table coordinator binding table, search, filter, and clear triggers."
+			},
+			"attributes": {
+				"data-ln-table-coordinator": {
+					"type": "string",
+					"read_by": "ln-table-coordinator",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes table coordinator."
+				},
+				"data-ln-table-clear-all": {
+					"type": "boolean",
+					"read_by": "ln-table-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Button to clear all active search and column filters."
+				},
+				"data-ln-table-clear": {
+					"type": "boolean",
+					"read_by": "ln-table-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Button to clear specific table search term."
+				}
+			}
+		},
+		"ln-tabs": {
+			"element": {
+				"recommended_tag": "div, nav, ul, ol",
+				"tag_enforced": false,
+				"note": "Tabbed interface container wrapper."
+			},
+			"attributes": {
+				"data-ln-tabs": {
+					"type": "string",
+					"read_by": "ln-tabs",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes tabs container."
+				},
+				"data-ln-tab": {
+					"type": "string",
+					"read_by": "ln-tabs",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Tab button activator bound to target panel ID."
+				},
+				"data-ln-panel": {
+					"type": "string",
+					"read_by": "ln-tabs",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Marks tab panel content element."
+				},
+				"data-ln-tabs-key": {
+					"type": "string",
+					"read_by": "ln-tabs",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Storage key for tab persistence."
+				},
+				"data-ln-tabs-default": {
+					"type": "string",
+					"read_by": "ln-tabs",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Default active tab ID on load."
+				},
+				"data-ln-tabs-focus": {
+					"type": "boolean",
+					"read_by": "ln-tabs",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Focuses panel when tab activates."
+				},
+				"data-ln-tabs-active": {
+					"type": "string",
+					"read_by": "ln-tabs",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "State attribute reflecting active tab ID."
+				},
+				"data-ln-tabs-for": {
+					"type": "string",
+					"read_by": "ln-tabs (SCSS)",
+					"consumed_by": "css",
+					"role": "input",
+					"description": "SCSS selector binding tab button to panel."
+				}
+			}
+		},
+		"ln-time": {
+			"element": {
+				"recommended_tag": "time",
+				"tag_enforced": false,
+				"note": "Semantic <time datetime='...'> tag for localized time formatting."
+			},
+			"attributes": {
+				"data-ln-time": {
+					"type": "string",
+					"enum": [
+						"short",
+						"medium",
+						"long",
+						"full"
+					],
+					"read_by": "ln-time",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Time formatting style preset using Intl.DateTimeFormat."
+				},
+				"data-ln-time-locale": {
+					"type": "string",
+					"read_by": "ln-time",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Locale tag override for time rendering."
+				}
+			}
+		},
+		"ln-toast": {
+			"element": {
+				"recommended_tag": "ol, ul",
+				"tag_enforced": false,
+				"note": "Sequential toast notification container list (<ol data-ln-toast> or <ul data-ln-toast>) rendering ordered toast <li> items."
+			},
+			"attributes": {
+				"data-ln-toast": {
+					"type": "string",
+					"read_by": "ln-toast",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes toast notification queue container."
+				},
+				"data-ln-toast-item": {
+					"type": "boolean",
+					"read_by": "ln-toast",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Marks individual toast item element inside template."
+				},
+				"data-ln-toast-timeout": {
+					"type": "number",
+					"read_by": "ln-toast",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Auto-dismiss duration in ms (default: 4000)."
+				},
+				"data-ln-toast-max": {
+					"type": "number",
+					"read_by": "ln-toast",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Maximum number of simultaneous visible toast messages (default: 5)."
+				},
+				"data-ln-toast-close": {
+					"type": "boolean",
+					"read_by": "ln-toast",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Close button trigger inside toast item."
+				}
+			}
+		},
+		"ln-toggle": {
+			"element": {
+				"recommended_tag": "button, section, div, ul, li",
+				"tag_enforced": false,
+				"note": "Toggle trigger control or collapsible target element (button, section, div, ul, li)."
+			},
+			"attributes": {
+				"data-ln-toggle": {
+					"type": "string",
+					"enum": [
+						"open",
+						"closed"
+					],
+					"read_by": "ln-toggle",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "Visibility state attribute written by JS ('open' or 'closed')."
+				},
+				"data-ln-toggle-for": {
+					"type": "string",
+					"read_by": "ln-toggle",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Binds trigger element to target toggle panel ID."
+				},
+				"data-ln-toggle-action": {
+					"type": "string",
+					"enum": [
+						"open",
+						"close",
+						"toggle"
+					],
+					"read_by": "ln-toggle",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Action type for trigger click (default: 'toggle')."
+				}
+			}
+		},
+		"ln-tooltip": {
+			"element": {
+				"recommended_tag": "button, a",
+				"tag_enforced": false,
+				"note": "Tooltip target host element."
+			},
+			"attributes": {
+				"data-ln-tooltip": {
+					"type": "string",
+					"read_by": "ln-tooltip",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Tooltip text content string."
+				},
+				"data-ln-tooltip-enhance": {
+					"type": "boolean",
+					"read_by": "ln-tooltip",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in trigger to enhance custom tooltip elements."
+				},
+				"data-ln-tooltip-position": {
+					"type": "string",
+					"enum": [
+						"top",
+						"bottom",
+						"left",
+						"right"
+					],
+					"read_by": "ln-tooltip",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Preferred tooltip position."
+				},
+				"data-ln-tooltip-placement": {
+					"type": "string",
+					"enum": [
+						"top",
+						"bottom",
+						"left",
+						"right"
+					],
+					"read_by": "ln-tooltip",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "Computed placement attribute set by positioning engine."
+				},
+				"data-ln-tooltip-enhanced": {
+					"type": "string",
+					"read_by": "ln-tooltip",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "State attribute indicating JS positioning engine has activated."
+				}
+			}
+		},
+		"ln-translations": {
+			"element": {
+				"recommended_tag": "form, div",
+				"tag_enforced": false,
+				"note": "Form translation manager container."
+			},
+			"attributes": {
+				"data-ln-translations": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Initializes form field translation manager."
+				},
+				"data-ln-translations-locales": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "JSON string of available language locale configurations."
+				},
+				"data-ln-translatable": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Marks form field wrapper as translatable across active locales."
+				},
+				"data-ln-translatable-lang": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "state",
+					"description": "State tag set on cloned input elements for language code."
+				},
+				"data-ln-translations-lang": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Default active language locale."
+				},
+				"data-ln-translations-prefix": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Nested object field prefix for cloned inputs (e.g. 'product')."
+				}
+			}
+		},
+		"ln-upload": {
+			"element": {
+				"recommended_tag": "div, section",
+				"tag_enforced": false,
+				"note": "File upload dropzone container."
+			},
+			"attributes": {
+				"data-ln-upload": {
+					"type": "string",
+					"read_by": "ln-upload",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Initializes file uploader and sets upload endpoint URL."
+				},
+				"data-ln-upload-delete": {
+					"type": "string",
+					"read_by": "ln-upload",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "URL endpoint pattern for file deletion requests."
+				},
+				"data-ln-upload-accept": {
+					"type": "string",
+					"read_by": "ln-upload",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Comma-separated list of allowed file extensions (e.g. '.pdf,.png')."
+				},
+				"data-ln-upload-context": {
+					"type": "string",
+					"read_by": "ln-upload",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Context namespace identifier sent with upload FormData."
+				},
+				"data-ln-upload-dict": {
+					"type": "string",
+					"read_by": "ln-upload",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Selector for hidden i18n message dictionary strings."
+				},
+				"data-ln-upload-action": {
+					"type": "string",
+					"enum": [
+						"remove"
+					],
+					"read_by": "ln-upload",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Item action button trigger (e.g. 'remove')."
+				}
+			}
+		},
+		"ln-validate": {
+			"element": {
+				"recommended_tag": "input, textarea, select, form",
+				"tag_enforced": false,
+				"note": "Input control field with HTML5 validity validation."
+			},
+			"attributes": {
+				"data-ln-validate": {
+					"type": "boolean",
+					"read_by": "ln-validate",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Enables HTML5 ValidityState field validation."
+				},
+				"data-ln-validate-errors": {
+					"type": "boolean",
+					"read_by": "ln-validate",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Container element for validation error message list."
+				},
+				"data-ln-validate-error": {
+					"type": "string",
+					"enum": [
+						"valueMissing",
+						"typeMismatch",
+						"patternMismatch",
+						"tooLong",
+						"tooShort",
+						"rangeUnderflow",
+						"rangeOverflow",
+						"stepMismatch",
+						"badInput",
+						"customError"
+					],
+					"read_by": "ln-validate",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Error message item key matching HTML5 ValidityState property or custom backend error key."
+				}
+			}
+		}
+	}
 }

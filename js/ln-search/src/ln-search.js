@@ -3,7 +3,6 @@ import { dispatchCancelable, registerComponent } from '../../ln-core';
 (function () {
 	const DOM_SELECTOR = 'data-ln-search';
 	const DOM_ATTRIBUTE = 'lnSearch';
-	const INIT_ATTR = 'data-ln-search-initialized';
 	const HIDE_ATTR = 'data-ln-search-hide';
 	const DEBOUNCE_MS = 150;
 
@@ -12,8 +11,6 @@ import { dispatchCancelable, registerComponent } from '../../ln-core';
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
-		if (dom.hasAttribute(INIT_ATTR)) return this;
-
 		this.dom = dom;
 		this.targetId = dom.getAttribute(DOM_SELECTOR);
 
@@ -43,7 +40,6 @@ import { dispatchCancelable, registerComponent } from '../../ln-core';
 			});
 		}
 
-		dom.setAttribute(INIT_ATTR, '');
 		return this;
 	}
 
@@ -112,7 +108,6 @@ import { dispatchCancelable, registerComponent } from '../../ln-core';
 		if (this._clearBtn && this._onClear) {
 			this._clearBtn.removeEventListener('click', this._onClear);
 		}
-		this.dom.removeAttribute(INIT_ATTR);
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
