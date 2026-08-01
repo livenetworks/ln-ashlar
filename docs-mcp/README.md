@@ -23,6 +23,7 @@ All agents consuming this corpus must understand that `ln-ashlar` supports **two
 ```
 docs-mcp/
   README.md          ← this file (NOT indexed)
+  component-router.md ← component-selection matrix (NOT indexed — served as the routing contract)
   _templates/        ← authoring templates (NOT indexed)
   components/        ← JS components, one file per component: ln-<name>.md
   css/               ← SCSS components/mixins/tokens: <name>.md
@@ -38,6 +39,26 @@ docs-mcp/
 The MCP indexer reads ONLY from `components/`, `css/`, `patterns/`, `guides/`, `doctrine/`, and `skills/`.
 `skills/` is read **recursively** — the subfolder name is the skill's `context`; no other indexed folder has subfolders.
 Files starting with `_` or named `README.md` are ignored.
+
+### `component-router.md` — the routing contract
+
+`component-router.md` is the one top-level file the MCP server **serves without
+indexing it as a document**. Its body is injected verbatim into every MCP
+session's `instructions` (the client puts it in the model's system prompt before
+the first token), and it is also served on demand by the `get_component_router`
+tool. Purpose: the agent picks the right component from the matrix instead of
+inventing markup, then calls `get_markup` for the canonical HTML.
+
+Consequences for authors:
+
+- It needs **no frontmatter** — it is read raw, never parsed as a corpus doc.
+- It must contain **no markup**. Selection only; HTML lives in `components/`.
+- It is deliberately kept out of the index so its name never collides with the
+  real `ln-router` component in `components/`.
+- Keep it short. It is paid for in tokens on *every* session, so it earns its
+  place only by staying a map, not a manual.
+- The filename is fixed and root-neutral: every product repo served by the
+  server carries its own `docs-mcp/component-router.md`.
 
 ## Frontmatter (Mandatory for every document)
 
