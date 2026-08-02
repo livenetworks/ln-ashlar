@@ -107,7 +107,7 @@
 		},
 		"ln-ajax": {
 			"element": {
-				"recommended_tag": "body, form, div",
+				"recommended_tag": "body, form, div, section, nav",
 				"tag_enforced": false,
 				"note": "Can be attached to body, parent container, or form element."
 			},
@@ -122,13 +122,6 @@
 					"consumed_by": "js",
 					"role": "marker",
 					"description": "Boolean flag activating AJAX interception when present or empty. Set to 'false' to explicitly exclude a nested link or form from parent AJAX delegation."
-				},
-				"data-ln-form-scope": {
-					"type": "string",
-					"read_by": "ln-ajax",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Form resource scope for AJAX submission routing."
 				}
 			}
 		},
@@ -249,7 +242,7 @@
 		},
 		"ln-autosave": {
 			"element": {
-				"recommended_tag": "form, div",
+				"recommended_tag": "form, div, input",
 				"tag_enforced": false,
 				"note": "Attached to forms or inputs for automated local storage draft saving."
 			},
@@ -286,7 +279,7 @@
 		},
 		"ln-circular-progress": {
 			"element": {
-				"recommended_tag": "div, span",
+				"recommended_tag": "div, span, li",
 				"tag_enforced": false,
 				"note": "SVG circular progress indicator."
 			},
@@ -397,7 +390,7 @@
 		},
 		"ln-data-coordinator": {
 			"element": {
-				"recommended_tag": "ul, ol",
+				"recommended_tag": "ul",
 				"tag_enforced": false,
 				"note": "Layer 2 data coordinator parent list (<ul data-ln-data-coordinator> or <ol>) enclosing store, connector, and queue <li> elements."
 			},
@@ -572,9 +565,9 @@
 		},
 		"ln-editor": {
 			"element": {
-				"recommended_tag": "textarea, div",
+				"recommended_tag": "textarea",
 				"tag_enforced": false,
-				"note": "WYSIWYG rich text editor attached to <textarea> or container wrapper."
+				"note": "WYSIWYG rich text editor attached to <textarea>."
 			},
 			"attributes": {
 				"data-ln-editor": {
@@ -736,6 +729,13 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "HTTP method spoofing value placed in _method hidden field."
+				},
+				"data-ln-form-scope": {
+					"type": "string",
+					"read_by": "ln-data-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in local-first write routing scope matching a target ln-data-coordinator entity namespace."
 				}
 			}
 		},
@@ -1073,7 +1073,7 @@
 		},
 		"ln-popover": {
 			"element": {
-				"recommended_tag": "div, dialog, section, form",
+				"recommended_tag": "div, section, form, a, button",
 				"tag_enforced": false,
 				"note": "Positioned popover container element."
 			},
@@ -1122,7 +1122,7 @@
 		},
 		"ln-progress": {
 			"element": {
-				"recommended_tag": "div, span",
+				"recommended_tag": "div, span, li",
 				"tag_enforced": false,
 				"note": "Linear progress bar container (<div data-ln-progress='50'>) whose width percentage and ARIA roles update dynamically."
 			},
@@ -1276,7 +1276,7 @@
 					"read_by": "ln-sortable",
 					"consumed_by": "js",
 					"role": "input",
-					"description": "CSS selector for drag handle handle button."
+					"description": "CSS selector for drag handle handle button. Applied to chile, sortable, elements."
 				}
 			}
 		},
@@ -1717,7 +1717,7 @@
 		},
 		"ln-tooltip": {
 			"element": {
-				"recommended_tag": "button, a",
+				"recommended_tag": "button, a, abbr",
 				"tag_enforced": false,
 				"note": "Tooltip target host element."
 			},
@@ -1773,7 +1773,7 @@
 		},
 		"ln-translations": {
 			"element": {
-				"recommended_tag": "form, div",
+				"recommended_tag": "form, input, div",
 				"tag_enforced": false,
 				"note": "Form translation manager container."
 			},
@@ -1783,7 +1783,14 @@
 					"read_by": "ln-translations",
 					"consumed_by": "js",
 					"role": "marker",
-					"description": "Initializes form field translation manager."
+					"description": "Initializes form field translation manager on a form or container."
+				},
+				"data-ln-translations-default": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Default language code (e.g. 'en') used to flag original (non-cloned) input elements."
 				},
 				"data-ln-translations-locales": {
 					"type": "string",
@@ -1791,6 +1798,20 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "JSON string of available language locale configurations."
+				},
+				"data-ln-translations-placeholder": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in placeholder template for cloned inputs, e.g. '{lang} translation'."
+				},
+				"data-ln-translations-remove-label": {
+					"type": "string",
+					"read_by": "ln-translations",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in aria-label template for the badge remove button, e.g. 'Remove {lang}'."
 				},
 				"data-ln-translatable": {
 					"type": "string",
@@ -1811,7 +1832,7 @@
 					"read_by": "ln-translations",
 					"consumed_by": "js",
 					"role": "input",
-					"description": "Default active language locale."
+					"description": "Language code associated with template items like badges or menu buttons."
 				},
 				"data-ln-translations-prefix": {
 					"type": "string",

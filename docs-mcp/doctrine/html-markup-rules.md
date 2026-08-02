@@ -62,6 +62,21 @@ Headings name content — they are not a visual size utility.
 - **Separators:** Use `<hr>` for a thematic break instead of `<div class="divider">`.
 - **Numeric Values:** Use `<data value="…">` or `<strong>` for numeric values — never a heading.
 
+> [!IMPORTANT]
+> **Coexistence with `data-ln-value` for Tables & Lists:**
+> Standard semantic elements like `<data value="...">` or `<time datetime="...">` live inside the visual display layer.
+> However, for components that support client-side sorting and filtering (e.g. `ln-table`), the core framework reads the raw machine key directly from the `data-ln-value` attribute on the cell container (`<td>`).
+>
+> To satisfy both semantic HTML5 and framework sorting, combine them like so:
+> ```html
+> <td data-ln-value="1250.50">
+>     <data value="1250.50">$1,250.50</data>
+> </td>
+> <td data-ln-value="2026-07-25">
+>     <time datetime="2026-07-25" data-ln-date="long">July 25, 2026</time>
+> </td>
+> ```
+
 ---
 
 ## 2. Interactive Elements (Clickables)
