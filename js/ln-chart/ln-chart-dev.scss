@@ -1,0 +1,20 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	[data-ln-chart]:not(.chart) {
+		@include dev-dom-error("[data-ln-chart] is missing the required .chart visual class.");
+	}
+
+	[data-ln-chart]:not([data-ln-chart-x]),
+	[data-ln-chart]:not([data-ln-chart-y]) {
+		@include dev-dom-error("[data-ln-chart] requires data-ln-chart-x and data-ln-chart-y.");
+	}
+
+	[data-ln-chart]:not(:has([data-ln-chart-plot][viewBox])) {
+		@include dev-dom-error("[data-ln-chart] requires [data-ln-chart-plot] with an SVG viewBox.");
+	}
+
+	[data-ln-chart]:not(:has([data-ln-chart-line])) {
+		@include dev-dom-error("[data-ln-chart] requires an authored [data-ln-chart-line] polyline.");
+	}
+}

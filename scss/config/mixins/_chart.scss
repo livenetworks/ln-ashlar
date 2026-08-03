@@ -1,0 +1,82 @@
+// Responsive SVG dataset chart. Geometry belongs to ln-chart; every visual
+// decision is exposed as a re-bindable CSS custom property.
+//
+// Usage:
+//   .chart { @include chart; }
+
+@mixin chart {
+	--chart-height: 20rem;
+	--chart-gap: 0.75rem;
+	--chart-radius: var(--radius-md);
+	--chart-line-color: hsl(var(--color-primary));
+	--chart-line-width: 2px;
+	--chart-area-color: hsl(var(--color-primary) / 0.16);
+	--chart-grid-color: var(--border-subtle);
+	--chart-grid-column-size: 12.5%;
+	--chart-grid-row-size: 25%;
+	--chart-label-color: var(--fg-muted);
+
+	display: grid;
+	gap: var(--chart-gap);
+	min-inline-size: 0;
+
+	.chart__plot {
+		display: block;
+		inline-size: 100%;
+		block-size: var(--chart-height);
+		border-radius: var(--chart-radius);
+		background-image:
+			linear-gradient(to right, var(--chart-grid-color) 1px, transparent 1px),
+			linear-gradient(to bottom, var(--chart-grid-color) 1px, transparent 1px);
+		background-size: var(--chart-grid-column-size) 100%, 100% var(--chart-grid-row-size);
+		overflow: visible;
+	}
+
+	.chart__line {
+		fill: none;
+		stroke: var(--chart-line-color);
+		stroke-width: var(--chart-line-width);
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.chart__area {
+		fill: var(--chart-area-color);
+		stroke: none;
+	}
+
+	.chart__labels {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: minmax(4rem, 1fr);
+		gap: var(--chart-gap);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		color: var(--chart-label-color);
+		font-size: 0.75rem;
+		line-height: 1.25;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+
+	.chart__label {
+		min-inline-size: 0;
+		text-align: center;
+	}
+
+	.chart__summary {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--chart-gap);
+		color: var(--chart-label-color);
+		font-size: 0.875rem;
+	}
+
+	.chart__empty {
+		margin: 0;
+		color: var(--chart-label-color);
+		text-align: center;
+	}
+}

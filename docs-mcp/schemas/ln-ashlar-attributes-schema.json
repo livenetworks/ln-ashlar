@@ -277,6 +277,143 @@
 				}
 			}
 		},
+		"ln-chart": {
+			"element": {
+				"recommended_tag": "figure, section, div",
+				"tag_enforced": false,
+				"note": "Responsive SVG line/area renderer bound to an ordered numeric dataset."
+			},
+			"attributes": {
+				"data-ln-chart": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Component name and chart event identity."
+				},
+				"data-ln-chart-source": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Data-driven source name and coordinator fallback binding."
+				},
+				"data-ln-chart-store": {
+					"type": "string",
+					"read_by": "ln-data-coordinator",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Local data-store name served by ln-data-coordinator."
+				},
+				"data-ln-chart-x": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field used as the ordered category label."
+				},
+				"data-ln-chart-y": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field containing the numeric series value."
+				},
+				"data-ln-chart-type": {
+					"type": "string",
+					"enum": [
+						"line",
+						"area",
+						"polygon"
+					],
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "SVG rendering mode; polygon aliases area."
+				},
+				"data-ln-chart-sort": {
+					"type": "string",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Optional query sort formatted as field:asc or field:desc."
+				},
+				"data-ln-chart-padding": {
+					"type": "number",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Inner padding measured in authored SVG viewBox units."
+				},
+				"data-ln-chart-zero": {
+					"type": "string",
+					"enum": [
+						"true",
+						"false"
+					],
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Set false to opt out of the default zero-inclusive y domain."
+				},
+				"data-ln-chart-plot": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "marker",
+					"description": "Authored SVG plotting surface; requires a valid viewBox."
+				},
+				"data-ln-chart-line": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Authored polyline receiving calculated points."
+				},
+				"data-ln-chart-area": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional authored polygon receiving area points."
+				},
+				"data-ln-chart-labels": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional container populated from the {chartName}-label template."
+				},
+				"data-ln-chart-empty": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Authored empty-state element toggled when no valid values exist."
+				},
+				"data-ln-chart-min": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional minimum-value text destination."
+				},
+				"data-ln-chart-max": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional maximum-value text destination."
+				},
+				"data-ln-chart-count": {
+					"type": "boolean",
+					"read_by": "ln-chart",
+					"consumed_by": "js",
+					"role": "output",
+					"description": "Optional rendered-point count destination."
+				}
+			}
+		},
 		"ln-circular-progress": {
 			"element": {
 				"recommended_tag": "div, span, li",

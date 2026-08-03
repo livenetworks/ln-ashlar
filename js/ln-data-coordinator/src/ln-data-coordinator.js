@@ -496,7 +496,7 @@ import { MutationReceipts } from './mutation-receipts';
 						kind: meta.kind
 					});
 				} else if (meta.targetEl && meta.kind) {
-					if (meta.kind === 'table' || meta.kind === 'list') {
+					if (meta.kind === 'table' || meta.kind === 'list' || meta.kind === 'chart') {
 						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
 						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', {
 							data: normalizedData,
@@ -677,6 +677,7 @@ import { MutationReceipts } from './mutation-receipts';
 			// ─── View Binder Handlers ─────────────────────────────
 			reqTableData: function (e) { self._serveData(e, 'table'); },
 			reqListData:  function (e) { self._serveData(e, 'list'); },
+			reqChartData: function (e) { self._serveData(e, 'chart'); },
 			reqOptions:   function (e) { self._serveOptions(e); },
 			reqStat:      function (e) { self._serveStat(e); },
 			refresh: function (e) {
@@ -724,6 +725,7 @@ import { MutationReceipts } from './mutation-receipts';
 		// View binder — request handlers (document-level to reach tables/lists outside this subtree)
 		document.addEventListener('ln-table:request-data', self._handlers.reqTableData);
 		document.addEventListener('ln-list:request-data',  self._handlers.reqListData);
+		document.addEventListener('ln-chart:request-data', self._handlers.reqChartData);
 		document.addEventListener('ln-options:request-data', self._handlers.reqOptions);
 		document.addEventListener('ln-stat:request-count',  self._handlers.reqStat);
 
@@ -748,8 +750,11 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype._serveData = function (e, kind) {
 		const el = e.target;
-		const attrName = kind === 'table' ? 'data-ln-table-store' : 'data-ln-list-store';
-		const storeName = el.getAttribute(attrName) || el.getAttribute('data-ln-table-source') || el.getAttribute('data-ln-list-source');
+		const attrName = kind === 'table' ? 'data-ln-table-store'
+			: (kind === 'list' ? 'data-ln-list-store' : 'data-ln-chart-store');
+		const sourceName = kind === 'table' ? 'data-ln-table-source'
+			: (kind === 'list' ? 'data-ln-list-source' : 'data-ln-chart-source');
+		const storeName = el.getAttribute(attrName) || el.getAttribute(sourceName);
 		if (!storeName) return;
 		if (!this._ownsStore(storeName)) return;
 
@@ -861,7 +866,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype._refreshAll = function (syncMeta) {
 		const self = this;
-		const allBound = document.querySelectorAll('[data-ln-table-store],[data-ln-list-store],[data-ln-options],[data-ln-stat]');
+		const allBound = document.querySelectorAll('[data-ln-table-store],[data-ln-list-store],[data-ln-chart-store],[data-ln-options],[data-ln-stat]');
 		for (let i = 0; i < allBound.length; i++) {
 			const el = allBound[i];
 			let storeName, kind;
@@ -872,6 +877,9 @@ import { MutationReceipts } from './mutation-receipts';
 			} else if (el.hasAttribute('data-ln-list-store')) {
 				storeName = el.getAttribute('data-ln-list-store');
 				kind = 'list';
+			} else if (el.hasAttribute('data-ln-chart-store')) {
+				storeName = el.getAttribute('data-ln-chart-store');
+				kind = 'chart';
 			} else if (el.hasAttribute('data-ln-options')) {
 				storeName = el.getAttribute('data-ln-options');
 				kind = 'options';
@@ -884,7 +892,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 			const store = this.findChildren().store;
 
-			if (kind === 'table' || kind === 'list') {
+			if (kind === 'table' || kind === 'list' || kind === 'chart') {
 				const cached = self._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
 				(function (capturedEl, capturedKind) {
 					store.getAll(cached).then(function (r) {
@@ -959,6 +967,7 @@ import { MutationReceipts } from './mutation-receipts';
 			// View binder — document-level listeners
 			document.removeEventListener('ln-table:request-data', self._handlers.reqTableData);
 			document.removeEventListener('ln-list:request-data',  self._handlers.reqListData);
+			document.removeEventListener('ln-chart:request-data', self._handlers.reqChartData);
 			document.removeEventListener('ln-options:request-data', self._handlers.reqOptions);
 			document.removeEventListener('ln-stat:request-count',  self._handlers.reqStat);
 

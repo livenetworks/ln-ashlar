@@ -1,6 +1,6 @@
 # `data-ln-data-coordinator`
 
-A zero-dependency, Local-First **Data Coordinator** component that orchestrates the full 3-Tier Data Layer in `ln-ashlar`: it bridges the local cache store to remote connectors **and** delivers live data to bound view components (tables, lists, selects, stat counters) with zero application JavaScript.
+A zero-dependency, Local-First **Data Coordinator** component that orchestrates the full 3-Tier Data Layer in `ln-ashlar`: it bridges the local cache store to remote connectors **and** delivers live data to bound view components (tables, lists, charts, selects, stat counters) with zero application JavaScript.
 
 This component monitors its DOM subtree, intercepts events, and coordinates the lifecycle between a **Local Storage Cache** (`data-ln-data-store`) and any **Transport Gateway** (`data-ln-*-connector`). It also listens on `document` for view-binding requests and refreshes all bound view elements on every store mutation.
 
@@ -14,6 +14,7 @@ Add these attributes to view elements to bind them to this coordinator's child s
 |---|---|---|
 | `data-ln-table-store="<storeName>"` | `[data-ln-table]` | Binds a table — receives `ln-table:set-data` automatically. |
 | `data-ln-list-store="<storeName>"` | `[data-ln-list]` | Binds a list — receives `ln-list:set-data` automatically. |
+| `data-ln-chart-store="<storeName>"` | `[data-ln-chart]` | Binds a chart; receives `ln-chart:set-data` automatically. |
 | `data-ln-options="<storeName>"` | `<select>` | Populated by `ln-options` via `ln-options:set-data`. |
 | `data-ln-stat="<storeName>"` | Inline element | Receives count via `ln-stat:set-count`. |
 
@@ -501,6 +502,7 @@ Source: `js/ln-data-coordinator/src/ln-data-coordinator.js`. The write pipeline 
 |---|---|---|
 | `data-ln-table-store="<name>"` | `[data-ln-table]` | `ln-table:set-data` |
 | `data-ln-list-store="<name>"` | `[data-ln-list]` | `ln-list:set-data` |
+| `data-ln-chart-store="<name>"` | `[data-ln-chart]` | `ln-chart:set-data` |
 | `data-ln-options="<name>"` | `<select>` | `ln-options:set-data` |
 | `data-ln-stat="<name>"` | inline element | `ln-stat:set-count` |
 
@@ -514,7 +516,7 @@ The binder awaits `store.ready` before choosing a source. Loaded non-windowed
 reads use the local store; an empty local-only store is also a valid source and
 returns `[]`. Windowed reads, connector-backed stores without a loaded cache,
 and stores with `initializationError` route remote. When IndexedDB is
-unavailable, table/list/options/stat responses are delivered directly to the
+unavailable, table/list/chart/options/stat responses are delivered directly to the
 requesting view instead of being forced through the failed store. Query
 failures clear loading and emit
 `ln-data-coordinator:error {operation:'query', kind, store, target, error}`.

@@ -26,6 +26,7 @@
 | Component | Use for | Don't use for |
 |---|---|---|
 | `ln-table` | Any tabular data. Sorting, filtering, search, selection, virtual scrolling. SSR **or** data-driven mode | Static tables with no interactivity → plain `<table>`; card grids |
+| `ln-chart` | Ordered numeric datasets shown as responsive line/area SVG, SSR shell or coordinator-backed | Multi-series analytical dashboards or highly interactive charting |
 | `ln-progress` / `ln-circular-progress` | Known-percentage progress: uploads, wizards, form completion | Indeterminate loading → skeletons / `ln-toast` |
 
 ## Forms & Input

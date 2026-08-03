@@ -48,6 +48,7 @@
 @use 'components/upload';
 @use 'components/translations';
 @use 'components/ln-table';
+@use 'components/chart';
 @use 'components/ajax';
 
 @use 'utilities/utilities';
@@ -62,6 +63,7 @@
 @use '../js/ln-search/ln-search';
 @use '../js/ln-table/ln-table' as ln-table-state;
 @use '../js/ln-list/ln-list';
+@use '../js/ln-chart/ln-chart';
 @use '../js/ln-editor/ln-editor';
 @use '../js/ln-confirm/ln-confirm';
 

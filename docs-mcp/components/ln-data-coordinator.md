@@ -49,7 +49,7 @@ tags: [data, synchronization, local-first]
 
 ### Variant 1: Connection to View Components
 
-View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere in the DOM. They communicate with the coordinator via bubbled document queries.
+View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-chart.md)) can reside anywhere in the DOM. They communicate with the coordinator via bubbled document queries.
 
 #### HTML Markup
 ```html
@@ -108,10 +108,11 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-list:request-data` | Listens | No | Query from a list to fetch items (same handling as `ln-table:request-data`). | `{ target: HTMLElement, sort, filters, search }` |
+| `ln-chart:request-data` | Listens | No | Query from a chart to fetch an ordered dataset. | `{ target: HTMLElement, sort, filters, search }` |
 | `ln-options:request-data` | Listens | No | Query from an `<select>`/options binder to fetch all records. | `{ target: HTMLElement }` |
 | `ln-stat:request-count` | Listens | No | Query from a stat/counter binder to fetch a record count. | `{ target: HTMLElement, filters?: Object }` |
-| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table` or `list`, matching the requesting view's own namespace. Delivers the resolved query result. | `{ data: Array, total: Number, filtered: Number }` |
-| `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: true }` |
+| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`, matching the requesting view's own namespace. Delivers the resolved query result. | `{ data: Array, total: Number, filtered: Number }` |
+| `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: Boolean }` |
 | `ln-options:set-data` | Emits | No | Delivers all records to a bound options binder. | `{ data: Array }` |
 | `ln-stat:set-count` | Emits | No | Delivers the resolved count to a bound stat binder. | `{ count: Number }` |
 | `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all bound view elements using their last cached query. | *(handler-internal; no detail consumed)* |
