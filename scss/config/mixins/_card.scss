@@ -140,6 +140,29 @@
 @mixin panel-body {
 	padding: var(--card-padding-y) var(--card-padding-x);
 
+	ul, ol {
+		padding-left: 1.5em;
+		margin-bottom: var(--size-md);
+
+		li {
+			margin-bottom: var(--size-xs);
+			line-height: 1.7;
+			list-style: inherit;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	ul {
+		list-style-type: disc;
+	}
+
+	ol {
+		list-style-type: decimal;
+	}
+
 	&:has(> table),
 	&:has(> .table-container) {
 		overflow-x: auto;
