@@ -12,13 +12,13 @@ Add these attributes to view elements to bind them to this coordinator's child s
 
 | Attribute | Applied To | Description |
 |---|---|---|
-| `data-ln-table-store="<storeName>"` | `[data-ln-table]` | Binds a table — receives `ln-table:set-data` automatically. |
-| `data-ln-list-store="<storeName>"` | `[data-ln-list]` | Binds a list — receives `ln-list:set-data` automatically. |
-| `data-ln-chart-store="<storeName>"` | `[data-ln-chart]` | Binds a chart; receives `ln-chart:set-data` automatically. |
+| `data-ln-table-source="<storeName>"` | `[data-ln-table]` | Binds a table — receives `ln-table:set-data` automatically. |
+| `data-ln-list-source="<storeName>"` | `[data-ln-list]` | Binds a list — receives `ln-list:set-data` automatically. |
+| `data-ln-chart-source="<storeName>"` | `[data-ln-chart]` | Binds a chart; receives `ln-chart:set-data` automatically. |
 | `data-ln-options="<storeName>"` | `<select>` | Populated by `ln-options` via `ln-options:set-data`. |
 | `data-ln-stat="<storeName>"` | Inline element | Receives count via `ln-stat:set-count`. |
 
-`<storeName>` = the value of `data-ln-data-store` on the coordinator's child store. Multiple coordinators on one page each serve only their own store — isolated by the `_ownsStore(name)` guard.
+`<storeName>` = the `id` of the coordinator's child store element. The presentation layer always addresses the **store**, never the coordinator. Multiple coordinators on one page each serve only their own store — isolated by the `_ownsStore(name)` guard.
 
 ### Presenter / Binder Split
 
@@ -27,21 +27,18 @@ Add these attributes to view elements to bind them to this coordinator's child s
 
 Use `setPresenters` for fields like `updated_display`, `size_display`, `status_label`. The binder delivers them as-is.
 
-### Store-Change Refresh
-
-The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `created`, `updated`, `deleted`, and `synced` (only when `changed`). On any of these, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
+The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `created`, `updated`, `deleted`, `synced` (only when `changed`), `ln-data-store:query-changed`, and `ln-data-store:request-page`. On request-page, it converts page offsets into `ln-api-connector:request-query` calls. On other store-change events, `_refreshAll()` re-queries all bound view elements using their last cached query parameters.
 
 ### Zero-JS Example
 
 ```html
-<ul data-ln-data-coordinator hidden>
-  <li data-ln-data-store="people"></li>
+<ul id="people-module" data-ln-data-coordinator hidden>
+  <li id="people" data-ln-data-store></li>
   <li data-ln-api-connector data-ln-api-endpoint="/api/people"></li>
 </ul>
 
 <section data-ln-table="people"
-         data-ln-table-source="people"
-         data-ln-table-store="people">
+         data-ln-table-source="people">
   <table>
     <thead>
       <tr>
@@ -75,11 +72,11 @@ No `<script>` block needed. The coordinator wires everything.
 The coordinator acts as a parent wrapper enclosing the database cache and transport connector:
 
 ```html
-<ul data-ln-data-coordinator="documents"
+<ul id="documents-module" data-ln-data-coordinator
     data-ln-data-mapper="documents" hidden>
      
     <!-- Tier 1: Local Cache Database (IndexedDB - pure and network-blind) -->
-    <li data-ln-data-store 
+    <li id="documents" data-ln-data-store 
         data-ln-data-store-indexes="status,updated_at">
     </li>
 
@@ -97,8 +94,9 @@ The coordinator acts as a parent wrapper enclosing the database cache and transp
 
 | Attribute | Category | Description |
 |-----------|----------|-------------|
-| `data-ln-data-coordinator` | Selector | Creates the coordinator instance. The value acts as the domain/scope name (e.g. `documents`). |
-| `data-ln-data-mapper` | Mapping | Reference to an externally registered data mapper name (e.g. `documents`). |
+| `id="name"` | Identity | Unique identifier of the coordinator (the coordinator name/domain/scope). |
+| `data-ln-data-coordinator` | Selector | Marker attribute to declare the component. |
+| `data-ln-data-mapper` | Mapping | Reference to an externally registered data mapper name (e.g. `documents`). Defaults to `id` if omitted. |
 
 ---
 
@@ -355,8 +353,8 @@ connector, no queue — is a first-class, supported configuration, not a
 degraded fallback:
 
 ```html
-<ul data-ln-data-coordinator="drafts" hidden>
-  <li data-ln-data-store="drafts"></li>
+<ul id="drafts-module" data-ln-data-coordinator hidden>
+  <li id="drafts" data-ln-data-store></li>
 </ul>
 ```
 
@@ -417,8 +415,8 @@ ignored otherwise):
    `buildDict()` helper `ln-upload` uses for its dictionary):
 
    ```html
-   <ul data-ln-data-coordinator="documents" hidden>
-     <li data-ln-data-store="documents"></li>
+   <ul id="documents-module" data-ln-data-coordinator hidden>
+     <li id="documents" data-ln-data-store></li>
      <li data-ln-api-connector data-ln-api-base-url="/api" data-ln-api-path="/documents"></li>
 
      <!-- consumed once at init, then removed from the DOM -->
@@ -478,7 +476,7 @@ page — the store itself no longer dispatches them (see the
 Access the coordinator instance programmatically via the `lnDataCoordinator` or `lnCoordinator` properties:
 
 ```javascript
-const coordinator = document.querySelector('[data-ln-data-coordinator="documents"]').lnDataCoordinator;
+const coordinator = document.getElementById('documents-module').lnDataCoordinator;
 
 // Force a remote configuration refresh
 coordinator.refreshConfig();
@@ -500,30 +498,25 @@ Source: `js/ln-data-coordinator/src/ln-data-coordinator.js`. The write pipeline 
 
 | Attribute | Applied to | Served by |
 |---|---|---|
-| `data-ln-table-store="<name>"` | `[data-ln-table]` | `ln-table:set-data` |
-| `data-ln-list-store="<name>"` | `[data-ln-list]` | `ln-list:set-data` |
-| `data-ln-chart-store="<name>"` | `[data-ln-chart]` | `ln-chart:set-data` |
+| `data-ln-table-source="<name>"` | `[data-ln-table]` | `ln-table:set-data` |
+| `data-ln-list-source="<name>"` | `[data-ln-list]` | `ln-list:set-data` |
+| `data-ln-chart-source="<name>"` | `[data-ln-chart]` | `ln-chart:set-data` |
 | `data-ln-options="<name>"` | `<select>` | `ln-options:set-data` |
 | `data-ln-stat="<name>"` | inline element | `ln-stat:set-count` |
 
-`<name>` must match the coordinator's own child store's `data-ln-data-store` value. Every document-level handler guards with `_ownsStore(name)` first (`children.store && children.store._name === name`), so multiple coordinators on one page coexist without cross-talk.
+`<name>` must match the coordinator's own child store's `id` value. Every document-level handler guards with `_ownsStore(name)` first (`children.store && children.store._name === name`), so multiple coordinators on one page coexist without cross-talk.
 
 ### Presenter / binder split
 
 Presenters (`store.setPresenters({computed})`) are registered once per store; computed display fields (`updated_display`, `status_label`, …) flow through `getAll → set-data` automatically. The coordinator is a pure binder — it transports whatever `getAll` produces to the requesting view element without transforming it.
 
-The binder awaits `store.ready` before choosing a source. Loaded non-windowed
-reads use the local store; an empty local-only store is also a valid source and
-returns `[]`. Windowed reads, connector-backed stores without a loaded cache,
-and stores with `initializationError` route remote. When IndexedDB is
-unavailable, table/list/chart/options/stat responses are delivered directly to the
-requesting view instead of being forced through the failed store. Query
-failures clear loading and emit
-`ln-data-coordinator:error {operation:'query', kind, store, target, error}`.
+When querying, the coordinator composes the final query payload: the view element provides pagination and sorting (`offset`, `limit`, `sort`), while the store cache provides the active filters and search terms (`filters`, `search`).
+
+The binder awaits `store.ready` before choosing a source. If the store is loaded and has no initialization error, reads use the local store; otherwise, connector-backed stores route remote. When IndexedDB is unavailable, table/list/chart/options/stat responses are delivered directly to the requesting view instead of being forced through the failed store. Query failures clear loading and emit `ln-data-coordinator:error {operation:'query', kind, store, target, error}`.
 
 ### Refresh trigger
 
-On `ln-data-store:ready`/`loaded`/`created`/`updated`/`deleted`, and `synced` (only when `e.detail.changed`), `_refreshAll()` re-queries every bound view element using its last cached query parameters (or defaults) — so a filter/sort/search a user set on a table survives a background sync.
+On `ln-data-store:ready`/`loaded`/`created`/`updated`/`deleted`, `synced` (only when `e.detail.changed`), and `ln-data-store:query-changed`, `_refreshAll()` re-queries every bound view element using its last cached query parameters (or defaults) — so a filter/sort/search a user set on a table survives a background sync.
 
 ### `data-ln-table-filter-options` — removed
 

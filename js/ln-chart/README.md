@@ -22,7 +22,6 @@ properties.
         class="chart"
         data-ln-chart="monthly-revenue"
         data-ln-chart-source="sales"
-        data-ln-chart-store="sales"
         data-ln-chart-x="month"
         data-ln-chart-y="revenue"
         data-ln-chart-sort="month:asc"
@@ -72,8 +71,7 @@ contain the configured x/y fields, for example:
 | Attribute | Description |
 |---|---|
 | `data-ln-chart="<name>"` | Component name and event identity. |
-| `data-ln-chart-source="<source>"` | Data-driven source name. Used as coordinator fallback when `-store` is absent. |
-| `data-ln-chart-store="<store>"` | Store owned by the `ln-data-coordinator`. |
+| `data-ln-chart-source="<source>"` | `id` of the `ln-data-store` this chart binds to. |
 | `data-ln-chart-x="<field>"` | Record field used as the ordered category label. |
 | `data-ln-chart-y="<field>"` | Record field containing the numeric value. Invalid/non-numeric records are ignored. |
 | `data-ln-chart-type="line\|area\|polygon"` | Rendering mode. Default `line`; `polygon` aliases `area`. |

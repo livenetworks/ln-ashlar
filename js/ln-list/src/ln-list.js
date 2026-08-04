@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent, createWindowCache, createBatcher, getLocale } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent, createBatcher, getLocale } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
@@ -6,9 +6,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 	const EMPTY_TEMPLATE = 'data-ln-list-empty';
 	const VIRTUAL_THRESHOLD = 200;
 	const BUFFER_ROWS = 15;
-	const WINDOW_DEFAULT = 1000;
-	const WINDOW_PAGE = 200;
-	const FETCH_DEBOUNCE = 120;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -76,9 +73,9 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this.currentSearch = '';
 			this.selectedIds = new Set();
 
-			this._windowed = false;
-			this._cache = null;
-			if (this.isDataDriven && dom.hasAttribute('data-ln-list-window')) this._enterWindowedMode();
+			this._sliceOffset = 0;
+			this._sliceData = [];
+			this._debounceId = null;
 
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
@@ -101,18 +98,47 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			// --- Event listeners ---
 			this._onSetData = function (e) {
 				const detail = e.detail || {};
-				if (self._windowed) {
+				if (detail.offset != null) {
+					self._sliceOffset = detail.offset;
+					self._sliceData = detail.data || [];
+					self._lastTotal = detail.total != null ? detail.total : self._lastTotal;
+					self._lastFiltered = detail.filtered != null ? detail.filtered : self._lastFiltered;
+					self.totalCount = self._lastTotal;
+					self.visibleCount = self._lastFiltered;
+					self.isLoaded = true;
+
+					if (self._selectable && self._selectAllCheckbox) {
+						self._selectAllCheckbox.classList.add('hidden');
+					}
+
 					dom.classList.remove('ln-list--loading');
-					self._cache.ingest(detail);
+
+					self._vStart = -1;
+					self._vEnd = -1;
+
+					self._render();
+					self._updateFooter();
+
+					dispatch(dom, 'ln-list:rendered', {
+						list: self.name,
+						total: self.totalCount,
+						visible: self.visibleCount
+					});
 					return;
 				}
 				self._data = detail.data || [];
+				self._sliceOffset = 0;
+				self._sliceData = [];
 				self._lastTotal = detail.total != null ? detail.total : self._data.length;
 				self._lastFiltered = detail.filtered != null ? detail.filtered : self._data.length;
 
 				self.totalCount = self._lastTotal;
 				self.visibleCount = self._lastFiltered;
 				self.isLoaded = true;
+
+				if (self._selectable && self._selectAllCheckbox) {
+					self._selectAllCheckbox.classList.remove('hidden');
+				}
 
 				dom.classList.remove('ln-list--loading');
 
@@ -156,9 +182,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (this._selectable) {
 				this._enableSelection();
 			}
-			if (this._windowed && this._selectable && this._selectAllCheckbox) {
-				this._selectAllCheckbox.classList.add('hidden');
-			}
+
 
 			// --- Item Click & Actions ---
 			this._onItemClick = function (e) {
@@ -220,16 +244,10 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			}
 
 			// Initial request-data
-			if (this._windowed) {
-				this._kickWindowInitial();
-			} else {
-				dispatch(dom, 'ln-list:request-data', {
-					list: this.name,
-					sort: this.currentSort,
-					filters: this.currentFilters,
-					search: this.currentSearch
-				});
-			}
+			dispatch(dom, 'ln-list:request-data', {
+				list: this.name,
+				sort: this.currentSort
+			});
 
 		} else {
 			// SSR Mode
@@ -441,18 +459,25 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (!this.tbody) return;
 
 		if (this.isDataDriven) {
-			if (this._windowed) { this._renderWindowed(); return; }
-			const total = this._lastTotal;
+			const isSlice = this._sliceData && this._sliceData.length > 0;
+			const total = isSlice ? this.visibleCount : this._lastTotal;
 			const filtered = this.visibleCount;
 
-			if (total === 0 || this._filteredData.length === 0 || filtered === 0) {
+			if (total === 0) {
 				this._disableVirtualScroll();
 				this._showEmptyState();
 				return;
 			}
 
-			if (this._filteredData.length > VIRTUAL_THRESHOLD) {
-				this._enableVirtualScroll();
+			if (!isSlice && (this._filteredData.length === 0 || filtered === 0)) {
+				this._disableVirtualScroll();
+				this._showEmptyState();
+				return;
+			}
+
+			if (isSlice || this._filteredData.length > VIRTUAL_THRESHOLD) {
+				if (!this._virtual) this._enableVirtualScroll();
+				this._measureItemHeight();
 				this._renderVirtual();
 			} else {
 				this._disableVirtualScroll();
@@ -511,32 +536,34 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		return { columns: columns, rowGap: isNaN(rowGap) ? 0 : rowGap };
 	};
 
+	// Measured from a real record only — a placeholder carries no intrinsic
+	// height, so an all-placeholder slice defers the measurement to a later pass.
 	_component.prototype._measureItemHeight = function () {
-		if (this._windowed) {
-			const sample = this._cache.peek();
-			const el = sample ? this._buildItem(sample) : this._buildPlaceholderItem();
-			if (el) {
-				this.tbody.textContent = '';
-				this.tbody.appendChild(el);
-				this._itemHeight = _getOuterHeight(el) || 50;
-				this.tbody.textContent = '';
-			}
-		} else if (this.isDataDriven) {
-			if (this._data.length > 0) {
-				const el = this._buildItem(this._data[0]);
-				if (el) {
-					this.tbody.textContent = '';
-					this.tbody.appendChild(el);
-					this._itemHeight = _getOuterHeight(el) || 50;
-					this.tbody.textContent = '';
-				}
-			}
-		} else {
+		if (this._itemHeight) return;
+
+		const isSlice = this._sliceData && this._sliceData.length > 0;
+		if (!isSlice && !this.isDataDriven) {
 			const children = this.tbody.children;
-			if (children.length > 0) {
-				this._itemHeight = _getOuterHeight(children[0]) || 50;
+			if (children.length > 0) this._itemHeight = _getOuterHeight(children[0]) || 50;
+			return;
+		}
+
+		let sample = null;
+		if (isSlice) {
+			for (let i = 0; i < this._sliceData.length; i++) {
+				if (this._sliceData[i]) { sample = this._sliceData[i]; break; }
 			}
 		}
+		if (!sample && this._data.length > 0) sample = this._data[0];
+		if (!sample) return;
+
+		const el = this._buildItem(sample);
+		if (!el) return;
+
+		this.tbody.textContent = '';
+		this.tbody.appendChild(el);
+		this._itemHeight = _getOuterHeight(el) || 50;
+		this.tbody.textContent = '';
 	};
 
 	_component.prototype._enableVirtualScroll = function () {
@@ -557,7 +584,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (!self._rafId) {
 				self._rafId = requestAnimationFrame(function () {
 					self._rafId = null;
-					self._windowed ? self._renderWindowed() : self._renderVirtual();
+					self._renderVirtual();
 				});
 			}
 		};
@@ -567,7 +594,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			self._measureItemHeight();
 			self._vStart = -1;
 			self._vEnd = -1;
-			self._windowed ? self._renderWindowed() : self._renderVirtual();
+			self._renderVirtual();
 		};
 
 		container.addEventListener('scroll', this._scrollHandler, { passive: true });
@@ -598,8 +625,9 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 	};
 
 	_component.prototype._renderVirtual = function () {
-		const data = this._filteredData;
-		const count = data.length;
+		const isSlice = this._sliceData && this._sliceData.length > 0;
+		const data = isSlice ? this._sliceData : this._filteredData;
+		const count = isSlice ? this.visibleCount : data.length;
 		const itemHeight = this._itemHeight;
 		if (!itemHeight || !count) return;
 
@@ -652,8 +680,22 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			}
 
 			for (let i = start; i < end; i++) {
-				const el = this._buildItem(data[i]);
-				if (el) frag.appendChild(el);
+				if (isSlice) {
+					if (i >= this._sliceOffset && i < this._sliceOffset + this._sliceData.length) {
+						const rec = this._sliceData[i - this._sliceOffset];
+						if (rec) {
+							const el = this._buildItem(rec);
+							if (el) frag.appendChild(el);
+						} else {
+							frag.appendChild(this._buildPlaceholderItem());
+						}
+					} else {
+						frag.appendChild(this._buildPlaceholderItem());
+					}
+				} else {
+					const el = this._buildItem(data[i]);
+					if (el) frag.appendChild(el);
+				}
 			}
 
 			if (bottomSpacerHeight > 0) {
@@ -667,6 +709,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this.tbody.appendChild(frag);
 
 			if (this._selectable) this._updateSelectAll();
+			if (isSlice) this._ensureSlice(start, end);
 		} else {
 			let html = '';
 			if (topSpacerHeight > 0) {
@@ -690,83 +733,43 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		return el;
 	};
 
-	_component.prototype._renderWindowed = function () {
-		if (this.isLoaded && this._cache.logicalTotal === 0) {
-			this._disableVirtualScroll();
-			this._showEmptyState();
-			return;
-		}
-		if (!this._virtual) this._enableVirtualScroll();
+	_component.prototype._ensureSlice = function (start, end) {
+		const sliceLen = this._sliceData ? this._sliceData.length : 0;
+		if (sliceLen === 0 || this.visibleCount === 0) return;
 
-		const itemHeight = this._itemHeight;
-		if (!itemHeight) return;
+		const threshold = 25;
+		const checkStart = Math.max(0, start - threshold);
+		const checkEnd = Math.min(this.visibleCount, end + threshold);
 
-		const container = this._scrollContainer;
-		let scrollTop, viewportHeight;
-		if (container) {
-			const rect = this.tbody.getBoundingClientRect();
-			const containerRect = container.getBoundingClientRect();
-			const relativeTop = (container === this.tbody) ? 0 : (rect.top - containerRect.top + container.scrollTop);
-			scrollTop = container.scrollTop - relativeTop;
-			viewportHeight = container.clientHeight;
-		} else {
-			const rect = this.tbody.getBoundingClientRect();
-			const absoluteTop = rect.top + window.scrollY;
-			scrollTop = window.scrollY - absoluteTop;
-			viewportHeight = window.innerHeight;
-		}
+		const pageSize = sliceLen;
+		const firstPage = Math.floor(checkStart / pageSize);
+		const lastPage = Math.floor(Math.max(0, checkEnd - 1) / pageSize);
 
-		const layout = this._readGridLayout();
-		const columns = layout.columns;
-		const rowGap = layout.rowGap;
-		const rowHeight = itemHeight + rowGap;
-		const total = this._cache.logicalTotal;
-		const totalRows = Math.ceil(total / columns);
-
-		let firstRow = Math.max(0, Math.floor(scrollTop / rowHeight) - BUFFER_ROWS);
-		firstRow = Math.min(firstRow, totalRows);
-		const visibleRows = Math.ceil(viewportHeight / rowHeight) + BUFFER_ROWS * 2;
-		const lastRow = Math.min(firstRow + visibleRows, totalRows);
-
-		const start = Math.min(firstRow * columns, total);
-		const end = Math.min(lastRow * columns, total);
-
-		// No start===_vStart early-return: windowed must re-render when a page
-		// splices in even if the range is unchanged.
-
-		const topSpacerHeight = firstRow * rowHeight;
-		const bottomSpacerHeight = (totalRows - lastRow) * rowHeight;
-
-		const frag = document.createDocumentFragment();
-		if (topSpacerHeight > 0) {
-			const topSpacer = document.createElement(this.isUl ? 'li' : 'div');
-			topSpacer.className = 'ln-list__spacer';
-			topSpacer.style.height = topSpacerHeight + 'px';
-			frag.appendChild(topSpacer);
-		}
-		for (let i = start; i < end; i++) {
-			if (this._cache.has(i)) {
-				const el = this._buildItem(this._cache.get(i));
-				if (el) frag.appendChild(el);
-			} else {
-				frag.appendChild(this._buildPlaceholderItem());
+		let targetPage = -1;
+		for (let p = firstPage; p <= lastPage; p++) {
+			const pOffset = p * pageSize;
+			if (pOffset < this._sliceOffset || pOffset >= this._sliceOffset + sliceLen) {
+				targetPage = p;
+				break;
 			}
 		}
-		if (bottomSpacerHeight > 0) {
-			const bottomSpacer = document.createElement(this.isUl ? 'li' : 'div');
-			bottomSpacer.className = 'ln-list__spacer';
-			bottomSpacer.style.height = bottomSpacerHeight + 'px';
-			frag.appendChild(bottomSpacer);
-		}
 
-		this.tbody.textContent = '';
-		this.tbody.appendChild(frag);
+		if (targetPage === -1) return;
 
-		// Select-all disabled in windowed mode — no _updateSelectAll().
-		this._vStart = start;
-		this._vEnd = end;
+		const targetOffset = targetPage * pageSize;
+		const targetLimit = pageSize;
 
-		this._cache.ensure(start, end);
+		if (this._debounceId) clearTimeout(this._debounceId);
+		const self = this;
+		this._debounceId = setTimeout(function () {
+			self.dom.classList.add('ln-list--loading');
+			dispatch(self.dom, 'ln-list:request-data', {
+				list: self.name,
+				sort: self.currentSort,
+				offset: targetOffset,
+				limit: targetLimit
+			});
+		}, 120);
 	};
 
 	_component.prototype._showEmptyState = function () {
@@ -919,112 +922,24 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 	};
 
 	_component.prototype._requestData = function () {
-		if (this._windowed) {
+		const isSlice = this._sliceData && this._sliceData.length > 0;
+		if (isSlice) {
 			this.dom.classList.add('ln-list--loading');
-			this._cache.invalidate({
+			const pageSize = this._sliceData.length || 200;
+			this._sliceOffset = 0;
+			this._sliceData = [];
+			dispatch(this.dom, 'ln-list:request-data', {
+				list: this.name,
 				sort: this.currentSort,
-				filters: this.currentFilters,
-				search: this.currentSearch
+				offset: 0,
+				limit: pageSize
 			});
 			return;
 		}
 		requestData(this, 'ln-list:request-data', 'list');
 	};
 
-	// ─── Windowed Mode — enter/exit/seed (live toggle) ──────────
 
-	_component.prototype._enterWindowedMode = function () {
-		const self = this;
-		const dom = this.dom;
-		const winAttr = parseInt(dom.getAttribute('data-ln-list-window'), 10);
-		const pageAttr = parseInt(dom.getAttribute('data-ln-list-window-page'), 10);
-		const threshAttr = parseInt(dom.getAttribute('data-ln-list-window-threshold'), 10);
-
-		this._onCacheChange = function () {
-			if (!self._windowed || !self._cache) return;
-			self.totalCount = self._cache.grandTotal;
-			self.visibleCount = self._cache.logicalTotal;
-			self._lastTotal = self._cache.grandTotal;
-			self.isLoaded = true;
-			self._vStart = -1;
-			self._vEnd = -1;
-			self._render();
-			self._updateFooter();
-			dispatch(dom, 'ln-list:rendered', {
-				list: self.name,
-				total: self.totalCount,
-				visible: self.visibleCount
-			});
-		};
-		this._renderBatch = createBatcher(this._onCacheChange);
-
-		this._cache = createWindowCache({
-			windowSize: winAttr > 0 ? winAttr : WINDOW_DEFAULT,
-			pageSize: pageAttr > 0 ? pageAttr : WINDOW_PAGE,
-			threshold: threshAttr >= 0 ? threshAttr : 25,
-			fetchDebounce: FETCH_DEBOUNCE,
-			requestPage: function (query, offset, limit) {
-				dispatch(dom, 'ln-list:request-data', {
-					list: self.name,
-					sort: query.sort,
-					filters: query.filters,
-					search: query.search,
-					offset: offset,
-					limit: limit,
-					queryGen: self._cache.queryGen
-				});
-			},
-			onChange: this._renderBatch
-		});
-
-		this._windowed = true;
-
-		if (this._selectable && this._selectAllCheckbox) {
-			this._selectAllCheckbox.classList.add('hidden');
-		}
-	};
-
-	_component.prototype._kickWindowInitial = function () {
-		if (this._data.length > 0) {
-			// SSR-seeded / warm-seeded: page 0 is already resident, the grand
-			// total is declared in markup — no initial fetch needed. No
-			// queryGen on the seed — it must never be dropped as stale.
-			const declaredTotal = parseInt(this.dom.getAttribute('data-ln-list-count'), 10);
-			const seedTotal = declaredTotal > 0 ? declaredTotal : this._data.length;
-			this._cache.ingest({
-				data: this._data,
-				offset: 0,
-				total: seedTotal,
-				filtered: seedTotal
-			});
-		} else {
-			this.dom.classList.add('ln-list--loading');
-			this._cache.requestInitial({
-				sort: this.currentSort,
-				filters: this.currentFilters,
-				search: this.currentSearch
-			});
-		}
-	};
-
-	_component.prototype._exitWindowedMode = function () {
-		this._disableVirtualScroll();
-		if (this._cache) this._cache.destroy();
-		this._cache = null;
-		this._windowed = false;
-		this._renderBatch = null;
-		this._onCacheChange = null;
-		if (this._selectAllCheckbox) {
-			this._selectAllCheckbox.classList.remove('hidden');
-		}
-		this._itemHeight = 0;
-		this._vStart = -1;
-		this._vEnd = -1;
-		this._data = [];
-		this._filteredData = [];
-		this.dom.classList.add('ln-list--loading');
-		this._requestData();
-	};
 
 	_component.prototype._updateFooter = function () {
 		let total = 0;
@@ -1057,9 +972,12 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
 		this._disableVirtualScroll();
+		if (this._debounceId) {
+			clearTimeout(this._debounceId);
+			this._debounceId = null;
+		}
 
 		if (this.isDataDriven) {
-			if (this._cache) this._cache.destroy();
 			this.dom.removeEventListener('ln-list:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-list:set-loading', this._onSetLoading);
 			this.dom.removeEventListener('click', this._onClearAll);
@@ -1094,42 +1012,5 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-list', {
-		extraAttributes: [
-			'data-ln-list-window',
-			'data-ln-list-window-page',
-			'data-ln-list-window-threshold',
-			'data-ln-list-count'
-		],
-		onAttributeChange: function (el, attrName) {
-			const inst = el[DOM_ATTRIBUTE];
-			if (!inst || !inst.isDataDriven) return;
-
-			if (attrName === 'data-ln-list-window') {
-				const present = el.hasAttribute('data-ln-list-window');
-				if (present && !inst._windowed) {
-					inst._enterWindowedMode();
-					inst._kickWindowInitial();
-				} else if (!present && inst._windowed) {
-					inst._exitWindowedMode();
-				} else if (present && inst._windowed) {
-					const v = parseInt(el.getAttribute('data-ln-list-window'), 10);
-					if (v > 0) inst._cache.configure({ windowSize: v });
-				}
-				return;
-			}
-
-			if (!inst._windowed || !inst._cache) return;
-			if (attrName === 'data-ln-list-window-page') {
-				const v = parseInt(el.getAttribute('data-ln-list-window-page'), 10);
-				if (v > 0) inst._cache.configure({ pageSize: v });
-			} else if (attrName === 'data-ln-list-window-threshold') {
-				const v = parseInt(el.getAttribute('data-ln-list-window-threshold'), 10);
-				if (v >= 0) inst._cache.configure({ threshold: v });
-			} else if (attrName === 'data-ln-list-count') {
-				const v = parseInt(el.getAttribute('data-ln-list-count'), 10);
-				if (v >= 0) inst._cache.setGrandTotal(v);
-			}
-		}
-	});
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-list');
 })();

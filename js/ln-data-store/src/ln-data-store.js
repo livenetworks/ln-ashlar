@@ -1,4 +1,5 @@
 import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, decryptData } from '../../ln-core';
+import { createWindowIndex } from './window-index';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-data-store';
@@ -25,7 +26,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 	function _getRequiredStores() {
 		const required = {};
 		for (const el of document.querySelectorAll(`[${DOM_SELECTOR}]`)) {
-			const name = el.getAttribute(DOM_SELECTOR);
+			const name = el.id;
 			if (name) {
 				const indexAttr = el.getAttribute('data-ln-data-store-indexes') || '';
 				required[name] = {
@@ -168,6 +169,19 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		.then(store => store ? _idbRequest(store.get(id)) : null)
 		.then(record => record ? _decryptRecord(record) : null);
 
+	const _getMultipleRecords = (storeName, ids) => _getDb().then(db => {
+		if (!db) return [];
+		const tx = db.transaction(storeName, 'readonly');
+		const store = tx.objectStore(storeName);
+		const promises = ids.map(id => _idbRequest(store.get(id)));
+		return Promise.all(promises).then(records => {
+			if (getCryptoKey()) {
+				return Promise.all(records.map(r => _decryptRecord(r)));
+			}
+			return records;
+		});
+	});
+
 	const _putRecord = (storeName, record) => {
 		const prepPromise = getCryptoKey() ? _encryptRecord(record) : Promise.resolve(record);
 		return prepPromise.then(prepped => _tx(storeName, 'readwrite').then(store => store ? _idbRequest(store.put(prepped)) : null));
@@ -190,7 +204,8 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 	function _component(dom) {
 		this.dom = dom;
-		this._name = dom.getAttribute(DOM_SELECTOR);
+		this._name = dom.id;
+		if (!this._name) console.warn('[ln-data-store] missing id — the store cannot be addressed', dom);
 
 		const staleAttr = dom.getAttribute('data-ln-data-store-stale');
 		const _parsed = parseInt(staleAttr, 10);
@@ -207,6 +222,29 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		this.hasCache = false;
 		this.isSyncing = false;
 		this.lastSyncedAt = null;
+		this.query = { filters: {}, search: '' };
+		const winAttr = dom.getAttribute('data-ln-data-store-window');
+		if (winAttr !== null) {
+			const winSize = parseInt(winAttr, 10) || 1000;
+			const pageSize = parseInt(dom.getAttribute('data-ln-data-store-window-page'), 10) || 200;
+			const threshold = parseInt(dom.getAttribute('data-ln-data-store-window-threshold'), 10) || 25;
+			this._windowIndex = createWindowIndex({
+				windowSize: winSize,
+				pageSize: pageSize,
+				threshold: threshold,
+				requestPage: (offset, limit, query) => {
+					dispatch(this.dom, 'ln-data-store:request-page', {
+						store: this._name,
+						offset: offset,
+						limit: limit,
+						query: query,
+						queryGen: this._windowIndex.queryGen
+					});
+				}
+			});
+		} else {
+			this._windowIndex = null;
+		}
 		this.totalCount = 0;
 		this.presenters = null;
 		this._mutationChain = Promise.resolve();
@@ -237,6 +275,27 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		};
 		for (const [event, fn] of Object.entries(self._handlers)) {
 			self.dom.addEventListener(`ln-data-store:request-${event}`, fn);
+		}
+
+		self._queryHandlers = {
+			'ln-search:change': e => {
+				e.preventDefault();
+				const term = (e.detail && e.detail.term != null) ? e.detail.term : '';
+				if (term === self.query.search) return;
+				self.query.search = term;
+				_emitQueryChanged(self);
+			},
+			'ln-filter:changed': e => {
+				const key = e.detail && e.detail.key;
+				if (!key) return;
+				const values = (e.detail.values || []).slice();
+				if (values.length) self.query.filters[key] = values;
+				else delete self.query.filters[key];
+				_emitQueryChanged(self);
+			}
+		};
+		for (const [event, fn] of Object.entries(self._queryHandlers)) {
+			self.dom.addEventListener(event, fn);
 		}
 	}
 
@@ -496,6 +555,7 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		if (!self.presenters || !self.presenters.computed) return records;
 		const computed = self.presenters.computed;
 		return records.map(record => {
+			if (!record) return null;
 			const copy = { ...record };
 			for (const [fieldName, fn] of Object.entries(computed)) {
 				try {
@@ -512,6 +572,47 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 	_component.prototype.getAll = function (options = {}) {
 		const self = this;
+		if (self._windowIndex) {
+			const offset = options.offset || 0;
+			const limit = options.limit || 200;
+			self._windowIndex.ensure(offset, offset + limit, options);
+
+			const ids = [];
+			for (let i = offset; i < offset + limit; i++) {
+				const id = self._windowIndex.getId(i);
+				ids.push(id);
+			}
+
+			const uniqueResolvedIds = Array.from(new Set(ids.filter(id => id !== undefined)));
+
+			return _getMultipleRecords(self._name, uniqueResolvedIds).then(records => {
+				const recordMap = new Map();
+				for (let i = 0; i < records.length; i++) {
+					const rec = records[i];
+					if (rec) {
+						recordMap.set(String(rec.id), rec);
+					}
+				}
+				const data = [];
+				for (let i = 0; i < ids.length; i++) {
+					const id = ids[i];
+					if (id === undefined) {
+						data.push(null);
+					} else {
+						const rec = recordMap.get(String(id));
+						data.push(rec || null);
+					}
+				}
+				return {
+					data: _decorate(self, data),
+					total: self._windowIndex.grandTotal,
+					filtered: self._windowIndex.logicalTotal,
+					offset: offset,
+					queryGen: self._windowIndex.queryGen
+				};
+			});
+		}
+
 		return _getAllRecords(self._name).then(records => {
 			const total = records.length;
 
@@ -565,7 +666,12 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		if (upsertedRecords.length > 0) chain = chain.then(() => _putBulk(self._name, upsertedRecords));
 		if (deletedIds.length > 0) chain = chain.then(() => _deleteBulk(self._name, deletedIds));
 
-		return chain.then(() => _countRecords(self._name)).then(count => {
+		return chain.then(() => {
+			if (self._windowIndex && meta.offset != null) {
+				const ids = upsertedRecords.map(r => r.id);
+				self._windowIndex.ingest(meta.offset, ids, meta.total, meta.filtered, meta.queryGen);
+			}
+		}).then(() => _countRecords(self._name)).then(count => {
 			self.totalCount = meta.total !== undefined ? meta.total : count;
 			self.hasCache = true;
 			return _setMeta(self._name, {
@@ -621,11 +727,21 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 	};
 
 	_component.prototype.destroy = function () {
+		if (this._windowIndex) {
+			this._windowIndex.clear();
+			this._windowIndex = null;
+		}
 		if (this._handlers) {
 			for (const [event, fn] of Object.entries(this._handlers)) {
 				this.dom.removeEventListener(`ln-data-store:request-${event}`, fn);
 			}
 			this._handlers = null;
+		}
+		if (this._queryHandlers) {
+			for (const [event, fn] of Object.entries(this._queryHandlers)) {
+				this.dom.removeEventListener(event, fn);
+			}
+			this._queryHandlers = null;
 		}
 
 		delete _stores[this._name];
@@ -656,6 +772,16 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 				inst.lastSyncedAt = null;
 				inst.totalCount = 0;
 			});
+		});
+	}
+
+	function _emitQueryChanged(self) {
+		if (self._windowIndex) {
+			self._windowIndex.reset();
+		}
+		dispatch(self.dom, 'ln-data-store:query-changed', {
+			store: self._name,
+			query: { filters: Object.assign({}, self.query.filters), search: self.query.search }
 		});
 	}
 

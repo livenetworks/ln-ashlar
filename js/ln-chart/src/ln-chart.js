@@ -166,7 +166,6 @@ import { buildChartModel, parseChartViewBox } from './chart-model';
 	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-chart', {
 		extraAttributes: [
 			'data-ln-chart-source',
-			'data-ln-chart-store',
 			'data-ln-chart-x',
 			'data-ln-chart-y',
 			'data-ln-chart-type',
@@ -177,7 +176,7 @@ import { buildChartModel, parseChartViewBox } from './chart-model';
 		onAttributeChange: function (el, attrName) {
 			const instance = el[DOM_ATTRIBUTE];
 			if (!instance) return;
-			if (attrName === 'data-ln-chart-source' || attrName === 'data-ln-chart-store' || attrName === 'data-ln-chart-sort') {
+			if (attrName === 'data-ln-chart-source' || attrName === 'data-ln-chart-sort') {
 				instance.requestData();
 				return;
 			}

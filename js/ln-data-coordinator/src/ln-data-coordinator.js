@@ -1,5 +1,5 @@
 import { registerComponent, dispatch, buildDict, serializeForm, resolveFormMethod } from '../../ln-core';
-import { normalizeDataQuery, selectDataSource } from './data-read-policy';
+import { normalizeDataQuery, selectDataSource, composeQuery } from './data-read-policy';
 import { MutationReceipts } from './mutation-receipts';
 
 (function () {
@@ -84,7 +84,8 @@ import { MutationReceipts } from './mutation-receipts';
 
 	function _component(dom) {
 		this.dom = dom;
-		this._name = dom.getAttribute(DOM_SELECTOR);
+		this._name = dom.id;
+		if (!this._name) console.warn('[ln-data-coordinator] missing id — the coordinator cannot be addressed', dom);
 		dom[DOM_ATTRIBUTE] = this;
 		dom[DOM_ALIAS] = this;
 
@@ -175,7 +176,7 @@ import { MutationReceipts } from './mutation-receipts';
 		}
 
 		// 2. Resolve to registered external mapper
-		const mapperName = this.dom.getAttribute('data-ln-data-mapper') || this.dom.getAttribute('data-ln-data-coordinator');
+		const mapperName = this.dom.getAttribute('data-ln-data-mapper') || this.dom.id;
 		if (mapperName && window.lnCore && typeof window.lnCore.getDataMapper === 'function') {
 			this.mapper = window.lnCore.getDataMapper(mapperName);
 		}
@@ -365,6 +366,19 @@ import { MutationReceipts } from './mutation-receipts';
 					return;
 				}
 				dispatch(children.connectorEl, 'ln-api-connector:request-sync', { since: e.detail.since, meta: { op: 'sync' } });
+			},
+
+			requestPage: function (e) {
+				const children = self.findChildren();
+				if (!children.connectorEl) return;
+				const detail = e.detail || {};
+				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
+					query: Object.assign({}, detail.query, {
+						offset: detail.offset,
+						limit: detail.limit,
+						queryGen: detail.queryGen
+					})
+				});
 			},
 
 			reqCreate: function (e) {
@@ -680,6 +694,7 @@ import { MutationReceipts } from './mutation-receipts';
 			reqChartData: function (e) { self._serveData(e, 'chart'); },
 			reqOptions:   function (e) { self._serveOptions(e); },
 			reqStat:      function (e) { self._serveStat(e); },
+			refreshQuery: function () { self._refreshAll(); },
 			refresh: function (e) {
 				self._mutationReceipts.resolve(e.detail);
 				self._refreshAll();
@@ -694,6 +709,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 		// Sync request bubbling up from the child store
 		self.dom.addEventListener('ln-data-store:request-remote-sync', self._handlers.sync);
+		self.dom.addEventListener('ln-data-store:request-page', self._handlers.requestPage);
 
 		// Coordinator-namespaced intake events (parallel fan-out)
 		self.dom.addEventListener('ln-data-coordinator:request-create', self._handlers.reqCreate);
@@ -737,6 +753,7 @@ import { MutationReceipts } from './mutation-receipts';
 		self.dom.addEventListener('ln-data-store:deleted', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
 		self.dom.addEventListener('ln-data-store:synced',  self._handlers.refreshSynced);
+		self.dom.addEventListener('ln-data-store:query-changed', self._handlers.refreshQuery);
 	}
 
 	// ─── Store↔View Binder ───────────────────────────────────
@@ -744,17 +761,14 @@ import { MutationReceipts } from './mutation-receipts';
 	_component.prototype._ownsStore = function (name) {
 		const children = this.findChildren();
 		if (children.store && children.store._name === name && name) return true;
-		if (this._name === name && name) return true;
 		return false;
 	};
 
 	_component.prototype._serveData = function (e, kind) {
 		const el = e.target;
-		const attrName = kind === 'table' ? 'data-ln-table-store'
-			: (kind === 'list' ? 'data-ln-list-store' : 'data-ln-chart-store');
-		const sourceName = kind === 'table' ? 'data-ln-table-source'
+		const attrName = kind === 'table' ? 'data-ln-table-source'
 			: (kind === 'list' ? 'data-ln-list-source' : 'data-ln-chart-source');
-		const storeName = el.getAttribute(attrName) || el.getAttribute(sourceName);
+		const storeName = el.getAttribute(attrName);
 		if (!storeName) return;
 		if (!this._ownsStore(storeName)) return;
 
@@ -764,16 +778,16 @@ import { MutationReceipts } from './mutation-receipts';
 
 		const children = this.findChildren();
 		const self = this;
-		const isWindowed = request.offset != null;
 		const store = children.store;
 		const ready = store && store.ready ? store.ready : Promise.resolve();
 
 		return ready.then(function () {
-			const source = selectDataSource(store, children.connector, isWindowed);
+			const source = selectDataSource(store, children.connector);
+			const effective = composeQuery(query, store && store.query);
 			if (source === 'remote') {
 				dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
 				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
-					query: query,
+					query: effective,
 					meta: { targetEl: el, kind: kind }
 				});
 				return;
@@ -784,7 +798,7 @@ import { MutationReceipts } from './mutation-receipts';
 				return;
 			}
 
-			return store.getAll(query).then(function (r) {
+			return store.getAll(effective).then(function (r) {
 				const detail = {
 					data: r.data,
 					total: r.total,
@@ -866,19 +880,19 @@ import { MutationReceipts } from './mutation-receipts';
 
 	_component.prototype._refreshAll = function (syncMeta) {
 		const self = this;
-		const allBound = document.querySelectorAll('[data-ln-table-store],[data-ln-list-store],[data-ln-chart-store],[data-ln-options],[data-ln-stat]');
+		const allBound = document.querySelectorAll('[data-ln-table-source],[data-ln-list-source],[data-ln-chart-source],[data-ln-options],[data-ln-stat]');
 		for (let i = 0; i < allBound.length; i++) {
 			const el = allBound[i];
 			let storeName, kind;
 
-			if (el.hasAttribute('data-ln-table-store')) {
-				storeName = el.getAttribute('data-ln-table-store');
+			if (el.hasAttribute('data-ln-table-source')) {
+				storeName = el.getAttribute('data-ln-table-source');
 				kind = 'table';
-			} else if (el.hasAttribute('data-ln-list-store')) {
-				storeName = el.getAttribute('data-ln-list-store');
+			} else if (el.hasAttribute('data-ln-list-source')) {
+				storeName = el.getAttribute('data-ln-list-source');
 				kind = 'list';
-			} else if (el.hasAttribute('data-ln-chart-store')) {
-				storeName = el.getAttribute('data-ln-chart-store');
+			} else if (el.hasAttribute('data-ln-chart-source')) {
+				storeName = el.getAttribute('data-ln-chart-source');
 				kind = 'chart';
 			} else if (el.hasAttribute('data-ln-options')) {
 				storeName = el.getAttribute('data-ln-options');
@@ -895,13 +909,15 @@ import { MutationReceipts } from './mutation-receipts';
 			if (kind === 'table' || kind === 'list' || kind === 'chart') {
 				const cached = self._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
 				(function (capturedEl, capturedKind) {
-					store.getAll(cached).then(function (r) {
+					store.getAll(composeQuery(cached, store.query)).then(function (r) {
 						const detail = {
 							data: r.data,
 							total: (syncMeta && syncMeta.total !== undefined) ? syncMeta.total : r.total,
 							filtered: (syncMeta && syncMeta.filtered !== undefined) ? syncMeta.filtered : r.filtered,
-							offset: (syncMeta && syncMeta.offset !== undefined) ? syncMeta.offset : cached.offset,
-							queryGen: (syncMeta && syncMeta.queryGen !== undefined) ? syncMeta.queryGen : cached.queryGen
+							offset: (r.offset !== undefined) ? r.offset
+								: ((syncMeta && syncMeta.offset !== undefined) ? syncMeta.offset : cached.offset),
+							queryGen: (r.queryGen !== undefined) ? r.queryGen
+								: ((syncMeta && syncMeta.queryGen !== undefined) ? syncMeta.queryGen : cached.queryGen)
 						};
 						dispatch(capturedEl, 'ln-' + capturedKind + ':set-loading', { loading: false });
 						dispatch(capturedEl, 'ln-' + capturedKind + ':set-data', detail);
@@ -943,6 +959,7 @@ import { MutationReceipts } from './mutation-receipts';
 		const self = this;
 		if (self._handlers) {
 			self.dom.removeEventListener('ln-data-store:request-remote-sync', self._handlers.sync);
+			self.dom.removeEventListener('ln-data-store:request-page', self._handlers.requestPage);
 
 			self.dom.removeEventListener('ln-data-coordinator:request-create', self._handlers.reqCreate);
 			self.dom.removeEventListener('ln-data-coordinator:request-update', self._handlers.reqUpdate);
@@ -979,6 +996,7 @@ import { MutationReceipts } from './mutation-receipts';
 			self.dom.removeEventListener('ln-data-store:deleted', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:mutation-error', self._handlers.mutationError);
 			self.dom.removeEventListener('ln-data-store:synced',  self._handlers.refreshSynced);
+			self.dom.removeEventListener('ln-data-store:query-changed', self._handlers.refreshQuery);
 
 			self._handlers = null;
 		}

@@ -17,8 +17,8 @@ A zero-dependency, high-performance table presenter component that supports both
 
 `ln-table` strictly operates as a **Layer 1 Component** (Data & DOM presenter):
 - Manages internal data arrays, virtual scroll rendering, sliding window cache, row template cloning, cell formatting, and selection state.
-- Responds to command/request events (`ln-table:set-search`, `ln-table:set-filter`, `ln-table:set-data`, `ln-table:set-loading`, `ln-table:request-clear-filters`).
-- Emits lifecycle notifications (`ln-table:ready`, `ln-table:rendered`, `ln-table:filter`, `ln-table:sorted`, `ln-table:select`).
+- Responds to command/request events (`ln-table:set-search` (SSR mode only), `ln-table:set-filter` (SSR mode only), `ln-table:set-data`, `ln-table:set-loading`, `ln-table:request-clear-filters` (SSR mode only)).
+- Emits lifecycle notifications (`ln-table:ready`, `ln-table:rendered`, `ln-table:filter` (SSR mode only), `ln-table:sorted`, `ln-table:select`).
 
 External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear buttons, keyboard focus shortcuts) are orchestrated by **Layer 2 Coordinator** [`ln-table-coordinator`](../ln-table-coordinator/README.md).
 
@@ -90,7 +90,7 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 | `data-ln-table` | Root wrapper | Component identifier. Target must carry a unique `id`. |
 | `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
 | `data-ln-table-selectable` | Root wrapper | Enables checkbox-based row selections. |
-| `data-ln-table-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-row cap (default 1000). Requires Data-Driven Mode. Observable: add/remove toggles windowed mode ON/OFF live; changing `N` while windowed reconfigures the live cache. |
+| ~~`data-ln-table-window`~~ | Root wrapper | **Removed.** Windowed residency is now configured on the store via `data-ln-data-store-window`. |
 | ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` in both modes. |
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
@@ -109,8 +109,8 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 
 - **`ln-table:ready`** `{ total }`  
   Fired after the initial DOM rows are parsed.
-- **`ln-table:request-data`** `{ table, sort, filters, search }`  
-  Requests a fresh dataset when sort, filter, or search is changed. Windowed mode (`data-ln-table-window`) adds `{ offset, limit, queryGen }`.
+- **`ln-table:request-data`** `{ table, sort }` — data-driven mode only; SSR mode never dispatches this event.  
+  Requests a fresh dataset when sort is changed. When partially rendered (windowed residency on the store), it includes `{ offset, limit }` parameters to request missing slices.
 - **`ln-table:rendered`** `{ table, total, visible }`  
   Fired after a dynamic template render finishes drawing.
 - **`ln-table:row-click`** `{ table, id, record }`  
@@ -121,8 +121,8 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 
 ### Received Events
 
-- **`ln-table:set-data`** `{ data, total, filtered, filterOptions }`  
-  Applies the payload array and triggers rendering. Windowed mode expects `{ offset, queryGen }` echoed back — routed straight into the internal window cache.
+- **`ln-table:set-data`** `{ data, total, filtered }`  
+  Applies the payload array and triggers rendering. If `{ offset }` is supplied, it is treated as a slice update of size `data.length` at the given offset within the total records count.
 - **`ln-table:set-loading`** `{ loading }`  
   Toggles the visual loading dimmed state overlay.
 
@@ -136,11 +136,8 @@ Column filters use static authored markup — a `[data-ln-popover]` block contai
 
 1. Receives `ln-filter:changed` on the table element.
 2. Maps `e.detail.key` to a column via `data-ln-table-filter-col` on `<th>`.
-3. Stores active filter values in `_columnFilters`.
-4. **SSR mode**: runs `_applyFilterAndSort()` + `_render()` in-memory.
-5. **Data-driven mode**: calls `_requestData()` — the coordinator handles fetching.
-6. Toggles `.ln-filter-active` on the funnel `<button>` (the dot indicator).
-7. Dispatches `ln-table:filter`.
+3. **SSR mode**: Stores active filter values in `_columnFilters`, runs `_applyFilterAndSort()` + `_render()` in-memory, toggles `.ln-filter-active` on the funnel `<button>` (the dot indicator), and dispatches `ln-table:filter`.
+4. **Data-driven mode**: (No-op; filtering and searching are the responsibility of the data source).
 
 ### What ln-table does NOT do
 
@@ -178,7 +175,7 @@ Options come from the domain (backend enum or lookup), never derived from the da
 
 **SSR mode:** `data-ln-table-clear` on a button inside the table wrapper. Clears search term and all `[data-ln-filter]` containers targeting this table.
 
-**Data-driven mode:** `data-ln-table-clear-all` on a button. Resets `currentFilters`, clears visual indicators on all filter buttons, and calls `_requestData()`.
+**Data-driven mode:** (No-op; filtering and searching are the responsibility of the data source).
 
 ---
 

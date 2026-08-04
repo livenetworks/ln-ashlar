@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createBatcher, getLocale } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
@@ -8,9 +8,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	// Tuning constant — duplicated in ln-data-table for component independence
 	const VIRTUAL_THRESHOLD = 200;
 	const BUFFER_ROWS = 15;
-	const WINDOW_DEFAULT = 1000;
-	const WINDOW_PAGE = 200;
-	const FETCH_DEBOUNCE = 120;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
@@ -77,85 +74,63 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		// --- Layer 1 Command / Request Event Handlers ---
 
 		this._onSetSearch = function (e) {
+			if (self.isDataDriven) return;
 			const term = (e.detail && e.detail.query != null ? e.detail.query : (e.detail && e.detail.term != null ? e.detail.term : '')).trim();
-			if (self.isDataDriven) {
-				self.currentSearch = term;
-				dispatch(dom, 'ln-table:search', {
-					table: self.name,
-					query: self.currentSearch
-				});
-				self._requestData();
-			} else {
-				self._searchTerm = term.toLowerCase();
-				self._applyFilterAndSort();
-				self._vStart = -1;
-				self._vEnd = -1;
-				self._render();
-				self._updateFooter();
-				dispatch(dom, 'ln-table:filter', {
-					term: self._searchTerm,
-					matched: self._filteredData.length,
-					total: self._data.length
-				});
-			}
+			self._searchTerm = term.toLowerCase();
+			self._applyFilterAndSort();
+			self._vStart = -1;
+			self._vEnd = -1;
+			self._render();
+			self._updateFooter();
+			dispatch(dom, 'ln-table:filter', {
+				term: self._searchTerm,
+				matched: self._filteredData.length,
+				total: self._data.length
+			});
 		};
 		dom.addEventListener('ln-table:set-search', this._onSetSearch);
 
 		this._onSetFilter = function (e) {
+			if (self.isDataDriven) return;
 			if (!e.detail) return;
 			const key = e.detail.key;
 			const values = e.detail.values;
 
-			if (self.isDataDriven) {
-				if (!values || values.length === 0) {
-					delete self.currentFilters[key];
-				} else {
-					self.currentFilters[key] = values;
-				}
-				self._requestData();
+			if (!values || values.length === 0) {
+				delete self._columnFilters[key];
 			} else {
-				if (!values || values.length === 0) {
-					delete self._columnFilters[key];
-				} else {
-					const lower = [];
-					for (let i = 0; i < values.length; i++) {
-						lower.push(values[i].toLowerCase());
-					}
-					self._columnFilters[key] = lower;
+				const lower = [];
+				for (let i = 0; i < values.length; i++) {
+					lower.push(values[i].toLowerCase());
 				}
-				self._applyFilterAndSort();
-				self._vStart = -1;
-				self._vEnd = -1;
-				self._render();
-				dispatch(dom, 'ln-table:filter', {
-					term: self._searchTerm,
-					matched: self._filteredData.length,
-					total: self._data.length
-				});
+				self._columnFilters[key] = lower;
 			}
+			self._applyFilterAndSort();
+			self._vStart = -1;
+			self._vEnd = -1;
+			self._render();
+			dispatch(dom, 'ln-table:filter', {
+				term: self._searchTerm,
+				matched: self._filteredData.length,
+				total: self._data.length
+			});
 		};
 		dom.addEventListener('ln-table:set-filter', this._onSetFilter);
 
 		this._onRequestClearFilters = function () {
-			if (self.isDataDriven) {
-				self.currentFilters = {};
-				self.currentSearch = '';
-				dispatch(dom, 'ln-table:clear-filters', { table: self.name });
-				self._requestData();
-			} else {
-				self._searchTerm = '';
-				self._columnFilters = {};
-				self._applyFilterAndSort();
-				self._vStart = -1;
-				self._vEnd = -1;
-				self._render();
-				self._updateFooter();
-				dispatch(dom, 'ln-table:filter', {
-					term: '',
-					matched: self._filteredData.length,
-					total: self._data.length
-				});
-			}
+			if (self.isDataDriven) return;
+			self._searchTerm = '';
+			self._columnFilters = {};
+			self._applyFilterAndSort();
+			self._vStart = -1;
+			self._vEnd = -1;
+			self._render();
+			self._updateFooter();
+			dispatch(dom, 'ln-table:filter', {
+				term: '',
+				matched: self._filteredData.length,
+				total: self._data.length
+			});
 		};
 		dom.addEventListener('ln-table:request-clear-filters', this._onRequestClearFilters);
 
@@ -164,17 +139,14 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this.totalCount = 0;
 			this.visibleCount = 0;
 			this.currentSort = null;
-			this.currentFilters = {};
-			this.currentSearch = '';
 			this.selectedIds = new Set();
 
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
 
-			// Windowed (sliding-window) server-side virtualization — opt-in
-			this._windowed = false;
-			this._cache = null;
-			if (this.isDataDriven && dom.hasAttribute('data-ln-table-window')) this._enterWindowedMode();
+			this._sliceOffset = 0;
+			this._sliceData = [];
+			this._debounceId = null;
 
 			// Footer elements
 			this._totalSpan = dom.querySelector('[data-ln-table-total]');
@@ -194,18 +166,47 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			// --- Event listeners ---
 			this._onSetData = function (e) {
 				const detail = e.detail || {};
-				if (self._windowed) {
+				if (detail.offset != null) {
+					self._sliceOffset = detail.offset;
+					self._sliceData = detail.data || [];
+					self._lastTotal = detail.total != null ? detail.total : self._lastTotal;
+					self._lastFiltered = detail.filtered != null ? detail.filtered : self._lastFiltered;
+					self.totalCount = self._lastTotal;
+					self.visibleCount = self._lastFiltered;
+					self.isLoaded = true;
+
+					if (self._selectable && self._selectAllCheckbox) {
+						self._selectAllCheckbox.classList.add('hidden');
+					}
+
 					dom.classList.remove('ln-table--loading');
-					self._cache.ingest(detail);
+
+					self._vStart = -1;
+					self._vEnd = -1;
+
+					self._render();
+					self._updateFooter();
+
+					dispatch(dom, 'ln-table:rendered', {
+						table: self.name,
+						total: self.totalCount,
+						visible: self.visibleCount
+					});
 					return;
 				}
 				self._data = detail.data || [];
+				self._sliceOffset = 0;
+				self._sliceData = [];
 				self._lastTotal = detail.total != null ? detail.total : self._data.length;
 				self._lastFiltered = detail.filtered != null ? detail.filtered : self._data.length;
 
 				self.totalCount = self._lastTotal;
 				self.visibleCount = self._lastFiltered;
 				self.isLoaded = true;
+
+				if (self._selectable && self._selectAllCheckbox) {
+					self._selectAllCheckbox.classList.remove('hidden');
+				}
 
 				dom.classList.remove('ln-table--loading');
 
@@ -253,10 +254,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			if (this._selectable) {
 				this._enableSelection();
 			}
-			// D4 — windowed tables cannot select rows they have never fetched
-			if (this._windowed && this._selectable && this._selectAllCheckbox) {
-				this._selectAllCheckbox.classList.add('hidden');
-			}
+
 
 			// --- Row Click & Actions ---
 			this._onRowClick = function (e) {
@@ -361,16 +359,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 
 			// Initial request-data
-			if (this._windowed) {
-				this._kickWindowInitial();
-			} else {
-				dispatch(dom, 'ln-table:request-data', {
-					table: this.name,
-					sort: this.currentSort,
-					filters: this.currentFilters,
-					search: this.currentSearch
-				});
-			}
+			dispatch(dom, 'ln-table:request-data', {
+				table: this.name,
+				sort: this.currentSort
+			});
 
 		} else {
 			// SSR Mode
@@ -499,38 +491,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 	_component.prototype._applyFilterAndSort = function () {
 		if (this.isDataDriven) {
-			const term = (this.currentSearch || '').trim().toLowerCase();
-			const filters = this.currentFilters || {};
-			const hasFilters = Object.keys(filters).length > 0;
-
-			// 1. Filter
-			this._filteredData = this._data.filter(function (row) {
-				if (term) {
-					let match = false;
-					for (const key in row) {
-						if (row.hasOwnProperty(key) && typeof row[key] === 'string' && key !== 'html' && key !== 'searchText') {
-							if (row[key].toLowerCase().indexOf(term) !== -1) {
-								match = true;
-								break;
-							}
-						}
-					}
-					if (!match) return false;
-				}
-
-				if (hasFilters) {
-					for (const field in filters) {
-						const activeVals = filters[field];
-						if (activeVals && activeVals.length > 0) {
-							const val = row[field];
-							const sVal = val != null ? String(val) : '';
-							if (activeVals.indexOf(sVal) === -1) return false;
-						}
-					}
-				}
-				return true;
-			});
-
+			this._filteredData = this._data.slice();
 			this.visibleCount = this._filteredData.length;
 
 			// 2. Sort
@@ -645,8 +606,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (!this.tbody) return;
 
 		if (this.isDataDriven) {
-			if (this._windowed) { this._renderWindowed(); return; }
-			const total = this._lastTotal;
+			const isSlice = this._sliceData && this._sliceData.length > 0;
+			const total = isSlice ? this.visibleCount : this._lastTotal;
 			const filtered = this.visibleCount;
 
 			if (total === 0) {
@@ -655,14 +616,15 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				return;
 			}
 
-			if (this._filteredData.length === 0 || filtered === 0) {
+			if (!isSlice && (this._filteredData.length === 0 || filtered === 0)) {
 				this._disableVirtualScroll();
 				this._showEmptyState();
 				return;
 			}
 
-			if (this._filteredData.length > VIRTUAL_THRESHOLD) {
-				this._enableVirtualScroll();
+			if (isSlice || this._filteredData.length > VIRTUAL_THRESHOLD) {
+				if (!this._virtual) this._enableVirtualScroll();
+				this._measureRowHeight();
 				this._renderVirtual();
 			} else {
 				this._disableVirtualScroll();
@@ -709,6 +671,36 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 	// ─── Virtual scroll ────────────────────────────────────────
 
+	// Measured from a real record only — a placeholder carries no intrinsic
+	// height, so an all-placeholder slice defers the measurement to a later pass.
+	_component.prototype._measureRowHeight = function () {
+		if (this._rowHeight) return;
+
+		const isSlice = this._sliceData && this._sliceData.length > 0;
+		if (!isSlice && !this.isDataDriven) {
+			const rows = this.tbody ? this.tbody.rows : [];
+			if (rows.length > 0) this._rowHeight = rows[0].offsetHeight || 40;
+			return;
+		}
+
+		let sample = null;
+		if (isSlice) {
+			for (let i = 0; i < this._sliceData.length; i++) {
+				if (this._sliceData[i]) { sample = this._sliceData[i]; break; }
+			}
+		}
+		if (!sample && this._data.length > 0) sample = this._data[0];
+		if (!sample) return;
+
+		const tempRow = this._buildRow(sample);
+		if (!tempRow) return;
+
+		this.tbody.textContent = '';
+		this.tbody.appendChild(tempRow);
+		this._rowHeight = tempRow.offsetHeight || 40;
+		this.tbody.textContent = '';
+	};
+
 	_component.prototype._enableVirtualScroll = function () {
 		if (this._virtual) return;
 		this._virtual = true;
@@ -716,38 +708,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		this._vEnd = -1;
 		const self = this;
 
-		if (!this._rowHeight) {
-			if (this._windowed) {
-				let tempRow = null;
-				const sample = this._cache.peek();
-				if (sample) {
-					tempRow = this._buildRow(sample);
-				} else {
-					tempRow = this._buildPlaceholderRow();
-				}
-				if (tempRow) {
-					this.tbody.textContent = '';
-					this.tbody.appendChild(tempRow);
-					this._rowHeight = tempRow.offsetHeight || 40;
-					this.tbody.textContent = '';
-				}
-			} else if (this.isDataDriven) {
-				if (this._data.length > 0) {
-					const tempRow = this._buildRow(this._data[0]);
-					if (tempRow) {
-						this.tbody.textContent = '';
-						this.tbody.appendChild(tempRow);
-						this._rowHeight = tempRow.offsetHeight || 40;
-						this.tbody.textContent = '';
-					}
-				}
-			} else {
-				const rows = this.tbody ? this.tbody.rows : [];
-				if (rows.length > 0) {
-					this._rowHeight = rows[0].offsetHeight || 40;
-				}
-			}
-		}
+		this._measureRowHeight();
 
 		if (this.isDataDriven) {
 			this._scrollContainer = _findScrollContainer(this.dom);
@@ -760,7 +721,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			if (self._rafId) return;
 			self._rafId = requestAnimationFrame(function () {
 				self._rafId = null;
-				self._windowed ? self._renderWindowed() : self._renderVirtual();
+				self._renderVirtual();
 			});
 		};
 
@@ -788,8 +749,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._renderVirtual = function () {
-		const data = this._filteredData;
-		const total = data.length;
+		const isSlice = this._sliceData && this._sliceData.length > 0;
+		const data = isSlice ? this._sliceData : this._filteredData;
+		const total = isSlice ? this.visibleCount : data.length;
 		const rowH = this._rowHeight;
 		if (!rowH || !total) return;
 
@@ -839,8 +801,22 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 
 			for (let i = startRow; i < endRow; i++) {
-				const tr = this._buildRow(data[i]);
-				if (tr) frag.appendChild(tr);
+				if (isSlice) {
+					if (i >= this._sliceOffset && i < this._sliceOffset + this._sliceData.length) {
+						const rec = this._sliceData[i - this._sliceOffset];
+						if (rec) {
+							const tr = this._buildRow(rec);
+							if (tr) frag.appendChild(tr);
+						} else {
+							frag.appendChild(this._buildPlaceholderRow());
+						}
+					} else {
+						frag.appendChild(this._buildPlaceholderRow());
+					}
+				} else {
+					const tr = this._buildRow(data[i]);
+					if (tr) frag.appendChild(tr);
+				}
 			}
 
 			if (bottomH > 0) {
@@ -858,6 +834,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this.tbody.appendChild(frag);
 
 			if (this._selectable) this._updateSelectAll();
+			if (isSlice) this._ensureSlice(startRow, endRow);
 		} else {
 			let html = '';
 
@@ -888,87 +865,43 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		return tr;
 	};
 
-	_component.prototype._renderWindowed = function () {
-		if (this.isLoaded && this._cache.logicalTotal === 0) {
-			this._disableVirtualScroll();
-			this._showEmptyState();
-			return;
-		}
+	_component.prototype._ensureSlice = function (startRow, endRow) {
+		const sliceLen = this._sliceData ? this._sliceData.length : 0;
+		if (sliceLen === 0 || this.visibleCount === 0) return;
 
-		if (!this._virtual) this._enableVirtualScroll();
+		const threshold = 25;
+		const checkStart = Math.max(0, startRow - threshold);
+		const checkEnd = Math.min(this.visibleCount, endRow + threshold);
 
-		const rowH = this._rowHeight;
-		if (!rowH) return;
+		const pageSize = sliceLen;
+		const firstPage = Math.floor(checkStart / pageSize);
+		const lastPage = Math.floor(Math.max(0, checkEnd - 1) / pageSize);
 
-		const total = this._cache.logicalTotal;
-		const theadH = this.thead ? this.thead.offsetHeight : 0;
-		const sc = this._scrollContainer;
-		let scrollIntoData;
-		let viewportH;
-
-		if (sc) {
-			const tableRect = this.table.getBoundingClientRect();
-			const scRect = sc.getBoundingClientRect();
-			const dataStartInContainer = (tableRect.top - scRect.top) + sc.scrollTop + theadH;
-			scrollIntoData = sc.scrollTop - dataStartInContainer;
-			viewportH = sc.clientHeight;
-		} else {
-			const tableRect = this.table.getBoundingClientRect();
-			const tableTopInPage = tableRect.top + window.scrollY;
-			const dataStartInPage = tableTopInPage + theadH;
-			scrollIntoData = window.scrollY - dataStartInPage;
-			viewportH = window.innerHeight;
-		}
-
-		let startRow = Math.max(0, Math.floor(scrollIntoData / rowH) - BUFFER_ROWS);
-		startRow = Math.min(startRow, total);
-		const endRow = Math.min(startRow + Math.ceil(viewportH / rowH) + (BUFFER_ROWS * 2), total);
-
-		const colSpan = this.ths.length || 1;
-		const topH = startRow * rowH;
-		const bottomH = (total - endRow) * rowH;
-
-		const frag = document.createDocumentFragment();
-
-		if (topH > 0) {
-			const topSpacer = document.createElement('tr');
-			topSpacer.className = 'ln-table__spacer';
-			topSpacer.setAttribute('aria-hidden', 'true');
-			const topTd = document.createElement('td');
-			topTd.setAttribute('colspan', colSpan);
-			topTd.style.height = topH + 'px';
-			topSpacer.appendChild(topTd);
-			frag.appendChild(topSpacer);
-		}
-
-		for (let i = startRow; i < endRow; i++) {
-			if (this._cache.has(i)) {
-				const tr = this._buildRow(this._cache.get(i));
-				if (tr) frag.appendChild(tr);
-			} else {
-				frag.appendChild(this._buildPlaceholderRow());
+		let targetPage = -1;
+		for (let p = firstPage; p <= lastPage; p++) {
+			const pOffset = p * pageSize;
+			if (pOffset < this._sliceOffset || pOffset >= this._sliceOffset + sliceLen) {
+				targetPage = p;
+				break;
 			}
 		}
 
-		if (bottomH > 0) {
-			const bottomSpacer = document.createElement('tr');
-			bottomSpacer.className = 'ln-table__spacer';
-			bottomSpacer.setAttribute('aria-hidden', 'true');
-			const bottomTd = document.createElement('td');
-			bottomTd.setAttribute('colspan', colSpan);
-			bottomTd.style.height = bottomH + 'px';
-			bottomSpacer.appendChild(bottomTd);
-			frag.appendChild(bottomSpacer);
-		}
+		if (targetPage === -1) return;
 
-		this.tbody.textContent = '';
-		this.tbody.appendChild(frag);
+		const targetOffset = targetPage * pageSize;
+		const targetLimit = pageSize;
 
-		// Select-all is disabled in windowed mode (D4) — no _updateSelectAll() call.
-		this._vStart = startRow;
-		this._vEnd = endRow;
-
-		this._cache.ensure(startRow, endRow);
+		if (this._debounceId) clearTimeout(this._debounceId);
+		const self = this;
+		this._debounceId = setTimeout(function () {
+			self.dom.classList.add('ln-table--loading');
+			dispatch(self.dom, 'ln-table:request-data', {
+				table: self.name,
+				sort: self.currentSort,
+				offset: targetOffset,
+				limit: targetLimit
+			});
+		}, 120);
 	};
 
 	// ─── Empty state ───────────────────────────────────────────
@@ -982,7 +915,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (this.isDataDriven) {
 			const total = this._lastTotal != null ? this._lastTotal : this._data.length;
 			const filtered = this.visibleCount;
-			const isFiltered = (this.currentSearch || Object.keys(this.currentFilters).length > 0) && (filtered < total || filtered === 0);
+			const isFiltered = filtered < total;
 
 			const templateName = isFiltered ? (this.name + '-empty-filtered') : (this.name + '-empty');
 			clone = cloneTemplateScoped(this.dom, templateName, 'ln-table');
@@ -1025,7 +958,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		}
 
 		dispatch(this.dom, 'ln-table:empty', {
-			term: this.isDataDriven ? (this.currentSearch || '') : this._searchTerm,
+			term: this.isDataDriven ? '' : this._searchTerm,
 			total: this.isDataDriven ? (this._lastTotal != null ? this._lastTotal : this._data.length) : this._data.length
 		});
 	};
@@ -1108,118 +1041,24 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._requestData = function () {
-		if (this._windowed) {
+		const isSlice = this._sliceData && this._sliceData.length > 0;
+		if (isSlice) {
 			this.dom.classList.add('ln-table--loading');
-			this._cache.invalidate({
+			const pageSize = this._sliceData.length || 200;
+			this._sliceOffset = 0;
+			this._sliceData = [];
+			dispatch(this.dom, 'ln-table:request-data', {
+				table: this.name,
 				sort: this.currentSort,
-				filters: this.currentFilters,
-				search: this.currentSearch
+				offset: 0,
+				limit: pageSize
 			});
 			return;
 		}
 		requestData(this, 'ln-table:request-data', 'table');
 	};
 
-	// ─── Windowed Mode — enter/exit/seed (live toggle) ──────────
 
-	_component.prototype._enterWindowedMode = function () {
-		const self = this;
-		const dom = this.dom;
-		const winAttr = parseInt(dom.getAttribute('data-ln-table-window'), 10);
-		const pageAttr = parseInt(dom.getAttribute('data-ln-table-window-page'), 10);
-		const threshAttr = parseInt(dom.getAttribute('data-ln-table-window-threshold'), 10);
-
-		// Cache change → sync totals off the cache, re-render (pull), notify.
-		this._onCacheChange = function () {
-			if (!self._windowed || !self._cache) return;
-			self.totalCount = self._cache.grandTotal;
-			self.visibleCount = self._cache.logicalTotal;
-			self._lastTotal = self._cache.grandTotal;
-			self.isLoaded = true;
-			self._vStart = -1;
-			self._vEnd = -1;
-			self._render();
-			self._updateFooter();
-			dispatch(dom, 'ln-table:rendered', {
-				table: self.name,
-				total: self.totalCount,
-				visible: self.visibleCount
-			});
-		};
-		this._renderBatch = createBatcher(this._onCacheChange);
-
-		this._cache = createWindowCache({
-			windowSize: winAttr > 0 ? winAttr : WINDOW_DEFAULT,
-			pageSize: pageAttr > 0 ? pageAttr : WINDOW_PAGE,
-			threshold: threshAttr >= 0 ? threshAttr : 25,
-			fetchDebounce: FETCH_DEBOUNCE,
-			requestPage: function (query, offset, limit) {
-				dispatch(dom, 'ln-table:request-data', {
-					table: self.name,
-					sort: query.sort,
-					filters: query.filters,
-					search: query.search,
-					offset: offset,
-					limit: limit,
-					queryGen: self._cache.queryGen
-				});
-			},
-			onChange: this._renderBatch
-		});
-
-		this._windowed = true;
-
-		// D4 — windowed tables cannot select rows they have never fetched
-		if (this._selectable && this._selectAllCheckbox) {
-			this._selectAllCheckbox.classList.add('hidden');
-		}
-	};
-
-	_component.prototype._kickWindowInitial = function () {
-		if (this._data.length > 0) {
-			// SSR-seeded / warm-seeded: page 0 is already resident, the grand
-			// total is declared in markup — no initial fetch needed. No
-			// queryGen on the seed — it must never be dropped as stale.
-			let declaredTotal = parseInt(this.dom.getAttribute('data-ln-table-count'), 10);
-			if (isNaN(declaredTotal) && this._totalSpan) {
-				const spanText = this._totalSpan.textContent.replace(/[^\d]/g, '');
-				if (spanText) declaredTotal = parseInt(spanText, 10);
-			}
-			const seedTotal = (declaredTotal > 0) ? declaredTotal : this._data.length;
-			this._cache.ingest({
-				data: this._data,
-				offset: 0,
-				total: seedTotal,
-				filtered: seedTotal
-			});
-		} else {
-			this.dom.classList.add('ln-table--loading');
-			this._cache.requestInitial({
-				sort: this.currentSort,
-				filters: this.currentFilters,
-				search: this.currentSearch
-			});
-		}
-	};
-
-	_component.prototype._exitWindowedMode = function () {
-		this._disableVirtualScroll();
-		if (this._cache) this._cache.destroy();
-		this._cache = null;
-		this._windowed = false;
-		this._renderBatch = null;
-		this._onCacheChange = null;
-		if (this._selectAllCheckbox) {
-			this._selectAllCheckbox.classList.remove('hidden');
-		}
-		this._rowHeight = 0;
-		this._vStart = -1;
-		this._vEnd = -1;
-		this._data = [];
-		this._filteredData = [];
-		this.dom.classList.add('ln-table--loading');
-		this._requestData();
-	};
 
 	// ─── Selection Helpers ─────────────────────────────────────
 
@@ -1431,6 +1270,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this._disableVirtualScroll();
+		if (this._debounceId) {
+			clearTimeout(this._debounceId);
+			this._debounceId = null;
+		}
 
 		this.dom.removeEventListener('ln-table:set-search', this._onSetSearch);
 		this.dom.removeEventListener('ln-table:set-filter', this._onSetFilter);
@@ -1449,7 +1292,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 			if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);
 			if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
-			if (this._cache) this._cache.destroy();
 		} else {
 			if (this._emptyTbodyObserver) {
 				this._emptyTbodyObserver.disconnect();
@@ -1470,42 +1312,5 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-table', {
-		extraAttributes: [
-			'data-ln-table-window',
-			'data-ln-table-window-page',
-			'data-ln-table-window-threshold',
-			'data-ln-table-count'
-		],
-		onAttributeChange: function (el, attrName) {
-			const inst = el[DOM_ATTRIBUTE];
-			if (!inst || !inst.isDataDriven) return;
-
-			if (attrName === 'data-ln-table-window') {
-				const present = el.hasAttribute('data-ln-table-window');
-				if (present && !inst._windowed) {
-					inst._enterWindowedMode();
-					inst._kickWindowInitial();
-				} else if (!present && inst._windowed) {
-					inst._exitWindowedMode();
-				} else if (present && inst._windowed) {
-					const v = parseInt(el.getAttribute('data-ln-table-window'), 10);
-					if (v > 0) inst._cache.configure({ windowSize: v });
-				}
-				return;
-			}
-
-			if (!inst._windowed || !inst._cache) return;
-			if (attrName === 'data-ln-table-window-page') {
-				const v = parseInt(el.getAttribute('data-ln-table-window-page'), 10);
-				if (v > 0) inst._cache.configure({ pageSize: v });
-			} else if (attrName === 'data-ln-table-window-threshold') {
-				const v = parseInt(el.getAttribute('data-ln-table-window-threshold'), 10);
-				if (v >= 0) inst._cache.configure({ threshold: v });
-			} else if (attrName === 'data-ln-table-count') {
-				const v = parseInt(el.getAttribute('data-ln-table-count'), 10);
-				if (v >= 0) inst._cache.setGrandTotal(v);
-			}
-		}
-	});
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-table');
 })();

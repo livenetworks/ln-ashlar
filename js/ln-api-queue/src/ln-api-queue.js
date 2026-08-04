@@ -31,7 +31,7 @@ import { QueueStorage } from './queue-storage';
 		dom[DOM_ATTRIBUTE] = this;
 
 		const coordinatorEl = dom.closest('[data-ln-data-coordinator]');
-		this.scope = dom.getAttribute(DOM_SELECTOR) || (coordinatorEl ? coordinatorEl.getAttribute('data-ln-data-coordinator') : null) || 'default';
+		this.scope = dom.id || (coordinatorEl ? coordinatorEl.id : null) || 'default';
 
 		this._paused = false;
 		this._timers = new Map();

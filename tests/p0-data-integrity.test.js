@@ -55,17 +55,16 @@ async function usingQueueStorage(options, operation) {
 
 test('loaded cache is selected for normal reads', () => {
 	const store = { isLoaded: true };
-	assert.equal(selectDataSource(store, {}, false), 'store');
+	assert.equal(selectDataSource(store, {}), 'store');
 });
 
 test('empty local-only store remains a valid read source', () => {
 	const store = { isLoaded: false, isInitialized: true };
-	assert.equal(selectDataSource(store, null, false), 'store');
+	assert.equal(selectDataSource(store, null), 'store');
 });
 
-test('unloaded and windowed connector reads route remote', () => {
-	assert.equal(selectDataSource({ isLoaded: false }, {}, false), 'remote');
-	assert.equal(selectDataSource({ isLoaded: true }, {}, true), 'remote');
+test('unloaded connector reads route remote', () => {
+	assert.equal(selectDataSource({ isLoaded: false }, {}), 'remote');
 });
 
 test('store initialization failure routes remote when possible', () => {
