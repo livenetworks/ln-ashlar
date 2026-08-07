@@ -35,9 +35,9 @@ tags: [data, synchronization, local-first]
 ### Base HTML Markup
 
 ```html
-<ul data-ln-data-coordinator="users" id="users-coordinator" hidden>
+<ul data-ln-data-coordinator id="users-coordinator" hidden>
     <!-- Local database storage (IndexedDB) -->
-    <li data-ln-data-store="users" id="users-store"></li>
+    <li data-ln-data-store id="users"></li>
     
     <!-- Remote connection endpoint (REST) -->
     <li data-ln-api-connector="/api/users" id="users-connector"></li>
@@ -54,13 +54,13 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 #### HTML Markup
 ```html
 <!-- Logical data definition -->
-<ul data-ln-data-coordinator="users" hidden>
-    <li data-ln-data-store="users"></li>
+<ul data-ln-data-coordinator hidden>
+    <li data-ln-data-store id="users"></li>
     <li data-ln-api-connector="/api/users"></li>
 </ul>
 
 <!-- UI View component consuming data -->
-<div id="users-table" data-ln-table="users" data-ln-table-store="users">
+<div id="users-table" data-ln-table="users" data-ln-table-source="users">
     <table>
         <!-- Populated automatically -->
     </table>
@@ -75,7 +75,7 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-data-coordinator` | Wrapper | `String` | — | Activates the coordinator. Declares the data model namespace. |
+| `data-ln-data-coordinator` | Wrapper | Flag / Valueless | — | Activates the coordinator. |
 | `data-ln-data-mapper` | Wrapper | `String` | — | Optional custom data mapper function key name. |
 | `data-ln-data-coordinator-stale` | Wrapper | `Number` | `300` | Stale cache window in seconds. Falls back to store rules. |
 | `data-ln-data-coordinator-no-autosync` | Wrapper | Flag | — | Disables automatic sync on visibility or online recovery events. |
@@ -174,7 +174,7 @@ sequenceDiagram
     participant API as Backend PHP API
 
     Note over Table, API: Single Source of Truth: Table binds strictly to ln-data-store
-    Table->>Store: Query request (data-ln-table-store="name")
+    Table->>Store: Query request (data-ln-table-source="name")
     Store->>Coord: Event: ln-data-store:request-remote-sync
     Coord->>Conn: Event: ln-api-connector:request-query
     Conn->>API: window.fetch(url) (Network Tab)

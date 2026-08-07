@@ -90,11 +90,11 @@ Use when the table queries a store and connects through a coordinator rather tha
 #### HTML Markup
 
 ```html
-<div data-ln-data-coordinator="products" id="products-coordinator">
-  <div data-ln-data-store="products" id="products-store"></div>
+<div data-ln-data-coordinator id="products-coordinator">
+  <div data-ln-data-store id="products"></div>
   <div data-ln-api-connector="/api/products" id="products-connector"></div>
 
-  <div id="products-table" data-ln-table="products" data-ln-table-source="products" data-ln-table-store="products">
+  <div id="products-table" data-ln-table="products" data-ln-table-source="products">
     <table>
       <thead>
         <tr>
@@ -138,8 +138,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-table` | Root container | `String` | - | Identifies the table. The value names generated events. Must have a unique `id`. |
-| `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the data source name. |
-| `data-ln-table-store` | Root container | `String` | - | Target data store name to connect with via `ln-data-coordinator`. |
+| `data-ln-table-source` | Root container | `String` | - | Enables Data-Driven mode. Value maps to the target data store ID. |
 | `data-ln-table-selectable` | Root container | `Boolean` | `false` | Enables row multi-selection and checkboxes. |
 | `data-ln-table-window` | Root container | `Number` | - | Opt-in server-side sliding-window virtualization. Sets the resident-row cap (`windowSize`) for the internal `ln-core.createWindowCache` instance. Observable — adding/removing it toggles windowed mode ON/OFF live, no re-init; changing the value while windowed reconfigures the live cache. |
 | `data-ln-table-window-page` | Root container | `Number` | `200` | Configures the chunk/page fetch size (`pageSize` / `limit`) for page-aligned server requests. Observable — applies to the live cache without re-init. |

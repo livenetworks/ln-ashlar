@@ -18,11 +18,11 @@
 			</div>
 		</header>
 
-		<section data-ln-table="tenants" data-ln-table-source="tenants" data-ln-table-store="tenants" data-ln-table-selectable id="tenants-table">
+		<section data-ln-table="tenants" data-ln-table-source="tenants" data-ln-table-selectable id="tenants-table">
 			<header class="ln-table__toolbar">
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Search tenants…" data-ln-search="tenants-table">
+					<input type="search" placeholder="Search tenants…" data-ln-search="tenants">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
@@ -112,7 +112,7 @@
 
 		<!-- Tenants table: auth method filter popover -->
 		<div data-ln-popover id="filter-tenants-auth">
-			<ul data-ln-filter="tenants-table">
+			<ul data-ln-filter="tenants">
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-reset checked> All</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="Local"> Local</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="LDAP"> LDAP</label></li>
@@ -121,7 +121,7 @@
 
 		<!-- Tenants table: status filter popover -->
 		<div data-ln-popover id="filter-tenants-active">
-			<ul data-ln-filter="tenants-table">
+			<ul data-ln-filter="tenants">
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>

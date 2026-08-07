@@ -35,10 +35,11 @@ tags: [data, store, database, indexeddb, offline-first]
 ### Base HTML Markup
 
 ```html
-<div data-ln-data-store="documents"
+<div data-ln-data-store
      data-ln-data-store-indexes="status,department,updated_at"
      data-ln-data-store-search-fields="title,owner"
-     data-ln-data-store-stale="300">
+     data-ln-data-store-stale="300"
+     id="documents">
 </div>
 ```
 
@@ -48,7 +49,7 @@ Use for configuration settings or static data tables.
 
 #### HTML Markup
 ```html
-<div data-ln-data-store="settings" data-ln-data-store-stale="never"></div>
+<div data-ln-data-store data-ln-data-store-stale="never" id="settings"></div>
 ```
 
 ### Variant 2: Full 3-Tier Synchronization Configuration
@@ -57,11 +58,12 @@ Use when synchronizing with a REST backend API.
 
 #### HTML Markup
 ```html
-<ul data-ln-data-coordinator="tasks" hidden>
+<ul data-ln-data-coordinator hidden>
     <!-- Tier 1: Local Cache -->
-    <li data-ln-data-store="tasks" 
+    <li data-ln-data-store 
         data-ln-data-store-indexes="due_date,priority"
-        data-ln-data-store-search-fields="title,description">
+        data-ln-data-store-search-fields="title,description"
+        id="tasks">
     </li>
     <!-- Tier 2: Backend Connector -->
     <li data-ln-api-connector 
@@ -79,7 +81,7 @@ Use when synchronizing with a REST backend API.
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-data-store` | Root | `String` | *Required* | Declares the store name. |
+| `data-ln-data-store` | Root | Flag / Valueless | *Required* | Activates the store. The store name is defined by the element's `id`. |
 | `data-ln-data-store-stale` | Root | `Integer` \| `"never"` \| `-1` | `300` | Seconds before data is considered stale. |
 | `data-ln-data-store-indexes` | Root | `String` | `""` | Comma-separated IndexedDB index fields. |
 | `data-ln-data-store-search-fields` | Root | `String` | `""` | Comma-separated list of text fields for search. |

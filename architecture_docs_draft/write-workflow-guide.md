@@ -60,7 +60,7 @@
 		<button type="button" data-ln-modal-open="document-edit">Нов документ</button>
 	</header>
 
-	<table data-ln-table="documents" data-ln-table-source="documents" data-ln-table-store="documents">
+	<table data-ln-table="documents" data-ln-table-source="documents">
 		<thead>
 			<tr>
 				<th data-ln-table-col="title">Наслов</th>

@@ -38,7 +38,7 @@
     "build:demos": "npm run build:demo-index && npm run build:demo-admin && npm run build:demo-docuflow && npm run build:demo-spa",
     "build:dev-css": "sass scss/ln-ashlar-dev.scss demo/dist/ln-ashlar-dev.css --no-source-map --style=compressed",
     "build:demo-index": "sass demo/index.scss demo/index.css --no-source-map --style=compressed",
-    "build:demo-admin": "sass demo/admin/src/admin.scss demo/admin/dist/admin.css --no-source-map --style=compressed && cp demo/admin/src/demo.js demo/admin/dist/demo.js && node demo/admin/src/build-pages.mjs",
+    "build:demo-admin": "sass demo/admin/src/admin.scss demo/admin/dist/admin.css --no-source-map --style=compressed && node -e \"const fs = require('fs'); fs.copyFileSync('demo/admin/src/demo.js', 'demo/admin/dist/demo.js')\" && node demo/admin/src/build-pages.mjs",
     "build:demo-docuflow": "sass demo/docuflow/docuflow.scss demo/docuflow/dist/docuflow.css --no-source-map --style=compressed",
     "build:demo-spa": "node demo/spa/build.mjs"
   },

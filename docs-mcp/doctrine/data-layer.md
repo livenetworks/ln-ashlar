@@ -79,8 +79,8 @@ registerDataMapper('documents', {
 
 Binding is declared in HTML using the mapping reference (where the coordinator itself is a hidden `<ul>` and its headless configuration children are `<li>` elements):
 ```html
-<ul data-ln-data-coordinator="documents" data-ln-data-mapper="documents" hidden>
-    <li data-ln-data-store data-ln-store-indexes="status"></li>
+<ul data-ln-data-coordinator data-ln-data-mapper="documents" id="documents-coordinator" hidden>
+    <li data-ln-data-store data-ln-store-indexes="status" id="documents"></li>
     <li data-ln-rest-connector data-ln-rest-base-url="/api" data-ln-rest-path="/documents"></li>
 </ul>
 ```

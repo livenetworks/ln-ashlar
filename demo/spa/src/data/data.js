@@ -2,8 +2,8 @@
 	'use strict';
 
 	App.defineModule(function () {
-		const packagesStoreEl = document.getElementById('packages-store');
-		const tenantsStoreEl = document.getElementById('tenants-store');
+		const packagesStoreEl = document.getElementById('packages');
+		const tenantsStoreEl = document.getElementById('tenants');
 
 		if (!packagesStoreEl || !tenantsStoreEl) {
 			console.warn('[spa:data] Missing store elements — aborting');

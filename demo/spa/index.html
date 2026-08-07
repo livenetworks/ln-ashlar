@@ -80,24 +80,24 @@
 	
 		<!-- data/data.html -->
 		<!-- Packages data layer -->
-<div data-ln-data-coordinator="packages" data-ln-data-mapper="packages" hidden>
-	<div data-ln-data-store="packages"
+<div data-ln-data-coordinator data-ln-data-mapper="packages" id="packages-coordinator" hidden>
+	<div data-ln-data-store
 	     data-ln-data-store-stale="-1"
 	     data-ln-data-store-indexes="active"
 	     data-ln-data-store-search-fields="name"
-	     id="packages-store"></div>
+	     id="packages"></div>
 	<div data-ln-api-connector
 	     data-ln-api-base-url="/docuflow/api"
 	     data-ln-api-path="/packages"></div>
 </div>
 
 <!-- Tenants data layer -->
-<div data-ln-data-coordinator="tenants" data-ln-data-mapper="tenants" hidden>
-	<div data-ln-data-store="tenants"
+<div data-ln-data-coordinator data-ln-data-mapper="tenants" id="tenants-coordinator" hidden>
+	<div data-ln-data-store
 	     data-ln-data-store-stale="-1"
 	     data-ln-data-store-indexes="package_id,auth_method,active"
 	     data-ln-data-store-search-fields="name,slug,custom_domain"
-	     id="tenants-store"></div>
+	     id="tenants"></div>
 	<div data-ln-api-connector
 	     data-ln-api-base-url="/docuflow/api"
 	     data-ln-api-path="/tenants"></div>
@@ -392,11 +392,11 @@
 			</div>
 		</header>
 
-		<section data-ln-table="packages" data-ln-table-source="packages" data-ln-table-store="packages" id="packages-table">
+		<section data-ln-table="packages" data-ln-table-source="packages" id="packages-table">
 			<header class="ln-table__toolbar">
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Search packages…" data-ln-search="packages-table">
+					<input type="search" placeholder="Search packages…" data-ln-search="packages">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
@@ -475,7 +475,7 @@
 
 		<!-- Packages table: status filter popover -->
 		<div data-ln-popover id="filter-packages-active">
-			<ul data-ln-filter="packages-table">
+			<ul data-ln-filter="packages">
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>
@@ -632,11 +632,11 @@
 			</div>
 		</header>
 
-		<section data-ln-table="tenants" data-ln-table-source="tenants" data-ln-table-store="tenants" data-ln-table-selectable id="tenants-table">
+		<section data-ln-table="tenants" data-ln-table-source="tenants" data-ln-table-selectable id="tenants-table">
 			<header class="ln-table__toolbar">
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Search tenants…" data-ln-search="tenants-table">
+					<input type="search" placeholder="Search tenants…" data-ln-search="tenants">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
@@ -726,7 +726,7 @@
 
 		<!-- Tenants table: auth method filter popover -->
 		<div data-ln-popover id="filter-tenants-auth">
-			<ul data-ln-filter="tenants-table">
+			<ul data-ln-filter="tenants">
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-reset checked> All</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="Local"> Local</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="auth_method" data-ln-filter-value="LDAP"> LDAP</label></li>
@@ -735,7 +735,7 @@
 
 		<!-- Tenants table: status filter popover -->
 		<div data-ln-popover id="filter-tenants-active">
-			<ul data-ln-filter="tenants-table">
+			<ul data-ln-filter="tenants">
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>
