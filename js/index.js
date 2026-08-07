@@ -32,6 +32,7 @@ import './ln-link/src/ln-link.js';
 import './ln-progress/src/ln-progress.js';
 import './ln-filter/src/ln-filter.js';
 import './ln-search/src/ln-search.js';
+import './ln-sort/src/ln-sort.js';
 import './ln-table/src/ln-table-sort.js';
 import './ln-table/src/ln-table.js';
 import './ln-table-coordinator/src/ln-table-coordinator.js';

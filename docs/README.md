@@ -79,7 +79,8 @@ Each component ships one file — usage guide plus architecture reference
 | Search | `data-ln-search` | [js/ln-search/README.md](../js/ln-search/README.md) |
 | Table | `data-ln-table` | [js/ln-table/README.md](../js/ln-table/README.md) |
 | Table Sort | `data-ln-table-sort` | [js/ln-table/README.md](../js/ln-table/README.md) |
-| Sortable | `data-ln-table-sortable` | [js/ln-sortable/README.md](../js/ln-sortable/README.md) |
+| Sort | `data-ln-sort` | [js/ln-sort/README.md](../js/ln-sort/README.md) |
+| Sortable | `data-ln-sortable` | [js/ln-sortable/README.md](../js/ln-sortable/README.md) |
 | Progress | `data-ln-progress` | [js/ln-progress/README.md](../js/ln-progress/README.md) |
 | Circular Progress | `data-ln-circular-progress` | [js/ln-circular-progress/README.md](../js/ln-circular-progress/README.md) |
 | Link | `data-ln-link` | [js/ln-link/README.md](../js/ln-link/README.md) |

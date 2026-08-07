@@ -236,6 +236,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			// --- Sort Click ---
 			this._onSortClick = function (e) {
+				if (self.thead.hasAttribute('data-ln-sort')) return;
 				const btn = e.target.closest('[data-ln-table-col-sort]');
 				if (!btn) return;
 				const th = btn.closest('th');

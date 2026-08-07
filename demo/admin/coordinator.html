@@ -238,12 +238,13 @@
 	<header><h3>Declarative 3-Tier Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- 3-Tier Data Layer: Parent Coordinator enclosing store cache, REST connector, and inline JS mapper -->
-		<div data-ln-data-coordinator="demo-docs" data-ln-data-mapper="demo-docs" id="demo-coordinator">
+		<div data-ln-data-coordinator data-ln-data-mapper="demo-docs" id="demo-coordinator">
 			
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
-			<div data-ln-data-store="demo-docs"
+			<div data-ln-data-store
 			     data-ln-data-store-indexes="status,department,updated_at"
-			     data-ln-data-store-search-fields="title,department,owner">
+			     data-ln-data-store-search-fields="title,department,owner"
+			     id="demo-docs">
 			</div>
 
 			<!-- Tier 2: Transport Gateway (REST Connector pointing to mocked server endpoints) -->
@@ -323,7 +324,7 @@
 				</div>
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Search cache…" data-ln-search="demo-table">
+					<input type="search" placeholder="Search cache…" data-ln-search="demo-docs">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
@@ -414,7 +415,7 @@
 			<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 		</button>
 	</label>
-	<ul id="filter-demo-table-dept-list" data-ln-filter="demo-table">
+	<ul id="filter-demo-table-dept-list" data-ln-filter="demo-docs">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>
@@ -428,7 +429,7 @@
 
 <!-- Status filter popover -->
 <div data-ln-popover id="filter-demo-table-status">
-	<ul id="filter-demo-table-status-list" data-ln-filter="demo-table">
+	<ul id="filter-demo-table-status-list" data-ln-filter="demo-docs">
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>

@@ -129,9 +129,9 @@ Rather than parsing raw string expressions out of inline `<script data-ln-mapper
   ```
   ```html
   <!-- CSP Compliant: No inline evaluation occurs -->
-  <div data-ln-data-coordinator="documents" data-ln-data-mapper="documents-mapper">
-       <div data-ln-data-store></div>
-  </div>
+  <ul id="documents-module" data-ln-data-coordinator data-ln-data-mapper="documents-mapper" hidden>
+       <li id="documents" data-ln-data-store></li>
+  </ul>
   ```
 
 ---

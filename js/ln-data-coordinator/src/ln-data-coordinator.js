@@ -338,11 +338,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 		const requestId = _uuid();
 		const receipt = this._mutationReceipts.wait(requestId);
-		try {
-			dispatch(storeEl, 'ln-data-store:request-' + action, Object.assign({}, detail, { requestId }));
-		} catch (error) {
-			this._mutationReceipts.reject({ requestId, error });
-		}
+		dispatch(storeEl, 'ln-data-store:request-' + action, Object.assign({}, detail, { requestId }));
 		return receipt;
 	};
 

@@ -22,6 +22,7 @@ export function composeQuery(viewQuery, storeQuery) {
 	if (storeQuery) {
 		q.filters = storeQuery.filters;
 		q.search  = storeQuery.search;
+		q.sort    = storeQuery.sort;
 	}
 	return q;
 }

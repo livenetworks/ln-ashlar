@@ -402,7 +402,7 @@ Bulk:    save all, remove → DELETE /bulk-delete → confirmed | reverted</code
 					<section class="section-card">
 						<header><h3>API</h3></header>
 						<main>
-							<pre><code>const storeEl = document.querySelector('[data-ln-data-store="documents"]');
+							<pre><code>const storeEl = document.getElementById('documents');
 
 // Queries (all return Promise)
 storeEl.lnDataStore.getAll(options)        // → { data, total, filtered }
@@ -613,7 +613,7 @@ window.lnDataStore.init(el)                // manual init</code></pre>
 	<header><h3>Reconnect auto-resync</h3></header>
 	<main>
 		<p>When the browser goes back online, <code>ln-data-store</code> automatically triggers a remote sync for all loaded stores — <strong>default on, no wiring required.</strong> The <code>isSyncing</code> guard makes it idempotent alongside manual <code>forceSync()</code> calls.</p>
-		<p>Opt out per store: <code>&lt;div data-ln-data-store="chat" data-ln-data-store-no-autosync&gt;&lt;/div&gt;</code></p>
+		<p>Opt out per store: <code>&lt;div data-ln-data-store id="chat" data-ln-data-store-no-autosync&gt;&lt;/div&gt;</code></p>
 		<p>Connectivity indicator (listens to <code>ln-data-store:online</code> / <code>ln-data-store:offline</code> on <code>document</code>):</p>
 		<p id="store-online-indicator" class="hidden">Online — resync triggered.</p>
 		<p id="store-offline-indicator" class="hidden">Offline — cached data still available.</p>

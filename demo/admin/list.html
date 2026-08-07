@@ -238,11 +238,11 @@
 					</section>
 
 					<!-- Declarative 3-Tier Data Layer -->
-					<div data-ln-data-coordinator="hybrid-docs" id="hybrid-list-coordinator">
-						<div data-ln-data-store="hybrid-docs"
+					<div data-ln-data-coordinator id="hybrid-list-coordinator">
+						<div data-ln-data-store
 						     data-ln-data-store-indexes="department,status,priority,updated_at"
 						     data-ln-data-store-search-fields="title,department,owner"
-						     id="hybrid-list-store"></div>
+						     id="hybrid-docs"></div>
 						<div data-ln-api-connector
 						     data-ln-api-base-url="data"
 						     data-ln-api-path="/api.php"
@@ -256,7 +256,7 @@
 							<!-- Search Bar -->
 							<label class="search">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-								<input type="search" placeholder="Search cache or server..." data-ln-search="hybrid-list">
+								<input type="search" placeholder="Search cache or server..." data-ln-search="hybrid-docs">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 								</button>
@@ -265,7 +265,6 @@
 							<!-- Scrollable Container with data-ln-list-body -->
 							<ul id="hybrid-list"
 							    data-ln-list="hybrid-docs"
-							    data-ln-list-store="hybrid-docs"
 							    data-ln-list-source="hybrid-docs"
 							    data-ln-list-selectable
 							    data-ln-list-window="1000"
@@ -1444,7 +1443,7 @@
 
 	document.addEventListener('DOMContentLoaded', function() {
 		log("Page loaded. 100 SSR pre-rendered items visible in list.", 'var(--color-primary)');
-		log("Declarative 3-Tier architecture active: data-ln-data-coordinator <-> data-ln-api-connector <-> data-ln-list-store.", 'var(--color-primary)');
+		log("Declarative 3-Tier architecture active: data-ln-data-coordinator <-> data-ln-api-connector <-> data-ln-data-store.", 'var(--color-primary)');
 	});
 
 	listEl.addEventListener('ln-list:request-data', function (e) {

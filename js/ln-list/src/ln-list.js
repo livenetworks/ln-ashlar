@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent, createBatcher, getLocale } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, dispatchCancelable, fill, fillTemplate, registerComponent, createBatcher, getLocale } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
@@ -68,9 +68,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this.isLoaded = false;
 			this.totalCount = 0;
 			this.visibleCount = 0;
-			this.currentSort = null;
-			this.currentFilters = {};
-			this.currentSearch = '';
 			this.selectedIds = new Set();
 
 			this._sliceOffset = 0;
@@ -166,16 +163,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			};
 			dom.addEventListener('ln-list:set-loading', this._onSetLoading);
 
-			// Clear all
-			this._onClearAll = function (e) {
-				const btn = e.target.closest('[data-ln-list-clear-all]');
-				if (!btn) return;
-				self.currentFilters = {};
-				dispatch(dom, 'ln-list:clear-filters', { list: self.name });
-				self._requestData();
-			};
-			dom.addEventListener('click', this._onClearAll);
-
 			// --- Selection ---
 			this._selectable = dom.hasAttribute('data-ln-list-selectable');
 			this._selectableActive = false;
@@ -226,18 +213,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			};
 			if (this.tbody) this.tbody.addEventListener('click', this._onItemAction);
 
-			// --- Search Change ---
-			this._onSearchChange = function (e) {
-				e.preventDefault();
-				self.currentSearch = (e.detail && e.detail.term) || '';
-				dispatch(dom, 'ln-list:search', {
-					list: self.name,
-					query: self.currentSearch
-				});
-				self._requestData();
-			};
-			dom.addEventListener('ln-search:change', this._onSearchChange);
-
 			// Local hydration of initial items
 			if (this.tbody && this.tbody.children.length > 0) {
 				this._parseChildren();
@@ -245,8 +220,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 
 			// Initial request-data
 			dispatch(dom, 'ln-list:request-data', {
-				list: this.name,
-				sort: this.currentSort
+				list: this.name
 			});
 
 		} else {
@@ -289,13 +263,12 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			const before = dispatchCancelable(dom, 'ln-list:before-clear-search', { list: self.name });
 			if (before.defaultPrevented) return;
 
-			if (self.isDataDriven) {
-				self.currentSearch = '';
-			} else {
+			if (!self.isDataDriven) {
 				self._searchTerm = '';
 			}
 
-			const searchEl = document.querySelector('[data-ln-search="' + dom.id + '"]');
+			const targetId = self.isDataDriven ? self.source : dom.id;
+			const searchEl = document.querySelector('[data-ln-search="' + targetId + '"]');
 			if (searchEl) {
 				const input = searchEl.tagName === 'INPUT' ? searchEl : searchEl.querySelector('input');
 				if (input) {
@@ -304,13 +277,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				}
 			}
 
-			if (self.isDataDriven) {
-				dispatch(dom, 'ln-list:search', {
-					list: self.name,
-					query: ''
-				});
-				self._requestData();
-			} else {
+			if (!self.isDataDriven) {
 				self._applyFilterAndSort();
 				self._vStart = -1;
 				self._vEnd = -1;
@@ -384,63 +351,8 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 
 	_component.prototype._applyFilterAndSort = function () {
 		if (this.isDataDriven) {
-			const term = (this.currentSearch || '').trim().toLowerCase();
-			const filters = this.currentFilters || {};
-			const hasFilters = Object.keys(filters).length > 0;
-
-			// 1. Filter
-			this._filteredData = this._data.filter(function (row) {
-				if (term) {
-					let match = false;
-					for (const key in row) {
-						if (row.hasOwnProperty(key) && typeof row[key] === 'string' && key !== 'html' && key !== 'searchText') {
-							if (row[key].toLowerCase().indexOf(term) !== -1) {
-								match = true;
-								break;
-							}
-						}
-					}
-					if (!match) return false;
-				}
-
-				if (hasFilters) {
-					for (const field in filters) {
-						const activeVals = filters[field];
-						if (activeVals && activeVals.length > 0) {
-							const val = row[field];
-							const sVal = val != null ? String(val) : '';
-							if (activeVals.indexOf(sVal) === -1) return false;
-						}
-					}
-				}
-				return true;
-			});
-
+			this._filteredData = this._data.slice();
 			this.visibleCount = this._filteredData.length;
-
-			// 2. Sort
-			if (!this.currentSort || !this.currentSort.field || !this.currentSort.direction) return;
-
-			const field = this.currentSort.field;
-			const multiplier = this.currentSort.direction === 'desc' ? -1 : 1;
-
-			const compare = typeof Intl !== 'undefined'
-				? new Intl.Collator(document.documentElement.lang || undefined, { sensitivity: 'base' }).compare
-				: function (a, b) { return a < b ? -1 : a > b ? 1 : 0; };
-
-			this._filteredData.sort(function (a, b) {
-				const valA = a[field];
-				const valB = b[field];
-
-				if (typeof valA === 'number' && typeof valB === 'number') {
-					return (valA - valB) * multiplier;
-				}
-
-				const strA = valA != null ? String(valA) : '';
-				const strB = valB != null ? String(valB) : '';
-				return compare(strA, strB) * multiplier;
-			});
-
 		} else {
 			const term = this._searchTerm;
 			if (!term) {
@@ -765,7 +677,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			self.dom.classList.add('ln-list--loading');
 			dispatch(self.dom, 'ln-list:request-data', {
 				list: self.name,
-				sort: self.currentSort,
 				offset: targetOffset,
 				limit: targetLimit
 			});
@@ -779,7 +690,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (this.isDataDriven) {
 			const total = this._lastTotal != null ? this._lastTotal : this._data.length;
 			const visible = this.visibleCount;
-			const isFiltered = this.currentSearch && (visible < total || visible === 0);
+			const isFiltered = visible < total;
 			const templateName = isFiltered ? this.name + '-empty-filtered' : this.name + '-empty';
 
 			el = cloneTemplateScoped(this.dom, templateName, 'ln-list');
@@ -809,7 +720,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		}
 
 		dispatch(this.dom, 'ln-list:empty', {
-			term: this.isDataDriven ? this.currentSearch : this._searchTerm,
+			term: this.isDataDriven ? '' : this._searchTerm,
 			total: this.isDataDriven ? (this._lastTotal != null ? this._lastTotal : this._data.length) : this._data.length
 		});
 	};
@@ -921,26 +832,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		this._selectAllCheckbox.checked = allSelected;
 	};
 
-	_component.prototype._requestData = function () {
-		const isSlice = this._sliceData && this._sliceData.length > 0;
-		if (isSlice) {
-			this.dom.classList.add('ln-list--loading');
-			const pageSize = this._sliceData.length || 200;
-			this._sliceOffset = 0;
-			this._sliceData = [];
-			dispatch(this.dom, 'ln-list:request-data', {
-				list: this.name,
-				sort: this.currentSort,
-				offset: 0,
-				limit: pageSize
-			});
-			return;
-		}
-		requestData(this, 'ln-list:request-data', 'list');
-	};
-
-
-
 	_component.prototype._updateFooter = function () {
 		let total = 0;
 		let filtered = 0;
@@ -980,7 +871,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (this.isDataDriven) {
 			this.dom.removeEventListener('ln-list:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-list:set-loading', this._onSetLoading);
-			this.dom.removeEventListener('click', this._onClearAll);
 
 			if (this.tbody) {
 				this.tbody.removeEventListener('click', this._onItemClick);
@@ -993,8 +883,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (this._selectAllCheckbox && this._onSelectAll) {
 				this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 			}
-
-			this.dom.removeEventListener('ln-search:change', this._onSearchChange);
 		} else {
 			if (this._emptyObserver) {
 				this._emptyObserver.disconnect();

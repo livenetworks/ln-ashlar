@@ -48,12 +48,12 @@
 <script class="mock-related" src="dist/mock-store-usecase.js" defer></script>
 
 <!-- 1. Coordinator Tree (wraps Store + Connector) -->
-<div data-ln-data-coordinator="documents" id="documents-coordinator">
-	<div data-ln-data-store="documents"
+<div data-ln-data-coordinator id="documents-coordinator">
+	<div data-ln-data-store
 	     data-ln-data-store-stale="60"
 	     data-ln-data-store-indexes="department,status,priority,updated_at"
 	     data-ln-data-store-search-fields="title,department,owner"
-	     id="documents-store"></div>
+	     id="documents"></div>
 	<div data-ln-api-connector
 	     data-ln-api-base-url=""
 	     data-ln-api-path="/api/documents"></div>
@@ -93,7 +93,7 @@
 				</div>
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Search…" data-ln-search="documents-table">
+					<input type="search" placeholder="Search…" data-ln-search="documents">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 					</button>
@@ -181,7 +181,7 @@
 			<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
 		</button>
 	</label>
-	<ul id="filter-documents-table-dept-list" data-ln-filter="documents-table">
+	<ul id="filter-documents-table-dept-list" data-ln-filter="documents">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>
@@ -195,7 +195,7 @@
 
 <!-- Documents table: status filter popover -->
 <div data-ln-popover id="filter-documents-table-status">
-	<ul id="filter-documents-table-status-list" data-ln-filter="documents-table">
+	<ul id="filter-documents-table-status-list" data-ln-filter="documents">
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>
@@ -276,7 +276,7 @@
 <script class="demo-coordinator">
 (function () {
 	const coordEl = document.getElementById('documents-coordinator');
-	const storeEl = document.querySelector('[data-ln-data-store="documents"]');
+	const storeEl = document.getElementById('documents');
 	const tableEl = document.querySelector('[data-ln-table="documents"]');
 	const formEl  = document.querySelector('[data-ln-form="document-form"]');
 	const documentModal = document.getElementById('document-modal');
@@ -384,10 +384,11 @@
 
 		<!-- Coordinator tree wraps store + connector -->
 		<div data-ln-data-coordinator>
-			<div data-ln-data-store="people"
+			<div data-ln-data-store
 			     data-ln-data-store-stale="60"
 			     data-ln-data-store-indexes="department,status,updated_at"
-			     data-ln-data-store-search-fields="title,department,owner"></div>
+			     data-ln-data-store-search-fields="title,department,owner"
+			     id="people"></div>
 			<div data-ln-api-connector
 			     data-ln-api-endpoint="/api/documents"></div>
 		</div>
@@ -409,11 +410,10 @@
 			Approved: <strong data-ln-stat="people" data-ln-stat-filter="status:Approved" class="is-loading"></strong>
 		</p>
 
-		<!-- Bound table — data-ln-table-store wires it to the binder -->
+		<!-- Bound table — data-ln-table-source wires it to the binder -->
 		<section data-ln-table="people"
 		         data-ln-table-source="people"
-		         data-ln-table-store="people"
-		         id="people"
+		         id="people-table"
 		         class="data-table-demo">
 			<header class="ln-table__toolbar">
 				<h3>Documents (declarative binding)</h3>

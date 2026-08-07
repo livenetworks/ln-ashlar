@@ -9,7 +9,7 @@ import { persistGet, persistSet } from '../../ln-core';
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	// ─── Constructor ───────────────────────────────────────────
-	// Auto-initializes any <table> that contains th[data-ln-sort] headers.
+	// Auto-initializes any <table> that contains th[data-ln-table-sort] headers.
 
 	function constructor(domRoot) {
 		findElements(domRoot);

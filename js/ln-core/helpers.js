@@ -60,7 +60,8 @@ export function dispatchCancelable(element, eventName, detail) {
  * Re-filter / re-sort / re-render a data-driven list-like component, then
  * notify the coordinator that fresh data is requested.
  *
- * Shared by ln-list and ln-table. The passed `component` MUST expose this
+ * Used by ln-table. `ln-list` does not — a source-bound list is refreshed by the
+ * store, not by asking on its own behalf. The passed `component` MUST expose this
  * instance contract:
  *   - _applyFilterAndSort()  method
  *   - _render()              method
@@ -71,8 +72,8 @@ export function dispatchCancelable(element, eventName, detail) {
  *   - currentSort, currentFilters, currentSearch
  *
  * @param {Object} component  component instance satisfying the contract above
- * @param {string} eventName  e.g. 'ln-table:request-data' / 'ln-list:request-data'
- * @param {string} keyName    payload key for the name, e.g. 'table' / 'list'
+ * @param {string} eventName  e.g. 'ln-table:request-data'
+ * @param {string} keyName    payload key for the name, e.g. 'table'
  */
 export function requestData(component, eventName, keyName) {
 	component._applyFilterAndSort();

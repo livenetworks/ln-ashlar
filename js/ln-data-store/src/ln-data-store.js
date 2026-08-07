@@ -222,7 +222,7 @@ import { createWindowIndex } from './window-index';
 		this.hasCache = false;
 		this.isSyncing = false;
 		this.lastSyncedAt = null;
-		this.query = { filters: {}, search: '' };
+		this.query = { filters: {}, search: '', sort: null };
 		const winAttr = dom.getAttribute('data-ln-data-store-window');
 		if (winAttr !== null) {
 			const winSize = parseInt(winAttr, 10) || 1000;
@@ -291,6 +291,16 @@ import { createWindowIndex } from './window-index';
 				const values = (e.detail.values || []).slice();
 				if (values.length) self.query.filters[key] = values;
 				else delete self.query.filters[key];
+				_emitQueryChanged(self);
+			},
+			'ln-sort:changed': e => {
+				const field = e.detail && e.detail.field;
+				const direction = e.detail && e.detail.direction;
+				const next = direction ? { field, direction } : null;
+				const prev = self.query.sort;
+				const unchanged = (!prev && !next) || (prev && next && prev.field === next.field && prev.direction === next.direction);
+				if (unchanged) return;
+				self.query.sort = next;
 				_emitQueryChanged(self);
 			}
 		};
@@ -781,7 +791,11 @@ import { createWindowIndex } from './window-index';
 		}
 		dispatch(self.dom, 'ln-data-store:query-changed', {
 			store: self._name,
-			query: { filters: Object.assign({}, self.query.filters), search: self.query.search }
+			query: {
+				filters: Object.assign({}, self.query.filters),
+				search: self.query.search,
+				sort: self.query.sort ? Object.assign({}, self.query.sort) : null
+			}
 		});
 	}
 

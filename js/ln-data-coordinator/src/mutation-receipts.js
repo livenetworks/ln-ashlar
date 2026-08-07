@@ -4,11 +4,6 @@ export class MutationReceipts {
 	}
 
 	wait(requestId) {
-		if (!requestId) return Promise.reject(new Error('Mutation requestId is required'));
-		if (this._pending.has(requestId)) {
-			return Promise.reject(new Error(`Duplicate mutation requestId: ${requestId}`));
-		}
-
 		return new Promise((resolve, reject) => {
 			this._pending.set(requestId, { resolve, reject });
 		});
