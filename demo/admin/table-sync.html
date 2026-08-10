@@ -219,17 +219,25 @@
 		border: 1px solid var(--border-muted);
 		line-height: 1.6;
 	}
-</style><section class="section-card">	<header><h3>Overview & Architecture</h3></header>	<main>		<p>For datasets too large to cache entirely client-side, <code>ln-table</code> provides a high-performance **SSR Hydration & Windowed Sync** pipeline: an instant paint from server-rendered rows, followed by a bounded sliding-window cache that fetches pages from the server as the user scrolls.</p>		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>				Lifecycle Mechanics			</h4>			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">				1. **Instant SSR Paint**: The table loads with a fast pre-rendered subset of rows (e.g. 100 rows printed inside <code>&lt;tbody&gt;</code> by the server, matching the server-declared <code>data-ln-table-count</code> grand total).  				2. **Local Hydration**: The JS layer instantly parses these pre-rendered rows on load, enabling immediate client-side sort and search over the hydrated subset.  				3. **Windowed Sync Configuration**:
-				   - <code>data-ln-table-window="1000"</code>: Caps resident cache memory at 1,000 rows.
-				   - <code>data-ln-table-window-page="200"</code>: Configures page/chunk fetch size (`limit=200`).
-				   - <code>data-ln-table-window-threshold="25"</code>: Configures prefetch trigger margin (`25` rows before reaching unloaded page boundary).
-				   - <code>data-ln-table-count="10000"</code>: Declares the server grand total.
-				   As the user scrolls, the table requests page-aligned chunks from the PHP backend API (e.g. `offset=200&limit=200`) and evicts LRU rows to stay under the cap. No initial fetch on load: the first 100 SSR rows seed the resident window directly.
-				4. **Continuous Scroll**: Rows outside the resident window render as blank placeholders until their page arrives; there are no pagination controls — scrolling stays continuous over the full server-side dataset.
-			</p>
-		</div>
-		<h4>Remote Full-Text Search Integration</h4>
-		<p>When searching, the table first filters local cached items for instant visual response, and then dispatches the search term to the PHP backend. The PHP API runs a full-text search across <code>title</code>, <code>department</code>, <code>owner</code>, and <code>tags</code> properties, returning matches from the entire 10k database.</p>
+</style><section class="section-card">	<header><h3>Overview & Architecture</h3></header>	<main>		<p>This page demonstrates <strong>SSR hydration</strong>: the server prints finished rows into <code>&lt;tbody&gt;</code>, and <code>ln-table</code> attaches behavior on top of markup that already renders without JavaScript.</p>
+
+<section class="alert-box">
+	<h4>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
+		Lifecycle
+	</h4>
+	<ol>
+		<li><strong>Instant paint.</strong> 100 rows arrive as server-rendered <code>&lt;tr&gt;</code> elements. They are readable before any script runs, and they survive with JavaScript disabled.</li>
+		<li><strong>Hydration.</strong> On init, <code>ln-table</code> parses those rows into an in-memory dataset, taking each sort value from <code>data-ln-value</code> where present and falling back to cell text.</li>
+		<li><strong>Behavior only.</strong> Search, column filters, tri-state sort, row selection and the footer counters all operate over that hydrated set. No network calls are made.</li>
+	</ol>
+</section>
+
+<h4>What each control is wired to</h4>
+<p>The toolbar search dispatches to <code>ln-table</code>, which matches against the text harvested from each row at parse time. The department and status popovers are <code>ln-filter</code> hosts scoped to this table, with their options authored from the domain vocabulary rather than derived from the visible rows. Each sortable header carries an <code>ln-sort</code> control whose <code>ln-sort:change</code> event the table consumes; file size and date columns sort on the raw <code>data-ln-value</code>, never on the formatted text.</p>
+
+<h4>Server-side paging</h4>
+<p>Fetching pages from a backend is a different mode, not an extension of this one. It requires <code>data-ln-table-source</code> — which flips the component into data-driven mode — plus <code>data-ln-table-window</code> to bound the resident cache, and something on the page to answer <code>ln-table:request-data</code>. This demo declares none of them, so everything above happens against the rows already in the document.</p>
 	</main>
 </section>
 
