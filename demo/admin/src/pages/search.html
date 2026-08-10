@@ -35,7 +35,7 @@
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
 									The Filtering Intent Doctrine
 								</h4>
 								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
@@ -74,10 +74,10 @@
 						<main>
 							<p>The canonical (required) form places <code>data-ln-search</code> directly on the <code>&lt;input&gt;</code> and uses <code>class="search"</code> for the compact icon-group chrome:</p>
 <pre><code>&lt;label class="search"&gt;
-  &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
+  &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-search"&gt;&lt;/use&gt;&lt;/svg&gt;
   &lt;input type="search" placeholder="Search..." data-ln-search="my-list"&gt;
   &lt;button type="button" data-ln-search-clear aria-label="Clear search"&gt;
-    &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-x"&gt;&lt;/use&gt;&lt;/svg&gt;
   &lt;/button&gt;
 &lt;/label&gt;
 
@@ -88,10 +88,10 @@
 
 							<p>Wrapper-host (backward-compat only — do NOT use for new markup) — places the attribute on a <code>&lt;label&gt;</code> and lets the component find the input inside. Retained so existing markup keeps working; input-host above is required for all new code:</p>
 <pre><code>&lt;label class="search" data-ln-search="my-list"&gt;
-    &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-search"&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-search"&gt;&lt;/use&gt;&lt;/svg&gt;
     &lt;input type="search" placeholder="Search..."&gt;
     &lt;button type="button" data-ln-search-clear aria-label="Clear search"&gt;
-        &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-x"&gt;&lt;/use&gt;&lt;/svg&gt;
+        &lt;svg class="ln-icon" aria-hidden="true"&gt;&lt;use href="#ln-icon-x"&gt;&lt;/use&gt;&lt;/svg&gt;
     &lt;/button&gt;
 &lt;/label&gt;</code></pre>
 
@@ -149,10 +149,10 @@
 						<main>
 							<p>The canonical input-host form: <code>data-ln-search</code> on the <code>&lt;input&gt;</code>, icon + clear button in a wrapping <code>&lt;label&gt;</code>. The component walks <code>target.children</code> on every keystroke (after the 150ms debounce) and toggles <code>data-ln-search-hide</code>. The library's CSS rule (<code>display: none !important</code>) hides matched items.</p>
 							<label class="search">
-								<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 								<input type="search" placeholder="Search countries..." data-ln-search="demo-list">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
 							</label>
 							<ul id="demo-list">

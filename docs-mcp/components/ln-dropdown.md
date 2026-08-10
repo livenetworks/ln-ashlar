@@ -48,7 +48,7 @@ Below is a standard copy-paste template for an actions dropdown:
     <!-- Trigger Button -->
     <button type="button" data-ln-toggle-for="options-menu" class="btn">
         Options
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
     </button>
     
     <!-- Dropdown Menu (State Primitive) -->
@@ -73,7 +73,7 @@ When using a dropdown to pick a single value, use the native `aria-current="true
 <div data-ln-dropdown>
     <button type="button" data-ln-toggle-for="lang-menu" class="btn-select">
         English
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-chevron-down"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-chevron-down"></use></svg>
     </button>
     <ul id="lang-menu" data-ln-toggle class="dropdown-menu">
         <li><button type="button">Македонски</button></li>

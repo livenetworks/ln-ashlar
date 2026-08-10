@@ -25,7 +25,7 @@ Whether your architecture relies on **Server-Rendered HTML** (Laravel, Go, Djang
 * **Modular Authoring (`spa-starter/`):** Out-of-the-box SPA scaffold supporting co-located view modules (`App.defineView()`) and session-long modules (`App.defineModule()`).
 
 > [!NOTE]
-> **Runtime Icon CDN Dependency:** While `ln-ashlar` has zero runtime npm package dependencies, the `ln-icons` component fetches SVG icons dynamically from jsDelivr (Tabler Icons) or a custom CDN URL. Once fetched, they are stored in `localStorage` so subsequent page views load instantly and work offline. If the client is offline and `localStorage` is empty, icon requests will fail silently and not display.
+> **Runtime Icon CDN Dependency:** While `ln-ashlar` has zero runtime npm package dependencies, the `ln-icon` component fetches SVG icons dynamically from jsDelivr (Tabler Icons) or a custom CDN URL. Once fetched, they are stored in `localStorage` so subsequent page views load instantly and work offline. If the client is offline and `localStorage` is empty, icon requests will fail silently and not display.
 
 > [!TIP]
 > 📖 **Read the complete engineering manifesto!**  
@@ -142,7 +142,7 @@ For detailed manual instructions, properties, attributes, and events of individu
 |---|---|---|
 | **Core Utilities** | — | 🛠️ **[Core helpers reference](js/ln-core/README.md)** |
 | **Component Pattern** | — | 🧠 **[JS Component Design Guide](docs/architecture/component-guide.md)** |
-| **SVG Icons** | 🏷️ **[Icon SVG Sprite Reference](js/ln-icons/README.md)** | 🌐 **[On-Demand CDN routing & injection](js/ln-icons/README.md)** |
+| **SVG Icons** | 🏷️ **[Icon SVG Sprite Reference](js/ln-icon/README.md)** | 🌐 **[On-Demand CDN routing & injection](js/ln-icon/README.md)** |
 | **Toggle** | 🎚️ **[ln-toggle docs](js/ln-toggle/README.md)** | 📄 **[toggle architecture](js/ln-toggle/README.md)** |
 | **Accordion** | 📂 **[ln-accordion docs](js/ln-accordion/README.md)** | 📄 **[accordion architecture](js/ln-accordion/README.md)** |
 | **Modal** | 🪟 **[ln-modal docs](js/ln-modal/README.md)** | 📄 **[modal architecture](js/ln-modal/README.md)** |
@@ -155,7 +155,7 @@ For detailed manual instructions, properties, attributes, and events of individu
 | **Filter** | 🔍 **[ln-filter docs](js/ln-filter/README.md)** | 📄 **[filter architecture](js/ln-filter/README.md)** |
 | **Search** | 🔎 **[ln-search docs](js/ln-search/README.md)** | 📄 **[search architecture](js/ln-search/README.md)** |
 | **Table** | 📊 **[ln-table docs](js/ln-table/README.md)** | 📄 **[table architecture](js/ln-table/README.md)** |
-| **Table Sort** | 📊 **[ln-table docs (Sort)](js/ln-table/README.md)** | 📄 **[table-sort architecture](js/ln-table/README.md)** |
+| **Sort** | ⇅ **[ln-sort docs](js/ln-sort/README.md)** | 📄 **[sort architecture](js/ln-sort/README.md)** |
 | **Sortable** | 🔃 **[ln-sortable docs](js/ln-sortable/README.md)** | 📄 **[sortable architecture](js/ln-sortable/README.md)** |
 | **Progress** | 📈 **[ln-progress docs](js/ln-progress/README.md)** | 📄 **[progress architecture](js/ln-progress/README.md)** |
 | **Circular Progress** | 📈 **[ln-circular-progress docs](js/ln-circular-progress/README.md)** | 📄 **[circular-progress architecture](js/ln-circular-progress/README.md)** |

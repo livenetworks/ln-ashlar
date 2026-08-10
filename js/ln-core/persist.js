@@ -3,7 +3,7 @@
 // Key format: ln:{component}:{pathname}:{elementId}
 // Example:    ln:filter:/admin/users:status-filter
 //
-// Each component passes its own name ("filter", "table-sort", "toggle", "tabs"),
+// Each component passes its own name ("filter", "sort", "toggle", "tabs"),
 // so keys are namespaced per component — no cross-component collision risk.
 // Element ID comes from data-ln-persist="key" or el.id.
 //

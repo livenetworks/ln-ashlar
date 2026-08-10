@@ -608,7 +608,7 @@ Write a value to localStorage. Value is JSON-serialized. Silently no-ops if loca
 ```js
 import { persistSet } from '../ln-core';
 persistSet('toggle', el, 'open');
-persistSet('table-sort', el, { col: 2, dir: 'desc' });
+persistSet('sort', el, { field: 'name', column: null, direction: 'desc' });
 persistSet('filter', el, null);  // explicitly clears
 ```
 
@@ -628,7 +628,7 @@ Remove ALL persisted values for a given component type. Scans all localStorage k
 ```js
 import { persistClear } from '../ln-core';
 persistClear('toggle');     // removes all ln:toggle:* keys
-persistClear('table-sort'); // removes all ln:table-sort:* keys
+persistClear('sort'); // removes all ln:sort:* keys
 ```
 
 Useful for "reset to defaults" functionality.
@@ -646,7 +646,7 @@ Examples:
 ```
 ln:toggle:/admin/users:sidebar
 ln:tabs:/settings:settings-tabs
-ln:table-sort:/admin/orders:orders-table
+ln:sort:/admin/orders:orders-table-name
 ln:filter:/admin/users:status-filter
 ```
 
@@ -664,7 +664,7 @@ Persistence is always opt-in. Elements without `data-ln-persist` are never touch
 
 Components that support `data-ln-persist` document the stored value
 shape in their own READMEs (ln-toggle, ln-accordion, ln-tabs,
-ln-table-sort, ln-filter).
+ln-sort, ln-filter).
 
 ### Graceful degradation
 
@@ -869,8 +869,10 @@ Sort coerces with `parseFloat(raw) || 0`. Formatted display text breaks it:
 ### The split
 
 - `data-ln-value` — the VALUE. Universal. Read by `ln-core.readValue`.
-- `data-ln-table-sort` — the BEHAVIOR/type (`string|number|date`).
-  Component-scoped (lives on `<th>`). Never universalize behavior; never scope the value.
+- **Type is inferred, not declared.** `ln-core.detectValueType` scans the current value set once
+  per sort operation — no `data-ln-*-sort` type attribute exists anymore. All non-empty values
+  finite numbers → numeric compare; otherwise `ln-core.compareValues` + `Intl.Collator` string
+  compare. See `js/ln-sort/README.md`.
 
 ### The reader
 

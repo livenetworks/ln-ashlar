@@ -1,14 +1,14 @@
 ---
-name: ln-icons
+name: ln-icon
 classification: service
 status: stable
 domain: frontend
 summary: An on-demand SVG sprite loader and localStorage caching service.
-source: js/ln-icons/src/ln-icons.js
+source: js/ln-icon/src/ln-icon.js
 tags: [icons, svg, sprite, cache]
 ---
 
-# 🎨 ln-icons
+# 🎨 ln-icon
 
 > **Classification:** ⚛️ Service (Layer 3 - SVG Sprite Loader Service)
 
@@ -16,12 +16,12 @@ tags: [icons, svg, sprite, cache]
 
 ## 1. Core Behavior & Responsibility
 
-The `ln-icons` utility is an on-demand SVG sprite manager. It loads SVG vector definitions dynamically as they are requested in the DOM, caching them locally in `localStorage` to eliminate subsequent network latency. It is defined in [ln-icons.js](../../js/ln-icons/src/ln-icons.js).
+The `ln-icon` utility is an on-demand SVG sprite manager. It loads SVG vector definitions dynamically as they are requested in the DOM, caching them locally in `localStorage` to eliminate subsequent network latency. It is defined in [ln-icon.js](../../js/ln-icon/src/ln-icon.js).
 
-*   **Declarative Detection:** Monitors the DOM for `<use href="#ln-...">` and `<use href="#lnc-...">` targets.
+*   **Declarative Detection:** Monitors the DOM for `<use href="#ln-icon-...">` and `<use href="#ln-icon-custom-...">` targets.
 *   **On-Demand Fetching:** Fetches only the requested SVG assets from a CDN (or a custom company directory) dynamically.
 *   **LocalStorage Caching:** Caches loaded SVG paths locally under the prefix `lni:` to guarantee instant load times on subsequent views.
-*   **Central Sprite Injection:** Automatically compiles and appends a hidden SVG sprite wrapper (`#ln-icons-sprite`) at the start of the `<body>`, transforming fetched SVGs into reusable `<symbol>` elements.
+*   **Central Sprite Injection:** Automatically compiles and appends a hidden SVG sprite wrapper (`#ln-icon-sprite`) at the start of the `<body>`, transforming fetched SVGs into reusable `<symbol>` elements.
 *   **Deduplication:** Prevents multiple parallel network requests for the same icon by tracking pending assets.
 
 > [!IMPORTANT]
@@ -40,22 +40,22 @@ Standard icon from the Tabler Icons library. Inherits its stroke color from the 
 
 ```html
 <svg class="ln-icon" aria-hidden="true">
-  <use href="#ln-home"></use>
+  <use href="#ln-icon-home"></use>
 </svg>
 ```
 
 ### Variant 2: Custom / Branded Icon (`#lnc-`)
 
-Used for company logos or custom multi-colored SVGs loaded via a custom CDN configuration (`window.LN_ICONS_CUSTOM_CDN`).
+Used for company logos or custom multi-colored SVGs loaded via a custom CDN configuration (`window.LN_ICON_CUSTOM_CDN`).
 
 ```html
 <script>
   // Set custom CDN before loading ln-ashlar
-  window.LN_ICONS_CUSTOM_CDN = "https://cdn.mycompany.com/assets/icons";
+  window.LN_ICON_CUSTOM_CDN = "https://cdn.mycompany.com/assets/icons";
 </script>
 
 <svg class="ln-icon" aria-hidden="true">
-  <use href="#lnc-company-logo"></use>
+  <use href="#ln-icon-custom-company-logo"></use>
 </svg>
 ```
 
@@ -66,7 +66,7 @@ Icon scale is governed by modifier utility classes: `.ln-icon--sm` (1rem), `.ln-
 ```html
 <!-- Large icon -->
 <svg class="ln-icon ln-icon--lg" aria-hidden="true">
-  <use href="#ln-settings"></use>
+  <use href="#ln-icon-settings"></use>
 </svg>
 ```
 
@@ -88,8 +88,8 @@ These properties must be declared in the global scope (`window`) *before* the sc
 
 | Config Parameter | Default Value | Description |
 |---|---|---|
-| `window.LN_ICONS_CDN` | `'https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline'` | Base URL for Tabler outline SVG icons. |
-| `window.LN_ICONS_CUSTOM_CDN` | `""` | Base URL for custom `#lnc-` brand assets. Custom CDN is disabled if left empty. |
+| `window.LN_ICON_CDN` | `'https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline'` | Base URL for Tabler outline SVG icons. |
+| `window.LN_ICON_CUSTOM_CDN` | `""` | Base URL for custom `#lnc-` brand assets. Custom CDN is disabled if left empty. |
 
 ---
 
@@ -133,7 +133,7 @@ svg.ln-icon.ln-chevron {
 - **Standalone Icons:** If a button or link has only an icon inside, you MUST set an `aria-label` on the parent interactive element:
   ```html
   <button type="button" aria-label="Delete item">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
   </button>
   ```
 
@@ -141,8 +141,8 @@ svg.ln-icon.ln-chevron {
 
 > [!CAUTION]
 > 1. **Omiting the `ln-icon` class:** Browser SVG elements default to expanding to 100% width and height of their parent. Omiting the `ln-icon` class will cause the SVG to render in a giant, broken layout.
-> 2. **Missing Custom CDN:** Attempting to render `#lnc-` custom icons without configuring `window.LN_ICONS_CUSTOM_CDN` beforehand will cause the fetch request to fail, leaving an empty space in the UI.
-> 3. **Lower-level innerHTML/createElement exception:** In order to build the hidden `#ln-icons-sprite` dynamically in the DOM, `ln-icons` leverages `document.createElementNS` and parses fetched vector contents via `.innerHTML`. This is a conscious low-level framework design choice to support on-demand SVG caching, and does not warrant modification.
+> 2. **Missing Custom CDN:** Attempting to render `#lnc-` custom icons without configuring `window.LN_ICON_CUSTOM_CDN` beforehand will cause the fetch request to fail, leaving an empty space in the UI.
+> 3. **Lower-level innerHTML/createElement exception:** In order to build the hidden `#ln-icon-sprite` dynamically in the DOM, `ln-icon` leverages `document.createElementNS` and parses fetched vector contents via `.innerHTML`. This is a conscious low-level framework design choice to support on-demand SVG caching, and does not warrant modification.
 
 ---
 
@@ -153,12 +153,12 @@ sequenceDiagram
     autonumber
     actor Dev as HTML DOM / Coordinator
     participant Obs as MutationObserver / DOM Scan
-    participant JS as ln-icons Engine
+    participant JS as ln-icon Engine
     participant Cache as localStorage (lni:*)
     participant CDN as CDN Server
-    participant Sprite as Hidden Sprite (#ln-icons-sprite)
+    participant Sprite as Hidden Sprite (#ln-icon-sprite)
 
-    Dev->>Obs: Injected <svg><use href="#ln-home"></use></svg>
+    Dev->>Obs: Injected <svg><use href="#ln-icon-home"></use></svg>
     Obs->>JS: Detects <use> containing #ln- or #lnc- prefix
     JS->>JS: Check in loaded/pending lists
     alt Already loaded or in progress
@@ -184,5 +184,5 @@ sequenceDiagram
 
 - [`ln-confirm`](./ln-confirm.md) — Swaps the `href` attribute on the `<use>` node dynamically during user confirmation prompts.
 - [`ln-toggle`](./ln-toggle.md) — Drives the rotation of the `.ln-chevron` class as toggle targets expand.
-- [`ln-toast`](./ln-toast.md) — Embeds `#ln-x` close icons dynamically inside notification templates.
+- [`ln-toast`](./ln-toast.md) — Embeds `#ln-icon-x` close icons dynamically inside notification templates.
 - [`ln-table`](./ln-table.md) — Leverages `#ln-arrows-sort` sort icons inside dynamic table headers.

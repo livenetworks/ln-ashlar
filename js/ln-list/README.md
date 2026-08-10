@@ -79,6 +79,7 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 * `ln-list:set-data` `{ data, total, filtered }`: Hydrates/renders the items. Windowed mode expects `{ offset, queryGen }` echoed back — routed into the internal window cache.
 * `ln-list:set-loading` `{ loading: true|false }`: Toggles the loading dimming overlay class (`.ln-list--loading`).
 * `ln-search:change` `{ term }`: Captures search query from `data-ln-search` inputs.
+* `ln-sort:change` `{ field, column, direction }`: Sets `currentSort` and re-sorts (data-driven only). Ignored when `field` is `null` (index-only events have nothing to key a record by).
 
 ### Emitted Events
 
@@ -113,3 +114,14 @@ Every windowing attribute is live-observable, no re-init required: `data-ln-list
 ### `_parseChildren()`
 
 Parses static children inside `[data-ln-list-body]` into `this._data` at mount (excluding existing spacers), and measures the first child's height for `this._itemHeight`.
+
+### Sort (`ln-sort:change`)
+
+Data-driven only — the SSR branch has no sort logic. `field === null` events (index-only, from an
+`ln-sort` instance authored without `data-ln-sort-field`) are ignored; `ln-list` records are
+field-keyed, not positional, so there is nothing to sort by without a field name. On a matching
+event: `preventDefault()`, `currentSort = { field, direction }` (or `null` on `direction: 'none'`),
+then mirrors `ln-table`'s own data-driven sort handling exactly — windowed lists call
+`_requestData()` (cache invalidate + re-fetch, same scheme as `ln-table`'s windowed
+`_requestData()`); non-windowed lists re-sort the already-fetched in-memory data directly
+(`_applyFilterAndSort()` + `_render()`, no server round-trip).

@@ -5,7 +5,7 @@
 
 ## Правила на работа (за секој документ)
 
-1. **Извори:** draft фајл (`architecture_docs_draft/`) + `js/ln-x/README.md` + изворниот код. Draft-от е суровина, НЕ вистина — секој атрибут/настан/вредност се проверува наспроти кодот пред да влезе.
+1. **Извори:** draft фајл (`architecture_docs_draft/`) + `js/ln-icon-x/README.md` + изворниот код. Draft-от е суровина, НЕ вистина — секој атрибут/настан/вредност се проверува наспроти кодот пред да влезе.
 2. **Калап:** точниот темплејт од `docs-mcp/_templates/` — насловите се parsing contract, не се менуваат.
 3. **Frontmatter:** `name` == име на фајлот, `classification` според фолдерот, се раѓа со `status: draft`.
 4. **Валидација:** `validate_docs` на MCP серверот пред commit.
@@ -38,9 +38,9 @@
 
 ---
 
-## Фаза 3 — components/ (50)
+## Фаза 3 — components/ (53)
 
-### 3А. Употребливи компоненти — декларативен `data-ln-*` API (41)
+### 3А. Употребливи компоненти — декларативен `data-ln-*` API (44)
 
 Публика: секој што гради страници со библиотеката. `classification: simple | coordinator`.
 
@@ -55,6 +55,7 @@
 - [x] **ln-sortable**
 - [x] **ln-filter**
 - [x] **ln-search**
+- [x] **ln-sort** — sort intent primitive, host `<ul data-ln-sort>` со три trigger копчиња, циклусот asc→desc→none е CSS-driven
 - [x] **ln-list**
 - [x] **ln-stat**
 
@@ -103,7 +104,7 @@
 
 #### Сервиси со markup контакт
 
-- [x] **ln-icons** — се врзува за `<use href>`, не за `data-ln-*` — API-то е markup конвенција
+- [x] **ln-icon** — се врзува за `<use href>`, не за `data-ln-*` — API-то е markup конвенција
 - [x] **ln-translations**
 - [x] **ln-progress**
 - [x] **ln-circular-progress**
@@ -119,7 +120,7 @@
 - [x] **ln-reactive** — `reactiveState`/`deepReactive`/`createBatcher` — извори: `js/ln-core/reactive.js`, `docs/js/core.md`
 - [x] **positioning** — споделено viewport-aware позиционирање (dropdown/popover/tooltip) — извор: `js/ln-core/positioning.js`
 - [x] **ln-hash** — hash state примитив — извор: `js/ln-core/hash.js` (го користат ln-router, ln-tabs)
-- [x] **ln-persist** — localStorage persistence примитив — извор: `js/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-table-sort)
+- [x] **ln-persist** — localStorage persistence примитив — извор: `js/ln-core/persist.js` (го користат ln-tabs, ln-filter, ln-toggle, ln-sort)
 - [x] **ln-crypto** — извор: `js/ln-core/crypto.js`
 - [x] **ln-http** — event-driven JSON fetch со abort — извори: `js/ln-http/`, `docs/js/http.md`
 - [x] **ln-debug** — dev дијагностика (не е за production употреба) — извор: `js/ln-debug/`
@@ -245,9 +246,9 @@
 |---|---|---|
 | doctrine | 6 | 6 |
 | guides | 5 | 5 |
-| components — употребливи (3А) | 42 | 42 |
+| components — употребливи (3А) | 44 | 44 |
 | components — позадински (3Б) | 9 | 9 |
-| css | 28 | 0 |
+| css | 29 | 0 |
 | patterns | 5 | 0 |
 | skills | 14 | 14 |
-| **Вкупно** | **109** | **75** |
+| **Вкупно** | **112** | **78** |

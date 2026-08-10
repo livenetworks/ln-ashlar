@@ -1,14 +1,14 @@
 // ==========================================================================
 // Icons — SVG sprite system
 // ==========================================================================
-// Icons are rendered via an SVG sprite injected by ln-icons.js.
+// Icons are rendered via an SVG sprite injected by ln-icon.js.
 // Color is inherited from the parent's `color` property (currentColor).
 //
 // Usage:
-//   <svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg>
-//   <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-close"></use></svg>
+//   <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg>
+//   <svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-close"></use></svg>
 //
-// Available IDs: #ln-{name} where name = filename in js/ln-icons/icons/
+// Available IDs: #ln-{name} where name = filename in js/ln-icon/icons/
 //   home, close, menu, users, settings, logout, books, lodges
 //   plus, edit, delete, view, save, search, check, copy, link
 //   upload, download, refresh, print, lock, star, filter, calendar

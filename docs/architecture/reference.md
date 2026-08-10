@@ -87,7 +87,7 @@ Redefining the customization hooks (`--btn-padding-x` and `--btn-padding-y`) loc
 
 <dialog class="ln-modal" data-ln-modal id="my-modal">
     <form>
-        <header><h3>Title</h3><button type="button" aria-label="Close" data-ln-modal-close><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button></header>
+        <header><h3>Title</h3><button type="button" aria-label="Close" data-ln-modal-close><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button></header>
         <main>...</main>
         <footer>
             <button type="button" data-ln-modal-close>Cancel</button>
@@ -122,8 +122,8 @@ Two distinct grouping patterns:
 ```html
 <!-- Action buttons -->
 <ul>
-  <li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-  <li><button aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+  <li><button aria-label="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button></li>
+  <li><button aria-label="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 </ul>
 
 <!-- Pill radio -->
@@ -196,11 +196,11 @@ Three tiers:
 1. **Decorating via a hook's bare presence is forbidden.**
    `[data-ln-modal] { padding: ... }` — the attribute is a JS init target, not a CSS selector.
 
-2. **A component styling its OWN state expressed as `data-ln-x="value"` in its OWN co-located `js/ln-x/ln-x.scss` is sanctioned** — the dominant library pattern. The component owns both sides of the contract. Examples: `[data-ln-modal="open"] { display: flex }`, `[data-ln-popover="open"] { display: block }`, `[data-ln-filter-hide="true"] { display: none }`. These are attribute-value selectors (state encoded in the value), not presence selectors.
+2. **A component styling its OWN state expressed as `data-ln-icon-x="value"` in its OWN co-located `js/ln-icon-x/ln-icon-x.scss` is sanctioned** — the dominant library pattern. The component owns both sides of the contract. Examples: `[data-ln-modal="open"] { display: flex }`, `[data-ln-popover="open"] { display: block }`, `[data-ln-filter-hide="true"] { display: none }`. These are attribute-value selectors (state encoded in the value), not presence selectors.
 
 3. **Consumer/app/cross-component CSS reaching through a foreign `data-ln-*` hook is forbidden.** Use a `.ln-*` state class (JS toggles, SCSS styles) or a plain app-owned `data-*`. App state must not enter the `data-ln-*` namespace.
 
-Practical test: *who owns this state, and where does the rule live?* Component's own state → `data-ln-x="value"` styled in co-located SCSS. App/coordinator state → app-owned `data-*` or `.ln-*` class, styled in app SCSS.
+Practical test: *who owns this state, and where does the rule live?* Component's own state → `data-ln-icon-x="value"` styled in co-located SCSS. App/coordinator state → app-owned `data-*` or `.ln-*` class, styled in app SCSS.
 
 ---
 
@@ -680,30 +680,30 @@ hardcode a value in a component.
 
 ## Icons
 
-Icons use SVG sprite injection — `ln-icons.js` fetches icons on demand from Tabler CDN (pinned to `@3.31.0`),
+Icons use SVG sprite injection — `ln-icon.js` fetches icons on demand from Tabler CDN (pinned to `@3.31.0`),
 builds a hidden `<svg>` sprite, and inserts it into `<body>` at init. Fetched SVGs are cached in `localStorage`
 (prefix `lni:`) — subsequent page loads resolve from cache with zero network requests. Icons render via
-`<use href="#ln-{name}">` and inherit `currentColor`.
+`<use href="#ln-icon-{name}">` and inherit `currentColor`.
 
 ```html
 <!-- Standalone icon -->
-<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 
 <!-- Icon in button with text -->
 <button>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
     Add
 </button>
 
 <!-- Icon-only button — aria-label required -->
 <button aria-label="Close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 </button>
 
 <!-- Toggle chevron (CSS rotates it on open — works inside accordion or standalone) -->
 <header data-ln-toggle-for="panel1">
     Title
-    <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+    <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 </header>
 ```
 
@@ -717,18 +717,18 @@ Any icon from [Tabler Icons](https://tabler.io/icons) works — use the Tabler n
 
 Full name list: `scss/tabler-icons.txt`
 
-Custom icons (not in Tabler) use `#lnc-` prefix and are served from `window.LN_ICONS_CUSTOM_CDN`:
-`lnc-file-pdf` `lnc-file-doc` `lnc-file-epub`
+Custom icons (not in Tabler) use `#lnc-` prefix and are served from `window.LN_ICON_CUSTOM_CDN`:
+`ln-icon-custom-file-pdf` `ln-icon-custom-file-doc` `ln-icon-custom-file-epub`
 
 Sizes: `ln-icon--sm` (1rem), default (1.25rem), `ln-icon--lg` (1.5rem), `ln-icon--xl` (4rem).
 
-Color: icons follow the parent's `color` property automatically. Exception: `lnc-file-pdf`, `lnc-file-doc`,
-`lnc-file-epub` have embedded semantic stroke colors.
+Color: icons follow the parent's `color` property automatically. Exception: `ln-icon-custom-file-pdf`, `ln-icon-custom-file-doc`,
+`ln-icon-custom-file-epub` have embedded semantic stroke colors.
 
 To host custom icons in production:
 1. Save the custom SVG icon files in a directory on your production asset server or public CDN (e.g., `/public/assets/icons/` or `https://cdn.mycompany.com/assets/icons/`).
-2. Before the library initializes, define the CDN URL globally using `window.LN_ICONS_CUSTOM_CDN = "https://cdn.mycompany.com/assets/icons";`.
-3. In HTML, reference the icon as `#lnc-{name}` (e.g., `<use href="#lnc-corporate-logo"></use>`). The on-demand sprite generator will fetch, cache, and inject the SVG automatically from your custom CDN.
+2. Before the library initializes, define the CDN URL globally using `window.LN_ICON_CUSTOM_CDN = "https://cdn.mycompany.com/assets/icons";`.
+3. In HTML, reference the icon as `#lnc-{name}` (e.g., `<use href="#ln-icon-custom-corporate-logo"></use>`). The on-demand sprite generator will fetch, cache, and inject the SVG automatically from your custom CDN.
 
 ---
 
@@ -747,13 +747,13 @@ See [js/ln-core/README.md](../../js/ln-core/README.md) for the reactive renderin
 <!-- button: data-ln-popover-for opens the popover                           -->
 <!--         data-ln-table-col-filter is a JS id hook — never a CSS selector -->
 <!-- .ln-filter-active on button = filter is active (JS-toggled; SCSS dot)   -->
-<th data-ln-table-sort="string" data-ln-table-filter-col="department">
+<th data-ln-table-filter-col="department">
 	Department
 	<button class="table-filter" type="button"
 	        data-ln-table-col-filter
 	        data-ln-popover-for="filter-my-table-dept"
 	        aria-label="Filter department">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 	</button>
 </th>
 

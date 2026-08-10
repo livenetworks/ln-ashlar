@@ -77,7 +77,7 @@ separate confirm/revert method). Delivers live data to bound view components
 beyond the native `action`/`method` contract. The UI controls that produce
 sort/filter/search input (intent).
 
-**Intent vs execution.** UI components like `ln-table-sort`, `ln-filter`,
+**Intent vs execution.** UI components like `ln-sort`, `ln-filter`,
 and `ln-search` produce **intent** — which column to sort by, which filter
 to apply, what to search for — via `ln-table:request-data` /
 `ln-list:request-data`. The coordinator resolves the request against its
@@ -322,7 +322,7 @@ the boundary.
 ```html
 <!-- ACCEPTED -->
 <section data-ln-table="documents" data-ln-table-store="documents">
-	<!-- data-ln-table-col-sort / data-ln-filter / data-ln-search on the
+	<!-- data-ln-sort / data-ln-filter / data-ln-search on the
 	     toolbar controls produce the intent; ln-table dispatches
 	     ln-table:request-data with { sort, filters, search } and the
 	     owning ln-data-coordinator resolves it via store.getAll(options). -->
@@ -631,7 +631,7 @@ the canonical convention for new code.
                         data-ln-fill-title="{{ title }}"
                         aria-label="Edit"
                     >
-                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
                     </button>
                 </li>
             </ul>
@@ -648,7 +648,7 @@ the canonical convention for new code.
                 <span data-ln-modal-when="edit">Edit — <span data-ln-field="title"></span></span>
             </h3>
             <button type="button" data-ln-modal-close aria-label="Close">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
         </header>
         <main>
@@ -755,7 +755,7 @@ _scan(document.body);  // init
 | **Store** | An `ln-data-store` instance (`data-ln-data-store="<name>"`) bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own; the optional offline outbox lives in `ln-api-queue`. |
 | **Renderer** | Any element with `data-ln-table-store`, `data-ln-list-store`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching store. |
 | **Scoped form** | `data-ln-form-scope="<name>"` on a `<form>` matches it to the `data-ln-data-coordinator` of the same name (or, when empty, to the nearest containing coordinator). The coordinator claims its native submit at the `document` bubble phase, after `ln-validate`'s own gate has already run. |
-| **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-table-sort`, `ln-filter`, `ln-search`; delivered via `request-data`, consumed by the coordinator through the owning store's `getAll()` options. |
+| **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-sort`, `ln-filter`, `ln-search`; delivered via `request-data`, consumed by the coordinator through the owning store's `getAll()` options. |
 | **Optimistic write** | Writing to the local cache before the server confirms. There is no `_pending` flag — a create's only marker is its `_temp_<uuid>` id, held until the server response arrives. |
 | **Reconcile** | Replacing a `_temp_<uuid>` with the server's authoritative id via an **ordinary** `ln-data-store:request-update` (the store detects the id mismatch and rekeys). There is no separate `confirmMutation` — reconciliation reuses the same update event a normal edit would dispatch. |
 | **Error bucket** | The three-way classification of a non-2xx connector response: **auth** (401/419 — pauses the queue scope, optimistic write stays), **transient** (status `0` / 5xx — optimistic write stays, retried with backoff on the queued path), **deterministic** (409 on update, or any other 4xx/3xx — create is deleted, 409 update takes the server's `remote` record, everything else is left for the next sync). Drives both the store action and the queue's ack/nack identically on the queued and non-queued paths. |

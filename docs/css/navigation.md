@@ -8,7 +8,7 @@ Sidebar navigation component. File: `scss/config/mixins/_nav.scss`.
 <nav class="nav" data-ln-nav="active">
     <ul>
         <li><a href="/dashboard">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg>
             <span class="nav-label">Dashboard</span>
         </a></li>
     </ul>
@@ -16,11 +16,11 @@ Sidebar navigation component. File: `scss/config/mixins/_nav.scss`.
     <h6 class="nav-section">Section Title</h6>
     <ul>
         <li><a href="/users">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-users"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-users"></use></svg>
             <span class="nav-label">Users</span>
         </a></li>
         <li><a href="/settings">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-settings"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-settings"></use></svg>
             <span class="nav-label">Settings</span>
         </a></li>
     </ul>

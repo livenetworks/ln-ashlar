@@ -48,14 +48,14 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
     <!-- Header Toolbar with Search & Reset -->
     <header class="page-header">
         <label class="search">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
             <input type="search" placeholder="Search employees... (Press '/')" data-ln-search="employee-table" data-ln-search-debounce="0">
             <button type="button" data-ln-search-clear aria-label="Clear search">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
         </label>
         <button type="button" class="btn" data-ln-table-clear>
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter-off"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter-off"></use></svg>
             <span>Reset Filters</span>
         </button>
     </header>
@@ -65,7 +65,7 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
         <!-- Empty State Template -->
         <template data-ln-table-empty>
             <article class="ln-table__empty-state">
-                <svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-filter"></use></svg>
+                <svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                 <h3>No employees found</h3>
                 <p>Try adjusting your search terms or filters.</p>
                 <button type="button" class="btn" data-ln-table-clear>Clear all</button>
@@ -76,29 +76,29 @@ Below is the canonical production pattern where `data-ln-table-coordinator` wrap
         <table>
             <thead>
                 <tr>
-                    <th data-ln-table-sort="string">
-                        Name
-                        <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort by name">
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-                        </button>
+                    <th>
+                        <span>Name</span>
+                        <ul data-ln-sort="employee-table" data-ln-sort-state="none">
+                            <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+                            <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+                            <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+                        </ul>
                     </th>
-                    <th data-ln-table-sort="string" data-ln-table-filter-col="dept">
-                        Department
+                    <th data-ln-table-filter-col="dept">
+                        <span>Department</span>
                         <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-dept-popover" aria-label="Filter department">
-                            <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+                            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                         </button>
-                        <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort by department">
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-                            <svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-                        </button>
+                        <ul data-ln-sort="employee-table" data-ln-sort-state="none">
+                            <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+                            <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+                            <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+                        </ul>
                     </th>
-                    <th data-ln-table-sort="string" data-ln-table-filter-col="status">
-                        Status
+                    <th data-ln-table-filter-col="status">
+                        <span>Status</span>
                         <button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-status-popover" aria-label="Filter status">
-                            <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+                            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
                         </button>
                     </th>
                 </tr>

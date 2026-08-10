@@ -48,7 +48,7 @@ The standard markup uses a `<ul>` list with the `data-ln-accordion` attribute se
         <header data-ln-toggle-for="faq-panel-1" class="accordion-trigger">
             <span>What is Ashlar?</span>
             <svg class="ln-icon ln-chevron" aria-hidden="true">
-                <use href="#ln-arrow-down"></use>
+                <use href="#ln-icon-arrow-down"></use>
             </svg>
         </header>
         <!-- First collapsible panel -->
@@ -63,7 +63,7 @@ The standard markup uses a `<ul>` list with the `data-ln-accordion` attribute se
         <header data-ln-toggle-for="faq-panel-2" class="accordion-trigger">
             <span>What is the role of the coordinator?</span>
             <svg class="ln-icon ln-chevron" aria-hidden="true">
-                <use href="#ln-arrow-down"></use>
+                <use href="#ln-icon-arrow-down"></use>
             </svg>
         </header>
         <!-- Second collapsible panel -->

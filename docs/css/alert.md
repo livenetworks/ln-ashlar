@@ -9,16 +9,16 @@ Applied automatically to `.alert` via `scss/components/_alert.scss`.
 ```html
 <!-- Info (default) -->
 <div class="alert" role="alert">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
     <p>Your session will expire in 5 minutes.</p>
 </div>
 
 <!-- With dismiss button -->
 <div class="alert" role="alert">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg>
     <p>Changes have been saved.</p>
     <button type="button" aria-label="Dismiss">
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
 </div>
 ```
@@ -72,19 +72,19 @@ class on top of `alert`.
 ```html
 <!-- Non-dismissible — user cannot resolve the condition -->
 <div class="alert banner" role="status" aria-live="polite">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg>
     <p>Scheduled maintenance Sunday 02:00–04:00 UTC.</p>
 </div>
 
 <!-- Dismissible, remembered across reloads -->
 <div class="alert banner" id="trial-notice" role="status" aria-live="polite"
      data-ln-toggle="open" data-ln-persist>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
     <p>Your trial expires in 3 days. <a href="/upgrade">Upgrade now →</a></p>
     <button type="button" aria-label="Dismiss"
             data-ln-toggle-for="trial-notice"
             data-ln-toggle-action="close">
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
 </div>
 ```

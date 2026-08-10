@@ -10,7 +10,7 @@
 
 		<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 			<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+				<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
 				The Modal &amp; Coordinator Doctrine
 			</h4>
 			<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
@@ -44,7 +44,7 @@
 			        data-ln-fill-email="dalibor@example.com"
 			        data-ln-fill-role="Administrator"
 			        data-ln-modal-title="Dalibor Sojic"
-			        class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg> Form Modal (Edit - Prefilled)</button>
+			        class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg> Form Modal (Edit - Prefilled)</button>
 			<button type="button" data-ln-modal-for="demo-large" class="btn">Large Modal</button>
 			<button type="button" data-ln-modal-for="demo-tall" class="btn">Tall Content (scroll test)</button>
 		</nav>
@@ -54,7 +54,7 @@
 			<form>
 				<header>
 					<h3>Basic Modal</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main>
 					<p>This is a standard basic modal overlay. It traps focus natively, locks background scrolling, and closes on Escape key or backdrop click.</p>
@@ -73,7 +73,7 @@
 						<span data-ln-modal-when="new">New User</span>
 						<span data-ln-modal-when="edit">Edit User — <span data-ln-field="name"></span></span>
 					</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main>
 					<div class="form-element">
@@ -105,7 +105,7 @@
 			<form>
 				<header>
 					<h3>Large Modal</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main>
 					<p>A larger modal for more content. Size set via <code>@include modal-lg</code> in SCSS.</p>
@@ -131,7 +131,7 @@
 			<form>
 				<header>
 					<h3>Tall Content — Scroll Test</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main>
 					<p>This modal has more content than fits in the viewport. Only <code>main</code> should scroll — the header and footer stay sticky.</p>
@@ -209,7 +209,7 @@
 			<form>
 				<header>
 					<h3>Delete membership record</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main>
 					<p>The membership record and all associated data will be permanently removed. This action cannot be undone.</p>
@@ -281,7 +281,7 @@
 						<span data-ln-modal-when="edit">Edit record #<span data-ln-field="id"></span></span>
 					</h3>
 					<button type="button" data-ln-modal-close aria-label="Close">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
 				</header>
 				<main>
@@ -357,7 +357,7 @@
 			<form>
 				<header>
 					<h3>Events Demo</h3>
-					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main>
 					<p>Opening and closing this modal dispatches <code>ln-modal:open</code> and <code>ln-modal:close</code> events.</p>

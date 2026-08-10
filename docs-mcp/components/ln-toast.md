@@ -49,17 +49,17 @@ Placed at the end of the main layout body:
     <li data-ln-toast-item data-ln-attr="class:type">
         <div class="icon">
             <ul>
-                <li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
-                <li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
-                <li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
-                <li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+                <li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+                <li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+                <li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+                <li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
             </ul>
         </div>
         <section class="content">
             <header>
                 <strong class="title" data-ln-field="title"></strong>
                 <button type="button" data-ln-toast-close aria-label="Close">
-                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
                 </button>
             </header>
             <main class="body" data-ln-field="message"></main>

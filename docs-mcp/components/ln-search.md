@@ -41,14 +41,14 @@ Recommended visual wrapper with `data-ln-search-debounce="0"`:
 
 ```html
 <label class="search">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" 
            placeholder="Search items..." 
            data-ln-search="items-list" 
            data-ln-search-debounce="0" 
            aria-label="Search items">
     <button type="button" data-ln-search-clear aria-label="Clear search">
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
 </label>
 
@@ -65,7 +65,7 @@ Targets specific descendant elements inside tables or complex trees:
 
 ```html
 <label class="search">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" 
            placeholder="Search users..." 
            data-ln-search="user-table" 
@@ -73,7 +73,7 @@ Targets specific descendant elements inside tables or complex trees:
            data-ln-search-debounce="0"
            aria-label="Search users">
     <button type="button" data-ln-search-clear aria-label="Clear search">
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
 </label>
 
@@ -94,13 +94,13 @@ Dispatches debounced `ln-search:change` events to drive remote table queries:
 
 ```html
 <label class="search">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" 
            placeholder="Search database..." 
            data-ln-search="main-data-table" 
            aria-label="Search database">
     <button type="button" data-ln-search-clear aria-label="Clear search">
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
     </button>
 </label>
 

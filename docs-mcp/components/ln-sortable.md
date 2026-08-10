@@ -50,13 +50,13 @@ To prevent accidental drags on mobile when clicking text/buttons inside list ite
 <ol data-ln-sortable>
     <li>
         <span data-ln-sortable-handle class="sortable-handle" aria-label="Move item">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>Board Configuration</span>
     </li>
     <li>
         <span data-ln-sortable-handle class="sortable-handle" aria-label="Move item">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>User Management</span>
     </li>
@@ -82,13 +82,13 @@ An example of how an application script listens to the `ln-sortable:reordered` e
 <ul id="task-list" data-ln-sortable>
     <li data-task-id="101">
         <span data-ln-sortable-handle class="sortable-handle">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>Task 1: Database Config</span>
     </li>
     <li data-task-id="102">
         <span data-ln-sortable-handle class="sortable-handle">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>Task 2: Implement REST APIs</span>
     </li>
@@ -151,7 +151,7 @@ In accordance with Ashlar architecture, communication is mediated using a projec
     data-project-item-key="task-id">
     <li data-task-id="101">
         <span data-ln-sortable-handle class="sortable-handle">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-grip-vertical"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-grip-vertical"></use></svg>
         </span>
         <span>Task 1</span>
     </li>

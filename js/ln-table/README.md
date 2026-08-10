@@ -39,8 +39,11 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
   <table>
     <thead>
       <tr>
-        <th data-ln-table-sort="string">Name</th>
-        <th data-ln-table-sort="number">Salary</th>
+        <th>Name
+          <ul data-ln-sort="employees-table"><li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li><li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li><li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li></ul>
+        <!-- Icon mapping is state-based, not direction-based — see js/ln-sort/README.md "Icon convention". -->
+        </th>
+        <th>Salary</th>
       </tr>
     </thead>
     <tbody>
@@ -94,7 +97,7 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 | ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` in both modes. |
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
-| `data-ln-table-col-sort` | `<button>` | Column sorting trigger button. |
+| `data-ln-sort` | `<ul>` inside `<th>` | Sort control — see [`ln-sort`](../ln-sort/README.md). Omit `data-ln-sort-field` on SSR columns (index fallback); set it on data-driven columns (must match `data-ln-table-col`). |
 | `data-ln-table-col-filter` | `<button>` | JS id hook — identifies the filter button in a `<th>`. Pair with `data-ln-popover-for` to open the filter popover. |
 | `data-ln-table-col-select` | `<th>` | Header checkbox column selector. |
 | `data-ln-table-row` | `<tr>` | Target row container in row templates. |
@@ -158,7 +161,7 @@ Column filters use static authored markup — a `[data-ln-popover]` block contai
 	        data-ln-table-col-filter
 	        data-ln-popover-for="filter-dept"
 	        aria-label="Filter department">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 	</button>
 </th>
 
@@ -216,12 +219,12 @@ Opt-in server-side sliding-window virtualization for datasets too large to cache
 
 ## 🔧 Internals
 
-Source: `js/ln-table/ln-table.js`, `js/ln-table/ln-table-sort.js` (a separate, co-loaded component). Imports from `ln-core`: `cloneTemplateScoped`, `dispatch`, `fill`, `fillTemplate`, `registerComponent`, `createWindowCache`.
+Source: `js/ln-table/ln-table.js`. Sort is a separate, co-loaded component — see `js/ln-sort/ln-sort.js`. Imports from `ln-core`: `cloneTemplateScoped`, `dispatch`, `fill`, `fillTemplate`, `registerComponent`, `createWindowCache`, `readValue`, `detectValueType`, `compareValues`.
 
 ### Mode detection & lifecycle
 
 - The constructor branches once, at construction: `this.isDataDriven = dom.hasAttribute('data-ln-table-source')`.
-- **SSR**: reads `<tbody>` rows once at bootstrap, caches them as static HTML strings in `_data`, and re-sorts/filters that in-memory cache on `ln-search:change` / `ln-table:sort` / `ln-filter:changed`.
+- **SSR**: reads `<tbody>` rows once at bootstrap, caches them as static HTML strings in `_data`, and re-sorts/filters that in-memory cache on `ln-search:change` / `ln-sort:change` / `ln-filter:changed`.
 - **Data-driven**: `isLoaded = false` until the first `ln-table:set-data`. If `<tbody>` already has rows (hybrid), they're parsed synchronously first — instant local sort/filter/search response before the authoritative dataset arrives. When the background sync lands, `_vStart`/`_vEnd` reset to `-1` and virtual scroll re-initializes against the full dataset.
 - **Loading dimming**: `ln-table:set-loading {loading:true}` adds `.ln-table--loading` to the wrapper; `ln-table:set-data` clears it automatically.
 
@@ -231,18 +234,23 @@ Source: `js/ln-table/ln-table.js`, `js/ln-table/ln-table-sort.js` (a separate, c
 |---|---|
 | `set-loading` | `.ln-table--loading` on the wrapper |
 | `set-data` / sort / filter / search | `<tbody>` rows re-rendered (cloned templates in data-driven mode, cached HTML in SSR); footer counters (`data-ln-table-total` / `-filtered` / `-selected`) updated |
-| sort click | `.ln-sort-asc` / `.ln-sort-desc` on the active `<th>`; sort direction icon visibility toggled via those classes |
+| sort click | `data-ln-sort-state` on the `[data-ln-sort]` element, owned entirely by `ln-sort` — `ln-table` never touches it |
 | filter change | `.ln-filter-active` toggled on the column's filter button |
 
-### Sort internals (`ln-table-sort.js`)
+### Sort integration (`ln-sort`)
 
-A separate component instance lives at `table.lnTableSort`, tracking `ths` (all sortable `<th>`), `_col` (active column index, `-1` = none), `_dir` (`'asc'|'desc'|null`).
+Sort is fully owned by the standalone [`ln-sort`](../ln-sort/README.md) component — `ln-table`
+only listens for its `ln-sort:change` event on itself, in both modes:
 
-- Click cycle: `(none) → asc → desc → (none)`; clicking a different column resets and starts at `asc`.
-- Each `<th>` gets `lnTableSortBound = true` to prevent duplicate listeners on MutationObserver re-fires.
-- **Persistence** (opt-in): `data-ln-persist` on the `[data-ln-table]` **wrapper** (not the `<table>`). Key: `ln:table-sort:{pagePath}:{wrapperId}`. Stored value: `{col, dir}` or `null`. Restored in the constructor, after click handlers bind, by replaying `_handleClick` (once for `asc`, twice for `desc`). A stale saved column index (`saved.col >= ths.length`) silently skips restore.
-- A dedicated MutationObserver (separate from `ln-table`'s own) watches for new sortable `<th>` (childList) and `data-ln-table-sort` attribute additions (re-scans the parent table).
-- **Dev diagnostic**: `ln-ashlar-dev.css` (dev-only stylesheet) renders a `⚠ missing sort button` warning next to any `<th data-ln-table-sort>` lacking the required `<button data-ln-table-col-sort>` child — sort silently no-ops without it otherwise.
+- **SSR** — `e.preventDefault()`, re-sorts the in-memory `_data` cache using `row.values[colIndex]`
+  (raw `readValue` per cell, type inferred once via `ln-core.detectValueType`), re-renders, keeps
+  emitting `ln-table:sorted`.
+- **Data-driven** — `e.preventDefault()`, sets `currentSort = { field, direction }` (or `null` on
+  `direction: 'none'`), calls `_requestData()`.
+
+`ln-table` never writes `data-ln-sort-state` and never persists sort state — both are `ln-sort`'s
+own responsibility (`data-ln-persist` goes on the `[data-ln-sort]` element itself, not the table
+wrapper — see `js/ln-sort/README.md`).
 
 ### MutationObserver flow (`ln-table.js`)
 

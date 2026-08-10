@@ -49,16 +49,16 @@
 		<li data-ln-toast-item data-ln-attr="class:type">
 			<div class="icon">
 				<ul>
-					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
-					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
-					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
-					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
 				</ul>
 			</div>
 			<section class="content">
 				<header>
 					<strong class="title" data-ln-field="title"></strong>
-					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main class="body" data-ln-field="message"></main>
 			</section>
@@ -71,14 +71,14 @@
 		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 				</button>
 				<h1>Table</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
 					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
 					</button>
 					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
 						<ul>
@@ -91,7 +91,7 @@
 						</ul>
 					</div>
 					<button type="button" id="demo-density-trigger" data-ln-popover-for="demo-density-picker" aria-label="Choose density">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-adjustments-horizontal"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg>
 					</button>
 					<div class="demo-density-picker" data-ln-popover id="demo-density-picker">
 						<ul>
@@ -112,20 +112,20 @@
 		<!-- Sidebar -->
 		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
-					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
 
 			<main>
 				<nav class="nav" id="demo-nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -219,7 +219,7 @@
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
 									The Server-Rendered Integration
 								</h4>
 								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
@@ -262,7 +262,7 @@
 									<tr><td data-label="Attribute"><code>data-ln-table</code></td><td data-label="On element">wrapper (needs <code>id</code>)</td><td data-label="Description">Component root. Parses rows, listens for events.</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-search="tableId"</code></td><td data-label="On element"><code>&lt;input&gt;</code> or wrapper</td><td data-label="Description">Standard <code>ln-search</code>. <code>ln-table</code> intercepts the event for in-memory filtering.</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-table-clear</code></td><td data-label="On element"><code>&lt;button&gt;</code></td><td data-label="Description">Clears search input.</td></tr>
-									<tr><td data-label="Attribute"><code>th[data-ln-table-sort="type"]</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Sortable column. Values: <code>string</code>, <code>number</code>, <code>date</code>.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-sort="tableId"</code></td><td data-label="On element"><code>&lt;ul&gt;</code> inside <code>&lt;th&gt;</code></td><td data-label="Description">Sort control. Type is auto-detected at sort time — no type attribute needed.</td></tr>
 									<tr><td data-label="Attribute"><code>td[data-ln-value]</code></td><td data-label="On element"><code>&lt;td&gt;</code></td><td data-label="Description">Raw sort value when display text differs.</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-table-filter-col="key"</code></td><td data-label="On element"><code>&lt;th&gt;</code></td><td data-label="Description">Maps column to a filter key (used by <code>ln-filter</code>).</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-table-empty</code></td><td data-label="On element"><code>&lt;template&gt;</code></td><td data-label="Description">Content shown when filter returns 0 results.</td></tr>
@@ -279,7 +279,7 @@
 							<div data-ln-table id="demo-table">
 								<template data-ln-table-empty>
 									<article class="ln-table__empty-state">
-										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-search"></use></svg>
+										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 										<h3>No results</h3>
 										<p>Try different search terms.</p>
 										<button data-ln-table-clear>Clear search</button>
@@ -293,10 +293,10 @@
 												<div>
 													<h3>Products</h3>
 													<label class="search">
-														<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 														<input type="search" placeholder="Search products..." data-ln-search="demo-table">
 														<button type="button" data-ln-search-clear aria-label="Clear search">
-															<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+															<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 														</button>
 													</label>
 													<span class="ln-table__count" id="demo-count"></span>
@@ -304,26 +304,26 @@
 											</th>
 										</tr>
 										<tr>
-											<th data-ln-table-sort="number">
+											<th>
 												#
-												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-												</button>
+												<ul data-ln-sort="demo-table">
+													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+												</ul>
 											</th>
-											<th data-ln-table-sort="string">
+											<th>
 												Product
-												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-												</button>
+												<ul data-ln-sort="demo-table">
+													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+												</ul>
 											</th>
-											<th data-ln-table-sort="string" data-ln-table-filter-col="category">
+											<th data-ln-table-filter-col="category">
 												Category
 												<button type="button" class="table-filter" data-ln-popover-for="filter-category" aria-label="Filter category">
-													<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 												</button>
 												<div id="filter-category" data-ln-popover>
 													<ul data-ln-filter="demo-table">
@@ -336,32 +336,32 @@
 														<li><label><input type="checkbox" data-ln-filter-key="category" data-ln-filter-value="Components"> Components</label></li>
 													</ul>
 												</div>
-												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-												</button>
+												<ul data-ln-sort="demo-table">
+													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+												</ul>
 											</th>
-											<th data-ln-table-sort="number" class="numeric">
+											<th class="numeric">
 												Price
-												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-												</button>
+												<ul data-ln-sort="demo-table">
+													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+												</ul>
 											</th>
-											<th data-ln-table-sort="number" class="numeric">
+											<th class="numeric">
 												Stock
-												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-												</button>
+												<ul data-ln-sort="demo-table">
+													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+												</ul>
 											</th>
-											<th data-ln-table-sort="string" data-ln-table-filter-col="status">
+											<th data-ln-table-filter-col="status">
 												Status
 												<button type="button" class="table-filter" data-ln-popover-for="filter-status" aria-label="Filter status">
-													<svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 												</button>
 												<div id="filter-status" data-ln-popover>
 													<ul data-ln-filter="demo-table">
@@ -371,11 +371,11 @@
 														<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Out of Stock"> Out of Stock</label></li>
 													</ul>
 												</div>
-												<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-													<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-													<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-												</button>
+												<ul data-ln-sort="demo-table">
+													<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+													<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+												</ul>
 											</th>
 										</tr>
 									</thead>
@@ -426,7 +426,6 @@
 								<tbody>
 									<tr><td><code>ln-table:ready</code></td><td><code>ln-table</code> — after row parse</td><td><code>{ total }</code></td></tr>
 									<tr><td><code>ln-table:filter</code></td><td><code>ln-table</code> — after filter render</td><td><code>{ term, matched, total }</code></td></tr>
-									<tr><td><code>ln-table:sort</code></td><td><code>ln-table-sort</code> — on th click</td><td><code>{ column, sortType, direction }</code></td></tr>
 									<tr><td><code>ln-table:sorted</code></td><td><code>ln-table</code> — after sort render</td><td><code>{ column, direction, matched, total }</code></td></tr>
 									<tr><td><code>ln-table:empty</code></td><td><code>ln-table</code> — filter returns 0</td><td><code>{ term, total }</code></td></tr>
 								</tbody>
@@ -495,7 +494,7 @@ el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code>
 		<form>
 			<header>
 				<h3>Basic Modal</h3>
-				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main>
 				<p>This is a basic modal with a title and content.</p>
@@ -511,13 +510,13 @@ el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code>
 		<form id="demo-form-el" data-ln-form>
 			<header>
 				<span class="icon">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-user"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-user"></use></svg>
 				</span>
 				<hgroup>
 					<h3>Edit User</h3>
 					<p>Update the user's details below.</p>
 				</hgroup>
-				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main>
 				<div class="form-element">
@@ -539,7 +538,7 @@ el.lnTable.destroy();   // remove listeners, virtual scroll, column locks</code>
 			</main>
 			<footer>
 				<button type="button" class="delete-action">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 					Delete
 				</button>
 				<button type="button" data-ln-modal-close>Cancel</button>

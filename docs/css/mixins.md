@@ -496,7 +496,7 @@ Styled accordion list — contained card. Chevron rotation comes from the generi
     <li>
         <header data-ln-toggle-for="panel1">
             Section Title
-            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
         </header>
         <main id="panel1" data-ln-toggle class="collapsible">
             <div class="collapsible-body">
@@ -507,7 +507,7 @@ Styled accordion list — contained card. Chevron rotation comes from the generi
     <li>
         <header data-ln-toggle-for="panel2">
             Another Section
-            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
         </header>
         <main id="panel2" data-ln-toggle class="collapsible">
             <div class="collapsible-body">
@@ -571,27 +571,27 @@ with breadcrumbs (`aria-current="page"`) or stepper
 
 ## Icon System
 
-SVG sprite injected into `<body>` at init by `ln-icons.js`. No init call required.
+SVG sprite injected into `<body>` at init by `ln-icon.js`. No init call required.
 
 ### Usage
 
 ```html
 <!-- Standalone icon -->
-<svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg>
+<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg>
 
 <!-- Icon in button with text -->
 <button>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
     Add User
 </button>
 
 <!-- Icon-only button — aria-label required -->
 <button type="button" aria-label="Close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 </button>
 
 <!-- Toggle chevron — rotates on open/close via CSS (works inside accordion or standalone) -->
-<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+<svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
 ```
 
 ### Size Variants
@@ -620,18 +620,18 @@ Icons inherit `currentColor` from the parent element's `color` property. No colo
 | Data/Content | `chart-bar` `clock` `mail` `book` `world` `list` `box` `building` |
 | People/Contact | `user` `phone` `square-compass` |
 | File Types | `file` |
-| File Types (custom CDN) | `file-pdf` `file-doc` `file-epub` — use `#lnc-{id}`, requires `window.LN_ICONS_CUSTOM_CDN` |
+| File Types (custom CDN) | `file-pdf` `file-doc` `file-epub` — use `#lnc-{id}`, requires `window.LN_ICON_CUSTOM_CDN` |
 
-Tabler icons: `#ln-{id}` — e.g. `<use href="#ln-home">`.
-Custom CDN icons: `#lnc-{id}` — e.g. `<use href="#lnc-file-pdf">`.
+Tabler icons: `#ln-{id}` — e.g. `<use href="#ln-icon-home">`.
+Custom CDN icons: `#lnc-{id}` — e.g. `<use href="#ln-icon-custom-file-pdf">`.
 
 ### Adding a New Icon
 
-All ~4000 Tabler icons are available in `js/ln-icons/tabler/` (source library, not bundled).
+All ~4000 Tabler icons are available in `js/ln-icon/tabler/` (source library, not bundled).
 
 ```bash
 # Copy from source library to bundled set, then rebuild
-cp js/ln-icons/tabler/{name}.svg js/ln-icons/icons/{name}.svg
+cp js/ln-icon/tabler/{name}.svg js/ln-icon/icons/{name}.svg
 npm run build
 ```
 
@@ -791,7 +791,7 @@ As a core rule: **Write standard CSS for single-line declarations, and reserve `
         <header>
             <h3>Edit User</h3>
             <button type="button" aria-label="Close" data-ln-modal-close>
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
         </header>
         <main>
@@ -887,4 +887,4 @@ Forms use CSS Grid + `<div class="form-element">` with explicit `for`/`id`. **Us
 | `scss/base/_global.scss` | Global element styles — all buttons, links, images, `::selection` |
 | `scss/base/_typography.scss` | h1–h6, p, code, pre, blockquote, lists |
 | `scss/components/` | Apply mixins to default selectors (CSS output) |
-| `js/ln-icons/` | Zero-dependency dynamic on-demand SVG icon sprite loader |
+| `js/ln-icon/` | Zero-dependency dynamic on-demand SVG icon sprite loader |

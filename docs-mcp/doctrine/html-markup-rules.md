@@ -34,7 +34,7 @@ This guide details the mandatory HTML conventions and structure doctrines within
         <header>
             <h3>Edit User</h3>
             <button type="button" aria-label="Close" data-ln-modal-close>
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
         </header>
         <main>
@@ -96,7 +96,7 @@ Every element that performs an action upon interaction must use the correct inte
 
 ```html
 <button aria-label="Close">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 </button>
 ```
 

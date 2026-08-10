@@ -75,14 +75,14 @@ Custom item layouts can be declared inside the component container via `<templat
     <template data-ln-template="ln-upload-item">
         <li class="ln-upload__item" data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
             <svg class="ln-icon ln-icon--lg" aria-hidden="true">
-                <use data-ln-attr="href:iconHref" href="#ln-file"></use>
+                <use data-ln-attr="href:iconHref" href="#ln-icon-file"></use>
             </svg>
             <article>
                 <span class="ln-upload__name" data-ln-field="name"></span>
                 <span class="ln-upload__size" data-ln-field="sizeText"></span>
             </article>
             <button type="button" class="ln-upload__remove" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
             <div class="ln-upload__progress"><div class="ln-upload__progress-bar"></div></div>
         </li>
@@ -210,4 +210,4 @@ sequenceDiagram
 
 - [`ln-form`](./ln-form.md) — Form wrapper that submits uploaded `file_ids[]`.
 - [`ln-toast`](./ln-toast.md) — Displays upload error notifications.
-- [`ln-icons`](./ln-icons.md) — Renders file extension icons (`#lnc-file-pdf`, `#ln-file`).
+- [`ln-icon`](./ln-icon.md) — Renders file extension icons (`#ln-icon-custom-file-pdf`, `#ln-icon-file`).

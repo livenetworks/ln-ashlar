@@ -43,7 +43,7 @@ The JavaScript source is located at [ln-translations.js](../../js/ln-translation
 			<ul data-ln-translations-active></ul>
 			<div data-ln-dropdown>
 				<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu" aria-label="Add translation">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
 				</button>
 				<ul id="trans-menu" data-ln-toggle></ul>
 			</div>
@@ -74,7 +74,7 @@ The JavaScript source is located at [ln-translations.js](../../js/ln-translation
 		<p data-ln-translations-lang>
 			<span></span>
 			<button type="button" aria-label="Remove">
-				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 			</button>
 		</p>
 	</li>
@@ -98,7 +98,7 @@ When translations are already rendered server-side, mark each pre-rendered field
 			<ul data-ln-translations-active></ul>
 			<div data-ln-dropdown>
 				<button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu-2" aria-label="Add translation">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
 				</button>
 				<ul id="trans-menu-2" data-ln-toggle></ul>
 			</div>

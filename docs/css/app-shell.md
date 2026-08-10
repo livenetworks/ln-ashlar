@@ -29,14 +29,14 @@ Canonical HTML:
     <header class="app-header">
         <div class="header-left">
             <button class="menu-toggle" type="button" data-ln-toggle-for="app-sidebar" aria-label="Menu">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
             </button>
             <h1>Dashboard</h1>
         </div>
         <div class="header-right">
             <ul class="header-actions">
-                <li><button type="button"><svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg><span>Search</span></button></li>
-                <li><button type="button"><svg class="ln-icon" aria-hidden="true"><use href="#ln-bell"></use></svg><span>Notifications</span></button></li>
+                <li><button type="button"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg><span>Search</span></button></li>
+                <li><button type="button"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-bell"></use></svg><span>Notifications</span></button></li>
             </ul>
             <button class="header-avatar" type="button" data-ln-popover-for="user-menu" aria-label="Account">
                 <img src="/me.jpg" alt="">
@@ -49,7 +49,7 @@ Canonical HTML:
                 <img src="/logo.svg" alt="">
                 <span class="app-name">Acme Admin</span>
                 <button type="button" data-ln-toggle-action="close" aria-label="Close">
-                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
                 </button>
                 <input type="search" data-ln-search placeholder="Search…">
             </header>
@@ -218,7 +218,7 @@ become visually-hidden below `sm`:
 ```html
 <ul class="header-actions">
     <li><button type="button">
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
         <span>Search</span>
     </button></li>
 </ul>

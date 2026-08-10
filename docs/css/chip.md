@@ -22,7 +22,7 @@ metadata display.
 <span class="ln-chip">
 	Quality Manual
 	<button type="button" aria-label="Remove">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>
 </span>
 

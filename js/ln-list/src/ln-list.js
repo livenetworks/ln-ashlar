@@ -1,4 +1,4 @@
-import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent, createWindowCache, createBatcher, getLocale } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, fillTemplate, registerComponent, createWindowCache, createBatcher, getLocale, detectValueType, compareValues } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-list';
@@ -149,6 +149,28 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				self._requestData();
 			};
 			dom.addEventListener('click', this._onClearAll);
+
+			// --- Sort ---
+			// Mirrors ln-table's own data-driven ln-sort:change handler: windowed lists
+			// invalidate the sliding-window cache and re-fetch (via the existing
+			// _requestData(), which already branches on this._windowed — see its
+			// definition further down this file); non-windowed lists re-sort the
+			// already-fetched in-memory data locally, no server round-trip.
+			this._onSort = function (e) {
+				// Index-only event (field === null) has nothing to key a record by — ignore.
+				if (e.detail.field == null) return;
+				e.preventDefault();
+				self.currentSort = e.detail.direction === 'none' ? null : { field: e.detail.field, direction: e.detail.direction };
+				if (self._windowed) {
+					self._requestData();
+				} else {
+					self._applyFilterAndSort();
+					self._vStart = -1;
+					self._vEnd = -1;
+					self._render();
+				}
+			};
+			dom.addEventListener('ln-sort:change', this._onSort);
 
 			// --- Selection ---
 			this._selectable = dom.hasAttribute('data-ln-list-selectable');
@@ -406,21 +428,14 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			const field = this.currentSort.field;
 			const multiplier = this.currentSort.direction === 'desc' ? -1 : 1;
 
-			const compare = typeof Intl !== 'undefined'
-				? new Intl.Collator(document.documentElement.lang || undefined, { sensitivity: 'base' }).compare
-				: function (a, b) { return a < b ? -1 : a > b ? 1 : 0; };
+			const values = this._filteredData.map(function (row) { return row[field]; });
+			const type = detectValueType(values);
+			const collator = typeof Intl !== 'undefined'
+				? new Intl.Collator(getLocale(this.dom), { sensitivity: 'base' })
+				: null;
 
 			this._filteredData.sort(function (a, b) {
-				const valA = a[field];
-				const valB = b[field];
-
-				if (typeof valA === 'number' && typeof valB === 'number') {
-					return (valA - valB) * multiplier;
-				}
-
-				const strA = valA != null ? String(valA) : '';
-				const strB = valB != null ? String(valB) : '';
-				return compare(strA, strB) * multiplier;
+				return compareValues(a[field], b[field], type, collator) * multiplier;
 			});
 
 		} else {
@@ -1062,6 +1077,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (this._cache) this._cache.destroy();
 			this.dom.removeEventListener('ln-list:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-list:set-loading', this._onSetLoading);
+			this.dom.removeEventListener('ln-sort:change', this._onSort);
 			this.dom.removeEventListener('click', this._onClearAll);
 
 			if (this.tbody) {

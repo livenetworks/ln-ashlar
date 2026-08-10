@@ -21,8 +21,15 @@
   <table>
     <thead>
       <tr>
-        <th data-ln-table-sort="string">Име</th>
-        <th data-ln-table-sort="number">Плата</th>
+        <th>
+          Име
+          <ul data-ln-sort="employees-table" data-ln-sort-state="none">
+            <li><button type="button" data-ln-sort-dir="asc" aria-label="Сортирај растечки"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+            <li><button type="button" data-ln-sort-dir="desc" aria-label="Сортирај опаѓачки"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+            <li><button type="button" data-ln-sort-dir="none" aria-label="Отстрани сортирање"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+          </ul>
+        </th>
+        <th>Плата</th>
       </tr>
     </thead>
     <tbody>

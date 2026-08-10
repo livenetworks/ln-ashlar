@@ -81,7 +81,7 @@
 | `ln-time` | Auto-updating relative timestamps | Precise absolute dates → plain `<time>` |
 | `ln-translations` | Static text swapping by language key | User-generated content; RTL layout (CSS concern) |
 | `ln-dictionary` | *TODO — confirm scope via `get_component`* | |
-| `ln-icons` | Sprite-based icons, localStorage-cached | Inline one-off SVGs |
+| `ln-icon` | Sprite-based icons, localStorage-cached | Inline one-off SVGs |
 
 ---
 
@@ -106,7 +106,7 @@ Only the flags that change a decision. Everything else → `get_attribute`.
 4. Semantic elements only: `<dialog>`, `<nav>`, `<form>`, `<section>`, `<article>`.
 5. SCSS mixins on IDs/selectors, not utility classes.
 6. JS is transport-agnostic — `ln-form` never submits; `ln-ajax`, the coordinator, or native HTML does.
-7. Icons come from `ln-icons`.
+7. Icons come from `ln-icon`.
 
 **Known exception:** inactive `ln-tabs` panels carry `class="hidden"`. This is the one sanctioned functional class — it does not license utility classes anywhere else.
 

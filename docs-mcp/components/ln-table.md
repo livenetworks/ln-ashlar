@@ -21,12 +21,13 @@ tags: [tables, data-grid, virtual-scrolling, sorting, selection]
 1. **SSR (Server-Side Rendered) Mode:** Hydrates pre-existing markup in `<tbody>` sent from the server. It parses the rows once on initialization and enables instant client-side sorting, column filtering, search, and virtual scrolling on the existing DOM.
 2. **Data-Driven Mode:** Functions as a dynamic template engine. When provided with a dataset, it clones a specified row template (`<template data-ln-template="...-row">`), performs safe XSS interpolation using double curly braces (`{{ field }}`), manages active row selections, and updates stats counters in the footer.
 
-The JavaScript source is located at [ln-table.js](../../js/ln-table/src/ln-table.js) and [ln-table-sort.js](../../js/ln-table/src/ln-table-sort.js).
+The JavaScript source is located at [ln-table.js](../../js/ln-table/src/ln-table.js). Column sorting is delegated entirely to [`ln-sort`](./ln-sort.md) — `ln-table` never renders or owns a sort trigger button itself; it only listens for `ln-sort:change` on its own root and reacts (see §3 Events API).
 
 ### Orthogonality Doctrine (What the component does NOT do)
 * **No direct network/API calls:** It does not fetch data itself. When sorting, filtering, or searching changes in Data-Driven mode, it merely emits a `ln-table:request-data` event. The app coordinator (e.g., [`ln-data-coordinator`](./ln-data-coordinator.md)) handles the transport layer.
 * **No primary state storage:** The component represents a visual window onto the data. State modifications must be propagated back via the `ln-table:set-data` event.
 * **No filter UI generation:** It does not generate dropdown menus or filter checkboxes. Filter panels are independent DOM trees managed by [`ln-filter`](./ln-filter.md), which notifies the table of filter changes via `ln-filter:changed`.
+* **No sort control UI:** It does not render or own sort trigger buttons. Column sort UI is composed via [`ln-sort`](./ln-sort.md) inside the `<th>`; `ln-table` only consumes the `ln-sort:change` event that control dispatches.
 
 ---
 
@@ -34,7 +35,7 @@ The JavaScript source is located at [ln-table.js](../../js/ln-table/src/ln-table
 
 ### Base HTML Markup (SSR Mode)
 
-In SSR mode, the table is functional immediately with the server-rendered markup. Sort buttons are activated via [ln-table-sort.js](../../js/ln-table/src/ln-table-sort.js).
+In SSR mode, the table is functional immediately with the server-rendered markup. Sort UI is composed via [`ln-sort`](./ln-sort.md), nested inside each `<th>` — omit `data-ln-sort-field` here so the control falls back to `th.cellIndex` (SSR/DOM-only path). Read `ln-sort`'s README "Icon convention" before copying this markup: the visible trigger button always performs the NEXT action, but the icon it carries reports the CURRENT state — the `dir="desc"` button carries an up-arrow, that is not a typo.
 
 ```html
 <div id="employees-table" data-ln-table="employees">
@@ -49,21 +50,21 @@ In SSR mode, the table is functional immediately with the server-rendered markup
   <table>
     <thead>
       <tr>
-        <th data-ln-table-sort="string">
-          Name
-          <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort by name">
-            <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
-            <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
-            <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
-          </button>
+        <th>
+          <span>Name</span>
+          <ul data-ln-sort="employees-table" data-ln-sort-state="none">
+            <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+            <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+            <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+          </ul>
         </th>
-        <th data-ln-table-sort="number">
-          Salary
-          <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort by salary">
-            <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
-            <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
-            <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
-          </button>
+        <th>
+          <span>Salary</span>
+          <ul data-ln-sort="employees-table" data-ln-sort-state="none">
+            <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+            <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+            <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+          </ul>
         </th>
       </tr>
     </thead>
@@ -98,21 +99,21 @@ Use when the table queries a store and connects through a coordinator rather tha
     <table>
       <thead>
         <tr>
-          <th data-ln-table-col="name" data-ln-table-sort="string">
-            Product
-            <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort by product">
-              <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
-              <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
-              <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
-            </button>
+          <th data-ln-table-col="name">
+            <span>Product</span>
+            <ul data-ln-sort="products-table" data-ln-sort-field="name" data-ln-sort-state="none">
+              <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+            </ul>
           </th>
-          <th data-ln-table-col="price" data-ln-table-sort="number">
-            Price
-            <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort by price">
-              <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg>
-              <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg>
-              <svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg>
-            </button>
+          <th data-ln-table-col="price">
+            <span>Price</span>
+            <ul data-ln-sort="products-table" data-ln-sort-field="price" data-ln-sort-state="none">
+              <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+              <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+            </ul>
           </th>
         </tr>
       </thead>
@@ -146,9 +147,7 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `data-ln-table-window-threshold` | Root container | `Number` | `25` | Prefetch margin threshold in rows before reaching unloaded page boundaries. Observable — applies to the live cache without re-init. |
 | `data-ln-table-count` | Root container | `Number` | - | Declares the unfiltered grand total (windowed mode). Observable — applies to the live cache via `setGrandTotal()` without re-init. |
 | `data-ln-table-col` | `<th>` | `String` | - | Maps a table header to a JSON payload field. |
-| `data-ln-table-sort` | `<th>` | `string`\|`number`\|`date` | - | Enables client-side/server-side sorting on this column. |
 | `data-ln-value` | `<td>` | `String` | - | Raw computer-readable sorting value, ignoring HTML formatting. *(Processed externally via `ln-core.js` / `fill()`)* |
-| `data-ln-table-col-sort` | `<button>` | - | - | Activates column sorting on click. |
 | `data-ln-table-col-filter` | `<button>` | - | - | Receives `.ln-filter-active` styling when filters are active on the column. |
 | `data-ln-table-col-select` | `<th>` | - | - | Marks a header column containing the global "Select All" checkbox. |
 | `data-ln-table-row` | `<tr>` | - | - | Identifies the row element inside a row template. |
@@ -163,7 +162,6 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `data-ln-table-clear-all` | `<button>` | - | - | Resets all active filters and triggers a new data request in Data-Driven mode. |
 | `data-ln-table-cell-attr` | Template element | `String` | - | List of `field:attribute` mappings for attribute interpolation. *(Processed externally via `ln-core.js` / `fillTemplate()`)* |
 | `data-ln-table-empty-when` | Template element | `initial`\|`search` | - | Targets empty state variant to show based on search vs initial load. |
-| `data-ln-persist` | Root container | - | - | Persists sorting configuration in storage. *(Processed externally via `ln-persist.js`)* |
 
 ---
 
@@ -175,11 +173,10 @@ Use when the table queries a store and connects through a coordinator rather tha
 | `ln-table:set-loading` | Listens | No | Toggles the `.ln-table--loading` overlay class (Data-Driven mode). | `{ loading: Boolean }` |
 | `ln-search:change` | Listens | No | Triggers local (SSR) or server-side (Data-Driven) search matching. | `{ term: String }` |
 | `ln-filter:changed` | Listens | No | Applies column filter values in both SSR and Data-Driven modes. | `{ key: String, values: Array }` |
-| `ln-table:sort` | Listens | No | SSR mode only — dispatched externally by `ln-table-sort.js` to execute local row re-ordering. | `{ column: Number, direction: String\|null, sortType: String }` |
+| `ln-sort:change` | Listens | No | Column sort intent from [`ln-sort`](./ln-sort.md). SSR mode re-orders in-memory rows locally and dispatches `ln-table:sorted`; Data-Driven mode sets `currentSort` and dispatches a fresh `ln-table:request-data`. `ln-table` always calls `preventDefault()`, superseding `ln-sort`'s own default DOM-reorder fallback. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-table:ready` | Emits | No | Fired once after initial row hydration/parsing completes (SSR and Data-Driven modes). | `{ total: Number }` |
 | `ln-table:rendered` | Emits | No | Fired after `ln-table:set-data` finishes rendering (Data-Driven mode). | `{ table: String, total: Number, visible: Number }` |
 | `ln-table:request-data` | Emits | No | Requests a new data page from the coordinator whenever sort/filter/search state changes, including the initial mount (Data-Driven mode). Windowed mode (`data-ln-table-window`) additionally emits `offset`/`limit`/`queryGen`. | `{ table: String, sort: Object\|null, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }` |
-| `ln-table:sort` | Emits | No | Emitted on column header sort click (Data-Driven mode). | `{ table: String, field: String, direction: String\|null }` |
 | `ln-table:sorted` | Emits | No | Emitted after applying a local sort (SSR mode). | `{ column: Number, direction: String\|null, matched: Number, total: Number }` |
 | `ln-table:filter` | Emits | No | Emitted after applying search, column filter, or clear actions locally (SSR mode). | `{ term: String, matched: Number, total: Number }` |
 | `ln-table:search` | Emits | No | Emitted when receiving an `ln-search:change` term, before requesting fresh data (Data-Driven mode). | `{ table: String, query: String }` |
@@ -258,7 +255,7 @@ Text comparisons utilize `Intl.Collator` read from the document `<html lang>` ta
 ### Common Pitfalls & Anti-patterns
 
 > [!WARNING]
-> 1. **Header Missing Button:** Column sorting requires `data-ln-table-col-sort` button elements inside `th[data-ln-table-sort]`. Otherwise sorting is disabled, and diagnostics styling highlights the mistake.
+> 1. **Missing `<ul data-ln-sort>` in header:** Column sorting is provided entirely by [`ln-sort`](./ln-sort.md), composed inside the `<th>` (see markup above). `ln-table` never renders a sort control itself — an `<th>` without a `data-ln-sort` descendant is simply not sortable; no diagnostic is raised.
 > 2. **Manual DOM Injection:** In Data-Driven mode, do not append table rows manually. Modifying dataset collections must go through the coordinator via `ln-table:set-data` events to preserve virtual scrolling and selected states.
 > 3. **Unformatted SSR Sort:** Column sorting on dates or formatted currencies will fail if done via raw text. Always define `data-ln-value` attributes with raw values on `<td>` cells for proper sorting.
 
@@ -365,5 +362,6 @@ stateDiagram-v2
 
 * [`ln-search`](./ln-search.md) — drives table text matching via `ln-search:change` events.
 * [`ln-filter`](./ln-filter.md) — controls column filter logic and active dropdown menus.
+* [`ln-sort`](./ln-sort.md) — provides the column sort trigger buttons and dispatches `ln-sort:change`, which `ln-table` intercepts to reorder or re-request data.
 * [`ln-data-coordinator`](./ln-data-coordinator.md) — generic coordinator bridging store datasets and connectors to `ln-table` inputs.
 * [`ln-data-store`](./ln-data-store.md) — caches query collections and updates views.

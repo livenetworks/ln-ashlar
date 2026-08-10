@@ -113,13 +113,13 @@ The canonical composition for `ln-table` per-column filters. `ln-filter` dispatc
 
 ```html
 <!-- Table Header column with filter button -->
-<th data-ln-table-sort="string" data-ln-table-filter-col="department">
+<th data-ln-table-filter-col="department">
   Department
   <button class="table-filter" type="button"
           data-ln-table-col-filter
           data-ln-popover-for="filter-dept-popover"
           aria-label="Filter department">
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
   </button>
 </th>
 

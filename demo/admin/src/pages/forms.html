@@ -12,7 +12,7 @@
 
 						<div class="alert-box">
 							<h4>
-								<svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
 								The Decoupled Form Doctrine
 							</h4>
 							<p>
@@ -207,8 +207,8 @@ textarea {
 					<main>
 						<p>Populate form fields programmatically or declaratively. Three patterns:</p>
 						<nav class="demo-actions">
-							<button type="button" class="btn" id="demo-fill-api-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg> Fill (API)</button>
-							<button type="button" class="btn" id="demo-fill-coordinator-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg> Fill (Coordinator)</button>
+							<button type="button" class="btn" id="demo-fill-api-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg> Fill (API)</button>
+							<button type="button" class="btn" id="demo-fill-coordinator-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg> Fill (Coordinator)</button>
 							<button type="button" class="btn"
 							        data-ln-fill-form="demo-form-grid"
 							        data-ln-fill-fname="Dalibor"
@@ -218,8 +218,8 @@ textarea {
 							        data-ln-fill-city="Skopje"
 							        data-ln-fill-zip="1000"
 							        data-ln-fill-country="Germany"
-							        data-ln-fill-message="Filled declaratively via ln-fill!"><svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg> Fill (Declarative ln-fill)</button>
-							<button type="button" id="demo-reset-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg> Reset</button>
+							        data-ln-fill-message="Filled declaratively via ln-fill!"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg> Fill (Declarative ln-fill)</button>
+							<button type="button" id="demo-reset-btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-refresh"></use></svg> Reset</button>
 						</nav>
 						<h4>Code</h4>
 						<pre><code>// Pattern 1: Direct API — caller has a reference to the form
@@ -594,11 +594,11 @@ input[type="radio"] {
 						<h4>3. Action button — <code>class="btn"</code></h4>
 						<p>Non-submit action buttons (Add, Delete, Export). In production, apply via <code>@include btn</code> on a semantic selector in project SCSS. <code>class="btn"</code> is for prototyping only.</p>
 						<nav class="demo-actions">
-							<button type="button" class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg> Add</button>
-							<button type="button" class="btn error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg> Delete</button>
-							<button type="button" class="btn success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg> Approve</button>
-							<button type="button" class="btn warning"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg> Archive</button>
-							<button type="button" class="btn info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-download"></use></svg> Export</button>
+							<button type="button" class="btn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg> Add</button>
+							<button type="button" class="btn error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg> Delete</button>
+							<button type="button" class="btn success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-device-floppy"></use></svg> Approve</button>
+							<button type="button" class="btn warning"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg> Archive</button>
+							<button type="button" class="btn info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-download"></use></svg> Export</button>
 							<button type="button" class="btn" disabled>Disabled</button>
 						</nav>
 
@@ -664,11 +664,11 @@ button[type="submit"] {
 					<main>
 						<p>Icon-only buttons use no class — they get neutral global styling (transparent, gray hover). No padding override needed.</p>
 						<nav class="demo-actions">
-							<button type="button" title="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button>
-							<button type="button" title="Copy"><svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg></button>
-							<button type="button" title="Print"><svg class="ln-icon" aria-hidden="true"><use href="#ln-printer"></use></svg></button>
-							<button type="button" title="Refresh"><svg class="ln-icon" aria-hidden="true"><use href="#ln-refresh"></use></svg></button>
-							<button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button>
+							<button type="button" title="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button>
+							<button type="button" title="Copy"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-copy"></use></svg></button>
+							<button type="button" title="Print"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-printer"></use></svg></button>
+							<button type="button" title="Refresh"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-refresh"></use></svg></button>
+							<button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button>
 						</nav>
 					</main>
 					<script type="text/plain" data-demo-scss>
@@ -689,10 +689,10 @@ button.btn-icon {
 					<main>
 						<p>Row action buttons grouped with small gap. In projects: <code>#users-table .row-actions { @include btn-group; }</code></p>
 						<ul class="btn-group">
-							<li><button type="button" title="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg></button></li>
-							<li><button type="button" title="View"><svg class="ln-icon" aria-hidden="true"><use href="#ln-eye"></use></svg></button></li>
-							<li><button type="button" title="Copy"><svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg></button></li>
-							<li><button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg></button></li>
+							<li><button type="button" title="Edit"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg></button></li>
+							<li><button type="button" title="View"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-eye"></use></svg></button></li>
+							<li><button type="button" title="Copy"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-copy"></use></svg></button></li>
+							<li><button type="button" title="Delete"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg></button></li>
 						</ul>
 					</main>
 					<script type="text/plain" data-demo-scss>
@@ -1035,16 +1035,16 @@ input:focus-visible {
 								<!-- Dropdown wrapper -->
 								<div data-ln-dropdown>
 									<button id="locale-dropdown-trigger" data-ln-toggle-for="locale-dropdown-menu" type="button" class="btn">
-										<svg class="ln-icon" aria-hidden="true"><use href="#ln-world"></use></svg>
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-world"></use></svg>
 										<span>Locale: English (US) [en-US]</span>
 									</button>
 									<div id="locale-dropdown-menu" data-ln-toggle style="padding: var(--size-xs); width: 260px;">
 										<div style="padding: var(--size-xs); border-bottom: 1px solid var(--border-muted); margin-bottom: var(--size-xs);">
 											<label class="search">
-												<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 												<input type="search" placeholder="Search locale..." data-ln-search="locale-list" data-ln-search-debounce="0">
 												<button type="button" data-ln-search-clear aria-label="Clear search">
-													<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+													<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 												</button>
 											</label>
 										</div>
@@ -1069,7 +1069,7 @@ input:focus-visible {
 						</header>
 						<main id="chrome-intl-warning-container" style="display: none; padding-top: 0;">
 							<div class="alert warning" style="width: 100%;">
-								<svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
 								<p>
 									<strong>Chromium Warning:</strong> Chrome and Chromium-based browsers use a reduced/truncated <code>Intl</code> locale database. 
 									Some formats or locales may be missing or fall back to English/standard rules.
@@ -1395,7 +1395,7 @@ input[data-ln-number] {
 			<button type="button" class="btn"
 			        data-ln-modal-for="demo-rest-modal"
 			        data-ln-fill-form="demo-rest-form">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 				New package
 			</button>
 			<button type="button" class="btn"
@@ -1404,7 +1404,7 @@ input[data-ln-number] {
 			        data-ln-fill-id="7"
 			        data-ln-fill-name="Starter"
 			        data-ln-fill-max-users="5">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
 				Edit #7
 			</button>
 			<button type="button" class="btn"
@@ -1413,7 +1413,7 @@ input[data-ln-number] {
 			        data-ln-fill-id="42"
 			        data-ln-fill-name="Enterprise"
 			        data-ln-fill-max-users="500">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
 				Edit #42
 			</button>
 		</nav>
@@ -1498,7 +1498,7 @@ input[data-ln-number] {
 				<span data-ln-modal-when="edit">Edit package #<span data-ln-field="id"></span></span>
 			</h3>
 			<button type="button" data-ln-modal-close aria-label="Close">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 			</button>
 		</header>
 		<main>

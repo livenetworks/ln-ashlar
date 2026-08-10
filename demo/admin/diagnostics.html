@@ -49,16 +49,16 @@
 		<li data-ln-toast-item data-ln-attr="class:type">
 			<div class="icon">
 				<ul>
-					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg></li>
-					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-x"></use></svg></li>
-					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg></li>
-					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg></li>
+					<li data-ln-toast-when="success"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg></li>
+					<li data-ln-toast-when="error"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-x"></use></svg></li>
+					<li data-ln-toast-when="warn"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg></li>
+					<li data-ln-toast-when="info"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg></li>
 				</ul>
 			</div>
 			<section class="content">
 				<header>
 					<strong class="title" data-ln-field="title"></strong>
-					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</header>
 				<main class="body" data-ln-field="message"></main>
 			</section>
@@ -71,14 +71,14 @@
 		<header class="app-header">
 			<div class="header-left">
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
 				</button>
 				<h1>Diagnostics (DOM Linter)</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
 					<button type="button" id="demo-theme-trigger" data-ln-popover-for="demo-theme-picker" aria-label="Choose theme">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-palette"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-palette"></use></svg>
 					</button>
 					<div class="demo-theme-picker" data-ln-popover id="demo-theme-picker">
 						<ul>
@@ -91,7 +91,7 @@
 						</ul>
 					</div>
 					<button type="button" id="demo-density-trigger" data-ln-popover-for="demo-density-picker" aria-label="Choose density">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-adjustments-horizontal"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-adjustments-horizontal"></use></svg>
 					</button>
 					<div class="demo-density-picker" data-ln-popover id="demo-density-picker">
 						<ul>
@@ -112,20 +112,20 @@
 		<!-- Sidebar -->
 		<aside class="app-sidebar" id="demo-sidebar" data-ln-toggle="open">
 			<header>
-				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button data-ln-toggle-for="demo-sidebar" data-ln-toggle-action="close" aria-label="Close sidebar"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				<img class="logo" src="ln-ashlar-logo.png" alt="ln-ashlar">
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
-					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
 
 			<main>
 				<nav class="nav" id="demo-nav" data-ln-nav="active">
 					<ul>
-						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
+						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
 
 					<h6 class="nav-section">CSS Components</h6>
@@ -217,49 +217,10 @@
 
 <hr class="my-lg">
 
-<!-- Case 1: Missing Sort Button Warning -->
-<section class="section-card" data-demo-html>
-	<header>
-		<h3>1. Missing Sort Button Warning</h3>
-		<p>Flags a <code>th[data-ln-table-sort]</code> that is configured to be sortable but is missing the required <code>&lt;button data-ln-table-col-sort&gt;</code> trigger.</p>
-	</header>
-	<main>
-		<div class="table-container">
-			<table>
-				<thead>
-					<tr>
-						<!-- ERROR: data-ln-table-sort is set, but no data-ln-table-col-sort button exists -->
-						<th data-ln-table-sort="string">
-							Username
-						</th>
-						<th>Email</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>petar_p</td>
-						<td>petar@example.com</td>
-					</tr>
-					<tr>
-						<td>marija_s</td>
-						<td>marija@example.com</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</main>
-	<script type="text/plain" data-demo-scss>
-// The CSS validation selector is fully DRY and uses dev-inline-error:
-th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
-    @include dev-inline-error("missing sort button");
-}
-	</script>
-</section>
-
 <!-- Case 2: Missing Wrapper ID Warning -->
 <section class="section-card" data-demo-html>
 	<header>
-		<h3>2. Missing Table Wrapper ID Warning</h3>
+		<h3>1. Missing Table Wrapper ID Warning</h3>
 		<p>Flags interactive table wrappers <code>[data-ln-table]</code> that are missing a unique <code>id</code> attribute (which is required for mapping search and column filters correctly).</p>
 	</header>
 	<main>
@@ -294,7 +255,7 @@ th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
 <!-- Case 3: Modal Trigger Missing Target Warning -->
 <section class="section-card" data-demo-html>
 	<header>
-		<h3>3. Modal Trigger Missing Target Warning</h3>
+		<h3>2. Modal Trigger Missing Target Warning</h3>
 		<p>Flags a modal trigger <code>[data-ln-modal-for]</code> that is declared with an empty value, so it has no target modal <code>id</code> to open.</p>
 	</header>
 	<main>
@@ -312,7 +273,7 @@ th[data-ln-table-sort]:not(:has([data-ln-table-col-sort])) {
 <!-- Case 4: Image Missing Alt Attribute -->
 <section class="section-card" data-demo-html>
 	<header>
-		<h3>4. Image Missing Alt Attribute</h3>
+		<h3>3. Image Missing Alt Attribute</h3>
 		<p>Flags an <code>&lt;img&gt;</code> that has no <code>alt</code> attribute at all. An empty <code>alt=""</code> is intentionally allowed — it is the valid, WCAG-endorsed pattern for purely decorative images, so it is never flagged.</p>
 	</header>
 	<main>
@@ -330,7 +291,7 @@ img:not([alt]) {
 <!-- Case 5: Abbr Missing Title -->
 <section class="section-card" data-demo-html>
 	<header>
-		<h3>5. Abbr Missing Title</h3>
+		<h3>4. Abbr Missing Title</h3>
 		<p>Flags an <code>&lt;abbr&gt;</code> that is missing its <code>title</code> attribute. Without a title the abbreviation has no expansion and is meaningless to readers and assistive tech.</p>
 	</header>
 	<main>
@@ -348,7 +309,7 @@ abbr:not([title]) {
 <!-- Case 6: Empty Tooltip (No Title Fallback) -->
 <section class="section-card" data-demo-html>
 	<header>
-		<h3>6. Empty Tooltip (No Title Fallback)</h3>
+		<h3>5. Empty Tooltip (No Title Fallback)</h3>
 		<p>Flags a <code>[data-ln-tooltip]</code> declared with an empty value and no native <code>title</code> fallback, so it would render an empty bubble. An empty <code>data-ln-tooltip</code> with a <code>title</code> present is valid (it falls back to the title) and is not flagged.</p>
 	</header>
 	<main>
@@ -366,7 +327,7 @@ abbr:not([title]) {
 <!-- Case 3: Correct Implementation -->
 <section class="section-card" data-demo-html>
 	<header>
-		<h3>7. Correct Implementation (No Errors)</h3>
+		<h3>6. Correct Implementation (No Errors)</h3>
 		<p>When the HTML structure and attributes are fully correct, no diagnostics warnings are shown.</p>
 	</header>
 	<main>
@@ -376,14 +337,14 @@ abbr:not([title]) {
 				<table>
 					<thead>
 						<tr>
-							<!-- CORRECT: sortable header contains the correct button -->
-							<th data-ln-table-sort="string">
+							<!-- CORRECT: sortable header contains the sort control -->
+							<th>
 								System Service
-								<button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort">
-									<svg class="ln-icon" data-ln-table-col-sort-icon="none" aria-hidden="true"><use href="#ln-arrows-sort"></use></svg>
-									<svg class="ln-icon" data-ln-table-col-sort-icon="asc" aria-hidden="true"><use href="#ln-arrow-up"></use></svg>
-									<svg class="ln-icon" data-ln-table-col-sort-icon="desc" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
-								</button>
+								<ul data-ln-sort="correct-demo-table">
+									<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+									<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+									<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+								</ul>
 							</th>
 							<th>Status</th>
 						</tr>
@@ -440,7 +401,7 @@ abbr:not([title]) {
 		<form>
 			<header>
 				<h3>Basic Modal</h3>
-				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button"  data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main>
 				<p>This is a basic modal with a title and content.</p>
@@ -456,13 +417,13 @@ abbr:not([title]) {
 		<form id="demo-form-el" data-ln-form>
 			<header>
 				<span class="icon">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-user"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-user"></use></svg>
 				</span>
 				<hgroup>
 					<h3>Edit User</h3>
 					<p>Update the user's details below.</p>
 				</hgroup>
-				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button" data-ln-modal-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main>
 				<div class="form-element">
@@ -484,7 +445,7 @@ abbr:not([title]) {
 			</main>
 			<footer>
 				<button type="button" class="delete-action">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 					Delete
 				</button>
 				<button type="button" data-ln-modal-close>Cancel</button>

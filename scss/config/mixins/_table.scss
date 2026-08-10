@@ -69,9 +69,10 @@
 		top: auto;
 		z-index: auto;
 
-		// Shared header-button stack — keyed off the unprefixed structural button classes,
-		// so table / ln-table / ln-data-table all share one positioning rule.
-		&:has(.table-sort):has(.table-filter) {
+		// Shared header-button stack — keyed off the unprefixed structural filter button
+		// class and the [data-ln-sort] JS-component selector, so table / ln-table /
+		// ln-data-table all share one positioning rule.
+		&:has([data-ln-sort]):has(.table-filter) {
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 3.75rem);
 
 			.table-filter {
@@ -81,7 +82,7 @@
 				right: var(--padding-x, var(--size-md));
 				margin: 0;
 			}
-			.table-sort {
+			[data-ln-sort] {
 				position: absolute;
 				top: 50%;
 				transform: translateY(-50%);
@@ -90,10 +91,10 @@
 			}
 		}
 
-		&:has(.table-sort):not(:has(.table-filter)) {
+		&:has([data-ln-sort]):not(:has(.table-filter)) {
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
 
-			.table-sort {
+			[data-ln-sort] {
 				position: absolute;
 				top: 50%;
 				transform: translateY(-50%);
@@ -102,7 +103,7 @@
 			}
 		}
 
-		&:has(.table-filter):not(:has(.table-sort)) {
+		&:has(.table-filter):not(:has([data-ln-sort])) {
 			padding-inline-end: calc(var(--padding-x, var(--size-md)) + 2rem);
 
 			.table-filter {
@@ -268,7 +269,7 @@
 
 // ─── Column sort & filter buttons ──────────────────────────────
 
-@mixin _table-header-btn-base {
+@mixin table-header-btn-base {
 	width: 1.75rem;
 	height: 1.75rem;
 	display: inline-flex;
@@ -291,23 +292,8 @@
 	}
 }
 
-@mixin table-sort {
-	@include _table-header-btn-base;
-	vertical-align: middle;
-
-	[data-ln-table-col-sort-icon="asc"],
-	[data-ln-table-col-sort-icon="desc"] {
-		display: none;
-	}
-}
-
-@mixin table-sort-active {
-	opacity: 1;
-	color: var(--color-accent);
-}
-
 @mixin table-filter {
-	@include _table-header-btn-base;
+	@include table-header-btn-base;
 	vertical-align: middle;
 	position: relative;
 }

@@ -1257,6 +1257,67 @@
 				}
 			}
 		},
+		"ln-sort": {
+			"element": {
+				"recommended_tag": "ul",
+				"tag_enforced": false,
+				"note": "Sort control root <ul data-ln-sort=\"targetId\">; three <li><button data-ln-sort-dir> triggers, only one visible at a time via CSS."
+			},
+			"attributes": {
+				"data-ln-sort": {
+					"type": "string",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "ID of the target element being sorted."
+				},
+				"data-ln-sort-field": {
+					"type": "string",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Record field name for data-driven sorting. Omit inside a <th> to fall back to th.cellIndex (SSR/DOM only) — never combine both on the same instance."
+				},
+				"data-ln-sort-state": {
+					"type": "string",
+					"enum": [
+						"none",
+						"asc",
+						"desc"
+					],
+					"read_by": "ln-sort",
+					"consumed_by": "both",
+					"role": "state",
+					"description": "Current sort state on the root; drives which trigger <button> is visible via CSS."
+				},
+				"data-ln-sort-items": {
+					"type": "string",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "CSS selector for target child items for default-DOM-behaviour reordering (mirrors data-ln-search-items)."
+				},
+				"data-ln-sort-dir": {
+					"type": "string",
+					"enum": [
+						"asc",
+						"desc",
+						"none"
+					],
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Identifies which sort action a trigger <button> performs."
+				},
+				"data-ln-persist": {
+					"type": "string",
+					"read_by": "ln-sort",
+					"consumed_by": "js",
+					"role": "input",
+					"description": "Opt-in. Persists { field, column, direction } to localStorage, keyed per instance."
+				}
+			}
+		},
 		"ln-sortable": {
 			"element": {
 				"recommended_tag": "ul, ol",
@@ -1330,25 +1391,6 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Maps <th> header column to record payload field key."
-				},
-				"data-ln-table-sort": {
-					"type": "string",
-					"enum": [
-						"string",
-						"number",
-						"date"
-					],
-					"read_by": "ln-table",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Enables column sorting and specifies sort data type."
-				},
-				"data-ln-table-col-sort": {
-					"type": "boolean",
-					"read_by": "ln-table",
-					"consumed_by": "js",
-					"role": "input",
-					"description": "Sort trigger button inside <th> header."
 				},
 				"data-ln-table-col-filter": {
 					"type": "boolean",
@@ -1493,18 +1535,6 @@
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Accessible aria-label for select-all checkbox."
-				},
-				"data-ln-sort-icon": {
-					"type": "string",
-					"enum": [
-						"none",
-						"asc",
-						"desc"
-					],
-					"read_by": "ln-table (SCSS)",
-					"consumed_by": "css",
-					"role": "input",
-					"description": "SCSS sort icon state selector inside sortable column headers."
 				}
 			}
 		},

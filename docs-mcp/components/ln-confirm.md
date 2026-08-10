@@ -45,7 +45,7 @@ tags: [interactions, confirmation, validation]
 
 ### Variant 1: Icon-Only Button with Tooltip
 
-For compact layouts. Replaces the SVG icon path with `#ln-check` and shows a CSS tooltip.
+For compact layouts. Replaces the SVG icon path with `#ln-icon-check` and shows a CSS tooltip.
 
 #### HTML Markup
 ```html
@@ -54,7 +54,7 @@ For compact layouts. Replaces the SVG icon path with `#ln-check` and shows a CSS
         aria-label="Delete Record" 
         data-ln-confirm="Confirm deletion?">
     <svg class="ln-icon" aria-hidden="true">
-        <use href="#ln-trash"></use>
+        <use href="#ln-icon-trash"></use>
     </svg>
 </button>
 ```
@@ -70,7 +70,7 @@ For complex layouts. Controls visibility of separate child nodes for idle and ac
         data-ln-confirm
         data-ln-confirm-timeout="4">
     <span data-ln-confirm-idle>
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
         Delete Selected (<span data-ln-table-selected></span>)
     </span>
     <span data-ln-confirm-active hidden>

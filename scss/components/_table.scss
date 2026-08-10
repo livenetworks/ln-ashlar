@@ -33,29 +33,11 @@ table {
 	}
 }
 
-// ─── Shared Column Sort & Filter Buttons ────────────────────────
+// ─── Shared Column Filter Button ─────────────────────────────────
 // CSS targets the unprefixed structural helper class on the button, NOT the data-ln-* JS
-// hook. .table-sort / .table-filter are thin bindings that mirror the mixins; a consumer
-// may instead @include table-sort / table-filter on their own selector (the class is a
-// convenience, not a mandate — see "Naming & class architecture"). Behavior hooks
-// (data-ln-table-col-sort / data-ln-popover-for / data-ln-table-col-filter) are
-// the per-system functional layer and intentionally differ.
-
-.table-sort { @include table-sort; }
-th:hover .table-sort { opacity: 0.7; }
-
-// Active sort — JS-state class on the <th>, set by sort JS (client) or server.
-.ln-sort-asc .table-sort,
-.ln-sort-desc .table-sort { @include table-sort-active; }
-
-.ln-sort-asc .table-sort {
-	[data-ln-table-col-sort-icon="none"] { display: none; }
-	[data-ln-table-col-sort-icon="asc"]  { display: inline-block; }
-}
-.ln-sort-desc .table-sort {
-	[data-ln-table-col-sort-icon="none"] { display: none; }
-	[data-ln-table-col-sort-icon="desc"] { display: inline-block; }
-}
+// hook. .table-filter is a thin binding that mirrors the mixin; a consumer may instead
+// @include table-filter on their own selector (the class is a convenience, not a mandate).
+// Sort lives in scss/components/_sort.scss — see [data-ln-sort].
 
 .table-filter { @include table-filter; }
 th:hover .table-filter { opacity: 0.7; }

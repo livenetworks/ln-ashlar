@@ -829,14 +829,14 @@ Beyond text, `fill()` binds attributes (`data-ln-attr`) and toggles classes (`da
     <li class="ln-upload__item"
         data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
         <svg class="ln-icon" aria-hidden="true">
-            <use data-ln-attr="href:iconHref" href="#ln-file"></use>
+            <use data-ln-attr="href:iconHref" href="#ln-icon-file"></use>
         </svg>
         <span class="ln-upload__name" data-ln-field="name"></span>
         <span class="ln-upload__size" data-ln-field="sizeText"></span>
         <button type="button" class="ln-upload__remove"
                 data-ln-upload-action="remove"
                 data-ln-attr="aria-label:removeLabel, title:removeLabel">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
         </button>
         <div class="ln-upload__progress">
             <div class="ln-upload__progress-bar"></div>
@@ -852,7 +852,7 @@ li.setAttribute('data-file-id', localId);
 fill(li, {
     name: file.name,
     sizeText: '0%',
-    iconHref: '#' + iconId,    // → <use href="#lnc-file-pdf">
+    iconHref: '#' + iconId,    // → <use href="#ln-icon-custom-file-pdf">
     removeLabel: dict.remove,  // → aria-label + title on button
     uploading: true,           // → adds ln-upload__item--uploading
     error: false,
@@ -876,7 +876,7 @@ One `fill()` call handles all three binding types at once:
 - **`data-ln-attr="href:iconHref"`** → one or more attributes per element (`href` on `<use>`, `aria-label` + `title` on the button)
 - **`data-ln-class="ln-upload__item--uploading:uploading, ..."`** → conditional class toggles driven by booleans
 
-State transitions are just successive `fill()` calls with different values — no imperative `classList.add/remove`, no manual `setAttribute`. The icon swap via `data-ln-attr="href:iconHref"` on a `<use>` element works because `ln-icons` runs a MutationObserver on `<use href>` changes and auto-fetches the new sprite — the component never touches the icon loader directly.
+State transitions are just successive `fill()` calls with different values — no imperative `classList.add/remove`, no manual `setAttribute`. The icon swap via `data-ln-attr="href:iconHref"` on a `<use>` element works because `ln-icon` runs a MutationObserver on `<use href>` changes and auto-fetches the new sprite — the component never touches the icon loader directly.
 
 **Behavioral hooks live on attributes, not classes** — `data-ln-upload-action="remove"` is a JS query hook, not a fill slot. Delegated click handlers on `.ln-upload__list` use `e.target.closest('[data-ln-upload-action="remove"]')` to locate the button, which also matches when the click lands on a nested `<svg>` / `<use>`. Keeping behavioral hooks off CSS class names means a project can rename or restyle classes without breaking JS.
 
@@ -901,7 +901,7 @@ Both are one-line assignments right after the `fill()` call and are the only non
         <li class="ln-upload__item"
             data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
             <svg class="ln-icon ln-icon--lg" aria-hidden="true">
-                <use data-ln-attr="href:iconHref" href="#ln-file"></use>
+                <use data-ln-attr="href:iconHref" href="#ln-icon-file"></use>
             </svg>
             <article>
                 <p class="ln-upload__name" data-ln-field="name"></p>
@@ -910,7 +910,7 @@ Both are one-line assignments right after the `fill()` call and are the only non
             <button type="button" class="ln-upload__remove"
                     data-ln-upload-action="remove"
                     data-ln-attr="aria-label:removeLabel, title:removeLabel">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
             <div class="ln-upload__progress"><div class="ln-upload__progress-bar"></div></div>
         </li>
@@ -998,8 +998,8 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-search | Instance | `data-ln-search` | Generic search (textContent filter) |
 | ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
 | ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll; opt-in server-side windowed virtualization via `data-ln-table-window`) |
-| ln-table-sort | Instance | `data-ln-table-sort` | Sort header handler (companion to ln-table) |
-| ln-sortable | Instance | `data-ln-table-sortable` | Drag & drop reorder |
+| ln-sort | Instance | `data-ln-sort` | Sort control primitive — 3-trigger cycle (none→asc→desc→none), search-precedent cancelable event; targets ln-table, ln-list, or plain lists |
+| ln-sortable | Instance | `data-ln-sortable` | Drag & drop reorder |
 | ln-dropdown | Instance | `data-ln-dropdown` | Positioned dropdown menu (wraps ln-toggle) |
 | ln-popover | Instance | `data-ln-popover` | Rich popover with viewport-aware positioning and ESC-stack management |
 | ln-link | Instance | `data-ln-link` | Clickable rows/containers |

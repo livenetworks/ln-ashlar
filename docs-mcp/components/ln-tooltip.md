@@ -45,7 +45,7 @@ Best for icon buttons or static elements located in open layout areas where pare
         data-ln-tooltip="Save Changes" 
         aria-label="Save Changes">
     <svg class="ln-icon" aria-hidden="true">
-        <use href="#ln-device-floppy"></use>
+        <use href="#ln-icon-device-floppy"></use>
     </svg>
 </button>
 ```
@@ -62,7 +62,7 @@ Recommended for elements close to the screen edges or nested inside containers w
         data-ln-tooltip-position="right"
         aria-label="Delete Row">
     <svg class="ln-icon" aria-hidden="true">
-        <use href="#ln-trash"></use>
+        <use href="#ln-icon-trash"></use>
     </svg>
 </button>
 ```

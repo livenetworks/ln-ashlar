@@ -27,7 +27,7 @@ Unified frontend library — SCSS CSS framework + vanilla JS components.
 | Motion | `scss/config/mixins/_motion.scss` | [motion.md](css/motion.md) |
 | Layout | `scss/config/mixins/_layout.scss` | [layout.md](css/layout.md) |
 | Mixins Reference | `scss/config/mixins/` | [mixins.md](css/mixins.md) |
-| Icons (CSS) | `scss/config/_icons.scss` | [../js/ln-icons/README.md](../js/ln-icons/README.md) |
+| Icons (CSS) | `scss/config/_icons.scss` | [../js/ln-icon/README.md](../js/ln-icon/README.md) |
 | Container Queries | — | [ln-ashlar-container-queries.md](ln-ashlar-container-queries.md) |
 
 **Components** (alphabetical)
@@ -65,7 +65,7 @@ Each component ships one file — usage guide plus architecture reference
 | Component | Attribute | README |
 |-----------|-----------|--------|
 | Core helpers | — | [js/ln-core/README.md](../js/ln-core/README.md) |
-| Icons | (auto-init) | [js/ln-icons/README.md](../js/ln-icons/README.md) |
+| Icons | (auto-init) | [js/ln-icon/README.md](../js/ln-icon/README.md) |
 | Toggle | `data-ln-toggle` | [js/ln-toggle/README.md](../js/ln-toggle/README.md) |
 | Accordion | `data-ln-accordion` | [js/ln-accordion/README.md](../js/ln-accordion/README.md) |
 | Modal | `data-ln-modal` | [js/ln-modal/README.md](../js/ln-modal/README.md) |
@@ -78,8 +78,8 @@ Each component ships one file — usage guide plus architecture reference
 | Filter | `data-ln-filter` | [js/ln-filter/README.md](../js/ln-filter/README.md) |
 | Search | `data-ln-search` | [js/ln-search/README.md](../js/ln-search/README.md) |
 | Table | `data-ln-table` | [js/ln-table/README.md](../js/ln-table/README.md) |
-| Table Sort | `data-ln-table-sort` | [js/ln-table/README.md](../js/ln-table/README.md) |
-| Sortable | `data-ln-table-sortable` | [js/ln-sortable/README.md](../js/ln-sortable/README.md) |
+| Sort | `data-ln-sort` | [js/ln-sort/README.md](../js/ln-sort/README.md) |
+| Sortable | `data-ln-sortable` | [js/ln-sortable/README.md](../js/ln-sortable/README.md) |
 | Progress | `data-ln-progress` | [js/ln-progress/README.md](../js/ln-progress/README.md) |
 | Circular Progress | `data-ln-circular-progress` | [js/ln-circular-progress/README.md](../js/ln-circular-progress/README.md) |
 | Link | `data-ln-link` | [js/ln-link/README.md](../js/ln-link/README.md) |

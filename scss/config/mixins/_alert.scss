@@ -15,10 +15,10 @@
 //
 // HTML:
 //   <div class="alert" role="alert">
-//       <svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+//       <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
 //       <p>Message text.</p>
 //       <button type="button" aria-label="Dismiss">
-//           <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+//           <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 //       </button>
 //   </div>
 
@@ -63,12 +63,12 @@
 // HTML (dismissible via ln-toggle, dismissed state persists across reloads):
 //   <div class="alert banner" role="status" aria-live="polite"
 //        data-ln-toggle="open" data-ln-persist id="trial-notice">
-//       <svg class="ln-icon" aria-hidden="true"><use href="#ln-info-circle"></use></svg>
+//       <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-info-circle"></use></svg>
 //       <p>Trial expires in 3 days.</p>
 //       <button type="button" aria-label="Dismiss"
 //               data-ln-toggle-for="trial-notice"
 //               data-ln-toggle-action="close">
-//           <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+//           <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 //       </button>
 //   </div>
 

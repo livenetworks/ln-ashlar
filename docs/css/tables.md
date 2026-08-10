@@ -102,10 +102,10 @@ Action buttons use `@include btn-group` on a `<ul>`. Color change via `--color-p
 <td>
     <ul>
         <li><button type="button">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
         </button></li>
         <li><button type="button">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
         </button></li>
     </ul>
 </td>

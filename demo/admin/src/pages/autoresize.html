@@ -21,7 +21,7 @@
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
-									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-info-circle"></use></svg>
+									<svg class="ln-icon" aria-hidden="true" style="width: 1.25rem; height: 1.25rem;"><use href="#ln-icon-info-circle"></use></svg>
 									The Scroll-Height Observation Trick
 								</h4>
 								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
@@ -153,11 +153,11 @@ textarea[data-ln-autoresize] {
 							</div>
 							<nav class="demo-actions">
 								<button type="button" id="demo-prog-set-silent">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-alert-triangle"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg>
 									Set .value (silent — height stays wrong)
 								</button>
 								<button type="button" id="demo-prog-set-event">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-check"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg>
 									Set .value + dispatch input (correct)
 								</button>
 								<button type="button" id="demo-prog-clear">Clear</button>
@@ -191,7 +191,7 @@ textarea[data-ln-autoresize] {
 							<p>Click the button to create a new <code>&lt;textarea data-ln-autoresize&gt;</code> via JavaScript. The shared <code>MutationObserver</code> registered through <code>registerComponent</code> picks it up automatically — no manual <code>lnAutoresize(container)</code> call is needed for live document inserts.</p>
 							<nav class="demo-actions">
 								<button type="button" id="demo-add-textarea">
-									<svg class="ln-icon" aria-hidden="true"><use href="#ln-plus"></use></svg>
+									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-plus"></use></svg>
 									Add textarea dynamically
 								</button>
 							</nav>

@@ -80,12 +80,6 @@ async function run() {
 		if (fs.existsSync(srcPath)) {
 			entriesToBuild.push({ entryName: `${comp}/${comp}`, srcPath });
 		}
-		if (comp === 'ln-table') {
-			const sortSrc = join(jsDir, comp, 'src', 'ln-table-sort.js');
-			if (fs.existsSync(sortSrc)) {
-				entriesToBuild.push({ entryName: `${comp}/ln-table-sort`, srcPath: sortSrc });
-			}
-		}
 	}
 
 	console.log(`Found ${entriesToBuild.length} components to compile.`);

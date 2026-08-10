@@ -40,11 +40,19 @@ The coordinator listens on `this.dom` for `ln-data-store:ready`, `loaded`, `crea
 
 <section data-ln-table="people"
          data-ln-table-source="people"
-         data-ln-table-store="people">
+         data-ln-table-store="people"
+         id="people-table">
   <table>
     <thead>
       <tr>
-        <th data-ln-table-col="name">Name <button data-ln-table-col-sort …></button></th>
+        <th data-ln-table-col="name">
+          Name
+          <ul data-ln-sort="people-table" data-ln-sort-field="name" data-ln-sort-state="none">
+            <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+            <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+            <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+          </ul>
+        </th>
         <th data-ln-table-col="status">Status <button data-ln-table-col-filter …></button></th>
       </tr>
     </thead>

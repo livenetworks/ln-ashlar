@@ -16,7 +16,7 @@ wrapper owns border, padding, and focus ring.
 
 ```html
 <label>
-    <svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
     <input type="search" placeholder="Search…">
 </label>
 ```
@@ -29,10 +29,10 @@ hover, tighter padding, 1rem icons — use `class="search"`:
 
 ```html
 <label class="search">
-	<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 	<input type="search" placeholder="Search…" data-ln-search="my-list">
 	<button type="button" data-ln-search-clear aria-label="Clear search">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>
 </label>
 ```

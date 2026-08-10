@@ -1,9 +1,8 @@
-import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale } from '../../ln-core';
+import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registerComponent, readValue, createWindowCache, createBatcher, getLocale, detectValueType, compareValues } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-table';
 	const DOM_ATTRIBUTE = 'lnTable';
-	const SORT_ATTR = 'data-ln-table-sort';
 	const EMPTY_TEMPLATE = 'data-ln-table-empty';
 	// Tuning constant — duplicated in ln-data-table for component independence
 	const VIRTUAL_THRESHOLD = 200;
@@ -59,7 +58,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		this._searchTerm = '';
 		this._sortCol = -1;
 		this._sortDir = null;
-		this._sortType = null;
 		this._columnFilters = {};
 
 		// Virtual scroll state
@@ -233,19 +231,13 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			};
 			dom.addEventListener('ln-table:set-loading', this._onSetLoading);
 
-			// --- Sort Click ---
-			this._onSortClick = function (e) {
-				const btn = e.target.closest('[data-ln-table-col-sort]');
-				if (!btn) return;
-				const th = btn.closest('th');
-				if (!th) return;
-				const field = th.getAttribute('data-ln-table-col');
-				if (!field) return;
-				self._handleSort(field, th);
+			// --- Sort ---
+			this._onSort = function (e) {
+				e.preventDefault();
+				self.currentSort = e.detail.direction === 'none' ? null : { field: e.detail.field, direction: e.detail.direction };
+				self._requestData();
 			};
-			if (this.thead) {
-				this.thead.addEventListener('click', this._onSortClick);
-			}
+			dom.addEventListener('ln-sort:change', this._onSort);
 
 			// --- Selection ---
 			this._selectable = dom.hasAttribute('data-ln-table-selectable');
@@ -390,9 +382,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 
 			this._onSort = function (e) {
-				self._sortCol = e.detail.direction === null ? -1 : e.detail.column;
-				self._sortDir = e.detail.direction;
-				self._sortType = e.detail.sortType;
+				e.preventDefault();
+				const direction = e.detail.direction === 'none' ? null : e.detail.direction;
+				self._sortCol = direction === null ? -1 : e.detail.column;
+				self._sortDir = direction;
 				self._applyFilterAndSort();
 				self._vStart = -1;
 				self._vEnd = -1;
@@ -404,7 +397,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 					total: self._data.length
 				});
 			};
-			dom.addEventListener('ln-table:sort', this._onSort);
+			dom.addEventListener('ln-sort:change', this._onSort);
 		}
 
 		return this;
@@ -417,35 +410,21 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		const ths = this.ths;
 		this._data = [];
 
-		const sortTypes = [];
-		for (let c = 0; c < ths.length; c++) {
-			sortTypes[c] = ths[c].getAttribute(SORT_ATTR);
-		}
-
 		if (rows.length > 0) this._rowHeight = rows[0].offsetHeight || 40;
 		this._lockColumnWidths();
 
 		for (let i = 0; i < rows.length; i++) {
 			const tr = rows[i];
-			const sortKeys = [];
+			const values = [];
 			const rawTexts = [];
 			const searchParts = [];
 
 			for (let j = 0; j < tr.cells.length; j++) {
 				const td = tr.cells[j];
 				const text = td.textContent.trim();
-				const raw = readValue(td);
-				const type = sortTypes[j];
 
+				values[j] = readValue(td);
 				rawTexts[j] = text.toLowerCase();
-
-				if (type === 'number' || type === 'date') {
-					sortKeys[j] = parseFloat(raw) || 0;
-				} else if (type === 'string') {
-					sortKeys[j] = String(raw);
-				} else {
-					sortKeys[j] = null;
-				}
 
 				if (j < tr.cells.length - 1) searchParts.push(text.toLowerCase());
 			}
@@ -455,7 +434,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				record = {};
 				const id = tr.getAttribute('data-ln-table-row-id');
 				if (id != null) record.id = id;
-				
+
 				for (let j = 0; j < ths.length; j++) {
 					const field = ths[j].getAttribute('data-ln-table-col');
 					if (field) {
@@ -469,7 +448,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 
 			this._data.push({
-				sortKeys: sortKeys,
+				values: values,
 				rawTexts: rawTexts,
 				html: tr.outerHTML,
 				searchText: searchParts.join(' '),
@@ -479,7 +458,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		}
 
 		this._filteredData = this._data.slice();
-		
+
 		if (this.isDataDriven) {
 			this._lastTotal = this._data.length;
 			this._lastFiltered = this._data.length;
@@ -540,37 +519,11 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			const direction = this.currentSort.direction;
 			const multiplier = direction === 'desc' ? -1 : 1;
 
-			let sortType = null;
-			if (this.ths) {
-				for (let i = 0; i < this.ths.length; i++) {
-					if (this.ths[i].getAttribute('data-ln-table-col') === field) {
-						sortType = this.ths[i].getAttribute(SORT_ATTR);
-						break;
-					}
-				}
-			}
-
-			const compare = _collator
-				? _collator.compare
-				: function (a, b) { return a < b ? -1 : a > b ? 1 : 0; };
+			const values = this._filteredData.map(function (row) { return row[field]; });
+			const type = detectValueType(values);
 
 			this._filteredData.sort(function (a, b) {
-				const valA = a[field];
-				const valB = b[field];
-
-				if (sortType === 'number' || sortType === 'date') {
-					const numA = parseFloat(valA) || 0;
-					const numB = parseFloat(valB) || 0;
-					return (numA - numB) * multiplier;
-				}
-
-				if (typeof valA === 'number' && typeof valB === 'number') {
-					return (valA - valB) * multiplier;
-				}
-
-				const strA = valA != null ? String(valA) : '';
-				const strB = valB != null ? String(valB) : '';
-				return compare(strA, strB) * multiplier;
+				return compareValues(a[field], b[field], type, _collator) * multiplier;
 			});
 
 		} else {
@@ -608,16 +561,11 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 			const colIndex = this._sortCol;
 			const multiplier = this._sortDir === 'desc' ? -1 : 1;
-			const isNumeric = (this._sortType === 'number' || this._sortType === 'date');
-			const compare = _collator
-				? _collator.compare
-				: function (a, b) { return a < b ? -1 : a > b ? 1 : 0; };
+			const values = this._filteredData.map(function (row) { return row.values[colIndex]; });
+			const type = detectValueType(values);
 
 			this._filteredData.sort(function (a, b) {
-				const aKey = a.sortKeys[colIndex];
-				const bKey = b.sortKeys[colIndex];
-				if (isNumeric) return (aKey - bKey) * multiplier;
-				return compare(aKey, bKey) * multiplier;
+				return compareValues(a.values[colIndex], b.values[colIndex], type, _collator) * multiplier;
 			});
 		}
 	};
@@ -978,7 +926,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		this.tbody.textContent = '';
 
 		let clone = null;
-		
+
 		if (this.isDataDriven) {
 			const total = this._lastTotal != null ? this._lastTotal : this._data.length;
 			const filtered = this.visibleCount;
@@ -1072,39 +1020,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		}
 
 		return tr;
-	};
-
-	// ─── Sort Helpers ──────────────────────────────────────────
-
-	_component.prototype._handleSort = function (field, th) {
-		let newDir;
-
-		if (!this.currentSort || this.currentSort.field !== field) {
-			newDir = 'asc';
-		} else if (this.currentSort.direction === 'asc') {
-			newDir = 'desc';
-		} else {
-			newDir = null;
-		}
-
-		for (let i = 0; i < this.ths.length; i++) {
-			this.ths[i].classList.remove('ln-sort-asc', 'ln-sort-desc');
-		}
-
-		if (newDir) {
-			this.currentSort = { field: field, direction: newDir };
-			th.classList.add(newDir === 'asc' ? 'ln-sort-asc' : 'ln-sort-desc');
-		} else {
-			this.currentSort = null;
-		}
-
-		dispatch(this.dom, 'ln-table:sort', {
-			table: this.name,
-			field: field,
-			direction: newDir
-		});
-
-		this._requestData();
 	};
 
 	_component.prototype._requestData = function () {
@@ -1439,9 +1354,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (this.isDataDriven) {
 			this.dom.removeEventListener('ln-table:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-table:set-loading', this._onSetLoading);
-			if (this.thead) {
-				this.thead.removeEventListener('click', this._onSortClick);
-			}
+			this.dom.removeEventListener('ln-sort:change', this._onSort);
 			document.removeEventListener('keydown', this._onKeydown);
 			if (this.tbody) {
 				this.tbody.removeEventListener('click', this._onRowClick);
@@ -1455,7 +1368,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				this._emptyTbodyObserver.disconnect();
 				this._emptyTbodyObserver = null;
 			}
-			this.dom.removeEventListener('ln-table:sort', this._onSort);
+			this.dom.removeEventListener('ln-sort:change', this._onSort);
 		}
 
 		if (this._colgroup) {

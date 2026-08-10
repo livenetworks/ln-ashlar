@@ -25,6 +25,46 @@ For lists containing more than 200 items, `ln-list` automatically activates virt
 
 The JavaScript source is located at [ln-list.js](../../js/ln-list/src/ln-list.js).
 
+### Sort Integration (`ln-sort`)
+
+Sorting is provided by [`ln-sort`](./ln-sort.md), composed as a `<ul data-ln-sort="listId">`
+control targeting the list's own `id` — `ln-list` never renders a sort trigger itself. Listening
+behavior differs by mode:
+
+* **Data-Driven mode** (`data-ln-list-source` present): listens for `ln-sort:change` on its own
+  root. An event carrying a `field` (`data-ln-sort-field` was authored on the control) is
+  intercepted — `preventDefault()` is called, `currentSort` is updated, and the list re-sorts
+  `_filteredData` locally by `row[field]` and re-renders (non-windowed), or calls `_requestData()`
+  to fetch the freshly-sorted page (windowed, `data-ln-list-window`). An event with
+  `field === null` (the `th.cellIndex`-only fallback — meaningless for a list, which has no
+  columns) is **ignored entirely**: `preventDefault()` is never called, so `ln-sort`'s own default
+  DOM-reorder fallback runs instead. Always author `data-ln-sort-field` when targeting a
+  Data-Driven list.
+* **SSR mode** (no `data-ln-list-source`): `ln-list` registers **no** `ln-sort:change` listener at
+  all. Sorting an SSR list is handled entirely by `ln-sort`'s own default DOM-reorder fallback —
+  `ln-list` never sees or intercepts the event.
+
+> [!CAUTION]
+> **`data-ln-list-field` is not `data-ln-sort-field`, and neither one is `data-ln-field`.** Three
+> attributes, three different jobs:
+> - `data-ln-sort-field` (on the `<ul data-ln-sort>` control) names which record property the
+>   click intends to sort by — the control's own input, forwarded verbatim as `field` on the
+>   `ln-sort:change` payload.
+> - `data-ln-list-field` (on a sub-element inside each `[data-ln-item]` row) tells `ln-list`'s own
+>   `_parseChildren()` which record property that sub-element's text represents — only read in
+>   Data-Driven mode, only to reconstruct `row[prop]` from hydrated/pre-fetch markup before the
+>   first `ln-list:set-data` arrives. It has nothing to do with which column is sortable.
+> - `data-ln-field` (generic, from `ln-core`) is what `ln-sort`'s OWN default DOM-reorder fallback
+>   reads per item when `ln-list` does not intercept the event (SSR mode, or an ignored
+>   `field === null` event). Unrelated to `data-ln-list-field` even though both can be authored
+>   inside the same `[data-ln-item]` row for different purposes.
+>
+> Once `ln-list` intercepts (Data-Driven, `field` set), the sort key is `row[field]` on the
+> already-resolved in-memory record — populated either straight from the API payload (matching
+> field names 1:1) or, for pre-fetch hydrated rows, via `data-ln-list-field`. Author the same
+> field-name string in both `data-ln-sort-field` and (if hydrating) `data-ln-list-field` so they
+> agree in value — they are not the same attribute, they must simply match.
+
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
 > - **No direct API/Network calls:** It does not fetch data itself. When sorting or searching is triggered in Data-Driven mode, it emits `ln-list:request-data` and delegates the fetching to coordinators like [`ln-data-coordinator`](./ln-data-coordinator.md).
@@ -44,12 +84,18 @@ In SSR mode, the list is functional immediately with the server-rendered markup.
   <input type="search" data-ln-search="ssr-documents-list" placeholder="Search...">
 </form>
 
+<ul data-ln-sort="ssr-documents-list" data-ln-sort-field="title" data-ln-sort-state="none">
+  <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+  <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+  <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+</ul>
+
 <ul id="ssr-documents-list" data-ln-list="ssr-documents">
   <li data-ln-item data-ln-item-id="1">
-    <span data-ln-list-field="title">Document A</span>
+    <span data-ln-list-field="title" data-ln-field="title">Document A</span>
   </li>
   <li data-ln-item data-ln-item-id="2">
-    <span data-ln-list-field="title">Document B</span>
+    <span data-ln-list-field="title" data-ln-field="title">Document B</span>
   </li>
 </ul>
 
@@ -66,7 +112,8 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 ```html
 <div data-ln-list="users_list" 
      data-ln-list-source="api/users" 
-     data-ln-list-selectable>
+     data-ln-list-selectable
+     id="users_list">
      
   <!-- Toolbar for Search and Stats -->
   <div class="list-controls">
@@ -74,6 +121,12 @@ In Data-Driven mode, the list requests data via coordinator events and populates
     <input type="checkbox" data-ln-list-select-all />
     
     <input type="text" data-ln-search="users_list" placeholder="Search..." />
+
+    <ul data-ln-sort="users_list" data-ln-sort-field="name" data-ln-sort-state="none">
+      <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+      <li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+      <li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+    </ul>
     
     <!-- Footer / Stats spans -->
     <div>
@@ -175,6 +228,7 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `ln-list:set-data` | Listens | No | Populates the list with a dataset, removes loading overlays, and triggers render. Windowed mode (`data-ln-list-window`) additionally reads `offset`/`queryGen` off the payload, routing it into the internal window cache. | `{ data: Array, total: Number, filtered: Number, offset?: Number, queryGen?: Number }` |
 | `ln-list:set-loading` | Listens | No | Controls the visual loading state of the list. | `{ loading: Boolean }` |
 | `ln-search:change` | Listens | No | Received from `ln-search` inputs, triggering local filtering or a new fetch request. | `{ term: String }` |
+| `ln-sort:change` | Listens | No | Column/field sort intent from [`ln-sort`](./ln-sort.md), **Data-Driven mode only** — SSR mode registers no listener at all (see "Sort Integration" in §1). An event with `field !== null` is intercepted: sets `currentSort`, re-sorts `_filteredData` locally and re-renders (non-windowed), or calls `_requestData()` for a fresh page (windowed, `data-ln-list-window`). An event with `field === null` is ignored (no `preventDefault()` called), leaving `ln-sort`'s own default DOM-reorder fallback to run. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-list:request-data` | Emits | No | Dispatched on initialization or parameter changes (sort, search, filter) to request data. Windowed mode (`data-ln-list-window`) additionally emits `offset`/`limit`/`queryGen`. | `{ list: String, sort: Object, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }` |
 | `ln-list:ready` | Emits | No | Dispatched after hydration or initial SSR item parsing completes. | `{ total: Number }` |
 | `ln-list:rendered` | Emits | No | Dispatched after items are appended/redrawn in the DOM. | `{ list: String, total: Number, visible: Number }` |
@@ -296,6 +350,7 @@ sequenceDiagram
 
 - [`ln-search`](./ln-search.md) — Dispatches `ln-search:change` to update the list's search criteria.
 - [`ln-filter`](./ln-filter.md) — Feeds multi-criteria options to the list.
+- [`ln-sort`](./ln-sort.md) — provides the sort trigger control; see §1 "Sort Integration" for the Data-Driven vs SSR listening difference.
 - [`ln-table`](./ln-table.md) — Paginated tabular alternative suitable for data-grid layout constraints.
 - [`ln-data-coordinator`](./ln-data-coordinator.md) — Bridges data store fetching automatically.
 

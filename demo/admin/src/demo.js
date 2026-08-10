@@ -216,7 +216,7 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 			btnToggle.setAttribute('data-ln-tooltip', 'Show HTML / SCSS Code');
 			btnToggle.setAttribute('data-ln-toggle-for', panelId);
 			btnToggle.setAttribute('data-ln-toggle-action', 'toggle');
-			btnToggle.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-code"></use></svg>';
+			btnToggle.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-code"></use></svg>';
 			header.appendChild(btnToggle);
 
 			// 4. Create Collapsible Wrapper and Code Panel Container
@@ -250,7 +250,7 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 				<div class="demo-code-header">
 					${headerHtml}
 					<button type="button" class="btn-copy-code" aria-label="Copy code">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-copy"></use></svg>
 						<span>Copy</span>
 					</button>
 				</div>
@@ -273,11 +273,11 @@ document.querySelectorAll('.demo-split').forEach(function(split) {
 				const textToCopy = activePane.querySelector('code').textContent;
 				navigator.clipboard.writeText(textToCopy).then(function () {
 					btnCopy.classList.add('copied');
-					btnCopy.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-check"></use></svg><span>Copied!</span>';
+					btnCopy.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-check"></use></svg><span>Copied!</span>';
 					
 					setTimeout(function () {
 						btnCopy.classList.remove('copied');
-						btnCopy.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-copy"></use></svg><span>Copy</span>';
+						btnCopy.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-copy"></use></svg><span>Copy</span>';
 					}, 2000);
 				}).catch(function (err) {
 					console.error('Failed to copy text: ', err);

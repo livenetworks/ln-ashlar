@@ -31,7 +31,7 @@ Discussion happens in main chat, execution in separate chats.
 - [x] reactive.md — translate + rewrite as reference doc (pattern now in COMPONENTS.md)
 
 ## 5. ln-acme Component Refactor (DONE except new features)
-- [x] Phase A — _findElements → findElements in 4 files (ln-ajax, ln-link, ln-progress, ln-table-sort)
+- [x] Phase A — _findElements → findElements in 4 files (ln-ajax, ln-link, ln-progress, ln-sort)
 - [x] Phase B1 — ln-store: threshold parsing, visibility staleness, synced event, listener cleanup
 - [x] Phase B2 — ln-data-table: inline styles fix, template scoping (cloneTemplateScoped), ln-core export
 
