@@ -11,7 +11,7 @@
 		border: 1px solid var(--border-muted);
 		line-height: 1.6;
 	}
-</style><section class="section-card">	<header><h3>Overview & Architecture</h3></header>	<main>		<p>This page demonstrates <strong>SSR hydration</strong>: the server prints finished rows into <code>&lt;tbody&gt;</code>, and <code>ln-table</code> attaches behavior on top of markup that already renders without JavaScript.</p>
+</style><section class="section-card">	<header><h3>Overview & Architecture</h3></header>	<main>		<p>This page demonstrates <strong>SSR hydration with a local cache &amp; remote sync layer</strong>: the server prints the first 100 rows into <code>&lt;tbody&gt;</code>, and <code>ln-table</code> hydrates them into the cache, then performs virtual windowed scrolling to fetch further pages on demand from a remote API.</p>
 
 <section class="alert-box">
 	<h4>
@@ -19,17 +19,17 @@
 		Lifecycle
 	</h4>
 	<ol>
-		<li><strong>Instant paint.</strong> 100 rows arrive as server-rendered <code>&lt;tr&gt;</code> elements. They are readable before any script runs, and they survive with JavaScript disabled.</li>
-		<li><strong>Hydration.</strong> On init, <code>ln-table</code> parses those rows into an in-memory dataset, taking each sort value from <code>data-ln-value</code> where present and falling back to cell text.</li>
-		<li><strong>Behavior only.</strong> Search, column filters, tri-state sort, row selection and the footer counters all operate over that hydrated set. No network calls are made.</li>
+		<li><strong>Instant paint.</strong> The first 100 rows arrive as server-rendered <code>&lt;tr&gt;</code> elements, readable before any script runs.</li>
+		<li><strong>Hydration.</strong> On init, <code>ln-table</code> parses those rows and ingests them into the resident cache store (<code>ln-data-store</code>).</li>
+		<li><strong>Data Sync.</strong> As the user scrolls, searches, or filters, the component executes virtual windowed paging, emitting requests that the <code>ln-data-coordinator</code> delegates to the <code>ln-api-connector</code> for remote fetching.</li>
 	</ol>
 </section>
 
 <h4>What each control is wired to</h4>
-<p>The toolbar search dispatches to <code>ln-table</code>, which matches against the text harvested from each row at parse time. The department and status popovers are <code>ln-filter</code> hosts scoped to this table, with their options authored from the domain vocabulary rather than derived from the visible rows. Each sortable header carries an <code>ln-sort</code> control whose <code>ln-sort:change</code> event the table consumes; file size and date columns sort on the raw <code>data-ln-value</code>, never on the formatted text.</p>
+<p>The toolbar search and department/status popovers dispatch to <code>ln-table</code>. Each sortable header carries an <code>ln-sort</code> control whose <code>ln-sort:change</code> event is intercepted. The <code>ln-data-coordinator</code> coordinates fetching new pages from the backend (<code>api.php</code>) via the <code>ln-api-connector</code> and feeding the cached data store.</p>
 
-<h4>Server-side paging</h4>
-<p>Fetching pages from a backend is a different mode, not an extension of this one. It requires <code>data-ln-table-source</code> — which flips the component into data-driven mode — plus <code>data-ln-table-window</code> to bound the resident cache, and something on the page to answer <code>ln-table:request-data</code>. This demo declares none of them, so everything above happens against the rows already in the document.</p>
+<h4>Server-side paging &amp; Data Layer</h4>
+<p>This demo uses <code>data-ln-table-source</code>, <code>data-ln-table-store</code> and <code>data-ln-table-window</code> to wire the table to the 3-Tier Data Layer. Scroll down to trigger remote chunk fetches dynamically.</p>
 	</main>
 </section>
 
@@ -45,8 +45,26 @@
 <section class="section-card" data-demo-html>
 	<header><h3>Interactive Table Demo</h3></header>
 	<main>
+		<!-- Declarative 3-Tier Data Layer -->
+		<ul data-ln-data-coordinator="hybrid-docs" id="hybrid-table-coordinator" hidden>
+			<li data-ln-data-store="hybrid-docs"
+			    data-ln-data-store-indexes="department,status,priority,updated_at"
+			    data-ln-data-store-search-fields="title,department,owner"
+			    id="hybrid-table-store"></li>
+			<li data-ln-api-connector
+			    data-ln-api-base-url="data"
+			    data-ln-api-path="/api.php"
+			    id="hybrid-table-connector"></li>
+		</ul>
+
 		<section data-ln-table="hybrid-docs"
+		         data-ln-table-store="hybrid-docs"
+		         data-ln-table-source="hybrid-docs"
 		         data-ln-table-selectable
+		         data-ln-table-window="1000"
+		         data-ln-table-window-page="200"
+		         data-ln-table-window-threshold="25"
+		         data-ln-table-count="10000"
 		         id="hybrid-table"
 		         class="data-table-demo">
 			<table>
@@ -71,7 +89,7 @@
 						<th data-ln-table-col-select></th>
 						<th data-ln-table-col="title">
 							Title
-							<ul data-ln-sort="hybrid-table" data-ln-sort-state="none">
+							<ul data-ln-sort="hybrid-table" data-ln-sort-field="title" data-ln-sort-state="none">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -82,7 +100,7 @@
 							<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-dept" aria-label="Filter department">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 							</button>
-							<ul data-ln-sort="hybrid-table" data-ln-sort-state="none">
+							<ul data-ln-sort="hybrid-table" data-ln-sort-field="department" data-ln-sort-state="none">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -93,7 +111,7 @@
 							<button type="button" class="table-filter" data-ln-table-col-filter data-ln-popover-for="filter-hybrid-status" aria-label="Filter status">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
 							</button>
-							<ul data-ln-sort="hybrid-table" data-ln-sort-state="none">
+							<ul data-ln-sort="hybrid-table" data-ln-sort-field="status" data-ln-sort-state="none">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -101,7 +119,7 @@
 						</th>
 						<th data-ln-table-col="priority">
 							Priority
-							<ul data-ln-sort="hybrid-table" data-ln-sort-state="none">
+							<ul data-ln-sort="hybrid-table" data-ln-sort-field="priority" data-ln-sort-state="none">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -109,7 +127,7 @@
 						</th>
 						<th data-ln-table-col="owner">
 							Owner
-							<ul data-ln-sort="hybrid-table" data-ln-sort-state="none">
+							<ul data-ln-sort="hybrid-table" data-ln-sort-field="owner" data-ln-sort-state="none">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -117,7 +135,7 @@
 						</th>
 						<th data-ln-table-col="file_size">
 							Size
-							<ul data-ln-sort="hybrid-table" data-ln-sort-state="none">
+							<ul data-ln-sort="hybrid-table" data-ln-sort-field="file_size" data-ln-sort-state="none">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -125,7 +143,7 @@
 						</th>
 						<th data-ln-table-col="updated_at">
 							Updated
-							<ul data-ln-sort="hybrid-table" data-ln-sort-state="none">
+							<ul data-ln-sort="hybrid-table" data-ln-sort-field="updated_at" data-ln-sort-state="none">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -1173,7 +1191,19 @@
 
 	document.addEventListener('DOMContentLoaded', function() {
 		log("Page loaded. 100 SSR pre-rendered rows visible in table.", 'var(--color-primary)');
-		log("Local SSR mode active: ln-table upgrades HTML rows and executes in-memory search, filter, and sort.", 'var(--color-primary)');
+		log("Declarative 3-Tier architecture active: data-ln-data-coordinator <-> data-ln-api-connector <-> data-ln-table-store.", 'var(--color-primary)');
+	});
+
+	tableEl.addEventListener('ln-table:request-data', function (e) {
+		log(`Component emitted 'ln-table:request-data' (offset: ${e.detail.offset || 0}, limit: ${e.detail.limit || 200})`, '#fbbf24');
+	});
+
+	tableEl.addEventListener('ln-table:ready', function(e) {
+		log(`Component emitted 'ln-table:ready' (Total parsed: ${e.detail.total}).`, 'var(--color-primary)');
+	});
+
+	tableEl.addEventListener('ln-table:rendered', function(e) {
+		log(`Component emitted 'ln-table:rendered' (Visible: ${e.detail.visible}, Total: ${e.detail.total}).`, '#34d399');
 	});
 
 	tableEl.addEventListener('ln-table:sorted', function (e) {
