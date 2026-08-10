@@ -49,10 +49,26 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		this.name = dom.getAttribute(DOM_SELECTOR) || '';
 		this.source = dom.getAttribute('data-ln-list-source') || '';
 
+		// Footer elements — both modes
+		this._totalSpan = dom.querySelector('[data-ln-list-total]');
+		this._filteredSpan = dom.querySelector('[data-ln-list-filtered]');
+		if (this._filteredSpan) {
+			this._filteredWrap = this._filteredSpan.parentElement !== dom
+				? this._filteredSpan.parentElement
+				: null;
+		}
+		this._selectedSpan = dom.querySelector('[data-ln-list-selected]');
+		if (this._selectedSpan) {
+			this._selectedWrap = this._selectedSpan.parentElement !== dom
+				? this._selectedSpan.parentElement
+				: null;
+		}
+
 		this._data = [];
 		this._filteredData = [];
 		this._searchTerm = '';
 		this._columnFilters = {};
+		this.selectedIds = new Set();
 
 		// Virtual scroll state
 		this._virtual = false;
@@ -67,6 +83,13 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 
 		const self = this;
 
+		// --- Selection (both modes) ---
+		this._selectable = dom.hasAttribute('data-ln-list-selectable');
+		this._selectableActive = false;
+		if (this._selectable) {
+			this._enableSelection();
+		}
+
 		if (this.isDataDriven) {
 			this.isLoaded = false;
 			this.totalCount = 0;
@@ -74,7 +97,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this.currentSort = null;
 			this.currentFilters = {};
 			this.currentSearch = '';
-			this.selectedIds = new Set();
 
 			this._windowed = false;
 			this._cache = null;
@@ -82,21 +104,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
-
-			// Footer elements
-			this._totalSpan = dom.querySelector('[data-ln-list-total]');
-			this._filteredSpan = dom.querySelector('[data-ln-list-filtered]');
-			if (this._filteredSpan) {
-				this._filteredWrap = this._filteredSpan.parentElement !== dom
-					? this._filteredSpan.parentElement
-					: null;
-			}
-			this._selectedSpan = dom.querySelector('[data-ln-list-selected]');
-			if (this._selectedSpan) {
-				this._selectedWrap = this._selectedSpan.parentElement !== dom
-					? this._selectedSpan.parentElement
-					: null;
-			}
 
 			// --- Event listeners ---
 			this._onSetData = function (e) {
@@ -172,12 +179,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			};
 			dom.addEventListener('ln-sort:change', this._onSort);
 
-			// --- Selection ---
-			this._selectable = dom.hasAttribute('data-ln-list-selectable');
-			this._selectableActive = false;
-			if (this._selectable) {
-				this._enableSelection();
-			}
+			// D4 — windowed lists cannot select rows they have never fetched
 			if (this._windowed && this._selectable && this._selectAllCheckbox) {
 				this._selectAllCheckbox.classList.add('hidden');
 			}
@@ -277,6 +279,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				self._vStart = -1;
 				self._vEnd = -1;
 				self._render();
+				self._updateFooter();
 				dispatch(dom, 'ln-list:filter', {
 					term: self._searchTerm,
 					matched: self._filteredData.length,
@@ -319,6 +322,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				self._vStart = -1;
 				self._vEnd = -1;
 				self._render();
+				self._updateFooter();
 				dispatch(dom, 'ln-list:filter', {
 					term: '',
 					matched: self._filteredData.length,
@@ -509,6 +513,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			const data = this._filteredData;
 			for (let i = 0; i < data.length; i++) html.push(data[i].html);
 			this.tbody.innerHTML = html.join('');
+			if (this._selectable) this._restoreSelection();
 		}
 	};
 
@@ -694,6 +699,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				html += `<${this.isUl ? 'li' : 'div'} class="ln-list__spacer" style="height:${bottomSpacerHeight}px;padding:0;border:none"></${this.isUl ? 'li' : 'div'}>`;
 			}
 			this.tbody.innerHTML = html;
+			if (this._selectable) this._restoreSelection();
 		}
 	};
 
@@ -933,6 +939,20 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		this._selectAllCheckbox.checked = allSelected;
 	};
 
+	// SSR re-render replays cached item HTML — reapply live selection state.
+	_component.prototype._restoreSelection = function () {
+		if (!this.tbody) return;
+		const items = this.tbody.querySelectorAll('[data-ln-item]');
+		for (let i = 0; i < items.length; i++) {
+			const id = items[i].getAttribute('data-ln-item-id');
+			const selected = id != null && this.selectedIds.has(String(id));
+			items[i].classList.toggle('ln-item-selected', selected);
+			const cb = items[i].querySelector('[data-ln-item-select]');
+			if (cb) cb.checked = selected;
+		}
+		this._updateSelectAll();
+	};
+
 	_component.prototype._requestData = function () {
 		if (this._windowed) {
 			this.dom.classList.add('ln-list--loading');
@@ -1085,13 +1105,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				this.tbody.removeEventListener('click', this._onItemAction);
 			}
 
-			if (this._onSelectionChange && this.tbody) {
-				this.tbody.removeEventListener('change', this._onSelectionChange);
-			}
-			if (this._selectAllCheckbox && this._onSelectAll) {
-				this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
-			}
-
 			this.dom.removeEventListener('ln-search:change', this._onSearchChange);
 		} else {
 			if (this._emptyObserver) {
@@ -1099,6 +1112,13 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				this._emptyObserver = null;
 			}
 			this.dom.removeEventListener('ln-search:change', this._onSearch);
+		}
+
+		if (this._onSelectionChange && this.tbody) {
+			this.tbody.removeEventListener('change', this._onSelectionChange);
+		}
+		if (this._selectAllCheckbox && this._onSelectAll) {
+			this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 		}
 
 		if (this._onClear) {
