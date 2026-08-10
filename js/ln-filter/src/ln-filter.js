@@ -156,7 +156,6 @@ import { persistGet, persistSet } from '../../ln-core';
 			}
 		}
 
-		dom.setAttribute(INIT_ATTR, '');
 		return this;
 	}
 
