@@ -3513,7 +3513,7 @@ H(Yt, be, Se, "ln-router", {
   function u(t) {
     this.dom = t, this.table = t.querySelector("table"), this.tbody = t.querySelector("[data-ln-table-body]") || t.querySelector("tbody"), this.thead = t.querySelector("thead");
     const n = this.thead ? this.thead.querySelector("tr:last-child") : null;
-    this.ths = n ? Array.from(n.querySelectorAll("th")) : [], this.isDataDriven = t.hasAttribute("data-ln-table-source"), this.name = t.getAttribute(f) || "", this.source = t.getAttribute("data-ln-table-source") || "", this._data = [], this._filteredData = [], this._searchTerm = "", this._sortCol = -1, this._sortDir = null, this._columnFilters = {}, this._virtual = !1, this._rowHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._scrollContainer = null, this._colgroup = null;
+    this.ths = n ? Array.from(n.querySelectorAll("th")) : [], this._totalSpan = t.querySelector("[data-ln-table-total]"), this._filteredSpan = t.querySelector("[data-ln-table-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== t ? this._filteredSpan.parentElement : null), this._selectedSpan = t.querySelector("[data-ln-table-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== t ? this._selectedSpan.parentElement : null), this.isDataDriven = t.hasAttribute("data-ln-table-source"), this.name = t.getAttribute(f) || "", this.source = t.getAttribute("data-ln-table-source") || "", this._data = [], this._filteredData = [], this._searchTerm = "", this._sortCol = -1, this._sortDir = null, this._columnFilters = {}, this.selectedIds = /* @__PURE__ */ new Set(), this._virtual = !1, this._rowHeight = 0, this._vStart = -1, this._vEnd = -1, this._rafId = null, this._scrollHandler = null, this._scrollContainer = null, this._colgroup = null;
     const i = this;
     return this._onSetSearch = function(s) {
       const e = (s.detail && s.detail.query != null ? s.detail.query : s.detail && s.detail.term != null ? s.detail.term : "").trim();
@@ -3551,7 +3551,7 @@ H(Yt, be, Se, "ln-router", {
         matched: i._filteredData.length,
         total: i._data.length
       }));
-    }, t.addEventListener("ln-table:request-clear-filters", this._onRequestClearFilters), this.isDataDriven ? (this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this.selectedIds = /* @__PURE__ */ new Set(), this._lastTotal = 0, this._lastFiltered = 0, this._windowed = !1, this._cache = null, this.isDataDriven && t.hasAttribute("data-ln-table-window") && this._enterWindowedMode(), this._totalSpan = t.querySelector("[data-ln-table-total]"), this._filteredSpan = t.querySelector("[data-ln-table-filtered]"), this._filteredSpan && (this._filteredWrap = this._filteredSpan.parentElement !== t ? this._filteredSpan.parentElement : null), this._selectedSpan = t.querySelector("[data-ln-table-selected]"), this._selectedSpan && (this._selectedWrap = this._selectedSpan.parentElement !== t ? this._selectedSpan.parentElement : null), this._onSetData = function(s) {
+    }, t.addEventListener("ln-table:request-clear-filters", this._onRequestClearFilters), this._selectable = t.hasAttribute("data-ln-table-selectable"), this._selectableActive = !1, this._selectable && this._enableSelection(), this.isDataDriven ? (this.isLoaded = !1, this.totalCount = 0, this.visibleCount = 0, this.currentSort = null, this.currentFilters = {}, this.currentSearch = "", this._lastTotal = 0, this._lastFiltered = 0, this._windowed = !1, this._cache = null, this.isDataDriven && t.hasAttribute("data-ln-table-window") && this._enterWindowedMode(), this._onSetData = function(s) {
       const e = s.detail || {};
       if (i._windowed) {
         t.classList.remove("ln-table--loading"), i._cache.ingest(e);
@@ -3567,7 +3567,7 @@ H(Yt, be, Se, "ln-router", {
       t.classList.toggle("ln-table--loading", !!e), e && (i.isLoaded = !1);
     }, t.addEventListener("ln-table:set-loading", this._onSetLoading), this._onSort = function(s) {
       s.preventDefault(), i.currentSort = s.detail.direction === "none" ? null : { field: s.detail.field, direction: s.detail.direction }, i._requestData();
-    }, t.addEventListener("ln-sort:change", this._onSort), this._selectable = t.hasAttribute("data-ln-table-selectable"), this._selectableActive = !1, this._selectable && this._enableSelection(), this._windowed && this._selectable && this._selectAllCheckbox && this._selectAllCheckbox.classList.add("hidden"), this._onRowClick = function(s) {
+    }, t.addEventListener("ln-sort:change", this._onSort), this._windowed && this._selectable && this._selectAllCheckbox && this._selectAllCheckbox.classList.add("hidden"), this._onRowClick = function(s) {
       if (s.target.closest("[data-ln-table-row-select]") || s.target.closest("[data-ln-table-row-action]") || s.target.closest("a") || s.target.closest("button") || s.ctrlKey || s.metaKey || s.button === 1) return;
       const e = s.target.closest("[data-ln-table-row]");
       if (!e) return;
@@ -3774,7 +3774,7 @@ H(Yt, be, Se, "ln-router", {
     } else {
       const t = [], n = this._filteredData;
       for (let i = 0; i < n.length; i++) t.push(n[i].html);
-      this.tbody.innerHTML = t.join("");
+      this.tbody.innerHTML = t.join(""), this._selectable && this._restoreSelection();
     }
   }, u.prototype._enableVirtualScroll = function() {
     if (this._virtual) return;
@@ -3844,7 +3844,7 @@ H(Yt, be, Se, "ln-router", {
       let L = "";
       w > 0 && (L += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' + E + '" style="height:' + w + 'px;padding:0;border:none"></td></tr>');
       for (let q = _; q < y; q++) L += t[q].html;
-      S > 0 && (L += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' + E + '" style="height:' + S + 'px;padding:0;border:none"></td></tr>'), this.tbody.innerHTML = L;
+      S > 0 && (L += '<tr class="ln-table__spacer" aria-hidden="true"><td colspan="' + E + '" style="height:' + S + 'px;padding:0;border:none"></td></tr>'), this.tbody.innerHTML = L, this._selectable && this._restoreSelection();
     }
   }, u.prototype._buildPlaceholderRow = function() {
     const t = document.createElement("tr");
@@ -4015,6 +4015,16 @@ H(Yt, be, Se, "ln-router", {
       }
     }
     this._selectAllCheckbox.checked = n;
+  }, u.prototype._restoreSelection = function() {
+    if (!this.tbody) return;
+    const t = this.tbody.querySelectorAll("[data-ln-table-row]");
+    for (let n = 0; n < t.length; n++) {
+      const i = t[n].getAttribute("data-ln-table-row-id"), s = i != null && this.selectedIds.has(i);
+      t[n].classList.toggle("ln-row-selected", s);
+      const e = t[n].querySelector("[data-ln-table-row-select]");
+      e && (e.checked = s);
+    }
+    this._updateSelectAll();
   }, Object.defineProperty(u.prototype, "selectedCount", {
     get: function() {
       return this.selectedIds.size;
@@ -4097,7 +4107,7 @@ H(Yt, be, Se, "ln-router", {
       n.classList.add("ln-row-focused"), n.setAttribute("tabindex", "0"), n.focus(), n.scrollIntoView({ block: "nearest" });
     }
   }, u.prototype.destroy = function() {
-    this.dom[l] && (this._disableVirtualScroll(), this.dom.removeEventListener("ln-table:set-search", this._onSetSearch), this.dom.removeEventListener("ln-table:set-filter", this._onSetFilter), this.dom.removeEventListener("ln-table:request-clear-filters", this._onRequestClearFilters), this.isDataDriven ? (this.dom.removeEventListener("ln-table:set-data", this._onSetData), this.dom.removeEventListener("ln-table:set-loading", this._onSetLoading), this.dom.removeEventListener("ln-sort:change", this._onSort), document.removeEventListener("keydown", this._onKeydown), this.tbody && (this.tbody.removeEventListener("click", this._onRowClick), this.tbody.removeEventListener("click", this._onRowAction)), this._onSelectionChange && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._onSelectAll && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this._cache && this._cache.destroy()) : (this._emptyTbodyObserver && (this._emptyTbodyObserver.disconnect(), this._emptyTbodyObserver = null), this.dom.removeEventListener("ln-sort:change", this._onSort)), this._colgroup && (this._colgroup.remove(), this._colgroup = null), this.table && (this.table.style.tableLayout = ""), this._data = [], this._filteredData = [], delete this.dom[l]);
+    this.dom[l] && (this._disableVirtualScroll(), this.dom.removeEventListener("ln-table:set-search", this._onSetSearch), this.dom.removeEventListener("ln-table:set-filter", this._onSetFilter), this.dom.removeEventListener("ln-table:request-clear-filters", this._onRequestClearFilters), this.isDataDriven ? (this.dom.removeEventListener("ln-table:set-data", this._onSetData), this.dom.removeEventListener("ln-table:set-loading", this._onSetLoading), this.dom.removeEventListener("ln-sort:change", this._onSort), document.removeEventListener("keydown", this._onKeydown), this.tbody && (this.tbody.removeEventListener("click", this._onRowClick), this.tbody.removeEventListener("click", this._onRowAction)), this._cache && this._cache.destroy()) : (this._emptyTbodyObserver && (this._emptyTbodyObserver.disconnect(), this._emptyTbodyObserver = null), this.dom.removeEventListener("ln-sort:change", this._onSort)), this._onSelectionChange && this.tbody && this.tbody.removeEventListener("change", this._onSelectionChange), this._selectAllCheckbox && this._onSelectAll && this._selectAllCheckbox.removeEventListener("change", this._onSelectAll), this._colgroup && (this._colgroup.remove(), this._colgroup = null), this.table && (this.table.style.tableLayout = ""), this._data = [], this._filteredData = [], delete this.dom[l]);
   }, H(f, l, u, "ln-table", {
     extraAttributes: [
       "data-ln-table-window",

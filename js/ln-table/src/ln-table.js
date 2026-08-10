@@ -49,6 +49,21 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		const colHeaderRow = this.thead ? this.thead.querySelector('tr:last-child') : null;
 		this.ths = colHeaderRow ? Array.from(colHeaderRow.querySelectorAll('th')) : [];
 
+		// Footer elements — both modes
+		this._totalSpan = dom.querySelector('[data-ln-table-total]');
+		this._filteredSpan = dom.querySelector('[data-ln-table-filtered]');
+		if (this._filteredSpan) {
+			this._filteredWrap = this._filteredSpan.parentElement !== dom
+				? this._filteredSpan.parentElement
+				: null;
+		}
+		this._selectedSpan = dom.querySelector('[data-ln-table-selected]');
+		if (this._selectedSpan) {
+			this._selectedWrap = this._selectedSpan.parentElement !== dom
+				? this._selectedSpan.parentElement
+				: null;
+		}
+
 		this.isDataDriven = dom.hasAttribute('data-ln-table-source');
 		this.name = dom.getAttribute(DOM_SELECTOR) || '';
 		this.source = dom.getAttribute('data-ln-table-source') || '';
@@ -59,6 +74,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		this._sortCol = -1;
 		this._sortDir = null;
 		this._columnFilters = {};
+		this.selectedIds = new Set();
 
 		// Virtual scroll state
 		this._virtual = false;
@@ -157,6 +173,13 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		};
 		dom.addEventListener('ln-table:request-clear-filters', this._onRequestClearFilters);
 
+		// --- Selection (both modes) ---
+		this._selectable = dom.hasAttribute('data-ln-table-selectable');
+		this._selectableActive = false;
+		if (this._selectable) {
+			this._enableSelection();
+		}
+
 		if (this.isDataDriven) {
 			this.isLoaded = false;
 			this.totalCount = 0;
@@ -164,7 +187,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this.currentSort = null;
 			this.currentFilters = {};
 			this.currentSearch = '';
-			this.selectedIds = new Set();
 
 			this._lastTotal = 0;
 			this._lastFiltered = 0;
@@ -173,21 +195,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this._windowed = false;
 			this._cache = null;
 			if (this.isDataDriven && dom.hasAttribute('data-ln-table-window')) this._enterWindowedMode();
-
-			// Footer elements
-			this._totalSpan = dom.querySelector('[data-ln-table-total]');
-			this._filteredSpan = dom.querySelector('[data-ln-table-filtered]');
-			if (this._filteredSpan) {
-				this._filteredWrap = this._filteredSpan.parentElement !== dom
-					? this._filteredSpan.parentElement
-					: null;
-			}
-			this._selectedSpan = dom.querySelector('[data-ln-table-selected]');
-			if (this._selectedSpan) {
-				this._selectedWrap = this._selectedSpan.parentElement !== dom
-					? this._selectedSpan.parentElement
-					: null;
-			}
 
 			// --- Event listeners ---
 			this._onSetData = function (e) {
@@ -239,12 +246,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			};
 			dom.addEventListener('ln-sort:change', this._onSort);
 
-			// --- Selection ---
-			this._selectable = dom.hasAttribute('data-ln-table-selectable');
-			this._selectableActive = false;
-			if (this._selectable) {
-				this._enableSelection();
-			}
 			// D4 — windowed tables cannot select rows they have never fetched
 			if (this._windowed && this._selectable && this._selectAllCheckbox) {
 				this._selectAllCheckbox.classList.add('hidden');
@@ -652,6 +653,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			const data = this._filteredData;
 			for (let i = 0; i < data.length; i++) html.push(data[i].html);
 			this.tbody.innerHTML = html.join('');
+			if (this._selectable) this._restoreSelection();
 		}
 	};
 
@@ -820,6 +822,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 
 			this.tbody.innerHTML = html;
+			if (this._selectable) this._restoreSelection();
 		}
 	};
 
@@ -1152,6 +1155,20 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		this._selectAllCheckbox.checked = allSelected;
 	};
 
+	// SSR re-render replays cached row HTML — reapply live selection state.
+	_component.prototype._restoreSelection = function () {
+		if (!this.tbody) return;
+		const rows = this.tbody.querySelectorAll('[data-ln-table-row]');
+		for (let i = 0; i < rows.length; i++) {
+			const id = rows[i].getAttribute('data-ln-table-row-id');
+			const selected = id != null && this.selectedIds.has(id);
+			rows[i].classList.toggle('ln-row-selected', selected);
+			const cb = rows[i].querySelector('[data-ln-table-row-select]');
+			if (cb) cb.checked = selected;
+		}
+		this._updateSelectAll();
+	};
+
 	Object.defineProperty(_component.prototype, 'selectedCount', {
 		get: function () { return this.selectedIds.size; },
 		set: function () { /* computed from selectedIds */ }
@@ -1360,8 +1377,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				this.tbody.removeEventListener('click', this._onRowClick);
 				this.tbody.removeEventListener('click', this._onRowAction);
 			}
-			if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);
-			if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 			if (this._cache) this._cache.destroy();
 		} else {
 			if (this._emptyTbodyObserver) {
@@ -1370,6 +1385,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			}
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
 		}
+
+		if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);
+		if (this._selectAllCheckbox && this._onSelectAll) this._selectAllCheckbox.removeEventListener('change', this._onSelectAll);
 
 		if (this._colgroup) {
 			this._colgroup.remove();
