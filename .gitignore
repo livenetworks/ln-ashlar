@@ -1,7 +1,7 @@
 node_modules/
 .DS_Store
 *.log
-js/ln-icons/tabler/
+js/ln-icon/tabler/
 /dist/
  
 # Built standalone components

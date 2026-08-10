@@ -3,31 +3,31 @@
 // page loads resolve instantly without network requests.
 //
 // Two prefixes:
-//   #ln-{name}   → Tabler CDN  (https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline)
-//   #lnc-{name}  → Custom CDN  (window.LN_ICONS_CUSTOM_CDN)
+//   #ln-icon-{name}        → Tabler CDN  (https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline)
+//   #ln-icon-custom-{name} → Custom CDN  (window.LN_ICON_CUSTOM_CDN)
 //
 // Config — set on window BEFORE this script loads:
-//   window.LN_ICONS_CDN        = 'https://...'   (override Tabler CDN base)
-//   window.LN_ICONS_CUSTOM_CDN = 'https://...'   (required for lnc- icons)
+//   window.LN_ICON_CDN        = 'https://...'   (override Tabler CDN base)
+//   window.LN_ICON_CUSTOM_CDN = 'https://...'   (required for custom icons)
 //
 // Cache: bump CACHE_VERSION to invalidate all cached icons.
 //
 // Usage:
-//   <svg class="ln-icon" aria-hidden="true"><use href="#ln-home"></use></svg>
-//   <svg class="ln-icon" aria-hidden="true"><use href="#lnc-file-pdf"></use></svg>
+//   <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg>
+//   <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-custom-file-pdf"></use></svg>
 
 (function () {
-	const SPRITE_ID  = 'ln-icons-sprite';
-	const PREFIX_LN  = '#ln-';
-	const PREFIX_LNC = '#lnc-';
+	const SPRITE_ID  = 'ln-icon-sprite';
+	const PREFIX_LN  = '#ln-icon-';
+	const PREFIX_LNC = '#ln-icon-custom-';
 
 	const loaded  = new Set();
 	const pending = new Set();
 	let spriteEl = null;
 
-	// Pinned version for cache stability — bump explicitly when upgrading. Override: window.LN_ICONS_CDN
-	const BASE_CDN   = (window.LN_ICONS_CDN        || 'https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline').replace(/\/$/, '');
-	const CUSTOM_CDN = (window.LN_ICONS_CUSTOM_CDN || '').replace(/\/$/, '');
+	// Pinned version for cache stability — bump explicitly when upgrading. Override: window.LN_ICON_CDN
+	const BASE_CDN   = (window.LN_ICON_CDN        || 'https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline').replace(/\/$/, '');
+	const CUSTOM_CDN = (window.LN_ICON_CUSTOM_CDN || '').replace(/\/$/, '');
 
 	const CACHE_PREFIX  = 'lni:';
 	const CACHE_VER_KEY = 'lni:v';
@@ -90,8 +90,12 @@
 	}
 
 	function _load(href) {
+		console.log('[ln-icon] _load called for:', href);
 		if (loaded.has(href) || pending.has(href)) return;
-		if (href.indexOf(PREFIX_LNC) === 0 && !CUSTOM_CDN) return;
+		if (href.indexOf(PREFIX_LNC) === 0 && !CUSTOM_CDN) {
+			console.warn('[ln-icon] Custom icon requested but no CUSTOM_CDN configured:', href);
+			return;
+		}
 
 		const id = href.slice(1);
 
@@ -99,6 +103,7 @@
 		try {
 			const cached = localStorage.getItem(CACHE_PREFIX + id);
 			if (cached) {
+				console.log('[ln-icon] Cache hit for:', id);
 				_addSymbol(id, cached);
 				loaded.add(href);
 				return;
@@ -106,19 +111,23 @@
 		} catch (e) { /* proceed to fetch */ }
 
 		pending.add(href);
+		const url = _url(href);
+		console.log('[ln-icon] Fetching from CDN:', url);
 
-		fetch(_url(href))
+		fetch(url)
 			.then(function (r) {
 				if (!r.ok) throw new Error(r.status);
 				return r.text();
 			})
 			.then(function (raw) {
+				console.log('[ln-icon] Fetch succeeded for:', id);
 				_addSymbol(id, raw);
 				loaded.add(href);
 				pending.delete(href);
 				try { localStorage.setItem(CACHE_PREFIX + id, raw); } catch (e) { /* storage full */ }
 			})
-			.catch(function () {
+			.catch(function (err) {
+				console.error('[ln-icon] Fetch failed for:', id, err);
 				pending.delete(href);
 			});
 	}
