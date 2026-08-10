@@ -11,13 +11,15 @@
 
 @mixin sort {
 	@include inline-flex;
-	list-style: none;
+	list-style: none !important;
+	list-style-type: none !important;
 	margin: 0;
 	padding: 0;
 	vertical-align: middle;
 
 	li {
-		list-style: none;
+		list-style: none !important;
+		list-style-type: none !important;
 	}
 
 	button {

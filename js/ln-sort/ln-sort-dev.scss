@@ -1,0 +1,8 @@
+@use '../../scss/config/mixins' as *;
+
+[data-ln-debug] {
+	// 1. Sort Target Check: an empty target id resolves to getElementById('') → null, so the control is silently inert
+	[data-ln-sort=""] {
+		@include dev-inline-error("data-ln-sort target is empty");
+	}
+}
