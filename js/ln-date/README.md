@@ -16,7 +16,7 @@ On initialization, the component wraps the original input in a `<span data-ln-da
     <input type="date" tabindex="-1" style="position:absolute;opacity:0;width:0;height:0;overflow:hidden;pointer-events:none">
     <input type="hidden" name="birthday" value="2026-04-19">
     <button type="button" aria-label="Open date picker">
-        <svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-calendar"></use></svg>
     </button>
 </span>
 ```

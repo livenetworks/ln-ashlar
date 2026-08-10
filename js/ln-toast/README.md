@@ -87,12 +87,12 @@ For server-side frameworks (like Laravel, Rails, or ASP.NET), the server authors
 <ul data-ln-toast data-ln-toast-timeout="6000" data-ln-toast-max="5" aria-live="polite" aria-atomic="false">
 	<li data-ln-toast-item class="success">
 		<div class="icon">
-			<svg class="ln-icon" aria-hidden="true"><use href="#ln-circle-check"></use></svg>
+			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-circle-check"></use></svg>
 		</div>
 		<section class="content">
 			<header>
 				<strong class="title">Saved</strong>
-				<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+				<button type="button" data-ln-toast-close aria-label="Close"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 			</header>
 			<main class="body"><p>Changes have been saved successfully.</p></main>
 		</section>

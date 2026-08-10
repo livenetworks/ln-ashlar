@@ -19,7 +19,7 @@ It supports two levels of execution: a **pure CSS baseline** (zero JS footprint,
 ### CSS Baseline (Zero JS)
 ```html
 <button type="button" data-ln-tooltip="Save document" aria-label="Save document">
-  <svg class="ln-icon" aria-hidden="true"><use href="#ln-device-floppy"></use></svg>
+  <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-device-floppy"></use></svg>
 </button>
 ```
 
@@ -31,7 +31,7 @@ Add `data-ln-tooltip-enhance` to activate advanced positioning and accessibility
         data-ln-tooltip-enhance 
         data-ln-tooltip-position="right"
         aria-label="Delete document">
-  <svg class="ln-icon" aria-hidden="true"><use href="#ln-trash"></use></svg>
+  <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
 </button>
 ```
 

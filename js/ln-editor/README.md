@@ -9,10 +9,10 @@ Lightweight WYSIWYG rich text editor. Enhances a `<textarea>` into a `contentEdi
     <div role="toolbar" aria-label="Text formatting">
         <ul>
             <li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-bold"></use></svg>
             </button></li>
             <li><button type="button" data-ln-editor-action="italic" aria-label="Italic">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-italic"></use></svg>
             </button></li>
         </ul>
     </div>
@@ -57,13 +57,13 @@ The toolbar is **authored HTML** — the consumer controls which buttons appear,
     <!-- Group 1: Inline formatting -->
     <ul>
         <li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-bold"></use></svg>
         </button></li>
         <li><button type="button" data-ln-editor-action="italic" aria-label="Italic">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-italic"></use></svg>
         </button></li>
         <li><button type="button" data-ln-editor-action="underline" aria-label="Underline">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-underline"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-underline"></use></svg>
         </button></li>
     </ul>
 
@@ -76,17 +76,17 @@ The toolbar is **authored HTML** — the consumer controls which buttons appear,
     <!-- Group 3: Lists -->
     <ul>
         <li><button type="button" data-ln-editor-action="unordered-list" aria-label="Bullet list">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-list"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list"></use></svg>
         </button></li>
         <li><button type="button" data-ln-editor-action="ordered-list" aria-label="Numbered list">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-list-numbers"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-list-numbers"></use></svg>
         </button></li>
     </ul>
 
     <!-- Group 4: Insert -->
     <ul>
         <li><button type="button" data-ln-editor-action="link" aria-label="Insert link">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-link"></use></svg>
         </button></li>
     </ul>
 </div>
@@ -115,10 +115,10 @@ This authored-markup design keeps the popover structure fully customizable and a
 	<div class="ln-editor__link-popover">
 		<input type="url" placeholder="https://…" />
 		<button type="button" data-ln-editor-action="confirm-link" aria-label="Confirm" title="Confirm">
-			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-check"></use></svg>
+			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-check"></use></svg>
 		</button>
 		<button type="button" data-ln-editor-action="cancel-link" aria-label="Cancel" title="Cancel">
-			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg>
+			<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 		</button>
 	</div>
 </template>
@@ -198,13 +198,13 @@ Include only the buttons you need:
     <div role="toolbar" aria-label="Text formatting">
         <ul>
             <li><button type="button" data-ln-editor-action="bold" aria-label="Bold">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-bold"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-bold"></use></svg>
             </button></li>
             <li><button type="button" data-ln-editor-action="italic" aria-label="Italic">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-italic"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-italic"></use></svg>
             </button></li>
             <li><button type="button" data-ln-editor-action="link" aria-label="Link">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-link"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-link"></use></svg>
             </button></li>
         </ul>
     </div>

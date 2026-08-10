@@ -26,7 +26,7 @@ On click, the text replaces with the confirmation prompt in-place, and the butto
 
 ```html
 <button aria-label="Delete item" data-ln-confirm="Confirm delete?">
-  <svg class="ln-icon"><use href="#ln-trash"></use></svg>
+  <svg class="ln-icon"><use href="#ln-icon-trash"></use></svg>
 </button>
 ```
 
@@ -36,7 +36,7 @@ On click, the text replaces with the confirmation prompt in-place, and the butto
 <button class="btn btn-danger" data-ln-confirm>
   <!-- Idle state -->
   <span data-ln-confirm-idle>
-    <svg class="ln-icon"><use href="#ln-trash"></use></svg>
+    <svg class="ln-icon"><use href="#ln-icon-trash"></use></svg>
     Delete Selected (<span data-ln-table-selected></span>)
   </span>
   <!-- Active (Confirming) state -->
@@ -136,7 +136,7 @@ For the same reason the shared observer watches `data-ln-confirm` only, **not** 
 
 - **Two-Element (recommended):** if the button contains `[data-ln-confirm-idle]` and `[data-ln-confirm-active]`, the component only toggles their `hidden` attribute — no DOM mutation, so inner icons / selection-count spans survive and all text stays authored in HTML.
 - **Legacy text:** no child markers → `dom.textContent` is swapped to `confirmText` and restored on revert.
-- **Icon-only:** fires when `originalText === ''` **and** a `svg.ln-icon use` exists at confirm time (checked fresh, to handle async-rendered icons). Swaps `<use href>` to `#ln-check` (ln-icons fetches it on demand), adds `.ln-confirm-tooltip` + `data-tooltip-text`, and handles a11y (below). Everything is restored symmetrically in `_reset`.
+- **Icon-only:** fires when `originalText === ''` **and** a `svg.ln-icon use` exists at confirm time (checked fresh, to handle async-rendered icons). Swaps `<use href>` to `#ln-icon-check` (ln-icon fetches it on demand), adds `.ln-confirm-tooltip` + `data-tooltip-text`, and handles a11y (below). Everything is restored symmetrically in `_reset`.
 
 ### Icon-only accessibility
 

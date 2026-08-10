@@ -32,13 +32,13 @@ For touch screens, limit drag triggers to a specific nested grab handle via `dat
 <ol data-ln-sortable>
   <li>
     <span data-ln-sortable-handle>
-      <svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+      <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
     </span>
     <span>Dashboard</span>
   </li>
   <li>
     <span data-ln-sortable-handle>
-      <svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
+      <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-menu"></use></svg>
     </span>
     <span>Users</span>
   </li>

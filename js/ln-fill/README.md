@@ -136,7 +136,7 @@ values** (not only text nodes), per-row trigger data stamps cleanly into
                         data-ln-fill-title="{{ title }}"
                         aria-label="Edit"
                     >
-                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-edit"></use></svg>
+                        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-edit"></use></svg>
                     </button>
                 </li>
             </ul>

@@ -32,7 +32,7 @@ Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `da
         <header>
             <h3>Add User</h3>
             <button type="button" data-ln-modal-close aria-label="Close">
-                <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+                <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
             </button>
         </header>
         

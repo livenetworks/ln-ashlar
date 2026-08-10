@@ -83,7 +83,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 			if (iconUse && this.originalText === '') {
 				this.isIconButton = true;
 				this.originalIconHref = iconUse.getAttribute('href');
-				iconUse.setAttribute('href', '#ln-check');
+				iconUse.setAttribute('href', '#ln-icon-check');
 				this.dom.classList.add('ln-confirm-tooltip');
 				this.dom.setAttribute('data-tooltip-text', this.confirmText);
 				this.dom.setAttribute('aria-label', this.confirmText);

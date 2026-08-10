@@ -275,7 +275,7 @@ import { dispatch, getLocale, registerComponent, interceptValueProperty, getLoca
 		const btn = document.createElement('button');
 		btn.type = 'button';
 		btn.setAttribute('aria-label', dom.getAttribute('data-ln-date-label') || 'Open date picker');
-		btn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-calendar"></use></svg>';
+		btn.innerHTML = '<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-calendar"></use></svg>';
 		picker.insertAdjacentElement('afterend', btn);
 		this._btn = btn;
 		this._lastISO = '';

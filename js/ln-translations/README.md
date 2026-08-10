@@ -29,7 +29,7 @@ Instead of writing custom layout handlers to manage multi-language fields, this 
     <!-- Locale Add Menu (Dropdown coordinated) -->
     <div data-ln-dropdown>
       <button type="button" data-ln-translations-add data-ln-toggle-for="trans-menu">
-        <svg class="ln-icon"><use href="#ln-world"></use></svg>
+        <svg class="ln-icon"><use href="#ln-icon-world"></use></svg>
       </button>
       <ul id="trans-menu" data-ln-toggle data-ln-dropdown-menu></ul>
     </div>
@@ -47,7 +47,7 @@ Instead of writing custom layout handlers to manage multi-language fields, this 
   <li>
     <p data-ln-translations-lang>
       <span></span>
-      <button type="button" aria-label="Remove"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-x"></use></svg></button>
+      <button type="button" aria-label="Remove"><svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
     </p>
   </li>
 </template>

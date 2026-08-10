@@ -72,7 +72,7 @@ Your template MUST include these elements for the component to function:
 | `<li>` root | `data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting"` | State classes toggled via `fill()` |
 | File name target | `data-ln-field="name"` | File name text |
 | Size/status target | `data-ln-field="sizeText"` | `"0%"` → `"45%"` → `"12.3 KB"` → `"Error"` |
-| File icon `<use>` | `data-ln-attr="href:iconHref"` | Auto-swapped to `#ln-file` / `#lnc-file-pdf` / `#lnc-file-doc` / `#lnc-file-epub` based on extension |
+| File icon `<use>` | `data-ln-attr="href:iconHref"` | Auto-swapped to `#ln-icon-file` / `#ln-icon-custom-file-pdf` / `#ln-icon-custom-file-doc` / `#ln-icon-custom-file-epub` based on extension |
 | Remove button | `data-ln-upload-action="remove"` and `data-ln-attr="aria-label:removeLabel, title:removeLabel"` | Click target (attribute-based, not class-based) |
 | Progress bar | `class="ln-upload__progress-bar"` | Width is animated imperatively via inline style |
 
@@ -82,13 +82,13 @@ Your template MUST include these elements for the component to function:
 <div data-ln-upload="/files/upload">
 	<template data-ln-template="ln-upload-item">
 		<li class="ln-upload__item" data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">
-			<svg class="ln-icon ln-icon--lg" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-file"></use></svg>
+			<svg class="ln-icon ln-icon--lg" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-icon-file"></use></svg>
 			<article>
 				<span class="ln-upload__name" data-ln-field="name"></span>
 				<span class="ln-upload__size" data-ln-field="sizeText"></span>
 			</article>
 			<button type="button" class="ln-upload__remove" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">
-				<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+				<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 			</button>
 			<div class="ln-upload__progress"><div class="ln-upload__progress-bar"></div></div>
 		</li>
@@ -177,12 +177,12 @@ Place nested hidden inputs (or any form fields) representing your upload metadat
 ## File Icons
 
 The component automatically adds an SVG icon per file type using the icon loader:
-- `#lnc-file-pdf` — PDF (custom CDN)
-- `#lnc-file-doc` — DOC/DOCX (custom CDN)
-- `#lnc-file-epub` — EPUB (custom CDN)
-- `#ln-file` — all other types (Tabler CDN)
+- `#ln-icon-custom-file-pdf` — PDF (custom CDN)
+- `#ln-icon-custom-file-doc` — DOC/DOCX (custom CDN)
+- `#ln-icon-custom-file-epub` — EPUB (custom CDN)
+- `#ln-icon-file` — all other types (Tabler CDN)
 
-Custom icons require `window.LN_ICONS_CUSTOM_CDN` to be set. See `js/ln-icons/README.md`.
+Custom icons require `window.LN_ICON_CUSTOM_CDN` to be set. See `js/ln-icon/README.md`.
 
 ## Hidden Inputs
 
@@ -227,7 +227,7 @@ Source: `js/ln-upload/ln-upload.js`. Each container has a closure-scoped `upload
 
 1. Validate extension against `data-ln-upload-accept`. Invalid → dispatch `ln-upload:invalid`, enqueue error toast, return.
 2. `cloneTemplateScoped` resolves the template (scoped → global → auto-injected default).
-3. `fill(li, {...})` populates name, `sizeText: '0%'`, icon `href`, `removeLabel`, and the `uploading`/`error`/`deleting` state classes in one pass — the `ln-icons` observer independently picks up the `<use href>` swap and fetches the sprite.
+3. `fill(li, {...})` populates name, `sizeText: '0%'`, icon `href`, `removeLabel`, and the `uploading`/`error`/`deleting` state classes in one pass — the `ln-icon` observer independently picks up the `<use href>` swap and fetches the sprite.
 4. `data-file-id` set (structural, not a `fill` slot); remove button disabled until upload completes.
 5. `<li>` appended to `.ln-upload__list`, XHR POST opened with `FormData` (nested container inputs serialized in).
 6. Progress: `progressBar.style.width` set imperatively + `fill(li, { sizeText: percent + '%' })`.

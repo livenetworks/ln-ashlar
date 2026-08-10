@@ -32,7 +32,7 @@
         <th data-ln-table-col="dept" data-ln-table-filter-col="dept">
           Оддел 
           <button type="button" data-ln-table-col-filter data-ln-popover-for="filter-dept">
-            <svg class="ln-icon" aria-hidden="true"><use href="#ln-filter"></use></svg>
+            <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
           </button>
         </th>
       </tr>

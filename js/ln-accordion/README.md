@@ -28,7 +28,7 @@ This is the standard HTML structure. The pairing of triggers and panels is by ID
         <!-- The Trigger -->
         <header data-ln-toggle-for="panel1">
             Section 1
-            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
         </header>
         <!-- The Collapsible Panel -->
         <section id="panel1" data-ln-toggle="open" class="collapsible">
@@ -40,7 +40,7 @@ This is the standard HTML structure. The pairing of triggers and panels is by ID
     <li>
         <header data-ln-toggle-for="panel2">
             Section 2
-            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-arrow-down"></use></svg>
+            <svg class="ln-icon ln-chevron" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg>
         </header>
         <section id="panel2" data-ln-toggle class="collapsible">
             <article class="collapsible-body">

@@ -23,10 +23,10 @@ clear button.
 
 ```html
 <label class="search">
-	<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 	<input type="search" placeholder="Search …" data-ln-search="<targetId>">
 	<button type="button" data-ln-search-clear aria-label="Clear search">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>
 </label>
 ```
@@ -74,10 +74,10 @@ and uses `class="search"` for the compact icon-group chrome (leading magnifier,
 recessed fill, clear button):
 ```html
 <label class="search">
-	<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 	<input type="search" placeholder="Search countries..." data-ln-search="countries-list">
 	<button type="button" data-ln-search-clear aria-label="Clear search">
-		<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>
 </label>
 ```

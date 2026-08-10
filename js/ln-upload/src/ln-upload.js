@@ -10,11 +10,11 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../..
 	const DEFAULT_ITEM_TEMPLATE_HTML =
 		'<template data-ln-template="ln-upload-item">' +
 			'<li class="ln-upload__item" data-ln-class="ln-upload__item--uploading:uploading, ln-upload__item--error:error, ln-upload__item--deleting:deleting">' +
-				'<svg class="ln-icon" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-file"></use></svg>' +
+				'<svg class="ln-icon" aria-hidden="true"><use data-ln-attr="href:iconHref" href="#ln-icon-file"></use></svg>' +
 				'<span class="ln-upload__name" data-ln-field="name"></span>' +
 				'<span class="ln-upload__size" data-ln-field="sizeText"></span>' +
 				'<button type="button" class="ln-upload__remove" data-ln-upload-action="remove" data-ln-attr="aria-label:removeLabel, title:removeLabel">' +
-					'<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>' +
+					'<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>' +
 				'</button>' +
 				'<div class="ln-upload__progress"><div class="ln-upload__progress-bar"></div></div>' +
 			'</li>' +
@@ -47,7 +47,7 @@ import { guardBody, dispatch, buildDict, cloneTemplateScoped, fill } from '../..
 	function _getIconId(extension) {
 		if (extension === 'docx') extension = 'doc';
 		const supported = ['pdf', 'doc', 'epub'];
-		return supported.includes(extension) ? 'lnc-file-' + extension : 'ln-file';
+		return supported.includes(extension) ? 'ln-icon-custom-file-' + extension : 'ln-icon-file';
 	}
 
 	function _isValidFile(file, acceptString) {

@@ -96,7 +96,7 @@ Source: `js/ln-http/ln-http.js`. A **service-style global**: wraps `window.fetch
 
 ### Parasitic design
 
-Other library components (`ln-form`, `ln-ajax`, `ln-store`, `ln-table`, `ln-icons`) call `fetch()` directly with no reference to ln-http. If ln-http loads, those calls are silently routed through the wrapper and inherit Path A dedup; if it doesn't load, they still work, just without dedup. No component has a hard dependency on ln-http.
+Other library components (`ln-form`, `ln-ajax`, `ln-store`, `ln-table`, `ln-icon`) call `fetch()` directly with no reference to ln-http. If ln-http loads, those calls are silently routed through the wrapper and inherit Path A dedup; if it doesn't load, they still work, just without dedup. No component has a hard dependency on ln-http.
 
 ### Path A — wrapped `fetch`
 
