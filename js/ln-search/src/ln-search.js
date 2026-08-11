@@ -4,7 +4,7 @@ import { dispatchCancelable, registerComponent } from '../../ln-core';
 	const DOM_SELECTOR = 'data-ln-search';
 	const DOM_ATTRIBUTE = 'lnSearch';
 	const HIDE_ATTR = 'data-ln-search-hide';
-	const DEBOUNCE_MS = 150;
+	const DEBOUNCE_MS = 500;
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
