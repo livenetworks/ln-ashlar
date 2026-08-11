@@ -598,9 +598,26 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 		});
 	};
 
+	_component.prototype.applyQuery = function (upsertedRecords, meta) {
+		meta = meta || {};
+		const self = this;
+
+		let chain = Promise.resolve();
+		if (upsertedRecords.length > 0) {
+			chain = chain.then(() => _putBulk(self._name, upsertedRecords));
+		}
+
+		return chain.then(() => _countRecords(self._name)).then(count => {
+			self.totalCount = meta.total !== undefined ? meta.total : count;
+		}).catch(err => {
+			console.error('[ln-data-store] applyQuery failed:', err);
+		});
+	};
+
 	// ─── Manual Triggers & Cleanup ─────────────────────────
 
 	_component.prototype.forceSync = function () {
+		if (this.isSyncing) return;
 		_triggerRemoteSync(this);
 	};
 

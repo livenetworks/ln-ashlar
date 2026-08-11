@@ -1041,6 +1041,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	// ─── Windowed Mode — enter/exit/seed (live toggle) ──────────
 
 	_component.prototype._enterWindowedMode = function () {
+		console.log('[DEBUG] enterWindowedMode called');
 		const self = this;
 		const dom = this.dom;
 		const winAttr = parseInt(dom.getAttribute('data-ln-table-window'), 10);
@@ -1094,6 +1095,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._kickWindowInitial = function () {
+		console.log('[DEBUG] kickWindowInitial called, data.length =', this._data.length);
 		if (this._data.length > 0) {
 			// SSR-seeded / warm-seeded: page 0 is already resident, the grand
 			// total is declared in markup — no initial fetch needed. No

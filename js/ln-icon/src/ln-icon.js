@@ -90,7 +90,6 @@
 	}
 
 	function _load(href) {
-		console.log('[ln-icon] _load called for:', href);
 		if (loaded.has(href) || pending.has(href)) return;
 		if (href.indexOf(PREFIX_LNC) === 0 && !CUSTOM_CDN) {
 			console.warn('[ln-icon] Custom icon requested but no CUSTOM_CDN configured:', href);
@@ -103,7 +102,6 @@
 		try {
 			const cached = localStorage.getItem(CACHE_PREFIX + id);
 			if (cached) {
-				console.log('[ln-icon] Cache hit for:', id);
 				_addSymbol(id, cached);
 				loaded.add(href);
 				return;
@@ -112,7 +110,6 @@
 
 		pending.add(href);
 		const url = _url(href);
-		console.log('[ln-icon] Fetching from CDN:', url);
 
 		fetch(url)
 			.then(function (r) {
@@ -120,7 +117,6 @@
 				return r.text();
 			})
 			.then(function (raw) {
-				console.log('[ln-icon] Fetch succeeded for:', id);
 				_addSymbol(id, raw);
 				loaded.add(href);
 				pending.delete(href);

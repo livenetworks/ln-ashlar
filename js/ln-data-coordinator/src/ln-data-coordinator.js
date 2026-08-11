@@ -487,14 +487,50 @@ import { MutationReceipts } from './mutation-receipts';
 
 				// 1. Pass fetched remote data strictly to ln-data-store (Single Source of Truth)
 				if (children.store && !children.store.initializationError) {
-					children.store.applySync(normalizedData, deletedIds, syncedAt || Math.floor(Date.now() / 1000), {
-						total: e.detail.total,
-						filtered: e.detail.filtered,
-						offset: e.detail.offset,
-						queryGen: e.detail.queryGen,
-						targetEl: meta.targetEl,
-						kind: meta.kind
-					});
+					if (meta.kind) {
+						if (meta.kind === 'table' || meta.kind === 'list') {
+							const cached = self._boundQueries.get(meta.targetEl) || { sort: null, filters: {}, search: '' };
+							console.log('[DEBUG] connFetched query: normalizedData.length =', normalizedData.length, 'cached =', JSON.stringify(cached));
+							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function () {
+								return children.store.getAll(cached);
+							}).then(function (r) {
+								console.log('[DEBUG] connFetched store.getAll: data.length =', r.data.length, 'total =', r.total, 'filtered =', r.filtered);
+								const detail = {
+									data: r.data,
+									total: (e.detail.total !== undefined) ? e.detail.total : r.total,
+									filtered: (e.detail.filtered !== undefined) ? e.detail.filtered : r.filtered,
+									offset: (e.detail.offset !== undefined) ? e.detail.offset : cached.offset,
+									queryGen: (e.detail.queryGen !== undefined) ? e.detail.queryGen : cached.queryGen
+								};
+								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
+								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', detail);
+								self._boundDelivered.set(meta.targetEl, true);
+							});
+						} else if (meta.kind === 'options') {
+							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function () {
+								return children.store.getAll({});
+							}).then(function (r) {
+								dispatch(meta.targetEl, 'ln-options:set-data', { data: r.data });
+							});
+						} else if (meta.kind === 'stat') {
+							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function () {
+								const count = e.detail.filtered !== undefined
+									? e.detail.filtered
+									: (e.detail.total !== undefined ? e.detail.total : normalizedData.length);
+								dispatch(meta.targetEl, 'ln-stat:set-count', { count: count });
+							});
+						}
+					} else {
+						children.store.applySync(normalizedData, deletedIds, syncedAt || Math.floor(Date.now() / 1000), {
+							total: e.detail.total,
+							filtered: e.detail.filtered,
+							offset: e.detail.offset,
+							queryGen: e.detail.queryGen,
+							targetEl: meta.targetEl,
+							kind: meta.kind,
+							op: meta.op
+						});
+					}
 				} else if (meta.targetEl && meta.kind) {
 					if (meta.kind === 'table' || meta.kind === 'list') {
 						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
@@ -729,7 +765,6 @@ import { MutationReceipts } from './mutation-receipts';
 
 		// Store-change refresh — attach to self.dom so bubbling store events are caught
 		self.dom.addEventListener('ln-data-store:ready',   self._handlers.refresh);
-		self.dom.addEventListener('ln-data-store:loaded',  self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:created', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:updated', self._handlers.refresh);
 		self.dom.addEventListener('ln-data-store:deleted', self._handlers.refresh);
@@ -964,7 +999,6 @@ import { MutationReceipts } from './mutation-receipts';
 
 			// Store-change listeners
 			self.dom.removeEventListener('ln-data-store:ready',   self._handlers.refresh);
-			self.dom.removeEventListener('ln-data-store:loaded',  self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:created', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:updated', self._handlers.refresh);
 			self.dom.removeEventListener('ln-data-store:deleted', self._handlers.refresh);

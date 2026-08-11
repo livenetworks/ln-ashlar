@@ -68,6 +68,8 @@ export function createWindowCache(config) {
 		// rows as freshly used, then checks if any page in range (padded by threshold)
 		// is missing from cache and needs to be fetched (page-aligned).
 		ensure: function (startRow, endRow) {
+			clearTimeout(debounceId);
+			console.log('[DEBUG] cache.ensure visible range:', startRow, 'to', endRow, 'logicalTotal =', logicalTotal, 'map.size =', map.size);
 			for (let i = startRow; i < endRow; i++) {
 				if (map.has(i)) stamp(i);
 			}
@@ -89,6 +91,7 @@ export function createWindowCache(config) {
 				let hasMissing = false;
 				for (let i = pOffset; i < pOffset + pLimit; i++) {
 					if (!map.has(i)) {
+						console.log('[DEBUG] cache.ensure missing key:', i, 'in page', p);
 						hasMissing = true;
 						break;
 					}
@@ -103,7 +106,7 @@ export function createWindowCache(config) {
 
 			if (targetPageOffset === -1) return;
 
-			clearTimeout(debounceId);
+			console.log('[DEBUG] cache.ensure scheduling fetch for offset:', targetPageOffset, 'limit:', targetPageLimit);
 			debounceId = setTimeout(function () {
 				fire(targetPageOffset, targetPageLimit);
 			}, fetchDebounce);
@@ -113,7 +116,11 @@ export function createWindowCache(config) {
 		// Out-of-order pages splice at their own offset, so order is irrelevant.
 		ingest: function (detail) {
 			detail = detail || {};
-			if (detail.queryGen != null && detail.queryGen !== queryGen) return;
+			console.log('[DEBUG] cache.ingest offset =', detail.offset, 'data.length =', detail.data ? detail.data.length : 0, 'queryGen =', detail.queryGen, 'current queryGen =', queryGen);
+			if (detail.queryGen != null && detail.queryGen !== queryGen) {
+				console.log('[DEBUG] cache.ingest dropped stale query response');
+				return;
+			}
 
 			grandTotal = detail.total != null ? detail.total : grandTotal;
 			logicalTotal = detail.filtered != null
