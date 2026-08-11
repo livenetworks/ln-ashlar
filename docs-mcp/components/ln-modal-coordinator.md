@@ -81,23 +81,23 @@ Key responsibilities include:
 
 ## 3. Declarative API Contract (Attributes & Events)
 
-### Attributes Recognized on Triggers & Modals
+### Attributes Table
 
-| Attribute | Element | Type / Values | Description |
-|---|---|---|---|
-| `data-ln-modal-for` | Trigger Button | Modal `id` | Connects button trigger to target `ln-modal` for open/toggle requests. |
-| `data-ln-modal-<key>` | Trigger Button | String | Populates display element `[data-ln-field="key"]` inside the modal. |
-| `data-ln-modal-mode` | `<dialog>` / Trigger | `"new"` \| `"edit"` | Specifies active mode; set automatically based on payload presence or hash parameter. |
-| `data-ln-fill-*` | Trigger Link | String | Populates form controls matching the `data-ln-fill-*` namespace. |
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-modal-for` | Trigger Button | Modal `id` | — | Connects button trigger to target `ln-modal` for open/toggle requests. |
+| `data-ln-modal-<key>` | Trigger Button | String | — | Populates display element `[data-ln-field="key"]` inside the modal. |
+| `data-ln-modal-mode` | `<dialog>` / Trigger | `"new"` \| `"edit"` | — | Specifies active mode; set automatically based on payload presence or hash parameter. |
+| `data-ln-fill-*` | Trigger Link | String | — | Populates form controls matching the `data-ln-fill-*` namespace. |
 
 ### Events API
 
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-modal:request-open` | Dispatches | No | Sent to target `ln-modal` to request panel opening. | `{ modalId: String }` |
-| `ln-modal:request-close` | Dispatches | No | Sent to target `ln-modal` to request panel closing. | `{ modalId: String }` |
-| `ln-form:request-reset` | Dispatches | No | Sent to inner `ln-form` to clear inputs after successful submit or cancel. | `{}` |
-| `ln-fill:request` | Dispatches | No | Sent to form layer to fill fields with record data. | `{ id: String, data: Object }` |
+| `ln-modal:request-open` | Emits | No | Sent to target `ln-modal` to request panel opening. | `{ modalId: String }` |
+| `ln-modal:request-close` | Emits | No | Sent to target `ln-modal` to request panel closing. | `{ modalId: String }` |
+| `ln-form:request-reset` | Emits | No | Sent to inner `ln-form` to clear inputs after successful submit or cancel. | `{}` |
+| `ln-fill:request` | Emits | No | Sent to form layer to fill fields with record data. | `{ id: String, data: Object }` |
 | `ln-form:success` | Listens | No | Catches form submission success, triggering hash cleanup and modal close. | `{ response: Object }` |
 | `ln-ajax:success` | Listens | No | Catches AJAX request success, triggering hash cleanup and modal close. | `{ response: Object }` |
 | `ln-form:error` | Listens | No | Catches form submit errors, keeping the modal open for user correction. | `{ errors: Array }` |

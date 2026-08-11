@@ -113,7 +113,7 @@ Dispatches debounced `ln-search:change` events to drive remote table queries:
 
 ### Attributes Table
 
-| Attribute | Element | Type | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-search` | Input / Label | String | — | Target element ID to filter or send search events to. |
 | `data-ln-search-items` | Input / Label | String | `null` | Optional CSS selector (e.g. `tbody tr`) targeting child elements instead of direct children. |
@@ -131,9 +131,9 @@ Dispatches debounced `ln-search:change` events to drive remote table queries:
 
 ### Events API
 
-| Event | Target | Cancelable | Payload `detail` | Description |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-search:change` | Target Container | Yes | `{ term: String, targetId: String }` | Dispatched when search term updates. `preventDefault()` skips default DOM show/hide. |
+| `ln-search:change` | Emits | Yes | Dispatched when search term updates. `preventDefault()` skips default DOM show/hide. | `{ term: String, targetId: String }` |
 
 ---
 

@@ -102,7 +102,7 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 
 ### Attributes Table
 
-| Attribute | Target Element | Type | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-toast` | Container (`ul`) | Identifier | — | Marks element as a toast container host. |
 | `data-ln-toast-timeout` | Container / Event | `Number (ms)` | `6000` | Display duration before auto-dismissal. `0` disables timeout. |
@@ -112,10 +112,10 @@ window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 
 ### Events API
 
-| Event | Target | Payload `detail` | Description |
-|---|---|---|---|
-| `ln-toast:enqueue` | `window` | `{ type, title, message, data, timeout, container }` | Dispatches a request to construct and append a new toast notification. |
-| `ln-toast:clear` | `window` | `{ container }` | Clears all active toast notifications (optionally filtered by container). |
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-toast:enqueue` | Listens | No | Dispatches a request to construct and append a new toast notification. | `{ type, title, message, data, timeout, container }` |
+| `ln-toast:clear` | Listens | No | Clears all active toast notifications (optionally filtered by container). | `{ container }` |
 
 ---
 

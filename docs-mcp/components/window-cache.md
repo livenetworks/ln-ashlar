@@ -131,13 +131,13 @@ In `ln-ashlar`, `windowSize`, `pageSize` (`window-page`), and `threshold` (`wind
 
 ---
 
-## 4. CSS Styling & Stacking Constraints
+## 5. CSS Styling & Stacking Constraints
 
 None. `window-cache` has no DOM footprint and applies no styles — see [ln-table](./ln-table.md) / [ln-list](./ln-list.md) for the render-side placeholder-row styling (static fill, no shimmer).
 
 ---
 
-## 5. Accessibility (ARIA) & Common Pitfalls
+## 6. Accessibility (ARIA) & Common Pitfalls
 
 - **Not directly ARIA-relevant** — `window-cache` produces no DOM. Accessibility of placeholder/loading states is owned by the render component (see [ln-table §5](./ln-table.md) / [ln-list §5](./ln-list.md)).
 
@@ -147,7 +147,7 @@ None. `window-cache` has no DOM footprint and applies no styles — see [ln-tabl
 
 ---
 
-## 6. Flow Diagram & Lifecycle
+## 7. Flow Diagram & Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -189,7 +189,7 @@ sequenceDiagram
 
 ---
 
-## 7. Related Guides & Components
+## 8. Related Guides & Components
 
 - [`guides/component-authoring`](../guides/component-authoring.md) — Guide on building custom components using ashlar core helpers.
 - [`ln-table`](./ln-table.md) — Consumes `createWindowCache` behind `data-ln-table-window`.

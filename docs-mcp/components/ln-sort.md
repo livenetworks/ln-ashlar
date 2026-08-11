@@ -35,7 +35,9 @@ It follows the same contract shape as [`ln-search`](./ln-search.md): dispatch-on
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Markup (SSR / DOM Table Column — index fallback)
+### Base HTML Markup
+
+*(SSR / DOM Table Column — index fallback)*
 
 Omit `data-ln-sort-field` and nest the `<ul>` inside the `<th>` so the `th.cellIndex` fallback resolves:
 
@@ -125,9 +127,9 @@ Target a generic `<ul>`/`<li>` container by `id`. Set `data-ln-sort-items` for d
 
 ### Events API
 
-| Event | Target | Cancelable | Payload `detail` | Description |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-sort:change` | Target Container | Yes | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` | Dispatched on the **target** (never on the sort control itself) on trigger click or persisted-state restore. `preventDefault()` hands the sort intent fully to the consumer and skips the default DOM reorder. |
+| `ln-sort:change` | Emits | Yes | Dispatched on the **target** (never on the sort control itself) on trigger click or persisted-state restore. `preventDefault()` hands the sort intent fully to the consumer and skips the default DOM reorder. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 
 ---
 

@@ -64,18 +64,18 @@ Disables parent prefix matching. Links are highlighted only if their `href` stri
 
 ### Attributes Table
 
-| Attribute | Target Element | Type | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-nav` | Host (`<nav>`, `<div>`) | String | `"active"` | Initializes component on container and defines the active CSS class name (e.g. `is-active`, `active`). |
 | `data-ln-nav-exact` | Host (`<nav>`, `<div>`) | Flag | `false` | When present, disables parent prefix matching and requires exact path equality. |
 
 ### Events API
 
-| Event | Direction | Cancelable | Payload `detail` | Description |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-nav:before-update` | Emits | Yes | `{ target: HTMLElement }` | Dispatched before evaluating and updating active link states. Cancelable. |
-| `ln-nav:update` | Emits | No | `{ target: HTMLElement }` | Dispatched after link active classes and `aria-current` attributes are applied. |
-| `ln-nav:destroyed` | Emits | No | `{ target: HTMLElement }` | Dispatched when `destroy()` is called on the component instance. |
+| `ln-nav:before-update` | Emits | Yes | Dispatched before evaluating and updating active link states. Cancelable. | `{ target: HTMLElement }` |
+| `ln-nav:updated` | Emits | No | Dispatched after active link states have been evaluated and CSS classes applied. | `{ activeLinks: Array, target: HTMLElement }` |
+| `ln-nav:destroyed` | Emits | No | Dispatched when `destroy()` is called on the component instance. | `{ target: HTMLElement }` |
 
 ---
 

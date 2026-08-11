@@ -72,7 +72,7 @@ Multiple child bars sharing one parent track:
 
 ### Attributes Table
 
-| Attribute | Target Element | Type / Values | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-progress` | Bar (`div`) | `Float` | `0` | Current progress value. Computed width percentage is clamped to `[0%, 100%]`. |
 | `data-ln-progress-max` | Bar (`div`) | `Float` | `100` | Maximum boundary value (denominator) for this specific bar. |
@@ -94,9 +94,9 @@ Instance interfaces accessed via `element.lnProgress`:
 
 ### Events API
 
-| Event | Direction | Cancelable | Payload `detail` | Description |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-progress:change` | Emits | No | `{ target: HTMLElement, value: Number, max: Number, percentage: Number }` | Dispatched on construction and every time value or max attributes change. |
+| `ln-progress:change` | Emits | No | Dispatched on construction and every time value or max attributes change. | `{ target: HTMLElement, value: Number, max: Number, percentage: Number }` |
 
 ---
 

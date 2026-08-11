@@ -96,7 +96,7 @@ The `ln-tabs` component (~180 lines JS) manages N-way exclusive selection of con
 
 ### Attributes Table
 
-| Attribute | Target Element | Type | Default | Description |
+| Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-tabs` | Host | Identifier | — | Initializes the tab group instance. |
 | `data-ln-tabs-active` | Host | State | — | Active tab key. Written by component; observed for reactive state changes. |
@@ -109,10 +109,10 @@ The `ln-tabs` component (~180 lines JS) manages N-way exclusive selection of con
 
 ### Events API
 
-| Event | Target | Payload `detail` | Description |
-|---|---|---|---|
-| `ln-tabs:change` | Host | `{ key: String, tab: HTMLElement, panel: HTMLElement }` | Dispatched after panel visibility, ARIA attributes, focus, and persistence updates complete. |
-| `ln-tabs:destroyed` | Host | `{ target: HTMLElement }` | Dispatched when `destroy()` is called on the instance. |
+| Event | Direction | Cancelable | Description | `detail` Object |
+|---|---|---|---|---|
+| `ln-tabs:change` | Emits | No | Dispatched after panel visibility, ARIA attributes, focus, and persistence updates complete. | `{ key: String, tab: HTMLElement, panel: HTMLElement }` |
+| `ln-tabs:destroyed` | Emits | No | Dispatched when `destroy()` is called on the instance. | `{ target: HTMLElement }` |
 
 ---
 

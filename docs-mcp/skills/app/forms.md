@@ -9,6 +9,8 @@ tags: [skill, form, selection-controls, validation, ln-specific]
 
 # Forms
 
+## Summary
+
 A form is a form — no scoped/unscoped variants, no per-method conditionals. Division of labor: `ln-validate` owns ALL validation (gate + `novalidate`, every method); `ln-form` owns fill and action; the write pipeline (coordinator claim) owns transport. The form's `action` URL is the single truth for the mutation target. Contracts: `../../components/ln-validate.md`, `../../components/ln-form.md`, `../../guides/write-workflow.md`.
 
 ---

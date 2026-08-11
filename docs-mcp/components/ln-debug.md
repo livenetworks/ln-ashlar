@@ -35,7 +35,7 @@ The JavaScript source is located at [ln-debug.js](../../js/ln-debug/src/ln-debug
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Global Debug Mode & Visual Linter
+### Base HTML Markup
 
 Place `data-ln-debug` on `<html>` or `<body>` and load `ln-ashlar-dev.css`:
 
@@ -74,17 +74,18 @@ console.log(tableInstance);
 
 ---
 
-## 3. Declarative API Contract
+## 3. Declarative API Contract (Attributes & Events)
 
-### Attributes
+### Attributes Table
 
-| Attribute | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `data-ln-debug` (on `html` / `body`) | `Flag` | — | Unmutes `[ln-` console warnings globally and activates the visual CSS linter. |
-| `data-ln-debug` (on any element) | `Flag` | — | Attaches component debug instance to `dom.lnDebug`. |
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-debug` | `html` / `body` | `Flag` | — | Unmutes `[ln-` console warnings globally and activates the visual CSS linter. |
+| `data-ln-debug` | Any element | `Flag` | — | Attaches component debug instance to `dom.lnDebug`. |
 
 ### Events API
-`ln-debug` is a passive service. It does not emit custom events.
+
+This component emits and listens to no custom ln-* events.
 
 ---
 

@@ -39,7 +39,7 @@ The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. 
 
 ## 2. Minimal HTML Markup & Usage Variants
 
-### Base HTML Template Routes
+### Base HTML Markup
 
 ```html
 <!-- Primary Routes -->
@@ -95,14 +95,14 @@ The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. 
 
 ### Attributes Table
 
-| Attribute | Element | Type | Description |
-|---|---|---|---|
-| `data-ln-route` | `<template>` | String | Registers template as a route with specified pattern (e.g. `/users/:id` or `*`). |
-| `data-ln-route-target` | `<template>` | String | ID of target container for auxiliary regions (defaults to primary `[data-ln-outlet]`). |
-| `data-ln-route-title` | `<template>` | String | Document title to apply on route match (`document.title`). |
-| `data-ln-route-keep` | Outlet Container | Flag | Skips DOM re-rendering when the matched template node has not changed. |
-| `data-ln-outlet` | `<main>` / `<div>` | Flag | Identifies the primary outlet container for main routes. |
-| `data-ln-router-hydrate` | Outlet Container | Flag | Prevents cloning initial template during server-side pre-rendered hydration. |
+| Attribute | Element | Type / Values | Default | Description |
+|---|---|---|---|---|
+| `data-ln-route` | `<template>` | String | — | Registers template as a route with specified pattern (e.g. `/users/:id` or `*`). |
+| `data-ln-route-target` | `<template>` | String | — | ID of target container for auxiliary regions (defaults to primary `[data-ln-outlet]`). |
+| `data-ln-route-title` | `<template>` | String | — | Document title to apply on route match (`document.title`). |
+| `data-ln-route-keep` | Outlet Container | Flag | — | Skips DOM re-rendering when the matched template node has not changed. |
+| `data-ln-outlet` | `<main>` / `<div>` | Flag | — | Identifies the primary outlet container for main routes. |
+| `data-ln-router-hydrate` | Outlet Container | Flag | — | Prevents cloning initial template during server-side pre-rendered hydration. |
 
 ### Programmatic JS API (`window.lnRouter` / `router`)
 
@@ -114,11 +114,11 @@ The `ln-router` component is the client-side SPA routing engine of `ln-ashlar`. 
 
 ### Events API
 
-| Event | Target | Cancelable | Payload `detail` | Description |
+| Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
-| `ln-router:before-navigate` | Primary Outlet | Yes | `{ from: String, to: String, params: Object, query: Object }` | Dispatched before navigation starts. Calling `preventDefault()` aborts route swap. |
-| `ln-router:navigated` | Swapped Outlets | No | `{ path, params, query, route, target, region }` | Dispatched on each updated target container after DOM replacement and focus setup. |
-| `ln-router:not-found` | `document.body` | No | `{ path: String }` | Dispatched when no route matches the requested URL. |
+| `ln-router:before-navigate` | Emits | Yes | Dispatched before navigation starts. Calling `preventDefault()` aborts route swap. | `{ from: String, to: String, params: Object, query: Object }` |
+| `ln-router:navigated` | Emits | No | Dispatched on each updated target container after DOM replacement and focus setup. | `{ path, params, query, route, target, region }` |
+| `ln-router:not-found` | Emits | No | Dispatched when no route matches the requested URL. | `{ path: String }` |
 
 ---
 
