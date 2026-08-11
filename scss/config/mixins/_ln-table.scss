@@ -364,11 +364,14 @@
 	}
 }
 
-// Windowed-virtualization placeholder row — blank, row-height chrome only (D2).
+// Windowed-virtualization placeholder row — static fill, row-height chrome
+// only. No shimmer (window-cache.md §4); height stays JS-owned via inline
+// px, spacer geometry depends on the exact value so nothing here may touch it.
 @mixin ln-table-placeholder-row {
 	td {
 		padding: 0 !important;
 		border: none !important;
+		background: var(--bg-sunken);
 	}
 }
 

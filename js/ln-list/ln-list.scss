@@ -11,3 +11,18 @@
 .ln-list__spacer {
 	grid-column: 1 / -1;
 }
+
+// Windowed-virtualization placeholder item — static fill, no shimmer, parity
+// with ln-table (window-cache.md §4). margin must stay zeroed: JS assigns
+// height from the real item's outerHeight (offsetHeight + margin already
+// folded in), so an inherited margin here would double-count and desync the
+// spacer math. padding/border zeroed so the fill paints edge-to-edge; no
+// grid-column override — each placeholder is one cell, not a collapsed
+// row block like the spacer.
+.ln-list__placeholder {
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	list-style: none !important;
+	background: var(--bg-sunken);
+}
