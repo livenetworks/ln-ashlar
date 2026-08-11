@@ -559,7 +559,6 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 	_component.prototype.applySync = function (upsertedRecords, deletedIds, syncedAt, meta) {
 		meta = meta || {};
 		const self = this;
-		const hasChanges = upsertedRecords.length > 0 || deletedIds.length > 0;
 
 		let chain = Promise.resolve();
 		if (upsertedRecords.length > 0) chain = chain.then(() => _putBulk(self._name, upsertedRecords));
@@ -609,8 +608,12 @@ import { registerComponent, dispatch, setCryptoKey, getCryptoKey, encryptData, d
 
 		return chain.then(() => _countRecords(self._name)).then(count => {
 			self.totalCount = meta.total !== undefined ? meta.total : count;
+			// record_count/has_cache stay untouched — a page fetch is not an
+			// authoritative cache; it would corrupt _isStale/storeInitialized sync gating.
+			return _decorate(self, upsertedRecords);
 		}).catch(err => {
 			console.error('[ln-data-store] applyQuery failed:', err);
+			return [];
 		});
 	};
 

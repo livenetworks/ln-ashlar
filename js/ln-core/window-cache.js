@@ -18,6 +18,7 @@ export function createWindowCache(config) {
 	let fetchDebounce = config.fetchDebounce != null ? config.fetchDebounce : 120;
 	const requestPage = typeof config.requestPage === 'function' ? config.requestPage : function () {};
 	const onChange = typeof config.onChange === 'function' ? config.onChange : function () {};
+	const onSwap = typeof config.onSwap === 'function' ? config.onSwap : function () {};
 
 	const map = new Map();       // logicalIndex → record
 	const touch = new Map();     // logicalIndex → seq (LRU stamp)
@@ -28,6 +29,9 @@ export function createWindowCache(config) {
 	let query = { sort: null, filters: {}, search: '' };
 	let debounceId = null;
 	let seq = 0;
+	let lastRangeStart = 0;       // last ensure() visible range — revalidate() re-targets here, not page 0
+	let lastRangeEnd = 0;
+	let pendingSwapOrigin = null; // 'invalidate' | 'revalidate' | null — consumed by the new generation's first ingest()
 
 	function stamp(i) { touch.set(i, ++seq); }
 
@@ -69,7 +73,8 @@ export function createWindowCache(config) {
 		// is missing from cache and needs to be fetched (page-aligned).
 		ensure: function (startRow, endRow) {
 			clearTimeout(debounceId);
-			console.log('[DEBUG] cache.ensure visible range:', startRow, 'to', endRow, 'logicalTotal =', logicalTotal, 'map.size =', map.size);
+			lastRangeStart = startRow;
+			lastRangeEnd = endRow;
 			for (let i = startRow; i < endRow; i++) {
 				if (map.has(i)) stamp(i);
 			}
@@ -91,7 +96,6 @@ export function createWindowCache(config) {
 				let hasMissing = false;
 				for (let i = pOffset; i < pOffset + pLimit; i++) {
 					if (!map.has(i)) {
-						console.log('[DEBUG] cache.ensure missing key:', i, 'in page', p);
 						hasMissing = true;
 						break;
 					}
@@ -106,7 +110,6 @@ export function createWindowCache(config) {
 
 			if (targetPageOffset === -1) return;
 
-			console.log('[DEBUG] cache.ensure scheduling fetch for offset:', targetPageOffset, 'limit:', targetPageLimit);
 			debounceId = setTimeout(function () {
 				fire(targetPageOffset, targetPageLimit);
 			}, fetchDebounce);
@@ -116,10 +119,15 @@ export function createWindowCache(config) {
 		// Out-of-order pages splice at their own offset, so order is irrelevant.
 		ingest: function (detail) {
 			detail = detail || {};
-			console.log('[DEBUG] cache.ingest offset =', detail.offset, 'data.length =', detail.data ? detail.data.length : 0, 'queryGen =', detail.queryGen, 'current queryGen =', queryGen);
-			if (detail.queryGen != null && detail.queryGen !== queryGen) {
-				console.log('[DEBUG] cache.ingest dropped stale query response');
-				return;
+			if (detail.queryGen != null && detail.queryGen !== queryGen) return;
+
+			// First response of a new generation: drop the stale rows now, at the
+			// swap moment, not at invalidate()/revalidate() time — stale-while-revalidate.
+			if (pendingSwapOrigin) {
+				map.clear();
+				touch.clear();
+				onSwap(pendingSwapOrigin);
+				pendingSwapOrigin = null;
 			}
 
 			grandTotal = detail.total != null ? detail.total : grandTotal;
@@ -144,17 +152,35 @@ export function createWindowCache(config) {
 			fire(0, pageSize);
 		},
 
-		// Query change: new generation, drop everything, refetch page 0, then
-		// notify for an immediate all-placeholder repaint at the stale height.
+		// Query change: new generation, stale rows stay visible until the first
+		// response of the new generation lands in ingest() — no blanking, no
+		// placeholder flash (ln-table--loading is the refresh affordance).
 		invalidate: function (q) {
 			queryGen++;
-			map.clear();
-			touch.clear();
 			inflight.clear();
 			clearTimeout(debounceId);
 			if (q) query = q;
+			pendingSwapOrigin = 'invalidate';
 			fire(0, pageSize);
-			onChange();
+		},
+
+		// Post-mutation refresh of a windowed view: same stale-while-revalidate
+		// swap as invalidate(), but re-requests the page at the CURRENT scroll
+		// position instead of jumping back to page 0.
+		revalidate: function () {
+			queryGen++;
+			inflight.clear();
+			clearTimeout(debounceId);
+			pendingSwapOrigin = 'revalidate';
+			const offset = Math.max(0, Math.floor(lastRangeStart / pageSize) * pageSize);
+			const limit = logicalTotal > 0 ? Math.min(pageSize, Math.max(1, logicalTotal - offset)) : pageSize;
+			fire(offset, limit);
+		},
+
+		// Failed page fetch: release the offset so the next ensure() (scroll,
+		// filter, resize) can re-request it. No onChange(), no auto-retry.
+		release: function (offset) {
+			inflight.delete(offset);
 		},
 
 		destroy: function () {

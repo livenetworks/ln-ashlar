@@ -471,6 +471,9 @@ const cache = createWindowCache({
 			queryGen: cache.queryGen
 		});
 	},
+	onSwap: function (origin) {
+		if (origin === 'invalidate') self._scrollContainer.scrollTop = 0;
+	},
 	onChange: function () { self._render(); }
 });
 
@@ -486,6 +489,7 @@ cache.requestInitial({ sort: null, filters: {}, search: '' });
 | `fetchDebounce` | `120` | Milliseconds to coalesce `ensure()` calls before firing a fetch. |
 | `overscan` | `15` | Rows padded onto the fetch range (not the render range) on either side. |
 | `requestPage(query, offset, limit)` | no-op | Callback — kick a fetch over any transport. |
+| `onSwap(origin)` | no-op | Callback — fires from `ingest()` at the moment the first response of a new generation lands, right before `onChange()`. `origin` is `'invalidate'` (query change — consumer should reset scroll to top) or `'revalidate'` (post-mutation refresh — consumer must NOT reset scroll). |
 | `onChange()` | no-op | Callback — cache mutated, re-render. |
 
 **Returns:**
@@ -500,9 +504,11 @@ cache.requestInitial({ sort: null, filters: {}, search: '' });
 | `queryGen` *(getter)* | `Number` | Current query generation — bumped by `invalidate()`. |
 | `size` *(getter)* | `Number` | Resident row count. |
 | `ensure` | `(startRow, endRow)` | Render client hands its visible logical range; stamps in-range resident rows as freshly touched, debounce-fires a fetch for whatever is missing (padded by `overscan`). |
-| `ingest` | `(detail)` | Splice a fetched page into the cache. Drops responses whose `detail.queryGen` doesn't match the current generation. Triggers `onChange()`. |
+| `ingest` | `(detail)` | Splice a fetched page into the cache. Drops responses whose `detail.queryGen` doesn't match the current generation. On the first response of a new generation (a pending `invalidate()`/`revalidate()` swap), clears the stale cache contents and fires `onSwap(origin)` before splicing. Triggers `onChange()`. |
 | `requestInitial` | `(query)` | First load — fetches page 0 at the current generation (no bump). |
-| `invalidate` | `(query)` | Query change — bumps `queryGen`, clears the cache, refetches page 0, fires `onChange()` for an immediate all-placeholder repaint. |
+| `invalidate` | `(query)` | Query change — bumps `queryGen`, refetches page 0. Stale rows and totals stay resident until the new generation's first page lands in `ingest()` (stale-while-revalidate); that's also when `onSwap('invalidate')` and `onChange()` fire. |
+| `revalidate` | `()` | Post-mutation refresh — bumps `queryGen`, re-requests the page containing the last `ensure()`-reported visible range instead of jumping back to page 0. Same stale-while-revalidate swap as `invalidate()`, but fires `onSwap('revalidate')` so the consumer knows not to reset scroll. |
+| `release` | `(offset)` | Drops `offset` from the in-flight set after a failed page fetch, so the next `ensure()` can re-request it. No re-render, no auto-retry. |
 | `configure` | `(partial)` | Live-mutate any subset of `{windowSize, pageSize, threshold, fetchDebounce}`. Shrinking `windowSize` runs `evict()` then `onChange()`; `pageSize`/`threshold`/`fetchDebounce` apply to the next `ensure()` with no immediate render. |
 | `setGrandTotal` | `(n)` | Sets `grandTotal`; moves `logicalTotal` to `n` too, but only when no `search`/`filters` are active on the current query (a filtered total is server-owned via `ingest`). Fires `onChange()`. |
 | `destroy` | `()` | Clears timers and cache contents. |

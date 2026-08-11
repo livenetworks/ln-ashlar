@@ -489,21 +489,15 @@ import { MutationReceipts } from './mutation-receipts';
 				if (children.store && !children.store.initializationError) {
 					if (meta.kind) {
 						if (meta.kind === 'table' || meta.kind === 'list') {
-							const cached = self._boundQueries.get(meta.targetEl) || { sort: null, filters: {}, search: '' };
-							console.log('[DEBUG] connFetched query: normalizedData.length =', normalizedData.length, 'cached =', JSON.stringify(cached));
-							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function () {
-								return children.store.getAll(cached);
-							}).then(function (r) {
-								console.log('[DEBUG] connFetched store.getAll: data.length =', r.data.length, 'total =', r.total, 'filtered =', r.filtered);
-								const detail = {
-									data: r.data,
-									total: (e.detail.total !== undefined) ? e.detail.total : r.total,
-									filtered: (e.detail.filtered !== undefined) ? e.detail.filtered : r.filtered,
-									offset: (e.detail.offset !== undefined) ? e.detail.offset : cached.offset,
-									queryGen: (e.detail.queryGen !== undefined) ? e.detail.queryGen : cached.queryGen
-								};
+							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function (decorated) {
 								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
-								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', detail);
+								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', {
+									data: decorated,
+									total: e.detail.total !== undefined ? e.detail.total : decorated.length,
+									filtered: e.detail.filtered !== undefined ? e.detail.filtered : decorated.length,
+									offset: e.detail.offset,
+									queryGen: e.detail.queryGen
+								});
 								self._boundDelivered.set(meta.targetEl, true);
 							});
 						} else if (meta.kind === 'options') {
@@ -526,9 +520,7 @@ import { MutationReceipts } from './mutation-receipts';
 							filtered: e.detail.filtered,
 							offset: e.detail.offset,
 							queryGen: e.detail.queryGen,
-							targetEl: meta.targetEl,
-							kind: meta.kind,
-							op: meta.op
+							targetEl: meta.targetEl
 						});
 					}
 				} else if (meta.targetEl && meta.kind) {
@@ -635,6 +627,9 @@ import { MutationReceipts } from './mutation-receipts';
 				if (op === 'query') {
 					if (meta.targetEl && meta.kind) {
 						dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
+						if (meta.kind === 'table' || meta.kind === 'list') {
+							dispatch(meta.targetEl, 'ln-' + meta.kind + ':page-failed', { offset: meta.offset });
+						}
 					}
 					self._reportReconciliationError('query', detail.error || detail, meta);
 					return;
@@ -804,7 +799,7 @@ import { MutationReceipts } from './mutation-receipts';
 				dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
 				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
 					query: query,
-					meta: { targetEl: el, kind: kind }
+					meta: { targetEl: el, kind: kind, offset: query.offset, limit: query.limit }
 				});
 				return;
 			}
@@ -920,6 +915,11 @@ import { MutationReceipts } from './mutation-receipts';
 			const store = this.findChildren().store;
 
 			if (kind === 'table' || kind === 'list') {
+				const windowAttr = kind === 'table' ? 'data-ln-table-window' : 'data-ln-list-window';
+				if (el.hasAttribute(windowAttr)) {
+					dispatch(el, 'ln-' + kind + ':request-revalidate', {});
+					continue;
+				}
 				const cached = self._boundQueries.get(el) || { sort: null, filters: {}, search: '' };
 				(function (capturedEl, capturedKind) {
 					store.getAll(cached).then(function (r) {

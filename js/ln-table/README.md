@@ -128,6 +128,10 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
   Applies the payload array and triggers rendering. Windowed mode expects `{ offset, queryGen }` echoed back — routed straight into the internal window cache.
 - **`ln-table:set-loading`** `{ loading }`  
   Toggles the visual loading dimmed state overlay.
+- **`ln-table:page-failed`** `{ offset }`  
+  Windowed mode: the coordinator reports the page fetch at `offset` failed. Releases it from the cache's in-flight set — no auto-retry; the next `ensure()` (scroll, filter, resize) requests it again.
+- **`ln-table:request-revalidate`**  
+  Windowed mode: the coordinator asks the cache to re-fetch the currently visible page after a local mutation. Stale rows stay visible until the response lands; does not jump back to page 0.
 
 ---
 

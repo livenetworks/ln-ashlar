@@ -32,6 +32,23 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		return null;
 	}
 
+	function _saveScroll(self) {
+		const sc = self._scrollContainer || _findScrollContainer(self.dom);
+		return {
+			container: sc,
+			top: sc ? sc.scrollTop : window.scrollY
+		};
+	}
+
+	function _restoreScroll(state) {
+		if (state.container) {
+			state.container.scrollTop = state.top;
+		} else {
+			window.scrollTo(window.scrollX, state.top);
+		}
+	}
+
+
 	function _getOuterHeight(el) {
 		if (!el) return 0;
 		const cs = getComputedStyle(el);
@@ -146,6 +163,18 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				}
 			};
 			dom.addEventListener('ln-list:set-loading', this._onSetLoading);
+
+			this._onPageFailed = function (e) {
+				if (!self._windowed || !self._cache) return;
+				self._cache.release(e.detail && e.detail.offset);
+			};
+			dom.addEventListener('ln-list:page-failed', this._onPageFailed);
+
+			this._onRequestRevalidate = function () {
+				if (!self._windowed || !self._cache) return;
+				self._cache.revalidate();
+			};
+			dom.addEventListener('ln-list:request-revalidate', this._onRequestRevalidate);
 
 			// Clear all
 			this._onClearAll = function (e) {
@@ -504,15 +533,21 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				frag.appendChild(el);
 			}
 
+			const scrollState = _saveScroll(this);
 			this.tbody.textContent = '';
 			this.tbody.appendChild(frag);
+			_restoreScroll(scrollState);
 
 			if (this._selectable) this._updateSelectAll();
 		} else {
 			const html = [];
 			const data = this._filteredData;
 			for (let i = 0; i < data.length; i++) html.push(data[i].html);
+
+			const scrollState = _saveScroll(this);
 			this.tbody.innerHTML = html.join('');
+			_restoreScroll(scrollState);
+
 			if (this._selectable) this._restoreSelection();
 		}
 	};
@@ -683,8 +718,10 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 				frag.appendChild(bottomSpacer);
 			}
 
+			const scrollState = _saveScroll(this);
 			this.tbody.textContent = '';
 			this.tbody.appendChild(frag);
+			_restoreScroll(scrollState);
 
 			if (this._selectable) this._updateSelectAll();
 		} else {
@@ -698,7 +735,11 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (bottomSpacerHeight > 0) {
 				html += `<${this.isUl ? 'li' : 'div'} class="ln-list__spacer" style="height:${bottomSpacerHeight}px;padding:0;border:none"></${this.isUl ? 'li' : 'div'}>`;
 			}
+
+			const scrollState = _saveScroll(this);
 			this.tbody.innerHTML = html;
+			_restoreScroll(scrollState);
+
 			if (this._selectable) this._restoreSelection();
 		}
 	};
@@ -780,8 +821,10 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			frag.appendChild(bottomSpacer);
 		}
 
+		const scrollState = _saveScroll(this);
 		this.tbody.textContent = '';
 		this.tbody.appendChild(frag);
+		_restoreScroll(scrollState);
 
 		// Select-all disabled in windowed mode — no _updateSelectAll().
 		this._vStart = start;
@@ -1009,6 +1052,13 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 					queryGen: self._cache.queryGen
 				});
 			},
+			// Query-change swap: reset to top, the new result set starts at row 0.
+			// Post-mutation revalidate swap: leave scroll position alone.
+			onSwap: function (origin) {
+				if (origin === 'invalidate' && self._scrollContainer) {
+					self._scrollContainer.scrollTop = 0;
+				}
+			},
 			onChange: this._renderBatch
 		});
 
@@ -1097,6 +1147,8 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			if (this._cache) this._cache.destroy();
 			this.dom.removeEventListener('ln-list:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-list:set-loading', this._onSetLoading);
+			this.dom.removeEventListener('ln-list:page-failed', this._onPageFailed);
+			this.dom.removeEventListener('ln-list:request-revalidate', this._onRequestRevalidate);
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
 			this.dom.removeEventListener('click', this._onClearAll);
 

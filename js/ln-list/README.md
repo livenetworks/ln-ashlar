@@ -78,6 +78,8 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 
 * `ln-list:set-data` `{ data, total, filtered }`: Hydrates/renders the items. Windowed mode expects `{ offset, queryGen }` echoed back — routed into the internal window cache.
 * `ln-list:set-loading` `{ loading: true|false }`: Toggles the loading dimming overlay class (`.ln-list--loading`).
+* `ln-list:page-failed` `{ offset }`: Windowed mode — the coordinator reports the page fetch at `offset` failed. Releases it from the cache's in-flight set; no auto-retry, the next `ensure()` requests it again.
+* `ln-list:request-revalidate`: Windowed mode — the coordinator asks the cache to revalidate the currently visible page after a local mutation. Stale rows stay visible, no jump to page 0.
 * `ln-search:change` `{ term }`: Captures search query from `data-ln-search` inputs.
 * `ln-sort:change` `{ field, column, direction }`: Sets `currentSort` and re-sorts (data-driven only). Ignored when `field` is `null` (index-only events have nothing to key a record by).
 

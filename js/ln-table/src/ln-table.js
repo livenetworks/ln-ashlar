@@ -38,6 +38,23 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		return null;
 	}
 
+	function _saveScroll(self) {
+		const sc = self._scrollContainer || _findScrollContainer(self.dom);
+		return {
+			container: sc,
+			top: sc ? sc.scrollTop : window.scrollY
+		};
+	}
+
+	function _restoreScroll(state) {
+		if (state.container) {
+			state.container.scrollTop = state.top;
+		} else {
+			window.scrollTo(window.scrollX, state.top);
+		}
+	}
+
+
 	// ─── Component ─────────────────────────────────────────────
 
 	function _component(dom) {
@@ -237,6 +254,18 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				}
 			};
 			dom.addEventListener('ln-table:set-loading', this._onSetLoading);
+
+			this._onPageFailed = function (e) {
+				if (!self._windowed || !self._cache) return;
+				self._cache.release(e.detail && e.detail.offset);
+			};
+			dom.addEventListener('ln-table:page-failed', this._onPageFailed);
+
+			this._onRequestRevalidate = function () {
+				if (!self._windowed || !self._cache) return;
+				self._cache.revalidate();
+			};
+			dom.addEventListener('ln-table:request-revalidate', this._onRequestRevalidate);
 
 			// --- Sort ---
 			this._onSort = function (e) {
@@ -644,15 +673,21 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				frag.appendChild(tr);
 			}
 
+			const scrollState = _saveScroll(this);
 			this.tbody.textContent = '';
 			this.tbody.appendChild(frag);
+			_restoreScroll(scrollState);
 
 			if (this._selectable) this._updateSelectAll();
 		} else {
 			const html = [];
 			const data = this._filteredData;
 			for (let i = 0; i < data.length; i++) html.push(data[i].html);
+
+			const scrollState = _saveScroll(this);
 			this.tbody.innerHTML = html.join('');
+			_restoreScroll(scrollState);
+
 			if (this._selectable) this._restoreSelection();
 		}
 	};
@@ -804,8 +839,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				frag.appendChild(bottomSpacer);
 			}
 
+			const scrollState = _saveScroll(this);
 			this.tbody.textContent = '';
 			this.tbody.appendChild(frag);
+			_restoreScroll(scrollState);
 
 			if (this._selectable) this._updateSelectAll();
 		} else {
@@ -821,7 +858,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 					colSpan + '" style="height:' + bottomH + 'px;padding:0;border:none"></td></tr>';
 			}
 
+			const scrollState = _saveScroll(this);
 			this.tbody.innerHTML = html;
+			_restoreScroll(scrollState);
+
 			if (this._selectable) this._restoreSelection();
 		}
 	};
@@ -912,8 +952,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			frag.appendChild(bottomSpacer);
 		}
 
+		const scrollState = _saveScroll(this);
 		this.tbody.textContent = '';
 		this.tbody.appendChild(frag);
+		_restoreScroll(scrollState);
 
 		// Select-all is disabled in windowed mode (D4) — no _updateSelectAll() call.
 		this._vStart = startRow;
@@ -1041,7 +1083,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	// ─── Windowed Mode — enter/exit/seed (live toggle) ──────────
 
 	_component.prototype._enterWindowedMode = function () {
-		console.log('[DEBUG] enterWindowedMode called');
 		const self = this;
 		const dom = this.dom;
 		const winAttr = parseInt(dom.getAttribute('data-ln-table-window'), 10);
@@ -1083,6 +1124,13 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 					queryGen: self._cache.queryGen
 				});
 			},
+			// Query-change swap: reset to top, the new result set starts at row 0.
+			// Post-mutation revalidate swap: leave scroll position alone.
+			onSwap: function (origin) {
+				if (origin === 'invalidate' && self._scrollContainer) {
+					self._scrollContainer.scrollTop = 0;
+				}
+			},
 			onChange: this._renderBatch
 		});
 
@@ -1095,7 +1143,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	};
 
 	_component.prototype._kickWindowInitial = function () {
-		console.log('[DEBUG] kickWindowInitial called, data.length =', this._data.length);
 		if (this._data.length > 0) {
 			// SSR-seeded / warm-seeded: page 0 is already resident, the grand
 			// total is declared in markup — no initial fetch needed. No
@@ -1373,6 +1420,8 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (this.isDataDriven) {
 			this.dom.removeEventListener('ln-table:set-data', this._onSetData);
 			this.dom.removeEventListener('ln-table:set-loading', this._onSetLoading);
+			this.dom.removeEventListener('ln-table:page-failed', this._onPageFailed);
+			this.dom.removeEventListener('ln-table:request-revalidate', this._onRequestRevalidate);
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
 			document.removeEventListener('keydown', this._onKeydown);
 			if (this.tbody) {
