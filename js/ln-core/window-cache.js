@@ -18,7 +18,6 @@ export function createWindowCache(config) {
 	let fetchDebounce = config.fetchDebounce != null ? config.fetchDebounce : 120;
 	const requestPage = typeof config.requestPage === 'function' ? config.requestPage : function () {};
 	const onChange = typeof config.onChange === 'function' ? config.onChange : function () {};
-	const onSwap = typeof config.onSwap === 'function' ? config.onSwap : function () {};
 
 	const map = new Map();       // logicalIndex → record
 	const touch = new Map();     // logicalIndex → seq (LRU stamp)
@@ -31,7 +30,7 @@ export function createWindowCache(config) {
 	let seq = 0;
 	let lastRangeStart = 0;       // last ensure() visible range — revalidate() re-targets here, not page 0
 	let lastRangeEnd = 0;
-	let pendingSwapOrigin = null; // 'invalidate' | 'revalidate' | null — consumed by the new generation's first ingest()
+	let pendingSwap = false;      // set by invalidate()/revalidate(), consumed by the new generation's first ingest()
 
 	function stamp(i) { touch.set(i, ++seq); }
 
@@ -123,11 +122,10 @@ export function createWindowCache(config) {
 
 			// First response of a new generation: drop the stale rows now, at the
 			// swap moment, not at invalidate()/revalidate() time — stale-while-revalidate.
-			if (pendingSwapOrigin) {
+			if (pendingSwap) {
 				map.clear();
 				touch.clear();
-				onSwap(pendingSwapOrigin);
-				pendingSwapOrigin = null;
+				pendingSwap = false;
 			}
 
 			grandTotal = detail.total != null ? detail.total : grandTotal;
@@ -160,7 +158,7 @@ export function createWindowCache(config) {
 			inflight.clear();
 			clearTimeout(debounceId);
 			if (q) query = q;
-			pendingSwapOrigin = 'invalidate';
+			pendingSwap = true;
 			fire(0, pageSize);
 		},
 
@@ -171,7 +169,7 @@ export function createWindowCache(config) {
 			queryGen++;
 			inflight.clear();
 			clearTimeout(debounceId);
-			pendingSwapOrigin = 'revalidate';
+			pendingSwap = true;
 			const offset = Math.max(0, Math.floor(lastRangeStart / pageSize) * pageSize);
 			const limit = logicalTotal > 0 ? Math.min(pageSize, Math.max(1, logicalTotal - offset)) : pageSize;
 			fire(offset, limit);

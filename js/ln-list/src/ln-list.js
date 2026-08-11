@@ -1052,13 +1052,6 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 					queryGen: self._cache.queryGen
 				});
 			},
-			// Query-change swap: reset to top, the new result set starts at row 0.
-			// Post-mutation revalidate swap: leave scroll position alone.
-			onSwap: function (origin) {
-				if (origin === 'invalidate' && self._scrollContainer) {
-					self._scrollContainer.scrollTop = 0;
-				}
-			},
 			onChange: this._renderBatch
 		});
 
