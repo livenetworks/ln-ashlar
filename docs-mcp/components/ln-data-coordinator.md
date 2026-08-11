@@ -112,9 +112,11 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere
 | `ln-stat:request-count` | Listens | No | Query from a stat/counter binder to fetch a record count. | `{ target: HTMLElement, filters?: Object }` |
 | `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table` or `list`, matching the requesting view's own namespace. Delivers the resolved query result. | `{ data: Array, total: Number, filtered: Number }` |
 | `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: true }` |
+| `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Reports that a windowed page query failed, so the view can release that offset for a later retry. | `{ offset: Number }` |
+| `ln-{kind}:request-revalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view on a store change in place of `set-data`: the view refreshes through its own window cache rather than being served store rows. | *(no payload)* |
 | `ln-options:set-data` | Emits | No | Delivers all records to a bound options binder. | `{ data: Array }` |
 | `ln-stat:set-count` | Emits | No | Delivers the resolved count to a bound stat binder. | `{ count: Number }` |
-| `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all bound view elements using their last cached query. | *(handler-internal; no detail consumed)* |
+| `ln-data-store:ready` / `:loaded` / `:created` / `:updated` / `:deleted` | Listens | No | Store change notifications — on any of these, re-queries and re-serves all non-windowed bound view elements using their last cached query. Windowed views (carrying `data-ln-table-window` / `data-ln-list-window`) instead receive `ln-{kind}:request-revalidate` and refresh through their own window cache, since a partial store cannot answer an offset-based slice. | *(handler-internal; no detail consumed)* |
 | `ln-data-store:synced` | Listens | No | Same re-serve as above, but only when `detail.changed` is true. | `{ changed: Boolean }` |
 
 **Write-Pipeline / Infrastructure Wiring**
