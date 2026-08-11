@@ -155,7 +155,24 @@ import { dispatchCancelable, readValue, getLocale, detectValueType, compareValue
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
+	// ─── Attribute Sync ────────────────────────────────────────
+
+	function _syncAttribute(el, attrName) {
+		const instance = el[DOM_ATTRIBUTE];
+		if (!instance) return;
+		if (attrName === FIELD_ATTR) {
+			instance.field = el.getAttribute(FIELD_ATTR) || null;
+			const th = el.closest('th');
+			instance.column = (!instance.field && th) ? th.cellIndex : null;
+		} else if (attrName === ITEMS_ATTR) {
+			instance.itemsSelector = el.getAttribute(ITEMS_ATTR) || null;
+		}
+	}
+
 	// ─── Init ──────────────────────────────────────────────────
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-sort');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-sort', {
+		extraAttributes: [FIELD_ATTR, ITEMS_ATTR],
+		onAttributeChange: _syncAttribute
+	});
 })();
