@@ -250,6 +250,7 @@
 </section>
 
 <!-- Active Table Component -->
+<section data-ln-table-coordinator>
 <section class="section-card" data-demo-html>
 	<header><h3>Interactive Table Demo</h3></header>
 	<main>
@@ -1375,6 +1376,7 @@
 			</template>			<!-- Empty State templates -->			<template data-ln-empty>				<section data-ln-empty-when="initial" data-ln-empty-state="no-data">					<h3>No documents found</h3>				</section>				<section data-ln-empty-when="search" data-ln-empty-state="no-results">					<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>					<h3>No results found</h3>					<p>Try refining your search terms.</p>					<button type="button" data-ln-table-clear-all class="btn">Clear Filters</button>				</section>			</template>		</section>	</main></section><!-- Department filter popover --><div data-ln-popover id="filter-hybrid-dept">	<label class="search">		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>		<input type="search" placeholder="Search..." data-ln-search="filter-hybrid-dept-list" data-ln-search-items="label">		<button type="button" data-ln-search-clear aria-label="Clear search">			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>		</button>	</label>	<ul id="filter-hybrid-dept-list" data-ln-filter="hybrid-table">		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="HR"> HR</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="IT"> IT</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Legal"> Legal</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Marketing"> Marketing</label></li>		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Operations"> Operations</label></li>	</ul></div><!-- Status filter popover --><div data-ln-popover id="filter-hybrid-status">	<ul id="filter-hybrid-status-list" data-ln-filter="hybrid-table">		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-reset checked> All</label></li>		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Approved"> Approved</label></li>		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Draft"> Draft</label></li>		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Pending"> Pending</label></li>		<li><label><input type="checkbox" data-ln-filter-key="status" data-ln-filter-value="Archived"> Archived</label></li>
 	</ul>
 </div>
+</section>
 
 <script>
 (function () {

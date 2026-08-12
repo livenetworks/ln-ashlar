@@ -94,7 +94,7 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 | `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
 | `data-ln-table-selectable` | Root wrapper | Enables checkbox-based row selections. |
 | `data-ln-table-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-row cap (default 1000). Requires Data-Driven Mode. Observable: add/remove toggles windowed mode ON/OFF live; changing `N` while windowed reconfigures the live cache. |
-| ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` in both modes. |
+| ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` directly in SSR mode only; data-driven mode relies on `ln-table-coordinator` to translate it into `ln-table:set-search`. |
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
 | `data-ln-sort` | `<ul>` inside `<th>` | Sort control — see [`ln-sort`](../ln-sort/README.md). Omit `data-ln-sort-field` on SSR columns (index fallback); set it on data-driven columns (must match `data-ln-table-col`). |
@@ -137,17 +137,20 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 
 ## Column Filters
 
-Column filters use static authored markup — a `[data-ln-popover]` block containing `[data-ln-filter]` checkboxes. `ln-table` consumes one event: `ln-filter:changed`.
+Column filters use static authored markup — a `[data-ln-popover]` block containing `[data-ln-filter]` checkboxes. `ln-filter` dispatches `ln-filter:changed`; `ln-table` consumes the coordinator's translated `ln-table:set-filter` instead.
 
 ### What ln-table does
 
-1. Receives `ln-filter:changed` on the table element.
-2. Maps `e.detail.key` to a column via `data-ln-table-filter-col` on `<th>`.
-3. Stores active filter values in `_columnFilters`.
+`ln-table` never listens for `ln-filter:changed` itself — no such binding exists in either mode. `ln-filter` dual-dispatches `ln-filter:changed` on both its own `<ul data-ln-filter>` root and directly on the table element; `ln-table-coordinator` receives it there and translates it into the commands `ln-table` actually listens for:
+
+1. `ln-table-coordinator` maps `e.detail.key` to a column via `data-ln-table-filter-col` on `<th>` and toggles `.ln-filter-active` on the funnel `<button>` (the dot indicator).
+2. `ln-table-coordinator` dispatches `ln-table:set-filter` at the table.
+3. `ln-table` stores the active filter values in `_columnFilters`.
 4. **SSR mode**: runs `_applyFilterAndSort()` + `_render()` in-memory.
-5. **Data-driven mode**: calls `_requestData()` — the coordinator handles fetching.
-6. Toggles `.ln-filter-active` on the funnel `<button>` (the dot indicator).
-7. Dispatches `ln-table:filter`.
+5. **Data-driven mode**: calls `_requestData()`.
+6. Dispatches `ln-table:filter`.
+
+An SSR table using column filters still requires the `[data-ln-table-coordinator]` wrapper — SSR self-binding only covers sort and search (see "Sort integration" below), not filters or clear-all.
 
 ### What ln-table does NOT do
 
@@ -228,7 +231,7 @@ Source: `js/ln-table/ln-table.js`. Sort is a separate, co-loaded component — s
 ### Mode detection & lifecycle
 
 - The constructor branches once, at construction: `this.isDataDriven = dom.hasAttribute('data-ln-table-source')`.
-- **SSR**: reads `<tbody>` rows once at bootstrap, caches them as static HTML strings in `_data`, and re-sorts/filters that in-memory cache on `ln-search:change` / `ln-sort:change` / `ln-filter:changed`.
+- **SSR**: reads `<tbody>` rows once at bootstrap, caches them as static HTML strings in `_data`, and re-sorts/filters that in-memory cache on `ln-search:change` / `ln-sort:change`. Column-filter values arrive as `ln-table:set-filter` from `ln-table-coordinator`, not as a direct `ln-filter:changed` listener.
 - **Data-driven**: `isLoaded = false` until the first `ln-table:set-data`. If `<tbody>` already has rows (hybrid), they're parsed synchronously first — instant local sort/filter/search response before the authoritative dataset arrives. When the background sync lands, `_vStart`/`_vEnd` reset to `-1` and virtual scroll re-initializes against the full dataset.
 - **Loading dimming**: `ln-table:set-loading {loading:true}` adds `.ln-table--loading` to the wrapper; `ln-table:set-data` clears it automatically.
 
@@ -255,6 +258,10 @@ only listens for its `ln-sort:change` event on itself, in both modes:
 `ln-table` never writes `data-ln-sort-state` and never persists sort state — both are `ln-sort`'s
 own responsibility (`data-ln-persist` goes on the `[data-ln-sort]` element itself, not the table
 wrapper — see `js/ln-sort/README.md`).
+
+### Search integration (`ln-search`)
+
+SSR mode also self-binds `ln-search:change` directly on itself, mirroring `ln-sort:change` above — an SSR table with a `[data-ln-search="<its own id>"]` input works standalone, no coordinator required. Data-driven mode relies on `ln-table-coordinator` translating `ln-search:change` into `ln-table:set-search` — do not wrap an SSR table in `[data-ln-table-coordinator]`, it will double-process search.
 
 ### MutationObserver flow (`ln-table.js`)
 

@@ -21,7 +21,7 @@ The `ln-search` component handles instant client-side DOM filtering and dispatch
 *   **Dual Search Operations (Local vs Remote):**
     *   **Local DOM Filtering (Markup Search):** Configured with `data-ln-search-debounce="0"` for instant per-keyup text matching against DOM children or target sub-elements. Matches are shown, while non-matching elements receive `data-ln-search-hide="true"`.
     *   **Remote API Search:** Uses a default `150ms` debounce (or custom value via `data-ln-search-debounce="150"`) to throttle search dispatches and prevent network request flooding.
-*   **Cancelable Change Event:** Emits `ln-search:change` on the target container. External components (such as [`ln-table`](./ln-table.md)) can call `event.preventDefault()` to handle custom API fetching and skip default DOM show/hide logic.
+*   **Cancelable Change Event:** Emits `ln-search:change` on the target container. External components can call `event.preventDefault()` to handle custom API fetching and skip default DOM show/hide logic — an SSR [`ln-table`](./ln-table.md) intercepts it directly, while a data-driven table's [`ln-table-coordinator`](./ln-table-coordinator.md) intercepts it on the table's behalf.
 *   **Clear Trigger Integration:** Binds `[data-ln-search-clear]` buttons to reset text input, dispatch empty term events, and restore focus.
 *   **Reactive Form Restore Hook:** Restores initial search filtering via `queueMicrotask` when browsers pre-fill form fields on page reload.
 
@@ -198,5 +198,5 @@ sequenceDiagram
 
 ## 7. Related Components
 
-- [`ln-table.md`](./ln-table.md) — Table component that intercepts search events for server-side queries.
+- [`ln-table.md`](./ln-table.md) — Table component that intercepts search events directly in SSR mode; in data-driven mode `ln-table-coordinator` intercepts them on the table's behalf.
 - [`ln-data-coordinator.md`](./ln-data-coordinator.md) — Mediator connecting search inputs with data stores.

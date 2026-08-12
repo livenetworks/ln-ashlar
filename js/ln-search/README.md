@@ -119,7 +119,7 @@ Dispatched on the **target** element whenever the search term changes.
 
 ## ⚠️ Common Pitfalls
 
-- **Driving an `ln-table` search box:** `ln-table` **does** consume `ln-search:change` in both SSR and data-driven modes — placing `data-ln-search="<tableId>"` on the search input (or its label wrapper) is the sole supported pattern. The search term is joined with sort and column filters into the `ln-table:request-data` payload. Note: `data-ln-table-search` has been removed — use `data-ln-search="<tableId>"` instead.
+- **Driving an `ln-table` search box:** placing `data-ln-search="<tableId>"` on the search input (or its label wrapper) is the sole supported pattern, but the consumer differs by mode. **SSR mode** consumes `ln-search:change` directly on the table. **Data-driven mode** requires the table to be wrapped in `[data-ln-table-coordinator]`, which receives `ln-search:change` and translates it into `ln-table:set-search`, joined with sort and column filters into the `ln-table:request-data` payload. Note: `data-ln-table-search` has been removed — use `data-ln-search="<tableId>"` instead.
 - **Bypassing Debounce via Native Input Listeners:** Listening to native `input` events directly will bypass the 150ms debounce and execute expensive logic on every single keystroke. Always listen to `ln-search:change`.
 - **Programmatic Value Mutations:** Assigning `input.value = "text"` programmatically does not trigger search. You must manually dispatch an `input` event:
   ```javascript
@@ -151,7 +151,7 @@ Scope for locating `[data-ln-search-clear]` is `input.parentElement` when `data-
 
 ### Cross-component coordination
 
-No imports of other components. `ln-table` consumes `ln-search:change` via `preventDefault()` and runs its own in-memory filter; `ln-filter` runs independently on the same target through a parallel `data-ln-search-hide` / `data-ln-filter-hide` pair — CSS unions both, neither component is aware of the other.
+No imports of other components. In SSR mode, `ln-table` consumes `ln-search:change` via `preventDefault()` and runs its own in-memory filter; in data-driven mode, `ln-table-coordinator` consumes it instead and translates it into `ln-table:set-search`. `ln-filter` runs independently on the same target through a parallel `data-ln-search-hide` / `data-ln-filter-hide` pair — CSS unions both, neither component is aware of the other.
 
 ### Destroy
 

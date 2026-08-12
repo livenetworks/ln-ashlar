@@ -23,8 +23,8 @@ The JavaScript source is located at [ln-table-coordinator.js](../../js/ln-table-
 Key responsibilities include:
 - **Child Component Coordination:** Coordinating child search inputs, filter popovers, and table primitives enclosed within the wrapper container.
 - **Multiple Coordinators Per Page:** Allowing multiple `data-ln-table-coordinator` wrappers to coexist independently on the exact same page without ID collisions or cross-table interference.
-- **Search Wire Mediation:** Catching `ln-search:change` events within the wrapper, value-mirroring search inputs, and dispatching `ln-table:set-search` to the child table.
-- **Filter Wire Mediation:** Catching `ln-filter:changed` events within the wrapper, toggling `.ln-filter-active` visual indicator classes on header filter buttons (`<th>`), and dispatching `ln-table:set-filter` to the child table.
+- **Search Wire Mediation (Data-Driven tables only):** Catching `ln-search:change` events within the wrapper, value-mirroring search inputs, and dispatching `ln-table:set-search` to the child table. The listener guards on the event target carrying both `data-ln-table` and `data-ln-table-source`, so an SSR table's self-bound `ln-search:change` handling is left untouched — wrapping an SSR table for search alone would double-process the event, which this guard prevents.
+- **Filter Wire Mediation (both modes):** Catching `ln-filter:changed` events within the wrapper, toggling `.ln-filter-active` visual indicator classes on header filter buttons (`<th>`), and dispatching `ln-table:set-filter` to the child table. Unlike search, column filtering and clear-all are not self-bound by `ln-table` in either mode — an SSR table using `data-ln-table-filter-col` or `data-ln-table-clear` still requires the `[data-ln-table-coordinator]` wrapper even though its search and sort work standalone.
 - **Clear Actions Handler:** Intercepting clicks on `[data-ln-table-clear]` and `[data-ln-table-clear-all]` inside the wrapper, resetting search inputs and filter checkboxes to `checked`, removing `.ln-filter-active` indicator classes, and dispatching `ln-table:request-clear-filters` to the child table.
 - **Keyboard Shortcut:** Capturing keydown `'/'` to focus the search input inside the active wrapper container.
 
@@ -39,7 +39,7 @@ Key responsibilities include:
 
 ### Base HTML Markup (Wrapper Coordinator Pattern)
 
-Below is the canonical production pattern where `data-ln-table-coordinator` wraps the search bar, table primitive, and filter popovers as a single cohesive unit:
+Below is the canonical production pattern where `data-ln-table-coordinator` wraps the search bar, table primitive, and filter popovers as a single cohesive unit. The wrapper may equally be an outer element enclosing the card and its popovers rather than the card itself — the contract requires only that the table, its filter popovers, and its clear buttons are descendants of the coordinator host, not any specific shape of container.
 
 ```html
 <!-- Table Coordinator Wrapper -->

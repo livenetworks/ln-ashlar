@@ -428,6 +428,12 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				});
 			};
 			dom.addEventListener('ln-sort:change', this._onSort);
+
+			this._onSearchChange = function (e) {
+				e.preventDefault();
+				self._onSetSearch(e);
+			};
+			dom.addEventListener('ln-search:change', this._onSearchChange);
 		}
 
 		return this;
@@ -1428,6 +1434,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				this._emptyTbodyObserver = null;
 			}
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
+			this.dom.removeEventListener('ln-search:change', this._onSearchChange);
 		}
 
 		if (this._onSelectionChange && this.tbody) this.tbody.removeEventListener('change', this._onSelectionChange);

@@ -95,6 +95,7 @@
 	<!-- Packages list -->
 	<template data-ln-route="/packages" data-ln-route-title="Packages — DocuFlow">
 		<section id="packages-view">
+			<section data-ln-table-coordinator>
 			<section data-ln-table="packages" data-ln-table-source="packages" id="packages-table">
 				<header class="ln-table__toolbar">
 					<div>
@@ -198,6 +199,7 @@
 					</td></tr>
 				</template>
 			</section>
+			</section>
 
 			<section data-view-error hidden>
 				<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-alert-triangle"></use></svg>
@@ -211,6 +213,7 @@
 	<!-- Tenants list -->
 	<template data-ln-route="/tenants" data-ln-route-title="Tenants — DocuFlow">
 		<section id="tenants-view">
+			<section data-ln-table-coordinator>
 			<section data-ln-table="tenants" data-ln-table-source="tenants" id="tenants-table">
 				<header class="ln-table__toolbar">
 					<div>
@@ -309,6 +312,7 @@
 						</article>
 					</td></tr>
 				</template>
+			</section>
 			</section>
 
 			<section data-view-error hidden>
