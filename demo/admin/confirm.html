@@ -221,7 +221,7 @@
 									The In-Place Action Gate
 								</h4>
 								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
-									The confirmation action IS the platform click. The script intercepts the first click via event prevention and propagation stopping, but releases the second click completely. If clicked within the armed timeout, the form submits, the link navigates, and existing AJAX handlers fire naturally. <strong>There is no rewrite of the default action.</strong>
+									The confirmation action IS the platform click. The script intercepts the first click via event prevention and propagation stopping, and releases the second click's default action. If clicked within the armed timeout, the form submits, the link navigates, and existing AJAX handlers fire naturally. <strong>There is no rewrite of the default action.</strong> Propagation, however, is stopped on both clicks — the click never reaches an ancestor click surface.
 								</p>
 							</div>
 
@@ -242,7 +242,7 @@
 							<h4>How the Interaction Flows</h4>
 							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
 								<li>The user clicks a destructive button. The component intercepts the event, calls <code>e.preventDefault()</code> and <code>e.stopImmediatePropagation()</code>, transitions the button to <code>data-confirming="true"</code>, replaces its label/icon with the armed prompt, schedules an auto-revert timer, and dispatches <code>ln-confirm:waiting</code>.</li>
-								<li>If the user clicks the armed button again before the timer expires, the component intercepts the second click, runs cleanups synchronously, and lets the event pass through. The browser executes the natural submit, navigate, or AJAX handler.</li>
+								<li>If the user clicks the armed button again before the timer expires, the component intercepts the second click, runs cleanups synchronously, calls <code>stopPropagation()</code> so the click stays on the button, and lets the default action proceed. The browser executes the natural submit, navigate, or AJAX handler.</li>
 								<li>If the timer expires before a second click arrives, the button automatically clears the armed state, restores its original text or icon, and disarms.</li>
 							</ol>
 
@@ -452,6 +452,38 @@ button[data-ln-confirm-timeout] {
 						</script>
 					</section>
 
+					<!-- Clickable card containment -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example — Confirm inside a clickable card</h3></header>
+						<main>
+							<p>The card carries its own <code>click</code> listener (the "whole card is clickable" pattern). The delete button lives inside it. Both clicks are contained at the button: the first arms it, the second accepts — and neither reaches the card surface, because <code>ln-confirm</code> calls <code>stopPropagation()</code> on both branches.</p>
+							<p>Click the card body: the surface handler fires. Click delete once: nothing logs (the arming click is swallowed — this listener is bound after the bundle, so <code>stopImmediatePropagation</code> blocks it). Click delete again within 3 seconds: the delete handler fires <strong>alone</strong>.</p>
+							<article id="demo-card-surface" class="card">
+								<header><h3>Invoice #2041</h3></header>
+								<main>
+									<div class="field"><span class="label">Client</span><span class="value">Nova Trade</span></div>
+									<div class="field"><span class="label">Amount</span><span class="value">12,400 MKD</span></div>
+								</main>
+								<footer>
+									<button type="button" id="demo-card-delete" class="btn btn-danger" aria-label="Delete invoice" data-ln-confirm="Delete invoice?">
+										<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-trash"></use></svg>
+									</button>
+								</footer>
+							</article>
+							<p id="demo-card-log" class="demo-log">Click log will appear here.</p>
+							<p><strong>Limitation.</strong> This works because the card surface is a <em>listener</em>. If the card were a real ancestor <code>&lt;a href&gt;</code> wrapping the button, propagation containment would not stop it — navigation is activation behavior, cancelled only by <code>preventDefault</code>, which would also cancel the delete being confirmed. Use <code>data-ln-link</code> on the card instead of nesting the button inside an anchor.</p>
+						</main>
+						<script type="text/plain" data-demo-scss>
+// Reveal the action only on card hover/focus-within:
+#demo-card-surface {
+    footer { visibility: hidden; }
+
+    &:hover footer,
+    &:focus-within footer { visibility: visible; }
+}
+						</script>
+					</section>
+
 					<!-- Button group Example -->
 					<section class="section-card" data-demo-html>
 						<header><h3>Example — Multiple confirms in a button group</h3></header>
@@ -603,6 +635,24 @@ window.lnConfirm(root);         // re-run init scan over `root`. Only needed for
 					: '(unknown)';
 				const ts = new Date().toLocaleTimeString();
 				trackLog.textContent = '[' + ts + '] ln-confirm:waiting fired on button "' + original + '"';
+			});
+		}
+
+		// Clickable-card containment demo
+		const cardSurface = document.getElementById('demo-card-surface');
+		const cardDelete = document.getElementById('demo-card-delete');
+		const cardLog = document.getElementById('demo-card-log');
+		if (cardSurface && cardDelete && cardLog) {
+			const logLine = function (text) {
+				const ts = new Date().toLocaleTimeString();
+				cardLog.textContent = '[' + ts + '] ' + text;
+			};
+			cardSurface.addEventListener('click', function () {
+				logLine('CARD surface fired — this is the navigation handler.');
+			});
+			cardDelete.addEventListener('click', function () {
+				// Second click only: the arming click never reaches here.
+				logLine('DELETE fired — and the card surface stayed silent.');
 			});
 		}
 	})();

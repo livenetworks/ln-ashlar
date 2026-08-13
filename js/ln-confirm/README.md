@@ -7,7 +7,7 @@ A zero-dependency, ultra-lightweight **Interaction Gate Primitive** (~131 lines 
 ## 🧭 Philosophy & Architecture
 
 1. **In-Place Morphing:** Instead of launching heavy, separate dialogs or using frozen, unstyleable `window.confirm()` scripts, confirmation lives **directly on the target button**. It preserves structural styling while using CSS mixins to display temporary labels or icon tooltips.
-2. **Platform Event Release:** `ln-confirm` does not implement a custom `accept` handler. The acceptance is the standard platform `click` event. On the second click, the component steps out of the way, allowing form submissions (`type="submit"`), links (`href`), or custom AJAX click listeners to execute natively.
+2. **Platform Event Release:** `ln-confirm` does not implement a custom `accept` handler. The acceptance is the standard platform `click` event. On the second click, the component steps out of the way of the *default action* — form submissions (`type="submit"`), links (`href`), or custom AJAX click listeners execute natively. It does **not** step out of the way of propagation: the click stops at the button on both clicks, so an ancestor click surface never sees it.
 3. **Graceful Auto-Revert:** The gate is timed. When armed, a countdown timer is scheduled. If a second click does not arrive within the window, the button cleanly reverts to its idle text or icon state.
 
 ---
@@ -121,8 +121,11 @@ The click handler branches on `this.confirming`.
 - `_enterConfirm()`: set `confirming`, write `data-confirming="true"` (CSS hook), swap the button to its confirm presentation (see Modes), schedule the auto-revert timer, dispatch `ln-confirm:waiting`.
 
 **Second click** (`confirming === true`) — accept:
-- No `preventDefault`, no `stopImmediatePropagation` — the click runs its native default (form submit, link nav, existing handler) unmodified. That is the whole design: insert a checkpoint, then step out.
+- No `preventDefault` — the click runs its native default (form submit, link nav, existing handler) unmodified. That is the whole design: insert a checkpoint, then step out.
+- `stopPropagation()` — the click is contained at the button, exactly as on the first click. Without it the accepting click reaches ancestor click surfaces (a clickable card, a row handler) and fires *their* action alongside the confirmed one. Deliberately **not** `stopImmediatePropagation`: same-element listeners are the accept path and must run.
 - `_reset()` runs **synchronously before the handler returns**, so the button is visually reverted in the same frame the action proceeds — no flash of the armed state. A `_submitted` flag guards against a synthetic re-entrant click inside the same handler.
+
+Containment covers listener-based ancestors. It does not cover an ancestor `<a href>`: navigation is activation behavior, cancelled only by `preventDefault` — which would also cancel the confirmed action. Don't nest the button inside the anchor; see [ln-link](../ln-link/README.md), which skips clicks originating from `button`.
 
 There is deliberately no `ln-confirm:accept` event and no second-click cancel signal — "accept" is just the native click; listen on the form `submit`, the link, or the button `click`.
 

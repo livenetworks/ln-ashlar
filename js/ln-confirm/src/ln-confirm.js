@@ -48,7 +48,11 @@ import { registerComponent, dispatch } from '../../ln-core';
 			} else {
 				if (self._submitted) return;
 				self._submitted = true;
-				// Second click — allow form submit
+				// Second click — the gate opens for THIS button's own default
+				// action (submit / href), but the click still must not reach
+				// an ancestor click surface. Same containment as the first
+				// click, without cancelling the action being confirmed.
+				e.stopPropagation();
 				self._reset();
 			}
 		};

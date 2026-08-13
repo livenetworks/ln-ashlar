@@ -19,7 +19,8 @@ tags: [interactions, confirmation, validation]
 - Intercepts the first user click on protected buttons/links to present an in-place confirmation message.
 - Morphs button contents during confirmation (updates text for text buttons; replaces icon with check and shows a tooltip for icon-only buttons).
 - Automatically resets back to the idle state if the timeout (default: 3s) expires without a second click.
-- Completely steps out of the way on the second click, letting the native `click` or `submit` event proceed.
+- Steps out of the way of the default action on the second click, letting the native `click` or `submit` event proceed.
+- Stops propagation on both clicks, so neither the arming nor the accepting click reaches an ancestor click surface (clickable card, row handler).
 - Located in [`js/ln-confirm/src/ln-confirm.js`](../../js/ln-confirm/src/ln-confirm.js).
 
 > [!IMPORTANT]

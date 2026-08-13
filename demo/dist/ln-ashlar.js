@@ -4965,7 +4965,7 @@ H(Yt, be, Se, "ln-router", {
         m.preventDefault(), m.stopImmediatePropagation(), s._enterConfirm();
       else {
         if (s._submitted) return;
-        s._submitted = !0, s._reset();
+        s._submitted = !0, m.stopPropagation(), s._reset();
       }
     }, h.addEventListener("click", this._onClick), this;
   }
