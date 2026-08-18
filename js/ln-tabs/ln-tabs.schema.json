@@ -1,0 +1,69 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-tabs",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-tabs-dev.scss"
+			]
+		},
+		"data-ln-panel": {
+			"direction": "author",
+			"sources": [
+				"src/ln-tabs.js"
+			]
+		},
+		"data-ln-persist": {
+			"direction": "author",
+			"sources": [
+				"src/ln-tabs.js"
+			]
+		},
+		"data-ln-tab": {
+			"direction": "author",
+			"sources": [
+				"src/ln-tabs.js"
+			]
+		},
+		"data-ln-tabs": {
+			"direction": null,
+			"sources": [
+				"ln-tabs-dev.scss",
+				"src/ln-tabs.js"
+			]
+		},
+		"data-ln-tabs-active": {
+			"direction": "both",
+			"sources": [
+				"src/ln-tabs.js"
+			]
+		},
+		"data-ln-tabs-default": {
+			"direction": "author",
+			"sources": [
+				"src/ln-tabs.js"
+			]
+		},
+		"data-ln-tabs-focus": {
+			"direction": "author",
+			"sources": [
+				"src/ln-tabs.js"
+			]
+		},
+		"data-ln-tabs-for": {
+			"direction": null,
+			"sources": [
+				"ln-tabs-dev.scss"
+			]
+		},
+		"data-ln-tabs-key": {
+			"direction": "author",
+			"sources": [
+				"ln-tabs-dev.scss",
+				"src/ln-tabs.js"
+			]
+		}
+	}
+}

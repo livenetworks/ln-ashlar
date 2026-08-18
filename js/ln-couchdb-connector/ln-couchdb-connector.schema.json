@@ -1,0 +1,37 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-couchdb-connector",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-couchdb-auth": {
+			"direction": "author",
+			"sources": [
+				"src/ln-couchdb-connector.js"
+			]
+		},
+		"data-ln-couchdb-connector": {
+			"direction": null,
+			"sources": [
+				"src/ln-couchdb-connector.js"
+			]
+		},
+		"data-ln-couchdb-db": {
+			"direction": "author",
+			"sources": [
+				"src/ln-couchdb-connector.js"
+			]
+		},
+		"data-ln-couchdb-headers": {
+			"direction": "author",
+			"sources": [
+				"src/ln-couchdb-connector.js"
+			]
+		},
+		"data-ln-couchdb-url": {
+			"direction": "author",
+			"sources": [
+				"src/ln-couchdb-connector.js"
+			]
+		}
+	}
+}

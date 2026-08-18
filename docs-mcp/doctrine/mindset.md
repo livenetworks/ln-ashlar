@@ -26,8 +26,8 @@ Historically, computing architectures swing between centralized server processin
 4. **Distributed (Single-Page Apps - SPA):** Frameworks (React, Vue, Angular) ship massive JS bundles to construct the entire UI in browser memory at runtime.
 5. **Progressive / DOM-First (ln-ashlar):** The server renders complete, structured semantic HTML. Lightweight client-side scripts progressively enhance and enliven it, using the browser's native DOM as the single source of truth.
 
-### The Virtual DOM Myth vs. Web Standards
-Browsers natively understand HTML DOM, not Virtual DOM. Heavy frameworks download megabytes of JS, run runtime diffing, and construct a Virtual DOM in memory, only to inject it into the real DOM. 
+### DOM-First vs. In-Memory Tree Construction
+Browsers natively understand HTML DOM, not an in-memory component tree. Mainstream frameworks download megabytes of JS, construct a component tree in memory, reconcile it against the previous state, and only then apply the result to the real DOM. 
 
 `ln-ashlar` bypasses this overhead. Ready-to-render HTML is delivered directly from the backend, rendering instantly (First Contentful Paint) while native progressive components take over and activate behavior in milliseconds.
 

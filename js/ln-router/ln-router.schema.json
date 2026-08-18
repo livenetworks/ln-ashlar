@@ -1,0 +1,49 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-router",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-outlet": {
+			"direction": "author",
+			"sources": [
+				"src/ln-router.js"
+			]
+		},
+		"data-ln-popover": {
+			"direction": "author",
+			"sources": [
+				"src/ln-router.js"
+			]
+		},
+		"data-ln-route": {
+			"direction": "author",
+			"sources": [
+				"src/ln-router.js"
+			]
+		},
+		"data-ln-route-keep": {
+			"direction": "author",
+			"sources": [
+				"src/ln-router.js"
+			]
+		},
+		"data-ln-route-target": {
+			"direction": "author",
+			"sources": [
+				"src/ln-router.js"
+			]
+		},
+		"data-ln-route-title": {
+			"direction": "author",
+			"sources": [
+				"src/ln-router.js"
+			]
+		},
+		"data-ln-router-hydrate": {
+			"direction": "author",
+			"sources": [
+				"src/ln-router.js"
+			]
+		}
+	}
+}

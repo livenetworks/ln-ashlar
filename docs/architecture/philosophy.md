@@ -32,7 +32,7 @@ The computer industry moves in cycles that periodically shift processing respons
 Regardless of which mainstream JS framework is used (React, Vue, Angular), they all ultimately must generate **clean HTML DOM**. That is the only thing the web browser natively understands.
 
 The difference is simply **where and when** that DOM is generated:
-* **In SPAs:** The client-side processor must download megabytes of JS, compile it at runtime, build a Virtual DOM in memory, run the so-called "diffing" algorithm, and only then inject it into the real DOM.
+* **In SPAs:** The client-side processor must download megabytes of JS, compile it at runtime, construct a component tree in memory, reconcile it against the previous tree, and only then apply the result to the real DOM.
 * **In `ln-ashlar`:** The server (whether written in PHP/Laravel, Go, Python, or Node) sends ready-to-render, semantic HTML. The browser displays it immediately, and the `ln-ashlar` progressive scripts take over and activate local behavior in milliseconds.
 
 ---

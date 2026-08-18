@@ -1,0 +1,19 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-accordion",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-accordion": {
+			"direction": "author",
+			"sources": [
+				"src/ln-accordion.js"
+			]
+		},
+		"data-ln-toggle": {
+			"direction": "both",
+			"sources": [
+				"src/ln-accordion.js"
+			]
+		}
+	}
+}

@@ -1,0 +1,47 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-tooltip",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-tooltip-dev.scss"
+			]
+		},
+		"data-ln-tooltip": {
+			"direction": "author",
+			"sources": [
+				"ln-tooltip-dev.scss",
+				"ln-tooltip.scss",
+				"src/ln-tooltip.js"
+			]
+		},
+		"data-ln-tooltip-enhance": {
+			"direction": null,
+			"sources": [
+				"ln-tooltip.scss",
+				"src/ln-tooltip.js"
+			]
+		},
+		"data-ln-tooltip-enhanced": {
+			"direction": "both",
+			"sources": [
+				"ln-tooltip.scss",
+				"src/ln-tooltip.js"
+			]
+		},
+		"data-ln-tooltip-placement": {
+			"direction": "runtime",
+			"sources": [
+				"src/ln-tooltip.js"
+			]
+		},
+		"data-ln-tooltip-position": {
+			"direction": "author",
+			"sources": [
+				"src/ln-tooltip.js"
+			]
+		}
+	}
+}

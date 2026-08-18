@@ -8,7 +8,7 @@
 
 ## 🏛️ The Dual-Core DOM-First Paradigm (SSR + Client-Side SPA)
 
-`ln-ashlar` is built on a **DOM-First** architecture. The browser works directly with native DOM standards, not a heavy Virtual DOM compilation layer. 
+`ln-ashlar` is built on a **DOM-First** architecture. The browser works directly with native DOM standards; there is no in-memory component tree to build. 
 
 Whether your architecture relies on **Server-Rendered HTML** (Laravel, Go, Django, Rails) or **Client-Side SPAs consuming REST/JSON APIs**, `ln-ashlar` provides first-class support for both paradigms:
 

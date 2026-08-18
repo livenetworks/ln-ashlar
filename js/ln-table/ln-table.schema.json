@@ -1,0 +1,165 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-table",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-table-dev.scss"
+			]
+		},
+		"data-ln-persist": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-sort.js"
+			]
+		},
+		"data-ln-sort": {
+			"direction": "author",
+			"sources": [
+				"ln-table.scss",
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-sort-icon": {
+			"direction": null,
+			"sources": [
+				"ln-table.scss"
+			]
+		},
+		"data-ln-table": {
+			"direction": "author",
+			"sources": [
+				"ln-table-dev.scss",
+				"ln-table.scss",
+				"src/ln-table-sort.js",
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-body": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-cell-attr": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-col": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-col-select": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-col-sort": {
+			"direction": "author",
+			"sources": [
+				"ln-table-dev.scss",
+				"src/ln-table-sort.js",
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-dict": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-empty": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-empty-when": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-filter-col": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-filtered": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-row": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-row-action": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-row-id": {
+			"direction": "both",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-row-select": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-select-all-label": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-selectable": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-selected": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-sort": {
+			"direction": "author",
+			"sources": [
+				"ln-table-dev.scss",
+				"src/ln-table-sort.js",
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		},
+		"data-ln-table-total": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table.js"
+			]
+		}
+	}
+}

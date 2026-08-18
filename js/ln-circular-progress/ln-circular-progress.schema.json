@@ -1,0 +1,25 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-circular-progress",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-circular-progress": {
+			"direction": "author",
+			"sources": [
+				"src/ln-circular-progress.js"
+			]
+		},
+		"data-ln-circular-progress-label": {
+			"direction": "author",
+			"sources": [
+				"src/ln-circular-progress.js"
+			]
+		},
+		"data-ln-circular-progress-max": {
+			"direction": "author",
+			"sources": [
+				"src/ln-circular-progress.js"
+			]
+		}
+	}
+}

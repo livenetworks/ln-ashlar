@@ -66,6 +66,21 @@ Before recommending an architecture, refactor, or claiming that a behavior/metho
 ## Build Commands
 
 ```bash
-npm run build        # Build library into demo/dist/ + compile demo pages
-npm run dev          # Watch mode (library only)
+npm run build              # Build library into demo/dist/ + compile demo pages
+npm run dev                # Watch mode (library only)
+npm run sync:ln-schemas    # Regenerate js/ln-*/ln-*.schema.json from source code
+npm run sync:ln-schemas:check   # Report schema drift without writing (exit 1 on drift)
 ```
+
+`sync:ln-schemas` scans each component's `src/**.js` and co-located `*.scss` for
+`data-ln-*` attributes and writes the per-component schema. Compiled bundles at
+`js/ln-*/ln-*.js` are deliberately skipped, so build order does not affect the result.
+
+It is **non-destructive**: it owns only the keys it generates (`$comment`, `component`,
+`generator`, and each attribute's `direction` and `sources`) and preserves every other
+key, so hand-authored fields survive regeneration. It writes only when something
+actually changed.
+
+`npm run build` runs it first, so schemas cannot go stale. `npm test` runs the `:check`
+variant, which never writes and exits 1 on drift. `npm run dev` deliberately does **not**
+run it — watch mode would capture half-typed attribute names.
