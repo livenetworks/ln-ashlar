@@ -215,21 +215,6 @@
 	The <code>ln-include</code> component allows template contents (like row structures or empty states) to be loaded asynchronously from external URLs. It uses central boot gating to block page initialization until all initial templates have loaded, preventing empty-render flickering.
 </p>
 
-<!-- Latency Controller -->
-<section class="section-card">
-	<header><h3>Simulation Controls</h3></header>
-	<main>
-		<ul class="control-list" style="list-style: none; padding: 0; margin: 0; display: flex; gap: var(--size-md);">
-			<li>
-				<label style="display: flex; align-items: center; gap: var(--size-xs); cursor: pointer;">
-					<input type="checkbox" id="sim-latency" checked>
-					<span>Simulate 600ms network latency on API requests</span>
-				</label>
-			</li>
-		</ul>
-	</main>
-</section>
-
 <!-- Include Demo Table -->
 <section class="section-card" data-demo-html>
 	<header><h3>Data-driven Table with External Templates</h3></header>
@@ -240,9 +225,7 @@
 
 		<section data-ln-table="documents" data-ln-table-source="documents" data-ln-table-selectable id="documents-table" class="data-table-demo">
 			<header class="ln-table__toolbar">
-				<div>
-					<h3>Documents</h3>
-				</div>
+				<h3>Documents</h3>
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
 					<input type="search" placeholder="Search…" data-ln-search="documents" data-ln-search-debounce="150">

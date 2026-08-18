@@ -216,6 +216,8 @@
 		<p>The <code>ln-router</code> component is a zero-dependency, **template-only** client-side router for <code>ln-ashlar</code>. It maps the URL to a <code>&lt;template data-ln-route="..."&gt;</code>, clones it into a target element, and lets existing component MutationObservers auto-initialize the injected DOM.</p>
 
 		<p>In accordance with project doctrine, the router does **not** fetch data, sanitise templates, or run data-binding logic. Instead, the router mounts the view, and the **page coordinator** listens for navigation events to populate the templates using the static text interpolation helper <code>fillTemplate</code>.</p>
+
+		<p>The <code>/profile</code> route below loads its markup from an external file via <code>ln-include</code> (<code>data-ln-include="tpl/router-profile.html"</code>). <code>ln-router</code> itself needs no changes — it still finds the <code>&lt;template data-ln-route&gt;</code> and clones its <code>.content</code> exactly as before, only now that content is populated asynchronously before the first clone.</p>
 	</main>
 </section>
 
@@ -227,12 +229,7 @@
 	</div>
 </template>
 
-<template data-ln-route="/profile" data-ln-route-title="Profile — ln-router">
-	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
-		<h4>👤 User Profile View</h4>
-		<p>This is the profile page at static route <code>/profile</code>.</p>
-	</div>
-</template>
+<template data-ln-route="/profile" data-ln-route-title="Profile — ln-router" data-ln-include="tpl/router-profile.html"></template>
 
 <template data-ln-route="/users/:id" data-ln-route-title="User Details">
 	<div class="card" style="padding: var(--size-md); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-surface);">
