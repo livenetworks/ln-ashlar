@@ -1,0 +1,72 @@
+<!-- ln-page: title="Include — ln-ashlar" h1="Include" -->
+<script class="mock-related" src="dist/mock-store-usecase.js" defer></script>
+
+<h1>Include</h1>
+<p>
+	The <code>ln-include</code> component allows template contents (like row structures or empty states) to be loaded asynchronously from external URLs. It uses central boot gating to block page initialization until all initial templates have loaded, preventing empty-render flickering.
+</p>
+
+<!-- Latency Controller -->
+<section class="section-card">
+	<header><h3>Simulation Controls</h3></header>
+	<main>
+		<ul class="control-list" style="list-style: none; padding: 0; margin: 0; display: flex; gap: var(--size-md);">
+			<li>
+				<label style="display: flex; align-items: center; gap: var(--size-xs); cursor: pointer;">
+					<input type="checkbox" id="sim-latency" checked>
+					<span>Simulate 600ms network latency on API requests</span>
+				</label>
+			</li>
+		</ul>
+	</main>
+</section>
+
+<!-- Include Demo Table -->
+<section class="section-card" data-demo-html>
+	<header><h3>Data-driven Table with External Templates</h3></header>
+	<main>
+		<p>
+			The row template (<code>documents-row</code>) and the empty state (<code>documents-empty</code>) below are fetched dynamically from external files in the <code>tpl/</code> directory.
+		</p>
+
+		<section data-ln-table="documents" data-ln-table-source="documents" data-ln-table-selectable id="documents-table" class="data-table-demo">
+			<header class="ln-table__toolbar">
+				<div>
+					<h3>Documents</h3>
+				</div>
+				<label class="search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Search…" data-ln-search="documents" data-ln-search-debounce="150">
+					<button type="button" data-ln-search-clear aria-label="Clear search">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					</button>
+				</label>
+			</header>
+
+			<table>
+				<thead>
+					<tr>
+						<th data-ln-table-col-select></th>
+						<th data-ln-table-col="title">Title <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="status">Status</th>
+						<th data-ln-table-col="file_size">Size <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+			<footer class="ln-table__footer">
+				<p><span class="hidden"><span data-ln-table-filtered></span> / </span><span data-ln-table-total></span> items</p>
+			</footer>
+
+			<!-- External Templates via data-ln-include -->
+			<template data-ln-template="documents-row" data-ln-include="tpl/documents-row.html"></template>
+			<template data-ln-template="documents-empty" data-ln-include="tpl/documents-empty.html"></template>
+		</section>
+	</main>
+	<script type="text/plain" data-demo-scss>
+	[data-ln-table] {
+		@include table-base;
+	}
+	</script>
+</section>

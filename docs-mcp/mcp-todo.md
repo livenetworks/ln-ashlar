@@ -100,6 +100,7 @@
 - [x] **ln-link**
 - [x] **ln-external-links**
 - [x] **ln-ajax** — AJAX навигација (`data-ln-ajax`)
+- [x] **ln-include** — надворешно вчитување на `<template>` содржина, boot gating (`data-ln-include`)
 
 #### Сервиси со markup контакт
 
@@ -245,9 +246,9 @@
 |---|---|---|
 | doctrine | 6 | 6 |
 | guides | 5 | 5 |
-| components — употребливи (3А) | 42 | 42 |
+| components — употребливи (3А) | 43 | 43 |
 | components — позадински (3Б) | 9 | 9 |
 | css | 28 | 0 |
 | patterns | 5 | 0 |
 | skills | 14 | 14 |
-| **Вкупно** | **109** | **75** |
+| **Вкупно** | **110** | **76** |

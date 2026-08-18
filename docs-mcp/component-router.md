@@ -69,6 +69,7 @@
 | Component | Use for | Don't use for |
 |---|---|---|
 | `ln-ajax` | Progressive enhancement: form submit / link load without reload | File uploads; forms claimed by a coordinator |
+| `ln-include` | Loading a `<template>` element's content from an external file, deduplicated, gating boot until initial hosts resolve | Loading page content into the visible DOM → `ln-ajax`; per-record fill → `ln-form` |
 | `ln-data-store` | Local-first cache: offline survival, optimistic writes, encryption at rest | Always-fresh read-only data → fetch on demand |
 | `ln-data-coordinator` | Parent that wires store ↔ connector ↔ mappers ↔ form writes | Read-only views with no local state |
 | `ln-api-connector` / `ln-couchdb-connector` | Network gateway from store to REST / CouchDB backend | Static sites without a backend |

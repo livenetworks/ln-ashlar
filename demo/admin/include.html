@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Kbd — ln-ashlar</title>
+	<title>Include — ln-ashlar</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -73,7 +73,7 @@
 				<button class="menu-toggle" data-ln-toggle-for="demo-sidebar" aria-label="Open menu">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-menu"></use></svg>
 				</button>
-				<h1>Kbd</h1>
+				<h1>Include</h1>
 			</div>
 			<div class="header-right">
 				<div class="header-actions">
@@ -136,7 +136,7 @@
 						<li><a href="density.html"><span class="nav-label">Density</span></a></li>
 						<li><a href="tables.html"><span class="nav-label">Tables</span></a></li>
 						<li><a href="forms.html"><span class="nav-label">Forms &amp; Buttons</span></a></li>
-						<li><a href="kbd.html" aria-current="page"><span class="nav-label">Kbd</span></a></li>
+						<li><a href="kbd.html"><span class="nav-label">Kbd</span></a></li>
 						<li><a href="layout.html"><span class="nav-label">Layout &amp; Grid</span></a></li>
 						<li><a href="sections.html"><span class="nav-label">Sections</span></a></li>
 						<li><a href="icons.html"><span class="nav-label">Icons</span></a></li>
@@ -164,7 +164,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
 						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
-						<li><a href="include.html"><span class="nav-label">Include</span></a></li>
+						<li><a href="include.html" aria-current="page"><span class="nav-label">Include</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
@@ -208,126 +208,77 @@
 		<!-- Content -->
 		<section>
 			<div class="app-content-wrapper">
-<h1>Kbd</h1>
-				<p>Keycap styling for inline keyboard shortcut documentation. Applied globally to all <code>&lt;kbd&gt;</code> elements via <code>scss/base/_typography.scss</code>. No attribute needed.</p>
+<script class="mock-related" src="dist/mock-store-usecase.js" defer></script>
 
-				<!-- Basic shortcuts -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Basic Shortcuts</h3></header>
-					<main>
-						<p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to open the command palette.</p>
-						<p>Save the document with <kbd>Ctrl</kbd>+<kbd>S</kbd>.</p>
-						<p>Undo the last action with <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					// Applied globally in ln-ashlar
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+<h1>Include</h1>
+<p>
+	The <code>ln-include</code> component allows template contents (like row structures or empty states) to be loaded asynchronously from external URLs. It uses central boot gating to block page initialization until all initial templates have loaded, preventing empty-render flickering.
+</p>
 
-				<!-- Modifier keys -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Modifier Keys</h3></header>
-					<main>
-						<p>Mac: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></p>
-						<p>Windows/Linux: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></p>
-						<p>Open terminal: <kbd>Ctrl</kbd> + <kbd>`</kbd></p>
-						<p>Force quit: <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>Esc</kbd></p>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+<!-- Latency Controller -->
+<section class="section-card">
+	<header><h3>Simulation Controls</h3></header>
+	<main>
+		<ul class="control-list" style="list-style: none; padding: 0; margin: 0; display: flex; gap: var(--size-md);">
+			<li>
+				<label style="display: flex; align-items: center; gap: var(--size-xs); cursor: pointer;">
+					<input type="checkbox" id="sim-latency" checked>
+					<span>Simulate 600ms network latency on API requests</span>
+				</label>
+			</li>
+		</ul>
+	</main>
+</section>
 
-				<!-- Single keys -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Single Keys</h3></header>
-					<main>
-						<p>Navigate: <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></p>
-						<p>Confirm: <kbd>Enter</kbd></p>
-						<p>Cancel: <kbd>Esc</kbd></p>
-						<p>Arrow keys: <kbd>&uarr;</kbd> <kbd>&darr;</kbd> <kbd>&larr;</kbd> <kbd>&rarr;</kbd></p>
-						<p>Function keys: <kbd>F1</kbd> <kbd>F5</kbd> <kbd>F12</kbd></p>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+<!-- Include Demo Table -->
+<section class="section-card" data-demo-html>
+	<header><h3>Data-driven Table with External Templates</h3></header>
+	<main>
+		<p>
+			The row template (<code>documents-row</code>) and the empty state (<code>documents-empty</code>) below are fetched dynamically from external files in the <code>tpl/</code> directory.
+		</p>
 
-				<!-- In a shortcut table -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Shortcuts Reference Table</h3></header>
-					<main>
-						<div class="table-container">
-						<table>
-							<thead>
-								<tr>
-									<th>Action</th>
-									<th>Shortcut</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td data-label="Action">Command palette</td>
-									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>K</kbd></td>
-								</tr>
-								<tr>
-									<td data-label="Action">Save</td>
-									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>S</kbd></td>
-								</tr>
-								<tr>
-									<td data-label="Action">Undo</td>
-									<td data-label="Shortcut"><kbd>Ctrl</kbd>+<kbd>Z</kbd></td>
-								</tr>
-								<tr>
-									<td>Redo</td>
-									<td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td>
-								</tr>
-								<tr>
-									<td>Find</td>
-									<td><kbd>Ctrl</kbd>+<kbd>F</kbd></td>
-								</tr>
-								<tr>
-									<td>Bold</td>
-									<td><kbd>Ctrl</kbd>+<kbd>B</kbd></td>
-								</tr>
-								<tr>
-									<td>Italic</td>
-									<td><kbd>Ctrl</kbd>+<kbd>I</kbd></td>
-								</tr>
-							</tbody>
-						</table>
-						</div>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+		<section data-ln-table="documents" data-ln-table-source="documents" data-ln-table-selectable id="documents-table" class="data-table-demo">
+			<header class="ln-table__toolbar">
+				<div>
+					<h3>Documents</h3>
+				</div>
+				<label class="search">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
+					<input type="search" placeholder="Search…" data-ln-search="documents" data-ln-search-debounce="150">
+					<button type="button" data-ln-search-clear aria-label="Clear search">
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+					</button>
+				</label>
+			</header>
 
-				<!-- In prose context -->
-				<section class="section-card" data-demo-html>
-					<header><h3>Kbd inside Prose</h3></header>
-					<main>
-						<article class="prose">
-							<h2>Keyboard shortcuts</h2>
-							<p>You can use keyboard shortcuts throughout the application. Press <kbd>Ctrl</kbd>+<kbd>K</kbd> to open the command palette, or <kbd>?</kbd> to see a full list of available shortcuts.</p>
-							<p>When editing a document, <kbd>Ctrl</kbd>+<kbd>S</kbd> saves your draft, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes the last change.</p>
-						</article>
-					</main>
-					<script type="text/plain" data-demo-scss>
-					kbd {
-						@include kbd;
-					}
-					</script>
-				</section>
+			<table>
+				<thead>
+					<tr>
+						<th data-ln-table-col-select></th>
+						<th data-ln-table-col="title">Title <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="status">Status</th>
+						<th data-ln-table-col="file_size">Size <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+					</tr>
+				</thead>
+				<tbody data-ln-table-body></tbody>
+			</table>
+			<footer class="ln-table__footer">
+				<p><span class="hidden"><span data-ln-table-filtered></span> / </span><span data-ln-table-total></span> items</p>
+			</footer>
+
+			<!-- External Templates via data-ln-include -->
+			<template data-ln-template="documents-row" data-ln-include="tpl/documents-row.html"></template>
+			<template data-ln-template="documents-empty" data-ln-include="tpl/documents-empty.html"></template>
+		</section>
+	</main>
+	<script type="text/plain" data-demo-scss>
+	[data-ln-table] {
+		@include table-base;
+	}
+	</script>
+</section>
 			</div>
 		</section>
 
