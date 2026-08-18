@@ -670,6 +670,11 @@ import { createWindowIndex } from './window-index';
 	_component.prototype.applySync = function (upsertedRecords, deletedIds, syncedAt, meta) {
 		meta = meta || {};
 		const self = this;
+
+		if (self._windowIndex && meta.queryGen != null && meta.queryGen !== self._windowIndex.queryGen) {
+			return Promise.resolve();
+		}
+
 		const hasChanges = upsertedRecords.length > 0 || deletedIds.length > 0;
 
 		let chain = Promise.resolve();

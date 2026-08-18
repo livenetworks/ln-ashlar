@@ -13,7 +13,7 @@ Modern frameworks often force developers to download megabytes of client-side Ja
 1. **Server-Rendered structure, client-rendered behavior:** The server (Laravel, Go, Rails, etc.) generates the complete, semantic HTML. The browser paints it immediately. A lightweight, native `MutationObserver` registers and binds vanilla JS components dynamically.
 2. **HTML describes WHAT, not HOW:** HTML markup should only consist of semantic tags and structural elements. Visual details belong exclusively in SCSS.
 3. **Pure SCSS Styling via `@include`:** We strictly forbid Tailwind-style utility classes in markup (avoid classes like `flex`, `grid-cols-4`, `text-red-500`). Markup is styled by applying SCSS mixins to semantic selectors (e.g., `#user-table { @include table-base; }`).
-4. **Zero Dependencies:** To ensure decades of stability and complete immunity to npm supply chain attacks, `ln-ashlar` contains zero transitive dependencies at runtime.
+4. **Zero Dependencies:** To ensure decades of stability and no transitive npm runtime tree, `ln-ashlar` contains zero runtime dependencies. This does not extend to `npm` packages served over a CDN — jsDelivr distributes `@tabler/icons` (see the [Dynamic SVG Icon Trust Boundary](security.md#7-dynamic-svg-icon-trust-boundary-ln-icons)), so a compromised release of that package would still propagate through the CDN into the page.
 
 ---
 

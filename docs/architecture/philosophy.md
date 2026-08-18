@@ -82,7 +82,7 @@ This creates severe **Supply Chain** security risks:
 * **`ua-parser-js`, `coa`, and `rc` compromises (2021):** High-profile packages with tens of millions of weekly downloads were hijacked to deliver password stealers and crypto-miners.
 * **Unpatched Vulnerabilities:** A significant portion of npm packages are hobby projects maintained by single individuals. When security vulnerabilities (CVEs) are discovered, months can pass before a patch is published, leaving downstream enterprise applications exposed in the meantime.
 
-`ln-ashlar` addresses this security nightmare via a strict **zero-dependency** policy. All client-side code in `ln-ashlar` is written in clean, native JavaScript that communicates directly with the browser's native Web APIs, reducing the dependency attack surface to absolute zero.
+`ln-ashlar` addresses this security nightmare via a strict **zero-dependency** policy. All client-side code in `ln-ashlar` is written in clean, native JavaScript that communicates directly with the browser's native Web APIs, eliminating the transitive npm runtime tree entirely. The one remaining third-party runtime source is the icon CDN used by `ln-icons` (configurable, self-hostable — see the [Dynamic SVG Icon Trust Boundary](security.md#7-dynamic-svg-icon-trust-boundary-ln-icons)).
 
 ---
 
@@ -96,15 +96,15 @@ Instead of forcing a choice between the outdated "dumb" server-rendered paint an
 2. **The DOM is the Coordinator:** Instead of JavaScript dynamically building the markup, declarative HTML attributes define the configuration and behavioral scope.
 3. **Progressive and Native Interactivity:** Lightweight, modular vanilla JS components (`ln-data-store`, `ln-table`, `ln-modal`) are dynamically registered via `MutationObserver` and communicate using native `CustomEvent` flows.
 
-### Summary of Architectural Comparison
-
-| Architectural Challenge | Mainstream JS-First (React/Vue/Angular) | DOM-First with `ln-ashlar` |
+### Summary of Architectural Trade-offs
+ 
+| Dimension | Component-Tree Frameworks (React/Vue/Angular) | DOM-First Architecture (`ln-ashlar`) |
 | :--- | :--- | :--- |
-| **Primary Rendering** | Client-side via heavy Virtual DOM compilation. | Server-side via standard HTML. |
-| **Binding & Config** | Inside JS files via imports, props, and states. | Directly in HTML via semantic `data-ln` attributes. |
-| **Dependency Overhead** | Hundreds to thousands of packages (`node_modules`). | **Zero-Dependency (0 npm packages at runtime)**. |
-| **Supply Chain Exposure** | High (dozens of newly discovered CVEs weekly). | Zero. Native and clean custom-built code. |
-| **Longevity & Support** | Extremely low (mandatory breaking upgrades). | **100% Stable (backed by permanent W3C web standards)**. |
-| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-table` onto any layout. |
+| **Primary Rendering** | In-memory component tree & reconciliation with client hydration. | Direct DOM enhancement of server HTML or lightweight `<template>` cloning. |
+| **Binding & Architecture** | Component-scoped props, hooks/signals, and virtual tree hierarchies. | Declarative HTML attributes (`data-ln-*`), `MutationObserver`, and `CustomEvent` messaging. |
+| **Runtime Dependencies** | Framework runtime + ecosystem dependencies in `node_modules`. | **Zero runtime dependencies** (0 npm packages, native Web APIs). |
+| **Supply Chain Surface** | Dependent on third-party npm package integrity and maintenance cycles. | Minimal: entire runtime is custom, native code built on web standards. |
+| **State Paradigm** | Centralized in-memory reactive stores, time-travel debugging. | Local-first store (IndexedDB/Memory) with FIFO sync queue, DOM-as-state for UI chrome. |
+| **Architectural Trade-offs** | Excellent for complex interactive graphics/canvas; overhead in hydration and build complexity. | Optimal for CRUD, admin systems, and long-lived enterprise apps; manual derived state wiring. |
 
 `ln-ashlar` is not merely a collection of JS components; it is an **architectural statement** that developing web applications can be simpler, faster, safer, and sustainable over decades.

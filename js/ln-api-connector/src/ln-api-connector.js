@@ -26,6 +26,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		dom[DOM_ATTRIBUTE] = this;
 		dom[DOM_ALIAS] = this; // Set alias for compatibility
 
+		this._inflight = new Map();
 		this.refreshConfig();
 		this._handlers = null;
 		_bindEvents(this);
@@ -75,7 +76,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 
 	// ─── JS API Methods (Promises) ──────────────────────────
 
-	_component.prototype.fetchDelta = function (since) {
+	_component.prototype.fetchDelta = function (since, targetEl) {
 		const self = this;
 		let url = buildUrl(self.baseUrl, self.path);
 
@@ -83,11 +84,28 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			url += (url.indexOf('?') !== -1 ? '&' : '?') + 'since=' + encodeURIComponent(since);
 		}
 
-		return window.fetch(url, { method: 'GET', headers: self._reqHeaders(), credentials: self.credentials })
-			.then(_resolve);
+		const key = targetEl || 'sync';
+		if (self._inflight.has(key)) {
+			self._inflight.get(key).abort();
+		}
+		const controller = new AbortController();
+		self._inflight.set(key, controller);
+
+		return window.fetch(url, {
+			method: 'GET',
+			headers: self._reqHeaders(),
+			credentials: self.credentials,
+			signal: controller.signal
+		})
+		.then(_resolve)
+		.finally(function () {
+			if (self._inflight.get(key) === controller) {
+				self._inflight.delete(key);
+			}
+		});
 	};
 
-	_component.prototype.query = function (queryParams) {
+	_component.prototype.query = function (queryParams, targetEl) {
 		const self = this;
 		queryParams = queryParams || {};
 		let url = buildUrl(self.baseUrl, self.path);
@@ -128,8 +146,35 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			url += (url.indexOf('?') !== -1 ? '&' : '?') + qs;
 		}
 
-		return window.fetch(url, { method: 'GET', headers: self._reqHeaders(), credentials: self.credentials })
-			.then(_resolve);
+		let controller = null;
+		if (targetEl) {
+			if (self._inflight.has(targetEl)) {
+				self._inflight.get(targetEl).abort();
+			}
+			controller = new AbortController();
+			self._inflight.set(targetEl, controller);
+		}
+
+		const fetchOptions = {
+			method: 'GET',
+			headers: self._reqHeaders(),
+			credentials: self.credentials
+		};
+		if (controller) {
+			fetchOptions.signal = controller.signal;
+		}
+
+		let promise = window.fetch(url, fetchOptions).then(_resolve);
+
+		if (targetEl && controller) {
+			promise = promise.finally(function () {
+				if (self._inflight.get(targetEl) === controller) {
+					self._inflight.delete(targetEl);
+				}
+			});
+		}
+
+		return promise;
 	};
 
 	_component.prototype.create = function (payload, url, idempotencyKey) {
@@ -188,11 +233,13 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		self._handlers = {
 			sync: function (e) {
 				const detail = e.detail || {};
-				self.fetchDelta(detail.since)
+				const targetEl = (detail.meta && detail.meta.targetEl) ? detail.meta.targetEl : null;
+				self.fetchDelta(detail.since, targetEl)
 					.then(function (data) {
 						dispatch(self.dom, 'ln-api-connector:fetched', { data: data, since: detail.since, meta: detail.meta || null });
 					})
 					.catch(function (err) {
+						if (err && err.name === 'AbortError') return;
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'sync',
 							error: err.message,
@@ -206,7 +253,8 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 			query: function (e) {
 				const detail = e.detail || {};
 				const queryParams = detail.query || detail;
-				self.query(queryParams)
+				const targetEl = (detail.meta && detail.meta.targetEl) ? detail.meta.targetEl : null;
+				self.query(queryParams, targetEl)
 					.then(function (res) {
 						const payload = res || {};
 						dispatch(self.dom, 'ln-api-connector:fetched', {
@@ -219,6 +267,7 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 						});
 					})
 					.catch(function (err) {
+						if (err && err.name === 'AbortError') return;
 						dispatch(self.dom, 'ln-api-connector:error', {
 							action: 'query',
 							error: err.message,
@@ -322,6 +371,13 @@ import { registerComponent, dispatch, buildUrl, getHeaders, parseHeaders } from 
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
 		const self = this;
+		if (self._inflight) {
+			self._inflight.forEach(function (controller) {
+				controller.abort();
+			});
+			self._inflight.clear();
+		}
+
 		if (self._handlers) {
 			const namespaces = ['ln-api-connector', 'ln-rest-connector'];
 			namespaces.forEach(function (ns) {

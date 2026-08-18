@@ -41,7 +41,7 @@ It possesses no visual interface and is **completely blind to the network** (no 
 
 - **Dynamic Schema Discovery:** Upon initialization, the component scans the document for all `[data-ln-data-store]` elements. It collects their store names and index definitions.
 - **Auto Upgrade:** If new stores or indexes are declared in the HTML markup, the component closes the active connection, increments the database version, and dynamically creates the missing stores and indexes in `onupgradeneeded`.
-- **Memory Fallback:** If the browser does not support IndexedDB, or if database open/upgrade operations fail/are blocked, the component transparently falls back to an in-memory data store.
+- **Initialization Failure:** If the browser does not support IndexedDB, or if database open/upgrade operations fail/are blocked, the component fails initialization, sets `initializationError`, and dispatches `ln-data-store:initialization-error`. There is no in-memory fallback; consumers are responsible for handling storage unavailability.
 
 ---
 

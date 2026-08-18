@@ -618,7 +618,7 @@ import { MutationReceipts } from './mutation-receipts';
 
 				const isAuth      = status === 401 || status === 419;
 				const isTransient = status === 0 || status >= 500;
-				const isConflict  = status === 409;
+				const isConflict  = status === 409 || status === 412;
 
 				// ── Auth: pause queue, keep local write ──
 				if (isAuth) {
