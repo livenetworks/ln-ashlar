@@ -1,0 +1,25 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-api-queue",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-api-queue": {
+			"direction": null,
+			"sources": [
+				"src/ln-api-queue.js"
+			]
+		},
+		"data-ln-api-queue-online": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-queue.js"
+			]
+		},
+		"data-ln-data-coordinator": {
+			"direction": "author",
+			"sources": [
+				"src/ln-api-queue.js"
+			]
+		}
+	}
+}

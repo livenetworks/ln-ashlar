@@ -37,8 +37,6 @@
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
-	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -164,6 +162,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
 						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="include.html"><span class="nav-label">Include</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
@@ -223,10 +222,10 @@
 	<header><h3>Declarative Data Layer Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- Coordinator wrapper: headless store + connector children (the scoped form lives outside — matched by name) -->
-		<div data-ln-data-coordinator="wwf-documents" id="wwf-coordinator">
+		<div data-ln-data-coordinator id="wwf-coordinator">
 
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
-			<div data-ln-data-store="wwf-documents" id="wwf-store"></div>
+			<div data-ln-data-store id="wwf-documents"></div>
 
 			<!-- Tier 2: Transport Gateway — path is read/sync fallback only; mutation URL comes from the form's action -->
 			<div data-ln-api-connector
@@ -241,7 +240,7 @@
 <section class="section-card">
 	<header><h3>Interactive Documents Manager</h3></header>
 	<main>
-		<section data-ln-table="wwf-documents" data-ln-table-source="wwf-documents" data-ln-table-store="wwf-documents" id="wwf-table" class="data-table-demo">
+		<section data-ln-table="wwf-documents" data-ln-table-source="wwf-documents" id="wwf-table" class="data-table-demo">
 			<header class="ln-table__toolbar">
 				<div>
 					<h3>Documents</h3>

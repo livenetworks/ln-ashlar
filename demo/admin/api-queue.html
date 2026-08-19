@@ -37,8 +37,6 @@
 	</script>
 	<link rel="stylesheet" href="dist/admin.css">
 	<link rel="stylesheet" href="../dist/ln-ashlar-dev.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
-	<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
 	<script src="../dist/ln-ashlar.iife.js" defer></script>
 	<script src="dist/demo.js" defer></script>
 </head>
@@ -164,6 +162,7 @@
 						<li><a href="external-links.html"><span class="nav-label">External Links</span></a></li>
 						<li><a href="filter.html"><span class="nav-label">Filter</span></a></li>
 						<li><a href="http.html"><span class="nav-label">HTTP</span></a></li>
+						<li><a href="include.html"><span class="nav-label">Include</span></a></li>
 						<li><a href="link.html"><span class="nav-label">Link</span></a></li>
 						<li><a href="modal.html"><span class="nav-label">Modal</span></a></li>
 						<li><a href="nav.html"><span class="nav-label">Nav</span></a></li>
@@ -229,10 +228,10 @@
 	<header><h3>Declarative 3-Tier + Queue Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- 3-Tier Data Layer + Outbox: Coordinator encloses store cache, REST connector, and offline queue -->
-		<div data-ln-data-coordinator="queue-demo" id="demo-queue-coordinator">
+		<div data-ln-data-coordinator id="demo-queue-coordinator">
 
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
-			<div data-ln-data-store="tasks" id="demo-queue-store"></div>
+			<div data-ln-data-store id="demo-queue-store"></div>
 
 			<!-- Tier 2: Transport Gateway (mocked REST endpoint, see mock-api-queue.js) -->
 			<div data-ln-api-connector

@@ -60,7 +60,8 @@ export function dispatchCancelable(element, eventName, detail) {
  * Re-filter / re-sort / re-render a data-driven list-like component, then
  * notify the coordinator that fresh data is requested.
  *
- * Shared by ln-list and ln-table. The passed `component` MUST expose this
+ * Used by ln-table. `ln-list` does not — a source-bound list is refreshed by the
+ * store, not by asking on its own behalf. The passed `component` MUST expose this
  * instance contract:
  *   - _applyFilterAndSort()  method
  *   - _render()              method
@@ -71,8 +72,8 @@ export function dispatchCancelable(element, eventName, detail) {
  *   - currentSort, currentFilters, currentSearch
  *
  * @param {Object} component  component instance satisfying the contract above
- * @param {string} eventName  e.g. 'ln-table:request-data' / 'ln-list:request-data'
- * @param {string} keyName    payload key for the name, e.g. 'table' / 'list'
+ * @param {string} eventName  e.g. 'ln-table:request-data'
+ * @param {string} keyName    payload key for the name, e.g. 'table'
  */
 export function requestData(component, eventName, keyName) {
 	component._applyFilterAndSort();
@@ -582,6 +583,59 @@ export function interceptValueProperty(dom, descriptor, { get, set }) {
 	});
 }
 
+// ─── Loader Gate State & Primitives ──────────────────────
+if (typeof window !== 'undefined') {
+	window.lnCore = window.lnCore || {};
+	window.lnCore._bootHolds = window.lnCore._bootHolds || 0;
+	window.lnCore._bootQueue = window.lnCore._bootQueue || [];
+}
+
+export function holdInit() {
+	if (typeof window !== 'undefined') {
+		window.lnCore = window.lnCore || {};
+		window.lnCore._bootHolds = (window.lnCore._bootHolds || 0) + 1;
+	}
+}
+
+export function releaseInit() {
+	if (typeof window !== 'undefined') {
+		window.lnCore = window.lnCore || {};
+		window.lnCore._bootHolds = Math.max(0, (window.lnCore._bootHolds || 0) - 1);
+		if (window.lnCore._bootHolds === 0 && window.lnCore._bootQueue) {
+			const queue = window.lnCore._bootQueue;
+			window.lnCore._bootQueue = [];
+			for (let i = 0; i < queue.length; i++) {
+				queue[i]();
+			}
+		}
+	}
+}
+
+export function pendingCount() {
+	return (typeof window !== 'undefined' && window.lnCore) ? (window.lnCore._bootHolds || 0) : 0;
+}
+
+// With holds active, fn is queued and later drained SYNCHRONOUSLY by releaseInit;
+// with no holds, fn is deferred via setTimeout(fn, 0) to preserve
+// ln-modal-coordinator's original setTimeout(_bootSync, 0) scheduling.
+// registerComponent only calls queueBoot when pendingCount() > 0, so the
+// zero-hold branch below is exercised solely by ln-modal-coordinator's own call.
+export function queueBoot(fn) {
+	if (typeof window !== 'undefined') {
+		window.lnCore = window.lnCore || {};
+		window.lnCore._bootHolds = window.lnCore._bootHolds || 0;
+		window.lnCore._bootQueue = window.lnCore._bootQueue || [];
+
+		if (window.lnCore._bootHolds > 0) {
+			window.lnCore._bootQueue.push(fn);
+		} else {
+			setTimeout(fn, 0);
+		}
+	} else {
+		fn();
+	}
+}
+
 // ─── Component Registration ───────────────────────────────
 
 export function registerComponent(selector, attribute, ComponentFn, componentTag, options = {}) {
@@ -660,12 +714,18 @@ export function registerComponent(selector, attribute, ComponentFn, componentTag
 
 	window[attribute] = constructor;
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
+	function boot() {
+		if (pendingCount() > 0) {
+			queueBoot(function () { constructor(document.body); });
+		} else {
 			constructor(document.body);
-		});
+		}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', boot);
 	} else {
-		constructor(document.body);
+		boot();
 	}
 
 	return constructor;

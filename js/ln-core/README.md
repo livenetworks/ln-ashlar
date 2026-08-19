@@ -367,6 +367,27 @@ registerComponent('data-ln-example', 'lnExample', _component, 'ln-example', {
   (initial DOM, added childList nodes, attribute-mutated subtrees).
 - Returns the constructor function (also stored at `window[attribute]`).
 
+### holdInit() / releaseInit() / pendingCount() / queueBoot(fn)
+
+Boot gating primitives for asynchronous loading (such as external partial templates). Prevents components from initializing (sweeping the DOM) before all external resources have finished loading.
+
+```js
+import { holdInit, releaseInit, pendingCount, queueBoot } from '../ln-core';
+
+// In an async component's initialization:
+holdInit();
+fetch('/tpl.html').then(html => {
+    // populate DOM
+    releaseInit();
+});
+```
+
+- `holdInit()` — Increments the global boot holds counter (`window.lnCore._bootHolds`).
+- `releaseInit()` — Decrements the global boot holds counter. If the counter reaches zero, it drains the queue (`window.lnCore._bootQueue`) in push order.
+- `pendingCount()` — Returns the current number of active boot holds.
+- `queueBoot(fn)` — If `pendingCount() > 0`, queues the function in `_bootQueue`. Otherwise, schedules it immediately using `setTimeout(fn, 0)` (to match standard event loop scheduling).
+- Used internally by `registerComponent` and `ln-modal-coordinator` to prevent race conditions during async initialization.
+
 ---
 
 ## reactive.js

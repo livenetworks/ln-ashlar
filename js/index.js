@@ -3,6 +3,12 @@ import '../scss/ln-ashlar.scss';
 
 // JS Components
 import './ln-http/src/ln-http.js';
+// ln-include must be the FIRST registerComponent caller: under `defer` the
+// readyState is already 'interactive', so every registerComponent takes the
+// synchronous boot branch during module evaluation, and ln-include's sweep has
+// to raise the boot gate before any other component sweeps. It sits AFTER
+// ln-http because its own fetch must go through the wrapped window.fetch.
+import './ln-include/src/ln-include.js';
 import './ln-form/src/ln-form.js';
 // ln-validate must attach its submit listener before ln-ajax's: a <form>
 // can carry both data-ln-validate fields and data-ln-ajax, and
@@ -51,6 +57,7 @@ import './ln-api-connector/src/ln-api-connector.js';
 import './ln-couchdb-connector/src/ln-couchdb-connector.js';
 import './ln-data-coordinator/src/ln-data-coordinator.js';
 import './ln-api-queue/src/ln-api-queue.js';
+import './ln-chart/src/ln-chart.js';
 import './ln-options/src/ln-options.js';
 import './ln-stat/src/ln-stat.js';
 import './ln-icon/src/ln-icon.js';

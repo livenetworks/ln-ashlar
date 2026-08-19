@@ -99,6 +99,10 @@ This service module exposes no declarative HTML attributes directly on itself.
 | `parseHeaders` | `(str: String, componentName?: String)` | `Object` | Safely parses a JSON header string, returning an empty object on error. |
 | `registerDataMapper` | `(name: String, mapper: { ingress: Function, egress: Function })` | `void` | Registers domain data mappers for record transformation in connectors/stores. |
 | `getDataMapper` | `(name: String)` | `Object` | Retrieves a registered data mapper (or identity fallback). |
+| `holdInit` | `()` | `void` | Increments the global boot holds counter to block component initialization. |
+| `releaseInit` | `()` | `void` | Decrements the global boot holds counter, draining the boot queue when it reaches zero. |
+| `pendingCount` | `()` | `Number` | Returns the current active boot hold count. |
+| `queueBoot` | `(fn: Function)` | `void` | Queues a component boot function if holds are active, otherwise calls it via setTimeout. |
 
 ### Events API
 

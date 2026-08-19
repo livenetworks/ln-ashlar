@@ -35,9 +35,9 @@ tags: [data, synchronization, local-first]
 ### Base HTML Markup
 
 ```html
-<ul data-ln-data-coordinator="users" id="users-coordinator" hidden>
+<ul data-ln-data-coordinator id="users-coordinator" hidden>
     <!-- Local database storage (IndexedDB) -->
-    <li data-ln-data-store="users" id="users-store"></li>
+    <li data-ln-data-store id="users"></li>
     
     <!-- Remote connection endpoint (REST) -->
     <li data-ln-api-connector="/api/users" id="users-connector"></li>
@@ -49,18 +49,18 @@ tags: [data, synchronization, local-first]
 
 ### Variant 1: Connection to View Components
 
-View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere in the DOM. They communicate with the coordinator via bubbled document queries.
+View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-chart.md)) can reside anywhere in the DOM. They communicate with the coordinator via bubbled document queries.
 
 #### HTML Markup
 ```html
 <!-- Logical data definition -->
-<ul data-ln-data-coordinator="users" hidden>
-    <li data-ln-data-store="users"></li>
+<ul data-ln-data-coordinator hidden>
+    <li data-ln-data-store id="users"></li>
     <li data-ln-api-connector="/api/users"></li>
 </ul>
 
 <!-- UI View component consuming data -->
-<div id="users-table" data-ln-table="users" data-ln-table-store="users">
+<div id="users-table" data-ln-table="users" data-ln-table-source="users">
     <table>
         <!-- Populated automatically -->
     </table>
@@ -75,7 +75,7 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere
 
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
-| `data-ln-data-coordinator` | Wrapper | `String` | — | Activates the coordinator. Declares the data model namespace. |
+| `data-ln-data-coordinator` | Wrapper | Flag / Valueless | — | Activates the coordinator. |
 | `data-ln-data-mapper` | Wrapper | `String` | — | Optional custom data mapper function key name. |
 | `data-ln-data-coordinator-stale` | Wrapper | `Number` | `300` | Stale cache window in seconds. Falls back to store rules. |
 | `data-ln-data-coordinator-no-autosync` | Wrapper | Flag | — | Disables automatic sync on visibility or online recovery events. |
@@ -108,10 +108,11 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`) can reside anywhere
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-list:request-data` | Listens | No | Query from a list to fetch items (same handling as `ln-table:request-data`). | `{ target: HTMLElement, sort, filters, search }` |
+| `ln-chart:request-data` | Listens | No | Query from a chart to fetch an ordered dataset. | `{ target: HTMLElement, sort, filters, search }` |
 | `ln-options:request-data` | Listens | No | Query from an `<select>`/options binder to fetch all records. | `{ target: HTMLElement }` |
 | `ln-stat:request-count` | Listens | No | Query from a stat/counter binder to fetch a record count. | `{ target: HTMLElement, filters?: Object }` |
-| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table` or `list`, matching the requesting view's own namespace. Delivers the resolved query result. | `{ data: Array, total: Number, filtered: Number }` |
-| `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: true }` |
+| `ln-{kind}:set-data` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`, matching the requesting view's own namespace. Delivers the resolved query result. | `{ data: Array, total: Number, filtered: Number }` |
+| `ln-{kind}:set-loading` | Emits | No | Pattern row — `{kind}` is `table`, `list`, or `chart`. Dispatched instead of `set-data` while the store hasn't finished loading yet. | `{ loading: Boolean }` |
 | `ln-{kind}:page-failed` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Reports that a windowed page query failed, so the view can release that offset for a later retry. | `{ offset: Number }` |
 | `ln-{kind}:request-revalidate` | Emits | No | Pattern row — `{kind}` is `table` or `list`. Sent to a windowed view on a store change in place of `set-data`: the view refreshes through its own window cache rather than being served store rows. | *(no payload)* |
 | `ln-options:set-data` | Emits | No | Delivers all records to a bound options binder. | `{ data: Array }` |
@@ -175,7 +176,7 @@ sequenceDiagram
     participant API as Backend PHP API
 
     Note over Table, API: Single Source of Truth: Table binds strictly to ln-data-store
-    Table->>Store: Query request (data-ln-table-store="name")
+    Table->>Store: Query request (data-ln-table-source="name")
     Store->>Coord: Event: ln-data-store:request-remote-sync
     Coord->>Conn: Event: ln-api-connector:request-query
     Conn->>API: window.fetch(url) (Network Tab)

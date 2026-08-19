@@ -11,9 +11,9 @@ This component persists pending mutations to its own `IndexedDB` database and re
 Place the queue inside your parent coordinator element alongside your store and connector — it is an **optional** third child:
 
 ```html
-<ul data-ln-data-coordinator="documents" hidden>
+<ul id="documents-module" data-ln-data-coordinator hidden>
     <!-- Storage Layer Cache (Blind to networking) -->
-    <li data-ln-data-store
+    <li id="documents" data-ln-data-store
         data-ln-data-store-indexes="status,updated_at">
     </li>
 
@@ -24,7 +24,7 @@ Place the queue inside your parent coordinator element alongside your store and 
     </li>
 
     <!-- Offline Outbox (optional Child 3) -->
-    <li data-ln-api-queue></li>
+    <li id="documents-queue" data-ln-api-queue></li>
 </ul>
 ```
 
@@ -36,7 +36,8 @@ When this child is absent, the coordinator's write handlers call the connector d
 
 | Attribute | Category | Description |
 |-----------|----------|-------------|
-| `data-ln-api-queue` | Selector | Creates the component instance. Optional value serves as a scope/name (defaults to the coordinator's scope). |
+| `id="name"` | Identity | Unique identifier of the queue (the scope name). Defaults to the coordinator's `id` if nested, else `'default'`. |
+| `data-ln-api-queue` | Selector | Marker attribute to declare the component. |
 | `data-ln-api-queue-online` | Status (read-only, reflected) | Set by the component itself — `"true"` when the scope is draining/idle normally, `"false"` while paused (e.g. auth pause). Useful for CSS hooks on a connectivity indicator; not meant to be written by consumers. |
 
 ---
@@ -174,7 +175,7 @@ The queue never imports or references a connector, never constructs a URL, and n
 
 ```javascript
 (function () {
-    const parent = document.querySelector('[data-ln-data-coordinator="documents"]');
+    const parent = document.getElementById('documents-module');
     const queueEl = parent.querySelector('[data-ln-api-queue]');
     const connectorEl = parent.querySelector('[data-ln-api-connector]');
 

@@ -129,9 +129,9 @@ Rather than parsing raw string expressions out of inline `<script data-ln-mapper
   ```
   ```html
   <!-- CSP Compliant: No inline evaluation occurs -->
-  <div data-ln-data-coordinator="documents" data-ln-data-mapper="documents-mapper">
-       <div data-ln-data-store></div>
-  </div>
+  <ul id="documents-module" data-ln-data-coordinator data-ln-data-mapper="documents-mapper" hidden>
+       <li id="documents" data-ln-data-store></li>
+  </ul>
   ```
 
 ---
@@ -212,4 +212,43 @@ document.addEventListener('ln-router:navigated', (e) => {
     const search = e.detail.query.q;
     e.detail.target.querySelector('#search-query').textContent = `Results for: ${search}`;
 });
+```
+
+---
+
+## 7. Dynamic SVG Icon Trust Boundary (`ln-icons`)
+
+`ln-icons` dynamically fetches SVG icon assets on-demand and injects their contents into `<symbol>` nodes in the document DOM via `innerHTML` without client-side sanitization. This is an intentional architectural boundary designed to keep raw SVG attributes, viewboxes, and path definitions intact without regex or parser corruption.
+
+### Trust Model & CDN Endpoints
+By default, `ln-icons` loads icons from a pinned version of the Tabler Icons library hosted on jsDelivr:
+- Default: `https://cdn.jsdelivr.net/npm/@tabler/icons@3.31.0/icons/outline/{name}.svg`
+- Custom prefix (`#lnc-`): configurable via `window.LN_ICONS_CUSTOM_CDN`
+- Primary override: configurable via `window.LN_ICONS_CDN`
+
+### `localStorage` Cache: Persistence Vector
+Fetched SVG strings are cached in `localStorage` under keys `lni:{id}` to prevent repeated network round-trips. When a cache hit occurs, the cached SVG payload rehydrates through the same symbol injection pipeline.
+> [!NOTE]
+> `localStorage` acts as a **persistence and escalation vector**, not an initial entry point (an attacker would already require arbitrary script execution on the origin to write to `localStorage`).
+
+### Self-Hosting Icons (Recommended for High-Security Deployments)
+For enterprise or air-gapped systems requiring strict origin isolation, configure a same-origin or self-hosted CDN URL before initializing `ln-icons`:
+```javascript
+// Point to self-hosted same-origin icon assets
+window.LN_ICONS_CDN = '/assets/icons/tabler';
+window.LN_ICONS_CUSTOM_CDN = '/assets/icons/custom';
+```
+
+### Content Security Policy (CSP) Directives
+When using dynamic icon fetching, configure the `connect-src` CSP directive to permit requests exclusively to your chosen icon CDN or origin:
+```http
+Content-Security-Policy: default-src 'self'; connect-src 'self' https://cdn.jsdelivr.net;
+```
+
+### Fully Offline Alternative (Zero Network Fetch)
+If dynamic runtime fetching is forbidden entirely, compile an SVG sprite sheet and reference symbols directly via native SVG markup:
+```html
+<svg class="ln-icon" aria-hidden="true">
+    <use href="/assets/icons.svg#icon-name"></use>
+</svg>
 ```

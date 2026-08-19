@@ -1,0 +1,45 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-modal",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-modal-dev.scss"
+			]
+		},
+		"data-ln-modal": {
+			"direction": "both",
+			"sources": [
+				"ln-modal-dev.scss",
+				"ln-modal.scss",
+				"src/ln-modal.js"
+			]
+		},
+		"data-ln-modal-close": {
+			"direction": "author",
+			"sources": [
+				"src/ln-modal.js"
+			]
+		},
+		"data-ln-modal-for": {
+			"direction": null,
+			"sources": [
+				"ln-modal-dev.scss"
+			]
+		},
+		"data-ln-modal-mode": {
+			"direction": null,
+			"sources": [
+				"ln-modal.scss"
+			]
+		},
+		"data-ln-modal-when": {
+			"direction": null,
+			"sources": [
+				"ln-modal.scss"
+			]
+		}
+	}
+}

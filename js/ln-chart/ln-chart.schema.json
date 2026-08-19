@@ -1,0 +1,120 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-chart",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-chart": {
+			"direction": "author",
+			"sources": [
+				"ln-chart-dev.scss",
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-area": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-count": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-empty": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-labels": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-line": {
+			"direction": "author",
+			"sources": [
+				"ln-chart-dev.scss",
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-max": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-min": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-padding": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-plot": {
+			"direction": "author",
+			"sources": [
+				"ln-chart-dev.scss",
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-sort": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-type": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-x": {
+			"direction": "author",
+			"sources": [
+				"ln-chart-dev.scss",
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-y": {
+			"direction": "author",
+			"sources": [
+				"ln-chart-dev.scss",
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-chart-zero": {
+			"direction": "author",
+			"sources": [
+				"src/ln-chart.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-chart-dev.scss"
+			]
+		},
+		"data-ln-template": {
+			"direction": null,
+			"sources": [
+				"src/ln-chart.js"
+			]
+		}
+	}
+}

@@ -1,0 +1,146 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-list",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-empty": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-empty-when": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-item": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-item-action": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-item-id": {
+			"direction": "both",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-item-select": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-body": {
+			"direction": "author",
+			"sources": [
+				"ln-list.scss",
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-clear": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-clear-all": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-count": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-empty": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-filtered": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-select-all": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-selectable": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-selected": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-source": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-total": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-window": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-window-page": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-list-window-threshold": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		},
+		"data-ln-search": {
+			"direction": "author",
+			"sources": [
+				"src/ln-list.js"
+			]
+		}
+	}
+}

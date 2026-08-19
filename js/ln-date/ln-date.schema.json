@@ -1,0 +1,68 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-date",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-date": {
+			"direction": "author",
+			"sources": [
+				"ln-date-dev.scss",
+				"src/ln-date.js"
+			]
+		},
+		"data-ln-date-dict": {
+			"direction": "author",
+			"sources": [
+				"src/ln-date.js"
+			]
+		},
+		"data-ln-date-dict-key": {
+			"direction": null,
+			"sources": [
+				"src/ln-date.js"
+			]
+		},
+		"data-ln-date-field": {
+			"direction": "runtime",
+			"sources": [
+				"src/ln-date.js"
+			]
+		},
+		"data-ln-date-format": {
+			"direction": "author",
+			"sources": [
+				"src/ln-date.js"
+			]
+		},
+		"data-ln-date-label": {
+			"direction": "both",
+			"sources": [
+				"src/ln-date.js"
+			]
+		},
+		"data-ln-date-locale": {
+			"direction": null,
+			"sources": [
+				"src/ln-date.js"
+			]
+		},
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-date-dev.scss"
+			]
+		},
+		"data-ln-fill-as": {
+			"direction": "both",
+			"sources": [
+				"src/ln-date.js"
+			]
+		},
+		"data-ln-value": {
+			"direction": "both",
+			"sources": [
+				"src/ln-date.js"
+			]
+		}
+	}
+}

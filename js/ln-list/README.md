@@ -68,7 +68,7 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 | `data-ln-list` | Root wrapper | Component identifier. Target must carry a unique `id`. |
 | `data-ln-list-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
 | `data-ln-list-selectable` | Root wrapper | Enables checkbox-based item selections. |
-| `data-ln-list-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-item cap (default 1000). Requires Data-Driven Mode. Observable: add/remove toggles windowed mode ON/OFF live; changing `N` while windowed reconfigures the live cache. `data-ln-list-window-page`, `data-ln-list-window-threshold`, and `data-ln-list-count` are likewise observable. |
+| ~~`data-ln-list-window`~~ | Root wrapper | **Removed.** Windowed residency is now configured on the store via `data-ln-data-store-window`. |
 
 ---
 
@@ -76,7 +76,7 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 
 ### Listened Events
 
-* `ln-list:set-data` `{ data, total, filtered }`: Hydrates/renders the items. Windowed mode expects `{ offset, queryGen }` echoed back — routed into the internal window cache.
+* `ln-list:set-data` `{ data, total, filtered }`: Hydrates/renders the items. If `{ offset }` is supplied, it is treated as a slice update of size `data.length` at the given offset within the total records count.
 * `ln-list:set-loading` `{ loading: true|false }`: Toggles the loading dimming overlay class (`.ln-list--loading`).
 * `ln-list:page-failed` `{ offset }`: Windowed mode — the coordinator reports the page fetch at `offset` failed. Releases it from the cache's in-flight set; no auto-retry, the next `ensure()` requests it again.
 * `ln-list:request-revalidate`: Windowed mode — the coordinator asks the cache to revalidate the currently visible page after a local mutation. Stale rows stay visible, no jump to page 0.
@@ -85,7 +85,7 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 
 ### Emitted Events
 
-* `ln-list:request-data` `{ list, search, sort, filters }`: Requests data query from the Coordinator. Windowed mode (`data-ln-list-window`) adds `{ offset, limit, queryGen }`. Disabling windowed mode live issues a fresh full `ln-list:request-data` (no `offset`/`limit`) to repopulate the complete dataset.
+* `ln-list:request-data` `{ list, sort }`: Requests data query from the Coordinator. When partially rendered (windowed residency on the store), it includes `{ offset, limit }` parameters to request missing slices.
 * `ln-list:ready` `{ total }`: Fired when initial markup parsing completes.
 * `ln-list:rendered` `{ list, total, visible }`: Fired after items have been drawn to DOM.
 * `ln-list:item-click` `{ list, id, record }`: Fired when clicking item body (excluding buttons, anchors, inputs).
@@ -101,17 +101,11 @@ Source: `js/ln-list/src/ln-list.js`.
 
 ### Spacer element matches container semantics
 
-Virtual scroll (both plain and windowed) needs top/bottom spacer elements to preserve scroll height without rendering off-screen rows. If `[data-ln-list-body]` is a `<ul>`/`<ol>`, spacers are `<li class="ln-list__spacer">` to stay HTML5-valid; any other container gets `<div class="ln-list__spacer">`.
+Virtual scroll needs top/bottom spacer elements to preserve scroll height without rendering off-screen rows. If `[data-ln-list-body]` is a `<ul>`/`<ol>`, spacers are `<li class="ln-list__spacer">` to stay HTML5-valid; any other container gets `<div class="ln-list__spacer">`.
 
-### `_renderVirtual()` vs `_renderWindowed()`
+### Slice / Windowed virtualization
 
-Both compute the visible `start`/`end` index range from the measured first-child height and the nearest scrollable ancestor's viewport, then mount spacers and clone the row template for the visible slice via `fillTemplate`/`fill`. They differ only in row source: `_renderVirtual()` reads `this._data[i]` (the full parsed/fetched dataset); `_renderWindowed()` reads `this._cache.get(i)` (the resident sliding window) and renders a blank placeholder spacer — no shimmer — for indices outside the cache, calling `this._cache.ensure(startRow, endRow)` every pass to debounce-fetch missing rows.
-
-### Windowed mode (`data-ln-list-window="N"`)
-
-Owns an `ln-core.createWindowCache` instance (`N` = resident cap, default 1000) instead of the full dataset. `ln-list:request-data` gains `{offset, limit, queryGen}`; `ln-list:set-data` echoes `{offset, queryGen}` back into `cache.ingest()`. Select-all is hidden under `data-ln-list-selectable` + windowed mode together — a windowed list can't select rows it hasn't fetched.
-
-Every windowing attribute is live-observable, no re-init required: `data-ln-list-window-page`/`-threshold`/`data-ln-list-count` reconfigure the cache via `configure()`/`setGrandTotal()`. Adding `data-ln-list-window` to an already-initialized, non-windowed, data-driven list seeds the cache from resident items and enables windowing live. Removing it destroys the cache and issues one full (no `offset`/`limit`) `ln-list:request-data` to repopulate before rendering non-windowed again.
+When windowed residency is enabled on the store, `ln-list` operates with slice rendering. Only a single page/slice of records is kept resident in the view at any time. When the user scrolls, `ln-list` renders placeholder items for records that are not yet loaded and dispatches `ln-list:request-data` with `{ offset, limit }` to fetch the missing slice from the coordinator.
 
 ### `_parseChildren()`
 

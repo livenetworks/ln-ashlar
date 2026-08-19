@@ -22,10 +22,10 @@
 	<header><h3>Declarative 3-Tier + Queue Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- 3-Tier Data Layer + Outbox: Coordinator encloses store cache, REST connector, and offline queue -->
-		<div data-ln-data-coordinator="queue-demo" id="demo-queue-coordinator">
+		<div data-ln-data-coordinator id="demo-queue-coordinator">
 
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
-			<div data-ln-data-store="tasks" id="demo-queue-store"></div>
+			<div data-ln-data-store id="demo-queue-store"></div>
 
 			<!-- Tier 2: Transport Gateway (mocked REST endpoint, see mock-api-queue.js) -->
 			<div data-ln-api-connector

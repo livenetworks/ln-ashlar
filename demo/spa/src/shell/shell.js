@@ -19,8 +19,8 @@
 
 		// Helper to force sync both stores
 		function forceSyncBoth() {
-			const packagesStoreEl = document.getElementById('packages-store');
-			const tenantsStoreEl = document.getElementById('tenants-store');
+			const packagesStoreEl = document.getElementById('packages');
+			const tenantsStoreEl = document.getElementById('tenants');
 			if (packagesStoreEl && packagesStoreEl.lnDataStore) packagesStoreEl.lnDataStore.forceSync();
 			if (tenantsStoreEl && tenantsStoreEl.lnDataStore) tenantsStoreEl.lnDataStore.forceSync();
 		}

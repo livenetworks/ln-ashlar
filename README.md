@@ -8,11 +8,11 @@
 
 ## 🏛️ The Dual-Core DOM-First Paradigm (SSR + Client-Side SPA)
 
-`ln-ashlar` is built on a **DOM-First** architecture. The browser works directly with native DOM standards, not a heavy Virtual DOM compilation layer. 
+`ln-ashlar` is built on a **DOM-First** architecture. The browser works directly with native DOM standards; there is no in-memory component tree to build. 
 
 Whether your architecture relies on **Server-Rendered HTML** (Laravel, Go, Django, Rails) or **Client-Side SPAs consuming REST/JSON APIs**, `ln-ashlar` provides first-class support for both paradigms:
 
-### 1. 🌐 Server-Rendered HTML (SSR Mode)
+### 1. 🌐 Backend-First Progressive HTML Enhancement (SSR)
 * **Progressive HTML Enhancement:** Your backend delivers complete, semantic, indexable HTML.
 * **Instant First Paint:** Fast to render, SEO-friendly, and accessible in milliseconds.
 * **Zero Boilerplate:** HTML elements auto-activate via attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-data-store`) backed by a native `MutationObserver`.
@@ -20,8 +20,8 @@ Whether your architecture relies on **Server-Rendered HTML** (Laravel, Go, Djang
 ### 2. ⚡ Client-Side Single-Page Applications (SPA / JSON Mode)
 * **Built-in SPA Router (`ln-router`):** Full client-side routing with dynamic parameters (`/users/:id`), catch-all paths (`*`), atomic region swapping (`replaceChildren`), and cancelable navigation intercepts (`ln-router:before-navigate`).
 * **Compound Hash-State Codec (`hash.js`):** Deep linking and overlay state tracking (`#tab:settings&modal:42`) that preserves browser Back/Forward navigation without page reloads.
-* **JSON API Data Layer (`ln-http`, `ln-api-connector`, `ln-store`):** Native async JSON client with abort control, queueing, and 3-Tier local storage (Memory + IndexedDB/localStorage).
-* **Client-Side Reactive Rendering (`lnCore.renderList` & `reactiveState`):** Declaratively render and bind JSON API payloads into `<template>` nodes with Proxy-backed reactive state updates without Virtual DOM overhead.
+* **JSON API Data Layer (`ln-http`, `ln-api-connector`, `ln-data-store`):** Native async JSON client with abort control, queueing, and 3-Tier local storage (Memory + IndexedDB/localStorage).
+* **Client-Side Reactive Rendering (`lnCore.renderList`, `deepReactive` & `createBatcher`):** Declaratively render and bind JSON API payloads into `<template>` nodes with keyed node reuse (`data-ln-key`), deep Proxy mutation traps, and microtask render batching (`queueMicrotask`) without Virtual DOM overhead.
 * **Modular Authoring (`spa-starter/`):** Out-of-the-box SPA scaffold supporting co-located view modules (`App.defineView()`) and session-long modules (`App.defineModule()`).
 
 > [!NOTE]
@@ -33,17 +33,65 @@ Whether your architecture relies on **Server-Rendered HTML** (Laravel, Go, Djang
 
 ---
 
-### Heavy Virtual-DOM (React / Vue / Angular) vs. DOM-First `ln-ashlar`
+### Architectural Comparison & Trade-offs
 
-| Architectural Dimension | Heavy Virtual-DOM (React / Vue / Angular) | DOM-First `ln-ashlar` (SSR or SPA) |
+| Dimension | Component-Tree Frameworks (React / Vue / Angular) | DOM-First Architecture (`ln-ashlar`) |
 | :--- | :--- | :--- |
-| **Execution Paradigm** | Heavy Virtual DOM compilation layer in memory. | Native W3C DOM APIs (`MutationObserver`, Custom Attributes). |
-| **Application Architecture** | SPA only (requires Next.js/Nuxt for SSR). | **Dual Mode**: Built-in **Client-Side SPA** (`ln-router` + `spa-starter`) AND **SSR Mode**. |
-| **Data Sources** | REST / GraphQL JSON APIs. | **Both REST / JSON APIs** (`ln-http`, `renderList`) AND **Server HTML**. |
-| **Dependencies** | Megabytes of JS, hundreds of npm packages. | **Zero Dependencies** (0 npm packages at runtime). |
-| **Security Risks** | High (transitive dependency supply chain risks). | Zero supply-chain vulnerabilities. |
-| **Longevity & Support** | EOL breaking upgrades every 6-18 months. | **100% Stable** (built on eternal W3C browser standards). |
-| **Progressive Adoption** | All-or-nothing SPA deployment. | Progressive: drop a single `ln-table` or `ln-router` onto any page. |
+| **UI & Rendering Model** | In-memory component tree & reconciliation (Virtual DOM / Ivy / Signals) with hydration. | Direct W3C DOM enhancement via `MutationObserver` and custom `data-ln-*` attributes. Zero hydration cost. |
+| **Runtime Dependencies** | Framework runtime dependencies + npm package ecosystem. | **Zero runtime dependencies** (0 npm packages at runtime, pure native Web APIs). |
+| **Server & Client Harmony** | Primarily JSON/client-state oriented; SSR requires dedicated hydration / server-rendering pipelines. | **Dual Mode**: Direct progressive enhancement over server-rendered HTML (Laravel, Go, Django) or client SPA (`ln-router`). |
+| **Data & State Flow** | Fine-grained reactivity, unidirectional props/state, centralized stores. | Local-first store (IndexedDB/Memory) with FIFO sync queue, event-driven inter-component messaging. |
+| **Best Suited For** | High-frequency continuous client state (collaborative editors, real-time dashboards, complex canvas). | Admin panels, CRUD systems, enterprise portals, long-lived apps with strong backend integration. |
+| **Key Architectural Cost** | Dependency maintenance, hydration overhead, framework-specific abstractions. | Manual bookkeeping for derived state (no auto-signals), runtime-only event tracing, no JSX compile-time markup types. |
+| **Long-Term Longevity** | Managed via framework LTS releases and automated migration tools (`ng update`, codemods). | Built directly on permanent W3C browser standards (`<dialog>`, Popover API, `CustomEvent`). |
+
+---
+
+## 💡 Declarative HTML at a Glance
+
+Combine autonomous components directly in semantic HTML — **zero initialization scripts**, full accessibility, and automatic `MutationObserver` binding:
+
+```html
+<!-- Trigger Button with Tooltip and Icon -->
+<button type="button" data-ln-modal-for="user-modal" data-ln-tooltip="Add new user">
+  <svg class="ln-icon" aria-hidden="true"><use href="#ln-user-plus"></use></svg> Create User
+</button>
+
+<!-- Native Modal Dialog with Form Validation -->
+<dialog class="ln-modal" data-ln-modal id="user-modal">
+  <form method="dialog">
+    <header>
+      <h3>Create User</h3>
+      <button type="button" data-ln-modal-close aria-label="Close">
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+      </button>
+    </header>
+
+    <main>
+      <div class="form-element">
+        <label for="email">Email Address</label>
+        <input id="email" name="email" type="email" required minlength="5" data-ln-validate>
+        <ul data-ln-validate-errors>
+          <li class="hidden" data-ln-validate-error="required">Email is required</li>
+          <li class="hidden" data-ln-validate-error="typeMismatch">Invalid email format</li>
+        </ul>
+      </div>
+    </main>
+
+    <footer>
+      <button type="button" data-ln-modal-close>Cancel</button>
+      <button type="submit">Submit</button>
+    </footer>
+  </form>
+</dialog>
+```
+
+> **What happens automatically under the hood:**
+> - `data-ln-modal-for="user-modal"` binds the trigger button to toggle the native `<dialog>` without writing JS listeners (`ln-modal`).
+> - `data-ln-tooltip` mounts an accessible top-layer tooltip on hover and focus (`ln-tooltip`).
+> - `<use href="#ln-*">` fetches SVG icons on-demand from CDN and caches them in `localStorage` (`ln-icons`).
+> - `data-ln-validate` intercepts the form submit gate, validates native browser `ValidityState`, and toggles `.hidden` on corresponding error messages without external validation libraries (`ln-validate`).
+> - `data-ln-modal-close` safely dismisses the modal and restores focus (`ln-modal`).
 
 ---
 
@@ -55,6 +103,33 @@ Four strict principles drive every technical decision in this library:
 2. **Style via `@include` on semantic selectors** — Projects write `#user-table { @include table-base; }`, not `<table class="table table-striped">`. The selector describes the element; the mixin describes how it looks.
 3. **Every color is a CSS variable** — Always use `hsl(var(--color-primary))`, never hardcoded hex codes like `#2737a1`. This makes the entire design system fully customizable at any scope via simple variable overrides.
 4. **JS is attribute-driven, zero init** — Interactivity is declared via attributes (`data-ln-modal`, `data-ln-filter`, `data-ln-toggle`). A single `MutationObserver` registers, binds, and cleans up instances automatically.
+
+---
+
+## 🤖 AI-Native & MCP Surface
+
+`ln-ashlar` is designed from the ground up to be inspectable, routable, and generatable by AI agents:
+
+* **Machine-Readable Component Corpus (`docs-mcp/`):** Unified, schema-validated documentation served directly to AI agent workflows via Model Context Protocol (MCP).
+* **MCP Component Router:** Decision matrix and routing layer that resolves user intent to specific declarative components before generating markup.
+* **In-Repo Agent Protocols (`.agents/`, `.cursorrules`, `CLAUDE.md`):** Strict architectural rules, component templates, and lifecycle constraints loaded automatically into AI pairing sessions.
+* **Agent Skills Submodule (`.claude/`):** Bundled domain skills and workflows (`livenetworks/claude-skills`).
+
+Because `ln-ashlar` relies on semantic HTML, explicit `data-ln-*` attribute contracts, and native W3C events, AI coding agents can resolve user intent directly to a declarative component and emit markup that is verifiable against the attribute contract, with no compilation step between the source and the DOM.
+
+---
+
+## 🌐 Browser Support
+
+`ln-ashlar` targets evergreen browsers with native support for the **Popover API**, since `ln-modal`, `ln-dropdown`, `ln-tooltip`, `ln-toast`, `ln-popover`, and `ln-router` rely on it (via `dialog.showModal()` and `popover`) for top-layer rendering. This is the floor — every other CSS/JS feature the library uses (`:has()`, `color-mix()`, `@container`) is supported earlier in all three engines.
+
+| Browser | Minimum Version |
+|---|---|
+| Chrome / Edge | 114+ |
+| Safari | 17.4+ |
+| Firefox | 125+ |
+
+Below this floor, CSS features degrade visually (a rule simply doesn't apply), but the Popover/`<dialog>` JS APIs break functionality outright — the affected components silently fail to open rather than falling back.
 
 ---
 
@@ -146,34 +221,50 @@ For detailed manual instructions, properties, attributes, and events of individu
 | **Toggle** | 🎚️ **[ln-toggle docs](js/ln-toggle/README.md)** | 📄 **[toggle architecture](js/ln-toggle/README.md)** |
 | **Accordion** | 📂 **[ln-accordion docs](js/ln-accordion/README.md)** | 📄 **[accordion architecture](js/ln-accordion/README.md)** |
 | **Modal** | 🪟 **[ln-modal docs](js/ln-modal/README.md)** | 📄 **[modal architecture](js/ln-modal/README.md)** |
+| **Modal Coordinator** | 🎛️ **[ln-modal-coordinator docs](js/ln-modal-coordinator/README.md)** | 📄 **[modal-coordinator architecture](js/ln-modal-coordinator/README.md)** |
 | **Tabs** | 🔖 **[ln-tabs docs](js/ln-tabs/README.md)** | 📄 **[tabs architecture](js/ln-tabs/README.md)** |
 | **Toast** | 🔔 **[ln-toast docs](js/ln-toast/README.md)** | 📄 **[toast architecture](js/ln-toast/README.md)** |
 | **Dropdown** | 🔽 **[ln-dropdown docs](js/ln-dropdown/README.md)** | 📄 **[dropdown architecture](js/ln-dropdown/README.md)** |
 | **Popover** | 💬 **[ln-popover docs](js/ln-popover/README.md)** | 📄 **[popover architecture](js/ln-popover/README.md)** |
 | **Tooltip (JS)** | 💬 **[ln-tooltip docs](js/ln-tooltip/README.md)** | 📄 **[tooltip architecture](js/ln-tooltip/README.md)** |
 | **Navigation** | 🗺️ **[ln-nav docs](js/ln-nav/README.md)** | 📄 **[nav architecture](js/ln-nav/README.md)** |
+| **Router** | 🧭 **[ln-router docs](js/ln-router/README.md)** | 📄 **[router architecture](js/ln-router/README.md)** |
 | **Filter** | 🔍 **[ln-filter docs](js/ln-filter/README.md)** | 📄 **[filter architecture](js/ln-filter/README.md)** |
 | **Search** | 🔎 **[ln-search docs](js/ln-search/README.md)** | 📄 **[search architecture](js/ln-search/README.md)** |
 | **Table** | 📊 **[ln-table docs](js/ln-table/README.md)** | 📄 **[table architecture](js/ln-table/README.md)** |
+| **Table Coordinator** | 🎛️ **[ln-table-coordinator docs](js/ln-table-coordinator/README.md)** | 📄 **[table-coordinator architecture](js/ln-table-coordinator/README.md)** |
 | **Sort** | ⇅ **[ln-sort docs](js/ln-sort/README.md)** | 📄 **[sort architecture](js/ln-sort/README.md)** |
 | **Sortable** | 🔃 **[ln-sortable docs](js/ln-sortable/README.md)** | 📄 **[sortable architecture](js/ln-sortable/README.md)** |
+| **List** | 📋 **[ln-list docs](js/ln-list/README.md)** | 📄 **[list architecture](js/ln-list/README.md)** |
 | **Progress** | 📈 **[ln-progress docs](js/ln-progress/README.md)** | 📄 **[progress architecture](js/ln-progress/README.md)** |
 | **Circular Progress** | 📈 **[ln-circular-progress docs](js/ln-circular-progress/README.md)** | 📄 **[circular-progress architecture](js/ln-circular-progress/README.md)** |
+| **Stat** | 📈 **[ln-stat docs](js/ln-stat/README.md)** | 📄 **[stat architecture](js/ln-stat/README.md)** |
+| **Chart** | 📊 **[ln-chart docs](js/ln-chart/README.md)** | 📄 **[chart architecture](js/ln-chart/README.md)** |
 | **Link** | 🔗 **[ln-link docs](js/ln-link/README.md)** | 📄 **[link architecture](js/ln-link/README.md)** |
 | **Confirm** | ⚠️ **[ln-confirm docs](js/ln-confirm/README.md)** | 📄 **[confirm architecture](js/ln-confirm/README.md)** |
 | **Upload** | 📤 **[ln-upload docs](js/ln-upload/README.md)** | 📄 **[upload architecture](js/ln-upload/README.md)** |
 | **AJAX** | 🔄 **[ln-ajax docs](js/ln-ajax/README.md)** | 📄 **[ajax architecture](js/ln-ajax/README.md)** |
+| **Include** | 📥 **[ln-include docs](js/ln-include/README.md)** | 📄 **[include architecture](js/ln-include/README.md)** |
 | **HTTP** | — | 📄 **[http service architecture](js/ln-http/README.md)** |
+| **API Queue** | 🚦 **[ln-api-queue docs](js/ln-api-queue/README.md)** | 📄 **[api-queue architecture](js/ln-api-queue/README.md)** |
 | **Store** | 🗄️ **[ln-data-store docs](js/ln-data-store/README.md)** | 📄 **[store cache architecture](js/ln-data-store/README.md)** |
+| **Data Coordinator** | 🎛️ **[ln-data-coordinator docs](js/ln-data-coordinator/README.md)** | 📄 **[data-coordinator architecture](js/ln-data-coordinator/README.md)** |
 | **API Connector** | 🔌 **[ln-api-connector docs](js/ln-api-connector/README.md)** | — |
 | **CouchDB Connector** | 🔌 **[ln-couchdb-connector docs](js/ln-couchdb-connector/README.md)** | 📄 **[couchdb-connector architecture](js/ln-couchdb-connector/README.md)** |
 | **Form** | 📝 **[ln-form docs](js/ln-form/README.md)** | 📄 **[form lifecycle architecture](js/ln-form/README.md)** |
 | **Validate** | ⚠️ **[ln-validate docs](js/ln-validate/README.md)** | 📄 **[validate architecture](js/ln-validate/README.md)** |
+| **Fill** | 🧩 **[ln-fill docs](js/ln-fill/README.md)** | 📄 **[fill architecture](js/ln-fill/README.md)** |
+| **Options** | ⚙️ **[ln-options docs](js/ln-options/README.md)** | 📄 **[options architecture](js/ln-options/README.md)** |
+| **Slug** | 🏷️ **[ln-slug docs](js/ln-slug/README.md)** | 📄 **[slug architecture](js/ln-slug/README.md)** |
+| **Date** | 📅 **[ln-date docs](js/ln-date/README.md)** | 📄 **[date architecture](js/ln-date/README.md)** |
 | **Time** | 🕒 **[ln-time docs](js/ln-time/README.md)** | 📄 **[time architecture](js/ln-time/README.md)** |
+| **Number** | 🔢 **[ln-number docs](js/ln-number/README.md)** | 📄 **[number architecture](js/ln-number/README.md)** |
+| **Editor** | ✍️ **[ln-editor docs](js/ln-editor/README.md)** | 📄 **[editor architecture](js/ln-editor/README.md)** |
 | **Autosave** | 💾 **[ln-autosave docs](js/ln-autosave/README.md)** | 📄 **[autosave architecture](js/ln-autosave/README.md)** |
 | **Autoresize** | ↕️ **[ln-autoresize docs](js/ln-autoresize/README.md)** | 📄 **[autoresize architecture](js/ln-autoresize/README.md)** |
 | **Translations** | 🗣️ **[ln-translations docs](js/ln-translations/README.md)** | 📄 **[translations architecture](js/ln-translations/README.md)** |
 | **External Links** | 🌐 **[ln-external-links docs](js/ln-external-links/README.md)** | 📄 **[external-links architecture](js/ln-external-links/README.md)** |
+| **Debug** | 🐞 **[ln-debug docs](js/ln-debug/README.md)** | 📄 **[debug architecture](js/ln-debug/README.md)** |
 
 ---
 
@@ -187,3 +278,9 @@ demo/admin/mixins.html      ← Interactive visual catalog of all SCSS mixins
 demo/admin/icons.html       ← Live SVG sprite icons browser (with live search/filter)
 demo/admin/{component}.html ← Standalone interactive playground pages for JS components
 ```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

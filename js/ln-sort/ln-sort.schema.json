@@ -1,0 +1,56 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-sort",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-debug": {
+			"direction": null,
+			"sources": [
+				"ln-sort-dev.scss"
+			]
+		},
+		"data-ln-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-sort.js"
+			]
+		},
+		"data-ln-persist": {
+			"direction": "author",
+			"sources": [
+				"src/ln-sort.js"
+			]
+		},
+		"data-ln-sort": {
+			"direction": "author",
+			"sources": [
+				"ln-sort-dev.scss",
+				"src/ln-sort.js"
+			]
+		},
+		"data-ln-sort-dir": {
+			"direction": "author",
+			"sources": [
+				"src/ln-sort.js"
+			]
+		},
+		"data-ln-sort-field": {
+			"direction": "author",
+			"sources": [
+				"src/ln-sort.js"
+			]
+		},
+		"data-ln-sort-items": {
+			"direction": "author",
+			"sources": [
+				"src/ln-sort.js"
+			]
+		},
+		"data-ln-sort-state": {
+			"direction": "runtime",
+			"sources": [
+				"src/ln-sort.js"
+			]
+		}
+	}
+}

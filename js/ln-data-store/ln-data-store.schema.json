@@ -1,0 +1,49 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-data-store",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-data-store": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			]
+		},
+		"data-ln-data-store-indexes": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			]
+		},
+		"data-ln-data-store-search-fields": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			]
+		},
+		"data-ln-data-store-stale": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			]
+		},
+		"data-ln-data-store-window": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			]
+		},
+		"data-ln-data-store-window-page": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			]
+		},
+		"data-ln-data-store-window-threshold": {
+			"direction": "author",
+			"sources": [
+				"src/ln-data-store.js"
+			]
+		}
+	}
+}

@@ -9,11 +9,13 @@ It possesses no visual interface and is **completely blind to the network** (no 
 ## 📦 Declarative Setup in HTML
 
 ```html
-<div data-ln-data-store="documents"
-     data-ln-data-store-stale="300"
-     data-ln-data-store-indexes="status,department,updated_at"
-     data-ln-data-store-search-fields="title,owner">
-</div>
+<ul id="documents"
+    data-ln-data-store
+    data-ln-data-store-stale="300"
+    data-ln-data-store-indexes="status,department,updated_at"
+    data-ln-data-store-search-fields="title,owner"
+    hidden>
+</ul>
 ```
 
 ---
@@ -22,10 +24,14 @@ It possesses no visual interface and is **completely blind to the network** (no 
 
 | Attribute | Description | Default |
 |---|---|---|
-| `data-ln-data-store="name"` | Declares the store name. | *Required* |
+| `id="name"` | Unique identifier of the store (the store name). | *Required* |
+| `data-ln-data-store` | Marker attribute to declare the component. | *Required* |
 | `data-ln-data-store-stale="N"` | Seconds before cache is considered stale. Set to `never` or `-1` to disable staleness. | `300` |
 | `data-ln-data-store-indexes="…"` | Comma-separated list of IndexedDB index fields. | `""` |
 | `data-ln-data-store-search-fields="…"` | Comma-separated list of text-search fields for local query search matching. | `""` |
+| `data-ln-data-store-window="N"` | Enables windowed residency mode. Size of the LRU position window cache. | *Disabled* |
+| `data-ln-data-store-window-page="N"` | Page size of slices requested from the server. | `200` |
+| `data-ln-data-store-window-threshold="N"` | Threshold of padding records to ensure are fetched before scroll cursor reaches them. | `25` |
 
 ---
 
@@ -35,7 +41,7 @@ It possesses no visual interface and is **completely blind to the network** (no 
 
 - **Dynamic Schema Discovery:** Upon initialization, the component scans the document for all `[data-ln-data-store]` elements. It collects their store names and index definitions.
 - **Auto Upgrade:** If new stores or indexes are declared in the HTML markup, the component closes the active connection, increments the database version, and dynamically creates the missing stores and indexes in `onupgradeneeded`.
-- **Memory Fallback:** If the browser does not support IndexedDB, or if database open/upgrade operations fail/are blocked, the component transparently falls back to an in-memory data store.
+- **Initialization Failure:** If the browser does not support IndexedDB, or if database open/upgrade operations fail/are blocked, the component fails initialization, sets `initializationError`, and dispatches `ln-data-store:initialization-error`. There is no in-memory fallback; consumers are responsible for handling storage unavailability.
 
 ---
 
@@ -54,7 +60,7 @@ The store supports local record encryption to secure cached data in IndexedDB:
 Access the database layer directly via the `lnDataStore` property on the store container element:
 
 ```javascript
-const storeEl = document.querySelector('[data-ln-data-store="documents"]');
+const storeEl = document.getElementById('documents');
 const store = storeEl.lnDataStore;
 ```
 
@@ -89,10 +95,11 @@ store.setPresenters({
 });
 ```
 
-### 3. Public Methods
+### 3. Public Properties & Methods
 
-| Method | Return Type | Description |
+| Property/Method | Type / Return Type | Description |
 |---|---|---|
+| `query` | `Object` | Active query filters and search terms: `{ filters: {}, search: '' }`. |
 | `getAll(options)` | `Promise<Object>` | Retrieves records. Options support `sort` (`{ field, direction }`), `filters` (`{ field: Array }`), `search` (`String`), `offset`, `limit`. Returns `{ data, total, filtered }`. |
 | `getById(id)` | `Promise<Object\|null>` | Returns a single record (decorated with presenters) or `null`. |
 | `count(filters)` | `Promise<Number>` | Returns the total count of records. If filters are provided, returns the filtered count. |
@@ -103,11 +110,20 @@ store.setPresenters({
 | `fullReload()` | `Promise<void>` | Clears the IndexedDB store, resets sync metadata, and triggers a sync. |
 | `destroy()` | `void` | Cleans up the instance, removes event listeners, and deletes the DOM reference. |
 
+### 4. Windowed Residency (Virtualization)
+
+When `data-ln-data-store-window` is present, the store operates in windowed residency mode. In this mode, the server is the sole authority on record order (sorting, filtering, and text search are delegated to the server). The store maintains a memory index of logical positions to record IDs (`Map<position, id>`) with a maximum capacity. When a view requests a range of records, the store resolves the IDs from its index and fetches them from IndexedDB. If any page of IDs is missing, it dispatches `ln-data-store:request-page`.
+
 ---
 
 ## ⚡ DOM Events
 
-### Commands (Listened to by the Store)
+### Commands & Query Events (Listened to by the Store)
+
+| Event | `e.detail` payload | Description |
+|---|---|---|
+| `ln-search:change` | `{ term }` | Updates the active `query.search` term and dispatches `ln-data-store:query-changed`. |
+| `ln-filter:changed` | `{ key, values }` | Updates the active `query.filters[key]` and dispatches `ln-data-store:query-changed`. |
 
 All mutations must be routed via DOM events. **Never invoke write methods directly.** The caller is responsible for supplying a `tempId` (e.g. `'_temp_' + crypto.randomUUID()`) when creating records:
 
@@ -158,6 +174,8 @@ These events bubble up and can be listened to by coordinators or rendering views
 
 | Event | `e.detail` payload | Description |
 |---|---|---|
+| `ln-data-store:request-page` | `{ store, offset, limit, query, queryGen }` | Dispatched in windowed residency when pages within the sliding window are missing and must be fetched from the server. |
+| `ln-data-store:query-changed` | `{ store, query }` | Emitted when store search query or column filters change. |
 | `ln-data-store:initialized` | `{ store, hasCache, lastSyncedAt, count }` | Emitted once after IndexedDB connection opens. The instance's `ready` promise resolves after this state is committed. |
 | `ln-data-store:initialization-error` | `{ store, error }` | IndexedDB could not be initialized. `ready` still resolves after `initializationError` is set, allowing a coordinator to route reads to its connector. |
 | `ln-data-store:ready` | `{ store, count, source }` | Emitted when data is ready. `source` is `'cache'` (init) or `'server'` (first sync). |

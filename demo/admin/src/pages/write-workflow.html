@@ -16,10 +16,10 @@
 	<header><h3>Declarative Data Layer Markup (Copy/Paste)</h3></header>
 	<main>
 		<!-- Coordinator wrapper: headless store + connector children (the scoped form lives outside — matched by name) -->
-		<div data-ln-data-coordinator="wwf-documents" id="wwf-coordinator">
+		<div data-ln-data-coordinator id="wwf-coordinator">
 
 			<!-- Tier 1: Local Cache Store (IndexedDB backed) -->
-			<div data-ln-data-store="wwf-documents" id="wwf-store"></div>
+			<div data-ln-data-store id="wwf-documents"></div>
 
 			<!-- Tier 2: Transport Gateway — path is read/sync fallback only; mutation URL comes from the form's action -->
 			<div data-ln-api-connector
@@ -34,7 +34,7 @@
 <section class="section-card">
 	<header><h3>Interactive Documents Manager</h3></header>
 	<main>
-		<section data-ln-table="wwf-documents" data-ln-table-source="wwf-documents" data-ln-table-store="wwf-documents" id="wwf-table" class="data-table-demo">
+		<section data-ln-table="wwf-documents" data-ln-table-source="wwf-documents" id="wwf-table" class="data-table-demo">
 			<header class="ln-table__toolbar">
 				<div>
 					<h3>Documents</h3>

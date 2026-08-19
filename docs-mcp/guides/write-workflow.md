@@ -158,7 +158,7 @@ To standardise successes and dispatch notifications automatically, all write ope
 ## 6. Common Pitfalls and Developer Errors
 
 - **Missing `method="post"` on Scoped Forms:** If `method` is omitted, some browsers default to `GET`. `ln-data-coordinator` only claims `POST`/`PUT`/`PATCH` submits for the write pipeline — a `GET` form is never claimed, regardless of field validity. If every field is valid, the browser executes a native page reload and appends inputs as a query string; `ln-validate`'s submit gate still blocks the reload if fields are invalid (it runs on every method), but a validation pass on an accidentally-`GET` form still bypasses the write pipeline entirely. Always declare `method="post"` explicitly on scoped forms.
-- **Mismatched Scope Names:** If `data-ln-form-scope="name"` does not match the parent's `data-ln-data-coordinator="name"`, the coordinator will ignore the submit — no console warning, the native submit proceeds untouched (progressive-enhancement fallback).
+- **Mismatched Scope Names:** If `data-ln-form-scope="name"` does not match the coordinator's `id="name"`, the coordinator will ignore the submit — no console warning, the native submit proceeds untouched (progressive-enhancement fallback).
 - **Base URL and HTTP Session Cookies:** The `ln-*-connector` components submit requests with `credentials: 'same-origin'` to safeguard against CSRF attacks. If you define a cross-origin `data-ln-api-base-url` targeting an external domain, cookies will not be sent. Use a same-origin backend proxy gateway instead.
 
 ---

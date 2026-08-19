@@ -128,3 +128,8 @@ Several components inject `<use>` elements dynamically rather than authoring the
 ### Offline behavior
 
 Uncached icons fail silently (`.catch()`) if the page loads offline — the icon stays blank. For offline-first deployments, self-host the SVG set and point `window.LN_ICON_CDN` at a local server before the library initializes; `vite.config.js` copies `js/ln-icon/icons/*.svg` → `dist/icons/` at build for this purpose.
+
+### Security & Trust Boundary
+
+`ln-icon` dynamically fetches SVG markup from CDNs and injects it via `innerHTML` into `<symbol>` definitions without client-side sanitization. For threat modeling, `localStorage` persistence implications, strict CSP directives (`connect-src`), and self-hosting / offline SVG sprite guidance, see the [Dynamic SVG Icon Trust Boundary](../../docs/architecture/security.md#7-dynamic-svg-icon-trust-boundary-ln-icons) documentation in `docs/architecture/security.md`.
+

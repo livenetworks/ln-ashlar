@@ -1,0 +1,68 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-upload",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-attr": {
+			"direction": null,
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-class": {
+			"direction": null,
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-field": {
+			"direction": null,
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-template": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-accept": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-action": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-context": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-delete": {
+			"direction": "author",
+			"sources": [
+				"src/ln-upload.js"
+			]
+		},
+		"data-ln-upload-dict": {
+			"direction": null,
+			"sources": [
+				"ln-upload.scss",
+				"src/ln-upload.js"
+			]
+		}
+	}
+}

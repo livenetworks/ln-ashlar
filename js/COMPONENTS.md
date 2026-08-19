@@ -997,8 +997,9 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-circular-progress | Instance | `data-ln-circular-progress` | Circular (ring) progress indicator |
 | ln-search | Instance | `data-ln-search` | Generic search (textContent filter) |
 | ln-filter | Instance | `data-ln-filter` | Generic filter (data attribute filter) |
-| ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll; opt-in server-side windowed virtualization via `data-ln-table-window`) |
 | ln-sort | Instance | `data-ln-sort` | Sort control primitive — 3-trigger cycle (none→asc→desc→none), search-precedent cancelable event; targets ln-table, ln-list, or plain lists |
+| ln-table | Instance | `data-ln-table` | Data table (search, filter, sort, virtual scroll; opt-in server-side windowed virtualization via `data-ln-table-window`) |
+| ln-chart | Instance | `data-ln-chart` | SVG line/area dataset renderer with `ln-data-coordinator` binding |
 | ln-sortable | Instance | `data-ln-sortable` | Drag & drop reorder |
 | ln-dropdown | Instance | `data-ln-dropdown` | Positioned dropdown menu (wraps ln-toggle) |
 | ln-popover | Instance | `data-ln-popover` | Rich popover with viewport-aware positioning and ESC-stack management |
@@ -1092,6 +1093,9 @@ event; the project coordinator catches it, calls `storeEl.lnStore.getAll(...)`,
 and dispatches `ln-table:set-data` back. See
 [docs/architecture/component-guide.md](../docs/architecture/component-guide.md#data-flow-with-ln-store)
 for the full handshake.
+
+`ln-list` and `ln-chart` use the same request/set-data handshake. None of
+the renderers import or query the store directly; `ln-data-coordinator` owns source selection and refresh.
 
 ### Rule
 

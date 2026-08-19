@@ -1,4 +1,4 @@
-import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick } from '../../ln-core';
+import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick, queueBoot } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = 'data-ln-modal-coordinator';
@@ -283,10 +283,10 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', function () {
-			setTimeout(_bootSync, 0);
+			queueBoot(_bootSync);
 		});
 	} else {
-		setTimeout(_bootSync, 0);
+		queueBoot(_bootSync);
 	}
 
 	// ─── Form Submission Auto-Close Mediation ────────────────

@@ -1,0 +1,31 @@
+{
+	"$comment": "This file is partly generated. The $comment, component, generator, and each attribute's direction and sources keys are owned by the generator and overwritten on every run. All other keys are preserved and safe to hand-author. Regenerate with `npm run sync:ln-schemas`.",
+	"component": "ln-autosave",
+	"generator": "scripts/sync-ln-schemas.mjs",
+	"attributes": {
+		"data-ln-autosave": {
+			"direction": "author",
+			"sources": [
+				"src/ln-autosave.js"
+			]
+		},
+		"data-ln-autosave-clear": {
+			"direction": "author",
+			"sources": [
+				"src/ln-autosave.js"
+			]
+		},
+		"data-ln-autosave-debounce-input": {
+			"direction": "author",
+			"sources": [
+				"src/ln-autosave.js"
+			]
+		},
+		"data-ln-autosave-exclude": {
+			"direction": "author",
+			"sources": [
+				"src/ln-autosave.js"
+			]
+		}
+	}
+}

@@ -26,6 +26,7 @@
 | Component | Use for | Don't use for |
 |---|---|---|
 | `ln-table` | Any tabular data. Sorting, filtering, search, selection, virtual scrolling. SSR **or** data-driven mode | Static tables with no interactivity → plain `<table>`; card grids |
+| `ln-chart` | Ordered numeric datasets shown as responsive line/area SVG, SSR shell or coordinator-backed | Multi-series analytical dashboards or highly interactive charting |
 | `ln-progress` / `ln-circular-progress` | Known-percentage progress: uploads, wizards, form completion | Indeterminate loading → skeletons / `ln-toast` |
 
 ## Forms & Input
@@ -68,6 +69,7 @@
 | Component | Use for | Don't use for |
 |---|---|---|
 | `ln-ajax` | Progressive enhancement: form submit / link load without reload | File uploads; forms claimed by a coordinator |
+| `ln-include` | Loading a `<template>` element's content from an external file, deduplicated, gating boot until initial hosts resolve | Loading page content into the visible DOM → `ln-ajax`; per-record fill → `ln-form` |
 | `ln-data-store` | Local-first cache: offline survival, optimistic writes, encryption at rest | Always-fresh read-only data → fetch on demand |
 | `ln-data-coordinator` | Parent that wires store ↔ connector ↔ mappers ↔ form writes | Read-only views with no local state |
 | `ln-api-connector` / `ln-couchdb-connector` | Network gateway from store to REST / CouchDB backend | Static sites without a backend |

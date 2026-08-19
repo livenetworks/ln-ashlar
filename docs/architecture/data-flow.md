@@ -23,8 +23,9 @@ never reach in.
 
 Two flows cross the concerns:
 
-- **Read.** A renderer binds to a store by name (`data-ln-table-store`,
-  `data-ln-list-store`, `data-ln-options`, `data-ln-stat`) and dispatches its
+- **Read.** A renderer binds to a store by its `id` (`data-ln-table-source`,
+  `data-ln-list-source`, `data-ln-chart-source`, `data-ln-options`,
+  `data-ln-stat`) and dispatches its
   own `request-data` intent. The coordinator that owns the matching store
   resolves it against the store's query engine and delivers
   `ln-{kind}:set-data`. The renderer draws.
@@ -55,7 +56,8 @@ What this rules out:
 ### 2.1 Data — `ln-data-store` + `ln-data-coordinator`
 
 **Owns.** `ln-data-store`: an IndexedDB-backed local cache per resource,
-declared with `data-ln-data-store="<name>"`. Query engine — `getAll(options)`,
+declared with the marker attribute `data-ln-data-store` and identified by its
+`id`. Query engine — `getAll(options)`,
 `getById`, `count`, `aggregate` — with sort / filter / search / limit applied
 **client-side over the cache**. Optimistic writes on
 `ln-data-store:request-create` / `-update` / `-delete` / `-bulk-delete` — the
@@ -97,19 +99,17 @@ intent) into an `ln-table:request-data` / `ln-list:request-data` payload.
 and receives a fresh array on every `ln-{kind}:set-data`. The query engine.
 Network calls.
 
-> **Windowed exception.** In windowed mode (`data-ln-table-window` /
-> `data-ln-list-window`), the renderer does own a bounded cache — an
-> `ln-core.createWindowCache` instance holding at most the configured
-> `windowSize` resident rows. `ln-{kind}:set-data` still delivers one
-> fetched page at a time rather than the full array; the cache splices
-> each page in and evicts by LRU. This is the sole exception to "renderer
-> is stateless about records" — the cache exists because the full dataset
-> is too large to hold client-side, not because the renderer resumed
-> owning data by default.
+> **Windowed residency.** In windowed residency mode (`data-ln-data-store-window`),
+> the store (`ln-data-store`) owns the bounded position index (`window-index`).
+> The renderer remains stateless about records: it holds only a single resident
+> page slice (`_sliceData` at `_sliceOffset`) and draws placeholders (empty items/rows)
+> for indices outside that slice. When scrolling outside this slice, the renderer
+> dispatches `request-data` with `offset`/`limit` to fetch the missing slice from
+> the coordinator.
 
 A renderer binds to a coordinator-owned store by attribute —
-`data-ln-table-store="<storeName>"` on `[data-ln-table]`, or
-`data-ln-list-store="<storeName>"` on `[data-ln-list]`. On mount, and on
+`data-ln-table-source="<storeName>"` on `[data-ln-table]`, or
+`data-ln-list-source="<storeName>"` on `[data-ln-list]`. On mount, and on
 every sort/filter/search change, the renderer dispatches
 `ln-table:request-data` / `ln-list:request-data` at itself; the coordinator
 whose child store matches `<storeName>` (guarded by an ownership check, so
@@ -321,7 +321,7 @@ the boundary.
 
 ```html
 <!-- ACCEPTED -->
-<section data-ln-table="documents" data-ln-table-store="documents">
+<section data-ln-table="documents" data-ln-table-source="documents">
 	<!-- data-ln-sort / data-ln-filter / data-ln-search on the
 	     toolbar controls produce the intent; ln-table dispatches
 	     ln-table:request-data with { sort, filters, search } and the
@@ -369,7 +369,7 @@ function _dispatchChange(storeName, records) {
 `-updated` / `-deleted` on its own element only, and knows nothing about
 renderers. Re-serving bound views is `ln-data-coordinator`'s job: on those
 same store-level notifications it queries
-`[data-ln-table-store],[data-ln-list-store],[data-ln-options],[data-ln-stat]`
+`[data-ln-table-source],[data-ln-list-source],[data-ln-chart-source],[data-ln-options],[data-ln-stat]`
 once, filters to the elements whose store name matches its own child
 (`_ownsStore()`), and re-runs each one's last query. This still avoids the
 O(n)-per-record cost the rejected pattern above has — the scan runs once
@@ -399,7 +399,7 @@ Two problems stack:
    translating sync into a draw call. The data layer is reaching into
    the render layer through the consumer.
 
-The renderer binds by attribute (`data-ln-table-store`, `data-ln-list-store`)
+The renderer binds by attribute (`data-ln-table-source`, `data-ln-list-source`)
 and dispatches its own `request-data` on mount; the owning coordinator
 answers with `ln-{kind}:set-data` on subscription, on every mutation, and
 on every sync. **Reactive to a stream, not a puller of state.**
@@ -752,8 +752,8 @@ _scan(document.body);  // init
 | Term | Definition |
 |------|------------|
 | **Coordinator** | A component or script that listens for events on one element and writes attributes (or dispatches events) on another, never calling instance methods directly. Two flavours — page-level (consumer-written shim that bridges data-flow components) and library-shipped (encapsulates a reusable cross-component rule, e.g. `ln-accordion`, or the data layer's own `ln-data-coordinator`). For details, see the [Coordinator Doctrine](coordinator.md). |
-| **Store** | An `ln-data-store` instance (`data-ln-data-store="<name>"`) bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own; the optional offline outbox lives in `ln-api-queue`. |
-| **Renderer** | Any element with `data-ln-table-store`, `data-ln-list-store`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching store. |
+| **Store** | An `ln-data-store` instance (marker attribute `data-ln-data-store`, identified by its `id`) bound to a single resource. One element, one cache. It is a pure cache — it holds no write queue of its own; the optional offline outbox lives in `ln-api-queue`. |
+| **Renderer** | Any element with `data-ln-table-source`, `data-ln-list-source`, `data-ln-chart-source`, `data-ln-options`, or `data-ln-stat`. Receives `ln-{kind}:set-data` / `:set-loading` (or `:set-count` for stats) from the coordinator that owns the matching store. |
 | **Scoped form** | `data-ln-form-scope="<name>"` on a `<form>` matches it to the `data-ln-data-coordinator` of the same name (or, when empty, to the nearest containing coordinator). The coordinator claims its native submit at the `document` bubble phase, after `ln-validate`'s own gate has already run. |
 | **Intent** | A UI component's output describing what the user wants — sort by column X descending, filter by status, search for "foo". Produced by `ln-sort`, `ln-filter`, `ln-search`; delivered via `request-data`, consumed by the coordinator through the owning store's `getAll()` options. |
 | **Optimistic write** | Writing to the local cache before the server confirms. There is no `_pending` flag — a create's only marker is its `_temp_<uuid>` id, held until the server response arrives. |

@@ -10,9 +10,19 @@ export function normalizeDataQuery(detail) {
 	};
 }
 
-export function selectDataSource(store, connector, isWindowed) {
+export function selectDataSource(store, connector) {
 	const storeUnavailable = !store || !!store.initializationError;
-	if (connector && (isWindowed || storeUnavailable || !store.isLoaded)) return 'remote';
+	if (connector && (storeUnavailable || !store.isLoaded)) return 'remote';
 	if (store && !store.initializationError) return 'store';
 	return 'none';
+}
+
+export function composeQuery(viewQuery, storeQuery) {
+	const q = Object.assign({}, viewQuery);
+	if (storeQuery) {
+		q.filters = storeQuery.filters;
+		q.search  = storeQuery.search;
+		q.sort    = storeQuery.sort;
+	}
+	return q;
 }
