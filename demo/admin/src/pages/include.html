@@ -6,7 +6,21 @@
 	The <code>ln-include</code> component allows template contents (like row structures or empty states) to be loaded asynchronously from external URLs. It uses central boot gating to block page initialization until all initial templates have loaded, preventing empty-render flickering.
 </p>
 
+<!-- Declarative 3-Tier Data Layer -->
+<div data-ln-data-coordinator="documents" id="documents-coordinator" hidden>
+	<div data-ln-data-store="documents"
+	     data-ln-data-store-stale="60"
+	     data-ln-data-store-indexes="department,status,priority,updated_at"
+	     data-ln-data-store-search-fields="title,department,owner"
+	     id="documents-store"></div>
+	<div data-ln-api-connector
+	     data-ln-api-base-url=""
+	     data-ln-api-path="/api/documents"
+	     id="documents-connector"></div>
+</div>
+
 <!-- Include Demo Table -->
+<section data-ln-table-coordinator>
 <section class="section-card" data-demo-html>
 	<header><h3>Data-driven Table with External Templates</h3></header>
 	<main>
@@ -18,10 +32,10 @@
 			<header class="ln-table__toolbar">
 				<h3>Documents</h3>
 				<label class="search">
-					<svg class="ln-icon" aria-hidden="true"><use href="#ln-search"></use></svg>
-					<input type="search" placeholder="Search…" data-ln-search="documents" data-ln-search-debounce="150">
+					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+					<input type="search" placeholder="Search…" data-ln-search="documents-table" data-ln-search-debounce="150">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
-						<svg class="ln-icon" aria-hidden="true"><use href="#ln-x"></use></svg>
+						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
 				</label>
 			</header>
@@ -30,10 +44,22 @@
 				<thead>
 					<tr>
 						<th data-ln-table-col-select></th>
-						<th data-ln-table-col="title">Title <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
-						<th data-ln-table-col="department">Department <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="title">Title <ul data-ln-sort="documents-table" data-ln-sort-field="title">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
+						<th data-ln-table-col="department">Department <ul data-ln-sort="documents-table" data-ln-sort-field="department">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
 						<th data-ln-table-col="status">Status</th>
-						<th data-ln-table-col="file_size">Size <button type="button" class="table-sort" data-ln-table-col-sort aria-label="Sort"><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="none"><use href="#ln-arrows-sort"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="asc"><use href="#ln-arrow-up"></use></svg><svg class="ln-icon" aria-hidden="true" data-ln-table-col-sort-icon="desc"><use href="#ln-arrow-down"></use></svg></button></th>
+						<th data-ln-table-col="file_size">Size <ul data-ln-sort="documents-table" data-ln-sort-field="file_size">
+							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
+							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
+						</ul></th>
 					</tr>
 				</thead>
 				<tbody data-ln-table-body></tbody>
@@ -53,3 +79,28 @@
 	}
 	</script>
 </section>
+</section>
+
+<script>
+(function () {
+	function registerPresenters() {
+		const storeEl = document.getElementById('documents-store');
+		const s = storeEl && storeEl.lnDataStore;
+		if (s) {
+			s.setPresenters({
+				computed: {
+					size_display: function (r) {
+						return (r.file_size || 0) >= 1024 ? ((r.file_size || 0) / 1024).toFixed(1) + ' MB' : (r.file_size || 0) + ' KB';
+					}
+				}
+			});
+		}
+	}
+	document.addEventListener('ln-data-store:initialized', function (e) {
+		if (e.detail && e.detail.store === 'documents') {
+			registerPresenters();
+		}
+	});
+	registerPresenters();
+})();
+</script>
