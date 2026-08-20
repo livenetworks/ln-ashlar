@@ -46,13 +46,24 @@ import { registerComponent, dispatch } from '../../ln-core';
 	function _bindEvents(self) {
 		const dom = self.dom;
 
+		function _resolveTable(e) {
+			let table = e.target;
+			if (table && table.hasAttribute && table.hasAttribute('data-ln-table')) return table;
+			const targetId = (e.detail && (e.detail.targetId || e.detail.store || e.detail.target)) || (e.target && e.target.id);
+			if (targetId) {
+				return dom.querySelector('[data-ln-table-source="' + targetId + '"]') ||
+				       dom.querySelector('[data-ln-table="' + targetId + '"]') ||
+				       dom.querySelector('[data-ln-table]');
+			}
+			return dom.querySelector('[data-ln-table]');
+		}
+
 		self._handlers = {
 			// ln-search dispatches ln-search:change directly on its resolved
-			// target — when that target IS the table, e.target already carries
-			// data-ln-table. No ID resolution needed here, only a guard.
+			// target — when that target IS the table or its bound store.
 			search: function (e) {
-				const table = e.target;
-				if (!table.hasAttribute || !table.hasAttribute('data-ln-table')) return;
+				const table = _resolveTable(e);
+				if (!table || !table.hasAttribute || !table.hasAttribute('data-ln-table')) return;
 				if (!table.lnTable) return;
 				// SSR tables self-bind ln-search:change directly (see ln-table.js) —
 				// the coordinator only owns the data-driven path. A table wrapped
@@ -69,12 +80,11 @@ import { registerComponent, dispatch } from '../../ln-core';
 			},
 
 			// ln-filter dispatches ln-filter:changed on both its own <ul> root
-			// and (if different) directly on the table via getElementById — same
-			// reasoning: no ID resolution needed, only a guard.
+			// and directly on the target store/table.
 			filter: function (e) {
 				if (!e.detail) return;
-				const table = e.target;
-				if (!table.hasAttribute || !table.hasAttribute('data-ln-table')) return;
+				const table = _resolveTable(e);
+				if (!table || !table.hasAttribute || !table.hasAttribute('data-ln-table')) return;
 				if (!table.lnTable) return;
 
 				const key = e.detail.key;
