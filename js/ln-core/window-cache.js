@@ -93,7 +93,9 @@ export function createWindowCache(config) {
 				const pLimit = Math.min(pageSize, logicalTotal - pOffset);
 
 				let hasMissing = false;
-				for (let i = pOffset; i < pOffset + pLimit; i++) {
+				const pageCheckStart = Math.max(pOffset, checkStart);
+				const pageCheckEnd = Math.min(pOffset + pLimit, checkEnd);
+				for (let i = pageCheckStart; i < pageCheckEnd; i++) {
 					if (!map.has(i)) {
 						hasMissing = true;
 						break;

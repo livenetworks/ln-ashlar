@@ -721,16 +721,16 @@ import { MutationReceipts } from './mutation-receipts';
 			reqChartData: function (e) { self._serveData(e, 'chart'); },
 			reqOptions:   function (e) { self._serveOptions(e); },
 			reqStat:      function (e) { self._serveStat(e); },
-			refreshQuery: function () { self._refreshAll(); },
+			refreshQuery: function () { self._refreshAll(null, true); },
 			refresh: function (e) {
 				self._mutationReceipts.resolve(e.detail);
-				self._refreshAll();
+				self._refreshAll(null, false);
 			},
 			mutationError: function (e) {
 				self._mutationReceipts.reject(e.detail);
 			},
 			refreshSynced: function (e) {
-				if (e.detail && e.detail.changed) self._refreshAll(e.detail.meta);
+				if (e.detail && e.detail.changed) self._refreshAll(e.detail.meta, false);
 			}
 		};
 
@@ -904,7 +904,7 @@ import { MutationReceipts } from './mutation-receipts';
 		});
 	};
 
-	_component.prototype._refreshAll = function (syncMeta) {
+	_component.prototype._refreshAll = function (syncMeta, isQueryChange) {
 		const self = this;
 		const allBound = document.querySelectorAll('[data-ln-table-source],[data-ln-list-source],[data-ln-chart-source],[data-ln-options],[data-ln-stat]');
 		for (let i = 0; i < allBound.length; i++) {
@@ -935,7 +935,9 @@ import { MutationReceipts } from './mutation-receipts';
 			if (kind === 'table' || kind === 'list') {
 				const windowAttr = kind === 'table' ? 'data-ln-table-window' : 'data-ln-list-window';
 				if (el.hasAttribute(windowAttr)) {
-					dispatch(el, 'ln-' + kind + ':request-revalidate', {});
+					if (!isQueryChange) {
+						dispatch(el, 'ln-' + kind + ':request-revalidate', {});
+					}
 					continue;
 				}
 			}
