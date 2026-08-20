@@ -1079,11 +1079,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	_component.prototype._requestData = function () {
 		if (this._windowed) {
 			this.dom.classList.add('ln-table--loading');
-			this._vStart = -1;
-			this._vEnd = -1;
-			if (this._scrollContainer) {
-				this._scrollContainer.scrollTop = 0;
-			}
 			this._cache.invalidate({
 				sort: this.currentSort,
 				filters: this.currentFilters,

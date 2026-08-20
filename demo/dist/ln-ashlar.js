@@ -4048,7 +4048,7 @@ U(ee, Se, ke, "ln-router", {
     return t;
   }, m.prototype._requestData = function() {
     if (this._windowed) {
-      this.dom.classList.add("ln-table--loading"), this._vStart = -1, this._vEnd = -1, this._scrollContainer && (this._scrollContainer.scrollTop = 0), this._cache.invalidate({
+      this.dom.classList.add("ln-table--loading"), this._cache.invalidate({
         sort: this.currentSort,
         filters: this.currentFilters,
         search: this.currentSearch
@@ -4744,7 +4744,7 @@ U(ee, Se, ke, "ln-router", {
     this._updateSelectAll();
   }, m.prototype._requestData = function() {
     if (this._windowed) {
-      this.dom.classList.add("ln-list--loading"), this._vStart = -1, this._vEnd = -1, this._scrollContainer && (this._scrollContainer.scrollTop = 0), this._cache.invalidate({
+      this.dom.classList.add("ln-list--loading"), this._cache.invalidate({
         sort: this.currentSort,
         filters: this.currentFilters,
         search: this.currentSearch
