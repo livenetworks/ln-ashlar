@@ -981,7 +981,10 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		if (this.isDataDriven) {
 			const total = this._lastTotal != null ? this._lastTotal : this._data.length;
 			const filtered = this.visibleCount;
-			const isFiltered = (this.currentSearch || Object.keys(this.currentFilters).length > 0) && (filtered < total || filtered === 0);
+			// The source owns the query (docs/architecture/shared-query.md), so the view
+			// cannot read a search term off itself — it only knows the source narrowed
+			// to zero while still holding records.
+			const isFiltered = filtered === 0 && total > 0;
 
 			const templateName = isFiltered ? (this.name + '-empty-filtered') : (this.name + '-empty');
 			clone = cloneTemplateScoped(this.dom, templateName, 'ln-table');

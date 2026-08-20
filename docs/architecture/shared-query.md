@@ -42,7 +42,7 @@ flowchart TD
 
     SEARCH -->|"ln-search:change"| STORE
     FILTER -->|"ln-filter:changed"| STORE
-    SORT -->|"ln-sort:changed"| STORE
+    SORT -->|"ln-sort:change"| STORE
     STORE -.->|"event bubbles"| COORD
     STORE -->|"query-changed"| COORD
     COORD -->|"set-data"| TABLE
@@ -108,7 +108,7 @@ Reads address the **source** (`data-ln-table-source`, `data-ln-list-source`,
 |---|---|---|
 | `filters`, `search` | source | Record scope is a property of the data, identical for every consumer. |
 | `offset`, `limit`, `queryGen` | store / view | Page positions are cached in the store's `window-index` (which owns `queryGen` and invalidation), while each view requests and holds a single active page slice. |
-| `sort` | source | Windowed mode forces it: `window-index` maps absolute positions to IDs, so a single mapping can encode only one ordering. A view sorting privately leaves those cached positions in place — `ensure()` finds nothing missing, returns without fetching, and the rows stay in the previous order. The only invalidation is `_windowIndex.reset()`, which fires when the store's own query changes. The control (a `<th>` button, a sidebar) dispatches intent via `ln-sort:changed` and nothing more. |
+| `sort` | source | Windowed mode forces it: `window-index` maps absolute positions to IDs, so a single mapping can encode only one ordering. A view sorting privately leaves those cached positions in place — `ensure()` finds nothing missing, returns without fetching, and the rows stay in the previous order. The only invalidation is `_windowIndex.reset()`, which fires when the store's own query changes. The control (a `<th>` button, a sidebar) dispatches intent via `ln-sort:change` and nothing more. |
 
 `store.getAll(options)` stays a pure query engine — it does not read the stored
 query. The store holds the query; the coordinator composes it with each view's

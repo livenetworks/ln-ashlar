@@ -293,7 +293,8 @@ import { createWindowIndex } from './window-index';
 				else delete self.query.filters[key];
 				_emitQueryChanged(self);
 			},
-			'ln-sort:changed': e => {
+			'ln-sort:change': e => {
+				e.preventDefault();
 				const field = e.detail && e.detail.field;
 				const direction = e.detail && e.detail.direction;
 				const next = direction ? { field, direction } : null;

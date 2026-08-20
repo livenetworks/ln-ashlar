@@ -16,11 +16,11 @@
 		</header>
 
 		<section data-ln-table-coordinator>
-		<section data-ln-table="packages" data-ln-table-source="packages" data-ln-table-store="packages" id="packages-table">
+		<section data-ln-table="packages" data-ln-table-source="packages" id="packages-table">
 			<header class="ln-table__toolbar">
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Search packages…" data-ln-search="packages-table">
+					<input type="search" placeholder="Search packages…" data-ln-search="packages">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
@@ -30,22 +30,22 @@
 			<table>
 				<thead>
 					<tr>
-						<th data-ln-table-col="name">Name <ul data-ln-sort="packages-table" data-ln-sort-field="name">
+						<th data-ln-table-col="name">Name <ul data-ln-sort="packages" data-ln-sort-field="name">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 						</ul></th>
-						<th data-ln-table-col="max_users">Max users <ul data-ln-sort="packages-table" data-ln-sort-field="max_users">
+						<th data-ln-table-col="max_users">Max users <ul data-ln-sort="packages" data-ln-sort-field="max_users">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 						</ul></th>
-						<th data-ln-table-col="max_documents">Documents <ul data-ln-sort="packages-table" data-ln-sort-field="max_documents">
+						<th data-ln-table-col="max_documents">Documents <ul data-ln-sort="packages" data-ln-sort-field="max_documents">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 						</ul></th>
-						<th data-ln-table-col="max_storage">Storage <ul data-ln-sort="packages-table" data-ln-sort-field="max_storage">
+						<th data-ln-table-col="max_storage">Storage <ul data-ln-sort="packages" data-ln-sort-field="max_storage">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -115,7 +115,7 @@
 
 		<!-- Packages table: status filter popover -->
 		<div data-ln-popover id="filter-packages-active">
-			<ul data-ln-filter="packages-table">
+			<ul data-ln-filter="packages">
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-reset checked> All</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="true"> Active</label></li>
 				<li><label><input type="checkbox" data-ln-filter-key="active" data-ln-filter-value="false"> Inactive</label></li>

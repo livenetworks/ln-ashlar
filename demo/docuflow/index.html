@@ -103,7 +103,7 @@
 					</div>
 					<label class="search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-						<input type="search" placeholder="Search…" data-ln-search="packages-table">
+						<input type="search" placeholder="Search…" data-ln-search="packages">
 						<button type="button" data-ln-search-clear aria-label="Clear search">
 							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 						</button>
@@ -119,22 +119,22 @@
 				<table>
 					<thead>
 						<tr>
-							<th data-ln-table-col="name">Name <ul data-ln-sort="packages-table" data-ln-sort-field="name">
+							<th data-ln-table-col="name">Name <ul data-ln-sort="packages" data-ln-sort-field="name">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 							</ul></th>
-							<th data-ln-table-col="max_users">Max users <ul data-ln-sort="packages-table" data-ln-sort-field="max_users">
+							<th data-ln-table-col="max_users">Max users <ul data-ln-sort="packages" data-ln-sort-field="max_users">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 							</ul></th>
-							<th data-ln-table-col="max_documents">Max docs <ul data-ln-sort="packages-table" data-ln-sort-field="max_documents">
+							<th data-ln-table-col="max_documents">Max docs <ul data-ln-sort="packages" data-ln-sort-field="max_documents">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 							</ul></th>
-							<th data-ln-table-col="max_storage">Max storage <ul data-ln-sort="packages-table" data-ln-sort-field="max_storage">
+							<th data-ln-table-col="max_storage">Max storage <ul data-ln-sort="packages" data-ln-sort-field="max_storage">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -221,7 +221,7 @@
 					</div>
 					<label class="search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-						<input type="search" placeholder="Search…" data-ln-search="tenants-table">
+						<input type="search" placeholder="Search…" data-ln-search="tenants">
 						<button type="button" data-ln-search-clear aria-label="Clear search">
 							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 						</button>
@@ -237,12 +237,12 @@
 				<table>
 					<thead>
 						<tr>
-							<th data-ln-table-col="name">Name <ul data-ln-sort="tenants-table" data-ln-sort-field="name">
+							<th data-ln-table-col="name">Name <ul data-ln-sort="tenants" data-ln-sort-field="name">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 							</ul></th>
-							<th data-ln-table-col="slug">Slug <ul data-ln-sort="tenants-table" data-ln-sort-field="slug">
+							<th data-ln-table-col="slug">Slug <ul data-ln-sort="tenants" data-ln-sort-field="slug">
 								<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 								<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -327,24 +327,24 @@
 	<!-- ── Data layer (persistent, outside outlet) ──────────────── -->
 
 	<!-- Packages data layer -->
-	<div data-ln-data-coordinator="packages" data-ln-data-mapper="packages" hidden>
+	<div data-ln-data-coordinator="packages" data-ln-data-mapper="packages" id="packages-coordinator" hidden>
 		<div data-ln-data-store="packages"
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="active"
 		     data-ln-data-store-search-fields="name"
-		     id="packages-store"></div>
+		     id="packages"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"
 		     data-ln-api-path="/packages"></div>
 	</div>
 
 	<!-- Tenants data layer -->
-	<div data-ln-data-coordinator="tenants" data-ln-data-mapper="tenants" hidden>
+	<div data-ln-data-coordinator="tenants" data-ln-data-mapper="tenants" id="tenants-coordinator" hidden>
 		<div data-ln-data-store="tenants"
 		     data-ln-data-store-stale="-1"
 		     data-ln-data-store-indexes="package_id,auth_method,active"
 		     data-ln-data-store-search-fields="name,slug,custom_domain"
-		     id="tenants-store"></div>
+		     id="tenants"></div>
 		<div data-ln-api-connector
 		     data-ln-api-base-url="/demo/docuflow/api"
 		     data-ln-api-path="/tenants"></div>

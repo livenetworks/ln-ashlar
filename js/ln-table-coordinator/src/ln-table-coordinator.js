@@ -112,17 +112,23 @@ import { registerComponent, dispatch } from '../../ln-core';
 					if (filterBtn) filterBtn.classList.remove('ln-filter-active');
 				}
 
-				const tableId = table.id;
-				const searchEl = (tableId && dom.querySelector('[data-ln-search="' + tableId + '"]'))
+				// Query controls address the source (docs/architecture/shared-query.md);
+				// only an SSR table is its own source.
+				const sourceId = table.getAttribute('data-ln-table-source') || table.id;
+				const searchEl = (sourceId && dom.querySelector('[data-ln-search="' + sourceId + '"]'))
 					|| dom.querySelector('[data-ln-search]');
 				if (searchEl) {
 					const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
 						? searchEl
 						: searchEl.querySelector('input');
-					if (input) input.value = '';
+					// Clearing the value is not an edit — ln-search only re-emits on input.
+					if (input) {
+						input.value = '';
+						input.dispatchEvent(new Event('input', { bubbles: true }));
+					}
 				}
 
-				const filters = (tableId && dom.querySelectorAll('[data-ln-filter="' + tableId + '"]'))
+				const filters = (sourceId && dom.querySelectorAll('[data-ln-filter="' + sourceId + '"]'))
 					|| dom.querySelectorAll('[data-ln-filter]');
 				for (let i = 0; i < filters.length; i++) {
 					const resetInput = filters[i].querySelector('[data-ln-filter-reset]');

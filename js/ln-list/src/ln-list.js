@@ -840,7 +840,9 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 		if (this.isDataDriven) {
 			const total = this._lastTotal != null ? this._lastTotal : this._data.length;
 			const visible = this.visibleCount;
-			const isFiltered = this.currentSearch && (visible < total || visible === 0);
+			// The source owns the query (docs/architecture/shared-query.md) — narrowed to
+			// zero while records exist is the only signal the view gets.
+			const isFiltered = visible === 0 && total > 0;
 			const templateName = isFiltered ? this.name + '-empty-filtered' : this.name + '-empty';
 
 			el = cloneTemplateScoped(this.dom, templateName, 'ln-list');

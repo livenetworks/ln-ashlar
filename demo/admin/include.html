@@ -219,7 +219,7 @@
 	     data-ln-data-store-stale="60"
 	     data-ln-data-store-indexes="department,status,priority,updated_at"
 	     data-ln-data-store-search-fields="title,department,owner"
-	     id="documents-store"></div>
+	     id="documents"></div>
 	<div data-ln-api-connector
 	     data-ln-api-base-url=""
 	     data-ln-api-path="/api/documents"
@@ -240,7 +240,7 @@
 				<h3>Documents</h3>
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Search…" data-ln-search="documents-table" data-ln-search-debounce="150">
+					<input type="search" placeholder="Search…" data-ln-search="documents" data-ln-search-debounce="150">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
@@ -251,18 +251,18 @@
 				<thead>
 					<tr>
 						<th data-ln-table-col-select></th>
-						<th data-ln-table-col="title">Title <ul data-ln-sort="documents-table" data-ln-sort-field="title">
+						<th data-ln-table-col="title">Title <ul data-ln-sort="documents" data-ln-sort-field="title">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 						</ul></th>
-						<th data-ln-table-col="department">Department <ul data-ln-sort="documents-table" data-ln-sort-field="department">
+						<th data-ln-table-col="department">Department <ul data-ln-sort="documents" data-ln-sort-field="department">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
 						</ul></th>
 						<th data-ln-table-col="status">Status</th>
-						<th data-ln-table-col="file_size">Size <ul data-ln-sort="documents-table" data-ln-sort-field="file_size">
+						<th data-ln-table-col="file_size">Size <ul data-ln-sort="documents" data-ln-sort-field="file_size">
 							<li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="desc" aria-label="Sort descending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-up"></use></svg></button></li>
 							<li><button type="button" data-ln-sort-dir="none" aria-label="Remove sort"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrow-down"></use></svg></button></li>
@@ -291,7 +291,7 @@
 <script>
 (function () {
 	function registerPresenters() {
-		const storeEl = document.getElementById('documents-store');
+		const storeEl = document.getElementById('documents');
 		const s = storeEl && storeEl.lnDataStore;
 		if (s) {
 			s.setPresenters({
