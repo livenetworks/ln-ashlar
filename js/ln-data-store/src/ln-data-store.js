@@ -682,9 +682,10 @@ import { createWindowIndex } from './window-index';
 		if (deletedIds.length > 0) chain = chain.then(() => _deleteBulk(self._name, deletedIds));
 
 		return chain.then(() => {
-			if (self._windowIndex && meta.offset != null) {
+			if (self._windowIndex && (meta.offset != null || meta.total != null)) {
+				const offset = meta.offset != null ? meta.offset : 0;
 				const ids = upsertedRecords.map(r => r.id);
-				self._windowIndex.ingest(meta.offset, ids, meta.total, meta.filtered, meta.queryGen);
+				self._windowIndex.ingest(offset, ids, meta.total, meta.filtered, meta.queryGen);
 			}
 		}).then(() => _countRecords(self._name)).then(count => {
 			self.totalCount = meta.total !== undefined ? meta.total : count;

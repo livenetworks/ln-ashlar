@@ -115,7 +115,7 @@
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li">
+					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li" data-ln-search-debounce="0">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
@@ -258,6 +258,9 @@
 			<li data-ln-data-store="hybrid-docs"
 			    data-ln-data-store-indexes="department,status,priority,updated_at"
 			    data-ln-data-store-search-fields="title,department,owner"
+			    data-ln-data-store-window="1000"
+			    data-ln-data-store-window-page="200"
+			    data-ln-data-store-window-threshold="25"
 			    id="hybrid-docs"></li>
 			<li data-ln-api-connector
 			    data-ln-api-base-url="data"
@@ -1403,8 +1406,26 @@
 	});
 
 	tableEl.addEventListener('ln-table:request-data', function (e) {
-		log(`Component emitted 'ln-table:request-data' (offset: ${e.detail.offset || 0}, limit: ${e.detail.limit || 200})`, '#fbbf24');
+		log(`[Intent] Table emitted 'ln-table:request-data' (offset: ${e.detail.offset || 0}, limit: ${e.detail.limit || 200})`, '#fbbf24');
 	});
+
+	const storeEl = document.getElementById('hybrid-docs');
+	if (storeEl) {
+		storeEl.addEventListener('ln-data-store:request-page', function (e) {
+			log(`[Store] Sliding window index emitted 'ln-data-store:request-page' (offset: ${e.detail.offset}, limit: ${e.detail.limit})`, '#a78bfa');
+		});
+		storeEl.addEventListener('ln-data-store:synced', function (e) {
+			log(`[Store] Synchronized cache with IndexedDB (+${e.detail.added || 0} records)`, '#34d399');
+		});
+	}
+
+	const connEl = document.getElementById('hybrid-table-connector');
+	if (connEl) {
+		connEl.addEventListener('ln-api-connector:fetched', function (e) {
+			const count = e.detail.data ? e.detail.data.length : 0;
+			log(`[Transport] Connector fetched ${count} records from /api.php (Grand total: ${e.detail.total || 'N/A'})`, '#38bdf8');
+		});
+	}
 
 	tableEl.addEventListener('ln-table:ready', function(e) {
 		log(`Component emitted 'ln-table:ready' (Total parsed: ${e.detail.total}).`, 'var(--color-primary)');

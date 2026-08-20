@@ -6267,9 +6267,9 @@ function Je(u) {
     S.length > 0 || T.length > 0;
     let F = Promise.resolve();
     return S.length > 0 && (F = F.then(() => P(O._name, S))), T.length > 0 && (F = F.then(() => W(O._name, T))), F.then(() => {
-      if (O._windowIndex && R.offset != null) {
-        const B = S.map((V) => V.id);
-        O._windowIndex.ingest(R.offset, B, R.total, R.filtered, R.queryGen);
+      if (O._windowIndex && (R.offset != null || R.total != null)) {
+        const B = R.offset != null ? R.offset : 0, V = S.map((G) => G.id);
+        O._windowIndex.ingest(B, V, R.total, R.filtered, R.queryGen);
       }
     }).then(() => A(O._name)).then((B) => (O.totalCount = R.total !== void 0 ? R.total : B, O.hasCache = !0, q(O._name, {
       schema_version: _,

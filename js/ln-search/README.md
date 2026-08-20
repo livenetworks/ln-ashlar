@@ -95,6 +95,7 @@ markup keeps working — input-host is **required** for all new code.
 | :--- | :--- | :--- |
 | `data-ln-search` | `<input>` (canonical); `<label>`/wrapper (backward-compat) | Component root and namespace. Value is the `id` of the target to filter. |
 | `data-ln-search-items` | Same as root | Opt-in. Deep CSS selector (e.g. `tbody tr`) to query deep matching elements instead of direct children. |
+| `data-ln-search-debounce` | Same as root | Opt-in. Debounce delay in milliseconds (e.g. `0` for instant local DOM filtering, default is `500`). |
 | `data-ln-search-clear` | `<button>` | Identifies the clear button. Click clears input and triggers synchronous search reset. |
 | `data-ln-search-hide` | Children of target | *State*. Automatically toggled on non-matching elements (`display: none !important`). |
 

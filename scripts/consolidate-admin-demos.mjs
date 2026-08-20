@@ -13,7 +13,7 @@ const SIDEBAR_CANONICAL = `		<!-- Sidebar -->
 				<span class="app-name">ashlar-gui</span>
 			</div>
 
-			<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li">
+			<label class="sidebar-search" data-ln-search="demo-nav" data-ln-search-items="li" data-ln-search-debounce="0">
 				<svg class="ln-icon ln-icon--sm" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 				<input type="search" placeholder="Filter menu…">
 			</label>
