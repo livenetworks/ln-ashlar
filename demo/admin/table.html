@@ -115,13 +115,13 @@
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li" data-ln-search-debounce="0">
+					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
@@ -242,7 +242,7 @@
 							<h4>How the Local Search and Sort Coherence Works</h4>
 							<ol style="margin-bottom: var(--size-md); line-height: 1.7;">
 								<li>On load, the script parses every row, mapping text strings or custom <code>data-ln-value</code> targets into highly-optimized search and sort indexes in memory.</li>
-								<li>When a user types in a connected search bar (<code>data-ln-search</code>) or clicks a sort header (<code>data-ln-sort</code>), the component executes in-memory, local array filters instantly.</li>
+								<li>When a user types in a connected search bar (<code>data-ln-search-for</code>) or clicks a sort header (<code>data-ln-sort</code>), the component executes in-memory, local array filters instantly.</li>
 								<li>The component updates table rows in-place (toggling visibility or re-ordering nodes in the DOM). If the visible row count exceeds 200, it automatically activates virtual scrolling.</li>
 							</ol>
 
@@ -259,7 +259,7 @@
 								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
 									<tr><td data-label="Attribute"><code>data-ln-table</code></td><td data-label="On element">wrapper (needs <code>id</code>)</td><td data-label="Description">Component root. Parses rows, listens for events.</td></tr>
-									<tr><td data-label="Attribute"><code>data-ln-search="tableId"</code></td><td data-label="On element"><code>&lt;input&gt;</code> or wrapper</td><td data-label="Description">Standard <code>ln-search</code>. <code>ln-table</code> intercepts the event for in-memory filtering.</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-search-for="tableId"</code></td><td data-label="On element"><code>&lt;input&gt;</code> or wrapper</td><td data-label="Description">Control pointer to table ID. <code>ln-table</code> intercepts the event for in-memory filtering.</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-table-clear</code></td><td data-label="On element"><code>&lt;button&gt;</code></td><td data-label="Description">Clears search input.</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-sort="tableId"</code></td><td data-label="On element"><code>&lt;ul&gt;</code> inside <code>&lt;th&gt;</code></td><td data-label="Description">Sort control. Type is auto-detected at sort time — no type attribute needed.</td></tr>
 									<tr><td data-label="Attribute"><code>td[data-ln-value]</code></td><td data-label="On element"><code>&lt;td&gt;</code></td><td data-label="Description">Raw sort value when display text differs.</td></tr>
@@ -275,7 +275,7 @@
 					<section class="section-card" data-demo-html>
 						<header><h3>Live Demo — 500 rows with search, sort and filter</h3></header>
 						<main>
-							<div data-ln-table id="demo-table">
+							<div data-ln-table data-ln-search="" id="demo-table">
 								<template data-ln-table-empty>
 									<article class="ln-table__empty-state">
 										<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
@@ -293,7 +293,7 @@
 													<h3>Products</h3>
 													<label class="search">
 														<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-														<input type="search" placeholder="Search products..." data-ln-search="demo-table">
+														<input type="search" placeholder="Search products..." data-ln-search-for="demo-table" data-ln-search-debounce="0">
 														<button type="button" data-ln-search-clear aria-label="Clear search">
 															<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 														</button>

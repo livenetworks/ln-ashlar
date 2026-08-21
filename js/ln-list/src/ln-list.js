@@ -176,6 +176,15 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			};
 			dom.addEventListener('ln-list:request-revalidate', this._onRequestRevalidate);
 
+			// The source owns the query, so a query change reaches the view as a
+			// restart order, not as query state — the window drops to page 0 and
+			// the composed query is resolved at serve time.
+			this._onRequestInvalidate = function () {
+				if (!self._windowed || !self._cache) return;
+				self._requestData();
+			};
+			dom.addEventListener('ln-list:request-invalidate', this._onRequestInvalidate);
+
 			// Clear all
 			this._onClearAll = function (e) {
 				const btn = e.target.closest('[data-ln-list-clear-all]');
@@ -1144,6 +1153,7 @@ import { cloneTemplateScoped, dispatch, dispatchCancelable, requestData, fill, f
 			this.dom.removeEventListener('ln-list:set-loading', this._onSetLoading);
 			this.dom.removeEventListener('ln-list:page-failed', this._onPageFailed);
 			this.dom.removeEventListener('ln-list:request-revalidate', this._onRequestRevalidate);
+			this.dom.removeEventListener('ln-list:request-invalidate', this._onRequestInvalidate);
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
 			this.dom.removeEventListener('click', this._onClearAll);
 

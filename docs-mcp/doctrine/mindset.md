@@ -31,6 +31,14 @@ Browsers natively understand HTML DOM, not an in-memory component tree. Mainstre
 
 `ln-ashlar` bypasses this overhead. Ready-to-render HTML is delivered directly from the backend, rendering instantly (First Contentful Paint) while native progressive components take over and activate behavior in milliseconds.
 
+### The Three Core Assertions of DOM-First Architecture
+1. **Zero Hidden State in JS Memory (No Inaccessible Closures):**
+   State is never trapped inside private JavaScript closures, component instances, or hidden memory trees. The true state lives openly and visibly on the DOM element's attributes (`data-ln-*`).
+2. **100% Declarative, Testable & Reproducible:**
+   Any given UI state (e.g. searching a term, opening a modal, toggling an accordion, deep-linking) can be authored, inspected, automated, restored, or server-rendered purely via HTML attributes without orchestration scripts.
+3. **DevTools Inspector as the Control Plane:**
+   Editing any attribute in the browser's DevTools Inspector immediately activates the component's functionality in real-time. The underlying `MutationObserver` instantly synchronizes the internal engine, updates the DOM, syncs matching controls (`[data-ln-*-for]`), and dispatches lifecycle events.
+
 ---
 
 ## 2. Performance: Caching over API Waterfalls
@@ -94,8 +102,10 @@ The library must support standard UI layouts out of the box. Projects must not w
 Developer configuration errors (e.g., missing target IDs) should be flagged using CSS `::after` content rules visible only in development mode. Avoid bloating JavaScript files with defensive checks and console statements.
 
 ### 10. Declarative Wiring Over Coordinators
-Actions triggered directly by user clicks (e.g., clicking edit to open and fill a modal) should be defined declaratively in HTML attributes:
-- Use `data-ln-modal-for="id"` to open.
+Actions triggered directly by user clicks or inputs (e.g., clicking edit to open a modal, typing to search a table) should be defined declaratively in HTML attributes:
+- Use `data-ln-modal-for="id"` to open a modal.
+- Use `data-ln-search-for="id"` to drive a search/filter target.
+- Use `data-ln-toggle-for="id"` to toggle a panel.
 - Use `data-ln-fill-form="form-id"` and `data-ln-fill-*` to bind data.
 
 JavaScript controllers (Coordinators) are reserved for non-declarative actions, such as handling conflicts, offline synch, and deep-linking.

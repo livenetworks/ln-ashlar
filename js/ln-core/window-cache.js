@@ -86,10 +86,13 @@ export function createWindowCache(config) {
 			const lastPage = Math.floor(Math.max(0, checkEnd - 1) / pageSize);
 
 			let targetPageOffset = -1;
-			let targetPageLimit = pageSize;
 
 			for (let p = firstPage; p <= lastPage; p++) {
 				const pOffset = p * pageSize;
+				// Bounds the missing-row scan only — the request always asks for a
+				// full page. logicalTotal is a stale carry-over between invalidate()
+				// and the new generation's first ingest(); clamping the limit by it
+				// short-fetches the page and costs a second request for the same offset.
 				const pLimit = Math.min(pageSize, logicalTotal - pOffset);
 
 				let hasMissing = false;
@@ -104,7 +107,6 @@ export function createWindowCache(config) {
 
 				if (hasMissing && !inflight.has(pOffset)) {
 					targetPageOffset = pOffset;
-					targetPageLimit = pLimit;
 					break;
 				}
 			}
@@ -112,7 +114,7 @@ export function createWindowCache(config) {
 			if (targetPageOffset === -1) return;
 
 			debounceId = setTimeout(function () {
-				fire(targetPageOffset, targetPageLimit);
+				fire(targetPageOffset, pageSize);
 			}, fetchDebounce);
 		},
 
@@ -138,6 +140,10 @@ export function createWindowCache(config) {
 			const offset = detail.offset || 0;
 			const rows = detail.data || [];
 			for (let i = 0; i < rows.length; i++) {
+				// A windowed source sends null for a position it has not resolved
+				// yet. That is absence, not a record — keeping it out of the map is
+				// what makes has() honest and renders a placeholder instead.
+				if (rows[i] == null) continue;
 				map.set(offset + i, rows[i]);
 				stamp(offset + i);
 			}
@@ -173,8 +179,7 @@ export function createWindowCache(config) {
 			clearTimeout(debounceId);
 			pendingSwap = true;
 			const offset = Math.max(0, Math.floor(lastRangeStart / pageSize) * pageSize);
-			const limit = logicalTotal > 0 ? Math.min(pageSize, Math.max(1, logicalTotal - offset)) : pageSize;
-			fire(offset, limit);
+			fire(offset, pageSize);
 		},
 
 		// Failed page fetch: release the offset so the next ensure() (scroll,

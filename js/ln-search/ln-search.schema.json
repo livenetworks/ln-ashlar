@@ -10,7 +10,7 @@
 			]
 		},
 		"data-ln-search": {
-			"direction": "author",
+			"direction": "both",
 			"sources": [
 				"ln-search-dev.scss",
 				"src/ln-search.js"
@@ -22,7 +22,31 @@
 				"src/ln-search.js"
 			]
 		},
+		"data-ln-search-clear-for": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
 		"data-ln-search-debounce": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-exclude": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-fields": {
+			"direction": "author",
+			"sources": [
+				"src/ln-search.js"
+			]
+		},
+		"data-ln-search-for": {
 			"direction": "author",
 			"sources": [
 				"src/ln-search.js"

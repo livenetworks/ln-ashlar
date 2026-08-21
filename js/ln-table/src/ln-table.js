@@ -132,6 +132,12 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 		};
 		dom.addEventListener('ln-table:set-search', this._onSetSearch);
 
+		this._onSearchChange = function (e) {
+			e.preventDefault();
+			self._onSetSearch(e);
+		};
+		dom.addEventListener('ln-search:change', this._onSearchChange);
+
 		this._onSetFilter = function (e) {
 			if (!e.detail) return;
 			const key = e.detail.key;
@@ -266,6 +272,15 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				self._cache.revalidate();
 			};
 			dom.addEventListener('ln-table:request-revalidate', this._onRequestRevalidate);
+
+			// The source owns the query, so a query change reaches the view as a
+			// restart order, not as query state — the window drops to page 0 and
+			// the composed query is resolved at serve time.
+			this._onRequestInvalidate = function () {
+				if (!self._windowed || !self._cache) return;
+				self._requestData();
+			};
+			dom.addEventListener('ln-table:request-invalidate', this._onRequestInvalidate);
 
 			// --- Sort ---
 			this._onSort = function (e) {
@@ -428,12 +443,6 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				});
 			};
 			dom.addEventListener('ln-sort:change', this._onSort);
-
-			this._onSearchChange = function (e) {
-				e.preventDefault();
-				self._onSetSearch(e);
-			};
-			dom.addEventListener('ln-search:change', this._onSearchChange);
 		}
 
 		return this;
@@ -462,7 +471,9 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				values[j] = readValue(td);
 				rawTexts[j] = text.toLowerCase();
 
-				if (j < tr.cells.length - 1) searchParts.push(text.toLowerCase());
+				if (!td.querySelector('[data-ln-table-row-action]')) {
+					searchParts.push(text.toLowerCase());
+				}
 			}
 
 			let record = null;
@@ -515,21 +526,23 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 	_component.prototype._applyFilterAndSort = function () {
 		if (this.isDataDriven) {
 			const term = (this.currentSearch || '').trim().toLowerCase();
+			const tokens = term ? term.split(/\s+/).filter(Boolean) : [];
 			const filters = this.currentFilters || {};
 			const hasFilters = Object.keys(filters).length > 0;
 
 			// 1. Filter
 			this._filteredData = this._data.filter(function (row) {
-				if (term) {
-					let match = false;
-					for (const key in row) {
-						if (row.hasOwnProperty(key) && typeof row[key] === 'string' && key !== 'html' && key !== 'searchText') {
-							if (row[key].toLowerCase().indexOf(term) !== -1) {
-								match = true;
-								break;
+				if (tokens.length > 0) {
+					const match = tokens.every(function (token) {
+						for (const key in row) {
+							if (row.hasOwnProperty(key) && typeof row[key] === 'string' && key !== 'html' && key !== 'searchText') {
+								if (row[key].toLowerCase().indexOf(token) !== -1) {
+									return true;
+								}
 							}
 						}
-					}
+						return false;
+					});
 					if (!match) return false;
 				}
 
@@ -564,6 +577,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 
 		} else {
 			const term = this._searchTerm;
+			const tokens = term ? term.split(/\s+/).filter(Boolean) : [];
 			const colFilters = this._columnFilters;
 			const hasColFilters = Object.keys(colFilters).length > 0;
 			const ths = this.ths;
@@ -576,11 +590,16 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 				}
 			}
 
-			if (!term && !hasColFilters) {
+			if (tokens.length === 0 && !hasColFilters) {
 				this._filteredData = this._data.slice();
 			} else {
 				this._filteredData = this._data.filter(function (row) {
-					if (term && row.searchText.indexOf(term) === -1) return false;
+					if (tokens.length > 0) {
+						const match = tokens.every(function (token) {
+							return row.searchText.indexOf(token) !== -1;
+						});
+						if (!match) return false;
+					}
 					if (hasColFilters) {
 						for (const key in colFilters) {
 							const idx = colIndexByKey[key];
@@ -1424,6 +1443,7 @@ import { cloneTemplateScoped, dispatch, requestData, fill, fillTemplate, registe
 			this.dom.removeEventListener('ln-table:set-loading', this._onSetLoading);
 			this.dom.removeEventListener('ln-table:page-failed', this._onPageFailed);
 			this.dom.removeEventListener('ln-table:request-revalidate', this._onRequestRevalidate);
+			this.dom.removeEventListener('ln-table:request-invalidate', this._onRequestInvalidate);
 			this.dom.removeEventListener('ln-sort:change', this._onSort);
 			document.removeEventListener('keydown', this._onKeydown);
 			if (this.tbody) {

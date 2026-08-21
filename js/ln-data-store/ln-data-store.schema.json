@@ -38,12 +38,6 @@
 			"sources": [
 				"src/ln-data-store.js"
 			]
-		},
-		"data-ln-data-store-window-threshold": {
-			"direction": "author",
-			"sources": [
-				"src/ln-data-store.js"
-			]
 		}
 	}
 }

@@ -20,7 +20,10 @@ import { registerComponent, dispatch } from '../../ln-core';
 		if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
 
 		// Resolve search input inside active coordinator wrapper or first visible search
-		const searchHost = document.querySelector('[' + DOM_SELECTOR + '] [data-ln-search]') || document.querySelector('[data-ln-search]');
+		const searchHost = document.querySelector('[' + DOM_SELECTOR + '] [data-ln-search-for]')
+			|| document.querySelector('[' + DOM_SELECTOR + '] [data-ln-search]')
+			|| document.querySelector('[data-ln-search-for]')
+			|| document.querySelector('[data-ln-search]');
 		if (!searchHost) return;
 
 		const input = (searchHost.tagName === 'INPUT' || searchHost.tagName === 'TEXTAREA')
@@ -46,53 +49,34 @@ import { registerComponent, dispatch } from '../../ln-core';
 	function _bindEvents(self) {
 		const dom = self.dom;
 
+		// Point-to-point only: the event either landed on the table itself, or it
+		// names the source that table is bound to. No "first table in the host"
+		// fallback — ln-filter fires the same ln-filter:changed on its own <ul>
+		// root AND on the target, so a fallback makes the coordinator act twice
+		// for one user change and emit two identical fetches.
 		function _resolveTable(e) {
-			let table = e.target;
-			if (table && table.hasAttribute && table.hasAttribute('data-ln-table')) return table;
-			const targetId = (e.detail && (e.detail.targetId || e.detail.store || e.detail.target)) || (e.target && e.target.id);
-			if (targetId) {
-				return dom.querySelector('[data-ln-table-source="' + targetId + '"]') ||
-				       dom.querySelector('[data-ln-table="' + targetId + '"]') ||
-				       dom.querySelector('[data-ln-table]');
-			}
-			return dom.querySelector('[data-ln-table]');
+			const el = e.target;
+			if (el && el.hasAttribute && el.hasAttribute('data-ln-table')) return el;
+			const targetId = (e.detail && e.detail.targetId) || (el && el.id);
+			if (!targetId) return null;
+			return dom.querySelector('[data-ln-table-source="' + targetId + '"]') ||
+			       dom.querySelector('[data-ln-table="' + targetId + '"]');
 		}
 
 		self._handlers = {
-			// ln-search dispatches ln-search:change directly on its resolved
-			// target — when that target IS the table or its bound store.
-			search: function (e) {
-				const table = _resolveTable(e);
-				if (!table || !table.hasAttribute || !table.hasAttribute('data-ln-table')) return;
-				if (!table.lnTable) return;
-				// SSR tables self-bind ln-search:change directly (see ln-table.js) —
-				// the coordinator only owns the data-driven path. A table wrapped
-				// here that happens to be SSR is a markup mistake (rule: coordinator
-				// is data-driven-only); this guard prevents a double-fire rather
-				// than silently mishandling it.
-				if (!table.hasAttribute('data-ln-table-source')) return;
-
-				e.preventDefault();
-				const term = e.detail && e.detail.term != null ? e.detail.term : '';
-				const name = table.lnTable.name || table.id;
-
-				dispatch(table, 'ln-table:set-search', { query: term, term: term, table: name });
-			},
-
-			// ln-filter dispatches ln-filter:changed on both its own <ul> root
-			// and directly on the target store/table.
+			// Query state is not forwarded here. The source owns search/filter/sort
+			// (docs/architecture/shared-query.md) and ln-data-coordinator re-serves
+			// every view bound to it — a second forwarder would fetch twice for one
+			// user change. What is left is the header indicator, which is Layer 2
+			// policy: ln-table never sets this class itself.
 			filter: function (e) {
 				if (!e.detail) return;
 				const table = _resolveTable(e);
 				if (!table || !table.hasAttribute || !table.hasAttribute('data-ln-table')) return;
-				if (!table.lnTable) return;
 
 				const key = e.detail.key;
 				const values = e.detail.values || [];
-				const name = table.lnTable.name || table.id;
 
-				// Header filter-button indicator — Layer 2 policy; ln-table itself
-				// never sets this class.
 				const ths = table.querySelectorAll('th');
 				for (let i = 0; i < ths.length; i++) {
 					if (ths[i].getAttribute('data-ln-table-filter-col') === key) {
@@ -101,8 +85,6 @@ import { registerComponent, dispatch } from '../../ln-core';
 						break;
 					}
 				}
-
-				dispatch(table, 'ln-table:set-filter', { key: key, values: values, table: name });
 			},
 
 			// Clear-all has no ID binding of its own — resolve structurally,
@@ -125,7 +107,8 @@ import { registerComponent, dispatch } from '../../ln-core';
 				// Query controls address the source (docs/architecture/shared-query.md);
 				// only an SSR table is its own source.
 				const sourceId = table.getAttribute('data-ln-table-source') || table.id;
-				const searchEl = (sourceId && dom.querySelector('[data-ln-search="' + sourceId + '"]'))
+				const searchEl = (sourceId && (dom.querySelector('[data-ln-search-for="' + sourceId + '"]') || dom.querySelector('[data-ln-search="' + sourceId + '"]')))
+					|| dom.querySelector('[data-ln-search-for]')
 					|| dom.querySelector('[data-ln-search]');
 				if (searchEl) {
 					const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
@@ -148,11 +131,15 @@ import { registerComponent, dispatch } from '../../ln-core';
 					}
 				}
 
-				dispatch(table, 'ln-table:request-clear-filters', { table: name });
+				// A data-driven table is refreshed by its source: the control resets
+				// above already emit the query change. Only an SSR table, which holds
+				// its own rows, still needs to be told directly.
+				if (!table.hasAttribute('data-ln-table-source')) {
+					dispatch(table, 'ln-table:request-clear-filters', { table: name });
+				}
 			}
 		};
 
-		dom.addEventListener('ln-search:change', self._handlers.search);
 		dom.addEventListener('ln-filter:changed', self._handlers.filter);
 		dom.addEventListener('click', self._handlers.clear);
 	}
@@ -163,7 +150,6 @@ import { registerComponent, dispatch } from '../../ln-core';
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 
 		if (this._handlers) {
-			this.dom.removeEventListener('ln-search:change', this._handlers.search);
 			this.dom.removeEventListener('ln-filter:changed', this._handlers.filter);
 			this.dom.removeEventListener('click', this._handlers.clear);
 			this._handlers = null;

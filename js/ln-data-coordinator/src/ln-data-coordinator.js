@@ -811,10 +811,13 @@ import { MutationReceipts } from './mutation-receipts';
 			const source = selectDataSource(store, children.connector);
 			const effective = composeQuery(query, store && store.query);
 			if (source === 'remote') {
+				// The source owns search/filter/sort even when it holds no rows yet —
+				// the view only contributes the page window, so the server must be
+				// asked with the composed query, not the view's request as it arrived.
 				dispatch(el, 'ln-' + kind + ':set-loading', { loading: true });
 				dispatch(children.connectorEl, 'ln-api-connector:request-query', {
-					query: query,
-					meta: { targetEl: el, kind: kind, offset: query.offset, limit: query.limit }
+					query: effective,
+					meta: { targetEl: el, kind: kind, offset: effective.offset, limit: effective.limit }
 				});
 				return;
 			}
@@ -935,9 +938,10 @@ import { MutationReceipts } from './mutation-receipts';
 			if (kind === 'table' || kind === 'list') {
 				const windowAttr = kind === 'table' ? 'data-ln-table-window' : 'data-ln-list-window';
 				if (el.hasAttribute(windowAttr)) {
-					if (!isQueryChange) {
-						dispatch(el, 'ln-' + kind + ':request-revalidate', {});
-					}
+					// A windowed view holds no rows to re-serve — it is told to restart
+					// its window (query change) or refresh it in place (post-mutation),
+					// and pulls the pages back through request-data.
+					dispatch(el, 'ln-' + kind + (isQueryChange ? ':request-invalidate' : ':request-revalidate'), {});
 					continue;
 				}
 			}

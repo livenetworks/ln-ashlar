@@ -115,13 +115,13 @@
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li" data-ln-search-debounce="0">
+					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
@@ -213,7 +213,7 @@
 				<section class="section-card" data-demo-html>
 					<header><h3>Employee Directory</h3></header>
 					<main>
-						<div data-ln-table id="employee-table">
+						<div data-ln-table data-ln-search="" id="employee-table">
 						<template data-ln-table-empty>
 							<article class="ln-table__empty-state">
 								<svg class="ln-icon ln-icon--xl" aria-hidden="true"><use href="#ln-icon-filter"></use></svg>
@@ -229,7 +229,7 @@
 										<div>
 											<label class="search">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-												<input type="search" placeholder="Search employees..." data-ln-search="employee-table">
+												<input type="search" placeholder="Search employees..." data-ln-search-for="employee-table" data-ln-search-debounce="0">
 												<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 											</label>
 										</div>
@@ -422,12 +422,12 @@
 						<div data-ln-popover id="filter-dept">
 							<label class="search">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-								<input type="search" placeholder="Search..." data-ln-search="filter-dept-list" data-ln-search-items="label">
+								<input type="search" placeholder="Search..." data-ln-search-for="filter-dept-list" data-ln-search-debounce="0">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
 							</label>
-							<ul id="filter-dept-list" data-ln-filter="employee-table">
+							<ul id="filter-dept-list" data-ln-filter="employee-table" data-ln-search="" data-ln-search-items="label">
 								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked> All</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Design"> Design</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="Engineering"> Engineering</label></li>
@@ -443,12 +443,12 @@
 						<div data-ln-popover id="filter-role">
 							<label class="search">
 								<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-								<input type="search" placeholder="Search..." data-ln-search="filter-role-list" data-ln-search-items="label">
+								<input type="search" placeholder="Search..." data-ln-search-for="filter-role-list" data-ln-search-debounce="0">
 								<button type="button" data-ln-search-clear aria-label="Clear search">
 									<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 								</button>
 							</label>
-							<ul id="filter-role-list" data-ln-filter="employee-table">
+							<ul id="filter-role-list" data-ln-filter="employee-table" data-ln-search="" data-ln-search-items="label">
 								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-reset checked> All</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Accountant"> Accountant</label></li>
 								<li><label><input type="checkbox" data-ln-filter-key="role" data-ln-filter-value="Backend Developer"> Backend Developer</label></li>
@@ -523,9 +523,8 @@
 &lt;div data-ln-popover id="filter-dept"&gt;
     &lt;!-- Optional search targets the OPTIONS UL id, never the table id --&gt;
     &lt;input type="search" placeholder="Search..."
-           data-ln-search="filter-dept-list"
-           data-ln-search-items="label"&gt;
-    &lt;ul id="filter-dept-list" data-ln-filter="my-table"&gt;
+           data-ln-search-for="filter-dept-list"&gt;
+    &lt;ul id="filter-dept-list" data-ln-filter="my-table" data-ln-search="" data-ln-search-items="label"&gt;
         &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-reset checked&gt; All&lt;/label&gt;&lt;/li&gt;
         &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="IT"&gt; IT&lt;/label&gt;&lt;/li&gt;
         &lt;li&gt;&lt;label&gt;&lt;input type="checkbox" data-ln-filter-key="dept" data-ln-filter-value="HR"&gt; HR&lt;/label&gt;&lt;/li&gt;
@@ -550,10 +549,10 @@
 					<main>
 						<p><code>ln-search</code> dispatches <code>ln-search:change</code> on the target element. When the target is a <code>data-ln-table</code> wrapper, <code>ln-table</code> intercepts the event, calls <code>preventDefault()</code>, and handles filtering in-memory. No custom script needed.</p>
 						<pre><code>&lt;!-- Search input targets the ln-table wrapper --&gt;
-&lt;input type="search" placeholder="Search..." data-ln-search="my-table"&gt;
+&lt;input type="search" placeholder="Search..." data-ln-search-for="my-table"&gt;
 
 &lt;!-- ln-table wrapper --&gt;
-&lt;div data-ln-table id="my-table"&gt;
+&lt;div data-ln-table data-ln-search="" id="my-table"&gt;
     &lt;table&gt;...&lt;/table&gt;
 &lt;/div&gt;</code></pre>
 					</main>

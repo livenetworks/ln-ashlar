@@ -31,7 +31,6 @@ It possesses no visual interface and is **completely blind to the network** (no 
 | `data-ln-data-store-search-fields="…"` | Comma-separated list of text-search fields for local query search matching. | `""` |
 | `data-ln-data-store-window="N"` | Enables windowed residency mode. Size of the LRU position window cache. | *Disabled* |
 | `data-ln-data-store-window-page="N"` | Page size of slices requested from the server. | `200` |
-| `data-ln-data-store-window-threshold="N"` | Threshold of padding records to ensure are fetched before scroll cursor reaches them. | `25` |
 
 ---
 

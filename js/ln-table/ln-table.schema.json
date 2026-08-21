@@ -9,10 +9,6 @@
 				"ln-table-dev.scss"
 			]
 		},
-		"data-ln-persist": {
-			"direction": null,
-			"sources": []
-		},
 		"data-ln-sort": {
 			"direction": null,
 			"sources": [

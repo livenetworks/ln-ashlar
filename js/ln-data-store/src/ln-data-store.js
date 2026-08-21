@@ -227,11 +227,9 @@ import { createWindowIndex } from './window-index';
 		if (winAttr !== null) {
 			const winSize = parseInt(winAttr, 10) || 1000;
 			const pageSize = parseInt(dom.getAttribute('data-ln-data-store-window-page'), 10) || 200;
-			const threshold = parseInt(dom.getAttribute('data-ln-data-store-window-threshold'), 10) || 25;
 			this._windowIndex = createWindowIndex({
 				windowSize: winSize,
 				pageSize: pageSize,
-				threshold: threshold,
 				requestPage: (offset, limit, query) => {
 					dispatch(this.dom, 'ln-data-store:request-page', {
 						store: this._name,
@@ -289,6 +287,14 @@ import { createWindowIndex } from './window-index';
 				const key = e.detail && e.detail.key;
 				if (!key) return;
 				const values = (e.detail.values || []).slice();
+				// Same no-op guard the search and sort handlers carry: a reset of a
+				// filter that was never set is not a query change, and clear-all
+				// resets every filter control on the page at once.
+				const prev = self.query.filters[key];
+				const unchanged = prev
+					? (prev.length === values.length && prev.every((v, i) => v === values[i]))
+					: !values.length;
+				if (unchanged) return;
 				if (values.length) self.query.filters[key] = values;
 				else delete self.query.filters[key];
 				_emitQueryChanged(self);
@@ -297,7 +303,10 @@ import { createWindowIndex } from './window-index';
 				e.preventDefault();
 				const field = e.detail && e.detail.field;
 				const direction = e.detail && e.detail.direction;
-				const next = direction ? { field, direction } : null;
+				// ln-sort emits direction 'none' to mean "sort removed" — a truthy
+				// string, so it has to be excluded explicitly or it travels to the
+				// server as sort_dir=none.
+				const next = (direction && direction !== 'none') ? { field, direction } : null;
 				const prev = self.query.sort;
 				const unchanged = (!prev && !next) || (prev && next && prev.field === next.field && prev.direction === next.direction);
 				if (unchanged) return;

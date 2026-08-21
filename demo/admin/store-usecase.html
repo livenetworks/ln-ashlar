@@ -115,13 +115,13 @@
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li" data-ln-search-debounce="0">
+					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
@@ -259,6 +259,7 @@
 	     data-ln-data-store-stale="60"
 	     data-ln-data-store-indexes="department,status,priority,updated_at"
 	     data-ln-data-store-search-fields="title,department,owner"
+	     data-ln-search=""
 	     id="documents"></div>
 	<div data-ln-api-connector
 	     data-ln-api-base-url=""
@@ -300,7 +301,7 @@
 				</div>
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Search…" data-ln-search="documents">
+					<input type="search" placeholder="Search…" data-ln-search-for="documents">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
@@ -399,12 +400,12 @@
 <div data-ln-popover id="filter-documents-table-dept">
 	<label class="search">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-		<input type="search" placeholder="Search..." data-ln-search="filter-documents-table-dept-list" data-ln-search-items="label">
+		<input type="search" placeholder="Search..." data-ln-search-for="filter-documents-table-dept-list" data-ln-search-debounce="0">
 		<button type="button" data-ln-search-clear aria-label="Clear search">
 			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 		</button>
 	</label>
-	<ul id="filter-documents-table-dept-list" data-ln-filter="documents">
+	<ul id="filter-documents-table-dept-list" data-ln-filter="documents" data-ln-search="" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>
@@ -704,12 +705,12 @@
 <div data-ln-popover id="filter-people-dept">
 	<label class="search">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-		<input type="search" placeholder="Search..." data-ln-search="filter-people-dept-list" data-ln-search-items="label">
+		<input type="search" placeholder="Search..." data-ln-search-for="filter-people-dept-list" data-ln-search-debounce="0">
 		<button type="button" data-ln-search-clear aria-label="Clear search">
 			<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 		</button>
 	</label>
-	<ul id="filter-people-dept-list" data-ln-filter="people">
+	<ul id="filter-people-dept-list" data-ln-filter="people" data-ln-search="" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Finance"> Finance</label></li>

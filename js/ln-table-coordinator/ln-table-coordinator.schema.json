@@ -21,6 +21,12 @@
 				"src/ln-table-coordinator.js"
 			]
 		},
+		"data-ln-search-for": {
+			"direction": "author",
+			"sources": [
+				"src/ln-table-coordinator.js"
+			]
+		},
 		"data-ln-table": {
 			"direction": "author",
 			"sources": [

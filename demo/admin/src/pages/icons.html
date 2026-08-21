@@ -71,8 +71,7 @@
 					<label class="search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
 						<input type="search" placeholder="Filter icons…"
-							   data-ln-search="icon-categories"
-							   data-ln-search-items=".icon-cell"
+							   data-ln-search-for="icon-categories"
 							   data-ln-search-debounce="0">
 						<button type="button" data-ln-search-clear aria-label="Clear search">
 							<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
@@ -80,7 +79,7 @@
 					</label>
 				</div>
 
-		<div id="icon-categories">
+		<div id="icon-categories" data-ln-search="" data-ln-search-items=".icon-cell">
 
 		<!-- Navigation icons -->
 		<section class="section-card" data-category="navigation">

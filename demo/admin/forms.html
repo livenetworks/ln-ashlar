@@ -115,13 +115,13 @@
 				<span class="app-name">ashlar-gui</span>
 				<label class="search sidebar-search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Filter menu…" data-ln-search="demo-nav" data-ln-search-items="li" data-ln-search-debounce="0">
+					<input type="search" placeholder="Filter menu…" data-ln-search-for="demo-nav" data-ln-search-debounce="0">
 					<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg></button>
 				</label>
 			</header>
 
 			<main>
-				<nav class="nav" id="demo-nav" data-ln-nav="active">
+				<nav class="nav" id="demo-nav" data-ln-nav="active" data-ln-search="" data-ln-search-items="li">
 					<ul>
 						<li><a href="index.html"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-home"></use></svg><span class="nav-label">Dashboard</span></a></li>
 					</ul>
@@ -1248,13 +1248,13 @@ input:focus-visible {
 										<div style="padding: var(--size-xs); border-bottom: 1px solid var(--border-muted); margin-bottom: var(--size-xs);">
 											<label class="search">
 												<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-												<input type="search" placeholder="Search locale..." data-ln-search="locale-list" data-ln-search-debounce="0">
+												<input type="search" placeholder="Search locale..." data-ln-search-for="locale-list" data-ln-search-debounce="0">
 												<button type="button" data-ln-search-clear aria-label="Clear search">
 													<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 												</button>
 											</label>
 										</div>
-										<ul id="locale-list" style="max-height: 250px; overflow-y: auto; list-style: none; margin: 0; padding: 0;">
+										<ul id="locale-list" data-ln-search="" style="max-height: 250px; overflow-y: auto; list-style: none; margin: 0; padding: 0;">
 											<li><button type="button" class="locale-btn" data-locale="en-US" aria-current="true">English (US)</button></li>
 											<li><button type="button" class="locale-btn" data-locale="en-GB">English (UK)</button></li>
 											<li><button type="button" class="locale-btn" data-locale="mk">Македонски (MK)</button></li>

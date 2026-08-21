@@ -47,6 +47,14 @@ Whether your architecture relies on **Server-Rendered HTML** (Laravel, Go, Djang
 
 ---
 
+### The Three Core Assertions of DOM-First Architecture
+
+1. 🔍 **Zero Hidden State in JS Memory:** State is never trapped inside private JavaScript closures, component instances, or hidden memory trees. The true state lives openly and visibly on the DOM element's attributes (`data-ln-*`).
+2. 🧪 **100% Declarative, Testable & Reproducible:** Any given UI state (searching a term, opening a modal, toggling an accordion, deep-linking) can be authored, inspected, automated, restored, or server-rendered purely via HTML attributes without orchestration scripts.
+3. 🎛️ **DevTools Inspector as the Control Plane:** Editing any attribute in the browser's DevTools Inspector immediately activates the component's functionality in real-time. The underlying `MutationObserver` instantly synchronizes the internal engine, updates the DOM, syncs matching controls (`[data-ln-*-for]`), and dispatches lifecycle events.
+
+---
+
 ## 💡 Declarative HTML at a Glance
 
 Combine autonomous components directly in semantic HTML — **zero initialization scripts**, full accessibility, and automatic `MutationObserver` binding:

@@ -85,6 +85,7 @@
 	     data-ln-data-store-stale="-1"
 	     data-ln-data-store-indexes="active"
 	     data-ln-data-store-search-fields="name"
+	     data-ln-search=""
 	     id="packages"></div>
 	<div data-ln-api-connector
 	     data-ln-api-base-url="/docuflow/api"
@@ -97,6 +98,7 @@
 	     data-ln-data-store-stale="-1"
 	     data-ln-data-store-indexes="package_id,auth_method,active"
 	     data-ln-data-store-search-fields="name,slug,custom_domain"
+	     data-ln-search=""
 	     id="tenants"></div>
 	<div data-ln-api-connector
 	     data-ln-api-base-url="/docuflow/api"
@@ -397,7 +399,7 @@
 			<header class="ln-table__toolbar">
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Search packages…" data-ln-search="packages">
+					<input type="search" placeholder="Search packages…" data-ln-search-for="packages">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
@@ -655,7 +657,7 @@
 			<header class="ln-table__toolbar">
 				<label class="search">
 					<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-					<input type="search" placeholder="Search tenants…" data-ln-search="tenants">
+					<input type="search" placeholder="Search tenants…" data-ln-search-for="tenants">
 					<button type="button" data-ln-search-clear aria-label="Clear search">
 						<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 					</button>
