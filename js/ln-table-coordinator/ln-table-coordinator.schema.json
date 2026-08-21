@@ -16,7 +16,7 @@
 			]
 		},
 		"data-ln-search": {
-			"direction": "author",
+			"direction": "both",
 			"sources": [
 				"src/ln-table-coordinator.js"
 			]

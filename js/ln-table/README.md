@@ -94,7 +94,7 @@ External UI controls (`ln-search`, `ln-filter`, filter header buttons, clear but
 | `data-ln-table-source` | Root wrapper | Opt-in indicator for Data-Driven Mode. |
 | `data-ln-table-selectable` | Root wrapper | Enables checkbox-based row selections. |
 | `data-ln-table-window="N"` | Root wrapper | Opt-in server-side sliding-window virtualization. `N` sets the resident-row cap (default 1000). Requires Data-Driven Mode. Observable: add/remove toggles windowed mode ON/OFF live; changing `N` while windowed reconfigures the live cache. |
-| ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search="<tableId>"` — `ln-table` consumes `ln-search:change` directly in SSR mode only; data-driven mode relies on `ln-table-coordinator` to translate it into `ln-table:set-search`. |
+| ~~`data-ln-table-search`~~ | — | **Removed.** Drive the search input with `data-ln-search-for="<tableId>"` — `ln-table` consumes `ln-search:change` directly in SSR mode only; data-driven mode relies on `ln-table-coordinator` to translate it into `ln-table:set-search`. |
 | `data-ln-table-col="field"` | `<th>` | Maps column header to data object field keys. |
 | `data-ln-value` | `<td>` | Raw machine value behind a formatted cell — sorting/filtering operate on this, not the displayed text. Read via `ln-core.readValue`. |
 | `data-ln-sort` | `<ul>` inside `<th>` | Sort control — see [`ln-sort`](../ln-sort/README.md). Omit `data-ln-sort-field` on SSR columns (index fallback); set it on data-driven columns (must match `data-ln-table-col`). |
@@ -174,8 +174,11 @@ An SSR table using column filters still requires the `[data-ln-table-coordinator
 
 <!-- Popover: sibling to [data-ln-table], not inside it -->
 <div data-ln-popover id="filter-dept">
-	<input type="search" data-ln-search="filter-dept-list" data-ln-search-items="label" placeholder="Search...">
-	<ul id="filter-dept-list" data-ln-filter="my-table">
+	<label class="search">
+		<input type="search" data-ln-search-for="filter-dept-list" data-ln-search-debounce="0" placeholder="Search...">
+		<button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon"><use href="#ln-icon-x"></use></svg></button>
+	</label>
+	<ul id="filter-dept-list" data-ln-search="" data-ln-filter="my-table" data-ln-search-items="label">
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-reset checked> All</label></li>
 		<li><label><input type="checkbox" data-ln-filter-key="department" data-ln-filter-value="Engineering"> Engineering</label></li>
 	</ul>
@@ -261,7 +264,7 @@ wrapper — see `js/ln-sort/README.md`).
 
 ### Search integration (`ln-search`)
 
-SSR mode also self-binds `ln-search:change` directly on itself, mirroring `ln-sort:change` above — an SSR table with a `[data-ln-search="<its own id>"]` input works standalone, no coordinator required. Data-driven mode relies on `ln-table-coordinator` translating `ln-search:change` into `ln-table:set-search` — do not wrap an SSR table in `[data-ln-table-coordinator]`, it will double-process search.
+SSR mode also self-binds `ln-search:change` directly on itself, mirroring `ln-sort:change` above — an SSR table with a `[data-ln-search-for="<its own id>"]` input works standalone, no coordinator required. Data-driven mode relies on `ln-table-coordinator` translating `ln-search:change` into `ln-table:set-search` — do not wrap an SSR table in `[data-ln-table-coordinator]`, it will double-process search.
 
 ### MutationObserver flow (`ln-table.js`)
 

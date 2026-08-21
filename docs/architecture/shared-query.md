@@ -88,7 +88,10 @@ is push.
     <table data-ln-table data-ln-table-source="orders">…</table>
 </section>
 
-<input data-ln-search="orders">
+<label class="search">
+    <input type="search" placeholder="Search..." data-ln-search-for="orders" data-ln-search-debounce="0">
+    <button type="button" data-ln-search-clear aria-label="Clear search"><svg class="ln-icon"><use href="#ln-icon-x"></use></svg></button>
+</label>
 <ul data-ln-filter="orders">…</ul>
 <nav data-ln-sort="orders">
     <button type="button" data-ln-sort-field="total">Total</button>
@@ -97,7 +100,7 @@ is push.
 
 Reads address the **source** (`data-ln-table-source`, `data-ln-list-source`,
 `data-ln-chart-source`, `data-ln-options`, `data-ln-stat`,
-`data-ln-search`, `data-ln-filter`, `data-ln-sort`). Writes address the **coordinator**
+`data-ln-search-for`, `data-ln-filter`, `data-ln-sort`). Writes address the **coordinator**
 (`ln-data-coordinator:request-*`, `data-ln-form-scope`).
 
 ---

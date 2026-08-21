@@ -10,11 +10,15 @@ A unified, structure-agnostic, and local-first **Data Presenter Component** desi
 For a server-rendered list where the backend outputs `<li>` elements directly:
 
 ```html
-<form role="search" onsubmit="return false;">
-    <input type="search" data-ln-search="documents-list" placeholder="Search...">
-</form>
+<label class="search">
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+    <input type="search" placeholder="Search..." data-ln-search-for="documents-list" data-ln-search-debounce="0">
+    <button type="button" data-ln-search-clear aria-label="Clear search">
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+    </button>
+</label>
 
-<ul id="documents-list" data-ln-list="documents">
+<ul id="documents-list" data-ln-list="documents" data-ln-search="">
     <li data-ln-item-id="1">Document A</li>
     <li data-ln-item-id="2">Document B</li>
 </ul>
@@ -24,13 +28,18 @@ For a server-rendered list where the backend outputs `<li>` elements directly:
 Opted-in by adding the `data-ln-list-source` attribute. It clones and renders the specified `<template>`:
 
 ```html
-<form role="search" onsubmit="return false;">
-    <input type="search" data-ln-search="documents-grid" placeholder="Search...">
-</form>
+<label class="search">
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+    <input type="search" placeholder="Search..." data-ln-search-for="documents-grid" data-ln-search-debounce="0">
+    <button type="button" data-ln-search-clear aria-label="Clear search">
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+    </button>
+</label>
 
 <section id="documents-grid" 
          data-ln-list="documents" 
          data-ln-list-source="documents" 
+         data-ln-search=""
          data-ln-list-selectable>
     
     <!-- Items container -->
@@ -80,7 +89,6 @@ Opted-in by adding the `data-ln-list-source` attribute. It clones and renders th
 * `ln-list:set-loading` `{ loading: true|false }`: Toggles the loading dimming overlay class (`.ln-list--loading`).
 * `ln-list:page-failed` `{ offset }`: Windowed mode — the coordinator reports the page fetch at `offset` failed. Releases it from the cache's in-flight set; no auto-retry, the next `ensure()` requests it again.
 * `ln-list:request-revalidate`: Windowed mode — the coordinator asks the cache to revalidate the currently visible page after a local mutation. Stale rows stay visible, no jump to page 0.
-* `ln-search:change` `{ term }`: Captures search query from `data-ln-search` inputs.
 * `ln-sort:change` `{ field, column, direction }`: Sets `currentSort` and re-sorts (data-driven only). Ignored when `field` is `null` (index-only events have nothing to key a record by).
 
 ### Emitted Events

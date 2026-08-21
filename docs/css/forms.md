@@ -30,7 +30,7 @@ hover, tighter padding, 1rem icons — use `class="search"`:
 ```html
 <label class="search">
 	<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
-	<input type="search" placeholder="Search…" data-ln-search="my-list">
+	<input type="search" placeholder="Search…" data-ln-search-for="my-list" data-ln-search-debounce="0">
 	<button type="button" data-ln-search-clear aria-label="Clear search">
 		<svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
 	</button>

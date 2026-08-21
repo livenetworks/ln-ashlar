@@ -21,9 +21,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 
 		// Resolve search input inside active coordinator wrapper or first visible search
 		const searchHost = document.querySelector('[' + DOM_SELECTOR + '] [data-ln-search-for]')
-			|| document.querySelector('[' + DOM_SELECTOR + '] [data-ln-search]')
-			|| document.querySelector('[data-ln-search-for]')
-			|| document.querySelector('[data-ln-search]');
+			|| document.querySelector('[data-ln-search-for]');
 		if (!searchHost) return;
 
 		const input = (searchHost.tagName === 'INPUT' || searchHost.tagName === 'TEXTAREA')
@@ -107,17 +105,20 @@ import { registerComponent, dispatch } from '../../ln-core';
 				// Query controls address the source (docs/architecture/shared-query.md);
 				// only an SSR table is its own source.
 				const sourceId = table.getAttribute('data-ln-table-source') || table.id;
-				const searchEl = (sourceId && (dom.querySelector('[data-ln-search-for="' + sourceId + '"]') || dom.querySelector('[data-ln-search="' + sourceId + '"]')))
-					|| dom.querySelector('[data-ln-search-for]')
-					|| dom.querySelector('[data-ln-search]');
-				if (searchEl) {
-					const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
-						? searchEl
-						: searchEl.querySelector('input');
-					// Clearing the value is not an edit — ln-search only re-emits on input.
-					if (input) {
-						input.value = '';
-						input.dispatchEvent(new Event('input', { bubbles: true }));
+				const sourceEl = sourceId ? document.getElementById(sourceId) : null;
+				if (sourceEl && sourceEl.hasAttribute('data-ln-search')) {
+					sourceEl.setAttribute('data-ln-search', '');
+				} else {
+					const searchEl = (sourceId && dom.querySelector('[data-ln-search-for="' + sourceId + '"]'))
+						|| dom.querySelector('[data-ln-search-for]');
+					if (searchEl) {
+						const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
+							? searchEl
+							: searchEl.querySelector('input');
+						if (input) {
+							input.value = '';
+							input.dispatchEvent(new Event('input', { bubbles: true }));
+						}
 					}
 				}
 

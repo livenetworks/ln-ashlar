@@ -79,10 +79,13 @@ behavior differs by mode:
 
 In SSR mode, the list is functional immediately with the server-rendered markup. Sort and search filters are run locally.
 
-```html
-<form role="search" onsubmit="return false;">
-  <input type="search" data-ln-search="ssr-documents-list" placeholder="Search...">
-</form>
+<label class="search">
+  <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+  <input type="search" placeholder="Search..." data-ln-search-for="ssr-documents-list" data-ln-search-debounce="0">
+  <button type="button" data-ln-search-clear aria-label="Clear search">
+    <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+  </button>
+</label>
 
 <ul data-ln-sort="ssr-documents-list" data-ln-sort-field="title" data-ln-sort-state="none">
   <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
@@ -120,7 +123,13 @@ In Data-Driven mode, the list requests data via coordinator events and populates
     <!-- Global select-all checkbox -->
     <input type="checkbox" data-ln-list-select-all />
     
-    <input type="text" data-ln-search="users_list" placeholder="Search..." />
+    <label class="search">
+      <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-search"></use></svg>
+      <input type="search" data-ln-search-for="users_list" data-ln-search-debounce="0" placeholder="Search..." />
+      <button type="button" data-ln-search-clear aria-label="Clear search">
+        <svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-x"></use></svg>
+      </button>
+    </label>
 
     <ul data-ln-sort="users_list" data-ln-sort-field="name" data-ln-sort-state="none">
       <li><button type="button" data-ln-sort-dir="asc" aria-label="Sort ascending"><svg class="ln-icon" aria-hidden="true"><use href="#ln-icon-arrows-sort"></use></svg></button></li>
@@ -216,7 +225,6 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `data-ln-list-filtered` | `<span>` | `Flag` | - | Displays filtered visible count. Parent element is hidden when no filters are active. |
 | `data-ln-list-selected` | `<span>` | `Flag` | - | Displays active selection count. Parent element is hidden when selection is 0. |
 | `data-ln-list-clear-all` | `<button>` | `Flag` | - | Button to clear all filters and trigger a new fetch. |
-| `data-ln-list-clear` | `<button>` | `Flag` | - | Button to clear the search input locally. |
 | `data-ln-list-empty` | `<template>` | `Flag` | - | Template (`template[data-ln-list-empty]`) for the empty state in SSR mode. |
 | `data-ln-empty` | `<template>` | `Flag` | - | Generic fallback template (`template[data-ln-empty]`) for empty states in Data-Driven mode. |
 | `data-ln-empty-when` | Sub-element | `"initial"` \| `"search"` | - | Placed inside `template[data-ln-empty]` to show a specific block when list is empty initially (`initial`) vs when search returned no results (`search`). |
@@ -229,7 +237,6 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `ln-list:set-loading` | Listens | No | Controls the visual loading state of the list. | `{ loading: Boolean }` |
 | `ln-list:page-failed` | Listens | No | Windowed mode (`data-ln-list-window`): the coordinator reports that the page fetch at `offset` failed. The component releases that offset from its window cache's in-flight set so a later `ensure()` pass can request it again; there is no automatic retry. | `{ offset: Number }` |
 | `ln-list:request-revalidate` | Listens | No | Windowed mode (`data-ln-list-window`): the coordinator asks the component to refresh through its window cache after a local mutation. The cache refetches the page covering the current viewport rather than page 0, and the resident rows stay visible until the replacement arrives. | *(no payload)* |
-| `ln-search:change` | Listens | No | Received from `ln-search` inputs, triggering local filtering or a new fetch request. | `{ term: String }` |
 | `ln-sort:change` | Listens | No | Column/field sort intent from [`ln-sort`](./ln-sort.md), **Data-Driven mode only** — SSR mode registers no listener at all (see "Sort Integration" in §1). An event with `field !== null` is intercepted: sets `currentSort`, re-sorts `_filteredData` locally and re-renders (non-windowed), or calls `_requestData()` for a fresh page (windowed, `data-ln-list-window`). An event with `field === null` is ignored (no `preventDefault()` called), leaving `ln-sort`'s own default DOM-reorder fallback to run. | `{ field: String\|null, column: Number\|null, direction: 'asc'\|'desc'\|'none', targetId: String }` |
 | `ln-list:request-data` | Emits | No | Dispatched on initialization or parameter changes (sort, search, filter) to request data. Windowed mode (`data-ln-list-window`) additionally emits `offset`/`limit`/`queryGen`. | `{ list: String, sort: Object, filters: Object, search: String, offset?: Number, limit?: Number, queryGen?: Number }` |
 | `ln-list:ready` | Emits | No | Dispatched after hydration or initial SSR item parsing completes. | `{ total: Number }` |
@@ -238,11 +245,8 @@ In Data-Driven mode, the list requests data via coordinator events and populates
 | `ln-list:item-action` | Emits | No | Dispatched when clicking a button marked with `data-ln-item-action`. | `{ list: String, id: String, action: String, record: Object }` |
 | `ln-list:select` | Emits | No | Dispatched when item selection changes. | `{ list: String, selectedIds: Set, count: Number }` |
 | `ln-list:select-all` | Emits | No | Dispatched when the global "Select All" checkbox status changes. | `{ list: String, selected: Boolean }` |
-| `ln-list:search` | Emits | No | Dispatched when a search is executed on the list. | `{ list: String, query: String }` |
 | `ln-list:empty` | Emits | No | Dispatched when the empty state template is drawn. | `{ term: String, total: Number }` |
-| `ln-list:filter` | Emits | No | Dispatched during local filtering in SSR mode. | `{ term: String, matched: Number, total: Number }` |
 | `ln-list:clear-filters` | Emits | No | Dispatched on clear-all click to instruct coordinator to reset active filters. | `{ list: String }` |
-| `ln-list:before-clear-search` | Emits | Yes | Dispatched before resetting search query via `[data-ln-list-clear]`. | `{ list: String }` |
 
 ---
 

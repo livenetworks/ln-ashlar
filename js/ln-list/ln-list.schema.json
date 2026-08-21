@@ -53,10 +53,8 @@
 			]
 		},
 		"data-ln-list-clear": {
-			"direction": "author",
-			"sources": [
-				"src/ln-list.js"
-			]
+			"direction": null,
+			"sources": []
 		},
 		"data-ln-list-clear-all": {
 			"direction": "author",
@@ -137,10 +135,12 @@
 			]
 		},
 		"data-ln-search": {
-			"direction": "author",
-			"sources": [
-				"src/ln-list.js"
-			]
+			"direction": null,
+			"sources": []
+		},
+		"data-ln-search-for": {
+			"direction": null,
+			"sources": []
 		}
 	}
 }
