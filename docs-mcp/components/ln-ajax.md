@@ -23,7 +23,7 @@ The `ln-ajax` component implements **HTML-over-the-wire** interactions. It inter
 *   **HTML-over-the-wire Updates:** Upon receiving a successful JSON response, `ln-ajax` performs the following updates:
     *   `title`: Updates `document.title`.
     *   `content`: Iterates through a key-value map `{ "target-id": "HTML content" }`, finding each DOM node by ID and overwriting its `innerHTML`.
-    *   `message`: Automatically dispatches `ln-toast:enqueue` to prompt notification popups.
+    *   `message`: Server-provided feedback is passed via `ln-ajax:success` / `ln-ajax:error` event details to Layer 2 coordinators (e.g. `ln-ui-coordinator`) to trigger toast notifications.
 *   **History Synchronization:** Updates the browser's URL address via `window.history.pushState` on successful GET actions or link navigations to preserve Back/Forward capability.
 *   **Visual Loading States:** Disables form submission triggers during in-flight network requests, applies the `.ln-ajax--loading` class to the triggering element, and appends a temporary loader spinner (`.ln-ajax-spinner`).
 *   **Security Integration:** Automatically appends CSRF tokens in headers (`X-CSRF-TOKEN`) and form parameters (`_token`) on non-idempotent actions.

@@ -74,7 +74,7 @@ Disables parent prefix matching. Links are highlighted only if their `href` stri
 | Event | Direction | Cancelable | Description | `detail` Object |
 |---|---|---|---|---|
 | `ln-nav:before-update` | Emits | Yes | Dispatched before evaluating and updating active link states. Cancelable. | `{ target: HTMLElement }` |
-| `ln-nav:updated` | Emits | No | Dispatched after active link states have been evaluated and CSS classes applied. | `{ activeLinks: Array, target: HTMLElement }` |
+| `ln-nav:update` | Emits | No | Dispatched after active link states have been evaluated and CSS classes applied. | `{ activeLinks: Array, target: HTMLElement }` |
 | `ln-nav:destroyed` | Emits | No | Dispatched when `destroy()` is called on the component instance. | `{ target: HTMLElement }` |
 
 ---

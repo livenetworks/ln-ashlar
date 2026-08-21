@@ -6,14 +6,19 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
-	// ─── pushState singleton patch ──────────────────────────────
-	const _pushStateCallbacks = [];
+	// ─── pushState / replaceState singleton patch ──────────────
+	history._lnNavCallbacks = history._lnNavCallbacks || [];
 
 	if (!history._lnNavPatched) {
 		const _origPushState = history.pushState;
 		history.pushState = function () {
 			_origPushState.apply(history, arguments);
-			for (const cb of _pushStateCallbacks) { cb(); }
+			for (const cb of history._lnNavCallbacks) { cb(); }
+		};
+		const _origReplaceState = history.replaceState;
+		history.replaceState = function () {
+			_origReplaceState.apply(history, arguments);
+			for (const cb of history._lnNavCallbacks) { cb(); }
 		};
 		history._lnNavPatched = true;
 	}
@@ -29,7 +34,7 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 
 		// Listen to navigation events
 		window.addEventListener('popstate', this.updateHandler);
-		_pushStateCallbacks.push(this.updateHandler);
+		history._lnNavCallbacks.push(this.updateHandler);
 
 		// Observe DOM changes inside this nav element
 		this.observer = new MutationObserver(() => this.update());
@@ -49,6 +54,7 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 		const links = Array.from(this.dom.querySelectorAll('a'));
 		const currentPath = window.location.pathname;
 		const normalizedCurrent = _normalizeUrl(currentPath);
+		const activeLinks = [];
 
 		for (const link of links) {
 			const href = link.getAttribute('href');
@@ -72,13 +78,14 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 			if (isExact || isParent) {
 				link.classList.add(this.activeClass);
 				link.setAttribute('aria-current', 'page');
+				activeLinks.push(link);
 			} else {
 				link.classList.remove(this.activeClass);
 				link.removeAttribute('aria-current');
 			}
 		}
 
-		dispatch(this.dom, 'ln-nav:update', { target: this.dom });
+		dispatch(this.dom, 'ln-nav:update', { target: this.dom, activeLinks: activeLinks });
 	};
 
 	_component.prototype.destroy = function () {
@@ -87,9 +94,9 @@ import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 			this.observer.disconnect();
 		}
 		window.removeEventListener('popstate', this.updateHandler);
-		const idx = _pushStateCallbacks.indexOf(this.updateHandler);
+		const idx = history._lnNavCallbacks.indexOf(this.updateHandler);
 		if (idx !== -1) {
-			_pushStateCallbacks.splice(idx, 1);
+			history._lnNavCallbacks.splice(idx, 1);
 		}
 		dispatch(this.dom, 'ln-nav:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];

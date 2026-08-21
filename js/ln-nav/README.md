@@ -79,7 +79,7 @@ All events bubble from the `<nav>` element.
 | Event | Cancelable | Payload (`detail`) | Description |
 |---|---|---|---|
 | `ln-nav:before-update` | Yes | `{ target }` | Fires at the start of every `update()` pass. Call `e.preventDefault()` to skip the highlight recalculation. |
-| `ln-nav:update` | No | `{ target }` | Fires after active classes / `aria-current` have been applied to matching links. |
+| `ln-nav:update` | No | `{ target, activeLinks }` | Fires after active classes / `aria-current` have been applied to matching links. |
 | `ln-nav:destroyed` | No | `{ target }` | Fires inside `destroy()`, after listeners/observer are torn down. |
 
 ---
@@ -88,9 +88,9 @@ All events bubble from the `<nav>` element.
 
 Source: `js/ln-nav/ln-nav.js`. Registered via `registerComponent` with `extraAttributes: ['data-ln-nav-exact']` and an `onAttributeChange` bridge — the shared core handles instantiation, body-guarding, and teardown.
 
-### Singleton `pushState` patch
+### Singleton `pushState` / `replaceState` patch
 
-`history.pushState` is monkey-patched once per page, guarded by `history._lnNavPatched`. Every `[data-ln-nav]` instance pushes its `updateHandler` onto a shared `_pushStateCallbacks` array; the patched `pushState` calls the original, then invokes every registered handler. This is the only mechanism that catches URL changes from `pushState`-based navigation (e.g. `ln-ajax`); `popstate` is wired separately for back/forward.
+`history.pushState` and `history.replaceState` are monkey-patched once per page, guarded by `history._lnNavPatched`. Every `[data-ln-nav]` instance pushes its `updateHandler` onto `history._lnNavCallbacks`; the patched methods call the original, then invoke every registered handler. This catches URL changes from both `pushState` and `replaceState` client navigation; `popstate` is wired separately for back/forward.
 
 ### Per-instance MutationObserver
 
