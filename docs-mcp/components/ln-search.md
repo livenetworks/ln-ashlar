@@ -30,6 +30,38 @@ The `ln-search` component is a decoupled search primitive implemented using the 
 *   **Cancelable Change Event:** Emits `ln-search:change` on the target. External components (`ln-table`, `ln-data-store`, or `ln-table-coordinator`) call `event.preventDefault()` to handle custom filtering.
 *   **Deep-link / Form Restore Support:** Pre-filled `data-ln-search` attributes on the target seed the initial state safely via `queueBoot`.
 
+### Backend Search Contract: Whitespace & Wildcard Handling
+
+When building backend APIs (e.g. `api.php`, REST endpoints, or SQL/NoSQL services) for remote search, the server **must mirror** the client-side tokenized contract:
+
+1. **Whitespace Tokenization (`AND` Logic):** Split the query string on whitespace (`\s+`). Every token must match somewhere within the record (order-independent).
+2. **Wildcard Conversion (`*` to `%` or `.*`):** Convert user-typed asterisks (`*`) into SQL `%` or Regex `.*`.
+3. **Multi-Field Matching (`OR` per token):** A single token matches if it appears in *any* of the searchable fields (e.g., `title`, `department`, `tags`). All tokens must match (`AND` across tokens).
+
+#### Reference PHP / SQL Implementation:
+```php
+$search = isset($_GET['search']) ? trim($_GET['search']) : (isset($_GET['q']) ? trim($_GET['q']) : '');
+if ($search !== '') {
+    // 1. Split by whitespace into independent tokens
+    $tokens = preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY);
+    $searchFields = ['title', 'department', 'owner', 'tags'];
+
+    foreach ($tokens as $token) {
+        // 2. Convert wildcard '*' to SQL '%' and normalize
+        $tokenPattern = '%' . str_replace('*', '%', $token) . '%';
+        $tokenPattern = preg_replace('/%+/', '%', $tokenPattern);
+
+        // 3. Match across columns (OR per field, AND between tokens)
+        $fieldClauses = [];
+        foreach ($searchFields as $field) {
+            $fieldClauses[] = "$field LIKE ?";
+            $params[] = $tokenPattern;
+        }
+        $where[] = '(' . implode(' OR ', $fieldClauses) . ')';
+    }
+}
+```
+
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
 > - **Does NOT hold JS references between control and target:** Communication is strictly attribute-driven.

@@ -94,6 +94,37 @@ Dispatched on the **target** element whenever the search term updates.
 
 ---
 
+## 🌐 Backend Search Contract (Whitespace & Wildcard Handling)
+
+To keep remote search consistent with client-side DOM and table filtering, backend APIs (e.g. `api.php`, SQL endpoints) must mirror the tokenized search contract:
+
+1. **Whitespace Tokenization (`AND` Logic):** Split the query string on whitespace (`\s+`). Every token must be present in the record.
+2. **Wildcard `*` Conversion:** Convert asterisks (`*`) into SQL `%` or Regex `.*`.
+3. **Multi-Field Matching (`OR` per token):** Each token can match anywhere across the allowed searchable columns/fields.
+
+```php
+// Reference PHP / SQLite PDO implementation
+$search = isset($_GET['search']) ? trim($_GET['search']) : (isset($_GET['q']) ? trim($_GET['q']) : '');
+if ($search !== '') {
+	$tokens = preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY);
+	$searchFields = ['title', 'department', 'owner', 'tags'];
+
+	foreach ($tokens as $token) {
+		$tokenPattern = '%' . str_replace('*', '%', $token) . '%';
+		$tokenPattern = preg_replace('/%+/', '%', $tokenPattern);
+
+		$fieldClauses = [];
+		foreach ($searchFields as $field) {
+			$fieldClauses[] = "$field LIKE ?";
+			$params[] = $tokenPattern;
+		}
+		$where[] = '(' . implode(' OR ', $fieldClauses) . ')';
+	}
+}
+```
+
+---
+
 ## ⚠️ Common Pitfalls
 
 - **Using `data-ln-search="tableId"` on inputs:** `data-ln-search` is the target state attribute. Inputs must use `data-ln-search-for="tableId"`.

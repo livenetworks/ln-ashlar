@@ -208,8 +208,29 @@ function pick_fields($e, $body) {
 
 function list_entity($e) {
 	$db = db_load();
+	$items = array_values($db[$e]);
+	$search = isset($_GET['search']) ? trim($_GET['search']) : (isset($_GET['q']) ? trim($_GET['q']) : '');
+
+	if ($search !== '') {
+		$tokens = preg_split('/\s+/', mb_strtolower($search), -1, PREG_SPLIT_NO_EMPTY);
+		$items = array_values(array_filter($items, function($item) use ($tokens) {
+			$searchableText = mb_strtolower(implode(' ', array_map(function($val) {
+				return is_array($val) ? json_encode($val) : (string)$val;
+			}, $item)));
+
+			foreach ($tokens as $token) {
+				$tokenPattern = str_replace('\*', '.*', preg_quote($token, '/'));
+				$tokenPattern = preg_replace('/(\.\*)+/', '.*', $tokenPattern);
+				if (!preg_match('/' . $tokenPattern . '/i', $searchableText)) {
+					return false;
+				}
+			}
+			return true;
+		}));
+	}
+
 	respond(200, [
-		'data'      => array_values($db[$e]),
+		'data'      => $items,
 		'deleted'   => [],
 		'synced_at' => time(),
 	]);

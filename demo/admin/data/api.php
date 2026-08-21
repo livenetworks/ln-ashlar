@@ -82,12 +82,21 @@ $params = [];
 // Support query parameter 'search' or 'q'
 $search = isset($_GET['search']) ? trim($_GET['search']) : (isset($_GET['q']) ? trim($_GET['q']) : '');
 if ($search !== '') {
-	$where[] = "(title LIKE ? OR department LIKE ? OR owner LIKE ? OR tags LIKE ?)";
-	$term = '%' . $search . '%';
-	$params[] = $term;
-	$params[] = $term;
-	$params[] = $term;
-	$params[] = $term;
+	// Token-based wildcard matching: split by whitespace, convert '*' to '%', AND-combined tokens
+	$tokens = preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY);
+	$searchFields = ['title', 'department', 'owner', 'tags', 'status', 'priority'];
+
+	foreach ($tokens as $token) {
+		$tokenPattern = '%' . str_replace('*', '%', $token) . '%';
+		$tokenPattern = preg_replace('/%+/', '%', $tokenPattern);
+
+		$fieldClauses = [];
+		foreach ($searchFields as $field) {
+			$fieldClauses[] = "$field LIKE ?";
+			$params[] = $tokenPattern;
+		}
+		$where[] = '(' . implode(' OR ', $fieldClauses) . ')';
+	}
 }
 
 // Support filters by department and status (comma-separated lists)
