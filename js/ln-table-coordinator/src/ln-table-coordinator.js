@@ -17,7 +17,7 @@ import { registerComponent, dispatch } from '../../ln-core';
 	document.addEventListener('keydown', function (e) {
 		if (e.key !== '/') return;
 		if (e.defaultPrevented) return;
-		if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+		if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.isContentEditable)) return;
 
 		// Resolve search input inside active coordinator wrapper or first visible search
 		const searchHost = document.querySelector('[' + DOM_SELECTOR + '] [data-ln-search-for]')
@@ -108,17 +108,17 @@ import { registerComponent, dispatch } from '../../ln-core';
 				const sourceEl = sourceId ? document.getElementById(sourceId) : null;
 				if (sourceEl && sourceEl.hasAttribute('data-ln-search')) {
 					sourceEl.setAttribute('data-ln-search', '');
-				} else {
-					const searchEl = (sourceId && dom.querySelector('[data-ln-search-for="' + sourceId + '"]'))
-						|| dom.querySelector('[data-ln-search-for]');
-					if (searchEl) {
-						const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
-							? searchEl
-							: searchEl.querySelector('input');
-						if (input) {
-							input.value = '';
-							input.dispatchEvent(new Event('input', { bubbles: true }));
-						}
+				}
+
+				const searchEl = (sourceId && dom.querySelector('[data-ln-search-for="' + sourceId + '"]'))
+					|| dom.querySelector('[data-ln-search-for]');
+				if (searchEl) {
+					const input = (searchEl.tagName === 'INPUT' || searchEl.tagName === 'TEXTAREA')
+						? searchEl
+						: searchEl.querySelector('input');
+					if (input && input.value !== '') {
+						input.value = '';
+						input.dispatchEvent(new Event('input', { bubbles: true }));
 					}
 				}
 

@@ -79,6 +79,11 @@ View elements (e.g., [`ln-table`](./ln-table.md), `ln-list`, [`ln-chart`](./ln-c
 | `data-ln-data-mapper` | Wrapper | `String` | — | Optional custom data mapper function key name. |
 | `data-ln-data-coordinator-stale` | Wrapper | `Number` | `300` | Stale cache window in seconds. Falls back to store rules. |
 | `data-ln-data-coordinator-no-autosync` | Wrapper | Flag | — | Disables automatic sync on visibility or online recovery events. |
+| `data-ln-table-source` | `[data-ln-table]` | `String` (Store ID) | — | Binds a table to this coordinator's child store; receives `ln-table:set-data`. |
+| `data-ln-list-source` | `[data-ln-list]` | `String` (Store ID) | — | Binds a list to this coordinator's child store; receives `ln-list:set-data`. |
+| `data-ln-chart-source` | `[data-ln-chart]` | `String` (Store ID) | — | Binds a chart to this coordinator's child store; receives `ln-chart:set-data`. |
+| `data-ln-options` | `<select>` | `String` (Store ID) | — | Populated with records via `ln-options:set-data`. |
+| `data-ln-stat` | Inline Element | `String` (Store ID) | — | Receives record count via `ln-stat:set-count`. |
 
 ### Programmatic JS API
 

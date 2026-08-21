@@ -58,10 +58,6 @@
 			"sources": [
 				"src/ln-filter.js"
 			]
-		},
-		"data-ln-table": {
-			"direction": null,
-			"sources": []
 		}
 	}
 }

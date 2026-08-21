@@ -302,10 +302,10 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 
 	// ─── Global Delegated Clear Triggers ───────────────────────
 	// Handles clearing search on:
-	// 1. <button data-ln-search-clear> sibling to input inside .search chrome
-	// 2. <button data-ln-search-clear> inside [data-ln-search-for] control wrapper
-	// 3. <button data-ln-search-clear> inside [data-ln-search] (empty states in lists, tables, sections)
-	// 4. <button data-ln-search-clear-for="targetId"> (anywhere on page)
+	// 1. <button data-ln-search-clear-for="targetId"> (explicit target, anywhere on page / data-driven empty states)
+	// 2. <button data-ln-search-clear> inside [data-ln-search] (SSR empty states in lists, tables, sections)
+	// 3. <button data-ln-search-clear> inside [data-ln-search-for] control wrapper
+	// 4. <button data-ln-search-clear> sibling to input inside .search chrome
 
 	function _resolveTargetAndInputFromClearBtn(btn) {
 		const explicitId = btn.getAttribute('data-ln-search-clear-for');
@@ -316,7 +316,7 @@ import { dispatchCancelable, registerComponent, queueBoot, hashGet, hashSet, res
 			return { target: target, input: input };
 		}
 
-		// 1. Clear button is inside a search state target (e.g. empty-state in a list/table/section)
+		// 1. Clear button is inside a search state target (e.g. SSR empty-state inside [data-ln-search])
 		const target = btn.closest('[' + DOM_SELECTOR + ']');
 		if (target) {
 			const control = target.id ? document.querySelector('[' + CONTROL_SELECTOR + '="' + target.id + '"]') : null;

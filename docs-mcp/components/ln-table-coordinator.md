@@ -24,8 +24,8 @@ Key responsibilities include:
 - **Child Component Coordination:** Coordinating child search inputs, filter popovers, and table primitives enclosed within the wrapper container.
 - **Multiple Coordinators Per Page:** Allowing multiple `data-ln-table-coordinator` wrappers to coexist independently on the exact same page without ID collisions or cross-table interference.
 - **Filter Indicator Mediation:** Catching `ln-filter:change` events within the wrapper and toggling `.ln-filter-active` visual indicator classes on header filter buttons (`<th>`).
-- **Clear Actions Handler:** Intercepting clicks on `[data-ln-table-clear]` and `[data-ln-table-clear-all]` inside the wrapper, resetting search inputs and filter checkboxes to `checked`, removing `.ln-filter-active` indicator classes, and dispatching `ln-table:request-clear-filters` to an SSR table.
-- **Keyboard Shortcut:** Capturing keydown `'/'` to focus the search input inside the active wrapper container.
+- **Clear Actions Handler:** Intercepting clicks on `[data-ln-table-clear]` and `[data-ln-table-clear-all]` inside the wrapper, symmetrically resetting linked search inputs and `data-ln-search` state host attributes, checking filter reset checkboxes, removing `.ln-filter-active` indicator classes, and dispatching `ln-table:request-clear-filters` to an SSR table.
+- **Keyboard Shortcut:** Capturing keydown `'/'` to focus the search input inside the active wrapper container (safely ignored when focus is inside an `<input>`, `<textarea>`, or `contenteditable` surface like `ln-editor`).
 
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
@@ -227,7 +227,7 @@ The `ln-table-coordinator` component is completely unstyled and contains no layo
 
 ### ARIA & Keyboard
 
-- **Search Shortcut:** Pressing `/` anywhere on the page automatically moves focus to `[data-ln-search-for]` inputs inside the active wrapper container.
+- **Search Shortcut:** Pressing `/` anywhere on the page automatically moves focus to `[data-ln-search-for]` inputs inside the active wrapper container. It is automatically ignored when the active element is an input, textarea, or `isContentEditable` element (e.g. `ln-editor`).
 - **Icon Labels:** Filter and sort buttons in `<th>` carry explicit `aria-label` attributes.
 
 ### Common Pitfalls & Anti-patterns
@@ -235,6 +235,7 @@ The `ln-table-coordinator` component is completely unstyled and contains no layo
 > [!CAUTION]
 > 1. **Omitting Wrapper Container:** Always place `data-ln-table-coordinator` on the parent container wrapping your `data-ln-table` and `data-ln-filter` popovers so header indicators and clear actions are coordinated automatically without ID conflicts.
 > 2. **Missing `ul/li` Wrap:** Filter options inside popovers MUST be wrapped in `<ul>/<li>` containers according to project DOM rules (`<ul data-ln-filter><li><label><input type="checkbox"...></label></li></ul>`).
+> 3. **Clear Button Composition:** For detached or data-driven layouts, reset buttons can compose both table and search clear triggers: `<button type="button" data-ln-table-clear data-ln-search-clear-for="storeId">Reset All</button>`.
 
 ---
 

@@ -21,8 +21,8 @@ A zero-dependency, per-instance, host-scoped coordinator component that wires ex
 | Target / Trigger | Event / Trigger | Behavior |
 | :--- | :--- | :--- |
 | `[data-ln-filter="tableId"]` (delivered by `ln-filter`) | `ln-filter:change` | Resolves target table in host, toggles `.ln-filter-active` indicator on header filter button. |
-| `[data-ln-table-clear]`, `[data-ln-table-clear-all]` | `click` | Resolves the table structurally within this host, clears the linked search input and filter reset checkboxes, removes `.ln-filter-active` visual classes, and dispatches `ln-table:request-clear-filters` to SSR tables. |
-| Document | `keydown` (`'/'`) | Focuses the search input inside the active coordinator wrapper on the page (or the first `[data-ln-search-for]` if none). |
+| `[data-ln-table-clear]`, `[data-ln-table-clear-all]` | `click` | Resolves the table structurally within this host, symmetrically clears the linked search input and `data-ln-search` source attribute, checks filter reset checkboxes, removes `.ln-filter-active` visual classes, and dispatches `ln-table:request-clear-filters` to SSR tables. |
+| Document | `keydown` (`'/'`) | Focuses the search input inside the active coordinator wrapper on the page (or the first `[data-ln-search-for]` if none). Safely ignored when focus is in an input, textarea, or `isContentEditable` surface. |
 
 ---
 
@@ -48,11 +48,11 @@ Source: `js/ln-table-coordinator/src/ln-table-coordinator.js`. This is a real pe
 
 ### Clear
 
-A `click` on `[data-ln-table-clear]` / `[data-ln-table-clear-all]` resolves the table structurally: `clearBtn.closest('[data-ln-table]')`, falling back to `dom.querySelector('[data-ln-table]')` — always scoped to this host. It then runs: (1) strip `.ln-filter-active` off every filter button in the table, (2) blank the linked search input, (3) check each linked filter popover's `[data-ln-filter-reset]` and fire a bubbling `change`, (4) dispatch `ln-table:request-clear-filters` if the table is an SSR table.
+A `click` on `[data-ln-table-clear]` / `[data-ln-table-clear-all]` resolves the table structurally: `clearBtn.closest('[data-ln-table]')`, falling back to `dom.querySelector('[data-ln-table]')` — always scoped to this host. It then runs: (1) strip `.ln-filter-active` off every filter button in the table, (2) blank the linked search input and set `data-ln-search=""` on the source host, (3) check each linked filter popover's `[data-ln-filter-reset]` and fire a bubbling `change`, (4) dispatch `ln-table:request-clear-filters` if the table is an SSR table.
 
 ### `/` focus shortcut
 
-The sole deliberate exception to host-scoping. It remains a single `document`-level `keydown` listener registered once at module scope (outside `_component`/`_bindEvents`) — a page-level keyboard affordance, not coordination between a host and its children. Registering it per-instance would fire it once per coordinator on the page. It focuses the search input inside the active `[data-ln-table-coordinator]` wrapper, or the first `[data-ln-search]` on the page if none. Ignored when focus is already in an `INPUT`/`TEXTAREA`, or when the event was already `defaultPrevented`.
+The sole deliberate exception to host-scoping. It remains a single `document`-level `keydown` listener registered once at module scope (outside `_component`/`_bindEvents`) — a page-level keyboard affordance, not coordination between a host and its children. Registering it per-instance would fire it once per coordinator on the page. It focuses the search input inside the active `[data-ln-table-coordinator]` wrapper, or the first `[data-ln-search]` on the page if none. Ignored when focus is already in an `INPUT`/`TEXTAREA`, `isContentEditable` surface (e.g. `ln-editor`), or when the event was already `defaultPrevented`.
 
 ### Multi-coordinator isolation
 

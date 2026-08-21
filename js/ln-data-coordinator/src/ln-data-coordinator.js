@@ -498,7 +498,7 @@ import { MutationReceipts } from './mutation-receipts';
 				// 1. Pass fetched remote data strictly to ln-data-store (Single Source of Truth)
 				if (children.store && !children.store.initializationError) {
 					if (meta.kind) {
-						if (meta.kind === 'table' || meta.kind === 'list') {
+						if (meta.kind === 'table' || meta.kind === 'list' || meta.kind === 'chart') {
 							children.store.applyQuery(normalizedData, { total: e.detail.total }).then(function (decorated) {
 								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-loading', { loading: false });
 								dispatch(meta.targetEl, 'ln-' + meta.kind + ':set-data', {
