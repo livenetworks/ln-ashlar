@@ -62,6 +62,22 @@ Dismiss all active toasts in the viewport:
 window.dispatchEvent(new CustomEvent('ln-toast:clear'));
 ```
 
+### Programmatic Instance Control
+You can also enqueue or clear toasts directly on a specific container instance:
+```js
+const toastContainer = document.querySelector('[data-ln-toast]');
+
+// Enqueue directly
+toastContainer.lnToast.enqueue({
+    type: 'info',
+    title: 'Update Available',
+    message: 'A new version has been downloaded.'
+});
+
+// Clear all active toasts in this container
+toastContainer.lnToast.clear();
+```
+
 ---
 
 ## 4. Toast Types & Tone

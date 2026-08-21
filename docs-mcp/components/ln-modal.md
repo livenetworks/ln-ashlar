@@ -85,7 +85,7 @@ Triggers communicate with modals via `data-ln-modal-for="modalId"` or URL hash l
 | `data-ln-modal-mode` | `<dialog>` | `"new"` \| `"edit"` | `"new"` | State attribute indicating form mode (toggles `[data-ln-modal-when]` descendants). |
 | `data-ln-modal-when` | Children | `"new"` \| `"edit"` | - | Element is displayed only when its value matches the modal's `data-ln-modal-mode`. |
 
-### Programmatic State Query
+### Programmatic JS API
 
 The initialized instance is exposed on the dialog element via `dom.lnModal`.
 
@@ -93,6 +93,9 @@ The initialized instance is exposed on the dialog element via `dom.lnModal`.
 |---|---|---|
 | `dom.lnModal` | `Object` | The simple component instance attached to the DOM element. |
 | `dom.lnModal.isOpen` | `Boolean` | True if the modal is currently open. |
+| `dom.lnModal.open()` | `Function` | Opens the modal by writing `setAttribute('data-ln-modal', 'open')`. |
+| `dom.lnModal.close()` | `Function` | Closes the modal by writing `setAttribute('data-ln-modal', 'close')`. |
+| `dom.lnModal.toggle()` | `Function` | Toggles the modal between open and closed state. |
 | `dom.lnModal.destroy()` | `Function` | Cleans up events, unlocks body scroll, and destroys the instance. |
 
 ### Events API

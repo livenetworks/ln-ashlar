@@ -52,6 +52,19 @@ import { registerComponent, dispatch, dispatchCancelable, isVisible } from '../.
 		return this;
 	}
 
+	_component.prototype.open = function () {
+		this.dom.setAttribute(DOM_SELECTOR, 'open');
+	};
+
+	_component.prototype.close = function () {
+		this.dom.setAttribute(DOM_SELECTOR, 'close');
+	};
+
+	_component.prototype.toggle = function () {
+		const current = this.dom.getAttribute(DOM_SELECTOR);
+		this.dom.setAttribute(DOM_SELECTOR, current === 'open' ? 'close' : 'open');
+	};
+
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 

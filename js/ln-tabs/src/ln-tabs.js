@@ -1,5 +1,5 @@
 /* Live Networks - lnTabs (hash-aware tabs — supports <button> and <a href="#nsKey:key"> triggers) */
-import { registerComponent, dispatch } from '../../ln-core';
+import { registerComponent, dispatch, dispatchCancelable } from '../../ln-core';
 import { persistGet, persistSet } from '../../ln-core';
 import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 
@@ -32,7 +32,7 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 		return (sep > 0 ? last.slice(sep + 1) : last).toLowerCase().trim();
 	}
 
-	function _component(dom) { this.dom = dom; _init.call(this); return this; }
+	function _component(dom) { this.dom = dom; this.activeKey = null; _init.call(this); return this; }
 
 	function _init() {
 		this.tabs   = Array.from(this.dom.querySelectorAll("[data-ln-tab]"));
@@ -107,10 +107,9 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 
 		this._onRequestSelect = function (e) {
 			const key = e.detail && (e.detail.key || e.detail.tab);
-			if (key) self.dom.setAttribute('data-ln-tabs-active', (key + '').toLowerCase().trim());
+			if (key) self.select(key);
 		};
 		this.dom.addEventListener('ln-tabs:request-select', this._onRequestSelect);
-		this.dom.addEventListener('ln-tabs:request-activate', this._onRequestSelect);
 
 		this._hashHandler = function () {
 			if (!self.hashEnabled) return;
@@ -133,8 +132,43 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 		}
 	}
 
+	_component.prototype.select = function (key) {
+		const k = (key + '').toLowerCase().trim();
+		if (!k) return;
+		if (this.hashEnabled) {
+			if (hashGet(this.nsKey) === k) this.dom.setAttribute('data-ln-tabs-active', k);
+			else hashSet(this.nsKey, k);
+		} else {
+			this.dom.setAttribute('data-ln-tabs-active', k);
+		}
+	};
+
 	_component.prototype._applyActive = function (key) {
 		if (!key || !(key in this.mapPanels)) key = this.defaultKey;
+		if (key === this.activeKey) return;
+
+		const prevKey = this.activeKey;
+		if (prevKey !== null) {
+			const before = dispatchCancelable(this.dom, 'ln-tabs:before-change', {
+				key: key,
+				previousKey: prevKey,
+				tab: this.mapTabs[key],
+				panel: this.mapPanels[key],
+				target: this.dom
+			});
+			if (before.defaultPrevented) {
+				if (prevKey in this.mapPanels) {
+					this.dom.setAttribute('data-ln-tabs-active', prevKey);
+					if (this.hashEnabled && hashGet(this.nsKey) !== prevKey) {
+						hashSet(this.nsKey, prevKey);
+					}
+				}
+				return;
+			}
+		}
+
+		this.activeKey = key;
+
 		for (const k in this.mapTabs) {
 			const btn = this.mapTabs[k];
 			if (k === key) {
@@ -155,7 +189,13 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 			const first = this.mapPanels[key]?.querySelector('input,button,select,textarea,[tabindex]:not([tabindex="-1"])');
 			if (first) setTimeout(() => first.focus({ preventScroll: true }), 0);
 		}
-		dispatch(this.dom, 'ln-tabs:change', { key: key, tab: this.mapTabs[key], panel: this.mapPanels[key] });
+		dispatch(this.dom, 'ln-tabs:change', {
+			key: key,
+			previousKey: prevKey,
+			tab: this.mapTabs[key],
+			panel: this.mapPanels[key],
+			target: this.dom
+		});
 		if (this.dom.hasAttribute('data-ln-persist') && !this.hashEnabled) {
 			persistSet('tabs', this.dom, key);
 		}
@@ -164,7 +204,6 @@ import { hashGet, hashSet, hashLinkClick } from '../../ln-core';
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		this.dom.removeEventListener('ln-tabs:request-select', this._onRequestSelect);
-		this.dom.removeEventListener('ln-tabs:request-activate', this._onRequestSelect);
 		for (const { el, handler } of this._clickHandlers) {
 			el.removeEventListener("click", handler);
 			delete el[DOM_ATTRIBUTE + 'Trigger'];

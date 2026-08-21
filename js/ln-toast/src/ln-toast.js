@@ -1,13 +1,12 @@
 /* Live Networks — ln-toast (side-accent with icons) */
-import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
+import { guardBody, cloneTemplateScoped, fill, registerComponent, dispatch } from '../../ln-core';
 
 (function () {
 	const DOM_SELECTOR = "data-ln-toast";
 	const DOM_ATTRIBUTE = "lnToast";
 	const TEMPLATE_NAME = "ln-toast-item";
 
-	if (window.__lnToastLoaded) return;
-	window.__lnToastLoaded = true;
+	if (window[DOM_ATTRIBUTE] !== undefined) return;
 
 	function _promoteTopLayer(container) {
 		if (!container || !(container instanceof HTMLElement)) return;
@@ -32,15 +31,6 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 		}
 	}
 
-	function _findContainers(root) {
-		if (!root || root.nodeType !== 1) return;
-		const items = Array.from(root.querySelectorAll("[" + DOM_SELECTOR + "]"));
-		if (root.hasAttribute && root.hasAttribute(DOM_SELECTOR)) items.push(root);
-		for (const el of items) {
-			if (!el[DOM_ATTRIBUTE]) new _Component(el);
-		}
-	}
-
 	function _Component(dom) {
 		this.dom = dom;
 		dom[DOM_ATTRIBUTE] = this;
@@ -58,12 +48,28 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 		return this;
 	}
 
+	_Component.prototype.enqueue = function (opts) {
+		if (!opts) return;
+		const li = _buildItem(opts, this.dom);
+		if (!li) return;
+		const timeout = Number.isFinite(opts.timeout) ? opts.timeout : this.timeoutDefault;
+		_append(this, li);
+		if (timeout > 0) li._timer = setTimeout(() => _dismiss(li), timeout);
+	};
+
+	_Component.prototype.clear = function () {
+		for (const child of Array.from(this.dom.querySelectorAll("[data-ln-toast-item]"))) {
+			_dismiss(child);
+		}
+	};
+
 	_Component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
 		for (const li of Array.from(this.dom.querySelectorAll("[data-ln-toast-item]"))) {
 			_dismiss(li);
 		}
 		_demoteTopLayerIfEmpty(this.dom);
+		dispatch(this.dom, 'ln-toast:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
@@ -80,7 +86,7 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 		// querySelectorAll never matches its own root, and here the fragment is
 		// the root, so the <li> (its child) is a matched descendant and gets
 		// class="{type}". title/message data-ln-field targets are descendants
-		// too, so one call resolves all three. See plan Finding: fill-on-fragment.
+		// too, so one call resolves all three.
 		fill(fragment, {
 			type: type,
 			title: opts.title,
@@ -182,12 +188,8 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 			console.warn('[ln-toast] No toast container found');
 			return;
 		}
-		const cmp = container[DOM_ATTRIBUTE] || new _Component(container);
-		const li = _buildItem(detail, container);
-		if (!li) return;
-		const timeout = Number.isFinite(detail.timeout) ? detail.timeout : cmp.timeoutDefault;
-		_append(cmp, li);
-		if (timeout > 0) li._timer = setTimeout(() => _dismiss(li), timeout);
+		const cmp = container[DOM_ATTRIBUTE] || (container[DOM_ATTRIBUTE] = new _Component(container));
+		cmp.enqueue(detail);
 	}
 
 	function _onClear(e) {
@@ -195,12 +197,14 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 		if (detail.container) {
 			const el = _resolveContainer(detail);
 			if (el) {
-				for (const child of Array.from(el.querySelectorAll("[data-ln-toast-item]"))) _dismiss(child);
+				const cmp = el[DOM_ATTRIBUTE] || (el[DOM_ATTRIBUTE] = new _Component(el));
+				cmp.clear();
 			}
 		} else {
 			const containers = document.querySelectorAll("[" + DOM_SELECTOR + "]");
 			for (const el of Array.from(containers)) {
-				for (const child of Array.from(el.querySelectorAll("[data-ln-toast-item]"))) _dismiss(child);
+				const cmp = el[DOM_ATTRIBUTE] || (el[DOM_ATTRIBUTE] = new _Component(el));
+				cmp.clear();
 			}
 		}
 	}
@@ -216,17 +220,7 @@ import { guardBody, cloneTemplateScoped, fill } from '../../ln-core';
 				}
 			}
 		});
-
-		const observer = new MutationObserver(function (muts) {
-			for (const m of muts) {
-				if (m.type === 'attributes') { _findContainers(m.target); continue; }
-				for (const n of m.addedNodes) {
-					_findContainers(n);
-				}
-			}
-		});
-		observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [DOM_SELECTOR] });
-
-		_findContainers(document.body);
 	}, 'ln-toast');
+
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _Component, 'ln-toast');
 })();

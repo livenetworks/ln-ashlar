@@ -60,9 +60,9 @@ Triggers and modals are paired by ID. The overlay has `class="ln-modal"` and `da
 
 ## 3. Declarative API & State Contract
 
-There are no imperative JavaScript mutation methods on the component instance. **The HTML attribute is the sole source of truth.**
+State changes are driven declaratively via the `data-ln-modal` attribute (`"open"` / `"close"`). **The HTML attribute is the sole source of truth.**
 
-Coordinators and external scripts request state changes by dispatching request events or writing the attribute on the modal element:
+Coordinators and external scripts request state changes by dispatching request events, writing the attribute on the modal element, or calling the instance attribute-bridge methods:
 
 ```js
 const modal = document.getElementById('user-modal');
@@ -73,8 +73,10 @@ modal.dispatchEvent(new CustomEvent('ln-modal:request-open', { bubbles: true }))
 // Or set attribute directly
 modal.setAttribute('data-ln-modal', 'open');
 
-// Request close via event
-modal.dispatchEvent(new CustomEvent('ln-modal:request-close', { bubbles: true }));
+// Or via instance attribute-bridge methods
+modal.lnModal.open();
+modal.lnModal.close();
+modal.lnModal.toggle();
 
 // Read-only state query
 const isOpen = modal.lnModal.isOpen; // Returns true/false

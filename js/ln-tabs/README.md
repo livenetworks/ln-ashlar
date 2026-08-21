@@ -48,15 +48,21 @@ Triggers and panels are bound via matching keys inside a wrapper. Inactive panel
 
 ## 3. The Declarative API & State Contract
 
-There are no imperative JavaScript methods (like `activate()` or `open()`) on the component instance. **The HTML attribute is the sole contract.** 
+State changes are driven declaratively via the `data-ln-tabs-active` attribute. **The HTML attribute is the sole source of truth.**
 
-Clicks, URL hash changes, localStorage restorations, and external scripts all change state by writing the active attribute on the wrapper:
+Clicks, URL hash changes, localStorage restorations, and external scripts all change state by writing the active attribute on the wrapper, dispatching request events, or calling the instance helper method:
 
 ```js
 const tabs = document.getElementById('user-tabs');
 
 // Canonical write — switches the active tab
 tabs.setAttribute('data-ln-tabs-active', 'settings');
+
+// Or via command event
+tabs.dispatchEvent(new CustomEvent('ln-tabs:request-select', { detail: { key: 'settings' }, bubbles: true }));
+
+// Or via instance attribute-bridge method
+tabs.lnTabs.select('settings');
 
 // Read-only state query
 tabs.getAttribute('data-ln-tabs-active'); // Returns currently active key
@@ -82,19 +88,29 @@ Mixing both trigger types in one group falls back to persist mode and logs a con
 
 ---
 
-## 4. Transition Events
+## 4. Transition & Command Events
 
 All events bubble. The dispatch target is the wrapper element.
 
-| Event | Cancelable | `detail` | Dispatched When |
-|---|---|---|---|
-| **`ln-tabs:change`** | No | `{ key, tab, panel }` | After the active panel is swapped, ARIA synced, focus moved (if enabled), and localStorage updated. |
-| **`ln-tabs:destroyed`** | No | `{ target }` | Inside `destroy()`, after removing click and hashchange listeners. |
+| Event | Direction | Cancelable | `detail` | Dispatched / Handled When |
+|---|:---:|:---:|---|---|
+| **`ln-tabs:request-select`** | Listens | No | `{ key }` | Command event sent by coordinators or external triggers to select a tab. |
+| **`ln-tabs:before-change`** | Emits | **Yes** | `{ key, previousKey, tab, panel, target }` | Dispatched before active tab changes. Calling `event.preventDefault()` cancels the switch and reverts attribute/hash state. |
+| **`ln-tabs:change`** | Emits | No | `{ key, previousKey, tab, panel, target }` | After the active panel is swapped, ARIA synced, focus moved (if enabled), and localStorage updated. |
+| **`ln-tabs:destroyed`** | Emits | No | `{ target }` | Inside `destroy()`, after removing click and hashchange listeners. |
 
 ```js
+// Example: Prevent tab change if unsaved changes exist
+document.addEventListener('ln-tabs:before-change', (e) => {
+    if (hasUnsavedChanges) {
+        e.preventDefault();
+        alert('Please save changes before leaving this tab.');
+    }
+});
+
 // Example: Listen for tab changes
 document.addEventListener('ln-tabs:change', (e) => {
-    console.log(`Active tab in ${e.target.id} changed to: ${e.detail.key}`);
+    console.log(`Active tab changed from ${e.detail.previousKey} to: ${e.detail.key}`);
 });
 ```
 

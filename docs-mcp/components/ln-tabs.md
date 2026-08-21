@@ -107,11 +107,23 @@ The `ln-tabs` component (~180 lines JS) manages N-way exclusive selection of con
 | `data-ln-panel` | Panel | String | — | Marks element as a content panel matching a trigger key. |
 | `data-ln-persist` | Host | String / Flag | — | Enables `localStorage` persistence for button triggers. |
 
+### Programmatic JS API
+
+The initialized instance is accessible via `dom.lnTabs`.
+
+| Property / Method | Type | Description |
+|---|---|---|
+| `dom.lnTabs.activeKey` | `String` | Currently active tab key. |
+| `dom.lnTabs.select(key)` | `Function` | Selects a tab by writing `setAttribute('data-ln-tabs-active', key)`. |
+| `dom.lnTabs.destroy()` | `Function` | Cleans up event listeners, dispatches `ln-tabs:destroyed`, and deletes instance reference. |
+
 ### Events API
 
 | Event | Direction | Cancelable | Description | `detail` Object |
-|---|---|---|---|---|
-| `ln-tabs:change` | Emits | No | Dispatched after panel visibility, ARIA attributes, focus, and persistence updates complete. | `{ key: String, tab: HTMLElement, panel: HTMLElement }` |
+|---|:---:|:---:|---|---|
+| `ln-tabs:request-select` | Listens | No | Command request event sent to switch active tab. | `{ key: String }` |
+| `ln-tabs:before-change` | Emits | **Yes** | Dispatched before switching active tab. Calling `preventDefault()` cancels switch and reverts state. | `{ key: String, previousKey: String, tab: HTMLElement, panel: HTMLElement, target: HTMLElement }` |
+| `ln-tabs:change` | Emits | No | Dispatched after panel visibility, ARIA attributes, focus, and persistence updates complete. | `{ key: String, previousKey: String, tab: HTMLElement, panel: HTMLElement, target: HTMLElement }` |
 | `ln-tabs:destroyed` | Emits | No | Dispatched when `destroy()` is called on the instance. | `{ target: HTMLElement }` |
 
 ---
