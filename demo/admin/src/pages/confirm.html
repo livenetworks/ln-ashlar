@@ -45,18 +45,14 @@
 
 					<!-- Anatomy -->
 					<section class="section-card">
-						<header><h3>Anatomy</h3></header>
+						<header><h3>Anatomy &amp; Three Usage Variants</h3></header>
 						<main>
-							<p>The minimum invocation is one attribute on the destructive button:</p>
-<pre><code>&lt;button data-ln-confirm="Are you sure?"&gt;Delete record&lt;/button&gt;</code></pre>
-
-							<h4>Two render modes — text button and icon-only button</h4>
-							<p>The component branches at confirm time on whether the button has any text content at construction (it captures <code>dom.textContent.trim()</code> in the constructor and reads it back later):</p>
+							<p><code>ln-confirm</code> acts as an in-place micro-component gate. It supports three distinct usage modes:</p>
 							<ul>
-								<li><strong>Text button</strong> (constructor saw non-empty text) — confirm-state replaces <code>textContent</code> with the prompt. The button visually says "Are you sure?" while armed and reverts to its original label on revert.</li>
-								<li><strong>Icon-only button</strong> (constructor saw empty text) — confirm-state finds the inner <code>svg.ln-icon use</code>, swaps its <code>href</code> to <code>#ln-icon-check</code>, adds <code>.ln-confirm-tooltip</code> on the button, and writes the prompt text into <code>data-tooltip-text</code>. CSS reads the attribute and renders an <code>::after</code> tooltip bubble above the button. <code>ln-icon</code> watches the <code>&lt;use href&gt;</code> mutation and ensures the swap target icon is in the sprite.</li>
+								<li><strong>1. Two-Element Mode (Recommended &amp; HTML-First):</strong> Separates idle and active contents using <code>[data-ln-confirm-idle]</code> and <code>[data-ln-confirm-active]</code>. Zero string replacement in JS, preserving complex child nodes (icons, badges) and ensuring 100% translatable HTML.</li>
+								<li><strong>2. Shorthand Attribute Mode:</strong> Uses <code>data-ln-confirm="Are you sure?"</code> on simple text buttons. The prompt string is read directly from the HTML attribute.</li>
+								<li><strong>3. Icon-Only Mode:</strong> Automatically detects buttons with only an SVG icon. Swaps the <code>href</code> to <code>#ln-icon-check</code>, applies <code>.ln-confirm-tooltip</code>, and displays the prompt in a CSS tooltip bubble.</li>
 							</ul>
-							<p>The branch is determined ONCE at construction. If you mount <code>data-ln-confirm</code> on an empty-text button and later add text content, the next confirm cycle still treats it as an icon button (because <code>this.originalText</code> was captured empty on construction). Re-init by calling <code>btn.lnConfirm.destroy()</code> followed by re-creating the instance, or set the text BEFORE the attribute lands.</p>
 
 							<h4>What state goes where</h4>
 							<p>"Should this button confirm before action?" lives on <code>data-ln-confirm</code> (presence). "Currently armed?" lives on <code>data-confirming="true"</code> on the button — the public CSS hook. "Auto-revert timeout (seconds)" lives on <code>data-ln-confirm-timeout</code>. "Original label" / "original icon <code>href</code>" live on the JS instance, captured at construction (text) or at first arm (icon).</p>
@@ -73,6 +69,8 @@
 								<thead><tr><th>Attribute</th><th>On element</th><th>Owned by</th><th>Description</th></tr></thead>
 								<tbody>
 									<tr><td><code>data-ln-confirm="text"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code></td><td>Marks the button as confirm-gated. Value is the prompt text shown on first click. If empty, defaults to <code>"Confirm?"</code>. Captured at construction; mutating later does not propagate to the live instance.</td></tr>
+									<tr><td><code>data-ln-confirm-idle</code></td><td>Child element</td><td>Markup</td><td>The content displayed while the button is in the idle state (Two-Element Mode).</td></tr>
+									<tr><td><code>data-ln-confirm-active</code></td><td>Child element</td><td>Markup</td><td>The content displayed while the button is armed in confirming state (Two-Element Mode). Should initially have <code>hidden</code>.</td></tr>
 									<tr><td><code>data-ln-confirm-timeout="3"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code></td><td>Auto-revert delay in seconds. Default <code>3</code>. Accepts decimals (<code>"1.5"</code>). Read fresh at first-click time inside <code>_startTimer</code>; mutating mid-armed does NOT extend the running timer (NOT in the observer's <code>attributeFilter</code>).</td></tr>
 									<tr><td><code>data-confirming="true"</code></td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Set by JS while the button is armed. Removed on second click, on timer fire, or on <code>destroy()</code>. Public CSS hook for the confirming state.</td></tr>
 									<tr><td><code>.ln-confirm-tooltip</code> (class)</td><td><code>&lt;button&gt;</code></td><td><code>ln-confirm</code> (auto)</td><td>Added in icon-only mode while armed. Removed on revert. Marker for the tooltip-bubble CSS in <code>@mixin confirm-tooltip</code>.</td></tr>
@@ -83,27 +81,9 @@
 						</main>
 					</section>
 
-					<!-- Basic Example -->
+					<!-- Two-Element Example (Recommended) -->
 					<section class="section-card" data-demo-html>
-						<header><h3>Example — Text buttons</h3></header>
-						<main>
-							<p>Click once: the button morphs into the prompt and turns red. Click within 3 seconds: the click passes through (these have no <code>type="submit"</code> and no <code>onclick</code>, so nothing happens — that's the point: the component does not <em>cause</em> an action, it gates an existing one). Wait 3 seconds: the button auto-reverts.</p>
-							<div class="demo-actions">
-								<button data-ln-confirm="Are you sure?">Delete record</button>
-								<button data-ln-confirm="Reset settings?">Reset defaults</button>
-							</div>
-						</main>
-						<script type="text/plain" data-demo-scss>
-// Gated buttons have data-ln-confirm:
-button[data-ln-confirm] {
-    transition: all var(--transition-base);
-}
-						</script>
-					</section>
-
-					<!-- Two-Element Example -->
-					<section class="section-card" data-demo-html>
-						<header><h3>Example — Two-Element Mode (Recommended)</h3></header>
+						<header><h3>Example 1 — Two-Element Mode (HTML-First &amp; Recommended)</h3></header>
 						<main>
 							<p>Two-element mode isolates the idle content (text, icons, selection counters) from the confirm state content, ensuring no DOM elements are destroyed on first click. Defining both states in the HTML also ensures 100% translatable text with no JS hardcoding.</p>
 							<div class="demo-actions">
@@ -129,6 +109,24 @@ button[data-ln-confirm] {
 						</main>
 						<script type="text/plain" data-demo-scss>
 // Two-element mode supports complex layout:
+button[data-ln-confirm] {
+    transition: all var(--transition-base);
+}
+						</script>
+					</section>
+
+					<!-- Basic Example -->
+					<section class="section-card" data-demo-html>
+						<header><h3>Example 2 — Shorthand Declarative Attribute</h3></header>
+						<main>
+							<p>Click once: the button morphs into the prompt text defined in the <code>data-ln-confirm</code> attribute. Click within 3 seconds: the click passes through to the platform action. Wait 3 seconds: the button auto-reverts.</p>
+							<div class="demo-actions">
+								<button data-ln-confirm="Are you sure?">Delete record</button>
+								<button data-ln-confirm="Reset settings?">Reset defaults</button>
+							</div>
+						</main>
+						<script type="text/plain" data-demo-scss>
+// Gated buttons have data-ln-confirm:
 button[data-ln-confirm] {
     transition: all var(--transition-base);
 }
