@@ -160,12 +160,23 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 			dispatch(self.dom, 'ln-editor:blur', { target: self.dom });
 		};
 
+		this._onTextareaInput = function () {
+			if (self._surface.innerHTML !== self._textarea.value) {
+				self._surface.innerHTML = self._textarea.value;
+				dispatch(self.dom, 'ln-editor:changed', {
+					html: self._textarea.value,
+					target: self.dom
+				});
+			}
+		};
+
 		// ─── Bind events ──────────────────────────────────────
 		this._surface.addEventListener('input', this._onInput);
 		this._surface.addEventListener('paste', this._onPaste);
 		this._surface.addEventListener('keydown', this._onKeydown);
 		this._surface.addEventListener('focus', this._onFocus);
 		this._surface.addEventListener('blur', this._onBlur);
+		this._textarea.addEventListener('input', this._onTextareaInput);
 
 		if (toolbar) {
 			toolbar.addEventListener('mousedown', this._onMousedownToolbar);
@@ -344,14 +355,21 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 			form.removeEventListener('reset', this._onFormReset);
 		}
 
-		// Restore textarea visibility
+		// Restore textarea visibility and remove input listener
 		if (this._textarea) {
+			if (this._onTextareaInput) {
+				this._textarea.removeEventListener('input', this._onTextareaInput);
+			}
 			this._textarea.removeAttribute('data-ln-editor-source');
 		}
 
-		// Remove link popover if present
-		const popover = this.dom.querySelector('.ln-editor__link-popover');
-		if (popover) popover.remove();
+		// Close/remove link popover if present
+		if (this._closeLinkPopover) {
+			this._closeLinkPopover();
+		} else {
+			const popover = this.dom.querySelector('.ln-editor__link-popover');
+			if (popover) popover.remove();
+		}
 
 		dispatch(this.dom, 'ln-editor:destroyed', { target: this.dom });
 		delete this.dom[DOM_ATTRIBUTE];
@@ -520,9 +538,10 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 		// Save the current selection range so we can restore it
 		const savedRange = sel.getRangeAt(0).cloneRange();
 
-		// Remove any existing popover
-		const existing = instance.dom.querySelector('.ln-editor__link-popover');
-		if (existing) existing.remove();
+		// Clean up any existing active popover for this instance
+		if (instance._closeLinkPopover) {
+			instance._closeLinkPopover();
+		}
 
 		// Clone popover template
 		const fragment = cloneTemplateScoped(instance.dom, 'ln-editor-link-popover', 'ln-editor');
@@ -554,9 +573,15 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 			sel.addRange(savedRange);
 		}
 
+		function _cleanupPopover() {
+			document.removeEventListener('mousedown', _onDocClick);
+			instance._closeLinkPopover = null;
+			popover.remove();
+		}
+
 		function _apply() {
 			const url = input.value.trim();
-			popover.remove();
+			_cleanupPopover();
 
 			_restoreSelection();
 			instance._surface.focus();
@@ -594,10 +619,23 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 		}
 
 		function _cancel() {
-			popover.remove();
+			_cleanupPopover();
 			_restoreSelection();
 			instance._surface.focus();
 		}
+
+		function _dismiss() {
+			_cleanupPopover();
+		}
+
+		function _onDocClick(e) {
+			const inThisLinkBtn = instance.dom.contains(e.target) && e.target.closest('[data-ln-editor-action="link"]');
+			if (!popover.contains(e.target) && !inThisLinkBtn) {
+				_dismiss();
+			}
+		}
+
+		instance._closeLinkPopover = _cleanupPopover;
 
 		confirmBtn.addEventListener('click', _apply);
 		removeBtn.addEventListener('click', _cancel);
@@ -611,6 +649,8 @@ import { dispatch, dispatchCancelable, registerComponent, cloneTemplateScoped } 
 				_cancel();
 			}
 		});
+
+		document.addEventListener('mousedown', _onDocClick);
 	}
 
 	// ─── Init ─────────────────────────────────────────────────

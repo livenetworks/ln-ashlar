@@ -4,9 +4,9 @@
 					<section class="section-card">
 						<header><h3>Overview &amp; Philosophy</h3></header>
 						<main>
-							<p>A dropdown menu is one of the most common layout controls in web applications. While simple on the surface, a premium dropdown menu requires complex engineering: it must close when the user clicks outside, close on viewport resizes, teleport to the body to escape parent stacking contexts (preventing <code>overflow: hidden</code> clippings), and position itself dynamically to fit the viewport.</p>
+							<p>A dropdown menu is one of the most common layout controls in web applications. While simple on the surface, a premium dropdown menu requires robust engineering: it must close when the user clicks outside, close on viewport resizes, promote to the browser's top layer to escape parent stacking contexts (preventing <code>overflow: hidden</code> clippings), provide full ARIA APG keyboard roving navigation, and position itself dynamically to fit the viewport.</p>
 
-							<p>In <code>ln-ashlar</code>, we solve this elegantly. <strong><code>ln-dropdown</code> is a coordinator wrapper</strong> that layers this menu-grade behavior on top of a standard <strong><code>ln-toggle</code></strong> instance. The dropdown component does not re-implement state; it delegates 100% of its open/closed state management to the underlying toggle primitive, adding click-outside listeners and positioning math on top.</p>
+							<p>In <code>ln-ashlar</code>, we solve this elegantly. <strong><code>ln-dropdown</code> is a coordinator wrapper</strong> that layers this menu-grade behavior on top of a standard <strong><code>ln-toggle</code></strong> instance. The dropdown component does not re-implement state; it delegates 100% of its open/closed state management to the underlying toggle primitive, adding top-layer popover promotion, keyboard roving focus, click-outside listeners, and positioning math on top.</p>
 
 							<div class="alert-box" style="margin: var(--size-md) 0; padding: var(--size-md); background: var(--bg-sunken); border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm);">
 								<h4 style="margin-top: 0; color: var(--color-primary); display: flex; align-items: center; gap: var(--size-xs);">
@@ -14,12 +14,12 @@
 									The Dropdown Doctrine
 								</h4>
 								<p style="margin: 0; font-size: var(--font-size-sm); line-height: 1.6;">
-									A dropdown does not own its state. <strong>The open/closed state lives entirely in the <code>data-ln-toggle</code> attribute of the inner menu.</strong> Click-outside rules and resize handlers close the menu simply by writing <code>data-ln-toggle="close"</code> back to the menu. The observer on the toggle runs the close pipeline, which the dropdown coordinates. <strong>The HTML attribute is the sole contract.</strong>
+									A dropdown does not own its state. <strong>The open/closed state lives entirely in the <code>data-ln-toggle</code> attribute of the inner menu.</strong> Click-outside rules, Escape keypresses, and resize handlers close the menu simply by writing <code>data-ln-toggle="close"</code> back to the menu. The observer on the toggle runs the close pipeline, which the dropdown coordinates. <strong>The HTML attribute is the sole contract.</strong>
 								</p>
 							</div>
 
-							<h4>Layout Teleportation &amp; Positioning</h4>
-							<p>When a dropdown menu is activated, <code>ln-dropdown</code> teleports the menu element to the <code>&lt;body&gt;</code> element to prevent clipping under scrollable containers. It then measures the trigger element and matches its position right-aligned below the trigger. It automatically flips above if vertical space is restricted, or left-aligned if horizontal space is restricted, returning the menu back to its original DOM position when closed.</p>
+							<h4>Top-Layer Promotion &amp; Positioning</h4>
+							<p>When a dropdown menu is activated, <code>ln-dropdown</code> promotes the menu element to the top layer using the native Popover API (<code>popover="manual"</code>, <code>showPopover()</code>) to prevent clipping under scrollable containers or nested cards. It then measures the trigger element and matches its position right-aligned below the trigger (or according to <code>data-ln-dropdown-position</code>). It automatically flips above if vertical space is restricted, and removes positioning styles when closed.</p>
 
 							<p>For the complete developer reference, see the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-dropdown/README.md"><code>ln-dropdown</code> README</a> and the <a href="https://github.com/livenetworks/ln-ashlar/blob/main/js/ln-dropdown/README.md">architecture reference</a>.</p>
 						</main>
@@ -33,7 +33,9 @@
 							<table>
 								<thead><tr><th>Attribute</th><th>On element</th><th>Description</th></tr></thead>
 								<tbody>
-									<tr><td data-label="Attribute"><code>data-ln-dropdown</code></td><td data-label="On element">wrapper</td><td data-label="Description">Creates a dropdown instance</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-dropdown</code></td><td data-label="On element">wrapper</td><td data-label="Description">Creates a dropdown coordinator instance</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-dropdown-position</code></td><td data-label="On element">wrapper</td><td data-label="Description">Target placement (e.g. <code>"bottom-start"</code>, <code>"bottom-end"</code>, default: <code>"bottom-end"</code>)</td></tr>
+									<tr><td data-label="Attribute"><code>data-ln-dropdown-placement</code></td><td data-label="On element">menu (auto)</td><td data-label="Description">Computed winning placement for CSS styling hooks</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-toggle</code></td><td data-label="On element">menu</td><td data-label="Description">The toggle target (menu element)</td></tr>
 									<tr><td data-label="Attribute"><code>data-ln-toggle-for</code></td><td data-label="On element">button</td><td data-label="Description">Trigger button, references menu by ID</td></tr>
 								</tbody>
@@ -44,15 +46,16 @@
 
 					<!-- Example 1: Basic -->
 					<section class="section-card" data-demo-html>
-						<header><h3>Example — Basic Dropdown</h3></header>
+						<header><h3>Example 1 — Basic Dropdown (with ARIA Keyboard Navigation)</h3></header>
 						<main>
+							<p>Click the button or press <code>ArrowDown</code> on it to open. Use <code>ArrowDown</code>, <code>ArrowUp</code>, <code>Home</code>, and <code>End</code> to navigate through the menu items. Press <code>Escape</code> to close and return focus to the trigger.</p>
 							<div data-ln-dropdown>
 								<button data-ln-toggle-for="demo-menu-1" type="button">Options</button>
 								<ul id="demo-menu-1" data-ln-toggle>
-									<li><button>Edit</button></li>
-									<li><button>Duplicate</button></li>
-									<li><button>Archive</button></li>
-									<li><button>Delete</button></li>
+									<li><button type="button">Edit</button></li>
+									<li><button type="button">Duplicate</button></li>
+									<li><button type="button">Archive</button></li>
+									<li><button type="button">Delete</button></li>
 								</ul>
 							</div>
 						</main>
@@ -68,26 +71,26 @@
 						</script>
 					</section>
 
-					<!-- Example 2: Multiple -->
+					<!-- Example 2: Configurable Placement -->
 					<section class="section-card" data-demo-html>
-						<header><h3>Example — Multiple Dropdowns</h3></header>
+						<header><h3>Example 2 — Configurable Placement</h3></header>
 						<main>
-							<p>Each dropdown operates independently. Opening one does not close the other (unless you click outside).</p>
-							<div>
-								<div data-ln-dropdown>
-									<button data-ln-toggle-for="demo-menu-2a" type="button">Actions</button>
-									<ul id="demo-menu-2a" data-ln-toggle>
-										<li><button>Save</button></li>
-										<li><button>Export</button></li>
-										<li><button>Print</button></li>
+							<p>Use <code>data-ln-dropdown-position</code> to specify the desired alignment (e.g. <code>bottom-start</code> for left-aligned buttons).</p>
+							<div style="display: flex; gap: var(--size-md);">
+								<div data-ln-dropdown data-ln-dropdown-position="bottom-start">
+									<button data-ln-toggle-for="demo-menu-start" type="button">Left Aligned (bottom-start)</button>
+									<ul id="demo-menu-start" data-ln-toggle>
+										<li><button type="button">Action 1</button></li>
+										<li><button type="button">Action 2</button></li>
+										<li><button type="button">Action 3</button></li>
 									</ul>
 								</div>
-								<div data-ln-dropdown>
-									<button data-ln-toggle-for="demo-menu-2b" type="button">Settings</button>
-									<ul id="demo-menu-2b" data-ln-toggle>
-										<li><button>Profile</button></li>
-										<li><button>Preferences</button></li>
-										<li><button>Logout</button></li>
+								<div data-ln-dropdown data-ln-dropdown-position="bottom-end">
+									<button data-ln-toggle-for="demo-menu-end" type="button">Right Aligned (bottom-end)</button>
+									<ul id="demo-menu-end" data-ln-toggle>
+										<li><button type="button">Action 1</button></li>
+										<li><button type="button">Action 2</button></li>
+										<li><button type="button">Action 3</button></li>
 									</ul>
 								</div>
 							</div>
@@ -96,7 +99,6 @@
 						[data-ln-dropdown] {
 							@include dropdown;
 
-							// The dropdown menu/list
 							[data-ln-toggle] {
 								@include dropdown-menu;
 							}

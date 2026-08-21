@@ -115,11 +115,14 @@ The dropdown menu can accommodate avatars, dividers (`<hr>`), and complex action
 | Attribute | Element | Type / Values | Default | Description |
 |---|---|---|---|---|
 | `data-ln-dropdown` | Wrapper (`<div>`) | Presence | Required | Initializes the dropdown coordinator on the wrapper element. |
+| `data-ln-dropdown-position` | Wrapper (`<div>`) | Placement String | `"bottom-end"` | Configuration attribute for target placement (`"bottom-start"`, `"bottom-end"`, `"top-start"`, `"top-end"`, etc.). |
+| `data-ln-dropdown-placement` | Menu (`<ul>`) | Placement String (auto) | — | Dynamically written by JS with the computed winning placement for CSS styling hooks. |
 | `data-ln-toggle-for` | Trigger (`<button>`) | Target Menu `id` | Required | Binds the trigger button to the target dropdown menu. |
 | `data-ln-toggle` | Menu (`<ul>`) | `"open"` \| `"close"` | `"close"` | The primary state indicator. Set to `"open"` to show the menu. |
 | `data-ln-dropdown-menu`| Menu (`<ul>`) | Attribute | Added by JS | Automatically applied by JS to bind base dropdown layout styles. |
 | `role="menu"` | Menu (`<ul>`) | Value | Added by JS | Automatically applied to define the semantic structure of the menu. |
-| `role="menuitem"` | Menu Items (`<li>`) | Value | Added by JS | Automatically applied to direct child items of the dropdown list. |
+| `role="none"` | List Items (`<li>`) | Value | Added by JS | Applied to `<li>` wrappers to remove list semantics and prevent ARIA collisions. |
+| `role="menuitem"` | Action Elements (`<button>`, `<a>`) | Value | Added by JS | Applied to interactive actions inside the menu with roving `tabindex`. |
 | `aria-haspopup` | Trigger | `"menu"` | Added by JS | Set automatically to inform screen readers of the pop-up behavior. |
 | `aria-expanded` | Trigger | `"true"` \| `"false"` | `"false"` | Dynamically synced with the open/close state of the dropdown. |
 
@@ -296,20 +299,26 @@ The visual layer is separated from JavaScript logic. Custom styles are provided 
 
 ## 5. Accessibility (ARIA) & Common Pitfalls
 
-### ARIA & Keyboard
+### ARIA & Keyboard Navigation (APG Compliance)
 
 - **Trigger Button:**
   - Receives `aria-haspopup="menu"` on initialization.
   - Toggles `aria-expanded="true"` when the menu is open, and `aria-expanded="false"` when closed.
+  - Pressing `ArrowDown` or `ArrowUp` on the focused trigger opens the menu and immediately focuses the first or last menu item.
 - **Menu Wrapper (`<ul>`):**
   - Receives `role="menu"` automatically.
-- **Menu Items (`<li>`):**
-  - All direct child list items receive `role="menuitem"`.
-- **Selection State (Single-select):**
-  - The currently active choice is marked with `aria-current="true"`.
-- **Keyboard Navigation:**
-  - `Tab` moves focus sequentially through the interactive links or buttons inside the menu.
-  - `Esc` or clicking outside closes the menu and returns focus back to the trigger button.
+- **List Items (`<li>`):**
+  - Receive `role="none"` to strip redundant list semantics and maintain clean hierarchy.
+- **Menu Items (`<button>`, `<a>`):**
+  - Receive `role="menuitem"`.
+  - Implements **Roving Tabindex**: the active/first item has `tabindex="0"` while all sibling items have `tabindex="-1"`.
+- **Keyboard Controls:**
+  - `ArrowDown`: Moves focus to the next menu item (with cyclic wrap-around).
+  - `ArrowUp`: Moves focus to the previous menu item (with cyclic wrap-around).
+  - `Home`: Jumps focus directly to the first menu item.
+  - `End`: Jumps focus directly to the last menu item.
+  - `Escape`: Closes the dropdown (`data-ln-toggle="close"`), calls `e.stopPropagation()`, and returns focus to the trigger button.
+  - `Tab`: Closes the dropdown gracefully and allows native focus movement to the next page element.
 
 ### Common Pitfalls & Anti-patterns
 

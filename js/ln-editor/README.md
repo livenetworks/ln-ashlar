@@ -247,7 +247,7 @@ Finds the `<textarea>`, reads its value as the initial HTML, builds a `contentEd
 
 ### Content sync
 
-One-way, continuous: every surface `input` event copies `innerHTML` into the textarea's `value` and dispatches `ln-editor:changed`. The textarea is never the source of truth after construction — it is a submit-time mirror.
+Continuous and bidirectional: every surface `input` event copies `innerHTML` into the textarea's `value` and dispatches `ln-editor:changed`. Conversely, synthetic `input` events on the `<textarea>` (e.g. from form population via `ln-form` or coordinators) update `surface.innerHTML` and notify listeners without losing caret position during normal editing.
 
 ### Formatting flow
 
@@ -263,11 +263,11 @@ On every document `selectionchange`: bail if the selection isn't inside the surf
 
 ### Link insertion
 
-Requires a page-authored `<template data-ln-template="ln-editor-link-popover">` — the editor never generates this markup. Flow: save the current selection range, detect if already inside an `<a>` (pre-fill), clone the template via `cloneTemplateScoped`, insert it after the toolbar; on confirm, restore the saved range and either update the existing link's `href` or run `execCommand('createLink')` (adding `rel="noopener noreferrer"` for new links) — either path dispatches `ln-editor:changed` exactly once. A missing template makes the link action a silent no-op.
+Requires a page-authored `<template data-ln-template="ln-editor-link-popover">` — the editor never generates this markup. Flow: save the current selection range, detect if already inside an `<a>` (pre-fill), clone the template via `cloneTemplateScoped`, insert it after the toolbar; on confirm, restore the saved range and either update the existing link's `href` or run `execCommand('createLink')` (adding `rel="noopener noreferrer"` for new links) — either path dispatches `ln-editor:changed` exactly once. Dismissing via outside-click closes the popover without yanking focus; explicit Cancel/Escape restores selection to the editing surface.
 
 ### Destroy
 
-Removes all surface/toolbar/document listeners, removes the surface node, restores textarea visibility (removes `data-ln-editor-source`), removes any open link popover, dispatches `ln-editor:destroyed`.
+Removes all surface, toolbar, textarea, document, and form listeners, removes the surface node, restores textarea visibility (removes `data-ln-editor-source`), dismisses any active link popover, and dispatches `ln-editor:destroyed`.
 
 ### Permanent constraints
 

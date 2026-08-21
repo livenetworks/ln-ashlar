@@ -16,6 +16,18 @@
 				"src/ln-dropdown.js"
 			]
 		},
+		"data-ln-dropdown-placement": {
+			"direction": "runtime",
+			"sources": [
+				"src/ln-dropdown.js"
+			]
+		},
+		"data-ln-dropdown-position": {
+			"direction": "author",
+			"sources": [
+				"src/ln-dropdown.js"
+			]
+		},
 		"data-ln-toggle": {
 			"direction": "both",
 			"sources": [

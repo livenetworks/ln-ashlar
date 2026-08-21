@@ -438,6 +438,7 @@
 									</div>
 								</div>
 								<div class="form-actions">
+									<button type="button" id="demo-form-populate">Load record</button>
 									<button type="button" id="demo-form-reset">Reset</button>
 									<button type="submit">Save</button>
 								</div>
@@ -612,6 +613,30 @@ el.lnEditor.destroy();</code></pre>
 				}
 				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
 					detail: { type: 'success', title: 'Saved', message: 'Form data captured — see raw output below.' }
+				}));
+			});
+		}
+
+		var populateBtn = document.getElementById('demo-form-populate');
+		if (populateBtn && formEl) {
+			populateBtn.addEventListener('click', function () {
+				var mockRecord = {
+					title: 'Architecture Review: Layer 1 Components',
+					content: '<h3>Overview</h3><p>Rich text editor content synchronized automatically via <code>ln-form</code> populate flow.</p><ul><li>Zero JS display text</li><li>Authored HTML templates</li><li>Bidirectional input sync</li></ul>'
+				};
+				if (formEl.lnForm) {
+					formEl.lnForm.populate(mockRecord);
+				} else {
+					var titleInput = formEl.querySelector('[name="title"]');
+					var contentTextarea = formEl.querySelector('[name="content"]');
+					if (titleInput) titleInput.value = mockRecord.title;
+					if (contentTextarea) {
+						contentTextarea.value = mockRecord.content;
+						contentTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+					}
+				}
+				window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+					detail: { type: 'info', title: 'Populated', message: 'Loaded mock record into form fields.' }
 				}));
 			});
 		}
