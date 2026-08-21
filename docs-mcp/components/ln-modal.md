@@ -30,9 +30,9 @@ Key responsibilities include:
 > [!IMPORTANT]
 > **What the component does NOT do (Orthogonality Doctrine):**
 > - **Focus Trapping:** It does not manually trap focus (the native `<dialog>` handles focus trapping automatically when opened via `showModal()`).
-> - **Form Submissions & Auto-close:** It does NOT listen to `ln-form:success` or manage form submit states. Form submission and completion handling belong strictly to **Layer 2 Coordinators** (such as `ln-modal-coordinator` or `ln-data-coordinator`).
+> - **Form Submissions & Auto-close:** It does NOT listen to `ln-ajax:success` or manage form submit states. Form submission and completion handling belong strictly to **Layer 2 Coordinators** (such as `ln-ui-coordinator` or `ln-data-coordinator`).
 > - **Validation Error Inspection:** It does not check form validation classes (`.has-error`, `[data-ln-validate-error]`).
-> - **DOM Data Population:** It does not populate form fields or display elements directly (handled by `ln-fill` / `ln-modal-coordinator`).
+> - **DOM Data Population:** It does not populate form fields or display elements directly (handled by `ln-fill` / `ln-ui-coordinator`).
 
 ---
 
@@ -161,7 +161,7 @@ body.ln-modal-open {
 
 > [!CAUTION]
 > 1. **Manual Focus Trap Implementation:** Do not write custom focus trap keyboard listeners. Native `<dialog>` handles focus trapping.
-> 2. **Form Event Handling inside Modal:** Do not add form submission or AJAX auto-closing logic inside `ln-modal`. Use a Layer 2 Coordinator (`ln-modal-coordinator` or `ln-data-coordinator`).
+> 2. **Form Event Handling inside Modal:** Do not add form submission or AJAX auto-closing logic inside `ln-modal`. Use a Layer 2 Coordinator (`ln-ui-coordinator` or `ln-data-coordinator`).
 
 ---
 
@@ -218,7 +218,7 @@ sequenceDiagram
 
 ## 7. Related Components
 
-- [`ln-modal-coordinator`](./ln-modal-coordinator.md) — Layer 2 Coordinator that handles triggers, hash addressing, data filling, and form auto-closing.
+- [`ln-ui-coordinator`](./ln-ui-coordinator.md) — Layer 2 Coordinator that handles triggers, hash addressing, data filling, and form auto-closing.
 - [`ln-fill`](./ln-fill.md) — Fills form and display elements from data records.
 - [`ln-form`](./ln-form.md) — Manages form submission pipelines.
 

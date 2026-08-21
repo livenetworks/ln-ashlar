@@ -13,7 +13,7 @@ In `ln-ashlar`, the core design principle is **Three-Layer Architecture** and **
 1. **State & Accessibility (JavaScript + native `<dialog>`)**: The `ln-modal` script manages the binary `open` / `close` attribute contract (`data-ln-modal="open|close"`) and suppresses `<body>` scrolling (toggling the `.ln-modal-open` class on `<body>`). Focus placement, native focus trapping, ESC dismissal, and focus restoration are delegated to the native `<dialog>` element via `showModal()`/`close()`.
 2. **The Content Root (HTML)**: The modal content root is structured in standard semantic HTML (such as `<dialog class="ln-modal" data-ln-modal>`).
 3. **Visual Presentation & Sizing (CSS)**: Overlay backdrops, sticky headers/footers, and scrollable body areas are styled using Vanilla CSS. Sizing variants (`modal-sm|md|lg|xl`) are applied via SCSS mixins on `> form`, keeping markup clean.
-4. **Layer Separation (Coordinators)**: `ln-modal` does NOT handle form submissions, auto-closing on AJAX success, validation error inspection, or DOM data population. Those responsibilities belong strictly to **Layer 2 Coordinators** (e.g. `ln-modal-coordinator` or `ln-data-coordinator`).
+4. **Layer Separation (Coordinators)**: `ln-modal` does NOT handle form submissions, auto-closing on AJAX success, validation error inspection, or DOM data population. Those responsibilities belong strictly to **Layer 2 Coordinators** (e.g. `ln-ui-coordinator` or `ln-data-coordinator`).
 
 ---
 
@@ -147,7 +147,7 @@ Do not use visual layout utility classes in your markup. Apply structural sizing
 Any modal with an `id` is hash-addressable (e.g. `#user-modal` or `#user-modal:42`).
 When an `id` modal opens, `ln-modal` emits `ln-modal:open` containing `{ hashNs, param }` in `e.detail`.
 
-Coordinators (such as `ln-modal-coordinator`) intercept hash changes and coordinate data fetching / form populating via `ln-fill`.
+Coordinators (such as `ln-ui-coordinator`) intercept hash changes and coordinate data fetching / form populating via `ln-fill`.
 
 ---
 
@@ -160,7 +160,7 @@ Coordinators (such as `ln-modal-coordinator`) intercept hash changes and coordin
 
 ## 🔧 Internals
 
-Source: `js/ln-modal/src/ln-modal.js` (~137 lines, native `<dialog>`-backed). Trigger delegation (`data-ln-modal-for`), hash-addressing, and form-fill on open are NOT implemented here — they live in `js/ln-modal-coordinator/src/ln-modal-coordinator.js` (a Layer 2 coordinator per §1.4). This section covers `ln-modal.js` only.
+Source: `js/ln-modal/src/ln-modal.js` (~137 lines, native `<dialog>`-backed). Trigger delegation (`data-ln-modal-for`), hash-addressing, and form-fill on open are NOT implemented here — they live in `js/ln-ui-coordinator/src/ln-ui-coordinator.js` (a Layer 2 coordinator per §1.4). This section covers `ln-modal.js` only.
 
 ### Single source of truth
 

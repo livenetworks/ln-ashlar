@@ -229,7 +229,7 @@ For detailed manual instructions, properties, attributes, and events of individu
 | **Toggle** | 🎚️ **[ln-toggle docs](js/ln-toggle/README.md)** | 📄 **[toggle architecture](js/ln-toggle/README.md)** |
 | **Accordion** | 📂 **[ln-accordion docs](js/ln-accordion/README.md)** | 📄 **[accordion architecture](js/ln-accordion/README.md)** |
 | **Modal** | 🪟 **[ln-modal docs](js/ln-modal/README.md)** | 📄 **[modal architecture](js/ln-modal/README.md)** |
-| **Modal Coordinator** | 🎛️ **[ln-modal-coordinator docs](js/ln-modal-coordinator/README.md)** | 📄 **[modal-coordinator architecture](js/ln-modal-coordinator/README.md)** |
+| **UI Coordinator** | 🎛️ **[ln-ui-coordinator docs](js/ln-ui-coordinator/README.md)** | 📄 **[ui-coordinator architecture](js/ln-ui-coordinator/README.md)** |
 | **Tabs** | 🔖 **[ln-tabs docs](js/ln-tabs/README.md)** | 📄 **[tabs architecture](js/ln-tabs/README.md)** |
 | **Toast** | 🔔 **[ln-toast docs](js/ln-toast/README.md)** | 📄 **[toast architecture](js/ln-toast/README.md)** |
 | **Dropdown** | 🔽 **[ln-dropdown docs](js/ln-dropdown/README.md)** | 📄 **[dropdown architecture](js/ln-dropdown/README.md)** |

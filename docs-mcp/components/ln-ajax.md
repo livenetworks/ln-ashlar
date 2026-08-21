@@ -109,10 +109,10 @@ Excludes specific nested elements (links/forms) from being intercepted inside an
 | `ln-ajax:before-start` | Emits | Yes | Fires before sending the request. Calling `e.preventDefault()` cancels the fetch. | `{ method: String, url: String }` |
 | `ln-ajax:start` | Emits | No | Fires when the request is sent and loading spinners are attached. | `{ method: String, url: String }` |
 | `ln-ajax:success` | Emits | No | Fires upon receiving a successful response (HTTP 2xx). | `{ method: String, url: String, data: Object }` |
-| `ln-ajax:error` | Emits | No | Fires when the request fails (network error or HTTP error codes). | `{ method: String, url: String, status: Number, data: Object }` |
+| `ln-ajax:error` | Emits | No | Fires when the request fails (network error or HTTP error codes). | `{ method: String, url: String, status: Number, data: Object\|null, error: Error\|null }` |
 | `ln-ajax:complete` | Emits | No | Fires after clean-up actions have completed. | `{ method: String, url: String }` |
 
-*Notification Integration:* If the server response contains a `message` envelope (e.g. `{ "message": { "type": "success", "body": "Saved!" } }`), `ln-ajax` automatically dispatches the `ln-toast:enqueue` event to the `window` object.
+*Notification Integration:* Toast notifications upon AJAX success or failure are handled by Layer 2 coordinators (e.g., [`ln-ui-coordinator`](./ln-ui-coordinator.md)), which listen for `ln-ajax:success` and `ln-ajax:error` and dispatch `ln-toast:enqueue`.
 
 ---
 

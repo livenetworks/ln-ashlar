@@ -617,9 +617,9 @@ export function pendingCount() {
 
 // With holds active, fn is queued and later drained SYNCHRONOUSLY by releaseInit;
 // with no holds, fn is deferred via setTimeout(fn, 0) to preserve
-// ln-modal-coordinator's original setTimeout(_bootSync, 0) scheduling.
+// ln-ui-coordinator's original setTimeout(_bootSync, 0) scheduling.
 // registerComponent only calls queueBoot when pendingCount() > 0, so the
-// zero-hold branch below is exercised solely by ln-modal-coordinator's own call.
+// zero-hold branch below is exercised solely by ln-ui-coordinator's own call.
 export function queueBoot(fn) {
 	if (typeof window !== 'undefined') {
 		window.lnCore = window.lnCore || {};

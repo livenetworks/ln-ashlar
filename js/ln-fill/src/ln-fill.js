@@ -46,7 +46,7 @@ import { } from '../../ln-core';
 
 		// Prevent double fill: if this trigger is a hash-bound anchor (e.g. href="#user-modal:142"),
 		// we skip the click-based fill. The resulting hash change will trigger ln-modal:open,
-		// and the ln-modal-coordinator will request the fill via ln-fill:request.
+		// and the ln-ui-coordinator will request the fill via ln-fill:request.
 		const href = trigger.getAttribute('href');
 		if (href && href.indexOf('#') !== -1) return;
 

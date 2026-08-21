@@ -108,7 +108,7 @@ All four skip `null`/`undefined` values, preserving existing content. Source: `j
 |---|---|---|---|
 | `window.lnCore.lnFill` | `(container: HTMLElement, record: Object\|null)` | `void` | Dispatches the `ln-fill` CustomEvent (with `record` as `detail`) at every `[data-ln-form]` / `[data-ln-fillable]` element found inside `container`. Guards against nested fillables re-triggering on the same target and is idempotent — safe to call repeatedly without double-binding. |
 
-Coordinators (e.g. [`ln-modal-coordinator`](./ln-modal-coordinator.md)) call `window.lnCore.lnFill` directly when they already hold a resolved record and need to bypass the click/attribute parsing steps. Authors relying purely on declarative markup never call it directly — `data-ln-fill-form` triggers and `ln-fill:request` events cover the common cases and call the helper internally.
+Coordinators (e.g. [`ln-ui-coordinator`](./ln-ui-coordinator.md)) call `window.lnCore.lnFill` directly when they already hold a resolved record and need to bypass the click/attribute parsing steps. Authors relying purely on declarative markup never call it directly — `data-ln-fill-form` triggers and `ln-fill:request` events cover the common cases and call the helper internally.
 
 ### Events API
 
@@ -145,7 +145,7 @@ Coordinators (e.g. [`ln-modal-coordinator`](./ln-modal-coordinator.md)) call `wi
 sequenceDiagram
     participant User
     participant Trigger as Button[data-ln-fill-form]
-    participant Coordinator as Coordinator (ln-modal-coordinator)
+    participant Coordinator as Coordinator (ln-ui-coordinator)
     participant FillJS as ln-fill Global listener
     participant DOM as document DOM
     participant Form as Form[id="formId"]
@@ -175,4 +175,4 @@ sequenceDiagram
 ## 7. Related Components
 
 - [`ln-form`](./ln-form.md) — the primary target for form filling.
-- [`ln-modal-coordinator`](./ln-modal-coordinator.md) — coordinator bridging hash modal opens to `ln-fill` requests.
+- [`ln-ui-coordinator`](./ln-ui-coordinator.md) — coordinator bridging hash modal opens to `ln-fill` requests.

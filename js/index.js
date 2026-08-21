@@ -21,7 +21,7 @@ import './ln-validate/src/ln-validate.js';
 import './ln-ajax/src/ln-ajax.js';
 import './ln-router/src/ln-router.js';
 import './ln-modal/src/ln-modal.js';
-import './ln-modal-coordinator/src/ln-modal-coordinator.js';
+import './ln-ui-coordinator/src/ln-ui-coordinator.js';
 import './ln-number/src/ln-number.js';
 import './ln-date/src/ln-date.js';
 import './ln-nav/src/ln-nav.js';

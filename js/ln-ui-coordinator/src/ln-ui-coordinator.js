@@ -1,10 +1,35 @@
-import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick, queueBoot } from '../../ln-core';
+import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick, queueBoot, buildDict } from '../../ln-core';
 
 (function () {
-	const DOM_SELECTOR = 'data-ln-modal-coordinator';
-	const DOM_ATTRIBUTE = 'lnModalCoordinator';
+	const DOM_SELECTOR = 'data-ln-ui-coordinator';
+	const DOM_ATTRIBUTE = 'lnUiCoordinator';
+	const DICT_SELECTOR = 'data-ln-ui-coordinator-dict';
 
 	if (window[DOM_ATTRIBUTE] !== undefined) return;
+
+	// Resolve the active coordinator dictionary for a given event target.
+	// Climbs the DOM hierarchy of UI coordinators and merges dictionary keys from
+	// root to leaf so nested coordinators inherit and selectively override outer translations.
+	function _getCoordinatorDict(target) {
+		const dict = {};
+		let current = target;
+		const hosts = [];
+
+		while (current) {
+			const host = current.closest('[' + DOM_SELECTOR + ']');
+			if (!host) break;
+			if (host[DOM_ATTRIBUTE] && host[DOM_ATTRIBUTE].dict) {
+				hosts.unshift(host[DOM_ATTRIBUTE].dict);
+			}
+			current = host.parentElement;
+		}
+
+		for (const hDict of hosts) {
+			Object.assign(dict, hDict);
+		}
+
+		return dict;
+	}
 
 	// Helper to resolve target modal from trigger element / wrapper / ID
 	function _findTargetModal(triggerEl, modalId) {
@@ -113,8 +138,8 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 					target.dataset.lnModalMode = hasRecord ? 'edit' : 'new';
 				}
 
-				if (hasRecord && window.lnCore && typeof window.lnCore.fill === 'function') {
-					window.lnCore.fill(target, record);
+				if (hasRecord && window.lnCore && typeof window.lnCore.lnFill === 'function') {
+					window.lnCore.lnFill(target, record);
 				} else if (target.dataset.lnModalMode === 'new') {
 					_resetModalForm(target);
 				}
@@ -213,10 +238,7 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 						sessionStorage.removeItem(pendingKey);
 					} catch (err) {}
 
-					const hasErrors = !!(
-						document.querySelector('.has-error, [data-ln-validate-error], .form-error, .alert-danger') ||
-						modal.querySelector('.has-error, [data-ln-validate-error], .form-error, .alert-danger')
-					);
+					const hasErrors = !!modal.querySelector('[data-ln-validate-error], [aria-invalid="true"]');
 
 					if (!hasErrors) {
 						hashSet(hashNs, null);
@@ -289,25 +311,80 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 		queueBoot(_bootSync);
 	}
 
-	// ─── Form Submission Auto-Close Mediation ────────────────
+	// ─── AJAX Submission Mediation & Toast Routing ──────────
 
-	function _handleFormSuccess(e) {
-		const modal = e.target.closest('[data-ln-modal]');
-		if (!modal || !modal.lnModal) return;
+	function _handleAjaxSuccess(e) {
+		const detail = e.detail || {};
+		const data = detail.data;
 
-		if (modal.id) {
-			try {
-				sessionStorage.removeItem('ln-modal-pending:' + modal.id);
-			} catch (err) {}
-			hashSet(modal.id, null);
+		// 1. Dispatch UI toast notification if response envelope contains a message
+		if (data && data.message) {
+			const msg = data.message;
+			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+				detail: {
+					type: msg.type || 'success',
+					title: msg.title || '',
+					message: msg.body || ''
+				}
+			}));
 		}
 
-		dispatch(modal, 'ln-modal:request-close', {});
-		_resetModalForm(modal);
+		// 2. Auto-close modal and clean up if the submitting element was inside a modal
+		const modal = e.target.closest('[data-ln-modal]');
+		if (modal && modal.lnModal) {
+			if (modal.id) {
+				try {
+					sessionStorage.removeItem('ln-modal-pending:' + modal.id);
+				} catch (err) {}
+				hashSet(modal.id, null);
+			}
+
+			dispatch(modal, 'ln-modal:request-close', {});
+			_resetModalForm(modal);
+		}
 	}
 
-	document.addEventListener('ln-form:success', _handleFormSuccess);
-	document.addEventListener('ln-ajax:success', _handleFormSuccess);
+	function _handleAjaxError(e) {
+		const detail = e.detail || {};
+		const data = detail.data;
+		const status = detail.status || 0;
+		const dict = _getCoordinatorDict(e.target);
+
+		// 1. If server returned structured error message, toast it
+		if (data && data.message) {
+			const msg = data.message;
+			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+				detail: {
+					type: msg.type || 'error',
+					title: msg.title || '',
+					message: msg.body || ''
+				}
+			}));
+		} else if (status === 0) {
+			// 2. Genuine network failure (DNS / offline / abort / connection dropped)
+			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+				detail: {
+					type: 'error',
+					title: dict['network-error-title'] || '',
+					message: dict['network-error'] || 'Network error'
+				}
+			}));
+		} else {
+			// 3. Server HTTP error (status >= 400 or HTML error page) without structured JSON message
+			window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
+				detail: {
+					type: 'error',
+					title: dict['server-error-title'] || '',
+					message: dict['server-error'] || 'Server error'
+				}
+			}));
+		}
+
+		// Note: We deliberately do NOT close the modal on error so form validation feedback remains visible
+	}
+
+	document.addEventListener('ln-ajax:success', _handleAjaxSuccess);
+	document.addEventListener('ln-ajax:error', _handleAjaxError);
 
 	// ─── Hash Cleanup & Reset on Modal Close ───────────────
 
@@ -333,13 +410,15 @@ import { registerComponent, dispatch, hashGet, hashSet, hashParse, hashLinkClick
 
 	function _component(dom) {
 		this.dom = dom;
+		this.dict = buildDict(dom, DICT_SELECTOR);
 		return this;
 	}
 
 	_component.prototype.destroy = function () {
 		if (!this.dom[DOM_ATTRIBUTE]) return;
+		this.dict = {};
 		delete this.dom[DOM_ATTRIBUTE];
 	};
 
-	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-modal-coordinator');
+	registerComponent(DOM_SELECTOR, DOM_ATTRIBUTE, _component, 'ln-ui-coordinator');
 })();

@@ -386,7 +386,7 @@ fetch('/tpl.html').then(html => {
 - `releaseInit()` — Decrements the global boot holds counter. If the counter reaches zero, it drains the queue (`window.lnCore._bootQueue`) in push order.
 - `pendingCount()` — Returns the current number of active boot holds.
 - `queueBoot(fn)` — If `pendingCount() > 0`, queues the function in `_bootQueue`. Otherwise, schedules it immediately using `setTimeout(fn, 0)` (to match standard event loop scheduling).
-- Used internally by `registerComponent` and `ln-modal-coordinator` to prevent race conditions during async initialization.
+- Used internally by `registerComponent` and `ln-ui-coordinator` to prevent race conditions during async initialization.
 
 ---
 

@@ -1058,7 +1058,7 @@
 						"new",
 						"edit"
 					],
-					"read_by": "ln-modal-coordinator",
+					"read_by": "ln-ui-coordinator",
 					"consumed_by": "both",
 					"role": "state",
 					"description": "Mode state set on dialog by coordinator ('new' vs 'edit')."
@@ -1076,23 +1076,36 @@
 				}
 			}
 		},
-		"ln-modal-coordinator": {
+		"ln-ui-coordinator": {
 			"element": {
-				"recommended_tag": "dialog",
-				"tag_enforced": true,
-				"note": "Layer 2 coordinator attached to dialog modal for form fill/reset."
+				"recommended_tag": "any",
+				"tag_enforced": false,
+				"note": "Layer 2 coordinator for modals, AJAX submit mediation, and toast routing."
 			},
 			"attributes": {
-				"data-ln-modal-coordinator": {
+				"data-ln-ui-coordinator": {
 					"type": "boolean",
-					"read_by": "ln-modal-coordinator",
+					"read_by": "ln-ui-coordinator",
 					"consumed_by": "js",
 					"role": "marker",
-					"description": "Activates modal coordinator for hash navigation and form fill."
+					"description": "Activates UI coordinator for modal hash navigation, AJAX toasts, and dictionary hosting."
+				},
+				"data-ln-ui-coordinator-dict": {
+					"type": "string",
+					"enum": [
+						"network-error",
+						"network-error-title",
+						"server-error",
+						"server-error-title"
+					],
+					"read_by": "ln-ui-coordinator",
+					"consumed_by": "js",
+					"role": "config",
+					"description": "Translatable error messages for network and server toast fallbacks."
 				},
 				"data-ln-modal-for": {
 					"type": "string",
-					"read_by": "ln-modal-coordinator",
+					"read_by": "ln-ui-coordinator",
 					"consumed_by": "js",
 					"role": "input",
 					"description": "Binds trigger button to target modal ID."

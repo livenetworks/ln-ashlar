@@ -71,7 +71,7 @@ The server must return JSON with the `application/json` Content-Type:
 
 * **`title`**: Updates `document.title` on page swap.
 * **`content`**: Key-value pairs matching container `id` selectors to their new `innerHTML` content.
-* **`message`**: Optional. If present, automatically dispatches `ln-toast:enqueue` on the `window` to trigger native notifications.
+* **`message`**: Optional. When present, handled and dispatched as UI toasts by Layer 2 coordinators (such as `ln-ui-coordinator`). The `message.body` property is required to display the notification text; `message.title` and `message.type` (`"success"` | `"error"` | `"warning"` | `"info"`) are optional.
 
 ---
 
@@ -84,7 +84,7 @@ All events are dispatched on the initiating element (`<a>` or `<form>`) and bubb
 | `ln-ajax:before-start` | **Yes** | Fires before any network activity. Call `e.preventDefault()` to cancel. | `{ method, url }` |
 | `ln-ajax:start` | No | Fires as the loader class is added and fetch begins. | `{ method, url }` |
 | `ln-ajax:success` | No | Fires after successful DOM swaps. | `{ method, url, data }` |
-| `ln-ajax:error` | No | Fires on HTTP status failure or network rejects. | `{ method, url, status, data }` or `{ method, url, error }` |
+| `ln-ajax:error` | No | Fires on HTTP status failure or network rejects. | `{ method, url, status, data, error }` |
 | `ln-ajax:complete` | No | Fires at the very end of the lifecycle (success or error). | `{ method, url }` |
 
 ---

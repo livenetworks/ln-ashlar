@@ -990,6 +990,7 @@ The component calls `_ensureDefaultItemTemplate()` at the top of `_initUpload()`
 | ln-tabs | Instance | `data-ln-tabs` | Tab navigation — URL hash (anchor triggers) or localStorage persist (button triggers) |
 | ln-nav | Instance | `data-ln-nav` | Active link highlighter |
 | ln-modal | Instance | `data-ln-modal` | Modal dialog |
+| ln-ui-coordinator | Coordinator | `data-ln-ui-coordinator` | UI mediator — modals, AJAX, forms, triggers, and toast notifications |
 | ln-toast | Functional | `data-ln-toast` | Toast notifications |
 | ln-upload | Functional | `data-ln-upload` | File upload |
 | ln-ajax | Functional | `data-ln-ajax` | AJAX navigation |

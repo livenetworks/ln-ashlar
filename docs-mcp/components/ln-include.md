@@ -126,4 +126,4 @@ sequenceDiagram
 - [`ln-core`](./ln-core.md) — Provides the `holdInit()` / `releaseInit()` boot-gating mechanism `ln-include` uses.
 - [`ln-table`](./ln-table.md) — A typical consumer of templates gated by `ln-include`.
 - [`ln-router`](./ln-router.md) — Consumes `<template data-ln-route>` views whose content `ln-include` can populate, with no changes to the router.
-- [`ln-modal-coordinator`](./ln-modal-coordinator.md) — Coordinates SSR modal templates that may also depend on `ln-include`-loaded content finishing before opening.
+- [`ln-ui-coordinator`](./ln-ui-coordinator.md) — Coordinates SSR modal templates that may also depend on `ln-include`-loaded content finishing before opening.

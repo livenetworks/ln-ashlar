@@ -39,7 +39,7 @@ The corollary binds the listening side. An event merely bubbling past is not per
 
 Rule 4 admits exceptions, but only where the behaviour genuinely is not coordination. A page-level keyboard shortcut, or a fan-out helper that must reach any matching element wherever it lives, has no host whose subtree could contain its work — scoping it would not make it correct, it would make it useless.
 
-Two such exceptions ship today: `ln-modal-coordinator`, which listens at `document` because its triggers are anywhere on the page and its targets are addressed by id, and `ln-table-coordinator`'s `/` focus shortcut, which is a page affordance rather than coordination between a host and its children.
+Two such exceptions ship today: `ln-ui-coordinator`, which listens at `document` because its triggers are anywhere on the page and its targets are addressed by id, and `ln-table-coordinator`'s `/` focus shortcut, which is a page affordance rather than coordination between a host and its children.
 
 What makes them sanctioned rather than sloppy is that they are named. An exception must be deliberate, documented where it lives, and justified by the impossibility of scoping — not by convenience. A `document` listener that *could* have been bound to a host is a defect, whatever it is called.
 
@@ -98,26 +98,26 @@ sequenceDiagram
   3. It measures the trigger and places the menu right-aligned beneath it.
   4. It listens for viewport resizes and outside clicks to safely write `data-ln-toggle="close"` back to the menu when needed.
 
-#### 3. `ln-modal-coordinator` (Bridging Triggers, Hash Navigation, Fill, and Submit)
-* **Children:** none — a global document listener (mirrors `ln-fill`); see [Sanctioned Exceptions](#sanctioned-exceptions) above for why this is a deliberate exception to Rule 4.
-* **The Rule:** a modal must open, get its form filled, and auto-close on
-  successful submit — without `ln-modal`, `ln-fill`, or `ln-form` knowing
-  about each other.
+#### 3. `ln-ui-coordinator` (Bridging Triggers, Hash Navigation, Fill, AJAX, and Submit)
+* **Children:** acts on targets across the page with dictionary scoped to `[data-ln-ui-coordinator]`; see [Sanctioned Exceptions](#sanctioned-exceptions) above for why global trigger delegation is a deliberate exception to Rule 4.
+* **The Rule:** a modal must open, get its form filled, auto-close on
+  successful AJAX submit, and toast response messages — without `ln-modal`,
+  `ln-fill`, `ln-ajax`, or `ln-toast` knowing about each other.
 * **Flow:**
   1. A trigger (`[data-ln-modal-for]` button or `<a href="#modalId:42">` hash
      anchor) is clicked; the coordinator intercepts it, updates the URL hash
      via `hashSet` (preserving foreign segments), and determines mode
      (`new` vs `edit`) from the presence of a hash param.
   2. It extracts `data-ln-modal-*` / `data-ln-fill-*` payload attributes from
-     the trigger, dispatches `ln-fill:request` to populate the form, and
+     the trigger, calls `lnFill` to populate the form, and
      dispatches `ln-modal:request-open` to the target `ln-modal`.
-  3. On `ln-form:success` / `ln-ajax:success` bubbling from the form, it
-     cleans the hash, dispatches `ln-modal:request-close`, and dispatches
-     `ln-form:request-reset`.
-  4. On `ln-form:error` / `ln-ajax:error`, it does nothing — the modal stays
-     open so inline validation errors remain visible.
+  3. On `ln-ajax:success` bubbling from the form, it
+     dispatches `ln-toast:enqueue` if a response message is present, cleans the hash,
+     dispatches `ln-modal:request-close`, and resets modal forms.
+  4. On `ln-ajax:error`, it dispatches error toast notifications and keeps the
+     modal open so inline validation errors remain visible.
 
-See also: [Hash-state doctrine](hash-state.md) — the cross-cutting rules for namespace ownership, foreign-segment preservation, and anchor interception that make hash-param coordinators like `ln-modal-coordinator` safe to compose.
+See also: [Hash-state doctrine](hash-state.md) — the cross-cutting rules for namespace ownership, foreign-segment preservation, and anchor interception that make hash-param coordinators like `ln-ui-coordinator` safe to compose.
 
 ---
 
@@ -281,8 +281,8 @@ require no coordinator at all (see [`js/ln-fill/README.md`](../../js/ln-fill/REA
 programmatic and not click-triggered (e.g. a store conflict handler, an import
 workflow, or a deep-link pre-fill). Pattern: on `ln-modal:before-open`, call
 `window.lnCore.lnFill(modalEl, record)`. For the hash-param deep-link case specifically,
-the shipped generic `ln-modal-coordinator` handles this automatically (source:
-`js/ln-modal-coordinator/src/ln-modal-coordinator.js`); the manual
+the shipped generic `ln-ui-coordinator` handles this automatically (source:
+`js/ln-ui-coordinator/src/ln-ui-coordinator.js`); the manual
 `before-open` + `lnFill` pattern remains valid for non-hash programmatic fills.
 Pass `record` to fill; pass `null` to reset. The helper fans out to all `[data-ln-form]`
 and `[data-ln-fillable]` descendants — coordinator never calls `lnForm.reset()` /

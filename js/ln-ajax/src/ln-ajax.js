@@ -146,19 +146,31 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '..
 		fetch(finalUrl, options)
 			.then(function (response) {
 				const ok = response.ok;
-				return response.json().then(function (data) {
-					return { ok: ok, status: response.status, data: data };
+				const status = response.status;
+				return response.text().then(function (text) {
+					let data = null;
+					let parseError = null;
+					if (text && text.trim()) {
+						try {
+							data = JSON.parse(text);
+						} catch (err) {
+							parseError = err;
+						}
+					}
+					return { ok: ok, status: status, data: data, parseError: parseError };
 				});
 			})
 			.then(function (result) {
+				const status = result.status;
 				const data = result.data;
+				const parseError = result.parseError;
 
-				if (result.ok) {
-					if (data.title) {
+				if (result.ok && !parseError) {
+					if (data && data.title) {
 						document.title = data.title;
 					}
 
-					if (data.content) {
+					if (data && data.content) {
 						for (const targetId in data.content) {
 							const targetElement = document.getElementById(targetId);
 							if (targetElement) {
@@ -178,27 +190,21 @@ import { guardBody, dispatch, dispatchCancelable, shouldInterceptLink } from '..
 
 					dispatch(element, 'ln-ajax:success', { method: method, url: finalUrl, data: data });
 				} else {
-					dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, status: result.status, data: data });
-				}
-
-				// Auto-dispatch response message as a toast event.
-				// Any listener (ln-toast by default) can pick it up.
-				if (data.message) {
-					const msg = data.message;
-					window.dispatchEvent(new CustomEvent('ln-toast:enqueue', {
-						detail: {
-							type: msg.type || (result.ok ? 'success' : 'error'),
-							title: msg.title || '',
-							message: msg.body || ''
-						}
-					}));
+					dispatch(element, 'ln-ajax:error', {
+						method: method,
+						url: finalUrl,
+						status: status,
+						data: data,
+						error: parseError || null
+					});
 				}
 
 				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
 			})
 			.catch(function (error) {
-				dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, error: error });
+				// True network failure / DNS / offline / abort (fetch itself threw)
+				dispatch(element, 'ln-ajax:error', { method: method, url: finalUrl, status: 0, data: null, error: error });
 				dispatch(element, 'ln-ajax:complete', { method: method, url: finalUrl });
 				_cleanup();
 			});

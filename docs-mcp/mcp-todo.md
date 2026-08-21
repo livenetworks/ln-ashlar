@@ -78,7 +78,7 @@
 #### Overlay и интеракција
 
 - [x] **ln-modal**
-- [x] **ln-modal-coordinator**
+- [x] **ln-ui-coordinator**
 - [x] **ln-popover**
 - [x] **ln-dropdown**
 - [x] **ln-tooltip**
